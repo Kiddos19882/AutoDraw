@@ -845,3 +845,46 @@ def test_automatic_optimizer_uses_precise_cost_when_no_mode_fits(monkeypatch):
     assert report["fits_budget"] is False
     assert report["needs_multi_board_split"] is True
     assert plan["generation"]["mode"] == "contour"
+
+
+
+def test_stroke_router_uses_exactly_one_batch_per_marker_for_many_colors():
+    strokes = [
+        _route_stroke(0, 40.0, 41.0),
+        _route_stroke(1, 0.0, 1.0),
+        _route_stroke(2, 20.0, 21.0),
+        _route_stroke(1, 2.0, 3.0),
+        _route_stroke(0, 42.0, 43.0),
+        _route_stroke(2, 22.0, 23.0),
+    ]
+
+    ordered = orient_and_order_strokes(strokes, color_grouping=True)
+    colors = [stroke["color"]["palette_index"] for stroke in ordered]
+    switches = sum(first != second for first, second in zip(colors, colors[1:]))
+
+    assert set(colors) == {0, 1, 2}
+    assert switches == len(set(colors)) - 1
+    assert all(colors.index(color) == colors.index(color) for color in set(colors))
+    assert sum(colors[i] != colors[i - 1] for i in range(1, len(colors))) == 2
+
+
+def test_stroke_router_does_not_modify_source_paths_or_metadata():
+    strokes = [
+        _route_stroke(0, 8.0, 2.0),
+        _route_stroke(1, 30.0, 31.0),
+        _route_stroke(0, 1.0, 4.0),
+    ]
+    original = [
+        {
+            **stroke,
+            "points": [dict(point) for point in stroke["points"]],
+            "color": dict(stroke["color"]),
+        }
+        for stroke in strokes
+    ]
+
+    ordered = orient_and_order_strokes(strokes, color_grouping=True)
+
+    assert strokes == original
+    assert len(ordered) == len(original)
+    assert all(stroke is not source for stroke in ordered for source in original)
