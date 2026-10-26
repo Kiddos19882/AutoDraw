@@ -39,24 +39,34 @@ def _estimate_geometry_paint_cost(
         raise GeometryColorPlanError("Параметры модели расхода краски недопустимы.")
     by_color: dict[int, dict[str, Any]] = {}
     total_length = 0.0
+    total_single_pixel_count = 0
     for stroke in plan.get("strokes", []):
         points = [(float(p["x"]), float(p["y"])) for p in stroke["points"]]
         length = _path_length(points, bool(stroke.get("closed")))
+        is_single_pixel = len(points) == 2 and _point_distance(points[0], points[1]) <= _EPSILON
+        single_pixel_extra = 1.0 if is_single_pixel else 0.0
         total_length += length
+        total_single_pixel_count += int(is_single_pixel)
         color_index = int(stroke["color"]["palette_index"])
-        entry = by_color.setdefault(color_index, {"palette_index": color_index, "hex": stroke["color"]["hex"],
-                                                   "name": stroke["color"]["name"], "stroke_count": 0,
-                                                   "drawing_length_px": 0.0})
+        entry = by_color.setdefault(color_index, {
+            "palette_index": color_index, "hex": stroke["color"]["hex"],
+            "name": stroke["color"]["name"], "stroke_count": 0,
+            "drawing_length_px": 0.0, "single_pixel_stroke_count": 0,
+        })
         entry["stroke_count"] += 1
         entry["drawing_length_px"] += length
+        entry["single_pixel_stroke_count"] += int(is_single_pixel)
     stroke_count = len(plan.get("strokes", []))
-    total_cost = total_length + stroke_count * overhead
+    single_pixel_extra_path = float(total_single_pixel_count)
+    total_cost = total_length + single_pixel_extra_path + stroke_count * overhead
     per_color = []
     for entry in by_color.values():
-        cost = entry["drawing_length_px"] + entry["stroke_count"] * overhead
+        extra_path = float(entry["single_pixel_stroke_count"])
+        cost = entry["drawing_length_px"] + extra_path + entry["stroke_count"] * overhead
         per_color.append({
             **entry,
             "drawing_length_px": round(entry["drawing_length_px"], 3),
+            "single_pixel_extra_path_px": round(extra_path, 3),
             "estimated_total_ink_px_equivalent": round(cost, 3),
             "estimated_usage_percent": round(cost / budget * 100, 3),
             "risk_level": "over_budget" if cost >= budget else "high" if cost >= budget * 0.9 else "normal",
@@ -67,6 +77,9 @@ def _estimate_geometry_paint_cost(
         "model_id": "empirical-ink-cost-v1-polyline",
         "stroke_count": stroke_count,
         "drawing_length_px": round(total_length, 3),
+        "single_pixel_stroke_count": total_single_pixel_count,
+        "single_pixel_extra_path_px": round(single_pixel_extra_path, 3),
+        "effective_drawing_length_px": round(total_length + single_pixel_extra_path, 3),
         "stroke_overhead_px_equivalent": overhead,
         "paint_budget_px_equivalent": budget,
         "estimated_total_ink_px_equivalent": round(total_cost, 3),
@@ -215,6 +228,14 @@ def _skeleton_paths(skeleton: np.ndarray) -> list[tuple[list[tuple[float, float]
     visited: set[tuple[tuple[int, int], tuple[int, int]]] = set()
     paths: list[tuple[list[tuple[float, float]], bool]] = []
 
+    # Isolated one-pixel components have no graph edges, but still represent a
+    # drawable mark and must not disappear from a skeleton plan.
+    isolated = sorted(
+        (node for node in nodes if not adjacency[node]),
+        key=lambda p: (p[1], p[0]),
+    )
+    paths.extend(([(float(x), float(y))], False) for x, y in isolated)
+
     starts = sorted(
         (node for node in nodes if len(adjacency[node]) != 2),
         key=lambda p: (p[1], p[0]),
@@ -298,9 +319,23 @@ def _simplify_path(
         for first, last in pairs:
             x1, y1 = int(round(first[0])), int(round(first[1]))
             x2, y2 = int(round(last[0])), int(round(last[1]))
-            line = np.zeros((height, width), dtype=np.uint8)
-            cv2.line(line, (x1, y1), (x2, y2), 1, 1, lineType=cv2.LINE_8)
-            if bool(np.any((line > 0) & (safe_mask == 0))):
+            # Validate in a segment-sized ROI instead of allocating a full-canvas
+            # image for every RDP segment. This keeps simplification practical for
+            # large source images.
+            if not (
+                0 <= x1 < width and 0 <= x2 < width
+                and 0 <= y1 < height and 0 <= y2 < height
+            ):
+                return points
+            xmin, xmax = min(x1, x2), max(x1, x2)
+            ymin, ymax = min(y1, y2), max(y1, y2)
+            line = np.zeros((ymax - ymin + 1, xmax - xmin + 1), dtype=np.uint8)
+            cv2.line(
+                line, (x1 - xmin, y1 - ymin), (x2 - xmin, y2 - ymin),
+                1, 1, lineType=cv2.LINE_8,
+            )
+            region = safe_mask[ymin:ymax + 1, xmin:xmax + 1]
+            if bool(np.any((line > 0) & (region == 0))):
                 return points
     return candidate
 
@@ -423,6 +458,8 @@ def _summarize_plan(
     visible_pixel_count: int,
     transparent_pixel_count: int,
     generation: dict[str, Any],
+    source_visible_pixel_count: int | None = None,
+    pixel_counts_by_color: dict[int, int] | None = None,
     name: str,
     source: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
@@ -452,7 +489,7 @@ def _summarize_plan(
             "id": str(stroke["color"]["id"]),
             "name": str(stroke["color"]["name"]),
             "hex": str(stroke["color"]["hex"]),
-            "pixel_count": 0,
+            "pixel_count": int((pixel_counts_by_color or {}).get(color_index, 0)),
             "stroke_count": 0,
             "percentage_visible": 0.0,
         })
@@ -483,7 +520,14 @@ def _summarize_plan(
             "drawing_length_px": round(sum(lengths), 3),
             "pen_up_distance_px": round(pen_up, 3),
             "visible_pixel_count": visible,
-            "source_visible_pixel_count": visible,
+            "retained_visible_pixel_count": visible,
+            "source_visible_pixel_count": max(
+                0, int(visible if source_visible_pixel_count is None else source_visible_pixel_count)
+            ),
+            "geometry_coverage_note": (
+                "Счётчик относится к пикселям исходных цветовых слоёв, сохранённым после фильтрации "
+                "компонентов; это не оценка площади, фактически закрашенной векторными штрихами."
+            ),
             "transparent_pixel_count": max(0, int(transparent_pixel_count)),
             "single_pixel_stroke_count": single_pixel_count,
             "color_switch_count": switches,
@@ -526,6 +570,8 @@ def build_geometry_color_plan(
     tolerance = float(simplify_tolerance_px)
     if not math.isfinite(tolerance) or tolerance < 0:
         raise GeometryColorPlanError("Допуск RDP должен быть конечным неотрицательным числом.")
+    if isinstance(min_component_area, bool) or not isinstance(min_component_area, int) or min_component_area < 1:
+        raise GeometryColorPlanError("Минимальная площадь компонента должна быть целым числом от 1.")
     if isinstance(max_strokes, bool) or not isinstance(max_strokes, int) or max_strokes < 1:
         raise GeometryColorPlanError("Лимит штрихов должен быть положительным целым числом.")
 
@@ -541,6 +587,11 @@ def build_geometry_color_plan(
             raise GeometryColorPlanError("Целевой холст меньше исходной карты цветов.")
 
     visible_count = int(np.count_nonzero(indexes >= 0))
+    pixel_counts_by_color = {
+        int(color["index"]): int(np.count_nonzero(indexes == int(color["index"])))
+        for color in normalized_palette
+    }
+    retained_visible_count = visible_count
     strokes: list[dict[str, Any]] = []
     removed_component_pixels = 0
     if mode == "scanline":
@@ -571,6 +622,7 @@ def build_geometry_color_plan(
                 continue
             mask, removed = _connected_components(raw_mask, min_component_area)
             removed_component_pixels += removed
+            pixel_counts_by_color[color_index] = int(np.count_nonzero(mask))
             if not bool(np.any(mask)):
                 continue
 
@@ -579,7 +631,13 @@ def build_geometry_color_plan(
                 contours.sort(key=lambda c: (-abs(float(cv2.contourArea(c))), int(c[0][0][1]), int(c[0][0][0])))
                 for contour_index, contour in enumerate(contours, start=1):
                     raw_points = [(float(point[0][0]), float(point[0][1])) for point in contour]
-                    if len(raw_points) < 2:
+                    if not raw_points:
+                        continue
+                    if len(raw_points) == 1:
+                        strokes.append(_stroke_record(
+                            raw_points, color, closed=False, index=contour_index,
+                            path_type="contour-point", source_component_area=1,
+                        ))
                         continue
                     simplified = _simplify_path(
                         raw_points, closed=True, tolerance_px=tolerance, safe_mask=mask
@@ -630,11 +688,14 @@ def build_geometry_color_plan(
         "source_size": {"width": source_width, "height": source_height},
         "source_tile": dict(source_tile) if source_tile else None,
     }
+    retained_visible_count = sum(pixel_counts_by_color.values())
     plan = _summarize_plan(
         strokes, normalized_palette, width, height,
-        visible_pixel_count=visible_count,
+        visible_pixel_count=retained_visible_count,
         transparent_pixel_count=int(indexes.size - visible_count),
         generation=generation, name=f"Геометрический цветной план ({mode})", source=source,
+        source_visible_pixel_count=visible_count,
+        pixel_counts_by_color=pixel_counts_by_color,
     )
     return validate_geometry_color_plan(plan)
 
@@ -810,6 +871,11 @@ def optimize_geometry_plan_to_budget(
         original, normalized, mode=mode, simplify_tolerance_px=0.0,
         min_component_area=1, source_name=source_name,
     )
+    before_estimate = _estimate_geometry_paint_cost(
+        before,
+        stroke_overhead_px_equivalent=overhead,
+        paint_budget_px_equivalent=budget,
+    )
     scales = (1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3)
     tolerances = tuple(sorted(set((0.0, float(simplify_tolerance_px), 1.0, 2.0, 3.5, 5.0)))
                         )
@@ -849,7 +915,7 @@ def optimize_geometry_plan_to_budget(
                     "simplify_tolerance_px": tolerance,
                     "source_visible_pixel_count": source_visible,
                     "retained_visible_pixel_count": visible,
-                    "estimated_ink_before_px_equivalent": before["summary"]["paint_cost_estimate"]["estimated_total_ink_px_equivalent"],
+                    "estimated_ink_before_px_equivalent": before_estimate["estimated_total_ink_px_equivalent"],
                     "estimated_ink_after_px_equivalent": cost,
                     "target_cost_px_equivalent": round(target_cost, 3),
                     "paint_budget_px_equivalent": budget,
@@ -1033,7 +1099,11 @@ def split_geometry_plan_to_boards(
         draft = _summarize_plan(
             strokes, data["palette"], board_width, board_height,
             visible_pixel_count=0, transparent_pixel_count=board_width * board_height,
-            generation={**data["generation"], "tile": {"x": x0, "y": y0, "width": x1 - x0, "height": y1 - y0}},
+            generation={
+                **data["generation"],
+                "tile": {"x": x0, "y": y0, "width": x1 - x0, "height": y1 - y0},
+                "coverage_metrics_available": False,
+            },
             name=f"{data.get('name', 'Геометрический план')} — фрагмент",
             source={**data.get("source", {}), "source_tile": {"x": x0, "y": y0, "width": x1 - x0, "height": y1 - y0}},
         )
