@@ -360,8 +360,26 @@ class Stage6App:
             self.root.protocol("WM_DELETE_WINDOW", self._on_close)
 
     def _build_ui(self) -> None:
-        outer = ttk.Frame(self.container, padding=10)
-        outer.pack(fill="both", expand=True)
+        # Put the full executor interface inside a scrollable viewport. In the
+        # unified app this frame may be shorter than the standalone window, so
+        # the execution controls must remain reachable on smaller displays.
+        scroll_host = ttk.Frame(self.container)
+        scroll_host.pack(fill="both", expand=True)
+
+        self.scroll_canvas = tk.Canvas(scroll_host, highlightthickness=0, borderwidth=0)
+        self.scrollbar = ttk.Scrollbar(
+            scroll_host, orient="vertical", command=self.scroll_canvas.yview
+        )
+        self.scroll_canvas.configure(yscrollcommand=self.scrollbar.set)
+        self.scrollbar.pack(side="right", fill="y")
+        self.scroll_canvas.pack(side="left", fill="both", expand=True)
+
+        outer = ttk.Frame(self.scroll_canvas, padding=10)
+        self._scroll_window_id = self.scroll_canvas.create_window(
+            (0, 0), window=outer, anchor="nw"
+        )
+        outer.bind("<Configure>", self._sync_scroll_region)
+        self.scroll_canvas.bind("<Configure>", self._resize_scroll_content)
         ttk.Label(outer, text="Этапы 6/20 — исполнение одноцветного или цветного плана", font=("Segoe UI", 15, "bold")).pack(anchor="w")
         ttk.Label(
             outer,
@@ -517,6 +535,39 @@ class Stage6App:
         self.progress.pack(fill="x", pady=(8, 2))
         ttk.Label(outer, textvariable=self.progress_text_var).pack(anchor="w")
         ttk.Label(outer, textvariable=self.status_var, foreground="#245b42", wraplength=1280).pack(anchor="w", pady=(5, 0))
+
+        # Attach wheel handling to every existing descendant so the content
+        # scrolls even when the pointer is over a button, input, or preview.
+        self._bind_mousewheel_tree(outer)
+
+    def _sync_scroll_region(self, _event=None) -> None:
+        self.scroll_canvas.configure(scrollregion=self.scroll_canvas.bbox("all"))
+
+    def _resize_scroll_content(self, event) -> None:
+        # Keep the content as wide as the viewport to avoid a horizontal scrollbar.
+        self.scroll_canvas.itemconfigure(self._scroll_window_id, width=event.width)
+
+    def _on_scroll_wheel(self, event):
+        delta = getattr(event, "delta", 0)
+        if delta:
+            units = int(-delta / 120)
+            if units == 0:
+                units = -1 if delta > 0 else 1
+        elif getattr(event, "num", None) == 4:
+            units = -1
+        elif getattr(event, "num", None) == 5:
+            units = 1
+        else:
+            return None
+        self.scroll_canvas.yview_scroll(units, "units")
+        return "break"
+
+    def _bind_mousewheel_tree(self, widget: tk.Widget) -> None:
+        widget.bind("<MouseWheel>", self._on_scroll_wheel, add="+")
+        widget.bind("<Button-4>", self._on_scroll_wheel, add="+")
+        widget.bind("<Button-5>", self._on_scroll_wheel, add="+")
+        for child in widget.winfo_children():
+            self._bind_mousewheel_tree(child)
 
     def _load_settings(self) -> None:
         if not SETTINGS_PATH.exists():
