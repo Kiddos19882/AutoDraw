@@ -29,6 +29,29 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install test dependencies
-        run: python -m pip install --upgrade pip numpy pillow opencv-python pytest
-      - name: Run geometry planner tests
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt -r ..\executor\requirements.txt pytest
+      - name: Run preparation and geometry tests
+        run: python -m pytest -q tests
+
+  executor-tests:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: AutoDraw_Stage20/source/executor
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install executor test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt -r ..\preparation\requirements.txt pytest
+      - name: Run executor regression tests
+        env:
+          PYTHONPATH: ${{ github.workspace }}\AutoDraw_Stage20\source\preparation
         run: python -m pytest -q tests
