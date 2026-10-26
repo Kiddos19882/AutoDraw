@@ -8,6 +8,8 @@ from geometry_color_plan import (
     GeometryColorPlanError,
     _zhang_suen_thinning,
     build_geometry_color_plan,
+    load_geometry_color_plan,
+    save_geometry_color_plan,
     optimize_geometry_plan_to_budget,
     split_geometry_plan_to_boards,
     validate_geometry_color_plan,
@@ -474,3 +476,15 @@ def test_optimizer_can_recover_when_unoptimized_source_exceeds_stroke_cap(monkey
     assert report["baseline_plan_available"] is False
     assert report["scale"] < 1.0
     assert report["fits_budget"] is True
+
+
+def test_geometry_plan_json_round_trip(tmp_path):
+    plan = build_geometry_color_plan(_map(), PALETTE, mode="contour")
+    path = tmp_path / "geometry-plan.json"
+
+    saved_path = save_geometry_color_plan(path, plan)
+    loaded = load_geometry_color_plan(saved_path)
+
+    assert loaded["plan_type"] == "autodraw_geometry_color_plan"
+    assert loaded["summary"]["stroke_count"] == plan["summary"]["stroke_count"]
+    assert loaded["strokes"] == plan["strokes"]
