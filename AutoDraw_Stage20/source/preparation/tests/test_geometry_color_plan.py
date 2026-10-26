@@ -252,6 +252,7 @@ def test_rdp_does_not_simplify_through_another_color_layer():
 
 
 from stroke_order_optimizer import orient_and_order_strokes
+from geometry_budget_optimizer import _rescale_map_centered
 
 
 def _route_stroke(color_index: int, first_x: float, last_x: float) -> dict:
@@ -377,3 +378,27 @@ def test_validator_rejects_closed_path_with_fewer_than_three_distinct_points():
 
     with pytest.raises(GeometryColorPlanError):
         validate_geometry_color_plan(plan)
+
+
+def test_budget_rescaling_preserves_canvas_occupancy():
+    indexes = np.full((50, 60), -1, dtype=np.int32)
+    indexes[5:45, 8:52] = 0
+
+    resized = _rescale_map_centered(indexes, 0.5)
+
+    assert resized.shape == indexes.shape
+    ys, xs = np.where(resized >= 0)
+    assert xs.min() <= 10
+    assert xs.max() >= 49
+    assert ys.min() <= 7
+    assert ys.max() >= 42
+
+
+def test_budget_rescaling_keeps_each_pixel_on_a_valid_palette_index():
+    indexes = _map()
+
+    resized = _rescale_map_centered(indexes, 0.4)
+
+    assert resized.dtype.kind in "iu"
+    assert int(resized.min()) >= -1
+    assert int(resized.max()) < len(PALETTE)
