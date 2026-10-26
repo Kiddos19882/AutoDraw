@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 import hashlib
 import json
+import math
 from pathlib import Path
 from typing import Any, Callable
 
@@ -109,6 +110,7 @@ def adaptive_brush_plan_to_drawing_plan(brush_plan: Any, source_color_plan: Any)
     palette = color_plan["palette"]
     source_strokes = color_plan["strokes"]
     strokes: list[Stroke] = []
+    previous_source_index = -1
     for index, raw in enumerate(adaptive["strokes"], start=1):
         try:
             source_index = raw["source_stroke_index"]
@@ -120,6 +122,11 @@ def adaptive_brush_plan_to_drawing_plan(brush_plan: Any, source_color_plan: Any)
             raise ColorPlanExecutionError(f"Адаптивный штрих №{index} повреждён.") from exc
         if isinstance(source_index, bool) or not isinstance(source_index, int) or not 0 <= source_index < len(source_strokes):
             raise ColorPlanExecutionError(f"Адаптивный штрих №{index} ссылается на неверный исходный штрих.")
+        if source_index < previous_source_index:
+            raise ColorPlanExecutionError(
+                f"Адаптивный штрих №{index} нарушает исходный порядок рисования; порядок штрихов не должен переставляться."
+            )
+        previous_source_index = source_index
         if isinstance(brush_value, bool) or not isinstance(brush_value, int) or not 1 <= brush_value <= 20:
             raise ColorPlanExecutionError(f"В адаптивном штрихе №{index} отсутствует допустимый размер кисти.")
         if not isinstance(brush_data, dict) or brush_data.get("safe_for_color_map") is not True:
@@ -134,6 +141,30 @@ def adaptive_brush_plan_to_drawing_plan(brush_plan: Any, source_color_plan: Any)
             not (0 <= point.x <= width and 0 <= point.y < height) for point in points
         ):
             raise ColorPlanExecutionError(f"Координаты адаптивного штриха №{index} выходят за пределы холста.")
+        if points[1].x < points[0].x or not abs(points[0].y - points[1].y) <= 1e-7:
+            raise ColorPlanExecutionError(
+                f"Адаптивный штрих №{index} должен сохранять горизонтальное направление scanline."
+            )
+        try:
+            source_points = source_strokes[source_index]["points"]
+            source_x1 = float(source_points[0]["x"])
+            source_y1 = float(source_points[0]["y"])
+            source_x2 = float(source_points[1]["x"])
+            source_y2 = float(source_points[1]["y"])
+        except (KeyError, TypeError, ValueError, IndexError) as exc:
+            raise ColorPlanExecutionError(
+                f"Нельзя проверить геометрию исходного штриха №{source_index + 1}."
+            ) from exc
+        if (not all(map(math.isfinite, (source_x1, source_y1, source_x2, source_y2)))
+                or abs(source_y1 - source_y2) > 1e-7
+                or abs(points[0].y - source_y1) > 1e-7
+                or abs(points[1].y - source_y1) > 1e-7
+                or source_x2 < source_x1
+                or points[0].x < source_x1 - 1e-7
+                or points[1].x > source_x2 + 1e-7):
+            raise ColorPlanExecutionError(
+                f"Адаптивный штрих №{index} выходит за границы или строку своего исходного участка."
+            )
         if points[0].distance_to(points[1]) == 0:
             if points[0].x >= width:
                 raise ColorPlanExecutionError(f"Одиночный адаптивный штрих №{index} расположен за правой границей.")

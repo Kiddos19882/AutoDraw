@@ -155,6 +155,43 @@ class ColorPlanExecutionTests(unittest.TestCase):
         with self.assertRaisesRegex(ColorPlanExecutionError, "Масштаб кисти адаптивного плана"):
             adaptive_brush_plan_to_drawing_plan(wrong_scale, source)
 
+    def test_adaptive_plan_cannot_move_stroke_outside_its_source_run(self):
+        import copy
+
+        index_map = np.zeros((5, 50), dtype=np.int32)
+        source = build_color_scanline_plan(
+            index_map, self.color_plan["palette"], plan_name="adaptive geometry source"
+        )
+        brush_plan = build_adaptive_brush_plan(
+            index_map, source, brush_scale_x=50 / 460, brush_scale_y=5 / 240,
+            calibration_confirmed=True,
+        )
+        tampered = copy.deepcopy(brush_plan)
+        tampered["strokes"][1]["points"][1]["x"] = 50
+        with self.assertRaisesRegex(ColorPlanExecutionError, "выходит за границы"):
+            adaptive_brush_plan_to_drawing_plan(tampered, source)
+
+    def test_adaptive_plan_cannot_change_scanline_row_or_reverse_stroke_direction(self):
+        import copy
+
+        index_map = np.zeros((5, 50), dtype=np.int32)
+        source = build_color_scanline_plan(
+            index_map, self.color_plan["palette"], plan_name="adaptive row source"
+        )
+        brush_plan = build_adaptive_brush_plan(
+            index_map, source, brush_scale_x=50 / 460, brush_scale_y=5 / 240,
+            calibration_confirmed=True,
+        )
+        wrong_row = copy.deepcopy(brush_plan)
+        wrong_row["strokes"][0]["points"][0]["y"] += 1
+        with self.assertRaisesRegex(ColorPlanExecutionError, "горизонтальное направление|исходного участка"):
+            adaptive_brush_plan_to_drawing_plan(wrong_row, source)
+
+        reversed_run = copy.deepcopy(brush_plan)
+        reversed_run["strokes"][0]["points"] = list(reversed(reversed_run["strokes"][0]["points"]))
+        with self.assertRaisesRegex(ColorPlanExecutionError, "горизонтальное направление"):
+            adaptive_brush_plan_to_drawing_plan(reversed_run, source)
+
     def test_brush_slider_calibration_interpolates_and_rejects_stale_screen(self):
         calibration = BrushSliderCalibration(
             x_at_min=100, x_at_max=390, y=200, initial_value=7,
