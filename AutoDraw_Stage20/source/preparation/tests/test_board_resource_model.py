@@ -5,8 +5,13 @@ import unittest
 from board_resource_model import (
     BOARD_ITEM_POINT_LIMITS,
     DEFAULT_POINT_SAFETY_FACTOR,
+    EXTENDED_BRUSH_SLIDER_MAX_VALUE,
+    EXTENDED_BRUSH_SLIDER_MIN_VALUE,
     MODEL_ID,
+    PLANNER_BRUSH_MAX_VALUE,
+    PLANNER_BRUSH_MIN_VALUE,
     STANDARD_BRUSH_PRESETS,
+    SUPPORTED_PLANNER_BRUSH_VALUES,
     create_board_resource_profile,
     estimate_calibrated_point_usage,
     get_board_point_limit,
@@ -47,6 +52,16 @@ class BoardResourceModelTests(unittest.TestCase):
         profile = create_board_resource_profile(3_000)
         profile["standard_brushes"][0]["value"] = 1
         self.assertEqual(STANDARD_BRUSH_PRESETS[0]["value"], 20)
+
+    def test_extended_slider_and_planner_ranges_are_distinct(self):
+        self.assertEqual((EXTENDED_BRUSH_SLIDER_MIN_VALUE, EXTENDED_BRUSH_SLIDER_MAX_VALUE), (1, 30))
+        self.assertEqual((PLANNER_BRUSH_MIN_VALUE, PLANNER_BRUSH_MAX_VALUE), (1, 20))
+        self.assertEqual(SUPPORTED_PLANNER_BRUSH_VALUES, tuple(range(1, 21)))
+        profile = create_board_resource_profile(6_000)
+        self.assertEqual(profile["extended_brush_slider"]["min_value"], 1)
+        self.assertEqual(profile["extended_brush_slider"]["max_value"], 30)
+        self.assertEqual(profile["planner_brush_range"], [1, 20])
+        self.assertEqual(len(profile["planner_brush_values"]), 20)
 
     def test_point_estimate_counts_path_samples_and_one_start_point_per_stroke(self):
         estimate = estimate_calibrated_point_usage(

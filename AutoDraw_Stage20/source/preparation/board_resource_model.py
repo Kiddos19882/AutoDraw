@@ -18,13 +18,20 @@ BOARD_ITEM_POINT_LIMITS: dict[str, int] = {
 }
 SUPPORTED_BOARD_POINT_LIMITS = (3_000, 6_000, 12_000)
 
-# These are the values emitted by the three standard brush buttons in normal mode.
-# They are deliberately named "value": the game passes them to its drawing API.
+# Values emitted by the three standard brush buttons in normal mode.
+# The extended painter slider can produce integer values from 1 through 30.
+# For the first planner version, use 1..20: smaller values help with details,
+# while values above the largest standard button (20) are not needed yet.
 STANDARD_BRUSH_PRESETS: tuple[dict[str, Any], ...] = (
     {"id": "large", "label": "Крупная", "value": 20, "purpose": "крупные однородные области"},
     {"id": "medium", "label": "Средняя", "value": 14, "purpose": "области среднего размера"},
     {"id": "small", "label": "Тонкая", "value": 7, "purpose": "детали и узкие участки"},
 )
+EXTENDED_BRUSH_SLIDER_MIN_VALUE = 1
+EXTENDED_BRUSH_SLIDER_MAX_VALUE = 30
+PLANNER_BRUSH_MIN_VALUE = 1
+PLANNER_BRUSH_MAX_VALUE = 20
+SUPPORTED_PLANNER_BRUSH_VALUES = tuple(range(PLANNER_BRUSH_MIN_VALUE, PLANNER_BRUSH_MAX_VALUE + 1))
 
 POINT_COUNT_SEMANTICS = (
     "BoardPane считает сохранённые уникальные точки штрихов. Начальная точка добавляется "
@@ -83,6 +90,14 @@ def create_board_resource_profile(
         "planning_budget_points": planning_budget,
         "reserved_points": point_limit - planning_budget,
         "standard_brushes": [dict(preset) for preset in STANDARD_BRUSH_PRESETS],
+        "extended_brush_slider": {
+            "min_value": EXTENDED_BRUSH_SLIDER_MIN_VALUE,
+            "max_value": EXTENDED_BRUSH_SLIDER_MAX_VALUE,
+            "integer_values": True,
+            "availability": "расширенный режим рисования; положение элементов UI нужно калибровать",
+        },
+        "planner_brush_values": list(SUPPORTED_PLANNER_BRUSH_VALUES),
+        "planner_brush_range": [PLANNER_BRUSH_MIN_VALUE, PLANNER_BRUSH_MAX_VALUE],
         "point_count_semantics": POINT_COUNT_SEMANTICS,
         "calibration_required_for_point_estimate": True,
     }

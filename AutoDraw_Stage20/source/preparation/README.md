@@ -16,6 +16,8 @@
 
 ## Board point quota and standard brushes
 
-`board_resource_model.py` keeps the game's stored-point quota separate from the empirical path-equivalent ink model in `paint_cost_model.py`. The confirmed board variants have quotas of 3,000, 6,000, or 12,000 points. Planning defaults to 85% of the hard limit, retaining a 15% reserve. Normal-mode brush button values are 20, 14, and 7.
+`board_resource_model.py` keeps the game's stored-point quota separate from the empirical path-equivalent ink model in `paint_cost_model.py`. The confirmed board variants have quotas of 3,000, 6,000, or 12,000 points. Planning defaults to 85% of the hard limit, retaining a 15% reserve. Normal-mode brush button values are 20, 14, and 7. The extended painter slider supports integer values 1 through 30. The adaptive planner will initially use the full range 1–20: small sizes below 7 are available for thin details, and values above 20 are excluded because the current goal is to reduce overpainting rather than broaden the maximum brush.
+
+The slider's presence and value range are separate from screen-coordinate calibration: before executor automation can change sizes, the extended-mode controls and slider position still need to be calibrated in the target UI.
 
 The game samples cursor coordinates on its frame loop, so executor movement steps do **not** directly determine the number of saved board points. `estimate_calibrated_point_usage()` therefore requires a measured `points_per_path_px` ratio and labels its result as an estimate. Calibrate that ratio against real runs before using it to promise that a plan fits. The existing equivalent-pixel cost model remains a separate empirical estimate.
