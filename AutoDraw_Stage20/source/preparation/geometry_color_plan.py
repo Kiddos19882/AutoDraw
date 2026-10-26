@@ -13,7 +13,6 @@ import cv2
 import numpy as np
 from PIL import Image, ImageDraw
 
-from paint_cost_model import estimate_color_plan_paint_cost
 from palette_quantization import MAX_IMAGE_PIXELS, normalize_palette
 
 
@@ -25,6 +24,59 @@ _EPSILON = 1e-7
 
 class GeometryColorPlanError(ValueError):
     """Raised when a geometric color plan cannot be created or validated."""
+
+
+def _estimate_geometry_paint_cost(
+    plan: dict[str, Any],
+    *,
+    stroke_overhead_px_equivalent: float = 6.67,
+    paint_budget_px_equivalent: float = 25_650.0,
+) -> dict[str, Any]:
+    """Estimate cost for arbitrary polylines; the legacy model only accepts two-point runs."""
+    budget = float(paint_budget_px_equivalent)
+    overhead = float(stroke_overhead_px_equivalent)
+    if not math.isfinite(budget) or budget <= 0 or not math.isfinite(overhead) or overhead < 0:
+        raise GeometryColorPlanError("Параметры модели расхода краски недопустимы.")
+    by_color: dict[int, dict[str, Any]] = {}
+    total_length = 0.0
+    for stroke in plan.get("strokes", []):
+        points = [(float(p["x"]), float(p["y"])) for p in stroke["points"]]
+        length = _path_length(points, bool(stroke.get("closed")))
+        total_length += length
+        color_index = int(stroke["color"]["palette_index"])
+        entry = by_color.setdefault(color_index, {"palette_index": color_index, "hex": stroke["color"]["hex"],
+                                                   "name": stroke["color"]["name"], "stroke_count": 0,
+                                                   "drawing_length_px": 0.0})
+        entry["stroke_count"] += 1
+        entry["drawing_length_px"] += length
+    stroke_count = len(plan.get("strokes", []))
+    total_cost = total_length + stroke_count * overhead
+    per_color = []
+    for entry in by_color.values():
+        cost = entry["drawing_length_px"] + entry["stroke_count"] * overhead
+        per_color.append({
+            **entry,
+            "drawing_length_px": round(entry["drawing_length_px"], 3),
+            "estimated_total_ink_px_equivalent": round(cost, 3),
+            "estimated_usage_percent": round(cost / budget * 100, 3),
+            "risk_level": "over_budget" if cost >= budget else "high" if cost >= budget * 0.9 else "normal",
+        })
+    highest = max(per_color, key=lambda entry: entry["estimated_usage_percent"], default=None)
+    usage = total_cost / budget * 100.0
+    return {
+        "model_id": "empirical-ink-cost-v1-polyline",
+        "stroke_count": stroke_count,
+        "drawing_length_px": round(total_length, 3),
+        "stroke_overhead_px_equivalent": overhead,
+        "paint_budget_px_equivalent": budget,
+        "estimated_total_ink_px_equivalent": round(total_cost, 3),
+        "estimated_usage_percent": round(usage, 3),
+        "risk_level": "over_budget" if usage >= 100 else "very_high" if usage >= 90 else "high" if usage >= 80 else "normal",
+        "risk_label": "Превышение бюджета" if usage >= 100 else "Высокий прогноз расхода" if usage >= 80 else "Оценка в пределах бюджета",
+        "per_color_estimates": per_color,
+        "highest_use_color": highest,
+        "resource_scope_note": "Экспериментальная оценка: длина полилиний + число штрихов × накладные расходы. Не является счётчиком игры.",
+    }
 
 
 def _validate_index_map(index_map: Any, palette_size: int) -> np.ndarray:
@@ -441,7 +493,7 @@ def _summarize_plan(
             "used_colors": [per_color[index] for index in sorted(per_color)],
         },
     }
-    plan["summary"]["paint_cost_estimate"] = estimate_color_plan_paint_cost(plan)
+    plan["summary"]["paint_cost_estimate"] = _estimate_geometry_paint_cost(plan)
     return plan
 
 
@@ -779,7 +831,7 @@ def optimize_geometry_plan_to_budget(
                         min_component_area=min_area,
                         source_name=source_name,
                     )
-                    estimate = estimate_color_plan_paint_cost(
+                    estimate = _estimate_geometry_paint_cost(
                         candidate,
                         stroke_overhead_px_equivalent=overhead,
                         paint_budget_px_equivalent=budget,
@@ -818,7 +870,7 @@ def optimize_geometry_plan_to_budget(
     if best is None or best_report is None:
         raise GeometryColorPlanError("Не удалось построить ни одного допустимого геометрического плана.")
     best["generation"]["budget_optimization"] = dict(best_report)
-    best["summary"]["paint_cost_estimate"] = estimate_color_plan_paint_cost(
+    best["summary"]["paint_cost_estimate"] = _estimate_geometry_paint_cost(
         best,
         stroke_overhead_px_equivalent=overhead,
         paint_budget_px_equivalent=budget,
@@ -981,7 +1033,7 @@ def split_geometry_plan_to_boards(
             name=f"{data.get('name', 'Геометрический план')} — фрагмент",
             source={**data.get("source", {}), "source_tile": {"x": x0, "y": y0, "width": x1 - x0, "height": y1 - y0}},
         )
-        estimate = estimate_color_plan_paint_cost(
+        estimate = _estimate_geometry_paint_cost(
             draft, stroke_overhead_px_equivalent=overhead, paint_budget_px_equivalent=budget
         )
         cost = float(estimate["estimated_total_ink_px_equivalent"])
