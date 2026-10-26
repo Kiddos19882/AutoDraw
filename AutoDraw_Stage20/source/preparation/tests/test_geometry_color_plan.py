@@ -747,3 +747,29 @@ def test_validator_rejects_non_numeric_or_non_finite_coordinates(axis, value):
 
     with pytest.raises(GeometryColorPlanError):
         validate_geometry_color_plan(plan)
+
+
+
+def test_multiboard_split_preserves_a_real_single_pixel_stroke():
+    index_map = np.full((20, 700), -1, dtype=np.int32)
+    index_map[5, 660] = 0
+    plan = build_geometry_color_plan(index_map, PALETTE, mode="scanline")
+
+    manifest = split_geometry_plan_to_boards(
+        plan,
+        paint_budget_px_equivalent=25_650,
+        target_usage_percent=75,
+        min_tile_size=8,
+        max_boards=4,
+        board_width=660,
+        board_height=340,
+    )
+
+    assert manifest["board_count"] == 2
+    right_board = next(board for board in manifest["boards"] if board["tile"]["x"] == 660)
+    singleton_strokes = [
+        stroke for stroke in right_board["plan"]["strokes"]
+        if stroke["points"][0] == stroke["points"][1]
+    ]
+    assert len(singleton_strokes) == 1
+    assert singleton_strokes[0]["points"][0] == {"x": 0.0, "y": 5.0}
