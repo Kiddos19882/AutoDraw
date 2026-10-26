@@ -14,6 +14,38 @@ class ColorPlanExecutionError(ValueError):
     """A color plan or its browser palette cannot be executed safely."""
 
 
+def normalize_brush_slider_points(
+    min_point: Any,
+    max_point: Any,
+    *,
+    max_y_difference: int = 8,
+) -> tuple[int, int, int]:
+    """Convert two screen clicks into the slider endpoints and a shared Y coordinate."""
+    try:
+        x_min, y_min = int(min_point[0]), int(min_point[1])
+        x_max, y_max = int(max_point[0]), int(max_point[1])
+    except (TypeError, ValueError, IndexError) as exc:
+        raise ColorPlanExecutionError(
+            "Не удалось прочитать две точки ползунка. Выберите обе точки заново."
+        ) from exc
+
+    if min(x_min, y_min, x_max, y_max) < 0:
+        raise ColorPlanExecutionError("Координаты точек ползунка не могут быть отрицательными.")
+    if x_max <= x_min:
+        raise ColorPlanExecutionError(
+            "Сначала отметьте позицию значения 1 слева, затем позицию значения 30 справа."
+        )
+    if x_max - x_min < 29:
+        raise ColorPlanExecutionError(
+            "Между крайними точками ползунка должно быть не менее 29 px."
+        )
+    if abs(y_max - y_min) > max_y_difference:
+        raise ColorPlanExecutionError(
+            "Точки оказались на разных высотах. Щёлкните две позиции на одной горизонтальной дорожке."
+        )
+    return x_min, x_max, round((y_min + y_max) / 2)
+
+
 @dataclass(frozen=True, slots=True)
 class PaletteTarget:
     palette_index: int

@@ -18,6 +18,7 @@ from drawing.color_plan_execution import (
     ColorPlanExecutionHooks,
     adaptive_brush_plan_to_drawing_plan,
     build_palette_targets,
+    normalize_brush_slider_points,
     color_plan_to_drawing_plan,
 )
 from brush_planner import build_adaptive_brush_plan
@@ -203,6 +204,22 @@ class ColorPlanExecutionTests(unittest.TestCase):
         calibration.validate((1920, 1080), {"x": 400, "y": 300, "width": 600, "height": 300})
         with self.assertRaisesRegex(ColorPlanExecutionError, "Разрешение экрана изменилось"):
             calibration.validate((1280, 720), {"x": 400, "y": 300, "width": 600, "height": 300})
+
+    def test_brush_slider_mouse_points_produce_track_coordinates(self):
+        self.assertEqual(
+            normalize_brush_slider_points((100, 200), (390, 202)),
+            (100, 390, 201),
+        )
+
+    def test_brush_slider_mouse_points_reject_wrong_order_or_short_track(self):
+        with self.assertRaisesRegex(ColorPlanExecutionError, "сначала отметьте позицию"):
+            normalize_brush_slider_points((390, 200), (100, 200))
+        with self.assertRaisesRegex(ColorPlanExecutionError, "не менее 29 px"):
+            normalize_brush_slider_points((100, 200), (120, 200))
+
+    def test_brush_slider_mouse_points_reject_different_heights(self):
+        with self.assertRaisesRegex(ColorPlanExecutionError, "разных высотах"):
+            normalize_brush_slider_points((100, 200), (390, 220))
 
     def test_brush_slider_calibration_rejects_track_crossing_canvas(self):
         calibration = BrushSliderCalibration(

@@ -29,7 +29,7 @@ from drawing.mouse_executor import ExecutorConfig, ExecutionSummary, MouseExecut
 from drawing.color_plan_execution import (
     BrushSliderCalibration, ColorPlanExecutionError, ColorPlanExecutionHooks,
     adaptive_brush_plan_to_drawing_plan, build_palette_targets, color_plan_to_drawing_plan,
-    validate_color_plan,
+    normalize_brush_slider_points, validate_color_plan,
 )
 from brush_planner import BrushPlannerError, load_adaptive_brush_plan
 from drawing.execution_diagnostics import (
@@ -135,6 +135,112 @@ class AreaSelector:
         area = TargetArea(x1, y1, x2 - x1, y2 - y1)
         self.window.destroy()
         self.on_done(area)
+
+    def _cancel(self, _event=None) -> None:
+        self.window.destroy()
+        self.on_done(None)
+
+
+
+class BrushSliderSelector:
+    """Fullscreen two-point picker for the brush-slider track."""
+
+    def __init__(self, parent: tk.Tk, on_done):
+        self.on_done = on_done
+        self.points: list[tuple[int, int]] = []
+        self.marker_ids: list[int] = []
+        self.window = tk.Toplevel(parent)
+        self.window.withdraw()
+        self.screen_w = self.window.winfo_screenwidth()
+        self.screen_h = self.window.winfo_screenheight()
+        self.window.overrideredirect(True)
+        self.window.geometry(f"{self.screen_w}x{self.screen_h}+0+0")
+        self.window.attributes("-topmost", True)
+        try:
+            self.window.attributes("-alpha", 0.32)
+        except tk.TclError:
+            pass
+        self.window.configure(bg="#202020")
+        self.canvas = tk.Canvas(self.window, bg="#202020", highlightthickness=0, cursor="crosshair")
+        self.canvas.pack(fill="both", expand=True)
+        self.canvas.create_text(
+            20, 20, anchor="nw", fill="white", font=("Segoe UI", 16, "bold"),
+            text=(
+                "Калибровка ползунка кисти: щёлкните позицию бегунка при значении 1, "
+                "затем позицию при значении 30.\n"
+                "Выбирайте центр одной горизонтальной дорожки; менять значение ползунка между щелчками не нужно. "
+                "Esc — отмена."
+            ),
+        )
+        self.status_id = self.canvas.create_text(
+            20, 92, anchor="nw", fill="#ffeb3b", font=("Segoe UI", 12, "bold"),
+            text="Точка 1 из 2: значение 1.",
+        )
+        self.cursor_id = self.canvas.create_text(
+            self.screen_w - 20, 20, anchor="ne", fill="white", font=("Consolas", 12, "bold"),
+            text="X=0  Y=0",
+        )
+        self.crosshair_v = self.canvas.create_line(
+            0, 0, 0, self.screen_h, fill="#ffeb3b", dash=(4, 4), width=1
+        )
+        self.crosshair_h = self.canvas.create_line(
+            0, 0, self.screen_w, 0, fill="#ffeb3b", dash=(4, 4), width=1
+        )
+        self.canvas.tag_lower(self.crosshair_v)
+        self.canvas.tag_lower(self.crosshair_h)
+        self.canvas.bind("<Motion>", self._track_cursor)
+        self.canvas.bind("<ButtonPress-1>", self._select_point)
+        self.window.bind("<Escape>", self._cancel)
+        self.window.deiconify()
+        self.window.lift()
+        self.window.focus_force()
+
+    def _track_cursor(self, event) -> None:
+        x, y = int(event.x), int(event.y)
+        self.canvas.coords(self.crosshair_v, x, 0, x, self.screen_h)
+        self.canvas.coords(self.crosshair_h, 0, y, self.screen_w, y)
+        self.canvas.itemconfigure(self.cursor_id, text=f"X={x}  Y={y}")
+
+    def _mark_point(self, number: int, point: tuple[int, int]) -> None:
+        x, y = point
+        radius = 7
+        self.marker_ids.append(self.canvas.create_oval(
+            x - radius, y - radius, x + radius, y + radius,
+            outline="#00ff90", width=3,
+        ))
+        self.marker_ids.append(self.canvas.create_text(
+            x + 11, y - 13, anchor="sw", fill="#00ff90",
+            font=("Segoe UI", 11, "bold"), text=f"{number}: ({x}, {y})",
+        ))
+
+    def _select_point(self, event) -> None:
+        point = (int(event.x), int(event.y))
+        if not self.points:
+            self.points.append(point)
+            self._mark_point(1, point)
+            self.canvas.itemconfigure(
+                self.status_id,
+                text="Точка 1 сохранена. Теперь щёлкните позицию бегунка при значении 30.",
+            )
+            return
+
+        try:
+            x_min, x_max, y = normalize_brush_slider_points(self.points[0], point)
+        except ColorPlanExecutionError as exc:
+            for marker_id in self.marker_ids:
+                self.canvas.delete(marker_id)
+            self.marker_ids.clear()
+            self.points.clear()
+            self.canvas.itemconfigure(
+                self.status_id,
+                text=f"{exc} Попробуйте ещё раз: сначала значение 1, затем 30.",
+            )
+            return
+
+        self.points.append(point)
+        self._mark_point(2, point)
+        self.window.destroy()
+        self.on_done((x_min, x_max, y))
 
     def _cancel(self, _event=None) -> None:
         self.window.destroy()
@@ -362,12 +468,19 @@ class Stage6App:
             entry.pack(anchor="w", pady=(2, 0))
             self.execution_controls.append(entry)
             brush_settings.columnconfigure(col, weight=1)
+        select_brush_button = ttk.Button(
+            brush_settings,
+            text="Выбрать точки мышью…",
+            command=self._select_brush_slider,
+        )
+        select_brush_button.grid(row=1, column=0, sticky="w", padx=4, pady=(6, 2))
+        self.execution_controls.append(select_brush_button)
         confirm_brush_button = ttk.Button(
             brush_settings,
-            text="Подтвердить координаты на текущем экране",
+            text="Подтвердить калибровку",
             command=self._confirm_brush_slider_calibration,
         )
-        confirm_brush_button.grid(row=1, column=0, columnspan=2, sticky="w", padx=4, pady=(6, 2))
+        confirm_brush_button.grid(row=1, column=1, sticky="w", padx=4, pady=(6, 2))
         self.execution_controls.append(confirm_brush_button)
         ttk.Label(
             brush_settings,
@@ -377,9 +490,9 @@ class Stage6App:
         ).grid(row=1, column=2, columnspan=2, sticky="w", padx=4, pady=(6, 2))
         ttk.Label(
             brush_settings,
-            text=("В расширенном режиме игры сначала откройте ползунок. Укажите экранные координаты позиции бегунка "
-                  "для значений 1 и 30; начальное значение должно точно совпадать с положением бегунка перед стартом. "
-                  "Положение считается линейным. Координаты ползунка обязаны быть вне выделенного холста."),
+            text=("В расширенном режиме игры сначала откройте ползунок. Нажмите «Выбрать точки мышью…» и отметьте "
+                  "позиции бегунка для значений 1 и 30: поля X/Y заполнятся автоматически. Затем укажите фактическое "
+                  "начальное значение ползунка и подтвердите калибровку. Координаты ползунка обязаны быть вне холста."),
             wraplength=1180,
             justify="left",
         ).grid(row=2, column=0, columnspan=4, sticky="w", padx=4, pady=(4, 0))
@@ -477,6 +590,33 @@ class Stage6App:
             self.brush_slider_status_var.set(
                 "Калибровка сброшена: координаты или начальный размер изменены. Подтвердите её заново."
             )
+
+    def _select_brush_slider(self) -> None:
+        if self.running:
+            return
+        self.root.withdraw()
+        self.root.after(120, lambda: BrushSliderSelector(self.root, self._brush_slider_points_selected))
+
+    def _brush_slider_points_selected(self, coordinates: tuple[int, int, int] | None) -> None:
+        self.root.deiconify()
+        self.root.lift()
+        if self.running:
+            return
+        if coordinates is None:
+            self.brush_slider_status_var.set("Выбор координат ползунка отменён.")
+            return
+        x_min, x_max, y = coordinates
+        self.brush_slider_x_min_var.set(str(x_min))
+        self.brush_slider_x_max_var.set(str(x_max))
+        self.brush_slider_y_var.set(str(y))
+        self.brush_slider_status_var.set(
+            f"Точки выбраны мышью: X(1)={x_min}, X(30)={x_max}, Y={y}. "
+            "Укажите фактическое текущее значение бегунка и подтвердите калибровку."
+        )
+        self.status_var.set(
+            "Координаты ползунка заполнены по двум щелчкам. Перед подтверждением проверьте, "
+            "что выбран именно ползунок кисти расширенного режима."
+        )
 
     def _confirm_brush_slider_calibration(self) -> None:
         try:
