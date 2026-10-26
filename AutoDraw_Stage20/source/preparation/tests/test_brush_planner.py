@@ -4,7 +4,10 @@ import unittest
 
 import numpy as np
 
-from brush_planner import BrushPlannerError, build_adaptive_brush_plan, validate_adaptive_brush_plan
+from brush_planner import (
+    BrushPlannerError, build_adaptive_brush_plan, load_adaptive_brush_plan,
+    save_adaptive_brush_plan, validate_adaptive_brush_plan,
+)
 
 
 def make_plan(width: int, height: int, strokes: list[dict]) -> dict:
@@ -42,6 +45,26 @@ class AdaptiveBrushPlannerTests(unittest.TestCase):
         self.assertFalse(result["summary"]["ready_for_automatic_execution"])
         self.assertEqual(len(result["summary"]["execution_blockers"]), 2)
         validate_adaptive_brush_plan(result)
+        self.assertEqual(len(result["source_plan_sha256"]), 64)
+
+    def test_saved_plan_round_trip_and_reject_tampered_source_hash(self):
+        import json
+        import tempfile
+        from pathlib import Path
+
+        indexes = np.zeros((30, 80), dtype=np.int32)
+        source = make_plan(80, 30, [make_stroke(0, 0, 79, 15)])
+        result = build_adaptive_brush_plan(indexes, source)
+        with tempfile.TemporaryDirectory() as directory:
+            path = save_adaptive_brush_plan(Path(directory) / "brush.json", result)
+            loaded = load_adaptive_brush_plan(path)
+            self.assertEqual(loaded["source_plan_sha256"], result["source_plan_sha256"])
+            tampered = json.loads(path.read_text(encoding="utf-8"))
+            tampered["source_plan_sha256"] = "0" * 64
+            path.write_text(json.dumps(tampered), encoding="utf-8")
+            # A shape-valid hash is accepted by schema validation but will be rejected
+            # by Stage 20 when compared against the exact source color plan.
+            self.assertNotEqual(load_adaptive_brush_plan(path)["source_plan_sha256"], result["source_plan_sha256"])
 
     def test_wide_brush_does_not_cross_adjacent_horizontal_color(self):
         indexes = np.zeros((30, 80), dtype=np.int32)

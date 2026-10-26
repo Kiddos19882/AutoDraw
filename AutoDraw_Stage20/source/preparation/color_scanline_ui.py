@@ -12,7 +12,9 @@ from paint_cost_model import (
     DEFAULT_PAINT_BUDGET_PX_EQUIVALENT, DEFAULT_STROKE_OVERHEAD_PX_EQUIVALENT,
     estimate_color_plan_paint_cost,
 )
-from brush_planner import BrushPlannerError, build_adaptive_brush_plan
+from brush_planner import (
+    BrushPlannerError, build_adaptive_brush_plan, save_adaptive_brush_plan,
+)
 
 from color_scanline import (
     ColorScanlinePlanError,
@@ -166,6 +168,9 @@ class ColorScanlineTab:
         ttk.Button(
             brush_controls, text="Рассчитать рекомендации", command=self.build_brush_recommendations,
         ).pack(side="left")
+        ttk.Button(
+            brush_controls, text="Экспорт плана кистей JSON…", command=self.save_brush_plan_dialog,
+        ).pack(side="left", padx=(6, 0))
         self.brush_summary_var = tk.StringVar(
             value="Рекомендации не рассчитаны. Масштаб 1.0 — начальное предположение, не измерение."
         )
@@ -331,6 +336,33 @@ class ColorScanlineTab:
             f"Цветной план построен. Шаг строк {plan['generation']['row_step_px']} px; "
             f"пропущено пикселей по шагу строк: {summary.get('omitted_by_row_step_pixel_count', 0):,}. "
             f"{risk_note} Порядок: сверху вниз, внутри строки слева направо."
+        )
+
+    def save_brush_plan_dialog(self) -> None:
+        if self.brush_plan is None:
+            messagebox.showinfo(
+                "Нет рекомендаций кистей",
+                "Сначала постройте цветной план и рассчитайте рекомендации кистей.",
+                parent=self.root,
+            )
+            return
+        selected = filedialog.asksaveasfilename(
+            parent=self.root,
+            title="Экспорт адаптивного плана кистей",
+            initialdir=str(self.output_dir),
+            initialfile="adaptive_brush_plan.json",
+            defaultextension=".json",
+            filetypes=(("Адаптивный план кистей AutoDraw", "*.json"), ("JSON", "*.json")),
+        )
+        if not selected:
+            return
+        try:
+            path = save_adaptive_brush_plan(selected, self.brush_plan)
+        except (OSError, BrushPlannerError, ValueError, TypeError) as exc:
+            messagebox.showerror("Не удалось сохранить план кистей", str(exc), parent=self.root)
+            return
+        self.status_var.set(
+            f"Адаптивный план кистей сохранён: {path}. Это отдельный файл; исходный цветной план не изменён."
         )
 
     def build_brush_recommendations(self) -> None:

@@ -1,7 +1,12 @@
 from __future__ import annotations
 
+import hashlib
+import json
 import math
+import os
+import tempfile
 from collections import Counter
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -16,6 +21,16 @@ MAX_BRUSH_PLAN_STROKES = 500_000
 
 class BrushPlannerError(ValueError):
     """Raised when an adaptive-brush plan cannot be built safely."""
+
+
+def _canonical_plan_sha256(plan: dict[str, Any]) -> str:
+    try:
+        payload = json.dumps(
+            plan, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False
+        ).encode("utf-8")
+    except (TypeError, ValueError) as exc:
+        raise BrushPlannerError("Исходный цветной план не сериализуется в безопасный JSON.") from exc
+    return hashlib.sha256(payload).hexdigest()
 
 
 def _finite_positive(value: Any, field: str) -> float:
@@ -269,6 +284,7 @@ def build_adaptive_brush_plan(
         "plan_type": BRUSH_PLAN_TYPE,
         "source_plan_type": color_plan["plan_type"],
         "source_plan_name": str(color_plan.get("plan_name", "Цветной scanline-план")),
+        "source_plan_sha256": _canonical_plan_sha256(color_plan),
         "canvas": {"width": width, "height": height},
         "brush_configuration": {
             "min_value": min_brush_value,
@@ -318,6 +334,11 @@ def validate_adaptive_brush_plan(plan: Any) -> dict[str, Any]:
         raise BrushPlannerError("В adaptive-brush-плане отсутствуют обязательные поля.")
     if len(strokes) != summary.get("planned_stroke_count") or not strokes:
         raise BrushPlannerError("Количество штрихов не совпадает со сводкой.")
+    source_hash = plan.get("source_plan_sha256")
+    if not isinstance(source_hash, str) or len(source_hash) != 64 or any(c not in "0123456789abcdef" for c in source_hash):
+        raise BrushPlannerError("В плане отсутствует корректная SHA-256 исходного цветного плана.")
+    if plan.get("brush_configuration", {}).get("automatic_execution_allowed") is not False:
+        raise BrushPlannerError("Адаптивный план не может сам разрешать автоматическое исполнение.")
     for index, stroke in enumerate(strokes, start=1):
         if not isinstance(stroke, dict) or not isinstance(stroke.get("brush"), dict):
             raise BrushPlannerError(f"В штрихе №{index} отсутствует информация о кисти.")
@@ -327,3 +348,41 @@ def validate_adaptive_brush_plan(plan: Any) -> dict[str, Any]:
         if stroke["brush"].get("safe_to_execute") and not stroke["brush"].get("safe_for_color_map"):
             raise BrushPlannerError(f"Небезопасный штрих №{index} отмечен готовым к исполнению.")
     return plan
+
+
+
+def save_adaptive_brush_plan(path: str | Path, plan: Any) -> Path:
+    """Validate and atomically save an adaptive brush plan."""
+    validated = validate_adaptive_brush_plan(plan)
+    destination = Path(path).expanduser().resolve()
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    text = json.dumps(validated, ensure_ascii=False, indent=2, allow_nan=False) + "\\n"
+    temporary: str | None = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            "w", encoding="utf-8", newline="\\n", dir=destination.parent,
+            prefix=f".{destination.name}.", suffix=".tmp", delete=False,
+        ) as handle:
+            temporary = handle.name
+            handle.write(text)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, destination)
+    except OSError:
+        if temporary:
+            try:
+                os.unlink(temporary)
+            except OSError:
+                pass
+        raise
+    return destination
+
+
+def load_adaptive_brush_plan(path: str | Path) -> dict[str, Any]:
+    """Load an adaptive brush plan and reject invalid or executable-looking documents."""
+    source = Path(path).expanduser().resolve()
+    try:
+        raw = json.loads(source.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise BrushPlannerError(f"Не удалось загрузить адаптивный план кистей: {exc}") from exc
+    return validate_adaptive_brush_plan(raw)
