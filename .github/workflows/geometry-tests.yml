@@ -8,6 +8,8 @@ on:
     paths:
       - "AutoDraw_Stage20/source/preparation/**"
       - "AutoDraw_Stage20/source/executor/**"
+      - "AutoDraw_Stage20/integrated_app.py"
+      - "AutoDraw_Stage20/tests/**"
       - ".github/workflows/geometry-tests.yml"
     types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
@@ -34,6 +36,11 @@ jobs:
           python -m pip install -r requirements.txt -r ..\executor\requirements.txt pytest
       - name: Run preparation and geometry tests
         run: python -m pytest -q tests
+
+      - name: Run unified-app UI regressions
+        run: |
+          $env:PYTHONPATH = "$env:GITHUB_WORKSPACE\AutoDraw_Stage20;$env:GITHUB_WORKSPACE\AutoDraw_Stage20\source\preparation;$env:GITHUB_WORKSPACE\AutoDraw_Stage20\source\executor"
+          python -m pytest -q ..\..\tests\test_unified_app.py
 
   executor-tests:
     runs-on: windows-latest
