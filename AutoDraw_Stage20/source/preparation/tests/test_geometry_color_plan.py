@@ -319,7 +319,9 @@ def test_multiboard_split_clips_a_path_to_physical_board_tiles():
     )
 
     assert manifest["board_count"] == 2
-    assert [board["tile"]["x"] for board in manifest["boards"]] == [0, 350]
+    # Fill the first physical board to its 660 px width, then use a 40 px remainder.
+    assert [board["tile"]["x"] for board in manifest["boards"]] == [0, 660]
+    assert [board["tile"]["width"] for board in manifest["boards"]] == [660, 40]
     for board in manifest["boards"]:
         tile_plan = board["plan"]
         assert tile_plan["canvas"] == {"width": 660, "height": 340}
