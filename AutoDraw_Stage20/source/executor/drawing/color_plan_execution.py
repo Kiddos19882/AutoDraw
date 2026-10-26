@@ -103,6 +103,10 @@ def adaptive_brush_plan_to_drawing_plan(brush_plan: Any, source_color_plan: Any)
     except Exception as exc:
         raise ColorPlanExecutionError(f"Некорректный адаптивный план кистей: {exc}") from exc
     color_plan = validate_color_plan(source_color_plan)
+    if color_plan.get("plan_type") != "autodraw_color_scanline_plan":
+        raise ColorPlanExecutionError(
+            "Адаптивный план кистей пока поддерживается только для scanline-планов этапа 19."
+        )
     if adaptive.get("source_plan_sha256") != _canonical_color_plan_sha256(color_plan):
         raise ColorPlanExecutionError(
             "Адаптивный план кистей создан для другого цветного плана. "
