@@ -712,6 +712,15 @@ class ColorScanlineTab:
         if self.plan is None:
             messagebox.showinfo("Нет цветного плана", "Сначала постройте или откройте цветной план.", parent=self.root)
             return
+        if self.plan.get("plan_type") != "autodraw_color_scanline_plan":
+            messagebox.showinfo(
+                "Адаптивные кисти недоступны",
+                "Этот алгоритм рассчитан на растровые scanline-штрихи. "
+                "Для геометрических полилиний адаптивный подбор кисти пока не применяется.",
+                parent=self.root,
+            )
+            self.brush_summary_var.set("Адаптивные рекомендации доступны только для scanline-планов.")
+            return
         if self.plan_index_map is None:
             messagebox.showwarning(
                 "Нет исходной карты цветов",
@@ -788,6 +797,24 @@ class ColorScanlineTab:
             stroke_overhead = self._parse_model_number(self.paint_overhead_var.get(), "Дополнительный расход на штрих")
             paint_budget = self._parse_model_number(self.paint_budget_var.get(), "Оценочный запас краски")
             candidate = copy.deepcopy(self.plan)
+            if candidate.get("plan_type") == "autodraw_geometry_color_plan":
+                candidate.setdefault("generation", {})["geometry_paint_cost_model"] = {
+                    "model_id": "empirical-ink-cost-v1-polyline",
+                    "stroke_overhead_px_equivalent": stroke_overhead,
+                    "budget_px_equivalent": paint_budget,
+                    "single_pixel_execution_length_px": 1.0,
+                }
+                candidate["summary"]["paint_cost_estimate"] = _estimate_geometry_paint_cost(
+                    candidate,
+                    stroke_overhead_px_equivalent=stroke_overhead,
+                    paint_budget_px_equivalent=paint_budget,
+                )
+                validate_geometry_color_plan(candidate)
+                self._display_geometry_plan(
+                    candidate, self.plan_index_map, plan_path=self.plan_path,
+                    status_prefix="Оценка расхода пересчитана без изменения геометрии.",
+                )
+                return
             candidate.setdefault("generation", {})["paint_cost_model"] = {
                 "model_id": "empirical-ink-cost-v1",
                 "stroke_overhead_px_equivalent": stroke_overhead,
@@ -820,7 +847,10 @@ class ColorScanlineTab:
         if not isinstance(estimate, dict):
             return "Оценка краски не сохранена в старом плане. Постройте план заново, чтобы записать модель."
         total = float(estimate.get("estimated_total_ink_px_equivalent", 0.0))
-        budget = float(estimate.get("estimated_budget_px_equivalent", DEFAULT_PAINT_BUDGET_PX_EQUIVALENT))
+        budget = float(estimate.get(
+            "estimated_budget_px_equivalent",
+            estimate.get("paint_budget_px_equivalent", DEFAULT_PAINT_BUDGET_PX_EQUIVALENT),
+        ))
         percent = float(estimate.get("estimated_usage_percent", 0.0))
         path = float(estimate.get("effective_path_length_px", estimate.get("drawing_length_px", 0.0)))
         overhead = float(estimate.get("estimated_stroke_overhead_px_equivalent", 0.0))
@@ -858,12 +888,13 @@ class ColorScanlineTab:
 
     def save_plan_dialog(self) -> None:
         if self.plan is None:
-            messagebox.showinfo("Нет плана", "Сначала постройте цветной scanline-план.", parent=self.root)
+            messagebox.showinfo("Нет плана", "Сначала постройте или откройте цветной план.", parent=self.root)
             return
-        initial = "color_scanline_plan.json"
+        is_geometry = self.plan.get("plan_type") == "autodraw_geometry_color_plan"
+        initial = "geometry_color_plan.json" if is_geometry else "color_scanline_plan.json"
         selected = filedialog.asksaveasfilename(
             parent=self.root,
-            title="Сохранить цветной scanline-план",
+            title="Сохранить геометрический план" if is_geometry else "Сохранить цветной scanline-план",
             initialdir=str(self.output_dir),
             initialfile=initial,
             defaultextension=".json",
@@ -872,8 +903,11 @@ class ColorScanlineTab:
         if not selected:
             return
         try:
-            path = save_color_scanline_plan(selected, self.plan)
-        except (OSError, ValueError, TypeError) as exc:
+            if is_geometry:
+                path = save_geometry_color_plan(selected, self.plan)
+            else:
+                path = save_color_scanline_plan(selected, self.plan)
+        except (OSError, GeometryColorPlanError, ColorScanlinePlanError, ValueError, TypeError) as exc:
             messagebox.showerror("Не удалось сохранить цветной план", str(exc), parent=self.root)
             return
         self.plan_path = path
@@ -889,9 +923,18 @@ class ColorScanlineTab:
         if not selected:
             return
         try:
+            document_type = copy.deepcopy(__import__("json").loads(Path(selected).read_text(encoding="utf-8"))).get("plan_type")
+            if document_type == "autodraw_geometry_color_plan":
+                plan = load_geometry_color_plan(selected)
+                self._display_geometry_plan(
+                    plan, None, plan_path=Path(selected).resolve(),
+                    status_prefix="Геометрический план открыт из JSON.",
+                )
+                self.plan_index_map = None
+                return
             plan = load_color_scanline_plan(selected)
             preview = render_color_scanline_preview(plan)
-        except (OSError, ValueError, TypeError) as exc:
+        except (OSError, GeometryColorPlanError, ColorScanlinePlanError, ValueError, TypeError) as exc:
             messagebox.showerror("Не удалось открыть цветной план", str(exc), parent=self.root)
             return
         self.plan = plan
