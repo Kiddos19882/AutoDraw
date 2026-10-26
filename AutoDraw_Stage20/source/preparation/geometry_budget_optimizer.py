@@ -14,11 +14,13 @@ def _rescale_map_centered(indexes: np.ndarray, scale: float) -> np.ndarray:
     height, width = indexes.shape
     new_width = max(1, round(width * scale))
     new_height = max(1, round(height * scale))
-    resized = cv2.resize(indexes, (new_width, new_height), interpolation=cv2.INTER_NEAREST)
-    output = np.full(indexes.shape, -1, dtype=np.int32)
-    x0, y0 = (width - new_width) // 2, (height - new_height) // 2
-    output[y0:y0 + new_height, x0:x0 + new_width] = resized
-    return output
+    # Reduce the sampling grid, then map it back to the original canvas size.
+    # Padding the reduced image would make the drawing itself shrink toward the
+    # center and leave unused board space; upscaling the reduced grid preserves
+    # the source composition while merging nearby pixels into larger color blocks.
+    reduced = cv2.resize(indexes, (new_width, new_height), interpolation=cv2.INTER_NEAREST)
+    restored = cv2.resize(reduced, (width, height), interpolation=cv2.INTER_NEAREST)
+    return restored.astype(np.int32, copy=False)
 
 
 def optimize_geometry_plan_to_budget(
