@@ -17,6 +17,7 @@ from drawing.color_plan_execution import (
     ColorPlanExecutionError,
     ColorPlanExecutionHooks,
     adaptive_brush_plan_to_drawing_plan,
+    build_brush_visual_test_plan,
     build_palette_targets,
     normalize_brush_slider_points,
     color_plan_to_drawing_plan,
@@ -221,6 +222,28 @@ class ColorPlanExecutionTests(unittest.TestCase):
         with self.assertRaisesRegex(ColorPlanExecutionError, "разных высотах"):
             normalize_brush_slider_points((100, 200), (390, 220))
 
+    def test_brush_visual_test_plan_contains_separated_strokes_for_sizes(self):
+        plan = build_brush_visual_test_plan(260, 180)
+        self.assertEqual(plan.name, "Визуальный тест изменения размера кисти")
+        self.assertEqual(
+            [stroke.metadata["brush_value"] for stroke in plan.strokes],
+            ["1", "7", "14", "20"],
+        )
+        self.assertEqual([stroke.name for stroke in plan.strokes], [
+            "Проверка кисти 1", "Проверка кисти 7", "Проверка кисти 14", "Проверка кисти 20"
+        ])
+        ys = [stroke.points[0].y for stroke in plan.strokes]
+        self.assertEqual(ys, sorted(ys))
+        self.assertGreaterEqual(min(b - a for a, b in zip(ys, ys[1:])), 30)
+        self.assertTrue(all(stroke.metadata["line_extension_px_override"] == "0" for stroke in plan.strokes))
+        plan.validate_bounds()
+
+    def test_brush_visual_test_plan_rejects_too_small_region(self):
+        with self.assertRaisesRegex(ColorPlanExecutionError, "180 × 160 px"):
+            build_brush_visual_test_plan(179, 160)
+        with self.assertRaisesRegex(ColorPlanExecutionError, "180 × 160 px"):
+            build_brush_visual_test_plan(200, 159)
+
     def test_brush_slider_calibration_rejects_track_crossing_canvas(self):
         calibration = BrushSliderCalibration(
             x_at_min=100, x_at_max=800, y=200, initial_value=7,
@@ -228,6 +251,26 @@ class ColorPlanExecutionTests(unittest.TestCase):
         )
         with self.assertRaisesRegex(ColorPlanExecutionError, "попадает внутрь выделенной области"):
             calibration.validate((1000, 800), {"x": 300, "y": 150, "width": 300, "height": 100})
+
+    def test_brush_slider_controller_can_restore_slider_to_value_30_without_drawing(self):
+        calibration = BrushSliderCalibration(
+            x_at_min=100, x_at_max=390, y=200, initial_value=7,
+            screen_width=1920, screen_height=1080, confirmed=True,
+        )
+        controller = BrushSliderController(
+            calibration,
+            {"x": 0, "y": 0, "width": 40, "height": 40},
+            current_screen_size_provider=lambda: (1920, 1080),
+        )
+        executor = MouseExecutor(FastEvent(), self.config())
+        detail = controller.select_value(executor, 30)
+        self.assertEqual(detail, "Выбрана кисть 30.")
+        self.assertEqual(FAKE_PYAUTOGUI.moves, [(160, 200, 0), (390, 200, 0)])
+        self.assertEqual(controller.current_value, 30)
+        self.assertEqual(FAKE_PYAUTOGUI.down_calls, 1)
+        self.assertEqual(FAKE_PYAUTOGUI.up_calls, 1)
+        with self.assertRaisesRegex(ColorPlanExecutionError, "вне диапазона 1–30"):
+            controller.select_value(executor, 31)
 
     def test_brush_slider_controller_drags_thumb_only_when_value_changes(self):
         from test_execution_hardening import FastEvent

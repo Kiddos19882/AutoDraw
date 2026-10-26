@@ -4,7 +4,7 @@ import ctypes
 import json
 import os
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import datetime
 from pathlib import Path
 import threading
@@ -27,16 +27,16 @@ except ImportError as exc:
 
 from drawing.mouse_executor import ExecutorConfig, ExecutionSummary, MouseExecutor
 from drawing.color_plan_execution import (
-    BrushSliderCalibration, ColorPlanExecutionError, ColorPlanExecutionHooks,
-    adaptive_brush_plan_to_drawing_plan, build_palette_targets, color_plan_to_drawing_plan,
-    normalize_brush_slider_points, validate_color_plan,
+    BrushSliderCalibration, BrushSliderController, ColorPlanExecutionError, ColorPlanExecutionHooks,
+    adaptive_brush_plan_to_drawing_plan, build_brush_visual_test_plan, build_palette_targets,
+    color_plan_to_drawing_plan, normalize_brush_slider_points, validate_color_plan,
 )
 from brush_planner import BrushPlannerError, load_adaptive_brush_plan
 from drawing.execution_diagnostics import (
     build_crash_summary, build_execution_report, validate_target_area, write_execution_report,
 )
 from drawing.plan_transform import PlanFitInfo, fit_plan_to_size
-from models import DrawingPlan
+from models import DrawingPlan, Point, Stroke
 from color_scanline import load_color_scanline_plan, render_color_scanline_preview
 from paint_cost_model import estimate_color_plan_paint_cost
 from palette_profiles import load_palette_profile, validate_palette_profile
@@ -78,9 +78,16 @@ class TargetArea:
 class AreaSelector:
     """Полноэкранный селектор области доски без конфликтующего -fullscreen."""
 
-    def __init__(self, parent: tk.Tk, on_done):
+    def __init__(
+        self,
+        parent: tk.Tk,
+        on_done,
+        *,
+        instruction: str = "Выделите рабочую область холста перетаскиванием. Esc — отмена.",
+    ):
         self.parent = parent
         self.on_done = on_done
+        self.instruction = instruction
         self.start: tuple[int, int] | None = None
         self.rect_id: int | None = None
         self.window = tk.Toplevel(parent)
@@ -99,7 +106,7 @@ class AreaSelector:
         self.canvas.pack(fill="both", expand=True)
         self.canvas.create_text(
             20, 20, anchor="nw", fill="white", font=("Segoe UI", 16, "bold"),
-            text="Выделите рабочую область холста перетаскиванием. Esc — отмена.",
+            text=self.instruction,
         )
         self.canvas.bind("<ButtonPress-1>", self._start)
         self.canvas.bind("<B1-Motion>", self._drag)
@@ -341,6 +348,9 @@ class Stage6App:
         self.brush_slider_confirmed_var = tk.BooleanVar(value=False)
         self.brush_slider_screen_size: tuple[int, int] | None = None
         self.brush_slider_status_var = tk.StringVar(value="Ползунок кисти не откалиброван; обычные цветные планы работают без него.")
+        self.brush_test_status_var = tk.StringVar(
+            value="Пробный тест нарисует четыре линии на выбранном свободном участке игрового холста."
+        )
         self.status_var = tk.StringVar(value="Откройте одноцветный DrawingPlan или цветной план этапа 19 и выберите область доски.")
         self.plan_stats_var = tk.StringVar(value="План не загружен.")
         self.progress_var = tk.DoubleVar(value=0.0)
@@ -506,6 +516,19 @@ class Stage6App:
             wraplength=1180,
             justify="left",
         ).grid(row=1, column=2, columnspan=2, sticky="w", padx=4, pady=(6, 2))
+        test_brush_button = ttk.Button(
+            brush_settings,
+            text="Проверить изменение размера кисти…",
+            command=self._start_brush_visual_test,
+        )
+        test_brush_button.grid(row=2, column=0, columnspan=2, sticky="w", padx=4, pady=(6, 2))
+        self.execution_controls.append(test_brush_button)
+        ttk.Label(
+            brush_settings,
+            textvariable=self.brush_test_status_var,
+            wraplength=1180,
+            justify="left",
+        ).grid(row=2, column=2, columnspan=2, sticky="w", padx=4, pady=(6, 2))
         ttk.Label(
             brush_settings,
             text=("В расширенном режиме игры сначала откройте ползунок. Нажмите «Выбрать точки мышью…» и отметьте "
@@ -513,7 +536,7 @@ class Stage6App:
                   "начальное значение ползунка и подтвердите калибровку. Координаты ползунка обязаны быть вне холста."),
             wraplength=1180,
             justify="left",
-        ).grid(row=2, column=0, columnspan=4, sticky="w", padx=4, pady=(4, 0))
+        ).grid(row=3, column=0, columnspan=4, sticky="w", padx=4, pady=(4, 0))
 
         stats_frame = ttk.LabelFrame(outer, text="План и ожидаемая работа", padding=8)
         stats_frame.pack(fill="x", pady=(0, 8))
@@ -668,6 +691,232 @@ class Stage6App:
             "Координаты ползунка заполнены по двум щелчкам. Перед подтверждением проверьте, "
             "что выбран именно ползунок кисти расширенного режима."
         )
+
+    def _start_brush_visual_test(self) -> None:
+        if self.running:
+            return
+        try:
+            if self.area is None:
+                raise ColorPlanExecutionError("Сначала выберите область игрового холста.")
+            calibration = BrushSliderCalibration.from_dict(self._read_brush_slider_calibration())
+            config = replace(self._read_executor_config(), line_extension_px=0.0)
+        except (ValueError, TypeError, ColorPlanExecutionError) as exc:
+            messagebox.showerror("Нельзя запустить тест кисти", str(exc), parent=self.root)
+            return
+
+        if not messagebox.askokcancel(
+            "Визуальный тест размера кисти",
+            "Тест нарисует четыре длинные линии значениями кисти 1, 7, 14 и 20 на свободном участке холста. "
+            "Пробные линии останутся на рисунке.\n\n"
+            f"После успешного теста бегунок будет возвращён к значению {calibration.initial_value}. "
+            "Перед продолжением проверьте, что в игре бегунок действительно стоит на этом значении.\n\n"
+            f"Обратный отсчёт: {config.countdown_seconds} с. После него переключитесь в браузер.",
+            icon="warning",
+            parent=self.root,
+        ):
+            return
+
+        self.root.withdraw()
+        self.root.after(
+            120,
+            lambda: AreaSelector(
+                self.root,
+                lambda chosen: self._brush_test_area_selected(chosen, calibration, config),
+                instruction=(
+                    "Выделите СВОБОДНЫЙ участок игрового холста для четырёх пробных линий. "
+                    "Нужно не менее 180 × 160 px. Esc — отмена."
+                ),
+            ),
+        )
+
+    def _brush_test_area_selected(
+        self,
+        test_area: TargetArea | None,
+        calibration: BrushSliderCalibration,
+        config: ExecutorConfig,
+    ) -> None:
+        self.root.deiconify()
+        self.root.lift()
+        if self.running:
+            return
+        if test_area is None:
+            self.brush_test_status_var.set("Визуальный тест отменён.")
+            return
+        if self.area is None:
+            messagebox.showerror("Нет области холста", "Сначала выберите область игрового холста.", parent=self.root)
+            return
+        canvas_right = self.area.x + self.area.width
+        canvas_bottom = self.area.y + self.area.height
+        test_right = test_area.x + test_area.width
+        test_bottom = test_area.y + test_area.height
+        if not (
+            test_area.x >= self.area.x and test_area.y >= self.area.y
+            and test_right <= canvas_right and test_bottom <= canvas_bottom
+        ):
+            messagebox.showerror(
+                "Участок вне холста",
+                "Тестовый прямоугольник должен полностью находиться внутри выбранной области игрового холста. "
+                "Повторно запустите тест и выберите свободный участок внутри доски.",
+                parent=self.root,
+            )
+            return
+        try:
+            plan = build_brush_visual_test_plan(test_area.width, test_area.height)
+            calibration.validate(pyautogui.size(), self.area.to_dict())
+        except (ValueError, TypeError, ColorPlanExecutionError) as exc:
+            messagebox.showerror("Неподходящий участок для теста", str(exc), parent=self.root)
+            return
+
+        details = (
+            f"Тестовая область: X={test_area.x}, Y={test_area.y}, "
+            f"{test_area.width} × {test_area.height} px.\n"
+            "Будут нарисованы четыре горизонтальные линии сверху вниз кистями 1, 7, 14 и 20.\n"
+            f"Начальное значение бегунка: {calibration.initial_value}; после успешного теста оно будет восстановлено.\n\n"
+            "Линии нельзя автоматически стереть. Продолжать?"
+        )
+        if not messagebox.askokcancel("Подтвердите визуальный тест", details, icon="warning", parent=self.root):
+            self.brush_test_status_var.set("Визуальный тест отменён до рисования.")
+            return
+
+        self.running = True
+        self.stop_event = threading.Event()
+        self.stop_reason = None
+        self._set_execution_controls_enabled(False)
+        self.start_button.configure(state="disabled")
+        self.stop_button.configure(state="normal")
+        self.execution_state_var.set("Состояние: визуальный тест кисти")
+        self.progress_var.set(0)
+        self.progress_text_var.set("Подготовка визуального теста…")
+        self.status_var.set("Визуальный тест запущен. Во время обратного отсчёта переключитесь в браузер.")
+        self.brush_test_status_var.set("Выполняется тест кистей 1, 7, 14 и 20…")
+
+        thread = threading.Thread(
+            target=self._execute_brush_visual_test_worker,
+            args=(plan, test_area, self.area, config, calibration),
+            name="AutoDraw-BrushVisualTest",
+            daemon=True,
+        )
+        try:
+            thread.start()
+        except Exception as exc:
+            self._brush_visual_test_failed(f"{type(exc).__name__}: {exc}")
+
+    def _execute_brush_visual_test_worker(
+        self,
+        plan: DrawingPlan,
+        test_area: TargetArea,
+        canvas_area: TargetArea,
+        config: ExecutorConfig,
+        calibration: BrushSliderCalibration,
+    ) -> None:
+        try:
+            controller = BrushSliderController(
+                calibration,
+                canvas_area.to_dict(),
+                current_screen_size_provider=pyautogui.size,
+            )
+            executor = MouseExecutor(
+                self.stop_event, config, stop_reason_provider=lambda: self.stop_reason
+            )
+            summary = executor.execute(
+                plan,
+                test_area.x,
+                test_area.y,
+                progress=lambda current, total, detail: self.root.after(
+                    0, self._update_progress, current, total, detail
+                ),
+                before_stroke=controller.before_stroke,
+            )
+            restore_detail = None
+            restore_error = None
+            if summary.status == "completed":
+                try:
+                    restore_detail = controller.select_value(executor, calibration.initial_value)
+                except Exception as exc:
+                    restore_error = f"{type(exc).__name__}: {exc}"
+            self.root.after(
+                0,
+                self._finish_brush_visual_test,
+                summary,
+                test_area,
+                calibration.initial_value,
+                restore_detail,
+                restore_error,
+            )
+        except Exception as exc:
+            self.root.after(0, self._brush_visual_test_failed, f"{type(exc).__name__}: {exc}")
+
+    def _finish_brush_visual_test(
+        self,
+        summary: ExecutionSummary,
+        test_area: TargetArea,
+        initial_value: int,
+        restore_detail: str | None,
+        restore_error: str | None,
+    ) -> None:
+        self.running = False
+        self._set_execution_controls_enabled(True)
+        self.stop_button.configure(state="disabled")
+        self.start_button.configure(
+            state="normal" if self.execution_plan is not None and self.area is not None else "disabled"
+        )
+        self.progress_var.set(
+            summary.completed_strokes * 100 / max(1, summary.total_strokes)
+        )
+        self.progress_text_var.set(
+            f"Выполнено пробных линий: {summary.completed_strokes}/{summary.total_strokes}"
+        )
+
+        if summary.status == "completed":
+            if restore_error:
+                message = (
+                    "Линии нарисованы, но бегунок не удалось автоматически вернуть к исходному значению "
+                    f"{initial_value}: {restore_error}. Проверьте его положение вручную."
+                )
+                self.execution_state_var.set("Состояние: тест завершён с предупреждением")
+                self.brush_test_status_var.set(message)
+                self.status_var.set(message)
+            else:
+                message = (
+                    "Визуальный тест завершён: линии должны идти сверху вниз с возрастающей толщиной "
+                    "(кисти 1, 7, 14, 20). Бегунок возвращён к исходному значению "
+                    f"{initial_value}. Сравните толщину линий на игровом холсте."
+                )
+                self.execution_state_var.set("Состояние: визуальный тест завершён")
+                self.brush_test_status_var.set(message)
+                self.status_var.set(message)
+        elif summary.status == "stopped":
+            message = (
+                f"Визуальный тест остановлен после {summary.completed_strokes}/{summary.total_strokes} линий. "
+                "Бегунок мог остаться на последнем выбранном значении; проверьте его перед следующей операцией."
+            )
+            self.execution_state_var.set("Состояние: визуальный тест остановлен")
+            self.brush_test_status_var.set(message)
+            self.status_var.set(message)
+        else:
+            message = (
+                f"Визуальный тест завершился ошибкой после {summary.completed_strokes}/{summary.total_strokes} линий: "
+                f"{summary.error or 'неизвестная ошибка'}. Проверьте положение бегунка и холст."
+            )
+            self.execution_state_var.set("Состояние: ошибка визуального теста")
+            self.brush_test_status_var.set(message)
+            self.status_var.set(message)
+        if self.close_after_execution:
+            self.root.destroy()
+
+    def _brush_visual_test_failed(self, error: str) -> None:
+        self.running = False
+        self._set_execution_controls_enabled(True)
+        self.stop_button.configure(state="disabled")
+        self.start_button.configure(
+            state="normal" if self.execution_plan is not None and self.area is not None else "disabled"
+        )
+        message = f"Не удалось выполнить визуальный тест кисти: {error}. Если тест успел начаться, проверьте положение бегунка."
+        self.execution_state_var.set("Состояние: ошибка визуального теста")
+        self.brush_test_status_var.set(message)
+        self.status_var.set(message)
+        if self.close_after_execution:
+            self.root.destroy()
 
     def _confirm_brush_slider_calibration(self) -> None:
         try:

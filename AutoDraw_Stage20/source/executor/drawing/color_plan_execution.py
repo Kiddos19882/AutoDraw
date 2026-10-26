@@ -319,6 +319,45 @@ class BrushSliderCalibration:
                     )
 
 
+def build_brush_visual_test_plan(width: int, height: int) -> DrawingPlan:
+    """Create four separated horizontal strokes to visually verify brush-size switching."""
+    if isinstance(width, bool) or isinstance(height, bool):
+        raise ColorPlanExecutionError("Размер тестовой области должен быть целым числом.")
+    try:
+        width, height = int(width), int(height)
+    except (TypeError, ValueError) as exc:
+        raise ColorPlanExecutionError("Не удалось прочитать размер тестовой области.") from exc
+    if width < 180 or height < 160:
+        raise ColorPlanExecutionError(
+            "Для визуального теста выберите свободный прямоугольник не менее 180 × 160 px."
+        )
+
+    brush_values = (1, 7, 14, 20)
+    margin_x = max(16, min(30, width // 10))
+    margin_y = max(20, min(26, height // 8))
+    available_height = height - margin_y * 2
+    strokes: list[Stroke] = []
+    for index, brush_value in enumerate(brush_values):
+        y = round(margin_y + index * available_height / (len(brush_values) - 1))
+        strokes.append(
+            Stroke(
+                name=f"Проверка кисти {brush_value}",
+                points=[Point(margin_x, y), Point(width - margin_x, y)],
+                metadata={
+                    "brush_value": str(brush_value),
+                    "line_extension_px_override": "0",
+                    "brush_visual_test": "true",
+                },
+            )
+        )
+    return DrawingPlan(
+        width=width,
+        height=height,
+        strokes=strokes,
+        name="Визуальный тест изменения размера кисти",
+    )
+
+
 class BrushSliderController:
     """Drag the currently selected slider thumb to the calibrated target value."""
 
@@ -356,6 +395,16 @@ class BrushSliderController:
             raise ColorPlanExecutionError(f"В штрихе №{stroke_index} указан неверный размер кисти.") from exc
         if not 1 <= value <= 20:
             raise ColorPlanExecutionError(f"Размер кисти {value} не входит в диапазон планировщика 1–20.")
+        return self.select_value(executor, value)
+
+    def select_value(self, executor: Any, value: int) -> str:
+        """Move the slider without drawing; the visual test also uses this to restore its starting value."""
+        if isinstance(value, bool) or not isinstance(value, int):
+            raise ColorPlanExecutionError("Размер кисти должен быть целым числом.")
+        if not self.calibration.min_value <= value <= self.calibration.max_value:
+            raise ColorPlanExecutionError(
+                f"Размер кисти {value} вне диапазона {self.calibration.min_value}–{self.calibration.max_value}."
+            )
         self.validate()
         if self.current_value == value:
             return f"Кисть {value} уже выбрана."
