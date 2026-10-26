@@ -44,7 +44,6 @@ def _estimate_geometry_paint_cost(
         points = [(float(p["x"]), float(p["y"])) for p in stroke["points"]]
         length = _path_length(points, bool(stroke.get("closed")))
         is_single_pixel = len(points) == 2 and _point_distance(points[0], points[1]) <= _EPSILON
-        single_pixel_extra = 1.0 if is_single_pixel else 0.0
         total_length += length
         total_single_pixel_count += int(is_single_pixel)
         color_index = int(stroke["color"]["palette_index"])
@@ -524,7 +523,12 @@ def _summarize_plan(
             "source_visible_pixel_count": max(
                 0, int(visible if source_visible_pixel_count is None else source_visible_pixel_count)
             ),
+            "geometry_coverage_metrics_available": generation.get("coverage_metrics_available", True),
             "geometry_coverage_note": (
+                "Метрики покрытия пикселями исходной карты недоступны для плана, собранного "
+                "из обрезанных векторных траекторий."
+                if generation.get("coverage_metrics_available") is False
+                else
                 "Счётчик относится к пикселям исходных цветовых слоёв, сохранённым после фильтрации "
                 "компонентов; это не оценка площади, фактически закрашенной векторными штрихами."
             ),
