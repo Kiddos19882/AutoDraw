@@ -13,6 +13,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 from palette_quantization import MAX_IMAGE_PIXELS, normalize_palette
+from paint_cost_model import CALIBRATED_BUDGET_HIGH_PX_EQUIVALENT, CALIBRATED_BUDGET_LOW_PX_EQUIVALENT
 from layer_segmentation import filter_small_components as _connected_components
 from skeletonization import thin_binary_mask as _zhang_suen_thinning
 from skeletonization import trace_skeleton_paths as _skeleton_paths
@@ -81,6 +82,7 @@ def _estimate_geometry_paint_cost(
         })
     highest = max(per_color, key=lambda entry: entry["estimated_usage_percent"], default=None)
     usage = total_cost / budget * 100.0
+    conservative_usage = total_cost / CALIBRATED_BUDGET_LOW_PX_EQUIVALENT * 100.0
     return {
         "model_id": "empirical-ink-cost-v1-polyline",
         "is_estimate": True,
@@ -94,9 +96,11 @@ def _estimate_geometry_paint_cost(
         "estimated_stroke_overhead_px_equivalent": round(stroke_count * overhead, 3),
         "paint_budget_px_equivalent": budget,
         "estimated_budget_px_equivalent": budget,
+        "calibrated_budget_low_px_equivalent": CALIBRATED_BUDGET_LOW_PX_EQUIVALENT,
+        "calibrated_budget_high_px_equivalent": CALIBRATED_BUDGET_HIGH_PX_EQUIVALENT,
         "estimated_total_ink_px_equivalent": round(total_cost, 3),
         "estimated_remaining_px_equivalent": round(budget - total_cost, 3),
-        "conservative_usage_percent": round(usage, 3),
+        "conservative_usage_percent": round(conservative_usage, 3),
         "estimated_usage_percent": round(usage, 3),
         "risk_level": "over_budget" if usage >= 100 else "very_high" if usage >= 90 else "high" if usage >= 80 else "normal",
         "risk_label": "Превышение бюджета" if usage >= 100 else "Высокий прогноз расхода" if usage >= 80 else "Оценка в пределах бюджета",
