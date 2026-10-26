@@ -313,9 +313,19 @@ def build_geometry_color_plan(
         width, height = source_width, source_height
     else:
         try:
-            width, height = int(canvas_size[0]), int(canvas_size[1])
-        except (TypeError, ValueError, IndexError) as exc:
+            raw_width, raw_height = canvas_size[0], canvas_size[1]
+            width, height = int(raw_width), int(raw_height)
+        except (TypeError, ValueError, IndexError, OverflowError) as exc:
             raise GeometryColorPlanError("Размер целевого холста задан неверно.") from exc
+        if (
+            isinstance(raw_width, bool)
+            or isinstance(raw_height, bool)
+            or width != raw_width
+            or height != raw_height
+        ):
+            raise GeometryColorPlanError(
+                "Размеры целевого холста должны быть целыми числами без округления."
+            )
         if width < source_width or height < source_height:
             raise GeometryColorPlanError("Целевой холст меньше исходной карты цветов.")
 
@@ -507,10 +517,12 @@ def validate_geometry_color_plan(plan: Any) -> dict[str, Any]:
         color = stroke.get("color")
         if not isinstance(color, dict):
             raise GeometryColorPlanError(f"У штриха №{index} отсутствует цвет.")
-        try:
-            color_index = int(color["palette_index"])
-        except (KeyError, TypeError, ValueError) as exc:
-            raise GeometryColorPlanError(f"У штриха №{index} неверный индекс палитры.") from exc
+        raw_color_index = color.get("palette_index")
+        if isinstance(raw_color_index, bool) or not isinstance(raw_color_index, int):
+            raise GeometryColorPlanError(
+                f"Индекс палитры штриха №{index} должен быть целым числом."
+            )
+        color_index = raw_color_index
         if not 0 <= color_index < len(palette):
             raise GeometryColorPlanError(f"Индекс палитры штриха №{index} выходит за границы.")
         if str(color.get("hex", "")).upper() != palette[color_index]["hex"]:
