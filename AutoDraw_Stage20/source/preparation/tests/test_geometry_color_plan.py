@@ -824,6 +824,7 @@ def test_automatic_optimizer_uses_precise_cost_when_no_mode_fits(monkeypatch):
         return plan, {
             "mode": mode,
             "fits_budget": False,
+            "needs_multi_board_split": True,
             "scale": 1.0,
             "estimated_ink_after_px_equivalent": cost,
             "quality_mismatch_pixel_count": mismatches,
