@@ -43,6 +43,7 @@ def test_geometry_adapter_preserves_closed_contours_and_marker_metadata():
     assert converted.stroke_count == len(plan["strokes"])
     assert any(stroke.closed for stroke in converted.strokes)
     assert all("palette_index" in stroke.metadata for stroke in converted.strokes)
+    assert all(stroke.metadata["line_extension_px_override"] == "0" for stroke in converted.strokes)
     converted.validate_bounds()
 
 
@@ -73,6 +74,7 @@ def test_legacy_scanline_adapter_remains_compatible():
     assert converted.width == 12
     assert converted.height == 8
     assert converted.strokes[0].metadata["color_scanline_order"] == "1"
+    assert "line_extension_px_override" not in converted.strokes[0].metadata
     assert not converted.strokes[0].closed
     converted.validate_bounds()
 
