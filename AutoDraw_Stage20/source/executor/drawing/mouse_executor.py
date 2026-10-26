@@ -15,6 +15,7 @@ from models import DrawingPlan, Point
 @dataclass(frozen=True, slots=True)
 class ExecutorConfig:
     point_step_px: float = 2.0
+    line_extension_px: float = 2.0
     point_delay_ms: int = 10
     after_mouse_up_ms: int = 20
     before_mouse_down_ms: int = 20
@@ -42,9 +43,16 @@ class ExecutorConfig:
             if not minimum <= value <= maximum:
                 raise ValueError(f"{name} должно быть в диапазоне {minimum}–{maximum}.")
 
+        extension = self.line_extension_px
+        if isinstance(extension, bool) or not isinstance(extension, (int, float)) or not math.isfinite(float(extension)):
+            raise ValueError("Продление конца линии должно быть конечным числом.")
+        if not 0.0 <= float(extension) <= 20.0:
+            raise ValueError("Продление конца линии должно быть в диапазоне 0–20 px.")
+
     def to_dict(self) -> dict:
         return {
             "point_step_px": self.point_step_px,
+            "line_extension_px": float(self.line_extension_px),
             "point_delay_ms": self.point_delay_ms,
             "after_mouse_up_ms": self.after_mouse_up_ms,
             "before_mouse_down_ms": self.before_mouse_down_ms,
@@ -247,7 +255,20 @@ class MouseExecutor:
 
                 try:
                     self._wait_interruptibly(self.config.after_mouse_down_ms / 1000.0)
-                    for segment_start, segment_end in stroke.iter_segments():
+                    segments = list(stroke.iter_segments())
+                    # Extend only the last endpoint of open strokes. Keep closed contours
+                    # and the saved DrawingPlan unchanged; clamp to the local canvas.
+                    if not stroke.closed and segments and float(self.config.line_extension_px) > 0:
+                        last_start, last_end = segments[-1]
+                        dx = last_end.x - last_start.x
+                        dy = last_end.y - last_start.y
+                        length = math.hypot(dx, dy)
+                        if length > 0:
+                            extension = float(self.config.line_extension_px)
+                            extended_x = min(float(plan.width), max(0.0, last_end.x + dx / length * extension))
+                            extended_y = min(float(plan.height), max(0.0, last_end.y + dy / length * extension))
+                            segments[-1] = (last_start, Point(extended_x, extended_y))
+                    for segment_start, segment_end in segments:
                         self._move_segment(segment_start, segment_end, area_x, area_y)
                     self._wait_interruptibly(self.config.end_hold_ms / 1000.0)
                 finally:

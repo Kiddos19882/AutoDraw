@@ -122,6 +122,7 @@ class ExecutorConfigTests(unittest.TestCase):
         config.validate()
         self.assertEqual(config.to_dict(), {
             "point_step_px": 2.0,
+            "line_extension_px": 2.0,
             "point_delay_ms": 10,
             "after_mouse_up_ms": 20,
             "before_mouse_down_ms": 20,
@@ -134,6 +135,11 @@ class ExecutorConfigTests(unittest.TestCase):
         for step in (0.1, 20.1, float("inf"), float("nan")):
             with self.subTest(step=step), self.assertRaises(ValueError):
                 ExecutorConfig(point_step_px=step).validate()
+
+    def test_line_extension_bounds_and_non_finite_values_rejected(self):
+        for extension in (-0.1, 20.1, float("inf"), float("nan"), True):
+            with self.subTest(extension=extension), self.assertRaises(ValueError):
+                ExecutorConfig(line_extension_px=extension).validate()
 
     def test_timing_bounds_rejected(self):
         for field, value in (("point_delay_ms", 101), ("after_mouse_up_ms", -1), ("before_mouse_down_ms", 501), ("countdown_seconds", 0)):
@@ -240,6 +246,52 @@ class MouseExecutorTests(unittest.TestCase):
         self.assertFalse(summary.mouse_release_succeeded)
         self.assertTrue(summary.mouse_release_errors)
         self.assertIn("mouseUp failure", summary.error)
+
+
+
+
+class LineExtensionTests(unittest.TestCase):
+    def setUp(self):
+        FAKE_PYAUTOGUI.reset()
+        FakeGlobalHotKeys.trigger_f12_on_start = False
+        FakeGlobalHotKeys.last_instance = None
+
+    def make_config(self, **overrides):
+        values = dict(
+            point_step_px=2.0, line_extension_px=2.0, point_delay_ms=0,
+            after_mouse_up_ms=0, before_mouse_down_ms=0, after_mouse_down_ms=0,
+            end_hold_ms=0, countdown_seconds=1,
+        )
+        values.update(overrides)
+        return ExecutorConfig(**values)
+
+    def test_open_line_is_drawn_two_pixels_longer_by_default(self):
+        plan = small_plan()
+        summary = MouseExecutor(FastEvent(), self.make_config()).execute(plan, 100, 200)
+        self.assertEqual(summary.status, "completed")
+        self.assertEqual(FAKE_PYAUTOGUI.moves[0][:2], (101, 201))
+        self.assertEqual(FAKE_PYAUTOGUI.moves[-1][:2], (111, 201))
+        self.assertEqual(plan.strokes[0].points[-1], Point(9, 1))
+
+    def test_zero_extension_keeps_original_endpoint(self):
+        MouseExecutor(FastEvent(), self.make_config(line_extension_px=0)).execute(small_plan(), 100, 200)
+        self.assertEqual(FAKE_PYAUTOGUI.moves[-1][:2], (109, 201))
+
+    def test_closed_contour_is_not_extended(self):
+        plan = DrawingPlan(
+            width=20, height=20,
+            strokes=[Stroke("triangle", [Point(1, 1), Point(9, 1), Point(9, 9)], closed=True)],
+        )
+        MouseExecutor(FastEvent(), self.make_config()).execute(plan, 100, 200)
+        self.assertEqual(FAKE_PYAUTOGUI.moves[-1][:2], (101, 201))
+
+    def test_extension_is_clamped_to_canvas_bounds(self):
+        plan = DrawingPlan(
+            width=20, height=20,
+            strokes=[Stroke("edge line", [Point(18, 10), Point(20, 10)])],
+        )
+        MouseExecutor(FastEvent(), self.make_config()).execute(plan, 100, 200)
+        self.assertEqual(FAKE_PYAUTOGUI.moves[-1][:2], (120, 210))
 
 
 if __name__ == "__main__":

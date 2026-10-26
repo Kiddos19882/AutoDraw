@@ -217,6 +217,7 @@ class Stage6App:
         self.h_var = tk.StringVar()
         self.fit_var = tk.BooleanVar(value=True)
         self.point_step_var = tk.StringVar(value="2.0")
+        self.line_extension_var = tk.StringVar(value="2.0")
         self.point_delay_var = tk.StringVar(value="10")
         self.after_up_var = tk.StringVar(value="20")
         self.before_down_var = tk.StringVar(value="20")
@@ -297,6 +298,7 @@ class Stage6App:
         settings.pack(fill="x", pady=(0, 8))
         controls = [
             ("Шаг точек, px", self.point_step_var, 0.5, 20, 0.5),
+            ("Продление конца линии, px", self.line_extension_var, 0, 20, 0.5),
             ("Задержка точки, мс", self.point_delay_var, 0, 100, 1),
             ("После mouseUp, мс", self.after_up_var, 0, 500, 5),
             ("Перед mouseDown, мс", self.before_down_var, 0, 500, 5),
@@ -314,6 +316,12 @@ class Stage6App:
             spinbox.pack(anchor="w")
             self.execution_controls.append(spinbox)
             settings.columnconfigure(col, weight=1)
+        ttk.Label(
+            settings,
+            text="Продление применяется к конечной точке каждого открытого штриха; замкнутые контуры не изменяются. У границы холста продление ограничивается его размерами.",
+            wraplength=1180,
+            justify="left",
+        ).grid(row=2, column=0, columnspan=4, sticky="w", padx=5, pady=(5, 0))
 
         stats_frame = ttk.LabelFrame(outer, text="План и ожидаемая работа", padding=8)
         stats_frame.pack(fill="x", pady=(0, 8))
@@ -343,6 +351,7 @@ class Stage6App:
             data = json.loads(SETTINGS_PATH.read_text(encoding="utf-8"))
             mappings = {
                 "point_step_px": self.point_step_var,
+                "line_extension_px": self.line_extension_var,
                 "point_delay_ms": self.point_delay_var,
                 "after_mouse_up_ms": self.after_up_var,
                 "before_mouse_down_ms": self.before_down_var,
@@ -717,6 +726,7 @@ class Stage6App:
         try:
             config = ExecutorConfig(
                 point_step_px=float(self.point_step_var.get()),
+                line_extension_px=float(self.line_extension_var.get()),
                 point_delay_ms=int(self.point_delay_var.get()),
                 after_mouse_up_ms=int(self.after_up_var.get()),
                 before_mouse_down_ms=int(self.before_down_var.get()),
@@ -760,9 +770,9 @@ class Stage6App:
             single_pixel_count = int(color_plan["summary"].get("single_pixel_stroke_count", 0))
             single_pixel_note = (
                 f"\nОдиночных пикселей: {single_pixel_count}. Вместо клика каждый будет выполнен "
-                "горизонтальным штрихом длиной 1 px цветом самого пикселя. На правом краю штрих "
-                "доходит до границы холста; на прозрачном соседнем участке возможно расширение цвета на 1 px. "
-                "Предпросмотр исполнителя показывает это расширение."
+                f"горизонтальным штрихом базовой длиной 1 px; затем исполнитель продлит конец на "
+                f"{config.line_extension_px:g} px. На границе холста продление ограничивается его размерами. "
+                "Предпросмотр показывает базовый план; добавка применяется при исполнении."
                 if single_pixel_count else ""
             )
             try:
@@ -803,6 +813,7 @@ class Stage6App:
             f"{self.area.width} × {self.area.height} px\n\n"
             f"Штрихов: {len(self.execution_plan.strokes)}\n"
             f"Интервал между точками: {config.point_delay_ms} мс\n"
+            f"Продление конца открытого штриха: +{config.line_extension_px:g} px (с ограничением по границе холста)\n"
             f"Паузы после mouseUp / перед mouseDown: {config.after_mouse_up_ms} / {config.before_mouse_down_ms} мс\n\n"
             f"{color_mode_text}"
             "После подтверждения начнётся обратный отсчёт. Переключитесь на правильную вкладку браузера.\n"
