@@ -3,6 +3,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 import geometry_color_plan as geometry_module
+import geometry_budget_optimizer as budget_module
 
 from geometry_color_plan import (
     GeometryColorPlanError,
@@ -775,3 +776,68 @@ def test_multiboard_split_preserves_a_real_single_pixel_stroke():
     ]
     assert len(singleton_strokes) == 1
     assert singleton_strokes[0]["points"][0] == {"x": 0.0, "y": 5.0}
+
+
+
+def test_quality_measure_rejects_fractional_palette_index_map():
+    plan = build_geometry_color_plan(_map(), PALETTE, mode="scanline")
+    invalid_map = _map().astype(np.float32)
+    invalid_map[0, 0] = 0.5
+
+    with pytest.raises(GeometryColorPlanError):
+        measure_geometry_plan_quality(invalid_map, plan)
+
+
+def test_quality_measure_rejects_out_of_range_palette_indexes():
+    plan = build_geometry_color_plan(_map(), PALETTE, mode="scanline")
+    invalid_map = _map().copy()
+    invalid_map[0, 0] = len(PALETTE)
+
+    with pytest.raises(GeometryColorPlanError):
+        measure_geometry_plan_quality(invalid_map, plan)
+
+
+def test_automatic_optimizer_uses_precise_cost_when_no_mode_fits(monkeypatch):
+    costs = {
+        "scanline": (100.9, 0),
+        "contour": (100.1, 99),
+        "skeleton": (100.5, 3),
+    }
+
+    def fake_optimize(
+        index_map,
+        palette,
+        *,
+        mode,
+        paint_budget_px_equivalent,
+        target_usage_percent=75.0,
+        stroke_overhead_px_equivalent=6.67,
+        simplify_tolerance_px=0.8,
+        min_component_area=1,
+        source_name=None,
+    ):
+        plan = build_geometry_color_plan(index_map, palette, mode=mode)
+        cost, mismatches = costs[mode]
+        return plan, {
+            "mode": mode,
+            "fits_budget": False,
+            "scale": 1.0,
+            "estimated_ink_after_px_equivalent": cost,
+            "quality_mismatch_pixel_count": mismatches,
+            "quality_pixel_accuracy_percent": 0.0,
+        }
+
+    monkeypatch.setattr(budget_module, "optimize_geometry_plan_to_budget", fake_optimize)
+
+    plan, report = optimize_geometry_plan_across_modes(
+        _map(),
+        PALETTE,
+        paint_budget_px_equivalent=1,
+        target_usage_percent=75,
+    )
+
+    assert report["mode"] == "contour"
+    assert report["estimated_ink_after_px_equivalent"] == pytest.approx(100.1)
+    assert report["fits_budget"] is False
+    assert report["needs_multi_board_split"] is True
+    assert plan["generation"]["mode"] == "contour"
