@@ -253,6 +253,10 @@ def test_rdp_does_not_simplify_through_another_color_layer():
 
 from stroke_order_optimizer import orient_and_order_strokes
 from geometry_budget_optimizer import _rescale_map_centered
+from geometry_budget_optimizer import (
+    measure_geometry_plan_quality,
+    optimize_geometry_plan_across_modes,
+)
 
 
 def _route_stroke(color_index: int, first_x: float, last_x: float) -> dict:
@@ -404,3 +408,36 @@ def test_budget_rescaling_keeps_each_pixel_on_a_valid_palette_index():
     assert resized.dtype.kind in "iu"
     assert int(resized.min()) >= -1
     assert int(resized.max()) < len(PALETTE)
+
+
+def test_exact_scanline_render_has_full_pixel_accuracy():
+    index_map = _map()
+    plan = build_geometry_color_plan(index_map, PALETTE, mode="scanline")
+
+    quality = measure_geometry_plan_quality(index_map, plan)
+
+    assert quality["quality_mismatch_pixel_count"] == 0
+    assert quality["quality_pixel_accuracy_percent"] == 100.0
+    assert quality["quality_visible_pixel_accuracy_percent"] == 100.0
+
+
+def test_automatic_optimizer_compares_all_modes_and_prefers_exact_render():
+    index_map = _map()
+
+    plan, report = optimize_geometry_plan_across_modes(
+        index_map,
+        PALETTE,
+        paint_budget_px_equivalent=100_000,
+        target_usage_percent=90,
+        stroke_overhead_px_equivalent=6.67,
+        simplify_tolerance_px=0.8,
+    )
+
+    assert validate_geometry_color_plan(plan) is plan
+    assert report["requested_mode"] == "automatic"
+    assert report["mode"] == "scanline"
+    assert report["fits_budget"] is True
+    assert report["quality_pixel_accuracy_percent"] == 100.0
+    assert {item["mode"] for item in report["mode_candidates"]} == {
+        "scanline", "contour", "skeleton"
+    }
