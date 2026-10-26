@@ -522,8 +522,15 @@ def render_geometry_color_preview(plan: Any, max_dimension: int = 1600) -> Image
         ]
         color = tuple(int(channel) for channel in stroke["color"]["rgb"]) + (255,)
         if len(points) == 2 and points[0] == points[1]:
-            x, y = points[0]
-            draw.point((x, y), fill=color)
+            # Stage 20 expands a zero-length point to a 1 px horizontal drag.
+            # Match the executor in the preview and in pixel-fidelity measurements.
+            raw_x = float(stroke["points"][0]["x"])
+            if raw_x < width:
+                raw_x2 = raw_x + 1.0
+                x2 = round(raw_x2 * scale)
+                draw.line((points[0][0], points[0][1], x2, points[0][1]), fill=color, width=1)
+            else:
+                draw.point(points[0], fill=color)
             continue
         if len(points) >= 2:
             if stroke.get("closed") and points[0] != points[-1]:
