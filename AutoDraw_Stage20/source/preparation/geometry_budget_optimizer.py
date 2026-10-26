@@ -38,6 +38,17 @@ def optimize_geometry_plan_to_budget(
     the smallest RDP tolerance. If no single-board candidate fits, the best low-cost
     candidate is returned so the caller can offer a multi-board split.
     """
+    # Lazy imports avoid a module cycle: the planner delegates candidate search
+    # to this module, while the optimizer calls back into the planner to build candidates.
+    from geometry_color_plan import (
+        GeometryColorPlanError,
+        _estimate_geometry_paint_cost,
+        _validate_index_map,
+        build_geometry_color_plan,
+        validate_geometry_color_plan,
+    )
+    from palette_quantization import normalize_palette
+
     normalized = normalize_palette(palette.get("colors", []) if isinstance(palette, dict) else palette)
     original = _validate_index_map(index_map, len(normalized))
     try:
