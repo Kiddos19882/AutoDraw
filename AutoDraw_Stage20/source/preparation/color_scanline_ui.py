@@ -854,6 +854,21 @@ class ColorScanlineTab:
                     stroke_overhead_px_equivalent=stroke_overhead,
                     paint_budget_px_equivalent=paint_budget,
                 )
+                optimization = candidate.setdefault("generation", {}).get("budget_optimization")
+                if isinstance(optimization, dict):
+                    target_usage = float(optimization.get("target_usage_percent", 75.0))
+                    target_cost = paint_budget * target_usage / 100.0
+                    estimated_cost = float(
+                        candidate["summary"]["paint_cost_estimate"]["estimated_total_ink_px_equivalent"]
+                    )
+                    optimization.update({
+                        "paint_budget_px_equivalent": paint_budget,
+                        "target_cost_px_equivalent": round(target_cost, 3),
+                        "estimated_ink_after_px_equivalent": estimated_cost,
+                        "fits_budget": estimated_cost <= target_cost,
+                        "needs_multi_board_split": estimated_cost > target_cost,
+                        "budget_recalculated_without_geometry_changes": True,
+                    })
                 validate_geometry_color_plan(candidate)
                 self._display_geometry_plan(
                     candidate, self.plan_index_map, plan_path=self.plan_path,
