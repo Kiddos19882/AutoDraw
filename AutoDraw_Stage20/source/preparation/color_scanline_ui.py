@@ -33,6 +33,7 @@ from geometry_color_plan import (
     _estimate_geometry_paint_cost,
     build_geometry_color_plan,
     load_geometry_color_plan,
+    optimize_geometry_plan_across_modes,
     optimize_geometry_plan_to_budget,
     render_geometry_color_preview,
     save_geometry_color_plan,
@@ -115,7 +116,7 @@ class ColorScanlineTab:
         self.brush_scale_calibrated_var = tk.BooleanVar(value=False)
         self.paint_overhead_var = tk.StringVar(value=f"{DEFAULT_STROKE_OVERHEAD_PX_EQUIVALENT:.2f}")
         self.paint_budget_var = tk.StringVar(value=f"{DEFAULT_PAINT_BUDGET_PX_EQUIVALENT:.0f}")
-        self.geometry_mode_var = tk.StringVar(value="skeleton")
+        self.geometry_mode_var = tk.StringVar(value="automatic")
         self.geometry_tolerance_var = tk.StringVar(value="0.8")
         self.geometry_min_component_var = tk.StringVar(value="2")
 
@@ -151,7 +152,7 @@ class ColorScanlineTab:
         ttk.Label(geometry_frame, text="Алгоритм").pack(side="left")
         ttk.Combobox(
             geometry_frame, textvariable=self.geometry_mode_var,
-            values=("skeleton", "contour", "scanline"), state="readonly", width=10,
+            values=("automatic", "scanline", "contour", "skeleton"), state="readonly", width=10,
         ).pack(side="left", padx=(4, 10))
         ttk.Label(geometry_frame, text="RDP, px").pack(side="left")
         ttk.Entry(geometry_frame, textvariable=self.geometry_tolerance_var, width=6).pack(side="left", padx=(4, 10))
@@ -432,10 +433,12 @@ class ColorScanlineTab:
         try:
             tolerance = self._parse_model_number(self.geometry_tolerance_var.get(), "Допуск RDP")
             min_component_area = int(self.geometry_min_component_var.get())
+            requested_mode = self.geometry_mode_var.get()
+            build_mode = "scanline" if requested_mode == "automatic" else requested_mode
             plan = build_geometry_color_plan(
                 self.quantization_result.index_map,
                 self.palette_profile,
-                mode=self.geometry_mode_var.get(),
+                mode=build_mode,
                 simplify_tolerance_px=tolerance,
                 min_component_area=min_component_area,
                 source_name=self.source_name,
@@ -444,7 +447,13 @@ class ColorScanlineTab:
             messagebox.showerror("Не удалось построить геометрический план", str(exc), parent=self.root)
             self.status_var.set(f"Ошибка геометрического плана: {exc}")
             return
-        self._display_geometry_plan(plan, self.quantization_result.index_map)
+        build_note = (
+            "Автовыбор построения без бюджетного ограничения: scanline сохраняет карту цветов."
+            if requested_mode == "automatic" else None
+        )
+        self._display_geometry_plan(
+            plan, self.quantization_result.index_map, status_prefix=build_note
+        )
 
     def fit_geometry_to_paint_budget(self) -> None:
         if self.quantization_result is None or self.palette_profile is None:
@@ -462,16 +471,32 @@ class ColorScanlineTab:
                 self.paint_target_usage_var.get(), "Целевой расход бюджета"
             )
             tolerance = self._parse_model_number(self.geometry_tolerance_var.get(), "Допуск RDP")
-            plan, report = optimize_geometry_plan_to_budget(
-                self.quantization_result.index_map,
-                self.palette_profile,
-                mode=self.geometry_mode_var.get(),
-                paint_budget_px_equivalent=paint_budget,
-                target_usage_percent=target_usage,
-                stroke_overhead_px_equivalent=stroke_overhead,
-                simplify_tolerance_px=tolerance,
-                source_name=self.source_name,
+            optimizer = (
+                optimize_geometry_plan_across_modes
+                if self.geometry_mode_var.get() == "automatic"
+                else None
             )
+            if optimizer is not None:
+                plan, report = optimizer(
+                    self.quantization_result.index_map,
+                    self.palette_profile,
+                    paint_budget_px_equivalent=paint_budget,
+                    target_usage_percent=target_usage,
+                    stroke_overhead_px_equivalent=stroke_overhead,
+                    simplify_tolerance_px=tolerance,
+                    source_name=self.source_name,
+                )
+            else:
+                plan, report = optimize_geometry_plan_to_budget(
+                    self.quantization_result.index_map,
+                    self.palette_profile,
+                    mode=self.geometry_mode_var.get(),
+                    paint_budget_px_equivalent=paint_budget,
+                    target_usage_percent=target_usage,
+                    stroke_overhead_px_equivalent=stroke_overhead,
+                    simplify_tolerance_px=tolerance,
+                    source_name=self.source_name,
+                )
         except (GeometryColorPlanError, ValueError, TypeError, MemoryError) as exc:
             messagebox.showerror(
                 "Не удалось оптимизировать геометрический план",
@@ -481,8 +506,12 @@ class ColorScanlineTab:
             self.status_var.set(f"Геометрическая оптимизация не выполнена: {exc}")
             return
 
+        choice_text = (
+            f"режим {report['mode']} (выбран автоматическим сравнением), "
+            if report.get("requested_mode") == "automatic" else f"режим {report['mode']}, "
+        )
         fit_text = (
-            f"Подогнано под бюджет: режим {report['mode']}, масштаб {report['scale']:.1f}, "
+            f"Подогнано под бюджет: {choice_text}масштаб {report['scale']:.1f}, "
             f"допуск RDP {report['simplify_tolerance_px']:.1f} px, "
             f"минимальный компонент {report['min_component_area']} px; "
             f"расход {report['estimated_ink_after_px_equivalent']:,.0f}/"
@@ -540,6 +569,16 @@ class ColorScanlineTab:
                 f"мин. компонент {optimization.get('min_component_area', 1)} px; "
                 f"в бюджет: {'да' if optimization.get('fits_budget') else 'нет'}."
             )
+            mode_candidates = optimization.get("mode_candidates", [])
+            if mode_candidates:
+                summary_lines.append(
+                    "Сравнение режимов (точное совпадение пикселей): "
+                    + " · ".join(
+                        f"{item['mode']}: {item['quality_pixel_accuracy_percent']:.1f}% "
+                        f"совпадение, {item['estimated_ink_after_px_equivalent']:,.0f} px-экв."
+                        for item in mode_candidates
+                    )
+                )
         self.stats_var.set("\n".join(summary_lines))
         prefix = f"{status_prefix} " if status_prefix else ""
         estimate_risk = estimate.get("risk_label", "оценка приблизительная") if isinstance(estimate, dict) else "оценка недоступна"
