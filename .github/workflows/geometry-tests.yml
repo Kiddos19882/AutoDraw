@@ -6,9 +6,11 @@ on:
       - feature/image-geometry-optimization
   pull_request:
     paths:
-      - "AutoDraw_Stage20/source/preparation/geometry_color_plan.py"
-      - "AutoDraw_Stage20/source/preparation/tests/test_geometry_color_plan.py"
+      - "AutoDraw_Stage20/source/preparation/**"
+      - "AutoDraw_Stage20/source/executor/**"
       - ".github/workflows/geometry-tests.yml"
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
 
 permissions:
   contents: read
