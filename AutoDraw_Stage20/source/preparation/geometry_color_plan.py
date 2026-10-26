@@ -376,6 +376,8 @@ def build_geometry_color_plan(
 
             if mode == "contour":
                 contours, _hierarchy = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
+                # OpenCV builds differ in whether findContours returns a list or tuple.
+                contours = list(contours)
                 contours.sort(key=lambda c: (-abs(float(cv2.contourArea(c))), int(c[0][0][1]), int(c[0][0][0])))
                 for contour_index, contour in enumerate(contours, start=1):
                     raw_points = [(float(point[0][0]), float(point[0][1])) for point in contour]
