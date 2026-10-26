@@ -27,9 +27,11 @@ except ImportError as exc:
 
 from drawing.mouse_executor import ExecutorConfig, ExecutionSummary, MouseExecutor
 from drawing.color_plan_execution import (
-    ColorPlanExecutionError, ColorPlanExecutionHooks, build_palette_targets, color_plan_to_drawing_plan,
+    BrushSliderCalibration, ColorPlanExecutionError, ColorPlanExecutionHooks,
+    adaptive_brush_plan_to_drawing_plan, build_palette_targets, color_plan_to_drawing_plan,
     validate_color_plan,
 )
+from brush_planner import BrushPlannerError, load_adaptive_brush_plan
 from drawing.execution_diagnostics import (
     build_crash_summary, build_execution_report, validate_target_area, write_execution_report,
 )
@@ -198,6 +200,8 @@ class Stage6App:
         self.source_plan: DrawingPlan | None = None
         self.execution_plan: DrawingPlan | None = None
         self.color_plan_data: dict[str, Any] | None = None
+        self.adaptive_brush_plan: dict[str, Any] | None = None
+        self.adaptive_brush_plan_path: Path | None = None
         self.color_palette_profile: dict[str, Any] | None = None
         self.color_palette_profile_path: Path | None = None
         self.fit_info: PlanFitInfo | None = None
@@ -224,6 +228,13 @@ class Stage6App:
         self.after_down_var = tk.StringVar(value="40")
         self.end_hold_var = tk.StringVar(value="50")
         self.countdown_var = tk.StringVar(value="5")
+        self.brush_slider_x_min_var = tk.StringVar(value="")
+        self.brush_slider_x_max_var = tk.StringVar(value="")
+        self.brush_slider_y_var = tk.StringVar(value="")
+        self.brush_slider_initial_value_var = tk.StringVar(value="7")
+        self.brush_slider_confirmed_var = tk.BooleanVar(value=False)
+        self.brush_slider_screen_size: tuple[int, int] | None = None
+        self.brush_slider_status_var = tk.StringVar(value="Ползунок кисти не откалиброван; обычные цветные планы работают без него.")
         self.status_var = tk.StringVar(value="Откройте одноцветный DrawingPlan или цветной план этапа 19 и выберите область доски.")
         self.plan_stats_var = tk.StringVar(value="План не загружен.")
         self.progress_var = tk.DoubleVar(value=0.0)
@@ -233,6 +244,11 @@ class Stage6App:
 
         self._build_ui()
         self._load_settings()
+        for variable in (
+            self.brush_slider_x_min_var, self.brush_slider_x_max_var,
+            self.brush_slider_y_var, self.brush_slider_initial_value_var,
+        ):
+            variable.trace_add("write", self._invalidate_brush_slider_calibration)
         self._load_profile_if_available()
         if not self.embedded:
             self.root.protocol("WM_DELETE_WINDOW", self._on_close)
@@ -257,6 +273,11 @@ class Stage6App:
         open_color_plan_button = ttk.Button(toolbar, text="Открыть цветной план…", command=self._open_color_plan)
         open_color_plan_button.pack(side="left", padx=(6, 0))
         self.execution_controls.append(open_color_plan_button)
+        load_adaptive_brush_button = ttk.Button(
+            toolbar, text="Адаптивный план кистей…", command=self._open_adaptive_brush_plan
+        )
+        load_adaptive_brush_button.pack(side="left", padx=(6, 0))
+        self.execution_controls.append(load_adaptive_brush_button)
         load_color_profile_button = ttk.Button(
             toolbar, text="Профиль палитры…", command=self._load_color_palette_profile_dialog
         )
@@ -323,6 +344,46 @@ class Stage6App:
             justify="left",
         ).grid(row=2, column=0, columnspan=4, sticky="w", padx=5, pady=(5, 0))
 
+        brush_settings = ttk.LabelFrame(
+            outer, text="Калибровка ползунка кисти (только для адаптивного плана)", padding=8
+        )
+        brush_settings.pack(fill="x", pady=(0, 8))
+        brush_fields = [
+            ("X при значении 1", self.brush_slider_x_min_var),
+            ("X при значении 30", self.brush_slider_x_max_var),
+            ("Y ползунка", self.brush_slider_y_var),
+            ("Текущее значение до запуска", self.brush_slider_initial_value_var),
+        ]
+        for col, (label, variable) in enumerate(brush_fields):
+            cell = ttk.Frame(brush_settings)
+            cell.grid(row=0, column=col, sticky="ew", padx=4, pady=2)
+            ttk.Label(cell, text=label).pack(anchor="w")
+            entry = ttk.Entry(cell, textvariable=variable, width=12)
+            entry.pack(anchor="w", pady=(2, 0))
+            self.execution_controls.append(entry)
+            brush_settings.columnconfigure(col, weight=1)
+        confirm_brush_button = ttk.Button(
+            brush_settings,
+            text="Подтвердить координаты на текущем экране",
+            command=self._confirm_brush_slider_calibration,
+        )
+        confirm_brush_button.grid(row=1, column=0, columnspan=2, sticky="w", padx=4, pady=(6, 2))
+        self.execution_controls.append(confirm_brush_button)
+        ttk.Label(
+            brush_settings,
+            textvariable=self.brush_slider_status_var,
+            wraplength=1180,
+            justify="left",
+        ).grid(row=1, column=2, columnspan=2, sticky="w", padx=4, pady=(6, 2))
+        ttk.Label(
+            brush_settings,
+            text=("В расширенном режиме игры сначала откройте ползунок. Укажите экранные координаты позиции бегунка "
+                  "для значений 1 и 30; начальное значение должно точно совпадать с положением бегунка перед стартом. "
+                  "Положение считается линейным. Координаты ползунка обязаны быть вне выделенного холста."),
+            wraplength=1180,
+            justify="left",
+        ).grid(row=2, column=0, columnspan=4, sticky="w", padx=4, pady=(4, 0))
+
         stats_frame = ttk.LabelFrame(outer, text="План и ожидаемая работа", padding=8)
         stats_frame.pack(fill="x", pady=(0, 8))
         ttk.Label(stats_frame, textvariable=self.plan_stats_var, justify="left", wraplength=1270).pack(anchor="w")
@@ -362,11 +423,121 @@ class Stage6App:
             for key, variable in mappings.items():
                 if key in data:
                     variable.set(str(data[key]))
+            brush_data = data.get("brush_slider_calibration", {})
+            if isinstance(brush_data, dict):
+                for key, variable in (
+                    ("x_at_min", self.brush_slider_x_min_var),
+                    ("x_at_max", self.brush_slider_x_max_var),
+                    ("y", self.brush_slider_y_var),
+                    ("initial_value", self.brush_slider_initial_value_var),
+                ):
+                    if brush_data.get(key) is not None:
+                        variable.set(str(brush_data[key]))
+                try:
+                    if brush_data.get("screen_width") and brush_data.get("screen_height"):
+                        self.brush_slider_screen_size = (
+                            int(brush_data["screen_width"]), int(brush_data["screen_height"])
+                        )
+                except (TypeError, ValueError):
+                    self.brush_slider_screen_size = None
+                confirmed = brush_data.get("confirmed") is True and self.brush_slider_screen_size is not None
+                self.brush_slider_confirmed_var.set(confirmed)
+                self.brush_slider_status_var.set(
+                    f"Калибровка загружена для {self.brush_slider_screen_size[0]}×{self.brush_slider_screen_size[1]} px."
+                    if confirmed else "Ползунок кисти не откалиброван; подтвердите координаты на текущем экране."
+                )
         except (OSError, ValueError, TypeError, json.JSONDecodeError):
             self.status_var.set("Файл настроек исполнителя повреждён; используются значения по умолчанию.")
 
     def _save_settings(self, config: ExecutorConfig) -> None:
-        SETTINGS_PATH.write_text(json.dumps(config.to_dict(), ensure_ascii=False, indent=2), encoding="utf-8")
+        data = config.to_dict()
+        data["brush_slider_calibration"] = {
+            "x_at_min": self._optional_int(self.brush_slider_x_min_var.get()),
+            "x_at_max": self._optional_int(self.brush_slider_x_max_var.get()),
+            "y": self._optional_int(self.brush_slider_y_var.get()),
+            "initial_value": self._optional_int(self.brush_slider_initial_value_var.get()),
+            "min_value": 1,
+            "max_value": 30,
+            "screen_width": self.brush_slider_screen_size[0] if self.brush_slider_screen_size else None,
+            "screen_height": self.brush_slider_screen_size[1] if self.brush_slider_screen_size else None,
+            "confirmed": bool(self.brush_slider_confirmed_var.get()),
+        }
+        SETTINGS_PATH.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    @staticmethod
+    def _optional_int(value: str) -> int | None:
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return None
+
+    def _invalidate_brush_slider_calibration(self, *_args) -> None:
+        if self.brush_slider_confirmed_var.get():
+            self.brush_slider_confirmed_var.set(False)
+            self.brush_slider_status_var.set(
+                "Калибровка сброшена: координаты или начальный размер изменены. Подтвердите её заново."
+            )
+
+    def _confirm_brush_slider_calibration(self) -> None:
+        try:
+            x_min = int(self.brush_slider_x_min_var.get())
+            x_max = int(self.brush_slider_x_max_var.get())
+            y = int(self.brush_slider_y_var.get())
+            initial = int(self.brush_slider_initial_value_var.get())
+            screen = pyautogui.size()
+            screen_size = (int(screen.width), int(screen.height))
+            candidate = BrushSliderCalibration(
+                x_at_min=x_min, x_at_max=x_max, y=y, initial_value=initial,
+                screen_width=screen_size[0], screen_height=screen_size[1], confirmed=True,
+            )
+            candidate.validate(screen_size, self.area.to_dict() if self.area else None)
+        except (ValueError, TypeError, ColorPlanExecutionError) as exc:
+            messagebox.showerror("Калибровка ползунка не подтверждена", str(exc), parent=self.root)
+            self.brush_slider_confirmed_var.set(False)
+            self.brush_slider_status_var.set(f"Калибровка не подтверждена: {exc}")
+            return
+        self.brush_slider_screen_size = screen_size
+        self.brush_slider_confirmed_var.set(True)
+        self.brush_slider_status_var.set(
+            f"Калибровка подтверждена на {screen_size[0]}×{screen_size[1]} px. "
+            f"Перед запуском вручную установите бегунок на значение {initial}."
+        )
+        try:
+            self._save_settings(self._read_executor_config())
+        except (ValueError, OSError):
+            # Keep the live calibration; it will be persisted with the next valid run.
+            pass
+
+    def _read_brush_slider_calibration(self) -> dict[str, Any]:
+        if not self.brush_slider_confirmed_var.get() or self.brush_slider_screen_size is None:
+            raise ColorPlanExecutionError(
+                "Для адаптивного плана нужно подтвердить координаты ползунка кисти на текущем экране."
+            )
+        try:
+            candidate = BrushSliderCalibration(
+                x_at_min=int(self.brush_slider_x_min_var.get()),
+                x_at_max=int(self.brush_slider_x_max_var.get()),
+                y=int(self.brush_slider_y_var.get()),
+                initial_value=int(self.brush_slider_initial_value_var.get()),
+                screen_width=self.brush_slider_screen_size[0],
+                screen_height=self.brush_slider_screen_size[1],
+                confirmed=True,
+            )
+            screen = pyautogui.size()
+            candidate.validate(screen, self.area.to_dict() if self.area else None)
+        except (ValueError, TypeError) as exc:
+            raise ColorPlanExecutionError(f"Неверная калибровка ползунка кисти: {exc}") from exc
+        return {
+            "x_at_min": candidate.x_at_min,
+            "x_at_max": candidate.x_at_max,
+            "y": candidate.y,
+            "initial_value": candidate.initial_value,
+            "screen_width": candidate.screen_width,
+            "screen_height": candidate.screen_height,
+            "confirmed": candidate.confirmed,
+            "min_value": candidate.min_value,
+            "max_value": candidate.max_value,
+        }
 
     def _load_profile_if_available(self) -> None:
         if not PROFILE_PATH.exists():
@@ -489,6 +660,8 @@ class Stage6App:
         plan = DrawingPlan.from_dict(document)
         plan.validate_bounds()
         self.color_plan_data = None
+        self.adaptive_brush_plan = None
+        self.adaptive_brush_plan_path = None
         self.plan_path = plan_path
         self.source_plan = plan
         self.status_var.set(f"Загружен одноцветный план {self.plan_path.name}; проверьте область и предпросмотр.")
@@ -503,6 +676,8 @@ class Stage6App:
         converted = color_plan_to_drawing_plan(color_plan)
         converted.validate_bounds()
         self.color_plan_data = color_plan
+        self.adaptive_brush_plan = None
+        self.adaptive_brush_plan_path = None
         self.plan_path = plan_path
         self.source_plan = converted
         self.fit_var.set(False)
@@ -512,6 +687,29 @@ class Stage6App:
             "Монохромный исполнитель для этого файла запрещён."
         )
         self._refresh_execution_plan()
+
+    def load_adaptive_brush_plan_from_path(self, path: str | Path) -> None:
+        """Load the brush recommendation sidecar for the exact currently loaded color plan."""
+        if self.running:
+            raise RuntimeError("Нельзя менять план во время исполнения.")
+        if self.color_plan_data is None:
+            raise ColorPlanExecutionError(
+                "Сначала откройте исходный цветной scanline-план этапа 19, затем его адаптивный план кистей."
+            )
+        brush_path = Path(path).resolve()
+        brush_plan = load_adaptive_brush_plan(brush_path)
+        converted = adaptive_brush_plan_to_drawing_plan(brush_plan, self.color_plan_data)
+        self.adaptive_brush_plan = brush_plan
+        self.adaptive_brush_plan_path = brush_path
+        self.plan_path = brush_path
+        self.source_plan = converted
+        self.fit_var.set(False)
+        self._refresh_execution_plan()
+        self.status_var.set(
+            f"Адаптивный план кистей загружен: {len(converted.strokes):,} штрихов, "
+            f"{brush_plan['summary']['stroke_count_by_brush']} по размерам. "
+            "Перед запуском подтвердите калибровку ползунка кисти на текущем экране."
+        )
 
     def load_color_palette_profile_document(self, document: dict[str, Any], path: str | Path | None = None) -> None:
         """Install a palette profile received directly from Stage 18/19 or loaded from disk."""
@@ -541,6 +739,29 @@ class Stage6App:
             self.load_color_plan_from_path(path)
         except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError, RuntimeError) as exc:
             messagebox.showerror("Ошибка цветного плана", f"Не удалось открыть цветной план:\n{exc}", parent=self.root)
+
+    def _open_adaptive_brush_plan(self) -> None:
+        if self.running:
+            return
+        if self.color_plan_data is None:
+            messagebox.showwarning(
+                "Нет исходного цветного плана",
+                "Сначала откройте цветной scanline-план этапа 19, затем соответствующий адаптивный план кистей.",
+                parent=self.root,
+            )
+            return
+        path = filedialog.askopenfilename(
+            parent=self.root,
+            title="Выберите экспортированный адаптивный план кистей Stage 19",
+            initialdir=str(self.plan_path.parent if self.plan_path else APP_DIR),
+            filetypes=[("Адаптивный план кистей AutoDraw", "*.json"), ("JSON", "*.json")],
+        )
+        if not path:
+            return
+        try:
+            self.load_adaptive_brush_plan_from_path(path)
+        except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError, RuntimeError, BrushPlannerError) as exc:
+            messagebox.showerror("Ошибка адаптивного плана кистей", str(exc), parent=self.root)
 
     def _load_color_palette_profile_dialog(self) -> None:
         if self.running:
@@ -750,6 +971,16 @@ class Stage6App:
             self.execution_plan.validate_bounds()
             # Revalidate against the current display: resolution/monitor can change after profile load.
             self._validate_area(self.area)
+            brush_slider_calibration = None
+            if self.adaptive_brush_plan is not None:
+                if self.color_plan_data is None:
+                    raise ColorPlanExecutionError("Адаптивному плану нужен исходный цветной план этапа 19.")
+                brush_slider_calibration = self._read_brush_slider_calibration()
+                if int(self.adaptive_brush_plan["summary"].get("legacy_fallback_source_stroke_count", 0)) > 0:
+                    raise ColorPlanExecutionError(
+                        "Адаптивный план содержит штрихи без подтверждённой геометрической безопасности. "
+                        "Пересчитайте рекомендации или используйте обычный цветной план."
+                    )
             if self.color_plan_data is not None:
                 if self.color_palette_profile is None:
                     raise ColorPlanExecutionError("Загрузите профиль палитры прежде, чем запускать цветной план.")
@@ -816,7 +1047,14 @@ class Stage6App:
             f"Продление конца открытого штриха: +{config.line_extension_px:g} px (с ограничением по границе холста)\n"
             f"Паузы после mouseUp / перед mouseDown: {config.after_mouse_up_ms} / {config.before_mouse_down_ms} мс\n\n"
             f"{color_mode_text}"
-            "После подтверждения начнётся обратный отсчёт. Переключитесь на правильную вкладку браузера.\n"
+            + (
+                f"АДАПТИВНЫЕ КИСТИ: {self.adaptive_brush_plan['summary']['stroke_count_by_brush']}\n"
+                f"Калибровка ползунка подтверждена на {self.brush_slider_screen_size[0]}×{self.brush_slider_screen_size[1]} px. "
+                f"Исполнитель начнёт с указанного значения {self.brush_slider_initial_value_var.get()} и будет перетаскивать бегунок.\n"
+                "Продление концов принудительно равно 0 для адаптивных штрихов, чтобы не выйти за проверенную область.\n"
+                if self.adaptive_brush_plan is not None else ""
+            )
+            + "После подтверждения начнётся обратный отсчёт. Переключитесь на правильную вкладку браузера.\n"
             "F12 или кнопка остановки прекращает рисование; кнопка мыши будет отпущена."
         )
         if not messagebox.askokcancel("Подтвердите рисование", details, icon="warning", parent=self.root):
@@ -839,7 +1077,7 @@ class Stage6App:
         plan_path = self.plan_path
         thread = threading.Thread(
             target=self._execute_in_worker,
-            args=(plan, area, config, fit_info, plan_path, color_plan, color_profile),
+            args=(plan, area, config, fit_info, plan_path, color_plan, color_profile, brush_slider_calibration),
             name="AutoDraw-Executor",
             daemon=True,
         )
@@ -870,6 +1108,7 @@ class Stage6App:
         plan_path: Path,
         color_plan: dict[str, Any] | None = None,
         color_profile: dict[str, Any] | None = None,
+        brush_slider_calibration: dict[str, Any] | None = None,
     ) -> None:
         hooks: ColorPlanExecutionHooks | None = None
         try:
@@ -881,7 +1120,11 @@ class Stage6App:
                 if color_profile is None:
                     raise ColorPlanExecutionError("Профиль палитры не был передан исполнителю.")
                 hooks = ColorPlanExecutionHooks(
-                    color_plan, color_profile, current_screen_size_provider=pyautogui.size
+                    color_plan,
+                    color_profile,
+                    current_screen_size_provider=pyautogui.size,
+                    brush_slider_calibration=brush_slider_calibration,
+                    brush_target_area=area.to_dict() if brush_slider_calibration is not None else None,
                 )
                 execute_options["preflight"] = hooks.preflight
                 execute_options["before_stroke"] = hooks.before_stroke
@@ -919,8 +1162,12 @@ class Stage6App:
     def _update_progress(self, current: int, total: int, detail: str) -> None:
         if detail.startswith("Начало через"):
             self.execution_state_var.set("Состояние: обратный отсчёт")
+        elif "Выбрана кисть" in detail or "Кисть " in detail:
+            self.execution_state_var.set("Состояние: выбор кисти")
         elif detail.startswith("Проверка палитры"):
             self.execution_state_var.set("Состояние: проверка палитры")
+        elif detail.startswith("Выбрана кисть") or "Кисть " in detail:
+            self.execution_state_var.set("Состояние: выбор кисти")
         elif detail.startswith("Выбран цвет") or detail.startswith("Цвет "):
             self.execution_state_var.set("Состояние: выбор цвета")
         elif detail.startswith("Штрих") or detail.startswith("Завершён штрих"):
@@ -968,6 +1215,15 @@ class Stage6App:
                 "selection_order": color_details.get("selection_order", []),
                 "used_colors": color_details.get("used_colors", []),
             }
+            if self.adaptive_brush_plan is not None:
+                report["adaptive_brush_plan"] = {
+                    "path": str(self.adaptive_brush_plan_path) if self.adaptive_brush_plan_path else None,
+                    "source_plan_sha256": self.adaptive_brush_plan.get("source_plan_sha256"),
+                    "summary": self.adaptive_brush_plan.get("summary", {}),
+                    "brush_slider_selection_count": color_details.get("brush_size_selection_count", 0),
+                    "brush_slider_selection_order": color_details.get("brush_size_selection_order", []),
+                    "slider_calibration": color_details.get("brush_slider_calibration"),
+                }
         try:
             report_path = write_execution_report(RESULTS_DIR, report)
             self.last_report_path = report_path

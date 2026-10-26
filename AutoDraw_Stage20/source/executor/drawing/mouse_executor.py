@@ -258,16 +258,32 @@ class MouseExecutor:
                     segments = list(stroke.iter_segments())
                     # Extend only the last endpoint of open strokes. Keep closed contours
                     # and the saved DrawingPlan unchanged; clamp to the local canvas.
-                    if not stroke.closed and segments and float(self.config.line_extension_px) > 0:
-                        last_start, last_end = segments[-1]
-                        dx = last_end.x - last_start.x
-                        dy = last_end.y - last_start.y
-                        length = math.hypot(dx, dy)
-                        if length > 0:
-                            extension = float(self.config.line_extension_px)
-                            extended_x = min(float(plan.width), max(0.0, last_end.x + dx / length * extension))
-                            extended_y = min(float(plan.height), max(0.0, last_end.y + dy / length * extension))
-                            segments[-1] = (last_start, Point(extended_x, extended_y))
+                    if not stroke.closed and segments:
+                        # Adaptive brush strokes are geometrically checked against their
+                        # exact color map, so do not extend them beyond the safe footprint.
+                        # Legacy plans retain the configured endpoint extension.
+                        raw_extension = stroke.metadata.get(
+                            "line_extension_px_override", self.config.line_extension_px
+                        )
+                        try:
+                            extension = float(raw_extension)
+                        except (TypeError, ValueError) as exc:
+                            raise ValueError(
+                                f"Некорректное продление штриха {stroke.name}: {raw_extension!r}."
+                            ) from exc
+                        if not math.isfinite(extension) or not 0.0 <= extension <= 20.0:
+                            raise ValueError(
+                                f"Продление штриха {stroke.name} должно быть в диапазоне 0–20 px."
+                            )
+                        if extension > 0:
+                            last_start, last_end = segments[-1]
+                            dx = last_end.x - last_start.x
+                            dy = last_end.y - last_start.y
+                            length = math.hypot(dx, dy)
+                            if length > 0:
+                                extended_x = min(float(plan.width), max(0.0, last_end.x + dx / length * extension))
+                                extended_y = min(float(plan.height), max(0.0, last_end.y + dy / length * extension))
+                                segments[-1] = (last_start, Point(extended_x, extended_y))
                     for segment_start, segment_end in segments:
                         self._move_segment(segment_start, segment_end, area_x, area_y)
                     self._wait_interruptibly(self.config.end_hold_ms / 1000.0)

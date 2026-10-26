@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import hashlib
+import json
 from pathlib import Path
 from typing import Any, Callable
 
@@ -44,6 +46,262 @@ def validate_color_plan(plan: Any) -> dict[str, Any]:
         if isinstance(exc, ColorPlanExecutionError):
             raise
         raise ColorPlanExecutionError(f"Некорректный цветной план: {exc}") from exc
+
+
+def _canonical_color_plan_sha256(plan: dict[str, Any]) -> str:
+    try:
+        serialized = json.dumps(
+            plan, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False
+        ).encode("utf-8")
+    except (TypeError, ValueError) as exc:
+        raise ColorPlanExecutionError("Исходный цветной план не сериализуется в безопасный JSON.") from exc
+    return hashlib.sha256(serialized).hexdigest()
+
+
+def adaptive_brush_plan_to_drawing_plan(brush_plan: Any, source_color_plan: Any) -> DrawingPlan:
+    """Convert an exported adaptive plan only when bound to its exact source color plan."""
+    try:
+        from brush_planner import validate_adaptive_brush_plan
+        adaptive = validate_adaptive_brush_plan(brush_plan)
+    except Exception as exc:
+        raise ColorPlanExecutionError(f"Некорректный адаптивный план кистей: {exc}") from exc
+    color_plan = validate_color_plan(source_color_plan)
+    if adaptive.get("source_plan_sha256") != _canonical_color_plan_sha256(color_plan):
+        raise ColorPlanExecutionError(
+            "Адаптивный план кистей создан для другого цветного плана. "
+            "Загрузите соответствующий исходный план этапа 19 и повторите."
+        )
+    canvas = adaptive["canvas"]
+    source_canvas = color_plan["canvas"]
+    if (canvas.get("width"), canvas.get("height")) != (source_canvas.get("width"), source_canvas.get("height")):
+        raise ColorPlanExecutionError("Размер адаптивного плана не совпадает с исходным цветным планом.")
+    summary = adaptive.get("summary", {})
+    if int(summary.get("legacy_fallback_source_stroke_count", 0)) > 0:
+        raise ColorPlanExecutionError(
+            "Адаптивный план содержит штрихи без подтверждённой безопасности. "
+            "Для исполнения используйте обычный цветной план или пересчитайте рекомендации."
+        )
+    if adaptive.get("brush_configuration", {}).get("automatic_execution_allowed") is not False:
+        raise ColorPlanExecutionError("Адаптивный план не прошёл обязательную блокировку автоматического исполнения.")
+
+    width, height = int(canvas["width"]), int(canvas["height"])
+    palette = color_plan["palette"]
+    source_strokes = color_plan["strokes"]
+    strokes: list[Stroke] = []
+    for index, raw in enumerate(adaptive["strokes"], start=1):
+        try:
+            source_index = raw["source_stroke_index"]
+            color_index = int(raw["color"]["palette_index"])
+            brush_data = raw["brush"]
+            brush_value = brush_data["value"]
+            points = [Point(float(point["x"]), float(point["y"])) for point in raw["points"]]
+        except (KeyError, TypeError, ValueError, IndexError) as exc:
+            raise ColorPlanExecutionError(f"Адаптивный штрих №{index} повреждён.") from exc
+        if isinstance(source_index, bool) or not isinstance(source_index, int) or not 0 <= source_index < len(source_strokes):
+            raise ColorPlanExecutionError(f"Адаптивный штрих №{index} ссылается на неверный исходный штрих.")
+        if isinstance(brush_value, bool) or not isinstance(brush_value, int) or not 1 <= brush_value <= 20:
+            raise ColorPlanExecutionError(f"В адаптивном штрихе №{index} отсутствует допустимый размер кисти.")
+        if not isinstance(brush_data, dict) or brush_data.get("safe_for_color_map") is not True:
+            raise ColorPlanExecutionError(f"Безопасность адаптивного штриха №{index} не подтверждена.")
+        try:
+            source_color_index = int(source_strokes[source_index]["color"]["palette_index"])
+        except (KeyError, TypeError, ValueError, IndexError) as exc:
+            raise ColorPlanExecutionError(f"Не удалось проверить цвет исходного штриха №{source_index + 1}.") from exc
+        if color_index != source_color_index or not 0 <= color_index < len(palette):
+            raise ColorPlanExecutionError(f"Цвет адаптивного штриха №{index} не совпадает с исходным планом.")
+        if len(points) != 2 or any(
+            not (0 <= point.x <= width and 0 <= point.y < height) for point in points
+        ):
+            raise ColorPlanExecutionError(f"Координаты адаптивного штриха №{index} выходят за пределы холста.")
+        if points[0].distance_to(points[1]) == 0:
+            if points[0].x >= width:
+                raise ColorPlanExecutionError(f"Одиночный адаптивный штрих №{index} расположен за правой границей.")
+            points[1] = Point(points[0].x + 1.0, points[0].y)
+
+        palette_color = palette[color_index]
+        metadata = {
+            "palette_index": str(color_index),
+            "color_id": str(palette_color["id"]),
+            "color_name": str(palette_color["name"]),
+            "color_hex": str(palette_color["hex"]),
+            "color_rgb": ",".join(str(channel) for channel in palette_color["rgb"]),
+            "color_scanline_order": str(index),
+            "adaptive_brush_plan": "true",
+            "brush_value": str(brush_value),
+            "brush_role": str(brush_data.get("role", "unspecified")),
+            "brush_plan_source_stroke_index": str(source_index),
+            "line_extension_px_override": "0",
+        }
+        strokes.append(Stroke(
+            name=str(raw.get("name") or f"adaptive-color-stroke-{index}"),
+            points=points,
+            closed=False,
+            metadata=metadata,
+        ))
+    converted = DrawingPlan(
+        width=width,
+        height=height,
+        strokes=strokes,
+        name=f"{str(adaptive.get('source_plan_name') or 'Цветной план')} (адаптивные кисти)",
+        created_at=str(color_plan.get("created_at") or ""),
+        schema_version=1,
+    )
+    converted.validate_bounds()
+    return converted
+
+
+@dataclass(frozen=True, slots=True)
+class BrushSliderCalibration:
+    """User-calibrated screen mapping for the extended painter brush slider."""
+
+    x_at_min: int
+    x_at_max: int
+    y: int
+    initial_value: int
+    screen_width: int
+    screen_height: int
+    confirmed: bool
+    min_value: int = 1
+    max_value: int = 30
+
+    @classmethod
+    def from_dict(cls, data: Any) -> "BrushSliderCalibration":
+        if not isinstance(data, dict):
+            raise ColorPlanExecutionError("Профиль ползунка кисти должен быть JSON-объектом.")
+        try:
+            return cls(
+                x_at_min=int(data["x_at_min"]),
+                x_at_max=int(data["x_at_max"]),
+                y=int(data["y"]),
+                initial_value=int(data["initial_value"]),
+                screen_width=int(data["screen_width"]),
+                screen_height=int(data["screen_height"]),
+                confirmed=data.get("confirmed") is True,
+                min_value=int(data.get("min_value", 1)),
+                max_value=int(data.get("max_value", 30)),
+            )
+        except (KeyError, TypeError, ValueError) as exc:
+            raise ColorPlanExecutionError("В профиле ползунка кисти не хватает корректных координат.") from exc
+
+    def coordinate_for_value(self, value: int) -> int:
+        if isinstance(value, bool) or not isinstance(value, int) or not self.min_value <= value <= self.max_value:
+            raise ColorPlanExecutionError(
+                f"Размер кисти {value!r} вне диапазона {self.min_value}–{self.max_value}."
+            )
+        fraction = (value - self.min_value) / (self.max_value - self.min_value)
+        return round(self.x_at_min + fraction * (self.x_at_max - self.x_at_min))
+
+    def validate(self, current_screen_size: Any, target_area: dict[str, int] | None = None) -> None:
+        if not self.confirmed:
+            raise ColorPlanExecutionError(
+                "Калибровка ползунка кисти не подтверждена. Укажите координаты крайних значений "
+                "1 и 30, начальный размер и подтвердите калибровку на текущем разрешении."
+            )
+        if (self.min_value, self.max_value) != (1, 30):
+            raise ColorPlanExecutionError("Поддерживается расширенный ползунок кисти со значениями 1–30.")
+        try:
+            if hasattr(current_screen_size, "width"):
+                screen_width, screen_height = int(current_screen_size.width), int(current_screen_size.height)
+            else:
+                screen_width, screen_height = int(current_screen_size[0]), int(current_screen_size[1])
+        except (TypeError, ValueError, IndexError, AttributeError) as exc:
+            raise ColorPlanExecutionError("Не удалось определить размер экрана для ползунка кисти.") from exc
+        if (screen_width, screen_height) != (self.screen_width, self.screen_height):
+            raise ColorPlanExecutionError(
+                f"Разрешение экрана изменилось после калибровки ползунка: "
+                f"{self.screen_width}×{self.screen_height}, сейчас {screen_width}×{screen_height}. "
+                "Подтвердите калибровку заново."
+            )
+        if not (0 <= self.x_at_min < screen_width and 0 <= self.x_at_max < screen_width):
+            raise ColorPlanExecutionError("Крайние X-координаты ползунка выходят за пределы экрана.")
+        if self.x_at_min == self.x_at_max:
+            raise ColorPlanExecutionError("Крайние X-координаты ползунка не должны совпадать.")
+        if not 0 <= self.y < screen_height:
+            raise ColorPlanExecutionError("Y-координата ползунка выходит за пределы экрана.")
+        if not self.min_value <= self.initial_value <= self.max_value:
+            raise ColorPlanExecutionError("Начальный размер кисти должен быть в диапазоне 1–30.")
+        if target_area:
+            # Check every integer value, not only endpoints: a track crossing the
+            # selected canvas must never cause a brush-selection drag over artwork.
+            for value in range(self.min_value, self.max_value + 1):
+                x = self.coordinate_for_value(value)
+                if (target_area["x"] <= x < target_area["x"] + target_area["width"]
+                        and target_area["y"] <= self.y < target_area["y"] + target_area["height"]):
+                    raise ColorPlanExecutionError(
+                        "Ползунок кисти попадает внутрь выделенной области рисования. "
+                        "Проверьте область холста и координаты элементов управления, чтобы AutoDraw не кликнул по рисунку."
+                    )
+
+
+class BrushSliderController:
+    """Drag the currently selected slider thumb to the calibrated target value."""
+
+    def __init__(
+        self,
+        calibration: BrushSliderCalibration,
+        target_area: dict[str, int],
+        *,
+        current_screen_size_provider: Callable[[], Any] | None = None,
+    ):
+        self.calibration = calibration
+        self.target_area = dict(target_area)
+        self.current_screen_size_provider = current_screen_size_provider
+        self.current_value = calibration.initial_value
+        self.selection_count = 0
+        self.selection_order: list[int] = []
+
+    def validate(self) -> None:
+        screen = (
+            self.current_screen_size_provider()
+            if self.current_screen_size_provider is not None
+            else (self.calibration.screen_width, self.calibration.screen_height)
+        )
+        self.calibration.validate(screen, self.target_area)
+
+    def before_stroke(self, executor: Any, stroke_index: int, stroke: Stroke) -> str:
+        raw_value = stroke.metadata.get("brush_value")
+        if raw_value is None:
+            raise ColorPlanExecutionError(
+                f"Адаптивный штрих №{stroke_index} не содержит размера кисти; обычный план не должен использовать этот контроллер."
+            )
+        try:
+            value = int(raw_value)
+        except (TypeError, ValueError) as exc:
+            raise ColorPlanExecutionError(f"В штрихе №{stroke_index} указан неверный размер кисти.") from exc
+        if not 1 <= value <= 20:
+            raise ColorPlanExecutionError(f"Размер кисти {value} не входит в диапазон планировщика 1–20.")
+        self.validate()
+        if self.current_value == value:
+            return f"Кисть {value} уже выбрана."
+
+        import pyautogui
+
+        current_x = self.calibration.coordinate_for_value(self.current_value)
+        target_x = self.calibration.coordinate_for_value(value)
+        y = self.calibration.y
+        executor._check_stop()
+        pyautogui.moveTo(current_x, y, duration=0)
+        executor.move_calls += 1
+        executor._wait_interruptibly(executor.config.before_mouse_down_ms / 1000.0)
+        executor._check_stop()
+        pyautogui.mouseDown()
+        try:
+            executor._wait_interruptibly(executor.config.after_mouse_down_ms / 1000.0)
+            executor._check_stop()
+            pyautogui.moveTo(target_x, y, duration=0)
+            executor.move_calls += 1
+            executor._wait_interruptibly(0.03)
+        finally:
+            if not executor._release_mouse():
+                raise RuntimeError(
+                    f"Не удалось отпустить мышь после переключения кисти на {value}: "
+                    f"{executor._release_errors[-1]}"
+                )
+        executor._wait_interruptibly(executor.config.after_mouse_up_ms / 1000.0)
+        self.current_value = value
+        self.selection_count += 1
+        self.selection_order.append(value)
+        return f"Выбрана кисть {value}."
 
 
 def color_plan_to_drawing_plan(plan: Any) -> DrawingPlan:
@@ -199,6 +457,8 @@ class ColorPlanExecutionHooks:
         current_screen_size_provider: Callable[[], tuple[int, int]] | None = None,
         screenshot_provider: Callable[[], Any] | None = None,
         dpi_scale_provider: Callable[[], int] | None = None,
+        brush_slider_calibration: dict[str, Any] | BrushSliderCalibration | None = None,
+        brush_target_area: dict[str, int] | None = None,
     ):
         self.plan = validate_color_plan(color_plan)
         self.profile_document = profile_document
@@ -210,6 +470,21 @@ class ColorPlanExecutionHooks:
         self.preflight_passed = False
         self.screenshot_provider = screenshot_provider
         self.dpi_scale_provider = dpi_scale_provider
+        self.brush_controller: BrushSliderController | None = None
+        if brush_slider_calibration is not None:
+            calibration = (
+                brush_slider_calibration
+                if isinstance(brush_slider_calibration, BrushSliderCalibration)
+                else BrushSliderCalibration.from_dict(brush_slider_calibration)
+            )
+            if brush_target_area is None:
+                raise ColorPlanExecutionError("Для калибровки кисти не передана область рисования.")
+            self.brush_controller = BrushSliderController(
+                calibration,
+                brush_target_area,
+                current_screen_size_provider=current_screen_size_provider,
+            )
+            self.brush_controller.validate()
         try:
             from palette_profiles import validate_palette_profile
             self.profile = validate_palette_profile(profile_document)
@@ -249,6 +524,8 @@ class ColorPlanExecutionHooks:
                 "Палитра не прошла проверку на текущем экране. Рисование не начато.\n"
                 f"{joined}\nОткройте браузер с палитрой, проверьте профиль на вкладке 3 и повторите запуск."
             )
+        if self.brush_controller is not None:
+            self.brush_controller.validate()
         self.preflight_passed = True
         return f"Палитра «{self.profile['profile_name']}» проверена: {len(self.targets)} используемых цветов."
 
@@ -262,31 +539,36 @@ class ColorPlanExecutionHooks:
             ) from exc
 
         executor._check_stop()
+        details: list[str] = []
         if self.current_palette_index == palette_index:
-            return f"Цвет {target.hex} уже выбран; штрих {stroke_index} идёт по плану."
+            details.append(f"Цвет {target.hex} уже выбран.")
+        else:
+            import pyautogui
 
-        import pyautogui
+            # Move to the saved swatch, click it, and always release before drawing.
+            pyautogui.moveTo(target.screen_x, target.screen_y, duration=0)
+            executor.move_calls += 1
+            executor._wait_interruptibly(executor.config.before_mouse_down_ms / 1000.0)
+            executor._check_stop()
+            pyautogui.mouseDown()
+            try:
+                executor._wait_interruptibly(executor.config.after_mouse_down_ms / 1000.0)
+            finally:
+                if not executor._release_mouse():
+                    raise RuntimeError(
+                        f"Не удалось отпустить мышь после выбора цвета {target.hex}: "
+                        f"{executor._release_errors[-1]}"
+                    )
 
-        # Move to the saved swatch, click it, and always release the mouse before drawing.
-        pyautogui.moveTo(target.screen_x, target.screen_y, duration=0)
-        executor.move_calls += 1
-        executor._wait_interruptibly(executor.config.before_mouse_down_ms / 1000.0)
-        executor._check_stop()
-        pyautogui.mouseDown()
-        try:
-            executor._wait_interruptibly(executor.config.after_mouse_down_ms / 1000.0)
-        finally:
-            if not executor._release_mouse():
-                raise RuntimeError(
-                    f"Не удалось отпустить мышь после выбора цвета {target.hex}: "
-                    f"{executor._release_errors[-1]}"
-                )
-
-        executor._wait_interruptibly(executor.config.after_mouse_up_ms / 1000.0)
-        self.current_palette_index = palette_index
-        self.selection_count += 1
-        self.selection_order.append(palette_index)
-        return f"Выбран цвет {target.name} {target.hex}; штрих {stroke_index}."
+            executor._wait_interruptibly(executor.config.after_mouse_up_ms / 1000.0)
+            self.current_palette_index = palette_index
+            self.selection_count += 1
+            self.selection_order.append(palette_index)
+            details.append(f"Выбран цвет {target.name} {target.hex}.")
+        if self.brush_controller is not None:
+            details.append(self.brush_controller.before_stroke(executor, stroke_index, stroke))
+        details.append(f"штрих {stroke_index} идёт по плану")
+        return " ".join(details)
 
     def to_report(self) -> dict[str, Any]:
         return {
@@ -297,4 +579,25 @@ class ColorPlanExecutionHooks:
             "used_colors": [self.targets[index].to_dict() for index in sorted(self.targets)],
             "selection_policy": "select_only_when_color_changes; preserve_scanline_stroke_order",
             "screenshot_preflight": "passed" if self.preflight_passed else "not_completed",
+            "brush_size_selection_count": (
+                self.brush_controller.selection_count if self.brush_controller is not None else 0
+            ),
+            "brush_size_selection_order": (
+                list(self.brush_controller.selection_order) if self.brush_controller is not None else []
+            ),
+            "final_brush_value": (
+                self.brush_controller.current_value if self.brush_controller is not None else None
+            ),
+            "brush_slider_calibration": (
+                {
+                    "x_at_min": self.brush_controller.calibration.x_at_min,
+                    "x_at_max": self.brush_controller.calibration.x_at_max,
+                    "y": self.brush_controller.calibration.y,
+                    "initial_value": self.brush_controller.calibration.initial_value,
+                    "screen_width": self.brush_controller.calibration.screen_width,
+                    "screen_height": self.brush_controller.calibration.screen_height,
+                    "confirmed": self.brush_controller.calibration.confirmed,
+                }
+                if self.brush_controller is not None else None
+            ),
         }

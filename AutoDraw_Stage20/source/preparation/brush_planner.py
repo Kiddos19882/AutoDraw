@@ -356,11 +356,11 @@ def save_adaptive_brush_plan(path: str | Path, plan: Any) -> Path:
     validated = validate_adaptive_brush_plan(plan)
     destination = Path(path).expanduser().resolve()
     destination.parent.mkdir(parents=True, exist_ok=True)
-    text = json.dumps(validated, ensure_ascii=False, indent=2, allow_nan=False) + "\\n"
+    text = json.dumps(validated, ensure_ascii=False, indent=2, allow_nan=False) + "\n"
     temporary: str | None = None
     try:
         with tempfile.NamedTemporaryFile(
-            "w", encoding="utf-8", newline="\\n", dir=destination.parent,
+            "w", encoding="utf-8", newline="\n", dir=destination.parent,
             prefix=f".{destination.name}.", suffix=".tmp", delete=False,
         ) as handle:
             temporary = handle.name

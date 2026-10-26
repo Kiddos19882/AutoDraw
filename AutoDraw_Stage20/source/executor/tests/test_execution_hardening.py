@@ -277,6 +277,20 @@ class LineExtensionTests(unittest.TestCase):
         MouseExecutor(FastEvent(), self.make_config(line_extension_px=0)).execute(small_plan(), 100, 200)
         self.assertEqual(FAKE_PYAUTOGUI.moves[-1][:2], (109, 201))
 
+    def test_per_stroke_extension_override_disables_extension_without_changing_config(self):
+        plan = small_plan()
+        plan.strokes[0].metadata["line_extension_px_override"] = "0"
+        MouseExecutor(FastEvent(), self.make_config(line_extension_px=2)).execute(plan, 100, 200)
+        self.assertEqual(FAKE_PYAUTOGUI.moves[-1][:2], (109, 201))
+
+    def test_invalid_per_stroke_extension_override_fails_safely(self):
+        plan = small_plan()
+        plan.strokes[0].metadata["line_extension_px_override"] = "nan"
+        summary = MouseExecutor(FastEvent(), self.make_config()).execute(plan, 100, 200)
+        self.assertEqual(summary.status, "failed")
+        self.assertIn("Продление штриха", summary.error)
+        self.assertTrue(summary.mouse_release_succeeded)
+
     def test_closed_contour_is_not_extended(self):
         plan = DrawingPlan(
             width=20, height=20,

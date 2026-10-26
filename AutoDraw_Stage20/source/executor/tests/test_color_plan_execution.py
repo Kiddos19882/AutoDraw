@@ -12,11 +12,16 @@ from palette_detection import create_palette_document
 from palette_profiles import create_palette_profile
 from color_scanline import build_color_scanline_plan, render_color_scanline_preview
 from drawing.color_plan_execution import (
+    BrushSliderCalibration,
+    BrushSliderController,
     ColorPlanExecutionError,
     ColorPlanExecutionHooks,
+    adaptive_brush_plan_to_drawing_plan,
     build_palette_targets,
     color_plan_to_drawing_plan,
 )
+from brush_planner import build_adaptive_brush_plan
+from models import Point, Stroke
 from drawing.mouse_executor import ExecutorConfig, MouseExecutor
 
 
@@ -118,6 +123,75 @@ class ColorPlanExecutionTests(unittest.TestCase):
         self.assertEqual(exact_preview.getpixel((1, 0)), (232, 78, 67, 255))
         self.assertEqual(exact_preview.getpixel((2, 0))[3], 0)
         self.assertEqual(execution_preview.getpixel((2, 0)), (232, 78, 67, 255))
+
+    def test_adaptive_plan_converts_only_for_matching_source_color_plan(self):
+        index_map = np.zeros((5, 50), dtype=np.int32)
+        source = build_color_scanline_plan(
+            index_map, self.color_plan["palette"], plan_name="adaptive conversion source"
+        )
+        brush_plan = build_adaptive_brush_plan(index_map, source)
+        converted = adaptive_brush_plan_to_drawing_plan(brush_plan, source)
+        self.assertEqual((converted.width, converted.height), (50, 5))
+        self.assertTrue(all(stroke.metadata["adaptive_brush_plan"] == "true" for stroke in converted.strokes))
+        self.assertTrue(all(stroke.metadata["line_extension_px_override"] == "0" for stroke in converted.strokes))
+        self.assertIn("brush_value", converted.strokes[1].metadata)
+        self.assertEqual(converted.strokes[1].metadata["brush_value"], "20")
+
+        different_source = build_color_scanline_plan(
+            index_map, self.color_plan["palette"], plan_name="different source"
+        )
+        with self.assertRaisesRegex(ColorPlanExecutionError, "другого цветного плана"):
+            adaptive_brush_plan_to_drawing_plan(brush_plan, different_source)
+
+    def test_brush_slider_calibration_interpolates_and_rejects_stale_screen(self):
+        calibration = BrushSliderCalibration(
+            x_at_min=100, x_at_max=390, y=200, initial_value=7,
+            screen_width=1920, screen_height=1080, confirmed=True,
+        )
+        self.assertEqual(calibration.coordinate_for_value(1), 100)
+        self.assertEqual(calibration.coordinate_for_value(30), 390)
+        self.assertEqual(calibration.coordinate_for_value(16), 250)
+        calibration.validate((1920, 1080), {"x": 400, "y": 300, "width": 600, "height": 300})
+        with self.assertRaisesRegex(ColorPlanExecutionError, "Разрешение экрана изменилось"):
+            calibration.validate((1280, 720), {"x": 400, "y": 300, "width": 600, "height": 300})
+
+    def test_brush_slider_calibration_rejects_track_crossing_canvas(self):
+        calibration = BrushSliderCalibration(
+            x_at_min=100, x_at_max=800, y=200, initial_value=7,
+            screen_width=1000, screen_height=800, confirmed=True,
+        )
+        with self.assertRaisesRegex(ColorPlanExecutionError, "попадает внутрь выделенной области"):
+            calibration.validate((1000, 800), {"x": 300, "y": 150, "width": 300, "height": 100})
+
+    def test_brush_slider_controller_drags_thumb_only_when_value_changes(self):
+        from test_execution_hardening import FastEvent
+        calibration = BrushSliderCalibration(
+            x_at_min=100, x_at_max=390, y=200, initial_value=7,
+            screen_width=1920, screen_height=1080, confirmed=True,
+        )
+        controller = BrushSliderController(
+            calibration,
+            {"x": 0, "y": 0, "width": 40, "height": 40},
+            current_screen_size_provider=lambda: (1920, 1080),
+        )
+        executor = MouseExecutor(FastEvent(), self.config())
+        stroke = Stroke(
+            name="adaptive test",
+            points=[Point(0, 0), Point(10, 0)],
+            metadata={"brush_value": "20"},
+        )
+        FAKE_PYAUTOGUI.reset()
+        detail = controller.before_stroke(executor, 1, stroke)
+        self.assertEqual(detail, "Выбрана кисть 20.")
+        self.assertEqual(FAKE_PYAUTOGUI.moves, [(160, 200, 0), (290, 200, 0)])
+        self.assertEqual(FAKE_PYAUTOGUI.down_calls, 1)
+        self.assertEqual(FAKE_PYAUTOGUI.up_calls, 1)
+        self.assertEqual(controller.selection_order, [20])
+        self.assertTrue(executor._release_succeeded)
+
+        FAKE_PYAUTOGUI.reset()
+        self.assertEqual(controller.before_stroke(executor, 2, stroke), "Кисть 20 уже выбрана.")
+        self.assertEqual(FAKE_PYAUTOGUI.moves, [])
 
     def test_profile_maps_rgb_to_exact_saved_swatch_coordinates(self):
         targets = build_palette_targets(self.color_plan, self.profile, current_screen_size=(160, 100))
