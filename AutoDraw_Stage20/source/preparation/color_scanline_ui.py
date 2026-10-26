@@ -423,6 +423,200 @@ class ColorScanlineTab:
             f"{risk_note} Порядок: сверху вниз, внутри строки слева направо."
         )
 
+    def build_geometry_plan(self) -> None:
+        if self.quantization_result is None or self.palette_profile is None:
+            self.use_latest_quantization()
+            if self.quantization_result is None or self.palette_profile is None:
+                return
+        try:
+            tolerance = self._parse_model_number(self.geometry_tolerance_var.get(), "Допуск RDP")
+            min_component_area = int(self.geometry_min_component_var.get())
+            plan = build_geometry_color_plan(
+                self.quantization_result.index_map,
+                self.palette_profile,
+                mode=self.geometry_mode_var.get(),
+                simplify_tolerance_px=tolerance,
+                min_component_area=min_component_area,
+                source_name=self.source_name,
+            )
+        except (GeometryColorPlanError, ValueError, TypeError, MemoryError) as exc:
+            messagebox.showerror("Не удалось построить геометрический план", str(exc), parent=self.root)
+            self.status_var.set(f"Ошибка геометрического плана: {exc}")
+            return
+        self._display_geometry_plan(plan, self.quantization_result.index_map)
+
+    def fit_geometry_to_paint_budget(self) -> None:
+        if self.quantization_result is None or self.palette_profile is None:
+            self.use_latest_quantization()
+            if self.quantization_result is None or self.palette_profile is None:
+                return
+        try:
+            stroke_overhead = self._parse_model_number(
+                self.paint_overhead_var.get(), "Дополнительный расход на штрих"
+            )
+            paint_budget = self._parse_model_number(
+                self.paint_budget_var.get(), "Оценочный запас краски"
+            )
+            target_usage = self._parse_model_number(
+                self.paint_target_usage_var.get(), "Целевой расход бюджета"
+            )
+            tolerance = self._parse_model_number(self.geometry_tolerance_var.get(), "Допуск RDP")
+            plan, report = optimize_geometry_plan_to_budget(
+                self.quantization_result.index_map,
+                self.palette_profile,
+                mode=self.geometry_mode_var.get(),
+                paint_budget_px_equivalent=paint_budget,
+                target_usage_percent=target_usage,
+                stroke_overhead_px_equivalent=stroke_overhead,
+                simplify_tolerance_px=tolerance,
+                source_name=self.source_name,
+            )
+        except (GeometryColorPlanError, ValueError, TypeError, MemoryError) as exc:
+            messagebox.showerror(
+                "Не удалось оптимизировать геометрический план",
+                str(exc),
+                parent=self.root,
+            )
+            self.status_var.set(f"Геометрическая оптимизация не выполнена: {exc}")
+            return
+
+        fit_text = (
+            f"Подогнано под бюджет: режим {report['mode']}, масштаб {report['scale']:.1f}, "
+            f"допуск RDP {report['simplify_tolerance_px']:.1f} px, "
+            f"минимальный компонент {report['min_component_area']} px; "
+            f"расход {report['estimated_ink_after_px_equivalent']:,.0f}/"
+            f"{report['target_cost_px_equivalent']:,.0f} px-экв."
+        )
+        if not report["fits_budget"]:
+            fit_text += " В одну доску не укладывается — можно попробовать разбиение."
+        self._display_geometry_plan(plan, self.quantization_result.index_map, status_prefix=fit_text)
+
+    def _display_geometry_plan(
+        self,
+        plan: dict[str, Any],
+        index_map: Any | None,
+        *,
+        plan_path: Path | None = None,
+        status_prefix: str | None = None,
+    ) -> None:
+        validated = validate_geometry_color_plan(plan)
+        self.plan = validated
+        self.plan_path = plan_path
+        self.plan_index_map = index_map.copy() if index_map is not None else None
+        self.brush_plan = None
+        self._auto_fit_row_step = None
+        self._auto_fit_row_offset = 0
+        self.brush_summary_var.set(
+            "Для геометрических планов адаптивные рекомендации кистей Stage 19 не применяются. "
+            "План использует полилинии/контуры и исполняется с обычным размером кисти."
+        )
+        self.preview.set_image(render_geometry_color_preview(validated))
+        self._populate_table(validated)
+
+        summary = validated["summary"]
+        canvas = validated["canvas"]
+        generation = validated["generation"]
+        estimate = summary.get("paint_cost_estimate")
+        optimization = generation.get("budget_optimization", {})
+        summary_lines = [
+            f"Формат: geometry · режим: {generation.get('mode', 'не указан')}",
+            f"Холст: {canvas['width']} × {canvas['height']} px",
+            f"Штрихов: {summary['stroke_count']:,}; точек: {summary['point_count']:,}",
+            f"Пикселей в исходной карте: {summary.get('source_visible_pixel_count', summary['visible_pixel_count']):,}; "
+            f"после фильтрации компонентов: {summary.get('retained_visible_pixel_count', summary['visible_pixel_count']):,}",
+            f"Прозрачных пикселей: {summary['transparent_pixel_count']:,}; "
+            f"удалено фильтром мелких компонентов: {generation.get('removed_component_pixel_count', 0):,}",
+            f"Переключений цвета: {summary['color_switch_count']:,}; "
+            f"выборов цвета ориентировочно: {summary['color_selection_count_estimate']:,}",
+            f"Длина рисующих траекторий: {summary['drawing_length_px']:,.1f} px; "
+            f"переходов без рисования: {summary['pen_up_distance_px']:,.1f} px",
+            self._format_paint_estimate(estimate),
+        ]
+        if optimization:
+            summary_lines.append(
+                f"Бюджетная оптимизация: масштаб {optimization.get('scale', 1.0):.1f}; "
+                f"RDP {optimization.get('simplify_tolerance_px', 0.0):.1f} px; "
+                f"мин. компонент {optimization.get('min_component_area', 1)} px; "
+                f"в бюджет: {'да' if optimization.get('fits_budget') else 'нет'}."
+            )
+        self.stats_var.set("\n".join(summary_lines))
+        prefix = f"{status_prefix} " if status_prefix else ""
+        estimate_risk = estimate.get("risk_label", "оценка приблизительная") if isinstance(estimate, dict) else "оценка недоступна"
+        self.source_var.set(
+            f"Геометрический план: {len(validated['strokes']):,} штрихов · "
+            f"{canvas['width']} × {canvas['height']} px · режим {generation.get('mode', 'не указан')}"
+        )
+        self.status_var.set(
+            f"{prefix}Геометрический план готов. {estimate_risk}. "
+            "Проверьте предпросмотр: скелетонизация и контуры меняют заполненную площадь, "
+            "поэтому визуальная точность отличается от scanline."
+        )
+
+    def split_geometry_to_boards_dialog(self) -> None:
+        if not isinstance(self.plan, dict) or self.plan.get("plan_type") != "autodraw_geometry_color_plan":
+            messagebox.showinfo(
+                "Нет геометрического плана",
+                "Сначала постройте или откройте геометрический план.",
+                parent=self.root,
+            )
+            return
+        try:
+            budget = self._parse_model_number(self.paint_budget_var.get(), "Оценочный запас краски")
+            overhead = self._parse_model_number(
+                self.paint_overhead_var.get(), "Дополнительный расход на штрих"
+            )
+            target = self._parse_model_number(self.paint_target_usage_var.get(), "Целевой расход бюджета")
+            manifest = split_geometry_plan_to_boards(
+                self.plan,
+                paint_budget_px_equivalent=budget,
+                target_usage_percent=target,
+                stroke_overhead_px_equivalent=overhead,
+                board_width=660,
+                board_height=340,
+            )
+        except (GeometryColorPlanError, ValueError, TypeError, MemoryError) as exc:
+            messagebox.showerror("Не удалось разбить план на доски", str(exc), parent=self.root)
+            return
+
+        selected = filedialog.asksaveasfilename(
+            parent=self.root,
+            title="Сохранить манифест геометрического плана",
+            initialdir=str(self.output_dir),
+            initialfile="geometry_multi_board_manifest.json",
+            defaultextension=".json",
+            filetypes=(("Манифест досок AutoDraw", "*.json"),),
+        )
+        if not selected:
+            return
+        manifest_path = Path(selected).resolve()
+        boards_dir = manifest_path.parent / f"{manifest_path.stem}_boards"
+        try:
+            save_multi_board_manifest(manifest_path, manifest)
+            boards_dir.mkdir(parents=True, exist_ok=True)
+            for board in manifest["boards"]:
+                index = int(board["board_index"])
+                save_geometry_color_plan(
+                    boards_dir / f"board_{index:02d}.json",
+                    board["plan"],
+                )
+        except (OSError, GeometryColorPlanError, ValueError, TypeError) as exc:
+            messagebox.showerror("Не удалось сохранить манифест досок", str(exc), parent=self.root)
+            return
+        over_budget_count = sum(not board["fits_budget"] for board in manifest["boards"])
+        self.status_var.set(
+            f"Создано досок: {manifest['board_count']}. Манифест: {manifest_path}; "
+            f"отдельные планы: {boards_dir}. "
+            f"Досок с прогнозом выше цели: {over_budget_count}. "
+            "Исполняйте каждый board_XX.json отдельно и собирайте изображение по метаданным tile."
+        )
+        messagebox.showinfo(
+            "Разбиение завершено",
+            f"Создано досок: {manifest['board_count']}\n"
+            f"Манифест: {manifest_path}\nОтдельные JSON-планы: {boards_dir}\n"
+            f"Досок выше целевого расхода: {over_budget_count}",
+            parent=self.root,
+        )
+
     def fit_to_paint_budget(self) -> None:
         if self.quantization_result is None or self.palette_profile is None:
             self.use_latest_quantization()
