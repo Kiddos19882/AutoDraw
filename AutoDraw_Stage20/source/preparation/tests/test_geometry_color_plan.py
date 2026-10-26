@@ -670,3 +670,20 @@ def test_multiboard_split_reconstructs_closed_contour_crossing_board_seam():
     assert np.array_equal(assembled[:, :, 3], expected[:, :, 3])
     visible_pixels = expected[:, :, 3] > 0
     assert np.array_equal(assembled[visible_pixels, :3], expected[visible_pixels, :3])
+
+
+@pytest.mark.parametrize("canvas_size", [(32.5, 32), (True, 32), ("32", 32)])
+def test_builder_rejects_non_integer_canvas_dimensions(canvas_size):
+    with pytest.raises(GeometryColorPlanError):
+        build_geometry_color_plan(
+            _map(), PALETTE, mode="scanline", canvas_size=canvas_size
+        )
+
+
+@pytest.mark.parametrize("palette_index", [0.5, "0", True])
+def test_validator_rejects_non_integer_palette_indexes(palette_index):
+    plan = build_geometry_color_plan(_map(), PALETTE, mode="scanline")
+    plan["strokes"][0]["color"]["palette_index"] = palette_index
+
+    with pytest.raises(GeometryColorPlanError):
+        validate_geometry_color_plan(plan)
