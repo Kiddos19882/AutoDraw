@@ -476,6 +476,9 @@ def color_plan_to_drawing_plan(plan: Any) -> DrawingPlan:
             metadata["color_scanline_order"] = str(index)
         else:
             metadata["color_geometry_order"] = str(index)
+            # RDP paths are checked against their exact source color mask. Do not
+            # extend open geometric paths past that validated footprint.
+            metadata["line_extension_px_override"] = "0"
 
         # A one-pixel run is encoded by Stage 19 as two identical points.  The
         # target board ignores a mouse click with no movement, so turn this into
