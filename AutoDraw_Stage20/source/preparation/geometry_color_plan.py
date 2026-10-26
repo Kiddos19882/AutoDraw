@@ -18,7 +18,10 @@ from skeletonization import thin_binary_mask as _zhang_suen_thinning
 from skeletonization import trace_skeleton_paths as _skeleton_paths
 from stroke_simplification import simplify_path as _simplify_path
 from stroke_order_optimizer import orient_and_order_strokes as _orient_and_order_strokes
-from geometry_budget_optimizer import optimize_geometry_plan_to_budget
+from geometry_budget_optimizer import (
+    optimize_geometry_plan_across_modes,
+    optimize_geometry_plan_to_budget,
+)
 from multi_board_splitter import split_geometry_plan_to_boards, save_multi_board_manifest
 
 
