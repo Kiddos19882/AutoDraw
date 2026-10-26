@@ -353,3 +353,27 @@ def test_multiboard_split_respects_maximum_board_count():
             board_width=660,
             board_height=340,
         )
+
+
+def test_two_pixel_contour_is_emitted_as_an_open_stroke():
+    indexes = np.full((7, 7), -1, dtype=np.int32)
+    indexes[3, 2:4] = 0
+
+    plan = build_geometry_color_plan(
+        indexes, PALETTE, mode="contour", simplify_tolerance_px=5
+    )
+
+    assert plan["summary"]["stroke_count"] == 1
+    assert plan["strokes"][0]["closed"] is False
+    assert plan["strokes"][0]["metadata"]["path_type"] == "contour-line"
+    assert len(plan["strokes"][0]["points"]) >= 2
+
+
+def test_validator_rejects_closed_path_with_fewer_than_three_distinct_points():
+    indexes = np.full((7, 7), -1, dtype=np.int32)
+    indexes[3, 2:4] = 0
+    plan = build_geometry_color_plan(indexes, PALETTE, mode="contour")
+    plan["strokes"][0]["closed"] = True
+
+    with pytest.raises(GeometryColorPlanError):
+        validate_geometry_color_plan(plan)
