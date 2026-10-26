@@ -687,3 +687,44 @@ def test_validator_rejects_non_integer_palette_indexes(palette_index):
 
     with pytest.raises(GeometryColorPlanError):
         validate_geometry_color_plan(plan)
+
+
+def test_multiboard_split_reconstructs_diagonal_strokes_crossing_board_seam():
+    index_map = np.full((40, 700), -1, dtype=np.int32)
+    for x in range(642, 679):
+        y = 4 + (x - 642)
+        index_map[y, x] = 0
+    plan = build_geometry_color_plan(
+        index_map, PALETTE, mode="contour", simplify_tolerance_px=0
+    )
+
+    manifest = split_geometry_plan_to_boards(
+        plan,
+        paint_budget_px_equivalent=25_650,
+        target_usage_percent=75,
+        min_tile_size=8,
+        max_boards=4,
+        board_width=660,
+        board_height=340,
+    )
+
+    assembled = np.zeros((40, 700, 4), dtype=np.uint8)
+    for board in manifest["boards"]:
+        tile = board["tile"]
+        preview = np.asarray(
+            render_geometry_color_preview(board["plan"], max_dimension=660).crop(
+                (0, 0, tile["width"], tile["height"])
+            )
+        )
+        destination = assembled[
+            tile["y"]:tile["y"] + tile["height"],
+            tile["x"]:tile["x"] + tile["width"],
+        ]
+        visible = preview[:, :, 3] > 0
+        destination[visible] = preview[visible]
+
+    expected = np.asarray(render_geometry_color_preview(plan, max_dimension=700))
+    assert manifest["board_count"] == 2
+    assert np.array_equal(assembled[:, :, 3], expected[:, :, 3])
+    visible_pixels = expected[:, :, 3] > 0
+    assert np.array_equal(assembled[visible_pixels, :3], expected[visible_pixels, :3])
