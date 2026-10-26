@@ -864,7 +864,6 @@ def test_stroke_router_uses_exactly_one_batch_per_marker_for_many_colors():
 
     assert set(colors) == {0, 1, 2}
     assert switches == len(set(colors)) - 1
-    assert all(colors.index(color) == colors.index(color) for color in set(colors))
     assert sum(colors[i] != colors[i - 1] for i in range(1, len(colors))) == 2
 
 
