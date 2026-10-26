@@ -255,6 +255,7 @@ def test_rdp_does_not_simplify_through_another_color_layer():
     assert result == points
 
 
+import stroke_order_optimizer as routing_module
 from stroke_order_optimizer import orient_and_order_strokes
 from geometry_budget_optimizer import _rescale_map_centered
 from geometry_budget_optimizer import (
@@ -594,3 +595,39 @@ def test_multiboard_split_reconstructs_scanline_pixels_across_board_seam():
     assert np.array_equal(assembled[:, :, 3], expected[:, :, 3])
     visible_pixels = expected[:, :, 3] > 0
     assert np.array_equal(assembled[visible_pixels, :3], expected[visible_pixels, :3])
+
+
+def test_large_color_batch_uses_bounded_work_in_stroke_router(monkeypatch):
+    distance_calls = 0
+    original_distance = routing_module._point_distance
+
+    def counted_distance(first, second):
+        nonlocal distance_calls
+        distance_calls += 1
+        return original_distance(first, second)
+
+    monkeypatch.setattr(routing_module, "_point_distance", counted_distance)
+    strokes = [
+        _route_stroke(0, float(index * 3), float(index * 3 + 1))
+        for index in range(1_000)
+    ]
+
+    ordered = orient_and_order_strokes(strokes, color_grouping=True)
+
+    assert len(ordered) == len(strokes)
+    assert distance_calls < 10_000
+
+
+def test_disabled_color_grouping_returns_without_routing_work(monkeypatch):
+    strokes = [
+        _route_stroke(0, 0.0, 1.0),
+        _route_stroke(1, 10.0, 11.0),
+        _route_stroke(0, 2.0, 3.0),
+    ]
+
+    def unexpected_distance_call(_first, _second):
+        raise AssertionError("Роутер не должен вычислять расстояния при отключённой группировке.")
+
+    monkeypatch.setattr(routing_module, "_point_distance", unexpected_distance_call)
+
+    assert orient_and_order_strokes(strokes, color_grouping=False) is strokes
