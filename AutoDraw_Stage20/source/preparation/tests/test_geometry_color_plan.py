@@ -86,3 +86,87 @@ def test_multiboard_split_has_manifest_and_tile_metadata():
 def test_invalid_mode_is_rejected():
     with pytest.raises(GeometryColorPlanError):
         build_geometry_color_plan(_map(), PALETTE, mode="magic")
+
+
+def test_skeletonization_preserves_isolated_single_pixel():
+    indexes = np.full((9, 9), -1, dtype=np.int32)
+    indexes[4, 4] = 0
+
+    plan = build_geometry_color_plan(
+        indexes, PALETTE, mode="skeleton", simplify_tolerance_px=0
+    )
+
+    assert plan["summary"]["source_visible_pixel_count"] == 1
+    assert plan["summary"]["retained_visible_pixel_count"] == 1
+    assert plan["summary"]["stroke_count"] == 1
+    assert plan["summary"]["single_pixel_stroke_count"] == 1
+    point_a, point_b = plan["strokes"][0]["points"]
+    assert point_a == point_b
+
+
+def test_contour_mode_preserves_isolated_single_pixel():
+    indexes = np.full((9, 9), -1, dtype=np.int32)
+    indexes[4, 4] = 0
+
+    plan = build_geometry_color_plan(
+        indexes, PALETTE, mode="contour", simplify_tolerance_px=0
+    )
+
+    assert plan["summary"]["stroke_count"] == 1
+    assert plan["summary"]["single_pixel_stroke_count"] == 1
+    assert plan["strokes"][0]["metadata"]["path_type"] == "contour-point"
+
+
+def test_summary_reports_pixels_retained_after_component_filtering():
+    indexes = np.full((8, 8), -1, dtype=np.int32)
+    indexes[1:4, 1:4] = 0  # Nine connected black pixels.
+    indexes[6, 6] = 1      # A single red pixel, removed by min_component_area=2.
+
+    plan = build_geometry_color_plan(
+        indexes, PALETTE, mode="contour", min_component_area=2
+    )
+
+    summary = plan["summary"]
+    assert summary["source_visible_pixel_count"] == 10
+    assert summary["visible_pixel_count"] == 9
+    assert summary["retained_visible_pixel_count"] == 9
+    assert plan["generation"]["removed_component_pixel_count"] == 1
+    assert summary["used_colors"][0]["palette_index"] == 0
+    assert summary["used_colors"][0]["pixel_count"] == 9
+    assert summary["used_colors"][0]["percentage_visible"] == 100.0
+
+
+def test_geometry_cost_accounts_for_executed_single_pixel_length():
+    indexes = np.full((9, 9), -1, dtype=np.int32)
+    indexes[4, 4] = 0
+    plan = build_geometry_color_plan(
+        indexes, PALETTE, mode="skeleton", simplify_tolerance_px=0
+    )
+
+    estimate = plan["summary"]["paint_cost_estimate"]
+    assert estimate["single_pixel_stroke_count"] == 1
+    assert estimate["single_pixel_extra_path_px"] == 1.0
+    assert estimate["estimated_total_ink_px_equivalent"] == pytest.approx(7.67, abs=0.01)
+
+
+def test_optimizer_uses_requested_cost_model_for_before_report():
+    indexes = np.full((8, 8), -1, dtype=np.int32)
+    indexes[2:6, 1:7] = 0
+
+    baseline = build_geometry_color_plan(
+        indexes, PALETTE, mode="scanline", simplify_tolerance_px=0
+    )
+    estimate = baseline["summary"]["drawing_length_px"] + (
+        baseline["summary"]["single_pixel_stroke_count"] * 1.0
+    ) + baseline["summary"]["stroke_count"] * 20.0
+
+    _plan, report = optimize_geometry_plan_to_budget(
+        indexes,
+        PALETTE,
+        mode="scanline",
+        paint_budget_px_equivalent=10_000,
+        stroke_overhead_px_equivalent=20,
+        target_usage_percent=90,
+    )
+
+    assert report["estimated_ink_before_px_equivalent"] == pytest.approx(estimate)
