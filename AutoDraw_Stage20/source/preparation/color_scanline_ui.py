@@ -27,6 +27,19 @@ from color_scanline import (
     validate_color_scanline_plan,
 )
 
+from geometry_color_plan import (
+    GeometryColorPlanError,
+    _estimate_geometry_paint_cost,
+    build_geometry_color_plan,
+    load_geometry_color_plan,
+    optimize_geometry_plan_to_budget,
+    render_geometry_color_preview,
+    save_geometry_color_plan,
+    save_multi_board_manifest,
+    split_geometry_plan_to_boards,
+    validate_geometry_color_plan,
+)
+
 
 class _PlanPreview(ttk.LabelFrame):
     def __init__(self, parent: tk.Widget, title: str):
@@ -101,18 +114,22 @@ class ColorScanlineTab:
         self.brush_scale_calibrated_var = tk.BooleanVar(value=False)
         self.paint_overhead_var = tk.StringVar(value=f"{DEFAULT_STROKE_OVERHEAD_PX_EQUIVALENT:.2f}")
         self.paint_budget_var = tk.StringVar(value=f"{DEFAULT_PAINT_BUDGET_PX_EQUIVALENT:.0f}")
+        self.geometry_mode_var = tk.StringVar(value="skeleton")
+        self.geometry_tolerance_var = tk.StringVar(value="0.8")
+        self.geometry_min_component_var = tk.StringVar(value="2")
 
         outer = ttk.Frame(parent, padding=10)
         outer.pack(fill="both", expand=True)
         ttk.Label(outer, text="Этап 19 — цветной scanline-план", font=("Segoe UI", 15, "bold")).pack(anchor="w")
         ttk.Label(
             outer,
-            text=("План строится по преобразованной карте цветов этапа 18. Строки обходятся сверху вниз, "
-                  "цветовые участки внутри строки — слева направо. Штрихи не группируются по цвету и не переставляются."),
+            text=("Scanline сохраняет растровые строки; геометрический режим строит траектории по цветовым слоям. "
+                  "Геометрический план поддерживает скелетонизацию, контуры, RDP-упрощение и маршрутизацию штрихов. "
+                  "Старый scanline-путь остаётся доступен отдельно."),
             wraplength=1120,
         ).pack(anchor="w", pady=(3, 9))
 
-        toolbar = ttk.LabelFrame(outer, text="Источник и план", padding=7)
+        toolbar = ttk.LabelFrame(outer, text="Источник и scanline-план", padding=7)
         toolbar.pack(fill="x", pady=(0, 7))
         ttk.Button(toolbar, text="Взять результат из этапа 18", command=self.use_latest_quantization).pack(side="left")
         ttk.Label(toolbar, text="Шаг строк (px)").pack(side="left", padx=(12, 4))
@@ -127,6 +144,30 @@ class ColorScanlineTab:
         ).pack(side="left", padx=(6, 0))
         ttk.Button(toolbar, text="Открыть цветной план…", command=self.open_plan_dialog).pack(side="left", padx=(6, 0))
         ttk.Button(toolbar, text="Сохранить план JSON…", command=self.save_plan_dialog).pack(side="left", padx=(6, 0))
+
+        geometry_frame = ttk.LabelFrame(outer, text="Геометрический план (новый формат)", padding=7)
+        geometry_frame.pack(fill="x", pady=(0, 7))
+        ttk.Label(geometry_frame, text="Алгоритм").pack(side="left")
+        ttk.Combobox(
+            geometry_frame, textvariable=self.geometry_mode_var,
+            values=("skeleton", "contour", "scanline"), state="readonly", width=10,
+        ).pack(side="left", padx=(4, 10))
+        ttk.Label(geometry_frame, text="RDP, px").pack(side="left")
+        ttk.Entry(geometry_frame, textvariable=self.geometry_tolerance_var, width=6).pack(side="left", padx=(4, 10))
+        ttk.Label(geometry_frame, text="Мин. компонент, px").pack(side="left")
+        ttk.Entry(geometry_frame, textvariable=self.geometry_min_component_var, width=5).pack(side="left", padx=(4, 10))
+        ttk.Button(
+            geometry_frame, text="Построить геометрический план",
+            command=self.build_geometry_plan,
+        ).pack(side="left")
+        ttk.Button(
+            geometry_frame, text="Оптимизировать под бюджет",
+            command=self.fit_geometry_to_paint_budget,
+        ).pack(side="left", padx=(6, 0))
+        ttk.Button(
+            geometry_frame, text="Разбить на доски…",
+            command=self.split_geometry_to_boards_dialog,
+        ).pack(side="left", padx=(6, 0))
 
         model_frame = ttk.LabelFrame(outer, text="Модель расхода краски — экспериментальная оценка", padding=(7, 5))
         model_frame.pack(fill="x", pady=(0, 7))
