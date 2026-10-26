@@ -23,6 +23,7 @@ from drawing.color_plan_execution import (
     color_plan_to_drawing_plan,
 )
 from brush_planner import build_adaptive_brush_plan
+from geometry_color_plan import build_geometry_color_plan
 from models import Point, Stroke
 from drawing.mouse_executor import ExecutorConfig, MouseExecutor
 
@@ -388,6 +389,39 @@ class ColorPlanExecutionTests(unittest.TestCase):
         self.assertEqual(summary.completed_strokes, 0)
         self.assertEqual(FAKE_PYAUTOGUI.down_calls, 0)
         self.assertTrue(summary.mouse_release_succeeded)
+
+
+    def test_geometry_plan_executes_through_palette_preflight_and_color_hooks(self):
+        index_map = np.asarray([[0, 1, 1, 0]], dtype=np.int32)
+        geometry_plan = build_geometry_color_plan(
+            index_map,
+            self.color_plan["palette"],
+            mode="scanline",
+            color_grouping=True,
+        )
+        drawing_plan = color_plan_to_drawing_plan(geometry_plan)
+        hooks = ColorPlanExecutionHooks(
+            geometry_plan,
+            self.profile,
+            current_screen_size_provider=lambda: (160, 100),
+            screenshot_provider=lambda: self.screen.copy(),
+            dpi_scale_provider=lambda: 100,
+        )
+
+        summary = MouseExecutor(FastEvent(), self.config()).execute(
+            drawing_plan,
+            100,
+            200,
+            preflight=hooks.preflight,
+            before_stroke=hooks.before_stroke,
+        )
+
+        self.assertEqual(summary.status, "completed")
+        self.assertTrue(summary.mouse_release_succeeded)
+        self.assertTrue(hooks.preflight_passed)
+        self.assertEqual(hooks.selection_order, [0, 1])
+        self.assertEqual(hooks.selection_count, 2)
+        self.assertEqual(hooks.to_report()["screenshot_preflight"], "passed")
 
 
 if __name__ == "__main__":
