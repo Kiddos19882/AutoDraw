@@ -191,13 +191,16 @@ def split_geometry_plan_to_boards(
         )
         cost = float(estimate["estimated_total_ink_px_equivalent"])
         tile_width, tile_height = x1 - x0, y1 - y0
-        if tile_width > board_width or tile_height > board_height:
-            if tile_width / max(1, board_width) >= tile_height / max(1, board_height) and tile_width > board_width:
-                middle = x0 + tile_width // 2
-                pending[0:0] = [(x0, y0, middle, y1), (middle, y0, x1, y1)]
-            else:
-                middle = y0 + tile_height // 2
-                pending[0:0] = [(x0, y0, x1, middle), (x0, middle, x1, y1)]
+        if tile_width > board_width:
+            # First use the full physical width and leave only the remainder for
+            # a later tile. Cost-driven subdivision happens only after all tiles
+            # fit on a physical board, avoiding an unnecessary 50/50 split.
+            middle = x0 + board_width
+            pending[0:0] = [(x0, y0, middle, y1), (middle, y0, x1, y1)]
+            continue
+        if tile_height > board_height:
+            middle = y0 + board_height
+            pending[0:0] = [(x0, y0, x1, middle), (x0, middle, x1, y1)]
             continue
         if cost <= target_cost or (tile_width <= min_tile_size and tile_height <= min_tile_size):
             draft["summary"]["paint_cost_estimate"] = estimate
