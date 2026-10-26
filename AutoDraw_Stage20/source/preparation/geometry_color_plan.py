@@ -360,10 +360,18 @@ def build_geometry_color_plan(
                             path_type="contour-point", source_component_area=1,
                         ))
                         continue
+                    if len(set(raw_points)) < 3:
+                        # Tiny connected components can yield a two-vertex contour.
+                        # They are lines, not valid closed polygons for DrawingPlan.
+                        strokes.append(_stroke_record(
+                            raw_points, color, closed=False, index=contour_index,
+                            path_type="contour-line", source_component_area=int(len(contour)),
+                        ))
+                        continue
                     simplified = _simplify_path(
                         raw_points, closed=True, tolerance_px=tolerance, safe_mask=mask
                     )
-                    if len(simplified) < 3:
+                    if len(simplified) < 3 or len(set(simplified)) < 3:
                         simplified = raw_points
                     strokes.append(_stroke_record(
                         simplified, color, closed=True, index=contour_index,
@@ -463,6 +471,10 @@ def validate_geometry_color_plan(plan: Any) -> dict[str, Any]:
             parsed.append((x, y))
         if not isinstance(stroke.get("closed", False), bool):
             raise GeometryColorPlanError(f"Признак замкнутости штриха №{index} должен быть логическим.")
+        if stroke.get("closed") and len(set(parsed)) < 3:
+            raise GeometryColorPlanError(
+                f"Замкнутый штрих №{index} должен содержать минимум три различные точки."
+            )
         color = stroke.get("color")
         if not isinstance(color, dict):
             raise GeometryColorPlanError(f"У штриха №{index} отсутствует цвет.")
