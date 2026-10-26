@@ -19,6 +19,7 @@ from palette_detection import (
     rgb_to_hex,
     save_palette,
 )
+from palette_reduction import select_representative_palette_colors
 from palette_profiles import (
     PaletteProfileError,
     check_profile_freshness,
@@ -210,6 +211,7 @@ class PaletteDetectionTab:
         self.region: dict[str, int] | None = None
         self.screen_size: tuple[int, int] | None = None
         self.colors: list[dict[str, Any]] = []
+        self.palette_reduction_report: dict[str, Any] | None = None
         self.active_path: Path | None = None
         self.active_profile_path: Path | None = None
         self.active_profile: dict[str, Any] | None = None
@@ -236,6 +238,7 @@ class PaletteDetectionTab:
         ttk.Button(toolbar, text="Снять экран через 3 секунды…", command=self.request_screenshot).pack(side="left")
         ttk.Button(toolbar, text="Выделить область палитры…", command=self.choose_region).pack(side="left", padx=(6, 0))
         ttk.Button(toolbar, text="Автопоиск цветных образцов", command=self.auto_detect).pack(side="left", padx=(6, 0))
+        ttk.Button(toolbar, text="Оставить 32 основных цвета", command=self._ensure_palette_limit).pack(side="left", padx=(6, 0))
         ttk.Button(toolbar, text="Загрузить палитру…", command=self.load_dialog).pack(side="right")
         ttk.Button(toolbar, text="Сохранить палитру…", command=self.save_dialog).pack(side="right", padx=(0, 6))
 
@@ -362,6 +365,7 @@ class PaletteDetectionTab:
             self._refresh_table()
         assert self.screenshot is not None
         self.region = {"x": left, "y": top, "width": width, "height": height}
+        self.palette_reduction_report = None
         self.region_image = self.screenshot.crop((left, top, left + width, top + height)).convert("RGB")
         self.screen_size = self.screenshot.size
         self.active_path = None
@@ -384,6 +388,8 @@ class PaletteDetectionTab:
                 origin_y=self.region["y"],
             )
             self.colors, added = merge_palette_entries(self.colors, candidates)
+            if added:
+                self.palette_reduction_report = None
             self._refresh_table()
             self.status_var.set(
                 f"Автопоиск: найдено кандидатов {len(candidates)}, добавлено новых цветов {added}. "
@@ -465,6 +471,7 @@ class PaletteDetectionTab:
             return
         entry["name"] = f"Цвет {len(self.colors) + 1}"
         entry["status"] = "detected"
+        self.palette_reduction_report = None
         self.colors.append(entry)
         self._refresh_table()
         self._render_preview()
@@ -529,6 +536,7 @@ class PaletteDetectionTab:
         entry["rgb"] = list(rgb)
         entry["source"] = "manual-edit"
         entry["status"] = "corrected"
+        self.palette_reduction_report = None
         self._refresh_table()
         self.status_var.set(f"Цвет обновлён: {hex_value}. Перед использованием проверьте соответствие образцу на экране.")
 
@@ -584,6 +592,7 @@ class PaletteDetectionTab:
         if index is None:
             return
         removed = self.colors.pop(index)
+        self.palette_reduction_report = None
         self._refresh_table()
         self.status_var.set(f"Удалён цвет {removed['hex']}.")
 
@@ -593,8 +602,37 @@ class PaletteDetectionTab:
         if not messagebox.askyesno("Очистить палитру", "Удалить все найденные цвета?", parent=self.root):
             return
         self.colors.clear()
+        self.palette_reduction_report = None
         self._refresh_table()
         self.status_var.set("Список цветов очищен.")
+
+    def _ensure_palette_limit(self) -> bool:
+        """Reduce a large palette to 32 real, representative game swatches."""
+        if len(self.colors) <= 32:
+            self.status_var.set(f"В палитре {len(self.colors)} цветов; сокращение до 32 не требуется.")
+            return True
+        if not messagebox.askyesno(
+            "Сократить палитру до 32 цветов",
+            f"Найдено {len(self.colors)} цветов. AutoDraw выберет 32 репрезентативных цвета из исходных образцов. "
+            "RGB и экранные координаты выбранных образцов сохранятся; остальные цвета не войдут в активный список. "
+            "Это уменьшит число доступных оттенков в преобразовании. Продолжить?",
+            parent=self.root,
+        ):
+            return False
+        try:
+            reduced, report = select_representative_palette_colors(self.colors, target_count=32)
+        except (ValueError, TypeError, KeyError) as exc:
+            messagebox.showerror("Не удалось сократить палитру", str(exc), parent=self.root)
+            return False
+        self.colors = reduced
+        self.palette_reduction_report = report
+        self._refresh_table()
+        self.status_var.set(
+            f"Палитра сокращена: {report['input_color_count']} → {report['output_color_count']} реальных образцов. "
+            f"Среднее отличие представителя ΔE76={report['mean_delta_e76']:.2f}; "
+            f"максимум={report['max_delta_e76']:.2f}. Координаты образцов сохранены."
+        )
+        return True
 
     def _current_palette_document(self) -> dict[str, Any]:
         if self.region is None or self.screen_size is None:
@@ -609,6 +647,7 @@ class PaletteDetectionTab:
                 "source": "desktop-screenshot",
                 "method": "screenshot-assisted",
                 **({"captured_at": self.palette_captured_at} if self.palette_captured_at else {}),
+                **({"palette_reduction": self.palette_reduction_report} if self.palette_reduction_report else {}),
             },
         )
 
@@ -643,6 +682,8 @@ class PaletteDetectionTab:
         return validate_palette_profile(profile)
 
     def save_profile_dialog(self) -> None:
+        if not self._ensure_palette_limit():
+            return
         try:
             profile = self._make_current_profile()
         except (PaletteProfileError, ValueError, TypeError, KeyError) as exc:
@@ -753,6 +794,8 @@ class PaletteDetectionTab:
         self.screen_size = (profile["screen"]["width"], profile["screen"]["height"])
         self.region = dict(profile["region"])
         self.colors = [dict(item) for item in profile["colors"]]
+        reduction = profile.get("metadata", {}).get("palette_reduction")
+        self.palette_reduction_report = reduction if isinstance(reduction, dict) else None
         # The saved profile intentionally does not contain a screenshot. Users need a fresh
         # capture to validate coordinates/colors or to view the source region again.
         self.screenshot = None
@@ -864,6 +907,8 @@ class PaletteDetectionTab:
         if not self.colors:
             messagebox.showinfo("Палитра пуста", "Найдите или добавьте хотя бы один цвет.", parent=self.root)
             return
+        if not self._ensure_palette_limit():
+            return
         path = filedialog.asksaveasfilename(
             parent=self.root,
             title="Сохранить палитру браузера",
@@ -883,6 +928,7 @@ class PaletteDetectionTab:
                     "source": "desktop-screenshot",
                     "method": "screenshot-assisted",
                     **({"captured_at": self.palette_captured_at} if self.palette_captured_at else {}),
+                    **({"palette_reduction": self.palette_reduction_report} if self.palette_reduction_report else {}),
                 },
             )
             actual = save_palette(path, document)
@@ -909,6 +955,8 @@ class PaletteDetectionTab:
         self.screen_size = (document["screen"]["width"], document["screen"]["height"])
         self.region = dict(document["region"])
         self.colors = [dict(item) for item in document["colors"]]
+        reduction = document.get("metadata", {}).get("palette_reduction")
+        self.palette_reduction_report = reduction if isinstance(reduction, dict) else None
         self.screenshot = None
         self.region_image = None
         self.palette_captured_at = str(document.get("metadata", {}).get("captured_at") or document.get("created_at") or "") or None

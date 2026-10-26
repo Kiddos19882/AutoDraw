@@ -22,6 +22,7 @@ from palette_detection import (
     save_palette,
     validate_palette_document,
 )
+from palette_reduction import select_representative_palette_colors
 
 
 class PaletteColorTests(unittest.TestCase):
@@ -162,6 +163,74 @@ class ScreenSelectionMappingTests(unittest.TestCase):
             offset=(0, 0),
         )
         self.assertEqual(mapped, (0, 0, 100, 100))
+
+
+
+class PaletteReductionTests(unittest.TestCase):
+    def make_colors(self, count):
+        colors = []
+        for index in range(count):
+            rgb = (
+                (index * 31 + 7) % 256,
+                (index * 67 + 41) % 256,
+                (index * 97 + 83) % 256,
+            )
+            colors.append({
+                "name": f"Swatch {index + 1}",
+                "hex": rgb_to_hex(rgb),
+                "rgb": list(rgb),
+                "screen_x": 100 + index * 10,
+                "screen_y": 200,
+                "local_x": index * 10,
+                "local_y": 0,
+                "source": "manual",
+                "status": "confirmed",
+                "custom_marker": f"preserve-{index}",
+            })
+        return colors
+
+    def test_large_palette_reduces_to_32_real_swatches_and_keeps_coordinates(self):
+        original = self.make_colors(72)
+        selected, report = select_representative_palette_colors(original, target_count=32)
+        original_hexes = {item["hex"] for item in original}
+        self.assertEqual(len(selected), 32)
+        self.assertEqual(report["input_color_count"], 72)
+        self.assertEqual(report["output_color_count"], 32)
+        self.assertEqual(report["removed_color_count"], 40)
+        self.assertTrue(all(item["hex"] in original_hexes for item in selected))
+        self.assertEqual(len({item["hex"] for item in selected}), 32)
+        for item in selected:
+            source = next(entry for entry in original if entry["hex"] == item["hex"])
+            self.assertEqual(item["screen_x"], source["screen_x"])
+            self.assertEqual(item["screen_y"], source["screen_y"])
+            self.assertEqual(item["local_x"], source["local_x"])
+            self.assertEqual(item["local_y"], source["local_y"])
+            self.assertEqual(item["custom_marker"], source["custom_marker"])
+
+    def test_reduction_is_deterministic(self):
+        colors = self.make_colors(64)
+        first, first_report = select_representative_palette_colors(colors, target_count=32)
+        second, second_report = select_representative_palette_colors(colors, target_count=32)
+        self.assertEqual([item["hex"] for item in first], [item["hex"] for item in second])
+        self.assertEqual(first_report["selected_hex_colors"], second_report["selected_hex_colors"])
+
+    def test_palette_with_at_most_32_colors_is_preserved(self):
+        colors = self.make_colors(20)
+        selected, report = select_representative_palette_colors(colors, target_count=32)
+        self.assertEqual(selected, colors)
+        self.assertEqual(report["output_color_count"], 20)
+        self.assertEqual(report["removed_color_count"], 0)
+        self.assertFalse(report["enabled"])
+
+    def test_invalid_limit_and_duplicate_rgb_are_rejected(self):
+        colors = self.make_colors(2)
+        for limit in (0, 513, True, 1.5):
+            with self.subTest(limit=limit), self.assertRaises(ValueError):
+                select_representative_palette_colors(colors, target_count=limit)
+        duplicate = [dict(colors[0]), dict(colors[0])]
+        with self.assertRaisesRegex(ValueError, "повторяется"):
+            select_representative_palette_colors(duplicate, target_count=1)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
