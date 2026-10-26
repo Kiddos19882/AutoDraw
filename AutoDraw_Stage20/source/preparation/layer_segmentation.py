@@ -17,15 +17,14 @@ def filter_small_components(mask: np.ndarray, min_component_area: int) -> tuple[
         raise LayerSegmentationError("Маска цветового слоя должна быть непустой двумерной матрицей.")
     binary = (binary > 0).astype(np.uint8)
     count, labels, stats, _centroids = cv2.connectedComponentsWithStats(binary, connectivity=8)
-    cleaned = np.zeros(binary.shape, dtype=np.uint8)
-    removed_pixels = 0
-    for label in range(1, count):
-        area = int(stats[label, cv2.CC_STAT_AREA])
-        component = labels == label
-        if area < min_component_area:
-            removed_pixels += area
-        else:
-            cleaned[component] = 1
+    # Build one lookup table from component label to keep/remove. Comparing the
+    # full label image once per component is O(pixel_count * component_count),
+    # which becomes extremely expensive for noisy images with many tiny islands.
+    areas = stats[1:count, cv2.CC_STAT_AREA]
+    keep_label = np.zeros(count, dtype=np.uint8)
+    keep_label[1:count] = (areas >= min_component_area).astype(np.uint8)
+    removed_pixels = int(areas[areas < min_component_area].sum())
+    cleaned = keep_label[labels]
     return cleaned, removed_pixels
 
 
