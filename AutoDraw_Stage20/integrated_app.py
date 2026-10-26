@@ -113,6 +113,86 @@ except ImportError as exc:  # pragma: no cover - exercised by packaging smoke te
     ) from exc
 
 
+class ScrollableTabContent:
+    """Vertical scrolling container for a main notebook tab.
+
+    The content frame keeps its natural requested height inside a Canvas, so
+    lower controls remain reachable when a tab contains more widgets than the
+    visible window. Widgets with their own vertical scrolling keep priority
+    while they can still scroll; at their boundary the tab itself scrolls.
+    """
+
+    def __init__(self, parent: tk.Widget):
+        self.host = ttk.Frame(parent)
+        self.host.pack(fill="both", expand=True)
+
+        self.canvas = tk.Canvas(self.host, highlightthickness=0, borderwidth=0)
+        self.scrollbar = ttk.Scrollbar(
+            self.host, orient="vertical", command=self.canvas.yview
+        )
+        self.canvas.configure(yscrollcommand=self.scrollbar.set)
+        self.scrollbar.pack(side="right", fill="y")
+        self.canvas.pack(side="left", fill="both", expand=True)
+
+        self.content = ttk.Frame(self.canvas)
+        self.window_id = self.canvas.create_window(
+            (0, 0), window=self.content, anchor="nw"
+        )
+        self.content.bind("<Configure>", self._update_scroll_region, add="+")
+        self.canvas.bind("<Configure>", self._resize_content, add="+")
+
+    def _update_scroll_region(self, _event: tk.Event | None = None) -> None:
+        self.canvas.configure(scrollregion=self.canvas.bbox("all"))
+
+    def _resize_content(self, event: tk.Event) -> None:
+        self.canvas.itemconfigure(self.window_id, width=max(1, event.width))
+        self._update_scroll_region()
+
+    @staticmethod
+    def _wheel_units(event: tk.Event) -> int:
+        number = getattr(event, "num", None)
+        if number == 4:
+            return -1
+        if number == 5:
+            return 1
+        delta = int(-getattr(event, "delta", 0) / 120)
+        if delta == 0:
+            delta = -1 if getattr(event, "delta", 0) > 0 else 1
+        return delta
+
+    def _on_mousewheel(self, event: tk.Event) -> str:
+        units = self._wheel_units(event)
+        widget = getattr(event, "widget", None)
+
+        # Preserve native wheel behavior for an overflowing Text, Treeview,
+        # Listbox or other child widget with its own yview.
+        if widget is not None and widget not in (self.canvas, self.content):
+            yview = getattr(widget, "yview", None)
+            scroll = getattr(widget, "yview_scroll", None)
+            if callable(yview) and callable(scroll):
+                try:
+                    first, last = yview()
+                    if (units < 0 and first > 0.0) or (units > 0 and last < 1.0):
+                        scroll(units, "units")
+                        return "break"
+                except (tk.TclError, TypeError, ValueError):
+                    pass
+
+        self.canvas.yview_scroll(units, "units")
+        return "break"
+
+    def bind_mousewheel_events(self) -> None:
+        """Bind wheel support after the tab's widgets have been constructed."""
+        def bind_descendants(widget: tk.Widget) -> None:
+            widget.bind("<MouseWheel>", self._on_mousewheel, add="+")
+            widget.bind("<Button-4>", self._on_mousewheel, add="+")
+            widget.bind("<Button-5>", self._on_mousewheel, add="+")
+            for child in widget.winfo_children():
+                bind_descendants(child)
+
+        bind_descendants(self.canvas)
+
+
 class AutoDrawUnifiedApp:
     """Single Tk window containing both preparation and execution interfaces."""
 
@@ -166,6 +246,12 @@ class AutoDrawUnifiedApp:
         self.quantization_tab = ttk.Frame(self.notebook)
         self.color_scanline_tab_frame = ttk.Frame(self.notebook)
         self.paint_limit_tab_frame = ttk.Frame(self.notebook)
+        # Tabs 4 and 6 already provide their own scrollable content areas.
+        # Add the same capability to the remaining top-level sections.
+        self.preparation_scroll = ScrollableTabContent(self.preparation_tab)
+        self.execution_scroll = ScrollableTabContent(self.execution_tab)
+        self.palette_scroll = ScrollableTabContent(self.palette_tab)
+        self.color_scanline_scroll = ScrollableTabContent(self.color_scanline_tab_frame)
         self.notebook.add(self.preparation_tab, text="1. Подготовка изображения")
         self.notebook.add(self.execution_tab, text="2. Исполнение рисунка")
         self.notebook.add(self.palette_tab, text="3. Палитра браузера")
@@ -175,16 +261,16 @@ class AutoDrawUnifiedApp:
 
         self.workbench = AutoDrawWorkbench(
             root,
-            parent=self.preparation_tab,
+            parent=self.preparation_scroll.content,
             embedded=True,
             on_select_canvas_area=self._select_target_area_for_preparation,
         )
-        self.executor = Stage6App(root, parent=self.execution_tab, embedded=True)
+        self.executor = Stage6App(root, parent=self.execution_scroll.content, embedded=True)
         # A single selected browser area controls both the executor's screen
         # coordinates and the preparation canvas dimensions. No separate canvas
         # profile import is needed in the preparation tab.
         self.executor.area_change_callback = self._synchronize_area_with_preparation
-        self.palette_detector = PaletteDetectionTab(root, self.palette_tab, self.data_paths["palettes"])
+        self.palette_detector = PaletteDetectionTab(root, self.palette_scroll.content, self.data_paths["palettes"])
         self.palette_quantizer = PaletteQuantizationTab(
             root,
             self.quantization_tab,
@@ -194,7 +280,7 @@ class AutoDrawUnifiedApp:
         )
         self.color_scanline_tab = ColorScanlineTab(
             root,
-            self.color_scanline_tab_frame,
+            self.color_scanline_scroll.content,
             self.data_paths["color_plans"],
             get_quantized_data=self._get_quantized_data,
         )
@@ -206,6 +292,14 @@ class AutoDrawUnifiedApp:
             get_canvas_size=self._get_execution_canvas_size,
             on_transfer_plan=self._transfer_paint_limit_plan,
         )
+
+        for scrollable in (
+            self.preparation_scroll,
+            self.execution_scroll,
+            self.palette_scroll,
+            self.color_scanline_scroll,
+        ):
+            scrollable.bind_mousewheel_events()
 
         footer = ttk.Frame(outer)
         footer.pack(fill="x", pady=(7, 0))
