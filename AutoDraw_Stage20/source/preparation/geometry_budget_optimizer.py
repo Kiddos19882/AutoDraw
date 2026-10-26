@@ -18,9 +18,12 @@ def _rescale_map_centered(indexes: np.ndarray, scale: float) -> np.ndarray:
     # Padding the reduced image would make the drawing itself shrink toward the
     # center and leave unused board space; upscaling the reduced grid preserves
     # the source composition while merging nearby pixels into larger color blocks.
-    reduced = cv2.resize(indexes, (new_width, new_height), interpolation=cv2.INTER_NEAREST)
+    # OpenCV resize does not support CV_32S maps on all supported builds.
+    # Palette indexes are small integers, so float32 can represent them exactly.
+    source = indexes.astype(np.float32, copy=False)
+    reduced = cv2.resize(source, (new_width, new_height), interpolation=cv2.INTER_NEAREST)
     restored = cv2.resize(reduced, (width, height), interpolation=cv2.INTER_NEAREST)
-    return restored.astype(np.int32, copy=False)
+    return np.rint(restored).astype(np.int32, copy=False)
 
 
 def optimize_geometry_plan_to_budget(
