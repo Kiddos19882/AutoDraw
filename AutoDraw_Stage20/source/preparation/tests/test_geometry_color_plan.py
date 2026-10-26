@@ -11,6 +11,7 @@ from geometry_color_plan import (
     load_geometry_color_plan,
     save_geometry_color_plan,
     optimize_geometry_plan_to_budget,
+    render_geometry_color_preview,
     split_geometry_plan_to_boards,
     validate_geometry_color_plan,
 )
@@ -525,3 +526,67 @@ def test_optimizer_never_uses_component_threshold_below_user_setting():
     assert plan["summary"]["retained_visible_pixel_count"] <= (
         plan["summary"]["source_visible_pixel_count"]
     )
+
+
+def test_skeleton_tracing_visits_a_closed_loop_once():
+    skeleton = np.zeros((7, 7), dtype=np.uint8)
+    skeleton[1, 1:6] = 1
+    skeleton[5, 1:6] = 1
+    skeleton[1:6, 1] = 1
+    skeleton[1:6, 5] = 1
+
+    paths = trace_skeleton_paths(skeleton)
+
+    assert len(paths) == 1
+    points, closed = paths[0]
+    assert closed is True
+    assert len(points) == 16
+    assert len(set(points)) == 16
+
+
+def test_skeleton_tracing_splits_a_junction_without_losing_edges():
+    skeleton = np.zeros((7, 7), dtype=np.uint8)
+    skeleton[3, 1:6] = 1
+    skeleton[1:6, 3] = 1
+
+    paths = trace_skeleton_paths(skeleton)
+
+    assert len(paths) == 4
+    assert all(closed is False for _points, closed in paths)
+    assert sum(len(points) - 1 for points, _closed in paths) == 8
+    assert all(points[0] == (3.0, 3.0) or points[-1] == (3.0, 3.0) for points, _closed in paths)
+
+
+def test_multiboard_split_reconstructs_scanline_pixels_across_board_seam():
+    index_map = np.full((20, 700), -1, dtype=np.int32)
+    index_map[5, :] = 0
+    plan = build_geometry_color_plan(index_map, PALETTE, mode="scanline")
+
+    manifest = split_geometry_plan_to_boards(
+        plan,
+        paint_budget_px_equivalent=25_650,
+        target_usage_percent=75,
+        min_tile_size=8,
+        max_boards=4,
+        board_width=660,
+        board_height=340,
+    )
+
+    assembled = np.zeros((20, 700, 4), dtype=np.uint8)
+    for board in manifest["boards"]:
+        tile = board["tile"]
+        preview = np.asarray(
+            render_geometry_color_preview(board["plan"], max_dimension=660).crop(
+                (0, 0, tile["width"], tile["height"])
+            )
+        )
+        destination = assembled[
+            tile["y"]:tile["y"] + tile["height"],
+            tile["x"]:tile["x"] + tile["width"],
+        ]
+        visible = preview[:, :, 3] > 0
+        destination[visible] = preview[visible]
+
+    expected = np.asarray(render_geometry_color_preview(plan, max_dimension=700))
+    assert manifest["board_count"] == 2
+    assert np.array_equal(assembled, expected)
