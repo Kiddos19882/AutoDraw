@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import json
 import tkinter as tk
 from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
@@ -923,7 +924,8 @@ class ColorScanlineTab:
         if not selected:
             return
         try:
-            document_type = copy.deepcopy(__import__("json").loads(Path(selected).read_text(encoding="utf-8"))).get("plan_type")
+            document = json.loads(Path(selected).read_text(encoding="utf-8"))
+            document_type = document.get("plan_type") if isinstance(document, dict) else None
             if document_type == "autodraw_geometry_color_plan":
                 plan = load_geometry_color_plan(selected)
                 self._display_geometry_plan(
