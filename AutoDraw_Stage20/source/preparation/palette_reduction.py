@@ -35,12 +35,14 @@ def select_representative_palette_colors(
     target_count: int = 32,
     *,
     max_iterations: int = 20,
+    required_hex_colors: tuple[str, ...] = ("#FFFFFF", "#000000"),
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     """Choose representative real palette swatches without creating synthetic RGB values.
 
     Farthest-point seeding covers the palette's colour range, then Lloyd-style
     refinement moves each centre to the existing swatch nearest its cluster mean.
-    Returned entries preserve original sample coordinates and metadata.
+    Returned entries preserve original sample coordinates and metadata. Pure white and
+    black are reserved by default when present, so clustering cannot replace them.
     """
     if not isinstance(colors, list):
         raise ValueError("Палитра должна быть списком цветов.")
@@ -77,6 +79,30 @@ def select_representative_palette_colors(
 
     input_count = len(entries)
     output_count = min(target_count, input_count)
+    hex_to_index = {rgb_to_hex(rgb): index for index, rgb in enumerate(rgbs)}
+    normalized_required: list[str] = []
+    for value in required_hex_colors:
+        try:
+            color_hex = rgb_to_hex(parse_hex_color(value))
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f"Обязательный цвет {value!r} не является допустимым HEX.") from exc
+        if color_hex not in normalized_required:
+            normalized_required.append(color_hex)
+    required_indices = [
+        hex_to_index[color_hex] for color_hex in normalized_required
+        if color_hex in hex_to_index
+    ]
+    preserved_required_colors = [
+        color_hex for color_hex in normalized_required if color_hex in hex_to_index
+    ]
+    missing_required_colors = [
+        color_hex for color_hex in normalized_required if color_hex not in hex_to_index
+    ]
+    if len(required_indices) > output_count:
+        raise ValueError(
+            f"Нужно сохранить {len(required_indices)} обязательных цветов, но лимит равен {output_count}."
+        )
+
     if input_count <= target_count:
         return entries, {
             "enabled": False,
@@ -88,21 +114,37 @@ def select_representative_palette_colors(
             "mean_delta_e76": 0.0,
             "max_delta_e76": 0.0,
             "clusters": [],
+            "required_color_hexes": normalized_required,
+            "preserved_required_colors": preserved_required_colors,
+            "missing_required_colors": missing_required_colors,
             "note": f"Палитра уже содержит не более {target_count} цветов; исходный список сохранён.",
         }
 
     lab = _rgb_to_lab(np.asarray(rgbs, dtype=np.uint8))
     palette_size = len(entries)
 
-    # Farthest-point initialisation; ties resolve by source order for determinism.
-    first = int(np.argmin(np.sum((lab - lab.mean(axis=0)) ** 2, axis=1)))
-    medoids = [first]
-    nearest_sq = np.sum((lab - lab[first]) ** 2, axis=1)
+    # Required colors are fixed medoids. Other medoids are selected for broad coverage.
+    if required_indices:
+        medoids = list(required_indices)
+    else:
+        first = int(np.argmin(np.sum((lab - lab.mean(axis=0)) ** 2, axis=1)))
+        medoids = [first]
+    seeded = set(medoids)
+    nearest_sq = np.min(
+        np.sum((lab[:, None, :] - lab[np.asarray(medoids, dtype=np.int32)][None, :, :]) ** 2, axis=2),
+        axis=1,
+    )
     while len(medoids) < output_count:
-        nearest_sq[medoids] = -1.0
+        nearest_sq[list(seeded)] = -1.0
         candidate = int(np.argmax(nearest_sq))
+        if candidate in seeded:
+            candidate = next(index for index in range(palette_size) if index not in seeded)
         medoids.append(candidate)
-        nearest_sq = np.minimum(nearest_sq, np.sum((lab - lab[candidate]) ** 2, axis=1))
+        seeded.add(candidate)
+        new_sq = np.sum((lab - lab[candidate]) ** 2, axis=1)
+        nearest_sq = np.minimum(nearest_sq, new_sq)
+
+    fixed_required_indices = set(required_indices)
 
     def farthest_unused(used: set[int]) -> int:
         available = [index for index in range(palette_size) if index not in used]
@@ -120,9 +162,14 @@ def select_representative_palette_colors(
         distances = np.sum((lab[:, None, :] - centers[None, :, :]) ** 2, axis=2)
         labels = np.argmin(distances, axis=1)
         updated: list[int] = []
-        used: set[int] = set()
+        used: set[int] = set(fixed_required_indices)
 
         for cluster_index in range(output_count):
+            if cluster_index < len(required_indices):
+                # These slots are reserved; clustering cannot replace white/black.
+                updated.append(required_indices[cluster_index])
+                continue
+
             members = np.flatnonzero(labels == cluster_index)
             if members.size:
                 centroid = lab[members].mean(axis=0)
@@ -175,13 +222,18 @@ def select_representative_palette_colors(
         "output_color_count": len(selected_colors),
         "target_color_count": target_count,
         "removed_color_count": input_count - len(selected_colors),
+        "required_color_hexes": normalized_required,
+        "preserved_required_colors": preserved_required_colors,
+        "missing_required_colors": missing_required_colors,
+        "reserved_color_hexes": preserved_required_colors,
         "mean_delta_e76": round(float(np.mean(nearest_delta)), 4),
         "max_delta_e76": round(float(np.max(nearest_delta)), 4),
         "clusters": clusters,
         "selected_hex_colors": [str(entry.get("hex") or rgb_to_hex(entry["rgb"])) for entry in selected_colors],
         "note": (
             "Выбраны реальные образцы из исходной игровой палитры; координаты кликов и RGB "
-            "сохранены без изменений. ΔE76 используется для кластеризации и оценки покрытия."
+            "сохранены без изменений. Обязательные цвета остаются в палитре, если присутствуют в источнике. "
+            "ΔE76 используется для кластеризации и оценки покрытия."
         ),
     }
     return selected_colors, report

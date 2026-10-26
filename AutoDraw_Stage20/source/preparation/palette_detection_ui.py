@@ -627,9 +627,12 @@ class PaletteDetectionTab:
         self.colors = reduced
         self.palette_reduction_report = report
         self._refresh_table()
+        preserved = ", ".join(report.get("preserved_required_colors", [])) or "нет обязательных цветов в исходной палитре"
+        missing = ", ".join(report.get("missing_required_colors", [])) or "нет"
         self.status_var.set(
             f"Палитра сокращена: {report['input_color_count']} → {report['output_color_count']} реальных образцов. "
-            f"Среднее отличие представителя ΔE76={report['mean_delta_e76']:.2f}; "
+            f"Обязательные цвета сохранены: {preserved}; отсутствуют в источнике: {missing}. "
+            f"Среднее отличие ΔE76={report['mean_delta_e76']:.2f}; "
             f"максимум={report['max_delta_e76']:.2f}. Координаты образцов сохранены."
         )
         return True

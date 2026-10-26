@@ -207,6 +207,51 @@ class PaletteReductionTests(unittest.TestCase):
             self.assertEqual(item["local_y"], source["local_y"])
             self.assertEqual(item["custom_marker"], source["custom_marker"])
 
+
+
+    def test_exact_white_and_black_are_reserved_in_the_32_color_palette(self):
+        original = self.make_colors(72)
+        original[4] = {
+            **original[4], "name": "Pure white", "hex": "#FFFFFF",
+            "rgb": [255, 255, 255], "screen_x": 145, "screen_y": 212,
+            "local_x": 45, "local_y": 12, "custom_marker": "keep-white",
+        }
+        original[9] = {
+            **original[9], "name": "Pure black", "hex": "#000000",
+            "rgb": [0, 0, 0], "screen_x": 192, "screen_y": 212,
+            "local_x": 92, "local_y": 12, "custom_marker": "keep-black",
+        }
+
+        selected, report = select_representative_palette_colors(original, target_count=32)
+        by_hex = {item["hex"]: item for item in selected}
+
+        self.assertEqual(len(selected), 32)
+        self.assertIn("#FFFFFF", by_hex)
+        self.assertIn("#000000", by_hex)
+        self.assertEqual(by_hex["#FFFFFF"]["screen_x"], 145)
+        self.assertEqual(by_hex["#FFFFFF"]["screen_y"], 212)
+        self.assertEqual(by_hex["#FFFFFF"]["custom_marker"], "keep-white")
+        self.assertEqual(by_hex["#000000"]["screen_x"], 192)
+        self.assertEqual(by_hex["#000000"]["screen_y"], 212)
+        self.assertEqual(by_hex["#000000"]["custom_marker"], "keep-black")
+        self.assertEqual(report["preserved_required_colors"], ["#FFFFFF", "#000000"])
+        self.assertEqual(report["missing_required_colors"], [])
+        self.assertIn("#FFFFFF", report["reserved_color_hexes"])
+        self.assertIn("#000000", report["reserved_color_hexes"])
+
+    def test_reports_required_color_missing_from_the_source_palette(self):
+        original = self.make_colors(48)
+        selected, report = select_representative_palette_colors(original, target_count=32)
+        self.assertIn("#FFFFFF", report["required_color_hexes"])
+        self.assertIn("#FFFFFF", report["missing_required_colors"])
+
+    def test_required_colors_must_fit_the_requested_limit(self):
+        original = self.make_colors(40)
+        original[0] = {**original[0], "hex": "#FFFFFF", "rgb": [255, 255, 255]}
+        original[1] = {**original[1], "hex": "#000000", "rgb": [0, 0, 0]}
+        with self.assertRaisesRegex(ValueError, "обязательных цветов"):
+            select_representative_palette_colors(original, target_count=1)
+
     def test_reduction_is_deterministic(self):
         colors = self.make_colors(64)
         first, first_report = select_representative_palette_colors(colors, target_count=32)
