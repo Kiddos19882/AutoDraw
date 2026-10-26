@@ -384,8 +384,8 @@ def validate_color_scanline_plan(plan: Any) -> dict[str, Any]:
         start_x, end_x = int(x1), int(x2)
         if row_y < row_offset_px or (row_y - row_offset_px) % row_step_px != 0:
             raise ColorScanlinePlanError(
-                f"Штрих №{stroke_number} находится в строке {row_y}, пропущенной схемой "
-                f"шага {row_step_px} и смещения {row_offset_px}."
+                f"Штрих №{stroke_number} находится в строке {row_y}, пропущенной шагом "
+                f"{row_step_px} при смещении {row_offset_px}."
             )
         if row_y < last_y or (row_y == last_y and start_x <= last_x_end):
             raise ColorScanlinePlanError("Порядок штрихов нарушен: требуется сверху вниз и слева направо без перекрытий.")
