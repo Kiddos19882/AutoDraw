@@ -582,12 +582,16 @@ class ColorScanlineTab:
             mode_candidates = optimization.get("mode_candidates", [])
             if mode_candidates:
                 summary_lines.append(
-                    "Сравнение режимов (точное совпадение пикселей): "
+                    "Сравнение режимов (совпадение по предпросмотру): "
                     + " · ".join(
                         f"{item['mode']}: {item['quality_pixel_accuracy_percent']:.1f}% "
                         f"совпадение, {item['estimated_ink_after_px_equivalent']:,.0f} px-экв."
                         for item in mode_candidates
                     )
+                )
+                summary_lines.append(
+                    "Качество оценено по программному предпросмотру; фактический след мыши и "
+                    "отрисовка браузерной игры могут отличаться."
                 )
         self.stats_var.set("\n".join(summary_lines))
         prefix = f"{status_prefix} " if status_prefix else ""
