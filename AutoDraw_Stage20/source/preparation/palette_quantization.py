@@ -750,3 +750,229 @@ def _make_report(
         "used_colors": used,
         "palette": palette_counts,
     }
+
+
+
+def optimize_short_scanline_runs(
+    result: PaletteQuantizationResult,
+    palette: Any,
+    *,
+    min_run_length: int = 3,
+    max_delta_e: float = 8.0,
+    min_frequency_ratio: float = 1.25,
+    max_passes: int = 2,
+) -> tuple[PaletteQuantizationResult, dict[str, Any]]:
+    """Merge short horizontal runs when local geometry and perceptual similarity agree.
+
+    The browser palette is fixed, so this optimizes the mapped index map rather than
+    inventing new palette colors. A run shorter than min_run_length may be reassigned
+    to a neighboring palette color only when CIEDE2000 is within max_delta_e.
+
+    A color surrounded by the same target on both sides is strong local evidence.
+    If the two neighbours differ, or the run touches an image edge, a candidate must
+    also be more common globally by min_frequency_ratio. High-contrast details and
+    transparent pixels are preserved. No dithering is introduced.
+    """
+    if not isinstance(result, PaletteQuantizationResult):
+        raise PaletteQuantizationError("Результат преобразования имеет неверный тип.")
+    if isinstance(min_run_length, bool) or not isinstance(min_run_length, int) or not 2 <= min_run_length <= 100:
+        raise PaletteQuantizationError("Минимальная длина сегмента должна быть целым числом от 2 до 100.")
+    if isinstance(max_delta_e, bool) or not isinstance(max_delta_e, (int, float)):
+        raise PaletteQuantizationError("Допуск ΔE00 должен быть числом от 0 до 100.")
+    if not np.isfinite(max_delta_e) or not 0 <= float(max_delta_e) <= 100:
+        raise PaletteQuantizationError("Допуск ΔE00 должен быть числом от 0 до 100.")
+    if isinstance(min_frequency_ratio, bool) or not isinstance(min_frequency_ratio, (int, float)):
+        raise PaletteQuantizationError("Коэффициент частоты должен быть числом от 1 до 1000.")
+    if not np.isfinite(min_frequency_ratio) or not 1 <= float(min_frequency_ratio) <= 1000:
+        raise PaletteQuantizationError("Коэффициент частоты должен быть числом от 1 до 1000.")
+    if isinstance(max_passes, bool) or not isinstance(max_passes, int) or not 1 <= max_passes <= 5:
+        raise PaletteQuantizationError("Число проходов должно быть целым числом от 1 до 5.")
+
+    normalized = _extract_palette_colors(palette)
+    original = np.asarray(result.index_map)
+    if original.ndim != 2 or original.shape != (result.image.height, result.image.width):
+        raise PaletteQuantizationError("Карта цветов не соответствует размеру преобразованного изображения.")
+    if original.dtype.kind not in "iu":
+        raise PaletteQuantizationError("Индексы цветов должны быть целыми числами.")
+    if original.size and (int(original.min()) < -1 or int(original.max()) >= len(normalized)):
+        raise PaletteQuantizationError("Карта цветов содержит индекс вне палитры.")
+
+    indexes = original.astype(np.int32, copy=True)
+    before_strokes = _count_scanline_runs(indexes)
+
+    def short_run_stats(index_map: np.ndarray) -> tuple[int, int]:
+        run_count = pixel_count = 0
+        for row in index_map:
+            if row.size == 0:
+                continue
+            boundaries = np.flatnonzero(np.r_[True, row[1:] != row[:-1], True])
+            lengths = np.diff(boundaries)
+            colors = row[boundaries[:-1]]
+            short_mask = (colors >= 0) & (lengths < min_run_length)
+            run_count += int(np.count_nonzero(short_mask))
+            pixel_count += int(lengths[short_mask].sum())
+        return run_count, pixel_count
+
+    short_before, short_pixels_before = short_run_stats(indexes)
+    counts = np.bincount(indexes[indexes >= 0], minlength=len(normalized)).astype(np.int64)
+    visible_before = int(counts.sum())
+    palette_rgb = np.asarray([entry["rgb"] for entry in normalized], dtype=np.uint8)
+    palette_lab = rgb_to_lab(palette_rgb)
+    mapping_stats: dict[tuple[int, int], dict[str, Any]] = {}
+    remapped_pixel_count = 0
+    weighted_delta_sum = 0.0
+    maximum_delta = 0.0
+
+    for _pass in range(max_passes):
+        changed_this_pass = False
+        for y in range(indexes.shape[0]):
+            # Detect runs on a stable row snapshot. Changes take effect in the next pass.
+            source_row = indexes[y].copy()
+            if source_row.size == 0:
+                continue
+            boundaries = np.flatnonzero(np.r_[True, source_row[1:] != source_row[:-1], True])
+            for run_position in range(len(boundaries) - 1):
+                start = int(boundaries[run_position])
+                end = int(boundaries[run_position + 1])
+                run_length = end - start
+                if run_length >= min_run_length:
+                    continue
+                source_index = int(source_row[start])
+                if source_index < 0:
+                    continue
+
+                left = int(source_row[start - 1]) if start > 0 else -1
+                right = int(source_row[end]) if end < source_row.size else -1
+                candidates = {index for index in (left, right) if index >= 0 and index != source_index}
+                if not candidates:
+                    continue
+
+                source_count = int(counts[source_index])
+                eligible: list[tuple[float, int, int, int]] = []
+                for target_index in candidates:
+                    distance = float(delta_e_ciede2000(
+                        palette_lab[source_index], palette_lab[target_index]
+                    ))
+                    if distance > float(max_delta_e):
+                        continue
+                    support = int(left == target_index) + int(right == target_index)
+                    target_count = int(counts[target_index])
+                    if support < 2 and target_count < max(
+                        source_count + 1,
+                        int(np.ceil(source_count * float(min_frequency_ratio))),
+                    ):
+                        continue
+                    # First minimize perceptual change, then prefer local agreement,
+                    # then the more prevalent target when distances are effectively tied.
+                    eligible.append((distance, -support, -target_count, target_index))
+
+                if not eligible:
+                    continue
+                distance, _negative_support, _negative_count, target_index = min(eligible)
+                indexes[y, start:end] = target_index
+                counts[source_index] -= run_length
+                counts[target_index] += run_length
+
+                key = (source_index, target_index)
+                entry = mapping_stats.setdefault(key, {
+                    "pixels": 0,
+                    "runs": 0,
+                    "delta_e": distance,
+                })
+                entry["pixels"] += run_length
+                entry["runs"] += 1
+                remapped_pixel_count += run_length
+                weighted_delta_sum += distance * run_length
+                maximum_delta = max(maximum_delta, distance)
+                changed_this_pass = True
+
+        if not changed_this_pass:
+            break
+
+    after_strokes = _count_scanline_runs(indexes)
+    short_after, short_pixels_after = short_run_stats(indexes)
+    new_counts = np.bincount(indexes[indexes >= 0], minlength=len(normalized)).astype(np.int64)
+    visible_after = int(np.count_nonzero(indexes >= 0))
+    palette_counts: list[dict[str, Any]] = []
+    for entry in normalized:
+        count = int(new_counts[int(entry["index"])])
+        palette_counts.append({
+            **entry,
+            "pixel_count": count,
+            "percentage_visible": round(100.0 * count / visible_after, 4) if visible_after else 0.0,
+        })
+    used_colors = [entry for entry in palette_counts if entry["pixel_count"] > 0]
+
+    rgba = np.asarray(result.image.convert("RGBA"), dtype=np.uint8).copy()
+    changed_mask = indexes != original.astype(np.int32, copy=False)
+    if bool(np.any(changed_mask)):
+        rgba[..., :3][changed_mask] = palette_rgb[indexes[changed_mask]]
+    rgba[indexes < 0, 3] = 0
+    has_alpha = "A" in result.image.getbands() or bool(np.any(indexes < 0))
+    output_image = (
+        Image.fromarray(rgba, mode="RGBA")
+        if has_alpha else Image.fromarray(rgba[..., :3].copy(), mode="RGB")
+    )
+
+    mapping_reports: list[dict[str, Any]] = []
+    for (source_index, target_index), stats in sorted(mapping_stats.items()):
+        source = normalized[source_index]
+        target = normalized[target_index]
+        mapping_reports.append({
+            "source_index": source_index,
+            "source_id": source["id"],
+            "source_name": source["name"],
+            "source_hex": source["hex"],
+            "target_index": target_index,
+            "target_id": target["id"],
+            "target_name": target["name"],
+            "target_hex": target["hex"],
+            "remapped_run_count": int(stats["runs"]),
+            "remapped_pixel_count": int(stats["pixels"]),
+            "delta_e_2000": round(float(stats["delta_e"]), 6),
+        })
+
+    optimization_report: dict[str, Any] = {
+        "enabled": True,
+        "method": "adjacent_short_run_merge_ciede2000_frequency_guard",
+        "min_run_length_pixels": min_run_length,
+        "max_delta_e_2000": float(max_delta_e),
+        "min_frequency_ratio_when_not_sandwiched": float(min_frequency_ratio),
+        "max_passes": max_passes,
+        "visible_pixel_count_before": visible_before,
+        "short_run_count_before": short_before,
+        "short_run_count_after": short_after,
+        "short_run_pixels_before": short_pixels_before,
+        "short_run_pixels_after": short_pixels_after,
+        "remapped_run_count": sum(int(item["runs"]) for item in mapping_stats.values()),
+        "remapped_pixel_count": remapped_pixel_count,
+        "estimated_scanline_strokes_before": before_strokes,
+        "estimated_scanline_strokes_after": after_strokes,
+        "estimated_scanline_strokes_reduced": before_strokes - after_strokes,
+        "mean_delta_e_2000_for_remapped_pixels": (
+            round(weighted_delta_sum / remapped_pixel_count, 6) if remapped_pixel_count else 0.0
+        ),
+        "max_delta_e_2000_for_remapped_pixels": round(maximum_delta, 6),
+        "mappings": mapping_reports,
+        "note": (
+            "Объединяются только короткие горизонтальные сегменты, для которых соседний цвет "
+            "не отличается больше заданного ΔE00. Если слева и справа один цвет, это сильное "
+            "пространственное свидетельство; иначе целевой цвет должен быть глобально более частым. "
+            "Прозрачные пиксели не изменяются. Метод уменьшает короткие штрихи ценой возможной "
+            "потери мелких деталей; контрастные границы выше заданного ΔE00 сохраняются."
+        ),
+    }
+
+    updated_report = dict(result.report)
+    updated_report.update({
+        "palette": palette_counts,
+        "used_colors": used_colors,
+        "used_palette_color_count": len(used_colors),
+        "unused_palette_color_count": len(normalized) - len(used_colors),
+        "short_run_optimization": optimization_report,
+    })
+    result.image = output_image
+    result.index_map = indexes
+    result.report = updated_report
+    return result, optimization_report
+

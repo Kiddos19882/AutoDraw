@@ -17,6 +17,7 @@ from palette_quantization import (
     merge_rare_palette_colors,
     remove_edge_connected_background,
     remove_white_palette_pixels,
+    optimize_short_scanline_runs,
 )
 
 
@@ -218,7 +219,38 @@ class PaletteQuantizationTab:
             wraplength=1100,
             justify="left",
         ).grid(row=3, column=0, columnspan=6, sticky="w", pady=(4, 0))
+
+        self.optimize_short_runs_var = tk.BooleanVar(value=True)
+        ttk.Checkbutton(
+            optimization_frame,
+            text="Объединять короткие горизонтальные сегменты с соседним похожим цветом",
+            variable=self.optimize_short_runs_var,
+            command=self._toggle_short_run_controls,
+        ).grid(row=4, column=0, columnspan=6, sticky="w", pady=(5, 0))
+        ttk.Label(optimization_frame, text="Сегмент короче (px):").grid(row=5, column=0, sticky="w", pady=(4, 0))
+        self.short_run_min_length_var = tk.IntVar(value=3)
+        self.short_run_min_length_spinbox = ttk.Spinbox(
+            optimization_frame, from_=2, to=100, increment=1, width=7,
+            textvariable=self.short_run_min_length_var,
+        )
+        self.short_run_min_length_spinbox.grid(row=5, column=1, sticky="w", padx=(5, 12), pady=(4, 0))
+        ttk.Label(optimization_frame, text="Максимальное отличие ΔE00:").grid(row=5, column=2, sticky="w", pady=(4, 0))
+        self.short_run_max_delta_var = tk.DoubleVar(value=8.0)
+        self.short_run_max_delta_spinbox = ttk.Spinbox(
+            optimization_frame, from_=0.0, to=100.0, increment=0.5, format="%.1f", width=7,
+            textvariable=self.short_run_max_delta_var,
+        )
+        self.short_run_max_delta_spinbox.grid(row=5, column=3, sticky="w", padx=(5, 0), pady=(4, 0))
+        ttk.Label(
+            optimization_frame,
+            text=("Сегменты короче порога заменяются только на визуально близкий соседний цвет. "
+                  "Это снижает число коротких штрихов, но может убрать мелкие детали. "
+                  "Контрастные границы и прозрачные пиксели сохраняются."),
+            wraplength=1100,
+            justify="left",
+        ).grid(row=6, column=0, columnspan=6, sticky="w", pady=(4, 0))
         self._toggle_rare_color_controls()
+        self._toggle_short_run_controls()
 
         previews = ttk.Panedwindow(outer, orient="horizontal", height=238)
         previews.pack(fill="x", expand=False)
@@ -345,6 +377,14 @@ class PaletteQuantizationTab:
             self.rare_color_min_pixels_spinbox,
             self.rare_color_min_percentage_spinbox,
             self.rare_color_max_delta_spinbox,
+        ):
+            widget.configure(state=state)
+
+    def _toggle_short_run_controls(self) -> None:
+        state = "normal" if self.optimize_short_runs_var.get() else "disabled"
+        for widget in (
+            self.short_run_min_length_spinbox,
+            self.short_run_max_delta_spinbox,
         ):
             widget.configure(state=state)
 
@@ -571,6 +611,33 @@ class PaletteQuantizationTab:
                     max_delta_e=max_delta,
                     min_frequency_ratio=2.0,
                 )
+
+            short_run_report: dict = {
+                "enabled": False,
+                "method": "adjacent_short_run_merge_ciede2000_frequency_guard",
+                "remapped_run_count": 0,
+                "remapped_pixel_count": 0,
+                "estimated_scanline_strokes_before": None,
+                "estimated_scanline_strokes_after": None,
+                "estimated_scanline_strokes_reduced": 0,
+                "note": "Оптимизация коротких сегментов отключена.",
+            }
+            if self.optimize_short_runs_var.get():
+                try:
+                    min_run_length = int(self.short_run_min_length_var.get())
+                    max_run_delta = float(self.short_run_max_delta_var.get())
+                except (tk.TclError, TypeError, ValueError) as exc:
+                    raise PaletteQuantizationError(
+                        "Параметры оптимизации коротких сегментов должны быть корректными числами."
+                    ) from exc
+                result, short_run_report = optimize_short_scanline_runs(
+                    result,
+                    self.palette_profile,
+                    min_run_length=min_run_length,
+                    max_delta_e=max_run_delta,
+                    min_frequency_ratio=1.25,
+                    max_passes=2,
+                )
         except (PaletteQuantizationError, ValueError, TypeError, MemoryError) as exc:
             messagebox.showerror("Преобразование не выполнено", str(exc), parent=self.root)
             self.status_var.set(f"Ошибка преобразования: {exc}")
@@ -578,6 +645,7 @@ class PaletteQuantizationTab:
 
         result.report["background_removal"] = background_report
         result.report["rare_color_merge"] = rare_color_merge_report
+        result.report["short_run_optimization"] = short_run_report
         result.report["palette_profile"] = {
             "name": self.palette_profile.get("profile_name", "Без имени"),
             "file": self.palette_path.name if self.palette_path else None,
@@ -594,10 +662,21 @@ class PaletteQuantizationTab:
         merge_strokes_before = rare_color_merge_report.get("estimated_scanline_strokes_before")
         merge_strokes_after = rare_color_merge_report.get("estimated_scanline_strokes_after")
         stroke_line = (
-            f"Оценка штрихов: {merge_strokes_before:,} → {merge_strokes_after:,} "
+            f"Оценка штрихов после объединения редких цветов: {merge_strokes_before:,} → {merge_strokes_after:,} "
             f"(−{rare_color_merge_report.get('estimated_scanline_strokes_reduced', 0):,})\n"
             if isinstance(merge_strokes_before, int) and isinstance(merge_strokes_after, int)
             else ""
+        )
+        short_strokes_before = short_run_report.get("estimated_scanline_strokes_before")
+        short_strokes_after = short_run_report.get("estimated_scanline_strokes_after")
+        short_run_line = (
+            f"Короткие сегменты (<{short_run_report.get('min_run_length_pixels', self.short_run_min_length_var.get())} px): "
+            f"{short_run_report.get('short_run_count_before', 0):,} → {short_run_report.get('short_run_count_after', 0):,}; "
+            f"переназначено пикселей: {short_run_report.get('remapped_pixel_count', 0):,}; "
+            f"оценка штрихов: {short_strokes_before:,} → {short_strokes_after:,} "
+            f"(−{short_run_report.get('estimated_scanline_strokes_reduced', 0):,})\n"
+            if isinstance(short_strokes_before, int) and isinstance(short_strokes_after, int)
+            else "Оптимизация коротких сегментов отключена.\n"
         )
         self.stats_var.set(
             f"Размер: {report['source_size']['width']} × {report['source_size']['height']}\n"
@@ -609,7 +688,7 @@ class PaletteQuantizationTab:
             f"Редкие цвета объединены: {rare_color_merge_report.get('rare_color_count_merged', 0)}; "
             f"переназначено пикселей: {rare_color_merge_report.get('remapped_pixel_count', 0):,}; "
             f"среднее отличие объединения ΔE00: {rare_color_merge_report.get('mean_delta_e_2000_for_merged_colors', 0):.3f}\n"
-            f"{stroke_line}{white_percentage_text}Удалено пикселей фона/белого цвета: {background_report.get('removed_pixel_count', 0):,}"
+            f"{stroke_line}{short_run_line}{white_percentage_text}Удалено пикселей фона/белого цвета: {background_report.get('removed_pixel_count', 0):,}"
         )
         self._populate_color_table(report)
 

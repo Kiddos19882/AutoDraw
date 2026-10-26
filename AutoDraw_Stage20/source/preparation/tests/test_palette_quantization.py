@@ -13,6 +13,7 @@ from palette_quantization import (
     merge_rare_palette_colors,
     remove_edge_connected_background,
     remove_white_palette_pixels,
+    optimize_short_scanline_runs,
     rgb_to_lab,
 )
 
@@ -439,6 +440,96 @@ class PaletteQuantizationTests(unittest.TestCase):
         image = Image.new("RGB", (800, 800), "#112233")
         with self.assertRaisesRegex(PaletteQuantizationError, "Слишком много сравнений"):
             quantize_image_to_palette(image, colors)
+
+
+
+
+class ShortScanlineOptimizationTests(unittest.TestCase):
+    def setUp(self):
+        self.common = {
+            "name": "Частый синий", "hex": "#3472C0",
+            "rgb": [52, 114, 192], "id": "common-blue",
+        }
+        self.near = {
+            "name": "Похожий синий", "hex": "#3977C5",
+            "rgb": [57, 119, 197], "id": "near-blue",
+        }
+
+    def test_merges_similar_short_run_between_same_color_and_reduces_strokes(self):
+        image = Image.new("RGB", (10, 1), tuple(self.common["rgb"]))
+        image.putpixel((4, 0), tuple(self.near["rgb"]))
+        image.putpixel((5, 0), tuple(self.near["rgb"]))
+        result = quantize_image_to_palette(image, [self.common, self.near])
+
+        optimized, report = optimize_short_scanline_runs(result, [self.common, self.near])
+
+        self.assertTrue(np.all(optimized.index_map == 0))
+        self.assertEqual(report["short_run_count_before"], 1)
+        self.assertEqual(report["short_run_count_after"], 0)
+        self.assertEqual(report["remapped_pixel_count"], 2)
+        self.assertEqual(report["estimated_scanline_strokes_before"], 3)
+        self.assertEqual(report["estimated_scanline_strokes_after"], 1)
+        self.assertEqual(optimized.report["used_palette_color_count"], 1)
+        self.assertEqual(optimized.image.getpixel((4, 0)), tuple(self.common["rgb"]))
+
+    def test_preserves_high_contrast_short_detail(self):
+        image = Image.new("RGB", (10, 1), tuple(self.common["rgb"]))
+        image.putpixel((4, 0), (255, 0, 0))
+        image.putpixel((5, 0), (255, 0, 0))
+        result = quantize_image_to_palette(image, [self.common, RED])
+
+        optimized, report = optimize_short_scanline_runs(result, [self.common, RED], max_delta_e=8.0)
+
+        self.assertEqual(int(optimized.index_map[0, 4]), 1)
+        self.assertEqual(report["remapped_pixel_count"], 0)
+
+    def test_edge_run_is_merged_only_to_a_similar_more_frequent_color(self):
+        image = Image.new("RGB", (10, 1), tuple(self.common["rgb"]))
+        image.putpixel((0, 0), tuple(self.near["rgb"]))
+        result = quantize_image_to_palette(image, [self.common, self.near])
+
+        optimized, report = optimize_short_scanline_runs(result, [self.common, self.near])
+
+        self.assertEqual(int(optimized.index_map[0, 0]), 0)
+        self.assertEqual(report["estimated_scanline_strokes_reduced"], 1)
+
+    def test_does_not_change_runs_at_or_above_minimum_length(self):
+        image = Image.new("RGB", (10, 1), tuple(self.common["rgb"]))
+        for x in range(4, 7):
+            image.putpixel((x, 0), tuple(self.near["rgb"]))
+        result = quantize_image_to_palette(image, [self.common, self.near])
+
+        optimized, report = optimize_short_scanline_runs(result, [self.common, self.near], min_run_length=3)
+
+        self.assertTrue(np.array_equal(optimized.index_map, result.index_map))
+        self.assertEqual(report["remapped_pixel_count"], 0)
+
+    def test_transparent_pixels_are_not_reassigned(self):
+        image = Image.new("RGBA", (10, 1), (*self.common["rgb"], 255))
+        image.putpixel((4, 0), (*self.near["rgb"], 0))
+        image.putpixel((5, 0), (*self.near["rgb"], 0))
+        result = quantize_image_to_palette(image, [self.common, self.near])
+
+        optimized, report = optimize_short_scanline_runs(result, [self.common, self.near])
+
+        self.assertTrue(np.all(optimized.index_map[0, 4:6] == -1))
+        self.assertTrue(np.all(np.asarray(optimized.image)[0, 4:6, 3] == 0))
+        self.assertEqual(report["remapped_pixel_count"], 0)
+
+    def test_invalid_options_are_rejected(self):
+        image = Image.new("RGB", (2, 1), tuple(self.common["rgb"]))
+        result = quantize_image_to_palette(image, [self.common])
+        invalid_options = (
+            {"min_run_length": 1},
+            {"min_run_length": True},
+            {"max_delta_e": float("nan")},
+            {"max_delta_e": 101},
+            {"min_frequency_ratio": 0.5},
+            {"max_passes": 6},
+        )
+        for options in invalid_options:
+            with self.subTest(options=options), self.assertRaises(PaletteQuantizationError):
+                optimize_short_scanline_runs(result, [self.common], **options)
 
 
 if __name__ == "__main__":
