@@ -52,6 +52,6 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt -r ..\preparation\requirements.txt pytest
       - name: Run executor regression tests
-        env:
-          PYTHONPATH: ${{ github.workspace }}\AutoDraw_Stage20\source\preparation
-        run: python -m pytest -q tests
+        run: |
+          $env:PYTHONPATH = "$env:GITHUB_WORKSPACE\AutoDraw_Stage20\source\preparation;$env:GITHUB_WORKSPACE\AutoDraw_Stage20\source\executor\tests"
+          python -m pytest -q tests
