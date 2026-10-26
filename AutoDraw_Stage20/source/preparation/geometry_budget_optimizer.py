@@ -28,14 +28,19 @@ def _rescale_map_centered(indexes: np.ndarray, scale: float) -> np.ndarray:
 
 def measure_geometry_plan_quality(index_map: Any, plan: dict[str, Any]) -> dict[str, Any]:
     """Compare a rasterized geometry plan with the indexed source image pixel by pixel."""
-    from geometry_color_plan import render_geometry_color_preview, validate_geometry_color_plan
+    from geometry_color_plan import (
+        _validate_index_map,
+        render_geometry_color_preview,
+        validate_geometry_color_plan,
+    )
 
     validated = validate_geometry_color_plan(plan)
     source = np.asarray(index_map)
     canvas = validated["canvas"]
     width, height = int(canvas["width"]), int(canvas["height"])
-    if source.ndim != 2 or source.shape != (height, width):
+    if source.shape != (height, width):
         raise ValueError("Размер исходной карты не совпадает с геометрическим планом.")
+    source = _validate_index_map(source, len(validated["palette"]))
 
     preview = render_geometry_color_preview(validated, max_dimension=max(width, height))
     rgba = np.asarray(preview.convert("RGBA"))
@@ -238,7 +243,7 @@ def optimize_geometry_plan_across_modes(
     """Evaluate scanline, contour and skeleton plans; prefer the most faithful one that fits."""
     from geometry_color_plan import GeometryColorPlanError, validate_geometry_color_plan
 
-    candidates: list[tuple[tuple[int, int, float, float, int], dict[str, Any], dict[str, Any]]] = []
+    candidates: list[tuple[tuple[int, float, float, float, int], dict[str, Any], dict[str, Any]]] = []
     failures: list[str] = []
     for mode_priority, mode in enumerate(("scanline", "contour", "skeleton")):
         try:
@@ -271,7 +276,7 @@ def optimize_geometry_plan_across_modes(
         else:
             key = (
                 1,
-                int(report["estimated_ink_after_px_equivalent"]),
+                float(report["estimated_ink_after_px_equivalent"]),
                 float(report.get("quality_mismatch_pixel_count", 0)),
                 -float(report.get("scale", 1.0)),
                 mode_priority,
