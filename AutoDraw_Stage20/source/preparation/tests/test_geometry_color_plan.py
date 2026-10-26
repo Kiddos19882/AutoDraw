@@ -249,3 +249,54 @@ def test_rdp_does_not_simplify_through_another_color_layer():
     )
 
     assert result == points
+
+
+from stroke_order_optimizer import orient_and_order_strokes
+
+
+def _route_stroke(color_index: int, first_x: float, last_x: float) -> dict:
+    return {
+        "name": f"color-{color_index}-{first_x}-{last_x}",
+        "points": [{"x": first_x, "y": 2.0}, {"x": last_x, "y": 2.0}],
+        "closed": False,
+        "color": {"palette_index": color_index},
+    }
+
+
+def test_stroke_router_groups_each_marker_into_one_batch():
+    strokes = [
+        _route_stroke(0, 0.0, 1.0),
+        _route_stroke(1, 20.0, 21.0),
+        _route_stroke(0, 2.0, 3.0),
+    ]
+
+    ordered = orient_and_order_strokes(strokes, color_grouping=True)
+    colors = [stroke["color"]["palette_index"] for stroke in ordered]
+    switches = sum(first != second for first, second in zip(colors, colors[1:]))
+
+    assert colors == [0, 0, 1]
+    assert switches == 1
+
+
+def test_stroke_router_reverses_open_paths_to_reduce_pen_up_distance():
+    strokes = [
+        _route_stroke(0, 0.0, 10.0),
+        _route_stroke(0, 12.0, 11.0),
+    ]
+
+    ordered = orient_and_order_strokes(strokes, color_grouping=True)
+
+    assert ordered[1]["points"][0]["x"] == 11.0
+    assert ordered[1]["points"][-1]["x"] == 12.0
+
+
+def test_stroke_router_preserves_input_order_when_grouping_is_disabled():
+    strokes = [
+        _route_stroke(0, 0.0, 1.0),
+        _route_stroke(1, 10.0, 11.0),
+        _route_stroke(0, 2.0, 3.0),
+    ]
+
+    ordered = orient_and_order_strokes(strokes, color_grouping=False)
+
+    assert ordered == strokes
