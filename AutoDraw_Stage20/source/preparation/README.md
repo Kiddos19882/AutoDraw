@@ -13,3 +13,9 @@
 ## Stage 19 — Color scanline planner
 
 `color_scanline.py` builds a strict ordered plan from Stage 18's integer `index_map`; `color_scanline_ui.py` exposes it in the unified AutoDraw window. Every row is processed top-to-bottom and every run left-to-right. Adjacent pixels merge only if their palette indexes are equal. Transparent pixels (`-1`) are skipped and split runs. The plan records the exact color on each stroke and is saved in its own `autodraw_color_scanline_plan` JSON schema, not Stage 6's one-color schema. See the application README for workflow and Stage 20 limitations.
+
+## Board point quota and standard brushes
+
+`board_resource_model.py` keeps the game's stored-point quota separate from the empirical path-equivalent ink model in `paint_cost_model.py`. The confirmed board variants have quotas of 3,000, 6,000, or 12,000 points. Planning defaults to 85% of the hard limit, retaining a 15% reserve. Normal-mode brush button values are 20, 14, and 7.
+
+The game samples cursor coordinates on its frame loop, so executor movement steps do **not** directly determine the number of saved board points. `estimate_calibrated_point_usage()` therefore requires a measured `points_per_path_px` ratio and labels its result as an estimate. Calibrate that ratio against real runs before using it to promise that a plan fits. The existing equivalent-pixel cost model remains a separate empirical estimate.
