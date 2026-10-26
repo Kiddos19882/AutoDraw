@@ -38,6 +38,7 @@ from drawing.execution_diagnostics import (
 from drawing.plan_transform import PlanFitInfo, fit_plan_to_size
 from models import DrawingPlan, Point, Stroke
 from color_scanline import load_color_scanline_plan, render_color_scanline_preview
+from geometry_color_plan import load_geometry_color_plan, render_geometry_color_preview
 from paint_cost_model import estimate_color_plan_paint_cost
 from palette_profiles import load_palette_profile, validate_palette_profile
 from path_planning.stroke_optimizer import measure_plan, render_plan_preview
@@ -1095,8 +1096,12 @@ class Stage6App:
             raise RuntimeError("Нельзя заменить план во время исполнения.")
         plan_path = Path(path).resolve()
         document = json.loads(plan_path.read_text(encoding="utf-8"))
-        if isinstance(document, dict) and document.get("plan_type") == "autodraw_color_scanline_plan":
-            raise ValueError("Это цветной план. Загрузите его кнопкой «Открыть цветной план…» вместе с профилем палитры.")
+        if isinstance(document, dict) and document.get("plan_type") in {
+            "autodraw_color_scanline_plan", "autodraw_geometry_color_plan"
+        }:
+            raise ValueError(
+                "Это цветной план. Загрузите его кнопкой «Открыть цветной план…» вместе с профилем палитры."
+            )
         plan = DrawingPlan.from_dict(document)
         plan.validate_bounds()
         self.color_plan_data = None
@@ -1108,11 +1113,22 @@ class Stage6App:
         self._refresh_execution_plan()
 
     def load_color_plan_from_path(self, path: str | Path) -> None:
-        """Load a validated Stage 19 color plan without silently downgrading it to mono."""
+        """Load either a legacy scanline plan or a geometry-optimized color plan."""
         if self.running:
             raise RuntimeError("Нельзя заменить план во время исполнения.")
         plan_path = Path(path).resolve()
-        color_plan = load_color_scanline_plan(plan_path)
+        document = json.loads(plan_path.read_text(encoding="utf-8"))
+        plan_type = document.get("plan_type") if isinstance(document, dict) else None
+        del document
+        if plan_type == "autodraw_color_scanline_plan":
+            color_plan = load_color_scanline_plan(plan_path)
+        elif plan_type == "autodraw_geometry_color_plan":
+            color_plan = load_geometry_color_plan(plan_path)
+        else:
+            raise ValueError(
+                "Файл не является поддерживаемым цветным планом AutoDraw "
+                "(scanline или geometry)."
+            )
         converted = color_plan_to_drawing_plan(color_plan)
         converted.validate_bounds()
         self.color_plan_data = color_plan
@@ -1135,6 +1151,11 @@ class Stage6App:
         if self.color_plan_data is None:
             raise ColorPlanExecutionError(
                 "Сначала откройте исходный цветной scanline-план этапа 19, затем его адаптивный план кистей."
+            )
+        if self.color_plan_data.get("plan_type") != "autodraw_color_scanline_plan":
+            raise ColorPlanExecutionError(
+                "Адаптивные планы кистей пока поддерживаются только для scanline-планов этапа 19. "
+                "Геометрический план использует собственные полилинии и не должен адаптироваться этим алгоритмом."
             )
         brush_path = Path(path).resolve()
         brush_plan = load_adaptive_brush_plan(brush_path)
@@ -1169,9 +1190,9 @@ class Stage6App:
             return
         path = filedialog.askopenfilename(
             parent=self.root,
-            title="Выберите цветной scanline-план этапа 19",
+            title="Выберите цветной план AutoDraw",
             initialdir=str(self.plan_path.parent if self.plan_path else APP_DIR),
-            filetypes=[("Цветной scanline-план", "*.json"), ("JSON", "*.json"), ("Все файлы", "*.*")],
+            filetypes=[("Цветной план AutoDraw", "*.json"), ("JSON", "*.json"), ("Все файлы", "*.*")],
         )
         if not path:
             return
@@ -1186,7 +1207,14 @@ class Stage6App:
         if self.color_plan_data is None:
             messagebox.showwarning(
                 "Нет исходного цветного плана",
-                "Сначала откройте цветной scanline-план этапа 19, затем соответствующий адаптивный план кистей.",
+                "Сначала откройте исходный цветной scanline-план этапа 19, затем соответствующий адаптивный план кистей.",
+                parent=self.root,
+            )
+            return
+        if self.color_plan_data.get("plan_type") != "autodraw_color_scanline_plan":
+            messagebox.showwarning(
+                "Адаптивные кисти недоступны",
+                "Адаптивные планы кистей пока доступны только для scanline-планов этапа 19.",
                 parent=self.root,
             )
             return
@@ -1254,7 +1282,12 @@ class Stage6App:
                 self.fit_check.configure(state="disabled")
             except tk.TclError:
                 pass
-            preview_image = render_color_scanline_preview(self.color_plan_data, expand_single_pixel_strokes=True)
+            if self.color_plan_data.get("plan_type") == "autodraw_geometry_color_plan":
+                preview_image = render_geometry_color_preview(self.color_plan_data)
+            else:
+                preview_image = render_color_scanline_preview(
+                    self.color_plan_data, expand_single_pixel_strokes=True
+                )
             self.preview.set_image(preview_image)
             if self.area is None:
                 self.execution_plan = self.source_plan
@@ -1296,10 +1329,19 @@ class Stage6App:
                         f"Максимум одного цвета: {highest.get('hex', '')} {highest.get('estimated_usage_percent', 0):.1f}%. "
                         if isinstance(highest, dict) else ""
                     )
+                    estimated_total = ink_estimate.get("estimated_total_ink_px_equivalent")
+                    estimated_budget = ink_estimate.get(
+                        "estimated_budget_px_equivalent",
+                        ink_estimate.get("paint_budget_px_equivalent"),
+                    )
+                    estimated_usage = ink_estimate.get("estimated_usage_percent")
+                    risk_label = ink_estimate.get("risk_label", "оценка приблизительная")
+                    if estimated_total is None or estimated_budget is None or estimated_usage is None:
+                        raise KeyError("Недостаточно полей модели расхода краски.")
                     ink_text = (
-                        f"Если запас общий: {ink_estimate['estimated_total_ink_px_equivalent']:,.0f}/"
-                        f"{ink_estimate['estimated_budget_px_equivalent']:,.0f} px-экв. "
-                        f"({ink_estimate['estimated_usage_percent']:.1f}%); {per_color_text}{ink_estimate['risk_label']}."
+                        f"Если запас общий: {float(estimated_total):,.0f}/"
+                        f"{float(estimated_budget):,.0f} px-экв. "
+                        f"({float(estimated_usage):.1f}%); {per_color_text}{risk_label}."
                     )
                 except (ValueError, KeyError, TypeError):
                     ink_text = "Оценка краски недоступна для этого плана."
