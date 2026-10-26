@@ -985,6 +985,8 @@ def split_geometry_plan_to_boards(
     stroke_overhead_px_equivalent: float = 6.67,
     min_tile_size: int = 24,
     max_boards: int = 64,
+    board_width: int = 660,
+    board_height: int = 340,
 ) -> dict[str, Any]:
     """Partition an already-optimized vector plan into spatial tile plans.
 
@@ -1003,6 +1005,8 @@ def split_geometry_plan_to_boards(
         raise GeometryColorPlanError("Целевой расход должен быть от 10 до 95%.")
     if min_tile_size < 2 or max_boards < 1:
         raise GeometryColorPlanError("Недопустимые параметры разбиения на доски.")
+    if isinstance(board_width, bool) or isinstance(board_height, bool) or board_width < 2 or board_height < 2:
+        raise GeometryColorPlanError("Размеры физической доски должны быть целыми числами от 2.")
     width, height = int(data["canvas"]["width"]), int(data["canvas"]["height"])
     target_cost = budget * target / 100.0
     pending = [(0, 0, width, height)]
@@ -1027,8 +1031,8 @@ def split_geometry_plan_to_boards(
         if not strokes:
             continue
         draft = _summarize_plan(
-            strokes, data["palette"], width, height,
-            visible_pixel_count=0, transparent_pixel_count=width * height,
+            strokes, data["palette"], board_width, board_height,
+            visible_pixel_count=0, transparent_pixel_count=board_width * board_height,
             generation={**data["generation"], "tile": {"x": x0, "y": y0, "width": x1 - x0, "height": y1 - y0}},
             name=f"{data.get('name', 'Геометрический план')} — фрагмент",
             source={**data.get("source", {}), "source_tile": {"x": x0, "y": y0, "width": x1 - x0, "height": y1 - y0}},
@@ -1038,6 +1042,14 @@ def split_geometry_plan_to_boards(
         )
         cost = float(estimate["estimated_total_ink_px_equivalent"])
         tile_width, tile_height = x1 - x0, y1 - y0
+        if tile_width > board_width or tile_height > board_height:
+            if tile_width / max(1, board_width) >= tile_height / max(1, board_height) and tile_width > board_width:
+                middle = x0 + tile_width // 2
+                pending[0:0] = [(x0, y0, middle, y1), (middle, y0, x1, y1)]
+            else:
+                middle = y0 + tile_height // 2
+                pending[0:0] = [(x0, y0, x1, middle), (x0, middle, x1, y1)]
+            continue
         if cost <= target_cost or (tile_width <= min_tile_size and tile_height <= min_tile_size):
             draft["summary"]["paint_cost_estimate"] = estimate
             accepted.append((tile, strokes, draft))
@@ -1074,6 +1086,7 @@ def split_geometry_plan_to_boards(
         "source_plan_type": GEOMETRY_PLAN_TYPE,
         "source_plan_name": str(data.get("name", "Геометрический план")),
         "canvas": {"width": width, "height": height},
+        "board_size": {"width": board_width, "height": board_height},
         "target_budget_px_equivalent": budget,
         "target_usage_percent": target,
         "board_count": len(boards),
