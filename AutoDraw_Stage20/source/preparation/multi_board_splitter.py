@@ -51,6 +51,13 @@ def _clip_stroke_to_tile(
     xmin, ymin, xmax, ymax = float(x0), float(y0), float(x1 - 1), float(y1 - 1)
     points = [(float(p["x"]), float(p["y"])) for p in stroke["points"]]
     closed = bool(stroke.get("closed"))
+    # A genuine source singleton must survive tiling because the executor turns
+    # it into a short drag. A normal multi-point path that merely touches a tile
+    # boundary must not become a standalone singleton: that would be expanded
+    # into an extra horizontal pixel by the executor.
+    source_is_singleton = (
+        len(points) == 2 and _point_distance(points[0], points[1]) <= _EPSILON
+    )
     segments = list(zip(points, points[1:]))
     if closed and len(points) >= 3 and _point_distance(points[-1], points[0]) > _EPSILON:
         segments.append((points[-1], points[0]))
@@ -93,6 +100,10 @@ def _clip_stroke_to_tile(
             if not clean or _point_distance(clean[-1], point) > _EPSILON:
                 clean.append(point)
         if len(clean) == 1:
+            if not source_is_singleton:
+                # This was only a point contact with the clipping rectangle,
+                # not a drawable segment inside this board.
+                continue
             clean.append(clean[0])
         if len(clean) < 2:
             continue
