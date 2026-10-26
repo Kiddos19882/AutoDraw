@@ -453,7 +453,7 @@ class ColorScanlineTab:
             self.status_var.set(f"Ошибка геометрического плана: {exc}")
             return
         build_note = (
-            "Автовыбор построения без бюджетного ограничения: scanline сохраняет карту цветов."
+            "Без бюджетной оптимизации выбран scanline; мелкие компоненты фильтруются по заданному порогу."
             if requested_mode == "automatic" else None
         )
         self._display_geometry_plan(
