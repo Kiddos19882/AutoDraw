@@ -728,3 +728,22 @@ def test_multiboard_split_reconstructs_diagonal_strokes_crossing_board_seam():
     assert np.array_equal(assembled[:, :, 3], expected[:, :, 3])
     visible_pixels = expected[:, :, 3] > 0
     assert np.array_equal(assembled[visible_pixels, :3], expected[visible_pixels, :3])
+
+
+@pytest.mark.parametrize(
+    ("axis", "value"),
+    [
+        ("x", True),
+        ("y", False),
+        ("x", "1"),
+        ("y", "2.5"),
+        ("x", float("nan")),
+        ("y", float("inf")),
+    ],
+)
+def test_validator_rejects_non_numeric_or_non_finite_coordinates(axis, value):
+    plan = build_geometry_color_plan(_map(), PALETTE, mode="scanline")
+    plan["strokes"][0]["points"][0][axis] = value
+
+    with pytest.raises(GeometryColorPlanError):
+        validate_geometry_color_plan(plan)
