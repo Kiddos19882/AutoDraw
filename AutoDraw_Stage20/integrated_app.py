@@ -246,10 +246,9 @@ class AutoDrawUnifiedApp:
         self.quantization_tab = ttk.Frame(self.notebook)
         self.color_scanline_tab_frame = ttk.Frame(self.notebook)
         self.paint_limit_tab_frame = ttk.Frame(self.notebook)
-        # Tabs 4 and 6 already provide their own scrollable content areas.
-        # Add the same capability to the remaining top-level sections.
+        # The executor (tab 2), quantizer (tab 4), and paint-limit test (tab 6)
+        # already own scrollable content areas. Wrap only tabs that need scrolling.
         self.preparation_scroll = ScrollableTabContent(self.preparation_tab)
-        self.execution_scroll = ScrollableTabContent(self.execution_tab)
         self.palette_scroll = ScrollableTabContent(self.palette_tab)
         self.color_scanline_scroll = ScrollableTabContent(self.color_scanline_tab_frame)
         self.notebook.add(self.preparation_tab, text="1. Подготовка изображения")
@@ -265,7 +264,7 @@ class AutoDrawUnifiedApp:
             embedded=True,
             on_select_canvas_area=self._select_target_area_for_preparation,
         )
-        self.executor = Stage6App(root, parent=self.execution_scroll.content, embedded=True)
+        self.executor = Stage6App(root, parent=self.execution_tab, embedded=True)
         # A single selected browser area controls both the executor's screen
         # coordinates and the preparation canvas dimensions. No separate canvas
         # profile import is needed in the preparation tab.
@@ -295,7 +294,6 @@ class AutoDrawUnifiedApp:
 
         for scrollable in (
             self.preparation_scroll,
-            self.execution_scroll,
             self.palette_scroll,
             self.color_scanline_scroll,
         ):
