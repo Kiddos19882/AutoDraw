@@ -327,9 +327,24 @@ def build_geometry_color_plan(
     retained_visible_count = visible_count
     strokes: list[dict[str, Any]] = []
     removed_component_pixels = 0
+    scanline_indexes = indexes
+    if mode == "scanline" and min_component_area > 1:
+        # Apply the same per-color component cutoff in scanline mode when the
+        # caller explicitly asks for it (normal scanline defaults to 1 and
+        # therefore remains pixel-exact).
+        scanline_indexes = indexes.copy()
+        for color in normalized_palette:
+            color_index = int(color["index"])
+            raw_mask = (indexes == color_index).astype(np.uint8)
+            if not bool(np.any(raw_mask)):
+                continue
+            mask, removed = _connected_components(raw_mask, min_component_area)
+            removed_component_pixels += removed
+            pixel_counts_by_color[color_index] = int(np.count_nonzero(mask))
+            scanline_indexes[(indexes == color_index) & (mask == 0)] = -1
     if mode == "scanline":
         for y in range(source_height):
-            row = indexes[y]
+            row = scanline_indexes[y]
             x = 0
             while x < source_width:
                 color_index = int(row[x])
