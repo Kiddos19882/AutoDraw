@@ -126,10 +126,11 @@ def _make_output_image(
 ) -> Image.Image:
     palette_rgb = np.asarray([entry["rgb"] for entry in palette], dtype=np.uint8)
     visible = index_map >= 0
+    source_rgba = np.asarray(source_image.convert("RGBA"), dtype=np.uint8)
     rgba = np.zeros((index_map.shape[0], index_map.shape[1], 4), dtype=np.uint8)
     if bool(np.any(visible)):
         rgba[visible, :3] = palette_rgb[index_map[visible]]
-        rgba[visible, 3] = 255
+        rgba[..., 3][visible] = source_rgba[..., 3][visible]
     has_alpha = "A" in source_image.getbands() or bool(np.any(~visible))
     return Image.fromarray(rgba, mode="RGBA") if has_alpha else Image.fromarray(rgba[..., :3].copy(), mode="RGB")
 

@@ -353,15 +353,15 @@ class ColorScanlineTab:
         row_step = int(generation.get("row_step_px", 1))
         row_offset = int(generation.get("row_offset_px", 0))
         self.stats_var.set(
-            f"Холст: {canvas['width']} × {canvas['height']}\\n"
-            f"Шаг строк: {row_step} px; смещение: {row_offset} px\\n"
-            f"Цветных штрихов: {summary['stroke_count']:,}; точек: {summary['point_count']:,}\\n"
+            f"Холст: {canvas['width']} × {canvas['height']}\n"
+            f"Шаг строк: {row_step} px; смещение: {row_offset} px\n"
+            f"Цветных штрихов: {summary['stroke_count']:,}; точек: {summary['point_count']:,}\n"
             f"Нарисовано видимых пикселей: {summary['visible_pixel_count']:,}; "
             f"пропущено шагом строк: {summary.get('omitted_by_row_step_pixel_count', 0):,}; "
-            f"прозрачных: {summary['transparent_pixel_count']:,}\\n"
-            f"Одиночных пикселей: {summary['single_pixel_stroke_count']:,}\\n"
-            f"Переключений цвета по порядку плана: {summary['color_switch_count']:,}; выборов цвета ориентировочно: {summary['color_selection_count_estimate']:,}\\n"
-            f"Длина рисующих штрихов: {summary['drawing_length_px']:,.1f} px; перемещение между штрихами: {summary['pen_up_distance_px']:,.1f} px\\n"
+            f"прозрачных: {summary['transparent_pixel_count']:,}\n"
+            f"Одиночных пикселей: {summary['single_pixel_stroke_count']:,}\n"
+            f"Переключений цвета по порядку плана: {summary['color_switch_count']:,}; выборов цвета ориентировочно: {summary['color_selection_count_estimate']:,}\n"
+            f"Длина рисующих штрихов: {summary['drawing_length_px']:,.1f} px; перемещение между штрихами: {summary['pen_up_distance_px']:,.1f} px\n"
             f"{self._format_paint_estimate(summary.get('paint_cost_estimate'))}"
         )
         self.source_var.set(
