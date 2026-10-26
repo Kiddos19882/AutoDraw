@@ -80,6 +80,7 @@ def optimize_geometry_plan_to_budget(
     target_usage_percent: float = 75.0,
     stroke_overhead_px_equivalent: float = 6.67,
     simplify_tolerance_px: float = 0.8,
+    min_component_area: int = 1,
     source_name: str | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     """Search quality-preserving candidates until the estimated ink budget fits.
@@ -113,6 +114,12 @@ def optimize_geometry_plan_to_budget(
         raise GeometryColorPlanError("Целевой расход должен быть от 10 до 95%.")
     if not math.isfinite(overhead) or overhead < 0:
         raise GeometryColorPlanError("Расход на один штрих должен быть неотрицательным.")
+    if (
+        isinstance(min_component_area, bool)
+        or not isinstance(min_component_area, int)
+        or min_component_area < 1
+    ):
+        raise GeometryColorPlanError("Минимальная площадь компонента должна быть целым числом от 1.")
     target_cost = budget * target / 100.0
     before_cost: float | None = None
     baseline_note: str | None = None
@@ -134,7 +141,10 @@ def optimize_geometry_plan_to_budget(
     scales = (1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.25, 0.2, 0.15, 0.1, 0.075, 0.05)
     tolerances = tuple(sorted(set((0.0, float(simplify_tolerance_px), 1.0, 2.0, 3.5, 5.0)))
                         )
-    component_thresholds = (1, 2, 4, 8, 16)
+    component_thresholds = tuple(sorted({
+        min_component_area,
+        *[value for value in (1, 2, 4, 8, 16, 32, 64) if value >= min_component_area],
+    }))
     best: dict[str, Any] | None = None
     best_report: dict[str, Any] | None = None
     target_fits_at_scale = False
@@ -222,6 +232,7 @@ def optimize_geometry_plan_across_modes(
     target_usage_percent: float = 75.0,
     stroke_overhead_px_equivalent: float = 6.67,
     simplify_tolerance_px: float = 0.8,
+    min_component_area: int = 1,
     source_name: str | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     """Evaluate scanline, contour and skeleton plans; prefer the most faithful one that fits."""
@@ -239,6 +250,7 @@ def optimize_geometry_plan_across_modes(
                 target_usage_percent=target_usage_percent,
                 stroke_overhead_px_equivalent=stroke_overhead_px_equivalent,
                 simplify_tolerance_px=simplify_tolerance_px,
+                min_component_area=min_component_area,
                 source_name=source_name,
             )
         except (GeometryColorPlanError, ValueError, TypeError, MemoryError) as exc:
