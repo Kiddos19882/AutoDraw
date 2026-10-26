@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-10-25T22:23:32+00:00",
+  "profiles": [
+    {
+      "schema_version": 1,
+      "profile_id": "70f5ad5f4c45479dabd74c71146728a4",
+      "name": "Основной",
+      "created_at": "2026-10-25T22:23:32+00:00",
+      "updated_at": "2026-10-25T22:23:32+00:00",
+      "workspace": {
+        "canvas_width": 646,
+        "canvas_height": 323,
+        "fit_mode": "contain",
+        "row_step_px": 1,
+        "image_processing": {
+          "brightness": 0,
+          "contrast": 1.0,
+          "denoise_level": 0,
+          "threshold_mode": "otsu",
+          "threshold": 128
+        }
+      },
+      "screen_area": null,
+      "calibration": {
+        "point_step_px": 2.0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "notes": ""
+    }
+  ]
+}
