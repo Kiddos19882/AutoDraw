@@ -64,7 +64,13 @@ def measure_geometry_plan_quality(index_map: Any, plan: dict[str, Any]) -> dict[
     visible_accuracy = 100.0 * exact_visible_matches / visible_count if visible_count else 100.0
 
     return {
-        "quality_measure": "exact_rgb_pixel_comparison_v1",
+        "quality_measure": "exact_preview_rgb_pixel_comparison_v1",
+        "quality_measure_scope": "programmatic_preview",
+        "quality_is_preview_estimate": True,
+        "quality_measure_note": (
+            "Сравнение точное относительно программного предпросмотра, но не гарантирует "
+            "пиксель-в-пиксель совпадение с браузерной игрой: фактический след мыши и отрисовка могут отличаться."
+        ),
         "quality_pixel_count": total_pixels,
         "quality_mismatch_pixel_count": mismatch_count,
         "quality_mismatch_percent": round(100.0 * mismatch_count / total_pixels, 4) if total_pixels else 0.0,
