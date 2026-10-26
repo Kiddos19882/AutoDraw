@@ -54,4 +54,4 @@ jobs:
       - name: Run executor regression tests
         run: |
           $env:PYTHONPATH = "$env:GITHUB_WORKSPACE\AutoDraw_Stage20\source\preparation;$env:GITHUB_WORKSPACE\AutoDraw_Stage20\source\executor\tests"
-          python -m pytest -q tests
+          python -m unittest discover -s tests -v
