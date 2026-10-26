@@ -424,5 +424,46 @@ class ColorPlanExecutionTests(unittest.TestCase):
         self.assertEqual(hooks.to_report()["screenshot_preflight"], "passed")
 
 
+    def test_closed_contour_geometry_executes_without_line_extension(self):
+        index_map = np.full((8, 8), -1, dtype=np.int32)
+        index_map[1:7, 1:7] = 0
+        index_map[3:5, 3:5] = 1
+        geometry_plan = build_geometry_color_plan(
+            index_map,
+            self.color_plan["palette"],
+            mode="contour",
+            simplify_tolerance_px=0,
+            color_grouping=True,
+        )
+        self.assertTrue(any(stroke["closed"] for stroke in geometry_plan["strokes"]))
+
+        drawing_plan = color_plan_to_drawing_plan(geometry_plan)
+        self.assertTrue(any(stroke.closed for stroke in drawing_plan.strokes))
+        self.assertTrue(all(
+            stroke.metadata["line_extension_px_override"] == "0"
+            for stroke in drawing_plan.strokes
+        ))
+        hooks = ColorPlanExecutionHooks(
+            geometry_plan,
+            self.profile,
+            current_screen_size_provider=lambda: (160, 100),
+            screenshot_provider=lambda: self.screen.copy(),
+            dpi_scale_provider=lambda: 100,
+        )
+
+        summary = MouseExecutor(FastEvent(), self.config()).execute(
+            drawing_plan,
+            100,
+            200,
+            preflight=hooks.preflight,
+            before_stroke=hooks.before_stroke,
+        )
+
+        self.assertEqual(summary.status, "completed")
+        self.assertTrue(summary.mouse_release_succeeded)
+        self.assertTrue(hooks.preflight_passed)
+        self.assertEqual(hooks.selection_order, [0, 1])
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
