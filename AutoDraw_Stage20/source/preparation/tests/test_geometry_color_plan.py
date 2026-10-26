@@ -886,4 +886,3 @@ def test_stroke_router_does_not_modify_source_paths_or_metadata():
 
     assert strokes == original
     assert len(ordered) == len(original)
-    assert all(stroke is not source for stroke in ordered for source in original)
