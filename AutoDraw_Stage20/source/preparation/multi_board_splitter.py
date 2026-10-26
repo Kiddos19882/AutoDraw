@@ -125,6 +125,16 @@ def split_geometry_plan_to_boards(
     the original full canvas size expected by the executor; their path coordinates are
     local to each tile. The manifest records source rectangles for later stitching.
     """
+    # Lazy imports avoid a cycle: the geometry planner delegates tiling here.
+    from geometry_color_plan import (
+        GEOMETRY_PLAN_TYPE,
+        GeometryColorPlanError,
+        _estimate_geometry_paint_cost,
+        _orient_and_order_strokes,
+        _summarize_plan,
+        validate_geometry_color_plan,
+    )
+
     data = validate_geometry_color_plan(plan)
     budget = float(paint_budget_px_equivalent)
     target = float(target_usage_percent)
@@ -245,6 +255,8 @@ def split_geometry_plan_to_boards(
 
 
 def save_multi_board_manifest(path: str | Path, manifest: Any) -> Path:
+    from geometry_color_plan import GeometryColorPlanError
+
     if not isinstance(manifest, dict) or manifest.get("plan_type") != "autodraw_multi_board_manifest":
         raise GeometryColorPlanError("Это не манифест многодосочного плана.")
     output = Path(path).expanduser().resolve()
