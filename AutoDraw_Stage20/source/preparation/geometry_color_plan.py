@@ -4,12 +4,10 @@ import json
 import math
 import os
 import tempfile
-from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
-import cv2
 import numpy as np
 from PIL import Image, ImageDraw
 
