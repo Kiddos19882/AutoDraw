@@ -692,7 +692,7 @@ def test_validator_rejects_non_integer_palette_indexes(palette_index):
 def test_multiboard_split_reconstructs_diagonal_strokes_crossing_board_seam():
     index_map = np.full((40, 700), -1, dtype=np.int32)
     for x in range(642, 679):
-        y = 4 + (x - 642)
+        y = 1 + (x - 642)
         index_map[y, x] = 0
     plan = build_geometry_color_plan(
         index_map, PALETTE, mode="contour", simplify_tolerance_px=0
