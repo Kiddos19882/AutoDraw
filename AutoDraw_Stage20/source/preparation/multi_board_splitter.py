@@ -143,10 +143,15 @@ def split_geometry_plan_to_boards(
         raise GeometryColorPlanError("Бюджет краски должен быть больше нуля.")
     if not 10 <= target <= 95 or not math.isfinite(target):
         raise GeometryColorPlanError("Целевой расход должен быть от 10 до 95%.")
-    if min_tile_size < 2 or max_boards < 1:
-        raise GeometryColorPlanError("Недопустимые параметры разбиения на доски.")
-    if isinstance(board_width, bool) or isinstance(board_height, bool) or board_width < 2 or board_height < 2:
-        raise GeometryColorPlanError("Размеры физической доски должны быть целыми числами от 2.")
+    integer_parameters = {
+        "Минимальный размер плитки": (min_tile_size, 2),
+        "Максимальное количество досок": (max_boards, 1),
+        "Ширина физической доски": (board_width, 2),
+        "Высота физической доски": (board_height, 2),
+    }
+    for label, (value, minimum) in integer_parameters.items():
+        if isinstance(value, bool) or not isinstance(value, int) or value < minimum:
+            raise GeometryColorPlanError(f"{label} должен быть целым числом не меньше {minimum}.")
     width, height = int(data["canvas"]["width"]), int(data["canvas"]["height"])
     target_cost = budget * target / 100.0
     pending = [(0, 0, width, height)]
