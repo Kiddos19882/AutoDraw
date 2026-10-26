@@ -589,4 +589,8 @@ def test_multiboard_split_reconstructs_scanline_pixels_across_board_seam():
 
     expected = np.asarray(render_geometry_color_preview(plan, max_dimension=700))
     assert manifest["board_count"] == 2
-    assert np.array_equal(assembled, expected)
+    # Transparent pixels may carry different, irrelevant RGB values; compare
+    # the alpha mask everywhere and exact RGB values on every painted pixel.
+    assert np.array_equal(assembled[:, :, 3], expected[:, :, 3])
+    visible_pixels = expected[:, :, 3] > 0
+    assert np.array_equal(assembled[visible_pixels, :3], expected[visible_pixels, :3])
