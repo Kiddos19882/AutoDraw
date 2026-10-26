@@ -270,6 +270,78 @@ class UnifiedAppCoreTests(unittest.TestCase):
                 except tk.TclError:
                     pass
 
+    def test_each_main_tab_has_vertical_scroll_support(self):
+        root = None
+        app = None
+        try:
+            root = tk.Tk()
+            root.geometry("1350x820+0+0")
+            app = integrated_app.AutoDrawUnifiedApp(root)
+
+            for scrollable in (
+                app.preparation_scroll,
+                app.execution_scroll,
+                app.palette_scroll,
+                app.color_scanline_scroll,
+            ):
+                self.assertIsInstance(scrollable.canvas, tk.Canvas)
+                self.assertIsInstance(scrollable.scrollbar, ttk.Scrollbar)
+                self.assertEqual(str(scrollable.scrollbar.cget("orient")), "vertical")
+                self.assertTrue(callable(scrollable._on_mousewheel))
+
+            # Sections 4 and 6 already had their own scrollable content areas.
+            self.assertIsInstance(app.palette_quantizer.scroll_canvas, tk.Canvas)
+            self.assertIsInstance(app.palette_quantizer.scrollbar, ttk.Scrollbar)
+            self.assertIsInstance(app.paint_limit_tab.scroll_canvas, tk.Canvas)
+            self.assertIsInstance(app.paint_limit_tab.scrollbar, ttk.Scrollbar)
+        except tk.TclError as exc:
+            self.skipTest(f"Tk desktop session unavailable: {exc}")
+        finally:
+            if app is not None:
+                app.workbench.cleanup()
+            if root is not None:
+                try:
+                    root.destroy()
+                except tk.TclError:
+                    pass
+
+    def test_color_scanline_tab_scroll_reaches_lower_controls(self):
+        root = None
+        app = None
+        try:
+            root = tk.Tk()
+            root.geometry("1350x820+0+0")
+            app = integrated_app.AutoDrawUnifiedApp(root)
+            app.notebook.select(app.color_scanline_tab_frame)
+            root.update_idletasks()
+            root.update()
+
+            scroll = app.color_scanline_scroll
+            self.assertIsInstance(scroll.canvas, tk.Canvas)
+            self.assertIsInstance(scroll.scrollbar, ttk.Scrollbar)
+            bounds = scroll.canvas.bbox("all")
+            self.assertIsNotNone(bounds)
+            self.assertGreater(bounds[3], scroll.canvas.winfo_height())
+
+            before = scroll.canvas.yview()[0]
+            event = type("MouseWheelEvent", (), {})()
+            event.widget = scroll.canvas
+            event.delta = -120
+            event.num = None
+            self.assertEqual(scroll._on_mousewheel(event), "break")
+            root.update_idletasks()
+            self.assertGreater(scroll.canvas.yview()[0], before)
+        except tk.TclError as exc:
+            self.skipTest(f"Tk desktop session unavailable: {exc}")
+        finally:
+            if app is not None:
+                app.workbench.cleanup()
+            if root is not None:
+                try:
+                    root.destroy()
+                except tk.TclError:
+                    pass
+
     def test_quantization_tab_has_vertical_scroll_support(self):
         root = None
         app = None
