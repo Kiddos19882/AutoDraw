@@ -71,8 +71,12 @@ class PaletteTarget:
 
 
 def validate_color_plan(plan: Any) -> dict[str, Any]:
-    """Use the Stage 19 validator, importing lazily to avoid import-cycle issues."""
+    """Validate either legacy scanline plans or the new geometric color-plan schema."""
     try:
+        if isinstance(plan, dict) and plan.get("plan_type") == "autodraw_geometry_color_plan":
+            from geometry_color_plan import validate_geometry_color_plan
+            return validate_geometry_color_plan(plan)
+
         from color_scanline import validate_color_scanline_plan
         return validate_color_scanline_plan(plan)
     except Exception as exc:
@@ -462,8 +466,12 @@ def color_plan_to_drawing_plan(plan: Any) -> DrawingPlan:
             "color_name": str(palette_color["name"]),
             "color_hex": str(palette_color["hex"]),
             "color_rgb": ",".join(str(channel) for channel in palette_color["rgb"]),
-            "color_scanline_order": str(index),
+            "color_plan_order": str(index),
         }
+        if color_plan.get("plan_type") == "autodraw_color_scanline_plan":
+            metadata["color_scanline_order"] = str(index)
+        else:
+            metadata["color_geometry_order"] = str(index)
 
         # A one-pixel run is encoded by Stage 19 as two identical points.  The
         # target board ignores a mouse click with no movement, so turn this into
@@ -490,7 +498,7 @@ def color_plan_to_drawing_plan(plan: Any) -> DrawingPlan:
         strokes.append(Stroke(
             name=str(raw_stroke.get("name") or f"color-stroke-{index}"),
             points=points,
-            closed=False,
+            closed=bool(raw_stroke.get("closed", False)),
             metadata=metadata,
         ))
     converted = DrawingPlan(
@@ -502,6 +510,13 @@ def color_plan_to_drawing_plan(plan: Any) -> DrawingPlan:
         schema_version=1,
     )
     return converted
+
+
+def geometry_color_plan_to_drawing_plan(plan: Any) -> DrawingPlan:
+    """Convert a validated geometric color plan while preserving open/closed path geometry."""
+    if not isinstance(plan, dict) or plan.get("plan_type") != "autodraw_geometry_color_plan":
+        raise ColorPlanExecutionError("Ожидался геометрический цветной план AutoDraw.")
+    return color_plan_to_drawing_plan(plan)
 
 
 def build_palette_targets(
@@ -712,7 +727,7 @@ class ColorPlanExecutionHooks:
             "selected_color_count": self.selection_count,
             "selection_order": list(self.selection_order),
             "used_colors": [self.targets[index].to_dict() for index in sorted(self.targets)],
-            "selection_policy": "select_only_when_color_changes; preserve_scanline_stroke_order",
+            "selection_policy": "select_only_when_color_changes; preserve_source_plan_stroke_order",
             "screenshot_preflight": "passed" if self.preflight_passed else "not_completed",
             "brush_size_selection_count": (
                 self.brush_controller.selection_count if self.brush_controller is not None else 0
