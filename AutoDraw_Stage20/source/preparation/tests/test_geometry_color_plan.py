@@ -425,6 +425,9 @@ def test_exact_scanline_render_has_full_pixel_accuracy():
     assert quality["quality_mismatch_pixel_count"] == 0
     assert quality["quality_pixel_accuracy_percent"] == 100.0
     assert quality["quality_visible_pixel_accuracy_percent"] == 100.0
+    assert quality["quality_is_preview_estimate"] is True
+    assert quality["quality_measure_scope"] == "programmatic_preview"
+    assert "браузерной игре" in quality["quality_measure_note"]
 
 
 def test_automatic_optimizer_compares_all_modes_and_prefers_exact_render():
