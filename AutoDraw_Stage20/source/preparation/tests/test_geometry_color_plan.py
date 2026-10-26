@@ -441,3 +441,16 @@ def test_automatic_optimizer_compares_all_modes_and_prefers_exact_render():
     assert {item["mode"] for item in report["mode_candidates"]} == {
         "scanline", "contour", "skeleton"
     }
+
+
+def test_pixel_fidelity_accounts_for_executor_single_pixel_drag():
+    index_map = np.full((9, 9), -1, dtype=np.int32)
+    index_map[4, 4] = 0
+    plan = build_geometry_color_plan(index_map, PALETTE, mode="scanline")
+
+    quality = measure_geometry_plan_quality(index_map, plan)
+
+    # The executor converts a click into a short horizontal drag, painting one
+    # extra board pixel when that pixel is inside the canvas.
+    assert quality["quality_mismatch_pixel_count"] == 1
+    assert quality["quality_exact_visible_pixel_count"] == 1
