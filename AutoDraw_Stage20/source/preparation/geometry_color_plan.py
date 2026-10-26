@@ -502,9 +502,20 @@ def validate_geometry_color_plan(plan: Any) -> dict[str, Any]:
         parsed: list[tuple[float, float]] = []
         for point in points:
             try:
-                x, y = float(point["x"]), float(point["y"])
-            except (KeyError, TypeError, ValueError) as exc:
+                raw_x, raw_y = point["x"], point["y"]
+            except (KeyError, TypeError) as exc:
                 raise GeometryColorPlanError(f"Координаты штриха №{index} повреждены.") from exc
+            numeric_types = (int, float, np.integer, np.floating)
+            if (
+                isinstance(raw_x, bool)
+                or isinstance(raw_y, bool)
+                or not isinstance(raw_x, numeric_types)
+                or not isinstance(raw_y, numeric_types)
+            ):
+                raise GeometryColorPlanError(
+                    f"Координаты штриха №{index} должны быть числами, а не строками или логическими значениями."
+                )
+            x, y = float(raw_x), float(raw_y)
             if not math.isfinite(x) or not math.isfinite(y) or not (0 <= x < width and 0 <= y < height):
                 raise GeometryColorPlanError(f"Штрих №{index} выходит за границы холста.")
             parsed.append((x, y))
