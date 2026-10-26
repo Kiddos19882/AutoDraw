@@ -7,6 +7,8 @@ from board_resource_model import (
     DEFAULT_POINT_SAFETY_FACTOR,
     EXTENDED_BRUSH_SLIDER_MAX_VALUE,
     EXTENDED_BRUSH_SLIDER_MIN_VALUE,
+    GAME_BOARD_LOGICAL_HEIGHT,
+    GAME_BOARD_LOGICAL_WIDTH,
     MODEL_ID,
     PLANNER_BRUSH_MAX_VALUE,
     PLANNER_BRUSH_MIN_VALUE,
@@ -26,6 +28,12 @@ class BoardResourceModelTests(unittest.TestCase):
         self.assertEqual(get_board_point_limit("BoardItem3"), 12_000)
         self.assertEqual(get_board_point_limit("BoardItem4"), 12_000)
         self.assertEqual(len(BOARD_ITEM_POINT_LIMITS), 5)
+
+    def test_game_logical_canvas_dimensions_are_explicit(self):
+        self.assertEqual(GAME_BOARD_LOGICAL_WIDTH, 460)
+        self.assertEqual(GAME_BOARD_LOGICAL_HEIGHT, 240)
+        self.assertAlmostEqual(646 / GAME_BOARD_LOGICAL_WIDTH, 1.404347826)
+        self.assertAlmostEqual(323 / GAME_BOARD_LOGICAL_HEIGHT, 1.345833333)
 
     def test_unknown_engine_type_is_not_guessed(self):
         with self.assertRaisesRegex(ValueError, "Неизвестный тип доски"):

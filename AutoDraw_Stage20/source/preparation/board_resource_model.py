@@ -18,6 +18,11 @@ BOARD_ITEM_POINT_LIMITS: dict[str, int] = {
 }
 SUPPORTED_BOARD_POINT_LIMITS = (3_000, 6_000, 12_000)
 
+# Logical board coordinates reported by the game engine. Stage 19's image/map
+# uses target-screen pixels, so these dimensions convert brush units to map pixels.
+GAME_BOARD_LOGICAL_WIDTH = 460
+GAME_BOARD_LOGICAL_HEIGHT = 240
+
 # Values emitted by the three standard brush buttons in normal mode.
 # The extended painter slider can produce integer values from 1 through 30.
 # For the first planner version, use 1..20: smaller values help with details,

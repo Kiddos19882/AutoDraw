@@ -85,6 +85,27 @@ def adaptive_brush_plan_to_drawing_plan(brush_plan: Any, source_color_plan: Any)
         raise ColorPlanExecutionError("Адаптивный план не прошёл обязательную блокировку автоматического исполнения.")
 
     width, height = int(canvas["width"]), int(canvas["height"])
+    brush_configuration = adaptive.get("brush_configuration", {})
+    if brush_configuration.get("calibration_confirmed") is not True:
+        raise ColorPlanExecutionError(
+            "Stage 19 не подтвердил, что карта цветов покрывает весь игровой холст. "
+            "Повторно рассчитайте адаптивный план и подтвердите геометрию 460×240."
+        )
+    try:
+        from board_resource_model import GAME_BOARD_LOGICAL_HEIGHT, GAME_BOARD_LOGICAL_WIDTH
+        actual_scale_x = float(brush_configuration["scale_x_source_px_per_game_unit"])
+        actual_scale_y = float(brush_configuration["scale_y_source_px_per_game_unit"])
+    except (ImportError, KeyError, TypeError, ValueError) as exc:
+        raise ColorPlanExecutionError("В адаптивном плане отсутствует рассчитанный масштаб кисти.") from exc
+    expected_scale_x = width / GAME_BOARD_LOGICAL_WIDTH
+    expected_scale_y = height / GAME_BOARD_LOGICAL_HEIGHT
+    if (abs(actual_scale_x - expected_scale_x) > max(0.01, expected_scale_x * 0.03)
+            or abs(actual_scale_y - expected_scale_y) > max(0.01, expected_scale_y * 0.03)):
+        raise ColorPlanExecutionError(
+            "Масштаб кисти адаптивного плана не согласуется с логическим холстом 460×240. "
+            f"Ожидалось X≈{expected_scale_x:.4f}, Y≈{expected_scale_y:.4f}; "
+            f"в плане X={actual_scale_x:.4f}, Y={actual_scale_y:.4f}. Пересчитайте Stage 19."
+        )
     palette = color_plan["palette"]
     source_strokes = color_plan["strokes"]
     strokes: list[Stroke] = []
@@ -214,8 +235,10 @@ class BrushSliderCalibration:
             )
         if not (0 <= self.x_at_min < screen_width and 0 <= self.x_at_max < screen_width):
             raise ColorPlanExecutionError("Крайние X-координаты ползунка выходят за пределы экрана.")
-        if self.x_at_min == self.x_at_max:
-            raise ColorPlanExecutionError("Крайние X-координаты ползунка не должны совпадать.")
+        if abs(self.x_at_max - self.x_at_min) < self.max_value - self.min_value:
+            raise ColorPlanExecutionError(
+                "Длина ползунка слишком мала для раздельного выбора всех значений 1–30."
+            )
         if not 0 <= self.y < screen_height:
             raise ColorPlanExecutionError("Y-координата ползунка выходит за пределы экрана.")
         if not self.min_value <= self.initial_value <= self.max_value:

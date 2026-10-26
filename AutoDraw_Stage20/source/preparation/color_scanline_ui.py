@@ -15,6 +15,7 @@ from paint_cost_model import (
 from brush_planner import (
     BrushPlannerError, build_adaptive_brush_plan, save_adaptive_brush_plan,
 )
+from board_resource_model import GAME_BOARD_LOGICAL_HEIGHT, GAME_BOARD_LOGICAL_WIDTH
 
 from color_scanline import (
     ColorScanlinePlanError,
@@ -91,8 +92,8 @@ class ColorScanlineTab:
         self.row_step_var = tk.StringVar(value="1")
         self.brush_min_var = tk.StringVar(value="1")
         self.brush_max_var = tk.StringVar(value="20")
-        self.brush_scale_x_var = tk.StringVar(value="1.0")
-        self.brush_scale_y_var = tk.StringVar(value="1.0")
+        self.brush_scale_x_var = tk.StringVar(value="авто")
+        self.brush_scale_y_var = tk.StringVar(value="авто")
         self.brush_scale_calibrated_var = tk.BooleanVar(value=False)
         self.paint_overhead_var = tk.StringVar(value=f"{DEFAULT_STROKE_OVERHEAD_PX_EQUIVALENT:.2f}")
         self.paint_budget_var = tk.StringVar(value=f"{DEFAULT_PAINT_BUDGET_PX_EQUIVALENT:.0f}")
@@ -156,13 +157,13 @@ class ColorScanlineTab:
             brush_controls, textvariable=self.brush_max_var,
             values=tuple(str(value) for value in range(1, 21)), state="readonly", width=3,
         ).pack(side="left", padx=(4, 10))
-        ttk.Label(brush_controls, text="X: px карты на единицу кисти").pack(side="left")
-        ttk.Entry(brush_controls, textvariable=self.brush_scale_x_var, width=6).pack(side="left", padx=(4, 8))
+        ttk.Label(brush_controls, text="Авто X: px карты / единицу кисти").pack(side="left")
+        ttk.Label(brush_controls, textvariable=self.brush_scale_x_var, width=7).pack(side="left", padx=(4, 8))
         ttk.Label(brush_controls, text="Y:").pack(side="left")
-        ttk.Entry(brush_controls, textvariable=self.brush_scale_y_var, width=6).pack(side="left", padx=(4, 8))
+        ttk.Label(brush_controls, textvariable=self.brush_scale_y_var, width=7).pack(side="left", padx=(4, 8))
         ttk.Checkbutton(
             brush_controls,
-            text="Масштаб кисти откалиброван по доске",
+            text="Подтверждаю, что карта соответствует всему холсту игры (460×240)",
             variable=self.brush_scale_calibrated_var,
         ).pack(side="left", padx=(2, 8))
         ttk.Button(
@@ -172,7 +173,7 @@ class ColorScanlineTab:
             brush_controls, text="Экспорт плана кистей JSON…", command=self.save_brush_plan_dialog,
         ).pack(side="left", padx=(6, 0))
         self.brush_summary_var = tk.StringVar(
-            value="Рекомендации не рассчитаны. Масштаб 1.0 — начальное предположение, не измерение."
+            value="Рекомендации не рассчитаны. Масштаб будет вычислен из размера карты и логического холста 460×240."
         )
         ttk.Label(brush_frame, textvariable=self.brush_summary_var, wraplength=1120, justify="left").pack(
             side="top", anchor="w", fill="x", pady=(5, 0)
@@ -381,8 +382,11 @@ class ColorScanlineTab:
         try:
             min_value = int(self.brush_min_var.get())
             max_value = int(self.brush_max_var.get())
-            scale_x = self._parse_model_number(self.brush_scale_x_var.get(), "Масштаб кисти по X")
-            scale_y = self._parse_model_number(self.brush_scale_y_var.get(), "Масштаб кисти по Y")
+            canvas = self.plan["canvas"]
+            scale_x = float(canvas["width"]) / GAME_BOARD_LOGICAL_WIDTH
+            scale_y = float(canvas["height"]) / GAME_BOARD_LOGICAL_HEIGHT
+            self.brush_scale_x_var.set(f"{scale_x:.4f}")
+            self.brush_scale_y_var.set(f"{scale_y:.4f}")
             candidate = build_adaptive_brush_plan(
                 self.plan_index_map,
                 self.plan,

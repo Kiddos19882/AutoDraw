@@ -129,7 +129,13 @@ class ColorPlanExecutionTests(unittest.TestCase):
         source = build_color_scanline_plan(
             index_map, self.color_plan["palette"], plan_name="adaptive conversion source"
         )
-        brush_plan = build_adaptive_brush_plan(index_map, source)
+        brush_plan = build_adaptive_brush_plan(
+            index_map,
+            source,
+            brush_scale_x=50 / 460,
+            brush_scale_y=5 / 240,
+            calibration_confirmed=True,
+        )
         converted = adaptive_brush_plan_to_drawing_plan(brush_plan, source)
         self.assertEqual((converted.width, converted.height), (50, 5))
         self.assertTrue(all(stroke.metadata["adaptive_brush_plan"] == "true" for stroke in converted.strokes))
@@ -142,6 +148,12 @@ class ColorPlanExecutionTests(unittest.TestCase):
         )
         with self.assertRaisesRegex(ColorPlanExecutionError, "другого цветного плана"):
             adaptive_brush_plan_to_drawing_plan(brush_plan, different_source)
+
+        wrong_scale = build_adaptive_brush_plan(
+            index_map, source, calibration_confirmed=True
+        )
+        with self.assertRaisesRegex(ColorPlanExecutionError, "Масштаб кисти адаптивного плана"):
+            adaptive_brush_plan_to_drawing_plan(wrong_scale, source)
 
     def test_brush_slider_calibration_interpolates_and_rejects_stale_screen(self):
         calibration = BrushSliderCalibration(
