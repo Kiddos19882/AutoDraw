@@ -84,3 +84,17 @@ def test_geometry_adapter_rejects_legacy_scanline_plan():
 
     with pytest.raises(ColorPlanExecutionError):
         geometry_color_plan_to_drawing_plan(legacy_plan)
+
+
+def test_two_pixel_geometry_contour_converts_to_open_drawing_stroke():
+    indexes = np.full((7, 7), -1, dtype=np.int32)
+    indexes[3, 2:4] = 0
+    plan = build_geometry_color_plan(
+        indexes, PALETTE, mode="contour", simplify_tolerance_px=5
+    )
+
+    converted = geometry_color_plan_to_drawing_plan(plan)
+
+    assert converted.stroke_count == 1
+    assert converted.strokes[0].closed is False
+    converted.validate_bounds()
