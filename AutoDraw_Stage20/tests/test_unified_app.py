@@ -280,7 +280,6 @@ class UnifiedAppCoreTests(unittest.TestCase):
 
             for scrollable in (
                 app.preparation_scroll,
-                app.execution_scroll,
                 app.palette_scroll,
                 app.color_scanline_scroll,
             ):
@@ -289,11 +288,58 @@ class UnifiedAppCoreTests(unittest.TestCase):
                 self.assertEqual(str(scrollable.scrollbar.cget("orient")), "vertical")
                 self.assertTrue(callable(scrollable._on_mousewheel))
 
+            # Section 2 owns its scroll container inside Stage6App; do not add
+            # a second, outer scroll container around it.
+            self.assertFalse(hasattr(app, "execution_scroll"))
+            self.assertIsInstance(app.executor.scroll_canvas, tk.Canvas)
+            self.assertIsInstance(app.executor.scrollbar, ttk.Scrollbar)
+            self.assertEqual(str(app.executor.scrollbar.cget("orient")), "vertical")
+
             # Sections 4 and 6 already had their own scrollable content areas.
             self.assertIsInstance(app.palette_quantizer.scroll_canvas, tk.Canvas)
             self.assertIsInstance(app.palette_quantizer.scrollbar, ttk.Scrollbar)
             self.assertIsInstance(app.paint_limit_tab.scroll_canvas, tk.Canvas)
             self.assertIsInstance(app.paint_limit_tab.scrollbar, ttk.Scrollbar)
+        except tk.TclError as exc:
+            self.skipTest(f"Tk desktop session unavailable: {exc}")
+        finally:
+            if app is not None:
+                app.workbench.cleanup()
+            if root is not None:
+                try:
+                    root.destroy()
+                except tk.TclError:
+                    pass
+
+    def test_execution_tab_scroll_reaches_lower_controls(self):
+        root = None
+        app = None
+        try:
+            root = tk.Tk()
+            root.geometry("1350x820+0+0")
+            app = integrated_app.AutoDrawUnifiedApp(root)
+            app.notebook.select(app.execution_tab)
+            root.update_idletasks()
+            root.update()
+
+            executor = app.executor
+            self.assertIsInstance(executor.scroll_canvas, tk.Canvas)
+            self.assertIsInstance(executor.scrollbar, ttk.Scrollbar)
+            bounds = executor.scroll_canvas.bbox("all")
+            self.assertIsNotNone(bounds)
+            self.assertGreater(
+                bounds[3],
+                executor.scroll_canvas.winfo_height(),
+                "Execution controls must extend below the visible viewport",
+            )
+
+            before = executor.scroll_canvas.yview()[0]
+            # Use a real widget with the wheel binding, rather than calling the
+            # handler directly, to catch accidental binding/scroll-container regressions.
+            executor.preview.canvas.event_generate("<MouseWheel>", delta=-120)
+            root.update_idletasks()
+            root.update()
+            self.assertGreater(executor.scroll_canvas.yview()[0], before)
         except tk.TclError as exc:
             self.skipTest(f"Tk desktop session unavailable: {exc}")
         finally:
