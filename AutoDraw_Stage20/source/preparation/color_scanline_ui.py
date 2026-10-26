@@ -476,6 +476,9 @@ class ColorScanlineTab:
                 self.paint_target_usage_var.get(), "Целевой расход бюджета"
             )
             tolerance = self._parse_model_number(self.geometry_tolerance_var.get(), "Допуск RDP")
+            min_component_area = int(self.geometry_min_component_var.get())
+            if min_component_area < 1:
+                raise ValueError("Минимальный размер компонента должен быть целым числом от 1.")
             optimizer = (
                 optimize_geometry_plan_across_modes
                 if self.geometry_mode_var.get() == "automatic"
@@ -489,6 +492,7 @@ class ColorScanlineTab:
                     target_usage_percent=target_usage,
                     stroke_overhead_px_equivalent=stroke_overhead,
                     simplify_tolerance_px=tolerance,
+                    min_component_area=min_component_area,
                     source_name=self.source_name,
                 )
             else:
@@ -500,6 +504,7 @@ class ColorScanlineTab:
                     target_usage_percent=target_usage,
                     stroke_overhead_px_equivalent=stroke_overhead,
                     simplify_tolerance_px=tolerance,
+                    min_component_area=min_component_area,
                     source_name=self.source_name,
                 )
         except (GeometryColorPlanError, ValueError, TypeError, MemoryError) as exc:
