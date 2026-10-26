@@ -300,3 +300,56 @@ def test_stroke_router_preserves_input_order_when_grouping_is_disabled():
     ordered = orient_and_order_strokes(strokes, color_grouping=False)
 
     assert ordered == strokes
+
+
+def test_multiboard_split_clips_a_path_to_physical_board_tiles():
+    indexes = np.full((20, 700), -1, dtype=np.int32)
+    indexes[5, :] = 0
+    plan = build_geometry_color_plan(indexes, PALETTE, mode="scanline")
+
+    manifest = split_geometry_plan_to_boards(
+        plan,
+        paint_budget_px_equivalent=25_650,
+        target_usage_percent=75,
+        min_tile_size=8,
+        max_boards=4,
+        board_width=660,
+        board_height=340,
+    )
+
+    assert manifest["board_count"] == 2
+    assert [board["tile"]["x"] for board in manifest["boards"]] == [0, 350]
+    for board in manifest["boards"]:
+        tile_plan = board["plan"]
+        assert tile_plan["canvas"] == {"width": 660, "height": 340}
+        assert board["fits_budget"] is True
+        for stroke in tile_plan["strokes"]:
+            for point in stroke["points"]:
+                assert 0 <= point["x"] < 660
+                assert 0 <= point["y"] < 340
+
+
+def test_multiboard_split_rejects_non_integer_board_size():
+    plan = build_geometry_color_plan(_map(), PALETTE, mode="contour")
+
+    with pytest.raises(GeometryColorPlanError):
+        split_geometry_plan_to_boards(
+            plan,
+            paint_budget_px_equivalent=25_650,
+            board_width=660.5,
+        )
+
+
+def test_multiboard_split_respects_maximum_board_count():
+    indexes = np.full((20, 700), -1, dtype=np.int32)
+    indexes[5, :] = 0
+    plan = build_geometry_color_plan(indexes, PALETTE, mode="scanline")
+
+    with pytest.raises(GeometryColorPlanError):
+        split_geometry_plan_to_boards(
+            plan,
+            paint_budget_px_equivalent=25_650,
+            max_boards=1,
+            board_width=660,
+            board_height=340,
+        )
