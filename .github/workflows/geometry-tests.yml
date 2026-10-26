@@ -23,9 +23,9 @@ jobs:
         working-directory: AutoDraw_Stage20/source/preparation
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.11"
       - name: Install test dependencies
@@ -42,9 +42,9 @@ jobs:
         working-directory: AutoDraw_Stage20/source/executor
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.11"
       - name: Install executor test dependencies
