@@ -488,3 +488,40 @@ def test_geometry_plan_json_round_trip(tmp_path):
     assert loaded["plan_type"] == "autodraw_geometry_color_plan"
     assert loaded["summary"]["stroke_count"] == plan["summary"]["stroke_count"]
     assert loaded["strokes"] == plan["strokes"]
+
+
+def test_scanline_component_filtering_respects_minimum_component_area():
+    indexes = np.full((8, 8), -1, dtype=np.int32)
+    indexes[1:4, 1:4] = 0
+    indexes[6, 6] = 1
+
+    plan = build_geometry_color_plan(
+        indexes, PALETTE, mode="scanline", min_component_area=2
+    )
+
+    assert plan["summary"]["source_visible_pixel_count"] == 10
+    assert plan["summary"]["retained_visible_pixel_count"] == 9
+    assert plan["generation"]["removed_component_pixel_count"] == 1
+    assert {stroke["color"]["palette_index"] for stroke in plan["strokes"]} == {0}
+
+
+def test_optimizer_never_uses_component_threshold_below_user_setting():
+    indexes = np.full((16, 16), -1, dtype=np.int32)
+    indexes[2:14, 2:14] = 0
+    indexes[0, 0] = 1
+
+    plan, report = optimize_geometry_plan_to_budget(
+        indexes,
+        PALETTE,
+        mode="scanline",
+        paint_budget_px_equivalent=10_000,
+        target_usage_percent=90,
+        min_component_area=4,
+    )
+
+    assert validate_geometry_color_plan(plan) is plan
+    assert report["min_component_area"] >= 4
+    assert plan["generation"]["min_component_area"] >= 4
+    assert plan["summary"]["retained_visible_pixel_count"] <= (
+        plan["summary"]["source_visible_pixel_count"]
+    )
