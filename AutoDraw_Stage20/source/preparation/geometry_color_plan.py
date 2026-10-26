@@ -251,10 +251,10 @@ def _summarize_plan(
     visible_pixel_count: int,
     transparent_pixel_count: int,
     generation: dict[str, Any],
-    source_visible_pixel_count: int | None = None,
-    pixel_counts_by_color: dict[int, int] | None = None,
     name: str,
     source: dict[str, Any] | None = None,
+    source_visible_pixel_count: int | None = None,
+    pixel_counts_by_color: dict[int, int] | None = None,
 ) -> dict[str, Any]:
     if not strokes:
         raise GeometryColorPlanError("После геометрической обработки не осталось штрихов.")
