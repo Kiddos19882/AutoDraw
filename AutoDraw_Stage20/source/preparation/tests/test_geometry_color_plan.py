@@ -170,3 +170,82 @@ def test_optimizer_uses_requested_cost_model_for_before_report():
     )
 
     assert report["estimated_ink_before_px_equivalent"] == pytest.approx(estimate)
+
+
+from layer_segmentation import LayerSegmentationError, filter_small_components
+from skeletonization import SkeletonizationError, trace_skeleton_paths
+from stroke_simplification import simplify_path
+
+
+def test_layer_segmentation_removes_only_components_below_threshold():
+    mask = np.zeros((10, 10), dtype=np.uint8)
+    mask[1:4, 1:4] = 1
+    mask[7, 7] = 1
+
+    filtered, removed = filter_small_components(mask, min_component_area=2)
+
+    assert int(filtered.sum()) == 9
+    assert removed == 1
+    assert filtered[2, 2] == 1
+    assert filtered[7, 7] == 0
+
+
+def test_layer_segmentation_uses_eight_connected_components():
+    mask = np.zeros((4, 4), dtype=np.uint8)
+    mask[1, 1] = 1
+    mask[2, 2] = 1
+
+    filtered, removed = filter_small_components(mask, min_component_area=2)
+
+    assert int(filtered.sum()) == 2
+    assert removed == 0
+
+
+def test_layer_segmentation_rejects_invalid_inputs():
+    with pytest.raises(LayerSegmentationError):
+        filter_small_components(np.zeros((2, 2)), min_component_area=0)
+    with pytest.raises(LayerSegmentationError):
+        filter_small_components(np.zeros((2, 2, 1)), min_component_area=1)
+
+
+def test_skeleton_path_tracing_visits_a_straight_line_from_end_to_end():
+    skeleton = np.zeros((5, 8), dtype=np.uint8)
+    skeleton[2, 1:6] = 1
+
+    paths = trace_skeleton_paths(skeleton)
+
+    assert len(paths) == 1
+    points, closed = paths[0]
+    assert closed is False
+    assert set(points) == {(float(x), 2.0) for x in range(1, 6)}
+
+
+def test_skeleton_path_tracing_keeps_an_isolated_pixel():
+    skeleton = np.zeros((5, 5), dtype=np.uint8)
+    skeleton[3, 2] = 1
+
+    paths = trace_skeleton_paths(skeleton)
+
+    assert paths == [([(2.0, 3.0)], False)]
+
+
+def test_skeleton_path_tracing_rejects_non_2d_input():
+    with pytest.raises(SkeletonizationError):
+        trace_skeleton_paths(np.zeros((3, 3, 1), dtype=np.uint8))
+
+
+def test_rdp_does_not_simplify_through_another_color_layer():
+    points = [(1.0, 1.0), (1.0, 5.0), (5.0, 5.0), (5.0, 1.0)]
+    safe_mask = np.zeros((7, 7), dtype=np.uint8)
+    safe_mask[1:6, 1] = 1
+    safe_mask[5, 1:6] = 1
+    safe_mask[1:6, 5] = 1
+
+    result = simplify_path(
+        points,
+        closed=False,
+        tolerance_px=10.0,
+        safe_mask=safe_mask,
+    )
+
+    assert result == points
