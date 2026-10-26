@@ -114,16 +114,24 @@ def optimize_geometry_plan_to_budget(
     if not math.isfinite(overhead) or overhead < 0:
         raise GeometryColorPlanError("Расход на один штрих должен быть неотрицательным.")
     target_cost = budget * target / 100.0
-    before = build_geometry_color_plan(
-        original, normalized, mode=mode, simplify_tolerance_px=0.0,
-        min_component_area=1, source_name=source_name,
-    )
-    before_estimate = _estimate_geometry_paint_cost(
-        before,
-        stroke_overhead_px_equivalent=overhead,
-        paint_budget_px_equivalent=budget,
-    )
-    scales = (1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3)
+    before_cost: float | None = None
+    baseline_note: str | None = None
+    try:
+        before = build_geometry_color_plan(
+            original, normalized, mode=mode, simplify_tolerance_px=0.0,
+            min_component_area=1, source_name=source_name,
+        )
+        before_estimate = _estimate_geometry_paint_cost(
+            before,
+            stroke_overhead_px_equivalent=overhead,
+            paint_budget_px_equivalent=budget,
+        )
+        before_cost = float(before_estimate["estimated_total_ink_px_equivalent"])
+    except (GeometryColorPlanError, ValueError, TypeError, MemoryError) as exc:
+        # Do not block optimization merely because the unoptimized source has
+        # too many strokes to serialize. Smaller sampling grids may still fit.
+        baseline_note = str(exc)
+    scales = (1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.25, 0.2, 0.15, 0.1, 0.075, 0.05)
     tolerances = tuple(sorted(set((0.0, float(simplify_tolerance_px), 1.0, 2.0, 3.5, 5.0)))
                         )
     component_thresholds = (1, 2, 4, 8, 16)
@@ -161,7 +169,9 @@ def optimize_geometry_plan_to_budget(
                     "simplify_tolerance_px": tolerance,
                     "source_visible_pixel_count": source_visible,
                     "retained_visible_pixel_count": visible,
-                    "estimated_ink_before_px_equivalent": before_estimate["estimated_total_ink_px_equivalent"],
+                    "estimated_ink_before_px_equivalent": before_cost,
+                    "baseline_plan_available": before_cost is not None,
+                    "baseline_note": baseline_note,
                     "estimated_ink_after_px_equivalent": cost,
                     "target_cost_px_equivalent": round(target_cost, 3),
                     "paint_budget_px_equivalent": budget,
