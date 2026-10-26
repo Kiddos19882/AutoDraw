@@ -765,8 +765,10 @@ def test_multiboard_split_preserves_a_real_single_pixel_stroke():
         board_height=340,
     )
 
-    assert manifest["board_count"] == 2
-    right_board = next(board for board in manifest["boards"] if board["tile"]["x"] == 660)
+    # The empty left tile is intentionally omitted from the manifest.
+    assert manifest["board_count"] == 1
+    right_board = manifest["boards"][0]
+    assert right_board["tile"]["x"] == 660
     singleton_strokes = [
         stroke for stroke in right_board["plan"]["strokes"]
         if stroke["points"][0] == stroke["points"][1]
