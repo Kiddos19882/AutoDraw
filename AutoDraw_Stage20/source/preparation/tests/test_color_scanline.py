@@ -175,6 +175,23 @@ class ColorScanlinePlanTests(unittest.TestCase):
 
 
 
+    def test_row_offset_can_start_sampling_after_transparent_top_rows(self):
+        plan = self.build(
+            [[-1, -1, -1], [-1, -1, -1], [0, 0, 0], [0, 1, 1], [-1, -1, -1]],
+            row_step_px=3,
+            row_offset_px=2,
+        )
+        self.assertEqual(plan["generation"]["row_step_px"], 3)
+        self.assertEqual(plan["generation"]["row_offset_px"], 2)
+        self.assertEqual(sorted({int(stroke["points"][0]["y"]) for stroke in plan["strokes"]}), [2])
+        self.assertEqual(plan["summary"]["visible_pixel_count"], 3)
+        validate_color_scanline_plan(plan)
+
+    def test_rejects_invalid_row_offset(self):
+        for step, offset in ((1, 1), (3, -1), (3, 3), (2, True)):
+            with self.subTest(step=step, offset=offset), self.assertRaises(ColorScanlinePlanError):
+                self.build([[0, 0], [1, 1], [0, 0]], row_step_px=step, row_offset_px=offset)
+
     def test_row_step_two_draws_only_even_rows_and_counts_skipped_visible_pixels(self):
         values = [
             [0, 0, 0, 0],

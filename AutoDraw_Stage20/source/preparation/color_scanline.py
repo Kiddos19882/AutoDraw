@@ -72,6 +72,7 @@ def build_color_scanline_plan(
     source_name: str | None = None,
     plan_name: str = "Цветной scanline-план",
     row_step_px: int = 1,
+    row_offset_px: int = 0,
     max_strokes: int = MAX_COLOR_STROKES,
     paint_stroke_overhead_px_equivalent: float = DEFAULT_STROKE_OVERHEAD_PX_EQUIVALENT,
     paint_budget_px_equivalent: float = DEFAULT_PAINT_BUDGET_PX_EQUIVALENT,
@@ -88,6 +89,10 @@ def build_color_scanline_plan(
         raise ColorScanlinePlanError("Лимит штрихов должен быть положительным целым числом.")
     if isinstance(row_step_px, bool) or not isinstance(row_step_px, int) or row_step_px < 1:
         raise ColorScanlinePlanError("Шаг строк должен быть положительным целым числом.")
+    if isinstance(row_offset_px, bool) or not isinstance(row_offset_px, int):
+        raise ColorScanlinePlanError("Смещение строк должно быть целым числом.")
+    if not 0 <= row_offset_px < row_step_px:
+        raise ColorScanlinePlanError("Смещение строк должно быть от 0 до шага строк минус 1.")
     indexes = _validate_index_map(index_map, len(normalized_palette))
     height, width = indexes.shape
     source_visible_pixels = int(np.count_nonzero(indexes >= 0))
@@ -96,7 +101,7 @@ def build_color_scanline_plan(
         raise ColorScanlinePlanError("В изображении нет непрозрачных пикселей для рисования.")
     # The color plan may intentionally sample every Nth row. Pixels on skipped
     # rows are reported separately from truly transparent pixels.
-    sampled_rows = range(0, height, row_step_px)
+    sampled_rows = range(row_offset_px, height, row_step_px)
     drawn_visible_pixels = sum(int(np.count_nonzero(indexes[y] >= 0)) for y in sampled_rows)
     omitted_by_row_step_pixels = source_visible_pixels - drawn_visible_pixels
     if drawn_visible_pixels == 0:
@@ -116,7 +121,7 @@ def build_color_scanline_plan(
     previous_end: tuple[int, int] | None = None
     previous_color_index: int | None = None
 
-    for y in range(0, height, row_step_px):
+    for y in range(row_offset_px, height, row_step_px):
         row = indexes[y]
         valid = row >= 0
         if not bool(np.any(valid)):
@@ -221,6 +226,20 @@ def build_color_scanline_plan(
         for key in ("changed_pixel_count", "mean_delta_e_2000", "p95_delta_e_2000", "max_delta_e_2000"):
             if key in source_report:
                 source_info[key] = source_report[key]
+        budget_report = source_report.get("paint_budget_optimization")
+        if isinstance(budget_report, dict):
+            source_info["paint_budget_optimization"] = {
+                key: budget_report[key]
+                for key in (
+                    "enabled", "target_usage_percent", "budget_px_equivalent",
+                    "target_cost_px_equivalent", "block_size_px", "row_step_px", "row_offset_px",
+                    "stroke_count_before", "stroke_count_after", "estimated_ink_before_px_equivalent",
+                    "estimated_ink_after_px_equivalent", "used_color_count_before",
+                    "used_color_count_after", "changed_pixel_count", "changed_pixel_percentage",
+                    "fallback_used",
+                )
+                if key in budget_report
+            }
         merge_report = source_report.get("rare_color_merge")
         if isinstance(merge_report, dict):
             # Keep a concise provenance record on the executable color plan.
@@ -248,6 +267,7 @@ def build_color_scanline_plan(
         "generation": {
             "method": "color_scanline",
             "row_step_px": row_step_px,
+            "row_offset_px": row_offset_px,
             "row_order": "top_to_bottom",
             "stroke_order": "left_to_right_within_row",
             "run_rule": "merge_adjacent_pixels_with_same_palette_index_only",
@@ -317,6 +337,12 @@ def validate_color_scanline_plan(plan: Any) -> dict[str, Any]:
     if isinstance(raw_row_step, bool) or not isinstance(raw_row_step, int) or raw_row_step < 1:
         raise ColorScanlinePlanError("Шаг строк в плане должен быть положительным целым числом.")
     row_step_px = raw_row_step
+    raw_row_offset = generation.get("row_offset_px", 0)
+    if isinstance(raw_row_offset, bool) or not isinstance(raw_row_offset, int):
+        raise ColorScanlinePlanError("Смещение строк в плане должно быть целым числом.")
+    row_offset_px = raw_row_offset
+    if not 0 <= row_offset_px < row_step_px or row_offset_px >= height:
+        raise ColorScanlinePlanError("Смещение строк выходит за допустимый диапазон.")
     raw_strokes = plan.get("strokes")
     if not isinstance(raw_strokes, list) or not raw_strokes:
         raise ColorScanlinePlanError("В плане отсутствуют цветные штрихи.")
@@ -356,9 +382,10 @@ def validate_color_scanline_plan(plan: Any) -> dict[str, Any]:
 
         row_y = int(y1)
         start_x, end_x = int(x1), int(x2)
-        if row_y % row_step_px != 0:
+        if row_y < row_offset_px or (row_y - row_offset_px) % row_step_px != 0:
             raise ColorScanlinePlanError(
-                f"Штрих №{stroke_number} находится в строке {row_y}, пропущенной шагом {row_step_px}."
+                f"Штрих №{stroke_number} находится в строке {row_y}, пропущенной схемой "
+                f"шага {row_step_px} и смещения {row_offset_px}."
             )
         if row_y < last_y or (row_y == last_y and start_x <= last_x_end):
             raise ColorScanlinePlanError("Порядок штрихов нарушен: требуется сверху вниз и слева направо без перекрытий.")
@@ -436,6 +463,8 @@ def validate_color_scanline_plan(plan: Any) -> dict[str, Any]:
         raise ColorScanlinePlanError("Видимые и пропущенные по шагу строки пиксели не совпадают с исходной маской.")
     if transparent_count != width * height - source_visible_count:
         raise ColorScanlinePlanError("Количество прозрачных пикселей в сводке не соответствует исходному изображению.")
+    if row_step_px == 1 and row_offset_px != 0:
+        raise ColorScanlinePlanError("При шаге строк 1 px смещение должно быть равно 0.")
     if omitted_count and row_step_px == 1:
         raise ColorScanlinePlanError("При шаге строк 1 px не должно быть пропущенных строк.")
     if summary.get("color_selection_count_estimate") != (1 + switches):

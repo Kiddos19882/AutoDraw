@@ -34,3 +34,10 @@ Adaptive plans are recommendations, never executable by themselves. Stage 20 onl
 ### Exporting a brush plan for Stage 20
 
 After the recommendations have been calculated, use **Export brush plan JSON** to save a separate `autodraw_adaptive_brush_plan` file. It contains a SHA-256 fingerprint of the exact source color plan. Stage 20 must load the matching source color plan and verify this fingerprint before it can execute the brush plan; brush recommendations are never silently substituted for the regular color plan.
+
+
+## Automatic paint-budget fitting
+
+Stage 19 provides **“Уложить в краску автоматически…”**. It progressively replaces square blocks with their most frequent palette index and samples fewer rows until the empirical paint-cost estimate is at or below the selected target (75% by default). The full canvas dimensions and original palette entries are retained; finer details and colors may deliberately disappear. The result records block size, row step/offset, estimated cost before/after, used-color count and pixel changes.
+
+This is a model-based ceiling, not a guarantee from the game's private ink counter. Start with the default 75% target and validate a small run on the actual board before a long execution. If the image only fits using the one-row fallback, the optimizer keeps the most informative source row rather than producing an empty plan.
