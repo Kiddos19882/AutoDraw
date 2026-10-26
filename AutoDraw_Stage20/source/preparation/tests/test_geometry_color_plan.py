@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
+import geometry_color_plan as geometry_module
 
 from geometry_color_plan import (
     GeometryColorPlanError,
@@ -454,3 +455,22 @@ def test_pixel_fidelity_accounts_for_executor_single_pixel_drag():
     # extra board pixel when that pixel is inside the canvas.
     assert quality["quality_mismatch_pixel_count"] == 1
     assert quality["quality_exact_visible_pixel_count"] == 1
+
+
+def test_optimizer_can_recover_when_unoptimized_source_exceeds_stroke_cap(monkeypatch):
+    index_map = np.array([[0, 1, 0, 1]], dtype=np.int32)
+    monkeypatch.setattr(geometry_module, "MAX_GEOMETRY_STROKES", 1)
+
+    plan, report = optimize_geometry_plan_to_budget(
+        index_map,
+        PALETTE,
+        mode="scanline",
+        paint_budget_px_equivalent=1_000,
+        target_usage_percent=90,
+        stroke_overhead_px_equivalent=1,
+    )
+
+    assert validate_geometry_color_plan(plan) is plan
+    assert report["baseline_plan_available"] is False
+    assert report["scale"] < 1.0
+    assert report["fits_budget"] is True
