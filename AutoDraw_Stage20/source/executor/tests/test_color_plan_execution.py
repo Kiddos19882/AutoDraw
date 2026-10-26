@@ -212,7 +212,7 @@ class ColorPlanExecutionTests(unittest.TestCase):
         )
 
     def test_brush_slider_mouse_points_reject_wrong_order_or_short_track(self):
-        with self.assertRaisesRegex(ColorPlanExecutionError, "сначала отметьте позицию"):
+        with self.assertRaisesRegex(ColorPlanExecutionError, "Сначала отметьте позицию"):
             normalize_brush_slider_points((390, 200), (100, 200))
         with self.assertRaisesRegex(ColorPlanExecutionError, "не менее 29 px"):
             normalize_brush_slider_points((100, 200), (120, 200))
