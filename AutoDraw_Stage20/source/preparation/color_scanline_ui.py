@@ -16,6 +16,7 @@ from brush_planner import (
     BrushPlannerError, build_adaptive_brush_plan, save_adaptive_brush_plan,
 )
 from board_resource_model import GAME_BOARD_LOGICAL_HEIGHT, GAME_BOARD_LOGICAL_WIDTH
+from paint_budget_optimizer import PaintBudgetOptimizationError, fit_result_to_paint_budget
 
 from color_scanline import (
     ColorScanlinePlanError,
@@ -90,6 +91,9 @@ class ColorScanlineTab:
         self.plan_index_map = None
         self.brush_plan: dict[str, Any] | None = None
         self.row_step_var = tk.StringVar(value="1")
+        self.paint_target_usage_var = tk.StringVar(value="75")
+        self._auto_fit_row_step: int | None = None
+        self._auto_fit_row_offset = 0
         self.brush_min_var = tk.StringVar(value="1")
         self.brush_max_var = tk.StringVar(value="20")
         self.brush_scale_x_var = tk.StringVar(value="авто")
@@ -118,6 +122,9 @@ class ColorScanlineTab:
         )
         self.row_step_combo.pack(side="left")
         ttk.Button(toolbar, text="Построить цветной план", command=self.build_plan).pack(side="left", padx=(6, 0))
+        ttk.Button(
+            toolbar, text="Уложить в краску автоматически…", command=self.fit_to_paint_budget,
+        ).pack(side="left", padx=(6, 0))
         ttk.Button(toolbar, text="Открыть цветной план…", command=self.open_plan_dialog).pack(side="left", padx=(6, 0))
         ttk.Button(toolbar, text="Сохранить план JSON…", command=self.save_plan_dialog).pack(side="left", padx=(6, 0))
 
@@ -133,11 +140,17 @@ class ColorScanlineTab:
         ttk.Entry(model_controls, textvariable=self.paint_budget_var, width=9).pack(side="left", padx=(5, 12))
         ttk.Button(model_controls, text="Вернуть значения эксперимента", command=self.reset_paint_model).pack(side="left")
         ttk.Button(model_controls, text="Пересчитать для текущего плана", command=self.recalculate_paint_estimate).pack(side="left", padx=(6, 0))
+        ttk.Label(model_controls, text="Цель расхода (%)").pack(side="left", padx=(12, 4))
+        ttk.Spinbox(
+            model_controls, from_=50, to=90, increment=5, width=4,
+            textvariable=self.paint_target_usage_var,
+        ).pack(side="left")
         self.paint_model_explanation = ttk.Label(
             model_frame,
             text=("По 4 экспериментальным замерам: ≈6,67 px-эквивалента на штрих; "
                   "оценочный запас ≈25 650 (наблюдавшийся диапазон 25 610–25 730). "
-                  "Это предварительная модель, а не измеренный внутренний счётчик игры."),
+                  "Автоматический режим укрупняет блоки, объединяет соседние цвета и пропускает строки, "
+                  "пока расчёт не достигнет целевого процента. Это предварительная модель, а не счётчик игры."),
             wraplength=1120,
             justify="left",
         )
@@ -210,6 +223,8 @@ class ColorScanlineTab:
         self.quantization_result = None
         self.palette_profile = None
         self.quantization_report = None
+        self._auto_fit_row_step = None
+        self._auto_fit_row_offset = 0
         self.source_name = None
         self.plan = None
         self.plan_path = None
@@ -267,6 +282,9 @@ class ColorScanlineTab:
         self.quantization_result = result
         self.palette_profile = profile
         self.quantization_report = report if isinstance(report, dict) else getattr(result, "report", None)
+        self._auto_fit_row_step = None
+        self._auto_fit_row_offset = 0
+        self.row_step_var.set("1")
         self.source_name = str(data.get("source_name") or "Результат этапа 18")
         self.plan = None
         self.plan_path = None
@@ -289,14 +307,21 @@ class ColorScanlineTab:
             if self.quantization_result is None or self.palette_profile is None:
                 return
         try:
-            stroke_overhead = self._parse_model_number(self.paint_overhead_var.get(), "Дополнительный расход на штрих")
-            paint_budget = self._parse_model_number(self.paint_budget_var.get(), "Оценочный запас краски")
+            stroke_overhead = self._parse_model_number(
+                self.paint_overhead_var.get(), "Дополнительный расход на штрих"
+            )
+            paint_budget = self._parse_model_number(
+                self.paint_budget_var.get(), "Оценочный запас краски"
+            )
+            row_step = int(self.row_step_var.get())
+            row_offset = self._auto_fit_row_offset if self._auto_fit_row_step == row_step else 0
             plan = build_color_scanline_plan(
                 self.quantization_result.index_map,
                 self.palette_profile,
                 source_report=self.quantization_report,
                 source_name=self.source_name,
-                row_step_px=int(self.row_step_var.get()),
+                row_step_px=row_step,
+                row_offset_px=row_offset,
                 paint_stroke_overhead_px_equivalent=stroke_overhead,
                 paint_budget_px_equivalent=paint_budget,
             )
@@ -304,40 +329,122 @@ class ColorScanlineTab:
             messagebox.showerror("Не удалось построить цветной план", str(exc), parent=self.root)
             self.status_var.set(f"Ошибка построения плана: {exc}")
             return
+        self._display_built_plan(plan, self.quantization_result.index_map)
+
+    def _display_built_plan(
+        self,
+        plan: dict[str, Any],
+        index_map: Any,
+        *,
+        status_prefix: str | None = None,
+    ) -> None:
         self.plan = plan
         self.plan_path = None
-        self.plan_index_map = self.quantization_result.index_map.copy()
+        self.plan_index_map = index_map.copy()
         self.brush_plan = None
-        self.brush_summary_var.set("Цветной план построен. Рассчитайте рекомендации кистей; без подтверждённого масштаба они останутся предварительными.")
+        self.brush_summary_var.set(
+            "Цветной план построен. Рассчитайте рекомендации кистей; без подтверждённого масштаба они останутся предварительными."
+        )
         self.preview.set_image(render_color_scanline_preview(plan))
         self._populate_table(plan)
         summary = plan["summary"]
         canvas = plan["canvas"]
+        generation = plan["generation"]
+        row_step = int(generation.get("row_step_px", 1))
+        row_offset = int(generation.get("row_offset_px", 0))
         self.stats_var.set(
-            f"Холст: {canvas['width']} × {canvas['height']}\n"
-            f"Шаг строк: {plan['generation']['row_step_px']} px\n"
-            f"Цветных штрихов: {summary['stroke_count']:,}; точек: {summary['point_count']:,}\n"
+            f"Холст: {canvas['width']} × {canvas['height']}\\n"
+            f"Шаг строк: {row_step} px; смещение: {row_offset} px\\n"
+            f"Цветных штрихов: {summary['stroke_count']:,}; точек: {summary['point_count']:,}\\n"
             f"Нарисовано видимых пикселей: {summary['visible_pixel_count']:,}; "
             f"пропущено шагом строк: {summary.get('omitted_by_row_step_pixel_count', 0):,}; "
-            f"прозрачных: {summary['transparent_pixel_count']:,}\n"
-            f"Одиночных пикселей: {summary['single_pixel_stroke_count']:,}\n"
-            f"Переключений цвета по порядку плана: {summary['color_switch_count']:,}; выборов цвета ориентировочно: {summary['color_selection_count_estimate']:,}\n"
-            f"Длина рисующих штрихов: {summary['drawing_length_px']:,.1f} px; перемещение между штрихами: {summary['pen_up_distance_px']:,.1f} px\n"
+            f"прозрачных: {summary['transparent_pixel_count']:,}\\n"
+            f"Одиночных пикселей: {summary['single_pixel_stroke_count']:,}\\n"
+            f"Переключений цвета по порядку плана: {summary['color_switch_count']:,}; выборов цвета ориентировочно: {summary['color_selection_count_estimate']:,}\\n"
+            f"Длина рисующих штрихов: {summary['drawing_length_px']:,.1f} px; перемещение между штрихами: {summary['pen_up_distance_px']:,.1f} px\\n"
             f"{self._format_paint_estimate(summary.get('paint_cost_estimate'))}"
         )
-        self.source_var.set(f"Построен план: {len(plan['strokes']):,} штрихов на холсте {canvas['width']} × {canvas['height']}.")
+        self.source_var.set(
+            f"Построен план: {len(plan['strokes']):,} штрихов на холсте "
+            f"{canvas['width']} × {canvas['height']} px."
+        )
         estimate = summary.get("paint_cost_estimate", {})
         risk = estimate.get("risk_level")
         risk_note = {
-            "over_budget": "Если запас краски общий для всех цветов, модель прогнозирует превышение; проверьте максимальную нагрузку отдельного цвета.",
-            "very_high": "При общем запасе расход близок к оценочному пределу; проверьте также нагрузку каждого цвета.",
-            "high": "Расход высокий; оценка не гарантирует завершение рисунка.",
-        }.get(risk, "Оценка приблизительная и основана на четырёх замерах.")
+            "over_budget": "Модель прогнозирует превышение лимита.",
+            "very_high": "Расход очень близок к пределу; оставьте дополнительный запас.",
+            "high": "Расход высокий; оценка не гарантирует фактический запас.",
+        }.get(risk, "Оценка приблизительная и основана на четырёх экспериментальных замерах.")
+        prefix = f"{status_prefix} " if status_prefix else ""
         self.status_var.set(
-            f"Цветной план построен. Шаг строк {plan['generation']['row_step_px']} px; "
-            f"пропущено пикселей по шагу строк: {summary.get('omitted_by_row_step_pixel_count', 0):,}. "
+            f"{prefix}План построен: шаг строк {row_step} px, смещение {row_offset} px; "
+            f"пропущено строкой выборки пикселей: {summary.get('omitted_by_row_step_pixel_count', 0):,}. "
             f"{risk_note} Порядок: сверху вниз, внутри строки слева направо."
         )
+
+    def fit_to_paint_budget(self) -> None:
+        if self.quantization_result is None or self.palette_profile is None:
+            self.use_latest_quantization()
+            if self.quantization_result is None or self.palette_profile is None:
+                return
+        try:
+            stroke_overhead = self._parse_model_number(
+                self.paint_overhead_var.get(), "Дополнительный расход на штрих"
+            )
+            paint_budget = self._parse_model_number(
+                self.paint_budget_var.get(), "Оценочный запас краски"
+            )
+            target_usage = self._parse_model_number(
+                self.paint_target_usage_var.get(), "Целевой расход бюджета"
+            )
+            optimized_result, row_step, row_offset, report = fit_result_to_paint_budget(
+                self.quantization_result,
+                self.palette_profile,
+                paint_budget_px_equivalent=paint_budget,
+                stroke_overhead_px_equivalent=stroke_overhead,
+                target_usage_percent=target_usage,
+            )
+            plan = build_color_scanline_plan(
+                optimized_result.index_map,
+                self.palette_profile,
+                source_report=optimized_result.report,
+                source_name=self.source_name,
+                row_step_px=row_step,
+                row_offset_px=row_offset,
+                paint_stroke_overhead_px_equivalent=stroke_overhead,
+                paint_budget_px_equivalent=paint_budget,
+                plan_name="Цветной план, автоматически подогнанный под запас краски",
+            )
+        except (
+            PaintBudgetOptimizationError, ColorScanlinePlanError, ValueError, TypeError, MemoryError
+        ) as exc:
+            messagebox.showerror(
+                "Не удалось уложить изображение в запас краски", str(exc), parent=self.root
+            )
+            self.status_var.set(f"Автооптимизация не выполнена: {exc}")
+            return
+
+        # fit_result_to_paint_budget returns a new object, leaving Stage 18's shared result intact.
+        self.quantization_result = optimized_result
+        self.quantization_report = optimized_result.report
+        self._auto_fit_row_step = row_step
+        self._auto_fit_row_offset = row_offset
+        self.row_step_var.set(str(row_step))
+        available_steps = {str(value) for value in self.row_step_combo["values"]}
+        if str(row_step) not in available_steps:
+            self.row_step_combo.configure(
+                values=tuple(sorted(available_steps | {str(row_step)}, key=int))
+            )
+        prefix = (
+            f"Автооптимизация: блок {report['block_size_px']} px; "
+            f"цветов {report['used_color_count_before']}→{report['used_color_count_after']}; "
+            f"штрихов {report['stroke_count_before']:,}→{report['stroke_count_after']:,}; "
+            f"оценка {report['estimated_ink_after_px_equivalent']:,.0f}/"
+            f"{report['target_cost_px_equivalent']:,.0f} px-экв."
+        )
+        if report.get("fallback_used"):
+            prefix += "; применён резервный режим с максимальным упрощением."
+        self._display_built_plan(plan, optimized_result.index_map, status_prefix=prefix)
 
     def save_brush_plan_dialog(self) -> None:
         if self.brush_plan is None:
@@ -554,6 +661,8 @@ class ColorScanlineTab:
             return
         self.plan = plan
         self.plan_path = Path(selected).resolve()
+        self._auto_fit_row_step = None
+        self._auto_fit_row_offset = 0
         self.plan_index_map = None
         self.brush_plan = None
         self.brush_summary_var.set(
