@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 import geometry_color_plan as geometry_module
 import geometry_budget_optimizer as budget_module
+from layer_segmentation import filter_small_components
 
 from geometry_color_plan import (
     GeometryColorPlanError,
@@ -886,3 +887,16 @@ def test_stroke_router_does_not_modify_source_paths_or_metadata():
 
     assert strokes == original
     assert len(ordered) == len(original)
+
+
+
+def test_component_filter_scales_to_tens_of_thousands_of_isolated_pixels():
+    mask = np.zeros((300, 300), dtype=np.uint8)
+    mask[::2, ::2] = 1
+    expected_component_count = 150 * 150
+
+    filtered, removed_pixels = filter_small_components(mask, min_component_area=2)
+
+    assert filtered.dtype == np.uint8
+    assert int(filtered.sum()) == 0
+    assert removed_pixels == expected_component_count
