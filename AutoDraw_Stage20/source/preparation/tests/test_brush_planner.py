@@ -36,8 +36,11 @@ class AdaptiveBrushPlannerTests(unittest.TestCase):
         self.assertEqual(len(planned), 3)
         self.assertEqual([item["brush"]["role"] for item in planned], ["leading_edge", "interior", "trailing_edge"])
         self.assertEqual([planned[i]["brush"]["value"] for i in range(3)], [1, 20, 1])
-        self.assertTrue(all(item["brush"]["safe_to_execute"] for item in planned))
-        self.assertTrue(result["summary"]["ready_for_automatic_execution"])
+        self.assertTrue(all(not item["brush"]["safe_to_execute"] for item in planned))
+        self.assertTrue(result["brush_configuration"]["calibration_confirmed"])
+        self.assertFalse(result["brush_configuration"]["automatic_execution_allowed"])
+        self.assertFalse(result["summary"]["ready_for_automatic_execution"])
+        self.assertEqual(len(result["summary"]["execution_blockers"]), 2)
         validate_adaptive_brush_plan(result)
 
     def test_wide_brush_does_not_cross_adjacent_horizontal_color(self):
@@ -65,6 +68,7 @@ class AdaptiveBrushPlannerTests(unittest.TestCase):
         result = build_adaptive_brush_plan(indexes, source)
         self.assertFalse(result["brush_configuration"]["automatic_execution_allowed"])
         self.assertTrue(all(not item["brush"]["safe_to_execute"] for item in result["strokes"]))
+        self.assertFalse(result["summary"]["ready_for_automatic_execution"])
 
     def test_transparency_is_not_treated_as_same_color(self):
         indexes = np.zeros((30, 80), dtype=np.int32)

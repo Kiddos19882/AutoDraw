@@ -12,6 +12,7 @@ from paint_cost_model import (
     DEFAULT_PAINT_BUDGET_PX_EQUIVALENT, DEFAULT_STROKE_OVERHEAD_PX_EQUIVALENT,
     estimate_color_plan_paint_cost,
 )
+from brush_planner import BrushPlannerError, build_adaptive_brush_plan
 
 from color_scanline import (
     ColorScanlinePlanError,
@@ -83,7 +84,14 @@ class ColorScanlineTab:
         self.source_name: str | None = None
         self.plan: dict[str, Any] | None = None
         self.plan_path: Path | None = None
+        self.plan_index_map = None
+        self.brush_plan: dict[str, Any] | None = None
         self.row_step_var = tk.StringVar(value="1")
+        self.brush_min_var = tk.StringVar(value="1")
+        self.brush_max_var = tk.StringVar(value="20")
+        self.brush_scale_x_var = tk.StringVar(value="1.0")
+        self.brush_scale_y_var = tk.StringVar(value="1.0")
+        self.brush_scale_calibrated_var = tk.BooleanVar(value=False)
         self.paint_overhead_var = tk.StringVar(value=f"{DEFAULT_STROKE_OVERHEAD_PX_EQUIVALENT:.2f}")
         self.paint_budget_var = tk.StringVar(value=f"{DEFAULT_PAINT_BUDGET_PX_EQUIVALENT:.0f}")
 
@@ -132,6 +140,39 @@ class ColorScanlineTab:
         )
         self.paint_model_explanation.pack(side="top", anchor="w", fill="x", pady=(6, 0))
 
+        brush_frame = ttk.LabelFrame(outer, text="Адаптивный подбор кистей — предварительные рекомендации", padding=(7, 5))
+        brush_frame.pack(fill="x", pady=(0, 7))
+        brush_controls = ttk.Frame(brush_frame)
+        brush_controls.pack(side="top", anchor="w", fill="x")
+        ttk.Label(brush_controls, text="Мин. кисть").pack(side="left")
+        ttk.Combobox(
+            brush_controls, textvariable=self.brush_min_var,
+            values=tuple(str(value) for value in range(1, 21)), state="readonly", width=3,
+        ).pack(side="left", padx=(4, 10))
+        ttk.Label(brush_controls, text="Макс. кисть").pack(side="left")
+        ttk.Combobox(
+            brush_controls, textvariable=self.brush_max_var,
+            values=tuple(str(value) for value in range(1, 21)), state="readonly", width=3,
+        ).pack(side="left", padx=(4, 10))
+        ttk.Label(brush_controls, text="X: px карты на единицу кисти").pack(side="left")
+        ttk.Entry(brush_controls, textvariable=self.brush_scale_x_var, width=6).pack(side="left", padx=(4, 8))
+        ttk.Label(brush_controls, text="Y:").pack(side="left")
+        ttk.Entry(brush_controls, textvariable=self.brush_scale_y_var, width=6).pack(side="left", padx=(4, 8))
+        ttk.Checkbutton(
+            brush_controls,
+            text="Масштаб кисти откалиброван по доске",
+            variable=self.brush_scale_calibrated_var,
+        ).pack(side="left", padx=(2, 8))
+        ttk.Button(
+            brush_controls, text="Рассчитать рекомендации", command=self.build_brush_recommendations,
+        ).pack(side="left")
+        self.brush_summary_var = tk.StringVar(
+            value="Рекомендации не рассчитаны. Масштаб 1.0 — начальное предположение, не измерение."
+        )
+        ttk.Label(brush_frame, textvariable=self.brush_summary_var, wraplength=1120, justify="left").pack(
+            side="top", anchor="w", fill="x", pady=(5, 0)
+        )
+
         self.source_var = tk.StringVar(value="Результат этапа 18 не загружен.")
         ttk.Label(outer, textvariable=self.source_var, wraplength=1120).pack(anchor="w", pady=(0, 6))
         self.preview = _PlanPreview(outer, "Предпросмотр по цветам штрихов")
@@ -166,6 +207,9 @@ class ColorScanlineTab:
         self.source_name = None
         self.plan = None
         self.plan_path = None
+        self.plan_index_map = None
+        self.brush_plan = None
+        self.brush_summary_var.set("Источник сброшен; пересчитайте исходное изображение перед подбором кистей.")
         self.preview.set_image(None)
         for row in self.table.get_children():
             self.table.delete(row)
@@ -220,6 +264,9 @@ class ColorScanlineTab:
         self.source_name = str(data.get("source_name") or "Результат этапа 18")
         self.plan = None
         self.plan_path = None
+        self.plan_index_map = None
+        self.brush_plan = None
+        self.brush_summary_var.set("Источник обновлён. Постройте цветной план, затем рассчитайте рекомендации кистей.")
         self.preview.set_image(None)
         for row in self.table.get_children():
             self.table.delete(row)
@@ -253,6 +300,9 @@ class ColorScanlineTab:
             return
         self.plan = plan
         self.plan_path = None
+        self.plan_index_map = self.quantization_result.index_map.copy()
+        self.brush_plan = None
+        self.brush_summary_var.set("Цветной план построен. Рассчитайте рекомендации кистей; без подтверждённого масштаба они останутся предварительными.")
         self.preview.set_image(render_color_scanline_preview(plan))
         self._populate_table(plan)
         summary = plan["summary"]
@@ -281,6 +331,60 @@ class ColorScanlineTab:
             f"Цветной план построен. Шаг строк {plan['generation']['row_step_px']} px; "
             f"пропущено пикселей по шагу строк: {summary.get('omitted_by_row_step_pixel_count', 0):,}. "
             f"{risk_note} Порядок: сверху вниз, внутри строки слева направо."
+        )
+
+    def build_brush_recommendations(self) -> None:
+        if self.plan is None:
+            messagebox.showinfo("Нет цветного плана", "Сначала постройте или откройте цветной план.", parent=self.root)
+            return
+        if self.plan_index_map is None:
+            messagebox.showwarning(
+                "Нет исходной карты цветов",
+                "Для безопасной проверки отпечатка кисти нужна точная карта индексов этапа 18. "
+                "Передайте актуальный результат из этапа 18 и заново постройте цветной план.",
+                parent=self.root,
+            )
+            self.brush_summary_var.set("Нельзя проверить кисти для загруженного JSON: исходная карта цветов не связана с этим планом.")
+            return
+        try:
+            min_value = int(self.brush_min_var.get())
+            max_value = int(self.brush_max_var.get())
+            scale_x = self._parse_model_number(self.brush_scale_x_var.get(), "Масштаб кисти по X")
+            scale_y = self._parse_model_number(self.brush_scale_y_var.get(), "Масштаб кисти по Y")
+            candidate = build_adaptive_brush_plan(
+                self.plan_index_map,
+                self.plan,
+                brush_scale_x=scale_x,
+                brush_scale_y=scale_y,
+                min_brush_value=min_value,
+                max_brush_value=max_value,
+                calibration_confirmed=bool(self.brush_scale_calibrated_var.get()),
+            )
+        except (BrushPlannerError, ValueError, TypeError, MemoryError) as exc:
+            messagebox.showerror("Не удалось подобрать кисти", str(exc), parent=self.root)
+            self.brush_summary_var.set(f"Ошибка подбора кистей: {exc}")
+            return
+        self.brush_plan = candidate
+        summary = candidate["summary"]
+        configuration = candidate["brush_configuration"]
+        per_brush = summary.get("stroke_count_by_brush", {})
+        brush_counts = ", ".join(f"{size}: {count:,}" for size, count in per_brush.items()) or "нет"
+        calibration_text = (
+            "масштаб помечен как откалиброванный" if configuration["calibration_confirmed"]
+            else "масштаб НЕ откалиброван; расчёт предварительный"
+        )
+        self.brush_summary_var.set(
+            f"Рекомендуемые штрихи: {summary['planned_stroke_count']:,} "
+            f"(исходно {summary['source_stroke_count']:,}; изменение {summary['additional_stroke_count']:+,}). "
+            f"Кисти по значениям: {brush_counts}. Переключений размера по порядку плана: "
+            f"{summary['recommended_brush_switch_count']:,}. "
+            f"Разбито исходных штрихов: {summary['split_source_stroke_count']:,}; "
+            f"резерв без гарантии геометрической безопасности: {summary['legacy_fallback_source_stroke_count']:,}. "
+            f"Результат: {calibration_text}. Исполнение Stage 20 этим этапом не активируется."
+        )
+        self.status_var.set(
+            "Рекомендации кистей рассчитаны отдельно от исходного цветного плана. "
+            "JSON цветного плана и Stage 20 не изменены; реальный расход точек не проверен."
         )
 
     @staticmethod
@@ -414,6 +518,12 @@ class ColorScanlineTab:
             return
         self.plan = plan
         self.plan_path = Path(selected).resolve()
+        self.plan_index_map = None
+        self.brush_plan = None
+        self.brush_summary_var.set(
+            "Открыт JSON плана без связанной карты цветов. Для рекомендаций заново постройте план "
+            "из актуального результата этапа 18."
+        )
         generation = plan.get("generation", {})
         self.row_step_var.set(str(generation.get("row_step_px", 1)))
         model_config = generation.get("paint_cost_model", {})

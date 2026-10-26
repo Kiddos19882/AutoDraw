@@ -254,7 +254,9 @@ def build_adaptive_brush_plan(
             if len(output_strokes) >= MAX_BRUSH_PLAN_STROKES:
                 raise BrushPlannerError(f"План превысил лимит {MAX_BRUSH_PLAN_STROKES:,} штрихов.")
             chosen = planned["brush"]["value"]
-            planned["brush"]["safe_to_execute"] = bool(chosen is not None and calibration_confirmed)
+            # Geometry calibration alone does not calibrate the Stage 20 UI controls
+            # or connect this recommendation plan to the mouse executor.
+            planned["brush"]["safe_to_execute"] = False
             if chosen is not None:
                 per_brush[chosen] += 1
                 if previous_brush is not None and previous_brush != chosen:
@@ -274,7 +276,11 @@ def build_adaptive_brush_plan(
             "scale_x_source_px_per_game_unit": scale_x,
             "scale_y_source_px_per_game_unit": scale_y,
             "calibration_confirmed": calibration_confirmed,
-            "automatic_execution_allowed": calibration_confirmed and fallback_source_strokes == 0,
+            "automatic_execution_allowed": False,
+            "execution_blockers": [
+                "План кистей ещё не подключён к исполнителю Stage 20.",
+                "Координаты и управление ползунком кисти в Stage 20 не откалиброваны.",
+            ],
             "safety_rule": "Весь проверяемый след кисти должен попадать на тот же palette_index; границы разбиваются на тонкие края и безопасную внутреннюю часть.",
         },
         "summary": {
@@ -286,7 +292,12 @@ def build_adaptive_brush_plan(
             "recommended_brush_switch_count": brush_switch_count,
             "stroke_count_by_brush": {str(k): per_brush[k] for k in sorted(per_brush)},
             "geometry_safety_confirmed": fallback_source_strokes == 0,
-            "ready_for_automatic_execution": calibration_confirmed and fallback_source_strokes == 0,
+            "geometry_calibration_confirmed": calibration_confirmed,
+            "ready_for_automatic_execution": False,
+            "execution_blockers": [
+                "План кистей ещё не подключён к исполнителю Stage 20.",
+                "Координаты и управление ползунком кисти в Stage 20 не откалиброваны.",
+            ],
             "note": (
                 "Размеры кисти назначены консервативно. Этот этап сохраняет исходное покрытие, "
                 "но может разделять длинные штрихи на края и внутреннюю часть. Следующим этапом "
