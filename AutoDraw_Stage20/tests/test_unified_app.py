@@ -863,7 +863,7 @@ class UnifiedAppCoreTests(unittest.TestCase):
                     )
                     self.assertEqual(app.notebook.select(), str(app.execution_tab))
                     self.assertTrue(app.executor.plan_path.is_file())
-                    self.assertEqual(app.executor.plan_path.parent, Path(temp) / "runtime")
+                    self.assertEqual(app.executor.plan_path.parent, Path(temp).resolve() / "runtime")
                     self.assertIsNotNone(app.executor.source_plan)
                     self.assertEqual(
                         [stroke.metadata["palette_index"] for stroke in app.executor.source_plan.strokes],
