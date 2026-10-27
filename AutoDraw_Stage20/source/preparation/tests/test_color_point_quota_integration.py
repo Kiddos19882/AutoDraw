@@ -29,6 +29,7 @@ class ColorPointQuotaIntegrationTests(unittest.TestCase):
         estimate = plan["summary"]["point_quota_estimate"]
         model = plan["generation"]["point_quota_model"]
 
+        self.assertEqual(model["board_item_type"], "BoardItem2")
         self.assertEqual(model["board_point_limit"], 6_000)
         self.assertEqual(model["point_step_px"], 2.0)
         self.assertEqual(model["point_delay_ms"], 10)
