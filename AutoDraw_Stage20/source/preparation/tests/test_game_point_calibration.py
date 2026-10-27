@@ -50,7 +50,10 @@ def test_historical_series_produces_finite_positive_point_model():
     assert model["equivalent_path_overhead_px_per_stroke"] > 0
     assert model["theoretical_points_per_path_px_from_measured_fps"] == 0.24
     assert model["maximum_fit_error_percent_of_quota"] < 10
-    assert model["fitting_method"] == "least_squares_on_cutoff_interval_midpoints_v1"
+    assert model["fitting_method"] == "interval_constrained_least_squares_v1"
+    assert model["interval_fit"]["status"] == "feasible"
+    assert model["interval_fit"]["feasible_vertex_count"] > 0
+    assert model["midpoint_reference_coefficients"]["points_per_path_px"] > 0
     assert model["all_cutoff_intervals_consistent"] is True
     assert model["cutoff_interval_consistent_run_count"] == 4
     assert all(run["cutoff_interval_contains_quota"] for run in model["per_run_fit"])
