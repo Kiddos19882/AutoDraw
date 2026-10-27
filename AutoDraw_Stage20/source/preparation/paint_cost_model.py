@@ -131,11 +131,12 @@ def estimate_color_plan_paint_cost(
     stroke_overhead_px_equivalent: float = DEFAULT_STROKE_OVERHEAD_PX_EQUIVALENT,
     paint_budget_px_equivalent: float = DEFAULT_PAINT_BUDGET_PX_EQUIVALENT,
 ) -> dict[str, Any]:
-    """Estimate both whole-plan and per-color consumption for a color plan.
+    """Estimate whole-plan equivalent-pixel cost plus diagnostic per-color breakdowns.
 
-    The experiment used only one color, so the game may have either one shared
-    pool or an independent pool per selected color. Return both interpretations
-    instead of pretending the experiment has established which one is true.
+    The engine counts all saved points in one BoardPane.atom.points list, so the
+    game has one shared coordinate quota for the drawing. Per-color entries below
+    are diagnostics that show the contribution of each color against the same
+    reference budget; they are not independent in-game supplies.
     """
     if not isinstance(plan, dict) or not isinstance(plan.get("summary"), dict):
         raise ValueError("Не найден summary цветного плана.")
