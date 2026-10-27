@@ -12,6 +12,7 @@ on:
       - "AutoDraw_Stage20/tests/**"
       - "AutoDraw_Stage20/build_windows.bat"
       - "AutoDraw_Stage20/build_windows.py"
+      - "AutoDraw_Stage20/app_features.json"
       - "AutoDraw_Stage20/run_all_tests.py"
       - "AutoDraw_Stage20/requirements-build.txt"
       - "AutoDraw_Stage20/requirements-runtime.txt"
