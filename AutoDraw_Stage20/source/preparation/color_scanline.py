@@ -12,6 +12,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 from palette_quantization import PaletteQuantizationError, normalize_palette
+from board_resource_model import DEFAULT_POINT_SAFETY_FACTOR, get_board_point_limit
 from paint_cost_model import (
     DEFAULT_PAINT_BUDGET_PX_EQUIVALENT, DEFAULT_STROKE_OVERHEAD_PX_EQUIVALENT,
     estimate_color_plan_paint_cost,
