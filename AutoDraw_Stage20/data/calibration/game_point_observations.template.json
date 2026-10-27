@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "updated_at": null,
+  "browser": {
+    "label": "Укажи браузер и версию",
+    "frame_probe": {
+      "duration_ms": null,
+      "frame_count": null,
+      "average_fps": null,
+      "median_fps": null,
+      "median_frame_interval_ms": null,
+      "p95_frame_interval_ms": null,
+      "long_frame_over_1_5x_median_percent": null,
+      "document_visibility": "visible",
+      "device_pixel_ratio": null,
+      "viewport": {
+        "width": null,
+        "height": null
+      },
+      "nominal_game_stage_fps": null,
+      "probe_kind": "requestAnimationFrame_cadence_not_internal_engine_counter"
+    }
+  },
+  "runs": [
+    {
+      "run_id": "BoardItem2-length650-repeat1",
+      "board_item_type": "BoardItem2",
+      "board_point_limit": 6000,
+      "point_step_px": 2.0,
+      "point_delay_ms": 10,
+      "scenario_id": "length_650",
+      "stroke_length_px": 650,
+      "planned_strokes": 40,
+      "planned_path_length_px": 26000,
+      "outcome": "partial",
+      "last_visible_strokes": 39,
+      "visible_path_length_px": 25350,
+      "fresh_supply_confirmed": true,
+      "repeat_index": 1,
+      "notes": "Пример записи; замени значения результатом реального запуска."
+    }
+  ]
+}
