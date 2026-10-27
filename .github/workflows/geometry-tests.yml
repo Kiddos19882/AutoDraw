@@ -34,6 +34,11 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt -r ..\executor\requirements.txt pytest
+      - name: Diagnose reference image from master
+        shell: pwsh
+        run: |
+          git fetch origin master --depth=1
+          python ..\..\tests\diagnose_reference_image.py --git-ref origin/master --git-path AutoDraw_Stage20/testImages/images.png --target-width 646 --target-height 323 --fit-mode contain
       - name: Run preparation and geometry tests
         run: python -m pytest -q tests
 
