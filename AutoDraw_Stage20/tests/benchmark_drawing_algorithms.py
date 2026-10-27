@@ -26,8 +26,10 @@ from paint_budget_optimizer import fit_result_to_paint_budget  # noqa: E402
 from palette_quantization import (  # noqa: E402
     PaletteQuantizationResult,
     normalize_palette,
+    quantize_image_to_palette,
     remove_edge_connected_background,
 )
+from drawing_algorithm_benchmark import load_palette_document  # noqa: E402
 
 
 def load_git_image(ref: str, repo_path: str) -> Image.Image:
@@ -50,8 +52,14 @@ def make_index_map(
     fit_mode: str,
     quantize_colors: int,
     background_mode: str,
+    palette: list[dict[str, Any]] | None = None,
+    palette_info: dict[str, Any] | None = None,
 ) -> tuple[np.ndarray, list[dict[str, Any]], dict[str, Any], Image.Image]:
-    """Create one deterministic benchmark map shared by every path planner."""
+    """Create one deterministic map shared by every path planner.
+
+    The normal path uses the saved browser palette and CIEDE2000 mapping.
+    MEDIANCUT remains available only with --synthetic-palette for comparison tests.
+    """
     fitted = fit_to_canvas(source_image, width, height, fit_mode)
     if background_mode == "edge-connected":
         background_result = remove_edge_connected_background(fitted, tolerance=24)
@@ -65,17 +73,42 @@ def make_index_map(
             "note": "Фон сохранён; это влияет на число видимых пикселей и работу геометрических методов.",
         }
 
+    if palette is not None:
+        quantized = quantize_image_to_palette(working, palette)
+        index_map = np.asarray(quantized.index_map, dtype=np.int32)
+        report = {
+            "original_size": {"width": source_image.width, "height": source_image.height},
+            "target_size": {"width": width, "height": height},
+            "fit_mode": fit_mode,
+            "background_mode": background_mode,
+            "background_report": background_report,
+            "quantization_algorithm": "saved browser palette + CIELAB/CIEDE2000 nearest color; no dithering",
+            "requested_palette_colors": len(palette),
+            "used_palette_colors": int(np.unique(index_map[index_map >= 0]).size),
+            "browser_palette_used": True,
+            "palette_source": palette_info or {},
+            "palette_quantization_report": quantized.report,
+            "source_visible_pixel_count": int(np.count_nonzero(index_map >= 0)),
+            "palette_note": (
+                "Все планировщики используют один и тот же снимок карты цветов, построенный "
+                "по сохранённым образцам игровой палитры. Геометрические планы не выполняют "
+                "дополнительную квантовку."
+            ),
+        }
+        return index_map, palette, report, quantized.image
+
+    # Explicit optional baseline: synthetic colors derived from the source image.
     rgb_image = working.convert("RGB")
-    quantized = rgb_image.quantize(
+    quantized_image = rgb_image.quantize(
         colors=quantize_colors,
         method=Image.Quantize.MEDIANCUT,
         dither=Image.Dither.NONE,
     )
-    source_indexes = np.asarray(quantized, dtype=np.int32).copy()
+    source_indexes = np.asarray(quantized_image, dtype=np.int32).copy()
     alpha = np.asarray(working.getchannel("A"), dtype=np.uint8)
     source_indexes[alpha == 0] = -1
 
-    raw_palette = quantized.getpalette()
+    raw_palette = quantized_image.getpalette()
     if not raw_palette:
         raise ValueError("Pillow не вернул палитру для benchmark-изображения.")
 
@@ -105,18 +138,17 @@ def make_index_map(
         "fit_mode": fit_mode,
         "background_mode": background_mode,
         "background_report": background_report,
-        "quantization_algorithm": "Pillow MEDIANCUT, no dithering",
+        "quantization_algorithm": "Pillow MEDIANCUT, no dithering (synthetic baseline)",
         "requested_palette_colors": quantize_colors,
         "used_palette_colors": len(palette),
         "browser_palette_used": False,
+        "palette_source": None,
         "palette_note": (
-            "Палитра детерминированно получена из эталонного изображения, поскольку в сохранённом "
-            "профиле рабочего пространства нет RGB-образцов настоящей браузерной палитры. "
-            "Все планировщики получают одну и ту же готовую карту цветов."
+            "Синтетическая палитра создана из эталонного изображения; она не является палитрой браузерной игры."
         ),
         "source_visible_pixel_count": int(np.count_nonzero(compact_indexes >= 0)),
     }
-    return compact_indexes, palette, report, fitted
+    return compact_indexes, palette, report, working
 
 
 def _resolved_path(raw_path: str) -> Path:
@@ -172,7 +204,17 @@ def main() -> int:
     parser.add_argument("--target-width", type=int, default=646)
     parser.add_argument("--target-height", type=int, default=323)
     parser.add_argument("--fit-mode", choices=("contain", "cover", "stretch"), default="contain")
-    parser.add_argument("--quantize-colors", type=int, default=8)
+    parser.add_argument("--quantize-colors", type=int, default=8, help="Color count only for --synthetic-palette.")
+    parser.add_argument(
+        "--palette-json",
+        default="AutoDraw_Stage20/data/palettes/profiles/Browser_palette.autodraw-palette.json",
+        help="Saved browser palette/profile JSON; uses CIEDE2000 to map the source image to these exact colors.",
+    )
+    parser.add_argument(
+        "--synthetic-palette",
+        action="store_true",
+        help="Use an optional MEDIANCUT palette generated from the image instead of the saved game palette.",
+    )
     parser.add_argument(
         "--background-mode",
         choices=("preserve", "edge-connected"),
@@ -207,6 +249,20 @@ def main() -> int:
         parser.error("safety-factor must be greater than 0 and at most 1.")
 
     source_image = load_git_image(args.git_ref, args.git_path)
+    benchmark_palette = None
+    palette_info = None
+    if not args.synthetic_palette:
+        palette_path = _resolved_path(args.palette_json)
+        benchmark_palette, palette_info = load_palette_document(palette_path)
+        print(
+            f"Using saved browser palette: {palette_info['palette_name']} "
+            f"({palette_info['palette_color_count']} colors) from {palette_path}"
+        )
+        if palette_info.get("missing_required_colors"):
+            print(
+                "Palette warning: expected base colors missing: "
+                + ", ".join(palette_info["missing_required_colors"])
+            )
     index_map, palette, image_report, fitted_image = make_index_map(
         source_image,
         width=args.target_width,
@@ -214,6 +270,8 @@ def main() -> int:
         fit_mode=args.fit_mode,
         quantize_colors=args.quantize_colors,
         background_mode=args.background_mode,
+        palette=benchmark_palette,
+        palette_info=palette_info,
     )
     point_limit = get_board_point_limit(args.board_item_type)
     source_name = f"{args.git_ref}:{args.git_path}"
@@ -249,9 +307,8 @@ def main() -> int:
     )
     plans.append(("scanline", raw_scanline))
 
-    quantized_rgb = np.asarray(fitted_image.convert("RGB"), dtype=np.uint8)
     palette_result = PaletteQuantizationResult(
-        image=Image.fromarray(quantized_rgb, mode="RGB"),
+        image=render_index_map_png(index_map, palette),
         index_map=index_map,
         report={"source_name": source_name, "benchmark_input": image_report},
     )
@@ -336,7 +393,7 @@ def main() -> int:
         },
         "interpretation_limits": [
             "This run uses one shared index map, so differences reflect planning strategies rather than different input colors.",
-            "The benchmark palette is generated from the reference image with Pillow MEDIANCUT; it is not the browser game's palette.",
+            "By default the map is quantized to the saved browser palette with CIELAB/CIEDE2000; use --synthetic-palette only for a synthetic comparison.",
             "Coverage is rasterized with a 1 px line and does not simulate the game's actual brush width.",
             "Point and ink values are estimates and must be checked against a controlled browser run.",
         ],

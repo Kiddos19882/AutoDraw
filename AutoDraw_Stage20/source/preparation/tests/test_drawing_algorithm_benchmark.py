@@ -57,3 +57,47 @@ def test_benchmark_reports_both_resource_estimates_and_visual_metrics():
     assert metrics["paint_cost_estimate"]["estimated_total_ink_px_equivalent"] > 0
     assert metrics["point_quota_estimate"]["estimated_point_count"] > 0
     assert metrics["point_quota_estimate"]["frame_rate_fps_is_nominal"] is True
+
+
+def test_load_palette_document_reads_confirmed_browser_profile(tmp_path):
+    import json
+
+    from drawing_algorithm_benchmark import load_palette_document
+
+    path = tmp_path / "browser-palette.json"
+    path.write_text(json.dumps({
+        "profile_schema_version": 1,
+        "profile_name": "Browser palette",
+        "metadata": {"source": "desktop-screenshot", "method": "screenshot-assisted"},
+        "colors": [
+            {"id": "dark", "name": "Dark", "rgb": [27, 27, 27], "hex": "#1B1B1B", "status": "confirmed"},
+            {"id": "white", "name": "White", "rgb": [255, 255, 255], "hex": "#FFFFFF", "status": "corrected"},
+        ],
+    }), encoding="utf-8")
+
+    palette, report = load_palette_document(path)
+
+    assert [item["hex"] for item in palette] == ["#1B1B1B", "#FFFFFF"]
+    assert report["palette_name"] == "Browser palette"
+    assert report["palette_color_count"] == 2
+    assert report["confirmed_color_count"] == 2
+    assert report["has_exact_black"] is False
+    assert report["has_exact_white"] is True
+
+
+def test_load_palette_document_rejects_unconfirmed_colors(tmp_path):
+    import json
+    import pytest
+
+    from drawing_algorithm_benchmark import load_palette_document
+
+    path = tmp_path / "unconfirmed.json"
+    path.write_text(json.dumps({
+        "profile_schema_version": 1,
+        "colors": [
+            {"id": "red", "name": "Red", "rgb": [255, 0, 0], "hex": "#FF0000", "status": "detected"},
+        ],
+    }), encoding="utf-8")
+
+    with pytest.raises(ValueError, match="неподтверждённые цвета"):
+        load_palette_document(path)

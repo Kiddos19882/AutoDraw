@@ -2,9 +2,11 @@
 from __future__ import annotations
 
 import math
+from pathlib import Path
 from typing import Any
 
 import numpy as np
+from palette_quantization import normalize_palette
 from PIL import Image, ImageDraw
 
 from board_resource_model import DEFAULT_POINT_SAFETY_FACTOR, get_board_point_limit
