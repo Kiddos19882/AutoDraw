@@ -135,6 +135,7 @@ def build_engine_point_calibration_report(
     empirical_residuals = [abs(item["empirical_residual_points"]) for item in observation_results]
     theoretical_residuals = [abs(item["theoretical_residual_points"]) for item in observation_results]
     nearest_deviation_percent = abs(theoretical_capacity - nearest_limit) / nearest_limit * 100.0
+    selected_deviation_percent = abs(theoretical_capacity - base_limit) / base_limit * 100.0
     spread_percent = (
         (
             float(fit["maximum_reconstructed_budget_px_equivalent"])
@@ -173,13 +174,15 @@ def build_engine_point_calibration_report(
         "point_limit_inference": {
             "selected_limit": base_limit,
             "is_inferred": is_inferred,
-            "is_verified_from_observation_metadata": not is_inferred,
+            "is_verified_from_observation_metadata": False,
+            "is_explicitly_supplied_by_caller": not is_inferred,
             "theoretical_capacity_points": round(theoretical_capacity, 2),
             "nearest_supported_limit": nearest_limit,
             "nearest_limit_deviation_percent": round(nearest_deviation_percent, 3),
+            "selected_limit_deviation_percent": round(selected_deviation_percent, 3),
             "consistency": (
-                "strong" if nearest_deviation_percent <= 5.0
-                else "plausible" if nearest_deviation_percent <= 15.0
+                "strong" if selected_deviation_percent <= 5.0
+                else "plausible" if selected_deviation_percent <= 15.0
                 else "weak"
             ),
             "supported_limits": list(SUPPORTED_BOARD_POINT_LIMITS),
