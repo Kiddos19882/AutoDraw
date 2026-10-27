@@ -51,6 +51,11 @@ def _stress_maps() -> dict[str, np.ndarray]:
     )
     transparent_noise[(transparent_x + 2 * transparent_y) % 7 < 3] = -1
 
+    # A mostly visible checkerboard with sparse transparent holes forces block
+    # optimization to choose a visible color around some transparent pixels.
+    transparent_checkerboard = ((transparent_x + transparent_y) % 2).astype(np.int32)
+    transparent_checkerboard[(transparent_x * 13 + transparent_y * 7) % 19 == 0] = -1
+
     thin_detail = np.full((height, width), -1, dtype=np.int32)
     thin_detail[19, 2:78] = (np.arange(76, dtype=np.int32) // 2) % 5
     thin_detail[20, 10:70] = 0
@@ -60,6 +65,7 @@ def _stress_maps() -> dict[str, np.ndarray]:
         "vertical_stripes": vertical_stripes,
         "noisy_palette": noisy,
         "transparent_noise": transparent_noise,
+        "transparent_checkerboard": transparent_checkerboard,
         "thin_detail": thin_detail,
     }
 
