@@ -258,6 +258,40 @@ class PaletteQuantizationTests(unittest.TestCase):
         self.assertEqual(int(np.count_nonzero(result.index_map == 1)), 1)
         self.assertFalse(result.report["dithering"])
 
+    def test_exact_five_color_source_does_not_expand_to_ten_used_colors(self):
+        # Regression baseline: a palette may contain ten or more available swatches,
+        # but a source image with exactly five RGB values cannot use more than five
+        # swatches after deterministic nearest-color mapping.
+        extra_palette_colors = [
+            {"name": "Бирюзовый", "hex": "#00FFFF", "rgb": [0, 255, 255], "id": "cyan"},
+            {"name": "Пурпурный", "hex": "#FF00FF", "rgb": [255, 0, 255], "id": "magenta"},
+            {"name": "Оранжевый", "hex": "#FFA500", "rgb": [255, 165, 0], "id": "orange"},
+            {"name": "Серый", "hex": "#808080", "rgb": [128, 128, 128], "id": "gray"},
+            {"name": "Оливковый", "hex": "#808000", "rgb": [128, 128, 0], "id": "olive"},
+        ]
+        source_colors = [RED, GREEN, BLUE, WHITE, BLACK]
+        palette = source_colors + extra_palette_colors
+
+        image = Image.new("RGB", (50, 25))
+        image.putdata([
+            tuple(source_colors[(x // 10 + y // 5) % len(source_colors)]["rgb"])
+            for y in range(image.height)
+            for x in range(image.width)
+        ])
+        source_unique_colors = set(image.getdata())
+        self.assertEqual(len(source_unique_colors), 5)
+
+        converted = quantize_image_to_palette(image, palette)
+        self.assertEqual(converted.report["palette_color_count"], 10)
+        self.assertEqual(converted.report["used_palette_color_count"], 5)
+
+        rare_optimized, _ = merge_rare_palette_colors(converted, palette)
+        self.assertLessEqual(rare_optimized.report["used_palette_color_count"], 5)
+
+        short_run_optimized, _ = optimize_short_scanline_runs(rare_optimized, palette)
+        self.assertLessEqual(short_run_optimized.report["used_palette_color_count"], 5)
+        self.assertEqual(short_run_optimized.image.size, image.size)
+
     def test_index_map_matches_palette_indices_and_counts(self):
         image = Image.new("RGB", (4, 1))
         image.putdata([(255, 0, 0), (240, 10, 10), (0, 255, 0), (5, 245, 5)])
