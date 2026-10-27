@@ -44,8 +44,12 @@ def _stress_maps() -> dict[str, np.ndarray]:
     checkerboard = ((x + y) % 2).astype(np.int32)
     vertical_stripes = ((x // 2 + y // 3) % 5).astype(np.int32)
     noisy = random
-    transparent_noise = random.copy()
-    transparent_noise[(x + 2 * y) % 7 < 3] = -1
+    transparent_height, transparent_width = 100, 160
+    transparent_y, transparent_x = np.indices((transparent_height, transparent_width))
+    transparent_noise = np.random.default_rng(2027).integers(
+        0, 5, size=(transparent_height, transparent_width), dtype=np.int32
+    )
+    transparent_noise[(transparent_x + 2 * transparent_y) % 7 < 3] = -1
 
     thin_detail = np.full((height, width), -1, dtype=np.int32)
     thin_detail[19, 2:78] = (np.arange(76, dtype=np.int32) // 2) % 5
@@ -85,7 +89,12 @@ class OptimizerEndToEndTests(unittest.TestCase):
                     report["target_cost_px_equivalent"],
                 )
                 self.assertEqual(optimized.index_map.shape, source_indexes.shape)
-                self.assertEqual((optimized.image.width, optimized.image.height), (80, 40))
+                self.assertEqual(
+                    (optimized.image.width, optimized.image.height),
+                    (source_indexes.shape[1], source_indexes.shape[0]),
+                )
+                # Transparent input remains transparent in the executable index map.
+                self.assertTrue(np.all(optimized.index_map[source_indexes < 0] == -1))
                 self.assertGreaterEqual(row_step, 1)
                 self.assertGreaterEqual(row_offset, 0)
                 self.assertLess(row_offset, row_step)

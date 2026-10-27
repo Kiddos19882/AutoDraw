@@ -55,7 +55,14 @@ def _mode_block_map(indexes: np.ndarray, block_size: int) -> np.ndarray:
             # On a tie, keep a visible palette color rather than erasing the tile.
             visible = most_common[most_common >= 0]
             chosen = int(visible.min()) if visible.size else -1
-            output[y:y_end, x:x_end] = chosen
+
+            # Never turn transparent source pixels into drawable palette indexes.
+            # Execution builds strokes from index_map, not the preview's alpha channel.
+            output_block = output[y:y_end, x:x_end]
+            output_block.fill(-1)
+            if chosen >= 0:
+                original_visible = indexes[y:y_end, x:x_end] >= 0
+                output_block[original_visible] = chosen
     return output
 
 

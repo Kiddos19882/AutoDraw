@@ -40,7 +40,7 @@ After the recommendations have been calculated, use **Export brush plan JSON** t
 
 The automatic fitting step checks both the empirical ink-equivalent target and the estimated stored-point quota while selecting a candidate. The default BoardItem2 hard limit is 6,000 points; the conservative safety budget is 5,100 points (85%). A target above that safety budget is clamped rather than allowed to consume the reserve.
 
-A dedicated end-to-end regression test stresses checkerboard patterns, repeated stripes, seeded palette noise, transparent noise, and thin details. It then rebuilds the selected color scanline plan exactly as the UI does and asserts that the final plan's ink and point estimates match the optimization report. These deterministic fixtures exercise resource accounting; they do not replace a manual check against the actual browser palette and game canvas.
+A dedicated end-to-end regression test stresses checkerboard patterns, repeated stripes, seeded palette noise, a larger transparent-noise image that forces simplification, and thin details. It verifies that originally transparent pixels remain -1 in the executable index map, then rebuilds the selected color scanline plan exactly as the UI does and asserts that the final plan's ink and point estimates match the optimization report. These deterministic fixtures exercise resource accounting; they do not replace a manual check against the actual browser palette and game canvas.
 
 ## Automatic paint-budget fitting
 
