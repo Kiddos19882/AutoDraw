@@ -1,6 +1,11 @@
 from __future__ import annotations
 
+import json
+import os
+import subprocess
+import sys
 import unittest
+from pathlib import Path
 
 from engine_point_calibration import (
     DEFAULT_EXECUTOR_POINT_DELAY_MS,
@@ -13,6 +18,22 @@ from engine_point_calibration import (
 
 
 class EnginePointCalibrationTests(unittest.TestCase):
+    def test_cli_report_is_safe_for_legacy_windows_console_encoding(self):
+        script = Path(__file__).resolve().parents[3] / "tests" / "report_game_point_calibration.py"
+        env = os.environ.copy()
+        env["PYTHONIOENCODING"] = "cp1252"
+
+        completed = subprocess.run(
+            [sys.executable, str(script)],
+            env=env,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            encoding="ascii",
+            check=True,
+        )
+        report = json.loads(completed.stdout)
+        self.assertEqual(report["point_limit_inference"]["selected_limit"], 6_000)
+
     def test_default_executor_profile_matches_nominal_frame_sampling(self):
         self.assertEqual(GAME_ENGINE_DEFAULT_FRAME_RATE_FPS, 48.0)
         self.assertEqual(DEFAULT_EXECUTOR_POINT_STEP_PX, 2.0)
