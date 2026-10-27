@@ -39,6 +39,12 @@ jobs:
         run: |
           git fetch origin master --depth=1
           python ..\..\tests\diagnose_reference_image.py --git-ref origin/master --git-path AutoDraw_Stage20/testImages/images.png --target-width 646 --target-height 323 --fit-mode contain
+      - name: Report game point calibration under 10 ms and 20 ms profiles
+        shell: pwsh
+        run: |
+          python ..\..\tests\report_game_point_calibration.py
+          python ..\..\tests\report_game_point_calibration.py --calibration-point-delay-ms 20
+
       - name: Run preparation and geometry tests
         run: python -m pytest -q tests
 
