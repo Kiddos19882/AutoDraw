@@ -48,6 +48,11 @@ class EnginePointCalibrationTests(unittest.TestCase):
         self.assertLess(fit["budget_spread_percent"], 0.5)
         self.assertLess(report["validation"]["max_abs_empirical_residual_points"], 20.0)
         self.assertFalse(report["validation"]["historic_executor_profile_was_recorded"])
+        self.assertTrue(report["validation"]["historic_executor_profile_is_assumed"])
+        self.assertEqual(
+            [item["nearest_supported_limit"] for item in report["reference_profile_scenarios"]],
+            [6_000, 12_000],
+        )
 
     def test_historical_twenty_ms_profile_points_to_12000_quota(self):
         report = build_engine_point_calibration_report(
