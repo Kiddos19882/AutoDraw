@@ -192,11 +192,11 @@ def analyze_game_point_calibration(document: Any) -> dict[str, Any]:
             "distinct_stroke_lengths_px": distinct_lengths,
             "run_ids": [item["run_id"] for item in group],
         }
-        if len(group) < MIN_FIT_RUNS or len(distinct_lengths) < MIN_DISTINCT_LENGTHS:
+        if len(group) < MIN_FIT_RUNS:
             models.append({
                 **fit_base,
                 "fit_status": "insufficient_data",
-                "note": f"Нужно минимум {MIN_FIT_RUNS} частичных замеров и {MIN_DISTINCT_LENGTHS} разных длин штриха; рекомендуется серия из 650, 200, 50 и 10 px.",
+                "note": f"Нужно минимум {MIN_FIT_RUNS} частичных замеров; рекомендуется серия из 650, 200, 50 и 10 px.",
             })
             continue
         rank = int(np.linalg.matrix_rank(matrix))
@@ -205,7 +205,15 @@ def analyze_game_point_calibration(document: Any) -> dict[str, Any]:
                 **fit_base,
                 "fit_status": "underdetermined",
                 "matrix_rank": rank,
-                "note": "Нельзя отдельно оценить стоимость пути и накладные расходы на штрих: наблюдения линейно зависимы.",
+                "note": "Нельзя отдельно оценить стоимость пути и накладные расходы на штрих: наблюдения линейно зависимы. Используйте разные длины штриха.",
+            })
+            continue
+        if len(distinct_lengths) < MIN_DISTINCT_LENGTHS:
+            models.append({
+                **fit_base,
+                "fit_status": "insufficient_data",
+                "matrix_rank": rank,
+                "note": f"Нужно минимум {MIN_DISTINCT_LENGTHS} разных длин штриха; рекомендуется серия из 650, 200, 50 и 10 px.",
             })
             continue
 
