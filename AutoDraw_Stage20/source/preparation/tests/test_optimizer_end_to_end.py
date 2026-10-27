@@ -102,6 +102,11 @@ class OptimizerEndToEndTests(unittest.TestCase):
                 # Transparent input remains transparent in the executable index map.
                 self.assertTrue(np.all(optimized.index_map[source_indexes < 0] == -1))
                 self.assertGreaterEqual(row_step, 1)
+                if case_name == "transparent_checkerboard":
+                    self.assertGreater(
+                        row_step, 1,
+                        "This fixture must exercise block coarsening, not only baseline validation.",
+                    )
                 self.assertGreaterEqual(row_offset, 0)
                 self.assertLess(row_offset, row_step)
 
