@@ -92,7 +92,7 @@ def build_color_scanline_plan(
     point_step_px: float = DEFAULT_EXECUTOR_POINT_STEP_PX,
     point_delay_ms: int = DEFAULT_EXECUTOR_POINT_DELAY_MS,
     frame_rate_fps: float = GAME_ENGINE_DEFAULT_FRAME_RATE_FPS,
-    point_quota_safety_factor: float = 0.85,
+    point_quota_safety_factor: float = DEFAULT_POINT_SAFETY_FACTOR,
 ) -> dict[str, Any]:
     """Build color runs in strict top-to-bottom, left-to-right order.
 
