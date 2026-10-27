@@ -42,6 +42,18 @@ jobs:
       - name: Report confirmed game point calibration
         run: python ..\..\tests\report_game_point_calibration.py
 
+      - name: Benchmark drawing algorithms (Stage 5)
+        shell: pwsh
+        run: |
+          python ..\..\tests\benchmark_drawing_algorithms.py --git-ref origin/master --git-path AutoDraw_Stage20/testImages/images.png --target-width 646 --target-height 323 --quantize-colors 8 --background-mode edge-connected --target-usage-percent 75 --output AutoDraw_Stage20/benchmark-results/stage5-report.json --preview-dir AutoDraw_Stage20/benchmark-results/previews
+      - name: Upload Stage 5 benchmark report and previews
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage5-drawing-algorithm-benchmark
+          path: AutoDraw_Stage20/benchmark-results/
+          if-no-files-found: ignore
+
       - name: Run preparation and geometry tests
         run: python -m pytest -q -ra tests
 
