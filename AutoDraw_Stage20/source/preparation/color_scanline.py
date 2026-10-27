@@ -561,6 +561,36 @@ def validate_color_scanline_plan(plan: Any) -> dict[str, Any]:
         ):
             if stored_estimate.get(key) != expected_estimate.get(key):
                 raise ColorScanlinePlanError(f"Оценка расхода краски не соответствует геометрии плана: поле {key}.")
+    # Plans created after point-quota calibration persist both the model
+    # parameters and the estimate. Older saved plans without these fields remain
+    # compatible and are not silently rewritten during validation.
+    stored_point_estimate = summary.get("point_quota_estimate")
+    stored_point_model = generation.get("point_quota_model")
+    if stored_point_estimate is not None:
+        if not isinstance(stored_point_estimate, dict) or not isinstance(stored_point_model, dict):
+            raise ColorScanlinePlanError("Оценка игровой квоты точек или параметры модели повреждены.")
+        if stored_point_model.get("model_id") != POINT_QUOTA_MODEL_ID:
+            raise ColorScanlinePlanError("Неизвестная модель лимита игровых точек в цветном плане.")
+        try:
+            expected_point_estimate = estimate_point_quota_usage(
+                summary["drawing_length_px"],
+                len(raw_strokes),
+                board_point_limit=stored_point_model["board_point_limit"],
+                single_pixel_stroke_count=single_pixel_count,
+                point_step_px=stored_point_model["point_step_px"],
+                point_delay_ms=stored_point_model["point_delay_ms"],
+                frame_rate_fps=stored_point_model["frame_rate_fps"],
+                calibration_point_limit=stored_point_model["calibration_point_limit"],
+                calibration_point_step_px=stored_point_model["calibration_point_step_px"],
+                calibration_point_delay_ms=stored_point_model["calibration_point_delay_ms"],
+                calibration_frame_rate_fps=stored_point_model["calibration_frame_rate_fps"],
+                safety_factor=stored_point_model["safety_factor"],
+            )
+        except (KeyError, TypeError, ValueError) as exc:
+            raise ColorScanlinePlanError(f"Некорректные параметры модели игровых точек: {exc}") from exc
+        if stored_point_estimate != expected_point_estimate:
+            raise ColorScanlinePlanError("Оценка лимита игровых точек не соответствует геометрии плана.")
+
     return plan
 
 
