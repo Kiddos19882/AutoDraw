@@ -1,0 +1,794 @@
+{
+  "profile_schema_version": 1,
+  "profile_name": "Browser palette",
+  "created_at": "2026-10-26T23:35:31+00:00",
+  "updated_at": "2026-10-26T23:35:31+00:00",
+  "screen": {
+    "width": 1920,
+    "height": 1080
+  },
+  "region": {
+    "x": 480,
+    "y": 755,
+    "width": 940,
+    "height": 113
+  },
+  "colors": [
+    {
+      "name": "Цвет 3",
+      "hex": "#00FE01",
+      "rgb": [
+        0,
+        254,
+        1
+      ],
+      "screen_x": 555,
+      "screen_y": 771,
+      "local_x": 75,
+      "local_y": 16,
+      "source": "auto",
+      "id": "627586e2-e77c-4194-b50e-78e838b27df7",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 4",
+      "hex": "#01FEFE",
+      "rgb": [
+        1,
+        254,
+        254
+      ],
+      "screen_x": 584,
+      "screen_y": 771,
+      "local_x": 104,
+      "local_y": 16,
+      "source": "auto",
+      "id": "501434f6-d071-4d16-8da8-7234f8a24ccd",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 5",
+      "hex": "#0003FB",
+      "rgb": [
+        0,
+        3,
+        251
+      ],
+      "screen_x": 613,
+      "screen_y": 771,
+      "local_x": 133,
+      "local_y": 16,
+      "source": "auto",
+      "id": "bbdb4b9a-2c96-4ef9-bdd6-1b5fefea8c5c",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 6",
+      "hex": "#FF00FF",
+      "rgb": [
+        255,
+        0,
+        255
+      ],
+      "screen_x": 642,
+      "screen_y": 771,
+      "local_x": 162,
+      "local_y": 16,
+      "source": "auto",
+      "id": "eb8807cd-7390-488d-b04f-9cd54422edae",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 7",
+      "hex": "#E60213",
+      "rgb": [
+        230,
+        2,
+        19
+      ],
+      "screen_x": 964,
+      "screen_y": 771,
+      "local_x": 484,
+      "local_y": 16,
+      "source": "auto",
+      "id": "bedd746b-355c-435e-9c1d-3d2d18d069b5",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 9",
+      "hex": "#F59701",
+      "rgb": [
+        245,
+        151,
+        1
+      ],
+      "screen_x": 1022,
+      "screen_y": 771,
+      "local_x": 542,
+      "local_y": 16,
+      "source": "auto",
+      "id": "6b58de42-30fe-4fc5-9435-6c391aa4b892",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 20",
+      "hex": "#930784",
+      "rgb": [
+        147,
+        7,
+        132
+      ],
+      "screen_x": 1343,
+      "screen_y": 771,
+      "local_x": 863,
+      "local_y": 16,
+      "source": "auto",
+      "id": "7f85dab5-e615-419c-9869-1e34d788a52d",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 23",
+      "hex": "#FBF300",
+      "rgb": [
+        251,
+        243,
+        0
+      ],
+      "screen_x": 525,
+      "screen_y": 798,
+      "local_x": 45,
+      "local_y": 43,
+      "source": "auto",
+      "id": "efd2f6a2-8d6f-4221-8229-897876d6dd92",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 24",
+      "hex": "#049649",
+      "rgb": [
+        4,
+        150,
+        73
+      ],
+      "screen_x": 555,
+      "screen_y": 798,
+      "local_x": 75,
+      "local_y": 43,
+      "source": "auto",
+      "id": "680f4f0e-3a32-48b6-8621-48c37e9d1fec",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 26",
+      "hex": "#212086",
+      "rgb": [
+        33,
+        32,
+        134
+      ],
+      "screen_x": 613,
+      "screen_y": 798,
+      "local_x": 133,
+      "local_y": 43,
+      "source": "auto",
+      "id": "fa4ebed2-f8b0-4878-84c5-e26b58f3bf10",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 27",
+      "hex": "#E20085",
+      "rgb": [
+        226,
+        0,
+        133
+      ],
+      "screen_x": 642,
+      "screen_y": 798,
+      "local_x": 162,
+      "local_y": 43,
+      "source": "auto",
+      "id": "018d8c47-dec6-4ea2-8932-faa1e310642f",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 30",
+      "hex": "#AD6A01",
+      "rgb": [
+        173,
+        106,
+        1
+      ],
+      "screen_x": 1022,
+      "screen_y": 798,
+      "local_x": 542,
+      "local_y": 43,
+      "source": "auto",
+      "id": "22ddbcd4-93f5-4ab7-b932-5ffc00c27808",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 31",
+      "hex": "#B7AB01",
+      "rgb": [
+        183,
+        171,
+        1
+      ],
+      "screen_x": 1051,
+      "screen_y": 798,
+      "local_x": 571,
+      "local_y": 43,
+      "source": "auto",
+      "id": "f93c6847-a798-4e17-87a0-37f35d1e3ef5",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 32",
+      "hex": "#638C0C",
+      "rgb": [
+        99,
+        140,
+        12
+      ],
+      "screen_x": 1080,
+      "screen_y": 798,
+      "local_x": 600,
+      "local_y": 43,
+      "source": "auto",
+      "id": "c2ab9df1-074c-4483-a7ca-609e9a6966dc",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 35",
+      "hex": "#00736E",
+      "rgb": [
+        0,
+        115,
+        110
+      ],
+      "screen_x": 1168,
+      "screen_y": 798,
+      "local_x": 688,
+      "local_y": 43,
+      "source": "auto",
+      "id": "233076bc-d478-4a8b-887f-455dec90989e",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 42",
+      "hex": "#A5015B",
+      "rgb": [
+        165,
+        1,
+        91
+      ],
+      "screen_x": 1373,
+      "screen_y": 798,
+      "local_x": 893,
+      "local_y": 43,
+      "source": "auto",
+      "id": "33330940-f4d1-47a4-86c6-c10fbfb4980a",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 43",
+      "hex": "#F39B77",
+      "rgb": [
+        243,
+        155,
+        119
+      ],
+      "screen_x": 496,
+      "screen_y": 824,
+      "local_x": 16,
+      "local_y": 69,
+      "source": "auto",
+      "id": "db918d87-67bc-4c5b-bdda-fb25e97a189d",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 45",
+      "hex": "#F7CE8C",
+      "rgb": [
+        247,
+        206,
+        140
+      ],
+      "screen_x": 555,
+      "screen_y": 824,
+      "local_x": 75,
+      "local_y": 69,
+      "source": "auto",
+      "id": "92b02535-386d-4270-9669-3488c7761d06",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 49",
+      "hex": "#8CC798",
+      "rgb": [
+        140,
+        199,
+        152
+      ],
+      "screen_x": 671,
+      "screen_y": 824,
+      "local_x": 191,
+      "local_y": 69,
+      "source": "auto",
+      "id": "7121741f-52d1-43fc-b14c-57a14940e734",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 55",
+      "hex": "#AA89BE",
+      "rgb": [
+        170,
+        137,
+        190
+      ],
+      "screen_x": 847,
+      "screen_y": 824,
+      "local_x": 367,
+      "local_y": 69,
+      "source": "auto",
+      "id": "b5b90906-b34a-4d10-8eb2-6e259e8055e8",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 60",
+      "hex": "#802D01",
+      "rgb": [
+        128,
+        45,
+        1
+      ],
+      "screen_x": 993,
+      "screen_y": 824,
+      "local_x": 513,
+      "local_y": 69,
+      "source": "auto",
+      "id": "d4a19d6a-9ace-4897-91ea-052806bb17d8",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 64",
+      "hex": "#015E17",
+      "rgb": [
+        1,
+        94,
+        23
+      ],
+      "screen_x": 1110,
+      "screen_y": 824,
+      "local_x": 630,
+      "local_y": 69,
+      "source": "auto",
+      "id": "5b6c6eab-2b19-429b-b254-c2b03c5f77db",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 68",
+      "hex": "#013567",
+      "rgb": [
+        1,
+        53,
+        103
+      ],
+      "screen_x": 1227,
+      "screen_y": 824,
+      "local_x": 747,
+      "local_y": 69,
+      "source": "auto",
+      "id": "9b0830d1-b48c-487b-96f0-2b3ce7cd9cdb",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 72",
+      "hex": "#500047",
+      "rgb": [
+        80,
+        0,
+        71
+      ],
+      "screen_x": 1344,
+      "screen_y": 824,
+      "local_x": 864,
+      "local_y": 69,
+      "source": "auto",
+      "id": "6850464a-781a-43d2-b080-687ab0bf38a7",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 79",
+      "hex": "#81C466",
+      "rgb": [
+        129,
+        196,
+        102
+      ],
+      "screen_x": 642,
+      "screen_y": 850,
+      "local_x": 162,
+      "local_y": 95,
+      "source": "auto",
+      "id": "bceb2652-d18b-4e1f-9c54-0906f676589d",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 81",
+      "hex": "#16B3AC",
+      "rgb": [
+        22,
+        179,
+        172
+      ],
+      "screen_x": 701,
+      "screen_y": 850,
+      "local_x": 221,
+      "local_y": 95,
+      "source": "auto",
+      "id": "516ee74f-d65e-4c7c-b3bc-8d8edcd7c920",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 82",
+      "hex": "#00B7F0",
+      "rgb": [
+        0,
+        183,
+        240
+      ],
+      "screen_x": 730,
+      "screen_y": 850,
+      "local_x": 250,
+      "local_y": 95,
+      "source": "auto",
+      "id": "05684e91-f15f-447d-a201-37ea5dfcc5b6",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 84",
+      "hex": "#566EB6",
+      "rgb": [
+        86,
+        110,
+        182
+      ],
+      "screen_x": 788,
+      "screen_y": 850,
+      "local_x": 308,
+      "local_y": 95,
+      "source": "auto",
+      "id": "0dec5d87-bcb1-4e39-a588-6ff0613e1b54",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 96",
+      "hex": "#A7927D",
+      "rgb": [
+        167,
+        146,
+        125
+      ],
+      "screen_x": 993,
+      "screen_y": 851,
+      "local_x": 513,
+      "local_y": 96,
+      "source": "auto",
+      "id": "5e5ce64f-0920-44d2-a67c-cfb6317e13c6",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 101",
+      "hex": "#FEC0AF",
+      "rgb": [
+        254,
+        192,
+        175
+      ],
+      "screen_x": 1373,
+      "screen_y": 851,
+      "local_x": 893,
+      "local_y": 96,
+      "source": "auto",
+      "id": "7ecc8e4b-bc74-4db4-a7bd-c186692b3c5f",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 102",
+      "hex": "#FFFFFF",
+      "rgb": [
+        255,
+        255,
+        255
+      ],
+      "screen_x": 670,
+      "screen_y": 770,
+      "local_x": 190,
+      "local_y": 15,
+      "source": "manual",
+      "id": "dc6ff484-275c-4f0e-8bd8-eaf548cbeea4",
+      "status": "confirmed"
+    },
+    {
+      "name": "Цвет 103",
+      "hex": "#1B1B1B",
+      "rgb": [
+        27,
+        27,
+        27
+      ],
+      "screen_x": 937,
+      "screen_y": 801,
+      "local_x": 457,
+      "local_y": 46,
+      "source": "manual",
+      "id": "61f37653-6af2-4fe9-9533-2d024ca6c9f4",
+      "status": "confirmed"
+    }
+  ],
+  "calibration": {
+    "dpi_scale_percent": 100,
+    "browser_label": "",
+    "notes": "",
+    "captured_at": "2026-10-27T02:35:12+03:00",
+    "capture_method": "screenshot-assisted"
+  },
+  "metadata": {
+    "source": "desktop-screenshot",
+    "method": "screenshot-assisted",
+    "captured_at": "2026-10-27T02:35:12+03:00",
+    "palette_reduction": {
+      "enabled": true,
+      "method": "CIELAB_farthest_point_seeding_plus_palette_medoid_refinement",
+      "input_color_count": 103,
+      "output_color_count": 32,
+      "target_color_count": 32,
+      "removed_color_count": 71,
+      "required_color_hexes": [
+        "#FFFFFF",
+        "#000000"
+      ],
+      "preserved_required_colors": [
+        "#FFFFFF"
+      ],
+      "missing_required_colors": [
+        "#000000"
+      ],
+      "reserved_color_hexes": [
+        "#FFFFFF"
+      ],
+      "mean_delta_e76": 9.5162,
+      "max_delta_e76": 27.1334,
+      "clusters": [
+        {
+          "representative_hex": "#00FE01",
+          "representative_name": "Цвет 3",
+          "represented_color_count": 1,
+          "max_delta_e76": 0.0
+        },
+        {
+          "representative_hex": "#01FEFE",
+          "representative_name": "Цвет 4",
+          "represented_color_count": 1,
+          "max_delta_e76": 0.0
+        },
+        {
+          "representative_hex": "#0003FB",
+          "representative_name": "Цвет 5",
+          "represented_color_count": 1,
+          "max_delta_e76": 0.0
+        },
+        {
+          "representative_hex": "#FF00FF",
+          "representative_name": "Цвет 6",
+          "represented_color_count": 1,
+          "max_delta_e76": 0.0
+        },
+        {
+          "representative_hex": "#E60213",
+          "representative_name": "Цвет 7",
+          "represented_color_count": 4,
+          "max_delta_e76": 18.0587
+        },
+        {
+          "representative_hex": "#F59701",
+          "representative_name": "Цвет 9",
+          "represented_color_count": 1,
+          "max_delta_e76": 0.0
+        },
+        {
+          "representative_hex": "#930784",
+          "representative_name": "Цвет 20",
+          "represented_color_count": 1,
+          "max_delta_e76": 0.0
+        },
+        {
+          "representative_hex": "#FBF300",
+          "representative_name": "Цвет 23",
+          "represented_color_count": 4,
+          "max_delta_e76": 20.261
+        },
+        {
+          "representative_hex": "#049649",
+          "representative_name": "Цвет 24",
+          "represented_color_count": 4,
+          "max_delta_e76": 11.4268
+        },
+        {
+          "representative_hex": "#212086",
+          "representative_name": "Цвет 26",
+          "represented_color_count": 7,
+          "max_delta_e76": 21.3689
+        },
+        {
+          "representative_hex": "#E20085",
+          "representative_name": "Цвет 27",
+          "represented_color_count": 3,
+          "max_delta_e76": 16.8268
+        },
+        {
+          "representative_hex": "#AD6A01",
+          "representative_name": "Цвет 30",
+          "represented_color_count": 4,
+          "max_delta_e76": 22.3801
+        },
+        {
+          "representative_hex": "#B7AB01",
+          "representative_name": "Цвет 31",
+          "represented_color_count": 3,
+          "max_delta_e76": 20.0109
+        },
+        {
+          "representative_hex": "#638C0C",
+          "representative_name": "Цвет 32",
+          "represented_color_count": 3,
+          "max_delta_e76": 17.3176
+        },
+        {
+          "representative_hex": "#00736E",
+          "representative_name": "Цвет 35",
+          "represented_color_count": 2,
+          "max_delta_e76": 11.2431
+        },
+        {
+          "representative_hex": "#A5015B",
+          "representative_name": "Цвет 42",
+          "represented_color_count": 2,
+          "max_delta_e76": 11.4273
+        },
+        {
+          "representative_hex": "#F39B77",
+          "representative_name": "Цвет 43",
+          "represented_color_count": 6,
+          "max_delta_e76": 22.5514
+        },
+        {
+          "representative_hex": "#F7CE8C",
+          "representative_name": "Цвет 45",
+          "represented_color_count": 3,
+          "max_delta_e76": 18.4823
+        },
+        {
+          "representative_hex": "#8CC798",
+          "representative_name": "Цвет 49",
+          "represented_color_count": 2,
+          "max_delta_e76": 11.6882
+        },
+        {
+          "representative_hex": "#AA89BE",
+          "representative_name": "Цвет 55",
+          "represented_color_count": 7,
+          "max_delta_e76": 27.1334
+        },
+        {
+          "representative_hex": "#802D01",
+          "representative_name": "Цвет 60",
+          "represented_color_count": 6,
+          "max_delta_e76": 16.534
+        },
+        {
+          "representative_hex": "#015E17",
+          "representative_name": "Цвет 64",
+          "represented_color_count": 3,
+          "max_delta_e76": 9.0701
+        },
+        {
+          "representative_hex": "#013567",
+          "representative_name": "Цвет 68",
+          "represented_color_count": 5,
+          "max_delta_e76": 18.4907
+        },
+        {
+          "representative_hex": "#500047",
+          "representative_name": "Цвет 72",
+          "represented_color_count": 3,
+          "max_delta_e76": 17.512
+        },
+        {
+          "representative_hex": "#81C466",
+          "representative_name": "Цвет 79",
+          "represented_color_count": 3,
+          "max_delta_e76": 17.765
+        },
+        {
+          "representative_hex": "#16B3AC",
+          "representative_name": "Цвет 81",
+          "represented_color_count": 3,
+          "max_delta_e76": 15.7736
+        },
+        {
+          "representative_hex": "#00B7F0",
+          "representative_name": "Цвет 82",
+          "represented_color_count": 4,
+          "max_delta_e76": 19.2989
+        },
+        {
+          "representative_hex": "#566EB6",
+          "representative_name": "Цвет 84",
+          "represented_color_count": 6,
+          "max_delta_e76": 16.7909
+        },
+        {
+          "representative_hex": "#A7927D",
+          "representative_name": "Цвет 96",
+          "represented_color_count": 1,
+          "max_delta_e76": 0.0
+        },
+        {
+          "representative_hex": "#FEC0AF",
+          "representative_name": "Цвет 101",
+          "represented_color_count": 6,
+          "max_delta_e76": 14.0842
+        },
+        {
+          "representative_hex": "#FFFFFF",
+          "representative_name": "Цвет 102",
+          "represented_color_count": 2,
+          "max_delta_e76": 20.9397
+        },
+        {
+          "representative_hex": "#1B1B1B",
+          "representative_name": "Цвет 103",
+          "represented_color_count": 1,
+          "max_delta_e76": 0.0
+        }
+      ],
+      "selected_hex_colors": [
+        "#00FE01",
+        "#01FEFE",
+        "#0003FB",
+        "#FF00FF",
+        "#E60213",
+        "#F59701",
+        "#930784",
+        "#FBF300",
+        "#049649",
+        "#212086",
+        "#E20085",
+        "#AD6A01",
+        "#B7AB01",
+        "#638C0C",
+        "#00736E",
+        "#A5015B",
+        "#F39B77",
+        "#F7CE8C",
+        "#8CC798",
+        "#AA89BE",
+        "#802D01",
+        "#015E17",
+        "#013567",
+        "#500047",
+        "#81C466",
+        "#16B3AC",
+        "#00B7F0",
+        "#566EB6",
+        "#A7927D",
+        "#FEC0AF",
+        "#FFFFFF",
+        "#1B1B1B"
+      ],
+      "note": "Выбраны реальные образцы из исходной игровой палитры; координаты кликов и RGB сохранены без изменений. Обязательные цвета остаются в палитре, если присутствуют в источнике. ΔE76 используется для кластеризации и оценки покрытия."
+    }
+  }
+}
