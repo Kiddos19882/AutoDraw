@@ -224,6 +224,7 @@ def build_color_scanline_plan(
     }
     point_quota_model_config = {
         "model_id": POINT_QUOTA_MODEL_ID,
+        "board_item_type": "BoardItem2" if board_point_limit == HISTORICAL_CALIBRATION_POINT_LIMIT else None,
         "board_point_limit": board_point_limit,
         "point_step_px": point_step_px,
         "point_delay_ms": point_delay_ms,
