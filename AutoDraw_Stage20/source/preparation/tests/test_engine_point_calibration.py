@@ -53,7 +53,8 @@ class EnginePointCalibrationTests(unittest.TestCase):
         report = build_engine_point_calibration_report(calibration_point_limit=6_000)
         self.assertEqual(report["point_limit_inference"]["selected_limit"], 6_000)
         self.assertFalse(report["point_limit_inference"]["is_inferred"])
-        self.assertTrue(report["point_limit_inference"]["is_verified_from_observation_metadata"])
+        self.assertTrue(report["point_limit_inference"]["is_explicitly_supplied_by_caller"])
+        self.assertFalse(report["point_limit_inference"]["is_verified_from_observation_metadata"])
 
     def test_estimator_predicts_the_calibrated_long_stroke_observation(self):
         estimate = estimate_point_quota_usage(
