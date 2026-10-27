@@ -36,6 +36,12 @@ Adaptive plans are recommendations, never executable by themselves. Stage 20 onl
 After the recommendations have been calculated, use **Export brush plan JSON** to save a separate `autodraw_adaptive_brush_plan` file. It contains a SHA-256 fingerprint of the exact source color plan. Stage 20 must load the matching source color plan and verify this fingerprint before it can execute the brush plan; brush recommendations are never silently substituted for the regular color plan.
 
 
+## End-to-end game point quota regression
+
+The automatic fitting step checks both the empirical ink-equivalent target and the estimated stored-point quota while selecting a candidate. The default BoardItem2 hard limit is 6,000 points; the conservative safety budget is 5,100 points (85%). A target above that safety budget is clamped rather than allowed to consume the reserve.
+
+A dedicated end-to-end regression test stresses checkerboard patterns, repeated stripes, seeded palette noise, transparent noise, and thin details. It then rebuilds the selected color scanline plan exactly as the UI does and asserts that the final plan's ink and point estimates match the optimization report. These deterministic fixtures exercise resource accounting; they do not replace a manual check against the actual browser palette and game canvas.
+
 ## Automatic paint-budget fitting
 
 Stage 19 provides **“Уложить в краску автоматически…”**. It progressively replaces square blocks with their most frequent palette index and samples fewer rows until the empirical paint-cost estimate is at or below the selected target (75% by default). The full canvas dimensions and original palette entries are retained; finer details and colors may deliberately disappear. The result records block size, row step/offset, estimated cost before/after, used-color count and pixel changes.
