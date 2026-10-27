@@ -41,6 +41,10 @@ class PaintBudgetOptimizerTests(unittest.TestCase):
         np.testing.assert_array_equal(result.index_map, indexes)
         self.assertEqual((step, offset), (1, 0))
         self.assertLessEqual(report["estimated_ink_after_px_equivalent"], report["target_cost_px_equivalent"])
+        self.assertEqual(report["board_point_limit"], 6_000)
+        self.assertGreater(report["estimated_game_points_after"], 0)
+        self.assertLessEqual(report["estimated_game_points_after"], report["target_point_count"])
+        self.assertTrue(report["game_point_target_met"])
         self.assertEqual(report["changed_pixel_count"], 0)
 
     def test_complex_map_is_reduced_to_target_budget_with_fixed_dimensions(self):
