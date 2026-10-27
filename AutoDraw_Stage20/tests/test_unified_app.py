@@ -931,6 +931,94 @@ class UnifiedAppCoreTests(unittest.TestCase):
 
 
 
+    def test_geometry_plan_handoff_uses_geometry_serializer_and_loads_into_executor(self):
+        from geometry_color_plan import build_geometry_color_plan
+
+        root = None
+        app = None
+        try:
+            root = tk.Tk()
+            root.withdraw()
+            app = integrated_app.AutoDrawUnifiedApp(root)
+            previous_runtime = app.data_paths["runtime"]
+            previous_area = app.executor.area
+            try:
+                with tempfile.TemporaryDirectory(prefix="AutoDraw geometry handoff ") as temp:
+                    app.data_paths["runtime"] = Path(temp) / "runtime"
+                    app.executor.area = None
+
+                    screen_width, screen_height = pyautogui.size()
+                    palette_doc = create_palette_document(
+                        [
+                            {"name": "Red", "hex": "#FF0000", "rgb": [255, 0, 0],
+                             "screen_x": 15, "screen_y": 15, "local_x": 10, "local_y": 10, "source": "manual"},
+                            {"name": "Green", "hex": "#00FF00", "rgb": [0, 255, 0],
+                             "screen_x": 35, "screen_y": 15, "local_x": 30, "local_y": 10, "source": "manual"},
+                        ],
+                        screen_size=(screen_width, screen_height),
+                        region={"x": 5, "y": 5, "width": 45, "height": 30},
+                    )
+                    profile = create_palette_profile(
+                        palette_doc, "Geometry handoff palette", dpi_scale_percent=100
+                    )
+                    for color in profile["colors"]:
+                        color["status"] = "confirmed"
+
+                    geometry_plan = build_geometry_color_plan(
+                        np.array([[0, 0, 1, 1], [0, 0, 1, 1]], dtype=np.int32),
+                        profile,
+                        mode="scanline",
+                        source_name="geometry handoff integration test",
+                    )
+                    self.assertEqual(geometry_plan["plan_type"], "autodraw_geometry_color_plan")
+                    tab = app.color_scanline_tab
+                    tab.plan = geometry_plan
+                    tab.palette_profile = profile
+
+                    with patch("integrated_app.messagebox.showerror") as showerror:
+                        app._transfer_color_plan_to_executor()
+
+                    showerror.assert_not_called()
+                    self.assertEqual(
+                        app.executor.color_plan_data["plan_type"],
+                        "autodraw_geometry_color_plan",
+                    )
+                    self.assertEqual(
+                        app.executor.color_plan_data["strokes"],
+                        geometry_plan["strokes"],
+                    )
+                    self.assertEqual(
+                        app.executor.color_palette_profile["profile_name"],
+                        "Geometry handoff palette",
+                    )
+                    self.assertIsNotNone(app.executor.source_plan)
+                    self.assertTrue(app.executor.plan_path.is_file())
+                    self.assertEqual(
+                        app.executor.plan_path.name,
+                        "current_geometry_color_plan_for_execution.json",
+                    )
+                    saved_document = json.loads(
+                        app.executor.plan_path.read_text(encoding="utf-8")
+                    )
+                    self.assertEqual(
+                        saved_document["plan_type"],
+                        "autodraw_geometry_color_plan",
+                    )
+                    self.assertEqual(app.notebook.select(), str(app.execution_tab))
+            finally:
+                app.data_paths["runtime"] = previous_runtime
+                app.executor.area = previous_area
+        except tk.TclError as exc:
+            self.skipTest(f"Tk desktop session unavailable: {exc}")
+        finally:
+            if app is not None:
+                app.workbench.cleanup()
+            if root is not None:
+                try:
+                    root.destroy()
+                except tk.TclError:
+                    pass
+
     def test_paint_model_explanation_uses_its_own_wrapped_row(self):
         root = None
         app = None
