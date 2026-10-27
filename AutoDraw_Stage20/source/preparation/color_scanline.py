@@ -16,6 +16,17 @@ from paint_cost_model import (
     DEFAULT_PAINT_BUDGET_PX_EQUIVALENT, DEFAULT_STROKE_OVERHEAD_PX_EQUIVALENT,
     estimate_color_plan_paint_cost,
 )
+from engine_point_calibration import (
+    DEFAULT_EXECUTOR_POINT_DELAY_MS,
+    DEFAULT_EXECUTOR_POINT_STEP_PX,
+    GAME_ENGINE_DEFAULT_FRAME_RATE_FPS,
+    HISTORICAL_CALIBRATION_FRAME_RATE_FPS,
+    HISTORICAL_CALIBRATION_POINT_DELAY_MS,
+    HISTORICAL_CALIBRATION_POINT_LIMIT,
+    HISTORICAL_CALIBRATION_POINT_STEP_PX,
+    MODEL_ID as POINT_QUOTA_MODEL_ID,
+    estimate_point_quota_usage,
+)
 
 COLOR_SCANLINE_SCHEMA_VERSION = 1
 COLOR_SCANLINE_PLAN_TYPE = "autodraw_color_scanline_plan"
@@ -76,6 +87,11 @@ def build_color_scanline_plan(
     max_strokes: int = MAX_COLOR_STROKES,
     paint_stroke_overhead_px_equivalent: float = DEFAULT_STROKE_OVERHEAD_PX_EQUIVALENT,
     paint_budget_px_equivalent: float = DEFAULT_PAINT_BUDGET_PX_EQUIVALENT,
+    board_point_limit: int = HISTORICAL_CALIBRATION_POINT_LIMIT,
+    point_step_px: float = DEFAULT_EXECUTOR_POINT_STEP_PX,
+    point_delay_ms: int = DEFAULT_EXECUTOR_POINT_DELAY_MS,
+    frame_rate_fps: float = GAME_ENGINE_DEFAULT_FRAME_RATE_FPS,
+    point_quota_safety_factor: float = 0.85,
 ) -> dict[str, Any]:
     """Build color runs in strict top-to-bottom, left-to-right order.
 
@@ -206,6 +222,18 @@ def build_color_scanline_plan(
         "budget_px_equivalent": float(paint_budget_px_equivalent),
         "single_pixel_execution_length_px": 1.0,
     }
+    point_quota_model_config = {
+        "model_id": POINT_QUOTA_MODEL_ID,
+        "board_point_limit": board_point_limit,
+        "point_step_px": point_step_px,
+        "point_delay_ms": point_delay_ms,
+        "frame_rate_fps": frame_rate_fps,
+        "safety_factor": point_quota_safety_factor,
+        "calibration_point_limit": HISTORICAL_CALIBRATION_POINT_LIMIT,
+        "calibration_point_step_px": HISTORICAL_CALIBRATION_POINT_STEP_PX,
+        "calibration_point_delay_ms": HISTORICAL_CALIBRATION_POINT_DELAY_MS,
+        "calibration_frame_rate_fps": HISTORICAL_CALIBRATION_FRAME_RATE_FPS,
+    }
     source_info: dict[str, Any] = {
         "name": str(source_name or "Изображение в цветах палитры"),
         "quantization_algorithm": "CIELAB + CIEDE2000",
@@ -278,6 +306,7 @@ def build_color_scanline_plan(
                 "Перестановка по цветам запрещена. При шаге больше 1 пропущенные строки не рисуются."
             ),
             "paint_cost_model": paint_model_config,
+            "point_quota_model": point_quota_model_config,
         },
         "summary": {
             "stroke_count": len(strokes),
@@ -297,12 +326,26 @@ def build_color_scanline_plan(
         },
         "strokes": strokes,
     }
-    # Include both the estimate for a shared pool and per-color estimates. The
-    # real game was calibrated with a single color, so either resource model may apply.
+    # Legacy equivalent-pixel estimate, plus the calibrated estimate in the game's
+    # actual unit: unique coordinates saved by BoardPane across the whole drawing.
     plan["summary"]["paint_cost_estimate"] = estimate_color_plan_paint_cost(
         plan,
         stroke_overhead_px_equivalent=paint_model_config["stroke_overhead_px_equivalent"],
         paint_budget_px_equivalent=paint_model_config["budget_px_equivalent"],
+    )
+    plan["summary"]["point_quota_estimate"] = estimate_point_quota_usage(
+        plan["summary"]["drawing_length_px"],
+        plan["summary"]["stroke_count"],
+        board_point_limit=point_quota_model_config["board_point_limit"],
+        single_pixel_stroke_count=plan["summary"]["single_pixel_stroke_count"],
+        point_step_px=point_quota_model_config["point_step_px"],
+        point_delay_ms=point_quota_model_config["point_delay_ms"],
+        frame_rate_fps=point_quota_model_config["frame_rate_fps"],
+        calibration_point_limit=point_quota_model_config["calibration_point_limit"],
+        calibration_point_step_px=point_quota_model_config["calibration_point_step_px"],
+        calibration_point_delay_ms=point_quota_model_config["calibration_point_delay_ms"],
+        calibration_frame_rate_fps=point_quota_model_config["calibration_frame_rate_fps"],
+        safety_factor=point_quota_model_config["safety_factor"],
     )
     validate_color_scanline_plan(plan)
     return plan
