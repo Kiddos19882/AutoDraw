@@ -41,17 +41,17 @@ def estimate_paint_cost(
     stroke_overhead_px_equivalent: float = DEFAULT_STROKE_OVERHEAD_PX_EQUIVALENT,
     paint_budget_px_equivalent: float = DEFAULT_PAINT_BUDGET_PX_EQUIVALENT,
 ) -> dict[str, Any]:
-    """Estimate brush consumption in equivalent pixels from the observed series.
+    """Estimate consumption of the game's stored-point quota in pixel-equivalent units.
 
-    Model: effective drawn path + per-stroke overhead. The current executor
-    turns a point-stroke into a real horizontal 1 px stroke, so those strokes
-    add 1 px of effective path each; that distance is missing from the Stage 19
-    geometric length (start and end coordinates are identical for a point run).
+    The game does not use an independent ink tank here: BoardPane counts the
+    unique cursor coordinates stored in atom.points. This legacy metric converts
+    that quota to an empirical equivalent-pixel scale for the tested executor
+    profile. The model is effective path length + per-stroke overhead. The
+    executor expands a point-stroke to a 1 px line, so that path is included too.
 
-    This is an empirical estimate, not a game-provided ink counter. Four trial
-    runs imply around 6.67 px-equivalent per stroke and about 25,650 px-equivalent
-    total supply, with observed reconstructed budgets ranging from ~25,610 to
-    ~25,730 depending on the trial.
+    Four observed runs imply around 6.67 px-equivalent per stroke and about
+    25,650 px-equivalent for the tested setup. The equivalent-pixel scale is not
+    universal: it depends on frame sampling, movement step, delay, and board quota.
     """
     path_length = _finite_number(drawing_length_px, "Длина рисования")
     overhead = _finite_number(stroke_overhead_px_equivalent, "Расход на штрих")
@@ -96,6 +96,11 @@ def estimate_paint_cost(
     return {
         "model_id": MODEL_ID,
         "is_estimate": True,
+        "resource_basis": "frame_sampled_unique_game_points",
+        "resource_semantics_note": (
+            "Legacy pixel-equivalent estimate for BoardPane's shared stored-coordinate quota; "
+            "not an independent per-color ink supply."
+        ),
         "drawing_length_px": round(path_length, 3),
         "single_pixel_extra_path_px": round(single_pixel_extra_path, 3),
         "effective_path_length_px": round(effective_path, 3),
@@ -113,8 +118,9 @@ def estimate_paint_cost(
         "risk_label": risk_label,
         "calibration_observation_count": len(CALIBRATION_OBSERVATIONS),
         "calibration_note": (
-            "Эмпирическая модель по четырём измерениям на доске 660×340; "
-            "расход не считывается из игры напрямую. Фактический результат может отличаться."
+            "Пиксель-эквивалент является эмпирическим приближением квоты сохранённых точек BoardPane, "
+            "а не отдельным счётчиком краски. Результат зависит от частоты кадров и настроек исполнителя "
+            "и должен сверяться с реальным запуском."
         ),
     }
 
@@ -208,8 +214,9 @@ def estimate_color_plan_paint_cost(
     )
     overall["highest_use_color"] = highest_color
     overall["resource_scope_note"] = (
-        "Общая сумма сравнивается с одним общим запасом. Отдельная таблица рассчитывает каждый цвет так, "
-        "будто у него собственный запас. Эксперимент с одним цветом ещё не установил, какая модель верна для игры."
+        "Движок считает точки всех цветов в одном BoardPane.atom.points, поэтому игровая квота общая для всего "
+        "рисунка. Строки по цветам — диагностическая разбивка той же общей суммы; их проценты нельзя трактовать "
+        "как отдельные независимые запасы."
     )
     return overall
 
