@@ -98,15 +98,23 @@ def build_engine_point_calibration_report(
     if budget <= 0:
         raise ValueError("Калиброванный бюджет должен быть больше нуля.")
 
-    theoretical_capacity = budget * theoretical_density
+    # Infer the historical calibration board using the baseline profile, not the
+    # caller's current profile. Otherwise changing point_delay_ms would incorrectly
+    # change which historical board quota is inferred.
+    baseline_theoretical_capacity = budget * baseline_theoretical_density
     nearest_limit = min(
         SUPPORTED_BOARD_POINT_LIMITS,
-        key=lambda value: abs(value - theoretical_capacity),
+        key=lambda value: abs(value - baseline_theoretical_capacity),
+    )
+    current_profile_nearest_limit = min(
+        SUPPORTED_BOARD_POINT_LIMITS,
+        key=lambda value: abs(value - budget * theoretical_density),
     )
     is_inferred = calibration_point_limit is None
     base_limit = nearest_limit if is_inferred else _validate_point_limit(calibration_point_limit)
     empirical_density_at_baseline = base_limit / budget
     density_scale = theoretical_density / baseline_theoretical_density
+    current_theoretical_capacity = budget * theoretical_density
     effective_density = empirical_density_at_baseline * density_scale
     stroke_overhead_points = (
         empirical_density_at_baseline * float(fit["stroke_overhead_px_equivalent"])
@@ -134,8 +142,8 @@ def build_engine_point_calibration_report(
 
     empirical_residuals = [abs(item["empirical_residual_points"]) for item in observation_results]
     theoretical_residuals = [abs(item["theoretical_residual_points"]) for item in observation_results]
-    nearest_deviation_percent = abs(theoretical_capacity - nearest_limit) / nearest_limit * 100.0
-    selected_deviation_percent = abs(theoretical_capacity - base_limit) / base_limit * 100.0
+    nearest_deviation_percent = abs(baseline_theoretical_capacity - nearest_limit) / nearest_limit * 100.0
+    selected_deviation_percent = abs(baseline_theoretical_capacity - base_limit) / base_limit * 100.0
     spread_percent = (
         (
             float(fit["maximum_reconstructed_budget_px_equivalent"])
@@ -176,8 +184,10 @@ def build_engine_point_calibration_report(
             "is_inferred": is_inferred,
             "is_verified_from_observation_metadata": False,
             "is_explicitly_supplied_by_caller": not is_inferred,
-            "theoretical_capacity_points": round(theoretical_capacity, 2),
+            "theoretical_capacity_points": round(baseline_theoretical_capacity, 2),
+            "current_profile_theoretical_capacity_points": round(current_theoretical_capacity, 2),
             "nearest_supported_limit": nearest_limit,
+            "current_profile_nearest_limit": current_profile_nearest_limit,
             "nearest_limit_deviation_percent": round(nearest_deviation_percent, 3),
             "selected_limit_deviation_percent": round(selected_deviation_percent, 3),
             "consistency": (
