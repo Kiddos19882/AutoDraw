@@ -27,6 +27,71 @@ from paint_cost_model import (
 )
 
 
+def load_palette_document(path: str | Path) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Load a saved browser palette/profile and return normalized confirmed colors."""
+    import json
+
+    palette_path = Path(path)
+    try:
+        document = json.loads(palette_path.read_text(encoding="utf-8-sig"))
+    except OSError as exc:
+        raise ValueError(f"Не удалось прочитать файл игровой палитры: {palette_path}: {exc}") from exc
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"Файл палитры содержит некорректный JSON: {palette_path}: {exc}") from exc
+
+    if not isinstance(document, dict) or not isinstance(document.get("colors"), list):
+        raise ValueError("В JSON палитры должен быть объект с массивом colors.")
+
+    raw_colors = document["colors"]
+    if not raw_colors:
+        raise ValueError("Файл игровой палитры не содержит цветов.")
+
+    statuses = [
+        str(item.get("status", "")).strip().lower()
+        for item in raw_colors
+        if isinstance(item, dict) and item.get("status") is not None
+    ]
+    unconfirmed = sorted({status for status in statuses if status not in {"confirmed", "corrected"}})
+    if unconfirmed:
+        raise ValueError(
+            "В файле есть неподтверждённые цвета палитры ("
+            + ", ".join(unconfirmed)
+            + "). Подтверди образцы на вкладке 3 или используй другой файл."
+        )
+
+    try:
+        normalized = normalize_palette(raw_colors)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"Не удалось проверить цвета игровой палитры: {exc}") from exc
+
+    metadata = document.get("metadata")
+    if not isinstance(metadata, dict):
+        metadata = {}
+    reduction = metadata.get("palette_reduction")
+    if not isinstance(reduction, dict):
+        reduction = {}
+
+    confirmed_count = sum(
+        1 for item in raw_colors
+        if isinstance(item, dict) and str(item.get("status", "")).lower() in {"confirmed", "corrected"}
+    )
+    palette_report = {
+        "palette_file": str(palette_path),
+        "palette_name": str(document.get("profile_name") or document.get("name") or document.get("palette_id") or palette_path.stem),
+        "schema_version": document.get("profile_schema_version", document.get("schema_version")),
+        "palette_color_count": len(normalized),
+        "sample_statuses_present": bool(statuses),
+        "confirmed_color_count": confirmed_count if statuses else None,
+        "source": str(metadata.get("source") or document.get("source") or "unknown"),
+        "capture_method": str(metadata.get("method") or document.get("capture_method") or "unknown"),
+        "captured_at": metadata.get("captured_at") or document.get("created_at"),
+        "has_exact_black": any(item["hex"].upper() == "#000000" for item in normalized),
+        "has_exact_white": any(item["hex"].upper() == "#FFFFFF" for item in normalized),
+        "missing_required_colors": list(reduction.get("missing_required_colors", [])),
+    }
+    return normalized, palette_report
+
+
 def render_plan_index_map(plan: dict[str, Any]) -> np.ndarray:
     """Rasterize ordered plan strokes into palette indexes; untouched pixels are -1."""
     canvas = plan.get("canvas")
