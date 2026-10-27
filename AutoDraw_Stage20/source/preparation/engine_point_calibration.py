@@ -78,6 +78,9 @@ def build_engine_point_calibration_report(
     point_delay_ms: float = DEFAULT_EXECUTOR_POINT_DELAY_MS,
     frame_rate_fps: float = GAME_ENGINE_DEFAULT_FRAME_RATE_FPS,
     calibration_point_limit: int | None = None,
+    calibration_point_step_px: float | None = None,
+    calibration_point_delay_ms: float | None = None,
+    calibration_frame_rate_fps: float | None = None,
 ) -> dict[str, Any]:
     """Compare empirical exhaustion observations with the game's point quotas.
 
@@ -93,32 +96,62 @@ def build_engine_point_calibration_report(
         point_delay_ms=point_delay_ms,
         frame_rate_fps=frame_rate_fps,
     )
-    baseline_theoretical_density = estimate_theoretical_points_per_path_px()
+    # Keep the historical calibration profile separate from the current target
+    # executor profile. When no historical settings are supplied, defaults are an
+    # explicit assumption, not proof of the old tests' settings.
+    calibration_step = (
+        DEFAULT_EXECUTOR_POINT_STEP_PX
+        if calibration_point_step_px is None
+        else calibration_point_step_px
+    )
+    calibration_delay = (
+        DEFAULT_EXECUTOR_POINT_DELAY_MS
+        if calibration_point_delay_ms is None
+        else calibration_point_delay_ms
+    )
+    calibration_fps = (
+        GAME_ENGINE_DEFAULT_FRAME_RATE_FPS
+        if calibration_frame_rate_fps is None
+        else calibration_frame_rate_fps
+    )
+    calibration_density = estimate_theoretical_points_per_path_px(
+        point_step_px=calibration_step,
+        point_delay_ms=calibration_delay,
+        frame_rate_fps=calibration_fps,
+    )
+    calibration_profile_is_fully_specified = all(
+        value is not None
+        for value in (
+            calibration_point_step_px,
+            calibration_point_delay_ms,
+            calibration_frame_rate_fps,
+        )
+    )
     budget = float(fit["paint_budget_px_equivalent"])
     if budget <= 0:
         raise ValueError("Калиброванный бюджет должен быть больше нуля.")
 
-    # Infer the historical calibration board using the baseline profile, not the
-    # caller's current profile. Otherwise changing point_delay_ms would incorrectly
-    # change which historical board quota is inferred.
-    baseline_theoretical_capacity = budget * baseline_theoretical_density
+    calibration_theoretical_capacity = budget * calibration_density
+    current_theoretical_capacity = budget * theoretical_density
     nearest_limit = min(
         SUPPORTED_BOARD_POINT_LIMITS,
-        key=lambda value: abs(value - baseline_theoretical_capacity),
+        key=lambda value: abs(value - calibration_theoretical_capacity),
     )
     current_profile_nearest_limit = min(
         SUPPORTED_BOARD_POINT_LIMITS,
-        key=lambda value: abs(value - budget * theoretical_density),
+        key=lambda value: abs(value - current_theoretical_capacity),
     )
     is_inferred = calibration_point_limit is None
     base_limit = nearest_limit if is_inferred else _validate_point_limit(calibration_point_limit)
-    empirical_density_at_baseline = base_limit / budget
-    density_scale = theoretical_density / baseline_theoretical_density
-    current_theoretical_capacity = budget * theoretical_density
-    effective_density = empirical_density_at_baseline * density_scale
+    empirical_density_at_calibration = base_limit / budget
+    density_scale = theoretical_density / calibration_density
+    effective_density = empirical_density_at_calibration * density_scale
+    # Per-stroke overhead includes start/transition behavior and is kept in
+    # points/stroke when adapting the path density to current settings.
     stroke_overhead_points = (
-        empirical_density_at_baseline * float(fit["stroke_overhead_px_equivalent"])
+        empirical_density_at_calibration * float(fit["stroke_overhead_px_equivalent"])
     )
+    calibration_profile_assumed = not calibration_profile_is_fully_specified
 
     observation_results: list[dict[str, Any]] = []
     for item in observation_list:
@@ -127,8 +160,8 @@ def build_engine_point_calibration_report(
         if isinstance(strokes_raw, bool) or not isinstance(strokes_raw, int) or strokes_raw < 0:
             raise ValueError("Количество завершённых штрихов должно быть целым неотрицательным числом.")
         equivalent_cost = path_px + float(fit["stroke_overhead_px_equivalent"]) * strokes_raw
-        empirical_points = equivalent_cost * empirical_density_at_baseline
-        theoretical_points = equivalent_cost * theoretical_density
+        empirical_points = equivalent_cost * empirical_density_at_calibration
+        theoretical_points = equivalent_cost * calibration_density
         observation_results.append({
             "stroke_length_px": item.get("stroke_length_px"),
             "completed_strokes": strokes_raw,
@@ -142,8 +175,8 @@ def build_engine_point_calibration_report(
 
     empirical_residuals = [abs(item["empirical_residual_points"]) for item in observation_results]
     theoretical_residuals = [abs(item["theoretical_residual_points"]) for item in observation_results]
-    nearest_deviation_percent = abs(baseline_theoretical_capacity - nearest_limit) / nearest_limit * 100.0
-    selected_deviation_percent = abs(baseline_theoretical_capacity - base_limit) / base_limit * 100.0
+    nearest_deviation_percent = abs(calibration_theoretical_capacity - nearest_limit) / nearest_limit * 100.0
+    selected_deviation_percent = abs(calibration_theoretical_capacity - base_limit) / base_limit * 100.0
     spread_percent = (
         (
             float(fit["maximum_reconstructed_budget_px_equivalent"])
@@ -170,6 +203,19 @@ def build_engine_point_calibration_report(
             "points_per_stroke_equivalent_overhead": round(stroke_overhead_points, 6),
             "theoretical_path_step_per_frame_px": round(1.0 / theoretical_density, 4),
         },
+        "calibration_profile": {
+            "point_step_px": round(_finite_number(calibration_step, "Шаг исторического исполнителя"), 4),
+            "point_delay_ms": round(_finite_number(calibration_delay, "Задержка исторического исполнителя"), 4),
+            "frame_rate_fps": round(_finite_number(calibration_fps, "Частота кадров исторического исполнителя"), 4),
+            "theoretical_points_per_path_px": round(calibration_density, 6),
+            "theoretical_capacity_points": round(calibration_theoretical_capacity, 2),
+            "is_fully_specified": calibration_profile_is_fully_specified,
+            "is_assumed": calibration_profile_assumed,
+            "note": (
+                "Если параметры исторического запуска не переданы, используются текущие значения по умолчанию; "
+                "они не доказывают, что именно так были сделаны старые замеры."
+            ),
+        },
         "observed_cutoff_fit": {
             "observation_count": int(fit["observation_count"]),
             "stroke_overhead_px_equivalent": fit["stroke_overhead_px_equivalent"],
@@ -184,7 +230,7 @@ def build_engine_point_calibration_report(
             "is_inferred": is_inferred,
             "is_verified_from_observation_metadata": False,
             "is_explicitly_supplied_by_caller": not is_inferred,
-            "theoretical_capacity_points": round(baseline_theoretical_capacity, 2),
+            "theoretical_capacity_points": round(calibration_theoretical_capacity, 2),
             "current_profile_theoretical_capacity_points": round(current_theoretical_capacity, 2),
             "nearest_supported_limit": nearest_limit,
             "current_profile_nearest_limit": current_profile_nearest_limit,
@@ -202,6 +248,7 @@ def build_engine_point_calibration_report(
             "max_abs_theoretical_residual_points": round(max(theoretical_residuals, default=0.0), 2),
             "empirical_density_is_scaled_for_current_executor_profile": True,
             "historic_executor_profile_was_recorded": False,
+            "historic_executor_profile_is_assumed": calibration_profile_assumed,
             "note": (
                 "The empirical fit uses the existing depletion observations. The nearest quota and historic "
                 "executor profile are inferred because these metadata were not saved with the observations."
@@ -221,6 +268,9 @@ def estimate_point_quota_usage(
     point_delay_ms: float = DEFAULT_EXECUTOR_POINT_DELAY_MS,
     frame_rate_fps: float = GAME_ENGINE_DEFAULT_FRAME_RATE_FPS,
     calibration_point_limit: int | None = None,
+    calibration_point_step_px: float | None = None,
+    calibration_point_delay_ms: float | None = None,
+    calibration_frame_rate_fps: float | None = None,
     safety_factor: float = DEFAULT_POINT_SAFETY_FACTOR,
 ) -> dict[str, Any]:
     """Estimate point-quota usage separately from the legacy pixel-equivalent model.
@@ -248,6 +298,9 @@ def estimate_point_quota_usage(
         point_delay_ms=point_delay_ms,
         frame_rate_fps=frame_rate_fps,
         calibration_point_limit=calibration_point_limit,
+        calibration_point_step_px=calibration_point_step_px,
+        calibration_point_delay_ms=calibration_point_delay_ms,
+        calibration_frame_rate_fps=calibration_frame_rate_fps,
     )
     profile = report["executor_profile"]
     effective_path_px = path_px + float(single_pixel_stroke_count)
@@ -295,7 +348,8 @@ def estimate_point_quota_usage(
         "calibration_report": report,
         "calibration_note": (
             "Игровой лимит — количество сохранённых координат. Расчёт откалиброван по четырём наблюдениям "
-            "и номинальным настройкам исполнителя; тип доски в исходных наблюдениях не записан, поэтому "
-            "лимит калибровочной доски помечен как вывод, а не подтверждённый факт."
+            "и выбранному профилю исторического запуска; если он не задан явно, используется допущение "
+            "по настройкам по умолчанию. Тип доски в исходных наблюдениях не записан, поэтому лимит помечен "
+            "как вывод, а не подтверждённый факт."
         ),
     }
