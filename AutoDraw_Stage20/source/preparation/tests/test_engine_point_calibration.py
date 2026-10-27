@@ -42,7 +42,9 @@ class EnginePointCalibrationTests(unittest.TestCase):
 
         self.assertEqual(report["observed_cutoff_fit"]["observation_count"], 4)
         self.assertEqual(inference["selected_limit"], 6_000)
-        self.assertTrue(inference["is_inferred"])
+        self.assertFalse(inference["is_inferred"])
+        self.assertTrue(inference["is_historical_configuration_confirmed"])
+        self.assertTrue(report["validation"]["historical_configuration_confirmed_by_user"])
         self.assertEqual(inference["consistency"], "strong")
         self.assertLess(inference["nearest_limit_deviation_percent"], 3.0)
         self.assertLess(fit["budget_spread_percent"], 0.5)
@@ -58,6 +60,7 @@ class EnginePointCalibrationTests(unittest.TestCase):
         report = build_engine_point_calibration_report(
             point_step_px=2,
             point_delay_ms=10,
+            calibration_point_limit=None,
             calibration_point_step_px=2,
             calibration_point_delay_ms=20,
         )
@@ -81,7 +84,7 @@ class EnginePointCalibrationTests(unittest.TestCase):
         report = build_engine_point_calibration_report(calibration_point_limit=6_000)
         self.assertEqual(report["point_limit_inference"]["selected_limit"], 6_000)
         self.assertFalse(report["point_limit_inference"]["is_inferred"])
-        self.assertTrue(report["point_limit_inference"]["is_explicitly_supplied_by_caller"])
+        self.assertTrue(report["point_limit_inference"]["is_historical_configuration_confirmed"])
         self.assertFalse(report["point_limit_inference"]["is_verified_from_observation_metadata"])
 
     def test_estimator_predicts_the_calibrated_long_stroke_observation(self):
@@ -94,7 +97,8 @@ class EnginePointCalibrationTests(unittest.TestCase):
         self.assertEqual(estimate["estimated_point_count"], 5_991)
         self.assertEqual(estimate["risk_level"], "within_budget")
         self.assertEqual(estimate["calibration_point_limit"], 6_000)
-        self.assertTrue(estimate["calibration_point_limit_is_inferred"])
+        self.assertFalse(estimate["calibration_point_limit_is_inferred"])
+        self.assertTrue(estimate["calibration_report"]["point_limit_inference"]["is_historical_configuration_confirmed"])
 
     def test_estimator_detects_observed_short_stroke_overrun(self):
         estimate = estimate_point_quota_usage(
