@@ -14,6 +14,7 @@ import numpy as np
 
 from board_resource_model import BOARD_ITEM_POINT_LIMITS
 from engine_point_calibration import estimate_theoretical_points_per_path_px
+from interval_quota_fit import fit_interval_censored_quota
 
 
 SCHEMA_VERSION = 1
@@ -324,6 +325,25 @@ def analyze_game_point_calibration(document: Any) -> dict[str, Any]:
             })
             continue
 
+        midpoint_coefficients = coefficients.copy()
+        interval_fit = fit_interval_censored_quota(
+            matrix,
+            visible_length,
+            visible_strokes,
+            stroke_lengths,
+            float(point_limit),
+            midpoint_coefficients,
+        )
+        if interval_fit["status"] == "feasible":
+            coefficients = np.asarray(
+                [
+                    interval_fit["points_per_path_px"],
+                    interval_fit["points_per_stroke"],
+                ],
+                dtype=np.float64,
+            )
+            density, per_stroke = float(coefficients[0]), float(coefficients[1])
+
         predicted = matrix @ coefficients
         absolute_errors = np.abs(predicted - target)
         relative_errors = absolute_errors / float(point_limit) * 100.0
@@ -357,14 +377,24 @@ def analyze_game_point_calibration(document: Any) -> dict[str, Any]:
         )
         fit_status = (
             "calibrated"
-            if max_relative_error <= MAX_ACCEPTABLE_RELATIVE_ERROR_PERCENT
+            if interval_fit["status"] == "feasible"
+            and max_relative_error <= MAX_ACCEPTABLE_RELATIVE_ERROR_PERCENT
             and all_cutoff_intervals_consistent
             else "needs_repeat"
         )
         models.append({
             **fit_base,
             "fit_status": fit_status,
-            "fitting_method": "least_squares_on_cutoff_interval_midpoints_v1",
+            "fitting_method": (
+                "interval_constrained_least_squares_v1"
+                if interval_fit["status"] == "feasible"
+                else "least_squares_on_cutoff_interval_midpoints_v1_fallback"
+            ),
+            "interval_fit": interval_fit,
+            "midpoint_reference_coefficients": {
+                "points_per_path_px": round(float(midpoint_coefficients[0]), 8),
+                "points_per_stroke": round(float(midpoint_coefficients[1]), 4),
+            },
             "midpoint_fit_error_is_not_a_measurement_of_absolute_accuracy": True,
             "matrix_rank": rank,
             "points_per_path_px": round(density, 8),
@@ -429,7 +459,7 @@ def analyze_game_point_calibration(document: Any) -> dict[str, Any]:
         ),
         "interpretation_limits": [
             "RequestAnimationFrame измеряет кадровую частоту видимой вкладки, но не читает внутренний счётчик точек игры напрямую.",
-            "Граница расхода задана интервалом между последним полностью видимым и следующим штрихом; подгонка использует середину интервала.",
+            "Граница расхода задана интервалом между последним полностью видимым и следующим штрихом; коэффициенты подбираются с ограничениями по всем интервалам, а середины используются только как целевая функция и диагностическая метрика.",
             "Узкий интервал и небольшая ошибка подгонки не доказывают абсолютную точность: на результат влияют повторяемость и условия браузера.",
             "Коэффициенты нельзя переносить на другой шаг, задержку, браузерную нагрузку или тип доски без проверки.",
         ],
