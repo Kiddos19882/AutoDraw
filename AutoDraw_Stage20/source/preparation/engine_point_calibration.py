@@ -157,13 +157,18 @@ def build_engine_point_calibration_report(
     stroke_overhead_points = (
         empirical_density_at_calibration * float(fit["stroke_overhead_px_equivalent"])
     )
-    calibration_profile_assumed = not calibration_profile_is_fully_specified
+    # The user confirmed the historic board, step, and delay. The engine exposes
+    # a nominal 48 FPS setting, but actual FPS during the historic tests was not
+    # measured, so the point-density conversion still contains that assumption.
+    calibration_frame_rate_is_measured = False
+    calibration_profile_assumed = (
+        not calibration_profile_is_fully_specified or not calibration_frame_rate_is_measured
+    )
     historical_configuration_confirmed = (
         not is_inferred
         and base_limit == HISTORICAL_CALIBRATION_POINT_LIMIT
         and math.isclose(float(calibration_step), HISTORICAL_CALIBRATION_POINT_STEP_PX)
         and math.isclose(float(calibration_delay), HISTORICAL_CALIBRATION_POINT_DELAY_MS)
-        and math.isclose(float(calibration_fps), HISTORICAL_CALIBRATION_FRAME_RATE_FPS)
     )
 
     observation_results: list[dict[str, Any]] = []
@@ -248,9 +253,12 @@ def build_engine_point_calibration_report(
             "theoretical_capacity_points": round(calibration_theoretical_capacity, 2),
             "is_fully_specified": calibration_profile_is_fully_specified,
             "is_assumed": calibration_profile_assumed,
+            "frame_rate_is_nominal": True,
+            "frame_rate_was_measured": calibration_frame_rate_is_measured,
             "note": (
-                "Если параметры исторического запуска не переданы, используются текущие значения по умолчанию; "
-                "они не доказывают, что именно так были сделаны старые замеры."
+                "Пользователь подтвердил BoardItem2 (6000 точек), шаг 2 px и задержку 10 ms. "
+                "48 FPS — номинальная частота движка; фактическая частота кадров в исторических замерах "
+                "не измерялась, поэтому эта часть расчёта остаётся приближением."
             ),
         },
         "observed_cutoff_fit": {
@@ -287,6 +295,7 @@ def build_engine_point_calibration_report(
             "historic_executor_profile_was_recorded": False,
             "historic_executor_profile_is_assumed": calibration_profile_assumed,
             "historical_configuration_confirmed_by_user": historical_configuration_confirmed,
+            "historic_frame_rate_was_measured": calibration_frame_rate_is_measured,
             "note": (
                 "The empirical fit uses the existing depletion observations. The nearest quota and historic "
                 "executor profile are inferred because these metadata were not saved with the observations."
