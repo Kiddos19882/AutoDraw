@@ -57,10 +57,11 @@ def estimate_theoretical_points_per_path_px(
 ) -> float:
     """Estimate frame-sampled points per screen-path pixel.
 
-    Approximation: points_per_px = FPS * delay_seconds / movement_step_px.
-    It assumes each game frame sees a new cursor coordinate. Real values can
-    differ because of frame scheduling, integer coordinates, browser load, and
-    the game canvas scale.
+    A movement event can contribute at most one new coordinate. Therefore the
+    density is min(FPS * delay_seconds, 1) / movement_step_px: for delays shorter
+    than a frame interval the estimate scales with FPS; for longer delays it
+    saturates at one new point per movement step. Real values can differ because
+    of frame scheduling, integer coordinates, browser load, and canvas scaling.
     """
     step = _finite_number(point_step_px, "Шаг исполнителя")
     delay = _finite_number(point_delay_ms, "Задержка исполнителя")
@@ -74,7 +75,7 @@ def estimate_theoretical_points_per_path_px(
         )
     if fps <= 0:
         raise ValueError("Частота кадров должна быть больше нуля.")
-    return fps * (delay / 1000.0) / step
+    return min(fps * (delay / 1000.0), 1.0) / step
 
 
 def build_engine_point_calibration_report(

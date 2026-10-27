@@ -278,7 +278,7 @@ class PaletteQuantizationTests(unittest.TestCase):
             for y in range(image.height)
             for x in range(image.width)
         ])
-        source_unique_colors = set(image.getdata())
+        source_unique_colors = {tuple(pixel) for pixel in np.asarray(image).reshape(-1, 3)}
         self.assertEqual(len(source_unique_colors), 5)
 
         converted = quantize_image_to_palette(image, palette)

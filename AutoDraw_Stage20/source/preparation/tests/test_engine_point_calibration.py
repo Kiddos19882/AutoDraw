@@ -56,6 +56,20 @@ class EnginePointCalibrationTests(unittest.TestCase):
             places=6,
         )
 
+    def test_sampling_density_saturates_when_mouse_events_are_slower_than_frames(self):
+        # Once movement events are less frequent than frames, each step can
+        # contribute at most one stored point instead of scaling forever with delay.
+        self.assertAlmostEqual(
+            estimate_theoretical_points_per_path_px(point_delay_ms=50),
+            0.5,
+            places=6,
+        )
+        self.assertAlmostEqual(
+            estimate_theoretical_points_per_path_px(point_delay_ms=100),
+            0.5,
+            places=6,
+        )
+
     def test_observed_cutoffs_are_consistent_with_a_6000_point_board(self):
         report = build_engine_point_calibration_report()
         inference = report["point_limit_inference"]
@@ -77,7 +91,7 @@ class EnginePointCalibrationTests(unittest.TestCase):
             [6_000, 12_000],
         )
 
-    def test_historical_twenty_ms_profile_points_to_12000_quota(self):
+    def test_alternative_twenty_ms_profile_points_to_12000_quota(self):
         report = build_engine_point_calibration_report(
             point_step_px=2,
             point_delay_ms=10,

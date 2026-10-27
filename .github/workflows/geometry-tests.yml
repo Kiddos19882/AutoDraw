@@ -43,12 +43,12 @@ jobs:
         run: python ..\..\tests\report_game_point_calibration.py
 
       - name: Run preparation and geometry tests
-        run: python -m pytest -q tests
+        run: python -m pytest -q -ra tests
 
       - name: Run unified-app UI regressions
         run: |
           $env:PYTHONPATH = "$env:GITHUB_WORKSPACE\AutoDraw_Stage20;$env:GITHUB_WORKSPACE\AutoDraw_Stage20\source\preparation;$env:GITHUB_WORKSPACE\AutoDraw_Stage20\source\executor"
-          python -m pytest -q ..\..\tests\test_unified_app.py
+          python -m pytest -q -ra ..\..\tests\test_unified_app.py
 
   executor-tests:
     runs-on: windows-latest
