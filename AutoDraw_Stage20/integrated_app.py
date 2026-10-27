@@ -105,6 +105,7 @@ try:
     from palette_quantization_ui import PaletteQuantizationTab
     from color_scanline_ui import ColorScanlineTab
     from color_scanline import save_color_scanline_plan
+    from geometry_color_plan import save_geometry_color_plan
     from paint_limit_test_ui import PaintLimitTestTab
 except ImportError as exc:  # pragma: no cover - exercised by packaging smoke test
     raise SystemExit(
@@ -447,8 +448,21 @@ class AutoDrawUnifiedApp:
             return
 
         try:
-            destination = self.data_paths["runtime"] / "current_color_plan_for_execution.json"
-            save_color_scanline_plan(destination, color_plan)
+            plan_type = color_plan.get("plan_type")
+            if plan_type == "autodraw_geometry_color_plan":
+                # Geometry plans have their own schema and validator. Saving one with
+                # the scanline serializer makes a direct Stage 5 -> executor transfer fail.
+                destination = self.data_paths["runtime"] / "current_geometry_color_plan_for_execution.json"
+                save_geometry_color_plan(destination, color_plan)
+            elif plan_type == "autodraw_color_scanline_plan":
+                destination = self.data_paths["runtime"] / "current_color_plan_for_execution.json"
+                save_color_scanline_plan(destination, color_plan)
+            else:
+                raise ValueError(
+                    "Раздел 5 передал неподдерживаемый тип цветного плана: "
+                    f"{plan_type!r}."
+                )
+
             # The profile is passed from the same Stage 19 source state that produced the plan,
             # not from a potentially different palette selected afterwards on another tab.
             self.executor.load_color_palette_profile_document(palette_profile)
