@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "purpose": "Declared AutoDraw features emitted to the generated build_info.json. Keep this manifest in sync with supported application workflows.",
+  "features": [
+    "image-preparation",
+    "scanline-plan",
+    "quality-check",
+    "autodraw-project",
+    "mouse-execution",
+    "browser-palette-detection",
+    "browser-palette-profiles",
+    "palette-calibration-check",
+    "palette-quantization-ciede2000",
+    "transparent-white-background-removal",
+    "global-white-color-removal",
+    "conditional-white-removal-over-30-percent",
+    "color-scanline-plan",
+    "color-plan-execution",
+    "palette-screenshot-preflight",
+    "scrollable-palette-conversion-ui",
+    "shared-canvas-area-selection",
+    "color-scanline-row-step",
+    "paint-limit-equal-length-series",
+    "empirical-paint-cost-estimate"
+  ]
+}

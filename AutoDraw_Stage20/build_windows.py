@@ -20,6 +20,7 @@ PORTABLE_NAME = "AutoDrawPortable"
 FINAL_ROOT = RELEASE_ROOT / PORTABLE_NAME
 STAGING_ROOT = RELEASE_ROOT / f".{PORTABLE_NAME}_staging"
 BACKUP_ROOT = RELEASE_ROOT / f".{PORTABLE_NAME}_previous_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}"
+FEATURE_MANIFEST_PATH = ROOT / "app_features.json"
 
 
 class BuildError(RuntimeError):
@@ -149,6 +150,27 @@ def replace_release(staging: Path, final: Path, backup: Path) -> None:
             print(f"Предупреждение: старая сборка осталась в {backup}: {exc}", flush=True)
 
 
+def load_feature_manifest(path: Path = FEATURE_MANIFEST_PATH) -> list[str]:
+    """Load the single declared feature list embedded in generated build_info.json."""
+    try:
+        document = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise BuildError(f"Не удалось прочитать manifest функций {path}: {exc}") from exc
+
+    if not isinstance(document, dict) or document.get("schema_version") != 1:
+        raise BuildError("Manifest функций должен иметь schema_version=1.")
+    features = document.get("features")
+    if (
+        not isinstance(features, list)
+        or not features
+        or any(not isinstance(item, str) or not item.strip() for item in features)
+    ):
+        raise BuildError("Поле features в manifest должно быть непустым списком строк.")
+    if len(features) != len(set(features)):
+        raise BuildError("Manifest функций содержит повторяющиеся идентификаторы.")
+    return list(features)
+
+
 def main() -> int:
     if os.name != "nt":
         print(
@@ -219,7 +241,7 @@ def main() -> int:
             "data_directory": "data",
             "interface": "single-window-tabs",
             "executable": "AutoDraw.exe",
-            "features": ["image-preparation", "scanline-plan", "quality-check", "autodraw-project", "mouse-execution", "browser-palette-detection", "browser-palette-profiles", "palette-calibration-check", "palette-quantization-ciede2000", "transparent-white-background-removal", "global-white-color-removal", "conditional-white-removal-over-30-percent", "color-scanline-plan", "color-plan-execution", "palette-screenshot-preflight", "scrollable-palette-conversion-ui", "shared-canvas-area-selection", "color-scanline-row-step", "paint-limit-equal-length-series", "empirical-paint-cost-estimate"],
+            "features": load_feature_manifest(),
         }
         (STAGING_ROOT / "build_info.json").write_text(
             json.dumps(metadata, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"

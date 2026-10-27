@@ -4,10 +4,33 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from build_windows import copy_existing_user_data, copy_source_user_data, create_data_layout, replace_release
+from build_windows import (
+    BuildError,
+    copy_existing_user_data,
+    copy_source_user_data,
+    create_data_layout,
+    load_feature_manifest,
+    replace_release,
+)
 
 
 class BuildHelperTests(unittest.TestCase):
+    def test_build_features_are_loaded_from_single_manifest(self):
+        features = load_feature_manifest()
+        self.assertGreaterEqual(len(features), 10)
+        self.assertEqual(len(features), len(set(features)))
+        self.assertTrue(all(isinstance(feature, str) and feature.strip() for feature in features))
+
+    def test_feature_manifest_rejects_duplicate_identifiers(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "features.json"
+            path.write_text(
+                '{"schema_version":1,"features":["scanline-plan","scanline-plan"]}',
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(BuildError, "повторяющиеся"):
+                load_feature_manifest(path)
+
     def test_existing_user_data_is_copied_to_new_staging_directory(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
