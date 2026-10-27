@@ -72,6 +72,55 @@ class BuildHelperTests(unittest.TestCase):
             self.assertTrue(copied.is_file())
             self.assertEqual(copied.read_text(encoding="utf-8"), '{"colors":[]}')
 
+    def test_screen_specific_browser_profile_is_not_seeded_into_a_fresh_build(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            source = root / "source"
+            profiles = source / "data" / "palettes" / "profiles"
+            profiles.mkdir(parents=True)
+            screen_profile = profiles / "Browser_palette.autodraw-palette.json"
+            screen_profile.write_text('{"screen":{"width":1920,"height":1080}}', encoding="utf-8")
+            portable_profile = profiles / "Portable_palette.autodraw-palette.json"
+            portable_profile.write_text('{"screen":null}', encoding="utf-8")
+
+            staging = root / "staging"
+            copy_source_user_data(source, staging)
+
+            self.assertFalse(
+                (staging / "data" / "palettes" / "profiles" / screen_profile.name).exists()
+            )
+            self.assertEqual(
+                (staging / "data" / "palettes" / "profiles" / portable_profile.name)
+                .read_text(encoding="utf-8"),
+                '{"screen":null}',
+            )
+
+    def test_existing_screen_specific_profile_is_preserved_as_user_data(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            source = root / "source"
+            screen_profile = (
+                source / "data" / "palettes" / "profiles" / "Browser_palette.autodraw-palette.json"
+            )
+            screen_profile.parent.mkdir(parents=True)
+            screen_profile.write_text('{"source":"benchmark"}', encoding="utf-8")
+
+            staging = root / "staging"
+            copy_source_user_data(source, staging)
+
+            old_release_profile = (
+                root / "old_release" / "data" / "palettes" / "profiles" / screen_profile.name
+            )
+            old_release_profile.parent.mkdir(parents=True)
+            old_release_profile.write_text('{"source":"user-customized"}', encoding="utf-8")
+            copy_existing_user_data(root / "old_release", staging)
+
+            self.assertEqual(
+                (staging / "data" / "palettes" / "profiles" / screen_profile.name)
+                .read_text(encoding="utf-8"),
+                '{"source":"user-customized"}',
+            )
+
     def test_existing_release_data_overrides_source_seed_data(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)

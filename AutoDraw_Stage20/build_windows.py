@@ -76,8 +76,33 @@ def copy_source_user_data(source_root: Path, staging: Path) -> None:
     source_data = source_root / "data"
     new_data = staging / "data"
     if source_data.is_dir():
-        print(f"Добавляю пользовательские данные из исходной папки: {source_data}", flush=True)
-        shutil.copytree(source_data, new_data, dirs_exist_ok=True)
+        print(f"Добавляю начальные данные из исходной папки: {source_data}", flush=True)
+        # This checked-in calibration belongs to one 1920x1080 desktop and
+        # has absolute screen coordinates. It is useful as a benchmark fixture,
+        # but must not be installed as a default profile on another PC.
+        screen_specific_profile = (
+            source_data / "palettes" / "profiles" / "Browser_palette.autodraw-palette.json"
+        )
+        excluded_profile_directory = screen_specific_profile.parent.resolve()
+
+        def ignore_screen_specific_profile(directory: str, names: list[str]) -> set[str]:
+            if (
+                Path(directory).resolve() == excluded_profile_directory
+                and screen_specific_profile.name in names
+            ):
+                print(
+                    "Не включаю экранный benchmark-профиль палитры в новую portable-сборку.",
+                    flush=True,
+                )
+                return {screen_specific_profile.name}
+            return set()
+
+        shutil.copytree(
+            source_data,
+            new_data,
+            dirs_exist_ok=True,
+            ignore=ignore_screen_specific_profile,
+        )
 
 
 def copy_existing_user_data(old_release: Path, staging: Path) -> None:

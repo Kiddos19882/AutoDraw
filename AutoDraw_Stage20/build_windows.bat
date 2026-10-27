@@ -6,14 +6,14 @@ where py >nul 2>nul
 if errorlevel 1 (
   echo Python Launcher ^(py.exe^) was not found.
   echo Install Python 3.11 x64 with Tcl/Tk, then retry.
-  pause
+if not defined AUTODRAW_NO_PAUSE pause
   exit /b 1
 )
 
 py -3.11 --version >nul 2>nul
 if errorlevel 1 (
   echo Python 3.11 was not found. Install Python 3.11 x64 and retry.
-  pause
+if not defined AUTODRAW_NO_PAUSE pause
   exit /b 1
 )
 
@@ -32,17 +32,19 @@ python run_all_tests.py
 if errorlevel 1 goto :fail
 python build_windows.py
 if errorlevel 1 goto :fail
+python smoke_test_portable.py
+if errorlevel 1 goto :fail
 
 echo.
 echo Build succeeded.
 echo Unified portable application: release\AutoDrawPortable\AutoDraw.exe
 echo Copy the complete AutoDrawPortable folder to another Windows PC.
 echo User data is stored in AutoDrawPortable\data.
-pause
+if not defined AUTODRAW_NO_PAUSE pause
 exit /b 0
 
 :fail
 echo.
 echo Build failed. Read the error output above.
-pause
+if not defined AUTODRAW_NO_PAUSE pause
 exit /b 1
