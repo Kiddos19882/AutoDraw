@@ -128,6 +128,17 @@ class PaintCostModelTests(unittest.TestCase):
             self.assertEqual(color["drawing_length_px"], 0.0)
             self.assertEqual(color["estimated_total_ink_px_equivalent"], 7.67)
 
+    def test_estimate_documents_shared_engine_point_quota_semantics(self):
+        plan = build_color_scanline_plan(
+            np.asarray([[0, 1, 0]], dtype=np.int32), PALETTE
+        )
+        estimate = plan["summary"]["paint_cost_estimate"]
+
+        self.assertEqual(estimate["resource_basis"], "frame_sampled_unique_game_points")
+        self.assertIn("shared stored-coordinate quota", estimate["resource_semantics_note"])
+        self.assertIn("общая для всего рисунка", estimate["resource_scope_note"])
+        self.assertEqual(len(estimate["per_color_estimates"]), 2)
+
     def test_tampered_cost_estimate_is_rejected(self):
         plan = build_color_scanline_plan(np.asarray([[0, 0, 1]], dtype=np.int32), PALETTE)
         tampered = copy.deepcopy(plan)
