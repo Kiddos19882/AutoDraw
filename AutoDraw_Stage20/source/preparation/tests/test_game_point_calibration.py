@@ -60,6 +60,7 @@ def test_all_visible_runs_are_not_used_as_exact_cutoff_observations():
     document = _document()
     document["runs"][0]["outcome"] = "all_visible"
     document["runs"][0]["last_visible_strokes"] = None
+    document["runs"][0]["visible_path_length_px"] = document["runs"][0]["planned_path_length_px"]
     report = analyze_game_point_calibration(document)
     assert report["fit_eligible_run_count"] == 3
     assert any(item["run_id"] == "650" for item in report["excluded_runs"])
