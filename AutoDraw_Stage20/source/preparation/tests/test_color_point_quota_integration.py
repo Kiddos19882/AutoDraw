@@ -40,6 +40,15 @@ class ColorPointQuotaIntegrationTests(unittest.TestCase):
         self.assertLess(estimate["estimated_point_count"], 6_000)
         validate_color_scanline_plan(plan)
 
+    def test_board_type_and_point_limit_must_match(self):
+        with self.assertRaisesRegex(ColorScanlinePlanError, "не совпадает с типом"):
+            build_color_scanline_plan(
+                np.asarray([[0]], dtype=np.int32),
+                PALETTE,
+                board_item_type="BoardItem1",
+                board_point_limit=3_000,
+            )
+
     def test_tampered_point_quota_estimate_is_rejected(self):
         plan = build_color_scanline_plan(
             np.asarray([[0, 0, 1]], dtype=np.int32), PALETTE
