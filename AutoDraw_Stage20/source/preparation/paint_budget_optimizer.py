@@ -318,6 +318,11 @@ def fit_result_to_paint_budget(
     after_unique = np.unique(chosen_map[chosen_map >= 0])
     changed_count = int(np.count_nonzero(chosen_map != indexes))
     after_estimate = chosen_plan["summary"]["paint_cost_estimate"]
+    before_point_estimate = baseline_plan["summary"]["point_quota_estimate"]
+    after_point_estimate = chosen_plan["summary"]["point_quota_estimate"]
+    target_point_count = math.floor(
+        int(after_point_estimate["board_point_limit"]) * target_percent / 100.0
+    )
     optimization_report: dict[str, Any] = {
         "enabled": True,
         "method": "progressive_block_mode_plus_row_sampling",
@@ -332,6 +337,14 @@ def fit_result_to_paint_budget(
         "estimated_ink_before_px_equivalent": float(baseline_estimate["estimated_total_ink_px_equivalent"]),
         "estimated_ink_after_px_equivalent": float(after_estimate["estimated_total_ink_px_equivalent"]),
         "estimated_usage_after_percent": float(after_estimate["estimated_usage_percent"]),
+        "board_point_limit": int(after_point_estimate["board_point_limit"]),
+        "target_point_usage_percent": target_percent,
+        "target_point_count": target_point_count,
+        "estimated_game_points_before": int(before_point_estimate["estimated_point_count"]),
+        "estimated_game_points_after": int(after_point_estimate["estimated_point_count"]),
+        "estimated_game_point_usage_after_percent": float(after_point_estimate["estimated_usage_percent"]),
+        "estimated_game_point_risk_after": str(after_point_estimate["risk_level"]),
+        "game_point_target_met": int(after_point_estimate["estimated_point_count"]) <= target_point_count,
         "used_color_count_before": int(before_unique.size),
         "used_color_count_after": int(after_unique.size),
         "visible_pixel_count_before": int(np.count_nonzero(indexes >= 0)),
