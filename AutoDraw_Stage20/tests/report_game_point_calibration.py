@@ -27,6 +27,24 @@ def main() -> int:
         default=None,
         help="Известный лимит доски, на которой проводились четыре контрольных замера.",
     )
+    parser.add_argument(
+        "--calibration-point-step",
+        type=float,
+        default=None,
+        help="Шаг мыши в историческом запуске (если отличался от текущего профиля).",
+    )
+    parser.add_argument(
+        "--calibration-point-delay-ms",
+        type=float,
+        default=None,
+        help="Задержка между перемещениями в историческом запуске, например 20.",
+    )
+    parser.add_argument(
+        "--calibration-fps",
+        type=float,
+        default=None,
+        help="Частота кадров, измеренная во время исторического запуска.",
+    )
     args = parser.parse_args()
 
     report = build_engine_point_calibration_report(
@@ -34,6 +52,9 @@ def main() -> int:
         point_delay_ms=args.point_delay_ms,
         frame_rate_fps=args.fps,
         calibration_point_limit=args.calibration_point_limit,
+        calibration_point_step_px=args.calibration_point_step,
+        calibration_point_delay_ms=args.calibration_point_delay_ms,
+        calibration_frame_rate_fps=args.calibration_fps,
     )
     print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0
