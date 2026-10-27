@@ -87,6 +87,7 @@ def build_color_scanline_plan(
     max_strokes: int = MAX_COLOR_STROKES,
     paint_stroke_overhead_px_equivalent: float = DEFAULT_STROKE_OVERHEAD_PX_EQUIVALENT,
     paint_budget_px_equivalent: float = DEFAULT_PAINT_BUDGET_PX_EQUIVALENT,
+    board_item_type: str = "BoardItem2",
     board_point_limit: int = HISTORICAL_CALIBRATION_POINT_LIMIT,
     point_step_px: float = DEFAULT_EXECUTOR_POINT_STEP_PX,
     point_delay_ms: int = DEFAULT_EXECUTOR_POINT_DELAY_MS,
@@ -100,6 +101,18 @@ def build_color_scanline_plan(
     intentionally remain zero-length point strokes; widening them belongs to the
     executor stage because widening here could paint over an adjacent color.
     """
+    if not isinstance(board_item_type, str):
+        raise ColorScanlinePlanError("Тип игровой доски должен быть строкой.")
+    try:
+        item_point_limit = get_board_point_limit(board_item_type)
+    except ValueError as exc:
+        raise ColorScanlinePlanError(f"Неизвестный тип игровой доски: {exc}") from exc
+    if board_point_limit != item_point_limit:
+        raise ColorScanlinePlanError(
+            f"Лимит {board_point_limit} не совпадает с типом {board_item_type} "
+            f"(ожидается {item_point_limit})."
+        )
+
     normalized_palette = _normalize_palette_document(palette)
     if isinstance(max_strokes, bool) or not isinstance(max_strokes, int) or max_strokes < 1:
         raise ColorScanlinePlanError("Лимит штрихов должен быть положительным целым числом.")
@@ -224,7 +237,7 @@ def build_color_scanline_plan(
     }
     point_quota_model_config = {
         "model_id": POINT_QUOTA_MODEL_ID,
-        "board_item_type": "BoardItem2" if board_point_limit == HISTORICAL_CALIBRATION_POINT_LIMIT else None,
+        "board_item_type": board_item_type,
         "board_point_limit": board_point_limit,
         "point_step_px": point_step_px,
         "point_delay_ms": point_delay_ms,
@@ -573,6 +586,12 @@ def validate_color_scanline_plan(plan: Any) -> dict[str, Any]:
         if stored_point_model.get("model_id") != POINT_QUOTA_MODEL_ID:
             raise ColorScanlinePlanError("Неизвестная модель лимита игровых точек в цветном плане.")
         try:
+            stored_board_limit = int(stored_point_model["board_point_limit"])
+            stored_board_type = str(stored_point_model["board_item_type"])
+            if get_board_point_limit(stored_board_type) != stored_board_limit:
+                raise ValueError(
+                    f"Тип {stored_board_type} не соответствует лимиту {stored_board_limit}."
+                )
             expected_point_estimate = estimate_point_quota_usage(
                 summary["drawing_length_px"],
                 len(raw_strokes),
