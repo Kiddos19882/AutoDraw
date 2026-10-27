@@ -728,8 +728,10 @@ class ColorScanlineTab:
             f"Автооптимизация: блок {report['block_size_px']} px; "
             f"цветов {report['used_color_count_before']}→{report['used_color_count_after']}; "
             f"штрихов {report['stroke_count_before']:,}→{report['stroke_count_after']:,}; "
-            f"оценка {report['estimated_ink_after_px_equivalent']:,.0f}/"
-            f"{report['target_cost_px_equivalent']:,.0f} px-экв."
+            f"оценка краски {report['estimated_ink_after_px_equivalent']:,.0f}/"
+            f"{report['target_cost_px_equivalent']:,.0f} px-экв.; "
+            f"игровые точки {report['estimated_game_points_after']:,}/"
+            f"{report['target_point_count']:,} (жёсткий лимит {report['board_point_limit']:,})"
         )
         if report.get("fallback_used"):
             prefix += "; применён резервный режим с максимальным упрощением."

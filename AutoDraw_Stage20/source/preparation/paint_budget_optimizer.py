@@ -8,6 +8,13 @@ import numpy as np
 from PIL import Image
 
 from color_scanline import ColorScanlinePlanError, build_color_scanline_plan
+from board_resource_model import DEFAULT_POINT_SAFETY_FACTOR, get_board_point_limit
+from engine_point_calibration import (
+    DEFAULT_EXECUTOR_POINT_DELAY_MS,
+    DEFAULT_EXECUTOR_POINT_STEP_PX,
+    GAME_ENGINE_DEFAULT_FRAME_RATE_FPS,
+    HISTORICAL_CALIBRATION_POINT_LIMIT,
+)
 from paint_cost_model import DEFAULT_PAINT_BUDGET_PX_EQUIVALENT, DEFAULT_STROKE_OVERHEAD_PX_EQUIVALENT
 from palette_quantization import PaletteQuantizationError, PaletteQuantizationResult, normalize_palette
 
@@ -90,6 +97,7 @@ def _candidate_plan(
     block_size: int,
     stroke_overhead: float,
     budget: float,
+    point_quota_config: dict[str, Any],
 ) -> tuple[dict[str, Any], int] | None:
     offset = _best_row_offset(index_map, block_size)
     if offset is None:
@@ -102,11 +110,36 @@ def _candidate_plan(
             row_offset_px=offset,
             paint_stroke_overhead_px_equivalent=stroke_overhead,
             paint_budget_px_equivalent=budget,
-            plan_name="Автоматически упрощённый план под лимит краски",
+            plan_name="Автоматически упрощённый план под лимит ресурсов",
+            **point_quota_config,
         )
     except (ColorScanlinePlanError, PaletteQuantizationError, ValueError, TypeError, MemoryError):
         return None
     return plan, offset
+
+
+
+def _point_target_counts(plan: dict[str, Any], target_usage_percent: float) -> tuple[int, int, int]:
+    """Return requested target, effective target (with safety reserve), and safe budget."""
+    estimate = plan["summary"]["point_quota_estimate"]
+    point_limit = int(estimate["board_point_limit"])
+    safe_budget = int(estimate["planning_budget_points"])
+    requested_target = math.floor(point_limit * target_usage_percent / 100.0)
+    effective_target = min(requested_target, safe_budget)
+    return requested_target, effective_target, safe_budget
+
+
+def _candidate_fits_targets(
+    plan: dict[str, Any],
+    *,
+    target_ink_cost: float,
+    target_usage_percent: float,
+) -> bool:
+    """Accept only when both the paint proxy and the game point quota fit."""
+    ink_estimate = float(plan["summary"]["paint_cost_estimate"]["estimated_total_ink_px_equivalent"])
+    point_estimate = int(plan["summary"]["point_quota_estimate"]["estimated_point_count"])
+    _requested, point_target, _safe = _point_target_counts(plan, target_usage_percent)
+    return ink_estimate <= target_ink_cost and point_estimate <= point_target
 
 
 def _candidate_sizes(max_size: int) -> list[int]:
@@ -165,8 +198,14 @@ def fit_result_to_paint_budget(
     paint_budget_px_equivalent: float = DEFAULT_PAINT_BUDGET_PX_EQUIVALENT,
     stroke_overhead_px_equivalent: float = DEFAULT_STROKE_OVERHEAD_PX_EQUIVALENT,
     target_usage_percent: float = 75.0,
+    board_item_type: str = "BoardItem2",
+    board_point_limit: int = HISTORICAL_CALIBRATION_POINT_LIMIT,
+    point_step_px: float = DEFAULT_EXECUTOR_POINT_STEP_PX,
+    point_delay_ms: float = DEFAULT_EXECUTOR_POINT_DELAY_MS,
+    frame_rate_fps: float = GAME_ENGINE_DEFAULT_FRAME_RATE_FPS,
+    point_quota_safety_factor: float = DEFAULT_POINT_SAFETY_FACTOR,
 ) -> tuple[PaletteQuantizationResult, int, int, dict[str, Any]]:
-    """Coarsen color blocks and sample fewer rows until estimated paint use fits a target."""
+    """Coarsen color blocks and sample rows until both resource targets are satisfied."""
     if not isinstance(result, PaletteQuantizationResult):
         raise PaintBudgetOptimizationError("Ожидался результат преобразования изображения этапа 18.")
     if isinstance(target_usage_percent, bool):
@@ -192,8 +231,27 @@ def fit_result_to_paint_budget(
     max_size = max(height, width)
     target_cost = budget * target_percent / 100.0
 
+    try:
+        expected_point_limit = get_board_point_limit(board_item_type)
+    except ValueError as exc:
+        raise PaintBudgetOptimizationError(str(exc)) from exc
+    if isinstance(board_point_limit, bool) or board_point_limit != expected_point_limit:
+        raise PaintBudgetOptimizationError(
+            f"Лимит {board_point_limit} не совпадает с типом {board_item_type} "
+            f"(ожидается {expected_point_limit})."
+        )
+    point_quota_config = {
+        "board_item_type": board_item_type,
+        "board_point_limit": board_point_limit,
+        "point_step_px": point_step_px,
+        "point_delay_ms": point_delay_ms,
+        "frame_rate_fps": frame_rate_fps,
+        "point_quota_safety_factor": point_quota_safety_factor,
+    }
+
     baseline_result = _candidate_plan(
-        indexes, normalized, block_size=1, stroke_overhead=overhead, budget=budget
+        indexes, normalized, block_size=1, stroke_overhead=overhead, budget=budget,
+        point_quota_config=point_quota_config,
     )
     if baseline_result is None:
         raise PaintBudgetOptimizationError("Не удалось построить исходный цветной план.")
@@ -207,7 +265,9 @@ def fit_result_to_paint_budget(
     fallback_used = False
     tested_sizes: list[int] = [1]
 
-    if float(baseline_estimate["estimated_total_ink_px_equivalent"]) > target_cost:
+    if not _candidate_fits_targets(
+        baseline_plan, target_ink_cost=target_cost, target_usage_percent=target_percent
+    ):
         last_failed_size = 1
         found = False
         for size in _candidate_sizes(max_size):
@@ -217,6 +277,7 @@ def fit_result_to_paint_budget(
             candidate_result = _candidate_plan(
                 candidate_map, normalized, block_size=size,
                 stroke_overhead=overhead, budget=budget,
+                point_quota_config=point_quota_config,
             )
             tested_sizes.append(size)
             if candidate_result is None:
@@ -226,13 +287,16 @@ def fit_result_to_paint_budget(
             candidate_cost = float(
                 candidate_plan["summary"]["paint_cost_estimate"]["estimated_total_ink_px_equivalent"]
             )
-            if candidate_cost <= target_cost:
+            if _candidate_fits_targets(
+                candidate_plan, target_ink_cost=target_cost, target_usage_percent=target_percent
+            ):
                 # Refine the interval before accepting a coarse step to preserve more detail.
                 for refined_size in range(last_failed_size + 1, size):
                     refined_map = _mode_block_map(indexes, refined_size)
                     refined_result = _candidate_plan(
                         refined_map, normalized, block_size=refined_size,
                         stroke_overhead=overhead, budget=budget,
+                        point_quota_config=point_quota_config,
                     )
                     tested_sizes.append(refined_size)
                     if refined_result is None:
@@ -241,7 +305,9 @@ def fit_result_to_paint_budget(
                     refined_cost = float(
                         refined_plan["summary"]["paint_cost_estimate"]["estimated_total_ink_px_equivalent"]
                     )
-                    if refined_cost <= target_cost:
+                    if _candidate_fits_targets(
+                        refined_plan, target_ink_cost=target_cost, target_usage_percent=target_percent
+                    ):
                         candidate_map = refined_map
                         candidate_plan = refined_plan
                         candidate_offset = refined_offset
@@ -274,12 +340,15 @@ def fit_result_to_paint_budget(
                 row_offset_px=fallback_offset,
                 paint_stroke_overhead_px_equivalent=overhead,
                 paint_budget_px_equivalent=budget,
-                plan_name="Резервный однострочный план под лимит краски",
+                plan_name="Резервный однострочный план под лимит ресурсов",
+                **point_quota_config,
             )
             fallback_cost = float(
                 fallback_plan["summary"]["paint_cost_estimate"]["estimated_total_ink_px_equivalent"]
             )
-            if fallback_cost <= target_cost:
+            if _candidate_fits_targets(
+                fallback_plan, target_ink_cost=target_cost, target_usage_percent=target_percent
+            ):
                 chosen_map = indexes.copy()
                 chosen_step = max_size
                 chosen_offset = fallback_offset
@@ -290,6 +359,7 @@ def fit_result_to_paint_budget(
                 coarse_result = _candidate_plan(
                     coarse_map, normalized, block_size=max_size,
                     stroke_overhead=overhead, budget=budget,
+                    point_quota_config=point_quota_config,
                 )
                 if coarse_result is None:
                     raise PaintBudgetOptimizationError(
@@ -298,10 +368,18 @@ def fit_result_to_paint_budget(
                     )
                 coarse_plan, coarse_offset = coarse_result
                 coarse_cost = float(coarse_plan["summary"]["paint_cost_estimate"]["estimated_total_ink_px_equivalent"])
-                if coarse_cost > target_cost:
+                if not _candidate_fits_targets(
+                    coarse_plan, target_ink_cost=target_cost, target_usage_percent=target_percent
+                ):
+                    point_estimate = int(coarse_plan["summary"]["point_quota_estimate"]["estimated_point_count"])
+                    _requested_point_target, effective_point_target, _safe_point_budget = _point_target_counts(
+                        coarse_plan, target_percent
+                    )
                     raise PaintBudgetOptimizationError(
-                        f"Даже максимально упрощённый план требует {coarse_cost:,.0f} px-экв., "
-                        f"что выше целевого лимита {target_cost:,.0f}."
+                        f"Даже максимально упрощённый план требует {coarse_cost:,.0f}/"
+                        f"{target_cost:,.0f} px-экв. и {point_estimate:,}/"
+                        f"{effective_point_target:,} игровых точек. "
+                        "Уменьшите исходное изображение или разделите его на несколько досок."
                     )
                 chosen_map = coarse_map
                 chosen_step = max_size
@@ -320,8 +398,8 @@ def fit_result_to_paint_budget(
     after_estimate = chosen_plan["summary"]["paint_cost_estimate"]
     before_point_estimate = baseline_plan["summary"]["point_quota_estimate"]
     after_point_estimate = chosen_plan["summary"]["point_quota_estimate"]
-    target_point_count = math.floor(
-        int(after_point_estimate["board_point_limit"]) * target_percent / 100.0
+    requested_target_point_count, target_point_count, safe_point_budget_points = _point_target_counts(
+        chosen_plan, target_percent
     )
     optimization_report: dict[str, Any] = {
         "enabled": True,
@@ -340,6 +418,10 @@ def fit_result_to_paint_budget(
         "board_point_limit": int(after_point_estimate["board_point_limit"]),
         "target_point_usage_percent": target_percent,
         "target_point_count": target_point_count,
+        "requested_target_point_count": requested_target_point_count,
+        "safe_point_budget_points": safe_point_budget_points,
+        "point_quota_safety_factor": float(after_point_estimate["safety_factor"]),
+        "game_point_constraint_applied": True,
         "estimated_game_points_before": int(before_point_estimate["estimated_point_count"]),
         "estimated_game_points_after": int(after_point_estimate["estimated_point_count"]),
         "estimated_game_point_usage_after_percent": float(after_point_estimate["estimated_usage_percent"]),
@@ -356,9 +438,10 @@ def fit_result_to_paint_budget(
         "fallback_used": fallback_used,
         "note": (
             "Режим постепенно заменяет квадратные блоки наиболее частым цветом и выбирает "
-            "реже расположенные строки, пока оценка не достигает заданной доли бюджета. "
+            "реже расположенные строки, пока одновременно не выполняются целевой расход краски "
+            "и оценка игровой квоты точек. Лимит точек дополнительно ограничен коэффициентом запаса. "
             "Цвета берутся только из исходной игровой палитры; размер холста не меняется. "
-            "Это намеренно упрощённый результат, оценка расхода экспериментальная."
+            "Обе оценки экспериментальные и не заменяют проверку в игре."
         ),
     }
     output.report["paint_budget_optimization"] = optimization_report

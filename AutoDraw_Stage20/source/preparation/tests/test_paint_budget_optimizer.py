@@ -47,6 +47,56 @@ class PaintBudgetOptimizerTests(unittest.TestCase):
         self.assertTrue(report["game_point_target_met"])
         self.assertEqual(report["changed_pixel_count"], 0)
 
+    def test_game_point_quota_triggers_optimization_even_when_ink_budget_fits(self):
+        height, width = 40, 80
+        y, x = np.indices((height, width))
+        indexes = ((x + y) % 2).astype(np.int32)
+
+        result, step, _offset, report = fit_result_to_paint_budget(
+            make_result(indexes),
+            PALETTE,
+            paint_budget_px_equivalent=100_000,
+            target_usage_percent=75,
+        )
+
+        self.assertLess(
+            report["estimated_ink_before_px_equivalent"],
+            report["target_cost_px_equivalent"],
+        )
+        self.assertGreater(
+            report["estimated_game_points_before"],
+            report["target_point_count"],
+        )
+        self.assertGreater(step, 1)
+        self.assertTrue(report["game_point_constraint_applied"])
+        self.assertTrue(report["game_point_target_met"])
+        self.assertLessEqual(
+            report["estimated_game_points_after"],
+            report["target_point_count"],
+        )
+        self.assertLessEqual(
+            report["estimated_ink_after_px_equivalent"],
+            report["target_cost_px_equivalent"],
+        )
+        self.assertEqual(result.index_map.shape, indexes.shape)
+
+    def test_high_requested_point_target_still_respects_safety_budget(self):
+        height, width = 40, 80
+        y, x = np.indices((height, width))
+        indexes = ((x + y) % 2).astype(np.int32)
+
+        _result, _step, _offset, report = fit_result_to_paint_budget(
+            make_result(indexes),
+            PALETTE,
+            paint_budget_px_equivalent=100_000,
+            target_usage_percent=95,
+        )
+
+        self.assertEqual(report["requested_target_point_count"], 5_700)
+        self.assertEqual(report["target_point_count"], report["safe_point_budget_points"])
+        self.assertEqual(report["safe_point_budget_points"], 5_100)
+        self.assertTrue(report["game_point_target_met"])
+
     def test_complex_map_is_reduced_to_target_budget_with_fixed_dimensions(self):
         height, width = 48, 80
         y, x = np.indices((height, width))
