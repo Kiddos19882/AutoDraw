@@ -36,8 +36,13 @@ def fit_interval_censored_quota(
     strokes = np.asarray(visible_strokes, dtype=np.float64)
     stroke_lengths_array = np.asarray(stroke_lengths, dtype=np.float64)
     midpoint = np.asarray(midpoint_coefficients, dtype=np.float64)
-    quota_value = float(quota)
+    try:
+        quota_value = float(quota)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("Квота должна быть конечным числом.") from exc
 
+    if not np.isfinite(quota_value):
+        raise ValueError("Квота должна быть конечным числом.")
     if matrix.ndim != 2 or matrix.shape[1] != 2 or matrix.shape[0] == 0:
         raise ValueError("midpoint_matrix должен иметь форму (n, 2), n > 0.")
     count = matrix.shape[0]
