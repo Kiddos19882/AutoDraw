@@ -10,7 +10,13 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 PREPARATION_ROOT = PROJECT_ROOT / "source" / "preparation"
 sys.path.insert(0, str(PREPARATION_ROOT))
 
-from engine_point_calibration import build_engine_point_calibration_report  # noqa: E402
+from engine_point_calibration import (  # noqa: E402
+    HISTORICAL_CALIBRATION_FRAME_RATE_FPS,
+    HISTORICAL_CALIBRATION_POINT_DELAY_MS,
+    HISTORICAL_CALIBRATION_POINT_LIMIT,
+    HISTORICAL_CALIBRATION_POINT_STEP_PX,
+    build_engine_point_calibration_report,
+)
 
 
 def main() -> int:
@@ -24,26 +30,26 @@ def main() -> int:
         "--calibration-point-limit",
         type=int,
         choices=(3000, 6000, 12000),
-        default=None,
-        help="Известный лимит доски, на которой проводились четыре контрольных замера.",
+        default=HISTORICAL_CALIBRATION_POINT_LIMIT,
+        help="Подтверждённый лимит исторической доски (по умолчанию 6000 для BoardItem2).",
     )
     parser.add_argument(
         "--calibration-point-step",
         type=float,
-        default=None,
-        help="Шаг мыши в историческом запуске (если отличался от текущего профиля).",
+        default=HISTORICAL_CALIBRATION_POINT_STEP_PX,
+        help="Шаг мыши в историческом запуске.",
     )
     parser.add_argument(
         "--calibration-point-delay-ms",
         type=float,
-        default=None,
-        help="Задержка между перемещениями в историческом запуске, например 20.",
+        default=HISTORICAL_CALIBRATION_POINT_DELAY_MS,
+        help="Задержка между перемещениями в историческом запуске.",
     )
     parser.add_argument(
         "--calibration-fps",
         type=float,
-        default=None,
-        help="Частота кадров, измеренная во время исторического запуска.",
+        default=HISTORICAL_CALIBRATION_FRAME_RATE_FPS,
+        help="Номинальная частота кадров исторического запуска (48 FPS).",
     )
     args = parser.parse_args()
 
