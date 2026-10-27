@@ -49,6 +49,29 @@ class EnginePointCalibrationTests(unittest.TestCase):
         self.assertLess(report["validation"]["max_abs_empirical_residual_points"], 20.0)
         self.assertFalse(report["validation"]["historic_executor_profile_was_recorded"])
 
+    def test_historical_twenty_ms_profile_points_to_12000_quota(self):
+        report = build_engine_point_calibration_report(
+            point_step_px=2,
+            point_delay_ms=10,
+            calibration_point_step_px=2,
+            calibration_point_delay_ms=20,
+        )
+        inference = report["point_limit_inference"]
+        self.assertEqual(inference["selected_limit"], 12_000)
+        self.assertEqual(inference["current_profile_nearest_limit"], 6_000)
+        self.assertLess(inference["selected_limit_deviation_percent"], 3.0)
+        self.assertLess(
+            report["calibration_profile"]["theoretical_capacity_points"],
+            12_500,
+        )
+        # Even with a 20 ms historic profile, the density is rescaled to the
+        # current 10 ms profile for new plans.
+        self.assertAlmostEqual(
+            report["executor_profile"]["effective_points_per_path_px"],
+            6_000 / report["observed_cutoff_fit"]["paint_budget_px_equivalent"],
+            places=5,
+        )
+
     def test_explicit_calibration_board_limit_is_not_marked_as_inferred(self):
         report = build_engine_point_calibration_report(calibration_point_limit=6_000)
         self.assertEqual(report["point_limit_inference"]["selected_limit"], 6_000)
