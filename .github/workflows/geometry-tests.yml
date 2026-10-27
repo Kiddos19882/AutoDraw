@@ -10,6 +10,8 @@ on:
       - "AutoDraw_Stage20/source/executor/**"
       - "AutoDraw_Stage20/integrated_app.py"
       - "AutoDraw_Stage20/tests/**"
+      - "AutoDraw_Stage20/data/calibration/**"
+      - "AutoDraw_Stage20/BROWSER_POINT_CALIBRATION.md"
       - "AutoDraw_Stage20/build_windows.bat"
       - "AutoDraw_Stage20/build_windows.py"
       - "AutoDraw_Stage20/app_features.json"

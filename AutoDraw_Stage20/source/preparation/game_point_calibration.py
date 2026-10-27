@@ -17,9 +17,13 @@ from engine_point_calibration import estimate_theoretical_points_per_path_px
 
 
 SCHEMA_VERSION = 1
+REPORT_SCHEMA_VERSION = 2
+FRAME_PROBE_SCHEMA_VERSION = 2
 MIN_FIT_RUNS = 3
 MIN_DISTINCT_LENGTHS = 3
 MAX_ACCEPTABLE_RELATIVE_ERROR_PERCENT = 10.0
+CUTOFF_INTERVAL_TOLERANCE_POINTS = 1.0
+MAX_ACCEPTABLE_FRAME_GAP_MS = 1000.0
 
 
 class GamePointCalibrationError(ValueError):
@@ -56,26 +60,78 @@ def _validate_document(document: Any) -> tuple[dict[str, Any], list[dict[str, An
     probe = browser.get("frame_probe")
     if not isinstance(probe, dict):
         raise GamePointCalibrationError("Добавьте результат browser_frame_probe.js в browser.frame_probe.")
+    if probe.get("schema_version") != FRAME_PROBE_SCHEMA_VERSION:
+        raise GamePointCalibrationError(
+            f"Версия browser.frame_probe должна быть {FRAME_PROBE_SCHEMA_VERSION}; "
+            "запустите актуальный browser_frame_probe.js заново."
+        )
+    if probe.get("probe_status") != "completed":
+        raise GamePointCalibrationError("Замер кадров не завершён корректно; повторите его.")
+    if probe.get("visibility_interrupted") is not False:
+        raise GamePointCalibrationError("Замер был прерван изменением видимости вкладки.")
+    visibility_changes = _integer(
+        probe.get("visibility_change_count"),
+        "Число изменений видимости вкладки",
+        minimum=0,
+    )
+    if visibility_changes != 0:
+        raise GamePointCalibrationError("Видимость вкладки изменилась во время замера; повторите его.")
+    if probe.get("document_visibility") != "visible":
+        raise GamePointCalibrationError("Вкладка была скрыта во время замера FPS; повторите его на видимой вкладке.")
+
     fps = _number(probe.get("average_fps"), "Средний FPS из browser.frame_probe", positive=True)
-    median_fps = _number(probe.get("median_fps", fps), "Медианный FPS", positive=True)
+    median_fps = _number(probe.get("median_fps"), "Медианный FPS", positive=True)
     duration = _number(probe.get("duration_ms"), "Длительность замера FPS", positive=True)
+    wall_duration = _number(probe.get("wall_clock_elapsed_ms"), "Реальная длительность замера FPS", positive=True)
+    frame_count = _integer(probe.get("frame_count"), "Число измеренных интервалов кадров", minimum=30)
+    median_interval = _number(
+        probe.get("median_frame_interval_ms"),
+        "Медианный интервал кадров",
+        positive=True,
+    )
+    p95_interval = _number(
+        probe.get("p95_frame_interval_ms"),
+        "95-й перцентиль интервала кадров",
+        positive=True,
+    )
+    maximum_interval = _number(
+        probe.get("max_frame_interval_ms"),
+        "Максимальный интервал кадров",
+        positive=True,
+    )
     if fps > 300 or median_fps > 300:
         raise GamePointCalibrationError("FPS выглядит недопустимо высоким; проверьте результат DevTools probe.")
     if duration < 3000:
         raise GamePointCalibrationError("Для калибровки используйте замер FPS длительностью не менее 3 секунд.")
-    if str(probe.get("document_visibility", "visible")) != "visible":
-        raise GamePointCalibrationError("Вкладка была скрыта во время замера FPS; повторите его на видимой вкладке.")
+    if wall_duration < duration * 0.9:
+        raise GamePointCalibrationError("Реальная длительность замера меньше ожидаемой; повторите измерение.")
+    if maximum_interval > MAX_ACCEPTABLE_FRAME_GAP_MS:
+        raise GamePointCalibrationError(
+            "В замере есть пауза кадров свыше 1000 мс; повторите его без приостановки вкладки."
+        )
+    if not median_interval <= p95_interval <= maximum_interval:
+        raise GamePointCalibrationError("Статистика интервалов кадров внутренне противоречива.")
+    interval_median_fps = 1000.0 / median_interval
+    if abs(interval_median_fps - median_fps) / median_fps > 0.03:
+        raise GamePointCalibrationError("Медианный FPS не согласуется с медианным интервалом кадров.")
+    fps_from_count = frame_count * 1000.0 / duration
+    if abs(fps_from_count - fps) / fps > 0.15:
+        raise GamePointCalibrationError("Число кадров, длительность и средний FPS не согласуются.")
     normalized_probe = dict(probe)
     normalized_probe["average_fps"] = fps
     normalized_probe["median_fps"] = median_fps
 
     normalized_runs: list[dict[str, Any]] = []
     excluded_runs: list[dict[str, Any]] = []
+    seen_run_ids: set[str] = set()
     allowed_outcomes = {"all_visible", "partial", "none_visible"}
     for position, raw in enumerate(runs, start=1):
         if not isinstance(raw, dict):
             raise GamePointCalibrationError(f"Запуск №{position} должен быть объектом JSON.")
         run_id = str(raw.get("run_id") or f"run-{position}")
+        if run_id in seen_run_ids:
+            raise GamePointCalibrationError(f"Повторяется run_id={run_id!r}; каждому запуску нужен уникальный ID.")
+        seen_run_ids.add(run_id)
         board_type = raw.get("board_item_type")
         if board_type not in BOARD_ITEM_POINT_LIMITS:
             raise GamePointCalibrationError(
@@ -102,25 +158,55 @@ def _validate_document(document: Any) -> tuple[dict[str, Any], list[dict[str, An
         stroke_length = _number(raw.get("stroke_length_px"), f"{run_id}: stroke_length_px", positive=True)
         planned_path = _number(raw.get("planned_path_length_px"), f"{run_id}: planned_path_length_px", positive=True)
         repeat_index = _integer(raw.get("repeat_index", 1), f"{run_id}: repeat_index", minimum=1)
-        fresh = raw.get("fresh_supply_confirmed") is True
+        if not isinstance(raw.get("fresh_supply_confirmed"), bool):
+            raise GamePointCalibrationError(
+                f"{run_id}: fresh_supply_confirmed должен быть true/false; не оставляйте поле пустым."
+            )
+        fresh = raw["fresh_supply_confirmed"]
         last_visible = raw.get("last_visible_strokes")
         if outcome == "all_visible":
+            if last_visible is not None and _integer(
+                last_visible, f"{run_id}: last_visible_strokes", minimum=0
+            ) != planned_count:
+                raise GamePointCalibrationError(
+                    f"{run_id}: all_visible противоречит last_visible_strokes; ожидалось planned_strokes."
+                )
             visible_count = planned_count
         elif outcome == "none_visible":
+            if last_visible is not None and _integer(
+                last_visible, f"{run_id}: last_visible_strokes", minimum=0
+            ) != 0:
+                raise GamePointCalibrationError(
+                    f"{run_id}: none_visible противоречит last_visible_strokes; ожидалось 0."
+                )
             visible_count = 0
         else:
-            visible_count = _integer(last_visible, f"{run_id}: last_visible_strokes", minimum=0)
+            visible_count = _integer(last_visible, f"{run_id}: last_visible_strokes", minimum=1)
             if visible_count >= planned_count:
                 raise GamePointCalibrationError(
-                    f"{run_id}: при outcome=partial число last_visible_strokes должно быть меньше planned_strokes."
+                    f"{run_id}: при outcome=partial число last_visible_strokes должно быть от 1 до planned_strokes - 1."
                 )
 
+        expected_planned_path = planned_count * stroke_length
+        planned_path_tolerance = max(1.0, expected_planned_path * 0.001)
+        if abs(planned_path - expected_planned_path) > planned_path_tolerance:
+            raise GamePointCalibrationError(
+                f"{run_id}: planned_path_length_px не согласуется с planned_strokes × stroke_length_px."
+            )
+        expected_visible_path = visible_count * stroke_length
         visible_path = _number(
-            raw.get("visible_path_length_px", visible_count * stroke_length),
+            raw.get("visible_path_length_px", expected_visible_path),
             f"{run_id}: visible_path_length_px",
         )
-        if visible_path < 0:
-            raise GamePointCalibrationError(f"{run_id}: visible_path_length_px не может быть отрицательным.")
+        visible_path_tolerance = max(1.0, expected_visible_path * 0.001)
+        if visible_path < 0 or abs(visible_path - expected_visible_path) > visible_path_tolerance:
+            raise GamePointCalibrationError(
+                f"{run_id}: visible_path_length_px не согласуется с количеством полностью видимых штрихов."
+            )
+        if visible_path > planned_path + planned_path_tolerance:
+            raise GamePointCalibrationError(
+                f"{run_id}: видимый путь не может быть длиннее запланированного."
+            )
         normalized = {
             "run_id": run_id,
             "board_item_type": board_type,
@@ -180,7 +266,15 @@ def analyze_game_point_calibration(document: Any) -> dict[str, Any]:
     for (board_type, point_limit, step, delay, measured_fps), group in sorted(groups.items()):
         visible_length = np.asarray([item["visible_path_length_px"] for item in group], dtype=np.float64)
         visible_strokes = np.asarray([item["last_visible_strokes"] for item in group], dtype=np.float64)
-        matrix = np.column_stack((visible_length, visible_strokes))
+        stroke_lengths = np.asarray([item["stroke_length_px"] for item in group], dtype=np.float64)
+
+        # The quota crossing is interval-censored: the quota was not reached
+        # after the last complete stroke, but was reached/rejected during the
+        # next one. Fit to the midpoint of that interval rather than pretending
+        # the last visible stroke is an exact quota boundary.
+        midpoint_lengths = visible_length + stroke_lengths / 2.0
+        midpoint_strokes = visible_strokes + 0.5
+        matrix = np.column_stack((midpoint_lengths, midpoint_strokes))
         distinct_lengths = sorted({round(float(item["stroke_length_px"]), 4) for item in group})
         fit_base = {
             "board_item_type": board_type,
@@ -235,6 +329,20 @@ def analyze_game_point_calibration(document: Any) -> dict[str, Any]:
         relative_errors = absolute_errors / float(point_limit) * 100.0
         mean_abs_error = float(np.mean(absolute_errors))
         max_relative_error = float(np.max(relative_errors))
+        lower_cutoff_points = visible_length * density + visible_strokes * per_stroke
+        upper_cutoff_points = (
+            (visible_length + stroke_lengths) * density
+            + (visible_strokes + 1.0) * per_stroke
+        )
+        cutoff_interval_width_points = upper_cutoff_points - lower_cutoff_points
+        cutoff_interval_contains_quota = (
+            (lower_cutoff_points <= float(point_limit) + CUTOFF_INTERVAL_TOLERANCE_POINTS)
+            & (upper_cutoff_points >= float(point_limit) - CUTOFF_INTERVAL_TOLERANCE_POINTS)
+        )
+        all_cutoff_intervals_consistent = bool(np.all(cutoff_interval_contains_quota))
+        maximum_cutoff_interval_width_percent = float(
+            np.max(cutoff_interval_width_points) / float(point_limit) * 100.0
+        )
         try:
             theoretical_density = estimate_theoretical_points_per_path_px(
                 point_step_px=step,
@@ -247,40 +355,60 @@ def analyze_game_point_calibration(document: Any) -> dict[str, Any]:
             (density - theoretical_density) / theoretical_density * 100.0
             if theoretical_density else None
         )
+        fit_status = (
+            "calibrated"
+            if max_relative_error <= MAX_ACCEPTABLE_RELATIVE_ERROR_PERCENT
+            and all_cutoff_intervals_consistent
+            else "needs_repeat"
+        )
         models.append({
             **fit_base,
-            "fit_status": "calibrated" if max_relative_error <= MAX_ACCEPTABLE_RELATIVE_ERROR_PERCENT else "needs_repeat",
+            "fit_status": fit_status,
+            "fitting_method": "least_squares_on_cutoff_interval_midpoints_v1",
+            "midpoint_fit_error_is_not_a_measurement_of_absolute_accuracy": True,
             "matrix_rank": rank,
             "points_per_path_px": round(density, 8),
             "points_per_stroke": round(per_stroke, 4),
             "equivalent_path_overhead_px_per_stroke": round(per_stroke / density, 4),
             "theoretical_points_per_path_px_from_measured_fps": round(theoretical_density, 8) if theoretical_density else None,
             "empirical_density_delta_from_theory_percent": round(density_delta, 3) if density_delta is not None else None,
-            "mean_absolute_fit_error_points": round(mean_abs_error, 2),
+            "mean_absolute_midpoint_fit_error_points": round(mean_abs_error, 2),
             "maximum_fit_error_percent_of_quota": round(max_relative_error, 3),
+            "cutoff_interval_tolerance_points": CUTOFF_INTERVAL_TOLERANCE_POINTS,
+            "all_cutoff_intervals_consistent": all_cutoff_intervals_consistent,
+            "cutoff_interval_consistent_run_count": int(np.count_nonzero(cutoff_interval_contains_quota)),
+            "cutoff_interval_run_count": len(group),
+            "maximum_cutoff_interval_width_points": round(float(np.max(cutoff_interval_width_points)), 2),
+            "maximum_cutoff_interval_width_percent_of_quota": round(maximum_cutoff_interval_width_percent, 3),
             "per_run_fit": [
                 {
                     "run_id": item["run_id"],
                     "stroke_length_px": item["stroke_length_px"],
                     "observed_visible_path_length_px": item["visible_path_length_px"],
                     "fully_visible_strokes": item["last_visible_strokes"],
-                    "predicted_points_at_observed_cutoff": round(float(predicted[index]), 2),
-                    "absolute_error_points": round(float(absolute_errors[index]), 2),
-                    "relative_error_percent": round(float(relative_errors[index]), 3),
+                    "cutoff_lower_points_estimate": round(float(lower_cutoff_points[index]), 2),
+                    "cutoff_upper_points_estimate": round(float(upper_cutoff_points[index]), 2),
+                    "cutoff_interval_width_points": round(float(cutoff_interval_width_points[index]), 2),
+                    "cutoff_interval_contains_quota": bool(cutoff_interval_contains_quota[index]),
+                    "predicted_points_at_cutoff_interval_midpoint": round(float(predicted[index]), 2),
+                    "midpoint_absolute_error_points": round(float(absolute_errors[index]), 2),
+                    "midpoint_relative_error_percent": round(float(relative_errors[index]), 3),
                 }
                 for index, item in enumerate(group)
             ],
             "notes": (
-                "Приближение: последний полностью видимый штрих не означает точную точку исчерпания; "
-                "точка отказа находится между последним полным и первым пропавшим штрихом. "
+                "Порог наблюдается как интервал между стоимостью последнего полностью видимого штриха "
+                "и стоимостью ещё одного штриха. Коэффициенты подогнаны по серединам этих интервалов; "
+                "это уменьшает ложную точность, но не доказывает абсолютную точность модели. "
+                "Интервалы должны согласоваться с лимитом с допуском на одну точку. "
                 "Коэффициенты относятся только к этому профилю движения и частоте кадров."
             ),
         })
 
     calibrated = [model for model in models if model.get("fit_status") == "calibrated"]
     return {
-        "schema_version": SCHEMA_VERSION,
-        "model_id": "browser-observed-game-point-calibration-v1",
+        "schema_version": REPORT_SCHEMA_VERSION,
+        "model_id": "browser-observed-game-point-calibration-v2-interval",
         "is_engine_exact_counter": False,
         "generated_at": document.get("updated_at"),
         "browser": {
@@ -301,7 +429,8 @@ def analyze_game_point_calibration(document: Any) -> dict[str, Any]:
         ),
         "interpretation_limits": [
             "RequestAnimationFrame измеряет кадровую частоту видимой вкладки, но не читает внутренний счётчик точек игры напрямую.",
-            "Оценка по последнему полностью видимому штриху является пороговым приближением, а не точным значением внутреннего счётчика.",
+            "Граница расхода задана интервалом между последним полностью видимым и следующим штрихом; подгонка использует середину интервала.",
+            "Узкий интервал и небольшая ошибка подгонки не доказывают абсолютную точность: на результат влияют повторяемость и условия браузера.",
             "Коэффициенты нельзя переносить на другой шаг, задержку, браузерную нагрузку или тип доски без проверки.",
         ],
     }
