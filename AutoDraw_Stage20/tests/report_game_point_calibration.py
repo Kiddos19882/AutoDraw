@@ -62,7 +62,7 @@ def main() -> int:
         calibration_point_delay_ms=args.calibration_point_delay_ms,
         calibration_frame_rate_fps=args.calibration_fps,
     )
-    print(json.dumps(report, ensure_ascii=False, indent=2))
+    print(json.dumps(report, ensure_ascii=True, indent=2))
     return 0
 
 
