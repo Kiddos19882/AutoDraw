@@ -91,11 +91,21 @@ def fit_interval_censored_quota(
     # every interval. Otherwise test its orthogonal projection onto each edge.
     if is_feasible(midpoint):
         candidates.append(midpoint.copy())
+    # Minimize the actual midpoint SSE along each constraint boundary.
+    # Euclidean projection would be feasible but would not generally minimize
+    # ||matrix @ coefficients - quota||^2 when the columns have different scales.
+    hessian = matrix.T @ matrix
     for normal, limit in zip(constraints, limits):
-        norm_squared = float(normal @ normal)
-        if norm_squared <= 0:
+        try:
+            hessian_inverse_normal = np.linalg.solve(hessian, normal)
+        except np.linalg.LinAlgError:
+            hessian_inverse_normal = np.linalg.pinv(hessian) @ normal
+        denominator = float(normal @ hessian_inverse_normal)
+        if denominator <= 1e-18:
             continue
-        projected = midpoint - normal * (float(normal @ midpoint) - float(limit)) / norm_squared
+        projected = midpoint - hessian_inverse_normal * (
+            float(normal @ midpoint) - float(limit)
+        ) / denominator
         if is_feasible(projected):
             candidates.append(projected)
 
@@ -123,8 +133,8 @@ def fit_interval_censored_quota(
         "points_per_stroke": float(best[1]),
         "midpoint_sse_points_squared": midpoint_objective,
         "interval_fit_sse_points_squared": best_objective,
-        "midpoint_sse_reduction_percent": (
-            (midpoint_objective - best_objective) / midpoint_objective * 100.0
+        "midpoint_sse_change_percent": (
+            (best_objective - midpoint_objective) / midpoint_objective * 100.0
             if midpoint_objective > 0
             else 0.0
         ),
