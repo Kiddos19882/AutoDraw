@@ -21,6 +21,12 @@ GAME_ENGINE_DEFAULT_FRAME_RATE_FPS = 48.0
 DEFAULT_EXECUTOR_POINT_STEP_PX = 2.0
 DEFAULT_EXECUTOR_POINT_DELAY_MS = 10
 
+# Confirmed for the four historical depletion measurements by the user.
+HISTORICAL_CALIBRATION_POINT_LIMIT = 6_000
+HISTORICAL_CALIBRATION_POINT_STEP_PX = 2.0
+HISTORICAL_CALIBRATION_POINT_DELAY_MS = 10.0
+HISTORICAL_CALIBRATION_FRAME_RATE_FPS = GAME_ENGINE_DEFAULT_FRAME_RATE_FPS
+
 
 def _finite_number(value: Any, field: str) -> float:
     if isinstance(value, bool):
@@ -77,10 +83,10 @@ def build_engine_point_calibration_report(
     point_step_px: float = DEFAULT_EXECUTOR_POINT_STEP_PX,
     point_delay_ms: float = DEFAULT_EXECUTOR_POINT_DELAY_MS,
     frame_rate_fps: float = GAME_ENGINE_DEFAULT_FRAME_RATE_FPS,
-    calibration_point_limit: int | None = None,
-    calibration_point_step_px: float | None = None,
-    calibration_point_delay_ms: float | None = None,
-    calibration_frame_rate_fps: float | None = None,
+    calibration_point_limit: int | None = HISTORICAL_CALIBRATION_POINT_LIMIT,
+    calibration_point_step_px: float | None = HISTORICAL_CALIBRATION_POINT_STEP_PX,
+    calibration_point_delay_ms: float | None = HISTORICAL_CALIBRATION_POINT_DELAY_MS,
+    calibration_frame_rate_fps: float | None = HISTORICAL_CALIBRATION_FRAME_RATE_FPS,
 ) -> dict[str, Any]:
     """Compare empirical exhaustion observations with the game's point quotas.
 
@@ -152,6 +158,13 @@ def build_engine_point_calibration_report(
         empirical_density_at_calibration * float(fit["stroke_overhead_px_equivalent"])
     )
     calibration_profile_assumed = not calibration_profile_is_fully_specified
+    historical_configuration_confirmed = (
+        not is_inferred
+        and base_limit == HISTORICAL_CALIBRATION_POINT_LIMIT
+        and math.isclose(float(calibration_step), HISTORICAL_CALIBRATION_POINT_STEP_PX)
+        and math.isclose(float(calibration_delay), HISTORICAL_CALIBRATION_POINT_DELAY_MS)
+        and math.isclose(float(calibration_fps), HISTORICAL_CALIBRATION_FRAME_RATE_FPS)
+    )
 
     observation_results: list[dict[str, Any]] = []
     for item in observation_list:
@@ -253,7 +266,7 @@ def build_engine_point_calibration_report(
             "selected_limit": base_limit,
             "is_inferred": is_inferred,
             "is_verified_from_observation_metadata": False,
-            "is_explicitly_supplied_by_caller": not is_inferred,
+            "is_historical_configuration_confirmed": historical_configuration_confirmed,
             "theoretical_capacity_points": round(calibration_theoretical_capacity, 2),
             "current_profile_theoretical_capacity_points": round(current_theoretical_capacity, 2),
             "nearest_supported_limit": nearest_limit,
@@ -273,6 +286,7 @@ def build_engine_point_calibration_report(
             "empirical_density_is_scaled_for_current_executor_profile": True,
             "historic_executor_profile_was_recorded": False,
             "historic_executor_profile_is_assumed": calibration_profile_assumed,
+            "historical_configuration_confirmed_by_user": historical_configuration_confirmed,
             "note": (
                 "The empirical fit uses the existing depletion observations. The nearest quota and historic "
                 "executor profile are inferred because these metadata were not saved with the observations."
@@ -291,10 +305,10 @@ def estimate_point_quota_usage(
     point_step_px: float = DEFAULT_EXECUTOR_POINT_STEP_PX,
     point_delay_ms: float = DEFAULT_EXECUTOR_POINT_DELAY_MS,
     frame_rate_fps: float = GAME_ENGINE_DEFAULT_FRAME_RATE_FPS,
-    calibration_point_limit: int | None = None,
-    calibration_point_step_px: float | None = None,
-    calibration_point_delay_ms: float | None = None,
-    calibration_frame_rate_fps: float | None = None,
+    calibration_point_limit: int | None = HISTORICAL_CALIBRATION_POINT_LIMIT,
+    calibration_point_step_px: float | None = HISTORICAL_CALIBRATION_POINT_STEP_PX,
+    calibration_point_delay_ms: float | None = HISTORICAL_CALIBRATION_POINT_DELAY_MS,
+    calibration_frame_rate_fps: float | None = HISTORICAL_CALIBRATION_FRAME_RATE_FPS,
     safety_factor: float = DEFAULT_POINT_SAFETY_FACTOR,
 ) -> dict[str, Any]:
     """Estimate point-quota usage separately from the legacy pixel-equivalent model.
