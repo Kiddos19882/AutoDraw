@@ -186,6 +186,29 @@ def build_engine_point_calibration_report(
         * 100.0
     )
 
+    reference_profile_scenarios: list[dict[str, Any]] = []
+    for scenario_delay_ms in (10.0, 20.0):
+        scenario_density = estimate_theoretical_points_per_path_px(
+            point_step_px=DEFAULT_EXECUTOR_POINT_STEP_PX,
+            point_delay_ms=scenario_delay_ms,
+            frame_rate_fps=GAME_ENGINE_DEFAULT_FRAME_RATE_FPS,
+        )
+        scenario_capacity = budget * scenario_density
+        scenario_limit = min(
+            SUPPORTED_BOARD_POINT_LIMITS,
+            key=lambda value: abs(value - scenario_capacity),
+        )
+        reference_profile_scenarios.append({
+            "point_step_px": DEFAULT_EXECUTOR_POINT_STEP_PX,
+            "point_delay_ms": scenario_delay_ms,
+            "frame_rate_fps": GAME_ENGINE_DEFAULT_FRAME_RATE_FPS,
+            "theoretical_points_per_path_px": round(scenario_density, 6),
+            "theoretical_capacity_points": round(scenario_capacity, 2),
+            "nearest_supported_limit": scenario_limit,
+            "deviation_percent": round(abs(scenario_capacity - scenario_limit) / scenario_limit * 100.0, 3),
+            "is_historical_fact": False,
+        })
+
     return {
         "model_id": MODEL_ID,
         "engine_resource": "Количество уникальных соседних координат, сохранённых в BoardPane.atom.points.",
@@ -203,6 +226,7 @@ def build_engine_point_calibration_report(
             "points_per_stroke_equivalent_overhead": round(stroke_overhead_points, 6),
             "theoretical_path_step_per_frame_px": round(1.0 / theoretical_density, 4),
         },
+        "reference_profile_scenarios": reference_profile_scenarios,
         "calibration_profile": {
             "point_step_px": round(_finite_number(calibration_step, "Шаг исторического исполнителя"), 4),
             "point_delay_ms": round(_finite_number(calibration_delay, "Задержка исторического исполнителя"), 4),
