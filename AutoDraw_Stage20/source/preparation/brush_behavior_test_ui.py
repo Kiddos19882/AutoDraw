@@ -15,6 +15,7 @@ import pyautogui
 from PIL import ImageGrab
 
 from stage8_optimizer import save_plan
+from brush_experiment_capture import compare_images, crop_calibrated_regions
 
 
 TEST_CASES: dict[str, dict[str, Any]] = {
@@ -176,6 +177,7 @@ class BrushBehaviorTestTab:
     def __init__(
         self, root: tk.Misc, parent: tk.Widget, output_dir: str | Path,
         area_selector_cls, *, get_canvas_size, get_canvas_area, on_transfer_plan, get_brush_control=None,
+        get_calibration_profile=None,
     ):
         self.root = root
         self.output_dir = Path(output_dir).resolve()
@@ -184,7 +186,10 @@ class BrushBehaviorTestTab:
         self.get_canvas_size = get_canvas_size
         self.get_canvas_area = get_canvas_area
         self.get_brush_control = get_brush_control
+        self.get_calibration_profile = get_calibration_profile
         self.on_transfer_plan = on_transfer_plan
+        self.experiment_dir: Path | None = None
+        self.experiment_phases: dict[str, dict[str, Any]] = {}
         self.current_plan: dict[str, Any] | None = None
         self.current_plan_path: Path | None = None
         self.canvas_area: dict[str, int] | None = None
@@ -248,6 +253,9 @@ class BrushBehaviorTestTab:
         ttk.Button(actions, text="Создать и передать тест в исполнитель →", command=self.create_and_transfer_plan).pack(side="left")
         ttk.Button(actions, text="Снять скриншот сейчас", command=self.capture_screenshot).pack(side="left", padx=(6, 0))
         ttk.Button(actions, text="Привязать отчёт исполнения…", command=self.load_execution_report).pack(side="left", padx=(6, 0))
+        ttk.Button(actions, text="Эксперимент: снимок ДО", command=lambda: self.capture_experiment_phase("before_draw")).pack(side="left", padx=(6, 0))
+        ttk.Button(actions, text="Эксперимент: ПОСЛЕ рисования", command=lambda: self.capture_experiment_phase("after_draw")).pack(side="left", padx=(6, 0))
+        ttk.Button(actions, text="Очистить и снять ПОСЛЕ", command=lambda: self.capture_experiment_phase("after_clear")).pack(side="left", padx=(6, 0))
         ttk.Button(actions, text="Сохранить запись теста…", command=self.save_record_dialog).pack(side="left", padx=(6, 0))
 
         details = ttk.LabelFrame(outer, text="Шаблон и фиксация результата", padding=8)
@@ -354,6 +362,8 @@ class BrushBehaviorTestTab:
     def _reset_observation_fields(self) -> None:
         """Prevent evidence from a previous run being attached to a new test plan."""
         self.screenshot_path = None
+        self.experiment_dir = None
+        self.experiment_phases = {}
         self.execution_report_path = None
         self.execution_report = None
         self.brush_slider_start = None
@@ -502,6 +512,179 @@ class BrushBehaviorTestTab:
             self.status_var.set(f"Полный скриншот сохранён: {path}")
         except Exception as exc:
             messagebox.showerror("Не удалось снять скриншот", str(exc), parent=self.root)
+
+    def capture_experiment_phase(self, phase: str) -> None:
+        """Capture calibrated board/meter evidence for before, after-draw and after-clear phases."""
+        labels = {
+            "before_draw": "до рисования",
+            "after_draw": "после рисования",
+            "after_clear": "после очистки",
+        }
+        if phase not in labels:
+            messagebox.showerror("Неизвестный этап", phase, parent=self.root)
+            return
+        if self.current_plan is None:
+            messagebox.showwarning(
+                "Нет тестового плана",
+                "Сначала создай и передай тестовый план в исполнитель.",
+                parent=self.root,
+            )
+            return
+        if phase == "before_draw":
+            self.experiment_dir = None
+            self.experiment_phases = {}
+        elif phase == "after_draw" and "before_draw" not in self.experiment_phases:
+            messagebox.showwarning(
+                "Нет исходного снимка",
+                "Сначала сделай снимок ДО рисования, затем выполни тест и сними результат.",
+                parent=self.root,
+            )
+            return
+        elif phase == "after_clear" and "after_draw" not in self.experiment_phases:
+            messagebox.showwarning(
+                "Нет снимка после рисования",
+                "Сначала сохрани снимок ПОСЛЕ рисования. Очистка доски необратима для текущего рисунка.",
+                parent=self.root,
+            )
+            return
+
+        config = self.get_calibration_profile() if callable(self.get_calibration_profile) else None
+        if not isinstance(config, dict):
+            messagebox.showwarning(
+                "Профиль калибровки недоступен",
+                "Сохрани профиль на вкладке 8 и проверь области доски, полоски краски и координату Clear.",
+                parent=self.root,
+            )
+            return
+        regions = config.get("regions", {})
+        points = config.get("points", {})
+        statuses = config.get("status", {})
+        region_status = statuses.get("regions", {}) if isinstance(statuses, dict) else {}
+        point_status = statuses.get("points", {}) if isinstance(statuses, dict) else {}
+        for key in ("board_area", "paint_meter_area"):
+            if not isinstance(regions.get(key), dict) or region_status.get(key) == "needs_review":
+                messagebox.showwarning(
+                    "Область требует калибровки",
+                    f"Область {key} отсутствует или требует повторной проверки на вкладке 8.",
+                    parent=self.root,
+                )
+                return
+        clear_point = points.get("clear_board")
+        if phase == "after_clear":
+            if not isinstance(clear_point, dict) or point_status.get("clear_board") == "needs_review":
+                messagebox.showwarning(
+                    "Координата Clear недоступна",
+                    "Проверь координату кнопки очистки на вкладке 8.",
+                    parent=self.root,
+                )
+                return
+            confirmed = messagebox.askyesno(
+                "Очистить игровую доску?",
+                "Сейчас AutoDraw нажмёт откалиброванную кнопку Clear и уничтожит текущий рисунок. "
+                "Продолжать только если тестовый рисунок можно удалить.",
+                icon="warning",
+                parent=self.root,
+            )
+            if not confirmed:
+                return
+
+        if phase == "before_draw":
+            brush = self.brush_var.get().strip() or "unknown"
+            case = TEST_CASES.get(self.case_var.get(), {}).get("id", "unknown")
+            stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+            self.experiment_dir = self.output_dir / f"experiment-{stamp}-b{brush}-{case}"
+            self.experiment_dir.mkdir(parents=True, exist_ok=False)
+            self.experiment_phases = {}
+
+        if self.experiment_dir is None:
+            messagebox.showwarning(
+                "Нет папки эксперимента",
+                "Начни серию со снимка ДО рисования.",
+                parent=self.root,
+            )
+            return
+        self.status_var.set(
+            f"Через 3 секунды будет сохранён снимок {labels[phase]}. Переключись в браузер."
+        )
+        self.root.withdraw()
+        self.root.after(3000, lambda: self._capture_experiment_phase_now(phase, config, clear_point if phase == "after_clear" else None))
+
+    def _capture_experiment_phase_now(
+        self, phase: str, config: dict[str, Any], clear_point: dict[str, int] | None,
+    ) -> None:
+        try:
+            if clear_point is not None:
+                pyautogui.click(int(clear_point["x"]), int(clear_point["y"]))
+                time.sleep(1.5)
+            screen = ImageGrab.grab()
+            crops = crop_calibrated_regions(screen, config.get("regions", {}))
+            if self.experiment_dir is None:
+                raise ValueError("Папка эксперимента не создана.")
+            screen_path = self.experiment_dir / f"{phase}-screen.png"
+            board_path = self.experiment_dir / f"{phase}-board.png"
+            meter_path = self.experiment_dir / f"{phase}-paint-meter.png"
+            screen.save(screen_path)
+            crops["board_area"].save(board_path)
+            crops["paint_meter_area"].save(meter_path)
+            self.screen_resolution = {"width": int(screen.width), "height": int(screen.height)}
+
+            phase_record: dict[str, Any] = {
+                "captured_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                "screen_size": {"width": int(screen.width), "height": int(screen.height)},
+                "clear_click_sent": clear_point is not None,
+                "files": {
+                    "full_screen": screen_path.name,
+                    "board_roi": board_path.name,
+                    "paint_meter_roi": meter_path.name,
+                },
+            }
+            before = self.experiment_phases.get("before_draw")
+            after = self.experiment_phases.get("after_draw")
+            for baseline_name, baseline in (("before_draw", before), ("after_draw", after)):
+                if baseline is None or baseline_name == phase:
+                    continue
+                for roi_key, file_key in (("board_area", "board_roi"), ("paint_meter_area", "paint_meter_roi")):
+                    baseline_path = self.experiment_dir / baseline["files"][file_key]
+                    current_path = board_path if roi_key == "board_area" else meter_path
+                    with Image.open(baseline_path) as first, Image.open(current_path) as second:
+                        phase_record.setdefault("visual_comparisons", {})[f"{roi_key}_vs_{baseline_name}"] = compare_images(first, second)
+
+            self.experiment_phases[phase] = phase_record
+            manifest = {
+                "schema_version": 1,
+                "record_type": "autodraw_brush_paint_experiment",
+                "created_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                "test_case": TEST_CASES.get(self.case_var.get(), {}).get("id"),
+                "brush_value_requested": int(self.brush_var.get().strip()),
+                "drawing_plan_path": str(self.current_plan_path) if self.current_plan_path else None,
+                "execution_report_path": str(self.execution_report_path) if self.execution_report_path else None,
+                "calibration_profile_path": str(getattr(self, "calibration_profile_path", "")) or None,
+                "phases": self.experiment_phases,
+                "interpretation_limits": [
+                    "Screenshots are captured from the configured screen-coordinate system.",
+                    "Pixel comparisons are visual diagnostics, not OCR and not a direct reading of the game's resource counter.",
+                    "A successful executor report does not prove that every stroke was registered by the game.",
+                    "The after-clear phase clicks Clear only after explicit confirmation.",
+                ],
+            }
+            manifest_path = self.experiment_dir / "experiment.json"
+            manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            self.screenshot_path = screen_path
+            self.area_var.set(
+                f"Эксперимент: {self.experiment_dir.name}; снимок {phase}: "
+                f"доска {crops['board_area'].width} × {crops['board_area'].height}, "
+                f"полоска краски {crops['paint_meter_area'].width} × {crops['paint_meter_area'].height}."
+            )
+            self.status_var.set(
+                f"Сохранён этап {phase}. ROI и experiment.json записаны в {self.experiment_dir}. "
+                "Сравнение пикселей не является автоматическим чтением числа краски."
+            )
+        except Exception as exc:
+            messagebox.showerror("Не удалось сохранить этап эксперимента", str(exc), parent=self.root)
+            self.status_var.set(f"Ошибка снимка эксперимента: {exc}")
+        finally:
+            self.root.deiconify()
+            self.root.lift()
 
     def load_execution_report(self) -> None:
         path = filedialog.askopenfilename(

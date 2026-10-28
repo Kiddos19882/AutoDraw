@@ -316,6 +316,7 @@ class AutoDrawUnifiedApp:
             get_canvas_size=self._get_brush_test_canvas_size,
             get_canvas_area=self._get_brush_test_canvas_area,
             get_brush_control=self._get_brush_test_brush_control,
+            get_calibration_profile=self._get_brush_test_calibration_profile,
             on_transfer_plan=self._transfer_brush_test_plan,
         )
 
@@ -524,6 +525,11 @@ class AutoDrawUnifiedApp:
         if area is None:
             return None
         return int(area["width"]), int(area["height"])
+
+    def _get_brush_test_calibration_profile(self) -> dict[str, Any] | None:
+        """Return the saved, screen-compatible profile for ROI capture experiments."""
+        calibration = getattr(self, "brush_calibration_tab", None)
+        return calibration.get_experiment_capture_config() if calibration is not None else None
 
     def _get_brush_test_brush_control(self) -> dict[str, list[int]] | None:
         calibration = getattr(self, "brush_calibration_tab", None)

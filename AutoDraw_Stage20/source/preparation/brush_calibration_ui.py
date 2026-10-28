@@ -643,6 +643,36 @@ class BrushCalibrationTab:
         self._refresh_view()
         self.status_var.set("Профиль очищен в памяти. Нажми «Сохранить профиль», чтобы записать изменения.")
 
+    def get_experiment_capture_config(self) -> dict[str, Any] | None:
+        """Return saved, screen-compatible calibration data for screenshot experiments."""
+        if self._ensure_screen_compatibility() or self._dirty:
+            return None
+        required_regions = ("board_area", "paint_meter_area")
+        for key in required_regions:
+            if self.profile["regions"].get(key) is None:
+                return None
+            if self.profile["status"]["regions"].get(key) == "needs_review":
+                return None
+        if self.profile["points"].get("clear_board") is None:
+            return None
+        if self.profile["status"]["points"].get("clear_board") == "needs_review":
+            return None
+        return {
+            "points": {key: dict(value) if isinstance(value, dict) else None
+                       for key, value in self.profile["points"].items()},
+            "regions": {key: dict(value) if isinstance(value, dict) else None
+                        for key, value in self.profile["regions"].items()},
+            "status": {
+                "points": dict(self.profile["status"]["points"]),
+                "regions": dict(self.profile["status"]["regions"]),
+            },
+            "profile_path": str(self.profile_path),
+            "screen_size": {
+                "width": self.profile["environment"].get("screen_width"),
+                "height": self.profile["environment"].get("screen_height"),
+            },
+        }
+
     def get_board_area(self) -> dict[str, int] | None:
         if self._ensure_screen_compatibility():
             return None
