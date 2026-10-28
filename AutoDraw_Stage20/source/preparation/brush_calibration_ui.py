@@ -381,7 +381,7 @@ class BrushCalibrationTab:
                 self.status_var.set(f"Выбор точки «{label}» отменён.")
                 return
             try:
-                self.profile["points"][key] = normalize_point(*point, self._screen_size())
+                self.profile["points"][key] = normalize_point(point[0], point[1], self._screen_size())
             except BrushCalibrationError as exc:
                 messagebox.showerror("Некорректная точка", str(exc), parent=self.root)
                 return
