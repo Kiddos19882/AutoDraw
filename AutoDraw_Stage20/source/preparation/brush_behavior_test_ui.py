@@ -75,7 +75,7 @@ def build_brush_test_record(
     screen_area: dict[str, int] | None = None, screenshot_path: str | None = None,
     drawing_plan_path: str | None = None, drawing_plan: dict[str, Any] | None = None,
     execution_report_path: str | None = None, execution_report: dict[str, Any] | None = None,
-    notes: str = "", outcome: str = "not_reviewed",
+    measurements: dict[str, Any] | None = None, notes: str = "", outcome: str = "not_reviewed",
 ) -> dict[str, Any]:
     """Build a versioned, portable observation record for later brush-model fitting."""
     if isinstance(brush_value, bool) or not isinstance(brush_value, int) or not 1 <= brush_value <= 30:
@@ -111,6 +111,7 @@ def build_brush_test_record(
             "paint_points_after": None,
             "browser_zoom_percent": None,
             "device_pixel_ratio": None,
+            **(measurements or {}),
         },
         "interpretation": {
             "status": "raw_observation",
@@ -186,6 +187,13 @@ class BrushBehaviorTestTab:
         self.case_var = tk.StringVar(value=next(iter(TEST_CASES)))
         self.outcome_var = tk.StringVar(value="not_reviewed")
         self.notes_var = tk.StringVar()
+        self.visible_strokes_var = tk.StringVar()
+        self.missing_strokes_var = tk.StringVar()
+        self.footprint_width_var = tk.StringVar()
+        self.footprint_height_var = tk.StringVar()
+        self.paint_before_var = tk.StringVar()
+        self.paint_after_var = tk.StringVar()
+        self.zoom_var = tk.StringVar(value="100")
         self.area_var = tk.StringVar(value="Область снимка не выбрана.")
         self.status_var = tk.StringVar(value="Выбери кисть и тест. В игре вручную установи указанную кисть и выполни тестовый шаблон.")
         self._build(parent)
@@ -236,6 +244,32 @@ class BrushBehaviorTestTab:
         ).pack(side="left", padx=(6, 14))
         ttk.Label(result, text="Заметки").pack(side="left")
         ttk.Entry(result, textvariable=self.notes_var).pack(side="left", fill="x", expand=True, padx=6)
+        measurements = ttk.LabelFrame(details, text="Измерения для будущей модели", padding=6)
+        measurements.pack(fill="x", pady=(8, 0))
+        measure_row1 = ttk.Frame(measurements)
+        measure_row1.pack(fill="x")
+        for label, variable, width in (
+            ("Видимые штрихи", self.visible_strokes_var, 24),
+            ("Пропущенные", self.missing_strokes_var, 20),
+            ("Ширина следа, px", self.footprint_width_var, 7),
+            ("Высота, px", self.footprint_height_var, 7),
+        ):
+            ttk.Label(measure_row1, text=label).pack(side="left", padx=(0, 3))
+            ttk.Entry(measure_row1, textvariable=variable, width=width).pack(side="left", padx=(0, 10))
+        measure_row2 = ttk.Frame(measurements)
+        measure_row2.pack(fill="x", pady=(6, 0))
+        for label, variable in (
+            ("Краска до", self.paint_before_var),
+            ("Краска после", self.paint_after_var),
+            ("Масштаб браузера, %", self.zoom_var),
+        ):
+            ttk.Label(measure_row2, text=label).pack(side="left", padx=(0, 3))
+            ttk.Entry(measure_row2, textvariable=variable, width=9).pack(side="left", padx=(0, 12))
+        ttk.Label(
+            measurements,
+            text="Видимые/пропущенные штрихи указывай через запятую по именам из шаблона. Числовые поля можно оставить пустыми.",
+            wraplength=1100,
+        ).pack(anchor="w", pady=(5, 0))
         ttk.Label(outer, textvariable=self.status_var, wraplength=1150).pack(anchor="w", pady=(8, 0))
 
     def _refresh_template(self) -> None:
@@ -342,6 +376,32 @@ class BrushBehaviorTestTab:
         self.execution_report = document
         self.status_var.set(f"Отчёт исполнения привязан к тесту: {self.execution_report_path}")
 
+    def _measurement_values(self) -> dict[str, Any]:
+        def optional_number(raw: str, field: str):
+            value = raw.strip()
+            if not value:
+                return None
+            try:
+                number = float(value.replace(",", "."))
+            except ValueError as exc:
+                raise ValueError(f"Поле «{field}» должно быть числом.") from exc
+            if number < 0:
+                raise ValueError(f"Поле «{field}» не может быть отрицательным.")
+            return int(number) if number.is_integer() else number
+
+        visible = [item.strip() for item in self.visible_strokes_var.get().split(",") if item.strip()]
+        missing = [item.strip() for item in self.missing_strokes_var.get().split(",") if item.strip()]
+        return {
+            "observed_stroke_count": len(visible),
+            "visible_stroke_names": visible,
+            "missing_stroke_names": missing,
+            "measured_footprint_width_px": optional_number(self.footprint_width_var.get(), "ширина следа"),
+            "measured_footprint_height_px": optional_number(self.footprint_height_var.get(), "высота следа"),
+            "paint_points_before": optional_number(self.paint_before_var.get(), "краска до"),
+            "paint_points_after": optional_number(self.paint_after_var.get(), "краска после"),
+            "browser_zoom_percent": optional_number(self.zoom_var.get(), "масштаб браузера"),
+        }
+
     def _build_record(self) -> dict[str, Any]:
         try:
             brush = int(self.brush_var.get().strip())
@@ -357,6 +417,7 @@ class BrushBehaviorTestTab:
             drawing_plan=self.current_plan,
             execution_report_path=str(self.execution_report_path) if self.execution_report_path else None,
             execution_report=self.execution_report,
+            measurements=self._measurement_values(),
             notes=self.notes_var.get(),
             outcome=self.outcome_var.get(),
         )
