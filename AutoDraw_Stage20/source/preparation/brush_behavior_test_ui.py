@@ -31,7 +31,7 @@ TEST_CASES: dict[str, dict[str, Any]] = {
         ),
         "strokes": [
             {
-                "name": f"consumption_line_{index:02d}",
+                "name": f"consumption_line_{index + 1:02d}",
                 "points": [[20, 10 + index * 18], [420, 10 + index * 18]],
             }
             for index in range(12)
