@@ -162,13 +162,14 @@ class BrushBehaviorTestTab:
 
     def __init__(
         self, root: tk.Misc, parent: tk.Widget, output_dir: str | Path,
-        area_selector_cls, *, get_canvas_size, on_transfer_plan,
+        area_selector_cls, *, get_canvas_size, get_canvas_area, on_transfer_plan,
     ):
         self.root = root
         self.output_dir = Path(output_dir).resolve()
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.area_selector_cls = area_selector_cls
         self.get_canvas_size = get_canvas_size
+        self.get_canvas_area = get_canvas_area
         self.on_transfer_plan = on_transfer_plan
         self.current_plan: dict[str, Any] | None = None
         self.current_plan_path: Path | None = None
@@ -263,6 +264,8 @@ class BrushBehaviorTestTab:
             return
         try:
             plan = build_brush_test_drawing_plan(self.case_var.get(), canvas_size)
+            area = self.get_canvas_area()
+            self.canvas_area = dict(area) if area else None
             brush = int(self.brush_var.get().strip())
             if not 1 <= brush <= 30:
                 raise ValueError("Размер кисти должен быть целым числом от 1 до 30.")
