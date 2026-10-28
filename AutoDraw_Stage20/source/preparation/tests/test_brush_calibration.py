@@ -73,10 +73,14 @@ def test_missing_fields_require_the_correct_brush_control():
     _set_point(profile, "clear_board", 10, 10)
     _set_region(profile, "board_area", 100, 100, 646, 323)
     _set_region(profile, "paint_meter_area", 100, 80, 120, 8)
+    assert missing_required_fields(profile, 7) == ["brush_control_mode"]
+    profile["brush_control_mode"] = "presets"
     assert missing_required_fields(profile, 7) == ["brush_7"]
-    assert missing_required_fields(profile, 1) == ["brush_slider_value_1", "brush_slider_value_30"]
     _set_point(profile, "brush_7", 15, 15)
     assert missing_required_fields(profile, 7) == []
+    assert missing_required_fields(profile, 1) == ["brush_control_mode"]
+    profile["brush_control_mode"] = "slider"
+    assert missing_required_fields(profile, 1) == ["brush_slider_value_1", "brush_slider_value_30"]
 
 
 def test_screen_change_marks_existing_coordinates_for_review_and_drops_outside_values():
