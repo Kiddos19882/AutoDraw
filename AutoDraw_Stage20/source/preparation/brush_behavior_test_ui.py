@@ -11,6 +11,7 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 from typing import Any
 
+import pyautogui
 from PIL import ImageGrab
 
 from stage8_optimizer import save_plan
