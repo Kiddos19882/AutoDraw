@@ -209,6 +209,12 @@ class BrushBehaviorTestTab:
         if not self.screen_area:
             messagebox.showwarning("Не выбрана область", "Сначала выбери область снимка.", parent=self.root)
             return
+        self.status_var.set("Через 3 секунды будет снята выбранная область. Переключись в браузер и не двигай окно игры.")
+        self.root.after(3000, self._capture_screenshot_now)
+
+    def _capture_screenshot_now(self) -> None:
+        if not self.screen_area:
+            return
         area = self.screen_area
         try:
             image = ImageGrab.grab(bbox=(area["x"], area["y"], area["x"] + area["width"], area["y"] + area["height"]))
