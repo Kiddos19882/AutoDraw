@@ -900,3 +900,25 @@ def test_component_filter_scales_to_tens_of_thousands_of_isolated_pixels():
     assert filtered.dtype == np.uint8
     assert int(filtered.sum()) == 0
     assert removed_pixels == expected_component_count
+
+
+def test_contour_mode_keeps_inner_boundary_of_a_transparent_hole():
+    indexes = np.full((24, 24), -1, dtype=np.int32)
+    indexes[2:22, 2:22] = 0
+    indexes[8:16, 8:16] = -1
+
+    plan = build_geometry_color_plan(
+        indexes, PALETTE, mode="contour", simplify_tolerance_px=0
+    )
+
+    closed_contours = [
+        stroke for stroke in plan["strokes"]
+        if stroke["closed"] and stroke["metadata"]["path_type"] == "contour"
+    ]
+    assert len(closed_contours) >= 2
+    # The outer and inner contour are distinct closed paths. The transparent
+    # hole must not be represented as a filled polygon.
+    assert any(
+        any(7 <= point["x"] <= 8 and 7 <= point["y"] <= 8 for point in stroke["points"])
+        for stroke in closed_contours
+    )
