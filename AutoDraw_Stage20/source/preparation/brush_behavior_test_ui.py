@@ -173,6 +173,7 @@ class BrushBehaviorTestTab:
         self.on_transfer_plan = on_transfer_plan
         self.current_plan: dict[str, Any] | None = None
         self.current_plan_path: Path | None = None
+        self.canvas_area: dict[str, int] | None = None
         self.screen_area: dict[str, int] | None = None
         self.canvas_area: dict[str, int] | None = None
         self.screenshot_path: Path | None = None
