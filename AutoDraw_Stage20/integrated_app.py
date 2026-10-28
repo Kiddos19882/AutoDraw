@@ -639,8 +639,8 @@ class AutoDrawUnifiedApp:
             return False
         self.notebook.select(self.execution_tab)
         self.status_var.set(
-            f"Тестовый план загружен: {source_path.name}. Установите размер кисти в браузере вручную "
-            "и проверьте область/параметры перед запуском."
+            f"Тестовый план загружен: {source_path.name}. Размер кисти будет установлен из профиля, "
+            "если калибровка сохранена; проверьте выбранный радиус и область перед запуском."
         )
         return True
 
