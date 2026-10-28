@@ -22,6 +22,21 @@ from brush_experiment_capture import (
 
 
 TEST_CASES: dict[str, dict[str, Any]] = {
+    "Расход краски — серия длинных линий": {
+        "id": "paint_consumption_long_lines",
+        "description": (
+            "Измерение расхода краски на серии из 12 длинных параллельных линий. "
+            "Ориентировочная суммарная длина траектории — 4800 px; выполняй на чистой доске "
+            "и записывай запас краски до и после."
+        ),
+        "strokes": [
+            {
+                "name": f"consumption_line_{index:02d}",
+                "points": [[20, 10 + index * 18], [420, 10 + index * 18]],
+            }
+            for index in range(12)
+        ],
+    },
     "Горизонтальные линии": {
         "id": "horizontal_lengths",
         "description": "Проверка длины и фактической ширины следа на прямых линиях.",
