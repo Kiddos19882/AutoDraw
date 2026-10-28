@@ -580,7 +580,7 @@ class BrushCalibrationTab:
 
     def get_board_area(self) -> dict[str, int] | None:
         region = self.profile["regions"].get("board_area")
-        if region is None or self.profile["status"]["regions"]["board_area"] == "needs_review":
+        if self._dirty or region is None or self.profile["status"]["regions"]["board_area"] == "needs_review":
             return None
         return dict(region)
 
@@ -589,6 +589,8 @@ class BrushCalibrationTab:
         return (area["width"], area["height"]) if area else None
 
     def get_brush_control(self) -> dict[str, Any] | None:
+        if self._dirty:
+            return None
         points = self.profile["points"]
         states = self.profile["status"]["points"]
         control: dict[str, Any] = {"presets": {}}
