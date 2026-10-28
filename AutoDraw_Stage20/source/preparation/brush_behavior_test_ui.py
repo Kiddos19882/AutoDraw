@@ -317,11 +317,27 @@ class BrushBehaviorTestTab:
             self.current_plan_path = path
             if not self.on_transfer_plan(plan, path):
                 return
+            self._reset_observation_fields()
             self.status_var.set(
                 f"План передан исполнителю: {path.name}. Установи в браузере кисть {brush} перед запуском."
             )
         except (OSError, ValueError, TypeError) as exc:
             messagebox.showerror("Не удалось создать тестовый план", str(exc), parent=self.root)
+
+    def _reset_observation_fields(self) -> None:
+        """Prevent evidence from a previous run being attached to a new test plan."""
+        self.screenshot_path = None
+        self.execution_report_path = None
+        self.execution_report = None
+        self.outcome_var.set("not_reviewed")
+        self.notes_var.set("")
+        self.visible_strokes_var.set("")
+        self.missing_strokes_var.set("")
+        self.footprint_width_var.set("")
+        self.footprint_height_var.set("")
+        self.paint_before_var.set("")
+        self.paint_after_var.set("")
+        self.zoom_var.set("100")
 
     def select_screenshot_area(self) -> None:
         def selected(area) -> None:
