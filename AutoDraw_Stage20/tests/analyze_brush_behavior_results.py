@@ -4,8 +4,9 @@
 Requires Pillow: python -m pip install Pillow
 
 The screenshot crop is the visible drawing board (not the whole browser window).
-Defaults match the 1648x927 screenshots collected on 2026-10-28. Override crop
-coordinates for screenshots captured at another browser zoom/window size.
+Defaults match the 1919x1079 screenshots collected on 2026-10-28 and the recorded
+board profile at x=504, y=280, size 645x328. Override crop coordinates if the
+capture uses another display scale, window position, or browser zoom.
 Measurements are approximate because screenshots may be scaled by the browser
 or display capture; this tool does not prove that the game charged paint.
 """
@@ -110,10 +111,10 @@ def measure_pair(
             by0 = min(point[1] for point in coords)
             by1 = max(point[1] for point in coords)
             bbox = {
-                "left": bx0,
-                "top": by0,
-                "right": bx1,
-                "bottom": by1,
+                "left": bx0 + x0,
+                "top": by0 + y0,
+                "right": bx1 + x0,
+                "bottom": by1 + y0,
                 "width_px": bx1 - bx0 + 1,
                 "height_px": by1 - by0 + 1,
             }
@@ -134,8 +135,8 @@ def measure_pair(
             "detected": bool(coords),
             "detected_bbox_board_px": bbox,
             "note": (
-                "Bounding box is measured inside a padded ROI; it may include "
-                "nearby ink for overlapping strokes or corners."
+                "Bounding box coordinates are relative to the cropped board; "
+                "the ROI may include nearby ink for overlapping strokes or corners."
             ),
         })
 
@@ -177,10 +178,10 @@ def main() -> int:
         "--pair", action="append", type=parse_pair, required=True,
         help="Plan/screenshot pair; repeat for each pair: PLAN.json=SCREENSHOT.png",
     )
-    parser.add_argument("--crop-x", type=int, default=421)
-    parser.add_argument("--crop-y", type=int, default=230)
-    parser.add_argument("--crop-width", type=int, default=578)
-    parser.add_argument("--crop-height", type=int, default=303)
+    parser.add_argument("--crop-x", type=int, default=504)
+    parser.add_argument("--crop-y", type=int, default=280)
+    parser.add_argument("--crop-width", type=int, default=645)
+    parser.add_argument("--crop-height", type=int, default=328)
     parser.add_argument("--threshold", type=int, default=100)
     parser.add_argument("--padding", type=float, default=6.0)
     parser.add_argument("--output", type=Path, default=Path("brush_behavior_measurements.json"))
