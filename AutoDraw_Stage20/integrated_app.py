@@ -32,6 +32,7 @@ def configure_environment(root: str | Path, *, create_directories: bool = True) 
         "color_plans": data / "results" / "color_scanline_plans",
         "paint_limit_tests": data / "results" / "paint_limit_tests",
         "brush_tests": data / "results" / "brush_behavior_tests",
+        "brush_calibration": data / "profiles" / "brush_paint_calibration.json",
     }
     if create_directories:
         for path in paths.values():
@@ -51,6 +52,7 @@ def configure_environment(root: str | Path, *, create_directories: bool = True) 
         "AUTODRAW_PALETTE_CONVERSIONS_DIR": str(paths["palette_conversions"]),
         "AUTODRAW_COLOR_PLANS_DIR": str(paths["color_plans"]),
         "AUTODRAW_PAINT_LIMIT_TESTS_DIR": str(paths["paint_limit_tests"]),
+        "AUTODRAW_BRUSH_CALIBRATION_PATH": str(paths["brush_calibration"]),
     }
     os.environ.update(environment)
     return paths
@@ -109,6 +111,8 @@ try:
     from geometry_color_plan import save_geometry_color_plan
     from paint_limit_test_ui import PaintLimitTestTab
     from brush_behavior_test_ui import BrushBehaviorTestTab
+    from brush_calibration_ui import BrushCalibrationTab
+    from stage6_execute_plan import TargetArea
 except ImportError as exc:  # pragma: no cover - exercised by packaging smoke test
     raise SystemExit(
         "Не удалось загрузить компоненты AutoDraw. Проверьте комплект поставки и зависимости.\n"
@@ -250,6 +254,7 @@ class AutoDrawUnifiedApp:
         self.color_scanline_tab_frame = ttk.Frame(self.notebook)
         self.paint_limit_tab_frame = ttk.Frame(self.notebook)
         self.brush_test_tab_frame = ttk.Frame(self.notebook)
+        self.brush_calibration_tab_frame = ttk.Frame(self.notebook)
         # The executor (tab 2), quantizer (tab 4), and paint-limit test (tab 6)
         # already own scrollable content areas. Wrap only tabs that need scrolling.
         self.preparation_scroll = ScrollableTabContent(self.preparation_tab)
@@ -262,6 +267,7 @@ class AutoDrawUnifiedApp:
         self.notebook.add(self.color_scanline_tab_frame, text="5. Цветной scanline-план")
         self.notebook.add(self.paint_limit_tab_frame, text="6. Тест лимита краски")
         self.notebook.add(self.brush_test_tab_frame, text="7. Тест кистей")
+        self.notebook.add(self.brush_calibration_tab_frame, text="8. Калибровка теста")
 
         self.workbench = AutoDrawWorkbench(
             root,
@@ -296,13 +302,19 @@ class AutoDrawUnifiedApp:
             get_canvas_size=self._get_execution_canvas_size,
             on_transfer_plan=self._transfer_paint_limit_plan,
         )
+        self.brush_calibration_tab = BrushCalibrationTab(
+            root,
+            self.brush_calibration_tab_frame,
+            self.data_paths["brush_calibration"],
+        )
         self.brush_behavior_tab = BrushBehaviorTestTab(
             root,
             self.brush_test_tab_frame,
             self.data_paths["brush_tests"],
             AreaSelector,
-            get_canvas_size=self._get_execution_canvas_size,
-            get_canvas_area=self._get_execution_canvas_area,
+            get_canvas_size=self._get_brush_test_canvas_size,
+            get_canvas_area=self._get_brush_test_canvas_area,
+            get_brush_control=self._get_brush_test_brush_control,
             on_transfer_plan=self._transfer_brush_test_plan,
         )
 
@@ -496,6 +508,26 @@ class AutoDrawUnifiedApp:
             "Проверьте точный размер холста, экранную область и профиль палитры до запуска."
         )
 
+
+    def _get_brush_test_canvas_area(self) -> dict[str, int] | None:
+        """Prefer the dedicated calibration profile for brush experiments."""
+        calibration = getattr(self, "brush_calibration_tab", None)
+        profile = getattr(calibration, "profile", {}) if calibration is not None else {}
+        region = profile.get("regions", {}).get("board_area") if isinstance(profile, dict) else None
+        if region is not None:
+            return calibration.get_board_area()
+        return self._get_execution_canvas_area()
+
+    def _get_brush_test_canvas_size(self) -> tuple[int, int] | None:
+        area = self._get_brush_test_canvas_area()
+        if area is None:
+            return None
+        return int(area["width"]), int(area["height"])
+
+    def _get_brush_test_brush_control(self) -> dict[str, list[int]] | None:
+        calibration = getattr(self, "brush_calibration_tab", None)
+        return calibration.get_brush_control() if calibration is not None else None
+
     def _get_execution_canvas_area(self) -> dict[str, int] | None:
         area = getattr(self.executor, "area", None)
         if area is None:
@@ -528,11 +560,38 @@ class AutoDrawUnifiedApp:
                 parent=self.root,
             )
             return False
+        calibration = getattr(self, "brush_calibration_tab", None)
+        calibrated_region = None
+        calibration_profile = getattr(calibration, "profile", {}) if calibration is not None else {}
+        if isinstance(calibration_profile, dict):
+            calibrated_region = calibration_profile.get("regions", {}).get("board_area")
+        if calibrated_region is not None:
+            area_data = calibration.get_board_area()
+            if area_data is None:
+                messagebox.showwarning(
+                    "Область требует проверки",
+                    "Область доски в профиле калибровки помечена как требующая проверки. "
+                    "Повторно выделите и подтвердите область на вкладке 8.",
+                    parent=self.root,
+                )
+                self.notebook.select(self.brush_calibration_tab_frame)
+                return False
+            try:
+                calibrated_area = TargetArea.from_dict(area_data)
+                self.executor._validate_area(calibrated_area)
+                self.executor.area = calibrated_area
+                self.executor._set_area_fields(calibrated_area)
+                self.executor._save_profile()
+                self.executor._refresh_execution_plan()
+                self.executor._notify_area_change()
+            except (ValueError, OSError, TypeError, KeyError) as exc:
+                messagebox.showerror("Некорректная область доски", str(exc), parent=self.root)
+                return False
         area = getattr(self.executor, "area", None)
         if area is None:
             messagebox.showwarning(
                 "Не выбрана область рисования",
-                "Сначала выберите область холста на вкладке 2, затем создайте тестовый план заново.",
+                "Задайте область доски на вкладке 8 «Калибровка теста» или выберите её на вкладке 2.",
                 parent=self.root,
             )
             return False
