@@ -658,7 +658,7 @@ class BrushBehaviorTestTab:
                 "brush_value_requested": int(self.brush_var.get().strip()),
                 "drawing_plan_path": str(self.current_plan_path) if self.current_plan_path else None,
                 "execution_report_path": str(self.execution_report_path) if self.execution_report_path else None,
-                "calibration_profile_path": str(getattr(self, "calibration_profile_path", "")) or None,
+                "calibration_profile_path": str(config.get("profile_path", "")) or None,
                 "phases": self.experiment_phases,
                 "interpretation_limits": [
                     "Screenshots are captured from the configured screen-coordinate system.",

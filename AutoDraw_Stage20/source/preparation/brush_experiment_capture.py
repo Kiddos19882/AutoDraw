@@ -51,9 +51,8 @@ def compare_images(first: Image.Image, second: Image.Image) -> dict[str, Any]:
     left = first.convert("RGB")
     right = second.convert("RGB")
     difference = ImageChops.difference(left, right)
-    histogram = difference.convert("L").histogram()
     total_pixels = left.width * left.height
-    changed_pixels = total_pixels - histogram[0]
+    changed_pixels = sum(1 for pixel in difference.getdata() if pixel != (0, 0, 0))
     channel_means = difference.getchannel("R"), difference.getchannel("G"), difference.getchannel("B")
     mean_absolute_difference = sum(
         sum(channel.getdata()) / total_pixels for channel in channel_means

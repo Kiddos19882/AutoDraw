@@ -12,14 +12,14 @@ def test_crops_board_and_paint_meter_from_independent_calibrated_regions():
     screen.putpixel((70, 50), (0, 0, 255))
     regions = {
         "board_area": {"x": 5, "y": 5, "width": 20, "height": 20},
-        "paint_meter_area": {"x": 60, "y": 40, "width": 25, "height": 10},
+        "paint_meter_area": {"x": 60, "y": 40, "width": 25, "height": 15},
     }
 
     crops = crop_calibrated_regions(screen, regions)
 
     assert crops["board_area"].size == (20, 20)
     assert crops["board_area"].getpixel((5, 5)) == (255, 0, 0)
-    assert crops["paint_meter_area"].size == (25, 10)
+    assert crops["paint_meter_area"].size == (25, 15)
     assert crops["paint_meter_area"].getpixel((10, 10)) == (0, 0, 255)
 
 
