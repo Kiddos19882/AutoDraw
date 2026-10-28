@@ -27,6 +27,7 @@
     "brush-behavior-observation-json",
     "independent-brush-calibration-points-and-regions",
     "persistent-brush-paint-calibration-profile",
-    "brush-test-uses-calibrated-board-and-slider"
+    "brush-test-uses-calibrated-board-and-slider",
+    "explicit-brush-control-mode"
   ]
 }
