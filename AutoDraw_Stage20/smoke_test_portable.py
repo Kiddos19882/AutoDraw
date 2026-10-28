@@ -14,8 +14,8 @@ SHUTDOWN_TIMEOUT_SECONDS = 3
 def validate_portable_layout() -> None:
     if not EXECUTABLE.is_file():
         raise RuntimeError(f"Не найден EXE portable-сборки: {EXECUTABLE}")
-    if not (PORTABLE_ROOT / "README.txt").is_file():
-        raise RuntimeError("В portable-сборке отсутствует README.txt.")
+    if not (PORTABLE_ROOT / "README.md").is_file():
+        raise RuntimeError("В portable-сборке отсутствует README.md.")
     if not (PORTABLE_ROOT / "build_info.json").is_file():
         raise RuntimeError("В portable-сборке отсутствует build_info.json.")
     required_data_directories = (
