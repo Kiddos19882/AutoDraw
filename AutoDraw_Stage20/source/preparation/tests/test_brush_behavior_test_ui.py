@@ -51,7 +51,6 @@ def test_brush_test_record_contains_reproducible_stroke_template() -> None:
     assert record["interpretation"]["automatic_execution_allowed"] is False
 
 
-@pytest.mark.parametrize("brush_value", [0, 31, -1, True, 7.5])
 def test_brush_test_record_defaults_unmeasured_paint_points_to_none() -> None:
     record = build_brush_test_record(brush_value=7, test_case="Горизонтальные линии")
 
@@ -59,6 +58,7 @@ def test_brush_test_record_defaults_unmeasured_paint_points_to_none() -> None:
     assert record["measurement_fields"]["paint_points_after"] is None
 
 
+@pytest.mark.parametrize("brush_value", [0, 31, -1, True, 7.5])
 def test_brush_test_record_rejects_invalid_brush_value(brush_value) -> None:
     with pytest.raises(ValueError):
         build_brush_test_record(brush_value=brush_value, test_case="Диагонали")
