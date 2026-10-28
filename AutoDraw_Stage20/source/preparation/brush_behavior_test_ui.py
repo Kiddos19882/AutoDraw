@@ -386,10 +386,24 @@ class BrushBehaviorTestTab:
             raise ValueError(f"{field}: X и Y должны быть целыми числами.") from exc
 
     def set_brush_size(self) -> bool:
-        """Drag the extended-mode radius slider using saved calibration when available."""
+        """Use a calibrated preset click or drag the extended-mode slider."""
         try:
+            brush = int(self.brush_var.get().strip())
+            if not 1 <= brush <= 30:
+                raise ValueError("Размер кисти должен быть целым числом от 1 до 30.")
+            if platform.system() != "Windows":
+                raise RuntimeError("Автоматическая установка кисти доступна только в Windows.")
             calibrated = self.get_brush_control() if callable(self.get_brush_control) else None
-            if calibrated:
+            preset = calibrated.get("presets", {}).get(str(brush)) if calibrated else None
+            if preset is not None and brush in (7, 14, 20):
+                x, y = int(preset[0]), int(preset[1])
+                self.status_var.set(
+                    f"Через 3 секунды будет выбран пресет кисти {brush} в ({x}, {y}). "
+                    "Переключись в браузер и не трогай мышь."
+                )
+                self.root.after(3000, lambda: self._apply_brush_preset_click(x, y, brush))
+                return True
+            if calibrated and calibrated.get("start") and calibrated.get("end"):
                 # The engine slider runs from brush 30 at the left endpoint to brush 1 at the right.
                 start = self._parse_point(
                     f"{calibrated['start'][0]},{calibrated['start'][1]}", "Край 30 из профиля"
@@ -402,11 +416,6 @@ class BrushBehaviorTestTab:
             else:
                 start = self._parse_point(self.slider_start_var.get(), "Край 30")
                 end = self._parse_point(self.slider_end_var.get(), "Край 1")
-            brush = int(self.brush_var.get().strip())
-            if not 1 <= brush <= 30:
-                raise ValueError("Размер кисти должен быть целым числом от 1 до 30.")
-            if platform.system() != "Windows":
-                raise RuntimeError("Автоматическая установка кисти доступна только в Windows.")
             ratio = (30 - brush) / 29
             x = round(start[0] + (end[0] - start[0]) * ratio)
             y = round(start[1] + (end[1] - start[1]) * ratio)
@@ -420,6 +429,17 @@ class BrushBehaviorTestTab:
         except (ValueError, RuntimeError, AttributeError) as exc:
             messagebox.showwarning("Не настроен ползунок кисти", str(exc), parent=self.root)
             return False
+
+    def _apply_brush_preset_click(self, x: int, y: int, brush: int) -> None:
+        """Select one of the ordinary game brush presets at its calibrated screen point."""
+        try:
+            pyautogui.click(x, y)
+        except Exception as exc:
+            self.status_var.set(f"Не удалось выбрать пресет кисти {brush}: {exc}")
+            return
+        self.status_var.set(
+            f"Выполнен клик по пресету кисти {brush} ({x}, {y}). Проверь, что игра выбрала нужный размер."
+        )
 
     def _apply_brush_drag(
         self, start: tuple[int, int], target_x: int, target_y: int, brush: int
