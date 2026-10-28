@@ -392,6 +392,7 @@ class BrushCalibrationTab:
         }.get(status, status)
 
     def _pick_point(self, key: str) -> None:
+        self._ensure_screen_compatibility()
         label = POINT_LABELS[key][0]
         def selected(point: tuple[int, int] | None) -> None:
             self.root.deiconify()
@@ -412,6 +413,7 @@ class BrushCalibrationTab:
         self.root.after(120, lambda: ScreenPointPicker(self.root, f"Укажите центр элемента: {label}", selected))
 
     def _pick_region(self, key: str) -> None:
+        self._ensure_screen_compatibility()
         label = REGION_LABELS[key][0]
         def selected(region: dict[str, int] | None) -> None:
             self.root.deiconify()
@@ -498,6 +500,7 @@ class BrushCalibrationTab:
         self.root.after(800, click_now)
 
     def _preview_region(self, key: str) -> None:
+        self._ensure_screen_compatibility()
         region = self.profile["regions"].get(key)
         if region is None:
             messagebox.showwarning("Область не задана", "Сначала задай эту область.", parent=self.root)
