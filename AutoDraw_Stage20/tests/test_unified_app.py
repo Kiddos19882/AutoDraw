@@ -30,7 +30,7 @@ class UnifiedAppCoreTests(unittest.TestCase):
             "AUTODRAW_PROFILE_STORE_PATH", "AUTODRAW_PALETTES_DIR", "AUTODRAW_TARGET_PROFILE_PATH",
             "AUTODRAW_EXECUTION_SETTINGS_PATH", "AUTODRAW_PROJECTS_DIR",
             "AUTODRAW_RESULTS_DIR", "AUTODRAW_LOGS_DIR", "AUTODRAW_PALETTE_CONVERSIONS_DIR", "AUTODRAW_COLOR_PLANS_DIR",
-            "AUTODRAW_PAINT_LIMIT_TESTS_DIR",
+            "AUTODRAW_PAINT_LIMIT_TESTS_DIR", "AUTODRAW_BRUSH_CALIBRATION_PATH",
         )}
         try:
             with tempfile.TemporaryDirectory(prefix="AutoDraw unified данные ") as temp:
@@ -49,6 +49,9 @@ class UnifiedAppCoreTests(unittest.TestCase):
                 self.assertTrue(paths["color_plans"].is_dir())
                 self.assertEqual(Path(os.environ["AUTODRAW_PAINT_LIMIT_TESTS_DIR"]), paths["paint_limit_tests"])
                 self.assertTrue(paths["paint_limit_tests"].is_dir())
+                self.assertEqual(Path(os.environ["AUTODRAW_BRUSH_CALIBRATION_PATH"]), paths["brush_calibration"])
+                self.assertEqual(paths["brush_calibration"], paths["profiles"] / "brush_paint_calibration.json")
+                self.assertTrue(paths["profiles"].is_dir())
         finally:
             for key, value in old_values.items():
                 if value is None:
