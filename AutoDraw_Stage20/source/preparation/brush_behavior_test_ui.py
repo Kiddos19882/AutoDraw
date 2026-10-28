@@ -220,7 +220,7 @@ class BrushBehaviorTestTab:
             text=("Для каждой кисти выполняй тест отдельно на чистой тестовой доске. Сначала запиши исходный запас краски, "
                   "затем выполни указанные штрихи через исполнитель AutoDraw. После завершения выбери область снимка: "
                   "в JSON сохраняются параметры, координаты запланированных штрихов, путь к скриншоту и поля для измерений. "
-                  "Размер кисти устанавливается щелчком по предварительно откалиброванному линейному ползунку; проверь его значение в игре."),
+                  "Размер задаётся радиусом: обычный режим предлагает радиусы 7, 14 и 20; расширенный ползунок меняет радиус от 30 слева до 1 справа."),
             wraplength=1150, justify="left",
         ).pack(anchor="w", pady=(4, 10))
 
@@ -228,19 +228,19 @@ class BrushBehaviorTestTab:
         controls.pack(fill="x", pady=(0, 8))
         row = ttk.Frame(controls)
         row.pack(fill="x")
-        ttk.Label(row, text="Размер кисти (1–30)").pack(side="left")
+        ttk.Label(row, text="Радиус кисти (1–30)").pack(side="left")
         ttk.Entry(row, textvariable=self.brush_var, width=6).pack(side="left", padx=(6, 16))
         ttk.Label(row, text="Тест").pack(side="left")
         ttk.Combobox(row, textvariable=self.case_var, values=tuple(TEST_CASES), state="readonly", width=30).pack(side="left", padx=6)
         ttk.Label(controls, textvariable=self.area_var, wraplength=1100).pack(anchor="w", pady=(8, 0))
         slider = ttk.LabelFrame(controls, text="Автоматическая установка кисти", padding=6)
         slider.pack(fill="x", pady=(8, 0))
-        ttk.Label(slider, text="Край 1 (X,Y)").pack(side="left")
+        ttk.Label(slider, text="Левый край 30 (X,Y)").pack(side="left")
         ttk.Entry(slider, textvariable=self.slider_start_var, width=12).pack(side="left", padx=4)
-        ttk.Label(slider, text="Край 30 (X,Y)").pack(side="left", padx=(8, 0))
+        ttk.Label(slider, text="Правый край 1 (X,Y)").pack(side="left", padx=(8, 0))
         ttk.Entry(slider, textvariable=self.slider_end_var, width=12).pack(side="left", padx=4)
         ttk.Button(slider, text="Установить кисть", command=self.set_brush_size).pack(side="left", padx=6)
-        ttk.Label(slider, text="Координаты крайних положений линейного ползунка; после щелчка проверь значение в игре.", wraplength=350).pack(side="left", padx=6)
+        ttk.Label(slider, text="Координаты расширенного ползунка: слева радиус 30, справа радиус 1. После перетаскивания проверь значение в игре.", wraplength=350).pack(side="left", padx=6)
         actions = ttk.Frame(outer)
         actions.pack(fill="x", pady=(0, 8))
         ttk.Button(actions, text="Создать и передать тест в исполнитель →", command=self.create_and_transfer_plan).pack(side="left")
@@ -385,7 +385,7 @@ class BrushBehaviorTestTab:
             raise ValueError(f"{field}: X и Y должны быть целыми числами.") from exc
 
     def set_brush_size(self) -> bool:
-        """Click the calibrated linear brush slider using native Windows mouse input."""
+        """Drag the extended-mode radius slider using the game engine inverse-radius mapping."""
         try:
             start = self._parse_point(self.slider_start_var.get(), "Край 1")
             end = self._parse_point(self.slider_end_var.get(), "Край 30")
@@ -394,12 +394,12 @@ class BrushBehaviorTestTab:
                 raise ValueError("Размер кисти должен быть целым числом от 1 до 30.")
             if platform.system() != "Windows":
                 raise RuntimeError("Автоматическая установка кисти доступна только в Windows.")
-            ratio = (brush - 1) / 29
+            ratio = (30 - brush) / 29
             x = round(start[0] + (end[0] - start[0]) * ratio)
             y = round(start[1] + (end[1] - start[1]) * ratio)
             self.brush_slider_start, self.brush_slider_end = start, end
             self.status_var.set(
-                f"Через 3 секунды ползунок будет перетащен к размеру кисти {brush}. "
+                f"Через 3 секунды ползунок будет перетащен к радиусу кисти {brush}. "
                 "Переключись в браузер и не трогай мышь."
             )
             self.root.after(3000, lambda: self._apply_brush_drag(start, x, y, brush))
@@ -429,7 +429,7 @@ class BrushBehaviorTestTab:
         finally:
             user32.mouse_event(0x0004, 0, 0, 0, 0)  # MOUSEEVENTF_LEFTUP
         self.status_var.set(
-            f"Выполнено перетаскивание ползунка к позиции кисти {brush} "
+            f"Выполнено перетаскивание ползунка к радиусу кисти {brush} "
             f"({target_x}, {target_y}). Проверь значение, показанное игрой."
         )
 
@@ -520,7 +520,7 @@ class BrushBehaviorTestTab:
             notes=self.notes_var.get(),
             outcome=self.outcome_var.get(),
             screen_resolution=self.screen_resolution,
-            brush_control={"type": "linear_drag_slider", "min_value": 1, "max_value": 30, "start": list(self.brush_slider_start) if self.brush_slider_start else None, "end": list(self.brush_slider_end) if self.brush_slider_end else None},
+            brush_control={"type": "linear_drag_slider_inverse_radius_1_to_30", "min_value": 1, "max_value": 30, "start": list(self.brush_slider_start) if self.brush_slider_start else None, "end": list(self.brush_slider_end) if self.brush_slider_end else None},
         )
 
     def save_record_dialog(self) -> None:
