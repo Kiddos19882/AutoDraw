@@ -96,3 +96,58 @@ def test_hole_and_disconnected_component_remain_unpainted_and_separate():
     # footprint; disconnected regions are represented without connecting paths.
     assert np.all(indexes[8:18, 8:18] == -1)
     assert all(len(stroke["points"]) == 2 for stroke in plan["strokes"])
+
+def _independent_footprint_pixels(
+    shape: tuple[int, int],
+    x1: int,
+    x2: int,
+    y: int,
+    brush: int,
+) -> set[tuple[int, int]]:
+    """Enumerate pixel centers covered by a modeled rectangular brush footprint.
+
+    Deliberately uses coordinate inequalities rather than the planner's ceil/floor
+    slice calculation, so a shared off-by-one error is less likely to pass unnoticed.
+    """
+    height, width = shape
+    half = brush / 2.0
+    return {
+        (py, px)
+        for py in range(height)
+        for px in range(width)
+        if y - half <= py <= y + half
+        and x1 - half <= px <= x2 + half
+    }
+
+
+@pytest.mark.parametrize("seed", range(12))
+def test_randomized_maps_match_independent_footprint_oracle(seed: int):
+    rng = np.random.default_rng(seed)
+    indexes = rng.integers(-1, 4, size=(7, 11), dtype=np.int32)
+
+    plan = build_interior_fill_plan(indexes, max_brush_value=5)
+    independently_covered: set[tuple[int, int]] = set()
+
+    for stroke in plan["strokes"]:
+        color = stroke["color_index"]
+        brush = stroke["brush_value"]
+        first, last = stroke["points"]
+        x1, x2, y = int(first["x"]), int(last["x"]), int(first["y"])
+        footprint = _independent_footprint_pixels(indexes.shape, x1, x2, y, brush)
+
+        for py, px in footprint:
+            assert indexes[py, px] == color, (
+                f"seed={seed}, stroke={stroke}, foreign pixel at ({px}, {py}) "
+                f"has palette index {indexes[py, px]}"
+            )
+        independently_covered.update(footprint)
+
+    expected_visible = {
+        (int(py), int(px))
+        for py, px in zip(*np.where(indexes >= 0))
+    }
+    assert expected_visible <= independently_covered
+    assert plan["summary"]["coverage_percent"] == 100.0
+    assert plan["summary"]["all_strokes_safe_for_color_map"]
+    assert not plan["summary"]["ready_for_automatic_execution"]
+
