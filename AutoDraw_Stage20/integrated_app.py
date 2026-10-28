@@ -35,8 +35,10 @@ def configure_environment(root: str | Path, *, create_directories: bool = True) 
         "brush_calibration": data / "profiles" / "brush_paint_calibration.json",
     }
     if create_directories:
-        for path in paths.values():
-            path.mkdir(parents=True, exist_ok=True)
+        for name, path in paths.items():
+            # brush_calibration is a JSON file, not a directory.
+            if name != "brush_calibration":
+                path.mkdir(parents=True, exist_ok=True)
 
     environment = {
         "AUTODRAW_ROOT": str(root_path),
