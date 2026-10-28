@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from brush_behavior_test_ui import TEST_CASES, build_brush_test_record
+from brush_behavior_test_ui import TEST_CASES, build_brush_test_drawing_plan, build_brush_test_record
 
 
 def test_brush_test_record_contains_reproducible_stroke_template() -> None:
@@ -53,3 +53,25 @@ def test_all_test_cases_have_named_strokes_with_two_endpoints() -> None:
 def test_brush_test_record_rejects_unknown_case() -> None:
     with pytest.raises(ValueError, match="Неизвестный тест"):
         build_brush_test_record(brush_value=7, test_case="не существует")
+
+
+
+def test_brush_test_plan_uses_standard_executor_schema_and_canvas_dimensions() -> None:
+    plan = build_brush_test_drawing_plan("Горизонтальные линии", (646, 323))
+
+    assert plan["coordinate_system"] == "local_canvas_pixels"
+    assert plan["canvas"] == {"width": 646, "height": 323}
+    assert plan["width"] == 646
+    assert len(plan["strokes"]) == 5
+    assert plan["strokes"][0]["points"] == [{"x": 20.0, "y": 20.0}, {"x": 30.0, "y": 20.0}]
+    assert plan["strokes"][0]["metadata"]["role"] == "brush_behavior_test"
+
+
+def test_brush_test_plan_rejects_points_outside_canvas() -> None:
+    with pytest.raises(ValueError, match="выходит за пределы"):
+        build_brush_test_drawing_plan("Горизонтальные линии", (100, 100))
+
+
+def test_brush_test_plan_rejects_invalid_canvas_size() -> None:
+    with pytest.raises(ValueError, match="положительным"):
+        build_brush_test_drawing_plan("Диагонали", (0, 323))
