@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "name": "Brush behavior test — rectangle_corners",
+  "created_at": "2026-10-28T17:53:39+00:00",
+  "coordinate_system": "local_canvas_pixels",
+  "canvas": {
+    "width": 645,
+    "height": 328
+  },
+  "width": 645,
+  "height": 328,
+  "strokes": [
+    {
+      "name": "top",
+      "points": [
+        {
+          "x": 20.0,
+          "y": 20.0
+        },
+        {
+          "x": 120.0,
+          "y": 20.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "rectangle_corners"
+      }
+    },
+    {
+      "name": "right",
+      "points": [
+        {
+          "x": 120.0,
+          "y": 20.0
+        },
+        {
+          "x": 120.0,
+          "y": 80.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "rectangle_corners"
+      }
+    },
+    {
+      "name": "bottom",
+      "points": [
+        {
+          "x": 120.0,
+          "y": 80.0
+        },
+        {
+          "x": 20.0,
+          "y": 80.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "rectangle_corners"
+      }
+    },
+    {
+      "name": "left",
+      "points": [
+        {
+          "x": 20.0,
+          "y": 80.0
+        },
+        {
+          "x": 20.0,
+          "y": 20.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "rectangle_corners"
+      }
+    }
+  ],
+  "generation": {
+    "method": "manual_brush_behavior_test",
+    "test_case": "rectangle_corners",
+    "brush_value_must_be_set_manually": true,
+    "note": "Set the requested brush size in the browser before executing this plan.",
+    "requested_brush_value": 20
+  },
+  "summary": {
+    "stroke_count": 4,
+    "drawing_length_px": 320.0,
+    "pen_up_distance_px": 0.0
+  }
+}

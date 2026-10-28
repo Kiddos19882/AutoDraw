@@ -1,0 +1,21 @@
+{
+  "point_step_px": 2.0,
+  "line_extension_px": 0.0,
+  "point_delay_ms": 10,
+  "after_mouse_up_ms": 20,
+  "before_mouse_down_ms": 20,
+  "after_mouse_down_ms": 40,
+  "end_hold_ms": 50,
+  "countdown_seconds": 5,
+  "brush_slider_calibration": {
+    "x_at_min": null,
+    "x_at_max": null,
+    "y": null,
+    "initial_value": 7,
+    "min_value": 1,
+    "max_value": 30,
+    "screen_width": null,
+    "screen_height": null,
+    "confirmed": false
+  }
+}
