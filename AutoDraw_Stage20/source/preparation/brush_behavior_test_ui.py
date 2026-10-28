@@ -356,6 +356,8 @@ class BrushBehaviorTestTab:
         self.screenshot_path = None
         self.execution_report_path = None
         self.execution_report = None
+        self.brush_slider_start = None
+        self.brush_slider_end = None
         self.outcome_var.set("not_reviewed")
         self.notes_var.set("")
         self.visible_strokes_var.set("")
@@ -552,6 +554,30 @@ class BrushBehaviorTestTab:
             brush = int(self.brush_var.get().strip())
         except ValueError as exc:
             raise ValueError("Размер кисти должен быть целым числом от 1 до 30.") from exc
+        calibrated = self.get_brush_control() if callable(self.get_brush_control) else None
+        if calibrated and calibrated.get("mode") == "presets":
+            brush_control = {
+                "type": "preset_click",
+                "mode": "presets",
+                "selected_brush_point": calibrated.get("presets", {}).get(str(brush)),
+                "presets": calibrated.get("presets", {}),
+            }
+        elif calibrated and calibrated.get("mode") == "slider":
+            brush_control = {
+                "type": "linear_drag_slider_inverse_radius_1_to_30",
+                "mode": "slider",
+                "min_value": 1,
+                "max_value": 30,
+                "start": calibrated.get("start"),
+                "end": calibrated.get("end"),
+            }
+        else:
+            brush_control = {
+                "type": "manual_or_unconfigured",
+                "mode": calibrated.get("mode") if calibrated else None,
+                "start": list(self.brush_slider_start) if self.brush_slider_start else None,
+                "end": list(self.brush_slider_end) if self.brush_slider_end else None,
+            }
         return build_brush_test_record(
             brush_value=brush,
             test_case=self.case_var.get(),
@@ -566,7 +592,7 @@ class BrushBehaviorTestTab:
             notes=self.notes_var.get(),
             outcome=self.outcome_var.get(),
             screen_resolution=self.screen_resolution,
-            brush_control={"type": "linear_drag_slider_inverse_radius_1_to_30", "min_value": 1, "max_value": 30, "start": list(self.brush_slider_start) if self.brush_slider_start else None, "end": list(self.brush_slider_end) if self.brush_slider_end else None},
+            brush_control=brush_control,
         )
 
     def save_record_dialog(self) -> None:
