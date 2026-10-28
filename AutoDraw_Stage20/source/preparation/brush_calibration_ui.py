@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import platform
 import tkinter as tk
+from datetime import datetime, timezone
 from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
 from typing import Any, Callable
@@ -555,6 +556,7 @@ class BrushCalibrationTab:
         env = self.profile["environment"]
         size = self._screen_size()
         env["screen_width"], env["screen_height"] = size
+        env["calibrated_at_utc"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
         self.profile["brush_control_mode"] = self._brush_mode_labels.get(self.brush_mode_var.get())
         for key in ("browser", "browser_version"):
             env[key] = self._env_vars[key].get().strip()
