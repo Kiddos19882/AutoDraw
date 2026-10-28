@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 import uuid
+import ctypes
+import platform
 from datetime import datetime, timezone
 from pathlib import Path
 import tkinter as tk
@@ -76,6 +78,7 @@ def build_brush_test_record(
     drawing_plan_path: str | None = None, drawing_plan: dict[str, Any] | None = None,
     execution_report_path: str | None = None, execution_report: dict[str, Any] | None = None,
     measurements: dict[str, Any] | None = None, notes: str = "", outcome: str = "not_reviewed",
+    screen_resolution: dict[str, int] | None = None, brush_control: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build a versioned, portable observation record for later brush-model fitting."""
     if isinstance(brush_value, bool) or not isinstance(brush_value, int) or not 1 <= brush_value <= 30:
@@ -91,7 +94,11 @@ def build_brush_test_record(
         "brush_value": brush_value,
         "test_case": {"id": scenario["id"], "name": test_case, "description": scenario["description"]},
         "canvas_area": canvas_area,
+        "board_selection_origin": ({"x": canvas_area["x"], "y": canvas_area["y"]} if canvas_area else None),
+        "board_selection_size": ({"width": canvas_area["width"], "height": canvas_area["height"]} if canvas_area else None),
+        "screen_resolution": screen_resolution,
         "screen_area": screen_area,
+        "brush_control": brush_control,
         "screenshot_path": screenshot_path,
         "drawing_plan_path": drawing_plan_path,
         "drawing_plan": drawing_plan,
@@ -179,6 +186,9 @@ class BrushBehaviorTestTab:
         self.current_plan_path: Path | None = None
         self.canvas_area: dict[str, int] | None = None
         self.screen_area: dict[str, int] | None = None
+        self.screen_resolution: dict[str, int] | None = None
+        self.brush_slider_start: tuple[int, int] | None = None
+        self.brush_slider_end: tuple[int, int] | None = None
         self.screenshot_path: Path | None = None
         self.execution_report_path: Path | None = None
         self.execution_report: dict[str, Any] | None = None
@@ -194,7 +204,9 @@ class BrushBehaviorTestTab:
         self.paint_before_var = tk.StringVar()
         self.paint_after_var = tk.StringVar()
         self.zoom_var = tk.StringVar(value="100")
-        self.area_var = tk.StringVar(value="Область снимка не выбрана.")
+        self.area_var = tk.StringVar(value="Область доски берётся из профиля исполнения.")
+        self.slider_start_var = tk.StringVar()
+        self.slider_end_var = tk.StringVar()
         self.status_var = tk.StringVar(value="Выбери кисть и тест. В игре вручную установи указанную кисть и выполни тестовый шаблон.")
         self._build(parent)
 
@@ -207,7 +219,7 @@ class BrushBehaviorTestTab:
             text=("Для каждой кисти выполняй тест отдельно на чистой тестовой доске. Сначала запиши исходный запас краски, "
                   "затем выполни указанные штрихи через исполнитель AutoDraw. После завершения выбери область снимка: "
                   "в JSON сохраняются параметры, координаты запланированных штрихов, путь к скриншоту и поля для измерений. "
-                  "Программа не запускает рисование автоматически из этой вкладки."),
+                  "Размер кисти устанавливается щелчком по предварительно откалиброванному линейному ползунку; проверь его значение в игре."),
             wraplength=1150, justify="left",
         ).pack(anchor="w", pady=(4, 10))
 
@@ -220,10 +232,17 @@ class BrushBehaviorTestTab:
         ttk.Label(row, text="Тест").pack(side="left")
         ttk.Combobox(row, textvariable=self.case_var, values=tuple(TEST_CASES), state="readonly", width=30).pack(side="left", padx=6)
         ttk.Label(controls, textvariable=self.area_var, wraplength=1100).pack(anchor="w", pady=(8, 0))
+        slider = ttk.LabelFrame(controls, text="Автоматическая установка кисти", padding=6)
+        slider.pack(fill="x", pady=(8, 0))
+        ttk.Label(slider, text="Край 1 (X,Y)").pack(side="left")
+        ttk.Entry(slider, textvariable=self.slider_start_var, width=12).pack(side="left", padx=4)
+        ttk.Label(slider, text="Край 30 (X,Y)").pack(side="left", padx=(8, 0))
+        ttk.Entry(slider, textvariable=self.slider_end_var, width=12).pack(side="left", padx=4)
+        ttk.Button(slider, text="Установить кисть", command=self.set_brush_size).pack(side="left", padx=6)
+        ttk.Label(slider, text="Координаты крайних положений линейного ползунка; после щелчка проверь значение в игре.", wraplength=350).pack(side="left", padx=6)
         actions = ttk.Frame(outer)
         actions.pack(fill="x", pady=(0, 8))
         ttk.Button(actions, text="Создать и передать тест в исполнитель →", command=self.create_and_transfer_plan).pack(side="left")
-        ttk.Button(actions, text="Выбрать область снимка…", command=self.select_screenshot_area).pack(side="left", padx=(6, 0))
         ttk.Button(actions, text="Снять скриншот сейчас", command=self.capture_screenshot).pack(side="left", padx=(6, 0))
         ttk.Button(actions, text="Привязать отчёт исполнения…", command=self.load_execution_report).pack(side="left", padx=(6, 0))
         ttk.Button(actions, text="Сохранить запись теста…", command=self.save_record_dialog).pack(side="left", padx=(6, 0))
@@ -349,26 +368,56 @@ class BrushBehaviorTestTab:
             self.status_var.set("Область сохранена. После завершения теста нажми «Снять скриншот сейчас».")
         self.area_selector_cls(self.root, selected, instruction="Выдели область завершённого теста кисти. Esc — отмена.")
 
+    @staticmethod
+    def _parse_point(raw: str, field: str) -> tuple[int, int]:
+        parts = [part.strip() for part in raw.replace(";", ",").split(",")]
+        if len(parts) != 2:
+            raise ValueError(f"{field}: введи координаты X,Y.")
+        try:
+            return int(parts[0]), int(parts[1])
+        except ValueError as exc:
+            raise ValueError(f"{field}: X и Y должны быть целыми числами.") from exc
+
+    def set_brush_size(self) -> None:
+        """Click the calibrated linear brush slider using native Windows mouse input."""
+        try:
+            start = self._parse_point(self.slider_start_var.get(), "Край 1")
+            end = self._parse_point(self.slider_end_var.get(), "Край 30")
+            brush = int(self.brush_var.get().strip())
+            if not 1 <= brush <= 30:
+                raise ValueError("Размер кисти должен быть целым числом от 1 до 30.")
+            if platform.system() != "Windows":
+                raise RuntimeError("Автоматическая установка кисти доступна только в Windows.")
+            ratio = (brush - 1) / 29
+            x = round(start[0] + (end[0] - start[0]) * ratio)
+            y = round(start[1] + (end[1] - start[1]) * ratio)
+            ctypes.windll.user32.SetCursorPos(x, y)
+            ctypes.windll.user32.mouse_event(0x0002, 0, 0, 0, 0)
+            ctypes.windll.user32.mouse_event(0x0004, 0, 0, 0, 0)
+            self.brush_slider_start, self.brush_slider_end = start, end
+            self.status_var.set(f"Щелчок установки кисти {brush} отправлен в ({x}, {y}). Проверь значение в игре.")
+        except (ValueError, RuntimeError, AttributeError) as exc:
+            messagebox.showwarning("Не настроен ползунок кисти", str(exc), parent=self.root)
+
     def capture_screenshot(self) -> None:
-        if not self.screen_area:
-            messagebox.showwarning("Не выбрана область", "Сначала выбери область снимка.", parent=self.root)
-            return
-        self.status_var.set("Через 3 секунды будет снята выбранная область. Переключись в браузер и не двигай окно игры.")
+        self.status_var.set("Через 3 секунды будет сохранён полный скриншот экрана. Переключись в браузер.")
         self.root.after(3000, self._capture_screenshot_now)
 
     def _capture_screenshot_now(self) -> None:
-        if not self.screen_area:
-            return
-        area = self.screen_area
         try:
-            image = ImageGrab.grab(bbox=(area["x"], area["y"], area["x"] + area["width"], area["y"] + area["height"]))
+            image = ImageGrab.grab()
             if image.width < 1 or image.height < 1:
                 raise ValueError("Получился пустой снимок.")
+            self.screen_resolution = {"width": int(image.width), "height": int(image.height)}
+            area = self.get_canvas_area()
+            self.canvas_area = ({key: int(area[key]) for key in ("x", "y", "width", "height")} if area else None)
+            self.screen_area = {"x": 0, "y": 0, "width": image.width, "height": image.height}
             self.output_dir.mkdir(parents=True, exist_ok=True)
-            path = self.output_dir / f"brush-screenshot-{datetime.now().strftime('%Y%m%d-%H%M%S')}.png"
+            path = self.output_dir / f"brush-screenshot-full-{datetime.now().strftime('%Y%m%d-%H%M%S')}.png"
             image.save(path)
             self.screenshot_path = path
-            self.status_var.set(f"Снимок сохранён: {path}")
+            self.area_var.set(f"Экран: {image.width} × {image.height}; доска: {self.canvas_area or 'не найдена в профиле'}")
+            self.status_var.set(f"Полный скриншот сохранён: {path}")
         except Exception as exc:
             messagebox.showerror("Не удалось снять скриншот", str(exc), parent=self.root)
 
@@ -436,6 +485,8 @@ class BrushBehaviorTestTab:
             measurements=self._measurement_values(),
             notes=self.notes_var.get(),
             outcome=self.outcome_var.get(),
+            screen_resolution=self.screen_resolution,
+            brush_control={"type": "linear_slider", "min_value": 1, "max_value": 30, "start": list(self.brush_slider_start) if self.brush_slider_start else None, "end": list(self.brush_slider_end) if self.brush_slider_end else None},
         )
 
     def save_record_dialog(self) -> None:
