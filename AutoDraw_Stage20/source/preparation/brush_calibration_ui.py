@@ -588,18 +588,27 @@ class BrushCalibrationTab:
         area = self.get_board_area()
         return (area["width"], area["height"]) if area else None
 
-    def get_brush_control(self) -> dict[str, list[int]] | None:
+    def get_brush_control(self) -> dict[str, Any] | None:
         points = self.profile["points"]
+        states = self.profile["status"]["points"]
+        control: dict[str, Any] = {"presets": {}}
+        for value in (7, 14, 20):
+            key = f"brush_{value}"
+            point = points.get(key)
+            if point and states.get(key) != "needs_review":
+                control["presets"][str(value)] = [point["x"], point["y"]]
         point_1 = points.get("brush_slider_value_1")
         point_30 = points.get("brush_slider_value_30")
-        if not point_1 or not point_30:
-            return None
-        if (
-            self.profile["status"]["points"]["brush_slider_value_1"] == "needs_review"
-            or self.profile["status"]["points"]["brush_slider_value_30"] == "needs_review"
-        ):
-            return None
-        return {"start": [point_30["x"], point_30["y"]], "end": [point_1["x"], point_1["y"]]}
+        slider_ready = (
+            point_1 is not None and point_30 is not None
+            and states.get("brush_slider_value_1") != "needs_review"
+            and states.get("brush_slider_value_30") != "needs_review"
+        )
+        if slider_ready:
+            # The executor drags from the value-30 endpoint toward value 1.
+            control["start"] = [point_30["x"], point_30["y"]]
+            control["end"] = [point_1["x"], point_1["y"]]
+        return control if control["presets"] or slider_ready else None
 
     def is_ready(self, brush_value: int | None = None) -> tuple[bool, list[str]]:
         try:
