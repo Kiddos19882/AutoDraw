@@ -302,6 +302,7 @@ class AutoDrawUnifiedApp:
             self.data_paths["brush_tests"],
             AreaSelector,
             get_canvas_size=self._get_execution_canvas_size,
+            get_canvas_area=self._get_execution_canvas_area,
             on_transfer_plan=self._transfer_brush_test_plan,
         )
 
@@ -494,6 +495,20 @@ class AutoDrawUnifiedApp:
             f"Цветной план передан исполнителю: {destination.name}. "
             "Проверьте точный размер холста, экранную область и профиль палитры до запуска."
         )
+
+    def _get_execution_canvas_area(self) -> dict[str, int] | None:
+        area = getattr(self.executor, "area", None)
+        if area is None:
+            return None
+        try:
+            return {
+                "x": int(area.x),
+                "y": int(area.y),
+                "width": int(area.width),
+                "height": int(area.height),
+            }
+        except (AttributeError, TypeError, ValueError):
+            return None
 
     def _get_execution_canvas_size(self) -> tuple[int, int] | None:
         area = getattr(self.executor, "area", None)
