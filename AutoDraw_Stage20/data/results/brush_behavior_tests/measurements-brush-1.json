@@ -1,0 +1,236 @@
+{
+  "schema_version": 1,
+  "result_count": 2,
+  "results": [
+    {
+      "schema_version": 1,
+      "plan_file": "data\\results\\brush_behavior_tests\\brush-plan-horizontal_lengths-b1-20261028-210932.json",
+      "screenshot_file": "data\\results\\brush_behavior_tests\\brush-screenshot-20261028-210954.png",
+      "screenshot_size": {
+        "width": 1919,
+        "height": 1079
+      },
+      "board_crop_screenshot_px": {
+        "x": 421,
+        "y": 230,
+        "width": 578,
+        "height": 303
+      },
+      "plan_canvas_size": {
+        "width": 645.0,
+        "height": 328.0
+      },
+      "screenshot_scale": {
+        "x": 0.896124,
+        "y": 0.92378
+      },
+      "threshold_max_rgb": 100,
+      "roi_padding_canvas_px": 6.0,
+      "requested_brush_value": 1,
+      "test_case": "horizontal_lengths",
+      "measurements": [
+        {
+          "stroke": "horizontal_10",
+          "planned_length_px": 10.0,
+          "closed": false,
+          "dark_pixel_count": 182,
+          "detected": true,
+          "detected_bbox_board_px": {
+            "left": 12,
+            "top": 12,
+            "right": 24,
+            "bottom": 25,
+            "width_px": 13,
+            "height_px": 14,
+            "estimated_canvas_width_px": 14.51,
+            "estimated_canvas_height_px": 15.16
+          },
+          "note": "Bounding box is measured inside a padded ROI; it may include nearby ink for overlapping strokes or corners."
+        },
+        {
+          "stroke": "horizontal_20",
+          "planned_length_px": 20.0,
+          "closed": false,
+          "dark_pixel_count": 169,
+          "detected": true,
+          "detected_bbox_board_px": {
+            "left": 12,
+            "top": 36,
+            "right": 24,
+            "bottom": 48,
+            "width_px": 13,
+            "height_px": 13,
+            "estimated_canvas_width_px": 14.51,
+            "estimated_canvas_height_px": 14.07
+          },
+          "note": "Bounding box is measured inside a padded ROI; it may include nearby ink for overlapping strokes or corners."
+        },
+        {
+          "stroke": "horizontal_50",
+          "planned_length_px": 50.0,
+          "closed": false,
+          "dark_pixel_count": 169,
+          "detected": true,
+          "detected_bbox_board_px": {
+            "left": 12,
+            "top": 59,
+            "right": 24,
+            "bottom": 71,
+            "width_px": 13,
+            "height_px": 13,
+            "estimated_canvas_width_px": 14.51,
+            "estimated_canvas_height_px": 14.07
+          },
+          "note": "Bounding box is measured inside a padded ROI; it may include nearby ink for overlapping strokes or corners."
+        },
+        {
+          "stroke": "horizontal_100",
+          "planned_length_px": 100.0,
+          "closed": false,
+          "dark_pixel_count": 169,
+          "detected": true,
+          "detected_bbox_board_px": {
+            "left": 12,
+            "top": 82,
+            "right": 24,
+            "bottom": 94,
+            "width_px": 13,
+            "height_px": 13,
+            "estimated_canvas_width_px": 14.51,
+            "estimated_canvas_height_px": 14.07
+          },
+          "note": "Bounding box is measured inside a padded ROI; it may include nearby ink for overlapping strokes or corners."
+        },
+        {
+          "stroke": "horizontal_200",
+          "planned_length_px": 200.0,
+          "closed": false,
+          "dark_pixel_count": 169,
+          "detected": true,
+          "detected_bbox_board_px": {
+            "left": 12,
+            "top": 105,
+            "right": 24,
+            "bottom": 117,
+            "width_px": 13,
+            "height_px": 13,
+            "estimated_canvas_width_px": 14.51,
+            "estimated_canvas_height_px": 14.07
+          },
+          "note": "Bounding box is measured inside a padded ROI; it may include nearby ink for overlapping strokes or corners."
+        }
+      ],
+      "limitations": [
+        "Threshold segmentation is approximate and can merge overlapping strokes.",
+        "A detected dark trace does not prove the game registered a stroke or charged paint.",
+        "Crop and scale must be verified for each screenshot capture setup."
+      ]
+    },
+    {
+      "schema_version": 1,
+      "plan_file": "data\\results\\brush_behavior_tests\\brush-plan-short_strokes-b1-20261028-211110.json",
+      "screenshot_file": "data\\results\\brush_behavior_tests\\brush-screenshot-20261028-211126.png",
+      "screenshot_size": {
+        "width": 1919,
+        "height": 1079
+      },
+      "board_crop_screenshot_px": {
+        "x": 421,
+        "y": 230,
+        "width": 578,
+        "height": 303
+      },
+      "plan_canvas_size": {
+        "width": 645.0,
+        "height": 328.0
+      },
+      "screenshot_scale": {
+        "x": 0.896124,
+        "y": 0.92378
+      },
+      "threshold_max_rgb": 100,
+      "roi_padding_canvas_px": 6.0,
+      "requested_brush_value": 1,
+      "test_case": "short_strokes",
+      "measurements": [
+        {
+          "stroke": "length_0",
+          "planned_length_px": 0.0,
+          "closed": false,
+          "dark_pixel_count": 168,
+          "detected": true,
+          "detected_bbox_board_px": {
+            "left": 8,
+            "top": 12,
+            "right": 19,
+            "bottom": 25,
+            "width_px": 12,
+            "height_px": 14,
+            "estimated_canvas_width_px": 13.39,
+            "estimated_canvas_height_px": 15.16
+          },
+          "note": "Bounding box is measured inside a padded ROI; it may include nearby ink for overlapping strokes or corners."
+        },
+        {
+          "stroke": "length_1",
+          "planned_length_px": 1.0,
+          "closed": false,
+          "dark_pixel_count": 0,
+          "detected": false,
+          "detected_bbox_board_px": null,
+          "note": "Bounding box is measured inside a padded ROI; it may include nearby ink for overlapping strokes or corners."
+        },
+        {
+          "stroke": "length_2",
+          "planned_length_px": 2.0,
+          "closed": false,
+          "dark_pixel_count": 0,
+          "detected": false,
+          "detected_bbox_board_px": null,
+          "note": "Bounding box is measured inside a padded ROI; it may include nearby ink for overlapping strokes or corners."
+        },
+        {
+          "stroke": "length_3",
+          "planned_length_px": 3.0,
+          "closed": false,
+          "dark_pixel_count": 0,
+          "detected": false,
+          "detected_bbox_board_px": null,
+          "note": "Bounding box is measured inside a padded ROI; it may include nearby ink for overlapping strokes or corners."
+        },
+        {
+          "stroke": "length_5",
+          "planned_length_px": 5.0,
+          "closed": false,
+          "dark_pixel_count": 0,
+          "detected": false,
+          "detected_bbox_board_px": null,
+          "note": "Bounding box is measured inside a padded ROI; it may include nearby ink for overlapping strokes or corners."
+        },
+        {
+          "stroke": "length_8",
+          "planned_length_px": 8.0,
+          "closed": false,
+          "dark_pixel_count": 0,
+          "detected": false,
+          "detected_bbox_board_px": null,
+          "note": "Bounding box is measured inside a padded ROI; it may include nearby ink for overlapping strokes or corners."
+        },
+        {
+          "stroke": "length_10",
+          "planned_length_px": 10.0,
+          "closed": false,
+          "dark_pixel_count": 0,
+          "detected": false,
+          "detected_bbox_board_px": null,
+          "note": "Bounding box is measured inside a padded ROI; it may include nearby ink for overlapping strokes or corners."
+        }
+      ],
+      "limitations": [
+        "Threshold segmentation is approximate and can merge overlapping strokes.",
+        "A detected dark trace does not prove the game registered a stroke or charged paint.",
+        "Crop and scale must be verified for each screenshot capture setup."
+      ]
+    }
+  ]
+}
