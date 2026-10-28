@@ -16,6 +16,14 @@ def test_brush_test_record_contains_reproducible_stroke_template() -> None:
         drawing_plan={"strokes": [{"name": "line"}]},
         execution_report_path="execution.json",
         execution_report={"status": "completed", "stroke_count": 5},
+        measurements={
+            "observed_stroke_count": 4,
+            "visible_stroke_names": ["horizontal_10", "horizontal_20"],
+            "missing_stroke_names": ["horizontal_50"],
+            "measured_footprint_width_px": 7,
+            "paint_points_before": 6000,
+            "paint_points_after": 5900,
+        },
         notes="Проверка кисти 7",
         outcome="partial",
     )
@@ -32,6 +40,10 @@ def test_brush_test_record_contains_reproducible_stroke_template() -> None:
     assert record["drawing_plan"]["strokes"][0]["name"] == "line"
     assert record["execution_report_path"] == "execution.json"
     assert record["execution_report"]["stroke_count"] == 5
+    assert record["measurement_fields"]["visible_stroke_names"] == ["horizontal_10", "horizontal_20"]
+    assert record["measurement_fields"]["missing_stroke_names"] == ["horizontal_50"]
+    assert record["measurement_fields"]["measured_footprint_width_px"] == 7
+    assert record["measurement_fields"]["paint_points_before"] == 6000
     assert record["outcome"] == "partial"
     assert record["measurement_fields"]["paint_points_before"] is None
     assert record["interpretation"]["automatic_execution_allowed"] is False
