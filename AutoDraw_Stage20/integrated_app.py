@@ -105,7 +105,7 @@ try:
     from stage13_workbench import AutoDrawWorkbench
     from stage8_optimizer import save_plan
     from models import DrawingPlan
-    from stage6_execute_plan import AreaSelector, Stage6App
+    from stage6_execute_plan import AreaSelector, Stage6App, TargetArea
     from palette_detection_ui import PaletteDetectionTab
     from palette_quantization_ui import PaletteQuantizationTab
     from color_scanline_ui import ColorScanlineTab
@@ -114,7 +114,6 @@ try:
     from paint_limit_test_ui import PaintLimitTestTab
     from brush_behavior_test_ui import BrushBehaviorTestTab
     from brush_calibration_ui import BrushCalibrationTab
-    from stage6_execute_plan import TargetArea
 except ImportError as exc:  # pragma: no cover - exercised by packaging smoke test
     raise SystemExit(
         "Не удалось загрузить компоненты AutoDraw. Проверьте комплект поставки и зависимости.\n"
