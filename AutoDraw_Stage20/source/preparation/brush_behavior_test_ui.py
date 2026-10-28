@@ -10,6 +10,8 @@ from typing import Any
 
 from PIL import ImageGrab
 
+from stage8_optimizer import save_plan
+
 
 TEST_CASES: dict[str, dict[str, Any]] = {
     "Горизонтальные линии": {
@@ -115,14 +117,61 @@ def build_brush_test_record(
     }
 
 
+def build_brush_test_drawing_plan(test_case: str, canvas_size: tuple[int, int]) -> dict[str, Any]:
+    """Build a standard local-canvas DrawingPlan that the existing executor can load."""
+    if test_case not in TEST_CASES:
+        raise ValueError(f"Неизвестный тест кисти: {test_case}")
+    width, height = (int(canvas_size[0]), int(canvas_size[1]))
+    if width < 1 or height < 1:
+        raise ValueError("Размер тестового холста должен быть положительным.")
+    scenario = TEST_CASES[test_case]
+    strokes = []
+    for item in scenario["strokes"]:
+        points = item["points"]
+        if any(x < 0 or y < 0 or x >= width or y >= height for x, y in points):
+            raise ValueError(
+                f"Штрих {item['name']} выходит за пределы холста {width} × {height}."
+            )
+        strokes.append({
+            "name": item["name"],
+            "points": [{"x": float(x), "y": float(y)} for x, y in points],
+            "closed": False,
+            "metadata": {"role": "brush_behavior_test", "test_case": scenario["id"]},
+        })
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    return {
+        "schema_version": 1,
+        "name": f"Brush behavior test — {scenario['id']}",
+        "created_at": now,
+        "coordinate_system": "local_canvas_pixels",
+        "canvas": {"width": width, "height": height},
+        "width": width,
+        "height": height,
+        "strokes": strokes,
+        "generation": {
+            "method": "manual_brush_behavior_test",
+            "test_case": scenario["id"],
+            "brush_value_must_be_set_manually": True,
+            "note": "Set the requested brush size in the browser before executing this plan.",
+        },
+    }
+
+
 class BrushBehaviorTestTab:
     """Manual browser brush test matrix, screenshot capture, and raw-data storage."""
 
-    def __init__(self, root: tk.Misc, parent: tk.Widget, output_dir: str | Path, area_selector_cls):
+    def __init__(
+        self, root: tk.Misc, parent: tk.Widget, output_dir: str | Path,
+        area_selector_cls, *, get_canvas_size, on_transfer_plan,
+    ):
         self.root = root
         self.output_dir = Path(output_dir).resolve()
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.area_selector_cls = area_selector_cls
+        self.get_canvas_size = get_canvas_size
+        self.on_transfer_plan = on_transfer_plan
+        self.current_plan: dict[str, Any] | None = None
+        self.current_plan_path: Path | None = None
         self.screen_area: dict[str, int] | None = None
         self.canvas_area: dict[str, int] | None = None
         self.screenshot_path: Path | None = None
@@ -161,7 +210,8 @@ class BrushBehaviorTestTab:
         ttk.Label(controls, textvariable=self.area_var, wraplength=1100).pack(anchor="w", pady=(8, 0))
         actions = ttk.Frame(outer)
         actions.pack(fill="x", pady=(0, 8))
-        ttk.Button(actions, text="Выбрать область снимка…", command=self.select_screenshot_area).pack(side="left")
+        ttk.Button(actions, text="Создать и передать тест в исполнитель →", command=self.create_and_transfer_plan).pack(side="left")
+        ttk.Button(actions, text="Выбрать область снимка…", command=self.select_screenshot_area).pack(side="left", padx=(6, 0))
         ttk.Button(actions, text="Снять скриншот сейчас", command=self.capture_screenshot).pack(side="left", padx=(6, 0))
         ttk.Button(actions, text="Привязать отчёт исполнения…", command=self.load_execution_report).pack(side="left", padx=(6, 0))
         ttk.Button(actions, text="Сохранить запись теста…", command=self.save_record_dialog).pack(side="left", padx=(6, 0))
@@ -200,6 +250,38 @@ class BrushBehaviorTestTab:
         self.template_text.delete("1.0", "end")
         self.template_text.insert("1.0", "\n".join(lines))
         self.template_text.configure(state="disabled")
+
+    def create_and_transfer_plan(self) -> None:
+        canvas_size = self.get_canvas_size()
+        if not canvas_size:
+            messagebox.showwarning(
+                "Не выбрана область холста",
+                "Сначала выбери реальную область рисования на вкладке исполнения. "
+                "Тестовый план должен совпадать с её размером.",
+                parent=self.root,
+            )
+            return
+        try:
+            plan = build_brush_test_drawing_plan(self.case_var.get(), canvas_size)
+            brush = int(self.brush_var.get().strip())
+            if not 1 <= brush <= 30:
+                raise ValueError("Размер кисти должен быть целым числом от 1 до 30.")
+            self.output_dir.mkdir(parents=True, exist_ok=True)
+            path = self.output_dir / (
+                f"brush-plan-{plan['generation']['test_case']}-b{brush}-"
+                f"{datetime.now().strftime('%Y%m%d-%H%M%S')}.json"
+            )
+            plan["generation"]["requested_brush_value"] = brush
+            save_plan(path, plan)
+            self.current_plan = plan
+            self.current_plan_path = path
+            if not self.on_transfer_plan(plan, path):
+                return
+            self.status_var.set(
+                f"План передан исполнителю: {path.name}. Установи в браузере кисть {brush} перед запуском."
+            )
+        except (OSError, ValueError, TypeError) as exc:
+            messagebox.showerror("Не удалось создать тестовый план", str(exc), parent=self.root)
 
     def select_screenshot_area(self) -> None:
         def selected(area) -> None:
