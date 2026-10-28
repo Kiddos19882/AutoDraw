@@ -12,6 +12,8 @@ def test_brush_test_record_contains_reproducible_stroke_template() -> None:
         canvas_area={"x": 100, "y": 200, "width": 646, "height": 323},
         screen_area={"x": 500, "y": 300, "width": 646, "height": 323},
         screenshot_path="capture.png",
+        execution_report_path="execution.json",
+        execution_report={"status": "completed", "stroke_count": 5},
         notes="Проверка кисти 7",
         outcome="partial",
     )
@@ -24,6 +26,8 @@ def test_brush_test_record_contains_reproducible_stroke_template() -> None:
     assert record["planned_strokes"][2]["points"] == [[20, 70], [70, 70]]
     assert record["screen_area"]["width"] == 646
     assert record["screenshot_path"] == "capture.png"
+    assert record["execution_report_path"] == "execution.json"
+    assert record["execution_report"]["stroke_count"] == 5
     assert record["outcome"] == "partial"
     assert record["measurement_fields"]["paint_points_before"] is None
     assert record["interpretation"]["automatic_execution_allowed"] is False
