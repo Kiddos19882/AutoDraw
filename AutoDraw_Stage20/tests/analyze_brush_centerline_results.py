@@ -112,7 +112,7 @@ def analyze_pair(plan_path: Path, screenshot_path: Path,
             else:
                 span, width_est = 0.0, None
             line_detected = len(centerline) >= 2 and span >= max(1.5, planned * 0.25)
-            classification = "line_trace_candidate" if line_detected else "weak_or_missing_trace"
+            if not line_detected:\n                classification = "weak_or_missing_trace"\n            elif width_est is not None and planned <= width_est:\n                classification = "brush_width_dominated_short_trace"\n            else:\n                classification = "line_trace_candidate"
             note = "Centerline proximity is geometric evidence only, not proof of game registration."
             dot_candidate = False
 
