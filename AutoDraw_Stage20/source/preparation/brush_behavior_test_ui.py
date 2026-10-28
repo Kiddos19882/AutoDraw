@@ -12,7 +12,7 @@ from tkinter import filedialog, messagebox, ttk
 from typing import Any
 
 import pyautogui
-from PIL import ImageGrab
+from PIL import Image, ImageGrab
 
 from stage8_optimizer import save_plan
 from brush_experiment_capture import (
