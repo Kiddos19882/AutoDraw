@@ -70,3 +70,29 @@ def test_scale_that_makes_even_thin_footprint_unsafe_fails_closed():
     indexes = np.array([[0, 1, 1]], dtype=np.int32)
     with pytest.raises(InteriorFillError):
         build_interior_fill_plan(indexes, max_brush_value=2, brush_scale_x=3.0)
+
+
+def test_hole_and_disconnected_component_remain_unpainted_and_separate():
+    indexes = np.full((28, 36), -1, dtype=np.int32)
+    indexes[2:24, 2:24] = 0
+    indexes[8:18, 8:18] = -1  # transparent hole
+    indexes[4:9, 29:34] = 0  # disconnected component
+
+    plan = build_interior_fill_plan(indexes, max_brush_value=10)
+
+    assert plan["summary"]["coverage_percent"] == 100.0
+    for stroke in plan["strokes"]:
+        color = stroke["color_index"]
+        brush = stroke["brush_value"]
+        first, last = stroke["points"]
+        x1, x2, y = int(first["x"]), int(last["x"]), int(first["y"])
+        left = max(0, int(np.ceil(x1 - brush / 2 - 1e-9)))
+        right = min(indexes.shape[1] - 1, int(np.floor(x2 + brush / 2 + 1e-9)))
+        top = max(0, int(np.ceil(y - brush / 2 - 1e-9)))
+        bottom = min(indexes.shape[0] - 1, int(np.floor(y + brush / 2 + 1e-9)))
+        assert np.all(indexes[top:bottom + 1, left:right + 1] == color)
+
+    # The hole is transparent in the input and cannot be covered by a planned
+    # footprint; disconnected regions are represented without connecting paths.
+    assert np.all(indexes[8:18, 8:18] == -1)
+    assert all(len(stroke["points"]) == 2 for stroke in plan["strokes"])
