@@ -178,7 +178,6 @@ class BrushBehaviorTestTab:
         self.current_plan_path: Path | None = None
         self.canvas_area: dict[str, int] | None = None
         self.screen_area: dict[str, int] | None = None
-        self.canvas_area: dict[str, int] | None = None
         self.screenshot_path: Path | None = None
         self.execution_report_path: Path | None = None
         self.execution_report: dict[str, Any] | None = None
