@@ -617,6 +617,18 @@ class BrushBehaviorTestTab:
                 pyautogui.click(int(clear_point["x"]), int(clear_point["y"]))
                 time.sleep(1.5)
             screen = ImageGrab.grab()
+            expected_size = config.get("screen_size", {})
+            expected_width = expected_size.get("width") if isinstance(expected_size, dict) else None
+            expected_height = expected_size.get("height") if isinstance(expected_size, dict) else None
+            if (
+                expected_width is not None and expected_height is not None
+                and (int(expected_width), int(expected_height)) != (screen.width, screen.height)
+            ):
+                raise ValueError(
+                    "Размер снимка экрана не совпадает с сохранённым профилем калибровки: "
+                    f"профиль {expected_width} × {expected_height}, снимок "
+                    f"{screen.width} × {screen.height}. Проверь DPI/масштаб и откалибруй заново."
+                )
             crops = crop_calibrated_regions(screen, config.get("regions", {}))
             if self.experiment_dir is None:
                 raise ValueError("Папка эксперимента не создана.")
