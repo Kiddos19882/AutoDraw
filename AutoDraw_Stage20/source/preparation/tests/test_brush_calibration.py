@@ -60,6 +60,13 @@ def test_validate_rejects_point_without_matching_status():
     with pytest.raises(BrushCalibrationError, match="not_set"):
         validate_profile(profile)
 
+def test_validate_rejects_point_missing_coordinate_without_leaking_key_error():
+    profile = create_default_profile((1920, 1080))
+    profile["points"]["clear_board"] = {"x": 20}
+    profile["status"]["points"]["clear_board"] = "set"
+    with pytest.raises(BrushCalibrationError, match="X и Y"):
+        validate_profile(profile)
+
 
 def test_missing_fields_require_the_correct_brush_control():
     profile = create_default_profile((1920, 1080))
