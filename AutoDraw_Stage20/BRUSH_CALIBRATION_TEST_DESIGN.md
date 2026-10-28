@@ -123,6 +123,7 @@
   "environment": {
     "screen_width": null,
     "screen_height": null,
+    "calibrated_at_utc": null,
     "browser_zoom_percent": null,
     "windows_scale_percent": null,
     "board_logical_width": 460,
