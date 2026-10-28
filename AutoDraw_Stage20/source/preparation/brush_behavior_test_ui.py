@@ -346,7 +346,7 @@ class BrushBehaviorTestTab:
                 )
             else:
                 self.status_var.set(
-                    f"План передан: {path.name}, но кисть не установлена автоматически. Настрой координаты ползунка и повтори установку."
+                    f"План передан: {path.name}, но кисть не установлена автоматически. Проверь режим управления кистью и задай нужные координаты на вкладке 8."
                 )
         except (OSError, ValueError, TypeError) as exc:
             messagebox.showerror("Не удалось создать тестовый план", str(exc), parent=self.root)
