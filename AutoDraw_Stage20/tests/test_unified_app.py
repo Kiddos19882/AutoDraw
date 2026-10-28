@@ -125,6 +125,37 @@ class UnifiedAppCoreTests(unittest.TestCase):
                 except tk.TclError:
                     pass
 
+    def test_brush_test_plan_transfers_to_existing_executor(self):
+        root = None
+        app = None
+        try:
+            root = tk.Tk()
+            root.withdraw()
+            app = integrated_app.AutoDrawUnifiedApp(root)
+            app.executor.area = TargetArea(x=100, y=80, width=646, height=323)
+            from brush_behavior_test_ui import build_brush_test_drawing_plan
+            plan = build_brush_test_drawing_plan("Горизонтальные линии", (646, 323))
+            with tempfile.TemporaryDirectory(prefix="AutoDraw brush test ") as temp:
+                app.data_paths["runtime"] = Path(temp) / "runtime"
+                source_path = Path(temp) / "brush-source.json"
+                save_plan(source_path, plan)
+                with patch.object(app.executor, "load_plan_from_path") as load_plan:
+                    result = app._transfer_brush_test_plan(plan, source_path)
+                    self.assertTrue(result)
+                    load_plan.assert_called_once()
+                    self.assertTrue(Path(load_plan.call_args.args[0]).is_file())
+                    self.assertEqual(app.notebook.select(), str(app.execution_tab))
+        except tk.TclError as exc:
+            self.skipTest(f"Tk desktop session unavailable: {exc}")
+        finally:
+            if app is not None:
+                app.workbench.cleanup()
+            if root is not None:
+                try:
+                    root.destroy()
+                except tk.TclError:
+                    pass
+
     def test_paint_limit_test_plan_transfers_into_color_executor(self):
         root = None
         app = None
