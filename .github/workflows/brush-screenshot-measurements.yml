@@ -1,0 +1,47 @@
+name: Brush screenshot measurements
+
+on:
+  push:
+    branches:
+      - feature/image-geometry-optimization
+    paths:
+      - "AutoDraw_Stage20/tests/analyze_brush_behavior_results.py"
+      - "AutoDraw_Stage20/data/results/brush_behavior_tests/**"
+      - ".github/workflows/brush-screenshot-measurements.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze-brush-screenshots:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: AutoDraw_Stage20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+
+      - name: Install image analysis dependency
+        run: python -m pip install Pillow
+
+      - name: Analyze brush 1 validation samples
+        run: |
+          python tests/analyze_brush_behavior_results.py `
+            --pair "data/results/brush_behavior_tests/brush-plan-horizontal_lengths-b1-20261028-210932.json=data/results/brush_behavior_tests/brush-screenshot-20261028-210954.png" `
+            --pair "data/results/brush_behavior_tests/brush-plan-short_strokes-b1-20261028-211110.json=data/results/brush_behavior_tests/brush-screenshot-20261028-211126.png" `
+            --output data/results/brush_behavior_tests/measurements-brush-1-ci.json
+
+      - name: Upload measurement report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: brush-1-screenshot-measurements
+          path: AutoDraw_Stage20/data/results/brush_behavior_tests/measurements-brush-1-ci.json
+          if-no-files-found: warn
