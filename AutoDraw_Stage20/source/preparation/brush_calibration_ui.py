@@ -190,6 +190,12 @@ class BrushCalibrationTab:
             "browser_zoom_percent": tk.StringVar(),
             "windows_scale_percent": tk.StringVar(),
         }
+        self.brush_mode_var = tk.StringVar(value="Не выбрано")
+        self._brush_mode_labels = {
+            "Не выбрано": None,
+            "Обычные пресеты 7/14/20": "presets",
+            "Расширенный ползунок 1–30": "slider",
+        }
         self.status_var = tk.StringVar(value="Профиль ещё не сохранён.")
         self.summary_var = tk.StringVar(value="")
         self._load_initial_profile()
@@ -223,6 +229,11 @@ class BrushCalibrationTab:
         for key, variable in self._env_vars.items():
             value = env.get(key)
             variable.set("" if value is None else str(value))
+        mode = self.profile.get("brush_control_mode")
+        self.brush_mode_var.set(next(
+            (label for label, value in self._brush_mode_labels.items() if value == mode),
+            "Не выбрано",
+        ))
 
     def _build(self, parent: tk.Widget) -> None:
         host = ttk.Frame(parent)
@@ -293,7 +304,12 @@ class BrushCalibrationTab:
         ttk.Label(env_frame, text=f"Текущий основной экран: {self._screen_size()[0]} × {self._screen_size()[1]} px").grid(
             row=0, column=0, columnspan=4, sticky="w", pady=(0, 5)
         )
-        for row, (key, variable) in enumerate(self._env_vars.items(), start=1):
+        ttk.Label(env_frame, text="Режим выбора кисти").grid(row=1, column=0, sticky="w", pady=2)
+        ttk.Combobox(
+            env_frame, textvariable=self.brush_mode_var,
+            values=tuple(self._brush_mode_labels), state="readonly", width=32,
+        ).grid(row=1, column=1, sticky="w", padx=(6, 20), pady=2)
+        for row, (key, variable) in enumerate(self._env_vars.items(), start=2):
             label = {
                 "browser": "Браузер",
                 "browser_version": "Версия браузера",
@@ -303,7 +319,7 @@ class BrushCalibrationTab:
             ttk.Label(env_frame, text=label).grid(row=row, column=0, sticky="w", pady=2)
             ttk.Entry(env_frame, textvariable=variable, width=34).grid(row=row, column=1, sticky="w", padx=(6, 20), pady=2)
         ttk.Label(env_frame, text="Логический размер доски игрового движка: 460 × 240; экранная область может быть масштабирована.",
-                  wraplength=800).grid(row=5, column=0, columnspan=4, sticky="w", pady=(6, 0))
+                  wraplength=800).grid(row=6, column=0, columnspan=4, sticky="w", pady=(6, 0))
 
         profile_frame = ttk.LabelFrame(outer, text="Профиль", padding=8)
         profile_frame.pack(fill="x", pady=(0, 8))
@@ -510,6 +526,7 @@ class BrushCalibrationTab:
         env = self.profile["environment"]
         size = self._screen_size()
         env["screen_width"], env["screen_height"] = size
+        self.profile["brush_control_mode"] = self._brush_mode_labels.get(self.brush_mode_var.get())
         for key in ("browser", "browser_version"):
             env[key] = self._env_vars[key].get().strip()
         for key in ("browser_zoom_percent", "windows_scale_percent"):
@@ -596,27 +613,32 @@ class BrushCalibrationTab:
 
     def get_brush_control(self) -> dict[str, Any] | None:
         if self._dirty:
-            return None
+            return {"mode": "unsaved"}
         points = self.profile["points"]
         states = self.profile["status"]["points"]
-        control: dict[str, Any] = {"presets": {}}
-        for value in (7, 14, 20):
-            key = f"brush_{value}"
-            point = points.get(key)
-            if point and states.get(key) != "needs_review":
-                control["presets"][str(value)] = [point["x"], point["y"]]
-        point_1 = points.get("brush_slider_value_1")
-        point_30 = points.get("brush_slider_value_30")
-        slider_ready = (
-            point_1 is not None and point_30 is not None
-            and states.get("brush_slider_value_1") != "needs_review"
-            and states.get("brush_slider_value_30") != "needs_review"
-        )
-        if slider_ready:
-            # The executor drags from the value-30 endpoint toward value 1.
-            control["start"] = [point_30["x"], point_30["y"]]
-            control["end"] = [point_1["x"], point_1["y"]]
-        return control if control["presets"] or slider_ready else None
+        mode = self.profile.get("brush_control_mode")
+        if mode == "presets":
+            presets: dict[str, list[int]] = {}
+            for value in (7, 14, 20):
+                key = f"brush_{value}"
+                point = points.get(key)
+                if point and states.get(key) != "needs_review":
+                    presets[str(value)] = [point["x"], point["y"]]
+            return {"mode": mode, "presets": presets}
+        if mode == "slider":
+            control: dict[str, Any] = {"mode": mode}
+            point_1 = points.get("brush_slider_value_1")
+            point_30 = points.get("brush_slider_value_30")
+            if (
+                point_1 is not None and point_30 is not None
+                and states.get("brush_slider_value_1") != "needs_review"
+                and states.get("brush_slider_value_30") != "needs_review"
+            ):
+                # The executor drags from the value-30 endpoint toward value 1.
+                control["start"] = [point_30["x"], point_30["y"]]
+                control["end"] = [point_1["x"], point_1["y"]]
+            return control
+        return {"mode": "unselected"}
 
     def is_ready(self, brush_value: int | None = None) -> tuple[bool, list[str]]:
         try:
