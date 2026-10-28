@@ -225,7 +225,7 @@ def main() -> int:
         STAGING_ROOT.mkdir(parents=True, exist_ok=True)
         # A single PyInstaller onedir app: one EXE plus its private _internal folder.
         copy_directory_contents(app_dist, STAGING_ROOT)
-        shutil.copy2(ROOT / "README.txt", STAGING_ROOT / "README.txt")
+        shutil.copy2(ROOT / "README.md", STAGING_ROOT / "README.md")
         copy_source_user_data(ROOT, STAGING_ROOT)
         copy_existing_user_data(FINAL_ROOT, STAGING_ROOT)
         create_data_layout(STAGING_ROOT)
