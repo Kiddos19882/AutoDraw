@@ -65,7 +65,7 @@ def create_default_profile(
             "screen_width": size[0] if size else None,
             "screen_height": size[1] if size else None,
             "windows_scale_percent": None,
-            "browser_zoom_percent": 100,
+            "browser_zoom_percent": None,
             "browser": "",
             "browser_version": "",
         },
