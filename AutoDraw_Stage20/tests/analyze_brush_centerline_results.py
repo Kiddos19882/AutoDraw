@@ -108,11 +108,18 @@ def analyze_pair(plan_path: Path, screenshot_path: Path,
                 distances = sorted(p[2] for p in centerline)
                 # 95th percentile of distance to centerline; rough full width.
                 idx = min(len(distances)-1, math.ceil(0.95 * len(distances))-1)
-                # Pixel-center distance needs a +1 pixel footprint; without it,\n                # a perfectly centered 1px line would incorrectly measure as 0px.\n                width_est = round(2.0 * distances[idx] + 1.0, 2)
+                # Pixel-center distance needs a +1 pixel footprint; without it,
+                # a perfectly centered 1px line would incorrectly measure as 0px.
+                width_est = round(2.0 * distances[idx] + 1.0, 2)
             else:
                 span, width_est = 0.0, None
             line_detected = len(centerline) >= 2 and span >= max(1.5, planned * 0.25)
-            if not line_detected:\n                classification = "weak_or_missing_trace"\n            elif width_est is not None and planned <= width_est:\n                classification = "brush_width_dominated_short_trace"\n            else:\n                classification = "line_trace_candidate"
+            if not line_detected:
+                classification = "weak_or_missing_trace"
+            elif width_est is not None and planned <= width_est:
+                classification = "brush_width_dominated_short_trace"
+            else:
+                classification = "line_trace_candidate"
             note = "Centerline proximity is geometric evidence only, not proof of game registration."
             dot_candidate = False
 
@@ -122,7 +129,8 @@ def analyze_pair(plan_path: Path, screenshot_path: Path,
             "classification": classification,
             "nearby_dark_pixel_count": len(nearby),
             "centerline_pixel_count": len(centerline),
-            "line_trace_candidate": line_detected,\n            "line_shape_dominated_by_brush": classification == "brush_width_dominated_short_trace",
+            "line_trace_candidate": line_detected,
+            "line_shape_dominated_by_brush": classification == "brush_width_dominated_short_trace",
             "dot_candidate_for_zero_length_control": dot_candidate,
             "observed_along_path_span_px": round(span, 2),
             "estimated_full_width_px_rough": width_est,
