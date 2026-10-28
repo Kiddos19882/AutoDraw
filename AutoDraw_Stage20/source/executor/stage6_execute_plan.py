@@ -593,6 +593,38 @@ class Stage6App:
         for child in widget.winfo_children():
             self._bind_mousewheel_tree(child)
 
+    def apply_brush_control_profile(self, control: dict | None) -> bool:
+        """Fill executor slider coordinates from the saved shared calibration profile."""
+        if self.running or not isinstance(control, dict) or control.get("mode") != "slider":
+            return False
+        start, end = control.get("start"), control.get("end")
+        screen_size = control.get("screen_size")
+        if not isinstance(start, (list, tuple)) or len(start) != 2:
+            return False
+        if not isinstance(end, (list, tuple)) or len(end) != 2:
+            return False
+        try:
+            current = pyautogui.size()
+            if screen_size and (
+                int(screen_size.get("width", -1)), int(screen_size.get("height", -1))
+            ) != (int(current.width), int(current.height)):
+                self.brush_slider_confirmed_var.set(False)
+                self.brush_slider_status_var.set("Профиль кисти относится к другому разрешению; повторно проверьте координаты.")
+                return False
+            # Shared profile uses 30 at start/left and 1 at end/right;
+            # executor fields are explicitly named by values 1 and 30.
+            self.brush_slider_x_max_var.set(str(int(start[0])))
+            self.brush_slider_x_min_var.set(str(int(end[0])))
+            self.brush_slider_y_var.set(str(round((int(start[1]) + int(end[1])) / 2)))
+            self.brush_slider_screen_size = (int(current.width), int(current.height))
+            self.brush_slider_confirmed_var.set(True)
+            self.brush_slider_status_var.set("Координаты ползунка автоматически загружены из профиля калибровки.")
+            return True
+        except (TypeError, ValueError, AttributeError):
+            self.brush_slider_confirmed_var.set(False)
+            self.brush_slider_status_var.set("Не удалось загрузить координаты кисти из профиля.")
+            return False
+
     def _load_settings(self) -> None:
         if not SETTINGS_PATH.exists():
             return
