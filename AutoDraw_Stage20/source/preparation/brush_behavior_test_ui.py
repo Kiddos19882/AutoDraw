@@ -174,7 +174,7 @@ class BrushBehaviorTestTab:
 
     def __init__(
         self, root: tk.Misc, parent: tk.Widget, output_dir: str | Path,
-        area_selector_cls, *, get_canvas_size, get_canvas_area, on_transfer_plan,
+        area_selector_cls, *, get_canvas_size, get_canvas_area, on_transfer_plan, get_brush_control=None,
     ):
         self.root = root
         self.output_dir = Path(output_dir).resolve()
@@ -182,6 +182,7 @@ class BrushBehaviorTestTab:
         self.area_selector_cls = area_selector_cls
         self.get_canvas_size = get_canvas_size
         self.get_canvas_area = get_canvas_area
+        self.get_brush_control = get_brush_control
         self.on_transfer_plan = on_transfer_plan
         self.current_plan: dict[str, Any] | None = None
         self.current_plan_path: Path | None = None
@@ -385,10 +386,22 @@ class BrushBehaviorTestTab:
             raise ValueError(f"{field}: X и Y должны быть целыми числами.") from exc
 
     def set_brush_size(self) -> bool:
-        """Drag the extended-mode radius slider using the game engine inverse-radius mapping."""
+        """Drag the extended-mode radius slider using saved calibration when available."""
         try:
-            start = self._parse_point(self.slider_start_var.get(), "Край 1")
-            end = self._parse_point(self.slider_end_var.get(), "Край 30")
+            calibrated = self.get_brush_control() if callable(self.get_brush_control) else None
+            if calibrated:
+                # The engine slider runs from brush 30 at the left endpoint to brush 1 at the right.
+                start = self._parse_point(
+                    f"{calibrated['start'][0]},{calibrated['start'][1]}", "Край 30 из профиля"
+                )
+                end = self._parse_point(
+                    f"{calibrated['end'][0]},{calibrated['end'][1]}", "Край 1 из профиля"
+                )
+                self.slider_start_var.set(f"{start[0]}, {start[1]}")
+                self.slider_end_var.set(f"{end[0]}, {end[1]}")
+            else:
+                start = self._parse_point(self.slider_start_var.get(), "Край 30")
+                end = self._parse_point(self.slider_end_var.get(), "Край 1")
             brush = int(self.brush_var.get().strip())
             if not 1 <= brush <= 30:
                 raise ValueError("Размер кисти должен быть целым числом от 1 до 30.")
