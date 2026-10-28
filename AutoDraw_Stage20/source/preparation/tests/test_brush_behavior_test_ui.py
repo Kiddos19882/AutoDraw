@@ -35,6 +35,9 @@ def test_brush_test_record_contains_reproducible_stroke_template() -> None:
     assert len(record["planned_strokes"]) == 5
     assert record["planned_strokes"][2]["points"] == [[20, 70], [70, 70]]
     assert record["screen_area"]["width"] == 646
+    assert record["board_selection_origin"] == {"x": 100, "y": 200}
+    assert record["board_selection_size"] == {"width": 646, "height": 323}
+    assert record["screen_resolution"] is None
     assert record["screenshot_path"] == "capture.png"
     assert record["drawing_plan_path"] == "brush-plan.json"
     assert record["drawing_plan"]["strokes"][0]["name"] == "line"
@@ -91,3 +94,20 @@ def test_brush_test_plan_rejects_points_outside_canvas() -> None:
 def test_brush_test_plan_rejects_invalid_canvas_size() -> None:
     with pytest.raises(ValueError, match="положительным"):
         build_brush_test_drawing_plan("Диагонали", (0, 323))
+
+
+def test_brush_test_record_persists_screen_and_brush_calibration_metadata() -> None:
+    record = build_brush_test_record(
+        brush_value=14,
+        test_case="Короткие линии и точки",
+        canvas_area={"x": 504, "y": 280, "width": 645, "height": 328},
+        screen_area={"x": 0, "y": 0, "width": 1920, "height": 1080},
+        screen_resolution={"width": 1920, "height": 1080},
+        brush_control={"type": "linear_slider", "min_value": 1, "max_value": 30, "start": [100, 500], "end": [390, 500]},
+    )
+    assert record["screen_resolution"] == {"width": 1920, "height": 1080}
+    assert record["board_selection_origin"] == {"x": 504, "y": 280}
+    assert record["board_selection_size"] == {"width": 645, "height": 328}
+    assert record["screen_area"] == {"x": 0, "y": 0, "width": 1920, "height": 1080}
+    assert record["brush_control"]["start"] == [100, 500]
+    assert record["brush_control"]["end"] == [390, 500]
