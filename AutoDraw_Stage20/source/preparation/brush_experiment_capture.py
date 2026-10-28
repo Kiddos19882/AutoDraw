@@ -68,3 +68,65 @@ def compare_images(first: Image.Image, second: Image.Image) -> dict[str, Any]:
         "exact_match": changed_pixels == 0,
         "interpretation": "visual_pixel_comparison_only_not_a_reading_of_the_game_resource_counter",
     }
+
+
+def measure_meter_fill_against_baseline(baseline: Image.Image, current: Image.Image, *, color_distance_threshold: float = 24.0, minimum_changed_suffix_fraction: float = 0.03) -> dict[str, Any]:
+    """Estimate a left-filled bar against a known full baseline; ambiguous cases stay inconclusive."""
+    import math
+    if not isinstance(baseline, Image.Image) or not isinstance(current, Image.Image):
+        raise ValueError("Для измерения шкалы нужны два изображения.")
+    if baseline.size != current.size:
+        raise ValueError(f"Размеры шкалы различаются: {baseline.size} и {current.size}.")
+    if baseline.width < 8 or baseline.height < 3:
+        raise ValueError("Область шкалы слишком мала для надёжного измерения.")
+    if color_distance_threshold <= 0 or not 0 < minimum_changed_suffix_fraction < 0.5:
+        raise ValueError("Некорректные параметры измерения шкалы.")
+    left, right = baseline.convert("RGB"), current.convert("RGB")
+    y0, y1 = max(1, int(left.height * .2)), min(left.height - 1, max(2, int(left.height * .8)))
+    base_cols, now_cols = [], []
+    for x in range(left.width):
+        a = sorted(left.getpixel((x, y)) for y in range(y0, y1))
+        b = sorted(right.getpixel((x, y)) for y in range(y0, y1))
+        base_cols.append(a[len(a)//2])
+        now_cols.append(b[len(b)//2])
+    distances = [math.sqrt(sum((c1-c2)**2 for c1,c2 in zip(a,b))) for a,b in zip(base_cols,now_cols)]
+    changed = [d > color_distance_threshold for d in distances]
+    count = sum(changed)
+    common = {"bar_width_px": left.width, "changed_columns": count, "color_distance_threshold": color_distance_threshold,
+              "method": "baseline_color_suffix_estimate", "interpretation": "estimate_only_not_game_counter_or_OCR"}
+    if count == 0:
+        return {**common, "status":"unchanged_or_full", "filled_width_px":left.width, "fill_fraction":1.0,
+                "fill_percent":100.0, "confidence":"low",
+                "note":"Изменений относительно исходной шкалы не обнаружено; полный ресурс не доказан."}
+    first = next((i for i,v in enumerate(changed) if v), left.width)
+    suffix = changed[first:]
+    suffix_consistency = sum(suffix)/len(suffix) if suffix else 0.0
+    prefix_consistency = sum(not v for v in changed[:first])/first if first else 1.0
+    if (len(suffix)/left.width < minimum_changed_suffix_fraction or suffix_consistency < .9 or prefix_consistency < .9):
+        return {**common, "status":"inconclusive", "filled_width_px":None, "fill_fraction":None,
+                "fill_percent":None, "confidence":"low",
+                "note":"Изменения не образуют достаточно чёткую непрерывную правую часть шкалы."}
+    fraction = first/left.width
+    return {**common, "status":"estimated", "filled_width_px":first, "fill_fraction":round(fraction,5),
+            "fill_percent":round(fraction*100,2), "confidence":"provisional",
+            "suffix_consistency":round(suffix_consistency,4), "prefix_consistency":round(prefix_consistency,4),
+            "note":"Оценка предполагает полную исходную шкалу и уменьшение заполнения справа налево."}
+
+
+def evaluate_meter_restoration(baseline: Image.Image, after_clear: Image.Image, *, tolerance_fraction: float = .03) -> dict[str, Any]:
+    """Classify whether the post-clear meter visually returned to its baseline."""
+    if not 0 <= tolerance_fraction <= .25:
+        raise ValueError("Допуск восстановления должен быть от 0 до 0.25.")
+    estimate = measure_meter_fill_against_baseline(baseline, after_clear)
+    comparison = compare_images(baseline, after_clear)
+    if comparison["exact_match"]:
+        status = "restored"
+    elif estimate["status"] == "estimated" and estimate["fill_fraction"] is not None:
+        status = "not_restored" if estimate["fill_fraction"] < 1-tolerance_fraction else "inconclusive"
+    elif comparison["changed_percent"] <= tolerance_fraction*100:
+        status = "restored_within_pixel_tolerance"
+    else:
+        status = "inconclusive"
+    return {"status":status, "tolerance_fraction":tolerance_fraction, "changed_percent":comparison["changed_percent"],
+            "baseline_comparison":comparison, "fill_estimate":estimate,
+            "note":"Визуальная оценка; не прямое чтение внутреннего счётчика игры."}

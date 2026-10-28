@@ -15,7 +15,10 @@ import pyautogui
 from PIL import ImageGrab
 
 from stage8_optimizer import save_plan
-from brush_experiment_capture import compare_images, crop_calibrated_regions
+from brush_experiment_capture import (
+    compare_images, crop_calibrated_regions,
+    measure_meter_fill_against_baseline, evaluate_meter_restoration,
+)
 
 
 TEST_CASES: dict[str, dict[str, Any]] = {
@@ -652,6 +655,12 @@ class BrushBehaviorTestTab:
             }
             before = self.experiment_phases.get("before_draw")
             after = self.experiment_phases.get("after_draw")
+            if before is not None:
+                baseline_meter_path = self.experiment_dir / before["files"]["paint_meter_roi"]
+                with Image.open(baseline_meter_path) as baseline_meter, Image.open(meter_path) as current_meter:
+                    phase_record["paint_meter_measurement"] = measure_meter_fill_against_baseline(baseline_meter, current_meter)
+                    if phase == "after_clear":
+                        phase_record["paint_meter_restoration"] = evaluate_meter_restoration(baseline_meter, current_meter)
             for baseline_name, baseline in (("before_draw", before), ("after_draw", after)):
                 if baseline is None or baseline_name == phase:
                     continue
@@ -674,7 +683,8 @@ class BrushBehaviorTestTab:
                 "phases": self.experiment_phases,
                 "interpretation_limits": [
                     "Screenshots are captured from the configured screen-coordinate system.",
-                    "Pixel comparisons are visual diagnostics, not OCR and not a direct reading of the game's resource counter.",
+                    "Meter fill is a provisional estimate against the before-draw baseline, not OCR or a direct reading of the game's resource counter.",
+                    "Ambiguous or non-contiguous changes are marked inconclusive and require manual review.",
                     "A successful executor report does not prove that every stroke was registered by the game.",
                     "The after-clear phase clicks Clear only after explicit confirmation.",
                 ],
@@ -689,7 +699,7 @@ class BrushBehaviorTestTab:
             )
             self.status_var.set(
                 f"Сохранён этап {phase}. ROI и experiment.json записаны в {self.experiment_dir}. "
-                "Сравнение пикселей не является автоматическим чтением числа краски."
+                "Оценка заполнения полоски предварительная; это не OCR и не чтение внутреннего счётчика."
             )
         except Exception as exc:
             messagebox.showerror("Не удалось сохранить этап эксперимента", str(exc), parent=self.root)

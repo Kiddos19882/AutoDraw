@@ -3,7 +3,10 @@ from __future__ import annotations
 from PIL import Image
 import pytest
 
-from brush_experiment_capture import compare_images, crop_calibrated_regions
+from brush_experiment_capture import (
+    compare_images, crop_calibrated_regions,
+    measure_meter_fill_against_baseline, evaluate_meter_restoration,
+)
 
 
 def test_crops_board_and_paint_meter_from_independent_calibrated_regions():
@@ -51,3 +54,42 @@ def test_compare_images_reports_exact_match_and_pixel_changes():
 def test_compare_images_rejects_different_dimensions():
     with pytest.raises(ValueError, match="различаются"):
         compare_images(Image.new("RGB", (2, 2)), Image.new("RGB", (3, 2)))
+
+
+def _meter(width=100, height=12, fill=100):
+    image = Image.new("RGB", (width, height), (35, 35, 35))
+    for x in range(round(width * fill / 100)):
+        for y in range(height):
+            image.putpixel((x, y), (40, 190, 80))
+    return image
+
+
+def test_meter_estimates_right_side_consumption_against_full_baseline():
+    result = measure_meter_fill_against_baseline(_meter(), _meter(fill=70))
+    assert result["status"] == "estimated"
+    assert result["filled_width_px"] == 70
+    assert result["fill_percent"] == 70.0
+
+
+def test_identical_meter_is_not_claimed_as_proven_full():
+    result = measure_meter_fill_against_baseline(_meter(), _meter())
+    assert result["status"] == "unchanged_or_full"
+    assert result["confidence"] == "low"
+
+
+def test_scattered_meter_changes_are_inconclusive():
+    current = _meter()
+    for x in (10, 30, 50, 70):
+        for y in range(2, 10):
+            current.putpixel((x, y), (0, 0, 0))
+    result = measure_meter_fill_against_baseline(_meter(), current)
+    assert result["status"] == "inconclusive"
+    assert result["fill_fraction"] is None
+
+
+def test_exact_baseline_after_clear_is_restored():
+    assert evaluate_meter_restoration(_meter(), _meter())["status"] == "restored"
+
+
+def test_reduced_fill_after_clear_is_not_restored():
+    assert evaluate_meter_restoration(_meter(), _meter(fill=75))["status"] == "not_restored"
