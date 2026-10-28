@@ -31,6 +31,7 @@ def configure_environment(root: str | Path, *, create_directories: bool = True) 
         "palette_conversions": data / "results" / "palette_conversions",
         "color_plans": data / "results" / "color_scanline_plans",
         "paint_limit_tests": data / "results" / "paint_limit_tests",
+        "brush_tests": data / "results" / "brush_behavior_tests",
     }
     if create_directories:
         for path in paths.values():
@@ -100,13 +101,14 @@ try:
     from stage13_workbench import AutoDrawWorkbench
     from stage8_optimizer import save_plan
     from models import DrawingPlan
-    from stage6_execute_plan import Stage6App
+    from stage6_execute_plan import AreaSelector, Stage6App
     from palette_detection_ui import PaletteDetectionTab
     from palette_quantization_ui import PaletteQuantizationTab
     from color_scanline_ui import ColorScanlineTab
     from color_scanline import save_color_scanline_plan
     from geometry_color_plan import save_geometry_color_plan
     from paint_limit_test_ui import PaintLimitTestTab
+    from brush_behavior_test_ui import BrushBehaviorTestTab
 except ImportError as exc:  # pragma: no cover - exercised by packaging smoke test
     raise SystemExit(
         "Не удалось загрузить компоненты AutoDraw. Проверьте комплект поставки и зависимости.\n"
@@ -247,6 +249,7 @@ class AutoDrawUnifiedApp:
         self.quantization_tab = ttk.Frame(self.notebook)
         self.color_scanline_tab_frame = ttk.Frame(self.notebook)
         self.paint_limit_tab_frame = ttk.Frame(self.notebook)
+        self.brush_test_tab_frame = ttk.Frame(self.notebook)
         # The executor (tab 2), quantizer (tab 4), and paint-limit test (tab 6)
         # already own scrollable content areas. Wrap only tabs that need scrolling.
         self.preparation_scroll = ScrollableTabContent(self.preparation_tab)
@@ -258,6 +261,7 @@ class AutoDrawUnifiedApp:
         self.notebook.add(self.quantization_tab, text="4. Преобразование в палитру")
         self.notebook.add(self.color_scanline_tab_frame, text="5. Цветной scanline-план")
         self.notebook.add(self.paint_limit_tab_frame, text="6. Тест лимита краски")
+        self.notebook.add(self.brush_test_tab_frame, text="7. Тест кистей")
 
         self.workbench = AutoDrawWorkbench(
             root,
@@ -292,6 +296,12 @@ class AutoDrawUnifiedApp:
             get_canvas_size=self._get_execution_canvas_size,
             on_transfer_plan=self._transfer_paint_limit_plan,
         )
+        self.brush_behavior_tab = BrushBehaviorTestTab(
+            root,
+            self.brush_test_tab_frame,
+            self.data_paths["brush_tests"],
+            AreaSelector,
+        )
 
         for scrollable in (
             self.preparation_scroll,
@@ -311,6 +321,7 @@ class AutoDrawUnifiedApp:
             ("Результаты", "results"),
             ("Цветные планы", "color_plans"),
             ("Тест лимита краски", "paint_limit_tests"),
+            ("Тест кистей", "brush_tests"),
             ("Журналы", "logs"),
         ):
             ttk.Button(footer, text=label, command=lambda name=folder: self._open_folder(name)).pack(side="right", padx=(5, 0))
