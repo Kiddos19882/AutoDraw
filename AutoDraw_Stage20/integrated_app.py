@@ -301,6 +301,8 @@ class AutoDrawUnifiedApp:
             self.brush_test_tab_frame,
             self.data_paths["brush_tests"],
             AreaSelector,
+            get_canvas_size=self._get_execution_canvas_size,
+            on_transfer_plan=self._transfer_brush_test_plan,
         )
 
         for scrollable in (
@@ -501,6 +503,49 @@ class AutoDrawUnifiedApp:
             return int(area.width), int(area.height)
         except (AttributeError, TypeError, ValueError):
             return None
+
+    def _transfer_brush_test_plan(self, plan: dict[str, Any], source_path: Path) -> bool:
+        """Validate a generated brush-test plan and load it into the existing executor."""
+        if self.executor.running:
+            messagebox.showwarning(
+                "Исполнение уже запущено",
+                "Нельзя заменить план во время рисования.",
+                parent=self.root,
+            )
+            return False
+        area = getattr(self.executor, "area", None)
+        if area is None:
+            messagebox.showwarning(
+                "Не выбрана область рисования",
+                "Сначала выберите область холста на вкладке 2, затем создайте тестовый план заново.",
+                parent=self.root,
+            )
+            return False
+        canvas = plan.get("canvas", {})
+        if (int(canvas.get("width", -1)), int(canvas.get("height", -1))) != (area.width, area.height):
+            messagebox.showwarning(
+                "Размер теста не совпадает с областью",
+                "Размер тестового плана не совпадает с текущим холстом. Пересоздайте план после выбора области.",
+                parent=self.root,
+            )
+            return False
+        destination = self.data_paths["runtime"] / "current_brush_behavior_test.json"
+        try:
+            path = write_validated_execution_plan(plan, destination, save_plan, DrawingPlan)
+            self.executor.load_plan_from_path(path)
+        except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError, RuntimeError) as exc:
+            messagebox.showerror(
+                "Не удалось передать тест кисти",
+                f"План не передан исполнителю. Исходный тестовый план сохранён отдельно.\\n\\n{exc}",
+                parent=self.root,
+            )
+            return False
+        self.notebook.select(self.execution_tab)
+        self.status_var.set(
+            f"Тестовый план загружен: {source_path.name}. Установите размер кисти в браузере вручную "
+            "и проверьте область/параметры перед запуском."
+        )
+        return True
 
     def _transfer_paint_limit_plan(
         self, plan: dict[str, Any], palette_profile: dict[str, Any], source_path: Path
