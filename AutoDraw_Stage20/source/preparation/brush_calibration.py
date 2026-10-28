@@ -65,6 +65,7 @@ def create_default_profile(
         "environment": {
             "screen_width": size[0] if size else None,
             "screen_height": size[1] if size else None,
+            "calibrated_at_utc": None,
             "windows_scale_percent": None,
             "browser_zoom_percent": None,
             "browser": "",
@@ -193,8 +194,8 @@ def validate_profile(profile: dict[str, Any]) -> dict[str, Any]:
             parsed = _integer(value, key, minimum=25)
             if parsed > 500:
                 raise BrushCalibrationError(f"{key}: значение должно быть в диапазоне 25–500.")
-    for key in ("browser", "browser_version"):
-        if key in env and not isinstance(env[key], str):
+    for key in ("browser", "browser_version", "calibrated_at_utc"):
+        if env.get(key) is not None and not isinstance(env[key], str):
             raise BrushCalibrationError(f"environment.{key} должно быть текстом.")
     return profile
 
