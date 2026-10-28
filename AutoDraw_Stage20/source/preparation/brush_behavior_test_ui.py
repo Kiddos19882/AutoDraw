@@ -337,8 +337,9 @@ class BrushBehaviorTestTab:
             if not self.on_transfer_plan(plan, path):
                 return
             self._reset_observation_fields()
+            self.set_brush_size()
             self.status_var.set(
-                f"План передан исполнителю: {path.name}. Установи в браузере кисть {brush} перед запуском."
+                f"План передан исполнителю: {path.name}. Переключись в браузер за 3 секунды: будет выбран размер кисти {brush}."
             )
         except (OSError, ValueError, TypeError) as exc:
             messagebox.showerror("Не удалось создать тестовый план", str(exc), parent=self.root)
@@ -395,9 +396,16 @@ class BrushBehaviorTestTab:
             ctypes.windll.user32.mouse_event(0x0002, 0, 0, 0, 0)
             ctypes.windll.user32.mouse_event(0x0004, 0, 0, 0, 0)
             self.brush_slider_start, self.brush_slider_end = start, end
-            self.status_var.set(f"Щелчок установки кисти {brush} отправлен в ({x}, {y}). Проверь значение в игре.")
+            self.status_var.set(f"Через 3 секунды будет выбран размер кисти {brush}. Переключись в браузер и не трогай мышь.")
+            self.root.after(3000, lambda: self._apply_brush_click(x, y, brush))
         except (ValueError, RuntimeError, AttributeError) as exc:
             messagebox.showwarning("Не настроен ползунок кисти", str(exc), parent=self.root)
+
+    def _apply_brush_click(self, x: int, y: int, brush: int) -> None:
+        ctypes.windll.user32.SetCursorPos(x, y)
+        ctypes.windll.user32.mouse_event(0x0002, 0, 0, 0, 0)
+        ctypes.windll.user32.mouse_event(0x0004, 0, 0, 0, 0)
+        self.status_var.set(f"Отправлен щелчок для кисти {brush} в ({x}, {y}). Проверь фактическое значение в игре.")
 
     def capture_screenshot(self) -> None:
         self.status_var.set("Через 3 секунды будет сохранён полный скриншот экрана. Переключись в браузер.")
