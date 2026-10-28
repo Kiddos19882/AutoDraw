@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 
+import brush_behavior_test_ui as brush_ui
 from brush_behavior_test_ui import TEST_CASES, build_brush_test_drawing_plan, build_brush_test_record
 
 
@@ -138,3 +139,47 @@ def test_paint_consumption_plan_uses_all_long_lines() -> None:
     plan = build_brush_test_drawing_plan("Расход краски — серия длинных линий", (460, 240))
     assert len(plan["strokes"]) == 12
     assert plan["strokes"][-1]["name"] == "consumption_line_12"
+
+
+def test_set_brush_size_uses_profile_coordinates_and_minimizes_before_drag(monkeypatch) -> None:
+    class Value:
+        def __init__(self, value=""):
+            self.value = value
+        def get(self):
+            return self.value
+        def set(self, value):
+            self.value = value
+
+    class Root:
+        def __init__(self):
+            self.minimized = False
+            self.scheduled = []
+        def iconify(self):
+            self.minimized = True
+        def after(self, delay, callback):
+            self.scheduled.append((delay, callback))
+
+    tab = brush_ui.BrushBehaviorTestTab.__new__(brush_ui.BrushBehaviorTestTab)
+    tab.root = Root()
+    tab.brush_var = Value("14")
+    tab.slider_start_var = Value()
+    tab.slider_end_var = Value()
+    tab.status_var = Value()
+    tab.get_brush_control = lambda: {
+        "mode": "slider", "start": [100, 500], "end": [390, 500],
+        "screen_size": {"width": 1920, "height": 1080},
+    }
+    tab.brush_slider_start = None
+    tab.brush_slider_end = None
+    monkeypatch.setattr(brush_ui.platform, "system", lambda: "Windows")
+
+    assert tab.set_brush_size() is True
+    assert tab.slider_start_var.get() == "100, 500"
+    assert tab.slider_end_var.get() == "390, 500"
+    assert tab.root.minimized is True
+    assert len(tab.root.scheduled) == 1
+    delay, callback = tab.root.scheduled[0]
+    assert delay == 3000
+
+    # Running the scheduled callback would control the real mouse, so assert
+    # only that the expected action is queued and do not invoke it in a unit test.
