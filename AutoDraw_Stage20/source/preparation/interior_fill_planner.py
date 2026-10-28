@@ -104,9 +104,11 @@ def build_interior_fill_plan(
             row_step = max(1, int(math.floor(brush * scale_y)))
             for y in range(0, height, row_step):
                 safe_centers = np.zeros(width, dtype=bool)
-                for x in range(width):
-                    if color_mask[y, x] and _footprint_is_color(
-                        indexes, color, x, x, y, brush, scale_x, scale_y
+                # Only test pixels belonging to this color. This avoids scanning
+                # every x coordinate for every palette index and brush size.
+                for x in np.flatnonzero(color_mask[y]):
+                    if _footprint_is_color(
+                        indexes, color, int(x), int(x), y, brush, scale_x, scale_y
                     ):
                         safe_centers[x] = True
                 x = 0
