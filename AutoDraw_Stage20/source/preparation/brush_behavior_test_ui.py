@@ -71,6 +71,7 @@ TEST_CASES: dict[str, dict[str, Any]] = {
 def build_brush_test_record(
     *, brush_value: int, test_case: str, canvas_area: dict[str, int] | None = None,
     screen_area: dict[str, int] | None = None, screenshot_path: str | None = None,
+    execution_report_path: str | None = None, execution_report: dict[str, Any] | None = None,
     notes: str = "", outcome: str = "not_reviewed",
 ) -> dict[str, Any]:
     """Build a versioned, portable observation record for later brush-model fitting."""
@@ -89,6 +90,8 @@ def build_brush_test_record(
         "canvas_area": canvas_area,
         "screen_area": screen_area,
         "screenshot_path": screenshot_path,
+        "execution_report_path": execution_report_path,
+        "execution_report": execution_report,
         "outcome": outcome,
         "notes": notes.strip(),
         "planned_strokes": scenario["strokes"],
@@ -123,6 +126,8 @@ class BrushBehaviorTestTab:
         self.screen_area: dict[str, int] | None = None
         self.canvas_area: dict[str, int] | None = None
         self.screenshot_path: Path | None = None
+        self.execution_report_path: Path | None = None
+        self.execution_report: dict[str, Any] | None = None
         self.last_record_path: Path | None = None
         self.brush_var = tk.StringVar(value="7")
         self.case_var = tk.StringVar(value=next(iter(TEST_CASES)))
@@ -158,6 +163,7 @@ class BrushBehaviorTestTab:
         actions.pack(fill="x", pady=(0, 8))
         ttk.Button(actions, text="Выбрать область снимка…", command=self.select_screenshot_area).pack(side="left")
         ttk.Button(actions, text="Снять скриншот сейчас", command=self.capture_screenshot).pack(side="left", padx=(6, 0))
+        ttk.Button(actions, text="Привязать отчёт исполнения…", command=self.load_execution_report).pack(side="left", padx=(6, 0))
         ttk.Button(actions, text="Сохранить запись теста…", command=self.save_record_dialog).pack(side="left", padx=(6, 0))
 
         details = ttk.LabelFrame(outer, text="Шаблон и фиксация результата", padding=8)
@@ -228,6 +234,26 @@ class BrushBehaviorTestTab:
         except Exception as exc:
             messagebox.showerror("Не удалось снять скриншот", str(exc), parent=self.root)
 
+    def load_execution_report(self) -> None:
+        path = filedialog.askopenfilename(
+            parent=self.root,
+            title="Выбери JSON-отчёт последнего исполнения AutoDraw",
+            initialdir=str(self.output_dir.parent),
+            filetypes=(("JSON", "*.json"), ("Все файлы", "*.*")),
+        )
+        if not path:
+            return
+        try:
+            document = json.loads(Path(path).read_text(encoding="utf-8"))
+            if not isinstance(document, dict):
+                raise ValueError("Отчёт должен содержать JSON-объект.")
+        except (OSError, UnicodeError, json.JSONDecodeError, ValueError) as exc:
+            messagebox.showerror("Не удалось прочитать отчёт", str(exc), parent=self.root)
+            return
+        self.execution_report_path = Path(path).resolve()
+        self.execution_report = document
+        self.status_var.set(f"Отчёт исполнения привязан к тесту: {self.execution_report_path}")
+
     def _build_record(self) -> dict[str, Any]:
         try:
             brush = int(self.brush_var.get().strip())
@@ -239,6 +265,8 @@ class BrushBehaviorTestTab:
             canvas_area=self.canvas_area,
             screen_area=self.screen_area,
             screenshot_path=str(self.screenshot_path) if self.screenshot_path else None,
+            execution_report_path=str(self.execution_report_path) if self.execution_report_path else None,
+            execution_report=self.execution_report,
             notes=self.notes_var.get(),
             outcome=self.outcome_var.get(),
         )
