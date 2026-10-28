@@ -335,6 +335,25 @@ class BrushCalibrationTab:
         ttk.Label(outer, textvariable=self.summary_var, wraplength=1050, justify="left").pack(anchor="w", pady=(0, 5))
         ttk.Label(outer, textvariable=self.status_var, wraplength=1050, justify="left").pack(anchor="w")
 
+    def _ensure_screen_compatibility(self) -> bool:
+        """Invalidate old coordinates if the primary display changed during this session."""
+        try:
+            adapted, changed = adapt_profile_to_screen(self.profile, self._screen_size())
+        except BrushCalibrationError as exc:
+            self.status_var.set(f"Не удалось проверить разрешение экрана: {exc}")
+            return False
+        if not changed:
+            return False
+        self.profile = adapted
+        self._dirty = True
+        self._sync_environment_vars()
+        if self._point_rows or self._region_rows:
+            self._refresh_view()
+        self.status_var.set(
+            "Разрешение экрана изменилось. Координаты помечены для проверки; повторно проверь элементы и сохрани профиль."
+        )
+        return True
+
     def _refresh_view(self) -> None:
         for key, (value_label, status_label) in self._point_rows.items():
             point = self.profile["points"][key]
@@ -431,6 +450,13 @@ class BrushCalibrationTab:
         self._refresh_view()
 
     def _test_point(self, key: str, destructive: bool) -> None:
+        if self._ensure_screen_compatibility():
+            messagebox.showwarning(
+                "Разрешение изменилось",
+                "Сначала повторно откалибруй точку на текущем экране; старые координаты не будут нажаты.",
+                parent=self.root,
+            )
+            return
         point = self.profile["points"].get(key)
         if point is None:
             messagebox.showwarning("Точка не задана", "Сначала задай координаты этой точки.", parent=self.root)
@@ -540,6 +566,7 @@ class BrushCalibrationTab:
                     raise BrushCalibrationError(f"{key}: введи целое число или оставь поле пустым.") from exc
 
     def _save(self) -> None:
+        screen_changed = self._ensure_screen_compatibility()
         try:
             self._apply_environment()
             save_profile(self.profile_path, self.profile)
@@ -547,7 +574,17 @@ class BrushCalibrationTab:
             messagebox.showerror("Не удалось сохранить профиль", str(exc), parent=self.root)
             return
         self._dirty = False
-        self.status_var.set(f"Профиль сохранён: {self.profile_path}")
+        has_review_items = any(
+            state == "needs_review"
+            for group in self.profile["status"].values()
+            for state in group.values()
+        )
+        if screen_changed or has_review_items:
+            self.status_var.set(
+                f"Профиль сохранён: {self.profile_path}. Координаты со статусом «Проверить» нельзя использовать до повторной проверки."
+            )
+        else:
+            self.status_var.set(f"Профиль сохранён: {self.profile_path}")
         self._refresh_view()
         if self.on_profile_saved:
             self.on_profile_saved(self.profile)
@@ -602,6 +639,8 @@ class BrushCalibrationTab:
         self.status_var.set("Профиль очищен в памяти. Нажми «Сохранить профиль», чтобы записать изменения.")
 
     def get_board_area(self) -> dict[str, int] | None:
+        if self._ensure_screen_compatibility():
+            return None
         region = self.profile["regions"].get("board_area")
         if self._dirty or region is None or self.profile["status"]["regions"]["board_area"] == "needs_review":
             return None
@@ -612,6 +651,7 @@ class BrushCalibrationTab:
         return (area["width"], area["height"]) if area else None
 
     def get_brush_control(self) -> dict[str, Any] | None:
+        self._ensure_screen_compatibility()
         if self._dirty:
             return {"mode": "unsaved"}
         points = self.profile["points"]
@@ -641,6 +681,10 @@ class BrushCalibrationTab:
         return {"mode": "unselected"}
 
     def is_ready(self, brush_value: int | None = None) -> tuple[bool, list[str]]:
+        if self._ensure_screen_compatibility():
+            return False, ["screen_changed"]
+        if self._dirty:
+            return False, ["unsaved_profile"]
         try:
             missing = missing_required_fields(self.profile, brush_value)
         except BrushCalibrationError:
