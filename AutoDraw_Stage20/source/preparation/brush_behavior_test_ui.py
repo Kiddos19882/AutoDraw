@@ -392,7 +392,7 @@ class BrushBehaviorTestTab:
         visible = [item.strip() for item in self.visible_strokes_var.get().split(",") if item.strip()]
         missing = [item.strip() for item in self.missing_strokes_var.get().split(",") if item.strip()]
         return {
-            "observed_stroke_count": len(visible),
+            "observed_stroke_count": len(visible) if visible or missing else None,
             "visible_stroke_names": visible,
             "missing_stroke_names": missing,
             "measured_footprint_width_px": optional_number(self.footprint_width_var.get(), "ширина следа"),
