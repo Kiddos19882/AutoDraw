@@ -208,7 +208,7 @@ class UnifiedAppCoreTests(unittest.TestCase):
             root.withdraw()
             app = integrated_app.AutoDrawUnifiedApp(root)
             labels = [app.notebook.tab(tab, "text") for tab in app.notebook.tabs()]
-            self.assertEqual(labels, ["1. Подготовка изображения", "2. Исполнение рисунка", "3. Палитра браузера", "4. Преобразование в палитру", "5. Цветной scanline-план", "6. Тест лимита краски", "7. Тест кистей"])
+            self.assertEqual(labels, ["1. Подготовка изображения", "2. Исполнение рисунка", "3. Палитра браузера", "4. Преобразование в палитру", "5. Цветной scanline-план", "6. Тест лимита краски", "7. Тест кистей", "8. Калибровка теста"])
             self.assertIsNotNone(app.workbench.on_select_canvas_area)
             self.assertIs(app.executor.area_change_callback.__self__, app)
             self.assertEqual(app.executor.area_change_callback.__func__.__name__, "_synchronize_area_with_preparation")
