@@ -31,17 +31,35 @@ jobs:
       - name: Install image analysis dependency
         run: python -m pip install Pillow
 
-      - name: Analyze brush 1 validation samples
+      - name: Analyze all brush behavior screenshots
         run: |
           python tests/analyze_brush_behavior_results.py `
+            --pair "data/results/brush_behavior_tests/brush-plan-horizontal_lengths-b7-20261028-203737.json=data/results/brush_behavior_tests/brush-screenshot-20261028-203838.png" `
+            --pair "data/results/brush_behavior_tests/brush-plan-vertical_lengths-b7-20261028-203920.json=data/results/brush_behavior_tests/brush-screenshot-20261028-203942.png" `
+            --pair "data/results/brush_behavior_tests/brush-plan-diagonal_lengths-b7-20261028-203956.json=data/results/brush_behavior_tests/brush-screenshot-20261028-204017.png" `
+            --pair "data/results/brush_behavior_tests/brush-plan-short_strokes-b7-20261028-204031.json=data/results/brush_behavior_tests/brush-screenshot-20261028-204049.png" `
+            --pair "data/results/brush_behavior_tests/brush-plan-rectangle_corners-b7-20261028-204103.json=data/results/brush_behavior_tests/brush-screenshot-20261028-204125.png" `
+            --pair "data/results/brush_behavior_tests/brush-plan-horizontal_lengths-b14-20261028-204231.json=data/results/brush_behavior_tests/brush-screenshot-20261028-204253.png" `
+            --pair "data/results/brush_behavior_tests/brush-plan-vertical_lengths-b14-20261028-204310.json=data/results/brush_behavior_tests/brush-screenshot-20261028-204333.png" `
+            --pair "data/results/brush_behavior_tests/brush-plan-diagonal_lengths-b14-20261028-204344.json=data/results/brush_behavior_tests/brush-screenshot-20261028-204409.png" `
+            --pair "data/results/brush_behavior_tests/brush-plan-short_strokes-b14-20261028-204423.json=data/results/brush_behavior_tests/brush-screenshot-20261028-204443.png" `
+            --pair "data/results/brush_behavior_tests/brush-plan-rectangle_corners-b14-20261028-204623.json=data/results/brush_behavior_tests/brush-screenshot-20261028-204644.png" `
+            --pair "data/results/brush_behavior_tests/brush-plan-horizontal_lengths-b20-20261028-204707.json=data/results/brush_behavior_tests/brush-screenshot-20261028-204731.png" `
+            --pair "data/results/brush_behavior_tests/brush-plan-vertical_lengths-b20-20261028-204821.json=data/results/brush_behavior_tests/brush-screenshot-20261028-204838.png" `
+            --pair "data/results/brush_behavior_tests/brush-plan-diagonal_lengths-b20-20261028-205048.json=data/results/brush_behavior_tests/brush-screenshot-20261028-205106.png" `
+            --pair "data/results/brush_behavior_tests/brush-plan-short_strokes-b20-20261028-205117.json=data/results/brush_behavior_tests/brush-screenshot-20261028-205138.png" `
+            --pair "data/results/brush_behavior_tests/brush-plan-rectangle_corners-b20-20261028-205339.json=data/results/brush_behavior_tests/brush-screenshot-20261028-205359.png" `
             --pair "data/results/brush_behavior_tests/brush-plan-horizontal_lengths-b1-20261028-210932.json=data/results/brush_behavior_tests/brush-screenshot-20261028-210954.png" `
+            --pair "data/results/brush_behavior_tests/brush-plan-vertical_lengths-b1-20261028-211006.json=data/results/brush_behavior_tests/brush-screenshot-20261028-211024.png" `
+            --pair "data/results/brush_behavior_tests/brush-plan-diagonal_lengths-b1-20261028-211042.json=data/results/brush_behavior_tests/brush-screenshot-20261028-211102.png" `
             --pair "data/results/brush_behavior_tests/brush-plan-short_strokes-b1-20261028-211110.json=data/results/brush_behavior_tests/brush-screenshot-20261028-211126.png" `
-            --output data/results/brush_behavior_tests/measurements-brush-1-ci.json
+            --pair "data/results/brush_behavior_tests/brush-plan-rectangle_corners-b1-20261028-211159.json=data/results/brush_behavior_tests/brush-screenshot-20261028-211218.png" `
+            --output data/results/brush_behavior_tests/measurements-all-brushes-ci.json
 
       - name: Upload measurement report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: brush-1-screenshot-measurements
-          path: AutoDraw_Stage20/data/results/brush_behavior_tests/measurements-brush-1-ci.json
+          name: all-brush-screenshot-measurements
+          path: AutoDraw_Stage20/data/results/brush_behavior_tests/measurements-all-brushes-ci.json
           if-no-files-found: warn
