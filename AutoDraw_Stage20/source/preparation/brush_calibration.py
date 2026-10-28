@@ -61,6 +61,7 @@ def create_default_profile(
         "schema_version": PROFILE_SCHEMA_VERSION,
         "profile_name": "brush-paint-calibration",
         "coordinate_system": COORDINATE_SYSTEM,
+        "brush_control_mode": None,
         "environment": {
             "screen_width": size[0] if size else None,
             "screen_height": size[1] if size else None,
@@ -129,6 +130,8 @@ def validate_profile(profile: dict[str, Any]) -> dict[str, Any]:
         raise BrushCalibrationError("Неизвестная система экранных координат.")
     if not isinstance(profile.get("profile_name"), str) or not profile["profile_name"].strip():
         raise BrushCalibrationError("Имя профиля не должно быть пустым.")
+    if profile.get("brush_control_mode") not in (None, "presets", "slider"):
+        raise BrushCalibrationError("Режим управления кистью должен быть presets, slider или не выбран.")
 
     env = profile.get("environment")
     points = profile.get("points")
@@ -244,11 +247,17 @@ def missing_required_fields(
     if brush_value is not None:
         if isinstance(brush_value, bool) or not isinstance(brush_value, int) or not 1 <= brush_value <= 30:
             raise BrushCalibrationError("Размер кисти должен быть целым числом от 1 до 30.")
-        if brush_value in (7, 14, 20):
-            key = f"brush_{brush_value}"
-            if profile["points"].get(key) is None:
-                missing.append(key)
-        elif profile["points"].get("brush_slider_value_1") is None or profile["points"].get("brush_slider_value_30") is None:
+        mode = profile.get("brush_control_mode")
+        if mode is None:
+            missing.append("brush_control_mode")
+        elif mode == "presets":
+            if brush_value not in (7, 14, 20):
+                missing.append("brush_control_mode")
+            else:
+                key = f"brush_{brush_value}"
+                if profile["points"].get(key) is None:
+                    missing.append(key)
+        elif mode == "slider":
             for key in ("brush_slider_value_1", "brush_slider_value_30"):
                 if profile["points"].get(key) is None:
                     missing.append(key)
