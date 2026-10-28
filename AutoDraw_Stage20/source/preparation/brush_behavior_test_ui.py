@@ -337,10 +337,14 @@ class BrushBehaviorTestTab:
             if not self.on_transfer_plan(plan, path):
                 return
             self._reset_observation_fields()
-            self.set_brush_size()
-            self.status_var.set(
-                f"План передан исполнителю: {path.name}. Переключись в браузер за 3 секунды: будет выбран размер кисти {brush}."
-            )
+            if self.set_brush_size():
+                self.status_var.set(
+                    f"План передан: {path.name}. Переключись в браузер за 3 секунды; затем проверь кисть {brush}."
+                )
+            else:
+                self.status_var.set(
+                    f"План передан: {path.name}, но кисть не установлена автоматически. Настрой координаты ползунка и повтори установку."
+                )
         except (OSError, ValueError, TypeError) as exc:
             messagebox.showerror("Не удалось создать тестовый план", str(exc), parent=self.root)
 
@@ -379,7 +383,7 @@ class BrushBehaviorTestTab:
         except ValueError as exc:
             raise ValueError(f"{field}: X и Y должны быть целыми числами.") from exc
 
-    def set_brush_size(self) -> None:
+    def set_brush_size(self) -> bool:
         """Click the calibrated linear brush slider using native Windows mouse input."""
         try:
             start = self._parse_point(self.slider_start_var.get(), "Край 1")
@@ -398,8 +402,10 @@ class BrushBehaviorTestTab:
             self.brush_slider_start, self.brush_slider_end = start, end
             self.status_var.set(f"Через 3 секунды будет выбран размер кисти {brush}. Переключись в браузер и не трогай мышь.")
             self.root.after(3000, lambda: self._apply_brush_click(x, y, brush))
+            return True
         except (ValueError, RuntimeError, AttributeError) as exc:
             messagebox.showwarning("Не настроен ползунок кисти", str(exc), parent=self.root)
+            return False
 
     def _apply_brush_click(self, x: int, y: int, brush: int) -> None:
         ctypes.windll.user32.SetCursorPos(x, y)
