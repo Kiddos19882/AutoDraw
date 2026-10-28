@@ -4,6 +4,7 @@ import json
 import uuid
 import ctypes
 import platform
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 import tkinter as tk
@@ -396,22 +397,41 @@ class BrushBehaviorTestTab:
             ratio = (brush - 1) / 29
             x = round(start[0] + (end[0] - start[0]) * ratio)
             y = round(start[1] + (end[1] - start[1]) * ratio)
-            ctypes.windll.user32.SetCursorPos(x, y)
-            ctypes.windll.user32.mouse_event(0x0002, 0, 0, 0, 0)
-            ctypes.windll.user32.mouse_event(0x0004, 0, 0, 0, 0)
             self.brush_slider_start, self.brush_slider_end = start, end
-            self.status_var.set(f"Через 3 секунды будет выбран размер кисти {brush}. Переключись в браузер и не трогай мышь.")
-            self.root.after(3000, lambda: self._apply_brush_click(x, y, brush))
+            self.status_var.set(
+                f"Через 3 секунды ползунок будет перетащен к размеру кисти {brush}. "
+                "Переключись в браузер и не трогай мышь."
+            )
+            self.root.after(3000, lambda: self._apply_brush_drag(start, x, y, brush))
             return True
         except (ValueError, RuntimeError, AttributeError) as exc:
             messagebox.showwarning("Не настроен ползунок кисти", str(exc), parent=self.root)
             return False
 
-    def _apply_brush_click(self, x: int, y: int, brush: int) -> None:
-        ctypes.windll.user32.SetCursorPos(x, y)
-        ctypes.windll.user32.mouse_event(0x0002, 0, 0, 0, 0)
-        ctypes.windll.user32.mouse_event(0x0004, 0, 0, 0, 0)
-        self.status_var.set(f"Отправлен щелчок для кисти {brush} в ({x}, {y}). Проверь фактическое значение в игре.")
+    def _apply_brush_drag(
+        self, start: tuple[int, int], target_x: int, target_y: int, brush: int
+    ) -> None:
+        """Drag from the calibrated minimum to the requested slider position."""
+        user32 = ctypes.windll.user32
+        start_x, start_y = start
+        distance = max(abs(target_x - start_x), abs(target_y - start_y))
+        steps = max(10, min(100, distance))
+        user32.SetCursorPos(start_x, start_y)
+        time.sleep(0.15)
+        user32.mouse_event(0x0002, 0, 0, 0, 0)  # MOUSEEVENTF_LEFTDOWN
+        try:
+            for step in range(1, steps + 1):
+                ratio = step / steps
+                current_x = round(start_x + (target_x - start_x) * ratio)
+                current_y = round(start_y + (target_y - start_y) * ratio)
+                user32.SetCursorPos(current_x, current_y)
+                time.sleep(0.01)
+        finally:
+            user32.mouse_event(0x0004, 0, 0, 0, 0)  # MOUSEEVENTF_LEFTUP
+        self.status_var.set(
+            f"Выполнено перетаскивание ползунка к позиции кисти {brush} "
+            f"({target_x}, {target_y}). Проверь значение, показанное игрой."
+        )
 
     def capture_screenshot(self) -> None:
         self.status_var.set("Через 3 секунды будет сохранён полный скриншот экрана. Переключись в браузер.")
@@ -500,7 +520,7 @@ class BrushBehaviorTestTab:
             notes=self.notes_var.get(),
             outcome=self.outcome_var.get(),
             screen_resolution=self.screen_resolution,
-            brush_control={"type": "linear_slider", "min_value": 1, "max_value": 30, "start": list(self.brush_slider_start) if self.brush_slider_start else None, "end": list(self.brush_slider_end) if self.brush_slider_end else None},
+            brush_control={"type": "linear_drag_slider", "min_value": 1, "max_value": 30, "start": list(self.brush_slider_start) if self.brush_slider_start else None, "end": list(self.brush_slider_end) if self.brush_slider_end else None},
         )
 
     def save_record_dialog(self) -> None:
