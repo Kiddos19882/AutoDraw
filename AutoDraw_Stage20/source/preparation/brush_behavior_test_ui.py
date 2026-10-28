@@ -73,6 +73,7 @@ TEST_CASES: dict[str, dict[str, Any]] = {
 def build_brush_test_record(
     *, brush_value: int, test_case: str, canvas_area: dict[str, int] | None = None,
     screen_area: dict[str, int] | None = None, screenshot_path: str | None = None,
+    drawing_plan_path: str | None = None, drawing_plan: dict[str, Any] | None = None,
     execution_report_path: str | None = None, execution_report: dict[str, Any] | None = None,
     notes: str = "", outcome: str = "not_reviewed",
 ) -> dict[str, Any]:
@@ -92,6 +93,8 @@ def build_brush_test_record(
         "canvas_area": canvas_area,
         "screen_area": screen_area,
         "screenshot_path": screenshot_path,
+        "drawing_plan_path": drawing_plan_path,
+        "drawing_plan": drawing_plan,
         "execution_report_path": execution_report_path,
         "execution_report": execution_report,
         "outcome": outcome,
@@ -351,6 +354,8 @@ class BrushBehaviorTestTab:
             canvas_area=self.canvas_area,
             screen_area=self.screen_area,
             screenshot_path=str(self.screenshot_path) if self.screenshot_path else None,
+            drawing_plan_path=str(self.current_plan_path) if self.current_plan_path else None,
+            drawing_plan=self.current_plan,
             execution_report_path=str(self.execution_report_path) if self.execution_report_path else None,
             execution_report=self.execution_report,
             notes=self.notes_var.get(),
