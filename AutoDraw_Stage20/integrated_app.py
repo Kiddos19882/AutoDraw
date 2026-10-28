@@ -307,7 +307,10 @@ class AutoDrawUnifiedApp:
             root,
             self.brush_calibration_tab_frame,
             self.data_paths["brush_calibration"],
+            on_profile_saved=self._on_brush_calibration_saved,
         )
+        self._on_brush_calibration_saved(self.brush_calibration_tab.profile)
+
         self.brush_behavior_tab = BrushBehaviorTestTab(
             root,
             self.brush_test_tab_frame,
@@ -525,6 +528,19 @@ class AutoDrawUnifiedApp:
         if area is None:
             return None
         return int(area["width"]), int(area["height"])
+
+    def _on_brush_calibration_saved(self, _profile: dict[str, Any] | None = None) -> None:
+        """Keep the execution tab and brush-test tab aligned with the shared profile."""
+        calibration = getattr(self, "brush_calibration_tab", None)
+        if calibration is None:
+            return
+        control = calibration.get_brush_control()
+        executor = getattr(self, "executor", None)
+        if executor is not None:
+            executor.apply_brush_control_profile(control)
+        brush_test = getattr(self, "brush_behavior_tab", None)
+        if brush_test is not None:
+            brush_test._load_brush_control_into_fields()
 
     def _get_brush_test_calibration_profile(self) -> dict[str, Any] | None:
         """Return the saved, screen-compatible profile for ROI capture experiments."""
