@@ -208,7 +208,7 @@ class BrushBehaviorTestTab:
         self.area_var = tk.StringVar(value="Область доски берётся из профиля исполнения.")
         self.slider_start_var = tk.StringVar()
         self.slider_end_var = tk.StringVar()
-        self.status_var = tk.StringVar(value="Выбери кисть и тест. В игре вручную установи указанную кисть и выполни тестовый шаблон.")
+        self.status_var = tk.StringVar(value="Выбери радиус и тест. Автоустановка 1–30 работает только с расширенным ползунком игры.")
         self._build(parent)
 
     def _build(self, parent: tk.Widget) -> None:
