@@ -359,6 +359,8 @@ class BrushCalibrationTab:
     def _pick_point(self, key: str) -> None:
         label = POINT_LABELS[key][0]
         def selected(point: tuple[int, int] | None) -> None:
+            self.root.deiconify()
+            self.root.lift()
             if point is None:
                 self.status_var.set(f"Выбор точки «{label}» отменён.")
                 return
@@ -371,11 +373,14 @@ class BrushCalibrationTab:
             self._dirty = True
             self.status_var.set(f"Точка «{label}» задана. Сохрани профиль, чтобы использовать её в тесте.")
             self._refresh_view()
-        ScreenPointPicker(self.root, f"Укажите центр элемента: {label}", selected)
+        self.root.withdraw()
+        self.root.after(120, lambda: ScreenPointPicker(self.root, f"Укажите центр элемента: {label}", selected))
 
     def _pick_region(self, key: str) -> None:
         label = REGION_LABELS[key][0]
         def selected(region: dict[str, int] | None) -> None:
+            self.root.deiconify()
+            self.root.lift()
             if region is None:
                 self.status_var.set(f"Выбор области «{label}» отменён.")
                 return
@@ -392,7 +397,8 @@ class BrushCalibrationTab:
             self._dirty = True
             self.status_var.set(f"Область «{label}» задана. Нажми «Проверить область», затем сохрани профиль.")
             self._refresh_view()
-        ScreenRegionPicker(self.root, f"Укажите область: {label}", selected)
+        self.root.withdraw()
+        self.root.after(120, lambda: ScreenRegionPicker(self.root, f"Укажите область: {label}", selected))
 
     def _reset_point(self, key: str) -> None:
         self.profile["points"][key] = None
