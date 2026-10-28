@@ -24,6 +24,9 @@
     "empirical-paint-cost-estimate",
     "browser-brush-behavior-tests",
     "brush-test-screenshot-capture",
-    "brush-behavior-observation-json"
+    "brush-behavior-observation-json",
+    "independent-brush-calibration-points-and-regions",
+    "persistent-brush-paint-calibration-profile",
+    "brush-test-uses-calibrated-board-and-slider"
   ]
 }
