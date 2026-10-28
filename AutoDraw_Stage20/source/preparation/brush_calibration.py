@@ -153,7 +153,7 @@ def validate_profile(profile: dict[str, Any]) -> dict[str, Any]:
             if state != "not_set":
                 raise BrushCalibrationError(f"Пустая точка {key} должна иметь статус not_set.")
             continue
-        if not isinstance(value, dict) or set(value) < {"x", "y"}:
+        if not isinstance(value, dict) or not {"x", "y"} <= set(value):
             raise BrushCalibrationError(f"Точка {key} должна содержать X и Y.")
         normalized = normalize_point(value["x"], value["y"], size)
         if normalized != {"x": value["x"], "y": value["y"]}:
