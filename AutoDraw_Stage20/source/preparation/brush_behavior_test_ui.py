@@ -235,6 +235,7 @@ class BrushBehaviorTestTab:
         self.slider_end_var = tk.StringVar()
         self.status_var = tk.StringVar(value="Выбери радиус и тест. Автоустановка 1–30 работает только с расширенным ползунком игры.")
         self._build(parent)
+        self._load_brush_control_into_fields()
 
     def _build(self, parent: tk.Widget) -> None:
         outer = ttk.Frame(parent, padding=10)
@@ -319,6 +320,27 @@ class BrushBehaviorTestTab:
             wraplength=1100,
         ).pack(anchor="w", pady=(5, 0))
         ttk.Label(outer, textvariable=self.status_var, wraplength=1150).pack(anchor="w", pady=(8, 0))
+
+    def _load_brush_control_into_fields(self) -> None:
+        """Populate visible brush coordinates from the saved calibration profile."""
+        try:
+            calibrated = self.get_brush_control() if callable(self.get_brush_control) else None
+            if not calibrated or calibrated.get("mode") in ("unsaved", "unselected"):
+                return
+            if calibrated.get("mode") == "slider" and calibrated.get("start") and calibrated.get("end"):
+                start = self._parse_point(
+                    f"{calibrated['start'][0]},{calibrated['start'][1]}", "Край 30 из профиля"
+                )
+                end = self._parse_point(
+                    f"{calibrated['end'][0]},{calibrated['end'][1]}", "Край 1 из профиля"
+                )
+                self.slider_start_var.set(f"{start[0]}, {start[1]}")
+                self.slider_end_var.set(f"{end[0]}, {end[1]}")
+                self.status_var.set("Координаты кисти загружены из сохранённого профиля калибровки.")
+            elif calibrated.get("mode") == "presets":
+                self.status_var.set("Координаты пресетов кисти загружаются из сохранённого профиля.")
+        except (ValueError, TypeError, AttributeError):
+            self.status_var.set("Не удалось автоматически загрузить координаты кисти; проверь профиль калибровки.")
 
     def _refresh_template(self) -> None:
         scenario = TEST_CASES.get(self.case_var.get())
@@ -440,6 +462,7 @@ class BrushBehaviorTestTab:
                         f"Через 3 секунды будет выбран пресет кисти {brush} в ({x}, {y}). "
                         "Переключись в браузер и не трогай мышь."
                     )
+                    self.root.iconify()
                     self.root.after(3000, lambda: self._apply_brush_preset_click(x, y, brush))
                     return True
                 if mode == "slider":
@@ -467,6 +490,8 @@ class BrushBehaviorTestTab:
                 f"Через 3 секунды ползунок будет перетащен к радиусу кисти {brush}. "
                 "Переключись в браузер и не трогай мышь."
             )
+            # Minimize AutoDraw before the countdown so it cannot cover the game slider.
+            self.root.iconify()
             self.root.after(3000, lambda: self._apply_brush_drag(start, x, y, brush))
             return True
         except (ValueError, RuntimeError, AttributeError) as exc:
