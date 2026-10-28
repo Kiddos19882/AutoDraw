@@ -187,7 +187,7 @@ class BrushCalibrationTab:
         self._env_vars = {
             "browser": tk.StringVar(),
             "browser_version": tk.StringVar(),
-            "browser_zoom_percent": tk.StringVar(value="100"),
+            "browser_zoom_percent": tk.StringVar(),
             "windows_scale_percent": tk.StringVar(),
         }
         self.status_var = tk.StringVar(value="Профиль ещё не сохранён.")
