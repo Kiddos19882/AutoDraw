@@ -395,25 +395,37 @@ class BrushBehaviorTestTab:
             if platform.system() != "Windows":
                 raise RuntimeError("Автоматическая установка кисти доступна только в Windows.")
             calibrated = self.get_brush_control() if callable(self.get_brush_control) else None
-            preset = calibrated.get("presets", {}).get(str(brush)) if calibrated else None
-            if preset is not None and brush in (7, 14, 20):
-                x, y = int(preset[0]), int(preset[1])
-                self.status_var.set(
-                    f"Через 3 секунды будет выбран пресет кисти {brush} в ({x}, {y}). "
-                    "Переключись в браузер и не трогай мышь."
-                )
-                self.root.after(3000, lambda: self._apply_brush_preset_click(x, y, brush))
-                return True
-            if calibrated and calibrated.get("start") and calibrated.get("end"):
-                # The engine slider runs from brush 30 at the left endpoint to brush 1 at the right.
-                start = self._parse_point(
-                    f"{calibrated['start'][0]},{calibrated['start'][1]}", "Край 30 из профиля"
-                )
-                end = self._parse_point(
-                    f"{calibrated['end'][0]},{calibrated['end'][1]}", "Край 1 из профиля"
-                )
-                self.slider_start_var.set(f"{start[0]}, {start[1]}")
-                self.slider_end_var.set(f"{end[0]}, {end[1]}")
+            if calibrated:
+                mode = calibrated.get("mode")
+                if mode == "unsaved":
+                    raise ValueError("Сначала сохрани профиль калибровки на вкладке 8.")
+                if mode == "presets":
+                    preset = calibrated.get("presets", {}).get(str(brush))
+                    if brush not in (7, 14, 20):
+                        raise ValueError("В режиме обычных пресетов доступны только кисти 7, 14 и 20. Выбери расширенный ползунок для других значений.")
+                    if preset is None:
+                        raise ValueError(f"Не заданы координаты пресета кисти {brush}. Настрой его на вкладке 8.")
+                    x, y = int(preset[0]), int(preset[1])
+                    self.status_var.set(
+                        f"Через 3 секунды будет выбран пресет кисти {brush} в ({x}, {y}). "
+                        "Переключись в браузер и не трогай мышь."
+                    )
+                    self.root.after(3000, lambda: self._apply_brush_preset_click(x, y, brush))
+                    return True
+                if mode == "slider":
+                    if not calibrated.get("start") or not calibrated.get("end"):
+                        raise ValueError("Для режима ползунка задай и сохрани положения кисти 1 и 30 на вкладке 8.")
+                    # The engine slider runs from brush 30 at the left endpoint to brush 1 at the right.
+                    start = self._parse_point(
+                        f"{calibrated['start'][0]},{calibrated['start'][1]}", "Край 30 из профиля"
+                    )
+                    end = self._parse_point(
+                        f"{calibrated['end'][0]},{calibrated['end'][1]}", "Край 1 из профиля"
+                    )
+                    self.slider_start_var.set(f"{start[0]}, {start[1]}")
+                    self.slider_end_var.set(f"{end[0]}, {end[1]}")
+                else:
+                    raise ValueError("Выбери режим управления кистью на вкладке 8 и сохрани профиль.")
             else:
                 start = self._parse_point(self.slider_start_var.get(), "Край 30")
                 end = self._parse_point(self.slider_end_var.get(), "Край 1")
