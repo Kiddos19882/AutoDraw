@@ -699,7 +699,10 @@ class BrushCalibrationTab:
                 point = points.get(key)
                 if point and states.get(key) != "needs_review":
                     presets[str(value)] = [point["x"], point["y"]]
-            return {"mode": mode, "presets": presets}
+            return {"mode": mode, "presets": presets, "screen_size": {
+                "width": self.profile["environment"].get("screen_width"),
+                "height": self.profile["environment"].get("screen_height"),
+            }}
         if mode == "slider":
             control: dict[str, Any] = {"mode": mode}
             point_1 = points.get("brush_slider_value_1")
@@ -712,6 +715,10 @@ class BrushCalibrationTab:
                 # The executor drags from the value-30 endpoint toward value 1.
                 control["start"] = [point_30["x"], point_30["y"]]
                 control["end"] = [point_1["x"], point_1["y"]]
+            control["screen_size"] = {
+                "width": self.profile["environment"].get("screen_width"),
+                "height": self.profile["environment"].get("screen_height"),
+            }
             return control
         return {"mode": "unselected"}
 
