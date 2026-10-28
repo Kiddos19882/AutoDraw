@@ -19,6 +19,7 @@ on:
       - "AutoDraw_Stage20/requirements-build.txt"
       - "AutoDraw_Stage20/requirements-runtime.txt"
       - "AutoDraw_Stage20/README.md"
+      - "AutoDraw_Stage20/PROJECT_GUIDE.md"
       - "AutoDraw_Stage20/README.txt"
       - ".github/workflows/geometry-tests.yml"
     types: [opened, synchronize, reopened, ready_for_review]
@@ -62,6 +63,18 @@ jobs:
         with:
           name: stage5-drawing-algorithm-benchmark
           path: AutoDraw_Stage20/benchmark-results/
+          if-no-files-found: ignore
+
+      - name: Benchmark interior fill (Stage 7)
+        shell: pwsh
+        run: |
+          python ..\..\tests\benchmark_stage7_interior_fill.py --git-ref origin/master --git-path AutoDraw_Stage20/testImages/images.png --target-width 646 --target-height 323 --palette-json AutoDraw_Stage20/data/palettes/profiles/Browser_palette.autodraw-palette.json --background-mode edge-connected --output AutoDraw_Stage20/benchmark-results/stage7-report.json --preview-dir AutoDraw_Stage20/benchmark-results/stage7-previews
+      - name: Upload Stage 7 benchmark report and previews
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage7-interior-fill-benchmark
+          path: AutoDraw_Stage20/benchmark-results/stage7-*
           if-no-files-found: ignore
 
       - name: Run preparation and geometry tests
