@@ -21,6 +21,9 @@
     "shared-canvas-area-selection",
     "color-scanline-row-step",
     "paint-limit-equal-length-series",
-    "empirical-paint-cost-estimate"
+    "empirical-paint-cost-estimate",
+    "browser-brush-behavior-tests",
+    "brush-test-screenshot-capture",
+    "brush-behavior-observation-json"
   ]
 }
