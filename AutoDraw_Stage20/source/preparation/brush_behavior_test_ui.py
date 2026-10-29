@@ -739,6 +739,55 @@ class BrushBehaviorTestTab:
             self.root.deiconify()
             self.root.lift()
 
+    def handle_executor_finished(self, summary: dict[str, Any], report_path: str | Path | None) -> bool:
+        """Attach the real executor result to the active brush experiment without a modal dialog."""
+        try:
+            self.execution_report = dict(summary) if isinstance(summary, dict) else {"summary": str(summary)}
+            self.execution_report_path = Path(report_path).resolve() if report_path else None
+            status = str(self.execution_report.get("status", "unknown"))
+            self.experiment_phases["execution"] = {
+                "status": status,
+                "report_path": str(self.execution_report_path) if self.execution_report_path else None,
+                "summary": self.execution_report,
+                "captured_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            }
+            if self.experiment_dir is not None:
+                self._write_experiment_manifest()
+            self.status_var.set(
+                f"Исполнитель завершил тест со статусом «{status}». "
+                + (f"Отчёт: {self.execution_report_path}" if self.execution_report_path else "Файл отчёта не создан.")
+            )
+            return True
+        except Exception as exc:
+            self.status_var.set(f"Не удалось привязать результат исполнителя к тесту кисти: {exc}")
+            return False
+
+    def _write_experiment_manifest(self) -> Path | None:
+        """Persist current experiment evidence; safe to call after any completed phase."""
+        if self.experiment_dir is None:
+            return None
+        config = self.get_calibration_profile() if callable(self.get_calibration_profile) else None
+        manifest = {
+            "schema_version": 1,
+            "record_type": "autodraw_brush_paint_experiment",
+            "updated_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            "test_case": TEST_CASES.get(self.case_var.get(), {}).get("id"),
+            "brush_value_requested": int(self.brush_var.get().strip()),
+            "drawing_plan_path": str(self.current_plan_path) if self.current_plan_path else None,
+            "execution_report_path": str(self.execution_report_path) if self.execution_report_path else None,
+            "execution_report": self.execution_report,
+            "calibration_profile_path": (str(config.get("profile_path", "")) or None) if isinstance(config, dict) else None,
+            "phases": self.experiment_phases,
+            "interpretation_limits": [
+                "Meter fill is a provisional image estimate, not a direct read of the game's internal resource counter.",
+                "A successful executor report does not prove every stroke was registered by the game.",
+                "Execution status and visual evidence are recorded separately.",
+            ],
+        }
+        path = self.experiment_dir / "experiment.json"
+        path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        return path
+
     def load_execution_report(self) -> None:
         path = filedialog.askopenfilename(
             parent=self.root,
