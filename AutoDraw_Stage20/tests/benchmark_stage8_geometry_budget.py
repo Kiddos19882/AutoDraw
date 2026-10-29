@@ -105,7 +105,7 @@ def benchmark_case(
         "scale": report.get("scale"),
         "min_component_area": report.get("min_component_area"),
         "simplify_tolerance_px": report.get("simplify_tolerance_px"),
-        "stroke_count": int(plan.get("summary", {}).get("stroke_count", len(plan.get("strokes", []))),
+        "stroke_count": int(plan.get("summary", {}).get("stroke_count", len(plan.get("strokes", [])))) ,
         "path_length_px": plan.get("summary", {}).get("drawing_length_px"),
         "paint_cost_px_equivalent": report.get("estimated_ink_after_px_equivalent"),
         "paint_target_px_equivalent": report.get("target_cost_px_equivalent"),
