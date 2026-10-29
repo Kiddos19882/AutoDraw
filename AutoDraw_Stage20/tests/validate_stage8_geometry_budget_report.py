@@ -48,8 +48,12 @@ def main() -> int:
     if not {"scanline", "contour", "skeleton"}.issubset({item.get("mode") for item in mode_candidates}):
         raise SystemExit("Reference-image report must include scanline, contour and skeleton candidates.")
     fitting_modes = [item for item in mode_candidates if item.get("fits_budget") is True]
+    for candidate in mode_candidates:
+        value = candidate.get("quality_visible_pixel_accuracy_percent")
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or not 0 <= value <= 100:
+            raise SystemExit(f"Invalid visible-pixel accuracy for mode {candidate.get('mode')!r}.")
     if fitting_modes:
-        max_visible_accuracy = max(float(item.get("quality_visible_pixel_accuracy_percent", -1)) for item in fitting_modes)
+        max_visible_accuracy = max(float(item["quality_visible_pixel_accuracy_percent"]) for item in fitting_modes)
         if abs(float(reference.get("quality_visible_pixel_accuracy_percent", -2)) - max_visible_accuracy) > 0.0001:
             raise SystemExit("Selected reference mode is not the best fitting candidate by visible-pixel accuracy.")
 
@@ -82,7 +86,7 @@ def main() -> int:
                       "needs_multi_board_split", "quality_measure_scope"):
             if field not in item:
                 raise SystemExit(f"{item.get('case')}/{item.get('scenario')} missing field {field!r}.")
-        for field in ("stroke_count", "quality_mismatch_pixel_count"):
+        for field in ("stroke_count", "quality_mismatch_pixel_count", "quality_uncovered_visible_pixel_count", "quality_painted_transparent_pixel_count"):
             if isinstance(item[field], bool) or not isinstance(item[field], int) or item[field] < 0:
                 raise SystemExit(f"{item.get('case')}/{item.get('scenario')} has invalid {field}.")
         for field in ("quality_pixel_accuracy_percent", "quality_coverage_percent", "quality_visible_pixel_accuracy_percent"):
