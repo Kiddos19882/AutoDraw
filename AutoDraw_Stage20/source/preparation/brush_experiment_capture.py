@@ -130,3 +130,37 @@ def evaluate_meter_restoration(baseline: Image.Image, after_clear: Image.Image, 
     return {"status":status, "tolerance_fraction":tolerance_fraction, "changed_percent":comparison["changed_percent"],
             "baseline_comparison":comparison, "fill_estimate":estimate,
             "note":"Визуальная оценка; не прямое чтение внутреннего счётчика игры."}
+
+def evaluate_board_clear(blank_reference: Image.Image, after_clear: Image.Image, *, tolerance_percent: float = 0.15) -> dict[str, Any]:
+    """Compare a post-clear board to a separately captured, known-empty reference.
+
+    A before/after comparison alone cannot prove that a board is empty. This helper
+    only returns a restored status when the post-clear ROI matches an explicit blank-board
+    reference within the configured pixel tolerance. It never captures the reference
+    or clicks Clear itself.
+    """
+    if not isinstance(blank_reference, Image.Image) or not isinstance(after_clear, Image.Image):
+        raise ValueError("Для проверки очистки нужны эталон пустой доски и текущий снимок.")
+    if blank_reference.size != after_clear.size:
+        raise ValueError(
+            f"Размеры эталона пустой доски и текущего снимка различаются: "
+            f"{blank_reference.size} и {after_clear.size}."
+        )
+    if not 0 <= tolerance_percent <= 5:
+        raise ValueError("Допуск сравнения доски должен быть от 0 до 5 процентов.")
+    comparison = compare_images(blank_reference, after_clear)
+    changed_percent = float(comparison["changed_percent"])
+    if comparison["exact_match"]:
+        status = "restored"
+    elif changed_percent <= tolerance_percent:
+        status = "restored_within_pixel_tolerance"
+    else:
+        status = "not_restored"
+    return {
+        "status": status,
+        "tolerance_percent": tolerance_percent,
+        "changed_percent": changed_percent,
+        "comparison": comparison,
+        "reference_type": "explicit_blank_board_roi",
+        "note": "Визуальное совпадение с отдельно сохранённым эталоном пустой доски; это не доказательство внутреннего состояния игры.",
+    }
