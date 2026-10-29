@@ -55,6 +55,56 @@ def _mark_footprint(
     covered[top:bottom + 1, left:right + 1] = True
 
 
+
+def _iter_fallback_runs(
+    indexes: np.ndarray,
+    covered: np.ndarray,
+    y: int,
+    max_merge_gap: int,
+):
+    """Yield same-color fallback runs, bridging only short covered gaps.
+
+    Covered pixels are eligible as a bridge only when they belong to the same
+    color. The caller still validates the complete brush footprint before use.
+    """
+    width = indexes.shape[1]
+    x = 0
+    while x < width:
+        color = int(indexes[y, x])
+        if color < 0 or covered[y, x]:
+            x += 1
+            continue
+
+        start = x
+        last_uncovered = x
+        cursor = x + 1
+        while cursor < width and int(indexes[y, cursor]) == color:
+            if not covered[y, cursor]:
+                last_uncovered = cursor
+                cursor += 1
+                continue
+
+            gap_start = cursor
+            while (
+                cursor < width
+                and int(indexes[y, cursor]) == color
+                and covered[y, cursor]
+            ):
+                cursor += 1
+            gap_length = cursor - gap_start
+            if (
+                cursor < width
+                and int(indexes[y, cursor]) == color
+                and not covered[y, cursor]
+                and gap_length <= max_merge_gap
+            ):
+                continue
+            break
+
+        yield color, start, last_uncovered + 1
+        x = last_uncovered + 1
+
+
 def build_interior_fill_plan(
     index_map: Any,
     *,
@@ -62,6 +112,7 @@ def build_interior_fill_plan(
     min_brush_value: int = 2,
     brush_scale_x: float = 1.0,
     brush_scale_y: float = 1.0,
+    fallback_merge_gap_px: int = 3,
 ) -> dict[str, Any]:
     """Cover a color-index map with safe wide strokes and thin fallback runs.
 
@@ -84,6 +135,10 @@ def build_interior_fill_plan(
         raise InteriorFillError("Минимальный размер кисти должен быть целым числом.")
     if not 2 <= min_brush_value <= max_brush_value <= 20:
         raise InteriorFillError("Диапазон широких кистей должен находиться внутри 2…20.")
+    if isinstance(fallback_merge_gap_px, bool) or not isinstance(fallback_merge_gap_px, int):
+        raise InteriorFillError("Допуск объединения fallback должен быть целым числом.")
+    if not 0 <= fallback_merge_gap_px <= 20:
+        raise InteriorFillError("Допуск объединения fallback должен находиться внутри 0…20 px.")
     scale_x = _positive_scale(brush_scale_x, "Масштаб кисти по X")
     scale_y = _positive_scale(brush_scale_y, "Масштаб кисти по Y")
     indexes = indexes.astype(np.int32, copy=False)
@@ -137,19 +192,14 @@ def build_interior_fill_plan(
                             _mark_footprint(covered, x, end - 1, y, brush, scale_x, scale_y)
                     x = end
 
-    # Fine pass closes all gaps and preserves thin features. Group only adjacent
-    # uncovered pixels of the same color; transparent and already covered pixels
-    # break runs. A one-unit footprint is checked before accepting every run.
+    # Fine pass closes all gaps and preserves thin features. Short runs may be
+    # joined across a small span already covered by interior-fill, but only when
+    # every bridged pixel has the same palette index. The full footprint is still
+    # checked, so the merge cannot cross a different color or transparency.
     for y in range(height):
-        x = 0
-        while x < width:
-            color = int(indexes[y, x])
-            if color < 0 or covered[y, x]:
-                x += 1
-                continue
-            end = x + 1
-            while end < width and int(indexes[y, end]) == color and not covered[y, end]:
-                end += 1
+        for color, x, end in _iter_fallback_runs(
+            indexes, covered, y, fallback_merge_gap_px
+        ):
             if not _footprint_is_color(indexes, color, x, end - 1, y, 1, scale_x, scale_y):
                 # At a sharp edge even the assumed thin footprint may be unsafe
                 # under this scale model. Fail closed instead of inventing safety.
@@ -165,7 +215,6 @@ def build_interior_fill_plan(
                 "safe_to_execute": False,
             })
             _mark_footprint(covered, x, end - 1, y, 1, scale_x, scale_y)
-            x = end
 
     visible = indexes >= 0
     # Coverage means pixels included in the conservative modeled footprints.
@@ -178,6 +227,7 @@ def build_interior_fill_plan(
         "brush_configuration": {
             "min_brush_value": min_brush_value,
             "max_brush_value": max_brush_value,
+            "fallback_merge_gap_px": fallback_merge_gap_px,
             "scale_x_source_px_per_game_unit": scale_x,
             "scale_y_source_px_per_game_unit": scale_y,
             "footprint_model": "conservative_axis_aligned_rectangle",
