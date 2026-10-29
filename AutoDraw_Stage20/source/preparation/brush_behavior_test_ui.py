@@ -1439,7 +1439,10 @@ class BrushBehaviorTestTab:
                 restore_brush=True,
             )
         except Exception as exc:
-            self._finish_automated_postdraw("failed", f"Не удалось проверить очистку: {exc}", restore_brush=True)
+            if self._automated_postdraw_stop_requested:
+                self._cancel_automated_postdraw()
+            else:
+                self._finish_automated_postdraw("failed", f"Не удалось проверить очистку: {exc}", restore_brush=True)
 
     def _finish_automated_postdraw(
         self, status: str, reason: str, *, restore_brush: bool = False
