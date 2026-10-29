@@ -313,7 +313,7 @@ def optimize_geometry_plan_across_modes(
     """Evaluate scanline, contour and skeleton plans against paint and point budgets."""
     from geometry_color_plan import GeometryColorPlanError, validate_geometry_color_plan
 
-    candidates: list[tuple[tuple[int, float, float, int, float, int], dict[str, Any], dict[str, Any]]] = []
+    candidates: list[tuple[tuple[int, float, int, float, float, int], dict[str, Any], dict[str, Any]]] = []
     failures: list[str] = []
     for mode_priority, mode in enumerate(("scanline", "contour", "skeleton")):
         try:
