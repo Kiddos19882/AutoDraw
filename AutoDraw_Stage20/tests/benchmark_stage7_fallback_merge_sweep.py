@@ -145,7 +145,7 @@ def _coverage_path_metrics(strokes: list[dict[str, Any]], index_map: np.ndarray)
     """Classify centerline pixel visits against prior modeled brush footprints."""
     height, width = index_map.shape
     covered_by_color: dict[int, np.ndarray] = {}
-    fresh_visits = revisit_visits = invalid_visits = 0
+    fresh_visits = revisit_visits = invalid_visits = invalid_footprint_visits = 0
     for stroke in strokes:
         color = int(stroke["color_index"])
         covered = covered_by_color.setdefault(color, np.zeros((height, width), dtype=bool))
@@ -172,8 +172,8 @@ def _coverage_path_metrics(strokes: list[dict[str, Any]], index_map: np.ndarray)
         brush = int(stroke.get("brush_value", 1))
         xs = [round(point[0]) for point in points]
         ys = [round(point[1]) for point in points]
-        # Planner strokes are horizontal; the rectangle also safely bounds
-        # multi-point routes for this diagnostic approximation.
+        # Current interior-fill planner emits horizontal strokes. For this
+        # planner-specific diagnostic, evaluate each horizontal row footprint.
         for y in range(min(ys), max(ys) + 1):
             bounds = footprint_pixel_bounds(
                 min(xs), max(xs), y, brush, 1.0, 1.0, width, height
@@ -182,12 +182,25 @@ def _coverage_path_metrics(strokes: list[dict[str, Any]], index_map: np.ndarray)
                 continue
             left, right, top, bottom = bounds
             region = index_map[top:bottom + 1, left:right + 1]
+            invalid_footprint_visits += int(np.count_nonzero(region != color))
             covered[top:bottom + 1, left:right + 1] |= region == color
+
+    modeled_covered = np.zeros((height, width), dtype=bool)
+    for color, covered in covered_by_color.items():
+        modeled_covered |= (index_map == color) & covered
+    visible = index_map >= 0
+    uncovered_visible_pixel_count = int(np.count_nonzero(visible & ~modeled_covered))
+    visible_pixel_count = int(np.count_nonzero(visible))
 
     return {
         "fresh_centerline_pixel_visits": fresh_visits,
         "revisit_centerline_pixel_visits": revisit_visits,
         "invalid_centerline_pixel_visits": invalid_visits,
+        "invalid_footprint_pixel_visits": invalid_footprint_visits,
+        "uncovered_visible_pixel_count": uncovered_visible_pixel_count,
+        "modeled_coverage_percent": round(
+            100.0 * (visible_pixel_count - uncovered_visible_pixel_count) / visible_pixel_count, 4
+        ) if visible_pixel_count else 100.0,
     }
 
 
