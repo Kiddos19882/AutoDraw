@@ -581,11 +581,15 @@ class ColorScanlineTab:
                 f"Бюджетная оптимизация: масштаб {optimization.get('scale', 1.0):.1f}; "
                 f"RDP {optimization.get('simplify_tolerance_px', 0.0):.1f} px; "
                 f"мин. компонент {optimization.get('min_component_area', 1)} px; "
-                f"краска: {'да' if optimization.get('fits_paint_budget') else 'нет'}; "
-                f"игровые точки: {'да' if optimization.get('fits_point_budget') else 'нет'} "
-                f"({optimization.get('estimated_game_points_after', 0):,}/"
-                f"{optimization.get('target_point_count', 0):,}, BoardItem2); "
-                f"оба ограничения: {'да' if optimization.get('fits_budget') else 'нет'}."
+                f"краска: {'да' if optimization.get('fits_paint_budget', optimization.get('fits_budget')) else 'нет' if 'fits_budget' in optimization else 'н/д'}; "
+                f"игровые точки: {'да' if optimization.get('fits_point_budget') else 'нет' if 'fits_point_budget' in optimization else 'н/д'}"
+                + (
+                    f" ({optimization['estimated_game_points_after']:,}/"
+                    f"{optimization['target_point_count']:,}, BoardItem2)"
+                    if "estimated_game_points_after" in optimization and "target_point_count" in optimization
+                    else ""
+                )
+                + f"; оба ограничения: {'да' if optimization.get('fits_budget') else 'нет' if 'fits_budget' in optimization else 'н/д'}."
             )
             mode_candidates = optimization.get("mode_candidates", [])
             if mode_candidates:
@@ -593,8 +597,12 @@ class ColorScanlineTab:
                     "Сравнение режимов (совпадение по предпросмотру): "
                     + " · ".join(
                         f"{item['mode']}: {item['quality_pixel_accuracy_percent']:.1f}% "
-                        f"совпадение, {item['estimated_ink_after_px_equivalent']:,.0f} px-экв., "
-                        f"{item['estimated_game_points_after']:,}/{item['target_point_count']:,} точек"
+                        f"совпадение, {item['estimated_ink_after_px_equivalent']:,.0f} px-экв."
+                        + (
+                            f", {item['estimated_game_points_after']:,}/{item['target_point_count']:,} точек"
+                            if "estimated_game_points_after" in item and "target_point_count" in item
+                            else ""
+                        )
                         for item in mode_candidates
                     )
                 )
