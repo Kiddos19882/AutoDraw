@@ -71,8 +71,11 @@ def polyline_distance(points_a: list[tuple[float, float]], points_b: list[tuple[
     return best
 
 
-def classify_brush_setting(phases: dict[str, Any] | None) -> str:
-    """Classify whether the requested brush value was explicitly checked in the game UI.
+def classify_brush_setting(
+    phases: dict[str, Any] | None,
+    requested_brush: Any = None,
+) -> str:
+    """Classify UI confirmation and reject mismatched requested values.
 
     Older experiment manifests predate the brush_setup phase. Their requested
     value must not be interpreted as a verified UI setting.
@@ -84,6 +87,9 @@ def classify_brush_setting(phases: dict[str, Any] | None) -> str:
         return "legacy_unverified"
     status = setup.get("status")
     if status == "confirmed_by_user":
+        confirmed_request = setup.get("requested_value")
+        if requested_brush is not None and confirmed_request != requested_brush:
+            return "confirmation_value_mismatch"
         return "confirmed_by_user"
     if status == "declined_by_user":
         return "declined_by_user"
@@ -203,7 +209,7 @@ def main() -> int:
     for record_path in experiments:
         record = json.loads(record_path.read_text(encoding="utf-8"))
         phases = record.get("phases", {})
-        brush_setting_status = classify_brush_setting(phases)
+        brush_setting_status = classify_brush_setting(phases, record.get("brush_value_requested"))
         brush_value_confirmed = brush_setting_status == "confirmed_by_user"
         draw_phase = phases.get("after_draw", {})
         board_name = draw_phase.get("files", {}).get("board_roi")
@@ -312,7 +318,8 @@ def main() -> int:
             "Width estimates are most reliable for isolated long strokes; short strokes, corners, and overlapping traces are lower confidence.",
             "Paint-meter results remain separate and are not inferred from board geometry.",
             "Execution completion is treated as registered only as the user's current working assumption.",
-            "Requested brush values in legacy experiments are not verified UI selections; see brush_setting_status."
+            "Requested brush values in legacy experiments are not verified UI selections; see brush_setting_status.",
+            "User confirmations are valid only when brush_setup.requested_value matches brush_value_requested."
         ],
     }
     args.output_json.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
