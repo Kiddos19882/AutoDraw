@@ -528,6 +528,18 @@ class BrushBehaviorTestTab:
             )
             return True
         except (ValueError, RuntimeError, AttributeError) as exc:
+            if self._brush_drag_countdown_id is not None:
+                try:
+                    self.root.after_cancel(self._brush_drag_countdown_id)
+                except (tk.TclError, ValueError):
+                    pass
+                self._brush_drag_countdown_id = None
+            self._stop_brush_hotkey_listener()
+            try:
+                self.root.deiconify()
+                self.root.lift()
+            except tk.TclError:
+                pass
             messagebox.showwarning("Не настроен ползунок кисти", str(exc), parent=self.root)
             return False
 
