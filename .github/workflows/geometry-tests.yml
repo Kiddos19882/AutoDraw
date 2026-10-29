@@ -87,7 +87,7 @@ jobs:
           $fixtureDir = Join-Path $env:GITHUB_WORKSPACE "AutoDraw_Stage20/benchmark-results/stage7-synthetic-inputs"
           Get-ChildItem $fixtureDir -Filter *.png | ForEach-Object {
             $name = [System.IO.Path]::GetFileNameWithoutExtension($_.Name)
-            python ..\..\tests\benchmark_stage7_interior_fill.py --image-file $_.FullName --target-width 646 --target-height 323 --palette-json AutoDraw_Stage20/data/palettes/profiles/Browser_palette.autodraw-palette.json --background-mode edge-connected --output "AutoDraw_Stage20/benchmark-results/stage7-synthetic/$name-report.json" --preview-dir "AutoDraw_Stage20/benchmark-results/stage7-synthetic/$name-previews"
+            python ..\..\tests\benchmark_stage7_interior_fill.py --image-file $_.FullName --target-width 646 --target-height 323 --palette-json AutoDraw_Stage20/data/palettes/profiles/Browser_palette.autodraw-palette.json --background-mode preserve --output "AutoDraw_Stage20/benchmark-results/stage7-synthetic/$name-report.json" --preview-dir "AutoDraw_Stage20/benchmark-results/stage7-synthetic/$name-previews"
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           }
       - name: Upload Stage 7 synthetic geometry reports
