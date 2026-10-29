@@ -108,7 +108,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description="Stage 7 benchmark: compare contour, skeleton, scanline and modeled interior-fill footprints."
     )
-    parser.add_argument("--git-ref", default="origin/master")
+    parser.add_argument("--git-ref", default="HEAD")
     parser.add_argument("--git-path", default="AutoDraw_Stage20/testImages/images.png")
     parser.add_argument("--target-width", type=int, default=646)
     parser.add_argument("--target-height", type=int, default=323)
