@@ -29,6 +29,12 @@ from drawing_algorithm_benchmark import (  # noqa: E402
 )
 from geometry_color_plan import build_geometry_color_plan  # noqa: E402
 from interior_fill_planner import build_interior_fill_plan  # noqa: E402
+from paint_cost_model import (
+    DEFAULT_PAINT_BUDGET_PX_EQUIVALENT,
+    DEFAULT_STROKE_OVERHEAD_PX_EQUIVALENT,
+    estimate_paint_cost,
+)  # noqa: E402
+from engine_point_calibration import estimate_point_quota_usage  # noqa: E402
 from brush_footprint_geometry import footprint_pixel_bounds  # noqa: E402
 
 
@@ -147,6 +153,78 @@ def _centerline_length(plan: dict[str, Any]) -> float:
     return total
 
 
+def _single_pixel_stroke_count(plan: dict[str, Any]) -> int:
+    """Count executor-expanded point strokes using the shared plan cost semantics."""
+    count = 0
+    for stroke in plan.get("strokes", []):
+        points = stroke.get("points", [])
+        if len(points) != 2:
+            continue
+        first, last = points
+        distance = math.hypot(
+            float(last["x"]) - float(first["x"]),
+            float(last["y"]) - float(first["y"]),
+        )
+        if distance <= 1e-7:
+            count += 1
+    return count
+
+
+def _resource_budget_estimates(
+    plan: dict[str, Any],
+    *,
+    board_point_limit: int = 6_000,
+    point_safety_factor: float = 0.85,
+    paint_target_usage_percent: float = 75.0,
+) -> dict[str, Any]:
+    """Report separate paint and point budgets for any Stage 7 strategy."""
+    stroke_count = len(plan.get("strokes", []))
+    path_length = _centerline_length(plan)
+    single_pixels = _single_pixel_stroke_count(plan)
+    paint = estimate_paint_cost(
+        path_length,
+        stroke_count,
+        single_pixels,
+        stroke_overhead_px_equivalent=DEFAULT_STROKE_OVERHEAD_PX_EQUIVALENT,
+        paint_budget_px_equivalent=DEFAULT_PAINT_BUDGET_PX_EQUIVALENT,
+    )
+    points = estimate_point_quota_usage(
+        path_length,
+        stroke_count,
+        single_pixel_stroke_count=single_pixels,
+        board_point_limit=board_point_limit,
+        safety_factor=point_safety_factor,
+    )
+    paint_target = DEFAULT_PAINT_BUDGET_PX_EQUIVALENT * paint_target_usage_percent / 100.0
+    point_target = int(points["planning_budget_points"])
+    fits_paint = float(paint["estimated_total_ink_px_equivalent"]) <= paint_target
+    fits_points = int(points["estimated_point_count"]) <= point_target
+    return {
+        "model_scope": "offline_estimate_not_browser_measurement",
+        "single_pixel_stroke_count": single_pixels,
+        "paint": {
+            "model_id": paint["model_id"],
+            "estimated_total_ink_px_equivalent": paint["estimated_total_ink_px_equivalent"],
+            "paint_budget_px_equivalent": DEFAULT_PAINT_BUDGET_PX_EQUIVALENT,
+            "target_usage_percent": paint_target_usage_percent,
+            "target_cost_px_equivalent": round(paint_target, 3),
+            "fits_target": fits_paint,
+            "risk_level": paint["risk_level"],
+        },
+        "game_points": {
+            "model_id": points["model_id"],
+            "estimated_point_count": points["estimated_point_count"],
+            "board_point_limit": board_point_limit,
+            "planning_budget_points": point_target,
+            "safety_factor": point_safety_factor,
+            "fits_target": fits_points,
+            "risk_level": points["risk_level"],
+            "calibration_point_limit_is_inferred": points["calibration_point_limit_is_inferred"],
+        },
+        "fits_both_targets": fits_paint and fits_points,
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Stage 7 benchmark: compare contour, skeleton, scanline and modeled interior-fill footprints."
@@ -217,15 +295,18 @@ def main() -> int:
             name, index_map, rendered, len(plan.get("strokes", [])),
             _centerline_length(plan), footprint_model="1px centerline rasterization",
         )
+        metrics["resource_budget_estimates"] = _resource_budget_estimates(plan)
         if metrics["painted_transparent_pixel_count"]:
             metrics["transparent_stroke_samples"] = _transparent_stroke_samples(plan, index_map)
         results.append(metrics)
     previews["interior_fill"] = interior_rendered
-    results.append(measure_rendering(
+    interior_metrics = measure_rendering(
         "interior_fill", index_map, interior_rendered,
         len(interior_plan["strokes"]), _centerline_length(interior_plan),
         footprint_model="conservative axis-aligned rectangle; not a measured game brush",
-    ))
+    )
+    interior_metrics["resource_budget_estimates"] = _resource_budget_estimates(interior_plan)
+    results.append(interior_metrics)
 
     report = {
         "schema_version": 1,
@@ -253,7 +334,8 @@ def main() -> int:
             "Contour, skeleton and scanline are rasterized as 1px centerlines; their real brush footprint is not modeled here.",
             "Interior fill is rasterized using its conservative rectangular model, not a measured in-game brush shape.",
             "Coverage and exact-color scores are offline estimates and do not prove the game registers every stroke.",
-            "This report compares geometry quality and stroke count; it does not certify paint quota or enable automatic execution.",
+            "Both paint and game-point budgets are reported separately for all four strategies; these are model estimates, not browser measurements.",
+            "This report compares geometry quality and stroke count; it does not certify resource depletion or enable automatic execution.",
         ],
     }
 
@@ -266,12 +348,15 @@ def main() -> int:
     output_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     print("Stage 7 geometry comparison (offline estimates, not browser measurements)")
-    print(f"{'Algorithm':<18} {'Strokes':>9} {'Coverage %':>12} {'Exact %':>10} {'Wrong':>8} {'Transparent':>13}")
+    print(f"{'Algorithm':<18} {'Strokes':>9} {'Coverage %':>12} {'Exact %':>10} {'Ink %':>9} {'Points %':>10} {'Both fit':>9} {'Wrong':>8} {'Transparent':>13}")
     for item in results:
         print(
             f"{item['name']:<18} {item['stroke_count']:>9} {item['coverage_percent']:>12.2f} "
-            f"{item['exact_color_percent']:>10.2f} {item['wrong_color_pixel_count']:>8} "
-            f"{item['painted_transparent_pixel_count']:>13}"
+            f"{item['exact_color_percent']:>10.2f} "
+            f"{item['resource_budget_estimates']['paint']['estimated_total_ink_px_equivalent'] / DEFAULT_PAINT_BUDGET_PX_EQUIVALENT * 100:>8.1f} "
+            f"{item['resource_budget_estimates']['game_points']['estimated_point_count'] / item['resource_budget_estimates']['game_points']['board_point_limit'] * 100:>9.1f} "
+            f"{'yes' if item['resource_budget_estimates']['fits_both_targets'] else 'no':>9} "
+            f"{item['wrong_color_pixel_count']:>8} {item['painted_transparent_pixel_count']:>13}"
         )
     print(f"\nJSON report: {output_path}")
     print(f"Preview directory: {preview_dir}")
