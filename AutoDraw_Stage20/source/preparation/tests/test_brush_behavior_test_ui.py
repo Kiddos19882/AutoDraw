@@ -252,8 +252,13 @@ def test_brush_drag_f12_cancellation_releases_mouse_without_real_input() -> None
     class Root:
         def __init__(self):
             self.cancelled = []
+            self.restored = False
         def after_cancel(self, callback_id):
             self.cancelled.append(callback_id)
+        def deiconify(self):
+            self.restored = True
+        def lift(self):
+            pass
 
     tab = brush_ui.BrushBehaviorTestTab.__new__(brush_ui.BrushBehaviorTestTab)
     tab.root = Root()
@@ -276,6 +281,7 @@ def test_brush_drag_f12_cancellation_releases_mouse_without_real_input() -> None
     assert tab._brush_drag_mouse_down is False
     assert tab._brush_drag_after_id is None
     assert tab.root.cancelled == ["scheduled-step"]
+    assert tab.root.restored is True
     assert "остановлено по F12" in tab.status_var.value
 
 
