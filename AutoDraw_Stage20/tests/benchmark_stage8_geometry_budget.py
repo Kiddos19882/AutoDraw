@@ -173,6 +173,14 @@ def benchmark_case(
             round(float(baseline["quality_pixel_accuracy_percent"]) - float(report["quality_pixel_accuracy_percent"]), 4)
             if baseline.get("available") else None
         ),
+        "visible_quality_loss_percentage_points": (
+            round(
+                float(baseline["quality_visible_pixel_accuracy_percent"])
+                - float(report["quality_visible_pixel_accuracy_percent"]),
+                4,
+            )
+            if baseline.get("available") else None
+        ),
         "artifacts": {
             "input": str((case_dir / "input.png").relative_to(REPO_ROOT)),
             "baseline_preview": str((case_dir / "baseline-preview.png").relative_to(REPO_ROOT)) if baseline.get("available") else None,

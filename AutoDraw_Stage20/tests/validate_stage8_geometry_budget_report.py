@@ -101,6 +101,11 @@ def main() -> int:
             raise SystemExit(f"{item.get('case')}/{item.get('scenario')} has inconsistent combined budget status.")
         if item["needs_multi_board_split"] == item["fits_both_budgets"]:
             raise SystemExit(f"{item.get('case')}/{item.get('scenario')} has inconsistent split recommendation.")
+        visible_loss = item.get("visible_quality_loss_percentage_points")
+        if visible_loss is not None and (
+            isinstance(visible_loss, bool) or not isinstance(visible_loss, (int, float)) or not math.isfinite(visible_loss)
+        ):
+            raise SystemExit(f"{item.get('case')}/{item.get('scenario')} has invalid visible quality loss.")
         baseline = item.get("baseline")
         if not isinstance(baseline, dict) or not isinstance(baseline.get("available"), bool):
             raise SystemExit(f"{item.get('case')}/{item.get('scenario')} missing baseline comparison status.")
