@@ -309,6 +309,29 @@ def main() -> int:
         footprint_model="conservative axis-aligned rectangle; not a measured game brush",
     )
     interior_metrics["resource_budget_estimates"] = _resource_budget_estimates(interior_plan)
+    # Expose why the interior-fill candidate spends its budget: wide-fill strokes
+    # and thin fallback strokes have very different planning roles. This is
+    # diagnostic only and does not alter the plan or its resource estimates.
+    interior_strokes = interior_plan.get("strokes", [])
+    role_counts: dict[str, int] = {}
+    brush_counts: dict[str, int] = {}
+    for stroke in interior_strokes:
+        role = str(stroke.get("role", "unknown"))
+        brush_value = str(stroke.get("brush_value", "unknown"))
+        role_counts[role] = role_counts.get(role, 0) + 1
+        brush_counts[brush_value] = brush_counts.get(brush_value, 0) + 1
+    interior_metrics["planner_diagnostics"] = {
+        "role_stroke_counts": role_counts,
+        "brush_value_stroke_counts": brush_counts,
+        "interior_fill_stroke_count": int(interior_plan["summary"]["interior_fill_stroke_count"]),
+        "boundary_fallback_stroke_count": int(interior_plan["summary"]["boundary_fallback_stroke_count"]),
+        "fallback_stroke_percentage": round(
+            100.0 * int(interior_plan["summary"]["boundary_fallback_stroke_count"]) / len(interior_strokes),
+            4,
+        ) if interior_strokes else 0.0,
+        "modeled_coverage_percent": interior_plan["summary"]["coverage_percent"],
+        "automatic_execution_allowed": interior_plan["brush_configuration"]["automatic_execution_allowed"],
+    }
     results.append(interior_metrics)
 
     report = {
