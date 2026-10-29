@@ -171,7 +171,19 @@ def test_set_brush_size_uses_profile_coordinates_and_minimizes_before_drag(monke
     }
     tab.brush_slider_start = None
     tab.brush_slider_end = None
+    class FakeListener:
+        def __init__(self, on_press):
+            self.on_press = on_press
+            self.daemon = False
+            self.started = False
+            self.stopped = False
+        def start(self):
+            self.started = True
+        def stop(self):
+            self.stopped = True
+
     monkeypatch.setattr(brush_ui.platform, "system", lambda: "Windows")
+    monkeypatch.setattr(brush_ui.keyboard, "Listener", FakeListener)
 
     assert tab.set_brush_size() is True
     assert tab.slider_start_var.get() == "100, 500"
@@ -307,3 +319,82 @@ def test_f12_is_not_consumed_when_no_brush_drag_is_active() -> None:
     tab = brush_ui.BrushBehaviorTestTab.__new__(brush_ui.BrushBehaviorTestTab)
     tab._brush_drag_state = None
     assert tab._on_brush_workflow_stop_key() is None
+
+
+
+def test_f12_cancels_pending_brush_countdown_and_restores_window(monkeypatch) -> None:
+    class Value:
+        def __init__(self, value=""):
+            self.value = value
+        def set(self, value):
+            self.value = value
+
+    class Listener:
+        def __init__(self):
+            self.stopped = False
+        def stop(self):
+            self.stopped = True
+
+    class Root:
+        def __init__(self):
+            self.cancelled = []
+            self.restored = False
+        def after_cancel(self, callback_id):
+            self.cancelled.append(callback_id)
+        def deiconify(self):
+            self.restored = True
+        def lift(self):
+            pass
+
+    tab = brush_ui.BrushBehaviorTestTab.__new__(brush_ui.BrushBehaviorTestTab)
+    tab.root = Root()
+    tab.status_var = Value()
+    tab._brush_drag_state = None
+    tab._brush_drag_after_id = None
+    tab._brush_drag_countdown_id = "countdown"
+    tab._brush_drag_mouse_down = False
+    tab._brush_hotkey_listener = Listener()
+    listener = tab._brush_hotkey_listener
+
+    tab.cancel_brush_drag()
+
+    assert tab.root.cancelled == ["countdown"]
+    assert tab._brush_drag_countdown_id is None
+    assert listener.stopped is True
+    assert tab._brush_hotkey_listener is None
+    assert tab.root.restored is True
+    assert "отменена по F12" in tab.status_var.value
+
+
+def test_global_f12_listener_schedules_cancellation_on_tk_thread(monkeypatch) -> None:
+    class FakeKeyboard:
+        f12 = object()
+
+    class Listener:
+        def __init__(self, on_press):
+            self.on_press = on_press
+            self.daemon = False
+            self.started = False
+        def start(self):
+            self.started = True
+        def stop(self):
+            pass
+
+    class Root:
+        def __init__(self):
+            self.scheduled = []
+        def after(self, delay, callback):
+            self.scheduled.append((delay, callback))
+
+    tab = brush_ui.BrushBehaviorTestTab.__new__(brush_ui.BrushBehaviorTestTab)
+    tab.root = Root()
+    tab._brush_hotkey_listener = None
+    monkeypatch.setattr(brush_ui.keyboard, "Key", FakeKeyboard)
+    monkeypatch.setattr(brush_ui.keyboard, "Listener", Listener)
+
+    tab._start_brush_hotkey_listener()
+    listener = tab._brush_hotkey_listener
+    listener.on_press(FakeKeyboard.f12)
+
+    assert listener.started is True
+    assert tab.root.scheduled and tab.root.scheduled[0][0] == 0
