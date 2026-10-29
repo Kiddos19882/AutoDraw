@@ -17,7 +17,7 @@ if str(PREPARATION_ROOT) not in sys.path:
 
 from benchmark_drawing_algorithms import load_git_image, make_index_map, _resolved_path
 from drawing_algorithm_benchmark import load_palette_document
-from geometry_budget_optimizer import measure_geometry_plan_quality, optimize_geometry_plan_to_budget
+from geometry_budget_optimizer import measure_geometry_plan_quality, optimize_geometry_plan_across_modes, optimize_geometry_plan_to_budget
 from geometry_color_plan import build_geometry_color_plan, render_geometry_color_preview, _estimate_geometry_paint_cost
 from engine_point_calibration import estimate_point_quota_usage
 from board_resource_model import get_board_point_limit
@@ -110,17 +110,18 @@ def benchmark_case(
     except (ValueError, TypeError, MemoryError) as exc:
         baseline = {"available": False, "note": f"{type(exc).__name__}: {exc}"}
 
-    plan, report = optimize_geometry_plan_to_budget(
-        index_map,
-        palette,
-        mode="scanline",
-        paint_budget_px_equivalent=budget,
-        target_usage_percent=target_usage_percent,
-        stroke_overhead_px_equivalent=6.67,
-        board_point_limit=point_limit,
-        point_safety_factor=safety_factor,
-        source_name=f"stage8:{name}:{scenario}",
-    )
+    optimizer_kwargs = {
+        "paint_budget_px_equivalent": budget,
+        "target_usage_percent": target_usage_percent,
+        "stroke_overhead_px_equivalent": 6.67,
+        "board_point_limit": point_limit,
+        "point_safety_factor": safety_factor,
+        "source_name": f"stage8:{name}:{scenario}",
+    }
+    if name == "reference-image":
+        plan, report = optimize_geometry_plan_across_modes(index_map, palette, **optimizer_kwargs)
+    else:
+        plan, report = optimize_geometry_plan_to_budget(index_map, palette, mode="scanline", **optimizer_kwargs)
     case_dir = output_dir / name / scenario
     case_dir.mkdir(parents=True, exist_ok=True)
     save_index_map(index_map, palette, case_dir / "input.png")
@@ -160,6 +161,7 @@ def benchmark_case(
         "quality_pixel_accuracy_percent": report.get("quality_pixel_accuracy_percent"),
         "quality_visible_pixel_accuracy_percent": report.get("quality_visible_pixel_accuracy_percent"),
         "quality_measure_scope": report.get("quality_measure_scope"),
+        "mode_candidates": report.get("mode_candidates", []),
         "baseline": baseline,
         "coarsening_quality_loss_percentage_points": (
             round(float(baseline["quality_pixel_accuracy_percent"]) - float(report["quality_pixel_accuracy_percent"]), 4)
@@ -223,20 +225,21 @@ def main() -> int:
 
     # Separate constraint experiments use a small deterministic input so the reports
     # isolate the configuration change and remain inexpensive enough for every CI run.
-    small = synthetic["horizontal_stripes"][::2, ::2]
+    small_stripes = synthetic["horizontal_stripes"][::2, ::2]
+    small_checkerboard = synthetic["checkerboard"]
     results.append(benchmark_case(
-        "constraint-isolation", small, SYNTHETIC_PALETTE, artifact_dir,
+        "constraint-isolation", small_checkerboard, SYNTHETIC_PALETTE, artifact_dir,
         budget=1_000_000_000.0, target_usage_percent=args.target_usage_percent,
-        point_limit=3_000, safety_factor=args.safety_factor, scenario="point-budget-priority",
+        point_limit=6_000, safety_factor=args.safety_factor, scenario="point-budget-priority",
     ))
     results.append(benchmark_case(
-        "constraint-isolation", small, SYNTHETIC_PALETTE, artifact_dir,
-        budget=900.0, target_usage_percent=args.target_usage_percent,
+        "constraint-isolation", small_stripes, SYNTHETIC_PALETTE, artifact_dir,
+        budget=2_200.0, target_usage_percent=args.target_usage_percent,
         point_limit=12_000, safety_factor=args.safety_factor, scenario="paint-budget-priority",
     ))
     results.append(benchmark_case(
-        "constraint-isolation", small, SYNTHETIC_PALETTE, artifact_dir,
-        budget=900.0, target_usage_percent=args.target_usage_percent,
+        "constraint-isolation", small_checkerboard, SYNTHETIC_PALETTE, artifact_dir,
+        budget=6_000.0, target_usage_percent=args.target_usage_percent,
         point_limit=3_000, safety_factor=args.safety_factor, scenario="combined-budget",
     ))
 
