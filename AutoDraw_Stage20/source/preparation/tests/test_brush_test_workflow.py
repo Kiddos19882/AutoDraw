@@ -228,7 +228,10 @@ def test_workflow_accepts_explicit_blank_reference_match():
         "board_clear_status": "restored_within_pixel_tolerance",
         "reference_type": "explicit_blank_board_roi",
     })
-    state.advance("before_capture", {"capture_saved": True})
+    state.advance("before_capture", {
+        "capture_saved": True,
+        "board_clear_status": "restored_within_pixel_tolerance",
+    })
     assert state.phase == "before_capture"
 
 @pytest.mark.parametrize("status", ["completed", " COMPLETED "])
