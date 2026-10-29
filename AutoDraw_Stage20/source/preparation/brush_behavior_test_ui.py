@@ -197,7 +197,7 @@ class BrushBehaviorTestTab:
     def __init__(
         self, root: tk.Misc, parent: tk.Widget, output_dir: str | Path,
         area_selector_cls, *, get_canvas_size, get_canvas_area, on_transfer_plan, get_brush_control=None,
-        get_calibration_profile=None,
+        get_calibration_profile=None, on_brush_ready=None,
     ):
         self.root = root
         self.output_dir = Path(output_dir).resolve()
@@ -208,6 +208,8 @@ class BrushBehaviorTestTab:
         self.get_brush_control = get_brush_control
         self.get_calibration_profile = get_calibration_profile
         self.on_transfer_plan = on_transfer_plan
+        self.on_brush_ready = on_brush_ready
+        self._start_executor_after_brush_drag = False
         self.experiment_dir: Path | None = None
         self.experiment_phases: dict[str, dict[str, Any]] = {}
         self.current_plan: dict[str, Any] | None = None
@@ -706,6 +708,12 @@ class BrushBehaviorTestTab:
                 f"Перетаскивание к радиусу кисти {brush} завершено ({target_x}, {target_y}). "
                 "Размер не подтверждён игрой — проверь значение перед рисованием."
             )
+            if self._start_executor_after_brush_drag:
+                self._start_executor_after_brush_drag = False
+                if callable(self.on_brush_ready):
+                    self.root.after(0, lambda: self.on_brush_ready(brush))
+                else:
+                    self.status_var.set("Кисть перетащена, но callback запуска исполнителя не подключён.")
         if cancelled or error or release_error:
             try:
                 self.root.deiconify()
@@ -751,8 +759,13 @@ class BrushBehaviorTestTab:
                 parent=self.root,
             )
             return
-        clear_point = config.get("points", {}).get("clear_board", {})
-        point_status = config.get("status", {}).get("points", {})
+        points = config.get("points")
+        points = points if isinstance(points, dict) else {}
+        statuses = config.get("status")
+        statuses = statuses if isinstance(statuses, dict) else {}
+        clear_point = points.get("clear_board", {})
+        point_status = statuses.get("points", {})
+        point_status = point_status if isinstance(point_status, dict) else {}
         if not isinstance(clear_point, dict) or point_status.get("clear_board") == "needs_review":
             self.status_var.set("Тест заблокирован: координата Clear требует проверки.")
             messagebox.showwarning("Clear не откалиброван", "Проверь точку Clear на вкладке 8.", parent=self.root)
@@ -900,11 +913,13 @@ class BrushBehaviorTestTab:
             self._stop_brush_hotkey_listener()
             self.root.deiconify()
             self.root.lift()
+            self._start_executor_after_brush_drag = True
             if not self.set_brush_size():
+                self._start_executor_after_brush_drag = False
                 self.status_var.set("Доска очищена и проверена, но кисть не установлена. Исполнитель не запущен.")
                 self._write_experiment_manifest()
                 return
-            self.status_var.set("Доска очищена и проверена; начата установка кисти. После установки проверь радиус перед запуском исполнителя.")
+            self.status_var.set("Доска очищена и проверена; начата установка кисти. После перетаскивания подтверди радиус в игре.")
         except Exception as exc:
             self._finish_automated_preclear_failure("preclear_capture_failed", str(exc))
 
