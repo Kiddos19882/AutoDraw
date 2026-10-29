@@ -44,14 +44,15 @@ def _supercover_segment(start: Point, end: Point) -> list[tuple[int, int]]:
         cells.add((math.floor(x + 0.5), math.floor(y + 0.5)))
 
     # Exact corner crossings conservatively include all four neighboring cells.
+    # Iterate only vertical grid boundaries; avoid a quadratic canvas-area scan.
     if dx != 0 and dy != 0:
         min_x, max_x = sorted((x0, x1))
-        min_y, max_y = sorted((y0, y1))
         for gx in range(math.floor(min_x + 0.5), math.ceil(max_x + 0.5)):
-            for gy in range(math.floor(min_y + 0.5), math.ceil(max_y + 0.5)):
-                tx = (gx + 0.5 - x0) / dx
-                ty = (gy + 0.5 - y0) / dy
-                if 0.0 <= tx <= 1.0 and abs(tx - ty) <= 1e-9:
+            tx = (gx + 0.5 - x0) / dx
+            if 0.0 <= tx <= 1.0:
+                y_at_crossing = y0 + dy * tx
+                gy = round(y_at_crossing - 0.5)
+                if abs(y_at_crossing - (gy + 0.5)) <= 1e-9:
                     cells.update(((gx, gy), (gx + 1, gy), (gx, gy + 1), (gx + 1, gy + 1)))
     return sorted(cells, key=lambda p: (p[1], p[0]))
 
@@ -103,6 +104,14 @@ def check_swept_footprint(
     centerline_cells = _path_centerline_cells(normalized)
     checked_cells = 0
     for x, y in centerline_cells:
+        if not (0 <= x < width and 0 <= y < height):
+            return {
+                "safe_for_color_map": False,
+                "reason": "centerline_outside_canvas",
+                "offending_pixel": [x, y],
+                "checked_footprint_cells": checked_cells,
+                "safe_to_execute": False,
+            }
         bounds = footprint_pixel_bounds(x, x, y, brush_value, sx, sy, width, height)
         if bounds is None:
             return {
