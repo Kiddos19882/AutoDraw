@@ -1131,3 +1131,5 @@ CI для изменений Stage 8: [workflow Geometry planner tests](https://
 - Добавлен корневой `.gitignore` в коммите [ed0f3e6](https://github.com/Kiddos19882/AutoDraw/commit/ed0f3e6587ce52d11cda7db91af276505e1ecf1f). Перед добавлением проверено дерево Git: новые шаблоны не совпадают с отслеживаемыми кэшами/build-output; экспериментальные данные и runtime JSON остаются под контролем версий.
 - Это безопасная уборка, не изменение алгоритмов. Следующий шаг — закрыть локальный разрыв тестового runner: preparation BAT использует unittest discovery, который не запускает обычные pytest-функции, тогда как единый runner использует pytest. До структурного переноса моделей/pipeline сохраняются требования к baseline, compatibility imports и полному CI.
 
+- Продолжение безопасной уборки: в коммите [3e7d40f](https://github.com/Kiddos19882/AutoDraw/commit/3e7d40fff797daec5be3afb22ecbae7ac2f33431) `source/preparation/run_tests.bat` переведён с unittest discovery на pytest, поскольку тесты подготовки включают обычные pytest-функции. Путь окружения согласован с `run_all_tests.py`. Windows BAT ещё не запускался в этой среде; изменение ожидает CI/локального подтверждения.
+
