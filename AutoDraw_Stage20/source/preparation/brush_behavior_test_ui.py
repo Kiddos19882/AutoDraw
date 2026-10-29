@@ -226,6 +226,10 @@ class BrushBehaviorTestTab:
         self._brush_drag_countdown_id: str | None = None
         self._brush_hotkey_listener = None
         self._brush_drag_mouse_down = False
+        self._brush_drag_purpose = "set_brush_size"
+        self._experiment_requested_brush: int | None = None
+        self._postdraw_final_status = "unknown"
+        self._postdraw_final_reason = ""
         self._automated_preclear_active = False
         self._automated_preclear_after_id: str | None = None
         self._automated_postdraw_active = False
@@ -444,6 +448,7 @@ class BrushBehaviorTestTab:
 
     def _reset_observation_fields(self) -> None:
         """Prevent evidence from a previous run being attached to a new test plan."""
+        self._experiment_requested_brush = int(self.brush_var.get().strip())
         self.screenshot_path = None
         self.experiment_dir = None
         self.experiment_phases = {}
@@ -614,7 +619,9 @@ class BrushBehaviorTestTab:
                 "step": 0,
                 "steps": max(10, min(100, distance)),
                 "user32": user32,
+                "purpose": self._brush_drag_purpose,
             }
+            self._brush_drag_purpose = "set_brush_size"
             user32.SetCursorPos(start_x, start_y)
             self.root.after(150, self._press_and_continue_brush_drag)
         except Exception as exc:
@@ -668,6 +675,7 @@ class BrushBehaviorTestTab:
     def cancel_brush_drag(self) -> None:
         """Cancel the countdown or active drag and release the mouse if it is held."""
         if self._brush_drag_countdown_id is not None:
+            purpose = self._brush_drag_purpose
             try:
                 self.root.after_cancel(self._brush_drag_countdown_id)
             except (tk.TclError, ValueError):
@@ -675,6 +683,10 @@ class BrushBehaviorTestTab:
             self._brush_drag_countdown_id = None
             self._stop_brush_hotkey_listener()
             self.status_var.set("Установка кисти отменена по F12 до начала перетаскивания.")
+            self._brush_drag_purpose = "set_brush_size"
+            if purpose == "restore_brush_30":
+                self._record_brush_restore_result("stopped", "F12 отменил возврат кисти до начала перетаскивания.")
+                return
             try:
                 self.root.deiconify()
                 self.root.lift()
@@ -703,6 +715,17 @@ class BrushBehaviorTestTab:
             finally:
                 self._brush_drag_mouse_down = False
         self._brush_drag_state = None
+        purpose = state.get("purpose", "set_brush_size") if state else self._brush_drag_purpose
+        if purpose == "restore_brush_30":
+            self._start_executor_after_brush_drag = False
+            if cancelled or error or release_error:
+                restore_status = "stopped" if cancelled else "failed"
+                detail = "F12 отменил возврат кисти." if cancelled else (error or release_error or "Неизвестная ошибка.")
+            else:
+                restore_status = "drag_completed_unverified"
+                detail = "Жест перетаскивания к позиции кисти 30 завершён; значение необходимо проверить в игре."
+            self._record_brush_restore_result(restore_status, detail, state=state)
+            return
         if cancelled or error or release_error:
             self._start_executor_after_brush_drag = False
         if release_error:
@@ -1224,7 +1247,7 @@ class BrushBehaviorTestTab:
                 "record_type": "autodraw_brush_paint_experiment",
                 "created_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
                 "test_case": TEST_CASES.get(self.case_var.get(), {}).get("id"),
-                "brush_value_requested": int(self.brush_var.get().strip()),
+                "brush_value_requested": self._experiment_requested_brush if self._experiment_requested_brush is not None else int(self.brush_var.get().strip()),
                 "drawing_plan_path": str(self.current_plan_path) if self.current_plan_path else None,
                 "execution_report_path": str(self.execution_report_path) if self.execution_report_path else None,
                 "calibration_profile_path": str(config.get("profile_path", "")) or None,
@@ -1457,6 +1480,8 @@ class BrushBehaviorTestTab:
                 pass
             self._automated_postdraw_after_id = None
         self._stop_brush_hotkey_listener()
+        self._postdraw_final_status = status
+        self._postdraw_final_reason = reason
         self.experiment_phases.setdefault("postdraw_workflow", {}).update({
             "status": status,
             "reason": reason,
@@ -1465,30 +1490,138 @@ class BrushBehaviorTestTab:
         try:
             self._write_experiment_manifest()
         except (OSError, ValueError, TypeError) as exc:
-            reason += f"; ошибка записи манифеста: {exc}"
-        self.root.deiconify()
-        self.root.lift()
-        self.status_var.set(f"Постэтап: {status}. {reason}")
+            self._postdraw_final_reason += f"; ошибка записи манифеста: {exc}"
         if restore_brush:
-            # Suppress the executor-start callback while returning the slider to 30.
+            requested_brush = self._experiment_requested_brush
+            if requested_brush is None:
+                try:
+                    requested_brush = int(self.brush_var.get().strip())
+                except (ValueError, AttributeError):
+                    requested_brush = 30
             self._start_executor_after_brush_drag = False
-            self.brush_var.set("30")
-            if self.set_brush_size():
+            try:
+                if not self._schedule_brush_restore_30(requested_brush):
+                    raise RuntimeError("Не удалось запланировать перетаскивание кисти к 30.")
                 self.experiment_phases["restore_brush_30"] = {
                     "status": "drag_scheduled",
                     "requested_value": 30,
-                    "note": "The game must be checked visually; scheduling the drag does not prove the selected radius.",
+                    "drag_start_for_requested_brush": list(calculate_slider_target(
+                        self.brush_slider_start, self.brush_slider_end, requested_brush
+                    )),
+                    "drag_target_for_brush_30": list(self.brush_slider_start),
+                    "note": "The return drag starts at the tested brush position and ends at the calibrated brush-30 endpoint. The game value still requires visual confirmation.",
                 }
-            else:
+                self._write_experiment_manifest()
+                self.status_var.set(
+                    f"Постэтап: {status}. {self._postdraw_final_reason} Возврат кисти к 30 запланирован; "
+                    "переключись в браузер и не трогай мышь 3 секунды. F12 отменяет перетаскивание."
+                )
+                return
+            except Exception as exc:
                 self.experiment_phases["restore_brush_30"] = {
                     "status": "failed",
                     "requested_value": 30,
+                    "error": str(exc),
                     "note": "Could not schedule the return drag; manual recovery is required.",
                 }
+                try:
+                    self._write_experiment_manifest()
+                except (OSError, ValueError, TypeError):
+                    pass
+                self._postdraw_final_reason += f" Возврат кисти к 30 не запланирован: {exc}"
+        self._show_postdraw_completion_notification()
+
+    def _schedule_brush_restore_30(self, requested_brush: int) -> bool:
+        """Drag from the tested slider position back to the calibrated brush-30 endpoint."""
+        if platform.system() != "Windows":
+            raise RuntimeError("Автоматический возврат кисти доступен только в Windows.")
+        calibrated = self.get_brush_control() if callable(self.get_brush_control) else None
+        if not isinstance(calibrated, dict) or calibrated.get("mode") != "slider":
+            raise ValueError("Для автоматического возврата требуется сохранённый профиль «Расширенный ползунок 1–30».")
+        if not calibrated.get("start") or not calibrated.get("end"):
+            raise ValueError("В профиле калибровки отсутствуют оба конца ползунка.")
+        start_30 = self._parse_point(
+            f"{calibrated['start'][0]},{calibrated['start'][1]}", "Край 30 из профиля"
+        )
+        end_1 = self._parse_point(
+            f"{calibrated['end'][0]},{calibrated['end'][1]}", "Край 1 из профиля"
+        )
+        drag_start = calculate_slider_target(start_30, end_1, requested_brush)
+        self.brush_slider_start, self.brush_slider_end = start_30, end_1
+        self.brush_var.set("30")
+        self._brush_drag_purpose = "restore_brush_30"
+        self.status_var.set(
+            f"Через 3 секунды кисть будет перетащена с позиции радиуса {requested_brush} к радиусу 30. "
+            "Переключись в браузер и не трогай мышь. F12 отменяет действие."
+        )
+        self.root.iconify()
+        self._start_brush_hotkey_listener()
+        try:
+            self._brush_drag_countdown_id = self.root.after(
+                3000, lambda: self._start_scheduled_brush_drag(drag_start, start_30[0], start_30[1], 30)
+            )
+        except Exception:
+            self._brush_drag_purpose = "set_brush_size"
+            self._stop_brush_hotkey_listener()
             try:
-                self._write_experiment_manifest()
-            except (OSError, ValueError, TypeError):
+                self.root.deiconify()
+                self.root.lift()
+            except tk.TclError:
                 pass
+            raise
+        return True
+
+    def _record_brush_restore_result(
+        self, status: str, detail: str, *, state: dict[str, Any] | None = None
+    ) -> None:
+        """Persist the final restore-drag result and notify the user after the last mouse action."""
+        phase: dict[str, Any] = {
+            "status": status,
+            "requested_value": 30,
+            "finished_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            "note": detail,
+        }
+        if state:
+            phase["drag_start"] = list(state.get("start", ()))
+            phase["drag_target"] = list(state.get("target", ()))
+        self.experiment_phases["restore_brush_30"] = phase
+        try:
+            self._write_experiment_manifest()
+        except (OSError, ValueError, TypeError) as exc:
+            detail += f" Не удалось обновить experiment.json: {exc}"
+        self._postdraw_final_reason = f"{self._postdraw_final_reason} {detail}".strip()
+        try:
+            self.root.deiconify()
+            self.root.lift()
+        except tk.TclError:
+            pass
+        self.status_var.set(f"Тест завершён: {self._postdraw_final_status}. {self._postdraw_final_reason}")
+        self._show_postdraw_completion_notification(restore_status=status)
+
+    def _show_postdraw_completion_notification(self, *, restore_status: str | None = None) -> None:
+        """Show a visible end-of-test notification instead of relying on a hidden status bar."""
+        restore_ok = restore_status == "drag_completed_unverified"
+        if self._postdraw_final_status == "completed" and restore_ok:
+            messagebox.showinfo(
+                "Тест кисти завершён",
+                "Скриншоты и experiment.json сохранены. Перетаскивание кисти к позиции 30 выполнено, "
+                "но игра не предоставляет автоматического подтверждения выбранного радиуса. "
+                "Проверь кисть в браузере и результат в папке эксперимента.",
+                parent=self.root,
+            )
+            return
+        details = self._postdraw_final_reason
+        if restore_status == "stopped":
+            details += " Возврат кисти отменён по F12; выставь 30 вручную."
+        elif restore_status == "failed":
+            details += " Автоматический возврат кисти не завершён; выставь 30 вручную."
+        elif restore_status is None:
+            details += " Проверь состояние кисти и папку эксперимента вручную."
+        messagebox.showwarning(
+            "Тест кисти завершён не полностью",
+            f"Статус постэтапа: {self._postdraw_final_status}.\n{details}",
+            parent=self.root,
+        )
 
     def handle_executor_finished(self, summary: dict[str, Any], report_path: str | Path | None) -> bool:
         """Attach the real executor result to the active brush experiment without a modal dialog."""
