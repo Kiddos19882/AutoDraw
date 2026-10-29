@@ -211,6 +211,8 @@ class UnifiedAppCoreTests(unittest.TestCase):
             self.assertEqual(labels, ["1. Подготовка изображения", "2. Исполнение рисунка", "3. Палитра браузера", "4. Преобразование в палитру", "5. Цветной scanline-план", "6. Тест лимита краски", "7. Тест кистей", "8. Калибровка теста"])
             self.assertIsNotNone(app.workbench.on_select_canvas_area)
             self.assertIs(app.executor.area_change_callback.__self__, app)
+            self.assertIs(app.executor.execution_finished_callback.__self__, app)
+            self.assertEqual(app.executor.execution_finished_callback.__func__.__name__, "_on_executor_finished")
             self.assertEqual(app.executor.area_change_callback.__func__.__name__, "_synchronize_area_with_preparation")
             self.assertIsNotNone(app.workbench)
             self.assertIsNotNone(app.executor)
