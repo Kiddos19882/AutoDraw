@@ -59,6 +59,9 @@ def measure_geometry_plan_quality(index_map: Any, plan: dict[str, Any]) -> dict[
     mismatch_count = int(np.count_nonzero(mismatches))
     total_pixels = int(source.size)
     source_visible = source_indexes >= 0
+    rendered_visible = rendered_indexes >= 0
+    covered = source_visible & rendered_visible
+    wrong = covered & (source_indexes != rendered_indexes)
     visible_count = int(np.count_nonzero(source_visible))
     covered_count = int(np.count_nonzero(covered))
     exact_visible_matches = int(np.count_nonzero((rendered_indexes == source_indexes) & source_visible))
