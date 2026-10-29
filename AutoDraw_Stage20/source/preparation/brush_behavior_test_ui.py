@@ -216,6 +216,10 @@ class BrushBehaviorTestTab:
         self.screen_resolution: dict[str, int] | None = None
         self.brush_slider_start: tuple[int, int] | None = None
         self.brush_slider_end: tuple[int, int] | None = None
+        self._brush_drag_state: dict[str, Any] | None = None
+        self._brush_drag_after_id: str | None = None
+        self._brush_drag_mouse_down = False
+        self.root.bind_all("<F12>", self._on_brush_workflow_stop_key, add="+")
         self.screenshot_path: Path | None = None
         self.execution_report_path: Path | None = None
         self.execution_report: dict[str, Any] | None = None
@@ -515,7 +519,7 @@ class BrushBehaviorTestTab:
             )
             # Minimize AutoDraw before the countdown so it cannot cover the game slider.
             self.root.iconify()
-            self.root.after(3000, lambda: self._apply_brush_drag(start, x, y, brush))
+            self.root.after(3000, lambda: self._begin_brush_drag(start, x, y, brush))
             return True
         except (ValueError, RuntimeError, AttributeError) as exc:
             messagebox.showwarning("Не настроен ползунок кисти", str(exc), parent=self.root)
@@ -532,30 +536,110 @@ class BrushBehaviorTestTab:
             f"Выполнен клик по пресету кисти {brush} ({x}, {y}). Проверь, что игра выбрала нужный размер."
         )
 
-    def _apply_brush_drag(
+    def _begin_brush_drag(
         self, start: tuple[int, int], target_x: int, target_y: int, brush: int
     ) -> None:
-        """Drag from the calibrated brush-30 position to the requested slider position."""
-        user32 = ctypes.windll.user32
-        start_x, start_y = start
-        distance = max(abs(target_x - start_x), abs(target_y - start_y))
-        steps = max(10, min(100, distance))
-        user32.SetCursorPos(start_x, start_y)
-        time.sleep(0.15)
-        user32.mouse_event(0x0002, 0, 0, 0, 0)  # MOUSEEVENTF_LEFTDOWN
+        """Start a cancellable slider drag without blocking Tk's event loop."""
+        if self._brush_drag_state is not None:
+            self.status_var.set("Перетаскивание кисти уже выполняется; повторный запуск заблокирован.")
+            return
         try:
-            for step in range(1, steps + 1):
-                ratio = step / steps
-                current_x = round(start_x + (target_x - start_x) * ratio)
-                current_y = round(start_y + (target_y - start_y) * ratio)
-                user32.SetCursorPos(current_x, current_y)
-                time.sleep(0.01)
-        finally:
-            user32.mouse_event(0x0004, 0, 0, 0, 0)  # MOUSEEVENTF_LEFTUP
-        self.status_var.set(
-            f"Выполнено перетаскивание ползунка к радиусу кисти {brush} "
-            f"({target_x}, {target_y}). Проверь значение, показанное игрой."
-        )
+            user32 = ctypes.windll.user32
+            start_x, start_y = start
+            distance = max(abs(target_x - start_x), abs(target_y - start_y))
+            self._brush_drag_state = {
+                "start": (start_x, start_y),
+                "target": (target_x, target_y),
+                "brush": brush,
+                "step": 0,
+                "steps": max(10, min(100, distance)),
+                "user32": user32,
+            }
+            user32.SetCursorPos(start_x, start_y)
+            self.root.after(150, self._press_and_continue_brush_drag)
+        except Exception as exc:
+            self._finish_brush_drag(error=f"Не удалось начать перетаскивание: {exc}")
+
+    def _press_and_continue_brush_drag(self) -> None:
+        state = self._brush_drag_state
+        if state is None:
+            return
+        try:
+            if state.get("cancel_requested"):
+                self._finish_brush_drag(cancelled=True)
+                return
+            state["user32"].mouse_event(0x0002, 0, 0, 0, 0)  # MOUSEEVENTF_LEFTDOWN
+            self._brush_drag_mouse_down = True
+            self._move_brush_drag_step()
+        except Exception as exc:
+            self._finish_brush_drag(error=f"Ошибка при нажатии на ползунок: {exc}")
+
+    def _move_brush_drag_step(self) -> None:
+        state = self._brush_drag_state
+        if state is None:
+            return
+        try:
+            if state.get("cancel_requested"):
+                self._finish_brush_drag(cancelled=True)
+                return
+            step = int(state["step"]) + 1
+            steps = int(state["steps"])
+            start_x, start_y = state["start"]
+            target_x, target_y = state["target"]
+            ratio = min(1.0, step / steps)
+            current_x = round(start_x + (target_x - start_x) * ratio)
+            current_y = round(start_y + (target_y - start_y) * ratio)
+            state["user32"].SetCursorPos(current_x, current_y)
+            state["step"] = step
+            if step >= steps:
+                self._finish_brush_drag()
+            else:
+                self._brush_drag_after_id = self.root.after(10, self._move_brush_drag_step)
+        except Exception as exc:
+            self._finish_brush_drag(error=f"Ошибка перемещения ползунка: {exc}")
+
+    def _on_brush_workflow_stop_key(self, _event=None) -> str:
+        """F12 cancels a pending or active brush drag and always releases the mouse."""
+        if self._brush_drag_state is not None:
+            self._finish_brush_drag(cancelled=True)
+        return "break"
+
+    def cancel_brush_drag(self) -> None:
+        """Public cancellation hook for a future full experiment controller."""
+        if self._brush_drag_state is not None:
+            self._finish_brush_drag(cancelled=True)
+
+    def _finish_brush_drag(self, *, cancelled: bool = False, error: str | None = None) -> None:
+        state = self._brush_drag_state
+        if self._brush_drag_after_id is not None:
+            try:
+                self.root.after_cancel(self._brush_drag_after_id)
+            except (tk.TclError, ValueError):
+                pass
+            self._brush_drag_after_id = None
+        release_error = None
+        if self._brush_drag_mouse_down:
+            try:
+                user32 = state.get("user32") if state else ctypes.windll.user32
+                user32.mouse_event(0x0004, 0, 0, 0, 0)  # MOUSEEVENTF_LEFTUP
+            except Exception as exc:
+                release_error = str(exc)
+            finally:
+                self._brush_drag_mouse_down = False
+        self._brush_drag_state = None
+        if release_error:
+            self.status_var.set(f"КРИТИЧЕСКАЯ ОШИБКА: не удалось подтвердить отпускание кнопки мыши: {release_error}")
+        elif error:
+            self.status_var.set(error)
+        elif cancelled:
+            self.status_var.set("Перетаскивание кисти остановлено по F12; проверь положение ползунка вручную.")
+        elif state:
+            target_x, target_y = state["target"]
+            brush = state["brush"]
+            self.status_var.set(
+                f"Перетаскивание к радиусу кисти {brush} завершено ({target_x}, {target_y}). "
+                "Размер не подтверждён игрой — проверь значение перед рисованием."
+            )
 
     def capture_screenshot(self) -> None:
         self.status_var.set("Через 3 секунды будет сохранён полный скриншот экрана. Переключись в браузер.")
