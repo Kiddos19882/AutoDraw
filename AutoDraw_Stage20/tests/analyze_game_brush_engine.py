@@ -33,10 +33,19 @@ PATTERNS: dict[str, str] = {
     "canvas_transform": r"\.(?:setTransform|resetTransform|transform)\s*\(",
     "canvas_draw_image": r"\.drawImage\s*\(",
     "canvas_composite": r"\.globalCompositeOperation\b",
-    "brush_terms": r"brush|Brush|radius|thickness|lineWidth|lineCap|lineJoin",
-    "board_terms": r"BoardPane|BoardItem|BoardCanvas|DrawingBoard|CanvasRenderingContext2D",
-    "point_quota_terms": r"maxPoints|max_points|pointCount|point_count|pointsLimit|pointLimit",
-    "pointer_terms": r"pointerdown|pointermove|pointerup|mousedown|mousemove|mouseup|PointerEvent",
+    "egret_line_style": r"\.lineStyle\s*\(",
+    "egret_draw_circle": r"\.drawCircle\s*\(",
+    "egret_draw_ellipse": r"\.drawEllipse\s*\(",
+    "egret_curve_to": r"\.curveTo\s*\(",
+    "egret_begin_fill": r"\.beginFill\s*\(",
+    "egret_end_fill": r"\.endFill\s*\(",
+    "egret_draw_rect": r"\.drawRect\s*\(",
+    "brush_terms": r"brush|Brush|radius|thickness|lineWidth|lineCap|lineJoin|painterExtend|isPainterExtend",
+    "board_terms": r"BoardPane|BoardItem|BoardCanvas|DrawingBoard|CanvasRenderingContext2D|BLACK_BOARD_WIDTH|BLACK_BOARD_HEIGHT|isPainterExtend|maxPoint",
+    "board_dimensions": r"BLACK_BOARD_WIDTH|BLACK_BOARD_HEIGHT",
+    "board_draw_input": r"BoardPane\.prototype\.(?:start|move|draw|paint|clear|add|finish|end|begin)|BoardPane\.BLACK_BOARD_(?:WIDTH|HEIGHT)",
+    "point_quota_terms": r"maxPoints|max_points|pointCount|point_count|pointsLimit|pointLimit|maxPoint",
+    "pointer_terms": r"pointerdown|pointermove|pointerup|mousedown|mousemove|mouseup|PointerEvent|TOUCH_BEGIN|TOUCH_MOVE|TOUCH_END",
 }
 
 MAX_SNIPPETS_PER_PATTERN = 12
@@ -60,7 +69,9 @@ def collect_report(source: str, source_sha256: str, git_ref: str, git_path: str)
         pattern = re.compile(expression)
         matches = list(pattern.finditer(source))
         counts[name] = len(matches)
-        selected = matches[:MAX_SNIPPETS_PER_PATTERN]
+        first_half = MAX_SNIPPETS_PER_PATTERN // 2
+        selected_matches = matches[:first_half] + matches[-(MAX_SNIPPETS_PER_PATTERN - first_half):]
+        selected = list({match.start(): match for match in selected_matches}.values())
         snippets[name] = [
             {
                 "offset": match.start(),
