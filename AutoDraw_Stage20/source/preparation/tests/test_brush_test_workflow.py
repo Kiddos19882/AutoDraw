@@ -4,7 +4,9 @@ import json
 
 import pytest
 
-from brush_test_workflow import BrushExperimentState, BrushWorkflowError, PHASES
+from brush_test_workflow import (
+    BrushExperimentState, BrushWorkflowError, PHASES, calculate_slider_target,
+)
 
 
 def _state() -> BrushExperimentState:
@@ -79,3 +81,29 @@ def test_warning_is_preserved_in_manifest_and_empty_warning_is_ignored() -> None
     state.add_warning("brush value not visually verified")
     state.add_warning("  ")
     assert state.to_dict()["warnings"] == ["brush value not visually verified"]
+
+
+
+@pytest.mark.parametrize(
+    "brush, expected",
+    [
+        (30, (100, 500)),
+        (20, (200, 500)),
+        (14, (260, 500)),
+        (7, (330, 500)),
+        (1, (390, 500)),
+    ],
+)
+def test_slider_target_maps_radius_30_left_to_radius_1_right(brush, expected) -> None:
+    assert calculate_slider_target((100, 500), (390, 500), brush) == expected
+
+
+@pytest.mark.parametrize("brush", [0, 31, True, 14.5])
+def test_slider_target_rejects_invalid_brush_values(brush) -> None:
+    with pytest.raises(ValueError):
+        calculate_slider_target((100, 500), (390, 500), brush)
+
+
+def test_slider_target_supports_diagonal_calibration() -> None:
+    assert calculate_slider_target((100, 200), (390, 490), 1) == (390, 490)
+    assert calculate_slider_target((100, 200), (390, 490), 30) == (100, 200)
