@@ -494,6 +494,8 @@ class ColorScanlineTab:
                     simplify_tolerance_px=tolerance,
                     min_component_area=min_component_area,
                     source_name=self.source_name,
+                    board_point_limit=6_000,
+                    point_safety_factor=0.85,
                 )
             else:
                 plan, report = optimize_geometry_plan_to_budget(
@@ -525,7 +527,9 @@ class ColorScanlineTab:
             f"допуск RDP {report['simplify_tolerance_px']:.1f} px, "
             f"минимальный компонент {report['min_component_area']} px; "
             f"расход {report['estimated_ink_after_px_equivalent']:,.0f}/"
-            f"{report['target_cost_px_equivalent']:,.0f} px-экв."
+            f"{report['target_cost_px_equivalent']:,.0f} px-экв.; "
+            f"игровые точки {report['estimated_game_points_after']:,}/"
+            f"{report['target_point_count']:,} (лимит BoardItem2: {report['board_point_limit']:,})"
         )
         if not report["fits_budget"]:
             fit_text += " В одну доску не укладывается — можно попробовать разбиение."
@@ -577,7 +581,11 @@ class ColorScanlineTab:
                 f"Бюджетная оптимизация: масштаб {optimization.get('scale', 1.0):.1f}; "
                 f"RDP {optimization.get('simplify_tolerance_px', 0.0):.1f} px; "
                 f"мин. компонент {optimization.get('min_component_area', 1)} px; "
-                f"в бюджет: {'да' if optimization.get('fits_budget') else 'нет'}."
+                f"краска: {'да' if optimization.get('fits_paint_budget') else 'нет'}; "
+                f"игровые точки: {'да' if optimization.get('fits_point_budget') else 'нет'} "
+                f"({optimization.get('estimated_game_points_after', 0):,}/"
+                f"{optimization.get('target_point_count', 0):,}, BoardItem2); "
+                f"оба ограничения: {'да' if optimization.get('fits_budget') else 'нет'}."
             )
             mode_candidates = optimization.get("mode_candidates", [])
             if mode_candidates:
@@ -585,7 +593,8 @@ class ColorScanlineTab:
                     "Сравнение режимов (совпадение по предпросмотру): "
                     + " · ".join(
                         f"{item['mode']}: {item['quality_pixel_accuracy_percent']:.1f}% "
-                        f"совпадение, {item['estimated_ink_after_px_equivalent']:,.0f} px-экв."
+                        f"совпадение, {item['estimated_ink_after_px_equivalent']:,.0f} px-экв., "
+                        f"{item['estimated_game_points_after']:,}/{item['target_point_count']:,} точек"
                         for item in mode_candidates
                     )
                 )
