@@ -24,7 +24,10 @@ def test_workflow_advances_through_exactly_one_complete_experiment() -> None:
     assert state.status == "running"
 
     for phase in PHASES[1:]:
-        state.advance(phase, {"confirmed": True})
+        result = {"confirmed": True}
+        if state.phase == "before_clear" and phase == "before_capture":
+            result["board_clear_status"] = "restored"
+        state.advance(phase, result)
 
     result = state.to_dict()
     assert result["phase"] == "completed"
@@ -193,3 +196,35 @@ def test_preflight_rejects_region_that_exceeds_screen_bounds():
     )
     assert result["valid"] is False
     assert any("board_area выходит за пределы" in error for error in result["errors"])
+
+
+def test_workflow_blocks_progress_when_clear_is_not_verified():
+    state = _state()
+    state.advance("preflight", {"profile_valid": True})
+    with pytest.raises(BrushWorkflowError, match="очистка доски не подтверждена"):
+        state.advance("before_clear", {"clear_click_sent": True})
+    assert state.phase == "preflight"
+
+
+@pytest.mark.parametrize("clear_status", ["not_restored", "inconclusive", None, ""])
+def test_workflow_rejects_uncertain_board_clear(clear_status):
+    state = _state()
+    state.advance("preflight", {"profile_valid": True})
+    result = {"clear_click_sent": True}
+    if clear_status is not None:
+        result["board_clear_status"] = clear_status
+    with pytest.raises(BrushWorkflowError, match="очистка доски не подтверждена"):
+        state.advance("before_clear", result)
+    assert state.phase == "preflight"
+
+
+def test_workflow_accepts_explicit_blank_reference_match():
+    state = _state()
+    state.advance("preflight", {"profile_valid": True})
+    state.advance("before_clear", {
+        "clear_click_sent": True,
+        "board_clear_status": "restored_within_pixel_tolerance",
+        "reference_type": "explicit_blank_board_roi",
+    })
+    state.advance("before_capture", {"capture_saved": True})
+    assert state.phase == "before_capture"
