@@ -598,11 +598,12 @@ class BrushBehaviorTestTab:
         except Exception as exc:
             self._finish_brush_drag(error=f"Ошибка перемещения ползунка: {exc}")
 
-    def _on_brush_workflow_stop_key(self, _event=None) -> str:
-        """F12 cancels a pending or active brush drag and always releases the mouse."""
+    def _on_brush_workflow_stop_key(self, _event=None) -> str | None:
+        """F12 cancels a brush drag; otherwise let the executor's F12 handler run."""
         if self._brush_drag_state is not None:
             self._finish_brush_drag(cancelled=True)
-        return "break"
+            return "break"
+        return None
 
     def cancel_brush_drag(self) -> None:
         """Public cancellation hook for a future full experiment controller."""
