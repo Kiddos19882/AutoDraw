@@ -11,6 +11,8 @@ from typing import Any
 
 import numpy as np
 
+from brush_footprint_geometry import footprint_pixel_bounds
+
 
 BRUSH_PLAN_SCHEMA_VERSION = 1
 BRUSH_PLAN_TYPE = "autodraw_adaptive_brush_plan"
@@ -73,15 +75,13 @@ def _line_is_safe(
     scale_y: float,
 ) -> bool:
     """Check the brush footprint against exact palette indexes, conservatively."""
-    half_x = brush_value * scale_x / 2.0
-    half_y = brush_value * scale_y / 2.0
     height, width = indexes.shape
-    left = max(0, math.ceil(x_start - half_x - 1e-9))
-    right = min(width - 1, math.floor(x_end + half_x + 1e-9))
-    top = max(0, math.ceil(y - half_y - 1e-9))
-    bottom = min(height - 1, math.floor(y + half_y + 1e-9))
-    if left > right or top > bottom:
+    bounds = footprint_pixel_bounds(
+        x_start, x_end, y, brush_value, scale_x, scale_y, width, height
+    )
+    if bounds is None:
         return False
+    left, right, top, bottom = bounds
     region = indexes[top:bottom + 1, left:right + 1]
     return bool(region.size and np.all(region == palette_index))
 
