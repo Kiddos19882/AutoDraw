@@ -356,6 +356,99 @@ def test_brush_drag_completion_releases_mouse_and_does_not_claim_verified_value(
 
 
 
+def test_automatic_brush_setup_requires_visual_confirmation_before_executor(monkeypatch):
+    class Value:
+        def __init__(self, value=""):
+            self.value = value
+        def set(self, value):
+            self.value = value
+
+    class FakeUser32:
+        def __init__(self):
+            self.events = []
+        def mouse_event(self, flags, *_args):
+            self.events.append(flags)
+
+    class Root:
+        def __init__(self):
+            self.restored = False
+            self.scheduled = []
+        def deiconify(self):
+            self.restored = True
+        def lift(self):
+            pass
+        def after(self, delay, callback):
+            self.scheduled.append((delay, callback))
+            return "scheduled"
+
+    tab = _make_test_tab()
+    tab.root = Root()
+    tab.status_var = Value()
+    tab._start_executor_after_brush_drag = True
+    tab.on_brush_ready = lambda brush: tab.status_var.set(f"executor:{brush}")
+    tab._brush_drag_mouse_down = True
+    user32 = FakeUser32()
+    tab._brush_drag_state = {
+        "user32": user32, "start": (1195, 327), "target": (1322, 327),
+        "brush": 10, "purpose": "set_brush_size",
+    }
+    monkeypatch.setattr(brush_ui.messagebox, "askyesno", lambda *args, **kwargs: False)
+    tab._finish_brush_drag()
+
+    assert user32.events == [0x0004]
+    assert tab.root.restored is True
+    assert tab.experiment_phases["brush_setup"]["status"] == "declined_by_user"
+    assert tab._start_executor_after_brush_drag is False
+    assert tab.root.scheduled == []
+    assert "не подтверждён" in tab.status_var.value
+
+
+def test_automatic_brush_setup_starts_executor_only_after_confirmation(monkeypatch):
+    class Value:
+        def __init__(self, value=""):
+            self.value = value
+        def set(self, value):
+            self.value = value
+
+    class FakeUser32:
+        def mouse_event(self, *_args):
+            pass
+
+    class Root:
+        def __init__(self):
+            self.restored = False
+            self.scheduled = []
+        def deiconify(self):
+            self.restored = True
+        def lift(self):
+            pass
+        def after(self, delay, callback):
+            self.scheduled.append((delay, callback))
+            return "scheduled"
+
+    tab = _make_test_tab()
+    tab.root = Root()
+    tab.status_var = Value()
+    tab._start_executor_after_brush_drag = True
+    started = []
+    tab.on_brush_ready = lambda brush: started.append(brush)
+    tab._brush_drag_mouse_down = True
+    tab._brush_drag_state = {
+        "user32": FakeUser32(), "start": (1195, 327), "target": (1322, 327),
+        "brush": 10, "purpose": "set_brush_size",
+    }
+    monkeypatch.setattr(brush_ui.messagebox, "askyesno", lambda *args, **kwargs: True)
+    tab._finish_brush_drag()
+
+    assert tab.experiment_phases["brush_setup"]["status"] == "confirmed_by_user"
+    assert tab.experiment_phases["brush_setup"]["confirmation_method"] == "explicit_user_visual_confirmation"
+    assert len(tab.root.scheduled) == 1
+    delay, callback = tab.root.scheduled[0]
+    assert delay == 0
+    callback()
+    assert started == [10]
+
+
 def test_f12_is_not_consumed_when_no_brush_drag_is_active() -> None:
     tab = _make_test_tab()
     tab._brush_drag_state = None
