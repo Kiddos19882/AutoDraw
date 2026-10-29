@@ -17,8 +17,9 @@ if str(PREPARATION_ROOT) not in sys.path:
 
 from benchmark_drawing_algorithms import load_git_image, make_index_map, _resolved_path
 from drawing_algorithm_benchmark import load_palette_document
-from geometry_budget_optimizer import optimize_geometry_plan_to_budget
-from geometry_color_plan import render_geometry_color_preview
+from geometry_budget_optimizer import measure_geometry_plan_quality, optimize_geometry_plan_to_budget
+from geometry_color_plan import build_geometry_color_plan, render_geometry_color_preview, _estimate_geometry_paint_cost
+from engine_point_calibration import estimate_point_quota_usage
 from board_resource_model import get_board_point_limit
 
 
@@ -74,6 +75,41 @@ def benchmark_case(
     safety_factor: float,
     scenario: str,
 ) -> dict[str, Any]:
+    baseline: dict[str, Any] = {"available": False, "note": None}
+    try:
+        baseline_plan = build_geometry_color_plan(
+            index_map, palette, mode="scanline", simplify_tolerance_px=0.0,
+            min_component_area=1, source_name=f"stage8-baseline:{name}:{scenario}",
+        )
+        baseline_quality = measure_geometry_plan_quality(index_map, baseline_plan)
+        baseline_paint = _estimate_geometry_paint_cost(
+            baseline_plan, stroke_overhead_px_equivalent=6.67,
+            paint_budget_px_equivalent=budget,
+        )
+        baseline_points = estimate_point_quota_usage(
+            drawing_length_px=float(baseline_paint["drawing_length_px"]),
+            stroke_count=int(baseline_paint["stroke_count"]),
+            single_pixel_stroke_count=int(baseline_paint["single_pixel_stroke_count"]),
+            board_point_limit=point_limit,
+            safety_factor=safety_factor,
+        )
+        baseline = {
+            "available": True,
+            "stroke_count": int(baseline_paint["stroke_count"]),
+            "path_length_px": baseline_paint["drawing_length_px"],
+            "paint_cost_px_equivalent": baseline_paint["estimated_total_ink_px_equivalent"],
+            "estimated_game_points": baseline_points["estimated_point_count"],
+            "fits_paint_budget": float(baseline_paint["estimated_total_ink_px_equivalent"]) <= budget * target_usage_percent / 100.0,
+            "fits_point_budget": int(baseline_points["estimated_point_count"]) <= int(baseline_points["planning_budget_points"]),
+            "quality_mismatch_pixel_count": baseline_quality["quality_mismatch_pixel_count"],
+            "quality_mismatch_percent": baseline_quality["quality_mismatch_percent"],
+            "quality_pixel_accuracy_percent": baseline_quality["quality_pixel_accuracy_percent"],
+            "quality_visible_pixel_accuracy_percent": baseline_quality["quality_visible_pixel_accuracy_percent"],
+            "quality_measure_scope": baseline_quality["quality_measure_scope"],
+        }
+    except (ValueError, TypeError, MemoryError) as exc:
+        baseline = {"available": False, "note": f"{type(exc).__name__}: {exc}"}
+
     plan, report = optimize_geometry_plan_to_budget(
         index_map,
         palette,
@@ -88,6 +124,9 @@ def benchmark_case(
     case_dir = output_dir / name / scenario
     case_dir.mkdir(parents=True, exist_ok=True)
     save_index_map(index_map, palette, case_dir / "input.png")
+    if baseline.get("available"):
+        render_geometry_color_preview(baseline_plan, max_dimension=max(index_map.shape)).save(case_dir / "baseline-preview.png")
+        (case_dir / "baseline-plan.json").write_text(json.dumps(baseline_plan, ensure_ascii=False, indent=2), encoding="utf-8")
     render_geometry_color_preview(plan, max_dimension=max(index_map.shape)).save(case_dir / "optimized-preview.png")
     (case_dir / "plan.json").write_text(
         json.dumps(plan, ensure_ascii=False, indent=2), encoding="utf-8"
@@ -121,8 +160,15 @@ def benchmark_case(
         "quality_pixel_accuracy_percent": report.get("quality_pixel_accuracy_percent"),
         "quality_visible_pixel_accuracy_percent": report.get("quality_visible_pixel_accuracy_percent"),
         "quality_measure_scope": report.get("quality_measure_scope"),
+        "baseline": baseline,
+        "coarsening_quality_loss_percentage_points": (
+            round(float(baseline["quality_pixel_accuracy_percent"]) - float(report["quality_pixel_accuracy_percent"]), 4)
+            if baseline.get("available") else None
+        ),
         "artifacts": {
             "input": str((case_dir / "input.png").relative_to(REPO_ROOT)),
+            "baseline_preview": str((case_dir / "baseline-preview.png").relative_to(REPO_ROOT)) if baseline.get("available") else None,
+            "baseline_plan": str((case_dir / "baseline-plan.json").relative_to(REPO_ROOT)) if baseline.get("available") else None,
             "plan": str((case_dir / "plan.json").relative_to(REPO_ROOT)),
             "preview": str((case_dir / "optimized-preview.png").relative_to(REPO_ROOT)),
             "report": str((case_dir / "report.json").relative_to(REPO_ROOT)),
