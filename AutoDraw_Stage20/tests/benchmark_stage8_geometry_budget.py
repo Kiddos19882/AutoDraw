@@ -234,7 +234,7 @@ def main() -> int:
     results.append(benchmark_case(
         "constraint-isolation", small_checkerboard, SYNTHETIC_PALETTE, artifact_dir,
         budget=14_000.0, target_usage_percent=args.target_usage_percent,
-        point_limit=12_000, safety_factor=args.safety_factor, scenario="paint-budget-priority",
+        point_limit=12_000, safety_factor=1.0, scenario="paint-budget-priority",
     ))
     results.append(benchmark_case(
         "constraint-isolation", small_checkerboard, SYNTHETIC_PALETTE, artifact_dir,
