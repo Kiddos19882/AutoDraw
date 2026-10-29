@@ -12,10 +12,10 @@ def make_cases(output_dir: Path) -> list[Path]:
     size = (320, 160)
     paths: list[Path] = []
 
-    image = Image.new("RGBA", size, (0, 0, 0, 0))
+    image = Image.new("RGBA", size, (255, 255, 255, 255))
     draw = ImageDraw.Draw(image)
     draw.rectangle((12, 12, 170, 145), fill=(35, 125, 220, 255))
-    draw.ellipse((55, 42, 120, 108), fill=(0, 0, 0, 0))
+    draw.ellipse((55, 42, 120, 108), fill=(255, 255, 255, 255))
     draw.rectangle((171, 12, 307, 145), fill=(220, 65, 55, 255))
     draw.rectangle((205, 38, 270, 118), fill=(245, 195, 45, 255))
     paths.append(_save(image, output_dir, "broad_regions_hole_and_neighbor.png"))
