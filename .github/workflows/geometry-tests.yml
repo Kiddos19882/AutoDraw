@@ -101,6 +101,22 @@ jobs:
           path: AutoDraw_Stage20/benchmark-results/stage7-synthetic/
           if-no-files-found: ignore
 
+      - name: Benchmark Stage 8 geometry budget and preview quality
+        shell: pwsh
+        run: |
+          python ..\\..\\tests\\benchmark_stage8_geometry_budget.py --git-ref origin/master --git-path AutoDraw_Stage20/testImages/images.png --target-width 646 --target-height 323 --palette-json AutoDraw_Stage20/data/palettes/profiles/Browser_palette.autodraw-palette.json --board-item-type BoardItem2 --target-usage-percent 75 --output AutoDraw_Stage20/benchmark-results/stage8/report.json --artifact-dir AutoDraw_Stage20/benchmark-results/stage8/cases
+      - name: Validate Stage 8 budget and quality report
+        shell: pwsh
+        run: |
+          python ..\\..\\tests\\validate_stage8_geometry_budget_report.py --report AutoDraw_Stage20/benchmark-results/stage8/report.json
+      - name: Upload Stage 8 geometry budget reports and previews
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stage8-geometry-budget-quality
+          path: AutoDraw_Stage20/benchmark-results/stage8/
+          if-no-files-found: ignore
+
       - name: Run preparation and geometry tests
         run: python -m pytest -q -ra tests
 
