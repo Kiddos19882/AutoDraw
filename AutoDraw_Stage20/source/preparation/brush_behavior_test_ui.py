@@ -707,6 +707,12 @@ class BrushBehaviorTestTab:
                 f"Перетаскивание к радиусу кисти {brush} завершено ({target_x}, {target_y}). "
                 "Размер не подтверждён игрой — проверь значение перед рисованием."
             )
+        if cancelled or error or release_error:
+            try:
+                self.root.deiconify()
+                self.root.lift()
+            except tk.TclError:
+                pass
 
     def capture_screenshot(self) -> None:
         self.status_var.set("Через 3 секунды будет сохранён полный скриншот экрана. Переключись в браузер.")
