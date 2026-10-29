@@ -221,3 +221,82 @@ def test_set_brush_size_rejects_preset_click_mode(monkeypatch) -> None:
     assert tab.root.scheduled == []
     assert warnings
     assert "перетаскиванием" in warnings[0][1]
+
+
+
+def test_brush_drag_f12_cancellation_releases_mouse_without_real_input() -> None:
+    class Value:
+        def __init__(self, value=""):
+            self.value = value
+        def set(self, value):
+            self.value = value
+
+    class FakeUser32:
+        def __init__(self):
+            self.events = []
+        def mouse_event(self, flags, *_args):
+            self.events.append(flags)
+
+    class Root:
+        def __init__(self):
+            self.cancelled = []
+        def after_cancel(self, callback_id):
+            self.cancelled.append(callback_id)
+
+    tab = brush_ui.BrushBehaviorTestTab.__new__(brush_ui.BrushBehaviorTestTab)
+    tab.root = Root()
+    tab.status_var = Value()
+    tab._brush_drag_after_id = "scheduled-step"
+    tab._brush_drag_mouse_down = True
+    user32 = FakeUser32()
+    tab._brush_drag_state = {
+        "user32": user32,
+        "target": (250, 500),
+        "brush": 14,
+    }
+
+    assert tab._on_brush_workflow_stop_key() == "break"
+
+    assert user32.events == [0x0004]  # MOUSEEVENTF_LEFTUP
+    assert tab._brush_drag_state is None
+    assert tab._brush_drag_mouse_down is False
+    assert tab._brush_drag_after_id is None
+    assert tab.root.cancelled == ["scheduled-step"]
+    assert "остановлено по F12" in tab.status_var.value
+
+
+def test_brush_drag_completion_releases_mouse_and_does_not_claim_verified_value() -> None:
+    class Value:
+        def __init__(self, value=""):
+            self.value = value
+        def set(self, value):
+            self.value = value
+
+    class FakeUser32:
+        def __init__(self):
+            self.events = []
+        def mouse_event(self, flags, *_args):
+            self.events.append(flags)
+
+    class Root:
+        def after_cancel(self, _callback_id):
+            raise AssertionError("No pending callback expected")
+
+    tab = brush_ui.BrushBehaviorTestTab.__new__(brush_ui.BrushBehaviorTestTab)
+    tab.root = Root()
+    tab.status_var = Value()
+    tab._brush_drag_after_id = None
+    tab._brush_drag_mouse_down = True
+    user32 = FakeUser32()
+    tab._brush_drag_state = {
+        "user32": user32,
+        "target": (250, 500),
+        "brush": 14,
+    }
+
+    tab._finish_brush_drag()
+
+    assert user32.events == [0x0004]
+    assert tab._brush_drag_state is None
+    assert tab._brush_drag_mouse_down is False
+    assert "не подтверждён игрой" in tab.status_var.value
