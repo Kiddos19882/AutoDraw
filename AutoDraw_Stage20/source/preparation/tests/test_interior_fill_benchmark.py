@@ -34,3 +34,12 @@ def test_footprint_default_scale_preserves_isotropic_behavior():
     }
 
     assert _footprint(indexes, stroke) == (8, 8, 14, 12)
+
+def test_footprint_includes_cells_touched_by_fractional_brush_edges():
+    indexes = np.zeros((10, 10), dtype=np.int32)
+    stroke = {
+        "brush_value": 1,
+        "points": [{"x": 3.0, "y": 3.0}, {"x": 3.0, "y": 3.0}],
+    }
+
+    assert _footprint(indexes, stroke, scale_x=1.4, scale_y=1.4) == (2, 2, 4, 4)
