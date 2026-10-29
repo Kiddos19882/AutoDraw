@@ -1143,3 +1143,12 @@ CI для изменений Stage 8: [workflow Geometry planner tests](https://
 - Путь к общему пакету добавлен в `(ф) source/executor/run_tests.bat`, в CI jobs подготовки и executor, а также явно в `--paths` сборщика `build_windows.py`.
 - Код внесён коммитами `b108c7e`–`30ca2e4`; Python-тесты и portable build ещё не подтверждены после этих изменений.
 - Не удалять compatibility-модули до успешного CI. Не менять геометрический алгоритм, бюджетные модели или флаги безопасности в рамках этого рефакторинга.
+
+
+### Общий конвейер обработки изображений — 29 октября 2026 г.
+
+- Добавлен пакет shared_image_processing в корне Stage20. Канонический pipeline.py сохранён без изменения алгоритма обработки; общий пакет экспортирует ProcessingSettings, ProcessingResult, режимы и функции подготовки изображения.
+- В source/preparation/image_processing и source/executor/image_processing оставлены compatibility-модули. Они сохраняют прежние пути импорта, а реализации типов и функций берутся из общего пакета. preview_pane.py остаётся в executor, поскольку это компонент интерфейса, а не общий pipeline.
+- В tests/test_import_resolution_diagnostics.py добавлена проверка, что подготовка и исполнитель используют идентичные объекты ProcessingSettings и ProcessingResult. Существующая диагностика коротких импортов должна по-прежнему подтверждать выбор компонента по порядку sys.path.
+- Изменение внесено коммитами 70fe7c4, 6075bd0, dcb29c6, bfdf727, bdefb5a, 955ad2e, ce3405f. CI и Windows portable smoke-test на HEAD ce3405f ожидают выполнения; локальный запуск тестов здесь не выполнялся.
+- Не удалять compatibility-модули до успешных тестов и portable-сборки. Геометрические алгоритмы, сериализация планов и модель расходов не менялись.
