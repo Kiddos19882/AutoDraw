@@ -19,7 +19,7 @@ from stage8_optimizer import save_plan
 from brush_test_workflow import calculate_slider_target, validate_brush_test_preflight
 from brush_experiment_capture import (
     compare_images, crop_calibrated_regions,
-    measure_meter_fill_against_baseline, evaluate_meter_restoration,
+    measure_meter_fill_against_baseline, evaluate_meter_restoration, evaluate_board_clear,
 )
 
 
@@ -279,6 +279,7 @@ class BrushBehaviorTestTab:
         actions.pack(fill="x", pady=(0, 8))
         ttk.Button(actions, text="Создать и передать тест в исполнитель →", command=self.create_and_transfer_plan).pack(side="left")
         ttk.Button(actions, text="Снять скриншот сейчас", command=self.capture_screenshot).pack(side="left", padx=(6, 0))
+        ttk.Button(actions, text="Сохранить эталон пустой доски…", command=self.capture_blank_board_reference).pack(side="left", padx=(6, 0))
         ttk.Button(actions, text="Привязать отчёт исполнения…", command=self.load_execution_report).pack(side="left", padx=(6, 0))
         ttk.Button(actions, text="Эксперимент: снимок ДО", command=lambda: self.capture_experiment_phase("before_draw")).pack(side="left", padx=(6, 0))
         ttk.Button(actions, text="Эксперимент: ПОСЛЕ рисования", command=lambda: self.capture_experiment_phase("after_draw")).pack(side="left", padx=(6, 0))
@@ -736,6 +737,80 @@ class BrushBehaviorTestTab:
         except Exception as exc:
             messagebox.showerror("Не удалось снять скриншот", str(exc), parent=self.root)
 
+    def _blank_board_reference_paths(self) -> tuple[Path, Path]:
+        return (
+            self.output_dir / "blank-board-reference.png",
+            self.output_dir / "blank-board-reference.json",
+        )
+
+    def capture_blank_board_reference(self) -> None:
+        """Capture an explicitly user-confirmed blank-board ROI for later Clear checks."""
+        config = self.get_calibration_profile() if callable(self.get_calibration_profile) else None
+        if not isinstance(config, dict):
+            messagebox.showwarning(
+                "Профиль калибровки недоступен",
+                "Сначала сохрани и проверь профиль калибровки на вкладке 8.",
+                parent=self.root,
+            )
+            return
+        regions = config.get("regions", {})
+        statuses = config.get("status", {})
+        region_status = statuses.get("regions", {}) if isinstance(statuses, dict) else {}
+        board_region = regions.get("board_area") if isinstance(regions, dict) else None
+        if not isinstance(board_region, dict) or region_status.get("board_area") == "needs_review":
+            messagebox.showwarning(
+                "Область доски требует проверки",
+                "Проверь ROI игровой доски на вкладке 8 перед созданием эталона.",
+                parent=self.root,
+            )
+            return
+        if not messagebox.askyesno(
+            "Эталон пустой доски",
+            "Убедись, что игровая доска уже полностью пустая, затем переключись в браузер. "
+            "Будет сохранён отдельный эталон ROI, который используется для проверки Clear. Продолжить?",
+            icon="warning",
+            parent=self.root,
+        ):
+            return
+        self.status_var.set("Через 3 секунды будет снят эталон пустой доски. Переключись в браузер.")
+        self.root.withdraw()
+        self.root.after(3000, lambda: self._capture_blank_board_reference_now(config))
+
+    def _capture_blank_board_reference_now(self, config: dict[str, Any]) -> None:
+        try:
+            screen = ImageGrab.grab()
+            expected = config.get("screen_size", {})
+            if isinstance(expected, dict):
+                ew, eh = expected.get("width"), expected.get("height")
+                if ew is not None and eh is not None and (int(ew), int(eh)) != screen.size:
+                    raise ValueError(
+                        f"Разрешение профиля {ew} × {eh} не совпадает со снимком "
+                        f"{screen.width} × {screen.height}."
+                    )
+            crops = crop_calibrated_regions(screen, config.get("regions", {}))
+            reference_path, metadata_path = self._blank_board_reference_paths()
+            crops["board_area"].save(reference_path)
+            region = config["regions"]["board_area"]
+            metadata = {
+                "schema_version": 1,
+                "reference_type": "user_confirmed_blank_board_roi",
+                "captured_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                "screen_size": {"width": screen.width, "height": screen.height},
+                "board_region": {key: int(region[key]) for key in ("x", "y", "width", "height")},
+                "calibration_profile_path": str(config.get("profile_path", "")) or None,
+                "image_file": reference_path.name,
+                "user_confirmed_blank": True,
+                "limitations": "Visual reference only; does not prove the game's internal board state.",
+            }
+            metadata_path.write_text(json.dumps(metadata, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            self.status_var.set(f"Эталон пустой доски сохранён: {reference_path}. Перед использованием проверь, что доска действительно пуста.")
+        except Exception as exc:
+            self.status_var.set(f"Не удалось сохранить эталон пустой доски: {exc}")
+            messagebox.showerror("Не удалось сохранить эталон", str(exc), parent=self.root)
+        finally:
+            self.root.deiconify()
+            self.root.lift()
+
     def capture_experiment_phase(self, phase: str) -> None:
         """Capture calibrated board/meter evidence for before, after-draw and after-clear phases."""
         labels = {
@@ -875,6 +950,34 @@ class BrushBehaviorTestTab:
             }
             before = self.experiment_phases.get("before_draw")
             after = self.experiment_phases.get("after_draw")
+            if phase == "after_clear":
+                reference_path, metadata_path = self._blank_board_reference_paths()
+                clear_check: dict[str, Any] = {
+                    "status": "inconclusive",
+                    "reason": "missing_explicit_blank_board_reference",
+                    "note": "Очистка не считается подтверждённой без отдельного эталона пустой доски.",
+                }
+                try:
+                    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+                    region = config.get("regions", {}).get("board_area", {})
+                    current_region = {key: int(region[key]) for key in ("x", "y", "width", "height")}
+                    if (
+                        metadata.get("reference_type") != "user_confirmed_blank_board_roi"
+                        or metadata.get("user_confirmed_blank") is not True
+                        or metadata.get("board_region") != current_region
+                        or metadata.get("screen_size") != {"width": screen.width, "height": screen.height}
+                        or not reference_path.is_file()
+                    ):
+                        clear_check["reason"] = "reference_profile_mismatch_or_invalid"
+                    else:
+                        with Image.open(reference_path) as reference_image, Image.open(board_path) as after_clear_image:
+                            clear_check = evaluate_board_clear(reference_image.copy(), after_clear_image.copy())
+                            clear_check["reference_file"] = reference_path.name
+                except (OSError, ValueError, TypeError, KeyError, json.JSONDecodeError) as exc:
+                    clear_check["reason"] = "reference_unavailable_or_invalid"
+                    clear_check["error"] = str(exc)
+                phase_record["board_clear_check"] = clear_check
+                phase_record["board_clear_status"] = clear_check.get("status", "inconclusive")
             if before is not None:
                 baseline_meter_path = self.experiment_dir / before["files"]["paint_meter_roi"]
                 with Image.open(baseline_meter_path) as baseline_meter, Image.open(meter_path) as current_meter:
@@ -907,6 +1010,7 @@ class BrushBehaviorTestTab:
                     "Ambiguous or non-contiguous changes are marked inconclusive and require manual review.",
                     "A successful executor report does not prove that every stroke was registered by the game.",
                     "The after-clear phase clicks Clear only after explicit confirmation.",
+                    "Board-clear status is confirmed only against a separately captured, user-confirmed blank-board ROI; missing/mismatched reference means inconclusive.",
                 ],
             }
             manifest_path = self.experiment_dir / "experiment.json"
