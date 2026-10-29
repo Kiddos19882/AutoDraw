@@ -30,15 +30,24 @@ from geometry_color_plan import build_geometry_color_plan  # noqa: E402
 from interior_fill_planner import build_interior_fill_plan  # noqa: E402
 
 
-def _footprint(indexes: np.ndarray, stroke: dict[str, Any]) -> tuple[int, int, int, int]:
+def _footprint(
+    indexes: np.ndarray,
+    stroke: dict[str, Any],
+    *,
+    scale_x: float = 1.0,
+    scale_y: float = 1.0,
+) -> tuple[int, int, int, int]:
+    """Return the modeled brush bounds using independent X/Y scale factors."""
     brush = float(stroke["brush_value"])
     first, last = stroke["points"]
     x1, x2, y = float(first["x"]), float(last["x"]), float(first["y"])
+    half_x = brush * scale_x / 2.0
+    half_y = brush * scale_y / 2.0
     height, width = indexes.shape
-    left = max(0, int(np.ceil(min(x1, x2) - brush / 2 - 1e-9)))
-    right = min(width - 1, int(np.floor(max(x1, x2) + brush / 2 + 1e-9)))
-    top = max(0, int(np.ceil(y - brush / 2 - 1e-9)))
-    bottom = min(height - 1, int(np.floor(y + brush / 2 + 1e-9)))
+    left = max(0, int(np.ceil(min(x1, x2) - half_x - 1e-9)))
+    right = min(width - 1, int(np.floor(max(x1, x2) + half_x + 1e-9)))
+    top = max(0, int(np.ceil(y - half_y - 1e-9)))
+    bottom = min(height - 1, int(np.floor(y + half_y + 1e-9)))
     return left, top, right, bottom
 
 
@@ -47,8 +56,13 @@ def summarize_interior_fill(indexes: np.ndarray, plan: dict[str, Any]) -> dict[s
     rendered = np.full((height, width), -1, dtype=np.int32)
     invalid_footprints = 0
     modeled_length = 0.0
+    brush_configuration = plan.get("brush_configuration", {})
+    scale_x = float(brush_configuration.get("scale_x_source_px_per_game_unit", 1.0))
+    scale_y = float(brush_configuration.get("scale_y_source_px_per_game_unit", 1.0))
     for stroke in plan["strokes"]:
-        left, top, right, bottom = _footprint(indexes, stroke)
+        left, top, right, bottom = _footprint(
+            indexes, stroke, scale_x=scale_x, scale_y=scale_y
+        )
         region = indexes[top:bottom + 1, left:right + 1]
         if not region.size or not np.all(region == int(stroke["color_index"])):
             invalid_footprints += 1
