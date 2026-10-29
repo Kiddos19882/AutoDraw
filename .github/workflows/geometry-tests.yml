@@ -90,6 +90,9 @@ jobs:
             python ..\..\tests\benchmark_stage7_interior_fill.py --image-file $_.FullName --target-width 646 --target-height 323 --palette-json AutoDraw_Stage20/data/palettes/profiles/Browser_palette.autodraw-palette.json --background-mode preserve --output "AutoDraw_Stage20/benchmark-results/stage7-synthetic/$name-report.json" --preview-dir "AutoDraw_Stage20/benchmark-results/stage7-synthetic/$name-previews"
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           }
+          $reportDir = Join-Path $env:GITHUB_WORKSPACE "AutoDraw_Stage20/benchmark-results/stage7-synthetic"
+          python ..\..\tests\validate_stage7_synthetic_reports.py --report-dir $reportDir
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Upload Stage 7 synthetic geometry reports
         if: always()
         uses: actions/upload-artifact@v4
