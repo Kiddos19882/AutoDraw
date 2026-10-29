@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import cv2
 import numpy as np
+from PIL import Image, ImageDraw
 
 
 def simplify_path(
@@ -44,11 +45,18 @@ def simplify_path(
                 return points
             xmin, xmax = min(x1, x2), max(x1, x2)
             ymin, ymax = min(y1, y2), max(y1, y2)
-            line = np.zeros((ymax - ymin + 1, xmax - xmin + 1), dtype=np.uint8)
-            cv2.line(
-                line, (x1 - xmin, y1 - ymin), (x2 - xmin, y2 - ymin),
-                1, 1, lineType=cv2.LINE_8,
+            # Match the benchmark and preview renderer exactly. OpenCV LINE_8
+            # and Pillow ImageDraw.line can rasterize some segments differently;
+            # validating with another rasterizer can approve a path that later
+            # paints transparent pixels in the preview.
+            roi_size = (xmax - xmin + 1, ymax - ymin + 1)
+            line_image = Image.new("1", roi_size, 0)
+            ImageDraw.Draw(line_image).line(
+                (x1 - xmin, y1 - ymin, x2 - xmin, y2 - ymin),
+                fill=1,
+                width=1,
             )
+            line = np.asarray(line_image, dtype=np.uint8)
             region = safe_mask[ymin:ymax + 1, xmin:xmax + 1]
             if bool(np.any((line > 0) & (region == 0))):
                 return points
