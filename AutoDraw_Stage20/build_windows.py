@@ -202,6 +202,7 @@ def main() -> int:
         prep_src = ROOT / "source" / "preparation"
         exec_src = ROOT / "source" / "executor"
         collect_args = [
+            "--paths", str(ROOT),
             "--paths", str(prep_src),
             "--paths", str(exec_src),
             "--collect-all", "PIL",
