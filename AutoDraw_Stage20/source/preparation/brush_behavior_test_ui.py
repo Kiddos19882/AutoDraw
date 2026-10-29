@@ -1379,6 +1379,9 @@ class BrushBehaviorTestTab:
             self.experiment_phases["postdraw_workflow"]["clear_click_sent"] = True
             self.experiment_phases["postdraw_workflow"]["status"] = "clear_requested"
             self._write_experiment_manifest()
+            if self._automated_postdraw_stop_requested or not self._automated_postdraw_active:
+                self._cancel_automated_postdraw()
+                return
             self.status_var.set("Результат сохранён; Clear нажат. Через 1,5 секунды проверяется пустая доска.")
             self._automated_postdraw_after_id = self.root.after(
                 1500, lambda: self._capture_automated_after_clear(config, reference_path, metadata)
