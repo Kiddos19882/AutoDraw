@@ -32,19 +32,37 @@ def distance_to_segment(px: float, py: float, ax: float, ay: float, bx: float, b
 
 
 def polyline_distance(points_a: list[tuple[float, float]], points_b: list[tuple[float, float]]) -> float:
-    """Approximate minimum centerline distance between two planned polylines."""
+    """Minimum separation between roughly parallel planned segments.
+
+    Perpendicular intersections and shared endpoints are intentionally ignored:
+    they are expected in rectangle corners and connected drawing geometry.
+    """
     if len(points_a) < 2 or len(points_b) < 2:
         return math.inf
     best = math.inf
     for (ax, ay), (bx, by) in zip(points_a, points_a[1:]):
+        avx, avy = bx - ax, by - ay
+        alen = math.hypot(avx, avy)
+        if alen < 1e-9:
+            continue
         for (cx, cy), (dx, dy) in zip(points_b, points_b[1:]):
-            # A crossing or touching pair of segments has zero separation.
-            denominator = (bx - ax) * (dy - cy) - (by - ay) * (dx - cx)
-            if abs(denominator) > 1e-9:
-                t = ((cx - ax) * (dy - cy) - (cy - ay) * (dx - cx)) / denominator
-                u = ((cx - ax) * (by - ay) - (cy - ay) * (bx - ax)) / denominator
-                if 0.0 <= t <= 1.0 and 0.0 <= u <= 1.0:
-                    return 0.0
+            bvx, bvy = dx - cx, dy - cy
+            blen = math.hypot(bvx, bvy)
+            if blen < 1e-9:
+                continue
+            # Compare only parallel-ish segments; right-angle joins should not
+            # be treated as overlapping brush footprints.
+            parallel = abs((avx * bvx + avy * bvy) / (alen * blen))
+            if parallel < 0.90:
+                continue
+            # Require overlap of projections along segment A, so distant
+            # collinear extensions do not trigger a false positive.
+            ux, uy = avx / alen, avy / alen
+            a0, a1 = 0.0, alen
+            b0 = (cx - ax) * ux + (cy - ay) * uy
+            b1 = (dx - ax) * ux + (dy - ay) * uy
+            if max(a0, min(b0, b1)) > min(a1, max(b0, b1)):
+                continue
             best = min(best,
                        distance_to_segment(ax, ay, cx, cy, dx, dy)[0],
                        distance_to_segment(bx, by, cx, cy, dx, dy)[0],
