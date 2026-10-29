@@ -65,3 +65,29 @@ def test_path_outside_canvas_is_rejected_even_if_footprint_clips_to_canvas():
     result = check_swept_footprint(indexes, [(-1, 2), (2, 2)], color_index=0)
     assert result["safe_for_color_map"] is False
     assert result["reason"] == "centerline_outside_canvas"
+
+
+def test_supercover_includes_both_side_cells_at_exact_corner_crossings():
+    from swept_footprint_geometry import _supercover_segment
+
+    cells = set(_supercover_segment((0, 0), (2, 2)))
+    assert {(1, 0), (0, 1), (1, 1), (2, 1), (1, 2), (2, 2)} <= cells
+
+
+def test_supercover_is_direction_symmetric():
+    from swept_footprint_geometry import _supercover_segment
+
+    forward = set(_supercover_segment((1.25, 7.75), (10.5, 2.125)))
+    backward = set(_supercover_segment((10.5, 2.125), (1.25, 7.75)))
+    assert forward == backward
+
+
+def test_supercover_handles_vertical_and_negative_direction_segments():
+    from swept_footprint_geometry import _supercover_segment
+
+    vertical = set(_supercover_segment((4, 9), (4, 1)))
+    assert {(4, y) for y in range(1, 10)} <= vertical
+    reverse_diagonal = set(_supercover_segment((8, 2), (2, 8)))
+    assert (5, 5) in reverse_diagonal
+    assert (5, 4) in reverse_diagonal
+    assert (4, 5) in reverse_diagonal
