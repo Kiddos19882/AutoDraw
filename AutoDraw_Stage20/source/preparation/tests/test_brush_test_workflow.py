@@ -173,3 +173,23 @@ def test_preflight_rejects_slider_point_outside_screen():
     )
     assert result["valid"] is False
     assert any("за пределами экрана" in error for error in result["errors"])
+
+
+def test_preflight_uses_actual_calibration_slider_status_keys():
+    profile = _valid_calibration_profile()
+    profile["status"]["points"]["brush_slider_value_1"] = "needs_review"
+    result = validate_brush_test_preflight(
+        profile, (1920, 1080), brush_control=_valid_brush_control()
+    )
+    assert result["valid"] is False
+    assert any("Конец ползунка end требует повторной проверки" in error for error in result["errors"])
+
+
+def test_preflight_rejects_region_that_exceeds_screen_bounds():
+    profile = _valid_calibration_profile()
+    profile["regions"]["board_area"]["x"] = 1500
+    result = validate_brush_test_preflight(
+        profile, (1920, 1080), brush_control=_valid_brush_control()
+    )
+    assert result["valid"] is False
+    assert any("board_area выходит за пределы" in error for error in result["errors"])
