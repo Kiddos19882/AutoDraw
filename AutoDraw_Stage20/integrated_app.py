@@ -648,6 +648,54 @@ class AutoDrawUnifiedApp:
         )
         return True
 
+    def _start_brush_test_executor(self, requested_brush: int) -> None:
+        """Start the shared executor only after the user checks the actual brush radius."""
+        if self.executor.running:
+            messagebox.showwarning(
+                "Исполнение уже запущено",
+                "Тест кисти не может запустить второй экземпляр исполнителя.",
+                parent=self.root,
+            )
+            return
+        plan_path = getattr(self.executor, "plan_path", None)
+        if plan_path is None or Path(plan_path).name != "current_brush_behavior_test.json":
+            messagebox.showerror(
+                "Нет тестового плана",
+                "Штатный исполнитель не содержит ожидаемый план теста кисти.",
+                parent=self.root,
+            )
+            return
+        confirmed = messagebox.askyesno(
+            "Проверь размер кисти",
+            f"Перетаскивание завершено для радиуса {requested_brush}, но игра не подтверждает размер автоматически.\n\n"
+            "Проверь значение в браузере. Запускать тест, только если выбран именно этот радиус?",
+            icon="warning",
+            parent=self.root,
+        )
+        if not confirmed:
+            self.status_var.set("Запуск отменён: радиус кисти не подтверждён. Исполнитель не запускался.")
+            return
+        try:
+            started = self.executor.start_execution_from_workflow()
+        except Exception as exc:
+            messagebox.showerror(
+                "Не удалось запустить тест кисти",
+                f"Штатный исполнитель не запущен: {exc}",
+                parent=self.root,
+            )
+            return
+        if not started:
+            messagebox.showwarning(
+                "Исполнитель не запущен",
+                "Штатный исполнитель отклонил запуск. Проверь область и план.",
+                parent=self.root,
+            )
+            return
+        self.status_var.set(
+            f"Штатный исполнитель запущен для теста кисти {requested_brush}. "
+            "После завершения требуется проверка результата и очистки."
+        )
+
     def _on_executor_finished(self, summary: dict[str, Any], report_path: str | Path | None) -> bool:
         """Route completion only for the generated brush-test plan."""
         plan_path = getattr(self.executor, "plan_path", None)
