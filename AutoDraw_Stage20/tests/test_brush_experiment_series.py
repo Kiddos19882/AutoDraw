@@ -8,10 +8,22 @@ class BrushSettingStatusTests(unittest.TestCase):
         self.assertEqual(classify_brush_setting({}), "legacy_unverified")
         self.assertEqual(classify_brush_setting(None), "legacy_unverified")
 
-    def test_explicit_user_confirmation_is_recognized(self):
+    def test_explicit_user_confirmation_is_recognized_for_matching_value(self):
         self.assertEqual(
-            classify_brush_setting({"brush_setup": {"status": "confirmed_by_user"}}),
+            classify_brush_setting(
+                {"brush_setup": {"status": "confirmed_by_user", "requested_value": 10}},
+                requested_brush=10,
+            ),
             "confirmed_by_user",
+        )
+
+    def test_mismatched_confirmation_does_not_confirm_requested_value(self):
+        self.assertEqual(
+            classify_brush_setting(
+                {"brush_setup": {"status": "confirmed_by_user", "requested_value": 10}},
+                requested_brush=15,
+            ),
+            "confirmation_value_mismatch",
         )
 
     def test_declined_and_pending_confirmation_are_distinguished(self):
