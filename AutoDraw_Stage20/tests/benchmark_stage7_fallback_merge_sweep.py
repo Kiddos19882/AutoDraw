@@ -72,13 +72,46 @@ def make_cases() -> dict[str, np.ndarray]:
     return cases
 
 
-def _path_length(strokes: list[dict[str, Any]]) -> float:
-    total = 0.0
-    for stroke in strokes:
-        points = stroke.get("points", [])
-        for a, b in zip(points, points[1:]):
-            total += math.hypot(float(b["x"]) - float(a["x"]), float(b["y"]) - float(a["y"]))
+def _stroke_points(stroke: dict[str, Any]) -> list[tuple[float, float]]:
+    """Normalize supported benchmark stroke representations to XY points."""
+    raw_points = stroke.get("points")
+    if raw_points is not None:
+        points = [
+            (float(point["x"]), float(point["y"]))
+            if isinstance(point, dict)
+            else (float(point.x), float(point.y))
+            for point in raw_points
+        ]
+    elif "start" in stroke and "end" in stroke:
+        endpoints = (stroke["start"], stroke["end"])
+        points = [
+            (float(point["x"]), float(point["y"]))
+            if isinstance(point, dict)
+            else (float(point.x), float(point.y))
+            for point in endpoints
+        ]
+    else:
+        points = []
+    return points
+
+
+def _stroke_path_length(stroke: dict[str, Any]) -> float:
+    points = _stroke_points(stroke)
+    total = sum(
+        math.hypot(x2 - x1, y2 - y1)
+        for (x1, y1), (x2, y2) in zip(points, points[1:])
+    )
+    if stroke.get("closed") and len(points) > 2:
+        total += math.hypot(points[0][0] - points[-1][0], points[0][1] - points[-1][1])
     return total
+
+
+def _path_length(strokes: list[dict[str, Any]]) -> float:
+    return sum(_stroke_path_length(stroke) for stroke in strokes)
+
+
+def _zero_length_stroke_count(strokes: list[dict[str, Any]]) -> int:
+    return sum(_stroke_path_length(stroke) == 0.0 for stroke in strokes)
 
 
 def _fallback_path_length(strokes: list[dict[str, Any]]) -> float:
@@ -103,9 +136,9 @@ def run_sweep() -> dict[str, Any]:
                 "merge_gap_px": gap,
                 "total_stroke_count": len(strokes),
                 "interior_fill_stroke_count": len(strokes) - len(fallback),
-                "fallback_stroke_count": len(fallback),
+                "fallback_stroke_count": len(fallback),\n                "fallback_zero_length_stroke_count": _zero_length_stroke_count(fallback),
                 "fallback_path_length_px": round(fallback_path, 3),
-                "total_path_length_px": round(_path_length(strokes), 3),
+                "total_path_length_px": round(_path_length(strokes), 3),\n                "zero_length_stroke_count": _zero_length_stroke_count(strokes),
                 "fallback_stroke_reduction_vs_gap_0_percent": round(
                     100.0 * (baseline_fallback_count - len(fallback)) / baseline_fallback_count, 4
                 ) if baseline_fallback_count else 0.0,
@@ -131,7 +164,7 @@ def run_sweep() -> dict[str, Any]:
         "cases": results,
         "interpretation_limits": [
             "Synthetic maps are deterministic stress cases, not a representative sample of all user images.",
-            "Fallback path delta is a geometric proxy for added centerline travel, not paint consumption.",
+            "A one-pixel or otherwise degenerate stroke can have zero centerline length while still counting as a stroke and potentially consuming an in-game action/resource.",\n            "Fallback path delta is a geometric proxy for added centerline travel, not paint consumption.",
             "Paint and game-point estimates are intentionally not inferred from stroke count alone.",
             "A 100% modeled coverage result does not validate the real in-game brush footprint.",
             "Automatic execution remains disabled for all generated plans.",
