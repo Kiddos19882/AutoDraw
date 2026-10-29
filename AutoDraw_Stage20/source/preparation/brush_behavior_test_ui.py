@@ -439,7 +439,7 @@ class BrushBehaviorTestTab:
             raise ValueError(f"{field}: X и Y должны быть целыми числами.") from exc
 
     def set_brush_size(self) -> bool:
-        """Use a calibrated preset click or drag the extended-mode slider."""
+        """Set brush size only by dragging the calibrated extended-mode slider."""
         try:
             brush = int(self.brush_var.get().strip())
             if not 1 <= brush <= 30:
@@ -452,19 +452,11 @@ class BrushBehaviorTestTab:
                 if mode == "unsaved":
                     raise ValueError("Сначала сохрани профиль калибровки на вкладке 8.")
                 if mode == "presets":
-                    preset = calibrated.get("presets", {}).get(str(brush))
-                    if brush not in (7, 14, 20):
-                        raise ValueError("В режиме обычных пресетов доступны только кисти 7, 14 и 20. Выбери расширенный ползунок для других значений.")
-                    if preset is None:
-                        raise ValueError(f"Не заданы координаты пресета кисти {brush}. Настрой его на вкладке 8.")
-                    x, y = int(preset[0]), int(preset[1])
-                    self.status_var.set(
-                        f"Через 3 секунды будет выбран пресет кисти {brush} в ({x}, {y}). "
-                        "Переключись в браузер и не трогай мышь."
+                    raise ValueError(
+                        "Этот режим использует щелчки по пресетам. Для установки размера перетаскиванием "
+                        "переключи профиль калибровки на «Расширенный ползунок 1–30», отметь оба конца "
+                        "ползунка и сохрани профиль."
                     )
-                    self.root.iconify()
-                    self.root.after(3000, lambda: self._apply_brush_preset_click(x, y, brush))
-                    return True
                 if mode == "slider":
                     if not calibrated.get("start") or not calibrated.get("end"):
                         raise ValueError("Для режима ползунка задай и сохрани положения кисти 1 и 30 на вкладке 8.")
