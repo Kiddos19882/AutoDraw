@@ -47,15 +47,43 @@ def main() -> int:
         raise SystemExit("Reference image must compare at least two optimized geometry modes.")
     if not {"scanline", "contour", "skeleton"}.issubset({item.get("mode") for item in mode_candidates}):
         raise SystemExit("Reference-image report must include scanline, contour and skeleton candidates.")
+    row_sampled_candidates = [
+        item for item in reference.get("additional_candidates", [])
+        if item.get("candidate") == "row_sampled_scanline"
+    ]
+    if len(row_sampled_candidates) != 1:
+        raise SystemExit("Reference image must include exactly one row-sampled scanline candidate.")
+    row_sampled = row_sampled_candidates[0]
+    if not row_sampled.get("artifacts", {}).get("plan") or not row_sampled.get("artifacts", {}).get("preview"):
+        raise SystemExit("Row-sampled scanline candidate is missing its plan or preview artifact.")
     fitting_modes = [item for item in mode_candidates if item.get("fits_budget") is True]
     for candidate in mode_candidates:
         value = candidate.get("quality_visible_pixel_accuracy_percent")
         if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or not 0 <= value <= 100:
             raise SystemExit(f"Invalid visible-pixel accuracy for mode {candidate.get('mode')!r}.")
-    if fitting_modes:
-        max_visible_accuracy = max(float(item["quality_visible_pixel_accuracy_percent"]) for item in fitting_modes)
-        if abs(float(reference.get("quality_visible_pixel_accuracy_percent", -2)) - max_visible_accuracy) > 0.0001:
-            raise SystemExit("Selected reference mode is not the best fitting candidate by visible-pixel accuracy.")
+    all_reference_candidates = [
+        {
+            "candidate": item.get("mode"),
+            "fits_both_budgets": bool(item.get("fits_budget")),
+            "quality_visible_pixel_accuracy_percent": float(item["quality_visible_pixel_accuracy_percent"]),
+        }
+        for item in mode_candidates
+    ] + [
+        {
+            "candidate": item["candidate"],
+            "fits_both_budgets": bool(item["fits_both_budgets"]),
+            "quality_visible_pixel_accuracy_percent": float(item["quality_visible_pixel_accuracy_percent"]),
+        }
+        for item in row_sampled_candidates
+    ]
+    fitting_all = [item for item in all_reference_candidates if item["fits_both_budgets"]]
+    if fitting_all:
+        expected_recommendation = max(fitting_all, key=lambda item: item["quality_visible_pixel_accuracy_percent"])
+    else:
+        expected_recommendation = max(all_reference_candidates, key=lambda item: item["quality_visible_pixel_accuracy_percent"])
+    actual_recommendation = reference.get("recommended_candidate")
+    if not isinstance(actual_recommendation, dict) or actual_recommendation.get("candidate") != expected_recommendation["candidate"]:
+        raise SystemExit("Recommended reference candidate does not match the visible-pixel quality comparison.")
 
     point_case = by_case[("constraint-isolation", "point-budget-priority")]
     point_baseline = point_case.get("baseline", {})
@@ -106,6 +134,20 @@ def main() -> int:
             isinstance(visible_loss, bool) or not isinstance(visible_loss, (int, float)) or not math.isfinite(visible_loss)
         ):
             raise SystemExit(f"{item.get('case')}/{item.get('scenario')} has invalid visible quality loss.")
+        if item.get("case") == "reference-image":
+            additional = item.get("additional_candidates")
+            if not isinstance(additional, list) or not additional:
+                raise SystemExit("Reference-image report must include additional offline candidates.")
+            for candidate in additional:
+                for field in ("stroke_count", "path_length_px", "paint_cost_px_equivalent",
+                              "estimated_game_points", "quality_coverage_percent",
+                              "quality_visible_pixel_accuracy_percent", "fits_both_budgets"):
+                    if field not in candidate:
+                        raise SystemExit(f"Additional candidate missing {field!r}.")
+                for field in ("quality_coverage_percent", "quality_visible_pixel_accuracy_percent"):
+                    value = candidate[field]
+                    if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or not 0 <= value <= 100:
+                        raise SystemExit(f"Additional candidate has invalid {field!r}.")
         baseline = item.get("baseline")
         if not isinstance(baseline, dict) or not isinstance(baseline.get("available"), bool):
             raise SystemExit(f"{item.get('case')}/{item.get('scenario')} missing baseline comparison status.")

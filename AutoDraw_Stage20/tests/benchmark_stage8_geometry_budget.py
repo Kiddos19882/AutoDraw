@@ -16,11 +16,19 @@ if str(PREPARATION_ROOT) not in sys.path:
     sys.path.insert(0, str(PREPARATION_ROOT))
 
 from benchmark_drawing_algorithms import load_git_image, make_index_map, _resolved_path
-from drawing_algorithm_benchmark import load_palette_document
+from board_resource_model import get_board_point_limit
+from color_scanline import build_color_scanline_plan
+from drawing_algorithm_benchmark import (
+    load_palette_document,
+    render_index_map_png,
+    render_plan_index_map,
+    summarize_plan,
+)
 from geometry_budget_optimizer import measure_geometry_plan_quality, optimize_geometry_plan_across_modes, optimize_geometry_plan_to_budget
 from geometry_color_plan import build_geometry_color_plan, render_geometry_color_preview, _estimate_geometry_paint_cost
 from engine_point_calibration import estimate_point_quota_usage
-from board_resource_model import get_board_point_limit
+from paint_budget_optimizer import fit_result_to_paint_budget
+from palette_quantization import PaletteQuantizationResult
 
 
 SYNTHETIC_PALETTE = [
@@ -61,6 +69,119 @@ def save_index_map(index_map: np.ndarray, palette: list[dict[str, Any]], path: P
         rgb[mask, 3] = 255
     path.parent.mkdir(parents=True, exist_ok=True)
     Image.fromarray(rgb, mode="RGBA").save(path)
+
+
+def benchmark_row_sampled_scanline(
+    index_map: np.ndarray,
+    palette: list[dict[str, Any]],
+    output_dir: Path,
+    *,
+    budget: float,
+    target_usage_percent: float,
+    board_item_type: str,
+    point_limit: int,
+    safety_factor: float,
+) -> dict[str, Any]:
+    """Build a Stage 5 row-sampled scanline plan as an offline Stage 8 candidate."""
+    source_name = "stage8:reference-image:row-sampled-scanline"
+    palette_result = PaletteQuantizationResult(
+        image=render_index_map_png(index_map, palette),
+        index_map=index_map,
+        report={"source_name": source_name, "benchmark_input": "reference-image"},
+    )
+    optimized_result, chosen_step, chosen_offset, optimization_report = fit_result_to_paint_budget(
+        palette_result,
+        palette,
+        target_usage_percent=target_usage_percent,
+        board_item_type=board_item_type,
+        board_point_limit=point_limit,
+        point_step_px=2.0,
+        point_delay_ms=10,
+        frame_rate_fps=48.0,
+        point_quota_safety_factor=safety_factor,
+    )
+    plan = build_color_scanline_plan(
+        optimized_result.index_map,
+        palette,
+        source_name=source_name,
+        plan_name="Stage 8 offline row-sampled scanline candidate",
+        row_step_px=chosen_step,
+        row_offset_px=chosen_offset,
+        board_item_type=board_item_type,
+        board_point_limit=point_limit,
+        point_step_px=2.0,
+        point_delay_ms=10,
+        frame_rate_fps=48.0,
+        point_quota_safety_factor=safety_factor,
+    )
+    summary = summarize_plan(
+        "row_sampled_scanline",
+        plan,
+        index_map,
+        board_item_type=board_item_type,
+        point_step_px=2.0,
+        point_delay_ms=10,
+        frame_rate_fps=48.0,
+        safety_factor=safety_factor,
+        paint_budget_px_equivalent=budget,
+        stroke_overhead_px_equivalent=6.67,
+    )
+    paint_cost = float(summary["paint_cost_estimate"]["estimated_total_ink_px_equivalent"])
+    points = int(summary["point_quota_estimate"]["estimated_point_count"])
+    paint_target = budget * target_usage_percent / 100.0
+    point_target = int(point_limit * safety_factor)
+    fits_paint = paint_cost <= paint_target
+    fits_points = points <= point_target
+    total_pixels = int(index_map.size)
+    mismatch_count = int(summary["pixel_mismatch_count"])
+    visible_count = int(summary["source_visible_pixel_count"])
+    covered_count = int(summary["covered_source_pixel_count"])
+    exact_count = int(summary["exact_color_pixel_count"])
+    case_dir = output_dir / "reference-image" / "combined-budget" / "row-sampled-scanline"
+    case_dir.mkdir(parents=True, exist_ok=True)
+    rendered = render_plan_index_map(plan)
+    render_index_map_png(rendered, palette).save(case_dir / "preview.png")
+    (case_dir / "plan.json").write_text(json.dumps(plan, ensure_ascii=False, indent=2), encoding="utf-8")
+    (case_dir / "report.json").write_text(
+        json.dumps({"summary": summary, "optimization": optimization_report}, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    return {
+        "candidate": "row_sampled_scanline",
+        "mode": "scanline_optimized",
+        "row_step_px": int(chosen_step),
+        "row_offset_px": int(chosen_offset),
+        "stroke_count": int(summary["stroke_count"]),
+        "path_length_px": float(summary["drawing_length_px"]),
+        "paint_cost_px_equivalent": paint_cost,
+        "paint_target_px_equivalent": paint_target,
+        "estimated_game_points": points,
+        "target_game_points": point_target,
+        "fits_paint_budget": bool(fits_paint),
+        "fits_point_budget": bool(fits_points),
+        "fits_both_budgets": bool(fits_paint and fits_points),
+        "needs_multi_board_split": not (fits_paint and fits_points),
+        "quality_mismatch_pixel_count": mismatch_count,
+        "quality_pixel_accuracy_percent": round(100.0 * (total_pixels - mismatch_count) / total_pixels, 4),
+        "quality_coverage_percent": round(100.0 * covered_count / visible_count, 4) if visible_count else 100.0,
+        "quality_visible_pixel_accuracy_percent": round(100.0 * exact_count / visible_count, 4) if visible_count else 100.0,
+        "quality_uncovered_visible_pixel_count": visible_count - covered_count,
+        "quality_painted_transparent_pixel_count": int(summary["painted_transparent_pixel_count"]),
+        "quality_wrong_color_pixel_count": int(summary["wrong_color_pixel_count"]),
+        "quality_measure_scope": "programmatic_preview",
+        "optimization": {
+            "block_size_px": optimization_report.get("block_size_px"),
+            "row_step_px": optimization_report.get("row_step_px"),
+            "row_offset_px": optimization_report.get("row_offset_px"),
+            "changed_pixel_percentage": optimization_report.get("changed_pixel_percentage"),
+            "sampled_row_omitted_pixel_count": optimization_report.get("sampled_row_omitted_pixel_count"),
+        },
+        "artifacts": {
+            "plan": str((case_dir / "plan.json").relative_to(REPO_ROOT)),
+            "preview": str((case_dir / "preview.png").relative_to(REPO_ROOT)),
+            "report": str((case_dir / "report.json").relative_to(REPO_ROOT)),
+        },
+    }
 
 
 def benchmark_case(
@@ -138,6 +259,42 @@ def benchmark_case(
     (case_dir / "report.json").write_text(
         json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8"
     )
+    additional_candidates = []
+    if name == "reference-image":
+        additional_candidates.append(benchmark_row_sampled_scanline(
+            index_map, palette, output_dir,
+            budget=budget, target_usage_percent=target_usage_percent,
+            board_item_type="BoardItem2", point_limit=point_limit, safety_factor=safety_factor,
+        ))
+    geometry_candidates = report.get("mode_candidates", [])
+    all_candidates = [
+        {
+            "candidate": item.get("mode"),
+            "fits_both_budgets": bool(item.get("fits_budget")),
+            "quality_visible_pixel_accuracy_percent": float(item.get("quality_visible_pixel_accuracy_percent", 0.0)),
+            "quality_pixel_accuracy_percent": float(item.get("quality_pixel_accuracy_percent", 0.0)),
+        }
+        for item in geometry_candidates
+    ] + [
+        {
+            "candidate": item["candidate"],
+            "fits_both_budgets": item["fits_both_budgets"],
+            "quality_visible_pixel_accuracy_percent": item["quality_visible_pixel_accuracy_percent"],
+            "quality_pixel_accuracy_percent": item["quality_pixel_accuracy_percent"],
+        }
+        for item in additional_candidates
+    ]
+    fitting_candidates = [item for item in all_candidates if item["fits_both_budgets"]]
+    if fitting_candidates:
+        recommended = max(fitting_candidates, key=lambda item: item["quality_visible_pixel_accuracy_percent"])
+        recommendation_reason = "highest exact-color accuracy on source-visible pixels among candidates fitting both budgets"
+    elif all_candidates:
+        recommended = max(all_candidates, key=lambda item: item["quality_visible_pixel_accuracy_percent"])
+        recommendation_reason = "highest exact-color accuracy on source-visible pixels; no candidate fits both budgets"
+    else:
+        recommended = None
+        recommendation_reason = "no comparable candidate report available"
+
     return {
         "case": name,
         "scenario": scenario,
@@ -168,6 +325,10 @@ def benchmark_case(
         "quality_painted_transparent_pixel_count": report.get("quality_painted_transparent_pixel_count"),
         "quality_measure_scope": report.get("quality_measure_scope"),
         "mode_candidates": report.get("mode_candidates", []),
+        "additional_candidates": additional_candidates,
+        "recommended_candidate": (
+            {**recommended, "reason": recommendation_reason} if recommended is not None else None
+        ),
         "baseline": baseline,
         "coarsening_quality_loss_percentage_points": (
             round(float(baseline["quality_pixel_accuracy_percent"]) - float(report["quality_pixel_accuracy_percent"]), 4)
