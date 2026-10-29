@@ -96,11 +96,11 @@ def optimize_geometry_plan_to_budget(
     board_point_limit: int = 6_000,
     point_safety_factor: float = 0.85,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
-    """Search quality-preserving candidates until the estimated ink budget fits.
+    """Search candidates against separate paint-cost and game-point safety budgets.
 
-    The optimizer prefers the largest image scale, then the least component loss and
-    the smallest RDP tolerance. If no single-board candidate fits, the best low-cost
-    candidate is returned so the caller can offer a multi-board split.
+    Both constraints must fit before a candidate is accepted. If no single-board
+    candidate fits, return the candidate with the lowest normalized combined
+    budget pressure so the caller can offer a multi-board split.
     """
     # Lazy imports avoid a module cycle: the planner delegates candidate search
     # to this module, while the optimizer calls back into the planner to build candidates.
@@ -325,13 +325,13 @@ def optimize_geometry_plan_across_modes(
                 0,
                 int(report.get("quality_mismatch_pixel_count", 0)),
                 -float(report.get("scale", 1.0)),
-                float(report["combined_budget_pressure"]),
+                float(report.get("combined_budget_pressure", report["estimated_ink_after_px_equivalent"])),
                 mode_priority,
             )
         else:
             key = (
                 1,
-                float(report["combined_budget_pressure"]),
+                float(report.get("combined_budget_pressure", report["estimated_ink_after_px_equivalent"])),
                 float(report.get("quality_mismatch_pixel_count", 0)),
                 -float(report.get("scale", 1.0)),
                 mode_priority,
@@ -350,6 +350,11 @@ def optimize_geometry_plan_across_modes(
             "scale": float(report["scale"]),
             "stroke_count": int(plan["summary"]["stroke_count"]),
             "estimated_ink_after_px_equivalent": float(report["estimated_ink_after_px_equivalent"]),
+            "estimated_game_points_after": int(report["estimated_game_points_after"]),
+            "target_point_count": int(report["target_point_count"]),
+            "fits_paint_budget": bool(report["fits_paint_budget"]),
+            "fits_point_budget": bool(report["fits_point_budget"]),
+            "combined_budget_pressure": float(report["combined_budget_pressure"]),
             "quality_mismatch_pixel_count": int(report.get("quality_mismatch_pixel_count", 0)),
             "quality_pixel_accuracy_percent": float(report.get("quality_pixel_accuracy_percent", 0.0)),
         }
