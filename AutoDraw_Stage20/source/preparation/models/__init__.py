@@ -1,6 +1,4 @@
-"""Compatibility snapshot of the Stage 6 DrawingPlan models for Stage 10 tests."""
-from .point import Point
-from .stroke import Stroke
-from .drawing_plan import DrawingPlan
+"""Compatibility exports for canonical geometry models."""
+from geometry_models import DrawingPlan, Point, Stroke
 
 __all__ = ["Point", "Stroke", "DrawingPlan"]
