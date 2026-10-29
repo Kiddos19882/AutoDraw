@@ -96,7 +96,8 @@ jobs:
       - name: Sweep fallback merge tolerances (Stage 7)
         shell: pwsh
         run: |
-          python ..\..\tests\benchmark_stage7_fallback_merge_sweep.py --output AutoDraw_Stage20/benchmark-results/stage7-synthetic/fallback-merge-gap-sweep.json
+          $reportDir = Join-Path $env:GITHUB_WORKSPACE "AutoDraw_Stage20/benchmark-results/stage7-synthetic"
+          python ..\..\tests\benchmark_stage7_fallback_merge_sweep.py --output (Join-Path $reportDir "fallback-merge-gap-sweep.json")
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Upload Stage 7 synthetic geometry reports
         if: always()
