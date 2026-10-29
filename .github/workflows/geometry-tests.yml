@@ -68,7 +68,7 @@ jobs:
       - name: Benchmark interior fill (Stage 7)
         shell: pwsh
         run: |
-          python ..\..\tests\benchmark_stage7_interior_fill.py --git-ref origin/master --git-path AutoDraw_Stage20/testImages/images.png --target-width 646 --target-height 323 --palette-json AutoDraw_Stage20/data/palettes/profiles/Browser_palette.autodraw-palette.json --background-mode edge-connected --output AutoDraw_Stage20/benchmark-results/stage7-report.json --preview-dir AutoDraw_Stage20/benchmark-results/stage7-previews
+          python ..\..\tests\benchmark_stage7_interior_fill.py --git-ref HEAD --git-path AutoDraw_Stage20/testImages/images.png --target-width 646 --target-height 323 --palette-json AutoDraw_Stage20/data/palettes/profiles/Browser_palette.autodraw-palette.json --background-mode edge-connected --output AutoDraw_Stage20/benchmark-results/stage7-report.json --preview-dir AutoDraw_Stage20/benchmark-results/stage7-previews
       - name: Upload Stage 7 benchmark report and previews
         if: always()
         uses: actions/upload-artifact@v4
