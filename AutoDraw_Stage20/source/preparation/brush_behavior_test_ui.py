@@ -222,6 +222,8 @@ class BrushBehaviorTestTab:
         self._brush_drag_countdown_id: str | None = None
         self._brush_hotkey_listener = None
         self._brush_drag_mouse_down = False
+        self._automated_preclear_active = False
+        self._automated_preclear_after_id: str | None = None
         self.root.bind_all("<F12>", self._on_brush_workflow_stop_key, add="+")
         self.screenshot_path: Path | None = None
         self.execution_report_path: Path | None = None
@@ -429,14 +431,7 @@ class BrushBehaviorTestTab:
             if not self.on_transfer_plan(plan, path):
                 return
             self._reset_observation_fields()
-            if self.set_brush_size():
-                self.status_var.set(
-                    f"План передан: {path.name}. Переключись в браузер за 3 секунды; затем проверь кисть {brush}."
-                )
-            else:
-                self.status_var.set(
-                    f"План передан: {path.name}, но кисть не установлена автоматически. Проверь режим управления кистью и задай нужные координаты на вкладке 8."
-                )
+            self._start_automated_preclear()
         except (OSError, ValueError, TypeError) as exc:
             messagebox.showerror("Не удалось создать тестовый план", str(exc), parent=self.root)
 
@@ -562,7 +557,10 @@ class BrushBehaviorTestTab:
         def on_press(key):
             if key == keyboard.Key.f12:
                 try:
-                    self.root.after(0, self.cancel_brush_drag)
+                    if self._automated_preclear_active:
+                        self.root.after(0, self._cancel_automated_preclear)
+                    else:
+                        self.root.after(0, self.cancel_brush_drag)
                 except (tk.TclError, RuntimeError):
                     pass
 
@@ -736,6 +734,208 @@ class BrushBehaviorTestTab:
             self.status_var.set(f"Полный скриншот сохранён: {path}")
         except Exception as exc:
             messagebox.showerror("Не удалось снять скриншот", str(exc), parent=self.root)
+
+    def _start_automated_preclear(self) -> None:
+        """Clear the board and verify it against the explicit blank reference before brush setup."""
+        config = self.get_calibration_profile() if callable(self.get_calibration_profile) else None
+        if not isinstance(config, dict):
+            self.status_var.set("Тест остановлен до очистки: профиль калибровки недоступен.")
+            messagebox.showwarning("Нет профиля", "Автоматическая подготовка не запущена.", parent=self.root)
+            return
+        reference_path, metadata_path = self._blank_board_reference_paths()
+        if not reference_path.is_file() or not metadata_path.is_file():
+            self.status_var.set("Тест заблокирован: сначала сохрани отдельный эталон пустой доски.")
+            messagebox.showwarning(
+                "Нет эталона пустой доски",
+                "Перед автоматическим тестом нажми «Сохранить эталон пустой доски…» и подтверди, что доска пуста.",
+                parent=self.root,
+            )
+            return
+        clear_point = config.get("points", {}).get("clear_board", {})
+        point_status = config.get("status", {}).get("points", {})
+        if not isinstance(clear_point, dict) or point_status.get("clear_board") == "needs_review":
+            self.status_var.set("Тест заблокирован: координата Clear требует проверки.")
+            messagebox.showwarning("Clear не откалиброван", "Проверь точку Clear на вкладке 8.", parent=self.root)
+            return
+        if not messagebox.askyesno(
+            "Подтвердить очистку перед тестом",
+            "AutoDraw нажмёт Clear и удалит текущий рисунок. Продолжать только на тестовой доске, "
+            "где рисунок можно удалить. Если очистка не подтвердится эталоном, тест не начнётся.",
+            icon="warning",
+            parent=self.root,
+        ):
+            self.status_var.set("Автоматический тест отменён до очистки.")
+            return
+        brush = int(self.brush_var.get().strip())
+        scenario = TEST_CASES.get(self.case_var.get(), {}).get("id", "unknown")
+        if self.experiment_dir is None:
+            stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+            self.experiment_dir = self.output_dir / f"experiment-{stamp}-b{brush}-{scenario}"
+            self.experiment_dir.mkdir(parents=True, exist_ok=False)
+        self.experiment_phases = {}
+        self._automated_preclear_active = True
+        self.status_var.set("Через 3 секунды будет выполнен Clear и проверка пустой доски. F12 отменяет подготовку.")
+        self.root.iconify()
+        self._start_brush_hotkey_listener()
+        self._automated_preclear_after_id = self.root.after(
+            3000, lambda: self._perform_automated_preclear(config, clear_point)
+        )
+
+    def _cancel_automated_preclear(self) -> None:
+        if not self._automated_preclear_active:
+            return
+        self._automated_preclear_active = False
+        if self._automated_preclear_after_id is not None:
+            try:
+                self.root.after_cancel(self._automated_preclear_after_id)
+            except (tk.TclError, ValueError):
+                pass
+            self._automated_preclear_after_id = None
+        self._stop_brush_hotkey_listener()
+        if self.experiment_dir is not None:
+            self.experiment_phases["before_clear"] = {
+                "status": "stopped",
+                "reason": "F12",
+                "captured_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            }
+            try:
+                self._write_experiment_manifest()
+            except (OSError, ValueError, TypeError) as exc:
+                self.status_var.set(f"Подготовка остановлена; не удалось записать манифест: {exc}")
+        self.status_var.set("Подготовка теста отменена по F12. Рисование не запускалось; проверь доску вручную.")
+        try:
+            self.root.deiconify()
+            self.root.lift()
+        except tk.TclError:
+            pass
+
+    def _perform_automated_preclear(self, config: dict[str, Any], clear_point: dict[str, int]) -> None:
+        if not self._automated_preclear_active:
+            return
+        self._automated_preclear_after_id = None
+        try:
+            reference_path, metadata_path = self._blank_board_reference_paths()
+            metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+            screen = ImageGrab.grab()
+            expected = config.get("screen_size", {})
+            if isinstance(expected, dict):
+                ew, eh = expected.get("width"), expected.get("height")
+                if ew is not None and eh is not None and (int(ew), int(eh)) != screen.size:
+                    raise ValueError("Разрешение экрана изменилось после калибровки.")
+            region = config.get("regions", {}).get("board_area", {})
+            current_region = {key: int(region[key]) for key in ("x", "y", "width", "height")}
+            if (
+                metadata.get("reference_type") != "user_confirmed_blank_board_roi"
+                or metadata.get("user_confirmed_blank") is not True
+                or metadata.get("screen_size") != {"width": screen.width, "height": screen.height}
+                or metadata.get("board_region") != current_region
+                or metadata.get("image_file") != reference_path.name
+            ):
+                raise ValueError("Эталон пустой доски не соответствует текущему разрешению/ROI.")
+            with Image.open(reference_path) as reference:
+                if reference.size != (current_region["width"], current_region["height"]):
+                    raise ValueError("Размер эталона не совпадает с ROI доски.")
+            pyautogui.click(int(clear_point["x"]), int(clear_point["y"]))
+            self.status_var.set("Clear нажат; через 1,5 секунды будет проверена доска.")
+            self._automated_preclear_after_id = self.root.after(
+                1500, lambda: self._capture_and_verify_preclear(config, metadata, reference_path)
+            )
+        except Exception as exc:
+            self._finish_automated_preclear_failure("preclear_failed", str(exc))
+
+    def _capture_and_verify_preclear(self, config: dict[str, Any], metadata: dict[str, Any], reference_path: Path) -> None:
+        if not self._automated_preclear_active:
+            return
+        self._automated_preclear_after_id = None
+        try:
+            screen = ImageGrab.grab()
+            expected = config.get("screen_size", {})
+            if isinstance(expected, dict):
+                ew, eh = expected.get("width"), expected.get("height")
+                if ew is not None and eh is not None and (int(ew), int(eh)) != screen.size:
+                    raise ValueError("Разрешение экрана изменилось во время подготовки.")
+            crops = crop_calibrated_regions(screen, config.get("regions", {}))
+            with Image.open(reference_path) as reference:
+                clear_check = evaluate_board_clear(reference.copy(), crops["board_area"])
+            phase_dir = self.experiment_dir
+            if phase_dir is None:
+                raise ValueError("Каталог опыта отсутствует.")
+            screen_path = phase_dir / "before_clear-screen.png"
+            board_path = phase_dir / "before_clear-board.png"
+            meter_path = phase_dir / "before_clear-paint-meter.png"
+            screen.save(screen_path)
+            crops["board_area"].save(board_path)
+            crops["paint_meter_area"].save(meter_path)
+            self.experiment_phases["before_clear"] = {
+                "status": clear_check["status"],
+                "board_clear_check": clear_check,
+                "captured_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                "screen_size": {"width": screen.width, "height": screen.height},
+                "files": {
+                    "full_screen": screen_path.name,
+                    "board_roi": board_path.name,
+                    "paint_meter_roi": meter_path.name,
+                },
+            }
+            if clear_check["status"] not in {"restored", "restored_within_pixel_tolerance"}:
+                self._write_experiment_manifest()
+                self._finish_automated_preclear_failure(
+                    "board_clear_not_confirmed",
+                    f"Очистка не подтверждена эталоном (статус: {clear_check['status']}). Рисование не запускалось.",
+                    write_manifest=False,
+                )
+                return
+            self.experiment_phases["before_draw"] = {
+                "captured_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                "screen_size": {"width": screen.width, "height": screen.height},
+                "clear_check": clear_check,
+                "files": {
+                    "full_screen": screen_path.name,
+                    "board_roi": board_path.name,
+                    "paint_meter_roi": meter_path.name,
+                },
+            }
+            self._write_experiment_manifest()
+            self._automated_preclear_active = False
+            self._stop_brush_hotkey_listener()
+            self.root.deiconify()
+            self.root.lift()
+            if not self.set_brush_size():
+                self.status_var.set("Доска очищена и проверена, но кисть не установлена. Исполнитель не запущен.")
+                self._write_experiment_manifest()
+                return
+            self.status_var.set("Доска очищена и проверена; начата установка кисти. После установки проверь радиус перед запуском исполнителя.")
+        except Exception as exc:
+            self._finish_automated_preclear_failure("preclear_capture_failed", str(exc))
+
+    def _finish_automated_preclear_failure(self, status: str, reason: str, *, write_manifest: bool = True) -> None:
+        self._automated_preclear_active = False
+        if self._automated_preclear_after_id is not None:
+            try:
+                self.root.after_cancel(self._automated_preclear_after_id)
+            except (tk.TclError, ValueError):
+                pass
+            self._automated_preclear_after_id = None
+        self._stop_brush_hotkey_listener()
+        if self.experiment_dir is not None:
+            self.experiment_phases.setdefault("before_clear", {})
+            self.experiment_phases["before_clear"].update({
+                "status": status,
+                "reason": reason,
+                "captured_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            })
+            if write_manifest:
+                try:
+                    self._write_experiment_manifest()
+                except (OSError, ValueError, TypeError) as exc:
+                    reason += f"; ошибка сохранения манифеста: {exc}"
+        self.status_var.set(f"Тест остановлен до рисования: {reason}")
+        try:
+            self.root.deiconify()
+            self.root.lift()
+        except tk.TclError:
+            pass
+        messagebox.showwarning("Автоматический тест остановлен", reason, parent=self.root)
 
     def _blank_board_reference_paths(self) -> tuple[Path, Path]:
         return (
