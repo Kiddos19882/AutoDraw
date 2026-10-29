@@ -1671,7 +1671,7 @@ class BrushBehaviorTestTab:
             "record_type": "autodraw_brush_paint_experiment",
             "updated_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "test_case": TEST_CASES.get(self.case_var.get(), {}).get("id"),
-            "brush_value_requested": int(self.brush_var.get().strip()),
+            "brush_value_requested": self._experiment_requested_brush if self._experiment_requested_brush is not None else int(self.brush_var.get().strip()),
             "drawing_plan_path": str(self.current_plan_path) if self.current_plan_path else None,
             "execution_report_path": str(self.execution_report_path) if self.execution_report_path else None,
             "execution_report": self.execution_report,
