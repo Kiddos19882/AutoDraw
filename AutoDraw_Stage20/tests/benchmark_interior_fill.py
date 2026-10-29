@@ -28,6 +28,7 @@ from benchmark_drawing_algorithms import make_index_map, load_git_image, _resolv
 from drawing_algorithm_benchmark import render_plan_index_map, summarize_plan, load_palette_document  # noqa: E402
 from geometry_color_plan import build_geometry_color_plan  # noqa: E402
 from interior_fill_planner import build_interior_fill_plan  # noqa: E402
+from brush_footprint_geometry import footprint_pixel_bounds  # noqa: E402
 
 
 def _footprint(
@@ -38,16 +39,16 @@ def _footprint(
     scale_y: float = 1.0,
 ) -> tuple[int, int, int, int]:
     """Return the modeled brush bounds using independent X/Y scale factors."""
-    brush = float(stroke["brush_value"])
+    brush = int(stroke["brush_value"])
     first, last = stroke["points"]
     x1, x2, y = float(first["x"]), float(last["x"]), float(first["y"])
-    half_x = brush * scale_x / 2.0
-    half_y = brush * scale_y / 2.0
     height, width = indexes.shape
-    left = max(0, int(np.ceil(min(x1, x2) - half_x - 1e-9)))
-    right = min(width - 1, int(np.floor(max(x1, x2) + half_x + 1e-9)))
-    top = max(0, int(np.ceil(y - half_y - 1e-9)))
-    bottom = min(height - 1, int(np.floor(y + half_y + 1e-9)))
+    bounds = footprint_pixel_bounds(
+        min(x1, x2), max(x1, x2), y, brush, scale_x, scale_y, width, height
+    )
+    if bounds is None:
+        return (0, 0, -1, -1)
+    left, right, top, bottom = bounds
     return left, top, right, bottom
 
 
