@@ -105,7 +105,7 @@ jobs:
         with:
           name: stage7-synthetic-geometry-benchmarks
           path: AutoDraw_Stage20/benchmark-results/stage7-synthetic/
-          if-no-files-found: ignore
+          if-no-files-found: error
 
       - name: Benchmark Stage 8 geometry budget and preview quality
         shell: pwsh
@@ -122,6 +122,12 @@ jobs:
           name: stage8-geometry-budget-quality
           path: AutoDraw_Stage20/benchmark-results/stage8/
           if-no-files-found: ignore
+
+      - name: Test fallback sweep path and coverage metrics
+        shell: pwsh
+        run: |
+          $env:PYTHONPATH = "$env:GITHUB_WORKSPACE\AutoDraw_Stage20;$env:GITHUB_WORKSPACE\AutoDraw_Stage20\source\preparation"
+          python -m pytest -q -ra ..\..\tests\test_fallback_sweep_metrics.py
 
       - name: Run preparation and geometry tests
         shell: pwsh
