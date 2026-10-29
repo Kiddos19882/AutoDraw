@@ -15,6 +15,7 @@ import pyautogui
 from PIL import Image, ImageGrab
 
 from stage8_optimizer import save_plan
+from brush_test_workflow import calculate_slider_target
 from brush_experiment_capture import (
     compare_images, crop_calibrated_regions,
     measure_meter_fill_against_baseline, evaluate_meter_restoration,
@@ -474,9 +475,7 @@ class BrushBehaviorTestTab:
             else:
                 start = self._parse_point(self.slider_start_var.get(), "Край 30")
                 end = self._parse_point(self.slider_end_var.get(), "Край 1")
-            ratio = (30 - brush) / 29
-            x = round(start[0] + (end[0] - start[0]) * ratio)
-            y = round(start[1] + (end[1] - start[1]) * ratio)
+            x, y = calculate_slider_target(start, end, brush)
             self.brush_slider_start, self.brush_slider_end = start, end
             self.status_var.set(
                 f"Через 3 секунды ползунок будет перетащен к радиусу кисти {brush}. "
@@ -504,7 +503,7 @@ class BrushBehaviorTestTab:
     def _apply_brush_drag(
         self, start: tuple[int, int], target_x: int, target_y: int, brush: int
     ) -> None:
-        """Drag from the calibrated minimum to the requested slider position."""
+        """Drag from the calibrated brush-30 position to the requested slider position."""
         user32 = ctypes.windll.user32
         start_x, start_y = start
         distance = max(abs(target_x - start_x), abs(target_y - start_y))
