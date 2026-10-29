@@ -1477,7 +1477,18 @@ class Stage6App:
         except (ValueError, TypeError) as exc:
             raise ValueError(f"Проверьте параметры исполнителя: {exc}") from exc
 
-    def _start_execution(self) -> None:
+    def start_execution_from_workflow(self) -> bool:
+        """Start a previously loaded plan from a host workflow without a second confirmation dialog.
+
+        All normal validation, stop handling, countdown, worker setup, and report generation
+        remain in the standard executor path. Must be called on the Tk thread.
+        """
+        if self.running or self.execution_plan is None or self.area is None or self.plan_path is None:
+            return False
+        self._start_execution(confirmed=True)
+        return bool(self.running)
+
+    def _start_execution(self, *, confirmed: bool = False) -> None:
         if self.running:
             return
         if self.execution_plan is None or self.area is None or self.plan_path is None:
@@ -1574,7 +1585,9 @@ class Stage6App:
             + "После подтверждения начнётся обратный отсчёт. Переключитесь на правильную вкладку браузера.\n"
             "F12 или кнопка остановки прекращает рисование; кнопка мыши будет отпущена."
         )
-        if not messagebox.askokcancel("Подтвердите рисование", details, icon="warning", parent=self.root):
+        if not confirmed and not messagebox.askokcancel(
+            "Подтвердите рисование", details, icon="warning", parent=self.root
+        ):
             self.execution_state_var.set("Состояние: запуск отменён")
             return
 
