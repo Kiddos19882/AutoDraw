@@ -4,6 +4,8 @@ import argparse
 import json
 from pathlib import Path
 
+from stage7_validator_rules import skeleton_transparency_error
+
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Validate synthetic Stage 7 benchmark reports.")
@@ -45,29 +47,13 @@ def main() -> int:
                     )
                 continue
 
-            samples = item.get("transparent_stroke_samples", [])
-            sampled_pixels = [
-                tuple(pixel)
-                for sample in samples
-                for pixel in sample.get("transparent_pixels", [])
-            ]
-            if transparent_count < 0 or transparent_count > max_skeleton_transparent_pixels:
-                raise SystemExit(
-                    f"{path.name}: skeleton painted {transparent_count} transparent pixels; "
-                    f"allowed maximum is {max_skeleton_transparent_pixels}"
-                )
-            if len(sampled_pixels) != transparent_count or len(set(sampled_pixels)) != len(sampled_pixels):
-                raise SystemExit(
-                    f"{path.name}: skeleton transparency diagnostics do not match the pixel count"
-                )
-            if any(len(sample.get("transparent_pixels", [])) != 1 for sample in samples):
-                raise SystemExit(
-                    f"{path.name}: skeleton tolerance permits only isolated one-pixel hits per stroke"
-                )
-            if transparent_count and len(samples) != transparent_count:
-                raise SystemExit(
-                    f"{path.name}: each tolerated skeleton pixel must be attributed to a separate stroke"
-                )
+            error = skeleton_transparency_error(
+                item,
+                path.name,
+                max_transparent_pixels=max_skeleton_transparent_pixels,
+            )
+            if error:
+                raise SystemExit(error)
         print(
             f"PASS {path.name}: visible={visible}/{total}, "
             f"interior_fill_strokes={by_name['interior_fill']['stroke_count']}, "
