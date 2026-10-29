@@ -23,6 +23,8 @@ def main() -> int:
     parser.add_argument("--report", required=True)
     args = parser.parse_args()
     path = Path(args.report)
+    if not path.is_absolute():
+        path = Path(__file__).resolve().parents[2] / path
     if not path.is_file():
         raise SystemExit(f"Stage 8 report does not exist: {path}")
     report = json.loads(path.read_text(encoding="utf-8"))
