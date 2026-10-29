@@ -198,7 +198,7 @@ def _coverage_path_metrics(strokes: list[dict[str, Any]], index_map: np.ndarray)
         "invalid_centerline_pixel_visits": invalid_visits,
         "invalid_footprint_pixel_visits": invalid_footprint_visits,
         "uncovered_visible_pixel_count": uncovered_visible_pixel_count,
-        "modeled_coverage_percent": round(
+        "footprint_coverage_percent": round(
             100.0 * (visible_pixel_count - uncovered_visible_pixel_count) / visible_pixel_count, 4
         ) if visible_pixel_count else 100.0,
     }
