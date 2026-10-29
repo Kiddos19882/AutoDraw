@@ -64,6 +64,99 @@ def calculate_slider_target(
     return round(sx + (ex - sx) * ratio), round(sy + (ey - sy) * ratio)
 
 
+def validate_brush_test_preflight(
+    profile: dict[str, Any] | None,
+    screen_size: tuple[int, int],
+    *,
+    require_slider: bool = True,
+) -> dict[str, Any]:
+    """Validate calibration before any automated mouse action; never performs I/O."""
+    errors: list[str] = []
+    warnings: list[str] = []
+    if not isinstance(profile, dict):
+        return {"valid": False, "errors": ["Профиль калибровки недоступен."], "warnings": []}
+
+    try:
+        screen_width, screen_height = int(screen_size[0]), int(screen_size[1])
+        if screen_width < 1 or screen_height < 1:
+            raise ValueError
+    except (TypeError, ValueError, IndexError, OverflowError):
+        return {"valid": False, "errors": ["Не удалось определить разрешение экрана."], "warnings": []}
+
+    saved_size = profile.get("screen_size")
+    if isinstance(saved_size, dict):
+        try:
+            saved = (int(saved_size["width"]), int(saved_size["height"]))
+        except (KeyError, TypeError, ValueError, OverflowError):
+            errors.append("В профиле некорректно указано разрешение экрана.")
+        else:
+            if saved != (screen_width, screen_height):
+                errors.append(
+                    f"Разрешение экрана изменилось: профиль {saved[0]} × {saved[1]}, "
+                    f"текущее {screen_width} × {screen_height}."
+                )
+    else:
+        errors.append("В профиле не сохранено разрешение экрана.")
+
+    regions = profile.get("regions")
+    statuses = profile.get("status")
+    region_status = statuses.get("regions", {}) if isinstance(statuses, dict) else {}
+    for name in ("board_area", "paint_meter_area"):
+        region = regions.get(name) if isinstance(regions, dict) else None
+        if not isinstance(region, dict):
+            errors.append(f"В профиле отсутствует область {name}.")
+            continue
+        try:
+            x, y = int(region["x"]), int(region["y"])
+            width, height = int(region["width"]), int(region["height"])
+        except (KeyError, TypeError, ValueError, OverflowError):
+            errors.append(f"Область {name} содержит некорректные координаты.")
+            continue
+        if x < 0 or y < 0 or width < 2 or height < 2 or x + width > screen_width or y + height > screen_height:
+            errors.append(f"Область {name} выходит за пределы текущего экрана.")
+        if isinstance(region_status, dict) and region_status.get(name) == "needs_review":
+            errors.append(f"Область {name} помечена как требующая повторной проверки.")
+
+    points = profile.get("points")
+    point_status = statuses.get("points", {}) if isinstance(statuses, dict) else {}
+    clear_point = points.get("clear_board") if isinstance(points, dict) else None
+    if not isinstance(clear_point, dict):
+        errors.append("Не откалибрована точка очистки Clear.")
+    else:
+        try:
+            clear_x, clear_y = int(clear_point["x"]), int(clear_point["y"])
+        except (KeyError, TypeError, ValueError, OverflowError):
+            errors.append("Координата Clear некорректна.")
+        else:
+            if not (0 <= clear_x < screen_width and 0 <= clear_y < screen_height):
+                errors.append("Координата Clear находится за пределами экрана.")
+        if isinstance(point_status, dict) and point_status.get("clear_board") == "needs_review":
+            errors.append("Точка Clear помечена как требующая повторной проверки.")
+
+    if require_slider:
+        brush = profile.get("brush_control")
+        if not isinstance(brush, dict):
+            errors.append("В профиле отсутствует калибровка ползунка кисти.")
+        elif brush.get("mode") != "slider":
+            errors.append("Для автоматического перетаскивания нужен режим «Расширенный ползунок 1–30».")
+        else:
+            for name in ("start", "end"):
+                point = brush.get(name)
+                try:
+                    px, py = int(point[0]), int(point[1])
+                except (TypeError, ValueError, IndexError, KeyError, OverflowError):
+                    errors.append(f"Не откалиброван конец ползунка {name}.")
+                    continue
+                if not (0 <= px < screen_width and 0 <= py < screen_height):
+                    errors.append(f"Конец ползунка {name} находится за пределами экрана.")
+                if isinstance(point_status, dict) and point_status.get(f"brush_slider_{name}") == "needs_review":
+                    errors.append(f"Конец ползунка {name} требует повторной проверки.")
+
+    if profile.get("needs_review") is True:
+        errors.append("Профиль целиком помечен как требующий повторной проверки.")
+    return {"valid": not errors, "errors": errors, "warnings": warnings}
+
+
 class BrushWorkflowError(RuntimeError):
     """Invalid experiment transition or attempted continuation after termination."""
 
