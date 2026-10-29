@@ -40,6 +40,35 @@ def main() -> int:
     if missing:
         raise SystemExit(f"Missing required Stage 8 scenarios: {sorted(missing)}")
 
+    by_case = {(item.get("case"), item.get("scenario")): item for item in results}
+    reference = by_case[("reference-image", "combined-budget")]
+    mode_candidates = reference.get("mode_candidates", [])
+    if not isinstance(mode_candidates, list) or len(mode_candidates) < 2:
+        raise SystemExit("Reference image must compare at least two optimized geometry modes.")
+    if not {"scanline", "contour", "skeleton"}.issubset({item.get("mode") for item in mode_candidates}):
+        raise SystemExit("Reference-image report must include scanline, contour and skeleton candidates.")
+
+    point_case = by_case[("constraint-isolation", "point-budget-priority")]
+    point_baseline = point_case.get("baseline", {})
+    if point_baseline.get("fits_point_budget") is not False or point_case.get("fits_point_budget") is not True:
+        raise SystemExit("Point-priority case did not demonstrate coarsening into the point budget.")
+    if not isinstance(point_case.get("scale"), (int, float)) or point_case["scale"] >= 1.0:
+        raise SystemExit("Point-priority case did not coarsen the input.")
+
+    paint_case = by_case[("constraint-isolation", "paint-budget-priority")]
+    paint_baseline = paint_case.get("baseline", {})
+    if paint_baseline.get("fits_paint_budget") is not False or paint_case.get("fits_paint_budget") is not True:
+        raise SystemExit("Paint-priority case did not demonstrate coarsening into the paint budget.")
+    if paint_baseline.get("fits_point_budget") is not True or paint_case.get("fits_point_budget") is not True:
+        raise SystemExit("Paint-priority case does not isolate paint cost from the point budget.")
+    if not isinstance(paint_case.get("scale"), (int, float)) or paint_case["scale"] >= 1.0:
+        raise SystemExit("Paint-priority case did not coarsen the input.")
+
+    combined_case = by_case[("constraint-isolation", "combined-budget")]
+    combined_baseline = combined_case.get("baseline", {})
+    if combined_baseline.get("fits_paint_budget") is not False or combined_baseline.get("fits_point_budget") is not False:
+        raise SystemExit("Combined-budget case must start outside both resource targets.")
+
     for item in results:
         for field in ("stroke_count", "quality_mismatch_pixel_count", "quality_pixel_accuracy_percent",
                       "quality_visible_pixel_accuracy_percent", "fits_paint_budget", "fits_point_budget",
