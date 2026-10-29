@@ -188,6 +188,7 @@ def main() -> int:
                 f"({row['fallback_stroke_reduction_vs_gap_0_percent']:>6.2f}% fewer), "
                 f"path={row['fallback_path_length_px']:>9.1f}px "
                 f"(delta {row['fallback_path_delta_vs_gap_0_px']:+.1f}px), "
+                f"zero-length={row['fallback_zero_length_stroke_count']}, "
                 f"coverage={row['modeled_coverage_percent']:.2f}%"
             )
     print(f"\nJSON report: {args.output}")
