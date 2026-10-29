@@ -3,8 +3,11 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
+
+from models import DrawingPlan
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -84,6 +87,28 @@ print(json.dumps({
                     (executor / filename).read_bytes(),
                     f"Model copies diverged: {filename}",
                 )
+
+    def test_legacy_drawing_plan_json_without_optional_fields_is_loadable(self) -> None:
+        legacy_plan = {
+            "canvas": {"width": 10, "height": 8},
+            "strokes": [
+                {
+                    "name": "legacy-line",
+                    "points": [{"x": 1, "y": 2}, {"x": 7, "y": 2}],
+                }
+            ],
+        }
+        with tempfile.TemporaryDirectory(prefix="autodraw-legacy-plan-") as directory:
+            path = Path(directory) / "legacy-plan.json"
+            path.write_text(json.dumps(legacy_plan), encoding="utf-8")
+            loaded = DrawingPlan.load(path)
+
+        self.assertEqual((loaded.width, loaded.height), (10, 8))
+        self.assertEqual(loaded.schema_version, 1)
+        self.assertEqual(loaded.stroke_count, 1)
+        self.assertFalse(loaded.strokes[0].closed)
+        self.assertEqual(loaded.strokes[0].metadata, {})
+        self.assertEqual(loaded.strokes[0].points[0].to_dict(), {"x": 1.0, "y": 2.0})
 
 
 if __name__ == "__main__":
