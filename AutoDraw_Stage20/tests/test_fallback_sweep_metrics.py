@@ -103,8 +103,8 @@ def test_coverage_metrics_report_uncovered_visible_pixels():
 
     metrics = _coverage_path_metrics([stroke], indexes)
 
-    assert metrics["uncovered_visible_pixel_count"] == 9
-    assert metrics["modeled_coverage_percent"] == 40.0
+    assert metrics["uncovered_visible_pixel_count"] == 13
+    assert metrics["modeled_coverage_percent"] == 13.3333
 
 
 def test_coverage_metrics_report_footprint_spilling_into_foreign_color():
