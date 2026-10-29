@@ -18,6 +18,12 @@ def _make_test_tab():
     tab._experiment_requested_brush = None
     tab._postdraw_final_status = "completed"
     tab._postdraw_final_reason = ""
+    tab.experiment_phases = {}
+    tab.experiment_dir = None
+    tab.current_plan_path = None
+    tab.execution_report_path = None
+    tab.execution_report = None
+    tab.get_calibration_profile = None
     tab._automated_preclear_active = False
     tab._automated_preclear_after_id = None
     tab._automated_postdraw_active = False
