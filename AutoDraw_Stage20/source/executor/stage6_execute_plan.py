@@ -358,6 +358,9 @@ class Stage6App:
         self.progress_text_var = tk.StringVar(value="Ожидание")
         self.execution_state_var = tk.StringVar(value="Состояние: готово к запуску")
         self.last_report_path: Path | None = None
+        # Optional host callback for workflows that continue after execution.
+        # Returning True handles the result and suppresses the default modal dialog.
+        self.execution_finished_callback = None
 
         self._build_ui()
         self._load_settings()
@@ -1750,6 +1753,17 @@ class Stage6App:
         self.stop_button.configure(state="disabled")
         self.start_button.configure(state="normal" if self.execution_plan is not None and self.area is not None else "disabled")
         self.execution_state_var.set({"completed": "Состояние: завершено", "stopped": "Состояние: остановлено", "failed": "Состояние: ошибка"}.get(summary.status, f"Состояние: {summary.status}"))
+        callback = self.execution_finished_callback
+        if callable(callback):
+            try:
+                handled = bool(callback(summary_data, report_path if "report_path" in locals() else None))
+            except Exception as callback_error:
+                handled = False
+                self.status_var.set(f"Ошибка callback завершения исполнения: {callback_error}")
+            if handled:
+                if self.close_after_execution:
+                    self.root.destroy()
+                return
         self.progress_var.set(100 if summary.status == "completed" else self.progress_var.get())
         self.progress_text_var.set(
             f"{summary.completed_strokes}/{summary.total_strokes} штрихов; "
@@ -1824,6 +1838,17 @@ class Stage6App:
         self.stop_button.configure(state="disabled")
         self.start_button.configure(state="normal" if self.execution_plan is not None and self.area is not None else "disabled")
         self.execution_state_var.set("Состояние: ошибка")
+        callback = self.execution_finished_callback
+        if callable(callback):
+            try:
+                handled = bool(callback(summary, report_path if "report_path" in locals() else None))
+            except Exception as callback_error:
+                handled = False
+                self.status_var.set(f"Ошибка callback завершения исполнения: {callback_error}")
+            if handled:
+                if self.close_after_execution:
+                    self.root.destroy()
+                return
         self.status_var.set(f"Ошибка исполнителя: {error}. Состояние кнопки мыши автоматически подтвердить не удалось. {report_text}")
         messagebox.showerror(
             "Ошибка исполнителя",
