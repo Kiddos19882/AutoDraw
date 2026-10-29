@@ -11,6 +11,8 @@ from typing import Any
 
 import numpy as np
 
+from brush_footprint_geometry import footprint_pixel_bounds
+
 
 class InteriorFillError(ValueError):
     """Raised when an interior-fill request cannot be planned safely."""
@@ -33,14 +35,10 @@ def _footprint_is_color(
     brush: int, scale_x: float, scale_y: float,
 ) -> bool:
     height, width = indexes.shape
-    half_x = brush * scale_x / 2.0
-    half_y = brush * scale_y / 2.0
-    left = max(0, math.ceil(x1 - half_x - 1e-9))
-    right = min(width - 1, math.floor(x2 + half_x + 1e-9))
-    top = max(0, math.ceil(y - half_y - 1e-9))
-    bottom = min(height - 1, math.floor(y + half_y + 1e-9))
-    if left > right or top > bottom:
+    bounds = footprint_pixel_bounds(x1, x2, y, brush, scale_x, scale_y, width, height)
+    if bounds is None:
         return False
+    left, right, top, bottom = bounds
     region = indexes[top:bottom + 1, left:right + 1]
     return bool(region.size and np.all(region == color))
 
@@ -50,12 +48,10 @@ def _mark_footprint(
     scale_x: float, scale_y: float,
 ) -> None:
     height, width = covered.shape
-    half_x = brush * scale_x / 2.0
-    half_y = brush * scale_y / 2.0
-    left = max(0, math.ceil(x1 - half_x - 1e-9))
-    right = min(width - 1, math.floor(x2 + half_x + 1e-9))
-    top = max(0, math.ceil(y - half_y - 1e-9))
-    bottom = min(height - 1, math.floor(y + half_y + 1e-9))
+    bounds = footprint_pixel_bounds(x1, x2, y, brush, scale_x, scale_y, width, height)
+    if bounds is None:
+        return
+    left, right, top, bottom = bounds
     covered[top:bottom + 1, left:right + 1] = True
 
 
@@ -122,10 +118,13 @@ def build_interior_fill_plan(
                     # A wider stroke is useful only if its entire footprint is
                     # safe and contributes at least one not-yet-covered pixel.
                     if _footprint_is_color(indexes, color, x, end - 1, y, brush, scale_x, scale_y):
-                        left = max(0, math.ceil(x - brush * scale_x / 2.0 - 1e-9))
-                        right = min(width - 1, math.floor(end - 1 + brush * scale_x / 2.0 + 1e-9))
-                        top = max(0, math.ceil(y - brush * scale_y / 2.0 - 1e-9))
-                        bottom = min(height - 1, math.floor(y + brush * scale_y / 2.0 + 1e-9))
+                        bounds = footprint_pixel_bounds(
+                            x, end - 1, y, brush, scale_x, scale_y, width, height
+                        )
+                        if bounds is None:
+                            x = end
+                            continue
+                        left, right, top, bottom = bounds
                         if not bool(np.all(covered[top:bottom + 1, left:right + 1])):
                             strokes.append({
                                 "color_index": color,
