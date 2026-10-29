@@ -93,6 +93,46 @@ def measure_rendering(name: str, source: np.ndarray, rendered: np.ndarray, strok
     }
 
 
+def _transparent_stroke_samples(
+    plan: dict[str, Any], source: np.ndarray, *, limit: int = 10
+) -> list[dict[str, Any]]:
+    """Locate the exact strokes responsible for transparent-pixel benchmark failures."""
+    transparent = np.asarray(source) < 0
+    height, width = transparent.shape
+    samples: list[dict[str, Any]] = []
+    for stroke in plan.get("strokes", []):
+        points = stroke.get("points", [])
+        if len(points) < 2:
+            continue
+        coordinates = [(int(round(float(p["x"]))), int(round(float(p["y"])))) for p in points]
+        if stroke.get("closed") and len(coordinates) >= 3 and coordinates[-1] != coordinates[0]:
+            coordinates.append(coordinates[0])
+        xmin = max(0, min(x for x, _ in coordinates))
+        xmax = min(width - 1, max(x for x, _ in coordinates))
+        ymin = max(0, min(y for _, y in coordinates))
+        ymax = min(height - 1, max(y for _, y in coordinates))
+        if xmin > xmax or ymin > ymax:
+            continue
+        local = [(x - xmin, y - ymin) for x, y in coordinates]
+        image = Image.new("I", (xmax - xmin + 1, ymax - ymin + 1), -1)
+        draw = ImageDraw.Draw(image)
+        if len(local) == 1:
+            draw.point(local[0], fill=int(stroke["color"]["palette_index"]))
+        else:
+            draw.line(local, fill=int(stroke["color"]["palette_index"]), width=1)
+        painted = np.asarray(image, dtype=np.int32) >= 0
+        hits = np.argwhere(painted & transparent[ymin:ymax + 1, xmin:xmax + 1])
+        if hits.size:
+            samples.append({
+                "name": stroke.get("name", "unknown"),
+                "points": coordinates,
+                "transparent_pixels": [[int(xmin + x), int(ymin + y)] for y, x in hits[:10]],
+            })
+            if len(samples) >= limit:
+                break
+    return samples
+
+
 def _centerline_length(plan: dict[str, Any]) -> float:
     total = 0.0
     for stroke in plan.get("strokes", []):
@@ -171,10 +211,13 @@ def main() -> int:
     for name, plan in plans:
         rendered = render_plan_index_map(plan)
         previews[name] = rendered
-        results.append(measure_rendering(
+        metrics = measure_rendering(
             name, index_map, rendered, len(plan.get("strokes", [])),
             _centerline_length(plan), footprint_model="1px centerline rasterization",
-        ))
+        )
+        if metrics["painted_transparent_pixel_count"]:
+            metrics["transparent_stroke_samples"] = _transparent_stroke_samples(plan, index_map)
+        results.append(metrics)
     previews["interior_fill"] = interior_rendered
     results.append(measure_rendering(
         "interior_fill", index_map, interior_rendered,
