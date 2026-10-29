@@ -1,7 +1,4 @@
-"""Модели геометрии для AutoDraw."""
-
-from .point import Point
-from .stroke import Stroke
-from .drawing_plan import DrawingPlan
+"""Совместимые экспорты общих моделей геометрии."""
+from geometry_models import DrawingPlan, Point, Stroke
 
 __all__ = ["Point", "Stroke", "DrawingPlan"]
