@@ -7,7 +7,7 @@ from brush_behavior_test_ui import TEST_CASES, build_brush_test_drawing_plan, bu
 
 def _make_test_tab():
     """Build a UI controller shell with the same lifecycle defaults as __init__ without creating Tk."""
-    tab = _make_test_tab()
+    tab = brush_ui.BrushBehaviorTestTab.__new__(brush_ui.BrushBehaviorTestTab)
     tab._start_executor_after_brush_drag = False
     tab._brush_drag_state = None
     tab._brush_drag_after_id = None
