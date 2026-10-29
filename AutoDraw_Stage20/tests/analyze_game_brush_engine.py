@@ -104,7 +104,7 @@ def collect_report(source: str, source_sha256: str, git_ref: str, git_path: str)
             {
                 "offset": position,
                 "excerpt": re.sub(
-                    r"\\s+",
+                    r"\s+",
                     " ",
                     source[
                         max(0, position - ANCHOR_CONTEXT_CHARS):
