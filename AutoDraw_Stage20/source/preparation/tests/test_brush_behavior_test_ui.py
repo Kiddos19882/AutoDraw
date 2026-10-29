@@ -14,6 +14,10 @@ def _make_test_tab():
     tab._brush_drag_countdown_id = None
     tab._brush_hotkey_listener = None
     tab._brush_drag_mouse_down = False
+    tab._brush_drag_purpose = "set_brush_size"
+    tab._experiment_requested_brush = None
+    tab._postdraw_final_status = "completed"
+    tab._postdraw_final_reason = ""
     tab._automated_preclear_active = False
     tab._automated_preclear_after_id = None
     tab._automated_postdraw_active = False
@@ -429,3 +433,103 @@ def test_global_f12_listener_schedules_cancellation_on_tk_thread(monkeypatch) ->
 
     assert listener.started is True
     assert tab.root.scheduled and tab.root.scheduled[0][0] == 0
+
+
+
+def test_brush_restore_starts_at_tested_value_and_drags_to_calibrated_30(monkeypatch) -> None:
+    class Value:
+        def __init__(self, value=""):
+            self.value = value
+        def get(self):
+            return self.value
+        def set(self, value):
+            self.value = value
+
+    class Root:
+        def __init__(self):
+            self.minimized = False
+            self.scheduled = []
+        def iconify(self):
+            self.minimized = True
+        def deiconify(self):
+            self.minimized = False
+        def lift(self):
+            pass
+        def after(self, delay, callback):
+            self.scheduled.append((delay, callback))
+            return "restore-countdown"
+
+    class Listener:
+        def __init__(self, on_press):
+            self.on_press = on_press
+        def start(self):
+            pass
+        def stop(self):
+            pass
+
+    tab = _make_test_tab()
+    tab.root = Root()
+    tab.brush_var = Value("14")
+    tab.status_var = Value()
+    tab.get_brush_control = lambda: {
+        "mode": "slider", "start": [100, 500], "end": [390, 500]
+    }
+    captured = []
+    tab._start_scheduled_brush_drag = lambda start, x, y, brush: captured.append((start, x, y, brush))
+    monkeypatch.setattr(brush_ui.platform, "system", lambda: "Windows")
+    monkeypatch.setattr(brush_ui.keyboard, "Listener", Listener)
+
+    assert tab._schedule_brush_restore_30(14) is True
+    assert tab.root.minimized is True
+    assert tab.brush_var.get() == "30"
+    assert tab._brush_drag_purpose == "restore_brush_30"
+    assert len(tab.root.scheduled) == 1
+    delay, callback = tab.root.scheduled[0]
+    assert delay == 3000
+    callback()
+
+    expected_start = brush_ui.calculate_slider_target((100, 500), (390, 500), 14)
+    assert captured == [(expected_start, 100, 500, 30)]
+
+
+def test_postdraw_completion_notification_is_shown_after_restore_drag(monkeypatch, tmp_path) -> None:
+    class Value:
+        def __init__(self, value=""):
+            self.value = value
+        def get(self):
+            return self.value
+        def set(self, value):
+            self.value = value
+
+    class Root:
+        def __init__(self):
+            self.restored = False
+        def deiconify(self):
+            self.restored = True
+        def lift(self):
+            pass
+
+    tab = _make_test_tab()
+    tab.root = Root()
+    tab.status_var = Value()
+    tab.case_var = Value("Горизонтальные линии")
+    tab.brush_var = Value("30")
+    tab.experiment_dir = tmp_path
+    tab._experiment_requested_brush = 14
+    tab.get_calibration_profile = lambda: None
+    notifications = []
+    monkeypatch.setattr(brush_ui.messagebox, "showinfo", lambda *args, **kwargs: notifications.append(("info", args)))
+    monkeypatch.setattr(brush_ui.messagebox, "showwarning", lambda *args, **kwargs: notifications.append(("warning", args)))
+
+    tab._record_brush_restore_result(
+        "drag_completed_unverified",
+        "Перетаскивание завершено; проверь размер в игре.",
+        state={"start": (250, 500), "target": (100, 500)},
+    )
+
+    manifest = __import__("json").loads((tmp_path / "experiment.json").read_text(encoding="utf-8"))
+    assert manifest["brush_value_requested"] == 14
+    assert manifest["phases"]["restore_brush_30"]["status"] == "drag_completed_unverified"
+    assert tab.root.restored is True
+    assert notifications and notifications[0][0] == "info"
+    assert "Тест завершён" in tab.status_var.value
