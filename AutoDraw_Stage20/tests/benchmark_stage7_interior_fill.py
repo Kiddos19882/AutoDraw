@@ -12,9 +12,12 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-PREPARATION_ROOT = REPO_ROOT / "AutoDraw_Stage20" / "source" / "preparation"
-if str(PREPARATION_ROOT) not in sys.path:
-    sys.path.insert(0, str(PREPARATION_ROOT))
+APP_ROOT = REPO_ROOT / "AutoDraw_Stage20"
+PREPARATION_ROOT = APP_ROOT / "source" / "preparation"
+# Compatibility wrappers resolve canonical modules from the Stage20 root.
+for import_root in (PREPARATION_ROOT, APP_ROOT):
+    if str(import_root) not in sys.path:
+        sys.path.insert(0, str(import_root))
 
 from benchmark_drawing_algorithms import (  # noqa: E402
     _resolved_path,
