@@ -207,3 +207,43 @@ def test_anisotropic_scale_preserves_diagonal_components_and_holes(scale_x: floa
     assert expected_visible <= independently_covered
     assert plan["summary"]["coverage_percent"] == 100.0
 
+
+
+def test_checkerboard_stress_case_keeps_isolated_multicolor_pixels_separate():
+    # Every visible pixel is isolated from its neighbours; no wide brush may
+    # bridge colors, and transparent cells must remain untouched.
+    height, width = 13, 17
+    yy, xx = np.indices((height, width))
+    indexes = ((xx + yy) % 4).astype(np.int32)
+    indexes[(xx * 3 + yy * 5) % 7 == 0] = -1
+
+    plan = build_interior_fill_plan(indexes, max_brush_value=8)
+    independently_covered: set[tuple[int, int]] = set()
+
+    for stroke in plan["strokes"]:
+        assert stroke["role"] == "boundary_fallback"
+        assert stroke["brush_value"] == 1
+        color = stroke["color_index"]
+        first, last = stroke["points"]
+        footprint = _independent_footprint_pixels(
+            indexes.shape,
+            int(first["x"]),
+            int(last["x"]),
+            int(first["y"]),
+            int(stroke["brush_value"]),
+        )
+        for py, px in footprint:
+            assert indexes[py, px] == color
+        independently_covered.update(footprint)
+
+    expected_visible = {
+        (int(py), int(px))
+        for py, px in zip(*np.where(indexes >= 0))
+    }
+    expected_transparent = {
+        (int(py), int(px))
+        for py, px in zip(*np.where(indexes < 0))
+    }
+    assert expected_visible == independently_covered
+    assert expected_transparent.isdisjoint(independently_covered)
+    assert plan["summary"]["coverage_percent"] == 100.0
