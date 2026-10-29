@@ -1,0 +1,37 @@
+name: Game brush engine analysis
+
+on:
+  push:
+    branches:
+      - feature/image-geometry-optimization
+    paths:
+      - "AutoDraw_Stage20/tests/analyze_game_brush_engine.py"
+      - ".github/workflows/game-brush-engine-analysis.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect-game-engine:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out feature branch
+        uses: actions/checkout@v7
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Fetch master game bundle
+        run: git fetch origin master --depth=1
+      - name: Scan brush and canvas geometry evidence
+        run: |
+          python AutoDraw_Stage20/tests/analyze_game_brush_engine.py \
+            --git-ref origin/master \
+            --output AutoDraw_Stage20/benchmark-results/game-brush-engine-analysis.json
+      - name: Upload game engine scan report
+        uses: actions/upload-artifact@v4
+        with:
+          name: game-brush-engine-analysis
+          path: AutoDraw_Stage20/benchmark-results/game-brush-engine-analysis.json
+          if-no-files-found: error
