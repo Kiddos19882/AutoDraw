@@ -6,7 +6,7 @@ import pytest
 
 from brush_test_workflow import (
     BrushExperimentState, BrushWorkflowError, PHASES, calculate_slider_target,
-    validate_brush_test_preflight,
+    validate_brush_test_preflight, should_run_postdraw_workflow,
 )
 
 
@@ -230,3 +230,15 @@ def test_workflow_accepts_explicit_blank_reference_match():
     })
     state.advance("before_capture", {"capture_saved": True})
     assert state.phase == "before_capture"
+
+@pytest.mark.parametrize("status", ["completed", " COMPLETED "])
+def test_postdraw_workflow_requires_explicit_completed_status(status):
+    assert should_run_postdraw_workflow(status) is True
+
+
+@pytest.mark.parametrize("status", [
+    "stopped", "failed", "success", "succeeded", "unknown", "", None, 1, True,
+])
+def test_postdraw_workflow_does_not_run_for_non_completed_status(status):
+    assert should_run_postdraw_workflow(status) is False
+
