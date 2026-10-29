@@ -5,6 +5,23 @@ import pytest
 import brush_behavior_test_ui as brush_ui
 from brush_behavior_test_ui import TEST_CASES, build_brush_test_drawing_plan, build_brush_test_record
 
+def _make_test_tab():
+    """Build a UI controller shell with the same lifecycle defaults as __init__ without creating Tk."""
+    tab = _make_test_tab()
+    tab._start_executor_after_brush_drag = False
+    tab._brush_drag_state = None
+    tab._brush_drag_after_id = None
+    tab._brush_drag_countdown_id = None
+    tab._brush_hotkey_listener = None
+    tab._brush_drag_mouse_down = False
+    tab._automated_preclear_active = False
+    tab._automated_preclear_after_id = None
+    tab._automated_postdraw_active = False
+    tab._automated_postdraw_stop_requested = False
+    tab._automated_postdraw_after_id = None
+    return tab
+
+
 
 def test_brush_test_record_contains_reproducible_stroke_template() -> None:
     record = build_brush_test_record(
@@ -159,7 +176,7 @@ def test_set_brush_size_uses_profile_coordinates_and_minimizes_before_drag(monke
         def after(self, delay, callback):
             self.scheduled.append((delay, callback))
 
-    tab = brush_ui.BrushBehaviorTestTab.__new__(brush_ui.BrushBehaviorTestTab)
+    tab = _make_test_tab()
     tab.root = Root()
     tab.brush_var = Value("14")
     tab.slider_start_var = Value()
@@ -215,7 +232,7 @@ def test_set_brush_size_rejects_preset_click_mode(monkeypatch) -> None:
         def after(self, delay, callback):
             self.scheduled.append((delay, callback))
 
-    tab = brush_ui.BrushBehaviorTestTab.__new__(brush_ui.BrushBehaviorTestTab)
+    tab = _make_test_tab()
     tab.root = Root()
     tab.brush_var = Value("14")
     tab.slider_start_var = Value()
@@ -260,7 +277,7 @@ def test_brush_drag_f12_cancellation_releases_mouse_without_real_input() -> None
         def lift(self):
             pass
 
-    tab = brush_ui.BrushBehaviorTestTab.__new__(brush_ui.BrushBehaviorTestTab)
+    tab = _make_test_tab()
     tab.root = Root()
     tab.status_var = Value()
     tab._brush_drag_after_id = "scheduled-step"
@@ -302,7 +319,7 @@ def test_brush_drag_completion_releases_mouse_and_does_not_claim_verified_value(
         def after_cancel(self, _callback_id):
             raise AssertionError("No pending callback expected")
 
-    tab = brush_ui.BrushBehaviorTestTab.__new__(brush_ui.BrushBehaviorTestTab)
+    tab = _make_test_tab()
     tab.root = Root()
     tab.status_var = Value()
     tab._brush_drag_after_id = None
@@ -326,7 +343,7 @@ def test_brush_drag_completion_releases_mouse_and_does_not_claim_verified_value(
 
 
 def test_f12_is_not_consumed_when_no_brush_drag_is_active() -> None:
-    tab = brush_ui.BrushBehaviorTestTab.__new__(brush_ui.BrushBehaviorTestTab)
+    tab = _make_test_tab()
     tab._brush_drag_state = None
     assert tab._on_brush_workflow_stop_key() is None
 
@@ -356,7 +373,7 @@ def test_f12_cancels_pending_brush_countdown_and_restores_window(monkeypatch) ->
         def lift(self):
             pass
 
-    tab = brush_ui.BrushBehaviorTestTab.__new__(brush_ui.BrushBehaviorTestTab)
+    tab = _make_test_tab()
     tab.root = Root()
     tab.status_var = Value()
     tab._brush_drag_state = None
@@ -396,7 +413,7 @@ def test_global_f12_listener_schedules_cancellation_on_tk_thread(monkeypatch) ->
         def after(self, delay, callback):
             self.scheduled.append((delay, callback))
 
-    tab = brush_ui.BrushBehaviorTestTab.__new__(brush_ui.BrushBehaviorTestTab)
+    tab = _make_test_tab()
     tab.root = Root()
     tab._brush_hotkey_listener = None
     monkeypatch.setattr(brush_ui.keyboard, "Key", FakeKeyboard)
