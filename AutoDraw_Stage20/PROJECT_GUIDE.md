@@ -1140,6 +1140,6 @@ CI для изменений Stage 8: [workflow Geometry planner tests](https://
 - Создан пакет `(п) geometry_models` в корне `AutoDraw_Stage20` с каноническими `(ф) point.py`, `(ф) stroke.py`, `(ф) drawing_plan.py` и `(ф) __init__.py`.
 - В `(п) source/preparation/models` и `(п) source/executor/models` сохранены прежние пути импорта; файлы теперь являются совместимыми обёртками и возвращают те же классы из `geometry_models`.
 - Диагностический тест обновлён: вместо сравнения байтов двух одинаковых копий он проверяет идентичность объектов классов `Point`, `Stroke`, `DrawingPlan` из preparation, executor и общего пакета, плюс сохранность legacy JSON.
-- Исправлен путь импорта общего пакета в `(ф) source/executor/run_tests.bat` и job `executor-tests` в CI.
+- Путь к общему пакету добавлен в `(ф) source/executor/run_tests.bat`, в CI jobs подготовки и executor, а также явно в `--paths` сборщика `build_windows.py`.
 - Код внесён коммитами `b108c7e`–`30ca2e4`; Python-тесты и portable build ещё не подтверждены после этих изменений.
 - Не удалять compatibility-модули до успешного CI. Не менять геометрический алгоритм, бюджетные модели или флаги безопасности в рамках этого рефакторинга.
