@@ -818,6 +818,7 @@ def test_geometry_optimizer_enforces_game_point_budget_separately_from_paint_bud
     assert report["fits_budget"] is True
     assert report["fits_paint_budget"] is True
     assert report["fits_point_budget"] is True
+    assert report["scale"] < 1.0, "The point quota, not paint cost, must force coarsening in this fixture."
     assert report["estimated_game_points_after"] <= report["target_point_count"]
     assert report["target_point_count"] == 5_100
     assert report["point_quota_estimate"]["board_point_limit"] == 6_000
