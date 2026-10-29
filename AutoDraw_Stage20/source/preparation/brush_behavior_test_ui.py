@@ -1425,6 +1425,67 @@ class BrushBehaviorTestTab:
                 baseline = self.experiment_dir / before["files"]["paint_meter_roi"]
                 with Image.open(baseline) as first, Image.open(meter_path) as second:
                     self.experiment_phases["after_draw"]["paint_meter_measurement"] = measure_meter_fill_against_baseline(first, second)
+            # Keep the automated post-draw path aligned with the manual capture path.
+            # Visibility-analysis failures are recorded as inconclusive and must not
+            # interrupt the safety-critical clear/restore workflow.
+            visibility: dict[str, Any] = {
+                "status": "inconclusive",
+                "reason": "missing_explicit_blank_board_reference",
+            }
+            try:
+                reference_path, metadata_path = self._blank_board_reference_paths()
+                metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+                region = config.get("regions", {}).get("board_area", {})
+                current_region = {key: int(region[key]) for key in ("x", "y", "width", "height")}
+                valid_reference = (
+                    metadata.get("reference_type") == "user_confirmed_blank_board_roi"
+                    and metadata.get("user_confirmed_blank") is True
+                    and metadata.get("board_region") == current_region
+                    and metadata.get("screen_size") == {"width": screen.width, "height": screen.height}
+                    and reference_path.is_file()
+                )
+                if not valid_reference:
+                    visibility["reason"] = "reference_profile_mismatch_or_invalid"
+                elif not isinstance(self.current_plan, dict) or not isinstance(self.current_plan.get("strokes"), list):
+                    visibility["reason"] = "drawing_plan_has_no_strokes"
+                else:
+                    with Image.open(reference_path) as reference_image, Image.open(board_path) as after_image:
+                        reference = reference_image.convert("RGB")
+                        current_board = after_image.convert("RGB")
+                        canvas = self.current_plan.get("canvas")
+                        if reference.size != current_board.size:
+                            visibility["reason"] = "reference_board_dimensions_mismatch"
+                        elif isinstance(canvas, dict) and (
+                            int(canvas.get("width", -1)) != current_board.width
+                            or int(canvas.get("height", -1)) != current_board.height
+                        ):
+                            visibility["reason"] = "drawing_plan_canvas_dimensions_mismatch"
+                        else:
+                            try:
+                                brush_value = int(
+                                    self._experiment_requested_brush
+                                    if self._experiment_requested_brush is not None
+                                    else self.brush_var.get().strip()
+                                )
+                            except (TypeError, ValueError):
+                                brush_value = 1
+                            padding_px = max(2, brush_value + 1)
+                            visibility = measure_stroke_visibility(
+                                reference, current_board, self.current_plan["strokes"],
+                                padding_px=padding_px,
+                            )
+                            visibility.update({
+                                "reference_file": reference_path.name,
+                                "padding_px": padding_px,
+                                "requested_brush_value": brush_value,
+                            })
+            except (OSError, ValueError, TypeError, KeyError, json.JSONDecodeError) as exc:
+                visibility = {
+                    "status": "inconclusive",
+                    "reason": "reference_or_plan_analysis_failed",
+                    "error": str(exc),
+                }
+            self.experiment_phases["after_draw"]["stroke_visibility_analysis"] = visibility
             self._write_experiment_manifest()
             if self._automated_postdraw_stop_requested or not self._automated_postdraw_active:
                 self._cancel_automated_postdraw()
