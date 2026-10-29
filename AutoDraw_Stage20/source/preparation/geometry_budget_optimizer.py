@@ -113,6 +113,7 @@ def optimize_geometry_plan_to_budget(
     )
     from palette_quantization import normalize_palette
     from engine_point_calibration import estimate_point_quota_usage
+    from board_resource_model import SUPPORTED_BOARD_POINT_LIMITS
 
     normalized = normalize_palette(palette.get("colors", []) if isinstance(palette, dict) else palette)
     original = _validate_index_map(index_map, len(normalized))
@@ -134,8 +135,13 @@ def optimize_geometry_plan_to_budget(
         or min_component_area < 1
     ):
         raise GeometryColorPlanError("Минимальная площадь компонента должна быть целым числом от 1.")
-    if isinstance(board_point_limit, bool) or not isinstance(board_point_limit, int) or board_point_limit < 1:
-        raise GeometryColorPlanError("Лимит игровых точек должен быть положительным целым числом.")
+    if (
+        isinstance(board_point_limit, bool)
+        or not isinstance(board_point_limit, int)
+        or board_point_limit not in SUPPORTED_BOARD_POINT_LIMITS
+    ):
+        supported = ", ".join(str(value) for value in SUPPORTED_BOARD_POINT_LIMITS)
+        raise GeometryColorPlanError(f"Лимит игровых точек должен быть одним из значений: {supported}.")
     try:
         point_factor = float(point_safety_factor)
     except (TypeError, ValueError) as exc:
