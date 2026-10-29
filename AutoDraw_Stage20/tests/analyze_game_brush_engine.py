@@ -50,10 +50,13 @@ PATTERNS: dict[str, str] = {
 
 MAX_SNIPPETS_PER_PATTERN = 12
 CONTEXT_CHARS = 260
-ANCHOR_CONTEXT_CHARS = 3_000
+ANCHOR_CONTEXT_CHARS = 4_000
 ANCHORS = {
     "board_pane_class_and_dimensions": "o.BLACK_BOARD_WIDTH=460,o.BLACK_BOARD_HEIGHT=240,o.BLACK_BOARD_LINE_RADIUS=7",
     "board_pane_export": 'e.BoardPane=o',
+    "board_on_draw_start": "o.prototype.onDrawStart=function",
+    "board_on_drawing_end": "o.prototype.onDrawingEnd=function",
+    "board_set_radius": "o.prototype.setRadius=function",
     "painter_class_export": "t.Painter=e",
     "board_creation": "createBlackBoard=function",
 }
