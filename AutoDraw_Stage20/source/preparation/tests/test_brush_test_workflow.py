@@ -6,6 +6,7 @@ import pytest
 
 from brush_test_workflow import (
     BrushExperimentState, BrushWorkflowError, PHASES, calculate_slider_target,
+    validate_brush_test_preflight,
 )
 
 
@@ -107,3 +108,68 @@ def test_slider_target_rejects_invalid_brush_values(brush) -> None:
 def test_slider_target_supports_diagonal_calibration() -> None:
     assert calculate_slider_target((100, 200), (390, 490), 1) == (390, 490)
     assert calculate_slider_target((100, 200), (390, 490), 30) == (100, 200)
+
+
+
+def _valid_calibration_profile():
+    return {
+        "screen_size": {"width": 1920, "height": 1080},
+        "regions": {
+            "board_area": {"x": 100, "y": 100, "width": 646, "height": 323},
+            "paint_meter_area": {"x": 100, "y": 60, "width": 120, "height": 12},
+        },
+        "points": {"clear_board": {"x": 80, "y": 50}},
+        "status": {
+            "regions": {"board_area": "confirmed", "paint_meter_area": "confirmed"},
+            "points": {"clear_board": "confirmed"},
+        },
+    }
+
+
+def _valid_brush_control():
+    return {"mode": "slider", "start": [200, 500], "end": [500, 500]}
+
+
+def test_preflight_accepts_valid_profile_and_slider():
+    result = validate_brush_test_preflight(
+        _valid_calibration_profile(), (1920, 1080), brush_control=_valid_brush_control()
+    )
+    assert result == {"valid": True, "errors": [], "warnings": []}
+
+
+def test_preflight_rejects_screen_size_mismatch_before_mouse_actions():
+    result = validate_brush_test_preflight(
+        _valid_calibration_profile(), (1600, 900), brush_control=_valid_brush_control()
+    )
+    assert result["valid"] is False
+    assert any("Разрешение экрана изменилось" in error for error in result["errors"])
+
+
+def test_preflight_rejects_uncalibrated_or_review_required_clear_point():
+    profile = _valid_calibration_profile()
+    profile["status"]["points"]["clear_board"] = "needs_review"
+    result = validate_brush_test_preflight(
+        profile, (1920, 1080), brush_control=_valid_brush_control()
+    )
+    assert result["valid"] is False
+    assert any("Clear помечена" in error for error in result["errors"])
+
+
+def test_preflight_rejects_missing_meter_roi_and_wrong_brush_mode():
+    profile = _valid_calibration_profile()
+    profile["regions"].pop("paint_meter_area")
+    result = validate_brush_test_preflight(
+        profile, (1920, 1080), brush_control={"mode": "presets"}
+    )
+    assert result["valid"] is False
+    assert any("paint_meter_area" in error for error in result["errors"])
+    assert any("Расширенный ползунок" in error for error in result["errors"])
+
+
+def test_preflight_rejects_slider_point_outside_screen():
+    result = validate_brush_test_preflight(
+        _valid_calibration_profile(), (1920, 1080),
+        brush_control={"mode": "slider", "start": [200, 500], "end": [2500, 500]},
+    )
+    assert result["valid"] is False
+    assert any("за пределами экрана" in error for error in result["errors"])
