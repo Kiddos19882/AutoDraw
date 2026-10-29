@@ -118,6 +118,22 @@ class AdaptiveBrushPlannerTests(unittest.TestCase):
             self.assertFalse(result["strokes"][0]["brush"]["safe_to_execute"])
             self.assertFalse(result["summary"]["ready_for_automatic_execution"])
 
+    def test_minimum_brush_rejects_adjacent_pixel_cells_at_scaled_board_size(self):
+        indexes = np.full((11, 11), -1, dtype=np.int32)
+        indexes[5, 1:10] = 0
+        indexes[4, :] = 1
+        indexes[6, :] = 1
+        source = make_plan(11, 11, [make_stroke(0, 1, 9, 5, 0)])
+
+        result = build_adaptive_brush_plan(
+            indexes, source, min_brush_value=1, max_brush_value=1,
+            brush_scale_x=1.0, brush_scale_y=1.4,
+        )
+
+        self.assertIsNone(result["strokes"][0]["brush"]["value"])
+        self.assertFalse(result["strokes"][0]["brush"]["safe_for_color_map"])
+        self.assertFalse(result["summary"]["geometry_safety_confirmed"])
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
