@@ -200,6 +200,23 @@ class UnifiedAppCoreTests(unittest.TestCase):
                 except tk.TclError:
                     pass
 
+    def test_brush_executor_callback_routes_only_brush_test_plan(self):
+        app = object.__new__(integrated_app.AutoDrawUnifiedApp)
+        app.executor = type("ExecutorStub", (), {})()
+        app.brush_behavior_tab = type("BrushTabStub", (), {})()
+        app.executor.plan_path = Path("current_brush_behavior_test.json")
+        received = []
+        app.brush_behavior_tab.handle_executor_finished = lambda summary, path: received.append((summary, path)) or True
+
+        summary = {"status": "completed"}
+        report_path = Path("report.json")
+        self.assertTrue(app._on_executor_finished(summary, report_path))
+        self.assertEqual(received, [(summary, report_path)])
+
+        app.executor.plan_path = Path("ordinary-plan.json")
+        self.assertFalse(app._on_executor_finished(summary, report_path))
+        self.assertEqual(len(received), 1)
+
     def test_workflow_executor_start_uses_standard_validation_path(self):
         executor = object.__new__(integrated_app.Stage6App)
         executor.running = False
