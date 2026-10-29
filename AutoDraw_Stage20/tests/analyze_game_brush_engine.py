@@ -67,14 +67,14 @@ ANCHORS = {
     "radius_option_class": "e.RadiusOption=o",
     "radius_changed_ui_handler": "onRadiusChanged=function",
     "preloader_stage_setup": "Preloader.prototype.initStage=function",
-    "board_atom_point_collection": "t.prototype.pushPoint=function",
+    "board_atom_point_collection": "e.prototype.pushPoint=function",
     "painter_class_export": "t.Painter=e",
     "board_creation": "createBlackBoard=function",
     "size_set_content_rect": "setContentRect=function",
     "size_run_adjust": "runAdjust=function",
     "size_reset_screen": "resetScreenSize=function",
     "preloader_resize_layout": "Preloader.prototype.resize=function",
-    "uniform_board_scale": "board.scaleX=board.scaleY=o",
+    "uniform_board_scale": "this.board.scaleX=this.board.scaleY=o",
 }
 
 
