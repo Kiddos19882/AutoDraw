@@ -96,7 +96,7 @@ def summarize_interior_fill(indexes: np.ndarray, plan: dict[str, Any]) -> dict[s
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Benchmark interior fill against contour, skeleton and scanline.")
-    parser.add_argument("--git-ref", default="origin/master")
+    parser.add_argument("--git-ref", default="HEAD")
     parser.add_argument("--git-path", default="AutoDraw_Stage20/testImages/images.png")
     parser.add_argument("--target-width", type=int, default=646)
     parser.add_argument("--target-height", type=int, default=323)
