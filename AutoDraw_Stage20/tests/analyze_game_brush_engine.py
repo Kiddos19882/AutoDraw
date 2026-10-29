@@ -46,6 +46,7 @@ PATTERNS: dict[str, str] = {
     "board_terms": r"BoardPane|BoardItem|BoardCanvas|DrawingBoard|CanvasRenderingContext2D|BLACK_BOARD_WIDTH|BLACK_BOARD_HEIGHT|isPainterExtend|maxPoint",
     "board_dimensions": r"BLACK_BOARD_WIDTH|BLACK_BOARD_HEIGHT",
     "board_draw_input": r"BoardPane\.prototype\.(?:start|move|draw|paint|clear|add|finish|end|begin)|BoardPane\.BLACK_BOARD_(?:WIDTH|HEIGHT)",
+    "point_storage_methods": r"\.prototype\.(?:pushPoint|add|undo)=function",
     "point_quota_terms": r"maxPoints|max_points|pointCount|point_count|pointsLimit|pointLimit|maxPoint",
     "pointer_terms": r"pointerdown|pointermove|pointerup|mousedown|mousemove|mouseup|PointerEvent|TOUCH_BEGIN|TOUCH_MOVE|TOUCH_END",
 }
@@ -65,6 +66,11 @@ ANCHORS = {
     "board_atom_point_collection": "t.prototype.pushPoint=function",
     "painter_class_export": "t.Painter=e",
     "board_creation": "createBlackBoard=function",
+    "size_set_content_rect": "setContentRect=function",
+    "size_run_adjust": "runAdjust=function",
+    "size_reset_screen": "resetScreenSize=function",
+    "preloader_resize_layout": "Preloader.prototype.resize=function",
+    "uniform_board_scale": "board.scaleX=board.scaleY=o",
 }
 
 
