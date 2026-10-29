@@ -103,6 +103,8 @@ def _independent_footprint_pixels(
     x2: int,
     y: int,
     brush: int,
+    scale_x: float = 1.0,
+    scale_y: float = 1.0,
 ) -> set[tuple[int, int]]:
     """Enumerate pixel centers covered by a modeled rectangular brush footprint.
 
@@ -110,13 +112,14 @@ def _independent_footprint_pixels(
     slice calculation, so a shared off-by-one error is less likely to pass unnoticed.
     """
     height, width = shape
-    half = brush / 2.0
+    half_x = brush * scale_x / 2.0
+    half_y = brush * scale_y / 2.0
     return {
         (py, px)
         for py in range(height)
         for px in range(width)
-        if y - half <= py <= y + half
-        and x1 - half <= px <= x2 + half
+        if y - half_y <= py <= y + half_y
+        and x1 - half_x <= px <= x2 + half_x
     }
 
 
@@ -133,7 +136,11 @@ def test_randomized_maps_match_independent_footprint_oracle(seed: int):
         brush = stroke["brush_value"]
         first, last = stroke["points"]
         x1, x2, y = int(first["x"]), int(last["x"]), int(first["y"])
-        footprint = _independent_footprint_pixels(indexes.shape, x1, x2, y, brush)
+        footprint = _independent_footprint_pixels(
+            indexes.shape, x1, x2, y, brush,
+            plan["brush_configuration"]["scale_x_source_px_per_game_unit"],
+            plan["brush_configuration"]["scale_y_source_px_per_game_unit"],
+        )
 
         for py, px in footprint:
             assert indexes[py, px] == color, (
@@ -150,4 +157,53 @@ def test_randomized_maps_match_independent_footprint_oracle(seed: int):
     assert plan["summary"]["coverage_percent"] == 100.0
     assert plan["summary"]["all_strokes_safe_for_color_map"]
     assert not plan["summary"]["ready_for_automatic_execution"]
+
+@pytest.mark.parametrize(
+    ("scale_x", "scale_y"),
+    [(0.75, 1.0), (1.0, 0.75), (1.0, 1.0)],
+)
+def test_anisotropic_scale_preserves_diagonal_components_and_holes(scale_x: float, scale_y: float):
+    indexes = np.full((24, 30), -1, dtype=np.int32)
+    # A broad region with a transparent hole.
+    indexes[2:22, 2:20] = 0
+    indexes[8:15, 8:14] = -1
+    # A disconnected diagonal component and a different-color neighbor.
+    for offset in range(5):
+        indexes[4 + offset, 23 + offset] = 1
+    indexes[:, 29] = 2
+
+    plan = build_interior_fill_plan(
+        indexes,
+        max_brush_value=8,
+        brush_scale_x=scale_x,
+        brush_scale_y=scale_y,
+    )
+    independently_covered: set[tuple[int, int]] = set()
+
+    for stroke in plan["strokes"]:
+        color = stroke["color_index"]
+        brush = stroke["brush_value"]
+        first, last = stroke["points"]
+        footprint = _independent_footprint_pixels(
+            indexes.shape,
+            int(first["x"]),
+            int(last["x"]),
+            int(first["y"]),
+            brush,
+            scale_x,
+            scale_y,
+        )
+        for py, px in footprint:
+            assert indexes[py, px] == color, (
+                f"scale=({scale_x}, {scale_y}), stroke={stroke}, "
+                f"foreign pixel at ({px}, {py}) has index {indexes[py, px]}"
+            )
+        independently_covered.update(footprint)
+
+    expected_visible = {
+        (int(py), int(px))
+        for py, px in zip(*np.where(indexes >= 0))
+    }
+    assert expected_visible <= independently_covered
+    assert plan["summary"]["coverage_percent"] == 100.0
 
