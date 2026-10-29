@@ -150,7 +150,8 @@ def validate_brush_test_preflight(
                     continue
                 if not (0 <= px < screen_width and 0 <= py < screen_height):
                     errors.append(f"Конец ползунка {name} находится за пределами экрана.")
-                if isinstance(point_status, dict) and point_status.get(f"brush_slider_{name}") == "needs_review":
+                status_key = "brush_slider_value_30" if name == "start" else "brush_slider_value_1"
+                if isinstance(point_status, dict) and point_status.get(status_key) == "needs_review":
                     errors.append(f"Конец ползунка {name} требует повторной проверки.")
 
     if profile.get("needs_review") is True:
