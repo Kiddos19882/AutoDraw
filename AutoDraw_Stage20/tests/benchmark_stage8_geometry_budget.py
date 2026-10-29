@@ -104,7 +104,10 @@ def benchmark_case(
             "quality_mismatch_pixel_count": baseline_quality["quality_mismatch_pixel_count"],
             "quality_mismatch_percent": baseline_quality["quality_mismatch_percent"],
             "quality_pixel_accuracy_percent": baseline_quality["quality_pixel_accuracy_percent"],
+            "quality_coverage_percent": baseline_quality["quality_coverage_percent"],
             "quality_visible_pixel_accuracy_percent": baseline_quality["quality_visible_pixel_accuracy_percent"],
+            "quality_uncovered_visible_pixel_count": baseline_quality["quality_uncovered_visible_pixel_count"],
+            "quality_painted_transparent_pixel_count": baseline_quality["quality_painted_transparent_pixel_count"],
             "quality_measure_scope": baseline_quality["quality_measure_scope"],
         }
     except (ValueError, TypeError, MemoryError) as exc:
@@ -159,7 +162,10 @@ def benchmark_case(
         "quality_mismatch_pixel_count": report.get("quality_mismatch_pixel_count"),
         "quality_mismatch_percent": report.get("quality_mismatch_percent"),
         "quality_pixel_accuracy_percent": report.get("quality_pixel_accuracy_percent"),
+        "quality_coverage_percent": report.get("quality_coverage_percent"),
         "quality_visible_pixel_accuracy_percent": report.get("quality_visible_pixel_accuracy_percent"),
+        "quality_uncovered_visible_pixel_count": report.get("quality_uncovered_visible_pixel_count"),
+        "quality_painted_transparent_pixel_count": report.get("quality_painted_transparent_pixel_count"),
         "quality_measure_scope": report.get("quality_measure_scope"),
         "mode_candidates": report.get("mode_candidates", []),
         "baseline": baseline,

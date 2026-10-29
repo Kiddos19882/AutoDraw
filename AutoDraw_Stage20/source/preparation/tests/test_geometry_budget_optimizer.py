@@ -48,6 +48,10 @@ class GeometryBudgetOptimizerTests(unittest.TestCase):
         self.assertEqual(report["target_point_count"], 2_550)
         self.assertIn("quality_mismatch_pixel_count", report)
         self.assertIn("quality_pixel_accuracy_percent", report)
+        self.assertIn("quality_coverage_percent", report)
+        self.assertIn("quality_visible_pixel_accuracy_percent", report)
+        self.assertIn("quality_uncovered_visible_pixel_count", report)
+        self.assertIn("quality_painted_transparent_pixel_count", report)
         self.assertIn("quality_measure_scope", report)
         self.assertEqual(
             report["quality_measure_scope"],

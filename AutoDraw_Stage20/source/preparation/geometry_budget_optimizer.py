@@ -60,8 +60,13 @@ def measure_geometry_plan_quality(index_map: Any, plan: dict[str, Any]) -> dict[
     total_pixels = int(source.size)
     source_visible = source_indexes >= 0
     visible_count = int(np.count_nonzero(source_visible))
+    covered_count = int(np.count_nonzero(covered))
     exact_visible_matches = int(np.count_nonzero((rendered_indexes == source_indexes) & source_visible))
+    uncovered_visible_count = int(np.count_nonzero(source_visible & ~rendered_visible))
+    painted_transparent_count = int(np.count_nonzero(~source_visible & rendered_visible))
+    wrong_color_count = int(np.count_nonzero(wrong))
     visible_accuracy = 100.0 * exact_visible_matches / visible_count if visible_count else 100.0
+    coverage_percent = 100.0 * covered_count / visible_count if visible_count else 100.0
 
     return {
         "quality_measure": "exact_preview_rgb_pixel_comparison_v1",
@@ -77,7 +82,12 @@ def measure_geometry_plan_quality(index_map: Any, plan: dict[str, Any]) -> dict[
         "quality_pixel_accuracy_percent": round(100.0 * (total_pixels - mismatch_count) / total_pixels, 4)
         if total_pixels else 100.0,
         "quality_source_visible_pixel_count": visible_count,
+        "quality_covered_visible_pixel_count": covered_count,
         "quality_exact_visible_pixel_count": exact_visible_matches,
+        "quality_uncovered_visible_pixel_count": uncovered_visible_count,
+        "quality_painted_transparent_pixel_count": painted_transparent_count,
+        "quality_wrong_color_pixel_count": wrong_color_count,
+        "quality_coverage_percent": round(coverage_percent, 4),
         "quality_visible_pixel_accuracy_percent": round(visible_accuracy, 4),
     }
 
@@ -250,6 +260,7 @@ def optimize_geometry_plan_to_budget(
                     quality_report = measure_geometry_plan_quality(original, candidate)
                     report.update(quality_report)
                     quality = (
+                        -float(quality_report["quality_visible_pixel_accuracy_percent"]),
                         int(quality_report["quality_mismatch_pixel_count"]),
                         float(tolerance),
                         min_area,
@@ -329,6 +340,7 @@ def optimize_geometry_plan_across_modes(
         if report["fits_budget"]:
             key = (
                 0,
+                -float(report.get("quality_visible_pixel_accuracy_percent", 0.0)),
                 int(report.get("quality_mismatch_pixel_count", 0)),
                 -float(report.get("scale", 1.0)),
                 float(report.get("combined_budget_pressure", report["estimated_ink_after_px_equivalent"])),
@@ -338,7 +350,8 @@ def optimize_geometry_plan_across_modes(
             key = (
                 1,
                 float(report.get("combined_budget_pressure", report["estimated_ink_after_px_equivalent"])),
-                float(report.get("quality_mismatch_pixel_count", 0)),
+                -float(report.get("quality_visible_pixel_accuracy_percent", 0.0)),
+                int(report.get("quality_mismatch_pixel_count", 0)),
                 -float(report.get("scale", 1.0)),
                 mode_priority,
             )
@@ -363,6 +376,10 @@ def optimize_geometry_plan_across_modes(
             "combined_budget_pressure": float(report["combined_budget_pressure"]),
             "quality_mismatch_pixel_count": int(report.get("quality_mismatch_pixel_count", 0)),
             "quality_pixel_accuracy_percent": float(report.get("quality_pixel_accuracy_percent", 0.0)),
+            "quality_coverage_percent": float(report.get("quality_coverage_percent", 0.0)),
+            "quality_visible_pixel_accuracy_percent": float(report.get("quality_visible_pixel_accuracy_percent", 0.0)),
+            "quality_uncovered_visible_pixel_count": int(report.get("quality_uncovered_visible_pixel_count", 0)),
+            "quality_painted_transparent_pixel_count": int(report.get("quality_painted_transparent_pixel_count", 0)),
         }
         for _score, plan, report in candidates
     ]
@@ -371,8 +388,9 @@ def optimize_geometry_plan_across_modes(
     chosen_report["mode_candidates"] = mode_summaries
     chosen_report["automatic_selection_policy"] = (
         "A candidate fits only when both paint cost and calibrated game-point estimate are within their safety targets. "
-        "Among fitting candidates: fewest exact-color pixel mismatches, then highest sampling scale, then lowest combined "
-        "budget pressure. If none fits, choose the lowest normalized combined pressure and flag multi-board splitting."
+        "Among fitting candidates: highest exact-color accuracy on source-visible pixels, then fewest total pixel mismatches, "
+        "then highest sampling scale and lowest combined budget pressure. If none fits, choose the lowest normalized combined "
+        "pressure, then best visible-pixel accuracy, and flag multi-board splitting."
     )
     best_plan["generation"]["budget_optimization"] = dict(chosen_report)
     return validate_geometry_color_plan(best_plan), chosen_report
