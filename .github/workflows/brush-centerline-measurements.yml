@@ -6,6 +6,7 @@ on:
       - feature/image-geometry-optimization
     paths:
       - "AutoDraw_Stage20/tests/analyze_brush_centerline_results.py"
+      - "AutoDraw_Stage20/tests/analyze_brush_experiment_series.py"
       - ".github/workflows/brush-centerline-measurements.yml"
       - "AutoDraw_Stage20/data/results/brush_behavior_tests/**"
   workflow_dispatch:
@@ -50,6 +51,22 @@ jobs:
             --pair "data/results/brush_behavior_tests/brush-plan-short_strokes-b1-20261028-211110.json=data/results/brush_behavior_tests/brush-screenshot-20261028-211126.png" `
             --pair "data/results/brush_behavior_tests/brush-plan-rectangle_corners-b1-20261028-211159.json=data/results/brush_behavior_tests/brush-screenshot-20261028-211218.png" `
             --output data/results/brush_behavior_tests/centerline-measurements-all-brushes-ci.json
+      - name: Analyze saved experiment ROI series
+        run: |
+          python tests/analyze_brush_experiment_series.py `
+            --data-dir data/results/brush_behavior_tests `
+            --blank data/results/brush_behavior_tests/blank-board-reference.png `
+            --output-json data/results/brush_behavior_tests/brush-geometry-summary.json `
+            --output-csv data/results/brush_behavior_tests/brush-geometry-summary.csv
+      - name: Upload aggregate experiment geometry report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: brush-experiment-geometry-summary
+          path: |
+            AutoDraw_Stage20/data/results/brush_behavior_tests/brush-geometry-summary.json
+            AutoDraw_Stage20/data/results/brush_behavior_tests/brush-geometry-summary.csv
+          if-no-files-found: warn
       - name: Upload centerline report
         if: always()
         uses: actions/upload-artifact@v4
