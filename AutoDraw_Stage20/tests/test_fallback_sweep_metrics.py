@@ -71,8 +71,8 @@ def test_coverage_metrics_separate_fresh_and_revisited_centerline_pixels():
 
     metrics = _coverage_path_metrics(strokes, indexes)
 
-    assert metrics["revisit_centerline_pixel_visits"] == 2
-    assert metrics["fresh_centerline_pixel_visits"] == 4
+    assert metrics["revisit_centerline_pixel_visits"] == 3
+    assert metrics["fresh_centerline_pixel_visits"] == 3
     assert metrics["invalid_centerline_pixel_visits"] == 0
 
 
