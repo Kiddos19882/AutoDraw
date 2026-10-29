@@ -874,6 +874,11 @@ def test_automatic_optimizer_uses_precise_cost_when_no_mode_fits(monkeypatch):
             "needs_multi_board_split": True,
             "scale": 1.0,
             "estimated_ink_after_px_equivalent": cost,
+            "estimated_game_points_after": 100,
+            "target_point_count": 5_100,
+            "fits_paint_budget": False,
+            "fits_point_budget": True,
+            "combined_budget_pressure": cost,
             "quality_mismatch_pixel_count": mismatches,
             "quality_pixel_accuracy_percent": 0.0,
         }
