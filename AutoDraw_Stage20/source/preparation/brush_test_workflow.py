@@ -27,6 +27,11 @@ PHASES = (
     "completed",
 )
 TERMINAL_STATES = frozenset({"completed", "stopped", "failed", "inconclusive"})
+
+
+def should_run_postdraw_workflow(execution_status: object) -> bool:
+    """Allow automatic post-draw actions only after an explicitly completed execution."""
+    return isinstance(execution_status, str) and execution_status.strip().lower() == "completed"
 _ALLOWED_NEXT = {
     "created": {"preflight"},
     "preflight": {"before_clear"},
