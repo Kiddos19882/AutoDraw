@@ -135,6 +135,20 @@ jobs:
           $env:PYTHONPATH = "$env:GITHUB_WORKSPACE\AutoDraw_Stage20;$env:GITHUB_WORKSPACE\AutoDraw_Stage20\source\preparation"
           python -m pytest -q -ra tests/test_outline_first_fill_planner.py
 
+      - name: Compare outline-first and interior-fill strategies
+        shell: pwsh
+        run: |
+          $env:PYTHONPATH = "$env:GITHUB_WORKSPACE\AutoDraw_Stage20;$env:GITHUB_WORKSPACE\AutoDraw_Stage20\source\preparation"
+          python ..\..\tests\benchmark_outline_first_fill.py --output AutoDraw_Stage20/benchmark-results/outline-first-comparison.json
+
+      - name: Upload outline-first comparison report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: outline-first-fill-comparison
+          path: AutoDraw_Stage20/benchmark-results/outline-first-comparison.json
+          if-no-files-found: error
+
       - name: Run preparation and geometry tests
         shell: pwsh
         run: |
