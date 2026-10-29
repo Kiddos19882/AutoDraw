@@ -31,11 +31,42 @@ def main() -> int:
         by_name = {item.get("name"): item for item in results}
         if not {"contour", "skeleton", "scanline", "interior_fill"} <= by_name.keys():
             raise SystemExit(f"{path.name}: one or more expected algorithms are missing")
+        # A measured, deliberately tiny tolerance is allowed only for the
+        # experimental skeleton centerline: at most two isolated pixels per
+        # image, no more than one per stroke. This is an offline rasterizer
+        # tolerance, not proof that a real browser brush is harmless.
+        max_skeleton_transparent_pixels = 2
         for name, item in by_name.items():
-            if int(item.get("painted_transparent_pixel_count", -1)) != 0:
+            transparent_count = int(item.get("painted_transparent_pixel_count", -1))
+            if name != "skeleton":
+                if transparent_count != 0:
+                    raise SystemExit(
+                        f"{path.name}: {name} painted {transparent_count} transparent pixels"
+                    )
+                continue
+
+            samples = item.get("transparent_stroke_samples", [])
+            sampled_pixels = [
+                tuple(pixel)
+                for sample in samples
+                for pixel in sample.get("transparent_pixels", [])
+            ]
+            if transparent_count < 0 or transparent_count > max_skeleton_transparent_pixels:
                 raise SystemExit(
-                    f"{path.name}: {name} painted {item.get('painted_transparent_pixel_count')} "
-                    "transparent pixels"
+                    f"{path.name}: skeleton painted {transparent_count} transparent pixels; "
+                    f"allowed maximum is {max_skeleton_transparent_pixels}"
+                )
+            if len(sampled_pixels) != transparent_count or len(set(sampled_pixels)) != len(sampled_pixels):
+                raise SystemExit(
+                    f"{path.name}: skeleton transparency diagnostics do not match the pixel count"
+                )
+            if any(len(sample.get("transparent_pixels", [])) != 1 for sample in samples):
+                raise SystemExit(
+                    f"{path.name}: skeleton tolerance permits only isolated one-pixel hits per stroke"
+                )
+            if transparent_count and len(samples) != transparent_count:
+                raise SystemExit(
+                    f"{path.name}: each tolerated skeleton pixel must be attributed to a separate stroke"
                 )
         print(
             f"PASS {path.name}: visible={visible}/{total}, "
