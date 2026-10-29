@@ -17,6 +17,7 @@ for import_root in (APP_ROOT / "source" / "preparation", APP_ROOT):
     if str(import_root) not in sys.path:
         sys.path.insert(0, str(import_root))
 
+from brush_footprint_geometry import footprint_pixel_bounds  # noqa: E402
 from interior_fill_planner import build_interior_fill_plan  # noqa: E402
 
 
@@ -118,6 +119,78 @@ def _fallback_path_length(strokes: list[dict[str, Any]]) -> float:
     return _path_length([s for s in strokes if s.get("role") == "boundary_fallback"])
 
 
+def _bresenham_pixels(x1: int, y1: int, x2: int, y2: int) -> list[tuple[int, int]]:
+    """Return integer pixel centers along a segment, including both endpoints."""
+    points: list[tuple[int, int]] = []
+    dx, dy = abs(x2 - x1), abs(y2 - y1)
+    sx = 1 if x1 < x2 else -1
+    sy = 1 if y1 < y2 else -1
+    error = dx - dy
+    x, y = x1, y1
+    while True:
+        points.append((x, y))
+        if x == x2 and y == y2:
+            break
+        doubled = 2 * error
+        if doubled > -dy:
+            error -= dy
+            x += sx
+        if doubled < dx:
+            error += dx
+            y += sy
+    return points
+
+
+def _coverage_path_metrics(strokes: list[dict[str, Any]], index_map: np.ndarray) -> dict[str, int]:
+    """Classify centerline pixel visits against prior modeled brush footprints."""
+    height, width = index_map.shape
+    covered_by_color: dict[int, np.ndarray] = {}
+    fresh_visits = revisit_visits = invalid_visits = 0
+    for stroke in strokes:
+        color = int(stroke["color_index"])
+        covered = covered_by_color.setdefault(color, np.zeros((height, width), dtype=bool))
+        points = _stroke_points(stroke)
+        if not points:
+            continue
+        segments = list(zip(points, points[1:]))
+        if len(points) == 1:
+            segments = [(points[0], points[0])]
+        elif stroke.get("closed") and len(points) > 2:
+            segments.append((points[-1], points[0]))
+        centerline: list[tuple[int, int]] = []
+        for (x1, y1), (x2, y2) in segments:
+            pixels = _bresenham_pixels(round(x1), round(y1), round(x2), round(y2))
+            centerline.extend(pixels if not centerline else pixels[1:])
+        for x, y in centerline:
+            if not (0 <= x < width and 0 <= y < height) or int(index_map[y, x]) != color:
+                invalid_visits += 1
+            elif covered[y, x]:
+                revisit_visits += 1
+            else:
+                fresh_visits += 1
+
+        brush = int(stroke.get("brush_value", 1))
+        xs = [round(point[0]) for point in points]
+        ys = [round(point[1]) for point in points]
+        # Planner strokes are horizontal; the rectangle also safely bounds
+        # multi-point routes for this diagnostic approximation.
+        for y in range(min(ys), max(ys) + 1):
+            bounds = footprint_pixel_bounds(
+                min(xs), max(xs), y, brush, 1.0, 1.0, width, height
+            )
+            if bounds is None:
+                continue
+            left, right, top, bottom = bounds
+            region = index_map[top:bottom + 1, left:right + 1]
+            covered[top:bottom + 1, left:right + 1] |= region == color
+
+    return {
+        "fresh_centerline_pixel_visits": fresh_visits,
+        "revisit_centerline_pixel_visits": revisit_visits,
+        "invalid_centerline_pixel_visits": invalid_visits,
+    }
+
+
 def run_sweep() -> dict[str, Any]:
     results: list[dict[str, Any]] = []
     for case_name, index_map in make_cases().items():
@@ -136,9 +209,12 @@ def run_sweep() -> dict[str, Any]:
                 "merge_gap_px": gap,
                 "total_stroke_count": len(strokes),
                 "interior_fill_stroke_count": len(strokes) - len(fallback),
-                "fallback_stroke_count": len(fallback),\n                "fallback_zero_length_stroke_count": _zero_length_stroke_count(fallback),
+                "fallback_stroke_count": len(fallback),
+                "fallback_zero_length_stroke_count": _zero_length_stroke_count(fallback),
                 "fallback_path_length_px": round(fallback_path, 3),
-                "total_path_length_px": round(_path_length(strokes), 3),\n                "zero_length_stroke_count": _zero_length_stroke_count(strokes),
+                "total_path_length_px": round(_path_length(strokes), 3),
+                **_coverage_path_metrics(strokes, index_map),
+                "zero_length_stroke_count": _zero_length_stroke_count(strokes),
                 "fallback_stroke_reduction_vs_gap_0_percent": round(
                     100.0 * (baseline_fallback_count - len(fallback)) / baseline_fallback_count, 4
                 ) if baseline_fallback_count else 0.0,
@@ -164,7 +240,9 @@ def run_sweep() -> dict[str, Any]:
         "cases": results,
         "interpretation_limits": [
             "Synthetic maps are deterministic stress cases, not a representative sample of all user images.",
-            "A one-pixel or otherwise degenerate stroke can have zero centerline length while still counting as a stroke and potentially consuming an in-game action/resource.",\n            "Fallback path delta is a geometric proxy for added centerline travel, not paint consumption.",
+            "A one-pixel or otherwise degenerate stroke can have zero centerline length while still counting as a stroke and potentially consuming an in-game action/resource.",
+            "Fresh/revisit centerline visits use rasterized centerlines and modeled footprints; they are geometric proxies, not real brush or paint measurements.",
+            "Fallback path delta is a geometric proxy for added centerline travel, not paint consumption.",
             "Paint and game-point estimates are intentionally not inferred from stroke count alone.",
             "A 100% modeled coverage result does not validate the real in-game brush footprint.",
             "Automatic execution remains disabled for all generated plans.",
@@ -178,10 +256,12 @@ def main() -> int:
     args = parser.parse_args()
     report = run_sweep()
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "
+", encoding="utf-8")
     print("Stage 7 fallback merge sweep (offline model)")
     for case in report["cases"]:
-        print(f"\n{case['case']}")
+        print(f"
+{case['case']}")
         for row in case["sweep"]:
             print(
                 f"gap={row['merge_gap_px']:>2}px fallback={row['fallback_stroke_count']:>5} "
@@ -191,7 +271,8 @@ def main() -> int:
                 f"zero-length={row['fallback_zero_length_stroke_count']}, "
                 f"coverage={row['modeled_coverage_percent']:.2f}%"
             )
-    print(f"\nJSON report: {args.output}")
+    print(f"
+JSON report: {args.output}")
     return 0
 
 
