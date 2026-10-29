@@ -71,6 +71,31 @@ def polyline_distance(points_a: list[tuple[float, float]], points_b: list[tuple[
     return best
 
 
+def classify_brush_setting(phases: dict[str, Any] | None) -> str:
+    """Classify whether the requested brush value was explicitly checked in the game UI.
+
+    Older experiment manifests predate the brush_setup phase. Their requested
+    value must not be interpreted as a verified UI setting.
+    """
+    if not isinstance(phases, dict):
+        return "legacy_unverified"
+    setup = phases.get("brush_setup")
+    if not isinstance(setup, dict):
+        return "legacy_unverified"
+    status = setup.get("status")
+    if status == "confirmed_by_user":
+        return "confirmed_by_user"
+    if status == "declined_by_user":
+        return "declined_by_user"
+    if status in {"awaiting_user_confirmation", "confirmation_dialog_failed"}:
+        return "pending_user_confirmation"
+    if status == "manifest_write_failed":
+        return "manifest_write_failed"
+    if status == "manifest_write_failed_after_confirmation":
+        return "manifest_write_failed_after_confirmation"
+    return str(status or "unknown")
+
+
 def difference_points(blank: Image.Image, drawn: Image.Image, threshold: float) -> list[tuple[int, int]]:
     if blank.size != drawn.size:
         raise ValueError(f"Board ROI sizes differ: blank={blank.size}, drawn={drawn.size}")
@@ -178,6 +203,8 @@ def main() -> int:
     for record_path in experiments:
         record = json.loads(record_path.read_text(encoding="utf-8"))
         phases = record.get("phases", {})
+        brush_setting_status = classify_brush_setting(phases)
+        brush_value_confirmed = brush_setting_status == "confirmed_by_user"
         draw_phase = phases.get("after_draw", {})
         board_name = draw_phase.get("files", {}).get("board_roi")
         if not board_name:
@@ -189,6 +216,8 @@ def main() -> int:
             rows.append({
                 "experiment": record_path.parent.name,
                 "brush": record.get("brush_value_requested"),
+                "brush_setting_status": brush_setting_status,
+                "brush_value_confirmed": brush_value_confirmed,
                 "scenario": record.get("test_case"),
                 "status": "missing_plan_or_board_image",
                 "plan_file": plan_name,
@@ -202,6 +231,8 @@ def main() -> int:
             rows.append({
                 "experiment": record_path.parent.name,
                 "brush": record.get("brush_value_requested"),
+                "brush_setting_status": brush_setting_status,
+                "brush_value_confirmed": brush_value_confirmed,
                 "scenario": record.get("test_case"),
                 "status": "roi_size_mismatch",
                 "blank_size": list(blank.size),
@@ -217,6 +248,8 @@ def main() -> int:
         row = {
             "experiment": record_path.parent.name,
             "brush": brush,
+            "brush_setting_status": brush_setting_status,
+            "brush_value_confirmed": brush_value_confirmed,
             "scenario": record.get("test_case"),
             "execution_status": execution.get("status"),
             "completed_strokes": execution.get("completed_strokes"),
@@ -235,8 +268,10 @@ def main() -> int:
         series.append(row)
         for measurement in stroke_results:
             rows.append({
-                "experiment": row["experiment"], "brush": brush, "scenario": row["scenario"],
-                "execution_status": row["execution_status"],
+                "experiment": row["experiment"], "brush": brush,
+                "brush_setting_status": row["brush_setting_status"],
+                "brush_value_confirmed": row["brush_value_confirmed"],
+                "scenario": row["scenario"], "execution_status": row["execution_status"],
                 "completed_strokes": row["completed_strokes"], "total_strokes": row["total_strokes"],
                 "duration_seconds": row["duration_seconds"],
                 "stroke": measurement.get("stroke"), "planned_length_px": measurement.get("planned_length_px"),
@@ -256,6 +291,15 @@ def main() -> int:
         "schema_version": 1,
         "method": "blank_board_pixel_difference_and_cross_track_percentile",
         "working_assumption": "All strokes completed by executor are treated as registered, per user decision; image analysis measures geometry only.",
+        "brush_setting_interpretation": (
+            "The requested brush value is not proof of the selected in-game value. "
+            "Experiments are marked confirmed_by_user only when phases.brush_setup.status is confirmed_by_user; "
+            "legacy experiments without that phase are legacy_unverified."
+        ),
+        "brush_setting_status_counts": {
+            status: sum(1 for item in series if item.get("brush_setting_status") == status)
+            for status in sorted({str(item.get("brush_setting_status")) for item in series})
+        },
         "blank_reference": str(args.blank),
         "blank_size": {"width": blank.width, "height": blank.height},
         "threshold_rgb_euclidean": args.threshold,
@@ -267,7 +311,8 @@ def main() -> int:
             "The brush-size setting expands the search corridor; it is not treated as a measured diameter.",
             "Width estimates are most reliable for isolated long strokes; short strokes, corners, and overlapping traces are lower confidence.",
             "Paint-meter results remain separate and are not inferred from board geometry.",
-            "Execution completion is treated as registered only as the user's current working assumption."
+            "Execution completion is treated as registered only as the user's current working assumption.",
+            "Requested brush values in legacy experiments are not verified UI selections; see brush_setting_status."
         ],
     }
     args.output_json.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
