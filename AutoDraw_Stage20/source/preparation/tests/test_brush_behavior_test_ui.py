@@ -183,3 +183,41 @@ def test_set_brush_size_uses_profile_coordinates_and_minimizes_before_drag(monke
 
     # Running the scheduled callback would control the real mouse, so assert
     # only that the expected action is queued and do not invoke it in a unit test.
+
+
+def test_set_brush_size_rejects_preset_click_mode(monkeypatch) -> None:
+    class Value:
+        def __init__(self, value=""):
+            self.value = value
+        def get(self):
+            return self.value
+        def set(self, value):
+            self.value = value
+
+    class Root:
+        def __init__(self):
+            self.minimized = False
+            self.scheduled = []
+        def iconify(self):
+            self.minimized = True
+        def after(self, delay, callback):
+            self.scheduled.append((delay, callback))
+
+    tab = brush_ui.BrushBehaviorTestTab.__new__(brush_ui.BrushBehaviorTestTab)
+    tab.root = Root()
+    tab.brush_var = Value("14")
+    tab.slider_start_var = Value()
+    tab.slider_end_var = Value()
+    tab.status_var = Value()
+    tab.get_brush_control = lambda: {
+        "mode": "presets", "presets": {"7": [10, 20], "14": [30, 40], "20": [50, 60]}
+    }
+    monkeypatch.setattr(brush_ui.platform, "system", lambda: "Windows")
+    warnings = []
+    monkeypatch.setattr(brush_ui.messagebox, "showwarning", lambda *args, **kwargs: warnings.append(args))
+
+    assert tab.set_brush_size() is False
+    assert tab.root.minimized is False
+    assert tab.root.scheduled == []
+    assert warnings
+    assert "перетаскиванием" in warnings[0][1]
