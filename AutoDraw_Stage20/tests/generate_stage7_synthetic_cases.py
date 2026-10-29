@@ -7,7 +7,7 @@ from PIL import Image, ImageDraw
 
 
 def make_cases(output_dir: Path) -> list[Path]:
-    """Create deterministic transparent RGBA inputs for geometry stress benchmarks."""
+    """Create deterministic opaque white-background RGBA inputs for geometry stress benchmarks."""
     output_dir.mkdir(parents=True, exist_ok=True)
     size = (320, 160)
     paths: list[Path] = []
