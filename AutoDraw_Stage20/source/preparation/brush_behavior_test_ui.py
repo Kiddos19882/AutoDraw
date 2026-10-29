@@ -16,7 +16,9 @@ from PIL import Image, ImageGrab
 from pynput import keyboard
 
 from stage8_optimizer import save_plan
-from brush_test_workflow import calculate_slider_target, validate_brush_test_preflight
+from brush_test_workflow import (
+    calculate_slider_target, validate_brush_test_preflight, should_run_postdraw_workflow,
+)
 from brush_experiment_capture import (
     compare_images, crop_calibrated_regions,
     measure_meter_fill_against_baseline, evaluate_meter_restoration, evaluate_board_clear,
@@ -1506,8 +1508,7 @@ class BrushBehaviorTestTab:
                 f"Исполнитель завершил тест со статусом «{status}». "
                 + (f"Отчёт: {self.execution_report_path}" if self.execution_report_path else "Файл отчёта не создан.")
             )
-            normalized_status = status.strip().lower()
-            if normalized_status in {"completed", "success", "succeeded"} and self.experiment_dir is not None:
+            if should_run_postdraw_workflow(status) and self.experiment_dir is not None:
                 self._start_automated_postdraw()
             else:
                 self.experiment_phases["postdraw_workflow"] = {
