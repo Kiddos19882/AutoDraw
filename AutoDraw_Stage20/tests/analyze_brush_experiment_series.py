@@ -31,6 +31,30 @@ def distance_to_segment(px: float, py: float, ax: float, ay: float, bx: float, b
     return math.hypot(px - qx, py - qy), t, signed_cross
 
 
+def polyline_distance(points_a: list[tuple[float, float]], points_b: list[tuple[float, float]]) -> float:
+    """Approximate minimum centerline distance between two planned polylines."""
+    if len(points_a) < 2 or len(points_b) < 2:
+        return math.inf
+    best = math.inf
+    for ax, ay in zip(points_a, points_a[1:]):
+        pass
+    for (ax, ay), (bx, by) in zip(points_a, points_a[1:]):
+        for (cx, cy), (dx, dy) in zip(points_b, points_b[1:]):
+            # A crossing or touching pair of segments has zero separation.
+            denominator = (bx - ax) * (dy - cy) - (by - ay) * (dx - cx)
+            if abs(denominator) > 1e-9:
+                t = ((cx - ax) * (dy - cy) - (cy - ay) * (dx - cx)) / denominator
+                u = ((cx - ax) * (by - ay) - (cy - ay) * (bx - ax)) / denominator
+                if 0.0 <= t <= 1.0 and 0.0 <= u <= 1.0:
+                    return 0.0
+            best = min(best,
+                       distance_to_segment(ax, ay, cx, cy, dx, dy)[0],
+                       distance_to_segment(bx, by, cx, cy, dx, dy)[0],
+                       distance_to_segment(cx, cy, ax, ay, bx, by)[0],
+                       distance_to_segment(dx, dy, ax, ay, bx, by)[0])
+    return best
+
+
 def difference_points(blank: Image.Image, drawn: Image.Image, threshold: float) -> list[tuple[int, int]]:
     if blank.size != drawn.size:
         raise ValueError(f"Board ROI sizes differ: blank={blank.size}, drawn={drawn.size}")
@@ -47,6 +71,7 @@ def difference_points(blank: Image.Image, drawn: Image.Image, threshold: float) 
 
 
 def analyze_stroke(stroke: dict[str, Any], ink: list[tuple[int, int]], brush: float | None,
+                   other_strokes: list[dict[str, Any]] | None = None,
                    minimum_coverage: float = 0.45) -> dict[str, Any]:
     raw = stroke.get("points", [])
     points = [(float(p["x"]), float(p["y"])) for p in raw if isinstance(p, dict) and "x" in p and "y" in p]
@@ -63,6 +88,17 @@ def analyze_stroke(stroke: dict[str, Any], ink: list[tuple[int, int]], brush: fl
     # Use a broad capture corridor, then estimate width from the central part of
     # the trajectory. This avoids using a padded ROI's bounding box as brush size.
     corridor = max(5.0, (float(brush or 1) * 0.9) + 4.0)
+    other_points = []
+    for other in other_strokes or []:
+        if other is stroke:
+            continue
+        raw_other = other.get("points", [])
+        parsed = [(float(p["x"]), float(p["y"])) for p in raw_other
+                  if isinstance(p, dict) and "x" in p and "y" in p]
+        if len(parsed) >= 2:
+            other_points.append(parsed)
+    nearest_other = min((polyline_distance(points, candidate) for candidate in other_points), default=math.inf)
+    overlap_risk = nearest_other <= 2.0 * corridor + 1.0
     samples: list[tuple[float, float]] = []
     along_values: list[float] = []
     for x, y in ink:
@@ -89,6 +125,8 @@ def analyze_stroke(stroke: dict[str, Any], ink: list[tuple[int, int]], brush: fl
     along_span = max(along_values) - min(along_values) if along_values else 0.0
     if length <= (float(brush or 1) * 2.0 + 8.0):
         status, confidence = "short_trace_width_confounded", "low"
+    elif overlap_risk:
+        status, confidence = "potential_overlap_confounded", "low"
     elif coverage >= 0.8 and len(central) >= 20:
         status, confidence = "measured_candidate", "medium"
     else:
@@ -98,6 +136,8 @@ def analyze_stroke(stroke: dict[str, Any], ink: list[tuple[int, int]], brush: fl
         "planned_length_px": round(length, 2), "observed_along_path_span_px": round(along_span, 2),
         "estimated_width_px": round(width, 2), "changed_pixels_near_path": len(samples),
         "central_cross_track_samples": len(central), "centerline_coverage": round(min(1.0, coverage), 3),
+        "nearest_other_centerline_px": None if math.isinf(nearest_other) else round(nearest_other, 2),
+        "potential_overlap": overlap_risk,
         "confidence": confidence,
         "note": "Width is the 5th–95th percentile cross-track span plus one pixel; isolated long strokes are most reliable."
     }
@@ -153,7 +193,8 @@ def main() -> int:
         ink = difference_points(blank, drawn, args.threshold)
         brush = record.get("brush_value_requested")
         strokes = plan.get("strokes", [])
-        stroke_results = [analyze_stroke(s, ink, float(brush) if brush is not None else None) for s in strokes]
+        stroke_results = [analyze_stroke(s, ink, float(brush) if brush is not None else None,
+                                         other_strokes=strokes) for s in strokes]
         execution = record.get("execution_report", {})
         row = {
             "experiment": record_path.parent.name,
@@ -185,6 +226,8 @@ def main() -> int:
                 "estimated_width_px": measurement.get("estimated_width_px"),
                 "centerline_coverage": measurement.get("centerline_coverage"),
                 "measurement_status": measurement.get("status"), "confidence": measurement.get("confidence"),
+                "nearest_other_centerline_px": measurement.get("nearest_other_centerline_px"),
+                "potential_overlap": measurement.get("potential_overlap"),
                 "changed_pixels_near_path": measurement.get("changed_pixels_near_path"),
                 "changed_pixels_vs_blank": len(ink),
                 "meter_status": row["meter_status"], "meter_confidence": row["meter_confidence"],
