@@ -68,6 +68,7 @@ def validate_brush_test_preflight(
     profile: dict[str, Any] | None,
     screen_size: tuple[int, int],
     *,
+    brush_control: dict[str, Any] | None = None,
     require_slider: bool = True,
 ) -> dict[str, Any]:
     """Validate calibration before any automated mouse action; never performs I/O."""
@@ -134,7 +135,7 @@ def validate_brush_test_preflight(
             errors.append("Точка Clear помечена как требующая повторной проверки.")
 
     if require_slider:
-        brush = profile.get("brush_control")
+        brush = brush_control if brush_control is not None else profile.get("brush_control")
         if not isinstance(brush, dict):
             errors.append("В профиле отсутствует калибровка ползунка кисти.")
         elif brush.get("mode") != "slider":
