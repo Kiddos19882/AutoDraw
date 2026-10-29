@@ -29,6 +29,7 @@ from drawing_algorithm_benchmark import (  # noqa: E402
 )
 from geometry_color_plan import build_geometry_color_plan  # noqa: E402
 from interior_fill_planner import build_interior_fill_plan  # noqa: E402
+from brush_footprint_geometry import footprint_pixel_bounds  # noqa: E402
 
 
 def render_interior_fill_footprints(index_map: Any, plan: dict[str, Any]) -> np.ndarray:
@@ -46,14 +47,15 @@ def render_interior_fill_footprints(index_map: Any, plan: dict[str, Any]) -> np.
         first, last = stroke["points"]
         x1, x2 = float(first["x"]), float(last["x"])
         y = float(first["y"])
-        half_x = brush * float(plan["brush_configuration"]["scale_x_source_px_per_game_unit"]) / 2.0
-        half_y = brush * float(plan["brush_configuration"]["scale_y_source_px_per_game_unit"]) / 2.0
-        left = max(0, math.ceil(min(x1, x2) - half_x - 1e-9))
-        right = min(width - 1, math.floor(max(x1, x2) + half_x + 1e-9))
-        top = max(0, math.ceil(y - half_y - 1e-9))
-        bottom = min(height - 1, math.floor(y + half_y + 1e-9))
-        if left > right or top > bottom:
-            raise ValueError("План содержит footprint за пределами холста.")
+        bounds = footprint_pixel_bounds(
+            min(x1, x2), max(x1, x2), y, brush,
+            float(plan["brush_configuration"]["scale_x_source_px_per_game_unit"]),
+            float(plan["brush_configuration"]["scale_y_source_px_per_game_unit"]),
+            width, height,
+        )
+        if bounds is None:
+            raise ValueError("План содержит пустой footprint или выходит за пределы холста.")
+        left, right, top, bottom = bounds
         footprint = source[top:bottom + 1, left:right + 1]
         if footprint.size == 0 or not np.all(footprint == color):
             raise ValueError(
