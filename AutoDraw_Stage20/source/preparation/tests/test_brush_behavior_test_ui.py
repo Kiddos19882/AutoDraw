@@ -229,6 +229,10 @@ def test_set_brush_size_rejects_preset_click_mode(monkeypatch) -> None:
             self.scheduled = []
         def iconify(self):
             self.minimized = True
+        def deiconify(self):
+            self.minimized = False
+        def lift(self):
+            pass
         def after(self, delay, callback):
             self.scheduled.append((delay, callback))
 
