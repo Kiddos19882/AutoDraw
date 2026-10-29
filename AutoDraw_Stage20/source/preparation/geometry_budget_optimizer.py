@@ -93,6 +93,8 @@ def optimize_geometry_plan_to_budget(
     simplify_tolerance_px: float = 0.8,
     min_component_area: int = 1,
     source_name: str | None = None,
+    board_point_limit: int = 6_000,
+    point_safety_factor: float = 0.85,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     """Search quality-preserving candidates until the estimated ink budget fits.
 
@@ -110,6 +112,7 @@ def optimize_geometry_plan_to_budget(
         validate_geometry_color_plan,
     )
     from palette_quantization import normalize_palette
+    from engine_point_calibration import estimate_point_quota_usage
 
     normalized = normalize_palette(palette.get("colors", []) if isinstance(palette, dict) else palette)
     original = _validate_index_map(index_map, len(normalized))
@@ -131,7 +134,18 @@ def optimize_geometry_plan_to_budget(
         or min_component_area < 1
     ):
         raise GeometryColorPlanError("Минимальная площадь компонента должна быть целым числом от 1.")
+    if isinstance(board_point_limit, bool) or not isinstance(board_point_limit, int) or board_point_limit < 1:
+        raise GeometryColorPlanError("Лимит игровых точек должен быть положительным целым числом.")
+    try:
+        point_factor = float(point_safety_factor)
+    except (TypeError, ValueError) as exc:
+        raise GeometryColorPlanError("Коэффициент запаса игровых точек должен быть числом.") from exc
+    if not math.isfinite(point_factor) or not 0 < point_factor <= 1:
+        raise GeometryColorPlanError("Коэффициент запаса игровых точек должен быть больше 0 и не больше 1.")
     target_cost = budget * target / 100.0
+    target_points = math.floor(board_point_limit * point_factor)
+    if target_points < 1:
+        raise GeometryColorPlanError("Безопасный бюджет игровых точек должен быть положительным.")
     before_cost: float | None = None
     baseline_note: str | None = None
     try:
@@ -158,6 +172,7 @@ def optimize_geometry_plan_to_budget(
     }))
     best: dict[str, Any] | None = None
     best_report: dict[str, Any] | None = None
+    best_pressure = math.inf
     target_fits_at_scale = False
     source_visible = int(np.count_nonzero(original >= 0))
 
@@ -182,6 +197,18 @@ def optimize_geometry_plan_to_budget(
                     continue
                 cost = float(estimate["estimated_total_ink_px_equivalent"])
                 visible = int(candidate["summary"]["visible_pixel_count"])
+                point_estimate = estimate_point_quota_usage(
+                    drawing_length_px=float(estimate["drawing_length_px"]),
+                    stroke_count=int(estimate["stroke_count"]),
+                    single_pixel_stroke_count=int(estimate["single_pixel_stroke_count"]),
+                    board_point_limit=board_point_limit,
+                    safety_factor=point_factor,
+                )
+                fits_paint_budget = cost <= target_cost
+                fits_point_budget = int(point_estimate["estimated_point_count"]) <= target_points
+                fits_both_budgets = fits_paint_budget and fits_point_budget
+                point_count = int(point_estimate["estimated_point_count"])
+                pressure = max(cost / target_cost, point_count / target_points)
                 report = {
                     "enabled": True,
                     "mode": mode,
@@ -197,18 +224,30 @@ def optimize_geometry_plan_to_budget(
                     "target_cost_px_equivalent": round(target_cost, 3),
                     "paint_budget_px_equivalent": budget,
                     "target_usage_percent": target,
-                    "fits_budget": cost <= target_cost,
-                    "needs_multi_board_split": cost > target_cost,
+                    "fits_paint_budget": fits_paint_budget,
+                    "estimated_game_points_after": point_count,
+                    "board_point_limit": board_point_limit,
+                    "target_point_count": target_points,
+                    "point_safety_factor": point_factor,
+                    "point_quota_estimate": point_estimate,
+                    "fits_point_budget": fits_point_budget,
+                    "combined_budget_pressure": round(pressure, 6),
+                    "fits_budget": fits_both_budgets,
+                    "needs_multi_board_split": not fits_both_budgets,
                 }
-                if best is None or cost < float(best_report["estimated_ink_after_px_equivalent"]):
-                    best, best_report = candidate, report
-                if cost <= target_cost:
+                if best is None or pressure < best_pressure or (
+                    math.isclose(pressure, best_pressure)
+                    and cost < float(best_report["estimated_ink_after_px_equivalent"])
+                ):
+                    best, best_report, best_pressure = candidate, report, pressure
+                if fits_both_budgets:
                     quality_report = measure_geometry_plan_quality(original, candidate)
                     report.update(quality_report)
                     quality = (
                         int(quality_report["quality_mismatch_pixel_count"]),
                         float(tolerance),
                         min_area,
+                        pressure,
                         cost,
                     )
                     candidates.append((quality, candidate, report))
@@ -228,8 +267,14 @@ def optimize_geometry_plan_to_budget(
         stroke_overhead_px_equivalent=overhead,
         paint_budget_px_equivalent=budget,
     )
-    best_report["fits_budget"] = bool(
+    best_report["fits_paint_budget"] = bool(
         best_report["estimated_ink_after_px_equivalent"] <= target_cost
+    )
+    best_report["fits_point_budget"] = bool(
+        best_report["estimated_game_points_after"] <= target_points
+    )
+    best_report["fits_budget"] = bool(
+        best_report["fits_paint_budget"] and best_report["fits_point_budget"]
     )
     best_report["needs_multi_board_split"] = not best_report["fits_budget"]
     best_report["target_fits_at_scale"] = target_fits_at_scale
@@ -245,8 +290,10 @@ def optimize_geometry_plan_across_modes(
     simplify_tolerance_px: float = 0.8,
     min_component_area: int = 1,
     source_name: str | None = None,
+    board_point_limit: int = 6_000,
+    point_safety_factor: float = 0.85,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
-    """Evaluate scanline, contour and skeleton plans; prefer the most faithful one that fits."""
+    """Evaluate scanline, contour and skeleton plans against paint and point budgets."""
     from geometry_color_plan import GeometryColorPlanError, validate_geometry_color_plan
 
     candidates: list[tuple[tuple[int, float, float, float, int], dict[str, Any], dict[str, Any]]] = []
@@ -263,6 +310,8 @@ def optimize_geometry_plan_across_modes(
                 simplify_tolerance_px=simplify_tolerance_px,
                 min_component_area=min_component_area,
                 source_name=source_name,
+                board_point_limit=board_point_limit,
+                point_safety_factor=point_safety_factor,
             )
         except (GeometryColorPlanError, ValueError, TypeError, MemoryError) as exc:
             failures.append(f"{mode}: {exc}")
@@ -276,13 +325,13 @@ def optimize_geometry_plan_across_modes(
                 0,
                 int(report.get("quality_mismatch_pixel_count", 0)),
                 -float(report.get("scale", 1.0)),
-                float(report["estimated_ink_after_px_equivalent"]),
+                float(report["combined_budget_pressure"]),
                 mode_priority,
             )
         else:
             key = (
                 1,
-                float(report["estimated_ink_after_px_equivalent"]),
+                float(report["combined_budget_pressure"]),
                 float(report.get("quality_mismatch_pixel_count", 0)),
                 -float(report.get("scale", 1.0)),
                 mode_priority,
@@ -310,8 +359,9 @@ def optimize_geometry_plan_across_modes(
     chosen_report["requested_mode"] = "automatic"
     chosen_report["mode_candidates"] = mode_summaries
     chosen_report["automatic_selection_policy"] = (
-        "Among budget-fitting candidates: fewest exact-color pixel mismatches, then highest sampling scale, "
-        "then lowest estimated cost. If no mode fits, choose the lowest estimated cost and flag multi-board splitting."
+        "A candidate fits only when both paint cost and calibrated game-point estimate are within their safety targets. "
+        "Among fitting candidates: fewest exact-color pixel mismatches, then highest sampling scale, then lowest combined "
+        "budget pressure. If none fits, choose the lowest normalized combined pressure and flag multi-board splitting."
     )
     best_plan["generation"]["budget_optimization"] = dict(chosen_report)
     return validate_geometry_color_plan(best_plan), chosen_report
