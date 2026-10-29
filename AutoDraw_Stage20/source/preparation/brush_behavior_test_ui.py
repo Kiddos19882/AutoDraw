@@ -13,6 +13,7 @@ from typing import Any
 
 import pyautogui
 from PIL import Image, ImageGrab
+from pynput import keyboard
 
 from stage8_optimizer import save_plan
 from brush_test_workflow import calculate_slider_target, validate_brush_test_preflight
@@ -218,6 +219,8 @@ class BrushBehaviorTestTab:
         self.brush_slider_end: tuple[int, int] | None = None
         self._brush_drag_state: dict[str, Any] | None = None
         self._brush_drag_after_id: str | None = None
+        self._brush_drag_countdown_id: str | None = None
+        self._brush_hotkey_listener = None
         self._brush_drag_mouse_down = False
         self.root.bind_all("<F12>", self._on_brush_workflow_stop_key, add="+")
         self.screenshot_path: Path | None = None
@@ -519,7 +522,10 @@ class BrushBehaviorTestTab:
             )
             # Minimize AutoDraw before the countdown so it cannot cover the game slider.
             self.root.iconify()
-            self.root.after(3000, lambda: self._begin_brush_drag(start, x, y, brush))
+            self._start_brush_hotkey_listener()
+            self._brush_drag_countdown_id = self.root.after(
+                3000, lambda: self._start_scheduled_brush_drag(start, x, y, brush)
+            )
             return True
         except (ValueError, RuntimeError, AttributeError) as exc:
             messagebox.showwarning("Не настроен ползунок кисти", str(exc), parent=self.root)
@@ -535,6 +541,39 @@ class BrushBehaviorTestTab:
         self.status_var.set(
             f"Выполнен клик по пресету кисти {brush} ({x}, {y}). Проверь, что игра выбрала нужный размер."
         )
+
+    def _start_brush_hotkey_listener(self) -> None:
+        """Listen for a global F12 during the minimized-window countdown and drag."""
+        self._stop_brush_hotkey_listener()
+
+        def on_press(key):
+            if key == keyboard.Key.f12:
+                try:
+                    self.root.after(0, self.cancel_brush_drag)
+                except (tk.TclError, RuntimeError):
+                    pass
+
+        listener = keyboard.Listener(on_press=on_press)
+        listener.daemon = True
+        listener.start()
+        self._brush_hotkey_listener = listener
+
+    def _stop_brush_hotkey_listener(self) -> None:
+        listener = self._brush_hotkey_listener
+        self._brush_hotkey_listener = None
+        if listener is not None:
+            try:
+                listener.stop()
+            except Exception:
+                pass
+
+    def _start_scheduled_brush_drag(
+        self, start: tuple[int, int], target_x: int, target_y: int, brush: int
+    ) -> None:
+        self._brush_drag_countdown_id = None
+        if self._brush_hotkey_listener is None:
+            return
+        self._begin_brush_drag(start, target_x, target_y, brush)
 
     def _begin_brush_drag(
         self, start: tuple[int, int], target_x: int, target_y: int, brush: int
@@ -599,19 +638,34 @@ class BrushBehaviorTestTab:
             self._finish_brush_drag(error=f"Ошибка перемещения ползунка: {exc}")
 
     def _on_brush_workflow_stop_key(self, _event=None) -> str | None:
-        """F12 cancels a brush drag; otherwise let the executor's F12 handler run."""
-        if self._brush_drag_state is not None:
-            self._finish_brush_drag(cancelled=True)
+        """F12 cancels a pending/active brush drag; otherwise let the executor handle it."""
+        if self._brush_drag_state is not None or self._brush_drag_countdown_id is not None:
+            self.cancel_brush_drag()
             return "break"
         return None
 
     def cancel_brush_drag(self) -> None:
-        """Public cancellation hook for a future full experiment controller."""
+        """Cancel the countdown or active drag and release the mouse if it is held."""
+        if self._brush_drag_countdown_id is not None:
+            try:
+                self.root.after_cancel(self._brush_drag_countdown_id)
+            except (tk.TclError, ValueError):
+                pass
+            self._brush_drag_countdown_id = None
+            self._stop_brush_hotkey_listener()
+            self.status_var.set("Установка кисти отменена по F12 до начала перетаскивания.")
+            try:
+                self.root.deiconify()
+                self.root.lift()
+            except tk.TclError:
+                pass
+            return
         if self._brush_drag_state is not None:
             self._finish_brush_drag(cancelled=True)
 
     def _finish_brush_drag(self, *, cancelled: bool = False, error: str | None = None) -> None:
         state = self._brush_drag_state
+        self._stop_brush_hotkey_listener()
         if self._brush_drag_after_id is not None:
             try:
                 self.root.after_cancel(self._brush_drag_after_id)
