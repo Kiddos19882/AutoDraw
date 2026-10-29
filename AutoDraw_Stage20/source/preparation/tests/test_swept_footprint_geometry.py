@@ -58,3 +58,10 @@ def test_invalid_map_and_brush_arguments_are_rejected():
         check_swept_footprint(np.array([0, 1]), [(0, 0)], color_index=0)
     with pytest.raises(ValueError):
         check_swept_footprint(np.zeros((3, 3), dtype=np.int32), [(1, 1)], color_index=0, brush_value=0)
+
+
+def test_path_outside_canvas_is_rejected_even_if_footprint_clips_to_canvas():
+    indexes = np.zeros((5, 5), dtype=np.int32)
+    result = check_swept_footprint(indexes, [(-1, 2), (2, 2)], color_index=0)
+    assert result["safe_for_color_map"] is False
+    assert result["reason"] == "centerline_outside_canvas"
