@@ -1,0 +1,23 @@
+# Python bytecode and test caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local virtual environments
+.venv/
+venv/
+env/
+
+# Generated packaging/build output (source specs and fixtures remain tracked)
+build/
+dist/
+AutoDraw_Stage20/build/
+AutoDraw_Stage20/dist/
+
+# Local editor/OS noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
