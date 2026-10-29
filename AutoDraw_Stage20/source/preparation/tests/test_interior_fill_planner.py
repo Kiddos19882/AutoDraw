@@ -3,7 +3,11 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from interior_fill_planner import InteriorFillError, build_interior_fill_plan
+from interior_fill_planner import (
+    InteriorFillError,
+    _iter_fallback_runs,
+    build_interior_fill_plan,
+)
 
 
 def test_uniform_rectangle_uses_wide_fill_and_covers_every_visible_pixel():
@@ -249,3 +253,23 @@ def test_checkerboard_stress_case_keeps_isolated_multicolor_pixels_separate():
     assert expected_visible == independently_covered
     assert expected_transparent.isdisjoint(independently_covered)
     assert plan["summary"]["coverage_percent"] == 100.0
+
+
+def test_fallback_runs_merge_across_short_same_color_covered_gaps_only():
+    indexes = np.zeros((1, 9), dtype=np.int32)
+    covered = np.array([[False, True, True, False, True, True, True, False, False]])
+
+    runs = list(_iter_fallback_runs(indexes, covered, 0, max_merge_gap=2))
+
+    # The first two uncovered runs are joined across two same-color pixels;
+    # a three-pixel covered gap is too wide, so the final run stays separate.
+    assert runs == [(0, 0, 4), (0, 7, 9)]
+
+
+def test_fallback_merge_never_bridges_different_color_or_transparency():
+    indexes = np.array([[0, 0, 1, 0, 0, -1, 0, 0]], dtype=np.int32)
+    covered = np.array([[False, True, True, False, False, True, False, False]])
+
+    runs = list(_iter_fallback_runs(indexes, covered, 0, max_merge_gap=3))
+
+    assert runs == [(0, 0, 2), (0, 3, 5), (0, 6, 8)]
