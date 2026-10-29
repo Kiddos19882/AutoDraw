@@ -96,7 +96,6 @@ def analyze_stroke(stroke: dict[str, Any], ink: list[tuple[int, int]], brush: fl
         if len(parsed) >= 2:
             other_points.append(parsed)
     nearest_other = min((polyline_distance(points, candidate) for candidate in other_points), default=math.inf)
-    overlap_risk = nearest_other <= 2.0 * corridor + 1.0
     samples: list[tuple[float, float]] = []
     along_values: list[float] = []
     for x, y in ink:
@@ -120,6 +119,9 @@ def analyze_stroke(stroke: dict[str, Any], ink: list[tuple[int, int]], brush: fl
     lo = central[int((len(central) - 1) * 0.05)]
     hi = central[int((len(central) - 1) * 0.95)]
     width = max(1.0, hi - lo + 1.0)
+    # Compare neighbor spacing with the measured footprint, not the broad
+    # search corridor; otherwise small brushes are falsely flagged as overlap.
+    overlap_risk = nearest_other <= width + 2.0
     along_span = max(along_values) - min(along_values) if along_values else 0.0
     if length <= (float(brush or 1) * 2.0 + 8.0):
         status, confidence = "short_trace_width_confounded", "low"
