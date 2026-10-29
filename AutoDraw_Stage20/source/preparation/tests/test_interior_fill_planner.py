@@ -272,4 +272,6 @@ def test_fallback_merge_never_bridges_different_color_or_transparency():
 
     runs = list(_iter_fallback_runs(indexes, covered, 0, max_merge_gap=3))
 
-    assert runs == [(0, 0, 2), (0, 3, 5), (0, 6, 8)]
+    # The first run must stop before the foreign-color pixel at x=2,
+    # even though the preceding covered pixel at x=1 has the same color.
+    assert runs == [(0, 0, 1), (0, 3, 5), (0, 6, 8)]
