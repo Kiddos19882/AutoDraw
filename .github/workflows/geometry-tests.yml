@@ -107,6 +107,12 @@ jobs:
       - name: Test Stage 7 validator tolerance boundaries
         run: python -m pytest -q -ra ..\..\tests\test_stage7_validator_rules.py
 
+      - name: Run import resolution baseline diagnostics
+        shell: pwsh
+        run: |
+          $env:PYTHONPATH = "$env:GITHUB_WORKSPACE\AutoDraw_Stage20;$env:GITHUB_WORKSPACE\AutoDraw_Stage20\source\preparation;$env:GITHUB_WORKSPACE\AutoDraw_Stage20\source\executor"
+          python ..\..\tests\test_import_resolution_diagnostics.py
+
       - name: Run unified-app UI regressions
         run: |
           $env:PYTHONPATH = "$env:GITHUB_WORKSPACE\AutoDraw_Stage20;$env:GITHUB_WORKSPACE\AutoDraw_Stage20\source\preparation;$env:GITHUB_WORKSPACE\AutoDraw_Stage20\source\executor"
