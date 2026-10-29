@@ -1,6 +1,28 @@
 import unittest
 
-from analyze_brush_experiment_series import polyline_distance
+from analyze_brush_experiment_series import classify_brush_setting, polyline_distance
+
+
+class BrushSettingStatusTests(unittest.TestCase):
+    def test_legacy_experiments_are_not_treated_as_confirmed(self):
+        self.assertEqual(classify_brush_setting({}), "legacy_unverified")
+        self.assertEqual(classify_brush_setting(None), "legacy_unverified")
+
+    def test_explicit_user_confirmation_is_recognized(self):
+        self.assertEqual(
+            classify_brush_setting({"brush_setup": {"status": "confirmed_by_user"}}),
+            "confirmed_by_user",
+        )
+
+    def test_declined_and_pending_confirmation_are_distinguished(self):
+        self.assertEqual(
+            classify_brush_setting({"brush_setup": {"status": "declined_by_user"}}),
+            "declined_by_user",
+        )
+        self.assertEqual(
+            classify_brush_setting({"brush_setup": {"status": "awaiting_user_confirmation"}}),
+            "pending_user_confirmation",
+        )
 
 
 class PolylineDistanceTests(unittest.TestCase):
