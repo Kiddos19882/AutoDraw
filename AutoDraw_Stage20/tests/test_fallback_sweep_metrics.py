@@ -90,3 +90,35 @@ def test_coverage_metrics_report_foreign_color_centerline_visits():
     metrics = _coverage_path_metrics([stroke], indexes)
 
     assert metrics["invalid_centerline_pixel_visits"] == 1
+
+def test_coverage_metrics_report_uncovered_visible_pixels():
+    import numpy as np
+
+    indexes = np.zeros((3, 5), dtype=np.int32)
+    stroke = {
+        "color_index": 0,
+        "points": [{"x": 1, "y": 1}, {"x": 2, "y": 1}],
+        "brush_value": 1,
+    }
+
+    metrics = _coverage_path_metrics([stroke], indexes)
+
+    assert metrics["uncovered_visible_pixel_count"] == 9
+    assert metrics["modeled_coverage_percent"] == 40.0
+
+
+def test_coverage_metrics_report_footprint_spilling_into_foreign_color():
+    import numpy as np
+
+    indexes = np.zeros((5, 6), dtype=np.int32)
+    indexes[1, 2] = 1
+    stroke = {
+        "color_index": 0,
+        "points": [{"x": 2, "y": 2}, {"x": 2, "y": 2}],
+        "brush_value": 3,
+    }
+
+    metrics = _coverage_path_metrics([stroke], indexes)
+
+    assert metrics["invalid_centerline_pixel_visits"] == 0
+    assert metrics["invalid_footprint_pixel_visits"] > 0
