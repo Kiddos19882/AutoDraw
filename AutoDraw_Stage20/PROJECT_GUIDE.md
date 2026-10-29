@@ -726,3 +726,11 @@ AutoDraw должен стать **планировщиком рисования
 - Это усиливает проверку математической модели, но не измеряет настоящую форму кисти игры. Автоматическое исполнение interior-fill по-прежнему запрещено до калибровки реального footprint.
 - Коммит с тестами: `a71df5b87b894ba2d6dfa3df42f33824fe59bf76`. На момент записи GitHub Actions для этого коммита поставлен в очередь; результат ещё не подтверждён. Предыдущий коммит `7babd0f2c96ea58b163a5ded700c656c2d5df962` прошёл все три задания CI: geometry tests/benchmark, executor regressions и Windows portable build/startup smoke-test.
 
+
+## 17. Подтверждение CI для scale-aware footprint — 29 октября 2026 г.
+
+- После коммита тестов `a71df5b87b894ba2d6dfa3df42f33824fe59bf76` GitHub Actions завершился со статусом SUCCESS: [запуск 40813516743](https://github.com/Kiddos19882/AutoDraw/actions/runs/40813516743). Успешны все три задания: geometry tests/Stage 5 и Stage 7 benchmark/UI regressions, executor regressions и Windows portable build/startup smoke-test.
+- После документационного коммита `7e662759e7d5ea2613649f9511c8513bf837006a` повторный запуск также завершился SUCCESS: [запуск 40813555011](https://github.com/Kiddos19882/AutoDraw/actions/runs/40813555011); все три задания прошли.
+- Оба запуска создали и загрузили артефакты `stage7-interior-fill-benchmark` и `stage5-drawing-algorithm-benchmark`. В этой проверке подтверждены наличие артефактов и успешность benchmark-шагов, но численные строки отчёта Stage 7 не были извлечены из ZIP-артефакта; поэтому конкретные значения количества штрихов/покрытия здесь не фиксируются и не интерпретируются.
+- Следующий шаг этапа 7: извлечь JSON Stage 7 из артефакта и записать фактические числа для contour, skeleton, scanline и interior-fill в сравнительную таблицу. При интерпретации учитывать, что contour/skeleton/scanline сейчас оцениваются как 1 px centerline, а interior-fill — прямоугольной моделью footprint; это неравные модели следа кисти, поэтому сравнение количества штрихов полезно, а сравнение покрытия пока предварительное.
+- До независимого чтения отчёта и калибровки реального footprint нельзя заявлять, что interior-fill доказанно превосходит другие алгоритмы или разрешать его автоматическое исполнение.
