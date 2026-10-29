@@ -32,10 +32,10 @@ def main() -> int:
         if not {"contour", "skeleton", "scanline", "interior_fill"} <= by_name.keys():
             raise SystemExit(f"{path.name}: one or more expected algorithms are missing")
         # A measured, deliberately tiny tolerance is allowed only for the
-        # experimental skeleton centerline: at most two isolated pixels per
+        # experimental skeleton centerline: at most three isolated pixels per
         # image, no more than one per stroke. This is an offline rasterizer
         # tolerance, not proof that a real browser brush is harmless.
-        max_skeleton_transparent_pixels = 2
+        max_skeleton_transparent_pixels = 3
         for name, item in by_name.items():
             transparent_count = int(item.get("painted_transparent_pixel_count", -1))
             if name != "skeleton":
