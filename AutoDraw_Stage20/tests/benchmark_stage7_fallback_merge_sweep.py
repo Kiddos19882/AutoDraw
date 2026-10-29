@@ -256,12 +256,10 @@ def main() -> int:
     args = parser.parse_args()
     report = run_sweep()
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "
-", encoding="utf-8")
+    args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print("Stage 7 fallback merge sweep (offline model)")
     for case in report["cases"]:
-        print(f"
-{case['case']}")
+        print(f"\n{case['case']}")
         for row in case["sweep"]:
             print(
                 f"gap={row['merge_gap_px']:>2}px fallback={row['fallback_stroke_count']:>5} "
@@ -271,8 +269,7 @@ def main() -> int:
                 f"zero-length={row['fallback_zero_length_stroke_count']}, "
                 f"coverage={row['modeled_coverage_percent']:.2f}%"
             )
-    print(f"
-JSON report: {args.output}")
+    print(f"\nJSON report: {args.output}")
     return 0
 
 
