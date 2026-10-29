@@ -5,7 +5,7 @@ import pytest
 
 from brush_experiment_capture import (
     compare_images, crop_calibrated_regions,
-    measure_meter_fill_against_baseline, evaluate_meter_restoration,
+    measure_meter_fill_against_baseline, evaluate_meter_restoration, evaluate_board_clear,
 )
 
 
@@ -93,3 +93,28 @@ def test_exact_baseline_after_clear_is_restored():
 
 def test_reduced_fill_after_clear_is_not_restored():
     assert evaluate_meter_restoration(_meter(), _meter(fill=75))["status"] == "not_restored"
+
+def test_board_clear_classifies_match_to_explicit_blank_reference():
+    blank = Image.new("RGB", (20, 10), (245, 245, 245))
+    result = evaluate_board_clear(blank, blank.copy())
+    assert result["status"] == "restored"
+    assert result["reference_type"] == "explicit_blank_board_roi"
+    assert result["changed_percent"] == 0
+
+
+def test_board_clear_detects_remaining_marks_against_blank_reference():
+    blank = Image.new("RGB", (20, 10), (245, 245, 245))
+    current = blank.copy()
+    for x in range(5, 10):
+        current.putpixel((x, 4), (20, 20, 20))
+    result = evaluate_board_clear(blank, current, tolerance_percent=0.15)
+    assert result["status"] == "not_restored"
+    assert result["changed_percent"] > 0.15
+
+
+def test_board_clear_rejects_different_sizes_and_invalid_tolerance():
+    blank = Image.new("RGB", (20, 10), "white")
+    with pytest.raises(ValueError, match="различаются"):
+        evaluate_board_clear(blank, Image.new("RGB", (19, 10), "white"))
+    with pytest.raises(ValueError, match="от 0 до 5"):
+        evaluate_board_clear(blank, blank, tolerance_percent=10)
