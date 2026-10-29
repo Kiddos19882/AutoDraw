@@ -322,6 +322,9 @@ class AutoDrawUnifiedApp:
             get_calibration_profile=self._get_brush_test_calibration_profile,
             on_transfer_plan=self._transfer_brush_test_plan,
         )
+        # Only brush-test plans use this callback; ordinary drawing keeps the executor's
+        # standard completion dialog and behavior.
+        self.executor.execution_finished_callback = self._on_executor_finished
 
         for scrollable in (
             self.preparation_scroll,
@@ -643,6 +646,16 @@ class AutoDrawUnifiedApp:
             "если калибровка сохранена; проверьте выбранный радиус и область перед запуском."
         )
         return True
+
+    def _on_executor_finished(self, summary: dict[str, Any], report_path: str | Path | None) -> bool:
+        """Route completion only for the generated brush-test plan."""
+        plan_path = getattr(self.executor, "plan_path", None)
+        if plan_path is None or Path(plan_path).name != "current_brush_behavior_test.json":
+            return False
+        brush_tab = getattr(self, "brush_behavior_tab", None)
+        if brush_tab is None:
+            return False
+        return brush_tab.handle_executor_finished(summary, report_path)
 
     def _transfer_paint_limit_plan(
         self, plan: dict[str, Any], palette_profile: dict[str, Any], source_path: Path
