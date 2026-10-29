@@ -9,6 +9,7 @@ import sys
 from typing import Any
 
 import numpy as np
+from PIL import Image
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PREPARATION_ROOT = REPO_ROOT / "AutoDraw_Stage20" / "source" / "preparation"
@@ -109,6 +110,7 @@ def main() -> int:
         description="Stage 7 benchmark: compare contour, skeleton, scanline and modeled interior-fill footprints."
     )
     parser.add_argument("--git-ref", default="HEAD")
+    parser.add_argument("--image-file", help="Optional local image path; overrides --git-ref/--git-path.")
     parser.add_argument("--git-path", default="AutoDraw_Stage20/testImages/images.png")
     parser.add_argument("--target-width", type=int, default=646)
     parser.add_argument("--target-height", type=int, default=323)
@@ -128,7 +130,14 @@ def main() -> int:
     if not 2 <= args.max_brush_value <= 20:
         parser.error("max-brush-value must be between 2 and 20.")
 
-    source_image = load_git_image(args.git_ref, args.git_path)
+    if args.image_file:
+        image_path = _resolved_path(args.image_file)
+        with Image.open(image_path) as opened_image:
+            source_image = opened_image.convert("RGBA").copy()
+        source_name = str(image_path.relative_to(REPO_ROOT)) if image_path.is_relative_to(REPO_ROOT) else str(image_path)
+    else:
+        source_image = load_git_image(args.git_ref, args.git_path)
+        source_name = f"{args.git_ref}:{args.git_path}"
     palette, palette_info = load_palette_document(_resolved_path(args.palette_json))
     index_map, palette, image_report, _ = make_index_map(
         source_image,
@@ -140,7 +149,6 @@ def main() -> int:
         palette=palette,
         palette_info=palette_info,
     )
-    source_name = f"{args.git_ref}:{args.git_path}"
     plans: list[tuple[str, dict[str, Any]]] = [
         ("contour", build_geometry_color_plan(
             index_map, palette, mode="contour", simplify_tolerance_px=0.8,
@@ -179,8 +187,9 @@ def main() -> int:
         "stage": 7,
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "source": {
-            "git_ref": args.git_ref,
-            "git_path": args.git_path,
+            "git_ref": None if args.image_file else args.git_ref,
+            "git_path": None if args.image_file else args.git_path,
+            "image_file": args.image_file,
             **image_report,
         },
         "palette": palette_info,
