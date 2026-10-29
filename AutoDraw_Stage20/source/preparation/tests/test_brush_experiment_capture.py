@@ -6,6 +6,7 @@ import pytest
 from brush_experiment_capture import (
     compare_images, crop_calibrated_regions,
     measure_meter_fill_against_baseline, evaluate_meter_restoration, evaluate_board_clear,
+    measure_stroke_visibility,
 )
 
 
@@ -118,3 +119,45 @@ def test_board_clear_rejects_different_sizes_and_invalid_tolerance():
         evaluate_board_clear(blank, Image.new("RGB", (19, 10), "white"))
     with pytest.raises(ValueError, match="от 0 до 5"):
         evaluate_board_clear(blank, blank, tolerance_percent=10)
+
+
+def test_stroke_visibility_detects_change_in_independent_roi():
+    blank = Image.new("RGB", (80, 30), (245, 245, 245))
+    current = blank.copy()
+    for x in range(10, 21):
+        current.putpixel((x, 10), (20, 20, 20))
+    result = measure_stroke_visibility(
+        blank, current,
+        [{"name": "horizontal_10", "points": [{"x": 10, "y": 10}, {"x": 20, "y": 10}]}],
+        padding_px=2,
+    )
+    assert result["status"] == "analyzed"
+    assert result["visible_change_count"] == 1
+    assert result["results"][0]["status"] == "visible_change_detected"
+    assert result["results"][0]["changed_pixels_in_roi"] == 11
+
+
+def test_stroke_visibility_does_not_claim_a_missing_stroke_is_visible():
+    blank = Image.new("RGB", (80, 30), (245, 245, 245))
+    result = measure_stroke_visibility(
+        blank, blank.copy(),
+        [{"name": "horizontal_10", "points": [{"x": 10, "y": 10}, {"x": 20, "y": 10}]}],
+    )
+    assert result["no_change_count"] == 1
+    assert result["results"][0]["status"] == "no_change_detected"
+
+
+def test_stroke_visibility_marks_overlapping_rois_ambiguous():
+    blank = Image.new("RGB", (80, 30), (245, 245, 245))
+    current = blank.copy()
+    current.putpixel((15, 10), (0, 0, 0))
+    result = measure_stroke_visibility(
+        blank, current,
+        [
+            {"name": "first", "points": [{"x": 10, "y": 10}, {"x": 20, "y": 10}]},
+            {"name": "second", "points": [{"x": 18, "y": 10}, {"x": 28, "y": 10}]},
+        ],
+        padding_px=4,
+    )
+    assert result["ambiguous_count"] == 2
+    assert all(item["status"] == "ambiguous_overlap" for item in result["results"])
