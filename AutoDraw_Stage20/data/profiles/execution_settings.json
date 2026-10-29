@@ -8,14 +8,14 @@
   "end_hold_ms": 50,
   "countdown_seconds": 5,
   "brush_slider_calibration": {
-    "x_at_min": null,
-    "x_at_max": null,
-    "y": null,
+    "x_at_min": 1343,
+    "x_at_max": 1195,
+    "y": 326,
     "initial_value": 7,
     "min_value": 1,
     "max_value": 30,
-    "screen_width": null,
-    "screen_height": null,
-    "confirmed": false
+    "screen_width": 1920,
+    "screen_height": 1080,
+    "confirmed": true
   }
 }

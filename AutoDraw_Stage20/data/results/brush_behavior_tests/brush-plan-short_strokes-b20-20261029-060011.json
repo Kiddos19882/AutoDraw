@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "name": "Brush behavior test — short_strokes",
+  "created_at": "2026-10-29T03:00:11+00:00",
+  "coordinate_system": "local_canvas_pixels",
+  "canvas": {
+    "width": 652,
+    "height": 335
+  },
+  "width": 652,
+  "height": 335,
+  "strokes": [
+    {
+      "name": "length_0",
+      "points": [
+        {
+          "x": 15.0,
+          "y": 20.0
+        },
+        {
+          "x": 15.0,
+          "y": 20.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "short_strokes"
+      }
+    },
+    {
+      "name": "length_1",
+      "points": [
+        {
+          "x": 35.0,
+          "y": 20.0
+        },
+        {
+          "x": 36.0,
+          "y": 20.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "short_strokes"
+      }
+    },
+    {
+      "name": "length_2",
+      "points": [
+        {
+          "x": 55.0,
+          "y": 20.0
+        },
+        {
+          "x": 57.0,
+          "y": 20.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "short_strokes"
+      }
+    },
+    {
+      "name": "length_3",
+      "points": [
+        {
+          "x": 75.0,
+          "y": 20.0
+        },
+        {
+          "x": 78.0,
+          "y": 20.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "short_strokes"
+      }
+    },
+    {
+      "name": "length_5",
+      "points": [
+        {
+          "x": 95.0,
+          "y": 20.0
+        },
+        {
+          "x": 100.0,
+          "y": 20.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "short_strokes"
+      }
+    },
+    {
+      "name": "length_8",
+      "points": [
+        {
+          "x": 115.0,
+          "y": 20.0
+        },
+        {
+          "x": 123.0,
+          "y": 20.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "short_strokes"
+      }
+    },
+    {
+      "name": "length_10",
+      "points": [
+        {
+          "x": 135.0,
+          "y": 20.0
+        },
+        {
+          "x": 145.0,
+          "y": 20.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "short_strokes"
+      }
+    }
+  ],
+  "generation": {
+    "method": "manual_brush_behavior_test",
+    "test_case": "short_strokes",
+    "brush_value_must_be_set_manually": true,
+    "note": "Set the requested brush size in the browser before executing this plan.",
+    "requested_brush_value": 20
+  },
+  "summary": {
+    "stroke_count": 7,
+    "drawing_length_px": 29.0,
+    "pen_up_distance_px": 101.0
+  }
+}

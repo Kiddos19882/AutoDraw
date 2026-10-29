@@ -1,0 +1,80 @@
+{
+  "schema_version": 2,
+  "created_at": "2026-10-29T05:53:16+03:00",
+  "stage": 14,
+  "status": "completed",
+  "source_plan_file": "C:\\Users\\Kiddos\\Desktop\\AutoDraw-feature-image-geometry-optimization(1)\\AutoDraw-feature-image-geometry-optimization\\AutoDraw_Stage20\\data\\runtime\\current_brush_behavior_test.json",
+  "source_plan_name": "Brush behavior test — diagonal_lengths",
+  "source_plan_sha256": "21bd070d1e961655a8272ad34f6fdfa2f81a3c8338dff244cc18d1e0005328ab",
+  "executed_plan": {
+    "name": "Brush behavior test — diagonal_lengths",
+    "width": 652,
+    "height": 335,
+    "stroke_count": 3,
+    "sha256": "21bd070d1e961655a8272ad34f6fdfa2f81a3c8338dff244cc18d1e0005328ab"
+  },
+  "target_area": {
+    "x": 502,
+    "y": 277,
+    "width": 652,
+    "height": 335
+  },
+  "plan_fit": {
+    "source_size": {
+      "width": 652,
+      "height": 335
+    },
+    "target_size": {
+      "width": 652,
+      "height": 335
+    },
+    "scale_x": 1.0,
+    "scale_y": 1.0,
+    "offset_x": 0.0,
+    "offset_y": 0.0,
+    "preserve_aspect_ratio": true,
+    "identity_transform": true
+  },
+  "executor_config": {
+    "point_step_px": 2.0,
+    "line_extension_px": 0.0,
+    "point_delay_ms": 10,
+    "after_mouse_up_ms": 20,
+    "before_mouse_down_ms": 20,
+    "after_mouse_down_ms": 40,
+    "end_hold_ms": 50,
+    "countdown_seconds": 5
+  },
+  "summary": {
+    "status": "completed",
+    "completed_strokes": 3,
+    "total_strokes": 3,
+    "started_at": "2026-10-29T05:53:08+03:00",
+    "ended_at": "2026-10-29T05:53:16+03:00",
+    "duration_seconds": 7.454,
+    "move_calls": 125,
+    "error": null,
+    "stop_reason": null,
+    "mouse_release": {
+      "attempted": true,
+      "succeeded": true,
+      "errors": []
+    },
+    "executor_config": {
+      "point_step_px": 2.0,
+      "line_extension_px": 0.0,
+      "point_delay_ms": 10,
+      "after_mouse_up_ms": 20,
+      "before_mouse_down_ms": 20,
+      "after_mouse_down_ms": 40,
+      "end_hold_ms": 50,
+      "countdown_seconds": 5
+    }
+  },
+  "error": null,
+  "environment": {
+    "python_version": "3.11.4",
+    "platform": "Windows-10-10.0.19045-SP0",
+    "python_implementation": "CPython"
+  }
+}
