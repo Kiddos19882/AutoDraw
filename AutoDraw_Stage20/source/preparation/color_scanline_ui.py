@@ -508,6 +508,8 @@ class ColorScanlineTab:
                     simplify_tolerance_px=tolerance,
                     min_component_area=min_component_area,
                     source_name=self.source_name,
+                    board_point_limit=6_000,
+                    point_safety_factor=0.85,
                 )
         except (GeometryColorPlanError, ValueError, TypeError, MemoryError) as exc:
             messagebox.showerror(
