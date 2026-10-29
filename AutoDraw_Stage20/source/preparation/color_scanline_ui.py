@@ -592,7 +592,9 @@ class ColorScanlineTab:
                     if "estimated_game_points_after" in optimization and "target_point_count" in optimization
                     else ""
                 )
-                + f"; оба ограничения: {'да' if optimization.get('fits_budget') else 'нет' if 'fits_budget' in optimization else 'н/д'}."
+                + f"; оба ограничения: {'да' if optimization.get('fits_budget') else 'нет' if 'fits_budget' in optimization else 'н/д'}"
+                if "fits_point_budget" in optimization
+                else "; общий результат двух ограничений: н/д."
             )
             mode_candidates = optimization.get("mode_candidates", [])
             if mode_candidates:
