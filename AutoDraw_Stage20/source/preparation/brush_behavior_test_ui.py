@@ -226,6 +226,8 @@ class BrushBehaviorTestTab:
         self._brush_drag_mouse_down = False
         self._automated_preclear_active = False
         self._automated_preclear_after_id: str | None = None
+        self._automated_postdraw_active = False
+        self._automated_postdraw_after_id: str | None = None
         self.root.bind_all("<F12>", self._on_brush_workflow_stop_key, add="+")
         self.screenshot_path: Path | None = None
         self.execution_report_path: Path | None = None
@@ -561,6 +563,8 @@ class BrushBehaviorTestTab:
                 try:
                     if self._automated_preclear_active:
                         self.root.after(0, self._cancel_automated_preclear)
+                    elif self._automated_postdraw_active:
+                        self.root.after(0, self._cancel_automated_postdraw)
                     else:
                         self.root.after(0, self.cancel_brush_drag)
                 except (tk.TclError, RuntimeError):
@@ -1249,6 +1253,225 @@ class BrushBehaviorTestTab:
             self.root.deiconify()
             self.root.lift()
 
+    def _cancel_automated_postdraw(self) -> None:
+        """Stop future post-draw actions and persist partial evidence on global F12."""
+        if not self._automated_postdraw_active:
+            return
+        self._automated_postdraw_active = False
+        if self._automated_postdraw_after_id is not None:
+            try:
+                self.root.after_cancel(self._automated_postdraw_after_id)
+            except (tk.TclError, ValueError):
+                pass
+            self._automated_postdraw_after_id = None
+        self._stop_brush_hotkey_listener()
+        self.experiment_phases.setdefault("postdraw_workflow", {}).update({
+            "status": "stopped",
+            "reason": "F12",
+            "captured_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            "note": "No later automatic action was started after F12.",
+        })
+        try:
+            self._write_experiment_manifest()
+        except (OSError, ValueError, TypeError) as exc:
+            self.status_var.set(f"Постэтап остановлен F12; не удалось сохранить манифест: {exc}")
+        else:
+            self.status_var.set("Постэтап остановлен по F12. Новые действия не запускаются; проверь доску и кисть вручную.")
+        try:
+            self.root.deiconify()
+            self.root.lift()
+        except tk.TclError:
+            pass
+
+    def _start_automated_postdraw(self) -> None:
+        """Capture the completed drawing, then clear and verify the board asynchronously."""
+        if self.experiment_dir is None:
+            self.status_var.set("Постэтап пропущен: каталог эксперимента отсутствует.")
+            return
+        config = self.get_calibration_profile() if callable(self.get_calibration_profile) else None
+        if not isinstance(config, dict):
+            self.experiment_phases["postdraw_workflow"] = {
+                "status": "failed", "reason": "calibration_profile_unavailable"
+            }
+            self._write_experiment_manifest()
+            self.status_var.set("Постэтап остановлен: профиль калибровки недоступен.")
+            return
+        self._automated_postdraw_active = True
+        self.status_var.set("Исполнение завершено. Через 2 секунды сохраняется результат, затем будет проверена очистка. F12 отменяет дальнейшие действия.")
+        self.root.iconify()
+        self._start_brush_hotkey_listener()
+        self._automated_postdraw_after_id = self.root.after(
+            2000, lambda: self._capture_automated_after_draw(config)
+        )
+
+    def _capture_automated_after_draw(self, config: dict[str, Any]) -> None:
+        if not self._automated_postdraw_active:
+            return
+        self._automated_postdraw_after_id = None
+        try:
+            screen = ImageGrab.grab()
+            expected = config.get("screen_size", {})
+            if isinstance(expected, dict):
+                ew, eh = expected.get("width"), expected.get("height")
+                if ew is not None and eh is not None and (int(ew), int(eh)) != screen.size:
+                    raise ValueError("Разрешение экрана изменилось после калибровки.")
+            crops = crop_calibrated_regions(screen, config.get("regions", {}))
+            if self.experiment_dir is None:
+                raise ValueError("Каталог эксперимента отсутствует.")
+            screen_path = self.experiment_dir / "after_draw-screen.png"
+            board_path = self.experiment_dir / "after_draw-board.png"
+            meter_path = self.experiment_dir / "after_draw-paint-meter.png"
+            screen.save(screen_path)
+            crops["board_area"].save(board_path)
+            crops["paint_meter_area"].save(meter_path)
+            self.experiment_phases["after_draw"] = {
+                "status": "captured",
+                "captured_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                "screen_size": {"width": screen.width, "height": screen.height},
+                "files": {"full_screen": screen_path.name, "board_roi": board_path.name, "paint_meter_roi": meter_path.name},
+            }
+            before = self.experiment_phases.get("before_draw")
+            if before and before.get("files", {}).get("paint_meter_roi"):
+                baseline = self.experiment_dir / before["files"]["paint_meter_roi"]
+                with Image.open(baseline) as first, Image.open(meter_path) as second:
+                    self.experiment_phases["after_draw"]["paint_meter_measurement"] = measure_meter_fill_against_baseline(first, second)
+            self._write_experiment_manifest()
+            if not self._automated_postdraw_active:
+                return
+            points = config.get("points")
+            points = points if isinstance(points, dict) else {}
+            statuses = config.get("status")
+            statuses = statuses if isinstance(statuses, dict) else {}
+            point_status = statuses.get("points")
+            point_status = point_status if isinstance(point_status, dict) else {}
+            clear_point = points.get("clear_board")
+            if not isinstance(clear_point, dict) or point_status.get("clear_board") == "needs_review":
+                raise ValueError("Координата Clear отсутствует или требует повторной проверки.")
+            reference_path, metadata_path = self._blank_board_reference_paths()
+            metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+            region = config.get("regions", {}).get("board_area", {})
+            current_region = {key: int(region[key]) for key in ("x", "y", "width", "height")}
+            if (
+                metadata.get("reference_type") != "user_confirmed_blank_board_roi"
+                or metadata.get("user_confirmed_blank") is not True
+                or metadata.get("board_region") != current_region
+                or metadata.get("screen_size") != {"width": screen.width, "height": screen.height}
+                or not reference_path.is_file()
+            ):
+                raise ValueError("Эталон пустой доски отсутствует или не соответствует профилю.")
+            with Image.open(reference_path) as reference:
+                if reference.size != (current_region["width"], current_region["height"]):
+                    raise ValueError("Размер эталона не совпадает с ROI доски.")
+            self.experiment_phases["postdraw_workflow"] = {
+                "status": "after_draw_captured",
+                "clear_click_sent": False,
+                "captured_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            }
+            self._write_experiment_manifest()
+            pyautogui.click(int(clear_point["x"]), int(clear_point["y"]))
+            self.experiment_phases["postdraw_workflow"]["clear_click_sent"] = True
+            self.experiment_phases["postdraw_workflow"]["status"] = "clear_requested"
+            self._write_experiment_manifest()
+            self.status_var.set("Результат сохранён; Clear нажат. Через 1,5 секунды проверяется пустая доска.")
+            self._automated_postdraw_after_id = self.root.after(
+                1500, lambda: self._capture_automated_after_clear(config, reference_path, metadata)
+            )
+        except Exception as exc:
+            self._finish_automated_postdraw("failed", f"Не удалось сохранить результат или начать проверенную очистку: {exc}")
+
+    def _capture_automated_after_clear(
+        self, config: dict[str, Any], reference_path: Path, metadata: dict[str, Any]
+    ) -> None:
+        if not self._automated_postdraw_active:
+            return
+        self._automated_postdraw_after_id = None
+        clear_status = "inconclusive"
+        try:
+            screen = ImageGrab.grab()
+            expected = config.get("screen_size", {})
+            if isinstance(expected, dict):
+                ew, eh = expected.get("width"), expected.get("height")
+                if ew is not None and eh is not None and (int(ew), int(eh)) != screen.size:
+                    raise ValueError("Разрешение экрана изменилось во время проверки очистки.")
+            crops = crop_calibrated_regions(screen, config.get("regions", {}))
+            if self.experiment_dir is None:
+                raise ValueError("Каталог эксперимента отсутствует.")
+            screen_path = self.experiment_dir / "after_clear-screen.png"
+            board_path = self.experiment_dir / "after_clear-board.png"
+            meter_path = self.experiment_dir / "after_clear-paint-meter.png"
+            screen.save(screen_path)
+            crops["board_area"].save(board_path)
+            crops["paint_meter_area"].save(meter_path)
+            with Image.open(reference_path) as reference:
+                clear_check = evaluate_board_clear(reference.copy(), crops["board_area"])
+            clear_status = clear_check.get("status", "inconclusive")
+            self.experiment_phases["after_clear"] = {
+                "status": clear_status,
+                "board_clear_check": clear_check,
+                "board_clear_status": clear_status,
+                "captured_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                "screen_size": {"width": screen.width, "height": screen.height},
+                "files": {"full_screen": screen_path.name, "board_roi": board_path.name, "paint_meter_roi": meter_path.name},
+            }
+            before = self.experiment_phases.get("before_draw")
+            if before and before.get("files", {}).get("paint_meter_roi"):
+                baseline = self.experiment_dir / before["files"]["paint_meter_roi"]
+                with Image.open(baseline) as first, Image.open(meter_path) as second:
+                    self.experiment_phases["after_clear"]["paint_meter_restoration"] = evaluate_meter_restoration(first, second)
+            self.experiment_phases["postdraw_workflow"]["status"] = "clear_verified" if clear_status in {"restored", "restored_within_pixel_tolerance"} else "clear_not_confirmed"
+            self._write_experiment_manifest()
+            self._finish_automated_postdraw(
+                "completed" if clear_status in {"restored", "restored_within_pixel_tolerance"} else "inconclusive",
+                "Очистка подтверждена эталоном." if clear_status in {"restored", "restored_within_pixel_tolerance"} else f"Очистка не подтверждена эталоном: {clear_status}.",
+                restore_brush=True,
+            )
+        except Exception as exc:
+            self._finish_automated_postdraw("failed", f"Не удалось проверить очистку: {exc}", restore_brush=True)
+
+    def _finish_automated_postdraw(
+        self, status: str, reason: str, *, restore_brush: bool = False
+    ) -> None:
+        self._automated_postdraw_active = False
+        if self._automated_postdraw_after_id is not None:
+            try:
+                self.root.after_cancel(self._automated_postdraw_after_id)
+            except (tk.TclError, ValueError):
+                pass
+            self._automated_postdraw_after_id = None
+        self._stop_brush_hotkey_listener()
+        self.experiment_phases.setdefault("postdraw_workflow", {}).update({
+            "status": status,
+            "reason": reason,
+            "finished_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        })
+        try:
+            self._write_experiment_manifest()
+        except (OSError, ValueError, TypeError) as exc:
+            reason += f"; ошибка записи манифеста: {exc}"
+        self.root.deiconify()
+        self.root.lift()
+        self.status_var.set(f"Постэтап: {status}. {reason}")
+        if restore_brush:
+            # Suppress the executor-start callback while returning the slider to 30.
+            self._start_executor_after_brush_drag = False
+            self.brush_var.set("30")
+            if self.set_brush_size():
+                self.experiment_phases["restore_brush_30"] = {
+                    "status": "drag_scheduled",
+                    "requested_value": 30,
+                    "note": "The game must be checked visually; scheduling the drag does not prove the selected radius.",
+                }
+            else:
+                self.experiment_phases["restore_brush_30"] = {
+                    "status": "failed",
+                    "requested_value": 30,
+                    "note": "Could not schedule the return drag; manual recovery is required.",
+                }
+            try:
+                self._write_experiment_manifest()
+            except (OSError, ValueError, TypeError):
+                pass
+
     def handle_executor_finished(self, summary: dict[str, Any], report_path: str | Path | None) -> bool:
         """Attach the real executor result to the active brush experiment without a modal dialog."""
         try:
@@ -1267,6 +1490,17 @@ class BrushBehaviorTestTab:
                 f"Исполнитель завершил тест со статусом «{status}». "
                 + (f"Отчёт: {self.execution_report_path}" if self.execution_report_path else "Файл отчёта не создан.")
             )
+            normalized_status = status.strip().lower()
+            if normalized_status in {"completed", "success", "succeeded"} and self.experiment_dir is not None:
+                self._start_automated_postdraw()
+            else:
+                self.experiment_phases["postdraw_workflow"] = {
+                    "status": "skipped",
+                    "reason": f"executor_status_not_successful:{status}",
+                    "note": "No automatic post-draw clear was attempted after a stopped/failed/unknown execution.",
+                }
+                if self.experiment_dir is not None:
+                    self._write_experiment_manifest()
             return True
         except Exception as exc:
             self.status_var.set(f"Не удалось привязать результат исполнителя к тесту кисти: {exc}")
