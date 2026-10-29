@@ -580,6 +580,11 @@ class ColorScanlineTab:
             self._format_paint_estimate(estimate),
         ]
         if optimization:
+            combined_status = (
+                f"; оба ограничения: {'да' if optimization.get('fits_budget') else 'нет'}"
+                if "fits_point_budget" in optimization
+                else "; общий результат двух ограничений: н/д"
+            )
             summary_lines.append(
                 f"Бюджетная оптимизация: масштаб {optimization.get('scale', 1.0):.1f}; "
                 f"RDP {optimization.get('simplify_tolerance_px', 0.0):.1f} px; "
@@ -592,9 +597,7 @@ class ColorScanlineTab:
                     if "estimated_game_points_after" in optimization and "target_point_count" in optimization
                     else ""
                 )
-                + f"; оба ограничения: {'да' if optimization.get('fits_budget') else 'нет' if 'fits_budget' in optimization else 'н/д'}"
-                if "fits_point_budget" in optimization
-                else "; общий результат двух ограничений: н/д."
+                + combined_status + "."
             )
             mode_candidates = optimization.get("mode_candidates", [])
             if mode_candidates:
