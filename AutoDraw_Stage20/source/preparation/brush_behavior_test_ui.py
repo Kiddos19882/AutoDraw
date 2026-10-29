@@ -1600,6 +1600,11 @@ class BrushBehaviorTestTab:
 
     def _show_postdraw_completion_notification(self, *, restore_status: str | None = None) -> None:
         """Show a visible end-of-test notification instead of relying on a hidden status bar."""
+        try:
+            self.root.deiconify()
+            self.root.lift()
+        except tk.TclError:
+            pass
         restore_ok = restore_status == "drag_completed_unverified"
         if self._postdraw_final_status == "completed" and restore_ok:
             messagebox.showinfo(
