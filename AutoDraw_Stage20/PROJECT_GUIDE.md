@@ -824,3 +824,13 @@ AutoDraw должен стать **планировщиком рисования
 - Свежий CI [40819912641](https://github.com/Kiddos19882/AutoDraw/actions/runs/40819912641) на `f8bc445` подтверждён и завершился ошибкой: `fragmented_components_and_holes-report.json: skeleton painted 2 transparent pixels`. Windows portable build/startup smoke-test и executor-tests прошли; preparation/geometry pytest и UI regressions были пропущены из-за раннего отказа синтетического валидатора. Артефакт этого запуска относится к `f8bc445`, но сам по себе не подтверждает исправление.
 - Для следующего цикла добавлена диагностика `transparent_stroke_samples` в отчёт Stage 7: коммит `426ff53` (`Add diagnostics for Stage 7 transparent skeleton strokes`). Если скелет снова затронет прозрачность, отчёт должен показать имена конкретных штрихов, их точки и первые координаты прозрачных пикселей. После этого исправлять конкретную геометрию и повторять полный CI, а не ослаблять проверку.
 - Stage 7 остаётся незавершённым. Внутренняя заливка не допускается к автоматическому исполнению до успешного CI и отдельной проверки реального footprint кисти в браузере.
+
+
+## 26. Исправление запуска диагностического отчёта Stage 7 — 29 октября 2026 г.
+
+- CI [40820307301](https://github.com/Kiddos19882/AutoDraw/actions/runs/40820307301) завершился ошибкой в geometry-tests, но причина этого запуска оказалась не подтверждённой регрессией прозрачности: диагностическая функция `_transparent_stroke_samples()` завершилась с `NameError: name 'ImageDraw' is not defined`.
+- До падения был создан только первый synthetic-отчёт `broad_regions_hole_and_neighbor-report.json`. В нём все четыре алгоритма имеют `painted_transparent_pixel_count = 0`; это не позволяет делать вывод по остальным трём синтетическим случаям, поскольку цикл остановился на следующем изображении.
+- Исправление: импорт `PIL.ImageDraw` добавлен в `tests/benchmark_stage7_interior_fill.py` отдельным коммитом [fc16e49](https://github.com/Kiddos19882/AutoDraw/commit/fc16e491ded5039aa6a7e4648998260911a495e9).
+- Executor-tests и Windows portable build/startup smoke-test в запуске 40820307301 прошли успешно. Preparation/geometry pytest и UI regressions были пропущены из-за ошибки диагностического benchmark.
+- Следующий шаг: проверить новый CI на HEAD после fc16e49. При успешном завершении изучить все четыре synthetic JSON-отчёта и поле `transparent_stroke_samples`. Если обнаружатся прозрачные пиксели, определить конкретные штрихи/координаты и решить, является ли отклонение визуально значимым. Не менять валидатор на допуск, пока не собраны все отчёты и не измерено влияние.
+- Stage 7 по-прежнему экспериментальный: отчёты пока моделируют геометрию офлайн и не заменяют проверку реального footprint кисти в браузере.
