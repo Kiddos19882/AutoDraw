@@ -34,7 +34,7 @@ PATTERNS: dict[str, str] = {
     "canvas_draw_image": r"\.drawImage\s*\(",
     "canvas_composite": r"\.globalCompositeOperation\b",
     "brush_terms": r"brush|Brush|radius|thickness|lineWidth|lineCap|lineJoin",
-    "board_terms": r"BoardPane|BoardItem\\d*|BoardCanvas|DrawingBoard|CanvasRenderingContext2D",
+    "board_terms": r"BoardPane|BoardItem|BoardCanvas|DrawingBoard|CanvasRenderingContext2D",
     "point_quota_terms": r"maxPoints|max_points|pointCount|point_count|pointsLimit|pointLimit",
     "pointer_terms": r"pointerdown|pointermove|pointerup|mousedown|mousemove|mouseup|PointerEvent",
 }
@@ -64,9 +64,11 @@ def collect_report(source: str, source_sha256: str, git_ref: str, git_path: str)
         snippets[name] = [
             {
                 "offset": match.start(),
-                "excerpt": source[max(0, match.start() - CONTEXT_CHARS):min(len(source), match.end() + CONTEXT_CHARS)]
-                .replace("\\r", " ")
-                .replace("\\n", " "),
+                "excerpt": re.sub(
+                    r"\s+",
+                    " ",
+                    source[max(0, match.start() - CONTEXT_CHARS):min(len(source), match.end() + CONTEXT_CHARS)],
+                ),
             }
             for match in selected
         ]
@@ -106,7 +108,7 @@ def main() -> int:
         source, source_sha256 = read_git_file(args.git_ref, args.git_path)
         report = collect_report(source, source_sha256, args.git_ref, args.git_path)
         args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+        args.output.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     except (OSError, RuntimeError, ValueError) as exc:
         parser.error(str(exc))
 
