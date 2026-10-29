@@ -22,6 +22,7 @@ from brush_test_workflow import (
 from brush_experiment_capture import (
     compare_images, crop_calibrated_regions,
     measure_meter_fill_against_baseline, evaluate_meter_restoration, evaluate_board_clear,
+    measure_stroke_visibility,
 )
 
 
@@ -1198,6 +1199,67 @@ class BrushBehaviorTestTab:
             }
             before = self.experiment_phases.get("before_draw")
             after = self.experiment_phases.get("after_draw")
+            if phase == "after_draw":
+                # Only analyze per-stroke visibility against a separately confirmed blank
+                # reference whose screen geometry matches the active calibration profile.
+                reference_path, metadata_path = self._blank_board_reference_paths()
+                visibility: dict[str, Any] = {
+                    "status": "inconclusive",
+                    "reason": "missing_explicit_blank_board_reference",
+                    "note": "Для анализа отдельных штрихов нужен подтверждённый эталон пустой доски.",
+                }
+                try:
+                    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+                    region = config.get("regions", {}).get("board_area", {})
+                    current_region = {key: int(region[key]) for key in ("x", "y", "width", "height")}
+                    valid_reference = (
+                        metadata.get("reference_type") == "user_confirmed_blank_board_roi"
+                        and metadata.get("user_confirmed_blank") is True
+                        and metadata.get("board_region") == current_region
+                        and metadata.get("screen_size") == {"width": screen.width, "height": screen.height}
+                        and reference_path.is_file()
+                    )
+                    if not valid_reference:
+                        visibility["reason"] = "reference_profile_mismatch_or_invalid"
+                    elif not isinstance(self.current_plan, dict) or not isinstance(self.current_plan.get("strokes"), list):
+                        visibility["reason"] = "drawing_plan_has_no_strokes"
+                    else:
+                        with Image.open(reference_path) as reference_image, Image.open(board_path) as after_image:
+                            reference = reference_image.convert("RGB")
+                            current_board = after_image.convert("RGB")
+                            if reference.size != current_board.size:
+                                visibility["reason"] = "reference_board_dimensions_mismatch"
+                            elif (
+                                isinstance(self.current_plan.get("canvas"), dict)
+                                and (
+                                    int(self.current_plan["canvas"].get("width", -1)) != current_board.width
+                                    or int(self.current_plan["canvas"].get("height", -1)) != current_board.height
+                                )
+                            ):
+                                visibility["reason"] = "drawing_plan_canvas_dimensions_mismatch"
+                            else:
+                                try:
+                                    brush_value = int(
+                                        self._experiment_requested_brush
+                                        if self._experiment_requested_brush is not None
+                                        else self.brush_var.get().strip()
+                                    )
+                                except (TypeError, ValueError):
+                                    brush_value = 1
+                                visibility = measure_stroke_visibility(
+                                    reference,
+                                    current_board,
+                                    self.current_plan["strokes"],
+                                    padding_px=max(2, brush_value + 1),
+                                )
+                                visibility["reference_file"] = reference_path.name
+                                visibility["padding_px"] = max(2, brush_value + 1)
+                                visibility["requested_brush_value"] = brush_value
+                except (OSError, ValueError, TypeError, KeyError, json.JSONDecodeError) as exc:
+                    visibility["status"] = "inconclusive"
+                    visibility["reason"] = "reference_or_plan_analysis_failed"
+                    visibility["error"] = str(exc)
+                phase_record["stroke_visibility_analysis"] = visibility
             if phase == "after_clear":
                 reference_path, metadata_path = self._blank_board_reference_paths()
                 clear_check: dict[str, Any] = {
