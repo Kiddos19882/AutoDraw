@@ -15,7 +15,7 @@ import pyautogui
 from PIL import Image, ImageGrab
 
 from stage8_optimizer import save_plan
-from brush_test_workflow import calculate_slider_target
+from brush_test_workflow import calculate_slider_target, validate_brush_test_preflight
 from brush_experiment_capture import (
     compare_images, crop_calibrated_regions,
     measure_meter_fill_against_baseline, evaluate_meter_restoration,
@@ -360,7 +360,39 @@ class BrushBehaviorTestTab:
         self.template_text.insert("1.0", "\n".join(lines))
         self.template_text.configure(state="disabled")
 
+    def _validate_automation_preflight(self) -> bool:
+        """Block automatic brush actions unless saved calibration matches this screen."""
+        config = self.get_calibration_profile() if callable(self.get_calibration_profile) else None
+        brush_control = self.get_brush_control() if callable(self.get_brush_control) else None
+        try:
+            screen = ImageGrab.grab()
+            result = validate_brush_test_preflight(
+                config,
+                (int(screen.width), int(screen.height)),
+                brush_control=brush_control,
+            )
+        except Exception as exc:
+            messagebox.showerror(
+                "Не удалось проверить калибровку",
+                f"Автоматический тест не запущен. До любых действий мышью произошла ошибка проверки: {exc}",
+                parent=self.root,
+            )
+            self.status_var.set(f"Предварительная проверка калибровки завершилась ошибкой: {exc}")
+            return False
+        if not result["valid"]:
+            details = "\n".join(f"• {error}" for error in result["errors"])
+            messagebox.showwarning(
+                "Калибровка не готова",
+                "План не будет передан и кисть не будет перемещена. Исправь профиль на вкладке 8:\n\n" + details,
+                parent=self.root,
+            )
+            self.status_var.set("Автоматический тест заблокирован: профиль калибровки требует исправления.")
+            return False
+        return True
+
     def create_and_transfer_plan(self) -> None:
+        if not self._validate_automation_preflight():
+            return
         canvas_size = self.get_canvas_size()
         if not canvas_size:
             messagebox.showwarning(
