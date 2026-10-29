@@ -200,6 +200,31 @@ class UnifiedAppCoreTests(unittest.TestCase):
                 except tk.TclError:
                     pass
 
+    def test_workflow_executor_start_uses_standard_validation_path(self):
+        executor = object.__new__(integrated_app.Stage6App)
+        executor.running = False
+        executor.execution_plan = object()
+        executor.area = object()
+        executor.plan_path = Path("brush-plan.json")
+
+        def start_validated(*, confirmed=False):
+            self.assertTrue(confirmed)
+            executor.running = True
+
+        with patch.object(executor, "_start_execution", side_effect=start_validated) as start:
+            self.assertTrue(executor.start_execution_from_workflow())
+            start.assert_called_once_with(confirmed=True)
+
+    def test_workflow_executor_start_rejects_missing_plan_or_area(self):
+        executor = object.__new__(integrated_app.Stage6App)
+        executor.running = False
+        executor.execution_plan = None
+        executor.area = object()
+        executor.plan_path = Path("brush-plan.json")
+        with patch.object(executor, "_start_execution") as start:
+            self.assertFalse(executor.start_execution_from_workflow())
+            start.assert_not_called()
+
     def test_unified_window_has_preparation_and_execution_tabs(self):
         root = None
         app = None
