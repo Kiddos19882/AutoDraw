@@ -201,21 +201,23 @@ def test_preflight_rejects_region_that_exceeds_screen_bounds():
 def test_workflow_blocks_progress_when_clear_is_not_verified():
     state = _state()
     state.advance("preflight", {"profile_valid": True})
+    state.advance("before_clear", {"clear_requested": True})
     with pytest.raises(BrushWorkflowError, match="очистка доски не подтверждена"):
-        state.advance("before_clear", {"clear_click_sent": True})
-    assert state.phase == "preflight"
+        state.advance("before_capture", {"clear_click_sent": True})
+    assert state.phase == "before_clear"
 
 
 @pytest.mark.parametrize("clear_status", ["not_restored", "inconclusive", None, ""])
 def test_workflow_rejects_uncertain_board_clear(clear_status):
     state = _state()
     state.advance("preflight", {"profile_valid": True})
+    state.advance("before_clear", {"clear_requested": True})
     result = {"clear_click_sent": True}
     if clear_status is not None:
         result["board_clear_status"] = clear_status
     with pytest.raises(BrushWorkflowError, match="очистка доски не подтверждена"):
-        state.advance("before_clear", result)
-    assert state.phase == "preflight"
+        state.advance("before_capture", result)
+    assert state.phase == "before_clear"
 
 
 def test_workflow_accepts_explicit_blank_reference_match():
