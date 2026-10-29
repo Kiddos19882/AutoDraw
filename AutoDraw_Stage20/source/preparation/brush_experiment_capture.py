@@ -164,3 +164,110 @@ def evaluate_board_clear(blank_reference: Image.Image, after_clear: Image.Image,
         "reference_type": "explicit_blank_board_roi",
         "note": "Визуальное совпадение с отдельно сохранённым эталоном пустой доски; это не доказательство внутреннего состояния игры.",
     }
+
+
+def measure_stroke_visibility(
+    blank_reference: Image.Image,
+    current: Image.Image,
+    strokes: list[dict[str, Any]],
+    *,
+    padding_px: int = 4,
+    color_distance_threshold: float = 24.0,
+    minimum_changed_pixels: int = 2,
+) -> dict[str, Any]:
+    """Measure visual changes in per-stroke bounding boxes against a blank-board ROI.
+
+    Stroke coordinates are local to the supplied board ROI. This is a visual heuristic,
+    not proof that the game accepted a stroke. Overlapping padded ROIs are explicitly
+    marked ambiguous because neighboring marks may contaminate the result.
+    """
+    import math
+
+    if not isinstance(blank_reference, Image.Image) or not isinstance(current, Image.Image):
+        raise ValueError("Для анализа штрихов нужны эталон пустой доски и снимок после рисования.")
+    if blank_reference.size != current.size:
+        raise ValueError(f"Размеры доски различаются: {blank_reference.size} и {current.size}.")
+    if not isinstance(strokes, list):
+        raise ValueError("Список штрихов должен быть массивом.")
+    if padding_px < 0 or color_distance_threshold <= 0 or minimum_changed_pixels < 1:
+        raise ValueError("Некорректные параметры обнаружения штрихов.")
+
+    baseline = blank_reference.convert("RGB")
+    observed = current.convert("RGB")
+    width, height = baseline.size
+    changed = Image.new("L", baseline.size, 0)
+    base_pixels, current_pixels = baseline.load(), observed.load()
+    changed_pixels = changed.load()
+    for y in range(height):
+        for x in range(width):
+            a, b = base_pixels[x, y], current_pixels[x, y]
+            distance = math.sqrt(sum((a[i] - b[i]) ** 2 for i in range(3)))
+            if distance > color_distance_threshold:
+                changed_pixels[x, y] = 255
+
+    regions: list[tuple[int, int, int, int]] = []
+    normalized: list[dict[str, Any]] = []
+    for index, stroke in enumerate(strokes):
+        if not isinstance(stroke, dict):
+            raise ValueError(f"Штрих {index} имеет неверный формат.")
+        points = stroke.get("points")
+        if not isinstance(points, list) or not points:
+            raise ValueError(f"У штриха {index} нет точек.")
+        coordinates: list[tuple[float, float]] = []
+        for point in points:
+            try:
+                if isinstance(point, dict):
+                    x, y = float(point["x"]), float(point["y"])
+                else:
+                    x, y = float(point[0]), float(point[1])
+            except (KeyError, TypeError, ValueError, IndexError, OverflowError) as exc:
+                raise ValueError(f"У штриха {index} некорректная точка.") from exc
+            if not math.isfinite(x) or not math.isfinite(y):
+                raise ValueError(f"У штриха {index} неконечная координата.")
+            coordinates.append((x, y))
+        x0 = max(0, math.floor(min(p[0] for p in coordinates)) - padding_px)
+        y0 = max(0, math.floor(min(p[1] for p in coordinates)) - padding_px)
+        x1 = min(width, math.ceil(max(p[0] for p in coordinates)) + padding_px + 1)
+        y1 = min(height, math.ceil(max(p[1] for p in coordinates)) + padding_px + 1)
+        if x0 >= x1 or y0 >= y1:
+            raise ValueError(f"ROI штриха {index} находится за пределами снимка.")
+        regions.append((x0, y0, x1, y1))
+        normalized.append({"name": str(stroke.get("name", f"stroke_{index + 1}")), "roi": (x0, y0, x1, y1)})
+
+    results: list[dict[str, Any]] = []
+    for index, item in enumerate(normalized):
+        x0, y0, x1, y1 = item["roi"]
+        changed_count = sum(
+            1 for y in range(y0, y1) for x in range(x0, x1)
+            if changed_pixels[x, y] != 0
+        )
+        overlaps = []
+        for other_index, (ox0, oy0, ox1, oy1) in enumerate(regions):
+            if other_index == index:
+                continue
+            if x0 < ox1 and ox0 < x1 and y0 < oy1 and oy0 < y1:
+                overlaps.append(other_index)
+        if overlaps:
+            status = "ambiguous_overlap"
+        elif changed_count >= minimum_changed_pixels:
+            status = "visible_change_detected"
+        else:
+            status = "no_change_detected"
+        results.append({
+            "name": item["name"],
+            "status": status,
+            "changed_pixels_in_roi": changed_count,
+            "roi": {"x": x0, "y": y0, "width": x1 - x0, "height": y1 - y0},
+            "overlapping_stroke_indices": overlaps,
+            "interpretation": "visual_roi_heuristic_not_game_acceptance",
+        })
+
+    return {
+        "status": "analyzed",
+        "stroke_count": len(results),
+        "visible_change_count": sum(r["status"] == "visible_change_detected" for r in results),
+        "no_change_count": sum(r["status"] == "no_change_detected" for r in results),
+        "ambiguous_count": sum(r["status"] == "ambiguous_overlap" for r in results),
+        "results": results,
+        "note": "ROI могут включать эффекты кисти и фон; пересекающиеся ROI помечаются неоднозначными.",
+    }
