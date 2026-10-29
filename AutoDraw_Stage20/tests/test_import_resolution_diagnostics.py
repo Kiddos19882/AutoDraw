@@ -15,11 +15,7 @@ SOURCE = ROOT / "source"
 
 
 class ImportResolutionDiagnosticsTests(unittest.TestCase):
-    """Document how short imports resolve when both component roots are present.
-
-    This is a baseline diagnostic, not a proposed architecture: it intentionally
-    records the current order-dependent behavior before any package moves.
-    """
+    """Check legacy short-import resolution and canonical model identity."""
 
     def _resolve_short_imports(self, first: str, second: str) -> dict[str, str]:
         roots = {
@@ -75,18 +71,41 @@ print(json.dumps({
                     expected_root / "image_processing" / "pipeline.py",
                 )
 
-    def test_preparation_and_executor_models_are_identical_blobs_today(self) -> None:
-        # Keep this test explicit: the current duplicate files are a known
-        # compatibility risk if either copy changes independently.
-        preparation = SOURCE / "preparation" / "models"
-        executor = SOURCE / "executor" / "models"
-        for filename in ("point.py", "stroke.py", "drawing_plan.py"):
-            with self.subTest(filename=filename):
-                self.assertEqual(
-                    (preparation / filename).read_bytes(),
-                    (executor / filename).read_bytes(),
-                    f"Model copies diverged: {filename}",
-                )
+    def test_preparation_and_executor_export_the_same_model_classes(self) -> None:
+        script = """
+import json
+import sys
+sys.path.insert(0, sys.argv[1])
+from preparation.models import DrawingPlan as PreparationPlan
+from preparation.models import Point as PreparationPoint
+from preparation.models import Stroke as PreparationStroke
+from executor.models import DrawingPlan as ExecutorPlan
+from executor.models import Point as ExecutorPoint
+from executor.models import Stroke as ExecutorStroke
+from geometry_models import DrawingPlan, Point, Stroke
+print(json.dumps({
+    "point_shared": PreparationPoint is ExecutorPoint is Point,
+    "stroke_shared": PreparationStroke is ExecutorStroke is Stroke,
+    "plan_shared": PreparationPlan is ExecutorPlan is DrawingPlan,
+    "point_module": PreparationPoint.__module__,
+    "stroke_module": PreparationStroke.__module__,
+    "plan_module": PreparationPlan.__module__,
+}))
+"""
+        completed = subprocess.run(
+            [sys.executable, "-c", script, str(SOURCE)],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        resolved = json.loads(completed.stdout)
+        self.assertTrue(resolved["point_shared"], resolved)
+        self.assertTrue(resolved["stroke_shared"], resolved)
+        self.assertTrue(resolved["plan_shared"], resolved)
+        self.assertEqual(resolved["point_module"], "geometry_models.point")
+        self.assertEqual(resolved["stroke_module"], "geometry_models.stroke")
+        self.assertEqual(resolved["plan_module"], "geometry_models.drawing_plan")
 
     def test_legacy_drawing_plan_json_without_optional_fields_is_loadable(self) -> None:
         legacy_plan = {
