@@ -107,6 +107,36 @@ print(json.dumps({
         self.assertEqual(resolved["stroke_module"], "geometry_models.stroke")
         self.assertEqual(resolved["plan_module"], "geometry_models.drawing_plan")
 
+    def test_preparation_and_executor_share_image_processing_types(self) -> None:
+        script = """
+import json
+import sys
+sys.path.insert(0, sys.argv[1])
+from preparation.image_processing import ProcessingResult as PreparationResult
+from preparation.image_processing import ProcessingSettings as PreparationSettings
+from executor.image_processing import ProcessingResult as ExecutorResult
+from executor.image_processing import ProcessingSettings as ExecutorSettings
+from shared_image_processing import ProcessingResult, ProcessingSettings
+print(json.dumps({
+    "result_shared": PreparationResult is ExecutorResult is ProcessingResult,
+    "settings_shared": PreparationSettings is ExecutorSettings is ProcessingSettings,
+    "result_module": PreparationResult.__module__,
+    "settings_module": PreparationSettings.__module__,
+}))
+"""
+        completed = subprocess.run(
+            [sys.executable, "-c", script, str(SOURCE)],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        resolved = json.loads(completed.stdout)
+        self.assertTrue(resolved["result_shared"], resolved)
+        self.assertTrue(resolved["settings_shared"], resolved)
+        self.assertEqual(resolved["result_module"], "shared_image_processing.pipeline")
+        self.assertEqual(resolved["settings_module"], "shared_image_processing.pipeline")
+
     def test_legacy_drawing_plan_json_without_optional_fields_is_loadable(self) -> None:
         legacy_plan = {
             "canvas": {"width": 10, "height": 8},
