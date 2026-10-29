@@ -525,7 +525,8 @@ class ColorScanlineTab:
             if report.get("requested_mode") == "automatic" else f"режим {report['mode']}, "
         )
         fit_text = (
-            f"Подогнано под бюджет: {choice_text}масштаб {report['scale']:.1f}, "
+            f"{'Подогнано под оба бюджета' if report['fits_budget'] else 'Лучший доступный вариант, оба бюджета не пройдены'}: "
+            f"{choice_text}масштаб {report['scale']:.1f}, "
             f"допуск RDP {report['simplify_tolerance_px']:.1f} px, "
             f"минимальный компонент {report['min_component_area']} px; "
             f"расход {report['estimated_ink_after_px_equivalent']:,.0f}/"
