@@ -41,6 +41,8 @@ PATTERNS: dict[str, str] = {
     "egret_end_fill": r"\.endFill\s*\(",
     "egret_draw_rect": r"\.drawRect\s*\(",
     "brush_terms": r"brush|Brush|radius|thickness|lineWidth|lineCap|lineJoin|painterExtend|isPainterExtend",
+    "radius_ui_terms": r"RadiusOption|RadiusChangedEvent|onRadiusChanged|radiusOption|radiusField",
+    "stage_scale_terms": r"scaleMode|StageScaleMode|SHOW_ALL|FIXED_WIDTH|FIXED_HEIGHT|NO_BORDER|EXACT_FIT",
     "board_terms": r"BoardPane|BoardItem|BoardCanvas|DrawingBoard|CanvasRenderingContext2D|BLACK_BOARD_WIDTH|BLACK_BOARD_HEIGHT|isPainterExtend|maxPoint",
     "board_dimensions": r"BLACK_BOARD_WIDTH|BLACK_BOARD_HEIGHT",
     "board_draw_input": r"BoardPane\.prototype\.(?:start|move|draw|paint|clear|add|finish|end|begin)|BoardPane\.BLACK_BOARD_(?:WIDTH|HEIGHT)",
