@@ -41,6 +41,29 @@ _ALLOWED_NEXT = {
 }
 
 
+def calculate_slider_target(
+    start_30: tuple[int, int] | list[int],
+    end_1: tuple[int, int] | list[int],
+    brush_value: int,
+) -> tuple[int, int]:
+    """Map brush radius 30 at the left/start point to radius 1 at the right/end."""
+    if isinstance(brush_value, bool) or not isinstance(brush_value, int) or not 1 <= brush_value <= 30:
+        raise ValueError("Размер кисти должен быть целым числом от 1 до 30.")
+    if not isinstance(start_30, (tuple, list)) or len(start_30) != 2:
+        raise ValueError("Начальная точка кисти 30 должна содержать X и Y.")
+    if not isinstance(end_1, (tuple, list)) or len(end_1) != 2:
+        raise ValueError("Конечная точка кисти 1 должна содержать X и Y.")
+    try:
+        sx, sy = int(start_30[0]), int(start_30[1])
+        ex, ey = int(end_1[0]), int(end_1[1])
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ValueError("Координаты ползунка должны быть целыми числами.") from exc
+    if (sx, sy) != tuple(start_30) or (ex, ey) != tuple(end_1):
+        raise ValueError("Координаты ползунка должны быть целыми числами.")
+    ratio = (30 - brush_value) / 29
+    return round(sx + (ex - sx) * ratio), round(sy + (ey - sy) * ratio)
+
+
 class BrushWorkflowError(RuntimeError):
     """Invalid experiment transition or attempted continuation after termination."""
 
