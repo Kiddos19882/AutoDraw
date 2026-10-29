@@ -59,6 +59,10 @@ ANCHORS = {
     "board_on_draw_start": "o.prototype.onDrawStart=function",
     "board_on_drawing_end": "o.prototype.onDrawingEnd=function",
     "board_set_radius": "o.prototype.setRadius=function",
+    "radius_option_class": "e.RadiusOption=o",
+    "radius_changed_ui_handler": "onRadiusChanged=function",
+    "preloader_stage_setup": "Preloader.prototype.initStage=function",
+    "board_atom_point_collection": "t.prototype.pushPoint=function",
     "painter_class_export": "t.Painter=e",
     "board_creation": "createBlackBoard=function",
 }
