@@ -33,13 +33,13 @@ def test_wide_fill_never_crosses_neighbor_color_or_transparency():
         brush = stroke["brush_value"]
         (first, last) = stroke["points"]
         x1, x2, y = int(first["x"]), int(last["x"]), int(first["y"])
-        half_x = brush / 2
-        half_y = brush / 2
-        left = max(0, int(np.ceil(x1 - half_x - 1e-9)))
-        right = min(indexes.shape[1] - 1, int(np.floor(x2 + half_x + 1e-9)))
-        top = max(0, int(np.ceil(y - half_y - 1e-9)))
-        bottom = min(indexes.shape[0] - 1, int(np.floor(y + half_y + 1e-9)))
-        assert np.all(indexes[top:bottom + 1, left:right + 1] == color)
+        footprint = _independent_footprint_pixels(
+            indexes.shape, x1, x2, y, brush,
+            plan["brush_configuration"]["scale_x_source_px_per_game_unit"],
+            plan["brush_configuration"]["scale_y_source_px_per_game_unit"],
+        )
+        for py, px in footprint:
+            assert indexes[py, px] == color
 
 
 def test_narrow_features_and_isolated_pixels_are_kept_by_fallback():
@@ -86,11 +86,13 @@ def test_hole_and_disconnected_component_remain_unpainted_and_separate():
         brush = stroke["brush_value"]
         first, last = stroke["points"]
         x1, x2, y = int(first["x"]), int(last["x"]), int(first["y"])
-        left = max(0, int(np.ceil(x1 - brush / 2 - 1e-9)))
-        right = min(indexes.shape[1] - 1, int(np.floor(x2 + brush / 2 + 1e-9)))
-        top = max(0, int(np.ceil(y - brush / 2 - 1e-9)))
-        bottom = min(indexes.shape[0] - 1, int(np.floor(y + brush / 2 + 1e-9)))
-        assert np.all(indexes[top:bottom + 1, left:right + 1] == color)
+        footprint = _independent_footprint_pixels(
+            indexes.shape, x1, x2, y, brush,
+            plan["brush_configuration"]["scale_x_source_px_per_game_unit"],
+            plan["brush_configuration"]["scale_y_source_px_per_game_unit"],
+        )
+        for py, px in footprint:
+            assert indexes[py, px] == color
 
     # The hole is transparent in the input and cannot be covered by a planned
     # footprint; disconnected regions are represented without connecting paths.
@@ -118,8 +120,8 @@ def _independent_footprint_pixels(
         (py, px)
         for py in range(height)
         for px in range(width)
-        if y - half_y <= py <= y + half_y
-        and x1 - half_x <= px <= x2 + half_x
+        if py + 0.5 > y - half_y and py - 0.5 < y + half_y
+        and px + 0.5 > x1 - half_x and px - 0.5 < x2 + half_x
     }
 
 
