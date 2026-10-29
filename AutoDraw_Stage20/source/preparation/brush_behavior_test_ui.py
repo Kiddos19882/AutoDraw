@@ -695,6 +695,8 @@ class BrushBehaviorTestTab:
             finally:
                 self._brush_drag_mouse_down = False
         self._brush_drag_state = None
+        if cancelled or error or release_error:
+            self._start_executor_after_brush_drag = False
         if release_error:
             self.status_var.set(f"КРИТИЧЕСКАЯ ОШИБКА: не удалось подтвердить отпускание кнопки мыши: {release_error}")
         elif error:
