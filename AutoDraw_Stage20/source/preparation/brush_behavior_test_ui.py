@@ -744,16 +744,105 @@ class BrushBehaviorTestTab:
             )
             if self._start_executor_after_brush_drag:
                 self._start_executor_after_brush_drag = False
-                if callable(self.on_brush_ready):
-                    self.root.after(0, lambda: self.on_brush_ready(brush))
-                else:
-                    self.status_var.set("Кисть перетащена, но callback запуска исполнителя не подключён.")
+                self._confirm_brush_before_test(brush, state)
         if cancelled or error or release_error:
             try:
                 self.root.deiconify()
                 self.root.lift()
             except tk.TclError:
                 pass
+
+    def _confirm_brush_before_test(self, brush: int, state: dict[str, Any]) -> None:
+        """Require visual confirmation before using a requested brush size in a measurement."""
+        start = state.get("start")
+        target = state.get("target")
+        phase = {
+            "status": "awaiting_user_confirmation",
+            "requested_value": int(brush),
+            "drag_start": list(start) if isinstance(start, (tuple, list)) else None,
+            "drag_target": list(target) if isinstance(target, (tuple, list)) else None,
+            "drag_completed_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            "confirmation_required": True,
+            "note": (
+                "A completed mouse drag does not prove the game selected the requested brush size. "
+                "The user must visually check the slider position before the test executor can start."
+            ),
+        }
+        self.experiment_phases["brush_setup"] = phase
+        if self.experiment_dir is not None:
+            try:
+                self._write_experiment_manifest()
+            except (OSError, ValueError, TypeError) as exc:
+                phase["status"] = "manifest_write_failed"
+                phase["error"] = str(exc)
+                self.status_var.set(
+                    "Размер кисти не подтверждён; не удалось сохранить запись. Исполнитель не запущен."
+                )
+                return
+
+        try:
+            self.root.deiconify()
+            self.root.lift()
+        except tk.TclError:
+            pass
+
+        try:
+            confirmed = messagebox.askyesno(
+                "Подтвердить положение кисти",
+                (
+                    f"AutoDraw перетащил ползунок к запрошенному размеру {brush}, "
+                    f"координаты цели: {target}.\n\n"
+                    "Переключись в браузер (Alt+Tab) и визуально проверь, что ползунок "
+                    "действительно находится в ожидаемой позиции. Нажимай «Да» только после проверки.\n\n"
+                    "При ответе «Нет» тестовое рисование не начнётся."
+                ),
+                icon="question",
+                parent=self.root,
+            )
+        except Exception as exc:
+            phase["status"] = "confirmation_dialog_failed"
+            phase["error"] = str(exc)
+            if self.experiment_dir is not None:
+                try:
+                    self._write_experiment_manifest()
+                except (OSError, ValueError, TypeError):
+                    pass
+            self.status_var.set("Не удалось запросить подтверждение кисти. Исполнитель не запущен.")
+            return
+
+        if not confirmed:
+            phase["status"] = "declined_by_user"
+            phase["declined_at_utc"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+            if self.experiment_dir is not None:
+                try:
+                    self._write_experiment_manifest()
+                except (OSError, ValueError, TypeError) as exc:
+                    phase["manifest_write_error"] = str(exc)
+            self.status_var.set(
+                "Размер кисти не подтверждён; тестовое рисование отменено. "
+                "Проверь ползунок и повтори установку при необходимости."
+            )
+            return
+
+        phase["status"] = "confirmed_by_user"
+        phase["confirmed_at_utc"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        phase["confirmation_method"] = "explicit_user_visual_confirmation"
+        if self.experiment_dir is not None:
+            try:
+                self._write_experiment_manifest()
+            except (OSError, ValueError, TypeError) as exc:
+                phase["status"] = "manifest_write_failed_after_confirmation"
+                phase["manifest_write_error"] = str(exc)
+                self.status_var.set(
+                    "Подтверждение получено, но не удалось записать манифест. Исполнитель не запущен."
+                )
+                return
+        if callable(self.on_brush_ready):
+            self.status_var.set(f"Размер {brush} подтверждён; запуск тестового исполнения.")
+            self.root.after(0, lambda: self.on_brush_ready(brush))
+        else:
+            phase["status"] = "executor_callback_missing"
+            self.status_var.set("Кисть подтверждена, но callback запуска исполнителя не подключён.")
 
     def capture_screenshot(self) -> None:
         self.status_var.set("Через 3 секунды будет сохранён полный скриншот экрана. Переключись в браузер.")
