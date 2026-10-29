@@ -36,8 +36,6 @@ def polyline_distance(points_a: list[tuple[float, float]], points_b: list[tuple[
     if len(points_a) < 2 or len(points_b) < 2:
         return math.inf
     best = math.inf
-    for ax, ay in zip(points_a, points_a[1:]):
-        pass
     for (ax, ay), (bx, by) in zip(points_a, points_a[1:]):
         for (cx, cy), (dx, dy) in zip(points_b, points_b[1:]):
             # A crossing or touching pair of segments has zero separation.
