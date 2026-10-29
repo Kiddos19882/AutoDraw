@@ -300,3 +300,10 @@ def test_brush_drag_completion_releases_mouse_and_does_not_claim_verified_value(
     assert tab._brush_drag_state is None
     assert tab._brush_drag_mouse_down is False
     assert "не подтверждён игрой" in tab.status_var.value
+
+
+
+def test_f12_is_not_consumed_when_no_brush_drag_is_active() -> None:
+    tab = brush_ui.BrushBehaviorTestTab.__new__(brush_ui.BrushBehaviorTestTab)
+    tab._brush_drag_state = None
+    assert tab._on_brush_workflow_stop_key() is None
