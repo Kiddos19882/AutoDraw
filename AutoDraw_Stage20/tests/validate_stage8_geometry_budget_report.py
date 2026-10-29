@@ -59,10 +59,23 @@ def main() -> int:
             raise SystemExit(f"{item.get('case')}/{item.get('scenario')} has inconsistent combined budget status.")
         if item["needs_multi_board_split"] == item["fits_both_budgets"]:
             raise SystemExit(f"{item.get('case')}/{item.get('scenario')} has inconsistent split recommendation.")
+        baseline = item.get("baseline")
+        if not isinstance(baseline, dict) or not isinstance(baseline.get("available"), bool):
+            raise SystemExit(f"{item.get('case')}/{item.get('scenario')} missing baseline comparison status.")
+        if baseline["available"]:
+            for field in ("stroke_count", "path_length_px", "paint_cost_px_equivalent",
+                          "estimated_game_points", "quality_pixel_accuracy_percent"):
+                if field not in baseline:
+                    raise SystemExit(f"{item.get('case')}/{item.get('scenario')} baseline missing {field!r}.")
+            loss = item.get("coarsening_quality_loss_percentage_points")
+            if isinstance(loss, bool) or not isinstance(loss, (int, float)) or not math.isfinite(loss):
+                raise SystemExit(f"{item.get('case')}/{item.get('scenario')} has invalid quality-loss comparison.")
         artifacts = item.get("artifacts", {})
         for artifact_key in ("input", "plan", "preview", "report"):
             if not artifacts.get(artifact_key):
                 raise SystemExit(f"{item.get('case')}/{item.get('scenario')} missing artifact {artifact_key!r}.")
+        if baseline["available"] and not artifacts.get("baseline_preview"):
+            raise SystemExit(f"{item.get('case')}/{item.get('scenario')} missing baseline preview artifact.")
 
     print(f"Stage 8 report validated: {len(results)} scenarios, quality and dual-budget fields are consistent.")
     return 0
