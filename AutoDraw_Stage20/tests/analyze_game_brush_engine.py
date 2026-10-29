@@ -50,6 +50,13 @@ PATTERNS: dict[str, str] = {
 
 MAX_SNIPPETS_PER_PATTERN = 12
 CONTEXT_CHARS = 260
+ANCHOR_CONTEXT_CHARS = 3_000
+ANCHORS = {
+    "board_pane_class_and_dimensions": "o.BLACK_BOARD_WIDTH=460,o.BLACK_BOARD_HEIGHT=240,o.BLACK_BOARD_LINE_RADIUS=7",
+    "board_pane_export": 'e.BoardPane=o',
+    "painter_class_export": "t.Painter=e",
+    "board_creation": "createBlackBoard=function",
+}
 
 
 def read_git_file(git_ref: str, git_path: str) -> tuple[str, str]:
@@ -83,6 +90,31 @@ def collect_report(source: str, source_sha256: str, git_ref: str, git_path: str)
             }
             for match in selected
         ]
+    anchor_snippets: dict[str, list[dict[str, Any]]] = {}
+    for name, anchor in ANCHORS.items():
+        positions: list[int] = []
+        start = 0
+        while True:
+            position = source.find(anchor, start)
+            if position < 0:
+                break
+            positions.append(position)
+            start = position + len(anchor)
+        anchor_snippets[name] = [
+            {
+                "offset": position,
+                "excerpt": re.sub(
+                    r"\\s+",
+                    " ",
+                    source[
+                        max(0, position - ANCHOR_CONTEXT_CHARS):
+                        min(len(source), position + len(anchor) + ANCHOR_CONTEXT_CHARS)
+                    ],
+                ),
+            }
+            for position in positions[-3:]
+        ]
+
     return {
         "schema_version": 1,
         "report_type": "autodraw_game_brush_engine_source_scan",
@@ -98,6 +130,7 @@ def collect_report(source: str, source_sha256: str, git_ref: str, git_path: str)
         ),
         "pattern_counts": counts,
         "snippets": snippets,
+        "anchor_snippets": anchor_snippets,
         "next_review_questions": [
             "Where is the selected brush value converted into a Canvas width or geometric radius?",
             "Is the width expressed in logical board units, canvas backing-store pixels, or CSS pixels?",
