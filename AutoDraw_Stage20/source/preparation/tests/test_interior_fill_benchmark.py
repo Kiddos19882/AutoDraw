@@ -11,6 +11,7 @@ if str(TEST_SCRIPTS) not in sys.path:
     sys.path.insert(0, str(TEST_SCRIPTS))
 
 from benchmark_interior_fill import _footprint
+from benchmark_stage7_interior_fill import _resource_budget_estimates
 
 
 def test_footprint_uses_independent_horizontal_and_vertical_scales():
@@ -43,3 +44,25 @@ def test_footprint_includes_cells_touched_by_fractional_brush_edges():
     }
 
     assert _footprint(indexes, stroke, scale_x=1.4, scale_y=1.4) == (2, 2, 4, 4)
+
+
+
+def test_stage7_resource_estimates_keep_paint_and_point_budgets_separate():
+    plan = {
+        "strokes": [
+            {"points": [{"x": 1.0, "y": 1.0}, {"x": 1.0, "y": 1.0}]},
+            {"points": [{"x": 2.0, "y": 2.0}, {"x": 8.0, "y": 2.0}]},
+        ]
+    }
+
+    report = _resource_budget_estimates(plan, board_point_limit=6_000, point_safety_factor=0.85)
+
+    assert report["single_pixel_stroke_count"] == 1
+    assert report["paint"]["estimated_total_ink_px_equivalent"] > 0
+    assert report["paint"]["target_cost_px_equivalent"] == 19_237.5
+    assert report["game_points"]["board_point_limit"] == 6_000
+    assert report["game_points"]["planning_budget_points"] == 5_100
+    assert report["fits_both_targets"] == (
+        report["paint"]["fits_target"] and report["game_points"]["fits_target"]
+    )
+    assert report["model_scope"] == "offline_estimate_not_browser_measurement"
