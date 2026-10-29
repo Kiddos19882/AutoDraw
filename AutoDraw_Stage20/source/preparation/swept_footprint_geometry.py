@@ -32,30 +32,48 @@ def _normalize_point(point: Any) -> Point:
 
 
 def _supercover_segment(start: Point, end: Point) -> list[tuple[int, int]]:
-    """Sample all cells conservatively along a segment, including grid corners."""
+    """Enumerate every grid cell touched by a segment using grid traversal."""
     x0, y0 = start
     x1, y1 = end
     dx, dy = x1 - x0, y1 - y0
-    steps = max(1, math.ceil(max(abs(dx), abs(dy)) * 2))
-    cells: set[tuple[int, int]] = set()
-    for index in range(steps + 1):
-        t = index / steps
-        x, y = x0 + dx * t, y0 + dy * t
-        cells.add((math.floor(x + 0.5), math.floor(y + 0.5)))
+    x, y = math.floor(x0 + 0.5), math.floor(y0 + 0.5)
+    end_x, end_y = math.floor(x1 + 0.5), math.floor(y1 + 0.5)
+    cells: set[tuple[int, int]] = {(x, y)}
 
-    # Exact corner crossings conservatively include all four neighboring cells.
-    # Iterate only vertical grid boundaries; avoid a quadratic canvas-area scan.
-    if dx != 0 and dy != 0:
-        min_x, max_x = sorted((x0, x1))
-        for gx in range(math.floor(min_x + 0.5), math.ceil(max_x + 0.5)):
-            tx = (gx + 0.5 - x0) / dx
-            if 0.0 <= tx <= 1.0:
-                y_at_crossing = y0 + dy * tx
-                gy = round(y_at_crossing - 0.5)
-                if abs(y_at_crossing - (gy + 0.5)) <= 1e-9:
-                    cells.update(((gx, gy), (gx + 1, gy), (gx, gy + 1), (gx + 1, gy + 1)))
+    step_x = 1 if dx > 0 else -1 if dx < 0 else 0
+    step_y = 1 if dy > 0 else -1 if dy < 0 else 0
+    t_delta_x = abs(1.0 / dx) if dx else math.inf
+    t_delta_y = abs(1.0 / dy) if dy else math.inf
+    boundary_x = x + 0.5 if step_x > 0 else x - 0.5
+    boundary_y = y + 0.5 if step_y > 0 else y - 0.5
+    t_max_x = (boundary_x - x0) / dx if dx else math.inf
+    t_max_y = (boundary_y - y0) / dy if dy else math.inf
+
+    # Each iteration crosses at least one grid boundary. At a corner crossing,
+    # include both side cells as well as the diagonal cell (fail-closed policy).
+    max_iterations = 4 + 2 * (abs(end_x - x) + abs(end_y - y))
+    for _ in range(max_iterations):
+        if (x, y) == (end_x, end_y):
+            break
+        if abs(t_max_x - t_max_y) <= 1e-12:
+            cells.add((x + step_x, y))
+            cells.add((x, y + step_y))
+            x += step_x
+            y += step_y
+            cells.add((x, y))
+            t_max_x += t_delta_x
+            t_max_y += t_delta_y
+        elif t_max_x < t_max_y:
+            x += step_x
+            cells.add((x, y))
+            t_max_x += t_delta_x
+        else:
+            y += step_y
+            cells.add((x, y))
+            t_max_y += t_delta_y
+    else:
+        raise ValueError("Could not rasterize segment within the expected grid traversal bound.")
     return sorted(cells, key=lambda p: (p[1], p[0]))
-
 
 def _path_centerline_cells(points: list[Point]) -> list[tuple[int, int]]:
     if len(points) == 1:
