@@ -201,6 +201,13 @@ class BrushExperimentState:
             )
         if result is not None and not isinstance(result, dict):
             raise ValueError("Результат этапа должен быть JSON-совместимым объектом.")
+        # A Clear click alone is not evidence that the board is empty.
+        if self.phase == "before_clear" and next_phase == "before_capture":
+            clear_status = result.get("board_clear_status") if isinstance(result, dict) else None
+            if clear_status not in {"restored", "restored_within_pixel_tolerance"}:
+                raise BrushWorkflowError(
+                    "Нельзя продолжить: очистка доски не подтверждена сравнением с эталоном пустой доски."
+                )
         if result is not None:
             self.phase_results[self.phase] = dict(result)
         self.phase = next_phase
