@@ -802,7 +802,7 @@ def test_quality_measure_rejects_out_of_range_palette_indexes():
 
 
 def test_geometry_optimizer_enforces_game_point_budget_separately_from_paint_budget():
-    indexes = np.indices((32, 32)).sum(axis=0).astype(np.int32) % 2
+    indexes = np.indices((96, 96)).sum(axis=0).astype(np.int32) % 2
     plan, report = optimize_geometry_plan_to_budget(
         indexes,
         PALETTE,
@@ -810,7 +810,7 @@ def test_geometry_optimizer_enforces_game_point_budget_separately_from_paint_bud
         paint_budget_px_equivalent=100_000,
         target_usage_percent=95,
         stroke_overhead_px_equivalent=1,
-        board_point_limit=120,
+        board_point_limit=6_000,
         point_safety_factor=0.85,
     )
 
@@ -819,8 +819,8 @@ def test_geometry_optimizer_enforces_game_point_budget_separately_from_paint_bud
     assert report["fits_paint_budget"] is True
     assert report["fits_point_budget"] is True
     assert report["estimated_game_points_after"] <= report["target_point_count"]
-    assert report["target_point_count"] == 102
-    assert report["point_quota_estimate"]["board_point_limit"] == 120
+    assert report["target_point_count"] == 5_100
+    assert report["point_quota_estimate"]["board_point_limit"] == 6_000
     assert report["point_quota_estimate"]["is_calibrated_estimate"] is True
     assert report["combined_budget_pressure"] <= 1.0
 
