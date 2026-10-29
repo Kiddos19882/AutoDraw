@@ -321,6 +321,7 @@ class AutoDrawUnifiedApp:
             get_brush_control=self._get_brush_test_brush_control,
             get_calibration_profile=self._get_brush_test_calibration_profile,
             on_transfer_plan=self._transfer_brush_test_plan,
+            on_brush_ready=self._start_brush_test_executor,
         )
         # Only brush-test plans use this callback; ordinary drawing keeps the executor's
         # standard completion dialog and behavior.
