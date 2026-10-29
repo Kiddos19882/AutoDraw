@@ -227,6 +227,7 @@ class BrushBehaviorTestTab:
         self._automated_preclear_active = False
         self._automated_preclear_after_id: str | None = None
         self._automated_postdraw_active = False
+        self._automated_postdraw_stop_requested = False
         self._automated_postdraw_after_id: str | None = None
         self.root.bind_all("<F12>", self._on_brush_workflow_stop_key, add="+")
         self.screenshot_path: Path | None = None
@@ -564,6 +565,7 @@ class BrushBehaviorTestTab:
                     if self._automated_preclear_active:
                         self.root.after(0, self._cancel_automated_preclear)
                     elif self._automated_postdraw_active:
+                        self._automated_postdraw_stop_requested = True
                         self.root.after(0, self._cancel_automated_postdraw)
                     else:
                         self.root.after(0, self.cancel_brush_drag)
@@ -1297,6 +1299,7 @@ class BrushBehaviorTestTab:
             self.status_var.set("Постэтап остановлен: профиль калибровки недоступен.")
             return
         self._automated_postdraw_active = True
+        self._automated_postdraw_stop_requested = False
         self.status_var.set("Исполнение завершено. Через 2 секунды сохраняется результат, затем будет проверена очистка. F12 отменяет дальнейшие действия.")
         self.root.iconify()
         self._start_brush_hotkey_listener()
@@ -1336,7 +1339,8 @@ class BrushBehaviorTestTab:
                 with Image.open(baseline) as first, Image.open(meter_path) as second:
                     self.experiment_phases["after_draw"]["paint_meter_measurement"] = measure_meter_fill_against_baseline(first, second)
             self._write_experiment_manifest()
-            if not self._automated_postdraw_active:
+            if self._automated_postdraw_stop_requested or not self._automated_postdraw_active:
+                self._cancel_automated_postdraw()
                 return
             points = config.get("points")
             points = points if isinstance(points, dict) else {}
@@ -1368,6 +1372,9 @@ class BrushBehaviorTestTab:
                 "captured_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             }
             self._write_experiment_manifest()
+            if self._automated_postdraw_stop_requested or not self._automated_postdraw_active:
+                self._cancel_automated_postdraw()
+                return
             pyautogui.click(int(clear_point["x"]), int(clear_point["y"]))
             self.experiment_phases["postdraw_workflow"]["clear_click_sent"] = True
             self.experiment_phases["postdraw_workflow"]["status"] = "clear_requested"
@@ -1420,6 +1427,9 @@ class BrushBehaviorTestTab:
                     self.experiment_phases["after_clear"]["paint_meter_restoration"] = evaluate_meter_restoration(first, second)
             self.experiment_phases["postdraw_workflow"]["status"] = "clear_verified" if clear_status in {"restored", "restored_within_pixel_tolerance"} else "clear_not_confirmed"
             self._write_experiment_manifest()
+            if self._automated_postdraw_stop_requested or not self._automated_postdraw_active:
+                self._cancel_automated_postdraw()
+                return
             self._finish_automated_postdraw(
                 "completed" if clear_status in {"restored", "restored_within_pixel_tolerance"} else "inconclusive",
                 "Очистка подтверждена эталоном." if clear_status in {"restored", "restored_within_pixel_tolerance"} else f"Очистка не подтверждена эталоном: {clear_status}.",
