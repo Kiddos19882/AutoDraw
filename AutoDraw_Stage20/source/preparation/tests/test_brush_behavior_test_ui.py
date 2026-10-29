@@ -259,6 +259,8 @@ def test_brush_drag_f12_cancellation_releases_mouse_without_real_input() -> None
     tab.root = Root()
     tab.status_var = Value()
     tab._brush_drag_after_id = "scheduled-step"
+    tab._brush_drag_countdown_id = None
+    tab._brush_hotkey_listener = None
     tab._brush_drag_mouse_down = True
     user32 = FakeUser32()
     tab._brush_drag_state = {
@@ -298,6 +300,8 @@ def test_brush_drag_completion_releases_mouse_and_does_not_claim_verified_value(
     tab.root = Root()
     tab.status_var = Value()
     tab._brush_drag_after_id = None
+    tab._brush_drag_countdown_id = None
+    tab._brush_hotkey_listener = None
     tab._brush_drag_mouse_down = True
     user32 = FakeUser32()
     tab._brush_drag_state = {
