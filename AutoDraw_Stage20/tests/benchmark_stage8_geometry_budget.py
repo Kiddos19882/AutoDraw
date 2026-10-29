@@ -225,7 +225,6 @@ def main() -> int:
 
     # Separate constraint experiments use a small deterministic input so the reports
     # isolate the configuration change and remain inexpensive enough for every CI run.
-    small_stripes = synthetic["horizontal_stripes"][::2, ::2]
     small_checkerboard = synthetic["checkerboard"]
     results.append(benchmark_case(
         "constraint-isolation", small_checkerboard, SYNTHETIC_PALETTE, artifact_dir,
@@ -233,13 +232,13 @@ def main() -> int:
         point_limit=6_000, safety_factor=args.safety_factor, scenario="point-budget-priority",
     ))
     results.append(benchmark_case(
-        "constraint-isolation", small_stripes, SYNTHETIC_PALETTE, artifact_dir,
-        budget=2_200.0, target_usage_percent=args.target_usage_percent,
+        "constraint-isolation", small_checkerboard, SYNTHETIC_PALETTE, artifact_dir,
+        budget=14_000.0, target_usage_percent=args.target_usage_percent,
         point_limit=12_000, safety_factor=args.safety_factor, scenario="paint-budget-priority",
     ))
     results.append(benchmark_case(
         "constraint-isolation", small_checkerboard, SYNTHETIC_PALETTE, artifact_dir,
-        budget=6_000.0, target_usage_percent=args.target_usage_percent,
+        budget=14_000.0, target_usage_percent=args.target_usage_percent,
         point_limit=3_000, safety_factor=args.safety_factor, scenario="combined-budget",
     ))
 
