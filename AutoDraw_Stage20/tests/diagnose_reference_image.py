@@ -12,9 +12,12 @@ import numpy as np
 from PIL import Image
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-PREPARATION_ROOT = REPO_ROOT / "AutoDraw_Stage20" / "source" / "preparation"
-if str(PREPARATION_ROOT) not in sys.path:
-    sys.path.insert(0, str(PREPARATION_ROOT))
+APP_ROOT = REPO_ROOT / "AutoDraw_Stage20"
+PREPARATION_ROOT = APP_ROOT / "source" / "preparation"
+# Compatibility wrappers import the canonical shared pipeline from APP_ROOT.
+for import_root in (PREPARATION_ROOT, APP_ROOT):
+    if str(import_root) not in sys.path:
+        sys.path.insert(0, str(import_root))
 
 from image_processing.pipeline import fit_to_canvas  # noqa: E402
 
