@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "0.1.0";
+  const VERSION = "0.1.1";
   const METHOD_NAMES = ["onDrawStart", "onDrawing", "onDrawingEnd", "setRadius", "updateLess"];
   const MAX_EVENTS = 50000;
   const SCAN_INTERVAL_MS = 500;
@@ -304,7 +304,7 @@
             initiatorType: entry.initiatorType || null,
             durationMs: Number(entry.duration.toFixed(3)),
             transferSize: Number.isFinite(entry.transferSize) ? entry.transferSize : null,
-            url: name.slice(0, 300)
+            url: safeUrl(name)
           });
         }
       });
@@ -345,7 +345,7 @@
       monitorVersion: VERSION,
       startedAtPerformanceMs: state.startedAt,
       exportedAtPerformanceMs: now(),
-      page: { origin: location.origin, pathname: location.pathname },
+      page: { origin: location.origin, pathname: location.pathname },\n      frameContext: frameContext(),
       boardDetected: !!state.board,
       boardLabel: state.boardLabel,
       eventCount: state.events.length,
