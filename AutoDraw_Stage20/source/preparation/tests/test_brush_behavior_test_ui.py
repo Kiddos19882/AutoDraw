@@ -540,6 +540,7 @@ def test_automatic_brush_setup_requires_visual_confirmation_before_executor(monk
         "user32": user32, "start": (1195, 327), "target": (1322, 327),
         "brush": 10, "purpose": "set_brush_size",
     }
+    monkeypatch.setattr(brush_ui.simpledialog, "askstring", lambda *args, **kwargs: "10")
     monkeypatch.setattr(brush_ui.messagebox, "askyesno", lambda *args, **kwargs: False)
     tab._finish_brush_drag()
 
@@ -585,6 +586,7 @@ def test_automatic_brush_setup_starts_executor_only_after_confirmation(monkeypat
         "user32": FakeUser32(), "start": (1195, 327), "target": (1322, 327),
         "brush": 10, "purpose": "set_brush_size",
     }
+    monkeypatch.setattr(brush_ui.simpledialog, "askstring", lambda *args, **kwargs: "10")
     monkeypatch.setattr(brush_ui.messagebox, "askyesno", lambda *args, **kwargs: True)
     tab._finish_brush_drag()
 
