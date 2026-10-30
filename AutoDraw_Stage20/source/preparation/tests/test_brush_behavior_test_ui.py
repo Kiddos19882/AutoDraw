@@ -98,9 +98,40 @@ def test_all_test_cases_have_named_strokes_with_two_endpoints() -> None:
         assert scenario["strokes"]
         for stroke in scenario["strokes"]:
             assert stroke["name"]
-            assert len(stroke["points"]) == 2
-            assert len(stroke["points"][0]) == 2
+            assert len(stroke["points"]) >= 2
+            assert all(len(point) == 2 for point in stroke["points"])
             assert len(stroke["points"][1]) == 2
+
+
+def test_new_polyline_scenarios_preserve_intermediate_points_in_executor_plan() -> None:
+    for case_name in ("Непрерывные повороты", "Замкнутый контур одной траекторией"):
+        scenario = TEST_CASES[case_name]
+        assert any(len(stroke["points"]) > 2 for stroke in scenario["strokes"])
+        plan = build_brush_test_drawing_plan(case_name, (460, 240))
+        assert len(plan["strokes"]) == len(scenario["strokes"])
+        for source, planned in zip(scenario["strokes"], plan["strokes"]):
+            assert len(planned["points"]) == len(source["points"])
+            assert planned["points"] == [
+                {"x": float(x), "y": float(y)} for x, y in source["points"]
+            ]
+
+
+def test_all_brush_scenarios_fit_engine_logical_board_and_have_unique_stroke_names() -> None:
+    for scenario in TEST_CASES.values():
+        names = [stroke["name"] for stroke in scenario["strokes"]]
+        assert len(names) == len(set(names))
+        plan = build_brush_test_drawing_plan(
+            next(name for name, value in TEST_CASES.items() if value is scenario),
+            (460, 240),
+        )
+        assert plan["canvas"] == {"width": 460, "height": 240}
+
+
+def test_parallel_spacing_case_has_controlled_centerline_distances() -> None:
+    strokes = TEST_CASES["Параллельные линии и расстояние"]["strokes"]
+    pairs = [(strokes[index]["points"][0][1], strokes[index + 1]["points"][0][1])
+             for index in range(0, len(strokes), 2)]
+    assert [second - first for first, second in pairs] == [4, 8, 16, 24]
 
 
 def test_brush_test_record_rejects_unknown_case() -> None:
