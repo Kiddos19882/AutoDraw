@@ -116,7 +116,7 @@
 
 1. Запустить локальный тестовый WebSocket endpoint, который слушает исключительно `127.0.0.1`, принимает только ожидаемый Origin игрового iframe и требует случайный одноразовый challenge/token.
 2. Открыть DevTools именно внутри игрового iframe (не top frame) и убедиться, что `location.origin` совпадает с Origin allowlist тестового сервера.
-3. Из Console создать WebSocket к `ws://127.0.0.1:<port>`, передать только тестовый challenge и строку `autodraw-bridge-smoke-test`; сервер должен вернуть точный echo.
+3. Из Console создать WebSocket к `ws://127.0.0.1:<port>`, пройти одноразовую авторизацию JSON-сообщением `auth`, затем отправить `ping` с nonce `autodraw-bridge-smoke-test`; сервер должен вернуть `ready`, затем `pong` с тем же nonce.
 4. Зафиксировать отдельно: конструктор WebSocket, `open`, `message`, `error`, `close`, текст ошибки Firefox, Origin, версию браузера, адрес/порт endpoint. Секретный challenge не включать в общий лог.
 5. Повторить с неверным Origin и неверным challenge: оба запроса должны быть отклонены сервером. Проверить, что endpoint недоступен через LAN-интерфейс.
 6. Повторить после перезагрузки iframe. Никакие вызовы `AutoDrawGameMonitor.clear()`, игровые методы или перемещение мыши в smoke test не выполняются.
@@ -133,3 +133,48 @@
 Предложенный выше JSON-протокол является логической схемой, а не окончательной реализацией. До кода необходимо определить handshake: сервер генерирует одноразовый случайный секрет при старте, секрет передаётся пользователю локально и не хранится в репозитории; сервер проверяет точный Origin и token до приёма сообщений. Token не должен передаваться в URL, логах или событиях Monitor.
 
 Bridge принимает только фиксированные операции чтения (`status`, `export`) и валидированные поля `sessionId/runId/sequence/checkpoint`. Запрещены произвольные имена методов, eval, команды управления мышью, `clear` и `stop`. Очистка остаётся отдельным локальным действием AutoDraw и возможна только после успешного сохранения экспорта.
+
+
+### 10.4. Реализация локального transport smoke server
+
+Добавлены отдельные файлы:
+- `source/game_monitor/websocket_smoke_server.py` — одноразовый локальный сервер;
+- `source/game_monitor/requirements-smoke.txt` — изолированная зависимость `websockets==12.0`, не добавленная в runtime приложения;
+- `tests/test_websocket_smoke_server.py` — unit/integration проверки токена, формата сообщений, Origin и ping/pong.
+
+Сервер слушает только `127.0.0.1`, принимает один точный HTTPS Origin, ограничивает сообщение 1024 байтами, ждёт handshake и ping не более 5 секунд, использует одноразовый случайный token (32 случайных байта в URL-safe представлении) и не пишет token в логи. Поддерживаются только две схемы сообщений: `auth` и `ping`; ответ — `ready` и `pong`. Сервер не предоставляет доступ к Game Monitor, не вызывает игровых методов и не умеет управлять мышью, очищать события или останавливать Monitor.
+
+**Запуск в Windows PowerShell** из корня репозитория:
+
+```powershell
+py -3.11 -m pip install -r .\\AutoDraw_Stage20\\source\\game_monitor\\requirements-smoke.txt
+py -3.11 .\\AutoDraw_Stage20\\source\\game_monitor\\websocket_smoke_server.py --origin https://ORIGIN-ИЗ-IFRAME
+```
+
+До запуска получить точное значение `location.origin` в Console именно игрового iframe. Передавать только origin (scheme + host + optional port), без пути. Не угадывать домен. Сервер выведет одноразовый token в локальный терминал; не отправлять его в чат, issue или commit.
+
+В Console игрового iframe выполнить, заменив `PASTE_TOKEN_HERE` локальным значением из терминала:
+
+```javascript
+(() => {
+  const ws = new WebSocket("ws://127.0.0.1:8765");
+  ws.addEventListener("open", () => {
+    ws.send(JSON.stringify({ type: "auth", token: "PASTE_TOKEN_HERE" }));
+  });
+  ws.addEventListener("message", (event) => {
+    const message = JSON.parse(event.data);
+    console.log("AutoDraw smoke message:", message);
+    if (message.type === "ready") {
+      ws.send(JSON.stringify({ type: "ping", nonce: "autodraw-bridge-smoke-test" }));
+    }
+  });
+  ws.addEventListener("error", () => console.error("AutoDraw smoke WebSocket error"));
+  ws.addEventListener("close", (event) => {
+    console.log("AutoDraw smoke WebSocket closed:", event.code, event.reason);
+  });
+})();
+```
+
+Ожидаемый результат: сообщения `{type: "ready"}` и `{type: "pong", nonce: "autodraw-bridge-smoke-test"}`, затем close code 1000. Неверный token должен завершить соединение кодом 4003. Неверный Origin отклоняется до открытия WebSocket handshake; эта отрицательная проверка дополнительно покрывается автоматическим integration test. Сервер останавливается Ctrl+C.
+
+Текущий статус реализации: код и CI-тесты добавлены, но browser test на пользовательском Firefox ещё не выполнялся. Статус live browser transport остаётся `not_tested` до результата пользователя. Веб-сокет smoke server — временная тестовая оснастка, не production bridge.
