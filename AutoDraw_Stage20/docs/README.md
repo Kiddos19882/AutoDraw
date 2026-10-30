@@ -14,6 +14,7 @@
 |---|---|
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Общая структура приложения, подсистемы и связи |
 | [COMPONENT_CATALOG.md](COMPONENT_CATALOG.md) | Каталог исходных модулей, тестов, утилит и CI |
+| [MODULE_REFERENCE.md](MODULE_REFERENCE.md) | Структурный справочник модулей preparation, executor и Game Monitor |
 | [DATA_FORMATS_AND_MODELS.md](DATA_FORMATS_AND_MODELS.md) | Общие модели DrawingPlan, Stroke, Point и формат .autodraw |
 | [CONFIGURATION_AND_DATA.md](CONFIGURATION_AND_DATA.md) | Каталоги данных, профили, форматы и переменные окружения |
 | [DEVELOPMENT.md](DEVELOPMENT.md) | Подготовка Windows-среды, запуск, тесты и сборка |
