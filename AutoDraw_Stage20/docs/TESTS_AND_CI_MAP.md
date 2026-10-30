@@ -192,11 +192,22 @@
 
 Указание «прямые импорты» означает только синтаксически обнаруженные import/from-import statements, включая локальные импорты внутри функций. Оно не описывает транзитивные зависимости импортируемого модуля и не является графом runtime-загрузки.
 
+
+### 2.7. Ещё пять тестов Preparation — прямые импорты
+
+| Тест | Прямые внутрипроектные импорты |
+|---|---|
+| `source/preparation/tests/test_paint_budget_optimizer.py` | `palette_quantization`, `paint_budget_optimizer` |
+| `source/preparation/tests/test_game_point_calibration.py` | `game_point_calibration` |
+| `source/preparation/tests/test_interior_fill_planner.py` | `interior_fill_planner` |
+| `source/preparation/tests/test_geometry_budget_optimizer.py` | `geometry_budget_optimizer`, `geometry_color_plan` |
+| `source/preparation/tests/test_outline_first_fill_planner.py` | `brush_footprint_geometry`, `outline_first_fill_planner` |
+
 ## 7. Границы и недостающая инвентаризация
 
 1. Список всех тестовых файлов в обоих discovery-каталогах не переписан целиком; зафиксированы тесты, названные в документации, CI workflow и непосредственно проверенных исходниках.
 2. Вспомогательные скрипты из `tests/` не все имеют автоматические тесты: часть из них — CLI-инструменты/benchmark runners.
-3. Прямые импорты дополнительно инвентаризированы для 20 файлов из Preparation, Executor и корневого tests; полный перечень всех тестовых файлов и импортов ещё не завершён.
+3. Прямые импорты дополнительно инвентаризированы для 25 файлов из Preparation, Executor и корневого tests; полный перечень всех тестовых файлов и импортов ещё не завершён.
 4. В рамках документирования не запускались тесты, benchmarks, UI или portable build.
 5. CI YAML описывает предполагаемый процесс, но его наличие не является доказательством успешного выполнения на текущем commit. Для статуса выполнения следует смотреть конкретный GitHub Actions run.
 
