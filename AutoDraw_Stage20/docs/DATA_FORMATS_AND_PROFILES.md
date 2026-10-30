@@ -346,3 +346,72 @@ Game Monitor — самостоятельный JavaScript DevTools-инстру
 ### 15.2. Безопасность экспортируемых URL
 
 Для Resource Timing URL пропускается через `safeUrl()`. Значения query-параметров, имена которых содержат `token`, `auth`, `session`, `cookie`, `secret`, `key`, `uid` или `user`, заменяются на `[REDACTED]`. Это правило относится к URL, обработанным Monitor; оно не является общей очисткой любых произвольных данных в экспортируемом JSON.
+
+
+## 16. Входные данные и отчёт калибровки игровых точек
+
+**Источник:** `game_point_calibration.py`.
+
+### 16.1. Входной документ
+
+Функция `analyze_game_point_calibration(document)` принимает JSON-совместимый объект с:
+
+- `schema_version = 1`;
+- `browser` — объект с данными браузерной среды;
+- `browser.frame_probe` — снимок измерения кадров версии `2`;
+- `runs` — массив запусков калибровочной серии.
+
+Снимок `frame_probe` должен содержать `schema_version`, `probe_status`, признаки видимости вкладки, `average_fps`, `median_fps`, `duration_ms`, `wall_clock_elapsed_ms`, `frame_count`, `median_frame_interval_ms`, `p95_frame_interval_ms`, `max_frame_interval_ms`.
+
+Запись `runs[]` содержит идентификатор запуска, тип доски и лимит точек, шаг и задержку исполнителя, измеренную частоту кадров, сценарий, длину штриха, количество запланированных штрихов и длину пути, исход наблюдения, количество последних полностью видимых штрихов, видимую длину пути, подтверждение сопоставимого запаса, номер повтора и примечание.
+
+Допустимые исходы: `all_visible`, `partial`, `none_visible`. Входной документ использует `schema_version = 1`, отдельно от версии снимка кадров.
+
+### 16.2. Отчёт
+
+Результат `analyze_game_point_calibration()` имеет `schema_version = 2` и содержит:
+
+- `model_id`, `is_engine_exact_counter`, `generated_at`;
+- нормализованный объект `browser` и `frame_probe`;
+- `input_run_count`, `fit_eligible_run_count`;
+- `excluded_runs`;
+- массив `models`;
+- `summary`;
+- `interpretation_limits`.
+
+Каждая модель группируется по типу доски, лимиту, шагу, задержке и измеренной частоте кадров. Поля модели включают `fit_status`, `fitting_method`, коэффициенты `points_per_path_px` и `points_per_stroke`, диагностические показатели подгонки, `per_run_fit` и примечание. Варианты `fit_status` включают `insufficient_data`, `underdetermined`, `invalid_fit`, `calibrated`, `needs_repeat`.
+
+Отчёт прямо помечен как не являющийся точным внутренним счётчиком движка. Его поля описывают результат калибровочной модели и ограничения исходных наблюдений.
+
+## 17. Отчёты модели ресурса и расхода
+
+**Источники:** `board_resource_model.py`, `paint_cost_model.py`, `engine_point_calibration.py`.
+
+### 17.1. Профиль ресурса доски
+
+`create_board_resource_profile()` возвращает объект с `model_id`, `point_limit`, `safety_factor`, `planning_budget_points`, `reserved_points`, описанием стандартных кистей, диапазоном расширенного ползунка, диапазоном кистей планировщика, семантикой подсчёта точек и флагом необходимости калибровки для оценки.
+
+### 17.2. Оценка использования точек
+
+`estimate_calibrated_point_usage()` возвращает объект с `model_id`, признаками `is_estimate` и `is_calibrated_estimate`, жёстким лимитом, безопасным бюджетом, коэффициентом точек на пиксель пути, количеством штрихов, оценками точек на путь и начало штриха, общей оценкой, процентами использования, `risk_level`, `risk_label` и примечанием к калибровке.
+
+### 17.3. Оценка эквивалентного расхода
+
+Функции `estimate_paint_cost()` и `estimate_color_plan_paint_cost()` возвращают словари с `model_id`, `is_estimate`, длиной пути, количеством штрихов, накладными расходами, оценкой общего расхода и бюджета, процентами использования, остатком, уровнем риска и примечанием к калибровке. Для цветного плана дополнительно формируются диагностические данные по цветам.
+
+Поля `per_color` являются разбивкой общего расчёта, а не отдельными независимыми игровыми запасами. Идентификаторы модели и флаги оценки следует сохранять при передаче этих результатов в отчёты.
+
+### 17.4. Отчёт engine point calibration
+
+`build_engine_point_calibration_report()` возвращает составной объект без отдельного поля `schema_version`. Основные разделы:
+
+- `model_id`, `engine_resource`, `engine_sampling`;
+- `executor_profile`;
+- `reference_profile_scenarios`;
+- `calibration_profile`;
+- `observed_cutoff_fit`;
+- `point_limit_inference`;
+- `validation`;
+- `observations`.
+
+В отчёте раздельно представлены текущие параметры исполнителя и исторические параметры калибровки. Поля `is_inferred`, `is_assumed`, `frame_rate_was_measured` и `is_verified_from_observation_metadata` характеризуют происхождение данных и не должны отбрасываться при экспорте отчёта.
