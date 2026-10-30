@@ -246,6 +246,7 @@
 - WebSocket smoke server ограничен loopback, exact HTTPS Origin, одноразовой авторизацией, 1024-байтными сообщениями и схемами auth/ping. Он не является production bridge; Firefox iframe smoke test не выполнен.
 - В проверенной серии 8 манифестов и 7 Monitor JSON; во всех 7 отчётах board detected, droppedEvents=0, errors=0, однако manifest-ссылки на JSON отсутствуют. Все измерения шкалы остались inconclusive. Номинальный/фактический radius mismatch: 1→1, 7→6, 14→13, 20→19.
 - Статический анализ выполнен; живые проверки производительности, attach/detach, браузерного транспорта, внутреннего радиуса и CHALK остаются незавершёнными.
+- Дополнительно выявлено: `start()` не очищает event buffer/errors/droppedEvents; stop → start без `clear()` смешивает события нескольких сессий при обновлённом `startedAt`. Это зафиксировано как MON-08.
 - Код, тесты, workflow, профили и пользовательские данные не изменялись.
 
 **Статус:** этап 7 выполняется; статическая часть завершена, live verification pending. Не подключать experimental planner; `safe_to_execute=false`.
