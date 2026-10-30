@@ -79,6 +79,25 @@ def test_brush_test_record_contains_reproducible_stroke_template() -> None:
     assert record["interpretation"]["automatic_execution_allowed"] is False
 
 
+def test_brush_test_record_can_link_passive_game_monitor_evidence() -> None:
+    summary = {
+        "monitor_version": "0.1.2",
+        "event_count": 411,
+        "dropped_events": 0,
+        "draw_sample_count": 145,
+        "interpretation": "passive_browser_telemetry_not_direct_paint_resource_measurement",
+    }
+    record = build_brush_test_record(
+        brush_value=14,
+        test_case="Непрерывные повороты",
+        game_monitor_report_path="monitor-report.json",
+        game_monitor_summary=summary,
+    )
+    assert record["game_monitor_report_path"] == "monitor-report.json"
+    assert record["game_monitor_summary"]["event_count"] == 411
+    assert record["game_monitor_summary"]["interpretation"].endswith("not_direct_paint_resource_measurement")
+
+
 def test_brush_test_record_defaults_unmeasured_paint_points_to_none() -> None:
     record = build_brush_test_record(brush_value=7, test_case="Горизонтальные линии")
 
