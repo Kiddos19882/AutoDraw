@@ -1496,6 +1496,10 @@ Read-only просмотр текущих исходников и докумен
 В `.github/workflows/geometry-tests.yml` для `game_monitor.js` выполняется только `node --check`. Отдельные unit/integration tests относятся к Python WebSocket smoke server; тестов JavaScript attach/detach, event ordering, point counting, export и overhead в найденном наборе нет. Успешный JS syntax check не подтверждает корректность жизненного цикла Monitor.
 
 
+**MON-08 — повторный start без clear смешивает сессии.**  
+`start()` обновляет `startedAt`, но не очищает `events`, `droppedEvents` и `errors`. Очистка выполняется отдельным `clear()`. Поэтому сценарий stop → start без clear оставляет события предыдущего запуска в следующем export, тогда как `startedAtPerformanceMs` уже относится к новому запуску. Это требует явной границы сессии при интерпретации JSON; ручной порядок status/download/clear из README предотвращает смешивание только при точном соблюдении процедуры.
+
+
 ## 7.3. WebSocket smoke server и границы bridge
 
 Проверены `source/game_monitor/websocket_smoke_server.py` и `tests/test_websocket_smoke_server.py`.
