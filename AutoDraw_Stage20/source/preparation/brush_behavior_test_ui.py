@@ -2067,6 +2067,20 @@ class BrushBehaviorTestTab:
             messagebox.showerror("Не удалось прочитать Game Monitor JSON", str(exc), parent=self.root)
             return
         summary = self.game_monitor_summary
+        manifest_path = None
+        try:
+            manifest_path = self._write_experiment_manifest()
+        except (OSError, ValueError, TypeError, AttributeError) as exc:
+            messagebox.showwarning(
+                "Не удалось сохранить привязку Monitor",
+                f"JSON прочитан, но манифест эксперимента не обновлён: {exc}",
+                parent=self.root,
+            )
+        persistence_note = (
+            f"Манифест обновлён: {manifest_path.name}."
+            if manifest_path is not None
+            else "Отчёт привязан только в текущем сеансе; активный манифест эксперимента отсутствует."
+        )
         brush_status = summary["brush_value_status"]
         if brush_status == "mismatch":
             self.status_var.set(
@@ -2077,7 +2091,7 @@ class BrushBehaviorTestTab:
                 "Размер кисти не совпал",
                 f"Запрошено: {summary['requested_brush_value']}\n"
                 f"Фактически в DRAW_SAMPLE: {summary['observed_draw_radii']}\n\n"
-                "Запись сохранена с предупреждением. Не используй этот прогон как подтверждение запрошенного размера.",
+                f"{persistence_note}\nНе используй этот прогон как подтверждение запрошенного размера.",
                 parent=self.root,
             )
         elif brush_status == "mixed":
@@ -2087,17 +2101,17 @@ class BrushBehaviorTestTab:
             messagebox.showwarning(
                 "В отчёте несколько размеров кисти",
                 f"Обнаруженные радиусы: {summary['observed_draw_radii']}.\n"
-                "Проверь, что отчёт относится только к одному эксперименту.",
+                f"Проверь, что отчёт относится только к одному эксперименту.\n{persistence_note}",
                 parent=self.root,
             )
         elif brush_status == "unavailable":
-            self.status_var.set("Game Monitor привязан, но в отчёте нет DRAW_SAMPLE с координатами активного рисования.")
+            self.status_var.set(f"Game Monitor привязан, но в отчёте нет DRAW_SAMPLE с координатами активного рисования. {persistence_note}")
         else:
             self.status_var.set(
                 f"Game Monitor привязан: {self.game_monitor_report_path.name}; "
                 f"событий {summary['event_count']}, "
                 f"активных DRAW_SAMPLE {summary['drawing_sample_count']}, "
-                f"радиус {summary['observed_draw_radii']}."
+                f"радиус {summary['observed_draw_radii']}. {persistence_note}"
             )
 
     def _measurement_values(self) -> dict[str, Any]:
