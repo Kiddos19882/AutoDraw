@@ -104,7 +104,7 @@ flowchart TD
     S6 --> TR[plan_transform]
     S6 --> DIAG[execution_diagnostics]
     S6 --> OPT[stroke_optimizer]
-    S6 --> MODELS[geometry_models]
+    S6 --> MODELS[models compatibility adapter]
     CPE --> PP
     CPE --> CSP
     CPE --> GEO
