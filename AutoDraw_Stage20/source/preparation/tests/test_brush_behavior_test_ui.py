@@ -23,6 +23,8 @@ def _make_test_tab():
     tab.current_plan_path = None
     tab.execution_report_path = None
     tab.execution_report = None
+    tab.game_monitor_report_path = None
+    tab.game_monitor_summary = None
     tab.get_calibration_profile = None
     tab._automated_preclear_active = False
     tab._automated_preclear_after_id = None
