@@ -12,6 +12,7 @@ import json
 import secrets
 import sys
 from dataclasses import dataclass
+from urllib.parse import urlsplit
 
 import websockets
 from websockets.exceptions import ConnectionClosed
@@ -31,6 +32,22 @@ def parse_message(raw: str) -> dict | None:
     except (json.JSONDecodeError, UnicodeError):
         return None
     return value if isinstance(value, dict) else None
+
+
+def is_valid_origin(origin: str) -> bool:
+    try:
+        parsed = urlsplit(origin)
+        return (
+            parsed.scheme == "https"
+            and bool(parsed.netloc)
+            and parsed.username is None
+            and parsed.password is None
+            and parsed.path in ("", "/")
+            and not parsed.query
+            and not parsed.fragment
+        )
+    except ValueError:
+        return False
 
 
 @dataclass
@@ -108,12 +125,12 @@ async def run_server(origin: str, port: int) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--origin", required=True, help="Exact origin of the game iframe, e.g. https://example.com")
+    parser.add_argument("--origin", required=True, help="Exact HTTPS origin of the game iframe, without a path")
     parser.add_argument("--port", type=int, default=DEFAULT_PORT)
     args = parser.parse_args()
 
-    if not args.origin.startswith("https://") or "/" in args.origin.removeprefix("https://").rstrip("/"):
-        parser.error("--origin must be an exact HTTPS origin without a path")
+    if not is_valid_origin(args.origin):
+        parser.error("--origin must be an exact HTTPS origin without a path, query, or fragment")
     if not 1 <= args.port <= 65535:
         parser.error("--port must be between 1 and 65535")
 
