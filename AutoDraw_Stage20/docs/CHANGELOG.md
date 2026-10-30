@@ -3,6 +3,7 @@
 ## 2026-10-31
 
 ### Added
+- Добавлен EXECUTOR_API_REFERENCE.md с интерфейсами Stage6, MouseExecutor, цветного исполнения, диагностики и планирования.
 - DATA_FORMATS_AND_PROFILES.md дополнен записью наблюдения поведения кисти и структурой `experiment.json`.
 - Добавлен UI_INTEGRATION_MAP.md с картой восьми вкладок, callback-связей и передачи планов в executor.
 - DATA_FORMATS_AND_PROFILES.md дополнен форматами game point calibration, engine point calibration и отчётами моделей ресурса/расхода.
