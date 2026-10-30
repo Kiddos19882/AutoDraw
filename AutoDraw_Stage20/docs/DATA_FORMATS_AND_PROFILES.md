@@ -415,3 +415,50 @@ Game Monitor — самостоятельный JavaScript DevTools-инстру
 - `observations`.
 
 В отчёте раздельно представлены текущие параметры исполнителя и исторические параметры калибровки. Поля `is_inferred`, `is_assumed`, `frame_rate_was_measured` и `is_verified_from_observation_metadata` характеризуют происхождение данных и не должны отбрасываться при экспорте отчёта.
+
+
+## 18. Brush behavior observation и манифест эксперимента
+
+**Источник:** `brush_behavior_test_ui.py`.
+
+### 18.1. Запись наблюдения
+
+`build_brush_test_record()` формирует запись:
+
+- `schema_version = 1`;
+- `record_type = "autodraw_brush_behavior_observation"`;
+- `record_id`, `created_at_utc`;
+- `brush_value`;
+- `test_case` (id, name, description);
+- `canvas_area`, `board_selection_origin`, `board_selection_size`;
+- `screen_resolution`, `screen_area`, `brush_control`;
+- ссылки и/или вложенные документы `screenshot_path`, `drawing_plan_path`, `drawing_plan`, `execution_report_path`, `execution_report`, `game_monitor_report_path`, `game_monitor_summary`;
+- `outcome`, `notes`, `planned_strokes`;
+- `measurement_fields`;
+- `interpretation`.
+
+В `measurement_fields` предусмотрены `observed_stroke_count`, `visible_stroke_names`, `missing_stroke_names`, `measured_footprint_width_px`, `measured_footprint_height_px`, `endpoints_offset_px`, `paint_points_before`, `paint_points_after`, `browser_zoom_percent`, `device_pixel_ratio`. UI может дополнять этот объект значениями измерений.
+
+Объект `interpretation` при создании помечает запись как `raw_observation`, устанавливает `automatic_execution_allowed = false` и содержит пояснение о том, что запись не является готовой моделью кисти.
+
+### 18.2. Файл experiment.json
+
+Метод `BrushBehaviorTestTab._write_experiment_manifest()` сохраняет в каталоге текущего опыта файл `experiment.json`. Верхнеуровневые поля:
+
+- `schema_version = 1`;
+- `record_type = "autodraw_brush_paint_experiment"`;
+- `updated_at_utc`;
+- `test_case`;
+- `brush_value_requested`;
+- `drawing_plan_path`;
+- `execution_report_path`, `execution_report`;
+- `game_monitor_report_path`, `game_monitor_summary`;
+- `calibration_profile_path`;
+- `phases`;
+- `interpretation_limits`.
+
+`phases` — словарь фаз эксперимента и соответствующих им данных/ссылок. Его внутренний состав зависит от записанных этапов. Manifest может обновляться после завершения отдельной фазы, поэтому `updated_at_utc` отражает последнюю запись, а не обязательно момент завершения всего опыта.
+
+В `interpretation_limits` сохраняются ограничения интерпретации: оценка заполнения шкалы является предварительной оценкой изображения, успешный отчёт исполнителя не доказывает регистрацию каждого штриха игрой, а статус исполнения и визуальные свидетельства хранятся отдельно.
+
+Манифест содержит пути к отдельным файлам, но не встраивает автоматически содержимое всех снимков экрана. Для переноса опыта нужно сохранять и каталог опыта с его файлами, и корректность относительных/абсолютных путей, если они используются внешними инструментами.
