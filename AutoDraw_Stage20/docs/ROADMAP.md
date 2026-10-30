@@ -22,7 +22,7 @@
 - [x] Завершить инвентаризацию интерфейсов всех 40 модулей preparation в [PREPARATION_API_REFERENCE.md](PREPARATION_API_REFERENCE.md).
 - [x] Завершить справочник интерфейсов всех 13 модулей executor в [EXECUTOR_API_REFERENCE.md](EXECUTOR_API_REFERENCE.md).
 - [x] Свести UI и интеграционные точки компонентов в [UI_INTEGRATION_MAP.md](UI_INTEGRATION_MAP.md).
-- [ ] Составить карту импортов и точек входа.
+- [ ] Завершить карту импортов и точек входа: создан [DEPENDENCY_MAP.md](DEPENDENCY_MAP.md), остаётся сверка всех оставшихся модулей и тестовых импортов.
 
 ## Фаза 3. Справочник форматов и хранилищ
 
