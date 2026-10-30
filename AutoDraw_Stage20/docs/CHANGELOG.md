@@ -3,6 +3,7 @@
 ## 2026-10-31
 
 ### Added
+- Добавлен TESTS_AND_CI_MAP.md: тестовые наборы, прямые зависимости проверенных тестов, CI jobs, benchmark и диагностики.
 - Добавлен FILE_STORAGE_CATALOG.md: пути пользовательских данных, runtime-планы, результаты, brush experiments и структура .autodraw.
 - Добавлен DEPENDENCY_MAP.md с картой точек входа, основных импортов и общих адаптеров.
 - DATA_FORMATS_AND_PROFILES.md дополнен схемой execution report v2, ExecutionSummary и color execution report.
