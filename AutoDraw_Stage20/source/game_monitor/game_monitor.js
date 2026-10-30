@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "0.1.1";
+  const VERSION = "0.1.2";
   const METHOD_NAMES = ["onDrawStart", "onDrawing", "onDrawingEnd", "setRadius", "updateLess"];
   const MAX_EVENTS = 50000;
   const SCAN_INTERVAL_MS = 500;
@@ -68,24 +68,37 @@
     return { isTopFrame, currentFrame, frameCandidates };
   }
 
+  // The game engine stores atom.points as stroke arrays containing
+  // egret.Point objects ({ x, y }), not numeric [x, y] tuples.
+  function isGamePoint(value) {
+    return !!value &&
+      typeof value === "object" &&
+      !Array.isArray(value) &&
+      Number.isFinite(value.x) &&
+      Number.isFinite(value.y);
+  }
+
   function pointCount(value, depth = 0, seen = new WeakSet()) {
     if (!Array.isArray(value) || depth > 8 || seen.has(value)) return 0;
     seen.add(value);
-    if (value.length >= 2 && Number.isFinite(value[0]) && Number.isFinite(value[1])) return 1;
     let total = 0;
-    for (const item of value) total += pointCount(item, depth + 1, seen);
+    for (const item of value) {
+      if (isGamePoint(item)) total++;
+      else if (Array.isArray(item)) total += pointCount(item, depth + 1, seen);
+    }
     return total;
   }
 
   function lastPoint(value, depth = 0, seen = new WeakSet()) {
     if (!Array.isArray(value) || depth > 8 || seen.has(value)) return null;
     seen.add(value);
-    if (value.length >= 2 && Number.isFinite(value[0]) && Number.isFinite(value[1])) {
-      return [value[0], value[1]];
-    }
     for (let i = value.length - 1; i >= 0; i--) {
-      const found = lastPoint(value[i], depth + 1, seen);
-      if (found) return found;
+      const item = value[i];
+      if (isGamePoint(item)) return [item.x, item.y];
+      if (Array.isArray(item)) {
+        const found = lastPoint(item, depth + 1, seen);
+        if (found) return found;
+      }
     }
     return null;
   }
