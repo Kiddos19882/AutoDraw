@@ -22,6 +22,7 @@
     lastPointCount: null,
     lastSampleSignature: null,
     strokePollTimer: null,
+    inputHandlers: null,
     startedAt: null,
     errors: []
   };
@@ -168,6 +169,45 @@
     sampleActiveStroke("stroke_end");
   }
 
+  function isGameCanvasTarget(target) {
+    if (!target || typeof target !== "object") return false;
+    if (typeof HTMLCanvasElement !== "undefined" && target instanceof HTMLCanvasElement) return true;
+    return !!(target.closest && target.closest("canvas"));
+  }
+
+  function onPointerDown(event) {
+    if (!state.active || !state.board || !isGameCanvasTarget(event.target)) return;
+    if (!state.activeStrokeId) {
+      state.strokeSequence++;
+      state.activeStrokeId = "pointer-stroke-" + state.strokeSequence;
+      emit("POINTER_DOWN_CANDIDATE", { clientX: event.clientX, clientY: event.clientY, pointerType: event.pointerType || "mouse" });
+      startStrokePolling();
+    }
+  }
+
+  function onPointerUp(event) {
+    if (!state.active || !state.activeStrokeId || !isGameCanvasTarget(event.target)) return;
+    stopStrokePolling();
+    emit("POINTER_UP_CANDIDATE", { clientX: event.clientX, clientY: event.clientY, pointerType: event.pointerType || "mouse" });
+    state.activeStrokeId = null;
+  }
+
+  function installInputObservers() {
+    if (state.inputHandlers) return;
+    state.inputHandlers = { down: onPointerDown, up: onPointerUp, cancel: onPointerUp };
+    window.addEventListener("pointerdown", state.inputHandlers.down, true);
+    window.addEventListener("pointerup", state.inputHandlers.up, true);
+    window.addEventListener("pointercancel", state.inputHandlers.cancel, true);
+  }
+
+  function removeInputObservers() {
+    if (!state.inputHandlers) return;
+    window.removeEventListener("pointerdown", state.inputHandlers.down, true);
+    window.removeEventListener("pointerup", state.inputHandlers.up, true);
+    window.removeEventListener("pointercancel", state.inputHandlers.cancel, true);
+    state.inputHandlers = null;
+  }
+
   function wrapMethod(board, name) {
     const original = board[name];
     if (typeof original !== "function") return;
@@ -177,9 +217,11 @@
       const before = boardSnapshot(board);
       const previousStroke = state.activeStrokeId;
       if (name === "onDrawStart") {
-        state.strokeSequence++;
-        state.activeStrokeId = "stroke-" + state.strokeSequence;
-        emit("DRAW_START", { args: args.slice(0, 4).map(safeValue), before });
+        if (!state.activeStrokeId) {
+          state.strokeSequence++;
+          state.activeStrokeId = "stroke-" + state.strokeSequence;
+        }
+        emit("DRAW_START", { source: "BoardPane.onDrawStart", args: args.slice(0, 4).map(safeValue), before });
       } else if (name === "setRadius") {
         emit("BRUSH_CHANGE", { args: args.slice(0, 4).map(safeValue), before });
       }
@@ -278,6 +320,7 @@
     state.startedAt = now();
     emit("MONITOR_STARTED", { pageUrl: location.origin + location.pathname });
     observeNetwork();
+    installInputObservers();
     scan();
     state.scanTimer = window.setInterval(scan, SCAN_INTERVAL_MS);
     return status();
@@ -289,6 +332,7 @@
     stopStrokePolling();
     if (state.networkObserver) state.networkObserver.disconnect();
     state.networkObserver = null;
+    removeInputObservers();
     detach();
     emit("MONITOR_STOPPED");
     state.active = false;
