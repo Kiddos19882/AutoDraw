@@ -152,11 +152,51 @@
 - Для benchmark используются фиксированные параметры доски/изображения и palette profile. Изменение fixture или профиля может менять результаты benchmark, даже если тестируемый алгоритм не менялся.
 - Не следует считать файлы в `benchmark-results/` долговременными пользовательскими данными: это CI-артефакты/выходы диагностических запусков.
 
+
+### 2.4. Дополнительные тесты Preparation — прямые импорты
+
+Следующие файлы прочитаны непосредственно; перечислены внутрипроектные импорты. Стандартная библиотека и сторонние библиотеки опущены.
+
+| Тест | Прямые внутрипроектные импорты |
+|---|---|
+| `source/preparation/tests/test_brush_planner.py` | `brush_planner` |
+| `source/preparation/tests/test_paint_cost_model.py` | `color_scanline`, `paint_cost_model` |
+| `source/preparation/tests/test_stage13_profiles.py` | `profile_manager` |
+| `source/preparation/tests/test_paint_limit_test.py` | `palette_detection`, `palette_profiles`, `paint_limit_test` |
+| `source/preparation/tests/test_palette_profiles.py` | `palette_detection`, `palette_profiles` |
+| `source/preparation/tests/test_stage12_workbench.py` | `image_processing`, `stage8_optimizer`, `stage9_quality`, `autodraw_project`, `models.drawing_plan` |
+| `source/preparation/tests/test_palette_detection.py` | `palette_detection_ui`, `palette_detection`, `palette_reduction` |
+| `source/preparation/tests/test_interval_quota_fit.py` | `interval_quota_fit` |
+| `source/preparation/tests/test_board_resource_model.py` | `board_resource_model` |
+| `source/preparation/tests/test_stroke_simplification.py` | `stroke_simplification` |
+
+### 2.5. Дополнительные тесты Executor — прямые импорты
+
+| Тест | Прямые внутрипроектные импорты |
+|---|---|
+| `source/executor/tests/test_drawing_plan.py` | `models`, `path_planning.test_shape` |
+| `source/executor/tests/test_plan_transform.py` | `drawing.plan_transform`, `models` |
+| `source/executor/tests/test_stroke_optimizer.py` | `models`, `path_planning.stroke_optimizer` |
+| `source/executor/tests/test_execution_hardening.py` | `drawing.mouse_executor`, `models` |
+| `source/executor/tests/test_execution_diagnostics.py` | `drawing.execution_diagnostics`, `models` |
+
+### 2.6. Дополнительные общие тесты — прямые импорты
+
+| Тест | Прямые внутрипроектные импорты |
+|---|---|
+| `tests/test_test_runner.py` | `run_all_tests` |
+| `tests/test_build_helpers.py` | `build_windows` |
+| `tests/test_fallback_sweep_metrics.py` | `benchmark_stage7_fallback_merge_sweep` |
+| `tests/test_websocket_smoke_server.py` | `websocket_smoke_server` (локальный импорт внутри теста) |
+| `tests/test_brush_experiment_series.py` | `analyze_brush_experiment_series` |
+
+Указание «прямые импорты» означает только синтаксически обнаруженные import/from-import statements, включая локальные импорты внутри функций. Оно не описывает транзитивные зависимости импортируемого модуля и не является графом runtime-загрузки.
+
 ## 7. Границы и недостающая инвентаризация
 
 1. Список всех тестовых файлов в обоих discovery-каталогах не переписан целиком; зафиксированы тесты, названные в документации, CI workflow и непосредственно проверенных исходниках.
 2. Вспомогательные скрипты из `tests/` не все имеют автоматические тесты: часть из них — CLI-инструменты/benchmark runners.
-3. Отдельная карта import statements для каждого тестового файла ещё не завершена.
+3. Прямые импорты дополнительно инвентаризированы для 20 файлов из Preparation, Executor и корневого tests; полный перечень всех тестовых файлов и импортов ещё не завершён.
 4. В рамках документирования не запускались тесты, benchmarks, UI или portable build.
 5. CI YAML описывает предполагаемый процесс, но его наличие не является доказательством успешного выполнения на текущем commit. Для статуса выполнения следует смотреть конкретный GitHub Actions run.
 
