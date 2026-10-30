@@ -782,3 +782,48 @@ def test_postdraw_completion_notification_is_shown_after_restore_drag(monkeypatc
     assert tab.root.restored is True
     assert notifications and notifications[0][0] == "info"
     assert "Тест завершён" in tab.status_var.value
+
+
+def test_paint_consumption_scenario_uses_non_overlapping_lines_for_maximum_brush() -> None:
+    strokes = TEST_CASES["Расход краски — серия длинных линий"]["strokes"]
+    assert len(strokes) == 6
+    ys = [stroke["points"][0][1] for stroke in strokes]
+    assert [second - first for first, second in zip(ys, ys[1:])] == [36] * 5
+    assert all(stroke["points"] == [[20, y], [420, y]] for stroke, y in zip(strokes, ys))
+    assert all(
+        second - first > brush_ui.MAX_BRUSH_LINE_WIDTH_LOGICAL_PX
+        for first, second in zip(ys, ys[1:])
+    )
+
+
+def test_long_isolated_line_scenario_covers_multiple_lengths_and_axes() -> None:
+    strokes = TEST_CASES["Длинные изолированные линии"]["strokes"]
+    lengths = {
+        (abs(item["points"][-1][0] - item["points"][0][0]),
+         abs(item["points"][-1][1] - item["points"][0][1]))
+        for item in strokes
+    }
+    assert (400, 0) in lengths
+    assert (0, 180) in lengths
+    plan = build_brush_test_drawing_plan("Длинные изолированные линии", (460, 240))
+    assert len(plan["strokes"]) == len(strokes)
+
+
+def test_repeated_coverage_scenario_reuses_exact_path_and_keeps_control_line() -> None:
+    strokes = TEST_CASES["Повторное покрытие одного следа"]["strokes"]
+    repeated = [item["points"] for item in strokes[:3]]
+    assert repeated[0] == repeated[1] == repeated[2]
+    assert strokes[3]["points"] != repeated[0]
+    plan = build_brush_test_drawing_plan("Повторное покрытие одного следа", (460, 240))
+    assert len(plan["strokes"]) == 4
+
+
+def test_cross_section_scenario_contains_horizontal_and_vertical_intersections() -> None:
+    strokes = TEST_CASES["Поперечный профиль и пересечения"]["strokes"]
+    assert len(strokes) == 4
+    horizontal = [item for item in strokes if item["points"][0][1] == item["points"][-1][1]]
+    vertical = [item for item in strokes if item["points"][0][0] == item["points"][-1][0]]
+    assert len(horizontal) == 2
+    assert len(vertical) == 2
+    plan = build_brush_test_drawing_plan("Поперечный профиль и пересечения", (460, 240))
+    assert len(plan["strokes"]) == 4
