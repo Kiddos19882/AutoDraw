@@ -206,6 +206,26 @@
 - Следующая задача справочника исходников — DOC-010: публичные интерфейсы executor.
 - DOC-013: карта импортов остаётся отдельной задачей.
 
+## 2026-10-31 — начало справочника API executor
+
+**Добавлен документ:** `AutoDraw_Stage20/docs/EXECUTOR_API_REFERENCE.md`.
+
+**Что сделано:**
+- Зафиксированы интерфейсы этапов executor и актуального Stage6App.
+- Описан контракт MouseExecutor, конфигурация и ExecutionSummary.
+- Описаны преобразование цветных/geometry/adaptive планов и hooks выбора палитры/кисти.
+- Добавлены интерфейсы трансформации DrawingPlan, отчётов исполнения и path planning.
+- Добавлены ссылки на общие геометрические модели и общий image-processing pipeline.
+- Обновлены индекс, TASKS, ROADMAP и PROJECT_STATUS; DOC-010 переведена в IN_PROGRESS.
+
+**Проверки:**
+- Сигнатуры сверены по объявлениям исходников Stage6, mouse_executor, color_plan_execution, plan_transform, execution_diagnostics и path_planning.
+- Приложение, тесты и управление мышью не запускались.
+
+**Продолжение:**
+- Проверить оставшиеся executor-модули, экспортные списки и legacy stage entrypoints.
+- DOC-010 остаётся IN_PROGRESS.
+
 ## Шаблон записи
 
 ~~~markdown
