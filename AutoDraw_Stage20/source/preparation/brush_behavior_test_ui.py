@@ -137,6 +137,75 @@ TEST_CASES: dict[str, dict[str, Any]] = {
 }
 
 
+def summarize_game_monitor_report(
+    document: dict[str, Any],
+    requested_brush_value: int | None = None,
+) -> dict[str, Any]:
+    """Summarize passive telemetry and compare requested size with radii used by actual draw samples."""
+    if not isinstance(document, dict):
+        raise ValueError("Отчёт Monitor должен содержать JSON-объект.")
+    events = document.get("events")
+    if not isinstance(events, list):
+        raise ValueError("В JSON нет массива events; выбери полный экспорт Game Monitor.")
+
+    counts: dict[str, int] = {}
+    drawing_samples = []
+    for event in events:
+        if not isinstance(event, dict):
+            continue
+        event_type = str(event.get("type", "UNKNOWN"))
+        counts[event_type] = counts.get(event_type, 0) + 1
+        if event_type == "DRAW_SAMPLE" and event.get("source") == "onDrawing_wrapper":
+            drawing_samples.append(event)
+
+    radii: set[int] = set()
+    for event in drawing_samples:
+        board = event.get("board")
+        values = board.get("radius") if isinstance(board, dict) else None
+        if not isinstance(values, list):
+            continue
+        for value in values:
+            if isinstance(value, bool) or not isinstance(value, (int, float)):
+                continue
+            if int(value) == value and int(value) > 0:
+                radii.add(int(value))
+
+    observed = sorted(radii)
+    if requested_brush_value is None:
+        brush_status = "not_compared"
+        brush_matches = None
+    elif not observed:
+        brush_status = "unavailable"
+        brush_matches = None
+    elif observed == [requested_brush_value]:
+        brush_status = "match"
+        brush_matches = True
+    elif requested_brush_value in observed:
+        brush_status = "mixed"
+        brush_matches = False
+    else:
+        brush_status = "mismatch"
+        brush_matches = False
+
+    return {
+        "monitor_version": document.get("monitorVersion"),
+        "event_count": document.get("eventCount", len(events)),
+        "dropped_events": document.get("droppedEvents"),
+        "error_count": len(document.get("errors", [])) if isinstance(document.get("errors"), list) else None,
+        "board_detected": document.get("boardDetected"),
+        "event_counts": counts,
+        "pointer_down_count": counts.get("POINTER_DOWN_CANDIDATE", 0),
+        "pointer_up_count": counts.get("POINTER_UP_CANDIDATE", 0),
+        "draw_sample_count": counts.get("DRAW_SAMPLE", 0),
+        "drawing_sample_count": len(drawing_samples),
+        "requested_brush_value": requested_brush_value,
+        "observed_draw_radii": observed,
+        "brush_value_status": brush_status,
+        "brush_value_matches_requested": brush_matches,
+        "interpretation": "passive_browser_telemetry_not_direct_paint_resource_measurement",
+    }
+
+
 def build_brush_test_record(
     *, brush_value: int, test_case: str, canvas_area: dict[str, int] | None = None,
     screen_area: dict[str, int] | None = None, screenshot_path: str | None = None,
@@ -1983,35 +2052,53 @@ class BrushBehaviorTestTab:
             document = json.loads(Path(path).read_text(encoding="utf-8"))
             if not isinstance(document, dict):
                 raise ValueError("Отчёт Monitor должен содержать JSON-объект.")
-            events = document.get("events")
-            if not isinstance(events, list):
-                raise ValueError("В JSON нет массива events; выбери полный экспорт Game Monitor.")
-            counts: dict[str, int] = {}
-            for event in events:
-                if isinstance(event, dict):
-                    event_type = str(event.get("type", "UNKNOWN"))
-                    counts[event_type] = counts.get(event_type, 0) + 1
+            requested_brush = self._experiment_requested_brush
+            if requested_brush is None:
+                setup = self.experiment_phases.get("brush_setup", {})
+                requested_brush = setup.get("requested_value") if isinstance(setup, dict) else None
+            if requested_brush is None:
+                try:
+                    requested_brush = int(self.brush_var.get().strip())
+                except (AttributeError, TypeError, ValueError):
+                    requested_brush = None
             self.game_monitor_report_path = Path(path).resolve()
-            self.game_monitor_summary = {
-                "monitor_version": document.get("monitorVersion"),
-                "event_count": document.get("eventCount", len(events)),
-                "dropped_events": document.get("droppedEvents"),
-                "error_count": len(document.get("errors", [])) if isinstance(document.get("errors"), list) else None,
-                "board_detected": document.get("boardDetected"),
-                "event_counts": counts,
-                "pointer_down_count": counts.get("POINTER_DOWN_CANDIDATE", 0),
-                "pointer_up_count": counts.get("POINTER_UP_CANDIDATE", 0),
-                "draw_sample_count": counts.get("DRAW_SAMPLE", 0),
-                "interpretation": "passive_browser_telemetry_not_direct_paint_resource_measurement",
-            }
+            self.game_monitor_summary = summarize_game_monitor_report(document, requested_brush)
         except (OSError, UnicodeError, json.JSONDecodeError, ValueError, TypeError) as exc:
             messagebox.showerror("Не удалось прочитать Game Monitor JSON", str(exc), parent=self.root)
             return
-        self.status_var.set(
-            f"Game Monitor привязан: {self.game_monitor_report_path.name}; "
-            f"событий {self.game_monitor_summary['event_count']}, "
-            f"DRAW_SAMPLE {self.game_monitor_summary['draw_sample_count']}."
-        )
+        summary = self.game_monitor_summary
+        brush_status = summary["brush_value_status"]
+        if brush_status == "mismatch":
+            self.status_var.set(
+                f"Game Monitor: радиус в игре {summary['observed_draw_radii']}, "
+                f"запрошено {summary['requested_brush_value']}. Несовпадение!"
+            )
+            messagebox.showwarning(
+                "Размер кисти не совпал",
+                f"Запрошено: {summary['requested_brush_value']}\n"
+                f"Фактически в DRAW_SAMPLE: {summary['observed_draw_radii']}\n\n"
+                "Запись сохранена с предупреждением. Не используй этот прогон как подтверждение запрошенного размера.",
+                parent=self.root,
+            )
+        elif brush_status == "mixed":
+            self.status_var.set(
+                f"Game Monitor: в одном отчёте обнаружены разные радиусы {summary['observed_draw_radii']}."
+            )
+            messagebox.showwarning(
+                "В отчёте несколько размеров кисти",
+                f"Обнаруженные радиусы: {summary['observed_draw_radii']}.\n"
+                "Проверь, что отчёт относится только к одному эксперименту.",
+                parent=self.root,
+            )
+        elif brush_status == "unavailable":
+            self.status_var.set("Game Monitor привязан, но в отчёте нет DRAW_SAMPLE с координатами активного рисования.")
+        else:
+            self.status_var.set(
+                f"Game Monitor привязан: {self.game_monitor_report_path.name}; "
+                f"событий {summary['event_count']}, "
+                f"активных DRAW_SAMPLE {summary['drawing_sample_count']}, "
+                f"радиус {summary['observed_draw_radii']}."
+            )
 
     def _measurement_values(self) -> dict[str, Any]:
         def optional_number(raw: str, field: str):
