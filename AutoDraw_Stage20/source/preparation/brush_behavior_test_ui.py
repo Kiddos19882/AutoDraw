@@ -1935,6 +1935,8 @@ class BrushBehaviorTestTab:
             "drawing_plan_path": str(self.current_plan_path) if self.current_plan_path else None,
             "execution_report_path": str(self.execution_report_path) if self.execution_report_path else None,
             "execution_report": self.execution_report,
+            "game_monitor_report_path": str(self.game_monitor_report_path) if self.game_monitor_report_path else None,
+            "game_monitor_summary": self.game_monitor_summary,
             "calibration_profile_path": (str(config.get("profile_path", "")) or None) if isinstance(config, dict) else None,
             "phases": self.experiment_phases,
             "interpretation_limits": [
