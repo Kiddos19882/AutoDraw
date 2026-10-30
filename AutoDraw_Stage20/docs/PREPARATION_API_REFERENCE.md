@@ -146,7 +146,30 @@
 - `save_adaptive_brush_plan(path: str | Path, plan: Any) -> Path`
 - `load_adaptive_brush_plan(path: str | Path) -> dict[str, Any]`
 
-## 5. Геометрия, кисть и порядок штрихов
+## 5. Профили рабочей области и настройки
+
+### `profile_manager.py`
+
+Модуль объявляет следующие dataclass и хранилище:
+
+- `ProfileValidationError(ValueError)` — ошибка проверки профиля.
+- `ScreenArea(x: int, y: int, width: int, height: int, screen_width: int | None = None, screen_height: int | None = None)`; методы `validate() -> None`, `to_dict() -> dict[str, int]`, `from_dict(data: dict[str, Any]) -> ScreenArea`.
+- `CalibrationSettings(point_step_px: float = 2.0, point_delay_ms: int = 10, after_mouse_up_ms: int = 20, before_mouse_down_ms: int = 20, after_mouse_down_ms: int = 40, end_hold_ms: int = 50, countdown_seconds: int = 5)`; методы `validate() -> None`, `to_dict() -> dict[str, int | float]`, `from_dict(data: dict[str, Any] | None) -> CalibrationSettings`, `to_stage6_settings() -> dict[str, int | float]`.
+- `WorkspaceProfile(profile_id: str, name: str, canvas_width: int = 646, canvas_height: int = 323, fit_mode: str = "contain", brightness: int = 0, contrast: float = 1.0, denoise_level: int = 0, threshold_mode: str = "otsu", threshold: int = 128, row_step_px: int = 1, screen_area: ScreenArea | None = None, calibration: CalibrationSettings = CalibrationSettings(), notes: str = "", created_at: str = "", updated_at: str = "")`.
+  - `create_default(name: str = "Основной") -> WorkspaceProfile`
+  - `validate() -> None`
+  - `to_dict() -> dict[str, Any]`
+  - `from_dict(data: dict[str, Any]) -> WorkspaceProfile`
+  - `from_external_dict(data: dict[str, Any], *, name: str | None = None) -> WorkspaceProfile`
+  - `to_canvas_profile() -> dict[str, int]`
+  - `to_stage6_target_profile() -> dict[str, dict[str, int]]`
+  - `to_stage6_settings() -> dict[str, int | float]`
+- `ProfileStore(path: str | Path)` — объект доступа к файлу набора профилей; методы `load() -> list[WorkspaceProfile]`, `save_all(profiles: list[WorkspaceProfile]) -> None`, `upsert(profile: WorkspaceProfile) -> list[WorkspaceProfile]`, `delete(profile_id: str) -> list[WorkspaceProfile]`.
+- `ProfileStore.export_json(path: str | Path, payload: dict[str, Any]) -> Path` — статический метод экспорта JSON.
+
+`PROFILE_SCHEMA_VERSION`, `FIT_MODES`, `THRESHOLD_MODES` и `DEFAULT_EXECUTION_SETTINGS` — публичные константы модуля.
+
+## 6. Геометрия, кисть и порядок штрихов
 
 ### `brush_calibration.py`
 
@@ -162,7 +185,7 @@
 
 ### `brush_footprint_geometry.py`
 
-- `footprint_pixel_bounds(x_start: float, ...)`
+- `footprint_pixel_bounds(x_start: float, x_end: float, y: float, brush_value: int, scale_x: float, scale_y: float, width: int, height: int) -> tuple[int, int, int, int] | None`
 
 ### `swept_footprint_geometry.py`
 
@@ -301,9 +324,9 @@
 - `summarize_plan(name: str, plan: dict[str, Any], source_index_map: Any, *, board_item_type: str = "BoardItem2", point_step_px: float = DEFAULT_EXECUTOR_POINT_STEP_PX, point_delay_ms: float = DEFAULT_EXECUTOR_POINT_DELAY_MS, frame_rate_fps: float = GAME_ENGINE_DEFAULT_FRAME_RATE_FPS, safety_factor: float = DEFAULT_POINT_SAFETY_FACTOR, paint_budget_px_equivalent: float = DEFAULT_PAINT_BUDGET_PX_EQUIVALENT, stroke_overhead_px_equivalent: float = DEFAULT_STROKE_OVERHEAD_PX_EQUIVALENT) -> dict[str, Any]`
 - `render_index_map_png(index_map: Any, palette: list[dict[str, Any]]) -> Image.Image`
 
-## 10. Пробелы в детализации
+## 11. Пробелы в детализации
 
-Этот документ фиксирует API-контуры, но не заменяет полные Python type stubs. Для функций, у которых в перечне после параметров стоит `...`, полная сигнатура должна быть взята непосредственно из исходника при интеграции. Для классов UI публичные методы и события отдельно не инвентаризированы.
+Этот документ фиксирует API-контуры, но не заменяет полные Python type stubs. Для функций, у которых в перечне после параметров всё ещё стоит `...`, полная сигнатура должна быть взята непосредственно из исходника при интеграции. Для классов UI публичные методы и события отдельно не инвентаризированы.
 
 Следующие отдельные документы должны раскрыть структуры сохранённых данных и связи компонентов:
 
@@ -312,6 +335,6 @@
 - manifest разбиения на доски и записи экспериментов;
 - карта импортов и точки подключения UI.
 
-## 11. Границы документирования
+## 12. Границы документирования
 
 Не рассматриваются: внутреннее устройство алгоритмов, причины выбора параметров, точность результатов, производительность, безопасность, качество планов, browser/game runtime и результаты экспериментов. Наличие функции в перечне не является утверждением о корректности её работы.
