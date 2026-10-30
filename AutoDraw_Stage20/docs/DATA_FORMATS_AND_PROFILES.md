@@ -310,3 +310,39 @@ Game Monitor — самостоятельный JavaScript DevTools-инстру
 - Brush workflow snapshot содержит пофазные результаты, но не заменяет файлы изображений, если контроллер сохраняет их отдельно.
 - Результаты визуальных измерений не следует переименовывать в подтверждения игрового счётчика.
 - Экспорт Game Monitor не объединяется с журналом теста лимита или brush workflow без явного идентификатора связи.
+
+
+## 15. JSON-экспорт Game Monitor
+
+**Источник:** `source/game_monitor/game_monitor.js`, версия Monitor `0.1.2`.
+
+Метод `AutoDrawGameMonitor.export()` возвращает объект со следующими полями верхнего уровня:
+
+| Поле | Тип | Назначение |
+|---|---|---|
+| `schemaVersion` | number | Версия схемы экспорта, сейчас `1` |
+| `monitorVersion` | string | Версия JavaScript Monitor |
+| `startedAtPerformanceMs` | number/null | Время старта в шкале `performance.now()` |
+| `exportedAtPerformanceMs` | number | Время формирования экспорта в той же шкале |
+| `page` | object | `origin`, `pathname` |
+| `frameContext` | object | `isTopFrame`, `currentFrame`, `frameCandidates` |
+| `boardDetected` | boolean | Обнаружена ли доска |
+| `boardLabel` | string/null | Метка экземпляра доски |
+| `eventCount` | number | Число сохранённых событий |
+| `droppedEvents` | number | Число событий, не помещённых в буфер |
+| `errors` | array | Ошибки Monitor |
+| `events` | array | Буфер событий |
+
+Снимок доски, помещаемый в события и возвращаемый методом `status()`, содержит `logicalWidth`, `logicalHeight`, `scaleX`, `scaleY`, `pointCount`, `strokeArrayLength`, `lastPoint`, `radius`.
+
+Событие включает общие поля `monitorVersion`, `t`, `type`, `strokeId`, `board` и дополнительные поля, зависящие от типа события. В реализации используются типы, связанные с запуском/остановкой Monitor, подключением доски, началом/завершением штриха, изменением кисти, обновлением квоты точек, снимками движения указателя, ошибками методов и Resource Timing. Поля дополнительных данных определяются конкретным событием и не образуют одну фиксированную структуру.
+
+`AutoDrawGameMonitor.download()` сериализует результат `export()` в JSON-файл с именем `autodraw-game-monitor-<timestamp>.json`.
+
+### 15.1. Структура ошибок
+
+Элементы `errors[]` формируются как объекты с временем `t` и текстом `message`. Они относятся к ошибкам поиска stage, подключения/восстановления методов и наблюдения ресурсов.
+
+### 15.2. Безопасность экспортируемых URL
+
+Для Resource Timing URL пропускается через `safeUrl()`. Значения query-параметров, имена которых содержат `token`, `auth`, `session`, `cookie`, `secret`, `key`, `uid` или `user`, заменяются на `[REDACTED]`. Это правило относится к URL, обработанным Monitor; оно не является общей очисткой любых произвольных данных в экспортируемом JSON.
