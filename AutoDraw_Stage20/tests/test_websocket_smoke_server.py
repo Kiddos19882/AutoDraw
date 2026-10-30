@@ -2,11 +2,16 @@ import asyncio
 import json
 import unittest
 
-import websockets
+try:
+    import websockets
+    from websocket_smoke_server import OneShotAuthenticator, make_handler, parse_message
+except ModuleNotFoundError:
+    websockets = None
 
-from websocket_smoke_server import OneShotAuthenticator, make_handler, parse_message
 
 
+
+@unittest.skipIf(websockets is None, "install game_monitor/requirements-smoke.txt to run transport tests")
 class SmokeServerUnitTests(unittest.TestCase):
     def test_token_is_one_shot(self):
         auth = OneShotAuthenticator("secret")
@@ -21,6 +26,7 @@ class SmokeServerUnitTests(unittest.TestCase):
         self.assertIsNone(parse_message('"' + ("x" * 1100) + '"'))
 
 
+@unittest.skipIf(websockets is None, "install game_monitor/requirements-smoke.txt to run transport tests")
 class SmokeServerIntegrationTests(unittest.IsolatedAsyncioTestCase):
     async def test_authorized_ping_pong_and_origin_filter(self):
         auth = OneShotAuthenticator("one-time")
