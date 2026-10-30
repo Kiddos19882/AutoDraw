@@ -295,25 +295,29 @@ def test_brush_test_record_persists_screen_and_brush_calibration_metadata() -> N
     assert record["brush_control"]["end"] == [390, 500]
 
 
-def test_paint_consumption_case_has_twelve_long_lines_within_default_game_canvas() -> None:
+def test_paint_consumption_case_has_six_non_overlapping_long_lines_within_default_game_canvas() -> None:
     scenario = TEST_CASES["Расход краски — серия длинных линий"]
     assert scenario["id"] == "paint_consumption_long_lines"
-    assert len(scenario["strokes"]) == 12
+    assert len(scenario["strokes"]) == 6
     total_length = 0
     for index, stroke in enumerate(scenario["strokes"]):
         start, end = stroke["points"]
-        assert start == [20, 10 + index * 18]
-        assert end == [420, 10 + index * 18]
+        expected_y = 18 + index * 36
+        assert start == [20, expected_y]
+        assert end == [420, expected_y]
         assert 0 <= start[0] < 460 and 0 <= end[0] < 460
         assert 0 <= start[1] < 240 and 0 <= end[1] < 240
+        if index:
+            previous_y = scenario["strokes"][index - 1]["points"][0][1]
+            assert expected_y - previous_y == 36
         total_length += abs(end[0] - start[0]) + abs(end[1] - start[1])
-    assert total_length == 4800
+    assert total_length == 2400
 
 
-def test_paint_consumption_plan_uses_all_long_lines() -> None:
+def test_paint_consumption_plan_uses_all_six_non_overlapping_long_lines() -> None:
     plan = build_brush_test_drawing_plan("Расход краски — серия длинных линий", (460, 240))
-    assert len(plan["strokes"]) == 12
-    assert plan["strokes"][-1]["name"] == "consumption_line_12"
+    assert len(plan["strokes"]) == 6
+    assert plan["strokes"][-1]["name"] == "consumption_line_06"
 
 
 def test_set_brush_size_uses_profile_coordinates_and_minimizes_before_drag(monkeypatch) -> None:
