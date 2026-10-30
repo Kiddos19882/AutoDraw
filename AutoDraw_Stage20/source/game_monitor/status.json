@@ -1,5 +1,5 @@
 {
-  "version": "0.1.1",
+  "version": "0.1.2",
   "active": true,
   "boardDetected": true,
   "boardLabel": "o",
@@ -8,38 +8,24 @@
     "logicalHeight": 240,
     "scaleX": 1,
     "scaleY": 1,
-    "pointCount": 0,
-    "strokeArrayLength": 25,
-    "lastPoint": null,
+    "pointCount": 140,
+    "strokeArrayLength": 8,
+    "lastPoint": [
+      283.2083339691162,
+      190
+    ],
     "radius": [
       0,
-      20,
       14,
       14,
-      7,
-      7,
-      7,
-      7,
-      7,
-      7,
-      7,
-      7,
-      7,
-      7,
-      7,
-      7,
-      7,
-      7,
-      7,
-      7,
-      7,
-      7,
-      1,
-      1,
-      1
+      14,
+      14,
+      14,
+      14,
+      14
     ]
   },
-  "eventCount": 1075,
+  "eventCount": 411,
   "droppedEvents": 0,
   "errors": 0
 }
