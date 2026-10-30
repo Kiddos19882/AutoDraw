@@ -230,12 +230,12 @@ fit_plan_to_size(
   - `distance_to(self, other: Point) -> float`;
   - `to_dict(self) -> dict[str, float]`;
   - `from_dict(cls, data: dict) -> Point`.
-- `Stroke(name: str, points: list[Point], closed: bool = False, metadata: dict[str, str] = {})`
+- `Stroke(name: str, points: list[Point], closed: bool = False, metadata: dict[str, str] = field(default_factory=dict))`
   - `iter_segments(self) -> Iterator[tuple[Point, Point]]`;
   - `length_px(self) -> float`;
   - `to_dict(self) -> dict`;
   - `from_dict(cls, data: dict) -> Stroke`.
-- `DrawingPlan(width: int, height: int, strokes: list[Stroke], name: str = "Test drawing plan", created_at: str = ..., schema_version: int = 1)`
+- `DrawingPlan(width: int, height: int, strokes: list[Stroke], name: str = "Test drawing plan", created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat(timespec="seconds")), schema_version: int = 1)`
   - `validate_bounds(self) -> None`;
   - свойства `stroke_count`, `total_drawing_length_px`, `pen_up_distance_px`;
   - `estimated_move_calls(self, point_step_px: float = 2.0) -> int`;
