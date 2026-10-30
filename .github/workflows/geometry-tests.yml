@@ -37,6 +37,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
+      - name: Check Game Monitor JavaScript syntax
+        run: node --check ..\game_monitor\game_monitor.js
       - name: Set up Python
         uses: actions/setup-python@v7
         with:
