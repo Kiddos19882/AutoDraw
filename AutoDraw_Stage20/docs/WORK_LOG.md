@@ -226,6 +226,20 @@
 - Проверить оставшиеся executor-модули, экспортные списки и legacy stage entrypoints.
 - DOC-010 остаётся IN_PROGRESS.
 
+## 2026-10-31 — дополнение форматов отчётов executor
+
+**Изменённый документ:** `AutoDraw_Stage20/docs/DATA_FORMATS_AND_PROFILES.md`.
+
+**Что сделано:**
+- Описана структура `ExecutionSummary.to_dict()`.
+- Добавлена схема execution report версии 2.
+- Зафиксированы дополнительные поля цветного исполнения и adaptive brush report.
+- Описано имя файла, формируемого `write_execution_report()`.
+
+**Проверки:**
+- Поля сверены с `ExecutionSummary.to_dict()`, `build_execution_report()`, `ColorPlanExecutionHooks.to_report()` и `write_execution_report()`.
+- Исполнитель не запускался, реальные отчёты не создавались.
+
 ## Шаблон записи
 
 ~~~markdown
