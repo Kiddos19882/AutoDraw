@@ -6,7 +6,7 @@ import pytest
 
 from brush_test_workflow import (
     BrushExperimentState, BrushWorkflowError, PHASES, calculate_slider_target,
-    validate_brush_test_preflight, should_run_postdraw_workflow,
+    validate_brush_test_preflight, validate_observed_brush_radius, should_run_postdraw_workflow,
 )
 
 
@@ -112,6 +112,31 @@ def test_slider_target_supports_diagonal_calibration() -> None:
     assert calculate_slider_target((100, 200), (390, 490), 1) == (390, 490)
     assert calculate_slider_target((100, 200), (390, 490), 30) == (100, 200)
 
+
+
+
+@pytest.mark.parametrize("observed", [14, "[14]", "[14, 14, 14]", (14,)])
+def test_observed_brush_radius_requires_exact_single_radius_match(observed):
+    assert validate_observed_brush_radius(14, observed) == {
+        "valid": True, "status": "match", "observed_radii": [14]
+    }
+
+
+@pytest.mark.parametrize(
+    "observed, status",
+    [(13, "mismatch"), ("[13]", "mismatch"), ("[13, 14]", "mixed"),
+     ("[]", "unavailable"), ("not-json", "unavailable"), ([0], "unavailable"),
+     ([14, 14.5], "unavailable")],
+)
+def test_observed_brush_radius_fails_closed_for_mismatch_or_invalid_snapshot(observed, status):
+    result = validate_observed_brush_radius(14, observed)
+    assert result["valid"] is False
+    assert result["status"] == status
+
+
+def test_observed_brush_radius_rejects_invalid_requested_brush():
+    with pytest.raises(ValueError):
+        validate_observed_brush_radius(31, [31])
 
 
 def _valid_calibration_profile():
