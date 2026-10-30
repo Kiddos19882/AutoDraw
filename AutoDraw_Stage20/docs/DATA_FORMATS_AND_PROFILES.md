@@ -462,3 +462,50 @@ Game Monitor — самостоятельный JavaScript DevTools-инстру
 В `interpretation_limits` сохраняются ограничения интерпретации: оценка заполнения шкалы является предварительной оценкой изображения, успешный отчёт исполнителя не доказывает регистрацию каждого штриха игрой, а статус исполнения и визуальные свидетельства хранятся отдельно.
 
 Манифест содержит пути к отдельным файлам, но не встраивает автоматически содержимое всех снимков экрана. Для переноса опыта нужно сохранять и каталог опыта с его файлами, и корректность относительных/абсолютных путей, если они используются внешними инструментами.
+
+
+## 19. Отчёт исполнения executor
+
+**Источники:** `drawing/execution_diagnostics.py`, `drawing/mouse_executor.py`, `stage6_execute_plan.py`.
+
+### 19.1. ExecutionSummary
+
+`ExecutionSummary.to_dict(config)` формирует сводку с полями:
+
+- `status`;
+- `completed_strokes`, `total_strokes`;
+- `started_at`, `ended_at`, `duration_seconds`;
+- `move_calls`;
+- `error`, `stop_reason`;
+- `mouse_release` (`attempted`, `succeeded`, `errors`);
+- `executor_config`.
+
+### 19.2. execution report
+
+`build_execution_report()` формирует документ `schema_version = 2`:
+
+- `created_at`, `stage`, `status`;
+- `source_plan_file`, `source_plan_name`, `source_plan_sha256`;
+- `executed_plan` (name, width, height, stroke_count, sha256);
+- `target_area`;
+- `plan_fit`;
+- `executor_config`;
+- `summary`;
+- `error`;
+- `environment` (python_version, platform, python_implementation).
+
+Для цветного исполнения Stage6 дополнительно включает `color_plan` и, если загружен adaptive brush plan, `adaptive_brush_plan`. Поле `summary.color_execution` содержит отчёт hooks выбора цвета и кисти.
+
+### 19.3. Color execution report
+
+`ColorPlanExecutionHooks.to_report()` возвращает:
+
+- `profile_name`, `browser_label`;
+- `selected_color_count`, `selection_order`, `used_colors`;
+- `selection_policy`, `screenshot_preflight`;
+- `brush_size_selection_count`, `brush_size_selection_order`, `final_brush_value`;
+- `brush_slider_calibration` (координаты концов, Y, исходное значение и разрешение экрана, признак подтверждения).
+
+### 19.4. Сохранение
+
+`write_execution_report(results_dir, report)` записывает уникальный файл вида `execution_<timestamp>_<id>.json`. Временный файл заменяется целевым после полной записи; существующий отчёт с другим именем не перезаписывается. Имя и формат пути зависят от реализации текущей версии.
