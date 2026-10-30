@@ -27,6 +27,9 @@ from brush_experiment_capture import (
 )
 
 
+# Verified against the master game bundle: Graphics.lineStyle receives atom.radius directly.
+MAX_BRUSH_LINE_WIDTH_LOGICAL_PX = 30;
+
 TEST_CASES: dict[str, dict[str, Any]] = {
     "Расход краски — серия длинных линий": {
         "id": "paint_consumption_long_lines",
