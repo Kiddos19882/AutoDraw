@@ -270,3 +270,24 @@ fit_plan_to_size(
 - Вызовы приватных методов из `integrated_app.py` описаны в [UI_INTEGRATION_MAP.md](UI_INTEGRATION_MAP.md) как фактические точки соединения.
 - Legacy Stage 1–5 не следует путать с актуальной интеграционной точкой Stage6.
 - Изменения API в исходниках требуют синхронного обновления этого справочника и [MODULE_REFERENCE.md](MODULE_REFERENCE.md).
+
+
+## 1.1. Конструкторы legacy UI и entrypoints
+
+- `stage1_calibration.AreaSelector(parent: tk.Tk, on_done: Callable[[TargetArea | None], None])`
+- `stage1_calibration.CalibrationApp(root: tk.Tk)`
+- `stage1_calibration.TargetArea(x: int, y: int, width: int, height: int)`
+- `stage1_calibration.CalibrationProfile(area: TargetArea, measured_min_length_px: int | None = None, reliable_length_px: int | None = None, preferred_move_interval_ms: float | None = None, notes: str = "")`; метод `to_dict(self) -> dict`.
+- `stage1_calibration.main() -> None`
+- `stage2_drawing.TargetArea(x: int, y: int, width: int, height: int)`; метод `to_dict(self) -> dict[str, int]`.
+- `stage2_drawing.AreaSelector(parent: tk.Tk, on_done)`
+- `stage2_drawing.DrawingApp(root: tk.Tk)`
+- `stage2_drawing.main()`
+- `stage3_image_processing.ImageProcessingApp(root: tk.Tk)`; `main() -> None`.
+- `stage4_contour_planning.load_mask_file(path: str | Path) -> Image.Image`
+- `stage4_contour_planning.ImagePreview(parent: tk.Widget, title: str)`; методы `set_image(self, image: Image.Image | None) -> None`, `redraw(self) -> None`.
+- `stage4_contour_planning.ContourPlanningApp(root: tk.Tk)`; `main() -> None`.
+- `stage5_stroke_optimization.PlanPreview(parent: tk.Widget, title: str)`; методы `set_image(self, image: Image.Image | None) -> None`, `redraw(self) -> None`.
+- `stage5_stroke_optimization.StrokeOptimizationApp(root: tk.Tk)`; `main() -> None`.
+
+У legacy Stage 2–5 большинство методов классов начинаются с подчёркивания; отдельные standalone API этих окон не выделяются. Их конструкторы и `main()` являются точками запуска соответствующих модулей.
