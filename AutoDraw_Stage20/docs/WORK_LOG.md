@@ -281,6 +281,29 @@
 - Сверить оставшиеся preparation/executor-модули, compatibility-модули и тестовые импорты.
 - DOC-013 остаётся IN_PROGRESS.
 
+## 2026-10-31 — каталог пользовательского хранилища
+
+**Добавлен документ:** `AutoDraw_Stage20/docs/FILE_STORAGE_CATALOG.md`.
+
+**Что сделано:**
+- Сведены каталоги профилей, палитр, проектов, результатов, runtime и логов из `configure_environment()`.
+- Документированы фиксированные runtime-файлы передачи одноцветных, цветных и тестовых планов.
+- Описаны каталоги результатов преобразования палитры, цветных планов и тестов лимита краски.
+- Зафиксированы `observations.json`, каталоги brush experiments, эталон доски, phase PNG и experiment manifests.
+- Добавлена структура ZIP-контейнера `.autodraw` и правила резервного копирования.
+- Уточнён индекс документации; устранена некорректная строка-разделитель в README.md.
+- Обновлены TASKS, ROADMAP и PROJECT_STATUS.
+
+**Проверки:**
+- Пути сверены с `integrated_app.py`, `autodraw_project.py`, `profile_manager.py`, `palette_profiles.py`, `paint_limit_test.py`, `brush_behavior_test_ui.py` и `analyze_brush_experiment_series.py`.
+- Отдельно отмечено, что Monitor exports хранятся вне каталога brush experiment и не всегда связаны с manifest.
+- Приложение, UI, браузер и тесты не запускались.
+- Код не изменялся.
+
+**Продолжение:**
+- DOC-013: сверка оставшихся import statements и тестовых зависимостей.
+- DOC-014: проверка относительных Markdown-ссылок и целевых файлов.
+
 ## Шаблон записи
 
 ~~~markdown
