@@ -87,12 +87,13 @@ def _supercover_segment(start: Point, end: Point) -> list[tuple[int, int]]:
     # Include cells touched exactly at segment endpoints. A segment aligned
     # with a grid boundary touches both sides along its entire length, not just
     # at the endpoints, so expand every traversed cell in that axis as well.
+    traversed_cells = tuple(cells)
     cells.update(cells_touching_point(x0, y0))
     cells.update(cells_touching_point(x1, y1))
     if dx == 0 and math.isclose(x0 - 0.5, round(x0 - 0.5), rel_tol=0.0, abs_tol=1e-10):
-        cells.update((cell_x - 1, cell_y) for cell_x, cell_y in tuple(cells))
+        cells.update((cell_x - 1, cell_y) for cell_x, cell_y in traversed_cells)
     if dy == 0 and math.isclose(y0 - 0.5, round(y0 - 0.5), rel_tol=0.0, abs_tol=1e-10):
-        cells.update((cell_x, cell_y - 1) for cell_x, cell_y in tuple(cells))
+        cells.update((cell_x, cell_y - 1) for cell_x, cell_y in traversed_cells)
     return sorted(cells, key=lambda p: (p[1], p[0]))
 
 def _path_centerline_cells(points: list[Point]) -> list[tuple[int, int]]:
