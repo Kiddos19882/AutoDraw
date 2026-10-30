@@ -1521,3 +1521,17 @@ JSON должен сохраняться как artifact `outline-first-fill-com
 Аудит `source/game_monitor/game_monitor.js` показал: `attach()` временно оборачивает методы экземпляра BoardPane, а `stop()` пытается восстановить исходные descriptors. Monitor не получает команд управления игрой, но это технически не полностью пассивный наблюдатель. До проверки восстановления методов, повторных start/stop и влияния на тайминги/FPS не считать его неинвазивным.
 
 Автоматическая интеграция через bridge не реализована. Firefox smoke test из игрового HTTPS iframe к локальному WebSocket endpoint ещё не выполнен. CI Windows portable build не заменяет этот браузерный тест. Подробности и сценарий — в `BRUSH_MONITOR_AUTOCAPTURE_DESIGN.md`, раздел 10.
+
+
+## 29. Локальный WebSocket transport smoke server — 30 октября 2026 г.
+
+Для проверки доступности loopback WebSocket из Firefox добавлена отдельная тестовая оснастка:
+
+- `source/game_monitor/websocket_smoke_server.py` — сервер только на `127.0.0.1`, exact HTTPS Origin allowlist, одноразовый случайный token, ограничение 1024 байта и таймауты;
+- `source/game_monitor/requirements-smoke.txt` — отдельная зависимость `websockets==12.0`, не входящая в runtime приложения;
+- `tests/test_websocket_smoke_server.py` — проверки token, JSON schema, Origin и ping/pong;
+- workflow `.github/workflows/geometry-tests.yml` устанавливает только smoke-зависимость и запускает этот набор на Windows/Python 3.11.
+
+Протокол оснастки ограничен handshake `auth` и сообщением `ping`; сервер отвечает `ready` и `pong`. Это не bridge к Game Monitor: игровые данные не читаются, игровые методы не вызываются, команды `clear/stop`, eval и управление мышью отсутствуют. Token печатается только в локальный терминал и не должен попадать в логи или репозиторий.
+
+Инструкция запуска и Console snippet находятся в разделе 10.4 `BRUSH_MONITOR_AUTOCAPTURE_DESIGN.md`. Перед запуском необходимо самостоятельно получить точный `location.origin` из игрового iframe. Live Firefox test ещё не проведён; нельзя отмечать транспорт проверенным только по CI.
