@@ -150,6 +150,52 @@ def test_game_monitor_summary_marks_mixed_brushes_and_missing_draw_samples() -> 
     assert empty["brush_value_matches_requested"] is None
 
 
+def test_loading_game_monitor_report_persists_link_and_warns_on_radius_mismatch(monkeypatch, tmp_path) -> None:
+    import json
+
+    class Value:
+        def __init__(self, value=""):
+            self.value = value
+        def get(self):
+            return self.value
+        def set(self, value):
+            self.value = value
+
+    tab = brush_ui.BrushBehaviorTestTab.__new__(brush_ui.BrushBehaviorTestTab)
+    tab.root = object()
+    tab.output_dir = tmp_path / "output"
+    tab._experiment_requested_brush = 14
+    tab.experiment_phases = {"brush_setup": {"requested_value": 14}}
+    tab.brush_var = Value("30")
+    tab.status_var = Value()
+    tab.game_monitor_report_path = None
+    tab.game_monitor_summary = None
+    writes = []
+    tab._write_experiment_manifest = lambda: writes.append(
+        (tab.game_monitor_report_path, tab.game_monitor_summary)
+    ) or (tmp_path / "experiment.json")
+    report_path = tmp_path / "monitor.json"
+    report_path.write_text(json.dumps({
+        "monitorVersion": "0.1.2",
+        "events": [
+            {"type": "DRAW_SAMPLE", "source": "onDrawing_wrapper", "board": {"radius": [0, 13]}},
+        ],
+    }), encoding="utf-8")
+    warnings = []
+    monkeypatch.setattr(brush_ui.filedialog, "askopenfilename", lambda **kwargs: str(report_path))
+    monkeypatch.setattr(brush_ui.messagebox, "showwarning", lambda *args, **kwargs: warnings.append(args))
+
+    tab.load_game_monitor_report()
+
+    assert tab.game_monitor_report_path == report_path.resolve()
+    assert tab.game_monitor_summary["brush_value_status"] == "mismatch"
+    assert len(writes) == 1
+    assert writes[0][0] == report_path.resolve()
+    assert writes[0][1]["observed_draw_radii"] == [13]
+    assert warnings and warnings[0][0] == "Размер кисти не совпал"
+    assert "Манифест обновлён" in tab.status_var.value or "Манифест обновлён" in warnings[0][1]
+
+
 def test_brush_test_record_defaults_unmeasured_paint_points_to_none() -> None:
     record = build_brush_test_record(brush_value=7, test_case="Горизонтальные линии")
 
