@@ -334,6 +334,24 @@
 - Сверено с `integrated_app.py: configure_environment()`.
 - Исходники не изменялись.
 
+## 2026-10-31 — карта тестов и CI
+
+**Добавлен документ:** `AutoDraw_Stage20/docs/TESTS_AND_CI_MAP.md`.
+
+**Что сделано:**
+- Разделены тестовые слои Preparation, Executor, интеграционные/UI, Game Monitor, diagnostics/benchmarks и portable build.
+- Документированы пять ключевых algorithmic tests, import-resolution diagnostics, Stage 7 validator и unified-app UI regression.
+- Зафиксированы прямые импорты проверенных тестовых файлов.
+- Перенесена в документ структура трёх CI jobs: geometry-tests, executor-tests, windows-build-smoke.
+- Перечислены workflow benchmark/diagnostic scripts и назначение их артефактов.
+- Отдельно обозначено, что workflow configuration не доказывает успешный запуск, а подготовка документа не включала запуск тестов.
+- Обновлён индекс docs, TASKS, ROADMAP и PROJECT_STATUS.
+
+**Граница выполненной работы:**
+- Проверены исходники пяти основных test modules, `test_import_resolution_diagnostics.py`, `test_stage7_validator_rules.py`, `test_unified_app.py` и workflow `.github/workflows/geometry-tests.yml`.
+- Полная построчная матрица импортов всех файлов из `source/preparation/tests/`, `source/executor/tests/` и `tests/` остаётся отдельной задачей.
+- Код не изменялся; тесты, UI, benchmarks и сборка не запускались.
+
 ## Шаблон записи
 
 ~~~markdown
