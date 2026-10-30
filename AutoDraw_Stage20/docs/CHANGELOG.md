@@ -3,6 +3,7 @@
 ## 2026-10-31
 
 ### Added
+- Добавлен FILE_STORAGE_CATALOG.md: пути пользовательских данных, runtime-планы, результаты, brush experiments и структура .autodraw.
 - Добавлен DEPENDENCY_MAP.md с картой точек входа, основных импортов и общих адаптеров.
 - DATA_FORMATS_AND_PROFILES.md дополнен схемой execution report v2, ExecutionSummary и color execution report.
 - Добавлен EXECUTOR_API_REFERENCE.md с интерфейсами Stage6, MouseExecutor, цветного исполнения, диагностики и планирования.
@@ -19,6 +20,7 @@
 - Добавлен справочник общих геометрических моделей и формата .autodraw.
 
 ### Changed
+- Индекс README.md дополнен каталогом файлового хранилища; исправлена некорректная строка таблицы.
 - DOC-010 закрыта: EXECUTOR_API_REFERENCE.md охватывает все 13 модулей executor из структурного справочника.
 - DOC-009 закрыта: PREPARATION_API_REFERENCE.md охватывает все 40 модулей preparation из структурного справочника.
 - PREPARATION_API_REFERENCE.md уточнён по сигнатуре build_brush_test_record и конструкторам UI-компонентов.
