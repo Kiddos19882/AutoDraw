@@ -98,6 +98,56 @@ def test_brush_test_record_can_link_passive_game_monitor_evidence() -> None:
     assert record["game_monitor_summary"]["interpretation"].endswith("not_direct_paint_resource_measurement")
 
 
+def test_game_monitor_summary_extracts_only_active_draw_radii_and_detects_match() -> None:
+    document = {
+        "monitorVersion": "0.1.2",
+        "eventCount": 5,
+        "droppedEvents": 0,
+        "errors": [],
+        "boardDetected": True,
+        "events": [
+            {"type": "DRAW_SAMPLE", "source": "onDrawStart", "board": {"radius": [0, 30]}},
+            {"type": "DRAW_SAMPLE", "source": "onDrawing_wrapper", "board": {"radius": [0, 7, 7]}},
+            {"type": "DRAW_SAMPLE", "source": "onDrawing_wrapper", "board": {"radius": [0, 7, 7]}},
+            {"type": "POINTER_DOWN_CANDIDATE"},
+            {"type": "POINTER_UP_CANDIDATE"},
+        ],
+    }
+    summary = brush_ui.summarize_game_monitor_report(document, requested_brush_value=7)
+    assert summary["observed_draw_radii"] == [7]
+    assert summary["brush_value_status"] == "match"
+    assert summary["brush_value_matches_requested"] is True
+    assert summary["drawing_sample_count"] == 2
+    assert summary["draw_sample_count"] == 3
+
+
+def test_game_monitor_summary_detects_requested_vs_actual_brush_mismatch() -> None:
+    document = {
+        "events": [
+            {"type": "DRAW_SAMPLE", "source": "onDrawing_wrapper", "board": {"radius": [0, 13, 13]}},
+        ],
+    }
+    summary = brush_ui.summarize_game_monitor_report(document, requested_brush_value=14)
+    assert summary["observed_draw_radii"] == [13]
+    assert summary["brush_value_status"] == "mismatch"
+    assert summary["brush_value_matches_requested"] is False
+
+
+def test_game_monitor_summary_marks_mixed_brushes_and_missing_draw_samples() -> None:
+    mixed = brush_ui.summarize_game_monitor_report({
+        "events": [
+            {"type": "DRAW_SAMPLE", "source": "onDrawing_wrapper", "board": {"radius": [0, 6]}},
+            {"type": "DRAW_SAMPLE", "source": "onDrawing_wrapper", "board": {"radius": [0, 13]}},
+        ],
+    }, requested_brush_value=6)
+    assert mixed["brush_value_status"] == "mixed"
+    assert mixed["observed_draw_radii"] == [6, 13]
+
+    empty = brush_ui.summarize_game_monitor_report({"events": []}, requested_brush_value=6)
+    assert empty["brush_value_status"] == "unavailable"
+    assert empty["brush_value_matches_requested"] is None
+
+
 def test_brush_test_record_defaults_unmeasured_paint_points_to_none() -> None:
     record = build_brush_test_record(brush_value=7, test_case="Горизонтальные линии")
 
