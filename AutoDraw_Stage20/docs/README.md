@@ -15,6 +15,7 @@
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Общая структура приложения, подсистемы и связи |
 | [COMPONENT_CATALOG.md](COMPONENT_CATALOG.md) | Каталог исходных модулей, тестов, утилит и CI |
 | [MODULE_REFERENCE.md](MODULE_REFERENCE.md) | Структурный справочник модулей preparation, executor и Game Monitor |\n| [PREPARATION_API_REFERENCE.md](PREPARATION_API_REFERENCE.md) | Справочник интерфейсов модулей preparation |
+| [EXECUTOR_API_REFERENCE.md](EXECUTOR_API_REFERENCE.md) | Справочник интерфейсов Stage 1–6, MouseExecutor, цветного исполнения и моделей |
 | [UI_INTEGRATION_MAP.md](UI_INTEGRATION_MAP.md) | Карта восьми вкладок, callback-связей и передачи данных в executor |
 | [DATA_FORMATS_AND_MODELS.md](DATA_FORMATS_AND_MODELS.md) | Общие модели DrawingPlan, Stroke, Point и формат .autodraw |
 | [DATA_FORMATS_AND_PROFILES.md](DATA_FORMATS_AND_PROFILES.md) | Профили, палитры, планы, лабораторные и калибровочные результаты, экспорт Game Monitor |
