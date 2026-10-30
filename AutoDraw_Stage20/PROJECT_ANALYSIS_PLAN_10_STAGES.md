@@ -170,7 +170,7 @@
 - [x] Этап 3. Архитектура приложения и потоки управления
 - [x] Этап 4. Пользовательский интерфейс и пользовательские сценарии
 - [x] Этап 5. Конвейер обработки изображения и построения плана
-- [ ] Этап 6. Исполнитель и взаимодействие с браузером
+- [x] Этап 6. Исполнитель и взаимодействие с браузером
 - [ ] Этап 7. Игровой движок, Game Monitor и лаборатория кистей
 - [ ] Этап 8. Хранение данных, профили и воспроизводимость
 - [ ] Этап 9. Тесты, CI, качество, производительность и безопасность
@@ -208,3 +208,16 @@
 - Записаны риски IMG-01…IMG-09 в `PROJECT_DOCUMENTATION.md`: различная семантика геометрических режимов, preview/game mismatch, потеря мелких деталей, row-step omissions, singleton/executor boundary, разные bounds contracts, board/canvas size contracts, отсутствие автоматического наследования row-step и неатомарная запись DrawingPlan.
 - Последний CI run `41131348814` для HEAD `7599c730`: executor-tests — success; geometry-tests — failure; Windows portable startup — failure. Benchmark-этапы завершились, общий набор и Windows startup заблокированы SyntaxError в `brush_behavior_test_ui.py:141` (этап 4).
 - Код, тесты, workflow, профили, планы и пользовательские данные не изменялись. Этапы 6–10 не выполнялись.
+
+
+### Журнал выполнения этапа 6
+
+- Проверены `stage6_execute_plan.py`, `drawing/mouse_executor.py`, color execution hooks, plan transform, execution diagnostics, adaptive brush controller и executor unit tests.
+- Подтверждён общий путь: валидация → worker thread → countdown → color preflight (если цветной план) → callbacks выбора цвета/кисти → MouseExecutor → cleanup → JSON execution report.
+- Подтверждены экранная проверка TargetArea, физические координаты Windows через SetProcessDPIAware, fit только для одноцветного плана и строгий exact-size для цветного.
+- Подтверждены stop button/F12/PyAutoGUI FAILSAFE, прерываемые задержки, mouseUp после штриха и повторный cleanup; ошибка mouseUp приводит к failed.
+- Подтверждены цветовой профиль по RGB, проверка разрешения/DPI и screenshot preflight, выбор swatch только при смене цвета, сохранение порядка штрихов.
+- Найден EXE-01 (high): scanline singleton конвертируется в базовый drag 1 px, но не получает line_extension_px_override=0; default extension 2 px увеличивает траекторию до 3 px. Geometry/adaptive plans явно отключают extension. Интеграционный тест не проверяет конечную координату singleton после extension.
+- Дополнительные риски EXE-02…EXE-07: inclusive canvas bounds против screen pixel bounds; не подтверждённая multi-monitor поддержка; возможный focus switch после screenshot preflight; Tk root.after из worker; деформация mono fit при неравномерном масштабе; отчёт хранит hashes/summary, а не полный snapshot плана.
+- Executor CI job на HEAD `c846bcc` — success, 97 tests passed. Geometry tests и Windows portable startup завершились failure из-за известного SyntaxError `brush_behavior_test_ui.py:141` (`},,`), найденного на этапе 4.
+- Код, тесты, workflow, профили, планы и пользовательские данные не изменялись. Этапы 7–10 не выполнялись.
