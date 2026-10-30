@@ -35,7 +35,7 @@
 
 - `ProjectFormatError(ValueError)` — исключение формата проекта.
 - `ProjectBundle` — объект открытого набора проекта.
-- `create_project(output_path, ...)` — создание portable-проекта; полный контракт параметров расположен в исходнике.
+- `create_project(output_path: str | Path, source_image_path: str | Path, mask_path: str | Path, drawing_plan_path: str | Path, *, project_name: str | None = None, processing_metadata_path: str | Path | None = None, imported_quality_report_path: str | Path | None = None, prepared_color_path: str | Path | None = None, grayscale_path: str | Path | None = None, quality_threshold: int | None = None, quality_foreground: str | None = None) -> Path` — создание portable-проекта.
 - `open_project(path: str | Path) -> ProjectBundle` — открытие проекта.
 - `export_drawing_plan(project_path: str | Path, destination_path: str | Path) -> Path` — экспорт плана в отдельный JSON.
 - `extract_project(project_path: str | Path, destination_dir: str | Path, *, overwrite: bool = False) -> Path` — извлечение проекта.
@@ -46,8 +46,8 @@
 ### `board_resource_model.py`
 
 - `get_board_point_limit(board_item_type: str) -> int`
-- `create_board_resource_profile(max_points: int, ...)`
-- `estimate_calibrated_point_usage(stroke_lengths_px: Iterable[float], ...)`
+- `create_board_resource_profile(max_points: int, *, safety_factor: float = DEFAULT_POINT_SAFETY_FACTOR) -> dict[str, Any]`
+- `estimate_calibrated_point_usage(stroke_lengths_px: Iterable[float], *, points_per_path_px: float, max_points: int, safety_factor: float = DEFAULT_POINT_SAFETY_FACTOR) -> dict[str, Any]`
 
 Модуль также содержит внутренние функции валидации чисел и лимита.
 
@@ -103,7 +103,7 @@
 ### `color_scanline.py`
 
 - `ColorScanlinePlanError(ValueError)`
-- `build_color_scanline_plan(index_map: Any, ...)`
+- `build_color_scanline_plan(index_map: Any, palette: Any, *, source_report: dict[str, Any] | None = None, source_name: str | None = None, plan_name: str = "Цветной scanline-план", row_step_px: int = 1, row_offset_px: int = 0, max_strokes: int = MAX_COLOR_STROKES, paint_stroke_overhead_px_equivalent: float = DEFAULT_STROKE_OVERHEAD_PX_EQUIVALENT, paint_budget_px_equivalent: float = DEFAULT_PAINT_BUDGET_PX_EQUIVALENT, board_item_type: str = "BoardItem2", board_point_limit: int = HISTORICAL_CALIBRATION_POINT_LIMIT, point_step_px: float = DEFAULT_EXECUTOR_POINT_STEP_PX, point_delay_ms: float = DEFAULT_EXECUTOR_POINT_DELAY_MS, frame_rate_fps: float = GAME_ENGINE_DEFAULT_FRAME_RATE_FPS, point_quota_safety_factor: float = DEFAULT_POINT_SAFETY_FACTOR) -> dict[str, Any]`
 - `validate_color_scanline_plan(plan: Any) -> dict[str, Any]`
 - `save_color_scanline_plan(path: str | Path, plan: dict[str, Any]) -> Path`
 - `load_color_scanline_plan(path: str | Path) -> dict[str, Any]`
@@ -112,7 +112,7 @@
 ### `geometry_color_plan.py`
 
 - `GeometryColorPlanError(ValueError)`
-- `build_geometry_color_plan(index_map: Any, ...)`
+- `build_geometry_color_plan(index_map: Any, palette: Any, *, mode: str = "skeleton", simplify_tolerance_px: float = 0.8, min_component_area: int = 1, color_grouping: bool = True, max_strokes: int = MAX_GEOMETRY_STROKES, canvas_size: tuple[int, int] | None = None, source_tile: dict[str, int] | None = None, source_name: str | None = None) -> dict[str, Any]`
 - `validate_geometry_color_plan(plan: Any) -> dict[str, Any]`
 - `render_geometry_color_preview(plan: Any, max_dimension: int = 1600) -> Image.Image`
 - `save_geometry_color_plan(path: str | Path, plan: Any) -> Path`
@@ -121,8 +121,8 @@
 ### `geometry_budget_optimizer.py`
 
 - `measure_geometry_plan_quality(index_map: Any, plan: dict[str, Any]) -> dict[str, Any]`
-- `optimize_geometry_plan_to_budget(index_map: Any, ...)`
-- `optimize_geometry_plan_across_modes(index_map: Any, ...)`
+- `optimize_geometry_plan_to_budget(index_map: Any, palette: Any, *, mode: str, paint_budget_px_equivalent: float, target_usage_percent: float = 75.0, stroke_overhead_px_equivalent: float = 6.67, simplify_tolerance_px: float = 0.8, min_component_area: int = 1, source_name: str | None = None, board_point_limit: int = 6_000, point_safety_factor: float = 0.85) -> tuple[dict[str, Any], dict[str, Any]]`
+- `optimize_geometry_plan_across_modes(index_map: Any, palette: Any, *, paint_budget_px_equivalent: float, target_usage_percent: float = 75.0, stroke_overhead_px_equivalent: float = 6.67, simplify_tolerance_px: float = 0.8, min_component_area: int = 1, source_name: str | None = None, board_point_limit: int = 6_000, point_safety_factor: float = 0.85) -> tuple[dict[str, Any], dict[str, Any]]`
 
 ### `interior_fill_planner.py`
 
@@ -141,7 +141,7 @@
 ### `brush_planner.py`
 
 - `BrushPlannerError(ValueError)`
-- `build_adaptive_brush_plan(index_map: Any, ...)`
+- `build_adaptive_brush_plan(index_map: Any, color_plan: dict[str, Any], *, brush_scale_x: float = 1.0, brush_scale_y: float = 1.0, min_brush_value: int = DEFAULT_MIN_BRUSH_VALUE, max_brush_value: int = DEFAULT_MAX_BRUSH_VALUE, calibration_confirmed: bool = False) -> dict[str, Any]`
 - `validate_adaptive_brush_plan(plan: Any) -> dict[str, Any]`
 - `save_adaptive_brush_plan(path: str | Path, plan: Any) -> Path`
 - `load_adaptive_brush_plan(path: str | Path) -> dict[str, Any]`
@@ -151,12 +151,12 @@
 ### `brush_calibration.py`
 
 - `BrushCalibrationError(ValueError)`
-- `create_default_profile(screen_size: tuple[int, int] | list[int] | None = None, ...)`
-- `normalize_point(x: Any, ...)`
-- `normalize_region(x1: Any, ...)`
+- `create_default_profile(screen_size: tuple[int, int] | list[int] | None = None) -> dict[str, Any]`
+- `normalize_point(x: Any, y: Any, screen_size: tuple[int, int] | list[int] | None = None) -> dict[str, int]`
+- `normalize_region(x1: Any, y1: Any, x2: Any, y2: Any, screen_size: tuple[int, int] | list[int] | None = None, *, min_width: int = 2, min_height: int = 2) -> dict[str, int]`
 - `validate_profile(profile: dict[str, Any]) -> dict[str, Any]`
-- `adapt_profile_to_screen(profile: dict[str, Any], ...)`
-- `missing_required_fields(profile: dict[str, Any], ...)`
+- `adapt_profile_to_screen(profile: dict[str, Any], screen_size: tuple[int, int] | list[int]) -> tuple[dict[str, Any], bool]`
+- `missing_required_fields(profile: dict[str, Any], brush_value: int | None = None) -> list[str]`
 - `save_profile(path: str | Path, profile: dict[str, Any]) -> Path`
 - `load_profile(path: str | Path) -> dict[str, Any]`
 
