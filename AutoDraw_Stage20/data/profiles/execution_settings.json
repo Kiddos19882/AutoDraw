@@ -8,9 +8,9 @@
   "end_hold_ms": 50,
   "countdown_seconds": 5,
   "brush_slider_calibration": {
-    "x_at_min": 1343,
-    "x_at_max": 1195,
-    "y": 326,
+    "x_at_min": 1293,
+    "x_at_max": 1168,
+    "y": 305,
     "initial_value": 7,
     "min_value": 1,
     "max_value": 30,

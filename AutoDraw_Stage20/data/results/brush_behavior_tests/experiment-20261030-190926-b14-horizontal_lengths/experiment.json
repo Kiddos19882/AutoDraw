@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "record_type": "autodraw_brush_paint_experiment",
+  "updated_at_utc": "2026-10-30T16:09:41+00:00",
+  "test_case": "horizontal_lengths",
+  "brush_value_requested": 14,
+  "drawing_plan_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw-feature-image-geometry-optimization(1)\\AutoDraw-feature-image-geometry-optimization\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\brush-plan-horizontal_lengths-b14-20261030-190921.json",
+  "execution_report_path": null,
+  "execution_report": null,
+  "game_monitor_report_path": null,
+  "game_monitor_summary": null,
+  "calibration_profile_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw-feature-image-geometry-optimization(1)\\AutoDraw-feature-image-geometry-optimization\\AutoDraw_Stage20\\data\\brush_paint_calibration.json",
+  "phases": {
+    "before_clear": {
+      "status": "restored",
+      "board_clear_check": {
+        "status": "restored",
+        "tolerance_percent": 0.15,
+        "changed_percent": 0.0,
+        "comparison": {
+          "width": 553,
+          "height": 274,
+          "total_pixels": 151522,
+          "changed_pixels": 0,
+          "changed_percent": 0.0,
+          "pixel_similarity_percent": 100.0,
+          "mean_absolute_rgb_difference": 0.0,
+          "exact_match": true,
+          "interpretation": "visual_pixel_comparison_only_not_a_reading_of_the_game_resource_counter"
+        },
+        "reference_type": "explicit_blank_board_roi",
+        "note": "Визуальное совпадение с отдельно сохранённым эталоном пустой доски; это не доказательство внутреннего состояния игры."
+      },
+      "captured_at_utc": "2026-10-30T16:09:31+00:00",
+      "screen_size": {
+        "width": 1920,
+        "height": 1080
+      },
+      "files": {
+        "full_screen": "before_clear-screen.png",
+        "board_roi": "before_clear-board.png",
+        "paint_meter_roi": "before_clear-paint-meter.png"
+      }
+    },
+    "before_draw": {
+      "captured_at_utc": "2026-10-30T16:09:31+00:00",
+      "screen_size": {
+        "width": 1920,
+        "height": 1080
+      },
+      "clear_check": {
+        "status": "restored",
+        "tolerance_percent": 0.15,
+        "changed_percent": 0.0,
+        "comparison": {
+          "width": 553,
+          "height": 274,
+          "total_pixels": 151522,
+          "changed_pixels": 0,
+          "changed_percent": 0.0,
+          "pixel_similarity_percent": 100.0,
+          "mean_absolute_rgb_difference": 0.0,
+          "exact_match": true,
+          "interpretation": "visual_pixel_comparison_only_not_a_reading_of_the_game_resource_counter"
+        },
+        "reference_type": "explicit_blank_board_roi",
+        "note": "Визуальное совпадение с отдельно сохранённым эталоном пустой доски; это не доказательство внутреннего состояния игры."
+      },
+      "files": {
+        "full_screen": "before_clear-screen.png",
+        "board_roi": "before_clear-board.png",
+        "paint_meter_roi": "before_clear-paint-meter.png"
+      }
+    },
+    "brush_setup": {
+      "status": "declined_by_user",
+      "requested_value": 14,
+      "drag_start": [
+        1168,
+        305
+      ],
+      "drag_target": [
+        1237,
+        305
+      ],
+      "drag_completed_at_utc": "2026-10-30T16:09:35+00:00",
+      "confirmation_required": true,
+      "note": "A completed mouse drag does not prove the game selected the requested brush size. The user must visually check the slider position before the test executor can start.",
+      "declined_at_utc": "2026-10-30T16:09:41+00:00"
+    }
+  },
+  "interpretation_limits": [
+    "Meter fill is a provisional image estimate, not a direct read of the game's internal resource counter.",
+    "A successful executor report does not prove every stroke was registered by the game.",
+    "Execution status and visual evidence are recorded separately."
+  ]
+}

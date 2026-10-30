@@ -6,7 +6,7 @@
   "environment": {
     "screen_width": 1920,
     "screen_height": 1080,
-    "calibrated_at_utc": "2026-10-29T02:29:55+00:00",
+    "calibrated_at_utc": "2026-10-30T16:03:26+00:00",
     "windows_scale_percent": 100,
     "browser_zoom_percent": 100,
     "browser": "Firefox",
@@ -14,61 +14,61 @@
   },
   "points": {
     "clear_board": {
-      "x": 590,
-      "y": 647
+      "x": 650,
+      "y": 578
     },
     "brush_7": {
-      "x": 1375,
-      "y": 289
+      "x": 1309,
+      "y": 272
     },
     "brush_14": {
-      "x": 1354,
-      "y": 289
+      "x": 1290,
+      "y": 272
     },
     "brush_20": {
-      "x": 1322,
-      "y": 290
+      "x": 1263,
+      "y": 272
     },
     "brush_slider_value_1": {
-      "x": 1343,
-      "y": 326
+      "x": 1293,
+      "y": 305
     },
     "brush_slider_value_30": {
-      "x": 1195,
-      "y": 327
+      "x": 1168,
+      "y": 305
     },
     "editor_open": null,
     "save_drawing": null
   },
   "regions": {
     "board_area": {
-      "x": 502,
-      "y": 277,
-      "width": 652,
-      "height": 335
+      "x": 576,
+      "y": 266,
+      "width": 553,
+      "height": 274
     },
     "paint_meter_area": {
-      "x": 687,
-      "y": 627,
-      "width": 199,
-      "height": 41
+      "x": 742,
+      "y": 566,
+      "width": 160,
+      "height": 26
     },
     "brush_value_area": null
   },
   "status": {
     "points": {
-      "clear_board": "verified",
-      "brush_7": "verified",
-      "brush_14": "verified",
-      "brush_20": "verified",
-      "brush_slider_value_1": "verified",
-      "brush_slider_value_30": "verified",
+      "clear_board": "set",
+      "brush_7": "set",
+      "brush_14": "set",
+      "brush_20": "set",
+      "brush_slider_value_1": "set",
+      "brush_slider_value_30": "set",
       "editor_open": "not_set",
       "save_drawing": "not_set"
     },
     "regions": {
-      "board_area": "verified",
-      "paint_meter_area": "verified",
+      "board_area": "set",
+      "paint_meter_area": "set",
       "brush_value_area": "not_set"
     }
   }

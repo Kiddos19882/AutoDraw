@@ -1,16 +1,16 @@
 {
   "schema_version": 1,
   "reference_type": "user_confirmed_blank_board_roi",
-  "captured_at_utc": "2026-10-29T02:30:22+00:00",
+  "captured_at_utc": "2026-10-30T16:04:15+00:00",
   "screen_size": {
     "width": 1920,
     "height": 1080
   },
   "board_region": {
-    "x": 502,
-    "y": 277,
-    "width": 652,
-    "height": 335
+    "x": 576,
+    "y": 266,
+    "width": 553,
+    "height": 274
   },
   "calibration_profile_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw-feature-image-geometry-optimization(1)\\AutoDraw-feature-image-geometry-optimization\\AutoDraw_Stage20\\data\\brush_paint_calibration.json",
   "image_file": "blank-board-reference.png",

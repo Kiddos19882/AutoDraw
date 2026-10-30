@@ -1,0 +1,341 @@
+{
+  "schema_version": 1,
+  "record_type": "autodraw_brush_paint_experiment",
+  "updated_at_utc": "2026-10-30T16:08:30+00:00",
+  "test_case": "horizontal_lengths",
+  "brush_value_requested": 7,
+  "drawing_plan_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw-feature-image-geometry-optimization(1)\\AutoDraw-feature-image-geometry-optimization\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\brush-plan-horizontal_lengths-b7-20261030-190755.json",
+  "execution_report_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw-feature-image-geometry-optimization(1)\\AutoDraw-feature-image-geometry-optimization\\AutoDraw_Stage20\\data\\results\\execution_20261030_190821_549777_9d35d8.json",
+  "execution_report": {
+    "status": "completed",
+    "completed_strokes": 5,
+    "total_strokes": 5,
+    "started_at": "2026-10-30T19:08:12+03:00",
+    "ended_at": "2026-10-30T19:08:21+03:00",
+    "duration_seconds": 8.859,
+    "move_calls": 195,
+    "error": null,
+    "stop_reason": null,
+    "mouse_release": {
+      "attempted": true,
+      "succeeded": true,
+      "errors": []
+    },
+    "executor_config": {
+      "point_step_px": 2.0,
+      "line_extension_px": 0.0,
+      "point_delay_ms": 10,
+      "after_mouse_up_ms": 20,
+      "before_mouse_down_ms": 20,
+      "after_mouse_down_ms": 40,
+      "end_hold_ms": 50,
+      "countdown_seconds": 5
+    }
+  },
+  "game_monitor_report_path": null,
+  "game_monitor_summary": null,
+  "calibration_profile_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw-feature-image-geometry-optimization(1)\\AutoDraw-feature-image-geometry-optimization\\AutoDraw_Stage20\\data\\brush_paint_calibration.json",
+  "phases": {
+    "before_clear": {
+      "status": "restored",
+      "board_clear_check": {
+        "status": "restored",
+        "tolerance_percent": 0.15,
+        "changed_percent": 0.0,
+        "comparison": {
+          "width": 553,
+          "height": 274,
+          "total_pixels": 151522,
+          "changed_pixels": 0,
+          "changed_percent": 0.0,
+          "pixel_similarity_percent": 100.0,
+          "mean_absolute_rgb_difference": 0.0,
+          "exact_match": true,
+          "interpretation": "visual_pixel_comparison_only_not_a_reading_of_the_game_resource_counter"
+        },
+        "reference_type": "explicit_blank_board_roi",
+        "note": "Визуальное совпадение с отдельно сохранённым эталоном пустой доски; это не доказательство внутреннего состояния игры."
+      },
+      "captured_at_utc": "2026-10-30T16:08:03+00:00",
+      "screen_size": {
+        "width": 1920,
+        "height": 1080
+      },
+      "files": {
+        "full_screen": "before_clear-screen.png",
+        "board_roi": "before_clear-board.png",
+        "paint_meter_roi": "before_clear-paint-meter.png"
+      }
+    },
+    "before_draw": {
+      "captured_at_utc": "2026-10-30T16:08:03+00:00",
+      "screen_size": {
+        "width": 1920,
+        "height": 1080
+      },
+      "clear_check": {
+        "status": "restored",
+        "tolerance_percent": 0.15,
+        "changed_percent": 0.0,
+        "comparison": {
+          "width": 553,
+          "height": 274,
+          "total_pixels": 151522,
+          "changed_pixels": 0,
+          "changed_percent": 0.0,
+          "pixel_similarity_percent": 100.0,
+          "mean_absolute_rgb_difference": 0.0,
+          "exact_match": true,
+          "interpretation": "visual_pixel_comparison_only_not_a_reading_of_the_game_resource_counter"
+        },
+        "reference_type": "explicit_blank_board_roi",
+        "note": "Визуальное совпадение с отдельно сохранённым эталоном пустой доски; это не доказательство внутреннего состояния игры."
+      },
+      "files": {
+        "full_screen": "before_clear-screen.png",
+        "board_roi": "before_clear-board.png",
+        "paint_meter_roi": "before_clear-paint-meter.png"
+      }
+    },
+    "brush_setup": {
+      "status": "confirmed_by_user",
+      "requested_value": 7,
+      "drag_start": [
+        1168,
+        305
+      ],
+      "drag_target": [
+        1267,
+        305
+      ],
+      "drag_completed_at_utc": "2026-10-30T16:08:07+00:00",
+      "confirmation_required": true,
+      "note": "A completed mouse drag does not prove the game selected the requested brush size. The user must visually check the slider position before the test executor can start.",
+      "confirmed_at_utc": "2026-10-30T16:08:09+00:00",
+      "confirmation_method": "explicit_user_visual_confirmation"
+    },
+    "execution": {
+      "status": "completed",
+      "report_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw-feature-image-geometry-optimization(1)\\AutoDraw-feature-image-geometry-optimization\\AutoDraw_Stage20\\data\\results\\execution_20261030_190821_549777_9d35d8.json",
+      "summary": {
+        "status": "completed",
+        "completed_strokes": 5,
+        "total_strokes": 5,
+        "started_at": "2026-10-30T19:08:12+03:00",
+        "ended_at": "2026-10-30T19:08:21+03:00",
+        "duration_seconds": 8.859,
+        "move_calls": 195,
+        "error": null,
+        "stop_reason": null,
+        "mouse_release": {
+          "attempted": true,
+          "succeeded": true,
+          "errors": []
+        },
+        "executor_config": {
+          "point_step_px": 2.0,
+          "line_extension_px": 0.0,
+          "point_delay_ms": 10,
+          "after_mouse_up_ms": 20,
+          "before_mouse_down_ms": 20,
+          "after_mouse_down_ms": 40,
+          "end_hold_ms": 50,
+          "countdown_seconds": 5
+        }
+      },
+      "captured_at_utc": "2026-10-30T16:08:21+00:00"
+    },
+    "after_draw": {
+      "status": "captured",
+      "captured_at_utc": "2026-10-30T16:08:23+00:00",
+      "screen_size": {
+        "width": 1920,
+        "height": 1080
+      },
+      "files": {
+        "full_screen": "after_draw-screen.png",
+        "board_roi": "after_draw-board.png",
+        "paint_meter_roi": "after_draw-paint-meter.png"
+      },
+      "paint_meter_measurement": {
+        "bar_width_px": 160,
+        "changed_columns": 3,
+        "color_distance_threshold": 24.0,
+        "method": "baseline_color_suffix_estimate",
+        "interpretation": "estimate_only_not_game_counter_or_OCR",
+        "status": "inconclusive",
+        "filled_width_px": null,
+        "fill_fraction": null,
+        "fill_percent": null,
+        "confidence": "low",
+        "note": "Изменения не образуют достаточно чёткую непрерывную правую часть шкалы."
+      },
+      "stroke_visibility_analysis": {
+        "status": "analyzed",
+        "stroke_count": 5,
+        "visible_change_count": 5,
+        "no_change_count": 0,
+        "ambiguous_count": 0,
+        "results": [
+          {
+            "name": "horizontal_10",
+            "status": "visible_change_detected",
+            "changed_pixels_in_roi": 126,
+            "roi": {
+              "x": 12,
+              "y": 12,
+              "width": 27,
+              "height": 17
+            },
+            "overlapping_stroke_indices": [],
+            "interpretation": "visual_roi_heuristic_not_game_acceptance"
+          },
+          {
+            "name": "horizontal_20",
+            "status": "visible_change_detected",
+            "changed_pixels_in_roi": 208,
+            "roi": {
+              "x": 12,
+              "y": 37,
+              "width": 37,
+              "height": 17
+            },
+            "overlapping_stroke_indices": [],
+            "interpretation": "visual_roi_heuristic_not_game_acceptance"
+          },
+          {
+            "name": "horizontal_50",
+            "status": "visible_change_detected",
+            "changed_pixels_in_roi": 438,
+            "roi": {
+              "x": 12,
+              "y": 62,
+              "width": 67,
+              "height": 17
+            },
+            "overlapping_stroke_indices": [],
+            "interpretation": "visual_roi_heuristic_not_game_acceptance"
+          },
+          {
+            "name": "horizontal_100",
+            "status": "visible_change_detected",
+            "changed_pixels_in_roi": 838,
+            "roi": {
+              "x": 12,
+              "y": 87,
+              "width": 117,
+              "height": 17
+            },
+            "overlapping_stroke_indices": [],
+            "interpretation": "visual_roi_heuristic_not_game_acceptance"
+          },
+          {
+            "name": "horizontal_200",
+            "status": "visible_change_detected",
+            "changed_pixels_in_roi": 1730,
+            "roi": {
+              "x": 12,
+              "y": 112,
+              "width": 217,
+              "height": 17
+            },
+            "overlapping_stroke_indices": [],
+            "interpretation": "visual_roi_heuristic_not_game_acceptance"
+          }
+        ],
+        "note": "ROI могут включать эффекты кисти и фон; пересекающиеся ROI помечаются неоднозначными.",
+        "reference_file": "blank-board-reference.png",
+        "padding_px": 8,
+        "requested_brush_value": 7
+      }
+    },
+    "postdraw_workflow": {
+      "status": "completed",
+      "clear_click_sent": true,
+      "captured_at_utc": "2026-10-30T16:08:23+00:00",
+      "reason": "Очистка подтверждена эталоном.",
+      "finished_at_utc": "2026-10-30T16:08:25+00:00"
+    },
+    "after_clear": {
+      "status": "restored",
+      "board_clear_check": {
+        "status": "restored",
+        "tolerance_percent": 0.15,
+        "changed_percent": 0.0,
+        "comparison": {
+          "width": 553,
+          "height": 274,
+          "total_pixels": 151522,
+          "changed_pixels": 0,
+          "changed_percent": 0.0,
+          "pixel_similarity_percent": 100.0,
+          "mean_absolute_rgb_difference": 0.0,
+          "exact_match": true,
+          "interpretation": "visual_pixel_comparison_only_not_a_reading_of_the_game_resource_counter"
+        },
+        "reference_type": "explicit_blank_board_roi",
+        "note": "Визуальное совпадение с отдельно сохранённым эталоном пустой доски; это не доказательство внутреннего состояния игры."
+      },
+      "board_clear_status": "restored",
+      "captured_at_utc": "2026-10-30T16:08:25+00:00",
+      "screen_size": {
+        "width": 1920,
+        "height": 1080
+      },
+      "files": {
+        "full_screen": "after_clear-screen.png",
+        "board_roi": "after_clear-board.png",
+        "paint_meter_roi": "after_clear-paint-meter.png"
+      },
+      "paint_meter_restoration": {
+        "status": "restored",
+        "tolerance_fraction": 0.03,
+        "changed_percent": 0.0,
+        "baseline_comparison": {
+          "width": 160,
+          "height": 26,
+          "total_pixels": 4160,
+          "changed_pixels": 0,
+          "changed_percent": 0.0,
+          "pixel_similarity_percent": 100.0,
+          "mean_absolute_rgb_difference": 0.0,
+          "exact_match": true,
+          "interpretation": "visual_pixel_comparison_only_not_a_reading_of_the_game_resource_counter"
+        },
+        "fill_estimate": {
+          "bar_width_px": 160,
+          "changed_columns": 0,
+          "color_distance_threshold": 24.0,
+          "method": "baseline_color_suffix_estimate",
+          "interpretation": "estimate_only_not_game_counter_or_OCR",
+          "status": "unchanged_or_full",
+          "filled_width_px": 160,
+          "fill_fraction": 1.0,
+          "fill_percent": 100.0,
+          "confidence": "low",
+          "note": "Изменений относительно исходной шкалы не обнаружено; полный ресурс не доказан."
+        },
+        "note": "Визуальная оценка; не прямое чтение внутреннего счётчика игры."
+      }
+    },
+    "restore_brush_30": {
+      "status": "drag_completed_unverified",
+      "requested_value": 30,
+      "finished_at_utc": "2026-10-30T16:08:30+00:00",
+      "note": "Жест перетаскивания к позиции кисти 30 завершён; значение необходимо проверить в игре.",
+      "drag_start": [
+        1267,
+        305
+      ],
+      "drag_target": [
+        1168,
+        305
+      ]
+    }
+  },
+  "interpretation_limits": [
+    "Meter fill is a provisional image estimate, not a direct read of the game's internal resource counter.",
+    "A successful executor report does not prove every stroke was registered by the game.",
+    "Execution status and visual evidence are recorded separately."
+  ]
+}
