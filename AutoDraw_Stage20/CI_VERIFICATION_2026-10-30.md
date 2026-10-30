@@ -67,3 +67,22 @@
 При чтении `source/game_monitor/game_monitor.js` установлено, что `attach()` временно оборачивает методы экземпляра BoardPane, а `stop()` восстанавливает их. Следовательно, Monitor не отправляет команды управления игре, но технически не является полностью пассивным/неинвазивным. До признания его безопасным необходимы проверки восстановления descriptors и сравнение работы игры с Monitor и без него.
 
 План browser smoke test, ограничения и уточнённая формулировка безопасности зафиксированы в `BRUSH_MONITOR_AUTOCAPTURE_DESIGN.md`, раздел 10. Сам тест в Firefox на пользовательском игровом iframe пока не выполнялся; его статус — `not_tested`.
+
+
+## Проверка после документационного HEAD 82d219c — workflow #748
+
+**Commit:** `82d219c46cd975467450e774e284e1e6518a64ee`  
+**Workflow run:** [41115809606 — Run #748](https://github.com/Kiddos19882/AutoDraw/actions/runs/41115809606)  
+**Статус при последней проверке:** `in_progress`, conclusion ещё отсутствует.
+
+| Job | Статус при последней проверке | Результат |
+|---|---|---|
+| executor-tests | completed | success |
+| Windows portable build and startup smoke-test | completed | success |
+| geometry-tests | in_progress | не завершён |
+
+Этот run относится к SHA `82d219c...` и не содержит новый WebSocket smoke server: файлы сервера и workflow-тест были добавлены позже. Нельзя переносить результат #748 на новые коммиты.
+
+## Локальный WebSocket smoke server
+
+Добавлены сервер на loopback, отдельная зависимость `websockets==12.0`, тесты Origin/token/ping-pong и шаг CI на Windows/Python 3.11. Новый workflow запускается на последующих push в рабочую ветку; его результат будет записан отдельной записью после проверки всех jobs. Даже успешный CI не заменяет live Firefox test из пользовательского игрового iframe.
