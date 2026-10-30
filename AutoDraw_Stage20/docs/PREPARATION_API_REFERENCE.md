@@ -293,6 +293,154 @@
 - `brush_behavior_test_ui.build_brush_test_drawing_plan(test_case: str, canvas_size: tuple[int, int]) -> dict[str, Any]`
 - `stage13_workbench.main() -> None` — точка запуска workbench.
 
+
+### 8.1. Методы UI-классов
+
+Сигнатуры ниже отражают объявления исходников. Методы с подчёркиванием в начале имени перечислены для полноты структуры класса; само наличие в справочнике не означает публичную гарантию совместимости.
+
+#### `brush_calibration_ui.py`
+
+- `ScreenPointPicker.__init__(parent: tk.Tk, instruction: str, on_done: Callable[[tuple[int, int] | None], None])`
+- `ScreenPointPicker._screen_size() -> tuple[int, int]`
+- `ScreenPointPicker._motion(self, event) -> None`
+- `ScreenPointPicker._select(self, event) -> None`
+- `ScreenPointPicker._cancel(self, _event=None) -> None`
+- `ScreenRegionPicker.__init__(parent: tk.Tk, instruction: str, on_done: Callable[[dict[str, int] | None], None])`
+- `ScreenRegionPicker._motion(self, event) -> None`
+- `ScreenRegionPicker._start(self, event) -> None`
+- `ScreenRegionPicker._drag(self, event) -> None`
+- `ScreenRegionPicker._finish(self, event) -> None`
+- `ScreenRegionPicker._cancel(self, _event=None) -> None`
+- `BrushCalibrationTab.__init__(root: tk.Tk, parent: tk.Widget, profile_path: str | Path, *, on_profile_saved: Callable[[dict[str, Any]], None] | None = None)`
+- `BrushCalibrationTab.get_experiment_capture_config(self) -> dict[str, Any] | None`
+- `BrushCalibrationTab.get_board_area(self) -> dict[str, int] | None`
+- `BrushCalibrationTab.get_canvas_size(self) -> tuple[int, int] | None`
+- `BrushCalibrationTab.get_brush_control(self) -> dict[str, Any] | None`
+- `BrushCalibrationTab.is_ready(self, brush_value: int | None = None) -> tuple[bool, list[str]]`
+
+Внутренние методы `BrushCalibrationTab`: `_screen_size`, `_load_initial_profile`, `_sync_environment_vars`, `_build`, `_ensure_screen_compatibility`, `_refresh_view`, `_status_label`, `_pick_point`, `_pick_region`, `_reset_point`, `_reset_region`, `_test_point`, `_preview_region`, `_show_region_preview`, `_apply_environment`, `_save`, `_save_as`, `_load_dialog`, `_reset_all`.
+
+#### `brush_behavior_test_ui.py`
+
+- `BrushBehaviorTestTab.__init__(root: tk.Misc, parent: tk.Widget, output_dir: str | Path, area_selector_cls, *, get_canvas_size, get_canvas_area, on_transfer_plan, get_brush_control=None, get_calibration_profile=None, on_brush_ready=None)`
+- `BrushBehaviorTestTab.create_and_transfer_plan(self) -> None`
+- `BrushBehaviorTestTab.select_screenshot_area(self) -> None`
+- `BrushBehaviorTestTab.set_brush_size(self) -> bool`
+- `BrushBehaviorTestTab.cancel_brush_drag(self) -> None`
+- `BrushBehaviorTestTab.capture_screenshot(self) -> None`
+- `BrushBehaviorTestTab.capture_blank_board_reference(self) -> None`
+- `BrushBehaviorTestTab.capture_experiment_phase(self, phase: str) -> None`
+- `BrushBehaviorTestTab.handle_executor_finished(self, summary: dict[str, Any], report_path: str | Path | None) -> bool`
+- `BrushBehaviorTestTab.load_execution_report(self) -> None`
+- `BrushBehaviorTestTab.load_game_monitor_report(self) -> None`
+- `BrushBehaviorTestTab.save_record_dialog(self) -> None`
+
+Внутренние методы класса: `_build`, `_load_brush_control_into_fields`, `_refresh_template`, `_validate_automation_preflight`, `_reset_observation_fields`, `_parse_point`, `_apply_brush_preset_click`, `_start_brush_hotkey_listener`, `_stop_brush_hotkey_listener`, `_start_scheduled_brush_drag`, `_begin_brush_drag`, `_press_and_continue_brush_drag`, `_move_brush_drag_step`, `_on_brush_workflow_stop_key`, `_finish_brush_drag`, `_confirm_brush_before_test`, `_capture_screenshot_now`, `_start_automated_preclear`, `_cancel_automated_preclear`, `_perform_automated_preclear`, `_capture_and_verify_preclear`, `_finish_automated_preclear_failure`, `_blank_board_reference_paths`, `_capture_blank_board_reference_now`, `_capture_experiment_phase_now`, `_cancel_automated_postdraw`, `_start_automated_postdraw`, `_capture_automated_after_draw`, `_capture_automated_after_clear`, `_finish_automated_postdraw`, `_schedule_brush_restore_30`, `_record_brush_restore_result`, `_show_postdraw_completion_notification`, `_write_experiment_manifest`, `_measurement_values`, `_build_record`.
+
+#### `color_scanline_ui.py`
+
+- `_PlanPreview.__init__(parent: tk.Widget, title: str)`
+- `_PlanPreview.set_image(self, image: Image.Image | None) -> None`
+- `_PlanPreview.render(self) -> None`
+- `ColorScanlineTab.__init__(root: tk.Misc, parent: tk.Widget, output_dir: str | Path, get_quantized_data: Callable[[], dict[str, Any] | None])`
+- `ColorScanlineTab.invalidate_source(self, reason: str) -> None`
+- `ColorScanlineTab.use_latest_quantization(self) -> None`
+- `ColorScanlineTab.build_plan(self) -> None`
+- `ColorScanlineTab.build_geometry_plan(self) -> None`
+- `ColorScanlineTab.fit_geometry_to_paint_budget(self) -> None`
+- `ColorScanlineTab.split_geometry_to_boards_dialog(self) -> None`
+- `ColorScanlineTab.fit_to_paint_budget(self) -> None`
+- `ColorScanlineTab.save_brush_plan_dialog(self) -> None`
+- `ColorScanlineTab.build_brush_recommendations(self) -> None`
+- `ColorScanlineTab.reset_paint_model(self) -> None`
+- `ColorScanlineTab.recalculate_paint_estimate(self) -> None`
+- `ColorScanlineTab.save_plan_dialog(self) -> None`
+- `ColorScanlineTab.open_plan_dialog(self) -> None`
+
+Внутренние методы класса: `_display_built_plan`, `_display_geometry_plan`, `_parse_model_number`, `_format_paint_estimate`, `_populate_table`.
+
+#### `palette_detection_ui.py`
+
+- `map_display_rect_to_image(rect: tuple[float, float, float, float], *, source_size: tuple[int, int], display_size: tuple[int, int], offset: tuple[float, float] = (0.0, 0.0)) -> tuple[int, int, int, int]`
+- `ScreenRegionPicker.__init__(root: tk.Misc, screenshot: Image.Image, on_selected: Callable[[tuple[int, int, int, int]], None])`
+- `PaletteDetectionTab.__init__(root: tk.Misc, parent: tk.Widget, store_dir: str | Path)`
+- `PaletteDetectionTab.request_screenshot(self) -> None`
+- `PaletteDetectionTab.choose_region(self) -> None`
+- `PaletteDetectionTab.auto_detect(self) -> None`
+- `PaletteDetectionTab.edit_selected_hex(self) -> None`
+- `PaletteDetectionTab.edit_selected_name(self) -> None`
+- `PaletteDetectionTab.confirm_selected_color(self) -> None`
+- `PaletteDetectionTab.confirm_all_colors(self) -> None`
+- `PaletteDetectionTab.remove_selected(self) -> None`
+- `PaletteDetectionTab.clear_colors(self) -> None`
+- `PaletteDetectionTab.save_profile_dialog(self) -> None`
+- `PaletteDetectionTab.load_profile_dialog(self) -> None`
+- `PaletteDetectionTab.refresh_saved_profiles(self) -> None`
+- `PaletteDetectionTab.load_selected_profile(self) -> None`
+- `PaletteDetectionTab.delete_selected_profile(self) -> None`
+- `PaletteDetectionTab.check_calibration(self) -> None`
+- `PaletteDetectionTab.save_dialog(self) -> None`
+- `PaletteDetectionTab.load_dialog(self) -> None`
+
+Остальные методы классов `ScreenRegionPicker` и `PaletteDetectionTab` — внутренние обработчики выбора области, рендеринга, таблицы, профиля и скриншота: `_render`, `_clamp_canvas`, `_press`, `_drag`, `_release`, `_accept`, `_capture_screenshot`, `_open_region_picker`, `_apply_selected_region`, `_schedule_preview_render`, `_render_preview`, `_on_preview_click`, `_refresh_table`, `_selected_index`, `_ensure_palette_limit`, `_current_palette_document`, `_make_current_profile`, `_install_profile`, `_get_current_screen_size`, `_capture_calibration_screenshot`.
+
+#### `palette_quantization_ui.py`
+
+- `_PreviewPanel.__init__(parent: tk.Widget, title: str)`
+- `_PreviewPanel.set_image(self, image: Image.Image | None) -> None`
+- `_PreviewPanel.render(self) -> None`
+- `PaletteQuantizationTab.__init__(root: tk.Misc, parent: tk.Widget, profile_dir: str | Path, output_dir: str | Path, get_prepared_image: Callable[[], Image.Image | None] | None = None)`
+- `PaletteQuantizationTab.set_target_canvas_size(self, width: int, height: int) -> None`
+- `PaletteQuantizationTab.refresh_profiles(self) -> None`
+- `PaletteQuantizationTab.load_selected_profile(self) -> bool`
+- `PaletteQuantizationTab.load_profile_file_dialog(self) -> None`
+- `PaletteQuantizationTab.open_image_dialog(self) -> None`
+- `PaletteQuantizationTab.use_prepared_image(self) -> None`
+- `PaletteQuantizationTab.quantize(self) -> None`
+- `PaletteQuantizationTab.save_image_dialog(self) -> None`
+- `PaletteQuantizationTab.save_report_dialog(self) -> None`
+
+Внутренние методы класса: `_update_scroll_region`, `_resize_scroll_content`, `_widget_is_in_scroll_content`, `_on_mousewheel`, `_on_mousewheel_linux`, `_set_background_mode`, `_toggle_background_tolerance`, `_toggle_rare_color_controls`, `_toggle_short_run_controls`, `_on_profile_selected`, `_read_profile`, `_format_palette_info`, `_set_source_image`, `_difference_preview`, `_populate_color_table`.
+
+#### `paint_limit_test_ui.py`
+
+- `PaintLimitTestTab.__init__(root: tk.Misc, parent: tk.Widget, output_dir: str | Path, profile_dir: str | Path, *, get_canvas_size: Callable[[], tuple[int, int] | None], on_transfer_plan: Callable[[dict[str, Any], dict[str, Any], Path], bool])`
+- `PaintLimitTestTab.load_profile_dialog(self) -> None`
+- `PaintLimitTestTab.set_profile(self, profile: dict[str, Any], path: Path | None = None) -> None`
+- `PaintLimitTestTab.generate_plan(self) -> None`
+- `PaintLimitTestTab.transfer_plan(self) -> None`
+- `PaintLimitTestTab.new_experiment(self) -> None`
+- `PaintLimitTestTab.record_observation(self) -> None`
+
+Внутренние методы класса: `_bind_scroll_events`, `_on_mousewheel`, `_get_scenario_id`, `_on_outcome_changed`, `_render_preview`.
+
+#### `stage13_workbench.py`
+
+- `ImagePreview.__init__(parent, title: str, *, selectable: bool = False, on_selection=None)`
+- `ImagePreview.set_image(self, image: Image.Image | None) -> None`
+- `ImagePreview.set_selection(self, selection: tuple[int, int, int, int] | None) -> None`
+- `AutoDrawWorkbench.__init__(root: tk.Tk, parent: tk.Widget | None = None, *, embedded: bool = False, on_select_canvas_area: Callable[[], None] | None = None)`
+- `AutoDrawWorkbench.set_target_area(self, area: dict | Any, screen_size: tuple[int, int] | None = None) -> None`
+- `AutoDrawWorkbench.cleanup(self) -> None`
+- `main() -> None`
+
+Внутренние методы `ImagePreview`: `_draw`, `_canvas_to_image`, `_on_press`, `_on_drag`, `_on_release`.
+
+Внутренние методы `AutoDrawWorkbench`: `_build_ui`, `_build_image_tab`, `_build_plan_tab`, `_build_quality_tab`, `_build_project_tab`, `_build_profile_tab`, `_profile_entry_row`, `_profile_combo_row`, `_refresh_profile_combo`, `_on_profile_selected`, `_load_profile_into_form`, `_profile_from_form`, `_new_profile_from_current`, `_save_profile_from_form`, `_apply_profile_to_workbench`, `_delete_selected_profile`, `_import_profile`, `_export_profile`, `_export_canvas_profile`, `_export_stage6_target_profile`, `_export_stage6_settings`, `_set_project_details`, `_request_target_area`, `_load_image`, `_load_profile`, `_on_crop_selected`, `_reset_crop`, `_current_settings`, `_on_setting_changed`, `_on_threshold_mode_changed`, `_schedule_processing`, `_process_now`, `_build_plan`, `_check_quality`, `_safe_save_dialog`, `_save_plan_json`, `_save_quality_report`, `_processing_metadata`, `_prepare_project_files`, `_save_project`, `_open_project`, `_export_stage6_json`, `_save_processing_bundle`, `_clear_quality_previews`, `_on_close`.
+
+### 8.2. События и callback-точки интеграции
+
+В конструкторах UI-компонентов передаются следующие внешние зависимости:
+
+- `BrushCalibrationTab`: `on_profile_saved` — callback с документом профиля `dict[str, Any]`.
+- `BrushBehaviorTestTab`: `area_selector_cls`, `get_canvas_size`, `get_canvas_area`, `on_transfer_plan`, необязательные `get_brush_control`, `get_calibration_profile`, `on_brush_ready`.
+- `ColorScanlineTab`: `get_quantized_data` — callback, возвращающий документ квантованных данных или `None`.
+- `PaintLimitTestTab`: `get_canvas_size` и `on_transfer_plan` — callbacks размера холста и передачи плана.
+- `PaletteQuantizationTab`: необязательный `get_prepared_image`.
+- `AutoDrawWorkbench`: `on_select_canvas_area` — необязательный callback запроса выбора области холста.
+
+Обработчики событий Tkinter/ttk, привязанные внутри классов, остаются деталями реализации UI. Внешние callback-параметры выше перечислены как явные зависимости конструкторов.
+
 ## 9. Утилиты предыдущих этапов
 
 ### `stage8_optimizer.py`
@@ -326,7 +474,7 @@
 
 ## 11. Пробелы в детализации
 
-Этот документ фиксирует API-контуры, но не заменяет полные Python type stubs. Для функций, у которых в перечне после параметров всё ещё стоит `...`, полная сигнатура должна быть взята непосредственно из исходника при интеграции. Для классов UI публичные методы и события отдельно не инвентаризированы.
+Этот документ фиксирует API-контуры, но не заменяет полные Python type stubs. Для функций, у которых в перечне после параметров всё ещё стоит `...`, полная сигнатура должна быть взята непосредственно из исходника при интеграции. Для UI-классов ниже приведён перечень методов и конструкторов по объявлениям исходников. События Tkinter и callback-привязки рассматриваются как внутренние точки интеграции, а не отдельный стабильный API.
 
 Следующие отдельные документы должны раскрыть структуры сохранённых данных и связи компонентов:
 
