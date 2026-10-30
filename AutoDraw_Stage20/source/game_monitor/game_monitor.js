@@ -20,6 +20,8 @@
     strokeSequence: 0,
     activeStrokeId: null,
     lastPointCount: null,
+    lastSampleSignature: null,
+    strokePollTimer: null,
     startedAt: null,
     errors: []
   };
@@ -119,8 +121,9 @@
     const queue = [{ node: root, depth: 0 }];
     const seen = new WeakSet();
     let visited = 0;
-    while (queue.length && visited < MAX_SCAN_NODES) {
-      const { node, depth } = queue.shift();
+    let queueIndex = 0;
+    while (queueIndex < queue.length && visited < MAX_SCAN_NODES) {
+      const { node, depth } = queue[queueIndex++];
       if (!node || typeof node !== "object" || seen.has(node)) continue;
       seen.add(node);
       visited++;
@@ -137,6 +140,32 @@
       }
     }
     return null;
+  }
+
+  function sampleActiveStroke(source) {
+    if (!state.active || !state.board || !state.activeStrokeId) return;
+    const snapshot = boardSnapshot(state.board);
+    const signature = JSON.stringify([snapshot.pointCount, snapshot.lastPoint]);
+    if (signature === state.lastSampleSignature) return;
+    const previous = state.lastSampleSignature;
+    state.lastSampleSignature = signature;
+    emit("DRAW_SAMPLE", { source, previousSignature: previous, after: snapshot });
+  }
+
+  function startStrokePolling() {
+    if (state.strokePollTimer !== null) window.clearInterval(state.strokePollTimer);
+    state.lastSampleSignature = null;
+    sampleActiveStroke("onDrawStart");
+    // onDrawing may already have been registered as a bound Egret listener
+    // before this snippet wraps the instance method. Poll only during a stroke
+    // so we still observe atom.points without replacing the registered callback.
+    state.strokePollTimer = window.setInterval(() => sampleActiveStroke("state_poll"), 25);
+  }
+
+  function stopStrokePolling() {
+    if (state.strokePollTimer !== null) window.clearInterval(state.strokePollTimer);
+    state.strokePollTimer = null;
+    sampleActiveStroke("stroke_end");
   }
 
   function wrapMethod(board, name) {
@@ -165,12 +194,12 @@
 
       const after = boardSnapshot(board);
       if (name === "onDrawing") {
-        if (before.pointCount !== after.pointCount || before.lastPoint?.[0] !== after.lastPoint?.[0] || before.lastPoint?.[1] !== after.lastPoint?.[1]) {
-          emit("DRAW_SAMPLE", { before, after });
-        }
+        sampleActiveStroke("onDrawing_wrapper");
       } else if (name === "onDrawStart") {
         emit("DRAW_START_APPLIED", { before, after });
+        startStrokePolling();
       } else if (name === "onDrawingEnd") {
+        stopStrokePolling();
         emit("DRAW_END", { before, after });
         state.activeStrokeId = null;
       } else if (name === "setRadius") {
@@ -257,6 +286,7 @@
   function stop() {
     if (state.scanTimer !== null) window.clearInterval(state.scanTimer);
     state.scanTimer = null;
+    stopStrokePolling();
     if (state.networkObserver) state.networkObserver.disconnect();
     state.networkObserver = null;
     detach();
