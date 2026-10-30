@@ -1492,6 +1492,10 @@ Read-only просмотр текущих исходников и докумен
 **MON-06 — сетевые события могут быть шире одного эксперимента.**  
 `PerformanceObserver.observe({type:"resource", buffered:true})` может передать ранее буферизованные ресурсы страницы. Поэтому `NETWORK_RESOURCE` не следует автоматически считать запросом текущего штриха. Функция `safeUrl()` маскирует значения некоторых query-параметров по имени, но не гарантирует удаление секретов, встроенных в path или параметры с неизвестными именами. Не использовать этот поток как полный сетевой аудит.
 
+**MON-07 — CI не проверяет поведение Game Monitor.**  
+В `.github/workflows/geometry-tests.yml` для `game_monitor.js` выполняется только `node --check`. Отдельные unit/integration tests относятся к Python WebSocket smoke server; тестов JavaScript attach/detach, event ordering, point counting, export и overhead в найденном наборе нет. Успешный JS syntax check не подтверждает корректность жизненного цикла Monitor.
+
+
 ## 7.3. WebSocket smoke server и границы bridge
 
 Проверены `source/game_monitor/websocket_smoke_server.py` и `tests/test_websocket_smoke_server.py`.
