@@ -2,7 +2,7 @@
 
 **Актуальность:** 30 октября 2026 г.  
 **Рабочая ветка:** `feature/image-geometry-optimization` (изменения в `master` запрещены).  
-**Последний полный успешный CI по текущему коду перед этим обновлением документации:** [run 40879732588 — SUCCESS](https://github.com/Kiddos19882/AutoDraw/actions/runs/40879732588), HEAD `2e581ecea01c6d6784e1fdba9dafc182d1a18c9e`: 445 тестов подготовки/геометрии прошли, UI regressions — 28 passed / 1 skipped, executor tests и Windows portable build/startup smoke-test прошли.
+**Последний полный успешный CI для исправленного кода:** [run 41114306121 — SUCCESS](https://github.com/Kiddos19882/AutoDraw/actions/runs/41114306121), коммит `2d662503caedd995afc54fea7b493e072974a828`; `geometry-tests`, `executor-tests` и `Windows portable build and startup smoke-test` завершились `completed/success`. Два UI-теста preflight были исправлены добавлением ожидаемого ввода фактического радиуса; production-проверка не ослаблялась.
 **Последний подтверждённый успешный CI до новой функции:** [запуск 40778291002 — SUCCESS](https://github.com/Kiddos19882/AutoDraw/actions/runs/40778291002) на коммите `54528a12270018c56919b2316d86e0b2ba8161ab`. Для новой функции снимков запуски [40782370399](https://github.com/Kiddos19882/AutoDraw/actions/runs/40782370399), [40782423542](https://github.com/Kiddos19882/AutoDraw/actions/runs/40782423542) и [40782603672](https://github.com/Kiddos19882/AutoDraw/actions/runs/40782603672) завершились до старта шагов: у всех задач `runner_id=0`, список шагов пуст, логи недоступны. Поэтому это не подтверждение прохождения или провала тестов кода; текущая реализация ожидает полноценного запуска CI. Последняя проверка: коммит `09db5dd9bfc3877f486a4a1ac0d53d571a43a3b1`.
 
 ## Актуальные результаты лаборатории кистей — 30 октября 2026 г.
@@ -16,6 +16,8 @@
 Этот документ заменяет разрозненные Markdown-описания этапов, палитры, калибровки, поведения кистей и тестирования. Сведения сверены с деревом репозитория, исходниками, тестами, JSON-отчётом калибровки и конкретным запуском GitHub Actions. Если наблюдение ещё не доказано на настоящем игровом холсте, оно помечено как оценка или незавершённая проверка.
 
 ## 1. Текущее состояние и правила работы
+
+Актуальная последовательность задач, статусы и критерии приёмки собраны в [MASTER_ROADMAP.md](MASTER_ROADMAP.md). Для Game Monitor ↔ AutoDraw использовать [BRUSH_MONITOR_AUTOCAPTURE_DESIGN.md](BRUSH_MONITOR_AUTOCAPTURE_DESIGN.md); loopback WebSocket из Firefox iframe пока не проверен на реальном браузере.
 
 - Рабочая и основная для текущей разработки ветка — feature/image-geometry-optimization. Изменения в master не вносить.
 - Последний подтверждённый CI: [40772190918](https://github.com/Kiddos19882/AutoDraw/actions/runs/40772190918), SUCCESS на коммите `e8f9d446cc2a66e8746c928f955471784c5649c8`.
@@ -1512,3 +1514,10 @@ JSON должен сохраняться как artifact `outline-first-fill-com
 - структурного рефакторинга и безопасного допуска проверенных маршрутов к исполнителю.
 
 Специализированные планы и аудиты сохраняются как подробные источники. `MASTER_ROADMAP.md` — единая точка входа и список всех открытых задач. Временный `TEMP_PLAN_OUTLINE_FIRST_FILL.md` не удалять до выполнения всех его пунктов. Текущий запрет `safe_to_execute=false` сохраняется; планирование и CI не заменяют живые игровые проверки.
+
+
+## 28. Уточнение по безопасности Game Monitor — 30.10.2026
+
+Аудит `source/game_monitor/game_monitor.js` показал: `attach()` временно оборачивает методы экземпляра BoardPane, а `stop()` пытается восстановить исходные descriptors. Monitor не получает команд управления игрой, но это технически не полностью пассивный наблюдатель. До проверки восстановления методов, повторных start/stop и влияния на тайминги/FPS не считать его неинвазивным.
+
+Автоматическая интеграция через bridge не реализована. Firefox smoke test из игрового HTTPS iframe к локальному WebSocket endpoint ещё не выполнен. CI Windows portable build не заменяет этот браузерный тест. Подробности и сценарий — в `BRUSH_MONITOR_AUTOCAPTURE_DESIGN.md`, раздел 10.
