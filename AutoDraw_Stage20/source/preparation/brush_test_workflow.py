@@ -69,6 +69,41 @@ def calculate_slider_target(
     return round(sx + (ex - sx) * ratio), round(sy + (ey - sy) * ratio)
 
 
+
+def validate_observed_brush_radius(
+    requested_brush: int,
+    observed_radii: object,
+) -> dict[str, Any]:
+    """Fail closed unless a pre-draw Game Monitor snapshot confirms one exact radius."""
+    if isinstance(requested_brush, bool) or not isinstance(requested_brush, int) or not 1 <= requested_brush <= 30:
+        raise ValueError("Размер кисти должен быть целым числом от 1 до 30.")
+    values = observed_radii
+    if isinstance(values, str):
+        import json
+        try:
+            values = json.loads(values.strip())
+        except (TypeError, ValueError):
+            return {"valid": False, "status": "unavailable", "observed_radii": []}
+    if isinstance(values, bool):
+        values = None
+    elif isinstance(values, (int, float)):
+        values = [values]
+    if not isinstance(values, (list, tuple)) or not values:
+        return {"valid": False, "status": "unavailable", "observed_radii": []}
+    radii: set[int] = set()
+    for value in values:
+        if isinstance(value, bool) or not isinstance(value, (int, float)) or int(value) != value or not 1 <= int(value) <= 30:
+            return {"valid": False, "status": "unavailable", "observed_radii": []}
+        radii.add(int(value))
+    observed = sorted(radii)
+    if observed == [requested_brush]:
+        return {"valid": True, "status": "match", "observed_radii": observed}
+    return {
+        "valid": False,
+        "status": "mixed" if requested_brush in observed else "mismatch",
+        "observed_radii": observed,
+    }
+
 def validate_brush_test_preflight(
     profile: dict[str, Any] | None,
     screen_size: tuple[int, int],
