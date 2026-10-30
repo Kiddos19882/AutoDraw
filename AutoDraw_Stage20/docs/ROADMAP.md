@@ -20,7 +20,7 @@
 - [x] Создать структурный справочник модулей preparation, executor и Game Monitor.
 - [x] Документировать общие геометрические модели.
 - [x] Завершить инвентаризацию интерфейсов всех 40 модулей preparation в [PREPARATION_API_REFERENCE.md](PREPARATION_API_REFERENCE.md).
-- [ ] Завершить справочник интерфейсов executor: создан [EXECUTOR_API_REFERENCE.md](EXECUTOR_API_REFERENCE.md), остаётся сверка экспортов и оставшихся модулей.
+- [x] Завершить справочник интерфейсов всех 13 модулей executor в [EXECUTOR_API_REFERENCE.md](EXECUTOR_API_REFERENCE.md).
 - [x] Свести UI и интеграционные точки компонентов в [UI_INTEGRATION_MAP.md](UI_INTEGRATION_MAP.md).
 - [ ] Составить карту импортов и точек входа.
 
