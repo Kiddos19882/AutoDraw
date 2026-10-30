@@ -289,7 +289,7 @@
 
 - `palette_detection_ui.map_display_rect_to_image(rect, *, source_size, display_size, offset=(0.0, 0.0)) -> tuple[int, int, int, int]`
 - `brush_behavior_test_ui.summarize_game_monitor_report(document, requested_brush_value=None) -> dict[str, Any]`
-- `brush_behavior_test_ui.build_brush_test_record(*, brush_value, test_case, ... ) -> dict[str, Any]`
+- `brush_behavior_test_ui.build_brush_test_record(*, brush_value: int, test_case: str, canvas_area: dict[str, int] | None = None, screen_area: dict[str, int] | None = None, screenshot_path: str | None = None, drawing_plan_path: str | None = None, drawing_plan: dict[str, Any] | None = None, execution_report_path: str | None = None, execution_report: dict[str, Any] | None = None, measurements: dict[str, Any] | None = None, notes: str = "", outcome: str = "not_reviewed", screen_resolution: dict[str, int] | None = None, brush_control: dict[str, Any] | None = None, game_monitor_report_path: str | None = None, game_monitor_summary: dict[str, Any] | None = None) -> dict[str, Any]`
 - `brush_behavior_test_ui.build_brush_test_drawing_plan(test_case: str, canvas_size: tuple[int, int]) -> dict[str, Any]`
 - `stage13_workbench.main() -> None` — точка запуска workbench.
 
@@ -322,7 +322,7 @@
 
 #### `brush_behavior_test_ui.py`
 
-- `BrushBehaviorTestTab.__init__(root: tk.Misc, parent: tk.Widget, output_dir: str | Path, area_selector_cls, *, get_canvas_size, get_canvas_area, on_transfer_plan, get_brush_control=None, get_calibration_profile=None, on_brush_ready=None)`
+- `BrushBehaviorTestTab.__init__(self, root: tk.Misc, parent: tk.Widget, output_dir: str | Path, area_selector_cls, *, get_canvas_size, get_canvas_area, on_transfer_plan, get_brush_control=None, get_calibration_profile=None, on_brush_ready=None)`
 - `BrushBehaviorTestTab.create_and_transfer_plan(self) -> None`
 - `BrushBehaviorTestTab.select_screenshot_area(self) -> None`
 - `BrushBehaviorTestTab.set_brush_size(self) -> bool`
@@ -416,10 +416,10 @@
 
 #### `stage13_workbench.py`
 
-- `ImagePreview.__init__(parent, title: str, *, selectable: bool = False, on_selection=None)`
+- `ImagePreview.__init__(self, parent, title: str, *, selectable: bool = False, on_selection=None)`
 - `ImagePreview.set_image(self, image: Image.Image | None) -> None`
 - `ImagePreview.set_selection(self, selection: tuple[int, int, int, int] | None) -> None`
-- `AutoDrawWorkbench.__init__(root: tk.Tk, parent: tk.Widget | None = None, *, embedded: bool = False, on_select_canvas_area: Callable[[], None] | None = None)`
+- `AutoDrawWorkbench.__init__(self, root: tk.Tk, parent: tk.Widget | None = None, *, embedded: bool = False, on_select_canvas_area: Callable[[], None] | None = None)`
 - `AutoDrawWorkbench.set_target_area(self, area: dict | Any, screen_size: tuple[int, int] | None = None) -> None`
 - `AutoDrawWorkbench.cleanup(self) -> None`
 - `main() -> None`
@@ -474,14 +474,9 @@
 
 ## 11. Пробелы в детализации
 
-Этот документ фиксирует API-контуры, но не заменяет полные Python type stubs. Для функций, у которых в перечне после параметров всё ещё стоит `...`, полная сигнатура должна быть взята непосредственно из исходника при интеграции. Для UI-классов ниже приведён перечень методов и конструкторов по объявлениям исходников. События Tkinter и callback-привязки рассматриваются как внутренние точки интеграции, а не отдельный стабильный API.
+Сигнатуры приводятся в пределах аннотаций, фактически присутствующих в исходниках. Если в исходнике параметры не аннотированы, справочник не добавляет предполагаемые типы. Для UI-классов перечислены объявления методов и конструкторов; внутренние методы приведены для структурной навигации и не объявляются стабильным публичным контрактом. События Tkinter и callback-привязки, создаваемые внутри классов, не перечисляются как отдельный API.
 
-Следующие отдельные документы должны раскрыть структуры сохранённых данных и связи компонентов:
-
-- профили палитры, кисти, рабочей области и калибровки;
-- JSON-планы scanline, geometry и adaptive brush;
-- manifest разбиения на доски и записи экспериментов;
-- карта импортов и точки подключения UI.
+Структуры профилей, цветных планов, лабораторных записей и калибровочных отчётов вынесены в [DATA_FORMATS_AND_PROFILES.md](DATA_FORMATS_AND_PROFILES.md). Оставшиеся отдельные задачи — общая карта импортов и точек подключения UI.
 
 ## 12. Границы документирования
 
