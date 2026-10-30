@@ -8,7 +8,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 import tkinter as tk
-from tkinter import filedialog, messagebox, ttk
+from tkinter import filedialog, messagebox, simpledialog, ttk
 from typing import Any
 
 import pyautogui
@@ -17,7 +17,8 @@ from pynput import keyboard
 
 from stage8_optimizer import save_plan
 from brush_test_workflow import (
-    calculate_slider_target, validate_brush_test_preflight, should_run_postdraw_workflow,
+    calculate_slider_target, validate_brush_test_preflight, validate_observed_brush_radius,
+    should_run_postdraw_workflow,
 )
 from brush_experiment_capture import (
     compare_images, crop_calibrated_regions,
@@ -904,14 +905,52 @@ class BrushBehaviorTestTab:
             pass
 
         try:
+            monitor_radius_text = simpledialog.askstring(
+                "Проверка фактической кисти",
+                (
+                    "До начала рисования проверь внутреннее значение игры.\n\n"
+                    "1. Переключись в игровой iframe и выполни в консоли:\n"
+                    "   AutoDrawGameMonitor.status().snapshot.radius\n"
+                    "2. Вставь сюда полученное значение целиком (например, 14 или [14]).\n\n"
+                    f"Запрошенный радиус AutoDraw: {brush}. "
+                    "Пустой ответ или несовпадение отменит тест."
+                ),
+                parent=self.root,
+            )
+            verification = validate_observed_brush_radius(brush, monitor_radius_text)
+            phase["monitor_preflight"] = {
+                **verification,
+                "checked_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                "source": "user_transcribed_AutoDrawGameMonitor.status_snapshot_radius",
+            }
+            if not verification["valid"]:
+                phase["status"] = "brush_mismatch" if verification["status"] in {"mismatch", "mixed"} else "brush_unverified"
+                phase["observed_radii"] = verification["observed_radii"]
+                phase["confirmation_method"] = "game_monitor_pre_draw_snapshot"
+                if self.experiment_dir is not None:
+                    try:
+                        self._write_experiment_manifest()
+                    except (OSError, ValueError, TypeError) as exc:
+                        phase["manifest_write_error"] = str(exc)
+                self.status_var.set(
+                    f"Тест отменён: запрошено {brush}, фактическое значение не подтверждено "
+                    f"(Monitor: {verification['observed_radii'] or 'нет данных'})."
+                )
+                messagebox.showwarning(
+                    "Проверка кисти не пройдена",
+                    "Исполнитель не запущен. Проверь ползунок и повтори установку кисти.",
+                    parent=self.root,
+                )
+                return
+            phase["monitor_preflight"]["status"] = "match"
+            if self.experiment_dir is not None:
+                self._write_experiment_manifest()
             confirmed = messagebox.askyesno(
                 "Подтвердить положение кисти",
                 (
-                    f"AutoDraw перетащил ползунок к запрошенному размеру {brush}, "
-                    f"координаты цели: {target}.\n\n"
-                    "Переключись в браузер (Alt+Tab) и визуально проверь, что ползунок "
-                    "действительно находится в ожидаемой позиции. Нажимай «Да» только после проверки.\n\n"
-                    "При ответе «Нет» тестовое рисование не начнётся."
+                    f"Game Monitor подтвердил внутренний радиус {brush}.\n"
+                    f"Целевая координата ползунка: {target}.\n\n"
+                    "Теперь визуально проверь положение ползунка. Продолжать тест?"
                 ),
                 icon="question",
                 parent=self.root,
