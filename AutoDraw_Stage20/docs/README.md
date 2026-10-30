@@ -17,7 +17,8 @@
 | [MODULE_REFERENCE.md](MODULE_REFERENCE.md) | Структурный справочник модулей preparation, executor и Game Monitor |
 | [PREPARATION_API_REFERENCE.md](PREPARATION_API_REFERENCE.md) | Справочник интерфейсов модулей preparation |
 | [EXECUTOR_API_REFERENCE.md](EXECUTOR_API_REFERENCE.md) | Справочник интерфейсов Stage 1–6, MouseExecutor, цветного исполнения и моделей |
-| [DEPENDENCY_MAP.md](DEPENDENCY_MAP.md) | Карта прямых импортов, слоёв зависимостей и общих адаптеров |
+| [DEPENDENCY_MAP.md](DEPENDENCY_MAP.md) | Карта прямых импортов production-модулей и общих адаптеров |
+| [TESTS_AND_CI_MAP.md](TESTS_AND_CI_MAP.md) | Тестовые наборы, диагностические скрипты, benchmark и GitHub Actions |
 | [UI_INTEGRATION_MAP.md](UI_INTEGRATION_MAP.md) | Карта восьми вкладок, callback-связей и передачи данных в executor |
 | [DATA_FORMATS_AND_MODELS.md](DATA_FORMATS_AND_MODELS.md) | Общие модели DrawingPlan, Stroke, Point и формат .autodraw |
 | [DATA_FORMATS_AND_PROFILES.md](DATA_FORMATS_AND_PROFILES.md) | Профили, палитры, планы, лабораторные и калибровочные результаты, экспорт Game Monitor |
