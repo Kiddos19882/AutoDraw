@@ -54,7 +54,7 @@
 - [x] Справочник интерфейсов executor: EXECUTOR_API_REFERENCE.md (13 модулей из MODULE_REFERENCE).
 - [x] Каталог пользовательских файлов и каталогов: FILE_STORAGE_CATALOG.md; пути и шаблоны сверены с integrated_app.py и владельцами форматов.
 - [x] Карта UI и внешних callback-интерфейсов: UI_INTEGRATION_MAP.md.
-- [ ] Карта импортов: DEPENDENCY_MAP.md содержит полную матрицу production-модулей (40 preparation + 13 executor); отдельно остаются тестовые и вспомогательные скрипты.
+- [ ] Карта импортов: production-модули (40 preparation + 13 executor) внесены в DEPENDENCY_MAP.md; TESTS_AND_CI_MAP.md описывает подтверждённые тестовые наборы и CI; полная матрица импортов каждого тестового файла ещё не готова.
 - [ ] Финальная проверка ссылок, путей и полноты документации.
 
 ## 6. Границы достоверности
