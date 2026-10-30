@@ -8,6 +8,7 @@ on:
     paths:
       - "AutoDraw_Stage20/source/preparation/**"
       - "AutoDraw_Stage20/source/executor/**"
+      - "AutoDraw_Stage20/source/game_monitor/**"
       - "AutoDraw_Stage20/integrated_app.py"
       - "AutoDraw_Stage20/tests/**"
       - "AutoDraw_Stage20/data/calibration/**"
