@@ -144,6 +144,7 @@ def build_brush_test_record(
     execution_report_path: str | None = None, execution_report: dict[str, Any] | None = None,
     measurements: dict[str, Any] | None = None, notes: str = "", outcome: str = "not_reviewed",
     screen_resolution: dict[str, int] | None = None, brush_control: dict[str, Any] | None = None,
+    game_monitor_report_path: str | None = None, game_monitor_summary: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build a versioned, portable observation record for later brush-model fitting."""
     if isinstance(brush_value, bool) or not isinstance(brush_value, int) or not 1 <= brush_value <= 30:
@@ -169,6 +170,8 @@ def build_brush_test_record(
         "drawing_plan": drawing_plan,
         "execution_report_path": execution_report_path,
         "execution_report": execution_report,
+        "game_monitor_report_path": game_monitor_report_path,
+        "game_monitor_summary": game_monitor_summary,
         "outcome": outcome,
         "notes": notes.strip(),
         "planned_strokes": scenario["strokes"],
@@ -279,6 +282,8 @@ class BrushBehaviorTestTab:
         self.screenshot_path: Path | None = None
         self.execution_report_path: Path | None = None
         self.execution_report: dict[str, Any] | None = None
+        self.game_monitor_report_path: Path | None = None
+        self.game_monitor_summary: dict[str, Any] | None = None
         self.last_record_path: Path | None = None
         self.brush_var = tk.StringVar(value="7")
         self.case_var = tk.StringVar(value=next(iter(TEST_CASES)))
@@ -334,6 +339,7 @@ class BrushBehaviorTestTab:
         ttk.Button(actions, text="Снять скриншот сейчас", command=self.capture_screenshot).pack(side="left", padx=(6, 0))
         ttk.Button(actions, text="Сохранить эталон пустой доски…", command=self.capture_blank_board_reference).pack(side="left", padx=(6, 0))
         ttk.Button(actions, text="Привязать отчёт исполнения…", command=self.load_execution_report).pack(side="left", padx=(6, 0))
+        ttk.Button(actions, text="Привязать Game Monitor JSON…", command=self.load_game_monitor_report).pack(side="left", padx=(6, 0))
         ttk.Button(actions, text="Эксперимент: снимок ДО", command=lambda: self.capture_experiment_phase("before_draw")).pack(side="left", padx=(6, 0))
         ttk.Button(actions, text="Эксперимент: ПОСЛЕ рисования", command=lambda: self.capture_experiment_phase("after_draw")).pack(side="left", padx=(6, 0))
         ttk.Button(actions, text="Очистить и снять ПОСЛЕ", command=lambda: self.capture_experiment_phase("after_clear")).pack(side="left", padx=(6, 0))
@@ -411,8 +417,9 @@ class BrushBehaviorTestTab:
         lines = [scenario["description"], "", "Координаты тестового шаблона (локальные координаты выбранной тестовой области):"]
         for stroke in scenario["strokes"]:
             points = stroke["points"]
-            lines.append(f"• {stroke['name']}: ({points[0][0]}, {points[0][1]}) → ({points[1][0]}, {points[1][1]})")
-        lines.extend(["", "Рекомендации:", "1. Выполняй каждый штрих отдельно и не соединяй соседние линии.",
+            route = " → ".join(f"({point[0]}, {point[1]})" for point in points)
+            lines.append(f"• {stroke['name']}: {route}")
+        lines.extend(["", "Рекомендации:", "1. Каждый элемент списка — отдельный штрих; точки внутри него образуют один непрерывный маршрут.",
                       "2. Не меняй масштаб браузера и размер кисти в середине серии.",
                       "3. Запиши размер кисти, видимые/пропущенные штрихи и остаток краски в заметках или заполни measurement_fields в JSON.",
                       "4. Снимок должен включать всю тестовую область и не закрывать её окнами приложения."])
@@ -494,6 +501,8 @@ class BrushBehaviorTestTab:
         self.experiment_phases = {}
         self.execution_report_path = None
         self.execution_report = None
+        self.game_monitor_report_path = None
+        self.game_monitor_summary = None
         self.brush_slider_start = None
         self.brush_slider_end = None
         self.outcome_var.set("not_reviewed")
@@ -1958,6 +1967,50 @@ class BrushBehaviorTestTab:
         self.execution_report = document
         self.status_var.set(f"Отчёт исполнения привязан к тесту: {self.execution_report_path}")
 
+    def load_game_monitor_report(self) -> None:
+        """Attach a passive Game Monitor JSON report and extract only verifiable telemetry."""
+        path = filedialog.askopenfilename(
+            parent=self.root,
+            title="Выбери JSON-отчёт Game Monitor",
+            initialdir=str(self.output_dir.parent),
+            filetypes=(("JSON", "*.json"), ("Все файлы", "*.*")),
+        )
+        if not path:
+            return
+        try:
+            document = json.loads(Path(path).read_text(encoding="utf-8"))
+            if not isinstance(document, dict):
+                raise ValueError("Отчёт Monitor должен содержать JSON-объект.")
+            events = document.get("events")
+            if not isinstance(events, list):
+                raise ValueError("В JSON нет массива events; выбери полный экспорт Game Monitor.")
+            counts: dict[str, int] = {}
+            for event in events:
+                if isinstance(event, dict):
+                    event_type = str(event.get("type", "UNKNOWN"))
+                    counts[event_type] = counts.get(event_type, 0) + 1
+            self.game_monitor_report_path = Path(path).resolve()
+            self.game_monitor_summary = {
+                "monitor_version": document.get("monitorVersion"),
+                "event_count": document.get("eventCount", len(events)),
+                "dropped_events": document.get("droppedEvents"),
+                "error_count": len(document.get("errors", [])) if isinstance(document.get("errors"), list) else None,
+                "board_detected": document.get("boardDetected"),
+                "event_counts": counts,
+                "pointer_down_count": counts.get("POINTER_DOWN_CANDIDATE", 0),
+                "pointer_up_count": counts.get("POINTER_UP_CANDIDATE", 0),
+                "draw_sample_count": counts.get("DRAW_SAMPLE", 0),
+                "interpretation": "passive_browser_telemetry_not_direct_paint_resource_measurement",
+            }
+        except (OSError, UnicodeError, json.JSONDecodeError, ValueError, TypeError) as exc:
+            messagebox.showerror("Не удалось прочитать Game Monitor JSON", str(exc), parent=self.root)
+            return
+        self.status_var.set(
+            f"Game Monitor привязан: {self.game_monitor_report_path.name}; "
+            f"событий {self.game_monitor_summary['event_count']}, "
+            f"DRAW_SAMPLE {self.game_monitor_summary['draw_sample_count']}."
+        )
+
     def _measurement_values(self) -> dict[str, Any]:
         def optional_number(raw: str, field: str):
             value = raw.strip()
@@ -2023,6 +2076,8 @@ class BrushBehaviorTestTab:
             drawing_plan=self.current_plan,
             execution_report_path=str(self.execution_report_path) if self.execution_report_path else None,
             execution_report=self.execution_report,
+            game_monitor_report_path=str(self.game_monitor_report_path) if self.game_monitor_report_path else None,
+            game_monitor_summary=self.game_monitor_summary,
             measurements=self._measurement_values(),
             notes=self.notes_var.get(),
             outcome=self.outcome_var.get(),
