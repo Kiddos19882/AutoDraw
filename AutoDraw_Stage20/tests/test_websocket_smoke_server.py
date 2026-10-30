@@ -42,6 +42,15 @@ class SmokeServerIntegrationTests(unittest.IsolatedAsyncioTestCase):
                 f"ws://127.0.0.1:{port}",
                 origin="https://game.example",
             ) as ws:
+                await ws.send(json.dumps({"type": "auth", "token": "wrong-token"}))
+                with self.assertRaises(websockets.ConnectionClosedError) as rejected:
+                    await ws.recv()
+                self.assertEqual(rejected.exception.code, 4003)
+
+            async with websockets.connect(
+                f"ws://127.0.0.1:{port}",
+                origin="https://game.example",
+            ) as ws:
                 await ws.send(json.dumps({"type": "auth", "token": "one-time"}))
                 self.assertEqual(json.loads(await ws.recv()), {"type": "ready"})
                 await ws.send(json.dumps({"type": "ping", "nonce": "test-123"}))
