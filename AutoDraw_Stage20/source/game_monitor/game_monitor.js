@@ -31,6 +31,43 @@
     return Number(performance.now().toFixed(3));
   }
 
+  function safeUrl(value) {
+    try {
+      const url = new URL(String(value), location.href);
+      for (const key of [...url.searchParams.keys()]) {
+        if (/token|auth|session|cookie|secret|key|uid|user/i.test(key)) {
+          url.searchParams.set(key, "[REDACTED]");
+        }
+      }
+      return url.origin + url.pathname + (url.search ? url.search : "");
+    } catch (_) {
+      return String(value).split("?")[0];
+    }
+  }
+
+  function frameContext() {
+    let isTopFrame = false;
+    try {
+      isTopFrame = window.top === window;
+    } catch (_) {}
+    let currentFrame = location.origin + location.pathname;
+    const frameCandidates = [];
+    if (isTopFrame) {
+      try {
+        for (const frame of document.querySelectorAll("iframe")) {
+          let src = frame.getAttribute("src") || "";
+          try { src = safeUrl(new URL(src, location.href).href); } catch (_) {}
+          frameCandidates.push({
+            src,
+            title: frame.title || null,
+            name: frame.name || null
+          });
+        }
+      } catch (_) {}
+    }
+    return { isTopFrame, currentFrame, frameCandidates };
+  }
+
   function pointCount(value, depth = 0, seen = new WeakSet()) {
     if (!Array.isArray(value) || depth > 8 || seen.has(value)) return 0;
     seen.add(value);
