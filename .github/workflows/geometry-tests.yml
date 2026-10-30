@@ -49,7 +49,7 @@ jobs:
         run: |
           python -m pip install -r ..\game_monitor\requirements-smoke.txt
           $env:PYTHONPATH = "$env:GITHUB_WORKSPACE\AutoDraw_Stage20\source\game_monitor"
-          python -m pytest -q -ra ..\\..\tests\test_websocket_smoke_server.py
+          python -m pytest -q -ra ..\..\tests\test_websocket_smoke_server.py
       - name: Install test dependencies
         run: |
           python -m pip install --upgrade pip
