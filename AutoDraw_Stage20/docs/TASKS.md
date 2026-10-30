@@ -24,7 +24,7 @@
 | DOC-007 | DONE | Документировать общие модели и формат .autodraw | docs/DATA_FORMATS_AND_MODELS.md |
 | DOC-008 | DONE | Создать структурный справочник модулей | docs/MODULE_REFERENCE.md |
 | DOC-009 | DONE | Документировать публичные интерфейсы preparation | PREPARATION_API_REFERENCE.md охватывает все 40 модулей подсистемы preparation из MODULE_REFERENCE; сигнатуры и UI-контракты сверены с объявлениями исходников |
-| DOC-010 | IN_PROGRESS | Документировать публичные интерфейсы executor | Создан EXECUTOR_API_REFERENCE.md: Stage6, MouseExecutor, цветное исполнение, трансформации, диагностика, path planning и общие модели; остаётся сверка оставшихся модулей/экспортов |
+| DOC-010 | DONE | Документировать публичные интерфейсы executor | EXECUTOR_API_REFERENCE.md охватывает все 13 модулей executor из MODULE_REFERENCE, общие модели, адаптер image processing и основные контракты исполнения |
 | DOC-011 | DONE | Документировать UI и интеграционные точки | docs/UI_INTEGRATION_MAP.md: восемь вкладок, создание компонентов, callbacks, синхронизация области и передача планов |
 | DOC-012 | DONE | Документировать профили, настройки и результаты | docs/DATA_FORMATS_AND_PROFILES.md: профили, палитры, планы, лабораторные записи, калибровочные отчёты, ресурсные модели и экспорт Game Monitor |
 | DOC-013 | TODO | Составить карту импортов | Карта зависимостей модулей |
