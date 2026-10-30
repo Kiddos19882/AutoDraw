@@ -51,7 +51,7 @@
 - [x] Реестр задач, план, журнал решений, журнал работ и changelog.
 - [x] Основные модели и форматы данных: .autodraw, профили, цветные планы, brush/paint-limit manifests, калибровочные отчёты и экспорт Game Monitor.
 - [x] Справочник интерфейсов всех 40 модулей preparation: PREPARATION_API_REFERENCE.md.
-- [ ] Справочник интерфейсов executor начат: EXECUTOR_API_REFERENCE.md; требуется сверка оставшихся модулей и экспортов.
+- [x] Справочник интерфейсов executor: EXECUTOR_API_REFERENCE.md (13 модулей из MODULE_REFERENCE).
 - [ ] Полный перечень фактически создаваемых пользовательских файлов и каталогов; схемы основных профилей описаны в DATA_FORMATS_AND_PROFILES.md.
 - [x] Карта UI и внешних callback-интерфейсов: UI_INTEGRATION_MAP.md.
 - [ ] Полная карта импортов и направлений межмодульных зависимостей.
