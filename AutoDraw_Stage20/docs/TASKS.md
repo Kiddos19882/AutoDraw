@@ -23,7 +23,7 @@
 | DOC-006 | DONE | Создать файлы управления проектом | PROJECT_STATUS.md, ROADMAP.md, TASKS.md, DECISIONS.md, WORK_LOG.md, CHANGELOG.md |
 | DOC-007 | DONE | Документировать общие модели и формат .autodraw | docs/DATA_FORMATS_AND_MODELS.md |
 | DOC-008 | DONE | Создать структурный справочник модулей | docs/MODULE_REFERENCE.md |
-| DOC-009 | IN_PROGRESS | Документировать полные публичные интерфейсы preparation | Уточнены сигнатуры и методы UI-классов; остаётся сверка экспортов и сигнатур остальных модулей preparation |
+| DOC-009 | DONE | Документировать публичные интерфейсы preparation | PREPARATION_API_REFERENCE.md охватывает все 40 модулей подсистемы preparation из MODULE_REFERENCE; сигнатуры и UI-контракты сверены с объявлениями исходников |
 | DOC-010 | TODO | Документировать полные публичные интерфейсы executor | Сигнатуры классов и функций |
 | DOC-011 | DONE | Документировать UI и интеграционные точки | docs/UI_INTEGRATION_MAP.md: восемь вкладок, создание компонентов, callbacks, синхронизация области и передача планов |
 | DOC-012 | DONE | Документировать профили, настройки и результаты | docs/DATA_FORMATS_AND_PROFILES.md: профили, палитры, планы, лабораторные записи, калибровочные отчёты, ресурсные модели и экспорт Game Monitor |
