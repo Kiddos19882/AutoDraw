@@ -168,6 +168,26 @@
 - Вызовы приватных методов executor отмечены как фактические интеграционные точки, а не публичная гарантия совместимости.
 - Исходный код и конфигурация не изменялись.
 
+## 2026-10-31 — уточнение API и brush experiment manifest
+
+**Изменённые документы:**
+- `AutoDraw_Stage20/docs/PREPARATION_API_REFERENCE.md`
+- `AutoDraw_Stage20/docs/DATA_FORMATS_AND_PROFILES.md`
+
+**Что сделано:**
+- Устранён оставшийся сокращённый placeholder в сигнатуре `build_brush_test_record()`; параметры сверены с объявлением исходника.
+- Уточнены объявления конструкторов UI-классов там, где в документации не был указан `self`.
+- Обновлены пояснения о сигнатурах без type annotations: типы не додумываются.
+- Описаны `autodraw_brush_behavior_observation` и структура файла `experiment.json`, записываемого UI теста кистей.
+
+**Проверки:**
+- Сверены `build_brush_test_record()`, `BrushBehaviorTestTab.__init__()` и `_write_experiment_manifest()` непосредственно с исходником.
+- Приложение и тесты не запускались.
+
+**Продолжение:**
+- DOC-009 остаётся IN_PROGRESS до сверки всех экспортов preparation.
+- DOC-010 и DOC-013 остаются TODO.
+
 ## Шаблон записи
 
 ~~~markdown
