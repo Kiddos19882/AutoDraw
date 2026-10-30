@@ -91,3 +91,25 @@ def test_supercover_handles_vertical_and_negative_direction_segments():
     assert (5, 5) in reverse_diagonal
     assert (5, 4) in reverse_diagonal
     assert (4, 5) in reverse_diagonal
+
+
+def test_supercover_includes_both_sides_of_horizontal_grid_boundary():
+    from swept_footprint_geometry import _supercover_segment
+
+    cells = set(_supercover_segment((0, 0.5), (3, 0.5)))
+    assert {(x, y) for x in range(4) for y in (0, 1)} <= cells
+
+
+def test_supercover_includes_both_sides_of_vertical_grid_boundary():
+    from swept_footprint_geometry import _supercover_segment
+
+    cells = set(_supercover_segment((0.5, 0), (0.5, 3)))
+    assert {(x, y) for x in (0, 1) for y in range(4)} <= cells
+
+
+def test_supercover_includes_cells_touched_at_boundary_endpoints():
+    from swept_footprint_geometry import _supercover_segment
+
+    cells = set(_supercover_segment((0.5, 0), (3, 2)))
+    assert (0, 0) in cells
+    assert (1, 0) in cells
