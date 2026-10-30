@@ -3,6 +3,7 @@
 ## 2026-10-31
 
 ### Added
+- Добавлен DEPENDENCY_MAP.md с картой точек входа, основных импортов и общих адаптеров.
 - DATA_FORMATS_AND_PROFILES.md дополнен схемой execution report v2, ExecutionSummary и color execution report.
 - Добавлен EXECUTOR_API_REFERENCE.md с интерфейсами Stage6, MouseExecutor, цветного исполнения, диагностики и планирования.
 - DATA_FORMATS_AND_PROFILES.md дополнен записью наблюдения поведения кисти и структурой `experiment.json`.
