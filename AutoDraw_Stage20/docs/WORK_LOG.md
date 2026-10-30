@@ -20,12 +20,11 @@
 - PROJECT_STATUS.md, ROADMAP.md, TASKS.md, DECISIONS.md и CHANGELOG.md обновлены.
 - Этапы 7–10 помечены CANCELLED, они не являются активными задачами.
 
-### Документирование моделей и формата
-- Добавлен DATA_FORMATS_AND_MODELS.md.
-- Описаны общие Point, Stroke, DrawingPlan и совместимые импорты preparation/executor.
-- Описана структура portable-архива .autodraw, manifest, обязательные/необязательные файлы, интерфейс модуля и лимиты формата.
-- README документации дополнен ссылкой на новый справочник.
-- DOC-007 закрыта.
+### Документирование
+- Добавлен DATA_FORMATS_AND_MODELS.md: общие Point, Stroke, DrawingPlan и portable-формат .autodraw.
+- Добавлен MODULE_REFERENCE.md: структурный справочник preparation, executor, общих пакетов и Game Monitor.
+- Обновлены индекс, roadmap и реестр задач.
+- DOC-007 и DOC-008 закрыты.
 
 ### Границы
 - Изменялись только Markdown-файлы.
