@@ -169,7 +169,7 @@
 - [x] Этап 2. Документация и соответствие коду
 - [x] Этап 3. Архитектура приложения и потоки управления
 - [x] Этап 4. Пользовательский интерфейс и пользовательские сценарии
-- [ ] Этап 5. Конвейер обработки изображения и построения плана
+- [x] Этап 5. Конвейер обработки изображения и построения плана
 - [ ] Этап 6. Исполнитель и взаимодействие с браузером
 - [ ] Этап 7. Игровой движок, Game Monitor и лаборатория кистей
 - [ ] Этап 8. Хранение данных, профили и воспроизводимость
@@ -197,3 +197,14 @@
 - Отмечены риски прокрутки calibration UI, crop при отпускании за пределами preview и плотность экспериментальных вкладок.
 - CI для HEAD `cf5688bb`: executor-tests — success; Windows portable startup — failure по SyntaxError; geometry-tests — in_progress на момент проверки.
 - Код, тесты, workflow и пользовательские данные не изменялись. Этапы 5–10 не выполнялись.
+
+
+### Журнал выполнения этапа 5
+
+- Проверены общий `shared_image_processing.pipeline`, одноцветный Stage 13 workbench, цветные Stage 18–20 quantization/scanline/geometry pipeline, модели планов, бюджетные оптимизаторы, multi-board splitter и профильные тесты.
+- Зафиксированы два самостоятельных конвейера: одноцветный (crop → fit → grayscale → denoise → brightness/contrast → threshold → raster scanline) и цветной (background → CIEDE2000 palette quantization → rare-color merge → short-run merge → scanline/geometry plan → budget optimization).
+- Подтверждены режимы белого фона preserve/edge/all_white/auto_white_30; auto_white_30 удаляет пиксели только при доле строго больше 30%.
+- Подтверждены три геометрических режима (scanline/contour/skeleton), сохранение одиночных пикселей, row-step с явным подсчётом пропусков и разделение paint-cost estimate/game-point quota.
+- Записаны риски IMG-01…IMG-09 в `PROJECT_DOCUMENTATION.md`: различная семантика геометрических режимов, preview/game mismatch, потеря мелких деталей, row-step omissions, singleton/executor boundary, разные bounds contracts, board/canvas size contracts, отсутствие автоматического наследования row-step и неатомарная запись DrawingPlan.
+- Последний CI run `41131348814` для HEAD `7599c730`: executor-tests — success; geometry-tests — failure; Windows portable startup — failure. Benchmark-этапы завершились, общий набор и Windows startup заблокированы SyntaxError в `brush_behavior_test_ui.py:141` (этап 4).
+- Код, тесты, workflow, профили, планы и пользовательские данные не изменялись. Этапы 6–10 не выполнялись.
