@@ -24,6 +24,7 @@
 | `source/preparation/tests/test_palette_quantization.py` | `palette_quantization` | CIEDE2000, точное соответствие палитре, прозрачность, удаление фона, редкие цвета, лимиты палитры |
 | `source/preparation/tests/test_color_scanline.py` | `color_scanline` | Порядок строк и сегментов, разрывы прозрачностью, singleton, row-step/offset, лимиты, сериализация и preview |
 | `source/preparation/tests/test_geometry_color_plan.py` | `geometry_color_plan`, `geometry_budget_optimizer`, `layer_segmentation`, `skeletonization`, `stroke_simplification`, `stroke_order_optimizer` | Scanline/contour/skeleton, фильтрация компонентов, маршрутизация, multi-board, бюджет, валидаторы, качество и round-trip |
+| `source/preparation/tests/test_chalk_radius_matrix.py` | `chalk_radius_matrix` | Валидация радиусов/блоков, уникальность Game Monitor run, experiment identity, точность CHALK и статистика повторов |
 
 Дополнительные импорты в `test_geometry_color_plan.py` подтверждают, что тест напрямую обращается к внутренним функциям и модулям-реализациям, а не только к публичному API. При изменении внутренних контрактов этот тестовый файл следует рассматривать как интеграционный тест нескольких алгоритмических компонентов.
 
@@ -189,6 +190,7 @@
 | `tests/test_fallback_sweep_metrics.py` | `benchmark_stage7_fallback_merge_sweep` |
 | `tests/test_websocket_smoke_server.py` | `websocket_smoke_server` (локальный импорт внутри теста) |
 | `tests/test_brush_experiment_series.py` | `analyze_brush_experiment_series` |
+| `tests/analyze_chalk_radius_matrix.py` | `chalk_radius_matrix` (локальный импорт через preparation path) |
 
 Указание «прямые импорты» означает только синтаксически обнаруженные import/from-import statements, включая локальные импорты внутри функций. Оно не описывает транзитивные зависимости импортируемого модуля и не является графом runtime-загрузки.
 
