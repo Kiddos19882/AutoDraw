@@ -160,9 +160,9 @@ class DrawingApp:
         ttk.Button(buttons, text="Сохранить план JSON", command=self._save_plan).pack(side="left", padx=(6, 0))
         ttk.Button(buttons, text="Выполнить на доске", command=self._start_execution).pack(side="left", padx=(6, 0))
         ttk.Button(buttons, text="Открыть папку", command=self._open_folder).pack(side="left", padx=(6, 0))
-        ttk.Button(buttons, text="Остановить (F12)", command=self._stop_execution).pack(side="right")
+        ttk.Button(buttons, text="Остановить (Alt)", command=self._stop_execution).pack(side="right")
         ttk.Label(outer,
-                  text="Профиль исполнителя: шаг 2 px, 10 мс между точками, 20 мс после mouseUp и перед mouseDown, 40 мс после mouseDown, 50 мс перед mouseUp. F12 — аварийная остановка.",
+                  text="Профиль исполнителя: шаг 2 px, 10 мс между точками, 20 мс после mouseUp и перед mouseDown, 40 мс после mouseDown, 50 мс перед mouseUp. Alt — аварийная остановка.",
                   foreground="#555555", wraplength=1050).pack(anchor="w", pady=(8, 0))
 
     def _load_profile(self):
@@ -316,7 +316,7 @@ class DrawingApp:
             f"Будет нарисовано {self.plan.stroke_count} штрихов в области X={self.area.x}, Y={self.area.y}, "
             f"{self.area.width} × {self.area.height} px.\n\n"
             "Очистите холст или используйте тестовую область. После подтверждения приложение скроется, "
-            "у вас будет 5 секунд переключиться на браузер. F12 — остановка.\n\n"
+            "у вас будет 5 секунд переключиться на браузер. Alt — остановка.\n\n"
             "Исполнитель использует профиль: шаг 2 px; 10 мс между точками; паузы 20/20 мс между штрихами.",
             parent=self.root,
         )
