@@ -868,6 +868,12 @@ class BrushBehaviorTestTab:
     def set_brush_size(self) -> bool:
         """Set brush size only by dragging the calibrated extended-mode slider."""
         try:
+            if (
+                getattr(self, "_brush_feedback_state", None) is not None
+                or self._brush_drag_state is not None
+                or self._brush_drag_countdown_id is not None
+            ):
+                raise RuntimeError("Установка или проверка кисти уже выполняется.")
             brush = int(self.brush_var.get().strip())
             if not 1 <= brush <= 30:
                 raise ValueError("Размер кисти должен быть целым числом от 1 до 30.")
@@ -1064,7 +1070,11 @@ class BrushBehaviorTestTab:
 
     def _on_brush_workflow_stop_key(self, _event=None) -> str | None:
         """Alt cancels a pending/active brush drag; otherwise let the executor handle it."""
-        if self._brush_drag_state is not None or self._brush_drag_countdown_id is not None:
+        if (
+            self._brush_drag_state is not None
+            or self._brush_drag_countdown_id is not None
+            or getattr(self, "_brush_feedback_state", None) is not None
+        ):
             self.cancel_brush_drag()
             return "break"
         return None
@@ -1079,11 +1089,16 @@ class BrushBehaviorTestTab:
                 pass
             self._brush_drag_countdown_id = None
             self._stop_brush_hotkey_listener()
-            self.status_var.set("Установка кисти отменена по Alt до начала перетаскивания.")
             self._brush_drag_purpose = "set_brush_size"
             if purpose == "restore_brush_30":
                 self._record_brush_restore_result("stopped", "Alt отменил возврат кисти до начала перетаскивания.")
                 return
+            if getattr(self, "_brush_feedback_state", None) is not None:
+                self._fail_brush_radius_feedback(
+                    "cancelled_by_user", "Проверка/установка радиуса отменена по Alt."
+                )
+                return
+            self.status_var.set("Установка кисти отменена по Alt до начала перетаскивания.")
             try:
                 self.root.deiconify()
                 self.root.lift()
@@ -1138,6 +1153,7 @@ class BrushBehaviorTestTab:
                     f"Положение для радиуса {feedback['requested_radius']} установлено. "
                     "Проверяю фактическое значение Game Monitor…"
                 )
+                self._start_brush_hotkey_listener()
                 self._brush_feedback_poll_id = self.root.after(250, self._poll_brush_radius_feedback)
             return
         if cancelled or error or release_error:
@@ -1291,6 +1307,7 @@ class BrushBehaviorTestTab:
             "observations": list(feedback.get("observations", [])),
         }
         self.experiment_phases["brush_setup"] = phase
+        self._stop_brush_hotkey_listener()
         if self.experiment_dir is not None:
             try:
                 self._write_experiment_manifest()
@@ -1334,6 +1351,7 @@ class BrushBehaviorTestTab:
                 pass
             self._brush_feedback_poll_id = None
         self._brush_feedback_state = None
+        self._stop_brush_hotkey_listener()
         self._start_executor_after_brush_drag = False
         phase = {
             "status": "verification_failed",
