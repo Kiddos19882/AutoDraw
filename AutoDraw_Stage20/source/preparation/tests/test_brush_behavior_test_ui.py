@@ -18,6 +18,8 @@ def _make_test_tab():
     tab._brush_drag_mouse_down = False
     tab._brush_drag_purpose = "set_brush_size"
     tab._experiment_requested_brush = None
+    tab._brush_feedback_state = None
+    tab._brush_feedback_poll_id = None
     tab._postdraw_final_status = "completed"
     tab._postdraw_final_reason = ""
     tab.experiment_phases = {}
