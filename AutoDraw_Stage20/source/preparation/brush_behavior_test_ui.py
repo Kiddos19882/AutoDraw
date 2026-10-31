@@ -21,7 +21,7 @@ from brush_test_workflow import (
     should_run_postdraw_workflow,
 )
 from brush_radius_feedback import (
-    calculate_radius_correction_target, monitor_radius_from_status, read_active_bridge_radius,
+    calculate_radius_correction_target, read_active_bridge_radius,
 )
 from chalk_radius_matrix import (
     MATRIX_SCENARIO_ID, build_chalk_radius_matrix_metadata, is_monitor_run_claimed,
