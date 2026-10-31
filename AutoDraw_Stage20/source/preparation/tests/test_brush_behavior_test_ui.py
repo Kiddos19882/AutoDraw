@@ -198,6 +198,41 @@ def test_loading_game_monitor_report_persists_link_and_warns_on_radius_mismatch(
     assert "Манифест обновлён" in tab.status_var.value or "Манифест обновлён" in warnings[0][1]
 
 
+def test_experiment_manifest_persists_chalk_matrix_identity_and_cell(tmp_path):
+    import json
+
+    class Value:
+        def __init__(self, value=""):
+            self.value = value
+        def get(self):
+            return self.value
+
+    tab = brush_ui.BrushBehaviorTestTab.__new__(brush_ui.BrushBehaviorTestTab)
+    tab.experiment_dir = tmp_path
+    tab.get_calibration_profile = lambda: None
+    tab._experiment_id = "experiment-unique-001"
+    tab._chalk_matrix_metadata = brush_ui.build_chalk_radius_matrix_metadata(
+        series_id="matrix-20261031", block=2, requested_radius=15
+    )
+    tab.case_var = Value("Расход краски — серия длинных линий")
+    tab.brush_var = Value("15")
+    tab._experiment_requested_brush = 15
+    tab.current_plan_path = None
+    tab.execution_report_path = None
+    tab.execution_report = None
+    tab.game_monitor_report_path = None
+    tab.game_monitor_summary = None
+    tab.experiment_phases = {}
+
+    manifest_path = tab._write_experiment_manifest()
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+
+    assert manifest["experiment_id"] == "experiment-unique-001"
+    assert manifest["chalk_radius_matrix"]["series_id"] == "matrix-20261031"
+    assert manifest["chalk_radius_matrix"]["block"] == 2
+    assert manifest["chalk_radius_matrix"]["requested_radius"] == 15
+
+
 def test_brush_test_record_defaults_unmeasured_paint_points_to_none() -> None:
     record = build_brush_test_record(brush_value=7, test_case="Горизонтальные линии")
 
