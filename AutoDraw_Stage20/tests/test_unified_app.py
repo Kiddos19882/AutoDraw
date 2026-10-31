@@ -143,7 +143,7 @@ class UnifiedAppCoreTests(unittest.TestCase):
             with tempfile.TemporaryDirectory(prefix="AutoDraw brush test ") as temp:
                 app.data_paths["runtime"] = Path(temp) / "runtime"
                 source_path = Path(temp) / "brush-source.json"
-                save_plan(source_path, plan)
+                source_path.write_text(json.dumps(plan, ensure_ascii=False, indent=2), encoding="utf-8")
                 with patch.object(app.executor, "load_plan_from_path") as load_plan:
                     result = app._transfer_brush_test_plan(plan, source_path)
                     self.assertTrue(result)
