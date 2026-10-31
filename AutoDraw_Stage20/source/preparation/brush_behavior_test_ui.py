@@ -1736,7 +1736,7 @@ class BrushBehaviorTestTab:
                     self.experiment_phases["after_draw"]["paint_meter_measurement"] = measure_meter_fill_against_baseline(first, second)
             # Keep the automated post-draw path aligned with the manual capture path.
             # Visibility-analysis failures are recorded as inconclusive and must not
-            # interrupt the safety-critical clear/restore workflow.
+            # interrupt the post-draw capture/restore workflow.
             visibility: dict[str, Any] = {
                 "status": "inconclusive",
                 "reason": "missing_explicit_blank_board_reference",
@@ -1805,7 +1805,7 @@ class BrushBehaviorTestTab:
                 restore_brush=True,
             )
         except Exception as exc:
-            self._finish_automated_postdraw("failed", f"Не удалось сохранить результат или начать проверенную очистку: {exc}")
+            self._finish_automated_postdraw("failed", f"Не удалось сохранить результат после рисования: {exc}")
 
     def _capture_automated_after_clear(
         self, config: dict[str, Any], reference_path: Path, metadata: dict[str, Any]
