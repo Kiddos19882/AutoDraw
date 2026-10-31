@@ -1030,11 +1030,26 @@ def test_execution_monitor_selection_fails_closed_without_executor_timestamps(tm
     assert count == 0
 
 
-def test_execution_monitor_selection_does_not_accept_reset_or_zero_chalk_as_saved():
-    report = _monitor_run_fixture(
-        started="2026-10-31T18:50:16+00:00", finished="2026-10-31T18:50:40+00:00",
-        pre=721, post=48, consumed=-673, chalk_status="inconclusive",
-    )
-    chalk = report["chalk"]
-    assert chalk["status"] != "exact"
-    assert chalk["consumed_points"] <= 0
+def test_exact_chalk_measurement_rejects_counter_reset_and_zero_consumption():
+    reset = {
+        "status": "inconclusive",
+        "pre_point_count": 721,
+        "post_point_count": 48,
+        "consumed_points": -673,
+    }
+    zero = {
+        "status": "exact",
+        "pre_point_count": 1,
+        "post_point_count": 1,
+        "consumed_points": 0,
+    }
+    valid = {
+        "status": "exact",
+        "pre_point_count": 10,
+        "post_point_count": 40,
+        "consumed_points": 30,
+    }
+
+    assert brush_ui.is_exact_positive_chalk_measurement(reset) is False
+    assert brush_ui.is_exact_positive_chalk_measurement(zero) is False
+    assert brush_ui.is_exact_positive_chalk_measurement(valid) is True
