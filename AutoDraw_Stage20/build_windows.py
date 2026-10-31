@@ -226,6 +226,24 @@ def main() -> int:
         STAGING_ROOT.mkdir(parents=True, exist_ok=True)
         # A single PyInstaller onedir app: one EXE plus its private _internal folder.
         copy_directory_contents(app_dist, STAGING_ROOT)
+        # The bridge is a local companion process, not a Python import of the GUI.
+        # Ship its scripts beside the portable executable so the Brush Test buttons
+        # work in the packaged build as well as from the source checkout.
+        bridge_source = ROOT / "source" / "game_monitor"
+        bridge_bundle = STAGING_ROOT / "game_monitor"
+        bridge_bundle.mkdir(parents=True, exist_ok=True)
+        for filename in (
+            "game_monitor.js",
+            "game_monitor_bridge.js",
+            "game_monitor_bridge_server.py",
+            "requirements-bridge.txt",
+            "start_game_monitor_bridge.bat",
+            "README.md",
+        ):
+            source_file = bridge_source / filename
+            if not source_file.is_file():
+                raise BuildError(f"Не найден обязательный файл Game Monitor Bridge: {source_file}")
+            shutil.copy2(source_file, bridge_bundle / filename)
         shutil.copy2(ROOT / "README.md", STAGING_ROOT / "README.md")
         copy_source_user_data(ROOT, STAGING_ROOT)
         copy_existing_user_data(FINAL_ROOT, STAGING_ROOT)
