@@ -525,3 +525,18 @@ CI run #41174050665 выявил ошибку в отрицательной фи
 Run #1223 на предыдущем docs commit также success. Исторические runs #1210—#1213 завершились failure, но последующие изменения исправили тестовую фикстуру non-uniform ROI и сигнатуру builder; актуальный HEAD и его полный workflow зелёные.
 
 Это подтверждает CI и portable startup на указанном SHA. Не подтверждает реальное соединение Firefox из HTTPS iframe с loopback, runtime-доступность CHALK в новой сессии, A/B/C overhead, восстановление Monitor после реального attach/detach или автоматическую привязку экспорта к manifest. INT-003 остаётся IN_PROGRESS; следующий обязательный live gate — A/B/C и повторный boundary probe с новым automated stroke visibility result.
+
+
+### 13.15. Game Monitor 0.2.1: принятые координаты в DRAW_SAMPLE — 31.10.2026
+
+Game Monitor обновлён до версии 0.2.1. При изменении точного `pointCount` событие `DRAW_SAMPLE` теперь содержит:
+
+- `pointDelta` — разницу `pointCount` между текущим и предыдущим наблюдением;
+- `acceptedPoint` — координаты последней точки последнего штриха из `atom.points`, если `pointDelta > 0`;
+- `after` — точный O(1) CHALK snapshot.
+
+`acceptedPoint` читается по последнему штриху и последнему элементу массива за O(1); полный обход `atom.points` не добавлен в hot path. При `pointDelta > 1` экспорт явно показывает, что между наблюдениями добавилось несколько точек: последняя координата известна, но промежуточная траектория может быть неполной. При нулевой/отрицательной/невалидной дельте `acceptedPoint=null`, чтобы не выдавать старую координату за новую.
+
+Добавлены Node.js регрессионные тесты: точная последняя координата, отсутствие stale point на старте, обнаружение coalesced multi-point delta; ранее добавленные тесты проверяют полное восстановление собственных/унаследованных методов, повторные start/stop и замену BoardPane. На текущем commit `32a3fdb35d95b15ca64c1bb4c7f404904ffc23e8` workflow #1238 запущен; синтаксис Game Monitor, Node.js tests и WebSocket smoke-server tests уже прошли, остальные обязательные jobs ещё выполняются.
+
+Следующий live-шаг: повторить `board_boundary_probe` с Monitor 0.2.1 и проверить, что `acceptedPoint` доходит до x=0/460 и y=0/240, а `pointDelta` не скрывает coalescing. A/B/C должен сравнивать Monitor off / 0.1.2 / 0.2.1; старый 0.2.0 остаётся исторической контрольной версией.

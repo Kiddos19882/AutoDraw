@@ -158,3 +158,14 @@ CI на commit f72 обнаружил ошибочную negative fixture в tes
 Три live-прогона `board_boundary_probe` ранее подтвердили точные CHALK deltas 51/52/52 при радиусе 1; визуально границы подтверждены на конкретном ROI 578×301. Старые manifests сохраняют исторический `stroke_visibility_analysis=inconclusive`, поскольку были созданы до исправления analyzer. Нужен новый прогон для автоматического visibility результата.
 
 INT-003 остаётся IN_PROGRESS: A/B/C Monitor off / 0.1.2 / 0.2.0 и численное измерение overhead/FPS не выполнены. Smoke server пока является только транспортным ping/pong прототипом; production bridge, автоматический per-run capture и связь с manifest не реализованы. Наличие успешного CI не доказывает соединение из реального Firefox iframe.
+
+
+## 16. Game Monitor 0.2.1 и расширение регрессионных проверок — 31 октября 2026 г.
+
+Game Monitor обновлён с 0.2.0 до 0.2.1. `DRAW_SAMPLE` теперь включает `pointDelta` и `acceptedPoint`; последняя координата считывается из хвоста `atom.points` за O(1), только когда точный `pointCount` увеличился. Если между наблюдениями добавлено несколько точек, `pointDelta > 1` отмечает возможный пропуск промежуточных координат; событие не выдаётся за полную траекторию. Полный O(N) scan остаётся только в явном `diagnosticSnapshot()`.
+
+Тесты дополнены проверкой последней принятой координаты, нулевого/stale sample, multi-point delta, точного восстановления всех пяти собственных методов, удаления wrappers у унаследованных методов, повторных start/stop и замены BoardPane.
+
+Проверяемый кодовый HEAD: `32a3fdb35d95b15ca64c1bb4c7f404904ffc23e8`. Workflow #1238 выполняется; на момент записи успешно завершились `node --check`, Node.js tests Game Monitor и WebSocket smoke-server tests. Executor tests, geometry suite и Windows portable build/startup smoke-test ещё не завершены. Не объявлять полный CI успешным до завершения всех трёх jobs.
+
+Новый Monitor 0.2.1 даёт данные для повторной live-проверки границ: сверять `acceptedPoint` с логическими x=0/460 и y=0/240, отдельно контролировать `pointDelta`. A/B/C обновляется до Monitor off / 0.1.2 / 0.2.1. Без пользовательской Firefox/игровой сессии эти live gates остаются незавершёнными; production bridge нельзя объявлять работающим до реального browser smoke test.

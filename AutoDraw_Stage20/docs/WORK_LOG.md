@@ -894,3 +894,10 @@ CI run #41174050665 на пользовательском commit f72 выяви�
 Исторические падения #1210—#1213 исправлены последующими изменениями: negative fixture для uniform-scale guard заменена на действительно non-uniform ROI 646×323, вызов plan builder приведён к актуальной сигнатуре. Текущий HEAD зелёный.
 
 Ограничения: это CI, а не live Firefox iframe test. Smoke server всё ещё принимает только `auth`/`ping`; production read-only bridge, автоматический pre/post capture и manifest binding отсутствуют. A/B/C Monitor off/0.1.2/0.2.0 и численный overhead не измерены. INT-003 остаётся IN_PROGRESS.
+
+
+### Game Monitor 0.2.1 — 31.10.2026
+
+Добавлена O(1) регистрация последней фактически принятой координаты в `DRAW_SAMPLE`: `pointDelta` показывает количество новых точек между снимками, `acceptedPoint` содержит хвостовую координату при положительной дельте. Если `pointDelta > 1`, промежуточные точки могли быть coalesced; экспорт это явно показывает. Добавлены тесты точной координаты, отсутствия stale point, multi-point delta, восстановления всех методов и повторного lifecycle. CI run #1238 на commit `32a3fdb35d95b15ca64c1bb4c7f404904ffc23e8`: Node.js tests и WebSocket smoke-server tests прошли; полный CI и Windows portable smoke-test на момент записи ещё выполняются.
+
+План live-валидации не закрыт: требуется новый boundary probe с Monitor 0.2.1 и A/B/C off / 0.1.2 / 0.2.1. Реальный Firefox iframe smoke test и production bridge по-прежнему не выполнены.
