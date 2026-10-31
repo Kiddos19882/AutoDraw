@@ -177,6 +177,10 @@ class RunRecorder:
         if self.current is None:
             return
         stroke_id = self._event_stroke_id(event)
+        # A single active stroke is also an unambiguous match when one side
+        # of an older event stream omitted or changed its strokeId.
+        if stroke_id not in self.active_stroke_ids and len(self.active_stroke_ids) == 1:
+            stroke_id = next(iter(self.active_stroke_ids))
         self.lifecycle_sources.add(source)
         if stroke_id in self.active_stroke_ids:
             self.active_stroke_ids.remove(stroke_id)
