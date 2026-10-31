@@ -22,10 +22,11 @@ def _manifest(radius=5, block=1, run_id="run-1", consumed=100):
         "execution_report": {"status": "completed", "completed_strokes": 6},
         "monitor_capture": {
             "status": "saved", "run_id": run_id, "stroke_count": 6,
-            "expected_stroke_count": 6,
+            "expected_stroke_count": 6, "experiment_id": f"exp-{block}-{radius}",
         },
         "game_monitor_summary": {
             "run_id": run_id,
+            "autodraw_experiment_id": f"exp-{block}-{radius}",
             "brush_radius_status": "single",
             "observed_brush_radii": [radius],
             "point_delta_matches_chalk": True,
