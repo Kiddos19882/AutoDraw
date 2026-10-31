@@ -133,6 +133,63 @@ class BridgeRecorderTests(unittest.TestCase):
         data = json.loads(files[0].read_text(encoding="utf-8"))
         self.assertEqual(data["execution_status"], "partial")
 
+    def test_pointer_only_lifecycle_creates_exact_run_and_counts_strokes(self):
+        before = {"maxPoints": 6000, "remainingPoints": 6000, "pointCount": 0,
+                  "isExact": True, "currentRadius": 30}
+        after_one = {"maxPoints": 6000, "remainingPoints": 5999, "pointCount": 1,
+                     "isExact": True, "currentRadius": 30}
+        after_two = {"maxPoints": 6000, "remainingPoints": 5998, "pointCount": 2,
+                     "isExact": True, "currentRadius": 30}
+
+        self.recorder.event({"type": "POINTER_DOWN_CANDIDATE", "t": 10,
+                             "strokeId": "pointer-stroke-1", "board": before}, 1.0)
+        self.recorder.event({"type": "DRAW_SAMPLE", "t": 15, "strokeId": "pointer-stroke-1",
+                             "board": after_one, "pointDelta": 1,
+                             "acceptedPoint": {"x": 10, "y": 10}}, 1.1)
+        self.recorder.event({"type": "POINTER_UP_CANDIDATE", "t": 20,
+                             "strokeId": "pointer-stroke-1", "board": after_one}, 1.2)
+
+        self.recorder.event({"type": "POINTER_DOWN_CANDIDATE", "t": 30,
+                             "strokeId": "pointer-stroke-2", "board": after_one}, 1.3)
+        self.recorder.event({"type": "DRAW_SAMPLE", "t": 35, "strokeId": "pointer-stroke-2",
+                             "board": after_two, "pointDelta": 1,
+                             "acceptedPoint": {"x": 20, "y": 20}}, 1.4)
+        self.recorder.event({"type": "POINTER_UP_CANDIDATE", "t": 40,
+                             "strokeId": "pointer-stroke-2", "board": after_two}, 1.5)
+        self.recorder.frame_probe({"startedAtPerformanceMs": 10, "endedAtPerformanceMs": 20,
+                                   "visible": True, "intervals": [16.67, 16.67]})
+
+        path = self.recorder.finalize("completed")
+        data = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(data["execution_status"], "completed")
+        self.assertEqual(data["chalk"]["consumed_points"], 2)
+        self.assertEqual(data["stroke_count"], 2)
+        self.assertEqual(data["stroke_lifecycle_sources"], ["pointer_observer"])
+        self.assertEqual(data["sampled_point_delta_total"], 2)
+        self.assertTrue(data["point_delta_matches_chalk"])
+        self.assertEqual(data["active_drawing_duration_ms"], 20)
+        self.assertEqual(data["frame_probe"]["stroke_probe_count"], 1)
+
+    def test_mixed_engine_and_pointer_lifecycle_does_not_double_count(self):
+        before = {"maxPoints": 6000, "remainingPoints": 6000, "pointCount": 0, "isExact": True}
+        after = {"maxPoints": 6000, "remainingPoints": 5999, "pointCount": 1, "isExact": True}
+        self.recorder.event({"type": "POINTER_DOWN_CANDIDATE", "t": 10,
+                             "strokeId": "pointer-stroke-1", "board": before}, 1.0)
+        self.recorder.event({"type": "DRAW_START", "t": 11, "strokeId": "pointer-stroke-1",
+                             "before": before}, 1.01)
+        self.recorder.event({"type": "DRAW_SAMPLE", "t": 15, "strokeId": "pointer-stroke-1",
+                             "board": after, "pointDelta": 1}, 1.1)
+        self.recorder.event({"type": "POINTER_UP_CANDIDATE", "t": 20,
+                             "strokeId": "pointer-stroke-1", "board": after}, 1.2)
+        self.recorder.event({"type": "DRAW_END", "t": 21, "strokeId": "pointer-stroke-1",
+                             "after": after}, 1.21)
+
+        path = self.recorder.finalize("completed")
+        data = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(data["stroke_count"], 1)
+        self.assertEqual(data["active_drawing_duration_ms"], 10)
+        self.assertEqual(data["stroke_lifecycle_sources"], ["engine", "pointer_observer"])
+
     def test_snapshot_validation_and_frame_summary(self):
         self.assertTrue(exact_snapshot({"maxPoints": 10, "remainingPoints": 8, "pointCount": 2, "isExact": True}))
         self.assertFalse(exact_snapshot({"maxPoints": 10, "remainingPoints": 8, "pointCount": 3, "isExact": True}))
