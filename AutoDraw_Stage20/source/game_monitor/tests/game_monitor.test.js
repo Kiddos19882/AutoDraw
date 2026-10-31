@@ -208,6 +208,7 @@ test("resource snapshots expose the actual current brush radius", () => {
   const snapshot = monitor.status().snapshot;
 
   assert.equal(snapshot.currentRadius, 7);
-  assert.deepEqual(snapshot.radius, [7]);
+  assert.equal(snapshot.radius.length, 1);
+  assert.equal(snapshot.radius[0], 7);
   monitor.stop();
 });
