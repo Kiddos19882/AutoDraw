@@ -137,7 +137,7 @@
 | `tests/benchmark_stage8_geometry_budget.py` | Benchmark геометрического бюджета и качества preview |
 | `tests/validate_stage8_geometry_budget_report.py` | Проверка Stage 8 отчёта |
 | `tests/test_fallback_sweep_metrics.py` | Тест метрик fallback sweep |
-| `tests/test_outline_first_fill_planner.py` | Тест экспериментального outline-first planner |
+| `source/preparation/tests/test_outline_first_fill_planner.py` | Тест экспериментального outline-first planner |
 | `tests/benchmark_outline_first_fill.py` | Сравнение outline-first и interior-fill стратегий |
 | `tests/test_import_resolution_diagnostics.py` | Проверка разрешения импортов и общих моделей |
 | `tests/test_unified_app.py` | Интеграционные UI-регрессии |
