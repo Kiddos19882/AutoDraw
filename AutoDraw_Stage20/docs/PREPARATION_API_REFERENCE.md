@@ -210,7 +210,7 @@
 - `LayerSegmentationError(ValueError)`
 - `filter_small_components(mask: np.ndarray, min_component_area: int) -> tuple[np.ndarray, int]`
 
-## 6. Модели затрат и калибровки ресурсов
+## 7. Модели затрат и калибровки ресурсов
 
 ### `paint_cost_model.py`
 
@@ -238,7 +238,7 @@
 - `GamePointCalibrationError(ValueError)`
 - `analyze_game_point_calibration(document: Any) -> dict[str, Any]`
 
-## 7. Сбор и хранение экспериментальных записей
+## 8. Сбор и хранение экспериментальных записей
 
 ### `paint_limit_test.py`
 
@@ -267,7 +267,7 @@
 - `validate_brush_test_preflight(profile: dict[str, Any] | None, screen_size: tuple[int, int], *, brush_control: dict[str, Any] | None = None, require_slider: bool = True) -> dict[str, Any]`
 - `BrushExperimentState` — структура состояния workflow.
 
-## 8. UI-компоненты и точки входа
+## 9. UI-компоненты и точки входа
 
 Следующие классы являются UI-компонентами подготовки на Tkinter/ttk. Их публичная точка подключения — создание соответствующего класса в родительском приложении:
 
@@ -441,7 +441,7 @@
 
 Обработчики событий Tkinter/ttk, привязанные внутри классов, остаются деталями реализации UI. Внешние callback-параметры выше перечислены как явные зависимости конструкторов.
 
-## 9. Утилиты предыдущих этапов
+## 10. Утилиты предыдущих этапов
 
 ### `stage8_optimizer.py`
 
