@@ -990,3 +990,10 @@ CI закрывает автоматическую проверку текуще
 - При начале нового эксперимента отменяется незавершённый polling предыдущего прогона.
 
 **Ограничения:** связь основана на timestamp+radius, не на сквозном experiment_id. Требуется live проверка реальной сессии и тест последовательных прогонов с одинаковым радиусом. Новый bridge и UI integration ещё не проверены локальным запуском/CI на актуальном HEAD.
+
+
+## 2026-10-31 — проверка целостности автоматической телеметрии
+
+Run JSON дополнен `stroke_count`, суммой `sampled_point_delta_total`, сравнением `point_delta_matches_chalk`, списком фактически наблюдавшихся радиусов и счётчиками dropped events/errors. UI теперь помечает capture как `saved` только при exact CHALK, единственном радиусе, совпадении суммы pointDelta с CHALK и нулевых потерях/ошибках. Если любое условие не выполнено, отчёт сохраняется со статусом `partial`.
+
+Добавлен WebSocket integration test для production collector: авторизация, session_start, передача DRAW_START/DRAW_END, heartbeat и появление run JSON с точной CHALK delta. Этот тест входит в существующий CI step `Test local WebSocket smoke server`.
