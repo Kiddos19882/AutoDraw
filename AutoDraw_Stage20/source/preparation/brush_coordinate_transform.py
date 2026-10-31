@@ -19,7 +19,7 @@ def transform_logical_brush_plan_to_screen(
 
     The logical board's inclusive coordinate bounds [0, 460] x [0, 240]
     are mapped to the screen ROI's pixel-center bounds [0, width-1] x
-    [0, height-1]. The returned plan is a copy; the source plan is untouched.
+    [0, height-1]. The game scales BoardPane uniformly, so X/Y ROI scales must agree within 1%. The returned plan is a copy; the source plan is untouched.
     """
     if not isinstance(plan, dict):
         raise ValueError("Логический план кисти должен быть JSON-объектом.")
