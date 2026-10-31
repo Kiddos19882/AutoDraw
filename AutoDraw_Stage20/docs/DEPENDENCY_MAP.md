@@ -54,9 +54,9 @@
 
 | Потребитель | Импортируемые модули |
 |---|---|
-| `stage6_execute_plan` | `drawing.mouse_executor`, `drawing.color_plan_execution`, `brush_planner`, `drawing.execution_diagnostics`, `drawing.plan_transform`, `models`, `color_scanline`, `geometry_color_plan`, `paint_cost_model`, `palette_profiles`, `path_planning.stroke_optimizer` |
+| `stage6_execute_plan` | `drawing.mouse_executor`, `drawing.color_plan_execution`, `brush_radius_feedback`, `brush_planner`, `drawing.execution_diagnostics`, `drawing.plan_transform`, `models`, `color_scanline`, `geometry_color_plan`, `paint_cost_model`, `palette_profiles`, `path_planning.stroke_optimizer` |
 | `drawing.mouse_executor` | `models`, PyAutoGUI, pynput keyboard |
-| `drawing.color_plan_execution` | `models`; по требованию — `palette_profiles`, `color_scanline`, `geometry_color_plan`, `brush_planner` |
+| `drawing.color_plan_execution` | `models`, `brush_radius_feedback`; по требованию — `palette_profiles`, `color_scanline`, `geometry_color_plan`, `brush_planner` |
 | `drawing.plan_transform` | `models` |
 | `drawing.execution_diagnostics` | стандартная библиотека Python |
 | `path_planning.contour_planner` | `models`, OpenCV, NumPy, Pillow |
@@ -167,7 +167,8 @@ flowchart TD
 | `brush_planner.py` | `brush_footprint_geometry` |
 | `brush_calibration.py` | — |
 | `brush_experiment_capture.py` | — |
-| `brush_test_workflow.py` | — |\n| `brush_radius_feedback.py` | — |
+| `brush_test_workflow.py` | — |
+| `brush_radius_feedback.py` | — |
 | `board_resource_model.py` | — |
 | `paint_cost_model.py` | — |
 | `paint_budget_optimizer.py` | `color_scanline`, `board_resource_model`, `engine_point_calibration`, `paint_cost_model`, `palette_quantization` |
@@ -189,9 +190,9 @@ flowchart TD
 | `stage3_image_processing.py` | — |
 | `stage4_contour_planning.py` | `models`, `path_planning.contour_planner` |
 | `stage5_stroke_optimization.py` | `models`, `path_planning.stroke_optimizer` |
-| `stage6_execute_plan.py` | `drawing.mouse_executor`, `drawing.color_plan_execution`, `brush_planner`, `drawing.execution_diagnostics`, `drawing.plan_transform`, `models`, `color_scanline`, `geometry_color_plan`, `paint_cost_model`, `palette_profiles`, `path_planning.stroke_optimizer` |
+| `stage6_execute_plan.py` | `drawing.mouse_executor`, `drawing.color_plan_execution`, `brush_radius_feedback`, `brush_planner`, `drawing.execution_diagnostics`, `drawing.plan_transform`, `models`, `color_scanline`, `geometry_color_plan`, `paint_cost_model`, `palette_profiles`, `path_planning.stroke_optimizer` |
 | `drawing/mouse_executor.py` | `models` |
-| `drawing/color_plan_execution.py` | `models` |
+| `drawing/color_plan_execution.py` | `models`, `brush_radius_feedback` |
 | `drawing/plan_transform.py` | `models` |
 | `drawing/execution_diagnostics.py` | — |
 | `path_planning/contour_planner.py` | `models` |
