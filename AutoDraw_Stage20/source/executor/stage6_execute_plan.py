@@ -1771,6 +1771,8 @@ class Stage6App:
                     "summary": self.adaptive_brush_plan.get("summary", {}),
                     "brush_slider_selection_count": color_details.get("brush_size_selection_count", 0),
                     "brush_slider_selection_order": color_details.get("brush_size_selection_order", []),
+                    "brush_slider_correction_counts": color_details.get("brush_size_correction_counts", []),
+                    "final_brush_slider_x": color_details.get("final_brush_slider_x"),
                     "slider_calibration": color_details.get("brush_slider_calibration"),
                 }
         try:
