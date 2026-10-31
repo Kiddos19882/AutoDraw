@@ -917,3 +917,31 @@ CI закрывает автоматическую проверку текуще
 - В README добавлены команды PowerShell из корня репозитория, получение точного `location.origin` из игрового iframe, реальный протокол одноразовой авторизации `auth → ready → ping → pong`, ожидаемые результаты, обработка типовых ошибок и остановка сервера.
 - Token явно обозначен как секрет одноразового использования; инструкция не предлагает публиковать его или обходить CSP.
 - Изменён только README Game Monitor и этот журнал документации. Код сервера, Game Monitor и игровой движок не менялись. Live Firefox smoke test по-прежнему не считается выполненным.
+
+
+## 2026-10-31 — разбор live WebSocket, A/B/C и boundary результатов (commit e9a915d)
+
+**Источник результатов:** `e9a915d5d8247055ab86168789079ed0562e0ee3`, ветка `feature/image-geometry-optimization`.
+
+**Проверенные данные:**
+- `data/result_test_web_socket/`: handshake response `ready → pong`; Game Monitor 0.2.1 экспортирован из игрового iframe `https://eufbpet.hust.me/pet.php`, `isTopFrame=false`, доска обнаружена, 340 событий, 0 dropped events, 0 ошибок.
+- `data/a,b,c -test/run_01..run_03/`: три переставленных порядка A/B/C, snapshots и полные Monitor exports.
+- FPS probe: каждый из трёх файлов содержит 600 кадров за ~10 секунд, 60 FPS, P95 16.68 ms, max 16.68 ms, документ видим, interruptions нет.
+- `data/results/brush_behavior_tests/experiment-...board_boundary_probe/experiment.json`: четыре завершённых штриха, 7.36 с, 106 move calls, успешный mouse release, точный post pointCount 53 при baseline 1.
+
+**Результаты A/B/C (дельта pointCount):**
+- A / Monitor off: 53, 52, 52.
+- B / Monitor 0.1.2: 0*, 52, 52.
+- C / Monitor 0.2.1: 50, 52, 52.
+- *B-1 невалиден как успешный drawing run: pointCount остался 1; экспорт содержит только стартовый sample и вызов updateLess без изменения счётчика.
+- В C во всех трёх прогонах `diagnosticPointCount` совпадает с точным snapshot; сумма `pointDelta` равна 50/52/52. В валидных повторах 2 и 3 все режимы дали 52.
+
+**Выводы и ограничения:**
+- Точный источник расхода — `ΔpointCount`; визуальная оценка шкалы краски в отдельном boundary experiment inconclusive.
+- FPS-файлы не привязаны к отдельным режимам A/B/C, а длительности исполнения по каждому режиму отсутствуют. Overhead Monitor не измерен.
+- Accepted points в одном из экспортов 0.2.1 дошли до y=0/240; горизонтальные крайние принятые координаты составили примерно x=2.21/458.21, не x=0/460. Автоматическая визуальная эвристика boundary experiment отметила 4/4 ROI как visible, но это не доказывает принятие точной крайней координаты.
+- Нет сравнения разных размеров кисти; влияние радиуса на расход пока не установлено.
+
+**Документация обновлена:** PROJECT_STATUS.md, GAME_MONITOR_BRUSH_LAB_PLAN.md, TASKS.md, ROADMAP.md и CHANGELOG.md. Код приложения, Game Monitor и тесты не менялись; тесты и CI в рамках этого документального разбора не запускались.
+
+**Следующие действия:** повторить A/B/C с отдельными FPS и wall-clock duration на каждый режим, исключить невалидный B-run; отдельно уточнить тест горизонтальных координат x=0/460. До этого полную матрицу размеров кисти не начинать.
