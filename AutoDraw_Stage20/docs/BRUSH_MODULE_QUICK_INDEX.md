@@ -31,7 +31,8 @@
 | Точка интеграции приложения | `AutoDraw_Stage20/integrated_app.py` | Создание вкладок, передача callbacks и DrawingPlan, получение canvas area/size, связь Brush Test с Stage6 |
 | UI лаборатории кистей | `AutoDraw_Stage20/source/preparation/brush_behavior_test_ui.py` | Сценарии, создание логических DrawingPlan 420×240 и передача теста |
 | Преобразование координат Brush Test | `AutoDraw_Stage20/source/preparation/brush_coordinate_transform.py` | Явное преобразование logical_board_pixels в screen-local ROI с сохранением transform в generation metadata |
-| Исполнитель мыши | `AutoDraw_Stage20/source/executor/stage6_execute_plan.py` | MouseExecutor, ExecutorConfig, экранные координаты, движение мыши, отчёт исполнения |
+| Исполнитель мыши | `AutoDraw_Stage20/source/executor/drawing/mouse_executor.py` | MouseExecutor, ExecutorConfig, экранные координаты, движение мыши, отчёт исполнения |
+| UI исполнителя | `AutoDraw_Stage20/source/executor/stage6_execute_plan.py` | Загрузка плана, preview, проверка размеров, запуск рабочего потока и передача в MouseExecutor |
 | Game Monitor | `AutoDraw_Stage20/source/game_monitor/game_monitor.js` | Поиск BoardPane, snapshot, inspect, export, wrappers, stop/start |
 | Документация Game Monitor | `AutoDraw_Stage20/source/game_monitor/README.md` | Команды Monitor, контекст iframe и ограничения |
 | Ресурсная модель | `AutoDraw_Stage20/source/preparation/board_resource_model.py` | Калиброванная модель точек/ресурса; не путать с точным игровым счётчиком |
@@ -81,7 +82,7 @@
 2. Прочитать этот индекс и разделы главного документа концепции, относящиеся к текущей задаче.
 3. Открыть реальные исходники всех затрагиваемых callsites; сверить документацию с кодом.
 4. Проверить зависимости и существующие тесты до изменения интерфейсов.
-5. Реализовывать по одному слою: сначала logical→screen transform, затем bridge/синхронизация, runner и recorder — в порядке актуального TASKS/ROADMAP.
+5. Сначала подтвердить live-геометрию уже реализованного logical→screen transform; затем двигаться к bridge/синхронизации, runner и recorder — в порядке актуального TASKS/ROADMAP.
 6. Добавить unit-тесты на преобразование координат и регрессии обычных screen/local планов.
 7. Обновить профиль/manifest и документацию, не смешивая точные измерения с оценками.
 8. Не запускать полную CHALK-матрицу, пока не пройдены геометрические и live measurement gates.
@@ -89,7 +90,7 @@
 
 ## 6. Границы достоверности и статусы
 
-- **Подтверждено статически:** формула чтения `max/less`, устройство Monitor 0.2.0, существующая основа Brush Test/MouseExecutor и координатное несоответствие.
+- **Подтверждено статически:** формула чтения `max/less`, устройство Monitor 0.2.0, существующая основа Brush Test/MouseExecutor и реализация преобразования logical→screen.
 - **Не подтверждено runtime:** доступность и точность `max/less` на живой доске, реальная установка радиуса во всех режимах, точность transform на живой игре, численный overhead Monitor.
 - **Не завершено:** live A/B/C, loopback integration, полноценный batch runner, полная матрица, валидированная модель CHALK и подключение модели к оптимизатору.
 - Статус задач смотреть в [TASKS.md](TASKS.md); не выводить его только из этого файла, поскольку статусы могут меняться.
