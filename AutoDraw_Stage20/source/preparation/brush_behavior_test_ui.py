@@ -15,7 +15,6 @@ import pyautogui
 from PIL import Image, ImageGrab
 from pynput import keyboard
 
-from stage8_optimizer import save_plan
 from brush_test_workflow import (
     calculate_slider_target, validate_brush_test_preflight, validate_observed_brush_radius,
     should_run_postdraw_workflow,
@@ -603,7 +602,7 @@ class BrushBehaviorTestTab:
                 f"{datetime.now().strftime('%Y%m%d-%H%M%S')}.json"
             )
             plan["generation"]["requested_brush_value"] = brush
-            save_plan(path, plan)
+            path.write_text(json.dumps(plan, ensure_ascii=False, indent=2), encoding="utf-8")
             self.current_plan = plan
             self.current_plan_path = path
             if not self.on_transfer_plan(plan, path):
