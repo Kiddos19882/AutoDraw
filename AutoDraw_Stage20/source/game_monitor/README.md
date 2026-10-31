@@ -315,3 +315,8 @@ Snippet с токеном создаётся в каталоге результ�
 ### Portable-сборка
 
 При сборке Windows portable в корень папки AutoDrawPortable копируется каталог game_monitor со следующими файлами: game_monitor.js, game_monitor_bridge.js, game_monitor_bridge_server.py, requirements-bridge.txt, start_game_monitor_bridge.bat и README.md. UI определяет этот каталог относительно AutoDraw.exe. Для запуска companion server используются тот же каталог результатов data/results/brush_behavior_tests/game_monitor_bridge и тот же output directory, что и у Brush Test.
+
+
+### Надёжность записи session.json на Windows
+
+Bridge записывает session.json атомарно через уникальный временный файл и os.replace(). Если Windows временно блокирует целевой файл и os.replace() возвращает PermissionError (например, WinError 5), сервер выполняет ограниченные повторные попытки с экспоненциальной задержкой. Если блокировка не исчезает, WebSocket handler остаётся активным, ошибка отмечается в bridge_diagnostics.session_persist_failures, а сохранение повторяется при следующем сообщении. Прежний session.json не заменяется частичной записью. Временный файл очищается после каждой попытки.
