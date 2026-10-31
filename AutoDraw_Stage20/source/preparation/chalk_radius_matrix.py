@@ -35,7 +35,8 @@ def build_chalk_radius_matrix_metadata(
         raise ValueError("Радиус матрицы должен быть целым числом.")
     if requested_radius not in RADIUS_LEVELS:
         raise ValueError(f"Для этой матрицы допустимы радиусы: {', '.join(map(str, RADIUS_LEVELS))}.")
-    expected_radius = MATRIX_BLOCKS[block][0] if False else None
+    if requested_radius not in MATRIX_BLOCKS[block]:
+        raise ValueError(f"Радиус {requested_radius} не входит в последовательность блока {block}.")
     return {
         "schema_version": 1,
         "series_id": normalized_id,
