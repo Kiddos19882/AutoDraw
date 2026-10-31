@@ -33,6 +33,8 @@ def test_logical_bounds_map_to_screen_pixel_centers():
     assert info["scale_x"] == pytest.approx(645 / 460)
     assert info["scale_y"] == pytest.approx(337 / 240)
     assert info["point_step_px_units"] == "screen_pixels"
+    assert info["expected_uniform_scale"] is True
+    assert info["uniform_scale_relative_error"] <= info["uniform_scale_tolerance"]
 
 
 def test_source_plan_is_not_mutated_and_transform_is_recorded():
