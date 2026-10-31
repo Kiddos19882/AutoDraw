@@ -1162,3 +1162,22 @@ Run JSON дополнен `stroke_count`, суммой `sampled_point_delta_tota
 Итог: `completed / success`. Успешны `geometry-tests`, `executor-tests` и `Windows portable build and startup smoke-test`. В частности, geometry job выполнил проверку синтаксиса Game Monitor, тесты resource snapshot, WebSocket smoke server, preparation/geometry tests и unified-app UI regressions.
 
 Браузерный gate открыт. Пользователю требуется выполнить локальную серию измерений в игре по `CHALK_RADIUS_MATRIX_PLAN.md`. CI не является доказательством расхода CHALK в браузере и не меняет статус единственной live-точки radius 1 = 718.
+
+
+## 2026-10-31 — автоматическая коррекция радиуса кисти
+
+Разобран дефект: линейная координата ползунка не гарантировала соответствие радиуса. В частности, целевой радиус 5 мог приводить к фактическому 4, а прежний workflow не выполнял автоматическую коррекцию.
+
+Реализован замкнутый цикл:
+1. перед началом установки проверяется наличие активной сессии Game Monitor Bridge со свежим heartbeat;
+2. после отпускания ползунка UI ожидает следующий heartbeat и читает `bridge_diagnostics.last_monitor_status.snapshot` из активного `session.json`;
+3. радиус нормализуется из `currentRadius` (fallback: последний элемент `radius`);
+4. при несовпадении обновляется интервал известных точек (радиус/координата) и рассчитывается следующая позиция bounded-secant методом;
+5. drag и проверка повторяются максимум 7 раз;
+6. только точное совпадение допускает дальнейшее действие; при потере Monitor/ошибке/лимите коррекций тест блокируется.
+
+Реализация: `source/preparation/brush_radius_feedback.py`, изменения `source/preparation/brush_behavior_test_ui.py`. Автоматический ввод значения Monitor пользователем удалён; после точной проверки остаётся только визуальное подтверждение положения ползунка перед запуском executor.
+
+Тесты: `source/preparation/tests/test_brush_radius_feedback.py` покрывает чтение радиуса, fallback, невалидные данные и направление коррекции; `source/preparation/tests/test_brush_behavior_test_ui.py` покрывает mismatch→correction, свежий heartbeat и блокировку/разрешение запуска после Monitor verification.
+
+**Статус:** ожидается CI на актуальном HEAD. Локальный browser test ещё не выполнялся. Полную CHALK-матрицу не запускать до проверки нового замкнутого цикла на коротком тесте радиуса 5.
