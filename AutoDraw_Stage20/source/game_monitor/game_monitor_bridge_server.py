@@ -10,6 +10,7 @@ import asyncio
 import hmac
 import json
 import math
+import os
 import secrets
 import statistics
 import sys
@@ -323,6 +324,44 @@ class RunRecorder:
         return path
 
 
+
+async def persist_json_atomically(
+    path: Path,
+    payload: dict,
+    *,
+    attempts: int = 6,
+    retry_delay: float = 0.05,
+) -> bool:
+    """Write JSON atomically, retrying transient Windows sharing violations."""
+    temp_path = path.with_name(f"{path.name}.{uuid.uuid4().hex}.tmp")
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        temp_path.write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2) + "\\n",
+            encoding="utf-8",
+        )
+        retry_count = max(1, attempts)
+        for attempt in range(retry_count):
+            try:
+                os.replace(temp_path, path)
+                return True
+            except PermissionError:
+                if attempt + 1 >= retry_count:
+                    return False
+                await asyncio.sleep(max(0.0, retry_delay) * (2 ** attempt))
+            except OSError:
+                return False
+        return False
+    except OSError:
+        return False
+    finally:
+        try:
+            temp_path.unlink(missing_ok=True)
+        except OSError:
+            pass
+
+
+
 def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float):
     active_connections = {"count": 0}
 
@@ -348,14 +387,19 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
         session_path: Path | None = None
         session_record: dict | None = None
 
-        def persist_session() -> None:
-            if session_path is not None and session_record is not None:
-                temp_path = session_path.with_suffix(".json.tmp")
-                temp_path.write_text(
-                    json.dumps(session_record, ensure_ascii=False, indent=2) + "\n",
-                    encoding="utf-8",
+        async def persist_session() -> None:
+            if session_path is None or session_record is None:
+                return
+            saved = await persist_json_atomically(session_path, session_record)
+            if not saved:
+                diagnostics = session_record["bridge_diagnostics"]
+                diagnostics["session_persist_failures"] = diagnostics.get("session_persist_failures", 0) + 1
+                diagnostics["last_session_persist_error"] = "atomic_replace_failed"
+                print(
+                    f"WARNING: unable to persist Game Monitor session {recorder.session_id if recorder else 'unknown'}; "
+                    "will retry on the next message",
+                    file=sys.stderr,
                 )
-                temp_path.replace(session_path)
 
         try:
             await websocket.send(json.dumps({"type": "ready"}, separators=(",", ":")))
@@ -401,7 +445,7 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
                             "connection_closed": False,
                         },
                     }
-                    persist_session()
+                    await persist_session()
                     continue
                 if recorder is None or message.get("sessionId") != recorder.session_id:
                     await websocket.close(code=4002, reason="unknown session")
@@ -451,7 +495,7 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
                 else:
                     await websocket.close(code=4002, reason="unsupported message type")
                     return
-                persist_session()
+                await persist_session()
         except (asyncio.TimeoutError, ConnectionClosed):
             pass
         finally:
@@ -460,7 +504,7 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
             if session_record is not None:
                 session_record["bridge_diagnostics"]["connection_closed"] = True
                 session_record["bridge_diagnostics"]["closed_at_utc"] = utc_now()
-                persist_session()
+                await persist_session()
             active_connections["count"] = max(0, active_connections["count"] - 1)
 
     return handler
