@@ -29,7 +29,7 @@
 | Компонент | Основной файл / каталог | Что искать |
 |---|---|---|
 | Точка интеграции приложения | `AutoDraw_Stage20/integrated_app.py` | Создание вкладок, передача callbacks и DrawingPlan, получение canvas area/size, связь Brush Test с Stage6 |
-| UI лаборатории кистей | `AutoDraw_Stage20/source/preparation/brush_behavior_test_ui.py` | Сценарии, создание и передача DrawingPlan, управление запуском теста |
+| UI лаборатории кистей | `AutoDraw_Stage20/source/preparation/brush_behavior_test_ui.py` | Сценарии, создание логических DrawingPlan 420×240 и передача теста |\n| Преобразование координат Brush Test | `AutoDraw_Stage20/source/preparation/brush_coordinate_transform.py` | Явное преобразование logical_board_pixels в screen-local ROI с сохранением transform в generation metadata |
 | Исполнитель мыши | `AutoDraw_Stage20/source/executor/stage6_execute_plan.py` | MouseExecutor, ExecutorConfig, экранные координаты, движение мыши, отчёт исполнения |
 | Game Monitor | `AutoDraw_Stage20/source/game_monitor/game_monitor.js` | Поиск BoardPane, snapshot, inspect, export, wrappers, stop/start |
 | Документация Game Monitor | `AutoDraw_Stage20/source/game_monitor/README.md` | Команды Monitor, контекст iframe и ограничения |
@@ -52,7 +52,7 @@
 | Почему нельзя использовать абсолютный pointCount как расход | [BRUSH_TEST_AUTOMATION_VISION.md](BRUSH_TEST_AUTOMATION_VISION.md), раздел 2 | поля `max`/`less` в Monitor |
 | Размер кисти и влияние на расход | [GAME_MONITOR_BRUSH_LAB_PLAN.md](../GAME_MONITOR_BRUSH_LAB_PLAN.md), разделы о движке и экспериментальной матрице | чтение `atom.radius`, установка ползунка, сценарии Brush Test |
 | Logical 420×240 и экранный ROI | [BRUSH_TEST_AUTOMATION_VISION.md](BRUSH_TEST_AUTOMATION_VISION.md), раздел 3.4; [GAME_MONITOR_BRUSH_LAB_PLAN.md](../GAME_MONITOR_BRUSH_LAB_PLAN.md), уточнение координат | `_get_brush_test_canvas_size()`, `_get_brush_test_canvas_area()`, `MouseExecutor._screen_point()` |
-| Преобразование logical→screen | [BRUSH_TEST_AUTOMATION_VISION.md](BRUSH_TEST_AUTOMATION_VISION.md), разделы 3.4 и 10 | профиль калибровки, transform в executor, callsites Brush Test и Stage6 |
+| Преобразование logical→screen | [BRUSH_TEST_AUTOMATION_VISION.md](BRUSH_TEST_AUTOMATION_VISION.md), разделы 3.4 и 10 | `brush_coordinate_transform.py`, `_get_brush_test_canvas_size()`, `_transfer_brush_test_plan()`; live-проверка границ остаётся |
 | Системное движение мыши и параметры скорости | [EXECUTOR_API_REFERENCE.md](EXECUTOR_API_REFERENCE.md) | `MouseExecutor`, `ExecutorConfig`, `point_step_px`, `point_delay_ms` |
 | Loopback bridge и привязку событий | [GAME_MONITOR_BRUSH_LAB_PLAN.md](../GAME_MONITOR_BRUSH_LAB_PLAN.md), разделы архитектуры и протокола; [BRUSH_TEST_AUTOMATION_VISION.md](BRUSH_TEST_AUTOMATION_VISION.md), раздел 3 | существующий IPC/bridge код и места его запуска |
 | Повторы, seed, матрицу и overlap | [BRUSH_TEST_AUTOMATION_VISION.md](BRUSH_TEST_AUTOMATION_VISION.md), разделы 5–6 | генератор DrawingPlan и Brush Test UI |
@@ -64,7 +64,7 @@
 ## 4. Главные факты и ограничения, которые нельзя потерять
 
 - Логическая доска игрового движка — **420×240**; экранный ROI — отдельная система координат.
-- Текущий зафиксированный блокер: Brush Test использует логические координаты, но размеры canvas берёт из экранного ROI; `MouseExecutor._screen_point()` прибавляет origin без применения scale. Перед матрицей требуется корректный logical→screen transform.
+- Logical→screen transform для Brush Test реализован на этапе передачи плана: logical 420×240 преобразуется в локальные пиксели ROI, обычные local/screen планы не затрагиваются. Используется отображение включительных границ логической доски в крайние пиксели ROI; его соответствие живому hit-test ещё нужно подтвердить.
 - Точный ресурсный снимок: `pointCount = maxPoints - remainingPoints`.
 - Расход опыта: `consumed = post.pointCount - pre.pointCount`, только если baseline/post валидны и относятся к одной сессии доски и одному лимиту.
 - Baseline снимается после подтверждённого Clear; post — до следующего Clear.
@@ -101,3 +101,8 @@
 - сверять упомянутые методы и поля с исходниками;
 - сохранять в индексе только устойчивые точки входа, а подробности оставлять в специализированных документах;
 - не копировать сюда целые разделы других документов.
+
+
+## Дополнение: реализованное преобразование координат
+
+`source/preparation/brush_coordinate_transform.py` содержит `transform_logical_brush_plan_to_screen()`. Brush Test теперь создаёт план в `logical_board_pixels` (420×240), а интеграционный слой преобразует его в `local_canvas_pixels` перед загрузкой в Stage6. Исходный план сохраняется с `generation.screen_transform`; runtime-план имеет размер экранного ROI. Для тестовых штрихов отключено дополнительное продление концов. Тесты: `source/preparation/tests/test_brush_coordinate_transform.py` и обновлённый `tests/test_unified_app.py`.
