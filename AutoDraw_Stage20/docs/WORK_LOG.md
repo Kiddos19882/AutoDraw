@@ -1055,3 +1055,16 @@ Run JSON дополнен `stroke_count`, суммой `sampled_point_delta_tota
 - После CI провести повторный live Firefox тест и проверить появление run JSON и автоматическую привязку к experiment.json.
 
 **CI:** commit 323a698 содержит только session.json. На нём успешно завершились workflow `Brush screenshot measurements` run 17 (`41230071895`) и `Brush centerline measurements` run 29 (`41230071885`). Workflow `Geometry planner tests` для этого commit в списке запусков не обнаружен; успешные профильные workflow не заменяют тесты WebSocket RunRecorder. Исправление и соответствующий regression test ещё не выполнены.
+
+
+### Исправление pointer lifecycle fallback и результаты CI
+
+После live-диагностики в `game_monitor_bridge_server.py` добавлены резервные границы штриха по pointer candidate events. В run сохраняется `stroke_lifecycle_sources`; `stroke_count` рассчитывается по уникальным stroke IDs, а active duration — по парным границам без повторного учёта. Browser bridge запускает/останавливает FPS probe по engine lifecycle или pointer fallback; функции probe идемпотентны.
+
+Добавлены regression tests:
+- pointer-only серия из двух штрихов создаёт один run с exact CHALK delta, правильным stroke_count, длительностью и FPS probe;
+- смешанный engine+pointer lifecycle одного stroke ID не удваивает число штрихов и длительность.
+
+Первые CI итерации обнаружили несовпадение идентификаторов в legacy test fixture: начало штриха не содержало strokeId, а завершающее событие содержало. Добавлен безопасный fallback: если активен ровно один штрих, его ID используется для end boundary. Это не создаёт неоднозначности при нескольких активных штрихах.
+
+На commit `a1f8090ea5117785427c643769e8f034b46af391` step `Test local WebSocket smoke server` в workflow `Geometry planner tests` run `41230755334` завершился success, включая новые pointer lifecycle tests. Остальные jobs полного workflow на момент записи ещё выполняются; общий CI пока не объявлен успешным. Live Firefox повтор после исправления ещё не выполнен.
