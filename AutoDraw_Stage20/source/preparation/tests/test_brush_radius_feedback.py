@@ -39,6 +39,11 @@ def test_radius_feedback_moves_towards_1_when_observed_radius_is_too_large():
     assert 200 < target[0] < 390
 
 
+def test_radius_feedback_returns_known_endpoint_for_radius_one_or_thirty():
+    assert calculate_radius_correction_target((100, 500), 30, (390, 500), 1, 30) == (100, 500)
+    assert calculate_radius_correction_target((100, 500), 30, (390, 500), 1, 1) == (390, 500)
+
+
 def test_radius_feedback_rejects_invalid_bracket():
     import pytest
     with pytest.raises(ValueError):
