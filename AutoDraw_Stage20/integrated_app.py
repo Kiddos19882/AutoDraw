@@ -113,6 +113,7 @@ try:
     from geometry_color_plan import save_geometry_color_plan
     from paint_limit_test_ui import PaintLimitTestTab
     from brush_behavior_test_ui import BrushBehaviorTestTab
+    from brush_coordinate_transform import LOGICAL_BOARD_SIZE, transform_logical_brush_plan_to_screen
     from brush_calibration_ui import BrushCalibrationTab
 except ImportError as exc:  # pragma: no cover - exercised by packaging smoke test
     raise SystemExit(
@@ -528,10 +529,10 @@ class AutoDrawUnifiedApp:
         return self._get_execution_canvas_area()
 
     def _get_brush_test_canvas_size(self) -> tuple[int, int] | None:
-        area = self._get_brush_test_canvas_area()
-        if area is None:
+        """Return game-logical dimensions; the screen ROI is resolved separately at handoff."""
+        if self._get_brush_test_canvas_area() is None:
             return None
-        return int(area["width"]), int(area["height"])
+        return LOGICAL_BOARD_SIZE
 
     def _on_brush_calibration_saved(self, _profile: dict[str, Any] | None = None) -> None:
         """Keep the execution tab and brush-test tab aligned with the shared profile."""
