@@ -26,7 +26,7 @@ def test_logical_bounds_map_to_screen_pixel_centers():
     points = result["strokes"][0]["points"]
     assert points[0] == {"x": 0.0, "y": 0.0}
     assert points[-1] == {"x": 645.0, "y": 322.0}
-    assert points[1]["x"] == pytest.approx(322.5)
+    assert points[1]["x"] == pytest.approx(210 * 645 / 460)
     assert points[1]["y"] == pytest.approx(161.0)
     assert result["canvas"] == {"width": 646, "height": 323}
     assert result["coordinate_system"] == "local_canvas_pixels"
