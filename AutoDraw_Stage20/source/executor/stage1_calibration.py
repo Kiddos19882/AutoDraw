@@ -324,7 +324,7 @@ class CalibrationApp:
         ttk.Label(
             notes,
             text=(
-                "Аварийная остановка: F12. Также сработает PyAutoGUI FAILSAFE, "
+                "Аварийная остановка: Alt. Также сработает PyAutoGUI FAILSAFE, "
                 "если переместить курсор в верхний левый угол экрана.\n"
                 "Программа не может определить, какие линии сервер доски сохранил: "
                 "после теста нужно визуально проверить результат."
@@ -456,7 +456,7 @@ class CalibrationApp:
             "После подтверждения у вас будет 5 секунд, чтобы переключиться на браузер.\n"
             + ("При запуске теста длины и пауз линии длины рисуются слева, тест пауз — справа.\n" if task == "both" else "")
             + ("Контрольный тест рисует сверху вниз три блока длиной 100, 200 и 400 px; параметры задержек фиксированы на 10/20/20 мс.\n" if task == "line_stability" else "")
-            + "F12 — аварийная остановка.",
+            + "Alt — аварийная остановка.",
             parent=self.root,
         )
         if not ok:
@@ -465,7 +465,7 @@ class CalibrationApp:
         self.running = True
         self.stop_event.clear()
         self.last_task = task
-        self.status_var.set("Тест выполняется… Переключитесь на браузер. F12 — остановить.")
+        self.status_var.set("Тест выполняется… Переключитесь на браузер. Alt — остановить.")
         self.root.withdraw()
         threading.Thread(target=self._worker, args=(task, self.area), daemon=True).start()
 
@@ -474,8 +474,8 @@ class CalibrationApp:
         was_stopped = False
         listener = None
         try:
-            # F12 работает глобально, даже когда окно программы скрыто.
-            listener = keyboard.GlobalHotKeys({"<f12>": self.stop_event.set})
+            # Alt работает глобально, даже когда окно программы скрыто.
+            listener = keyboard.GlobalHotKeys({"<alt>": self.stop_event.set})
             listener.start()
             for _ in range(5, 0, -1):
                 if self.stop_event.is_set():
@@ -522,7 +522,7 @@ class CalibrationApp:
 
     def _check_stop(self) -> None:
         if self.stop_event.is_set():
-            raise InterruptedError("Тест остановлен пользователем через F12")
+            raise InterruptedError("Тест остановлен пользователем через Alt")
 
     def _draw_single_move(self, x1: int, y: int, length: int) -> None:
         self._check_stop()
