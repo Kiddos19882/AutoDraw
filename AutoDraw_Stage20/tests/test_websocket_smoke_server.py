@@ -209,6 +209,12 @@ class ProductionBridgeIntegrationTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(report["sampled_point_delta_total"], 0)
                 self.assertIsNone(report["point_delta_matches_chalk"])
                 self.assertEqual(report["execution_status"], "completed")
+                session = json.loads((output / session_id / "session.json").read_text(encoding="utf-8"))
+                diagnostics = session["bridge_diagnostics"]
+                self.assertEqual(diagnostics["received_event_count"], 2)
+                self.assertEqual(diagnostics["received_event_types"], {"DRAW_START": 1, "DRAW_END": 1})
+                self.assertEqual(diagnostics["last_monitor_status"]["active"], True)
+                self.assertTrue(diagnostics["connection_closed"])
             finally:
                 server.close()
                 await server.wait_closed()
