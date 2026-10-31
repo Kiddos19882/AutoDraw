@@ -291,10 +291,10 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
             await websocket.close(code=4008, reason="bridge already has an active browser")
             return
         active_connections["count"] += 1
-        await websocket.send(json.dumps({"type": "ready"}, separators=(",", ":")))
         recorder: RunRecorder | None = None
         last_sequence = 0
         try:
+            await websocket.send(json.dumps({"type": "ready"}, separators=(",", ":")))
             async for raw in websocket:
                 message = parse_json(raw)
                 if not message:
