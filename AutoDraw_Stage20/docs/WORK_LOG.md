@@ -1002,3 +1002,23 @@ Run JSON дополнен `stroke_count`, суммой `sampled_point_delta_tota
 ### Уточнение статуса monitor_capture
 
 Статус `saved` теперь требует не только exact CHALK и отсутствия потерь, но и положительного расхода/наличия штриха, acceptedPoint, совпадения pointDelta с CHALK, одного радиуса, измеренного FPS без скрытия iframe и нулевых ошибок. Пустой/неполный прогон не будет автоматически считаться успешным даже если executor вернул completed.
+
+
+## 2026-10-31 — диагностика отсутствующих WebSocket run-файлов после commit 6382c27
+
+**Исходные данные:** commit `6382c27e01f12f7b980bc8fb1ec3e78c760d5b6f` содержит два завершённых executor-теста (`paint_consumption_long_lines`, 6 штрихов; `repeated_coverage`, 4 штриха). В обоих `experiment.json` записано `monitor_capture.status=unavailable`, `reason=matching_run_report_not_found`, `game_monitor_report_path=null`. Добавленный в репозиторий `session.json` относится к session ID `3323cf8e-01ca-4009-8f16-27d657d857f8`; он не совпадает с ID `89f3383e-b562-462f-a1dc-8f516bdd7378`, сообщённым после коммита.
+
+**Подтверждённое поведение кода:** `session.json` создаётся на `session_start`; run JSON создаётся только после события `DRAW_START` и финализируется после idle heartbeat/закрытия соединения. Поэтому наличие только session.json означает, что collector не получил распознанный стартовый штрих (либо поток событий не дошёл до него). Старый формат session.json не сохранял последующие heartbeat и счётчики входящих событий, поэтому по нему нельзя отличить отсутствие событий Monitor от потери событий на стороне bridge.
+
+**Изменения:**
+- Browser bridge теперь ведёт `sentEventCount`, `lastEventType`, `lastEventAtPerformanceMs` и `sendFailureCount` и передаёт их в heartbeat.
+- Collector обновляет `session.json` атомарно после сообщений: количество принятых сообщений/событий, типы событий, последний sequence/type/time, последний `monitorStatus`, browser bridge diagnostics, число FPS probes и состояние закрытия соединения.
+- Интеграционный тест production WebSocket handler дополнен проверками сохранённых event counters/types и heartbeat status.
+
+**Как читать следующий диагностический session.json:**
+- `last_monitor_status.eventCount` растёт, `browser_bridge.sentEventCount` растёт, но `received_event_count=0` — browser bridge не доставляет event-сообщения серверу либо callback не вызывается;
+- `last_monitor_status.eventCount` растёт и `sentEventCount` растёт, но серверные `received_event_count`/типы не растут — искать сбой между отправкой и обработчиком/протоколом;
+- `last_monitor_status.eventCount` не растёт во время рисования — Game Monitor не фиксирует вызовы BoardPane в текущем игровом контексте;
+- `received_event_types` содержит `DRAW_START`/`DRAW_SAMPLE`/`DRAW_END`, но run JSON отсутствует — это уже ошибка RunRecorder/finalization, которую можно локализовать по последовательности и `last_message_type`.
+
+**Статус:** это диагностическое улучшение, а не доказанное исправление причины отсутствия run-файла. После обновления требуется перезапустить локальный bridge, заново вставить новый сгенерированный snippet в игровой iframe и выполнить один короткий тест. Live Firefox run ещё не подтверждён.
