@@ -100,6 +100,12 @@ def _manifest_measurement(document: dict[str, Any]) -> tuple[bool, str, dict[str
     capture = capture if isinstance(capture, dict) else {}
     if capture.get("status") != "saved":
         return False, f"monitor_capture_{capture.get('status', 'missing')}", None
+    experiment_id = document.get("experiment_id")
+    if not experiment_id or capture.get("experiment_id") != experiment_id:
+        return False, "experiment_id_mismatch", None
+    if summary_id := document.get("game_monitor_summary", {}).get("autodraw_experiment_id") if isinstance(document.get("game_monitor_summary"), dict) else None:
+        if summary_id != experiment_id:
+            return False, "monitor_experiment_id_mismatch", None
     if capture.get("stroke_count") != EXPECTED_STROKES or capture.get("expected_stroke_count") != EXPECTED_STROKES:
         return False, "stroke_count_mismatch", None
 
@@ -135,7 +141,11 @@ def _manifest_measurement(document: dict[str, Any]) -> tuple[bool, str, dict[str
     execution = execution if isinstance(execution, dict) else {}
     if execution.get("status") != "completed":
         return False, "executor_not_completed", None
-    if int(execution.get("completed_strokes", EXPECTED_STROKES) or 0) != EXPECTED_STROKES:
+    try:
+        completed_strokes = int(execution.get("completed_strokes", EXPECTED_STROKES) or 0)
+    except (TypeError, ValueError, OverflowError):
+        return False, "executor_stroke_count_unreadable", None
+    if completed_strokes != EXPECTED_STROKES:
         return False, "executor_stroke_count_mismatch", None
 
     return True, "valid", {
