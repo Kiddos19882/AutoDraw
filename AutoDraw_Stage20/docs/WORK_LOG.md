@@ -635,3 +635,60 @@
 - Далее INT-005—INT-009: контролируемая матрица, модель, интеграция, оптимизация и прогноз/факт.
 
 **Документы, обновлённые по INT-002:** `TASKS.md`, `WORK_LOG.md`, `PROJECT_STATUS.md`, `ROADMAP.md`, `DECISIONS.md`, `CHANGELOG.md`, `BRUSH_MONITOR_AUTOCAPTURE_DESIGN.md`, `GAME_MONITOR_BRUSH_LAB_PLAN.md`, `source/game_monitor/README.md`.
+
+## INT-003 — точный источник CHALK и низконагрузочный Monitor (частично выполнено)
+
+**Дата:** 2026-10-31  
+**Статус:** IN_PROGRESS — статическая часть и реализация выполнены; live browser/game A/B остаётся незавершённым.
+
+### Проверка игрового bundle
+
+Изучен клиентский bundle из `master`: `AutoDraw_Stage20/fileGameEngine/main.min_570122a1.js` (blob SHA `28838e803dcc6f85efb13febd93cc9e0f5046ffc`).
+
+Подтверждено:
+- конструктор `BoardPane` устанавливает `this.max=n`, `this.less=this.max`, затем вызывает `clear()`;
+- `updateLess()` считает все точки `atom.points`, присваивает `this.less=this.max-e` и отправляет `BlackBoardEvent.CHALK` с `percent=this.less/this.max`;
+- `onDrawStart()` добавляет начальную точку и вызывает `updateLess()`;
+- `onDrawing()` на `ENTER_FRAME` добавляет точку только если координата внутри доски, затем вызывает `updateLess()`;
+- `onDrawingEnd()` фиксирует штрих через `atom.add()`;
+- радиус кисти не участвует в формуле CHALK. Он может влиять на покрытие/количество требуемых штрихов, но не на прямую стоимость уже принятой точки.
+
+Таким образом, статически подтверждён O(1)-источник точного текущего остатка: числовые поля экземпляра `BoardPane.max` и `BoardPane.less`. `percent` в событии CHALK не нужен для восстановления целого остатка. Фактический расход прогона по-прежнему вычисляется как `post.pointCount-pre.pointCount`, где `pointCount=max-less`, при неизменной доске и лимите.
+
+### Реализация Game Monitor 0.2.0
+
+Изменён `AutoDraw_Stage20/source/game_monitor/game_monitor.js`:
+- добавлен O(1) `resourceSnapshot()` с проверкой целочисленности и диапазона `max/less`;
+- `emit()`, wrappers, polling, `status()` и `export()` больше не сканируют `atom.points`;
+- полный рекурсивный подсчёт и поиск последней точки вынесены в явный `diagnosticSnapshot()`;
+- при недоступных/невалидных полях возвращается `validationStatus: "unavailable"`, без скрытого O(N) fallback;
+- экспорт содержит `resourceSnapshot`, включая `maxPoints`, `remainingPoints`, `pointCount`, `sourceMethod`, `isExact` и `validationStatus`.
+
+### Автоматические проверки
+
+Добавлен `AutoDraw_Stage20/source/game_monitor/tests/game_monitor.test.js` на Node.js:
+- exact snapshot из `max-less`;
+- отсутствие чтения элементов `atom.points` из Monitor hot path;
+- явная диагностическая сверка с полным подсчётом;
+- `unavailable` без fallback при отсутствии `less`;
+- вычисление дельты точек;
+- восстановление исходного метода после `stop()`.
+
+В `.github/workflows/geometry-tests.yml` добавлен шаг `node --test ..\\game_monitor\\tests\\game_monitor.test.js`. CI-запуски после изменений созданы; окончательное состояние и логи теста будут зафиксированы после завершения workflow.
+
+### Незавершённая runtime-часть
+
+В текущей среде нет управляемого браузера/DevTools и доступа к пользовательскому игровому iframe, поэтому фактическое чтение полей живого экземпляра и A/B-замер FPS выполнить здесь нельзя. Это ограничение среды, а не отрицательный результат теста.
+
+Для закрытия INT-003 необходимы в реальной игре:
+1. проверить `status().snapshot`: `isExact=true`, целые `maxPoints`/ `remainingPoints`, `pointCountMatches=true` при явном `diagnosticSnapshot()`;
+2. проверить значения до Clear, после Clear, после одного штриха и после нескольких штрихов;
+3. провести минимум 3 чередующихся повтора A (Monitor off) и B (Monitor 0.1.2), а затем минимум 3 повтора A и C (Monitor 0.2.0) при одинаковых условиях;
+4. сохранить frame probe, длительность, фактическую дельту точек, завершённые/пропущенные штрихи, eventCount/droppedEvents/errors;
+5. сравнить медианы и разброс. До этого нельзя заявлять, что overhead равен нулю или что FPS улучшился на конкретный процент.
+
+**Коммиты реализации:**  
+- `5619b68eea41e933db10dcb145d6326a22bb2e56` — Game Monitor 0.2.0, O(1) snapshot.  
+- `541d04a150dedb3b048242b879fa8aa28e715de5` — первичные Node-тесты.  
+- `683a943bcb69b4cd38309c38910981efae7c2701` — запуск Node-тестов в CI.  
+- `3892e380827d16872073adac785d4c776db95232` — исправлена проверка восстановления исходного метода в тесте.
