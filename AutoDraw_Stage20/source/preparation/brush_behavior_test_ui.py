@@ -1107,6 +1107,11 @@ class BrushBehaviorTestTab:
             return
         if self._brush_drag_state is not None:
             self._finish_brush_drag(cancelled=True)
+            return
+        if getattr(self, "_brush_feedback_state", None) is not None:
+            self._fail_brush_radius_feedback(
+                "cancelled_by_user", "Проверка радиуса отменена по Alt."
+            )
 
     def _finish_brush_drag(self, *, cancelled: bool = False, error: str | None = None) -> None:
         state = self._brush_drag_state
