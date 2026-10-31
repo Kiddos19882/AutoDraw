@@ -49,7 +49,6 @@
   };
 
   const startFpsProbe = () => {
-    fpsEndTimer = null;
     if (fpsActive) return;
     fpsActive = true;
     fpsStartedAt = performance.now();
@@ -103,7 +102,6 @@
     connected = false;
     if (unsubscribe) unsubscribe();
     if (heartbeatTimer !== null) clearInterval(heartbeatTimer);
-    if (fpsEndTimer !== null) clearTimeout(fpsEndTimer);
     if (rafHandle !== null) cancelAnimationFrame(rafHandle);
     window.AutoDrawGameMonitorBridge = { connected: false, sessionId, closeCode: event.code, closeReason: event.reason };
     console.warn("AutoDraw Game Monitor Bridge disconnected:", event.code, event.reason);
