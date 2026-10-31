@@ -25,7 +25,6 @@
   let fpsActive = false;
   let fpsStartedAt = null;
   let frameTimes = [];
-  let fpsEndTimer = null;
 
   const send = (type, payload = {}) => {
     if (!connected || socket.readyState !== WebSocket.OPEN) return false;
@@ -50,7 +49,6 @@
   };
 
   const startFpsProbe = () => {
-    if (fpsEndTimer !== null) clearTimeout(fpsEndTimer);
     fpsEndTimer = null;
     if (fpsActive) return;
     fpsActive = true;
@@ -86,13 +84,7 @@
       unsubscribe = monitor.subscribe(item => {
         if (!ALLOWED_EVENTS.has(item.type)) return;
         if (item.type === "DRAW_START") startFpsProbe();
-        if (item.type === "DRAW_END" && fpsActive) {
-          if (fpsEndTimer !== null) clearTimeout(fpsEndTimer);
-          fpsEndTimer = setTimeout(() => {
-            fpsEndTimer = null;
-            stopFpsProbe();
-          }, 2500);
-        }
+        if (item.type === "DRAW_END" && fpsActive) stopFpsProbe();
         send("event", { event: item });
       });
       heartbeatTimer = setInterval(() => {
