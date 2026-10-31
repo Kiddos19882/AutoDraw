@@ -308,3 +308,15 @@ Game Monitor 0.2.0 читает `max` и `less` через O(1) `resourceSnapsho
 - при старте нового эксперимента отменяется предыдущий polling callback.
 
 **Ограничение корреляции:** текущая привязка основана на timestamp `before_draw` + фактическом радиусе, а не на общем experiment_id, переданном из UI в browser session. При последовательных одинаковых тестах с перекрывающимися временными окнами нужна дополнительная проверка; прямой run marker будет предпочтительным следующим улучшением.
+
+
+## 15. Строгая проверка полноты телеметрии — 31.10.2026
+
+Run JSON дополнен автоматическими контрольными метриками:
+- `stroke_count` — число `DRAW_START` в run;
+- `sampled_point_delta_total` — сумма неотрицательных целочисленных `pointDelta` из `DRAW_SAMPLE`;
+- `point_delta_matches_chalk` — совпадает ли сумма sample deltas с exact pre/post CHALK delta, если все samples имеют валидный delta;
+- `observed_brush_radii` и `brush_radius_status` (`single`, `mixed`, `unavailable`) — проверка, что внутри одного run кисть не менялась;
+- `monitor_dropped_events`, `dropped_events`, `monitor_error_count` — потери и ошибки Monitor/collector.
+
+Brush Test UI выставляет `monitor_capture.status=saved` только если одновременно: execution completed, CHALK exact, один наблюдаемый радиус, сумма pointDelta совпала с CHALK, нет dropped events и нет ошибок Monitor. Во всех остальных случаях отчёт сохраняется, но статус остаётся `partial`; данные не отбрасываются и не маскируются как успешные.
