@@ -908,3 +908,12 @@ CI run #41174050665 на пользовательском commit f72 выяви�
 Проверен актуальный HEAD ветки `feature/image-geometry-optimization`: `354ff64802a8065aff19f17176c2ea3e65ff4bbc`. Workflow #1241 (`41212496267`) завершился success. Все три jobs прошли: `geometry-tests`, `executor-tests`, `Windows portable build and startup smoke-test`. В geometry job успешно выполнены Game Monitor syntax/resource snapshot tests, локальный WebSocket smoke server, анализ клиентского bundle, Stage 5/7/8 benchmarks, synthetic geometry, fallback/outline-first comparisons, preparation/geometry tests и unified-app UI regressions.
 
 CI закрывает автоматическую проверку текущего HEAD, но не live Firefox iframe transport, не A/B/C overhead и не новую live-проверку acceptedPoint. INT-003 остаётся IN_PROGRESS. Следующий gate — реальный browser smoke test; до его прохождения production bridge не реализовывать.
+
+
+### 31.10.2026 — дополнена инструкция запуска Firefox smoke-server
+
+- По замечанию пользователя проверен `source/game_monitor/README.md`: инструкция подключения Game Monitor присутствовала, но команды установки зависимости и запуска отдельного WebSocket smoke-server отсутствовали.
+- Сверены фактические CLI-параметры с `source/game_monitor/websocket_smoke_server.py` и зависимостью `requirements-smoke.txt`: Python 3.11, обязательный `--origin`, порт по умолчанию `8765`, привязка только к `127.0.0.1`.
+- В README добавлены команды PowerShell из корня репозитория, получение точного `location.origin` из игрового iframe, реальный протокол одноразовой авторизации `auth → ready → ping → pong`, ожидаемые результаты, обработка типовых ошибок и остановка сервера.
+- Token явно обозначен как секрет одноразового использования; инструкция не предлагает публиковать его или обходить CSP.
+- Изменён только README Game Monitor и этот журнал документации. Код сервера, Game Monitor и игровой движок не менялись. Live Firefox smoke test по-прежнему не считается выполненным.
