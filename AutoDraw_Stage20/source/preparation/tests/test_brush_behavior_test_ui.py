@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
 import brush_behavior_test_ui as brush_ui
@@ -918,3 +920,121 @@ def test_logical_plan_visibility_rejects_screenshot_roi_mismatch() -> None:
     strokes, error = brush_ui._screen_local_strokes_for_capture(plan, (553, 301))
     assert strokes is None
     assert error == "drawing_plan_screen_transform_roi_mismatch"
+
+
+
+def _monitor_run_fixture(*, started, finished, strokes=6, radius=1, radii=None, chalk_status="exact",
+                         pre=10, post=40, consumed=30):
+    return {
+        "record_type": "autodraw_game_monitor_run",
+        "execution_status": "completed",
+        "started_at_utc": started,
+        "finished_at_utc": finished,
+        "brush_radius": radius,
+        "observed_brush_radii": [radius] if radii is None else radii,
+        "brush_radius_status": "single" if radii is None or radii == [radius] else "mixed",
+        "stroke_count": strokes,
+        "chalk": {
+            "status": chalk_status,
+            "pre_point_count": pre,
+            "post_point_count": post,
+            "consumed_points": consumed,
+        },
+    }
+
+
+def test_execution_monitor_selection_uses_executor_window_stroke_count_and_radius(tmp_path):
+    execution = {
+        "started_at": "2026-10-31T21:50:15+03:00",
+        "ended_at": "2026-10-31T21:50:45+03:00",
+    }
+    stale_before = _monitor_run_fixture(
+        started="2026-10-31T18:50:06+00:00", finished="2026-10-31T18:50:09+00:00",
+        strokes=6,
+    )
+    valid = _monitor_run_fixture(
+        started="2026-10-31T18:50:16+00:00", finished="2026-10-31T18:50:40+00:00",
+        strokes=6,
+    )
+    manual_after = _monitor_run_fixture(
+        started="2026-10-31T18:52:11+00:00", finished="2026-10-31T18:52:22+00:00",
+        strokes=6,
+    )
+    wrong_stroke_count = _monitor_run_fixture(
+        started="2026-10-31T18:50:17+00:00", finished="2026-10-31T18:50:30+00:00",
+        strokes=1,
+    )
+    wrong_radius = _monitor_run_fixture(
+        started="2026-10-31T18:50:17+00:00", finished="2026-10-31T18:50:30+00:00",
+        strokes=6, radius=30,
+    )
+    candidates = [
+        (tmp_path / "old.json", stale_before),
+        (tmp_path / "manual.json", manual_after),
+        (tmp_path / "wrong-count.json", wrong_stroke_count),
+        (tmp_path / "wrong-radius.json", wrong_radius),
+        (tmp_path / "valid.json", valid),
+    ]
+
+    selected, reason, count = brush_ui.select_execution_monitor_run(
+        candidates,
+        execution_report=execution,
+        requested_brush=1,
+        expected_strokes=6,
+        before_draw_at="2026-10-31T18:50:08+00:00",
+    )
+
+    assert selected == candidates[-1]
+    assert reason == "matched_executor_window"
+    assert count == 1
+
+
+def test_execution_monitor_selection_rejects_ambiguous_runs_in_same_window(tmp_path):
+    execution = {
+        "started_at": "2026-10-31T21:50:15+03:00",
+        "ended_at": "2026-10-31T21:50:45+03:00",
+    }
+    first = _monitor_run_fixture(
+        started="2026-10-31T18:50:16+00:00", finished="2026-10-31T18:50:30+00:00",
+    )
+    second = _monitor_run_fixture(
+        started="2026-10-31T18:50:20+00:00", finished="2026-10-31T18:50:40+00:00",
+    )
+
+    selected, reason, count = brush_ui.select_execution_monitor_run(
+        [(tmp_path / "first.json", first), (tmp_path / "second.json", second)],
+        execution_report=execution,
+        requested_brush=1,
+        expected_strokes=6,
+    )
+
+    assert selected is None
+    assert reason == "ambiguous_executor_window"
+    assert count == 2
+
+
+def test_execution_monitor_selection_fails_closed_without_executor_timestamps(tmp_path):
+    report = _monitor_run_fixture(
+        started="2026-10-31T18:50:16+00:00", finished="2026-10-31T18:50:40+00:00",
+    )
+
+    selected, reason, count = brush_ui.select_execution_monitor_run(
+        [(tmp_path / "run.json", report)],
+        execution_report={"status": "completed"},
+        requested_brush=1,
+        expected_strokes=6,
+    )
+
+    assert selected is None
+    assert reason == "execution_time_window_unavailable"
+    assert count == 0
+
+
+def test_execution_monitor_selection_does_not_accept_reset_or_zero_chalk_as_saved():
+    report = _monitor_run_fixture(
+        started="2026-10-31T18:50:16+00:00", finished="2026-10-31T18:50:40+00:00",
+        pre=721, post=48, consumed=-673, chalk_status="inconclusive",
+    )
+    chalk = report["chalk"]
+    assert chalk["status"] != "exact"
+    assert chalk["consumed_points"] <= 0
