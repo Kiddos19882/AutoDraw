@@ -61,7 +61,7 @@ class ColorPlanExecutionTests(unittest.TestCase):
         FAKE_PYAUTOGUI.up_calls = 0
         FAKE_PYAUTOGUI._size = (160, 100)
         FAKE_PYAUTOGUI.on_move = None
-        FakeGlobalHotKeys.trigger_f12_on_start = False
+        FakeGlobalHotKeys.trigger_alt_on_start = False
         self.screen, self.profile, self.color_plan = make_profile_and_plan()
 
     def config(self):
