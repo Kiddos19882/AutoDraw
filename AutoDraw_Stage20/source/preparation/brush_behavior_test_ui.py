@@ -20,6 +20,9 @@ from brush_test_workflow import (
     calculate_slider_target, validate_brush_test_preflight, validate_observed_brush_radius,
     should_run_postdraw_workflow,
 )
+from chalk_radius_matrix import (
+    MATRIX_SCENARIO_ID, build_chalk_radius_matrix_metadata, is_monitor_run_claimed,
+)
 from brush_experiment_capture import (
     compare_images, crop_calibrated_regions,
     measure_meter_fill_against_baseline, evaluate_meter_restoration, evaluate_board_clear,
@@ -572,6 +575,10 @@ class BrushBehaviorTestTab:
         self.last_record_path: Path | None = None
         self.brush_var = tk.StringVar(value="7")
         self.case_var = tk.StringVar(value=next(iter(TEST_CASES)))
+        self.matrix_series_var = tk.StringVar(value=f"chalk-{datetime.now().strftime('%Y%m%d-%H%M%S')}")
+        self.matrix_block_var = tk.StringVar(value="1")
+        self._chalk_matrix_metadata: dict[str, Any] | None = None
+        self._experiment_id: str | None = None
         self.outcome_var = tk.StringVar(value="not_reviewed")
         self.notes_var = tk.StringVar()
         self.visible_strokes_var = tk.StringVar()
@@ -609,6 +616,16 @@ class BrushBehaviorTestTab:
         ttk.Entry(row, textvariable=self.brush_var, width=6).pack(side="left", padx=(6, 16))
         ttk.Label(row, text="Тест").pack(side="left")
         ttk.Combobox(row, textvariable=self.case_var, values=tuple(TEST_CASES), state="readonly", width=30).pack(side="left", padx=6)
+        matrix_row = ttk.Frame(controls)
+        matrix_row.pack(fill="x", pady=(8, 0))
+        ttk.Label(matrix_row, text="ID серии CHALK").pack(side="left")
+        ttk.Entry(matrix_row, textvariable=self.matrix_series_var, width=28).pack(side="left", padx=(6, 16))
+        ttk.Label(matrix_row, text="Блок матрицы (1–3)").pack(side="left")
+        ttk.Entry(matrix_row, textvariable=self.matrix_block_var, width=4).pack(side="left", padx=6)
+        ttk.Label(
+            matrix_row,
+            text="Для paint_consumption_long_lines: один радиус в каждом блоке; три блока дают три повтора.",
+        ).pack(side="left", padx=8)
         ttk.Label(controls, textvariable=self.area_var, wraplength=1100).pack(anchor="w", pady=(8, 0))
         slider = ttk.LabelFrame(controls, text="Автоматическая установка кисти", padding=6)
         slider.pack(fill="x", pady=(8, 0))
@@ -770,9 +787,18 @@ class BrushBehaviorTestTab:
                 f"{datetime.now().strftime('%Y%m%d-%H%M%S')}.json"
             )
             plan["generation"]["requested_brush_value"] = brush
+            matrix_metadata = None
+            if plan["generation"].get("test_case") == MATRIX_SCENARIO_ID:
+                matrix_metadata = build_chalk_radius_matrix_metadata(
+                    series_id=self.matrix_series_var.get(),
+                    block=int(self.matrix_block_var.get().strip()),
+                    requested_radius=brush,
+                )
+                plan["generation"]["chalk_radius_matrix"] = matrix_metadata
             path.write_text(json.dumps(plan, ensure_ascii=False, indent=2), encoding="utf-8")
             self.current_plan = plan
             self.current_plan_path = path
+            self._chalk_matrix_metadata = matrix_metadata
             if not self.on_transfer_plan(plan, path):
                 return
             self._reset_observation_fields()
@@ -783,6 +809,7 @@ class BrushBehaviorTestTab:
     def _reset_observation_fields(self) -> None:
         """Prevent evidence from a previous run being attached to a new test plan."""
         self._experiment_requested_brush = int(self.brush_var.get().strip())
+        self._experiment_id = uuid.uuid4().hex
         self.screenshot_path = None
         self.experiment_dir = None
         self.experiment_phases = {}
@@ -1285,7 +1312,9 @@ class BrushBehaviorTestTab:
         scenario = TEST_CASES.get(self.case_var.get(), {}).get("id", "unknown")
         if self.experiment_dir is None:
             stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-            self.experiment_dir = self.output_dir / f"experiment-{stamp}-b{brush}-{scenario}"
+            experiment_id = self._experiment_id or uuid.uuid4().hex
+            self._experiment_id = experiment_id
+            self.experiment_dir = self.output_dir / f"experiment-{stamp}-b{brush}-{scenario}-{experiment_id[:8]}"
             self.experiment_dir.mkdir(parents=True, exist_ok=False)
         self.experiment_phases = {}
         self._automated_preclear_active = True
@@ -2258,13 +2287,40 @@ class BrushBehaviorTestTab:
         if selected is not None:
             source_path, report = selected
             try:
+                run_id = report.get("run_id")
+                if is_monitor_run_claimed(
+                    self.output_dir, run_id, exclude_experiment_dir=self.experiment_dir
+                ):
+                    selected = None
+                    match_reason = "monitor_run_already_claimed"
+                    candidate_count = 0
+                    self.status_var.set("Game Monitor run уже привязан к другому experiment; повторная привязка запрещена.")
+                    self._bridge_capture_poll_id = None
+                    self.experiment_phases["monitor_capture"] = {
+                        "status": "unavailable",
+                        "transport": "loopback_websocket",
+                        "reason": match_reason,
+                        "run_id": run_id,
+                        "experiment_id": self._experiment_id,
+                    }
+                    self._write_experiment_manifest()
+                    return
                 target_path = self.experiment_dir / "monitor_report.json"
-                shutil.copy2(source_path, target_path)
+                report_copy = dict(report)
+                report_copy["autodraw_experiment_id"] = self._experiment_id
+                report_copy["chalk_radius_matrix"] = self._chalk_matrix_metadata
+                target_path.write_text(
+                    json.dumps(report_copy, ensure_ascii=False, indent=2) + "\n",
+                    encoding="utf-8",
+                )
                 chalk = report.get("chalk") if isinstance(report.get("chalk"), dict) else {}
                 frame_probe = report.get("frame_probe") if isinstance(report.get("frame_probe"), dict) else {}
                 trajectory = report.get("trajectory") if isinstance(report.get("trajectory"), dict) else {}
                 summary = {
                     "source": "loopback_websocket_bridge",
+                    "autodraw_experiment_id": self._experiment_id,
+                    "chalk_radius_matrix": self._chalk_matrix_metadata,
+                    "run_id": report.get("run_id"),
                     "session_id": report.get("session_id"),
                     "run_id": report.get("run_id"),
                     "execution_status": report.get("execution_status"),
@@ -2306,6 +2362,8 @@ class BrushBehaviorTestTab:
                     "status": "saved" if telemetry_clean else "partial",
                     "transport": "loopback_websocket",
                     "match_reason": match_reason,
+                    "experiment_id": self._experiment_id,
+                    "chalk_radius_matrix": self._chalk_matrix_metadata,
                     "session_id": report.get("session_id"),
                     "run_id": report.get("run_id"),
                     "source_path": str(source_path.resolve()),
@@ -2363,6 +2421,8 @@ class BrushBehaviorTestTab:
         manifest = {
             "schema_version": 1,
             "record_type": "autodraw_brush_paint_experiment",
+            "experiment_id": self._experiment_id,
+            "chalk_radius_matrix": self._chalk_matrix_metadata,
             "updated_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "test_case": TEST_CASES.get(self.case_var.get(), {}).get("id"),
             "brush_value_requested": self._experiment_requested_brush if self._experiment_requested_brush is not None else int(self.brush_var.get().strip()),
