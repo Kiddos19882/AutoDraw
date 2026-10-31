@@ -97,14 +97,18 @@ def calculate_radius_correction_target(
     requested_radius: int,
 ) -> tuple[int, int]:
     """Use a bounded secant step between known higher- and lower-radius positions."""
-    if not (1 <= low_radius < requested_radius < high_radius <= 30):
-        raise ValueError("Для коррекции нужны границы: low < requested < high.")
+    if not (1 <= low_radius <= requested_radius <= high_radius <= 30):
+        raise ValueError("Для коррекции нужны границы: low <= requested <= high.")
     if not (isinstance(high_point, (tuple, list)) and len(high_point) == 2):
         raise ValueError("Точка верхней границы должна содержать X и Y.")
     if not (isinstance(low_point, (tuple, list)) and len(low_point) == 2):
         raise ValueError("Точка нижней границы должна содержать X и Y.")
     hx, hy = int(high_point[0]), int(high_point[1])
     lx, ly = int(low_point[0]), int(low_point[1])
+    if requested_radius == high_radius:
+        return (hx, hy)
+    if requested_radius == low_radius:
+        return (lx, ly)
     ratio = (high_radius - requested_radius) / (high_radius - low_radius)
     candidate = (round(hx + (lx - hx) * ratio), round(hy + (ly - hy) * ratio))
     if candidate in {(hx, hy), (lx, ly)}:
