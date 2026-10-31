@@ -149,7 +149,13 @@ class RunRecorder:
 
     def _event_stroke_id(self, event: dict) -> str:
         value = event.get("strokeId")
-        return str(value) if value is not None else f"unidentified-{event.get('t')}"
+        if value is not None:
+            return str(value)
+        # Older exports and synthetic tests may omit strokeId. If exactly one
+        # stroke is active, its matching end boundary is unambiguous.
+        if len(self.active_stroke_ids) == 1:
+            return next(iter(self.active_stroke_ids))
+        return f"unidentified-{event.get('t')}"
 
     def _begin_stroke(self, event: dict, now: float, source: str) -> None:
         if self.current is not None and now - self.last_activity >= self.idle_seconds:
