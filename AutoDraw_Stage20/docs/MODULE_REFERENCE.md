@@ -68,6 +68,7 @@ Preparation и executor предоставляют совместимые import
 | brush_calibration.py | Модели калибровки кисти |
 | brush_experiment_capture.py | Запись материалов лабораторных запусков |
 | brush_test_workflow.py | Сценарии лаборатории кистей |
+| chalk_radius_matrix.py | Валидация метаданных, уникальности Game Monitor run и статистика матрицы CHALK по радиусам |
 
 ### 2.4. Ресурсные и калибровочные модули
 
@@ -86,7 +87,8 @@ Preparation и executor предоставляют совместимые import
 
 | Модуль | Назначение по имени/точке подключения |
 |---|---|
-| brush_behavior_test_ui.py | Интерфейс тестирования кистей |
+| brush_behavior_test_ui.py | Интерфейс тестирования кистей и запись метаданных CHALK-матрицы |
+| chalk_radius_matrix.py | Контракт серии/повтора и агрегирование точных CHALK-измерений |
 | brush_calibration_ui.py | Интерфейс калибровки кистей |
 | paint_limit_test_ui.py | Интерфейс теста лимита краски |
 
