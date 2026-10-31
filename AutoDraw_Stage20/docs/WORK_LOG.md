@@ -821,3 +821,10 @@ CI выявил, что общий helper stage8_optimizer.save_plan() норм�
 ### Защита от неправильного использования исходного logical-плана
 
 Stage6App.load_plan_from_path() теперь явно отклоняет coordinate_system=logical_board_pixels с сообщением о необходимости передать его через Brush Test. Это не позволяет вручную открыть исходный логический JSON как обычный screen-local DrawingPlan. Добавлен regression test в tests/test_unified_app.py.
+
+
+## 2026-10-31 — INT-003: подтверждён CI для logical→screen handoff
+
+Проверен актуальный HEAD `3a0383b56b5972d4b978ff30080d7b7768b021d0` ветки `feature/image-geometry-optimization`. GitHub Actions run #1132 завершился `success`; успешно завершены jobs `geometry-tests`, `executor-tests` и `Windows portable build and startup smoke-test`. Следовательно, программные unit/integration/regression проверки и portable smoke-test для этого HEAD прошли.
+
+CI не подтверждает точное совпадение сохранённого screen ROI с физической границей игровой доски, поведение hit-test для x=420/y=240, runtime-доступность Game Monitor в iframe или влияние Monitor на FPS. Эти пункты остаются незавершёнными условиями INT-003. Полную CHALK-матрицу не запускать до live-проверки геометрии.
