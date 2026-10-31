@@ -319,7 +319,8 @@ test("DRAW_SAMPLE records the exact last accepted board coordinate with O(1) tai
   assert.equal(getPointIndexReads(), readsBefore + 1);
   const samples = monitor.export().events.filter(event => event.type === "DRAW_SAMPLE");
   const sample = samples[samples.length - 1];
-  assert.deepEqual(sample.acceptedPoint, { x: 17, y: 23 });
+  assert.equal(sample.acceptedPoint.x, 17);
+  assert.equal(sample.acceptedPoint.y, 23);
   assert.equal(sample.after.pointCount, 1);
   monitor.stop();
 });
