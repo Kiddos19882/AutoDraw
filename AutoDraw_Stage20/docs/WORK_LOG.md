@@ -816,3 +816,8 @@ CI выявил, что общий helper stage8_optimizer.save_plan() норм�
 
 
 Дополнение: transform metadata дополнена явным указанием, что runtime-план и ExecutorConfig.point_step_px используют экранные пиксели. Это не позволяет ошибочно интерпретировать шаг исполнителя как логический шаг доски; фактические настройки executor сохраняются в execution report.
+
+
+### Защита от неправильного использования исходного logical-плана
+
+Stage6App.load_plan_from_path() теперь явно отклоняет coordinate_system=logical_board_pixels с сообщением о необходимости передать его через Brush Test. Это не позволяет вручную открыть исходный логический JSON как обычный screen-local DrawingPlan. Добавлен regression test в tests/test_unified_app.py.
