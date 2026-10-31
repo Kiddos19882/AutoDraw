@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "0.1.2";
+  const VERSION = "0.2.0";
   const METHOD_NAMES = ["onDrawStart", "onDrawing", "onDrawingEnd", "setRadius", "updateLess"];
   const MAX_EVENTS = 50000;
   const SCAN_INTERVAL_MS = 500;
@@ -117,18 +117,46 @@
     return String(value);
   }
 
-  function boardSnapshot(board) {
+  // BoardPane.updateLess() writes exact integer fields on the live instance:
+  // this.less = this.max - pointCount(atom.points). Reading these fields is O(1).
+  // Do not fall back to scanning atom.points in the hot path.
+  function resourceSnapshot(board) {
     const atom = board && board.atom;
-    const points = atom && atom.points;
+    const maxPoints = board && board.max;
+    const remainingPoints = board && board.less;
+    const isExact = Number.isSafeInteger(maxPoints) &&
+      maxPoints > 0 &&
+      Number.isSafeInteger(remainingPoints) &&
+      remainingPoints >= 0 &&
+      remainingPoints <= maxPoints;
     return {
       logicalWidth: safeValue(board && (board.BLACK_BOARD_WIDTH ?? board.width)),
       logicalHeight: safeValue(board && (board.BLACK_BOARD_HEIGHT ?? board.height)),
       scaleX: safeValue(board && board.scaleX),
       scaleY: safeValue(board && board.scaleY),
-      pointCount: Array.isArray(points) ? pointCount(points) : null,
-      strokeArrayLength: Array.isArray(points) ? points.length : null,
-      lastPoint: Array.isArray(points) ? lastPoint(points) : null,
+      maxPoints: isExact ? maxPoints : null,
+      remainingPoints: isExact ? remainingPoints : null,
+      pointCount: isExact ? maxPoints - remainingPoints : null,
+      sourceMethod: "BoardPane.max+BoardPane.less",
+      isExact,
+      validationStatus: isExact ? "valid" : "unavailable",
       radius: atom ? safeValue(atom.radius) : null
+    };
+  }
+
+  // Explicit diagnostic only. This performs O(N) scans and is never called
+  // automatically by emit(), wrappers, status(), polling, or export().
+  function diagnosticSnapshot() {
+    if (!state.board) return { boardDetected: false, validationStatus: "unavailable" };
+    const fast = resourceSnapshot(state.board);
+    const points = state.board.atom && state.board.atom.points;
+    const diagnosticPointCount = Array.isArray(points) ? pointCount(points) : null;
+    return {
+      ...fast,
+      diagnosticPointCount,
+      pointCountMatches: fast.isExact && diagnosticPointCount === fast.pointCount,
+      strokeArrayLength: Array.isArray(points) ? points.length : null,
+      lastPoint: Array.isArray(points) ? lastPoint(points) : null
     };
   }
 
@@ -139,7 +167,7 @@
       t: now(),
       type,
       strokeId: state.activeStrokeId,
-      board: state.board ? boardSnapshot(state.board) : null,
+      board: state.board ? resourceSnapshot(state.board) : null,
       ...details
     };
     if (state.events.length < MAX_EVENTS) state.events.push(event);
@@ -195,8 +223,8 @@
 
   function sampleActiveStroke(source) {
     if (!state.active || !state.board || !state.activeStrokeId) return;
-    const snapshot = boardSnapshot(state.board);
-    const signature = JSON.stringify([snapshot.pointCount, snapshot.lastPoint]);
+    const snapshot = resourceSnapshot(state.board);
+    const signature = JSON.stringify([snapshot.maxPoints, snapshot.remainingPoints, snapshot.pointCount, snapshot.validationStatus]);
     if (signature === state.lastSampleSignature) return;
     const previous = state.lastSampleSignature;
     state.lastSampleSignature = signature;
@@ -208,8 +236,8 @@
     state.lastSampleSignature = null;
     sampleActiveStroke("onDrawStart");
     // onDrawing may already have been registered as a bound Egret listener
-    // before this snippet wraps the instance method. Poll only during a stroke
-    // so we still observe atom.points without replacing the registered callback.
+    // before this snippet wraps the instance method. Poll only during a stroke;
+    // the poll reads BoardPane.max/less in O(1), never scans atom.points.
     state.strokePollTimer = window.setInterval(() => sampleActiveStroke("state_poll"), 25);
   }
 
@@ -264,7 +292,7 @@
     if (original.__autoDrawMonitorWrapped) return;
     const ownDescriptor = Object.getOwnPropertyDescriptor(board, name);
     const wrapped = function (...args) {
-      const before = boardSnapshot(board);
+      const before = resourceSnapshot(board);
       const previousStroke = state.activeStrokeId;
       if (name === "onDrawStart") {
         if (!state.activeStrokeId) {
@@ -284,7 +312,7 @@
         throw error;
       }
 
-      const after = boardSnapshot(board);
+      const after = resourceSnapshot(board);
       if (name === "onDrawing") {
         sampleActiveStroke("onDrawing_wrapper");
       } else if (name === "onDrawStart") {
@@ -318,8 +346,8 @@
     state.board = board;
     state.boardLabel = board.constructor && board.constructor.name ? board.constructor.name : "BoardPane";
     for (const name of METHOD_NAMES) wrapMethod(board, name);
-    state.lastPointCount = boardSnapshot(board).pointCount;
-    emit("BOARD_ATTACHED", { label: state.boardLabel, snapshot: boardSnapshot(board) });
+    state.lastPointCount = resourceSnapshot(board).pointCount;
+    emit("BOARD_ATTACHED", { label: state.boardLabel, snapshot: resourceSnapshot(board) });
   }
 
   function detach() {
@@ -399,6 +427,7 @@
       frameContext: frameContext(),
       boardDetected: !!state.board,
       boardLabel: state.boardLabel,
+      resourceSnapshot: state.board ? resourceSnapshot(state.board) : null,
       eventCount: state.events.length,
       droppedEvents: state.droppedEvents,
       errors: state.errors.slice(),
@@ -422,7 +451,7 @@
       active: state.active,
       boardDetected: !!state.board,
       boardLabel: state.boardLabel,
-      snapshot: state.board ? boardSnapshot(state.board) : null,
+      snapshot: state.board ? resourceSnapshot(state.board) : null,
       eventCount: state.events.length,
       droppedEvents: state.droppedEvents,
       errors: state.errors.length
@@ -436,7 +465,8 @@
     export: exportData,
     download,
     clear() { state.events.length = 0; state.droppedEvents = 0; state.errors.length = 0; },
-    attach
+    attach,
+    diagnosticSnapshot
   };
   Object.defineProperty(window, "AutoDrawGameMonitor", { configurable: true, value: api });
   return start();
