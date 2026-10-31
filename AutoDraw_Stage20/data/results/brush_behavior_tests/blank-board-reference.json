@@ -1,18 +1,18 @@
 {
   "schema_version": 1,
   "reference_type": "user_confirmed_blank_board_roi",
-  "captured_at_utc": "2026-10-31T15:32:41+00:00",
+  "captured_at_utc": "2026-10-31T18:05:33+00:00",
   "screen_size": {
     "width": 1920,
     "height": 1080
   },
   "board_region": {
-    "x": 563,
+    "x": 566,
     "y": 253,
-    "width": 578,
-    "height": 301
+    "width": 581,
+    "height": 304
   },
-  "calibration_profile_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw-feature-image-geometry-optimization(1)\\AutoDraw-feature-image-geometry-optimization\\AutoDraw_Stage20\\data\\brush_paint_calibration.json",
+  "calibration_profile_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\brush_paint_calibration.json",
   "image_file": "blank-board-reference.png",
   "user_confirmed_blank": true,
   "limitations": "Visual reference only; does not prove the game's internal board state."
