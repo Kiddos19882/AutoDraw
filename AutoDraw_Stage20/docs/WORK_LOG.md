@@ -699,3 +699,7 @@
 - В run #1037 успешно завершился job `executor-tests`. Полный workflow на момент записи ещё выполняет benchmark Stage 8 и Windows portable build smoke-test; его общий conclusion пока не зафиксирован.
 - Предыдущий запуск выявил две ошибки тестовых fixtures: regex перехвата индексного чтения массива был переэкранирован, а начальный `less` не соответствовал mock-массиву. Исправлено в `fc39292`; повторный Node test step прошёл.
 - Успешные mock-тесты подтверждают контракт Monitor и отсутствие дополнительных чтений индексов `atom.points` со стороны hot path. Они не измеряют реальный FPS браузерной игры.
+
+### Read-only checkpoint для A/B/C
+
+Добавлен `AutoDrawGameMonitor.inspect()`: он находит BoardPane по запросу и читает `max`/`less` без attach, wrappers, polling и изменения методов. После `AutoDrawGameMonitor.stop()` его можно использовать только на контрольных точках в режиме A, чтобы получить точный baseline/post без активного Monitor во время штриха. Добавлен отдельный Node-тест на этот режим. Код и тест добавлены commits `3c46e65318bca121af3f9a074a72d1f7c117188f` и `fabb666d5fa6398da029922799efb96ef6aaafdb`.
