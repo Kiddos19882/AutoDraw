@@ -62,7 +62,7 @@ INT-002 завершена как статическое проектирова�
 
 Рабочая ветка: `feature/image-geometry-optimization`.
 
-Последний проверенный commit перед текущим документированием: `05eed973bbdc018605ae9604dee11eb8dd776563`; после него выполнены новые документационные commits на рабочей ветке. Изменения INT-003 и связанные commits фиксируются в [WORK_LOG.md](WORK_LOG.md); текущий HEAD сверяется перед каждой следующей записью.
+Последний проверенный HEAD: `3a0383b56b5972d4b978ff30080d7b7768b021d0` в `feature/image-geometry-optimization`. GitHub Actions run #1132 завершился success для этого HEAD: jobs `geometry-tests`, `executor-tests` и `Windows portable build and startup smoke-test` прошли. Это подтверждает CI, но не live-геометрию игры.
 
 ## 7. Состояние документации
 
@@ -106,4 +106,9 @@ Game Monitor 0.2.0 и Node-тесты проверены через GitHub Actio
 
 Добавлен source/preparation/brush_coordinate_transform.py; Brush Test теперь явно использует логическую систему 420×240. При передаче плана в Stage6 создаётся screen-local копия под фактический ROI, а исходный план сохраняет generation.screen_transform. Дополнительное продление концов тестовых линий отключено.
 
-Добавлены unit-тесты transform и проверка интеграционного handoff. Проверки CI для текущих изменений ожидаются; live browser validation, A/B/C Monitor и полная CHALK-матрица не завершены. INT-003 остаётся IN_PROGRESS.
+Добавлены unit-тесты transform и проверка интеграционного handoff. GitHub Actions run #1132 для HEAD `3a0383b56b5972d4b978ff30080d7b7768b021d0` прошёл полностью: `geometry-tests`, `executor-tests`, `Windows portable build and startup smoke-test` — success. Live browser validation, A/B/C Monitor и полная CHALK-матрица не завершены. INT-003 остаётся IN_PROGRESS.
+
+
+## 11. Последняя проверка CI — 31 октября 2026 г.
+
+Для HEAD `3a0383b56b5972d4b978ff30080d7b7768b021d0` workflow run #1132 завершился `success`. Все три jobs прошли: geometry-tests, executor-tests, Windows portable build and startup smoke-test. Программная часть logical→screen handoff и regression guards прошла CI. Это не заменяет live-проверку точной области доски, граничного hit-test и A/B/C overhead Game Monitor.
