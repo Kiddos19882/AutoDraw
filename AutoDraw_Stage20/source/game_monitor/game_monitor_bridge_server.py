@@ -9,6 +9,7 @@ import argparse
 import asyncio
 import hmac
 import json
+import math
 import secrets
 import statistics
 import sys
@@ -72,7 +73,7 @@ def summarize_intervals(intervals: object) -> dict:
                 "max_interval_ms": None}
     ordered = sorted(values)
     median_interval = statistics.median(values)
-    p95 = ordered[min(len(ordered) - 1, max(0, int(len(ordered) * 0.95 + 0.999) - 1))]
+    p95 = ordered[min(len(ordered) - 1, max(0, math.ceil(len(ordered) * 0.95) - 1))]
     return {
         "status": "measured",
         "frame_count": len(values) + 1,
@@ -110,7 +111,9 @@ class RunRecorder:
             "post_test_snapshot": None,
             "brush_radius": (before or {}).get("currentRadius") if isinstance(before, dict) else None,
             "events": [],
-            "frame_probe": None,
+            "frame_probes": [],
+            "active_drawing_duration_ms": 0.0,
+            "stroke_started_at_performance_ms": event.get("t"),
             "dropped_events": 0,
             "monitor_errors": [],
             "interpretation": {"chalk_status": "inconclusive",
@@ -147,9 +150,12 @@ class RunRecorder:
             raise ValueError("unsupported event type")
         if event_type == "DRAW_START":
             if self.current is not None and now - self.last_activity >= self.idle_seconds:
-                self.finalize("completed")
+                previous_status = "completed" if self.current.get("execution_status") == "completed" else "partial"
+                self.finalize(previous_status)
             if self.current is None:
                 self._start(event)
+            else:
+                self.current["stroke_started_at_performance_ms"] = event.get("t")
         if self.current is not None:
             self._append_event(event)
         if event_type in {"DRAW_START", "DRAW_START_APPLIED", "DRAW_SAMPLE", "DRAW_END"}:
@@ -157,20 +163,22 @@ class RunRecorder:
         if event_type == "DRAW_END" and self.current is not None:
             self.current["execution_status"] = "completed"
             self.current["ended_at_performance_ms"] = event.get("t")
+            stroke_start = self.current.get("stroke_started_at_performance_ms")
+            if isinstance(stroke_start, (int, float)) and isinstance(event.get("t"), (int, float)):
+                self.current["active_drawing_duration_ms"] += max(0.0, event["t"] - stroke_start)
+            self.current["stroke_started_at_performance_ms"] = None
             if isinstance(event.get("after"), dict):
                 self.current["post_test_snapshot"] = event["after"]
 
     def frame_probe(self, message: dict) -> None:
         if self.current is None:
             return
-        self.current["frame_probe"] = {
+        self.current["frame_probes"].append({
             "started_at_performance_ms": message.get("startedAtPerformanceMs"),
             "ended_at_performance_ms": message.get("endedAtPerformanceMs"),
             "visible": message.get("visible") is True,
-            **summarize_intervals(message.get("intervals")),
-        }
-        if message.get("visible") is not True:
-            self.current["frame_probe"]["visibility_interruption"] = True
+            "intervals": message.get("intervals", []),
+        })
 
     def heartbeat(self, status: dict, now: float) -> None:
         self.last_status = status
@@ -213,6 +221,16 @@ class RunRecorder:
             "status": run["interpretation"]["path_length_status"],
             "note": "Coalesced pointDelta values mean intermediate accepted coordinates may be missing."
         }
+        all_intervals = [interval for probe in run["frame_probes"]
+                         for interval in probe.get("intervals", [])]
+        fps = summarize_intervals(all_intervals)
+        fps["stroke_probe_count"] = len(run["frame_probes"])
+        fps["visibility_interruption"] = any(probe.get("visible") is not True for probe in run["frame_probes"])
+        run["frame_probe"] = fps
+        run["frame_probes"].clear()
+        if isinstance(run.get("started_at_performance_ms"), (int, float)) and isinstance(run.get("ended_at_performance_ms"), (int, float)):
+            run["elapsed_from_first_to_last_stroke_ms"] = max(0.0, run["ended_at_performance_ms"] - run["started_at_performance_ms"])
+        run.pop("stroke_started_at_performance_ms", None)
         run["finished_at_utc"] = utc_now()
         run["event_count"] = len(run["events"])
         run["dropped_events"] += 0
