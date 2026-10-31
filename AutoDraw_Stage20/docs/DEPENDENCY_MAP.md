@@ -212,3 +212,11 @@ flowchart TD
 - `integrated_app.py` описан отдельно в разделе 2.1 как интеграционный потребитель.
 - Game Monitor остаётся отдельной JavaScript-подсистемой; Python smoke server не импортируется в основной UI.
 - Вспомогательные тесты и скрипты из `tests/`, `source/preparation/tests/` и `source/executor/tests/` не включены в эту матрицу. Они образуют следующий отдельный слой зависимостей и не должны смешиваться с импортами production-модулей.
+
+
+## Дополнение 2026-10-31 — logical→screen для Brush Test
+
+- `integrated_app.py` импортирует `LOGICAL_BOARD_SIZE` и `transform_logical_brush_plan_to_screen` из preparation.
+- `brush_behavior_test_ui.py` создаёт явно маркированные логические планы `logical_board_pixels`.
+- При передаче в Stage6 `integrated_app.py` преобразует такой план в `local_canvas_pixels` с размерами экранного ROI. Обычные screen/local планы проходят прежний путь без трансформации.
+- Unit-тесты преобразования находятся в `source/preparation/tests/test_brush_coordinate_transform.py`; интеграционная проверка handoff — в `tests/test_unified_app.py`.
