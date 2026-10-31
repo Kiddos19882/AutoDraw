@@ -38,12 +38,12 @@
 ## Протокол контрольных сообщений
 
 Запрос AutoDraw:
-`{type:"capture", sessionId, runId, checkpoint:"pre_test"|"post_test", sequence, token}`
+`{type:"capture", sessionId, runId, checkpoint:"pre_test"|"post_test"|"post_clear", sequence, token}`
 
 Ответ Monitor:
-`{type:"capture_result", sessionId, runId, checkpoint, sequence, timestamp, status, export}`
+`{type:"capture_result", sessionId, runId, checkpoint, sequence, timestamp, status, resourceSnapshot, export}`
 
-В `status` включить только публичный результат `AutoDrawGameMonitor.status()`; `export` — объект `AutoDrawGameMonitor.export()`. Никаких игровых команд, eval, произвольных имён методов или передачи JS-кода протокол не допускает. Повторные/устаревшие sequence, неверный token, чужой runId и неизвестные checkpoint отклоняются.
+В `status` включить только публичный результат `AutoDrawGameMonitor.status()`; `resourceSnapshot` — отдельный checkpoint CHALK по контракту раздела 11; `export` — объект `AutoDrawGameMonitor.export()`. Для `post_clear` сохраняется только дополнительная контрольная точка после очистки. Никаких игровых команд, eval, произвольных имён методов или передачи JS-кода протокол не допускает. Повторные/устаревшие sequence, неверный token, чужой runId и неизвестные checkpoint отклоняются.
 
 ## Состояния сохранения в manifest
 
