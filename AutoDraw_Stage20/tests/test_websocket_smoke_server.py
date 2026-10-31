@@ -202,6 +202,7 @@ class ProductionBridgeIntegrationTests(unittest.IsolatedAsyncioTestCase):
                         "monitorStatus": {"active": True, "droppedEvents": 0, "errors": 0},
                     }))
                     await asyncio.sleep(0.05)
+                await asyncio.sleep(0.05)
                 run_files = list((output / session_id).glob("game-monitor-run-*.json"))
                 self.assertEqual(len(run_files), 1)
                 report = json.loads(run_files[0].read_text(encoding="utf-8"))
