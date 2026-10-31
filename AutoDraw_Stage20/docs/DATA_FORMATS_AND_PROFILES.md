@@ -515,7 +515,7 @@ Game Monitor — самостоятельный JavaScript DevTools-инстру
 
 План лаборатории кистей может быть сохранён в двух явных системах:
 
-- `logical_board_pixels` — исходная геометрия игры 420×240. Этот план является источником сценария и сохраняется в каталоге результатов эксперимента.
+- `logical_board_pixels` — исходная геометрия игры 460×240. Этот план является источником сценария и сохраняется в каталоге результатов эксперимента.
 - `local_canvas_pixels` — runtime-план, преобразованный под фактические размеры экранного ROI и загружаемый в Stage6.
 
 Исходный logical-план дополняется `generation.screen_transform`: `method`, `source_coordinate_system`, `target_coordinate_system`, `logical_board`, `screen_roi` (origin и размеры), `scale_x`, `scale_y`, `logical_bounds`, `screen_local_bounds`, `boundary_mapping`, `executor_coordinate_units` и `point_step_px_units`. Последние поля указывают, что после передачи в Stage6 шаг MouseExecutor задаётся в экранных пикселях. Это позволяет восстановить параметры преобразования и отличать логическую длину сценария от экранной длины исполнения.
