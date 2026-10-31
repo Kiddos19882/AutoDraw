@@ -29,7 +29,8 @@ AutoDrawGameMonitor.status()
 ## Управление
 
 ```js
-AutoDrawGameMonitor.status()       // текущее состояние
+AutoDrawGameMonitor.status()       // текущее состояние и O(1) CHALK snapshot
+AutoDrawGameMonitor.inspect()      // read-only checkpoint без attach/wrappers
 AutoDrawGameMonitor.export()       // получить объект с телеметрией
 AutoDrawGameMonitor.download()     // скачать JSON
 AutoDrawGameMonitor.clear()        // очистить буфер событий
@@ -103,3 +104,17 @@ Game Monitor 0.2.0 использует `resourceSnapshot()` для чтения
 Добавлены автоматические Node.js тесты в `source/game_monitor/tests/game_monitor.test.js`, запускаемые в GitHub Actions. Они проверяют exact snapshot, отсутствие array scan в hot path, отказ без fallback при недоступных полях, point delta и восстановление метода после stop.
 
 **Ограничение:** поля подтверждены статически в bundle. Живая проверка на BoardPane в игровом iframe и A/B-измерение FPS/длительности ещё не выполнены. Не считать версию 0.2.0 измеренно без overhead до получения результатов A/B.
+
+
+### Контрольная точка без активного Monitor (режим A)
+
+Для A/B/C сравнения можно загрузить snippet и сразу остановить активное наблюдение:
+
+```js
+AutoDrawGameMonitor.stop()
+AutoDrawGameMonitor.inspect()
+```
+
+После `stop()` методы BoardPane восстановлены, polling и input handlers сняты. `inspect()` находит BoardPane по запросу, читает только `max`/`less` и возвращает snapshot без attach, wrappers, timers или постоянного наблюдения. Вызывайте его только на контрольных точках до/после штриха. Это даёт одинаковый read-only способ снять точный счётчик в режиме A; он не должен работать во время самого штриха.
+
+В режимах B/C оставляйте Monitor активным и используйте `status().snapshot`; после каждого контрольного снимка можно вызвать `diagnosticSnapshot()` для проверки `pointCountMatches`. Не вызывайте диагностический O(N) обход в процессе рисования.
