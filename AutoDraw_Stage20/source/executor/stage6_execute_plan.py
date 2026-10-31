@@ -553,7 +553,7 @@ class Stage6App:
         actions.pack(fill="x")
         self.start_button = ttk.Button(actions, text="Выполнить план на доске…", command=self._start_execution, state="disabled")
         self.start_button.pack(side="left")
-        self.stop_button = ttk.Button(actions, text="Остановить (F12)", command=self._stop_execution, state="disabled")
+        self.stop_button = ttk.Button(actions, text="Остановить (Alt)", command=self._stop_execution, state="disabled")
         self.stop_button.pack(side="left", padx=(6, 0))
         ttk.Label(actions, textvariable=self.execution_state_var).pack(side="left", padx=(12, 0))
         ttk.Button(actions, text="Открыть результаты", command=self._open_results_folder).pack(side="right")
@@ -1588,7 +1588,7 @@ class Stage6App:
                 if self.adaptive_brush_plan is not None else ""
             )
             + "После подтверждения начнётся обратный отсчёт. Переключитесь на правильную вкладку браузера.\n"
-            "F12 или кнопка остановки прекращает рисование; кнопка мыши будет отпущена."
+            "Alt или кнопка остановки прекращает рисование; кнопка мыши будет отпущена."
         )
         if not confirmed and not messagebox.askokcancel(
             "Подтвердите рисование", details, icon="warning", parent=self.root
