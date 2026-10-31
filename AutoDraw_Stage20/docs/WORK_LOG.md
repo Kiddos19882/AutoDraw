@@ -1213,3 +1213,6 @@ Run JSON дополнен `stroke_count`, суммой `sampled_point_delta_tota
 ### Дополнение — поддержка portable build для WebSocket launcher
 
 После добавления UI-кнопок уточнено, что PyInstaller не включает неимпортируемые companion-файлы Game Monitor автоматически. build_windows.py теперь копирует в portable-root/game_monitor JS Monitor, JS bridge, Python collector, requirements-bridge.txt, BAT launcher и README. Frozen UI определяет каталог через путь к AutoDraw.exe; source UI продолжает использовать source/game_monitor. BAT распознаёт оба layout и принимает явный output directory от UI, чтобы run JSON и heartbeat оставались в общем каталоге Brush Test. 
+
+
+В app_features.json добавлены идентификаторы game-monitor-websocket-bridge, brush-test-websocket-launcher и brush-test-monitor-snippet-copy. Справочники MODULE_REFERENCE.md и FILE_STORAGE_CATALOG.md дополнены описанием companion-файлов и их расположения в portable-сборке.
