@@ -320,3 +320,8 @@ Run JSON дополнен автоматическими контрольным�
 - `monitor_dropped_events`, `dropped_events`, `monitor_error_count` — потери и ошибки Monitor/collector.
 
 Brush Test UI выставляет `monitor_capture.status=saved` только если одновременно: execution completed, CHALK exact, один наблюдаемый радиус, сумма pointDelta совпала с CHALK, нет dropped events и нет ошибок Monitor. Во всех остальных случаях отчёт сохраняется, но статус остаётся `partial`; данные не отбрасываются и не маскируются как успешные.
+
+
+### Уточнение критерия capture=saved
+
+UI считает сбор полностью успешным только при положительном расходе CHALK и наличии хотя бы одного штриха/acceptedPoint, exact pre/post snapshots, совпадении суммы `pointDelta` с CHALK delta, одном наблюдаемом радиусе, измеренном FPS без visibility interruption, нулевых dropped events и нулевых Monitor errors. Отчёт с нулевым расходом, пустыми accepted points, недоступным FPS или прерванной видимостью всё равно сохраняется, но получает `partial`.
