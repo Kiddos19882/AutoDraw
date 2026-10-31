@@ -48,7 +48,7 @@ def test_workflow_rejects_skipped_or_repeated_phases() -> None:
 
 
 @pytest.mark.parametrize("terminal_action, expected_status", [
-    (lambda state: state.stop("F12"), "stopped"),
+    (lambda state: state.stop("Alt"), "stopped"),
     (lambda state: state.fail("clear failed"), "failed"),
     (lambda state: state.mark_inconclusive("meter ambiguous"), "inconclusive"),
 ])
@@ -67,10 +67,10 @@ def test_terminal_result_is_saved_and_cannot_continue(terminal_action, expected_
 
 def test_stop_does_not_overwrite_first_terminal_result() -> None:
     state = _state()
-    state.stop("F12")
+    state.stop("Alt")
     state.fail("later cleanup error")
     assert state.status == "stopped"
-    assert state.stop_reason == "F12"
+    assert state.stop_reason == "Alt"
     assert state.error is None
 
 
