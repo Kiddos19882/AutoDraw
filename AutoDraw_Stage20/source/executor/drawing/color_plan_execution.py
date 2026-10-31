@@ -841,6 +841,12 @@ class ColorPlanExecutionHooks:
             "brush_size_selection_order": (
                 list(self.brush_controller.selection_order) if self.brush_controller is not None else []
             ),
+            "brush_size_correction_counts": (
+                list(self.brush_controller.correction_counts) if self.brush_controller is not None else []
+            ),
+            "final_brush_slider_x": (
+                self.brush_controller.current_x if self.brush_controller is not None else None
+            ),
             "final_brush_value": (
                 self.brush_controller.current_value if self.brush_controller is not None else None
             ),
