@@ -89,3 +89,6 @@
 - Game Monitor обновлён с 0.1.2 до 0.2.0: ресурсный snapshot читает `max`/`less` за O(1), а полный обход `atom.points` оставлен только в явном `diagnosticSnapshot()`.
 - Экспорт дополнен текущим `resourceSnapshot`; при отсутствующих/невалидных engine-полях точность не имитируется и array fallback не выполняется.
 - INT-003 остаётся IN_PROGRESS до живой runtime-сверки и A/B-замера FPS/длительности без Monitor и с Monitor.
+
+
+- Добавлен read-only `inspect()` для контрольных точек без активных wrappers/polling; это позволяет снимать точные `max`/ `less` в режиме A после `stop()`.
