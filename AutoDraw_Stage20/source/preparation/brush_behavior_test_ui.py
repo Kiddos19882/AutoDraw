@@ -573,7 +573,7 @@ class BrushBehaviorTestTab:
         self.game_monitor_summary: dict[str, Any] | None = None
         self._bridge_capture_poll_id: str | None = None
         self.last_record_path: Path | None = None
-        self.brush_var = tk.StringVar(value="7")
+        self.brush_var = tk.StringVar(value="1")
         self.case_var = tk.StringVar(value=next(iter(TEST_CASES)))
         self.matrix_series_var = tk.StringVar(
             value=f"chalk-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:6]}"
@@ -784,9 +784,11 @@ class BrushBehaviorTestTab:
             if not 1 <= brush <= 30:
                 raise ValueError("Размер кисти должен быть целым числом от 1 до 30.")
             self.output_dir.mkdir(parents=True, exist_ok=True)
+            experiment_id = uuid.uuid4().hex
+            plan["generation"]["experiment_id"] = experiment_id
             path = self.output_dir / (
                 f"brush-plan-{plan['generation']['test_case']}-b{brush}-"
-                f"{datetime.now().strftime('%Y%m%d-%H%M%S')}.json"
+                f"{datetime.now().strftime('%Y%m%d-%H%M%S')}-{experiment_id[:8]}.json"
             )
             plan["generation"]["requested_brush_value"] = brush
             matrix_metadata = None
@@ -800,6 +802,7 @@ class BrushBehaviorTestTab:
             path.write_text(json.dumps(plan, ensure_ascii=False, indent=2), encoding="utf-8")
             self.current_plan = plan
             self.current_plan_path = path
+            self._experiment_id = experiment_id
             self._chalk_matrix_metadata = matrix_metadata
             if not self.on_transfer_plan(plan, path):
                 return
@@ -811,7 +814,7 @@ class BrushBehaviorTestTab:
     def _reset_observation_fields(self) -> None:
         """Prevent evidence from a previous run being attached to a new test plan."""
         self._experiment_requested_brush = int(self.brush_var.get().strip())
-        self._experiment_id = uuid.uuid4().hex
+        self._experiment_id = getattr(self, "_experiment_id", None) or uuid.uuid4().hex
         self.screenshot_path = None
         self.experiment_dir = None
         self.experiment_phases = {}
