@@ -211,6 +211,26 @@ class RunRecorder:
         else:
             run["chalk"] = {"status": "inconclusive", "reason": "missing_or_inconsistent_exact_snapshots"}
         accepted = run.get("accepted_points", [])
+        run["stroke_count"] = sum(1 for event in run["events"] if event.get("type") == "DRAW_START")
+        sample_events = [event for event in run["events"] if event.get("type") == "DRAW_SAMPLE"]
+        point_deltas = [event.get("pointDelta") for event in sample_events]
+        point_delta_complete = bool(sample_events) and all(type(delta) is int and delta >= 0 for delta in point_deltas)
+        run["sampled_point_delta_total"] = sum(delta for delta in point_deltas if type(delta) is int and delta >= 0)
+        run["point_delta_matches_chalk"] = (
+            run["sampled_point_delta_total"] == run["chalk"]["consumed_points"]
+            if run["chalk"]["status"] == "exact" and point_delta_complete else None
+        )
+        observed_radii = set()
+        for event in run["events"]:
+            for snapshot_key in ("board", "before", "after"):
+                snapshot = event.get(snapshot_key)
+                radius = snapshot.get("currentRadius") if isinstance(snapshot, dict) else None
+                if isinstance(radius, (int, float)) and not isinstance(radius, bool):
+                    observed_radii.add(float(radius))
+        run["observed_brush_radii"] = sorted(observed_radii)
+        run["brush_radius_status"] = (
+            "unavailable" if not observed_radii else "single" if len(observed_radii) == 1 else "mixed"
+        )
         by_stroke: dict[str, list[dict]] = {}
         for point in accepted:
             by_stroke.setdefault(str(point.get("stroke_id")), []).append(point)
