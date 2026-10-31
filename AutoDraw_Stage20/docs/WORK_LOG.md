@@ -852,3 +852,12 @@ Bundle показывает, что BoardPane масштабируется ра�
 ### CI для базовой коррекции 460×240
 
 GitHub Actions run #1142 на коммите `d0c4aee8c4bef75daedfae85ae4403a3a8661ef4` завершился `success`: `geometry-tests`, `executor-tests`, `Windows portable build and startup smoke-test` — все jobs прошли. Это проверяет базовую коррекцию ширины BoardPane на 460 и соответствующий integration handoff. Run #1142 предшествует более позднему boundary probe и guard равномерности ROI; их CI остаётся отдельным ожидаемым подтверждением.
+
+
+## 2026-10-31 — INT-003: сохранение доски после теста и горячая клавиша Alt
+
+По запросу пользователя изменён post-draw workflow Brush Test. После успешного исполнения AutoDraw сохраняет `after_draw` (полный экран, ROI доски, ROI индикатора краски), измерения видимости штрихов и `experiment.json`, затем завершает постэтап без автоматического клика по Clear. Рисунок остаётся на доске для ручной проверки и снятия Game Monitor snapshot/export. Начальная очистка перед независимым тестом сохранена; очистка между повторами выполняется вручную после сохранения результатов.
+
+Глобальная клавиша остановки изменена с F12 на Alt: Brush Test listener, MouseExecutor, окно Stage6, legacy Stage2 и калибровочный тест. Для левой и правой Alt добавлены Tk bindings; глобальные обработчики используют `pynput` Alt. F12 в инструкции Game Monitor для открытия DevTools не менялась.
+
+Обновлены unit tests для Alt listener и stop reason. Локальный запуск тестов и CI в этой сессии не выполнялись; требуется проверить GitHub Actions на новом HEAD. INT-003 остаётся IN_PROGRESS, live-проверка доски и A/B/C остаются обязательными.
