@@ -64,7 +64,7 @@
 - [x] INT-001: статически инвентаризировать Brush Test UI, Game Monitor, игровой счётчик и модели стоимости AutoDraw.
 - [x] INT-002: статически спроектировать контракт низкозатратного CHALK snapshot, baseline/delta и требования к Monitor.
 - [~] INT-003: live WebSocket smoke handshake подтверждён артефактами `ready→pong`; Monitor 0.2.1 обнаружил игровую доску в iframe. A/B/C pointCount deltas: A=53/52/52, B=0*/52/52 (B-1 невалиден), C=50/52/52; в двух валидных повторениях все режимы дали 52, а diagnostic snapshot C совпал с точным счётчиком. FPS probes показывают 60 FPS, но не размечены по режимам, поэтому overhead не измерен. Boundary probe дал 4/4 визуально видимых штриха и ΔpointCount=52; точные горизонтальные acceptedPoint x=0/460 ещё не подтверждены. До раздельного A/B/C FPS/duration и проверки горизонтальных границ полную матрицу кистей не запускать.
-- [ ] INT-004: реализовать автоматическую привязку pre/post capture и полного Monitor export к experiment ID через проверенный transport.
+- [~] INT-004: добавлен первый read-only WebSocket bridge: event subscription, автоматические run JSON, точные pre/post CHALK snapshots, acceptedPoint и per-stroke FPS. Остались live Firefox validation и автоматическая привязка run JSON к UI experiment.json.
 - [ ] INT-005: реализовать параметрический генератор DrawingPlan и пакетный запуск через MouseExecutor; автоматически провести матрицу кисти, скорости/FPS, длины и формы траектории, числа штрихов, overlap и повторов с pre/post CHALK capture.
 - [ ] INT-006: построить и валидировать модель прогноза расхода игровых точек, отделяя измерение от оценки.
 - [ ] INT-007: интегрировать модель в preflight/resource estimator AutoDraw.
