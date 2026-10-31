@@ -41,7 +41,7 @@ function createMonitor() {
   };
 
   vm.runInNewContext(monitorSource, sandbox, { filename: "game_monitor.js" });
-  return { monitor: window.AutoDrawGameMonitor, timers };
+  return { monitor: window.AutoDrawGameMonitor, timers, window };
 }
 
 function createBoard() {
@@ -158,4 +158,24 @@ test("resource delta equals the change in exact engine point count", () => {
   assert.equal(after - before, 3);
   assert.equal(monitor.diagnosticSnapshot().pointCountMatches, true);
   monitor.stop();
+});
+
+
+test("read-only inspect captures exact CHALK while monitor is stopped", () => {
+  const { monitor, window } = createMonitor();
+  const { board } = createBoard();
+  const originalUpdateLess = board.updateLess;
+  window.egret = { MainContext: { instance: { stage: { $children: [board] } } } };
+
+  monitor.stop();
+  const result = monitor.inspect();
+
+  assert.equal(result.inspectionMode, "read_only");
+  assert.equal(result.boardDetected, true);
+  assert.equal(result.snapshot.maxPoints, 3000);
+  assert.equal(result.snapshot.remainingPoints, 3000);
+  assert.equal(result.snapshot.pointCount, 0);
+  assert.equal(result.snapshot.isExact, true);
+  assert.equal(monitor.status().active, false);
+  assert.equal(board.updateLess, originalUpdateLess);
 });
