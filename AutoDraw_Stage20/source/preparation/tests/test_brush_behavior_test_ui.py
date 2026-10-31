@@ -459,7 +459,7 @@ def test_set_brush_size_rejects_preset_click_mode(monkeypatch) -> None:
 
 
 
-def test_brush_drag_f12_cancellation_releases_mouse_without_real_input() -> None:
+def test_brush_drag_alt_cancellation_releases_mouse_without_real_input() -> None:
     class Value:
         def __init__(self, value=""):
             self.value = value
@@ -505,7 +505,7 @@ def test_brush_drag_f12_cancellation_releases_mouse_without_real_input() -> None
     assert tab._brush_drag_after_id is None
     assert tab.root.cancelled == ["scheduled-step"]
     assert tab.root.restored is True
-    assert "остановлено по F12" in tab.status_var.value
+    assert "остановлено по Alt" in tab.status_var.value
 
 
 def test_brush_drag_completion_releases_mouse_and_does_not_claim_verified_value() -> None:
@@ -643,14 +643,14 @@ def test_automatic_brush_setup_starts_executor_only_after_confirmation(monkeypat
     assert started == [10]
 
 
-def test_f12_is_not_consumed_when_no_brush_drag_is_active() -> None:
+def test_alt_is_not_consumed_when_no_brush_drag_is_active() -> None:
     tab = _make_test_tab()
     tab._brush_drag_state = None
     assert tab._on_brush_workflow_stop_key() is None
 
 
 
-def test_f12_cancels_pending_brush_countdown_and_restores_window(monkeypatch) -> None:
+def test_alt_cancels_pending_brush_countdown_and_restores_window(monkeypatch) -> None:
     class Value:
         def __init__(self, value=""):
             self.value = value
@@ -691,12 +691,14 @@ def test_f12_cancels_pending_brush_countdown_and_restores_window(monkeypatch) ->
     assert listener.stopped is True
     assert tab._brush_hotkey_listener is None
     assert tab.root.restored is True
-    assert "отменена по F12" in tab.status_var.value
+    assert "отменена по Alt" in tab.status_var.value
 
 
-def test_global_f12_listener_schedules_cancellation_on_tk_thread(monkeypatch) -> None:
+def test_global_alt_listener_schedules_cancellation_on_tk_thread(monkeypatch) -> None:
     class FakeKeyboard:
-        f12 = object()
+        alt = object()
+        alt_l = object()
+        alt_r = object()
 
     class Listener:
         def __init__(self, on_press):
@@ -722,7 +724,7 @@ def test_global_f12_listener_schedules_cancellation_on_tk_thread(monkeypatch) ->
 
     tab._start_brush_hotkey_listener()
     listener = tab._brush_hotkey_listener
-    listener.on_press(FakeKeyboard.f12)
+    listener.on_press(FakeKeyboard.alt_l)
 
     assert listener.started is True
     assert tab.root.scheduled and tab.root.scheduled[0][0] == 0
