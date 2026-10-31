@@ -445,6 +445,18 @@
     URL.revokeObjectURL(url);
   }
 
+  // Read-only checkpoint inspection. When the monitor is stopped this locates
+  // BoardPane on demand, reads max/less, and does not attach wrappers or timers.
+  function inspect() {
+    const board = state.board || findBoard(findStage());
+    return {
+      inspectionMode: "read_only",
+      boardDetected: !!board,
+      boardLabel: board && board.constructor && board.constructor.name ? board.constructor.name : null,
+      snapshot: board ? resourceSnapshot(board) : null
+    };
+  }
+
   function status() {
     return {
       version: VERSION,
@@ -466,7 +478,8 @@
     download,
     clear() { state.events.length = 0; state.droppedEvents = 0; state.errors.length = 0; },
     attach,
-    diagnosticSnapshot
+    diagnosticSnapshot,
+    inspect
   };
   Object.defineProperty(window, "AutoDrawGameMonitor", { configurable: true, value: api });
   return start();
