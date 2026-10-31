@@ -2199,8 +2199,17 @@ class BrushBehaviorTestTab:
                 }
                 self.game_monitor_report_path = target_path.resolve()
                 self.game_monitor_summary = summary
+                telemetry_clean = (
+                    report.get("execution_status") == "completed"
+                    and chalk.get("status") == "exact"
+                    and report.get("brush_radius_status") == "single"
+                    and report.get("point_delta_matches_chalk") is True
+                    and report.get("dropped_events", 0) == 0
+                    and report.get("monitor_dropped_events", 0) == 0
+                    and report.get("monitor_error_count", 0) == 0
+                )
                 self.experiment_phases["monitor_capture"] = {
-                    "status": "saved" if report.get("execution_status") == "completed" and chalk.get("status") == "exact" else "partial",
+                    "status": "saved" if telemetry_clean else "partial",
                     "transport": "loopback_websocket",
                     "session_id": report.get("session_id"),
                     "run_id": report.get("run_id"),
