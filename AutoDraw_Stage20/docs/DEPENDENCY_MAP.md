@@ -45,7 +45,7 @@
 | `palette_quantization_ui` | `palette_profiles`, `palette_quantization` |
 | `color_scanline_ui` | `paint_cost_model`, `brush_planner`, `board_resource_model`, `paint_budget_optimizer`, `color_scanline`, `geometry_color_plan` |
 | `paint_limit_test_ui` | `color_scanline`, `paint_limit_test`, `palette_profiles` |
-| `brush_behavior_test_ui` | `stage8_optimizer`, `brush_test_workflow`, `brush_experiment_capture`, `chalk_radius_matrix` |
+| `brush_behavior_test_ui` | `stage8_optimizer`, `brush_test_workflow`, `brush_radius_feedback`, `brush_experiment_capture`, `chalk_radius_matrix` |
 | `brush_calibration_ui` | `brush_calibration` |
 
 Дополнительные прямые зависимости модулей подготовки описаны по каждому модулю в [PREPARATION_API_REFERENCE.md](PREPARATION_API_REFERENCE.md); этот документ не перечисляет все транзитивные связи библиотек.
@@ -167,7 +167,7 @@ flowchart TD
 | `brush_planner.py` | `brush_footprint_geometry` |
 | `brush_calibration.py` | — |
 | `brush_experiment_capture.py` | — |
-| `brush_test_workflow.py` | — |
+| `brush_test_workflow.py` | — |\n| `brush_radius_feedback.py` | — |
 | `board_resource_model.py` | — |
 | `paint_cost_model.py` | — |
 | `paint_budget_optimizer.py` | `color_scanline`, `board_resource_model`, `engine_point_calibration`, `paint_cost_model`, `palette_quantization` |
@@ -176,7 +176,7 @@ flowchart TD
 | `engine_point_calibration.py` | `board_resource_model`, `paint_cost_model` |
 | `interval_quota_fit.py` | — |
 | `drawing_algorithm_benchmark.py` | `palette_quantization`, `board_resource_model`, `engine_point_calibration`, `paint_cost_model` |
-| `brush_behavior_test_ui.py` | `stage8_optimizer`, `brush_test_workflow`, `brush_experiment_capture` |
+| `brush_behavior_test_ui.py` | `stage8_optimizer`, `brush_test_workflow`, `brush_radius_feedback`, `brush_experiment_capture` |
 | `brush_calibration_ui.py` | `brush_calibration` |
 | `paint_limit_test_ui.py` | `color_scanline`, `paint_limit_test`, `palette_profiles` |
 
