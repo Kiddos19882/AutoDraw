@@ -2301,14 +2301,14 @@ class BrushBehaviorTestTab:
                         "transport": "loopback_websocket",
                         "reason": match_reason,
                         "run_id": run_id,
-                        "experiment_id": self._experiment_id,
+                        "experiment_id": getattr(self, "_experiment_id", None),
                     }
                     self._write_experiment_manifest()
                     return
                 target_path = self.experiment_dir / "monitor_report.json"
                 report_copy = dict(report)
-                report_copy["autodraw_experiment_id"] = self._experiment_id
-                report_copy["chalk_radius_matrix"] = self._chalk_matrix_metadata
+                report_copy["autodraw_experiment_id"] = getattr(self, "_experiment_id", None)
+                report_copy["chalk_radius_matrix"] = getattr(self, "_chalk_matrix_metadata", None)
                 target_path.write_text(
                     json.dumps(report_copy, ensure_ascii=False, indent=2) + "\n",
                     encoding="utf-8",
@@ -2318,8 +2318,8 @@ class BrushBehaviorTestTab:
                 trajectory = report.get("trajectory") if isinstance(report.get("trajectory"), dict) else {}
                 summary = {
                     "source": "loopback_websocket_bridge",
-                    "autodraw_experiment_id": self._experiment_id,
-                    "chalk_radius_matrix": self._chalk_matrix_metadata,
+                    "autodraw_experiment_id": getattr(self, "_experiment_id", None),
+                    "chalk_radius_matrix": getattr(self, "_chalk_matrix_metadata", None),
                     "run_id": report.get("run_id"),
                     "session_id": report.get("session_id"),
                     "run_id": report.get("run_id"),
@@ -2362,8 +2362,8 @@ class BrushBehaviorTestTab:
                     "status": "saved" if telemetry_clean else "partial",
                     "transport": "loopback_websocket",
                     "match_reason": match_reason,
-                    "experiment_id": self._experiment_id,
-                    "chalk_radius_matrix": self._chalk_matrix_metadata,
+                    "experiment_id": getattr(self, "_experiment_id", None),
+                    "chalk_radius_matrix": getattr(self, "_chalk_matrix_metadata", None),
                     "session_id": report.get("session_id"),
                     "run_id": report.get("run_id"),
                     "source_path": str(source_path.resolve()),
@@ -2421,8 +2421,8 @@ class BrushBehaviorTestTab:
         manifest = {
             "schema_version": 1,
             "record_type": "autodraw_brush_paint_experiment",
-            "experiment_id": self._experiment_id,
-            "chalk_radius_matrix": self._chalk_matrix_metadata,
+            "experiment_id": getattr(self, "_experiment_id", None),
+            "chalk_radius_matrix": getattr(self, "_chalk_matrix_metadata", None),
             "updated_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "test_case": TEST_CASES.get(self.case_var.get(), {}).get("id"),
             "brush_value_requested": self._experiment_requested_brush if self._experiment_requested_brush is not None else int(self.brush_var.get().strip()),
