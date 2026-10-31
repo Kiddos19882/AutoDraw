@@ -7,6 +7,7 @@ import sys
 from dataclasses import dataclass, replace
 from datetime import datetime
 from pathlib import Path
+from typing import Any
 import threading
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
