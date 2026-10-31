@@ -712,6 +712,7 @@ class ColorPlanExecutionHooks:
         dpi_scale_provider: Callable[[], int] | None = None,
         brush_slider_calibration: dict[str, Any] | BrushSliderCalibration | None = None,
         brush_target_area: dict[str, int] | None = None,
+        brush_monitor_radius_provider: Callable[..., dict[str, Any] | None] | None = None,
     ):
         self.plan = validate_color_plan(color_plan)
         self.profile_document = profile_document
@@ -736,6 +737,7 @@ class ColorPlanExecutionHooks:
                 calibration,
                 brush_target_area,
                 current_screen_size_provider=current_screen_size_provider,
+                monitor_radius_provider=brush_monitor_radius_provider,
             )
             self.brush_controller.validate()
         try:
