@@ -22,15 +22,15 @@ if not defined GAME_ORIGIN (
     exit /b 2
 )
 
-if not defined SNIPPET_FILE (
-    set "SNIPPET_FILE=%REPO_ROOT%\data\results\brush_behavior_tests\game_monitor_bridge\connection_snippet.js"
-)
 if not defined OUTPUT_DIR (
     if exist "%REPO_ROOT%\AutoDraw.exe" (
         set "OUTPUT_DIR=%REPO_ROOT%\data\results\brush_behavior_tests\game_monitor_bridge"
     ) else (
         set "OUTPUT_DIR=%REPO_ROOT%\AutoDraw_Stage20\data\results\brush_behavior_tests\game_monitor_bridge"
     )
+)
+if not defined SNIPPET_FILE (
+    set "SNIPPET_FILE=%OUTPUT_DIR%\connection_snippet.js"
 )
 
 cd /d "%REPO_ROOT%"
