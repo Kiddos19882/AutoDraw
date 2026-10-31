@@ -623,17 +623,34 @@ class AutoDrawUnifiedApp:
                 parent=self.root,
             )
             return False
-        canvas = plan.get("canvas", {})
-        if (int(canvas.get("width", -1)), int(canvas.get("height", -1))) != (area.width, area.height):
-            messagebox.showwarning(
-                "Размер теста не совпадает с областью",
-                "Размер тестового плана не совпадает с текущим холстом. Пересоздайте план после выбора области.",
-                parent=self.root,
-            )
-            return False
+        coordinate_system = plan.get("coordinate_system", "local_canvas_pixels")
+        execution_plan = plan
+        if coordinate_system == "logical_board_pixels":
+            try:
+                execution_plan, transform = transform_logical_brush_plan_to_screen(
+                    plan,
+                    {"x": int(area.x), "y": int(area.y), "width": int(area.width), "height": int(area.height)},
+                )
+                generation = plan.setdefault("generation", {})
+                if not isinstance(generation, dict):
+                    raise ValueError("Поле generation должно быть объектом.")
+                generation["screen_transform"] = transform
+                save_plan(source_path, plan)
+            except (OSError, ValueError, TypeError, KeyError) as exc:
+                messagebox.showerror("Ошибка преобразования координат", str(exc), parent=self.root)
+                return False
+        else:
+            canvas = plan.get("canvas", {})
+            if (int(canvas.get("width", -1)), int(canvas.get("height", -1))) != (area.width, area.height):
+                messagebox.showwarning(
+                    "Размер теста не совпадает с областью",
+                    "Размер тестового плана не совпадает с текущим холстом. Пересоздайте план после выбора области.",
+                    parent=self.root,
+                )
+                return False
         destination = self.data_paths["runtime"] / "current_brush_behavior_test.json"
         try:
-            path = write_validated_execution_plan(plan, destination, save_plan, DrawingPlan)
+            path = write_validated_execution_plan(execution_plan, destination, save_plan, DrawingPlan)
             self.executor.load_plan_from_path(path)
         except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError, RuntimeError) as exc:
             messagebox.showerror(
