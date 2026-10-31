@@ -487,3 +487,19 @@ Session be40944f-523f-49b1-ba87-5af1875185d0 закрыта штатно в 19:1
 - unit/regression tests для этих правил.
 
 До выполнения этих пунктов локальные браузерные прогоны матрицы не начинать.
+
+
+### 20.1. Реализация подготовки матрицы
+
+В Brush Test UI добавлены ID серии и номер блока (1–3). Для сценария `paint_consumption_long_lines` метаданные серии, блока, позиции радиуса в последовательности и запрошенного радиуса сохраняются в drawing plan и experiment manifest.
+
+Каждый эксперимент получает уникальный `experiment_id`. Тот же ID и matrix metadata записываются в копию Game Monitor run, summary и `monitor_capture`. Перед сохранением проверяется, не использован ли `run_id` ранее в другом experiment; повторная привязка завершается `unavailable`.
+
+Добавлен `source/preparation/chalk_radius_matrix.py`:
+- валидация серии/блока/радиуса;
+- проверка experiment ID и согласованности metadata в manifest/capture/summary;
+- проверка exact positive CHALK и совпадения sampled pointDelta;
+- исключение повторно использованных monitor run и дублированных ячеек матрицы;
+- расчёт среднего, медианы, диапазона и population standard deviation по радиусу.
+
+Добавлен CLI `tests/analyze_chalk_radius_matrix.py` и regression tests. Автоматические тесты и CI ещё должны быть запущены/проверены на финальном HEAD. Live браузерный gate не открыт до этого подтверждения.
