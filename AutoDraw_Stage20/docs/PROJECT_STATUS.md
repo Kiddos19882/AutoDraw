@@ -403,3 +403,8 @@ GitHub Actions `Geometry planner tests`, run `41235681326`, завершился
 Bridge server получил аргумент --snippet-file: он записывает токенизированный snippet в локальный файл для копирования из UI и удаляет его при остановке сервера. Секрет не добавляется в Git и не включается в experiment manifest. Валидация Origin в UI принимает только bare HTTPS Origin без пути, query и fragment.
 
 Добавлены regression tests в source/preparation/tests/test_brush_behavior_test_ui.py для допустимых и недопустимых Origin. Требуется подтвердить GitHub Actions и затем проверить на локальной Windows-системе полный порядок: запуск сервера → копирование/выполнение Monitor → копирование/выполнение bridge snippet → появление активной heartbeat-сессии.
+
+
+### Уточнение для portable-сборки
+
+Сборщик build_windows.py копирует необходимые файлы Game Monitor Bridge в папку game_monitor рядом с AutoDraw.exe. UI использует отдельную ветку определения путей для frozen/portable режима и передаёт серверу фактический каталог результатов Brush Test; вложенный путь AutoDraw_Stage20 в portable data не создаётся.
