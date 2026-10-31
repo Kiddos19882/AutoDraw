@@ -164,3 +164,10 @@
 
 - GitHub Actions run #1132 для HEAD `3a0383b56b5972d4b978ff30080d7b7768b021d0` завершился успешно: geometry-tests, executor-tests и Windows portable build/startup smoke-test.
 - Live-проверка геометрии доски, границ и A/B/C Monitor остаётся незавершённой.
+
+
+## 2026-10-31 — исправление размера BoardPane в Brush Test
+
+- Повторная сверка master game bundle подтвердила `BoardPane` 460×240; ранее использованное в transform значение 420×240 было ошибочным.
+- Обновлены логический размер Brush Test, X-масштаб transform, unit-тесты, UI-подпись и документация.
+- CI для новой геометрии и live-проверка ROI/границ ожидаются.
