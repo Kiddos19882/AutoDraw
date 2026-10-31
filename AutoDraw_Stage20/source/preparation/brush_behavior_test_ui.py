@@ -701,6 +701,12 @@ class BrushBehaviorTestTab:
         self.execution_report = None
         self.game_monitor_report_path = None
         self.game_monitor_summary = None
+        if self._bridge_capture_poll_id is not None:
+            try:
+                self.root.after_cancel(self._bridge_capture_poll_id)
+            except (tk.TclError, ValueError):
+                pass
+            self._bridge_capture_poll_id = None
         self.brush_slider_start = None
         self.brush_slider_end = None
         self.outcome_var.set("not_reviewed")
