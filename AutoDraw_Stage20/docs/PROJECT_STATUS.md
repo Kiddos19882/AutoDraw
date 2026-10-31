@@ -62,7 +62,7 @@ INT-002 завершена как статическое проектирова�
 
 Рабочая ветка: `feature/image-geometry-optimization`.
 
-Последний проверенный HEAD: `3a0383b56b5972d4b978ff30080d7b7768b021d0` в `feature/image-geometry-optimization`. GitHub Actions run #1132 завершился success для этого HEAD: jobs `geometry-tests`, `executor-tests` и `Windows portable build and startup smoke-test` прошли. Это подтверждает CI, но не live-геометрию игры.
+Последний проверенный HEAD: `2449664918fcb43679b5be664e0f020bb8a9622c` в `feature/image-geometry-optimization`. Run #1132 успешно проверил предыдущую версию transform с шириной 420; после исправления логической ширины на 460 запущен run #1142 на кодовом коммите `d0c4aee8c4bef75daedfae85ae4403a3a8661ef4` (выполняется), а run #1157 на текущем HEAD `2449664...` находится в очереди. Успех run #1132 не засчитывается как проверка исправления 460×240.
 
 ## 7. Состояние документации
 
@@ -112,3 +112,8 @@ Game Monitor 0.2.0 и Node-тесты проверены через GitHub Actio
 ## 11. Последняя проверка CI — 31 октября 2026 г.
 
 Для HEAD `3a0383b56b5972d4b978ff30080d7b7768b021d0` workflow run #1132 завершился `success`. Все три jobs прошли: geometry-tests, executor-tests, Windows portable build and startup smoke-test. Программная часть logical→screen handoff и regression guards прошла CI. Это не заменяет live-проверку точной области доски, граничного hit-test и A/B/C overhead Game Monitor.
+
+
+## 12. Исправление размера доски и состояние проверки
+
+Прямая проверка master bundle подтвердила размеры `BoardPane` 460×240; прежнее значение 420×240 было ошибочным. Код, тесты и активная документация обновлены. Run #1142 на кодовом коммите `d0c4aee8c4bef75daedfae85ae4403a3a8661ef4` выполняет geometry-tests и Windows smoke-test; run #1157 на текущем документированном HEAD `2449664918fcb43679b5be664e0f020bb8a9622c` ожидает запуска. До успешного CI и live-проверки не считать INT-003 закрытой.
