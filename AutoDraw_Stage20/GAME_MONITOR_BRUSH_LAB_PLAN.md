@@ -1,7 +1,7 @@
 # План: Game Monitor и лаборатория измерения кистей AutoDraw
 
 **Дата:** 30 октября 2026 г.  
-**Статус:** лаборатория не завершена; Monitor 0.1.2 подключался к живой игре и собраны первые серии. INT-001 (инвентаризация) и INT-002 (статическое проектирование CHALK snapshot) завершены 31 октября 2026 г.; точный CHALK и overhead Monitor ещё не проверены контролируемыми экспериментами.  
+**Статус:** лаборатория не завершена; текущая версия Game Monitor — 0.2.1; Monitor 0.1.2 подключался к живой игре и собраны первые серии. INT-001 (инвентаризация) и INT-002 (статическое проектирование CHALK snapshot) завершены 31 октября 2026 г.; точный CHALK и overhead Monitor ещё не проверены контролируемыми экспериментами.  
 **Рабочая ветка:** `feature/image-geometry-optimization`.  
 **Запрет:** ветку `master` не изменять.
 
@@ -540,3 +540,19 @@ Game Monitor обновлён до версии 0.2.1. При изменении
 Добавлены Node.js регрессионные тесты: точная последняя координата, отсутствие stale point на старте, обнаружение coalesced multi-point delta; ранее добавленные тесты проверяют полное восстановление собственных/унаследованных методов, повторные start/stop и замену BoardPane. На текущем commit `32a3fdb35d95b15ca64c1bb4c7f404904ffc23e8` workflow #1238 запущен; синтаксис Game Monitor, Node.js tests и WebSocket smoke-server tests уже прошли, остальные обязательные jobs ещё выполняются.
 
 Следующий live-шаг: повторить `board_boundary_probe` с Monitor 0.2.1 и проверить, что `acceptedPoint` доходит до x=0/460 и y=0/240, а `pointDelta` не скрывает coalescing. A/B/C должен сравнивать Monitor off / 0.1.2 / 0.2.1; старый 0.2.0 остаётся исторической контрольной версией.
+
+
+### 13.16. Полный CI для Game Monitor 0.2.1 — 31.10.2026
+
+Актуальный branch HEAD на момент проверки: `354ff64802a8065aff19f17176c2ea3e65ff4bbc`. Workflow #1241 (`41212496267`) завершился `completed/success`; все три обязательные jobs успешны: `geometry-tests`, `executor-tests`, `Windows portable build and startup smoke-test`.
+
+В `geometry-tests` успешно завершились проверки синтаксиса Game Monitor, точного O(1) resource snapshot, локального WebSocket smoke server, статического анализа bundle, benchmark Stage 5/7/8, synthetic geometry, fallback и outline-first стратегий, preparation/geometry и unified-app UI regressions. Результаты CI подтверждают автоматические тесты и сборку, но не live browser transport и не численный overhead на реальной игровой странице.
+
+Дальнейший порядок не меняется:
+1. Реальный Firefox iframe → localhost WebSocket smoke test.
+2. A/B/C: Monitor off / 0.1.2 / 0.2.1 с одинаковыми сценариями и измерением FPS/длительности.
+3. Повторный `board_boundary_probe` на 0.2.1 с проверкой `acceptedPoint`, `pointDelta` и автоматической visibility-метрики.
+4. После допуска — полная матрица кистей и точная экспериментальная модель `ΔpointCount`.
+5. Только после успешного browser transport smoke test — production bridge и автоматический capture в manifest.
+
+Не считать локальный smoke-server доказательством доступности из Firefox iframe. Не считать геометрическую длину, число пикселей или площадь покрытия эквивалентом CHALK.
