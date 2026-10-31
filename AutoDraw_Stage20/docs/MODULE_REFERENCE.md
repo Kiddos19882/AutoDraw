@@ -169,3 +169,14 @@ Game Monitor документируется как самостоятельна�
 ## Дополнение 2026-10-31 — лаборатория кистей
 
 - `source/preparation/brush_coordinate_transform.py` — преобразование явно маркированных logical-планов Brush Test 420×240 в screen-local ROI; исходный план сохраняется отдельно с transform metadata.
+
+
+### Дополнение 2026-11-01 — Game Monitor Bridge launcher
+
+В source/game_monitor/ добавлены:
+- game_monitor_bridge.js — browser-side агент, передающий read-only события Monitor через WebSocket;
+- game_monitor_bridge_server.py — локальный collector с auth token и записью session/run JSON;
+- requirements-bridge.txt — отдельная зависимость WebSocket collector;
+- start_game_monitor_bridge.bat — Windows launcher, вызываемый кнопкой Brush Test UI.
+
+Windows portable build копирует эти файлы и game_monitor.js в каталог game_monitor рядом с AutoDraw.exe. Каталог companion-инструментов не импортируется как часть GUI Python package и запускается отдельным процессом.
