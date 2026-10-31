@@ -25,11 +25,24 @@
   let fpsActive = false;
   let fpsStartedAt = null;
   let frameTimes = [];
+  let sentEventCount = 0;
+  let lastEventType = null;
+  let lastEventAtPerformanceMs = null;
+  let sendFailureCount = 0;
 
   const send = (type, payload = {}) => {
-    if (!connected || socket.readyState !== WebSocket.OPEN) return false;
-    socket.send(JSON.stringify({ type, sessionId, sequence: ++sequence, sentAtUtc: new Date().toISOString(), ...payload }));
-    return true;
+    if (!connected || socket.readyState !== WebSocket.OPEN) {
+      sendFailureCount++;
+      return false;
+    }
+    try {
+      socket.send(JSON.stringify({ type, sessionId, sequence: ++sequence, sentAtUtc: new Date().toISOString(), ...payload }));
+      return true;
+    } catch (error) {
+      sendFailureCount++;
+      console.error("AutoDraw Game Monitor Bridge send failed:", error);
+      return false;
+    }
   };
 
   const stopFpsProbe = () => {
@@ -84,13 +97,22 @@
         if (!ALLOWED_EVENTS.has(item.type)) return;
         if (item.type === "DRAW_START") startFpsProbe();
         if (item.type === "DRAW_END" && fpsActive) stopFpsProbe();
+        sentEventCount++;
+        lastEventType = item.type;
+        lastEventAtPerformanceMs = item.t;
         send("event", { event: item });
       });
       heartbeatTimer = setInterval(() => {
         send("heartbeat", {
           monitorStatus: monitor.status(),
           performanceNowMs: performance.now(),
-          visibilityState: document.visibilityState
+          visibilityState: document.visibilityState,
+          bridgeDiagnostics: {
+            sentEventCount,
+            lastEventType,
+            lastEventAtPerformanceMs,
+            sendFailureCount
+          }
         });
       }, 1000);
       window.AutoDrawGameMonitorBridge.connected = true;
