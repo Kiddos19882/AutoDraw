@@ -32,6 +32,7 @@ def test_logical_bounds_map_to_screen_pixel_centers():
     assert result["coordinate_system"] == "local_canvas_pixels"
     assert info["scale_x"] == pytest.approx(645 / 420)
     assert info["scale_y"] == pytest.approx(322 / 240)
+    assert info["point_step_px_units"] == "screen_pixels"
 
 
 def test_source_plan_is_not_mutated_and_transform_is_recorded():
