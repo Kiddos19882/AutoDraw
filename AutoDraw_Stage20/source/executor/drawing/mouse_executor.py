@@ -133,10 +133,10 @@ class MouseExecutor:
         self.stop_event.set()
 
     def _current_stop_reason(self) -> str:
-        # If F12 was pressed first, a subsequent window-close stop request must not rewrite its cause.
+        # If Alt was pressed first, a subsequent window-close stop request must not rewrite its cause.
         with self._reason_lock:
             if self._hotkey_stop_requested:
-                return "F12"
+                return "Alt"
         try:
             external_reason = self.stop_reason_provider() if self.stop_reason_provider else None
         except Exception:
@@ -216,11 +216,11 @@ class MouseExecutor:
                 progress(current, len(plan.strokes), detail)
 
         try:
-            listener = keyboard.GlobalHotKeys({"<f12>": self._request_hotkey_stop})
+            listener = keyboard.GlobalHotKeys({"<alt>": self._request_hotkey_stop})
             listener.start()
             for remaining in range(self.config.countdown_seconds, 0, -1):
                 self._check_stop()
-                notify(0, f"Начало через {remaining} с. Переключитесь на браузер; F12 — остановить.")
+                notify(0, f"Начало через {remaining} с. Переключитесь на браузер; Alt — остановить.")
                 self._wait_interruptibly(1.0)
 
             if preflight is not None:
@@ -319,7 +319,7 @@ class MouseExecutor:
                 try:
                     listener.stop()
                 except Exception as exc:
-                    listener_message = f"Не удалось остановить обработчик F12: {type(exc).__name__}: {exc}"
+                    listener_message = f"Не удалось остановить обработчик Alt: {type(exc).__name__}: {exc}"
                     error = f"{error}; {listener_message}" if error else listener_message
                     if status == "completed":
                         status = "failed"
