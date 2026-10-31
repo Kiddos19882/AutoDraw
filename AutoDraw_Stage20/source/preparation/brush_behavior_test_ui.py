@@ -9,7 +9,7 @@ import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import tkinter as tk
-from tkinter import filedialog, messagebox, simpledialog, ttk
+from tkinter import filedialog, messagebox, ttk
 from typing import Any
 
 import pyautogui
@@ -17,7 +17,7 @@ from PIL import Image, ImageGrab
 from pynput import keyboard
 
 from brush_test_workflow import (
-    calculate_slider_target, validate_brush_test_preflight, validate_observed_brush_radius,
+    calculate_slider_target, validate_brush_test_preflight,
     should_run_postdraw_workflow,
 )
 from brush_radius_feedback import (
@@ -641,7 +641,7 @@ class BrushBehaviorTestTab:
         ttk.Label(slider, text="Правый край 1 (X,Y)").pack(side="left", padx=(8, 0))
         ttk.Entry(slider, textvariable=self.slider_end_var, width=12).pack(side="left", padx=4)
         ttk.Button(slider, text="Установить кисть", command=self.set_brush_size).pack(side="left", padx=6)
-        ttk.Label(slider, text="Координаты расширенного ползунка: слева радиус 30, справа радиус 1. После перетаскивания проверь значение в игре.", wraplength=350).pack(side="left", padx=6)
+        ttk.Label(slider, text="Слева радиус 30, справа радиус 1. Game Monitor автоматически проверяет и корректирует фактический радиус; мост должен быть подключён.", wraplength=410).pack(side="left", padx=6)
         actions = ttk.Frame(outer)
         actions.pack(fill="x", pady=(0, 8))
         ttk.Button(actions, text="Создать и передать тест в исполнитель →", command=self.create_and_transfer_plan).pack(side="left")
@@ -873,6 +873,11 @@ class BrushBehaviorTestTab:
                 raise ValueError("Размер кисти должен быть целым числом от 1 до 30.")
             if platform.system() != "Windows":
                 raise RuntimeError("Автоматическая установка кисти доступна только в Windows.")
+            if self._read_live_brush_radius() is None:
+                raise RuntimeError(
+                    "Для автоматической коррекции требуется активный Game Monitor Bridge. "
+                    "Подключи мост в игровом iframe и дождись свежего heartbeat."
+                )
             calibrated = self.get_brush_control() if callable(self.get_brush_control) else None
             if calibrated:
                 mode = calibrated.get("mode")
@@ -1623,7 +1628,7 @@ class BrushBehaviorTestTab:
                 self.status_var.set("Доска очищена и проверена, но кисть не установлена. Исполнитель не запущен.")
                 self._write_experiment_manifest()
                 return
-            self.status_var.set("Доска очищена и проверена; начата установка кисти. После перетаскивания подтверди радиус в игре.")
+            self.status_var.set("Доска очищена и проверена; начата установка кисти. Game Monitor автоматически проверит радиус и скорректирует ползунок.")
         except Exception as exc:
             self._finish_automated_preclear_failure("preclear_capture_failed", str(exc))
 
