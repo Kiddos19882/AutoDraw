@@ -1154,6 +1154,9 @@ class BrushBehaviorTestTab:
                 feedback["current_point"] = tuple(state["target"])
                 feedback["await_after_utc"] = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
                 feedback["poll_count"] = 0
+                feedback.pop("last_status_timestamp", None)
+                feedback.pop("candidate_radius", None)
+                feedback["stable_status_count"] = 0
                 self.status_var.set(
                     f"Положение для радиуса {feedback['requested_radius']} установлено. "
                     "Проверяю фактическое значение Game Monitor…"
