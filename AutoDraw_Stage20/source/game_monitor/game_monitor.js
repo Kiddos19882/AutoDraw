@@ -124,6 +124,8 @@
     const atom = board && board.atom;
     const maxPoints = board && board.max;
     const remainingPoints = board && board.less;
+    const radii = atom && atom.radius;
+    const currentRadius = Array.isArray(radii) && radii.length ? safeValue(radii[radii.length - 1]) : null;
     const isExact = Number.isSafeInteger(maxPoints) &&
       maxPoints > 0 &&
       Number.isSafeInteger(remainingPoints) &&
@@ -140,7 +142,8 @@
       sourceMethod: "BoardPane.max+BoardPane.less",
       isExact,
       validationStatus: isExact ? "valid" : "unavailable",
-      radius: atom ? safeValue(atom.radius) : null
+      radius: atom ? safeValue(atom.radius) : null,
+      currentRadius
     };
   }
 
