@@ -256,3 +256,8 @@ Game Monitor 0.2.1 остаётся текущей версией. INT-003 ос�
 Brush Test UI теперь после callback завершения executor автоматически опрашивает каталог bridge, выбирает отчёт по времени старта относительно фазы `before_draw` и фактическому радиусу, копирует его в каталог эксперимента как `monitor_report.json` и добавляет в `experiment.json` session_id, run_id, точную CHALK delta, FPS, trajectory summary и capture status. Если совпадающий отчёт не появился в течение 10 секунд, manifest получает `monitor_capture.status=unavailable`.
 
 Это закрывает файловую привязку на уровне UI, но корреляция пока основана на времени+радиусе, а не на сквозном experiment_id. Live Firefox validation и проверка возможных неоднозначностей при одинаковых радиусах остаются открытыми.
+
+
+### Контроль целостности WebSocket run
+
+В bridge добавлены `stroke_count`, сумма sample `pointDelta`, сравнение с CHALK delta, проверка единственного фактического радиуса и счётчики потерь/ошибок. UI присваивает capture статус `saved` только при полном совпадении CHALK/sample delta, одном радиусе, завершённом исполнении и нулевых потерях/ошибках; иначе сохраняет отчёт как `partial`. Production WebSocket handler дополнительно покрыт integration test с auth/session/event/heartbeat и проверкой файла результата.
