@@ -505,3 +505,10 @@ Pointer-up endpoints: right (1140,240), left (563,240), bottom (852,390), top (8
 Во всех исходных manifest stroke visibility была inconclusive: код сравнивал canvas исходного logical-плана 460×240 с board screenshot ROI 578×301, не применяя сохранённый transform. Исправлен анализатор в `brush_behavior_test_ui.py`: ожидаемые strokes теперь переводятся в screen-local ROI pixels с проверкой размеров и metadata transform. Добавлены тесты helper и mismatch ROI. Paint-meter estimate (2 changed columns, low confidence) остаётся inconclusive и не заменяет Game Monitor.
 
 CI run #41174050665 выявил ошибку в отрицательной фикстуре uniform-scale guard: тест передавал равномерный ROI 646×338 и ожидал исключение. Исправлено на 646×323. Исправлен также вызов plan builder в новых тестах. Новые CI runs проверяются отдельно; полная матрица и A/B/C пока заблокированы.
+
+
+### 13.13. Визуальная сверка live boundary probe
+
+Выполнен визуальный просмотр трёх `after_draw-board.png` и трёх `after_draw-screen.png` из commit f72. Во всех трёх опытах видны четыре штриха, заканчивающиеся на правой, левой, нижней и верхней границах BoardPane; на полных снимках не обнаружен видимый выход за доску. Для проверенного ROI 578×301 при screen resolution 1920×1080 логическая геометрия и текущий transform визуально подтверждены.
+
+Исторические `experiment.json` не изменялись: автоматическое поле `stroke_visibility_analysis` остаётся inconclusive, поскольку тогда код сравнивал logical canvas 460×240 с screen ROI 578×301 без transform. Сам analyzer исправлен в коде, но новые автоматические visibility-результаты появятся в следующем прогоне. A/B/C Monitor off/0.1.2/0.2.0 остаётся следующим крупным тестом INT-003.
