@@ -21,7 +21,7 @@ from brush_test_workflow import (
     should_run_postdraw_workflow,
 )
 from brush_radius_feedback import (
-    calculate_radius_correction_target, monitor_radius_from_status,
+    calculate_radius_correction_target, monitor_radius_from_status, read_active_bridge_radius,
 )
 from chalk_radius_matrix import (
     MATRIX_SCENARIO_ID, build_chalk_radius_matrix_metadata, is_monitor_run_claimed,
@@ -1187,40 +1187,11 @@ class BrushBehaviorTestTab:
                 pass
 
     def _read_live_brush_radius(self, *, after_utc: str | None = None) -> dict[str, Any] | None:
-        """Read a fresh read-only Monitor status from the active bridge session file."""
-        bridge_root = self.output_dir / "game_monitor_bridge"
-        if not bridge_root.is_dir():
-            return None
-        after = _parse_monitor_timestamp(after_utc) if after_utc else None
-        now_utc = datetime.now(timezone.utc)
-        candidates: list[tuple[datetime, dict[str, Any]]] = []
-        for session_path in bridge_root.glob("*/session.json"):
-            try:
-                record = json.loads(session_path.read_text(encoding="utf-8"))
-                diagnostics = record.get("bridge_diagnostics", {})
-                if not isinstance(diagnostics, dict) or diagnostics.get("connection_closed") is True:
-                    continue
-                if diagnostics.get("last_message_type") != "heartbeat":
-                    continue
-                stamp_text = diagnostics.get("last_message_at_utc")
-                stamp = _parse_monitor_timestamp(stamp_text)
-                if stamp is None or (now_utc - stamp).total_seconds() > 4.0:
-                    continue
-                if after is not None and stamp <= after:
-                    continue
-                status = diagnostics.get("last_monitor_status")
-                radius = monitor_radius_from_status(status)
-                if radius is None:
-                    continue
-                candidates.append((stamp, {
-                    "radius": radius,
-                    "session_id": record.get("session_id"),
-                    "observed_at_utc": stamp_text,
-                    "snapshot": status.get("snapshot") if isinstance(status, dict) else None,
-                }))
-            except (OSError, ValueError, TypeError, AttributeError):
-                continue
-        return max(candidates, key=lambda item: item[0])[1] if candidates else None
+        """Read the active bridge heartbeat from the shared feedback helper."""
+        return read_active_bridge_radius(
+            self.output_dir / "game_monitor_bridge",
+            after_utc=after_utc,
+        )
 
     def _poll_brush_radius_feedback(self) -> None:
         """Wait for a post-drag heartbeat, then correct the slider until the game reports the target."""
