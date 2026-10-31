@@ -60,7 +60,7 @@ def test_transform_rejects_wrong_coordinate_system():
 def test_transform_rejects_nonuniform_roi_for_uniform_game_scale():
     with pytest.raises(ValueError, match="не соответствуют равномерному масштабу"):
         transform_logical_brush_plan_to_screen(
-            make_plan(), {"x": 0, "y": 0, "width": 646, "height": 338}
+            make_plan(), {"x": 0, "y": 0, "width": 646, "height": 323}
         )
 
 
