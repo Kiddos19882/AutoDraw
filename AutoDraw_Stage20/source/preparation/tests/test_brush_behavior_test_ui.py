@@ -281,6 +281,24 @@ def test_brush_test_plan_can_use_explicit_logical_board_coordinates() -> None:
     assert plan["strokes"][0]["metadata"]["line_extension_px_override"] == 0.0
 
 
+def test_board_boundary_probe_reaches_all_four_inclusive_board_edges() -> None:
+    plan = build_brush_test_drawing_plan(
+        "Проверка границ доски",
+        (460, 240),
+        coordinate_system="logical_board_pixels",
+    )
+
+    assert len(plan["strokes"]) == 4
+    endpoints = [stroke["points"][-1] for stroke in plan["strokes"]]
+    assert endpoints == [
+        {"x": 460.0, "y": 120.0},
+        {"x": 0.0, "y": 120.0},
+        {"x": 230.0, "y": 240.0},
+        {"x": 230.0, "y": 0.0},
+    ]
+    assert all(stroke["metadata"]["line_extension_px_override"] == 0.0 for stroke in plan["strokes"])
+
+
 def test_logical_brush_plan_rejects_points_beyond_supplied_canvas_bounds() -> None:
     with pytest.raises(ValueError, match="выходит за пределы"):
         build_brush_test_drawing_plan(
