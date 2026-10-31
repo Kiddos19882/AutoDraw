@@ -29,7 +29,7 @@
 | Компонент | Основной файл / каталог | Что искать |
 |---|---|---|
 | Точка интеграции приложения | `AutoDraw_Stage20/integrated_app.py` | Создание вкладок, передача callbacks и DrawingPlan, получение canvas area/size, связь Brush Test с Stage6 |
-| UI лаборатории кистей | `AutoDraw_Stage20/source/preparation/brush_behavior_test_ui.py` | Сценарии, создание логических DrawingPlan 460×240 и передача теста |
+| UI лаборатории кистей | `AutoDraw_Stage20/source/preparation/brush_behavior_test_ui.py` | Сценарии, создание логических DrawingPlan 460×240 и передача теста |\n| Обратная связь радиуса | `AutoDraw_Stage20/source/preparation/brush_radius_feedback.py` | Извлечение фактического радиуса из heartbeat Game Monitor и расчёт коррекции ползунка |
 | Преобразование координат Brush Test | `AutoDraw_Stage20/source/preparation/brush_coordinate_transform.py` | Явное преобразование logical_board_pixels в screen-local ROI с сохранением transform в generation metadata |
 | Исполнитель мыши | `AutoDraw_Stage20/source/executor/drawing/mouse_executor.py` | MouseExecutor, ExecutorConfig, экранные координаты, движение мыши, отчёт исполнения |
 | UI исполнителя | `AutoDraw_Stage20/source/executor/stage6_execute_plan.py` | Загрузка плана, preview, проверка размеров, запуск рабочего потока и передача в MouseExecutor |
