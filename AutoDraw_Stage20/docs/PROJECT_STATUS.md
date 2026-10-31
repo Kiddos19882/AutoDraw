@@ -268,3 +268,14 @@ Brush Test UI теперь после callback завершения executor а�
 В результатах commit `6382c27` оба тестовых `experiment.json` имеют `monitor_capture.status=unavailable` и `matching_run_report_not_found`; единственный сохранённый session.json в этом коммите имеет ID `3323cf8e-01ca-4009-8f16-27d657d857f8`, отличный от отдельно сообщённого ID `89f3383e-b562-462f-a1dc-8f516bdd7378`. Код collector создаёт session.json на `session_start`, а run JSON — только после `DRAW_START`; следовательно подтверждено подключение, но не поступление события старта рисования.
 
 Добавлена постоянная диагностика канала: браузерный счётчик отправленных событий/последнего типа/ошибок отправки и серверные счётчики принятых сообщений/событий/типов, последний heartbeat Monitor и состояние соединения. Поля записываются в session.json после каждого сообщения. Добавлен тест сохранения этих диагностик. Причина отсутствия событий пока не доказана; нужен следующий короткий live-прогон с новой версией агента.
+
+
+
+
+### Live bridge diagnostics — commit 323a698 (31.10.2026)
+
+В сессии `f303b3e1-382e-4859-9681-e1c360ec6424` подтверждена доставка телеметрии: Monitor активен, доска обнаружена, exact point counter 1→49 (`ΔCHALK=48`) за интервал сессии, 0 dropped events, 0 Monitor errors; browser bridge отправил 119 событий, сервер принял 119. Наблюдались 8 pointer-down/up пар, 55 DRAW_SAMPLE и 48 POINT_QUOTA_UPDATE. Радиус — 30.
+
+**Причина отсутствия run JSON установлена:** в сессии нет `DRAW_START/DRAW_END`. Game Monitor pointer observer генерирует `POINTER_DOWN_CANDIDATE/POINTER_UP_CANDIDATE` и samples, но bridge FPS probe и серверный RunRecorder ориентированы только на engine lifecycle `DRAW_START/DRAW_END`. Поэтому WebSocket transport исправен, но pointer-only lifecycle не открывает/не завершает run; frame_probe_count остаётся 0.
+
+Статус INT-004: transport/session diagnostics — LIVE CONFIRMED; automatic run recording — BLOCKED; FPS capture — BLOCKED; привязка monitor report к experiment.json — не подтверждена для этой сессии. Следующий gate — pointer lifecycle fallback с regression tests и повторный live Firefox run. Δ48 нельзя приписывать отдельному experiment.json без отдельной корреляции теста.
