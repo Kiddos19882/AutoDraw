@@ -5,7 +5,7 @@ import unittest
 try:
     import websockets
     from websocket_smoke_server import OneShotAuthenticator, make_handler, parse_message
-    from game_monitor_bridge_server import RunRecorder, exact_snapshot, summarize_intervals, valid_origin
+    from game_monitor_bridge_server import RunRecorder, exact_snapshot, summarize_intervals, valid_origin, make_handler as bridge_make_handler
 except ModuleNotFoundError:
     websockets = None
 
@@ -133,6 +133,63 @@ class BridgeRecorderTests(unittest.TestCase):
         self.assertEqual(len(files), 1)
         data = json.loads(files[0].read_text(encoding="utf-8"))
         self.assertEqual(data["execution_status"], "partial")
+
+
+@unittest.skipIf(websockets is None, "install game_monitor/requirements-smoke.txt to run transport tests")
+class ProductionBridgeIntegrationTests(unittest.IsolatedAsyncioTestCase):
+    async def test_authenticated_browser_stream_is_saved_as_run_json(self):
+        import tempfile
+        import uuid
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output = Path(temp_dir)
+            session_id = str(uuid.uuid4())
+            token = "local-test-token"
+            server = await websockets.serve(
+                bridge_make_handler(token, "https://game.example", output, 0.5),
+                "127.0.0.1", 0,
+                origins=["https://game.example"],
+                max_size=65536,
+            )
+            port = server.sockets[0].getsockname()[1]
+            try:
+                async with websockets.connect(
+                    f"ws://127.0.0.1:{port}", origin="https://game.example"
+                ) as ws:
+                    await ws.send(json.dumps({"type": "auth", "token": token}))
+                    self.assertEqual(json.loads(await ws.recv()), {"type": "ready"})
+                    await ws.send(json.dumps({
+                        "type": "session_start", "sessionId": session_id, "sequence": 1,
+                        "monitorStatus": {"active": True, "boardDetected": True},
+                        "browser": "unit-test", "page": {"origin": "https://game.example"},
+                    }))
+                    before = {"maxPoints": 6000, "remainingPoints": 6000,
+                              "pointCount": 0, "isExact": True}
+                    after = {"maxPoints": 6000, "remainingPoints": 5998,
+                             "pointCount": 2, "isExact": True}
+                    await ws.send(json.dumps({
+                        "type": "event", "sessionId": session_id, "sequence": 2,
+                        "event": {"type": "DRAW_START", "t": 10, "before": before},
+                    }))
+                    await ws.send(json.dumps({
+                        "type": "event", "sessionId": session_id, "sequence": 3,
+                        "event": {"type": "DRAW_END", "t": 20, "after": after},
+                    }))
+                    await asyncio.sleep(0.6)
+                    await ws.send(json.dumps({
+                        "type": "heartbeat", "sessionId": session_id, "sequence": 4,
+                        "monitorStatus": {"active": True, "droppedEvents": 0, "errors": 0},
+                    }))
+                    await asyncio.sleep(0.05)
+                run_files = list((output / session_id).glob("game-monitor-run-*.json"))
+                self.assertEqual(len(run_files), 1)
+                report = json.loads(run_files[0].read_text(encoding="utf-8"))
+                self.assertEqual(report["chalk"]["consumed_points"], 2)
+                self.assertEqual(report["execution_status"], "completed")
+            finally:
+                server.close()
+                await server.wait_closed()
 
 
 if __name__ == "__main__":
