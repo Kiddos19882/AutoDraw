@@ -65,7 +65,7 @@ def read_active_bridge_radius(
         try:
             record = json.loads(session_path.read_text(encoding="utf-8"))
             diagnostics = record.get("bridge_diagnostics", {})
-            if not isinstance(diagnostics, dict) or diagnostics.get("connection_closed") is True:
+            if not isinstance(diagnostics, dict) or diagnostics.get("connection_closed") is not False:
                 continue
             if diagnostics.get("last_message_type") != "heartbeat":
                 continue
