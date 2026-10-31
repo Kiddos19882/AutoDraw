@@ -186,9 +186,9 @@ class RunRecorder:
             self.current["monitor_dropped_events"] = status.get("droppedEvents")
             self.current["monitor_error_count"] = status.get("errors")
             self.current["monitor_active"] = status.get("active")
-        if self.current is not None and self.current["execution_status"] == "completed":
-            if now - self.last_activity >= self.idle_seconds:
-                self.finalize("completed")
+        if self.current is not None and now - self.last_activity >= self.idle_seconds:
+            status = "completed" if self.current["execution_status"] == "completed" else "partial"
+            self.finalize(status)
 
     def finalize(self, status: str = "partial") -> Path | None:
         if self.current is None:
@@ -229,7 +229,8 @@ class RunRecorder:
                          for interval in probe.get("intervals", [])]
         fps = summarize_intervals(all_intervals)
         fps["stroke_probe_count"] = len(run["frame_probes"])
-        fps["visibility_interruption"] = any(probe.get("visible") is not True for probe in run["frame_probes"])
+        fps["visibility_interruption"] = (any(probe.get("visible") is not True for probe in run["frame_probes"])
+                                          if run["frame_probes"] else None)
         run["frame_probe"] = fps
         run["frame_probes"].clear()
         run["interpretation"]["chalk_status"] = run["chalk"]["status"]
