@@ -34,7 +34,7 @@ def monitor_radius_from_status(status: object) -> int | None:
 
 
 def read_active_bridge_radius(
-    bridge_root: str | Any,
+    bridge_root: Any,
     *,
     after_utc: str | None = None,
     max_age_seconds: float = 4.0,
