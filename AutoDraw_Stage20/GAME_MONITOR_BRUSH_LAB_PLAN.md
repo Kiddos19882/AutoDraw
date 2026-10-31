@@ -359,3 +359,11 @@ INT-002: спроектировать получение `pointCount`, `max`, `l
 - Monitor 0.2.0 использует O(1) resource snapshot; O(N) подсчёт доступен только через явный диагностический вызов.
 - Добавлены Node.js тесты и CI step.
 - Живая runtime-сверка и A/B/C overhead не выполнены; INT-003 остаётся IN_PROGRESS.
+
+
+### 12.8. Статический результат INT-003 — 31.10.2026
+
+- Точный источник: `BoardPane.max` и `BoardPane.less`; `pointCount=max-less`.
+- Monitor 0.2.0 использует O(1) resource snapshot; O(N) подсчёт доступен только через явный диагностический вызов.
+- Добавлены Node.js тесты и CI step.
+- Живая runtime-сверка и A/B/C overhead не выполнены; INT-003 остаётся IN_PROGRESS.
