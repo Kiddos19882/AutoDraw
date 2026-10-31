@@ -45,6 +45,7 @@ def build_chalk_radius_matrix_metadata(
         "requested_radius": requested_radius,
         "planned_radii": list(RADIUS_LEVELS),
         "block_order": list(MATRIX_BLOCKS[block]),
+        "matrix_order_index": MATRIX_BLOCKS[block].index(requested_radius) + 1,
         "scenario_id": MATRIX_SCENARIO_ID,
         "expected_strokes": EXPECTED_STROKES,
     }
@@ -103,9 +104,22 @@ def _manifest_measurement(document: dict[str, Any]) -> tuple[bool, str, dict[str
     experiment_id = document.get("experiment_id")
     if not experiment_id or capture.get("experiment_id") != experiment_id:
         return False, "experiment_id_mismatch", None
-    if summary_id := document.get("game_monitor_summary", {}).get("autodraw_experiment_id") if isinstance(document.get("game_monitor_summary"), dict) else None:
-        if summary_id != experiment_id:
-            return False, "monitor_experiment_id_mismatch", None
+    summary_document = document.get("game_monitor_summary")
+    summary_document = summary_document if isinstance(summary_document, dict) else {}
+    summary_id = summary_document.get("autodraw_experiment_id")
+    if summary_id != experiment_id:
+        return False, "monitor_experiment_id_mismatch", None
+    expected_cell = {
+        "series_id": metadata["series_id"],
+        "block": metadata["block"],
+        "requested_radius": metadata["requested_radius"],
+    }
+    for source_name, source in (
+        ("capture", capture.get("chalk_radius_matrix")),
+        ("summary", summary_document.get("chalk_radius_matrix")),
+    ):
+        if not isinstance(source, dict) or any(source.get(key) != value for key, value in expected_cell.items()):
+            return False, f"{source_name}_matrix_metadata_mismatch", None
     if capture.get("stroke_count") != EXPECTED_STROKES or capture.get("expected_stroke_count") != EXPECTED_STROKES:
         return False, "stroke_count_mismatch", None
 
