@@ -532,7 +532,7 @@ class BrushBehaviorTestTab:
         scenario = TEST_CASES.get(self.case_var.get())
         if not scenario:
             return
-        lines = [scenario["description"], "", "Координаты тестового шаблона (локальные координаты выбранной тестовой области):"]
+        lines = [scenario["description"], "", "Координаты тестового шаблона (логическая доска игры 420×240; при передаче будет преобразована в экранный ROI):"]
         for stroke in scenario["strokes"]:
             points = stroke["points"]
             route = " → ".join(f"({point[0]}, {point[1]})" for point in points)
