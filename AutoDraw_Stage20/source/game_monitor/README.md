@@ -310,3 +310,8 @@ Brush Test UI и основной Stage6 executor используют толь�
 Snippet с токеном создаётся в каталоге результатов и доступен для копирования, пока сервер работает. При штатной остановке сервера временный файл удаляется. Не публикуй snippet и не сохраняй его в проекте: он содержит одноразовый секретный токен. Для остановки сервера нажми Ctrl+C в отдельном окне.
 
 Для самостоятельного запуска без интерфейса используй start_game_monitor_bridge.bat в этом каталоге. Файл запросит Origin, при необходимости установит только зависимость из requirements-bridge.txt, затем запустит тот же collector. Требуется Python 3.11 с launcher-командой py -3.11.
+
+
+### Portable-сборка
+
+При сборке Windows portable в корень папки AutoDrawPortable копируется каталог game_monitor со следующими файлами: game_monitor.js, game_monitor_bridge.js, game_monitor_bridge_server.py, requirements-bridge.txt, start_game_monitor_bridge.bat и README.md. UI определяет этот каталог относительно AutoDraw.exe. Для запуска companion server используются тот же каталог результатов data/results/brush_behavior_tests/game_monitor_bridge и тот же output directory, что и у Brush Test.
