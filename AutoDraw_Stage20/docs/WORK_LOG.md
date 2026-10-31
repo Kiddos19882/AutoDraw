@@ -945,3 +945,33 @@ CI закрывает автоматическую проверку текуще
 **Документация обновлена:** PROJECT_STATUS.md, GAME_MONITOR_BRUSH_LAB_PLAN.md, TASKS.md, ROADMAP.md и CHANGELOG.md. Код приложения, Game Monitor и тесты не менялись; тесты и CI в рамках этого документального разбора не запускались.
 
 **Следующие действия:** повторить A/B/C с отдельными FPS и wall-clock duration на каждый режим, исключить невалидный B-run; отдельно уточнить тест горизонтальных координат x=0/460. До этого полную матрицу размеров кисти не начинать.
+
+
+
+## 2026-10-31 — первая реализация автоматического Game Monitor WebSocket bridge
+
+**Изменённые исходники:**
+- `source/game_monitor/game_monitor.js`
+- `source/game_monitor/game_monitor_bridge.js`
+- `source/game_monitor/game_monitor_bridge_server.py`
+- `source/game_monitor/requirements-bridge.txt`
+- тесты Game Monitor и WebSocket smoke/bridge recorder.
+
+**Что сделано:**
+- Добавлен API `subscribe(listener)` в Game Monitor. Новые события можно получать инкрементально без повторной сериализации полного event buffer.
+- Добавлен браузерный агент с одноразовой авторизацией, строгим allowlist игровых событий, heartbeat и per-stroke FPS probe.
+- Добавлен локальный WebSocket collector на `127.0.0.1`, который автоматически группирует непрерывную серию штрихов в run и сохраняет session/run JSON.
+- Реализован расчёт CHALK delta по exact pre/post snapshots; если snapshots невалидны/несогласованы, расход получает статус inconclusive.
+- Сохраняются принятые координаты и нижняя граница наблюдаемой длины пути; при coalesced pointDelta траектория маркируется неполной.
+- При разрыве WebSocket незавершённый run сохраняется со статусом partial.
+- Добавлены тесты подписки/отписки, синтаксиса browser agent, CHALK delta, неполных samples, idle finalization, FPS summary и Origin validation.
+
+**Документация:** обновлены README Game Monitor, BRUSH_MONITOR_AUTOCAPTURE_DESIGN, TASKS, ROADMAP и PROJECT_STATUS.
+
+**Что не подтверждено:**
+- новый bridge ещё не проверен в реальном Firefox iframe;
+- привязка run JSON к UI `experiment.json` не реализована;
+- overhead bridge и FPS probe не измерен;
+- тесты не запускались локально в этой среде; CI должен подтвердить Node/Python проверки после push.
+
+**Следующий шаг:** проверить CI на актуальном HEAD; затем провести один browser run и подтвердить автоматическое появление session/run JSON. После этого выполнить интеграцию с manifest и закрыть оставшиеся gates INT-004.
