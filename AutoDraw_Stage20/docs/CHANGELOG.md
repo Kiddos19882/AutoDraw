@@ -197,3 +197,11 @@
 - Исправлена negative fixture uniform-scale test: non-uniform ROI 646×323 вместо ошибочного uniform ROI 646×338.
 - Paint meter visual estimator остаётся inconclusive; CHALK измеряется по точному Monitor max/less.
 - A/B/C Monitor и повторная визуальная проверка границ ещё не выполнены.
+
+
+### Дополнение — визуальная проверка live boundary probe
+
+- Вручную просмотрены все три пары `after_draw-board.png` / `after_draw-screen.png`: все четыре штриха доходят до границ доски, видимого выхода за пределы нет.
+- Результат относится к проверенному ROI 578×301 на экране 1920×1080.
+- Поля automated visibility в исходных manifest не переписывались: они сохраняют исторический inconclusive из-за выявленного и уже исправленного mismatch logical/screen dimensions.
+- INT-003 остаётся открытой до A/B/C и успешного CI актуального HEAD.
