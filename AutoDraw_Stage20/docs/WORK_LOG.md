@@ -1216,3 +1216,18 @@ Run JSON дополнен `stroke_count`, суммой `sampled_point_delta_tota
 
 
 В app_features.json добавлены идентификаторы game-monitor-websocket-bridge, brush-test-websocket-launcher и brush-test-monitor-snippet-copy. Справочники MODULE_REFERENCE.md и FILE_STORAGE_CATALOG.md дополнены описанием companion-файлов и их расположения в portable-сборке.
+
+
+## 2026-11-01 — исправление PermissionError при сохранении WebSocket session
+
+Пользователь сообщил: live-тесты радиусов 1 и 5 прошли; при тесте радиуса 10 сервер получил PermissionError: [WinError 5] на операции session.json.tmp -> session.json внутри persist_session(). Этот тест не считать завершённым измерением CHALK.
+
+Анализ game_monitor_bridge_server.py:
+- persist_session() вызывался последовательно из одного async handler, поэтому внутрипроцессная конкуренция между этими вызовами не подтверждена;
+- фиксированное имя session.json.tmp заменено на уникальное имя для каждой записи;
+- добавлена async-функция persist_json_atomically() с атомарным os.replace() и ограниченными повторами PermissionError (экспоненциальная задержка);
+- прямой неатомарной записи в целевой файл нет;
+- при временной блокировке handler не должен падать: ошибка учитывается в bridge_diagnostics, попытка повторяется на следующем сообщении;
+- временные файлы очищаются независимо от результата.
+
+Добавлены два regression tests в tests/test_websocket_smoke_server.py: временные WinError 5 с последующим успешным replace и постоянная блокировка с сохранением прежнего JSON. Изменения кода и тестов находятся в коммитах ee00643c, 28d6482e, 21a55f4d. CI ещё не подтверждён; live повтор радиуса 10 ожидает CI.
