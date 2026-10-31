@@ -1238,6 +1238,19 @@ class BrushBehaviorTestTab:
             self._brush_feedback_poll_id = self.root.after(250, self._poll_brush_radius_feedback)
             return
 
+        stamp = observation.get("observed_at_utc")
+        if stamp != feedback.get("last_status_timestamp"):
+            feedback["last_status_timestamp"] = stamp
+            observed_candidate = int(observation["radius"])
+            if feedback.get("candidate_radius") == observed_candidate:
+                feedback["stable_status_count"] = int(feedback.get("stable_status_count", 1)) + 1
+            else:
+                feedback["candidate_radius"] = observed_candidate
+                feedback["stable_status_count"] = 1
+        if int(feedback.get("stable_status_count", 0)) < 2:
+            self._brush_feedback_poll_id = self.root.after(250, self._poll_brush_radius_feedback)
+            return
+
         requested = int(feedback["requested_radius"])
         observed = int(observation["radius"])
         feedback.setdefault("observations", []).append({
