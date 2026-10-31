@@ -175,3 +175,15 @@ flowchart TD
 ## Дополнение 2026-10-31 — Brush Test logical→screen handoff
 
 Вкладка Brush Test получает от integrated_app логический размер 460×240 и отдельно экранную область ROI. При callback передачи плана integrated_app проверяет coordinate_system: logical_board_pixels проходит через brush_coordinate_transform и превращается в local_canvas_pixels под размеры ROI; обычный local_canvas_pixels должен уже совпадать с ROI и остаётся без трансформации. В Stage6 загружается только runtime screen-local копия. Исходный logical-план и параметры transform сохраняются в файле эксперимента.
+
+
+
+## Управление Game Monitor Bridge на вкладке «Тест кистей»
+
+BrushBehaviorTestTab предоставляет три операции для локального тестового подключения:
+
+- start_game_monitor_bridge() запрашивает точный HTTPS Origin, затем запускает source/game_monitor/start_game_monitor_bridge.bat в отдельной консоли Windows;
+- copy_game_monitor_source() копирует source/game_monitor/game_monitor.js;
+- copy_game_monitor_bridge_snippet() копирует токенизированный snippet, созданный активным bridge server.
+
+Bridge server получает временный путь через --snippet-file и удаляет его после остановки. Для копирования snippet сервер должен быть запущен, а файл — уже создан.
