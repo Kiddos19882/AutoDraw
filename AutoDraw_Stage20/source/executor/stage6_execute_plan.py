@@ -32,6 +32,7 @@ from drawing.color_plan_execution import (
     color_plan_to_drawing_plan, normalize_brush_slider_points, validate_color_plan,
 )
 from brush_planner import BrushPlannerError, load_adaptive_brush_plan
+from brush_radius_feedback import read_active_bridge_radius
 from drawing.execution_diagnostics import (
     build_crash_summary, build_execution_report, validate_target_area, write_execution_report,
 )
@@ -54,6 +55,12 @@ _default_settings_path = DATA_DIR / "profiles" / "execution_settings.json" if _H
 PROFILE_PATH = Path(os.environ.get("AUTODRAW_TARGET_PROFILE_PATH", _default_profile_path)).resolve()
 RESULTS_DIR = Path(os.environ.get("AUTODRAW_RESULTS_DIR", DATA_DIR / "results" if _HAS_SHARED_DATA_DIR else APP_DIR / "results")).resolve()
 SETTINGS_PATH = Path(os.environ.get("AUTODRAW_EXECUTION_SETTINGS_PATH", _default_settings_path)).resolve()
+
+
+def _game_monitor_brush_radius_provider(*, after_utc: str | None = None) -> dict[str, Any] | None:
+    """Read a fresh brush radius from the shared Game Monitor Bridge session."""
+    bridge_root = RESULTS_DIR / "brush_behavior_tests" / "game_monitor_bridge"
+    return read_active_bridge_radius(bridge_root, after_utc=after_utc)
 
 
 @dataclass(frozen=True, slots=True)
@@ -850,6 +857,7 @@ class Stage6App:
                 calibration,
                 canvas_area.to_dict(),
                 current_screen_size_provider=pyautogui.size,
+                monitor_radius_provider=_game_monitor_brush_radius_provider,
             )
             executor = MouseExecutor(
                 self.stop_event, config, stop_reason_provider=lambda: self.stop_reason
@@ -1660,6 +1668,9 @@ class Stage6App:
                     current_screen_size_provider=pyautogui.size,
                     brush_slider_calibration=brush_slider_calibration,
                     brush_target_area=area.to_dict() if brush_slider_calibration is not None else None,
+                    brush_monitor_radius_provider=(
+                        _game_monitor_brush_radius_provider if brush_slider_calibration is not None else None
+                    ),
                 )
                 execute_options["preflight"] = hooks.preflight
                 execute_options["before_stroke"] = hooks.before_stroke
