@@ -828,3 +828,12 @@ Stage6App.load_plan_from_path() теперь явно отклоняет coordin
 Проверен актуальный HEAD `3a0383b56b5972d4b978ff30080d7b7768b021d0` ветки `feature/image-geometry-optimization`. GitHub Actions run #1132 завершился `success`; успешно завершены jobs `geometry-tests`, `executor-tests` и `Windows portable build and startup smoke-test`. Следовательно, программные unit/integration/regression проверки и portable smoke-test для этого HEAD прошли.
 
 CI не подтверждает точное совпадение сохранённого screen ROI с физической границей игровой доски, поведение hit-test для x=420/y=240, runtime-доступность Game Monitor в iframe или влияние Monitor на FPS. Эти пункты остаются незавершёнными условиями INT-003. Полную CHALK-матрицу не запускать до live-проверки геометрии.
+
+
+## 2026-10-31 — INT-003: исправлена ошибочная ширина логической доски
+
+**Причина:** предыдущая версия Brush Test transform использовала 420×240 на основании прежнего документированного уточнения. Повторная прямая проверка клиентского bundle из `master` выявила, что `BoardPane.BLACK_BOARD_WIDTH=460`, `BLACK_BOARD_HEIGHT=240`; `BoardItemBase.createNativeContent()` назначает `board.width=460`, `board.height=240` и равномерный scale `boardMask.width / 460`. `onDrawing()` преобразует координаты через `globalToLocal()` и проверяет их в прямоугольнике `0,0,this.width,this.height`.
+
+**Изменения:** `LOGICAL_BOARD_WIDTH` изменён на 460; Brush Test теперь создаёт logical-планы 460×240; преобразование X использует `(ROI.width-1)/460`; исходный тестовый endpoint x=420 оставлен без изменений, так как это координата штриха внутри доски, а не её ширина. Обновлены transform unit tests, тест генерации logical-плана, интеграционный handoff test и текст UI. Исторические записи с выводом 420×240 не удалялись; это зафиксировано как исправление предыдущего вывода.
+
+**Граница проверки:** Egret `Rectangle.contains()` в исходнике Egret использует включительные сравнения `x <= this.x + this.width` и `y <= this.y + this.height`; поэтому текущая модель inclusive boundary соответствует API движка. Тем не менее live-проверка попадания ROI и граничных координат в конкретной игре обязательна. CI для новой версии 460×240 ожидается; run #1132 относится к предыдущей версии кода и не засчитывается как проверка этой коррекции.
