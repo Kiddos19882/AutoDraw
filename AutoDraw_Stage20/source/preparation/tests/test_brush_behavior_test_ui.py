@@ -240,6 +240,7 @@ def test_all_brush_scenarios_fit_engine_logical_board_and_have_unique_stroke_nam
         plan = build_brush_test_drawing_plan(
             next(name for name, value in TEST_CASES.items() if value is scenario),
             (460, 240),
+            coordinate_system="logical_board_pixels",
         )
         assert plan["canvas"] == {"width": 460, "height": 240}
 
