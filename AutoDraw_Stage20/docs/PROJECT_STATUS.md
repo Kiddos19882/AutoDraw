@@ -279,3 +279,12 @@ Brush Test UI теперь после callback завершения executor а�
 **Причина отсутствия run JSON установлена:** в сессии нет `DRAW_START/DRAW_END`. Game Monitor pointer observer генерирует `POINTER_DOWN_CANDIDATE/POINTER_UP_CANDIDATE` и samples, но bridge FPS probe и серверный RunRecorder ориентированы только на engine lifecycle `DRAW_START/DRAW_END`. Поэтому WebSocket transport исправен, но pointer-only lifecycle не открывает/не завершает run; frame_probe_count остаётся 0.
 
 Статус INT-004: transport/session diagnostics — LIVE CONFIRMED; automatic run recording — BLOCKED; FPS capture — BLOCKED; привязка monitor report к experiment.json — не подтверждена для этой сессии. Следующий gate — pointer lifecycle fallback с regression tests и повторный live Firefox run. Δ48 нельзя приписывать отдельному experiment.json без отдельной корреляции теста.
+
+
+
+
+### Pointer lifecycle fallback — исправление в работе
+
+В collector добавлен fallback по `POINTER_DOWN_CANDIDATE/POINTER_UP_CANDIDATE`, а FPS probe запускается и останавливается по тем же pointer границам, если engine callbacks отсутствуют. Источник lifecycle сохраняется в run как `stroke_lifecycle_sources`; штрихи дедуплицируются по stroke ID. Regression tests покрывают pointer-only и смешанный engine+pointer сценарии.
+
+На HEAD `a1f8090ea5117785427c643769e8f034b46af391` CI step `Test local WebSocket smoke server` прошёл успешно (run `41230755334`). Полный workflow ещё выполняется. Live Firefox повтор после изменения не проведён, поэтому автоматическое появление run JSON и FPS в реальной игровой сессии пока не подтверждено.
