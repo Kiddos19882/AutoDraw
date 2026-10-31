@@ -134,3 +134,103 @@ AutoDrawGameMonitor.inspect()
 Это не ошибка формулы CHALK и не доказывает ошибку чтения `max`/`less`. Первый этап преобразования реализован: Brush Test передаёт logical-план 460×240 через отдельный преобразователь в screen-local ROI; обычные local-планы не меняются. Unit-тесты добавлены. Live-проверка соответствия ROI, масштаба и граничного hit-test остаётся обязательной до запуска полной матрицы.
 
 Граница доски требует отдельного решения: `build_brush_test_drawing_plan()` для `logical_board_pixels` разрешает включительные границы `0 <= x <= 460`, `0 <= y <= 240`; для `local_canvas_pixels` сохраняется обычная проверка `x < width`, `y < height`. Игровой `BoardPane.onDrawing()` использует `Rectangle.contains()`, который в Egret сравнивает правую/нижнюю границу включительно. Сценарий длинных линий заканчивается на x=420 и находится внутри логической доски 460×240. Live-проверка попадания в конкретный экранный ROI всё равно требуется.
+
+
+## Запуск локального WebSocket smoke-server для Firefox
+
+Этот сервер нужен только для проверки, может ли игровой HTTPS iframe в Firefox открыть WebSocket-соединение с локальным адресом. Он **не подключён к Game Monitor**, не получает игровые данные и не управляет игрой. Запускайте его отдельно от AutoDraw.
+
+### Требования
+
+- Windows PowerShell;
+- Python 3.11 с launcher-командой `py`;
+- доступ к репозиторию локально.
+
+### 1. Узнать точный Origin игрового iframe
+
+1. Откройте игру в Firefox и дождитесь загрузки доски.
+2. Нажмите F12 → Console.
+3. В переключателе контекста Console выберите именно игровой iframe (не верхнюю страницу).
+4. Выполните:
+
+```js
+location.origin
+```
+
+Скопируйте результат целиком. Это должен быть только Origin вида `https://домен` (при наличии нестандартного порта он также входит в Origin), без пути, query и fragment. Не подставляйте домен по догадке.
+
+### 2. Установить отдельную зависимость smoke-server
+
+Откройте PowerShell в корне локального репозитория AutoDraw и выполните:
+
+```powershell
+py -3.11 -m pip install -r .\AutoDraw_Stage20\source\game_monitor\requirements-smoke.txt
+```
+
+Зависимость изолирована в `requirements-smoke.txt` и не нужна для обычного запуска AutoDraw.
+
+### 3. Запустить сервер
+
+В том же PowerShell, из корня репозитория, выполните команду, заменив адрес на фактический результат `location.origin` из игрового iframe:
+
+```powershell
+py -3.11 .\AutoDraw_Stage20\source\game_monitor\websocket_smoke_server.py --origin https://ВАШ-ФАКТИЧЕСКИЙ-ORIGIN
+```
+
+По умолчанию сервер слушает только `127.0.0.1:8765`. В терминале появятся адрес прослушивания, разрешённый Origin и одноразовый token. Оставьте окно PowerShell открытым. Token действует для одного подключения: не публикуйте его, не отправляйте в чат и не сохраняйте в репозитории.
+
+Если порт 8765 занят, можно указать другой свободный порт параметром `--port 8766`; тогда в браузерном snippet ниже также замените порт на 8766.
+
+### 4. Проверить соединение из игрового iframe
+
+Вернитесь в Console Firefox, убедитесь, что выбран тот же игровой iframe, и выполните snippet ниже. Замените `PASTE_TOKEN_HERE` одноразовым token из локального терминала. Не отправляйте заполненный token кому-либо.
+
+```js
+(() => {
+  const ws = new WebSocket("ws://127.0.0.1:8765");
+
+  ws.addEventListener("open", () => {
+    ws.send(JSON.stringify({
+      type: "auth",
+      token: "PASTE_TOKEN_HERE"
+    }));
+  });
+
+  ws.addEventListener("message", (event) => {
+    const message = JSON.parse(event.data);
+    console.log("AutoDraw smoke message:", message);
+
+    if (message.type === "ready") {
+      ws.send(JSON.stringify({
+        type: "ping",
+        nonce: "autodraw-bridge-smoke-test"
+      }));
+    }
+  });
+
+  ws.addEventListener("error", (event) => {
+    console.error("AutoDraw smoke WebSocket error:", event);
+  });
+
+  ws.addEventListener("close", (event) => {
+    console.log("AutoDraw smoke WebSocket closed:", event.code, event.reason);
+  });
+})();
+```
+
+**Ожидаемый результат в Console:**
+
+- `{type: "ready"}`;
+- `{type: "pong", nonce: "autodraw-bridge-smoke-test"}`;
+- закрытие соединения с кодом `1000` и причиной `smoke test complete`.
+
+В терминале сервера после успешной проверки процесс завершится ожиданием следующего подключения? Нет: сервер остаётся запущенным, но одноразовый token уже использован; остановите сервер сочетанием `Ctrl+C`. Для нового прогона запустите сервер заново и используйте новый token.
+
+### 5. Если тест не прошёл
+
+- `Connection refused`: проверьте, что сервер запущен и порт в URL совпадает с портом сервера.
+- Ошибка Origin / handshake: повторно проверьте `location.origin` именно в игровом iframe и аргумент `--origin`; Origin должен совпадать точно.
+- `4003 authentication failed`: token неверный, устарел или уже был использован; перезапустите сервер и возьмите новый.
+- Нет `ready`/ `pong`: сохраните полный текст ошибок Console и вывод терминала. Не обходите CSP и не меняйте политику безопасности браузера ради прохождения теста.
+
+После проверки остановите сервер через `Ctrl+C`. Успешный ping/pong подтверждает только доступность локального WebSocket транспорта из данного iframe в данном профиле Firefox. Это не production bridge и не подтверждает связь Game Monitor с AutoDraw. До реального успешного теста статус транспорта остаётся `not_tested`.
