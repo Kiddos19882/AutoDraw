@@ -37,7 +37,10 @@
 Текущий статус на 31.10.2026: HEAD `0c09d2830bb007b7a9de1cd46e085f779e91d2f3`; CI run #1224 прошёл все три обязательные jobs. Локальный smoke server и его тесты реализованы, но production bridge и per-run capture не реализованы. Реальный Firefox iframe smoke test остаётся обязательным prerequisite; доступность loopback из браузера не подтверждена. Пользователь разрешил выполнение всех оставшихся этапов плана без дополнительных запросов. Monitor временно оборачивает методы BoardPane; восстановление и overhead остаются задачами P3.
 
 1. [x] Зафиксировать ограничения и сценарий проверки Firefox 159, включая HTTPS iframe, loopback WebSocket, Origin, mixed-content и Local Network Access. Это пока анализ, не подтверждение транспорта.
-2. [ ] Выполнить минимальный browser smoke test из реального игрового iframe на пользовательском Firefox. При блокировке записать точную ошибку и исследовать альтернативу (например, расширение/native messaging).\n   - [x] Добавить локальный Windows WebSocket smoke server на `127.0.0.1`, exact Origin allowlist, одноразовый token, лимиты/таймауты и только ping/pong.\n   - [x] Добавить unit/integration тесты авторизации и Origin и включить их в Windows CI.\n   - [ ] Выполнить реальный тест из игрового iframe; до него transport остаётся `not_tested`.
+2. [ ] Выполнить минимальный browser smoke test из реального игрового iframe на пользовательском Firefox. При блокировке записать точную ошибку и исследовать альтернативу (например, расширение/native messaging).
+   - [x] Добавить локальный Windows WebSocket smoke server на `127.0.0.1`, exact Origin allowlist, одноразовый token, лимиты/таймауты и только ping/pong.
+   - [x] Добавить unit/integration тесты авторизации и Origin и включить их в Windows CI.
+   - [ ] Выполнить реальный тест из игрового iframe; до него transport остаётся `not_tested`.
 3. [ ] Спроектировать/реализовать локальный read-only bridge: bind только `127.0.0.1`, случайный token сессии, allowlist Origin, строгая схема, лимит размера, таймауты, sequence/run ID, один активный прогон. Не логировать token.
 4. [ ] Bridge должен предоставлять только чтение `status()` и полного `export()`; никакого eval, произвольных команд, управления мышью, `clear()` или `stop()` через bridge.
 5. [ ] Реализовать в AutoDraw приём, проверку и запись JSON в каталог текущего эксперимента.
