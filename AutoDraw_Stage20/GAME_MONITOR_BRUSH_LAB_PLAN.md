@@ -492,3 +492,16 @@ INT-002: спроектировать получение `pointCount`, `max`, `l
 ### 13.11. Проверка равномерности экранного масштаба
 
 Исходник `BoardItemBase.createNativeContent()` задаёт `board.scaleX=board.scaleY=boardMask.width/460`. Следовательно, точная область ROI должна соответствовать равномерному масштабу BoardPane. Transform вычисляет `scaleX=(ROI.width-1)/460` и `scaleY=(ROI.height-1)/240`, оценивает относительное расхождение и отклоняет ROI, если оно превышает 1%. Это защищает от неверно выделенной области, при которой независимое масштабирование X/Y могло бы исказить тестовую траекторию. В metadata сохраняются `expected_uniform_scale`, `uniform_scale_relative_error` и `uniform_scale_tolerance`. Допуск 1% учитывает дискретность целочисленных размеров ROI; точность реальной области всё равно должна быть подтверждена live-проверкой.
+
+
+### 13.12. Результаты трёх live-прогонов — 31.10.2026
+
+В пользовательском commit `f72c2d16e7f61071bcaa2d184c071189dd74b69c` сохранены три папки экспериментов для `board_boundary_probe`. Все три исполнения завершились: 4/4 штриха, 106 move calls, успешный mouse release, без ошибок; длительности 7.407/7.422/7.407 с. Радиус 1 подтверждён визуально и preflight Game Monitor; текущий radius 30 в финальном snapshot — результат возврата кисти после теста.
+
+Baseline каждого запуска: max=6000, pointCount=1, remaining=5999. Post: run 1 pointCount=52/remaining=5948; run 2 и 3 pointCount=53/remaining=5947. Точные дельты CHALK: 51/52/52, среднее 51.67. Monitor 0.2.0: isExact=true, validationStatus=valid, droppedEvents=0, errors=0. Все четыре штриха присутствуют в event stream; в runs 2/3 каждый штрих дал 13 новых точек, в первом прогоне первый штрих дал на одну точку меньше, что подтверждает вариативность sampling при одинаковом плане.
+
+Pointer-up endpoints: right (1140,240), left (563,240), bottom (852,390), top (852,90) в client coordinates. С учётом viewport offset 163 px они совпадают с крайними точками screen ROI x=563..1140, y=253..553. Экспорт не содержит x/y фактически принятых DRAW_SAMPLE points, поэтому окончательный hit-test boundary proof отсутствует.
+
+Во всех исходных manifest stroke visibility была inconclusive: код сравнивал canvas исходного logical-плана 460×240 с board screenshot ROI 578×301, не применяя сохранённый transform. Исправлен анализатор в `brush_behavior_test_ui.py`: ожидаемые strokes теперь переводятся в screen-local ROI pixels с проверкой размеров и metadata transform. Добавлены тесты helper и mismatch ROI. Paint-meter estimate (2 changed columns, low confidence) остаётся inconclusive и не заменяет Game Monitor.
+
+CI run #41174050665 выявил ошибку в отрицательной фикстуре uniform-scale guard: тест передавал равномерный ROI 646×338 и ожидал исключение. Исправлено на 646×323. Исправлен также вызов plan builder в новых тестах. Новые CI runs проверяются отдельно; полная матрица и A/B/C пока заблокированы.
