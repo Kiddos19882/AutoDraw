@@ -294,4 +294,17 @@ Game Monitor 0.2.0 читает `max` и `less` через O(1) `resourceSnapsho
 4. Проверка overhead от передачи событий и requestAnimationFrame probe. Сравнивать тесты кистей нужно при одинаково включённом bridge; сам сборщик нельзя объявлять нулевым overhead.
 5. Полный экспорт Monitor не запрашивается единым вызовом `export()`: события собираются инкрементально через subscribe, что избегает повторной сериализации растущего массива. Корневые session metadata и события хранятся раздельно.
 
-**Статус INT-004:** IN_PROGRESS. Автоматический сбор телеметрии реализован на уровне Monitor→WebSocket→JSON files; интеграция жизненного цикла с UI manifest и browser validation остаются обязательными.
+**Статус INT-004:** IN_PROGRESS. Автоматический сбор и автоматическая привязка run JSON к UI manifest реализованы. Live Firefox validation, тестирование корреляции при повторных одинаковых радиусах и измерение overhead остаются обязательными.
+
+
+## 14. Автоматическая привязка bridge run к Brush Test manifest — 31.10.2026
+
+В `brush_behavior_test_ui.py` добавлен автоматический post-execution capture:
+- после callback завершения executor UI начинает опрашивать стандартный каталог `<output_dir>/game_monitor_bridge/`;
+- выбирается отчёт с `record_type=autodraw_game_monitor_run`, временем старта не раньше фазы `before_draw` и радиусом, совпадающим с запрошенным размером кисти;
+- отчёт копируется в каталог конкретного эксперимента как `monitor_report.json`;
+- в `experiment.json` сохраняются путь, session_id, run_id, CHALK summary, FPS, траектория, event count, dropped events и capture status;
+- если подходящий отчёт не появился за 10 секунд, в manifest записывается `monitor_capture.status=unavailable`, без подмены пустым успешным результатом;
+- при старте нового эксперимента отменяется предыдущий polling callback.
+
+**Ограничение корреляции:** текущая привязка основана на timestamp `before_draw` + фактическом радиусе, а не на общем experiment_id, переданном из UI в browser session. При последовательных одинаковых тестах с перекрывающимися временными окнами нужна дополнительная проверка; прямой run marker будет предпочтительным следующим улучшением.
