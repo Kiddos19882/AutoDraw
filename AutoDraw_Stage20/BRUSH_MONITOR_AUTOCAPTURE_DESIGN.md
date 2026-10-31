@@ -1,6 +1,6 @@
 # Game Monitor: автоматическое сохранение отчётов теста кисти
 
-Статус: проектирование; автоматическая интеграция ещё не реализована и не проверена в браузере.
+Статус: первая реализация read-only WebSocket telemetry bridge добавлена; автоматическая привязка к UI experiment.json и live-проверка нового bridge в Firefox ещё не завершены.
 
 ## Цель
 
@@ -267,3 +267,31 @@ Game Monitor 0.2.0 читает `max` и `less` через O(1) `resourceSnapsho
 Добавлены Node-тесты и CI step. Результаты GitHub Actions должны быть проверены отдельно; локальный запуск Node в среде разработки недоступен.
 
 **Не выполнено:** runtime-сверка на живом BoardPane и A/B/C FPS/duration. До неё INT-003 остаётся IN_PROGRESS.
+
+
+## 13. Первая реализация автоматического WebSocket telemetry bridge — 31.10.2026
+
+Добавлены:
+- `source/game_monitor/game_monitor_bridge.js` — браузерный агент, который подключается к loopback WebSocket, подписывается на события Monitor через новый API `AutoDrawGameMonitor.subscribe(listener)`, отправляет ограниченный allowlist событий и heartbeat;
+- `source/game_monitor/game_monitor_bridge_server.py` — локальный сервер-приёмник с точной Origin allowlist, случайным токеном, ограничением размера сообщения, одним активным браузерным соединением и автоматическим сохранением run JSON;
+- `source/game_monitor/requirements-bridge.txt` — изолированная зависимость `websockets==12.0`;
+- расширены Node/Python regression tests: подписка/отписка от событий, синтаксис browser agent, baseline/post CHALK delta, неполные acceptedPoint samples, idle finalization, FPS summary и Origin validation.
+
+### Что теперь автоматизировано
+
+- Пользователь один раз загружает Game Monitor и вставляет сгенерированный сервером browser snippet в Console игрового iframe.
+- Каждый `DRAW_START` автоматически открывает run; непрерывная серия штрихов собирается в один run. После `DRAW_END` и idle timeout отчёт автоматически сохраняется.
+- Pre snapshot берётся из `DRAW_START.before`, post snapshot — из `DRAW_END.after`; точный CHALK delta рассчитывается только при валидных согласованных integer snapshots.
+- Сохраняются фактические радиусы, события, pointDelta, принятые координаты, число событий, локальные ошибки, длительность активных штрихов и FPS, измеренный requestAnimationFrame во время каждого штриха.
+- При потере соединения незавершённый run сохраняется как partial.
+- Отчёты записываются атомарной заменой временного файла в отдельный каталог session UUID. Секретный токен не записывается в JSON.
+
+### Что ещё не закрыто
+
+1. Live-проверка нового bridge из реального Firefox iframe: handshake, reconnect/close, появление session.json и run JSON.
+2. Автоматическая привязка созданного run JSON к конкретному UI `experiment.json` по experiment_id/run_id. Пока bridge пишет отдельный session/run каталог.
+3. Проверка того, что idle timeout 2.5 s корректно объединяет все штрихи одного DrawingPlan и разделяет соседние тесты. Значение можно настроить через `--idle-seconds`.
+4. Проверка overhead от передачи событий и requestAnimationFrame probe. Сравнивать тесты кистей нужно при одинаково включённом bridge; сам сборщик нельзя объявлять нулевым overhead.
+5. Полный экспорт Monitor не запрашивается единым вызовом `export()`: события собираются инкрементально через subscribe, что избегает повторной сериализации растущего массива. Корневые session metadata и события хранятся раздельно.
+
+**Статус INT-004:** IN_PROGRESS. Автоматический сбор телеметрии реализован на уровне Monitor→WebSocket→JSON files; интеграция жизненного цикла с UI manifest и browser validation остаются обязательными.
