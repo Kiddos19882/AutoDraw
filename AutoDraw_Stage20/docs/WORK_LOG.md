@@ -633,3 +633,5 @@
 - INT-003 — живой тест доступности источника CHALK и A/B сравнение без Monitor / с Monitor 0.1.2; запускать только после отдельного разрешения на тестирование.
 - INT-004 — реализация автоматической связи через уже описанный loopback bridge; требует отдельного разрешения на изменение кода.
 - Далее INT-005—INT-009: контролируемая матрица, модель, интеграция, оптимизация и прогноз/факт.
+
+**Документы, обновлённые по INT-002:** `TASKS.md`, `WORK_LOG.md`, `PROJECT_STATUS.md`, `ROADMAP.md`, `DECISIONS.md`, `CHANGELOG.md`, `BRUSH_MONITOR_AUTOCAPTURE_DESIGN.md`, `GAME_MONITOR_BRUSH_LAB_PLAN.md`, `source/game_monitor/README.md`.
