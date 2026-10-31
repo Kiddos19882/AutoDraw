@@ -158,3 +158,9 @@
 ### Fixed
 - Stage6 отклоняет прямую загрузку исходных logical_board_pixels планов Brush Test; их нужно передавать через интеграционный преобразователь.
 - Добавлен regression test на запрет такой прямой загрузки.
+
+
+## 2026-10-31 — CI logical→screen handoff
+
+- GitHub Actions run #1132 для HEAD `3a0383b56b5972d4b978ff30080d7b7768b021d0` завершился успешно: geometry-tests, executor-tests и Windows portable build/startup smoke-test.
+- Live-проверка геометрии доски, границ и A/B/C Monitor остаётся незавершённой.
