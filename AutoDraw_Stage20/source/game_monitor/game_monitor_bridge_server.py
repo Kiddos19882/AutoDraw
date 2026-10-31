@@ -155,6 +155,7 @@ class RunRecorder:
             if self.current is None:
                 self._start(event)
             else:
+                self.current["execution_status"] = "in_progress"
                 self.current["stroke_started_at_performance_ms"] = event.get("t")
         if self.current is not None:
             self._append_event(event)
