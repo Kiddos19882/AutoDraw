@@ -534,6 +534,10 @@ class BrushSliderController:
                 raise ColorPlanExecutionError(
                     f"Не удалось скорректировать ползунок для радиуса {value}: {exc}"
                 ) from exc
+            if next_point[0] == target_x:
+                raise ColorPlanExecutionError(
+                    f"Для радиуса {value} дальнейшее перемещение ползунка невозможно."
+                )
             current_x = target_x
             target_x = next_point[0]
             correction_count += 1
