@@ -150,3 +150,6 @@
 
 ### Fixed — сохранение исходного logical-плана
 - Общий stage8 save_plan нормализует coordinate_system в local_canvas_pixels; Brush Test теперь сохраняет исходный logical_board_pixels JSON напрямую, а Stage6 runtime-копия по-прежнему проходит нормализацию в local_canvas_pixels.
+
+### Changed
+- Transform metadata явно фиксирует единицы координат runtime executor и point_step_px как screen_pixels.
