@@ -5,12 +5,14 @@ import shutil
 import uuid
 import ctypes
 import platform
+import subprocess
 import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import tkinter as tk
-from tkinter import filedialog, messagebox, ttk
+from tkinter import filedialog, messagebox, simpledialog, ttk
 from typing import Any
+from urllib.parse import urlsplit
 
 import pyautogui
 from PIL import Image, ImageGrab
@@ -577,6 +579,8 @@ class BrushBehaviorTestTab:
         self.game_monitor_report_path: Path | None = None
         self.game_monitor_summary: dict[str, Any] | None = None
         self._bridge_capture_poll_id: str | None = None
+        self.bridge_snippet_path: Path | None = None
+        self.bridge_process: subprocess.Popen | None = None
         self.last_record_path: Path | None = None
         self.brush_var = tk.StringVar(value="1")
         self.case_var = tk.StringVar(value=next(iter(TEST_CASES)))
@@ -642,6 +646,23 @@ class BrushBehaviorTestTab:
         ttk.Entry(slider, textvariable=self.slider_end_var, width=12).pack(side="left", padx=4)
         ttk.Button(slider, text="Установить кисть", command=self.set_brush_size).pack(side="left", padx=6)
         ttk.Label(slider, text="Слева радиус 30, справа радиус 1. Game Monitor автоматически проверяет и корректирует фактический радиус; мост должен быть подключён.", wraplength=410).pack(side="left", padx=6)
+
+        bridge = ttk.LabelFrame(controls, text="Game Monitor WebSocket", padding=6)
+        bridge.pack(fill="x", pady=(8, 0))
+        ttk.Button(bridge, text="Запустить сокет", command=self.start_game_monitor_bridge).pack(side="left")
+        ttk.Button(
+            bridge, text="Копировать snippet подключения",
+            command=self.copy_game_monitor_bridge_snippet,
+        ).pack(side="left", padx=(6, 0))
+        ttk.Button(
+            bridge, text="Копировать game_monitor.js",
+            command=self.copy_game_monitor_source,
+        ).pack(side="left", padx=(6, 0))
+        ttk.Label(
+            bridge,
+            text="Сначала запусти сокет, затем скопируй и выполни game_monitor.js, после него — snippet подключения в Console игрового iframe.",
+            wraplength=760,
+        ).pack(side="left", padx=8)
         actions = ttk.Frame(outer)
         actions.pack(fill="x", pady=(0, 8))
         ttk.Button(actions, text="Создать и передать тест в исполнитель →", command=self.create_and_transfer_plan).pack(side="left")
@@ -697,6 +718,147 @@ class BrushBehaviorTestTab:
             wraplength=1100,
         ).pack(anchor="w", pady=(5, 0))
         ttk.Label(outer, textvariable=self.status_var, wraplength=1150).pack(anchor="w", pady=(8, 0))
+
+
+    @staticmethod
+    def normalize_game_monitor_origin(value: str) -> str | None:
+        """Accept only a bare HTTPS origin copied from the game iframe."""
+        raw = str(value).strip()
+        if not raw or "?" in raw or "#" in raw:
+            return None
+        try:
+            parsed = urlsplit(raw)
+            _ = parsed.port
+        except ValueError:
+            return None
+        if (
+            parsed.scheme.lower() != "https"
+            or not parsed.hostname
+            or parsed.username is not None
+            or parsed.password is not None
+            or parsed.path not in ("", "/")
+            or parsed.query
+            or parsed.fragment
+            or any(character.isspace() for character in parsed.netloc)
+        ):
+            return None
+        return raw.rstrip("/")
+
+    def start_game_monitor_bridge(self) -> None:
+        """Launch the authenticated local bridge in its own Windows console."""
+        if self.bridge_process is not None and self.bridge_process.poll() is None:
+            messagebox.showinfo(
+                "Game Monitor Bridge",
+                "Окно WebSocket-сервера уже запущено. Остановить его можно сочетанием Ctrl+C в этом окне.",
+                parent=self.root,
+            )
+            return
+        origin_value = simpledialog.askstring(
+            "Запуск Game Monitor WebSocket",
+            "Вставь точный Origin игрового iframe. Получить его можно в Console iframe командой location.origin:",
+            parent=self.root,
+        )
+        if not origin_value:
+            return
+        origin = self.normalize_game_monitor_origin(origin_value)
+        if origin is None:
+            messagebox.showerror(
+                "Некорректный Origin",
+                "Нужен точный HTTPS Origin без пути, query и fragment. Скопируй location.origin именно из игрового iframe.",
+                parent=self.root,
+            )
+            return
+        if platform.system() != "Windows":
+            messagebox.showerror(
+                "Недоступный запуск",
+                "Кнопка запуска использует Windows .bat. На этой системе запусти game_monitor_bridge_server.py вручную.",
+                parent=self.root,
+            )
+            return
+
+        project_root = Path(__file__).resolve().parents[2]
+        bridge_dir = project_root / "source" / "game_monitor"
+        batch_path = bridge_dir / "start_game_monitor_bridge.bat"
+        if not batch_path.is_file():
+            messagebox.showerror(
+                "Файл запуска не найден",
+                f"Не найден файл:\n{batch_path}",
+                parent=self.root,
+            )
+            return
+
+        snippet_dir = self.output_dir / "game_monitor_bridge"
+        snippet_path = snippet_dir / f"connection_snippet_{uuid.uuid4().hex}.js"
+        try:
+            snippet_dir.mkdir(parents=True, exist_ok=True)
+            snippet_path.unlink(missing_ok=True)
+            self.bridge_process = subprocess.Popen(
+                ["cmd.exe", "/c", "call", str(batch_path), origin, str(snippet_path)],
+                cwd=str(project_root.parent),
+                creationflags=getattr(subprocess, "CREATE_NEW_CONSOLE", 0),
+            )
+        except (OSError, subprocess.SubprocessError) as exc:
+            messagebox.showerror(
+                "Не удалось запустить WebSocket",
+                str(exc),
+                parent=self.root,
+            )
+            return
+        self.bridge_snippet_path = snippet_path
+        self.status_var.set(
+            "WebSocket запускается в отдельном окне. После появления сообщения о готовности скопируй snippet подключения."
+        )
+
+    def _copy_text_to_clipboard(self, content: str, success_message: str) -> None:
+        self.root.clipboard_clear()
+        self.root.clipboard_append(content)
+        self.root.update_idletasks()
+        self.status_var.set(success_message)
+        messagebox.showinfo("Буфер обмена", success_message, parent=self.root)
+
+    def copy_game_monitor_bridge_snippet(self) -> None:
+        """Copy the one-time-token snippet generated by the active local server."""
+        path = self.bridge_snippet_path
+        if path is None or not path.is_file():
+            messagebox.showwarning(
+                "Snippet пока не готов",
+                "Сначала запусти WebSocket и дождись появления в его окне строки Listening и готового snippet. Затем повтори копирование.",
+                parent=self.root,
+            )
+            return
+        try:
+            content = path.read_text(encoding="utf-8")
+        except OSError as exc:
+            messagebox.showerror("Ошибка чтения snippet", str(exc), parent=self.root)
+            return
+        if "__AUTODRAW_BRIDGE_TOKEN__" in content or "new WebSocket" not in content:
+            messagebox.showerror(
+                "Некорректный snippet",
+                "Файл подключения не содержит готовый одноразовый токен. Перезапусти WebSocket.",
+                parent=self.root,
+            )
+            return
+        self._copy_text_to_clipboard(
+            content,
+            "Готовый snippet подключения скопирован. Не публикуй его: он содержит одноразовый секретный токен.",
+        )
+
+    def copy_game_monitor_source(self) -> None:
+        """Copy the exact Game Monitor source shipped with this application."""
+        path = Path(__file__).resolve().parents[1] / "game_monitor" / "game_monitor.js"
+        try:
+            content = path.read_text(encoding="utf-8")
+        except OSError as exc:
+            messagebox.showerror(
+                "Не удалось прочитать game_monitor.js",
+                f"{path}\n\n{exc}",
+                parent=self.root,
+            )
+            return
+        self._copy_text_to_clipboard(
+            content,
+            "Полный исходник game_monitor.js скопирован. Вставь его в Console игрового iframe первым.",
+        )
 
     def _load_brush_control_into_fields(self) -> None:
         """Populate visible brush coordinates from the saved calibration profile."""
