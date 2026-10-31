@@ -45,6 +45,23 @@ def _parse_monitor_timestamp(value: Any) -> datetime | None:
     return parsed.astimezone(timezone.utc)
 
 
+
+def is_exact_positive_chalk_measurement(chalk: dict[str, Any]) -> bool:
+    """Accept only a positive, internally consistent, non-reset CHALK counter delta."""
+    try:
+        pre = int(chalk.get("pre_point_count"))
+        post = int(chalk.get("post_point_count"))
+        consumed = int(chalk.get("consumed_points"))
+    except (TypeError, ValueError):
+        return False
+    return (
+        chalk.get("status") == "exact"
+        and post >= pre
+        and post - pre == consumed
+        and consumed > 0
+    )
+
+
 def select_execution_monitor_run(
     candidates: list[tuple[Path, dict[str, Any]]],
     *,
@@ -54,6 +71,8 @@ def select_execution_monitor_run(
     before_draw_at: str | None = None,
 ) -> tuple[tuple[Path, dict[str, Any]] | None, str, int]:
     """Select one run strictly correlated with an executor interval; never guess by mtime."""
+    if expected_strokes <= 0:
+        return None, "expected_stroke_count_unavailable", 0
     execution_start = _parse_monitor_timestamp(execution_report.get("started_at"))
     execution_end = _parse_monitor_timestamp(execution_report.get("ended_at"))
     if execution_start is None or execution_end is None or execution_end < execution_start:
@@ -2267,17 +2286,7 @@ class BrushBehaviorTestTab:
                 }
                 self.game_monitor_report_path = target_path.resolve()
                 self.game_monitor_summary = summary
-                try:
-                    chalk_pre = int(chalk.get("pre_point_count"))
-                    chalk_post = int(chalk.get("post_point_count"))
-                    chalk_consumed = int(chalk.get("consumed_points"))
-                    chalk_counter_consistent = (
-                        chalk_post >= chalk_pre
-                        and chalk_post - chalk_pre == chalk_consumed
-                        and chalk_consumed > 0
-                    )
-                except (TypeError, ValueError):
-                    chalk_counter_consistent = False
+                chalk_counter_consistent = is_exact_positive_chalk_measurement(chalk)
                 telemetry_clean = (
                     report.get("execution_status") == "completed"
                     and chalk.get("status") == "exact"
