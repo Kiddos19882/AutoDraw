@@ -63,7 +63,7 @@
 
 - [x] INT-001: статически инвентаризировать Brush Test UI, Game Monitor, игровой счётчик и модели стоимости AutoDraw.
 - [x] INT-002: статически спроектировать контракт низкозатратного CHALK snapshot, baseline/delta и требования к Monitor.
-- [~] INT-003: точные поля `BoardPane.max`/`less` подтверждены статически; Monitor 0.2.0 и O(1) Node-тесты добавлены. Logical→screen transform реализован и покрыт Python unit/integration-тестами. Ожидаются live-проверка ROI/границ и A/B/C overhead Monitor.
+- [~] INT-003: точные поля `BoardPane.max`/`less` подтверждены статически; Monitor 0.2.0 и O(1) Node-тесты добавлены. Logical→screen transform реализован и покрыт Python unit/integration-тестами; CI run #1132 на HEAD 3a0383b прошёл все jobs. Ожидаются live-проверка ROI/границ и A/B/C overhead Monitor.
 - [ ] INT-004: реализовать автоматическую привязку pre/post capture и полного Monitor export к experiment ID через проверенный transport.
 - [ ] INT-005: реализовать параметрический генератор DrawingPlan и пакетный запуск через MouseExecutor; автоматически провести матрицу кисти, скорости/FPS, длины и формы траектории, числа штрихов, overlap и повторов с pre/post CHALK capture.
 - [ ] INT-006: построить и валидировать модель прогноза расхода игровых точек, отделяя измерение от оценки.
