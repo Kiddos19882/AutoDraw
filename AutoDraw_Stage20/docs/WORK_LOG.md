@@ -1025,3 +1025,33 @@ Run JSON дополнен `stroke_count`, суммой `sampled_point_delta_tota
 
 
 **Дополнение по CI:** первый запуск теста диагностики выявил только гонку закрытия WebSocket: проверка `connection_closed` выполнялась до того, как сервер завершал обработчик закрытия. Тест дополнен коротким ожиданием после выхода клиента из контекстного менеджера. Повторный CI для HEAD `81ac2cb0870457f49a3d849bd592595a48539c98` запущен; итог пока не подтверждён.
+
+
+## 2026-10-31 — live WebSocket session: события доставляются, но run не формируется (commit 323a698)
+
+**Артефакт:** `data/results/brush_behavior_tests/game_monitor_bridge/f303b3e1-382e-4859-9681-e1c360ec6424/session.json`, добавлен commit `323a6982666d6b810db3f1deda646888a658ab2a`.
+
+**Фактические показатели сессии:**
+- Monitor активен, доска обнаружена; точность snapshot подтверждена (`isExact=true`), ошибок Monitor — 0, dropped events — 0.
+- При подключении `pointCount=1`, последний heartbeat: `pointCount=49`, `maxPoints=6000`, `remainingPoints=5951`. Следовательно, точная дельта игрового счётчика за интервал сессии — **48 CHALK points**. Это суммарный расход за сессию, а не доказательство расхода отдельного experiment.json.
+- Browser bridge отправил 119 событий, сервер принял 119; `sendFailureCount=0`.
+- Получено: 8 `POINTER_DOWN_CANDIDATE`, 8 `POINTER_UP_CANDIDATE`, 55 `DRAW_SAMPLE`, 48 `POINT_QUOTA_UPDATE`.
+- Не получено ни одного `DRAW_START` или `DRAW_END`; `frame_probe_count=0`.
+- Радиус во время наблюдаемой сессии — 30. Это один размер кисти, не сравнительная серия радиусов.
+
+**Локализованная причина отсутствия run JSON — несовпадение двух моделей жизненного цикла:**
+1. Game Monitor 0.2.1 при наблюдении указателя самостоятельно создаёт `POINTER_DOWN_CANDIDATE`, запускает state polling и выдаёт `DRAW_SAMPLE`; при отпускании выдаёт `POINTER_UP_CANDIDATE`.
+2. В этой сессии обёртки методов `BoardPane.onDrawStart/onDrawingEnd` не дали событий `DRAW_START/DRAW_END`.
+3. Browser bridge запускает FPS probe только на `DRAW_START` и останавливает только на `DRAW_END`.
+4. `RunRecorder.event()` открывает run только на `DRAW_START`, а закрывает штрих только на `DRAW_END`. Поэтому доставленные pointer/sample/quota events остаются только в session diagnostics и не создают run JSON.
+
+Это не сбой WebSocket transport: счётчики отправки и приёма совпадают. Это подтверждённый пробел в согласовании pointer-observer fallback с RunRecorder и FPS probe.
+
+**Следующее исправление:**
+- Добавить в RunRecorder fallback lifecycle на `POINTER_DOWN_CANDIDATE/POINTER_UP_CANDIDATE`, сохраняя в отчёте источник границ как pointer-observer; не переименовывать эти события в подтверждённые engine callbacks.
+- Считать штрихи по фактически наблюдаемым границам, не удваивая их, если для одного жеста одновременно пришли engine и pointer events.
+- Запускать/останавливать FPS probe на pointer fallback, когда engine lifecycle отсутствует; обеспечить отсутствие двойного probe при наличии обоих типов границ.
+- Добавить regression tests: pointer-only серия из нескольких штрихов создаёт один run; pre/post exact snapshots дают точный CHALK; stroke count верен; FPS probe связан с run; смешанный engine+pointer поток не удваивает штрихи.
+- После CI провести повторный live Firefox тест и проверить появление run JSON и автоматическую привязку к experiment.json.
+
+**CI:** commit 323a698 содержит только session.json. На нём успешно завершились workflow `Brush screenshot measurements` run 17 (`41230071895`) и `Brush centerline measurements` run 29 (`41230071885`). Workflow `Geometry planner tests` для этого commit в списке запусков не обнаружен; успешные профильные workflow не заменяют тесты WebSocket RunRecorder. Исправление и соответствующий regression test ещё не выполнены.
