@@ -325,3 +325,12 @@ Brush Test UI выставляет `monitor_capture.status=saved` только �
 ### Уточнение критерия capture=saved
 
 UI считает сбор полностью успешным только при положительном расходе CHALK и наличии хотя бы одного штриха/acceptedPoint, exact pre/post snapshots, совпадении суммы `pointDelta` с CHALK delta, одном наблюдаемом радиусе, измеренном FPS без visibility interruption, нулевых dropped events и нулевых Monitor errors. Отчёт с нулевым расходом, пустыми accepted points, недоступным FPS или прерванной видимостью всё равно сохраняется, но получает `partial`.
+
+
+## 16. Диагностика сессии, когда создан только session.json
+
+`session.json` подтверждает только принятие `session_start`. Run JSON создаётся при получении `DRAW_START`, затем завершается по idle heartbeat или закрытию соединения. Если после теста присутствует только session.json, нельзя считать WebSocket сбор работающим.
+
+Для локализации причины browser agent передаёт в heartbeat собственные `sentEventCount`, `lastEventType`, `lastEventAtPerformanceMs`, `sendFailureCount`. Collector сохраняет в session.json после каждого сообщения `received_message_count`, `received_event_count`, `received_event_types`, `last_sequence`, `last_message_type`, последний `monitorStatus`, browser bridge diagnostics, число frame probes и факт закрытия соединения. Это позволяет различить: Monitor не генерирует события; browser subscription не отправляет события; сервер не принимает события; либо recorder не создаёт/не финализирует run.
+
+После обновления server и snippet необходимо перезапустить локальный bridge и повторно вставить snippet в iframe: запущенный процесс и уже вставленный snippet не обновляются автоматически при изменении файлов репозитория. Затем выполнить один короткий тест и изучить session.json. До успешного появления run JSON и проверки CHALK delta нельзя считать live bridge интеграцию принятой.
