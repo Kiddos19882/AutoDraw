@@ -5,7 +5,7 @@ from math import isfinite
 from typing import Any
 
 
-LOGICAL_BOARD_WIDTH = 420
+LOGICAL_BOARD_WIDTH = 460
 LOGICAL_BOARD_HEIGHT = 240
 LOGICAL_BOARD_SIZE = (LOGICAL_BOARD_WIDTH, LOGICAL_BOARD_HEIGHT)
 
@@ -14,9 +14,9 @@ def transform_logical_brush_plan_to_screen(
     plan: dict[str, Any],
     screen_area: dict[str, int],
 ) -> tuple[dict[str, Any], dict[str, Any]]:
-    """Map a logical 420x240 brush-test plan to screen-local ROI pixels.
+    """Map a logical 460x240 brush-test plan to screen-local ROI pixels.
 
-    The logical board's inclusive coordinate bounds [0, 420] x [0, 240]
+    The logical board's inclusive coordinate bounds [0, 460] x [0, 240]
     are mapped to the screen ROI's pixel-center bounds [0, width-1] x
     [0, height-1]. The returned plan is a copy; the source plan is untouched.
     """
