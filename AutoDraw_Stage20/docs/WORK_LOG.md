@@ -1153,3 +1153,12 @@ Run JSON дополнен `stroke_count`, суммой `sampled_point_delta_tota
 Ключевые изменения кода: `bb91a554`, `953e9e70`, `7a5b1348`, `e07be04a`, `62b9109f`; тесты: `187090d5`, `baeb7be1`, `4aa27a01`; анализатор: `4786483b`. Полная история доступна в git log ветки.
 
 **Проверки:** GitHub combined status на проверенном HEAD не вернул status contexts; отдельный workflow-run API также не показал PR workflow runs. Поэтому успешный CI не заявляется. Локальный pytest в текущей среде не запускался. Live browser tests не запускались. Браузерный gate остаётся закрытым до успешного автоматического тестирования.
+
+
+## 2026-10-31 — CI gate матрицы CHALK пройден
+
+Проверен workflow run `41235681326` для commit `34535d1a56fce75ae9712d55b662a0abd19de868` в ветке `feature/image-geometry-optimization`.
+
+Итог: `completed / success`. Успешны `geometry-tests`, `executor-tests` и `Windows portable build and startup smoke-test`. В частности, geometry job выполнил проверку синтаксиса Game Monitor, тесты resource snapshot, WebSocket smoke server, preparation/geometry tests и unified-app UI regressions.
+
+Браузерный gate открыт. Пользователю требуется выполнить локальную серию измерений в игре по `CHALK_RADIUS_MATRIX_PLAN.md`. CI не является доказательством расхода CHALK в браузере и не меняет статус единственной live-точки radius 1 = 718.
