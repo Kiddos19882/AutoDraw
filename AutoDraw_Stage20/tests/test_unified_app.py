@@ -137,7 +137,9 @@ class UnifiedAppCoreTests(unittest.TestCase):
             app = integrated_app.AutoDrawUnifiedApp(root)
             app.executor.area = TargetArea(x=100, y=80, width=646, height=323)
             from brush_behavior_test_ui import build_brush_test_drawing_plan
-            plan = build_brush_test_drawing_plan("Горизонтальные линии", (646, 323))
+            plan = build_brush_test_drawing_plan(
+                "Горизонтальные линии", (420, 240), coordinate_system="logical_board_pixels"
+            )
             with tempfile.TemporaryDirectory(prefix="AutoDraw brush test ") as temp:
                 app.data_paths["runtime"] = Path(temp) / "runtime"
                 source_path = Path(temp) / "brush-source.json"
@@ -146,7 +148,16 @@ class UnifiedAppCoreTests(unittest.TestCase):
                     result = app._transfer_brush_test_plan(plan, source_path)
                     self.assertTrue(result)
                     load_plan.assert_called_once()
-                    self.assertTrue(Path(load_plan.call_args.args[0]).is_file())
+                    runtime_plan_path = Path(load_plan.call_args.args[0])
+                    self.assertTrue(runtime_plan_path.is_file())
+                    runtime_plan = json.loads(runtime_plan_path.read_text(encoding="utf-8"))
+                    self.assertEqual(runtime_plan["coordinate_system"], "local_canvas_pixels")
+                    self.assertEqual(runtime_plan["canvas"], {"width": 646, "height": 323})
+                    self.assertEqual(runtime_plan["strokes"][0]["points"][0]["x"], 30.75)
+                    self.assertEqual(runtime_plan["strokes"][0]["points"][0]["y"], 19.75)
+                    source_plan = json.loads(source_path.read_text(encoding="utf-8"))
+                    self.assertEqual(source_plan["coordinate_system"], "logical_board_pixels")
+                    self.assertIn("screen_transform", source_plan["generation"])
                     self.assertEqual(app.notebook.select(), str(app.execution_tab))
         except tk.TclError as exc:
             self.skipTest(f"Tk desktop session unavailable: {exc}")
