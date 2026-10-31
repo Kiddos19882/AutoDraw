@@ -350,3 +350,12 @@ UI считает сбор полностью успешным только пр
 В этой реальной сессии engine callbacks не были зафиксированы, поэтому pointer fallback не пересёк lifecycle boundary collector. Это не потеря WebSocket сообщений. Точный расход 48 points относится ко всему временному интервалу сессии и не должен автоматически считаться расходом одного Brush Test experiment.
 
 **Обязательное исправление:** поддержать pointer candidate как fallback lifecycle в RunRecorder и FPS probe, при этом явно маркировать источник границ и не удваивать штрихи при одновременных engine/pointer событиях. Нужны regression tests для pointer-only, engine-only и смешанного потока. До этих изменений нельзя считать автоматическую генерацию run JSON и FPS capture работающими в live режиме.
+
+
+
+
+### 17.1. Реализация pointer lifecycle fallback
+
+RunRecorder теперь принимает `POINTER_DOWN_CANDIDATE/POINTER_UP_CANDIDATE` как fallback границы штриха, если BoardPane engine callbacks не наблюдаются. В отчёте сохраняется `stroke_lifecycle_sources`; число штрихов строится по уникальным stroke IDs, длительность учитывает каждую пару начала/окончания один раз. Browser bridge запускает и завершает FPS probe по engine events или pointer fallback. Если один из legacy events не содержит strokeId, сопоставление по единственному активному штриху допускается только когда активен ровно один ID.
+
+Regression tests покрывают pointer-only и смешанный engine+pointer потоки. На commit `a1f8090ea5117785427c643769e8f034b46af391` WebSocket smoke-server CI step завершился success; полный CI ещё выполняется. Требуется live Firefox повтор, чтобы подтвердить run JSON, exact CHALK, stroke_count, FPS и manifest binding.
