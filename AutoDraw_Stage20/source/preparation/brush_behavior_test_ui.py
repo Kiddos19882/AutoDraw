@@ -2203,6 +2203,8 @@ class BrushBehaviorTestTab:
                 telemetry_clean = (
                     report.get("execution_status") == "completed"
                     and chalk.get("status") == "exact"
+                    and int(chalk.get("consumed_points", 0) or 0) > 0
+                    and int(report.get("stroke_count", 0) or 0) > 0
                     and report.get("brush_radius_status") == "single"
                     and report.get("point_delta_matches_chalk") is True
                     and report.get("dropped_events", 0) == 0
