@@ -98,7 +98,7 @@ class BridgeRecorderTests(unittest.TestCase):
         data = json.loads(path.read_text(encoding="utf-8"))
         self.assertEqual(data["chalk"]["status"], "exact")
         self.assertEqual(data["chalk"]["consumed_points"], 52)
-        self.assertEqual(data["sampled_point_delta_total"], 2)
+        self.assertEqual(data["sampled_point_delta_total"], 52)
         self.assertTrue(data["point_delta_matches_chalk"])
         self.assertEqual(data["trajectory"]["status"], "incomplete_samples")
         self.assertEqual(data["stroke_count"], 1)
