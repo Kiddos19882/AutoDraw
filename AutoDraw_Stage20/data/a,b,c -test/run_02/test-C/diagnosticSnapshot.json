@@ -1,0 +1,28 @@
+{
+  "logicalWidth": 460,
+  "logicalHeight": 240,
+  "scaleX": 1,
+  "scaleY": 1,
+  "maxPoints": 6000,
+  "remainingPoints": 5947,
+  "pointCount": 53,
+  "sourceMethod": "BoardPane.max+BoardPane.less",
+  "isExact": true,
+  "validationStatus": "valid",
+  "radius": [
+    0,
+    1,
+    1,
+    1,
+    1,
+    29
+  ],
+  "currentRadius": 29,
+  "diagnosticPointCount": 53,
+  "pointCountMatches": true,
+  "strokeArrayLength": 6,
+  "lastPoint": [
+    230.2083339691162,
+    0
+  ]
+}

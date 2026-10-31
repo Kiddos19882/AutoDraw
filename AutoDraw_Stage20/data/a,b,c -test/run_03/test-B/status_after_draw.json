@@ -1,0 +1,29 @@
+{
+  "version": "0.1.2",
+  "active": true,
+  "boardDetected": true,
+  "boardLabel": "o",
+  "snapshot": {
+    "logicalWidth": 460,
+    "logicalHeight": 240,
+    "scaleX": 1,
+    "scaleY": 1,
+    "pointCount": 53,
+    "strokeArrayLength": 6,
+    "lastPoint": [
+      230.2083339691162,
+      0
+    ],
+    "radius": [
+      0,
+      1,
+      1,
+      1,
+      1,
+      30
+    ]
+  },
+  "eventCount": 729,
+  "droppedEvents": 0,
+  "errors": 0
+}

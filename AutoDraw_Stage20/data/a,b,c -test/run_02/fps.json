@@ -1,0 +1,24 @@
+{
+  "schema_version": 2,
+  "probe_status": "completed",
+  "measured_at": "2026-10-31T17:03:35.887Z",
+  "duration_ms": 10004,
+  "wall_clock_elapsed_ms": 10009,
+  "frame_count": 600,
+  "average_fps": 60,
+  "median_fps": 60.024,
+  "median_frame_interval_ms": 16.66,
+  "p95_frame_interval_ms": 16.68,
+  "max_frame_interval_ms": 16.68,
+  "long_frame_over_1_5x_median_percent": 0,
+  "document_visibility": "visible",
+  "visibility_change_count": 0,
+  "visibility_interrupted": false,
+  "device_pixel_ratio": 1,
+  "viewport": {
+    "width": 1920,
+    "height": 751
+  },
+  "nominal_game_stage_fps": null,
+  "probe_kind": "requestAnimationFrame_cadence_not_internal_engine_counter"
+}

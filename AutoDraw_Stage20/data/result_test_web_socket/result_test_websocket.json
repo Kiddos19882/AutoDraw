@@ -1,0 +1,9 @@
+[
+  {
+    "type": "ready"
+  },
+  {
+    "type": "pong",
+    "nonce": "autodraw-bridge-smoke-test"
+  }
+]

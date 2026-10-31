@@ -1,0 +1,22 @@
+{
+  "inspectionMode": "read_only",
+  "boardDetected": true,
+  "boardLabel": "o",
+  "snapshot": {
+    "logicalWidth": 460,
+    "logicalHeight": 240,
+    "scaleX": 1,
+    "scaleY": 1,
+    "maxPoints": 6000,
+    "remainingPoints": 5999,
+    "pointCount": 1,
+    "sourceMethod": "BoardPane.max+BoardPane.less",
+    "isExact": true,
+    "validationStatus": "valid",
+    "radius": [
+      0,
+      30
+    ],
+    "currentRadius": 30
+  }
+}
