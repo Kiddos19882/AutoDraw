@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "0.2.0";
+  const VERSION = "0.2.1";
   const METHOD_NAMES = ["onDrawStart", "onDrawing", "onDrawingEnd", "setRadius", "updateLess"];
   const MAX_EVENTS = 50000;
   const SCAN_INTERVAL_MS = 500;
@@ -76,6 +76,17 @@
       !Array.isArray(value) &&
       Number.isFinite(value.x) &&
       Number.isFinite(value.y);
+  }
+
+  // Read only the tail of the current stroke. This is O(1) and records the
+  // exact last coordinate accepted by BoardPane without scanning atom.points.
+  function latestAcceptedPoint(board) {
+    const strokes = board && board.atom && board.atom.points;
+    if (!Array.isArray(strokes) || strokes.length === 0) return null;
+    const lastStroke = strokes[strokes.length - 1];
+    if (!Array.isArray(lastStroke) || lastStroke.length === 0) return null;
+    const point = lastStroke[lastStroke.length - 1];
+    return isGamePoint(point) ? { x: point.x, y: point.y } : null;
   }
 
   function pointCount(value, depth = 0, seen = new WeakSet()) {
@@ -231,7 +242,12 @@
     if (signature === state.lastSampleSignature) return;
     const previous = state.lastSampleSignature;
     state.lastSampleSignature = signature;
-    emit("DRAW_SAMPLE", { source, previousSignature: previous, after: snapshot });
+    emit("DRAW_SAMPLE", {
+      source,
+      previousSignature: previous,
+      after: snapshot,
+      acceptedPoint: latestAcceptedPoint(state.board)
+    });
   }
 
   function startStrokePolling() {
