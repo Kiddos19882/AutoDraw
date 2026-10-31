@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "record_type": "autodraw_game_monitor_run",
+  "session_id": "be40944f-523f-49b1-ba87-5af1875185d0",
+  "run_id": "94de2da6-c336-4682-9fe6-e8100b8b9ed1",
+  "started_at_utc": "2026-10-31T19:18:51.821+00:00",
+  "started_at_performance_ms": 66711,
+  "execution_status": "completed",
+  "pre_test_snapshot": {
+    "logicalWidth": 460,
+    "logicalHeight": 240,
+    "scaleX": 1,
+    "scaleY": 1,
+    "maxPoints": 6000,
+    "remainingPoints": 5999,
+    "pointCount": 1,
+    "sourceMethod": "BoardPane.max+BoardPane.less",
+    "isExact": true,
+    "validationStatus": "valid",
+    "radius": [
+      0,
+      30
+    ],
+    "currentRadius": 30
+  },
+  "post_test_snapshot": {
+    "logicalWidth": 460,
+    "logicalHeight": 240,
+    "scaleX": 1,
+    "scaleY": 1,
+    "maxPoints": 6000,
+    "remainingPoints": 5999,
+    "pointCount": 1,
+    "sourceMethod": "BoardPane.max+BoardPane.less",
+    "isExact": true,
+    "validationStatus": "valid",
+    "radius": [
+      0,
+      30
+    ],
+    "currentRadius": 30
+  },
+  "brush_radius": 30,
+  "events": [
+    {
+      "monitorVersion": "0.2.1",
+      "t": 66711,
+      "type": "POINTER_DOWN_CANDIDATE",
+      "strokeId": "pointer-stroke-1",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5999,
+        "pointCount": 1,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "clientX": 650,
+      "clientY": 415,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 66711,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-1",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5999,
+        "pointCount": 1,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "source": "onDrawStart",
+      "previousSignature": null,
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5999,
+        "pointCount": 1,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "pointDelta": 0,
+      "acceptedPoint": null
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 66718,
+      "type": "POINTER_UP_CANDIDATE",
+      "strokeId": "pointer-stroke-1",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5999,
+        "pointCount": 1,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "clientX": 650,
+      "clientY": 415,
+      "pointerType": "mouse"
+    }
+  ],
+  "frame_probes": [],
+  "active_drawing_duration_ms": 7.0,
+  "dropped_events": 0,
+  "monitor_errors": [],
+  "interpretation": {
+    "chalk_status": "exact",
+    "path_length_status": "incomplete_until_verified"
+  },
+  "ended_at_performance_ms": 66718,
+  "monitor_dropped_events": 0,
+  "monitor_error_count": 0,
+  "monitor_active": true,
+  "chalk": {
+    "status": "exact",
+    "consumed_points": 0,
+    "pre_point_count": 1,
+    "post_point_count": 1,
+    "max_points": 6000
+  },
+  "stroke_count": 1,
+  "stroke_lifecycle_sources": [
+    "pointer_observer"
+  ],
+  "sampled_point_delta_total": 0,
+  "point_delta_matches_chalk": true,
+  "observed_brush_radii": [
+    30.0
+  ],
+  "brush_radius_status": "single",
+  "trajectory": {
+    "observed_segment_length_lower_bound": 0.0,
+    "accepted_sample_count": 0,
+    "status": "incomplete_until_verified",
+    "note": "Coalesced pointDelta values mean intermediate accepted coordinates may be missing."
+  },
+  "frame_probe": {
+    "status": "unavailable",
+    "frame_count": 0,
+    "average_fps": null,
+    "median_fps": null,
+    "median_interval_ms": null,
+    "p95_interval_ms": null,
+    "max_interval_ms": null,
+    "stroke_probe_count": 1,
+    "visibility_interruption": false
+  },
+  "elapsed_from_first_to_last_stroke_ms": 7,
+  "finished_at_utc": "2026-10-31T19:18:54.386+00:00",
+  "event_count": 3
+}
