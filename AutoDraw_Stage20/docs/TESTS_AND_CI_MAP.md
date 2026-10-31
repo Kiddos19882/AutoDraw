@@ -298,3 +298,6 @@ node --test ..\\game_monitor\\tests\\game_monitor.test.js
 В source/preparation/tests/test_brush_behavior_test_ui.py добавлена проверка normalize_game_monitor_origin(): принимается только bare HTTPS Origin; отклоняются HTTP, URL с путём, query, credentials и произвольный текст.
 
 Серверная опция --snippet-file проверяется интеграционным запуском collector на уровне локальной Windows-сессии: UI должен получить токенизированный snippet, а после остановки сервера временный файл должен исчезнуть. Это live-интеграционный gate и не подменяется unit-тестом Origin.
+
+
+**Portable build:** build_windows.py должен включать companion-каталог game_monitor рядом с AutoDraw.exe. В нём должны присутствовать game_monitor.js, game_monitor_bridge.js, game_monitor_bridge_server.py, requirements-bridge.txt и start_game_monitor_bridge.bat. Проверка Windows portable build подтверждает наличие файлов и запуск UI; реальное подключение Firefox iframe требует отдельного live-теста.
