@@ -134,3 +134,12 @@ Game Monitor 0.2.0 и Node-тесты проверены через GitHub Actio
 ### Изменение поведения Brush Test — 2026-10-31
 
 После успешного теста автоматически сохраняются `after_draw`-скриншоты, ROI и `experiment.json`; автоматический клик Clear и post-clear verification больше не запускаются. Доска остаётся в состоянии после рисования, чтобы пользователь мог проверить конечные точки и снять Game Monitor export. Начальный pre-clear перед независимым тестом сохранён. Остановка по горячей клавише переведена с F12 на Alt во всех исполнительных сценариях. Unit tests обновлены, но CI и live-проверка ещё не выполнены.
+
+
+## 13. Live boundary probe — результаты 31.10.2026
+
+В commit пользователя `f72c2d16e7f61071bcaa2d184c071189dd74b69c` добавлены три реальных запуска `board_boundary_probe` с радиусом 1. Каждый запуск завершил четыре штриха. Game Monitor 0.2.0 подтвердил точные snapshots через `BoardPane.max+BoardPane.less`: baseline pointCount=1, max=6000; post pointCount 52/53/53, следовательно CHALK delta=51/52/52 (среднее 51.67). Ошибок и dropped events нет. Результаты подтверждают, что Monitor фиксирует изменение игрового счётчика в живой игре и что повторяемый тест расходует около 52 точек при текущих параметрах.
+
+Конечные POINTER_UP client coordinates совпадают с расчётными экранными endpoints после учёта viewport offset. Но сами координаты принятых DRAW_SAMPLE точек в export отсутствуют, поэтому hit-test включительных границ нельзя считать окончательно доказанным по Monitor JSON. В исходных manifest автоматическая проверка видимости была inconclusive из-за сравнения logical 460×240 с screen ROI 578×301. Исправлен analyzer: теперь он применяет сохранённый transform к expected strokes. Требуется повторный прогон для подтверждения визуальной метрики. Paint meter screenshot estimator также inconclusive и не используется вместо точного Monitor.
+
+CI на commit f72 обнаружил ошибочную negative fixture в test_transform_rejects_nonuniform_roi_for_uniform_game_scale (646×338 — равномерный ROI). Фикстура заменена на 646×323. Добавлены tests для screen-local преобразования expected strokes и mismatch ROI. Последующие CI runs нужно дождаться и проверить по актуальному HEAD. A/B/C Monitor off/0.1.2/0.2.0 не выполнялся; полная матрица кистей не разблокирована.
