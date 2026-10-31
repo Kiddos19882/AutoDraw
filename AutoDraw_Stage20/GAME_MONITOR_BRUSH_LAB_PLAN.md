@@ -512,3 +512,16 @@ CI run #41174050665 выявил ошибку в отрицательной фи
 Выполнен визуальный просмотр трёх `after_draw-board.png` и трёх `after_draw-screen.png` из commit f72. Во всех трёх опытах видны четыре штриха, заканчивающиеся на правой, левой, нижней и верхней границах BoardPane; на полных снимках не обнаружен видимый выход за доску. Для проверенного ROI 578×301 при screen resolution 1920×1080 логическая геометрия и текущий transform визуально подтверждены.
 
 Исторические `experiment.json` не изменялись: автоматическое поле `stroke_visibility_analysis` остаётся inconclusive, поскольку тогда код сравнивал logical canvas 460×240 с screen ROI 578×301 без transform. Сам analyzer исправлен в коде, но новые автоматические visibility-результаты появятся в следующем прогоне. A/B/C Monitor off/0.1.2/0.2.0 остаётся следующим крупным тестом INT-003.
+
+
+### 13.14. Проверка актуального CI — 31.10.2026
+
+Проверена вершина `feature/image-geometry-optimization`: `0c09d2830bb007b7a9de1cd46e085f779e91d2f3`. GitHub Actions workflow `Geometry planner tests`, run #1224 (`41174465072`), завершился `completed/success`. Все три обязательные jobs прошли:
+
+- `geometry-tests` — success; включая `node --check` для Game Monitor, Node.js тесты O(1) CHALK snapshot, Python smoke tests локального WebSocket transport, preparation/geometry tests и unified-app UI regressions;
+- `executor-tests` — success;
+- `Windows portable build and startup smoke-test` — success.
+
+Run #1223 на предыдущем docs commit также success. Исторические runs #1210—#1213 завершились failure, но последующие изменения исправили тестовую фикстуру non-uniform ROI и сигнатуру builder; актуальный HEAD и его полный workflow зелёные.
+
+Это подтверждает CI и portable startup на указанном SHA. Не подтверждает реальное соединение Firefox из HTTPS iframe с loopback, runtime-доступность CHALK в новой сессии, A/B/C overhead, восстановление Monitor после реального attach/detach или автоматическую привязку экспорта к manifest. INT-003 остаётся IN_PROGRESS; следующий обязательный live gate — A/B/C и повторный boundary probe с новым automated stroke visibility result.
