@@ -2,9 +2,15 @@
 setlocal
 
 set "SCRIPT_DIR=%~dp0"
-for %%I in ("%SCRIPT_DIR%..\..\..") do set "REPO_ROOT=%%~fI"
+for %%I in ("%SCRIPT_DIR%..") do set "APP_ROOT=%%~fI"
+if exist "%APP_ROOT%\AutoDraw.exe" (
+    set "REPO_ROOT=%APP_ROOT%"
+) else (
+    for %%I in ("%SCRIPT_DIR%..\..\..") do set "REPO_ROOT=%%~fI"
+)
 set "GAME_ORIGIN=%~1"
 set "SNIPPET_FILE=%~2"
+set "OUTPUT_DIR=%~3"
 
 if not defined GAME_ORIGIN (
     echo Enter the exact HTTPS Origin from the game iframe.
@@ -17,7 +23,14 @@ if not defined GAME_ORIGIN (
 )
 
 if not defined SNIPPET_FILE (
-    set "SNIPPET_FILE=%REPO_ROOT%\AutoDraw_Stage20\data\results\brush_behavior_tests\game_monitor_bridge\connection_snippet.js"
+    set "SNIPPET_FILE=%REPO_ROOT%\data\results\brush_behavior_tests\game_monitor_bridge\connection_snippet.js"
+)
+if not defined OUTPUT_DIR (
+    if exist "%REPO_ROOT%\AutoDraw.exe" (
+        set "OUTPUT_DIR=%REPO_ROOT%\data\results\brush_behavior_tests\game_monitor_bridge"
+    ) else (
+        set "OUTPUT_DIR=%REPO_ROOT%\AutoDraw_Stage20\data\results\brush_behavior_tests\game_monitor_bridge"
+    )
 )
 
 cd /d "%REPO_ROOT%"
@@ -39,7 +52,7 @@ if errorlevel 1 (
 )
 
 echo Starting the read-only Game Monitor WebSocket collector...
-py -3.11 "%SCRIPT_DIR%game_monitor_bridge_server.py" --origin "%GAME_ORIGIN%" --snippet-file "%SNIPPET_FILE%"
+py -3.11 "%SCRIPT_DIR%game_monitor_bridge_server.py" --origin "%GAME_ORIGIN%" --output-dir "%OUTPUT_DIR%" --snippet-file "%SNIPPET_FILE%"
 set "RESULT=%ERRORLEVEL%"
 if not "%RESULT%"=="0" (
     echo Bridge exited with code %RESULT%.
