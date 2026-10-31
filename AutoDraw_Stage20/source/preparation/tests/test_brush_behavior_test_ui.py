@@ -271,17 +271,17 @@ def test_brush_test_plan_uses_standard_executor_schema_and_canvas_dimensions() -
 def test_brush_test_plan_can_use_explicit_logical_board_coordinates() -> None:
     plan = build_brush_test_drawing_plan(
         "Расход краски — серия длинных линий",
-        (420, 240),
+        (460, 240),
         coordinate_system="logical_board_pixels",
     )
 
     assert plan["coordinate_system"] == "logical_board_pixels"
-    assert plan["canvas"] == {"width": 420, "height": 240}
+    assert plan["canvas"] == {"width": 460, "height": 240}
     assert plan["strokes"][0]["points"][-1] == {"x": 420.0, "y": 18.0}
     assert plan["strokes"][0]["metadata"]["line_extension_px_override"] == 0.0
 
 
-def test_logical_brush_plan_rejects_points_beyond_inclusive_board_bounds() -> None:
+def test_logical_brush_plan_rejects_points_beyond_supplied_canvas_bounds() -> None:
     with pytest.raises(ValueError, match="выходит за пределы"):
         build_brush_test_drawing_plan(
             "Длинные изолированные линии", (419, 240),
