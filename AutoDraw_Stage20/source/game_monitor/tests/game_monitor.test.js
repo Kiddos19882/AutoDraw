@@ -321,6 +321,7 @@ test("DRAW_SAMPLE records the exact last accepted board coordinate with O(1) tai
   const sample = samples[samples.length - 1];
   assert.equal(sample.acceptedPoint.x, 17);
   assert.equal(sample.acceptedPoint.y, 23);
+  assert.equal(sample.pointDelta, 1);
   assert.equal(sample.after.pointCount, 1);
   monitor.stop();
 });
