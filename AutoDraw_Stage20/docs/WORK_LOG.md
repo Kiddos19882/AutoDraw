@@ -901,3 +901,10 @@ CI run #41174050665 на пользовательском commit f72 выяви�
 Добавлена O(1) регистрация последней фактически принятой координаты в `DRAW_SAMPLE`: `pointDelta` показывает количество новых точек между снимками, `acceptedPoint` содержит хвостовую координату при положительной дельте. Если `pointDelta > 1`, промежуточные точки могли быть coalesced; экспорт это явно показывает. Добавлены тесты точной координаты, отсутствия stale point, multi-point delta, восстановления всех методов и повторного lifecycle. CI run #1238 на commit `32a3fdb35d95b15ca64c1bb4c7f404904ffc23e8`: Node.js tests и WebSocket smoke-server tests прошли; полный CI и Windows portable smoke-test на момент записи ещё выполняются.
 
 План live-валидации не закрыт: требуется новый boundary probe с Monitor 0.2.1 и A/B/C off / 0.1.2 / 0.2.1. Реальный Firefox iframe smoke test и production bridge по-прежнему не выполнены.
+
+
+### Полный CI Game Monitor 0.2.1 — 31.10.2026
+
+Проверен актуальный HEAD ветки `feature/image-geometry-optimization`: `354ff64802a8065aff19f17176c2ea3e65ff4bbc`. Workflow #1241 (`41212496267`) завершился success. Все три jobs прошли: `geometry-tests`, `executor-tests`, `Windows portable build and startup smoke-test`. В geometry job успешно выполнены Game Monitor syntax/resource snapshot tests, локальный WebSocket smoke server, анализ клиентского bundle, Stage 5/7/8 benchmarks, synthetic geometry, fallback/outline-first comparisons, preparation/geometry tests и unified-app UI regressions.
+
+CI закрывает автоматическую проверку текущего HEAD, но не live Firefox iframe transport, не A/B/C overhead и не новую live-проверку acceptedPoint. INT-003 остаётся IN_PROGRESS. Следующий gate — реальный browser smoke test; до его прохождения production bridge не реализовывать.
