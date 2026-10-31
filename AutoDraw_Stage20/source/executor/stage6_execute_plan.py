@@ -1137,6 +1137,11 @@ class Stage6App:
             raise ValueError(
                 "Это цветной план. Загрузите его кнопкой «Открыть цветной план…» вместе с профилем палитры."
             )
+        if isinstance(document, dict) and document.get("coordinate_system") == "logical_board_pixels":
+            raise ValueError(
+                "Это исходный логический план Brush Test. Его нужно передавать через вкладку «Тест кистей», "
+                "где он преобразуется в координаты экранной области."
+            )
         plan = DrawingPlan.from_dict(document)
         plan.validate_bounds()
         self.color_plan_data = None
