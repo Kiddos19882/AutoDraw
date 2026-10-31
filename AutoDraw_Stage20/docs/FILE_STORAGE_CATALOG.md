@@ -182,3 +182,16 @@ Manifest содержит логические ссылки `files`, контр�
 `data/runtime/` содержит промежуточные копии планов. Перед переносом или очисткой следует завершить работу приложения и убедиться, что нужные планы уже сохранены в соответствующих проектных/результирующих каталогах.
 
 Не переносите абсолютные пути из старых manifest как универсальные: пути в исторических экспериментальных записях могут ссылаться на исходный компьютер. Для архива опыта сохраняйте весь каталог опыта вместе с `experiment.json` и файлами, на которые он ссылается.
+
+
+## 11. Game Monitor Bridge companion files
+
+В исходном репозитории файлы расположены в source/game_monitor/. В Windows portable-сборке build_windows.py копирует runtime-набор в game_monitor/ рядом с AutoDraw.exe:
+
+- game_monitor.js и game_monitor_bridge.js — код для Console игрового iframe;
+- game_monitor_bridge_server.py — локальный WebSocket collector;
+- requirements-bridge.txt — отдельная Python-зависимость collector;
+- start_game_monitor_bridge.bat — запуск сервера из UI или напрямую;
+- README.md — инструкция подключения.
+
+Временный токенизированный snippet записывается в data/results/brush_behavior_tests/game_monitor_bridge/ и удаляется при штатной остановке collector. Он не относится к постоянным данным и не должен включаться в резервные копии или коммиты.
