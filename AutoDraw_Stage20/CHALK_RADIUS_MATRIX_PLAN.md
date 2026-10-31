@@ -102,23 +102,24 @@
 
 ## 8. Подготовка к браузерному этапу — реализация
 
-**Реализовано в ветке:**
+**Реализовано в ветке:** `feature/image-geometry-optimization`.
+
 1. UI хранит ID серии CHALK, номер блока и заданный радиус; метаданные попадают в drawing plan и experiment manifest.
 2. Для каждого прогона создаётся уникальный `experiment_id`; он записывается в manifest, копию Game Monitor report и summary.
 3. Перед привязкой проверяется, не использован ли этот Game Monitor `run_id` в другом experiment. Повторное использование запрещено.
 4. Добавлен анализатор `tests/analyze_chalk_radius_matrix.py`; он принимает только согласованные experiment/capture/summary IDs, валидный exact CHALK, один радиус и 6/6 штрихов. Дубликаты run и повторов в одной ячейке исключаются.
 5. Добавлены unit/regression tests для метаданных, run deduplication, experiment identity, точности CHALK, статистики и дубликатов.
 
-**Осталось до открытия браузерного gate:**
-- дождаться и проверить GitHub Actions на новом HEAD;
-- подтвердить успешное выполнение `test_chalk_radius_matrix.py` и `test_brush_behavior_test_ui.py`;
-- при необходимости исправить выявленные CI regressions.
+**Автоматический gate пройден:** GitHub Actions workflow `Geometry planner tests`, run `41235681326`, commit `34535d1a56fce75ae9712d55b662a0abd19de868`. Успешны все задания:
+- `geometry-tests`;
+- `executor-tests`;
+- `Windows portable build and startup smoke-test`.
 
-Команда целевого локального теста из каталога `AutoDraw_Stage20/source/preparation`:
+**Браузерный gate открыт.** Теперь требуется локальная live-серия в игре. Автоматический CI не заменяет проверку реального расхода CHALK. До получения 21 валидного измерения модель зависимости расхода от радиуса не строить.
+
+Целевой локальный тест (из каталога `AutoDraw_Stage20/source/preparation`):
 `python -m pytest -q -ra tests/test_chalk_radius_matrix.py tests/test_brush_behavior_test_ui.py`
 с тем же `PYTHONPATH`, что используется workflow `Geometry planner tests`.
-
-**Браузерный gate пока закрыт.** Пользователю не требуется запускать Firefox/игру до подтверждения автоматических тестов. После успешного CI я отдельно сообщу о необходимости локального live-прогона.
 
 ## 9. Запреты
 
