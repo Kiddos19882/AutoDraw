@@ -1093,3 +1093,29 @@ Run JSON дополнен `stroke_count`, суммой `sampled_point_delta_tota
 Тесты: добавлены unit tests на корректный выбор среди старых/поздних/неподходящих run, неоднозначность, отсутствие executor timestamps, сброс pointCount и нулевой расход. Это автоматические тесты корреляции, не ручные рисовальные сценарии.
 
 Ограничение/следующий gate: текущая реализация требует один run на всю плановую серию. Если collector создаёт несколько run на один executor, manifest безопасно останется unavailable. Необходимы запуск pytest профильного файла и новый live Firefox тест; до подтверждения точного CHALK нельзя переходить к матрице кистей.
+
+
+
+## 2026-10-31 — первый успешный live-тест после исправления автопривязки
+
+Ветка: feature/image-geometry-optimization. Результаты добавлены коммитами a552e5d2a0ea8288e6db1d7f784495ae84e097cb и 7d2ce8e53409d9e3faa6b6246de3e3e8ca79b4a4.
+
+Тест paint_consumption_long_lines, кисть радиуса 1:
+- executor completed: 6/6 штрихов, 29.984 s, 1524 move calls;
+- Game Monitor run 570ec65b: 6 штрихов, radius 1 only, 1454 events;
+- pre pointCount 1, post 719, exact CHALK 718;
+- sampled_point_delta_total 718, point_delta_matches_chalk=true;
+- 0 dropped events, 0 monitor dropped events, 0 monitor errors;
+- frame probe: 1452 samples, average FPS 60.0, median FPS 60.024;
+- remaining points 5281 / 6000;
+- monitor_capture saved, match_reason matched_executor_window.
+
+Проверка хронологии WebSocket session be40944f-523f-49b1-ba87-5af1875185d0:
+- целевой run 19:19:06.367–19:19:34.416 UTC совпадает с executor 19:19:01–19:19:31 UTC с учётом post-finalization окна;
+- до него были короткие runs с нулевым расходом, не привязанные к experiment;
+- после него run 2984ccc8 19:19:36.719–19:19:41.091 UTC содержит изменение ползунка кисти (радиусы 1..30), 0 pointDelta и 0 CHALK; это не рисование тестового плана и не входит в experiment;
+- session закрыта 19:19:41.104 UTC; 1831 messages / 1750 events, sendFailureCount=0, connection_closed=true.
+
+Пользователь сообщил, что после завершения теста сразу выключил мост в PowerShell. По телеметрии мост завершил сессию штатно через несколько секунд после завершающих действий UI; потерь доставки не зафиксировано.
+
+Интерпретация: первое подтверждённое измерение расхода CHALK для радиуса 1 и шаблона из шести длинных горизонтальных линий — 718 points. Это не универсальная константа расхода для других радиусов/геометрий. Траектория остаётся неполной из-за coalesced samples; визуальная paint-meter эвристика inconclusive. Ручные линии в план и тесты не добавлялись.
