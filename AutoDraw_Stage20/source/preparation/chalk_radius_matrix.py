@@ -94,8 +94,13 @@ def _manifest_measurement(document: dict[str, Any]) -> tuple[bool, str, dict[str
         )
     except (TypeError, ValueError) as exc:
         return False, f"invalid_matrix_metadata:{exc}", None
-    if matrix.get("scenario_id") != MATRIX_SCENARIO_ID:
+    if matrix.get("scenario_id") != MATRIX_SCENARIO_ID or document.get("test_case") != MATRIX_SCENARIO_ID:
         return False, "wrong_test_scenario", None
+    if document.get("brush_value_requested") != metadata["requested_radius"]:
+        return False, "requested_radius_mismatch", None
+    for key in ("planned_radii", "block_order", "matrix_order_index", "expected_strokes"):
+        if matrix.get(key) != metadata.get(key):
+            return False, "matrix_schedule_metadata_mismatch", None
 
     capture = document.get("monitor_capture")
     capture = capture if isinstance(capture, dict) else {}
@@ -122,6 +127,14 @@ def _manifest_measurement(document: dict[str, Any]) -> tuple[bool, str, dict[str
             return False, f"{source_name}_matrix_metadata_mismatch", None
     if capture.get("stroke_count") != EXPECTED_STROKES or capture.get("expected_stroke_count") != EXPECTED_STROKES:
         return False, "stroke_count_mismatch", None
+    if capture.get("brush_radius_status") != "single" or capture.get("chalk_status") != "exact":
+        return False, "capture_radius_or_chalk_status_invalid", None
+    if capture.get("chalk_counter_consistent") is not True or capture.get("point_delta_matches_chalk") is not True:
+        return False, "capture_counter_validation_failed", None
+    if any(capture.get(key, 0) != 0 for key in (
+        "dropped_events", "monitor_dropped_events", "monitor_error_count"
+    )):
+        return False, "capture_has_dropped_events_or_errors", None
 
     summary = document.get("game_monitor_summary")
     summary = summary if isinstance(summary, dict) else {}
@@ -133,6 +146,16 @@ def _manifest_measurement(document: dict[str, Any]) -> tuple[bool, str, dict[str
         return False, "sampled_delta_mismatch", None
     if summary.get("stroke_count") != EXPECTED_STROKES:
         return False, "monitor_stroke_count_mismatch", None
+    if summary.get("frame_probe", {}).get("status") != "measured":
+        return False, "frame_probe_unavailable", None
+    if summary.get("frame_probe", {}).get("visibility_interruption") is not False:
+        return False, "frame_probe_visibility_interruption", None
+    if int(summary.get("trajectory", {}).get("accepted_sample_count", 0) or 0) <= 0:
+        return False, "trajectory_samples_missing", None
+    if any(summary.get(key, 0) != 0 for key in (
+        "dropped_events", "monitor_dropped_events", "monitor_error_count"
+    )):
+        return False, "monitor_summary_has_dropped_events_or_errors", None
 
     chalk = summary.get("chalk")
     chalk = chalk if isinstance(chalk, dict) else {}
