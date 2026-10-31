@@ -333,7 +333,7 @@ def build_brush_test_drawing_plan(
             "name": item["name"],
             "points": [{"x": float(x), "y": float(y)} for x, y in points],
             "closed": False,
-            "metadata": {"role": "brush_behavior_test", "test_case": scenario["id"]},
+            "metadata": {"role": "brush_behavior_test", "test_case": scenario["id"], "line_extension_px_override": 0.0},
         })
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
     return {
