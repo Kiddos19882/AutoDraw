@@ -67,7 +67,7 @@ function createBoard() {
     onDrawStart() {},
     onDrawing() {},
     onDrawingEnd() {},
-    setRadius() {},
+    setRadius(value) { this.atom.radius[this.atom.radius.length - 1] = value; },
     updateLess() {
       let total = 0;
       for (let i = 0; i < this.atom.points.length; i++) {
@@ -194,5 +194,20 @@ test("unchanged updateLess calls do not create duplicate quota events", () => {
   board.updateLess();
   assert.equal(monitor.status().eventCount, before + 1);
   assert.equal(monitor.status().snapshot.pointCount, 1);
+  monitor.stop();
+});
+
+
+test("resource snapshots expose the actual current brush radius", () => {
+  const { monitor } = createMonitor();
+  const { board } = createBoard();
+  monitor.attach(board);
+
+  assert.equal(monitor.status().snapshot.currentRadius, 3);
+  board.setRadius(7);
+  const snapshot = monitor.status().snapshot;
+
+  assert.equal(snapshot.currentRadius, 7);
+  assert.deepEqual(snapshot.radius, [7]);
   monitor.stop();
 });
