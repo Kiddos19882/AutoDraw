@@ -1,0 +1,3285 @@
+{
+  "schemaVersion": 1,
+  "monitorVersion": "0.2.0",
+  "startedAtPerformanceMs": 48840466,
+  "exportedAtPerformanceMs": 49390823,
+  "page": {
+    "origin": "https://eufbpet.hust.me",
+    "pathname": "/pet.php"
+  },
+  "frameContext": {
+    "isTopFrame": false,
+    "currentFrame": "https://eufbpet.hust.me/pet.php",
+    "frameCandidates": []
+  },
+  "boardDetected": true,
+  "boardLabel": "o",
+  "resourceSnapshot": {
+    "logicalWidth": 460,
+    "logicalHeight": 240,
+    "scaleX": 1,
+    "scaleY": 1,
+    "maxPoints": 6000,
+    "remainingPoints": 5947,
+    "pointCount": 53,
+    "sourceMethod": "BoardPane.max+BoardPane.less",
+    "isExact": true,
+    "validationStatus": "valid",
+    "radius": [
+      0,
+      1,
+      1,
+      1,
+      1,
+      30
+    ],
+    "currentRadius": 30
+  },
+  "eventCount": 79,
+  "droppedEvents": 0,
+  "errors": [],
+  "events": [
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49333651,
+      "type": "POINTER_DOWN_CANDIDATE",
+      "strokeId": "pointer-stroke-9",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5999,
+        "pointCount": 1,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "clientX": 650,
+      "clientY": 415,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49333651,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-9",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5999,
+        "pointCount": 1,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "source": "onDrawStart",
+      "previousSignature": null,
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5999,
+        "pointCount": 1,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30
+        ],
+        "currentRadius": 30
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49333658,
+      "type": "POINTER_UP_CANDIDATE",
+      "strokeId": "pointer-stroke-9",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5999,
+        "pointCount": 1,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "clientX": 650,
+      "clientY": 415,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49338529,
+      "type": "POINTER_DOWN_CANDIDATE",
+      "strokeId": "pointer-stroke-10",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5999,
+        "pointCount": 1,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "clientX": 1168,
+      "clientY": 142,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49338529,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-10",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5999,
+        "pointCount": 1,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "source": "onDrawStart",
+      "previousSignature": null,
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5999,
+        "pointCount": 1,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30
+        ],
+        "currentRadius": 30
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49340070,
+      "type": "POINTER_UP_CANDIDATE",
+      "strokeId": "pointer-stroke-10",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5999,
+        "pointCount": 1,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "clientX": 1293,
+      "clientY": 142,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49351555,
+      "type": "POINTER_DOWN_CANDIDATE",
+      "strokeId": "pointer-stroke-11",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5999,
+        "pointCount": 1,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "clientX": 155,
+      "clientY": 325,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49351555,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-11",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5999,
+        "pointCount": 1,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "onDrawStart",
+      "previousSignature": null,
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5999,
+        "pointCount": 1,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49351607,
+      "type": "POINTER_UP_CANDIDATE",
+      "strokeId": "pointer-stroke-11",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5999,
+        "pointCount": 1,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "clientX": 155,
+      "clientY": 325,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49355637,
+      "type": "POINTER_DOWN_CANDIDATE",
+      "strokeId": "pointer-stroke-12",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5999,
+        "pointCount": 1,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "clientX": 1090,
+      "clientY": 240,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49355638,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-12",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5999,
+        "pointCount": 1,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "onDrawStart",
+      "previousSignature": null,
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5999,
+        "pointCount": 1,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49355664,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-12",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5999,1,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49355739,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-12",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5997,
+        "pointCount": 3,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5998,2,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5997,
+        "pointCount": 3,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49355764,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-12",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5996,
+        "pointCount": 4,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5997,3,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5996,
+        "pointCount": 4,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49355791,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-12",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5995,
+        "pointCount": 5,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5996,4,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5995,
+        "pointCount": 5,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49355841,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-12",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5994,
+        "pointCount": 6,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5995,5,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5994,
+        "pointCount": 6,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49355867,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-12",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5993,
+        "pointCount": 7,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5994,6,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5993,
+        "pointCount": 7,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49355892,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-12",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5992,
+        "pointCount": 8,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5993,7,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5992,
+        "pointCount": 8,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49355942,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-12",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5991,
+        "pointCount": 9,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5992,8,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5991,
+        "pointCount": 9,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49355967,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-12",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5990,
+        "pointCount": 10,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5991,9,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5990,
+        "pointCount": 10,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49355993,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-12",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5989,
+        "pointCount": 11,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5990,10,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5989,
+        "pointCount": 11,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49356025,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-12",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5988,
+        "pointCount": 12,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5989,11,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5988,
+        "pointCount": 12,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49356075,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-12",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5987,
+        "pointCount": 13,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5988,12,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5987,
+        "pointCount": 13,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49356100,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-12",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5986,
+        "pointCount": 14,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5987,13,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5986,
+        "pointCount": 14,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49356147,
+      "type": "POINTER_UP_CANDIDATE",
+      "strokeId": "pointer-stroke-12",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5986,
+        "pointCount": 14,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "clientX": 1140,
+      "clientY": 240,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49356221,
+      "type": "POINTER_DOWN_CANDIDATE",
+      "strokeId": "pointer-stroke-13",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5986,
+        "pointCount": 14,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "clientX": 613,
+      "clientY": 240,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49356221,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-13",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5986,
+        "pointCount": 14,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "onDrawStart",
+      "previousSignature": null,
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5986,
+        "pointCount": 14,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49356246,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-13",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5985,
+        "pointCount": 15,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5986,14,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5985,
+        "pointCount": 15,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49356324,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-13",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5984,
+        "pointCount": 16,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5985,15,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5984,
+        "pointCount": 16,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49356374,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-13",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5983,
+        "pointCount": 17,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5984,16,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5983,
+        "pointCount": 17,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49356400,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-13",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5982,
+        "pointCount": 18,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5983,17,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5982,
+        "pointCount": 18,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49356425,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-13",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5981,
+        "pointCount": 19,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5982,18,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5981,
+        "pointCount": 19,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49356476,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-13",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5980,
+        "pointCount": 20,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5981,19,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5980,
+        "pointCount": 20,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49356505,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-13",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5979,
+        "pointCount": 21,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5980,20,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5979,
+        "pointCount": 21,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49356530,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-13",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5978,
+        "pointCount": 22,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5979,21,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5978,
+        "pointCount": 22,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49356557,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-13",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5977,
+        "pointCount": 23,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5978,22,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5977,
+        "pointCount": 23,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49356608,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-13",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5976,
+        "pointCount": 24,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5977,23,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5976,
+        "pointCount": 24,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49356633,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-13",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5975,
+        "pointCount": 25,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5976,24,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5975,
+        "pointCount": 25,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49356659,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-13",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5974,
+        "pointCount": 26,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5975,25,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5974,
+        "pointCount": 26,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49356709,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-13",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5973,
+        "pointCount": 27,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5974,26,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5973,
+        "pointCount": 27,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49356754,
+      "type": "POINTER_UP_CANDIDATE",
+      "strokeId": "pointer-stroke-13",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5973,
+        "pointCount": 27,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "clientX": 563,
+      "clientY": 240,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49356820,
+      "type": "POINTER_DOWN_CANDIDATE",
+      "strokeId": "pointer-stroke-14",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5973,
+        "pointCount": 27,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "clientX": 852,
+      "clientY": 340,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49356820,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-14",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5973,
+        "pointCount": 27,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "onDrawStart",
+      "previousSignature": null,
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5973,
+        "pointCount": 27,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49356845,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-14",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5972,
+        "pointCount": 28,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5973,27,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5972,
+        "pointCount": 28,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49356897,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-14",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5971,
+        "pointCount": 29,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5972,28,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5971,
+        "pointCount": 29,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49356924,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-14",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5970,
+        "pointCount": 30,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5971,29,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5970,
+        "pointCount": 30,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49356974,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-14",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5969,
+        "pointCount": 31,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5970,30,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5969,
+        "pointCount": 31,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49357000,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-14",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5968,
+        "pointCount": 32,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5969,31,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5968,
+        "pointCount": 32,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49357026,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-14",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5967,
+        "pointCount": 33,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5968,32,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5967,
+        "pointCount": 33,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49357057,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-14",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5966,
+        "pointCount": 34,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5967,33,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5966,
+        "pointCount": 34,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49357107,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-14",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5965,
+        "pointCount": 35,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5966,34,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5965,
+        "pointCount": 35,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49357134,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-14",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5964,
+        "pointCount": 36,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5965,35,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5964,
+        "pointCount": 36,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49357158,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-14",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5963,
+        "pointCount": 37,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5964,36,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5963,
+        "pointCount": 37,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49357191,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-14",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5962,
+        "pointCount": 38,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5963,37,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5962,
+        "pointCount": 38,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49357242,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-14",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5961,
+        "pointCount": 39,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5962,38,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5961,
+        "pointCount": 39,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49357269,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-14",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5960,
+        "pointCount": 40,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5961,39,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5960,
+        "pointCount": 40,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49357311,
+      "type": "POINTER_UP_CANDIDATE",
+      "strokeId": "pointer-stroke-14",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5960,
+        "pointCount": 40,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "clientX": 852,
+      "clientY": 390,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49357396,
+      "type": "POINTER_DOWN_CANDIDATE",
+      "strokeId": "pointer-stroke-15",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5960,
+        "pointCount": 40,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "clientX": 852,
+      "clientY": 140,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49357396,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-15",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5960,
+        "pointCount": 40,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "onDrawStart",
+      "previousSignature": null,
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5960,
+        "pointCount": 40,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49357422,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-15",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5959,
+        "pointCount": 41,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5960,40,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5959,
+        "pointCount": 41,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49357499,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-15",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5958,
+        "pointCount": 42,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5959,41,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5958,
+        "pointCount": 42,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49357525,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-15",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5957,
+        "pointCount": 43,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5958,42,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5957,
+        "pointCount": 43,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49357557,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-15",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5956,
+        "pointCount": 44,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5957,43,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5956,
+        "pointCount": 44,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49357608,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-15",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5955,
+        "pointCount": 45,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5956,44,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5955,
+        "pointCount": 45,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49357633,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-15",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5954,
+        "pointCount": 46,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5955,45,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5954,
+        "pointCount": 46,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49357658,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-15",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5953,
+        "pointCount": 47,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5954,46,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5953,
+        "pointCount": 47,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49357709,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-15",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5952,
+        "pointCount": 48,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5953,47,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5952,
+        "pointCount": 48,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49357738,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-15",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5951,
+        "pointCount": 49,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5952,48,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5951,
+        "pointCount": 49,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49357763,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-15",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5950,
+        "pointCount": 50,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5951,49,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5950,
+        "pointCount": 50,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49357790,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-15",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5949,
+        "pointCount": 51,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5950,50,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5949,
+        "pointCount": 51,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49357841,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-15",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5948,
+        "pointCount": 52,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5949,51,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5948,
+        "pointCount": 52,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49357866,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-15",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5947,
+        "pointCount": 53,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5948,52,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5947,
+        "pointCount": 53,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49357889,
+      "type": "POINTER_UP_CANDIDATE",
+      "strokeId": "pointer-stroke-15",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5947,
+        "pointCount": 53,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "clientX": 852,
+      "clientY": 90,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49363237,
+      "type": "POINTER_DOWN_CANDIDATE",
+      "strokeId": "pointer-stroke-16",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5947,
+        "pointCount": 53,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "clientX": 1293,
+      "clientY": 142,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49363237,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-16",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5947,
+        "pointCount": 53,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "onDrawStart",
+      "previousSignature": null,
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5947,
+        "pointCount": 53,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49364781,
+      "type": "POINTER_UP_CANDIDATE",
+      "strokeId": "pointer-stroke-16",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5947,
+        "pointCount": 53,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "clientX": 1168,
+      "clientY": 142,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49370647,
+      "type": "POINTER_DOWN_CANDIDATE",
+      "strokeId": "pointer-stroke-17",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5947,
+        "pointCount": 53,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "clientX": 177,
+      "clientY": 251,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49370647,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-17",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5947,
+        "pointCount": 53,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "source": "onDrawStart",
+      "previousSignature": null,
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5947,
+        "pointCount": 53,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1,
+          30
+        ],
+        "currentRadius": 30
+      }
+    },
+    {
+      "monitorVersion": "0.2.0",
+      "t": 49370707,
+      "type": "POINTER_UP_CANDIDATE",
+      "strokeId": "pointer-stroke-17",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5947,
+        "pointCount": 53,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          1,
+          1,
+          1,
+          1,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "clientX": 177,
+      "clientY": 251,
+      "pointerType": "mouse"
+    }
+  ]
+}

@@ -1,98 +1,150 @@
 {
   "schema_version": 1,
-  "name": "Brush behavior test — vertical_lengths",
-  "created_at": "2026-10-30T16:23:32+00:00",
+  "name": "Brush behavior test — board_boundary_probe",
+  "created_at": "2026-10-31T05:44:51+00:00",
   "coordinate_system": "local_canvas_pixels",
   "canvas": {
-    "width": 553,
-    "height": 274
+    "width": 578,
+    "height": 301
   },
-  "width": 553,
-  "height": 274,
+  "width": 578,
+  "height": 301,
   "strokes": [
     {
-      "name": "vertical_10",
+      "name": "right_boundary_probe",
       "points": [
         {
-          "x": 20.0,
-          "y": 20.0
+          "x": 526.8260869565217,
+          "y": 150.0
         },
         {
-          "x": 20.0,
-          "y": 30.0
+          "x": 577.0,
+          "y": 150.0
         }
       ],
       "closed": false,
       "metadata": {
         "role": "brush_behavior_test",
-        "test_case": "vertical_lengths"
+        "test_case": "board_boundary_probe",
+        "line_extension_px_override": 0.0
       }
     },
     {
-      "name": "vertical_20",
+      "name": "left_boundary_probe",
       "points": [
         {
-          "x": 45.0,
-          "y": 20.0
+          "x": 50.17391304347826,
+          "y": 150.0
         },
         {
-          "x": 45.0,
-          "y": 40.0
+          "x": 0.0,
+          "y": 150.0
         }
       ],
       "closed": false,
       "metadata": {
         "role": "brush_behavior_test",
-        "test_case": "vertical_lengths"
+        "test_case": "board_boundary_probe",
+        "line_extension_px_override": 0.0
       }
     },
     {
-      "name": "vertical_50",
+      "name": "bottom_boundary_probe",
       "points": [
         {
-          "x": 70.0,
-          "y": 20.0
+          "x": 288.5,
+          "y": 250.0
         },
         {
-          "x": 70.0,
-          "y": 70.0
+          "x": 288.5,
+          "y": 300.0
         }
       ],
       "closed": false,
       "metadata": {
         "role": "brush_behavior_test",
-        "test_case": "vertical_lengths"
+        "test_case": "board_boundary_probe",
+        "line_extension_px_override": 0.0
       }
     },
     {
-      "name": "vertical_100",
+      "name": "top_boundary_probe",
       "points": [
         {
-          "x": 95.0,
-          "y": 20.0
+          "x": 288.5,
+          "y": 50.0
         },
         {
-          "x": 95.0,
-          "y": 120.0
+          "x": 288.5,
+          "y": 0.0
         }
       ],
       "closed": false,
       "metadata": {
         "role": "brush_behavior_test",
-        "test_case": "vertical_lengths"
+        "test_case": "board_boundary_probe",
+        "line_extension_px_override": 0.0
       }
     }
   ],
   "generation": {
     "method": "manual_brush_behavior_test",
-    "test_case": "vertical_lengths",
+    "test_case": "board_boundary_probe",
     "brush_value_must_be_set_manually": true,
     "note": "Set the requested brush size in the browser before executing this plan.",
-    "requested_brush_value": 14
+    "requested_brush_value": 1,
+    "source_coordinate_system": "logical_board_pixels",
+    "source_canvas": {
+      "width": 460,
+      "height": 240
+    },
+    "screen_transform": {
+      "method": "inclusive_logical_bounds_to_screen_pixel_centers",
+      "source_coordinate_system": "logical_board_pixels",
+      "target_coordinate_system": "local_canvas_pixels",
+      "logical_board": {
+        "width": 460,
+        "height": 240
+      },
+      "screen_roi": {
+        "x": 563,
+        "y": 253,
+        "width": 578,
+        "height": 301
+      },
+      "scale_x": 1.2543478260869565,
+      "scale_y": 1.25,
+      "expected_uniform_scale": true,
+      "uniform_scale_relative_error": 0.0034662045060658377,
+      "uniform_scale_tolerance": 0.01,
+      "logical_bounds": {
+        "x": [
+          0,
+          460
+        ],
+        "y": [
+          0,
+          240
+        ]
+      },
+      "screen_local_bounds": {
+        "x": [
+          0,
+          577
+        ],
+        "y": [
+          0,
+          300
+        ]
+      },
+      "boundary_mapping": "logical_max_to_last_screen_pixel",
+      "executor_coordinate_units": "screen_pixels",
+      "point_step_px_units": "screen_pixels"
+    }
   },
   "summary": {
     "stroke_count": 4,
-    "drawing_length_px": 180.0,
-    "pen_up_distance_px": 114.84
+    "drawing_length_px": 200.35,
+    "pen_up_distance_px": 1082.17
   }
 }
