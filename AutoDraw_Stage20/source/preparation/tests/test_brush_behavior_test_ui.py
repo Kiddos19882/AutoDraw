@@ -702,13 +702,17 @@ def test_game_monitor_radius_mismatch_schedules_automatic_correction(monkeypatch
         "current_point": current, "attempt": 0, "poll_count": 0,
         "observations": [], "await_after_utc": "2026-10-31T00:00:00+00:00",
     }
-    tab._read_live_brush_radius = lambda **kwargs: {
+    observation = {
         "radius": 4, "session_id": "session", "observed_at_utc": "2026-10-31T00:00:01+00:00"
     }
+    tab._read_live_brush_radius = lambda **kwargs: dict(observation)
     tab._start_brush_hotkey_listener = lambda: None
     scheduled = []
     tab._begin_brush_drag = lambda start, x, y, brush: scheduled.append((start, x, y, brush))
 
+    tab._poll_brush_radius_feedback()
+    assert not scheduled  # One heartbeat is not enough to rule out a transient status.
+    observation["observed_at_utc"] = "2026-10-31T00:00:02+00:00"
     tab._poll_brush_radius_feedback()
 
     assert scheduled
