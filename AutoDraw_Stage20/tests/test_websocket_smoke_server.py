@@ -88,6 +88,8 @@ class BridgeRecorderTests(unittest.TestCase):
         self.recorder.event({"type": "DRAW_START", "t": 10, "before": before}, 1.0)
         self.recorder.event({"type": "DRAW_SAMPLE", "t": 20, "strokeId": "s1",
                              "pointDelta": 1, "acceptedPoint": {"x": 10, "y": 10}}, 1.1)
+        self.recorder.event({"type": "DRAW_SAMPLE", "t": 25, "strokeId": "s1",
+                             "pointDelta": 1, "acceptedPoint": {"x": 11, "y": 10}}, 1.15)
         self.recorder.event({"type": "DRAW_END", "t": 30, "strokeId": "s1",
                              "after": after}, 1.2)
         self.recorder.frame_probe({"startedAtPerformanceMs": 10, "endedAtPerformanceMs": 30,
@@ -96,6 +98,9 @@ class BridgeRecorderTests(unittest.TestCase):
         data = json.loads(path.read_text(encoding="utf-8"))
         self.assertEqual(data["chalk"]["status"], "exact")
         self.assertEqual(data["chalk"]["consumed_points"], 52)
+        self.assertEqual(data["sampled_point_delta_total"], 2)
+        self.assertTrue(data["point_delta_matches_chalk"])
+        self.assertEqual(data["stroke_count"], 1)
         self.assertEqual(data["frame_probe"]["stroke_probe_count"], 1)
         self.assertEqual(data["active_drawing_duration_ms"], 20)
 
@@ -186,6 +191,8 @@ class ProductionBridgeIntegrationTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(len(run_files), 1)
                 report = json.loads(run_files[0].read_text(encoding="utf-8"))
                 self.assertEqual(report["chalk"]["consumed_points"], 2)
+                self.assertEqual(report["sampled_point_delta_total"], 0)
+                self.assertIsNone(report["point_delta_matches_chalk"])
                 self.assertEqual(report["execution_status"], "completed")
             finally:
                 server.close()
