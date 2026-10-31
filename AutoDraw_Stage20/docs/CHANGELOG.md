@@ -186,3 +186,14 @@
 - Начальная очистка перед независимым тестом остаётся частью подготовки.
 - Глобальная клавиша аварийной остановки изменена с F12 на Alt (левая и правая Alt) в Brush Test, MouseExecutor, Stage6, Stage2 и калибровочном тесте.
 - Обновлены unit tests. CI и live browser test ещё не запускались.
+
+
+## 2026-10-31 — результаты live board_boundary_probe и исправление анализа
+
+- Добавлены три live-прогона boundary probe: Game Monitor exact CHALK deltas 51, 52 и 52 при радиусе 1; 4/4 штриха в каждом прогоне; errors=0, droppedEvents=0.
+- В каждом эксперименте baseline pointCount=1; после исполнения 52/53/53. Средний расход — 51.67 игровых точки.
+- Конечные POINTER_UP client coordinates соответствуют преобразованным ROI endpoints, но не являются доказательством фактического принятия граничных координат BoardPane.
+- Исправлен stroke visibility analyzer: теперь logical-plan strokes преобразуются в screen-local coordinates по сохранённому screen_transform; добавлены regression tests.
+- Исправлена negative fixture uniform-scale test: non-uniform ROI 646×323 вместо ошибочного uniform ROI 646×338.
+- Paint meter visual estimator остаётся inconclusive; CHALK измеряется по точному Monitor max/less.
+- A/B/C Monitor и повторная визуальная проверка границ ещё не выполнены.
