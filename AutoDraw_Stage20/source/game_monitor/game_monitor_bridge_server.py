@@ -294,6 +294,18 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
         active_connections["count"] += 1
         recorder: RunRecorder | None = None
         last_sequence = 0
+        session_path: Path | None = None
+        session_record: dict | None = None
+
+        def persist_session() -> None:
+            if session_path is not None and session_record is not None:
+                temp_path = session_path.with_suffix(".json.tmp")
+                temp_path.write_text(
+                    json.dumps(session_record, ensure_ascii=False, indent=2) + "\n",
+                    encoding="utf-8",
+                )
+                temp_path.replace(session_path)
+
         try:
             await websocket.send(json.dumps({"type": "ready"}, separators=(",", ":")))
             async for raw in websocket:
@@ -316,12 +328,29 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
                         await websocket.close(code=4002, reason="invalid session id")
                         return
                     recorder = RunRecorder(output_dir / session_id, session_id, idle_seconds)
-                    (output_dir / session_id).mkdir(parents=True, exist_ok=True)
-                    (output_dir / session_id / "session.json").write_text(
-                        json.dumps({"session_id": session_id, "started_at_utc": utc_now(),
-                                    "browser": message.get("browser"), "page": message.get("page"),
-                                    "monitor_status": message.get("monitorStatus")}, ensure_ascii=False, indent=2) + "\n",
-                        encoding="utf-8")
+                    session_dir = output_dir / session_id
+                    session_dir.mkdir(parents=True, exist_ok=True)
+                    session_path = session_dir / "session.json"
+                    session_record = {
+                        "session_id": session_id,
+                        "started_at_utc": utc_now(),
+                        "browser": message.get("browser"),
+                        "page": message.get("page"),
+                        "monitor_status_at_connect": message.get("monitorStatus"),
+                        "bridge_diagnostics": {
+                            "received_message_count": 1,
+                            "received_event_count": 0,
+                            "received_event_types": {},
+                            "last_message_type": "session_start",
+                            "last_sequence": 1,
+                            "last_message_at_utc": utc_now(),
+                            "last_monitor_status": message.get("monitorStatus"),
+                            "browser_bridge": None,
+                            "frame_probe_count": 0,
+                            "connection_closed": False,
+                        },
+                    }
+                    persist_session()
                     continue
                 if recorder is None or message.get("sessionId") != recorder.session_id:
                     await websocket.close(code=4002, reason="unknown session")
@@ -331,11 +360,25 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
                     await websocket.close(code=4002, reason="invalid sequence")
                     return
                 last_sequence = sequence
+                if session_record is not None:
+                    diagnostics = session_record["bridge_diagnostics"]
+                    diagnostics["received_message_count"] += 1
+                    diagnostics["last_message_type"] = msg_type
+                    diagnostics["last_sequence"] = sequence
+                    diagnostics["last_message_at_utc"] = utc_now()
                 if msg_type == "event":
                     event = message.get("event")
                     if not isinstance(event, dict):
                         await websocket.close(code=4002, reason="invalid event")
                         return
+                    if session_record is not None:
+                        diagnostics = session_record["bridge_diagnostics"]
+                        diagnostics["received_event_count"] += 1
+                        event_type = str(event.get("type", "unknown"))
+                        event_types = diagnostics["received_event_types"]
+                        event_types[event_type] = event_types.get(event_type, 0) + 1
+                        diagnostics["last_event_type"] = event_type
+                        diagnostics["last_event_performance_ms"] = event.get("t")
                     try:
                         recorder.event(event, asyncio.get_running_loop().time())
                     except ValueError:
@@ -345,16 +388,28 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
                     status = message.get("monitorStatus")
                     if isinstance(status, dict):
                         recorder.heartbeat(status, asyncio.get_running_loop().time())
+                        if session_record is not None:
+                            session_record["bridge_diagnostics"]["last_monitor_status"] = status
+                    if session_record is not None:
+                        session_record["bridge_diagnostics"]["browser_bridge"] = message.get("bridgeDiagnostics")
                 elif msg_type == "frame_probe":
                     recorder.frame_probe(message)
+                    if session_record is not None:
+                        diagnostics = session_record["bridge_diagnostics"]
+                        diagnostics["frame_probe_count"] += 1
                 else:
                     await websocket.close(code=4002, reason="unsupported message type")
                     return
+                persist_session()
         except (asyncio.TimeoutError, ConnectionClosed):
             pass
         finally:
             if recorder is not None:
                 recorder.finalize("partial")
+            if session_record is not None:
+                session_record["bridge_diagnostics"]["connection_closed"] = True
+                session_record["bridge_diagnostics"]["closed_at_utc"] = utc_now()
+                persist_session()
             active_connections["count"] = max(0, active_connections["count"] - 1)
 
     return handler
