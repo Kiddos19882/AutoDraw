@@ -847,3 +847,8 @@ CI не подтверждает точное совпадение сохран�
 ### Защита от неверного aspect ratio ROI
 
 Bundle показывает, что BoardPane масштабируется равномерно (`scaleX=scaleY`). Поэтому независимые X/Y коэффициенты не должны маскировать ошибочно выделенный ROI. В `brush_coordinate_transform.py` добавлена проверка относительного расхождения `scaleX` и `scaleY`: допуск 1%; при превышении transform прекращается с просьбой повторно выделить точную область доски. В metadata записываются `expected_uniform_scale`, `uniform_scale_relative_error`, `uniform_scale_tolerance`. Тесты обновлены на ROI 646×338 (равномерный масштаб с учётом целочисленных границ) и добавлен negative test для ROI 646×323. Интеграционный fixture также переведён на 646×338.
+
+
+### CI для базовой коррекции 460×240
+
+GitHub Actions run #1142 на коммите `d0c4aee8c4bef75daedfae85ae4403a3a8661ef4` завершился `success`: `geometry-tests`, `executor-tests`, `Windows portable build and startup smoke-test` — все jobs прошли. Это проверяет базовую коррекцию ширины BoardPane на 460 и соответствующий integration handoff. Run #1142 предшествует более позднему boundary probe и guard равномерности ROI; их CI остаётся отдельным ожидаемым подтверждением.
