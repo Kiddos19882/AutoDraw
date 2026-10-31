@@ -76,3 +76,16 @@
 - Проверены 67 относительных Markdown-ссылок в 35 документах, все локальные цели существуют; DOC-014 закрыта.
 - Обновлены TASKS, PROJECT_STATUS и ROADMAP.
 - Код, тесты, UI, benchmarks и сборка не запускались.
+
+
+## 2026-10-31 — INT-003: точный CHALK snapshot и Game Monitor 0.2.0
+
+### Added
+- Добавлены Node.js поведенческие тесты Game Monitor: точность `max-less`, отсутствие обхода `atom.points` в hot path, обработка unavailable и сверка с диагностическим подсчётом.
+- В CI добавлен запуск `node --test` для Game Monitor.
+
+### Changed
+- В игровом bundle статически подтверждены поля `BoardPane.max` и `BoardPane.less`; событие CHALK использует только `percent`, но точные целые значения доступны на экземпляре доски.
+- Game Monitor обновлён с 0.1.2 до 0.2.0: ресурсный snapshot читает `max`/`less` за O(1), а полный обход `atom.points` оставлен только в явном `diagnosticSnapshot()`.
+- Экспорт дополнен текущим `resourceSnapshot`; при отсутствующих/невалидных engine-полях точность не имитируется и array fallback не выполняется.
+- INT-003 остаётся IN_PROGRESS до живой runtime-сверки и A/B-замера FPS/длительности без Monitor и с Monitor.
