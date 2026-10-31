@@ -61,9 +61,9 @@ INT-002 завершена как статическое проектирова�
 
 ## 6. Git-состояние
 
-Рабочая ветка: `feature/image-geometry-optimization`.
+Рабочая ветка: `feature/image-geometry-optimization`. Ветка `master` не изменяется и используется только для чтения игрового bundle.
 
-Последний проверенный кодовый коммит: `d953ed7092f54d49fbe1168cd3d441e2f321fa5c` в `feature/image-geometry-optimization`. Он включает проверку uniform-scale metadata; ранее добавлен сценарий `board_boundary_probe`, а интеграционный fixture приведён к ROI 646×338 с почти равными X/Y масштабами. Run #1142 для базовой коррекции 460×240 завершился success всеми тремя jobs (`geometry-tests`, `executor-tests`, `Windows portable build and startup smoke-test`), но он предшествует добавлению boundary probe и uniform-scale guard. Run #1176 для test-коммита с uniform-scale metadata находится в очереди. Текущий docs HEAD перед этой записью: `37c0c901166404885959f39fb8fc9b7fb6b34f74`. Run #1132 относится к старой ширине 420 и не засчитывается как проверка текущего кода.
+Последний проверенный кодовый HEAD — `0c09d2830bb007b7a9de1cd46e085f779e91d2f3`; его workflow #1224 завершился success по всем трём обязательным jobs. После него созданы документационные коммиты `50dd800`, `5ece51e`, `41ef0e0` и `b414a77`; для них GitHub Actions запустил отдельные runs #1225—#1228, которые на момент этой записи ещё выполняются. До завершения этих runs актуальный HEAD не следует объявлять полностью CI-проверенным.
 
 ## 7. Состояние документации
 
@@ -153,7 +153,7 @@ CI на commit f72 обнаружил ошибочную negative fixture в tes
 
 ## 15. Актуализация состояния после проверки CI — 31 октября 2026 г.
 
-Рабочая ветка `feature/image-geometry-optimization` имеет HEAD `0c09d2830bb007b7a9de1cd46e085f779e91d2f3`. Последний workflow `Geometry planner tests`, run #1224, завершился `completed/success`; все три обязательные jobs прошли: `geometry-tests`, `executor-tests`, `Windows portable build and startup smoke-test`. В `geometry-tests` успешно выполнены проверки синтаксиса Game Monitor, O(1) resource snapshot, локального WebSocket smoke server и набор preparation/geometry tests. Run #1223 также завершился success. Ранние падения #1210—#1213 исправлены последующими коммитами и не являются текущим статусом HEAD.
+Кодовый HEAD перед документационными обновлениями — `0c09d2830bb007b7a9de1cd46e085f779e91d2f3`. Workflow `Geometry planner tests`, run #1224, завершился `completed/success`; все три обязательные jobs прошли: `geometry-tests`, `executor-tests`, `Windows portable build and startup smoke-test`. В `geometry-tests` успешно выполнены проверки синтаксиса Game Monitor, O(1) resource snapshot, локального WebSocket smoke server и набор preparation/geometry tests. Run #1223 также завершился success. Ранние падения #1210—#1213 исправлены последующими коммитами и не являются текущим статусом HEAD.
 
 Три live-прогона `board_boundary_probe` ранее подтвердили точные CHALK deltas 51/52/52 при радиусе 1; визуально границы подтверждены на конкретном ROI 578×301. Старые manifests сохраняют исторический `stroke_visibility_analysis=inconclusive`, поскольку были созданы до исправления analyzer. Нужен новый прогон для автоматического visibility результата.
 
