@@ -1291,7 +1291,6 @@ class BrushBehaviorTestTab:
             "observations": list(feedback.get("observations", [])),
         }
         self.experiment_phases["brush_setup"] = phase
-        self._brush_feedback_state = None
         if self.experiment_dir is not None:
             try:
                 self._write_experiment_manifest()
@@ -1301,6 +1300,7 @@ class BrushBehaviorTestTab:
                     f"Игра подтвердила радиус, но манифест не сохранён: {exc}",
                 )
                 return
+        self._brush_feedback_state = None
         try:
             self.root.deiconify()
             self.root.lift()
