@@ -95,8 +95,11 @@
       });
       unsubscribe = monitor.subscribe(item => {
         if (!ALLOWED_EVENTS.has(item.type)) return;
-        if (item.type === "DRAW_START") startFpsProbe();
-        if (item.type === "DRAW_END" && fpsActive) stopFpsProbe();
+        // BoardPane callbacks are not exposed in every game frame. Pointer
+        // candidates are the explicit fallback lifecycle; startFpsProbe/stopFpsProbe
+        // are idempotent so engine and pointer events cannot double-count probes.
+        if (item.type === "DRAW_START" || item.type === "POINTER_DOWN_CANDIDATE") startFpsProbe();
+        if ((item.type === "DRAW_END" || item.type === "POINTER_UP_CANDIDATE") && fpsActive) stopFpsProbe();
         sentEventCount++;
         lastEventType = item.type;
         lastEventAtPerformanceMs = item.t;
