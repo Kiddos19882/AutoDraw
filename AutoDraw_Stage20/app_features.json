@@ -28,6 +28,9 @@
     "independent-brush-calibration-points-and-regions",
     "persistent-brush-paint-calibration-profile",
     "brush-test-uses-calibrated-board-and-slider",
-    "explicit-brush-control-mode"
+    "explicit-brush-control-mode",
+    "game-monitor-websocket-bridge",
+    "brush-test-websocket-launcher",
+    "brush-test-monitor-snippet-copy"
   ]
 }
