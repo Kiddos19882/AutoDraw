@@ -873,3 +873,14 @@ def test_cross_section_scenario_contains_horizontal_and_vertical_intersections()
     assert len(vertical) == 2
     plan = build_brush_test_drawing_plan("Поперечный профиль и пересечения", (460, 240))
     assert len(plan["strokes"]) == 4
+
+
+
+def test_automated_postdraw_capture_preserves_board_without_clicking_clear() -> None:
+    import inspect
+
+    source = inspect.getsource(brush_ui.BrushBehaviorTestTab._capture_automated_after_draw)
+
+    assert "pyautogui.click" not in source
+    assert "_capture_automated_after_clear" not in source
+    assert '_finish_automated_postdraw(' in source
