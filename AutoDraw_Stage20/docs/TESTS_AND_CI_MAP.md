@@ -220,14 +220,15 @@
 | `source/preparation/tests/test_brush_footprint_geometry.py` | `brush_footprint_geometry` |
 | `source/preparation/tests/test_geometry_execution_adapter.py` | `color_scanline`, `drawing.color_plan_execution`, `geometry_color_plan` |
 | `source/preparation/tests/test_drawing_algorithm_benchmark.py` | `color_scanline`, `drawing_algorithm_benchmark`, `geometry_color_plan` |
-| `source/preparation/tests/test_brush_behavior_test_ui.py` | `brush_behavior_test_ui`, `brush_radius_feedback` |\n| `source/preparation/tests/test_brush_radius_feedback.py` | `brush_radius_feedback` |
+| `source/preparation/tests/test_brush_behavior_test_ui.py` | `brush_behavior_test_ui`, `brush_radius_feedback` |
+| `source/preparation/tests/test_brush_radius_feedback.py` | `brush_radius_feedback` |
 | `source/preparation/tests/test_optimizer_end_to_end.py` | `color_scanline`, `paint_budget_optimizer`, `paint_cost_model`, `palette_quantization` |
 
 ### 2.9. Дополнительный тест Executor — прямые импорты
 
 | Тест | Прямые внутрипроектные импорты |
 |---|---|
-| `source/executor/tests/test_color_plan_execution.py` | `test_execution_hardening` (тестовый helper), `palette_detection`, `palette_profiles`, `color_scanline`, `drawing.color_plan_execution`, `brush_planner`, `geometry_color_plan`, `models`, `drawing.mouse_executor` |
+| `source/executor/tests/test_color_plan_execution.py` | `test_execution_hardening` (тестовый helper), `palette_detection`, `palette_profiles`, `color_scanline`, `drawing.color_plan_execution`, `brush_radius_feedback`, `brush_planner`, `geometry_color_plan`, `models`, `drawing.mouse_executor` |
 
 **Вспомогательный модуль тестов:** `source/executor/path_planning/test_shape.py` импортирует `models.DrawingPlan`, `Point`, `Stroke`; он используется как helper в `test_drawing_plan.py`, а не учитывается как отдельный discovery-тест в таблице выше.
 
