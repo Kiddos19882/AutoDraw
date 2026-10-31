@@ -95,6 +95,10 @@ class RunRecorder:
         self.last_activity = 0.0
         self.last_status: dict | None = None
         self.run_count = 0
+        self.active_stroke_ids: set[str] = set()
+        self.stroke_started_at: dict[str, float] = {}
+        self.observed_stroke_ids: set[str] = set()
+        self.lifecycle_sources: set[str] = set()
 
     def _start(self, event: dict) -> None:
         self.run_count += 1
@@ -113,7 +117,6 @@ class RunRecorder:
             "events": [],
             "frame_probes": [],
             "active_drawing_duration_ms": 0.0,
-            "stroke_started_at_performance_ms": event.get("t"),
             "dropped_events": 0,
             "monitor_errors": [],
             "interpretation": {"chalk_status": "inconclusive",
@@ -144,32 +147,65 @@ class RunRecorder:
         if event.get("type") == "GAME_METHOD_ERROR":
             self.current["monitor_errors"].append(event)
 
+    def _event_stroke_id(self, event: dict) -> str:
+        value = event.get("strokeId")
+        return str(value) if value is not None else f"unidentified-{event.get('t')}"
+
+    def _begin_stroke(self, event: dict, now: float, source: str) -> None:
+        if self.current is not None and now - self.last_activity >= self.idle_seconds:
+            previous_status = "completed" if self.current.get("execution_status") == "completed" else "partial"
+            self.finalize(previous_status)
+        if self.current is None:
+            self._start(event)
+        stroke_id = self._event_stroke_id(event)
+        self.lifecycle_sources.add(source)
+        self.observed_stroke_ids.add(stroke_id)
+        if stroke_id not in self.active_stroke_ids:
+            self.active_stroke_ids.add(stroke_id)
+            if isinstance(event.get("t"), (int, float)):
+                self.stroke_started_at[stroke_id] = event["t"]
+        self.current["execution_status"] = "in_progress"
+        self.last_activity = now
+
+    def _end_stroke(self, event: dict, now: float, source: str) -> None:
+        if self.current is None:
+            return
+        stroke_id = self._event_stroke_id(event)
+        self.lifecycle_sources.add(source)
+        if stroke_id in self.active_stroke_ids:
+            self.active_stroke_ids.remove(stroke_id)
+            started = self.stroke_started_at.pop(stroke_id, None)
+            ended = event.get("t")
+            if isinstance(started, (int, float)) and isinstance(ended, (int, float)):
+                self.current["active_drawing_duration_ms"] += max(0.0, ended - started)
+        if not self.active_stroke_ids:
+            self.current["execution_status"] = "completed"
+            self.current["ended_at_performance_ms"] = event.get("t")
+        self.last_activity = now
+        if isinstance(event.get("after"), dict):
+            self.current["post_test_snapshot"] = event["after"]
+
     def event(self, event: dict, now: float) -> None:
         event_type = event.get("type")
         if event_type not in ALLOWED_TYPES:
             raise ValueError("unsupported event type")
+
         if event_type == "DRAW_START":
-            if self.current is not None and now - self.last_activity >= self.idle_seconds:
-                previous_status = "completed" if self.current.get("execution_status") == "completed" else "partial"
-                self.finalize(previous_status)
-            if self.current is None:
-                self._start(event)
-            else:
-                self.current["execution_status"] = "in_progress"
-                self.current["stroke_started_at_performance_ms"] = event.get("t")
+            self._begin_stroke(event, now, "engine")
+        elif event_type == "POINTER_DOWN_CANDIDATE":
+            self._begin_stroke(event, now, "pointer_observer")
+
         if self.current is not None:
             self._append_event(event)
-        if event_type in {"DRAW_START", "DRAW_START_APPLIED", "DRAW_SAMPLE", "DRAW_END"}:
+
+        if event_type in {"DRAW_START", "DRAW_START_APPLIED", "DRAW_SAMPLE", "DRAW_END",
+                          "POINTER_DOWN_CANDIDATE", "POINTER_UP_CANDIDATE"}:
             self.last_activity = now
-        if event_type == "DRAW_END" and self.current is not None:
-            self.current["execution_status"] = "completed"
-            self.current["ended_at_performance_ms"] = event.get("t")
-            stroke_start = self.current.get("stroke_started_at_performance_ms")
-            if isinstance(stroke_start, (int, float)) and isinstance(event.get("t"), (int, float)):
-                self.current["active_drawing_duration_ms"] += max(0.0, event["t"] - stroke_start)
-            self.current["stroke_started_at_performance_ms"] = None
-            if isinstance(event.get("after"), dict):
-                self.current["post_test_snapshot"] = event["after"]
+
+        if event_type == "DRAW_END":
+            self._end_stroke(event, now, "engine")
+        elif event_type == "POINTER_UP_CANDIDATE":
+            self._end_stroke(event, now, "pointer_observer")
 
     def frame_probe(self, message: dict) -> None:
         if self.current is None:
@@ -212,7 +248,13 @@ class RunRecorder:
         else:
             run["chalk"] = {"status": "inconclusive", "reason": "missing_or_inconsistent_exact_snapshots"}
         accepted = run.get("accepted_points", [])
-        run["stroke_count"] = sum(1 for event in run["events"] if event.get("type") == "DRAW_START")
+        run["stroke_count"] = len(self.observed_stroke_ids)
+        run["stroke_lifecycle_sources"] = sorted(self.lifecycle_sources)
+        run.pop("stroke_started_at_performance_ms", None)
+        self.active_stroke_ids.clear()
+        self.stroke_started_at.clear()
+        self.observed_stroke_ids.clear()
+        self.lifecycle_sources.clear()
         sample_events = [event for event in run["events"] if event.get("type") == "DRAW_SAMPLE"]
         point_deltas = [event.get("pointDelta") for event in sample_events]
         point_delta_complete = bool(sample_events) and all(type(delta) is int and delta >= 0 for delta in point_deltas)
@@ -259,7 +301,6 @@ class RunRecorder:
             run["interpretation"]["path_length_status"] = "monitor_events_dropped"
         if isinstance(run.get("started_at_performance_ms"), (int, float)) and isinstance(run.get("ended_at_performance_ms"), (int, float)):
             run["elapsed_from_first_to_last_stroke_ms"] = max(0.0, run["ended_at_performance_ms"] - run["started_at_performance_ms"])
-        run.pop("stroke_started_at_performance_ms", None)
         run["finished_at_utc"] = utc_now()
         run["event_count"] = len(run["events"])
         run["dropped_events"] += 0
