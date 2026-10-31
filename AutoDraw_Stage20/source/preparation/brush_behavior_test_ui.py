@@ -409,7 +409,8 @@ class BrushBehaviorTestTab:
         self._automated_postdraw_active = False
         self._automated_postdraw_stop_requested = False
         self._automated_postdraw_after_id: str | None = None
-        self.root.bind_all("<F12>", self._on_brush_workflow_stop_key, add="+")
+        self.root.bind_all("<Alt_L>", self._on_brush_workflow_stop_key, add="+")
+        self.root.bind_all("<Alt_R>", self._on_brush_workflow_stop_key, add="+")
         self.screenshot_path: Path | None = None
         self.execution_report_path: Path | None = None
         self.execution_report: dict[str, Any] | None = None
@@ -745,11 +746,11 @@ class BrushBehaviorTestTab:
         )
 
     def _start_brush_hotkey_listener(self) -> None:
-        """Listen for a global F12 during the minimized-window countdown and drag."""
+        """Listen for a global Alt key during the minimized-window countdown and drag."""
         self._stop_brush_hotkey_listener()
 
         def on_press(key):
-            if key == keyboard.Key.f12:
+            if key in (keyboard.Key.alt, keyboard.Key.alt_l, keyboard.Key.alt_r):
                 try:
                     if self._automated_preclear_active:
                         self.root.after(0, self._cancel_automated_preclear)
@@ -848,7 +849,7 @@ class BrushBehaviorTestTab:
             self._finish_brush_drag(error=f"Ошибка перемещения ползунка: {exc}")
 
     def _on_brush_workflow_stop_key(self, _event=None) -> str | None:
-        """F12 cancels a pending/active brush drag; otherwise let the executor handle it."""
+        """Alt cancels a pending/active brush drag; otherwise let the executor handle it."""
         if self._brush_drag_state is not None or self._brush_drag_countdown_id is not None:
             self.cancel_brush_drag()
             return "break"
@@ -864,10 +865,10 @@ class BrushBehaviorTestTab:
                 pass
             self._brush_drag_countdown_id = None
             self._stop_brush_hotkey_listener()
-            self.status_var.set("Установка кисти отменена по F12 до начала перетаскивания.")
+            self.status_var.set("Установка кисти отменена по Alt до начала перетаскивания.")
             self._brush_drag_purpose = "set_brush_size"
             if purpose == "restore_brush_30":
-                self._record_brush_restore_result("stopped", "F12 отменил возврат кисти до начала перетаскивания.")
+                self._record_brush_restore_result("stopped", "Alt отменил возврат кисти до начала перетаскивания.")
                 return
             try:
                 self.root.deiconify()
@@ -902,7 +903,7 @@ class BrushBehaviorTestTab:
             self._start_executor_after_brush_drag = False
             if cancelled or error or release_error:
                 restore_status = "stopped" if cancelled else "failed"
-                detail = "F12 отменил возврат кисти." if cancelled else (error or release_error or "Неизвестная ошибка.")
+                detail = "Alt отменил возврат кисти." if cancelled else (error or release_error or "Неизвестная ошибка.")
             else:
                 restore_status = "drag_completed_unverified"
                 detail = "Жест перетаскивания к позиции кисти 30 завершён; значение необходимо проверить в игре."
@@ -915,7 +916,7 @@ class BrushBehaviorTestTab:
         elif error:
             self.status_var.set(error)
         elif cancelled:
-            self.status_var.set("Перетаскивание кисти остановлено по F12; проверь положение ползунка вручную.")
+            self.status_var.set("Перетаскивание кисти остановлено по Alt; проверь положение ползунка вручную.")
         elif state:
             target_x, target_y = state["target"]
             brush = state["brush"]
@@ -1129,7 +1130,7 @@ class BrushBehaviorTestTab:
             self.experiment_dir.mkdir(parents=True, exist_ok=False)
         self.experiment_phases = {}
         self._automated_preclear_active = True
-        self.status_var.set("Через 3 секунды будет выполнен Clear и проверка пустой доски. F12 отменяет подготовку.")
+        self.status_var.set("Через 3 секунды будет выполнен Clear и проверка пустой доски. Alt отменяет подготовку.")
         self.root.iconify()
         self._start_brush_hotkey_listener()
         self._automated_preclear_after_id = self.root.after(
@@ -1150,14 +1151,14 @@ class BrushBehaviorTestTab:
         if self.experiment_dir is not None:
             self.experiment_phases["before_clear"] = {
                 "status": "stopped",
-                "reason": "F12",
+                "reason": "Alt",
                 "captured_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             }
             try:
                 self._write_experiment_manifest()
             except (OSError, ValueError, TypeError) as exc:
                 self.status_var.set(f"Подготовка остановлена; не удалось записать манифест: {exc}")
-        self.status_var.set("Подготовка теста отменена по F12. Рисование не запускалось; проверь доску вручную.")
+        self.status_var.set("Подготовка теста отменена по Alt. Рисование не запускалось; проверь доску вручную.")
         try:
             self.root.deiconify()
             self.root.lift()
@@ -1627,7 +1628,7 @@ class BrushBehaviorTestTab:
                     "Meter fill is a provisional estimate against the before-draw baseline, not OCR or a direct reading of the game's resource counter.",
                     "Ambiguous or non-contiguous changes are marked inconclusive and require manual review.",
                     "A successful executor report does not prove that every stroke was registered by the game.",
-                    "The after-clear phase clicks Clear only after explicit confirmation.",
+                    "The automated post-draw workflow does not click Clear; the drawing remains on the board for manual inspection.",
                     "Board-clear status is confirmed only against a separately captured, user-confirmed blank-board ROI; missing/mismatched reference means inconclusive.",
                 ],
             }
@@ -1651,7 +1652,7 @@ class BrushBehaviorTestTab:
             self.root.lift()
 
     def _cancel_automated_postdraw(self) -> None:
-        """Stop future post-draw actions and persist partial evidence on global F12."""
+        """Stop future post-draw actions and persist partial evidence on global Alt."""
         if not self._automated_postdraw_active:
             return
         self._automated_postdraw_active = False
@@ -1664,16 +1665,16 @@ class BrushBehaviorTestTab:
         self._stop_brush_hotkey_listener()
         self.experiment_phases.setdefault("postdraw_workflow", {}).update({
             "status": "stopped",
-            "reason": "F12",
+            "reason": "Alt",
             "captured_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-            "note": "No later automatic action was started after F12.",
+            "note": "No later automatic action was started after Alt.",
         })
         try:
             self._write_experiment_manifest()
         except (OSError, ValueError, TypeError) as exc:
-            self.status_var.set(f"Постэтап остановлен F12; не удалось сохранить манифест: {exc}")
+            self.status_var.set(f"Постэтап остановлен Alt; не удалось сохранить манифест: {exc}")
         else:
-            self.status_var.set("Постэтап остановлен по F12. Новые действия не запускаются; проверь доску и кисть вручную.")
+            self.status_var.set("Постэтап остановлен по Alt. Новые действия не запускаются; проверь доску и кисть вручную.")
         try:
             self.root.deiconify()
             self.root.lift()
@@ -1681,7 +1682,7 @@ class BrushBehaviorTestTab:
             pass
 
     def _start_automated_postdraw(self) -> None:
-        """Capture the completed drawing, then clear and verify the board asynchronously."""
+        """Capture the completed drawing and preserve the board for manual inspection."""
         if self.experiment_dir is None:
             self.status_var.set("Постэтап пропущен: каталог эксперимента отсутствует.")
             return
@@ -1695,7 +1696,7 @@ class BrushBehaviorTestTab:
             return
         self._automated_postdraw_active = True
         self._automated_postdraw_stop_requested = False
-        self.status_var.set("Исполнение завершено. Через 2 секунды сохраняется результат, затем будет проверена очистка. F12 отменяет дальнейшие действия.")
+        self.status_var.set("Исполнение завершено. Через 2 секунды сохраняется результат; доска останется без очистки. Alt отменяет дальнейшие действия.")
         self.root.iconify()
         self._start_brush_hotkey_listener()
         self._automated_postdraw_after_id = self.root.after(
@@ -1798,49 +1799,10 @@ class BrushBehaviorTestTab:
             if self._automated_postdraw_stop_requested or not self._automated_postdraw_active:
                 self._cancel_automated_postdraw()
                 return
-            points = config.get("points")
-            points = points if isinstance(points, dict) else {}
-            statuses = config.get("status")
-            statuses = statuses if isinstance(statuses, dict) else {}
-            point_status = statuses.get("points")
-            point_status = point_status if isinstance(point_status, dict) else {}
-            clear_point = points.get("clear_board")
-            if not isinstance(clear_point, dict) or point_status.get("clear_board") == "needs_review":
-                raise ValueError("Координата Clear отсутствует или требует повторной проверки.")
-            reference_path, metadata_path = self._blank_board_reference_paths()
-            metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
-            region = config.get("regions", {}).get("board_area", {})
-            current_region = {key: int(region[key]) for key in ("x", "y", "width", "height")}
-            if (
-                metadata.get("reference_type") != "user_confirmed_blank_board_roi"
-                or metadata.get("user_confirmed_blank") is not True
-                or metadata.get("board_region") != current_region
-                or metadata.get("screen_size") != {"width": screen.width, "height": screen.height}
-                or not reference_path.is_file()
-            ):
-                raise ValueError("Эталон пустой доски отсутствует или не соответствует профилю.")
-            with Image.open(reference_path) as reference:
-                if reference.size != (current_region["width"], current_region["height"]):
-                    raise ValueError("Размер эталона не совпадает с ROI доски.")
-            self.experiment_phases["postdraw_workflow"] = {
-                "status": "after_draw_captured",
-                "clear_click_sent": False,
-                "captured_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-            }
-            self._write_experiment_manifest()
-            if self._automated_postdraw_stop_requested or not self._automated_postdraw_active:
-                self._cancel_automated_postdraw()
-                return
-            pyautogui.click(int(clear_point["x"]), int(clear_point["y"]))
-            self.experiment_phases["postdraw_workflow"]["clear_click_sent"] = True
-            self.experiment_phases["postdraw_workflow"]["status"] = "clear_requested"
-            self._write_experiment_manifest()
-            if self._automated_postdraw_stop_requested or not self._automated_postdraw_active:
-                self._cancel_automated_postdraw()
-                return
-            self.status_var.set("Результат сохранён; Clear нажат. Через 1,5 секунды проверяется пустая доска.")
-            self._automated_postdraw_after_id = self.root.after(
-                1500, lambda: self._capture_automated_after_clear(config, reference_path, metadata)
+            self._finish_automated_postdraw(
+                "completed",
+                "Результат сохранён; автоматическая очистка отключена, рисунок оставлен на доске.",
+                restore_brush=True,
             )
         except Exception as exc:
             self._finish_automated_postdraw("failed", f"Не удалось сохранить результат или начать проверенную очистку: {exc}")
@@ -1945,7 +1907,7 @@ class BrushBehaviorTestTab:
                 self._write_experiment_manifest()
                 self.status_var.set(
                     f"Постэтап: {status}. {self._postdraw_final_reason} Возврат кисти к 30 запланирован; "
-                    "переключись в браузер и не трогай мышь 3 секунды. F12 отменяет перетаскивание."
+                    "переключись в браузер и не трогай мышь 3 секунды. Alt отменяет перетаскивание."
                 )
                 return
             except Exception as exc:
@@ -1983,7 +1945,7 @@ class BrushBehaviorTestTab:
         self._brush_drag_purpose = "restore_brush_30"
         self.status_var.set(
             f"Через 3 секунды кисть будет перетащена с позиции радиуса {requested_brush} к радиусу 30. "
-            "Переключись в браузер и не трогай мышь. F12 отменяет действие."
+            "Переключись в браузер и не трогай мышь. Alt отменяет действие."
         )
         self.root.iconify()
         self._start_brush_hotkey_listener()
@@ -2048,7 +2010,7 @@ class BrushBehaviorTestTab:
             return
         details = self._postdraw_final_reason
         if restore_status == "stopped":
-            details += " Возврат кисти отменён по F12; выставь 30 вручную."
+            details += " Возврат кисти отменён по Alt; выставь 30 вручную."
         elif restore_status == "failed":
             details += " Автоматический возврат кисти не завершён; выставь 30 вручную."
         elif restore_status is None:
