@@ -313,6 +313,9 @@
       }
 
       const after = resourceSnapshot(board);
+      const resourceChanged = before.maxPoints !== after.maxPoints ||
+        before.remainingPoints !== after.remainingPoints ||
+        before.validationStatus !== after.validationStatus;
       if (name === "onDrawing") {
         sampleActiveStroke("onDrawing_wrapper");
       } else if (name === "onDrawStart") {
@@ -324,7 +327,10 @@
         state.activeStrokeId = null;
       } else if (name === "setRadius") {
         emit("BRUSH_CHANGE_APPLIED", { before, after });
-      } else if (name === "updateLess") {
+      } else if (name === "updateLess" && resourceChanged) {
+        // updateLess() can run on every ENTER_FRAME even when pushPoint()
+        // rejects a duplicate coordinate. Do not log a quota event if max/less
+        // did not change.
         emit("POINT_QUOTA_UPDATE", { before, after, args: args.slice(0, 3).map(safeValue) });
       }
       if (previousStroke && !state.activeStrokeId && name !== "onDrawingEnd") state.activeStrokeId = previousStroke;
