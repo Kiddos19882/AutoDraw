@@ -888,9 +888,8 @@ def test_automated_postdraw_capture_preserves_board_without_clicking_clear() -> 
 
 def test_logical_plan_strokes_are_transformed_for_screenshot_roi() -> None:
     plan = build_brush_test_drawing_plan(
-        brush_value=1,
-        test_case="board_boundary_probe",
-        canvas_area={"x": 0, "y": 0, "width": 460, "height": 240},
+        "Проверка границ доски", (460, 240),
+        coordinate_system="logical_board_pixels",
     )
     plan["generation"]["screen_transform"] = {
         "logical_board": {"width": 460, "height": 240},
@@ -907,9 +906,8 @@ def test_logical_plan_strokes_are_transformed_for_screenshot_roi() -> None:
 
 def test_logical_plan_visibility_rejects_screenshot_roi_mismatch() -> None:
     plan = build_brush_test_drawing_plan(
-        brush_value=1,
-        test_case="board_boundary_probe",
-        canvas_area={"x": 0, "y": 0, "width": 460, "height": 240},
+        "Проверка границ доски", (460, 240),
+        coordinate_system="logical_board_pixels",
     )
     plan["generation"]["screen_transform"] = {
         "logical_board": {"width": 460, "height": 240},
