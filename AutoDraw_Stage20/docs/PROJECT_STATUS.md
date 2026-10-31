@@ -169,3 +169,16 @@ Game Monitor обновлён с 0.2.0 до 0.2.1. `DRAW_SAMPLE` теперь в
 Проверяемый кодовый HEAD: `32a3fdb35d95b15ca64c1bb4c7f404904ffc23e8`. Workflow #1238 выполняется; на момент записи успешно завершились `node --check`, Node.js tests Game Monitor и WebSocket smoke-server tests. Executor tests, geometry suite и Windows portable build/startup smoke-test ещё не завершены. Не объявлять полный CI успешным до завершения всех трёх jobs.
 
 Новый Monitor 0.2.1 даёт данные для повторной live-проверки границ: сверять `acceptedPoint` с логическими x=0/460 и y=0/240, отдельно контролировать `pointDelta`. A/B/C обновляется до Monitor off / 0.1.2 / 0.2.1. Без пользовательской Firefox/игровой сессии эти live gates остаются незавершёнными; production bridge нельзя объявлять работающим до реального browser smoke test.
+
+
+## 17. Game Monitor 0.2.1: CI подтверждён на актуальном HEAD — 31 октября 2026 г.
+
+Актуальная вершина рабочей ветки: `354ff64802a8065aff19f17176c2ea3e65ff4bbc` (`docs(game-monitor): align README with 0.2.1 telemetry`). GitHub Actions workflow `Geometry planner tests`, run #1241 (`41212496267`), завершился `completed/success`. Все три обязательные jobs прошли:
+
+- `geometry-tests` — success: синтаксис Game Monitor, O(1) resource snapshot, локальный WebSocket smoke server, анализ игрового bundle, Stage 5/7/8 benchmarks, synthetic geometry, fallback/outline-first comparison, preparation/geometry и unified-app UI regressions;
+- `executor-tests` — success;
+- `Windows portable build and startup smoke-test` — success.
+
+Это подтверждает автоматические проверки и portable build на указанном HEAD. Это не подтверждает соединение из реального Firefox iframe с localhost, отсутствие overhead в живой игре, точность свежего boundary probe или корректность production bridge.
+
+Game Monitor 0.2.1 остаётся текущей версией. INT-003 остаётся IN_PROGRESS: необходимы live Firefox transport smoke test, A/B/C Monitor off / 0.1.2 / 0.2.1, повторный boundary probe с проверкой `acceptedPoint`, затем полная матрица кистей и экспериментальная модель CHALK. Production bridge не реализовывать до успешного browser transport smoke test.
