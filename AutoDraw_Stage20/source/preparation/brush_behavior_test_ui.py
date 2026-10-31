@@ -29,6 +29,68 @@ from brush_experiment_capture import (
 # Verified against the master game bundle: Graphics.lineStyle receives atom.radius directly.
 MAX_BRUSH_LINE_WIDTH_LOGICAL_PX = 30;
 
+
+def _screen_local_strokes_for_capture(
+    plan: dict[str, Any],
+    board_size: tuple[int, int],
+) -> tuple[list[dict[str, Any]] | None, str | None]:
+    """Return expected strokes in screenshot-ROI pixels, using saved logical transform."""
+    strokes = plan.get("strokes")
+    if not isinstance(strokes, list):
+        return None, "drawing_plan_has_no_strokes"
+    canvas = plan.get("canvas")
+    if not isinstance(canvas, dict):
+        return None, "drawing_plan_has_no_canvas"
+    try:
+        canvas_size = (int(canvas.get("width", -1)), int(canvas.get("height", -1)))
+    except (TypeError, ValueError):
+        return None, "drawing_plan_canvas_dimensions_invalid"
+    if canvas_size == board_size:
+        return strokes, None
+
+    if plan.get("coordinate_system") != "logical_board_pixels":
+        return None, "drawing_plan_canvas_dimensions_mismatch"
+    generation = plan.get("generation")
+    transform = generation.get("screen_transform") if isinstance(generation, dict) else None
+    if not isinstance(transform, dict):
+        return None, "drawing_plan_canvas_dimensions_mismatch"
+    roi = transform.get("screen_roi")
+    logical_board = transform.get("logical_board")
+    if not isinstance(roi, dict) or not isinstance(logical_board, dict):
+        return None, "drawing_plan_screen_transform_missing"
+    try:
+        roi_size = (int(roi.get("width", -1)), int(roi.get("height", -1)))
+        logical_size = (int(logical_board.get("width", -1)), int(logical_board.get("height", -1)))
+        scale_x = float(transform["scale_x"])
+        scale_y = float(transform["scale_y"])
+    except (KeyError, TypeError, ValueError):
+        return None, "drawing_plan_screen_transform_invalid"
+    if roi_size != board_size:
+        return None, "drawing_plan_screen_transform_roi_mismatch"
+    if logical_size != canvas_size or scale_x <= 0 or scale_y <= 0:
+        return None, "drawing_plan_screen_transform_invalid"
+
+    screen_strokes: list[dict[str, Any]] = []
+    for stroke in strokes:
+        if not isinstance(stroke, dict) or not isinstance(stroke.get("points"), list):
+            return None, "drawing_plan_strokes_invalid"
+        screen_stroke = dict(stroke)
+        screen_points: list[dict[str, Any]] = []
+        for point in stroke["points"]:
+            if not isinstance(point, dict):
+                return None, "drawing_plan_points_invalid"
+            try:
+                x, y = float(point["x"]), float(point["y"])
+            except (KeyError, TypeError, ValueError):
+                return None, "drawing_plan_points_invalid"
+            screen_point = dict(point)
+            screen_point["x"] = x * scale_x
+            screen_point["y"] = y * scale_y
+            screen_points.append(screen_point)
+        screen_stroke["points"] = screen_points
+        screen_strokes.append(screen_stroke)
+    return screen_strokes, None
+
 TEST_CASES: dict[str, dict[str, Any]] = {
     "Расход краски — серия длинных линий": {
         "id": "paint_consumption_long_lines",
@@ -1538,32 +1600,30 @@ class BrushBehaviorTestTab:
                             current_board = after_image.convert("RGB")
                             if reference.size != current_board.size:
                                 visibility["reason"] = "reference_board_dimensions_mismatch"
-                            elif (
-                                isinstance(self.current_plan.get("canvas"), dict)
-                                and (
-                                    int(self.current_plan["canvas"].get("width", -1)) != current_board.width
-                                    or int(self.current_plan["canvas"].get("height", -1)) != current_board.height
-                                )
-                            ):
-                                visibility["reason"] = "drawing_plan_canvas_dimensions_mismatch"
                             else:
-                                try:
-                                    brush_value = int(
-                                        self._experiment_requested_brush
-                                        if self._experiment_requested_brush is not None
-                                        else self.brush_var.get().strip()
-                                    )
-                                except (TypeError, ValueError):
-                                    brush_value = 1
-                                visibility = measure_stroke_visibility(
-                                    reference,
-                                    current_board,
-                                    self.current_plan["strokes"],
-                                    padding_px=max(2, brush_value + 1),
+                                capture_strokes, transform_error = _screen_local_strokes_for_capture(
+                                    self.current_plan, current_board.size
                                 )
-                                visibility["reference_file"] = reference_path.name
-                                visibility["padding_px"] = max(2, brush_value + 1)
-                                visibility["requested_brush_value"] = brush_value
+                                if transform_error:
+                                    visibility["reason"] = transform_error
+                                else:
+                                    try:
+                                        brush_value = int(
+                                            self._experiment_requested_brush
+                                            if self._experiment_requested_brush is not None
+                                            else self.brush_var.get().strip()
+                                        )
+                                    except (TypeError, ValueError):
+                                        brush_value = 1
+                                    visibility = measure_stroke_visibility(
+                                        reference,
+                                        current_board,
+                                        capture_strokes or [],
+                                        padding_px=max(2, brush_value + 1),
+                                    )
+                                    visibility["reference_file"] = reference_path.name
+                                    visibility["padding_px"] = max(2, brush_value + 1)
+                                    visibility["requested_brush_value"] = brush_value
                 except (OSError, ValueError, TypeError, KeyError, json.JSONDecodeError) as exc:
                     visibility["status"] = "inconclusive"
                     visibility["reason"] = "reference_or_plan_analysis_failed"
@@ -1761,33 +1821,33 @@ class BrushBehaviorTestTab:
                     with Image.open(reference_path) as reference_image, Image.open(board_path) as after_image:
                         reference = reference_image.convert("RGB")
                         current_board = after_image.convert("RGB")
-                        canvas = self.current_plan.get("canvas")
                         if reference.size != current_board.size:
                             visibility["reason"] = "reference_board_dimensions_mismatch"
-                        elif isinstance(canvas, dict) and (
-                            int(canvas.get("width", -1)) != current_board.width
-                            or int(canvas.get("height", -1)) != current_board.height
-                        ):
-                            visibility["reason"] = "drawing_plan_canvas_dimensions_mismatch"
                         else:
-                            try:
-                                brush_value = int(
-                                    self._experiment_requested_brush
-                                    if self._experiment_requested_brush is not None
-                                    else self.brush_var.get().strip()
-                                )
-                            except (TypeError, ValueError):
-                                brush_value = 1
-                            padding_px = max(2, brush_value + 1)
-                            visibility = measure_stroke_visibility(
-                                reference, current_board, self.current_plan["strokes"],
-                                padding_px=padding_px,
+                            capture_strokes, transform_error = _screen_local_strokes_for_capture(
+                                self.current_plan, current_board.size
                             )
-                            visibility.update({
-                                "reference_file": reference_path.name,
-                                "padding_px": padding_px,
-                                "requested_brush_value": brush_value,
-                            })
+                            if transform_error:
+                                visibility["reason"] = transform_error
+                            else:
+                                try:
+                                    brush_value = int(
+                                        self._experiment_requested_brush
+                                        if self._experiment_requested_brush is not None
+                                        else self.brush_var.get().strip()
+                                    )
+                                except (TypeError, ValueError):
+                                    brush_value = 1
+                                padding_px = max(2, brush_value + 1)
+                                visibility = measure_stroke_visibility(
+                                    reference, current_board, capture_strokes or [],
+                                    padding_px=padding_px,
+                                )
+                                visibility.update({
+                                    "reference_file": reference_path.name,
+                                    "padding_px": padding_px,
+                                    "requested_brush_value": brush_value,
+                                })
             except (OSError, ValueError, TypeError, KeyError, json.JSONDecodeError) as exc:
                 visibility = {
                     "status": "inconclusive",
