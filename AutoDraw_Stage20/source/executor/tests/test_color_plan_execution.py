@@ -289,6 +289,7 @@ class ColorPlanExecutionTests(unittest.TestCase):
             {"radius": 7, "observed_at_utc": "2026-10-31T00:00:00+00:00"},
             {"radius": 20, "observed_at_utc": "2026-10-31T00:00:01+00:00"},
             {"radius": 20, "observed_at_utc": "2026-10-31T00:00:02+00:00"},
+            {"radius": 20, "observed_at_utc": "2026-10-31T00:00:03+00:00"},
         ])
         controller = BrushSliderController(
             calibration,
