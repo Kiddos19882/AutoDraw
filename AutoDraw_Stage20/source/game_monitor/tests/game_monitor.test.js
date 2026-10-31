@@ -357,3 +357,19 @@ test("DRAW_SAMPLE exposes multi-point deltas so skipped intermediate samples are
   assert.equal(sample.acceptedPoint.y, 9);
   monitor.stop();
 });
+
+
+test("subscribe streams emitted monitor events and unsubscribe stops delivery", () => {
+  const { monitor } = createMonitor();
+  const { board } = createBoard();
+  const received = [];
+  const unsubscribe = monitor.subscribe(event => received.push(event));
+  monitor.attach(board);
+  board.onDrawStart();
+  assert.ok(received.some(event => event.type === "DRAW_START"));
+  const countBeforeUnsubscribe = received.length;
+  unsubscribe();
+  board.onDrawingEnd();
+  assert.equal(received.length, countBeforeUnsubscribe);
+  monitor.stop();
+});
