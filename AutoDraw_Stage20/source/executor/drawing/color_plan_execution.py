@@ -493,6 +493,7 @@ class BrushSliderController:
                 f"Размер кисти {value} вне диапазона {self.calibration.min_value}–{self.calibration.max_value}."
             )
         if self.current_value == value:
+            self.validate()
             return f"Кисть {value} уже выбрана."
         self.validate()
 
