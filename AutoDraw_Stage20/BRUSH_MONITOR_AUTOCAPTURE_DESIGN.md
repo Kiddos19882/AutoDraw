@@ -391,3 +391,36 @@ fbcd2b1b начался в 18:52:11 UTC, уже после executor. Он сод
 ### Реализация
 
 brush_behavior_test_ui.select_execution_monitor_run() выполняет строгую временную/радиусную/штриховую корреляцию и отказывается от неоднозначного выбора. is_exact_positive_chalk_measurement() отдельно проверяет положительную согласованную дельту. Ручные действия не добавляются в TEST_CASES и не включаются в автоматическую матрицу.
+
+
+
+## 19. Подтверждённый live-прогон после исправления корреляции
+
+Артефакты добавлены коммитами:
+- a552e5d2a0ea8288e6db1d7f784495ae84e097cb — experiment, execution report, план и screenshots;
+- 7d2ce8e53409d9e3faa6b6246de3e3e8ca79b4a4 — WebSocket session и Game Monitor run.
+
+Эксперимент: paint_consumption_long_lines, запрошенный и подтверждённый радиус 1. Executor выполнил 6/6 горизонтальных тестовых штрихов за 29.984 s, 1524 move calls. Game Monitor привязал run 570ec65b в интервале 19:19:06.367–19:19:34.416 UTC.
+
+Измерение:
+- pre pointCount = 1;
+- post pointCount = 719;
+- exact CHALK = 718;
+- сумма sampled pointDelta = 718;
+- point_delta_matches_chalk = true;
+- 6 штрихов, observed_brush_radii = [1], brush_radius_status = single;
+- 1454 события в целевом run, dropped_events = 0, monitor_dropped_events = 0, monitor_error_count = 0;
+- frame probe measured: 60.0 average FPS, 60.024 median FPS, 1452 frame samples, visibility_interruption=false;
+- остаток ресурса: 5281 из 6000.
+
+Это первое подтверждённое измерение, где executor report и Game Monitor report согласованы по времени, числу штрихов, радиусу и расходу CHALK. Расход 718 относится только к кисти радиуса 1 и именно к данному тестовому шаблону; он не является универсальной формулой для других радиусов или геометрий.
+
+Ограничение траектории остаётся: trajectory.status=incomplete_until_verified, поскольку coalesced pointDelta не гарантирует наличие всех промежуточных координат. Нижняя оценка наблюдённой длины сегментов 2436 px не должна подменять точный расход CHALK.
+
+### Завершение WebSocket-сессии
+
+Session be40944f-523f-49b1-ba87-5af1875185d0 закрыта штатно в 19:19:41.104 UTC. Сервер получил 1831 сообщение и 1750 событий; browser bridge отправил 1750 событий, sendFailureCount=0. В session указаны connection_closed=true, dropped/errors=0.
+
+После основного рисования зафиксирован отдельный короткий run 2984ccc8 (19:19:36.719–19:19:41.091 UTC): pointer activity при восстановлении ползунка кисти, наблюдаемые значения радиуса 1–30, 0 pointDelta и 0 CHALK. Он начался после целевого executor и не входит в experiment. Другие короткие runs до executor также не были привязаны к experiment. Ручные линии и дополнительные рисовальные сценарии не добавлялись.
+
+Визуальный анализ после теста обнаружил изменения во всех шести ROI штрихов, но paint-meter image heuristic осталась inconclusive (low confidence). Она не заменяет внутренний счётчик Game Monitor.
