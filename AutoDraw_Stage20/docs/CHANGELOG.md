@@ -146,3 +146,7 @@
 ### Validation boundary
 - CI runs созданы, окончательный результат ожидается.
 - Live-проверка координат и границ в браузерной игре ещё не выполнена; полная CHALK-матрица остаётся заблокированной до этой проверки.
+
+
+### Fixed — сохранение исходного logical-плана
+- Общий stage8 save_plan нормализует coordinate_system в local_canvas_pixels; Brush Test теперь сохраняет исходный logical_board_pixels JSON напрямую, а Stage6 runtime-копия по-прежнему проходит нормализацию в local_canvas_pixels.
