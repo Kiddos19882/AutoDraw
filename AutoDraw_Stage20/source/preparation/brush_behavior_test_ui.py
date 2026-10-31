@@ -575,7 +575,9 @@ class BrushBehaviorTestTab:
         self.last_record_path: Path | None = None
         self.brush_var = tk.StringVar(value="7")
         self.case_var = tk.StringVar(value=next(iter(TEST_CASES)))
-        self.matrix_series_var = tk.StringVar(value=f"chalk-{datetime.now().strftime('%Y%m%d-%H%M%S')}")
+        self.matrix_series_var = tk.StringVar(
+            value=f"chalk-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:6]}"
+        )
         self.matrix_block_var = tk.StringVar(value="1")
         self._chalk_matrix_metadata: dict[str, Any] | None = None
         self._experiment_id: str | None = None
