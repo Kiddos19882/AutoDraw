@@ -119,6 +119,20 @@ class BridgeRecorderTests(unittest.TestCase):
         self.recorder.heartbeat({}, 4.0)
         self.assertIsNone(self.recorder.current)
 
+
+    def test_new_stroke_reopens_run_until_its_draw_end(self):
+        before = {"maxPoints": 6000, "remainingPoints": 6000, "pointCount": 0, "isExact": True}
+        self.recorder.event({"type": "DRAW_START", "t": 1, "before": before}, 1.0)
+        self.recorder.event({"type": "DRAW_END", "t": 2, "after": before}, 1.1)
+        self.recorder.event({"type": "DRAW_START", "t": 3, "before": before}, 1.2)
+        self.assertEqual(self.recorder.current["execution_status"], "in_progress")
+        self.recorder.heartbeat({"droppedEvents": 0, "errors": 0}, 4.0)
+        self.assertIsNone(self.recorder.current)
+        files = list(self.output.glob("game-monitor-run-*.json"))
+        self.assertEqual(len(files), 1)
+        data = json.loads(files[0].read_text(encoding="utf-8"))
+        self.assertEqual(data["execution_status"], "partial")
+
     def test_snapshot_validation_and_frame_summary(self):
         self.assertTrue(exact_snapshot({"maxPoints": 10, "remainingPoints": 8, "pointCount": 2, "isExact": True}))
         self.assertFalse(exact_snapshot({"maxPoints": 10, "remainingPoints": 8, "pointCount": 3, "isExact": True}))
