@@ -267,6 +267,9 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
         if not isinstance(candidate, str) or not hmac.compare_digest(token, candidate):
             await websocket.close(code=4003, reason="authentication failed")
             return
+        if active_connections["count"]:
+            await websocket.close(code=4008, reason="bridge already has an active browser")
+            return
         active_connections["count"] += 1
         await websocket.send(json.dumps({"type": "ready"}, separators=(",", ":")))
         recorder: RunRecorder | None = None
@@ -281,6 +284,9 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
                 if msg_type == "session_start":
                     if recorder is not None:
                         await websocket.close(code=4002, reason="duplicate session_start")
+                        return
+                    if message.get("sequence") != 1:
+                        await websocket.close(code=4002, reason="invalid initial sequence")
                         return
                     session_id = message.get("sessionId")
                     try:
@@ -309,7 +315,11 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
                     if not isinstance(event, dict):
                         await websocket.close(code=4002, reason="invalid event")
                         return
-                    recorder.event(event, asyncio.get_running_loop().time())
+                    try:
+                        recorder.event(event, asyncio.get_running_loop().time())
+                    except ValueError:
+                        await websocket.close(code=4002, reason="unsupported game event")
+                        return
                 elif msg_type == "heartbeat":
                     status = message.get("monitorStatus")
                     if isinstance(status, dict):
@@ -334,7 +344,7 @@ async def run_server(origin: str, port: int, output_dir: Path, idle_seconds: flo
     print(f"Listening only on ws://{HOST}:{port}")
     print(f"Allowed game Origin: {origin}")
     print(f"Output directory: {output_dir.resolve()}")
-    print("One-time session token (keep local; do not share):")
+    print("Session token (keep local; do not share):")
     print(token)
     bridge_path = Path(__file__).with_name("game_monitor_bridge.js")
     snippet = bridge_path.read_text(encoding="utf-8").replace("__AUTODRAW_BRIDGE_TOKEN__", token)
