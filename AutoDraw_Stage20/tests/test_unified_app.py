@@ -133,7 +133,7 @@ class UnifiedAppCoreTests(unittest.TestCase):
             source_path = Path(temp) / "logical-brush-plan.json"
             source_path.write_text(json.dumps({
                 "coordinate_system": "logical_board_pixels",
-                "canvas": {"width": 420, "height": 240},
+                "canvas": {"width": 460, "height": 240},
                 "strokes": [{
                     "name": "logical line",
                     "points": [{"x": 20, "y": 20}, {"x": 420, "y": 20}],
@@ -155,7 +155,7 @@ class UnifiedAppCoreTests(unittest.TestCase):
             app.executor.area = TargetArea(x=100, y=80, width=646, height=323)
             from brush_behavior_test_ui import build_brush_test_drawing_plan
             plan = build_brush_test_drawing_plan(
-                "Горизонтальные линии", (420, 240), coordinate_system="logical_board_pixels"
+                "Горизонтальные линии", (460, 240), coordinate_system="logical_board_pixels"
             )
             with tempfile.TemporaryDirectory(prefix="AutoDraw brush test ") as temp:
                 app.data_paths["runtime"] = Path(temp) / "runtime"
@@ -170,7 +170,7 @@ class UnifiedAppCoreTests(unittest.TestCase):
                     runtime_plan = json.loads(runtime_plan_path.read_text(encoding="utf-8"))
                     self.assertEqual(runtime_plan["coordinate_system"], "local_canvas_pixels")
                     self.assertEqual(runtime_plan["canvas"], {"width": 646, "height": 323})
-                    self.assertAlmostEqual(runtime_plan["strokes"][0]["points"][0]["x"], 20 * 645 / 420)
+                    self.assertAlmostEqual(runtime_plan["strokes"][0]["points"][0]["x"], 20 * 645 / 460)
                     self.assertAlmostEqual(runtime_plan["strokes"][0]["points"][0]["y"], 20 * 322 / 240)
                     source_plan = json.loads(source_path.read_text(encoding="utf-8"))
                     self.assertEqual(source_plan["coordinate_system"], "logical_board_pixels")
