@@ -884,3 +884,39 @@ def test_automated_postdraw_capture_preserves_board_without_clicking_clear() -> 
     assert "pyautogui.click" not in source
     assert "_capture_automated_after_clear" not in source
     assert '_finish_automated_postdraw(' in source
+
+
+def test_logical_plan_strokes_are_transformed_for_screenshot_roi() -> None:
+    plan = build_brush_test_drawing_plan(
+        brush_value=1,
+        test_case="board_boundary_probe",
+        canvas_area={"x": 0, "y": 0, "width": 460, "height": 240},
+    )
+    plan["generation"]["screen_transform"] = {
+        "logical_board": {"width": 460, "height": 240},
+        "screen_roi": {"x": 563, "y": 253, "width": 578, "height": 301},
+        "scale_x": 577 / 460,
+        "scale_y": 300 / 240,
+    }
+    strokes, error = brush_ui._screen_local_strokes_for_capture(plan, (578, 301))
+    assert error is None
+    assert strokes is not None
+    assert strokes[0]["points"][-1]["x"] == pytest.approx(577.0)
+    assert strokes[2]["points"][-1]["y"] == pytest.approx(300.0)
+
+
+def test_logical_plan_visibility_rejects_screenshot_roi_mismatch() -> None:
+    plan = build_brush_test_drawing_plan(
+        brush_value=1,
+        test_case="board_boundary_probe",
+        canvas_area={"x": 0, "y": 0, "width": 460, "height": 240},
+    )
+    plan["generation"]["screen_transform"] = {
+        "logical_board": {"width": 460, "height": 240},
+        "screen_roi": {"x": 563, "y": 253, "width": 578, "height": 301},
+        "scale_x": 577 / 460,
+        "scale_y": 300 / 240,
+    }
+    strokes, error = brush_ui._screen_local_strokes_for_capture(plan, (553, 301))
+    assert strokes is None
+    assert error == "drawing_plan_screen_transform_roi_mismatch"
