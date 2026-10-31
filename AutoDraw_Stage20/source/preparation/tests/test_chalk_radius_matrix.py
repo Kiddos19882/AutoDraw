@@ -23,10 +23,16 @@ def _manifest(radius=5, block=1, run_id="run-1", consumed=100):
         "monitor_capture": {
             "status": "saved", "run_id": run_id, "stroke_count": 6,
             "expected_stroke_count": 6, "experiment_id": f"exp-{block}-{radius}",
+            "chalk_radius_matrix": build_chalk_radius_matrix_metadata(
+                series_id="matrix-test", block=block, requested_radius=radius
+            ),
         },
         "game_monitor_summary": {
             "run_id": run_id,
             "autodraw_experiment_id": f"exp-{block}-{radius}",
+            "chalk_radius_matrix": build_chalk_radius_matrix_metadata(
+                series_id="matrix-test", block=block, requested_radius=radius
+            ),
             "brush_radius_status": "single",
             "observed_brush_radii": [radius],
             "point_delta_matches_chalk": True,
@@ -48,6 +54,7 @@ def test_matrix_metadata_accepts_only_planned_radius_and_block():
     assert metadata["planned_radii"] == list(RADIUS_LEVELS)
     assert metadata["block_order"] == list(MATRIX_BLOCKS[2])
     assert metadata["repeat_index"] == 2
+    assert metadata["matrix_order_index"] == 4
 
     with pytest.raises(ValueError):
         build_chalk_radius_matrix_metadata(series_id="bad id", block=1, requested_radius=5)
