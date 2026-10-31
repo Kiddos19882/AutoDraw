@@ -87,9 +87,9 @@ class BridgeRecorderTests(unittest.TestCase):
         after = {"maxPoints": 6000, "remainingPoints": 5947, "pointCount": 53, "isExact": True}
         self.recorder.event({"type": "DRAW_START", "t": 10, "before": before}, 1.0)
         self.recorder.event({"type": "DRAW_SAMPLE", "t": 20, "strokeId": "s1",
-                             "pointDelta": 1, "acceptedPoint": {"x": 10, "y": 10}}, 1.1)
+                             "pointDelta": 50, "acceptedPoint": {"x": 10, "y": 10}}, 1.1)
         self.recorder.event({"type": "DRAW_SAMPLE", "t": 25, "strokeId": "s1",
-                             "pointDelta": 1, "acceptedPoint": {"x": 11, "y": 10}}, 1.15)
+                             "pointDelta": 2, "acceptedPoint": {"x": 11, "y": 10}}, 1.15)
         self.recorder.event({"type": "DRAW_END", "t": 30, "strokeId": "s1",
                              "after": after}, 1.2)
         self.recorder.frame_probe({"startedAtPerformanceMs": 10, "endedAtPerformanceMs": 30,
@@ -100,6 +100,7 @@ class BridgeRecorderTests(unittest.TestCase):
         self.assertEqual(data["chalk"]["consumed_points"], 52)
         self.assertEqual(data["sampled_point_delta_total"], 2)
         self.assertTrue(data["point_delta_matches_chalk"])
+        self.assertEqual(data["trajectory"]["status"], "incomplete_samples")
         self.assertEqual(data["stroke_count"], 1)
         self.assertEqual(data["frame_probe"]["stroke_probe_count"], 1)
         self.assertEqual(data["active_drawing_duration_ms"], 20)
