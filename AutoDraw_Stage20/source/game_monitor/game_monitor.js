@@ -21,6 +21,7 @@
     activeStrokeId: null,
     lastPointCount: null,
     lastSampleSignature: null,
+    lastSamplePointCount: null,
     strokePollTimer: null,
     inputHandlers: null,
     startedAt: null,
@@ -241,18 +242,26 @@
     const signature = JSON.stringify([snapshot.maxPoints, snapshot.remainingPoints, snapshot.pointCount, snapshot.validationStatus]);
     if (signature === state.lastSampleSignature) return;
     const previous = state.lastSampleSignature;
+    const previousPointCount = state.lastSamplePointCount;
+    const acceptedPoint = snapshot.isExact &&
+      Number.isSafeInteger(previousPointCount) &&
+      snapshot.pointCount > previousPointCount
+      ? latestAcceptedPoint(state.board)
+      : null;
     state.lastSampleSignature = signature;
+    state.lastSamplePointCount = snapshot.pointCount;
     emit("DRAW_SAMPLE", {
       source,
       previousSignature: previous,
       after: snapshot,
-      acceptedPoint: latestAcceptedPoint(state.board)
+      acceptedPoint
     });
   }
 
   function startStrokePolling() {
     if (state.strokePollTimer !== null) window.clearInterval(state.strokePollTimer);
     state.lastSampleSignature = null;
+    state.lastSamplePointCount = resourceSnapshot(state.board).pointCount;
     sampleActiveStroke("onDrawStart");
     // onDrawing may already have been registered as a bound Egret listener
     // before this snippet wraps the instance method. Poll only during a stroke;
