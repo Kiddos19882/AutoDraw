@@ -25,7 +25,8 @@
     strokePollTimer: null,
     inputHandlers: null,
     startedAt: null,
-    errors: []
+    errors: [],
+    eventListeners: new Set()
   };
 
   function now() {
@@ -187,6 +188,10 @@
     };
     if (state.events.length < MAX_EVENTS) state.events.push(event);
     else state.droppedEvents++;
+    for (const listener of state.eventListeners) {
+      try { listener(event); }
+      catch (error) { state.errors.push({ t: now(), message: "event_listener: " + String(error) }); }
+    }
   }
 
   function isBoard(candidate) {
@@ -504,8 +509,15 @@
     };
   }
 
+  function subscribe(listener) {
+    if (typeof listener !== "function") throw new TypeError("listener must be a function");
+    state.eventListeners.add(listener);
+    return () => state.eventListeners.delete(listener);
+  }
+
   const api = {
     start,
+    subscribe,
     stop,
     status,
     export: exportData,
