@@ -16,6 +16,8 @@ from chalk_radius_matrix import (
 def _manifest(radius=5, block=1, run_id="run-1", consumed=100):
     return {
         "experiment_id": f"exp-{block}-{radius}",
+        "test_case": "paint_consumption_long_lines",
+        "brush_value_requested": radius,
         "chalk_radius_matrix": build_chalk_radius_matrix_metadata(
             series_id="matrix-test", block=block, requested_radius=radius
         ),
