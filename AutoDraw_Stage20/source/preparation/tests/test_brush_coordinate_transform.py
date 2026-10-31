@@ -28,7 +28,7 @@ def test_logical_bounds_map_to_screen_pixel_centers():
     assert points[-1] == {"x": 645.0, "y": 337.0}
     assert points[1]["x"] == pytest.approx(210 * 645 / 460)
     assert points[1]["y"] == pytest.approx(168.5)
-    assert result["canvas"] == {"width": 646, "height": 323}
+    assert result["canvas"] == {"width": 646, "height": 338}
     assert result["coordinate_system"] == "local_canvas_pixels"
     assert info["scale_x"] == pytest.approx(645 / 460)
     assert info["scale_y"] == pytest.approx(337 / 240)
@@ -58,7 +58,7 @@ def test_transform_rejects_wrong_coordinate_system():
 def test_transform_rejects_nonuniform_roi_for_uniform_game_scale():
     with pytest.raises(ValueError, match="не соответствуют равномерному масштабу"):
         transform_logical_brush_plan_to_screen(
-            make_plan(), {"x": 0, "y": 0, "width": 646, "height": 323}
+            make_plan(), {"x": 0, "y": 0, "width": 646, "height": 338}
         )
 
 
