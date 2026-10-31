@@ -278,5 +278,58 @@ class ProductionBridgeIntegrationTests(unittest.IsolatedAsyncioTestCase):
                 await server.wait_closed()
 
 
+
+@unittest.skipIf(websockets is None, "install game_monitor/requirements-smoke.txt to run transport tests")
+class AtomicSessionPersistenceTests(unittest.IsolatedAsyncioTestCase):
+    async def test_retries_transient_windows_permission_error(self):
+        import tempfile
+        from pathlib import Path
+        from unittest.mock import patch
+        import game_monitor_bridge_server as bridge_server
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            target = Path(temp_dir) / "session.json"
+            payload = {"session_id": "retry-test", "bridge_diagnostics": {"connection_closed": False}}
+            real_replace = bridge_server.os.replace
+            calls = []
+
+            def fail_twice_then_replace(source, destination):
+                calls.append((source, destination))
+                if len(calls) <= 2:
+                    raise PermissionError(5, "Access is denied")
+                return real_replace(source, destination)
+
+            with patch.object(bridge_server.os, "replace", side_effect=fail_twice_then_replace):
+                saved = await bridge_server.persist_json_atomically(
+                    target, payload, attempts=4, retry_delay=0
+                )
+
+            self.assertTrue(saved)
+            self.assertEqual(len(calls), 3)
+            self.assertEqual(json.loads(target.read_text(encoding="utf-8")), payload)
+            self.assertEqual(list(Path(temp_dir).glob("*.tmp")), [])
+
+    async def test_exhausted_permission_errors_preserve_previous_session(self):
+        import tempfile
+        from pathlib import Path
+        from unittest.mock import patch
+        import game_monitor_bridge_server as bridge_server
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            target = Path(temp_dir) / "session.json"
+            target.write_text('{"previous": true}', encoding="utf-8")
+            payload = {"session_id": "locked-target"}
+            with patch.object(
+                bridge_server.os, "replace",
+                side_effect=PermissionError(5, "Access is denied"),
+            ):
+                saved = await bridge_server.persist_json_atomically(
+                    target, payload, attempts=3, retry_delay=0
+                )
+
+            self.assertFalse(saved)
+            self.assertEqual(json.loads(target.read_text(encoding="utf-8")), {"previous": True})
+            self.assertEqual(list(Path(temp_dir).glob("*.tmp")), [])
+
 if __name__ == "__main__":
     unittest.main()
