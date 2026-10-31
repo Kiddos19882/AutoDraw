@@ -224,3 +224,28 @@ Game Monitor 0.2.1 остаётся текущей версией. INT-003 ос�
 - Boundary probe: визуально 4/4, точный счётчик и acceptedPoint доступны; точные горизонтальные граничные координаты x=0/460 ещё не подтверждены.
 - Полная матрица размеров кисти не разблокирована до завершения контролируемого overhead-сравнения и граничного контроля.
 - Влияние размера кисти на CHALK не установлено: все описанные live-прогоны относятся к кисти 1 и не являются сравнением разных размеров.
+
+
+
+## 19. Первая реализация автоматического WebSocket telemetry bridge — 31 октября 2026 г.
+
+Ветка получила первую реализацию автоматического сбора телеметрии Game Monitor. Это отдельный read-only поток, не управляющий мышью или игровым состоянием.
+
+**Добавлено:**
+- `game_monitor.js`: API `AutoDrawGameMonitor.subscribe(listener)` для инкрементальной передачи новых событий без повторного копирования всего массива events;
+- `game_monitor_bridge.js`: браузерный агент для игрового iframe, WebSocket auth, event allowlist, heartbeat и requestAnimationFrame измерения во время активных штрихов;
+- `game_monitor_bridge_server.py`: локальный loopback collector, точный Origin allowlist, случайный токен, лимит сообщения, один активный клиент, группировка штрихов по idle timeout и атомарное сохранение JSON;
+- `requirements-bridge.txt`: изолированная зависимость websockets 12.0;
+- README и BRUSH_MONITOR_AUTOCAPTURE_DESIGN дополнены инструкцией и границами реализации.
+
+**Автоматические данные одного run:**
+- pre-test snapshot из `DRAW_START.before`;
+- post-test snapshot из `DRAW_END.after`;
+- точный `consumed_points`, только если оба snapshot exact и согласованы;
+- фактический радиус кисти, события, `pointDelta`, принятые координаты;
+- длительность активных штрихов, elapsed от первого до последнего штриха и FPS по requestAnimationFrame;
+- статус partial при разрыве соединения.
+
+**Ограничения:** bridge сохраняет session/run JSON в отдельном каталоге, но пока не записывает путь и run_id в UI `experiment.json`. Live-проверка нового bridge из реального Firefox iframe ещё не выполнена. A/B/C overhead самого bridge также не измерен; все будущие сравниваемые прогоны должны иметь одинаковую конфигурацию инструментации.
+
+**Статус INT-004:** IN_PROGRESS. Не считать production integration завершённой до browser validation и автоматической привязки run JSON к manifest.
