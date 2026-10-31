@@ -205,3 +205,14 @@
 - Результат относится к проверенному ROI 578×301 на экране 1920×1080.
 - Поля automated visibility в исходных manifest не переписывались: они сохраняют исторический inconclusive из-за выявленного и уже исправленного mismatch logical/screen dimensions.
 - INT-003 остаётся открытой до A/B/C и успешного CI актуального HEAD.
+
+
+## 2026-10-31 — live WebSocket smoke и A/B/C Monitor 0.2.1
+
+- Добавлены результаты browser WebSocket handshake: `ready` и `pong`; Monitor 0.2.1 обнаружил BoardPane в игровом iframe, 0 dropped events и 0 errors.
+- Добавлены три повтора A/B/C. Точные дельты pointCount: A 53/52/52, B 0*/52/52, C 50/52/52. B-1 невалиден: игра не добавила новых точек. В повторах 2 и 3 все три режима дали 52.
+- В Monitor 0.2.1 diagnosticPointCount совпал с точным pointCount во всех трёх повторах; pointDelta подтверждает дельты 50/52/52.
+- FPS probes показали 60 FPS во всех трёх сериях, но не разделены по режимам A/B/C; overhead Monitor не измерен.
+- Новый boundary experiment: 4/4 видимых штриха, 7.36 с, 106 move calls, ΔpointCount=52. Paint-meter image estimate остаётся inconclusive.
+- AcceptedPoint подтвердил y=0/240; горизонтальные конечные координаты около x=2.21/458.21, поэтому точные x=0/460 требуют отдельной проверки.
+- Влияние размера кисти не установлено; полная матрица ожидает завершения A/B/C overhead и проверки горизонтальных границ.
