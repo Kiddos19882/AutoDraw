@@ -1136,3 +1136,20 @@ Run JSON дополнен `stroke_count`, суммой `sampled_point_delta_tota
 - ручные действия в тестовые данные не включаются.
 
 **Браузерный gate не открыт.** Перед локальными тестами нужно добавить метаданные серии/повтора и контроль полноты измерения в experiment manifest, проверить защиту от повторного использования старых run и покрыть эти изменения unit/regression tests. После этого выполнить локальные Python/bridge tests. Пользователю сообщить отдельно, когда подготовка закончена и требуется запуск Firefox/игры.
+
+## 2026-10-31 — реализация подготовки матрицы CHALK
+
+Ветка: `feature/image-geometry-optimization`.
+
+Реализовано:
+- `source/preparation/chalk_radius_matrix.py`: проверка ID серии/блока/радиуса, матричные последовательности, проверка точного CHALK и согласованности experiment ID, запрет повторного использования monitor run, отклонение дубликатов matrix cell, статистика по радиусу/повтору;
+- `source/preparation/brush_behavior_test_ui.py`: UI поля серии/блока, запись метаданных в plan/manifest, уникальный experiment ID, cross-link в monitor report/summary, fail-closed при уже привязанном run;
+- `source/preparation/tests/test_chalk_radius_matrix.py`: тесты метаданных, run deduplication, точности измерения, experiment identity, статистики и duplicate cell/run;
+- `source/preparation/tests/test_brush_behavior_test_ui.py`: проверка сохранения matrix identity в experiment manifest;
+- `tests/analyze_chalk_radius_matrix.py`: CLI для агрегации JSON manifests.
+
+Также обновлены `CHALK_RADIUS_MATRIX_PLAN.md`, `BRUSH_MONITOR_AUTOCAPTURE_DESIGN.md`, `docs/PROJECT_STATUS.md`, `docs/TESTS_AND_CI_MAP.md`, `docs/DEPENDENCY_MAP.md`, `docs/MODULE_REFERENCE.md`.
+
+Ключевые изменения кода: `bb91a554`, `953e9e70`, `7a5b1348`, `e07be04a`, `62b9109f`; тесты: `187090d5`, `baeb7be1`, `4aa27a01`; анализатор: `4786483b`. Полная история доступна в git log ветки.
+
+**Проверки:** GitHub combined status на проверенном HEAD не вернул status contexts; отдельный workflow-run API также не показал PR workflow runs. Поэтому успешный CI не заявляется. Локальный pytest в текущей среде не запускался. Live browser tests не запускались. Браузерный gate остаётся закрытым до успешного автоматического тестирования.
