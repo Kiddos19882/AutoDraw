@@ -351,3 +351,12 @@ WebSocket session штатно закрыта в 19:19:41.104 UTC: 1831 сооб
 Добавлен чистый модуль `source/preparation/chalk_radius_matrix.py` с валидацией, дедупликацией и агрегированием. Добавлен CLI `tests/analyze_chalk_radius_matrix.py`, который формирует JSON-сводку по сохранённым experiment. Добавлены тесты `source/preparation/tests/test_chalk_radius_matrix.py` и проверка записи matrix metadata в UI manifest. Карты модулей, зависимостей и тестов обновлены.
 
 **Статус проверки:** код и тесты добавлены в GitHub, но локальное выполнение pytest и итог GitHub Actions пока не подтверждены (combined status не вернул check statuses). Браузерные live-тесты не запускались и не должны начинаться до успешного автоматического прогона.
+
+
+## 2026-10-31 — автоматический gate матрицы CHALK пройден
+
+Актуальный HEAD ветки на момент проверки: `34535d1a56fce75ae9712d55b662a0abd19de868`.
+
+GitHub Actions `Geometry planner tests`, run `41235681326`, завершился с `conclusion=success`. Все три задания завершились успешно: `geometry-tests`, `executor-tests`, `Windows portable build and startup smoke-test`. Ветка: `feature/image-geometry-optimization`.
+
+**Следующий обязательный этап — локальная браузерная матрица CHALK.** Автоматические проверки подтверждают программную часть подготовки, но не дают новых игровых измерений. Единственная live-точка по-прежнему radius 1 = 718 CHALK для контрольного шаблона; зависимости от радиуса пока не установлено.
