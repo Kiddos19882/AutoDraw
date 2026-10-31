@@ -23,9 +23,13 @@ def monitor_radius_from_status(status: object) -> int | None:
         value = value[-1] if value else None
     if isinstance(value, bool) or not isinstance(value, (int, float)):
         return None
-    if int(value) != value or not 1 <= int(value) <= 30:
+    try:
+        numeric = float(value)
+        if not numeric.is_integer() or not 1 <= numeric <= 30:
+            return None
+    except (TypeError, ValueError, OverflowError):
         return None
-    return int(value)
+    return int(numeric)
 
 
 def calculate_radius_correction_target(
