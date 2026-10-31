@@ -1,0 +1,92 @@
+{
+  "session_id": "21dc06a5-27fa-4ab7-9d2c-4f29e27b6a9f",
+  "started_at_utc": "2026-10-31T18:49:15.029+00:00",
+  "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:159.0) Gecko/20100101 Firefox/159.0",
+  "page": {
+    "origin": "https://eufbpet.hust.me",
+    "pathname": "/pet.php"
+  },
+  "monitor_status_at_connect": {
+    "version": "0.2.1",
+    "active": true,
+    "boardDetected": true,
+    "boardLabel": "o",
+    "snapshot": {
+      "logicalWidth": 460,
+      "logicalHeight": 240,
+      "scaleX": 1,
+      "scaleY": 1,
+      "maxPoints": 6000,
+      "remainingPoints": 5999,
+      "pointCount": 1,
+      "sourceMethod": "BoardPane.max+BoardPane.less",
+      "isExact": true,
+      "validationStatus": "valid",
+      "radius": [
+        0,
+        30
+      ],
+      "currentRadius": 30
+    },
+    "eventCount": 252,
+    "droppedEvents": 0,
+    "errors": 0
+  },
+  "bridge_diagnostics": {
+    "received_message_count": 2163,
+    "received_event_count": 1904,
+    "received_event_types": {
+      "POINTER_DOWN_CANDIDATE": 19,
+      "DRAW_SAMPLE": 784,
+      "POINTER_UP_CANDIDATE": 19,
+      "BRUSH_CHANGE": 157,
+      "BRUSH_CHANGE_APPLIED": 157,
+      "POINT_QUOTA_UPDATE": 768
+    },
+    "last_message_type": "heartbeat",
+    "last_sequence": 2163,
+    "last_message_at_utc": "2026-10-31T18:53:20.006+00:00",
+    "last_monitor_status": {
+      "version": "0.2.1",
+      "active": true,
+      "boardDetected": true,
+      "boardLabel": "o",
+      "snapshot": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5952,
+        "pointCount": 48,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          30,
+          30,
+          1,
+          1,
+          1,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "eventCount": 2156,
+      "droppedEvents": 0,
+      "errors": 0
+    },
+    "browser_bridge": {
+      "sentEventCount": 1904,
+      "lastEventType": "POINTER_UP_CANDIDATE",
+      "lastEventAtPerformanceMs": 232150,
+      "sendFailureCount": 0
+    },
+    "frame_probe_count": 19,
+    "connection_closed": false,
+    "last_event_type": "POINTER_UP_CANDIDATE",
+    "last_event_performance_ms": 232150
+  }
+}
