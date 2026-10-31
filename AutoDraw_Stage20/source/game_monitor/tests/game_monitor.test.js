@@ -46,10 +46,10 @@ function createMonitor() {
 
 function createBoard() {
   let pointIndexReads = 0;
-  const pointStrokes = [[{ x: 10, y: 10 }, { x: 11, y: 10 }]];
+  const pointStrokes = [[]];
   const points = new Proxy(pointStrokes, {
     get(target, property, receiver) {
-      if (typeof property === "string" && /^\\d+$/.test(property)) {
+      if (typeof property === "string" && /^\d+$/.test(property)) {
         pointIndexReads++;
       }
       return Reflect.get(target, property, receiver);
@@ -109,6 +109,7 @@ test("hot-path wrappers, status and export do not scan atom.points", () => {
   monitor.export();
   assert.equal(getPointIndexReads(), readsBefore);
 
+  board.atom.points[0].push({ x: 10, y: 10 }, { x: 11, y: 10 });
   board.updateLess();
   assert.equal(board.less, 2998);
   assert.equal(board.pointIndexReadsAtEngineReturn, getPointIndexReads());
