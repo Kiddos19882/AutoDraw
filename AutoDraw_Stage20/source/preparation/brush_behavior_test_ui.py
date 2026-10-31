@@ -2322,7 +2322,6 @@ class BrushBehaviorTestTab:
                     "chalk_radius_matrix": getattr(self, "_chalk_matrix_metadata", None),
                     "run_id": report.get("run_id"),
                     "session_id": report.get("session_id"),
-                    "run_id": report.get("run_id"),
                     "execution_status": report.get("execution_status"),
                     "brush_radius": report.get("brush_radius"),
                     "observed_brush_radii": report.get("observed_brush_radii"),
