@@ -258,10 +258,16 @@ class ColorPlanExecutionTests(unittest.TestCase):
             x_at_min=100, x_at_max=390, y=200, initial_value=7,
             screen_width=1920, screen_height=1080, confirmed=True,
         )
+        monitor_values = iter([
+            {"radius": 7, "observed_at_utc": "2026-10-31T00:00:00+00:00"},
+            {"radius": 30, "observed_at_utc": "2026-10-31T00:00:01+00:00"},
+            {"radius": 30, "observed_at_utc": "2026-10-31T00:00:02+00:00"},
+        ])
         controller = BrushSliderController(
             calibration,
             {"x": 0, "y": 0, "width": 40, "height": 40},
             current_screen_size_provider=lambda: (1920, 1080),
+            monitor_radius_provider=lambda **kwargs: next(monitor_values),
         )
         executor = MouseExecutor(FastEvent(), self.config())
         detail = controller.select_value(executor, 30)
@@ -279,10 +285,16 @@ class ColorPlanExecutionTests(unittest.TestCase):
             x_at_min=100, x_at_max=390, y=200, initial_value=7,
             screen_width=1920, screen_height=1080, confirmed=True,
         )
+        monitor_values = iter([
+            {"radius": 7, "observed_at_utc": "2026-10-31T00:00:00+00:00"},
+            {"radius": 20, "observed_at_utc": "2026-10-31T00:00:01+00:00"},
+            {"radius": 20, "observed_at_utc": "2026-10-31T00:00:02+00:00"},
+        ])
         controller = BrushSliderController(
             calibration,
             {"x": 0, "y": 0, "width": 40, "height": 40},
             current_screen_size_provider=lambda: (1920, 1080),
+            monitor_radius_provider=lambda **kwargs: next(monitor_values),
         )
         executor = MouseExecutor(FastEvent(), self.config())
         stroke = Stroke(
@@ -302,6 +314,40 @@ class ColorPlanExecutionTests(unittest.TestCase):
         FAKE_PYAUTOGUI.reset()
         self.assertEqual(controller.before_stroke(executor, 2, stroke), "Кисть 20 уже выбрана.")
         self.assertEqual(FAKE_PYAUTOGUI.moves, [])
+
+    def test_brush_slider_controller_corrects_radius_5_when_game_reports_4(self):
+        calibration = BrushSliderCalibration(
+            x_at_min=100, x_at_max=390, y=200, initial_value=30,
+            screen_width=1920, screen_height=1080, confirmed=True,
+        )
+        monitor_values = iter([
+            {"radius": 30, "observed_at_utc": "2026-10-31T00:00:00+00:00"},
+            {"radius": 4, "observed_at_utc": "2026-10-31T00:00:01+00:00"},
+            {"radius": 4, "observed_at_utc": "2026-10-31T00:00:02+00:00"},
+            {"radius": 5, "observed_at_utc": "2026-10-31T00:00:03+00:00"},
+            {"radius": 5, "observed_at_utc": "2026-10-31T00:00:04+00:00"},
+        ])
+        controller = BrushSliderController(
+            calibration,
+            {"x": 0, "y": 0, "width": 40, "height": 40},
+            current_screen_size_provider=lambda: (1920, 1080),
+            monitor_radius_provider=lambda **kwargs: next(monitor_values),
+        )
+        executor = MouseExecutor(FastEvent(), self.config())
+        FAKE_PYAUTOGUI.reset()
+
+        detail = controller.select_value(executor, 5)
+
+        self.assertEqual(detail, "Выбрана кисть 5 (автокоррекций: 1).")
+        self.assertEqual(
+            FAKE_PYAUTOGUI.moves,
+            [(390, 200, 0), (140, 200, 0), (140, 200, 0), (150, 200, 0)],
+        )
+        self.assertEqual(controller.current_value, 5)
+        self.assertEqual(controller.current_x, 150)
+        self.assertEqual(controller.correction_counts, [1])
+        self.assertEqual(FAKE_PYAUTOGUI.down_calls, 2)
+        self.assertEqual(FAKE_PYAUTOGUI.up_calls, 2)
 
     def test_profile_maps_rgb_to_exact_saved_swatch_coordinates(self):
         targets = build_palette_targets(self.color_plan, self.profile, current_screen_size=(160, 100))
