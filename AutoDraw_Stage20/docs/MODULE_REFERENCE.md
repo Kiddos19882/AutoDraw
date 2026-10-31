@@ -67,7 +67,7 @@ Preparation и executor предоставляют совместимые import
 | brush_planner.py | Формирование адаптивных brush-планов |
 | brush_calibration.py | Модели калибровки кисти |
 | brush_experiment_capture.py | Запись материалов лабораторных запусков |
-| brush_test_workflow.py | Сценарии лаборатории кистей |
+| brush_test_workflow.py | Сценарии лаборатории кистей |\n| brush_radius_feedback.py | Чтение радиуса из Game Monitor и bounded-secant коррекция позиции ползунка |
 | chalk_radius_matrix.py | Валидация метаданных, уникальности Game Monitor run и статистика матрицы CHALK по радиусам |
 
 ### 2.4. Ресурсные и калибровочные модули
