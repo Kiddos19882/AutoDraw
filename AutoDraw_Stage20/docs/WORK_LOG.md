@@ -418,3 +418,27 @@
 
 **Продолжение:**
 - Продолжить проверку оставшихся тестов и полного состава каталогов.
+
+
+## 2026-10-31 — расширение матрицы тестовых импортов до 39 файлов
+
+**Изменённые документы:**
+- `AutoDraw_Stage20/docs/TESTS_AND_CI_MAP.md`
+- `AutoDraw_Stage20/docs/TASKS.md`
+- `AutoDraw_Stage20/docs/PROJECT_STATUS.md`
+
+**Что сделано:**
+- Поиск по репозиторию выявил дополнительные тесты Preparation и Executor, не вошедшие в предыдущую выборку.
+- Проверены прямые import/from-import statements ещё 14 тестовых файлов.
+- В матрицу внесены импорты brush calibration/workflow, quota integration, footprint geometry, benchmark, engine calibration, experiment capture, geometry adapter, brush UI, end-to-end optimizer и color-plan execution.
+- Отдельно отмечен helper `source/executor/path_planning/test_shape.py`, используемый тестом DrawingPlan, но не считаемый самостоятельным discovery-тестом.
+- Общее количество файлов с зафиксированными прямыми импортами доведено до 39.
+
+**Проверки:**
+- Файлы прочитаны непосредственно в ветке `feature/image-geometry-optimization`; импортные строки сверены по содержимому.
+- Не выполнялись тесты, UI, benchmarks или сборка.
+- Исходный код не изменялся.
+
+**Продолжение:**
+- Необходимо завершить инвентаризацию полного набора тестов, включая точное сопоставление discovery-каталогов с файлами и проверку возможных тестовых модулей, не попавших в поисковую выдачу.
+- После этого завершить DOC-013 и перейти к DOC-014.
