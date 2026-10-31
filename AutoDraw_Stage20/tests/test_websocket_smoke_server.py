@@ -70,10 +70,6 @@ class SmokeServerIntegrationTests(unittest.IsolatedAsyncioTestCase):
             await server.wait_closed()
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 @unittest.skipIf(websockets is None, "install game_monitor/requirements-smoke.txt to run transport tests")
 class BridgeRecorderTests(unittest.TestCase):
     def setUp(self):
@@ -94,10 +90,14 @@ class BridgeRecorderTests(unittest.TestCase):
                              "pointDelta": 1, "acceptedPoint": {"x": 10, "y": 10}}, 1.1)
         self.recorder.event({"type": "DRAW_END", "t": 30, "strokeId": "s1",
                              "after": after}, 1.2)
+        self.recorder.frame_probe({"startedAtPerformanceMs": 10, "endedAtPerformanceMs": 30,
+                                   "visible": True, "intervals": [16.67, 16.67, 16.67]})
         path = self.recorder.finalize("completed")
         data = json.loads(path.read_text(encoding="utf-8"))
         self.assertEqual(data["chalk"]["status"], "exact")
         self.assertEqual(data["chalk"]["consumed_points"], 52)
+        self.assertEqual(data["frame_probe"]["stroke_probe_count"], 1)
+        self.assertEqual(data["active_drawing_duration_ms"], 20)
 
     def test_coalesced_samples_mark_path_as_incomplete(self):
         before = {"maxPoints": 6000, "remainingPoints": 6000, "pointCount": 0, "isExact": True}
@@ -122,3 +122,18 @@ class BridgeRecorderTests(unittest.TestCase):
         self.assertTrue(valid_origin("https://game.example"))
         self.assertFalse(valid_origin("http://game.example"))
         self.assertFalse(valid_origin("https://game.example/path"))
+
+
+    def test_missing_draw_end_is_saved_as_partial_after_idle(self):
+        before = {"maxPoints": 6000, "remainingPoints": 6000, "pointCount": 0, "isExact": True}
+        self.recorder.event({"type": "DRAW_START", "t": 1, "before": before}, 1.0)
+        self.recorder.heartbeat({"droppedEvents": 0, "errors": 0}, 4.0)
+        self.assertIsNone(self.recorder.current)
+        files = list(self.output.glob("game-monitor-run-*.json"))
+        self.assertEqual(len(files), 1)
+        data = json.loads(files[0].read_text(encoding="utf-8"))
+        self.assertEqual(data["execution_status"], "partial")
+
+
+if __name__ == "__main__":
+    unittest.main()
