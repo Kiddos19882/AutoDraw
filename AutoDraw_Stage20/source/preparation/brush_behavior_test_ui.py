@@ -2207,6 +2207,8 @@ class BrushBehaviorTestTab:
                     and int(report.get("stroke_count", 0) or 0) > 0
                     and report.get("brush_radius_status") == "single"
                     and report.get("point_delta_matches_chalk") is True
+                    and frame_probe.get("status") == "measured"
+                    and int(trajectory.get("accepted_sample_count", 0) or 0) > 0
                     and report.get("dropped_events", 0) == 0
                     and report.get("monitor_dropped_events", 0) == 0
                     and report.get("monitor_error_count", 0) == 0
