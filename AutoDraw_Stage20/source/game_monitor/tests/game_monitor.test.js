@@ -338,3 +338,22 @@ test("DRAW_SAMPLE reports null when the current stroke has no accepted point", (
   assert.equal(samples[samples.length - 1].acceptedPoint, null);
   monitor.stop();
 });
+
+
+test("DRAW_SAMPLE exposes multi-point deltas so skipped intermediate samples are detectable", () => {
+  const { monitor } = createMonitor();
+  const { board } = createBoard();
+  monitor.attach(board);
+  board.onDrawStart();
+
+  board.atom.points[0].push({ x: 5, y: 6 }, { x: 8, y: 9 });
+  board.less = board.max - 2;
+  board.onDrawing();
+
+  const samples = monitor.export().events.filter(event => event.type === "DRAW_SAMPLE");
+  const sample = samples[samples.length - 1];
+  assert.equal(sample.pointDelta, 2);
+  assert.equal(sample.acceptedPoint.x, 8);
+  assert.equal(sample.acceptedPoint.y, 9);
+  monitor.stop();
+});
