@@ -212,3 +212,93 @@ test("resource snapshots expose the actual current brush radius", () => {
   assert.equal(snapshot.radius[0], 7);
   monitor.stop();
 });
+
+
+test("stop restores every own BoardPane method descriptor exactly", () => {
+  const { monitor, timers } = createMonitor();
+  const { board } = createBoard();
+  const names = ["onDrawStart", "onDrawing", "onDrawingEnd", "setRadius", "updateLess"];
+  const originals = new Map(names.map(name => [
+    name,
+    { method: board[name], descriptor: Object.getOwnPropertyDescriptor(board, name) }
+  ]));
+
+  monitor.attach(board);
+  for (const name of names) {
+    assert.notEqual(board[name], originals.get(name).method);
+  }
+
+  monitor.stop();
+  for (const name of names) {
+    assert.equal(board[name], originals.get(name).method);
+    assert.deepEqual(
+      Object.getOwnPropertyDescriptor(board, name),
+      originals.get(name).descriptor
+    );
+  }
+  assert.equal(timers.size, 0);
+  assert.equal(monitor.status().active, false);
+});
+
+test("stop removes wrappers for inherited methods and repeated start/stop is safe", () => {
+  const { monitor, timers } = createMonitor();
+  const prototype = {
+    onDrawStart() {},
+    onDrawing() {},
+    onDrawingEnd() {},
+    setRadius(value) { this.atom.radius[0] = value; },
+    updateLess() {}
+  };
+  const board = Object.assign(Object.create(prototype), {
+    atom: { points: [[]], radius: [3] },
+    max: 3000,
+    less: 3000,
+    width: 460,
+    height: 240,
+    scaleX: 1,
+    scaleY: 1
+  });
+
+  monitor.attach(board);
+  for (const name of Object.keys(prototype)) {
+    assert.equal(Object.hasOwn(board, name), true);
+    assert.notEqual(board[name], prototype[name]);
+  }
+
+  monitor.stop();
+  for (const name of Object.keys(prototype)) {
+    assert.equal(Object.hasOwn(board, name), false);
+    assert.equal(board[name], prototype[name]);
+  }
+  assert.equal(timers.size, 0);
+
+  monitor.start();
+  assert.equal(monitor.status().active, true);
+  monitor.attach(board);
+  assert.equal(timers.size, 1);
+  monitor.stop();
+  monitor.stop();
+  assert.equal(timers.size, 0);
+  for (const name of Object.keys(prototype)) {
+    assert.equal(Object.hasOwn(board, name), false);
+    assert.equal(board[name], prototype[name]);
+  }
+});
+
+test("attaching a replacement BoardPane restores the previous instance", () => {
+  const { monitor } = createMonitor();
+  const first = createBoard().board;
+  const second = createBoard().board;
+  const firstUpdateLess = first.updateLess;
+  const secondUpdateLess = second.updateLess;
+
+  monitor.attach(first);
+  assert.notEqual(first.updateLess, firstUpdateLess);
+
+  monitor.attach(second);
+  assert.equal(first.updateLess, firstUpdateLess);
+  assert.notEqual(second.updateLess, secondUpdateLess);
+
+  monitor.stop();
+  assert.equal(second.updateLess, secondUpdateLess);
+});
