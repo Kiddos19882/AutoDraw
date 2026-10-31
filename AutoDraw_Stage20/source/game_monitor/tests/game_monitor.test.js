@@ -302,3 +302,35 @@ test("attaching a replacement BoardPane restores the previous instance", () => {
   monitor.stop();
   assert.equal(second.updateLess, secondUpdateLess);
 });
+
+
+test("DRAW_SAMPLE records the exact last accepted board coordinate with O(1) tail access", () => {
+  const { monitor } = createMonitor();
+  const { board, getPointIndexReads } = createBoard();
+  monitor.attach(board);
+
+  board.onDrawStart();
+  board.atom.points[0].push({ x: 17, y: 23 });
+  board.less = board.max - 1;
+  const readsBefore = getPointIndexReads();
+
+  board.onDrawing();
+
+  assert.equal(getPointIndexReads(), readsBefore + 1);
+  const samples = monitor.export().events.filter(event => event.type === "DRAW_SAMPLE");
+  const sample = samples[samples.length - 1];
+  assert.deepEqual(sample.acceptedPoint, { x: 17, y: 23 });
+  assert.equal(sample.after.pointCount, 1);
+  monitor.stop();
+});
+
+test("DRAW_SAMPLE reports null when the current stroke has no accepted point", () => {
+  const { monitor } = createMonitor();
+  const { board } = createBoard();
+  monitor.attach(board);
+  board.onDrawStart();
+
+  const samples = monitor.export().events.filter(event => event.type === "DRAW_SAMPLE");
+  assert.equal(samples[samples.length - 1].acceptedPoint, null);
+  monitor.stop();
+});
