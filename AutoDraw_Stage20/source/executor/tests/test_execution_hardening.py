@@ -77,7 +77,7 @@ FAKE_PYAUTOGUI = FakePyAutoGUI()
 
 
 class FakeGlobalHotKeys:
-    trigger_f12_on_start = False
+    trigger_alt_on_start = False
     last_instance = None
 
     def __init__(self, mapping):
@@ -88,8 +88,8 @@ class FakeGlobalHotKeys:
 
     def start(self):
         self.started = True
-        if FakeGlobalHotKeys.trigger_f12_on_start:
-            self.mapping["<f12>"]()
+        if FakeGlobalHotKeys.trigger_alt_on_start:
+            self.mapping["<alt>"]()
 
     def stop(self):
         self.stopped = True
@@ -150,7 +150,7 @@ class ExecutorConfigTests(unittest.TestCase):
 class MouseExecutorTests(unittest.TestCase):
     def setUp(self):
         FAKE_PYAUTOGUI.reset()
-        FakeGlobalHotKeys.trigger_f12_on_start = False
+        FakeGlobalHotKeys.trigger_alt_on_start = False
         FakeGlobalHotKeys.last_instance = None
 
     def config(self, **overrides):
@@ -197,11 +197,11 @@ class MouseExecutorTests(unittest.TestCase):
         self.assertEqual(summary.status, "stopped")
         self.assertEqual(summary.stop_reason, "stop_button")
 
-    def test_f12_stop_reason_is_recorded(self):
-        FakeGlobalHotKeys.trigger_f12_on_start = True
+    def test_alt_stop_reason_is_recorded(self):
+        FakeGlobalHotKeys.trigger_alt_on_start = True
         summary = MouseExecutor(FastEvent(), self.config()).execute(small_plan(), 0, 0)
         self.assertEqual(summary.status, "stopped")
-        self.assertEqual(summary.stop_reason, "F12")
+        self.assertEqual(summary.stop_reason, "Alt")
         self.assertEqual(FAKE_PYAUTOGUI.down_calls, 0)
 
     def test_stop_during_stroke_releases_mouse(self):
@@ -253,7 +253,7 @@ class MouseExecutorTests(unittest.TestCase):
 class LineExtensionTests(unittest.TestCase):
     def setUp(self):
         FAKE_PYAUTOGUI.reset()
-        FakeGlobalHotKeys.trigger_f12_on_start = False
+        FakeGlobalHotKeys.trigger_alt_on_start = False
         FakeGlobalHotKeys.last_instance = None
 
     def make_config(self, **overrides):
