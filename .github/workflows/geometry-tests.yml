@@ -40,6 +40,8 @@ jobs:
         uses: actions/checkout@v7
       - name: Check Game Monitor JavaScript syntax
         run: node --check ..\game_monitor\game_monitor.js
+      - name: Test Game Monitor resource snapshot
+        run: node --test ..\game_monitor\tests\game_monitor.test.js
       - name: Set up Python
         uses: actions/setup-python@v7
         with:
