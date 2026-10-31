@@ -635,7 +635,7 @@ class AutoDrawUnifiedApp:
                 if not isinstance(generation, dict):
                     raise ValueError("Поле generation должно быть объектом.")
                 generation["screen_transform"] = transform
-                save_plan(source_path, plan)
+                source_path.write_text(json.dumps(plan, ensure_ascii=False, indent=2), encoding="utf-8")
             except (OSError, ValueError, TypeError, KeyError) as exc:
                 messagebox.showerror("Ошибка преобразования координат", str(exc), parent=self.root)
                 return False
