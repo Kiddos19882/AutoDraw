@@ -466,7 +466,10 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
     return handler
 
 
-async def run_server(origin: str, port: int, output_dir: Path, idle_seconds: float, token: str) -> None:
+async def run_server(
+    origin: str, port: int, output_dir: Path, idle_seconds: float, token: str,
+    snippet_file: Path | None = None,
+) -> None:
     print("AutoDraw Game Monitor Bridge — read-only telemetry collector")
     print(f"Listening only on ws://{HOST}:{port}")
     print(f"Allowed game Origin: {origin}")
@@ -476,14 +479,26 @@ async def run_server(origin: str, port: int, output_dir: Path, idle_seconds: flo
     bridge_path = Path(__file__).with_name("game_monitor_bridge.js")
     snippet = bridge_path.read_text(encoding="utf-8").replace("__AUTODRAW_BRIDGE_TOKEN__", token)
     snippet = snippet.replace("ws://127.0.0.1:8765", f"ws://127.0.0.1:{port}")
+    if snippet_file is not None:
+        snippet_file = snippet_file.expanduser().resolve()
+        snippet_file.parent.mkdir(parents=True, exist_ok=True)
+        snippet_file.write_text(snippet, encoding="utf-8")
+        print(f"Ready-to-copy browser snippet written to: {snippet_file}")
     print("\nPaste this complete snippet into the Console of the game iframe after Game Monitor is loaded:\n")
     print(snippet)
     print("\nWaiting for browser telemetry. Press Ctrl+C to stop.")
-    async with websockets.serve(make_handler(token, origin, output_dir, idle_seconds),
-                                HOST, port, origins=[origin], max_size=MAX_MESSAGE_BYTES,
-                                max_queue=128, ping_interval=20, ping_timeout=10,
-                                close_timeout=3):
-        await asyncio.Future()
+    try:
+        async with websockets.serve(make_handler(token, origin, output_dir, idle_seconds),
+                                    HOST, port, origins=[origin], max_size=MAX_MESSAGE_BYTES,
+                                    max_queue=128, ping_interval=20, ping_timeout=10,
+                                    close_timeout=3):
+            await asyncio.Future()
+    finally:
+        if snippet_file is not None:
+            try:
+                snippet_file.unlink(missing_ok=True)
+            except OSError as exc:
+                print(f"Warning: could not remove temporary browser snippet: {exc}", file=sys.stderr)
 
 
 def main() -> int:
@@ -493,6 +508,8 @@ def main() -> int:
     parser.add_argument("--output-dir", type=Path,
                         default=Path("AutoDraw_Stage20/data/results/brush_behavior_tests/game_monitor_bridge"))
     parser.add_argument("--idle-seconds", type=float, default=2.5)
+    parser.add_argument("--snippet-file", type=Path, default=None,
+                        help="Write the tokenized browser snippet here until the server stops")
     args = parser.parse_args()
     if not valid_origin(args.origin):
         parser.error("--origin must be an exact HTTPS origin without path/query/fragment")
@@ -502,7 +519,7 @@ def main() -> int:
         parser.error("--idle-seconds must be between 0.5 and 15")
     try:
         asyncio.run(run_server(args.origin.rstrip("/"), args.port, args.output_dir,
-                               args.idle_seconds, secrets.token_urlsafe(32)))
+                               args.idle_seconds, secrets.token_urlsafe(32), args.snippet_file))
     except KeyboardInterrupt:
         print("\nBridge stopped.")
     except OSError as exc:
