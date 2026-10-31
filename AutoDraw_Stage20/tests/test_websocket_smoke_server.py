@@ -5,6 +5,7 @@ import unittest
 try:
     import websockets
     from websocket_smoke_server import OneShotAuthenticator, make_handler, parse_message
+    from game_monitor_bridge_server import RunRecorder, exact_snapshot, summarize_intervals, valid_origin
 except ModuleNotFoundError:
     websockets = None
 
@@ -71,3 +72,53 @@ class SmokeServerIntegrationTests(unittest.IsolatedAsyncioTestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+@unittest.skipIf(websockets is None, "install game_monitor/requirements-smoke.txt to run transport tests")
+class BridgeRecorderTests(unittest.TestCase):
+    def setUp(self):
+        import tempfile
+        from pathlib import Path
+        self.temp = tempfile.TemporaryDirectory()
+        self.output = Path(self.temp.name)
+        self.recorder = RunRecorder(self.output, "session-test", 2.5)
+
+    def tearDown(self):
+        self.temp.cleanup()
+
+    def test_exact_chalk_delta_and_run_export(self):
+        before = {"maxPoints": 6000, "remainingPoints": 5999, "pointCount": 1, "isExact": True}
+        after = {"maxPoints": 6000, "remainingPoints": 5947, "pointCount": 53, "isExact": True}
+        self.recorder.event({"type": "DRAW_START", "t": 10, "before": before}, 1.0)
+        self.recorder.event({"type": "DRAW_SAMPLE", "t": 20, "strokeId": "s1",
+                             "pointDelta": 1, "acceptedPoint": {"x": 10, "y": 10}}, 1.1)
+        self.recorder.event({"type": "DRAW_END", "t": 30, "strokeId": "s1",
+                             "after": after}, 1.2)
+        path = self.recorder.finalize("completed")
+        data = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(data["chalk"]["status"], "exact")
+        self.assertEqual(data["chalk"]["consumed_points"], 52)
+
+    def test_coalesced_samples_mark_path_as_incomplete(self):
+        before = {"maxPoints": 6000, "remainingPoints": 6000, "pointCount": 0, "isExact": True}
+        self.recorder.event({"type": "DRAW_START", "t": 1, "before": before}, 1.0)
+        self.recorder.event({"type": "DRAW_SAMPLE", "t": 2, "strokeId": "s1",
+                             "pointDelta": 3, "acceptedPoint": {"x": 3, "y": 4}}, 1.1)
+        self.assertEqual(self.recorder.current["interpretation"]["path_length_status"], "incomplete_samples")
+
+    def test_idle_finalizes_completed_run(self):
+        before = {"maxPoints": 6000, "remainingPoints": 6000, "pointCount": 0, "isExact": True}
+        self.recorder.event({"type": "DRAW_START", "t": 1, "before": before}, 1.0)
+        self.recorder.event({"type": "DRAW_END", "t": 2, "after": before}, 1.1)
+        self.recorder.heartbeat({}, 4.0)
+        self.assertIsNone(self.recorder.current)
+
+    def test_snapshot_validation_and_frame_summary(self):
+        self.assertTrue(exact_snapshot({"maxPoints": 10, "remainingPoints": 8, "pointCount": 2, "isExact": True}))
+        self.assertFalse(exact_snapshot({"maxPoints": 10, "remainingPoints": 8, "pointCount": 3, "isExact": True}))
+        self.assertAlmostEqual(summarize_intervals([16.67] * 60)["median_fps"], 59.988, places=2)
+
+    def test_origin_validation(self):
+        self.assertTrue(valid_origin("https://game.example"))
+        self.assertFalse(valid_origin("http://game.example"))
+        self.assertFalse(valid_origin("https://game.example/path"))
