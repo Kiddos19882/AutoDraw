@@ -179,3 +179,20 @@ test("read-only inspect captures exact CHALK while monitor is stopped", () => {
   assert.equal(monitor.status().active, false);
   assert.equal(board.updateLess, originalUpdateLess);
 });
+
+
+test("unchanged updateLess calls do not create duplicate quota events", () => {
+  const { monitor } = createMonitor();
+  const { board } = createBoard();
+  monitor.attach(board);
+
+  const before = monitor.status().eventCount;
+  board.updateLess();
+  assert.equal(monitor.status().eventCount, before);
+
+  board.atom.points[0].push({ x: 1, y: 1 });
+  board.updateLess();
+  assert.equal(monitor.status().eventCount, before + 1);
+  assert.equal(monitor.status().snapshot.pointCount, 1);
+  monitor.stop();
+});
