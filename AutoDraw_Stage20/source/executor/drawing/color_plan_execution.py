@@ -4,8 +4,12 @@ from dataclasses import dataclass
 import hashlib
 import json
 import math
+import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
+
+from brush_radius_feedback import calculate_radius_correction_target
 
 from models import DrawingPlan, Point, Stroke
 
@@ -367,7 +371,7 @@ def build_brush_visual_test_plan(width: int, height: int) -> DrawingPlan:
 
 
 class BrushSliderController:
-    """Drag the currently selected slider thumb to the calibrated target value."""
+    """Select brush sizes with closed-loop verification against live Game Monitor."""
 
     def __init__(
         self,
@@ -375,13 +379,17 @@ class BrushSliderController:
         target_area: dict[str, int],
         *,
         current_screen_size_provider: Callable[[], Any] | None = None,
+        monitor_radius_provider: Callable[..., dict[str, Any] | None] | None = None,
     ):
         self.calibration = calibration
         self.target_area = dict(target_area)
         self.current_screen_size_provider = current_screen_size_provider
+        self.monitor_radius_provider = monitor_radius_provider
         self.current_value = calibration.initial_value
+        self.current_x = calibration.coordinate_for_value(calibration.initial_value)
         self.selection_count = 0
         self.selection_order: list[int] = []
+        self.correction_counts: list[int] = []
 
     def validate(self) -> None:
         screen = (
@@ -390,6 +398,21 @@ class BrushSliderController:
             else (self.calibration.screen_width, self.calibration.screen_height)
         )
         self.calibration.validate(screen, self.target_area)
+        if not callable(self.monitor_radius_provider):
+            raise ColorPlanExecutionError(
+                "Для автоматической установки кисти требуется активный Game Monitor Bridge."
+            )
+        observation = self.monitor_radius_provider()
+        if not isinstance(observation, dict):
+            raise ColorPlanExecutionError(
+                "Нет свежего Game Monitor heartbeat. Подключите мост в игровом iframe."
+            )
+        observed = observation.get("radius")
+        if isinstance(observed, bool) or not isinstance(observed, int) or observed != self.current_value:
+            raise ColorPlanExecutionError(
+                f"Game Monitor сообщает радиус {observed!r}, а профиль ожидает "
+                f"{self.current_value}. Установите начальную кисть и повторите запуск."
+            )
 
     def before_stroke(self, executor: Any, stroke_index: int, stroke: Stroke) -> str:
         raw_value = stroke.metadata.get("brush_value")
@@ -405,22 +428,9 @@ class BrushSliderController:
             raise ColorPlanExecutionError(f"Размер кисти {value} не входит в диапазон планировщика 1–20.")
         return self.select_value(executor, value)
 
-    def select_value(self, executor: Any, value: int) -> str:
-        """Move the slider without drawing; the visual test also uses this to restore its starting value."""
-        if isinstance(value, bool) or not isinstance(value, int):
-            raise ColorPlanExecutionError("Размер кисти должен быть целым числом.")
-        if not self.calibration.min_value <= value <= self.calibration.max_value:
-            raise ColorPlanExecutionError(
-                f"Размер кисти {value} вне диапазона {self.calibration.min_value}–{self.calibration.max_value}."
-            )
-        self.validate()
-        if self.current_value == value:
-            return f"Кисть {value} уже выбрана."
-
+    def _drag_to(self, executor: Any, current_x: int, target_x: int) -> None:
         import pyautogui
 
-        current_x = self.calibration.coordinate_for_value(self.current_value)
-        target_x = self.calibration.coordinate_for_value(value)
         y = self.calibration.y
         executor._check_stop()
         pyautogui.moveTo(current_x, y, duration=0)
@@ -437,14 +447,100 @@ class BrushSliderController:
         finally:
             if not executor._release_mouse():
                 raise RuntimeError(
-                    f"Не удалось отпустить мышь после переключения кисти на {value}: "
-                    f"{executor._release_errors[-1]}"
+                    f"Не удалось отпустить мышь при переключении кисти: {executor._release_errors[-1]}"
                 )
         executor._wait_interruptibly(executor.config.after_mouse_up_ms / 1000.0)
-        self.current_value = value
-        self.selection_count += 1
-        self.selection_order.append(value)
-        return f"Выбрана кисть {value}."
+
+    def _wait_for_stable_radius(self, executor: Any, after_utc: str) -> dict[str, Any]:
+        if not callable(self.monitor_radius_provider):
+            raise ColorPlanExecutionError("Game Monitor Bridge не подключён.")
+        deadline = time.monotonic() + 12.0
+        last_timestamp = None
+        candidate_radius = None
+        stable_count = 0
+        while time.monotonic() < deadline:
+            executor._check_stop()
+            observation = self.monitor_radius_provider(after_utc=after_utc)
+            if isinstance(observation, dict):
+                timestamp = observation.get("observed_at_utc")
+                radius = observation.get("radius")
+                if (
+                    isinstance(timestamp, str)
+                    and timestamp != last_timestamp
+                    and isinstance(radius, int)
+                    and not isinstance(radius, bool)
+                    and 1 <= radius <= 30
+                ):
+                    last_timestamp = timestamp
+                    if candidate_radius == radius:
+                        stable_count += 1
+                    else:
+                        candidate_radius = radius
+                        stable_count = 1
+                    if stable_count >= 2:
+                        return observation
+            executor._wait_interruptibly(0.25)
+        raise ColorPlanExecutionError(
+            "Game Monitor не подтвердил стабильный радиус двумя свежими heartbeat за 12 секунд."
+        )
+
+    def select_value(self, executor: Any, value: int) -> str:
+        """Drag, read the actual radius, and correct the slider until it matches."""
+        if isinstance(value, bool) or not isinstance(value, int):
+            raise ColorPlanExecutionError("Размер кисти должен быть целым числом.")
+        if not self.calibration.min_value <= value <= self.calibration.max_value:
+            raise ColorPlanExecutionError(
+                f"Размер кисти {value} вне диапазона {self.calibration.min_value}–{self.calibration.max_value}."
+            )
+        if self.current_value == value:
+            return f"Кисть {value} уже выбрана."
+        self.validate()
+
+        high_point = (self.calibration.x_at_max, self.calibration.y)
+        high_radius = self.calibration.max_value
+        low_point = (self.calibration.x_at_min, self.calibration.y)
+        low_radius = self.calibration.min_value
+        current_x = self.current_x
+        target_x = self.calibration.coordinate_for_value(value)
+        correction_count = 0
+
+        for attempt in range(8):
+            self._drag_to(executor, current_x, target_x)
+            completed_at = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
+            observation = self._wait_for_stable_radius(executor, completed_at)
+            observed = observation["radius"]
+            if observed == value:
+                self.current_value = value
+                self.current_x = target_x
+                self.selection_count += 1
+                self.selection_order.append(value)
+                self.correction_counts.append(correction_count)
+                suffix = f" (автокоррекций: {correction_count})" if correction_count else ""
+                return f"Выбрана кисть {value}{suffix}."
+
+            current_point = (target_x, self.calibration.y)
+            if observed > value:
+                high_point, high_radius = current_point, observed
+            else:
+                low_point, low_radius = current_point, observed
+            if attempt >= 7:
+                break
+            try:
+                next_point = calculate_radius_correction_target(
+                    high_point, high_radius, low_point, low_radius, value
+                )
+            except ValueError as exc:
+                raise ColorPlanExecutionError(
+                    f"Не удалось скорректировать ползунок для радиуса {value}: {exc}"
+                ) from exc
+            current_x = target_x
+            target_x = next_point[0]
+            correction_count += 1
+
+        raise ColorPlanExecutionError(
+            f"Game Monitor не подтвердил радиус {value} после {correction_count} автокоррекций; "
+            "исполнение остановлено до следующего штриха."
+        )
 
 
 def color_plan_to_drawing_plan(plan: Any) -> DrawingPlan:
