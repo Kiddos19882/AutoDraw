@@ -32,6 +32,63 @@ def monitor_radius_from_status(status: object) -> int | None:
     return int(numeric)
 
 
+
+def read_active_bridge_radius(
+    bridge_root: str | Any,
+    *,
+    after_utc: str | None = None,
+    max_age_seconds: float = 4.0,
+) -> dict[str, Any] | None:
+    """Read the newest fresh radius from an active Game Monitor Bridge session."""
+    import json
+    from datetime import datetime, timezone
+    from pathlib import Path
+
+    def parse_stamp(value: object) -> datetime | None:
+        if not isinstance(value, str) or not value.strip():
+            return None
+        try:
+            stamp = datetime.fromisoformat(value.strip().replace("Z", "+00:00"))
+        except ValueError:
+            return None
+        if stamp.tzinfo is None:
+            stamp = stamp.replace(tzinfo=timezone.utc)
+        return stamp.astimezone(timezone.utc)
+
+    root = Path(bridge_root)
+    if not root.is_dir():
+        return None
+    after = parse_stamp(after_utc) if after_utc else None
+    now = datetime.now(timezone.utc)
+    candidates: list[tuple[datetime, dict[str, Any]]] = []
+    for session_path in root.glob("*/session.json"):
+        try:
+            record = json.loads(session_path.read_text(encoding="utf-8"))
+            diagnostics = record.get("bridge_diagnostics", {})
+            if not isinstance(diagnostics, dict) or diagnostics.get("connection_closed") is True:
+                continue
+            if diagnostics.get("last_message_type") != "heartbeat":
+                continue
+            stamp_text = diagnostics.get("last_message_at_utc")
+            stamp = parse_stamp(stamp_text)
+            if stamp is None or (now - stamp).total_seconds() > max_age_seconds:
+                continue
+            if after is not None and stamp <= after:
+                continue
+            status = diagnostics.get("last_monitor_status")
+            radius = monitor_radius_from_status(status)
+            if radius is None:
+                continue
+            candidates.append((stamp, {
+                "radius": radius,
+                "session_id": record.get("session_id"),
+                "observed_at_utc": stamp_text,
+                "snapshot": status.get("snapshot") if isinstance(status, dict) else None,
+            }))
+        except (OSError, ValueError, TypeError, AttributeError):
+            continue
+    return max(candidates, key=lambda item: item[0])[1] if candidates else None
+
 def calculate_radius_correction_target(
     high_point: tuple[int, int] | list[int],
     high_radius: int,
