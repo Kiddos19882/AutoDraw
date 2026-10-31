@@ -302,18 +302,30 @@ def build_brush_test_record(
     }
 
 
-def build_brush_test_drawing_plan(test_case: str, canvas_size: tuple[int, int]) -> dict[str, Any]:
-    """Build a standard local-canvas DrawingPlan that the existing executor can load."""
+def build_brush_test_drawing_plan(
+    test_case: str,
+    canvas_size: tuple[int, int],
+    *,
+    coordinate_system: str = "local_canvas_pixels",
+) -> dict[str, Any]:
+    """Build a brush-test plan in either screen-local or explicit logical coordinates."""
     if test_case not in TEST_CASES:
         raise ValueError(f"Неизвестный тест кисти: {test_case}")
+    if coordinate_system not in {"local_canvas_pixels", "logical_board_pixels"}:
+        raise ValueError(f"Неподдерживаемая система координат: {coordinate_system}")
     width, height = (int(canvas_size[0]), int(canvas_size[1]))
     if width < 1 or height < 1:
         raise ValueError("Размер тестового холста должен быть положительным.")
     scenario = TEST_CASES[test_case]
+    inclusive_bounds = coordinate_system == "logical_board_pixels"
     strokes = []
     for item in scenario["strokes"]:
         points = item["points"]
-        if any(x < 0 or y < 0 or x >= width or y >= height for x, y in points):
+        outside = any(
+            x < 0 or y < 0 or (x > width or y > height if inclusive_bounds else x >= width or y >= height)
+            for x, y in points
+        )
+        if outside:
             raise ValueError(
                 f"Штрих {item['name']} выходит за пределы холста {width} × {height}."
             )
@@ -328,7 +340,7 @@ def build_brush_test_drawing_plan(test_case: str, canvas_size: tuple[int, int]) 
         "schema_version": 1,
         "name": f"Brush behavior test — {scenario['id']}",
         "created_at": now,
-        "coordinate_system": "local_canvas_pixels",
+        "coordinate_system": coordinate_system,
         "canvas": {"width": width, "height": height},
         "width": width,
         "height": height,
@@ -577,7 +589,9 @@ class BrushBehaviorTestTab:
             )
             return
         try:
-            plan = build_brush_test_drawing_plan(self.case_var.get(), canvas_size)
+            plan = build_brush_test_drawing_plan(
+                self.case_var.get(), canvas_size, coordinate_system="logical_board_pixels"
+            )
             area = self.get_canvas_area()
             self.canvas_area = dict(area) if area else None
             brush = int(self.brush_var.get().strip())
