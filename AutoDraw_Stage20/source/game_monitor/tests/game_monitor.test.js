@@ -101,6 +101,7 @@ test("resource snapshot reads exact max/less fields and derives point count", ()
 test("hot-path wrappers, status and export do not scan atom.points", () => {
   const { monitor } = createMonitor();
   const { board, getPointIndexReads } = createBoard();
+  const originalUpdateLess = board.updateLess;
   monitor.attach(board);
 
   const readsBefore = getPointIndexReads();
@@ -108,7 +109,6 @@ test("hot-path wrappers, status and export do not scan atom.points", () => {
   monitor.export();
   assert.equal(getPointIndexReads(), readsBefore);
 
-  const originalUpdateLess = board.updateLess;
   board.updateLess();
   assert.equal(board.less, 2998);
   assert.equal(board.pointIndexReadsAtEngineReturn, getPointIndexReads());
