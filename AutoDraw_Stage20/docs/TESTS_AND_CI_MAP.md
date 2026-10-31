@@ -203,11 +203,37 @@
 | `source/preparation/tests/test_geometry_budget_optimizer.py` | `geometry_budget_optimizer`, `geometry_color_plan` |
 | `source/preparation/tests/test_outline_first_fill_planner.py` | `brush_footprint_geometry`, `outline_first_fill_planner` |
 
+
+### 2.8. Дополнительные тесты Preparation — прямые импорты
+
+| Тест | Прямые внутрипроектные импорты |
+|---|---|
+| `source/preparation/tests/test_brush_calibration.py` | `brush_calibration` |
+| `source/preparation/tests/test_brush_test_workflow.py` | `brush_test_workflow` |
+| `source/preparation/tests/test_color_point_quota_integration.py` | `color_scanline` |
+| `source/preparation/tests/test_interior_fill_benchmark.py` | `benchmark_interior_fill`, `benchmark_stage7_interior_fill` |
+| `source/preparation/tests/test_swept_footprint_geometry.py` | `swept_footprint_geometry` (включая локальные импорты helper-функции) |
+| `source/preparation/tests/test_engine_point_calibration.py` | `engine_point_calibration` |
+| `source/preparation/tests/test_brush_experiment_capture.py` | `brush_experiment_capture` |
+| `source/preparation/tests/test_brush_footprint_geometry.py` | `brush_footprint_geometry` |
+| `source/preparation/tests/test_geometry_execution_adapter.py` | `color_scanline`, `drawing.color_plan_execution`, `geometry_color_plan` |
+| `source/preparation/tests/test_drawing_algorithm_benchmark.py` | `color_scanline`, `drawing_algorithm_benchmark`, `geometry_color_plan` |
+| `source/preparation/tests/test_brush_behavior_test_ui.py` | `brush_behavior_test_ui` |
+| `source/preparation/tests/test_optimizer_end_to_end.py` | `color_scanline`, `paint_budget_optimizer`, `paint_cost_model`, `palette_quantization` |
+
+### 2.9. Дополнительный тест Executor — прямые импорты
+
+| Тест | Прямые внутрипроектные импорты |
+|---|---|
+| `source/executor/tests/test_color_plan_execution.py` | `test_execution_hardening` (тестовый helper), `palette_detection`, `palette_profiles`, `color_scanline`, `drawing.color_plan_execution`, `brush_planner`, `geometry_color_plan`, `models`, `drawing.mouse_executor` |
+
+**Вспомогательный модуль тестов:** `source/executor/path_planning/test_shape.py` импортирует `models.DrawingPlan`, `Point`, `Stroke`; он используется как helper в `test_drawing_plan.py`, а не учитывается как отдельный discovery-тест в таблице выше.
+
 ## 7. Границы и недостающая инвентаризация
 
 1. Список всех тестовых файлов в обоих discovery-каталогах не переписан целиком; зафиксированы тесты, названные в документации, CI workflow и непосредственно проверенных исходниках.
 2. Вспомогательные скрипты из `tests/` не все имеют автоматические тесты: часть из них — CLI-инструменты/benchmark runners.
-3. Прямые импорты дополнительно инвентаризированы для 25 файлов из Preparation, Executor и корневого tests; полный перечень всех тестовых файлов и импортов ещё не завершён.
+3. Прямые импорты дополнительно инвентаризированы для 39 тестовых файлов из Preparation, Executor и корневого tests; полный перечень всех тестовых файлов и импортов ещё не завершён.
 4. В рамках документирования не запускались тесты, benchmarks, UI или portable build.
 5. CI YAML описывает предполагаемый процесс, но его наличие не является доказательством успешного выполнения на текущем commit. Для статуса выполнения следует смотреть конкретный GitHub Actions run.
 
