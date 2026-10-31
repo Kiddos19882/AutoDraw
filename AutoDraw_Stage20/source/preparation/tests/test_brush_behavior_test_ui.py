@@ -592,12 +592,6 @@ def test_automatic_brush_setup_requires_visual_confirmation_before_executor(monk
         def set(self, value):
             self.value = value
 
-    class FakeUser32:
-        def __init__(self):
-            self.events = []
-        def mouse_event(self, flags, *_args):
-            self.events.append(flags)
-
     class Root:
         def __init__(self):
             self.restored = False
@@ -615,34 +609,28 @@ def test_automatic_brush_setup_requires_visual_confirmation_before_executor(monk
     tab.status_var = Value()
     tab._start_executor_after_brush_drag = True
     tab.on_brush_ready = lambda brush: tab.status_var.set(f"executor:{brush}")
-    tab._brush_drag_mouse_down = True
-    user32 = FakeUser32()
-    tab._brush_drag_state = {
-        "user32": user32, "start": (1195, 327), "target": (1322, 327),
-        "brush": 10, "purpose": "set_brush_size",
+    tab._brush_feedback_state = {
+        "requested_radius": 10, "start_30": (100, 500), "end_1": (390, 500),
+        "current_point": (300, 500), "attempt": 0, "observations": [],
     }
-    monkeypatch.setattr(brush_ui.simpledialog, "askstring", lambda *args, **kwargs: "10")
     monkeypatch.setattr(brush_ui.messagebox, "askyesno", lambda *args, **kwargs: False)
-    tab._finish_brush_drag()
 
-    assert user32.events == [0x0004]
+    tab._complete_brush_radius_feedback({
+        "radius": 10, "session_id": "session", "observed_at_utc": "2026-10-31T00:00:00+00:00"
+    })
+
     assert tab.root.restored is True
     assert tab.experiment_phases["brush_setup"]["status"] == "declined_by_user"
     assert tab._start_executor_after_brush_drag is False
     assert tab.root.scheduled == []
-    assert "не подтверждён" in tab.status_var.value
 
 
-def test_automatic_brush_setup_starts_executor_only_after_confirmation(monkeypatch):
+def test_automatic_brush_setup_starts_executor_only_after_exact_monitor_match(monkeypatch):
     class Value:
         def __init__(self, value=""):
             self.value = value
         def set(self, value):
             self.value = value
-
-    class FakeUser32:
-        def mouse_event(self, *_args):
-            pass
 
     class Root:
         def __init__(self):
@@ -662,22 +650,99 @@ def test_automatic_brush_setup_starts_executor_only_after_confirmation(monkeypat
     tab._start_executor_after_brush_drag = True
     started = []
     tab.on_brush_ready = lambda brush: started.append(brush)
-    tab._brush_drag_mouse_down = True
-    tab._brush_drag_state = {
-        "user32": FakeUser32(), "start": (1195, 327), "target": (1322, 327),
-        "brush": 10, "purpose": "set_brush_size",
+    tab._brush_feedback_state = {
+        "requested_radius": 10, "start_30": (100, 500), "end_1": (390, 500),
+        "current_point": (300, 500), "attempt": 0, "observations": [],
     }
-    monkeypatch.setattr(brush_ui.simpledialog, "askstring", lambda *args, **kwargs: "10")
     monkeypatch.setattr(brush_ui.messagebox, "askyesno", lambda *args, **kwargs: True)
-    tab._finish_brush_drag()
+
+    tab._complete_brush_radius_feedback({
+        "radius": 10, "session_id": "session", "observed_at_utc": "2026-10-31T00:00:00+00:00"
+    })
 
     assert tab.experiment_phases["brush_setup"]["status"] == "confirmed_by_user"
-    assert tab.experiment_phases["brush_setup"]["confirmation_method"] == "explicit_user_visual_confirmation"
+    assert tab.experiment_phases["brush_setup"]["confirmation_method"] == "game_monitor_exact_radius_plus_user_visual_check"
     assert len(tab.root.scheduled) == 1
     delay, callback = tab.root.scheduled[0]
     assert delay == 0
     callback()
     assert started == [10]
+
+
+def test_game_monitor_radius_mismatch_schedules_automatic_correction(monkeypatch):
+    class Value:
+        def __init__(self, value=""):
+            self.value = value
+        def set(self, value):
+            self.value = value
+
+    class Root:
+        def __init__(self):
+            self.minimized = False
+            self.scheduled = []
+        def iconify(self):
+            self.minimized = True
+        def after(self, delay, callback):
+            self.scheduled.append((delay, callback))
+            return "scheduled"
+
+    tab = _make_test_tab()
+    tab.root = Root()
+    tab.status_var = Value()
+    current = (350, 500)
+    tab._brush_feedback_state = {
+        "requested_radius": 5,
+        "start_30": (100, 500), "end_1": (390, 500),
+        "high_point": (100, 500), "high_radius": 30,
+        "low_point": (390, 500), "low_radius": 1,
+        "current_point": current, "attempt": 0, "poll_count": 0,
+        "observations": [], "await_after_utc": "2026-10-31T00:00:00+00:00",
+    }
+    tab._read_live_brush_radius = lambda **kwargs: {
+        "radius": 4, "session_id": "session", "observed_at_utc": "2026-10-31T00:00:01+00:00"
+    }
+    tab._start_brush_hotkey_listener = lambda: None
+    scheduled = []
+    tab._begin_brush_drag = lambda start, x, y, brush: scheduled.append((start, x, y, brush))
+
+    tab._poll_brush_radius_feedback()
+
+    assert scheduled
+    start, target_x, target_y, brush = scheduled[0]
+    assert start == current
+    assert target_x < current[0]  # Radius 4 is too small: move towards radius 30.
+    assert target_y == current[1]
+    assert brush == 5
+    assert tab._brush_feedback_state["attempt"] == 1
+    assert tab.root.minimized is True
+
+
+def test_bridge_status_reader_uses_fresh_active_heartbeat(tmp_path):
+    import json
+    from datetime import datetime, timezone
+    from pathlib import Path
+
+    tab = _make_test_tab()
+    tab.output_dir = Path(tmp_path)
+    session_dir = tmp_path / "game_monitor_bridge" / "session-1"
+    session_dir.mkdir(parents=True)
+    now = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
+    record = {
+        "session_id": "session-1",
+        "bridge_diagnostics": {
+            "connection_closed": False,
+            "last_message_type": "heartbeat",
+            "last_message_at_utc": now,
+            "last_monitor_status": {"snapshot": {"currentRadius": 4, "radius": [30, 4]}},
+        },
+    }
+    (session_dir / "session.json").write_text(json.dumps(record), encoding="utf-8")
+
+    observed = tab._read_live_brush_radius()
+
+    assert observed is not None
+    assert observed["radius"] == 4
+    assert observed["session_id"] == "session-1"
 
 
 def test_alt_is_not_consumed_when_no_brush_drag_is_active() -> None:
