@@ -71,5 +71,5 @@ def test_transform_rejects_invalid_roi_and_points():
     plan["strokes"][0]["points"][0]["x"] = 461
     with pytest.raises(ValueError, match="выходит за границы"):
         transform_logical_brush_plan_to_screen(
-            plan, {"x": 0, "y": 0, "width": 646, "height": 323}
+            plan, {"x": 0, "y": 0, "width": 646, "height": 338}
         )
