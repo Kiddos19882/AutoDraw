@@ -23,6 +23,9 @@ def _manifest(radius=5, block=1, run_id="run-1", consumed=100):
         "monitor_capture": {
             "status": "saved", "run_id": run_id, "stroke_count": 6,
             "expected_stroke_count": 6, "experiment_id": f"exp-{block}-{radius}",
+            "brush_radius_status": "single", "chalk_status": "exact",
+            "chalk_counter_consistent": True, "point_delta_matches_chalk": True,
+            "dropped_events": 0, "monitor_dropped_events": 0, "monitor_error_count": 0,
             "chalk_radius_matrix": build_chalk_radius_matrix_metadata(
                 series_id="matrix-test", block=block, requested_radius=radius
             ),
@@ -37,6 +40,9 @@ def _manifest(radius=5, block=1, run_id="run-1", consumed=100):
             "observed_brush_radii": [radius],
             "point_delta_matches_chalk": True,
             "stroke_count": 6,
+            "frame_probe": {"status": "measured", "visibility_interruption": False},
+            "trajectory": {"accepted_sample_count": 12},
+            "dropped_events": 0, "monitor_dropped_events": 0, "monitor_error_count": 0,
             "chalk": {
                 "status": "exact",
                 "pre_point_count": 1,
