@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 import uuid
 import ctypes
 import platform
@@ -478,6 +479,7 @@ class BrushBehaviorTestTab:
         self.execution_report: dict[str, Any] | None = None
         self.game_monitor_report_path: Path | None = None
         self.game_monitor_summary: dict[str, Any] | None = None
+        self._bridge_capture_poll_id: str | None = None
         self.last_record_path: Path | None = None
         self.brush_var = tk.StringVar(value="7")
         self.case_var = tk.StringVar(value=next(iter(TEST_CASES)))
@@ -2095,6 +2097,7 @@ class BrushBehaviorTestTab:
             }
             if self.experiment_dir is not None:
                 self._write_experiment_manifest()
+                self._schedule_bridge_report_capture()
             self.status_var.set(
                 f"Исполнитель завершил тест со статусом «{status}». "
                 + (f"Отчёт: {self.execution_report_path}" if self.execution_report_path else "Файл отчёта не создан.")
@@ -2114,6 +2117,116 @@ class BrushBehaviorTestTab:
             self.status_var.set(f"Не удалось привязать результат исполнителя к тесту кисти: {exc}")
             return False
 
+    def _schedule_bridge_report_capture(self, attempt: int = 0) -> None:
+        """Find the completed WebSocket run for this experiment and attach it automatically."""
+        if self.experiment_dir is None:
+            return
+        if attempt == 0 and self._bridge_capture_poll_id is not None:
+            return
+
+        bridge_root = self.output_dir / "game_monitor_bridge"
+        before_phase = self.experiment_phases.get("before_draw", {})
+        before_text = before_phase.get("captured_at_utc") if isinstance(before_phase, dict) else None
+        try:
+            before_time = datetime.fromisoformat(before_text) if before_text else None
+        except (TypeError, ValueError):
+            before_time = None
+        requested = self._experiment_requested_brush
+        if requested is None:
+            try:
+                requested = int(self.brush_var.get().strip())
+            except (AttributeError, TypeError, ValueError):
+                requested = None
+
+        candidates = sorted(
+            bridge_root.rglob("game-monitor-run-*.json") if bridge_root.is_dir() else [],
+            key=lambda item: item.stat().st_mtime,
+            reverse=True,
+        )
+        for source_path in candidates:
+            try:
+                report = json.loads(source_path.read_text(encoding="utf-8"))
+                if not isinstance(report, dict) or report.get("record_type") != "autodraw_game_monitor_run":
+                    continue
+                if report.get("execution_status") not in {"completed", "partial"}:
+                    continue
+                try:
+                    observed_brush = int(round(float(report.get("brush_radius"))))
+                except (TypeError, ValueError):
+                    continue
+                if requested is not None and observed_brush != requested:
+                    continue
+                started_text = report.get("started_at_utc")
+                try:
+                    started_time = datetime.fromisoformat(started_text) if started_text else None
+                except (TypeError, ValueError):
+                    started_time = None
+                if before_time is not None and (started_time is None or started_time < before_time):
+                    continue
+                if self.game_monitor_summary and self.game_monitor_summary.get("run_id") == report.get("run_id"):
+                    continue
+
+                target_path = self.experiment_dir / "monitor_report.json"
+                shutil.copy2(source_path, target_path)
+                chalk = report.get("chalk") if isinstance(report.get("chalk"), dict) else {}
+                frame_probe = report.get("frame_probe") if isinstance(report.get("frame_probe"), dict) else {}
+                trajectory = report.get("trajectory") if isinstance(report.get("trajectory"), dict) else {}
+                summary = {
+                    "source": "loopback_websocket_bridge",
+                    "session_id": report.get("session_id"),
+                    "run_id": report.get("run_id"),
+                    "execution_status": report.get("execution_status"),
+                    "brush_radius": report.get("brush_radius"),
+                    "chalk": chalk,
+                    "frame_probe": frame_probe,
+                    "trajectory": trajectory,
+                    "event_count": report.get("event_count"),
+                    "dropped_events": report.get("dropped_events"),
+                    "monitor_error_count": report.get("monitor_error_count"),
+                    "started_at_utc": report.get("started_at_utc"),
+                    "finished_at_utc": report.get("finished_at_utc"),
+                }
+                self.game_monitor_report_path = target_path.resolve()
+                self.game_monitor_summary = summary
+                self.experiment_phases["monitor_capture"] = {
+                    "status": "saved" if report.get("execution_status") == "completed" and chalk.get("status") == "exact" else "partial",
+                    "transport": "loopback_websocket",
+                    "session_id": report.get("session_id"),
+                    "run_id": report.get("run_id"),
+                    "source_path": str(source_path.resolve()),
+                    "report_path": target_path.name,
+                    "report_event_count": report.get("event_count"),
+                    "chalk_status": chalk.get("status", "inconclusive"),
+                    "captured_at_utc": datetime.now(timezone.utc).isoformat(timespec="milliseconds"),
+                }
+                self._bridge_capture_poll_id = None
+                self._write_experiment_manifest()
+                self.status_var.set(
+                    f"Game Monitor автоматически привязан: CHALK {chalk.get('consumed_points', 'не определён')}, "
+                    f"радиус {observed_brush}, FPS {frame_probe.get('median_fps', 'нет данных')}."
+                )
+                return
+            except (OSError, UnicodeError, json.JSONDecodeError, TypeError, ValueError):
+                continue
+
+        if attempt < 20:
+            self._bridge_capture_poll_id = self.root.after(
+                500, lambda: self._schedule_bridge_report_capture(attempt + 1)
+            )
+            return
+
+        self._bridge_capture_poll_id = None
+        self.experiment_phases["monitor_capture"] = {
+            "status": "unavailable",
+            "transport": "loopback_websocket",
+            "reason": "matching_run_report_not_found",
+            "checked_at_utc": datetime.now(timezone.utc).isoformat(timespec="milliseconds"),
+        }
+        try:
+            self._write_experiment_manifest()
+        except (OSError, ValueError, TypeError):
+            pass
+
     def _write_experiment_manifest(self) -> Path | None:
         """Persist current experiment evidence; safe to call after any completed phase."""
         if self.experiment_dir is None:
@@ -2130,6 +2243,7 @@ class BrushBehaviorTestTab:
             "execution_report": self.execution_report,
             "game_monitor_report_path": str(self.game_monitor_report_path) if self.game_monitor_report_path else None,
             "game_monitor_summary": self.game_monitor_summary,
+            "monitor_capture": self.experiment_phases.get("monitor_capture"),
             "calibration_profile_path": (str(config.get("profile_path", "")) or None) if isinstance(config, dict) else None,
             "phases": self.experiment_phases,
             "interpretation_limits": [
