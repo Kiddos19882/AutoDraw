@@ -800,7 +800,7 @@ class BrushBehaviorTestTab:
             snippet_dir.mkdir(parents=True, exist_ok=True)
             snippet_path.unlink(missing_ok=True)
             self.bridge_process = subprocess.Popen(
-                ["cmd.exe", "/c", "call", str(batch_path), origin, str(snippet_path), str(self.output_dir)],
+                ["cmd.exe", "/c", "call", str(batch_path), origin, str(snippet_path), str(snippet_dir)],
                 cwd=str(working_directory),
                 creationflags=getattr(subprocess, "CREATE_NEW_CONSOLE", 0),
             )
