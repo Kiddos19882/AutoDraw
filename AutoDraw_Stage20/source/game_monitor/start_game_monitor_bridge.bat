@@ -41,8 +41,8 @@ if errorlevel 1 (
 echo Starting the read-only Game Monitor WebSocket collector...
 py -3.11 "%SCRIPT_DIR%game_monitor_bridge_server.py" --origin "%GAME_ORIGIN%" --snippet-file "%SNIPPET_FILE%"
 set "RESULT=%ERRORLEVEL%"
-if not "%RESULT%"=="0" echo Bridge exited with code %RESULT%.
-echo.
-echo The temporary browser snippet is removed when the server stops.
-pause
+if not "%RESULT%"=="0" (
+    echo Bridge exited with code %RESULT%.
+    pause
+)
 exit /b %RESULT%
