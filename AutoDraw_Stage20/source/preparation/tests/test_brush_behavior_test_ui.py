@@ -425,6 +425,7 @@ def test_set_brush_size_uses_profile_coordinates_and_minimizes_before_drag(monke
         "mode": "slider", "start": [100, 500], "end": [390, 500],
         "screen_size": {"width": 1920, "height": 1080},
     }
+    tab._read_live_brush_radius = lambda: {"radius": 30, "session_id": "test"}
     tab.brush_slider_start = None
     tab.brush_slider_end = None
     class FakeListener:
@@ -484,6 +485,7 @@ def test_set_brush_size_rejects_preset_click_mode(monkeypatch) -> None:
     tab.get_brush_control = lambda: {
         "mode": "presets", "presets": {"7": [10, 20], "14": [30, 40], "20": [50, 60]}
     }
+    tab._read_live_brush_radius = lambda: {"radius": 30, "session_id": "test"}
     monkeypatch.setattr(brush_ui.platform, "system", lambda: "Windows")
     warnings = []
     monkeypatch.setattr(brush_ui.messagebox, "showwarning", lambda *args, **kwargs: warnings.append(args))
