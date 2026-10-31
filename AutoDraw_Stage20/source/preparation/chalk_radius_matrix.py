@@ -146,11 +146,19 @@ def _manifest_measurement(document: dict[str, Any]) -> tuple[bool, str, dict[str
         return False, "sampled_delta_mismatch", None
     if summary.get("stroke_count") != EXPECTED_STROKES:
         return False, "monitor_stroke_count_mismatch", None
-    if summary.get("frame_probe", {}).get("status") != "measured":
+    frame_probe = summary.get("frame_probe")
+    frame_probe = frame_probe if isinstance(frame_probe, dict) else {}
+    trajectory = summary.get("trajectory")
+    trajectory = trajectory if isinstance(trajectory, dict) else {}
+    if frame_probe.get("status") != "measured":
         return False, "frame_probe_unavailable", None
-    if summary.get("frame_probe", {}).get("visibility_interruption") is not False:
+    if frame_probe.get("visibility_interruption") is not False:
         return False, "frame_probe_visibility_interruption", None
-    if int(summary.get("trajectory", {}).get("accepted_sample_count", 0) or 0) <= 0:
+    try:
+        accepted_samples = int(trajectory.get("accepted_sample_count", 0) or 0)
+    except (TypeError, ValueError, OverflowError):
+        return False, "trajectory_samples_unreadable", None
+    if accepted_samples <= 0:
         return False, "trajectory_samples_missing", None
     if any(summary.get(key, 0) != 0 for key in (
         "dropped_events", "monitor_dropped_events", "monitor_error_count"
