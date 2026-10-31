@@ -94,6 +94,8 @@ def transform_logical_brush_plan_to_screen(
             "y": [0, screen_height - 1],
         },
         "boundary_mapping": "logical_max_to_last_screen_pixel",
+        "executor_coordinate_units": "screen_pixels",
+        "point_step_px_units": "screen_pixels",
     }
 
     transformed["coordinate_system"] = "local_canvas_pixels"
