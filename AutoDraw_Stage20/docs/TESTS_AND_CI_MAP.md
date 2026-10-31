@@ -284,3 +284,6 @@ node --test ..\\game_monitor\\tests\\game_monitor.test.js
 Обновлён `tests/test_unified_app.py`: тест передачи Brush Test теперь передаёт logical-план 420×240 и проверяет runtime-план в screen-local размере ROI и сохранение transform в исходном плане.
 
 Эти проверки относятся к геометрическому преобразованию данных. Они не подтверждают физическое совпадение ROI с реальной доской в браузере; это требует live-проверки.
+
+
+Дополнительно в `tests/test_unified_app.py` добавлен regression test: Stage6 должен отклонять исходный `logical_board_pixels` план, если он загружается напрямую, минуя преобразование Brush Test.
