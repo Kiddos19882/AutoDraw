@@ -334,3 +334,19 @@ UI считает сбор полностью успешным только пр
 Для локализации причины browser agent передаёт в heartbeat собственные `sentEventCount`, `lastEventType`, `lastEventAtPerformanceMs`, `sendFailureCount`. Collector сохраняет в session.json после каждого сообщения `received_message_count`, `received_event_count`, `received_event_types`, `last_sequence`, `last_message_type`, последний `monitorStatus`, browser bridge diagnostics, число frame probes и факт закрытия соединения. Это позволяет различить: Monitor не генерирует события; browser subscription не отправляет события; сервер не принимает события; либо recorder не создаёт/не финализирует run.
 
 После обновления server и snippet необходимо перезапустить локальный bridge и повторно вставить snippet в iframe: запущенный процесс и уже вставленный snippet не обновляются автоматически при изменении файлов репозитория. Затем выполнить один короткий тест и изучить session.json. До успешного появления run JSON и проверки CHALK delta нельзя считать live bridge интеграцию принятой.
+
+
+
+
+## 17. Live session 323a698: root cause отсутствия run JSON
+
+Сессия `f303b3e1-382e-4859-9681-e1c360ec6424` подтвердила полноценную доставку событий browser bridge → collector: 119 событий отправлено и принято, ошибок отправки/Monitor и dropped events — 0. Счётчик доски изменился с 1 до 49 (`ΔpointCount=48`) при exact snapshots. Получено 8 pointer-down/up пар, 55 DRAW_SAMPLE и 48 POINT_QUOTA_UPDATE, но 0 DRAW_START/DRAW_END; frame_probe_count равен 0.
+
+Причина найдена в текущем коде:
+- Game Monitor умеет отслеживать указатель независимо от BoardPane callbacks: `onPointerDown` создаёт `POINTER_DOWN_CANDIDATE` и включает polling; `onPointerUp` завершает polling и создаёт `POINTER_UP_CANDIDATE`.
+- Browser bridge запускает FPS probe только по `DRAW_START`, останавливает по `DRAW_END`.
+- RunRecorder начинает run только по `DRAW_START` и отмечает завершение штриха только по `DRAW_END`.
+
+В этой реальной сессии engine callbacks не были зафиксированы, поэтому pointer fallback не пересёк lifecycle boundary collector. Это не потеря WebSocket сообщений. Точный расход 48 points относится ко всему временному интервалу сессии и не должен автоматически считаться расходом одного Brush Test experiment.
+
+**Обязательное исправление:** поддержать pointer candidate как fallback lifecycle в RunRecorder и FPS probe, при этом явно маркировать источник границ и не удваивать штрихи при одновременных engine/pointer событиях. Нужны regression tests для pointer-only, engine-only и смешанного потока. До этих изменений нельзя считать автоматическую генерацию run JSON и FPS capture работающими в live режиме.
