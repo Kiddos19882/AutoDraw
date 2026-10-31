@@ -337,7 +337,7 @@ async def persist_json_atomically(
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
         temp_path.write_text(
-            json.dumps(payload, ensure_ascii=False, indent=2) + "\\n",
+            json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
         )
         retry_count = max(1, attempts)
