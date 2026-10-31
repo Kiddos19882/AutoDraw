@@ -290,3 +290,11 @@ node --test ..\\game_monitor\\tests\\game_monitor.test.js
 
 
 Дополнительно в `tests/test_unified_app.py` добавлен regression test: Stage6 должен отклонять исходный `logical_board_pixels` план, если он загружается напрямую, минуя преобразование Brush Test.
+
+
+
+## Дополнение 2026-11-01 — запуск Game Monitor Bridge из Brush Test
+
+В source/preparation/tests/test_brush_behavior_test_ui.py добавлена проверка normalize_game_monitor_origin(): принимается только bare HTTPS Origin; отклоняются HTTP, URL с путём, query, credentials и произвольный текст.
+
+Серверная опция --snippet-file проверяется интеграционным запуском collector на уровне локальной Windows-сессии: UI должен получить токенизированный snippet, а после остановки сервера временный файл должен исчезнуть. Это live-интеграционный gate и не подменяется unit-тестом Origin.
