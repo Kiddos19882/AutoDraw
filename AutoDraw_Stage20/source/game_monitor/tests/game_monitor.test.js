@@ -329,6 +329,8 @@ test("DRAW_SAMPLE reports null when the current stroke has no accepted point", (
   const { monitor } = createMonitor();
   const { board } = createBoard();
   monitor.attach(board);
+  board.atom.points[0].push({ x: 4, y: 9 });
+  board.less = board.max - 1;
   board.onDrawStart();
 
   const samples = monitor.export().events.filter(event => event.type === "DRAW_SAMPLE");
