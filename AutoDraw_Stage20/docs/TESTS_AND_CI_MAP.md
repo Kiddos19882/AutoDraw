@@ -301,3 +301,13 @@ node --test ..\\game_monitor\\tests\\game_monitor.test.js
 
 
 **Portable build:** build_windows.py должен включать companion-каталог game_monitor рядом с AutoDraw.exe. В нём должны присутствовать game_monitor.js, game_monitor_bridge.js, game_monitor_bridge_server.py, requirements-bridge.txt и start_game_monitor_bridge.bat. Проверка Windows portable build подтверждает наличие файлов и запуск UI; реальное подключение Firefox iframe требует отдельного live-теста.
+
+
+### Game Monitor Bridge — атомарное сохранение session.json
+
+tests/test_websocket_smoke_server.py включает regression tests для persist_json_atomically():
+- временные PermissionError от os.replace() должны переживаться с повтором и успешной атомарной заменой;
+- при исчерпании повторов существующий session.json должен остаться неизменным, временный файл должен быть удалён;
+- проверка выполняется в отдельном Windows CI step Test local WebSocket smoke server на Python 3.11.
+
+Эти тесты проверяют политику восстановления файловой записи, но не заменяют повторный live-тест Firefox/игрового iframe с радиусом 10.
