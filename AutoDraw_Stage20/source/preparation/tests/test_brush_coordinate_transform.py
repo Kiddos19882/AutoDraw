@@ -8,10 +8,10 @@ from brush_coordinate_transform import transform_logical_brush_plan_to_screen
 def make_plan():
     return {
         "coordinate_system": "logical_board_pixels",
-        "canvas": {"width": 420, "height": 240},
+        "canvas": {"width": 460, "height": 240},
         "strokes": [{
             "name": "edge",
-            "points": [{"x": 0, "y": 0}, {"x": 210, "y": 120}, {"x": 420, "y": 240}],
+            "points": [{"x": 0, "y": 0}, {"x": 210, "y": 120}, {"x": 460, "y": 240}],
             "closed": False,
             "metadata": {},
         }],
@@ -30,7 +30,7 @@ def test_logical_bounds_map_to_screen_pixel_centers():
     assert points[1]["y"] == pytest.approx(161.0)
     assert result["canvas"] == {"width": 646, "height": 323}
     assert result["coordinate_system"] == "local_canvas_pixels"
-    assert info["scale_x"] == pytest.approx(645 / 420)
+    assert info["scale_x"] == pytest.approx(645 / 460)
     assert info["scale_y"] == pytest.approx(322 / 240)
     assert info["point_step_px_units"] == "screen_pixels"
 
@@ -43,7 +43,7 @@ def test_source_plan_is_not_mutated_and_transform_is_recorded():
     )
     assert plan["strokes"][0]["points"][1] == before
     assert result["generation"]["screen_transform"] == info
-    assert result["generation"]["source_canvas"] == {"width": 420, "height": 240}
+    assert result["generation"]["source_canvas"] == {"width": 460, "height": 240}
 
 
 def test_transform_rejects_wrong_coordinate_system():
@@ -61,7 +61,7 @@ def test_transform_rejects_invalid_roi_and_points():
         transform_logical_brush_plan_to_screen(
             plan, {"x": 0, "y": 0, "width": 1, "height": 323}
         )
-    plan["strokes"][0]["points"][0]["x"] = 421
+    plan["strokes"][0]["points"][0]["x"] = 461
     with pytest.raises(ValueError, match="выходит за границы"):
         transform_logical_brush_plan_to_screen(
             plan, {"x": 0, "y": 0, "width": 646, "height": 323}
