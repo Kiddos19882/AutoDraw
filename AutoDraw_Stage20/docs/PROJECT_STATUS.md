@@ -28,7 +28,7 @@ Game Monitor обновлён до 0.2.0: в клиентском bundle ста�
 
 INT-002 завершена как статическое проектирование контракта ресурсного снимка и протокола baseline/delta. В INT-003 статически подтверждены `BoardPane.max`/`less`, реализован Monitor 0.2.0 с O(1) snapshot и добавлены Node-тесты. INT-003 остаётся IN_PROGRESS: необходимы проверка этих полей в живом iframe и A/B/C замеры без Monitor, с 0.1.2 и с 0.2.0.
 
-Блокер logical→screen частично устранён: Brush Test теперь создаёт logical-планы 420×240, а integrated_app.py преобразует их в screen-local ROI перед загрузкой в Stage6. Добавлены unit- и integration-тесты; обычные local-планы сохраняют прежний путь. Live-проверка фактического ROI и семантики правой/нижней границы ещё не выполнена, поэтому полную матрицу запускать рано. Это ограничение геометрии эксперимента, а не ошибка формулы CHALK.
+Блокер logical→screen частично устранён: Brush Test теперь создаёт logical-планы 460×240, а integrated_app.py преобразует их в screen-local ROI перед загрузкой в Stage6. Добавлены unit- и integration-тесты; обычные local-планы сохраняют прежний путь. Live-проверка фактического ROI и семантики правой/нижней границы ещё не выполнена, поэтому полную матрицу запускать рано. Это ограничение геометрии эксперимента, а не ошибка формулы CHALK.
 
 ## 4. Разрешения и границы работ
 
@@ -104,7 +104,7 @@ Game Monitor 0.2.0 и Node-тесты проверены через GitHub Actio
 
 ## 10. Реализация первого этапа logical→screen transform
 
-Добавлен source/preparation/brush_coordinate_transform.py; Brush Test теперь явно использует логическую систему 420×240. При передаче плана в Stage6 создаётся screen-local копия под фактический ROI, а исходный план сохраняет generation.screen_transform. Дополнительное продление концов тестовых линий отключено.
+Добавлен source/preparation/brush_coordinate_transform.py; Brush Test теперь явно использует логическую систему 460×240. При передаче плана в Stage6 создаётся screen-local копия под фактический ROI, а исходный план сохраняет generation.screen_transform. Дополнительное продление концов тестовых линий отключено.
 
 Добавлены unit-тесты transform и проверка интеграционного handoff. GitHub Actions run #1132 для HEAD `3a0383b56b5972d4b978ff30080d7b7768b021d0` прошёл полностью: `geometry-tests`, `executor-tests`, `Windows portable build and startup smoke-test` — success. Live browser validation, A/B/C Monitor и полная CHALK-матрица не завершены. INT-003 остаётся IN_PROGRESS.
 
