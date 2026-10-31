@@ -152,7 +152,7 @@ class UnifiedAppCoreTests(unittest.TestCase):
             root = tk.Tk()
             root.withdraw()
             app = integrated_app.AutoDrawUnifiedApp(root)
-            app.executor.area = TargetArea(x=100, y=80, width=646, height=323)
+            app.executor.area = TargetArea(x=100, y=80, width=646, height=338)
             from brush_behavior_test_ui import build_brush_test_drawing_plan
             plan = build_brush_test_drawing_plan(
                 "Горизонтальные линии", (460, 240), coordinate_system="logical_board_pixels"
@@ -169,9 +169,9 @@ class UnifiedAppCoreTests(unittest.TestCase):
                     self.assertTrue(runtime_plan_path.is_file())
                     runtime_plan = json.loads(runtime_plan_path.read_text(encoding="utf-8"))
                     self.assertEqual(runtime_plan["coordinate_system"], "local_canvas_pixels")
-                    self.assertEqual(runtime_plan["canvas"], {"width": 646, "height": 323})
+                    self.assertEqual(runtime_plan["canvas"], {"width": 646, "height": 338})
                     self.assertAlmostEqual(runtime_plan["strokes"][0]["points"][0]["x"], 20 * 645 / 460)
-                    self.assertAlmostEqual(runtime_plan["strokes"][0]["points"][0]["y"], 20 * 322 / 240)
+                    self.assertAlmostEqual(runtime_plan["strokes"][0]["points"][0]["y"], 20 * 337 / 240)
                     source_plan = json.loads(source_path.read_text(encoding="utf-8"))
                     self.assertEqual(source_plan["coordinate_system"], "logical_board_pixels")
                     self.assertIn("screen_transform", source_plan["generation"])
