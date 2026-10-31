@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import shutil
+import sys
 import uuid
 import ctypes
 import platform
@@ -776,8 +777,14 @@ class BrushBehaviorTestTab:
             )
             return
 
-        project_root = Path(__file__).resolve().parents[2]
-        bridge_dir = project_root / "source" / "game_monitor"
+        if getattr(sys, "frozen", False):
+            app_root = Path(sys.executable).resolve().parent
+            bridge_dir = app_root / "game_monitor"
+            working_directory = app_root
+        else:
+            app_root = Path(__file__).resolve().parents[2]
+            bridge_dir = app_root / "source" / "game_monitor"
+            working_directory = app_root.parent
         batch_path = bridge_dir / "start_game_monitor_bridge.bat"
         if not batch_path.is_file():
             messagebox.showerror(
@@ -793,8 +800,8 @@ class BrushBehaviorTestTab:
             snippet_dir.mkdir(parents=True, exist_ok=True)
             snippet_path.unlink(missing_ok=True)
             self.bridge_process = subprocess.Popen(
-                ["cmd.exe", "/c", "call", str(batch_path), origin, str(snippet_path)],
-                cwd=str(project_root.parent),
+                ["cmd.exe", "/c", "call", str(batch_path), origin, str(snippet_path), str(self.output_dir)],
+                cwd=str(working_directory),
                 creationflags=getattr(subprocess, "CREATE_NEW_CONSOLE", 0),
             )
         except (OSError, subprocess.SubprocessError) as exc:
@@ -845,7 +852,11 @@ class BrushBehaviorTestTab:
 
     def copy_game_monitor_source(self) -> None:
         """Copy the exact Game Monitor source shipped with this application."""
-        path = Path(__file__).resolve().parents[1] / "game_monitor" / "game_monitor.js"
+        if getattr(sys, "frozen", False):
+            bridge_dir = Path(sys.executable).resolve().parent / "game_monitor"
+        else:
+            bridge_dir = Path(__file__).resolve().parents[1] / "game_monitor"
+        path = bridge_dir / "game_monitor.js"
         try:
             content = path.read_text(encoding="utf-8")
         except OSError as exc:
