@@ -128,6 +128,23 @@ class UnifiedAppCoreTests(unittest.TestCase):
                 except tk.TclError:
                     pass
 
+    def test_stage6_rejects_untransformed_logical_brush_source_plan(self):
+        with tempfile.TemporaryDirectory(prefix="AutoDraw logical brush source ") as temp:
+            source_path = Path(temp) / "logical-brush-plan.json"
+            source_path.write_text(json.dumps({
+                "coordinate_system": "logical_board_pixels",
+                "canvas": {"width": 420, "height": 240},
+                "strokes": [{
+                    "name": "logical line",
+                    "points": [{"x": 20, "y": 20}, {"x": 420, "y": 20}],
+                    "closed": False,
+                }],
+            }), encoding="utf-8")
+            executor = object.__new__(integrated_app.Stage6App)
+            executor.running = False
+            with self.assertRaisesRegex(ValueError, "исходный логический план Brush Test"):
+                executor.load_plan_from_path(source_path)
+
     def test_brush_test_plan_transfers_to_existing_executor(self):
         root = None
         app = None
