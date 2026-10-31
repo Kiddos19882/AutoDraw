@@ -1208,3 +1208,8 @@ Run JSON дополнен `stroke_count`, суммой `sampled_point_delta_tota
 **Безопасность и эксплуатация:** сервер по-прежнему слушает только loopback и допускает только переданный точный HTTPS Origin. Токен не записывается в Git, manifest или постоянные настройки. Окно сервера нужно оставить открытым; остановка — Ctrl+C.
 
 **Проверки:** изменения и тесты внесены в ветку; локальный Windows GUI/Firefox live test и итог GitHub Actions требуют отдельного подтверждения.
+
+
+### Дополнение — поддержка portable build для WebSocket launcher
+
+После добавления UI-кнопок уточнено, что PyInstaller не включает неимпортируемые companion-файлы Game Monitor автоматически. build_windows.py теперь копирует в portable-root/game_monitor JS Monitor, JS bridge, Python collector, requirements-bridge.txt, BAT launcher и README. Frozen UI определяет каталог через путь к AutoDraw.exe; source UI продолжает использовать source/game_monitor. BAT распознаёт оба layout и принимает явный output directory от UI, чтобы run JSON и heartbeat оставались в общем каталоге Brush Test. 
