@@ -1161,3 +1161,19 @@ def test_exact_chalk_measurement_rejects_counter_reset_and_zero_consumption():
     assert brush_ui.is_exact_positive_chalk_measurement(reset) is False
     assert brush_ui.is_exact_positive_chalk_measurement(zero) is False
     assert brush_ui.is_exact_positive_chalk_measurement(valid) is True
+
+
+
+def test_game_monitor_origin_validation_accepts_only_bare_https_origin():
+    normalize = brush_ui.BrushBehaviorTestTab.normalize_game_monitor_origin
+
+    assert normalize("https://game.example") == "https://game.example"
+    assert normalize("https://game.example/") == "https://game.example"
+    assert normalize("https://game.example:8443") == "https://game.example:8443"
+    assert normalize("http://game.example") is None
+    assert normalize("https://game.example/game") is None
+    assert normalize("https://game.example/?token=x") is None
+    assert normalize("https://game.example?") is None
+    assert normalize("https://game.example#") is None
+    assert normalize("https://user:pass@game.example") is None
+    assert normalize("not-an-origin") is None
