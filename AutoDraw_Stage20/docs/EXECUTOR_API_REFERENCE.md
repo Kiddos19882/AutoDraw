@@ -151,10 +151,13 @@ BrushSliderController(
     target_area: dict[str, int],
     *,
     current_screen_size_provider: Callable[[], Any] | None = None,
+    monitor_radius_provider: Callable[..., dict[str, Any] | None] | None = None,
 )
 ```
 
 Методы: `validate(self) -> None`, `before_stroke(self, executor: Any, stroke_index: int, stroke: Stroke) -> str`, `select_value(self, executor: Any, value: int) -> str`.
+
+`coordinate_for_value()` используется только для начальной оценки координаты. После каждого drag контроллер читает свежий Game Monitor Bridge heartbeat, требует два последовательных одинаковых значения радиуса и при расхождении выполняет до 7 bounded-secant коррекций. Без активного моста, при несовпадении начального радиуса или неподтверждённом целевом радиусе исполнение прекращается до следующего рисующего штриха.
 
 ### 4.4. ColorPlanExecutionHooks
 
@@ -170,6 +173,7 @@ ColorPlanExecutionHooks(
     dpi_scale_provider: Callable[[], int] | None = None,
     brush_slider_calibration: dict[str, Any] | BrushSliderCalibration | None = None,
     brush_target_area: dict[str, int] | None = None,
+    brush_monitor_radius_provider: Callable[..., dict[str, Any] | None] | None = None,
 )
 ```
 
