@@ -21,7 +21,7 @@
 | [TESTS_AND_CI_MAP.md](TESTS_AND_CI_MAP.md) | Тестовые наборы, диагностические скрипты, benchmark и GitHub Actions |
 | [UI_INTEGRATION_MAP.md](UI_INTEGRATION_MAP.md) | Карта восьми вкладок, callback-связей и передачи данных в executor |
 | [DATA_FORMATS_AND_MODELS.md](DATA_FORMATS_AND_MODELS.md) | Общие модели DrawingPlan, Stroke, Point и формат .autodraw |
-| [DATA_FORMATS_AND_PROFILES.md](DATA_FORMATS_AND_PROFILES.md) | Профили, палитры, планы, лабораторные и калибровочные результаты, экспорт Game Monitor |
+| [DATA_FORMATS_AND_PROFILES.md](DATA_FORMATS_AND_PROFILES.md) | Профили, палитры, планы, лабораторные и калибровочные результаты, экспорт Game Monitor |\n| [BRUSH_TEST_AUTOMATION_VISION.md](BRUSH_TEST_AUTOMATION_VISION.md) | Целевая архитектура автоматизированной лаборатории кистей, CHALK-экспериментов и сбора данных |
 | [FILE_STORAGE_CATALOG.md](FILE_STORAGE_CATALOG.md) | Каталог пользовательских файлов, runtime-планов, отчётов, проектов и экспериментальных данных |
 | [CONFIGURATION_AND_DATA.md](CONFIGURATION_AND_DATA.md) | Каталоги данных, профили, форматы и переменные окружения |
 | [DEVELOPMENT.md](DEVELOPMENT.md) | Подготовка Windows-среды, запуск, тесты и сборка |
