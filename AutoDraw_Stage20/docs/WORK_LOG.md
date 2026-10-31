@@ -885,3 +885,12 @@ CI run #41174050665 на пользовательском commit f72 выяви�
 Выполнен непосредственный визуальный просмотр всех трёх `after_draw-board.png` и всех трёх `after_draw-screen.png` из commit f72. На каждом ROI-скриншоте видны четыре ожидаемых чёрных штриха; на полном экране все четыре доходят до соответствующих видимых границ игрового BoardPane. Видимого выхода штрихов за пределы доски нет. Следовательно, boundary probe визуально подтверждён на трёх повторах для конкретного screen ROI 1920×1080, ROI x=563/y=253/578×301 и текущего масштаба браузера. Это не универсальная гарантия для других экранов/ROI.
 
 Автоматическое поле `stroke_visibility_analysis` в исходных manifest всё ещё содержит прежний inconclusive-результат, поскольку было создано до исправления analyzer; ручная проверка самих приложенных PNG не меняет исторический JSON. После исправления analyzer новые снимки смогут дополнительно получать машинную метрику. В совокупности live screenshots + exact Game Monitor max/less snapshots подтверждают корректность геометрии и расхода в проверенной конфигурации. Основной оставшийся блокер INT-003 — контролируемая A/B/C-серия Monitor off / 0.1.2 / 0.2.0 минимум по три повтора каждого режима, а также успешный CI актуального кода.
+
+
+### INT-003 — проверка актуального CI, 31.10.2026
+
+Проверен branch HEAD `0c09d2830bb007b7a9de1cd46e085f779e91d2f3`. Workflow `Geometry planner tests` run #1224 (`41174465072`) имеет `completed/success`; jobs `geometry-tests`, `executor-tests` и `Windows portable build and startup smoke-test` завершились success. В geometry job успешно прошли Node syntax/resource snapshot tests Game Monitor, WebSocket smoke-server tests, preparation/geometry tests и UI regressions. Run #1223 также success.
+
+Исторические падения #1210—#1213 исправлены последующими изменениями: negative fixture для uniform-scale guard заменена на действительно non-uniform ROI 646×323, вызов plan builder приведён к актуальной сигнатуре. Текущий HEAD зелёный.
+
+Ограничения: это CI, а не live Firefox iframe test. Smoke server всё ещё принимает только `auth`/`ping`; production read-only bridge, автоматический pre/post capture и manifest binding отсутствуют. A/B/C Monitor off/0.1.2/0.2.0 и численный overhead не измерены. INT-003 остаётся IN_PROGRESS.
