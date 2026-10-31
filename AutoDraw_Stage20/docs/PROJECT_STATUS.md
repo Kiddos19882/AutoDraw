@@ -249,3 +249,10 @@ Game Monitor 0.2.1 остаётся текущей версией. INT-003 ос�
 **Ограничения:** bridge сохраняет session/run JSON в отдельном каталоге, но пока не записывает путь и run_id в UI `experiment.json`. Live-проверка нового bridge из реального Firefox iframe ещё не выполнена. A/B/C overhead самого bridge также не измерен; все будущие сравниваемые прогоны должны иметь одинаковую конфигурацию инструментации.
 
 **Статус INT-004:** IN_PROGRESS. Не считать production integration завершённой до browser validation и автоматической привязки run JSON к manifest.
+
+
+### Дополнение к INT-004 — автоматическая привязка run к experiment.json
+
+Brush Test UI теперь после callback завершения executor автоматически опрашивает каталог bridge, выбирает отчёт по времени старта относительно фазы `before_draw` и фактическому радиусу, копирует его в каталог эксперимента как `monitor_report.json` и добавляет в `experiment.json` session_id, run_id, точную CHALK delta, FPS, trajectory summary и capture status. Если совпадающий отчёт не появился в течение 10 секунд, manifest получает `monitor_capture.status=unavailable`.
+
+Это закрывает файловую привязку на уровне UI, но корреляция пока основана на времени+радиусе, а не на сквозном experiment_id. Live Firefox validation и проверка возможных неоднозначностей при одинаковых радиусах остаются открытыми.
