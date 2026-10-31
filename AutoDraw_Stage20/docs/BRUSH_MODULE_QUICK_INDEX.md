@@ -108,3 +108,6 @@
 ## Дополнение: реализованное преобразование координат
 
 `source/preparation/brush_coordinate_transform.py` содержит `transform_logical_brush_plan_to_screen()`. Brush Test теперь создаёт план в `logical_board_pixels` (420×240), а интеграционный слой преобразует его в `local_canvas_pixels` перед загрузкой в Stage6. Исходный план сохраняется с `generation.screen_transform`; runtime-план имеет размер экранного ROI. Для тестовых штрихов отключено дополнительное продление концов. Тесты: `source/preparation/tests/test_brush_coordinate_transform.py` и обновлённый `tests/test_unified_app.py`.
+
+
+**Защита Stage6:** исходный logical_board_pixels JSON нельзя открывать напрямую через обычную загрузку DrawingPlan. Для него предусмотрена передача через Brush Test, где выполняется преобразование в экранный ROI. Stage6 отклоняет прямую загрузку такого исходника.
