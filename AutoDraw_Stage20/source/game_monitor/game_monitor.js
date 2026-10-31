@@ -243,17 +243,17 @@
     if (signature === state.lastSampleSignature) return;
     const previous = state.lastSampleSignature;
     const previousPointCount = state.lastSamplePointCount;
-    const acceptedPoint = snapshot.isExact &&
-      Number.isSafeInteger(previousPointCount) &&
-      snapshot.pointCount > previousPointCount
-      ? latestAcceptedPoint(state.board)
+    const pointDelta = snapshot.isExact && Number.isSafeInteger(previousPointCount)
+      ? snapshot.pointCount - previousPointCount
       : null;
+    const acceptedPoint = pointDelta > 0 ? latestAcceptedPoint(state.board) : null;
     state.lastSampleSignature = signature;
     state.lastSamplePointCount = snapshot.pointCount;
     emit("DRAW_SAMPLE", {
       source,
       previousSignature: previous,
       after: snapshot,
+      pointDelta,
       acceptedPoint
     });
   }
