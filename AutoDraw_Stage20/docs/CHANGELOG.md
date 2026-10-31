@@ -153,3 +153,8 @@
 
 ### Changed
 - Transform metadata явно фиксирует единицы координат runtime executor и point_step_px как screen_pixels.
+
+
+### Fixed
+- Stage6 отклоняет прямую загрузку исходных logical_board_pixels планов Brush Test; их нужно передавать через интеграционный преобразователь.
+- Добавлен regression test на запрет такой прямой загрузки.
