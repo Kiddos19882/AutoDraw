@@ -37,12 +37,12 @@ def transform_logical_brush_plan_to_screen(
     if not isinstance(screen_area, dict):
         raise ValueError("Экранная область должна быть объектом.")
     try:
-        origin_x = int(screen_area["x"])
-        origin_y = int(screen_area["y"])
-        screen_width = int(screen_area["width"])
-        screen_height = int(screen_area["height"])
-    except (KeyError, TypeError, ValueError) as exc:
+        values = [screen_area[key] for key in ("x", "y", "width", "height")]
+    except KeyError as exc:
         raise ValueError("Экранная область должна содержать целые x, y, width и height.") from exc
+    if any(isinstance(value, bool) or not isinstance(value, int) for value in values):
+        raise ValueError("Координаты и размеры экранной области должны быть целыми числами.")
+    origin_x, origin_y, screen_width, screen_height = values
     if screen_width < 2 or screen_height < 2:
         raise ValueError("Экранный ROI должен быть не меньше 2×2 пикселя.")
 
