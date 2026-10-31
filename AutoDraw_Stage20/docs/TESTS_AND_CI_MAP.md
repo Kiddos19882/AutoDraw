@@ -247,3 +247,24 @@
 - [UI_INTEGRATION_MAP.md](UI_INTEGRATION_MAP.md) — интеграция UI.
 - [FILE_STORAGE_CATALOG.md](FILE_STORAGE_CATALOG.md) — файлы и каталоги данных.
 - [PROJECT_GUIDE.md](../PROJECT_GUIDE.md) — рабочие правила и общий план.
+
+
+## 7. Game Monitor JavaScript behavior tests — INT-003
+
+**Файл:** `source/game_monitor/tests/game_monitor.test.js`  
+**Среда:** Node.js built-in test runner (`node --test`), без браузера и без реального игрового iframe.
+
+Проверяемые контракты:
+- точный O(1) snapshot из `BoardPane.max` и `BoardPane.less`;
+- `pointCount=max-less` и delta между контрольными точками;
+- отсутствие индексных чтений `atom.points` со стороны Monitor в `status()`, `export()` и wrappers;
+- явный `diagnosticSnapshot()` выполняет полный подсчёт и сверяет его с ресурсным snapshot;
+- отсутствие скрытого array fallback, если engine fields отсутствуют/невалидны;
+- восстановление исходного метода после `stop()`.
+
+В `.github/workflows/geometry-tests.yml` добавлен отдельный шаг:
+```powershell
+node --test ..\\game_monitor\\tests\\game_monitor.test.js
+```
+
+**Граница:** эти тесты проверяют JS-логику Monitor на mock BoardPane. Они не заменяют живую проверку реального Egret BoardPane, frame probe или A/B/C-измерение overhead.
