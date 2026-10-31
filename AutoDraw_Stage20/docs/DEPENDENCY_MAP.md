@@ -45,7 +45,7 @@
 | `palette_quantization_ui` | `palette_profiles`, `palette_quantization` |
 | `color_scanline_ui` | `paint_cost_model`, `brush_planner`, `board_resource_model`, `paint_budget_optimizer`, `color_scanline`, `geometry_color_plan` |
 | `paint_limit_test_ui` | `color_scanline`, `paint_limit_test`, `palette_profiles` |
-| `brush_behavior_test_ui` | `stage8_optimizer`, `brush_test_workflow`, `brush_experiment_capture` |
+| `brush_behavior_test_ui` | `stage8_optimizer`, `brush_test_workflow`, `brush_experiment_capture`, `chalk_radius_matrix` |
 | `brush_calibration_ui` | `brush_calibration` |
 
 Дополнительные прямые зависимости модулей подготовки описаны по каждому модулю в [PREPARATION_API_REFERENCE.md](PREPARATION_API_REFERENCE.md); этот документ не перечисляет все транзитивные связи библиотек.
