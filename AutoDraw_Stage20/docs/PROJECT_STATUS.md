@@ -408,3 +408,6 @@ Bridge server получил аргумент --snippet-file: он записы�
 ### Уточнение для portable-сборки
 
 Сборщик build_windows.py копирует необходимые файлы Game Monitor Bridge в папку game_monitor рядом с AutoDraw.exe. UI использует отдельную ветку определения путей для frozen/portable режима и передаёт серверу фактический каталог результатов Brush Test; вложенный путь AutoDraw_Stage20 в portable data не создаётся.
+
+
+Функции запуска и копирования Game Monitor Bridge включены в app_features.json. Сопутствующие файлы копируются build_windows.py в portable-root/game_monitor; временный snippet хранится только в каталоге результатов на время сессии.
