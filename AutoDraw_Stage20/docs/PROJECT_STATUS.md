@@ -143,3 +143,8 @@ Game Monitor 0.2.0 и Node-тесты проверены через GitHub Actio
 Конечные POINTER_UP client coordinates совпадают с расчётными экранными endpoints после учёта viewport offset. Но сами координаты принятых DRAW_SAMPLE точек в export отсутствуют, поэтому hit-test включительных границ нельзя считать окончательно доказанным по Monitor JSON. В исходных manifest автоматическая проверка видимости была inconclusive из-за сравнения logical 460×240 с screen ROI 578×301. Исправлен analyzer: теперь он применяет сохранённый transform к expected strokes. Требуется повторный прогон для подтверждения визуальной метрики. Paint meter screenshot estimator также inconclusive и не используется вместо точного Monitor.
 
 CI на commit f72 обнаружил ошибочную negative fixture в test_transform_rejects_nonuniform_roi_for_uniform_game_scale (646×338 — равномерный ROI). Фикстура заменена на 646×323. Добавлены tests для screen-local преобразования expected strokes и mismatch ROI. Последующие CI runs нужно дождаться и проверить по актуальному HEAD. A/B/C Monitor off/0.1.2/0.2.0 не выполнялся; полная матрица кистей не разблокирована.
+
+
+### 14. Визуальное подтверждение границ на live-скриншотах
+
+Все три полных `after_draw-screen.png` и три `after_draw-board.png` из commit f72 просмотрены. На всех трёх прогонах четыре штриха видны и доходят до соответствующих сторон BoardPane; видимого выхода за границы нет. Это подтверждает transform для конкретного ROI x=563/y=253/578×301 при разрешении 1920×1080. Исходное поле automated `stroke_visibility_analysis` остаётся inconclusive, так как записано до исправления analyzer; ручной просмотр PNG является отдельным подтверждением. A/B/C overhead тестирование и CI актуального кода остаются открытыми условиями INT-003.
