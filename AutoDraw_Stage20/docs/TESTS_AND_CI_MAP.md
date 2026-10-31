@@ -268,3 +268,6 @@ node --test ..\\game_monitor\\tests\\game_monitor.test.js
 ```
 
 **Граница:** эти тесты проверяют JS-логику Monitor на mock BoardPane. Они не заменяют живую проверку реального Egret BoardPane, frame probe или A/B/C-измерение overhead.
+
+
+- Дополнительно проверяется `inspect()` после `stop()`: точный snapshot доступен без повторного attach и без изменения исходных методов BoardPane.
