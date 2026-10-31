@@ -6,7 +6,7 @@ import uuid
 import ctypes
 import platform
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
@@ -29,6 +29,76 @@ from brush_experiment_capture import (
 
 # Verified against the master game bundle: Graphics.lineStyle receives atom.radius directly.
 MAX_BRUSH_LINE_WIDTH_LOGICAL_PX = 30;
+
+
+
+def _parse_monitor_timestamp(value: Any) -> datetime | None:
+    """Parse an ISO timestamp as an aware UTC datetime."""
+    if not isinstance(value, str) or not value.strip():
+        return None
+    try:
+        parsed = datetime.fromisoformat(value.strip().replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+def select_execution_monitor_run(
+    candidates: list[tuple[Path, dict[str, Any]]],
+    *,
+    execution_report: dict[str, Any],
+    requested_brush: int | None,
+    expected_strokes: int,
+    before_draw_at: str | None = None,
+) -> tuple[tuple[Path, dict[str, Any]] | None, str, int]:
+    """Select one run strictly correlated with an executor interval; never guess by mtime."""
+    execution_start = _parse_monitor_timestamp(execution_report.get("started_at"))
+    execution_end = _parse_monitor_timestamp(execution_report.get("ended_at"))
+    if execution_start is None or execution_end is None or execution_end < execution_start:
+        return None, "execution_time_window_unavailable", 0
+
+    before_draw = _parse_monitor_timestamp(before_draw_at)
+    window_start = execution_start - timedelta(seconds=1)
+    if before_draw is not None:
+        window_start = max(window_start, before_draw)
+    # The collector may finalize shortly after the executor releases the mouse.
+    window_end = execution_end + timedelta(seconds=5)
+
+    matching: list[tuple[Path, dict[str, Any]]] = []
+    for source_path, report in candidates:
+        if not isinstance(report, dict) or report.get("record_type") != "autodraw_game_monitor_run":
+            continue
+        if report.get("execution_status") not in {"completed", "partial"}:
+            continue
+        started = _parse_monitor_timestamp(report.get("started_at_utc"))
+        finished = _parse_monitor_timestamp(report.get("finished_at_utc"))
+        if started is None or finished is None or finished < started:
+            continue
+        if started < window_start or finished > window_end:
+            continue
+        try:
+            observed_brush = int(round(float(report.get("brush_radius"))))
+            stroke_count = int(report.get("stroke_count", 0))
+        except (TypeError, ValueError, OverflowError):
+            continue
+        if requested_brush is not None and observed_brush != requested_brush:
+            continue
+        if stroke_count != expected_strokes:
+            continue
+        radii = report.get("observed_brush_radii")
+        if report.get("brush_radius_status") != "single":
+            continue
+        if not isinstance(radii, list) or radii != [observed_brush]:
+            continue
+        matching.append((source_path, report))
+
+    if len(matching) == 1:
+        return matching[0], "matched_executor_window", 1
+    if len(matching) > 1:
+        return None, "ambiguous_executor_window", len(matching)
+    return None, "no_run_matches_executor_window", 0
 
 
 def _screen_local_strokes_for_capture(
@@ -2124,19 +2194,24 @@ class BrushBehaviorTestTab:
             return False
 
     def _schedule_bridge_report_capture(self, attempt: int = 0) -> None:
-        """Find the completed WebSocket run for this experiment and attach it automatically."""
+        """Attach only the unique Game Monitor run matching the completed executor interval."""
         if self.experiment_dir is None:
             return
         if attempt == 0 and self._bridge_capture_poll_id is not None:
             return
 
         bridge_root = self.output_dir / "game_monitor_bridge"
+        execution = self.execution_report if isinstance(self.execution_report, dict) else {}
+        plan_strokes = self.current_plan.get("strokes") if isinstance(self.current_plan, dict) else None
+        try:
+            expected_strokes = len(plan_strokes) if isinstance(plan_strokes, list) else int(
+                execution.get("total_strokes", execution.get("completed_strokes", 0))
+            )
+        except (TypeError, ValueError):
+            expected_strokes = 0
+
         before_phase = self.experiment_phases.get("before_draw", {})
         before_text = before_phase.get("captured_at_utc") if isinstance(before_phase, dict) else None
-        try:
-            before_time = datetime.fromisoformat(before_text) if before_text else None
-        except (TypeError, ValueError):
-            before_time = None
         requested = self._experiment_requested_brush
         if requested is None:
             try:
@@ -2144,34 +2219,26 @@ class BrushBehaviorTestTab:
             except (AttributeError, TypeError, ValueError):
                 requested = None
 
-        candidates = sorted(
-            bridge_root.rglob("game-monitor-run-*.json") if bridge_root.is_dir() else [],
-            key=lambda item: item.stat().st_mtime,
-            reverse=True,
-        )
-        for source_path in candidates:
-            try:
-                report = json.loads(source_path.read_text(encoding="utf-8"))
-                if not isinstance(report, dict) or report.get("record_type") != "autodraw_game_monitor_run":
-                    continue
-                if report.get("execution_status") not in {"completed", "partial"}:
-                    continue
+        candidates: list[tuple[Path, dict[str, Any]]] = []
+        if bridge_root.is_dir():
+            for source_path in bridge_root.rglob("game-monitor-run-*.json"):
                 try:
-                    observed_brush = int(round(float(report.get("brush_radius"))))
-                except (TypeError, ValueError):
-                    continue
-                if requested is not None and observed_brush != requested:
-                    continue
-                started_text = report.get("started_at_utc")
-                try:
-                    started_time = datetime.fromisoformat(started_text) if started_text else None
-                except (TypeError, ValueError):
-                    started_time = None
-                if before_time is not None and (started_time is None or started_time < before_time):
-                    continue
-                if self.game_monitor_summary and self.game_monitor_summary.get("run_id") == report.get("run_id"):
+                    report = json.loads(source_path.read_text(encoding="utf-8"))
+                    if isinstance(report, dict):
+                        candidates.append((source_path, report))
+                except (OSError, UnicodeError, json.JSONDecodeError):
                     continue
 
+        selected, match_reason, candidate_count = select_execution_monitor_run(
+            candidates,
+            execution_report=execution,
+            requested_brush=requested,
+            expected_strokes=expected_strokes,
+            before_draw_at=before_text,
+        )
+        if selected is not None:
+            source_path, report = selected
+            try:
                 target_path = self.experiment_dir / "monitor_report.json"
                 shutil.copy2(source_path, target_path)
                 chalk = report.get("chalk") if isinstance(report.get("chalk"), dict) else {}
@@ -2200,12 +2267,24 @@ class BrushBehaviorTestTab:
                 }
                 self.game_monitor_report_path = target_path.resolve()
                 self.game_monitor_summary = summary
+                try:
+                    chalk_pre = int(chalk.get("pre_point_count"))
+                    chalk_post = int(chalk.get("post_point_count"))
+                    chalk_consumed = int(chalk.get("consumed_points"))
+                    chalk_counter_consistent = (
+                        chalk_post >= chalk_pre
+                        and chalk_post - chalk_pre == chalk_consumed
+                        and chalk_consumed > 0
+                    )
+                except (TypeError, ValueError):
+                    chalk_counter_consistent = False
                 telemetry_clean = (
                     report.get("execution_status") == "completed"
                     and chalk.get("status") == "exact"
-                    and int(chalk.get("consumed_points", 0) or 0) > 0
-                    and int(report.get("stroke_count", 0) or 0) > 0
+                    and chalk_counter_consistent
+                    and int(report.get("stroke_count", 0) or 0) == expected_strokes
                     and report.get("brush_radius_status") == "single"
+                    and report.get("observed_brush_radii") == [requested]
                     and report.get("point_delta_matches_chalk") is True
                     and frame_probe.get("status") == "measured"
                     and frame_probe.get("visibility_interruption") is False
@@ -2217,6 +2296,7 @@ class BrushBehaviorTestTab:
                 self.experiment_phases["monitor_capture"] = {
                     "status": "saved" if telemetry_clean else "partial",
                     "transport": "loopback_websocket",
+                    "match_reason": match_reason,
                     "session_id": report.get("session_id"),
                     "run_id": report.get("run_id"),
                     "source_path": str(source_path.resolve()),
@@ -2226,20 +2306,23 @@ class BrushBehaviorTestTab:
                     "monitor_dropped_events": report.get("monitor_dropped_events"),
                     "monitor_error_count": report.get("monitor_error_count"),
                     "stroke_count": report.get("stroke_count"),
+                    "expected_stroke_count": expected_strokes,
                     "point_delta_matches_chalk": report.get("point_delta_matches_chalk"),
                     "brush_radius_status": report.get("brush_radius_status"),
                     "chalk_status": chalk.get("status", "inconclusive"),
+                    "chalk_counter_consistent": chalk_counter_consistent,
                     "captured_at_utc": datetime.now(timezone.utc).isoformat(timespec="milliseconds"),
                 }
                 self._bridge_capture_poll_id = None
                 self._write_experiment_manifest()
                 self.status_var.set(
-                    f"Game Monitor автоматически привязан: CHALK {chalk.get('consumed_points', 'не определён')}, "
-                    f"радиус {observed_brush}, FPS {frame_probe.get('median_fps', 'нет данных')}."
+                    f"Game Monitor привязан к прогону исполнителя: CHALK "
+                    f"{chalk.get('consumed_points', 'не определён')}, радиус {report.get('brush_radius')}, "
+                    f"штрихов {report.get('stroke_count')}/{expected_strokes}."
                 )
                 return
-            except (OSError, UnicodeError, json.JSONDecodeError, TypeError, ValueError):
-                continue
+            except (OSError, UnicodeError, TypeError, ValueError):
+                pass
 
         if attempt < 20:
             self._bridge_capture_poll_id = self.root.after(
@@ -2251,7 +2334,11 @@ class BrushBehaviorTestTab:
         self.experiment_phases["monitor_capture"] = {
             "status": "unavailable",
             "transport": "loopback_websocket",
-            "reason": "matching_run_report_not_found",
+            "reason": match_reason,
+            "candidate_count": candidate_count,
+            "expected_stroke_count": expected_strokes,
+            "execution_started_at": execution.get("started_at"),
+            "execution_ended_at": execution.get("ended_at"),
             "checked_at_utc": datetime.now(timezone.utc).isoformat(timespec="milliseconds"),
         }
         try:
