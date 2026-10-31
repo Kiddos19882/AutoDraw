@@ -78,14 +78,14 @@ AutoDrawGameMonitor.attach(boardPaneInstance)
 
 В Monitor 0.1.2 ресурсный `pointCount` получался сканированием `atom.points`, а hot path создавал дополнительные O(N)-проходы. В версии 0.2.0 эти проходы убраны из `emit()`, wrappers, polling, `status()` и `export()`: используется `BoardPane.max`/`less`. Влияние на FPS и восстановление descriptors требует отдельного runtime/A-B подтверждения.
 
-CI проверяет JavaScript Monitor только командой `node --check`; поведенческих JS-тестов жизненного цикла Monitor пока не найдено. Python tests в `tests/test_websocket_smoke_server.py` проверяют только отдельный transport smoke server.
+CI проверяет синтаксис `node --check` и поведенческие Node.js тесты `source/game_monitor/tests/game_monitor.test.js`. Python tests в `tests/test_websocket_smoke_server.py` по-прежнему проверяют только отдельный transport smoke server.
 
 
 ## Низконагрузочный CHALK snapshot — проектное уточнение INT-002 (31.10.2026)
 
 В версии 0.1.2 `pointCount` вычислялся рекурсивным обходом `atom.points`, а `emit()`, wrappers и polling повторяли O(N)-проходы. В версии 0.2.0 обычная телеметрия использует O(1) `resourceSnapshot()` из `BoardPane.max`/`BoardPane.less`; полный обход оставлен только в явном `diagnosticSnapshot()`.
 
-Целевое требование для следующей версии: не строить полный snapshot автоматически на каждое событие; разделить O(1) ресурсный снимок из уже вычисленных/проверенных полей и диагностический O(N) обход, вызываемый только явно на контрольных точках. Статический bundle подтверждает, что конструктор `BoardPane` устанавливает `this.max`/`this.less`, а `updateLess()` обновляет `this.less = this.max - pointCount`. Runtime-сверка доступности и соответствия диагностическому подсчёту в живом iframe остаётся обязательной. Payload CHALK содержит `percent`, но Monitor не использует его для восстановления целого остатка.
+Это требование реализовано в 0.2.0: обычная телеметрия использует O(1) ресурсный снимок из проверяемых полей; диагностический O(N) обход вызывается только явно через `diagnosticSnapshot()`. Статический bundle подтверждает, что конструктор `BoardPane` устанавливает `this.max`/`this.less`, а `updateLess()` обновляет `this.less = this.max - pointCount`. Runtime-сверка доступности и соответствия диагностическому подсчёту в живом iframe остаётся обязательной. Payload CHALK содержит `percent`, но Monitor не использует его для восстановления целого остатка.
 
 Фактический расход прогона должен считаться дельтой между `pre_test` (после подтверждённого Clear) и `post_test` (до следующего Clear). Все калиброванные модели AutoDraw остаются оценками и не подменяют прямой игровой счётчик.
 
