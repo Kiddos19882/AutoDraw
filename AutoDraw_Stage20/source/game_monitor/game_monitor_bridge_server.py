@@ -57,9 +57,9 @@ def parse_json(raw: str) -> dict | None:
 
 def exact_snapshot(value: object) -> bool:
     return (isinstance(value, dict) and value.get("isExact") is True
-            and isinstance(value.get("maxPoints"), int)
-            and isinstance(value.get("pointCount"), int)
-            and isinstance(value.get("remainingPoints"), int)
+            and type(value.get("maxPoints")) is int
+            and type(value.get("pointCount")) is int
+            and type(value.get("remainingPoints")) is int
             and value["maxPoints"] > 0
             and 0 <= value["pointCount"] <= value["maxPoints"]
             and value["pointCount"] + value["remainingPoints"] == value["maxPoints"])
@@ -182,6 +182,10 @@ class RunRecorder:
 
     def heartbeat(self, status: dict, now: float) -> None:
         self.last_status = status
+        if self.current is not None:
+            self.current["monitor_dropped_events"] = status.get("droppedEvents")
+            self.current["monitor_error_count"] = status.get("errors")
+            self.current["monitor_active"] = status.get("active")
         if self.current is not None and self.current["execution_status"] == "completed":
             if now - self.last_activity >= self.idle_seconds:
                 self.finalize("completed")
@@ -228,6 +232,9 @@ class RunRecorder:
         fps["visibility_interruption"] = any(probe.get("visible") is not True for probe in run["frame_probes"])
         run["frame_probe"] = fps
         run["frame_probes"].clear()
+        run["interpretation"]["chalk_status"] = run["chalk"]["status"]
+        if run.get("monitor_dropped_events", 0):
+            run["interpretation"]["path_length_status"] = "monitor_events_dropped"
         if isinstance(run.get("started_at_performance_ms"), (int, float)) and isinstance(run.get("ended_at_performance_ms"), (int, float)):
             run["elapsed_from_first_to_last_stroke_ms"] = max(0.0, run["ended_at_performance_ms"] - run["started_at_performance_ms"])
         run.pop("stroke_started_at_performance_ms", None)
@@ -275,7 +282,9 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
                         await websocket.close(code=4002, reason="duplicate session_start")
                         return
                     session_id = message.get("sessionId")
-                    if not isinstance(session_id, str) or len(session_id) > 80:
+                    try:
+                        session_id = str(uuid.UUID(session_id))
+                    except (ValueError, TypeError, AttributeError):
                         await websocket.close(code=4002, reason="invalid session id")
                         return
                     recorder = RunRecorder(output_dir / session_id, session_id, idle_seconds)
