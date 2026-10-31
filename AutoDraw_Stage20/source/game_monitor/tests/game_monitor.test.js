@@ -373,3 +373,9 @@ test("subscribe streams emitted monitor events and unsubscribe stops delivery", 
   assert.equal(received.length, countBeforeUnsubscribe);
   monitor.stop();
 });
+
+
+test("WebSocket bridge browser agent parses without executing", () => {
+  const bridgeSource = fs.readFileSync(path.join(__dirname, "..", "game_monitor_bridge.js"), "utf8");
+  assert.doesNotThrow(() => new vm.Script(bridgeSource, { filename: "game_monitor_bridge.js" }));
+});
