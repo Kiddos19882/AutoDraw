@@ -216,3 +216,13 @@
 - Новый boundary experiment: 4/4 видимых штриха, 7.36 с, 106 move calls, ΔpointCount=52. Paint-meter image estimate остаётся inconclusive.
 - AcceptedPoint подтвердил y=0/240; горизонтальные конечные координаты около x=2.21/458.21, поэтому точные x=0/460 требуют отдельной проверки.
 - Влияние размера кисти не установлено; полная матрица ожидает завершения A/B/C overhead и проверки горизонтальных границ.
+
+
+## 2026-10-31 — первая реализация Game Monitor WebSocket telemetry bridge
+
+- Добавлен `AutoDrawGameMonitor.subscribe(listener)` для низконагрузочной инкрементальной передачи событий.
+- Добавлен browser agent для iframe: авторизация, allowlist событий, heartbeat и per-stroke FPS probe.
+- Добавлен loopback WebSocket collector: автоматическая группировка DRAW_START/DRAW_END в run, exact pre/post CHALK delta, acceptedPoint и JSON persistence.
+- Незавершённые runs при потере соединения сохраняются как partial.
+- Добавлены Python/Node regression tests; browser live validation и привязка к UI experiment.json остаются открытыми.
+- INT-004 переведена в IN_PROGRESS, не DONE.
