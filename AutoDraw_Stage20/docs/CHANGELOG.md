@@ -226,3 +226,11 @@
 - Незавершённые runs при потере соединения сохраняются как partial.
 - Добавлены Python/Node regression tests; browser live validation и привязка к UI experiment.json остаются открытыми.
 - INT-004 переведена в IN_PROGRESS, не DONE.
+
+
+### Дополнение — автоматическая связь bridge telemetry с Brush Test
+
+- Brush Test UI автоматически находит bridge run по времени `before_draw` и фактическому радиусу кисти.
+- Отчёт копируется в каталог эксперимента как `monitor_report.json`; `experiment.json` получает `session_id`, `run_id`, CHALK/FPS/trajectory summary и capture status.
+- Если отчёт не найден за 10 секунд, сохраняется `monitor_capture.status=unavailable`.
+- Корреляция по времени+радиусу является промежуточной; сквозной experiment_id и live validation ещё требуются.
