@@ -544,7 +544,8 @@ class Stage6App:
             brush_settings,
             text=("В расширенном режиме игры сначала откройте ползунок. Нажмите «Выбрать точки мышью…» и отметьте "
                   "позиции бегунка для значений 1 и 30: поля X/Y заполнятся автоматически. Затем укажите фактическое "
-                  "начальное значение ползунка и подтвердите калибровку. Координаты ползунка обязаны быть вне холста."),
+                  "начальное значение и подтвердите калибровку. Координаты ползунка должны быть вне холста. "
+                  "Для автоматической проверки и коррекции фактического радиуса Game Monitor Bridge должен быть подключён."),
             wraplength=1180,
             justify="left",
         ).grid(row=3, column=0, columnspan=4, sticky="w", padx=4, pady=(4, 0))
@@ -859,6 +860,7 @@ class Stage6App:
                 current_screen_size_provider=pyautogui.size,
                 monitor_radius_provider=_game_monitor_brush_radius_provider,
             )
+            controller.validate()
             executor = MouseExecutor(
                 self.stop_event, config, stop_reason_provider=lambda: self.stop_reason
             )
