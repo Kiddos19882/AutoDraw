@@ -8,6 +8,7 @@ from typing import Any
 LOGICAL_BOARD_WIDTH = 460
 LOGICAL_BOARD_HEIGHT = 240
 LOGICAL_BOARD_SIZE = (LOGICAL_BOARD_WIDTH, LOGICAL_BOARD_HEIGHT)
+MAX_UNIFORM_SCALE_RELATIVE_ERROR = 0.01
 
 
 def transform_logical_brush_plan_to_screen(
@@ -48,6 +49,14 @@ def transform_logical_brush_plan_to_screen(
 
     scale_x = (screen_width - 1) / LOGICAL_BOARD_WIDTH
     scale_y = (screen_height - 1) / LOGICAL_BOARD_HEIGHT
+    uniform_scale_error = abs(scale_x - scale_y) / max(scale_x, scale_y)
+    if uniform_scale_error > MAX_UNIFORM_SCALE_RELATIVE_ERROR:
+        raise ValueError(
+            "Пропорции экранного ROI не соответствуют равномерному масштабу BoardPane: "
+            f"scaleX={scale_x:.6f}, scaleY={scale_y:.6f}, "
+            f"расхождение={uniform_scale_error:.2%} (допуск {MAX_UNIFORM_SCALE_RELATIVE_ERROR:.0%}). "
+            "Повторно выдели точную область доски в профиле калибровки."
+        )
     transformed = deepcopy(plan)
     strokes = transformed.get("strokes")
     if not isinstance(strokes, list) or not strokes:
@@ -85,6 +94,9 @@ def transform_logical_brush_plan_to_screen(
         },
         "scale_x": scale_x,
         "scale_y": scale_y,
+        "expected_uniform_scale": True,
+        "uniform_scale_relative_error": uniform_scale_error,
+        "uniform_scale_tolerance": MAX_UNIFORM_SCALE_RELATIVE_ERROR,
         "logical_bounds": {
             "x": [0, LOGICAL_BOARD_WIDTH],
             "y": [0, LOGICAL_BOARD_HEIGHT],
