@@ -20,6 +20,9 @@ from brush_test_workflow import (
     calculate_slider_target, validate_brush_test_preflight, validate_observed_brush_radius,
     should_run_postdraw_workflow,
 )
+from brush_radius_feedback import (
+    calculate_radius_correction_target, monitor_radius_from_status,
+)
 from chalk_radius_matrix import (
     MATRIX_SCENARIO_ID, build_chalk_radius_matrix_metadata, is_monitor_run_claimed,
 )
@@ -557,6 +560,8 @@ class BrushBehaviorTestTab:
         self._brush_drag_mouse_down = False
         self._brush_drag_purpose = "set_brush_size"
         self._experiment_requested_brush: int | None = None
+        self._brush_feedback_state: dict[str, Any] | None = None
+        self._brush_feedback_poll_id: str | None = None
         self._postdraw_final_status = "unknown"
         self._postdraw_final_reason = ""
         self._automated_preclear_active = False
@@ -897,6 +902,19 @@ class BrushBehaviorTestTab:
                 start = self._parse_point(self.slider_start_var.get(), "Край 30")
                 end = self._parse_point(self.slider_end_var.get(), "Край 1")
             x, y = calculate_slider_target(start, end, brush)
+            self._brush_feedback_state = {
+                "requested_radius": brush,
+                "start_30": start,
+                "end_1": end,
+                "high_point": start,
+                "high_radius": 30,
+                "low_point": end,
+                "low_radius": 1,
+                "current_point": (x, y),
+                "attempt": 0,
+                "poll_count": 0,
+                "observations": [],
+            }
             self.brush_slider_start, self.brush_slider_end = start, end
             self.status_var.set(
                 f"Через 3 секунды ползунок будет перетащен к радиусу кисти {brush}. "
@@ -1100,6 +1118,23 @@ class BrushBehaviorTestTab:
                 detail = "Жест перетаскивания к позиции кисти 30 завершён; значение необходимо проверить в игре."
             self._record_brush_restore_result(restore_status, detail, state=state)
             return
+        feedback = getattr(self, "_brush_feedback_state", None)
+        if purpose in {"set_brush_size", "correct_brush_size"} and feedback is not None and state:
+            if cancelled or error or release_error:
+                self._fail_brush_radius_feedback(
+                    "drag_cancelled" if cancelled else "drag_failed",
+                    error or release_error or "Перетаскивание отменено.",
+                )
+            else:
+                feedback["current_point"] = tuple(state["target"])
+                feedback["await_after_utc"] = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
+                feedback["poll_count"] = 0
+                self.status_var.set(
+                    f"Положение для радиуса {feedback['requested_radius']} установлено. "
+                    "Проверяю фактическое значение Game Monitor…"
+                )
+                self._brush_feedback_poll_id = self.root.after(250, self._poll_brush_radius_feedback)
+            return
         if cancelled or error or release_error:
             self._start_executor_after_brush_drag = False
         if release_error:
@@ -1115,9 +1150,6 @@ class BrushBehaviorTestTab:
                 f"Перетаскивание к радиусу кисти {brush} завершено ({target_x}, {target_y}). "
                 "Размер не подтверждён игрой — проверь значение перед рисованием."
             )
-            if self._start_executor_after_brush_drag:
-                self._start_executor_after_brush_drag = False
-                self._confirm_brush_before_test(brush, state)
         if cancelled or error or release_error:
             try:
                 self.root.deiconify()
@@ -1125,87 +1157,234 @@ class BrushBehaviorTestTab:
             except tk.TclError:
                 pass
 
-    def _confirm_brush_before_test(self, brush: int, state: dict[str, Any]) -> None:
-        """Require visual confirmation before using a requested brush size in a measurement."""
-        start = state.get("start")
-        target = state.get("target")
+    def _read_live_brush_radius(self, *, after_utc: str | None = None) -> dict[str, Any] | None:
+        """Read a fresh read-only Monitor status from the active bridge session file."""
+        bridge_root = self.output_dir / "game_monitor_bridge"
+        if not bridge_root.is_dir():
+            return None
+        after = _parse_monitor_timestamp(after_utc) if after_utc else None
+        now_utc = datetime.now(timezone.utc)
+        candidates: list[tuple[datetime, dict[str, Any]]] = []
+        for session_path in bridge_root.glob("*/session.json"):
+            try:
+                record = json.loads(session_path.read_text(encoding="utf-8"))
+                diagnostics = record.get("bridge_diagnostics", {})
+                if not isinstance(diagnostics, dict) or diagnostics.get("connection_closed") is True:
+                    continue
+                if diagnostics.get("last_message_type") != "heartbeat":
+                    continue
+                stamp_text = diagnostics.get("last_message_at_utc")
+                stamp = _parse_monitor_timestamp(stamp_text)
+                if stamp is None or (now_utc - stamp).total_seconds() > 4.0:
+                    continue
+                if after is not None and stamp <= after:
+                    continue
+                status = diagnostics.get("last_monitor_status")
+                radius = monitor_radius_from_status(status)
+                if radius is None:
+                    continue
+                candidates.append((stamp, {
+                    "radius": radius,
+                    "session_id": record.get("session_id"),
+                    "observed_at_utc": stamp_text,
+                    "snapshot": status.get("snapshot") if isinstance(status, dict) else None,
+                }))
+            except (OSError, ValueError, TypeError, AttributeError):
+                continue
+        return max(candidates, key=lambda item: item[0])[1] if candidates else None
+
+    def _poll_brush_radius_feedback(self) -> None:
+        """Wait for a post-drag heartbeat, then correct the slider until the game reports the target."""
+        self._brush_feedback_poll_id = None
+        feedback = self._brush_feedback_state
+        if not isinstance(feedback, dict):
+            return
+        observation = self._read_live_brush_radius(after_utc=feedback.get("await_after_utc"))
+        if observation is None:
+            feedback["poll_count"] = int(feedback.get("poll_count", 0)) + 1
+            if feedback["poll_count"] >= 48:
+                self._fail_brush_radius_feedback(
+                    "monitor_unavailable",
+                    "Нет свежего heartbeat Game Monitor после отпускания ползунка. "
+                    "Проверь подключение Game Monitor Bridge.",
+                )
+                return
+            self._brush_feedback_poll_id = self.root.after(250, self._poll_brush_radius_feedback)
+            return
+
+        requested = int(feedback["requested_radius"])
+        observed = int(observation["radius"])
+        feedback.setdefault("observations", []).append({
+            "requested_radius": requested,
+            "observed_radius": observed,
+            "observed_at_utc": observation["observed_at_utc"],
+            "session_id": observation["session_id"],
+            "position": list(feedback["current_point"]),
+        })
+        if observed == requested:
+            self._complete_brush_radius_feedback(observation)
+            return
+
+        attempt = int(feedback.get("attempt", 0))
+        if attempt >= 7:
+            self._fail_brush_radius_feedback(
+                "correction_limit_reached",
+                f"После {attempt + 1} проверок игра сообщает радиус {observed}, "
+                f"а запрошен {requested}.",
+            )
+            return
+
+        current_point = tuple(feedback["current_point"])
+        if observed > requested:
+            feedback["high_point"] = current_point
+            feedback["high_radius"] = observed
+        else:
+            feedback["low_point"] = current_point
+            feedback["low_radius"] = observed
+        try:
+            target = calculate_radius_correction_target(
+                feedback["high_point"], int(feedback["high_radius"]),
+                feedback["low_point"], int(feedback["low_radius"]), requested,
+            )
+        except (TypeError, ValueError) as exc:
+            self._fail_brush_radius_feedback("correction_calculation_failed", str(exc))
+            return
+        if target == current_point:
+            self._fail_brush_radius_feedback(
+                "correction_has_no_progress",
+                "Координатного разрешения ползунка недостаточно для следующей коррекции.",
+            )
+            return
+
+        feedback["attempt"] = attempt + 1
+        self.status_var.set(
+            f"Game Monitor показывает {observed} вместо {requested}. "
+            f"Автоматическая коррекция {feedback['attempt']}/7…"
+        )
+        self._brush_drag_purpose = "correct_brush_size"
+        try:
+            self.root.iconify()
+            self._start_brush_hotkey_listener()
+            self._begin_brush_drag(current_point, target[0], target[1], requested)
+        except Exception as exc:
+            self._fail_brush_radius_feedback("correction_drag_failed", str(exc))
+
+    def _complete_brush_radius_feedback(self, observation: dict[str, Any]) -> None:
+        feedback = self._brush_feedback_state
+        if not isinstance(feedback, dict):
+            return
+        requested = int(feedback["requested_radius"])
         phase = {
-            "status": "awaiting_user_confirmation",
-            "requested_value": int(brush),
-            "drag_start": list(start) if isinstance(start, (tuple, list)) else None,
-            "drag_target": list(target) if isinstance(target, (tuple, list)) else None,
-            "drag_completed_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-            "confirmation_required": True,
-            "note": (
-                "A completed mouse drag does not prove the game selected the requested brush size. "
-                "The user must visually check the slider position before the test executor can start."
-            ),
+            "status": "verified_by_game_monitor",
+            "requested_value": requested,
+            "observed_value": int(observation["radius"]),
+            "verification_source": "active_game_monitor_bridge_heartbeat",
+            "session_id": observation.get("session_id"),
+            "verified_at_utc": observation.get("observed_at_utc"),
+            "final_position": list(feedback["current_point"]),
+            "correction_count": int(feedback.get("attempt", 0)),
+            "observations": list(feedback.get("observations", [])),
         }
         self.experiment_phases["brush_setup"] = phase
+        self._brush_feedback_state = None
         if self.experiment_dir is not None:
             try:
                 self._write_experiment_manifest()
             except (OSError, ValueError, TypeError) as exc:
-                phase["status"] = "manifest_write_failed"
-                phase["error"] = str(exc)
-                self.status_var.set(
-                    "Размер кисти не подтверждён; не удалось сохранить запись. Исполнитель не запущен."
+                self._fail_brush_radius_feedback(
+                    "manifest_write_failed",
+                    f"Игра подтвердила радиус, но манифест не сохранён: {exc}",
                 )
                 return
-
         try:
             self.root.deiconify()
             self.root.lift()
         except tk.TclError:
             pass
-
-        try:
-            monitor_radius_text = simpledialog.askstring(
-                "Проверка фактической кисти",
-                (
-                    "До начала рисования проверь внутреннее значение игры.\n\n"
-                    "1. Переключись в игровой iframe и выполни в консоли:\n"
-                    "   AutoDrawGameMonitor.status().snapshot.radius\n"
-                    "2. Вставь сюда полученное значение целиком (например, 14 или [14]).\n\n"
-                    f"Запрошенный радиус AutoDraw: {brush}. "
-                    "Пустой ответ или несовпадение отменит тест."
-                ),
+        self.status_var.set(
+            f"Фактический радиус {requested} подтверждён Game Monitor. "
+            f"Коррекций выполнено: {phase['correction_count']}."
+        )
+        state = {
+            "start": feedback["start_30"],
+            "target": feedback["current_point"],
+            "brush": requested,
+        }
+        if self._start_executor_after_brush_drag:
+            self._start_executor_after_brush_drag = False
+            self._confirm_brush_before_test(requested, state, observation)
+        else:
+            messagebox.showinfo(
+                "Кисть установлена",
+                f"Game Monitor подтвердил фактический радиус {requested}.",
                 parent=self.root,
             )
-            verification = validate_observed_brush_radius(brush, monitor_radius_text)
-            phase["monitor_preflight"] = {
-                **verification,
-                "checked_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-                "source": "user_transcribed_AutoDrawGameMonitor.status_snapshot_radius",
-            }
-            if not verification["valid"]:
-                phase["status"] = "brush_mismatch" if verification["status"] in {"mismatch", "mixed"} else "brush_unverified"
-                phase["observed_radii"] = verification["observed_radii"]
-                phase["confirmation_method"] = "game_monitor_pre_draw_snapshot"
-                if self.experiment_dir is not None:
-                    try:
-                        self._write_experiment_manifest()
-                    except (OSError, ValueError, TypeError) as exc:
-                        phase["manifest_write_error"] = str(exc)
+
+    def _fail_brush_radius_feedback(self, reason: str, detail: str) -> None:
+        feedback = self._brush_feedback_state
+        if self._brush_feedback_poll_id is not None:
+            try:
+                self.root.after_cancel(self._brush_feedback_poll_id)
+            except (tk.TclError, ValueError):
+                pass
+            self._brush_feedback_poll_id = None
+        self._brush_feedback_state = None
+        self._start_executor_after_brush_drag = False
+        phase = {
+            "status": "verification_failed",
+            "reason": reason,
+            "detail": detail,
+            "requested_value": feedback.get("requested_radius") if isinstance(feedback, dict) else None,
+            "observations": list(feedback.get("observations", [])) if isinstance(feedback, dict) else [],
+            "failed_at_utc": datetime.now(timezone.utc).isoformat(timespec="milliseconds"),
+        }
+        self.experiment_phases["brush_setup"] = phase
+        if self.experiment_dir is not None:
+            try:
+                self._write_experiment_manifest()
+            except (OSError, ValueError, TypeError):
+                pass
+        try:
+            self.root.deiconify()
+            self.root.lift()
+        except tk.TclError:
+            pass
+        self.status_var.set(
+            f"Автоустановка кисти не подтверждена: {detail} Исполнитель не запущен."
+        )
+        messagebox.showwarning(
+            "Не удалось подтвердить размер кисти",
+            f"{detail}\n\nПроверь Game Monitor Bridge и профиль ползунка. "
+            "Рисование не запускалось.",
+            parent=self.root,
+        )
+
+    def _confirm_brush_before_test(
+        self, brush: int, state: dict[str, Any], observation: dict[str, Any]
+    ) -> None:
+        """Ask only for a visual sanity check after the live Monitor verified the exact radius."""
+        phase = self.experiment_phases.setdefault("brush_setup", {})
+        phase["status"] = "awaiting_visual_confirmation"
+        phase["visual_confirmation_required"] = True
+        phase["confirmation_method"] = "game_monitor_exact_radius_plus_user_visual_check"
+        if self.experiment_dir is not None:
+            try:
+                self._write_experiment_manifest()
+            except (OSError, ValueError, TypeError) as exc:
+                phase["status"] = "manifest_write_failed"
+                phase["manifest_write_error"] = str(exc)
                 self.status_var.set(
-                    f"Тест отменён: запрошено {brush}, фактическое значение не подтверждено "
-                    f"(Monitor: {verification['observed_radii'] or 'нет данных'})."
-                )
-                messagebox.showwarning(
-                    "Проверка кисти не пройдена",
-                    "Исполнитель не запущен. Проверь ползунок и повтори установку кисти.",
-                    parent=self.root,
+                    "Game Monitor подтвердил радиус, но манифест не сохранён. Исполнитель не запущен."
                 )
                 return
-            phase["monitor_preflight"]["status"] = "match"
-            if self.experiment_dir is not None:
-                self._write_experiment_manifest()
+        try:
             confirmed = messagebox.askyesno(
                 "Подтвердить положение кисти",
                 (
-                    f"Game Monitor подтвердил внутренний радиус {brush}.\n"
-                    f"Целевая координата ползунка: {target}.\n\n"
-                    "Теперь визуально проверь положение ползунка. Продолжать тест?"
+                    f"Game Monitor автоматически подтвердил радиус {observation['radius']} "
+                    f"(запрошено {brush}).\n"
+                    f"Фактическая координата ползунка: {state.get('target')}.\n\n"
+                    "Визуально проверь положение ползунка. Продолжать тест?"
                 ),
                 icon="question",
                 parent=self.root,
@@ -1213,31 +1392,20 @@ class BrushBehaviorTestTab:
         except Exception as exc:
             phase["status"] = "confirmation_dialog_failed"
             phase["error"] = str(exc)
-            if self.experiment_dir is not None:
-                try:
-                    self._write_experiment_manifest()
-                except (OSError, ValueError, TypeError):
-                    pass
-            self.status_var.set("Не удалось запросить подтверждение кисти. Исполнитель не запущен.")
+            self.status_var.set("Не удалось запросить визуальное подтверждение. Исполнитель не запущен.")
             return
-
         if not confirmed:
             phase["status"] = "declined_by_user"
             phase["declined_at_utc"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
             if self.experiment_dir is not None:
                 try:
                     self._write_experiment_manifest()
-                except (OSError, ValueError, TypeError) as exc:
-                    phase["manifest_write_error"] = str(exc)
-            self.status_var.set(
-                "Размер кисти не подтверждён; тестовое рисование отменено. "
-                "Проверь ползунок и повтори установку при необходимости."
-            )
+                except (OSError, ValueError, TypeError):
+                    pass
+            self.status_var.set("Тест отменён пользователем после автоматической проверки радиуса.")
             return
-
         phase["status"] = "confirmed_by_user"
         phase["confirmed_at_utc"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
-        phase["confirmation_method"] = "explicit_user_visual_confirmation"
         if self.experiment_dir is not None:
             try:
                 self._write_experiment_manifest()
@@ -1249,7 +1417,7 @@ class BrushBehaviorTestTab:
                 )
                 return
         if callable(self.on_brush_ready):
-            self.status_var.set(f"Размер {brush} подтверждён; запуск тестового исполнения.")
+            self.status_var.set(f"Размер {brush} подтверждён Game Monitor; запуск тестового исполнения.")
             self.root.after(0, lambda: self.on_brush_ready(brush))
         else:
             phase["status"] = "executor_callback_missing"
