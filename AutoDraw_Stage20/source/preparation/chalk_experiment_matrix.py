@@ -71,7 +71,6 @@ def _validated_executor_parameters(phase_id: str, value: Any = None) -> dict[str
     elif parameters != GEOMETRY_EXECUTOR_CONFIG:
         raise ValueError("В G1/G2 требуется штатная конфигурация исполнителя.")
     return parameters
-}
 
 
 def _normalize_series_id(value: Any) -> str:
