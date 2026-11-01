@@ -1391,3 +1391,14 @@ Run JSON дополнен `stroke_count`, суммой `sampled_point_delta_tota
 - параллельный запуск блоков запрещён при любом unresolved journal.
 
 Добавлены unit tests для явного recovery decision, обязательного board_checked и закрытия interrupted блока. Полный UI callback-level test matrix и CI остаются открытыми.
+
+
+## 2026-11-01 — regression tests переходов Brush Test block runner
+
+Добавлен `source/preparation/tests/test_chalk_test_block_ui_workflow.py`:
+- задача отмечается completed и следующая может стартовать только после положительного строгого acceptance gate;
+- incomplete per-stroke evidence вызывает pause и не вызывает переход;
+- capture timeout завершает gate fail-closed;
+- executor failure не запускает postdraw и приостанавливает блок.
+
+Это первые callback-level tests. Полная матрица отказов preclear, brush drag/feedback, bridge loss, restore, Stop и startup recovery ещё требует расширения. CI результата для текущего HEAD пока нет; live G1 не запускался.
