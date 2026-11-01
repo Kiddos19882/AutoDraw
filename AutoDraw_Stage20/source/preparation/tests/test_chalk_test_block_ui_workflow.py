@@ -94,7 +94,7 @@ def test_ui_capture_gate_pauses_without_advancing_on_incomplete_evidence(tmp_pat
     monkeypatch.setattr(
         ui_module,
         "validate_chalk_block_experiment",
-        lambda _path: (False, "stroke_level_stroke_id_count_mismatch", None),
+        lambda _path, **_kwargs: (False, "stroke_level_stroke_id_count_mismatch", None),
     )
     ui._fail_chalk_test_block = lambda reason: failures.append(reason)
     ui._start_next_chalk_block_task = lambda: advanced.append(True)
