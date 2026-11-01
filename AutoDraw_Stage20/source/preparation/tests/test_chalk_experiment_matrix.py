@@ -19,23 +19,35 @@ def _strokes(count=5):
     ]
 
 
-def _manifest(tmp_path, repeat=1, run_id="run-1", consumed=50, scenario="horizontal_lengths"):
-    strokes = _strokes(5)
+def _manifest(
+    tmp_path,
+    repeat=1,
+    run_id="run-1",
+    consumed=50,
+    scenario="horizontal_lengths",
+    executor_parameters=None,
+    matrix_order_index=None,
+    experiment_id=None,
+):
+    stroke_count = 6 if scenario == "paint_consumption_long_lines" else 5
+    strokes = _strokes(stroke_count)
+    parameters = dict(executor_parameters or GEOMETRY_EXECUTOR_CONFIG)
     metadata = build_chalk_experiment_matrix_metadata(
         series_id="geometry-series",
         scenario_id=scenario,
         repeat_index=repeat,
         requested_radius=10,
         strokes=strokes,
-        matrix_order_index=repeat,
+        matrix_order_index=matrix_order_index or repeat,
+        executor_parameters=parameters,
     )
-    experiment_id = f"exp-{repeat}"
+    experiment_id = experiment_id or f"exp-{repeat}"
     report_events = []
-    for index in range(5):
+    for index in range(stroke_count):
         stroke_id = f"stroke-{index + 1}"
         report_events.extend([
             {"type": "POINTER_DOWN_CANDIDATE", "strokeId": stroke_id},
-            {"type": "DRAW_SAMPLE", "strokeId": stroke_id, "pointDelta": consumed // 5},
+            {"type": "DRAW_SAMPLE", "strokeId": stroke_id, "pointDelta": consumed // stroke_count},
             {"type": "POINTER_UP_CANDIDATE", "strokeId": stroke_id},
         ])
     (tmp_path / "monitor_report.json").write_text(
@@ -46,8 +58,8 @@ def _manifest(tmp_path, repeat=1, run_id="run-1", consumed=50, scenario="horizon
         "run_id": run_id,
         "experiment_id": experiment_id,
         "chalk_experiment_matrix": metadata,
-        "stroke_count": 5,
-        "expected_stroke_count": 5,
+        "stroke_count": stroke_count,
+        "expected_stroke_count": stroke_count,
         "brush_radius_status": "single",
         "chalk_status": "exact",
         "chalk_counter_consistent": True,
@@ -63,7 +75,7 @@ def _manifest(tmp_path, repeat=1, run_id="run-1", consumed=50, scenario="horizon
         "brush_radius_status": "single",
         "observed_brush_radii": [10],
         "point_delta_matches_chalk": True,
-        "stroke_count": 5,
+        "stroke_count": stroke_count,
         "sampled_point_delta_total": consumed,
         "dropped_events": 0,
         "monitor_dropped_events": 0,
@@ -82,7 +94,11 @@ def _manifest(tmp_path, repeat=1, run_id="run-1", consumed=50, scenario="horizon
         "chalk_experiment_matrix": metadata,
         "monitor_capture": capture,
         "game_monitor_summary": summary,
-        "execution_report": {"status": "completed", "completed_strokes": 5, "executor_config": dict(GEOMETRY_EXECUTOR_CONFIG)},
+        "execution_report": {
+            "status": "completed",
+            "completed_strokes": stroke_count,
+            "executor_config": parameters,
+        },
         "experiment_dir": str(tmp_path),
     }
 
@@ -312,3 +328,37 @@ def test_g3_metadata_rejects_values_outside_the_experiment_matrix(step, delay):
             strokes=_strokes(6),
             executor_parameters=parameters,
         )
+
+def test_g3_analyzer_keeps_nine_executor_configurations_separate_and_complete(tmp_path):
+    documents = []
+    order = 0
+    for step in (1, 2, 4):
+        for delay in (5, 10, 20):
+            parameters = dict(GEOMETRY_EXECUTOR_CONFIG)
+            parameters.update({"point_step_px": step, "point_delay_ms": delay})
+            for repeat in (1, 2, 3):
+                order += 1
+                folder = tmp_path / f"g3-{step}-{delay}-{repeat}"
+                folder.mkdir()
+                consumed = 60 + 6 * (step + delay // 5 + repeat)
+                documents.append(_manifest(
+                    folder,
+                    repeat=repeat,
+                    run_id=f"g3-run-{order}",
+                    consumed=consumed,
+                    scenario="paint_consumption_long_lines",
+                    executor_parameters=parameters,
+                    matrix_order_index=order,
+                    experiment_id=f"g3-exp-{order}",
+                ))
+
+    result = summarize_chalk_experiment_matrix(documents)
+    assert result["valid_measurement_count"] == 27
+    assert result["rejected_measurement_count"] == 0
+    assert len(result["scenarios"]) == 9
+    assert all(row["phase_id"] == "G3" and row["complete"] for row in result["scenarios"])
+    assert {
+        (row["point_step_px"], row["point_delay_ms"])
+        for row in result["scenarios"]
+    } == {(step, delay) for step in (1, 2, 4) for delay in (5, 10, 20)}
+    assert all(row["valid_repeat_count"] == 3 for row in result["scenarios"])
