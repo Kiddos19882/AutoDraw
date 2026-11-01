@@ -376,3 +376,44 @@ Run относится к точному актуальному HEAD и вклю
 - Manual brush adjustment must still restore the AutoDraw window and show its confirmation.
 - Regression assertion: `test_automatic_brush_setup_starts_executor_without_visual_confirmation` checks that the root is not restored for the automatic path.
 - New full CI and Windows live verification are pending; this fix is not yet a confirmed live G3 pass.
+ 
+## 10. Оптимизированный CI и G3 regression coverage — 2026-11-02
+
+Этот раздел описывает актуальную конфигурацию после коммитов workflow optimization; он supersedes прежнее описание job layout в разделах 4.1–4.3. Исторические CI runs и прежняя конфигурация сохранены выше для аудита.
+
+### 10.1. Триггеры и устранение лишних запусков
+
+- Автоматический запуск: только `push` в `feature/image-geometry-optimization` при изменениях в перечисленных исходниках, тестах, build/runtime-конфигурации или самом workflow.
+- Ручной `workflow_dispatch`: запускает обязательные проверки и дополнительный длительный benchmark job.
+- Удалён отдельный `pull_request` trigger, который вместе с push создавал два одинаковых набора CI на одном обновлении ветки. Проверка feature-ветки выполняется по push.
+- `concurrency.group=autodraw-validation-${{ github.ref }}`, `cancel-in-progress=true`: новый commit отменяет устаревший run той же ветки, чтобы не тратить runner на промежуточные версии.
+- Включён pip cache через setup-python; ключи зависят от файлов requirements соответствующего job.
+
+### 10.2. Обязательные jobs на каждом code push
+
+| Job | Состав |
+|---|---|
+| `game-monitor-tests` | Node syntax check, Node resource-snapshot tests, Python WebSocket/bridge tests |
+| `preparation-tests` | Полный pytest `source/preparation/tests/`, включая G3 matrix, block journal, capture и brush UI regression tests |
+| `integration-tests` | Один полный pytest запуск по корневому `AutoDraw_Stage20/tests/`, включая unittest.TestCase и pytest cases; WebSocket test исключён, так как он уже выполняется в Game Monitor job |
+| `executor-tests` | Executor unittest discovery |
+| `windows-build-smoke` | Portable build и startup smoke; запускается через `needs` только после успеха всех четырёх тестовых jobs, затем публикует `autodraw-g3-preflight-build` на 7 дней |
+
+Build job устанавливает build/runtime requirements, но получает `AUTODRAW_SKIP_TESTS=1`: `build_windows.bat` пропускает встроенный повторный вызов `run_all_tests.py`, потому что его три suite уже прошли отдельные обязательные jobs. Без этой переменной обычная локальная сборка по-прежнему выполняет `run_all_tests.py`. Пропуск тестов в CI build не может сработать до успешного завершения Game Monitor, Preparation, Integration и Executor jobs благодаря `needs`.
+
+### 10.3. Длительные benchmarks
+
+`algorithm-benchmarks` запускается только вручную через `workflow_dispatch`. В него перенесены диагностика эталонного изображения, отчёт калибровки, Stage 5/7/8 benchmarks, синтетические Stage 7 cases, fallback merge sweep и сравнение outline-first/interior-fill. Эти исследования не нужны для проверки G3 handoff и больше не удлиняют каждый commit CI.
+
+Benchmark job работает из корня `AutoDraw_Stage20/`; пути скриптов, fixture, palette и отчётов заданы относительно этой рабочей директории. Git reference paths остаются относительно корня репозитория. Отчёты и preview публикуются одним artifact `autodraw-algorithm-benchmarks`.
+
+### 10.4. Дополнительные G3 regressions
+
+- `source/preparation/tests/test_brush_behavior_test_ui.py::test_g3_block_task_bypasses_legacy_radius_matrix_routing` проверяет pure routing predicate для совпадающего legacy/G3 scenario ID.
+- `test_g3_block_plan_writes_matrix_and_block_identity_instead_of_legacy_radius_matrix` проходит через настоящий `create_and_transfer_plan` с контролируемым UI shell и проверяет наличие `chalk_test_block`, G3 `chalk_experiment_matrix`, task-specific executor parameters и отсутствие legacy `chalk_radius_matrix`.
+- `tests/test_unified_app.py::test_brush_test_executor_applies_g3_task_specific_parameters` проверяет, что параметры 2/20 из metadata передаются в Stage6 executor handoff без подмены стандартными 2/10.
+- Сами тесты проверяют software contract. Они не заменяют live G3 capture, точный CHALK counter и проверку фокуса браузерной игры.
+
+### 10.5. Текущий статус проверки
+
+Workflow и тесты обновлены в feature-ветке; результат нового CI на конечном HEAD ещё не подтверждён. До статуса success по всем обязательным jobs, успешной portable build и локального Windows preflight запускать новую live G3 серию нельзя.
