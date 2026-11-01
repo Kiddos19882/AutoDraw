@@ -246,3 +246,12 @@
 ### Validation
 - Полный CI и Windows portable startup smoke-test ещё ожидают подтверждения.
 - Live G3 не запускался.
+
+
+## 2026-11-01 — подтверждён CI на актуальном G3 HEAD
+
+- Полный workflow run [41340237207](https://github.com/Kiddos19882/AutoDraw/actions/runs/41340237207) завершился success на HEAD `3dbf8f20bcea44c61290e49398e1a4daf182dbf9`.
+- Успешны все три jobs: geometry-tests, executor-tests, Windows portable build/startup smoke-test.
+- Run включает интеграционный regression test основного приложения из commit `8c93a498864973b9879c926627030bb7e1d3ce2a`; прежнее ожидание нового CI для этого теста закрыто.
+- G3 software gate закрыт. Локальный Windows preflight и 27 live G3 captures не выполнены; экспериментальная модель расхода CHALK пока не подтверждена.
+- Документация синхронизирована; исходный код и workflow не менялись.
