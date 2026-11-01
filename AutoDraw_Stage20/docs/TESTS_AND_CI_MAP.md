@@ -323,3 +323,12 @@ tests/test_websocket_smoke_server.py включает regression tests для pe
 - CLI: `tests/analyze_chalk_experiment_matrix.py` scans experiment manifests, validates exact captures and duplicate identities, calculates repeat statistics, and attempts stroke-level aggregation from `monitor_report.json`.
 - Stroke-level aggregation is accepted only when unique `strokeId` count matches expected strokes and the sum of per-stroke `DRAW_SAMPLE.pointDelta` equals the exact experiment CHALK. Otherwise it is explicitly marked incomplete.
 - Live data collection must wait for GitHub Actions success and follow `CHALK_GEOMETRY_MATRIX_PLAN.md`.
+
+
+### CHALK automated block runner
+
+- Production scheduler/journal and strict acceptance gate: `source/preparation/chalk_test_blocks.py`.
+- Unit tests: `source/preparation/tests/test_chalk_test_blocks.py` — G1/G2 task completeness, repeat cells, deterministic order, journal safety, pause/interruption, complete per-stroke gate, clean frame probe and safe task-boundary stop.
+- UI integration: `source/preparation/brush_behavior_test_ui.py` — Start G1/G2, progress, Stop-at-boundary, preclear, brush feedback, executor, Game Monitor capture, postdraw and transition.
+- Pending: callback-level failure injection, restart/recovery UI tests, GitHub Actions result and Windows portable smoke test.
+- Live experiments must not start until CI and portable smoke test pass.
