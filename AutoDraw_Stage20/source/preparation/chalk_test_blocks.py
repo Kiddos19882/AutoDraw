@@ -132,8 +132,10 @@ def _validate_chalk_test_block_journal(document: Any, path: Path) -> dict[str, A
         not isinstance(document, dict)
         or document.get("record_type") != "autodraw_chalk_test_block"
         or document.get("schema_version") != BLOCK_SCHEMA_VERSION
-        or not isinstance(document.get("phase_id"), str)\n        or document.get("phase_id") not in BLOCK_PHASES
-        or not isinstance(document.get("status"), str)\n        or document.get("status") not in {"ready", "running", "paused", "completed", "stopped", "failed"}
+        or not isinstance(document.get("phase_id"), str)
+        or document.get("phase_id") not in BLOCK_PHASES
+        or not isinstance(document.get("status"), str)
+        or document.get("status") not in {"ready", "running", "paused", "completed", "stopped", "failed"}
         or not isinstance(document.get("tasks"), list)
     ):
         raise ValueError(f"Некорректный журнал блока CHALK: {path}")
