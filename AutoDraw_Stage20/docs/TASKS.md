@@ -71,7 +71,7 @@
 - [x] Добавить unit tests для полного состава блока, repeat cells, deterministic order и recovery.
 - [x] Интегрировать Start/Stop/progress UI в Brush Test.
 - [x] Связать block state machine с preclear, подтверждением радиуса, executor, Game Monitor exact capture и переходом к следующей задаче; добавить fail-closed gate полного per-stroke breakdown.
-- [ ] Добавить recovery UI для прерванной/приостановленной задачи без автоматического повторного рисования.
+- [x] Добавить recovery UI для прерванной/приостановленной задачи без автоматического повторного рисования.
 - [ ] Добавить исчерпывающие orchestration tests на отказ каждого callback/gate.
 - [ ] Пройти CI и Windows portable smoke test; затем выполнить один live G1 block.
 
