@@ -13,6 +13,7 @@ from chalk_test_blocks import (
     load_chalk_test_block_journal,
     mark_interrupted_chalk_block_task,
     validate_chalk_block_experiment,
+    stop_chalk_test_block,
 )
 
 
@@ -184,3 +185,23 @@ def test_block_experiment_acceptance_requires_clean_frame_probe_and_trajectory(t
     assert accepted is False
     assert reason == "frame_probe_not_clean"
     assert details is None
+
+
+
+def test_block_can_stop_only_at_task_boundary(tmp_path):
+    plan = build_chalk_test_block_plan(series_id="series", phase_id="G1")
+    path = tmp_path / "block.json"
+    create_chalk_test_block_journal(path, plan)
+    running = claim_next_chalk_block_task(path)
+    with pytest.raises(RuntimeError):
+        stop_chalk_test_block(path)
+    finish_chalk_block_task(
+        path,
+        running["task_id"],
+        accepted=True,
+        experiment_id="exp-1",
+        experiment_dir=tmp_path / "exp-1",
+    )
+    stopped = stop_chalk_test_block(path)
+    assert stopped["status"] == "stopped"
+    assert claim_next_chalk_block_task(path) is None
