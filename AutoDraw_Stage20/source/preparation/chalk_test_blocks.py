@@ -333,3 +333,33 @@ def stop_chalk_test_block(journal_path: str | Path) -> dict[str, Any]:
     journal["stopped_at_utc"] = _utc_now()
     _save_journal(path, journal)
     return journal
+
+def record_chalk_block_task_experiment(
+    journal_path: str | Path,
+    task_id: str,
+    *,
+    experiment_id: str,
+    experiment_dir: str | Path,
+) -> dict[str, Any]:
+    """Persist experiment identity/path on the active attempt before the first mouse action."""
+    if not isinstance(experiment_id, str) or not experiment_id.strip():
+        raise ValueError("experiment_id обязателен.")
+    path = Path(journal_path)
+    journal = load_chalk_test_block_journal(path)
+    task = next((item for item in journal["tasks"] if item.get("task_id") == task_id), None)
+    if task is None or task.get("status") != "running":
+        raise ValueError(f"Тест {task_id!r} не является активным заданием блока.")
+    attempt_id = task.get("active_attempt_id")
+    attempt = next(
+        (item for item in reversed(task.get("attempts", [])) if item.get("attempt_id") == attempt_id),
+        None,
+    )
+    if attempt is None or attempt.get("status") != "running":
+        raise ValueError("Не найдена активная попытка теста.")
+    if attempt.get("experiment_id") or attempt.get("experiment_dir"):
+        raise ValueError("Для активной попытки уже зарегистрирован experiment.")
+    attempt["experiment_id"] = experiment_id
+    attempt["experiment_dir"] = str(Path(experiment_dir).resolve())
+    attempt["experiment_registered_at_utc"] = _utc_now()
+    _save_journal(path, journal)
+    return dict(task)
