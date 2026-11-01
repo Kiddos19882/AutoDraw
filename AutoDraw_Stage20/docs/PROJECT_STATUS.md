@@ -568,3 +568,6 @@ Owner lock I/O теперь fail-closed: ошибка открытия/созд�
 
 
 Закрытие failed journal теперь оставляет явную audit-запись close_failed_block с board_checked=true и timestamp, аналогично закрытию paused journal. Код/тест: 6df2644a2e011a2dea6e8862c5267e9e9348d0ea, 8d0a949d5fc7697e836aad412ff900ba7532dc9c.
+
+### CI finding — closure audit classification (2026-11-01)
+The first final CI run exposed a mismatch: `finish_chalk_block_task(accepted=False)` correctly leaves the block in `paused`, while the rejected task itself is `failed`. Closure audit classification now inspects task statuses, recording `close_failed_block` when a failed task exists and `close_paused_block` for interruption-only pauses. This preserves the distinction between block state and failed experiment state. The existing regression test asserts the failed-task path. Full CI must be rerun; G1 remains blocked until all jobs and Windows portable smoke-test pass.
