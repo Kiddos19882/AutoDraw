@@ -1,6 +1,6 @@
 # План измерения расхода CHALK по геометрии и режиму ввода
 
-**Статус:** G1 и G2 LIVE ACCEPTED; G3 SOFTWARE IMPLEMENTATION IN PROGRESS. Live-запуск G3 закрыт до regression tests и полного CI.  
+**Статус:** G1 и G2 LIVE ACCEPTED; G3 SOFTWARE IMPLEMENTED, CI/Windows smoke-test PENDING. Live-запуск G3 закрыт до прохождения software gate.  
 **Дата:** 1 ноября 2026 г.  
 **Предыдущая серия:** `chalk-20261101-023127-b85dbb`, 21/21 валидных прогонов.  
 **Ветка:** `feature/image-geometry-optimization`.
