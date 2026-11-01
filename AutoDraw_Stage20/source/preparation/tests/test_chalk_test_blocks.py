@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import multiprocessing
 from pathlib import Path
 
 import pytest
@@ -626,3 +627,29 @@ def test_owner_lock_io_failure_fails_closed(tmp_path, monkeypatch):
 
     monkeypatch.setattr(Path, "open", fail_owner_lock_open)
     assert acquire_chalk_block_owner_lock(tmp_path / "block.json") is None
+
+
+def _owner_lock_child_attempt(journal_path, result_queue):
+    lock_file = acquire_chalk_block_owner_lock(journal_path)
+    result_queue.put(lock_file is not None)
+    if lock_file is not None:
+        release_chalk_block_owner_lock(lock_file)
+
+
+def test_block_owner_lock_is_exclusive_across_processes(tmp_path):
+    path = tmp_path / "block.json"
+    parent_lock = acquire_chalk_block_owner_lock(path)
+    assert parent_lock is not None
+    context = multiprocessing.get_context("spawn")
+    result_queue = context.Queue()
+    process = context.Process(target=_owner_lock_child_attempt, args=(str(path), result_queue))
+    try:
+        process.start()
+        assert result_queue.get(timeout=10) is False
+        process.join(timeout=10)
+        assert process.exitcode == 0
+    finally:
+        if process.is_alive():
+            process.terminate()
+            process.join(timeout=5)
+        release_chalk_block_owner_lock(parent_lock)
