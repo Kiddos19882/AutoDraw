@@ -366,3 +366,12 @@ Run относится к точному актуальному HEAD и вклю
 - Ни один из этих jobs не выполняет реальный рисунок в пользовательской браузерной игре и не измеряет расход CHALK.
 
 **Статус:** G3 software/CI gate закрыт на HEAD выше. Local Windows preflight и полный live G3 (27 captures) остаются открытыми. Исторические записи о том, что CI для popup-removal commits ожидается, superseded этим run и должны читаться как история, а не как текущий статус.
+
+
+### Regression: AutoDraw focus during automatic brush handoff (2026-11-01)
+
+- Source: `source/preparation/brush_behavior_test_ui.py::_complete_brush_radius_feedback`.
+- Automated executor handoff must not call `root.deiconify()` or `root.lift()`; the game must retain foreground focus between brush verification and Stage6 execution.
+- Manual brush adjustment must still restore the AutoDraw window and show its confirmation.
+- Regression assertion: `test_automatic_brush_setup_starts_executor_without_visual_confirmation` checks that the root is not restored for the automatic path.
+- New full CI and Windows live verification are pending; this fix is not yet a confirmed live G3 pass.
