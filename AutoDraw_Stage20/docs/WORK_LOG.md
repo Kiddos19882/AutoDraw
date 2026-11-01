@@ -1722,3 +1722,17 @@ Regression test в `source/preparation/tests/test_brush_behavior_test_ui.py` т�
 - Проверен recovery code после анализа commit 094381f: stopped block не может выдавать pending tasks; failed task не подходит под interrupted retry; стандартный G3 builder формирует 27 задач. Не пытаться возобновлять этот block или вручную менять journal.
 - [ ] Принять решение: новая полная серия G3 27/27 по штатному workflow либо отдельная разработка continuation/aggregation механизма для 21 принятых captures + шесть недостающих задач.
 - [ ] До повторного live запуска обеспечить чистый Monitor capture; при partial status блок должен останавливаться, а capture оставаться исключённым из accepted repeats.
+
+## 2026-11-02 — диагностика ложного G3 partial из-за глобального буфера Monitor
+
+Проверены `game_monitor.js`, `game_monitor_bridge.js`, `game_monitor_bridge_server.py`, `RunRecorder`, `session.json` проблемной сессии и `experiment.json` задачи `s4-d10-r2`.
+
+Установлено:
+- `MAX_EVENTS=50000` ограничивает только локальный массив `state.events`; после лимита `emit()` всё равно вызывает listeners.
+- На старте сессии было 252 локальных события; Browser Bridge отправил 50 320, collector принял те же 50 320; финальное состояние Monitor: eventCount=50 000, droppedEvents=572. Баланс `252 + 50320 = 50000 + 572` сходится.
+- `sendFailureCount=0`; серверный `received_event_count` равен `sentEventCount`. В проблемном run сохранено 744 события, recorder `dropped_events=0`, CHALK=363 exact и `point_delta_matches_chalk=true`.
+- Во время failed run глобальный счётчик уже был 434; позднее он вырос до 572. `RunRecorder.heartbeat()` записывает этот cumulative session counter в поле отдельного run, а gate ошибочно считает его потерей событий текущего capture.
+- Детерминированная симуляция 50 320 emit-вызовов подтвердила: retained=50 000, local buffer drops=320, subscriber delivery=50 320.
+
+Вывод: G3 partial вызван ложной интерпретацией глобального буферного overflow, а не доказанной потерей WebSocket-событий. Создан отдельный анализ `docs/GAME_MONITOR_BUFFER_OVERFLOW_ANALYSIS_2026-11-02.md`. Изменения кода, live рисование, CI/workflow и правки исторических журналов не выполнялись.
+
