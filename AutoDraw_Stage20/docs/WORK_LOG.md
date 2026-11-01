@@ -1643,3 +1643,29 @@ G1 принят по второму блоку. G2 теперь разблоки
 
 
 Дополнительная регрессия: в `tests/test_unified_app.py` добавлен интеграционный тест, который вызывает handoff основного приложения и падает, если перед запуском executor будет показан `messagebox.askyesno`. Commit: `8c93a498864973b9879c926627030bb7e1d3ce2a`. CI run [41340056751](https://github.com/Kiddos19882/AutoDraw/actions/runs/41340056751) был создан до этого последнего тестового commit, поэтому его результат не будет считаться окончательной проверкой текущего HEAD; требуется run по актуальному PR head.
+
+
+## 2026-11-01 — финальный CI G3 на актуальном HEAD и синхронизация статуса
+
+**Рабочая ветка:** `feature/image-geometry-optimization`  
+**Проверенный HEAD:** `3dbf8f20bcea44c61290e49398e1a4daf182dbf9`  
+**GitHub Actions:** [run 41340237207](https://github.com/Kiddos19882/AutoDraw/actions/runs/41340237207)  
+**Workflow:** `.github/workflows/geometry-tests.yml` — `Geometry planner tests`.
+
+Run завершился `completed / success`; все три jobs прошли на одном и том же HEAD:
+- `geometry-tests` — success. Включая Game Monitor JS syntax/resource snapshot, WebSocket smoke server, benchmark/validation steps, preparation/geometry suite, Stage 7 validator, import diagnostics и unified-app UI regressions.
+- `executor-tests` — success.
+- `Windows portable build and startup smoke-test` — success; шаг portable build/startup завершился успешно.
+
+Важное уточнение истории: предыдущий run `41340056751` не был окончательной проверкой последнего интеграционного теста. Актуальный run `41340237207` имеет точный `head_sha=3dbf8f20bcea44c61290e49398e1a4daf182dbf9`, включая commit `8c93a498864973b9879c926627030bb7e1d3ce2a` с regression test основного приложения. Прежние записи о необходимости нового CI теперь закрыты этим run.
+
+Workflow настроен на:
+- push в `feature/image-geometry-optimization`;
+- pull_request с path-фильтром по production/test/build/docs-наборам, перечисленным в YAML;
+- ручной `workflow_dispatch`.
+
+PR #3 использован как временный CI-only PR с base `ci/g3-validation-base`; он остаётся открытым и не должен сливаться. `master` не изменялся.
+
+**Статус gate:** G3 software/CI gate закрыт на указанном HEAD. Это не означает выполнения live G3. Не выполнены локальный Windows preflight и 27 live captures; фактическая зависимость CHALK от `point_step_px` и `point_delay_ms` ещё не измерена. Следующий этап — локальный preflight, затем полный последовательный G3 block 27/27.
+
+**Синхронизация:** обновлены PROJECT_STATUS, TASKS, CHALK_TEST_BLOCKS_DESIGN, TESTS_AND_CI_MAP и CHANGELOG; данная запись фиксирует фактический результат CI. Код приложения и workflow не менялись в рамках этой документальной синхронизации.
