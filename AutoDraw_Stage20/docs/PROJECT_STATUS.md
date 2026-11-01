@@ -63,7 +63,7 @@ INT-002 завершена: определены контракт ресурсн
 
 Рабочая ветка: `feature/image-geometry-optimization`. Ветка `master` не изменяется и используется только для чтения игрового bundle.
 
-Первичные данные завершённой CHALK-матрицы добавлены коммитом [e2af4d0a69e2bd89b610b58678e20e86475cb8d0](https://github.com/Kiddos19882/AutoDraw/commit/e2af4d0a69e2bd89b610b58678e20e86475cb8d0). После него созданы отчёт результатов `docs/CHALK_RADIUS_MATRIX_RESULTS.md`, закрыт `CHALK_RADIUS_MATRIX_PLAN.md` и добавлен активный `CHALK_GEOMETRY_MATRIX_PLAN.md`. Последний проверенный HEAD на момент фиксации: `8e7b2f8e8c4a65bbbb2d4c6a1a2a603e752fefff`. GitHub Actions workflow `41256989852` завершён успешно; все три jobs имеют conclusion `success`.
+Первичные данные завершённой CHALK-матрицы добавлены коммитом [e2af4d0a69e2bd89b610b58678e20e86475cb8d0](https://github.com/Kiddos19882/AutoDraw/commit/e2af4d0a69e2bd89b610b58678e20e86475cb8d0). После него созданы отчёт результатов `docs/CHALK_RADIUS_MATRIX_RESULTS.md`, закрыт `CHALK_RADIUS_MATRIX_PLAN.md` и добавлен активный `CHALK_GEOMETRY_MATRIX_PLAN.md`. Последний подтверждённый HEAD до identity hardening: `f8f2d1c6fe47b8d5e539be78951cea16296e16f6`. GitHub Actions run `41266141717` для этого SHA завершён успешно; все три jobs (`geometry-tests`, `executor-tests`, `Windows portable build and startup smoke-test`) имеют conclusion `success`. После него добавлен task-bound capture acceptance gate; его новый CI ещё ожидается.
 
 ## 7. Состояние документации
 
@@ -503,3 +503,12 @@ GitHub Actions для актуального HEAD `5771f52554c3356c54d451e0ab26e
 
 
 Последний CI run для commit `36b32dbc...` (`41265149825`) завершился failure: executor-tests прошёл, preparation suite — 8 failed / 556 passed; Windows portable build остановился на той же Stage 13 test suite до startup smoke-test. Исправлены тестовые фикстуры/ожидания. Дополнительно устранён runtime edge case: Alt cancellation во время preclear/postdraw теперь fail-closed приостанавливает block journal; добавлены два workflow tests. CI run `41266047330` для commit `609aca9156e5eb136c7db5cb516262b971d4fa82` выполняется, успех пока не подтверждён. Live G1 не запускался.
+
+
+## 10. Актуальный статус автоматических CHALK-блоков (2026-11-01)
+
+UI runner G1/G2 и recovery реализованы. Последний подтверждённый CI до дополнительного identity hardening: run [41266141717](https://github.com/Kiddos19882/AutoDraw/actions/runs/41266141717) для HEAD f8f2d1c6fe47b8d5e539be78951cea16296e16f6 — success по всем трём jobs, включая Windows portable build/startup smoke-test.
+
+После этого review обнаружил, что capture acceptance не сравнивал идентификаторы manifest с активной задачей block journal. Добавлена проверка block_id/task_id/experiment_id, series/phase/scenario/repeat, requested radius, expected stroke count, matrix order и executor config. Добавлены тесты на несовпадения и положительное совпадение. Эти новые коммиты требуют отдельного CI; до его успешного завершения live G1 не запускать.
+
+Live G1/G2 не запускались. Старые 12 G1 manifests не переписывались. data/ не очищалась. master не изменялся. Локальный запуск pytest в текущей среде недоступен.
