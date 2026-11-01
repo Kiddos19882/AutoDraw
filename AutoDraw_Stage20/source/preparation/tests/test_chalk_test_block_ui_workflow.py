@@ -269,6 +269,7 @@ def test_startup_does_not_mark_live_block_interrupted_when_another_instance_owns
     ui.root = _Root()
     warnings = []
     monkeypatch.setattr(ui_module.messagebox, "showwarning", lambda *args, **kwargs: warnings.append(args))
+    monkeypatch.setattr(ui_module, "acquire_chalk_block_owner_lock", lambda _path: None)
 
     try:
         ui._scan_chalk_block_recovery()
