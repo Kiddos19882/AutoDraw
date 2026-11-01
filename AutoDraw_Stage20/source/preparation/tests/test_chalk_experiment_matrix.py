@@ -157,6 +157,33 @@ def test_geometry_matrix_keeps_total_valid_when_per_stroke_split_is_incomplete(t
     assert row["stroke_level"]["reason"] == "stroke_id_count_mismatch"
 
 
+def test_geometry_matrix_ignores_non_consuming_pointer_candidate_for_stroke_count(tmp_path):
+    folder = tmp_path / "exp"
+    folder.mkdir()
+    doc = _manifest(folder, consumed=50)
+    events = [
+        {"type": "POINTER_DOWN_CANDIDATE", "strokeId": "empty-candidate"},
+        {"type": "DRAW_SAMPLE", "strokeId": "empty-candidate", "pointDelta": 0},
+        {"type": "POINTER_UP_CANDIDATE", "strokeId": "empty-candidate"},
+    ]
+    for index in range(5):
+        stroke_id = f"accepted-{index}"
+        events.extend([
+            {"type": "POINTER_DOWN_CANDIDATE", "strokeId": stroke_id},
+            {"type": "DRAW_SAMPLE", "strokeId": stroke_id, "pointDelta": 10},
+            {"type": "POINTER_UP_CANDIDATE", "strokeId": stroke_id},
+        ])
+    (folder / "monitor_report.json").write_text(json.dumps({"events": events}), encoding="utf-8")
+
+    result = summarize_chalk_experiment_matrix([doc])
+    row = result["scenarios"][0]["measurements"][0]
+    assert result["valid_measurement_count"] == 1
+    assert row["stroke_level"]["status"] == "complete"
+    assert row["stroke_level"]["observed_stroke_candidates"] == 6
+    assert row["stroke_level"]["non_consuming_stroke_ids"] == ["empty-candidate"]
+    assert [stroke["consumed_points"] for stroke in row["stroke_level"]["strokes"]] == [10] * 5
+
+
 def test_geometry_matrix_rejects_duplicate_run_and_repeat_cell(tmp_path):
     folder_a, folder_b = tmp_path / "a", tmp_path / "b"
     folder_a.mkdir()
