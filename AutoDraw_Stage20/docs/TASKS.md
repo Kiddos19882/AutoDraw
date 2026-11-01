@@ -156,3 +156,15 @@ CI/software gate закрыт. Live gate остаётся открытым, по
 - [x] Подтвердить полный CI run 41276703424, HEAD c8d8c2c5588a0d423e48682962a4213ee725c808.
 - [ ] Обновить локальную portable-сборку до HEAD c8d8c2c5588a0d423e48682962a4213ee725c808 и провести G2 live block (18 задач).
 - [ ] После принятия G2 разблокировать G3.
+
+
+## CHALK geometry matrix — после принятия G2 (2026-11-01)
+
+- [x] Выполнить автоматизированный G2 block — 18/18 задач завершены.
+- [x] Проверить exact CHALK, baseline/post pointCount, сумму DRAW_SAMPLE.pointDelta, stroke_count, радиус, dropped events и monitor errors для всех 18 captures.
+- [x] Сохранить первичные результаты в commit `16a426b534de269ed967027bbe59f3daac4b97ec` без переписывания manifests.
+- [x] Зафиксировать сценарные средние и отдельную per-stroke агрегацию для повторного покрытия в `docs/CHALK_GEOMETRY_MATRIX_G2_RESULTS.md`.
+- [x] Принять G2 и открыть следующий gate.
+- [ ] Выполнить G3: 27 независимых опытов (`point_step_px` 1/2/4 × `point_delay_ms` 5/10/20 × 3 повтора) на фиксированной геометрии `paint_consumption_long_lines`, радиус 10.
+- [ ] Проверить точный CHALK, move calls, длительность, FPS, dropped events и качество capture; не считать move calls эквивалентом расхода CHALK.
+- [ ] После G3 сформировать сводную модель с ограничениями и проверить её на независимых контрольных рисунках.
