@@ -96,13 +96,13 @@ G1/G2 используют radius=10 и фиксированный `GEOMETRY_EXE
 
 **Recovery:** при запуске UI обнаруживает журнал в состоянии running и переводит текущую задачу в interrupted без replay. Оператор видит experiment ID/каталог и должен вручную проверить игровую доску. Только после явного подтверждения можно создать новую попытку interrupted-задачи; предыдущая попытка остаётся в журнале. Ready-журнал после закрытия приложения также можно продолжить только после подтверждения тестовой доски. Failed/paused блок можно закрыть без продолжения; первичные попытки сохраняются.
 
-**Проверки:** добавлены 13 unit tests ядра и 8 callback workflow tests (acceptance-before-advance, incomplete evidence, capture timeout, executor failure, brush restore, safe stop recovery, G2 lock). Это промежуточное покрытие, не исчерпывающая матрица всех Tk callback/failure paths.
+**Проверки:** добавлены 13 unit tests ядра и 10 callback workflow tests (acceptance-before-advance, incomplete evidence, capture timeout, executor failure, brush restore, safe stop recovery, G2 lock, Alt cancellation during preclear/postdraw). Это промежуточное покрытие, не исчерпывающая матрица всех Tk callback/failure paths.
 
-**Ограничение:** GitHub Actions result и Windows portable smoke test для актуального HEAD не подтверждены. До их успешного прохождения и отдельного контролируемого live G1 не использовать runner для экспериментальной серии.
+**CI status:** run `41265149825` для commit `36b32dbc...` завершился failure: 8 тестовых ошибок в preparation suite (556 passed), из-за чего Windows portable build остановился до startup smoke-test. Исправлены тестовые фикстуры и timeout expectation; отдельно исправлено fail-closed поведение Alt cancellation во время preclear/postdraw. Run `41266047330` для commit `609aca9156e5eb136c7db5cb516262b971d4fa82` выполняется; успешный результат пока не подтверждён. До успешного CI и отдельного контролируемого live G1 не использовать runner для экспериментальной серии. До их успешного прохождения и отдельного контролируемого live G1 не использовать runner для экспериментальной серии.
 
 ## 7. Текущие ограничения и порядок работ
 
-1. Расширить callback-level tests на preclear, brush feedback, executor, capture, restore, Stop и restart/recovery.
+1. Завершить callback-level tests для preclear, brush feedback, executor, capture correlation, restore, Stop и restart/recovery; базовые Alt-cancel gates теперь покрыты.
 2. Проверить GitHub Actions и Windows portable smoke test.
 3. Только после CI попросить один контролируемый live-блок G1 на тестовой доске.
 4. После принятия полного G1 разрешить G2.

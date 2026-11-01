@@ -72,7 +72,7 @@
 - [x] Интегрировать Start/Stop/progress UI в Brush Test.
 - [x] Связать block state machine с preclear, подтверждением радиуса, executor, Game Monitor exact capture и переходом к следующей задаче; добавить fail-closed gate полного per-stroke breakdown.
 - [x] Добавить recovery UI для прерванной/приостановленной задачи без автоматического повторного рисования.
-- [ ] Добавить исчерпывающие orchestration tests на отказ каждого callback/gate.
+- [ ] Добавить исчерпывающие orchestration tests на отказ каждого callback/gate (добавлены Alt-cancel tests для preclear/postdraw; покрытие пока неполное).
 - [ ] Пройти CI и Windows portable smoke test; затем выполнить один live G1 block.
 
 UI runner реализован, но до CI и отдельного контролируемого live G1 не считать его готовым к экспериментальной эксплуатации. Live-матрицу вручную по частям не продолжать.

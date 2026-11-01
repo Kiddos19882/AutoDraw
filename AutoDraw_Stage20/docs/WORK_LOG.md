@@ -1415,3 +1415,20 @@ Run JSON дополнен `stroke_count`, суммой `sampled_point_delta_tota
 - G2 остаётся закрытой, пока все 12 G1 задач не имеют completed state.
 
 Проверить тесты локально в этой среде не удалось: сетевое клонирование репозитория недоступно. GitHub Actions для последнего SHA нужно подтвердить отдельно; пустой combined status и PR-only workflow lookup не являются доказательством успешного CI.
+
+
+## 2026-11-01 — разбор CI и закрытие Alt-cancel recovery edge cases
+
+Проверен GitHub Actions run [41265149825](https://github.com/Kiddos19882/AutoDraw/actions/runs/41265149825) для HEAD `36b32dbc4cad3e6e5aabea07136e25f949f9bf43`. Workflow завершился с failure:
+- `executor-tests` — success;
+- `geometry-tests` — 8 failed, 556 passed, 24 warnings; ошибки находились в тестовых фикстурах и тестовых ожиданиях, а не в runtime-поведенческой логике;
+- `Windows portable build and startup smoke-test` — build остановился на Stage 13 preparation test suite с теми же ошибками, поэтому сам startup smoke-test не был достигнут.
+
+Исправления тестов в ветке `feature/image-geometry-optimization`:
+- добавлены недостающие поля `current_plan` и `_chalk_block_task` в UI controller fixtures;
+- acceptance-validator fixtures теперь соответствуют контракту валидированного record (`expected_strokes`, `consumed_points`);
+- timeout test переводит monitor capture в `pending` и проверяет соответствующую причину timeout.
+
+При дополнительном review найден runtime edge case: Alt отменял автоматический preclear или postdraw, но не переводил активную block task в failed/paused. Журнал мог оставаться в состоянии running до перезапуска приложения. Исправлено: отмена через Alt теперь вызывает fail-closed остановку блока с причинами `preclear_cancelled_by_user` / `postdraw_cancelled_by_user`. Добавлены два callback workflow tests, проверяющие, что journal становится paused, задача — failed, причина сохраняется и автоматического перехода нет.
+
+Тестовое покрытие блока теперь: 13 unit tests ядра и 10 callback workflow tests. Исчерпывающая матрица callback failure paths ещё не завершена. Последний проверяемый кодовый commit — `609aca9156e5eb136c7db5cb516262b971d4fa82`; GitHub Actions run `41266047330` для него запущен, результат на момент этой записи не подтверждён. Локальный запуск тестов в текущей среде недоступен. Live G1 не запускался.
