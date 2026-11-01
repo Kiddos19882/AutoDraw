@@ -1177,3 +1177,47 @@ def test_game_monitor_origin_validation_accepts_only_bare_https_origin():
     assert normalize("https://game.example#") is None
     assert normalize("https://user:pass@game.example") is None
     assert normalize("not-an-origin") is None
+
+
+def test_geometry_matrix_metadata_is_persisted_in_experiment_manifest(tmp_path):
+    import json
+    from chalk_experiment_matrix import build_chalk_experiment_matrix_metadata
+
+    class Value:
+        def __init__(self, value=""):
+            self.value = value
+        def get(self):
+            return self.value
+
+    plan = build_brush_test_drawing_plan("Горизонтальные линии", (460, 240))
+    metadata = build_chalk_experiment_matrix_metadata(
+        series_id="geometry-series",
+        scenario_id=plan["generation"]["test_case"],
+        repeat_index=2,
+        requested_radius=10,
+        strokes=plan["strokes"],
+    )
+    tab = brush_ui.BrushBehaviorTestTab.__new__(brush_ui.BrushBehaviorTestTab)
+    tab.experiment_dir = tmp_path
+    tab.get_calibration_profile = lambda: None
+    tab._experiment_id = "geometry-experiment-002"
+    tab._chalk_matrix_metadata = None
+    tab._chalk_experiment_matrix_metadata = metadata
+    tab.case_var = Value("Горизонтальные линии")
+    tab.brush_var = Value("10")
+    tab._experiment_requested_brush = 10
+    tab.current_plan_path = None
+    tab.execution_report_path = None
+    tab.execution_report = None
+    tab.game_monitor_report_path = None
+    tab.game_monitor_summary = None
+    tab.experiment_phases = {}
+
+    manifest_path = tab._write_experiment_manifest()
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+
+    assert manifest["chalk_experiment_matrix"]["phase_id"] == "G1"
+    assert manifest["chalk_experiment_matrix"]["scenario_id"] == "horizontal_lengths"
+    assert manifest["chalk_experiment_matrix"]["repeat_index"] == 2
+    assert manifest["chalk_experiment_matrix"]["expected_strokes"] == 5
+    assert len(manifest["chalk_experiment_matrix"]["geometry_signature"]) == 64
