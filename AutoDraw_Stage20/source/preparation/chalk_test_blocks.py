@@ -259,3 +259,49 @@ def chalk_test_block_progress(journal: dict[str, Any]) -> dict[str, int | str]:
     counts["total"] = len(tasks)
     counts["status"] = str(journal.get("status", "unknown"))
     return counts
+
+
+def validate_chalk_block_experiment(
+    manifest_path: str | Path,
+) -> tuple[bool, str, dict[str, Any] | None]:
+    """Apply the strict matrix and per-stroke acceptance gates to one saved experiment."""
+    path = Path(manifest_path)
+    try:
+        document = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        return False, f"experiment_manifest_unavailable:{exc}", None
+    if not isinstance(document, dict):
+        return False, "experiment_manifest_invalid", None
+
+    document["experiment_dir"] = str(path.parent)
+    from chalk_experiment_matrix import summarize_chalk_experiment_matrix
+
+    result = summarize_chalk_experiment_matrix([document])
+    accepted = result.get("accepted", [])
+    rejected = result.get("rejected", [])
+    if result.get("valid_measurement_count") != 1 or len(accepted) != 1:
+        reason = rejected[0].get("reason") if rejected else "experiment_not_accepted"
+        return False, str(reason), None
+
+    record = accepted[0]
+    stroke_level = record.get("stroke_level")
+    if not isinstance(stroke_level, dict) or stroke_level.get("status") != "complete":
+        reason = stroke_level.get("reason") if isinstance(stroke_level, dict) else "stroke_breakdown_missing"
+        return False, f"stroke_level_{reason}", None
+
+    summary = document.get("game_monitor_summary")
+    summary = summary if isinstance(summary, dict) else {}
+    frame_probe = summary.get("frame_probe")
+    frame_probe = frame_probe if isinstance(frame_probe, dict) else {}
+    if frame_probe.get("status") != "measured" or frame_probe.get("visibility_interruption") is not False:
+        return False, "frame_probe_not_clean", None
+    trajectory = summary.get("trajectory")
+    trajectory = trajectory if isinstance(trajectory, dict) else {}
+    try:
+        accepted_samples = int(trajectory.get("accepted_sample_count", 0) or 0)
+    except (TypeError, ValueError, OverflowError):
+        accepted_samples = 0
+    if accepted_samples <= 0:
+        return False, "trajectory_samples_missing", None
+
+    return True, "accepted", record
