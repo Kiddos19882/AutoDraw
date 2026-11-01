@@ -986,6 +986,7 @@ class BrushBehaviorTestTab:
                 journal.get("phase_id") == "G1"
                 and journal.get("status") == "completed"
                 and journal.get("expected_task_count") == 12
+                and len(journal.get("tasks", [])) == 12
                 and all(task.get("status") == "completed" for task in journal.get("tasks", []))
             ):
                 return True
