@@ -123,3 +123,15 @@ Partial capture содержит измеренное значение CHALK 363
 ## 8. Источник истины
 
 Raw manifests, execution reports, Game Monitor reports и block journal сохранены в commit `094381f1d3f005efc8b2324062cc1f2dacc277a5`. Этот документ — аналитическая сводка, он не заменяет исходные JSON и не меняет экспериментальные данные.
+
+## 9. Проверка возможности продолжения закрытого блока
+
+Проверен код на том же commit, что и исходные результаты:
+
+- `claim_next_chalk_block_task()` отказывает для block status `stopped` и не выдаёт следующую pending-задачу;
+- UI recovery scan рассматривает `ready/running/paused/failed`, но не `stopped`;
+- `resolve_interrupted_chalk_block_task()` принимает только task status `interrupted`; failed-задача не может быть автоматически переведена в pending;
+- UI recovery допускает retry ровно одной interrupted-задачи после ручного подтверждения проверки доски; для failed-задачи интерфейс прямо запрещает автоматический retry;
+- `build_chalk_test_block_plan(phase_id="G3")` всегда строит полные 27 ячеек (9 конфигураций × 3 повтора), а не частичную шестизадачную continuation-матрицу.
+
+Следовательно, штатный UI/code path не умеет продолжить именно этот stopped block или создать штатную G3 continuation-матрицу только из шести задач. Не менять вручную journal и не переоткрывать stopped block. Без изменения механизма продолжения корректный штатный путь — новая полная G3 серия 27/27. Альтернатива — отдельная разработка и тестирование формального continuation/aggregation механизма, который явно связывает исходный и дочерний block IDs и не позволяет задвоить уже принятые captures.
