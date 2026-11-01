@@ -116,14 +116,14 @@ class BridgeRecorderTests(unittest.TestCase):
         before = {"maxPoints": 6000, "remainingPoints": 6000, "pointCount": 0, "isExact": True}
         after = {"maxPoints": 6000, "remainingPoints": 5999, "pointCount": 1, "isExact": True}
         self.recorder.heartbeat(
-            {"droppedEvents": 50000, "errors": 0}, 0.5, {"sendFailureCount": 0}
+            {"droppedEvents": 50000, "errors": 8}, 0.5, {"sendFailureCount": 0}
         )
         self.recorder.event({"type": "DRAW_START", "t": 1, "before": before}, 1.0)
         self.recorder.event({"type": "DRAW_SAMPLE", "t": 2, "strokeId": "s1",
                              "pointDelta": 1, "acceptedPoint": {"x": 3, "y": 4}}, 1.1)
         self.recorder.event({"type": "DRAW_END", "t": 3, "after": after}, 1.2)
         self.recorder.heartbeat(
-            {"droppedEvents": 50010, "errors": 0},
+            {"droppedEvents": 50010, "errors": 8},
             1.3,
             {"sendFailureCount": 0},
         )
@@ -133,6 +133,8 @@ class BridgeRecorderTests(unittest.TestCase):
         self.assertEqual(data["monitor_buffer_dropped_events_start"], 50000)
         self.assertEqual(data["monitor_buffer_dropped_events_end"], 50010)
         self.assertEqual(data["monitor_buffer_dropped_events_delta"], 10)
+        self.assertEqual(data["monitor_error_count"], 8)
+        self.assertEqual(data["monitor_error_count_delta"], 0)
         self.assertEqual(data["bridge_send_failures_delta"], 0)
         self.assertEqual(data["collector_sequence_gap_count"], 0)
         self.assertEqual(data["interpretation"]["path_length_status"], "incomplete_until_verified")
@@ -305,7 +307,7 @@ class ProductionBridgeIntegrationTests(unittest.IsolatedAsyncioTestCase):
                     self.assertEqual(json.loads(await ws.recv()), {"type": "ready"})
                     await ws.send(json.dumps({
                         "type": "session_start", "sessionId": session_id, "sequence": 1,
-                        "monitorStatus": {"active": True, "boardDetected": True},
+                        "monitorStatus": {"active": True, "boardDetected": True, "droppedEvents": 0, "errors": 0},
                         "browser": "unit-test", "page": {"origin": "https://game.example"},
                     }))
                     before = {"maxPoints": 6000, "remainingPoints": 6000,
