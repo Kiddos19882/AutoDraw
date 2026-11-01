@@ -1314,3 +1314,24 @@ Run JSON дополнен `stroke_count`, суммой `sampled_point_delta_tota
 **Документация:** добавлен `docs/CHALK_GEOMETRY_MATRIX_G1_RESULTS.md`; обновлены `CHALK_GEOMETRY_MATRIX_PLAN.md`, `docs/PROJECT_STATUS.md` и индекс `docs/README.md`.
 
 **Статус / следующий шаг:** individual captures и per-stroke breakdown подтверждены, но G1 не закрыта до разрешения metadata blocker и повторной проверки analyzer. G2/G3 остаются закрытыми. Никакие экспериментальные данные не удалялись.
+
+## 2026-11-01 — аудит и исправление repeat metadata для CHALK G1/G2
+
+**Причина:** в Brush Test UI `matrix_block_var` создавался с `StringVar(value="1")`; поле было обычным Entry. При создании DrawingPlan код передавал `int(self.matrix_block_var.get().strip())` непосредственно в `repeat_index`. Автоматического инкремента и проверки ранее сохранённых ячеек не существовало. Следовательно, три прогона одного сценария могли все получить repeat_index=1, если значение поля не меняли. По исходникам нельзя доказать, что именно пользователь вводил в интерфейс, но программная причина отсутствия защиты подтверждена.
+
+**Дополнительная проверка первичных данных:** 12 G1 manifests относятся к одной series ID; внутри каждого сценария есть три последовательных запуска с уникальными experiment ID и Game Monitor run ID. У всех точный CHALK и валидный per-stroke breakdown. Все исходные значения `repeat_index=1`, `matrix_order_index` отсутствует. Ни один raw manifest/report не изменён.
+
+**Исправления:**
+- добавлен `inspect_chalk_matrix_series()` для сканирования уже сохранённых manifests, проверки repeat cell и вычисления следующего порядкового номера;
+- UI блокирует повторное использование ячейки `series_id + scenario_id + repeat_index`;
+- metadata теперь содержит автоматически назначаемый `matrix_order_index`;
+- анализатор валидирует `matrix_order_index`, когда он есть, и сохраняет обратную совместимость с legacy manifests;
+- добавлены unit tests для duplicate guard, следующего индекса и manifests без нового поля.
+
+**Изменённые файлы:** `source/preparation/chalk_experiment_matrix.py`, `source/preparation/brush_behavior_test_ui.py`, `source/preparation/tests/test_chalk_experiment_matrix.py`.
+
+**Коммиты:** `afb5076c6de3f1eb6b42057d1830e1e7320b32d6`, `32d145ef9874be8e936ee411ec5bc2a96723a5b9`, `dc4100a22b0ebab576af22480b992449cbe2c8dd`, `e03e71ee9b285a896b039de12becf80aad5596a6`, `5771f52554c3356c54d451e0ab26e99c6a7524a8`.
+
+**Проверка:** GitHub Actions workflow `41261159618` для HEAD `5771f52554c3356c54d451e0ab26e99c6a7524a8` был поставлен в очередь; итог ещё не подтверждён на момент записи.
+
+**Статус:** кодовая причина повторного использования repeat index устранена для будущих запусков. Принятие уже собранной G1 остаётся отдельной задачей: требуется auditable reconciliation sidecar или повторное измерение. Никакие первичные данные не переписывались и не удалялись. G2/G3 остаются закрытыми.
