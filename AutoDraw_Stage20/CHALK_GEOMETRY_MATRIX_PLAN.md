@@ -122,7 +122,11 @@ Live G1 записана в коммите `b75fe367073c22e818227b1d07ef4abe63a6
 
 **Всего в текущем плане: 57 экспериментов**, выполняемых последовательно через gates.
 
-**Новое обязательное требование к исполнению:** G1/G2 должны запускаться целыми автоматическими блоками через `source/preparation/chalk_test_blocks.py`, а не серией ручных нажатий. Ядро планирования/журналирования создано; до live-использования требуется завершить UI-интеграцию, автоматический lifecycle и fail-closed переходы. Спецификация: `docs/CHALK_TEST_BLOCKS_DESIGN.md`. Не просить оператора выполнять оставшиеся G1/G2 по одному сценарию до готовности block runner. Следующие фазы не запускать автоматически, если предыдущая выявила проблему качества данных, safety threshold или необходимость изменить протокол.
+**Новое обязательное требование к исполнению:** G1/G2 должны запускаться целыми автоматическими блоками через `source/preparation/chalk_test_blocks.py`, а не серией ручных нажатий.
+
+**Реализация block runner:** в Brush Test добавлены Start G1/G2, progress, Stop-at-boundary, автоматический preclear/blank-board verification, установка радиуса с heartbeat feedback, executor, корреляция Game Monitor, строгий exact CHALK/per-stroke/frame gate и переход к следующей задаче. Journal сохраняет experiment ID/path до первого mouse action. Recovery UI обнаруживает interrupted/ready/paused journals; повтор interrupted task возможен только после ручной проверки доски и явного подтверждения. Failed attempts не повторяются автоматически.
+
+**Открытые gates перед live:** callback-level integration tests на каждый failure path, GitHub Actions и Windows portable smoke test. Ни один новый G1 block не запускался. После успешного CI выполнить один контролируемый полный G1 block; старые 12 manifests с repeat_index=1 не переписывать. G1/G2/G3 не запускать вручную по частям. Спецификация: `docs/CHALK_TEST_BLOCKS_DESIGN.md`. Следующие фазы не запускать автоматически, если предыдущая выявила проблему качества данных, safety threshold или необходимость изменить протокол.
 
 ## 8. Критерий завершения плана
 
