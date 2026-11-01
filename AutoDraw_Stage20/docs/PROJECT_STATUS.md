@@ -646,3 +646,34 @@ G3 остаётся экспериментально не выполненным
 Для G1/G2/G3 block runner это убирает лишний popup после каждого автоматического drag; Clear/blank-board и остальные обязательные предупреждения не затрагивались. Добавлены regression tests: точный Monitor radius запускает callback без диалога, mismatch блокирует handoff.
 
 Изменения в commits: `bb32589cb9d450a03b1d5b5264732828812b8ed3`, `465346a58caf76b8566d99128361095324368366`, `c919610999c5ea9f4a1afebad937395e586dc4b9`. Требуется новый полный CI на изменённом HEAD; до его завершения успешный CI предыдущего G3 HEAD не распространяется на эти изменения.
+
+
+## Актуальное состояние G3 и CI — 2026-11-01 (проверено на актуальном HEAD)
+
+**Последний подтверждённый HEAD:** `3dbf8f20bcea44c61290e49398e1a4daf182dbf9`  
+**Ветка:** `feature/image-geometry-optimization`  
+**GitHub Actions run:** [41340237207](https://github.com/Kiddos19882/AutoDraw/actions/runs/41340237207) — `completed / success`.
+
+Все три обязательных jobs завершились успешно на этом exact HEAD:
+- `geometry-tests` — success;
+- `executor-tests` — success;
+- `Windows portable build and startup smoke-test` — success.
+
+Run включает commit `8c93a498864973b9879c926627030bb7e1d3ce2a` с интеграционным regression test `AutoDrawUnifiedApp._start_brush_test_executor`. Поэтому прежнее замечание, что run `41340056751` не покрывал последний тестовый commit, закрыто новым run `41340237207`.
+
+### Разделение статусов
+
+- **G3 software gate:** CLOSED — реализация матрицы, regression coverage, полный CI и удалённая Windows portable build/startup smoke-test подтверждены.
+- **Local Windows preflight:** OPEN — требуется запуск актуальной portable-сборки на рабочей Windows-машине, проверка профиля/калибровки кисти, Clear/чистой доски, игровой canvas и heartbeat Game Monitor.
+- **Live G3:** NOT RUN — требуется полный блок 27/27: девять сочетаний шага/задержки × три повтора.
+- **Ресурсная модель G3:** NOT CONFIRMED — нет live captures, поэтому влияние `point_step_px` и `point_delay_ms` на фактический CHALK пока неизвестно.
+
+### Автоматическое подтверждение радиуса кисти
+
+Визуальные popup-подтверждения после установки кисти удалены. Handoff остаётся fail-closed: требуется свежий heartbeat Game Monitor и точное совпадение фактического радиуса с запросом; mismatch/устаревшие данные/ошибка коррекции или записи manifest блокируют запуск. Предупреждение о возможной очистке тестовой доски сохраняется.
+
+### Workflow и ветки
+
+Workflow `.github/workflows/geometry-tests.yml` запускается на push feature-ветки, на pull_request при совпадении path-фильтра и вручную через workflow_dispatch. PR #3 с base `ci/g3-validation-base` остаётся временным CI-only PR и не должен сливаться. `master` не изменялся.
+
+**Следующее действие:** выполнить локальный Windows preflight; только после его успешного завершения запускать полный G3 block. Не запускать отдельные ячейки вручную и не строить модель расхода до проверки всех 27 captures.
