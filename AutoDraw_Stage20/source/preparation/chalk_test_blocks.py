@@ -263,6 +263,10 @@ def chalk_test_block_progress(journal: dict[str, Any]) -> dict[str, int | str]:
 
 def validate_chalk_block_experiment(
     manifest_path: str | Path,
+    *,
+    expected_task: dict[str, Any] | None = None,
+    expected_block: dict[str, Any] | None = None,
+    expected_experiment_id: str | None = None,
 ) -> tuple[bool, str, dict[str, Any] | None]:
     """Apply the strict matrix and per-stroke acceptance gates to one saved experiment."""
     path = Path(manifest_path)
@@ -274,6 +278,30 @@ def validate_chalk_block_experiment(
         return False, "experiment_manifest_invalid", None
 
     document["experiment_dir"] = str(path.parent)
+    if expected_task is not None or expected_block is not None or expected_experiment_id is not None:
+        if not isinstance(expected_task, dict) or not isinstance(expected_block, dict):
+            return False, "expected_block_task_identity_unavailable", None
+        block_ref = document.get("chalk_test_block")
+        matrix = document.get("chalk_experiment_matrix")
+        if not isinstance(block_ref, dict) or not isinstance(matrix, dict):
+            return False, "block_task_identity_missing", None
+        identity_pairs = (
+            (block_ref.get("block_id"), expected_block.get("block_id"), "block_id"),
+            (block_ref.get("task_id"), expected_task.get("task_id"), "task_id"),
+            (block_ref.get("phase_id"), expected_block.get("phase_id"), "block_phase_id"),
+            (matrix.get("series_id"), expected_block.get("series_id"), "series_id"),
+            (matrix.get("phase_id"), expected_block.get("phase_id"), "phase_id"),
+            (matrix.get("scenario_id"), expected_task.get("scenario_id"), "scenario_id"),
+            (matrix.get("repeat_index"), expected_task.get("repeat_index"), "repeat_index"),
+            (matrix.get("requested_radius"), expected_task.get("requested_radius"), "requested_radius"),
+            (matrix.get("expected_strokes"), expected_task.get("expected_strokes"), "expected_strokes"),
+            (matrix.get("matrix_order_index"), expected_task.get("matrix_order_index"), "matrix_order_index"),
+            (matrix.get("executor_parameters"), expected_task.get("executor_parameters"), "executor_parameters"),
+            (document.get("experiment_id"), expected_experiment_id, "experiment_id"),
+        )
+        for actual, expected, field in identity_pairs:
+            if actual != expected:
+                return False, f"block_task_identity_mismatch:{field}", None
     phases = document.get("phases") if isinstance(document.get("phases"), dict) else {}
     before_clear = phases.get("before_clear") if isinstance(phases.get("before_clear"), dict) else {}
     before_draw = phases.get("before_draw") if isinstance(phases.get("before_draw"), dict) else {}
