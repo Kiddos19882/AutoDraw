@@ -1452,3 +1452,12 @@ Run JSON дополнен `stroke_count`, суммой `sampled_point_delta_tota
 Добавлен callback test, моделирующий неуспешную проверку очистки доски: block journal становится paused, текущая задача failed, executor не запускается. Изменения кода/тестов: 14d112e4b4ea22ea26b47c5850863cd30f4c146b, 02d0e308681fc626bcf1bc56b898864e17df1597, df756c9ce8e2a9403a1b00dd001b593959e5d22a, eda6f6462747ce3999a882995b50f69e558985d7, 95d3ab6c6f782340785ceaf4c534951c1f648c8b.
 
 GitHub Actions для новых изменений выполняется/ожидает очереди; итог ещё не подтверждён. Live G1 не запускался.
+
+
+## 2026-11-01 — разбор CI и исправление callback test stub
+
+Проверены workflow runs `41267183785` (кодовый/test commit `95d3ab6c6f782340785ceaf4c534951c1f648c8b`) и `41267241966` (документированный HEAD `cce3d38d99920f787c2ea8dd63c88caf2c883c54`). В обоих запусках `executor-tests` прошёл; `geometry-tests` завершился с 1 failed / 574 passed, а Windows portable build остановился на той же Stage 13 preparation suite до startup smoke-test.
+
+Причина единственного падения — устаревшая lambda-подмена `validate_chalk_block_experiment` в `test_ui_capture_gate_pauses_without_advancing_on_incomplete_evidence`: UI корректно передаёт новые keyword-only identity аргументы (`expected_task`, `expected_block`, `expected_experiment_id`, `expected_experiment_dir`), а тестовая lambda принимала только путь. Обновлена подмена до `lambda _path, **_kwargs`, сохраняя проверку отказа на incomplete evidence. Изменение: commit `20704ab984b981a4bf5b2278eba6cfad970d15a5`.
+
+Для нового commit combined status пока не содержит checks; CI результата после исправления ещё нет. До полного успешного CI и Windows startup smoke-test live G1 не запускать. Raw manifests, `data/` и `master` не изменялись.
