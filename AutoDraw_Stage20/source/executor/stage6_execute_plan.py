@@ -1493,18 +1493,28 @@ class Stage6App:
         except (ValueError, TypeError) as exc:
             raise ValueError(f"Проверьте параметры исполнителя: {exc}") from exc
 
-    def start_execution_from_workflow(self) -> bool:
-        """Start a previously loaded plan from a host workflow without a second confirmation dialog.
+    def start_execution_from_workflow(
+        self, executor_config_override: dict[str, Any] | None = None
+    ) -> bool:
+        """Start a workflow plan with an optional ephemeral ExecutorConfig override.
 
-        All normal validation, stop handling, countdown, worker setup, and report generation
-        remain in the standard executor path. Must be called on the Tk thread.
+        Overrides are validated and included in the execution report, but are not
+        written into the user's persistent execution settings.
         """
         if self.running or self.execution_plan is None or self.area is None or self.plan_path is None:
             return False
-        self._start_execution(confirmed=True)
+        self._start_execution(
+            confirmed=True,
+            executor_config_override=executor_config_override,
+        )
         return bool(self.running)
 
-    def _start_execution(self, *, confirmed: bool = False) -> None:
+    def _start_execution(
+        self,
+        *,
+        confirmed: bool = False,
+        executor_config_override: dict[str, Any] | None = None,
+    ) -> None:
         if self.running:
             return
         if self.execution_plan is None or self.area is None or self.plan_path is None:
@@ -1512,6 +1522,11 @@ class Stage6App:
             return
         try:
             config = self._read_executor_config()
+            if executor_config_override is not None:
+                if not isinstance(executor_config_override, dict):
+                    raise ValueError("Переопределение параметров исполнителя должно быть объектом.")
+                config = replace(config, **executor_config_override)
+                config.validate()
             self.execution_plan.validate_bounds()
             # Revalidate against the current display: resolution/monitor can change after profile load.
             self._validate_area(self.area)
@@ -1533,8 +1548,9 @@ class Stage6App:
                 build_palette_targets(
                     self.color_plan_data, self.color_palette_profile, current_screen_size=pyautogui.size()
                 )
-            self._save_settings(config)
-        except (ValueError, OSError, ColorPlanExecutionError) as exc:
+            if executor_config_override is None:
+                self._save_settings(config)
+        except (ValueError, OSError, TypeError, ColorPlanExecutionError) as exc:
             messagebox.showerror("Неверные настройки", str(exc), parent=self.root)
             return
 
