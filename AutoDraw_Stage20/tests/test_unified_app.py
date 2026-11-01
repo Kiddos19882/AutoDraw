@@ -252,13 +252,14 @@ class UnifiedAppCoreTests(unittest.TestCase):
         executor.area = object()
         executor.plan_path = Path("brush-plan.json")
 
-        def start_validated(*, confirmed=False):
+        def start_validated(*, confirmed=False, executor_config_override=None):
             self.assertTrue(confirmed)
+            self.assertIsNone(executor_config_override)
             executor.running = True
 
         with patch.object(executor, "_start_execution", side_effect=start_validated) as start:
             self.assertTrue(executor.start_execution_from_workflow())
-            start.assert_called_once_with(confirmed=True)
+            start.assert_called_once_with(confirmed=True, executor_config_override=None)
 
     def test_workflow_executor_start_rejects_missing_plan_or_area(self):
         executor = object.__new__(integrated_app.Stage6App)
@@ -1175,6 +1176,22 @@ class UnifiedAppCoreTests(unittest.TestCase):
                 except tk.TclError:
                     pass
 
+
+
+    def test_workflow_executor_start_passes_ephemeral_config_override(self):
+        executor = object.__new__(integrated_app.Stage6App)
+        executor.running = False
+        executor.execution_plan = object()
+        executor.area = object()
+        executor.plan_path = Path("brush-plan.json")
+        override = {"point_step_px": 1.0, "point_delay_ms": 5}
+
+        with patch.object(executor, "_start_execution") as start:
+            self.assertFalse(executor.start_execution_from_workflow(override))
+            start.assert_called_once_with(
+                confirmed=True,
+                executor_config_override=override,
+            )
 
 
 if __name__ == "__main__":
