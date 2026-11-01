@@ -24,6 +24,19 @@ from palette_profiles import create_palette_profile
 
 
 class UnifiedAppCoreTests(unittest.TestCase):
+    def setUp(self):
+        self._data_tempdir = tempfile.TemporaryDirectory(prefix="AutoDraw isolated UI data ")
+        self._environment_patch = patch.dict(os.environ)
+        self._environment_patch.start()
+        self._test_data_paths = integrated_app.configure_environment(self._data_tempdir.name)
+        self._data_paths_patch = patch.object(integrated_app, "DATA_PATHS", self._test_data_paths)
+        self._data_paths_patch.start()
+
+    def tearDown(self):
+        self._data_paths_patch.stop()
+        self._environment_patch.stop()
+        self._data_tempdir.cleanup()
+
     def test_environment_routes_both_workflows_to_shared_data(self):
         old_values = {key: os.environ.get(key) for key in (
             "AUTODRAW_ROOT", "AUTODRAW_APP_DIR", "AUTODRAW_DATA_DIR",
