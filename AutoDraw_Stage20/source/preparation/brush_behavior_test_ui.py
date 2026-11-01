@@ -636,19 +636,24 @@ class BrushBehaviorTestTab:
         self._load_brush_control_into_fields()
         self._chalk_block_recovery_scan_after_id = self.root.after(0, self._scan_chalk_block_recovery)
 
-    def destroy(self) -> None:
-        """Cancel the deferred recovery scan before Tk destroys this tab."""
+    def _cancel_pending_chalk_block_recovery_scan(self) -> None:
         callback_id = getattr(self, "_chalk_block_recovery_scan_after_id", None)
-        if callback_id is not None:
-            try:
-                self.root.after_cancel(callback_id)
-            except (tk.TclError, ValueError):
-                pass
-            self._chalk_block_recovery_scan_after_id = None
-        super().destroy()
+        if callback_id is None:
+            return
+        try:
+            self.root.after_cancel(callback_id)
+        except (tk.TclError, ValueError):
+            pass
+        self._chalk_block_recovery_scan_after_id = None
+
+    def _on_recovery_scan_owner_destroyed(self, event) -> None:
+        if event.widget is getattr(self, "_recovery_scan_frame", None):
+            self._cancel_pending_chalk_block_recovery_scan()
 
     def _build(self, parent: tk.Widget) -> None:
         outer = ttk.Frame(parent, padding=10)
+        self._recovery_scan_frame = outer
+        outer.bind("<Destroy>", self._on_recovery_scan_owner_destroyed, add="+")
         outer.pack(fill="both", expand=True)
         ttk.Label(outer, text="Тест поведения кистей", font=("Segoe UI", 15, "bold")).pack(anchor="w")
         ttk.Label(
