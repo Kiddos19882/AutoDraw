@@ -7,6 +7,7 @@ import pytest
 from chalk_experiment_matrix import (
     GEOMETRY_EXECUTOR_CONFIG,
     build_chalk_experiment_matrix_metadata,
+    inspect_chalk_matrix_series,
     summarize_chalk_experiment_matrix,
 )
 
@@ -26,6 +27,7 @@ def _manifest(tmp_path, repeat=1, run_id="run-1", consumed=50, scenario="horizon
         repeat_index=repeat,
         requested_radius=10,
         strokes=strokes,
+        matrix_order_index=repeat,
     )
     experiment_id = f"exp-{repeat}"
     report_events = []
@@ -92,9 +94,11 @@ def test_geometry_metadata_records_phase_repeat_stroke_count_and_signature():
         repeat_index=2,
         requested_radius=10,
         strokes=_strokes(),
+        matrix_order_index=7,
     )
     assert metadata["phase_id"] == "G1"
     assert metadata["repeat_index"] == 2
+    assert metadata["matrix_order_index"] == 7
     assert metadata["expected_strokes"] == 5
     assert len(metadata["geometry_signature"]) == 64
     assert metadata["planned_strokes"] == _strokes()
@@ -174,3 +178,54 @@ def test_geometry_matrix_rejects_changed_geometry_signature(tmp_path):
     result = summarize_chalk_experiment_matrix([doc])
     assert result["valid_measurement_count"] == 0
     assert result["rejected"][0]["reason"] == "matrix_metadata_mismatch:geometry_signature"
+
+
+
+def test_inspect_matrix_series_blocks_used_repeat_and_assigns_next_order(tmp_path):
+    first = tmp_path / "first"
+    second = tmp_path / "second"
+    first.mkdir()
+    second.mkdir()
+    doc1 = _manifest(first, repeat=1, run_id="run-1")
+    doc2 = _manifest(second, repeat=2, run_id="run-2")
+    (first / "experiment.json").write_text(json.dumps(doc1), encoding="utf-8")
+    (second / "experiment.json").write_text(json.dumps(doc2), encoding="utf-8")
+
+    occupied = inspect_chalk_matrix_series(
+        tmp_path,
+        series_id="geometry-series",
+        scenario_id="horizontal_lengths",
+        repeat_index=1,
+    )
+    assert occupied["duplicate_manifest_path"] == str(first / "experiment.json")
+    assert occupied["series_experiment_count"] == 2
+    assert occupied["next_matrix_order_index"] == 3
+
+    available = inspect_chalk_matrix_series(
+        tmp_path,
+        series_id="geometry-series",
+        scenario_id="horizontal_lengths",
+        repeat_index=3,
+    )
+    assert available["duplicate_manifest_path"] is None
+    assert available["next_matrix_order_index"] == 3
+
+
+def test_inspect_matrix_series_counts_legacy_manifests_without_order_index(tmp_path):
+    folder = tmp_path / "legacy"
+    folder.mkdir()
+    doc = _manifest(folder, repeat=1, run_id="legacy-run")
+    doc["chalk_experiment_matrix"].pop("matrix_order_index")
+    doc["monitor_capture"]["chalk_experiment_matrix"].pop("matrix_order_index")
+    doc["game_monitor_summary"]["chalk_experiment_matrix"].pop("matrix_order_index")
+    (folder / "experiment.json").write_text(json.dumps(doc), encoding="utf-8")
+
+    state = inspect_chalk_matrix_series(
+        tmp_path,
+        series_id="geometry-series",
+        scenario_id="vertical_lengths",
+        repeat_index=2,
+    )
+    assert state["series_experiment_count"] == 1
+    assert state["next_matrix_order_index"] == 2
+    assert state["duplicate_manifest_path"] is None
