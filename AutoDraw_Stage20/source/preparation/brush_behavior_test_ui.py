@@ -991,7 +991,7 @@ class BrushBehaviorTestTab:
                 except (OSError, ValueError, RuntimeError):
                     unresolved.append(journal_path)
                     continue
-            if journal.get("status") == "paused":
+            if journal.get("status") in {"ready", "paused"}:
                 unresolved.append(journal_path)
         if unresolved:
             self._chalk_block_recovery_journal_path = unresolved[0]
@@ -1023,6 +1023,22 @@ class BrushBehaviorTestTab:
             task for task in journal.get("tasks", [])
             if task.get("status") == "interrupted"
         ]
+        if not interrupted and journal.get("status") == "ready":
+            if not messagebox.askyesno(
+                "Продолжить готовый блок",
+                "В журнале есть ожидающие задачи без незавершённого запуска. AutoDraw продолжит блок с первой pending-задачи "
+                "и перед рисованием автоматически очистит/проверит доску. Подтверждаешь, что это тестовая доска?",
+                icon="warning",
+                parent=self.root,
+            ):
+                return
+            self._chalk_block_recovery_journal_path = None
+            self._chalk_block_journal_path = path
+            self._chalk_block_task = None
+            self._chalk_block_stop_requested = False
+            self._chalk_block_clear_confirmed = True
+            self._start_next_chalk_block_task()
+            return
         if len(interrupted) != 1:
             messagebox.showwarning(
                 "Повтор не разрешён",
