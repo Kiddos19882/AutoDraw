@@ -291,3 +291,18 @@ Software gate закрыт; live gate остаётся открытым. Авт�
 ### Recovery после partial G3 2026-11-02
 
 Текущий code path не поддерживает штатное продолжение остановленного блока: `claim_next_chalk_block_task` не выдаёт задачи для `stopped`; recovery scan не рассматривает `stopped`; `resolve_interrupted_chalk_block_task` принимает только `interrupted`, а не `failed`; G3 builder формирует полный набор 27 задач. Поэтому текущий блок нельзя штатно продолжить на оставшихся шести ячейках. Не менять journal вручную. Использовать новый полный G3 block либо сначала реализовать и протестировать явную continuation/aggregation модель, связанную с исходным block ID.
+
+## 2026-11-02 — диагностика переполнения Game Monitor
+
+- [x] Проверить фактическую session проблемного G3 capture и сопоставить browser sent / collector received.
+- [x] Проверить лимит `MAX_EVENTS=50000` и поведение `emit()` после достижения лимита.
+- [x] Подтвердить, что `monitor_dropped_events` является накопительным session-счётчиком, а не per-run loss.
+- [x] Выполнить детерминированную симуляцию заполнения буфера и продолжения доставки подписчику.
+- [x] Задокументировать причину и границы доказательств в `docs/GAME_MONITOR_BUFFER_OVERFLOW_ANALYSIS_2026-11-02.md`.
+- [ ] Разделить метрики локального export buffer, browser send failures, collector sequence gaps и per-run recorder drops.
+- [ ] Исправить передачу cumulative `status.droppedEvents` в per-run report и acceptance gate.
+- [ ] Добавить JS regression test для overflow при продолжающейся доставке подписчика.
+- [ ] Добавить Python regression test: overflow предыдущих событий session не должен делать следующий run partial.
+- [ ] Прогнать Game Monitor/Preparation tests и CI на конечном HEAD.
+- [ ] Только после исправления и тестов планировать новый live G3; старый stopped journal не переоткрывать и не переписывать.
+
