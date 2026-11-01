@@ -315,27 +315,29 @@ def summarize_chalk_experiment_matrix(
                 "experiment_dir": document.get("experiment_dir"),
             })
 
-    grouped: dict[tuple[str, str, str, int], list[dict[str, Any]]] = {}
+    grouped: dict[tuple[str, str, str, int, str], list[dict[str, Any]]] = {}
     for record in accepted:
-        key = (record["series_id"], record["phase_id"], record["scenario_id"], record["radius"])
+        key = (record["series_id"], record["phase_id"], record["scenario_id"], record["radius"], record["geometry_signature"])
         grouped.setdefault(key, []).append(record)
 
     results = []
-    for (series_id, phase_id, scenario_id, radius), rows in sorted(grouped.items()):
+    for (series_id, phase_id, scenario_id, radius, geometry_signature), rows in sorted(grouped.items()):
         rows.sort(key=lambda row: row["repeat_index"])
         values = [row["consumed_points"] for row in rows]
-        signatures = {row["geometry_signature"] for row in rows}
+        complete = len(rows) == 3 and {row["repeat_index"] for row in rows} == {1, 2, 3}
         results.append({
             "series_id": series_id,
             "phase_id": phase_id,
             "scenario_id": scenario_id,
             "radius": radius,
+            "geometry_signature": geometry_signature,
             "valid_repeat_count": len(rows),
-            "complete": len(rows) == 3 and {row["repeat_index"] for row in rows} == {1, 2, 3},
-            "geometry_consistent": len(signatures) == 1,
+            "complete": complete,
+            "geometry_consistent": True,
             "measurements": rows,
-            "mean": mean(values) if values else None,
-            "median": median(values) if values else None,
+            "mean": mean(values) if complete else None,
+            "partial_mean": mean(values) if values else None,
+            "median": median(values) if complete else None,
             "minimum": min(values) if values else None,
             "maximum": max(values) if values else None,
             "range": max(values) - min(values) if values else None,
