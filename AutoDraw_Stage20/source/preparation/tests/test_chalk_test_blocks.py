@@ -708,3 +708,19 @@ def test_g3_block_order_is_deterministic_for_same_seed():
         for task in plan["tasks"]
     ]
     assert identity(first) == identity(second)
+
+def test_g3_journal_rejects_boolean_repeat_and_duplicate_matrix_order_index(tmp_path):
+    plan = build_chalk_test_block_plan(series_id="g3-strict", phase_id="G3", seed=42)
+    invalid_repeat = json.loads(json.dumps(plan))
+    invalid_repeat["tasks"][0]["repeat_index"] = True
+    repeat_path = tmp_path / "g3-bool-repeat.json"
+    repeat_path.write_text(json.dumps(invalid_repeat), encoding="utf-8")
+    with pytest.raises(ValueError, match="Некорректная или повторная ячейка G3"):
+        load_chalk_test_block_journal(repeat_path)
+
+    invalid_order = json.loads(json.dumps(plan))
+    invalid_order["tasks"][1]["matrix_order_index"] = invalid_order["tasks"][0]["matrix_order_index"]
+    order_path = tmp_path / "g3-duplicate-order.json"
+    order_path.write_text(json.dumps(invalid_order), encoding="utf-8")
+    with pytest.raises(ValueError, match="Некорректная или повторная ячейка G3"):
+        load_chalk_test_block_journal(order_path)
