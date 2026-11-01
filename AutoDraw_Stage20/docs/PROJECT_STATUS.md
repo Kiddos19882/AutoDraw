@@ -612,3 +612,11 @@ The first final CI run exposed a mismatch: `finish_chalk_block_task(accepted=Fal
 
 ### Уточнение готовности G3
 G2 принят и исследовательский gate G3 открыт. Однако текущий код block runner, UI и matrix validator поддерживает только G1/G2. Поэтому live G3 пока не запускать: сначала реализовать G3-идентификацию 9 комбинаций `point_step_px` × `point_delay_ms` с тремя повторами, UI-поддержку, валидацию/анализатор и regression tests; затем подтвердить полный CI и Windows portable smoke-test. Это программная подготовка G3, а не изменение экспериментального протокола.
+
+## Актуальное дополнение — подготовка G3
+
+G1 и G2 приняты по live-данным. Начата программная реализация G3 на текущей feature-ветке.
+
+Целевой контракт: 27 задач на `paint_consumption_long_lines`, радиус 10; девять комбинаций `point_step_px` 1/2/4 × `point_delay_ms` 5/10/20, три повтора каждой. Идентичность каждой ячейки включает обе настройки executor и repeat_index.
+
+До live-запуска обязательны regression tests, полный GitHub Actions CI и Windows portable startup smoke-test. Параметры должны реально применяться к `MouseExecutor` и попадать в execution report; запись только в experiment manifest не считается реализацией G3. Временный override не должен изменять постоянный профиль пользователя.
