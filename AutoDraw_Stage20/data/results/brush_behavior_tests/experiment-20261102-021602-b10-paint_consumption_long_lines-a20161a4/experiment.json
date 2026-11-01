@@ -1,0 +1,958 @@
+{
+  "schema_version": 1,
+  "record_type": "autodraw_brush_paint_experiment",
+  "experiment_id": "a20161a4dd2740bb8bea969f85cf901a",
+  "chalk_radius_matrix": null,
+  "chalk_experiment_matrix": {
+    "schema_version": 1,
+    "series_id": "chalk-20261102-015749-7c1141",
+    "phase_id": "G3",
+    "scenario_id": "paint_consumption_long_lines",
+    "repeat_index": 2,
+    "matrix_order_index": 15,
+    "planned_repeats": 3,
+    "requested_radius": 10,
+    "expected_strokes": 6,
+    "geometry_signature": "a157b49849c30c097e1836cc0689a2f2570bb5ca8431751e21e7269c30e325f1",
+    "planned_strokes": [
+      {
+        "closed": false,
+        "metadata": {
+          "line_extension_px_override": 0.0,
+          "role": "brush_behavior_test",
+          "test_case": "paint_consumption_long_lines"
+        },
+        "name": "consumption_line_01",
+        "points": [
+          {
+            "x": 20.0,
+            "y": 18.0
+          },
+          {
+            "x": 420.0,
+            "y": 18.0
+          }
+        ]
+      },
+      {
+        "closed": false,
+        "metadata": {
+          "line_extension_px_override": 0.0,
+          "role": "brush_behavior_test",
+          "test_case": "paint_consumption_long_lines"
+        },
+        "name": "consumption_line_02",
+        "points": [
+          {
+            "x": 20.0,
+            "y": 54.0
+          },
+          {
+            "x": 420.0,
+            "y": 54.0
+          }
+        ]
+      },
+      {
+        "closed": false,
+        "metadata": {
+          "line_extension_px_override": 0.0,
+          "role": "brush_behavior_test",
+          "test_case": "paint_consumption_long_lines"
+        },
+        "name": "consumption_line_03",
+        "points": [
+          {
+            "x": 20.0,
+            "y": 90.0
+          },
+          {
+            "x": 420.0,
+            "y": 90.0
+          }
+        ]
+      },
+      {
+        "closed": false,
+        "metadata": {
+          "line_extension_px_override": 0.0,
+          "role": "brush_behavior_test",
+          "test_case": "paint_consumption_long_lines"
+        },
+        "name": "consumption_line_04",
+        "points": [
+          {
+            "x": 20.0,
+            "y": 126.0
+          },
+          {
+            "x": 420.0,
+            "y": 126.0
+          }
+        ]
+      },
+      {
+        "closed": false,
+        "metadata": {
+          "line_extension_px_override": 0.0,
+          "role": "brush_behavior_test",
+          "test_case": "paint_consumption_long_lines"
+        },
+        "name": "consumption_line_05",
+        "points": [
+          {
+            "x": 20.0,
+            "y": 162.0
+          },
+          {
+            "x": 420.0,
+            "y": 162.0
+          }
+        ]
+      },
+      {
+        "closed": false,
+        "metadata": {
+          "line_extension_px_override": 0.0,
+          "role": "brush_behavior_test",
+          "test_case": "paint_consumption_long_lines"
+        },
+        "name": "consumption_line_06",
+        "points": [
+          {
+            "x": 20.0,
+            "y": 198.0
+          },
+          {
+            "x": 420.0,
+            "y": 198.0
+          }
+        ]
+      }
+    ],
+    "executor_parameters": {
+      "point_step_px": 4,
+      "line_extension_px": 0,
+      "point_delay_ms": 5,
+      "after_mouse_up_ms": 20,
+      "before_mouse_down_ms": 20,
+      "after_mouse_down_ms": 40,
+      "end_hold_ms": 50,
+      "countdown_seconds": 5
+    }
+  },
+  "chalk_test_block": {
+    "block_id": "c8876401458b4197aee39bab33ae8e5f",
+    "task_id": "paint_consumption_long_lines-s4-d5-r2",
+    "phase_id": "G3"
+  },
+  "updated_at_utc": "2026-11-01T23:16:44+00:00",
+  "test_case": "paint_consumption_long_lines",
+  "brush_value_requested": 10,
+  "drawing_plan_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\brush-plan-paint_consumption_long_lines-b10-20261102-021602-a20161a4.json",
+  "execution_report_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\execution_20261102_021633_465954_fa9f3c.json",
+  "execution_report": {
+    "status": "completed",
+    "completed_strokes": 6,
+    "total_strokes": 6,
+    "started_at": "2026-11-02T02:16:15+03:00",
+    "ended_at": "2026-11-02T02:16:33+03:00",
+    "duration_seconds": 18.0,
+    "move_calls": 768,
+    "error": null,
+    "stop_reason": null,
+    "mouse_release": {
+      "attempted": true,
+      "succeeded": true,
+      "errors": []
+    },
+    "executor_config": {
+      "point_step_px": 4,
+      "line_extension_px": 0.0,
+      "point_delay_ms": 5,
+      "after_mouse_up_ms": 20,
+      "before_mouse_down_ms": 20,
+      "after_mouse_down_ms": 40,
+      "end_hold_ms": 50,
+      "countdown_seconds": 5
+    }
+  },
+  "game_monitor_report_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-021602-b10-paint_consumption_long_lines-a20161a4\\monitor_report.json",
+  "game_monitor_summary": {
+    "source": "loopback_websocket_bridge",
+    "autodraw_experiment_id": "a20161a4dd2740bb8bea969f85cf901a",
+    "chalk_radius_matrix": null,
+    "chalk_experiment_matrix": {
+      "schema_version": 1,
+      "series_id": "chalk-20261102-015749-7c1141",
+      "phase_id": "G3",
+      "scenario_id": "paint_consumption_long_lines",
+      "repeat_index": 2,
+      "matrix_order_index": 15,
+      "planned_repeats": 3,
+      "requested_radius": 10,
+      "expected_strokes": 6,
+      "geometry_signature": "a157b49849c30c097e1836cc0689a2f2570bb5ca8431751e21e7269c30e325f1",
+      "planned_strokes": [
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "paint_consumption_long_lines"
+          },
+          "name": "consumption_line_01",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 18.0
+            },
+            {
+              "x": 420.0,
+              "y": 18.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "paint_consumption_long_lines"
+          },
+          "name": "consumption_line_02",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 54.0
+            },
+            {
+              "x": 420.0,
+              "y": 54.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "paint_consumption_long_lines"
+          },
+          "name": "consumption_line_03",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 90.0
+            },
+            {
+              "x": 420.0,
+              "y": 90.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "paint_consumption_long_lines"
+          },
+          "name": "consumption_line_04",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 126.0
+            },
+            {
+              "x": 420.0,
+              "y": 126.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "paint_consumption_long_lines"
+          },
+          "name": "consumption_line_05",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 162.0
+            },
+            {
+              "x": 420.0,
+              "y": 162.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "paint_consumption_long_lines"
+          },
+          "name": "consumption_line_06",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 198.0
+            },
+            {
+              "x": 420.0,
+              "y": 198.0
+            }
+          ]
+        }
+      ],
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      }
+    },
+    "run_id": "3b7e127d-ee16-4e98-8f05-60f15921c0c1",
+    "session_id": "e3ba66d3-93ba-4f0f-aaf0-bc271d30f6e1",
+    "execution_status": "completed",
+    "brush_radius": 10,
+    "observed_brush_radii": [
+      10.0
+    ],
+    "brush_radius_status": "single",
+    "chalk": {
+      "status": "exact",
+      "consumed_points": 362,
+      "pre_point_count": 1,
+      "post_point_count": 363,
+      "max_points": 6000
+    },
+    "sampled_point_delta_total": 362,
+    "point_delta_matches_chalk": true,
+    "stroke_count": 6,
+    "frame_probe": {
+      "status": "measured",
+      "frame_count": 743,
+      "average_fps": 59.991,
+      "median_fps": 60.024,
+      "median_interval_ms": 16.66,
+      "p95_interval_ms": 16.68,
+      "max_interval_ms": 18.54,
+      "visibility_interruption": false,
+      "stroke_probe_count": 6
+    },
+    "trajectory": {
+      "observed_segment_length_lower_bound": 2436.0,
+      "accepted_sample_count": 362,
+      "status": "incomplete_until_verified",
+      "note": "Coalesced pointDelta values mean intermediate accepted coordinates may be missing."
+    },
+    "event_count": 742,
+    "dropped_events": 0,
+    "monitor_dropped_events": 0,
+    "monitor_error_count": 0,
+    "started_at_utc": "2026-11-01T23:16:20.597+00:00",
+    "finished_at_utc": "2026-11-01T23:16:36.471+00:00"
+  },
+  "monitor_capture": {
+    "status": "saved",
+    "transport": "loopback_websocket",
+    "match_reason": "matched_executor_window",
+    "experiment_id": "a20161a4dd2740bb8bea969f85cf901a",
+    "chalk_radius_matrix": null,
+    "chalk_experiment_matrix": {
+      "schema_version": 1,
+      "series_id": "chalk-20261102-015749-7c1141",
+      "phase_id": "G3",
+      "scenario_id": "paint_consumption_long_lines",
+      "repeat_index": 2,
+      "matrix_order_index": 15,
+      "planned_repeats": 3,
+      "requested_radius": 10,
+      "expected_strokes": 6,
+      "geometry_signature": "a157b49849c30c097e1836cc0689a2f2570bb5ca8431751e21e7269c30e325f1",
+      "planned_strokes": [
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "paint_consumption_long_lines"
+          },
+          "name": "consumption_line_01",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 18.0
+            },
+            {
+              "x": 420.0,
+              "y": 18.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "paint_consumption_long_lines"
+          },
+          "name": "consumption_line_02",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 54.0
+            },
+            {
+              "x": 420.0,
+              "y": 54.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "paint_consumption_long_lines"
+          },
+          "name": "consumption_line_03",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 90.0
+            },
+            {
+              "x": 420.0,
+              "y": 90.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "paint_consumption_long_lines"
+          },
+          "name": "consumption_line_04",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 126.0
+            },
+            {
+              "x": 420.0,
+              "y": 126.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "paint_consumption_long_lines"
+          },
+          "name": "consumption_line_05",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 162.0
+            },
+            {
+              "x": 420.0,
+              "y": 162.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "paint_consumption_long_lines"
+          },
+          "name": "consumption_line_06",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 198.0
+            },
+            {
+              "x": 420.0,
+              "y": 198.0
+            }
+          ]
+        }
+      ],
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      }
+    },
+    "session_id": "e3ba66d3-93ba-4f0f-aaf0-bc271d30f6e1",
+    "run_id": "3b7e127d-ee16-4e98-8f05-60f15921c0c1",
+    "source_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\game_monitor_bridge\\e3ba66d3-93ba-4f0f-aaf0-bc271d30f6e1\\game-monitor-run-20261101T231636471541Z-3b7e127d.json",
+    "report_path": "monitor_report.json",
+    "report_event_count": 742,
+    "dropped_events": 0,
+    "monitor_dropped_events": 0,
+    "monitor_error_count": 0,
+    "stroke_count": 6,
+    "expected_stroke_count": 6,
+    "point_delta_matches_chalk": true,
+    "brush_radius_status": "single",
+    "chalk_status": "exact",
+    "chalk_counter_consistent": true,
+    "captured_at_utc": "2026-11-01T23:16:39.080+00:00"
+  },
+  "calibration_profile_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\brush_paint_calibration.json",
+  "phases": {
+    "before_clear": {
+      "status": "restored_within_pixel_tolerance",
+      "board_clear_check": {
+        "status": "restored_within_pixel_tolerance",
+        "tolerance_percent": 0.15,
+        "changed_percent": 0.1047,
+        "comparison": {
+          "width": 581,
+          "height": 304,
+          "total_pixels": 176624,
+          "changed_pixels": 185,
+          "changed_percent": 0.1047,
+          "pixel_similarity_percent": 99.8953,
+          "mean_absolute_rgb_difference": 0.0939,
+          "exact_match": false,
+          "interpretation": "visual_pixel_comparison_only_not_a_reading_of_the_game_resource_counter"
+        },
+        "reference_type": "explicit_blank_board_roi",
+        "note": "Визуальное совпадение с отдельно сохранённым эталоном пустой доски; это не доказательство внутреннего состояния игры."
+      },
+      "captured_at_utc": "2026-11-01T23:16:07+00:00",
+      "screen_size": {
+        "width": 1920,
+        "height": 1080
+      },
+      "files": {
+        "full_screen": "before_clear-screen.png",
+        "board_roi": "before_clear-board.png",
+        "paint_meter_roi": "before_clear-paint-meter.png"
+      }
+    },
+    "before_draw": {
+      "captured_at_utc": "2026-11-01T23:16:07+00:00",
+      "screen_size": {
+        "width": 1920,
+        "height": 1080
+      },
+      "clear_check": {
+        "status": "restored_within_pixel_tolerance",
+        "tolerance_percent": 0.15,
+        "changed_percent": 0.1047,
+        "comparison": {
+          "width": 581,
+          "height": 304,
+          "total_pixels": 176624,
+          "changed_pixels": 185,
+          "changed_percent": 0.1047,
+          "pixel_similarity_percent": 99.8953,
+          "mean_absolute_rgb_difference": 0.0939,
+          "exact_match": false,
+          "interpretation": "visual_pixel_comparison_only_not_a_reading_of_the_game_resource_counter"
+        },
+        "reference_type": "explicit_blank_board_roi",
+        "note": "Визуальное совпадение с отдельно сохранённым эталоном пустой доски; это не доказательство внутреннего состояния игры."
+      },
+      "files": {
+        "full_screen": "before_clear-screen.png",
+        "board_roi": "before_clear-board.png",
+        "paint_meter_roi": "before_clear-paint-meter.png"
+      }
+    },
+    "brush_setup": {
+      "status": "confirmed_by_monitor_for_automated_block",
+      "requested_value": 10,
+      "observed_value": 10,
+      "verification_source": "active_game_monitor_bridge_heartbeat",
+      "session_id": "e3ba66d3-93ba-4f0f-aaf0-bc271d30f6e1",
+      "verified_at_utc": "2026-11-01T23:16:15.443+00:00",
+      "final_position": [
+        1250,
+        305
+      ],
+      "correction_count": 1,
+      "observations": [
+        {
+          "requested_radius": 10,
+          "observed_radius": 9,
+          "observed_at_utc": "2026-11-01T23:16:13.441+00:00",
+          "session_id": "e3ba66d3-93ba-4f0f-aaf0-bc271d30f6e1",
+          "position": [
+            1254,
+            305
+          ]
+        },
+        {
+          "requested_radius": 10,
+          "observed_radius": 10,
+          "observed_at_utc": "2026-11-01T23:16:15.443+00:00",
+          "session_id": "e3ba66d3-93ba-4f0f-aaf0-bc271d30f6e1",
+          "position": [
+            1250,
+            305
+          ]
+        }
+      ],
+      "visual_confirmation_required": false,
+      "confirmed_at_utc": "2026-11-01T23:16:15+00:00"
+    },
+    "execution": {
+      "status": "completed",
+      "report_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\execution_20261102_021633_465954_fa9f3c.json",
+      "summary": {
+        "status": "completed",
+        "completed_strokes": 6,
+        "total_strokes": 6,
+        "started_at": "2026-11-02T02:16:15+03:00",
+        "ended_at": "2026-11-02T02:16:33+03:00",
+        "duration_seconds": 18.0,
+        "move_calls": 768,
+        "error": null,
+        "stop_reason": null,
+        "mouse_release": {
+          "attempted": true,
+          "succeeded": true,
+          "errors": []
+        },
+        "executor_config": {
+          "point_step_px": 4,
+          "line_extension_px": 0.0,
+          "point_delay_ms": 5,
+          "after_mouse_up_ms": 20,
+          "before_mouse_down_ms": 20,
+          "after_mouse_down_ms": 40,
+          "end_hold_ms": 50,
+          "countdown_seconds": 5
+        }
+      },
+      "captured_at_utc": "2026-11-01T23:16:33+00:00"
+    },
+    "monitor_capture": {
+      "status": "saved",
+      "transport": "loopback_websocket",
+      "match_reason": "matched_executor_window",
+      "experiment_id": "a20161a4dd2740bb8bea969f85cf901a",
+      "chalk_radius_matrix": null,
+      "chalk_experiment_matrix": {
+        "schema_version": 1,
+        "series_id": "chalk-20261102-015749-7c1141",
+        "phase_id": "G3",
+        "scenario_id": "paint_consumption_long_lines",
+        "repeat_index": 2,
+        "matrix_order_index": 15,
+        "planned_repeats": 3,
+        "requested_radius": 10,
+        "expected_strokes": 6,
+        "geometry_signature": "a157b49849c30c097e1836cc0689a2f2570bb5ca8431751e21e7269c30e325f1",
+        "planned_strokes": [
+          {
+            "closed": false,
+            "metadata": {
+              "line_extension_px_override": 0.0,
+              "role": "brush_behavior_test",
+              "test_case": "paint_consumption_long_lines"
+            },
+            "name": "consumption_line_01",
+            "points": [
+              {
+                "x": 20.0,
+                "y": 18.0
+              },
+              {
+                "x": 420.0,
+                "y": 18.0
+              }
+            ]
+          },
+          {
+            "closed": false,
+            "metadata": {
+              "line_extension_px_override": 0.0,
+              "role": "brush_behavior_test",
+              "test_case": "paint_consumption_long_lines"
+            },
+            "name": "consumption_line_02",
+            "points": [
+              {
+                "x": 20.0,
+                "y": 54.0
+              },
+              {
+                "x": 420.0,
+                "y": 54.0
+              }
+            ]
+          },
+          {
+            "closed": false,
+            "metadata": {
+              "line_extension_px_override": 0.0,
+              "role": "brush_behavior_test",
+              "test_case": "paint_consumption_long_lines"
+            },
+            "name": "consumption_line_03",
+            "points": [
+              {
+                "x": 20.0,
+                "y": 90.0
+              },
+              {
+                "x": 420.0,
+                "y": 90.0
+              }
+            ]
+          },
+          {
+            "closed": false,
+            "metadata": {
+              "line_extension_px_override": 0.0,
+              "role": "brush_behavior_test",
+              "test_case": "paint_consumption_long_lines"
+            },
+            "name": "consumption_line_04",
+            "points": [
+              {
+                "x": 20.0,
+                "y": 126.0
+              },
+              {
+                "x": 420.0,
+                "y": 126.0
+              }
+            ]
+          },
+          {
+            "closed": false,
+            "metadata": {
+              "line_extension_px_override": 0.0,
+              "role": "brush_behavior_test",
+              "test_case": "paint_consumption_long_lines"
+            },
+            "name": "consumption_line_05",
+            "points": [
+              {
+                "x": 20.0,
+                "y": 162.0
+              },
+              {
+                "x": 420.0,
+                "y": 162.0
+              }
+            ]
+          },
+          {
+            "closed": false,
+            "metadata": {
+              "line_extension_px_override": 0.0,
+              "role": "brush_behavior_test",
+              "test_case": "paint_consumption_long_lines"
+            },
+            "name": "consumption_line_06",
+            "points": [
+              {
+                "x": 20.0,
+                "y": 198.0
+              },
+              {
+                "x": 420.0,
+                "y": 198.0
+              }
+            ]
+          }
+        ],
+        "executor_parameters": {
+          "point_step_px": 4,
+          "line_extension_px": 0,
+          "point_delay_ms": 5,
+          "after_mouse_up_ms": 20,
+          "before_mouse_down_ms": 20,
+          "after_mouse_down_ms": 40,
+          "end_hold_ms": 50,
+          "countdown_seconds": 5
+        }
+      },
+      "session_id": "e3ba66d3-93ba-4f0f-aaf0-bc271d30f6e1",
+      "run_id": "3b7e127d-ee16-4e98-8f05-60f15921c0c1",
+      "source_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\game_monitor_bridge\\e3ba66d3-93ba-4f0f-aaf0-bc271d30f6e1\\game-monitor-run-20261101T231636471541Z-3b7e127d.json",
+      "report_path": "monitor_report.json",
+      "report_event_count": 742,
+      "dropped_events": 0,
+      "monitor_dropped_events": 0,
+      "monitor_error_count": 0,
+      "stroke_count": 6,
+      "expected_stroke_count": 6,
+      "point_delta_matches_chalk": true,
+      "brush_radius_status": "single",
+      "chalk_status": "exact",
+      "chalk_counter_consistent": true,
+      "captured_at_utc": "2026-11-01T23:16:39.080+00:00"
+    },
+    "after_draw": {
+      "status": "captured",
+      "captured_at_utc": "2026-11-01T23:16:39+00:00",
+      "screen_size": {
+        "width": 1920,
+        "height": 1080
+      },
+      "files": {
+        "full_screen": "after_draw-screen.png",
+        "board_roi": "after_draw-board.png",
+        "paint_meter_roi": "after_draw-paint-meter.png"
+      },
+      "paint_meter_measurement": {
+        "bar_width_px": 160,
+        "changed_columns": 10,
+        "color_distance_threshold": 24.0,
+        "method": "baseline_color_suffix_estimate",
+        "interpretation": "estimate_only_not_game_counter_or_OCR",
+        "status": "inconclusive",
+        "filled_width_px": null,
+        "fill_fraction": null,
+        "fill_percent": null,
+        "confidence": "low",
+        "note": "Изменения не образуют достаточно чёткую непрерывную правую часть шкалы."
+      },
+      "stroke_visibility_analysis": {
+        "status": "analyzed",
+        "stroke_count": 6,
+        "visible_change_count": 6,
+        "no_change_count": 0,
+        "ambiguous_count": 0,
+        "results": [
+          {
+            "name": "consumption_line_01",
+            "status": "visible_change_detected",
+            "changed_pixels_in_roi": 6628,
+            "roi": {
+              "x": 14,
+              "y": 11,
+              "width": 528,
+              "height": 24
+            },
+            "overlapping_stroke_indices": [],
+            "interpretation": "visual_roi_heuristic_not_game_acceptance"
+          },
+          {
+            "name": "consumption_line_02",
+            "status": "visible_change_detected",
+            "changed_pixels_in_roi": 6147,
+            "roi": {
+              "x": 14,
+              "y": 57,
+              "width": 528,
+              "height": 24
+            },
+            "overlapping_stroke_indices": [],
+            "interpretation": "visual_roi_heuristic_not_game_acceptance"
+          },
+          {
+            "name": "consumption_line_03",
+            "status": "visible_change_detected",
+            "changed_pixels_in_roi": 6167,
+            "roi": {
+              "x": 14,
+              "y": 102,
+              "width": 528,
+              "height": 24
+            },
+            "overlapping_stroke_indices": [],
+            "interpretation": "visual_roi_heuristic_not_game_acceptance"
+          },
+          {
+            "name": "consumption_line_04",
+            "status": "visible_change_detected",
+            "changed_pixels_in_roi": 6627,
+            "roi": {
+              "x": 14,
+              "y": 148,
+              "width": 528,
+              "height": 24
+            },
+            "overlapping_stroke_indices": [],
+            "interpretation": "visual_roi_heuristic_not_game_acceptance"
+          },
+          {
+            "name": "consumption_line_05",
+            "status": "visible_change_detected",
+            "changed_pixels_in_roi": 6652,
+            "roi": {
+              "x": 14,
+              "y": 193,
+              "width": 528,
+              "height": 24
+            },
+            "overlapping_stroke_indices": [],
+            "interpretation": "visual_roi_heuristic_not_game_acceptance"
+          },
+          {
+            "name": "consumption_line_06",
+            "status": "visible_change_detected",
+            "changed_pixels_in_roi": 6800,
+            "roi": {
+              "x": 14,
+              "y": 238,
+              "width": 528,
+              "height": 24
+            },
+            "overlapping_stroke_indices": [],
+            "interpretation": "visual_roi_heuristic_not_game_acceptance"
+          }
+        ],
+        "note": "ROI могут включать эффекты кисти и фон; пересекающиеся ROI помечаются неоднозначными.",
+        "reference_file": "blank-board-reference.png",
+        "padding_px": 11,
+        "requested_brush_value": 10
+      }
+    },
+    "postdraw_workflow": {
+      "status": "completed",
+      "reason": "Результат сохранён; автоматическая очистка отключена, рисунок оставлен на доске.",
+      "finished_at_utc": "2026-11-01T23:16:39+00:00"
+    },
+    "restore_brush_30": {
+      "status": "drag_completed_unverified",
+      "requested_value": 30,
+      "finished_at_utc": "2026-11-01T23:16:44+00:00",
+      "note": "Жест перетаскивания к позиции кисти 30 завершён; значение необходимо проверить в игре.",
+      "drag_start": [
+        1254,
+        305
+      ],
+      "drag_target": [
+        1168,
+        305
+      ]
+    }
+  },
+  "interpretation_limits": [
+    "Meter fill is a provisional image estimate, not a direct read of the game's internal resource counter.",
+    "A successful executor report does not prove every stroke was registered by the game.",
+    "Execution status and visual evidence are recorded separately."
+  ]
+}

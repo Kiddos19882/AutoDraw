@@ -56,9 +56,9 @@
     }
   ],
   "expected_task_count": 27,
-  "status": "paused",
+  "status": "stopped",
   "created_at_utc": "2026-11-01T20:23:43.336+00:00",
-  "updated_at_utc": "2026-11-01T20:24:36.697+00:00",
+  "updated_at_utc": "2026-11-01T22:58:03.985+00:00",
   "tasks": [
     {
       "task_id": "paint_consumption_long_lines-s2-d20-r3",
@@ -612,5 +612,13 @@
       "attempts": []
     }
   ],
-  "pause_reason": "block_task_identity_missing"
+  "pause_reason": "block_task_identity_missing",
+  "recovery_decisions": [
+    {
+      "decision": "close_failed_block",
+      "board_checked": true,
+      "decided_at_utc": "2026-11-01T22:58:03.985+00:00"
+    }
+  ],
+  "stopped_at_utc": "2026-11-01T22:58:03.985+00:00"
 }

@@ -1,0 +1,855 @@
+{
+  "schema_version": 1,
+  "record_type": "autodraw_chalk_test_block",
+  "block_id": "c8876401458b4197aee39bab33ae8e5f",
+  "series_id": "chalk-20261102-015749-7c1141",
+  "phase_id": "G3",
+  "repeat_count": 3,
+  "random_seed": 20261101,
+  "requested_radius": 10,
+  "executor_parameters": {
+    "point_step_px": 2,
+    "line_extension_px": 0,
+    "point_delay_ms": 10,
+    "after_mouse_up_ms": 20,
+    "before_mouse_down_ms": 20,
+    "after_mouse_down_ms": 40,
+    "end_hold_ms": 50,
+    "countdown_seconds": 5
+  },
+  "executor_parameter_matrix": [
+    {
+      "point_step_px": 1,
+      "point_delay_ms": 5
+    },
+    {
+      "point_step_px": 1,
+      "point_delay_ms": 10
+    },
+    {
+      "point_step_px": 1,
+      "point_delay_ms": 20
+    },
+    {
+      "point_step_px": 2,
+      "point_delay_ms": 5
+    },
+    {
+      "point_step_px": 2,
+      "point_delay_ms": 10
+    },
+    {
+      "point_step_px": 2,
+      "point_delay_ms": 20
+    },
+    {
+      "point_step_px": 4,
+      "point_delay_ms": 5
+    },
+    {
+      "point_step_px": 4,
+      "point_delay_ms": 10
+    },
+    {
+      "point_step_px": 4,
+      "point_delay_ms": 20
+    }
+  ],
+  "expected_task_count": 27,
+  "status": "stopped",
+  "created_at_utc": "2026-11-01T23:01:23.292+00:00",
+  "updated_at_utc": "2026-11-01T23:29:32.538+00:00",
+  "tasks": [
+    {
+      "task_id": "paint_consumption_long_lines-s2-d20-r3",
+      "scenario_id": "paint_consumption_long_lines",
+      "repeat_index": 3,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 20,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 1,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "445352756a8f4b89bd2d2f3d02337ec7",
+          "status": "completed",
+          "started_at_utc": "2026-11-01T23:01:25.272+00:00",
+          "experiment_id": "a7d732f8456043a2b901d23e54355e76",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-020125-b10-paint_consumption_long_lines-a7d732f8",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-01T23:01:25.335+00:00",
+          "finished_at_utc": "2026-11-01T23:02:40.946+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "paint_consumption_long_lines-s2-d20-r1",
+      "scenario_id": "paint_consumption_long_lines",
+      "repeat_index": 1,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 20,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 2,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "5e688995f02242ffa31f2b1fd1d10365",
+          "status": "completed",
+          "started_at_utc": "2026-11-01T23:02:40.949+00:00",
+          "experiment_id": "a2d5f96eed8f4b93b13e0a713d4c2ee6",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-020241-b10-paint_consumption_long_lines-a2d5f96e",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-01T23:02:41.021+00:00",
+          "finished_at_utc": "2026-11-01T23:03:56.958+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "paint_consumption_long_lines-s2-d5-r3",
+      "scenario_id": "paint_consumption_long_lines",
+      "repeat_index": 3,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 3,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "cade4d95e7ca43acb5af9e6339527ee2",
+          "status": "completed",
+          "started_at_utc": "2026-11-01T23:03:56.962+00:00",
+          "experiment_id": "596489e9b95f4fb7a33779e171a9aa8d",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-020357-b10-paint_consumption_long_lines-596489e9",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-01T23:03:57.028+00:00",
+          "finished_at_utc": "2026-11-01T23:04:48.622+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "paint_consumption_long_lines-s1-d20-r1",
+      "scenario_id": "paint_consumption_long_lines",
+      "repeat_index": 1,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 1,
+        "line_extension_px": 0,
+        "point_delay_ms": 20,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 4,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "081d47ab990646cbb2074251d10f8a2b",
+          "status": "completed",
+          "started_at_utc": "2026-11-01T23:04:48.625+00:00",
+          "experiment_id": "eaafafdcd8244415a1f2036f7a60f79a",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-020448-b10-paint_consumption_long_lines-eaafafdc",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-01T23:04:48.704+00:00",
+          "finished_at_utc": "2026-11-01T23:06:51.640+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "paint_consumption_long_lines-s4-d20-r3",
+      "scenario_id": "paint_consumption_long_lines",
+      "repeat_index": 3,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 20,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 5,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "adae7dd573d64320bbdaf693df9165b2",
+          "status": "completed",
+          "started_at_utc": "2026-11-01T23:06:51.644+00:00",
+          "experiment_id": "1bc0f2d74cf04c9982ff7a5995f1d3c6",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-020651-b10-paint_consumption_long_lines-1bc0f2d7",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-01T23:06:51.716+00:00",
+          "finished_at_utc": "2026-11-01T23:07:44.071+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "paint_consumption_long_lines-s4-d20-r1",
+      "scenario_id": "paint_consumption_long_lines",
+      "repeat_index": 1,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 20,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 6,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "4a313426269344c7a0ecbb717d828007",
+          "status": "completed",
+          "started_at_utc": "2026-11-01T23:07:44.075+00:00",
+          "experiment_id": "3a4586d2e64849cf95489583531abc21",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-020744-b10-paint_consumption_long_lines-3a4586d2",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-01T23:07:44.135+00:00",
+          "finished_at_utc": "2026-11-01T23:08:36.280+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "paint_consumption_long_lines-s2-d10-r2",
+      "scenario_id": "paint_consumption_long_lines",
+      "repeat_index": 2,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 7,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "16a322ccde434bb99b53d95fca5eb04c",
+          "status": "completed",
+          "started_at_utc": "2026-11-01T23:08:36.284+00:00",
+          "experiment_id": "e426c9395d0e4e69b2834d33ceb26e98",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-020836-b10-paint_consumption_long_lines-e426c939",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-01T23:08:36.354+00:00",
+          "finished_at_utc": "2026-11-01T23:09:28.469+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "paint_consumption_long_lines-s1-d10-r3",
+      "scenario_id": "paint_consumption_long_lines",
+      "repeat_index": 3,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 1,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 8,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "9fa66828090444fa872151e1ff662984",
+          "status": "completed",
+          "started_at_utc": "2026-11-01T23:09:28.474+00:00",
+          "experiment_id": "2e90740e8d574c539be9d1e91fda9cfa",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-020928-b10-paint_consumption_long_lines-2e90740e",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-01T23:09:28.545+00:00",
+          "finished_at_utc": "2026-11-01T23:10:45.043+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "paint_consumption_long_lines-s1-d5-r1",
+      "scenario_id": "paint_consumption_long_lines",
+      "repeat_index": 1,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 1,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 9,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "05ee9c05733e43d28e787f3ace44c4fd",
+          "status": "completed",
+          "started_at_utc": "2026-11-01T23:10:45.047+00:00",
+          "experiment_id": "ca28bed52f0644fca76831aa8019c0f6",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-021045-b10-paint_consumption_long_lines-ca28bed5",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-01T23:10:45.109+00:00",
+          "finished_at_utc": "2026-11-01T23:12:01.769+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "paint_consumption_long_lines-s2-d5-r1",
+      "scenario_id": "paint_consumption_long_lines",
+      "repeat_index": 1,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 10,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "9cff2798168b40bcae0a71b77a6d2a4d",
+          "status": "completed",
+          "started_at_utc": "2026-11-01T23:12:01.773+00:00",
+          "experiment_id": "f8131e86a9124a62927c8c5731b6cfd3",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-021201-b10-paint_consumption_long_lines-f8131e86",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-01T23:12:01.832+00:00",
+          "finished_at_utc": "2026-11-01T23:12:54.346+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "paint_consumption_long_lines-s4-d20-r2",
+      "scenario_id": "paint_consumption_long_lines",
+      "repeat_index": 2,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 20,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 11,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "c1260abbb59c41f79c56a0611ee0e2e4",
+          "status": "completed",
+          "started_at_utc": "2026-11-01T23:12:54.350+00:00",
+          "experiment_id": "4b57b44b35bc49c39b51b2380d946b9f",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-021254-b10-paint_consumption_long_lines-4b57b44b",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-01T23:12:54.432+00:00",
+          "finished_at_utc": "2026-11-01T23:13:47.473+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "paint_consumption_long_lines-s4-d5-r3",
+      "scenario_id": "paint_consumption_long_lines",
+      "repeat_index": 3,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 12,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "dbf9a3da5ece47f993ecd4ed338185a5",
+          "status": "completed",
+          "started_at_utc": "2026-11-01T23:13:47.477+00:00",
+          "experiment_id": "554a5d210fc241c49381577750665352",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-021347-b10-paint_consumption_long_lines-554a5d21",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-01T23:13:47.535+00:00",
+          "finished_at_utc": "2026-11-01T23:14:28.900+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "paint_consumption_long_lines-s2-d10-r3",
+      "scenario_id": "paint_consumption_long_lines",
+      "repeat_index": 3,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 13,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "16581ae975e6429b822a76eb11fb0952",
+          "status": "completed",
+          "started_at_utc": "2026-11-01T23:14:28.904+00:00",
+          "experiment_id": "450a19012c3f4907beae2cfa756881eb",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-021429-b10-paint_consumption_long_lines-450a1901",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-01T23:14:29.006+00:00",
+          "finished_at_utc": "2026-11-01T23:15:21.811+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "paint_consumption_long_lines-s4-d5-r1",
+      "scenario_id": "paint_consumption_long_lines",
+      "repeat_index": 1,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 14,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "601eccf478df4972b7f1274166609d03",
+          "status": "completed",
+          "started_at_utc": "2026-11-01T23:15:21.815+00:00",
+          "experiment_id": "77d3a0800f6a414d8c8c255617a1fe6e",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-021521-b10-paint_consumption_long_lines-77d3a080",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-01T23:15:21.875+00:00",
+          "finished_at_utc": "2026-11-01T23:16:02.911+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "paint_consumption_long_lines-s4-d5-r2",
+      "scenario_id": "paint_consumption_long_lines",
+      "repeat_index": 2,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 15,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "49bfab5e634b4607896400f4083454c9",
+          "status": "completed",
+          "started_at_utc": "2026-11-01T23:16:02.916+00:00",
+          "experiment_id": "a20161a4dd2740bb8bea969f85cf901a",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-021602-b10-paint_consumption_long_lines-a20161a4",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-01T23:16:02.989+00:00",
+          "finished_at_utc": "2026-11-01T23:16:44.112+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "paint_consumption_long_lines-s2-d20-r2",
+      "scenario_id": "paint_consumption_long_lines",
+      "repeat_index": 2,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 20,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 16,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "57c2140dcb1c4c31958b55aac47a1521",
+          "status": "completed",
+          "started_at_utc": "2026-11-01T23:16:44.116+00:00",
+          "experiment_id": "2274dfa953b8467fb341be2d7c3a751e",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-021644-b10-paint_consumption_long_lines-2274dfa9",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-01T23:16:44.179+00:00",
+          "finished_at_utc": "2026-11-01T23:18:00.707+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "paint_consumption_long_lines-s1-d10-r2",
+      "scenario_id": "paint_consumption_long_lines",
+      "repeat_index": 2,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 1,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 17,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "d4787935ec274e40a70f9615cf12e34b",
+          "status": "completed",
+          "started_at_utc": "2026-11-01T23:18:00.710+00:00",
+          "experiment_id": "5b91e677237e44538ce6c1e7bda3f55c",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-021800-b10-paint_consumption_long_lines-5b91e677",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-01T23:18:00.780+00:00",
+          "finished_at_utc": "2026-11-01T23:19:18.236+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "paint_consumption_long_lines-s2-d5-r2",
+      "scenario_id": "paint_consumption_long_lines",
+      "repeat_index": 2,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 18,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "ea7e68a213524b1198d117ec8913dc33",
+          "status": "completed",
+          "started_at_utc": "2026-11-01T23:19:18.241+00:00",
+          "experiment_id": "41bd813101904367a5b0ee1975514c2f",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-021918-b10-paint_consumption_long_lines-41bd8131",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-01T23:19:18.300+00:00",
+          "finished_at_utc": "2026-11-01T23:20:11.773+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "paint_consumption_long_lines-s1-d20-r3",
+      "scenario_id": "paint_consumption_long_lines",
+      "repeat_index": 3,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 1,
+        "line_extension_px": 0,
+        "point_delay_ms": 20,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 19,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "8ca033d41a6942618b51d4cbf25aa039",
+          "status": "completed",
+          "started_at_utc": "2026-11-01T23:20:11.777+00:00",
+          "experiment_id": "7f974c734f6b46118c808739a11b414c",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-022011-b10-paint_consumption_long_lines-7f974c73",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-01T23:20:11.838+00:00",
+          "finished_at_utc": "2026-11-01T23:22:17.178+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "paint_consumption_long_lines-s1-d20-r2",
+      "scenario_id": "paint_consumption_long_lines",
+      "repeat_index": 2,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 1,
+        "line_extension_px": 0,
+        "point_delay_ms": 20,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 20,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "a986e795372f455c9b09e79e95da1cee",
+          "status": "completed",
+          "started_at_utc": "2026-11-01T23:22:17.183+00:00",
+          "experiment_id": "a8bf045568924075a7e013e6f07a87a8",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-022217-b10-paint_consumption_long_lines-a8bf0455",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-01T23:22:17.257+00:00",
+          "finished_at_utc": "2026-11-01T23:24:22.408+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "paint_consumption_long_lines-s4-d10-r1",
+      "scenario_id": "paint_consumption_long_lines",
+      "repeat_index": 1,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 21,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "4f52abeaa3374be1a7c390ed5ecad4ce",
+          "status": "completed",
+          "started_at_utc": "2026-11-01T23:24:22.412+00:00",
+          "experiment_id": "f101851d8f274e7bac78a651bf0e5b91",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-022422-b10-paint_consumption_long_lines-f101851d",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-01T23:24:22.482+00:00",
+          "finished_at_utc": "2026-11-01T23:25:05.220+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "paint_consumption_long_lines-s4-d10-r2",
+      "scenario_id": "paint_consumption_long_lines",
+      "repeat_index": 2,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 22,
+      "status": "failed",
+      "attempts": [
+        {
+          "attempt_id": "3bd9de07d1854981874b25df6473b2a0",
+          "status": "failed",
+          "started_at_utc": "2026-11-01T23:25:05.224+00:00",
+          "experiment_id": "b9abd01839094a66bfba9f27d52fb02c",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-022505-b10-paint_consumption_long_lines-b9abd018",
+          "reason": "monitor_capture_gate_timeout:partial",
+          "experiment_registered_at_utc": "2026-11-01T23:25:05.286+00:00",
+          "finished_at_utc": "2026-11-01T23:26:18.651+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "paint_consumption_long_lines-s1-d5-r2",
+      "scenario_id": "paint_consumption_long_lines",
+      "repeat_index": 2,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 1,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 23,
+      "status": "pending",
+      "attempts": []
+    },
+    {
+      "task_id": "paint_consumption_long_lines-s2-d10-r1",
+      "scenario_id": "paint_consumption_long_lines",
+      "repeat_index": 1,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 24,
+      "status": "pending",
+      "attempts": []
+    },
+    {
+      "task_id": "paint_consumption_long_lines-s1-d10-r1",
+      "scenario_id": "paint_consumption_long_lines",
+      "repeat_index": 1,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 1,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 25,
+      "status": "pending",
+      "attempts": []
+    },
+    {
+      "task_id": "paint_consumption_long_lines-s1-d5-r3",
+      "scenario_id": "paint_consumption_long_lines",
+      "repeat_index": 3,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 1,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 26,
+      "status": "pending",
+      "attempts": []
+    },
+    {
+      "task_id": "paint_consumption_long_lines-s4-d10-r3",
+      "scenario_id": "paint_consumption_long_lines",
+      "repeat_index": 3,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 27,
+      "status": "pending",
+      "attempts": []
+    }
+  ],
+  "pause_reason": "monitor_capture_gate_timeout:partial",
+  "recovery_decisions": [
+    {
+      "decision": "close_failed_block",
+      "board_checked": true,
+      "decided_at_utc": "2026-11-01T23:29:32.538+00:00"
+    }
+  ],
+  "stopped_at_utc": "2026-11-01T23:29:32.538+00:00"
+}
