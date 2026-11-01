@@ -158,3 +158,17 @@ G3 реализуется как отдельная фаза общего CHALK 
 - Stage6 получает task-specific executor config из G3 metadata, применяет его к фактическому `MouseExecutor`, записывает в execution report и не перезаписывает пользовательский профиль.
 - Analyzer проверяет executor_config из execution report и агрегирует три повтора отдельно для каждой комбинации.
 - Live G3 нельзя запускать до regression tests, полного CI и Windows portable startup smoke-test.
+
+
+## 11. Актуализация G3 software gate — 2026-11-01
+
+Предыдущая формулировка раздела 10 о неподтверждённом CI является исторической. На HEAD `e1872af08efbff7ee7c9ac771e6b9eb70b748c46` полный GitHub Actions run [41337768801](https://github.com/Kiddos19882/AutoDraw/actions/runs/41337768801) завершился `success`. Все обязательные jobs успешны: `geometry-tests`, `executor-tests`, `Windows portable build and startup smoke-test`.
+
+До успешного run исправлены три найденных дефекта:
+- лишняя `}` в `chalk_experiment_matrix.py` — `bf52f12`;
+- два executor override теста вне unittest-класса и преждевременный `unittest.main()` — `6594e28`;
+- docstring с некорректным закрытием — `e1872af`.
+
+**Текущий gate:** программная реализация G3 и CI gate приняты. Это не означает, что G3 live-эксперименты выполнены. До запуска требуется локальный Windows preflight: portable-приложение должно открыться, профиль калибровки и фактический радиус должны быть подтверждены, доска должна быть очищена и проверена, игровая canvas доступна, Game Monitor heartbeat стабилен.
+
+После preflight выполнить только полный автоматический блок из 27 задач (9 конфигураций × 3 повтора). Для каждого опыта сохранить фактические executor parameters, baseline/post pointCount, exact CHALK, сумму DRAW_SAMPLE.pointDelta, stroke count, радиус, frame/FPS и диагностику dropped events/errors. До получения валидных captures не делать выводов о влиянии шага/задержки и не строить подтверждённую модель CHALK.
