@@ -63,9 +63,12 @@ def acquire_chalk_block_owner_lock(journal_path: str | Path):
     handed back to recovery UI.
     """
     path = Path(journal_path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    lock_path = path.parent / ".active-block.owner.lock"
-    lock_file = lock_path.open("a+b")
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        lock_path = path.parent / ".active-block.owner.lock"
+        lock_file = lock_path.open("a+b")
+    except OSError:
+        return None
     try:
         if os.name == "nt":
             import msvcrt
@@ -96,6 +99,9 @@ def release_chalk_block_owner_lock(lock_file) -> None:
         else:
             import fcntl
             fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
+    except OSError:
+        # Closing the descriptor still releases the OS lock.
+        pass
     finally:
         lock_file.close()
 
