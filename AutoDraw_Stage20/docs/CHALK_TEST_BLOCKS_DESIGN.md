@@ -265,4 +265,4 @@ Live G3 остаётся закрытым до прохождения regression
 
 Проверка 22 manifests: task metadata совпадает с фактическим executor config; radius=10; шесть штрихов; внутренний CHALK counter exact. 21 Monitor capture saved, один partial. Траектория во всех случаях помечена `incomplete_until_verified` из-за coalesced pointDelta.
 
-Таблица CHALK по всем девяти конфигурациям, пять полностью собранных ячеек, четыре неполных ячейки и ограничения вывода находятся в `CHALK_G3_PARTIAL_RESULTS_2026-11-02.md`. До завершения повторов и проверки continuation semantics модель расхода остаётся предварительной.
+Таблица CHALK по всем девяти конфигурациям, пять полностью собранных ячеек, четыре неполных ячейки и ограничения вывода находятся в `CHALK_G3_PARTIAL_RESULTS_2026-11-02.md`. До завершения повторов и проверки continuation semantics модель расхода остаётся предварительной.undefined
