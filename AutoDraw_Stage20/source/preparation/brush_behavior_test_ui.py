@@ -38,6 +38,7 @@ from chalk_test_blocks import (
     claim_next_chalk_block_task, finish_chalk_block_task,
     load_chalk_test_block_journal, chalk_test_block_progress,
     validate_chalk_block_experiment, stop_chalk_test_block as stop_chalk_test_block_journal,
+    record_chalk_block_task_experiment,
 )
 from brush_experiment_capture import (
     compare_images, crop_calibrated_regions,
@@ -2073,6 +2074,17 @@ class BrushBehaviorTestTab:
             self._experiment_id = experiment_id
             self.experiment_dir = self.output_dir / f"experiment-{stamp}-b{brush}-{scenario}-{experiment_id[:8]}"
             self.experiment_dir.mkdir(parents=True, exist_ok=False)
+        if self._chalk_block_task is not None and self._chalk_block_journal_path is not None:
+            try:
+                record_chalk_block_task_experiment(
+                    self._chalk_block_journal_path,
+                    self._chalk_block_task["task_id"],
+                    experiment_id=self._experiment_id,
+                    experiment_dir=self.experiment_dir,
+                )
+            except (OSError, ValueError, RuntimeError) as exc:
+                self._fail_chalk_test_block(f"experiment_identity_journal_failed:{exc}")
+                return
         self.experiment_phases = {}
         self._automated_preclear_active = True
         self.status_var.set("Через 3 секунды будет выполнен Clear и проверка пустой доски. Alt отменяет подготовку.")
