@@ -202,3 +202,19 @@ G1 принят. G2 разблокирован и является следую�
 - Исправления покрыты regression tests и прошли полный CI run 41276703424.
 
 G2 разблокирован; G3 остаётся закрытым до завершения G2. Перед следующим live-блоком обновить локальную сборку до HEAD c8d8c2c5588a0d423e48682962a4213ee725c808.
+
+## 8. Поддержка G3
+
+G3 использует тот же безопасный последовательный lifecycle, что и G1/G2, но вместо набора геометрических сценариев создаёт 27 parameter cells для `paint_consumption_long_lines`:
+
+- `point_step_px`: 1, 2, 4;
+- `point_delay_ms`: 5, 10, 20;
+- `repeat_index`: 1, 2, 3;
+- радиус кисти: 10;
+- ожидаемые штрихи: 6.
+
+`task_id` содержит обе настройки executor и номер повтора. Journal validation отклоняет дубликаты и неполные матрицы. G3 доступен в UI только после принятия G2.
+
+Executor parameters из задачи сохраняются в matrix metadata и передаются как временный override в Stage6. Override валидируется `ExecutorConfig`, отражается в execution report и не изменяет пользовательские сохранённые настройки. Acceptance analyzer сравнивает report с matrix metadata; поэтому manifest не может выдать запрошенные параметры за фактически использованные.
+
+Live G3 остаётся закрытым до прохождения regression tests, полного CI и Windows portable startup smoke-test.
