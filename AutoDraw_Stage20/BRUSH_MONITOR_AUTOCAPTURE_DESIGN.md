@@ -503,3 +503,20 @@ Session be40944f-523f-49b1-ba87-5af1875185d0 закрыта штатно в 19:1
 - расчёт среднего, медианы, диапазона и population standard deviation по радиусу.
 
 Добавлен CLI `tests/analyze_chalk_radius_matrix.py` и regression tests. Автоматические тесты и CI ещё должны быть запущены/проверены на финальном HEAD. Live браузерный gate не открыт до этого подтверждения.
+
+## 21. Диагностика глобального event-buffer overflow (2026-11-02)
+
+Для G3 session `e3ba66d3-93ba-4f0f-aaf0-bc271d30f6e1` установлен источник `monitor_dropped_events`. `game_monitor.js` ограничивает локальный массив `state.events` константой `MAX_EVENTS=50000`. При заполнении массива `emit()` увеличивает `state.droppedEvents`, но всё равно вызывает подписчиков. Поэтому Browser Bridge может передать события дальше, хотя локальный export buffer уже не сохраняет их.
+
+Session diagnostics: при подключении eventCount=252; Browser Bridge sentEventCount=50 320; collector received_event_count=50 320; финальный Monitor eventCount=50 000 и droppedEvents=572; sendFailureCount=0. Баланс буфера точный: 252 + 50 320 = 50 000 + 572. Для проблемного run счётчик был 434, позднее в той же session вырос до 572. Целевой run содержит 744 события, collector dropped_events=0, CHALK exact и sampled delta совпадает.
+
+Ошибка находится в семантике метрики: `RunRecorder.heartbeat()` копирует cumulative `status.droppedEvents` в поле отдельного run, а acceptance gate трактует его как потери именно этого run. Это ложное срабатывание gate; оно не доказывает потери в WebSocket или collector.
+
+До следующего live G3:
+1. Разделить buffer overflow, bridge send failures, transport sequence gaps и per-run recorder drops.
+2. Не использовать cumulative `status.droppedEvents` как per-run acceptance metric.
+3. Добавить regression coverage для 50 000+ событий и нескольких runs в одной session.
+4. Сохранять transport diagnostics и exact CHALK checks как независимые критерии.
+
+Полный разбор: `docs/GAME_MONITOR_BUFFER_OVERFLOW_ANALYSIS_2026-11-02.md`. Код на этом шаге не менялся; live рисование и CI не запускались.
+
