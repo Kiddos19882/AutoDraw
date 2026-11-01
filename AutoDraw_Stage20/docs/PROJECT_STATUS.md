@@ -581,3 +581,19 @@ The first final CI run exposed a mismatch: `finish_chalk_block_task(accepted=Fal
 **Статус:** программная реализация G1 block runner прошла CI и Windows portable build/startup smoke-test; software gate закрыт. Live G1 не запускался. Перед первым опытом остаётся локальный Windows preflight: открыть portable AutoDraw на рабочей машине, подтвердить профиль калибровки и диапазон кисти 1–30, Clear reference, доступную игровую canvas, heartbeat Game Monitor и фактически пустую тестовую доску. Только после этого оператор запускает полный G1 блок из 12 задач. G2/G3 остаются заблокированными до принятия всех 12 валидных ячеек G1.
 
 Изменения только в `feature/image-geometry-optimization`; `master`, `data/` и исторические G1 manifests не изменялись.
+
+## 16. Live G1 завершён и post-run fixes — 2026-11-01
+
+Пользователь провёл два live G1 прогона. Первый блок chalk-20261101-075204-f43b0d остановился после двух принятых задач: на vertical_lengths-r1 capture gate не принял Monitor run, ещё девять задач остались pending. Второй блок chalk-20261101-080012-4d6add завершён со статусом completed; все 12/12 задач приняты, с корректными repeat indices и matrix order.
+
+Для второго блока подтверждены 12 exact Game Monitor captures, радиус 10, point_delta_matches_chalk=true, ноль потерянных событий и ошибок Monitor. Общий расход по 12 независимым опытам — 836 CHALK. Средние по сценариям: vertical 61,00; horizontal 123,33; diagonal 76,00; short 18,33. Подробные per-stroke данные и ограничения — docs/CHALK_GEOMETRY_MATRIX_G1_RESULTS.md, раздел 8.
+
+Разбор первого блока установил: raw Monitor run ba6cf902-b635-442e-809b-e34ed1c7ced2 содержал точный расход 60 CHALK и точную сумму pointDelta, но пять pointer candidates при ожидаемых четырёх; один кандидат имел нулевой расход. Matcher ошибочно трактовал его как пятый штрих и отклонил run. Исправлено: stroke_count считает только stroke IDs с положительным суммарным DRAW_SAMPLE.pointDelta, а нулевые кандидаты записываются отдельно. Per-stroke analyzer использует то же правило и сохраняет список исключённых нулевых кандидатов.
+
+Исправлено отсутствие финального уведомления: после принятия всех задач UI выводит отдельное окно с итогом 12/12. Добавлены regression tests для нулевого pointer candidate и completion notification.
+
+Кодовые коммиты: e0bc57242498750c4ea3d327c6ac848690be72f5, a32b95d609b87470d43482b196916e2e5602c8ca, 42a84d2a146fcc7986a29843cf62398459361516, 08c70a2d2823c3df2c4aadced0c99100f46e5734, f5972945fe5e53e5d267a3de6e9ad45065d17c2f, c8d8c2c5588a0d423e48682962a4213ee725c808.
+
+Полный GitHub Actions run 41276703424 завершился success на HEAD c8d8c2c5588a0d423e48682962a4213ee725c808. Все jobs прошли: geometry-tests, executor-tests, Windows portable build/startup smoke-test. В Windows job общий набор завершился 605 passed и 98 tests OK, затем portable layout и запуск приложения прошли.
+
+**Текущий gate:** G1 принят. G2 разблокирован программной проверкой и готов к следующему live-блоку (18 задач), но перед запуском локальная сборка должна быть обновлена до HEAD выше. G3 остаётся заблокирован до принятия G2. Live-проверка исправленного уведомления и подсчёта будет дополнительно подтверждена на следующем обновлённом live-блоке.

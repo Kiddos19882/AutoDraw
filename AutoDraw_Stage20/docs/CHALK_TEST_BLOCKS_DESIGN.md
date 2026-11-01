@@ -1,6 +1,6 @@
 # Автоматизированные блоки экспериментов CHALK
 
-**Статус:** ядро планирования и журналирования добавлено; интеграция полного автоматического запуска в Brush Test UI ещё не завершена.  
+**Статус:** block runner интегрирован и прошёл live G1 (12/12). После live-прогона исправлены подсчёт принятых штрихов и отсутствие итогового уведомления; полный CI прошёл на HEAD c8d8c2c5588a0d423e48682962a4213ee725c808.  
 **Рабочая ветка:** `feature/image-geometry-optimization`.  
 **Связанные документы:** `../CHALK_GEOMETRY_MATRIX_PLAN.md`, `CHALK_GEOMETRY_MATRIX_G1_RESULTS.md`, `BRUSH_TEST_AUTOMATION_VISION.md`.
 
@@ -57,7 +57,7 @@ G1/G2 используют radius=10 и фиксированный `GEOMETRY_EXE
 - Game Monitor однозначно связан с текущим executor window и имеет уникальный `run_id`;
 - `chalk.status=exact`, `post_point_count - pre_point_count = consumed_points > 0`;
 - `sampled_point_delta_total` совпадает с точным CHALK;
-- число уникальных strokeId равно expected stroke count;
+- число уникальных strokeId с положительным суммарным DRAW_SAMPLE.pointDelta равно expected stroke count; нулевые pointer-кандидаты учитываются отдельно и не увеличивают число принятых штрихов;
 - per-stroke сумма `DRAW_SAMPLE.pointDelta` совпадает с exact CHALK;
 - frame probe измерен, нет visibility interruption;
 - dropped events, monitor dropped events и monitor errors равны нулю;
@@ -189,4 +189,16 @@ The first final CI run exposed a mismatch: `finish_chalk_block_task(accepted=Fal
 
 Исправлена найденная CI ошибка классификации closure audit: paused block с failed task теперь закрывается с `close_failed_block`, а interrupted-only paused block — с `close_paused_block`. Кодовый commit `dd976b04f6d6423726ad7382bac7223c12d8342b`.
 
-Пункт 1 плана работ выше (полный CI и Windows portable smoke-test после identity gate и journal hardening) выполнен. Callback-level failure-path review имеет тестовое покрытие, но не заявляется исчерпывающим. Следующий gate — локальный Windows preflight на реальной рабочей машине: калибровка и slider 1–30, Clear reference, canvas, Game Monitor heartbeat и пустая тестовая доска. Live G1 ещё не запускался; G2/G3 не начинать до принятия 12 валидных ячеек G1.
+Пункт 1 плана работ выше выполнен. Live G1 завершён отдельным блоком 12/12: chalk-20261101-080012-4d6add. Первый блок был остановлен из-за ложного подсчёта нулевого pointer-кандидата; причина исправлена. Завершение блока теперь сопровождается отдельным окном 12/12. Исправления и regression tests прошли полный CI run 41276703424 на HEAD c8d8c2c5588a0d423e48682962a4213ee725c808.
+
+G1 принят. G2 разблокирован и является следующим live-блоком (18 задач); G3 остаётся закрытым до принятия G2. Перед G2 обновить локальную сборку до указанного HEAD. Callback-level failure-path review имеет тестовое покрытие, но не заявляется исчерпывающим.
+
+## 7. Подтверждённый live G1 и post-run fixes — 2026-11-01
+
+- Блок chalk-20261101-080012-4d6add завершён: 12/12 задач приняты.
+- Первый блок остановлен после false mismatch: Game Monitor видел 5 pointer candidates, но один не имел положительного pointDelta; четыре реальные расходующие штриха дали точный CHALK 60.
+- stroke_count теперь считает только stroke IDs с положительным суммарным DRAW_SAMPLE.pointDelta; диагностические поля candidate count сохраняют информацию о нулевых pointer-жестах.
+- При journal.status=completed UI выводит отдельное итоговое окно с количеством принятых опытов.
+- Исправления покрыты regression tests и прошли полный CI run 41276703424.
+
+G2 разблокирован; G3 остаётся закрытым до завершения G2. Перед следующим live-блоком обновить локальную сборку до HEAD c8d8c2c5588a0d423e48682962a4213ee725c808.

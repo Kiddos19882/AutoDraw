@@ -1540,3 +1540,25 @@ The first final CI run exposed a mismatch: `finish_chalk_block_task(accepted=Fal
 Финальный workflow run `41272291546` на HEAD `311299296559b9a5949f1e803f134b46436a2850` завершился success. Все jobs прошли: geometry-tests, executor-tests, Windows portable build/startup smoke-test. Windows job завершил полный `build_windows.bat`, включая общий набор тестов, сборку portable приложения и smoke-test запуска.
 
 Обновлены PROJECT_STATUS.md, TASKS.md и CHALK_TEST_BLOCKS_DESIGN.md. Программный gate G1 закрыт. Не выполнено и не имитировалось: локальное открытие portable приложения в пользовательской Windows, проверка текущего профиля калибровки/игровой сессии/пустой доски и live G1. Эти действия остаются обязательным локальным preflight.
+
+## 2026-11-01 — live G1, диагностика capture gate и уведомление завершения
+
+Пользователь выполнил два автоматизированных G1 прогона. Первый journal chalk-20261101-075204-f43b0d остановился после двух принятых задач: задача vertical_lengths-r1 получила monitor_capture_gate_timeout:unavailable, девять следующих задач остались pending. Второй journal chalk-20261101-080012-4d6add завершён; все 12/12 задач приняты.
+
+Проверка второго блока:
+- Vertical: 62/61/60 CHALK, mean 61.00.
+- Horizontal: 124/123/123 CHALK, mean 123.33.
+- Diagonal: 76/77/75 CHALK, mean 76.00.
+- Short: 18/19/18 CHALK, mean 18.33.
+- Всего 836 CHALK по 12 отдельным опытам; каждый run имеет точный baseline/post counter, совпадающий pointDelta, radius 10, ноль dropped events и monitor errors.
+
+Первый отказ оказался ложным mismatch по количеству pointer candidates. Raw run ba6cf902-b635-442e-809b-e34ed1c7ced2 содержит exact CHALK 60 (pointCount 1→61), sampled pointDelta total 60 и пять candidate IDs. Один ID имел нулевой delta; четыре расходующих штриха имели [4,8,16,32]. Старый matcher считал все пять candidate IDs и не сопоставлял run с ожидаемыми четырьмя штрихами.
+
+Исправления:
+1. В RunRecorder stroke_count теперь рассчитывается по уникальным stroke IDs, имеющим положительный DRAW_SAMPLE.pointDelta. Добавлены stroke_candidate_count и non_consuming_stroke_candidate_count для аудита нулевых pointer gestures.
+2. _stroke_level_breakdown исключает нулевые кандидаты из числа принятых штрихов, сохраняет их ID в non_consuming_stroke_ids и проверяет ожидаемое число расходующих штрихов и сумму CHALK.
+3. В UI добавлено отдельное итоговое messagebox.showinfo при статусе block completed; окно поднимает AutoDraw на передний план и показывает число принятых опытов.
+
+Regression tests добавлены для каждого исправления. Полный GitHub Actions run 41276703424 завершился success на HEAD c8d8c2c5588a0d423e48682962a4213ee725c808: geometry-tests, executor-tests, Windows portable build/startup smoke-test. Windows job: 605 pytest tests passed, 98 unittest tests OK, ALL TEST SUITES PASSED, portable layout и smoke-test запуска пройдены.
+
+G1 принят по второму блоку. G2 теперь разблокирован программной проверкой; следующий этап — G2 (18 задач). Перед ним обновить локальную сборку до проверенного HEAD. G3 остаётся заблокирован до принятия G2. Старый stopped journal и его raw Monitor data сохранены без задней правки.
