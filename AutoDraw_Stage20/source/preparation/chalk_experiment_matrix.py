@@ -78,8 +78,8 @@ def build_chalk_experiment_matrix_metadata(
         raise ValueError(f"Сценарий {scenario_id!r} не входит в план G1/G2.")
     if isinstance(repeat_index, bool) or not isinstance(repeat_index, int) or repeat_index not in (1, 2, 3):
         raise ValueError("Номер повтора должен быть целым числом 1, 2 или 3.")
-    if isinstance(requested_radius, bool) or not isinstance(requested_radius, int) or not 1 <= requested_radius <= 30:
-        raise ValueError("Радиус кисти должен быть целым числом от 1 до 30.")
+    if isinstance(requested_radius, bool) or not isinstance(requested_radius, int) or requested_radius != 10:
+        raise ValueError("Для серий G1/G2 требуется фиксированный радиус кисти 10.")
     if not isinstance(strokes, list) or len(strokes) != EXPECTED_STROKES[scenario_id]:
         raise ValueError(f"Сценарий {scenario_id} должен содержать {EXPECTED_STROKES[scenario_id]} штрихов.")
     canonical_geometry = json.dumps(strokes, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
