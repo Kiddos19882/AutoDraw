@@ -95,6 +95,7 @@ class RunRecorder:
         self.current: dict | None = None
         self.last_activity = 0.0
         self.last_status: dict | None = None
+        self.last_bridge_diagnostics: dict | None = None
         self.run_count = 0
         self.active_stroke_ids: set[str] = set()
         self.stroke_started_at: dict[str, float] = {}
@@ -120,6 +121,29 @@ class RunRecorder:
             "frame_probes": [],
             "active_drawing_duration_ms": 0.0,
             "dropped_events": 0,
+            "monitor_buffer_dropped_events_start": (
+                self.last_status.get("droppedEvents")
+                if isinstance(self.last_status, dict)
+                and type(self.last_status.get("droppedEvents")) is int else None
+            ),
+            "monitor_buffer_dropped_events_end": (
+                self.last_status.get("droppedEvents")
+                if isinstance(self.last_status, dict)
+                and type(self.last_status.get("droppedEvents")) is int else None
+            ),
+            "monitor_buffer_dropped_events_delta": 0,
+            "bridge_send_failures_start": (
+                self.last_bridge_diagnostics.get("sendFailureCount")
+                if isinstance(self.last_bridge_diagnostics, dict)
+                and type(self.last_bridge_diagnostics.get("sendFailureCount")) is int else None
+            ),
+            "bridge_send_failures_end": (
+                self.last_bridge_diagnostics.get("sendFailureCount")
+                if isinstance(self.last_bridge_diagnostics, dict)
+                and type(self.last_bridge_diagnostics.get("sendFailureCount")) is int else None
+            ),
+            "bridge_send_failures_delta": 0,
+            "collector_sequence_gap_count": 0,
             "monitor_errors": [],
             "interpretation": {"chalk_status": "inconclusive",
                                "path_length_status": "incomplete_until_verified"}
@@ -235,12 +259,37 @@ class RunRecorder:
             "intervals": message.get("intervals", []),
         })
 
-    def heartbeat(self, status: dict, now: float) -> None:
+    def note_collector_sequence_gap(self, missing_count: int) -> None:
+        if self.current is not None and type(missing_count) is int and missing_count > 0:
+            self.current["collector_sequence_gap_count"] += missing_count
+
+    def heartbeat(
+        self,
+        status: dict,
+        now: float,
+        bridge_diagnostics: dict | None = None,
+    ) -> None:
         self.last_status = status
+        if isinstance(bridge_diagnostics, dict):
+            self.last_bridge_diagnostics = bridge_diagnostics
         if self.current is not None:
-            self.current["monitor_dropped_events"] = status.get("droppedEvents")
+            dropped = status.get("droppedEvents")
+            if type(dropped) is int:
+                self.current["monitor_buffer_dropped_events_end"] = dropped
+                start = self.current.get("monitor_buffer_dropped_events_start")
+                self.current["monitor_buffer_dropped_events_delta"] = (
+                    max(0, dropped - start) if type(start) is int else None
+                )
+            self.current["monitor_dropped_events"] = dropped  # Deprecated session-cumulative alias.
             self.current["monitor_error_count"] = status.get("errors")
             self.current["monitor_active"] = status.get("active")
+            failures = bridge_diagnostics.get("sendFailureCount") if isinstance(bridge_diagnostics, dict) else None
+            if type(failures) is int:
+                self.current["bridge_send_failures_end"] = failures
+                start_failures = self.current.get("bridge_send_failures_start")
+                self.current["bridge_send_failures_delta"] = (
+                    max(0, failures - start_failures) if type(start_failures) is int else None
+                )
         if self.current is not None and now - self.last_activity >= self.idle_seconds:
             status = "completed" if self.current["execution_status"] == "completed" else "partial"
             self.finalize(status)
@@ -319,8 +368,6 @@ class RunRecorder:
         run["frame_probe"] = fps
         run["frame_probes"].clear()
         run["interpretation"]["chalk_status"] = run["chalk"]["status"]
-        if run.get("monitor_dropped_events", 0):
-            run["interpretation"]["path_length_status"] = "monitor_events_dropped"
         if isinstance(run.get("started_at_performance_ms"), (int, float)) and isinstance(run.get("ended_at_performance_ms"), (int, float)):
             run["elapsed_from_first_to_last_stroke_ms"] = max(0.0, run["ended_at_performance_ms"] - run["started_at_performance_ms"])
         run["finished_at_utc"] = utc_now()
@@ -449,6 +496,7 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
                             "received_event_types": {},
                             "last_message_type": "session_start",
                             "last_sequence": 1,
+                            "collector_sequence_gap_count": 0,
                             "last_message_at_utc": utc_now(),
                             "last_monitor_status": message.get("monitorStatus"),
                             "browser_bridge": None,
@@ -456,15 +504,24 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
                             "connection_closed": False,
                         },
                     }
+                    last_sequence = 1
                     await persist_session()
                     continue
                 if recorder is None or message.get("sessionId") != recorder.session_id:
                     await websocket.close(code=4002, reason="unknown session")
                     return
                 sequence = message.get("sequence")
-                if not isinstance(sequence, int) or sequence <= last_sequence:
+                if type(sequence) is not int or sequence <= last_sequence:
                     await websocket.close(code=4002, reason="invalid sequence")
                     return
+                sequence_gap = sequence - last_sequence - 1
+                if sequence_gap > 0:
+                    recorder.note_collector_sequence_gap(sequence_gap)
+                    if session_record is not None:
+                        diagnostics = session_record["bridge_diagnostics"]
+                        diagnostics["collector_sequence_gap_count"] = (
+                            diagnostics.get("collector_sequence_gap_count", 0) + sequence_gap
+                        )
                 last_sequence = sequence
                 if session_record is not None:
                     diagnostics = session_record["bridge_diagnostics"]
@@ -493,7 +550,12 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
                 elif msg_type == "heartbeat":
                     status = message.get("monitorStatus")
                     if isinstance(status, dict):
-                        recorder.heartbeat(status, asyncio.get_running_loop().time())
+                        bridge_diagnostics = message.get("bridgeDiagnostics")
+                        recorder.heartbeat(
+                            status,
+                            asyncio.get_running_loop().time(),
+                            bridge_diagnostics if isinstance(bridge_diagnostics, dict) else None,
+                        )
                         if session_record is not None:
                             session_record["bridge_diagnostics"]["last_monitor_status"] = status
                     if session_record is not None:
