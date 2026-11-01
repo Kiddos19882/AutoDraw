@@ -1379,11 +1379,29 @@ class BrushBehaviorTestTab:
             except (OSError, ValueError, json.JSONDecodeError) as exc:
                 self._fail_chalk_test_block(f"block_journal_unavailable_during_acceptance:{exc}")
                 return
+            journal_task = next(
+                (item for item in journal.get("tasks", [])
+                 if item.get("task_id") == self._chalk_block_task.get("task_id")),
+                None,
+            )
+            if not isinstance(journal_task, dict) or journal_task.get("status") != "running":
+                self._fail_chalk_test_block("active_block_task_missing_from_journal")
+                return
+            active_attempt_id = journal_task.get("active_attempt_id")
+            active_attempt = next(
+                (item for item in reversed(journal_task.get("attempts", []))
+                 if item.get("attempt_id") == active_attempt_id),
+                None,
+            )
+            if not isinstance(active_attempt, dict):
+                self._fail_chalk_test_block("active_block_attempt_missing_from_journal")
+                return
             accepted, reason, _record = validate_chalk_block_experiment(
                 manifest_path,
-                expected_task=self._chalk_block_task,
+                expected_task=journal_task,
                 expected_block=journal,
-                expected_experiment_id=self._experiment_id,
+                expected_experiment_id=active_attempt.get("experiment_id"),
+                expected_experiment_dir=active_attempt.get("experiment_dir"),
             )
             if not accepted:
                 self._fail_chalk_test_block(reason)
