@@ -1230,3 +1230,51 @@ def test_g3_block_task_bypasses_legacy_radius_matrix_routing():
     task = {"task_id": "paint_consumption_long_lines-s2-d20-r3"}
     assert brush_ui._is_legacy_chalk_radius_matrix_run(scenario_id, task) is False
     assert brush_ui._is_legacy_chalk_radius_matrix_run("horizontal_lengths", task) is False
+
+def test_g3_block_plan_writes_matrix_and_block_identity_instead_of_legacy_radius_matrix(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+
+    from chalk_experiment_matrix import GEOMETRY_EXECUTOR_CONFIG
+
+    task_parameters = dict(GEOMETRY_EXECUTOR_CONFIG)
+    task_parameters.update({"point_step_px": 2, "point_delay_ms": 20})
+    task = {
+        "task_id": "paint_consumption_long_lines-s2-d20-r1",
+        "repeat_index": 1,
+        "matrix_order_index": 1,
+        "executor_parameters": task_parameters,
+    }
+    transferred = {}
+    monkeypatch.setattr(
+        brush_ui,
+        "load_chalk_test_block_journal",
+        lambda _path: {"block_id": "g3-block", "phase_id": "G3"},
+    )
+
+    tab = SimpleNamespace(
+        _validate_automation_preflight=lambda: True,
+        get_canvas_size=lambda: (460, 240),
+        case_var=SimpleNamespace(get=lambda: "Расход краски — серия длинных линий"),
+        get_canvas_area=lambda: {"x": 0, "y": 0, "width": 460, "height": 240},
+        brush_var=SimpleNamespace(get=lambda: "10"),
+        output_dir=tmp_path,
+        matrix_series_var=SimpleNamespace(get=lambda: "g3-series"),
+        _chalk_block_task=task,
+        _chalk_block_journal_path=tmp_path / "g3-block.json",
+        on_transfer_plan=lambda plan, path: transferred.update(plan=plan, path=path) or True,
+        _reset_observation_fields=lambda: None,
+        _start_automated_preclear=lambda: None,
+    )
+
+    brush_ui.BrushBehaviorTestTab.create_and_transfer_plan(tab)
+
+    generation = transferred["plan"]["generation"]
+    assert generation["chalk_test_block"] == {
+        "block_id": "g3-block",
+        "task_id": task["task_id"],
+        "phase_id": "G3",
+    }
+    assert generation["chalk_experiment_matrix"]["phase_id"] == "G3"
+    assert generation["chalk_experiment_matrix"]["executor_parameters"] == task_parameters
+    assert "chalk_radius_matrix" not in generation
+
