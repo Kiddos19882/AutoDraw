@@ -674,7 +674,7 @@ Run включает commit `8c93a498864973b9879c926627030bb7e1d3ce2a` с инт
 
 ### Workflow и ветки
 
-Workflow `.github/workflows/geometry-tests.yml` запускается на push feature-ветки, на pull_request при совпадении path-фильтра и вручную через workflow_dispatch. PR #3 с base `ci/g3-validation-base` остаётся временным CI-only PR и не должен сливаться. `master` не изменялся.
+Workflow `.github/workflows/geometry-tests.yml` запускается на push feature-ветки при изменениях релевантных путей и вручную через workflow_dispatch; дублирующий pull_request trigger удалён. PR #3 с base `ci/g3-validation-base` остаётся временным CI-only PR и не должен сливаться. `master` не изменялся.
 
 **Следующее действие:** выполнить локальный Windows preflight; только после его успешного завершения запускать полный G3 block. Не запускать отдельные ячейки вручную и не строить модель расхода до проверки всех 27 captures.
 
@@ -696,3 +696,20 @@ Workflow `.github/workflows/geometry-tests.yml` запускается на push
 Кодовый commit `85ae43af292e8c8ecdb4d1e5791a27db4a06a97c`; regression test commit `60117ef34db54a5bf858c946d7b5ca09137caa44`. Runtime Game Monitor connection snippets удалены из репозитория, а шаблон `connection_snippet_*.js` добавлен в `.gitignore`.
 
 **Статус:** CI на исправленном HEAD должен быть проверен. Live G3 не запускать до успешного полного CI и обновления локальной Windows-сборки. Затем создать новую серию G3 (27 задач); два старых блока оставить в истории и не возобновлять. Live G3 и модель влияния sampling на CHALK пока NOT CONFIRMED.
+
+## 2026-11-02 — оптимизация CI и усиление G3 regressions
+
+Текущий HEAD после workflow/test changes: ожидает подтверждения новым GitHub Actions run. Ветка остаётся `feature/image-geometry-optimization`; `master` не изменялся.
+
+Оптимизирован `.github/workflows/geometry-tests.yml`:
+- push trigger ограничен feature-веткой и релевантными source/test/build paths; дублирующий pull_request trigger удалён;
+- concurrency отменяет устаревшие промежуточные runs одной ветки;
+- pip cache добавлен в Python jobs;
+- Game Monitor, Preparation, Integration и Executor тесты разделены на независимые jobs и выполняются параллельно;
+- корневой integration suite запускается единым pytest вызовом, который собирает unittest и pytest tests; WebSocket suite исключён из него, потому что запускается отдельно;
+- portable build зависит от успеха всех тестовых jobs; в CI build пропускает повторный `run_all_tests.py` через `AUTODRAW_SKIP_TESTS=1`, а обычный локальный build по-прежнему выполняет тесты;
+- длительные Stage 5/7/8 и synthetic benchmarks переведены на ручной `workflow_dispatch`.
+
+Усилено G3 regression coverage: добавлен тест, проходящий через реальный `BrushBehaviorTestTab.create_and_transfer_plan` и проверяющий, что block task формирует оба G3 identity объекта и сохраняет параметры задачи вместо legacy radius metadata. Тест handoff в `tests/test_unified_app.py` проверяет передачу 2/20 в executor.
+
+**Пока не подтверждено:** новый CI на конечном HEAD, portable artifact после новых изменений, локальный Windows preflight и live G3. Два предыдущих запуска по 718 CHALK остаются невалидными G3 попытками и в матрицу не включаются. Новый 27-task block создаётся только после прохождения всех software gates и проверки/закрытия старого paused journal через recovery UI.
