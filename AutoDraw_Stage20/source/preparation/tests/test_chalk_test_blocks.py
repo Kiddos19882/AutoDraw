@@ -15,6 +15,7 @@ from chalk_test_blocks import (
     validate_chalk_block_experiment,
     stop_chalk_test_block,
     record_chalk_block_task_experiment,
+    resolve_interrupted_chalk_block_task,
 )
 
 
@@ -245,3 +246,39 @@ def test_running_attempt_records_experiment_identity_before_completion(tmp_path)
             experiment_id="experiment-456",
             experiment_dir=experiment_dir,
         )
+
+
+
+def test_interrupted_block_requires_board_check_before_retry(tmp_path):
+    plan = build_chalk_test_block_plan(series_id="series", phase_id="G1")
+    path = tmp_path / "block.json"
+    create_chalk_test_block_journal(path, plan)
+    claimed = claim_next_chalk_block_task(path)
+    mark_interrupted_chalk_block_task(path)
+    with pytest.raises(ValueError):
+        resolve_interrupted_chalk_block_task(
+            path, claimed["task_id"], board_checked=False, decision="retry"
+        )
+    resolved = resolve_interrupted_chalk_block_task(
+        path, claimed["task_id"], board_checked=True, decision="retry"
+    )
+    assert resolved["status"] == "pending"
+    journal = load_chalk_test_block_journal(path)
+    assert journal["status"] == "ready"
+    assert journal["recovery_decision"]["decision"] == "retry"
+    assert journal["tasks"][0]["attempts"][-1]["status"] == "interrupted"
+
+
+def test_interrupted_block_can_be_stopped_after_explicit_board_check(tmp_path):
+    plan = build_chalk_test_block_plan(series_id="series", phase_id="G1")
+    path = tmp_path / "block.json"
+    create_chalk_test_block_journal(path, plan)
+    claimed = claim_next_chalk_block_task(path)
+    mark_interrupted_chalk_block_task(path)
+    resolve_interrupted_chalk_block_task(
+        path, claimed["task_id"], board_checked=True, decision="stop"
+    )
+    journal = load_chalk_test_block_journal(path)
+    assert journal["status"] == "stopped"
+    assert journal["recovery_decision"]["board_checked"] is True
+    assert claim_next_chalk_block_task(path) is None
