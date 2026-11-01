@@ -684,3 +684,15 @@ Workflow `.github/workflows/geometry-tests.yml` запускается на push
 Оператор сообщил, что после установки кисти AutoDraw автоматически появляется поверх игры. Найдена причина в успешном пути `_complete_brush_radius_feedback()`: окно восстанавливалось до handoff Stage6. Исправление внесено: при автоматическом запуске executor окно остаётся свёрнутым; ручная установка сохраняет старое поведение. Добавлен regression test.
 
 Кодовые коммиты: `8f8923ded3d788e725206d31515d6f0ed221db3a`, `fd814517b584b9a800c95e4b6a19581a7afc33ce`. Новый CI ещё не подтверждён. G3 live capture приостановить до успешного CI и проверки обновлённой сборки; уже полученные данные не переинтерпретировать и не удалять.
+
+## 2026-11-02 — исправление маршрутизации G3 после двух невалидных запусков
+
+На HEAD `a747b112969f0a69a3b04b701aec00a4cadc161d` исследованы два запуска G3 из серии `chalk-20261101-232008-3e9348`. Оба завершили шесть штрихов и получили точный расход 718 CHALK, однако оба были попытками одной и той же первой задачи `paint_consumption_long_lines-s2-d20-r3`. В execution report фактически указано `point_step_px=2`, `point_delay_ms=10`, тогда как журнал требовал `2/20`. В manifests отсутствовала G3 matrix identity, поэтому analyzer корректно отклонил попытки с `block_task_identity_missing`. Эти данные не засчитываются в G3.
+
+Причина — конфликт двух матриц: `paint_consumption_long_lines` совпадает с `MATRIX_SCENARIO_ID` старой радиусной матрицы и одновременно входит в `GEOMETRY_MATRIX_SCENARIOS`. В `BrushBehaviorTestTab.create_and_transfer_plan` legacy-ветка стояла первой и перехватывала задачу автоматического G3-блока. Stage6 уже имел корректную передачу временного `executor_config_override`, но она активируется только при наличии G3 metadata; без metadata исполнитель оставался на стандартных 2/10.
+
+Исправление: legacy-ветка теперь выбирается только для запуска без активной задачи block runner. Если задача принадлежит автоматическому блоку, тот же scenario_id маршрутизируется в geometry matrix и получает `chalk_experiment_matrix` плюс `chalk_test_block`. Добавлен regression test на коллизию scenario ID. Это сохраняет старый radius-matrix workflow.
+
+Кодовый commit `85ae43af292e8c8ecdb4d1e5791a27db4a06a97c`; regression test commit `60117ef34db54a5bf858c946d7b5ca09137caa44`. Runtime Game Monitor connection snippets удалены из репозитория, а шаблон `connection_snippet_*.js` добавлен в `.gitignore`.
+
+**Статус:** CI на исправленном HEAD должен быть проверен. Live G3 не запускать до успешного полного CI и обновления локальной Windows-сборки. Затем создать новую серию G3 (27 задач); два старых блока оставить в истории и не возобновлять. Live G3 и модель влияния sampling на CHALK пока NOT CONFIRMED.
