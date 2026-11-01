@@ -132,10 +132,11 @@ class RunRecorder:
                 and type(self.last_status.get("droppedEvents")) is int else None
             ),
             "monitor_buffer_dropped_events_delta": 0,
+            # Browser Bridge initializes sendFailureCount at zero for each session.
             "bridge_send_failures_start": (
                 self.last_bridge_diagnostics.get("sendFailureCount")
                 if isinstance(self.last_bridge_diagnostics, dict)
-                and type(self.last_bridge_diagnostics.get("sendFailureCount")) is int else None
+                and type(self.last_bridge_diagnostics.get("sendFailureCount")) is int else 0
             ),
             "bridge_send_failures_end": (
                 self.last_bridge_diagnostics.get("sendFailureCount")
