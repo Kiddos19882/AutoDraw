@@ -608,3 +608,7 @@ The first final CI run exposed a mismatch: `finish_chalk_block_task(accepted=Fal
 - **Текущий этап: G3 разблокирован.** G3 должен измерить влияние `point_step_px` и `point_delay_ms` на фиксированной геометрии `paint_consumption_long_lines`: 3 × 3 комбинации, 3 повтора, 27 опытов.
 - Подробные результаты G2: `docs/CHALK_GEOMETRY_MATRIX_G2_RESULTS.md`.
 - До завершения G3 нельзя объявлять универсальную ресурсную модель подтверждённой. `move_calls`, длина пути, принятые точки и CHALK остаются разными метриками.
+
+
+### Уточнение готовности G3
+G2 принят и исследовательский gate G3 открыт. Однако текущий код block runner, UI и matrix validator поддерживает только G1/G2. Поэтому live G3 пока не запускать: сначала реализовать G3-идентификацию 9 комбинаций `point_step_px` × `point_delay_ms` с тремя повторами, UI-поддержку, валидацию/анализатор и regression tests; затем подтвердить полный CI и Windows portable smoke-test. Это программная подготовка G3, а не изменение экспериментального протокола.
