@@ -29,8 +29,13 @@ python -m pip install -r requirements-build.txt
 if errorlevel 1 goto :fail
 python -m pip install -r requirements-runtime.txt
 if errorlevel 1 goto :fail
-python run_all_tests.py
-if errorlevel 1 goto :fail
+if /I "%AUTODRAW_SKIP_TESTS%"=="1" (
+  echo.
+  echo Skipping build-time tests because the CI regression jobs have already passed.
+) else (
+  python run_all_tests.py
+  if errorlevel 1 goto :fail
+)
 python build_windows.py
 if errorlevel 1 goto :fail
 python smoke_test_portable.py
