@@ -1402,3 +1402,16 @@ Run JSON дополнен `stroke_count`, суммой `sampled_point_delta_tota
 - executor failure не запускает postdraw и приостанавливает блок.
 
 Это первые callback-level tests. Полная матрица отказов preclear, brush drag/feedback, bridge loss, restore, Stop и startup recovery ещё требует расширения. CI результата для текущего HEAD пока нет; live G1 не запускался.
+
+
+## 2026-11-01 — дополнительная проверка Stop/restore/G1 acceptance
+
+В процессе повторной проверки обнаружен UI edge case: если остановка блока между задачами не могла записать terminal state журнала (например, временная ошибка диска), runtime очищался без сохранения recovery pointer. Исправлено: путь такого журнала сохраняется для явного восстановления, ошибка показывается оператору.
+
+Дополнены callback tests:
+- brush restore failure приостанавливает блок и не допускает capture acceptance;
+- только завершённый drag вызывает capture acceptance gate;
+- ошибка safe-stop сохраняет ссылку на журнал для восстановления;
+- G2 остаётся закрытой, пока все 12 G1 задач не имеют completed state.
+
+Проверить тесты локально в этой среде не удалось: сетевое клонирование репозитория недоступно. GitHub Actions для последнего SHA нужно подтвердить отдельно; пустой combined status и PR-only workflow lookup не являются доказательством успешного CI.
