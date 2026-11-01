@@ -24,7 +24,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: autodraw-validation-${{ github.ref }}
+  group: autodraw-validation-v2-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -85,7 +85,7 @@ jobs:
   integration-tests:
     name: Application integration tests
     runs-on: windows-latest
-    timeout-minutes: 20
+    timeout-minutes: 12
     defaults:
       run:
         working-directory: AutoDraw_Stage20
@@ -103,17 +103,20 @@ jobs:
       - name: Install application test dependencies
         run: python -m pip install -r source/preparation/requirements.txt -r source/executor/requirements.txt pytest
       - name: Run unified application and G3 handoff tests
+        timeout-minutes: 3
         working-directory: AutoDraw_Stage20/source/preparation
         shell: pwsh
         run: |
           $env:PYTHONPATH = "$env:GITHUB_WORKSPACE\\AutoDraw_Stage20;$env:GITHUB_WORKSPACE\\AutoDraw_Stage20\\source\\preparation;$env:GITHUB_WORKSPACE\\AutoDraw_Stage20\\source\\executor"
           python -m pytest -q -ra ..\\..\\tests\\test_unified_app.py
       - name: Run root build, import and test-runner regressions
+        timeout-minutes: 5
         shell: pwsh
         run: |
           $env:PYTHONPATH = "$env:GITHUB_WORKSPACE\\AutoDraw_Stage20;$env:GITHUB_WORKSPACE\\AutoDraw_Stage20\\source\\preparation;$env:GITHUB_WORKSPACE\\AutoDraw_Stage20\\source\\executor"
           python -m pytest -q -ra tests/test_build_helpers.py tests/test_test_runner.py tests/test_brush_experiment_series.py tests/test_import_resolution_diagnostics.py
       - name: Run root geometry validator and metric tests
+        timeout-minutes: 5
         shell: pwsh
         run: |
           $env:PYTHONPATH = "$env:GITHUB_WORKSPACE\\AutoDraw_Stage20;$env:GITHUB_WORKSPACE\\AutoDraw_Stage20\\source\\preparation;$env:GITHUB_WORKSPACE\\AutoDraw_Stage20\\source\\executor"
