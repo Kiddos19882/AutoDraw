@@ -201,6 +201,143 @@ def test_block_experiment_acceptance_requires_clean_frame_probe_and_trajectory(t
 
 
 
+@pytest.mark.parametrize(
+    ("identity_change", "expected_reason"),
+    [
+        ({"task_id": "another-task"}, "task_id"),
+        ({"scenario_id": "vertical_lengths"}, "scenario_id"),
+        ({"repeat_index": 2}, "repeat_index"),
+        ({"matrix_order_index": 9}, "matrix_order_index"),
+        ({"block_id": "another-block"}, "block_id"),
+        ({"experiment_id": "another-experiment"}, "experiment_id"),
+    ],
+)
+def test_block_experiment_acceptance_is_bound_to_active_task_identity(
+    tmp_path, monkeypatch, identity_change, expected_reason
+):
+    import chalk_experiment_matrix
+
+    manifest_path = tmp_path / "experiment.json"
+    block = {
+        "block_id": "block-001",
+        "series_id": "series-001",
+        "phase_id": "G1",
+    }
+    task = {
+        "task_id": "horizontal_lengths-r1",
+        "scenario_id": "horizontal_lengths",
+        "repeat_index": 1,
+        "requested_radius": 10,
+        "expected_strokes": 5,
+        "matrix_order_index": 3,
+        "executor_parameters": {"point_step_px": 2},
+    }
+    document = {
+        "record_type": "autodraw_brush_paint_experiment",
+        "experiment_id": "experiment-001",
+        "chalk_test_block": {
+            "block_id": block["block_id"],
+            "task_id": task["task_id"],
+            "phase_id": block["phase_id"],
+        },
+        "chalk_experiment_matrix": {
+            "series_id": block["series_id"],
+            "phase_id": block["phase_id"],
+            "scenario_id": task["scenario_id"],
+            "repeat_index": task["repeat_index"],
+            "requested_radius": task["requested_radius"],
+            "expected_strokes": task["expected_strokes"],
+            "matrix_order_index": task["matrix_order_index"],
+            "executor_parameters": task["executor_parameters"],
+        },
+        "phases": {
+            "before_clear": {"status": "restored"},
+            "before_draw": {"captured_at_utc": "2026-11-01T00:00:00Z"},
+            "after_draw": {"status": "captured"},
+            "postdraw_workflow": {"status": "completed"},
+        },
+        "game_monitor_summary": {
+            "frame_probe": {"status": "measured", "visibility_interruption": False},
+            "trajectory": {"accepted_sample_count": 12},
+        },
+    }
+    for key, value in identity_change.items():
+        if key in {"block_id", "task_id"}:
+            target = "chalk_test_block"
+        elif key == "experiment_id":
+            document[key] = value
+            continue
+        else:
+            target = "chalk_experiment_matrix"
+        field = "block_id" if key == "block_id" else key
+        document[target][field] = value
+    manifest_path.write_text(json.dumps(document), encoding="utf-8")
+    monkeypatch.setattr(chalk_experiment_matrix, "_validate_manifest", lambda _doc: (True, "valid", {
+        "expected_strokes": 5, "consumed_points": 25
+    }))
+    monkeypatch.setattr(chalk_experiment_matrix, "_stroke_level_breakdown", lambda *_a, **_k: {
+        "status": "complete", "strokes": []
+    })
+
+    accepted, reason, details = validate_chalk_block_experiment(
+        manifest_path,
+        expected_task=task,
+        expected_block=block,
+        expected_experiment_id="experiment-001",
+    )
+
+    assert accepted is False
+    assert reason == f"block_task_identity_mismatch:{expected_reason}"
+    assert details is None
+
+
+def test_block_experiment_acceptance_accepts_matching_active_task_identity(tmp_path, monkeypatch):
+    import chalk_experiment_matrix
+
+    manifest_path = tmp_path / "experiment.json"
+    block = {"block_id": "block-001", "series_id": "series-001", "phase_id": "G1"}
+    task = {
+        "task_id": "horizontal_lengths-r1", "scenario_id": "horizontal_lengths",
+        "repeat_index": 1, "requested_radius": 10, "expected_strokes": 5,
+        "matrix_order_index": 3, "executor_parameters": {"point_step_px": 2},
+    }
+    document = {
+        "record_type": "autodraw_brush_paint_experiment", "experiment_id": "experiment-001",
+        "chalk_test_block": {"block_id": "block-001", "task_id": task["task_id"], "phase_id": "G1"},
+        "chalk_experiment_matrix": {
+            "series_id": "series-001", "phase_id": "G1", "scenario_id": "horizontal_lengths",
+            "repeat_index": 1, "requested_radius": 10, "expected_strokes": 5,
+            "matrix_order_index": 3, "executor_parameters": {"point_step_px": 2},
+        },
+        "phases": {
+            "before_clear": {"status": "restored"}, "before_draw": {"captured_at_utc": "2026-11-01T00:00:00Z"},
+            "after_draw": {"status": "captured"}, "postdraw_workflow": {"status": "completed"},
+        },
+        "game_monitor_summary": {
+            "frame_probe": {"status": "measured", "visibility_interruption": False},
+            "trajectory": {"accepted_sample_count": 12},
+        },
+    }
+    manifest_path.write_text(json.dumps(document), encoding="utf-8")
+    monkeypatch.setattr(chalk_experiment_matrix, "_validate_manifest", lambda _doc: (True, "valid", {
+        "expected_strokes": 5, "consumed_points": 25
+    }))
+    monkeypatch.setattr(chalk_experiment_matrix, "_stroke_level_breakdown", lambda *_a, **_k: {
+        "status": "complete", "strokes": []
+    })
+
+    accepted, reason, details = validate_chalk_block_experiment(
+        manifest_path,
+        expected_task=task,
+        expected_block=block,
+        expected_experiment_id="experiment-001",
+    )
+
+    assert accepted is True
+    assert reason == "accepted"
+    assert details is not None
+
+
 def test_block_can_stop_only_at_task_boundary(tmp_path):
     plan = build_chalk_test_block_plan(series_id="series", phase_id="G1")
     path = tmp_path / "block.json"
