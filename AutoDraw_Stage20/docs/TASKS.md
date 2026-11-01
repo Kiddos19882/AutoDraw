@@ -113,3 +113,8 @@ UI runner реализован, но до CI и отдельного контр�
 - [ ] Подтвердить полный CI и Windows startup smoke-test на финальном SHA.
 - [ ] Провести Windows preflight: calibration, slider 1–30, Clear reference, canvas, Game Monitor heartbeat.
 - [ ] После явного подтверждения тестовой доски запустить G1 и принять все 12 ячеек.
+
+
+- [x] Сделать owner lock общим для всего каталога chalk_test_blocks, чтобы блокировать запуск разных журналов параллельно.
+- [x] Добавить тест конкуренции для разных journal paths в одном каталоге.
+- [ ] Подтвердить CI на финальном кодовом SHA.
