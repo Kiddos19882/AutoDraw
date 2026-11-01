@@ -1256,7 +1256,11 @@ class BrushBehaviorTestTab:
             try:
                 stop_chalk_test_block_journal(self._chalk_block_journal_path)
             except (OSError, ValueError, RuntimeError) as exc:
-                self.status_var.set(f"Не удалось остановить блок: {exc}")
+                self._chalk_block_recovery_journal_path = self._chalk_block_journal_path
+                self.status_var.set(f"Не удалось остановить блок: {exc}. Журнал сохранён для восстановления.")
+                self._update_chalk_block_progress()
+                self._clear_chalk_block_runtime()
+                return
             self._update_chalk_block_progress()
             self._chalk_block_recovery_journal_path = None
             self._clear_chalk_block_runtime()
