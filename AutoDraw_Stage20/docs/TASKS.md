@@ -264,3 +264,12 @@ Software gate закрыт; live gate остаётся открытым. Авт�
 - [ ] Выполнить локальный Windows preflight и закрыть старый paused G3 journal только через recovery UI с подтверждением доски.
 - [ ] Создать новую чистую серию G3 из 27 задач и выполнить все captures.
 - [ ] Проверить фактический executor config и точный CHALK для каждой ячейки; проанализировать девять конфигураций.
+
+## 2026-11-02 — стабилизация Windows UI CI
+
+- [x] Изолировать DATA_PATHS каждого UI test case во временном каталоге.
+- [x] Не допускать чтение старых paused G3 journals и модальных recovery dialogs в CI UI tests.
+- [x] Отменять deferred recovery scan при уничтожении owner frame.
+- [x] Добавить regression test на отмену pending Tk callback.
+- [x] Разделить root integration tests и ограничить время UI test step.
+- [ ] Получить успешный CI на HEAD после этих изменений.
