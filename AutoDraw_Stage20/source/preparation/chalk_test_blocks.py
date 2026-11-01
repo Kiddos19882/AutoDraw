@@ -64,7 +64,7 @@ def acquire_chalk_block_owner_lock(journal_path: str | Path):
     """
     path = Path(journal_path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    lock_path = path.with_name(path.name + ".owner.lock")
+    lock_path = path.parent / ".active-block.owner.lock"
     lock_file = lock_path.open("a+b")
     try:
         if os.name == "nt":
