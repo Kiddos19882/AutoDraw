@@ -702,6 +702,8 @@ class AutoDrawUnifiedApp:
             generation = plan_document.get("generation", {})
             matrix = generation.get("chalk_experiment_matrix") if isinstance(generation, dict) else None
             if isinstance(matrix, dict) and matrix.get("phase_id") == "G3":
+                from chalk_experiment_matrix import GEOMETRY_EXECUTOR_CONFIG
+
                 parameters = matrix.get("executor_parameters")
                 required = {
                     "point_step_px", "line_extension_px", "point_delay_ms",
@@ -710,6 +712,18 @@ class AutoDrawUnifiedApp:
                 }
                 if not isinstance(parameters, dict) or set(parameters) != required:
                     raise ValueError("G3: отсутствует полный набор параметров исполнителя в metadata.")
+                step, delay = parameters.get("point_step_px"), parameters.get("point_delay_ms")
+                expected_parameters = dict(GEOMETRY_EXECUTOR_CONFIG)
+                expected_parameters.update({"point_step_px": step, "point_delay_ms": delay})
+                if (
+                    matrix.get("scenario_id") != "paint_consumption_long_lines"
+                    or matrix.get("requested_radius") != 10
+                    or matrix.get("expected_strokes") != 6
+                    or isinstance(step, bool) or type(step) is not int or step not in (1, 2, 4)
+                    or isinstance(delay, bool) or type(delay) is not int or delay not in (5, 10, 20)
+                    or parameters != expected_parameters
+                ):
+                    raise ValueError("G3: параметры плана не соответствуют фиксированному протоколу матрицы.")
                 executor_config_override = dict(parameters)
             started = self.executor.start_execution_from_workflow(
                 executor_config_override=executor_config_override
