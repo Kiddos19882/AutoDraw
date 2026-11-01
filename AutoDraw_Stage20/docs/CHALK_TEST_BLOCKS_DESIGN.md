@@ -134,3 +134,6 @@ Mock обновлён до `lambda _path, **_kwargs` в commit `20704ab984b981a4
 Добавлены tests на повреждённые task records, пустые/дублированные ID, неизвестные статусы, несоответствие количества задач, orphaned running attempt, несколько running attempts, несогласованный block status, некорректный JSON и валидный running state.
 
 Изменения: `2ea67817bd1187baa66252aec440a4a5238042e0`, `52b40e94eadf1e75f461565960547b2a749993e4`. CI для этих commits ожидается. Файловый journal пока предполагает один активный экземпляр UI; межпроцессная блокировка не реализована.
+
+
+Journal validator также проверяет типы полей phase/status до membership checks. Некорректные JSON значения list/dict в этих полях возвращают ValueError, а не TypeError из-за unhashable values. Для этого добавлены отдельные negative cases; CI для финального изменения ожидается.
