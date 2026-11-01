@@ -538,3 +538,12 @@ Live G1/G2 не запускались. Старые 12 G1 manifests не пер
 
 
 CI выявил SyntaxError в journal validator после последнего hardening: literal `\\n` попал в Python source вместо newline. Исправлено в commit `dd5aaade3b790546d9e3fc11341554f6aa09d8ec`. Это regression внесённого изменения; требуется повторный полный CI для исправленного SHA. Не считать блок runner готовым к live G1 до success всех трёх jobs.
+
+
+## 13. Подготовка к G1: журнал и I/O failure paths
+
+Добавлена строгая проверка согласованности block/task statuses и fail-closed блокировка запуска при journal status failed. Все транзакции изменения журнала защищены межпроцессной блокировкой ОС (Windows msvcrt, POSIX fcntl). Добавлены fault-injection tests для ошибок записи temp-файла и os.replace; при отказе замены исходный журнал сохраняется.
+
+Коммиты: e688ed5b893903794afdf306c3b8db955e578639, dc21778fff4fc8ef8d47525d93ac00fde784eb78, 0d2d4182d9d418a274a69dcaa1ee9495a48e012d, 9147bbdfa8419a77481d093bb0669c05e4ab640a.
+
+Важная граница: advisory lock сериализует транзакции, но не удерживается на протяжении всего GUI-сеанса. Поэтому два экземпляра AutoDraw не должны одновременно восстанавливать/обслуживать один журнал. CI и Windows startup smoke-test для нового SHA ожидаются. Live G1 пока не запускался.
