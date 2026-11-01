@@ -187,3 +187,11 @@ Windows portable build копирует эти файлы и game_monitor.js в 
 - `source/preparation/chalk_experiment_matrix.py` — metadata для серий G1/G2, fingerprint геометрии, строгая проверка experiment/monitor identity, exact CHALK, уникальности run/repeat и per-stroke aggregation по `strokeId`.
 - `tests/analyze_chalk_experiment_matrix.py` — CLI-обход experiment manifests и создание сводки по сценариям/повторам.
 - `source/preparation/brush_behavior_test_ui.py` сохраняет `chalk_experiment_matrix` в drawing plan, manifest, monitor report copy, summary и capture metadata.
+
+### Дополнение — G3 CHALK executor matrix
+
+- `source/preparation/chalk_experiment_matrix.py` поддерживает G1/G2/G3 metadata, параметрическую идентичность G3 и агрегирование повторов по конфигурации executor.
+- `source/preparation/chalk_test_blocks.py` строит и валидирует полный G3 block из 27 уникальных задач.
+- `source/preparation/brush_behavior_test_ui.py` разрешает G3 только после принятия G2 и передаёт task-specific executor parameters в experiment metadata.
+- `integrated_app.py` извлекает G3 executor config из runtime plan; `Stage6App.start_execution_from_workflow()` применяет временный override к фактическому исполнителю без записи в пользовательский профиль.
+- `tests/analyze_chalk_experiment_matrix.py` агрегирует каждую из девяти комбинаций отдельно.
