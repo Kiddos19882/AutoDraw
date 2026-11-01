@@ -706,7 +706,7 @@ Workflow `.github/workflows/geometry-tests.yml` запускается на push
 - concurrency отменяет устаревшие промежуточные runs одной ветки;
 - pip cache добавлен в Python jobs;
 - Game Monitor, Preparation, Integration и Executor тесты разделены на независимые jobs и выполняются параллельно;
-- корневые unittest tests и pytest function suites запускаются отдельными штатными runners; WebSocket suite выполняется отдельно в Game Monitor job;
+- корневые интеграционные тесты разбиты на три pytest группы: UI/G3 handoff; build/import/test-runner; geometry validator/metrics. WebSocket suite выполняется отдельно в Game Monitor job.;
 - portable build зависит от успеха всех тестовых jobs; в CI build пропускает повторный `run_all_tests.py` через `AUTODRAW_SKIP_TESTS=1`, а обычный локальный build по-прежнему выполняет тесты;
 - длительные Stage 5/7/8 и synthetic benchmarks переведены на ручной `workflow_dispatch`.
 
