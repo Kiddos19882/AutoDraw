@@ -311,3 +311,13 @@ tests/test_websocket_smoke_server.py включает regression tests для pe
 - проверка выполняется в отдельном Windows CI step Test local WebSocket smoke server на Python 3.11.
 
 Эти тесты проверяют политику восстановления файловой записи, но не заменяют повторный live-тест Firefox/игрового iframe с радиусом 10.
+
+
+## CHALK geometry matrix G1/G2
+
+- Production helper: `source/preparation/chalk_experiment_matrix.py`.
+- Unit tests: `source/preparation/tests/test_chalk_experiment_matrix.py`.
+- UI integration: `source/preparation/tests/test_brush_behavior_test_ui.py` verifies that geometry matrix metadata is preserved in experiment manifests.
+- CLI: `tests/analyze_chalk_experiment_matrix.py` scans experiment manifests, validates exact captures and duplicate identities, calculates repeat statistics, and attempts stroke-level aggregation from `monitor_report.json`.
+- Stroke-level aggregation is accepted only when unique `strokeId` count matches expected strokes and the sum of per-stroke `DRAW_SAMPLE.pointDelta` equals the exact experiment CHALK. Otherwise it is explicitly marked incomplete.
+- Live data collection must wait for GitHub Actions success and follow `CHALK_GEOMETRY_MATRIX_PLAN.md`.
