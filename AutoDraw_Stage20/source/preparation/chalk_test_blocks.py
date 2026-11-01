@@ -274,6 +274,20 @@ def validate_chalk_block_experiment(
         return False, "experiment_manifest_invalid", None
 
     document["experiment_dir"] = str(path.parent)
+    phases = document.get("phases") if isinstance(document.get("phases"), dict) else {}
+    before_clear = phases.get("before_clear") if isinstance(phases.get("before_clear"), dict) else {}
+    before_draw = phases.get("before_draw") if isinstance(phases.get("before_draw"), dict) else {}
+    after_draw = phases.get("after_draw") if isinstance(phases.get("after_draw"), dict) else {}
+    postdraw = phases.get("postdraw_workflow") if isinstance(phases.get("postdraw_workflow"), dict) else {}
+    if before_clear.get("status") not in {"restored", "restored_within_pixel_tolerance"}:
+        return False, "preclear_not_verified", None
+    if not before_draw.get("captured_at_utc"):
+        return False, "before_draw_capture_missing", None
+    if after_draw.get("status") != "captured":
+        return False, "after_draw_capture_missing", None
+    if postdraw.get("status") != "completed":
+        return False, "postdraw_workflow_not_completed", None
+
     from chalk_experiment_matrix import _validate_manifest, _stroke_level_breakdown
 
     valid, reason, record = _validate_manifest(document)
