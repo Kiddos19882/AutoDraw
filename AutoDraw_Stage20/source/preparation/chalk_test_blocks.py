@@ -267,6 +267,7 @@ def validate_chalk_block_experiment(
     expected_task: dict[str, Any] | None = None,
     expected_block: dict[str, Any] | None = None,
     expected_experiment_id: str | None = None,
+    expected_experiment_dir: str | Path | None = None,
 ) -> tuple[bool, str, dict[str, Any] | None]:
     """Apply the strict matrix and per-stroke acceptance gates to one saved experiment."""
     path = Path(manifest_path)
@@ -278,8 +279,11 @@ def validate_chalk_block_experiment(
         return False, "experiment_manifest_invalid", None
 
     document["experiment_dir"] = str(path.parent)
-    if expected_task is not None or expected_block is not None or expected_experiment_id is not None:
-        if not isinstance(expected_task, dict) or not isinstance(expected_block, dict):
+    if (
+        expected_task is not None or expected_block is not None
+        or expected_experiment_id is not None or expected_experiment_dir is not None
+    ):
+        if not isinstance(expected_task, dict) or not isinstance(expected_block, dict) or expected_experiment_dir is None:
             return False, "expected_block_task_identity_unavailable", None
         block_ref = document.get("chalk_test_block")
         matrix = document.get("chalk_experiment_matrix")
@@ -298,6 +302,7 @@ def validate_chalk_block_experiment(
             (matrix.get("matrix_order_index"), expected_task.get("matrix_order_index"), "matrix_order_index"),
             (matrix.get("executor_parameters"), expected_task.get("executor_parameters"), "executor_parameters"),
             (document.get("experiment_id"), expected_experiment_id, "experiment_id"),
+            (path.parent.resolve(), Path(expected_experiment_dir).resolve(), "experiment_dir"),
         )
         for actual, expected, field in identity_pairs:
             if actual != expected:
