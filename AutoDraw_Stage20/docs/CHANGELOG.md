@@ -234,3 +234,15 @@
 - Отчёт копируется в каталог эксперимента как `monitor_report.json`; `experiment.json` получает `session_id`, `run_id`, CHALK/FPS/trajectory summary и capture status.
 - Если отчёт не найден за 10 секунд, сохраняется `monitor_capture.status=unavailable`.
 - Корреляция по времени+радиусу является промежуточной; сквозной experiment_id и live validation ещё требуются.
+
+## 2026-11-01 — G3 CHALK executor matrix
+
+### Added
+- G3 block на 27 уникальных задач для девяти сочетаний `point_step_px` и `point_delay_ms`, по три повтора.
+- G3 metadata, parameter-aware duplicate protection, journal validation и analyzer aggregation.
+- UI gate G3 после принятого G2 и runtime передачу параметров в MouseExecutor без перезаписи пользовательского профиля.
+- Regression tests для G3 матрицы, журнала, анализатора и workflow override.
+
+### Validation
+- Полный CI и Windows portable startup smoke-test ещё ожидают подтверждения.
+- Live G3 не запускался.
