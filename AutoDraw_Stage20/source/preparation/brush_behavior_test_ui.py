@@ -660,7 +660,7 @@ class BrushBehaviorTestTab:
         ttk.Entry(matrix_row, textvariable=self.matrix_block_var, width=4).pack(side="left", padx=6)
         ttk.Label(
             matrix_row,
-            text="Для G1/G2 номер повтора задаётся вручную; занятый повтор будет заблокирован. Порядок запуска серии назначается автоматически.",
+            text="Для ручных G1/G2 номер повтора задаётся вручную. Автоматические блоки G1/G2/G3 назначают ячейки и порядок самостоятельно.",
         ).pack(side="left", padx=8)
         ttk.Label(controls, textvariable=self.area_var, wraplength=1100).pack(anchor="w", pady=(8, 0))
         slider = ttk.LabelFrame(controls, text="Автоматическая установка кисти", padding=6)
@@ -705,7 +705,7 @@ class BrushBehaviorTestTab:
         ttk.Label(block_controls, text="Фаза").pack(side="left")
         ttk.Combobox(
             block_controls, textvariable=self.chalk_block_phase_var,
-            values=("G1", "G2"), state="readonly", width=5,
+            values=("G1", "G2", "G3"), state="readonly", width=5,
         ).pack(side="left", padx=(6, 10))
         ttk.Button(block_controls, text="Запустить полный блок", command=self.start_chalk_test_block).pack(side="left")
         ttk.Button(block_controls, text="Остановить после текущего опыта", command=self.request_stop_chalk_test_block).pack(side="left", padx=6)
@@ -1188,6 +1188,26 @@ class BrushBehaviorTestTab:
                 return True
         return False
 
+    def _has_completed_g2_block(self) -> bool:
+        """Require one fully accepted G2 block before exposing G3 live execution."""
+        journal_dir = self.output_dir / "chalk_test_blocks"
+        if not journal_dir.is_dir():
+            return False
+        for journal_path in journal_dir.glob("chalk-block-G2-*.json"):
+            try:
+                journal = load_chalk_test_block_journal(journal_path)
+            except (OSError, ValueError, json.JSONDecodeError):
+                continue
+            if (
+                journal.get("phase_id") == "G2"
+                and journal.get("status") == "completed"
+                and journal.get("expected_task_count") == 18
+                and len(journal.get("tasks", [])) == 18
+                and all(task.get("status") == "completed" for task in journal.get("tasks", []))
+            ):
+                return True
+        return False
+
     def start_chalk_test_block(self) -> None:
         if self._chalk_block_task is not None or self._chalk_block_journal_path is not None:
             messagebox.showwarning("Блок уже активен", "Сначала заверши или останови текущий блок.", parent=self.root)
@@ -1202,13 +1222,20 @@ class BrushBehaviorTestTab:
             )
             return
         phase_id = self.chalk_block_phase_var.get().strip()
-        if phase_id not in {"G1", "G2"}:
-            messagebox.showwarning("Неизвестная фаза", "Выбери G1 или G2.", parent=self.root)
+        if phase_id not in {"G1", "G2", "G3"}:
+            messagebox.showwarning("Неизвестная фаза", "Выбери G1, G2 или G3.", parent=self.root)
             return
         if phase_id == "G2" and not self._has_completed_g1_block():
             messagebox.showwarning(
                 "G2 пока закрыта",
                 "Сначала полностью выполни и прими автоматический блок G1. G2 нельзя запускать до завершения G1.",
+                parent=self.root,
+            )
+            return
+        if phase_id == "G3" and not self._has_completed_g2_block():
+            messagebox.showwarning(
+                "G3 пока закрыта",
+                "Сначала полностью выполни и прими автоматический блок G2. G3 нельзя запускать до завершения G2.",
                 parent=self.root,
             )
             return
@@ -1609,6 +1636,7 @@ class BrushBehaviorTestTab:
                         requested_radius=brush,
                         strokes=plan["strokes"],
                         matrix_order_index=int(self._chalk_block_task["matrix_order_index"]),
+                        executor_parameters=self._chalk_block_task.get("executor_parameters"),
                     )
                     plan["generation"]["chalk_test_block"] = {
                         "block_id": load_chalk_test_block_journal(self._chalk_block_journal_path)["block_id"],
