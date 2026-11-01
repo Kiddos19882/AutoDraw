@@ -3441,7 +3441,12 @@ class BrushBehaviorTestTab:
                     "trajectory": trajectory,
                     "event_count": report.get("event_count"),
                     "dropped_events": report.get("dropped_events"),
-                    "monitor_dropped_events": report.get("monitor_dropped_events"),
+                    "monitor_dropped_events": report.get("monitor_dropped_events"),  # Deprecated cumulative alias.
+                    "monitor_buffer_dropped_events_start": report.get("monitor_buffer_dropped_events_start"),
+                    "monitor_buffer_dropped_events_end": report.get("monitor_buffer_dropped_events_end"),
+                    "monitor_buffer_dropped_events_delta": report.get("monitor_buffer_dropped_events_delta"),
+                    "bridge_send_failures_delta": report.get("bridge_send_failures_delta"),
+                    "collector_sequence_gap_count": report.get("collector_sequence_gap_count"),
                     "monitor_error_count": report.get("monitor_error_count"),
                     "started_at_utc": report.get("started_at_utc"),
                     "finished_at_utc": report.get("finished_at_utc"),
@@ -3461,8 +3466,9 @@ class BrushBehaviorTestTab:
                     and frame_probe.get("visibility_interruption") is False
                     and int(trajectory.get("accepted_sample_count", 0) or 0) > 0
                     and report.get("dropped_events", 0) == 0
-                    and report.get("monitor_dropped_events", 0) == 0
                     and report.get("monitor_error_count", 0) == 0
+                    and report.get("bridge_send_failures_delta", 0) == 0
+                    and report.get("collector_sequence_gap_count", 0) == 0
                 )
                 self.experiment_phases["monitor_capture"] = {
                     "status": "saved" if telemetry_clean else "partial",
@@ -3477,7 +3483,12 @@ class BrushBehaviorTestTab:
                     "report_path": target_path.name,
                     "report_event_count": report.get("event_count"),
                     "dropped_events": report.get("dropped_events"),
-                    "monitor_dropped_events": report.get("monitor_dropped_events"),
+                    "monitor_dropped_events": report.get("monitor_dropped_events"),  # Deprecated cumulative alias.
+                    "monitor_buffer_dropped_events_start": report.get("monitor_buffer_dropped_events_start"),
+                    "monitor_buffer_dropped_events_end": report.get("monitor_buffer_dropped_events_end"),
+                    "monitor_buffer_dropped_events_delta": report.get("monitor_buffer_dropped_events_delta"),
+                    "bridge_send_failures_delta": report.get("bridge_send_failures_delta"),
+                    "collector_sequence_gap_count": report.get("collector_sequence_gap_count"),
                     "monitor_error_count": report.get("monitor_error_count"),
                     "stroke_count": report.get("stroke_count"),
                     "expected_stroke_count": expected_strokes,
