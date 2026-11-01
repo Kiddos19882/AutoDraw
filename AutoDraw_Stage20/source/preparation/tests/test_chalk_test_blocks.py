@@ -210,6 +210,7 @@ def test_block_experiment_acceptance_requires_clean_frame_probe_and_trajectory(t
         ({"matrix_order_index": 9}, "matrix_order_index"),
         ({"block_id": "another-block"}, "block_id"),
         ({"experiment_id": "another-experiment"}, "experiment_id"),
+        ({"experiment_dir": "another-directory"}, "experiment_dir"),
     ],
 )
 def test_block_experiment_acceptance_is_bound_to_active_task_identity(
@@ -261,7 +262,11 @@ def test_block_experiment_acceptance_is_bound_to_active_task_identity(
             "trajectory": {"accepted_sample_count": 12},
         },
     }
+    expected_experiment_dir = tmp_path
     for key, value in identity_change.items():
+        if key == "experiment_dir":
+            expected_experiment_dir = tmp_path / value
+            continue
         if key in {"block_id", "task_id"}:
             target = "chalk_test_block"
         elif key == "experiment_id":
@@ -284,6 +289,7 @@ def test_block_experiment_acceptance_is_bound_to_active_task_identity(
         expected_task=task,
         expected_block=block,
         expected_experiment_id="experiment-001",
+        expected_experiment_dir=expected_experiment_dir,
     )
 
     assert accepted is False
@@ -331,6 +337,7 @@ def test_block_experiment_acceptance_accepts_matching_active_task_identity(tmp_p
         expected_task=task,
         expected_block=block,
         expected_experiment_id="experiment-001",
+        expected_experiment_dir=tmp_path,
     )
 
     assert accepted is True
