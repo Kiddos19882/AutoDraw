@@ -118,3 +118,10 @@ G1/G2 используют radius=10 и фиксированный `GEOMETRY_EXE
 
 
 Дополнительно identity gate использует не только UI runtime values: ожидаемые experiment_id и experiment_dir читаются из активной попытки, сохранённой в block journal. Проверяется, что путь manifest принадлежит именно каталогу этой зарегистрированной попытки. Добавлен callback test для отказа preclear: при несовпадении blank-board эталона блок становится paused/failed, executor не запускается. CI для этих последних изменений ещё ожидается.
+
+
+## Дополнение 2026-11-01 — CI diagnosis и коррекция тестовой подмены
+
+Runs `41267183785` и `41267241966` завершились одинаково: `executor-tests` — success; `geometry-tests` — 1 failed / 574 passed; Windows portable build завершился до startup smoke-test из-за той же ошибки preparation suite. Единственное падение находилось в callback test `test_ui_capture_gate_pauses_without_advancing_on_incomplete_evidence`: mock validator lambda не принимала новые именованные identity-параметры UI.
+
+Mock обновлён до `lambda _path, **_kwargs` в commit `20704ab984b981a4bf5b2278eba6cfad970d15a5`. Логика production validator/UI не менялась. Повторный CI для исправления ожидается; block runner пока не считать готовым к live G1.
