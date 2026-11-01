@@ -1599,3 +1599,11 @@ G1 принят по второму блоку. G2 теперь разблоки
 Добавлена защита от обхода полного блока: сценарий `paint_consumption_long_lines` нельзя запускать вручную вне G3 block runner. Runtime handoff дополнительно сверяет scenario_id, радиус, ожидаемые шесть штрихов, разрешённые целочисленные значения шага/задержки и неизменность остальных executor settings. Это предотвращает подмену G3 metadata перед передачей плана исполнителю.
 
 Текущий кодовый HEAD после этого исправления: `f50b14d1a8389d259e17940a4e54cfa9f81a042c`. Полный CI пока не подтверждён; live G3 не запускался.
+
+### Финальная фиксация программного gate G3
+
+Дополнительно ужесточена journal validation: для всех 27 задач проверяются целочисленные repeat_index и matrix_order_index, уникальность каждого matrix_order_index в диапазоне 1–27, а также полный набор девяти parameter cells. Добавлены regression tests для boolean repeat и повторного порядка.
+
+Ручной запуск `paint_consumption_long_lines` вне полного G3 block запрещён. Runtime handoff проверяет сценарий, радиус 10, шесть штрихов, полный набор executor-параметров и допустимые значения 1/2/4 × 5/10/20.
+
+Актуальный кодовый HEAD: `5a63fcbcbd86a441499567a2572d8c967d845371`. G3 software implementation и regression coverage внесены. Полный CI/Windows portable smoke-test не удалось подтвердить через доступные результаты GitHub Actions; live G3 не запускался.
