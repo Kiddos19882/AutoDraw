@@ -264,3 +264,16 @@
 
 ### Security
 - Удалены runtime Game Monitor connection snippets; добавлено правило .gitignore для таких файлов.
+
+## 2026-11-02 — CI и G3 regression optimization
+
+### Changed
+- Обязательный CI разделён на параллельные jobs Game Monitor, Preparation/G3, Integration и Executor; portable build запускается только после их успеха.
+- Добавлены pip caching и отмена устаревших runs одной feature-ветки; убран дублирующий pull_request trigger.
+- Длительные Stage 5/7/8 и synthetic benchmarks запускаются вручную через workflow_dispatch.
+- В CI portable build использует `AUTODRAW_SKIP_TESTS=1` только после прохождения независимых test jobs; локальная сборка сохраняет полный test run.
+
+### Tests
+- Добавлен тест реального G3 UI plan routing: обязательные block/matrix identity и executor parameters должны формироваться для активной block task.
+- Integration regression проверяет передачу task-specific параметров 2/20 в Stage6.
+- Новый workflow run на конечном HEAD ожидает подтверждения.
