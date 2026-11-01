@@ -694,7 +694,26 @@ class AutoDrawUnifiedApp:
             self.status_var.set("Запуск отменён: радиус кисти не подтверждён. Исполнитель не запускался.")
             return
         try:
-            started = self.executor.start_execution_from_workflow()
+            executor_config_override = None
+            try:
+                plan_document = json.loads(Path(plan_path).read_text(encoding="utf-8"))
+            except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+                raise ValueError(f"Не удалось прочитать метаданные плана теста: {exc}") from exc
+            generation = plan_document.get("generation", {})
+            matrix = generation.get("chalk_experiment_matrix") if isinstance(generation, dict) else None
+            if isinstance(matrix, dict) and matrix.get("phase_id") == "G3":
+                parameters = matrix.get("executor_parameters")
+                required = {
+                    "point_step_px", "line_extension_px", "point_delay_ms",
+                    "after_mouse_up_ms", "before_mouse_down_ms",
+                    "after_mouse_down_ms", "end_hold_ms", "countdown_seconds",
+                }
+                if not isinstance(parameters, dict) or set(parameters) != required:
+                    raise ValueError("G3: отсутствует полный набор параметров исполнителя в metadata.")
+                executor_config_override = dict(parameters)
+            started = self.executor.start_execution_from_workflow(
+                executor_config_override=executor_config_override
+            )
         except Exception as exc:
             messagebox.showerror(
                 "Не удалось запустить тест кисти",
