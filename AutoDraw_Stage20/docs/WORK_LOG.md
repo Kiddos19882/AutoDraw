@@ -1680,3 +1680,12 @@ PR #3 использован как временный CI-only PR с base `ci/g3
 Regression test в `source/preparation/tests/test_brush_behavior_test_ui.py` теперь требует, чтобы автоматический handoff не вызывал восстановление окна. Коммиты: `8f8923ded3d788e725206d31515d6f0ed221db3a`, `fd814517b584b9a800c95e4b6a19581a7afc33ce`.
 
 **Проверка:** тест и полный CI для нового HEAD ожидаются; live-повтор G3 после исправления ещё не выполнен. До успешного CI и повторного preflight/G3 продолжать сбор 27 captures нельзя.
+
+## 2026-11-02 — G3 routing fix
+
+- Проверена ветка на HEAD `a747b112969f0a69a3b04b701aec00a4cadc161d`, два G3 experiment manifests и два block journals.
+- Подтверждено: оба прогона имели exact CHALK=718, 6 strokes, radius=10, фактические executor параметры 2/10; G3 journal требовал 2/20. Оба отклонены с `block_task_identity_missing`, поэтому не входят в статистику G3.
+- Исправлен конфликт legacy radius-matrix / geometry-matrix routing для активных block tasks; добавлен regression test.
+- Commits: `85ae43af292e8c8ecdb4d1e5791a27db4a06a97c`, `60117ef34db54a5bf858c946d7b5ca09137caa44`.
+- Runtime connection snippets удалены из репозитория, их шаблон добавлен в .gitignore.
+- Next gate: полный GitHub Actions CI; затем локальный Windows preflight и новая чистая серия G3 из 27 задач.
