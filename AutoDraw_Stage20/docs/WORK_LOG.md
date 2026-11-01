@@ -1432,3 +1432,14 @@ Run JSON дополнен `stroke_count`, суммой `sampled_point_delta_tota
 При дополнительном review найден runtime edge case: Alt отменял автоматический preclear или postdraw, но не переводил активную block task в failed/paused. Журнал мог оставаться в состоянии running до перезапуска приложения. Исправлено: отмена через Alt теперь вызывает fail-closed остановку блока с причинами `preclear_cancelled_by_user` / `postdraw_cancelled_by_user`. Добавлены два callback workflow tests, проверяющие, что journal становится paused, задача — failed, причина сохраняется и автоматического перехода нет.
 
 Тестовое покрытие блока теперь: 13 unit tests ядра и 10 callback workflow tests. Исчерпывающая матрица callback failure paths ещё не завершена. Последний проверяемый кодовый commit — `609aca9156e5eb136c7db5cb516262b971d4fa82`; GitHub Actions run `41266047330` для него запущен, результат на момент этой записи не подтверждён. Локальный запуск тестов в текущей среде недоступен. Live G1 не запускался.
+
+
+## 2026-11-01 — CI success и привязка capture acceptance к block task
+
+**CI:** run [41266047330](https://github.com/Kiddos19882/AutoDraw/actions/runs/41266047330) для commit 609aca9156e5eb136c7db5cb516262b971d4fa82 и run [41266141717](https://github.com/Kiddos19882/AutoDraw/actions/runs/41266141717) для f8f2d1c6fe47b8d5e539be78951cea16296e16f6 завершились успешно. Последний запуск подтвердил geometry-tests, executor-tests, Windows portable build и startup smoke-test.
+
+**Дополнительный аудит:** найдено, что capture acceptance проверял внутреннюю целостность manifest, но не сравнивал его идентификаторы с активной задачей block journal. Теперь валидатор получает ожидаемые task/block/experiment identity и сравнивает block_id, task_id, experiment_id, series_id, phase_id, scenario_id, repeat_index, requested_radius, expected_strokes, matrix_order_index и executor_parameters. При несовпадении возвращается отказ и UI ставит блок на паузу.
+
+**Тесты:** добавлены шесть parameterized mismatch cases, positive identity case и проверка, что UI передаёт текущие identity в acceptance validator. Новые commits: d5d3542840138f80df51cc467ca4b91012c18689, 589f25d116f1fadb924aa2d773da22515e17b001, 9576a97c4cc84fe8b139743dcf20b46eec5fece3, b63b7170f758c26016d46092ea5dc90fea1337fb.
+
+**Статус:** CI для task-identity hardening ещё не получен. Live G1 не запускался. Raw manifests, data/ и ветка master не изменялись.
