@@ -196,6 +196,7 @@ def _validate_manifest(document: dict[str, Any]) -> tuple[bool, str, dict[str, A
     repeat_index = expected["repeat_index"]
     radius = expected["requested_radius"]
     expected_strokes = expected["expected_strokes"]
+    signature = expected["geometry_signature"]
     if document.get("test_case") != scenario_id:
         return False, "scenario_mismatch", None
     if document.get("brush_value_requested") != radius:
