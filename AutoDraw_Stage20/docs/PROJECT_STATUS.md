@@ -63,7 +63,7 @@ INT-002 завершена: определены контракт ресурсн
 
 Рабочая ветка: `feature/image-geometry-optimization`. Ветка `master` не изменяется и используется только для чтения игрового bundle.
 
-Первичные данные завершённой CHALK-матрицы добавлены коммитом [e2af4d0a69e2bd89b610b58678e20e86475cb8d0](https://github.com/Kiddos19882/AutoDraw/commit/e2af4d0a69e2bd89b610b58678e20e86475cb8d0). После него добавлены результаты и обновлена документация; последний известный HEAD на момент записи — `01b867a891dd04b30abf01bb273b67d0d88fcac4`. GitHub Actions для последних документационных коммитов ещё выполняется; не объявлять его успешным до завершения последнего workflow run.
+Первичные данные завершённой CHALK-матрицы добавлены коммитом [e2af4d0a69e2bd89b610b58678e20e86475cb8d0](https://github.com/Kiddos19882/AutoDraw/commit/e2af4d0a69e2bd89b610b58678e20e86475cb8d0). После него созданы отчёт результатов `docs/CHALK_RADIUS_MATRIX_RESULTS.md`, закрыт `CHALK_RADIUS_MATRIX_PLAN.md` и добавлен активный `CHALK_GEOMETRY_MATRIX_PLAN.md`. Последние изменения документации находятся в той же рабочей ветке; GitHub Actions для последних commits ещё выполняется, не объявлять CI успешным до завершения latest workflow run.
 
 ## 7. Состояние документации
 
