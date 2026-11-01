@@ -28,7 +28,7 @@ Game Monitor 0.2.1 читает точный счётчик через `BoardPan
 
 INT-002 завершена: определены контракт ресурсного snapshot и протокол baseline/delta. INT-003 частично подтверждена в живом браузере: точный счётчик и события доступны. Она остаётся IN_PROGRESS до A/B/C сравнения Monitor off / 0.1.2 / 0.2.1 и численной оценки overhead/FPS. INT-004 получила live-подтверждение транспорта, RunRecorder, корреляции executor-window и записи monitor report в experiment manifest на серии из 21 валидного прогона семи радиусов. Ошибка Windows `PermissionError` при сохранении session.json обработана ограниченными повторами атомарной замены; live-повтор радиуса 10 прошёл без сбоев по подтверждению пользователя.
 
-Преобразование logical→screen реализовано и покрыто unit/integration-тестами. Матрица CHALK для радиусов 1–30 завершена (21/21 валидных измерений); план `CHALK_RADIUS_MATRIX_PLAN.md` закрыт. Следующий активный план — `CHALK_GEOMETRY_MATRIX_PLAN.md`: G1 (длина/направление/короткие штрихи, 12 прогонов), G2 (сегментация/повороты/перекрытие, 18), G3 (скорость/sampling, 27). До live-прогонов требуется универсальная metadata/analyzer и per-stroke aggregation; затем автоматические тесты и CI. Не переносить вывод о радиусе из длинных прямых линий на другие типы траекторий.
+Преобразование logical→screen реализовано и покрыто unit/integration-тестами. Матрица CHALK для радиусов 1–30 завершена (21/21 валидных измерений); план `CHALK_RADIUS_MATRIX_PLAN.md` закрыт. Следующий активный план — `CHALK_GEOMETRY_MATRIX_PLAN.md`: G1 (длина/направление/короткие штрихи, 12 прогонов), G2 (сегментация/повороты/перекрытие, 18), G3 (скорость/sampling, 27). Универсальная metadata/analyzer, проверка per-stroke aggregation, автоматические тесты и CI завершены. Commit `8e7b2f8e8c4a65bbbb2d4c6a1a2a603e752fefff` прошёл workflow `41256989852`: все три jobs (`geometry-tests`, `executor-tests`, `Windows portable build and startup smoke-test`) завершились успешно. Текущий gate — локальная подготовка и live G1; до получения 12 валидных экспериментов G2/G3 не запускать. Не переносить вывод о радиусе из длинных прямых линий на другие типы траекторий.
 
 ## 4. Разрешения и границы работ
 
@@ -63,7 +63,7 @@ INT-002 завершена: определены контракт ресурсн
 
 Рабочая ветка: `feature/image-geometry-optimization`. Ветка `master` не изменяется и используется только для чтения игрового bundle.
 
-Первичные данные завершённой CHALK-матрицы добавлены коммитом [e2af4d0a69e2bd89b610b58678e20e86475cb8d0](https://github.com/Kiddos19882/AutoDraw/commit/e2af4d0a69e2bd89b610b58678e20e86475cb8d0). После него созданы отчёт результатов `docs/CHALK_RADIUS_MATRIX_RESULTS.md`, закрыт `CHALK_RADIUS_MATRIX_PLAN.md` и добавлен активный `CHALK_GEOMETRY_MATRIX_PLAN.md`. Последние изменения документации находятся в той же рабочей ветке; GitHub Actions для последних commits ещё выполняется, не объявлять CI успешным до завершения latest workflow run.
+Первичные данные завершённой CHALK-матрицы добавлены коммитом [e2af4d0a69e2bd89b610b58678e20e86475cb8d0](https://github.com/Kiddos19882/AutoDraw/commit/e2af4d0a69e2bd89b610b58678e20e86475cb8d0). После него созданы отчёт результатов `docs/CHALK_RADIUS_MATRIX_RESULTS.md`, закрыт `CHALK_RADIUS_MATRIX_PLAN.md` и добавлен активный `CHALK_GEOMETRY_MATRIX_PLAN.md`. Последний проверенный HEAD на момент фиксации: `8e7b2f8e8c4a65bbbb2d4c6a1a2a603e752fefff`. GitHub Actions workflow `41256989852` завершён успешно; все три jobs имеют conclusion `success`.
 
 ## 7. Состояние документации
 

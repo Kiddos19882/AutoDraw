@@ -1,6 +1,6 @@
 # План измерения расхода CHALK по геометрии и режиму ввода
 
-**Статус:** ACTIVE — подготовка следующей серии после завершённой radius matrix.  
+**Статус:** READY FOR LIVE G1 — инфраструктура, автоматические тесты и CI завершены; ожидается запуск 12 пользовательских live-экспериментов.  
 **Дата:** 1 ноября 2026 г.  
 **Предыдущая серия:** `chalk-20261101-023127-b85dbb`, 21/21 валидных прогонов.  
 **Ветка:** `feature/image-geometry-optimization`.
@@ -107,9 +107,13 @@ Analyzer должен:
 
 ## 7. Порядок выполнения и gates
 
-1. Реализовать универсальные matrix metadata и analyzer; добавить unit/regression tests.
-2. Пройти автоматические тесты и GitHub Actions.
-3. Подготовить локальную сборку и выполнить G1 (12 экспериментов).
+**Текущее состояние на 2026-11-01:** пункты 1–2 завершены. Универсальные matrix metadata, analyzer, per-stroke validation и regression tests добавлены. Исправление `NameError` в validated geometry signature прошло GitHub Actions на commit `8e7b2f8e8c4a65bbbb2d4c6a1a2a603e752fefff`; workflow run `41256989852` завершён со статусом `success`, все три jobs успешны (`geometry-tests`, `executor-tests`, `Windows portable build and startup smoke-test`). Ветка на момент проверки указывает на этот commit.
+
+Следующий gate — локальная подготовка и live G1. Автоматический CI не заменяет проверку в реальном игровом iframe и не подтверждает расход CHALK в браузере.
+
+1. Реализовать универсальные matrix metadata и analyzer; добавить unit/regression tests. **ЗАВЕРШЕНО.**
+2. Пройти автоматические тесты и GitHub Actions. **ЗАВЕРШЕНО на commit `8e7b2f8e8c4a65bbbb2d4c6a1a2a603e752fefff`, workflow `41256989852`.**
+3. Подготовить локальную сборку и выполнить G1 (12 экспериментов). **ОЖИДАЕТ live-запуска.**
 4. Проверить полноту stroke-level агрегации и сделать выводы G1.
 5. Только затем открыть G2 (18 экспериментов).
 6. После анализа G2 открыть G3 (27 экспериментов).

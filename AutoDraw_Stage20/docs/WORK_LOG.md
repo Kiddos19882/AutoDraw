@@ -1271,3 +1271,12 @@ Run JSON дополнен `stroke_count`, суммой `sampled_point_delta_tota
 Итого план содержит 57 экспериментов с последовательными gates. Перед браузерной серией нужно расширить matrix metadata за пределы единственного radius-сценария и реализовать проверку per-stroke CHALK по `strokeId`; сумма per-stroke `pointDelta` должна совпадать с точным общим engine counter. Если полнота телеметрии не подтверждается, разбивка по штрихам должна оставаться incomplete и не использоваться для формулы.
 
 План связан в `docs/README.md` и установлен активным следующим этапом в `docs/PROJECT_STATUS.md`. Live-запуски G1 пока не начинались.
+
+
+## 2026-11-01 — инфраструктура CHALK geometry matrix прошла CI
+
+Исправлена ошибка `NameError` при формировании matrix record: validated `geometry_signature` теперь явно извлекается из проверенных metadata перед записью. Источник значения — повторно построенные и валидированные ожидаемые metadata, а не произвольное поле входного документа.
+
+**Проверка:** commit `8e7b2f8e8c4a65bbbb2d4c6a1a2a603e752fefff`; GitHub Actions workflow run `41256989852` завершён `completed/success`. Успешны все jobs: `geometry-tests`, `executor-tests`, `Windows portable build and startup smoke-test`. Ветка `feature/image-geometry-optimization` на момент проверки указывала на этот commit.
+
+**Статус серии:** инфраструктура G1/G2, analyzer, проверка полноты per-stroke breakdown и автоматическая проверка завершены. G1 готова к live-сбору после обновления локальной ветки и запуска AutoDraw, Game Monitor Bridge и игрового iframe. Ни один G1 live experiment этой записью не считается выполненным. G2 и G3 остаются закрытыми до анализа предыдущих серий.
