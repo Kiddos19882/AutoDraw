@@ -1162,6 +1162,26 @@ class BrushBehaviorTestTab:
                 parent=self.root,
             )
             return
+        if platform.system() != "Windows":
+            messagebox.showwarning(
+                "Платформа не поддерживается",
+                "Автоматический блок требует Windows для калиброванного перетаскивания ползунка кисти.",
+                parent=self.root,
+            )
+            return
+        brush_control = self.get_brush_control() if callable(self.get_brush_control) else None
+        if (
+            not isinstance(brush_control, dict)
+            or brush_control.get("mode") != "slider"
+            or not brush_control.get("start")
+            or not brush_control.get("end")
+        ):
+            messagebox.showwarning(
+                "Ползунок кисти не откалиброван",
+                "До запуска блока требуется сохранённый профиль расширенного ползунка 1–30 с обеими крайними координатами.",
+                parent=self.root,
+            )
+            return
         if self._read_live_brush_radius() is None:
             messagebox.showwarning(
                 "Game Monitor не подключён",
