@@ -1,0 +1,687 @@
+{
+  "schema_version": 1,
+  "record_type": "autodraw_brush_paint_experiment",
+  "experiment_id": "8b6c48423d9b40c6b3308763ba6971e3",
+  "chalk_radius_matrix": null,
+  "chalk_experiment_matrix": {
+    "schema_version": 1,
+    "series_id": "chalk-20261101-084732-a5c2cf",
+    "phase_id": "G2",
+    "scenario_id": "continuous_closed_contour",
+    "repeat_index": 2,
+    "matrix_order_index": 1,
+    "planned_repeats": 3,
+    "requested_radius": 10,
+    "expected_strokes": 2,
+    "geometry_signature": "aa767441137adb0599d452b1ac23373486fe4729e6c34ad71d0a7b7d7899df31",
+    "planned_strokes": [
+      {
+        "closed": false,
+        "metadata": {
+          "line_extension_px_override": 0.0,
+          "role": "brush_behavior_test",
+          "test_case": "continuous_closed_contour"
+        },
+        "name": "closed_rectangle_path",
+        "points": [
+          {
+            "x": 35.0,
+            "y": 35.0
+          },
+          {
+            "x": 205.0,
+            "y": 35.0
+          },
+          {
+            "x": 205.0,
+            "y": 155.0
+          },
+          {
+            "x": 35.0,
+            "y": 155.0
+          },
+          {
+            "x": 35.0,
+            "y": 35.0
+          }
+        ]
+      },
+      {
+        "closed": false,
+        "metadata": {
+          "line_extension_px_override": 0.0,
+          "role": "brush_behavior_test",
+          "test_case": "continuous_closed_contour"
+        },
+        "name": "closed_triangle_path",
+        "points": [
+          {
+            "x": 255.0,
+            "y": 45.0
+          },
+          {
+            "x": 365.0,
+            "y": 165.0
+          },
+          {
+            "x": 145.0,
+            "y": 165.0
+          },
+          {
+            "x": 255.0,
+            "y": 45.0
+          }
+        ]
+      }
+    ],
+    "executor_parameters": {
+      "point_step_px": 2,
+      "line_extension_px": 0,
+      "point_delay_ms": 10,
+      "after_mouse_up_ms": 20,
+      "before_mouse_down_ms": 20,
+      "after_mouse_down_ms": 40,
+      "end_hold_ms": 50,
+      "countdown_seconds": 5
+    }
+  },
+  "chalk_test_block": {
+    "block_id": "64d2e366053543b1bf4393f87fd8b214",
+    "task_id": "continuous_closed_contour-r2",
+    "phase_id": "G2"
+  },
+  "updated_at_utc": "2026-11-01T05:49:57+00:00",
+  "test_case": "continuous_closed_contour",
+  "brush_value_requested": 10,
+  "drawing_plan_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\brush-plan-continuous_closed_contour-b10-20261101-084915-8b6c4842.json",
+  "execution_report_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\execution_20261101_084948_155797_454aeb.json",
+  "execution_report": {
+    "status": "completed",
+    "completed_strokes": 2,
+    "total_strokes": 2,
+    "started_at": "2026-11-01T08:49:31+03:00",
+    "ended_at": "2026-11-01T08:49:48+03:00",
+    "duration_seconds": 16.657,
+    "move_calls": 715,
+    "error": null,
+    "stop_reason": null,
+    "mouse_release": {
+      "attempted": true,
+      "succeeded": true,
+      "errors": []
+    },
+    "executor_config": {
+      "point_step_px": 2.0,
+      "line_extension_px": 0.0,
+      "point_delay_ms": 10,
+      "after_mouse_up_ms": 20,
+      "before_mouse_down_ms": 20,
+      "after_mouse_down_ms": 40,
+      "end_hold_ms": 50,
+      "countdown_seconds": 5
+    }
+  },
+  "game_monitor_report_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261101-084916-b10-continuous_closed_contour-8b6c4842\\monitor_report.json",
+  "game_monitor_summary": {
+    "source": "loopback_websocket_bridge",
+    "autodraw_experiment_id": "8b6c48423d9b40c6b3308763ba6971e3",
+    "chalk_radius_matrix": null,
+    "chalk_experiment_matrix": {
+      "schema_version": 1,
+      "series_id": "chalk-20261101-084732-a5c2cf",
+      "phase_id": "G2",
+      "scenario_id": "continuous_closed_contour",
+      "repeat_index": 2,
+      "matrix_order_index": 1,
+      "planned_repeats": 3,
+      "requested_radius": 10,
+      "expected_strokes": 2,
+      "geometry_signature": "aa767441137adb0599d452b1ac23373486fe4729e6c34ad71d0a7b7d7899df31",
+      "planned_strokes": [
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "continuous_closed_contour"
+          },
+          "name": "closed_rectangle_path",
+          "points": [
+            {
+              "x": 35.0,
+              "y": 35.0
+            },
+            {
+              "x": 205.0,
+              "y": 35.0
+            },
+            {
+              "x": 205.0,
+              "y": 155.0
+            },
+            {
+              "x": 35.0,
+              "y": 155.0
+            },
+            {
+              "x": 35.0,
+              "y": 35.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "continuous_closed_contour"
+          },
+          "name": "closed_triangle_path",
+          "points": [
+            {
+              "x": 255.0,
+              "y": 45.0
+            },
+            {
+              "x": 365.0,
+              "y": 165.0
+            },
+            {
+              "x": 145.0,
+              "y": 165.0
+            },
+            {
+              "x": 255.0,
+              "y": 45.0
+            }
+          ]
+        }
+      ],
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      }
+    },
+    "run_id": "f66094de-e27a-4a24-8ddf-fc55fe924e1b",
+    "session_id": "8744aeac-91bd-4309-981f-7bab5486904c",
+    "execution_status": "completed",
+    "brush_radius": 10,
+    "observed_brush_radii": [
+      10.0
+    ],
+    "brush_radius_status": "single",
+    "chalk": {
+      "status": "exact",
+      "consumed_points": 337,
+      "pre_point_count": 1,
+      "post_point_count": 338,
+      "max_points": 6000
+    },
+    "sampled_point_delta_total": 337,
+    "point_delta_matches_chalk": true,
+    "stroke_count": 2,
+    "frame_probe": {
+      "status": "measured",
+      "frame_count": 681,
+      "average_fps": 59.639,
+      "median_fps": 60.024,
+      "median_interval_ms": 16.66,
+      "p95_interval_ms": 16.68,
+      "max_interval_ms": 33.34,
+      "visibility_interruption": false,
+      "stroke_probe_count": 2
+    },
+    "trajectory": {
+      "observed_segment_length_lower_bound": 1142.2999,
+      "accepted_sample_count": 337,
+      "status": "incomplete_until_verified",
+      "note": "Coalesced pointDelta values mean intermediate accepted coordinates may be missing."
+    },
+    "event_count": 680,
+    "dropped_events": 0,
+    "monitor_dropped_events": 0,
+    "monitor_error_count": 0,
+    "started_at_utc": "2026-11-01T05:49:36.646+00:00",
+    "finished_at_utc": "2026-11-01T05:49:51.482+00:00"
+  },
+  "monitor_capture": {
+    "status": "saved",
+    "transport": "loopback_websocket",
+    "match_reason": "matched_executor_window",
+    "experiment_id": "8b6c48423d9b40c6b3308763ba6971e3",
+    "chalk_radius_matrix": null,
+    "chalk_experiment_matrix": {
+      "schema_version": 1,
+      "series_id": "chalk-20261101-084732-a5c2cf",
+      "phase_id": "G2",
+      "scenario_id": "continuous_closed_contour",
+      "repeat_index": 2,
+      "matrix_order_index": 1,
+      "planned_repeats": 3,
+      "requested_radius": 10,
+      "expected_strokes": 2,
+      "geometry_signature": "aa767441137adb0599d452b1ac23373486fe4729e6c34ad71d0a7b7d7899df31",
+      "planned_strokes": [
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "continuous_closed_contour"
+          },
+          "name": "closed_rectangle_path",
+          "points": [
+            {
+              "x": 35.0,
+              "y": 35.0
+            },
+            {
+              "x": 205.0,
+              "y": 35.0
+            },
+            {
+              "x": 205.0,
+              "y": 155.0
+            },
+            {
+              "x": 35.0,
+              "y": 155.0
+            },
+            {
+              "x": 35.0,
+              "y": 35.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "continuous_closed_contour"
+          },
+          "name": "closed_triangle_path",
+          "points": [
+            {
+              "x": 255.0,
+              "y": 45.0
+            },
+            {
+              "x": 365.0,
+              "y": 165.0
+            },
+            {
+              "x": 145.0,
+              "y": 165.0
+            },
+            {
+              "x": 255.0,
+              "y": 45.0
+            }
+          ]
+        }
+      ],
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      }
+    },
+    "session_id": "8744aeac-91bd-4309-981f-7bab5486904c",
+    "run_id": "f66094de-e27a-4a24-8ddf-fc55fe924e1b",
+    "source_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\game_monitor_bridge\\8744aeac-91bd-4309-981f-7bab5486904c\\game-monitor-run-20261101T054951482554Z-f66094de.json",
+    "report_path": "monitor_report.json",
+    "report_event_count": 680,
+    "dropped_events": 0,
+    "monitor_dropped_events": 0,
+    "monitor_error_count": 0,
+    "stroke_count": 2,
+    "expected_stroke_count": 2,
+    "point_delta_matches_chalk": true,
+    "brush_radius_status": "single",
+    "chalk_status": "exact",
+    "chalk_counter_consistent": true,
+    "captured_at_utc": "2026-11-01T05:49:52.349+00:00"
+  },
+  "calibration_profile_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\brush_paint_calibration.json",
+  "phases": {
+    "before_clear": {
+      "status": "restored_within_pixel_tolerance",
+      "board_clear_check": {
+        "status": "restored_within_pixel_tolerance",
+        "tolerance_percent": 0.15,
+        "changed_percent": 0.1047,
+        "comparison": {
+          "width": 581,
+          "height": 304,
+          "total_pixels": 176624,
+          "changed_pixels": 185,
+          "changed_percent": 0.1047,
+          "pixel_similarity_percent": 99.8953,
+          "mean_absolute_rgb_difference": 0.0939,
+          "exact_match": false,
+          "interpretation": "visual_pixel_comparison_only_not_a_reading_of_the_game_resource_counter"
+        },
+        "reference_type": "explicit_blank_board_roi",
+        "note": "Визуальное совпадение с отдельно сохранённым эталоном пустой доски; это не доказательство внутреннего состояния игры."
+      },
+      "captured_at_utc": "2026-11-01T05:49:20+00:00",
+      "screen_size": {
+        "width": 1920,
+        "height": 1080
+      },
+      "files": {
+        "full_screen": "before_clear-screen.png",
+        "board_roi": "before_clear-board.png",
+        "paint_meter_roi": "before_clear-paint-meter.png"
+      }
+    },
+    "before_draw": {
+      "captured_at_utc": "2026-11-01T05:49:20+00:00",
+      "screen_size": {
+        "width": 1920,
+        "height": 1080
+      },
+      "clear_check": {
+        "status": "restored_within_pixel_tolerance",
+        "tolerance_percent": 0.15,
+        "changed_percent": 0.1047,
+        "comparison": {
+          "width": 581,
+          "height": 304,
+          "total_pixels": 176624,
+          "changed_pixels": 185,
+          "changed_percent": 0.1047,
+          "pixel_similarity_percent": 99.8953,
+          "mean_absolute_rgb_difference": 0.0939,
+          "exact_match": false,
+          "interpretation": "visual_pixel_comparison_only_not_a_reading_of_the_game_resource_counter"
+        },
+        "reference_type": "explicit_blank_board_roi",
+        "note": "Визуальное совпадение с отдельно сохранённым эталоном пустой доски; это не доказательство внутреннего состояния игры."
+      },
+      "files": {
+        "full_screen": "before_clear-screen.png",
+        "board_roi": "before_clear-board.png",
+        "paint_meter_roi": "before_clear-paint-meter.png"
+      }
+    },
+    "brush_setup": {
+      "status": "confirmed_by_monitor_for_automated_block",
+      "requested_value": 10,
+      "observed_value": 10,
+      "verification_source": "active_game_monitor_bridge_heartbeat",
+      "session_id": "8744aeac-91bd-4309-981f-7bab5486904c",
+      "verified_at_utc": "2026-11-01T05:49:28.445+00:00",
+      "final_position": [
+        1250,
+        305
+      ],
+      "correction_count": 1,
+      "observations": [
+        {
+          "requested_radius": 10,
+          "observed_radius": 9,
+          "observed_at_utc": "2026-11-01T05:49:26.444+00:00",
+          "session_id": "8744aeac-91bd-4309-981f-7bab5486904c",
+          "position": [
+            1254,
+            305
+          ]
+        },
+        {
+          "requested_radius": 10,
+          "observed_radius": 10,
+          "observed_at_utc": "2026-11-01T05:49:28.445+00:00",
+          "session_id": "8744aeac-91bd-4309-981f-7bab5486904c",
+          "position": [
+            1250,
+            305
+          ]
+        }
+      ],
+      "visual_confirmation_required": true,
+      "confirmation_method": "game_monitor_exact_radius_plus_user_visual_check",
+      "confirmed_at_utc": "2026-11-01T05:49:28+00:00"
+    },
+    "execution": {
+      "status": "completed",
+      "report_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\execution_20261101_084948_155797_454aeb.json",
+      "summary": {
+        "status": "completed",
+        "completed_strokes": 2,
+        "total_strokes": 2,
+        "started_at": "2026-11-01T08:49:31+03:00",
+        "ended_at": "2026-11-01T08:49:48+03:00",
+        "duration_seconds": 16.657,
+        "move_calls": 715,
+        "error": null,
+        "stop_reason": null,
+        "mouse_release": {
+          "attempted": true,
+          "succeeded": true,
+          "errors": []
+        },
+        "executor_config": {
+          "point_step_px": 2.0,
+          "line_extension_px": 0.0,
+          "point_delay_ms": 10,
+          "after_mouse_up_ms": 20,
+          "before_mouse_down_ms": 20,
+          "after_mouse_down_ms": 40,
+          "end_hold_ms": 50,
+          "countdown_seconds": 5
+        }
+      },
+      "captured_at_utc": "2026-11-01T05:49:48+00:00"
+    },
+    "monitor_capture": {
+      "status": "saved",
+      "transport": "loopback_websocket",
+      "match_reason": "matched_executor_window",
+      "experiment_id": "8b6c48423d9b40c6b3308763ba6971e3",
+      "chalk_radius_matrix": null,
+      "chalk_experiment_matrix": {
+        "schema_version": 1,
+        "series_id": "chalk-20261101-084732-a5c2cf",
+        "phase_id": "G2",
+        "scenario_id": "continuous_closed_contour",
+        "repeat_index": 2,
+        "matrix_order_index": 1,
+        "planned_repeats": 3,
+        "requested_radius": 10,
+        "expected_strokes": 2,
+        "geometry_signature": "aa767441137adb0599d452b1ac23373486fe4729e6c34ad71d0a7b7d7899df31",
+        "planned_strokes": [
+          {
+            "closed": false,
+            "metadata": {
+              "line_extension_px_override": 0.0,
+              "role": "brush_behavior_test",
+              "test_case": "continuous_closed_contour"
+            },
+            "name": "closed_rectangle_path",
+            "points": [
+              {
+                "x": 35.0,
+                "y": 35.0
+              },
+              {
+                "x": 205.0,
+                "y": 35.0
+              },
+              {
+                "x": 205.0,
+                "y": 155.0
+              },
+              {
+                "x": 35.0,
+                "y": 155.0
+              },
+              {
+                "x": 35.0,
+                "y": 35.0
+              }
+            ]
+          },
+          {
+            "closed": false,
+            "metadata": {
+              "line_extension_px_override": 0.0,
+              "role": "brush_behavior_test",
+              "test_case": "continuous_closed_contour"
+            },
+            "name": "closed_triangle_path",
+            "points": [
+              {
+                "x": 255.0,
+                "y": 45.0
+              },
+              {
+                "x": 365.0,
+                "y": 165.0
+              },
+              {
+                "x": 145.0,
+                "y": 165.0
+              },
+              {
+                "x": 255.0,
+                "y": 45.0
+              }
+            ]
+          }
+        ],
+        "executor_parameters": {
+          "point_step_px": 2,
+          "line_extension_px": 0,
+          "point_delay_ms": 10,
+          "after_mouse_up_ms": 20,
+          "before_mouse_down_ms": 20,
+          "after_mouse_down_ms": 40,
+          "end_hold_ms": 50,
+          "countdown_seconds": 5
+        }
+      },
+      "session_id": "8744aeac-91bd-4309-981f-7bab5486904c",
+      "run_id": "f66094de-e27a-4a24-8ddf-fc55fe924e1b",
+      "source_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\game_monitor_bridge\\8744aeac-91bd-4309-981f-7bab5486904c\\game-monitor-run-20261101T054951482554Z-f66094de.json",
+      "report_path": "monitor_report.json",
+      "report_event_count": 680,
+      "dropped_events": 0,
+      "monitor_dropped_events": 0,
+      "monitor_error_count": 0,
+      "stroke_count": 2,
+      "expected_stroke_count": 2,
+      "point_delta_matches_chalk": true,
+      "brush_radius_status": "single",
+      "chalk_status": "exact",
+      "chalk_counter_consistent": true,
+      "captured_at_utc": "2026-11-01T05:49:52.349+00:00"
+    },
+    "after_draw": {
+      "status": "captured",
+      "captured_at_utc": "2026-11-01T05:49:52+00:00",
+      "screen_size": {
+        "width": 1920,
+        "height": 1080
+      },
+      "files": {
+        "full_screen": "after_draw-screen.png",
+        "board_roi": "after_draw-board.png",
+        "paint_meter_roi": "after_draw-paint-meter.png"
+      },
+      "paint_meter_measurement": {
+        "bar_width_px": 160,
+        "changed_columns": 9,
+        "color_distance_threshold": 24.0,
+        "method": "baseline_color_suffix_estimate",
+        "interpretation": "estimate_only_not_game_counter_or_OCR",
+        "status": "inconclusive",
+        "filled_width_px": null,
+        "fill_fraction": null,
+        "fill_percent": null,
+        "confidence": "low",
+        "note": "Изменения не образуют достаточно чёткую непрерывную правую часть шкалы."
+      },
+      "stroke_visibility_analysis": {
+        "status": "analyzed",
+        "stroke_count": 2,
+        "visible_change_count": 0,
+        "no_change_count": 0,
+        "ambiguous_count": 2,
+        "results": [
+          {
+            "name": "closed_rectangle_path",
+            "status": "ambiguous_overlap",
+            "changed_pixels_in_roi": 10951,
+            "roi": {
+              "x": 33,
+              "y": 33,
+              "width": 238,
+              "height": 175
+            },
+            "overlapping_stroke_indices": [
+              1
+            ],
+            "interpretation": "visual_roi_heuristic_not_game_acceptance"
+          },
+          {
+            "name": "closed_triangle_path",
+            "status": "ambiguous_overlap",
+            "changed_pixels_in_roi": 12615,
+            "roi": {
+              "x": 171,
+              "y": 45,
+              "width": 302,
+              "height": 176
+            },
+            "overlapping_stroke_indices": [
+              0
+            ],
+            "interpretation": "visual_roi_heuristic_not_game_acceptance"
+          }
+        ],
+        "note": "ROI могут включать эффекты кисти и фон; пересекающиеся ROI помечаются неоднозначными.",
+        "reference_file": "blank-board-reference.png",
+        "padding_px": 11,
+        "requested_brush_value": 10
+      }
+    },
+    "postdraw_workflow": {
+      "status": "completed",
+      "reason": "Результат сохранён; автоматическая очистка отключена, рисунок оставлен на доске.",
+      "finished_at_utc": "2026-11-01T05:49:52+00:00"
+    },
+    "restore_brush_30": {
+      "status": "drag_completed_unverified",
+      "requested_value": 30,
+      "finished_at_utc": "2026-11-01T05:49:57+00:00",
+      "note": "Жест перетаскивания к позиции кисти 30 завершён; значение необходимо проверить в игре.",
+      "drag_start": [
+        1254,
+        305
+      ],
+      "drag_target": [
+        1168,
+        305
+      ]
+    }
+  },
+  "interpretation_limits": [
+    "Meter fill is a provisional image estimate, not a direct read of the game's internal resource counter.",
+    "A successful executor report does not prove every stroke was registered by the game.",
+    "Execution status and visual evidence are recorded separately."
+  ]
+}

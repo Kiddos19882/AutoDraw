@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "name": "Brush behavior test — short_strokes",
-  "created_at": "2026-11-01T05:06:31+00:00",
+  "name": "Brush behavior test — long_isolated_lines",
+  "created_at": "2026-11-01T06:01:39+00:00",
   "coordinate_system": "local_canvas_pixels",
   "canvas": {
     "width": 581,
@@ -11,179 +11,160 @@
   "height": 304,
   "strokes": [
     {
-      "name": "length_0",
+      "name": "horizontal_100",
       "points": [
         {
-          "x": 18.91304347826087,
-          "y": 25.25
+          "x": 25.217391304347828,
+          "y": 22.724999999999998
         },
         {
-          "x": 18.91304347826087,
-          "y": 25.25
+          "x": 151.30434782608697,
+          "y": 22.724999999999998
         }
       ],
       "closed": false,
       "metadata": {
         "role": "brush_behavior_test",
-        "test_case": "short_strokes",
+        "test_case": "long_isolated_lines",
         "line_extension_px_override": 0.0
       }
     },
     {
-      "name": "length_1",
+      "name": "horizontal_200",
       "points": [
         {
-          "x": 44.130434782608695,
-          "y": 25.25
+          "x": 25.217391304347828,
+          "y": 68.175
         },
         {
-          "x": 45.391304347826086,
-          "y": 25.25
+          "x": 277.3913043478261,
+          "y": 68.175
         }
       ],
       "closed": false,
       "metadata": {
         "role": "brush_behavior_test",
-        "test_case": "short_strokes",
+        "test_case": "long_isolated_lines",
         "line_extension_px_override": 0.0
       }
     },
     {
-      "name": "length_2",
+      "name": "horizontal_300",
+      "points": [
+        {
+          "x": 25.217391304347828,
+          "y": 113.625
+        },
+        {
+          "x": 403.47826086956525,
+          "y": 113.625
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "long_isolated_lines",
+        "line_extension_px_override": 0.0
+      }
+    },
+    {
+      "name": "horizontal_400",
+      "points": [
+        {
+          "x": 25.217391304347828,
+          "y": 159.075
+        },
+        {
+          "x": 529.5652173913044,
+          "y": 159.075
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "long_isolated_lines",
+        "line_extension_px_override": 0.0
+      }
+    },
+    {
+      "name": "vertical_100",
       "points": [
         {
           "x": 69.34782608695653,
-          "y": 25.25
+          "y": 22.724999999999998
         },
         {
-          "x": 71.86956521739131,
-          "y": 25.25
+          "x": 69.34782608695653,
+          "y": 148.975
         }
       ],
       "closed": false,
       "metadata": {
         "role": "brush_behavior_test",
-        "test_case": "short_strokes",
+        "test_case": "long_isolated_lines",
         "line_extension_px_override": 0.0
       }
     },
     {
-      "name": "length_3",
-      "points": [
-        {
-          "x": 94.56521739130436,
-          "y": 25.25
-        },
-        {
-          "x": 98.34782608695653,
-          "y": 25.25
-        }
-      ],
-      "closed": false,
-      "metadata": {
-        "role": "brush_behavior_test",
-        "test_case": "short_strokes",
-        "line_extension_px_override": 0.0
-      }
-    },
-    {
-      "name": "length_5",
-      "points": [
-        {
-          "x": 119.78260869565217,
-          "y": 25.25
-        },
-        {
-          "x": 126.08695652173914,
-          "y": 25.25
-        }
-      ],
-      "closed": false,
-      "metadata": {
-        "role": "brush_behavior_test",
-        "test_case": "short_strokes",
-        "line_extension_px_override": 0.0
-      }
-    },
-    {
-      "name": "length_8",
+      "name": "vertical_180",
       "points": [
         {
           "x": 145.0,
-          "y": 25.25
+          "y": 22.724999999999998
         },
         {
-          "x": 155.08695652173913,
-          "y": 25.25
+          "x": 145.0,
+          "y": 249.975
         }
       ],
       "closed": false,
       "metadata": {
         "role": "brush_behavior_test",
-        "test_case": "short_strokes",
-        "line_extension_px_override": 0.0
-      }
-    },
-    {
-      "name": "length_10",
-      "points": [
-        {
-          "x": 170.21739130434784,
-          "y": 25.25
-        },
-        {
-          "x": 182.82608695652175,
-          "y": 25.25
-        }
-      ],
-      "closed": false,
-      "metadata": {
-        "role": "brush_behavior_test",
-        "test_case": "short_strokes",
+        "test_case": "long_isolated_lines",
         "line_extension_px_override": 0.0
       }
     }
   ],
   "generation": {
     "method": "manual_brush_behavior_test",
-    "test_case": "short_strokes",
+    "test_case": "long_isolated_lines",
     "brush_value_must_be_set_manually": true,
     "note": "Set the requested brush size in the browser before executing this plan.",
-    "experiment_id": "3c38f12d22e44f7382234f35c412496c",
+    "experiment_id": "ef9e63e32d524280a1206d3cd5fc4f29",
     "requested_brush_value": 10,
     "chalk_test_block": {
-      "block_id": "c4493b5807a54d3587391b0a1e934512",
-      "task_id": "short_strokes-r3",
-      "phase_id": "G1"
+      "block_id": "64d2e366053543b1bf4393f87fd8b214",
+      "task_id": "long_isolated_lines-r3",
+      "phase_id": "G2"
     },
     "chalk_experiment_matrix": {
       "schema_version": 1,
-      "series_id": "chalk-20261101-080012-4d6add",
-      "phase_id": "G1",
-      "scenario_id": "short_strokes",
+      "series_id": "chalk-20261101-084732-a5c2cf",
+      "phase_id": "G2",
+      "scenario_id": "long_isolated_lines",
       "repeat_index": 3,
-      "matrix_order_index": 12,
+      "matrix_order_index": 18,
       "planned_repeats": 3,
       "requested_radius": 10,
-      "expected_strokes": 7,
-      "geometry_signature": "6f09fda6e3721ed6d042a15c99ab5a93a870c36fc672934ced1272a44ed9fc8d",
+      "expected_strokes": 6,
+      "geometry_signature": "f44b3367a726644a51640f1f311395d283aaafc4a6c926587765d68ebc7f3126",
       "planned_strokes": [
         {
           "closed": false,
           "metadata": {
             "line_extension_px_override": 0.0,
             "role": "brush_behavior_test",
-            "test_case": "short_strokes"
+            "test_case": "long_isolated_lines"
           },
-          "name": "length_0",
+          "name": "horizontal_100",
           "points": [
             {
-              "x": 15.0,
-              "y": 20.0
+              "x": 20.0,
+              "y": 18.0
             },
             {
-              "x": 15.0,
-              "y": 20.0
+              "x": 120.0,
+              "y": 18.0
             }
           ]
         },
@@ -192,17 +173,17 @@
           "metadata": {
             "line_extension_px_override": 0.0,
             "role": "brush_behavior_test",
-            "test_case": "short_strokes"
+            "test_case": "long_isolated_lines"
           },
-          "name": "length_1",
+          "name": "horizontal_200",
           "points": [
             {
-              "x": 35.0,
-              "y": 20.0
+              "x": 20.0,
+              "y": 54.0
             },
             {
-              "x": 36.0,
-              "y": 20.0
+              "x": 220.0,
+              "y": 54.0
             }
           ]
         },
@@ -211,17 +192,55 @@
           "metadata": {
             "line_extension_px_override": 0.0,
             "role": "brush_behavior_test",
-            "test_case": "short_strokes"
+            "test_case": "long_isolated_lines"
           },
-          "name": "length_2",
+          "name": "horizontal_300",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 90.0
+            },
+            {
+              "x": 320.0,
+              "y": 90.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "long_isolated_lines"
+          },
+          "name": "horizontal_400",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 126.0
+            },
+            {
+              "x": 420.0,
+              "y": 126.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "long_isolated_lines"
+          },
+          "name": "vertical_100",
           "points": [
             {
               "x": 55.0,
-              "y": 20.0
+              "y": 18.0
             },
             {
-              "x": 57.0,
-              "y": 20.0
+              "x": 55.0,
+              "y": 118.0
             }
           ]
         },
@@ -230,74 +249,17 @@
           "metadata": {
             "line_extension_px_override": 0.0,
             "role": "brush_behavior_test",
-            "test_case": "short_strokes"
+            "test_case": "long_isolated_lines"
           },
-          "name": "length_3",
-          "points": [
-            {
-              "x": 75.0,
-              "y": 20.0
-            },
-            {
-              "x": 78.0,
-              "y": 20.0
-            }
-          ]
-        },
-        {
-          "closed": false,
-          "metadata": {
-            "line_extension_px_override": 0.0,
-            "role": "brush_behavior_test",
-            "test_case": "short_strokes"
-          },
-          "name": "length_5",
-          "points": [
-            {
-              "x": 95.0,
-              "y": 20.0
-            },
-            {
-              "x": 100.0,
-              "y": 20.0
-            }
-          ]
-        },
-        {
-          "closed": false,
-          "metadata": {
-            "line_extension_px_override": 0.0,
-            "role": "brush_behavior_test",
-            "test_case": "short_strokes"
-          },
-          "name": "length_8",
+          "name": "vertical_180",
           "points": [
             {
               "x": 115.0,
-              "y": 20.0
+              "y": 18.0
             },
             {
-              "x": 123.0,
-              "y": 20.0
-            }
-          ]
-        },
-        {
-          "closed": false,
-          "metadata": {
-            "line_extension_px_override": 0.0,
-            "role": "brush_behavior_test",
-            "test_case": "short_strokes"
-          },
-          "name": "length_10",
-          "points": [
-            {
-              "x": 135.0,
-              "y": 20.0
-            },
-            {
-              "x": 145.0,
-              "y": 20.0
+              "x": 115.0,
+              "y": 198.0
             }
           ]
         }
@@ -363,8 +325,8 @@
     }
   },
   "summary": {
-    "stroke_count": 7,
-    "drawing_length_px": 36.57,
-    "pen_up_distance_px": 127.35
+    "stroke_count": 6,
+    "drawing_length_px": 1614.37,
+    "pen_up_distance_px": 1398.42
   }
 }

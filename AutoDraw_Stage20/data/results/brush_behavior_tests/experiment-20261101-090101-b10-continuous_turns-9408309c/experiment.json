@@ -1,0 +1,804 @@
+{
+  "schema_version": 1,
+  "record_type": "autodraw_brush_paint_experiment",
+  "experiment_id": "9408309cb0fc403d8238db039cfc60aa",
+  "chalk_radius_matrix": null,
+  "chalk_experiment_matrix": {
+    "schema_version": 1,
+    "series_id": "chalk-20261101-084732-a5c2cf",
+    "phase_id": "G2",
+    "scenario_id": "continuous_turns",
+    "repeat_index": 1,
+    "matrix_order_index": 17,
+    "planned_repeats": 3,
+    "requested_radius": 10,
+    "expected_strokes": 3,
+    "geometry_signature": "70d7e4bb10ab36a521540e775f7fffe10615b8a73f582d30b7e61aaf88b5cebf",
+    "planned_strokes": [
+      {
+        "closed": false,
+        "metadata": {
+          "line_extension_px_override": 0.0,
+          "role": "brush_behavior_test",
+          "test_case": "continuous_turns"
+        },
+        "name": "right_angle_path",
+        "points": [
+          {
+            "x": 25.0,
+            "y": 25.0
+          },
+          {
+            "x": 115.0,
+            "y": 25.0
+          },
+          {
+            "x": 115.0,
+            "y": 85.0
+          },
+          {
+            "x": 205.0,
+            "y": 85.0
+          }
+        ]
+      },
+      {
+        "closed": false,
+        "metadata": {
+          "line_extension_px_override": 0.0,
+          "role": "brush_behavior_test",
+          "test_case": "continuous_turns"
+        },
+        "name": "acute_turn_path",
+        "points": [
+          {
+            "x": 25.0,
+            "y": 115.0
+          },
+          {
+            "x": 95.0,
+            "y": 165.0
+          },
+          {
+            "x": 155.0,
+            "y": 115.0
+          },
+          {
+            "x": 225.0,
+            "y": 165.0
+          }
+        ]
+      },
+      {
+        "closed": false,
+        "metadata": {
+          "line_extension_px_override": 0.0,
+          "role": "brush_behavior_test",
+          "test_case": "continuous_turns"
+        },
+        "name": "s_curve_path",
+        "points": [
+          {
+            "x": 250.0,
+            "y": 25.0
+          },
+          {
+            "x": 290.0,
+            "y": 55.0
+          },
+          {
+            "x": 250.0,
+            "y": 85.0
+          },
+          {
+            "x": 290.0,
+            "y": 115.0
+          },
+          {
+            "x": 250.0,
+            "y": 145.0
+          }
+        ]
+      }
+    ],
+    "executor_parameters": {
+      "point_step_px": 2,
+      "line_extension_px": 0,
+      "point_delay_ms": 10,
+      "after_mouse_up_ms": 20,
+      "before_mouse_down_ms": 20,
+      "after_mouse_down_ms": 40,
+      "end_hold_ms": 50,
+      "countdown_seconds": 5
+    }
+  },
+  "chalk_test_block": {
+    "block_id": "64d2e366053543b1bf4393f87fd8b214",
+    "task_id": "continuous_turns-r1",
+    "phase_id": "G2"
+  },
+  "updated_at_utc": "2026-11-01T06:01:39+00:00",
+  "test_case": "continuous_turns",
+  "brush_value_requested": 10,
+  "drawing_plan_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\brush-plan-continuous_turns-b10-20261101-090101-9408309c.json",
+  "execution_report_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\execution_20261101_090131_098940_c582e9.json",
+  "execution_report": {
+    "status": "completed",
+    "completed_strokes": 3,
+    "total_strokes": 3,
+    "started_at": "2026-11-01T09:01:18+03:00",
+    "ended_at": "2026-11-01T09:01:31+03:00",
+    "duration_seconds": 12.594,
+    "move_calls": 443,
+    "error": null,
+    "stop_reason": null,
+    "mouse_release": {
+      "attempted": true,
+      "succeeded": true,
+      "errors": []
+    },
+    "executor_config": {
+      "point_step_px": 2.0,
+      "line_extension_px": 0.0,
+      "point_delay_ms": 10,
+      "after_mouse_up_ms": 20,
+      "before_mouse_down_ms": 20,
+      "after_mouse_down_ms": 40,
+      "end_hold_ms": 50,
+      "countdown_seconds": 5
+    }
+  },
+  "game_monitor_report_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261101-090101-b10-continuous_turns-9408309c\\monitor_report.json",
+  "game_monitor_summary": {
+    "source": "loopback_websocket_bridge",
+    "autodraw_experiment_id": "9408309cb0fc403d8238db039cfc60aa",
+    "chalk_radius_matrix": null,
+    "chalk_experiment_matrix": {
+      "schema_version": 1,
+      "series_id": "chalk-20261101-084732-a5c2cf",
+      "phase_id": "G2",
+      "scenario_id": "continuous_turns",
+      "repeat_index": 1,
+      "matrix_order_index": 17,
+      "planned_repeats": 3,
+      "requested_radius": 10,
+      "expected_strokes": 3,
+      "geometry_signature": "70d7e4bb10ab36a521540e775f7fffe10615b8a73f582d30b7e61aaf88b5cebf",
+      "planned_strokes": [
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "continuous_turns"
+          },
+          "name": "right_angle_path",
+          "points": [
+            {
+              "x": 25.0,
+              "y": 25.0
+            },
+            {
+              "x": 115.0,
+              "y": 25.0
+            },
+            {
+              "x": 115.0,
+              "y": 85.0
+            },
+            {
+              "x": 205.0,
+              "y": 85.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "continuous_turns"
+          },
+          "name": "acute_turn_path",
+          "points": [
+            {
+              "x": 25.0,
+              "y": 115.0
+            },
+            {
+              "x": 95.0,
+              "y": 165.0
+            },
+            {
+              "x": 155.0,
+              "y": 115.0
+            },
+            {
+              "x": 225.0,
+              "y": 165.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "continuous_turns"
+          },
+          "name": "s_curve_path",
+          "points": [
+            {
+              "x": 250.0,
+              "y": 25.0
+            },
+            {
+              "x": 290.0,
+              "y": 55.0
+            },
+            {
+              "x": 250.0,
+              "y": 85.0
+            },
+            {
+              "x": 290.0,
+              "y": 115.0
+            },
+            {
+              "x": 250.0,
+              "y": 145.0
+            }
+          ]
+        }
+      ],
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      }
+    },
+    "run_id": "d74df997-e865-4630-844e-b20f41aa932e",
+    "session_id": "8744aeac-91bd-4309-981f-7bab5486904c",
+    "execution_status": "completed",
+    "brush_radius": 10,
+    "observed_brush_radii": [
+      10.0
+    ],
+    "brush_radius_status": "single",
+    "chalk": {
+      "status": "exact",
+      "consumed_points": 214,
+      "pre_point_count": 1,
+      "post_point_count": 215,
+      "max_points": 6000
+    },
+    "sampled_point_delta_total": 214,
+    "point_delta_matches_chalk": true,
+    "stroke_count": 3,
+    "frame_probe": {
+      "status": "measured",
+      "frame_count": 434,
+      "average_fps": 60.0,
+      "median_fps": 60.024,
+      "median_interval_ms": 16.66,
+      "p95_interval_ms": 16.68,
+      "max_interval_ms": 16.68,
+      "visibility_interruption": false,
+      "stroke_probe_count": 3
+    },
+    "trajectory": {
+      "observed_segment_length_lower_bound": 705.4289,
+      "accepted_sample_count": 214,
+      "status": "incomplete_until_verified",
+      "note": "Coalesced pointDelta values mean intermediate accepted coordinates may be missing."
+    },
+    "event_count": 437,
+    "dropped_events": 0,
+    "monitor_dropped_events": 0,
+    "monitor_error_count": 0,
+    "started_at_utc": "2026-11-01T06:01:23.648+00:00",
+    "finished_at_utc": "2026-11-01T06:01:33.913+00:00"
+  },
+  "monitor_capture": {
+    "status": "saved",
+    "transport": "loopback_websocket",
+    "match_reason": "matched_executor_window",
+    "experiment_id": "9408309cb0fc403d8238db039cfc60aa",
+    "chalk_radius_matrix": null,
+    "chalk_experiment_matrix": {
+      "schema_version": 1,
+      "series_id": "chalk-20261101-084732-a5c2cf",
+      "phase_id": "G2",
+      "scenario_id": "continuous_turns",
+      "repeat_index": 1,
+      "matrix_order_index": 17,
+      "planned_repeats": 3,
+      "requested_radius": 10,
+      "expected_strokes": 3,
+      "geometry_signature": "70d7e4bb10ab36a521540e775f7fffe10615b8a73f582d30b7e61aaf88b5cebf",
+      "planned_strokes": [
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "continuous_turns"
+          },
+          "name": "right_angle_path",
+          "points": [
+            {
+              "x": 25.0,
+              "y": 25.0
+            },
+            {
+              "x": 115.0,
+              "y": 25.0
+            },
+            {
+              "x": 115.0,
+              "y": 85.0
+            },
+            {
+              "x": 205.0,
+              "y": 85.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "continuous_turns"
+          },
+          "name": "acute_turn_path",
+          "points": [
+            {
+              "x": 25.0,
+              "y": 115.0
+            },
+            {
+              "x": 95.0,
+              "y": 165.0
+            },
+            {
+              "x": 155.0,
+              "y": 115.0
+            },
+            {
+              "x": 225.0,
+              "y": 165.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "continuous_turns"
+          },
+          "name": "s_curve_path",
+          "points": [
+            {
+              "x": 250.0,
+              "y": 25.0
+            },
+            {
+              "x": 290.0,
+              "y": 55.0
+            },
+            {
+              "x": 250.0,
+              "y": 85.0
+            },
+            {
+              "x": 290.0,
+              "y": 115.0
+            },
+            {
+              "x": 250.0,
+              "y": 145.0
+            }
+          ]
+        }
+      ],
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      }
+    },
+    "session_id": "8744aeac-91bd-4309-981f-7bab5486904c",
+    "run_id": "d74df997-e865-4630-844e-b20f41aa932e",
+    "source_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\game_monitor_bridge\\8744aeac-91bd-4309-981f-7bab5486904c\\game-monitor-run-20261101T060133913785Z-d74df997.json",
+    "report_path": "monitor_report.json",
+    "report_event_count": 437,
+    "dropped_events": 0,
+    "monitor_dropped_events": 0,
+    "monitor_error_count": 0,
+    "stroke_count": 3,
+    "expected_stroke_count": 3,
+    "point_delta_matches_chalk": true,
+    "brush_radius_status": "single",
+    "chalk_status": "exact",
+    "chalk_counter_consistent": true,
+    "captured_at_utc": "2026-11-01T06:01:34.708+00:00"
+  },
+  "calibration_profile_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\brush_paint_calibration.json",
+  "phases": {
+    "before_clear": {
+      "status": "restored_within_pixel_tolerance",
+      "board_clear_check": {
+        "status": "restored_within_pixel_tolerance",
+        "tolerance_percent": 0.15,
+        "changed_percent": 0.1047,
+        "comparison": {
+          "width": 581,
+          "height": 304,
+          "total_pixels": 176624,
+          "changed_pixels": 185,
+          "changed_percent": 0.1047,
+          "pixel_similarity_percent": 99.8953,
+          "mean_absolute_rgb_difference": 0.0939,
+          "exact_match": false,
+          "interpretation": "visual_pixel_comparison_only_not_a_reading_of_the_game_resource_counter"
+        },
+        "reference_type": "explicit_blank_board_roi",
+        "note": "Визуальное совпадение с отдельно сохранённым эталоном пустой доски; это не доказательство внутреннего состояния игры."
+      },
+      "captured_at_utc": "2026-11-01T06:01:06+00:00",
+      "screen_size": {
+        "width": 1920,
+        "height": 1080
+      },
+      "files": {
+        "full_screen": "before_clear-screen.png",
+        "board_roi": "before_clear-board.png",
+        "paint_meter_roi": "before_clear-paint-meter.png"
+      }
+    },
+    "before_draw": {
+      "captured_at_utc": "2026-11-01T06:01:06+00:00",
+      "screen_size": {
+        "width": 1920,
+        "height": 1080
+      },
+      "clear_check": {
+        "status": "restored_within_pixel_tolerance",
+        "tolerance_percent": 0.15,
+        "changed_percent": 0.1047,
+        "comparison": {
+          "width": 581,
+          "height": 304,
+          "total_pixels": 176624,
+          "changed_pixels": 185,
+          "changed_percent": 0.1047,
+          "pixel_similarity_percent": 99.8953,
+          "mean_absolute_rgb_difference": 0.0939,
+          "exact_match": false,
+          "interpretation": "visual_pixel_comparison_only_not_a_reading_of_the_game_resource_counter"
+        },
+        "reference_type": "explicit_blank_board_roi",
+        "note": "Визуальное совпадение с отдельно сохранённым эталоном пустой доски; это не доказательство внутреннего состояния игры."
+      },
+      "files": {
+        "full_screen": "before_clear-screen.png",
+        "board_roi": "before_clear-board.png",
+        "paint_meter_roi": "before_clear-paint-meter.png"
+      }
+    },
+    "brush_setup": {
+      "status": "confirmed_by_monitor_for_automated_block",
+      "requested_value": 10,
+      "observed_value": 10,
+      "verification_source": "active_game_monitor_bridge_heartbeat",
+      "session_id": "8744aeac-91bd-4309-981f-7bab5486904c",
+      "verified_at_utc": "2026-11-01T06:01:14.902+00:00",
+      "final_position": [
+        1250,
+        305
+      ],
+      "correction_count": 1,
+      "observations": [
+        {
+          "requested_radius": 10,
+          "observed_radius": 9,
+          "observed_at_utc": "2026-11-01T06:01:12.900+00:00",
+          "session_id": "8744aeac-91bd-4309-981f-7bab5486904c",
+          "position": [
+            1254,
+            305
+          ]
+        },
+        {
+          "requested_radius": 10,
+          "observed_radius": 10,
+          "observed_at_utc": "2026-11-01T06:01:14.902+00:00",
+          "session_id": "8744aeac-91bd-4309-981f-7bab5486904c",
+          "position": [
+            1250,
+            305
+          ]
+        }
+      ],
+      "visual_confirmation_required": true,
+      "confirmation_method": "game_monitor_exact_radius_plus_user_visual_check",
+      "confirmed_at_utc": "2026-11-01T06:01:15+00:00"
+    },
+    "execution": {
+      "status": "completed",
+      "report_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\execution_20261101_090131_098940_c582e9.json",
+      "summary": {
+        "status": "completed",
+        "completed_strokes": 3,
+        "total_strokes": 3,
+        "started_at": "2026-11-01T09:01:18+03:00",
+        "ended_at": "2026-11-01T09:01:31+03:00",
+        "duration_seconds": 12.594,
+        "move_calls": 443,
+        "error": null,
+        "stop_reason": null,
+        "mouse_release": {
+          "attempted": true,
+          "succeeded": true,
+          "errors": []
+        },
+        "executor_config": {
+          "point_step_px": 2.0,
+          "line_extension_px": 0.0,
+          "point_delay_ms": 10,
+          "after_mouse_up_ms": 20,
+          "before_mouse_down_ms": 20,
+          "after_mouse_down_ms": 40,
+          "end_hold_ms": 50,
+          "countdown_seconds": 5
+        }
+      },
+      "captured_at_utc": "2026-11-01T06:01:31+00:00"
+    },
+    "monitor_capture": {
+      "status": "saved",
+      "transport": "loopback_websocket",
+      "match_reason": "matched_executor_window",
+      "experiment_id": "9408309cb0fc403d8238db039cfc60aa",
+      "chalk_radius_matrix": null,
+      "chalk_experiment_matrix": {
+        "schema_version": 1,
+        "series_id": "chalk-20261101-084732-a5c2cf",
+        "phase_id": "G2",
+        "scenario_id": "continuous_turns",
+        "repeat_index": 1,
+        "matrix_order_index": 17,
+        "planned_repeats": 3,
+        "requested_radius": 10,
+        "expected_strokes": 3,
+        "geometry_signature": "70d7e4bb10ab36a521540e775f7fffe10615b8a73f582d30b7e61aaf88b5cebf",
+        "planned_strokes": [
+          {
+            "closed": false,
+            "metadata": {
+              "line_extension_px_override": 0.0,
+              "role": "brush_behavior_test",
+              "test_case": "continuous_turns"
+            },
+            "name": "right_angle_path",
+            "points": [
+              {
+                "x": 25.0,
+                "y": 25.0
+              },
+              {
+                "x": 115.0,
+                "y": 25.0
+              },
+              {
+                "x": 115.0,
+                "y": 85.0
+              },
+              {
+                "x": 205.0,
+                "y": 85.0
+              }
+            ]
+          },
+          {
+            "closed": false,
+            "metadata": {
+              "line_extension_px_override": 0.0,
+              "role": "brush_behavior_test",
+              "test_case": "continuous_turns"
+            },
+            "name": "acute_turn_path",
+            "points": [
+              {
+                "x": 25.0,
+                "y": 115.0
+              },
+              {
+                "x": 95.0,
+                "y": 165.0
+              },
+              {
+                "x": 155.0,
+                "y": 115.0
+              },
+              {
+                "x": 225.0,
+                "y": 165.0
+              }
+            ]
+          },
+          {
+            "closed": false,
+            "metadata": {
+              "line_extension_px_override": 0.0,
+              "role": "brush_behavior_test",
+              "test_case": "continuous_turns"
+            },
+            "name": "s_curve_path",
+            "points": [
+              {
+                "x": 250.0,
+                "y": 25.0
+              },
+              {
+                "x": 290.0,
+                "y": 55.0
+              },
+              {
+                "x": 250.0,
+                "y": 85.0
+              },
+              {
+                "x": 290.0,
+                "y": 115.0
+              },
+              {
+                "x": 250.0,
+                "y": 145.0
+              }
+            ]
+          }
+        ],
+        "executor_parameters": {
+          "point_step_px": 2,
+          "line_extension_px": 0,
+          "point_delay_ms": 10,
+          "after_mouse_up_ms": 20,
+          "before_mouse_down_ms": 20,
+          "after_mouse_down_ms": 40,
+          "end_hold_ms": 50,
+          "countdown_seconds": 5
+        }
+      },
+      "session_id": "8744aeac-91bd-4309-981f-7bab5486904c",
+      "run_id": "d74df997-e865-4630-844e-b20f41aa932e",
+      "source_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\game_monitor_bridge\\8744aeac-91bd-4309-981f-7bab5486904c\\game-monitor-run-20261101T060133913785Z-d74df997.json",
+      "report_path": "monitor_report.json",
+      "report_event_count": 437,
+      "dropped_events": 0,
+      "monitor_dropped_events": 0,
+      "monitor_error_count": 0,
+      "stroke_count": 3,
+      "expected_stroke_count": 3,
+      "point_delta_matches_chalk": true,
+      "brush_radius_status": "single",
+      "chalk_status": "exact",
+      "chalk_counter_consistent": true,
+      "captured_at_utc": "2026-11-01T06:01:34.708+00:00"
+    },
+    "after_draw": {
+      "status": "captured",
+      "captured_at_utc": "2026-11-01T06:01:34+00:00",
+      "screen_size": {
+        "width": 1920,
+        "height": 1080
+      },
+      "files": {
+        "full_screen": "after_draw-screen.png",
+        "board_roi": "after_draw-board.png",
+        "paint_meter_roi": "after_draw-paint-meter.png"
+      },
+      "paint_meter_measurement": {
+        "bar_width_px": 160,
+        "changed_columns": 6,
+        "color_distance_threshold": 24.0,
+        "method": "baseline_color_suffix_estimate",
+        "interpretation": "estimate_only_not_game_counter_or_OCR",
+        "status": "inconclusive",
+        "filled_width_px": null,
+        "fill_fraction": null,
+        "fill_percent": null,
+        "confidence": "low",
+        "note": "Изменения не образуют достаточно чёткую непрерывную правую часть шкалы."
+      },
+      "stroke_visibility_analysis": {
+        "status": "analyzed",
+        "stroke_count": 3,
+        "visible_change_count": 3,
+        "no_change_count": 0,
+        "ambiguous_count": 0,
+        "results": [
+          {
+            "name": "right_angle_path",
+            "status": "visible_change_detected",
+            "changed_pixels_in_roi": 3997,
+            "roi": {
+              "x": 20,
+              "y": 20,
+              "width": 251,
+              "height": 100
+            },
+            "overlapping_stroke_indices": [],
+            "interpretation": "visual_roi_heuristic_not_game_acceptance"
+          },
+          {
+            "name": "acute_turn_path",
+            "status": "visible_change_detected",
+            "changed_pixels_in_roi": 4261,
+            "roi": {
+              "x": 20,
+              "y": 134,
+              "width": 276,
+              "height": 87
+            },
+            "overlapping_stroke_indices": [],
+            "interpretation": "visual_roi_heuristic_not_game_acceptance"
+          },
+          {
+            "name": "s_curve_path",
+            "status": "visible_change_detected",
+            "changed_pixels_in_roi": 3632,
+            "roi": {
+              "x": 304,
+              "y": 20,
+              "width": 74,
+              "height": 176
+            },
+            "overlapping_stroke_indices": [],
+            "interpretation": "visual_roi_heuristic_not_game_acceptance"
+          }
+        ],
+        "note": "ROI могут включать эффекты кисти и фон; пересекающиеся ROI помечаются неоднозначными.",
+        "reference_file": "blank-board-reference.png",
+        "padding_px": 11,
+        "requested_brush_value": 10
+      }
+    },
+    "postdraw_workflow": {
+      "status": "completed",
+      "reason": "Результат сохранён; автоматическая очистка отключена, рисунок оставлен на доске.",
+      "finished_at_utc": "2026-11-01T06:01:35+00:00"
+    },
+    "restore_brush_30": {
+      "status": "drag_completed_unverified",
+      "requested_value": 30,
+      "finished_at_utc": "2026-11-01T06:01:39+00:00",
+      "note": "Жест перетаскивания к позиции кисти 30 завершён; значение необходимо проверить в игре.",
+      "drag_start": [
+        1254,
+        305
+      ],
+      "drag_target": [
+        1168,
+        305
+      ]
+    }
+  },
+  "interpretation_limits": [
+    "Meter fill is a provisional image estimate, not a direct read of the game's internal resource counter.",
+    "A successful executor report does not prove every stroke was registered by the game.",
+    "Execution status and visual evidence are recorded separately."
+  ]
+}

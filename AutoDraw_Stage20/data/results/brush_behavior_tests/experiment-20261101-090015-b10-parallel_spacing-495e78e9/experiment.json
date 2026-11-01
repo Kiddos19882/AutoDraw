@@ -1,0 +1,1149 @@
+{
+  "schema_version": 1,
+  "record_type": "autodraw_brush_paint_experiment",
+  "experiment_id": "495e78e9c77145918abc95f09cd90639",
+  "chalk_radius_matrix": null,
+  "chalk_experiment_matrix": {
+    "schema_version": 1,
+    "series_id": "chalk-20261101-084732-a5c2cf",
+    "phase_id": "G2",
+    "scenario_id": "parallel_spacing",
+    "repeat_index": 1,
+    "matrix_order_index": 16,
+    "planned_repeats": 3,
+    "requested_radius": 10,
+    "expected_strokes": 8,
+    "geometry_signature": "5bdaf17600a8beee9d777cd5d11afa1e186185361e0892f18c57a44f72ef7ec9",
+    "planned_strokes": [
+      {
+        "closed": false,
+        "metadata": {
+          "line_extension_px_override": 0.0,
+          "role": "brush_behavior_test",
+          "test_case": "parallel_spacing"
+        },
+        "name": "spacing_4px_a",
+        "points": [
+          {
+            "x": 20.0,
+            "y": 25.0
+          },
+          {
+            "x": 200.0,
+            "y": 25.0
+          }
+        ]
+      },
+      {
+        "closed": false,
+        "metadata": {
+          "line_extension_px_override": 0.0,
+          "role": "brush_behavior_test",
+          "test_case": "parallel_spacing"
+        },
+        "name": "spacing_4px_b",
+        "points": [
+          {
+            "x": 20.0,
+            "y": 29.0
+          },
+          {
+            "x": 200.0,
+            "y": 29.0
+          }
+        ]
+      },
+      {
+        "closed": false,
+        "metadata": {
+          "line_extension_px_override": 0.0,
+          "role": "brush_behavior_test",
+          "test_case": "parallel_spacing"
+        },
+        "name": "spacing_8px_a",
+        "points": [
+          {
+            "x": 20.0,
+            "y": 55.0
+          },
+          {
+            "x": 200.0,
+            "y": 55.0
+          }
+        ]
+      },
+      {
+        "closed": false,
+        "metadata": {
+          "line_extension_px_override": 0.0,
+          "role": "brush_behavior_test",
+          "test_case": "parallel_spacing"
+        },
+        "name": "spacing_8px_b",
+        "points": [
+          {
+            "x": 20.0,
+            "y": 63.0
+          },
+          {
+            "x": 200.0,
+            "y": 63.0
+          }
+        ]
+      },
+      {
+        "closed": false,
+        "metadata": {
+          "line_extension_px_override": 0.0,
+          "role": "brush_behavior_test",
+          "test_case": "parallel_spacing"
+        },
+        "name": "spacing_16px_a",
+        "points": [
+          {
+            "x": 20.0,
+            "y": 95.0
+          },
+          {
+            "x": 200.0,
+            "y": 95.0
+          }
+        ]
+      },
+      {
+        "closed": false,
+        "metadata": {
+          "line_extension_px_override": 0.0,
+          "role": "brush_behavior_test",
+          "test_case": "parallel_spacing"
+        },
+        "name": "spacing_16px_b",
+        "points": [
+          {
+            "x": 20.0,
+            "y": 111.0
+          },
+          {
+            "x": 200.0,
+            "y": 111.0
+          }
+        ]
+      },
+      {
+        "closed": false,
+        "metadata": {
+          "line_extension_px_override": 0.0,
+          "role": "brush_behavior_test",
+          "test_case": "parallel_spacing"
+        },
+        "name": "spacing_24px_a",
+        "points": [
+          {
+            "x": 20.0,
+            "y": 145.0
+          },
+          {
+            "x": 200.0,
+            "y": 145.0
+          }
+        ]
+      },
+      {
+        "closed": false,
+        "metadata": {
+          "line_extension_px_override": 0.0,
+          "role": "brush_behavior_test",
+          "test_case": "parallel_spacing"
+        },
+        "name": "spacing_24px_b",
+        "points": [
+          {
+            "x": 20.0,
+            "y": 169.0
+          },
+          {
+            "x": 200.0,
+            "y": 169.0
+          }
+        ]
+      }
+    ],
+    "executor_parameters": {
+      "point_step_px": 2,
+      "line_extension_px": 0,
+      "point_delay_ms": 10,
+      "after_mouse_up_ms": 20,
+      "before_mouse_down_ms": 20,
+      "after_mouse_down_ms": 40,
+      "end_hold_ms": 50,
+      "countdown_seconds": 5
+    }
+  },
+  "chalk_test_block": {
+    "block_id": "64d2e366053543b1bf4393f87fd8b214",
+    "task_id": "parallel_spacing-r1",
+    "phase_id": "G2"
+  },
+  "updated_at_utc": "2026-11-01T06:01:01+00:00",
+  "test_case": "parallel_spacing",
+  "brush_value_requested": 10,
+  "drawing_plan_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\brush-plan-parallel_spacing-b10-20261101-090015-495e78e9.json",
+  "execution_report_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\execution_20261101_090053_307851_b27f0c.json",
+  "execution_report": {
+    "status": "completed",
+    "completed_strokes": 8,
+    "total_strokes": 8,
+    "started_at": "2026-11-01T09:00:32+03:00",
+    "ended_at": "2026-11-01T09:00:53+03:00",
+    "duration_seconds": 20.906,
+    "move_calls": 920,
+    "error": null,
+    "stop_reason": null,
+    "mouse_release": {
+      "attempted": true,
+      "succeeded": true,
+      "errors": []
+    },
+    "executor_config": {
+      "point_step_px": 2.0,
+      "line_extension_px": 0.0,
+      "point_delay_ms": 10,
+      "after_mouse_up_ms": 20,
+      "before_mouse_down_ms": 20,
+      "after_mouse_down_ms": 40,
+      "end_hold_ms": 50,
+      "countdown_seconds": 5
+    }
+  },
+  "game_monitor_report_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261101-090015-b10-parallel_spacing-495e78e9\\monitor_report.json",
+  "game_monitor_summary": {
+    "source": "loopback_websocket_bridge",
+    "autodraw_experiment_id": "495e78e9c77145918abc95f09cd90639",
+    "chalk_radius_matrix": null,
+    "chalk_experiment_matrix": {
+      "schema_version": 1,
+      "series_id": "chalk-20261101-084732-a5c2cf",
+      "phase_id": "G2",
+      "scenario_id": "parallel_spacing",
+      "repeat_index": 1,
+      "matrix_order_index": 16,
+      "planned_repeats": 3,
+      "requested_radius": 10,
+      "expected_strokes": 8,
+      "geometry_signature": "5bdaf17600a8beee9d777cd5d11afa1e186185361e0892f18c57a44f72ef7ec9",
+      "planned_strokes": [
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "parallel_spacing"
+          },
+          "name": "spacing_4px_a",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 25.0
+            },
+            {
+              "x": 200.0,
+              "y": 25.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "parallel_spacing"
+          },
+          "name": "spacing_4px_b",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 29.0
+            },
+            {
+              "x": 200.0,
+              "y": 29.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "parallel_spacing"
+          },
+          "name": "spacing_8px_a",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 55.0
+            },
+            {
+              "x": 200.0,
+              "y": 55.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "parallel_spacing"
+          },
+          "name": "spacing_8px_b",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 63.0
+            },
+            {
+              "x": 200.0,
+              "y": 63.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "parallel_spacing"
+          },
+          "name": "spacing_16px_a",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 95.0
+            },
+            {
+              "x": 200.0,
+              "y": 95.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "parallel_spacing"
+          },
+          "name": "spacing_16px_b",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 111.0
+            },
+            {
+              "x": 200.0,
+              "y": 111.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "parallel_spacing"
+          },
+          "name": "spacing_24px_a",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 145.0
+            },
+            {
+              "x": 200.0,
+              "y": 145.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "parallel_spacing"
+          },
+          "name": "spacing_24px_b",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 169.0
+            },
+            {
+              "x": 200.0,
+              "y": 169.0
+            }
+          ]
+        }
+      ],
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      }
+    },
+    "run_id": "6f22428f-b05b-4f42-9dd1-cc63db11c636",
+    "session_id": "8744aeac-91bd-4309-981f-7bab5486904c",
+    "execution_status": "completed",
+    "brush_radius": 10,
+    "observed_brush_radii": [
+      10.0
+    ],
+    "brush_radius_status": "single",
+    "chalk": {
+      "status": "exact",
+      "consumed_points": 444,
+      "pre_point_count": 1,
+      "post_point_count": 445,
+      "max_points": 6000
+    },
+    "sampled_point_delta_total": 444,
+    "point_delta_matches_chalk": true,
+    "stroke_count": 8,
+    "frame_probe": {
+      "status": "measured",
+      "frame_count": 905,
+      "average_fps": 60.0,
+      "median_fps": 60.024,
+      "median_interval_ms": 16.66,
+      "p95_interval_ms": 16.68,
+      "max_interval_ms": 16.68,
+      "visibility_interruption": false,
+      "stroke_probe_count": 8
+    },
+    "trajectory": {
+      "observed_segment_length_lower_bound": 1464.0,
+      "accepted_sample_count": 444,
+      "status": "incomplete_until_verified",
+      "note": "Coalesced pointDelta values mean intermediate accepted coordinates may be missing."
+    },
+    "event_count": 912,
+    "dropped_events": 0,
+    "monitor_dropped_events": 0,
+    "monitor_error_count": 0,
+    "started_at_utc": "2026-11-01T06:00:37.547+00:00",
+    "finished_at_utc": "2026-11-01T06:00:55.893+00:00"
+  },
+  "monitor_capture": {
+    "status": "saved",
+    "transport": "loopback_websocket",
+    "match_reason": "matched_executor_window",
+    "experiment_id": "495e78e9c77145918abc95f09cd90639",
+    "chalk_radius_matrix": null,
+    "chalk_experiment_matrix": {
+      "schema_version": 1,
+      "series_id": "chalk-20261101-084732-a5c2cf",
+      "phase_id": "G2",
+      "scenario_id": "parallel_spacing",
+      "repeat_index": 1,
+      "matrix_order_index": 16,
+      "planned_repeats": 3,
+      "requested_radius": 10,
+      "expected_strokes": 8,
+      "geometry_signature": "5bdaf17600a8beee9d777cd5d11afa1e186185361e0892f18c57a44f72ef7ec9",
+      "planned_strokes": [
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "parallel_spacing"
+          },
+          "name": "spacing_4px_a",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 25.0
+            },
+            {
+              "x": 200.0,
+              "y": 25.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "parallel_spacing"
+          },
+          "name": "spacing_4px_b",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 29.0
+            },
+            {
+              "x": 200.0,
+              "y": 29.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "parallel_spacing"
+          },
+          "name": "spacing_8px_a",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 55.0
+            },
+            {
+              "x": 200.0,
+              "y": 55.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "parallel_spacing"
+          },
+          "name": "spacing_8px_b",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 63.0
+            },
+            {
+              "x": 200.0,
+              "y": 63.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "parallel_spacing"
+          },
+          "name": "spacing_16px_a",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 95.0
+            },
+            {
+              "x": 200.0,
+              "y": 95.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "parallel_spacing"
+          },
+          "name": "spacing_16px_b",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 111.0
+            },
+            {
+              "x": 200.0,
+              "y": 111.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "parallel_spacing"
+          },
+          "name": "spacing_24px_a",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 145.0
+            },
+            {
+              "x": 200.0,
+              "y": 145.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "parallel_spacing"
+          },
+          "name": "spacing_24px_b",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 169.0
+            },
+            {
+              "x": 200.0,
+              "y": 169.0
+            }
+          ]
+        }
+      ],
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      }
+    },
+    "session_id": "8744aeac-91bd-4309-981f-7bab5486904c",
+    "run_id": "6f22428f-b05b-4f42-9dd1-cc63db11c636",
+    "source_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\game_monitor_bridge\\8744aeac-91bd-4309-981f-7bab5486904c\\game-monitor-run-20261101T060055893935Z-6f22428f.json",
+    "report_path": "monitor_report.json",
+    "report_event_count": 912,
+    "dropped_events": 0,
+    "monitor_dropped_events": 0,
+    "monitor_error_count": 0,
+    "stroke_count": 8,
+    "expected_stroke_count": 8,
+    "point_delta_matches_chalk": true,
+    "brush_radius_status": "single",
+    "chalk_status": "exact",
+    "chalk_counter_consistent": true,
+    "captured_at_utc": "2026-11-01T06:00:56.858+00:00"
+  },
+  "calibration_profile_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\brush_paint_calibration.json",
+  "phases": {
+    "before_clear": {
+      "status": "restored_within_pixel_tolerance",
+      "board_clear_check": {
+        "status": "restored_within_pixel_tolerance",
+        "tolerance_percent": 0.15,
+        "changed_percent": 0.1047,
+        "comparison": {
+          "width": 581,
+          "height": 304,
+          "total_pixels": 176624,
+          "changed_pixels": 185,
+          "changed_percent": 0.1047,
+          "pixel_similarity_percent": 99.8953,
+          "mean_absolute_rgb_difference": 0.0939,
+          "exact_match": false,
+          "interpretation": "visual_pixel_comparison_only_not_a_reading_of_the_game_resource_counter"
+        },
+        "reference_type": "explicit_blank_board_roi",
+        "note": "Визуальное совпадение с отдельно сохранённым эталоном пустой доски; это не доказательство внутреннего состояния игры."
+      },
+      "captured_at_utc": "2026-11-01T06:00:19+00:00",
+      "screen_size": {
+        "width": 1920,
+        "height": 1080
+      },
+      "files": {
+        "full_screen": "before_clear-screen.png",
+        "board_roi": "before_clear-board.png",
+        "paint_meter_roi": "before_clear-paint-meter.png"
+      }
+    },
+    "before_draw": {
+      "captured_at_utc": "2026-11-01T06:00:19+00:00",
+      "screen_size": {
+        "width": 1920,
+        "height": 1080
+      },
+      "clear_check": {
+        "status": "restored_within_pixel_tolerance",
+        "tolerance_percent": 0.15,
+        "changed_percent": 0.1047,
+        "comparison": {
+          "width": 581,
+          "height": 304,
+          "total_pixels": 176624,
+          "changed_pixels": 185,
+          "changed_percent": 0.1047,
+          "pixel_similarity_percent": 99.8953,
+          "mean_absolute_rgb_difference": 0.0939,
+          "exact_match": false,
+          "interpretation": "visual_pixel_comparison_only_not_a_reading_of_the_game_resource_counter"
+        },
+        "reference_type": "explicit_blank_board_roi",
+        "note": "Визуальное совпадение с отдельно сохранённым эталоном пустой доски; это не доказательство внутреннего состояния игры."
+      },
+      "files": {
+        "full_screen": "before_clear-screen.png",
+        "board_roi": "before_clear-board.png",
+        "paint_meter_roi": "before_clear-paint-meter.png"
+      }
+    },
+    "brush_setup": {
+      "status": "confirmed_by_monitor_for_automated_block",
+      "requested_value": 10,
+      "observed_value": 10,
+      "verification_source": "active_game_monitor_bridge_heartbeat",
+      "session_id": "8744aeac-91bd-4309-981f-7bab5486904c",
+      "verified_at_utc": "2026-11-01T06:00:27.867+00:00",
+      "final_position": [
+        1250,
+        305
+      ],
+      "correction_count": 1,
+      "observations": [
+        {
+          "requested_radius": 10,
+          "observed_radius": 9,
+          "observed_at_utc": "2026-11-01T06:00:25.865+00:00",
+          "session_id": "8744aeac-91bd-4309-981f-7bab5486904c",
+          "position": [
+            1254,
+            305
+          ]
+        },
+        {
+          "requested_radius": 10,
+          "observed_radius": 10,
+          "observed_at_utc": "2026-11-01T06:00:27.867+00:00",
+          "session_id": "8744aeac-91bd-4309-981f-7bab5486904c",
+          "position": [
+            1250,
+            305
+          ]
+        }
+      ],
+      "visual_confirmation_required": true,
+      "confirmation_method": "game_monitor_exact_radius_plus_user_visual_check",
+      "confirmed_at_utc": "2026-11-01T06:00:27+00:00"
+    },
+    "execution": {
+      "status": "completed",
+      "report_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\execution_20261101_090053_307851_b27f0c.json",
+      "summary": {
+        "status": "completed",
+        "completed_strokes": 8,
+        "total_strokes": 8,
+        "started_at": "2026-11-01T09:00:32+03:00",
+        "ended_at": "2026-11-01T09:00:53+03:00",
+        "duration_seconds": 20.906,
+        "move_calls": 920,
+        "error": null,
+        "stop_reason": null,
+        "mouse_release": {
+          "attempted": true,
+          "succeeded": true,
+          "errors": []
+        },
+        "executor_config": {
+          "point_step_px": 2.0,
+          "line_extension_px": 0.0,
+          "point_delay_ms": 10,
+          "after_mouse_up_ms": 20,
+          "before_mouse_down_ms": 20,
+          "after_mouse_down_ms": 40,
+          "end_hold_ms": 50,
+          "countdown_seconds": 5
+        }
+      },
+      "captured_at_utc": "2026-11-01T06:00:53+00:00"
+    },
+    "monitor_capture": {
+      "status": "saved",
+      "transport": "loopback_websocket",
+      "match_reason": "matched_executor_window",
+      "experiment_id": "495e78e9c77145918abc95f09cd90639",
+      "chalk_radius_matrix": null,
+      "chalk_experiment_matrix": {
+        "schema_version": 1,
+        "series_id": "chalk-20261101-084732-a5c2cf",
+        "phase_id": "G2",
+        "scenario_id": "parallel_spacing",
+        "repeat_index": 1,
+        "matrix_order_index": 16,
+        "planned_repeats": 3,
+        "requested_radius": 10,
+        "expected_strokes": 8,
+        "geometry_signature": "5bdaf17600a8beee9d777cd5d11afa1e186185361e0892f18c57a44f72ef7ec9",
+        "planned_strokes": [
+          {
+            "closed": false,
+            "metadata": {
+              "line_extension_px_override": 0.0,
+              "role": "brush_behavior_test",
+              "test_case": "parallel_spacing"
+            },
+            "name": "spacing_4px_a",
+            "points": [
+              {
+                "x": 20.0,
+                "y": 25.0
+              },
+              {
+                "x": 200.0,
+                "y": 25.0
+              }
+            ]
+          },
+          {
+            "closed": false,
+            "metadata": {
+              "line_extension_px_override": 0.0,
+              "role": "brush_behavior_test",
+              "test_case": "parallel_spacing"
+            },
+            "name": "spacing_4px_b",
+            "points": [
+              {
+                "x": 20.0,
+                "y": 29.0
+              },
+              {
+                "x": 200.0,
+                "y": 29.0
+              }
+            ]
+          },
+          {
+            "closed": false,
+            "metadata": {
+              "line_extension_px_override": 0.0,
+              "role": "brush_behavior_test",
+              "test_case": "parallel_spacing"
+            },
+            "name": "spacing_8px_a",
+            "points": [
+              {
+                "x": 20.0,
+                "y": 55.0
+              },
+              {
+                "x": 200.0,
+                "y": 55.0
+              }
+            ]
+          },
+          {
+            "closed": false,
+            "metadata": {
+              "line_extension_px_override": 0.0,
+              "role": "brush_behavior_test",
+              "test_case": "parallel_spacing"
+            },
+            "name": "spacing_8px_b",
+            "points": [
+              {
+                "x": 20.0,
+                "y": 63.0
+              },
+              {
+                "x": 200.0,
+                "y": 63.0
+              }
+            ]
+          },
+          {
+            "closed": false,
+            "metadata": {
+              "line_extension_px_override": 0.0,
+              "role": "brush_behavior_test",
+              "test_case": "parallel_spacing"
+            },
+            "name": "spacing_16px_a",
+            "points": [
+              {
+                "x": 20.0,
+                "y": 95.0
+              },
+              {
+                "x": 200.0,
+                "y": 95.0
+              }
+            ]
+          },
+          {
+            "closed": false,
+            "metadata": {
+              "line_extension_px_override": 0.0,
+              "role": "brush_behavior_test",
+              "test_case": "parallel_spacing"
+            },
+            "name": "spacing_16px_b",
+            "points": [
+              {
+                "x": 20.0,
+                "y": 111.0
+              },
+              {
+                "x": 200.0,
+                "y": 111.0
+              }
+            ]
+          },
+          {
+            "closed": false,
+            "metadata": {
+              "line_extension_px_override": 0.0,
+              "role": "brush_behavior_test",
+              "test_case": "parallel_spacing"
+            },
+            "name": "spacing_24px_a",
+            "points": [
+              {
+                "x": 20.0,
+                "y": 145.0
+              },
+              {
+                "x": 200.0,
+                "y": 145.0
+              }
+            ]
+          },
+          {
+            "closed": false,
+            "metadata": {
+              "line_extension_px_override": 0.0,
+              "role": "brush_behavior_test",
+              "test_case": "parallel_spacing"
+            },
+            "name": "spacing_24px_b",
+            "points": [
+              {
+                "x": 20.0,
+                "y": 169.0
+              },
+              {
+                "x": 200.0,
+                "y": 169.0
+              }
+            ]
+          }
+        ],
+        "executor_parameters": {
+          "point_step_px": 2,
+          "line_extension_px": 0,
+          "point_delay_ms": 10,
+          "after_mouse_up_ms": 20,
+          "before_mouse_down_ms": 20,
+          "after_mouse_down_ms": 40,
+          "end_hold_ms": 50,
+          "countdown_seconds": 5
+        }
+      },
+      "session_id": "8744aeac-91bd-4309-981f-7bab5486904c",
+      "run_id": "6f22428f-b05b-4f42-9dd1-cc63db11c636",
+      "source_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\game_monitor_bridge\\8744aeac-91bd-4309-981f-7bab5486904c\\game-monitor-run-20261101T060055893935Z-6f22428f.json",
+      "report_path": "monitor_report.json",
+      "report_event_count": 912,
+      "dropped_events": 0,
+      "monitor_dropped_events": 0,
+      "monitor_error_count": 0,
+      "stroke_count": 8,
+      "expected_stroke_count": 8,
+      "point_delta_matches_chalk": true,
+      "brush_radius_status": "single",
+      "chalk_status": "exact",
+      "chalk_counter_consistent": true,
+      "captured_at_utc": "2026-11-01T06:00:56.858+00:00"
+    },
+    "after_draw": {
+      "status": "captured",
+      "captured_at_utc": "2026-11-01T06:00:57+00:00",
+      "screen_size": {
+        "width": 1920,
+        "height": 1080
+      },
+      "files": {
+        "full_screen": "after_draw-screen.png",
+        "board_roi": "after_draw-board.png",
+        "paint_meter_roi": "after_draw-paint-meter.png"
+      },
+      "paint_meter_measurement": {
+        "bar_width_px": 160,
+        "changed_columns": 12,
+        "color_distance_threshold": 24.0,
+        "method": "baseline_color_suffix_estimate",
+        "interpretation": "estimate_only_not_game_counter_or_OCR",
+        "status": "inconclusive",
+        "filled_width_px": null,
+        "fill_fraction": null,
+        "fill_percent": null,
+        "confidence": "low",
+        "note": "Изменения не образуют достаточно чёткую непрерывную правую часть шкалы."
+      },
+      "stroke_visibility_analysis": {
+        "status": "analyzed",
+        "stroke_count": 8,
+        "visible_change_count": 2,
+        "no_change_count": 0,
+        "ambiguous_count": 6,
+        "results": [
+          {
+            "name": "spacing_4px_a",
+            "status": "ambiguous_overlap",
+            "changed_pixels_in_roi": 4273,
+            "roi": {
+              "x": 14,
+              "y": 20,
+              "width": 251,
+              "height": 24
+            },
+            "overlapping_stroke_indices": [
+              1
+            ],
+            "interpretation": "visual_roi_heuristic_not_game_acceptance"
+          },
+          {
+            "name": "spacing_4px_b",
+            "status": "ambiguous_overlap",
+            "changed_pixels_in_roi": 4273,
+            "roi": {
+              "x": 14,
+              "y": 25,
+              "width": 251,
+              "height": 24
+            },
+            "overlapping_stroke_indices": [
+              0
+            ],
+            "interpretation": "visual_roi_heuristic_not_game_acceptance"
+          },
+          {
+            "name": "spacing_8px_a",
+            "status": "ambiguous_overlap",
+            "changed_pixels_in_roi": 4513,
+            "roi": {
+              "x": 14,
+              "y": 58,
+              "width": 251,
+              "height": 24
+            },
+            "overlapping_stroke_indices": [
+              3
+            ],
+            "interpretation": "visual_roi_heuristic_not_game_acceptance"
+          },
+          {
+            "name": "spacing_8px_b",
+            "status": "ambiguous_overlap",
+            "changed_pixels_in_roi": 4509,
+            "roi": {
+              "x": 14,
+              "y": 68,
+              "width": 251,
+              "height": 24
+            },
+            "overlapping_stroke_indices": [
+              2
+            ],
+            "interpretation": "visual_roi_heuristic_not_game_acceptance"
+          },
+          {
+            "name": "spacing_16px_a",
+            "status": "ambiguous_overlap",
+            "changed_pixels_in_roi": 3080,
+            "roi": {
+              "x": 14,
+              "y": 108,
+              "width": 251,
+              "height": 24
+            },
+            "overlapping_stroke_indices": [
+              5
+            ],
+            "interpretation": "visual_roi_heuristic_not_game_acceptance"
+          },
+          {
+            "name": "spacing_16px_b",
+            "status": "ambiguous_overlap",
+            "changed_pixels_in_roi": 2843,
+            "roi": {
+              "x": 14,
+              "y": 129,
+              "width": 251,
+              "height": 24
+            },
+            "overlapping_stroke_indices": [
+              4
+            ],
+            "interpretation": "visual_roi_heuristic_not_game_acceptance"
+          },
+          {
+            "name": "spacing_24px_a",
+            "status": "visible_change_detected",
+            "changed_pixels_in_roi": 3079,
+            "roi": {
+              "x": 14,
+              "y": 172,
+              "width": 251,
+              "height": 24
+            },
+            "overlapping_stroke_indices": [],
+            "interpretation": "visual_roi_heuristic_not_game_acceptance"
+          },
+          {
+            "name": "spacing_24px_b",
+            "status": "visible_change_detected",
+            "changed_pixels_in_roi": 3211,
+            "roi": {
+              "x": 14,
+              "y": 202,
+              "width": 251,
+              "height": 24
+            },
+            "overlapping_stroke_indices": [],
+            "interpretation": "visual_roi_heuristic_not_game_acceptance"
+          }
+        ],
+        "note": "ROI могут включать эффекты кисти и фон; пересекающиеся ROI помечаются неоднозначными.",
+        "reference_file": "blank-board-reference.png",
+        "padding_px": 11,
+        "requested_brush_value": 10
+      }
+    },
+    "postdraw_workflow": {
+      "status": "completed",
+      "reason": "Результат сохранён; автоматическая очистка отключена, рисунок оставлен на доске.",
+      "finished_at_utc": "2026-11-01T06:00:57+00:00"
+    },
+    "restore_brush_30": {
+      "status": "drag_completed_unverified",
+      "requested_value": 30,
+      "finished_at_utc": "2026-11-01T06:01:01+00:00",
+      "note": "Жест перетаскивания к позиции кисти 30 завершён; значение необходимо проверить в игре.",
+      "drag_start": [
+        1254,
+        305
+      ],
+      "drag_target": [
+        1168,
+        305
+      ]
+    }
+  },
+  "interpretation_limits": [
+    "Meter fill is a provisional image estimate, not a direct read of the game's internal resource counter.",
+    "A successful executor report does not prove every stroke was registered by the game.",
+    "Execution status and visual evidence are recorded separately."
+  ]
+}

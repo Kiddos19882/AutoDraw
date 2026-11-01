@@ -1,0 +1,210 @@
+{
+  "schema_version": 1,
+  "name": "Brush behavior test — continuous_closed_contour",
+  "created_at": "2026-11-01T05:53:14+00:00",
+  "coordinate_system": "logical_board_pixels",
+  "canvas": {
+    "width": 460,
+    "height": 240
+  },
+  "width": 460,
+  "height": 240,
+  "strokes": [
+    {
+      "name": "closed_rectangle_path",
+      "points": [
+        {
+          "x": 35.0,
+          "y": 35.0
+        },
+        {
+          "x": 205.0,
+          "y": 35.0
+        },
+        {
+          "x": 205.0,
+          "y": 155.0
+        },
+        {
+          "x": 35.0,
+          "y": 155.0
+        },
+        {
+          "x": 35.0,
+          "y": 35.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "continuous_closed_contour",
+        "line_extension_px_override": 0.0
+      }
+    },
+    {
+      "name": "closed_triangle_path",
+      "points": [
+        {
+          "x": 255.0,
+          "y": 45.0
+        },
+        {
+          "x": 365.0,
+          "y": 165.0
+        },
+        {
+          "x": 145.0,
+          "y": 165.0
+        },
+        {
+          "x": 255.0,
+          "y": 45.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "continuous_closed_contour",
+        "line_extension_px_override": 0.0
+      }
+    }
+  ],
+  "generation": {
+    "method": "manual_brush_behavior_test",
+    "test_case": "continuous_closed_contour",
+    "brush_value_must_be_set_manually": true,
+    "note": "Set the requested brush size in the browser before executing this plan.",
+    "experiment_id": "bcf77e35fc5a42cea86571062a85852c",
+    "requested_brush_value": 10,
+    "chalk_test_block": {
+      "block_id": "64d2e366053543b1bf4393f87fd8b214",
+      "task_id": "continuous_closed_contour-r1",
+      "phase_id": "G2"
+    },
+    "chalk_experiment_matrix": {
+      "schema_version": 1,
+      "series_id": "chalk-20261101-084732-a5c2cf",
+      "phase_id": "G2",
+      "scenario_id": "continuous_closed_contour",
+      "repeat_index": 1,
+      "matrix_order_index": 6,
+      "planned_repeats": 3,
+      "requested_radius": 10,
+      "expected_strokes": 2,
+      "geometry_signature": "aa767441137adb0599d452b1ac23373486fe4729e6c34ad71d0a7b7d7899df31",
+      "planned_strokes": [
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "continuous_closed_contour"
+          },
+          "name": "closed_rectangle_path",
+          "points": [
+            {
+              "x": 35.0,
+              "y": 35.0
+            },
+            {
+              "x": 205.0,
+              "y": 35.0
+            },
+            {
+              "x": 205.0,
+              "y": 155.0
+            },
+            {
+              "x": 35.0,
+              "y": 155.0
+            },
+            {
+              "x": 35.0,
+              "y": 35.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "continuous_closed_contour"
+          },
+          "name": "closed_triangle_path",
+          "points": [
+            {
+              "x": 255.0,
+              "y": 45.0
+            },
+            {
+              "x": 365.0,
+              "y": 165.0
+            },
+            {
+              "x": 145.0,
+              "y": 165.0
+            },
+            {
+              "x": 255.0,
+              "y": 45.0
+            }
+          ]
+        }
+      ],
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      }
+    },
+    "screen_transform": {
+      "method": "inclusive_logical_bounds_to_screen_pixel_centers",
+      "source_coordinate_system": "logical_board_pixels",
+      "target_coordinate_system": "local_canvas_pixels",
+      "logical_board": {
+        "width": 460,
+        "height": 240
+      },
+      "screen_roi": {
+        "x": 566,
+        "y": 253,
+        "width": 581,
+        "height": 304
+      },
+      "scale_x": 1.2608695652173914,
+      "scale_y": 1.2625,
+      "expected_uniform_scale": true,
+      "uniform_scale_relative_error": 0.0012914334911751312,
+      "uniform_scale_tolerance": 0.01,
+      "logical_bounds": {
+        "x": [
+          0,
+          460
+        ],
+        "y": [
+          0,
+          240
+        ]
+      },
+      "screen_local_bounds": {
+        "x": [
+          0,
+          580
+        ],
+        "y": [
+          0,
+          303
+        ]
+      },
+      "boundary_mapping": "logical_max_to_last_screen_pixel",
+      "executor_coordinate_units": "screen_pixels",
+      "point_step_px_units": "screen_pixels"
+    }
+  }
+}
