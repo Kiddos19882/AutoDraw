@@ -1220,3 +1220,13 @@ def test_g3_long_line_scenario_is_available_with_six_controlled_strokes():
     assert plan["generation"]["test_case"] == "paint_consumption_long_lines"
     assert len(plan["strokes"]) == 6
     assert all(stroke["metadata"]["line_extension_px_override"] == 0.0 for stroke in plan["strokes"])
+
+
+def test_g3_block_task_bypasses_legacy_radius_matrix_routing():
+    scenario_id = brush_ui.MATRIX_SCENARIO_ID
+    assert scenario_id == "paint_consumption_long_lines"
+    assert scenario_id in brush_ui.GEOMETRY_MATRIX_SCENARIOS
+    assert brush_ui._is_legacy_chalk_radius_matrix_run(scenario_id, None) is True
+    task = {"task_id": "paint_consumption_long_lines-s2-d20-r3"}
+    assert brush_ui._is_legacy_chalk_radius_matrix_run(scenario_id, task) is False
+    assert brush_ui._is_legacy_chalk_radius_matrix_run("horizontal_lengths", task) is False
