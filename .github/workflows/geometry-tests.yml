@@ -102,12 +102,17 @@ jobs:
             AutoDraw_Stage20/source/executor/requirements.txt
       - name: Install application test dependencies
         run: python -m pip install -r source/preparation/requirements.txt -r source/executor/requirements.txt pytest
-      - name: Run root application unittest suite
+      - name: Run unified application and G3 handoff tests
         shell: pwsh
         run: |
           $env:PYTHONPATH = "$env:GITHUB_WORKSPACE\\AutoDraw_Stage20;$env:GITHUB_WORKSPACE\\AutoDraw_Stage20\\source\\preparation;$env:GITHUB_WORKSPACE\\AutoDraw_Stage20\\source\\executor"
-          python -m unittest discover -s tests -v
-      - name: Run root pytest function suites
+          python -m pytest -q -ra tests/test_unified_app.py
+      - name: Run root build, import and test-runner regressions
+        shell: pwsh
+        run: |
+          $env:PYTHONPATH = "$env:GITHUB_WORKSPACE\\AutoDraw_Stage20;$env:GITHUB_WORKSPACE\\AutoDraw_Stage20\\source\\preparation;$env:GITHUB_WORKSPACE\\AutoDraw_Stage20\\source\\executor"
+          python -m pytest -q -ra tests/test_build_helpers.py tests/test_test_runner.py tests/test_brush_experiment_series.py tests/test_import_resolution_diagnostics.py
+      - name: Run root geometry validator and metric tests
         shell: pwsh
         run: |
           $env:PYTHONPATH = "$env:GITHUB_WORKSPACE\\AutoDraw_Stage20;$env:GITHUB_WORKSPACE\\AutoDraw_Stage20\\source\\preparation;$env:GITHUB_WORKSPACE\\AutoDraw_Stage20\\source\\executor"
