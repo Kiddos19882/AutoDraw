@@ -87,3 +87,15 @@
 - [ ] Расширить матрицу на независимые параметры размера кисти, траектории и покрытия, если результаты G3 покажут необходимость.
 
 **Граница:** software gate не закрывает live gate. Фактическое влияние шага и задержки на расход CHALK пока не установлено.
+
+## 2026-11-02 — G3 software gate: оптимизация CI
+
+- [x] Разделить обязательные Game Monitor, Preparation/G3, Integration и Executor regression suites на параллельные jobs.
+- [x] Отложить тяжёлые Stage 5/7/8 benchmarks до ручного workflow_dispatch.
+- [x] Гейтировать portable build успешным завершением всех test jobs и убрать повторный прогон тех же suite только в CI.
+- [x] Добавить G3 UI plan-routing test, проверяющий block identity, matrix identity и task-specific executor parameters.
+- [ ] Подтвердить полный CI на конечном code HEAD.
+- [ ] Получить portable artifact и провести локальный Windows preflight.
+- [ ] Закрыть прежний paused journal только через recovery UI после проверки доски.
+- [ ] Выполнить новую чистую серию G3 — 27/27 подтверждённых captures.
+- [ ] Рассчитать расход CHALK отдельно для девяти комбинаций sampling и проверить влияние на ресурс.
