@@ -254,3 +254,61 @@ def test_inspect_matrix_series_counts_legacy_manifests_without_order_index(tmp_p
     assert state["series_experiment_count"] == 1
     assert state["next_matrix_order_index"] == 2
     assert state["duplicate_manifest_path"] is None
+
+def test_g3_metadata_distinguishes_executor_parameter_cells_and_blocks_only_exact_duplicates(tmp_path):
+    first_parameters = dict(GEOMETRY_EXECUTOR_CONFIG)
+    first_parameters.update({"point_step_px": 1, "point_delay_ms": 5})
+    second_parameters = dict(GEOMETRY_EXECUTOR_CONFIG)
+    second_parameters.update({"point_step_px": 2, "point_delay_ms": 5})
+    metadata = build_chalk_experiment_matrix_metadata(
+        series_id="g3-series",
+        scenario_id="paint_consumption_long_lines",
+        repeat_index=1,
+        requested_radius=10,
+        strokes=_strokes(6),
+        matrix_order_index=1,
+        executor_parameters=first_parameters,
+    )
+    assert metadata["phase_id"] == "G3"
+    assert metadata["expected_strokes"] == 6
+    assert metadata["executor_parameters"] == first_parameters
+
+    folder = tmp_path / "g3-run"
+    folder.mkdir()
+    (folder / "experiment.json").write_text(
+        json.dumps({"chalk_experiment_matrix": metadata}), encoding="utf-8"
+    )
+    occupied = inspect_chalk_matrix_series(
+        tmp_path,
+        series_id="g3-series",
+        scenario_id="paint_consumption_long_lines",
+        repeat_index=1,
+        executor_parameters=first_parameters,
+    )
+    assert occupied["duplicate_manifest_path"] == str(folder / "experiment.json")
+    available = inspect_chalk_matrix_series(
+        tmp_path,
+        series_id="g3-series",
+        scenario_id="paint_consumption_long_lines",
+        repeat_index=1,
+        executor_parameters=second_parameters,
+    )
+    assert available["duplicate_manifest_path"] is None
+
+
+@pytest.mark.parametrize(
+    "step, delay",
+    [(0, 5), (3, 5), (1, 0), (1, 15), (1.0, 5)],
+)
+def test_g3_metadata_rejects_values_outside_the_experiment_matrix(step, delay):
+    parameters = dict(GEOMETRY_EXECUTOR_CONFIG)
+    parameters.update({"point_step_px": step, "point_delay_ms": delay})
+    with pytest.raises(ValueError):
+        build_chalk_experiment_matrix_metadata(
+            series_id="g3-series",
+            scenario_id="paint_consumption_long_lines",
+            repeat_index=1,
+            requested_radius=10,
+            strokes=_strokes(6),
+            executor_parameters=parameters,
+        )
