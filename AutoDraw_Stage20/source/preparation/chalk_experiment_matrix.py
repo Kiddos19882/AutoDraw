@@ -141,7 +141,7 @@ def build_chalk_experiment_matrix_metadata(
     matrix_order_index: int = 1,
     executor_parameters: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Create stable identity for one G1/G2/G3 experiment cell.""
+    """Create stable identity for one G1/G2/G3 experiment cell."""
     normalized_series = _normalize_series_id(series_id)
     if not isinstance(scenario_id, str):
         raise ValueError("ID сценария должен быть текстом.")
