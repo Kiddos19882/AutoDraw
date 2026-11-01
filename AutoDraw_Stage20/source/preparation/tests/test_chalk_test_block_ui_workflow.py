@@ -8,6 +8,7 @@ from chalk_test_blocks import (
     build_chalk_test_block_plan,
     claim_next_chalk_block_task,
     create_chalk_test_block_journal,
+    finish_chalk_block_task,
     load_chalk_test_block_journal,
     record_chalk_block_task_experiment,
 )
@@ -57,6 +58,49 @@ def _active_ui(tmp_path: Path):
     ui.root = _Root()
     ui._update_chalk_block_progress = lambda: None
     return ui, journal_path, task
+
+
+def test_completed_block_shows_visible_notification(tmp_path, monkeypatch):
+    plan = build_chalk_test_block_plan(series_id="ui-complete", phase_id="G1", seed=8)
+    journal_path = tmp_path / "completed-block.json"
+    create_chalk_test_block_journal(journal_path, plan)
+    for index in range(12):
+        task = claim_next_chalk_block_task(journal_path)
+        assert task is not None
+        experiment_dir = tmp_path / f"experiment-{index}"
+        experiment_dir.mkdir()
+        finish_chalk_block_task(
+            journal_path,
+            task["task_id"],
+            accepted=True,
+            experiment_id=f"experiment-{index}",
+            experiment_dir=experiment_dir,
+        )
+
+    ui = object.__new__(BrushBehaviorTestTab)
+    ui._chalk_block_journal_path = journal_path
+    ui._chalk_block_stop_requested = False
+    ui._chalk_block_task = None
+    ui._chalk_block_recovery_journal_path = None
+    ui.status_var = _Value()
+    ui.matrix_series_var = _Value()
+    ui.root = _Root()
+    ui._update_chalk_block_progress = lambda: None
+    ui._clear_chalk_block_runtime = lambda: setattr(ui, "_chalk_block_journal_path", None)
+    notifications = []
+    monkeypatch.setattr(
+        ui_module.messagebox,
+        "showinfo",
+        lambda *args, **kwargs: notifications.append((args, kwargs)),
+    )
+
+    ui._start_next_chalk_block_task()
+
+    assert len(notifications) == 1
+    assert notifications[0][0][0] == "Блок G1 завершён"
+    assert "12/12" in notifications[0][0][1]
+    assert notifications[0][1]["parent"] is ui.root
+    assert "все опыты приняты" in ui.status_var.value
 
 
 def test_ui_capture_gate_accepts_task_before_advancing(tmp_path, monkeypatch):
