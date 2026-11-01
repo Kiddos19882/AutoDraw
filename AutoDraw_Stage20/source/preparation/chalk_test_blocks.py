@@ -327,7 +327,7 @@ def stop_chalk_test_block(journal_path: str | Path) -> dict[str, Any]:
     journal = load_chalk_test_block_journal(path)
     if any(task.get("status") == "running" for task in journal["tasks"]):
         raise RuntimeError("Нельзя остановить блок посреди опыта; дождитесь безопасной границы.")
-    if journal.get("status") in {"completed", "failed", "paused"}:
+    if journal.get("status") in {"completed", "stopped"}:
         return journal
     journal["status"] = "stopped"
     journal["stopped_at_utc"] = _utc_now()
@@ -361,5 +361,44 @@ def record_chalk_block_task_experiment(
     attempt["experiment_id"] = experiment_id
     attempt["experiment_dir"] = str(Path(experiment_dir).resolve())
     attempt["experiment_registered_at_utc"] = _utc_now()
+    _save_journal(path, journal)
+    return dict(task)
+
+def resolve_interrupted_chalk_block_task(
+    journal_path: str | Path,
+    task_id: str,
+    *,
+    board_checked: bool,
+    decision: str,
+) -> dict[str, Any]:
+    """Require explicit board inspection before retrying or closing an interrupted block."""
+    if board_checked is not True:
+        raise ValueError("Перед решением требуется явно подтвердить проверку игровой доски.")
+    if decision not in {"retry", "stop"}:
+        raise ValueError("decision должен быть retry или stop.")
+    path = Path(journal_path)
+    journal = load_chalk_test_block_journal(path)
+    task = next((item for item in journal["tasks"] if item.get("task_id") == task_id), None)
+    if task is None or task.get("status") != "interrupted":
+        raise ValueError(f"Тест {task_id!r} не находится в состоянии interrupted.")
+    if decision == "retry":
+        task["status"] = "pending"
+        journal["status"] = "ready"
+        journal.pop("pause_reason", None)
+        journal["recovery_decision"] = {
+            "task_id": task_id,
+            "decision": "retry",
+            "board_checked": True,
+            "decided_at_utc": _utc_now(),
+        }
+    else:
+        journal["status"] = "stopped"
+        journal["stopped_at_utc"] = _utc_now()
+        journal["recovery_decision"] = {
+            "task_id": task_id,
+            "decision": "stop",
+            "board_checked": True,
+            "decided_at_utc": _utc_now(),
+        }
     _save_journal(path, journal)
     return dict(task)
