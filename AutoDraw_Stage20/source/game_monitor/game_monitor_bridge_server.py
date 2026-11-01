@@ -132,6 +132,17 @@ class RunRecorder:
                 and type(self.last_status.get("droppedEvents")) is int else None
             ),
             "monitor_buffer_dropped_events_delta": 0,
+            "monitor_error_count_start": (
+                self.last_status.get("errors")
+                if isinstance(self.last_status, dict)
+                and type(self.last_status.get("errors")) is int else None
+            ),
+            "monitor_error_count_end": (
+                self.last_status.get("errors")
+                if isinstance(self.last_status, dict)
+                and type(self.last_status.get("errors")) is int else None
+            ),
+            "monitor_error_count_delta": 0,
             # Browser Bridge initializes sendFailureCount at zero for each session.
             "bridge_send_failures_start": (
                 self.last_bridge_diagnostics.get("sendFailureCount")
@@ -282,7 +293,14 @@ class RunRecorder:
                     max(0, dropped - start) if type(start) is int else None
                 )
             self.current["monitor_dropped_events"] = dropped  # Deprecated session-cumulative alias.
-            self.current["monitor_error_count"] = status.get("errors")
+            errors = status.get("errors")
+            if type(errors) is int:
+                self.current["monitor_error_count_end"] = errors
+                start_errors = self.current.get("monitor_error_count_start")
+                self.current["monitor_error_count_delta"] = (
+                    max(0, errors - start_errors) if type(start_errors) is int else None
+                )
+            self.current["monitor_error_count"] = errors  # Deprecated cumulative alias.
             self.current["monitor_active"] = status.get("active")
             failures = bridge_diagnostics.get("sendFailureCount") if isinstance(bridge_diagnostics, dict) else None
             if type(failures) is int:
@@ -482,6 +500,12 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
                         await websocket.close(code=4002, reason="invalid session id")
                         return
                     recorder = RunRecorder(output_dir / session_id, session_id, idle_seconds)
+                    initial_status = message.get("monitorStatus")
+                    if isinstance(initial_status, dict):
+                        recorder.last_status = initial_status
+                    initial_bridge_diagnostics = message.get("bridgeDiagnostics")
+                    if isinstance(initial_bridge_diagnostics, dict):
+                        recorder.last_bridge_diagnostics = initial_bridge_diagnostics
                     session_dir = output_dir / session_id
                     session_dir.mkdir(parents=True, exist_ok=True)
                     session_path = session_dir / "session.json"
