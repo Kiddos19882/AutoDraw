@@ -1526,3 +1526,6 @@ Recovery resume/close теперь также требуют владения lo
 
 
 Добавлен отдельный cross-process test: дочерний процесс через multiprocessing spawn пытается захватить owner lock, удерживаемый основным процессом; ожидается отказ. Это особенно важно для проверки Windows msvcrt locking в CI. Commit: 73af05b495b06b87bf892e93a2fb2d2085c9adad.
+
+
+Дополнительно: при явном закрытии failed-блока после осмотра доски в recovery_decisions записывается close_failed_block, board_checked=true и timestamp. Commit 6df2644a; test 8d0a949d.
