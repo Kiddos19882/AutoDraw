@@ -403,7 +403,7 @@ Build job устанавливает build/runtime requirements, но получ
 
 ### 10.3. Длительные benchmarks
 
-`algorithm-benchmarks` запускается только вручную через `workflow_dispatch`. В него перенесены диагностика эталонного изображения, отчёт калибровки, Stage 5/7/8 benchmarks, синтетические Stage 7 cases, fallback merge sweep и сравнение outline-first/interior-fill. Эти исследования не нужны для проверки G3 handoff и больше не удлиняют каждый commit CI.
+`algorithm-benchmarks` запускается только вручную через `workflow_dispatch` и только если пользователь явно включил input `run_algorithm_benchmarks`; обычный manual validation run по умолчанию выполняет только обязательные tests/build. В него перенесены диагностика эталонного изображения, отчёт калибровки, Stage 5/7/8 benchmarks, синтетические Stage 7 cases, fallback merge sweep и сравнение outline-first/interior-fill. Эти исследования не нужны для проверки G3 handoff и больше не удлиняют каждый commit CI.
 
 Benchmark job работает из корня `AutoDraw_Stage20/`; пути скриптов, fixture, palette и отчётов заданы относительно этой рабочей директории. Git reference paths остаются относительно корня репозитория. Отчёты и preview публикуются одним artifact `autodraw-algorithm-benchmarks`.
 
