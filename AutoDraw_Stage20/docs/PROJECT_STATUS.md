@@ -523,3 +523,12 @@ Live G1/G2 не запускались. Старые 12 G1 manifests не пер
 Падение было в callback test stub: lambda для `validate_chalk_block_experiment` не принимала новые keyword identity параметры. Исправлено в commit [20704ab984b981a4bf5b2278eba6cfad970d15a5](https://github.com/Kiddos19882/AutoDraw/commit/20704ab984b981a4bf5b2278eba6cfad970d15a5): stub принимает `**_kwargs`, а проверка incomplete evidence сохранена.
 
 **Текущий gate:** повторный CI для исправленного commit ещё не подтверждён. Live G1 не запускался. Не изменялись `data/`, первичные manifests и `master`.
+
+
+## 12. Целостность block journal и CI (2026-11-01)
+
+Исправление callback test stub прошло полный CI: run [41268085571](https://github.com/Kiddos19882/AutoDraw/actions/runs/41268085571) — geometry-tests, executor-tests, Windows portable build/startup smoke-test: success. Последний documentation commit на тот момент также прошёл все три job: [41268149629](https://github.com/Kiddos19882/AutoDraw/actions/runs/41268149629).
+
+Дополнительно усилен загрузчик block journal. Теперь структурно повреждённые журналы отвергаются до state transition/recovery: проверяются task/attempt shape и ID, статусы, единственная активная попытка, число running задач и согласованность статуса блока. Невалидный JSON преобразуется в ValueError и остаётся unresolved; автоматическая миграция/починка не выполняется. Добавлены негативные и позитивные unit tests. Коммиты: `2ea67817bd1187baa66252aec440a4a5238042e0`, `52b40e94eadf1e75f461565960547b2a749993e4`.
+
+Новые изменения требуют CI. Межпроцессная блокировка journal write не реализована; предположение текущего runner — один активный экземпляр UI. Live G1 ещё не запускался.
