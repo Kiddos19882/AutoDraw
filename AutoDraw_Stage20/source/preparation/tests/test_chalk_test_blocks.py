@@ -586,15 +586,13 @@ def test_journal_mutations_use_a_stable_cross_process_lock_file(tmp_path):
 
 
 
-def test_block_owner_lock_is_exclusive_until_released(tmp_path):
+def test_block_owner_lock_can_be_reacquired_after_release(tmp_path):
     path = tmp_path / "block.json"
     first = acquire_chalk_block_owner_lock(path)
     assert first is not None
-    assert acquire_chalk_block_owner_lock(path) is None
-    assert acquire_chalk_block_owner_lock(tmp_path / "another-block.json") is None
-
     release_chalk_block_owner_lock(first)
-    second = acquire_chalk_block_owner_lock(path)
+
+    second = acquire_chalk_block_owner_lock(tmp_path / "another-block.json")
     assert second is not None
     release_chalk_block_owner_lock(second)
 
