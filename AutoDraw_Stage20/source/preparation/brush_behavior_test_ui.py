@@ -1626,6 +1626,11 @@ class BrushBehaviorTestTab:
                 )
                 plan["generation"]["chalk_radius_matrix"] = matrix_metadata
             elif scenario_id in GEOMETRY_MATRIX_SCENARIOS:
+                if scenario_id == "paint_consumption_long_lines" and self._chalk_block_task is None:
+                    raise ValueError(
+                        "G3 разрешено запускать только полным автоматическим блоком после принятия G2. "
+                        "Отдельные ручные опыты G3 запрещены, чтобы не обходить порядок и матрицу повторов."
+                    )
                 series_id = self.matrix_series_var.get()
                 repeat_index = int(self._chalk_block_task["repeat_index"]) if self._chalk_block_task else int(self.matrix_block_var.get().strip())
                 if self._chalk_block_task is not None:
