@@ -137,3 +137,6 @@ Mock обновлён до `lambda _path, **_kwargs` в commit `20704ab984b981a4
 
 
 Journal validator также проверяет типы полей phase/status до membership checks. Некорректные JSON значения list/dict в этих полях возвращают ValueError, а не TypeError из-за unhashable values. Для этого добавлены отдельные negative cases; CI для финального изменения ожидается.
+
+
+CI run `41269156105` обнаружил SyntaxError в source validator из-за буквального `\\n` в строке type check. Исправлено commit `dd5aaade3b790546d9e3fc11341554f6aa09d8ec`. Полный CI на исправленном commit — обязательный gate перед live G1.
