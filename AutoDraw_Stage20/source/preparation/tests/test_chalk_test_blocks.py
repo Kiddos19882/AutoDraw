@@ -133,7 +133,7 @@ def test_block_experiment_acceptance_requires_complete_stroke_breakdown(tmp_path
                 "after_draw": {"status": "captured"},
                 "postdraw_workflow": {"status": "completed"},
             },}), encoding="utf-8")
-    record = {"stroke_level": {"status": "incomplete", "reason": "stroke_id_count_mismatch"}}
+    record = {"expected_strokes": 5, "consumed_points": 25, "stroke_level": {"status": "incomplete", "reason": "stroke_id_count_mismatch"}}
     monkeypatch.setattr(chalk_experiment_matrix, "_validate_manifest", lambda _document: (True, "valid", record))
     monkeypatch.setattr(
         chalk_experiment_matrix,
@@ -166,7 +166,7 @@ def test_block_experiment_acceptance_requires_clean_frame_probe_and_trajectory(t
         }),
         encoding="utf-8",
     )
-    record = {"stroke_level": {"status": "complete", "strokes": []}}
+    record = {"expected_strokes": 5, "consumed_points": 25, "stroke_level": {"status": "complete", "strokes": []}}
     monkeypatch.setattr(chalk_experiment_matrix, "_validate_manifest", lambda _document: (True, "valid", record))
     monkeypatch.setattr(
         chalk_experiment_matrix,
