@@ -72,7 +72,8 @@
 - [x] Разобрать CI после task-identity/path acceptance hardening: выявлена устаревшая mock lambda в callback test.
 - [x] Исправить mock validator stub для новых keyword identity аргументов (commit `20704ab984b981a4bf5b2278eba6cfad970d15a5`).
 - [ ] Подтвердить полный CI и Windows startup smoke-test после исправления.
-- [ ] Завершить review оставшихся callback/journal I/O/recovery failure paths.
+- [x] Провести review journal/recovery shape: добавить fail-closed structural validation и unit tests для повреждённых журналов.
+- [ ] Проверить новый journal validator в полном CI; отдельно оценить single-instance assumption и journal I/O failure paths.
 - [ ] Выполнить один контролируемый live G1 block после успешного CI и проверки тестовой доски.
 - [ ] Только после полного принятия G1 разрешить G2.
 
