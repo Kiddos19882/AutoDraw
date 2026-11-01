@@ -185,3 +185,18 @@ CI/software gate закрыт. Live gate остаётся открытым, по
 - [ ] Подтвердить полный GitHub Actions CI: geometry-tests, executor-tests, Windows portable build/startup smoke-test.
 - [ ] После software gate выполнить 27 live G3 экспериментов на пользовательской Windows/игровой сессии.
 - [ ] Проанализировать CHALK, move calls, длительность, FPS, accepted points и dropped events отдельно для каждой конфигурации.
+
+
+## Актуализация G3 gate — 2026-11-01
+
+- [x] Подтвердить полный GitHub Actions CI на HEAD `e1872af08efbff7ee7c9ac771e6b9eb70b748c46`: run [41337768801](https://github.com/Kiddos19882/AutoDraw/actions/runs/41337768801), все три jobs success.
+- [x] Подтвердить `geometry-tests`.
+- [x] Подтвердить `executor-tests`.
+- [x] Подтвердить Windows portable build и startup smoke-test.
+- [x] Исправить три CI-дефекта: лишняя скобка, тесты вне unittest-класса, незакрытый docstring (commits `bf52f12`, `6594e28`, `e1872af`).
+- [ ] Локальный Windows preflight: запуск portable-сборки, профиль/калибровка кисти, Clear reference, пустая тестовая доска, игровая canvas, heartbeat Game Monitor.
+- [ ] После успешного preflight выполнить полный G3 block: 27/27 задач, девять комбинаций шага/задержки × три повтора.
+- [ ] Проверить каждый capture: точный baseline/post CHALK, сумма DRAW_SAMPLE pointDelta, executor config из execution report, радиус 10, шесть штрихов, ноль dropped events/errors, валидный frame capture.
+- [ ] Рассчитать статистику отдельно по девяти конфигурациям и только после этого сформировать модель расхода CHALK.
+
+Software gate закрыт; live gate остаётся открытым. Автоматический Windows smoke-test в GitHub Actions не является подтверждением локальной игровой сессии или измерением расхода краски.
