@@ -1096,7 +1096,7 @@ class BrushBehaviorTestTab:
         ):
             return
         try:
-            journal = stop_chalk_test_block_journal(path)
+            journal = stop_chalk_test_block_journal(path, board_checked=True)
         except (OSError, ValueError, RuntimeError) as exc:
             messagebox.showerror("Не удалось закрыть блок", str(exc), parent=self.root)
             return
