@@ -194,7 +194,7 @@ jobs:
             AutoDraw_Stage20/source/preparation/requirements.txt
             AutoDraw_Stage20/source/executor/requirements.txt
       - name: Install benchmark dependencies
-        run: python -m pip install -r requirements.txt -r ..\executor\requirements.txt
+        run: python -m pip install -r source/preparation/requirements.txt -r source/executor/requirements.txt
       - name: Fetch master benchmark reference
         shell: pwsh
         run: git fetch origin master --depth=1
