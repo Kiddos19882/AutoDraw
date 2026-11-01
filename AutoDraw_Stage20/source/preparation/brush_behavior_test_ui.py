@@ -31,6 +31,7 @@ from chalk_radius_matrix import (
 )
 from chalk_experiment_matrix import (
     GEOMETRY_MATRIX_SCENARIOS, build_chalk_experiment_matrix_metadata,
+    inspect_chalk_matrix_series,
 )
 from brush_experiment_capture import (
     compare_images, crop_calibrated_regions,
@@ -640,7 +641,7 @@ class BrushBehaviorTestTab:
         ttk.Entry(matrix_row, textvariable=self.matrix_block_var, width=4).pack(side="left", padx=6)
         ttk.Label(
             matrix_row,
-            text="Для длинных линий — блок радиуса; для G1/G2 — номер повтора сценария.",
+            text="Для G1/G2 номер повтора задаётся вручную; занятый повтор будет заблокирован. Порядок запуска серии назначается автоматически.",
         ).pack(side="left", padx=8)
         ttk.Label(controls, textvariable=self.area_var, wraplength=1100).pack(anchor="w", pady=(8, 0))
         slider = ttk.LabelFrame(controls, text="Автоматическая установка кисти", padding=6)
@@ -984,12 +985,27 @@ class BrushBehaviorTestTab:
                 )
                 plan["generation"]["chalk_radius_matrix"] = matrix_metadata
             elif scenario_id in GEOMETRY_MATRIX_SCENARIOS:
-                experiment_matrix_metadata = build_chalk_experiment_matrix_metadata(
-                    series_id=self.matrix_series_var.get(),
+                series_id = self.matrix_series_var.get()
+                repeat_index = int(self.matrix_block_var.get().strip())
+                series_state = inspect_chalk_matrix_series(
+                    self.output_dir,
+                    series_id=series_id,
                     scenario_id=scenario_id,
-                    repeat_index=int(self.matrix_block_var.get().strip()),
+                    repeat_index=repeat_index,
+                )
+                duplicate_path = series_state["duplicate_manifest_path"]
+                if duplicate_path:
+                    raise ValueError(
+                        f"Повтор {repeat_index} для сценария {scenario_id} уже сохранён в этой серии: "
+                        f"{duplicate_path}. Выбери другой номер повтора (1–3) или новый ID серии."
+                    )
+                experiment_matrix_metadata = build_chalk_experiment_matrix_metadata(
+                    series_id=series_id,
+                    scenario_id=scenario_id,
+                    repeat_index=repeat_index,
                     requested_radius=brush,
                     strokes=plan["strokes"],
+                    matrix_order_index=series_state["next_matrix_order_index"],
                 )
                 plan["generation"]["chalk_experiment_matrix"] = experiment_matrix_metadata
             path.write_text(json.dumps(plan, ensure_ascii=False, indent=2), encoding="utf-8")
