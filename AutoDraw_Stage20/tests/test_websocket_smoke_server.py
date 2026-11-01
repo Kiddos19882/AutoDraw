@@ -115,7 +115,9 @@ class BridgeRecorderTests(unittest.TestCase):
     def test_session_cumulative_monitor_buffer_overflow_does_not_invalidate_run(self):
         before = {"maxPoints": 6000, "remainingPoints": 6000, "pointCount": 0, "isExact": True}
         after = {"maxPoints": 6000, "remainingPoints": 5999, "pointCount": 1, "isExact": True}
-        self.recorder.heartbeat({"droppedEvents": 50000, "errors": 0}, 0.5)
+        self.recorder.heartbeat(
+            {"droppedEvents": 50000, "errors": 0}, 0.5, {"sendFailureCount": 0}
+        )
         self.recorder.event({"type": "DRAW_START", "t": 1, "before": before}, 1.0)
         self.recorder.event({"type": "DRAW_SAMPLE", "t": 2, "strokeId": "s1",
                              "pointDelta": 1, "acceptedPoint": {"x": 3, "y": 4}}, 1.1)
