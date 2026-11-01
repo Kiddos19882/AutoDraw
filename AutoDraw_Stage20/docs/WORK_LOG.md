@@ -1669,3 +1669,14 @@ PR #3 использован как временный CI-only PR с base `ci/g3
 **Статус gate:** G3 software/CI gate закрыт на указанном HEAD. Это не означает выполнения live G3. Не выполнены локальный Windows preflight и 27 live captures; фактическая зависимость CHALK от `point_step_px` и `point_delay_ms` ещё не измерена. Следующий этап — локальный preflight, затем полный последовательный G3 block 27/27.
 
 **Синхронизация:** обновлены PROJECT_STATUS, TASKS, CHALK_TEST_BLOCKS_DESIGN, TESTS_AND_CI_MAP и CHANGELOG; данная запись фиксирует фактический результат CI. Код приложения и workflow не менялись в рамках этой документальной синхронизации.
+
+
+## 2026-11-01 — исправлен возврат окна AutoDraw после установки кисти в G3
+
+Во время live G3 обнаружено нарушение последовательности: после успешного подтверждения радиуса Game Monitor окно AutoDraw восстанавливалось поверх игры до запуска Stage6. Причина — безусловные `root.deiconify()` / `root.lift()` в `BrushBehaviorTestTab._complete_brush_radius_feedback()`.
+
+Исправление в `source/preparation/brush_behavior_test_ui.py`: при автоматическом handoff (`_start_executor_after_brush_drag=True`) окно остаётся свёрнутым, фокус остаётся у игры, после чего выполняется штатный callback запуска executor. При ручной установке кисти прежнее восстановление окна и уведомление сохранены. Проверка точного свежего heartbeat, запись manifest и fail-closed условия не менялись.
+
+Regression test в `source/preparation/tests/test_brush_behavior_test_ui.py` теперь требует, чтобы автоматический handoff не вызывал восстановление окна. Коммиты: `8f8923ded3d788e725206d31515d6f0ed221db3a`, `fd814517b584b9a800c95e4b6a19581a7afc33ce`.
+
+**Проверка:** тест и полный CI для нового HEAD ожидаются; live-повтор G3 после исправления ещё не выполнен. До успешного CI и повторного preflight/G3 продолжать сбор 27 captures нельзя.
