@@ -1221,5 +1221,38 @@ class UnifiedAppCoreTests(unittest.TestCase):
 
 
 
+    def test_brush_test_executor_starts_without_redundant_radius_confirmation(self):
+        class Status:
+            def set(self, value):
+                self.value = value
+
+        class Executor:
+            running = False
+
+            def __init__(self, plan_path):
+                self.plan_path = plan_path
+                self.started_with = None
+
+            def start_execution_from_workflow(self, *, executor_config_override=None):
+                self.started_with = executor_config_override
+                return True
+
+        app = object.__new__(integrated_app.AutoDrawUnifiedApp)
+        app.status_var = Status()
+        with tempfile.TemporaryDirectory(prefix="AutoDraw brush handoff ") as temp:
+            plan_path = Path(temp) / "current_brush_behavior_test.json"
+            plan_path.write_text(json.dumps({"generation": {}}), encoding="utf-8")
+            app.executor = Executor(plan_path)
+
+            with patch(
+                "integrated_app.messagebox.askyesno",
+                side_effect=AssertionError("Redundant visual radius confirmation must not appear"),
+            ):
+                app._start_brush_test_executor(10)
+
+        self.assertIsNone(app.executor.started_with)
+        self.assertIn("запущен", app.status_var.value)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
