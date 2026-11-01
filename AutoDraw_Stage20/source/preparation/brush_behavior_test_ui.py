@@ -40,6 +40,7 @@ from chalk_test_blocks import (
     validate_chalk_block_experiment, stop_chalk_test_block as stop_chalk_test_block_journal,
     record_chalk_block_task_experiment, mark_interrupted_chalk_block_task,
     resolve_interrupted_chalk_block_task,
+    acquire_chalk_block_owner_lock, release_chalk_block_owner_lock,
 )
 from brush_experiment_capture import (
     compare_images, crop_calibrated_regions,
@@ -607,6 +608,7 @@ class BrushBehaviorTestTab:
         self.chalk_block_phase_var = tk.StringVar(value="G1")
         self.chalk_block_progress_var = tk.StringVar(value="Блок CHALK не запущен.")
         self._chalk_block_journal_path: Path | None = None
+        self._chalk_block_owner_lock = None
         self._chalk_block_recovery_journal_path: Path | None = None
         self._chalk_block_task: dict[str, Any] | None = None
         self._chalk_block_stop_requested = False
@@ -971,10 +973,24 @@ class BrushBehaviorTestTab:
             return
         unresolved: list[Path] = []
         interrupted_details = None
+        ownership_conflict = False
         for journal_path in sorted(root.glob("*.json")):
             try:
                 journal = load_chalk_test_block_journal(journal_path)
             except (OSError, ValueError, json.JSONDecodeError):
+                unresolved.append(journal_path)
+                continue
+            if journal.get("status") not in {"ready", "running", "paused", "failed"}:
+                continue
+            owner_lock = acquire_chalk_block_owner_lock(journal_path)
+            if owner_lock is None:
+                ownership_conflict = True
+                unresolved.append(journal_path)
+                continue
+            if self._chalk_block_owner_lock is None:
+                self._chalk_block_owner_lock = owner_lock
+            else:
+                release_chalk_block_owner_lock(owner_lock)
                 unresolved.append(journal_path)
                 continue
             if journal.get("status") == "running":
@@ -991,8 +1007,7 @@ class BrushBehaviorTestTab:
                 except (OSError, ValueError, RuntimeError):
                     unresolved.append(journal_path)
                     continue
-            if journal.get("status") in {"ready", "paused"}:
-                unresolved.append(journal_path)
+            unresolved.append(journal_path)
         if interrupted_details:
             self._chalk_block_recovery_journal_path = interrupted_details[0]
         elif unresolved:
@@ -1006,6 +1021,14 @@ class BrushBehaviorTestTab:
                 f"Каталог: {experiment_dir or 'не создан'}\nЖурнал: {path}\n\n"
                 "Автоматического повторного рисования не будет. Сначала вручную проверь игровую доску. "
                 "После проверки можно явно разрешить новую попытку или закрыть блок.",
+                parent=self.root,
+            )
+        elif unresolved and ownership_conflict:
+            self.chalk_block_progress_var.set("Журнал CHALK используется другим экземпляром AutoDraw.")
+            messagebox.showwarning(
+                "Блок CHALK уже обслуживается",
+                f"Журнал: {unresolved[0]}\nДругой экземпляр AutoDraw удерживает блокировку сеанса. "
+                "Не запускай восстановление или второй блок одновременно.",
                 parent=self.root,
             )
         elif unresolved:
@@ -1101,6 +1124,10 @@ class BrushBehaviorTestTab:
             messagebox.showerror("Не удалось закрыть блок", str(exc), parent=self.root)
             return
         self._chalk_block_recovery_journal_path = None
+        owner_lock = getattr(self, "_chalk_block_owner_lock", None)
+        if owner_lock is not None:
+            release_chalk_block_owner_lock(owner_lock)
+            self._chalk_block_owner_lock = None
         self.chalk_block_progress_var.set(
             f"{journal.get('phase_id')}: блок закрыт; первичные попытки сохранены."
         )
@@ -1233,11 +1260,21 @@ class BrushBehaviorTestTab:
         journal_path = journal_dir / (
             f"chalk-block-{phase_id}-{series_id}-{block_plan['block_id'][:8]}.json"
         )
+        owner_lock = acquire_chalk_block_owner_lock(journal_path)
+        if owner_lock is None:
+            messagebox.showwarning(
+                "Блок уже обслуживается",
+                "Другой экземпляр AutoDraw уже владеет этим журналом. Параллельный запуск запрещён.",
+                parent=self.root,
+            )
+            return
         try:
             create_chalk_test_block_journal(journal_path, block_plan)
         except (OSError, ValueError) as exc:
+            release_chalk_block_owner_lock(owner_lock)
             messagebox.showerror("Не удалось создать журнал блока", str(exc), parent=self.root)
             return
+        self._chalk_block_owner_lock = owner_lock
         self._chalk_block_journal_path = journal_path
         self._chalk_block_task = None
         self._chalk_block_stop_requested = False
@@ -1274,6 +1311,10 @@ class BrushBehaviorTestTab:
             self._chalk_block_capture_poll_id = None
         self._chalk_block_journal_path = None
         self._chalk_block_task = None
+        owner_lock = getattr(self, "_chalk_block_owner_lock", None)
+        if owner_lock is not None:
+            release_chalk_block_owner_lock(owner_lock)
+            self._chalk_block_owner_lock = None
         self._chalk_block_clear_confirmed = False
         self._chalk_block_stop_requested = False
 
