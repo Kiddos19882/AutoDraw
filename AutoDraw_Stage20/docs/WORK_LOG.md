@@ -1529,3 +1529,6 @@ Recovery resume/close теперь также требуют владения lo
 
 
 Дополнительно: при явном закрытии failed-блока после осмотра доски в recovery_decisions записывается close_failed_block, board_checked=true и timestamp. Commit 6df2644a; test 8d0a949d.
+
+### CI finding — closure audit classification (2026-11-01)
+The first final CI run exposed a mismatch: `finish_chalk_block_task(accepted=False)` correctly leaves the block in `paused`, while the rejected task itself is `failed`. Closure audit classification now inspects task statuses, recording `close_failed_block` when a failed task exists and `close_paused_block` for interruption-only pauses. This preserves the distinction between block state and failed experiment state. The existing regression test asserts the failed-task path. Full CI must be rerun; G1 remains blocked until all jobs and Windows portable smoke-test pass.
