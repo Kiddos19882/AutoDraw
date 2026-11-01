@@ -729,3 +729,14 @@ Workflow `.github/workflows/geometry-tests.yml` запускается на push
 ### Дополнение — проверка recovery semantics G3 (2026-11-02)
 
 Проверен код `chalk_test_blocks.py` и UI recovery на HEAD после документации. Обычный claim не работает для `stopped`; recovery scan не поднимает stopped journals; retry разрешён только для единственной `interrupted` task, а не для `failed`; G3 plan builder всегда создаёт 27 задач. Поэтому штатный workflow не поддерживает continuation из шести задач для закрытого блока. Не возобновлять его вручную и не редактировать журнал. Следующий штатный G3 запуск — новый полный блок 27 задач. Если требуется сохранить 21 валидный capture и выполнить только шесть недостающих, сначала нужно отдельно разработать и протестировать continuation/aggregation semantics.
+
+## 2026-11-02 — установлена причина partial G3 capture: переполнение буфера Game Monitor
+
+Диагностика кода и реального `session.json` сессии `e3ba66d3-93ba-4f0f-aaf0-bc271d30f6e1` установила причину `monitor_dropped_events=434`: локальный массив `game_monitor.js` достиг лимита `MAX_EVENTS=50000`. После заполнения массива события перестают сохраняться в локальный export buffer, но `emit()` продолжает вызывать подписчиков; Browser Bridge продолжает получать и отправлять события.
+
+Подтверждённый баланс сессии: 252 события уже были в Monitor при подключении + 50 320 событий, отправленных Bridge = 50 572; локальный массив содержит 50 000, cumulative droppedEvents=572. Browser Bridge sentEventCount=50 320, collector received_event_count=50 320, sendFailureCount=0, received_message_count=last_sequence=52 324. Для failed G3 run сохранено 744 события, RunRecorder dropped_events=0, CHALK=363 exact и sampled delta совпадает. Значение 434 — накопительный счётчик всей сессии, а не число пропущенных событий этого run.
+
+Корень ошибки в учёте: `RunRecorder.heartbeat()` переносит глобальный `status.droppedEvents` в конкретный run, а acceptance gate трактует его как per-run loss. В результате capture ошибочно стал `partial`. Код не менялся; выполнена детерминированная симуляция поведения лимита; live рисование и CI не запускались.
+
+Полный разбор и рекомендуемая схема исправления: [GAME_MONITOR_BUFFER_OVERFLOW_ANALYSIS_2026-11-02.md](GAME_MONITOR_BUFFER_OVERFLOW_ANALYSIS_2026-11-02.md). Исторический G3 journal остаётся неизменным и `stopped`; задним числом не переписывать его статусы. Следующая задача — разделить глобальный buffer overflow, bridge send failures, collector transport gaps и per-run recorder drops, добавить regressions и только после этого открывать новый live G3.
+
