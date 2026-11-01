@@ -179,3 +179,6 @@ Owner lock — файловая блокировка ОС, а не маркер�
 
 
 Закрытие failed-блока также записывает отдельное audit-решение close_failed_block с board_checked=true и временем решения; это не должно теряться по сравнению с закрытием paused-блока.
+
+### CI finding — closure audit classification (2026-11-01)
+The first final CI run exposed a mismatch: `finish_chalk_block_task(accepted=False)` correctly leaves the block in `paused`, while the rejected task itself is `failed`. Closure audit classification now inspects task statuses, recording `close_failed_block` when a failed task exists and `close_paused_block` for interruption-only pauses. This preserves the distinction between block state and failed experiment state. The existing regression test asserts the failed-task path. Full CI must be rerun; G1 remains blocked until all jobs and Windows portable smoke-test pass.
