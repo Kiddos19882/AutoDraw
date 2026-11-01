@@ -71,7 +71,8 @@ G1/G2 используют radius=10 и фиксированный `GEOMETRY_EXE
 - task_id, scenario_id, repeat_index, matrix_order_index;
 - expected_strokes, radius, executor parameters;
 - статус pending/running/completed/failed/interrupted;
-- список попыток с experiment_id, experiment_dir, timestamps и причиной отказа.
+- список попыток с experiment_id, experiment_dir, timestamps и причиной отказа;
+- experiment_id и experiment_dir записываются в активную попытку журнала до первого действия мышью, чтобы interrupted run можно было найти после рестарта.
 
 Журнал записывается до запуска и обновляется после каждой попытки. При перезапуске приложения незавершённая задача становится `interrupted`; её нельзя автоматически повторить, потому что игра могла успеть частично нарисовать рисунок. Оператор должен проверить доску и отдельно решить вопрос о повторном запуске. Неудачный/неполный опыт сохраняется как первичное доказательство, но не засчитывается в три валидных повтора.
 
