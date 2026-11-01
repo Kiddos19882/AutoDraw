@@ -595,3 +595,20 @@ def test_block_owner_lock_is_exclusive_until_released(tmp_path):
     second = acquire_chalk_block_owner_lock(path)
     assert second is not None
     release_chalk_block_owner_lock(second)
+
+
+
+def test_failed_block_requires_board_check_before_stop(tmp_path):
+    path = tmp_path / "block.json"
+    create_chalk_test_block_journal(
+        path, build_chalk_test_block_plan(series_id="failed-close", phase_id="G1")
+    )
+    task = claim_next_chalk_block_task(path)
+    finish_chalk_block_task(
+        path, task["task_id"], accepted=False,
+        experiment_id="exp-failed", experiment_dir=tmp_path / "failed",
+        reason="test_failure",
+    )
+    with pytest.raises(ValueError):
+        stop_chalk_test_block(path)
+    assert stop_chalk_test_block(path, board_checked=True)["status"] == "stopped"
