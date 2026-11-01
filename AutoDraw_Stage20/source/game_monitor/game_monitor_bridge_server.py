@@ -99,6 +99,7 @@ class RunRecorder:
         self.active_stroke_ids: set[str] = set()
         self.stroke_started_at: dict[str, float] = {}
         self.observed_stroke_ids: set[str] = set()
+        self.accepted_stroke_ids: set[str] = set()
         self.lifecycle_sources: set[str] = set()
 
     def _start(self, event: dict) -> None:
@@ -138,6 +139,12 @@ class RunRecorder:
         if event.get("type") == "DRAW_SAMPLE":
             point = event.get("acceptedPoint")
             delta = event.get("pointDelta")
+            if type(delta) is int and delta > 0:
+                stroke_id = event.get("strokeId")
+                if stroke_id is None and len(self.active_stroke_ids) == 1:
+                    stroke_id = next(iter(self.active_stroke_ids))
+                if stroke_id is not None:
+                    self.accepted_stroke_ids.add(str(stroke_id))
             if isinstance(point, dict) and isinstance(point.get("x"), (int, float)) and isinstance(point.get("y"), (int, float)):
                 self.current.setdefault("accepted_points", []).append({
                     "t": event.get("t"), "stroke_id": event.get("strokeId"),
@@ -259,12 +266,16 @@ class RunRecorder:
         else:
             run["chalk"] = {"status": "inconclusive", "reason": "missing_or_inconsistent_exact_snapshots"}
         accepted = run.get("accepted_points", [])
-        run["stroke_count"] = len(self.observed_stroke_ids)
+        observed_stroke_ids = self.observed_stroke_ids | self.accepted_stroke_ids
+        run["stroke_count"] = len(self.accepted_stroke_ids)
+        run["stroke_candidate_count"] = len(observed_stroke_ids)
+        run["non_consuming_stroke_candidate_count"] = len(observed_stroke_ids - self.accepted_stroke_ids)
         run["stroke_lifecycle_sources"] = sorted(self.lifecycle_sources)
         run.pop("stroke_started_at_performance_ms", None)
         self.active_stroke_ids.clear()
         self.stroke_started_at.clear()
         self.observed_stroke_ids.clear()
+        self.accepted_stroke_ids.clear()
         self.lifecycle_sources.clear()
         sample_events = [event for event in run["events"] if event.get("type") == "DRAW_SAMPLE"]
         point_deltas = [event.get("pointDelta") for event in sample_events]
