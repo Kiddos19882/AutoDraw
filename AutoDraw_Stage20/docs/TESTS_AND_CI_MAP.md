@@ -417,3 +417,9 @@ Benchmark job работает из корня `AutoDraw_Stage20/`; пути с�
 ### 10.5. Текущий статус проверки
 
 Workflow и тесты обновлены в feature-ветке; результат нового CI на конечном HEAD ещё не подтверждён. До статуса success по всем обязательным jobs, успешной portable build и локального Windows preflight запускать новую live G3 серию нельзя.
+
+### 10.6. Изоляция UI tests и Tk callback lifecycle
+
+Корневой UI test suite запускается из установленной рабочей директории Preparation и имеет отдельный 3-minute timeout. UnifiedAppCoreTests.setUp/tearDown создают временный data root и подменяют integrated_app.DATA_PATHS; тестовые окна не читают реальные data/results/brush_behavior_tests/chalk_test_blocks и не могут показать recovery warning из-за сохранённого пользовательского paused journal.
+
+В BrushBehaviorTestTab отложенный recovery scan теперь хранит after ID. Владельческий frame отменяет callback при событии <Destroy>; сам callback очищает ID при начале выполнения. Regression test проверяет отмену pending callback. Это устраняет вызовы recovery scan после уничтожения Tk frame и изолирует UI suite от пользовательских/репозиторных журналов.
