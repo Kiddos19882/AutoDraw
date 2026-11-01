@@ -565,3 +565,6 @@ Owner lock I/O теперь fail-closed: ошибка открытия/созд�
 
 
 Добавлен межпроцессный owner-lock test с отдельным spawn-процессом. Он должен подтвердить, что блокировка не является только внутрипроцессной. Требуется Windows CI для проверки msvcrt поведения.
+
+
+Закрытие failed journal теперь оставляет явную audit-запись close_failed_block с board_checked=true и timestamp, аналогично закрытию paused journal. Код/тест: 6df2644a2e011a2dea6e8862c5267e9e9348d0ea, 8d0a949d5fc7697e836aad412ff900ba7532dc9c.
