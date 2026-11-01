@@ -41,7 +41,7 @@
 - `load_color_plan_from_path(self, path: str | Path) -> None`
 - `load_adaptive_brush_plan_from_path(self, path: str | Path) -> None`
 - `load_color_palette_profile_document(self, document: dict[str, Any], path: str | Path | None = None) -> None`
-- `start_execution_from_workflow(self) -> bool`
+- `start_execution_from_workflow(self, executor_config_override: dict[str, Any] | None = None) -> bool`
 
 Интеграционный слой единого приложения также читает/назначает атрибуты `area_change_callback` и `execution_finished_callback`. Это точки связи, фактически используемые `integrated_app.py`; они не оформлены отдельными типизированными методами Stage6App.
 
