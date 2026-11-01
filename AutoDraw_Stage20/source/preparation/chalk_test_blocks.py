@@ -322,7 +322,9 @@ def _validate_chalk_test_block_journal(document: Any, path: Path) -> dict[str, A
             expected_parameters = dict(GEOMETRY_EXECUTOR_CONFIG)
             expected_parameters.update({"point_step_px": step, "point_delay_ms": delay})
             if (
-                task.get("scenario_id") != "paint_consumption_long_lines"
+                isinstance(step, bool) or not isinstance(step, int)
+                or isinstance(delay, bool) or not isinstance(delay, int)
+                or task.get("scenario_id") != "paint_consumption_long_lines"
                 or task.get("expected_strokes") != EXPECTED_STROKES["paint_consumption_long_lines"]
                 or task.get("requested_radius") != 10
                 or parameters != expected_parameters
@@ -331,7 +333,16 @@ def _validate_chalk_test_block_journal(document: Any, path: Path) -> dict[str, A
             ):
                 raise ValueError(f"Некорректная или повторная ячейка G3 в журнале: {path}")
             observed_cells.add(cell)
-        if observed_cells != expected_cells or len(tasks) != 27:
+        expected_parameter_matrix = [
+            {"point_step_px": step, "point_delay_ms": delay}
+            for step in G3_POINT_STEPS for delay in G3_POINT_DELAYS_MS
+        ]
+        if (
+            observed_cells != expected_cells
+            or len(tasks) != 27
+            or document.get("executor_parameters") != GEOMETRY_EXECUTOR_CONFIG
+            or document.get("executor_parameter_matrix") != expected_parameter_matrix
+        ):
             raise ValueError(f"Журнал G3 должен содержать все 27 уникальных ячеек: {path}")
     else:
         for task in tasks:
