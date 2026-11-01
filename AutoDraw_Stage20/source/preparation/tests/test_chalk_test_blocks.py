@@ -613,3 +613,16 @@ def test_failed_block_requires_board_check_before_stop(tmp_path):
     with pytest.raises(ValueError):
         stop_chalk_test_block(path)
     assert stop_chalk_test_block(path, board_checked=True)["status"] == "stopped"
+
+
+
+def test_owner_lock_io_failure_fails_closed(tmp_path, monkeypatch):
+    original_open = Path.open
+
+    def fail_owner_lock_open(self, *args, **kwargs):
+        if self.name == ".active-block.owner.lock":
+            raise PermissionError("simulated owner lock permission failure")
+        return original_open(self, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "open", fail_owner_lock_open)
+    assert acquire_chalk_block_owner_lock(tmp_path / "block.json") is None
