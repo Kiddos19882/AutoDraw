@@ -997,12 +997,21 @@ class BrushBehaviorTestTab:
             self._chalk_block_recovery_journal_path = unresolved[0]
         if interrupted_details:
             path, task_id, experiment_id, experiment_dir = interrupted_details
+            self.chalk_block_progress_var.set(f"Найден interrupted block: {task_id}; требуется ручная проверка доски.")
             messagebox.showwarning(
                 "Обнаружен прерванный блок CHALK",
                 f"Задача: {task_id}\nExperiment ID: {experiment_id or 'не зарегистрирован'}\n"
                 f"Каталог: {experiment_dir or 'не создан'}\nЖурнал: {path}\n\n"
                 "Автоматического повторного рисования не будет. Сначала вручную проверь игровую доску. "
                 "После проверки можно явно разрешить новую попытку или закрыть блок.",
+                parent=self.root,
+            )
+        elif unresolved:
+            self.chalk_block_progress_var.set("Найден сохранённый/приостановленный блок; требуется явное восстановление или закрытие.")
+            messagebox.showwarning(
+                "Найден незавершённый блок CHALK",
+                f"Журнал: {unresolved[0]}\nНовый блок не будет запущен параллельно. "
+                "Используй восстановление, чтобы продолжить готовый журнал, либо закрой приостановленный блок.",
                 parent=self.root,
             )
 
