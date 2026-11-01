@@ -1099,6 +1099,13 @@ class BrushBehaviorTestTab:
                 self._fail_chalk_test_block(f"block_not_complete:{journal.get('status')}")
             return
         self._chalk_block_task = task
+        self.experiment_dir = None
+        self.experiment_phases = {}
+        self._experiment_id = None
+        self.execution_report = None
+        self.execution_report_path = None
+        self.game_monitor_summary = None
+        self.game_monitor_report_path = None
         label = next(
             (name for name, details in TEST_CASES.items() if details.get("id") == task.get("scenario_id")),
             None,
@@ -1210,9 +1217,13 @@ class BrushBehaviorTestTab:
 
     def create_and_transfer_plan(self) -> None:
         if not self._validate_automation_preflight():
+            if self._chalk_block_task is not None:
+                self._fail_chalk_test_block("automation_preflight_failed")
             return
         canvas_size = self.get_canvas_size()
         if not canvas_size:
+            if self._chalk_block_task is not None:
+                self._fail_chalk_test_block("canvas_area_unavailable")
             messagebox.showwarning(
                 "Не выбрана область холста",
                 "Сначала выбери реальную область рисования на вкладке исполнения. "
@@ -1249,7 +1260,7 @@ class BrushBehaviorTestTab:
                 plan["generation"]["chalk_radius_matrix"] = matrix_metadata
             elif scenario_id in GEOMETRY_MATRIX_SCENARIOS:
                 series_id = self.matrix_series_var.get()
-                repeat_index = int(self.matrix_block_task["repeat_index"]) if self._chalk_block_task else int(self.matrix_block_var.get().strip())
+                repeat_index = int(self._chalk_block_task["repeat_index"]) if self._chalk_block_task else int(self.matrix_block_var.get().strip())
                 if self._chalk_block_task is not None:
                     experiment_matrix_metadata = build_chalk_experiment_matrix_metadata(
                         series_id=series_id,
@@ -2140,6 +2151,8 @@ class BrushBehaviorTestTab:
                 self._start_executor_after_brush_drag = False
                 self.status_var.set("Доска очищена и проверена, но кисть не установлена. Исполнитель не запущен.")
                 self._write_experiment_manifest()
+                if self._chalk_block_task is not None:
+                    self._fail_chalk_test_block("brush_setup_not_started")
                 return
             self.status_var.set("Доска очищена и проверена; начата установка кисти. Game Monitor автоматически проверит радиус и скорректирует ползунок.")
         except Exception as exc:
@@ -3124,6 +3137,11 @@ class BrushBehaviorTestTab:
             "experiment_id": getattr(self, "_experiment_id", None),
             "chalk_radius_matrix": getattr(self, "_chalk_matrix_metadata", None),
             "chalk_experiment_matrix": getattr(self, "_chalk_experiment_matrix_metadata", None),
+            "chalk_test_block": (
+                self.current_plan.get("generation", {}).get("chalk_test_block")
+                if isinstance(self.current_plan, dict) and isinstance(self.current_plan.get("generation"), dict)
+                else None
+            ),
             "updated_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "test_case": TEST_CASES.get(self.case_var.get(), {}).get("id"),
             "brush_value_requested": self._experiment_requested_brush if self._experiment_requested_brush is not None else int(self.brush_var.get().strip()),
