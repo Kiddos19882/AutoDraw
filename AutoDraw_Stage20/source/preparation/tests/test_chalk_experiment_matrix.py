@@ -200,6 +200,32 @@ def test_geometry_matrix_ignores_non_consuming_pointer_candidate_for_stroke_coun
     assert [stroke["consumed_points"] for stroke in row["stroke_level"]["strokes"]] == [10] * 5
 
 
+def test_geometry_matrix_ignores_cumulative_monitor_buffer_overflow(tmp_path):
+    folder = tmp_path / "exp"
+    folder.mkdir()
+    doc = _manifest(folder, consumed=50)
+    doc["monitor_capture"]["monitor_dropped_events"] = 434
+    doc["monitor_capture"]["monitor_buffer_dropped_events_delta"] = 434
+    doc["game_monitor_summary"]["monitor_dropped_events"] = 434
+    doc["game_monitor_summary"]["monitor_buffer_dropped_events_delta"] = 434
+
+    result = summarize_chalk_experiment_matrix([doc])
+    assert result["valid_measurement_count"] == 1
+    assert result["rejected"] == []
+
+
+def test_geometry_matrix_rejects_actual_bridge_or_collector_loss(tmp_path):
+    folder = tmp_path / "exp"
+    folder.mkdir()
+    doc = _manifest(folder, consumed=50)
+    doc["monitor_capture"]["bridge_send_failures_delta"] = 1
+    doc["game_monitor_summary"]["bridge_send_failures_delta"] = 1
+
+    result = summarize_chalk_experiment_matrix([doc])
+    assert result["valid_measurement_count"] == 0
+    assert result["rejected"][0]["reason"] == "capture_has_dropped_events_or_errors"
+
+
 def test_geometry_matrix_rejects_duplicate_run_and_repeat_cell(tmp_path):
     folder_a, folder_b = tmp_path / "a", tmp_path / "b"
     folder_a.mkdir()
