@@ -2181,11 +2181,14 @@ class BrushBehaviorTestTab:
                 )
                 return
         self._brush_feedback_state = None
-        try:
-            self.root.deiconify()
-            self.root.lift()
-        except tk.TclError:
-            pass
+        # Keep AutoDraw minimized during automated block handoff: restoring this
+        # window would steal focus from the game immediately before Stage6 starts.
+        if not self._start_executor_after_brush_drag:
+            try:
+                self.root.deiconify()
+                self.root.lift()
+            except tk.TclError:
+                pass
         self.status_var.set(
             f"Фактический радиус {requested} подтверждён Game Monitor. "
             f"Коррекций выполнено: {phase['correction_count']}."
