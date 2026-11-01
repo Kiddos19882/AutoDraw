@@ -305,3 +305,17 @@ def validate_chalk_block_experiment(
         return False, "trajectory_samples_missing", None
 
     return True, "accepted", record
+
+
+def stop_chalk_test_block(journal_path: str | Path) -> dict[str, Any]:
+    """Stop a block at a task boundary; refuse to stop while a task is running."""
+    path = Path(journal_path)
+    journal = load_chalk_test_block_journal(path)
+    if any(task.get("status") == "running" for task in journal["tasks"]):
+        raise RuntimeError("Нельзя остановить блок посреди опыта; дождитесь безопасной границы.")
+    if journal.get("status") in {"completed", "failed", "paused"}:
+        return journal
+    journal["status"] = "stopped"
+    journal["stopped_at_utc"] = _utc_now()
+    _save_journal(path, journal)
+    return journal
