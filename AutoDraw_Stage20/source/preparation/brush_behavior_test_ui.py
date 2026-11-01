@@ -2250,11 +2250,22 @@ class BrushBehaviorTestTab:
     def _confirm_brush_before_test(
         self, brush: int, state: dict[str, Any], observation: dict[str, Any]
     ) -> None:
-        """Ask only for a visual sanity check after the live Monitor verified the exact radius."""
+        """Continue automatically after an exact, fresh Game Monitor radius match."""
         phase = self.experiment_phases.setdefault("brush_setup", {})
-        phase["status"] = "awaiting_visual_confirmation"
-        phase["visual_confirmation_required"] = True
-        phase["confirmation_method"] = "game_monitor_exact_radius_plus_user_visual_check"
+        if int(observation.get("radius", -1)) != int(brush):
+            self._fail_brush_radius_feedback(
+                "monitor_radius_mismatch_at_handoff",
+                f"Game Monitor сообщил радиус {observation.get('radius')}, ожидался {brush}.",
+            )
+            return
+        phase["status"] = (
+            "confirmed_by_monitor_for_automated_block"
+            if self._chalk_block_task is not None
+            else "verified_by_game_monitor"
+        )
+        phase["verification_source"] = "active_game_monitor_bridge_heartbeat"
+        phase["visual_confirmation_required"] = False
+        phase["confirmed_at_utc"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
         if self.experiment_dir is not None:
             try:
                 self._write_experiment_manifest()
@@ -2262,70 +2273,19 @@ class BrushBehaviorTestTab:
                 phase["status"] = "manifest_write_failed"
                 phase["manifest_write_error"] = str(exc)
                 self.status_var.set(
-                    "Game Monitor подтвердил радиус, но манифест не сохранён. Исполнитель не запущен."
+                    "Game Monitor подтвердил точный радиус, но манифест не сохранён. Исполнитель не запущен."
                 )
                 if self._chalk_block_task is not None:
                     self._fail_chalk_test_block(f"brush_confirmation_manifest_failed:{exc}")
                 return
-        if self._chalk_block_task is not None:
-            phase["status"] = "confirmed_by_monitor_for_automated_block"
-            phase["confirmed_at_utc"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
-            if self.experiment_dir is not None:
-                try:
-                    self._write_experiment_manifest()
-                except (OSError, ValueError, TypeError) as exc:
-                    self._fail_chalk_test_block(f"brush_confirmation_manifest_failed:{exc}")
-                    return
-            if callable(self.on_brush_ready):
-                self.root.after(0, lambda: self.on_brush_ready(brush))
-            else:
-                self._fail_chalk_test_block("executor_callback_missing")
-            return
-        try:
-            confirmed = messagebox.askyesno(
-                "Подтвердить положение кисти",
-                (
-                    f"Game Monitor автоматически подтвердил радиус {observation['radius']} "
-                    f"(запрошено {brush}).\n"
-                    f"Фактическая координата ползунка: {state.get('target')}.\n\n"
-                    "Визуально проверь положение ползунка. Продолжать тест?"
-                ),
-                icon="question",
-                parent=self.root,
-            )
-        except Exception as exc:
-            phase["status"] = "confirmation_dialog_failed"
-            phase["error"] = str(exc)
-            self.status_var.set("Не удалось запросить визуальное подтверждение. Исполнитель не запущен.")
-            return
-        if not confirmed:
-            phase["status"] = "declined_by_user"
-            phase["declined_at_utc"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
-            if self.experiment_dir is not None:
-                try:
-                    self._write_experiment_manifest()
-                except (OSError, ValueError, TypeError):
-                    pass
-            self.status_var.set("Тест отменён пользователем после автоматической проверки радиуса.")
-            return
-        phase["status"] = "confirmed_by_user"
-        phase["confirmed_at_utc"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
-        if self.experiment_dir is not None:
-            try:
-                self._write_experiment_manifest()
-            except (OSError, ValueError, TypeError) as exc:
-                phase["status"] = "manifest_write_failed_after_confirmation"
-                phase["manifest_write_error"] = str(exc)
-                self.status_var.set(
-                    "Подтверждение получено, но не удалось записать манифест. Исполнитель не запущен."
-                )
-                return
         if callable(self.on_brush_ready):
             self.status_var.set(f"Размер {brush} подтверждён Game Monitor; запуск тестового исполнения.")
             self.root.after(0, lambda: self.on_brush_ready(brush))
+        elif self._chalk_block_task is not None:
+            self._fail_chalk_test_block("executor_callback_missing")
         else:
             phase["status"] = "executor_callback_missing"
-            self.status_var.set("Кисть подтверждена, но callback запуска исполнителя не подключён.")
+            self.status_var.set("Кисть подтверждена Game Monitor, но callback запуска исполнителя не подключён.")
 
     def capture_screenshot(self) -> None:
         self.status_var.set("Через 3 секунды будет сохранён полный скриншот экрана. Переключись в браузер.")
