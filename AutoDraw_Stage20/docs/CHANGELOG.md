@@ -270,7 +270,7 @@
 ### Changed
 - Обязательный CI разделён на параллельные jobs Game Monitor, Preparation/G3, Integration и Executor; portable build запускается только после их успеха.
 - Добавлены pip caching и отмена устаревших runs одной feature-ветки; убран дублирующий pull_request trigger.
-- Длительные Stage 5/7/8 и synthetic benchmarks запускаются вручную через workflow_dispatch.
+- Длительные Stage 5/7/8 и synthetic benchmarks запускаются вручную через отдельный opt-in input; по умолчанию выключены.
 - В CI portable build использует `AUTODRAW_SKIP_TESTS=1` только после прохождения независимых test jobs; локальная сборка сохраняет полный test run.
 
 ### Tests
