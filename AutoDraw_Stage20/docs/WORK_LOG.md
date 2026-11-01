@@ -1475,3 +1475,6 @@ GitHub Actions для новых изменений выполняется/ож�
 
 
 Дополнительный defensive review сразу после первого CI запуска выявил, что membership check по set мог выбросить TypeError, если JSON содержал list/dict в поле status или phase_id. Это также может обойти ожидаемую обработку ValueError в recovery UI. Исправлено явной проверкой string type до проверки допустимого значения; добавлены cases с unhashable значениями. Commits: `732128bfa62160ce6811e3925f371ab87f5f08d0`, `ff3e675fb09a5b05cceba75892469b87ba526fef`. Все journal-validation изменения теперь требуют CI на финальном code SHA.
+
+
+**CI feedback и коррекция:** Windows packaging run `41269156105` обнаружил SyntaxError в validator: при добавлении явных type checks в файл попала буквальная последовательность `\\n` вместо переноса строки. Это ошибка внесённого изменения, не исходного кода проекта. Исправлено в commit `dd5aaade3b790546d9e3fc11341554f6aa09d8ec`. Повторный полный CI для исправленного SHA обязателен; до него journal validator не считается проверенным.
