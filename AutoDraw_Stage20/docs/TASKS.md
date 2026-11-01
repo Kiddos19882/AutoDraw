@@ -69,7 +69,9 @@
 - [x] Полный CI для f8f2d1c6fe47b8d5e539be78951cea16296e16f6: geometry-tests, executor-tests и Windows portable build/startup smoke-test — success.
 - [x] Capture acceptance привязан к активным block/task/experiment identity, experiment_dir из journal и ожидаемым полям сценария/повтора.
 - [x] Добавлен тест preclear failure: блок paused, executor не запускается.
-- [ ] Подтвердить CI после task-identity/path acceptance hardening и preclear failure test.
+- [x] Разобрать CI после task-identity/path acceptance hardening: выявлена устаревшая mock lambda в callback test.
+- [x] Исправить mock validator stub для новых keyword identity аргументов (commit `20704ab984b981a4bf5b2278eba6cfad970d15a5`).
+- [ ] Подтвердить полный CI и Windows startup smoke-test после исправления.
 - [ ] Завершить review оставшихся callback/journal I/O/recovery failure paths.
 - [ ] Выполнить один контролируемый live G1 block после успешного CI и проверки тестовой доски.
 - [ ] Только после полного принятия G1 разрешить G2.
@@ -83,6 +85,6 @@
 - [x] Связать block state machine с preclear, подтверждением радиуса, executor, Game Monitor exact capture и переходом к следующей задаче; добавить fail-closed gate полного per-stroke breakdown.
 - [x] Добавить recovery UI для прерванной/приостановленной задачи без автоматического повторного рисования.
 - [ ] Добавить исчерпывающие orchestration tests на отказ каждого callback/gate (добавлены Alt-cancel tests для preclear/postdraw; покрытие пока неполное).
-- [ ] Пройти CI и Windows portable smoke test; затем выполнить один live G1 block.
+- [ ] Пройти полный CI и Windows portable startup smoke-test после исправления mock; затем выполнить один live G1 block.
 
 UI runner реализован, но до CI и отдельного контролируемого live G1 не считать его готовым к экспериментальной эксплуатации. Live-матрицу вручную по частям не продолжать.
