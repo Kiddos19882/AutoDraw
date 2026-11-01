@@ -939,6 +939,26 @@ class BrushBehaviorTestTab:
         self.template_text.insert("1.0", "\n".join(lines))
         self.template_text.configure(state="disabled")
 
+    def _chalk_block_series_is_in_use(self, series_id: str) -> bool:
+        for manifest_path in self.output_dir.rglob("experiment.json"):
+            try:
+                document = json.loads(manifest_path.read_text(encoding="utf-8"))
+            except (OSError, UnicodeError, json.JSONDecodeError):
+                continue
+            metadata = document.get("chalk_experiment_matrix") if isinstance(document, dict) else None
+            if isinstance(metadata, dict) and metadata.get("series_id") == series_id:
+                return True
+        journal_root = self.output_dir / "chalk_test_blocks"
+        if journal_root.is_dir():
+            for journal_path in journal_root.glob("*.json"):
+                try:
+                    journal = load_chalk_test_block_journal(journal_path)
+                except (OSError, ValueError, json.JSONDecodeError):
+                    continue
+                if journal.get("series_id") == series_id and journal.get("status") not in {"completed", "stopped"}:
+                    return True
+        return False
+
     def _has_completed_g1_block(self) -> bool:
         root = self.output_dir / "chalk_test_blocks"
         if not root.is_dir():
@@ -1000,6 +1020,13 @@ class BrushBehaviorTestTab:
             messagebox.showwarning("Нет области доски", "Сначала выбери область игрового холста.", parent=self.root)
             return
         series_id = self.matrix_series_var.get().strip()
+        if self._chalk_block_series_is_in_use(series_id):
+            messagebox.showwarning(
+                "ID серии уже используется",
+                "Для автоматического блока нужен новый ID серии без ранее сохранённых manifests или незавершённого журнала.",
+                parent=self.root,
+            )
+            return
         try:
             block_plan = build_chalk_test_block_plan(series_id=series_id, phase_id=phase_id)
         except (TypeError, ValueError) as exc:
