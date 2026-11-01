@@ -236,3 +236,19 @@ Live G3 остаётся закрытым до прохождения regression
 ### Уточнение lifecycle: автоматическое подтверждение радиуса Game Monitor
 
 В актуальной реализации G1/G2/G3 ручное визуальное подтверждение радиуса после drag не требуется. Game Monitor является источником фактического значения: UI ждёт свежие heartbeat после отпускания ползунка, автоматически корректирует положение при mismatch и перед handoff повторно проверяет `observed radius == requested radius`. Только точное совпадение разрешает запуск executor. Повторные диалоги визуальной проверки удалены как дублирующие эту программную проверку. Отсутствие/устаревание heartbeat, mismatch, ошибка коррекции или записи manifest сохраняют fail-closed поведение. Предупреждение о том, что блок может очистить текущую тестовую доску, остаётся и не относится к подтверждению кисти.
+
+
+## CI и программный gate G3 — подтверждение актуального HEAD (2026-11-01)
+
+Последний подтверждённый workflow run: [41340237207](https://github.com/Kiddos19882/AutoDraw/actions/runs/41340237207). Проверенный commit: `3dbf8f20bcea44c61290e49398e1a4daf182dbf9` в ветке `feature/image-geometry-optimization`.
+
+Все jobs завершились success:
+- `geometry-tests`;
+- `executor-tests`;
+- `Windows portable build and startup smoke-test`.
+
+В `geometry-tests` включены тесты Game Monitor, локального WebSocket smoke server, preparation/geometry, G3 matrix/block workflow, Stage 7 validator, import diagnostics и unified-app UI regressions. Последний run включает regression test удаления popup в основном приложении из commit `8c93a498864973b9879c926627030bb7e1d3ce2a`.
+
+**Вывод для lifecycle блока:** G3 программно готов к локальному preflight. Автоматическое подтверждение кисти выполняется по свежему heartbeat Game Monitor и точному совпадению радиуса; отдельное визуальное подтверждение после drag не требуется. При mismatch или недостоверном heartbeat запуск блокируется. Предупреждение о возможной очистке доски сохраняется.
+
+**Границы CI:** workflow подтверждает тесты и сборку/старт portable-приложения на runner GitHub. Он не подключается к пользовательской игровой сессии, не выполняет 27 live опытов и не измеряет CHALK. Поэтому software gate закрыт, но local Windows preflight и live G3 остаются обязательными.
