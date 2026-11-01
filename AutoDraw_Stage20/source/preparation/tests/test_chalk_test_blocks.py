@@ -447,3 +447,57 @@ def test_paused_block_cannot_be_closed_without_board_check(tmp_path):
     stopped = stop_chalk_test_block(path, board_checked=True)
     assert stopped["status"] == "stopped"
     assert stopped["recovery_decisions"][-1]["board_checked"] is True
+
+
+
+@pytest.mark.parametrize(
+    "mutate",
+    [
+        lambda journal: journal["tasks"].__setitem__(0, "not-a-task"),
+        lambda journal: journal["tasks"][0].update({"task_id": ""}),
+        lambda journal: journal["tasks"][1].update({"task_id": journal["tasks"][0]["task_id"]}),
+        lambda journal: journal["tasks"][0].update({"status": "unknown"}),
+        lambda journal: journal.update({"expected_task_count": 999}),
+        lambda journal: journal.update({"status": "running"}),
+        lambda journal: journal["tasks"][0].update({"status": "running", "active_attempt_id": "missing"}),
+        lambda journal: journal["tasks"][0].update({
+            "attempts": [{"attempt_id": "attempt-1", "status": "running"}]
+        }),
+        lambda journal: journal.update({
+            "status": "completed",
+            "tasks": [dict(task, status="pending") for task in journal["tasks"]],
+        }),
+    ],
+)
+def test_load_journal_rejects_corrupt_or_inconsistent_state(tmp_path, mutate):
+    import copy
+
+    journal = build_chalk_test_block_plan(series_id="series", phase_id="G1")
+    corrupt = copy.deepcopy(journal)
+    mutate(corrupt)
+    path = tmp_path / "corrupt.json"
+    path.write_text(json.dumps(corrupt), encoding="utf-8")
+
+    with pytest.raises(ValueError):
+        load_chalk_test_block_journal(path)
+
+
+def test_load_journal_accepts_consistent_running_attempt(tmp_path):
+    path = tmp_path / "block.json"
+    create_chalk_test_block_journal(
+        path, build_chalk_test_block_plan(series_id="series", phase_id="G1")
+    )
+    claimed = claim_next_chalk_block_task(path)
+
+    journal = load_chalk_test_block_journal(path)
+
+    assert journal["status"] == "running"
+    assert next(task for task in journal["tasks"] if task["task_id"] == claimed["task_id"])["status"] == "running"
+
+
+def test_load_journal_converts_invalid_json_to_value_error(tmp_path):
+    path = tmp_path / "invalid.json"
+    path.write_text("{broken", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="Не удалось разобрать журнал"):
+        load_chalk_test_block_journal(path)
