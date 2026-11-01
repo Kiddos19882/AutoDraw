@@ -611,7 +611,10 @@ def test_failed_block_requires_board_check_before_stop(tmp_path):
     )
     with pytest.raises(ValueError):
         stop_chalk_test_block(path)
-    assert stop_chalk_test_block(path, board_checked=True)["status"] == "stopped"
+    stopped = stop_chalk_test_block(path, board_checked=True)
+    assert stopped["status"] == "stopped"
+    assert stopped["recovery_decisions"][-1]["decision"] == "close_failed_block"
+    assert stopped["recovery_decisions"][-1]["board_checked"] is True
 
 
 
