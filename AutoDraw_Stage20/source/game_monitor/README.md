@@ -320,3 +320,27 @@ Snippet с токеном создаётся в каталоге результ�
 ### Надёжность записи session.json на Windows
 
 Bridge записывает session.json атомарно через уникальный временный файл и os.replace(). Если Windows временно блокирует целевой файл и os.replace() возвращает PermissionError (например, WinError 5), сервер выполняет ограниченные повторные попытки с экспоненциальной задержкой. Если блокировка не исчезает, WebSocket handler остаётся активным, ошибка отмечается в bridge_diagnostics.session_persist_failures, а сохранение повторяется при следующем сообщении. Прежний session.json не заменяется частичной записью. Временный файл очищается после каждой попытки.
+
+## Диагностика переполнения Monitor и per-run integrity (2026-11-02)
+
+Локальный массив событий Game Monitor ограничен `MAX_EVENTS=50000`. При достижении лимита новые события не попадают в `state.events`, а `state.droppedEvents` растёт. Это ограничение только локального export buffer: `emit()` продолжает вызывать подписчиков, поэтому Browser Bridge продолжает получать события. Ненулевой cumulative `monitor_dropped_events` не означает потери событий текущего run.
+
+Bridge report разделяет:
+- `monitor_buffer_dropped_events_start/end/delta` — cumulative overflow локального массива Monitor, только диагностика;
+- `monitor_error_count_start/end/delta` — изменение счётчика Monitor errors за конкретный run;
+- `bridge_send_failures_delta` — новые ошибки отправки browser bridge за run;
+- `collector_sequence_gap_count` — число пропущенных sequence, замеченных collector во время активного run;
+- `dropped_events` — события, не попавшие в ограниченный per-run список `RunRecorder`.
+
+Collector проверяет монотонность sequence и отдельно считает gaps. Любой gap во время активного run считается потенциальной потерей сообщения и блокирует acceptance. Это консервативная проверка: sequence gaps включают пропущенные сообщения любого типа, не только game events.
+
+Capture gate использует per-run `dropped_events`, `monitor_error_count_delta`, `bridge_send_failures_delta` и `collector_sequence_gap_count`. Старые cumulative aliases сохраняются для диагностики и обратной совместимости, но не отклоняют run сами по себе.
+
+Regression coverage:
+- Node test отправляет более 60 000 событий после заполнения локального буфера и проверяет, что подписчик получает все события;
+- Python tests проверяют, что накопительный buffer overflow и старые Monitor errors не портят следующий run;
+- WebSocket integration test моделирует sequence gap и проверяет, что он отражается в run report и session diagnostics;
+- matrix validators принимают capture с cumulative buffer overflow, но отклоняют per-run bridge failures и collector sequence gaps.
+
+Live Firefox/game test этим не заменяется. До успешного CI и локального preflight новый G3 не запускать.
+
