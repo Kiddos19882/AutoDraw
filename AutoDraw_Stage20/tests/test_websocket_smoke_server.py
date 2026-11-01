@@ -170,6 +170,35 @@ class BridgeRecorderTests(unittest.TestCase):
         self.assertEqual(data["active_drawing_duration_ms"], 20)
         self.assertEqual(data["frame_probe"]["stroke_probe_count"], 1)
 
+    def test_non_consuming_pointer_candidate_does_not_inflate_accepted_stroke_count(self):
+        before = {"maxPoints": 6000, "remainingPoints": 6000, "pointCount": 0,
+                  "isExact": True, "currentRadius": 10}
+        after = {"maxPoints": 6000, "remainingPoints": 5999, "pointCount": 1,
+                 "isExact": True, "currentRadius": 10}
+
+        self.recorder.event({"type": "POINTER_DOWN_CANDIDATE", "t": 1,
+                             "strokeId": "empty-candidate", "board": before}, 1.0)
+        self.recorder.event({"type": "DRAW_SAMPLE", "t": 2,
+                             "strokeId": "empty-candidate", "board": before,
+                             "pointDelta": 0}, 1.1)
+        self.recorder.event({"type": "POINTER_UP_CANDIDATE", "t": 3,
+                             "strokeId": "empty-candidate", "board": before}, 1.2)
+
+        self.recorder.event({"type": "POINTER_DOWN_CANDIDATE", "t": 4,
+                             "strokeId": "accepted-stroke", "board": before}, 1.3)
+        self.recorder.event({"type": "DRAW_SAMPLE", "t": 5,
+                             "strokeId": "accepted-stroke", "board": after,
+                             "pointDelta": 1, "acceptedPoint": {"x": 10, "y": 10}}, 1.4)
+        self.recorder.event({"type": "POINTER_UP_CANDIDATE", "t": 6,
+                             "strokeId": "accepted-stroke", "board": after}, 1.5)
+
+        path = self.recorder.finalize("completed")
+        data = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(data["chalk"]["consumed_points"], 1)
+        self.assertEqual(data["stroke_count"], 1)
+        self.assertEqual(data["stroke_candidate_count"], 2)
+        self.assertEqual(data["non_consuming_stroke_candidate_count"], 1)
+
     def test_mixed_engine_and_pointer_lifecycle_does_not_double_count(self):
         before = {"maxPoints": 6000, "remainingPoints": 6000, "pointCount": 0, "isExact": True}
         after = {"maxPoints": 6000, "remainingPoints": 5999, "pointCount": 1, "isExact": True}
