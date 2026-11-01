@@ -67,8 +67,9 @@
 
 ### CHALK block runner — актуальные gates (2026-11-01)
 - [x] Полный CI для f8f2d1c6fe47b8d5e539be78951cea16296e16f6: geometry-tests, executor-tests и Windows portable build/startup smoke-test — success.
-- [x] Capture acceptance привязан к активным block/task/experiment identity и ожидаемым полям сценария/повтора.
-- [ ] Подтвердить CI после task-identity acceptance hardening.
+- [x] Capture acceptance привязан к активным block/task/experiment identity, experiment_dir из journal и ожидаемым полям сценария/повтора.
+- [x] Добавлен тест preclear failure: блок paused, executor не запускается.
+- [ ] Подтвердить CI после task-identity/path acceptance hardening и preclear failure test.
 - [ ] Завершить review оставшихся callback/journal I/O/recovery failure paths.
 - [ ] Выполнить один контролируемый live G1 block после успешного CI и проверки тестовой доски.
 - [ ] Только после полного принятия G1 разрешить G2.
