@@ -182,3 +182,11 @@ Owner lock — файловая блокировка ОС, а не маркер�
 
 ### CI finding — closure audit classification (2026-11-01)
 The first final CI run exposed a mismatch: `finish_chalk_block_task(accepted=False)` correctly leaves the block in `paused`, while the rejected task itself is `failed`. Closure audit classification now inspects task statuses, recording `close_failed_block` when a failed task exists and `close_paused_block` for interruption-only pauses. This preserves the distinction between block state and failed experiment state. The existing regression test asserts the failed-task path. Full CI must be rerun; G1 remains blocked until all jobs and Windows portable smoke-test pass.
+
+### Финальная проверка CI — 2026-11-01
+
+Последний CI run [41272291546](https://github.com/Kiddos19882/AutoDraw/actions/runs/41272291546) для HEAD `311299296559b9a5949f1e803f134b46436a2850` завершился `success`: `geometry-tests`, `executor-tests` и `Windows portable build and startup smoke-test` прошли. Windows job выполнил portable build и `smoke_test_portable.py` после общего набора тестов.
+
+Исправлена найденная CI ошибка классификации closure audit: paused block с failed task теперь закрывается с `close_failed_block`, а interrupted-only paused block — с `close_paused_block`. Кодовый commit `dd976b04f6d6423726ad7382bac7223c12d8342b`.
+
+Пункт 1 плана работ выше (полный CI и Windows portable smoke-test после identity gate и journal hardening) выполнен. Callback-level failure-path review имеет тестовое покрытие, но не заявляется исчерпывающим. Следующий gate — локальный Windows preflight на реальной рабочей машине: калибровка и slider 1–30, Clear reference, canvas, Game Monitor heartbeat и пустая тестовая доска. Live G1 ещё не запускался; G2/G3 не начинать до принятия 12 валидных ячеек G1.
