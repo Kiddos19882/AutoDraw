@@ -256,7 +256,7 @@
 - G3 software gate закрыт. Локальный Windows preflight и 27 live G3 captures не выполнены; экспериментальная модель расхода CHALK пока не подтверждена.
 - Документация синхронизирована; исходный код и workflow не менялись.
 
-## 2026-11-02
+## 2026-11-01
 
 ### Fixed
 - Автоматические G3 block tasks больше не перехватываются legacy radius-matrix routing при совпадении `scenario_id`; geometry metadata создаётся для G3 task и может активировать task-specific executor override.
