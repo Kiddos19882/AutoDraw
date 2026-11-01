@@ -221,3 +221,11 @@ flowchart TD
 - `brush_behavior_test_ui.py` создаёт явно маркированные логические планы `logical_board_pixels`.
 - При передаче в Stage6 `integrated_app.py` преобразует такой план в `local_canvas_pixels` с размерами экранного ROI. Обычные screen/local планы проходят прежний путь без трансформации.
 - Unit-тесты преобразования находятся в `source/preparation/tests/test_brush_coordinate_transform.py`; интеграционная проверка handoff — в `tests/test_unified_app.py`.
+
+
+### 6.5. CHALK geometry matrix
+
+- `brush_behavior_test_ui.py` импортирует `build_chalk_experiment_matrix_metadata` и список допустимых G1/G2 сценариев из `chalk_experiment_matrix.py`.
+- `chalk_experiment_matrix.py` зависит только от стандартной библиотеки Python; он не импортирует UI или executor.
+- `tests/analyze_chalk_experiment_matrix.py` добавляет `source/preparation` в `sys.path` и вызывает чистую функцию `summarize_chalk_experiment_matrix()`.
+- Тесты helper расположены в `source/preparation/tests/test_chalk_experiment_matrix.py`; интеграционная сериализация проверяется в `test_brush_behavior_test_ui.py`.
