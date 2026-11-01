@@ -125,7 +125,12 @@ def test_block_experiment_acceptance_requires_complete_stroke_breakdown(tmp_path
     import chalk_experiment_matrix
 
     manifest_path = tmp_path / "experiment.json"
-    manifest_path.write_text(json.dumps({"record_type": "autodraw_brush_paint_experiment"}), encoding="utf-8")
+    manifest_path.write_text(json.dumps({"record_type": "autodraw_brush_paint_experiment", "phases": {
+                "before_clear": {"status": "restored"},
+                "before_draw": {"captured_at_utc": "2026-11-01T00:00:00Z"},
+                "after_draw": {"status": "captured"},
+                "postdraw_workflow": {"status": "completed"},
+            },}), encoding="utf-8")
     record = {"stroke_level": {"status": "incomplete", "reason": "stroke_id_count_mismatch"}}
     monkeypatch.setattr(chalk_experiment_matrix, "_validate_manifest", lambda _document: (True, "valid", record))
     monkeypatch.setattr(
@@ -146,6 +151,12 @@ def test_block_experiment_acceptance_requires_clean_frame_probe_and_trajectory(t
     manifest_path.write_text(
         json.dumps({
             "record_type": "autodraw_brush_paint_experiment",
+            "phases": {
+                "before_clear": {"status": "restored"},
+                "before_draw": {"captured_at_utc": "2026-11-01T00:00:00Z"},
+                "after_draw": {"status": "captured"},
+                "postdraw_workflow": {"status": "completed"},
+            },
             "game_monitor_summary": {
                 "frame_probe": {"status": "measured", "visibility_interruption": False},
                 "trajectory": {"accepted_sample_count": 12},
