@@ -1219,6 +1219,6 @@ def test_workflow_executor_config_override_is_validated_without_mutating_base_co
         with patch.object(executor, "_read_executor_config", return_value=ExecutorConfig()):
             with self.assertRaises(ValueError):
                 executor._resolve_workflow_executor_config({
-                    "point_step_px": 3,
+                    "point_step_px": 0.1,
                     "point_delay_ms": 5,
                 })
