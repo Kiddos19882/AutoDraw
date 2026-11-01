@@ -91,3 +91,15 @@
 - [ ] Пройти полный CI и Windows portable startup smoke-test после исправления mock; затем выполнить один live G1 block.
 
 UI runner реализован, но до CI и отдельного контролируемого live G1 не считать его готовым к экспериментальной эксплуатации. Live-матрицу вручную по частям не продолжать.
+
+
+### G1 readiness — журнал и отказоустойчивость
+- [x] Ужесточить согласованность block/task statuses.
+- [x] Не разрешать новый блок при journal status failed.
+- [x] Сериализовать read-modify-write транзакции межпроцессной advisory lock.
+- [x] Добавить fault-injection tests для temp write и os.replace.
+- [ ] Подтвердить полный CI для новых коммитов (geometry, executor, Windows startup smoke-test).
+- [ ] Проверить на Windows, что блокировка и fault handling работают в portable-сборке.
+- [ ] Подтвердить фактическую готовность профиля калибровки и Game Monitor bridge.
+- [ ] Получить подтверждение чистой тестовой доски перед live G1.
+- [ ] Выполнить один контролируемый G1 block и принять все 12 уникальных ячеек.
