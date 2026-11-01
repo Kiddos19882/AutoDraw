@@ -226,3 +226,11 @@ jobs:
         env:
           AUTODRAW_NO_PAUSE: "1"
         run: build_windows.bat
+      - name: Upload portable application for local G3 preflight
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autodraw-g3-preflight-build
+          path: AutoDraw_Stage20/release/AutoDrawPortable/
+          if-no-files-found: error
+          retention-days: 7
