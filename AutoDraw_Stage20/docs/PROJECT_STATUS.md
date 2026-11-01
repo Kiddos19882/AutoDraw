@@ -556,3 +556,6 @@ CI выявил SyntaxError в journal validator после последнего
 Коммиты: 9c709c5a597ebcb968419839d2dfc4af9b1a2bd3, 4c80d167ae28ea3327e71813a3db0c03a5d8e05a, 0d666afb63cb70634d90a25e7b0b87022a0394f2, 1b7486a86d2b19ead81625f9a465aef51b3e3450, 3ba5b4dc1c7a26d4a333592807bda802ceba76c5, 4e0e7809d5eef1235efccc65e2529892e8a81f85, 4d681cdf09c62f65647f651b271b81458ff59e29.
 
 Ожидается CI на последнем кодовом SHA. Не запускать G1 до проверки Windows portable build/startup smoke-test и живого preflight.
+
+
+Уточнение owner lock: блокировка общая для каталога chalk_test_blocks, а не отдельная на файл журнала. Это закрывает параллельный запуск разных серий в одном output_dir после одновременного прохождения preflight. Финальная реализация: commit e4793e0c03f8bface4b69954b109d8c843fa68d2d; UI scan: d82c1276fc9a1861003dfc3428cdf5b10b1d58ab; тест: 6034759be2bb873ea5ac20150ebe54bc40dab81e.
