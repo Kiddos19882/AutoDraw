@@ -667,7 +667,7 @@ class AutoDrawUnifiedApp:
         return True
 
     def _start_brush_test_executor(self, requested_brush: int) -> None:
-        """Start the shared executor only after the user checks the actual brush radius."""
+        """Start the shared executor after Game Monitor has verified the requested brush radius."""
         if self.executor.running:
             messagebox.showwarning(
                 "Исполнение уже запущено",
@@ -683,16 +683,8 @@ class AutoDrawUnifiedApp:
                 parent=self.root,
             )
             return
-        confirmed = messagebox.askyesno(
-            "Проверь размер кисти",
-            f"Перетаскивание завершено для радиуса {requested_brush}, но игра не подтверждает размер автоматически.\n\n"
-            "Проверь значение в браузере. Запускать тест, только если выбран именно этот радиус?",
-            icon="warning",
-            parent=self.root,
-        )
-        if not confirmed:
-            self.status_var.set("Запуск отменён: радиус кисти не подтверждён. Исполнитель не запускался.")
-            return
+        # This callback is invoked only after Brush Test UI has received a fresh,
+        # exact Game Monitor radius match. A second visual confirmation is redundant.
         try:
             executor_config_override = None
             try:
