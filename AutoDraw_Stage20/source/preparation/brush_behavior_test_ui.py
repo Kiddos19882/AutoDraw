@@ -982,6 +982,9 @@ class BrushBehaviorTestTab:
                 continue
             if journal.get("status") not in {"ready", "running", "paused", "failed"}:
                 continue
+            if self._chalk_block_owner_lock is not None:
+                unresolved.append(journal_path)
+                continue
             owner_lock = acquire_chalk_block_owner_lock(journal_path)
             if owner_lock is None:
                 ownership_conflict = True
