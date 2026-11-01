@@ -1578,3 +1578,18 @@ G1 принят по второму блоку. G2 теперь разблоки
 
 
 Уточнение по G3: live gate открыт после принятия G2, но кодовая поддержка ещё отсутствует. `PHASE_SCENARIOS`, `BLOCK_PHASES` и UI selector на текущем HEAD содержат только G1/G2; matrix metadata/duplicate protection также не учитывают параметры G3. До live-запуска требуется отдельная реализация G3 на 9 комбинаций `point_step_px` × `point_delay_ms` и 3 повтора, затем tests + полный CI + Windows portable smoke-test. Экспериментальный план G3 не меняется.
+
+## 2026-11-01 — программная реализация G3
+
+Начата реализация G3 на `feature/image-geometry-optimization` после live acceptance G1 (12/12) и G2 (18/18).
+
+Изменения:
+- Matrix metadata поддерживает фазу G3, шесть ожидаемых штрихов и полную конфигурацию executor.
+- Уникальность G3 repeat cell учитывает `point_step_px`, `point_delay_ms` и `repeat_index`.
+- Block runner строит 27 задач, детерминированно перемешивает их и валидирует полный набор ячеек в журнале.
+- Brush Test UI показывает G3 и разрешает запуск только после завершённого G2.
+- Интеграция Stage6 принимает временный executor config override; параметры применяются к реальному `MouseExecutor`, попадают в execution report и не записываются в пользовательский профиль.
+- Analyzer разделяет статистику по каждой из девяти конфигураций и проверяет совпадение executor report с metadata.
+- Добавлены regression tests для матрицы, журнала и workflow override.
+
+На момент этой записи CI ещё не подтверждён. Live G3 не запускался. Экспериментальная спецификация не менялась.
