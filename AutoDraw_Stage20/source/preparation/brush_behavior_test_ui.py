@@ -3445,6 +3445,7 @@ class BrushBehaviorTestTab:
                     "monitor_buffer_dropped_events_start": report.get("monitor_buffer_dropped_events_start"),
                     "monitor_buffer_dropped_events_end": report.get("monitor_buffer_dropped_events_end"),
                     "monitor_buffer_dropped_events_delta": report.get("monitor_buffer_dropped_events_delta"),
+                    "monitor_error_count_delta": report.get("monitor_error_count_delta"),
                     "bridge_send_failures_delta": report.get("bridge_send_failures_delta"),
                     "collector_sequence_gap_count": report.get("collector_sequence_gap_count"),
                     "monitor_error_count": report.get("monitor_error_count"),
@@ -3466,7 +3467,7 @@ class BrushBehaviorTestTab:
                     and frame_probe.get("visibility_interruption") is False
                     and int(trajectory.get("accepted_sample_count", 0) or 0) > 0
                     and report.get("dropped_events", 0) == 0
-                    and report.get("monitor_error_count", 0) == 0
+                    and report.get("monitor_error_count_delta", 0) == 0
                     and report.get("bridge_send_failures_delta", 0) == 0
                     and report.get("collector_sequence_gap_count", 0) == 0
                 )
