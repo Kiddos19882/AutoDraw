@@ -99,6 +99,28 @@ def test_matrix_summary_accepts_valid_cells_and_calculates_repeat_statistics():
     assert radius["missing_blocks"] == []
 
 
+def test_matrix_summary_ignores_cumulative_monitor_buffer_overflow():
+    doc = _manifest(radius=5, block=1, run_id="overflow", consumed=100)
+    doc["monitor_capture"]["monitor_dropped_events"] = 434
+    doc["monitor_capture"]["monitor_buffer_dropped_events_delta"] = 434
+    doc["game_monitor_summary"]["monitor_dropped_events"] = 434
+    doc["game_monitor_summary"]["monitor_buffer_dropped_events_delta"] = 434
+
+    summary = summarize_chalk_radius_matrix([doc])
+    assert summary["valid_measurement_count"] == 1
+    assert summary["rejected"] == []
+
+
+def test_matrix_summary_rejects_actual_collector_sequence_gaps():
+    doc = _manifest(radius=5, block=1, run_id="sequence-gap", consumed=100)
+    doc["monitor_capture"]["collector_sequence_gap_count"] = 1
+    doc["game_monitor_summary"]["collector_sequence_gap_count"] = 1
+
+    summary = summarize_chalk_radius_matrix([doc])
+    assert summary["valid_measurement_count"] == 0
+    assert summary["rejected"][0]["reason"] == "capture_has_dropped_events_or_errors"
+
+
 def test_matrix_summary_rejects_inexact_and_duplicate_monitor_runs():
     bad = _manifest(radius=5, block=1, run_id="same", consumed=100)
     bad["game_monitor_summary"]["chalk"]["post_point_count"] = 999
