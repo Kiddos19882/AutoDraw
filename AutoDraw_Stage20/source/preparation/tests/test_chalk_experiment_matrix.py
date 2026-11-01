@@ -216,8 +216,6 @@ def test_inspect_matrix_series_counts_legacy_manifests_without_order_index(tmp_p
     folder.mkdir()
     doc = _manifest(folder, repeat=1, run_id="legacy-run")
     doc["chalk_experiment_matrix"].pop("matrix_order_index")
-    doc["monitor_capture"]["chalk_experiment_matrix"].pop("matrix_order_index")
-    doc["game_monitor_summary"]["chalk_experiment_matrix"].pop("matrix_order_index")
     (folder / "experiment.json").write_text(json.dumps(doc), encoding="utf-8")
 
     state = inspect_chalk_matrix_series(
