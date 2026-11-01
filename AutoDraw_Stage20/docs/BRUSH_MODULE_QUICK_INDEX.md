@@ -134,6 +134,6 @@
 ## Автоматические блоки CHALK
 
 - `source/preparation/chalk_test_blocks.py` — детерминированный план G1/G2, JSON journal, claim/finish, fail-closed pause, interrupted recovery primitive, строгая проверка exact CHALK/per-stroke/frame evidence.
-- `source/preparation/brush_behavior_test_ui.py` — UI Start/Stop/progress и последовательная интеграция блока с preclear, brush feedback, executor и Game Monitor.
+- `source/preparation/brush_behavior_test_ui.py` — UI Start/Stop/progress/recovery и последовательная интеграция блока с preclear, brush feedback, executor и Game Monitor.
 - Полный workflow и критерии принятия: [CHALK_TEST_BLOCKS_DESIGN.md](CHALK_TEST_BLOCKS_DESIGN.md).
 - Recovery UI, callback-level tests, CI и live G1 ещё остаются gates.
