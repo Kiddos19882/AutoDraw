@@ -132,8 +132,8 @@ def _validate_chalk_test_block_journal(document: Any, path: Path) -> dict[str, A
         not isinstance(document, dict)
         or document.get("record_type") != "autodraw_chalk_test_block"
         or document.get("schema_version") != BLOCK_SCHEMA_VERSION
-        or document.get("phase_id") not in BLOCK_PHASES
-        or document.get("status") not in {"ready", "running", "paused", "completed", "stopped", "failed"}
+        or not isinstance(document.get("phase_id"), str)\n        or document.get("phase_id") not in BLOCK_PHASES
+        or not isinstance(document.get("status"), str)\n        or document.get("status") not in {"ready", "running", "paused", "completed", "stopped", "failed"}
         or not isinstance(document.get("tasks"), list)
     ):
         raise ValueError(f"Некорректный журнал блока CHALK: {path}")
@@ -157,7 +157,7 @@ def _validate_chalk_test_block_journal(document: Any, path: Path) -> dict[str, A
         if not isinstance(task_id, str) or not task_id or task_id in task_ids:
             raise ValueError(f"Отсутствует или повторяется task_id в журнале CHALK: {path}")
         task_ids.add(task_id)
-        if task.get("status") not in {"pending", "running", "completed", "failed", "interrupted"}:
+        if not isinstance(task.get("status"), str) or task.get("status") not in {"pending", "running", "completed", "failed", "interrupted"}:
             raise ValueError(f"Неизвестный статус задачи {task_id!r} в журнале CHALK: {path}")
         attempts = task.get("attempts")
         if not isinstance(attempts, list) or any(not isinstance(item, dict) for item in attempts):
@@ -169,7 +169,7 @@ def _validate_chalk_test_block_journal(document: Any, path: Path) -> dict[str, A
             if not isinstance(attempt_id, str) or not attempt_id or attempt_id in attempt_ids:
                 raise ValueError(f"Отсутствует или повторяется attempt_id задачи {task_id!r}: {path}")
             attempt_ids.add(attempt_id)
-            if attempt.get("status") not in {"running", "completed", "failed", "interrupted"}:
+            if not isinstance(attempt.get("status"), str) or attempt.get("status") not in {"running", "completed", "failed", "interrupted"}:
                 raise ValueError(f"Неизвестный статус попытки задачи {task_id!r}: {path}")
             if attempt.get("status") == "running":
                 running_attempts.append(attempt)
