@@ -108,3 +108,46 @@ def test_ui_executor_failure_pauses_block_without_starting_postdraw(tmp_path):
 
     assert result is True
     assert failures == ["executor_status_failed"]
+
+
+
+def test_brush_restore_failure_pauses_block_and_does_not_capture(tmp_path):
+    ui, _journal_path, _task = _active_ui(tmp_path)
+    failures = []
+    captures = []
+    ui._fail_chalk_test_block = lambda reason: failures.append(reason)
+    ui._wait_for_chalk_block_capture = lambda: captures.append(True)
+
+    ui._on_chalk_block_restore_finished("failed")
+
+    assert failures == ["brush_restore_failed"]
+    assert captures == []
+
+
+def test_brush_restore_completion_enters_capture_acceptance_gate(tmp_path):
+    ui, _journal_path, _task = _active_ui(tmp_path)
+    captures = []
+    ui._wait_for_chalk_block_capture = lambda: captures.append(True)
+
+    ui._on_chalk_block_restore_finished("drag_completed_unverified")
+
+    assert captures == [True]
+
+
+def test_safe_stop_failure_keeps_journal_recoverable(tmp_path, monkeypatch):
+    ui, journal_path, _task = _active_ui(tmp_path)
+    ui._chalk_block_task = None
+    ui._chalk_block_stop_requested = False
+    ui._chalk_block_recovery_journal_path = None
+    monkeypatch.setattr(
+        ui_module,
+        "stop_chalk_test_block_journal",
+        lambda *_args, **_kwargs: (_ for _ in ()).throw(OSError("disk unavailable")),
+    )
+    ui._update_chalk_block_progress = lambda: None
+    ui._clear_chalk_block_runtime = lambda: setattr(ui, "_chalk_block_journal_path", None)
+
+    ui.request_stop_chalk_test_block()
+
+    assert ui._chalk_block_recovery_journal_path == journal_path
+    assert "Журнал сохранён для восстановления" in ui.status_var.value
