@@ -100,10 +100,9 @@ G1/G2 используют radius=10 и фиксированный `GEOMETRY_EXE
 
 ## 7. Текущие ограничения и порядок работ
 
-1. Добавить recovery UI: обнаруживать running journal после рестарта, маркировать задачу interrupted и требовать решения оператора.
-2. Расширить callback-level tests на preclear, brush feedback, executor, capture, restore, Stop и restart.
-3. Проверить GitHub Actions и Windows portable smoke test.
-4. Только после CI попросить один контролируемый live-блок G1 на тестовой доске.
-5. После принятия полного G1 разрешить G2.
+1. Расширить callback-level tests на preclear, brush feedback, executor, capture, restore, Stop и restart/recovery.
+2. Проверить GitHub Actions и Windows portable smoke test.
+3. Только после CI попросить один контролируемый live-блок G1 на тестовой доске.
+4. После принятия полного G1 разрешить G2.
 
 Существующие 12 G1 manifests с `repeat_index=1` не мигрировать и не переписывать автоматически. Для них нужен отдельный reconciliation sidecar с привязкой исходных experiment_id к повторениям либо повторная серия штатным block runner.
