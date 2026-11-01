@@ -465,3 +465,15 @@ Bridge server получил аргумент --snippet-file: он записы�
 Коммиты: `afb5076c6de3f1eb6b42057d1830e1e7320b32d6`, `32d145ef9874be8e936ee411ec5bc2a96723a5b9`, `dc4100a22b0ebab576af22480b992449cbe2c8dd`, `e03e71ee9b285a896b039de12becf80aad5596a6`, `5771f52554c3356c54d451e0ab26e99c6a7524a8`.
 
 GitHub Actions для актуального HEAD `5771f52554c3356c54d451e0ab26e99c6a7524a8` запущен, результат ожидается. G1 остаётся на gate принятия; G2/G3 не запускать.
+## 2026-11-01 — ядро автоматических блоков CHALK
+
+По предложению оператора начата замена ручного запуска каждого теста на пакетные блоки. Добавлены:
+- `source/preparation/chalk_test_blocks.py`: формирование полного детерминированно перемешанного блока G1 (12 задач) или G2 (18 задач), три повтора каждого сценария, radius 10, фиксированный executor config, уникальный matrix_order_index;
+- долговечный JSON-журнал блока с task/attempt IDs, статусами, experiment paths, progress и fail-closed поведением;
+- защита от одновременного активного задания; failed/interrupted task ставит блок на паузу, автоматического пропуска/повторного запуска нет;
+- `source/preparation/tests/test_chalk_test_blocks.py`: тесты полного состава, repeat cells, детерминированного порядка, journal, progression, fail-closed и interruption recovery;
+- `docs/CHALK_TEST_BLOCKS_DESIGN.md` и ссылки в README, quick index, test map.
+
+**Ограничение текущего этапа:** пока реализовано ядро планирования и журналирования, но кнопки Start/Stop, progress UI и автоматическая связка preclear → brush feedback → executor → Game Monitor exact capture → следующая задача ещё не подключены. Пакетный запуск пока не доступен оператору и нельзя считать блоки готовыми к live-использованию.
+
+Следующий этап — UI state machine и интеграция полного жизненного цикла с существующими callback-ами. Любой невалидный CHALK capture, незавершённый executor, потеря Monitor, неуспешная очистка или прерывание приложения должны останавливать блок без пропуска задачи. Перед каждым новым экспериментом обязательна проверка пустой доски. Существующие G1 raw manifests не переписывать.
