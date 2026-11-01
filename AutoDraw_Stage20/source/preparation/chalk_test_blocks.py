@@ -152,7 +152,7 @@ def claim_next_chalk_block_task(
     """Claim the next pending task; an unfinished running task blocks progression."""
     path = Path(journal_path)
     journal = load_chalk_test_block_journal(path)
-    if journal.get("status") in {"completed", "stopped", "failed"}:
+    if journal.get("status") in {"completed", "stopped", "failed", "paused"}:
         return None
     tasks = journal["tasks"]
     if any(task.get("status") == "running" for task in tasks):
