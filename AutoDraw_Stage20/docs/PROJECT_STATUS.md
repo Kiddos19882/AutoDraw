@@ -708,7 +708,7 @@ Workflow `.github/workflows/geometry-tests.yml` запускается на push
 - Game Monitor, Preparation, Integration и Executor тесты разделены на независимые jobs и выполняются параллельно;
 - корневые интеграционные тесты разбиты на три pytest группы: UI/G3 handoff; build/import/test-runner; geometry validator/metrics. WebSocket suite выполняется отдельно в Game Monitor job.;
 - portable build зависит от успеха всех тестовых jobs; в CI build пропускает повторный `run_all_tests.py` через `AUTODRAW_SKIP_TESTS=1`, а обычный локальный build по-прежнему выполняет тесты;
-- длительные Stage 5/7/8 и synthetic benchmarks переведены на ручной `workflow_dispatch`.
+- длительные Stage 5/7/8 и synthetic benchmarks переведены на ручной `workflow_dispatch` с отдельным boolean input; по умолчанию они выключены.
 
 Усилено G3 regression coverage: добавлен тест, проходящий через реальный `BrushBehaviorTestTab.create_and_transfer_plan` и проверяющий, что block task формирует оба G3 identity объекта и сохраняет параметры задачи вместо legacy radius metadata. Тест handoff в `tests/test_unified_app.py` проверяет передачу 2/20 в executor.
 
