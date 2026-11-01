@@ -285,11 +285,11 @@ def summarize_chalk_experiment_matrix(
             evaluated.append((document, valid, reason, record))
 
     run_counts: dict[str, int] = {}
-    cell_counts: dict[tuple[str, str, str, int], int] = {}
+    cell_counts: dict[tuple[str, str, str, int, int], int] = {}
     for _, valid, _, record in evaluated:
         if valid and record:
             run_counts[record["run_id"]] = run_counts.get(record["run_id"], 0) + 1
-            key = (record["series_id"], record["phase_id"], record["scenario_id"], record["repeat_index"])
+            key = (record["series_id"], record["phase_id"], record["scenario_id"], record["radius"], record["repeat_index"])
             cell_counts[key] = cell_counts.get(key, 0) + 1
 
     accepted, rejected = [], []
@@ -315,13 +315,13 @@ def summarize_chalk_experiment_matrix(
                 "experiment_dir": document.get("experiment_dir"),
             })
 
-    grouped: dict[tuple[str, str, str], list[dict[str, Any]]] = {}
+    grouped: dict[tuple[str, str, str, int], list[dict[str, Any]]] = {}
     for record in accepted:
-        key = (record["series_id"], record["phase_id"], record["scenario_id"])
+        key = (record["series_id"], record["phase_id"], record["scenario_id"], record["radius"])
         grouped.setdefault(key, []).append(record)
 
     results = []
-    for (series_id, phase_id, scenario_id), rows in sorted(grouped.items()):
+    for (series_id, phase_id, scenario_id, radius), rows in sorted(grouped.items()):
         rows.sort(key=lambda row: row["repeat_index"])
         values = [row["consumed_points"] for row in rows]
         signatures = {row["geometry_signature"] for row in rows}
@@ -329,6 +329,7 @@ def summarize_chalk_experiment_matrix(
             "series_id": series_id,
             "phase_id": phase_id,
             "scenario_id": scenario_id,
+            "radius": radius,
             "valid_repeat_count": len(rows),
             "complete": len(rows) == 3 and {row["repeat_index"] for row in rows} == {1, 2, 3},
             "geometry_consistent": len(signatures) == 1,
