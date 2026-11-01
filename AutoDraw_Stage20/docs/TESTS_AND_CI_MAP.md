@@ -423,3 +423,11 @@ Workflow и тесты обновлены в feature-ветке; результ�
 Корневой UI test suite запускается из установленной рабочей директории Preparation и имеет отдельный 3-minute timeout. UnifiedAppCoreTests.setUp/tearDown создают временный data root и подменяют integrated_app.DATA_PATHS; тестовые окна не читают реальные data/results/brush_behavior_tests/chalk_test_blocks и не могут показать recovery warning из-за сохранённого пользовательского paused journal.
 
 В BrushBehaviorTestTab отложенный recovery scan теперь хранит after ID. Владельческий frame отменяет callback при событии <Destroy>; сам callback очищает ID при начале выполнения. Regression test проверяет отмену pending callback. Это устраняет вызовы recovery scan после уничтожения Tk frame и изолирует UI suite от пользовательских/репозиторных журналов.
+## Дополнение 2026-11-02 — Game Monitor buffer overflow / per-run integrity regression
+
+- Node: `source/game_monitor/tests/game_monitor.test.js` проверяет, что после заполнения `MAX_EVENTS=50000` локальный массив остаётся ограниченным, счётчик buffer overflow увеличивается, а подписчики продолжают получать все события.
+- Python: `tests/test_websocket_smoke_server.py` проверяет независимость per-run CHALK/trajectory от cumulative Monitor buffer overflow и старых ошибок Monitor.
+- WebSocket integration: пропуск sequence должен попасть в `collector_sequence_gap_count` и в активный run report.
+- Preparation: `source/preparation/tests/test_chalk_experiment_matrix.py` и `test_chalk_radius_matrix.py` проверяют, что cumulative `monitor_dropped_events` не отклоняет run, а новые per-run bridge/collector loss metrics отклоняют.
+- Acceptance gate: использует `dropped_events`, `monitor_error_count_delta`, `bridge_send_failures_delta` и `collector_sequence_gap_count`. Session-cumulative `monitor_dropped_events` / `monitor_error_count` сохраняются только как диагностические aliases.
+- CI job `game-monitor-tests` уже запускает Node suite и `test_websocket_smoke_server.py`; `preparation-tests` запускает матричные валидаторы. Live Firefox/Game iframe не покрывается этими тестами.
