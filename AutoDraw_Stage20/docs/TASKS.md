@@ -103,3 +103,13 @@ UI runner реализован, но до CI и отдельного контр�
 - [ ] Подтвердить фактическую готовность профиля калибровки и Game Monitor bridge.
 - [ ] Получить подтверждение чистой тестовой доски перед live G1.
 - [ ] Выполнить один контролируемый G1 block и принять все 12 уникальных ячеек.
+
+
+### G1 readiness — эксклюзивный session lock
+- [x] Добавить lifetime owner lock на весь активный block/recovery сеанс.
+- [x] Не переводить running в interrupted, если lock удерживается другим экземпляром.
+- [x] Требовать владение lock для resume/close.
+- [x] Требовать проверку доски для закрытия failed/paused.
+- [ ] Подтвердить полный CI и Windows startup smoke-test на финальном SHA.
+- [ ] Провести Windows preflight: calibration, slider 1–30, Clear reference, canvas, Game Monitor heartbeat.
+- [ ] После явного подтверждения тестовой доски запустить G1 и принять все 12 ячеек.
