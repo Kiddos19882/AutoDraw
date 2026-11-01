@@ -96,15 +96,22 @@ G1/G2 используют radius=10 и фиксированный `GEOMETRY_EXE
 
 **Recovery:** при запуске UI обнаруживает журнал в состоянии running и переводит текущую задачу в interrupted без replay. Оператор видит experiment ID/каталог и должен вручную проверить игровую доску. Только после явного подтверждения можно создать новую попытку interrupted-задачи; предыдущая попытка остаётся в журнале. Ready-журнал после закрытия приложения также можно продолжить только после подтверждения тестовой доски. Failed/paused блок можно закрыть без продолжения; первичные попытки сохраняются.
 
-**Проверки:** добавлены 13 unit tests ядра и 10 callback workflow tests (acceptance-before-advance, incomplete evidence, capture timeout, executor failure, brush restore, safe stop recovery, G2 lock, Alt cancellation during preclear/postdraw). Это промежуточное покрытие, не исчерпывающая матрица всех Tk callback/failure paths.
+**Проверки:** добавлены unit tests ядра и 10 callback workflow tests (acceptance-before-advance, incomplete evidence, capture timeout, executor failure, brush restore, safe stop recovery, G2 lock, Alt cancellation during preclear/postdraw). Дополнительно acceptance gate проверяет соответствие manifest активной задаче блока: block/task/experiment IDs, series, phase, scenario, repeat, radius, expected stroke count, matrix order и executor config. Добавлены parameterized tests для несовпадений identity и тест положительного совпадения. Покрытие остаётся промежуточным, не исчерпывающей матрицей всех Tk callback/failure paths.
 
-**CI status:** run `41265149825` для commit `36b32dbc...` завершился failure: 8 тестовых ошибок в preparation suite (556 passed), из-за чего Windows portable build остановился до startup smoke-test. Исправлены тестовые фикстуры и timeout expectation; отдельно исправлено fail-closed поведение Alt cancellation во время preclear/postdraw. Run `41266047330` для commit `609aca9156e5eb136c7db5cb516262b971d4fa82` выполняется; успешный результат пока не подтверждён. До успешного CI и отдельного контролируемого live G1 не использовать runner для экспериментальной серии. До их успешного прохождения и отдельного контролируемого live G1 не использовать runner для экспериментальной серии.
+**CI status (2026-11-01):** GitHub Actions run `41266047330` для `609aca9156e5eb136c7db5cb516262b971d4fa82` и run `41266141717` для `f8f2d1c6fe47b8d5e539be78951cea16296e16f6` завершились `success`. В последнем run успешны `geometry-tests`, `executor-tests`, `Windows portable build and startup smoke-test`. После этих CI проверок добавлена дополнительная проверка идентичности активной block task в capture acceptance; её новый код и тесты ещё должны пройти отдельный CI. Live G1 не запускался.
 
 ## 7. Текущие ограничения и порядок работ
 
-1. Завершить callback-level tests для preclear, brush feedback, executor, capture correlation, restore, Stop и restart/recovery; базовые Alt-cancel gates теперь покрыты.
-2. Проверить GitHub Actions и Windows portable smoke test.
-3. Только после CI попросить один контролируемый live-блок G1 на тестовой доске.
+1. Прогнать GitHub Actions и Windows portable smoke test после добавления task-identity acceptance gate.
+2. Продолжить callback-level review для отказов preclear, brush feedback, executor, capture correlation, restore, Stop, journal I/O и restart/recovery.
+3. После успешного CI и подтверждения готовности оператора выполнить один контролируемый live-блок G1 на тестовой доске.
 4. После принятия полного G1 разрешить G2.
 
 Существующие 12 G1 manifests с `repeat_index=1` не мигрировать и не переписывать автоматически. Для них нужен отдельный reconciliation sidecar с привязкой исходных experiment_id к повторениям либо повторная серия штатным block runner.
+
+
+## Дополнение 2026-11-01 — привязка capture acceptance к текущей задаче
+
+В ходе заключительного review обнаружен пробел: строгий валидатор проверял внутреннюю целостность experiment manifest, но UI не передавал ему ожидаемую идентичность активной задачи block journal. Исправлено fail-closed поведение: перед принятием capture сравниваются block_id, task_id, experiment_id, series_id, phase_id, scenario_id, repeat_index, requested_radius, expected_strokes, matrix_order_index и executor_parameters. Если journal недоступен или любое поле не совпадает, задача не принимается и блок приостанавливается.
+
+Добавлены тесты на шесть вариантов несовпадения идентичности и на положительный сценарий. Дополнен callback test: UI обязан передать активную задачу, журнал блока и текущий experiment_id в validator. Новые изменения: d5d3542840138f80df51cc467ca4b91012c18689, 589f25d116f1fadb924aa2d773da22515e17b001, 9576a97c4cc84fe8b139743dcf20b46eec5fece3, b63b7170f758c26016d46092ea5dc90fea1337fb. Результат CI для этих новых изменений ожидается; live G1 не запускался.
