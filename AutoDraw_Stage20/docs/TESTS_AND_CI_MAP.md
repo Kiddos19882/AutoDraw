@@ -25,6 +25,8 @@
 | `source/preparation/tests/test_color_scanline.py` | `color_scanline` | Порядок строк и сегментов, разрывы прозрачностью, singleton, row-step/offset, лимиты, сериализация и preview |
 | `source/preparation/tests/test_geometry_color_plan.py` | `geometry_color_plan`, `geometry_budget_optimizer`, `layer_segmentation`, `skeletonization`, `stroke_simplification`, `stroke_order_optimizer` | Scanline/contour/skeleton, фильтрация компонентов, маршрутизация, multi-board, бюджет, валидаторы, качество и round-trip |
 | `source/preparation/tests/test_chalk_radius_matrix.py` | `chalk_radius_matrix` | Валидация радиусов/блоков, уникальность Game Monitor run, experiment identity, точность CHALK и статистика повторов |
+| `source/preparation/tests/test_chalk_experiment_matrix.py` | `chalk_experiment_matrix` | G1/G2 metadata, exact capture, уникальность repeat cells, per-stroke pointDelta и статистика |
+| `source/preparation/tests/test_chalk_test_blocks.py` | `chalk_test_blocks` | Полные планы G1/G2 (12/18 задач), три повтора, детерминированный порядок, журнал, последовательный claim, fail-closed и interrupted recovery |
 
 Дополнительные импорты в `test_geometry_color_plan.py` подтверждают, что тест напрямую обращается к внутренним функциям и модулям-реализациям, а не только к публичному API. При изменении внутренних контрактов этот тестовый файл следует рассматривать как интеграционный тест нескольких алгоритмических компонентов.
 
