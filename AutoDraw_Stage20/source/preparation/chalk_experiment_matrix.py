@@ -310,13 +310,19 @@ def _validate_manifest(document: dict[str, Any]) -> tuple[bool, str, dict[str, A
         return False, "capture_radius_or_chalk_status_invalid", None
     if capture.get("chalk_counter_consistent") is not True or capture.get("point_delta_matches_chalk") is not True:
         return False, "capture_counter_validation_failed", None
-    if any(capture.get(key, 0) != 0 for key in ("dropped_events", "monitor_dropped_events", "monitor_error_count")):
+    if any(capture.get(key, 0) != 0 for key in (
+        "dropped_events", "monitor_error_count", "bridge_send_failures_delta",
+        "collector_sequence_gap_count"
+    )):
         return False, "capture_has_dropped_events_or_errors", None
     if summary.get("brush_radius_status") != "single" or summary.get("observed_brush_radii") != [radius]:
         return False, "observed_radius_mismatch", None
     if summary.get("stroke_count") != expected_strokes or summary.get("point_delta_matches_chalk") is not True:
         return False, "summary_stroke_or_delta_mismatch", None
-    if any(summary.get(key, 0) != 0 for key in ("dropped_events", "monitor_dropped_events", "monitor_error_count")):
+    if any(summary.get(key, 0) != 0 for key in (
+        "dropped_events", "monitor_error_count", "bridge_send_failures_delta",
+        "collector_sequence_gap_count"
+    )):
         return False, "summary_has_dropped_events_or_errors", None
 
     chalk = summary.get("chalk")
