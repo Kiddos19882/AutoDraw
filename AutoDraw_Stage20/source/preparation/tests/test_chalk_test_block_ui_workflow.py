@@ -248,3 +248,34 @@ def test_g2_unlock_requires_all_twelve_g1_tasks_completed(tmp_path):
         )
 
     assert ui._has_completed_g1_block() is True
+
+
+
+def test_startup_does_not_mark_live_block_interrupted_when_another_instance_owns_it(tmp_path, monkeypatch):
+    journal_path = tmp_path / "chalk_test_blocks" / "block.json"
+    journal_path.parent.mkdir(parents=True)
+    create_chalk_test_block_journal(
+        journal_path, build_chalk_test_block_plan(series_id="ui-owner", phase_id="G1")
+    )
+    task = claim_next_chalk_block_task(journal_path)
+    owner_lock = ui_module.acquire_chalk_block_owner_lock(journal_path)
+    assert owner_lock is not None
+
+    ui = object.__new__(BrushBehaviorTestTab)
+    ui.output_dir = tmp_path
+    ui._chalk_block_owner_lock = None
+    ui._chalk_block_recovery_journal_path = None
+    ui.chalk_block_progress_var = _Value()
+    ui.root = _Root()
+    warnings = []
+    monkeypatch.setattr(ui_module.messagebox, "showwarning", lambda *args, **kwargs: warnings.append(args))
+
+    try:
+        ui._scan_chalk_block_recovery()
+        journal = load_chalk_test_block_journal(journal_path)
+        assert journal["status"] == "running"
+        assert next(item for item in journal["tasks"] if item["task_id"] == task["task_id"])["status"] == "running"
+        assert ui._chalk_block_owner_lock is None
+        assert warnings
+    finally:
+        ui_module.release_chalk_block_owner_lock(owner_lock)
