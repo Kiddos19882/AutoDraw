@@ -614,6 +614,7 @@ class BrushBehaviorTestTab:
         self._chalk_block_journal_path: Path | None = None
         self._chalk_block_owner_lock = None
         self._chalk_block_recovery_journal_path: Path | None = None
+        self._chalk_block_recovery_scan_after_id: str | None = None
         self._chalk_block_task: dict[str, Any] | None = None
         self._chalk_block_stop_requested = False
         self._chalk_block_capture_poll_id: str | None = None
@@ -633,7 +634,18 @@ class BrushBehaviorTestTab:
         self.status_var = tk.StringVar(value="Выбери радиус и тест. Автоустановка 1–30 работает только с расширенным ползунком игры.")
         self._build(parent)
         self._load_brush_control_into_fields()
-        self.root.after(0, self._scan_chalk_block_recovery)
+        self._chalk_block_recovery_scan_after_id = self.root.after(0, self._scan_chalk_block_recovery)
+
+    def destroy(self) -> None:
+        """Cancel the deferred recovery scan before Tk destroys this tab."""
+        callback_id = getattr(self, "_chalk_block_recovery_scan_after_id", None)
+        if callback_id is not None:
+            try:
+                self.root.after_cancel(callback_id)
+            except (tk.TclError, ValueError):
+                pass
+            self._chalk_block_recovery_scan_after_id = None
+        super().destroy()
 
     def _build(self, parent: tk.Widget) -> None:
         outer = ttk.Frame(parent, padding=10)
@@ -972,6 +984,7 @@ class BrushBehaviorTestTab:
         return False
 
     def _scan_chalk_block_recovery(self) -> None:
+        self._chalk_block_recovery_scan_after_id = None
         root = self.output_dir / "chalk_test_blocks"
         if not root.is_dir():
             return
