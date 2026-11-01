@@ -127,14 +127,11 @@ def test_block_experiment_acceptance_requires_complete_stroke_breakdown(tmp_path
     manifest_path = tmp_path / "experiment.json"
     manifest_path.write_text(json.dumps({"record_type": "autodraw_brush_paint_experiment"}), encoding="utf-8")
     record = {"stroke_level": {"status": "incomplete", "reason": "stroke_id_count_mismatch"}}
+    monkeypatch.setattr(chalk_experiment_matrix, "_validate_manifest", lambda _document: (True, "valid", record))
     monkeypatch.setattr(
         chalk_experiment_matrix,
-        "summarize_chalk_experiment_matrix",
-        lambda _documents: {
-            "valid_measurement_count": 1,
-            "accepted": [record],
-            "rejected": [],
-        },
+        "_stroke_level_breakdown",
+        lambda *_args, **_kwargs: record["stroke_level"],
     )
     accepted, reason, details = validate_chalk_block_experiment(manifest_path)
     assert accepted is False
@@ -157,14 +154,11 @@ def test_block_experiment_acceptance_requires_clean_frame_probe_and_trajectory(t
         encoding="utf-8",
     )
     record = {"stroke_level": {"status": "complete", "strokes": []}}
+    monkeypatch.setattr(chalk_experiment_matrix, "_validate_manifest", lambda _document: (True, "valid", record))
     monkeypatch.setattr(
         chalk_experiment_matrix,
-        "summarize_chalk_experiment_matrix",
-        lambda _documents: {
-            "valid_measurement_count": 1,
-            "accepted": [record],
-            "rejected": [],
-        },
+        "_stroke_level_breakdown",
+        lambda *_args, **_kwargs: record["stroke_level"],
     )
     accepted, reason, details = validate_chalk_block_experiment(manifest_path)
     assert accepted is True
