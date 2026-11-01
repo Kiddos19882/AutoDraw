@@ -1681,7 +1681,7 @@ Regression test в `source/preparation/tests/test_brush_behavior_test_ui.py` т�
 
 **Проверка:** тест и полный CI для нового HEAD ожидаются; live-повтор G3 после исправления ещё не выполнен. До успешного CI и повторного preflight/G3 продолжать сбор 27 captures нельзя.
 
-## 2026-11-02 — G3 routing fix
+## 2026-11-01 — G3 routing fix
 
 - Проверена ветка на HEAD `a747b112969f0a69a3b04b701aec00a4cadc161d`, два G3 experiment manifests и два block journals.
 - Подтверждено: оба прогона имели exact CHALK=718, 6 strokes, radius=10, фактические executor параметры 2/10; G3 journal требовал 2/20. Оба отклонены с `block_task_identity_missing`, поэтому не входят в статистику G3.
