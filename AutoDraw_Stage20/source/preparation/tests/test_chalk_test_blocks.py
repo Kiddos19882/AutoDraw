@@ -654,3 +654,57 @@ def test_block_owner_lock_is_exclusive_across_processes(tmp_path):
             process.terminate()
             process.join(timeout=5)
         release_chalk_block_owner_lock(parent_lock)
+
+def test_g3_block_plan_contains_all_27_unique_parameter_repeat_cells_and_validates_journal(tmp_path):
+    plan = build_chalk_test_block_plan(
+        series_id="g3-block",
+        phase_id="G3",
+        repeats=3,
+        seed=12345,
+    )
+    assert plan["expected_task_count"] == 27
+    assert len(plan["tasks"]) == 27
+    assert len({task["task_id"] for task in plan["tasks"]}) == 27
+    cells = {
+        (
+            task["executor_parameters"]["point_step_px"],
+            task["executor_parameters"]["point_delay_ms"],
+            task["repeat_index"],
+        )
+        for task in plan["tasks"]
+    }
+    assert len(cells) == 27
+    assert {(step, delay) for step, delay, _repeat in cells} == {
+        (step, delay) for step in (1, 2, 4) for delay in (5, 10, 20)
+    }
+    assert all(task["scenario_id"] == "paint_consumption_long_lines" for task in plan["tasks"])
+    assert all(task["expected_strokes"] == 6 and task["requested_radius"] == 10 for task in plan["tasks"])
+
+    journal_path = tmp_path / "g3-block.json"
+    create_chalk_test_block_journal(journal_path, plan)
+    loaded = load_chalk_test_block_journal(journal_path)
+    assert loaded["phase_id"] == "G3"
+    assert loaded["expected_task_count"] == 27
+
+    invalid = json.loads(json.dumps(plan))
+    invalid["tasks"][1]["executor_parameters"] = dict(invalid["tasks"][0]["executor_parameters"])
+    invalid["tasks"][1]["repeat_index"] = invalid["tasks"][0]["repeat_index"]
+    invalid["tasks"][1]["task_id"] = "manually-renamed-duplicate-cell"
+    bad_path = tmp_path / "g3-duplicate.json"
+    bad_path.write_text(json.dumps(invalid), encoding="utf-8")
+    with pytest.raises(ValueError, match="Некорректная или повторная ячейка G3"):
+        load_chalk_test_block_journal(bad_path)
+
+
+def test_g3_block_order_is_deterministic_for_same_seed():
+    first = build_chalk_test_block_plan(series_id="g3-series", phase_id="G3", seed=777)
+    second = build_chalk_test_block_plan(series_id="g3-series", phase_id="G3", seed=777)
+    identity = lambda plan: [
+        (
+            task["executor_parameters"]["point_step_px"],
+            task["executor_parameters"]["point_delay_ms"],
+            task["repeat_index"],
+        )
+        for task in plan["tasks"]
+    ]
+    assert identity(first) == identity(second)
