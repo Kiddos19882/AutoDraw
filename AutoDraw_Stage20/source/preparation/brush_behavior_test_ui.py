@@ -33,6 +33,12 @@ from chalk_experiment_matrix import (
     GEOMETRY_MATRIX_SCENARIOS, build_chalk_experiment_matrix_metadata,
     inspect_chalk_matrix_series,
 )
+from chalk_test_blocks import (
+    build_chalk_test_block_plan, create_chalk_test_block_journal,
+    claim_next_chalk_block_task, finish_chalk_block_task,
+    load_chalk_test_block_journal, chalk_test_block_progress,
+    validate_chalk_block_experiment, stop_chalk_test_block as stop_chalk_test_block_journal,
+)
 from brush_experiment_capture import (
     compare_images, crop_calibrated_regions,
     measure_meter_fill_against_baseline, evaluate_meter_restoration, evaluate_board_clear,
@@ -596,6 +602,13 @@ class BrushBehaviorTestTab:
         self._chalk_matrix_metadata: dict[str, Any] | None = None
         self._chalk_experiment_matrix_metadata: dict[str, Any] | None = None
         self._experiment_id: str | None = None
+        self.chalk_block_phase_var = tk.StringVar(value="G1")
+        self.chalk_block_progress_var = tk.StringVar(value="Блок CHALK не запущен.")
+        self._chalk_block_journal_path: Path | None = None
+        self._chalk_block_task: dict[str, Any] | None = None
+        self._chalk_block_stop_requested = False
+        self._chalk_block_capture_poll_id: str | None = None
+        self._chalk_block_clear_confirmed = False
         self.outcome_var = tk.StringVar(value="not_reviewed")
         self.notes_var = tk.StringVar()
         self.visible_strokes_var = tk.StringVar()
@@ -680,6 +693,17 @@ class BrushBehaviorTestTab:
         ttk.Button(actions, text="Эксперимент: ПОСЛЕ рисования", command=lambda: self.capture_experiment_phase("after_draw")).pack(side="left", padx=(6, 0))
         ttk.Button(actions, text="Очистить и снять ПОСЛЕ", command=lambda: self.capture_experiment_phase("after_clear")).pack(side="left", padx=(6, 0))
         ttk.Button(actions, text="Сохранить запись теста…", command=self.save_record_dialog).pack(side="left", padx=(6, 0))
+
+        block_controls = ttk.LabelFrame(outer, text="Автоматический блок CHALK — полный пакет тестов", padding=8)
+        block_controls.pack(fill="x", pady=(0, 8))
+        ttk.Label(block_controls, text="Фаза").pack(side="left")
+        ttk.Combobox(
+            block_controls, textvariable=self.chalk_block_phase_var,
+            values=("G1", "G2"), state="readonly", width=5,
+        ).pack(side="left", padx=(6, 10))
+        ttk.Button(block_controls, text="Запустить полный блок", command=self.start_chalk_test_block).pack(side="left")
+        ttk.Button(block_controls, text="Остановить после текущего опыта", command=self.request_stop_chalk_test_block).pack(side="left", padx=6)
+        ttk.Label(block_controls, textvariable=self.chalk_block_progress_var, wraplength=650).pack(side="left", padx=10)
 
         details = ttk.LabelFrame(outer, text="Шаблон и фиксация результата", padding=8)
         details.pack(fill="both", expand=True)
@@ -915,6 +939,245 @@ class BrushBehaviorTestTab:
         self.template_text.insert("1.0", "\n".join(lines))
         self.template_text.configure(state="disabled")
 
+    def _has_completed_g1_block(self) -> bool:
+        root = self.output_dir / "chalk_test_blocks"
+        if not root.is_dir():
+            return False
+        for journal_path in root.glob("*.json"):
+            try:
+                journal = load_chalk_test_block_journal(journal_path)
+            except (OSError, ValueError, json.JSONDecodeError):
+                continue
+            if (
+                journal.get("phase_id") == "G1"
+                and journal.get("status") == "completed"
+                and journal.get("expected_task_count") == 12
+                and all(task.get("status") == "completed" for task in journal.get("tasks", []))
+            ):
+                return True
+        return False
+
+    def start_chalk_test_block(self) -> None:
+        if self._chalk_block_task is not None or self._chalk_block_journal_path is not None:
+            messagebox.showwarning("Блок уже активен", "Сначала заверши или останови текущий блок.", parent=self.root)
+            return
+        if not self._validate_automation_preflight():
+            return
+        phase_id = self.chalk_block_phase_var.get().strip()
+        if phase_id not in {"G1", "G2"}:
+            messagebox.showwarning("Неизвестная фаза", "Выбери G1 или G2.", parent=self.root)
+            return
+        if phase_id == "G2" and not self._has_completed_g1_block():
+            messagebox.showwarning(
+                "G2 пока закрыта",
+                "Сначала полностью выполни и прими автоматический блок G1. G2 нельзя запускать до завершения G1.",
+                parent=self.root,
+            )
+            return
+        if self._read_live_brush_radius() is None:
+            messagebox.showwarning(
+                "Game Monitor не подключён",
+                "Для автоматического блока нужен активный Game Monitor Bridge со свежим heartbeat.",
+                parent=self.root,
+            )
+            return
+        config = self.get_calibration_profile() if callable(self.get_calibration_profile) else None
+        reference_path, metadata_path = self._blank_board_reference_paths()
+        if not isinstance(config, dict) or not reference_path.is_file() or not metadata_path.is_file():
+            messagebox.showwarning(
+                "Подготовка блока не завершена",
+                "Нужны сохранённый профиль калибровки и подтверждённый эталон пустой доски.",
+                parent=self.root,
+            )
+            return
+        points = config.get("points") if isinstance(config.get("points"), dict) else {}
+        statuses = config.get("status") if isinstance(config.get("status"), dict) else {}
+        point_status = statuses.get("points") if isinstance(statuses.get("points"), dict) else {}
+        if not isinstance(points.get("clear_board"), dict) or point_status.get("clear_board") == "needs_review":
+            messagebox.showwarning("Clear не откалиброван", "Проверь координату Clear на вкладке калибровки.", parent=self.root)
+            return
+        if not self.get_canvas_size():
+            messagebox.showwarning("Нет области доски", "Сначала выбери область игрового холста.", parent=self.root)
+            return
+        series_id = self.matrix_series_var.get().strip()
+        try:
+            block_plan = build_chalk_test_block_plan(series_id=series_id, phase_id=phase_id)
+        except (TypeError, ValueError) as exc:
+            messagebox.showerror("Неверные параметры блока", str(exc), parent=self.root)
+            return
+        if not messagebox.askyesno(
+            "Подтвердить автоматический блок",
+            f"Будет выполнено {block_plan['expected_task_count']} экспериментов фазы {phase_id}, "
+            "каждый на тестовой доске. AutoDraw будет автоматически нажимать Clear между опытами. "
+            "Убедись, что текущий рисунок можно удалить. При любой ошибке блок остановится без пропуска теста. Продолжить?",
+            icon="warning",
+            parent=self.root,
+        ):
+            return
+        journal_dir = self.output_dir / "chalk_test_blocks"
+        journal_path = journal_dir / (
+            f"chalk-block-{phase_id}-{series_id}-{block_plan['block_id'][:8]}.json"
+        )
+        try:
+            create_chalk_test_block_journal(journal_path, block_plan)
+        except (OSError, ValueError) as exc:
+            messagebox.showerror("Не удалось создать журнал блока", str(exc), parent=self.root)
+            return
+        self._chalk_block_journal_path = journal_path
+        self._chalk_block_task = None
+        self._chalk_block_stop_requested = False
+        self._chalk_block_clear_confirmed = True
+        self.status_var.set("Журнал полного блока сохранён до первого действия мышью.")
+        self._update_chalk_block_progress()
+        self._start_next_chalk_block_task()
+
+    def request_stop_chalk_test_block(self) -> None:
+        if self._chalk_block_journal_path is None:
+            self.status_var.set("Активного блока CHALK нет.")
+            return
+        self._chalk_block_stop_requested = True
+        self.status_var.set("Остановка запрошена: текущий опыт будет доведён до безопасной границы; следующий не начнётся.")
+        if self._chalk_block_task is None:
+            try:
+                stop_chalk_test_block_journal(self._chalk_block_journal_path)
+            except (OSError, ValueError, RuntimeError) as exc:
+                self.status_var.set(f"Не удалось остановить блок: {exc}")
+            self._update_chalk_block_progress()
+            self._clear_chalk_block_runtime()
+    
+    def _clear_chalk_block_runtime(self) -> None:
+        if self._chalk_block_capture_poll_id is not None:
+            try:
+                self.root.after_cancel(self._chalk_block_capture_poll_id)
+            except (tk.TclError, ValueError):
+                pass
+            self._chalk_block_capture_poll_id = None
+        self._chalk_block_journal_path = None
+        self._chalk_block_task = None
+        self._chalk_block_clear_confirmed = False
+        self._chalk_block_stop_requested = False
+
+    def _update_chalk_block_progress(self) -> None:
+        if self._chalk_block_journal_path is None:
+            return
+        try:
+            journal = load_chalk_test_block_journal(self._chalk_block_journal_path)
+            progress = chalk_test_block_progress(journal)
+            current = self._chalk_block_task.get("scenario_id") if self._chalk_block_task else "—"
+            self.chalk_block_progress_var.set(
+                f"{journal.get('phase_id')}: {progress['completed']}/{progress['total']} завершено; "
+                f"текущий: {current}; осталось: {progress['pending']}; статус: {progress['status']}"
+            )
+        except (OSError, ValueError, KeyError):
+            self.chalk_block_progress_var.set("Не удалось прочитать журнал блока.")
+
+    def _start_next_chalk_block_task(self) -> None:
+        if self._chalk_block_journal_path is None:
+            return
+        if self._chalk_block_stop_requested:
+            try:
+                stop_chalk_test_block_journal(self._chalk_block_journal_path)
+            except (OSError, ValueError, RuntimeError) as exc:
+                self._fail_chalk_test_block(f"safe_stop_failed:{exc}")
+                return
+            self._update_chalk_block_progress()
+            self.status_var.set("Блок остановлен на границе опыта.")
+            self._clear_chalk_block_runtime()
+            return
+        try:
+            task = claim_next_chalk_block_task(self._chalk_block_journal_path)
+        except (OSError, ValueError, RuntimeError) as exc:
+            self._fail_chalk_test_block(f"task_claim_failed:{exc}")
+            return
+        if task is None:
+            journal = load_chalk_test_block_journal(self._chalk_block_journal_path)
+            self._update_chalk_block_progress()
+            if journal.get("status") == "completed":
+                self.status_var.set(f"Блок {journal.get('phase_id')} завершён: все опыты приняты.")
+                self._clear_chalk_block_runtime()
+            else:
+                self._fail_chalk_test_block(f"block_not_complete:{journal.get('status')}")
+            return
+        self._chalk_block_task = task
+        label = next(
+            (name for name, details in TEST_CASES.items() if details.get("id") == task.get("scenario_id")),
+            None,
+        )
+        if label is None:
+            self._fail_chalk_test_block("scenario_not_available_in_brush_test_ui")
+            return
+        self.case_var.set(label)
+        self.brush_var.set("10")
+        self.matrix_series_var.set(load_chalk_test_block_journal(self._chalk_block_journal_path)["series_id"])
+        self.matrix_block_var.set(str(task["repeat_index"]))
+        self._update_chalk_block_progress()
+        self.create_and_transfer_plan()
+
+    def _fail_chalk_test_block(self, reason: str) -> None:
+        if self._chalk_block_journal_path is not None and self._chalk_block_task is not None:
+            try:
+                finish_chalk_block_task(
+                    self._chalk_block_journal_path,
+                    self._chalk_block_task["task_id"],
+                    accepted=False,
+                    experiment_id=self._experiment_id,
+                    experiment_dir=self.experiment_dir,
+                    reason=reason,
+                )
+            except (OSError, ValueError, RuntimeError):
+                pass
+        self.status_var.set(f"Блок CHALK приостановлен без пропуска теста: {reason}")
+        self._update_chalk_block_progress()
+        self._clear_chalk_block_runtime()
+
+    def _wait_for_chalk_block_capture(self, attempt: int = 0) -> None:
+        self._chalk_block_capture_poll_id = None
+        if self._chalk_block_journal_path is None or self._chalk_block_task is None:
+            return
+        capture = self.experiment_phases.get("monitor_capture", {})
+        if isinstance(capture, dict) and capture.get("status") == "saved":
+            manifest_path = self.experiment_dir / "experiment.json" if self.experiment_dir else None
+            if manifest_path is None:
+                self._fail_chalk_test_block("experiment_manifest_missing")
+                return
+            accepted, reason, _record = validate_chalk_block_experiment(manifest_path)
+            if not accepted:
+                self._fail_chalk_test_block(reason)
+                return
+            try:
+                finish_chalk_block_task(
+                    self._chalk_block_journal_path,
+                    self._chalk_block_task["task_id"],
+                    accepted=True,
+                    experiment_id=self._experiment_id,
+                    experiment_dir=self.experiment_dir,
+                )
+            except (OSError, ValueError, RuntimeError) as exc:
+                self._fail_chalk_test_block(f"journal_finish_failed:{exc}")
+                return
+            self._chalk_block_task = None
+            self._update_chalk_block_progress()
+            self.status_var.set("Опыт принят: точный CHALK и полный per-stroke breakdown подтверждены.")
+            self._start_next_chalk_block_task()
+            return
+        if attempt >= 60:
+            self._fail_chalk_test_block(
+                f"monitor_capture_gate_timeout:{capture.get('status', 'missing') if isinstance(capture, dict) else 'invalid'}"
+            )
+            return
+        self._chalk_block_capture_poll_id = self.root.after(
+            500, lambda: self._wait_for_chalk_block_capture(attempt + 1)
+        )
+
+    def _on_chalk_block_restore_finished(self, restore_status: str) -> None:
+        if self._chalk_block_journal_path is None or self._chalk_block_task is None:
+            return
+        if restore_status != "drag_completed_unverified":
+            self._fail_chalk_test_block(f"brush_restore_{restore_status}")
+            return
+        self.status_var.set("Перетаскивание кисти завершено. Проверяю точный CHALK и телеметрию перед следующим опытом…")
+        self._wait_for_chalk_block_capture()
+
     def _validate_automation_preflight(self) -> bool:
         """Block automatic brush actions unless saved calibration matches this screen."""
         config = self.get_calibration_profile() if callable(self.get_calibration_profile) else None
@@ -986,27 +1249,42 @@ class BrushBehaviorTestTab:
                 plan["generation"]["chalk_radius_matrix"] = matrix_metadata
             elif scenario_id in GEOMETRY_MATRIX_SCENARIOS:
                 series_id = self.matrix_series_var.get()
-                repeat_index = int(self.matrix_block_var.get().strip())
-                series_state = inspect_chalk_matrix_series(
-                    self.output_dir,
-                    series_id=series_id,
-                    scenario_id=scenario_id,
-                    repeat_index=repeat_index,
-                )
-                duplicate_path = series_state["duplicate_manifest_path"]
-                if duplicate_path:
-                    raise ValueError(
-                        f"Повтор {repeat_index} для сценария {scenario_id} уже сохранён в этой серии: "
-                        f"{duplicate_path}. Выбери другой номер повтора (1–3) или новый ID серии."
+                repeat_index = int(self.matrix_block_task["repeat_index"]) if self._chalk_block_task else int(self.matrix_block_var.get().strip())
+                if self._chalk_block_task is not None:
+                    experiment_matrix_metadata = build_chalk_experiment_matrix_metadata(
+                        series_id=series_id,
+                        scenario_id=scenario_id,
+                        repeat_index=repeat_index,
+                        requested_radius=brush,
+                        strokes=plan["strokes"],
+                        matrix_order_index=int(self._chalk_block_task["matrix_order_index"]),
                     )
-                experiment_matrix_metadata = build_chalk_experiment_matrix_metadata(
-                    series_id=series_id,
-                    scenario_id=scenario_id,
-                    repeat_index=repeat_index,
-                    requested_radius=brush,
-                    strokes=plan["strokes"],
-                    matrix_order_index=series_state["next_matrix_order_index"],
-                )
+                    plan["generation"]["chalk_test_block"] = {
+                        "block_id": load_chalk_test_block_journal(self._chalk_block_journal_path)["block_id"],
+                        "task_id": self._chalk_block_task["task_id"],
+                        "phase_id": load_chalk_test_block_journal(self._chalk_block_journal_path)["phase_id"],
+                    }
+                else:
+                    series_state = inspect_chalk_matrix_series(
+                        self.output_dir,
+                        series_id=series_id,
+                        scenario_id=scenario_id,
+                        repeat_index=repeat_index,
+                    )
+                    duplicate_path = series_state["duplicate_manifest_path"]
+                    if duplicate_path:
+                        raise ValueError(
+                            f"Повтор {repeat_index} для сценария {scenario_id} уже сохранён в этой серии: "
+                            f"{duplicate_path}. Выбери другой номер повтора (1–3) или новый ID серии."
+                        )
+                    experiment_matrix_metadata = build_chalk_experiment_matrix_metadata(
+                        series_id=series_id,
+                        scenario_id=scenario_id,
+                        repeat_index=repeat_index,
+                        requested_radius=brush,
+                        strokes=plan["strokes"],
+                        matrix_order_index=series_state["next_matrix_order_index"],
+                    )
                 plan["generation"]["chalk_experiment_matrix"] = experiment_matrix_metadata
             path.write_text(json.dumps(plan, ensure_ascii=False, indent=2), encoding="utf-8")
             self.current_plan = plan
@@ -1015,10 +1293,14 @@ class BrushBehaviorTestTab:
             self._chalk_matrix_metadata = matrix_metadata
             self._chalk_experiment_matrix_metadata = experiment_matrix_metadata
             if not self.on_transfer_plan(plan, path):
+                if self._chalk_block_task is not None:
+                    self._fail_chalk_test_block("executor_plan_transfer_failed")
                 return
             self._reset_observation_fields()
             self._start_automated_preclear()
         except (OSError, ValueError, TypeError) as exc:
+            if self._chalk_block_task is not None:
+                self._fail_chalk_test_block(f"plan_creation_failed:{exc}")
             messagebox.showerror("Не удалось создать тестовый план", str(exc), parent=self.root)
 
     def _reset_observation_fields(self) -> None:
@@ -1572,6 +1854,8 @@ class BrushBehaviorTestTab:
         self.status_var.set(
             f"Автоустановка кисти не подтверждена: {detail} Исполнитель не запущен."
         )
+        if self._chalk_block_task is not None:
+            self._fail_chalk_test_block(f"brush_radius_feedback_{reason}:{detail}")
         messagebox.showwarning(
             "Не удалось подтвердить размер кисти",
             f"{detail}\n\nПроверь Game Monitor Bridge и профиль ползунка. "
@@ -1597,6 +1881,20 @@ class BrushBehaviorTestTab:
                     "Game Monitor подтвердил радиус, но манифест не сохранён. Исполнитель не запущен."
                 )
                 return
+        if self._chalk_block_task is not None:
+            phase["status"] = "confirmed_by_monitor_for_automated_block"
+            phase["confirmed_at_utc"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+            if self.experiment_dir is not None:
+                try:
+                    self._write_experiment_manifest()
+                except (OSError, ValueError, TypeError) as exc:
+                    self._fail_chalk_test_block(f"brush_confirmation_manifest_failed:{exc}")
+                    return
+            if callable(self.on_brush_ready):
+                self.root.after(0, lambda: self.on_brush_ready(brush))
+            else:
+                self._fail_chalk_test_block("executor_callback_missing")
+            return
         try:
             confirmed = messagebox.askyesno(
                 "Подтвердить положение кисти",
@@ -1692,7 +1990,7 @@ class BrushBehaviorTestTab:
             self.status_var.set("Тест заблокирован: координата Clear требует проверки.")
             messagebox.showwarning("Clear не откалиброван", "Проверь точку Clear на вкладке 8.", parent=self.root)
             return
-        if not messagebox.askyesno(
+        if self._chalk_block_task is None and not messagebox.askyesno(
             "Подтвердить очистку перед тестом",
             "AutoDraw нажмёт Clear и удалит текущий рисунок. Продолжать только на тестовой доске, "
             "где рисунок можно удалить. Если очистка не подтвердится эталоном, тест не начнётся.",
@@ -1869,6 +2167,8 @@ class BrushBehaviorTestTab:
                 except (OSError, ValueError, TypeError) as exc:
                     reason += f"; ошибка сохранения манифеста: {exc}"
         self.status_var.set(f"Тест остановлен до рисования: {reason}")
+        if self._chalk_block_task is not None:
+            self._fail_chalk_test_block(f"{status}:{reason}")
         try:
             self.root.deiconify()
             self.root.lift()
@@ -2562,6 +2862,9 @@ class BrushBehaviorTestTab:
         except (OSError, ValueError, TypeError) as exc:
             detail += f" Не удалось обновить experiment.json: {exc}"
         self._postdraw_final_reason = f"{self._postdraw_final_reason} {detail}".strip()
+        if self._chalk_block_task is not None:
+            self._on_chalk_block_restore_finished(status)
+            return
         try:
             self.root.deiconify()
             self.root.lift()
@@ -2629,6 +2932,8 @@ class BrushBehaviorTestTab:
                 }
                 if self.experiment_dir is not None:
                     self._write_experiment_manifest()
+                if self._chalk_block_task is not None:
+                    self._fail_chalk_test_block(f"executor_status_{status}")
             return True
         except Exception as exc:
             self.status_var.set(f"Не удалось привязать результат исполнителя к тесту кисти: {exc}")
