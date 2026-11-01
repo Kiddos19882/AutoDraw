@@ -571,3 +571,13 @@ Owner lock I/O теперь fail-closed: ошибка открытия/созд�
 
 ### CI finding — closure audit classification (2026-11-01)
 The first final CI run exposed a mismatch: `finish_chalk_block_task(accepted=False)` correctly leaves the block in `paused`, while the rejected task itself is `failed`. Closure audit classification now inspects task statuses, recording `close_failed_block` when a failed task exists and `close_paused_block` for interruption-only pauses. This preserves the distinction between block state and failed experiment state. The existing regression test asserts the failed-task path. Full CI must be rerun; G1 remains blocked until all jobs and Windows portable smoke-test pass.
+
+## 15. Итоговая готовность G1 runner — 2026-11-01
+
+Финальный GitHub Actions run [41272291546](https://github.com/Kiddos19882/AutoDraw/actions/runs/41272291546) для HEAD `311299296559b9a5949f1e803f134b46436a2850` завершился `success`. Успешны все три jobs: `geometry-tests`, `executor-tests`, `Windows portable build and startup smoke-test`. Windows job выполнил `build_windows.bat`, включая `run_all_tests.py`, portable build и `smoke_test_portable.py`.
+
+Первопричина предыдущего падения исправлена в [dd976b04](https://github.com/Kiddos19882/AutoDraw/commit/dd976b04f6d6423726ad7382bac7223c12d8342b): при закрытии блока тип audit-записи теперь определяется по состояниям задач, а не только по статусу блока. Если в paused-блоке есть failed-задача, сохраняется `close_failed_block`; для прерывания без failed-задач — `close_paused_block`. Регрессионный тест прошёл в финальном CI.
+
+**Статус:** программная реализация G1 block runner прошла CI и Windows portable build/startup smoke-test; software gate закрыт. Live G1 не запускался. Перед первым опытом остаётся локальный Windows preflight: открыть portable AutoDraw на рабочей машине, подтвердить профиль калибровки и диапазон кисти 1–30, Clear reference, доступную игровую canvas, heartbeat Game Monitor и фактически пустую тестовую доску. Только после этого оператор запускает полный G1 блок из 12 задач. G2/G3 остаются заблокированными до принятия всех 12 валидных ячеек G1.
+
+Изменения только в `feature/image-geometry-optimization`; `master`, `data/` и исторические G1 manifests не изменялись.
