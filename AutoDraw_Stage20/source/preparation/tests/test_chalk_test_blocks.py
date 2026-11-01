@@ -12,6 +12,7 @@ from chalk_test_blocks import (
     finish_chalk_block_task,
     load_chalk_test_block_journal,
     mark_interrupted_chalk_block_task,
+    validate_chalk_block_experiment,
 )
 
 
@@ -116,3 +117,70 @@ def test_interrupted_task_is_not_silently_replayed(tmp_path):
     assert journal["status"] == "paused"
     assert chalk_test_block_progress(journal)["interrupted"] == 1
     assert claim_next_chalk_block_task(path) is None
+
+
+
+def test_block_experiment_acceptance_requires_complete_stroke_breakdown(tmp_path, monkeypatch):
+    import chalk_experiment_matrix
+
+    manifest_path = tmp_path / "experiment.json"
+    manifest_path.write_text(json.dumps({"record_type": "autodraw_brush_paint_experiment"}), encoding="utf-8")
+    record = {"stroke_level": {"status": "incomplete", "reason": "stroke_id_count_mismatch"}}
+    monkeypatch.setattr(
+        chalk_experiment_matrix,
+        "summarize_chalk_experiment_matrix",
+        lambda _documents: {
+            "valid_measurement_count": 1,
+            "accepted": [record],
+            "rejected": [],
+        },
+    )
+    accepted, reason, details = validate_chalk_block_experiment(manifest_path)
+    assert accepted is False
+    assert reason == "stroke_level_stroke_id_count_mismatch"
+    assert details is None
+
+
+def test_block_experiment_acceptance_requires_clean_frame_probe_and_trajectory(tmp_path, monkeypatch):
+    import chalk_experiment_matrix
+
+    manifest_path = tmp_path / "experiment.json"
+    manifest_path.write_text(
+        json.dumps({
+            "record_type": "autodraw_brush_paint_experiment",
+            "game_monitor_summary": {
+                "frame_probe": {"status": "measured", "visibility_interruption": False},
+                "trajectory": {"accepted_sample_count": 12},
+            },
+        }),
+        encoding="utf-8",
+    )
+    record = {"stroke_level": {"status": "complete", "strokes": []}}
+    monkeypatch.setattr(
+        chalk_experiment_matrix,
+        "summarize_chalk_experiment_matrix",
+        lambda _documents: {
+            "valid_measurement_count": 1,
+            "accepted": [record],
+            "rejected": [],
+        },
+    )
+    accepted, reason, details = validate_chalk_block_experiment(manifest_path)
+    assert accepted is True
+    assert reason == "accepted"
+    assert details is record
+
+    manifest_path.write_text(
+        json.dumps({
+            "record_type": "autodraw_brush_paint_experiment",
+            "game_monitor_summary": {
+                "frame_probe": {"status": "measured", "visibility_interruption": True},
+                "trajectory": {"accepted_sample_count": 12},
+            },
+        }),
+        encoding="utf-8",
+    )
+    accepted, reason, details = validate_chalk_block_experiment(manifest_path)
+    assert accepted is False
+    assert reason == "frame_probe_not_clean"
+    assert details is None
