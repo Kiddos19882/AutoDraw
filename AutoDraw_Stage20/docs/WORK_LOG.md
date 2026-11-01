@@ -1504,3 +1504,14 @@ GitHub Actions для новых изменений выполняется/ож�
 Коммиты кода/тестов: e688ed5b893903794afdf306c3b8db955e578639, dc21778fff4fc8ef8d47525d93ac00fde784eb78, 0d2d4182d9d418a274a69dcaa1ee9495a48e012d, 9147bbdfa8419a77481d093bb0669c05e4ab640a.
 
 Новый CI для этих изменений обязателен; live G1 не запускать до успешных geometry-tests, executor-tests и Windows portable build/startup smoke-test. master, data/ и исторические manifests не изменялись.
+
+
+## 2026-11-01 — эксклюзивное владение блоком и безопасный recovery
+
+Устранён риск, при котором второй экземпляр AutoDraw мог принять ещё работающий блок за прерванный. Добавлен отдельный lifetime owner lock для каждого block journal: Windows msvcrt non-blocking lock, POSIX flock LOCK_NB. UI удерживает lock в течение всего активного блока, recovery-сеанса или закрытия журнала. При старте второго экземпляра занятый lock означает, что journal не меняется и running-задача не переводится в interrupted. После завершения владельца ОС автоматически освобождает lock; новый экземпляр получает его и выполняет recovery.
+
+Recovery resume/close теперь также требуют владения lock. Закрытие failed journal, как и paused, требует явного подтверждения проверки доски. Добавлены unit и UI workflow tests на эксклюзивность owner lock и отказ второго экземпляра менять живой running journal.
+
+Коммиты: 9c709c5a597ebcb968419839d2dfc4af9b1a2bd3, 4c80d167ae28ea3327e71813a3db0c03a5d8e05a, 0d666afb63cb70634d90a25e7b0b87022a0394f2, 1b7486a86d2b19ead81625f9a465aef51b3e3450, 3ba5b4dc1c7a26d4a333592807bda802ceba76c5, 4e0e7809d5eef1235efccc65e2529892e8a81f85, 4d681cdf09c62f65647f651b271b81458ff59e29.
+
+Новый CI для этих изменений обязателен. Live G1 запрещён до успешного полного CI и фактического Windows preflight. Ветка master, data/ и первичные manifests не изменялись.
