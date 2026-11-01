@@ -2301,6 +2301,8 @@ class BrushBehaviorTestTab:
                 self._write_experiment_manifest()
             except (OSError, ValueError, TypeError) as exc:
                 self.status_var.set(f"Подготовка остановлена; не удалось записать манифест: {exc}")
+        if self._chalk_block_task is not None:
+            self._fail_chalk_test_block("preclear_cancelled_by_user")
         self.status_var.set("Подготовка теста отменена по Alt. Рисование не запускалось; проверь доску вручную.")
         try:
             self.root.deiconify()
@@ -2820,6 +2822,8 @@ class BrushBehaviorTestTab:
             self.status_var.set(f"Постэтап остановлен Alt; не удалось сохранить манифест: {exc}")
         else:
             self.status_var.set("Постэтап остановлен по Alt. Новые действия не запускаются; проверь доску и кисть вручную.")
+        if self._chalk_block_task is not None:
+            self._fail_chalk_test_block("postdraw_cancelled_by_user")
         try:
             self.root.deiconify()
             self.root.lift()
