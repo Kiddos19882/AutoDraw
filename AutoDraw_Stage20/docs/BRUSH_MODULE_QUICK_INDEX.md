@@ -22,7 +22,9 @@
 | 9 | [UI_INTEGRATION_MAP.md](UI_INTEGRATION_MAP.md) | Как вкладки и callbacks связаны с integrated_app и executor |
 | 10 | [DEPENDENCY_MAP.md](DEPENDENCY_MAP.md) | Реальные прямые импорты и зависимости модулей |
 | 11 | [DATA_FORMATS_AND_PROFILES.md](DATA_FORMATS_AND_PROFILES.md) | Форматы профилей, калибровки, планов и отчётов |
-| 12 | [WORK_LOG.md](WORK_LOG.md) и [DECISIONS.md](DECISIONS.md) | История технических выводов и принятых решений |\n| 13 | [CHALK_RADIUS_MATRIX_RESULTS.md](CHALK_RADIUS_MATRIX_RESULTS.md) | Завершённые 21 измерение расхода по радиусам и границы вывода |\n| 14 | [../CHALK_GEOMETRY_MATRIX_PLAN.md](../CHALK_GEOMETRY_MATRIX_PLAN.md) | Активный план G1–G3: геометрия, перекрытие, скорость и sampling |
+| 12 | [WORK_LOG.md](WORK_LOG.md) и [DECISIONS.md](DECISIONS.md) | История технических выводов и принятых решений |
+| 13 | [CHALK_RADIUS_MATRIX_RESULTS.md](CHALK_RADIUS_MATRIX_RESULTS.md) | Завершённые 21 измерение расхода по радиусам и границы вывода |
+| 14 | [../CHALK_GEOMETRY_MATRIX_PLAN.md](../CHALK_GEOMETRY_MATRIX_PLAN.md) | Активный план G1–G3: геометрия, перекрытие, скорость и sampling |
 
 ## 2. Карта компонентов: где искать код
 
@@ -30,7 +32,8 @@
 |---|---|---|
 | Точка интеграции приложения | `AutoDraw_Stage20/integrated_app.py` | Создание вкладок, передача callbacks и DrawingPlan, получение canvas area/size, связь Brush Test с Stage6 |
 | UI лаборатории кистей | `AutoDraw_Stage20/source/preparation/brush_behavior_test_ui.py` | Сценарии, создание логических DrawingPlan 460×240 и передача теста |
-| Обратная связь радиуса | `AutoDraw_Stage20/source/preparation/brush_radius_feedback.py` | Извлечение фактического радиуса из heartbeat Game Monitor и расчёт коррекции ползунка для Brush Test и Stage6 |\n| Метаданные и анализ геометрической матрицы CHALK | `AutoDraw_Stage20/source/preparation/chalk_experiment_matrix.py` | G1/G2 metadata, exact-capture validation, duplicate rejection и per-stroke pointDelta aggregation |
+| Обратная связь радиуса | `AutoDraw_Stage20/source/preparation/brush_radius_feedback.py` | Извлечение фактического радиуса из heartbeat Game Monitor и расчёт коррекции ползунка для Brush Test и Stage6 |
+| Метаданные и анализ геометрической матрицы CHALK | `AutoDraw_Stage20/source/preparation/chalk_experiment_matrix.py` | G1/G2 metadata, exact-capture validation, duplicate rejection и per-stroke pointDelta aggregation |
 | Преобразование координат Brush Test | `AutoDraw_Stage20/source/preparation/brush_coordinate_transform.py` | Явное преобразование logical_board_pixels в screen-local ROI с сохранением transform в generation metadata |
 | Исполнитель мыши | `AutoDraw_Stage20/source/executor/drawing/mouse_executor.py` | MouseExecutor, ExecutorConfig, экранные координаты, движение мыши, отчёт исполнения |
 | UI исполнителя | `AutoDraw_Stage20/source/executor/stage6_execute_plan.py` | Загрузка плана, preview, проверка размеров, запуск рабочего потока и передача в MouseExecutor |
@@ -42,7 +45,8 @@
 | Модели геометрии | `AutoDraw_Stage20/source/geometry_models/` | Общие Point, Stroke, DrawingPlan |
 | Профили и калибровка | `AutoDraw_Stage20/source/preparation/profile_manager.py` и связанные модули | ScreenArea, calibration settings, параметры ввода |
 | Игровой bundle (только чтение) | `AutoDraw_Stage20/fileGameEngine/main.min_570122a1.js` в `master` | Источник BoardPane; не изменять master |
-| Статический анализ bundle | `AutoDraw_Stage20/tests/analyze_game_brush_engine.py` | Повторяемая статическая проверка игрового bundle |\n| Анализ геометрической матрицы CHALK | `AutoDraw_Stage20/tests/analyze_chalk_experiment_matrix.py` | CLI для сводки G1/G2 и проверки stroke-level разбивки |
+| Статический анализ bundle | `AutoDraw_Stage20/tests/analyze_game_brush_engine.py` | Повторяемая статическая проверка игрового bundle |
+| Анализ геометрической матрицы CHALK | `AutoDraw_Stage20/tests/analyze_chalk_experiment_matrix.py` | CLI для сводки G1/G2 и проверки stroke-level разбивки |
 
 Пути выше — навигационные указатели. Если файл переименован или перемещён, сначала проверьте дерево текущей ветки и обновите этот индекс.
 
@@ -92,7 +96,8 @@
 ## 6. Границы достоверности и статусы
 
 - **Подтверждено статически:** формула чтения `max/less`, устройство Monitor 0.2.0, существующая основа Brush Test/MouseExecutor и реализация преобразования logical→screen.
-- **Подтверждено live:** `max/less`, установка радиуса 1–30 с feedback, loopback bridge и 21 exact CHALK capture для длинных линий.\n- **Не завершено:** live A/B/C overhead Monitor, геометрическая/скоростная матрица G1–G3, валидированная общая модель CHALK и подключение модели к оптимизатору.
+- **Подтверждено live:** `max/less`, установка радиуса 1–30 с feedback, loopback bridge и 21 exact CHALK capture для длинных линий.
+- **Не завершено:** live A/B/C overhead Monitor, геометрическая/скоростная матрица G1–G3, валидированная общая модель CHALK и подключение модели к оптимизатору.
 
 - Статус задач смотреть в [TASKS.md](TASKS.md); не выводить его только из этого файла, поскольку статусы могут меняться.
 
