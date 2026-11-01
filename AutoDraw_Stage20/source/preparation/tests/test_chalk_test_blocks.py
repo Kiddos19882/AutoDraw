@@ -179,6 +179,12 @@ def test_block_experiment_acceptance_requires_clean_frame_probe_and_trajectory(t
     manifest_path.write_text(
         json.dumps({
             "record_type": "autodraw_brush_paint_experiment",
+            "phases": {
+                "before_clear": {"status": "restored"},
+                "before_draw": {"captured_at_utc": "2026-11-01T00:00:00Z"},
+                "after_draw": {"status": "captured"},
+                "postdraw_workflow": {"status": "completed"},
+            },
             "game_monitor_summary": {
                 "frame_probe": {"status": "measured", "visibility_interruption": True},
                 "trajectory": {"accepted_sample_count": 12},
