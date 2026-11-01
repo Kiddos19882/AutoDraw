@@ -1194,10 +1194,7 @@ class UnifiedAppCoreTests(unittest.TestCase):
             )
 
 
-if __name__ == "__main__":
-    unittest.main(verbosity=2)
-
-def test_workflow_executor_config_override_is_validated_without_mutating_base_config(self):
+    def test_workflow_executor_config_override_is_validated_without_mutating_base_config(self):
         executor = object.__new__(integrated_app.Stage6App)
         from drawing.mouse_executor import ExecutorConfig
 
@@ -1221,3 +1218,8 @@ def test_workflow_executor_config_override_is_validated_without_mutating_base_co
                     "point_step_px": 0.1,
                     "point_delay_ms": 5,
                 })
+
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)
