@@ -538,8 +538,14 @@ def stop_chalk_test_block(
     if journal.get("status") in {"completed", "stopped"}:
         return journal
     if journal.get("status") in {"paused", "failed"}:
+        # A rejected experiment pauses the block, but its task remains failed.
+        # Preserve that distinction in the closure audit instead of deriving it
+        # from the block-level "paused" state alone.
+        has_failed_task = any(
+            task.get("status") == "failed" for task in journal.get("tasks", [])
+        )
         journal.setdefault("recovery_decisions", []).append({
-            "decision": "close_failed_block" if journal.get("status") == "failed" else "close_paused_block",
+            "decision": "close_failed_block" if has_failed_task else "close_paused_block",
             "board_checked": True,
             "decided_at_utc": _utc_now(),
         })
