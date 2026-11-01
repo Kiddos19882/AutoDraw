@@ -101,7 +101,7 @@ def test_ui_capture_gate_times_out_closed(tmp_path):
 
     ui._wait_for_chalk_block_capture(attempt=60)
 
-    assert failures == ["monitor_capture_gate_timeout:saved"]
+    assert failures == ["monitor_capture_gate_timeout:pending"]
 
 
 def test_alt_cancelled_preclear_pauses_active_block(tmp_path):
