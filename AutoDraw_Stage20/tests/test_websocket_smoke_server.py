@@ -111,6 +111,42 @@ class BridgeRecorderTests(unittest.TestCase):
         self.recorder.event({"type": "DRAW_SAMPLE", "t": 2, "strokeId": "s1",
                              "pointDelta": 3, "acceptedPoint": {"x": 3, "y": 4}}, 1.1)
         self.assertEqual(self.recorder.current["interpretation"]["path_length_status"], "incomplete_samples")
+ 
+    def test_session_cumulative_monitor_buffer_overflow_does_not_invalidate_run(self):
+        before = {"maxPoints": 6000, "remainingPoints": 6000, "pointCount": 0, "isExact": True}
+        after = {"maxPoints": 6000, "remainingPoints": 5999, "pointCount": 1, "isExact": True}
+        self.recorder.heartbeat({"droppedEvents": 50000, "errors": 0}, 0.5)
+        self.recorder.event({"type": "DRAW_START", "t": 1, "before": before}, 1.0)
+        self.recorder.event({"type": "DRAW_SAMPLE", "t": 2, "strokeId": "s1",
+                             "pointDelta": 1, "acceptedPoint": {"x": 3, "y": 4}}, 1.1)
+        self.recorder.event({"type": "DRAW_END", "t": 3, "after": after}, 1.2)
+        self.recorder.heartbeat(
+            {"droppedEvents": 50010, "errors": 0},
+            1.3,
+            {"sendFailureCount": 0},
+        )
+        path = self.recorder.finalize("completed")
+        data = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(data["monitor_dropped_events"], 50010)
+        self.assertEqual(data["monitor_buffer_dropped_events_start"], 50000)
+        self.assertEqual(data["monitor_buffer_dropped_events_end"], 50010)
+        self.assertEqual(data["monitor_buffer_dropped_events_delta"], 10)
+        self.assertEqual(data["bridge_send_failures_delta"], 0)
+        self.assertEqual(data["collector_sequence_gap_count"], 0)
+        self.assertEqual(data["interpretation"]["path_length_status"], "incomplete_until_verified")
+        self.assertEqual(data["chalk"]["consumed_points"], 1)
+
+    def test_per_run_transport_failures_are_tracked_separately(self):
+        before = {"maxPoints": 6000, "remainingPoints": 6000, "pointCount": 0, "isExact": True}
+        self.recorder.heartbeat({"droppedEvents": 7, "errors": 0}, 0.5, {"sendFailureCount": 1})
+        self.recorder.event({"type": "DRAW_START", "t": 1, "before": before}, 1.0)
+        self.recorder.note_collector_sequence_gap(2)
+        self.recorder.heartbeat({"droppedEvents": 9, "errors": 0}, 1.1, {"sendFailureCount": 3})
+        path = self.recorder.finalize("partial")
+        data = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(data["monitor_buffer_dropped_events_delta"], 2)
+        self.assertEqual(data["bridge_send_failures_delta"], 2)
+        self.assertEqual(data["collector_sequence_gap_count"], 2)
 
     def test_idle_finalizes_completed_run(self):
         before = {"maxPoints": 6000, "remainingPoints": 6000, "pointCount": 0, "isExact": True}
