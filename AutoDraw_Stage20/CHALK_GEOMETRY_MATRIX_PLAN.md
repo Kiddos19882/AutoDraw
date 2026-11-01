@@ -172,3 +172,13 @@ G3 реализуется как отдельная фаза общего CHALK 
 **Текущий gate:** программная реализация G3 и CI gate приняты. Это не означает, что G3 live-эксперименты выполнены. До запуска требуется локальный Windows preflight: portable-приложение должно открыться, профиль калибровки и фактический радиус должны быть подтверждены, доска должна быть очищена и проверена, игровая canvas доступна, Game Monitor heartbeat стабилен.
 
 После preflight выполнить только полный автоматический блок из 27 задач (9 конфигураций × 3 повтора). Для каждого опыта сохранить фактические executor parameters, baseline/post pointCount, exact CHALK, сумму DRAW_SAMPLE.pointDelta, stroke count, радиус, frame/FPS и диагностику dropped events/errors. До получения валидных captures не делать выводов о влиянии шага/задержки и не строить подтверждённую модель CHALK.
+
+## 12. Инцидент первых live-запусков G3 и исправление маршрутизации — 2026-11-02
+
+Два запуска из серии `chalk-20261101-232008-3e9348` не являются зачётными G3-повторами. Оба относились к задаче `paint_consumption_long_lines-s2-d20-r3`, но executor report показывает фактические `point_step_px=2`, `point_delay_ms=10`. Каждый запуск дал exact CHALK=718, 6 штрихов, радиус 10, 0 dropped events и 0 monitor errors. Отсутствие `chalk_test_block`/`chalk_experiment_matrix` вызвало штатный fail-closed отказ `block_task_identity_missing`. Не включать их в G3 analyzer.
+
+Причина подтверждена в UI: `paint_consumption_long_lines` одновременно совпадает с legacy `MATRIX_SCENARIO_ID` и входит в `GEOMETRY_MATRIX_SCENARIOS`; legacy `if` перехватывал G3 block task раньше geometry branch. В Stage6 task-specific `executor_config_override` уже реализован и валидируется, но без G3 metadata он не включался.
+
+Исправлена маршрутизация: legacy radius-matrix ветка применяется только если нет активной block task. Автоматический G3 task теперь проходит geometry-matrix ветку, записывает оба обязательных identity объекта и активирует существующий Stage6 override. Regression test фиксирует коллизию и проверяет, что активная block task не классифицируется как legacy radius-matrix run.
+
+Кодовый commit: `85ae43af292e8c8ecdb4d1e5791a27db4a06a97c`; regression test commit: `60117ef34db54a5bf858c946d7b5ca09137caa44`. Полный CI на текущем HEAD ожидается. После успешного CI и локального Windows preflight создать новую G3 series и выполнить полный блок 27/27. Старые paused/stopped journals оставить неизменными. Модель влияния sampling на CHALK пока не подтверждена.
