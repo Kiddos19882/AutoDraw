@@ -590,6 +590,7 @@ def test_block_owner_lock_is_exclusive_until_released(tmp_path):
     first = acquire_chalk_block_owner_lock(path)
     assert first is not None
     assert acquire_chalk_block_owner_lock(path) is None
+    assert acquire_chalk_block_owner_lock(tmp_path / "another-block.json") is None
 
     release_chalk_block_owner_lock(first)
     second = acquire_chalk_block_owner_lock(path)
