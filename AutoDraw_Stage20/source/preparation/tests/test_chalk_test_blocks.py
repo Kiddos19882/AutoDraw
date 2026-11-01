@@ -14,6 +14,7 @@ from chalk_test_blocks import (
     mark_interrupted_chalk_block_task,
     validate_chalk_block_experiment,
     stop_chalk_test_block,
+    record_chalk_block_task_experiment,
 )
 
 
@@ -216,3 +217,31 @@ def test_block_can_stop_only_at_task_boundary(tmp_path):
     stopped = stop_chalk_test_block(path)
     assert stopped["status"] == "stopped"
     assert claim_next_chalk_block_task(path) is None
+
+
+
+def test_running_attempt_records_experiment_identity_before_completion(tmp_path):
+    plan = build_chalk_test_block_plan(series_id="series", phase_id="G1")
+    path = tmp_path / "block.json"
+    create_chalk_test_block_journal(path, plan)
+    task = claim_next_chalk_block_task(path)
+    experiment_dir = tmp_path / "experiment"
+    experiment_dir.mkdir()
+    record_chalk_block_task_experiment(
+        path,
+        task["task_id"],
+        experiment_id="experiment-123",
+        experiment_dir=experiment_dir,
+    )
+    journal = load_chalk_test_block_journal(path)
+    saved_task = next(item for item in journal["tasks"] if item["task_id"] == task["task_id"])
+    attempt = saved_task["attempts"][-1]
+    assert attempt["experiment_id"] == "experiment-123"
+    assert attempt["experiment_dir"] == str(experiment_dir.resolve())
+    with pytest.raises(ValueError):
+        record_chalk_block_task_experiment(
+            path,
+            task["task_id"],
+            experiment_id="experiment-456",
+            experiment_dir=experiment_dir,
+        )
