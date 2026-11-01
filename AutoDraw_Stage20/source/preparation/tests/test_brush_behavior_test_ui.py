@@ -1278,19 +1278,18 @@ def test_g3_block_plan_writes_matrix_and_block_identity_instead_of_legacy_radius
     assert generation["chalk_experiment_matrix"]["executor_parameters"] == task_parameters
     assert "chalk_radius_matrix" not in generation
 
-def test_destroy_cancels_pending_chalk_block_recovery_scan(monkeypatch):
+def test_destroying_recovery_scan_owner_cancels_pending_callback():
     from types import SimpleNamespace
 
     cancelled = []
-    destroyed = []
+    frame = object()
     tab = object.__new__(brush_ui.BrushBehaviorTestTab)
     tab.root = SimpleNamespace(after_cancel=lambda callback_id: cancelled.append(callback_id))
+    tab._recovery_scan_frame = frame
     tab._chalk_block_recovery_scan_after_id = "after#recovery-scan"
-    monkeypatch.setattr(brush_ui.ttk.Frame, "destroy", lambda _self: destroyed.append(True))
 
-    tab.destroy()
+    tab._on_recovery_scan_owner_destroyed(SimpleNamespace(widget=frame))
 
     assert cancelled == ["after#recovery-scan"]
-    assert destroyed == [True]
     assert tab._chalk_block_recovery_scan_after_id is None
 
