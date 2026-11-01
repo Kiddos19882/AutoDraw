@@ -620,3 +620,16 @@ G1 и G2 приняты по live-данным. Программная реал�
 Целевой контракт: 27 задач на `paint_consumption_long_lines`, радиус 10; девять комбинаций `point_step_px` 1/2/4 × `point_delay_ms` 5/10/20, три повтора каждой. Идентичность каждой ячейки включает обе настройки executor и repeat_index.
 
 До live-запуска обязательны regression tests, полный GitHub Actions CI и Windows portable startup smoke-test. Параметры должны реально применяться к `MouseExecutor` и попадать в execution report; запись только в experiment manifest не считается реализацией G3. Временный override не должен изменять постоянный профиль пользователя.
+
+
+## Актуальное состояние G3 — 2026-11-01 (после CI)
+
+**Software gate G3 закрыт** на HEAD `e1872af08efbff7ee7c9ac771e6b9eb70b748c46`. GitHub Actions run [41337768801](https://github.com/Kiddos19882/AutoDraw/actions/runs/41337768801) завершён со статусом `success`; jobs `geometry-tests`, `executor-tests` и `Windows portable build and startup smoke-test` все успешны.
+
+Три дефекта, выявленные последовательными проверками CI, исправлены в коммитах `bf52f12`, `6594e28` и `e1872af`: лишняя скобка, расположение тестовых методов вне unittest-класса и незакрытый docstring.
+
+**Не смешивать два gate:**
+- Software gate — закрыт автоматическими тестами и удалённым Windows portable build/startup smoke-test.
+- Local/live gate — ещё открыт. Требуется локальный Windows preflight (portable запуск, калибровка кисти, Clear/чистая доска, игровая canvas, Game Monitor heartbeat), затем полный live G3 block.
+
+G3 остаётся экспериментально не выполненным: нет 27 подтверждённых live captures. Не делать выводов о влиянии `point_step_px` или `point_delay_ms` на CHALK до измерений. Не запускать отдельные задачи вручную и не переходить к модели расхода до проверки всех девяти конфигураций и трёх повторов.
