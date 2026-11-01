@@ -2073,7 +2073,14 @@ class BrushBehaviorTestTab:
             experiment_id = self._experiment_id or uuid.uuid4().hex
             self._experiment_id = experiment_id
             self.experiment_dir = self.output_dir / f"experiment-{stamp}-b{brush}-{scenario}-{experiment_id[:8]}"
-            self.experiment_dir.mkdir(parents=True, exist_ok=False)
+            try:
+                self.experiment_dir.mkdir(parents=True, exist_ok=False)
+            except OSError as exc:
+                if self._chalk_block_task is not None:
+                    self._fail_chalk_test_block(f"experiment_directory_create_failed:{exc}")
+                else:
+                    self.status_var.set(f"Не удалось создать каталог эксперимента: {exc}")
+                return
         if self._chalk_block_task is not None and self._chalk_block_journal_path is not None:
             try:
                 record_chalk_block_task_experiment(
