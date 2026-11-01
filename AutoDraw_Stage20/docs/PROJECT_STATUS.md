@@ -477,3 +477,19 @@ GitHub Actions для актуального HEAD `5771f52554c3356c54d451e0ab26e
 **Ограничение текущего этапа:** пока реализовано ядро планирования и журналирования, но кнопки Start/Stop, progress UI и автоматическая связка preclear → brush feedback → executor → Game Monitor exact capture → следующая задача ещё не подключены. Пакетный запуск пока не доступен оператору и нельзя считать блоки готовыми к live-использованию.
 
 Следующий этап — UI state machine и интеграция полного жизненного цикла с существующими callback-ами. Любой невалидный CHALK capture, незавершённый executor, потеря Monitor, неуспешная очистка или прерывание приложения должны останавливать блок без пропуска задачи. Перед каждым новым экспериментом обязательна проверка пустой доски. Существующие G1 raw manifests не переписывать.
+
+## 2026-11-01 — интеграция автоматических блоков CHALK в Brush Test
+
+Ветка `feature/image-geometry-optimization` получила первый UI runner для G1/G2:
+- выбор фазы и запуск полного блока одной кнопкой;
+- создание долговечного block journal до первого действия мышью;
+- автоматическое получение всех 12 задач G1 или 18 задач G2 с тремя повторами;
+- progress, текущая задача и безопасная остановка на границе эксперимента;
+- последовательная связка preclear + blank-board verification → brush drag/heartbeat feedback → executor → Game Monitor run capture → postdraw/brush restore;
+- переход к следующей задаче только после успешной проверки manifest и complete per-stroke breakdown;
+- любой failure, неполный capture или timeout переводит блок в paused; автоматического skip/replay нет;
+- G2 заблокирована до завершения полного G1 block.
+
+Добавлена функция `validate_chalk_block_experiment()`: использует матричный validator и фактические события `monitor_report.json`, требует complete per-stroke totals, измеренный frame probe без visibility interruption и непустую accepted trajectory.
+
+**Пока не завершено:** UI восстановления interrupted/paused block после перезапуска; исчерпывающие orchestration tests на каждый Tk callback/failure path; CI и Windows portable smoke test. Live G1 не запускался. До CI и отдельного разрешения оператора не запускать браузерные эксперименты.
