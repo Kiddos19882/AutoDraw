@@ -22,6 +22,8 @@ def _make_test_tab():
     tab._brush_feedback_poll_id = None
     tab._postdraw_final_status = "completed"
     tab._postdraw_final_reason = ""
+    tab.current_plan = None
+    tab._chalk_block_task = None
     tab.experiment_phases = {}
     tab.experiment_dir = None
     tab.current_plan_path = None
@@ -210,6 +212,8 @@ def test_experiment_manifest_persists_chalk_matrix_identity_and_cell(tmp_path):
             return self.value
 
     tab = brush_ui.BrushBehaviorTestTab.__new__(brush_ui.BrushBehaviorTestTab)
+    tab.current_plan = None
+    tab._chalk_block_task = None
     tab.experiment_dir = tmp_path
     tab.get_calibration_profile = lambda: None
     tab._experiment_id = "experiment-unique-001"
