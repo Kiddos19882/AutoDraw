@@ -959,6 +959,19 @@ class BrushBehaviorTestTab:
                     return True
         return False
 
+    def _has_unresolved_chalk_block_journal(self) -> bool:
+        root = self.output_dir / "chalk_test_blocks"
+        if not root.is_dir():
+            return False
+        for journal_path in root.glob("*.json"):
+            try:
+                journal = load_chalk_test_block_journal(journal_path)
+            except (OSError, ValueError, json.JSONDecodeError):
+                return True
+            if journal.get("status") in {"ready", "running", "paused"}:
+                return True
+        return False
+
     def _has_completed_g1_block(self) -> bool:
         root = self.output_dir / "chalk_test_blocks"
         if not root.is_dir():
@@ -982,6 +995,13 @@ class BrushBehaviorTestTab:
             messagebox.showwarning("Блок уже активен", "Сначала заверши или останови текущий блок.", parent=self.root)
             return
         if not self._validate_automation_preflight():
+            return
+        if self._has_unresolved_chalk_block_journal():
+            messagebox.showwarning(
+                "Есть незавершённый блок CHALK",
+                "Найден активный или приостановленный журнал. Сначала выполните recovery/разбор этого блока; параллельный запуск запрещён.",
+                parent=self.root,
+            )
             return
         phase_id = self.chalk_block_phase_var.get().strip()
         if phase_id not in {"G1", "G2"}:
