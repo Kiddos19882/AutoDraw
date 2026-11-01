@@ -395,7 +395,7 @@ Run относится к точному актуальному HEAD и вклю
 |---|---|
 | `game-monitor-tests` | Node syntax check, Node resource-snapshot tests, Python WebSocket/bridge tests |
 | `preparation-tests` | Полный pytest `source/preparation/tests/`, включая G3 matrix, block journal, capture и brush UI regression tests |
-| `integration-tests` | корневой unittest discovery `tests/` (UI/G3 handoff, import diagnostics и build helpers) плюс отдельный pytest запуск root function suites `test_fallback_sweep_metrics.py` и `test_stage7_validator_rules.py`; WebSocket test выполняется только в Game Monitor job |
+| `integration-tests` | корневые тесты разделены на три изолированных pytest вызова: UI/G3 handoff (`test_unified_app.py`), build/import/test-runner/brush-series (`test_build_helpers.py`, `test_import_resolution_diagnostics.py` и др.), затем root geometry validator/metric functions. WebSocket test выполняется только в Game Monitor job. |
 | `executor-tests` | Executor unittest discovery |
 | `windows-build-smoke` | Portable build и startup smoke; запускается через `needs` только после успеха всех четырёх тестовых jobs, затем публикует `autodraw-g3-preflight-build` на 7 дней |
 
