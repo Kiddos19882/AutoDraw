@@ -58,11 +58,13 @@ def _active_ui(tmp_path: Path):
 def test_ui_capture_gate_accepts_task_before_advancing(tmp_path, monkeypatch):
     ui, journal_path, task = _active_ui(tmp_path)
     advanced = []
-    monkeypatch.setattr(
-        ui_module,
-        "validate_chalk_block_experiment",
-        lambda _path: (True, "accepted", {"consumed_points": 25}),
-    )
+    validator_calls = []
+
+    def accept_current_task(path, **kwargs):
+        validator_calls.append((path, kwargs))
+        return True, "accepted", {"consumed_points": 25}
+
+    monkeypatch.setattr(ui_module, "validate_chalk_block_experiment", accept_current_task)
     ui._start_next_chalk_block_task = lambda: advanced.append(True)
 
     ui._wait_for_chalk_block_capture()
@@ -73,6 +75,11 @@ def test_ui_capture_gate_accepts_task_before_advancing(tmp_path, monkeypatch):
     assert saved_task["attempts"][-1]["experiment_id"] == "experiment-ui"
     assert advanced == [True]
     assert "полный per-stroke" in ui.status_var.value
+    assert len(validator_calls) == 1
+    _path, identity = validator_calls[0]
+    assert identity["expected_task"]["task_id"] == task["task_id"]
+    assert identity["expected_block"]["block_id"] == journal["block_id"]
+    assert identity["expected_experiment_id"] == "experiment-ui"
 
 
 def test_ui_capture_gate_pauses_without_advancing_on_incomplete_evidence(tmp_path, monkeypatch):
