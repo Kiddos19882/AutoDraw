@@ -58,6 +58,46 @@ def _normalize_series_id(value: Any) -> str:
     return normalized
 
 
+def inspect_chalk_matrix_series(
+    results_dir: str | Path,
+    *,
+    series_id: str,
+    scenario_id: str,
+    repeat_index: int,
+) -> dict[str, Any]:
+    """Find an occupied repeat cell and calculate the next chronological series index."""
+    normalized_series = _normalize_series_id(series_id)
+    if scenario_id not in GEOMETRY_MATRIX_SCENARIOS:
+        raise ValueError(f"Неизвестный сценарий CHALK: {scenario_id!r}.")
+    if isinstance(repeat_index, bool) or not isinstance(repeat_index, int) or repeat_index not in (1, 2, 3):
+        raise ValueError("Номер повтора должен быть целым числом 1, 2 или 3.")
+
+    series_count = 0
+    max_order_index = 0
+    duplicate_path = None
+    root = Path(results_dir)
+    if root.exists():
+        for manifest_path in root.rglob("experiment.json"):
+            try:
+                document = json.loads(manifest_path.read_text(encoding="utf-8"))
+            except (OSError, UnicodeError, json.JSONDecodeError):
+                continue
+            metadata = document.get("chalk_experiment_matrix") if isinstance(document, dict) else None
+            if not isinstance(metadata, dict) or metadata.get("series_id") != normalized_series:
+                continue
+            series_count += 1
+            order = metadata.get("matrix_order_index")
+            if isinstance(order, int) and not isinstance(order, bool) and order > max_order_index:
+                max_order_index = order
+            if metadata.get("scenario_id") == scenario_id and metadata.get("repeat_index") == repeat_index:
+                duplicate_path = manifest_path
+    return {
+        "next_matrix_order_index": max(series_count, max_order_index) + 1,
+        "duplicate_manifest_path": str(duplicate_path) if duplicate_path else None,
+        "series_experiment_count": series_count,
+    }
+
+
 def build_chalk_experiment_matrix_metadata(
     *,
     series_id: str,
@@ -65,6 +105,7 @@ def build_chalk_experiment_matrix_metadata(
     repeat_index: int,
     requested_radius: int,
     strokes: list[dict[str, Any]],
+    matrix_order_index: int = 1,
 ) -> dict[str, Any]:
     """Create stable identity for one G1/G2 scenario repeat."""
     normalized_series = _normalize_series_id(series_id)
@@ -78,6 +119,8 @@ def build_chalk_experiment_matrix_metadata(
         raise ValueError(f"Сценарий {scenario_id!r} не входит в план G1/G2.")
     if isinstance(repeat_index, bool) or not isinstance(repeat_index, int) or repeat_index not in (1, 2, 3):
         raise ValueError("Номер повтора должен быть целым числом 1, 2 или 3.")
+    if isinstance(matrix_order_index, bool) or not isinstance(matrix_order_index, int) or matrix_order_index < 1:
+        raise ValueError("Порядковый номер эксперимента должен быть положительным целым числом.")
     if isinstance(requested_radius, bool) or not isinstance(requested_radius, int) or requested_radius != 10:
         raise ValueError("Для серий G1/G2 требуется фиксированный радиус кисти 10.")
     if not isinstance(strokes, list) or len(strokes) != EXPECTED_STROKES[scenario_id]:
@@ -90,6 +133,7 @@ def build_chalk_experiment_matrix_metadata(
         "phase_id": phase_id,
         "scenario_id": scenario_id,
         "repeat_index": repeat_index,
+        "matrix_order_index": matrix_order_index,
         "planned_repeats": 3,
         "requested_radius": requested_radius,
         "expected_strokes": EXPECTED_STROKES[scenario_id],
