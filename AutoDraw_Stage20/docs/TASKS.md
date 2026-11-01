@@ -74,7 +74,8 @@
 - [ ] Подтвердить полный CI и Windows startup smoke-test после исправления.
 - [x] Провести review journal/recovery shape: добавить fail-closed structural validation и unit tests для повреждённых журналов.
 - [x] Дополнить journal validator проверкой типов phase/status до membership checks; добавить тесты на list/dict в статусных полях.
-- [ ] Проверить финальный journal validator в полном CI; отдельно оценить single-instance assumption и journal I/O failure paths.
+- [x] Исправить SyntaxError, выявленный Windows packaging test в journal validator (commit `dd5aaade3b790546d9e3fc11341554f6aa09d8ec`).
+- [ ] Повторно подтвердить полный CI для исправленного validator; отдельно оценить single-instance assumption и journal I/O failure paths.
 - [ ] Выполнить один контролируемый live G1 block после успешного CI и проверки тестовой доски.
 - [ ] Только после полного принятия G1 разрешить G2.
 
