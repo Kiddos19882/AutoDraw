@@ -1374,3 +1374,6 @@ Run JSON дополнен `stroke_count`, суммой `sampled_point_delta_tota
 **Изменённые файлы:** `source/preparation/chalk_test_blocks.py`, `source/preparation/tests/test_chalk_test_blocks.py`, `source/preparation/brush_behavior_test_ui.py`.
 
 **Ограничения:** recovery UI для running/interrupted journal после перезапуска ещё не сделан; нет полного набора callback integration tests; CI/Windows portable smoke test ожидаются. Live G1 не запускался. Существующие raw manifests и `data/` не изменялись.
+
+
+**Дополнительная защита журнала:** перед первым mouse action текущая попытка теперь получает в journal конкретные `experiment_id` и абсолютный `experiment_dir`. Это сохраняет ссылку на частично выполненный опыт при аварийном закрытии приложения. Добавлен unit test на регистрацию и запрет повторной перезаписи identity активной попытки.
