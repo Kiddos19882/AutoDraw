@@ -53,6 +53,10 @@ from brush_experiment_capture import (
 MAX_BRUSH_LINE_WIDTH_LOGICAL_PX = 30;
 
 
+def _is_legacy_chalk_radius_matrix_run(scenario_id: str | None, chalk_block_task: dict[str, Any] | None) -> bool:
+    """Keep the legacy radius matrix separate from automated G1/G2/G3 block tasks."""
+    return scenario_id == MATRIX_SCENARIO_ID and chalk_block_task is None
+
 
 def _parse_monitor_timestamp(value: Any) -> datetime | None:
     """Parse an ISO timestamp as an aware UTC datetime."""
@@ -1618,7 +1622,7 @@ class BrushBehaviorTestTab:
             matrix_metadata = None
             experiment_matrix_metadata = None
             scenario_id = plan["generation"].get("test_case")
-            if scenario_id == MATRIX_SCENARIO_ID:
+            if _is_legacy_chalk_radius_matrix_run(scenario_id, self._chalk_block_task):
                 matrix_metadata = build_chalk_radius_matrix_metadata(
                     series_id=self.matrix_series_var.get(),
                     block=int(self.matrix_block_var.get().strip()),
