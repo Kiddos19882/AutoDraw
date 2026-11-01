@@ -1254,5 +1254,54 @@ class UnifiedAppCoreTests(unittest.TestCase):
         self.assertIn("запущен", app.status_var.value)
 
 
+    def test_brush_test_executor_applies_g3_task_specific_parameters(self):
+        class Status:
+            def set(self, value):
+                self.value = value
+
+        class Executor:
+            running = False
+
+            def __init__(self, plan_path):
+                self.plan_path = plan_path
+                self.started_with = None
+
+            def start_execution_from_workflow(self, *, executor_config_override=None):
+                self.started_with = executor_config_override
+                return True
+
+        from chalk_experiment_matrix import GEOMETRY_EXECUTOR_CONFIG
+
+        parameters = dict(GEOMETRY_EXECUTOR_CONFIG)
+        parameters.update({"point_step_px": 2, "point_delay_ms": 20})
+        plan = {
+            "generation": {
+                "chalk_test_block": {
+                    "block_id": "block-g3-test",
+                    "task_id": "paint_consumption_long_lines-s2-d20-r1",
+                    "phase_id": "G3",
+                },
+                "chalk_experiment_matrix": {
+                    "phase_id": "G3",
+                    "scenario_id": "paint_consumption_long_lines",
+                    "requested_radius": 10,
+                    "expected_strokes": 6,
+                    "executor_parameters": parameters,
+                },
+            }
+        }
+        app = object.__new__(integrated_app.AutoDrawUnifiedApp)
+        app.status_var = Status()
+        with tempfile.TemporaryDirectory(prefix="AutoDraw G3 handoff ") as temp:
+            plan_path = Path(temp) / "current_brush_behavior_test.json"
+            plan_path.write_text(json.dumps(plan), encoding="utf-8")
+            app.executor = Executor(plan_path)
+            app._start_brush_test_executor(10)
+
+        self.assertEqual(app.executor.started_with, parameters)
+        self.assertEqual(app.executor.started_with["point_step_px"], 2)
+        self.assertEqual(app.executor.started_with["point_delay_ms"], 20)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
