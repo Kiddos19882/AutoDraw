@@ -150,6 +150,26 @@ def test_alt_cancelled_postdraw_pauses_active_block(tmp_path):
     assert ui._automated_postdraw_active is False
 
 
+def test_preclear_failure_pauses_block_before_executor(tmp_path, monkeypatch):
+    ui, journal_path, task = _active_ui(tmp_path)
+    ui._automated_preclear_active = True
+    ui._automated_preclear_after_id = None
+    ui._stop_brush_hotkey_listener = lambda: None
+    ui._write_experiment_manifest = lambda: None
+    executor_starts = []
+    ui.on_brush_ready = lambda *_args: executor_starts.append(True)
+    monkeypatch.setattr(ui_module.messagebox, "showwarning", lambda *_args, **_kwargs: None)
+
+    ui._finish_automated_preclear_failure("preclear_failed", "blank board mismatch")
+
+    journal = load_chalk_test_block_journal(journal_path)
+    failed = next(item for item in journal["tasks"] if item["task_id"] == task["task_id"])
+    assert journal["status"] == "paused"
+    assert failed["status"] == "failed"
+    assert failed["attempts"][-1]["reason"].startswith("preclear_failed:")
+    assert executor_starts == []
+
+
 def test_ui_executor_failure_pauses_block_without_starting_postdraw(tmp_path):
     ui, _journal_path, _task = _active_ui(tmp_path)
     ui.experiment_dir = None
