@@ -317,13 +317,14 @@ class ProductionBridgeIntegrationTests(unittest.IsolatedAsyncioTestCase):
                         "event": {"type": "DRAW_START", "t": 10, "before": before},
                     }))
                     await ws.send(json.dumps({
-                        "type": "event", "sessionId": session_id, "sequence": 3,
+                        "type": "event", "sessionId": session_id, "sequence": 4,
                         "event": {"type": "DRAW_END", "t": 20, "after": after},
                     }))
                     await asyncio.sleep(0.6)
                     await ws.send(json.dumps({
-                        "type": "heartbeat", "sessionId": session_id, "sequence": 4,
+                        "type": "heartbeat", "sessionId": session_id, "sequence": 5,
                         "monitorStatus": {"active": True, "droppedEvents": 0, "errors": 0},
+                        "bridgeDiagnostics": {"sendFailureCount": 0},
                     }))
                     await asyncio.sleep(0.05)
                 await asyncio.sleep(0.05)
@@ -338,6 +339,8 @@ class ProductionBridgeIntegrationTests(unittest.IsolatedAsyncioTestCase):
                 diagnostics = session["bridge_diagnostics"]
                 self.assertEqual(diagnostics["received_event_count"], 2)
                 self.assertEqual(diagnostics["received_event_types"], {"DRAW_START": 1, "DRAW_END": 1})
+                self.assertEqual(diagnostics["collector_sequence_gap_count"], 1)
+                self.assertEqual(report["collector_sequence_gap_count"], 1)
                 self.assertEqual(diagnostics["last_monitor_status"]["active"], True)
                 self.assertTrue(diagnostics["connection_closed"])
             finally:
