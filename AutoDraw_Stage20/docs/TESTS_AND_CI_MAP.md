@@ -334,3 +334,35 @@ tests/test_websocket_smoke_server.py включает regression tests для pe
 - Recovery UI: startup detection of running/ready/paused journals, explicit board-check confirmation before retry, no automatic replay, and safe close of paused journals.
 - Pending: callback-level failure injection across Tk lifecycle stages, GitHub Actions result and Windows portable smoke test.
 - Live experiments must not start until CI and portable smoke test pass.
+
+
+## 9. Фактический результат последнего G3 CI — 2026-11-01
+
+**Workflow:** `.github/workflows/geometry-tests.yml` (`Geometry planner tests`).  
+**Run:** [41340237207](https://github.com/Kiddos19882/AutoDraw/actions/runs/41340237207).  
+**Проверенный HEAD:** `3dbf8f20bcea44c61290e49398e1a4daf182dbf9`, ветка `feature/image-geometry-optimization`.
+
+Результат run: `completed / success`. Все три jobs завершились успешно:
+- `geometry-tests`;
+- `executor-tests`;
+- `Windows portable build and startup smoke-test`.
+
+Run относится к точному актуальному HEAD и включает commit `8c93a498864973b9879c926627030bb7e1d3ce2a` с тестом основного приложения, который проверяет отсутствие повторного `messagebox.askyesno` перед запуском brush-test executor.
+
+### 9.1. Триггеры workflow
+
+По текущему YAML:
+- `push` в `feature/image-geometry-optimization`;
+- `pull_request` с path-фильтром (изменения в перечисленных source/preparation, executor, game_monitor, integrated app, tests, build/runtime files и отдельных документационных файлах);
+- ручной запуск `workflow_dispatch`.
+
+Из-за path-фильтра pull_request изменение только тех файлов, которые не перечислены в YAML, может не запустить workflow. Не следует считать отсутствие run доказательством провала CI; сначала проверять event, base/head, path filter и SHA.
+
+### 9.2. Интерпретация результата
+
+- Успешный geometry job подтверждает прохождение включённых в него автоматических проверок и benchmark/validation steps.
+- Успешный executor job подтверждает executor regression suite.
+- Успешный Windows job подтверждает portable build/startup smoke-test на GitHub-hosted Windows runner.
+- Ни один из этих jobs не выполняет реальный рисунок в пользовательской браузерной игре и не измеряет расход CHALK.
+
+**Статус:** G3 software/CI gate закрыт на HEAD выше. Local Windows preflight и полный live G3 (27 captures) остаются открытыми. Исторические записи о том, что CI для popup-removal commits ожидается, superseded этим run и должны читаться как история, а не как текущий статус.
