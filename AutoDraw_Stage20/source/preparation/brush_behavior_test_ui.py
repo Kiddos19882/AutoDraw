@@ -1938,6 +1938,8 @@ class BrushBehaviorTestTab:
                 self.status_var.set(
                     "Game Monitor подтвердил радиус, но манифест не сохранён. Исполнитель не запущен."
                 )
+                if self._chalk_block_task is not None:
+                    self._fail_chalk_test_block(f"brush_confirmation_manifest_failed:{exc}")
                 return
         if self._chalk_block_task is not None:
             phase["status"] = "confirmed_by_monitor_for_automated_block"
@@ -2025,11 +2027,15 @@ class BrushBehaviorTestTab:
         """Clear the board and verify it against the explicit blank reference before brush setup."""
         config = self.get_calibration_profile() if callable(self.get_calibration_profile) else None
         if not isinstance(config, dict):
+            if self._chalk_block_task is not None:
+                self._fail_chalk_test_block("calibration_profile_unavailable_before_preclear")
             self.status_var.set("Тест остановлен до очистки: профиль калибровки недоступен.")
             messagebox.showwarning("Нет профиля", "Автоматическая подготовка не запущена.", parent=self.root)
             return
         reference_path, metadata_path = self._blank_board_reference_paths()
         if not reference_path.is_file() or not metadata_path.is_file():
+            if self._chalk_block_task is not None:
+                self._fail_chalk_test_block("blank_board_reference_missing")
             self.status_var.set("Тест заблокирован: сначала сохрани отдельный эталон пустой доски.")
             messagebox.showwarning(
                 "Нет эталона пустой доски",
@@ -2045,6 +2051,8 @@ class BrushBehaviorTestTab:
         point_status = statuses.get("points", {})
         point_status = point_status if isinstance(point_status, dict) else {}
         if not isinstance(clear_point, dict) or point_status.get("clear_board") == "needs_review":
+            if self._chalk_block_task is not None:
+                self._fail_chalk_test_block("clear_point_requires_review")
             self.status_var.set("Тест заблокирован: координата Clear требует проверки.")
             messagebox.showwarning("Clear не откалиброван", "Проверь точку Clear на вкладке 8.", parent=self.root)
             return
@@ -2631,6 +2639,8 @@ class BrushBehaviorTestTab:
                 "status": "failed", "reason": "calibration_profile_unavailable"
             }
             self._write_experiment_manifest()
+            if self._chalk_block_task is not None:
+                self._fail_chalk_test_block("postdraw_calibration_profile_unavailable")
             self.status_var.set("Постэтап остановлен: профиль калибровки недоступен.")
             return
         self._automated_postdraw_active = True
@@ -2814,6 +2824,8 @@ class BrushBehaviorTestTab:
         self._stop_brush_hotkey_listener()
         self._postdraw_final_status = status
         self._postdraw_final_reason = reason
+        if status != "completed" and self._chalk_block_task is not None:
+            self._fail_chalk_test_block(f"postdraw_{status}:{reason}")
         self.experiment_phases.setdefault("postdraw_workflow", {}).update({
             "status": status,
             "reason": reason,
@@ -2997,6 +3009,8 @@ class BrushBehaviorTestTab:
             return True
         except Exception as exc:
             self.status_var.set(f"Не удалось привязать результат исполнителя к тесту кисти: {exc}")
+            if self._chalk_block_task is not None:
+                self._fail_chalk_test_block(f"executor_callback_failed:{exc}")
             return False
 
     def _schedule_bridge_report_capture(self, attempt: int = 0) -> None:
