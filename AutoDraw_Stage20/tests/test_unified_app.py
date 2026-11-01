@@ -1199,8 +1199,7 @@ if __name__ == "__main__":
 
 def test_workflow_executor_config_override_is_validated_without_mutating_base_config(self):
         executor = object.__new__(integrated_app.Stage6App)
-        base = integrated_app.Stage6App._read_executor_config
-        from mouse_executor import ExecutorConfig
+        from drawing.mouse_executor import ExecutorConfig
 
         with patch.object(executor, "_read_executor_config", return_value=ExecutorConfig()):
             resolved = executor._resolve_workflow_executor_config({
@@ -1214,7 +1213,7 @@ def test_workflow_executor_config_override_is_validated_without_mutating_base_co
 
     def test_workflow_executor_config_override_rejects_invalid_matrix_values(self):
         executor = object.__new__(integrated_app.Stage6App)
-        from mouse_executor import ExecutorConfig
+        from drawing.mouse_executor import ExecutorConfig
 
         with patch.object(executor, "_read_executor_config", return_value=ExecutorConfig()):
             with self.assertRaises(ValueError):
