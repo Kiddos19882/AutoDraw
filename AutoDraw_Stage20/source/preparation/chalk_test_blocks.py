@@ -274,17 +274,17 @@ def validate_chalk_block_experiment(
         return False, "experiment_manifest_invalid", None
 
     document["experiment_dir"] = str(path.parent)
-    from chalk_experiment_matrix import summarize_chalk_experiment_matrix
+    from chalk_experiment_matrix import _validate_manifest, _stroke_level_breakdown
 
-    result = summarize_chalk_experiment_matrix([document])
-    accepted = result.get("accepted", [])
-    rejected = result.get("rejected", [])
-    if result.get("valid_measurement_count") != 1 or len(accepted) != 1:
-        reason = rejected[0].get("reason") if rejected else "experiment_not_accepted"
+    valid, reason, record = _validate_manifest(document)
+    if not valid or record is None:
         return False, str(reason), None
-
-    record = accepted[0]
-    stroke_level = record.get("stroke_level")
+    stroke_level = _stroke_level_breakdown(
+        path.parent,
+        expected_strokes=int(record["expected_strokes"]),
+        expected_chalk=int(record["consumed_points"]),
+    )
+    record["stroke_level"] = stroke_level
     if not isinstance(stroke_level, dict) or stroke_level.get("status") != "complete":
         reason = stroke_level.get("reason") if isinstance(stroke_level, dict) else "stroke_breakdown_missing"
         return False, f"stroke_level_{reason}", None
