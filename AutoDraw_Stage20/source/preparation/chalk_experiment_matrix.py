@@ -19,6 +19,7 @@ PHASE_SCENARIOS = {
         "parallel_spacing",
         "cross_section_intersections",
     ),
+    "G3": ("paint_consumption_long_lines",),
 }
 GEOMETRY_MATRIX_SCENARIOS = frozenset(
     scenario for scenarios in PHASE_SCENARIOS.values() for scenario in scenarios
@@ -44,6 +45,32 @@ EXPECTED_STROKES = {
     "repeated_coverage": 4,
     "parallel_spacing": 8,
     "cross_section_intersections": 4,
+    "paint_consumption_long_lines": 6,
+}
+
+G3_POINT_STEPS = (1, 2, 4)
+G3_POINT_DELAYS_MS = (5, 10, 20)
+
+
+def _validated_executor_parameters(phase_id: str, value: Any = None) -> dict[str, Any]:
+    """Validate the complete executor configuration for one matrix phase."""
+    parameters = dict(GEOMETRY_EXECUTOR_CONFIG if value is None else value)
+    if set(parameters) != set(GEOMETRY_EXECUTOR_CONFIG):
+        raise ValueError("Набор параметров исполнителя не совпадает со схемой CHALK.")
+    if phase_id == "G3":
+        step = parameters.get("point_step_px")
+        delay = parameters.get("point_delay_ms")
+        if isinstance(step, bool) or not isinstance(step, int) or step not in G3_POINT_STEPS:
+            raise ValueError("G3 допускает point_step_px только 1, 2 или 4.")
+        if isinstance(delay, bool) or not isinstance(delay, int) or delay not in G3_POINT_DELAYS_MS:
+            raise ValueError("G3 допускает point_delay_ms только 5, 10 или 20.")
+        expected = dict(GEOMETRY_EXECUTOR_CONFIG)
+        expected.update({"point_step_px": step, "point_delay_ms": delay})
+        if parameters != expected:
+            raise ValueError("В G3 разрешено менять только point_step_px и point_delay_ms.")
+    elif parameters != GEOMETRY_EXECUTOR_CONFIG:
+        raise ValueError("В G1/G2 требуется штатная конфигурация исполнителя.")
+    return parameters
 }
 
 
@@ -64,6 +91,7 @@ def inspect_chalk_matrix_series(
     series_id: str,
     scenario_id: str,
     repeat_index: int,
+    executor_parameters: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Find an occupied repeat cell and calculate the next chronological series index."""
     normalized_series = _normalize_series_id(series_id)
@@ -71,6 +99,8 @@ def inspect_chalk_matrix_series(
         raise ValueError(f"Неизвестный сценарий CHALK: {scenario_id!r}.")
     if isinstance(repeat_index, bool) or not isinstance(repeat_index, int) or repeat_index not in (1, 2, 3):
         raise ValueError("Номер повтора должен быть целым числом 1, 2 или 3.")
+    phase_id = next(phase for phase, scenarios in PHASE_SCENARIOS.items() if scenario_id in scenarios)
+    parameters = _validated_executor_parameters(phase_id, executor_parameters)
 
     series_count = 0
     max_order_index = 0
@@ -89,7 +119,11 @@ def inspect_chalk_matrix_series(
             order = metadata.get("matrix_order_index")
             if isinstance(order, int) and not isinstance(order, bool) and order > max_order_index:
                 max_order_index = order
-            if metadata.get("scenario_id") == scenario_id and metadata.get("repeat_index") == repeat_index:
+            if (
+                metadata.get("scenario_id") == scenario_id
+                and metadata.get("repeat_index") == repeat_index
+                and metadata.get("executor_parameters", GEOMETRY_EXECUTOR_CONFIG) == parameters
+            ):
                 duplicate_path = manifest_path
     return {
         "next_matrix_order_index": max(series_count, max_order_index) + 1,
@@ -106,8 +140,9 @@ def build_chalk_experiment_matrix_metadata(
     requested_radius: int,
     strokes: list[dict[str, Any]],
     matrix_order_index: int = 1,
+    executor_parameters: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Create stable identity for one G1/G2 scenario repeat."""
+    """Create stable identity for one G1/G2/G3 experiment cell.""
     normalized_series = _normalize_series_id(series_id)
     if not isinstance(scenario_id, str):
         raise ValueError("ID сценария должен быть текстом.")
@@ -116,13 +151,14 @@ def build_chalk_experiment_matrix_metadata(
         None,
     )
     if phase_id is None:
-        raise ValueError(f"Сценарий {scenario_id!r} не входит в план G1/G2.")
+        raise ValueError(f"Сценарий {scenario_id!r} не входит в план G1/G2/G3.")
+    parameters = _validated_executor_parameters(phase_id, executor_parameters)
     if isinstance(repeat_index, bool) or not isinstance(repeat_index, int) or repeat_index not in (1, 2, 3):
         raise ValueError("Номер повтора должен быть целым числом 1, 2 или 3.")
     if isinstance(matrix_order_index, bool) or not isinstance(matrix_order_index, int) or matrix_order_index < 1:
         raise ValueError("Порядковый номер эксперимента должен быть положительным целым числом.")
     if isinstance(requested_radius, bool) or not isinstance(requested_radius, int) or requested_radius != 10:
-        raise ValueError("Для серий G1/G2 требуется фиксированный радиус кисти 10.")
+        raise ValueError("Для серий G1/G2/G3 требуется фиксированный радиус кисти 10.")
     if not isinstance(strokes, list) or len(strokes) != EXPECTED_STROKES[scenario_id]:
         raise ValueError(f"Сценарий {scenario_id} должен содержать {EXPECTED_STROKES[scenario_id]} штрихов.")
     canonical_geometry = json.dumps(strokes, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
@@ -139,7 +175,7 @@ def build_chalk_experiment_matrix_metadata(
         "expected_strokes": EXPECTED_STROKES[scenario_id],
         "geometry_signature": geometry_signature,
         "planned_strokes": json.loads(canonical_geometry),
-        "executor_parameters": dict(GEOMETRY_EXECUTOR_CONFIG),
+        "executor_parameters": parameters,
     }
 
 
@@ -233,6 +269,7 @@ def _validate_manifest(document: dict[str, Any]) -> tuple[bool, str, dict[str, A
             requested_radius=metadata.get("requested_radius"),
             matrix_order_index=metadata.get("matrix_order_index", 1),
             strokes=metadata.get("planned_strokes"),
+            executor_parameters=metadata.get("executor_parameters"),
         )
     except (TypeError, ValueError, OverflowError) as exc:
         return False, f"invalid_matrix_metadata:{exc}", None
@@ -303,7 +340,7 @@ def _validate_manifest(document: dict[str, Any]) -> tuple[bool, str, dict[str, A
     executor_config = execution.get("executor_config")
     if not isinstance(executor_config, dict) or any(
         executor_config.get(key) != value
-        for key, value in GEOMETRY_EXECUTOR_CONFIG.items()
+        for key, value in expected["executor_parameters"].items()
     ):
         return False, "executor_parameters_mismatch", None
 
@@ -321,6 +358,7 @@ def _validate_manifest(document: dict[str, Any]) -> tuple[bool, str, dict[str, A
         "repeat_index": repeat_index,
         "matrix_order_index": expected["matrix_order_index"],
         "radius": radius,
+        "executor_parameters": dict(expected["executor_parameters"]),
         "geometry_signature": signature,
         "expected_strokes": expected_strokes,
         "consumed_points": consumed,
@@ -340,17 +378,25 @@ def summarize_chalk_experiment_matrix(
             evaluated.append((document, valid, reason, record))
 
     run_counts: dict[str, int] = {}
-    cell_counts: dict[tuple[str, str, str, int, int], int] = {}
+    cell_counts: dict[tuple[str, str, str, int, int, int, int], int] = {}
     for _, valid, _, record in evaluated:
         if valid and record:
             run_counts[record["run_id"]] = run_counts.get(record["run_id"], 0) + 1
-            key = (record["series_id"], record["phase_id"], record["scenario_id"], record["radius"], record["repeat_index"])
+            parameters = record["executor_parameters"]
+            key = (
+                record["series_id"], record["phase_id"], record["scenario_id"], record["radius"],
+                parameters["point_step_px"], parameters["point_delay_ms"], record["repeat_index"],
+            )
             cell_counts[key] = cell_counts.get(key, 0) + 1
 
     accepted, rejected = [], []
     for document, valid, reason, record in evaluated:
         if valid and record:
-            key = (record["series_id"], record["phase_id"], record["scenario_id"], record["radius"], record["repeat_index"])
+            parameters = record["executor_parameters"]
+            key = (
+                record["series_id"], record["phase_id"], record["scenario_id"], record["radius"],
+                parameters["point_step_px"], parameters["point_delay_ms"], record["repeat_index"],
+            )
             if run_counts[record["run_id"]] > 1:
                 valid, reason = False, "duplicate_monitor_run"
             elif cell_counts[key] > 1:
@@ -370,13 +416,17 @@ def summarize_chalk_experiment_matrix(
                 "experiment_dir": document.get("experiment_dir"),
             })
 
-    grouped: dict[tuple[str, str, str, int, str], list[dict[str, Any]]] = {}
+    grouped: dict[tuple[str, str, str, int, int, int, str], list[dict[str, Any]]] = {}
     for record in accepted:
-        key = (record["series_id"], record["phase_id"], record["scenario_id"], record["radius"], record["geometry_signature"])
+        parameters = record["executor_parameters"]
+        key = (
+            record["series_id"], record["phase_id"], record["scenario_id"], record["radius"],
+            parameters["point_step_px"], parameters["point_delay_ms"], record["geometry_signature"],
+        )
         grouped.setdefault(key, []).append(record)
 
     results = []
-    for (series_id, phase_id, scenario_id, radius, geometry_signature), rows in sorted(grouped.items()):
+    for (series_id, phase_id, scenario_id, radius, point_step_px, point_delay_ms, geometry_signature), rows in sorted(grouped.items()):
         rows.sort(key=lambda row: row["repeat_index"])
         values = [row["consumed_points"] for row in rows]
         complete = len(rows) == 3 and {row["repeat_index"] for row in rows} == {1, 2, 3}
@@ -385,6 +435,9 @@ def summarize_chalk_experiment_matrix(
             "phase_id": phase_id,
             "scenario_id": scenario_id,
             "radius": radius,
+            "executor_parameters": dict(rows[0]["executor_parameters"]),
+            "point_step_px": point_step_px,
+            "point_delay_ms": point_delay_ms,
             "geometry_signature": geometry_signature,
             "valid_repeat_count": len(rows),
             "complete": complete,
