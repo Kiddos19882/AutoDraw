@@ -537,9 +537,9 @@ def stop_chalk_test_block(
         raise ValueError("Приостановленный/failed блок можно закрыть только после явной проверки игровой доски.")
     if journal.get("status") in {"completed", "stopped"}:
         return journal
-    if journal.get("status") == "paused":
+    if journal.get("status") in {"paused", "failed"}:
         journal.setdefault("recovery_decisions", []).append({
-            "decision": "close_paused_block",
+            "decision": "close_failed_block" if journal.get("status") == "failed" else "close_paused_block",
             "board_checked": True,
             "decided_at_utc": _utc_now(),
         })
