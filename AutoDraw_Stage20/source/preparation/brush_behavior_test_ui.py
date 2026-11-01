@@ -1379,6 +1379,7 @@ class BrushBehaviorTestTab:
             self._update_chalk_block_progress()
             if journal.get("status") == "completed":
                 self.status_var.set(f"Блок {journal.get('phase_id')} завершён: все опыты приняты.")
+                self._show_chalk_block_completion_notification(journal)
                 self.matrix_series_var.set(
                     f"chalk-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:6]}"
                 )
@@ -1408,6 +1409,26 @@ class BrushBehaviorTestTab:
         self.matrix_block_var.set(str(task["repeat_index"]))
         self._update_chalk_block_progress()
         self.create_and_transfer_plan()
+
+    def _show_chalk_block_completion_notification(self, journal: dict[str, Any]) -> None:
+        """Bring the UI forward and explicitly notify the operator after all block tasks are accepted."""
+        phase = str(journal.get("phase_id", "CHALK"))
+        tasks = journal.get("tasks", [])
+        total = int(journal.get("expected_task_count", len(tasks)))
+        completed = sum(1 for task in tasks if isinstance(task, dict) and task.get("status") == "completed")
+        try:
+            self.root.deiconify()
+            self.root.lift()
+        except tk.TclError:
+            pass
+        try:
+            messagebox.showinfo(
+                f"Блок {phase} завершён",
+                f"Принято опытов: {completed}/{total}.\nЖурнал блока и результаты сохранены.",
+                parent=self.root,
+            )
+        except tk.TclError:
+            self.status_var.set(f"Блок {phase} завершён: принято {completed}/{total} опытов.")
 
     def _fail_chalk_test_block(self, reason: str) -> None:
         if self._chalk_block_journal_path is not None and self._chalk_block_task is not None:
