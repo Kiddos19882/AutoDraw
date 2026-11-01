@@ -1562,3 +1562,16 @@ The first final CI run exposed a mismatch: `finish_chalk_block_task(accepted=Fal
 Regression tests добавлены для каждого исправления. Полный GitHub Actions run 41276703424 завершился success на HEAD c8d8c2c5588a0d423e48682962a4213ee725c808: geometry-tests, executor-tests, Windows portable build/startup smoke-test. Windows job: 605 pytest tests passed, 98 unittest tests OK, ALL TEST SUITES PASSED, portable layout и smoke-test запуска пройдены.
 
 G1 принят по второму блоку. G2 теперь разблокирован программной проверкой; следующий этап — G2 (18 задач). Перед ним обновить локальную сборку до проверенного HEAD. G3 остаётся заблокирован до принятия G2. Старый stopped journal и его raw Monitor data сохранены без задней правки.
+
+
+## 2026-11-01 — live G2 принят, G3 открыт
+
+Пользователь сообщил об успешном прохождении G2 и указал commit `16a426b534de269ed967027bbe59f3daac4b97ec`. Проверен commit на ветке `feature/image-geometry-optimization`; он является текущим HEAD и дочерним для документационного commit `b2969169105a7e080f8115ec8b45c7cd96c68265`.
+
+Проверен block journal `chalk-block-G2-chalk-20261101-084732-a5c2cf-64d2e366.json`: статус completed, 18/18 задач завершены, repeat_index 1/2/3 для каждого из шести сценариев. Для всех 18 experiment.json и monitor_report.json проверены точные CHALK captures, согласованность `post-pre`, сумма `DRAW_SAMPLE.pointDelta`, фактический/ожидаемый stroke_count, радиус 10, ноль dropped events и monitor errors. Все frame probes имеют статус measured.
+
+Результаты по repeat 1/2/3: continuous_closed_contour 339/337/338 (mean 338,00); cross_section_intersections 323/322/322 (322,33); parallel_spacing 444/444/446 (444,67); repeated_coverage 247/245/246 (246,00); long_isolated_lines 393/394/392 (393,00); continuous_turns 214/211/211 (212,00). Сумма 5868 — сумма 18 независимых запусков, а не одного рисунка.
+
+В трёх `repeated_coverage` monitor reports события DRAW_SAMPLE агрегированы по strokeId. Значения по четырём штрихам: [61,62,62,62], [61,61,61,62], [61,61,62,62]. Повторное покрытие не демонстрирует заметной экономии CHALK относительно контрольной параллельной линии в рамках этой геометрии.
+
+Отдельный отчёт: `docs/CHALK_GEOMETRY_MATRIX_G2_RESULTS.md`. G2 принят; G3 разблокирован. Следующий блок — 27 опытов на `paint_consumption_long_lines`, радиус 10, комбинации `point_step_px` 1/2/4 и `point_delay_ms` 5/10/20, по три повтора. Код не изменялся.
