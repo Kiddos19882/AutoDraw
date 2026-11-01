@@ -127,3 +127,7 @@ UI runner реализован, но до CI и отдельного контр�
 
 - [x] Добавить тест блокировки owner lock из отдельного OS-процесса (multiprocessing spawn).
 - [ ] Подтвердить Windows CI с новым cross-process test.
+
+
+- [x] Сохранять audit decision при закрытии failed-блока после проверки доски.
+- [ ] Подтвердить полный CI для последнего кода и cross-process owner lock.
