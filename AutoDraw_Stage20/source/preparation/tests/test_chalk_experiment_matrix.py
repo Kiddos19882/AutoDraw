@@ -5,6 +5,7 @@ import json
 import pytest
 
 from chalk_experiment_matrix import (
+    GEOMETRY_EXECUTOR_CONFIG,
     build_chalk_experiment_matrix_metadata,
     summarize_chalk_experiment_matrix,
 )
@@ -79,7 +80,7 @@ def _manifest(tmp_path, repeat=1, run_id="run-1", consumed=50, scenario="horizon
         "chalk_experiment_matrix": metadata,
         "monitor_capture": capture,
         "game_monitor_summary": summary,
-        "execution_report": {"status": "completed", "completed_strokes": 5},
+        "execution_report": {"status": "completed", "completed_strokes": 5, "executor_config": dict(GEOMETRY_EXECUTOR_CONFIG)},
         "experiment_dir": str(tmp_path),
     }
 
@@ -97,6 +98,7 @@ def test_geometry_metadata_records_phase_repeat_stroke_count_and_signature():
     assert metadata["expected_strokes"] == 5
     assert len(metadata["geometry_signature"]) == 64
     assert metadata["planned_strokes"] == _strokes()
+    assert metadata["executor_parameters"] == GEOMETRY_EXECUTOR_CONFIG
 
 
 @pytest.mark.parametrize(
