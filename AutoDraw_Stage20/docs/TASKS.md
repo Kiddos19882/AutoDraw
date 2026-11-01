@@ -182,7 +182,7 @@ CI/software gate закрыт. Live gate остаётся открытым, по
 - [x] Передавать фактические параметры G3 в Stage6/MouseExecutor и сохранять их в execution report без изменения пользовательского профиля.
 - [x] Добавить analyzer support для раздельной проверки и агрегации девяти конфигураций.
 - [x] Добавить regression tests для metadata, duplicate identity, block plan, journal validation и workflow config override.
-- [ ] Подтвердить полный GitHub Actions CI: geometry-tests, executor-tests, Windows portable build/startup smoke-test.
+- [x] Подтвердить полный GitHub Actions CI на актуальном HEAD `3dbf8f20bcea44c61290e49398e1a4daf182dbf9` (run `41340237207`).
 - [ ] После software gate выполнить 27 live G3 экспериментов на пользовательской Windows/игровой сессии.
 - [ ] Проанализировать CHALK, move calls, длительность, FPS, accepted points и dropped events отдельно для каждой конфигурации.
 
@@ -220,4 +220,20 @@ Software gate закрыт; live gate остаётся открытым. Авт�
 - [x] Удалить повторный popup «Проверь размер кисти» в integrated app перед запуском тестового executor.
 - [x] Сохранить строгую проверку свежего heartbeat и точного совпадения радиуса; mismatch остаётся fail-closed.
 - [x] Добавить regression tests на автоматический запуск после exact Monitor match и блокировку mismatch.
-- [ ] Подтвердить полный CI и Windows portable smoke-test на новых commits.
+- [x] Подтвердить полный CI и Windows portable smoke-test на актуальном HEAD (run `41340237207`).
+
+
+## Актуализация G3 CI и следующих действий — 2026-11-01
+
+- [x] Подтвердить полный GitHub Actions CI на актуальном HEAD `3dbf8f20bcea44c61290e49398e1a4daf182dbf9`: run [41340237207](https://github.com/Kiddos19882/AutoDraw/actions/runs/41340237207).
+- [x] Подтвердить `geometry-tests` — success.
+- [x] Подтвердить `executor-tests` — success.
+- [x] Подтвердить `Windows portable build and startup smoke-test` — success.
+- [x] Включить в CI подтверждение commit `8c93a498864973b9879c926627030bb7e1d3ce2a` с regression test основного приложения.
+- [x] Синхронизировать WORK_LOG, PROJECT_STATUS, CHALK_TEST_BLOCKS_DESIGN, TESTS_AND_CI_MAP и CHANGELOG с результатом run.
+- [ ] Локальный Windows preflight на рабочей машине: запуск актуальной portable-сборки, профиль/калибровка кисти, Clear reference, чистая тестовая доска, игровая canvas и свежий heartbeat Game Monitor.
+- [ ] После успешного preflight выполнить полный G3 block: 27/27 задач, все девять сочетаний `point_step_px` 1/2/4 × `point_delay_ms` 5/10/20, по три повтора.
+- [ ] Для каждого capture проверить точный baseline/post CHALK, сумму DRAW_SAMPLE pointDelta, фактический executor config из execution report, радиус 10, шесть штрихов, отсутствие dropped events/errors и валидный frame capture.
+- [ ] Рассчитать статистику по девяти конфигурациям и только после принятия всех captures строить модель расхода CHALK.
+
+**Текущий статус:** software/CI gate закрыт. Local/live gate открыт. Успешный GitHub Actions Windows smoke-test не заменяет локальную игровую сессию и не подтверждает расход краски.
