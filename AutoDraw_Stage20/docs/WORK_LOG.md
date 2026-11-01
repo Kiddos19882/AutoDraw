@@ -1443,3 +1443,12 @@ Run JSON дополнен `stroke_count`, суммой `sampled_point_delta_tota
 **Тесты:** добавлены шесть parameterized mismatch cases, positive identity case и проверка, что UI передаёт текущие identity в acceptance validator. Новые commits: d5d3542840138f80df51cc467ca4b91012c18689, 589f25d116f1fadb924aa2d773da22515e17b001, 9576a97c4cc84fe8b139743dcf20b46eec5fece3, b63b7170f758c26016d46092ea5dc90fea1337fb.
 
 **Статус:** CI для task-identity hardening ещё не получен. Live G1 не запускался. Raw manifests, data/ и ветка master не изменялись.
+
+
+## 2026-11-01 — проверка persisted experiment path и отказа preclear
+
+Дополнена привязка capture acceptance: UI теперь извлекает активную задачу и текущую попытку из сохранённого block journal; experiment_id и experiment_dir берутся из записи этой попытки. Валидатор сравнивает canonical path каталога manifest с зарегистрированным experiment_dir. Отсутствующая/неактивная задача или попытка, не зарегистрированный каталог либо несовпадение identity ведут к отказу без перехода к следующему тесту.
+
+Добавлен callback test, моделирующий неуспешную проверку очистки доски: block journal становится paused, текущая задача failed, executor не запускается. Изменения кода/тестов: 14d112e4b4ea22ea26b47c5850863cd30f4c146b, 02d0e308681fc626bcf1bc56b898864e17df1597, df756c9ce8e2a9403a1b00dd001b593959e5d22a, eda6f6462747ce3999a882995b50f69e558985d7, 95d3ab6c6f782340785ceaf4c534951c1f648c8b.
+
+GitHub Actions для новых изменений выполняется/ожидает очереди; итог ещё не подтверждён. Live G1 не запускался.
