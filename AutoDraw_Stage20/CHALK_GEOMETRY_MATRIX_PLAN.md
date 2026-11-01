@@ -173,7 +173,7 @@ G3 реализуется как отдельная фаза общего CHALK 
 
 После preflight выполнить только полный автоматический блок из 27 задач (9 конфигураций × 3 повтора). Для каждого опыта сохранить фактические executor parameters, baseline/post pointCount, exact CHALK, сумму DRAW_SAMPLE.pointDelta, stroke count, радиус, frame/FPS и диагностику dropped events/errors. До получения валидных captures не делать выводов о влиянии шага/задержки и не строить подтверждённую модель CHALK.
 
-## 12. Инцидент первых live-запусков G3 и исправление маршрутизации — 2026-11-02
+## 12. Инцидент первых live-запусков G3 и исправление маршрутизации — 2026-11-01
 
 Два запуска из серии `chalk-20261101-232008-3e9348` не являются зачётными G3-повторами. Оба относились к задаче `paint_consumption_long_lines-s2-d20-r3`, но executor report показывает фактические `point_step_px=2`, `point_delay_ms=10`. Каждый запуск дал exact CHALK=718, 6 штрихов, радиус 10, 0 dropped events и 0 monitor errors. Отсутствие `chalk_test_block`/`chalk_experiment_matrix` вызвало штатный fail-closed отказ `block_task_identity_missing`. Не включать их в G3 analyzer.
 
