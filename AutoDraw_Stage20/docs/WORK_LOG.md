@@ -1351,3 +1351,26 @@ Run JSON дополнен `stroke_count`, суммой `sampled_point_delta_tota
 Добавлены `source/preparation/tests/test_chalk_test_blocks.py` и `docs/CHALK_TEST_BLOCKS_DESIGN.md`; обновлены `docs/README.md`, `docs/TESTS_AND_CI_MAP.md`, `docs/BRUSH_MODULE_QUICK_INDEX.md`.
 
 **Граница реализации:** в этой итерации создано ядро планирования/журналирования и его unit tests. UI-кнопки, автоматическое выполнение полного блока и переход между опытами ещё не подключены. Никакие live-эксперименты не запускались; G1/G2/G3 status gates не менялись; первичные результаты не изменялись.
+
+## 2026-11-01 — UI runner автоматических блоков CHALK
+
+Реализована первая интеграция block scheduler с Brush Test UI.
+
+**Интерфейс:**
+- добавлены выбор G1/G2, кнопка запуска полного блока, безопасная остановка после текущего опыта и строка прогресса;
+- план всех задач и journal сохраняются в `data/results/brush_behavior_tests/chalk_test_blocks/` до первого mouse action;
+- серия блокируется, если ID уже встречается в manifests или незавершённом журнале;
+- G2 недоступна, пока не найден завершённый G1 block journal со всеми 12 принятыми задачами.
+
+**Lifecycle:**
+- автоматическая последовательность использует существующие preclear, blank-board reference, brush drag feedback, executor callback, Game Monitor correlation, postdraw capture и brush restore;
+- при пакетном запуске не запрашивается повторное подтверждение Clear и визуальное подтверждение каждого одинакового радиуса; исходное предупреждение о стирании тестовой доски показывается один раз на блок, радиус при этом каждый раз подтверждается свежими heartbeat;
+- переход к следующему опыту происходит только после проверки manifest, точного CHALK, уникального Monitor run, согласованного pointDelta, чистых frame/trajectory diagnostics и полного per-stroke breakdown по strokeId;
+- failed/incomplete/timeout gate приостанавливает блок, не засчитывает попытку и не пропускает задачу;
+- Stop действует на границе опыта; Alt/ошибка во время текущего запуска приводит к fail-closed остановке.
+
+**Новые проверки:** добавлены тесты строгого acceptance gate (incomplete per-stroke, frame probe interruption) и безопасной остановки блока только между задачами.
+
+**Изменённые файлы:** `source/preparation/chalk_test_blocks.py`, `source/preparation/tests/test_chalk_test_blocks.py`, `source/preparation/brush_behavior_test_ui.py`.
+
+**Ограничения:** recovery UI для running/interrupted journal после перезапуска ещё не сделан; нет полного набора callback integration tests; CI/Windows portable smoke test ожидаются. Live G1 не запускался. Существующие raw manifests и `data/` не изменялись.
