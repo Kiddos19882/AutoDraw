@@ -313,17 +313,23 @@ def _validate_chalk_test_block_journal(document: Any, path: Path) -> dict[str, A
             for repeat in (1, 2, 3)
         }
         observed_cells = set()
+        observed_order_indices = set()
         for task in tasks:
             parameters = task.get("executor_parameters")
             if not isinstance(parameters, dict):
                 raise ValueError(f"В G3-задаче {task['task_id']!r} отсутствуют параметры исполнителя: {path}")
             step, delay = parameters.get("point_step_px"), parameters.get("point_delay_ms")
-            cell = (step, delay, task.get("repeat_index"))
+            repeat_index = task.get("repeat_index")
+            order_index = task.get("matrix_order_index")
+            cell = (step, delay, repeat_index)
             expected_parameters = dict(GEOMETRY_EXECUTOR_CONFIG)
             expected_parameters.update({"point_step_px": step, "point_delay_ms": delay})
             if (
                 isinstance(step, bool) or not isinstance(step, int)
                 or isinstance(delay, bool) or not isinstance(delay, int)
+                or isinstance(repeat_index, bool) or not isinstance(repeat_index, int)
+                or isinstance(order_index, bool) or not isinstance(order_index, int)
+                or order_index < 1 or order_index > 27 or order_index in observed_order_indices
                 or task.get("scenario_id") != "paint_consumption_long_lines"
                 or task.get("expected_strokes") != EXPECTED_STROKES["paint_consumption_long_lines"]
                 or task.get("requested_radius") != 10
@@ -333,12 +339,14 @@ def _validate_chalk_test_block_journal(document: Any, path: Path) -> dict[str, A
             ):
                 raise ValueError(f"Некорректная или повторная ячейка G3 в журнале: {path}")
             observed_cells.add(cell)
+            observed_order_indices.add(order_index)
         expected_parameter_matrix = [
             {"point_step_px": step, "point_delay_ms": delay}
             for step in G3_POINT_STEPS for delay in G3_POINT_DELAYS_MS
         ]
         if (
             observed_cells != expected_cells
+            or observed_order_indices != set(range(1, 28))
             or len(tasks) != 27
             or document.get("executor_parameters") != GEOMETRY_EXECUTOR_CONFIG
             or document.get("executor_parameter_matrix") != expected_parameter_matrix
