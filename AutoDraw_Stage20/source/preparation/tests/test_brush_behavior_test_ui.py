@@ -1227,3 +1227,13 @@ def test_geometry_matrix_metadata_is_persisted_in_experiment_manifest(tmp_path):
     assert manifest["chalk_experiment_matrix"]["repeat_index"] == 2
     assert manifest["chalk_experiment_matrix"]["expected_strokes"] == 5
     assert len(manifest["chalk_experiment_matrix"]["geometry_signature"]) == 64
+
+def test_g3_long_line_scenario_is_available_with_six_controlled_strokes():
+    plan = build_brush_test_drawing_plan(
+        "Расход краски — серия длинных линий",
+        (460, 240),
+        coordinate_system="logical_board_pixels",
+    )
+    assert plan["generation"]["test_case"] == "paint_consumption_long_lines"
+    assert len(plan["strokes"]) == 6
+    assert all(stroke["metadata"]["line_extension_px_override"] == 0.0 for stroke in plan["strokes"])
