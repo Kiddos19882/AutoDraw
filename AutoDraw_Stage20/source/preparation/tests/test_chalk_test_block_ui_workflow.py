@@ -105,32 +105,36 @@ def test_ui_capture_gate_times_out_closed(tmp_path):
 
 
 def test_alt_cancelled_preclear_pauses_active_block(tmp_path):
-    ui, _journal_path, _task = _active_ui(tmp_path)
-    failures = []
+    ui, journal_path, task = _active_ui(tmp_path)
     ui._automated_preclear_active = True
     ui._automated_preclear_after_id = None
     ui._stop_brush_hotkey_listener = lambda: None
     ui._write_experiment_manifest = lambda: None
-    ui._fail_chalk_test_block = lambda reason: failures.append(reason)
 
     ui._cancel_automated_preclear()
 
-    assert failures == ["preclear_cancelled_by_user"]
+    journal = load_chalk_test_block_journal(journal_path)
+    failed = next(item for item in journal["tasks"] if item["task_id"] == task["task_id"])
+    assert journal["status"] == "paused"
+    assert failed["status"] == "failed"
+    assert failed["attempts"][-1]["reason"] == "preclear_cancelled_by_user"
     assert ui._automated_preclear_active is False
 
 
 def test_alt_cancelled_postdraw_pauses_active_block(tmp_path):
-    ui, _journal_path, _task = _active_ui(tmp_path)
-    failures = []
+    ui, journal_path, task = _active_ui(tmp_path)
     ui._automated_postdraw_active = True
     ui._automated_postdraw_after_id = None
     ui._stop_brush_hotkey_listener = lambda: None
     ui._write_experiment_manifest = lambda: None
-    ui._fail_chalk_test_block = lambda reason: failures.append(reason)
 
     ui._cancel_automated_postdraw()
 
-    assert failures == ["postdraw_cancelled_by_user"]
+    journal = load_chalk_test_block_journal(journal_path)
+    failed = next(item for item in journal["tasks"] if item["task_id"] == task["task_id"])
+    assert journal["status"] == "paused"
+    assert failed["status"] == "failed"
+    assert failed["attempts"][-1]["reason"] == "postdraw_cancelled_by_user"
     assert ui._automated_postdraw_active is False
 
 
