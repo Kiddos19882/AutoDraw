@@ -547,3 +547,12 @@ CI выявил SyntaxError в journal validator после последнего
 Коммиты: e688ed5b893903794afdf306c3b8db955e578639, dc21778fff4fc8ef8d47525d93ac00fde784eb78, 0d2d4182d9d418a274a69dcaa1ee9495a48e012d, 9147bbdfa8419a77481d093bb0669c05e4ab640a.
 
 Важная граница: advisory lock сериализует транзакции, но не удерживается на протяжении всего GUI-сеанса. Поэтому два экземпляра AutoDraw не должны одновременно восстанавливать/обслуживать один журнал. CI и Windows startup smoke-test для нового SHA ожидаются. Live G1 пока не запускался.
+
+
+## 14. Межпроцессное владение и recovery
+
+Добавлен lifetime owner lock на каждый block journal. Он удерживается в активном GUI-сеансе и в recovery-сеансе. Второй экземпляр AutoDraw не может пометить живую running-задачу как interrupted, продолжить или закрыть тот же журнал. Если процесс завершился, ОС освобождает lock; следующий экземпляр получает lock и может выполнить штатный interrupted recovery. Resume/close повторно проверяют владение. Для закрытия failed/paused требуется явная проверка доски.
+
+Коммиты: 9c709c5a597ebcb968419839d2dfc4af9b1a2bd3, 4c80d167ae28ea3327e71813a3db0c03a5d8e05a, 0d666afb63cb70634d90a25e7b0b87022a0394f2, 1b7486a86d2b19ead81625f9a465aef51b3e3450, 3ba5b4dc1c7a26d4a333592807bda802ceba76c5, 4e0e7809d5eef1235efccc65e2529892e8a81f85, 4d681cdf09c62f65647f651b271b81458ff59e29.
+
+Ожидается CI на последнем кодовом SHA. Не запускать G1 до проверки Windows portable build/startup smoke-test и живого preflight.
