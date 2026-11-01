@@ -109,6 +109,7 @@ def test_geometry_metadata_records_phase_repeat_stroke_count_and_signature():
         {"series_id": "series", "scenario_id": "horizontal_lengths", "repeat_index": 1.0, "requested_radius": 10, "strokes": _strokes()},
         {"series_id": "series", "scenario_id": "unknown", "repeat_index": 1, "requested_radius": 10, "strokes": _strokes()},
         {"series_id": "series", "scenario_id": "horizontal_lengths", "repeat_index": 1, "requested_radius": 10, "strokes": _strokes(4)},
+        {"series_id": "series", "scenario_id": "horizontal_lengths", "repeat_index": 1, "requested_radius": 5, "strokes": _strokes()},
     ],
 )
 def test_geometry_metadata_rejects_invalid_series_scenario_repeat_or_stroke_count(kwargs):
