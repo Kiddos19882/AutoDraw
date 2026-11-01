@@ -559,3 +559,6 @@ CI выявил SyntaxError в journal validator после последнего
 
 
 Уточнение owner lock: блокировка общая для каталога chalk_test_blocks, а не отдельная на файл журнала. Это закрывает параллельный запуск разных серий в одном output_dir после одновременного прохождения preflight. Финальная реализация: commit e4793e0c03f8bface4b69954b109d8c843fa68d2d; UI scan: d82c1276fc9a1861003dfc3428cdf5b10b1d58ab; тест: 6034759be2bb873ea5ac20150ebe54bc40dab81e.
+
+
+Owner lock I/O теперь fail-closed: ошибка открытия/создания блокировки не разрешает запуск или recovery; ошибка unlock не препятствует закрытию дескриптора. Добавлен PermissionError fault test. Новые commits 80f5c96f и d44d84f6 требуют полного CI.
