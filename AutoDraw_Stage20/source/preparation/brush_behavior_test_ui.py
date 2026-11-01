@@ -3488,9 +3488,10 @@ class BrushBehaviorTestTab:
                     "monitor_buffer_dropped_events_start": report.get("monitor_buffer_dropped_events_start"),
                     "monitor_buffer_dropped_events_end": report.get("monitor_buffer_dropped_events_end"),
                     "monitor_buffer_dropped_events_delta": report.get("monitor_buffer_dropped_events_delta"),
+                    "monitor_error_count_delta": report.get("monitor_error_count_delta"),
                     "bridge_send_failures_delta": report.get("bridge_send_failures_delta"),
                     "collector_sequence_gap_count": report.get("collector_sequence_gap_count"),
-                    "monitor_error_count": report.get("monitor_error_count"),
+                    "monitor_error_count": report.get("monitor_error_count"),  # Deprecated cumulative alias.
                     "stroke_count": report.get("stroke_count"),
                     "expected_stroke_count": expected_strokes,
                     "point_delta_matches_chalk": report.get("point_delta_matches_chalk"),
