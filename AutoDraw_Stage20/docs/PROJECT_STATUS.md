@@ -715,3 +715,13 @@ Workflow `.github/workflows/geometry-tests.yml` запускается на push
 **Пока не подтверждено:** новый CI на конечном HEAD, portable artifact после новых изменений, локальный Windows preflight и live G3. Два предыдущих запуска по 718 CHALK остаются невалидными G3 попытками и в матрицу не включаются. Новый 27-task block создаётся только после прохождения всех software gates и проверки/закрытия старого paused journal через recovery UI.
 
 Дополнительная стабилизация UI regression suite: тесты UnifiedAppCoreTests теперь изолируют DATA_PATHS во временном каталоге на каждый тест. Это исключает чтение сохранённых paused G3 journals во время CI и появление модальных recovery dialogs. Deferred recovery scan в Brush Test tab отменяется при уничтожении его owner frame; добавлен regression test. UI test step ограничен тремя минутами, остальные root groups имеют отдельные таймауты.
+
+## 2026-11-02 — частичный live G3 capture (commit 094381f)
+
+Серия `chalk-20261102-015749-7c1141`, block `c8876401458b4197aee39bab33ae8e5f`, была остановлена после 22 попыток из 27 задач: 21 completed, 1 failed, 5 pending. Из 22 experiment manifests 21 имеют полный Monitor capture, один capture для `point_step_px=4 / point_delay_ms=10 / repeat=2` имеет статус partial и 434 `monitor_dropped_events`; executor при этом завершил 6/6 штрихов, а CHALK delta остался exact. Причина закрытия блока — `monitor_capture_gate_timeout:partial`. Блок остановлен и закрыт, не является paused-блоком для обычного resume.
+
+Во всех 22 manifests фактические `execution_report.executor_config` совпадают с task metadata; radius=10, шесть штрихов. Внутренний CHALK counter exact и совпадает с sampled pointDelta. У всех trajectory summaries остаётся `incomplete_until_verified` из-за coalesced pointDelta.
+
+Полные значения, таблица девяти ячеек и ограничения анализа записаны в [CHALK_G3_PARTIAL_RESULTS_2026-11-02.md](CHALK_G3_PARTIAL_RESULTS_2026-11-02.md). Предварительно delay=20 ms даёт существенно больший расход CHALK, чем 5/10 ms; меньший point_step также повышает расход. Это пока не универсальная формула: четыре ячейки неполны, радиус фиксирован на 10, геометрия только длинные горизонтальные линии.
+
+**Статус:** live G3 PARTIAL / NOT COMPLETE; ресурсная модель CHALK NOT CONFIRMED. Для завершения исходной матрицы не хватает пяти pending задач и одного корректного повтора вместо failed partial capture. Перед новым запуском требуется проверить, допускает ли validator объединение continuation-блока с этой серией; закрытый block не возобновлять вслепую.
