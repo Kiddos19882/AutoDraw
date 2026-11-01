@@ -22,7 +22,7 @@
 | 9 | [UI_INTEGRATION_MAP.md](UI_INTEGRATION_MAP.md) | Как вкладки и callbacks связаны с integrated_app и executor |
 | 10 | [DEPENDENCY_MAP.md](DEPENDENCY_MAP.md) | Реальные прямые импорты и зависимости модулей |
 | 11 | [DATA_FORMATS_AND_PROFILES.md](DATA_FORMATS_AND_PROFILES.md) | Форматы профилей, калибровки, планов и отчётов |
-| 12 | [WORK_LOG.md](WORK_LOG.md) и [DECISIONS.md](DECISIONS.md) | История технических выводов и принятых решений |
+| 12 | [WORK_LOG.md](WORK_LOG.md) и [DECISIONS.md](DECISIONS.md) | История технических выводов и принятых решений |\n| 13 | [CHALK_RADIUS_MATRIX_RESULTS.md](CHALK_RADIUS_MATRIX_RESULTS.md) | Завершённые 21 измерение расхода по радиусам и границы вывода |\n| 14 | [../CHALK_GEOMETRY_MATRIX_PLAN.md](../CHALK_GEOMETRY_MATRIX_PLAN.md) | Активный план G1–G3: геометрия, перекрытие, скорость и sampling |
 
 ## 2. Карта компонентов: где искать код
 
@@ -30,7 +30,7 @@
 |---|---|---|
 | Точка интеграции приложения | `AutoDraw_Stage20/integrated_app.py` | Создание вкладок, передача callbacks и DrawingPlan, получение canvas area/size, связь Brush Test с Stage6 |
 | UI лаборатории кистей | `AutoDraw_Stage20/source/preparation/brush_behavior_test_ui.py` | Сценарии, создание логических DrawingPlan 460×240 и передача теста |
-| Обратная связь радиуса | `AutoDraw_Stage20/source/preparation/brush_radius_feedback.py` | Извлечение фактического радиуса из heartbeat Game Monitor и расчёт коррекции ползунка для Brush Test и Stage6 |
+| Обратная связь радиуса | `AutoDraw_Stage20/source/preparation/brush_radius_feedback.py` | Извлечение фактического радиуса из heartbeat Game Monitor и расчёт коррекции ползунка для Brush Test и Stage6 |\n| Метаданные и анализ геометрической матрицы CHALK | `AutoDraw_Stage20/source/preparation/chalk_experiment_matrix.py` | G1/G2 metadata, exact-capture validation, duplicate rejection и per-stroke pointDelta aggregation |
 | Преобразование координат Brush Test | `AutoDraw_Stage20/source/preparation/brush_coordinate_transform.py` | Явное преобразование logical_board_pixels в screen-local ROI с сохранением transform в generation metadata |
 | Исполнитель мыши | `AutoDraw_Stage20/source/executor/drawing/mouse_executor.py` | MouseExecutor, ExecutorConfig, экранные координаты, движение мыши, отчёт исполнения |
 | UI исполнителя | `AutoDraw_Stage20/source/executor/stage6_execute_plan.py` | Загрузка плана, preview, проверка размеров, запуск рабочего потока и передача в MouseExecutor |
@@ -42,7 +42,7 @@
 | Модели геометрии | `AutoDraw_Stage20/source/geometry_models/` | Общие Point, Stroke, DrawingPlan |
 | Профили и калибровка | `AutoDraw_Stage20/source/preparation/profile_manager.py` и связанные модули | ScreenArea, calibration settings, параметры ввода |
 | Игровой bundle (только чтение) | `AutoDraw_Stage20/fileGameEngine/main.min_570122a1.js` в `master` | Источник BoardPane; не изменять master |
-| Статический анализ bundle | `AutoDraw_Stage20/tests/analyze_game_brush_engine.py` | Повторяемая статическая проверка игрового bundle |
+| Статический анализ bundle | `AutoDraw_Stage20/tests/analyze_game_brush_engine.py` | Повторяемая статическая проверка игрового bundle |\n| Анализ геометрической матрицы CHALK | `AutoDraw_Stage20/tests/analyze_chalk_experiment_matrix.py` | CLI для сводки G1/G2 и проверки stroke-level разбивки |
 
 Пути выше — навигационные указатели. Если файл переименован или перемещён, сначала проверьте дерево текущей ветки и обновите этот индекс.
 
@@ -71,10 +71,10 @@
 - Точный ресурсный снимок: `pointCount = maxPoints - remainingPoints`.
 - Расход опыта: `consumed = post.pointCount - pre.pointCount`, только если baseline/post валидны и относятся к одной сессии доски и одному лимиту.
 - Baseline снимается после подтверждённого Clear; post — до следующего Clear.
-- Радиус кисти не входит напрямую в формулу CHALK. Его влияние на покрытие и число необходимых траекторий проверяется экспериментально.
+- В завершённой матрице радиусов 1–30 (21 прогон, шесть длинных линий) расход составил 722–728 CHALK; заметной систематической зависимости от радиуса в этом сценарии не обнаружено. См. `CHALK_RADIUS_MATRIX_RESULTS.md`. Это не доказывает независимость для других геометрий.
 - Длина траектории, площадь следа, количество вызовов движения и количество игровых точек — разные величины; не подменять ими CHALK.
 - Измеряемые штрихи должны идти через MouseExecutor/PyAutoGUI. Не вызывать из тестового контура игровые методы и не менять `atom.points`, `max`, `less`.
-- Game Monitor 0.2.0 использует O(1) resource snapshot из `max/less`; полный обход `atom.points` — только явная диагностика.
+- Game Monitor 0.2.1 использует O(1) resource snapshot из `max/less`; полный обход `atom.points` — только явная диагностика.
 - Статическая проверка и Node-тесты не заменяют live-проверку в iframe и A/B/C замеры.
 
 ## 5. Порядок работы при реализации
@@ -83,17 +83,17 @@
 2. Прочитать этот индекс и разделы главного документа концепции, относящиеся к текущей задаче.
 3. Открыть реальные исходники всех затрагиваемых callsites; сверить документацию с кодом.
 4. Проверить зависимости и существующие тесты до изменения интерфейсов.
-5. Сначала подтвердить live-геометрию уже реализованного logical→screen transform; затем двигаться к bridge/синхронизации, runner и recorder — в порядке актуального TASKS/ROADMAP.
+5. Перед следующей серией проверить universal matrix metadata/analyzer и strokeId aggregation; затем пройти G1, G2 и G3 из `CHALK_GEOMETRY_MATRIX_PLAN.md` последовательными gates.
 6. Добавить unit-тесты на преобразование координат и регрессии обычных screen/local планов.
 7. Обновить профиль/manifest и документацию, не смешивая точные измерения с оценками.
-8. Не запускать полную CHALK-матрицу, пока не пройдены геометрические и live measurement gates.
+8. Radius matrix завершена; геометрическую/скоростную серию запускать только после прохождения CI и проверки универсального capture/analyzer.
 9. После работы обновить TASKS, PROJECT_STATUS, WORK_LOG и CHANGELOG; не отмечать задачу DONE без критериев проверки.
 
 ## 6. Границы достоверности и статусы
 
 - **Подтверждено статически:** формула чтения `max/less`, устройство Monitor 0.2.0, существующая основа Brush Test/MouseExecutor и реализация преобразования logical→screen.
-- **Не подтверждено runtime:** доступность и точность `max/less` на живой доске, реальная установка радиуса во всех режимах, точность transform на живой игре, численный overhead Monitor.
-- **Не завершено:** live A/B/C, loopback integration, полноценный batch runner, полная матрица, валидированная модель CHALK и подключение модели к оптимизатору.
+- **Подтверждено live:** `max/less`, установка радиуса 1–30 с feedback, loopback bridge и 21 exact CHALK capture для длинных линий.\n- **Не завершено:** live A/B/C overhead Monitor, геометрическая/скоростная матрица G1–G3, валидированная общая модель CHALK и подключение модели к оптимизатору.
+
 - Статус задач смотреть в [TASKS.md](TASKS.md); не выводить его только из этого файла, поскольку статусы могут меняться.
 
 ## 7. Правило поддержки этого индекса
@@ -115,3 +115,10 @@
 
 
 **Live-проверка границ:** во вкладке Brush Test добавлен сценарий `Проверка границ доски` (`board_boundary_probe`): четыре коротких штриха от внутренней точки к правой, левой, нижней и верхней границам 460×240. Для первого запуска использовать радиус 1; сценарий предназначен для проверки ROI/hit-test до полной CHALK-матрицы.
+
+
+## Актуализация 2026-11-01 — результаты радиусной серии и следующий этап
+
+Радиусная матрица `chalk-20261101-023127-b85dbb` завершена: 21/21 валидных capture, семь радиусов, три независимых повтора. В сценарии `paint_consumption_long_lines` получено 722–728 CHALK; размер кисти не показал заметного систематического влияния на расход.
+
+Следующий этап — `CHALK_GEOMETRY_MATRIX_PLAN.md`. Для G1/G2 добавлены универсальные metadata и analyzer в `source/preparation/chalk_experiment_matrix.py`; Brush Test UI сохраняет серию, сценарий, повтор, радиус и fingerprint геометрии в plan/manifest/monitor capture. Analyzer дополнительно пытается распределить `DRAW_SAMPLE.pointDelta` по `strokeId`; такая разбивка считается complete только если число stroke IDs соответствует ожидаемому числу штрихов и сумма равна общему exact CHALK. Иначе per-stroke данные остаются incomplete.
