@@ -1493,6 +1493,18 @@ class Stage6App:
         except (ValueError, TypeError) as exc:
             raise ValueError(f"Проверьте параметры исполнителя: {exc}") from exc
 
+    def _resolve_workflow_executor_config(
+        self, executor_config_override: dict[str, Any] | None = None
+    ) -> ExecutorConfig:
+        """Resolve and validate a temporary workflow config without persisting it."""
+        config = self._read_executor_config()
+        if executor_config_override is not None:
+            if not isinstance(executor_config_override, dict):
+                raise ValueError("Переопределение параметров исполнителя должно быть объектом.")
+            config = replace(config, **executor_config_override)
+        config.validate()
+        return config
+
     def start_execution_from_workflow(
         self, executor_config_override: dict[str, Any] | None = None
     ) -> bool:
@@ -1521,12 +1533,7 @@ class Stage6App:
             messagebox.showwarning("План не готов", "Сначала загрузите план и выберите область доски.", parent=self.root)
             return
         try:
-            config = self._read_executor_config()
-            if executor_config_override is not None:
-                if not isinstance(executor_config_override, dict):
-                    raise ValueError("Переопределение параметров исполнителя должно быть объектом.")
-                config = replace(config, **executor_config_override)
-                config.validate()
+            config = self._resolve_workflow_executor_config(executor_config_override)
             self.execution_plan.validate_bounds()
             # Revalidate against the current display: resolution/monitor can change after profile load.
             self._validate_area(self.area)
