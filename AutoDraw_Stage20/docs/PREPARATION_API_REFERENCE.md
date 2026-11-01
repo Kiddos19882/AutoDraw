@@ -492,3 +492,10 @@
 - Результат содержит в `generation.screen_transform` исходную/целевую систему координат, размеры доски и ROI, origin, масштабы и правило обработки границ.
 
 Преобразование используется только при передаче Brush Test. Обычные планы `local_canvas_pixels` продолжают проверяться на совпадение размеров с ROI и не преобразуются.
+
+### Дополнение — G3 Brush Test integration
+
+- Автоматический CHALK block selector поддерживает G1, G2 и G3.
+- G3 block разрешён только после завершённого G2 journal (18/18 accepted tasks).
+- G3 tasks передают полный `executor_parameters` через experiment matrix metadata; ручной запуск сценария `paint_consumption_long_lines` вне автоматического G3 block запрещён.
+- Runtime handoff применяет настройки к Stage6 `MouseExecutor` через временный override; пользовательский профиль не изменяется.
