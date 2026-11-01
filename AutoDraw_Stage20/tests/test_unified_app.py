@@ -1296,8 +1296,14 @@ class UnifiedAppCoreTests(unittest.TestCase):
             plan_path = Path(temp) / "current_brush_behavior_test.json"
             plan_path.write_text(json.dumps(plan), encoding="utf-8")
             app.executor = Executor(plan_path)
-            app._start_brush_test_executor(10)
+            with (
+                patch("integrated_app.messagebox.showerror") as showerror,
+                patch("integrated_app.messagebox.showwarning") as showwarning,
+            ):
+                app._start_brush_test_executor(10)
 
+        showerror.assert_not_called()
+        showwarning.assert_not_called()
         self.assertEqual(app.executor.started_with, parameters)
         self.assertEqual(app.executor.started_with["point_step_px"], 2)
         self.assertEqual(app.executor.started_with["point_delay_ms"], 20)
