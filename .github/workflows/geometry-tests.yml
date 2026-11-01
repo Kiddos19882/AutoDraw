@@ -103,10 +103,11 @@ jobs:
       - name: Install application test dependencies
         run: python -m pip install -r source/preparation/requirements.txt -r source/executor/requirements.txt pytest
       - name: Run unified application and G3 handoff tests
+        working-directory: AutoDraw_Stage20/source/preparation
         shell: pwsh
         run: |
           $env:PYTHONPATH = "$env:GITHUB_WORKSPACE\\AutoDraw_Stage20;$env:GITHUB_WORKSPACE\\AutoDraw_Stage20\\source\\preparation;$env:GITHUB_WORKSPACE\\AutoDraw_Stage20\\source\\executor"
-          python -m pytest -q -ra tests/test_unified_app.py
+          python -m pytest -q -ra ..\\..\\tests\\test_unified_app.py
       - name: Run root build, import and test-runner regressions
         shell: pwsh
         run: |
