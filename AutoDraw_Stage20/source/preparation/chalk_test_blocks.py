@@ -6,6 +6,7 @@ import json
 import os
 import random
 import uuid
+import functools
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -19,6 +20,38 @@ from chalk_experiment_matrix import (
 
 BLOCK_SCHEMA_VERSION = 1
 BLOCK_PHASES = frozenset(PHASE_SCENARIOS)
+
+
+
+def _journal_locked(function):
+    """Serialize journal read-modify-write transitions across processes."""
+    @functools.wraps(function)
+    def wrapped(journal_path, *args, **kwargs):
+        path = Path(journal_path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        lock_path = path.with_name(path.name + ".lock")
+        with lock_path.open("a+b") as lock_file:
+            if os.name == "nt":
+                import msvcrt
+                lock_file.seek(0, os.SEEK_END)
+                if lock_file.tell() == 0:
+                    lock_file.write(b"\\0")
+                    lock_file.flush()
+                lock_file.seek(0)
+                msvcrt.locking(lock_file.fileno(), msvcrt.LK_LOCK, 1)
+                try:
+                    return function(journal_path, *args, **kwargs)
+                finally:
+                    lock_file.seek(0)
+                    msvcrt.locking(lock_file.fileno(), msvcrt.LK_UNLCK, 1)
+            else:
+                import fcntl
+                fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
+                try:
+                    return function(journal_path, *args, **kwargs)
+                finally:
+                    fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
+    return wrapped
 
 
 def _utc_now() -> str:
@@ -112,6 +145,7 @@ def _atomic_write_json(path: Path, document: dict[str, Any]) -> None:
             pass
 
 
+@_journal_locked
 def create_chalk_test_block_journal(
     journal_path: str | Path,
     plan: dict[str, Any],
@@ -191,10 +225,22 @@ def _validate_chalk_test_block_journal(document: Any, path: Path) -> dict[str, A
         raise ValueError(f"В журнале CHALK обнаружено несколько running-задач: {path}")
     if (document.get("status") == "running") != (len(running_tasks) == 1):
         raise ValueError(f"Статус блока не согласован с активной задачей: {path}")
-    if document.get("status") == "completed" and not all(
-        task.get("status") == "completed" for task in tasks
-    ):
+    block_status = document["status"]
+    task_statuses = {task["status"] for task in tasks}
+    if block_status == "completed" and task_statuses != {"completed"}:
         raise ValueError(f"Завершённый блок содержит незавершённые задачи: {path}")
+    if block_status == "ready" and not task_statuses.issubset({"pending", "completed"}):
+        raise ValueError(f"Ready-блок содержит failed/interrupted/running задачу: {path}")
+    if block_status == "paused" and (
+        running_tasks or not task_statuses.intersection({"failed", "interrupted"})
+    ):
+        raise ValueError(f"Paused-блок не содержит корректной причины остановки: {path}")
+    if block_status == "failed" and (
+        running_tasks or "failed" not in task_statuses
+    ):
+        raise ValueError(f"Failed-блок не согласован с failed-задачей: {path}")
+    if block_status == "stopped" and running_tasks:
+        raise ValueError(f"Остановленный блок содержит running-задачу: {path}")
     return document
 
 
@@ -212,6 +258,7 @@ def _save_journal(path: Path, journal: dict[str, Any]) -> None:
     _atomic_write_json(path, journal)
 
 
+@_journal_locked
 def claim_next_chalk_block_task(
     journal_path: str | Path,
     *,
@@ -246,6 +293,7 @@ def claim_next_chalk_block_task(
     return dict(task)
 
 
+@_journal_locked
 def finish_chalk_block_task(
     journal_path: str | Path,
     task_id: str,
@@ -290,6 +338,7 @@ def finish_chalk_block_task(
     return dict(task)
 
 
+@_journal_locked
 def mark_interrupted_chalk_block_task(
     journal_path: str | Path,
     *,
@@ -422,6 +471,7 @@ def validate_chalk_block_experiment(
     return True, "accepted", record
 
 
+@_journal_locked
 def stop_chalk_test_block(
     journal_path: str | Path,
     *,
@@ -447,6 +497,7 @@ def stop_chalk_test_block(
     _save_journal(path, journal)
     return journal
 
+@_journal_locked
 def record_chalk_block_task_experiment(
     journal_path: str | Path,
     task_id: str,
@@ -477,6 +528,7 @@ def record_chalk_block_task_experiment(
     _save_journal(path, journal)
     return dict(task)
 
+@_journal_locked
 def resolve_interrupted_chalk_block_task(
     journal_path: str | Path,
     task_id: str,
