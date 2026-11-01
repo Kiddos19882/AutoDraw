@@ -1115,7 +1115,7 @@ class BrushBehaviorTestTab:
                 journal = load_chalk_test_block_journal(journal_path)
             except (OSError, ValueError, json.JSONDecodeError):
                 return True
-            if journal.get("status") in {"ready", "running", "paused"}:
+            if journal.get("status") in {"ready", "running", "paused", "failed"}:
                 return True
         return False
 
