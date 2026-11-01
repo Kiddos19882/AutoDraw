@@ -125,3 +125,12 @@ G1/G2 используют radius=10 и фиксированный `GEOMETRY_EXE
 Runs `41267183785` и `41267241966` завершились одинаково: `executor-tests` — success; `geometry-tests` — 1 failed / 574 passed; Windows portable build завершился до startup smoke-test из-за той же ошибки preparation suite. Единственное падение находилось в callback test `test_ui_capture_gate_pauses_without_advancing_on_incomplete_evidence`: mock validator lambda не принимала новые именованные identity-параметры UI.
 
 Mock обновлён до `lambda _path, **_kwargs` в commit `20704ab984b981a4bf5b2278eba6cfad970d15a5`. Логика production validator/UI не менялась. Повторный CI для исправления ожидается; block runner пока не считать готовым к live G1.
+
+
+## Дополнение 2026-11-01 — structural integrity gate журнала
+
+Загрузчик block journal дополнен централизованной структурной проверкой до любого recovery/state transition. Проверяются schema version, phase/block status, соответствие `expected_task_count` фактическому числу задач, уникальные `task_id` и `attempt_id`, допустимые статусы, корректная ссылка `active_attempt_id` на единственную running attempt, максимум одна running task и согласованность running/completed статуса блока. Некорректный JSON возвращается как ValueError. UI recovery рассматривает такой файл как unresolved и не пытается его исправлять или перезапускать.
+
+Добавлены tests на повреждённые task records, пустые/дублированные ID, неизвестные статусы, несоответствие количества задач, orphaned running attempt, несколько running attempts, несогласованный block status, некорректный JSON и валидный running state.
+
+Изменения: `2ea67817bd1187baa66252aec440a4a5238042e0`, `52b40e94eadf1e75f461565960547b2a749993e4`. CI для этих commits ожидается. Файловый journal пока предполагает один активный экземпляр UI; межпроцессная блокировка не реализована.
