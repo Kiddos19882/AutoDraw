@@ -9,6 +9,7 @@ from chalk_test_blocks import (
     claim_next_chalk_block_task,
     create_chalk_test_block_journal,
     load_chalk_test_block_journal,
+    record_chalk_block_task_experiment,
 )
 
 
@@ -42,6 +43,9 @@ def _active_ui(tmp_path: Path):
     task = claim_next_chalk_block_task(journal_path)
     experiment_dir = tmp_path / "experiment"
     experiment_dir.mkdir()
+    record_chalk_block_task_experiment(
+        journal_path, task["task_id"], experiment_id="experiment-ui", experiment_dir=experiment_dir
+    )
     ui = object.__new__(BrushBehaviorTestTab)
     ui._chalk_block_journal_path = journal_path
     ui._chalk_block_task = task
@@ -80,6 +84,7 @@ def test_ui_capture_gate_accepts_task_before_advancing(tmp_path, monkeypatch):
     assert identity["expected_task"]["task_id"] == task["task_id"]
     assert identity["expected_block"]["block_id"] == journal["block_id"]
     assert identity["expected_experiment_id"] == "experiment-ui"
+    assert identity["expected_experiment_dir"] == str(ui.experiment_dir.resolve())
 
 
 def test_ui_capture_gate_pauses_without_advancing_on_incomplete_evidence(tmp_path, monkeypatch):
