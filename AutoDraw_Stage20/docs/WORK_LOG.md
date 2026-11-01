@@ -1718,3 +1718,7 @@ Regression test в `source/preparation/tests/test_brush_behavior_test_ui.py` т�
 - 21 capture имеют полный Monitor status saved. Во всех trajectory summaries — `incomplete_until_verified`; точная траектория не восстановлена.
 - Сводная таблица и осторожная интерпретация влияния шага/задержки записаны в `docs/CHALK_G3_PARTIAL_RESULTS_2026-11-02.md`.
 - Предварительный вывод: delay=20 ms заметно увеличивает CHALK против 5/10 ms; уменьшение шага также увеличивает CHALK. Универсальная модель не выводится до завершения матрицы и отдельного контроля радиуса.
+
+- Проверен recovery code после анализа commit 094381f: stopped block не может выдавать pending tasks; failed task не подходит под interrupted retry; стандартный G3 builder формирует 27 задач. Не пытаться возобновлять этот block или вручную менять journal.
+- [ ] Принять решение: новая полная серия G3 27/27 по штатному workflow либо отдельная разработка continuation/aggregation механизма для 21 принятых captures + шесть недостающих задач.
+- [ ] До повторного live запуска обеспечить чистый Monitor capture; при partial status блок должен останавливаться, а capture оставаться исключённым из accepted repeats.
