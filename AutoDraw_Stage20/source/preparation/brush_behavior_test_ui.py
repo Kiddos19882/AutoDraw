@@ -993,7 +993,9 @@ class BrushBehaviorTestTab:
                     continue
             if journal.get("status") in {"ready", "paused"}:
                 unresolved.append(journal_path)
-        if unresolved:
+        if interrupted_details:
+            self._chalk_block_recovery_journal_path = interrupted_details[0]
+        elif unresolved:
             self._chalk_block_recovery_journal_path = unresolved[0]
         if interrupted_details:
             path, task_id, experiment_id, experiment_dir = interrupted_details
