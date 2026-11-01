@@ -225,6 +225,7 @@ def _validate_manifest(document: dict[str, Any]) -> tuple[bool, str, dict[str, A
             scenario_id=metadata.get("scenario_id"),
             repeat_index=metadata.get("repeat_index"),
             requested_radius=metadata.get("requested_radius"),
+            matrix_order_index=metadata.get("matrix_order_index", 1),
             strokes=metadata.get("planned_strokes"),
         )
     except (TypeError, ValueError, OverflowError) as exc:
@@ -241,6 +242,8 @@ def _validate_manifest(document: dict[str, Any]) -> tuple[bool, str, dict[str, A
     radius = expected["requested_radius"]
     expected_strokes = expected["expected_strokes"]
     signature = expected["geometry_signature"]
+    if "matrix_order_index" in metadata and metadata.get("matrix_order_index") != expected["matrix_order_index"]:
+        return False, "matrix_metadata_mismatch:matrix_order_index", None
     if document.get("test_case") != scenario_id:
         return False, "scenario_mismatch", None
     if document.get("brush_value_requested") != radius:
@@ -310,6 +313,7 @@ def _validate_manifest(document: dict[str, Any]) -> tuple[bool, str, dict[str, A
         "phase_id": phase_id,
         "scenario_id": scenario_id,
         "repeat_index": repeat_index,
+        "matrix_order_index": expected["matrix_order_index"],
         "radius": radius,
         "geometry_signature": signature,
         "expected_strokes": expected_strokes,
