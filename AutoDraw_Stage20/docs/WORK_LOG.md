@@ -1523,3 +1523,6 @@ Recovery resume/close теперь также требуют владения lo
 
 
 Дополнительный review owner-lock I/O: ошибка создания/открытия .active-block.owner.lock теперь трактуется как отказ получить владение, а не пробрасывается в UI как необработанное исключение. При ошибке unlock дескриптор всё равно закрывается, чтобы ОС освободила блокировку. Добавлен fault-injection test на PermissionError при открытии lock-файла. Commit: 80f5c96f3c601b94c567b6d91435f0c778608bda; test: d44d84f6be5a7daf3aae38ba7e6576f70c138f24.
+
+
+Добавлен отдельный cross-process test: дочерний процесс через multiprocessing spawn пытается захватить owner lock, удерживаемый основным процессом; ожидается отказ. Это особенно важно для проверки Windows msvcrt locking в CI. Commit: 73af05b495b06b87bf892e93a2fb2d2085c9adad.
