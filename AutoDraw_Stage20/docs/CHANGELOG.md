@@ -277,3 +277,8 @@
 - Добавлен тест реального G3 UI plan routing: обязательные block/matrix identity и executor parameters должны формироваться для активной block task.
 - Integration regression проверяет передачу task-specific параметров 2/20 в Stage6.
 - Новый workflow run на конечном HEAD ожидает подтверждения.
+
+### Tests and CI
+- UI regression tests изолируют persistent data paths во временном каталоге, чтобы CI не читал сохранённые paused CHALK journals и не открывал recovery dialogs.
+- Brush Test tab отменяет deferred recovery scan при уничтожении owner frame; добавлен тест очистки Tk callback.
+- Root integration tests разбиты на отдельные группы с локальными таймаутами; concurrency group обновлён для чистого повторного CI после зависших предыдущих runs.
