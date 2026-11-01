@@ -1461,3 +1461,14 @@ GitHub Actions для новых изменений выполняется/ож�
 Причина единственного падения — устаревшая lambda-подмена `validate_chalk_block_experiment` в `test_ui_capture_gate_pauses_without_advancing_on_incomplete_evidence`: UI корректно передаёт новые keyword-only identity аргументы (`expected_task`, `expected_block`, `expected_experiment_id`, `expected_experiment_dir`), а тестовая lambda принимала только путь. Обновлена подмена до `lambda _path, **_kwargs`, сохраняя проверку отказа на incomplete evidence. Изменение: commit `20704ab984b981a4bf5b2278eba6cfad970d15a5`.
 
 Для нового commit combined status пока не содержит checks; CI результата после исправления ещё нет. До полного успешного CI и Windows startup smoke-test live G1 не запускать. Raw manifests, `data/` и `master` не изменялись.
+
+
+## 2026-11-01 — завершение CI и аудит целостности block journal
+
+После исправления callback test stub полный workflow run [41268085571](https://github.com/Kiddos19882/AutoDraw/actions/runs/41268085571) для code commit `20704ab984b981a4bf5b2278eba6cfad970d15a5` завершился успешно: geometry-tests, executor-tests и Windows portable build/startup smoke-test — success. Документационный HEAD `1c7bf1501347df981f6a664e3bf057a54953a4c9` также прошёл все три job в run [41268149629](https://github.com/Kiddos19882/AutoDraw/actions/runs/41268149629).
+
+**Review recovery/journal:** выявлено, что загрузчик проверял только верхний уровень JSON. Синтаксически корректный, но структурно повреждённый журнал (например, несловарная задача, дублированный task_id, orphaned running attempt, несколько running задач или несогласованный статус блока) мог приводить к исключениям глубже в UI recovery/state transitions. Добавлен централизованный структурный validator в `chalk_test_blocks.py`: проверяются schema/phase/block status, ожидаемое количество задач, уникальность task_id/attempt_id, допустимые статусы, связь active_attempt_id с единственной running attempt, максимум одна running task, согласованность статуса блока и полное завершение всех задач для completed block. Некорректный JSON теперь выдаёт ValueError с путём журнала; recovery уже трактует это как unresolved и не запускает тест.
+
+Добавлены тесты на повреждённые структуры, несогласованные статусы, orphaned/multiple running attempt, invalid JSON и корректную активную попытку. Code commits: `2ea67817bd1187baa66252aec440a4a5238042e0`, `52b40e94eadf1e75f461565960547b2a749993e4`.
+
+Оставшиеся границы: файловый журнал рассчитан на единственный активный экземпляр UI; межпроцессная блокировка claim/write не реализована. Повреждённый журнал намеренно блокирует новый блок и требует ручного сохранения/разбора файла, а не автоматического исправления. Live G1 не запускался; ожидать новый CI для journal validation. `data/`, старые manifests и `master` не изменялись.
