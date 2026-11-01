@@ -22,6 +22,12 @@ on:
       - "AutoDraw_Stage20/PROJECT_GUIDE.md"
       - "AutoDraw_Stage20/README.txt"
   workflow_dispatch:
+    inputs:
+      run_algorithm_benchmarks:
+        description: Run the long Stage 5/7/8 algorithm benchmark suite
+        required: false
+        type: boolean
+        default: false
 
 concurrency:
   group: autodraw-validation-v2-${{ github.ref }}
@@ -187,7 +193,7 @@ jobs:
 
   algorithm-benchmarks:
     name: Optional algorithm benchmarks
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' && inputs.run_algorithm_benchmarks == true
     runs-on: windows-latest
     timeout-minutes: 60
     defaults:
