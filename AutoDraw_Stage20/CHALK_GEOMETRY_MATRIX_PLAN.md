@@ -1,6 +1,6 @@
 # План измерения расхода CHALK по геометрии и режиму ввода
 
-**Статус:** G1 и G2 LIVE ACCEPTED; G3 исследовательский gate открыт, реализация block runner/UI/analyzer для G3 ещё требуется.  
+**Статус:** G1 и G2 LIVE ACCEPTED; G3 SOFTWARE IMPLEMENTATION IN PROGRESS. Live-запуск G3 закрыт до regression tests и полного CI.  
 **Дата:** 1 ноября 2026 г.  
 **Предыдущая серия:** `chalk-20261101-023127-b85dbb`, 21/21 валидных прогонов.  
 **Ветка:** `feature/image-geometry-optimization`.
@@ -146,3 +146,15 @@ G2 выполнен одним автоматизированным блоком
 Отдельная агрегация stroke ID в `repeated_coverage`: повторы [61,62,62,62], [61,61,61,62], [61,61,62,62]. Три прохода по той же линии расходуют примерно столько же CHALK, сколько отдельный контрольный параллельный проход. Перекрытие нельзя считать бесплатным.
 
 **Gate обновлён: G1 и G2 приняты; G3 разблокирован.** G3: 27 опытов, `point_step_px` 1/2/4 × `point_delay_ms` 5/10/20, три повтора на комбинацию, фиксированная геометрия `paint_consumption_long_lines`, радиус 10. Полный анализ и ограничения — в отчёте G2.
+
+## 10. Реализация G3 — программный gate
+
+G3 реализуется как отдельная фаза общего CHALK block runner. Сценарий остаётся `paint_consumption_long_lines` (6 штрихов), радиус 10 и три повтора каждой из девяти конфигураций.
+
+- Matrix metadata хранит полный `executor_parameters`; G3 identity определяется сочетанием `point_step_px`, `point_delay_ms` и `repeat_index`.
+- Duplicate protection сравнивает параметры исполнителя, поэтому одинаковый repeat_index в разных конфигурациях не конфликтует.
+- Block journal формирует 27 уникальных задач, перемешивает их детерминированным seed и отклоняет неполную/повторную матрицу.
+- Brush Test UI предлагает G3 только после полностью принятого G2.
+- Stage6 получает task-specific executor config из G3 metadata, применяет его к фактическому `MouseExecutor`, записывает в execution report и не перезаписывает пользовательский профиль.
+- Analyzer проверяет executor_config из execution report и агрегирует три повтора отдельно для каждой комбинации.
+- Live G3 нельзя запускать до regression tests, полного CI и Windows portable startup smoke-test.
