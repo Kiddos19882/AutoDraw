@@ -265,7 +265,7 @@ def test_interrupted_block_requires_board_check_before_retry(tmp_path):
     assert resolved["status"] == "pending"
     journal = load_chalk_test_block_journal(path)
     assert journal["status"] == "ready"
-    assert journal["recovery_decision"]["decision"] == "retry"
+    assert journal["recovery_decisions"][-1]["decision"] == "retry"
     assert journal["tasks"][0]["attempts"][-1]["status"] == "interrupted"
 
 
@@ -280,5 +280,25 @@ def test_interrupted_block_can_be_stopped_after_explicit_board_check(tmp_path):
     )
     journal = load_chalk_test_block_journal(path)
     assert journal["status"] == "stopped"
-    assert journal["recovery_decision"]["board_checked"] is True
+    assert journal["recovery_decisions"][-1]["board_checked"] is True
     assert claim_next_chalk_block_task(path) is None
+
+
+
+def test_paused_block_cannot_be_closed_without_board_check(tmp_path):
+    plan = build_chalk_test_block_plan(series_id="series", phase_id="G1")
+    path = tmp_path / "block.json"
+    create_chalk_test_block_journal(path, plan)
+    task = claim_next_chalk_block_task(path)
+    finish_chalk_block_task(
+        path,
+        task["task_id"],
+        accepted=False,
+        experiment_id="exp-failed",
+        experiment_dir=tmp_path / "failed",
+        reason="monitor_capture_not_exact",
+    )
+    with pytest.raises(ValueError):
+        stop_chalk_test_block(path)
+    stopped = stop_chalk_test_block(path, board_checked=True)
+    assert stopped["status"] == "stopped"
