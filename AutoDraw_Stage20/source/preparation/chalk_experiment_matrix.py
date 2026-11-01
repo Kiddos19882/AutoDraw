@@ -23,6 +23,16 @@ PHASE_SCENARIOS = {
 GEOMETRY_MATRIX_SCENARIOS = frozenset(
     scenario for scenarios in PHASE_SCENARIOS.values() for scenario in scenarios
 )
+GEOMETRY_EXECUTOR_CONFIG = {
+    "point_step_px": 2,
+    "line_extension_px": 0,
+    "point_delay_ms": 10,
+    "after_mouse_up_ms": 20,
+    "before_mouse_down_ms": 20,
+    "after_mouse_down_ms": 40,
+    "end_hold_ms": 50,
+    "countdown_seconds": 5,
+}
 EXPECTED_STROKES = {
     "horizontal_lengths": 5,
     "vertical_lengths": 4,
@@ -85,6 +95,7 @@ def build_chalk_experiment_matrix_metadata(
         "expected_strokes": EXPECTED_STROKES[scenario_id],
         "geometry_signature": geometry_signature,
         "planned_strokes": json.loads(canonical_geometry),
+        "executor_parameters": dict(GEOMETRY_EXECUTOR_CONFIG),
     }
 
 
@@ -176,7 +187,7 @@ def _validate_manifest(document: dict[str, Any]) -> tuple[bool, str, dict[str, A
         return False, f"invalid_matrix_metadata:{exc}", None
     for key in ("schema_version", "series_id", "phase_id", "scenario_id", "repeat_index",
                 "planned_repeats", "requested_radius", "expected_strokes", "geometry_signature",
-                "planned_strokes"):
+                "planned_strokes", "executor_parameters"):
         if metadata.get(key) != expected.get(key):
             return False, f"matrix_metadata_mismatch:{key}", None
     series_id = expected["series_id"]
@@ -235,6 +246,12 @@ def _validate_manifest(document: dict[str, Any]) -> tuple[bool, str, dict[str, A
         return False, "executor_not_completed", None
     if execution.get("completed_strokes") != expected_strokes:
         return False, "executor_stroke_count_mismatch", None
+    executor_config = execution.get("executor_config")
+    if not isinstance(executor_config, dict) or any(
+        executor_config.get(key) != value
+        for key, value in GEOMETRY_EXECUTOR_CONFIG.items()
+    ):
+        return False, "executor_parameters_mismatch", None
 
     run_id = capture.get("run_id") or summary.get("run_id")
     if not isinstance(run_id, str) or not run_id.strip() or (
