@@ -28,6 +28,12 @@ class _Root:
         self.scheduled.append((delay, callback))
         return f"after-{len(self.scheduled)}"
 
+    def deiconify(self):
+        pass
+
+    def lift(self):
+        pass
+
 
 def _active_ui(tmp_path: Path):
     plan = build_chalk_test_block_plan(series_id="ui-series", phase_id="G1", seed=4)
@@ -96,6 +102,36 @@ def test_ui_capture_gate_times_out_closed(tmp_path):
     ui._wait_for_chalk_block_capture(attempt=60)
 
     assert failures == ["monitor_capture_gate_timeout:saved"]
+
+
+def test_alt_cancelled_preclear_pauses_active_block(tmp_path):
+    ui, _journal_path, _task = _active_ui(tmp_path)
+    failures = []
+    ui._automated_preclear_active = True
+    ui._automated_preclear_after_id = None
+    ui._stop_brush_hotkey_listener = lambda: None
+    ui._write_experiment_manifest = lambda: None
+    ui._fail_chalk_test_block = lambda reason: failures.append(reason)
+
+    ui._cancel_automated_preclear()
+
+    assert failures == ["preclear_cancelled_by_user"]
+    assert ui._automated_preclear_active is False
+
+
+def test_alt_cancelled_postdraw_pauses_active_block(tmp_path):
+    ui, _journal_path, _task = _active_ui(tmp_path)
+    failures = []
+    ui._automated_postdraw_active = True
+    ui._automated_postdraw_after_id = None
+    ui._stop_brush_hotkey_listener = lambda: None
+    ui._write_experiment_manifest = lambda: None
+    ui._fail_chalk_test_block = lambda reason: failures.append(reason)
+
+    ui._cancel_automated_postdraw()
+
+    assert failures == ["postdraw_cancelled_by_user"]
+    assert ui._automated_postdraw_active is False
 
 
 def test_ui_executor_failure_pauses_block_without_starting_postdraw(tmp_path):
