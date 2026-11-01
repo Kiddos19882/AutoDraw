@@ -90,6 +90,7 @@ def test_ui_capture_gate_pauses_without_advancing_on_incomplete_evidence(tmp_pat
 def test_ui_capture_gate_times_out_closed(tmp_path):
     ui, _journal_path, _task = _active_ui(tmp_path)
     failures = []
+    ui.experiment_phases["monitor_capture"]["status"] = "pending"
     ui._fail_chalk_test_block = lambda reason: failures.append(reason)
 
     ui._wait_for_chalk_block_capture(attempt=60)
