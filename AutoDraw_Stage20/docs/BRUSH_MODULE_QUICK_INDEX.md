@@ -129,3 +129,11 @@
 Радиусная матрица `chalk-20261101-023127-b85dbb` завершена: 21/21 валидных capture, семь радиусов, три независимых повтора. В сценарии `paint_consumption_long_lines` получено 722–728 CHALK; размер кисти не показал заметного систематического влияния на расход.
 
 Следующий этап — `CHALK_GEOMETRY_MATRIX_PLAN.md`. Для G1/G2 добавлены универсальные metadata и analyzer в `source/preparation/chalk_experiment_matrix.py`; Brush Test UI сохраняет серию, сценарий, повтор, радиус и fingerprint геометрии в plan/manifest/monitor capture. Analyzer дополнительно пытается распределить `DRAW_SAMPLE.pointDelta` по `strokeId`; такая разбивка считается complete только если число stroke IDs соответствует ожидаемому числу штрихов и сумма равна общему exact CHALK. Иначе per-stroke данные остаются incomplete.
+
+
+## Автоматические блоки CHALK
+
+- `source/preparation/chalk_test_blocks.py` — детерминированный план G1/G2, JSON journal, claim/finish, fail-closed pause, interrupted recovery primitive, строгая проверка exact CHALK/per-stroke/frame evidence.
+- `source/preparation/brush_behavior_test_ui.py` — UI Start/Stop/progress и последовательная интеграция блока с preclear, brush feedback, executor и Game Monitor.
+- Полный workflow и критерии принятия: [CHALK_TEST_BLOCKS_DESIGN.md](CHALK_TEST_BLOCKS_DESIGN.md).
+- Recovery UI, callback-level tests, CI и live G1 ещё остаются gates.
