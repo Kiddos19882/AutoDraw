@@ -123,3 +123,7 @@ UI runner реализован, но до CI и отдельного контр�
 - [x] Fail-closed обработка ошибки открытия/создания owner lock.
 - [x] Тест PermissionError при получении owner lock.
 - [ ] Полный CI после последних owner-lock I/O изменений.
+
+
+- [x] Добавить тест блокировки owner lock из отдельного OS-процесса (multiprocessing spawn).
+- [ ] Подтвердить Windows CI с новым cross-process test.
