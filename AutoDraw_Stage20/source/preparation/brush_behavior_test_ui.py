@@ -1374,7 +1374,17 @@ class BrushBehaviorTestTab:
             if manifest_path is None:
                 self._fail_chalk_test_block("experiment_manifest_missing")
                 return
-            accepted, reason, _record = validate_chalk_block_experiment(manifest_path)
+            try:
+                journal = load_chalk_test_block_journal(self._chalk_block_journal_path)
+            except (OSError, ValueError, json.JSONDecodeError) as exc:
+                self._fail_chalk_test_block(f"block_journal_unavailable_during_acceptance:{exc}")
+                return
+            accepted, reason, _record = validate_chalk_block_experiment(
+                manifest_path,
+                expected_task=self._chalk_block_task,
+                expected_block=journal,
+                expected_experiment_id=self._experiment_id,
+            )
             if not accepted:
                 self._fail_chalk_test_block(reason)
                 return
