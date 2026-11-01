@@ -1532,3 +1532,11 @@ Recovery resume/close теперь также требуют владения lo
 
 ### CI finding — closure audit classification (2026-11-01)
 The first final CI run exposed a mismatch: `finish_chalk_block_task(accepted=False)` correctly leaves the block in `paused`, while the rejected task itself is `failed`. Closure audit classification now inspects task statuses, recording `close_failed_block` when a failed task exists and `close_paused_block` for interruption-only pauses. This preserves the distinction between block state and failed experiment state. The existing regression test asserts the failed-task path. Full CI must be rerun; G1 remains blocked until all jobs and Windows portable smoke-test pass.
+
+## 2026-11-01 — финальный CI и готовность программной части G1
+
+Исправлена классификация audit при закрытии paused-блока, если одна из задач имеет статус failed. Решение о закрытии теперь основано на статусах задач: `close_failed_block` для блока с failed-задачей и `close_paused_block` для interrupted-only состояния. Изменение: `dd976b04f6d6423726ad7382bac7223c12d8342b`.
+
+Финальный workflow run `41272291546` на HEAD `311299296559b9a5949f1e803f134b46436a2850` завершился success. Все jobs прошли: geometry-tests, executor-tests, Windows portable build/startup smoke-test. Windows job завершил полный `build_windows.bat`, включая общий набор тестов, сборку portable приложения и smoke-test запуска.
+
+Обновлены PROJECT_STATUS.md, TASKS.md и CHALK_TEST_BLOCKS_DESIGN.md. Программный gate G1 закрыт. Не выполнено и не имитировалось: локальное открытие portable приложения в пользовательской Windows, проверка текущего профиля калибровки/игровой сессии/пустой доски и live G1. Эти действия остаются обязательным локальным preflight.
