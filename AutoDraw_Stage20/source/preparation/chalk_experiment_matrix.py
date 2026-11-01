@@ -161,26 +161,37 @@ def _validate_manifest(document: dict[str, Any]) -> tuple[bool, str, dict[str, A
     if not isinstance(metadata, dict):
         return False, "matrix_metadata_missing", None
     try:
-        expected = build_chalk_experiment_matrix_metadata(
-            series_id=metadata.get("series_id"),
-            scenario_id=metadata.get("scenario_id"),
-            repeat_index=metadata.get("repeat_index"),
-            requested_radius=metadata.get("requested_radius"),
-            strokes=metadata.get("planned_strokes") if isinstance(metadata.get("planned_strokes"), list) else [
-                {} for _ in range(int(metadata.get("expected_strokes", 0) or 0))
-            ],
-        )
-    except (TypeError, ValueError, OverflowError) as exc:
+        series_id = _normalize_series_id(metadata.get("series_id"))
+    except ValueError as exc:
         return False, f"invalid_matrix_metadata:{exc}", None
-    for key in ("schema_version", "series_id", "phase_id", "scenario_id", "repeat_index",
-                "planned_repeats", "requested_radius", "expected_strokes", "geometry_signature"):
-        if metadata.get(key) != expected.get(key):
-            return False, f"matrix_metadata_mismatch:{key}", None
-    if metadata.get("geometry_signature") != expected.get("geometry_signature"):
-        return False, "geometry_signature_mismatch", None
-    if document.get("test_case") != expected["scenario_id"]:
+    scenario_id = metadata.get("scenario_id")
+    phase_id = next(
+        (phase for phase, scenarios in PHASE_SCENARIOS.items() if scenario_id in scenarios),
+        None,
+    )
+    if phase_id is None:
+        return False, "unknown_scenario", None
+    repeat_index = metadata.get("repeat_index")
+    radius = metadata.get("requested_radius")
+    if isinstance(repeat_index, bool) or repeat_index not in (1, 2, 3):
+        return False, "invalid_repeat_index", None
+    if isinstance(radius, bool) or not isinstance(radius, int) or not 1 <= radius <= 30:
+        return False, "invalid_requested_radius", None
+    signature = metadata.get("geometry_signature")
+    if not isinstance(signature, str) or len(signature) != 64 or any(char not in "0123456789abcdef" for char in signature):
+        return False, "invalid_geometry_signature", None
+    expected_strokes = EXPECTED_STROKES[scenario_id]
+    if (
+        metadata.get("schema_version") != 1
+        or metadata.get("series_id") != series_id
+        or metadata.get("phase_id") != phase_id
+        or metadata.get("planned_repeats") != 3
+        or metadata.get("expected_strokes") != expected_strokes
+    ):
+        return False, "matrix_metadata_mismatch", None
+    if document.get("test_case") != scenario_id:
         return False, "scenario_mismatch", None
-    if document.get("brush_value_requested") != expected["requested_radius"]:
+    if document.get("brush_value_requested") != radius:
         return False, "requested_radius_mismatch", None
 
     capture = document.get("monitor_capture")
@@ -196,7 +207,7 @@ def _validate_manifest(document: dict[str, Any]) -> tuple[bool, str, dict[str, A
         return False, "summary_experiment_id_mismatch", None
     if capture.get("chalk_experiment_matrix") != metadata or summary.get("chalk_experiment_matrix") != metadata:
         return False, "capture_matrix_metadata_mismatch", None
-    if capture.get("stroke_count") != expected["expected_strokes"] or capture.get("expected_stroke_count") != expected["expected_strokes"]:
+    if capture.get("stroke_count") != expected_strokes or capture.get("expected_stroke_count") != expected_strokes:
         return False, "capture_stroke_count_mismatch", None
     if capture.get("brush_radius_status") != "single" or capture.get("chalk_status") != "exact":
         return False, "capture_radius_or_chalk_status_invalid", None
@@ -204,9 +215,9 @@ def _validate_manifest(document: dict[str, Any]) -> tuple[bool, str, dict[str, A
         return False, "capture_counter_validation_failed", None
     if any(capture.get(key, 0) != 0 for key in ("dropped_events", "monitor_dropped_events", "monitor_error_count")):
         return False, "capture_has_dropped_events_or_errors", None
-    if summary.get("brush_radius_status") != "single" or summary.get("observed_brush_radii") != [expected["requested_radius"]]:
+    if summary.get("brush_radius_status") != "single" or summary.get("observed_brush_radii") != [radius]:
         return False, "observed_radius_mismatch", None
-    if summary.get("stroke_count") != expected["expected_strokes"] or summary.get("point_delta_matches_chalk") is not True:
+    if summary.get("stroke_count") != expected_strokes or summary.get("point_delta_matches_chalk") is not True:
         return False, "summary_stroke_or_delta_mismatch", None
     if any(summary.get(key, 0) != 0 for key in ("dropped_events", "monitor_dropped_events", "monitor_error_count")):
         return False, "summary_has_dropped_events_or_errors", None
@@ -226,7 +237,7 @@ def _validate_manifest(document: dict[str, Any]) -> tuple[bool, str, dict[str, A
     execution = execution if isinstance(execution, dict) else {}
     if execution.get("status") != "completed":
         return False, "executor_not_completed", None
-    if execution.get("completed_strokes") != expected["expected_strokes"]:
+    if execution.get("completed_strokes") != expected_strokes:
         return False, "executor_stroke_count_mismatch", None
 
     run_id = capture.get("run_id") or summary.get("run_id")
@@ -237,13 +248,13 @@ def _validate_manifest(document: dict[str, Any]) -> tuple[bool, str, dict[str, A
     return True, "valid", {
         "experiment_id": experiment_id,
         "run_id": run_id,
-        "series_id": expected["series_id"],
-        "phase_id": expected["phase_id"],
-        "scenario_id": expected["scenario_id"],
-        "repeat_index": expected["repeat_index"],
-        "radius": expected["requested_radius"],
-        "geometry_signature": expected["geometry_signature"],
-        "expected_strokes": expected["expected_strokes"],
+        "series_id": series_id,
+        "phase_id": phase_id,
+        "scenario_id": scenario_id,
+        "repeat_index": repeat_index,
+        "radius": radius,
+        "geometry_signature": signature,
+        "expected_strokes": expected_strokes,
         "consumed_points": consumed,
         "pre_point_count": pre,
         "post_point_count": post,
