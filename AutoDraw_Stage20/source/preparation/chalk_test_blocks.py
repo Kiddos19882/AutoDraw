@@ -54,6 +54,51 @@ def _journal_locked(function):
     return wrapped
 
 
+
+def acquire_chalk_block_owner_lock(journal_path: str | Path):
+    """Acquire an exclusive lifetime lock for one active block UI session.
+
+    Returns an open lock handle, or None when another process owns the journal.
+    The caller must retain the handle until the block is completed, stopped, or
+    handed back to recovery UI.
+    """
+    path = Path(journal_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    lock_path = path.with_name(path.name + ".owner.lock")
+    lock_file = lock_path.open("a+b")
+    try:
+        if os.name == "nt":
+            import msvcrt
+            lock_file.seek(0, os.SEEK_END)
+            if lock_file.tell() == 0:
+                lock_file.write(b"\\0")
+                lock_file.flush()
+            lock_file.seek(0)
+            msvcrt.locking(lock_file.fileno(), msvcrt.LK_NBLCK, 1)
+        else:
+            import fcntl
+            fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        return lock_file
+    except (OSError, BlockingIOError):
+        lock_file.close()
+        return None
+
+
+def release_chalk_block_owner_lock(lock_file) -> None:
+    """Release a previously acquired block-session ownership lock."""
+    if lock_file is None or lock_file.closed:
+        return
+    try:
+        if os.name == "nt":
+            import msvcrt
+            lock_file.seek(0)
+            msvcrt.locking(lock_file.fileno(), msvcrt.LK_UNLCK, 1)
+        else:
+            import fcntl
+            fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
+    finally:
+        lock_file.close()
+
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="milliseconds")
 
