@@ -509,6 +509,8 @@ GitHub Actions для актуального HEAD `5771f52554c3356c54d451e0ab26e
 
 UI runner G1/G2 и recovery реализованы. Последний подтверждённый CI до дополнительного identity hardening: run [41266141717](https://github.com/Kiddos19882/AutoDraw/actions/runs/41266141717) для HEAD f8f2d1c6fe47b8d5e539be78951cea16296e16f6 — success по всем трём jobs, включая Windows portable build/startup smoke-test.
 
-После этого review обнаружил, что capture acceptance не сравнивал идентификаторы manifest с активной задачей block journal. Добавлена проверка block_id/task_id/experiment_id, series/phase/scenario/repeat, requested radius, expected stroke count, matrix order и executor config. Добавлены тесты на несовпадения и положительное совпадение. Эти новые коммиты требуют отдельного CI; до его успешного завершения live G1 не запускать.
+После этого review обнаружил, что capture acceptance не сравнивал идентификаторы manifest с активной задачей block journal. Добавлена проверка block_id/task_id/experiment_id, точного experiment_dir из активной попытки journal, series/phase/scenario/repeat, requested radius, expected stroke count, matrix order и executor config. Добавлен callback test на отказ preclear до запуска executor. Добавлены тесты на несовпадения и положительное совпадение. Эти новые коммиты требуют отдельного CI; до его успешного завершения live G1 не запускать.
 
 Live G1/G2 не запускались. Старые 12 G1 manifests не переписывались. data/ не очищалась. master не изменялся. Локальный запуск pytest в текущей среде недоступен.
+
+Последние изменения identity hardening: experiment_id и experiment_dir берутся из активной попытки, сохранённой в journal, а не только из UI state; manifest path сверяется с зарегистрированным каталогом. Добавлен тест preclear failure -> paused/failed без запуска executor. Последний CI для commit 95d3ab6c6f782340785ceaf4c534951c1f648c8b поставлен в очередь; результат ожидается.
