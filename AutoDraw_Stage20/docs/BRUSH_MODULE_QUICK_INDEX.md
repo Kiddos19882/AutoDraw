@@ -34,6 +34,8 @@
 | UI лаборатории кистей | `AutoDraw_Stage20/source/preparation/brush_behavior_test_ui.py` | Сценарии, создание логических DrawingPlan 460×240 и передача теста |
 | Обратная связь радиуса | `AutoDraw_Stage20/source/preparation/brush_radius_feedback.py` | Извлечение фактического радиуса из heartbeat Game Monitor и расчёт коррекции ползунка для Brush Test и Stage6 |
 | Метаданные и анализ геометрической матрицы CHALK | `AutoDraw_Stage20/source/preparation/chalk_experiment_matrix.py` | G1/G2 metadata, exact-capture validation, duplicate rejection и per-stroke pointDelta aggregation |
+| Планировщик автоматических блоков CHALK | `AutoDraw_Stage20/source/preparation/chalk_test_blocks.py` | Полный список задач G1/G2, три повтора, matrix order, долговечный журнал, fail-closed и recovery |
+| Архитектура пакетного запуска | [CHALK_TEST_BLOCKS_DESIGN.md](CHALK_TEST_BLOCKS_DESIGN.md) | Целевой UI lifecycle, критерии автоматического принятия и правила остановки блока |
 | Преобразование координат Brush Test | `AutoDraw_Stage20/source/preparation/brush_coordinate_transform.py` | Явное преобразование logical_board_pixels в screen-local ROI с сохранением transform в generation metadata |
 | Исполнитель мыши | `AutoDraw_Stage20/source/executor/drawing/mouse_executor.py` | MouseExecutor, ExecutorConfig, экранные координаты, движение мыши, отчёт исполнения |
 | UI исполнителя | `AutoDraw_Stage20/source/executor/stage6_execute_plan.py` | Загрузка плана, preview, проверка размеров, запуск рабочего потока и передача в MouseExecutor |
