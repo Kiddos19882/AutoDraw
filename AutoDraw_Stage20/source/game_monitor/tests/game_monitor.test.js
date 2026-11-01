@@ -213,6 +213,26 @@ test("resource snapshots expose the actual current brush radius", () => {
   monitor.stop();
 });
 
+test("event buffer overflow does not stop subscriber delivery", () => {
+  const { monitor } = createMonitor();
+  const { board } = createBoard();
+  monitor.start();
+  let delivered = 0;
+  monitor.subscribe(() => { delivered += 1; });
+  monitor.attach(board);
+
+  for (let index = 0; index < 30000; index += 1) {
+    board.setRadius((index % 30) + 1);
+  }
+
+  const status = monitor.status();
+  assert.equal(status.eventCount, 50000);
+  assert.equal(status.droppedEvents, delivered + 1 - status.eventCount);
+  assert.equal(delivered, 60001);
+  assert.equal(status.errors, 0);
+  monitor.stop();
+});
+
 
 test("stop restores every own BoardPane method descriptor exactly", () => {
   const { monitor, timers } = createMonitor();
