@@ -187,3 +187,9 @@ BrushBehaviorTestTab предоставляет три операции для �
 - copy_game_monitor_bridge_snippet() копирует токенизированный snippet, созданный активным bridge server.
 
 Bridge server получает временный путь через --snippet-file и удаляет его после остановки. Для копирования snippet сервер должен быть запущен, а файл — уже создан.
+
+### 4.3.1. G3 CHALK executor parameter matrix
+
+Автоматический CHALK block runner поддерживает G3 только после принятого G2. Каждая задача передаёт `executor_parameters` в `chalk_experiment_matrix` metadata и сохраняет их в runtime plan. Интеграционный слой читает runtime plan при подтверждении кисти, проверяет фиксированный G3 protocol и передаёт полный набор параметров в `Stage6App.start_execution_from_workflow(executor_config_override=...)`.
+
+Stage6 валидирует override через `ExecutorConfig`, применяет его к текущему запуску и не сохраняет временные значения в пользовательский профиль. Фактическая конфигурация попадает в execution report и сверяется analyzer с metadata.
