@@ -302,3 +302,4 @@ def test_paused_block_cannot_be_closed_without_board_check(tmp_path):
         stop_chalk_test_block(path)
     stopped = stop_chalk_test_block(path, board_checked=True)
     assert stopped["status"] == "stopped"
+    assert stopped["recovery_decisions"][-1]["board_checked"] is True
