@@ -6,12 +6,11 @@ on:
       - feature/image-geometry-optimization
     paths:
       - ".github/workflows/geometry-tests.yml"
-      - "AutoDraw_Stage20/source/preparation/**"
-      - "AutoDraw_Stage20/source/executor/**"
-      - "AutoDraw_Stage20/source/game_monitor/**"
+      - "AutoDraw_Stage20/source/**"
       - "AutoDraw_Stage20/integrated_app.py"
       - "AutoDraw_Stage20/tests/**"
-      - "AutoDraw_Stage20/data/calibration/**"
+      - "AutoDraw_Stage20/data/**"
+      - "AutoDraw_Stage20/*.py"
       - "AutoDraw_Stage20/BROWSER_POINT_CALIBRATION.md"
       - "AutoDraw_Stage20/build_windows.bat"
       - "AutoDraw_Stage20/build_windows.py"
@@ -159,7 +158,7 @@ jobs:
           cache-dependency-path: |
             AutoDraw_Stage20/requirements-build.txt
             AutoDraw_Stage20/requirements-runtime.txt
-      - name: Build portable application and run its full build test suite
+      - name: Build portable application after all regression suites pass
         shell: cmd
         env:
           AUTODRAW_NO_PAUSE: "1"
