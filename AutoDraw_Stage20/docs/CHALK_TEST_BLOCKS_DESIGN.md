@@ -253,7 +253,7 @@ Live G3 остаётся закрытым до прохождения regression
 
 **Границы CI:** workflow подтверждает тесты и сборку/старт portable-приложения на runner GitHub. Он не подключается к пользовательской игровой сессии, не выполняет 27 live опытов и не измеряет CHALK. Поэтому software gate закрыт, но local Windows preflight и live G3 остаются обязательными.
 
-## 2026-11-02 — G3 scenario routing regression
+## 2026-11-01 — G3 scenario routing regression
 
 При первом live-старте G3 две попытки первой задачи `paint_consumption_long_lines-s2-d20-r3` были выполнены фактически с настройками 2/10 и отклонены acceptance gate из-за отсутствующей block/matrix identity. Причина: один scenario ID использовался и legacy radius matrix, и geometry matrix; первая ветка UI перехватывала G3 task. Исправлено условие выбора legacy-ветки: она применима только при отсутствии активной block task. Для G3 block task теперь выполняется geometry-matrix path, который создаёт `chalk_experiment_matrix` и `chalk_test_block`; Stage6 получает параметры задачи через существующий временный executor override.
 
