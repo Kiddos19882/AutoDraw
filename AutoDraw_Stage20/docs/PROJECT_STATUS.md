@@ -514,3 +514,12 @@ UI runner G1/G2 и recovery реализованы. Последний подт�
 Live G1/G2 не запускались. Старые 12 G1 manifests не переписывались. data/ не очищалась. master не изменялся. Локальный запуск pytest в текущей среде недоступен.
 
 Последние изменения identity hardening: experiment_id и experiment_dir берутся из активной попытки, сохранённой в journal, а не только из UI state; manifest path сверяется с зарегистрированным каталогом. Добавлен тест preclear failure -> paused/failed без запуска executor. Последний CI для commit 95d3ab6c6f782340785ceaf4c534951c1f648c8b поставлен в очередь; результат ожидается.
+
+
+## 11. Проверка CI и исправление тестовой подмены (2026-11-01)
+
+Для task-identity/path acceptance hardening проверены runs [41267183785](https://github.com/Kiddos19882/AutoDraw/actions/runs/41267183785) и [41267241966](https://github.com/Kiddos19882/AutoDraw/actions/runs/41267241966). Оба подтвердили `executor-tests` success, но `geometry-tests` завершился с 1 failed / 574 passed; Windows portable build остановился на той же ошибке до startup smoke-test.
+
+Падение было в callback test stub: lambda для `validate_chalk_block_experiment` не принимала новые keyword identity параметры. Исправлено в commit [20704ab984b981a4bf5b2278eba6cfad970d15a5](https://github.com/Kiddos19882/AutoDraw/commit/20704ab984b981a4bf5b2278eba6cfad970d15a5): stub принимает `**_kwargs`, а проверка incomplete evidence сохранена.
+
+**Текущий gate:** повторный CI для исправленного commit ещё не подтверждён. Live G1 не запускался. Не изменялись `data/`, первичные manifests и `master`.
