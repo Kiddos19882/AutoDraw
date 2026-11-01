@@ -1294,3 +1294,23 @@ Run JSON дополнен `stroke_count`, суммой `sampled_point_delta_tota
 **Результат:** массовое удаление старых экспериментальных каталогов и снимков не обосновано. Условно безопасные кандидаты — только неактивная runtime-копия `data/runtime/current_brush_behavior_test.json`, временный токенизированный snippet после остановки collector и фактически пустые placeholder-файлы после проверки ссылок.
 
 **Ограничения:** фактический объём локального диска, untracked-файлы и все локальные SHA-256 не измерялись; физическое удаление не выполнялось. Первичные результаты и код не менялись.
+
+
+## 2026-11-01 — проверка live G1 CHALK geometry matrix
+
+**Первичные данные:** commit [b75fe367073c22e818227b1d07ef4abe63a654fb](https://github.com/Kiddos19882/AutoDraw/commit/b75fe367073c22e818227b1d07ef4abe63a654fb). В commit добавлены 12 experiment-каталогов, brush plans, execution reports, Game Monitor run JSON/session и исходные изображения.
+
+**Проверки всех 12 experiment manifests и monitor reports:**
+- точный положительный CHALK, baseline `pointCount=1`, согласованный post counter;
+- радиус 10 и ожидаемое количество штрихов;
+- уникальные experiment ID и Game Monitor run ID;
+- нулевые dropped events и monitor errors;
+- сумма `DRAW_SAMPLE.pointDelta` по уникальным `strokeId` равна exact CHALK; число strokeId соответствует ожидаемому числу штрихов.
+
+**Измерения:** horizontal 122/124/120 (mean 122,00); vertical 60/61/61 (60,67); diagonal 75/76/76 (75,67); short strokes 19/18/17 (18,00). Средние per-stroke CHALK и первичные суммы по каждому запуску записаны в `docs/CHALK_GEOMETRY_MATRIX_G1_RESULTS.md`.
+
+**Найденная проблема metadata:** все 12 manifests имеют `repeat_index=1`, хотя физически представлены три запуска каждого сценария. Поле `matrix_order_index`, указанное в требованиях плана, отсутствует. Строгая проверка duplicate repeat cell не позволяет принять complete groups. Первичные manifests и reports не изменялись; автоматическая перенумерация не выполнялась.
+
+**Документация:** добавлен `docs/CHALK_GEOMETRY_MATRIX_G1_RESULTS.md`; обновлены `CHALK_GEOMETRY_MATRIX_PLAN.md`, `docs/PROJECT_STATUS.md` и индекс `docs/README.md`.
+
+**Статус / следующий шаг:** individual captures и per-stroke breakdown подтверждены, но G1 не закрыта до разрешения metadata blocker и повторной проверки analyzer. G2/G3 остаются закрытыми. Никакие экспериментальные данные не удалялись.
