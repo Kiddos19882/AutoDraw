@@ -81,6 +81,7 @@ def build_chalk_experiment_matrix_metadata(
         "requested_radius": requested_radius,
         "expected_strokes": EXPECTED_STROKES[scenario_id],
         "geometry_signature": geometry_signature,
+        "planned_strokes": json.loads(canonical_geometry),
     }
 
 
@@ -161,34 +162,26 @@ def _validate_manifest(document: dict[str, Any]) -> tuple[bool, str, dict[str, A
     if not isinstance(metadata, dict):
         return False, "matrix_metadata_missing", None
     try:
-        series_id = _normalize_series_id(metadata.get("series_id"))
-    except ValueError as exc:
+        expected = build_chalk_experiment_matrix_metadata(
+            series_id=metadata.get("series_id"),
+            scenario_id=metadata.get("scenario_id"),
+            repeat_index=metadata.get("repeat_index"),
+            requested_radius=metadata.get("requested_radius"),
+            strokes=metadata.get("planned_strokes"),
+        )
+    except (TypeError, ValueError, OverflowError) as exc:
         return False, f"invalid_matrix_metadata:{exc}", None
-    scenario_id = metadata.get("scenario_id")
-    phase_id = next(
-        (phase for phase, scenarios in PHASE_SCENARIOS.items() if scenario_id in scenarios),
-        None,
-    )
-    if phase_id is None:
-        return False, "unknown_scenario", None
-    repeat_index = metadata.get("repeat_index")
-    radius = metadata.get("requested_radius")
-    if isinstance(repeat_index, bool) or repeat_index not in (1, 2, 3):
-        return False, "invalid_repeat_index", None
-    if isinstance(radius, bool) or not isinstance(radius, int) or not 1 <= radius <= 30:
-        return False, "invalid_requested_radius", None
-    signature = metadata.get("geometry_signature")
-    if not isinstance(signature, str) or len(signature) != 64 or any(char not in "0123456789abcdef" for char in signature):
-        return False, "invalid_geometry_signature", None
-    expected_strokes = EXPECTED_STROKES[scenario_id]
-    if (
-        metadata.get("schema_version") != 1
-        or metadata.get("series_id") != series_id
-        or metadata.get("phase_id") != phase_id
-        or metadata.get("planned_repeats") != 3
-        or metadata.get("expected_strokes") != expected_strokes
-    ):
-        return False, "matrix_metadata_mismatch", None
+    for key in ("schema_version", "series_id", "phase_id", "scenario_id", "repeat_index",
+                "planned_repeats", "requested_radius", "expected_strokes", "geometry_signature",
+                "planned_strokes"):
+        if metadata.get(key) != expected.get(key):
+            return False, f"matrix_metadata_mismatch:{key}", None
+    series_id = expected["series_id"]
+    phase_id = expected["phase_id"]
+    scenario_id = expected["scenario_id"]
+    repeat_index = expected["repeat_index"]
+    radius = expected["requested_radius"]
+    expected_strokes = expected["expected_strokes"]
     if document.get("test_case") != scenario_id:
         return False, "scenario_mismatch", None
     if document.get("brush_value_requested") != radius:
