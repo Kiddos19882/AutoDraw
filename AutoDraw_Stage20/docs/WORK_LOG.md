@@ -1707,3 +1707,14 @@ Regression test в `source/preparation/tests/test_brush_behavior_test_ui.py` т�
 - Диагностика Tk CI выявила, что UI tests использовали реальный DATA_PATHS, в котором могут лежать paused G3 journals; это создавало риск recovery warning/dialog внутри тестового процесса. В UnifiedAppCoreTests.setUp/tearDown добавлена временная изоляция data root и восстановление environment.
 - Deferred _scan_chalk_block_recovery callback получил сохраняемый after ID и отменяется при уничтожении owner frame. Добавлен regression test на cancel callback.
 - UI root test запускается из прежней проверенной рабочей директории Preparation с 3-minute timeout; build/import и geometry root suites отделены в самостоятельные pytest groups. Для integration job задан общий 12-minute timeout.
+
+## 2026-11-02 — анализ частичной серии G3 из commit 094381f
+
+- Прочитан block journal и все 22 experiment manifests серии `chalk-20261102-015749-7c1141`.
+- Подтверждено 21 completed, 1 failed, 5 pending из 27 задач; block status `stopped`, gate reason `monitor_capture_gate_timeout:partial`.
+- Сверены task metadata и фактические executor config: `point_step_px` / `point_delay_ms` совпадают во всех 22 попытках.
+- Все 22 executor reports завершили 6/6 strokes; фактический радиус — 10; CHALK counter exact и согласован с sampled pointDelta.
+- Один capture `s4-d10-r2` partial: 434 `monitor_dropped_events`; его CHALK=363 сохранён как диагностическое значение, но не считается полноценным повтором.
+- 21 capture имеют полный Monitor status saved. Во всех trajectory summaries — `incomplete_until_verified`; точная траектория не восстановлена.
+- Сводная таблица и осторожная интерпретация влияния шага/задержки записаны в `docs/CHALK_G3_PARTIAL_RESULTS_2026-11-02.md`.
+- Предварительный вывод: delay=20 ms заметно увеличивает CHALK против 5/10 ms; уменьшение шага также увеличивает CHALK. Универсальная модель не выводится до завершения матрицы и отдельного контроля радиуса.
