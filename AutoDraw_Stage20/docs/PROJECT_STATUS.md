@@ -535,3 +535,6 @@ Live G1/G2 не запускались. Старые 12 G1 manifests не пер
 
 
 Дополнительная защита journal validator: поля phase_id и block/task/attempt status сначала проверяются на строковый тип, затем на допустимое значение. Это исключает TypeError на unhashable JSON values (list/dict) и сохраняет fail-closed recovery path. Добавлены негативные тесты. Commits: `732128bfa62160ce6811e3925f371ab87f5f08d0`, `ff3e675fb09a5b05cceba75892469b87ba526fef`. CI для финального SHA ожидается.
+
+
+CI выявил SyntaxError в journal validator после последнего hardening: literal `\\n` попал в Python source вместо newline. Исправлено в commit `dd5aaade3b790546d9e3fc11341554f6aa09d8ec`. Это regression внесённого изменения; требуется повторный полный CI для исправленного SHA. Не считать блок runner готовым к live G1 до success всех трёх jobs.
