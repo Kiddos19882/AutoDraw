@@ -170,8 +170,8 @@ CI/software gate закрыт. Live gate остаётся открытым, по
 - [ ] После G3 сформировать сводную модель с ограничениями и проверить её на независимых контрольных рисунках.
 
 
-- [ ] Подготовить G3 в коде до live-запуска: добавить девять parameter cells (`point_step_px` 1/2/4 × `point_delay_ms` 5/10/20), три повтора на каждую, metadata/duplicate protection, journal validation, UI и analyzer support.
-- [ ] Добавить regression tests для G3 identity, deterministic randomized order, recovery и exact CHALK gate; подтвердить полный CI и Windows portable startup smoke-test.
+- [x] Подготовить G3 в коде: девять parameter cells (`point_step_px` 1/2/4 × `point_delay_ms` 5/10/20), три повтора на каждую, metadata/duplicate protection, journal validation, UI и analyzer support.
+- [x] Добавить regression tests для G3 identity, deterministic randomized order, recovery и exact CHALK gate. Полный CI и Windows portable startup smoke-test остаются отдельным gate.
 
 ## G3 — программная реализация и live gate
 
