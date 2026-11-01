@@ -295,7 +295,7 @@ def summarize_chalk_experiment_matrix(
     accepted, rejected = [], []
     for document, valid, reason, record in evaluated:
         if valid and record:
-            key = (record["series_id"], record["phase_id"], record["scenario_id"], record["repeat_index"])
+            key = (record["series_id"], record["phase_id"], record["scenario_id"], record["radius"], record["repeat_index"])
             if run_counts[record["run_id"]] > 1:
                 valid, reason = False, "duplicate_monitor_run"
             elif cell_counts[key] > 1:
