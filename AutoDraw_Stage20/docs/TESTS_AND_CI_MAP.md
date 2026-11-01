@@ -26,7 +26,7 @@
 | `source/preparation/tests/test_geometry_color_plan.py` | `geometry_color_plan`, `geometry_budget_optimizer`, `layer_segmentation`, `skeletonization`, `stroke_simplification`, `stroke_order_optimizer` | Scanline/contour/skeleton, фильтрация компонентов, маршрутизация, multi-board, бюджет, валидаторы, качество и round-trip |
 | `source/preparation/tests/test_chalk_radius_matrix.py` | `chalk_radius_matrix` | Валидация радиусов/блоков, уникальность Game Monitor run, experiment identity, точность CHALK и статистика повторов |
 | `source/preparation/tests/test_chalk_experiment_matrix.py` | `chalk_experiment_matrix` | G1/G2 metadata, exact capture, уникальность repeat cells, per-stroke pointDelta и статистика |
-| `source/preparation/tests/test_chalk_test_blocks.py` | `chalk_test_blocks` | Полные планы G1/G2 (12/18 задач), три повтора, детерминированный порядок, журнал, последовательный claim, fail-closed и interrupted recovery |
+| `source/preparation/tests/test_chalk_test_blocks.py` | `chalk_test_blocks` | Полные планы G1/G2/G3 (12/18/27 задач), три повтора, детерминированный порядок, журнал, последовательный claim, fail-closed и interrupted recovery |
 
 Дополнительные импорты в `test_geometry_color_plan.py` подтверждают, что тест напрямую обращается к внутренним функциям и модулям-реализациям, а не только к публичному API. При изменении внутренних контрактов этот тестовый файл следует рассматривать как интеграционный тест нескольких алгоритмических компонентов.
 
@@ -106,7 +106,7 @@
 11. Полный pytest-набор `source/preparation/tests/`.
 12. Проверка правил валидатора Stage 7.
 13. Диагностика разрешения импортов.
-14. UI-регрессии `tests/test_unified_app.py`.
+14. UI-регрессии `tests/test_unified_app.py`, включая передачу G3 task-specific executor parameters из matrix metadata в Stage6.
 
 ### 4.2. Job: executor-tests
 
@@ -122,7 +122,7 @@
 
 Рабочая директория: `AutoDraw_Stage20`.
 
-Запускает `build_windows.bat` с `AUTODRAW_NO_PAUSE=1`. Это отдельная проверка portable-сборки и startup smoke test; она не заменяет pytest/unittest и не является тестом качества рисунка в игре.
+Запускает `build_windows.bat` с `AUTODRAW_NO_PAUSE=1`. После успешной сборки и smoke test публикует `release/AutoDrawPortable/` как artifact `autodraw-g3-preflight-build` (срок хранения 7 дней), предназначенный для локального Windows preflight G3. Это отдельная проверка portable-сборки и startup smoke test; она не заменяет pytest/unittest и не является тестом качества рисунка в игре.
 
 ## 5. Диагностики и benchmark-скрипты
 
@@ -150,6 +150,7 @@
 ## 6. Пути, артефакты и изоляция
 
 - Benchmark output направляется в `AutoDraw_Stage20/benchmark-results/`; workflow публикует его через upload-artifact.
+- Portable-сборка публикуется отдельным artifact `autodraw-g3-preflight-build` только после успешного startup smoke test; она предназначена для локального preflight и не содержит live G3 captures.
 - WebSocket smoke test запускается отдельно от общего preparation pytest.
 - Preparation и executor используют общий PYTHONPATH в отдельных шагах, но executor job дополнительно добавляет `source/executor/tests`.
 - Для benchmark используются фиксированные параметры доски/изображения и palette profile. Изменение fixture или профиля может менять результаты benchmark, даже если тестируемый алгоритм не менялся.
