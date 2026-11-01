@@ -593,47 +593,7 @@ def test_brush_drag_completion_releases_mouse_and_does_not_claim_verified_value(
 
 
 
-def test_automatic_brush_setup_requires_visual_confirmation_before_executor(monkeypatch):
-    class Value:
-        def __init__(self, value=""):
-            self.value = value
-        def set(self, value):
-            self.value = value
-
-    class Root:
-        def __init__(self):
-            self.restored = False
-            self.scheduled = []
-        def deiconify(self):
-            self.restored = True
-        def lift(self):
-            pass
-        def after(self, delay, callback):
-            self.scheduled.append((delay, callback))
-            return "scheduled"
-
-    tab = _make_test_tab()
-    tab.root = Root()
-    tab.status_var = Value()
-    tab._start_executor_after_brush_drag = True
-    tab.on_brush_ready = lambda brush: tab.status_var.set(f"executor:{brush}")
-    tab._brush_feedback_state = {
-        "requested_radius": 10, "start_30": (100, 500), "end_1": (390, 500),
-        "current_point": (300, 500), "attempt": 0, "observations": [],
-    }
-    monkeypatch.setattr(brush_ui.messagebox, "askyesno", lambda *args, **kwargs: False)
-
-    tab._complete_brush_radius_feedback({
-        "radius": 10, "session_id": "session", "observed_at_utc": "2026-10-31T00:00:00+00:00"
-    })
-
-    assert tab.root.restored is True
-    assert tab.experiment_phases["brush_setup"]["status"] == "declined_by_user"
-    assert tab._start_executor_after_brush_drag is False
-    assert tab.root.scheduled == []
-
-
-def test_automatic_brush_setup_starts_executor_only_after_exact_monitor_match(monkeypatch):
+def test_automatic_brush_setup_starts_executor_without_visual_confirmation(monkeypatch):
     class Value:
         def __init__(self, value=""):
             self.value = value
@@ -662,19 +622,42 @@ def test_automatic_brush_setup_starts_executor_only_after_exact_monitor_match(mo
         "requested_radius": 10, "start_30": (100, 500), "end_1": (390, 500),
         "current_point": (300, 500), "attempt": 0, "observations": [],
     }
-    monkeypatch.setattr(brush_ui.messagebox, "askyesno", lambda *args, **kwargs: True)
+    monkeypatch.setattr(
+        brush_ui.messagebox, "askyesno",
+        lambda *args, **kwargs: pytest.fail("Visual brush confirmation must not be shown"),
+    )
 
     tab._complete_brush_radius_feedback({
         "radius": 10, "session_id": "session", "observed_at_utc": "2026-10-31T00:00:00+00:00"
     })
 
-    assert tab.experiment_phases["brush_setup"]["status"] == "confirmed_by_user"
-    assert tab.experiment_phases["brush_setup"]["confirmation_method"] == "game_monitor_exact_radius_plus_user_visual_check"
+    phase = tab.experiment_phases["brush_setup"]
+    assert tab.root.restored is True
+    assert phase["status"] == "verified_by_game_monitor"
+    assert phase["verification_source"] == "active_game_monitor_bridge_heartbeat"
+    assert phase["visual_confirmation_required"] is False
     assert len(tab.root.scheduled) == 1
     delay, callback = tab.root.scheduled[0]
     assert delay == 0
     callback()
     assert started == [10]
+
+
+def test_brush_handoff_rejects_radius_mismatch_without_visual_confirmation(monkeypatch):
+    tab = _make_test_tab()
+    tab.status_var = type("Value", (), {"set": lambda self, value: setattr(self, "value", value)})()
+    tab._brush_feedback_state = {"requested_radius": 10, "observations": []}
+    failures = []
+    tab._fail_brush_radius_feedback = lambda reason, detail: failures.append((reason, detail))
+    monkeypatch.setattr(
+        brush_ui.messagebox, "askyesno",
+        lambda *args, **kwargs: pytest.fail("Visual brush confirmation must not be shown"),
+    )
+
+    tab._confirm_brush_before_test(10, {"target": (300, 500)}, {"radius": 9})
+
+    assert failures
+    assert failures[0][0] == "monitor_radius_mismatch_at_handoff"
 
 
 def test_game_monitor_radius_mismatch_schedules_automatic_correction(monkeypatch):
