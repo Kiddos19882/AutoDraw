@@ -169,4 +169,4 @@ def test_geometry_matrix_rejects_changed_geometry_signature(tmp_path):
     doc["game_monitor_summary"]["chalk_experiment_matrix"] = doc["chalk_experiment_matrix"]
     result = summarize_chalk_experiment_matrix([doc])
     assert result["valid_measurement_count"] == 0
-    assert result["rejected"][0]["reason"] == "invalid_matrix_metadata:Геометрия плана должна быть сериализуемым списком штрихов." or result["rejected"][0]["reason"].startswith("invalid_matrix_metadata:")
+    assert result["rejected"][0]["reason"] == "matrix_metadata_mismatch:geometry_signature"
