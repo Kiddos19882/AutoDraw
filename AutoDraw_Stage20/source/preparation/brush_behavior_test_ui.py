@@ -1311,6 +1311,9 @@ class BrushBehaviorTestTab:
             self._update_chalk_block_progress()
             if journal.get("status") == "completed":
                 self.status_var.set(f"Блок {journal.get('phase_id')} завершён: все опыты приняты.")
+                self.matrix_series_var.set(
+                    f"chalk-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:6]}"
+                )
                 self._chalk_block_recovery_journal_path = None
                 self._clear_chalk_block_runtime()
             else:
