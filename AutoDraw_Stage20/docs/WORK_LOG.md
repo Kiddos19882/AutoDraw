@@ -1607,3 +1607,23 @@ G1 принят по второму блоку. G2 теперь разблоки
 Ручной запуск `paint_consumption_long_lines` вне полного G3 block запрещён. Runtime handoff проверяет сценарий, радиус 10, шесть штрихов, полный набор executor-параметров и допустимые значения 1/2/4 × 5/10/20.
 
 Актуальный кодовый HEAD: `5a63fcbcbd86a441499567a2572d8c967d845371`. G3 software implementation и regression coverage внесены. Полный CI/Windows portable smoke-test не удалось подтвердить через доступные результаты GitHub Actions; live G3 не запускался.
+
+
+## 2026-11-01 — G3 software gate закрыт
+
+**Проверенный HEAD:** `e1872af08efbff7ee7c9ac771e6b9eb70b748c46`  
+**GitHub Actions run:** [41337768801](https://github.com/Kiddos19882/AutoDraw/actions/runs/41337768801) — `completed / success`.
+
+Успешно завершены все три обязательных jobs:
+- `geometry-tests` — success; включая syntax checks Game Monitor, WebSocket smoke server, preparation/geometry tests и unified-app UI regressions.
+- `executor-tests` — success; executor regression tests.
+- `Windows portable build and startup smoke-test` — success; portable build и smoke-test запуска.
+
+В процессе подготовки CI были найдены и исправлены три дефекта:
+1. Лишняя закрывающая фигурная скобка в `source/preparation/chalk_experiment_matrix.py` — commit `bf52f12ece873908f256f12f475faef6e31465ea`.
+2. Тесты executor override в `tests/test_unified_app.py` находились вне unittest-класса, а `unittest.main()` стоял до них — commit `6594e28c96a70b421d96e3e90434ac3104d6a196`.
+3. Docstring в `source/preparation/chalk_experiment_matrix.py` закрывался двумя кавычками вместо трёх — commit `e1872af08efbff7ee7c9ac771e6b9eb70b748c46`.
+
+**Статус:** G3 software gate закрыт. Успешная автоматическая Windows portable smoke-проверка не заменяет локальный preflight на пользовательской машине и не является live CHALK измерением. Live G3 ещё не запускался; фактические расходы краски по девяти конфигурациям отсутствуют и не должны моделироваться предположениями.
+
+**Следующий шаг:** локально запустить проверенную portable-сборку на Windows, проверить калибровку кисти, Clear/чистую доску, игровую canvas и heartbeat Game Monitor. После подтверждения preflight выполнить полный G3 block из 27 задач; не запускать задачи вручную по отдельности.
