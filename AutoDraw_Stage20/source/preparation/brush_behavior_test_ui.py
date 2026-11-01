@@ -38,7 +38,8 @@ from chalk_test_blocks import (
     claim_next_chalk_block_task, finish_chalk_block_task,
     load_chalk_test_block_journal, chalk_test_block_progress,
     validate_chalk_block_experiment, stop_chalk_test_block as stop_chalk_test_block_journal,
-    record_chalk_block_task_experiment,
+    record_chalk_block_task_experiment, mark_interrupted_chalk_block_task,
+    resolve_interrupted_chalk_block_task,
 )
 from brush_experiment_capture import (
     compare_images, crop_calibrated_regions,
@@ -606,6 +607,7 @@ class BrushBehaviorTestTab:
         self.chalk_block_phase_var = tk.StringVar(value="G1")
         self.chalk_block_progress_var = tk.StringVar(value="Блок CHALK не запущен.")
         self._chalk_block_journal_path: Path | None = None
+        self._chalk_block_recovery_journal_path: Path | None = None
         self._chalk_block_task: dict[str, Any] | None = None
         self._chalk_block_stop_requested = False
         self._chalk_block_capture_poll_id: str | None = None
@@ -625,6 +627,7 @@ class BrushBehaviorTestTab:
         self.status_var = tk.StringVar(value="Выбери радиус и тест. Автоустановка 1–30 работает только с расширенным ползунком игры.")
         self._build(parent)
         self._load_brush_control_into_fields()
+        self.root.after(0, self._scan_chalk_block_recovery)
 
     def _build(self, parent: tk.Widget) -> None:
         outer = ttk.Frame(parent, padding=10)
@@ -704,6 +707,8 @@ class BrushBehaviorTestTab:
         ).pack(side="left", padx=(6, 10))
         ttk.Button(block_controls, text="Запустить полный блок", command=self.start_chalk_test_block).pack(side="left")
         ttk.Button(block_controls, text="Остановить после текущего опыта", command=self.request_stop_chalk_test_block).pack(side="left", padx=6)
+        ttk.Button(block_controls, text="Восстановить прерванный блок", command=self.resume_interrupted_chalk_test_block).pack(side="left", padx=6)
+        ttk.Button(block_controls, text="Закрыть приостановленный блок", command=self.close_paused_chalk_test_block).pack(side="left", padx=6)
         ttk.Label(block_controls, textvariable=self.chalk_block_progress_var, wraplength=650).pack(side="left", padx=10)
 
         details = ttk.LabelFrame(outer, text="Шаблон и фиксация результата", padding=8)
@@ -960,6 +965,120 @@ class BrushBehaviorTestTab:
                     return True
         return False
 
+    def _scan_chalk_block_recovery(self) -> None:
+        root = self.output_dir / "chalk_test_blocks"
+        if not root.is_dir():
+            return
+        unresolved: list[Path] = []
+        interrupted_details = None
+        for journal_path in sorted(root.glob("*.json")):
+            try:
+                journal = load_chalk_test_block_journal(journal_path)
+            except (OSError, ValueError, json.JSONDecodeError):
+                unresolved.append(journal_path)
+                continue
+            if journal.get("status") == "running":
+                try:
+                    task = mark_interrupted_chalk_block_task(journal_path)
+                    journal = load_chalk_test_block_journal(journal_path)
+                    attempt = task.get("attempts", [])[-1] if task.get("attempts") else {}
+                    interrupted_details = (
+                        journal_path,
+                        task.get("task_id"),
+                        attempt.get("experiment_id"),
+                        attempt.get("experiment_dir"),
+                    )
+                except (OSError, ValueError, RuntimeError):
+                    unresolved.append(journal_path)
+                    continue
+            if journal.get("status") == "paused":
+                unresolved.append(journal_path)
+        if unresolved:
+            self._chalk_block_recovery_journal_path = unresolved[0]
+        if interrupted_details:
+            path, task_id, experiment_id, experiment_dir = interrupted_details
+            messagebox.showwarning(
+                "Обнаружен прерванный блок CHALK",
+                f"Задача: {task_id}\nExperiment ID: {experiment_id or 'не зарегистрирован'}\n"
+                f"Каталог: {experiment_dir or 'не создан'}\nЖурнал: {path}\n\n"
+                "Автоматического повторного рисования не будет. Сначала вручную проверь игровую доску. "
+                "После проверки можно явно разрешить новую попытку или закрыть блок.",
+                parent=self.root,
+            )
+
+    def resume_interrupted_chalk_test_block(self) -> None:
+        path = self._chalk_block_recovery_journal_path
+        if path is None:
+            self._scan_chalk_block_recovery()
+            path = self._chalk_block_recovery_journal_path
+        if path is None:
+            messagebox.showinfo("Нет прерванного блока", "Журналов, требующих восстановления, не найдено.", parent=self.root)
+            return
+        try:
+            journal = load_chalk_test_block_journal(path)
+        except (OSError, ValueError) as exc:
+            messagebox.showerror("Не удалось прочитать журнал", str(exc), parent=self.root)
+            return
+        interrupted = [
+            task for task in journal.get("tasks", [])
+            if task.get("status") == "interrupted"
+        ]
+        if len(interrupted) != 1:
+            messagebox.showwarning(
+                "Повтор не разрешён",
+                "В журнале нет ровно одной interrupted-задачи. Failed-задачи нельзя автоматически повторять; закрой блок после проверки доски.",
+                parent=self.root,
+            )
+            return
+        task = interrupted[0]
+        attempt = task.get("attempts", [])[-1] if task.get("attempts") else {}
+        if not messagebox.askyesno(
+            "Подтвердить проверку доски и повтор",
+            f"Прерванная задача: {task['task_id']}\nКаталог частичного опыта: {attempt.get('experiment_dir') or 'не создан'}\n\n"
+            "Ты вручную проверил состояние игровой доски и подтверждаешь, что AutoDraw может очистить её "
+            "по эталону и выполнить эту задачу заново отдельной попыткой?",
+            icon="warning",
+            parent=self.root,
+        ):
+            return
+        try:
+            resolve_interrupted_chalk_block_task(
+                path, task["task_id"], board_checked=True, decision="retry"
+            )
+        except (OSError, ValueError, RuntimeError) as exc:
+            messagebox.showerror("Не удалось восстановить блок", str(exc), parent=self.root)
+            return
+        self._chalk_block_recovery_journal_path = None
+        self._chalk_block_journal_path = path
+        self._chalk_block_task = None
+        self._chalk_block_stop_requested = False
+        self._chalk_block_clear_confirmed = True
+        self._start_next_chalk_block_task()
+
+    def close_paused_chalk_test_block(self) -> None:
+        path = self._chalk_block_recovery_journal_path
+        if path is None:
+            messagebox.showinfo("Нет приостановленного блока", "Журналов для закрытия не найдено.", parent=self.root)
+            return
+        if not messagebox.askyesno(
+            "Закрыть приостановленный блок",
+            "После проверки игровой доски блок будет окончательно закрыт без продолжения оставшихся задач. "
+            "Все первичные попытки и журнал сохранятся. Продолжить?",
+            icon="warning",
+            parent=self.root,
+        ):
+            return
+        try:
+            journal = stop_chalk_test_block_journal(path)
+        except (OSError, ValueError, RuntimeError) as exc:
+            messagebox.showerror("Не удалось закрыть блок", str(exc), parent=self.root)
+            return
+        self._chalk_block_recovery_journal_path = None
+        self.chalk_block_progress_var.set(
+            f"{journal.get('phase_id')}: блок закрыт; первичные попытки сохранены."
+        )
+        self.status_var.set("Приостановленный блок закрыт. Его незавершённые задачи не будут запущены.")
+
     def _has_unresolved_chalk_block_journal(self) -> bool:
         root = self.output_dir / "chalk_test_blocks"
         if not root.is_dir():
@@ -1092,6 +1211,7 @@ class BrushBehaviorTestTab:
             except (OSError, ValueError, RuntimeError) as exc:
                 self.status_var.set(f"Не удалось остановить блок: {exc}")
             self._update_chalk_block_progress()
+            self._chalk_block_recovery_journal_path = None
             self._clear_chalk_block_runtime()
     
     def _clear_chalk_block_runtime(self) -> None:
@@ -1131,6 +1251,7 @@ class BrushBehaviorTestTab:
                 return
             self._update_chalk_block_progress()
             self.status_var.set("Блок остановлен на границе опыта.")
+            self._chalk_block_recovery_journal_path = None
             self._clear_chalk_block_runtime()
             return
         try:
@@ -1143,6 +1264,7 @@ class BrushBehaviorTestTab:
             self._update_chalk_block_progress()
             if journal.get("status") == "completed":
                 self.status_var.set(f"Блок {journal.get('phase_id')} завершён: все опыты приняты.")
+                self._chalk_block_recovery_journal_path = None
                 self._clear_chalk_block_runtime()
             else:
                 self._fail_chalk_test_block(f"block_not_complete:{journal.get('status')}")
@@ -1182,6 +1304,8 @@ class BrushBehaviorTestTab:
                 )
             except (OSError, ValueError, RuntimeError):
                 pass
+        if self._chalk_block_journal_path is not None:
+            self._chalk_block_recovery_journal_path = self._chalk_block_journal_path
         self.status_var.set(f"Блок CHALK приостановлен без пропуска теста: {reason}")
         self._update_chalk_block_progress()
         self._clear_chalk_block_runtime()
