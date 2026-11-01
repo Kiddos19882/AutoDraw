@@ -17,6 +17,8 @@ from chalk_test_blocks import (
     stop_chalk_test_block,
     record_chalk_block_task_experiment,
     resolve_interrupted_chalk_block_task,
+    acquire_chalk_block_owner_lock,
+    release_chalk_block_owner_lock,
 )
 
 
@@ -580,3 +582,16 @@ def test_journal_mutations_use_a_stable_cross_process_lock_file(tmp_path):
     assert path.with_name(path.name + ".lock").exists()
     mark_interrupted_chalk_block_task(path)
     assert load_chalk_test_block_journal(path)["status"] == "paused"
+
+
+
+def test_block_owner_lock_is_exclusive_until_released(tmp_path):
+    path = tmp_path / "block.json"
+    first = acquire_chalk_block_owner_lock(path)
+    assert first is not None
+    assert acquire_chalk_block_owner_lock(path) is None
+
+    release_chalk_block_owner_lock(first)
+    second = acquire_chalk_block_owner_lock(path)
+    assert second is not None
+    release_chalk_block_owner_lock(second)
