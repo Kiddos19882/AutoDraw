@@ -184,11 +184,15 @@ def _stroke_level_breakdown(
             totals[stroke_id] += delta
             sample_counts[stroke_id] += 1
 
-    if len(stroke_order) != expected_strokes:
+    consuming_stroke_order = [stroke_id for stroke_id in stroke_order if totals[stroke_id] > 0]
+    non_consuming_stroke_ids = [stroke_id for stroke_id in stroke_order if totals[stroke_id] == 0]
+    if len(consuming_stroke_order) != expected_strokes:
         return {
             "status": "incomplete",
             "reason": "stroke_id_count_mismatch",
-            "observed_stroke_ids": len(stroke_order),
+            "observed_stroke_ids": len(consuming_stroke_order),
+            "observed_stroke_candidates": len(stroke_order),
+            "non_consuming_stroke_ids": non_consuming_stroke_ids,
             "expected_strokes": expected_strokes,
             "strokes": [],
         }
@@ -203,6 +207,8 @@ def _stroke_level_breakdown(
     return {
         "status": "complete",
         "reason": None,
+        "observed_stroke_candidates": len(stroke_order),
+        "non_consuming_stroke_ids": non_consuming_stroke_ids,
         "strokes": [
             {
                 "stroke_index": index + 1,
@@ -210,7 +216,7 @@ def _stroke_level_breakdown(
                 "consumed_points": totals[stroke_id],
                 "draw_sample_events": sample_counts[stroke_id],
             }
-            for index, stroke_id in enumerate(stroke_order)
+            for index, stroke_id in enumerate(consuming_stroke_order)
         ],
     }
 
