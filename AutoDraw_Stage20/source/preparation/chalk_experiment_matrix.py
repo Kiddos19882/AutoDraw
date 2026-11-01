@@ -311,7 +311,7 @@ def _validate_manifest(document: dict[str, Any]) -> tuple[bool, str, dict[str, A
     if capture.get("chalk_counter_consistent") is not True or capture.get("point_delta_matches_chalk") is not True:
         return False, "capture_counter_validation_failed", None
     if any(capture.get(key, 0) != 0 for key in (
-        "dropped_events", "monitor_error_count", "bridge_send_failures_delta",
+        "dropped_events", "monitor_error_count_delta", "bridge_send_failures_delta",
         "collector_sequence_gap_count"
     )):
         return False, "capture_has_dropped_events_or_errors", None
@@ -320,7 +320,7 @@ def _validate_manifest(document: dict[str, Any]) -> tuple[bool, str, dict[str, A
     if summary.get("stroke_count") != expected_strokes or summary.get("point_delta_matches_chalk") is not True:
         return False, "summary_stroke_or_delta_mismatch", None
     if any(summary.get(key, 0) != 0 for key in (
-        "dropped_events", "monitor_error_count", "bridge_send_failures_delta",
+        "dropped_events", "monitor_error_count_delta", "bridge_send_failures_delta",
         "collector_sequence_gap_count"
     )):
         return False, "summary_has_dropped_events_or_errors", None
