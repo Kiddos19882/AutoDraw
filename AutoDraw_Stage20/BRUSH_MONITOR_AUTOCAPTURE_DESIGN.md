@@ -317,14 +317,16 @@ Run JSON дополнен автоматическими контрольным�
 - `sampled_point_delta_total` — сумма неотрицательных целочисленных `pointDelta` из `DRAW_SAMPLE`;
 - `point_delta_matches_chalk` — совпадает ли сумма sample deltas с exact pre/post CHALK delta, если все samples имеют валидный delta;
 - `observed_brush_radii` и `brush_radius_status` (`single`, `mixed`, `unavailable`) — проверка, что внутри одного run кисть не менялась;
-- `monitor_dropped_events`, `dropped_events`, `monitor_error_count` — потери и ошибки Monitor/collector.
+- `monitor_dropped_events` — legacy alias накопительного session-счётчика локального буфера; он не означает потерю событий текущего run;
+- `dropped_events` — переполнение event list конкретного RunRecorder;
+- `monitor_error_count_delta`, `bridge_send_failures_delta`, `collector_sequence_gap_count` — ошибки/потери, относящиеся к конкретному run.
 
-Brush Test UI выставляет `monitor_capture.status=saved` только если одновременно: execution completed, CHALK exact, один наблюдаемый радиус, сумма pointDelta совпала с CHALK, нет dropped events и нет ошибок Monitor. Во всех остальных случаях отчёт сохраняется, но статус остаётся `partial`; данные не отбрасываются и не маскируются как успешные.
+Brush Test UI выставляет `monitor_capture.status=saved` только если одновременно: execution completed, CHALK exact, один наблюдаемый радиус, сумма pointDelta совпала с CHALK, per-run dropped/error/transport counters равны нулю. Накопительный buffer overflow Monitor не блокирует run. Во всех остальных случаях отчёт сохраняется, но статус остаётся `partial`; данные не отбрасываются и не маскируются как успешные.
 
 
 ### Уточнение критерия capture=saved
 
-UI считает сбор полностью успешным только при положительном расходе CHALK и наличии хотя бы одного штриха/acceptedPoint, exact pre/post snapshots, совпадении суммы `pointDelta` с CHALK delta, одном наблюдаемом радиусе, измеренном FPS без visibility interruption, нулевых dropped events и нулевых Monitor errors. Отчёт с нулевым расходом, пустыми accepted points, недоступным FPS или прерванной видимостью всё равно сохраняется, но получает `partial`.
+UI считает сбор полностью успешным только при положительном расходе CHALK и наличии хотя бы одного штриха/acceptedPoint, exact pre/post snapshots, совпадении суммы `pointDelta` с CHALK delta, одном наблюдаемом радиусе, измеренном FPS без visibility interruption, нулевых per-run dropped events, нулевых `monitor_error_count_delta`, `bridge_send_failures_delta` и `collector_sequence_gap_count`. Накопительные session counters не подменяют per-run counters. Отчёт с нулевым расходом, пустыми accepted points, недоступным FPS или прерванной видимостью всё равно сохраняется, но получает `partial`.
 
 
 ## 16. Диагностика сессии, когда создан только session.json
@@ -467,7 +469,7 @@ Session be40944f-523f-49b1-ba87-5af1875185d0 закрыта штатно в 19:1
 - `post_point_count >= pre_point_count`;
 - `post_point_count - pre_point_count = consumed_points > 0`;
 - `sampled_point_delta_total = consumed_points`;
-- dropped events, monitor dropped events и monitor errors равны нулю;
+- `dropped_events`, `monitor_error_count_delta`, `bridge_send_failures_delta` и `collector_sequence_gap_count` равны нулю; накопительные `monitor_dropped_events` / `monitor_error_count` не являются per-run gate;
 - run и experiment session однозначно связаны.
 
 Неполная траектория не отменяет точный CHALK counter, но запрещает использовать её как полную геометрическую длину пути. FPS и видимость фиксируются отдельно.
@@ -519,4 +521,17 @@ Session diagnostics: при подключении eventCount=252; Browser Bridg
 4. Сохранять transport diagnostics и exact CHALK checks как независимые критерии.
 
 Полный разбор: `docs/GAME_MONITOR_BUFFER_OVERFLOW_ANALYSIS_2026-11-02.md`. Код на этом шаге не менялся; live рисование и CI не запускались.
+
+## 22. Разделение session buffer counters и per-run transport integrity (2026-11-02)
+
+`monitor_dropped_events` — устаревший alias накопительного `AutoDrawGameMonitor.status().droppedEvents`. Он показывает, сколько событий не попало в ограниченный локальный массив `state.events` за время жизни Monitor; подписчики (включая Browser Bridge) продолжают получать события после заполнения массива. Этот счётчик не является доказательством потери событий конкретного run и не должен блокировать `monitor_capture.status=saved`.
+
+Новые run reports сохраняют:
+- `monitor_buffer_dropped_events_start/end/delta` — диагностика локального Monitor export buffer;
+- `monitor_error_count_start/end/delta` — изменение глобального счётчика ошибок Monitor за run;
+- `bridge_send_failures_delta` — новые ошибки отправки Browser Bridge за run;
+- `collector_sequence_gap_count` — пропуски sequence, замеченные collector во время активного run;
+- `dropped_events` — реальное переполнение event list внутри RunRecorder данного run.
+
+Acceptance gate и матричные валидаторы используют per-run `dropped_events`, `monitor_error_count_delta`, `bridge_send_failures_delta` и `collector_sequence_gap_count`. Cumulative aliases остаются в manifest для диагностики и совместимости, но не участвуют в решении о полноте run. Старые manifests не переписываются.
 
