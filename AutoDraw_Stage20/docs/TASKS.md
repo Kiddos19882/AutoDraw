@@ -250,3 +250,17 @@ Software gate закрыт; live gate остаётся открытым. Авт�
 - [ ] Только после этого возобновить полный G3 block 27/27.
 
 Коммиты: `8f8923ded3d788e725206d31515d6f0ed221db3a`, `fd814517b584b9a800c95e4b6a19581a7afc33ce`.
+
+## 2026-11-02 — оптимизация CI перед новой серией G3
+
+- [x] Убрать дублирование push/pull_request CI для обновлений одной feature-ветки.
+- [x] Включить concurrency cancellation и pip cache.
+- [x] Разделить обязательные Game Monitor, Preparation/G3, Integration и Executor suites на параллельные jobs.
+- [x] Убрать повторный запуск build-time test suite в CI только после успешного завершения отдельных обязательных jobs; сохранить обычный локальный `run_all_tests.py`.
+- [x] Перенести длительные алгоритмические benchmarks на ручной запуск.
+- [x] Добавить regression test фактического G3 UI plan routing и сохранения task identity/parameters.
+- [ ] Подтвердить все обязательные jobs нового CI на конечном HEAD.
+- [ ] Получить portable artifact, собранный после успешных test jobs.
+- [ ] Выполнить локальный Windows preflight и закрыть старый paused G3 journal только через recovery UI с подтверждением доски.
+- [ ] Создать новую чистую серию G3 из 27 задач и выполнить все captures.
+- [ ] Проверить фактический executor config и точный CHALK для каждой ячейки; проанализировать девять конфигураций.
