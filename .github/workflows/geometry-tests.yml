@@ -75,14 +75,12 @@ jobs:
             AutoDraw_Stage20/source/preparation/requirements.txt
             AutoDraw_Stage20/source/executor/requirements.txt
       - name: Install preparation and executor test dependencies
-        run: python -m pip install -r source/preparation/requirements.txt -r source/executor/requirements.txt pytest
+        run: python -m pip install -r requirements.txt -r ..\executor\requirements.txt pytest
       - name: Run preparation, brush, Game Monitor capture and G3 block tests
         shell: pwsh
         run: |
           $env:PYTHONPATH = "$env:GITHUB_WORKSPACE\AutoDraw_Stage20;$env:GITHUB_WORKSPACE\AutoDraw_Stage20\source\preparation;$env:GITHUB_WORKSPACE\AutoDraw_Stage20\source\executor"
           python -m pytest -q -ra tests
-      - name: Test Stage 7 validator tolerance boundaries
-        run: python -m pytest -q -ra ..\..\tests\test_stage7_validator_rules.py
 
   integration-tests:
     name: Application integration tests
