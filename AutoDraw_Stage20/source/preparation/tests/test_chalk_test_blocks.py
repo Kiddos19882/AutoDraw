@@ -505,3 +505,77 @@ def test_load_journal_converts_invalid_json_to_value_error(tmp_path):
 
     with pytest.raises(ValueError, match="Не удалось разобрать журнал"):
         load_chalk_test_block_journal(path)
+
+
+
+@pytest.mark.parametrize(
+    ("block_status", "task_status"),
+    [
+        ("ready", "failed"),
+        ("ready", "interrupted"),
+        ("ready", "running"),
+        ("paused", "pending"),
+        ("failed", "pending"),
+    ],
+)
+def test_load_journal_rejects_inconsistent_block_and_task_status(block_status, task_status, tmp_path):
+    plan = build_chalk_test_block_plan(series_id="series", phase_id="G1")
+    plan["status"] = block_status
+    plan["tasks"][0]["status"] = task_status
+    path = tmp_path / "inconsistent.json"
+    path.write_text(json.dumps(plan), encoding="utf-8")
+    with pytest.raises(ValueError):
+        load_chalk_test_block_journal(path)
+
+
+def test_atomic_write_replace_failure_preserves_previous_journal(tmp_path, monkeypatch):
+    import chalk_test_blocks
+
+    path = tmp_path / "block.json"
+    plan = build_chalk_test_block_plan(series_id="series", phase_id="G1")
+    create_chalk_test_block_journal(path, plan)
+    original = path.read_bytes()
+
+    def fail_replace(_source, _destination):
+        raise PermissionError("simulated replace failure")
+
+    monkeypatch.setattr(chalk_test_blocks.os, "replace", fail_replace)
+    with pytest.raises(PermissionError):
+        claim_next_chalk_block_task(path)
+
+    assert path.read_bytes() == original
+    assert load_chalk_test_block_journal(path)["status"] == "ready"
+
+
+def test_atomic_write_temp_creation_failure_preserves_previous_journal(tmp_path, monkeypatch):
+    import chalk_test_blocks
+
+    path = tmp_path / "block.json"
+    plan = build_chalk_test_block_plan(series_id="series", phase_id="G1")
+    create_chalk_test_block_journal(path, plan)
+    original = path.read_bytes()
+    original_write_text = Path.write_text
+
+    def fail_temp_write(self, *args, **kwargs):
+        if self.name.endswith(".tmp"):
+            raise OSError("simulated temp write failure")
+        return original_write_text(self, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "write_text", fail_temp_write)
+    with pytest.raises(OSError):
+        claim_next_chalk_block_task(path)
+
+    assert path.read_bytes() == original
+    assert load_chalk_test_block_journal(path)["status"] == "ready"
+
+
+def test_journal_mutations_use_a_stable_cross_process_lock_file(tmp_path):
+    path = tmp_path / "block.json"
+    create_chalk_test_block_journal(
+        path, build_chalk_test_block_plan(series_id="series", phase_id="G1")
+    )
+    claimed = claim_next_chalk_block_task(path)
+    assert claimed is not None
+    assert path.with_name(path.name + ".lock").exists()
+    mark_interrupted_chalk_block_task(path)
+    assert load_chalk_test_block_journal(path)["status"] == "paused"
