@@ -1202,6 +1202,8 @@ def test_geometry_matrix_metadata_is_persisted_in_experiment_manifest(tmp_path):
         strokes=plan["strokes"],
     )
     tab = brush_ui.BrushBehaviorTestTab.__new__(brush_ui.BrushBehaviorTestTab)
+    tab.current_plan = None
+    tab._chalk_block_task = None
     tab.experiment_dir = tmp_path
     tab.get_calibration_profile = lambda: None
     tab._experiment_id = "geometry-experiment-002"
