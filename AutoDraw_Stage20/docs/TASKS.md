@@ -172,3 +172,16 @@ CI/software gate закрыт. Live gate остаётся открытым, по
 
 - [ ] Подготовить G3 в коде до live-запуска: добавить девять parameter cells (`point_step_px` 1/2/4 × `point_delay_ms` 5/10/20), три повтора на каждую, metadata/duplicate protection, journal validation, UI и analyzer support.
 - [ ] Добавить regression tests для G3 identity, deterministic randomized order, recovery и exact CHALK gate; подтвердить полный CI и Windows portable startup smoke-test.
+
+## G3 — программная реализация и live gate
+
+- [x] Добавить G3 в matrix metadata и включить `point_step_px`/`point_delay_ms` в идентичность ячейки.
+- [x] Добавить девять комбинаций параметров и три повтора (27 задач) в block plan.
+- [x] Добавить строгую journal validation полного набора 27 ячеек.
+- [x] Добавить G3 в Brush Test UI и gate по принятому G2.
+- [x] Передавать фактические параметры G3 в Stage6/MouseExecutor и сохранять их в execution report без изменения пользовательского профиля.
+- [x] Добавить analyzer support для раздельной проверки и агрегации девяти конфигураций.
+- [x] Добавить regression tests для metadata, duplicate identity, block plan, journal validation и workflow config override.
+- [ ] Подтвердить полный GitHub Actions CI: geometry-tests, executor-tests, Windows portable build/startup smoke-test.
+- [ ] После software gate выполнить 27 live G3 экспериментов на пользовательской Windows/игровой сессии.
+- [ ] Проанализировать CHALK, move calls, длительность, FPS, accepted points и dropped events отдельно для каждой конфигурации.
