@@ -527,8 +527,8 @@ def stop_chalk_test_block(
     journal = load_chalk_test_block_journal(path)
     if any(task.get("status") == "running" for task in journal["tasks"]):
         raise RuntimeError("Нельзя остановить блок посреди опыта; дождитесь безопасной границы.")
-    if journal.get("status") == "paused" and board_checked is not True:
-        raise ValueError("Приостановленный блок можно закрыть только после явной проверки игровой доски.")
+    if journal.get("status") in {"paused", "failed"} and board_checked is not True:
+        raise ValueError("Приостановленный/failed блок можно закрыть только после явной проверки игровой доски.")
     if journal.get("status") in {"completed", "stopped"}:
         return journal
     if journal.get("status") == "paused":
