@@ -21,3 +21,6 @@ AutoDraw_Stage20/dist/
 Thumbs.db
 .vscode/
 .idea/
+
+# Runtime Game Monitor connection snippets contain ephemeral session credentials
+AutoDraw_Stage20/data/results/brush_behavior_tests/game_monitor_bridge/connection_snippet_*.js
