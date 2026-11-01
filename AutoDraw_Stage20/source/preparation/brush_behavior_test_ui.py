@@ -1048,6 +1048,16 @@ class BrushBehaviorTestTab:
         if path is None:
             messagebox.showinfo("Нет прерванного блока", "Журналов, требующих восстановления, не найдено.", parent=self.root)
             return
+        if getattr(self, "_chalk_block_owner_lock", None) is None:
+            owner_lock = acquire_chalk_block_owner_lock(path)
+            if owner_lock is None:
+                messagebox.showwarning(
+                    "Блок уже обслуживается",
+                    "Другой экземпляр AutoDraw удерживает этот журнал. Восстановление запрещено.",
+                    parent=self.root,
+                )
+                return
+            self._chalk_block_owner_lock = owner_lock
         try:
             journal = load_chalk_test_block_journal(path)
         except (OSError, ValueError) as exc:
@@ -1110,6 +1120,16 @@ class BrushBehaviorTestTab:
         if path is None:
             messagebox.showinfo("Нет приостановленного блока", "Журналов для закрытия не найдено.", parent=self.root)
             return
+        if getattr(self, "_chalk_block_owner_lock", None) is None:
+            owner_lock = acquire_chalk_block_owner_lock(path)
+            if owner_lock is None:
+                messagebox.showwarning(
+                    "Блок уже обслуживается",
+                    "Другой экземпляр AutoDraw удерживает этот журнал. Закрытие запрещено.",
+                    parent=self.root,
+                )
+                return
+            self._chalk_block_owner_lock = owner_lock
         if not messagebox.askyesno(
             "Закрыть приостановленный блок",
             "После проверки игровой доски блок будет окончательно закрыт без продолжения оставшихся задач. "
