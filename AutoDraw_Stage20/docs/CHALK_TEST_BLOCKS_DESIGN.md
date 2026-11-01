@@ -258,3 +258,11 @@ Live G3 остаётся закрытым до прохождения regression
 При первом live-старте G3 две попытки первой задачи `paint_consumption_long_lines-s2-d20-r3` были выполнены фактически с настройками 2/10 и отклонены acceptance gate из-за отсутствующей block/matrix identity. Причина: один scenario ID использовался и legacy radius matrix, и geometry matrix; первая ветка UI перехватывала G3 task. Исправлено условие выбора legacy-ветки: она применима только при отсутствии активной block task. Для G3 block task теперь выполняется geometry-matrix path, который создаёт `chalk_experiment_matrix` и `chalk_test_block`; Stage6 получает параметры задачи через существующий временный executor override.
 
 Добавлен regression test на пересечение `MATRIX_SCENARIO_ID` и `GEOMETRY_MATRIX_SCENARIOS`. Два исходных запуска оставлены в журналах как failed attempts, не засчитываются и не перезапускаются. Новая серия должна быть создана только после полного CI и локального Windows preflight.
+
+## 2026-11-02 — фактический результат первой live G3 серии
+
+Первая полноценная попытка live G3 после исправления scenario routing сохранена в commit `094381f1d3f005efc8b2324062cc1f2dacc277a5`. Block journal содержит 27 задач: 21 completed, 1 failed, 5 pending. Причина остановки — `monitor_capture_gate_timeout:partial`. Задача `s4-d10-r2` завершила executor (6/6), получила точный CHALK delta 363 и matching pointDelta, но Monitor report был partial из-за 434 `monitor_dropped_events`; она не проходит acceptance gate. Блок имеет `stopped` и recovery decision `close_failed_block`, поэтому не считать его paused для обычного resume.
+
+Проверка 22 manifests: task metadata совпадает с фактическим executor config; radius=10; шесть штрихов; внутренний CHALK counter exact. 21 Monitor capture saved, один partial. Траектория во всех случаях помечена `incomplete_until_verified` из-за coalesced pointDelta.
+
+Таблица CHALK по всем девяти конфигурациям, пять полностью собранных ячеек, четыре неполных ячейки и ограничения вывода находятся в `CHALK_G3_PARTIAL_RESULTS_2026-11-02.md`. До завершения повторов и проверки continuation semantics модель расхода остаётся предварительной.
