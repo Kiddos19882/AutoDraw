@@ -20,6 +20,9 @@ PHASE_SCENARIOS = {
         "cross_section_intersections",
     ),
 }
+GEOMETRY_MATRIX_SCENARIOS = frozenset(
+    scenario for scenarios in PHASE_SCENARIOS.values() for scenario in scenarios
+)
 EXPECTED_STROKES = {
     "horizontal_lengths": 5,
     "vertical_lengths": 4,
