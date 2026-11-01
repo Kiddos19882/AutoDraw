@@ -126,17 +126,83 @@ def create_chalk_test_block_journal(
     return path
 
 
-def load_chalk_test_block_journal(journal_path: str | Path) -> dict[str, Any]:
-    path = Path(journal_path)
-    document = json.loads(path.read_text(encoding="utf-8"))
+def _validate_chalk_test_block_journal(document: Any, path: Path) -> dict[str, Any]:
+    """Reject structurally inconsistent journals before any recovery or state transition."""
     if (
         not isinstance(document, dict)
         or document.get("record_type") != "autodraw_chalk_test_block"
         or document.get("schema_version") != BLOCK_SCHEMA_VERSION
+        or document.get("phase_id") not in BLOCK_PHASES
+        or document.get("status") not in {"ready", "running", "paused", "completed", "stopped", "failed"}
         or not isinstance(document.get("tasks"), list)
     ):
         raise ValueError(f"Некорректный журнал блока CHALK: {path}")
+
+    tasks = document["tasks"]
+    expected_count = document.get("expected_task_count")
+    if (
+        isinstance(expected_count, bool)
+        or not isinstance(expected_count, int)
+        or expected_count != len(tasks)
+        or expected_count <= 0
+    ):
+        raise ValueError(f"Некорректное число задач в журнале CHALK: {path}")
+
+    task_ids: set[str] = set()
+    running_tasks = []
+    for task in tasks:
+        if not isinstance(task, dict):
+            raise ValueError(f"Некорректная запись задачи в журнале CHALK: {path}")
+        task_id = task.get("task_id")
+        if not isinstance(task_id, str) or not task_id or task_id in task_ids:
+            raise ValueError(f"Отсутствует или повторяется task_id в журнале CHALK: {path}")
+        task_ids.add(task_id)
+        if task.get("status") not in {"pending", "running", "completed", "failed", "interrupted"}:
+            raise ValueError(f"Неизвестный статус задачи {task_id!r} в журнале CHALK: {path}")
+        attempts = task.get("attempts")
+        if not isinstance(attempts, list) or any(not isinstance(item, dict) for item in attempts):
+            raise ValueError(f"Некорректный список попыток задачи {task_id!r}: {path}")
+        attempt_ids: set[str] = set()
+        running_attempts = []
+        for attempt in attempts:
+            attempt_id = attempt.get("attempt_id")
+            if not isinstance(attempt_id, str) or not attempt_id or attempt_id in attempt_ids:
+                raise ValueError(f"Отсутствует или повторяется attempt_id задачи {task_id!r}: {path}")
+            attempt_ids.add(attempt_id)
+            if attempt.get("status") not in {"running", "completed", "failed", "interrupted"}:
+                raise ValueError(f"Неизвестный статус попытки задачи {task_id!r}: {path}")
+            if attempt.get("status") == "running":
+                running_attempts.append(attempt)
+        if task.get("status") == "running":
+            running_tasks.append(task)
+            active_attempt_id = task.get("active_attempt_id")
+            if (
+                not isinstance(active_attempt_id, str)
+                or sum(item.get("attempt_id") == active_attempt_id for item in running_attempts) != 1
+                or len(running_attempts) != 1
+            ):
+                raise ValueError(f"Активная попытка задачи {task_id!r} не согласована с журналом: {path}")
+        elif task.get("active_attempt_id") is not None or running_attempts:
+            raise ValueError(f"У неактивной задачи {task_id!r} осталась running-попытка: {path}")
+
+    if len(running_tasks) > 1:
+        raise ValueError(f"В журнале CHALK обнаружено несколько running-задач: {path}")
+    if (document.get("status") == "running") != (len(running_tasks) == 1):
+        raise ValueError(f"Статус блока не согласован с активной задачей: {path}")
+    if document.get("status") == "completed" and not all(
+        task.get("status") == "completed" for task in tasks
+    ):
+        raise ValueError(f"Завершённый блок содержит незавершённые задачи: {path}")
     return document
+
+
+def load_chalk_test_block_journal(journal_path: str | Path) -> dict[str, Any]:
+    path = Path(journal_path)
+    try:
+        document = json.loads(path.read_text(encoding="utf-8"))
+    except (UnicodeError, json.JSONDecodeError) as exc:
+        raise ValueError(f"Не удалось разобрать журнал блока CHALK: {path}: {exc}") from exc
+    return _validate_chalk_test_block_journal(document, path)
 
 
 def _save_journal(path: Path, journal: dict[str, Any]) -> None:
