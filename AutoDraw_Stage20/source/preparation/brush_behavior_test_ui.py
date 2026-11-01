@@ -29,6 +29,9 @@ from brush_radius_feedback import (
 from chalk_radius_matrix import (
     MATRIX_SCENARIO_ID, build_chalk_radius_matrix_metadata, is_monitor_run_claimed,
 )
+from chalk_experiment_matrix import (
+    GEOMETRY_MATRIX_SCENARIOS, build_chalk_experiment_matrix_metadata,
+)
 from brush_experiment_capture import (
     compare_images, crop_calibrated_regions,
     measure_meter_fill_against_baseline, evaluate_meter_restoration, evaluate_board_clear,
@@ -590,6 +593,7 @@ class BrushBehaviorTestTab:
         )
         self.matrix_block_var = tk.StringVar(value="1")
         self._chalk_matrix_metadata: dict[str, Any] | None = None
+        self._chalk_experiment_matrix_metadata: dict[str, Any] | None = None
         self._experiment_id: str | None = None
         self.outcome_var = tk.StringVar(value="not_reviewed")
         self.notes_var = tk.StringVar()
@@ -632,11 +636,11 @@ class BrushBehaviorTestTab:
         matrix_row.pack(fill="x", pady=(8, 0))
         ttk.Label(matrix_row, text="ID серии CHALK").pack(side="left")
         ttk.Entry(matrix_row, textvariable=self.matrix_series_var, width=28).pack(side="left", padx=(6, 16))
-        ttk.Label(matrix_row, text="Блок матрицы (1–3)").pack(side="left")
+        ttk.Label(matrix_row, text="Блок / повтор (1–3)").pack(side="left")
         ttk.Entry(matrix_row, textvariable=self.matrix_block_var, width=4).pack(side="left", padx=6)
         ttk.Label(
             matrix_row,
-            text="Для paint_consumption_long_lines: один радиус в каждом блоке; три блока дают три повтора.",
+            text="Для длинных линий — блок радиуса; для G1/G2 — номер повтора сценария.",
         ).pack(side="left", padx=8)
         ttk.Label(controls, textvariable=self.area_var, wraplength=1100).pack(anchor="w", pady=(8, 0))
         slider = ttk.LabelFrame(controls, text="Автоматическая установка кисти", padding=6)
@@ -970,18 +974,30 @@ class BrushBehaviorTestTab:
             )
             plan["generation"]["requested_brush_value"] = brush
             matrix_metadata = None
-            if plan["generation"].get("test_case") == MATRIX_SCENARIO_ID:
+            experiment_matrix_metadata = None
+            scenario_id = plan["generation"].get("test_case")
+            if scenario_id == MATRIX_SCENARIO_ID:
                 matrix_metadata = build_chalk_radius_matrix_metadata(
                     series_id=self.matrix_series_var.get(),
                     block=int(self.matrix_block_var.get().strip()),
                     requested_radius=brush,
                 )
                 plan["generation"]["chalk_radius_matrix"] = matrix_metadata
+            elif scenario_id in GEOMETRY_MATRIX_SCENARIOS:
+                experiment_matrix_metadata = build_chalk_experiment_matrix_metadata(
+                    series_id=self.matrix_series_var.get(),
+                    scenario_id=scenario_id,
+                    repeat_index=int(self.matrix_block_var.get().strip()),
+                    requested_radius=brush,
+                    strokes=plan["strokes"],
+                )
+                plan["generation"]["chalk_experiment_matrix"] = experiment_matrix_metadata
             path.write_text(json.dumps(plan, ensure_ascii=False, indent=2), encoding="utf-8")
             self.current_plan = plan
             self.current_plan_path = path
             self._experiment_id = experiment_id
             self._chalk_matrix_metadata = matrix_metadata
+            self._chalk_experiment_matrix_metadata = experiment_matrix_metadata
             if not self.on_transfer_plan(plan, path):
                 return
             self._reset_observation_fields()
@@ -2670,6 +2686,7 @@ class BrushBehaviorTestTab:
                 report_copy = dict(report)
                 report_copy["autodraw_experiment_id"] = getattr(self, "_experiment_id", None)
                 report_copy["chalk_radius_matrix"] = getattr(self, "_chalk_matrix_metadata", None)
+                report_copy["chalk_experiment_matrix"] = getattr(self, "_chalk_experiment_matrix_metadata", None)
                 target_path.write_text(
                     json.dumps(report_copy, ensure_ascii=False, indent=2) + "\n",
                     encoding="utf-8",
@@ -2681,6 +2698,7 @@ class BrushBehaviorTestTab:
                     "source": "loopback_websocket_bridge",
                     "autodraw_experiment_id": getattr(self, "_experiment_id", None),
                     "chalk_radius_matrix": getattr(self, "_chalk_matrix_metadata", None),
+                    "chalk_experiment_matrix": getattr(self, "_chalk_experiment_matrix_metadata", None),
                     "run_id": report.get("run_id"),
                     "session_id": report.get("session_id"),
                     "execution_status": report.get("execution_status"),
@@ -2724,6 +2742,7 @@ class BrushBehaviorTestTab:
                     "match_reason": match_reason,
                     "experiment_id": getattr(self, "_experiment_id", None),
                     "chalk_radius_matrix": getattr(self, "_chalk_matrix_metadata", None),
+                    "chalk_experiment_matrix": getattr(self, "_chalk_experiment_matrix_metadata", None),
                     "session_id": report.get("session_id"),
                     "run_id": report.get("run_id"),
                     "source_path": str(source_path.resolve()),
@@ -2783,6 +2802,7 @@ class BrushBehaviorTestTab:
             "record_type": "autodraw_brush_paint_experiment",
             "experiment_id": getattr(self, "_experiment_id", None),
             "chalk_radius_matrix": getattr(self, "_chalk_matrix_metadata", None),
+            "chalk_experiment_matrix": getattr(self, "_chalk_experiment_matrix_metadata", None),
             "updated_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "test_case": TEST_CASES.get(self.case_var.get(), {}).get("id"),
             "brush_value_requested": self._experiment_requested_brush if self._experiment_requested_brush is not None else int(self.brush_var.get().strip()),
