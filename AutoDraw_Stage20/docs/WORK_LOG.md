@@ -1697,7 +1697,7 @@ Regression test в `source/preparation/tests/test_brush_behavior_test_ui.py` т�
 - Workflow разделён на параллельные обязательные jobs: Game Monitor, Preparation/G3, корневые Integration tests и Executor. Portable build gated через `needs` на успех этих jobs.
 - Добавлены pip cache и concurrency cancellation для устаревших commits.
 - Удалён дублирующий pull_request trigger; code CI выполняется на push feature-ветки. Benchmark suite запускается вручную через workflow_dispatch.
-- В корневом integration job единый pytest invocation собирает unittest и pytest cases; WebSocket test выполняется только в специализированном Game Monitor job.
+- Корневой integration job приведён к штатной схеме `run_all_tests.py`: unittest discovery для UI/G3 handoff, import diagnostics и build helpers; pytest отдельно запускает root function tests. WebSocket test выполняется только в специализированном Game Monitor job.
 - `build_windows.bat` получил opt-in флаг `AUTODRAW_SKIP_TESTS=1`. Он используется только CI build job после успешного завершения всех test jobs; обычный локальный запуск не пропускает тесты.
 - Добавлен end-to-end UI routing regression test: G3 block task должен записывать `chalk_test_block` и `chalk_experiment_matrix`, передавать параметры task и не записывать legacy `chalk_radius_matrix`.
 - Существующий integration test handoff проверяет, что параметры 2/20 доходят до Stage6 executor.
