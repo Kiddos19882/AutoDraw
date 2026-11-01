@@ -151,3 +151,27 @@ def test_safe_stop_failure_keeps_journal_recoverable(tmp_path, monkeypatch):
 
     assert ui._chalk_block_recovery_journal_path == journal_path
     assert "Журнал сохранён для восстановления" in ui.status_var.value
+
+
+
+def test_g2_unlock_requires_all_twelve_g1_tasks_completed(tmp_path):
+    plan = build_chalk_test_block_plan(series_id="g1-series", phase_id="G1", seed=4)
+    journal_path = tmp_path / "chalk_test_blocks" / "g1.json"
+    create_chalk_test_block_journal(journal_path, plan)
+    ui = object.__new__(BrushBehaviorTestTab)
+    ui.output_dir = tmp_path
+    assert ui._has_completed_g1_block() is False
+
+    for index in range(12):
+        task = claim_next_chalk_block_task(journal_path)
+        assert task is not None
+        from chalk_test_blocks import finish_chalk_block_task
+        finish_chalk_block_task(
+            journal_path,
+            task["task_id"],
+            accepted=True,
+            experiment_id=f"exp-{index}",
+            experiment_dir=tmp_path / f"exp-{index}",
+        )
+
+    assert ui._has_completed_g1_block() is True
