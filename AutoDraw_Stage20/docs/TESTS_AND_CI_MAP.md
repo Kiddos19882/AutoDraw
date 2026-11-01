@@ -330,7 +330,7 @@ tests/test_websocket_smoke_server.py включает regression tests для pe
 - Production scheduler/journal and strict acceptance gate: `source/preparation/chalk_test_blocks.py`.
 - Unit tests: `source/preparation/tests/test_chalk_test_blocks.py` — G1/G2 task completeness, repeat cells, deterministic order, journal safety, pause/interruption, complete per-stroke gate, clean frame probe and safe task-boundary stop.
 - UI integration: `source/preparation/brush_behavior_test_ui.py` — Start G1/G2, progress, Stop-at-boundary, recovery, preclear, brush feedback, executor, Game Monitor capture, postdraw and transition.
-- Callback workflow tests: `source/preparation/tests/test_chalk_test_block_ui_workflow.py` — accept-before-advance, incomplete evidence pause, capture timeout and executor failure.
+- Callback workflow tests: `source/preparation/tests/test_chalk_test_block_ui_workflow.py` — accept-before-advance, incomplete evidence pause, capture timeout, executor failure, brush-restore gate, safe-stop journal recovery and G2 lock until all 12 G1 tasks are accepted.
 - Recovery UI: startup detection of running/ready/paused journals, explicit board-check confirmation before retry, no automatic replay, and safe close of paused journals.
 - Pending: callback-level failure injection across Tk lifecycle stages, GitHub Actions result and Windows portable smoke test.
 - Live experiments must not start until CI and portable smoke test pass.
