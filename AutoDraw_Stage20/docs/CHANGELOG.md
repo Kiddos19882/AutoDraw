@@ -255,3 +255,12 @@
 - Run включает интеграционный regression test основного приложения из commit `8c93a498864973b9879c926627030bb7e1d3ce2a`; прежнее ожидание нового CI для этого теста закрыто.
 - G3 software gate закрыт. Локальный Windows preflight и 27 live G3 captures не выполнены; экспериментальная модель расхода CHALK пока не подтверждена.
 - Документация синхронизирована; исходный код и workflow не менялись.
+
+## 2026-11-02
+
+### Fixed
+- Автоматические G3 block tasks больше не перехватываются legacy radius-matrix routing при совпадении `scenario_id`; geometry metadata создаётся для G3 task и может активировать task-specific executor override.
+- Добавлен regression test для коллизии scenario ID между legacy и geometry matrices.
+
+### Security
+- Удалены runtime Game Monitor connection snippets; добавлено правило .gitignore для таких файлов.
