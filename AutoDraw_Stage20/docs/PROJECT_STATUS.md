@@ -492,7 +492,7 @@ GitHub Actions для актуального HEAD `5771f52554c3356c54d451e0ab26e
 
 Добавлена функция `validate_chalk_block_experiment()`: использует матричный validator и фактические события `monitor_report.json`, требует complete per-stroke totals, измеренный frame probe без visibility interruption и непустую accepted trajectory.
 
-**Пока не завершено:** UI восстановления interrupted/paused block после перезапуска; исчерпывающие orchestration tests на каждый Tk callback/failure path; CI и Windows portable smoke test. Live G1 не запускался. До CI и отдельного разрешения оператора не запускать браузерные эксперименты.
+**Пока не завершено:** исчерпывающие orchestration tests на каждый Tk callback/failure path; CI и Windows portable smoke test. Recovery UI уже реализован. Live G1 не запускался. До CI и отдельного разрешения оператора не запускать браузерные эксперименты.
 
 
 ## 2026-11-01 — recovery автоматических блоков
