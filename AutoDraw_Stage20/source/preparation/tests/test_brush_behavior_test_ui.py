@@ -632,7 +632,7 @@ def test_automatic_brush_setup_starts_executor_without_visual_confirmation(monke
     })
 
     phase = tab.experiment_phases["brush_setup"]
-    assert tab.root.restored is True
+    assert tab.root.restored is False  # Automated handoff must leave the game in the foreground.
     assert phase["status"] == "verified_by_game_monitor"
     assert phase["verification_source"] == "active_game_monitor_bridge_heartbeat"
     assert phase["visual_confirmation_required"] is False
