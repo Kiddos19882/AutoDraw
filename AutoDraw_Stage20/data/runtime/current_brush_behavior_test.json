@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "name": "Brush behavior test — short_strokes",
-  "created_at": "2026-11-01T01:18:15+00:00",
+  "created_at": "2026-11-01T05:06:31+00:00",
   "coordinate_system": "local_canvas_pixels",
   "canvas": {
     "width": 581,
@@ -149,14 +149,20 @@
     "test_case": "short_strokes",
     "brush_value_must_be_set_manually": true,
     "note": "Set the requested brush size in the browser before executing this plan.",
-    "experiment_id": "1547eec126ad42d7ae028d928f30c465",
+    "experiment_id": "3c38f12d22e44f7382234f35c412496c",
     "requested_brush_value": 10,
+    "chalk_test_block": {
+      "block_id": "c4493b5807a54d3587391b0a1e934512",
+      "task_id": "short_strokes-r3",
+      "phase_id": "G1"
+    },
     "chalk_experiment_matrix": {
       "schema_version": 1,
-      "series_id": "chalk-20261101-040508-1b9e5d",
+      "series_id": "chalk-20261101-080012-4d6add",
       "phase_id": "G1",
       "scenario_id": "short_strokes",
-      "repeat_index": 1,
+      "repeat_index": 3,
+      "matrix_order_index": 12,
       "planned_repeats": 3,
       "requested_radius": 10,
       "expected_strokes": 7,
