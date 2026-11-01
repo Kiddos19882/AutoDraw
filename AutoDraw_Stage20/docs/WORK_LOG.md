@@ -1280,3 +1280,17 @@ Run JSON дополнен `stroke_count`, суммой `sampled_point_delta_tota
 **Проверка:** commit `8e7b2f8e8c4a65bbbb2d4c6a1a2a603e752fefff`; GitHub Actions workflow run `41256989852` завершён `completed/success`. Успешны все jobs: `geometry-tests`, `executor-tests`, `Windows portable build and startup smoke-test`. Ветка `feature/image-geometry-optimization` на момент проверки указывала на этот commit.
 
 **Статус серии:** инфраструктура G1/G2, analyzer, проверка полноты per-stroke breakdown и автоматическая проверка завершены. G1 готова к live-сбору после обновления локальной ветки и запуска AutoDraw, Game Monitor Bridge и игрового iframe. Ни один G1 live experiment этой записью не считается выполненным. G2 и G3 остаются закрытыми до анализа предыдущих серий.
+
+## 2026-11-01 — инвентаризация результатов тестов и безопасной очистки data
+
+Создан `docs/DATA_CLEANUP_INVENTORY_2026-11-01.md` и добавлена ссылка в `docs/README.md`.
+
+Инвентаризация основана на текущих manifests, анализаторах и storage documentation, а также на ранее зафиксированных Git-tree audits:
+- рассмотрены ранние brush experiments 29–30 октября, boundary probe, WebSocket smoke artifacts и семь экспортов Monitor 0.1.2;
+- отдельно выделены 21 валидный CHALK radius experiment серии `chalk-20261101-023127-b85dbb`; их первичные файлы и `monitor_report.json` сохраняются;
+- учтены требования нового G1/G2 analyzer: per-stroke breakdown требует исходного `monitor_report.json`, а summary не заменяет event stream;
+- описаны условно удаляемые runtime/snippet/empty-placeholder файлы и кандидаты на дедупликацию PNG и Monitor run JSON.
+
+**Результат:** массовое удаление старых экспериментальных каталогов и снимков не обосновано. Условно безопасные кандидаты — только неактивная runtime-копия `data/runtime/current_brush_behavior_test.json`, временный токенизированный snippet после остановки collector и фактически пустые placeholder-файлы после проверки ссылок.
+
+**Ограничения:** фактический объём локального диска, untracked-файлы и все локальные SHA-256 не измерялись; физическое удаление не выполнялось. Первичные результаты и код не менялись.
