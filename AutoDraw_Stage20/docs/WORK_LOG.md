@@ -1703,3 +1703,7 @@ Regression test в `source/preparation/tests/test_brush_behavior_test_ui.py` т�
 - Существующий integration test handoff проверяет, что параметры 2/20 доходят до Stage6 executor.
 - Исправлены root-relative пути benchmark job после переноса её working directory в корень Stage20.
 - Тесты/CI на конечном HEAD ещё не завершены; live G3 не запускался. Следующий gate — успешный новый CI, portable artifact, локальный preflight и recovery старого paused журнала.
+
+- Диагностика Tk CI выявила, что UI tests использовали реальный DATA_PATHS, в котором могут лежать paused G3 journals; это создавало риск recovery warning/dialog внутри тестового процесса. В UnifiedAppCoreTests.setUp/tearDown добавлена временная изоляция data root и восстановление environment.
+- Deferred _scan_chalk_block_recovery callback получил сохраняемый after ID и отменяется при уничтожении owner frame. Добавлен regression test на cancel callback.
+- UI root test запускается из прежней проверенной рабочей директории Preparation с 3-minute timeout; build/import и geometry root suites отделены в самостоятельные pytest groups. Для integration job задан общий 12-minute timeout.
