@@ -180,3 +180,10 @@ Game Monitor документируется как самостоятельна�
 - start_game_monitor_bridge.bat — Windows launcher, вызываемый кнопкой Brush Test UI.
 
 Windows portable build копирует эти файлы и game_monitor.js в каталог game_monitor рядом с AutoDraw.exe. Каталог companion-инструментов не импортируется как часть GUI Python package и запускается отдельным процессом.
+
+
+### Дополнение 2026-11-01 — CHALK geometry matrix
+
+- `source/preparation/chalk_experiment_matrix.py` — metadata для серий G1/G2, fingerprint геометрии, строгая проверка experiment/monitor identity, exact CHALK, уникальности run/repeat и per-stroke aggregation по `strokeId`.
+- `tests/analyze_chalk_experiment_matrix.py` — CLI-обход experiment manifests и создание сводки по сценариям/повторам.
+- `source/preparation/brush_behavior_test_ui.py` сохраняет `chalk_experiment_matrix` в drawing plan, manifest, monitor report copy, summary и capture metadata.
