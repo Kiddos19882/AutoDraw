@@ -1689,3 +1689,17 @@ Regression test в `source/preparation/tests/test_brush_behavior_test_ui.py` т�
 - Commits: `85ae43af292e8c8ecdb4d1e5791a27db4a06a97c`, `60117ef34db54a5bf858c946d7b5ca09137caa44`.
 - Runtime connection snippets удалены из репозитория, их шаблон добавлен в .gitignore.
 - Next gate: полный GitHub Actions CI; затем локальный Windows preflight и новая чистая серия G3 из 27 задач.
+
+## 2026-11-02 — оптимизация workflow и усиление G3 regression tests
+
+- Проверена актуальная конфигурация `.github/workflows/geometry-tests.yml`, `run_all_tests.py`, `build_windows.bat`, build helpers и тестовые suite.
+- Обнаружены лишние затраты: push + pull_request запускали одинаковые jobs; benchmark Stage 5/7/8 и synthetic sweeps выполнялись в обычном CI; build job повторно запускал те же основные suite после отдельных test jobs.
+- Workflow разделён на параллельные обязательные jobs: Game Monitor, Preparation/G3, корневые Integration tests и Executor. Portable build gated через `needs` на успех этих jobs.
+- Добавлены pip cache и concurrency cancellation для устаревших commits.
+- Удалён дублирующий pull_request trigger; code CI выполняется на push feature-ветки. Benchmark suite запускается вручную через workflow_dispatch.
+- В корневом integration job единый pytest invocation собирает unittest и pytest cases; WebSocket test выполняется только в специализированном Game Monitor job.
+- `build_windows.bat` получил opt-in флаг `AUTODRAW_SKIP_TESTS=1`. Он используется только CI build job после успешного завершения всех test jobs; обычный локальный запуск не пропускает тесты.
+- Добавлен end-to-end UI routing regression test: G3 block task должен записывать `chalk_test_block` и `chalk_experiment_matrix`, передавать параметры task и не записывать legacy `chalk_radius_matrix`.
+- Существующий integration test handoff проверяет, что параметры 2/20 доходят до Stage6 executor.
+- Исправлены root-relative пути benchmark job после переноса её working directory в корень Stage20.
+- Тесты/CI на конечном HEAD ещё не завершены; live G3 не запускался. Следующий gate — успешный новый CI, portable artifact, локальный preflight и recovery старого paused журнала.
