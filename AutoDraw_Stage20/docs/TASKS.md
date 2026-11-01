@@ -69,9 +69,10 @@
 - [x] Создать ядро планирования G1/G2 с полным набором сценариев и тремя повторами.
 - [x] Создать долговечный журнал блока, фиксировать попытки и прогресс; останавливать блок при failed/interrupted.
 - [x] Добавить unit tests для полного состава блока, repeat cells, deterministic order и recovery.
-- [ ] Интегрировать Start/Stop/progress UI в Brush Test.
-- [ ] Связать block state machine с preclear, подтверждением радиуса, executor, Game Monitor exact capture и переходом к следующей задаче.
-- [ ] Добавить recovery UI для прерванной задачи без автоматического повторного рисования.
+- [x] Интегрировать Start/Stop/progress UI в Brush Test.
+- [x] Связать block state machine с preclear, подтверждением радиуса, executor, Game Monitor exact capture и переходом к следующей задаче; добавить fail-closed gate полного per-stroke breakdown.
+- [ ] Добавить recovery UI для прерванной/приостановленной задачи без автоматического повторного рисования.
+- [ ] Добавить исчерпывающие orchestration tests на отказ каждого callback/gate.
 - [ ] Пройти CI и Windows portable smoke test; затем выполнить один live G1 block.
 
-До выполнения UI-интеграции пакетный запуск не считается доступным, live-матрицу вручную не продолжать.
+UI runner реализован, но до CI и отдельного контролируемого live G1 не считать его готовым к экспериментальной эксплуатации. Live-матрицу вручную по частям не продолжать.
