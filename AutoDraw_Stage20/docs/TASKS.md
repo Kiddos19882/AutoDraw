@@ -273,3 +273,17 @@ Software gate закрыт; live gate остаётся открытым. Авт�
 - [x] Добавить regression test на отмену pending Tk callback.
 - [x] Разделить root integration tests и ограничить время UI test step.
 - [ ] Получить успешный CI на HEAD после этих изменений.
+
+## 2026-11-02 — статус live G3 по commit 094381f
+
+- [x] Принять и сохранить raw results серии `chalk-20261102-015749-7c1141` в commit `094381f1d3f005efc8b2324062cc1f2dacc277a5`.
+- [x] Сверить 22 task identities с фактическими `executor_config`; mismatch не обнаружен.
+- [x] Сверить радиус 10, 6/6 strokes и точный CHALK counter во всех 22 experiment summaries.
+- [x] Выявить partial Monitor capture: `s4-d10-r2`, 434 `monitor_dropped_events`; не засчитывать его как полноценный повтор.
+- [x] Зафиксировать 21 completed, 1 failed, 5 pending; блок закрыт со статусом stopped.
+- [x] Записать аналитическую сводку `docs/CHALK_G3_PARTIAL_RESULTS_2026-11-02.md`.
+- [ ] Проверить в коде validator/recovery, можно ли формально объединять результаты continuation-блока с текущей серией.
+- [ ] Выполнить корректный повтор `s4-d10-r2` и пять pending задач, если continuation поддерживается; иначе определить новую полную серию без изменения/перезапуска закрытого блока.
+- [ ] Получить девять конфигураций × три полноценных Monitor captures.
+- [ ] После завершения матрицы рассчитать статистику и калибровочную модель CHALK.
+- [ ] Отдельно проверить влияние радиуса кисти: в текущей G3 серии радиус фиксирован на 10.
