@@ -335,6 +335,12 @@ def stop_chalk_test_block(
         raise ValueError("Приостановленный блок можно закрыть только после явной проверки игровой доски.")
     if journal.get("status") in {"completed", "stopped"}:
         return journal
+    if journal.get("status") == "paused":
+        journal.setdefault("recovery_decisions", []).append({
+            "decision": "close_paused_block",
+            "board_checked": True,
+            "decided_at_utc": _utc_now(),
+        })
     journal["status"] = "stopped"
     journal["stopped_at_utc"] = _utc_now()
     _save_journal(path, journal)
