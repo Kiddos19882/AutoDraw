@@ -6,7 +6,7 @@
 **Block ID:** `1f93ddcac07445b78093744c7cbabcde`  
 **Frozen model:** `chalk-int006-frozen-2026-11-02`, version 1  
 **Radius:** 10  
-**Статус:** CAPTURES AUDITED; FORMAL ANALYZER GATE PENDING
+**Статус на момент первичного отчёта:** CAPTURES AUDITED; FORMAL ANALYZER GATE PENDING. Этот документ сохраняет предварительную хронологию; официальный результат приведён в [отдельном отчёте](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md).
 
 ## 1. Объём и источник данных
 
@@ -131,4 +131,4 @@ P1 имеет наименьшие MAE/RMSE и меньшую максималь
 - Во всех 45 reports: `point_delta_matches_chalk=true`, dropped events=0, Monitor error delta=0, Bridge send-failure delta=0, collector sequence gaps=0, `brush_radius_status=single`, `observed_brush_radii=[10]`.
 - SHA-256 frozen prediction artifact независимо пересчитан по canonical JSON (sorted keys, compact separators, UTF-8) и совпал с journal: `a0eab016e96a81e14bededd32cf5161dd943d6fc85a20b7eec17455f69d0c61c`. В artifact 15 prediction records.
 
-Эта проверка подтверждает целостность всех сохранённых Monitor captures и frozen artifact. Она всё ещё не заменяет запуск штатного `chalk_int006_validation.py`: официальный JSON report с итоговыми accepted/missing/rejected и per-stroke метриками пока не получен. CI status/run artifact не удалось прочитать доступными GitHub connector endpoints; это не трактуется ни как успех, ни как ошибка CI.
+На момент создания этого предварительного отчёта штатный `chalk_int006_validation.py` ещё не был запущен на полном наборе, поэтому здесь были только ручные пересчёты. Позднее официальный analyzer был выполнен в CI run 41532629748: 45 accepted, 0 missing, 0 rejected, 15 complete groups. Итоговые значения совпали с предварительными; см. [официальный отчёт](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md).
