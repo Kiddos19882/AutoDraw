@@ -8,10 +8,11 @@
 - [x] Исправлены пересечения в DrawingPlan V1/V3, добавлен isolation gate; для V4 реализован cursor-free automated post-draw capture.
 - [x] Corrective code HEAD `3e8e6c5` прошёл полный CI run [41470680544](https://github.com/Kiddos19882/AutoDraw/actions/runs/41470680544): integration, executor, Game Monitor/bridge, Preparation/G3, Windows portable build и PNG audit — success.
 - [x] Получена первичная holdout-проверка G1-модели на 66 новых штрихах P0 (MAE 1.09, RMSE 1.33, MAPE 1.71%).
-- [ ] Выполнить live follow-up V1/V3 с исправленной геометрией, V4 cursor-free closure, V2 short-stroke и V5 spacing sweep.
+- [x] Выполнить live follow-up V1/V3/V4 и V2/V5: 45/45 captures в commit `e879a77`; все блоки 9/9 completed, exact CHALK и per-run Monitor integrity приняты.
+- [ ] Выполнить pixel-level аудит новых 45 follow-up PNG; ROI heuristic неоднозначна для V3/V4/V5 и не заменяет image-mask analysis.
 - [ ] Завершить независимую validation step=4 и полных DrawingPlan; только затем определить safety margin.
 
-Подробные данные и ограничения: [CHALK_INT006_V1_V5_RESULTS_2026-11-02.md](CHALK_INT006_V1_V5_RESULTS_2026-11-02.md), [протокол V1/V3/V4 follow-up](CHALK_INT006_V1_V3_V4_FOLLOWUP_2026-11-02.md), [протокол V2/V5 follow-up](CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md). Production defaults и estimator не менялись. Исторические записи ниже сохраняются для хронологии и не переопределяют этот статус.
+Подробные данные: [исходная live-матрица](CHALK_INT006_V1_V5_RESULTS_2026-11-02.md), [новые follow-up результаты](CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md), [протокол V1/V3/V4](CHALK_INT006_V1_V3_V4_FOLLOWUP_2026-11-02.md), [протокол V2/V5](CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md). Production defaults и estimator не менялись. Исторические записи ниже сохраняются для хронологии и не переопределяют этот статус.
 
 Документ объединяет завершённые направления документирования и текущую последовательность работ по измерению игрового CHALK. В текущем продолжении пользователь разрешил все действия; live captures требуют доступной игровой сессии и готовой тестовой доски.
 
