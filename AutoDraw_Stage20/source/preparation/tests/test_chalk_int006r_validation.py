@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import copy
+import json
 
 import pytest
+from PIL import Image
 
 from chalk_experiment_matrix import (
     GEOMETRY_EXECUTOR_CONFIG,
@@ -157,3 +159,149 @@ def test_int006r_analyzer_keeps_unexecuted_block_incomplete(tmp_path):
     assert report["missing_count"] == 45
     assert report["safety_margin_status"] == "not_established"
     assert report["production_eligibility"] == "not_validated"
+
+
+def test_int006r_analyzer_accepts_complete_45_capture_set_with_png_and_monitor_evidence(tmp_path):
+    plan = build_chalk_test_block_plan(
+        series_id="int006r-complete",
+        phase_id=RADIUS_GEOMETRY_VALIDATION_PHASE,
+        seed=45,
+    )
+    results_dir = tmp_path / "results"
+    results_dir.mkdir()
+    for index, task in enumerate(plan["tasks"], start=1):
+        scenario_id = task["scenario_id"]
+        radius = task["requested_radius"]
+        repeat = task["repeat_index"]
+        stroke_count = task["expected_strokes"]
+        experiment_id = f"int006r-exp-{index:02d}"
+        run_id = f"int006r-run-{index:02d}"
+        experiment_dir = results_dir / f"experiment-{index:02d}"
+        experiment_dir.mkdir()
+        strokes = _strokes(stroke_count)
+        parameters = dict(task["executor_parameters"])
+        metadata = build_chalk_experiment_matrix_metadata(
+            series_id=plan["series_id"],
+            scenario_id=scenario_id,
+            repeat_index=repeat,
+            requested_radius=radius,
+            strokes=strokes,
+            matrix_order_index=task["matrix_order_index"],
+            executor_parameters=parameters,
+        )
+        consumed = stroke_count * 2
+        events = []
+        for stroke_index in range(stroke_count):
+            stroke_id = f"{experiment_id}-stroke-{stroke_index + 1}"
+            events.extend([
+                {"type": "POINTER_DOWN_CANDIDATE", "strokeId": stroke_id},
+                {"type": "DRAW_SAMPLE", "strokeId": stroke_id, "pointDelta": 2},
+                {"type": "POINTER_UP_CANDIDATE", "strokeId": stroke_id},
+            ])
+        (experiment_dir / "monitor_report.json").write_text(
+            json.dumps({"events": events}), encoding="utf-8"
+        )
+        Image.new("RGB", (460, 240), "white").save(experiment_dir / "before_draw-board.png")
+        Image.new("RGB", (460, 240), "white").save(experiment_dir / "after_draw-board.png")
+
+        plan["tasks"][index - 1]["status"] = "completed"
+        plan["tasks"][index - 1]["attempts"] = [{
+            "attempt_id": f"int006r-attempt-{index:02d}",
+            "status": "completed",
+            "started_at_utc": "2026-11-03T00:00:00Z",
+            "finished_at_utc": "2026-11-03T00:00:01Z",
+            "experiment_id": experiment_id,
+            "experiment_dir": str(experiment_dir),
+            "reason": None,
+        }]
+        capture = {
+            "status": "saved",
+            "run_id": run_id,
+            "experiment_id": experiment_id,
+            "chalk_experiment_matrix": metadata,
+            "stroke_count": stroke_count,
+            "expected_stroke_count": stroke_count,
+            "brush_radius_status": "single",
+            "chalk_status": "exact",
+            "chalk_counter_consistent": True,
+            "point_delta_matches_chalk": True,
+            "dropped_events": 0,
+            "monitor_dropped_events": 0,
+            "monitor_error_count_delta": 0,
+            "bridge_send_failures_delta": 0,
+            "collector_sequence_gap_count": 0,
+        }
+        summary = {
+            "run_id": run_id,
+            "autodraw_experiment_id": experiment_id,
+            "chalk_experiment_matrix": metadata,
+            "brush_radius_status": "single",
+            "observed_brush_radii": [radius],
+            "point_delta_matches_chalk": True,
+            "stroke_count": stroke_count,
+            "sampled_point_delta_total": consumed,
+            "dropped_events": 0,
+            "monitor_dropped_events": 0,
+            "monitor_error_count_delta": 0,
+            "bridge_send_failures_delta": 0,
+            "collector_sequence_gap_count": 0,
+            "chalk": {
+                "status": "exact",
+                "pre_point_count": 1000,
+                "post_point_count": 1000 + consumed,
+                "consumed_points": consumed,
+            },
+            "frame_probe": {"status": "measured", "visibility_interruption": False},
+            "trajectory": {"accepted_sample_count": stroke_count},
+        }
+        manifest = {
+            "experiment_id": experiment_id,
+            "test_case": scenario_id,
+            "brush_value_requested": radius,
+            "chalk_experiment_matrix": metadata,
+            "chalk_test_block": {
+                "block_id": plan["block_id"],
+                "task_id": task["task_id"],
+                "phase_id": RADIUS_GEOMETRY_VALIDATION_PHASE,
+            },
+            "monitor_capture": capture,
+            "game_monitor_summary": summary,
+            "execution_report": {
+                "status": "completed",
+                "completed_strokes": stroke_count,
+                "executor_config": parameters,
+            },
+            "phases": {
+                "before_clear": {"status": "restored"},
+                "before_draw": {
+                    "captured_at_utc": "2026-11-03T00:00:00Z",
+                    "files": {"board_roi": "before_draw-board.png"},
+                },
+                "after_draw": {
+                    "status": "captured",
+                    "files": {"board_roi": "after_draw-board.png"},
+                },
+                "postdraw_workflow": {"status": "completed"},
+            },
+        }
+        (experiment_dir / "experiment.json").write_text(
+            json.dumps(manifest), encoding="utf-8"
+        )
+
+    plan["status"] = "completed"
+    journal_path = tmp_path / "completed-int006r.json"
+    create_chalk_test_block_journal(journal_path, plan)
+    report = analyze_int006r_validation(journal_path, results_dir)
+
+    assert report["status"] == "complete"
+    assert report["accepted_count"] == 45
+    assert report["missing_count"] == 0
+    assert report["rejected"] == []
+    assert report["png_evidence_status"] == "complete"
+    assert report["visual_quality_gate"] == "pending_manual_review"
+    for scenario_id in PHASE_SCENARIOS[RADIUS_GEOMETRY_VALIDATION_PHASE]:
+        for radius in RADIUS_GEOMETRY_VALIDATION_RADII:
+            group = report["groups"][scenario_id][str(radius)]
+            assert group["count"] == 3
+            assert len(group["repeat_chalk"]) == 3
+            assert len(group["per_stroke_chalk"]) == 3 * EXPECTED_STROKES[scenario_id]
