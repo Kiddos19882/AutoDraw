@@ -1924,3 +1924,13 @@ Brush Test acceptance и матричные валидаторы больше н
 - Добавлен regression test `test_manual_experiment_capture_does_not_relocate_cursor`, запрещающий mouseUp/moveTo в ручном capture method.
 - Fix commit: `16ffb5893b642799fe6b5b6fc39d764975d70dfe`; guard test commit: `a74f7fd18c1b4100c87747ab4bd533afaa74b95d`.
 - CI для промежуточного HEAD `723a410` run `41466392528` ещё выполнялся на момент проверки; исправленный HEAD запустил новый workflow. Финальный CI ожидается.
+
+
+## 2026-11-02 — подготовлены отдельные live follow-up серии V2/V5
+
+- Новая V2 серия `int006_short_strokes_followup`: пять изолированных штрихов 12/16/20/24/30 logical px, направления горизонталь/вертикаль/диагональ. Исходные V2 captures сохранены.
+- Новая V5 серия `int006_intersections_spacing_sweep`: шесть контрольных штрихов X/T/креста и пять независимых пар параллельных линий spacing 8/12/16/20/24 logical px; всего 16 штрихов. Исходные V5 captures сохранены.
+- Обе серии подключены к PHASE_SCENARIOS/EXPECTED_STROKES, block matrix, UI presets и regression tests. Каждая серия создаёт 9 задач (P0/P1/P2 × 3 повтора), radius=10; всего 18 будущих live captures.
+- Добавлены геометрические regression checks точных длин V2 и межосевых расстояний V5.
+- Документ выполнения: `CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md`. Live experiments не запускались; их выполняет пользователь. Production executor, estimator, defaults и старые captures не изменялись.
+- Кодовые коммиты follow-up: `1f2917a`, `8a012de`, `230fe22`, `3d6754c`, `ef8b704`, `94c3c87`. Предыдущий CI run `41466760095` успешен для HEAD `a74f7fd`; CI новых изменений ожидается.
