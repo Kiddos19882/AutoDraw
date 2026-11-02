@@ -26,9 +26,15 @@ PHASE_SCENARIOS = {
     "V4": ("int006_closed_contours",),
     "V5": ("int006_intersections_spacing_sweep",),
 }
-GEOMETRY_MATRIX_SCENARIOS = frozenset(
-    scenario for scenarios in PHASE_SCENARIOS.values() for scenario in scenarios
-)
+LEGACY_V_SCENARIO_PHASES = {
+    "int006_short_strokes": "V2",
+    "int006_intersections_spacing": "V5",
+}
+PHASE_BY_SCENARIO = {
+    scenario: phase for phase, scenarios in PHASE_SCENARIOS.items() for scenario in scenarios
+}
+PHASE_BY_SCENARIO.update(LEGACY_V_SCENARIO_PHASES)
+GEOMETRY_MATRIX_SCENARIOS = frozenset(PHASE_BY_SCENARIO)
 GEOMETRY_EXECUTOR_CONFIG = {
     "point_step_px": 2,
     "line_extension_px": 0,
@@ -119,7 +125,7 @@ def inspect_chalk_matrix_series(
         raise ValueError(f"Неизвестный сценарий CHALK: {scenario_id!r}.")
     if isinstance(repeat_index, bool) or not isinstance(repeat_index, int) or repeat_index not in (1, 2, 3):
         raise ValueError("Номер повтора должен быть целым числом 1, 2 или 3.")
-    phase_id = next(phase for phase, scenarios in PHASE_SCENARIOS.items() if scenario_id in scenarios)
+    phase_id = PHASE_BY_SCENARIO[scenario_id]
     parameters = _validated_executor_parameters(phase_id, executor_parameters)
 
     series_count = 0
@@ -166,10 +172,7 @@ def build_chalk_experiment_matrix_metadata(
     normalized_series = _normalize_series_id(series_id)
     if not isinstance(scenario_id, str):
         raise ValueError("ID сценария должен быть текстом.")
-    phase_id = next(
-        (phase for phase, scenarios in PHASE_SCENARIOS.items() if scenario_id in scenarios),
-        None,
-    )
+    phase_id = PHASE_BY_SCENARIO.get(scenario_id)
     if phase_id is None:
         raise ValueError(f"Сценарий {scenario_id!r} не входит в план G1/G2/G3/V1-V5.")
     parameters = _validated_executor_parameters(phase_id, executor_parameters)
