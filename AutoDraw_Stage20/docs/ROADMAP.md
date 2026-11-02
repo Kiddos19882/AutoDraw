@@ -3,18 +3,16 @@
 ## Актуальный статус INT-006 — 2026-11-03
 
 - [x] Harness D1–D5, 45-cell journal, 15 frozen prediction records, prediction ID handoff и independent analyzer реализованы.
-- [x] Software CI run [41513389663](https://github.com/Kiddos19882/AutoDraw/actions/runs/41513389663) прошёл на code HEAD `ca8c9b3`: 667 passed, 82 subtests; обязательные jobs, Windows portable build/startup smoke-test и PNG audit success.
-- [x] Live block D1–D5 выполнен: 45/45 tasks completed, radius=10.
-- [x] Предварительно проверены 45 experiment manifests и 45 Monitor reports: exact CHALK, per-stroke sums, stroke counts, нулевые per-run Monitor/Bridge integrity counters.
-- [x] Предварительные run-level и per-stroke метрики рассчитаны и записаны в [отдельный отчёт](CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md).
-- [x] Исправлена portability-привязка journal attempt к каталогу эксперимента и добавлен regression test.
-- [x] В `.github/workflows/geometry-tests.yml` добавлен официальный analyzer run и upload JSON report.
-- [ ] Подтвердить CI после последних analyzer/test/workflow commits и получить официальный analyzer JSON: 45 accepted, 0 missing, 0 rejected.
-- [ ] Проверить frozen artifact SHA-256 и все journal/task/experiment/run/profile/geometry bindings штатным analyzer.
-- [ ] После официального результата определить обоснованный safety margin; до этого production estimator/defaults не менять.
-- [ ] INT-007 начинать только после закрытия validation и safety-margin gates.
+- [x] Live block D1–D5 выполнен: 45/45 tasks completed, radius=10; все 45 Monitor reports прошли повторный аудит exact CHALK и per-stroke integrity.
+- [x] Официальный analyzer run [41532629748](https://github.com/Kiddos19882/AutoDraw/actions/runs/41532629748) завершился SUCCESS: 45 accepted, 0 missing, 0 rejected, 15/15 groups complete, 3 repeats per group, 243 stroke rows.
+- [x] Frozen artifact SHA-256 и полный journal/task/experiment/run/profile/normalized-geometry binding проверены штатным analyzer.
+- [x] Полный CI: Preparation/G3 669 passed + 82 subtests; Application integration, Executor regression, Game Monitor/bridge, Windows portable build/startup smoke-test, PNG audit и CHALK analyzer — success; optional benchmarks skipped.
+- [x] Analyzer runtime geometry serialization mismatch исправлен в `8eba34f`; runtime-shaped regression fixture добавлен в `dd64730`.
+- [x] Официальные run-level и per-stroke metrics записаны в [официальный отчёт](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md).
+- [ ] Отдельно принять решение о safety margin и расширить domain validation на полные рисунки, кривые, заливки, повторное покрытие и другие радиусы.
+- [ ] INT-007 начинать только после решения о safety margin и расширенной проверки. Production estimator/defaults не менять до этого.
 
-**Предварительные результаты:** 45 plan runs — MAE 1.408 CHALK, RMSE 1.967, bias -0.875, MAPE 2.134%, max underprediction 1.82 CHALK. Это не официальный analyzer result и не основание для production eligibility. Все live captures были при requested radius=10; влияние радиуса не проверялось.
+**Итог quantitative gate:** PASS. **INT-006 остаётся IN_PROGRESS** только из-за неустановленного safety margin и ограниченной области применимости (пять DrawingPlan, три повтора на cell, radius=10). P1 (step=4, delay=5 ms) — лучший совокупный исследовательский профиль: MAE 0.657, RMSE 0.838, MAPE 1.178%, max underprediction 0.92 CHALK. P1/1 CHALK — лишь provisional empirical guard для этой выборки, не статистическая гарантия и не production rule.
 
 ## Статус аналитических планов
 
@@ -137,7 +135,7 @@ G3 block `chalk-20261102-031830-a0f325` завершён: 27/27 captures при�
 - [ ] Выполнить независимую проверку прогноза на новых рисунках, получить error distribution и консервативный safety margin.
 - [ ] После validation перейти к INT-007 — интеграции проверенной оценки в preflight/resource estimator.
 
-**Текущий статус INT-006:** IN_PROGRESS. Live follow-up V1–V5 и pixel-level audit 90 captures завершены; предварительная модель остаётся non-production до независимой validation на полных DrawingPlan и определения safety margin.
+**Исторический статус на момент записи 2026-11-02:** IN_PROGRESS до получения официального analyzer report. Текущий статус и закрытие quantitative gate приведены в разделе «Актуальный статус INT-006 — 2026-11-03» выше.
 
 
 ## 2026-11-02 — G3 visual quality audit
