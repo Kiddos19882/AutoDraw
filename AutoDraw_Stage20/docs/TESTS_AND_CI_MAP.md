@@ -26,7 +26,8 @@
 | `source/preparation/tests/test_geometry_color_plan.py` | `geometry_color_plan`, `geometry_budget_optimizer`, `layer_segmentation`, `skeletonization`, `stroke_simplification`, `stroke_order_optimizer` | Scanline/contour/skeleton, фильтрация компонентов, маршрутизация, multi-board, бюджет, валидаторы, качество и round-trip |
 | `source/preparation/tests/test_chalk_radius_matrix.py` | `chalk_radius_matrix` | Валидация радиусов/блоков, уникальность Game Monitor run, experiment identity, точность CHALK и статистика повторов |
 | `source/preparation/tests/test_chalk_experiment_matrix.py` | `chalk_experiment_matrix` | G1/G2 metadata, exact capture, уникальность repeat cells, per-stroke pointDelta и статистика |
-| `source/preparation/tests/test_chalk_test_blocks.py` | `chalk_test_blocks` | Полные планы G1/G2/G3 (12/18/27 задач), три повтора, детерминированный порядок, журнал, последовательный claim, fail-closed и interrupted recovery |
+| `source/preparation/tests/test_chalk_test_blocks.py` | `chalk_test_blocks` | Полные планы G1/G2/G3/INT006R, три повтора, детерминированный порядок, журнал, последовательный claim, fail-closed и interrupted recovery |
+| `source/preparation/tests/test_chalk_int006r_validation.py` | `chalk_experiment_matrix`, `chalk_test_blocks`, `chalk_int006r_validation` | 45-cell radius × geometry matrix, радиусы 1/10/30, P1-only, journal tampering, duplicate cells и incomplete analyzer gate |
 
 Дополнительные импорты в `test_geometry_color_plan.py` подтверждают, что тест напрямую обращается к внутренним функциям и модулям-реализациям, а не только к публичному API. При изменении внутренних контрактов этот тестовый файл следует рассматривать как интеграционный тест нескольких алгоритмических компонентов.
 
@@ -439,3 +440,13 @@ Workflow и тесты обновлены в feature-ветке; результ�
 - `source/preparation/tests/test_brush_behavior_test_ui.py`: число штрихов и logical-board bounds DrawingPlan.
 - `tests/test_unified_app.py`: task-specific executor override для V5.
 - Workflow `.github/workflows/geometry-tests.yml` покрывает эти тесты через preparation и integration jobs; успешный run для текущего HEAD ещё не подтверждён.
+
+
+## INT006R radius × geometry validation
+
+- Matrix contract: `source/preparation/chalk_experiment_matrix.py` — отдельные scenario IDs D1R–D5R, радиусы 1/10/30 и единственный sampling profile P1 (4/5).
+- Durable block planner/journal: `source/preparation/chalk_test_blocks.py` — 45 уникальных ячеек `(scenario, radius, repeat)`; проверяются missing/duplicate cells, task IDs, radius, P1 и отсутствие frozen prediction artifact.
+- UI and executor handoff: `source/preparation/brush_behavior_test_ui.py` и `integrated_app.py` — радиус устанавливается из task journal и повторно сверяется с requested brush до запуска штатного executor.
+- Analyzer: `source/preparation/chalk_int006r_validation.py` — exact CHALK, completed journal attempt, experiment/run binding, per-stroke breakdown, per-geometry/per-radius mean/median/range/population SD и сравнение с radius=10.
+- Regression: `source/preparation/tests/test_chalk_int006r_validation.py` и `tests/test_unified_app.py`.
+- Live execution запрещён до полного CI и Windows portable build/startup smoke-test PASS. INT006R не использует frozen INT-006 predictions и не меняет production estimator.
