@@ -694,7 +694,7 @@ class AutoDrawUnifiedApp:
             generation = plan_document.get("generation", {})
             matrix = generation.get("chalk_experiment_matrix") if isinstance(generation, dict) else None
             matrix_phase = matrix.get("phase_id") if isinstance(matrix, dict) else None
-            if isinstance(matrix, dict) and matrix_phase in {"G3", "V1", "V2", "V3", "V4", "V5"}:
+            if isinstance(matrix, dict) and matrix_phase in {"G3", "V1", "V2", "V3", "V4", "V5", "INT006"}:
                 from chalk_experiment_matrix import (
                     GEOMETRY_EXECUTOR_CONFIG, EXPECTED_STROKES, PHASE_SCENARIOS,
                     V_SAMPLING_PROFILES,
@@ -715,10 +715,13 @@ class AutoDrawUnifiedApp:
                 if matrix_phase == "G3":
                     expected_scenario = "paint_consumption_long_lines"
                     allowed_profiles = {(step, delay) for step in (1, 2, 4) for delay in (5, 10, 20)}
+                elif matrix_phase == "INT006":
+                    expected_scenario = scenario_id if scenario_id in PHASE_SCENARIOS[matrix_phase] else None
+                    allowed_profiles = set(V_SAMPLING_PROFILES)
                 else:
                     expected_scenario = PHASE_SCENARIOS[matrix_phase][0]
                     allowed_profiles = set(V_SAMPLING_PROFILES)
-                expected_strokes = EXPECTED_STROKES[expected_scenario]
+                expected_strokes = EXPECTED_STROKES.get(expected_scenario) if expected_scenario else None
                 block = generation.get("chalk_test_block") if isinstance(generation, dict) else None
                 if (
                     scenario_id != expected_scenario
