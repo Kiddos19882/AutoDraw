@@ -55,11 +55,11 @@
 - [x] Выполнить V1/V3/V4 follow-up по [отдельному протоколу](CHALK_INT006_V1_V3_V4_FOLLOWUP_2026-11-02.md): по 9 captures на фазу.
 - [x] Выполнить V2 short-stroke follow-up (5 strokes) и V5 spacing sweep (16 strokes) по отдельному протоколу.
 - [x] Выполнить pixel-level audit исходных + follow-up PNG; 90/90 valid, no missing/duplicate cells, 297/297 новых stroke rows без gaps (CI 41496555297).
-- [ ] Реализовать INT006 D1–D5 в matrix/block/UI/executor/analyzer harness; пройти regression tests и полный CI.
-- [ ] Провести локальный Windows preflight; затем выполнить 45 независимых live captures и сравнить с frozen predictions.
+- [x] Реализовать INT006 D1–D5 в matrix/block/UI/executor/analyzer harness; regression tests добавлены, software CI run `41513389663` прошёл.
+- [x] Выполнить 45 независимых live captures D1–D5; предварительно сверить exact CHALK и per-stroke breakdown по всем 45 Monitor reports. Отдельный preflight log в capture bundle не найден.
 - [ ] После validation определить обоснованный safety margin.
 
-**Актуальный приоритет INT-006:** CI legacy-journal compatibility закрыт run `41496555297`; следующий gate — независимая validation по [отдельному плану](CHALK_INT006_INDEPENDENT_VALIDATION_PLAN_2026-11-02.md); общий порядок — [план дальнейших действий](CHALK_NEXT_STEPS_PLAN_2026-11-02.md) и [исполнительный протокол INT-006](CHALK_INT006_EXECUTION_PROTOCOL_2026-11-02.md). Исторические чек-листы ниже сохраняют ход выполнения и не переопределяют статусы таблицы.
+**Актуальный приоритет INT-006:** live D1–D5 captures завершены. Следующий gate — официальный analyzer JSON, hash/binding verification и решение по safety margin. См. [предварительные результаты](CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md), [план validation](CHALK_INT006_INDEPENDENT_VALIDATION_PLAN_2026-11-02.md) и [план дальнейших действий](CHALK_NEXT_STEPS_PLAN_2026-11-02.md). Исторические чек-листы ниже сохраняют ход выполнения и не переопределяют статусы таблицы.
 ## Отменённые работы
 
 | ID | Статус | Задача | Основание |
