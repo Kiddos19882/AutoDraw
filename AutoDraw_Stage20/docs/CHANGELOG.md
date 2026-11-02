@@ -442,6 +442,6 @@
 ### INT-006 legacy journal compatibility and independent validation plan — 2026-11-02
 
 - Добавлена совместимость validator с историческими scenario IDs V2/V5 и их собственными expected stroke counts; добавлены regression tests (commits `f0e05df`, `4847cce`).
-- Уточнено, что последний подтверждённый полный CI на code HEAD `3e8e6c5` предшествует этим двум commits. Проверка CI для legacy-journal fix остаётся открытой; статический review не считается запуском тестов.
+- Подтверждено, что полный CI run [41496555297](https://github.com/Kiddos19882/AutoDraw/actions/runs/41496555297) checkout рабочей ветки после commit `956ce2b`, содержащего оба исправления в истории. Preparation/G3 завершился 662 passed и 82 subtests passed; все обязательные jobs успешны.
 - Создан `CHALK_INT006_INDEPENDENT_VALIDATION_PLAN_2026-11-02.md`: пять новых DrawingPlan, frozen predictions P0/P1/P2, 3 повтора, exact pre/post pointCount и метрики ошибок.
-- Обновлены PROJECT_STATUS, TASKS, ROADMAP, WORK_LOG, CHALK_NEXT_STEPS_PLAN и docs index. Production estimator, executor defaults и первичные experiment data не менялись.
+- Обновлены PROJECT_STATUS, TASKS, ROADMAP, WORK_LOG, CHALK_NEXT_STEPS_PLAN и docs index. Production estimator, executor defaults и первичные experiment data не менялись. Legacy-journal CI gate закрыт.
