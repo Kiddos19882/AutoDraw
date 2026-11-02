@@ -784,3 +784,15 @@ Per-run transport gates чистые: `dropped_events=0`, `monitor_error_count_d
 - Отчёт: [CHALK_INT006_PNG_SCREENING_2026-11-02.md](CHALK_INT006_PNG_SCREENING_2026-11-02.md), разделы 7–8.
 - Следующий шаг: выполнить пакетную сегментацию в checkout-среде, где доступны PNG и зависимости Pillow/NumPy/OpenCV; сохранить per-stroke JSON/CSV и diagnostic overlays. Сначала проверить маски на одном capture каждой фазы/профиля.
 - Pixel-level gate остаётся OPEN. Production code, defaults и estimator не менялись.
+
+
+## INT-006 — количественный pixel-level аудит выполнен (2026-11-02)
+
+- На кодовом HEAD `d3971e4` GitHub Actions run [41392156994](https://github.com/Kiddos19882/AutoDraw/actions/runs/41392156994) завершился success: все обязательные jobs, Windows portable build/startup smoke-test и INT-006 PNG audit успешны.
+- Анализатор обработал 45/45 captures V1–V5; capture_valid=45, invalid=0, matrix missing/duplicate/unexpected=0, batch failures=0. Созданы 252 per-stroke записи, 279 pair records, JSON summary и diagnostic overlays/masks.
+- Coverage=1.0 и gap_count=0 для всех строк в пределах оцениваемой траектории; эти значения не закрывают quality gate автоматически. 9/54 штрихов V2 length_10 имеют evaluable_path_fraction=0.381 и path_metrics_sufficient=false.
+- V5: 9/144 пар имеют candidate mask overlap и ink masks touch/merge; все относятся к близкой паре spacing≈8.01 logical px. Это не устанавливает универсальный безопасный spacing.
+- V4 rectangle/triangle closure seam подтверждён; irregular_polygon closure metric отсутствует. V1/V3 сохраняют multi-component/intersection ambiguity.
+- Подробные метод, P0/P1/P2 таблицы, ограничения и дальнейшие действия: [CHALK_INT006_PIXEL_AUDIT_2026-11-02.md](CHALK_INT006_PIXEL_AUDIT_2026-11-02.md). Артефакт CI: [ZIP](https://github.com/Kiddos19882/AutoDraw/actions/runs/41392156994/artifacts/13117572972).
+- **INT-006 остаётся IN_PROGRESS:** нужны просмотр проблемных overlay, исправленные изолированные V1/V3, короткие targeted strokes и V5 spacing sweep. Независимая validation модели и safety margin впереди; INT-007 остаётся BLOCKED.
+- Production executor, estimator, defaults и первичные captures не менялись.
