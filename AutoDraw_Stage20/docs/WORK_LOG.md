@@ -1773,4 +1773,4 @@ Brush Test acceptance и матричные валидаторы больше н
 - G3 фиксировал radius=10. Отдельная radius matrix (1–30) не выявила систематического влияния радиуса на pointCount в этом сценарии.
 - Trajectory reconstruction ограничен coalescing; точную принятую длину пути по Monitor не утверждать.
 
-**Документация:** создан `docs/CHALK_G3_RESULTS_2026-11-02.md`; управляющие документы синхронизируются с принятым live результатом. Старый stopped G3 block не менялся.
+**Документация:** создан `docs/CHALK_G3_RESULTS_2026-11-02.md`; управляющие документы синхронизированы с принятым live результатом: TASKS, PROJECT_STATUS, README, ROADMAP, CHANGELOG, CHALK_GEOMETRY_MATRIX_PLAN и диагностические отчёты. Старый stopped G3 block не менялся.
