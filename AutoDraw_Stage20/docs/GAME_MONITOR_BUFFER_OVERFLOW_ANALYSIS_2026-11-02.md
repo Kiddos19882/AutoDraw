@@ -113,3 +113,19 @@
 Причина G3 fail установлена с высокой уверенностью: **глобальный локальный буфер Game Monitor достиг 50 000 записей; его накопительный overflow-счётчик был ошибочно интерпретирован как потери событий конкретного run**. Browser Bridge и collector по диагностике этой session передали и приняли одинаковые 50 320 событий без ошибок отправки.
 
 Следующая задача — исправить семантику счётчиков и acceptance gate, затем покрыть её регрессионными тестами до нового live G3 запуска.
+## 9. Исправление реализовано (2026-11-02)
+
+В коде feature-ветки внесены изменения:
+- `RunRecorder` сохраняет session-cumulative Monitor buffer drops как `monitor_buffer_dropped_events_start/end/delta`; больше не меняет `trajectory.status` и не маркирует run как `monitor_events_dropped` только из-за переполнения локального export buffer.
+- Cumulative Monitor errors также записываются как start/end/delta; acceptance использует `monitor_error_count_delta`.
+- Browser Bridge `sendFailureCount` сравнивается с baseline run и сохраняется как `bridge_send_failures_delta`.
+- Collector обнаруживает пропуски sequence, считает их в session diagnostics и записывает пропущенные sequence активного run как `collector_sequence_gap_count`.
+- Brush Test gate и CHALK matrix validators больше не используют cumulative `monitor_dropped_events` / `monitor_error_count` как per-run rejection criteria. Они проверяют per-run `dropped_events`, `monitor_error_count_delta`, `bridge_send_failures_delta` и `collector_sequence_gap_count`.
+
+Добавлены регрессионные тесты:
+- Node: подписчик получает все события после достижения 50 000 лимита локального буфера;
+- Python: cumulative overflow и прежние Monitor errors не портят следующий run;
+- WebSocket integration: пропуск sequence фиксируется в session и run;
+- матричные валидаторы: cumulative overflow принимается как диагностический счётчик, реальные per-run transport loss отвергаются.
+
+**Статус:** код и тесты добавлены, но CI на конечном HEAD ещё не подтверждён. Live Firefox/game test не запускался. Исторический G3 journal и manifest `s4-d10-r2` не переписывались. До успешного CI и локального preflight live G3 не запускать.
