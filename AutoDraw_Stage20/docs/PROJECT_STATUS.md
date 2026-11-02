@@ -3,7 +3,7 @@
 **Актуально на:** 2 ноября 2026 г.  
 **Репозиторий:** `Kiddos19882/AutoDraw`  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
-**Последний кодовый HEAD:** `b60d9aef5b9a95ebefa85f42d99956f181bec7ee` (реализация harness V1–V5 и regression tests); CI для этого HEAD ещё не подтверждён.
+**Последний кодовый HEAD:** `b60d9aef5b9a95ebefa85f42d99956f181bec7ee` (реализация harness V1–V5 и regression tests); обязательный CI run #1886 завершился успешно. Текущий branch HEAD `400becfaefd59497f95b370f3608717d61d5d86e` содержит только шесть последующих документационных коммитов относительно кодового HEAD.
 
 > Этот верхний блок — единственный источник текущего статуса. Ниже сохранена историческая хронология работ. Более ранние статусы, планы и чек-листы в исторических записях не являются текущим backlog и не должны переопределять сведения этого блока и [TASKS.md](TASKS.md).
 
@@ -17,7 +17,7 @@
 - Предварительная сегментированная модель создана в [CHALK_PRELIMINARY_SEGMENTED_MODEL_2026-11-02.md](CHALK_PRELIMINARY_SEGMENTED_MODEL_2026-11-02.md). Она исследовательская, не production estimator; независимая validation ещё не выполнена.
 - Визуальный аудит всех шести G3 PNG step=4/delay=5 и step=4/delay=10 пройден для длинных горизонтальных линий. Все шесть линий визуально непрерывны. Конец шестой линии частично закрыт курсором. Количественные pixel-level метрики gap/centerline/width не рассчитаны.
 - step=4 подтверждён только как экспериментальный режим для длинных горизонтальных линий в условиях G3. Универсальный production default не утверждён; настройки executor не менялись.
-- INT-006 зафиксирован протоколом `CHALK_INT006_EXECUTION_PROTOCOL_2026-11-02.md`. Экспериментальный harness расширен сценариями V1–V5 поверх G3: matrix metadata/validator, 9-cell block planner/journal, Brush Test UI и task-specific executor override. Добавлены regression tests. CI и 45 live captures ещё не подтверждены; независимая validation модели не выполнена.
+- INT-006 зафиксирован протоколом `CHALK_INT006_EXECUTION_PROTOCOL_2026-11-02.md`. Экспериментальный harness расширен сценариями V1–V5 поверх G3: matrix metadata/validator, 9-cell block planner/journal, Brush Test UI и task-specific executor override. Добавлены regression tests. Обязательный CI run #1886 на кодовом HEAD `b60d9aef` завершился success: Application integration, Executor regression, Game Monitor/bridge, Preparation/G3 matrix и Windows portable build/startup — success; Optional algorithm benchmarks — skipped. 45 live captures ещё не выполнялись; независимая validation модели не выполнена.
 - Код и live-эксперименты в ходе последнего документального аудита не изменялись/не запускались.
 
 ## Статусы инициатив
@@ -30,7 +30,7 @@
 | INT-003 | IN_PROGRESS | Точный счётчик и события подтверждены; требуется завершить сопоставимый A/B/C overhead/FPS анализ Monitor off / версий Monitor. |
 | INT-004 | DONE* | WebSocket telemetry, per-run capture, RunRecorder и автоматическая связь Monitor report с экспериментом используются в принятых G1–G3 данных. *Это закрывает сбор/корреляцию данных, но не A/B/C overhead — он остаётся в INT-003.* |
 | INT-005 | DONE* | Автоматические CHALK blocks, manifest, matrix, recovery и fail-closed gates использованы для принятых G1–G3. *Отдельные будущие улучшения лаборатории не блокируют завершение реализованного контура.* |
-| INT-006 | IN_PROGRESS | Протокол зафиксирован. Требуется расширить harness для V1–V5, выполнить геометрическую validation step=4 и независимую validation прогноза CHALK; harness пока поддерживает только G1/G2/G3. |
+| INT-006 | IN_PROGRESS | Harness V1–V5 реализован и обязательный CI run #1886 пройден. Ожидаются 45 live captures, геометрическая validation step=4 и независимая validation прогноза CHALK. |
 | INT-007 | TODO | Интеграция валидированной модели в preflight/resource estimator запрещена до закрытия INT-006. |
 | INT-008 | TODO | Оптимизация траекторий/покрытия в пределах CHALK после появления валидированного estimator. |
 | INT-009 | TODO | Проверка прогноза на независимых рисунках, визуальное качество и фактическая экономия. |
@@ -38,7 +38,7 @@
 ## Ближайший рабочий приоритет
 
 1. Завершить документальную консолидацию: синхронизировать TASKS, ROADMAP, модель CHALK, G3 Results и индексы.
-2. Подтвердить CI расширенного G3 harness для V1–V5. Затем выполнить геометрическую валидацию step=4: диагонали, короткие штрихи, повороты, замкнутые контуры и пересечения. Контроль — step=2/delay=10; кандидаты — step=4/delay=5 и step=4/delay=10.
+2. CI расширенного harness V1–V5 подтверждён run #1886 на кодовом HEAD `b60d9aef`. Следующий gate — выполнить геометрическую валидацию step=4: диагонали, короткие штрихи, повороты, замкнутые контуры и пересечения. Контроль — step=2/delay=10; кандидаты — step=4/delay=5 и step=4/delay=10.
 3. Для каждого run требовать exact CHALK, per-run Monitor integrity, одинаковую геометрию, визуальный capture и три повтора на профиль.
 4. Собрать независимую validation-выборку реальных планов и сравнить прогноз с exact pre/post pointCount; рассчитать MAE, RMSE, bias и относительную ошибку, отдельно по типам геометрии.
 5. Только после validation определить консервативный safety margin и критерии допуска к квоте.
