@@ -1512,6 +1512,14 @@ class UnifiedAppCoreTests(unittest.TestCase):
         showerror.assert_called_once()
         self.assertIsNone(started_with)
 
+        started_with, showerror, _ = run_handoff(1.0)
+        showerror.assert_called_once()
+        self.assertIsNone(started_with)
+
+        started_with, showerror, _ = run_handoff(True)
+        showerror.assert_called_once()
+        self.assertIsNone(started_with)
+
         started_with, showerror, _ = run_handoff(1, requested_brush=10)
         showerror.assert_called_once()
         self.assertIsNone(started_with)
