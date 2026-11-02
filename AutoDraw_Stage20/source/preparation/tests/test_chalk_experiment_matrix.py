@@ -206,8 +206,12 @@ def test_geometry_matrix_ignores_cumulative_monitor_buffer_overflow(tmp_path):
     doc = _manifest(folder, consumed=50)
     doc["monitor_capture"]["monitor_dropped_events"] = 434
     doc["monitor_capture"]["monitor_buffer_dropped_events_delta"] = 434
+    doc["monitor_capture"]["monitor_error_count"] = 8
+    doc["monitor_capture"]["monitor_error_count_delta"] = 0
     doc["game_monitor_summary"]["monitor_dropped_events"] = 434
     doc["game_monitor_summary"]["monitor_buffer_dropped_events_delta"] = 434
+    doc["game_monitor_summary"]["monitor_error_count"] = 8
+    doc["game_monitor_summary"]["monitor_error_count_delta"] = 0
 
     result = summarize_chalk_experiment_matrix([doc])
     assert result["valid_measurement_count"] == 1
