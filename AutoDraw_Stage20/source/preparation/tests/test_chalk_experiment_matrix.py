@@ -6,6 +6,7 @@ import pytest
 
 from chalk_experiment_matrix import (
     GEOMETRY_EXECUTOR_CONFIG,
+    PHASE_SCENARIOS,
     build_chalk_experiment_matrix_metadata,
     inspect_chalk_matrix_series,
     summarize_chalk_experiment_matrix,
@@ -431,6 +432,7 @@ def test_legacy_int006_v2_v5_scenarios_remain_analyzable(scenario, stroke_count)
     )
     assert metadata["phase_id"] in {"V2", "V5"}
     assert metadata["expected_strokes"] == stroke_count
+    assert scenario not in {item for scenarios in PHASE_SCENARIOS.values() for item in scenarios}
 
 
 def test_int006_matrix_rejects_unplanned_sampling_profile():
