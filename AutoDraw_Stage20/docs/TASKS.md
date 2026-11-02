@@ -305,4 +305,16 @@ Software gate закрыт; live gate остаётся открытым. Авт�
 - [ ] Добавить Python regression test: overflow предыдущих событий session не должен делать следующий run partial.
 - [ ] Прогнать Game Monitor/Preparation tests и CI на конечном HEAD.
 - [ ] Только после исправления и тестов планировать новый live G3; старый stopped journal не переоткрывать и не переписывать.
+## 2026-11-02 — устранение ложного Game Monitor partial
 
+- [x] Разделить cumulative Monitor export-buffer overflow и per-run RunRecorder drops.
+- [x] Добавить start/end/delta для Monitor buffer overflow и Monitor error counters.
+- [x] Добавить per-run delta Browser Bridge send failures.
+- [x] Добавить обнаружение WebSocket sequence gaps на collector и фиксацию в активном run.
+- [x] Удалить cumulative `monitor_dropped_events` из acceptance gate Brush Test.
+- [x] Обновить G1/G2/G3 и radius-matrix validators на per-run loss/error metrics.
+- [x] Добавить Node/Python/WebSocket/matrix regression tests.
+- [x] Обновить техническую документацию.
+- [ ] Проверить все новые regression tests и полный CI на конечном HEAD.
+- [ ] Проверить portable build и локальный Windows/Firefox preflight.
+- [ ] После успешных gates выполнить новый G3 block; старый stopped journal не возобновлять и не переписывать.
