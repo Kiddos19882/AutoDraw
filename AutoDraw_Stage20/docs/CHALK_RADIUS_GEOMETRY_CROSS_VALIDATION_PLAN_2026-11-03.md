@@ -1,7 +1,7 @@
 # План перекрёстной validation радиуса кисти и геометрии CHALK
 
 **Дата:** 2026-11-03  
-**Статус:** IMPLEMENTATION IN PROGRESS — отдельная фаза INT006R и тестовый analyzer добавлены; software gate CI ожидается; live-запуски запрещены до PASS  
+**Статус:** SOFTWARE GATE PASS — отдельная фаза INT006R прошла полный CI; следующий шаг — локальный Windows preflight и 45 live captures  
 **Связь:** продолжение INT-006; не открывает INT-007 автоматически  
 **Рабочая ветка:** `feature/image-geometry-optimization`
 
@@ -109,7 +109,7 @@
 
 ### Software gate
 
-На момент этой записи CI ещё не подтверждён. Требуется полный `.github/workflows/geometry-tests.yml` на HEAD с INT006R. Live captures не запускать до успешного CI и Windows portable smoke-test.
+Полный workflow [41540054975](https://github.com/Kiddos19882/AutoDraw/actions/runs/41540054975) на code HEAD `28b56a97255b57b50072ba973533ce349c706bd1` завершился SUCCESS. Preparation/G3 — 682 passed, 82 subtests passed, 24 warnings; Application integration, Executor regression, Game Monitor/Bridge, INT-006 PNG audit и Windows portable build/startup smoke-test — success. Подробности: [INT006R software gate report](CHALK_INT006R_SOFTWARE_GATE_RESULTS_2026-11-03.md). Live captures по-прежнему запрещены до локального Windows preflight.
 
 ### Текущие неизменённые условия
 
@@ -120,3 +120,6 @@
 
 
 Подробная последовательность локального Windows preflight, запуска блока, CLI analyzer и ручного просмотра 45 пар PNG зафиксирована в [CHALK_INT006R_LIVE_PREFLIGHT_AND_VISUAL_AUDIT_2026-11-03.md](CHALK_INT006R_LIVE_PREFLIGHT_AND_VISUAL_AUDIT_2026-11-03.md).
+
+
+Software gate закрыт. Live execution остаётся отдельным следующим этапом и требует доступной Windows-сессии с игрой, подключённым Game Monitor, откалиброванным slider и подтверждённой пустой доской. Следовать [live preflight guide](CHALK_INT006R_LIVE_PREFLIGHT_AND_VISUAL_AUDIT_2026-11-03.md).
