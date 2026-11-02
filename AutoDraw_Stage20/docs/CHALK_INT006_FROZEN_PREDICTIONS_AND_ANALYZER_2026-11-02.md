@@ -60,3 +60,15 @@ Analyzer проверяет hash/содержимое artifact; 45 уникал�
 ## Hash and capture audit — 2026-11-03
 
 The frozen prediction artifact SHA-256 was independently recomputed from canonical JSON and matches the journal value: `a0eab016e96a81e14bededd32cf5161dd943d6fc85a20b7eec17455f69d0c61c`. All 45 Monitor reports were re-read and checked for exact CHALK, stroke-level pointDelta sum, unique observed radius=10, and zero Monitor/Bridge integrity counters. The official analyzer JSON remains pending.
+
+
+## Дополнительная проверка binding журнала — 2026-11-03
+
+При статическом аудите analyzer обнаружено, что prediction ID проверялся в manifest metadata, но не сравнивался напрямую с `prediction_id` в соответствующей journal task. Это оставляло непроверенным одно звено цепочки frozen artifact → journal task → manifest.
+
+Исправлено:
+- analyzer теперь отклоняет запись с `journal_prediction_id_mismatch`, если task prediction ID не совпадает с вычисленным ID для scenario/profile;
+- analyzer дополнительно сверяет `task.expected_strokes` с числом strokes в frozen prediction;
+- добавлен regression test, который изменяет task prediction ID и ожидает fail-closed rejection.
+
+Изменение не меняет frozen model, прогнозы, production estimator или executor defaults. После этого изменения нужен новый CI run; официальный report по 45 captures остаётся pending.
