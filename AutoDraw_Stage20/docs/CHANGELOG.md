@@ -400,3 +400,16 @@
 - Добавлен отдельный протокол новых live-серий для исправленной геометрии V1/V3 и cursor-free closure capture V4.
 - Для каждой фазы определены новый series_id, отдельный block journal и 9 captures; все три фазы вместе — 27 captures.
 - Ссылки добавлены в docs index, PROJECT_STATUS, TASKS, ROADMAP и действующий план INT-006. Код и исходные captures не менялись.
+
+
+## 2026-11-02 — legacy CHALK block journal compatibility
+
+### Fixed
+- Fixed validation of historical INT-006 V2/V5 block journals. The validator now accepts the corresponding legacy scenario IDs and validates each task against its own legacy expected stroke count.
+- Preserved strict matrix integrity: all nine unique sampling/repeat cells and unique order indexes remain required; mixing legacy and current scenario IDs inside one block is rejected.
+- Added regression coverage for completed legacy V2 (6 strokes) and V5 (10 strokes) journals.
+
+### Verified input
+- The reported V2 journal contains 9 unique completed tasks and no duplicate matrix cell. Its legacy ID was the sole compatibility mismatch.
+- Commits: `f0e05df`, `4847cce`. CI validation pending.
+- No experiment records were modified; no production drawing or CHALK calculation behavior changed.
