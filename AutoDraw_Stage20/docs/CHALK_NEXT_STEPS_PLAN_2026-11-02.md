@@ -5,6 +5,8 @@
 **Ветка:** `feature/image-geometry-optimization`  
 **Зависимости:** принятые G1 12/12, G2 18/18, G3 27/27 и radius matrix 21 опыта
 
+> Уточнение CI: run `41470680544` на code HEAD `3e8e6c5` прошёл до commits `f0e05df`/`4847cce`, добавивших совместимость ранее сохранённых legacy V2/V5 journals. Эти два изменения присутствуют в текущей рабочей ветке, но требуют отдельного полного CI. До его результата legacy-journal compatibility gate остаётся открытым.
+
 ## Текущий статус INT-006 — 2026-11-02
 
 INT-006 остаётся IN_PROGRESS. Harness V1–V5 и regression tests реализованы. Исходные 45 captures и исходный pixel-level audit сохранены отдельно. После исправлений сценариев пользователь выполнил полный follow-up: commit [e879a77](https://github.com/Kiddos19882/AutoDraw/commit/e879a77f63be7a7a68de3f09091eab7dba0d34a2) содержит пять block journals (каждый 9/9 completed), 45 experiment manifests, 45 Game Monitor reports и соответствующие PNG. Все 45 captures приняты для анализа exact CHALK и Monitor integrity.
@@ -18,10 +20,11 @@ INT-006 остаётся IN_PROGRESS. Harness V1–V5 и regression tests реа
 2. [x] Реализовать поддержку V1–V5 в экспериментальном harness и добавить regression tests.
 3. [x] Подтвердить CI/Windows startup smoke-test для исходной реализации.
 4. [x] Выполнить исходные 45 live captures и сохранить raw data в commit 6479536.
-5. [x] Исправить legacy V2/V5 manifest compatibility и V5 integration fixture; полный CI на `3e8e6c5` прошёл run `41470680544`.
+5. [x] Восстановить legacy V2/V5 expected counts и исправить V5 integration fixture; полный CI на `3e8e6c5` прошёл run `41470680544`.
+   [ ] Отдельно проверить legacy journal compatibility (`f0e05df`) и regression tests (`4847cce`) полным CI на текущей ветке.
 6. [x] Выполнить live follow-up V1–V5: 45/45 captures, commit `e879a77`; exact CHALK и per-run Monitor integrity приняты.
 7. [x] Выполнить pixel-level аудит новых 45 follow-up PNG: 90/90 captures valid, 297/297 новых strokes coverage=1.0 и zero gaps, V4 closure seams 27/27 covered; V5 spacing 8/12 merge, 16/20/24 separated при radius=10 (CI 41496555297).
-8. [ ] Провести независимую validation CHALK-модели на новых DrawingPlan; только после неё рассчитать safety margin.
+8. [ ] Провести независимую validation CHALK-модели на новых DrawingPlan; только после неё рассчитать safety margin. Протокол набора планов и замороженных прогнозов: [CHALK_INT006_INDEPENDENT_VALIDATION_PLAN_2026-11-02.md](CHALK_INT006_INDEPENDENT_VALIDATION_PLAN_2026-11-02.md).
 
 ## Цель
 
