@@ -1934,3 +1934,12 @@ Brush Test acceptance и матричные валидаторы больше н
 - Добавлены геометрические regression checks точных длин V2 и межосевых расстояний V5.
 - Документ выполнения: `CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md`. Live experiments не запускались; их выполняет пользователь. Production executor, estimator, defaults и старые captures не изменялись.
 - Кодовые коммиты follow-up: `1f2917a`, `8a012de`, `230fe22`, `3d6754c`, `ef8b704`, `94c3c87`. Предыдущий CI run `41466760095` успешен для HEAD `a74f7fd`; CI новых изменений ожидается.
+
+
+## 2026-11-02 — исправление CI regression для INT-006 follow-up
+
+- Проверен CI run `41468581157`: Preparation/G3 — 654 passed, 2 failed; Application integration — 34 passed, 1 failed; Executor и Game Monitor/bridge — success. Windows build и PNG audit были skipped.
+- Preparation failure вызван отсутствием legacy expected counts: `int006_short_strokes` (6) и `int006_intersections_spacing` (10). Эти counts восстановлены в `EXPECTED_STROKES`; старые IDs остаются только в legacy phase map и не добавлены в новые phase/block planners.
+- Application integration failure вызван устаревшей test fixture: она передавала старый V5 scenario ID `int006_intersections_spacing`, тогда как runtime gate ожидает `int006_intersections_spacing_sweep` с 16 штрихами. Fixture и task ID обновлены. `AttributeError` по отсутствующему `self.root` возник вторично при показе error dialog после отклонения устаревшего плана; production error handling не менялся.
+- Изменения: `0cac37c` (legacy counts), `706be60` (V5 fixture). Production executor, CHALK estimator, sampling defaults и live data не менялись.
+- Следующий gate: полный CI на исправленном HEAD; live V2/V5 не запускать до green CI.
