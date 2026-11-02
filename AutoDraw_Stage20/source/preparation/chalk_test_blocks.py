@@ -11,6 +11,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from chalk_int006_validation import (
+    MODEL_ID as INT006_MODEL_ID,
+    build_int006_prediction_artifact,
+    validate_int006_prediction_artifact,
+)
 from chalk_experiment_matrix import (
     EXPECTED_STROKES,
     GEOMETRY_EXECUTOR_CONFIG,
@@ -188,6 +193,7 @@ def build_chalk_test_block_plan(
             for repeat_index in range(1, repeats + 1)
         ]
     random.Random(seed).shuffle(cells)
+    prediction_artifact = build_int006_prediction_artifact(normalized_series) if phase_id == "INT006" else None
     tasks = []
     for order_index, cell in enumerate(cells, start=1):
         parameters = cell["executor_parameters"]
@@ -197,13 +203,25 @@ def build_chalk_test_block_plan(
             if phase_id == "G3" or phase_id.startswith("V") or phase_id == "INT006"
             else f"{cell['scenario_id']}-r{cell['repeat_index']}"
         )
-        tasks.append({
+        task_record = {
             "task_id": task_id,
             **cell,
             "matrix_order_index": order_index,
             "status": "pending",
             "attempts": [],
-        })
+        }
+        if phase_id == "INT006":
+            profile_name = next(
+                name for name, profile in (
+                    ("P0", {"point_step_px": 2, "point_delay_ms": 10}),
+                    ("P1", {"point_step_px": 4, "point_delay_ms": 5}),
+                    ("P2", {"point_step_px": 4, "point_delay_ms": 10}),
+                )
+                if (parameters["point_step_px"], parameters["point_delay_ms"])
+                == (profile["point_step_px"], profile["point_delay_ms"])
+            )
+            task_record["prediction_id"] = f"{INT006_MODEL_ID}:{cell['scenario_id']}:{profile_name}"
+        tasks.append(task_record)
     return {
         "schema_version": BLOCK_SCHEMA_VERSION,
         "record_type": "autodraw_chalk_test_block",
@@ -230,6 +248,7 @@ def build_chalk_test_block_plan(
         "created_at_utc": _utc_now(),
         "updated_at_utc": _utc_now(),
         "tasks": tasks,
+        **({"prediction_artifact": prediction_artifact} if prediction_artifact is not None else {}),
     }
 
 
@@ -374,6 +393,11 @@ def _validate_chalk_test_block_journal(document: Any, path: Path) -> dict[str, A
         ):
             raise ValueError(f"Журнал G3 должен содержать все 27 уникальных ячеек: {path}")
     elif phase_id == "INT006":
+        artifact_ok, artifact_reason = validate_int006_prediction_artifact(
+            document.get("prediction_artifact"), expected_series_id=document.get("series_id")
+        )
+        if not artifact_ok:
+            raise ValueError(f"INT006 frozen prediction artifact invalid ({artifact_reason}): {path}")
         expected_cells = {
             (scenario_id, step, delay, repeat)
             for scenario_id in PHASE_SCENARIOS[phase_id]
@@ -393,6 +417,15 @@ def _validate_chalk_test_block_journal(document: Any, path: Path) -> dict[str, A
             cell = (scenario_id, step, delay, repeat_index)
             expected_parameters = dict(GEOMETRY_EXECUTOR_CONFIG)
             expected_parameters.update({"point_step_px": step, "point_delay_ms": delay})
+            profile_name = next(
+                (name for name, profile in (
+                    ("P0", {"point_step_px": 2, "point_delay_ms": 10}),
+                    ("P1", {"point_step_px": 4, "point_delay_ms": 5}),
+                    ("P2", {"point_step_px": 4, "point_delay_ms": 10}),
+                ) if (step, delay) == (profile["point_step_px"], profile["point_delay_ms"])),
+                None,
+            )
+            expected_prediction_id = f"{INT006_MODEL_ID}:{scenario_id}:{profile_name}" if profile_name else None
             if (
                 scenario_id not in PHASE_SCENARIOS[phase_id]
                 or isinstance(step, bool) or not isinstance(step, int)
@@ -406,8 +439,10 @@ def _validate_chalk_test_block_journal(document: Any, path: Path) -> dict[str, A
                 or (step, delay) not in V_SAMPLING_PROFILES
                 or cell not in expected_cells
                 or cell in observed_cells
+                or task.get("prediction_id") != expected_prediction_id
+                or expected_prediction_id not in document["prediction_artifact"]["predictions"]
             ):
-                raise ValueError(f"Некорректная или повторная ячейка INT006 в журнале: {path}")
+                raise ValueError(f"Некорректная/повторная ячейка INT006 или prediction binding: {path}")
             observed_cells.add(cell)
             observed_order_indices.add(order_index)
         expected_parameter_matrix = [
