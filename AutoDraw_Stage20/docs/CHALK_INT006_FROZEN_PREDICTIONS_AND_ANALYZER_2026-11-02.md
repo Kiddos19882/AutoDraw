@@ -2,7 +2,7 @@
 
 **Model ID:** `chalk-int006-frozen-2026-11-02`, version 1; **radius:** 10; **phase:** `INT006`.  
 **Software gate:** PASS — [CI run 41513389663](https://github.com/Kiddos19882/AutoDraw/actions/runs/41513389663).  
-**Live gate:** BLOCKED до локального Windows preflight.
+**Live gate:** PASS — D1–D5 block 45/45 captures completed при radius=10. **Quantitative gate:** PENDING — требуется официальный запуск analyzer по полному набору.
 
 ## Frozen model
 
@@ -45,3 +45,13 @@ Analyzer проверяет hash/содержимое artifact; 45 уникал�
 Неполные, duplicate, unexpected, повреждённые или не связанные с journal captures отражаются в `rejected`/`missing_cells`. `status=complete` возможен только при 45 валидных captures без пропусков и rejected rows.
 
 Положительный residual означает недооценку расхода. Максимальная наблюдённая недооценка — только provisional empirical guard выборки. Analyzer всегда выставляет `safety_margin_status=not_established` и `production_eligibility=not_validated`. Production estimator/defaults не менялись. Radius в INT-006 фиксирован; влияние размера кисти требует отдельного controlled experiment.
+
+
+## Актуализация после live D1–D5 — 2026-11-03
+
+- Block `chalk-20261102-232320-7cea27`: 45/45 tasks completed; одна завершённая попытка на каждую задачу.
+- Все 45 experiment manifests и 45 `monitor_report.json` доступны в ветке. Предварительная проверка: exact CHALK, per-stroke delta sum, соответствие количества штрихов, нулевые dropped events/errors/Bridge failures/sequence gaps.
+- Предварительные метрики сохранены в [CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md](CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md): 45 plan runs, MAE 1.408, RMSE 1.967, bias -0.875, MAPE 2.134%, max underprediction 1.82 CHALK. Per-stroke: 243 rows, MAE 0.439, RMSE 0.544.
+- Analyzer изменён только в части journal experiment-directory binding: вместо сравнения абсолютных путей используется уникальное имя каталога эксперимента, чтобы Windows captures можно было проверять после переноса в CI workspace. Добавлен regression test.
+- Workflow `.github/workflows/geometry-tests.yml` теперь запускает этот analyzer и сохраняет JSON report как artifact.
+- **Официальная quantitative validation пока не закрыта:** требуется подтвердить CI, получить analyzer JSON, проверить SHA-256 frozen artifact и accepted/missing/rejected counters. До этого `safety_margin_status=not_established`, `production_eligibility=not_validated`.
