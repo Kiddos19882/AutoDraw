@@ -25,10 +25,10 @@ Block journal содержит 45 ожидаемых задач: 5 геомет�
 По всем 45 прочитанным парам manifest/Monitor report:
 
 - `monitor_capture.chalk_status = exact`;
-- радиус записан как один наблюдаемый размер, соответствующий radius=10;
+- в journal/manifest задан radius=10, `brush_radius_status=single`; полная проверка observed radius остаётся частью официального analyzer;
 - число потребляющих strokes соответствует плану конкретной геометрии;
 - сумма `DRAW_SAMPLE.pointDelta` по stroke ID совпадает с точной CHALK delta;
-- `dropped_events`, Monitor errors, Bridge send failures и collector sequence gaps равны нулю;
+- `dropped_events`, Monitor error deltas, Bridge send-failure deltas и collector sequence gaps равны нулю;
 - Monitor report связан с experiment ID и run ID из manifest;
 - отсутствующих manifest или `monitor_report.json` среди 45 ожидаемых директорий не обнаружено.
 
