@@ -236,7 +236,7 @@ INT-007 не открывать, пока:
 
 ## 13. Реализация экспериментального harness V1–V5 — 2026-11-02
 
-**Статус подготовки:** реализовано в рабочей ветке; обязательный CI и live validation ещё не подтверждены.
+**Статус подготовки:** реализовано в рабочей ветке; обязательный CI run #1886 на кодовом HEAD `b60d9aef` завершился успешно. Live validation ещё не выполнялась.
 
 V1–V5 подключены к существующему lifecycle G3. Отдельный runner не создавался.
 
@@ -265,7 +265,7 @@ V1–V5 подключены к существующему lifecycle G3. Отд�
 ### Границы результата
 - Production defaults и production estimator не изменялись.
 - Реализация не подтверждает визуальное качество step=4.
-- CI должен проверить новые regression tests и Windows portable startup.
+- Новые regression tests и Windows portable startup проверены обязательным CI run #1886 на кодовом HEAD `b60d9aef`: все обязательные jobs завершились success.
 - Live captures не запускались; перед ними нужна актуальная portable-сборка, доступная игровая сессия, свежий Monitor heartbeat и пустая тестовая доска.
 - Геометрические captures требуют отдельной визуальной оценки после live runs.
 
@@ -281,4 +281,4 @@ V1–V5 подключены к существующему lifecycle G3. Отд�
 - block planner и journal validator используют единый `V_SAMPLING_PROFILES`;
 - каждый V-блок содержит ровно девять уникальных profile/repeat cells.
 
-**CI не подтверждён:** доступный commit-status endpoint не вернул checks для конечного HEAD. Успешное прохождение тестов не заявляется. Live captures не запускались.
+**CI подтверждён:** GitHub Actions run [#1886](https://github.com/Kiddos19882/AutoDraw/actions/runs/41376333639) для кодового HEAD `b60d9aef5b9a95ebefa85f42d99956f181bec7ee` завершился `success`. Успешны jobs: Application integration tests, Executor regression tests, Game Monitor and bridge tests, Preparation and G3 matrix tests, Windows portable build and startup smoke-test. Optional algorithm benchmarks — `skipped` (необязательный job). Все шесть последующих коммитов до branch HEAD `400becf` изменяли только документацию: `CHALK_INT006_EXECUTION_PROTOCOL`, `CHALK_NEXT_STEPS_PLAN`, `PROJECT_STATUS`, `WORK_LOG`; код после проверенного CI не менялся. Commit-status endpoint возвращает пустой список statuses, поэтому источником подтверждения является непосредственно workflow run и его jobs. Live captures не запускались.
