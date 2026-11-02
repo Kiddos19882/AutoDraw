@@ -13,7 +13,7 @@ import chalk_int006_png_analysis as analysis
 
 class Int006PngAnalysisTests(unittest.TestCase):
     def make_run(self, root: Path, *, gap: bool = False, parallel: bool = False, cursor: bool = False,
-                 name: str = "experiment-test", series_id: str = "series-test") -> Path:
+                 name: str = "synthetic-run", series_id: str = "series-test") -> Path:
         folder = root / name
         folder.mkdir()
         before = np.full((240, 460, 3), 236, np.uint8)
