@@ -398,10 +398,10 @@ def test_g3_analyzer_keeps_nine_executor_configurations_separate_and_complete(tm
     ("phase", "scenario", "count", "profile"),
     [
         ("V1", "int006_diagonals", 6, (2, 10)),
-        ("V2", "int006_short_strokes", 6, (4, 5)),
+        ("V2", "int006_short_strokes_followup", 5, (4, 5)),
         ("V3", "int006_turns", 3, (4, 10)),
         ("V4", "int006_closed_contours", 3, (2, 10)),
-        ("V5", "int006_intersections_spacing", 10, (4, 5)),
+        ("V5", "int006_intersections_spacing_sweep", 16, (4, 5)),
     ],
 )
 def test_int006_scenarios_accept_declared_sampling_profiles(phase, scenario, count, profile):
