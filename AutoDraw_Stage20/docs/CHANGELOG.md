@@ -357,3 +357,9 @@
 
 ### INT-006 — корректировка геометрии тестов
 - По результатам ручного review PNG-overlay исправлены пересекающиеся тестовые траектории V1/V3; добавлен regression gate минимального межштрихового расстояния. Первичные captures не переписывались, повторные live-блоки и CI для нового code HEAD остаются следующими проверками.
+
+
+### INT-006 — cursor-free post-draw capture
+- Post-draw screenshot теперь выполняется после mouseUp и перемещения курсора за пределы calibrated board ROI; выбранная точка и метод фиксируются в experiment manifest.
+- Добавлены regression tests выбора безопасной точки и порядка mouseUp → move → screenshot. CI и live validation нового поведения ожидаются.
+- Production executor, estimator, sampling defaults и первичные captures не менялись.
