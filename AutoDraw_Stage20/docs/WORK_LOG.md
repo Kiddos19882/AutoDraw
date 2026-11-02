@@ -1915,3 +1915,12 @@ Brush Test acceptance и матричные валидаторы больше н
 - Коммиты: `a680f51997b8981eb430d9dd1cf12d24106130e9`, `d299259e1a490330d75ecd4a25b5d22a2435d851`, `723a410795953e075fbdfefe0c03cdfc28a94dd0`.
 - Изменён только post-draw capture экспериментального UI и его тесты. Production executor, estimator, sampling defaults, первичные captures и Game Monitor не менялись.
 - CI workflow `geometry-tests.yml` запускается на push изменений `source/**`; запуск для текущего HEAD ещё требуется подтвердить. Live captures не выполнялись.
+
+
+## 2026-11-02 — изоляция cursor relocation только в automated post-draw
+
+- Diff review выявил, что первая версия cursor relocation была вставлена в общую `_capture_experiment_phase_now`, а не только в `_capture_automated_after_draw`; это затрагивало ручной capture и оставляло `safe_cursor_point` неинициализированным в автоматическом методе.
+- Исправлено: общий/manual capture возвращён к прежнему `crop_calibrated_regions(screen, config.get("regions", {}))`; cursor-safe sequence расположен только в `_capture_automated_after_draw`.
+- Добавлен regression test `test_manual_experiment_capture_does_not_relocate_cursor`, запрещающий mouseUp/moveTo в ручном capture method.
+- Fix commit: `16ffb5893b642799fe6b5b6fc39d764975d70dfe`; guard test commit: `a74f7fd18c1b4100c87747ab4bd533afaa74b95d`.
+- CI для промежуточного HEAD `723a410` run `41466392528` ещё выполнялся на момент проверки; исправленный HEAD запустил новый workflow. Финальный CI ожидается.
