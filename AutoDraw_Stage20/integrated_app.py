@@ -740,7 +740,9 @@ class AutoDrawUnifiedApp:
                 block = generation.get("chalk_test_block") if isinstance(generation, dict) else None
                 expected_radius = matrix.get("requested_radius")
                 radius_valid = (
-                    expected_radius in RADIUS_GEOMETRY_VALIDATION_RADII
+                    isinstance(expected_radius, int)
+                    and not isinstance(expected_radius, bool)
+                    and expected_radius in RADIUS_GEOMETRY_VALIDATION_RADII
                     and expected_radius == requested_brush
                     if matrix_phase == "INT006R" else expected_radius == 10
                 )
