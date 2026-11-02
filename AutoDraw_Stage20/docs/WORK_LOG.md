@@ -1903,3 +1903,15 @@ Brush Test acceptance и матричные валидаторы больше н
 - Коммиты: `5047cb7973a266ca69b6fd9c21ea81af0bd89db3` (test DrawingPlan fix), `a4a909d08b9947cfff139b20d55300f1e97dcc25` (isolation regression test). CI для нового code HEAD ещё не подтверждён.
 - Production executor, estimator, sampling defaults и первичные experiment data не менялись. Live reruns не запускались.
 - Следующие действия: подтвердить CI; повторить V1/V3 blocks; улучшить V4 post-draw cursor handling; спроектировать V2 extended short-stroke и V5 spacing sweep; затем независимая validation модели.
+
+
+## 2026-11-02 — V4 cursor-free post-draw capture
+
+- Причина V4 closure occlusion найдена в `_capture_automated_after_draw`: снимок делался без изменения положения курсора, оставшегося на конечной точке контура.
+- Добавлен `_cursor_safe_point_outside_region(region, screen_size, margin=24)`: выбирает ближайшую доступную точку за пределами calibrated board ROI; проверяет размеры/границы и отказывает, если безопасной точки нет.
+- Перед финальным screenshot post-draw workflow выполняет `pyautogui.mouseUp()`, затем `pyautogui.moveTo(..., duration=0)`, ждёт 150 ms и повторно снимает экран. Board не очищается и не изменяется; действие перемещения не содержит клика.
+- В `experiment_phases.after_draw.cursor_exclusion` сохраняются метод, координаты, margin и статус перемещения для аудита.
+- Добавлены unit/regression tests для выбора точки у границы экрана, отказа при невозможности безопасного перемещения и порядка mouseUp → move → screenshot.
+- Коммиты: `a680f51997b8981eb430d9dd1cf12d24106130e9`, `d299259e1a490330d75ecd4a25b5d22a2435d851`, `723a410795953e075fbdfefe0c03cdfc28a94dd0`.
+- Изменён только post-draw capture экспериментального UI и его тесты. Production executor, estimator, sampling defaults, первичные captures и Game Monitor не менялись.
+- CI workflow `geometry-tests.yml` запускается на push изменений `source/**`; запуск для текущего HEAD ещё требуется подтвердить. Live captures не выполнялись.
