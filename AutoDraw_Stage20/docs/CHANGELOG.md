@@ -393,3 +393,10 @@
 - Исправления legacy V2/V5 counts и V5 integration fixture подтверждены обязательными jobs. Optional algorithm benchmarks пропущены.
 - Уточнено разделение исходных V2/V5 сценариев и follow-up контрактов; исходные manifests остаются обратно совместимыми.
 - Обновлены PROJECT_STATUS, TASKS, CHALK_NEXT_STEPS_PLAN и CHALK_INT006_EXECUTION_PROTOCOL. Live follow-up и независимая validation модели остаются незавершёнными.
+
+
+## 2026-11-02 — INT-006 V1/V3/V4 follow-up protocol
+
+- Добавлен отдельный протокол новых live-серий для исправленной геометрии V1/V3 и cursor-free closure capture V4.
+- Для каждой фазы определены новый series_id, отдельный block journal и 9 captures; все три фазы вместе — 27 captures.
+- Ссылки добавлены в docs index, PROJECT_STATUS, TASKS, ROADMAP и действующий план INT-006. Код и исходные captures не менялись.
