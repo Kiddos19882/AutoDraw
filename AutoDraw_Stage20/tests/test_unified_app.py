@@ -1322,5 +1322,60 @@ class UnifiedAppCoreTests(unittest.TestCase):
         self.assertEqual(app.executor.started_with["point_delay_ms"], 20)
 
 
+    def test_brush_test_executor_applies_int006_v5_task_specific_parameters(self):
+        class Status:
+            def set(self, value):
+                self.value = value
+
+        class Executor:
+            running = False
+
+            def __init__(self, plan_path):
+                self.plan_path = plan_path
+                self.started_with = None
+
+            def start_execution_from_workflow(self, *, executor_config_override=None):
+                self.started_with = executor_config_override
+                return True
+
+        from chalk_experiment_matrix import GEOMETRY_EXECUTOR_CONFIG
+
+        parameters = dict(GEOMETRY_EXECUTOR_CONFIG)
+        parameters.update({"point_step_px": 4, "point_delay_ms": 5})
+        plan = {
+            "generation": {
+                "chalk_test_block": {
+                    "block_id": "block-v5-test",
+                    "task_id": "int006_intersections_spacing-s4-d5-r1",
+                    "phase_id": "V5",
+                },
+                "chalk_experiment_matrix": {
+                    "phase_id": "V5",
+                    "scenario_id": "int006_intersections_spacing",
+                    "requested_radius": 10,
+                    "expected_strokes": 10,
+                    "executor_parameters": parameters,
+                },
+            }
+        }
+        app = object.__new__(integrated_app.AutoDrawUnifiedApp)
+        app.status_var = Status()
+        with tempfile.TemporaryDirectory(prefix="AutoDraw V5 handoff ") as temp:
+            plan_path = Path(temp) / "current_brush_behavior_test.json"
+            plan_path.write_text(json.dumps(plan), encoding="utf-8")
+            app.executor = Executor(plan_path)
+            with (
+                patch("integrated_app.messagebox.showerror") as showerror,
+                patch("integrated_app.messagebox.showwarning") as showwarning,
+            ):
+                app._start_brush_test_executor(10)
+
+        showerror.assert_not_called()
+        showwarning.assert_not_called()
+        self.assertEqual(app.executor.started_with, parameters)
+        self.assertEqual(app.executor.started_with["point_step_px"], 4)
+        self.assertEqual(app.executor.started_with["point_delay_ms"], 5)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
