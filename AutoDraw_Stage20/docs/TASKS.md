@@ -40,7 +40,7 @@
 | INT-003 | IN_PROGRESS | Завершить оценку overhead Game Monitor | Exact counter и telemetry подтверждены. Осталось сопоставимое A/B/C измерение Monitor off / версий Monitor с отдельными FPS, длительностью и overhead. Не блокирует точность CHALK capture, но нужен для оценки накладных расходов. |
 | INT-004 | DONE | Автоматически собирать telemetry и связывать её с experiment ID | WebSocket bridge, per-run capture, RunRecorder и запись monitor report/идентификаторов в experiment manifest использованы в принятых G1–G3 captures. Overhead comparison относится к INT-003. |
 | INT-005 | DONE | Реализовать автоматизированную лабораторию CHALK-экспериментов | Matrix/block runner, task identity, повторения, manifest, recovery/fail-closed gates и capture acceptance использованы для G1 12/12, G2 18/18 и G3 27/27. |
-| INT-006 | IN_PROGRESS | 45/45 исходных captures приняты; pixel audit: 252 per-stroke и 279 pair metrics. DrawingPlan V1/V3 исправлены, добавлен isolation gate >20 logical px; automated post-draw capture перемещает отпущенный курсор за board ROI, ручной capture не меняется. Corrective code HEAD `3e8e6c5` прошёл полный CI run `41470680544`: integration, executor, Game Monitor/bridge, Preparation/G3, Windows portable build и PNG audit — success. Открыты live follow-up V1/V3/V2/V4/V5, независимая validation модели и safety margin. Production defaults/estimator не менять. См. `CHALK_INT006_PIXEL_AUDIT_2026-11-02.md`, [V1/V3/V4 follow-up](CHALK_INT006_V1_V3_V4_FOLLOWUP_2026-11-02.md) и [V2/V5 follow-up](CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md). |
+| INT-006 | IN_PROGRESS | 90/90 исходных + follow-up captures приняты; pixel audit: 549 per-stroke и 900 pair rows. Follow-up CHALK: step=4 экономит 38.5–49.4%; V5 spacing при radius=10 сливается на 8/12 logical px и разделяется на 16/20/24. Курсор не обнаружен на board image в 45/45 follow-up captures. Full CI run `41496555297` — success. Открыта независимая validation модели и safety margin; production defaults/estimator не менять. См. `CHALK_INT006_PIXEL_AUDIT_2026-11-02.md` и [follow-up results](CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md). |
 | INT-007 | BLOCKED | Интегрировать валидированную модель в preflight/resource estimator AutoDraw | Начинать только после независимой validation INT-006 и определения консервативного safety margin. |
 | INT-008 | TODO | Оптимизировать кисти, траектории, порядок и покрытие | Подбирать способ построения рисунка в пределах квоты CHALK с учётом качества покрытия; зависит от INT-006/007. |
 | INT-009 | TODO | Сравнить прогноз с фактом и проверить качество | Проверить на независимых рисунках прогноз, exact CHALK delta, визуальное качество и устойчивость к разным типам геометрии. |
@@ -51,8 +51,9 @@
 - [x] Перевести Application integration fixture на действующий V5 follow-up ID `int006_intersections_spacing_sweep` и expected count `16`.
 - [x] Запустить полный CI на исправленном HEAD `3e8e6c5`; run `41470680544` подтвердил все обязательные jobs, Windows portable build и INT-006 PNG audit.
 - [x] Разрешить переход к live follow-up после green CI; live-прогоны выполняются только при доступной игровой сессии.
-- [ ] Выполнить V1/V3/V4 follow-up по [отдельному протоколу](CHALK_INT006_V1_V3_V4_FOLLOWUP_2026-11-02.md): по 9 captures на фазу.
-- [ ] Выполнить V2 short-stroke follow-up (5 strokes) и V5 spacing sweep (16 strokes) по отдельному протоколу.
+- [x] Выполнить V1/V3/V4 follow-up по [отдельному протоколу](CHALK_INT006_V1_V3_V4_FOLLOWUP_2026-11-02.md): по 9 captures на фазу.
+- [x] Выполнить V2 short-stroke follow-up (5 strokes) и V5 spacing sweep (16 strokes) по отдельному протоколу.
+- [x] Выполнить pixel-level audit исходных + follow-up PNG; 90/90 valid, no missing/duplicate cells, 297/297 новых stroke rows без gaps (CI 41496555297).
 - [ ] Провести независимую validation модели на полных DrawingPlan; после неё определить safety margin.
 
 **Актуальный приоритет INT-006:** см. [план дальнейших действий](CHALK_NEXT_STEPS_PLAN_2026-11-02.md) и [исполнительный протокол INT-006](CHALK_INT006_EXECUTION_PROTOCOL_2026-11-02.md). Исторические чек-листы ниже сохраняют ход выполнения и не переопределяют статусы таблицы.
@@ -358,8 +359,8 @@ Software gate закрыт; live gate остаётся открытым. Авт�
 - [x] Выделить sampling-specific coefficients G3 для длинных горизонтальных линий.
 - [x] Зафиксировать ограничения радиуса, Monitor trajectory coalescing и отсутствие независимой validation.
 - [x] Выполнить первичный визуальный скрининг 15 representative PNG V1–V5 (P0/P1/P2); выводы и ограничения записаны в `CHALK_INT006_PNG_SCREENING_2026-11-02.md`.
-- [ ] Выполнить количественный pixel-level аудит всех 45 PNG: continuity/max gap, centerline deviation, coverage width/variation, contour closure и parallel separation.
-- [ ] Если PNG невозможно проверить автоматически, выполнить ручную проверку исходных изображений; не считать ROI heuristic достаточным подтверждением.
+- [x] Выполнить количественный pixel-level аудит всех 90 PNG (45 исходных +45 follow-up): continuity/max gap, centerline deviation, coverage width/variation, contour closure и parallel separation; 549 stroke rows, 900 pair rows.
+- [x] Просмотреть диагностические overlays новых follow-up V1/V4/V5; ROI heuristic ambiguity проверена через pixel masks, не трактуется как отсутствие штрихов.
 - [ ] Подготовить независимую validation-матрицу на нескольких изображениях и геометриях.
 - [ ] Рассчитать абсолютную/относительную ошибку прогноза против точной pre/post `pointCount`.
 - [ ] Определить safety margin только после validation; затем рассматривать INT-007 (интеграцию в preflight).
@@ -387,7 +388,7 @@ Software gate закрыт; live gate остаётся открытым. Авт�
 - [x] Зафиксировать ограничения V1/V3 (непреднамеренные пересечения), V2 (короткие движения как точки), V4 (курсором закрыта часть контура), V5 (spacing=8 сливается).
 - [x] Рассчитать pixel-level метрики для исходных 45 captures: 252 per-stroke rows и 279 parallel-pair rows; CI artifact run `41392156994`.
 - [x] Проверить сегментацию/маски на исходных captures и сохранить диагностические overlays; ограничения и ambiguous cases задокументированы.
-- [ ] Повторить pixel-level аудит на новых 45 follow-up captures из `e879a77`; отдельно проверить ambiguous ROI V3/V4/V5.
+- [x] Повторить pixel-level аудит на новых 45 follow-up captures из `e879a77`; 297/297 strokes coverage=1.0, zero gaps; V4 seams 27/27 covered; V5 spacing thresholds documented.
 
 Отчёт исходного аудита: [CHALK_INT006_PIXEL_AUDIT_2026-11-02.md](CHALK_INT006_PIXEL_AUDIT_2026-11-02.md). Новые live-результаты: [CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md](CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md). Production defaults и estimator не менять.
 
@@ -400,6 +401,6 @@ Software gate закрыт; live gate остаётся открытым. Авт�
 - [x] Зафиксировать три профиля P0/P1/P2, три повтора и radius=10: по 9 captures на серию.
 - [x] Подтвердить CI code HEAD `878bd1f`; обязательные jobs, Windows portable build/startup smoke-test и INT-006 PNG audit завершились success в run `41486593544`.
 - [x] Пользователь выполнил V2 и V5 live blocks; вместе с V1/V3/V4 получено 45/45 captures. Exact CHALK и per-run Monitor integrity подтверждены.
-- [ ] Выполнить pixel-level аудит новых 45 follow-up PNG; отдельно проверить ambiguous ROI V3/V4/V5.
+- [x] Выполнить pixel-level аудит новых 45 follow-up PNG; 45/45 valid, 144/144 V5 strokes sufficient and gap-free; V5 target pair separation documented.
 
 Инструкции: [V1/V3/V4](CHALK_INT006_V1_V3_V4_FOLLOWUP_2026-11-02.md), [V2/V5](CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md). Итоги: [CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md](CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md).
