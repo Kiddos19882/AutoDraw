@@ -1,0 +1,3535 @@
+{
+  "schema_version": 1,
+  "record_type": "autodraw_chalk_test_block",
+  "block_id": "1f93ddcac07445b78093744c7cbabcde",
+  "series_id": "chalk-20261102-232320-7cea27",
+  "phase_id": "INT006",
+  "repeat_count": 3,
+  "random_seed": 20261101,
+  "requested_radius": 10,
+  "executor_parameters": {
+    "point_step_px": 2,
+    "line_extension_px": 0,
+    "point_delay_ms": 10,
+    "after_mouse_up_ms": 20,
+    "before_mouse_down_ms": 20,
+    "after_mouse_down_ms": 40,
+    "end_hold_ms": 50,
+    "countdown_seconds": 5
+  },
+  "executor_parameter_matrix": [
+    {
+      "point_step_px": 2,
+      "point_delay_ms": 10
+    },
+    {
+      "point_step_px": 4,
+      "point_delay_ms": 5
+    },
+    {
+      "point_step_px": 4,
+      "point_delay_ms": 10
+    }
+  ],
+  "expected_task_count": 45,
+  "status": "completed",
+  "created_at_utc": "2026-11-02T20:30:20.025+00:00",
+  "updated_at_utc": "2026-11-02T21:01:43.202+00:00",
+  "tasks": [
+    {
+      "task_id": "int006_validation_d4_short_details-s2-d10-r3",
+      "scenario_id": "int006_validation_d4_short_details",
+      "repeat_index": 3,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 1,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "3ce33ce9f1a54ac8b477a577d3d2ad10",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:30:27.280+00:00",
+          "experiment_id": "82f8be56f0384840868e5b7084a853c9",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-233027-b10-int006_validation_d4_short_details-82f8be56",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:30:27.356+00:00",
+          "finished_at_utc": "2026-11-02T20:31:06.291+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d4_short_details:P0"
+    },
+    {
+      "task_id": "int006_validation_d2_polygon-s4-d5-r3",
+      "scenario_id": "int006_validation_d2_polygon",
+      "repeat_index": 3,
+      "expected_strokes": 5,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 2,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "0d9be58db9c34f4a9fbc01d1b25f1ad2",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:31:06.303+00:00",
+          "experiment_id": "f3cadafa93804ebcaa8fb35ec2a0ab2d",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-233106-b10-int006_validation_d2_polygon-f3cadafa",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:31:06.410+00:00",
+          "finished_at_utc": "2026-11-02T20:31:46.515+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d2_polygon:P1"
+    },
+    {
+      "task_id": "int006_validation_d1_mixed_lines-s4-d10-r2",
+      "scenario_id": "int006_validation_d1_mixed_lines",
+      "repeat_index": 2,
+      "expected_strokes": 4,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 3,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "6ae28ae9475f4b7b8799406ce7e60611",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:31:46.527+00:00",
+          "experiment_id": "5f1eafba669046059fc40689647d6442",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-233146-b10-int006_validation_d1_mixed_lines-5f1eafba",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:31:46.610+00:00",
+          "finished_at_utc": "2026-11-02T20:32:26.391+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d1_mixed_lines:P2"
+    },
+    {
+      "task_id": "int006_validation_d2_polygon-s4-d5-r1",
+      "scenario_id": "int006_validation_d2_polygon",
+      "repeat_index": 1,
+      "expected_strokes": 5,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 4,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "52e7aeb72e684cce9fe13310532e8aab",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:32:26.404+00:00",
+          "experiment_id": "20e67f83072d4ec19b7f134fd25168fd",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-233226-b10-int006_validation_d2_polygon-20e67f83",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:32:26.482+00:00",
+          "finished_at_utc": "2026-11-02T20:33:05.371+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d2_polygon:P1"
+    },
+    {
+      "task_id": "int006_validation_d5_repeated_coverage-s4-d10-r1",
+      "scenario_id": "int006_validation_d5_repeated_coverage",
+      "repeat_index": 1,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 5,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "5b0da60019c044aebc7189029a217e06",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:33:05.383+00:00",
+          "experiment_id": "ffc551f43bae4f2c8eb699128ba746ff",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-233305-b10-int006_validation_d5_repeated_coverage-ffc551f4",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:33:05.461+00:00",
+          "finished_at_utc": "2026-11-02T20:33:46.385+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d5_repeated_coverage:P2"
+    },
+    {
+      "task_id": "int006_validation_d2_polygon-s2-d10-r1",
+      "scenario_id": "int006_validation_d2_polygon",
+      "repeat_index": 1,
+      "expected_strokes": 5,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 6,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "c0c515340e564274a37e797bd7b18ce2",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:33:46.398+00:00",
+          "experiment_id": "8c1b98b99963442180fa90839fce444b",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-233346-b10-int006_validation_d2_polygon-8c1b98b9",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:33:46.501+00:00",
+          "finished_at_utc": "2026-11-02T20:34:30.672+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d2_polygon:P0"
+    },
+    {
+      "task_id": "int006_validation_d3_intersections-s4-d10-r2",
+      "scenario_id": "int006_validation_d3_intersections",
+      "repeat_index": 2,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 7,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "bfef309a0d5f4629901fcab81823bbb2",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:34:30.685+00:00",
+          "experiment_id": "dfef93ee18d24756b22a2ff53c92c28f",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-233430-b10-int006_validation_d3_intersections-dfef93ee",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:34:30.775+00:00",
+          "finished_at_utc": "2026-11-02T20:35:12.626+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d3_intersections:P2"
+    },
+    {
+      "task_id": "int006_validation_d4_short_details-s4-d10-r2",
+      "scenario_id": "int006_validation_d4_short_details",
+      "repeat_index": 2,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 8,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "78204b1f8e2c45819a86db689b71a62f",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:35:12.640+00:00",
+          "experiment_id": "d016bb4190454d2fa72ca4b29d284ee5",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-233512-b10-int006_validation_d4_short_details-d016bb41",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:35:12.724+00:00",
+          "finished_at_utc": "2026-11-02T20:35:50.957+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d4_short_details:P2"
+    },
+    {
+      "task_id": "int006_validation_d2_polygon-s2-d10-r2",
+      "scenario_id": "int006_validation_d2_polygon",
+      "repeat_index": 2,
+      "expected_strokes": 5,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 9,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "a492c5504ff445fe8f1262fe78620fd9",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:35:50.970+00:00",
+          "experiment_id": "44a621ef585c47f9b69141809df55a4a",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-233551-b10-int006_validation_d2_polygon-44a621ef",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:35:51.057+00:00",
+          "finished_at_utc": "2026-11-02T20:36:34.081+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d2_polygon:P0"
+    },
+    {
+      "task_id": "int006_validation_d4_short_details-s4-d5-r1",
+      "scenario_id": "int006_validation_d4_short_details",
+      "repeat_index": 1,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 10,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "d8ef4047e9dc4d739104f1cf2aa10479",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:36:34.094+00:00",
+          "experiment_id": "e5e313df485e4146867140f63e3fd552",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-233634-b10-int006_validation_d4_short_details-e5e313df",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:36:34.177+00:00",
+          "finished_at_utc": "2026-11-02T20:37:13.118+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d4_short_details:P1"
+    },
+    {
+      "task_id": "int006_validation_d1_mixed_lines-s4-d10-r3",
+      "scenario_id": "int006_validation_d1_mixed_lines",
+      "repeat_index": 3,
+      "expected_strokes": 4,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 11,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "fcb7b5f090d343298c88b6f74b871dca",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:37:13.132+00:00",
+          "experiment_id": "6a20970eb6f64a60b4bcdfb184441bcf",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-233713-b10-int006_validation_d1_mixed_lines-6a20970e",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:37:13.252+00:00",
+          "finished_at_utc": "2026-11-02T20:37:53.949+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d1_mixed_lines:P2"
+    },
+    {
+      "task_id": "int006_validation_d1_mixed_lines-s4-d5-r2",
+      "scenario_id": "int006_validation_d1_mixed_lines",
+      "repeat_index": 2,
+      "expected_strokes": 4,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 12,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "08858d8da80840e98906b5c615c883ff",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:37:53.962+00:00",
+          "experiment_id": "534ff674d08c459194e726eb34fade97",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-233754-b10-int006_validation_d1_mixed_lines-534ff674",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:37:54.046+00:00",
+          "finished_at_utc": "2026-11-02T20:38:34.481+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d1_mixed_lines:P1"
+    },
+    {
+      "task_id": "int006_validation_d4_short_details-s4-d5-r2",
+      "scenario_id": "int006_validation_d4_short_details",
+      "repeat_index": 2,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 13,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "538a2239bdf643a29db400c8928b1362",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:38:34.498+00:00",
+          "experiment_id": "6ef877c935034568be808bc6406019bb",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-233834-b10-int006_validation_d4_short_details-6ef877c9",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:38:34.589+00:00",
+          "finished_at_utc": "2026-11-02T20:39:13.768+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d4_short_details:P1"
+    },
+    {
+      "task_id": "int006_validation_d2_polygon-s4-d10-r2",
+      "scenario_id": "int006_validation_d2_polygon",
+      "repeat_index": 2,
+      "expected_strokes": 5,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 14,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "73a8d2607fd94f98abe195ce8000c6d9",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:39:13.781+00:00",
+          "experiment_id": "19a0f3f772a84c6486cd47e3d7431ca9",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-233913-b10-int006_validation_d2_polygon-19a0f3f7",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:39:13.865+00:00",
+          "finished_at_utc": "2026-11-02T20:39:54.137+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d2_polygon:P2"
+    },
+    {
+      "task_id": "int006_validation_d1_mixed_lines-s4-d10-r1",
+      "scenario_id": "int006_validation_d1_mixed_lines",
+      "repeat_index": 1,
+      "expected_strokes": 4,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 15,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "03193dfecba0419489ab09ff253a1912",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:39:54.151+00:00",
+          "experiment_id": "d469c63862f1495d81790326b0985270",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-233954-b10-int006_validation_d1_mixed_lines-d469c638",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:39:54.236+00:00",
+          "finished_at_utc": "2026-11-02T20:40:34.912+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d1_mixed_lines:P2"
+    },
+    {
+      "task_id": "int006_validation_d4_short_details-s4-d10-r1",
+      "scenario_id": "int006_validation_d4_short_details",
+      "repeat_index": 1,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 16,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "1f4414e5f67644fb9097b87a6b7db5f2",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:40:34.925+00:00",
+          "experiment_id": "16b19435296c4e01a3f3568ac5b8d355",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-234034-b10-int006_validation_d4_short_details-16b19435",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:40:35.003+00:00",
+          "finished_at_utc": "2026-11-02T20:41:14.667+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d4_short_details:P2"
+    },
+    {
+      "task_id": "int006_validation_d4_short_details-s4-d10-r3",
+      "scenario_id": "int006_validation_d4_short_details",
+      "repeat_index": 3,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 17,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "e3923b3edc1b4e4da318c55b5b2e81f0",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:41:14.681+00:00",
+          "experiment_id": "4758c7da88054aa4a4b1cce35966849c",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-234114-b10-int006_validation_d4_short_details-4758c7da",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:41:14.770+00:00",
+          "finished_at_utc": "2026-11-02T20:41:53.349+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d4_short_details:P2"
+    },
+    {
+      "task_id": "int006_validation_d1_mixed_lines-s2-d10-r3",
+      "scenario_id": "int006_validation_d1_mixed_lines",
+      "repeat_index": 3,
+      "expected_strokes": 4,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 18,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "34c8c47cd10e4eaab8fda73005b3da0f",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:41:53.362+00:00",
+          "experiment_id": "a2c78ea6f4614acb9bf25ee10fb9c273",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-234153-b10-int006_validation_d1_mixed_lines-a2c78ea6",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:41:53.454+00:00",
+          "finished_at_utc": "2026-11-02T20:42:35.881+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d1_mixed_lines:P0"
+    },
+    {
+      "task_id": "int006_validation_d3_intersections-s4-d5-r2",
+      "scenario_id": "int006_validation_d3_intersections",
+      "repeat_index": 2,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 19,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "12183ea2cc904d3c94f8bb19703072a2",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:42:35.897+00:00",
+          "experiment_id": "32fd76cb692b43fca1091dd1ab210045",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-234235-b10-int006_validation_d3_intersections-32fd76cb",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:42:35.997+00:00",
+          "finished_at_utc": "2026-11-02T20:43:18.298+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d3_intersections:P1"
+    },
+    {
+      "task_id": "int006_validation_d3_intersections-s4-d10-r1",
+      "scenario_id": "int006_validation_d3_intersections",
+      "repeat_index": 1,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 20,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "1e5a3b27955d4b12ad8e7052dc1452b2",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:43:18.313+00:00",
+          "experiment_id": "89a7f4383b93405b8305268d2648535e",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-234318-b10-int006_validation_d3_intersections-89a7f438",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:43:18.408+00:00",
+          "finished_at_utc": "2026-11-02T20:44:00.930+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d3_intersections:P2"
+    },
+    {
+      "task_id": "int006_validation_d3_intersections-s4-d10-r3",
+      "scenario_id": "int006_validation_d3_intersections",
+      "repeat_index": 3,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 21,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "6ffced89d69a4680b2511272709488ee",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:44:00.943+00:00",
+          "experiment_id": "0ef79b730c284ef7972cc59195a5273d",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-234401-b10-int006_validation_d3_intersections-0ef79b73",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:44:01.031+00:00",
+          "finished_at_utc": "2026-11-02T20:44:42.615+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d3_intersections:P2"
+    },
+    {
+      "task_id": "int006_validation_d5_repeated_coverage-s4-d5-r2",
+      "scenario_id": "int006_validation_d5_repeated_coverage",
+      "repeat_index": 2,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 22,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "1340f74bfae94ac1a6dfbe9dd5a14cab",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:44:42.633+00:00",
+          "experiment_id": "05aedfa5e0fc48aca9e3a38beabfaccd",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-234442-b10-int006_validation_d5_repeated_coverage-05aedfa5",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:44:42.747+00:00",
+          "finished_at_utc": "2026-11-02T20:45:24.335+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d5_repeated_coverage:P1"
+    },
+    {
+      "task_id": "int006_validation_d5_repeated_coverage-s4-d10-r2",
+      "scenario_id": "int006_validation_d5_repeated_coverage",
+      "repeat_index": 2,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 23,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "9d3d4706c3d3447889da12b61ae03df9",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:45:24.348+00:00",
+          "experiment_id": "d63bc0d19ff04d8f90de17c4a90a23c2",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-234524-b10-int006_validation_d5_repeated_coverage-d63bc0d1",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:45:24.433+00:00",
+          "finished_at_utc": "2026-11-02T20:46:06.597+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d5_repeated_coverage:P2"
+    },
+    {
+      "task_id": "int006_validation_d3_intersections-s2-d10-r3",
+      "scenario_id": "int006_validation_d3_intersections",
+      "repeat_index": 3,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 24,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "ec2fcda38d074e6cbbd075edfa7fd33c",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:46:06.610+00:00",
+          "experiment_id": "28a0e611fc2a41bcbdbc9e50115235ff",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-234606-b10-int006_validation_d3_intersections-28a0e611",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:46:06.701+00:00",
+          "finished_at_utc": "2026-11-02T20:46:51.155+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d3_intersections:P0"
+    },
+    {
+      "task_id": "int006_validation_d1_mixed_lines-s4-d5-r1",
+      "scenario_id": "int006_validation_d1_mixed_lines",
+      "repeat_index": 1,
+      "expected_strokes": 4,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 25,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "223d08f0be67406a84666f03c9db2fda",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:46:51.170+00:00",
+          "experiment_id": "5c7afc3cf617491a92356dcad28300b8",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-234651-b10-int006_validation_d1_mixed_lines-5c7afc3c",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:46:51.247+00:00",
+          "finished_at_utc": "2026-11-02T20:47:32.080+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d1_mixed_lines:P1"
+    },
+    {
+      "task_id": "int006_validation_d3_intersections-s4-d5-r3",
+      "scenario_id": "int006_validation_d3_intersections",
+      "repeat_index": 3,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 26,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "0bf841d166a0454897ddb539350aa3bd",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:47:32.094+00:00",
+          "experiment_id": "af85cce41f6b494f8a4675c00a09ad73",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-234732-b10-int006_validation_d3_intersections-af85cce4",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:47:32.186+00:00",
+          "finished_at_utc": "2026-11-02T20:48:14.694+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d3_intersections:P1"
+    },
+    {
+      "task_id": "int006_validation_d2_polygon-s2-d10-r3",
+      "scenario_id": "int006_validation_d2_polygon",
+      "repeat_index": 3,
+      "expected_strokes": 5,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 27,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "795f4034c36f4b75a271751e06cb3576",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:48:14.710+00:00",
+          "experiment_id": "cce9bf68ab964292a849664c6a49114d",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-234814-b10-int006_validation_d2_polygon-cce9bf68",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:48:14.805+00:00",
+          "finished_at_utc": "2026-11-02T20:48:56.937+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d2_polygon:P0"
+    },
+    {
+      "task_id": "int006_validation_d1_mixed_lines-s2-d10-r1",
+      "scenario_id": "int006_validation_d1_mixed_lines",
+      "repeat_index": 1,
+      "expected_strokes": 4,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 28,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "19054dc9a4c04e3cb3190d02f5f0d89e",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:48:56.950+00:00",
+          "experiment_id": "e8ebdd3d4ed0451fb43ab7e4b8b1ca02",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-234857-b10-int006_validation_d1_mixed_lines-e8ebdd3d",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:48:57.041+00:00",
+          "finished_at_utc": "2026-11-02T20:49:39.140+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d1_mixed_lines:P0"
+    },
+    {
+      "task_id": "int006_validation_d5_repeated_coverage-s4-d5-r1",
+      "scenario_id": "int006_validation_d5_repeated_coverage",
+      "repeat_index": 1,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 29,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "cee9273deefa42958d896f1a09b7644e",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:49:39.156+00:00",
+          "experiment_id": "6af5cf99021e43b0840fdc33f0e24a17",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-234939-b10-int006_validation_d5_repeated_coverage-6af5cf99",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:49:39.278+00:00",
+          "finished_at_utc": "2026-11-02T20:50:22.019+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d5_repeated_coverage:P1"
+    },
+    {
+      "task_id": "int006_validation_d5_repeated_coverage-s4-d5-r3",
+      "scenario_id": "int006_validation_d5_repeated_coverage",
+      "repeat_index": 3,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 30,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "4e2cfdb75ee64dedb184fdb5c12043ab",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:50:22.033+00:00",
+          "experiment_id": "0fcc52a984244e3aa1eb75244b5ed597",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-235022-b10-int006_validation_d5_repeated_coverage-0fcc52a9",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:50:22.111+00:00",
+          "finished_at_utc": "2026-11-02T20:51:03.256+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d5_repeated_coverage:P1"
+    },
+    {
+      "task_id": "int006_validation_d5_repeated_coverage-s2-d10-r1",
+      "scenario_id": "int006_validation_d5_repeated_coverage",
+      "repeat_index": 1,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 31,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "83d6fbd31ecc4f9db014611a2fe57bc0",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:51:03.270+00:00",
+          "experiment_id": "9de85a1439d143bfa02b7107dea94a99",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-235103-b10-int006_validation_d5_repeated_coverage-9de85a14",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:51:03.373+00:00",
+          "finished_at_utc": "2026-11-02T20:51:48.685+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d5_repeated_coverage:P0"
+    },
+    {
+      "task_id": "int006_validation_d5_repeated_coverage-s4-d10-r3",
+      "scenario_id": "int006_validation_d5_repeated_coverage",
+      "repeat_index": 3,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 32,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "491ef79c9f6f4af19e62ae9af7df863c",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:51:48.699+00:00",
+          "experiment_id": "0178abc6a216418387d27e0a6c6f100c",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-235148-b10-int006_validation_d5_repeated_coverage-0178abc6",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:51:48.779+00:00",
+          "finished_at_utc": "2026-11-02T20:52:30.959+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d5_repeated_coverage:P2"
+    },
+    {
+      "task_id": "int006_validation_d2_polygon-s4-d10-r1",
+      "scenario_id": "int006_validation_d2_polygon",
+      "repeat_index": 1,
+      "expected_strokes": 5,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 33,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "5faffb73495a45838e54b1e0e5312608",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:52:30.973+00:00",
+          "experiment_id": "c81515904a174f71b2f296f771f47fef",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-235231-b10-int006_validation_d2_polygon-c8151590",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:52:31.092+00:00",
+          "finished_at_utc": "2026-11-02T20:53:11.631+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d2_polygon:P2"
+    },
+    {
+      "task_id": "int006_validation_d4_short_details-s4-d5-r3",
+      "scenario_id": "int006_validation_d4_short_details",
+      "repeat_index": 3,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 34,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "8b300d5c4cd748909d641e2f02bce1c2",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:53:11.645+00:00",
+          "experiment_id": "f6b8a0314eed4f49850b74a58be8952b",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-235311-b10-int006_validation_d4_short_details-f6b8a031",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:53:11.733+00:00",
+          "finished_at_utc": "2026-11-02T20:53:51.400+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d4_short_details:P1"
+    },
+    {
+      "task_id": "int006_validation_d5_repeated_coverage-s2-d10-r2",
+      "scenario_id": "int006_validation_d5_repeated_coverage",
+      "repeat_index": 2,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 35,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "8f9b7216ab2441029a1cf0f9a0bb9cb4",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:53:51.414+00:00",
+          "experiment_id": "f9d7a5dd9e02418f9146bd55b7c4e02b",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-235351-b10-int006_validation_d5_repeated_coverage-f9d7a5dd",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:53:51.500+00:00",
+          "finished_at_utc": "2026-11-02T20:54:36.525+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d5_repeated_coverage:P0"
+    },
+    {
+      "task_id": "int006_validation_d4_short_details-s2-d10-r2",
+      "scenario_id": "int006_validation_d4_short_details",
+      "repeat_index": 2,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 36,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "937b3fb248dc426681513d6ccaa5caf0",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:54:36.539+00:00",
+          "experiment_id": "646bd2f3386c4374ba9929eae46254f0",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-235436-b10-int006_validation_d4_short_details-646bd2f3",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:54:36.658+00:00",
+          "finished_at_utc": "2026-11-02T20:55:16.438+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d4_short_details:P0"
+    },
+    {
+      "task_id": "int006_validation_d2_polygon-s4-d5-r2",
+      "scenario_id": "int006_validation_d2_polygon",
+      "repeat_index": 2,
+      "expected_strokes": 5,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 37,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "bd07bfa58cc44e21bc91148b6ff5a95e",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:55:16.451+00:00",
+          "experiment_id": "f5a0f162e93742868143c47d8575af0f",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-235516-b10-int006_validation_d2_polygon-f5a0f162",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:55:16.539+00:00",
+          "finished_at_utc": "2026-11-02T20:55:58.272+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d2_polygon:P1"
+    },
+    {
+      "task_id": "int006_validation_d3_intersections-s4-d5-r1",
+      "scenario_id": "int006_validation_d3_intersections",
+      "repeat_index": 1,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 38,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "d380534443244d3b8b929637fae40bcd",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:55:58.286+00:00",
+          "experiment_id": "d159de87990e4671ae796c5c6a1f164e",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-235558-b10-int006_validation_d3_intersections-d159de87",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:55:58.379+00:00",
+          "finished_at_utc": "2026-11-02T20:56:42.187+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d3_intersections:P1"
+    },
+    {
+      "task_id": "int006_validation_d5_repeated_coverage-s2-d10-r3",
+      "scenario_id": "int006_validation_d5_repeated_coverage",
+      "repeat_index": 3,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 39,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "0a52317bb6094cc58a70d356b9e54e96",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:56:42.206+00:00",
+          "experiment_id": "a4979114ab214e1f810a1e7b385085de",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-235642-b10-int006_validation_d5_repeated_coverage-a4979114",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:56:42.317+00:00",
+          "finished_at_utc": "2026-11-02T20:57:26.670+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d5_repeated_coverage:P0"
+    },
+    {
+      "task_id": "int006_validation_d2_polygon-s4-d10-r3",
+      "scenario_id": "int006_validation_d2_polygon",
+      "repeat_index": 3,
+      "expected_strokes": 5,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 40,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "a7f5925d6585447abbc9ef6e504d2f11",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:57:26.685+00:00",
+          "experiment_id": "f80ad486e0d44d9e9f93470f8cad8839",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-235726-b10-int006_validation_d2_polygon-f80ad486",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:57:26.778+00:00",
+          "finished_at_utc": "2026-11-02T20:58:08.273+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d2_polygon:P2"
+    },
+    {
+      "task_id": "int006_validation_d3_intersections-s2-d10-r1",
+      "scenario_id": "int006_validation_d3_intersections",
+      "repeat_index": 1,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 41,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "5855b1187b8c4de99eb18310dfc66056",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:58:08.286+00:00",
+          "experiment_id": "092b3174a7774524acbe69acdaea066c",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-235808-b10-int006_validation_d3_intersections-092b3174",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:58:08.381+00:00",
+          "finished_at_utc": "2026-11-02T20:58:53.449+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d3_intersections:P0"
+    },
+    {
+      "task_id": "int006_validation_d4_short_details-s2-d10-r1",
+      "scenario_id": "int006_validation_d4_short_details",
+      "repeat_index": 1,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 42,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "08a74a9ea65241779925d6a9c65dbfae",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:58:53.464+00:00",
+          "experiment_id": "d06c01d3c3e24c6e8ceb67190e466cd4",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-235853-b10-int006_validation_d4_short_details-d06c01d3",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:58:53.550+00:00",
+          "finished_at_utc": "2026-11-02T20:59:32.564+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d4_short_details:P0"
+    },
+    {
+      "task_id": "int006_validation_d1_mixed_lines-s4-d5-r3",
+      "scenario_id": "int006_validation_d1_mixed_lines",
+      "repeat_index": 3,
+      "expected_strokes": 4,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 43,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "50c977afdf3f438fa5cb13d3d35f995a",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T20:59:32.578+00:00",
+          "experiment_id": "9ac675975e984b1c9775cfc54134bbc7",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261102-235932-b10-int006_validation_d1_mixed_lines-9ac67597",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T20:59:32.668+00:00",
+          "finished_at_utc": "2026-11-02T21:00:14.602+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d1_mixed_lines:P1"
+    },
+    {
+      "task_id": "int006_validation_d3_intersections-s2-d10-r2",
+      "scenario_id": "int006_validation_d3_intersections",
+      "repeat_index": 2,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 44,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "8f515bdb9adb4cd780b0497431c95b19",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T21:00:14.616+00:00",
+          "experiment_id": "3c9997547e9146a3bab8a82826faf2c1",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-000014-b10-int006_validation_d3_intersections-3c999754",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T21:00:14.707+00:00",
+          "finished_at_utc": "2026-11-02T21:00:59.981+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d3_intersections:P0"
+    },
+    {
+      "task_id": "int006_validation_d1_mixed_lines-s2-d10-r2",
+      "scenario_id": "int006_validation_d1_mixed_lines",
+      "repeat_index": 2,
+      "expected_strokes": 4,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 45,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "6871eb20556a42fda442ab5ff81cdd88",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T21:00:59.996+00:00",
+          "experiment_id": "53c5e9968e7a45c59cf5458b99c242a9",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-000100-b10-int006_validation_d1_mixed_lines-53c5e996",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T21:01:00.090+00:00",
+          "finished_at_utc": "2026-11-02T21:01:43.202+00:00"
+        }
+      ],
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d1_mixed_lines:P0"
+    }
+  ],
+  "prediction_artifact": {
+    "schema_version": 1,
+    "record_type": "autodraw_int006_frozen_prediction_artifact",
+    "artifact_id": "chalk-int006-frozen-2026-11-02:chalk-20261102-232320-7cea27",
+    "model_id": "chalk-int006-frozen-2026-11-02",
+    "model_version": 1,
+    "series_id": "chalk-20261102-232320-7cea27",
+    "phase_id": "INT006",
+    "radius": 10,
+    "profiles": {
+      "P0": {
+        "point_step_px": 2,
+        "point_delay_ms": 10,
+        "intercept": 1.765,
+        "slope": 0.2988
+      },
+      "P1": {
+        "point_step_px": 4,
+        "point_delay_ms": 5,
+        "intercept": 1.475,
+        "slope": 0.148865
+      },
+      "P2": {
+        "point_step_px": 4,
+        "point_delay_ms": 10,
+        "intercept": 1.44,
+        "slope": 0.149151
+      }
+    },
+    "short_lookup": {
+      "1": {
+        "P0": 2.0,
+        "P1": 2.0,
+        "P2": 2.0
+      },
+      "2": {
+        "P0": 2.67,
+        "P1": 2.0,
+        "P2": 2.0
+      },
+      "3": {
+        "P0": 2.67,
+        "P1": 2.0,
+        "P2": 2.0
+      },
+      "5": {
+        "P0": 3.67,
+        "P1": 2.33,
+        "P2": 2.67
+      },
+      "8": {
+        "P0": 4.0,
+        "P1": 3.0,
+        "P2": 3.0
+      },
+      "10": {
+        "P0": 5.0,
+        "P1": 3.67,
+        "P2": 3.67
+      }
+    },
+    "expected_cell_count": 45,
+    "predictions": {
+      "chalk-int006-frozen-2026-11-02:int006_validation_d1_mixed_lines:P0": {
+        "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d1_mixed_lines:P0",
+        "model_id": "chalk-int006-frozen-2026-11-02",
+        "model_version": 1,
+        "series_id": "chalk-20261102-232320-7cea27",
+        "phase_id": "INT006",
+        "scenario_id": "int006_validation_d1_mixed_lines",
+        "profile_id": "P0",
+        "executor_parameters": {
+          "point_step_px": 2,
+          "line_extension_px": 0,
+          "point_delay_ms": 10,
+          "after_mouse_up_ms": 20,
+          "before_mouse_down_ms": 20,
+          "after_mouse_down_ms": 40,
+          "end_hold_ms": 50,
+          "countdown_seconds": 5
+        },
+        "radius": 10,
+        "geometry_signature": "baf1fda5d20e43803b662ab9e162bb813aaf544970c411476e7b458dc80470ac",
+        "drawing_plan_sha256": "baf1fda5d20e43803b662ab9e162bb813aaf544970c411476e7b458dc80470ac",
+        "planned_strokes": [
+          {
+            "name": "d1_horizontal_100",
+            "points": [
+              [
+                30,
+                30
+              ],
+              [
+                130,
+                30
+              ]
+            ]
+          },
+          {
+            "name": "d1_vertical_80",
+            "points": [
+              [
+                160,
+                20
+              ],
+              [
+                160,
+                100
+              ]
+            ]
+          },
+          {
+            "name": "d1_diagonal_1",
+            "points": [
+              [
+                210,
+                25
+              ],
+              [
+                280,
+                95
+              ]
+            ]
+          },
+          {
+            "name": "d1_diagonal_2",
+            "points": [
+              [
+                310,
+                100
+              ],
+              [
+                390,
+                40
+              ]
+            ]
+          }
+        ],
+        "stroke_predictions": [
+          {
+            "stroke_id": "d1_horizontal_100",
+            "length_logical_px": 100.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 31.645000000000003
+          },
+          {
+            "stroke_id": "d1_vertical_80",
+            "length_logical_px": 80.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 25.669
+          },
+          {
+            "stroke_id": "d1_diagonal_1",
+            "length_logical_px": 98.99494936611666,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 31.34469087059566
+          },
+          {
+            "stroke_id": "d1_diagonal_2",
+            "length_logical_px": 100.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 31.645000000000003
+          }
+        ],
+        "prediction_rule": "straight_line_linear",
+        "predicted_chalk": 120.3,
+        "calculated_unrounded_total": 120.30369087059566,
+        "created_at_utc": "2026-11-02T20:30:20+00:00"
+      },
+      "chalk-int006-frozen-2026-11-02:int006_validation_d1_mixed_lines:P1": {
+        "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d1_mixed_lines:P1",
+        "model_id": "chalk-int006-frozen-2026-11-02",
+        "model_version": 1,
+        "series_id": "chalk-20261102-232320-7cea27",
+        "phase_id": "INT006",
+        "scenario_id": "int006_validation_d1_mixed_lines",
+        "profile_id": "P1",
+        "executor_parameters": {
+          "point_step_px": 4,
+          "line_extension_px": 0,
+          "point_delay_ms": 5,
+          "after_mouse_up_ms": 20,
+          "before_mouse_down_ms": 20,
+          "after_mouse_down_ms": 40,
+          "end_hold_ms": 50,
+          "countdown_seconds": 5
+        },
+        "radius": 10,
+        "geometry_signature": "baf1fda5d20e43803b662ab9e162bb813aaf544970c411476e7b458dc80470ac",
+        "drawing_plan_sha256": "baf1fda5d20e43803b662ab9e162bb813aaf544970c411476e7b458dc80470ac",
+        "planned_strokes": [
+          {
+            "name": "d1_horizontal_100",
+            "points": [
+              [
+                30,
+                30
+              ],
+              [
+                130,
+                30
+              ]
+            ]
+          },
+          {
+            "name": "d1_vertical_80",
+            "points": [
+              [
+                160,
+                20
+              ],
+              [
+                160,
+                100
+              ]
+            ]
+          },
+          {
+            "name": "d1_diagonal_1",
+            "points": [
+              [
+                210,
+                25
+              ],
+              [
+                280,
+                95
+              ]
+            ]
+          },
+          {
+            "name": "d1_diagonal_2",
+            "points": [
+              [
+                310,
+                100
+              ],
+              [
+                390,
+                40
+              ]
+            ]
+          }
+        ],
+        "stroke_predictions": [
+          {
+            "stroke_id": "d1_horizontal_100",
+            "length_logical_px": 100.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 16.3615
+          },
+          {
+            "stroke_id": "d1_vertical_80",
+            "length_logical_px": 80.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 13.3842
+          },
+          {
+            "stroke_id": "d1_diagonal_1",
+            "length_logical_px": 98.99494936611666,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 16.211883137386955
+          },
+          {
+            "stroke_id": "d1_diagonal_2",
+            "length_logical_px": 100.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 16.3615
+          }
+        ],
+        "prediction_rule": "straight_line_linear",
+        "predicted_chalk": 62.32,
+        "calculated_unrounded_total": 62.319083137386954,
+        "created_at_utc": "2026-11-02T20:30:20+00:00"
+      },
+      "chalk-int006-frozen-2026-11-02:int006_validation_d1_mixed_lines:P2": {
+        "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d1_mixed_lines:P2",
+        "model_id": "chalk-int006-frozen-2026-11-02",
+        "model_version": 1,
+        "series_id": "chalk-20261102-232320-7cea27",
+        "phase_id": "INT006",
+        "scenario_id": "int006_validation_d1_mixed_lines",
+        "profile_id": "P2",
+        "executor_parameters": {
+          "point_step_px": 4,
+          "line_extension_px": 0,
+          "point_delay_ms": 10,
+          "after_mouse_up_ms": 20,
+          "before_mouse_down_ms": 20,
+          "after_mouse_down_ms": 40,
+          "end_hold_ms": 50,
+          "countdown_seconds": 5
+        },
+        "radius": 10,
+        "geometry_signature": "baf1fda5d20e43803b662ab9e162bb813aaf544970c411476e7b458dc80470ac",
+        "drawing_plan_sha256": "baf1fda5d20e43803b662ab9e162bb813aaf544970c411476e7b458dc80470ac",
+        "planned_strokes": [
+          {
+            "name": "d1_horizontal_100",
+            "points": [
+              [
+                30,
+                30
+              ],
+              [
+                130,
+                30
+              ]
+            ]
+          },
+          {
+            "name": "d1_vertical_80",
+            "points": [
+              [
+                160,
+                20
+              ],
+              [
+                160,
+                100
+              ]
+            ]
+          },
+          {
+            "name": "d1_diagonal_1",
+            "points": [
+              [
+                210,
+                25
+              ],
+              [
+                280,
+                95
+              ]
+            ]
+          },
+          {
+            "name": "d1_diagonal_2",
+            "points": [
+              [
+                310,
+                100
+              ],
+              [
+                390,
+                40
+              ]
+            ]
+          }
+        ],
+        "stroke_predictions": [
+          {
+            "stroke_id": "d1_horizontal_100",
+            "length_logical_px": 100.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 16.3551
+          },
+          {
+            "stroke_id": "d1_vertical_80",
+            "length_logical_px": 80.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 13.37208
+          },
+          {
+            "stroke_id": "d1_diagonal_1",
+            "length_logical_px": 98.99494936611666,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 16.205195692905665
+          },
+          {
+            "stroke_id": "d1_diagonal_2",
+            "length_logical_px": 100.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 16.3551
+          }
+        ],
+        "prediction_rule": "straight_line_linear",
+        "predicted_chalk": 62.29,
+        "calculated_unrounded_total": 62.287475692905666,
+        "created_at_utc": "2026-11-02T20:30:20+00:00"
+      },
+      "chalk-int006-frozen-2026-11-02:int006_validation_d2_polygon:P0": {
+        "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d2_polygon:P0",
+        "model_id": "chalk-int006-frozen-2026-11-02",
+        "model_version": 1,
+        "series_id": "chalk-20261102-232320-7cea27",
+        "phase_id": "INT006",
+        "scenario_id": "int006_validation_d2_polygon",
+        "profile_id": "P0",
+        "executor_parameters": {
+          "point_step_px": 2,
+          "line_extension_px": 0,
+          "point_delay_ms": 10,
+          "after_mouse_up_ms": 20,
+          "before_mouse_down_ms": 20,
+          "after_mouse_down_ms": 40,
+          "end_hold_ms": 50,
+          "countdown_seconds": 5
+        },
+        "radius": 10,
+        "geometry_signature": "7dd88db2501f7abbfd98cea3dfea539ccde159bf89e2778ee46f616098e5a00e",
+        "drawing_plan_sha256": "7dd88db2501f7abbfd98cea3dfea539ccde159bf89e2778ee46f616098e5a00e",
+        "planned_strokes": [
+          {
+            "name": "d2_side_1",
+            "points": [
+              [
+                40,
+                35
+              ],
+              [
+                130,
+                25
+              ]
+            ]
+          },
+          {
+            "name": "d2_side_2",
+            "points": [
+              [
+                130,
+                25
+              ],
+              [
+                170,
+                85
+              ]
+            ]
+          },
+          {
+            "name": "d2_side_3",
+            "points": [
+              [
+                170,
+                85
+              ],
+              [
+                110,
+                155
+              ]
+            ]
+          },
+          {
+            "name": "d2_side_4",
+            "points": [
+              [
+                110,
+                155
+              ],
+              [
+                30,
+                115
+              ]
+            ]
+          },
+          {
+            "name": "d2_side_5",
+            "points": [
+              [
+                30,
+                115
+              ],
+              [
+                40,
+                35
+              ]
+            ]
+          }
+        ],
+        "stroke_predictions": [
+          {
+            "stroke_id": "d2_side_1",
+            "length_logical_px": 90.55385138137417,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 28.822490792754603
+          },
+          {
+            "stroke_id": "d2_side_2",
+            "length_logical_px": 72.11102550927978,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 23.3117744221728
+          },
+          {
+            "stroke_id": "d2_side_3",
+            "length_logical_px": 92.19544457292888,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 29.31299883839115
+          },
+          {
+            "stroke_id": "d2_side_4",
+            "length_logical_px": 89.44271909999159,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 28.49048446707749
+          },
+          {
+            "stroke_id": "d2_side_5",
+            "length_logical_px": 80.62257748298549,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 25.855026151916068
+          }
+        ],
+        "prediction_rule": "straight_line_linear",
+        "predicted_chalk": 135.79,
+        "calculated_unrounded_total": 135.7927746723121,
+        "created_at_utc": "2026-11-02T20:30:20+00:00"
+      },
+      "chalk-int006-frozen-2026-11-02:int006_validation_d2_polygon:P1": {
+        "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d2_polygon:P1",
+        "model_id": "chalk-int006-frozen-2026-11-02",
+        "model_version": 1,
+        "series_id": "chalk-20261102-232320-7cea27",
+        "phase_id": "INT006",
+        "scenario_id": "int006_validation_d2_polygon",
+        "profile_id": "P1",
+        "executor_parameters": {
+          "point_step_px": 4,
+          "line_extension_px": 0,
+          "point_delay_ms": 5,
+          "after_mouse_up_ms": 20,
+          "before_mouse_down_ms": 20,
+          "after_mouse_down_ms": 40,
+          "end_hold_ms": 50,
+          "countdown_seconds": 5
+        },
+        "radius": 10,
+        "geometry_signature": "7dd88db2501f7abbfd98cea3dfea539ccde159bf89e2778ee46f616098e5a00e",
+        "drawing_plan_sha256": "7dd88db2501f7abbfd98cea3dfea539ccde159bf89e2778ee46f616098e5a00e",
+        "planned_strokes": [
+          {
+            "name": "d2_side_1",
+            "points": [
+              [
+                40,
+                35
+              ],
+              [
+                130,
+                25
+              ]
+            ]
+          },
+          {
+            "name": "d2_side_2",
+            "points": [
+              [
+                130,
+                25
+              ],
+              [
+                170,
+                85
+              ]
+            ]
+          },
+          {
+            "name": "d2_side_3",
+            "points": [
+              [
+                170,
+                85
+              ],
+              [
+                110,
+                155
+              ]
+            ]
+          },
+          {
+            "name": "d2_side_4",
+            "points": [
+              [
+                110,
+                155
+              ],
+              [
+                30,
+                115
+              ]
+            ]
+          },
+          {
+            "name": "d2_side_5",
+            "points": [
+              [
+                30,
+                115
+              ],
+              [
+                40,
+                35
+              ]
+            ]
+          }
+        ],
+        "stroke_predictions": [
+          {
+            "stroke_id": "d2_side_1",
+            "length_logical_px": 90.55385138137417,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 14.955299085888266
+          },
+          {
+            "stroke_id": "d2_side_2",
+            "length_logical_px": 72.11102550927978,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 12.209807812438935
+          },
+          {
+            "stroke_id": "d2_side_3",
+            "length_logical_px": 92.19544457292888,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 15.199674856349057
+          },
+          {
+            "stroke_id": "d2_side_4",
+            "length_logical_px": 89.44271909999159,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 14.789890378820248
+          },
+          {
+            "stroke_id": "d2_side_5",
+            "length_logical_px": 80.62257748298549,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 13.476879997004634
+          }
+        ],
+        "prediction_rule": "straight_line_linear",
+        "predicted_chalk": 70.63,
+        "calculated_unrounded_total": 70.63155213050113,
+        "created_at_utc": "2026-11-02T20:30:20+00:00"
+      },
+      "chalk-int006-frozen-2026-11-02:int006_validation_d2_polygon:P2": {
+        "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d2_polygon:P2",
+        "model_id": "chalk-int006-frozen-2026-11-02",
+        "model_version": 1,
+        "series_id": "chalk-20261102-232320-7cea27",
+        "phase_id": "INT006",
+        "scenario_id": "int006_validation_d2_polygon",
+        "profile_id": "P2",
+        "executor_parameters": {
+          "point_step_px": 4,
+          "line_extension_px": 0,
+          "point_delay_ms": 10,
+          "after_mouse_up_ms": 20,
+          "before_mouse_down_ms": 20,
+          "after_mouse_down_ms": 40,
+          "end_hold_ms": 50,
+          "countdown_seconds": 5
+        },
+        "radius": 10,
+        "geometry_signature": "7dd88db2501f7abbfd98cea3dfea539ccde159bf89e2778ee46f616098e5a00e",
+        "drawing_plan_sha256": "7dd88db2501f7abbfd98cea3dfea539ccde159bf89e2778ee46f616098e5a00e",
+        "planned_strokes": [
+          {
+            "name": "d2_side_1",
+            "points": [
+              [
+                40,
+                35
+              ],
+              [
+                130,
+                25
+              ]
+            ]
+          },
+          {
+            "name": "d2_side_2",
+            "points": [
+              [
+                130,
+                25
+              ],
+              [
+                170,
+                85
+              ]
+            ]
+          },
+          {
+            "name": "d2_side_3",
+            "points": [
+              [
+                170,
+                85
+              ],
+              [
+                110,
+                155
+              ]
+            ]
+          },
+          {
+            "name": "d2_side_4",
+            "points": [
+              [
+                110,
+                155
+              ],
+              [
+                30,
+                115
+              ]
+            ]
+          },
+          {
+            "name": "d2_side_5",
+            "points": [
+              [
+                30,
+                115
+              ],
+              [
+                40,
+                35
+              ]
+            ]
+          }
+        ],
+        "stroke_predictions": [
+          {
+            "stroke_id": "d2_side_1",
+            "length_logical_px": 90.55385138137417,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 14.946197487383339
+          },
+          {
+            "stroke_id": "d2_side_2",
+            "length_logical_px": 72.11102550927978,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 12.195431565734589
+          },
+          {
+            "stroke_id": "d2_side_3",
+            "length_logical_px": 92.19544457292888,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 15.191042753496916
+          },
+          {
+            "stroke_id": "d2_side_4",
+            "length_logical_px": 89.44271909999159,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 14.780470996482846
+          },
+          {
+            "stroke_id": "d2_side_5",
+            "length_logical_px": 80.62257748298549,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 13.464938054164769
+          }
+        ],
+        "prediction_rule": "straight_line_linear",
+        "predicted_chalk": 70.58,
+        "calculated_unrounded_total": 70.57808085726245,
+        "created_at_utc": "2026-11-02T20:30:20+00:00"
+      },
+      "chalk-int006-frozen-2026-11-02:int006_validation_d3_intersections:P0": {
+        "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d3_intersections:P0",
+        "model_id": "chalk-int006-frozen-2026-11-02",
+        "model_version": 1,
+        "series_id": "chalk-20261102-232320-7cea27",
+        "phase_id": "INT006",
+        "scenario_id": "int006_validation_d3_intersections",
+        "profile_id": "P0",
+        "executor_parameters": {
+          "point_step_px": 2,
+          "line_extension_px": 0,
+          "point_delay_ms": 10,
+          "after_mouse_up_ms": 20,
+          "before_mouse_down_ms": 20,
+          "after_mouse_down_ms": 40,
+          "end_hold_ms": 50,
+          "countdown_seconds": 5
+        },
+        "radius": 10,
+        "geometry_signature": "a88ea4dc635f9c07745951afcee5530e0a9d727306417d010cbfe634c2aea5c1",
+        "drawing_plan_sha256": "a88ea4dc635f9c07745951afcee5530e0a9d727306417d010cbfe634c2aea5c1",
+        "planned_strokes": [
+          {
+            "name": "d3_x_a",
+            "points": [
+              [
+                40,
+                30
+              ],
+              [
+                140,
+                130
+              ]
+            ]
+          },
+          {
+            "name": "d3_x_b",
+            "points": [
+              [
+                40,
+                130
+              ],
+              [
+                140,
+                30
+              ]
+            ]
+          },
+          {
+            "name": "d3_cross_vertical",
+            "points": [
+              [
+                230,
+                30
+              ],
+              [
+                230,
+                150
+              ]
+            ]
+          },
+          {
+            "name": "d3_cross_horizontal",
+            "points": [
+              [
+                170,
+                90
+              ],
+              [
+                290,
+                90
+              ]
+            ]
+          },
+          {
+            "name": "d3_t_horizontal",
+            "points": [
+              [
+                330,
+                40
+              ],
+              [
+                390,
+                40
+              ]
+            ]
+          },
+          {
+            "name": "d3_t_vertical",
+            "points": [
+              [
+                360,
+                10
+              ],
+              [
+                360,
+                40
+              ]
+            ]
+          }
+        ],
+        "stroke_predictions": [
+          {
+            "stroke_id": "d3_x_a",
+            "length_logical_px": 141.4213562373095,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 44.02170124370809
+          },
+          {
+            "stroke_id": "d3_x_b",
+            "length_logical_px": 141.4213562373095,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 44.02170124370809
+          },
+          {
+            "stroke_id": "d3_cross_vertical",
+            "length_logical_px": 120.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 37.621
+          },
+          {
+            "stroke_id": "d3_cross_horizontal",
+            "length_logical_px": 120.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 37.621
+          },
+          {
+            "stroke_id": "d3_t_horizontal",
+            "length_logical_px": 60.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 19.693
+          },
+          {
+            "stroke_id": "d3_t_vertical",
+            "length_logical_px": 30.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 10.729000000000001
+          }
+        ],
+        "prediction_rule": "straight_line_linear",
+        "predicted_chalk": 193.71,
+        "calculated_unrounded_total": 193.7074024874162,
+        "created_at_utc": "2026-11-02T20:30:20+00:00"
+      },
+      "chalk-int006-frozen-2026-11-02:int006_validation_d3_intersections:P1": {
+        "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d3_intersections:P1",
+        "model_id": "chalk-int006-frozen-2026-11-02",
+        "model_version": 1,
+        "series_id": "chalk-20261102-232320-7cea27",
+        "phase_id": "INT006",
+        "scenario_id": "int006_validation_d3_intersections",
+        "profile_id": "P1",
+        "executor_parameters": {
+          "point_step_px": 4,
+          "line_extension_px": 0,
+          "point_delay_ms": 5,
+          "after_mouse_up_ms": 20,
+          "before_mouse_down_ms": 20,
+          "after_mouse_down_ms": 40,
+          "end_hold_ms": 50,
+          "countdown_seconds": 5
+        },
+        "radius": 10,
+        "geometry_signature": "a88ea4dc635f9c07745951afcee5530e0a9d727306417d010cbfe634c2aea5c1",
+        "drawing_plan_sha256": "a88ea4dc635f9c07745951afcee5530e0a9d727306417d010cbfe634c2aea5c1",
+        "planned_strokes": [
+          {
+            "name": "d3_x_a",
+            "points": [
+              [
+                40,
+                30
+              ],
+              [
+                140,
+                130
+              ]
+            ]
+          },
+          {
+            "name": "d3_x_b",
+            "points": [
+              [
+                40,
+                130
+              ],
+              [
+                140,
+                30
+              ]
+            ]
+          },
+          {
+            "name": "d3_cross_vertical",
+            "points": [
+              [
+                230,
+                30
+              ],
+              [
+                230,
+                150
+              ]
+            ]
+          },
+          {
+            "name": "d3_cross_horizontal",
+            "points": [
+              [
+                170,
+                90
+              ],
+              [
+                290,
+                90
+              ]
+            ]
+          },
+          {
+            "name": "d3_t_horizontal",
+            "points": [
+              [
+                330,
+                40
+              ],
+              [
+                390,
+                40
+              ]
+            ]
+          },
+          {
+            "name": "d3_t_vertical",
+            "points": [
+              [
+                360,
+                10
+              ],
+              [
+                360,
+                40
+              ]
+            ]
+          }
+        ],
+        "stroke_predictions": [
+          {
+            "stroke_id": "d3_x_a",
+            "length_logical_px": 141.4213562373095,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 22.52769019626708
+          },
+          {
+            "stroke_id": "d3_x_b",
+            "length_logical_px": 141.4213562373095,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 22.52769019626708
+          },
+          {
+            "stroke_id": "d3_cross_vertical",
+            "length_logical_px": 120.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 19.338800000000003
+          },
+          {
+            "stroke_id": "d3_cross_horizontal",
+            "length_logical_px": 120.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 19.338800000000003
+          },
+          {
+            "stroke_id": "d3_t_horizontal",
+            "length_logical_px": 60.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 10.4069
+          },
+          {
+            "stroke_id": "d3_t_vertical",
+            "length_logical_px": 30.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 5.940950000000001
+          }
+        ],
+        "prediction_rule": "straight_line_linear",
+        "predicted_chalk": 100.08,
+        "calculated_unrounded_total": 100.08083039253417,
+        "created_at_utc": "2026-11-02T20:30:20+00:00"
+      },
+      "chalk-int006-frozen-2026-11-02:int006_validation_d3_intersections:P2": {
+        "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d3_intersections:P2",
+        "model_id": "chalk-int006-frozen-2026-11-02",
+        "model_version": 1,
+        "series_id": "chalk-20261102-232320-7cea27",
+        "phase_id": "INT006",
+        "scenario_id": "int006_validation_d3_intersections",
+        "profile_id": "P2",
+        "executor_parameters": {
+          "point_step_px": 4,
+          "line_extension_px": 0,
+          "point_delay_ms": 10,
+          "after_mouse_up_ms": 20,
+          "before_mouse_down_ms": 20,
+          "after_mouse_down_ms": 40,
+          "end_hold_ms": 50,
+          "countdown_seconds": 5
+        },
+        "radius": 10,
+        "geometry_signature": "a88ea4dc635f9c07745951afcee5530e0a9d727306417d010cbfe634c2aea5c1",
+        "drawing_plan_sha256": "a88ea4dc635f9c07745951afcee5530e0a9d727306417d010cbfe634c2aea5c1",
+        "planned_strokes": [
+          {
+            "name": "d3_x_a",
+            "points": [
+              [
+                40,
+                30
+              ],
+              [
+                140,
+                130
+              ]
+            ]
+          },
+          {
+            "name": "d3_x_b",
+            "points": [
+              [
+                40,
+                130
+              ],
+              [
+                140,
+                30
+              ]
+            ]
+          },
+          {
+            "name": "d3_cross_vertical",
+            "points": [
+              [
+                230,
+                30
+              ],
+              [
+                230,
+                150
+              ]
+            ]
+          },
+          {
+            "name": "d3_cross_horizontal",
+            "points": [
+              [
+                170,
+                90
+              ],
+              [
+                290,
+                90
+              ]
+            ]
+          },
+          {
+            "name": "d3_t_horizontal",
+            "points": [
+              [
+                330,
+                40
+              ],
+              [
+                390,
+                40
+              ]
+            ]
+          },
+          {
+            "name": "d3_t_vertical",
+            "points": [
+              [
+                360,
+                10
+              ],
+              [
+                360,
+                40
+              ]
+            ]
+          }
+        ],
+        "stroke_predictions": [
+          {
+            "stroke_id": "d3_x_a",
+            "length_logical_px": 141.4213562373095,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 22.53313670415095
+          },
+          {
+            "stroke_id": "d3_x_b",
+            "length_logical_px": 141.4213562373095,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 22.53313670415095
+          },
+          {
+            "stroke_id": "d3_cross_vertical",
+            "length_logical_px": 120.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 19.338120000000004
+          },
+          {
+            "stroke_id": "d3_cross_horizontal",
+            "length_logical_px": 120.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 19.338120000000004
+          },
+          {
+            "stroke_id": "d3_t_horizontal",
+            "length_logical_px": 60.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 10.38906
+          },
+          {
+            "stroke_id": "d3_t_vertical",
+            "length_logical_px": 30.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 5.914530000000001
+          }
+        ],
+        "prediction_rule": "straight_line_linear",
+        "predicted_chalk": 100.05,
+        "calculated_unrounded_total": 100.0461034083019,
+        "created_at_utc": "2026-11-02T20:30:20+00:00"
+      },
+      "chalk-int006-frozen-2026-11-02:int006_validation_d4_short_details:P0": {
+        "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d4_short_details:P0",
+        "model_id": "chalk-int006-frozen-2026-11-02",
+        "model_version": 1,
+        "series_id": "chalk-20261102-232320-7cea27",
+        "phase_id": "INT006",
+        "scenario_id": "int006_validation_d4_short_details",
+        "profile_id": "P0",
+        "executor_parameters": {
+          "point_step_px": 2,
+          "line_extension_px": 0,
+          "point_delay_ms": 10,
+          "after_mouse_up_ms": 20,
+          "before_mouse_down_ms": 20,
+          "after_mouse_down_ms": 40,
+          "end_hold_ms": 50,
+          "countdown_seconds": 5
+        },
+        "radius": 10,
+        "geometry_signature": "5f2eb823c439f48515bd9bf71b785c7d03c19d367ee817512e1b96ab7f96c87f",
+        "drawing_plan_sha256": "5f2eb823c439f48515bd9bf71b785c7d03c19d367ee817512e1b96ab7f96c87f",
+        "planned_strokes": [
+          {
+            "name": "d4_length_1",
+            "points": [
+              [
+                30,
+                30
+              ],
+              [
+                31,
+                30
+              ]
+            ]
+          },
+          {
+            "name": "d4_length_2",
+            "points": [
+              [
+                60,
+                30
+              ],
+              [
+                60,
+                32
+              ]
+            ]
+          },
+          {
+            "name": "d4_length_3",
+            "points": [
+              [
+                90,
+                30
+              ],
+              [
+                93,
+                30
+              ]
+            ]
+          },
+          {
+            "name": "d4_length_5",
+            "points": [
+              [
+                130,
+                30
+              ],
+              [
+                130,
+                35
+              ]
+            ]
+          },
+          {
+            "name": "d4_length_8",
+            "points": [
+              [
+                170,
+                30
+              ],
+              [
+                178,
+                30
+              ]
+            ]
+          },
+          {
+            "name": "d4_length_10",
+            "points": [
+              [
+                210,
+                30
+              ],
+              [
+                210,
+                40
+              ]
+            ]
+          }
+        ],
+        "stroke_predictions": [
+          {
+            "stroke_id": "d4_length_1",
+            "length_logical_px": 1.0,
+            "rule": "exact_short_lookup",
+            "predicted_chalk": 2.0
+          },
+          {
+            "stroke_id": "d4_length_2",
+            "length_logical_px": 2.0,
+            "rule": "exact_short_lookup",
+            "predicted_chalk": 2.67
+          },
+          {
+            "stroke_id": "d4_length_3",
+            "length_logical_px": 3.0,
+            "rule": "exact_short_lookup",
+            "predicted_chalk": 2.67
+          },
+          {
+            "stroke_id": "d4_length_5",
+            "length_logical_px": 5.0,
+            "rule": "exact_short_lookup",
+            "predicted_chalk": 3.67
+          },
+          {
+            "stroke_id": "d4_length_8",
+            "length_logical_px": 8.0,
+            "rule": "exact_short_lookup",
+            "predicted_chalk": 4.0
+          },
+          {
+            "stroke_id": "d4_length_10",
+            "length_logical_px": 10.0,
+            "rule": "exact_short_lookup",
+            "predicted_chalk": 5.0
+          }
+        ],
+        "prediction_rule": "exact_short_lookup",
+        "predicted_chalk": 20.01,
+        "calculated_unrounded_total": 20.009999999999998,
+        "created_at_utc": "2026-11-02T20:30:20+00:00"
+      },
+      "chalk-int006-frozen-2026-11-02:int006_validation_d4_short_details:P1": {
+        "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d4_short_details:P1",
+        "model_id": "chalk-int006-frozen-2026-11-02",
+        "model_version": 1,
+        "series_id": "chalk-20261102-232320-7cea27",
+        "phase_id": "INT006",
+        "scenario_id": "int006_validation_d4_short_details",
+        "profile_id": "P1",
+        "executor_parameters": {
+          "point_step_px": 4,
+          "line_extension_px": 0,
+          "point_delay_ms": 5,
+          "after_mouse_up_ms": 20,
+          "before_mouse_down_ms": 20,
+          "after_mouse_down_ms": 40,
+          "end_hold_ms": 50,
+          "countdown_seconds": 5
+        },
+        "radius": 10,
+        "geometry_signature": "5f2eb823c439f48515bd9bf71b785c7d03c19d367ee817512e1b96ab7f96c87f",
+        "drawing_plan_sha256": "5f2eb823c439f48515bd9bf71b785c7d03c19d367ee817512e1b96ab7f96c87f",
+        "planned_strokes": [
+          {
+            "name": "d4_length_1",
+            "points": [
+              [
+                30,
+                30
+              ],
+              [
+                31,
+                30
+              ]
+            ]
+          },
+          {
+            "name": "d4_length_2",
+            "points": [
+              [
+                60,
+                30
+              ],
+              [
+                60,
+                32
+              ]
+            ]
+          },
+          {
+            "name": "d4_length_3",
+            "points": [
+              [
+                90,
+                30
+              ],
+              [
+                93,
+                30
+              ]
+            ]
+          },
+          {
+            "name": "d4_length_5",
+            "points": [
+              [
+                130,
+                30
+              ],
+              [
+                130,
+                35
+              ]
+            ]
+          },
+          {
+            "name": "d4_length_8",
+            "points": [
+              [
+                170,
+                30
+              ],
+              [
+                178,
+                30
+              ]
+            ]
+          },
+          {
+            "name": "d4_length_10",
+            "points": [
+              [
+                210,
+                30
+              ],
+              [
+                210,
+                40
+              ]
+            ]
+          }
+        ],
+        "stroke_predictions": [
+          {
+            "stroke_id": "d4_length_1",
+            "length_logical_px": 1.0,
+            "rule": "exact_short_lookup",
+            "predicted_chalk": 2.0
+          },
+          {
+            "stroke_id": "d4_length_2",
+            "length_logical_px": 2.0,
+            "rule": "exact_short_lookup",
+            "predicted_chalk": 2.0
+          },
+          {
+            "stroke_id": "d4_length_3",
+            "length_logical_px": 3.0,
+            "rule": "exact_short_lookup",
+            "predicted_chalk": 2.0
+          },
+          {
+            "stroke_id": "d4_length_5",
+            "length_logical_px": 5.0,
+            "rule": "exact_short_lookup",
+            "predicted_chalk": 2.33
+          },
+          {
+            "stroke_id": "d4_length_8",
+            "length_logical_px": 8.0,
+            "rule": "exact_short_lookup",
+            "predicted_chalk": 3.0
+          },
+          {
+            "stroke_id": "d4_length_10",
+            "length_logical_px": 10.0,
+            "rule": "exact_short_lookup",
+            "predicted_chalk": 3.67
+          }
+        ],
+        "prediction_rule": "exact_short_lookup",
+        "predicted_chalk": 15.0,
+        "calculated_unrounded_total": 15.0,
+        "created_at_utc": "2026-11-02T20:30:20+00:00"
+      },
+      "chalk-int006-frozen-2026-11-02:int006_validation_d4_short_details:P2": {
+        "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d4_short_details:P2",
+        "model_id": "chalk-int006-frozen-2026-11-02",
+        "model_version": 1,
+        "series_id": "chalk-20261102-232320-7cea27",
+        "phase_id": "INT006",
+        "scenario_id": "int006_validation_d4_short_details",
+        "profile_id": "P2",
+        "executor_parameters": {
+          "point_step_px": 4,
+          "line_extension_px": 0,
+          "point_delay_ms": 10,
+          "after_mouse_up_ms": 20,
+          "before_mouse_down_ms": 20,
+          "after_mouse_down_ms": 40,
+          "end_hold_ms": 50,
+          "countdown_seconds": 5
+        },
+        "radius": 10,
+        "geometry_signature": "5f2eb823c439f48515bd9bf71b785c7d03c19d367ee817512e1b96ab7f96c87f",
+        "drawing_plan_sha256": "5f2eb823c439f48515bd9bf71b785c7d03c19d367ee817512e1b96ab7f96c87f",
+        "planned_strokes": [
+          {
+            "name": "d4_length_1",
+            "points": [
+              [
+                30,
+                30
+              ],
+              [
+                31,
+                30
+              ]
+            ]
+          },
+          {
+            "name": "d4_length_2",
+            "points": [
+              [
+                60,
+                30
+              ],
+              [
+                60,
+                32
+              ]
+            ]
+          },
+          {
+            "name": "d4_length_3",
+            "points": [
+              [
+                90,
+                30
+              ],
+              [
+                93,
+                30
+              ]
+            ]
+          },
+          {
+            "name": "d4_length_5",
+            "points": [
+              [
+                130,
+                30
+              ],
+              [
+                130,
+                35
+              ]
+            ]
+          },
+          {
+            "name": "d4_length_8",
+            "points": [
+              [
+                170,
+                30
+              ],
+              [
+                178,
+                30
+              ]
+            ]
+          },
+          {
+            "name": "d4_length_10",
+            "points": [
+              [
+                210,
+                30
+              ],
+              [
+                210,
+                40
+              ]
+            ]
+          }
+        ],
+        "stroke_predictions": [
+          {
+            "stroke_id": "d4_length_1",
+            "length_logical_px": 1.0,
+            "rule": "exact_short_lookup",
+            "predicted_chalk": 2.0
+          },
+          {
+            "stroke_id": "d4_length_2",
+            "length_logical_px": 2.0,
+            "rule": "exact_short_lookup",
+            "predicted_chalk": 2.0
+          },
+          {
+            "stroke_id": "d4_length_3",
+            "length_logical_px": 3.0,
+            "rule": "exact_short_lookup",
+            "predicted_chalk": 2.0
+          },
+          {
+            "stroke_id": "d4_length_5",
+            "length_logical_px": 5.0,
+            "rule": "exact_short_lookup",
+            "predicted_chalk": 2.67
+          },
+          {
+            "stroke_id": "d4_length_8",
+            "length_logical_px": 8.0,
+            "rule": "exact_short_lookup",
+            "predicted_chalk": 3.0
+          },
+          {
+            "stroke_id": "d4_length_10",
+            "length_logical_px": 10.0,
+            "rule": "exact_short_lookup",
+            "predicted_chalk": 3.67
+          }
+        ],
+        "prediction_rule": "exact_short_lookup",
+        "predicted_chalk": 15.34,
+        "calculated_unrounded_total": 15.34,
+        "created_at_utc": "2026-11-02T20:30:20+00:00"
+      },
+      "chalk-int006-frozen-2026-11-02:int006_validation_d5_repeated_coverage:P0": {
+        "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d5_repeated_coverage:P0",
+        "model_id": "chalk-int006-frozen-2026-11-02",
+        "model_version": 1,
+        "series_id": "chalk-20261102-232320-7cea27",
+        "phase_id": "INT006",
+        "scenario_id": "int006_validation_d5_repeated_coverage",
+        "profile_id": "P0",
+        "executor_parameters": {
+          "point_step_px": 2,
+          "line_extension_px": 0,
+          "point_delay_ms": 10,
+          "after_mouse_up_ms": 20,
+          "before_mouse_down_ms": 20,
+          "after_mouse_down_ms": 40,
+          "end_hold_ms": 50,
+          "countdown_seconds": 5
+        },
+        "radius": 10,
+        "geometry_signature": "0eb08836ef1ab0d8aaf395b40a5648c02ec06753f0a7fc18b81017c2ee62940e",
+        "drawing_plan_sha256": "0eb08836ef1ab0d8aaf395b40a5648c02ec06753f0a7fc18b81017c2ee62940e",
+        "planned_strokes": [
+          {
+            "name": "d5_line_50_pass_1",
+            "points": [
+              [
+                40,
+                40
+              ],
+              [
+                90,
+                40
+              ]
+            ]
+          },
+          {
+            "name": "d5_line_50_pass_2",
+            "points": [
+              [
+                40,
+                40
+              ],
+              [
+                90,
+                40
+              ]
+            ]
+          },
+          {
+            "name": "d5_line_100_pass_1",
+            "points": [
+              [
+                40,
+                90
+              ],
+              [
+                140,
+                90
+              ]
+            ]
+          },
+          {
+            "name": "d5_line_100_pass_2",
+            "points": [
+              [
+                40,
+                90
+              ],
+              [
+                140,
+                90
+              ]
+            ]
+          },
+          {
+            "name": "d5_line_120_pass_1",
+            "points": [
+              [
+                40,
+                150
+              ],
+              [
+                160,
+                150
+              ]
+            ]
+          },
+          {
+            "name": "d5_line_120_pass_2",
+            "points": [
+              [
+                40,
+                150
+              ],
+              [
+                160,
+                150
+              ]
+            ]
+          }
+        ],
+        "stroke_predictions": [
+          {
+            "stroke_id": "d5_line_50_pass_1",
+            "length_logical_px": 50.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 16.705000000000002
+          },
+          {
+            "stroke_id": "d5_line_50_pass_2",
+            "length_logical_px": 50.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 16.705000000000002
+          },
+          {
+            "stroke_id": "d5_line_100_pass_1",
+            "length_logical_px": 100.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 31.645000000000003
+          },
+          {
+            "stroke_id": "d5_line_100_pass_2",
+            "length_logical_px": 100.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 31.645000000000003
+          },
+          {
+            "stroke_id": "d5_line_120_pass_1",
+            "length_logical_px": 120.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 37.621
+          },
+          {
+            "stroke_id": "d5_line_120_pass_2",
+            "length_logical_px": 120.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 37.621
+          }
+        ],
+        "prediction_rule": "straight_line_linear",
+        "predicted_chalk": 171.94,
+        "calculated_unrounded_total": 171.94200000000004,
+        "created_at_utc": "2026-11-02T20:30:20+00:00"
+      },
+      "chalk-int006-frozen-2026-11-02:int006_validation_d5_repeated_coverage:P1": {
+        "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d5_repeated_coverage:P1",
+        "model_id": "chalk-int006-frozen-2026-11-02",
+        "model_version": 1,
+        "series_id": "chalk-20261102-232320-7cea27",
+        "phase_id": "INT006",
+        "scenario_id": "int006_validation_d5_repeated_coverage",
+        "profile_id": "P1",
+        "executor_parameters": {
+          "point_step_px": 4,
+          "line_extension_px": 0,
+          "point_delay_ms": 5,
+          "after_mouse_up_ms": 20,
+          "before_mouse_down_ms": 20,
+          "after_mouse_down_ms": 40,
+          "end_hold_ms": 50,
+          "countdown_seconds": 5
+        },
+        "radius": 10,
+        "geometry_signature": "0eb08836ef1ab0d8aaf395b40a5648c02ec06753f0a7fc18b81017c2ee62940e",
+        "drawing_plan_sha256": "0eb08836ef1ab0d8aaf395b40a5648c02ec06753f0a7fc18b81017c2ee62940e",
+        "planned_strokes": [
+          {
+            "name": "d5_line_50_pass_1",
+            "points": [
+              [
+                40,
+                40
+              ],
+              [
+                90,
+                40
+              ]
+            ]
+          },
+          {
+            "name": "d5_line_50_pass_2",
+            "points": [
+              [
+                40,
+                40
+              ],
+              [
+                90,
+                40
+              ]
+            ]
+          },
+          {
+            "name": "d5_line_100_pass_1",
+            "points": [
+              [
+                40,
+                90
+              ],
+              [
+                140,
+                90
+              ]
+            ]
+          },
+          {
+            "name": "d5_line_100_pass_2",
+            "points": [
+              [
+                40,
+                90
+              ],
+              [
+                140,
+                90
+              ]
+            ]
+          },
+          {
+            "name": "d5_line_120_pass_1",
+            "points": [
+              [
+                40,
+                150
+              ],
+              [
+                160,
+                150
+              ]
+            ]
+          },
+          {
+            "name": "d5_line_120_pass_2",
+            "points": [
+              [
+                40,
+                150
+              ],
+              [
+                160,
+                150
+              ]
+            ]
+          }
+        ],
+        "stroke_predictions": [
+          {
+            "stroke_id": "d5_line_50_pass_1",
+            "length_logical_px": 50.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 8.91825
+          },
+          {
+            "stroke_id": "d5_line_50_pass_2",
+            "length_logical_px": 50.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 8.91825
+          },
+          {
+            "stroke_id": "d5_line_100_pass_1",
+            "length_logical_px": 100.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 16.3615
+          },
+          {
+            "stroke_id": "d5_line_100_pass_2",
+            "length_logical_px": 100.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 16.3615
+          },
+          {
+            "stroke_id": "d5_line_120_pass_1",
+            "length_logical_px": 120.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 19.338800000000003
+          },
+          {
+            "stroke_id": "d5_line_120_pass_2",
+            "length_logical_px": 120.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 19.338800000000003
+          }
+        ],
+        "prediction_rule": "straight_line_linear",
+        "predicted_chalk": 89.24,
+        "calculated_unrounded_total": 89.23710000000001,
+        "created_at_utc": "2026-11-02T20:30:20+00:00"
+      },
+      "chalk-int006-frozen-2026-11-02:int006_validation_d5_repeated_coverage:P2": {
+        "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d5_repeated_coverage:P2",
+        "model_id": "chalk-int006-frozen-2026-11-02",
+        "model_version": 1,
+        "series_id": "chalk-20261102-232320-7cea27",
+        "phase_id": "INT006",
+        "scenario_id": "int006_validation_d5_repeated_coverage",
+        "profile_id": "P2",
+        "executor_parameters": {
+          "point_step_px": 4,
+          "line_extension_px": 0,
+          "point_delay_ms": 10,
+          "after_mouse_up_ms": 20,
+          "before_mouse_down_ms": 20,
+          "after_mouse_down_ms": 40,
+          "end_hold_ms": 50,
+          "countdown_seconds": 5
+        },
+        "radius": 10,
+        "geometry_signature": "0eb08836ef1ab0d8aaf395b40a5648c02ec06753f0a7fc18b81017c2ee62940e",
+        "drawing_plan_sha256": "0eb08836ef1ab0d8aaf395b40a5648c02ec06753f0a7fc18b81017c2ee62940e",
+        "planned_strokes": [
+          {
+            "name": "d5_line_50_pass_1",
+            "points": [
+              [
+                40,
+                40
+              ],
+              [
+                90,
+                40
+              ]
+            ]
+          },
+          {
+            "name": "d5_line_50_pass_2",
+            "points": [
+              [
+                40,
+                40
+              ],
+              [
+                90,
+                40
+              ]
+            ]
+          },
+          {
+            "name": "d5_line_100_pass_1",
+            "points": [
+              [
+                40,
+                90
+              ],
+              [
+                140,
+                90
+              ]
+            ]
+          },
+          {
+            "name": "d5_line_100_pass_2",
+            "points": [
+              [
+                40,
+                90
+              ],
+              [
+                140,
+                90
+              ]
+            ]
+          },
+          {
+            "name": "d5_line_120_pass_1",
+            "points": [
+              [
+                40,
+                150
+              ],
+              [
+                160,
+                150
+              ]
+            ]
+          },
+          {
+            "name": "d5_line_120_pass_2",
+            "points": [
+              [
+                40,
+                150
+              ],
+              [
+                160,
+                150
+              ]
+            ]
+          }
+        ],
+        "stroke_predictions": [
+          {
+            "stroke_id": "d5_line_50_pass_1",
+            "length_logical_px": 50.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 8.89755
+          },
+          {
+            "stroke_id": "d5_line_50_pass_2",
+            "length_logical_px": 50.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 8.89755
+          },
+          {
+            "stroke_id": "d5_line_100_pass_1",
+            "length_logical_px": 100.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 16.3551
+          },
+          {
+            "stroke_id": "d5_line_100_pass_2",
+            "length_logical_px": 100.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 16.3551
+          },
+          {
+            "stroke_id": "d5_line_120_pass_1",
+            "length_logical_px": 120.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 19.338120000000004
+          },
+          {
+            "stroke_id": "d5_line_120_pass_2",
+            "length_logical_px": 120.0,
+            "rule": "straight_line_linear",
+            "predicted_chalk": 19.338120000000004
+          }
+        ],
+        "prediction_rule": "straight_line_linear",
+        "predicted_chalk": 89.18,
+        "calculated_unrounded_total": 89.18154000000001,
+        "created_at_utc": "2026-11-02T20:30:20+00:00"
+      }
+    },
+    "artifact_sha256": "a0eab016e96a81e14bededd32cf5161dd943d6fc85a20b7eec17455f69d0c61c"
+  }
+}

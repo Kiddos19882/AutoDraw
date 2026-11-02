@@ -1,0 +1,323 @@
+{
+  "schema_version": 1,
+  "name": "Brush behavior test — int006_validation_d4_short_details",
+  "created_at": "2026-11-02T20:54:36+00:00",
+  "coordinate_system": "logical_board_pixels",
+  "canvas": {
+    "width": 460,
+    "height": 240
+  },
+  "width": 460,
+  "height": 240,
+  "strokes": [
+    {
+      "name": "d4_length_1",
+      "points": [
+        {
+          "x": 30.0,
+          "y": 30.0
+        },
+        {
+          "x": 31.0,
+          "y": 30.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "int006_validation_d4_short_details",
+        "line_extension_px_override": 0.0
+      }
+    },
+    {
+      "name": "d4_length_2",
+      "points": [
+        {
+          "x": 60.0,
+          "y": 30.0
+        },
+        {
+          "x": 60.0,
+          "y": 32.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "int006_validation_d4_short_details",
+        "line_extension_px_override": 0.0
+      }
+    },
+    {
+      "name": "d4_length_3",
+      "points": [
+        {
+          "x": 90.0,
+          "y": 30.0
+        },
+        {
+          "x": 93.0,
+          "y": 30.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "int006_validation_d4_short_details",
+        "line_extension_px_override": 0.0
+      }
+    },
+    {
+      "name": "d4_length_5",
+      "points": [
+        {
+          "x": 130.0,
+          "y": 30.0
+        },
+        {
+          "x": 130.0,
+          "y": 35.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "int006_validation_d4_short_details",
+        "line_extension_px_override": 0.0
+      }
+    },
+    {
+      "name": "d4_length_8",
+      "points": [
+        {
+          "x": 170.0,
+          "y": 30.0
+        },
+        {
+          "x": 178.0,
+          "y": 30.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "int006_validation_d4_short_details",
+        "line_extension_px_override": 0.0
+      }
+    },
+    {
+      "name": "d4_length_10",
+      "points": [
+        {
+          "x": 210.0,
+          "y": 30.0
+        },
+        {
+          "x": 210.0,
+          "y": 40.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "int006_validation_d4_short_details",
+        "line_extension_px_override": 0.0
+      }
+    }
+  ],
+  "generation": {
+    "method": "manual_brush_behavior_test",
+    "test_case": "int006_validation_d4_short_details",
+    "brush_value_must_be_set_manually": true,
+    "note": "Set the requested brush size in the browser before executing this plan.",
+    "experiment_id": "646bd2f3386c4374ba9929eae46254f0",
+    "requested_brush_value": 10,
+    "chalk_test_block": {
+      "block_id": "1f93ddcac07445b78093744c7cbabcde",
+      "task_id": "int006_validation_d4_short_details-s2-d10-r2",
+      "phase_id": "INT006"
+    },
+    "chalk_experiment_matrix": {
+      "schema_version": 1,
+      "series_id": "chalk-20261102-232320-7cea27",
+      "phase_id": "INT006",
+      "scenario_id": "int006_validation_d4_short_details",
+      "repeat_index": 2,
+      "matrix_order_index": 36,
+      "planned_repeats": 3,
+      "requested_radius": 10,
+      "expected_strokes": 6,
+      "geometry_signature": "a6cd85049eb764f3a8d8c03ccf203668cf0426c712f93d23141cf48ae92d8d2e",
+      "planned_strokes": [
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "int006_validation_d4_short_details"
+          },
+          "name": "d4_length_1",
+          "points": [
+            {
+              "x": 30.0,
+              "y": 30.0
+            },
+            {
+              "x": 31.0,
+              "y": 30.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "int006_validation_d4_short_details"
+          },
+          "name": "d4_length_2",
+          "points": [
+            {
+              "x": 60.0,
+              "y": 30.0
+            },
+            {
+              "x": 60.0,
+              "y": 32.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "int006_validation_d4_short_details"
+          },
+          "name": "d4_length_3",
+          "points": [
+            {
+              "x": 90.0,
+              "y": 30.0
+            },
+            {
+              "x": 93.0,
+              "y": 30.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "int006_validation_d4_short_details"
+          },
+          "name": "d4_length_5",
+          "points": [
+            {
+              "x": 130.0,
+              "y": 30.0
+            },
+            {
+              "x": 130.0,
+              "y": 35.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "int006_validation_d4_short_details"
+          },
+          "name": "d4_length_8",
+          "points": [
+            {
+              "x": 170.0,
+              "y": 30.0
+            },
+            {
+              "x": 178.0,
+              "y": 30.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "int006_validation_d4_short_details"
+          },
+          "name": "d4_length_10",
+          "points": [
+            {
+              "x": 210.0,
+              "y": 30.0
+            },
+            {
+              "x": 210.0,
+              "y": 40.0
+            }
+          ]
+        }
+      ],
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "prediction_id": "chalk-int006-frozen-2026-11-02:int006_validation_d4_short_details:P0"
+    },
+    "screen_transform": {
+      "method": "inclusive_logical_bounds_to_screen_pixel_centers",
+      "source_coordinate_system": "logical_board_pixels",
+      "target_coordinate_system": "local_canvas_pixels",
+      "logical_board": {
+        "width": 460,
+        "height": 240
+      },
+      "screen_roi": {
+        "x": 566,
+        "y": 253,
+        "width": 581,
+        "height": 304
+      },
+      "scale_x": 1.2608695652173914,
+      "scale_y": 1.2625,
+      "expected_uniform_scale": true,
+      "uniform_scale_relative_error": 0.0012914334911751312,
+      "uniform_scale_tolerance": 0.01,
+      "logical_bounds": {
+        "x": [
+          0,
+          460
+        ],
+        "y": [
+          0,
+          240
+        ]
+      },
+      "screen_local_bounds": {
+        "x": [
+          0,
+          580
+        ],
+        "y": [
+          0,
+          303
+        ]
+      },
+      "boundary_mapping": "logical_max_to_last_screen_pixel",
+      "executor_coordinate_units": "screen_pixels",
+      "point_step_px_units": "screen_pixels"
+    }
+  }
+}
