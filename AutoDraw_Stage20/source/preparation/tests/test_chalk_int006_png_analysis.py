@@ -12,8 +12,9 @@ sys.path.insert(0, str(APP_ROOT / "tests"))
 import chalk_int006_png_analysis as analysis
 
 class Int006PngAnalysisTests(unittest.TestCase):
-    def make_run(self, root: Path, *, gap: bool = False, parallel: bool = False, cursor: bool = False) -> Path:
-        folder = root / "experiment-test"
+    def make_run(self, root: Path, *, gap: bool = False, parallel: bool = False, cursor: bool = False,
+                 name: str = "experiment-test", series_id: str = "series-test") -> Path:
+        folder = root / name
         folder.mkdir()
         before = np.full((240, 460, 3), 236, np.uint8)
         after = before.copy()
@@ -37,8 +38,8 @@ class Int006PngAnalysisTests(unittest.TestCase):
         cv2.imwrite(str(folder / "after_draw-board.png"), after)
         n = len(strokes)
         manifest = {
-            "experiment_id":"synthetic-run",
-            "chalk_experiment_matrix":{"phase_id":"V1","scenario_id":"int006_diagonals","repeat_index":1,
+            "experiment_id":name,
+            "chalk_experiment_matrix":{"series_id":series_id,"phase_id":"V1","scenario_id":"int006_diagonals","repeat_index":1,
                 "expected_strokes":n,"requested_radius":10,"planned_strokes":strokes,
                 "executor_parameters":{"point_step_px":2,"point_delay_ms":10}},
             "execution_report":{"status":"completed","completed_strokes":n},
@@ -100,6 +101,16 @@ class Int006PngAnalysisTests(unittest.TestCase):
             self.assertTrue((root/"out"/"summary.json").exists())
             self.assertTrue((root/"out"/"per_stroke_metrics.csv").exists())
             self.assertTrue((root/"out"/"parallel_pair_metrics.csv").exists())
+
+    def test_same_matrix_cells_in_different_series_are_not_duplicates(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            self.make_run(root, name="original-run", series_id="original-series")
+            self.make_run(root, name="followup-run", series_id="followup-series")
+            report=analysis.run(root, root/"out", expected_runs=2)
+            self.assertEqual(report["series_count"], 2)
+            self.assertEqual(report["duplicate_matrix_cells"], [])
+            self.assertEqual(report["discovered_runs"], 2)
 
 if __name__ == "__main__":
     unittest.main()
