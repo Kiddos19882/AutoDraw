@@ -1293,3 +1293,23 @@ def test_destroying_recovery_scan_owner_cancels_pending_callback():
     assert cancelled == ["after#recovery-scan"]
     assert tab._chalk_block_recovery_scan_after_id is None
 
+
+
+@pytest.mark.parametrize(
+    ("case_name", "scenario_id", "expected_strokes"),
+    [
+        ("V1 — диагонали разных наклонов", "int006_diagonals", 6),
+        ("V2 — короткие штрихи 1–10 px", "int006_short_strokes", 6),
+        ("V3 — непрерывные повороты", "int006_turns", 3),
+        ("V4 — замкнутые контуры", "int006_closed_contours", 3),
+        ("V5 — пересечения и параллельные линии", "int006_intersections_spacing", 10),
+    ],
+)
+def test_int006_drawing_plans_have_expected_strokes_and_logical_bounds(case_name, scenario_id, expected_strokes):
+    plan = build_brush_test_drawing_plan(case_name, (460, 240), coordinate_system="logical_board_pixels")
+    assert plan["generation"]["test_case"] == scenario_id
+    assert len(plan["strokes"]) == expected_strokes
+    assert all(
+        0 <= point["x"] <= 460 and 0 <= point["y"] <= 240
+        for stroke in plan["strokes"] for point in stroke["points"]
+    )
