@@ -40,7 +40,7 @@
 | INT-003 | IN_PROGRESS | Завершить оценку overhead Game Monitor | Exact counter и telemetry подтверждены. Осталось сопоставимое A/B/C измерение Monitor off / версий Monitor с отдельными FPS, длительностью и overhead. Не блокирует точность CHALK capture, но нужен для оценки накладных расходов. |
 | INT-004 | DONE | Автоматически собирать telemetry и связывать её с experiment ID | WebSocket bridge, per-run capture, RunRecorder и запись monitor report/идентификаторов в experiment manifest использованы в принятых G1–G3 captures. Overhead comparison относится к INT-003. |
 | INT-005 | DONE | Реализовать автоматизированную лабораторию CHALK-экспериментов | Matrix/block runner, task identity, повторения, manifest, recovery/fail-closed gates и capture acceptance использованы для G1 12/12, G2 18/18 и G3 27/27. |
-| INT-006 | IN_PROGRESS | D1–D5 live block выполнен: 45/45 captures. Все 45 manifest/Monitor report доступны; предварительный разбор подтвердил exact CHALK, per-stroke sum и нулевые Monitor/Bridge integrity counters. Предварительные метрики: MAE 1.408, RMSE 1.967, bias -0.875, MAPE 2.134%, max underprediction 1.82 CHALK. Ожидаются официальный analyzer JSON, hash/binding validation и отдельное решение по safety margin. См. [предварительные результаты](CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md) и [frozen analyzer](CHALK_INT006_FROZEN_PREDICTIONS_AND_ANALYZER_2026-11-02.md). Production estimator/defaults не менять. |
+| INT-006 | IN_PROGRESS | Официальный analyzer PASS: 45/45 accepted, 0 missing/rejected, 15/15 groups complete; SHA-256 и journal/task/experiment/run/profile/geometry binding проверены. Метрики: MAE 1.408, RMSE 1.967, bias -0.875, MAPE 2.134%, max underprediction 1.82 CHALK. Остаются safety-margin decision и расширение domain validation. См. [официальный отчёт](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md). Production estimator/defaults не менять. |
 | INT-007 | BLOCKED | Интегрировать валидированную модель в preflight/resource estimator AutoDraw | Начинать только после независимой validation INT-006 и определения консервативного safety margin. |
 | INT-008 | TODO | Оптимизировать кисти, траектории, порядок и покрытие | Подбирать способ построения рисунка в пределах квоты CHALK с учётом качества покрытия; зависит от INT-006/007. |
 | INT-009 | TODO | Сравнить прогноз с фактом и проверить качество | Проверить на независимых рисунках прогноз, exact CHALK delta, визуальное качество и устойчивость к разным типам геометрии. |
@@ -59,7 +59,7 @@
 - [x] Выполнить 45 независимых live captures D1–D5; предварительно сверить exact CHALK и per-stroke breakdown по всем 45 Monitor reports. Отдельный preflight log в capture bundle не найден.
 - [ ] После validation определить обоснованный safety margin.
 
-**Актуальный приоритет INT-006:** live D1–D5 captures завершены. Следующий gate — официальный analyzer JSON, hash/binding verification и решение по safety margin. См. [предварительные результаты](CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md), [план validation](CHALK_INT006_INDEPENDENT_VALIDATION_PLAN_2026-11-02.md) и [план дальнейших действий](CHALK_NEXT_STEPS_PLAN_2026-11-02.md). Исторические чек-листы ниже сохраняют ход выполнения и не переопределяют статусы таблицы.
+**Актуальный приоритет INT-006:** официальный quantitative analyzer gate закрыт. Следующий gate — отдельное решение о provisional empirical guard и расширенная проверка модели на полном разнообразии рисунков. См. [официальный отчёт](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md) и [план validation](CHALK_INT006_INDEPENDENT_VALIDATION_PLAN_2026-11-02.md). Исторические чек-листы ниже сохраняют ход выполнения и не переопределяют статусы таблицы.
 ## Отменённые работы
 
 | ID | Статус | Задача | Основание |
@@ -450,7 +450,7 @@ INT-006 остаётся IN_PROGRESS до официального analyzer repo
 
 ## Следующие действия после geometry binding fix
 
-- [ ] Получить окончательный результат CI run 41532629748 на commit dd64730.
-- [ ] Проверить официальный analyzer artifact: hash, 45 accepted, 0 missing, 0 rejected, 15 complete groups, per-stroke metrics и все journal/task/experiment/run/profile bindings.
-- [ ] Если CI успешен, сопоставить официальный report с предварительными метриками; если нет — разбирать следующий конкретный rejection без ослабления fail-closed checks.
-- [ ] Отдельно принять решение по safety margin; до решения не менять production estimator/defaults и не запускать INT-007.
+- [x] Получить окончательный результат CI run 41532629748 на commit dd64730 — SUCCESS.
+- [x] Проверить официальный analyzer artifact: hash, 45 accepted, 0 missing, 0 rejected, 15 complete groups, per-stroke metrics и все journal/task/experiment/run/profile bindings.
+- [x] Сопоставить официальный report с предварительными метриками — расхождений, влияющих на выводы, нет.
+- [ ] Отдельно принять решение по safety margin и расширить domain validation; до этого не менять production estimator/defaults и не запускать INT-007.
