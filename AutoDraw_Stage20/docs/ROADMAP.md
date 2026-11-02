@@ -217,3 +217,16 @@ Harness V1–V5: matrix metadata/validator, block planner/journal, Brush Test UI
 - [ ] INT-007 integration только после принятия результатов INT-006.
 
 Подробности: [frozen predictions/analyzer](CHALK_INT006_FROZEN_PREDICTIONS_AND_ANALYZER_2026-11-02.md), [local preflight](CHALK_INT006_LOCAL_PREFLIGHT_GUIDE_2026-11-02.md).
+
+
+## Актуальный статус INT006R — 2026-11-03
+
+- [x] Выделена отдельная фаза INT006R с новыми D1–D5 scenario IDs, чтобы не смешивать её с frozen INT-006 radius=10 journal/model.
+- [x] Добавлен 45-cell planner: D1–D5 × radius 1/10/30 × 3 повтора; sampling фиксирован на P1 (step=4, delay=5 ms).
+- [x] Добавлены strict journal validation, UI aliases, task-specific radius selection и fail-closed executor handoff.
+- [x] Добавлен отдельный analyzer exact CHALK и regression tests для matrix/journal/analyzer/handoff.
+- [ ] Пройти полный CI на новом HEAD, включая Windows portable build/startup smoke-test.
+- [ ] После CI и локального Windows preflight выполнить 45 live captures; не запускать до закрытия software gate.
+- [ ] По результатам оценить radius × geometry interaction отдельно по каждой геометрии; при обнаружении эффекта добавить промежуточные радиусы.
+
+**Текущий gate:** software implementation added; CI pending. **Live gate:** BLOCKED. Frozen INT-006 model, production estimator/defaults и master не менялись.
