@@ -337,4 +337,4 @@ Step=4 дал снижение расхода на 38.5–49.4% относите
 
 В manifests post-draw cursor placement записан ниже `board_area` и `paint_meter_area` (32 px margin; экранная точка 856,624). Paint-meter image measurement остаётся inconclusive. ROI visibility heuristic помечает часть V3/V4 и все V5 штрихи ambiguous из-за overlap ROI; это не отменяет exact telemetry, но требует pixel-level проверки PNG именно новых follow-up captures.
 
-**Статус:** live follow-up V1–V5 завершён. Следующие gates: pixel-level аудит новых 45 PNG → независимая validation модели на полных DrawingPlan → safety margin → только затем INT-007. Production defaults и estimator не менялись.
+**Статус:** live follow-up V1–V5 и pixel-level audit завершены. V5 spacing audit: 8/12 logical px — merge, 16/20/24 — no merge для целевых пар при radius=10. Следующий gate: независимая validation модели на полных DrawingPlan → safety margin → только затем INT-007. Подробно: CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md. Production defaults и estimator не менялись.
