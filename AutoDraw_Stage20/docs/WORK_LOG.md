@@ -1841,3 +1841,14 @@ Brush Test acceptance и матричные валидаторы больше н
 - Проверена согласованность block plan и journal validator: три V sampling profiles, три повтора, девять уникальных ячеек на фазу.
 - Статусы GitHub commit checks через доступный endpoint пока не предоставили результатов; успешный CI не заявляется. Попытка локального clone для запуска тестов невозможна из-за недоступности DNS/сети в контейнере.
 - Live captures не запускались: локальная игровая сессия не доступна в этом рабочем окружении.
+
+
+## 2026-11-02 — CI verification for INT-006 V1–V5
+
+- Проверен актуальный branch HEAD: `400becfaefd59497f95b370f3608717d61d5d86e`.
+- Найден обязательный GitHub Actions run [#1886](https://github.com/Kiddos19882/AutoDraw/actions/runs/41376333639) на кодовом HEAD `b60d9aef5b9a95ebefa85f42d99956f181bec7ee`; итоговый conclusion: `success`.
+- Успешны обязательные jobs: Application integration tests; Executor regression tests; Game Monitor and bridge tests; Preparation and G3 matrix tests; Windows portable build and startup smoke-test.
+- Optional algorithm benchmarks завершился `skipped`; это необязательный job и не влияет на итог обязательного CI.
+- Между проверенным кодовым HEAD и текущим branch HEAD — шесть коммитов, меняющих только четыре Markdown-документа: `CHALK_INT006_EXECUTION_PROTOCOL_2026-11-02.md`, `CHALK_NEXT_STEPS_PLAN_2026-11-02.md`, `PROJECT_STATUS.md`, `WORK_LOG.md`. Код после проверенного CI не менялся.
+- Commit-status endpoint вернул пустой список; CI подтверждён по самому workflow run и результатам jobs.
+- Live captures V1–V5 не запускались. Следующий gate — 45 captures в доступной игровой сессии с проверкой exact CHALK, per-run Monitor integrity и геометрического качества.
