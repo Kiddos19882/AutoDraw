@@ -12,7 +12,7 @@
 **Актуально на:** 3 ноября 2026 г.  
 **Репозиторий:** `Kiddos19882/AutoDraw`  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
-**Текущий HEAD:** [`e42e38d`](https://github.com/Kiddos19882/AutoDraw/commit/e42e38d7fa9850122bef16e4331a4378ea43c66c) — предварительные количественные результаты INT-006.  
+**Состояние ветки:** analyzer portability fix, regression test, CI workflow и документационная синхронизация внесены в текущую историю commits этой ветки; `master` не менялся.
 **Последний подтверждённый полный CI до последних analyzer/workflow изменений:** run [41513389663](https://github.com/Kiddos19882/AutoDraw/actions/runs/41513389663), code HEAD `ca8c9b3bd739ea0a5b557b87fc0106ecfde81216`; последующие commits `f2c182e`, `cf8fb51`, `3f9a408` и `e42e38d` требуют проверки нового CI.  
 > Этот блок — единственный источник текущего статуса. Ниже сохранена историческая хронология; старые статусы и планы не являются текущим backlog.
 
