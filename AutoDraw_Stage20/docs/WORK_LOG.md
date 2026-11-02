@@ -2004,3 +2004,15 @@ Brush Test acceptance и матричные валидаторы больше н
 - Новые manifests фиксируют курсор в точке (856,624), ниже board/paint-meter ROI, margin=32 px. Paint-meter screenshot estimate inconclusive. ROI heuristic ambiguity в V3/V4/V5 требует pixel-level анализа и не опровергает exact Monitor telemetry.
 - Создан подробный отчёт `CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md`; протокол INT-006 и PROJECT_STATUS синхронизированы.
 - Следующий gate: pixel-level аудит новых 45 PNG, затем независимая validation CHALK модели на полных DrawingPlan и safety margin. Production defaults/estimator не менялись; radius matrix этим follow-up не расширялась.
+
+
+## 2026-11-02 — series-aware PNG audit, V5 spacing and full CI
+
+- Первый CI run на data commit e879a77 обнаружил 90 valid captures (исходные 45 + follow-up 45), но старый анализатор ожидал только 45 и считал совпадающие matrix cells разных series дублями. Реальные duplicate/missing/unexpected cells и batch failures отсутствовали.
+- Исправлен tests/chalk_int006_png_analysis.py: matrix identity scoped by series_id + phase; validation выполняется отдельно для каждой серии по 9 ячейкам; series_id включён в summary и CSV. Workflow теперь использует --expected-runs-per-series 9.
+- Добавлены regression tests: одинаковые ячейки в разных series не конфликтуют; повтор в одной series по-прежнему детектируется. Поправлено имя synthetic fixture после изменения experiment_id.
+- Pixel audit run [41496555297](https://github.com/Kiddos19882/AutoDraw/actions/runs/41496555297) обработал 90/90 captures, 10 series ×9, 0 invalid, 0 duplicate/missing/unexpected cells, 0 batch failures. Artifact: 273 files, 549 per-stroke rows, 900 parallel-pair rows.
+- Новые 45 follow-up captures: 297/297 strokes coverage=1.0, path_metrics_sufficient=true, gap_count=0, max_gap=0.0; V4 closure seams 27/27 covered. Cursor detection false и cursor-exclusion pixels=0 для 45/45.
+- V5 target pair sweep: spacing 8.0115/12.0172 logical px — touch/merge 9/9; 16.0229/20.0286/24.0344 — 0/9. Первое проверенное разделённое расстояние в этой конфигурации — 16 logical px при radius=10.
+- Full CI run 41496555297 — success: all required regression jobs, PNG audit, Windows portable build/startup smoke-test. Optional benchmarks skipped. Артефакты PNG audit и portable build доступны в Actions.
+- Документация: CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md, execution protocol, PROJECT_STATUS, TASKS, ROADMAP и follow-up protocols синхронизированы. Следующий gate — independent validation модели на полных DrawingPlan, затем safety margin. Production defaults/estimator не менялись.
