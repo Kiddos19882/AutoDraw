@@ -1,5 +1,21 @@
 # Журнал работ AutoDraw
 
+## 2026-11-03 — INT006R full software gate PASS
+
+**CI:** [run 41540054975](https://github.com/Kiddos19882/AutoDraw/actions/runs/41540054975)  
+**Проверенный code HEAD:** `28b56a97255b57b50072ba973533ce349c706bd1`  
+**Результат:** SUCCESS.
+
+- Preparation/G3: 682 passed, 82 subtests passed, 24 warnings.
+- Application integration, Executor regression и Game Monitor/Bridge — success.
+- INT-006 pixel-level PNG geometry audit — success.
+- Windows portable build и startup smoke-test — success; portable artifact upload завершён.
+- Новый положительный INT006R analyzer test принял synthetic 45/45 комплект, проверив journal/task/experiment/run binding, exact CHALK, per-stroke breakdown и читаемые before/after PNG.
+- Отрицательные regression tests проверяют неподдерживаемые радиусы, bool/float радиусы, P1-only contract, mismatch requested brush, tampered journal radius и duplicate cells.
+
+**Границы:** CI подтверждает программную готовность INT006R, но не влияние радиуса на фактический CHALK. Live captures не выполнялись; visual quality gate остаётся pending manual review. Следующий шаг — локальный Windows preflight по `CHALK_INT006R_LIVE_PREFLIGHT_AND_VISUAL_AUDIT_2026-11-03.md`. Production estimator, frozen INT-006 artifact, executor defaults, sampling defaults и `master` не менялись.
+
+
 ## 2026-11-03 — реализация INT006R radius × geometry harness
 
 **Ветка:** `feature/image-geometry-optimization`  
