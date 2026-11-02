@@ -125,18 +125,18 @@ Logical DrawingPlan переводился в пиксели изображен�
 5. Выдержать 150 ms и сделать новый screenshot; board ROI и paint meter crop формируются только из второго снимка.
 6. Записать в `experiment_phases.after_draw.cursor_exclusion` метод, точку и margin.
 
-Если безопасная точка вне экрана недоступна или координаты некорректны, post-draw capture завершится ошибкой вместо сохранения потенциально закрытого курсором кадра. Это fail-closed поведение. Добавлены тесты геометрии выбора точки и порядка действий. Кодовые коммиты: `a680f51`, `d299259`, `723a410`. CI для нового HEAD и реальный V4 capture ещё не подтверждены; старые captures не изменялись.
+Если безопасная точка вне экрана недоступна или координаты некорректны, post-draw capture завершится ошибкой вместо сохранения потенциально закрытого курсором кадра. Это fail-closed поведение. При review diff выявлена и исправлена ошибочная первая вставка в общий manual capture method: перемещение оставлено только в `_capture_automated_after_draw`; manual capture возвращён к прежнему поведению и защищён regression test. Коммиты: `a680f51`, `d299259`, `723a410`, `16ffb58`, `a74f7fd`. CI для окончательного HEAD и реальный V4 capture ещё не подтверждены; старые captures не изменялись.
 
 ## 9. Следующие действия
 
 1. [x] Просмотреть representative overlays и зафиксировать причины неоднозначности.
 2. [x] Исправить DrawingPlan V1/V3 и добавить regression gate межштрихового расстояния.
 3. [x] Добавить cursor-free post-draw capture и unit/regression tests.
-4. [ ] Подтвердить CI для code HEAD `723a410795953e075fbdfefe0c03cdfc28a94dd0`.
+4. [ ] Подтвердить CI для code HEAD `a74f7fd18c1b4100c87747ab4bd533afaa74b95d`.
 5. [ ] Выполнить V4 closure capture и проверить, что seam не закрыт курсором.
 6. [ ] Повторить полные V1/V3 blocks с новой геометрией.
 7. [ ] Добавить V2 targeted lengths 12/16/20/24/30 logical px.
 8. [ ] Выполнить V5 spacing sweep 8/12/16/20/24 logical px.
 9. [ ] Провести независимую validation CHALK model и определить safety margin; INT-007 остаётся BLOCKED.
 
-**Статус:** код cursor-free capture и его тесты добавлены, но CI и live validation ожидаются. Quality gate остаётся OPEN. Production executor, estimator, sampling defaults и первичные captures не изменялись.
+**Статус:** код cursor-free capture ограничен automated post-draw, manual capture сохранён без перемещения курсора; добавлены regression tests. CI и live validation ожидаются. Quality gate остаётся OPEN. Production executor, estimator, sampling defaults и первичные captures не изменялись.
