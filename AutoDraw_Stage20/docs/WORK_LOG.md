@@ -1993,3 +1993,14 @@ Brush Test acceptance и матричные валидаторы больше н
 - Ручной capture и поведение рисования не менялись. В manifest фиксируются исключённые области и политика размещения курсора.
 - Добавлены regression tests для позиции ниже обеих областей и защиты от paint-meter hover.
 - Live-проверка на рабочем игровом окне не выполнялась; требуется подтвердить отсутствие уведомления в следующем реальном CHALK-блоке.
+
+
+## 2026-11-02 — анализ live follow-up V1–V5
+
+- Получен commit [e879a77](https://github.com/Kiddos19882/AutoDraw/commit/e879a77f63be7a7a68de3f09091eab7dba0d34a2) с пятью block journals, 45 DrawingPlan/experiment captures, Game Monitor reports и PNG. Проверка дерева commit подтвердила полный набор 45 experiment manifests и 45 monitor reports; каждый блок содержит 9/9 completed tasks.
+- Проверены все 45 manifests: radius=10, точный CHALK delta, `point_delta_matches_chalk=true`, expected stroke count, нулевые per-run Monitor/Bridge errors, dropped events и sequence gaps.
+- Сводные средние exact CHALK P0/P1/P2: V1 251.67/131.33/132.33; V2 39.00/24.00/23.67; V3 344.00/175.33/174.00; V4 438.33/229.00/229.33; V5 407.67/216.00/216.33.
+- Step=4 экономит 38.5–49.4% относительно step=2. Разница delay=5/10 ms при step=4 незначительна (до ~1.4% по средним).
+- Новые manifests фиксируют курсор в точке (856,624), ниже board/paint-meter ROI, margin=32 px. Paint-meter screenshot estimate inconclusive. ROI heuristic ambiguity в V3/V4/V5 требует pixel-level анализа и не опровергает exact Monitor telemetry.
+- Создан подробный отчёт `CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md`; протокол INT-006 и PROJECT_STATUS синхронизированы.
+- Следующий gate: pixel-level аудит новых 45 PNG, затем независимая validation CHALK модели на полных DrawingPlan и safety margin. Production defaults/estimator не менялись; radius matrix этим follow-up не расширялась.
