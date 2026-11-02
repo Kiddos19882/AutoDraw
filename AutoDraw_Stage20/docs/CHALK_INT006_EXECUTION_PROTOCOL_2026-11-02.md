@@ -305,3 +305,17 @@ G1 per-stroke модель `1.765 + 0.2988×L` проверена без refit �
 Визуальный обзор PNG выявил непреднамеренные пересечения в V1 (slope_050 × negative_shallow, (340,80)) и V3 (right_angle × acute_zigzag, около (233.33,100)). V2 при radius=10 показывает точечные следы коротких движений; V5 spacing=8 logical px сливает параллельные линии, spacing=24 оставляет их раздельными. Pixel-level gap/centerline/width metrics ещё не рассчитаны.
 
 Полная сводка, raw repeat values, V2 lookup и ограничения: [CHALK_INT006_V1_V5_RESULTS_2026-11-02.md](CHALK_INT006_V1_V5_RESULTS_2026-11-02.md). INT-006 остаётся IN_PROGRESS; production defaults и estimator не менялись.
+
+
+## 16. Follow-up V2/V5 после pixel audit
+
+Исходная матрица V1–V5 выше является исторической и остаётся неизменной. Для закрытия ограничений V2/V5 подготовлены отдельные scenario IDs, отдельные DrawingPlan и отдельные 9-task journals:
+
+- V2: `int006_short_strokes_followup`, 5 штрихов длиной 12/16/20/24/30 logical px.
+- V5: `int006_intersections_spacing_sweep`, 16 штрихов: X/T/крест (6) и пять изолированных пар параллельных линий со spacing 8/12/16/20/24 logical px (10).
+
+Обе серии используют P0=2/10, P1=4/5, P2=4/10, три повтора и radius=10. Каждая серия даёт 9 captures; совокупно 18 новых captures. Expected strokes обновлены в matrix contract и block acceptance: V2=5, V5=16. Новые IDs обязательны, чтобы старые результаты не смешивались с новыми.
+
+Полные координаты, цели, критерии capture acceptance и пошаговая инструкция live-прогона: [CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md](CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md).
+
+Live-прогоны выполняет пользователь в собственной игровой сессии. Подготовка кода и CI не считается live validation. После получения данных отдельно проверить exact pre/post pointCount, per-stroke pointDelta, Monitor integrity, PNG geometry и repeatability. Production executor, estimator и sampling defaults не менять.
