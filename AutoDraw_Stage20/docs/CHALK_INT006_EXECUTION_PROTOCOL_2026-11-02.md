@@ -232,3 +232,39 @@ INT-007 не открывать, пока:
 - Не считать move calls, coalesced trajectory или pixel ROI изменением exact CHALK.
 - Live-рисование выполняется только при доступной игровой сессии и явном подтверждении готовности тестовой доски. Автоматические live-блоки не запускать из CI.
 - В одном запуске запускать не более пяти workflow.
+
+
+## 13. Реализация экспериментального harness V1–V5 — 2026-11-02
+
+**Статус подготовки:** реализовано в рабочей ветке; обязательный CI и live validation ещё не подтверждены.
+
+V1–V5 подключены к существующему lifecycle G3. Отдельный runner не создавался.
+
+| Фаза | Scenario ID | Ожидаемые штрихи | Содержимое |
+|---|---|---:|---|
+| V1 | `int006_diagonals` | 6 | Изолированные диагонали разных наклонов и направлений |
+| V2 | `int006_short_strokes` | 6 | Длины 1, 2, 3, 5, 8 и 10 logical px |
+| V3 | `int006_turns` | 3 | Непрерывные ломаные с прямыми и острыми поворотами |
+| V4 | `int006_closed_contours` | 3 | Прямоугольник, треугольник и неправильный замкнутый контур |
+| V5 | `int006_intersections_spacing` | 10 | X/T/крестовые узлы и две пары параллельных линий |
+
+Каждая V-фаза создаёт отдельный block journal на 9 задач: три профиля × три повтора:
+- P0: `point_step_px=2`, `point_delay_ms=10`;
+- P1: `point_step_px=4`, `point_delay_ms=5`;
+- P2: `point_step_px=4`, `point_delay_ms=10`.
+
+Итого V1–V5 — 45 captures. Радиус фиксирован на 10; остальные параметры executor наследуются из `GEOMETRY_EXECUTOR_CONFIG`.
+
+### Изменённые компоненты
+- `source/preparation/chalk_experiment_matrix.py`: V1–V5, expected stroke counts, allowlist sampling profiles.
+- `source/preparation/chalk_test_blocks.py`: 9-cell V-blocks, profile matrix, строгая journal validation.
+- `source/preparation/brush_behavior_test_ui.py`: пять DrawingPlan и выбор V-фазы; одиночный ручной запуск V-сценариев запрещён.
+- `integrated_app.py`: task-specific executor override для V1–V5 с fail-closed проверкой phase/scenario/strokes/radius/profile.
+- Tests: matrix metadata, block plan/journal, DrawingPlan logical bounds и интеграционный executor handoff V5.
+
+### Границы результата
+- Production defaults и production estimator не изменялись.
+- Реализация не подтверждает визуальное качество step=4.
+- CI должен проверить новые regression tests и Windows portable startup.
+- Live captures не запускались; перед ними нужна актуальная portable-сборка, доступная игровая сессия, свежий Monitor heartbeat и пустая тестовая доска.
+- Геометрические captures требуют отдельной визуальной оценки после live runs.
