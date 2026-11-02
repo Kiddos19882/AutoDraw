@@ -1867,3 +1867,14 @@ Brush Test acceptance и матричные валидаторы больше н
 - Ручной просмотр репрезентативных P0/P1 PNG: выявлены непреднамеренные пересечения V1/V3; V2 показывает круглые отметки для движений короче радиуса; V5 spacing=8 logical px сливает параллельные следы, spacing=24 сохраняет разделение. Pixel-level метрики не рассчитаны.
 - Подробный отчёт: [CHALK_INT006_V1_V5_RESULTS_2026-11-02.md](CHALK_INT006_V1_V5_RESULTS_2026-11-02.md). Production-код, executor defaults и estimator не менялись.
 - CI run [#1887](https://github.com/Kiddos19882/AutoDraw/actions/runs/41384186201) для data commit завершился success.
+
+
+## 2026-11-02 — INT-006: первичный скрининг PNG V1–V5
+
+- Проверены оригинальные board ROI из GitHub: 15 representative PNG, по одному capture для каждого профиля P0/P1/P2 в V1–V5.
+- Визуально не выявлено очевидной потери непрерывности у step=4 относительно P0 на просмотренных диагоналях, ломаных, контурах и пересечениях.
+- Зафиксированы дефекты/ограничения геометрии: V1 пересечение slope_050/negative_shallow; V3 пересечение right_angle/acute_zigzag; V2 короткие движения выглядят точками при radius=10; V4 часть контура перекрыта курсором; V5 spacing=8 logical px сливается.
+- P1 и P2 визуально практически неразличимы на выбранных примерах.
+- Численные pixel-level метрики не рассчитаны; этап нельзя считать закрытым. Требуется сегментация всех 45 PNG, вычисление continuity/max gap, centerline deviation, width/width variation, closure и parallel separation с проверкой масок относительно blank-board reference.
+- Отчёт: [CHALK_INT006_PNG_SCREENING_2026-11-02.md](CHALK_INT006_PNG_SCREENING_2026-11-02.md).
+- Production code, executor defaults, estimator и первичные captures не изменялись.
