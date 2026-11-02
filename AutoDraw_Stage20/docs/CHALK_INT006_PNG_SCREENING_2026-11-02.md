@@ -64,3 +64,33 @@
 5. Сохранить исходные PNG, manifests, monitor reports и block journals неизменными.
 
 **Решение:** этап первичного визуального скрининга выполнен; количественный pixel-level аудит остаётся следующим активным подэтапом INT-006. Production code, executor defaults и estimator не изменялись.
+
+
+## 7. Инвентаризация полного набора и ограничение количественного анализа
+
+По Git tree исходного data commit `64795362aa1bf4d0a3587e119b8c959242be6181` подтверждено наличие полного набора:
+- 45 experiment directories;
+- 45 `experiment.json`;
+- 45 `monitor_report.json`;
+- 45 `before_clear-board.png`;
+- 45 `after_draw-board.png`;
+- 45 `after_draw-screen.png`;
+- всего 270 PNG в шести capture-категориях на каждый experiment.
+
+Размеры всех `after_draw-board.png` суммарно — 594,826 bytes; `before_clear-board.png` — 107,685 bytes. Blank/reference board capture, таким образом, сохранён для каждого run и может использоваться для differential segmentation.
+
+**Почему численные метрики пока не рассчитаны:** GitHub connector предоставляет binary PNG в base64/preview форме, но текущая рабочая среда не передаёт эти бинарные данные в локальный Python/OpenCV runtime как файлы. Прямая загрузка raw GitHub из контейнера также недоступна из-за отсутствия DNS/network. Просмотр изображения через preview не даёт достоверных pixel arrays. Поэтому вычислять или публиковать max gap, centerline deviation, width и closure по этим preview было бы недостоверно.
+
+Это ограничение среды анализа, а не отсутствие исходных данных: все 45 пар blank/after-draw PNG присутствуют в репозитории.
+
+## 8. Условия для продолжения количественного аудита
+
+Количественный этап следует запускать в среде, где checkout commit `6479536` доступен локально:
+1. Установить зависимости из `source/preparation/requirements.txt` (Pillow, NumPy, OpenCV).
+2. Для каждой experiment directory загрузить `before_clear-board.png`, `after_draw-board.png` и planned geometry из `experiment.json`.
+3. Получить differential ink mask, исключить постоянный фон и ограничить анализ коридорами planned strokes.
+4. Отдельно маркировать участки, перекрытые курсором, интерфейсом, пересечениями или соседними штрихами; не выдавать ambiguous зоны за валидные метрики.
+5. Сначала вручную проверить mask/overlay на одном run каждой фазы и каждого профиля, затем выполнять пакетный расчёт всех 45 captures.
+6. Сохранять CSV/JSON per-stroke metrics и диагностические overlay в отдельном output directory; исходные captures не изменять.
+
+**Важно:** не применять автоматический порог к абсолютному цвету без differential reference. Курсор и пересечения должны иметь отдельный ambiguous mask. До появления численных результатов pixel-level gate остаётся OPEN.
