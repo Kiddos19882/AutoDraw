@@ -147,36 +147,62 @@ def select_execution_monitor_run(
 
 
 def _cursor_safe_point_outside_region(
-    region: dict[str, Any], screen_size: tuple[int, int], *, margin: int = 24
+    region: dict[str, Any],
+    screen_size: tuple[int, int],
+    *,
+    margin: int = 32,
+    avoid_regions: tuple[dict[str, Any], ...] = (),
 ) -> tuple[int, int]:
-    """Choose a screen point safely outside a calibrated ROI for unobstructed capture."""
+    """Choose a capture point outside the board and every additional interactive ROI."""
     if not isinstance(region, dict):
         raise ValueError("Область доски не задана.")
     try:
-        x, y, width, height = (int(region[key]) for key in ("x", "y", "width", "height"))
         screen_width, screen_height = (int(value) for value in screen_size)
         margin = int(margin)
+        raw_regions = (region, *avoid_regions)
+        rectangles = [
+            tuple(int(item[key]) for key in ("x", "y", "width", "height"))
+            for item in raw_regions
+        ]
     except (KeyError, TypeError, ValueError):
-        raise ValueError("Некорректные размеры области доски или экрана.") from None
-    if width <= 0 or height <= 0 or screen_width <= 0 or screen_height <= 0 or margin < 1:
-        raise ValueError("Размеры области доски, экрана и отступ должны быть положительными.")
-    if x < 0 or y < 0 or x + width > screen_width or y + height > screen_height:
-        raise ValueError("Область доски выходит за пределы экрана.")
+        raise ValueError("Некорректные размеры областей или экрана.") from None
+    if screen_width <= 0 or screen_height <= 0 or margin < 1:
+        raise ValueError("Размеры экрана и отступ должны быть положительными.")
+    for x, y, width, height in rectangles:
+        if width <= 0 or height <= 0:
+            raise ValueError("Размеры областей должны быть положительными.")
+        if x < 0 or y < 0 or x + width > screen_width or y + height > screen_height:
+            raise ValueError("Область выходит за пределы экрана.")
 
+    x, y, width, height = rectangles[0]
     center_x, center_y = x + width // 2, y + height // 2
-    candidates = [
-        (x - margin - 1, center_y),
-        (x + width + margin, center_y),
-        (center_x, y - margin - 1),
-        (center_x, y + height + margin),
-    ]
-    valid = [
-        point for point in candidates
-        if 0 <= point[0] < screen_width and 0 <= point[1] < screen_height
-    ]
+    # The preferred destination is below the lowest interactive region, not merely
+    # below the board: this prevents hovering the paint meter and opening its tooltip.
+    lowest_region_bottom = max(ry + rh for _, ry, _, rh in rectangles)
+    candidates = [(center_x, lowest_region_bottom + margin)]
+    for rx, ry, rw, rh in rectangles:
+        candidates.extend((
+            (rx - margin - 1, ry + rh // 2),
+            (rx + rw + margin, ry + rh // 2),
+            (rx + rw // 2, ry - margin - 1),
+            (rx + rw // 2, ry + rh + margin),
+        ))
+
+    def is_clear(point: tuple[int, int]) -> bool:
+        px, py = point
+        if not (0 <= px < screen_width and 0 <= py < screen_height):
+            return False
+        return all(
+            not (rx - margin <= px <= rx + rw - 1 + margin
+                 and ry - margin <= py <= ry + rh - 1 + margin)
+            for rx, ry, rw, rh in rectangles
+        )
+
+    valid = [point for point in candidates if is_clear(point)]
     if not valid:
-        raise ValueError("Не удалось найти безопасную точку курсора за пределами доски.")
-    # Prefer the nearest valid off-board position to minimize unrelated pointer movement.
+        raise ValueError("Не удалось найти безопасную точку курсора вне доски и интерактивных областей.")
+    if is_clear(candidates[0]):
+        return candidates[0]
     return min(valid, key=lambda point: (point[0] - center_x) ** 2 + (point[1] - center_y) ** 2)
 
 
@@ -3103,8 +3129,12 @@ class BrushBehaviorTestTab:
                     raise ValueError("Разрешение экрана изменилось после калибровки.")
             regions = config.get("regions", {})
             board_region = regions.get("board_area", {}) if isinstance(regions, dict) else {}
+            paint_meter_region = regions.get("paint_meter_area", {}) if isinstance(regions, dict) else {}
             safe_cursor_point = _cursor_safe_point_outside_region(
-                board_region, screen.size, margin=24
+                board_region,
+                screen.size,
+                margin=32,
+                avoid_regions=(paint_meter_region,),
             )
             # Drawing has completed; release any residual button state before moving off-board.
             pyautogui.mouseUp()
@@ -3132,7 +3162,9 @@ class BrushBehaviorTestTab:
                     "status": "moved_outside_board_before_capture",
                     "method": "mouse_up_then_move_without_click",
                     "screen_point": {"x": safe_cursor_point[0], "y": safe_cursor_point[1]},
-                    "margin_px": 24,
+                    "margin_px": 32,
+                    "avoided_regions": ["board_area", "paint_meter_area"],
+                    "destination_policy": "below_board_and_paint_meter",
                 },
                 "files": {"full_screen": screen_path.name, "board_roi": board_path.name, "paint_meter_roi": meter_path.name},
             }
