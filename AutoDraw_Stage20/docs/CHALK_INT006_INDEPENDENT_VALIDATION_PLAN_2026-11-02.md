@@ -8,7 +8,7 @@
 
 ## Технический gate перед запуском
 
-Исторический readiness audit ниже был выполнен до реализации и зафиксировал отсутствие D1–D5 в harness. Этот блок сохранён как история выявления проблемы. Текущая реализация и успешный software gate описаны в [отчёте frozen predictions/analyzer](CHALK_INT006_FROZEN_PREDICTIONS_AND_ANALYZER_2026-11-02.md); текущий оставшийся gate — локальный Windows preflight.
+Исторический readiness audit ниже был выполнен до реализации и зафиксировал отсутствие D1–D5 в harness. Этот блок сохранён как история выявления проблемы. Текущая реализация и успешный software gate описаны в [отчёте frozen predictions/analyzer](CHALK_INT006_FROZEN_PREDICTIONS_AND_ANALYZER_2026-11-02.md); текущие оставшиеся gates — официальный analyzer JSON, frozen artifact SHA-256 и полный journal/task binding audit.
 
 ## 1. Цель
 
