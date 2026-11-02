@@ -21,10 +21,10 @@ PHASE_SCENARIOS = {
     ),
     "G3": ("paint_consumption_long_lines",),
     "V1": ("int006_diagonals",),
-    "V2": ("int006_short_strokes",),
+    "V2": ("int006_short_strokes_followup",),
     "V3": ("int006_turns",),
     "V4": ("int006_closed_contours",),
-    "V5": ("int006_intersections_spacing",),
+    "V5": ("int006_intersections_spacing_sweep",),
 }
 GEOMETRY_MATRIX_SCENARIOS = frozenset(
     scenario for scenarios in PHASE_SCENARIOS.values() for scenario in scenarios
@@ -52,10 +52,10 @@ EXPECTED_STROKES = {
     "cross_section_intersections": 4,
     "paint_consumption_long_lines": 6,
     "int006_diagonals": 6,
-    "int006_short_strokes": 6,
+    "int006_short_strokes_followup": 5,
     "int006_turns": 3,
     "int006_closed_contours": 3,
-    "int006_intersections_spacing": 10,
+    "int006_intersections_spacing_sweep": 16,
 }
 
 G3_POINT_STEPS = (1, 2, 4)
