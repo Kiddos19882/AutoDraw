@@ -103,8 +103,12 @@ def test_matrix_summary_ignores_cumulative_monitor_buffer_overflow():
     doc = _manifest(radius=5, block=1, run_id="overflow", consumed=100)
     doc["monitor_capture"]["monitor_dropped_events"] = 434
     doc["monitor_capture"]["monitor_buffer_dropped_events_delta"] = 434
+    doc["monitor_capture"]["monitor_error_count"] = 8
+    doc["monitor_capture"]["monitor_error_count_delta"] = 0
     doc["game_monitor_summary"]["monitor_dropped_events"] = 434
     doc["game_monitor_summary"]["monitor_buffer_dropped_events_delta"] = 434
+    doc["game_monitor_summary"]["monitor_error_count"] = 8
+    doc["game_monitor_summary"]["monitor_error_count_delta"] = 0
 
     summary = summarize_chalk_radius_matrix([doc])
     assert summary["valid_measurement_count"] == 1
