@@ -1943,3 +1943,6 @@ Brush Test acceptance и матричные валидаторы больше н
 - Application integration failure вызван устаревшей test fixture: она передавала старый V5 scenario ID `int006_intersections_spacing`, тогда как runtime gate ожидает `int006_intersections_spacing_sweep` с 16 штрихами. Fixture и task ID обновлены. `AttributeError` по отсутствующему `self.root` возник вторично при показе error dialog после отклонения устаревшего плана; production error handling не менялся.
 - Изменения: `0cac37c` (legacy counts), `706be60` (V5 fixture). Production executor, CHALK estimator, sampling defaults и live data не менялись.
 - Следующий gate: полный CI на исправленном HEAD; live V2/V5 не запускать до green CI.
+
+- Дополнительно усилены регрессионные проверки: legacy IDs явно проверяются на отсутствие в новых `PHASE_SCENARIOS`; V5 integration test double получает `root=None`, чтобы будущая ошибка runtime gate не маскировалась `AttributeError` при вызове messagebox.
+- Дополнительные commits: `7a22a76` (planner isolation assertion), `3e8e6c5` (устойчивость integration fixture). Текущий corrective code HEAD: `3e8e6c5709dce330551d46667c0f5841fbc5a3fc`.
