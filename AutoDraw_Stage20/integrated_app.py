@@ -694,7 +694,7 @@ class AutoDrawUnifiedApp:
             generation = plan_document.get("generation", {})
             matrix = generation.get("chalk_experiment_matrix") if isinstance(generation, dict) else None
             matrix_phase = matrix.get("phase_id") if isinstance(matrix, dict) else None
-            if isinstance(matrix, dict) and matrix_phase in ({"G3"} | V_PHASES):
+            if isinstance(matrix, dict) and matrix_phase in {"G3", "V1", "V2", "V3", "V4", "V5"}:
                 from chalk_experiment_matrix import (
                     GEOMETRY_EXECUTOR_CONFIG, EXPECTED_STROKES, PHASE_SCENARIOS,
                     V_PHASES, V_SAMPLING_PROFILES,
