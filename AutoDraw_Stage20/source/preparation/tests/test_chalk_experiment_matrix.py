@@ -415,6 +415,24 @@ def test_int006_scenarios_accept_declared_sampling_profiles(phase, scenario, cou
     assert metadata["expected_strokes"] == count
 
 
+
+@pytest.mark.parametrize(
+    ("scenario", "stroke_count"),
+    [
+        ("int006_short_strokes", 6),
+        ("int006_intersections_spacing", 10),
+    ],
+)
+def test_legacy_int006_v2_v5_scenarios_remain_analyzable(scenario, stroke_count):
+    metadata = build_chalk_experiment_matrix_metadata(
+        series_id="int006-legacy-series", scenario_id=scenario, repeat_index=1,
+        requested_radius=10, strokes=_strokes(stroke_count),
+        executor_parameters=dict(GEOMETRY_EXECUTOR_CONFIG),
+    )
+    assert metadata["phase_id"] in {"V2", "V5"}
+    assert metadata["expected_strokes"] == stroke_count
+
+
 def test_int006_matrix_rejects_unplanned_sampling_profile():
     parameters = dict(GEOMETRY_EXECUTOR_CONFIG)
     parameters.update({"point_step_px": 1, "point_delay_ms": 5})
