@@ -40,12 +40,12 @@
 | INT-003 | IN_PROGRESS | Завершить оценку overhead Game Monitor | Exact counter и telemetry подтверждены. Осталось сопоставимое A/B/C измерение Monitor off / версий Monitor с отдельными FPS, длительностью и overhead. Не блокирует точность CHALK capture, но нужен для оценки накладных расходов. |
 | INT-004 | DONE | Автоматически собирать telemetry и связывать её с experiment ID | WebSocket bridge, per-run capture, RunRecorder и запись monitor report/идентификаторов в experiment manifest использованы в принятых G1–G3 captures. Overhead comparison относится к INT-003. |
 | INT-005 | DONE | Реализовать автоматизированную лабораторию CHALK-экспериментов | Matrix/block runner, task identity, повторения, manifest, recovery/fail-closed gates и capture acceptance использованы для G1 12/12, G2 18/18 и G3 27/27. |
-| INT-006 | IN_PROGRESS | Построить и валидировать модель расхода игровых точек | Предварительная сегментированная модель G1/G2/G3/radius matrix построена. Визуальный gate step=4 закрыт только для длинных горизонтальных линий. Требуются другие геометрии и независимая validation с метриками ошибки. |
+| INT-006 | IN_PROGRESS | Геометрическая validation step=4 и независимая validation модели CHALK | Зафиксирован `CHALK_INT006_EXECUTION_PROTOCOL_2026-11-02.md`. Текущий matrix/block/UI/analyzer контракт ограничен G1/G2/G3; V1–V5 ещё не поддержаны. Следом — расширение экспериментального harness, regression tests/CI, затем 45 live captures и независимая проверка прогноза. Production defaults/estimator не менять. |
 | INT-007 | BLOCKED | Интегрировать валидированную модель в preflight/resource estimator AutoDraw | Начинать только после независимой validation INT-006 и определения консервативного safety margin. |
 | INT-008 | TODO | Оптимизировать кисти, траектории, порядок и покрытие | Подбирать способ построения рисунка в пределах квоты CHALK с учётом качества покрытия; зависит от INT-006/007. |
 | INT-009 | TODO | Сравнить прогноз с фактом и проверить качество | Проверить на независимых рисунках прогноз, exact CHALK delta, визуальное качество и устойчивость к разным типам геометрии. |
 
-**Актуальный приоритет INT-006:** см. [план дальнейших действий](CHALK_NEXT_STEPS_PLAN_2026-11-02.md). Исторические чек-листы ниже сохраняют ход выполнения и не переопределяют статусы таблицы.
+**Актуальный приоритет INT-006:** см. [план дальнейших действий](CHALK_NEXT_STEPS_PLAN_2026-11-02.md) и [исполнительный протокол INT-006](CHALK_INT006_EXECUTION_PROTOCOL_2026-11-02.md). Исторические чек-листы ниже сохраняют ход выполнения и не переопределяют статусы таблицы.
 ## Отменённые работы
 
 | ID | Статус | Задача | Основание |
