@@ -809,7 +809,7 @@ Per-run transport gates чистые: `dropped_events=0`, `monitor_error_count_d
 - Brush Test UI содержит отдельные V2 follow-up (5 штрихов: 12/16/20/24/30 logical px) и V5 spacing sweep (16 штрихов: X/T/крест и пять пар spacing 8/12/16/20/24 logical px).
 - Новые scenario IDs изолируют результаты от исходных V2/V5 captures. Matrix metadata и block planner ожидают соответственно 5 и 16 strokes; обе серии имеют 9 задач (P0/P1/P2 × 3 повтора), radius=10.
 - Regression tests проверяют точные длины V2 и пять расстояний V5. Кодовые изменения: 1f2917a, 8a012de, 230fe22, 3d6754c, ef8b704, 94c3c87.
-- Новый протокол: [CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md](CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md). Live captures не выполнялись; их выполнит пользователь. Production executor, estimator, sampling defaults и исходные данные не изменялись.
+- Новый протокол: [CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md](CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md). На момент подготовки live captures ещё не выполнялись; впоследствии все V1–V5 follow-up были выполнены (45/45) и зафиксированы в `e879a77`. Production executor, estimator и sampling defaults не изменялись.
 
 
 - Дополнительная совместимость: прежние V2/V5 scenario IDs оставлены в legacy phase map для повторного анализа старых manifests; новые block planners используют только новые follow-up IDs. Regression test подтверждает принятие старых IDs.
