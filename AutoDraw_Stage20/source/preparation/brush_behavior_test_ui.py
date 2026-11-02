@@ -30,8 +30,8 @@ from chalk_radius_matrix import (
     MATRIX_SCENARIO_ID, build_chalk_radius_matrix_metadata, is_monitor_run_claimed,
 )
 from chalk_experiment_matrix import (
-    GEOMETRY_MATRIX_SCENARIOS, build_chalk_experiment_matrix_metadata,
-    inspect_chalk_matrix_series,
+    GEOMETRY_MATRIX_SCENARIOS, PHASE_BY_SCENARIO, INDEPENDENT_VALIDATION_PHASE,
+    build_chalk_experiment_matrix_metadata, inspect_chalk_matrix_series,
 )
 from chalk_test_blocks import (
     build_chalk_test_block_plan, create_chalk_test_block_journal,
@@ -1862,6 +1862,8 @@ class BrushBehaviorTestTab:
                 )
                 plan["generation"]["chalk_radius_matrix"] = matrix_metadata
             elif scenario_id in GEOMETRY_MATRIX_SCENARIOS:
+                if PHASE_BY_SCENARIO.get(scenario_id) == INDEPENDENT_VALIDATION_PHASE and self._chalk_block_task is None:
+                    raise ValueError("D1–D5 разрешено запускать только через полный INT006 block с frozen predictions.")
                 if scenario_id in {
                     "paint_consumption_long_lines",
                     "int006_diagonals",
@@ -1885,6 +1887,7 @@ class BrushBehaviorTestTab:
                         strokes=plan["strokes"],
                         matrix_order_index=int(self._chalk_block_task["matrix_order_index"]),
                         executor_parameters=self._chalk_block_task.get("executor_parameters"),
+                        prediction_id=self._chalk_block_task.get("prediction_id"),
                     )
                     plan["generation"]["chalk_test_block"] = {
                         "block_id": load_chalk_test_block_journal(self._chalk_block_journal_path)["block_id"],
