@@ -1744,3 +1744,33 @@ Collector теперь считает пропущенные WebSocket sequence,
 Brush Test acceptance и матричные валидаторы больше не отклоняют run из-за cumulative local-buffer overflow. Они fail-closed по per-run `dropped_events`, `monitor_error_count_delta`, `bridge_send_failures_delta` и `collector_sequence_gap_count`. Исправления покрыты Node, Python, WebSocket integration и matrix regression tests.
 
 Документация обновлена: `BRUSH_MONITOR_AUTOCAPTURE_DESIGN.md`, `source/game_monitor/README.md`, `docs/TESTS_AND_CI_MAP.md`. Исторические G3 captures/journal не изменялись. Live game не запускалась. Результат CI на финальном HEAD ещё требуется проверить.
+
+
+## 2026-11-02 — новая live G3 матрица завершена и проанализирована
+
+**Источник:** commit [35ae78e31f9b6d357a4e8aa30cd12307d8c322e8](https://github.com/Kiddos19882/AutoDraw/commit/35ae78e31f9b6d357a4e8aa30cd12307d8c322e8).  
+**Серия:** `chalk-20261102-031830-a0f325`; block ID `d5d28990cb954610aa7f58534be9d3d7`.
+
+**Что проверено:**
+- Block journal: 27/27 задач completed, все девять конфигураций sampling имеют по три повтора.
+- В коммите: 27 brush plans, 27 experiment manifests, 27 Monitor reports, 55 raw Monitor run JSON и 162 PNG.
+- Все 27 experiment summaries: `chalk.status=exact`, CHALK delta совпадает с sampled pointDelta, radius=10/single, 6/6 strokes, frame probe measured.
+- Во всех runs: per-run recorder drops=0, Monitor error delta=0, Bridge send failure delta=0, collector sequence gaps=0.
+- В шести поздних runs local Monitor export-buffer delta положителен. Сохранённый report event count совпадает с event count run; Bridge/collector не показывают потерь. Cumulative `monitor_dropped_events` достиг 12 237 и остаётся только session diagnostic, не per-run rejection metric.
+
+**Результаты по CHALK:**
+- step=1: средние 1351,0 / 1350,3 / 2069,7 для delay 5/10/20 ms.
+- step=2: 716,7 / 718,0 / 1383,0.
+- step=4: 365,7 / 365,0 / 713,7.
+- Для delay=5/10 переход step=1→4 уменьшает расход примерно на 73%, step=2→4 — примерно на 49%.
+- Delay=20 увеличивает расход относительно delay=5/10 примерно на 53% (step=1), 93% (step=2) и 95% (step=4).
+- Средние длительности и min/max сохранены в `docs/CHALK_G3_RESULTS_2026-11-02.md`.
+
+**Выводы и границы:**
+- Для шести длинных прямых линий лучший по измеренному CHALK кандидат — step=4 / delay=5 или 10 ms (около 365 CHALK на 2400 логических px).
+- 5 и 10 ms практически эквивалентны по CHALK и времени.
+- Это сценарный коэффициент, не универсальная модель. Визуальная непрерывность/качество при более редком sampling ещё не подтверждены.
+- G3 фиксировал radius=10. Отдельная radius matrix (1–30) не выявила систематического влияния радиуса на pointCount в этом сценарии.
+- Trajectory reconstruction ограничен coalescing; точную принятую длину пути по Monitor не утверждать.
+
+**Документация:** создан `docs/CHALK_G3_RESULTS_2026-11-02.md`; управляющие документы синхронизируются с принятым live результатом. Старый stopped G3 block не менялся.
