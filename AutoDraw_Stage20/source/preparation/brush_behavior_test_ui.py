@@ -31,6 +31,7 @@ from chalk_radius_matrix import (
 )
 from chalk_experiment_matrix import (
     GEOMETRY_MATRIX_SCENARIOS, PHASE_BY_SCENARIO, INDEPENDENT_VALIDATION_PHASE,
+    RADIUS_GEOMETRY_VALIDATION_PHASE,
     build_chalk_experiment_matrix_metadata, inspect_chalk_matrix_series,
 )
 from chalk_test_blocks import (
@@ -674,6 +675,26 @@ def build_brush_test_record(
     }
 
 
+# INT006R reuses the exact D1-D5 geometry while assigning a distinct scenario identity.
+for _int006r_label, _int006_label in (
+    ("INT-006R D1 — смешанные прямые", "INT-006 D1 — смешанные прямые"),
+    ("INT-006R D2 — пятиугольник отдельными сторонами", "INT-006 D2 — пятиугольник отдельными сторонами"),
+    ("INT-006R D3 — пересечения X, крест и T", "INT-006 D3 — пересечения X, крест и T"),
+    ("INT-006R D4 — короткие детали", "INT-006 D4 — короткие детали"),
+    ("INT-006R D5 — повторное покрытие", "INT-006 D5 — повторное покрытие"),
+):
+    _source_scenario = TEST_CASES[_int006_label]
+    TEST_CASES[_int006r_label] = {
+        **_source_scenario,
+        "id": _source_scenario["id"].replace("int006_validation_", "int006r_validation_"),
+        "description": f"INT006R cross-validation: {_source_scenario['description']}",
+        "strokes": [
+            {**stroke, "points": [list(point) for point in stroke["points"]]}
+            for stroke in _source_scenario["strokes"]
+        ],
+    }
+
+
 def build_brush_test_drawing_plan(
     test_case: str,
     canvas_size: tuple[int, int],
@@ -907,7 +928,7 @@ class BrushBehaviorTestTab:
         ttk.Label(block_controls, text="Фаза").pack(side="left")
         ttk.Combobox(
             block_controls, textvariable=self.chalk_block_phase_var,
-            values=("G1", "G2", "G3", "V1", "V2", "V3", "V4", "V5", "INT006"), state="readonly", width=8,
+            values=("G1", "G2", "G3", "V1", "V2", "V3", "V4", "V5", "INT006", "INT006R"), state="readonly", width=10,
         ).pack(side="left", padx=(6, 10))
         ttk.Button(block_controls, text="Запустить полный блок", command=self.start_chalk_test_block).pack(side="left")
         ttk.Button(block_controls, text="Остановить после текущего опыта", command=self.request_stop_chalk_test_block).pack(side="left", padx=6)
@@ -1451,8 +1472,8 @@ class BrushBehaviorTestTab:
             )
             return
         phase_id = self.chalk_block_phase_var.get().strip()
-        if phase_id not in {"G1", "G2", "G3", "V1", "V2", "V3", "V4", "V5", "INT006"}:
-            messagebox.showwarning("Неизвестная фаза", "Выбери G1/G2/G3, V1–V5 или INT006.", parent=self.root)
+        if phase_id not in {"G1", "G2", "G3", "V1", "V2", "V3", "V4", "V5", "INT006", "INT006R"}:
+            messagebox.showwarning("Неизвестная фаза", "Выбери G1/G2/G3, V1–V5, INT006 или INT006R.", parent=self.root)
             return
         if phase_id == "G2" and not self._has_completed_g1_block():
             messagebox.showwarning(
@@ -1667,7 +1688,7 @@ class BrushBehaviorTestTab:
             self._fail_chalk_test_block("scenario_not_available_in_brush_test_ui")
             return
         self.case_var.set(label)
-        self.brush_var.set("10")
+        self.brush_var.set(str(task.get("requested_radius", 10)))
         self.matrix_series_var.set(load_chalk_test_block_journal(self._chalk_block_journal_path)["series_id"])
         self.matrix_block_var.set(str(task["repeat_index"]))
         self._update_chalk_block_progress()
@@ -1862,8 +1883,10 @@ class BrushBehaviorTestTab:
                 )
                 plan["generation"]["chalk_radius_matrix"] = matrix_metadata
             elif scenario_id in GEOMETRY_MATRIX_SCENARIOS:
-                if PHASE_BY_SCENARIO.get(scenario_id) == INDEPENDENT_VALIDATION_PHASE and self._chalk_block_task is None:
-                    raise ValueError("D1–D5 разрешено запускать только через полный INT006 block с frozen predictions.")
+                if PHASE_BY_SCENARIO.get(scenario_id) in {
+                    INDEPENDENT_VALIDATION_PHASE, RADIUS_GEOMETRY_VALIDATION_PHASE
+                } and self._chalk_block_task is None:
+                    raise ValueError("D1–D5 validation разрешено запускать только через полный автоматический блок соответствующей фазы.")
                 if scenario_id in {
                     "paint_consumption_long_lines",
                     "int006_diagonals",
