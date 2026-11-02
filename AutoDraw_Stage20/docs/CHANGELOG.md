@@ -288,7 +288,7 @@
 
 ### Experimental results
 - Принят новый независимый G3 block `chalk-20261102-031830-a0f325`: 27/27 captures, девять сочетаний шага/задержки, три повтора.
-- Все 27 измерений имеют exact CHALK и совпадение sampled pointDelta; per-run dropped events, Monitor errors, Bridge send failures и collector sequence gaps равны нулю.
+- Все 27 измерений имеют exact CHALK и совпадение sampled pointDelta; per-run dropped events, Monitor error deltas, Bridge send-failure deltas и collector sequence gaps равны нулю.
 - Подтверждено, что положительный cumulative local Monitor buffer overflow не равен потере событий конкретного run: Bridge/collector captures сохранены и приняты.
 - Для шести длинных горизонтальных линий step=4 / delay=5–10 ms расходует около 365 CHALK; step=1 / delay=5–10 ms — около 1350; delay=20 ms увеличивает расход примерно на 53–95% в зависимости от шага.
 - Полные таблицы и границы применимости: [CHALK_G3_RESULTS_2026-11-02.md](CHALK_G3_RESULTS_2026-11-02.md).
