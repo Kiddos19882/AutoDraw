@@ -1774,3 +1774,14 @@ Brush Test acceptance и матричные валидаторы больше н
 - Trajectory reconstruction ограничен coalescing; точную принятую длину пути по Monitor не утверждать.
 
 **Документация:** создан `docs/CHALK_G3_RESULTS_2026-11-02.md`; управляющие документы синхронизированы с принятым live результатом: TASKS, PROJECT_STATUS, README, ROADMAP, CHANGELOG, CHALK_GEOMETRY_MATRIX_PLAN и диагностические отчёты. Старый stopped G3 block не менялся.
+
+
+## 2026-11-02 — визуальный gate G3 и предварительная модель INT-006
+
+- Проверены metadata шести captures для step=4/delay=5 и step=4/delay=10: каждый прогон завершил 6/6 штрихов, 768 move calls, около 18 секунд и около 60 FPS; ROI heuristic отметила 6/6 областей с изменениями.
+- Проверена реализация `measure_stroke_visibility`: она считает изменившиеся пиксели в bounding box, порог — 2 пикселя. Это не доказывает непрерывность, точность центральной линии или равномерность покрытия. Визуальный gate оставлен открытым.
+- Для G1 построена предварительная per-stroke регрессия прямых горизонтальных/вертикальных/диагональных штрихов: `C ≈ 1.765 + 0.2988 × L`, 36 наблюдений, обучающий RMSE около 0.48 CHALK.
+- Короткие штрихи выделены в отдельный lookup-сегмент. G2 repeated_coverage подтверждает расход 61–62 CHALK на каждый повторный проход длиной 200 logical px; перекрытие не является бесплатным.
+- G3 sampling coefficients сохранены отдельно от G1/G2 baseline. Radius matrix не показала систематического влияния радиуса на pointCount в проверенной геометрии.
+- Создан `docs/CHALK_PRELIMINARY_SEGMENTED_MODEL_2026-11-02.md`; обновлены README, G3 report, PROJECT_STATUS, TASKS и ROADMAP.
+- Код не менялся, live-тесты не запускались. Следующий шаг — pixel-level audit PNG и независимая validation модели.
