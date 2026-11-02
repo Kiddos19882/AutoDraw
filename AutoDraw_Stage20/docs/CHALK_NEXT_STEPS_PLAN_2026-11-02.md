@@ -11,14 +11,14 @@ INT-006 остаётся IN_PROGRESS. Harness V1–V5 и regression tests реа
 
 Сводный отчёт: [CHALK_INT006_V1_V5_RESULTS_2026-11-02.md](CHALK_INT006_V1_V5_RESULTS_2026-11-02.md). Step=4 снизил CHALK примерно на 48–49% для V1/V3/V4/V5 и на 23–25% для V2. G1-модель проверена без refit на 66 новых per-stroke наблюдениях P0: MAE 1.09, RMSE 1.33, bias −1.04, MAPE 1.71%. Исследовательские step=4 fits около 0.149 CHALK/logical px ещё не являются независимой validation.
 
-Pixel-level audit 45/45 и ручной review representative overlays выполнены. DrawingPlan V1/V3 исправлены в harness, добавлен regression test минимального межштрихового расстояния >20 logical px; CI и новые live reruns ещё ожидаются. Открыты V2 short-stroke follow-up, V4 cursor-free closure capture, V5 spacing sweep, независимая validation step=4/полных DrawingPlan и safety margin. Production executor defaults и estimator не менять.
+Pixel-level audit 45/45 и ручной review representative overlays выполнены. DrawingPlan V1/V3 исправлены в harness с isolation gate >20 logical px. Для V4 добавлен cursor-free post-draw capture: mouseUp, перемещение за пределы board ROI, повторный screenshot; добавлены unit/regression tests. CI текущего HEAD `723a410` и live capture ещё ожидаются. Открыты V2 short-stroke follow-up, V4 closure validation, V5 spacing sweep, независимая validation step=4/полных DrawingPlan и safety margin. Production executor defaults и estimator не менять.
 
 Порядок дальнейшей работы:
 1. [x] Зафиксировать контракт V1–V5 и единицы координат (logical DrawingPlan vs screen-pixel sampling step).
 2. [x] Реализовать поддержку V1–V5 в экспериментальном harness и добавить regression tests.
 3. [x] Подтвердить CI/Windows startup smoke-test.
 4. [x] Выполнить 45 live captures и сохранить исходные manifests/reports/PNG в commit 6479536.
-5. [ ] Завершить pixel-level geometry gate на новых V1/V3 captures и независимую validation CHALK модели на новых DrawingPlan.
+5. [ ] Подтвердить CI cursor-free capture, выполнить V4 closure capture и pixel-level geometry gate на новых V1/V3 captures; затем провести независимую validation CHALK модели на новых DrawingPlan.
 ## Цель
 
 Получить проверенную модель, которая до запуска рисунка прогнозирует расход игрового CHALK и помогает выбрать траектории/режим исполнения так, чтобы рисунок укладывался в доступную квоту без недопустимого ухудшения визуального качества.
@@ -59,7 +59,7 @@ Pixel-level audit 45/45 и ручной review representative overlays выпо�
 
 ## Этап 2. Геометрическая валидация sampling step=4
 
-**Текущий статус:** 45/45 исходных live captures приняты; CI #1887 и pixel audit CI `41392156994` пройдены. Pixel-level metrics рассчитаны, representative overlays просмотрены. Геометрия V1/V3 исправлена в test harness (коммиты `5047cb7`/`a4a909d`), но новые CI и live reruns ещё не подтверждены. V2 short-stroke, V4 closure cursor occlusion и V5 spacing sweep остаются открытыми.
+**Текущий статус:** 45/45 исходных live captures приняты; CI #1887 и pixel audit CI `41392156994` пройдены. Pixel-level metrics рассчитаны, representative overlays просмотрены. Геометрия V1/V3 исправлена в test harness (`5047cb7`/`a4a909d`). Для V4 добавлен cursor-free post-draw capture (`a680f51`/`d299259`/`723a410`); новый CI и live validation ожидаются. V2 short-stroke, V4 closure и V5 spacing sweep остаются открытыми.
 
 **Цель:** определить, можно ли безопасно применять step=4 не только к длинным горизонтальным линиям. Первичная матрица уже выполнена; текущая работа — quality audit и закрытие ограничений V1/V3/V2.
 
