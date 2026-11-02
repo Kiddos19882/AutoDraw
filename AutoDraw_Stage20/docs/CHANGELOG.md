@@ -1,6 +1,14 @@
 # История изменений документации и проекта
 
 
+## 2026-11-03 — план radius × geometry cross-validation
+
+- Сопоставлены два подтверждённых источника: radius matrix 21/21 на шести длинных горизонтальных линиях (радиусы 1–30, 722–728 CHALK) и официальный INT-006 D1–D5 при фиксированном radius=10.
+- Вывод: radius matrix не показывает систематического эффекта для длинных горизонтальных линий, но не отвечает на вопрос для коротких деталей, диагоналей, пересечений и повторного покрытия.
+- Создан [CHALK_RADIUS_GEOMETRY_CROSS_VALIDATION_PLAN_2026-11-03.md](CHALK_RADIUS_GEOMETRY_CROSS_VALIDATION_PLAN_2026-11-03.md): предложена матрица D1–D5 × radius 1/10/30 × 3 повтора при P1 (45 captures). Требуется отдельная experimental phase/harness и успешный CI до live запуска.
+- До результатов не вводить radius multiplier и не менять production estimator/defaults.
+
+
 ## 2026-11-03 — INT-006 official quantitative validation PASS
 
 - Повторный CI [41532629748](https://github.com/Kiddos19882/AutoDraw/actions/runs/41532629748) на commit `dd64730e202ed6f6014fa2dd1a65c3100cc32018` завершился SUCCESS. Preparation/G3: 669 passed, 82 subtests passed; Application integration, Executor regression, Game Monitor/bridge, Windows portable build/startup smoke-test, PNG audit и независимый analyzer — success. Optional algorithm benchmarks skipped.
