@@ -14,6 +14,8 @@
 
 **Итог quantitative gate:** PASS. **INT-006 остаётся IN_PROGRESS** только из-за неустановленного safety margin и ограниченной области применимости (пять DrawingPlan, три повтора на cell, radius=10). P1 (step=4, delay=5 ms) — лучший совокупный исследовательский профиль: MAE 0.657, RMSE 0.838, MAPE 1.178%, max underprediction 0.92 CHALK. P1/1 CHALK — лишь provisional empirical guard для этой выборки, не статистическая гарантия и не production rule.
 
+Следующая исследовательская задача: [перекрёстная validation радиуса и геометрии](CHALK_RADIUS_GEOMETRY_CROSS_VALIDATION_PLAN_2026-11-03.md) — отдельная phase/harness, CI gate и только затем live matrix 1/10/30 на D1–D5.
+
 ## Статус аналитических планов
 
 Аналитический план этапов 7–10 отменён пользователем 31 октября 2026 г. Эти этапы не переносятся в настоящий roadmap и не должны возобновляться автоматически. См. [архивный план](../PROJECT_ANALYSIS_PLAN_10_STAGES.md).
