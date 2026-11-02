@@ -345,3 +345,11 @@
 - Step=4 снизил расход CHALK примерно на 48–49% для V1/V3/V4/V5 и на 23–25% для коротких штрихов V2.
 - G1-модель на 66 новых штрихах P0: MAE 1.09, RMSE 1.33, MAPE 1.71%; step=4 fits остаются исследовательскими.
 - Production defaults и estimator не изменялись; INT-006 остаётся IN_PROGRESS до pixel-level audit и независимой validation.
+
+
+## 2026-11-02 — INT-006 preliminary PNG screening
+
+- Added `CHALK_INT006_PNG_SCREENING_2026-11-02.md` with representative visual screening of 15 original PNGs across V1–V5 and P0/P1/P2.
+- Recorded geometry limitations: unintended intersections in V1/V3, dot-like V2 marks at radius 10, cursor occlusion in V4, and merged close parallel lines in V5.
+- No obvious step=4 continuity regression was seen in the reviewed samples; quantitative pixel-level metrics remain pending.
+- No production code, executor defaults, estimator, or raw captures changed.
