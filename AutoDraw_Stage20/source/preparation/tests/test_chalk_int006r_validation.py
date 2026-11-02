@@ -135,7 +135,7 @@ def test_int006r_journal_rejects_tampered_radius_and_duplicate_cells(tmp_path):
     second["scenario_id"] = first["scenario_id"]
     second["requested_radius"] = first["requested_radius"]
     second["repeat_index"] = first["repeat_index"]
-    second["task_id"] = first["task_id"]
+    second["task_id"] = "tampered-duplicate-cell"
     path = tmp_path / "duplicate.json"
     create_chalk_test_block_journal(path, tampered_duplicate)
     with pytest.raises(ValueError, match="INT006R"):
