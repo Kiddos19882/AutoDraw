@@ -14,7 +14,7 @@
 - Радиусная матрица: 21/21 принятых опытов. В проверенном сценарии длинных линий систематического влияния радиуса 1–30 на exact CHALK не обнаружено.
 - G1: 12/12 принятых опытов. G2: 18/18. G3: 27/27 в блоке `chalk-20261102-031830-a0f325`. Старые stopped/partial блоки остаются историческими и не смешиваются с принятыми данными.
 - Game Monitor exact CHALK рассчитывается как `post.pointCount - pre.pointCount`. Per-run capture/transport acceptance G3 пройдены; cumulative local Monitor buffer overflow не трактуется как потеря конкретного run.
-- Предварительная сегментированная модель создана в [CHALK_PRELIMINARY_SEGMENTED_MODEL_2026-11-02.md](CHALK_PRELIMINARY_SEGMENTED_MODEL_2026-11-02.md). Она исследовательская, не production estimator; независимая validation ещё не выполнена.
+- Предварительная сегментированная модель и результаты первой holdout-проверки изложены в [CHALK_PRELIMINARY_SEGMENTED_MODEL_2026-11-02.md](CHALK_PRELIMINARY_SEGMENTED_MODEL_2026-11-02.md). G1-модель проверена на 66 новых штрихах P0 (MAE 1.09, RMSE 1.33, MAPE 1.71%), но независимая validation step=4 и полных DrawingPlan ещё не завершена; модель остаётся исследовательской, не production estimator.
 - Визуальный аудит всех шести G3 PNG step=4/delay=5 и step=4/delay=10 пройден для длинных горизонтальных линий. Все шесть линий визуально непрерывны. Конец шестой линии частично закрыт курсором. Количественные pixel-level метрики gap/centerline/width не рассчитаны.
 - step=4 подтверждён только как экспериментальный режим для длинных горизонтальных линий в условиях G3. Универсальный production default не утверждён; настройки executor не менялись.
 - INT-006: все 45 live captures V1–V5 выполнены и приняты (5 блоков × 9 задач); exact CHALK и per-stroke pointDelta согласованы во всех runs, все Monitor/Bridge per-run integrity counters нулевые. CI run #1887 на data commit `6479536` — success. Отчёт: `CHALK_INT006_V1_V5_RESULTS_2026-11-02.md`. Первичная holdout-проверка G1-модели на 66 новых штрихах P0 дала MAE 1.09, RMSE 1.33 CHALK, MAPE 1.71%; step=4 fit исследовательский. INT-006 остаётся IN_PROGRESS из-за пересечений в геометриях V1/V3, отсутствия pixel-level quality metrics и незавершённой независимой validation step=4/коротких strokes.
@@ -37,9 +37,9 @@
 
 ## Ближайший рабочий приоритет
 
-1. Завершить документальную консолидацию: синхронизировать TASKS, ROADMAP, модель CHALK, G3 Results и индексы.
+1. Выполнить pixel-level аудит сохранённых PNG и зафиксировать критерии continuity/gap/centerline/width до дальнейших сравнений.
 2. Live captures V1–V5 завершены: см. `CHALK_INT006_V1_V5_RESULTS_2026-11-02.md`. Следующий gate — pixel-level audit PNG, исправление непреднамеренных пересечений V1/V3 и targeted reruns, где геометрическая изоляция нужна для выводов.
-3. Для каждого run требовать exact CHALK, per-run Monitor integrity, одинаковую геометрию, визуальный capture и три повтора на профиль.
+3. Подготовить изолированные повторные сценарии V1/V3 и короткую серию V2 для сравнения отдельных strokes с непрерывной полилинией; сохранять exact CHALK и per-run Monitor integrity.
 4. Собрать независимую validation-выборку реальных планов и сравнить прогноз с exact pre/post pointCount; рассчитать MAE, RMSE, bias и относительную ошибку, отдельно по типам геометрии.
 5. Только после validation определить консервативный safety margin и критерии допуска к квоте.
 6. Затем проектировать INT-007/008/009. До этого production defaults и код estimator не менять.
