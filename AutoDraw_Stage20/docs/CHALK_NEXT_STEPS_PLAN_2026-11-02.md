@@ -7,17 +7,18 @@
 
 ## Текущий статус INT-006 — 2026-11-02
 
-INT-006 активна. Исполнительный протокол и детальная матрица V1–V5 зафиксированы в [CHALK_INT006_EXECUTION_PROTOCOL_2026-11-02.md](CHALK_INT006_EXECUTION_PROTOCOL_2026-11-02.md).
+INT-006 остаётся IN_PROGRESS. Harness V1–V5 и regression tests реализованы; CI #1886 пройден. Пользователь выполнил и загрузил все 45 live captures коммитом [6479536](https://github.com/Kiddos19882/AutoDraw/commit/64795362aa1bf4d0a3587e119b8c959242be6181); CI #1887 на этом commit завершился success. Каждый из пяти block journals имеет 9/9 completed, exact CHALK и per-run Monitor integrity подтверждены для 45/45 runs.
 
-Поддержка V1–V5 реализована поверх lifecycle G3: расширены matrix metadata/validator, block planner/journal, Brush Test UI и task-specific executor override; добавлены regression tests. Каждая V-фаза формирует 9 задач (3 sampling profiles × 3 повтора), всего 45 captures. Обязательный CI ещё не подтверждён. Production executor defaults и estimator менять нельзя.
+Сводный отчёт: [CHALK_INT006_V1_V5_RESULTS_2026-11-02.md](CHALK_INT006_V1_V5_RESULTS_2026-11-02.md). Step=4 снизил CHALK примерно на 48–49% для V1/V3/V4/V5 и на 23–25% для V2. G1-модель проверена без refit на 66 новых per-stroke наблюдениях P0: MAE 1.09, RMSE 1.33, bias −1.04, MAPE 1.71%. Исследовательские step=4 fits около 0.149 CHALK/logical px ещё не являются независимой validation.
 
-Порядок старта:
-1. Зафиксировать контракт V1–V5 и единицы координат (logical DrawingPlan vs screen-pixel sampling step).
+Открыты: pixel-level quality metrics; исправление непреднамеренных пересечений V1/V3 и targeted reruns; уточнение short-stroke lookup V2; независимая validation step=4 и полных DrawingPlan; safety margin. Production executor defaults и estimator не менять.
+
+Порядок дальнейшей работы:
+1. [x] Зафиксировать контракт V1–V5 и единицы координат (logical DrawingPlan vs screen-pixel sampling step).
 2. [x] Реализовать поддержку V1–V5 в экспериментальном harness и добавить regression tests.
-3. Подтвердить CI/Windows startup smoke-test.
-4. После проверки игровой сессии и тестовой доски выполнить 45 live captures.
-5. Выполнить независимую validation CHALK модели на новых DrawingPlan.
-
+3. [x] Подтвердить CI/Windows startup smoke-test.
+4. [x] Выполнить 45 live captures и сохранить исходные manifests/reports/PNG в commit 6479536.
+5. [ ] Завершить pixel-level geometry audit и независимую validation CHALK модели на новых DrawingPlan.
 ## Цель
 
 Получить проверенную модель, которая до запуска рисунка прогнозирует расход игрового CHALK и помогает выбрать траектории/режим исполнения так, чтобы рисунок укладывался в доступную квоту без недопустимого ухудшения визуального качества.
@@ -60,7 +61,7 @@ INT-006 активна. Исполнительный протокол и дет�
 
 **Текущий статус:** 45/45 live captures приняты. CI #1887 пройден; первичная сводка и holdout-анализ опубликованы. Геометрический gate остаётся частично открытым из-за непреднамеренных пересечений V1/V3 и отсутствия pixel-level метрик.
 
-**Цель:** определить, можно ли безопасно применять step=4 не только к длинным горизонтальным линиям.
+**Цель:** определить, можно ли безопасно применять step=4 не только к длинным горизонтальным линиям. Первичная матрица уже выполнена; текущая работа — quality audit и закрытие ограничений V1/V3/V2.
 
 Сценарии:
 
