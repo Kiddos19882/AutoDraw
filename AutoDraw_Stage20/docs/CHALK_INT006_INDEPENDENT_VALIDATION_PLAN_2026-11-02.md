@@ -1,14 +1,14 @@
 # INT-006 — план независимой validation модели CHALK
 
 **Дата:** 2026-11-02  
-**Статус:** BLOCKED — D1–D5 протокол подготовлен, но текущий matrix/block/UI/executor harness ещё не поддерживает эту независимую серию. Live captures не запускать до завершения реализации и CI.  
+**Статус:** SOFTWARE GATE PASS, LIVE GATE BLOCKED — D1–D5 подключены к matrix/block/UI/executor и frozen prediction artifact; CI пройден, локальный Windows preflight ещё не выполнен. Live captures не запускать.  
 **Ветка:** `feature/image-geometry-optimization`  
 **Связанные задачи:** INT-006; gate перед INT-007  
 **Ограничения:** production estimator, executor defaults и исходные экспериментальные данные не изменять.
 
 ## Технический gate перед запуском
 
-Статический аудит исходников выявил, что D1–D5 отсутствуют в текущих `PHASE_SCENARIOS`/`EXPECTED_STROKES`, block planner/journal validator и Brush Test UI; `integrated_app.py` также не разрешает для них executor override. Общий analyzer пока не сравнивает accepted runs с immutable prediction records. Поэтому протокол ниже является спецификацией эксперимента, а не подтверждением готовности UI к запуску. См. [аудит готовности harness](CHALK_INT006_HARNESS_READINESS_AUDIT_2026-11-02.md).
+Исторический readiness audit ниже был выполнен до реализации и зафиксировал отсутствие D1–D5 в harness. Этот блок сохранён как история выявления проблемы. Текущая реализация и успешный software gate описаны в [отчёте frozen predictions/analyzer](CHALK_INT006_FROZEN_PREDICTIONS_AND_ANALYZER_2026-11-02.md); текущий оставшийся gate — локальный Windows preflight.
 
 ## 1. Цель
 
@@ -240,7 +240,7 @@ INT-006 можно закрыть только после:
 - [ ] Выполнить локальный Windows 10 preflight по [инструкции](CHALK_INT006_LOCAL_PREFLIGHT_GUIDE_2026-11-02.md).
 - [ ] Только после preflight и явного подтверждения чистой доски начать 45 live captures.
 
-До выполнения этих пунктов не запускать D1–D5 через существующие V-фазы или вручную. Production estimator/defaults остаются неизменными.
+До завершения локального preflight не запускать полный INT006 block и не запускать D1–D5 через существующие V-фазы или вручную. Production estimator/defaults остаются неизменными.
 
 
 ## 12. Software gate закрыт — 2026-11-02

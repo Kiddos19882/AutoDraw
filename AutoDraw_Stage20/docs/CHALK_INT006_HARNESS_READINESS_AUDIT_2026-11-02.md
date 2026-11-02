@@ -119,3 +119,16 @@ Production defaults не изменять.
 ## 7. Текущий следующий шаг
 
 Реализовать INT006 как расширение существующих matrix/block/UI/Stage6/analyzer контрактов. Новый отдельный executor не нужен. После реализации и CI пользователь выполняет только локальный preflight; live серия начинается после проверки готовности игры и доски.
+
+
+## 8.1. Итог реализации и CI — 2026-11-02
+
+Предыдущие выводы разделов 1–7 отражают исходное состояние до разработки. Software implementation завершена:
+- `chalk_int006_validation.py`: frozen model, 15 prediction records, hash-sealed artifact и analyzer;
+- `chalk_test_blocks.py`: 45-cell journal с prediction artifact и prediction IDs;
+- Brush Test UI: блокировка ручного запуска D1–D5 и запись prediction ID;
+- `integrated_app.py`: fail-closed проверка prediction ID при executor handoff.
+
+Полный workflow [41513389663](https://github.com/Kiddos19882/AutoDraw/actions/runs/41513389663) завершился success: 667 passed, 82 subtests passed; Application integration, Executor regression, Game Monitor/bridge, pixel-level audit и Windows portable build/startup smoke-test — success.
+
+**Оставшийся блокер:** пользовательский Windows 10 preflight. До его успешного завершения 45 live captures не начинать. Production estimator/defaults не менялись.
