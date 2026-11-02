@@ -1852,3 +1852,18 @@ Brush Test acceptance и матричные валидаторы больше н
 - Между проверенным кодовым HEAD и текущим branch HEAD — шесть коммитов, меняющих только четыре Markdown-документа: `CHALK_INT006_EXECUTION_PROTOCOL_2026-11-02.md`, `CHALK_NEXT_STEPS_PLAN_2026-11-02.md`, `PROJECT_STATUS.md`, `WORK_LOG.md`. Код после проверенного CI не менялся.
 - Commit-status endpoint вернул пустой список; CI подтверждён по самому workflow run и результатам jobs.
 - Live captures V1–V5 не запускались. Следующий gate — 45 captures в доступной игровой сессии с проверкой exact CHALK, per-run Monitor integrity и геометрического качества.
+
+
+## 2026-11-02 — INT-006 V1–V5 live captures and analysis
+
+- Получен data commit [6479536](https://github.com/Kiddos19882/AutoDraw/commit/64795362aa1bf4d0a3587e119b8c959242be6181); актуальный branch HEAD на момент анализа — этот commit.
+- Проверены все пять block journals: V1–V5, каждый 9/9 completed; итого 45/45 captures.
+- Для всех 45 runs: monitor capture saved, exact CHALK, pointDelta matches exact counter, requested/observed radius=10; dropped events, Monitor errors, Bridge failures, collector sequence gaps и per-run buffer drops — 0.
+- Per-stroke pointDelta сгруппирован по stroke_id: число stroke groups соответствует плану, non-consuming candidates=0, сумма per-stroke расходов совпадает с CHALK delta.
+- Средний расход P0/P1/P2 (step2/delay10; step4/delay5; step4/delay10): V1 243.67/126.67/127.33; V2 20.00/15.00/15.33; V3 380.67/193.67/193.67; V4 448.67/229.00/229.67; V5 441.33/229.33/229.00.
+- Step=4 снизил расход на 48–49% в V1/V3/V4/V5 и на 23–25% в V2. P1/P2 практически равны по CHALK.
+- G1-модель `1.765 + 0.2988×L` проверена без refit на 66 новых per-stroke наблюдениях P0 из V1/V3/V4/V5: MAE 1.09, RMSE 1.33, bias −1.04, MAPE 1.71%, max absolute error 4.12.
+- Исследовательские step=4 fits: P1 `1.475 + 0.148865×L`; P2 `1.440 + 0.149151×L`. Это fit на тех же наблюдениях, не independent validation.
+- Ручной просмотр репрезентативных P0/P1 PNG: выявлены непреднамеренные пересечения V1/V3; V2 показывает круглые отметки для движений короче радиуса; V5 spacing=8 logical px сливает параллельные следы, spacing=24 сохраняет разделение. Pixel-level метрики не рассчитаны.
+- Подробный отчёт: [CHALK_INT006_V1_V5_RESULTS_2026-11-02.md](CHALK_INT006_V1_V5_RESULTS_2026-11-02.md). Production-код, executor defaults и estimator не менялись.
+- CI run [#1887](https://github.com/Kiddos19882/AutoDraw/actions/runs/41384186201) для data commit завершился success.
