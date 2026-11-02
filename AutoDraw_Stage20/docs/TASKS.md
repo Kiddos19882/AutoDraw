@@ -40,7 +40,7 @@
 | INT-003 | IN_PROGRESS | Завершить оценку overhead Game Monitor | Exact counter и telemetry подтверждены. Осталось сопоставимое A/B/C измерение Monitor off / версий Monitor с отдельными FPS, длительностью и overhead. Не блокирует точность CHALK capture, но нужен для оценки накладных расходов. |
 | INT-004 | DONE | Автоматически собирать telemetry и связывать её с experiment ID | WebSocket bridge, per-run capture, RunRecorder и запись monitor report/идентификаторов в experiment manifest использованы в принятых G1–G3 captures. Overhead comparison относится к INT-003. |
 | INT-005 | DONE | Реализовать автоматизированную лабораторию CHALK-экспериментов | Matrix/block runner, task identity, повторения, manifest, recovery/fail-closed gates и capture acceptance использованы для G1 12/12, G2 18/18 и G3 27/27. |
-| INT-006 | IN_PROGRESS | 90/90 исходных + follow-up captures приняты; pixel audit: 549 per-stroke и 900 pair rows. Follow-up CHALK: step=4 экономит 38.5–49.4%; V5 spacing при radius=10 сливается на 8/12 logical px и разделяется на 16/20/24. Курсор не обнаружен на board image в 45/45 follow-up captures. Full CI run `41496555297` — success. Открыта независимая validation модели и safety margin; production defaults/estimator не менять. См. `CHALK_INT006_PIXEL_AUDIT_2026-11-02.md` и [follow-up results](CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md). |
+| INT-006 | IN_PROGRESS | Исходные и follow-up V1–V5 captures/pixel audit приняты. Следующий gate — реализация отдельной INT006 harness phase для D1–D5: matrix, 45-cell block journal, UI plans, executor override, immutable predictions и analyzer. До прохождения CI и Windows preflight live validation заблокирована. Production defaults/estimator не менять. См. [harness readiness audit](CHALK_INT006_HARNESS_READINESS_AUDIT_2026-11-02.md) и [validation protocol](CHALK_INT006_INDEPENDENT_VALIDATION_PLAN_2026-11-02.md). |
 | INT-007 | BLOCKED | Интегрировать валидированную модель в preflight/resource estimator AutoDraw | Начинать только после независимой validation INT-006 и определения консервативного safety margin. |
 | INT-008 | TODO | Оптимизировать кисти, траектории, порядок и покрытие | Подбирать способ построения рисунка в пределах квоты CHALK с учётом качества покрытия; зависит от INT-006/007. |
 | INT-009 | TODO | Сравнить прогноз с фактом и проверить качество | Проверить на независимых рисунках прогноз, exact CHALK delta, визуальное качество и устойчивость к разным типам геометрии. |
@@ -55,7 +55,9 @@
 - [x] Выполнить V1/V3/V4 follow-up по [отдельному протоколу](CHALK_INT006_V1_V3_V4_FOLLOWUP_2026-11-02.md): по 9 captures на фазу.
 - [x] Выполнить V2 short-stroke follow-up (5 strokes) и V5 spacing sweep (16 strokes) по отдельному протоколу.
 - [x] Выполнить pixel-level audit исходных + follow-up PNG; 90/90 valid, no missing/duplicate cells, 297/297 новых stroke rows без gaps (CI 41496555297).
-- [ ] Провести независимую validation модели на полных DrawingPlan; после неё определить safety margin.
+- [ ] Реализовать INT006 D1–D5 в matrix/block/UI/executor/analyzer harness; пройти regression tests и полный CI.
+- [ ] Провести локальный Windows preflight; затем выполнить 45 независимых live captures и сравнить с frozen predictions.
+- [ ] После validation определить обоснованный safety margin.
 
 **Актуальный приоритет INT-006:** CI legacy-journal compatibility закрыт run `41496555297`; следующий gate — независимая validation по [отдельному плану](CHALK_INT006_INDEPENDENT_VALIDATION_PLAN_2026-11-02.md); общий порядок — [план дальнейших действий](CHALK_NEXT_STEPS_PLAN_2026-11-02.md) и [исполнительный протокол INT-006](CHALK_INT006_EXECUTION_PROTOCOL_2026-11-02.md). Исторические чек-листы ниже сохраняют ход выполнения и не переопределяют статусы таблицы.
 ## Отменённые работы
@@ -405,3 +407,12 @@ Software gate закрыт; live gate остаётся открытым. Авт�
 - [x] Выполнить pixel-level аудит новых 45 follow-up PNG; 45/45 valid, 144/144 V5 strokes sufficient and gap-free; V5 target pair separation documented.
 
 Инструкции: [V1/V3/V4](CHALK_INT006_V1_V3_V4_FOLLOWUP_2026-11-02.md), [V2/V5](CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md). Итоги: [CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md](CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md).
+
+
+### INT-006 — блокер готовности независимого validation harness (2026-11-02)
+
+- [x] Сверить независимый D1–D5 протокол с текущими исходниками matrix, block planner/journal, Brush Test UI и executor handoff.
+- [x] Подтвердить, что D1–D5 не подключены к существующим фазам и что analyzer не сравнивает runs с immutable prediction records.
+- [x] Создать [аудит готовности harness](CHALK_INT006_HARNESS_READINESS_AUDIT_2026-11-02.md) и изменить статус validation protocol с READY FOR LIVE VALIDATION на BLOCKED.
+- [ ] Реализовать отдельную INT006 phase без изменения production estimator/defaults.
+- [ ] Добавить regression tests, подтвердить полный CI и подготовить Windows 10 preflight.
