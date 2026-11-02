@@ -2016,3 +2016,13 @@ Brush Test acceptance и матричные валидаторы больше н
 - V5 target pair sweep: spacing 8.0115/12.0172 logical px — touch/merge 9/9; 16.0229/20.0286/24.0344 — 0/9. Первое проверенное разделённое расстояние в этой конфигурации — 16 logical px при radius=10.
 - Full CI run 41496555297 — success: all required regression jobs, PNG audit, Windows portable build/startup smoke-test. Optional benchmarks skipped. Артефакты PNG audit и portable build доступны в Actions.
 - Документация: CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md, execution protocol, PROJECT_STATUS, TASKS, ROADMAP и follow-up protocols синхронизированы. Следующий gate — independent validation модели на полных DrawingPlan, затем safety margin. Production defaults/estimator не менялись.
+
+
+## 2026-11-02 — уточнение CI legacy-journal compatibility и подготовка независимой validation
+
+- Повторно проверена история ветки `feature/image-geometry-optimization`: commits `f0e05df` и `4847cce` входят в текущую ветку.
+- Сопоставлены commits с последними подтверждёнными CI runs. Run `41470680544` прошёл на более раннем code HEAD `3e8e6c5`; он не включает validator change и regression tests legacy-journal compatibility. Run `41496555297` подтверждает pixel audit/portable build, но не закрывает этот поздний кодовый gate.
+- Статически проверены актуальный validator, таблица legacy IDs/counts и новые regression tests: V2 принимает legacy `int006_short_strokes` (6 strokes), V5 — legacy `int006_intersections_spacing` (10 strokes); в одном journal запрещено смешение сценариев, matrix cells и order остаются уникальными.
+- Полный запуск CI на текущем кодовом состоянии не выполнен: доступные GitHub Actions-инструменты в этой сессии позволяют читать jobs и повторять failed jobs, но не запускать новый workflow dispatch. Сетевой clone из контейнера недоступен. Поэтому задача оставлена открытой, результат не объявлен тестовым успехом.
+- Подготовлен отдельный протокол независимой validation на пяти новых DrawingPlan с frozen predictions P0/P1/P2, тремя повторами и exact pre/post pointCount. Production estimator, executor defaults и исходные экспериментальные данные не изменялись.
+- Обновлены PROJECT_STATUS, TASKS, CHALK_NEXT_STEPS_PLAN, ROADMAP и индекс документации.
