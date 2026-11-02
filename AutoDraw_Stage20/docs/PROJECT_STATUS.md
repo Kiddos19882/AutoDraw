@@ -1,4 +1,4 @@
-## Последнее исправление — совместимость legacy CHALK journals (2026-11-02)
+## Историческая запись — совместимость legacy CHALK journals (2026-11-02)
 
 - Подтверждён источник ошибки при запуске: корректный completed V2 journal использует исторический `int006_short_strokes` (6 штрихов), тогда как validator принимал только follow-up ID `int006_short_strokes_followup` (5 штрихов). Все 9 задач в найденном журнале completed, matrix cells уникальны.
 - Validator обновлён: V2/V5 принимают соответствующие legacy IDs с собственными expected stroke counts; запрет дублирования и смешения сценариев сохранён.
