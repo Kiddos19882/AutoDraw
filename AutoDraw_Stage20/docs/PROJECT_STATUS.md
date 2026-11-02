@@ -748,3 +748,25 @@ Brush Test gate и матричные валидаторы G1/G2/G3/radius matri
 Добавлены regression tests: Node subscriber delivery после 50 000 buffer entries; Python isolation cumulative overflow/errors от последующего run; WebSocket sequence gap; matrix validators accept cumulative overflow but reject per-run bridge/collector loss.
 
 **Пока не подтверждено:** прохождение нового CI на конечном HEAD, локальный Windows/Firefox preflight и live повтор G3. До этого новый live G3 не запускать. Подробности — `BRUSH_MONITOR_AUTOCAPTURE_DESIGN.md` и `source/game_monitor/README.md`.
+
+
+## 2026-11-02 — live G3 завершён: 27/27 captures приняты
+
+**Контрольная точка первичных данных:** commit [35ae78e31f9b6d357a4e8aa30cd12307d8c322e8](https://github.com/Kiddos19882/AutoDraw/commit/35ae78e31f9b6d357a4e8aa30cd12307d8c322e8).  
+**Ветка:** `feature/image-geometry-optimization`.  
+**Серия:** `chalk-20261102-031830-a0f325`; block ID `d5d28990cb954610aa7f58534be9d3d7`.
+
+G3 block имеет статус completed: 27/27 задач, все девять сочетаний `point_step_px` 1/2/4 × `point_delay_ms` 5/10/20 представлены тремя повторами. Радиус во всех опытах — 10. Все 27 captures имеют exact CHALK, совпадение суммы pointDelta, 6/6 завершённых штрихов и сохранённый Monitor report.
+
+Per-run transport gates чистые: `dropped_events=0`, `monitor_error_count_delta=0`, `bridge_send_failures_delta=0`, `collector_sequence_gap_count=0`. В шести поздних captures был положительный delta переполнения локального export buffer Monitor; при этом RunRecorder/Bridge/collector не потеряли события конкретных runs. Накопительный `monitor_dropped_events` не является per-run loss.
+
+Ключевой результат для шести длинных горизонтальных линий (2400 логических px, radius=10):
+- step=4, delay=5/10: около 365 CHALK;
+- step=2, delay=5/10: около 717–718 CHALK;
+- step=1, delay=5/10: около 1350 CHALK;
+- delay=20 увеличивает расход относительно 5/10 примерно на 53–95% в зависимости от шага.
+Средние и повторы приведены в [CHALK_G3_RESULTS_2026-11-02.md](CHALK_G3_RESULTS_2026-11-02.md).
+
+Экономичный кандидат для длинных линий — step=4 с delay=5 или 10 ms. Это пока не production default: качество, непрерывность и точность линий при более редком sampling требуют отдельной проверки. Предыдущая radius matrix по радиусам 1–30 не выявила систематической зависимости CHALK от размера кисти для того же сценария; G3 фиксировал радиус 10 и не является новой радиусной матрицей.
+
+**Следующая активная работа:** INT-006 — сегментированная модель прогноза CHALK с отдельными коэффициентами для геометрии и режима ввода; далее — визуальная валидация экономичного режима и проверка на коротких/диагональных/криволинейных штрихах. Старый stopped G3 block и его первичные данные не изменять.
