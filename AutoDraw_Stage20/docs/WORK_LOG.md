@@ -2079,3 +2079,13 @@ Brush Test acceptance и матричные валидаторы больше н
 - INT-006 pixel-level PNG audit — success. Windows portable build/startup smoke-test — success. Artifact `autodraw-g3-preflight-build`, ID `13173632860`; PNG audit artifact ID `13174616232`.
 
 **Следующий шаг:** пользователь выполняет локальный Windows 10 preflight по `CHALK_INT006_LOCAL_PREFLIGHT_GUIDE_2026-11-02.md`. 45 live captures не запускались. Production estimator/defaults, исходные экспериментальные данные и master не менялись.
+
+
+## 2026-11-03 — INT-006 D1–D5 captures и предварительная независимая сверка
+
+- Проверена актуальная ветка `feature/image-geometry-optimization`; live block `chalk-20261102-232320-7cea27` содержит 45/45 completed tasks.
+- Прочитаны все 45 `experiment.json` и 45 `monitor_report.json`. Для каждого capture проверены exact CHALK, радиус, stroke count, сумма per-stroke `pointDelta`, run/experiment linkage и integrity counters; missing reports не обнаружены.
+- Предварительно пересчитаны 45 plan-level и 243 stroke-level residuals. Результаты и таблицы сохранены в `CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md`.
+- Найден portability blocker штатного analyzer: сравнение полного локального Windows пути не подходит для relocated capture bundle в CI. Исправлено сравнение по уникальному experiment directory name; добавлен regression test на Windows-style path.
+- Workflow geometry-tests дополнен запуском `chalk_int006_validation.py` и upload JSON artifact.
+- Официальный analyzer report, проверка frozen artifact SHA-256 и подтверждение полного CI после последних commits остаются pending. Не менять estimator/defaults и не начинать INT-007 до закрытия этих gates.
