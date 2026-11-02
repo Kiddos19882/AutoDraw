@@ -445,3 +445,11 @@
 - Подтверждено, что полный CI run [41496555297](https://github.com/Kiddos19882/AutoDraw/actions/runs/41496555297) checkout рабочей ветки после commit `956ce2b`, содержащего оба исправления в истории. Preparation/G3 завершился 662 passed и 82 subtests passed; все обязательные jobs успешны.
 - Создан `CHALK_INT006_INDEPENDENT_VALIDATION_PLAN_2026-11-02.md`: пять новых DrawingPlan, frozen predictions P0/P1/P2, 3 повтора, exact pre/post pointCount и метрики ошибок.
 - Обновлены PROJECT_STATUS, TASKS, ROADMAP, WORK_LOG, CHALK_NEXT_STEPS_PLAN и docs index. Production estimator, executor defaults и первичные experiment data не менялись. Legacy-journal CI gate закрыт.
+
+
+## 2026-11-02 — INT-006 independent validation harness readiness
+
+- Добавлен `CHALK_INT006_HARNESS_READINESS_AUDIT_2026-11-02.md`.
+- Независимый validation protocol переведён в BLOCKED: D1–D5 пока не подключены к matrix/block/UI/executor harness, а analyzer не сравнивает captures с immutable frozen predictions.
+- PROJECT_STATUS, TASKS, ROADMAP, WORK_LOG и docs index синхронизированы с фактическим состоянием исходников.
+- Production estimator/defaults, исходные экспериментальные данные и master не изменялись; code/tests/CI/live captures в рамках readiness audit не запускались.
