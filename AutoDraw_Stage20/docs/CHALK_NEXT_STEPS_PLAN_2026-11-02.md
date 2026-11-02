@@ -25,7 +25,8 @@ INT-006 live captures и quantitative analyzer gate завершены: D1–D5 
 6. [x] Выполнить live follow-up V1–V5: 45/45 captures, commit `e879a77`; exact CHALK и per-run Monitor integrity приняты.
 7. [x] Выполнить pixel-level аудит новых 45 follow-up PNG: 90/90 captures valid, 297/297 новых strokes coverage=1.0 и zero gaps, V4 closure seams 27/27 covered; V5 spacing 8/12 merge, 16/20/24 separated при radius=10 (CI 41496555297).
 8. [x] Провести независимую validation CHALK-модели на новых DrawingPlan D1–D5; официальный analyzer PASS, 45 accepted, 0 missing/rejected. Протокол и результаты: [CHALK_INT006_INDEPENDENT_VALIDATION_PLAN_2026-11-02.md](CHALK_INT006_INDEPENDENT_VALIDATION_PLAN_2026-11-02.md), [официальный отчёт](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md).
-9. [ ] Отдельно оценить provisional empirical guard P1=1 CHALK и спланировать расширенную проверку на полных реальных рисунках, кривых/заливках, повторном покрытии и разных радиусах. Не считать 1 CHALK статистической гарантией.
+9. [ ] Отдельно оценить provisional empirical guard P1=1 CHALK и спланировать расширенную проверку на полных реальных рисунках, кривых/заливках и повторном покрытии. Не считать 1 CHALK статистической гарантией.
+10. [ ] Выполнить отдельную radius × geometry validation по [CHALK_RADIUS_GEOMETRY_CROSS_VALIDATION_PLAN_2026-11-03.md](CHALK_RADIUS_GEOMETRY_CROSS_VALIDATION_PLAN_2026-11-03.md): сначала harness/CI, затем 45 live captures.
 
 ## Цель
 
