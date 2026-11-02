@@ -480,3 +480,12 @@
 - Для каждой записи подтверждены exact CHALK, per-stroke pointDelta sum, stroke count, experiment linkage, observed radius=10 и нулевые Monitor/Bridge integrity counters.
 - SHA-256 frozen prediction artifact независимо пересчитан и совпал с journal: `a0eab016e96a81e14bededd32cf5161dd943d6fc85a20b7eec17455f69d0c61c`.
 - Официальный analyzer JSON и результат CI после его подключения пока не получены; quantitative validation и safety margin остаются pending.
+
+
+## 2026-11-03 — INT-006 analyzer binding hardening
+
+- Added direct journal-task `prediction_id` verification against the frozen scenario/profile prediction.
+- Added `expected_strokes` verification against the frozen planned-stroke count.
+- Added a fail-closed regression test for a tampered journal prediction ID.
+- No prediction coefficients, sampling defaults, executor defaults, or production estimator changes.
+- CI confirmation and the official 45-capture analyzer JSON remain pending.
