@@ -7,6 +7,12 @@
 **Связанные задачи:** INT-006; предпосылки INT-007  
 **Режим:** исследовательская валидация; production executor и estimator не изменять.
 
+## Дополнение 2026-11-03 — официальный quantitative gate PASS
+
+Штатный analyzer в CI [41532629748](https://github.com/Kiddos19882/AutoDraw/actions/runs/41532629748) принял 45/45 D1–D5 captures, 0 missing, 0 rejected; все 15 profile/scenario groups содержат 3/3 повтора. SHA-256 frozen artifact и полный journal/task/experiment/run/profile/normalized geometry binding подтверждены. Preparation/G3: 669 passed, 82 subtests passed; все обязательные CI jobs, Windows portable build и PNG audit завершились success. См. [официальный отчёт](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md).
+
+P1 (step=4, delay=5 ms) показал лучшие общие MAE/RMSE/MAPE: 0.657 / 0.838 / 1.178%; максимальная недооценка 0.92 CHALK. P1/1 CHALK — только provisional empirical guard для D1–D5, не статистическая гарантия. D3/P1 repeat σ≈1.41 CHALK. `safety_margin_status=not_established`, `production_eligibility=not_validated`; INT-007 остаётся BLOCKED до расширенной проверки и отдельного решения.
+
 ## Дополнение 2026-11-02 — corrective CI и отдельные follow-up сценарии
 
 Первоначальная матрица V1–V5 в этом документе описывает исходную серию и сохраняется как исторический протокол. Для повторных/дополнительных испытаний V2 и V5 применяется отдельный документ [CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md](CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md): V2 `int006_short_strokes_followup` содержит 5 штрихов длиной 12/16/20/24/30 logical px; V5 `int006_intersections_spacing_sweep` содержит 16 штрихов — 6 intersection controls и 10 штрихов пяти пар параллельных линий spacing 8/12/16/20/24 logical px. Новые scenario IDs отделены от legacy IDs, а исходные manifests остаются анализируемыми.
@@ -337,4 +343,4 @@ Step=4 дал снижение расхода на 38.5–49.4% относите
 
 В manifests post-draw cursor placement записан ниже `board_area` и `paint_meter_area` (32 px margin; экранная точка 856,624). Paint-meter image measurement остаётся inconclusive. ROI visibility heuristic помечает часть V3/V4 и все V5 штрихи ambiguous из-за overlap ROI; это не отменяет exact telemetry, но требует pixel-level проверки PNG именно новых follow-up captures.
 
-**Статус:** live follow-up V1–V5 и pixel-level audit завершены. V5 spacing audit: 8/12 logical px — merge, 16/20/24 — no merge для целевых пар при radius=10. Следующий gate: независимая validation модели на полных DrawingPlan → safety margin → только затем INT-007. Подробно: CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md. Production defaults и estimator не менялись.
+**Статус:** live follow-up V1–V5, pixel-level audit и официальный quantitative analyzer D1–D5 завершены. Следующий gate: решение о safety margin и расширенная validation на полных DrawingPlan → только затем INT-007. Подробно: [CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md). Production defaults и estimator не менялись.
