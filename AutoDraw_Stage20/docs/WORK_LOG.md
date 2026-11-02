@@ -1946,3 +1946,13 @@ Brush Test acceptance и матричные валидаторы больше н
 
 - Дополнительно усилены регрессионные проверки: legacy IDs явно проверяются на отсутствие в новых `PHASE_SCENARIOS`; V5 integration test double получает `root=None`, чтобы будущая ошибка runtime gate не маскировалась `AttributeError` при вызове messagebox.
 - Дополнительные commits: `7a22a76` (planner isolation assertion), `3e8e6c5` (устойчивость integration fixture). Текущий corrective code HEAD: `3e8e6c5709dce330551d46667c0f5841fbc5a3fc`.
+
+
+## 2026-11-02 — corrective INT-006 CI подтверждён
+
+- Через полный список GitHub Actions runs найден push-triggered workflow run [41470680544](https://github.com/Kiddos19882/AutoDraw/actions/runs/41470680544) на code HEAD `3e8e6c5709dce330551d46667c0f5841fbc5a3fc`; предыдущий интерфейс commit-associated runs не показывал push events.
+- Все обязательные jobs завершились success: Application integration, Executor regression, Game Monitor/bridge, Preparation/G3, Windows portable build/startup smoke-test и INT-006 pixel-level PNG audit. Optional algorithm benchmarks skipped.
+- Run [41470651104](https://github.com/Kiddos19882/AutoDraw/actions/runs/41470651104) на промежуточном commit `7a22a76` был cancelled concurrency group после появления более нового push run; финальный run на `3e8e6c5` завершился success.
+- Найдены артефакты `autodraw-int006-png-analysis` и `autodraw-g3-preflight-build`; они сохранены в GitHub Actions.
+- Синхронизированы PROJECT_STATUS, TASKS, CHALK_NEXT_STEPS_PLAN и INT-006 execution protocol: software CI gate закрыт, live follow-up V1/V3/V2/V4/V5 и независимая model validation остаются открытыми.
+- Live captures не выполнялись; production executor, estimator, sampling defaults и master не изменялись.
