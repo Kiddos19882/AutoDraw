@@ -11,7 +11,7 @@ INT-006 остаётся IN_PROGRESS. Harness V1–V5 и regression tests реа
 
 Сводный отчёт: [CHALK_INT006_V1_V5_RESULTS_2026-11-02.md](CHALK_INT006_V1_V5_RESULTS_2026-11-02.md). Step=4 снизил CHALK примерно на 48–49% для V1/V3/V4/V5 и на 23–25% для V2. G1-модель проверена без refit на 66 новых per-stroke наблюдениях P0: MAE 1.09, RMSE 1.33, bias −1.04, MAPE 1.71%. Исследовательские step=4 fits около 0.149 CHALK/logical px ещё не являются независимой validation.
 
-Pixel-level audit 45/45 и ручной review representative overlays выполнены. DrawingPlan V1/V3 исправлены в harness с isolation gate >20 logical px. Для V4 добавлен cursor-free post-draw capture: mouseUp, перемещение за пределы board ROI, повторный screenshot; добавлены unit/regression tests. CI текущего HEAD `723a410` и live capture ещё ожидаются. Открыты V2 short-stroke follow-up, V4 closure validation, V5 spacing sweep, независимая validation step=4/полных DrawingPlan и safety margin. Production executor defaults и estimator не менять.
+Pixel-level audit 45/45 и ручной review representative overlays выполнены. DrawingPlan V1/V3 исправлены в harness с isolation gate >20 logical px. Для V4 добавлен cursor-free post-draw capture: mouseUp, перемещение за пределы board ROI, повторный screenshot; добавлены unit/regression tests. CI текущего HEAD `a74f7fd` и live capture ещё ожидаются. Перемещение курсора изолировано только в automated post-draw; ручной capture не затронут. Открыты V2 short-stroke follow-up, V4 closure validation, V5 spacing sweep, независимая validation step=4/полных DrawingPlan и safety margin. Production executor defaults и estimator не менять.
 
 Порядок дальнейшей работы:
 1. [x] Зафиксировать контракт V1–V5 и единицы координат (logical DrawingPlan vs screen-pixel sampling step).
