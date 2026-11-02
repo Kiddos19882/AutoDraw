@@ -24,7 +24,7 @@
 | G2 | long_isolated_lines, continuous_turns, continuous_closed_contour, repeated_coverage, parallel_spacing, cross_section_intersections | 3 | 18 |
 | G3 | 9 комбинаций point_step_px × point_delay_ms | 3 | 27 |
 
-G1/G2 используют radius=10 и фиксированный `GEOMETRY_EXECUTOR_CONFIG`. G3 открывается только после принятия G1 и G2.
+G1/G2 используют radius=10 и фиксированный `GEOMETRY_EXECUTOR_CONFIG`. G3 открывается только после принятия G1 и G2. INT-006 V1–V5 используют тот же lifecycle, radius=10 и отдельную матрицу P0=2/10, P1=4/5, P2=4/10; каждая фаза содержит 9 задач (3 профиля × 3 повтора).
 
 ## 3. Поведение полноценного блока в UI
 
