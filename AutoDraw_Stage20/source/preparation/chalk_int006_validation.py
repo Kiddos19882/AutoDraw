@@ -287,6 +287,7 @@ def analyze_int006_validation(
                 expected_cells.add((scenario_id, profile_name, repeat))
     seen_cells: set[tuple[str, str, int]] = set()
     seen_runs: set[str] = set()
+    seen_experiments: set[str] = set()
     accepted = []
     rejected = []
     for manifest_path in sorted(results_dir.rglob("experiment.json")):
@@ -296,6 +297,9 @@ def analyze_int006_validation(
             continue
         block = document.get("chalk_test_block") if isinstance(document, dict) else None
         if not isinstance(block, dict) or block.get("block_id") != journal.get("block_id"):
+            continue
+        if block.get("phase_id") != INDEPENDENT_VALIDATION_PHASE:
+            rejected.append({"path": str(manifest_path), "reason": "block_phase_mismatch"})
             continue
         task = task_index.get(block.get("task_id"))
         if task is None:
@@ -318,7 +322,15 @@ def analyze_int006_validation(
         if cell in seen_cells:
             rejected.append({"path": str(manifest_path), "reason": "duplicate_matrix_cell"})
             continue
-        if task.get("scenario_id") != cell[0] or task.get("repeat_index") != cell[2]:
+        if (
+            task.get("scenario_id") != cell[0]
+            or task.get("repeat_index") != cell[2]
+            or task.get("matrix_order_index") != matrix.get("matrix_order_index")
+            or task.get("executor_parameters") != matrix.get("executor_parameters")
+            or task.get("requested_radius") != matrix.get("requested_radius")
+            or matrix.get("series_id") != journal.get("series_id")
+            or matrix.get("phase_id") != INDEPENDENT_VALIDATION_PHASE
+        ):
             rejected.append({"path": str(manifest_path), "reason": "journal_task_mismatch"})
             continue
         prediction_id = f"{MODEL_ID}:{cell[0]}:{cell[1]}"
@@ -342,6 +354,24 @@ def analyze_int006_validation(
         if not valid or not isinstance(record, dict):
             rejected.append({"path": str(manifest_path), "reason": f"capture_invalid:{reason}"})
             continue
+        experiment_id = record.get("experiment_id")
+        attempts = task.get("attempts")
+        matching_attempts = [
+            attempt for attempt in attempts
+            if isinstance(attempt, dict)
+            and attempt.get("status") == "completed"
+            and attempt.get("experiment_id") == experiment_id
+        ] if isinstance(attempts, list) else []
+        if task.get("status") != "completed" or len(matching_attempts) != 1:
+            rejected.append({"path": str(manifest_path), "reason": "journal_attempt_not_accepted"})
+            continue
+        attempt_dir = matching_attempts[0].get("experiment_dir")
+        if not isinstance(attempt_dir, str) or Path(attempt_dir).resolve() != manifest_path.parent.resolve():
+            rejected.append({"path": str(manifest_path), "reason": "journal_experiment_directory_mismatch"})
+            continue
+        if experiment_id in seen_experiments:
+            rejected.append({"path": str(manifest_path), "reason": "duplicate_experiment_id"})
+            continue
         stroke_level = _stroke_level_breakdown(
             manifest_path.parent,
             expected_strokes=record["expected_strokes"],
@@ -356,9 +386,26 @@ def analyze_int006_validation(
             continue
         seen_cells.add(cell)
         seen_runs.add(run_id)
+        seen_experiments.add(experiment_id)
         actual = record["consumed_points"]
         predicted = prediction["predicted_chalk"]
         residual = actual - predicted
+        stroke_errors = []
+        for planned_stroke, predicted_stroke, actual_stroke in zip(
+            prediction["planned_strokes"],
+            prediction["stroke_predictions"],
+            stroke_level["strokes"],
+        ):
+            stroke_residual = actual_stroke["consumed_points"] - predicted_stroke["predicted_chalk"]
+            stroke_errors.append({
+                "stroke_id": planned_stroke["name"],
+                "length_logical_px": predicted_stroke["length_logical_px"],
+                "prediction_rule": predicted_stroke["rule"],
+                "actual_chalk": actual_stroke["consumed_points"],
+                "predicted_chalk": predicted_stroke["predicted_chalk"],
+                "residual": stroke_residual,
+                "absolute_error": abs(stroke_residual),
+            })
         accepted.append({
             "path": str(manifest_path),
             "scenario_id": cell[0],
@@ -372,6 +419,7 @@ def analyze_int006_validation(
             "absolute_error": abs(residual),
             "relative_error": abs(residual) / actual if actual else None,
             "stroke_level": stroke_level,
+            "stroke_errors": stroke_errors,
         })
 
     missing = sorted(expected_cells - seen_cells)
@@ -385,6 +433,10 @@ def analyze_int006_validation(
             residuals = [row["residual"] for row in rows]
             actuals = [row["actual_chalk"] for row in rows]
             absolute = [abs(value) for value in residuals]
+            stroke_residuals = [
+                stroke["residual"] for row in rows for stroke in row["stroke_errors"]
+            ]
+            stroke_absolute = [abs(value) for value in stroke_residuals]
             groups[f"{scenario_id}:{profile_name}"] = {
                 "scenario_id": scenario_id,
                 "profile_id": profile_name,
@@ -398,6 +450,9 @@ def analyze_int006_validation(
                 "max_underprediction": max([value for value in residuals if value > 0], default=0) if rows else None,
                 "actual_mean": mean(actuals) if rows else None,
                 "actual_repeat_pstdev": pstdev(actuals) if len(actuals) > 1 else (0.0 if rows else None),
+                "stroke_mae": mean(stroke_absolute) if stroke_absolute else None,
+                "stroke_rmse": math.sqrt(mean(value * value for value in stroke_residuals)) if stroke_residuals else None,
+                "stroke_bias_actual_minus_predicted": mean(stroke_residuals) if stroke_residuals else None,
                 "runs": rows,
             }
     complete = len(accepted) == 45 and not missing and not rejected and all(
