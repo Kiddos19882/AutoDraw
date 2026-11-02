@@ -8,6 +8,8 @@ from pathlib import Path
 from statistics import mean, median, pstdev
 from typing import Any
 
+from PIL import Image
+
 from chalk_experiment_matrix import (
     EXPECTED_STROKES,
     GEOMETRY_EXECUTOR_CONFIG,
@@ -30,6 +32,43 @@ def _stats(values: list[float]) -> dict[str, float | int | None]:
         "max": max(values),
         "population_sd": round(pstdev(values), 6),
     }
+
+
+def _validate_board_png_evidence(
+    manifest_path: Path,
+    document: dict[str, Any],
+) -> tuple[dict[str, Any] | None, str | None]:
+    phases = document.get("phases")
+    if not isinstance(phases, dict):
+        return None, "phase_evidence_missing"
+    evidence: dict[str, Any] = {}
+    dimensions: set[tuple[int, int]] = set()
+    for phase_name in ("before_draw", "after_draw"):
+        phase = phases.get(phase_name)
+        files = phase.get("files") if isinstance(phase, dict) else None
+        filename = files.get("board_roi") if isinstance(files, dict) else None
+        if not isinstance(filename, str) or not filename or Path(filename).name != filename:
+            return None, f"{phase_name}_board_png_reference_invalid"
+        png_path = manifest_path.parent / filename
+        if not png_path.is_file() or png_path.suffix.lower() != ".png":
+            return None, f"{phase_name}_board_png_missing"
+        try:
+            with Image.open(png_path) as image_file:
+                size = tuple(int(value) for value in image_file.size)
+                image_file.verify()
+        except (OSError, ValueError, Image.DecompressionBombError):
+            return None, f"{phase_name}_board_png_unreadable"
+        if len(size) != 2 or min(size) <= 0:
+            return None, f"{phase_name}_board_png_dimensions_invalid"
+        dimensions.add(size)
+        evidence[phase_name] = {
+            "file": filename,
+            "width": size[0],
+            "height": size[1],
+        }
+    if len(dimensions) != 1:
+        return None, "before_after_board_png_dimensions_mismatch"
+    return evidence, None
 
 
 def analyze_int006r_validation(
@@ -144,6 +183,10 @@ def analyze_int006r_validation(
         if not valid or record is None:
             rejected.append({"path": str(manifest_path), "reason": str(reason)})
             continue
+        png_evidence, png_error = _validate_board_png_evidence(manifest_path, document)
+        if png_error is not None or png_evidence is None:
+            rejected.append({"path": str(manifest_path), "reason": str(png_error)})
+            continue
         run_id = record.get("run_id")
         if run_id in seen_runs or experiment_id in seen_experiments:
             rejected.append({"path": str(manifest_path), "reason": "duplicate_run_or_experiment"})
@@ -162,6 +205,8 @@ def analyze_int006r_validation(
             "post_point_count": record["post_point_count"],
             "stroke_count": record["expected_strokes"],
             "stroke_level": stroke_level.get("strokes", []),
+            "png_evidence": png_evidence,
+            "visual_quality_status": "pending_manual_review",
         })
         seen_cells.add(cell)
         seen_runs.add(run_id)
@@ -229,6 +274,8 @@ def analyze_int006r_validation(
         "groups": groups,
         "radius_comparisons": radius_comparisons,
         "captures": accepted,
+        "png_evidence_status": "complete" if len(accepted) == 45 else "incomplete",
+        "visual_quality_gate": "pending_manual_review",
         "production_model_changed": False,
         "safety_margin_status": "not_established",
         "production_eligibility": "not_validated",
