@@ -1735,4 +1735,12 @@ Regression test в `source/preparation/tests/test_brush_behavior_test_ui.py` т�
 - Детерминированная симуляция 50 320 emit-вызовов подтвердила: retained=50 000, local buffer drops=320, subscriber delivery=50 320.
 
 Вывод: G3 partial вызван ложной интерпретацией глобального буферного overflow, а не доказанной потерей WebSocket-событий. Создан отдельный анализ `docs/GAME_MONITOR_BUFFER_OVERFLOW_ANALYSIS_2026-11-02.md`. Изменения кода, live рисование, CI/workflow и правки исторических журналов не выполнялись.
+## 2026-11-02 — исправление ложного partial из-за session-cumulative Monitor counters
 
+Исправлен RunRecorder: вместо трактовки `status.droppedEvents` как per-run loss теперь сохраняются `monitor_buffer_dropped_events_start/end/delta`; cumulative Monitor errors также представлены start/end/delta. `monitor_dropped_events` и `monitor_error_count` оставлены как deprecated cumulative aliases.
+
+Collector теперь считает пропущенные WebSocket sequence, записывает session-level `collector_sequence_gap_count` и добавляет gap count к активному run. Browser Bridge `sendFailureCount` сравнивается с baseline run и сохраняется как `bridge_send_failures_delta`.
+
+Brush Test acceptance и матричные валидаторы больше не отклоняют run из-за cumulative local-buffer overflow. Они fail-closed по per-run `dropped_events`, `monitor_error_count_delta`, `bridge_send_failures_delta` и `collector_sequence_gap_count`. Исправления покрыты Node, Python, WebSocket integration и matrix regression tests.
+
+Документация обновлена: `BRUSH_MONITOR_AUTOCAPTURE_DESIGN.md`, `source/game_monitor/README.md`, `docs/TESTS_AND_CI_MAP.md`. Исторические G3 captures/journal не изменялись. Live game не запускалась. Результат CI на финальном HEAD ещё требуется проверить.
