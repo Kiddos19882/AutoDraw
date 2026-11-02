@@ -5,7 +5,7 @@
 - [x] Harness D1–D5, 45-cell journal, 15 frozen prediction records, prediction ID handoff и independent analyzer реализованы.
 - [x] Software CI run [41513389663](https://github.com/Kiddos19882/AutoDraw/actions/runs/41513389663) прошёл на code HEAD `ca8c9b3`: 667 passed, 82 subtests; обязательные jobs, Windows portable build/startup smoke-test и PNG audit success.
 - [x] Live block D1–D5 выполнен: 45/45 tasks completed, radius=10.
-- [x] Предварительно проверены 45 experiment manifests и 45 Monitor reports: exact CHALK, per-stroke sums, stroke counts, нулевые Monitor/Bridge integrity errors.
+- [x] Предварительно проверены 45 experiment manifests и 45 Monitor reports: exact CHALK, per-stroke sums, stroke counts, нулевые per-run Monitor/Bridge integrity counters.
 - [x] Предварительные run-level и per-stroke метрики рассчитаны и записаны в [отдельный отчёт](CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md).
 - [x] Исправлена portability-привязка journal attempt к каталогу эксперимента и добавлен regression test.
 - [x] В `.github/workflows/geometry-tests.yml` добавлен официальный analyzer run и upload JSON report.
@@ -14,7 +14,7 @@
 - [ ] После официального результата определить обоснованный safety margin; до этого production estimator/defaults не менять.
 - [ ] INT-007 начинать только после закрытия validation и safety-margin gates.
 
-**Предварительные результаты:** 45 plan runs — MAE 1.408 CHALK, RMSE 1.967, bias -0.875, MAPE 2.134%, max underprediction 1.82 CHALK. Это не официальный analyzer result и не основание для production eligibility. Все live captures были при radius=10; влияние радиуса не проверялось.
+**Предварительные результаты:** 45 plan runs — MAE 1.408 CHALK, RMSE 1.967, bias -0.875, MAPE 2.134%, max underprediction 1.82 CHALK. Это не официальный analyzer result и не основание для production eligibility. Все live captures были при requested radius=10; влияние радиуса не проверялось.
 
 ## Статус аналитических планов
 
