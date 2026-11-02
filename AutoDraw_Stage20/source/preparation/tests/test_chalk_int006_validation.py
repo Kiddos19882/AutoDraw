@@ -238,3 +238,34 @@ def test_analyzer_accepts_original_windows_experiment_path_after_relocation(tmp_
     assert result["accepted_count"] == 1
     assert result["rejected"] == []
     assert len(result["missing_cells"]) == 44
+
+
+def test_analyzer_rejects_journal_prediction_id_mismatch(tmp_path):
+    series_id = "int006-journal-prediction-binding-series"
+    plan = build_chalk_test_block_plan(series_id=series_id, phase_id="INT006", seed=11)
+    journal_path = tmp_path / "int006-block.json"
+    create_chalk_test_block_journal(journal_path, plan)
+    results_dir = tmp_path / "results"
+    results_dir.mkdir()
+
+    task = claim_next_chalk_block_task(journal_path)
+    assert task is not None
+    actual = round(plan["prediction_artifact"]["predictions"][task["prediction_id"]]["predicted_chalk"])
+    manifest_path = _write_capture(results_dir, plan, task, plan["prediction_artifact"], actual)
+    finish_chalk_block_task(
+        journal_path,
+        task["task_id"],
+        accepted=True,
+        experiment_id=f"exp-{task['task_id']}",
+        experiment_dir=manifest_path.parent,
+    )
+
+    journal = json.loads(journal_path.read_text(encoding="utf-8"))
+    journal_task = next(item for item in journal["tasks"] if item["task_id"] == task["task_id"])
+    journal_task["prediction_id"] = "tampered-prediction-id"
+    journal_path.write_text(json.dumps(journal, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    result = analyze_int006_validation(journal_path, results_dir)
+    assert result["accepted_count"] == 0
+    assert result["rejected"][0]["reason"] == "journal_prediction_id_mismatch"
+    assert len(result["missing_cells"]) == 45
