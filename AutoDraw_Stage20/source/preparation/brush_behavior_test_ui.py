@@ -1894,6 +1894,11 @@ class BrushBehaviorTestTab:
                     "int006_turns",
                     "int006_closed_contours",
                     "int006_intersections_spacing",
+                    "int006r_validation_d1_mixed_lines",
+                    "int006r_validation_d2_polygon",
+                    "int006r_validation_d3_intersections",
+                    "int006r_validation_d4_short_details",
+                    "int006r_validation_d5_repeated_coverage",
                 } and self._chalk_block_task is None:
                     raise ValueError(
                         "G3 и V1–V5 разрешено запускать только полными автоматическими блоками. "
