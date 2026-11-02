@@ -7,9 +7,9 @@
 
 > Уточнение CI: legacy-journal compatibility (`f0e05df`/`4847cce`) подтверждена полным run `41496555297`. Checkout рабочей ветки выполнен после commit `956ce2b`, который содержит оба исправления в истории; Preparation/G3 job завершился 662 passed и 82 subtests passed. Все обязательные jobs и Windows portable build успешны. Legacy-journal CI gate закрыт.
 
-## Текущий статус INT-006 — 2026-11-02
+## Текущий статус INT-006 — обновлено 2026-11-03
 
-INT-006 остаётся IN_PROGRESS. Harness V1–V5 и regression tests реализованы. Исходные 45 captures и исходный pixel-level audit сохранены отдельно. После исправлений сценариев пользователь выполнил полный follow-up: commit [e879a77](https://github.com/Kiddos19882/AutoDraw/commit/e879a77f63be7a7a68de3f09091eab7dba0d34a2) содержит пять block journals (каждый 9/9 completed), 45 experiment manifests, 45 Game Monitor reports и соответствующие PNG. Все 45 captures приняты для анализа exact CHALK и Monitor integrity.
+INT-006 live captures и quantitative analyzer gate завершены: D1–D5 — 45/45 accepted, 0 missing/rejected, 15/15 groups complete; SHA-256 frozen artifact и journal/task/experiment/run/profile/normalized geometry bindings подтверждены официальным analyzer в CI [41532629748](https://github.com/Kiddos19882/AutoDraw/actions/runs/41532629748). Подробные метрики: [официальный отчёт](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md). INT-006 остаётся IN_PROGRESS только до отдельного решения по safety margin и расширения domain validation. INT-007 остаётся BLOCKED.
 
 Новые средние exact CHALK P0/P1/P2 (step2/delay10; step4/delay5; step4/delay10): V1 251.67/131.33/132.33; V2 39.00/24.00/23.67; V3 344.00/175.33/174.00; V4 438.33/229.00/229.33; V5 407.67/216.00/216.33. Step=4 дал экономию 38.5–49.4% относительно step=2. Разница delay=5/10 ms при step=4 не превышает примерно 1.4% по среднему расходу. Все новые серии проведены при radius=10; они не дают новых данных о влиянии размера кисти. Подробные raw repeat values: [CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md](CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md).
 
@@ -24,7 +24,8 @@ INT-006 остаётся IN_PROGRESS. Harness V1–V5 и regression tests реа
    [x] Отдельно проверить legacy journal compatibility (`f0e05df`) и regression tests (`4847cce`) полным CI `41496555297`; Preparation/G3 — 662 passed, 82 subtests passed.
 6. [x] Выполнить live follow-up V1–V5: 45/45 captures, commit `e879a77`; exact CHALK и per-run Monitor integrity приняты.
 7. [x] Выполнить pixel-level аудит новых 45 follow-up PNG: 90/90 captures valid, 297/297 новых strokes coverage=1.0 и zero gaps, V4 closure seams 27/27 covered; V5 spacing 8/12 merge, 16/20/24 separated при radius=10 (CI 41496555297).
-8. [ ] Провести независимую validation CHALK-модели на новых DrawingPlan; только после неё рассчитать safety margin. Протокол набора планов и замороженных прогнозов: [CHALK_INT006_INDEPENDENT_VALIDATION_PLAN_2026-11-02.md](CHALK_INT006_INDEPENDENT_VALIDATION_PLAN_2026-11-02.md).
+8. [x] Провести независимую validation CHALK-модели на новых DrawingPlan D1–D5; официальный analyzer PASS, 45 accepted, 0 missing/rejected. Протокол и результаты: [CHALK_INT006_INDEPENDENT_VALIDATION_PLAN_2026-11-02.md](CHALK_INT006_INDEPENDENT_VALIDATION_PLAN_2026-11-02.md), [официальный отчёт](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md).
+9. [ ] Отдельно оценить provisional empirical guard P1=1 CHALK и спланировать расширенную проверку на полных реальных рисунках, кривых/заливках, повторном покрытии и разных радиусах. Не считать 1 CHALK статистической гарантией.
 
 ## Цель
 
@@ -66,7 +67,7 @@ INT-006 остаётся IN_PROGRESS. Harness V1–V5 и regression tests реа
 
 ## Этап 2. Геометрическая валидация sampling step=4
 
-**Текущий статус:** 90/90 исходных + follow-up captures приняты; pixel audit обеих серий пройден. Исправления harness/legacy compatibility и cursor placement прошли CI `41470680544`/`41486593544`; новый series-aware audit и Windows build прошли run `41496555297`. Live follow-up V1/V3/V2/V4/V5 завершён (45/45); pixel metrics 297/297 strokes gap-free. Открыта независимая validation модели и safety margin.
+**Историческая фиксация на 2026-11-02:** на тот момент оставались независимая validation модели и safety margin. Официальная quantitative validation завершена в CI 41532629748; текущие оставшиеся gates — решение о safety margin и расширенная domain validation.
 
 **Цель:** определить, можно ли безопасно применять step=4 не только к длинным горизонтальным линиям. Первичная матрица уже выполнена; текущая работа — quality audit и закрытие ограничений V1/V3/V2.
 
