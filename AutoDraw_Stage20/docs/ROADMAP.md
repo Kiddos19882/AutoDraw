@@ -11,9 +11,11 @@
 - [x] Получена первичная holdout-проверка G1-модели на 66 новых штрихах P0 (MAE 1.09, RMSE 1.33, MAPE 1.71%).
 - [x] Выполнить live follow-up V1/V3/V4 и V2/V5: 45/45 captures в commit `e879a77`; все блоки 9/9 completed, exact CHALK и per-run Monitor integrity приняты.
 - [x] Выполнить pixel-level аудит новых 45 follow-up PNG в CI `41496555297`: 90/90 captures valid; 297/297 новых strokes coverage=1.0, zero gaps; V4 closure seams 27/27 covered; V5 spacing 8/12 merge, 16/20/24 separated при radius=10.
-- [ ] Завершить независимую validation step=4 и полных DrawingPlan; только затем определить safety margin.
+- [ ] Реализовать D1–D5 в отдельной INT006 matrix/block/UI/executor phase, подготовить frozen prediction records и analyzer; затем regression tests и полный CI.
+- [ ] Провести локальный Windows 10 preflight и только после него выполнить 45 live captures независимой validation.
+- [ ] Рассчитать ошибки модели и только затем определить обоснованный safety margin.
 
-Подробные данные: [исходная live-матрица](CHALK_INT006_V1_V5_RESULTS_2026-11-02.md), [новые follow-up результаты](CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md), [протокол V1/V3/V4](CHALK_INT006_V1_V3_V4_FOLLOWUP_2026-11-02.md), [протокол V2/V5](CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md). Production defaults и estimator не менялись. Исторические записи ниже сохраняются для хронологии и не переопределяют этот статус.
+Текущий blocker независимой validation: [аудит готовности harness](CHALK_INT006_HARNESS_READINESS_AUDIT_2026-11-02.md). Протокол D1–D5 имеет статус BLOCKED до подключения к UI и block runner. Подробные данные: [исходная live-матрица](CHALK_INT006_V1_V5_RESULTS_2026-11-02.md), [новые follow-up результаты](CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md), [протокол V1/V3/V4](CHALK_INT006_V1_V3_V4_FOLLOWUP_2026-11-02.md), [протокол V2/V5](CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md). Production defaults и estimator не менялись. Исторические записи ниже сохраняются для хронологии и не переопределяют этот статус.
 
 Документ объединяет завершённые направления документирования и текущую последовательность работ по измерению игрового CHALK. В текущем продолжении пользователь разрешил все действия; live captures требуют доступной игровой сессии и готовой тестовой доски.
 
@@ -195,3 +197,12 @@ Harness V1–V5: matrix metadata/validator, block planner/journal, Brush Test UI
 Геометрические follow-up V1–V5 и pixel audit завершены. Следующий аналитический gate — независимая validation замороженных моделей P0/P1/P2 на новых DrawingPlan; план эксперимента находится в `CHALK_INT006_INDEPENDENT_VALIDATION_PLAN_2026-11-02.md`.
 
 Программный gate legacy-journal compatibility закрыт: run `41496555297` checkout рабочей ветки после commit `956ce2b`, содержащего commits `f0e05df` и `4847cce` в истории. Preparation/G3 завершился 662 passed и 82 subtests passed; все обязательные jobs, Windows portable build и PNG audit успешны.
+
+
+## 2026-11-02 — readiness audit независимой validation
+
+- [x] Подтвердить по исходникам отсутствие D1–D5 в matrix contract, block planner/journal, Brush Test UI и executor override allowlist.
+- [x] Зафиксировать, что analyzer пока не сравнивает accepted captures с immutable frozen predictions.
+- [x] Исправить статус D1–D5 protocol на BLOCKED; создать отдельный readiness audit.
+- [ ] Расширить существующий harness отдельной INT006 phase, не меняя production estimator/defaults.
+- [ ] Пройти полный CI и Windows portable smoke-test; затем передать локальную инструкцию preflight.
