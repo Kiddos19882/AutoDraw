@@ -353,7 +353,7 @@ Software gate закрыт; live gate остаётся открытым. Авт�
 - [ ] Рассчитать абсолютную/относительную ошибку прогноза против точной pre/post `pointCount`.
 - [ ] Определить safety margin только после validation; затем рассматривать INT-007 (интеграцию в preflight).
 
-Документ модели: [CHALK_PRELIMINARY_SEGMENTED_MODEL_2026-11-02.md](docs/CHALK_PRELIMINARY_SEGMENTED_MODEL_2026-11-02.md). Модель пока не production-ready. Код и пользовательские executor defaults не менялись.
+Документ модели: [CHALK_PRELIMINARY_SEGMENTED_MODEL_2026-11-02.md](CHALK_PRELIMINARY_SEGMENTED_MODEL_2026-11-02.md). Модель пока не production-ready. Код и пользовательские executor defaults не менялись.
 
 
 ## G3 visual gate — уточнение после просмотра оригинальных PNG (2026-11-02)
@@ -366,4 +366,4 @@ Software gate закрыт; live gate остаётся открытым. Авт�
 - [ ] Проверить короткие штрихи, пересечения и плотное расположение линий.
 - [ ] После геометрической validation провести независимую проверку прогнозной модели CHALK.
 
-**Результат:** step=4 визуально приемлем для длинных горизонтальных линий G3. Это не основание менять общий production default. Отчёт: [CHALK_G3_VISUAL_QUALITY_AUDIT_2026-11-02.md](docs/CHALK_G3_VISUAL_QUALITY_AUDIT_2026-11-02.md).
+**Результат:** step=4 визуально приемлем для длинных горизонтальных линий G3. Это не основание менять общий production default. Отчёт: [CHALK_G3_VISUAL_QUALITY_AUDIT_2026-11-02.md](CHALK_G3_VISUAL_QUALITY_AUDIT_2026-11-02.md).
