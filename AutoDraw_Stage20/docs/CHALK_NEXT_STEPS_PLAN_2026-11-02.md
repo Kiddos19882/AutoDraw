@@ -19,7 +19,7 @@ Pixel-level audit 45/45 и ручной review representative overlays выпо�
 3. [x] Подтвердить CI/Windows startup smoke-test для исходной реализации.
 4. [x] Выполнить 45 live captures и сохранить исходные manifests/reports/PNG в commit 6479536.
 5. [x] Исправить legacy V2/V5 manifest compatibility и V5 integration fixture; полный CI на `3e8e6c5` прошёл run `41470680544`.
-6. [ ] Выполнить live follow-up V1/V3/V2/V4/V5 по протоколам, не смешивая новые scenario IDs с исходными captures.
+6. [ ] Выполнить live follow-up V1/V3/V4 по [протоколу повторных геометрических серий](CHALK_INT006_V1_V3_V4_FOLLOWUP_2026-11-02.md) и V2/V5 по [отдельному протоколу](CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md), не смешивая новые серии с исходными captures.
 7. [ ] Провести независимую validation CHALK-модели на новых DrawingPlan; только после неё рассчитать safety margin.
 
 ## Цель
