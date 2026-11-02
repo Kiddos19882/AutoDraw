@@ -428,3 +428,12 @@
 - Подтверждены exact CHALK и согласованность per-stroke Monitor deltas для всех 45 runs; per-run Monitor/Bridge errors и drops отсутствуют.
 - Step=4 показал 38.5–49.4% экономии против step=2; различие delay=5/10 ms при step=4 мало. Радиус во всех сериях фиксирован на 10.
 - Добавлен отдельный отчёт repeat values и ограничений `CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md`. Следующий gate — pixel-level audit новых PNG и независимая validation; production defaults не изменены.
+
+
+### INT-006 follow-up pixel audit and CI — 2026-11-02
+
+- Исправлен PNG analyzer: независимые серии INT-006 идентифицируются по series_id; duplicate matrix cells проверяются только внутри серии. Добавлены regression tests и обновлён CI expected runs per series.
+- Pixel-level audit завершён для 90 captures (45 исходных + 45 follow-up): 90 valid, 0 duplicate/missing/unexpected cells, 0 batch failures; 549 stroke rows и 900 pair rows.
+- Для новых 45 captures: 297/297 strokes с coverage=1.0 и zero gaps; V4 closure seam 27/27 covered; курсор не обнаружен на board image в 45/45 captures.
+- V5 spacing sweep: целевые пары 8/12 logical px touch/merge; 16/20/24 logical px остаются разделёнными при radius=10.
+- Full CI run [41496555297](https://github.com/Kiddos19882/AutoDraw/actions/runs/41496555297) — success, включая Windows portable build/startup smoke-test и PNG audit. Production executor defaults и CHALK estimator не менялись.
