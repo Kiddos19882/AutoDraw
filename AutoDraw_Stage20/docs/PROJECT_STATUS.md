@@ -9,12 +9,12 @@
 
 # Текущее состояние проекта
 
-**Последнее обновление:** 2026-11-03 — официальный INT-006 analyzer принял 45/45 captures, 0 missing/rejected; полный CI run [41532629748](https://github.com/Kiddos19882/AutoDraw/actions/runs/41532629748) завершился SUCCESS. Quantitative gate закрыт; safety margin и production eligibility остаются не установленными.
+**Последнее обновление:** 2026-11-03 — после INT-006 PASS реализована отдельная экспериментальная фаза INT006R (radius 1/10/30 × D1–D5 × 3 повтора, P1), включая matrix/block/UI/executor handoff, journal validation, analyzer и regression tests. Новый software gate ещё не подтверждён; live captures запрещены до полного CI PASS.
 
 **Актуально на:** 3 ноября 2026 г.  
 **Репозиторий:** `Kiddos19882/AutoDraw`  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
-**Состояние ветки:** analyzer portability и journal-binding fixes, regression tests, CI workflow и документационная синхронизация внесены в `feature/image-geometry-optimization`; `master` не менялся.
+**Состояние ветки:** после подтверждённого INT-006 HEAD `dd64730` добавлена INT006R harness implementation и regression suite в `feature/image-geometry-optimization`; CI для новых изменений ожидается. `master` не менялся.
 **Последний подтверждённый полный CI:** run [41532629748](https://github.com/Kiddos19882/AutoDraw/actions/runs/41532629748), code HEAD `dd64730e202ed6f6014fa2dd1a65c3100cc32018`; все обязательные jobs и независимый analyzer завершились success. Preparation/G3: 669 passed, 82 subtests passed; optional algorithm benchmarks skipped. Analyzer artifact `13182727663` содержит 45 accepted, 0 missing, 0 rejected и 15 complete groups.  
 > Этот блок — единственный источник текущего статуса. Ниже сохранена историческая хронология; старые статусы и планы не являются текущим backlog.
 
@@ -31,6 +31,8 @@
 - В analyzer исправлено сравнение абсолютного Windows experiment path: relocated capture bundles связываются с journal по имени experiment directory. Дополнительно analyzer сверяет `task.prediction_id` и `task.expected_strokes` с frozen prediction; regression tests покрывают Windows path и tampered journal prediction ID.
 - В `.github/workflows/geometry-tests.yml` analyzer проверяет runtime manifest hash и нормализованную logical geometry против frozen plan. Первый run `41530634729` обнаружил несовпадение сериализаций; fix `8eba34f` и regression fixture `dd64730` устранили ошибку. Повторный run `41532629748` завершился SUCCESS, официальный JSON artifact проверен.
 - Production estimator, executor defaults, sampling defaults и `master` не менялись.
+- **INT006R harness реализован, software gate pending:** отдельные scenario IDs D1R–D5R, 45 уникальных cells `(scenario, radius, repeat)`, разрешённые radius 1/10/30, строго P1 (4/5), отдельный journal без frozen prediction artifact. UI устанавливает радиус из текущей task; executor handoff повторно сверяет радиус с requested brush и phase contract. Analyzer `chalk_int006r_validation.py` валидирует exact CHALK, per-stroke telemetry и journal/run/experiment binding, затем считает статистику отдельно для каждой геометрии и радиуса.
+- Добавлены unit/regression tests `source/preparation/tests/test_chalk_int006r_validation.py` и executor handoff test в `tests/test_unified_app.py`. Полный CI для новых commits ещё не завершён; никаких live captures INT006R не выполнялось.
 
 ## Статусы инициатив
 
@@ -43,6 +45,7 @@
 | INT-004 | DONE* | WebSocket telemetry, per-run capture и привязка Monitor report к experiment используются; A/B/C overhead остаётся в INT-003. |
 | INT-005 | DONE* | Автоматические CHALK blocks, matrix, journal, recovery и fail-closed gates используются в принятых сериях. |
 | INT-006 | IN_PROGRESS | Live captures, 45/45 Monitor audit, официальный analyzer (45 accepted, 0 missing/rejected), 15/15 complete groups и полный binding audit завершены. Осталось отдельно решить вопрос safety margin и расширить domain validation; production eligibility не подтверждена. |
+| INT-006R | IN_PROGRESS | Отдельная радиусно-геометрическая фаза и analyzer добавлены; software gate CI pending. До PASS live captures запрещены. |
 | INT-007 | BLOCKED | Интеграция валидированной модели в preflight/resource estimator запрещена до закрытия INT-006 и определения safety margin. |
 | INT-008 | TODO | Оптимизация траекторий, кистей, порядка и покрытия в пределах CHALK после INT-007. |
 | INT-009 | TODO | Независимая проверка прогноза на полных рисунках, визуального качества и фактической экономии. |
