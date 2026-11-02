@@ -1956,3 +1956,13 @@ Brush Test acceptance и матричные валидаторы больше н
 - Найдены артефакты `autodraw-int006-png-analysis` и `autodraw-g3-preflight-build`; они сохранены в GitHub Actions.
 - Синхронизированы PROJECT_STATUS, TASKS, CHALK_NEXT_STEPS_PLAN и INT-006 execution protocol: software CI gate закрыт, live follow-up V1/V3/V2/V4/V5 и независимая model validation остаются открытыми.
 - Live captures не выполнялись; production executor, estimator, sampling defaults и master не изменялись.
+
+
+### Дополнительная проверка артефакта INT-006 PNG audit — 2026-11-02
+
+- Скачан и локально проверен Actions artifact `autodraw-int006-png-analysis` из run `41470680544` (ZIP, 1.2 MB).
+- `summary.json`: expected/discovered/analysed/capture-valid = 45/45/45/45; invalid captures = 0; по 9 captures для каждой фазы V1–V5; duplicate/missing/unexpected matrix cells и batch failures = 0.
+- CSV содержит 252 per-stroke rows и 279 parallel-pair rows. Gap rows отсутствуют во всех фазах; максимальный измеренный gap = 0.0 logical px в анализируемых коридорах.
+- V2: 9 строк `length_10` имеют `path_metrics_sufficient=false`; это ограничение оценки центральной линии, не доказательство разрыва.
+- V5: 9/144 candidate pair rows отмечены как touching/overlap для близкой пары с axis separation 8.0115 logical px и minimum ink-mask distance 2.3718 logical px. Это подтверждает известное ограничение исходной V5 spacing=8 и обосновывает отдельный sweep.
+- Результаты PNG являются геометрической диагностикой и не заменяют exact CHALK telemetry `post.pointCount - pre.pointCount`.
