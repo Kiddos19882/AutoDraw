@@ -225,8 +225,8 @@ Harness V1–V5: matrix metadata/validator, block planner/journal, Brush Test UI
 - [x] Добавлен 45-cell planner: D1–D5 × radius 1/10/30 × 3 повтора; sampling фиксирован на P1 (step=4, delay=5 ms).
 - [x] Добавлены strict journal validation, UI aliases, task-specific radius selection и fail-closed executor handoff.
 - [x] Добавлен отдельный analyzer exact CHALK и regression tests для matrix/journal/analyzer/handoff.
-- [ ] Пройти полный CI на новом HEAD, включая Windows portable build/startup smoke-test.
-- [ ] После CI и локального Windows preflight выполнить 45 live captures; не запускать до закрытия software gate.
-- [ ] По результатам оценить radius × geometry interaction отдельно по каждой геометрии; при обнаружении эффекта добавить промежуточные радиусы.
+- [x] Полный CI [41540054975](https://github.com/Kiddos19882/AutoDraw/actions/runs/41540054975) на code HEAD `28b56a9` завершился SUCCESS: 682 passed, 82 subtests, application/executor/bridge/PNG audit и Windows portable build/startup smoke-test — success.
+- [ ] Выполнить локальный Windows preflight и после его PASS провести 45 live captures; live block ещё не запускался.
+- [ ] Проверить 45 пар before/after PNG вручную, закрыть visual quality gate и оценить radius × geometry interaction отдельно по каждой геометрии; при обнаружении эффекта добавить промежуточные радиусы.
 
-**Текущий gate:** software implementation added; CI pending. **Live gate:** BLOCKED. Frozen INT-006 model, production estimator/defaults и master не менялись.
+**Текущий gate:** SOFTWARE PASS. **Live gate:** BLOCKED до локального Windows preflight. Frozen INT-006 model, production estimator/defaults и master не менялись.
