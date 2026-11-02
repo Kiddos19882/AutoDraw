@@ -1410,3 +1410,10 @@ def test_automated_postdraw_capture_moves_cursor_before_second_screenshot():
     assert source.index("pyautogui.mouseUp()") < source.index("pyautogui.moveTo(*safe_cursor_point")
     assert source.index("pyautogui.moveTo(*safe_cursor_point") < source.index("screen = ImageGrab.grab()", source.index("pyautogui.moveTo(*safe_cursor_point"))
     assert '"cursor_exclusion"' in source
+
+
+def test_manual_experiment_capture_does_not_relocate_cursor():
+    import inspect
+    source = inspect.getsource(brush_ui.BrushBehaviorTestTab._capture_experiment_phase_now)
+    assert "pyautogui.mouseUp()" not in source
+    assert "pyautogui.moveTo(" not in source
