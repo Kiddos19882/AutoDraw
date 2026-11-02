@@ -174,3 +174,14 @@ G3 block `chalk-20261102-031830-a0f325` завершён: 27/27 captures при�
 INT-006 остаётся IN_PROGRESS. Создан [исполнительный протокол](CHALK_INT006_EXECUTION_PROTOCOL_2026-11-02.md): пять геометрических сценариев V1–V5, три sampling-профиля и три повтора (45 captures), отдельная независимая validation модели CHALK и критерии safety margin.
 
 Harness V1–V5 расширен поверх G3: matrix metadata/validator, block planner/journal, Brush Test UI и task-specific executor override поддерживают пять фаз по 9 задач (три профиля × три повтора). Добавлены regression tests. Следующий gate — полный CI и Windows portable smoke-test; затем 45 live captures. Production executor defaults и estimator не менять.
+
+
+## 2026-11-02 — INT-006 PNG screening progress
+
+- [x] Просмотрены 15 representative PNG V1–V5 × P0/P1/P2.
+- [x] Зафиксированы ограничения исходной геометрии и отсутствие очевидного визуального ухудшения непрерывности step=4 в выбранных примерах.
+- [ ] Выполнить количественный pixel-level аудит всех 45 PNG: continuity/max gap, centerline deviation, coverage width/variation, contour closure, parallel separation.
+- [ ] Проверить segmentation masks на blank-board reference и исключить курсор/UI.
+- [ ] После количественного аудита выполнить targeted reruns исправленных V1/V3, если доступна игровая сессия.
+
+Отчёт текущего скрининга: [CHALK_INT006_PNG_SCREENING_2026-11-02.md](CHALK_INT006_PNG_SCREENING_2026-11-02.md). INT-006 остаётся IN_PROGRESS; production defaults/estimator не менять.
