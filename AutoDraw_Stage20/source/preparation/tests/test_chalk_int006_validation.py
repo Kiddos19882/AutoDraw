@@ -203,3 +203,38 @@ def test_analyzer_rejects_changed_geometry_prediction_binding(tmp_path):
     assert result["accepted_count"] == 0
     assert result["status"] == "incomplete"
     assert result["rejected"][0]["reason"] == "geometry_signature_mismatch"
+
+
+def test_analyzer_accepts_original_windows_experiment_path_after_relocation(tmp_path):
+    series_id = "int006-relocated-path-series"
+    plan = build_chalk_test_block_plan(series_id=series_id, phase_id="INT006", seed=7)
+    journal_path = tmp_path / "int006-block.json"
+    create_chalk_test_block_journal(journal_path, plan)
+    results_dir = tmp_path / "results"
+    results_dir.mkdir()
+
+    task = claim_next_chalk_block_task(journal_path)
+    assert task is not None
+    actual = round(plan["prediction_artifact"]["predictions"][task["prediction_id"]]["predicted_chalk"])
+    manifest_path = _write_capture(results_dir, plan, task, plan["prediction_artifact"], actual)
+    finish_chalk_block_task(
+        journal_path,
+        task["task_id"],
+        accepted=True,
+        experiment_id=f"exp-{task['task_id']}",
+        experiment_dir=manifest_path.parent,
+    )
+
+    journal = json.loads(journal_path.read_text(encoding="utf-8"))
+    journal_task = next(item for item in journal["tasks"] if item["task_id"] == task["task_id"])
+    slash = chr(92)
+    journal_task["attempts"][0]["experiment_dir"] = slash.join([
+        "C:", "Users", "Kiddos", "Desktop", "autodraw-g3-preflight-build",
+        "data", "results", "brush_behavior_tests", manifest_path.parent.name,
+    ])
+    journal_path.write_text(json.dumps(journal, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    result = analyze_int006_validation(journal_path, results_dir)
+    assert result["accepted_count"] == 1
+    assert result["rejected"] == []
+    assert len(result["missing_cells"]) == 44
