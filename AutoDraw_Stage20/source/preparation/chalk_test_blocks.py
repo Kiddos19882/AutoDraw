@@ -17,6 +17,7 @@ from chalk_experiment_matrix import (
     G3_POINT_STEPS,
     G3_POINT_DELAYS_MS,
     PHASE_SCENARIOS,
+    LEGACY_V_SCENARIO_PHASES,
     V_SAMPLING_PROFILES,
 )
 
@@ -374,6 +375,10 @@ def _validate_chalk_test_block_journal(document: Any, path: Path) -> dict[str, A
             raise ValueError(f"Журнал G3 должен содержать все 27 уникальных ячеек: {path}")
     elif phase_id in {"V1", "V2", "V3", "V4", "V5"}:
         scenario_id = PHASE_SCENARIOS[phase_id][0]
+        compatible_scenarios = {scenario_id, *(
+            legacy_id for legacy_id, legacy_phase in LEGACY_V_SCENARIO_PHASES.items()
+            if legacy_phase == phase_id
+        )}
         expected_cells = {
             (step, delay, repeat)
             for step, delay in V_SAMPLING_PROFILES
@@ -381,6 +386,7 @@ def _validate_chalk_test_block_journal(document: Any, path: Path) -> dict[str, A
         }
         observed_cells = set()
         observed_order_indices = set()
+        observed_scenarios = set()
         for task in tasks:
             parameters = task.get("executor_parameters")
             if not isinstance(parameters, dict):
@@ -388,6 +394,7 @@ def _validate_chalk_test_block_journal(document: Any, path: Path) -> dict[str, A
             step, delay = parameters.get("point_step_px"), parameters.get("point_delay_ms")
             repeat_index = task.get("repeat_index")
             order_index = task.get("matrix_order_index")
+            task_scenario_id = task.get("scenario_id")
             cell = (step, delay, repeat_index)
             expected_parameters = dict(GEOMETRY_EXECUTOR_CONFIG)
             expected_parameters.update({"point_step_px": step, "point_delay_ms": delay})
@@ -397,8 +404,8 @@ def _validate_chalk_test_block_journal(document: Any, path: Path) -> dict[str, A
                 or isinstance(repeat_index, bool) or not isinstance(repeat_index, int)
                 or isinstance(order_index, bool) or not isinstance(order_index, int)
                 or order_index < 1 or order_index > 9 or order_index in observed_order_indices
-                or task.get("scenario_id") != scenario_id
-                or task.get("expected_strokes") != EXPECTED_STROKES[scenario_id]
+                or task_scenario_id not in compatible_scenarios
+                or task.get("expected_strokes") != EXPECTED_STROKES.get(task_scenario_id)
                 or task.get("requested_radius") != 10
                 or parameters != expected_parameters
                 or cell not in expected_cells
@@ -407,6 +414,7 @@ def _validate_chalk_test_block_journal(document: Any, path: Path) -> dict[str, A
                 raise ValueError(f"Некорректная или повторная ячейка {phase_id} в журнале: {path}")
             observed_cells.add(cell)
             observed_order_indices.add(order_index)
+            observed_scenarios.add(task_scenario_id)
         expected_parameter_matrix = [
             {"point_step_px": step, "point_delay_ms": delay}
             for step, delay in V_SAMPLING_PROFILES
@@ -414,6 +422,7 @@ def _validate_chalk_test_block_journal(document: Any, path: Path) -> dict[str, A
         if (
             observed_cells != expected_cells
             or observed_order_indices != set(range(1, 10))
+            or len(observed_scenarios) != 1
             or len(tasks) != 9
             or document.get("executor_parameters") != GEOMETRY_EXECUTOR_CONFIG
             or document.get("executor_parameter_matrix") != expected_parameter_matrix
