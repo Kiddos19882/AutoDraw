@@ -392,3 +392,35 @@ def test_g3_analyzer_keeps_nine_executor_configurations_separate_and_complete(tm
         for row in result["scenarios"]
     } == {(step, delay) for step in (1, 2, 4) for delay in (5, 10, 20)}
     assert all(row["valid_repeat_count"] == 3 for row in result["scenarios"])
+
+
+@pytest.mark.parametrize(
+    ("phase", "scenario", "count", "profile"),
+    [
+        ("V1", "int006_diagonals", 6, (2, 10)),
+        ("V2", "int006_short_strokes", 6, (4, 5)),
+        ("V3", "int006_turns", 3, (4, 10)),
+        ("V4", "int006_closed_contours", 3, (2, 10)),
+        ("V5", "int006_intersections_spacing", 10, (4, 5)),
+    ],
+)
+def test_int006_scenarios_accept_declared_sampling_profiles(phase, scenario, count, profile):
+    parameters = dict(GEOMETRY_EXECUTOR_CONFIG)
+    parameters.update({"point_step_px": profile[0], "point_delay_ms": profile[1]})
+    metadata = build_chalk_experiment_matrix_metadata(
+        series_id="int006-series", scenario_id=scenario, repeat_index=1,
+        requested_radius=10, strokes=_strokes(count), executor_parameters=parameters,
+    )
+    assert metadata["phase_id"] == phase
+    assert metadata["expected_strokes"] == count
+
+
+def test_int006_matrix_rejects_unplanned_sampling_profile():
+    parameters = dict(GEOMETRY_EXECUTOR_CONFIG)
+    parameters.update({"point_step_px": 1, "point_delay_ms": 5})
+    with pytest.raises(ValueError, match="V1–V5"):
+        build_chalk_experiment_matrix_metadata(
+            series_id="int006-series", scenario_id="int006_diagonals",
+            repeat_index=1, requested_radius=10, strokes=_strokes(6),
+            executor_parameters=parameters,
+        )
