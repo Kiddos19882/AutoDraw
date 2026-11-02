@@ -282,3 +282,26 @@ V1–V5 подключены к существующему lifecycle G3. Отд�
 - каждый V-блок содержит ровно девять уникальных profile/repeat cells.
 
 **CI подтверждён:** GitHub Actions run [#1886](https://github.com/Kiddos19882/AutoDraw/actions/runs/41376333639) для кодового HEAD `b60d9aef5b9a95ebefa85f42d99956f181bec7ee` завершился `success`. Успешны jobs: Application integration tests, Executor regression tests, Game Monitor and bridge tests, Preparation and G3 matrix tests, Windows portable build and startup smoke-test. Optional algorithm benchmarks — `skipped` (необязательный job). Все шесть последующих коммитов до branch HEAD `400becf` изменяли только документацию: `CHALK_INT006_EXECUTION_PROTOCOL`, `CHALK_NEXT_STEPS_PLAN`, `PROJECT_STATUS`, `WORK_LOG`; код после проверенного CI не менялся. Commit-status endpoint возвращает пустой список statuses, поэтому источником подтверждения является непосредственно workflow run и его jobs. Live captures не запускались.
+
+
+## 15. Live captures V1–V5 — результаты 2026-11-02
+
+Все пять block journals сохранены в data commit [6479536](https://github.com/Kiddos19882/AutoDraw/commit/64795362aa1bf4d0a3587e119b8c959242be6181); GitHub Actions [run #1887](https://github.com/Kiddos19882/AutoDraw/actions/runs/41384186201) завершился success. В каждом блоке 9/9 задач completed, итого 45/45.
+
+Все 45 captures прошли telemetry acceptance: executor completed, ожидаемое число strokes, monitor_capture saved, exact CHALK, point_delta_matches_chalk=true, radius=10, dropped events/Monitor errors/Bridge failures/sequence gaps/per-run buffer drops равны нулю. Сумма per-stroke pointDelta, сгруппированная по stroke_id, совпала с exact CHALK; non-consuming stroke candidates отсутствуют.
+
+Средний расход P0/P1/P2 (step2/delay10; step4/delay5; step4/delay10):
+
+| Фаза | P0 | P1 | P2 | Снижение P1/P2 |
+|---|---:|---:|---:|---:|
+| V1 диагонали | 243.67 | 126.67 | 127.33 | 48.0% / 47.7% |
+| V2 короткие | 20.00 | 15.00 | 15.33 | 25.0% / 23.3% |
+| V3 повороты | 380.67 | 193.67 | 193.67 | 49.1% / 49.1% |
+| V4 контуры | 448.67 | 229.00 | 229.67 | 49.0% / 48.8% |
+| V5 пересечения/параллели | 441.33 | 229.33 | 229.00 | 48.0% / 48.1% |
+
+G1 per-stroke модель `1.765 + 0.2988×L` проверена без refit на 66 новых штрихах P0 из V1/V3/V4/V5: MAE 1.09, RMSE 1.33, bias −1.04, MAPE 1.71%, максимальная абсолютная ошибка 4.12. Короткие strokes V2 исключены из этой метрики, поскольку для них требуется отдельный lookup. Step=4 fits около 0.149 CHALK/logical px остаются исследовательскими, так как построены на той же выборке.
+
+Визуальный обзор PNG выявил непреднамеренные пересечения в V1 (slope_050 × negative_shallow, (340,80)) и V3 (right_angle × acute_zigzag, около (233.33,100)). V2 при radius=10 показывает точечные следы коротких движений; V5 spacing=8 logical px сливает параллельные линии, spacing=24 оставляет их раздельными. Pixel-level gap/centerline/width metrics ещё не рассчитаны.
+
+Полная сводка, raw repeat values, V2 lookup и ограничения: [CHALK_INT006_V1_V5_RESULTS_2026-11-02.md](CHALK_INT006_V1_V5_RESULTS_2026-11-02.md). INT-006 остаётся IN_PROGRESS; production defaults и estimator не менялись.
