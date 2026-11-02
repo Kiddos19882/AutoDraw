@@ -201,14 +201,14 @@ def parallel_pairs(geometries: list[dict[str, Any]], masks: list[np.ndarray], sc
             ma, mb = masks[i], masks[j]
             overlap = int(np.count_nonzero((ma > 0) & (mb > 0)))
             if np.any(ma) and np.any(mb):
-                touching = bool(np.any((cv2.dilate(ma, np.ones((3, 3), np.uint8)) > 0) & (mb > 0)))
                 dm = cv2.distanceTransform((mb == 0).astype(np.uint8), cv2.DIST_L2, 5)
                 distance = float(np.min(dm[ma > 0]))
+                touching = bool(distance <= max(5.0, scale * 3.0))
             else:
                 touching, distance = False, None
             result.append({"stroke_a": a["name"], "stroke_b": b["name"],
                 "axis_separation_logical": round(separation / scale, 4), "axis_angle_difference_deg": round(angle, 4),
-                "candidate_mask_overlap_pixels": overlap, "candidate_masks_touch_or_merge": touching,
+                "assigned_mask_overlap_pixels": overlap, "assigned_ink_masks_touch_or_merge": touching,
                 "minimum_ink_mask_distance_px": round(distance, 4) if distance is not None else None,
                 "minimum_ink_mask_distance_logical": round(distance / scale, 4) if distance is not None else None})
     return result
@@ -234,6 +234,7 @@ def analyse_capture(folder: Path, out: Path) -> dict[str, Any]:
     after_g = cv2.cvtColor(after, cv2.COLOR_BGR2GRAY)
     gs = [geometry(s, sx, sy) for s in raw_strokes]
     radius = float(matrix.get("requested_radius", 10) or 10)
+    corridor = max(7.0, radius * scale * .65 + 1.0)
     cursor = cursor_mask(before_g, after_g, gs[-1]["points"][-1])
     ink = (((before_g.astype(np.int16) - after_g.astype(np.int16)) >= 22) & (after_g <= 205)).astype(np.uint8) * 255
     ink[cursor > 0] = 0
@@ -246,7 +247,7 @@ def analyse_capture(folder: Path, out: Path) -> dict[str, Any]:
         nearest = order[:, 0]
         best = dists[np.arange(len(x)), nearest]
         second = dists[np.arange(len(x)), order[:, 1]] if len(gs) > 1 else np.full(len(x), np.inf)
-        in_corridor = best <= max(12.0, radius * scale * 2.0 + 3)
+        in_corridor = best <= corridor
         ambiguous_pixels = in_corridor & ((second - best) <= max(2.0, scale * 1.5))
     else:
         nearest, in_corridor, ambiguous_pixels = np.empty(0, int), np.empty(0, bool), np.empty(0, bool)
@@ -256,7 +257,7 @@ def analyse_capture(folder: Path, out: Path) -> dict[str, Any]:
         ambiguous_mask = cv2.dilate(ambiguous_mask, np.ones((3, 3), np.uint8), iterations=1)
     assigned_masks, candidate_masks, stroke_rows = [], [], []
     for i, g in enumerate(gs):
-        candidate = (dists[:, i] <= max(12.0, radius * scale * 2.0 + 3)) if len(x) else np.empty(0, bool)
+        candidate = (dists[:, i] <= corridor) if len(x) else np.empty(0, bool)
         assigned = ((nearest == i) & in_corridor & ~ambiguous_pixels) if len(x) else np.empty(0, bool)
         cm, am = np.zeros((h, w), np.uint8), np.zeros((h, w), np.uint8)
         if len(x) and np.any(candidate): cm[y[candidate], x[candidate]] = 255
@@ -265,7 +266,7 @@ def analyse_capture(folder: Path, out: Path) -> dict[str, Any]:
         stroke_rows.append(stroke_metrics(g, am, int(np.count_nonzero(candidate)),
             int(np.count_nonzero(candidate & ambiguous_pixels)) if len(x) else 0,
             cursor, ambiguous_mask, scale, radius))
-    pairs = parallel_pairs(gs, candidate_masks, scale)
+    pairs = parallel_pairs(gs, assigned_masks, scale)
     errors = capture_errors(manifest, monitor, expected)
     summary = {
         "experiment_id": manifest.get("experiment_id"), "experiment_dir": str(folder),
@@ -360,7 +361,7 @@ def run(results_dir: Path, out: Path, expected_runs: int = 45) -> dict[str, Any]
                     "exact_chalk": r["exact_chalk"], "capture_valid": r["capture_valid"], **stroke})
     pair_fields = ["experiment_id", "phase_id", "scenario_id", "repeat_index", "point_step_px",
         "point_delay_ms", "capture_valid", "stroke_a", "stroke_b", "axis_separation_logical",
-        "axis_angle_difference_deg", "candidate_mask_overlap_pixels", "candidate_masks_touch_or_merge",
+        "axis_angle_difference_deg", "assigned_mask_overlap_pixels", "assigned_ink_masks_touch_or_merge",
         "minimum_ink_mask_distance_px", "minimum_ink_mask_distance_logical"]
     with (out / "parallel_pair_metrics.csv").open("w", encoding="utf-8-sig", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=pair_fields, extrasaction="ignore"); writer.writeheader()
