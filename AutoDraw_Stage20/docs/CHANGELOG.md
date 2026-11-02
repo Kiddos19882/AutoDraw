@@ -1,6 +1,15 @@
 # История изменений документации и проекта
 
 
+## 2026-11-03 — INT006R software gate PASS
+
+- Полный workflow [41540054975](https://github.com/Kiddos19882/AutoDraw/actions/runs/41540054975) на code HEAD `28b56a9` завершился SUCCESS.
+- Preparation/G3: 682 passed, 82 subtests passed, 24 warnings; Application integration, Executor regression, Game Monitor/Bridge, INT-006 PNG audit и Windows portable build/startup smoke-test — success.
+- Положительный synthetic analyzer fixture подтвердил полный 45/45 набор с Monitor и PNG evidence; визуальная оценка остаётся отдельным manual gate.
+- INT006R live captures не запускались. Следующий этап — локальный Windows preflight и контролируемая live matrix. Production estimator/defaults и master не менялись.
+
+
+
 ## 2026-11-03 — реализация отдельной фазы INT006R
 
 - Добавлены phase/scenario contracts для D1–D5R, радиусов 1/10/30 и фиксированного P1 (step=4, delay=5 ms).
