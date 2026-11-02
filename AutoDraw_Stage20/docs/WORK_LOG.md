@@ -2034,3 +2034,32 @@ Brush Test acceptance и матричные валидаторы больше н
 - Preparation/G3 job завершился результатом `662 passed, 82 subtests passed`; Application integration, Executor regression, Game Monitor/bridge, Windows portable build и INT-006 PNG audit также завершились success. Optional benchmarks skipped.
 - CI gate для legacy V2/V5 journal compatibility закрыт. Ранее внесённая отметка о неподтверждённом CI исправлена; повторный запуск не требуется.
 - Следующий gate INT-006 — live independent validation по пяти новым DrawingPlan из `CHALK_INT006_INDEPENDENT_VALIDATION_PLAN_2026-11-02.md`.
+
+
+## 2026-11-02 — аудит готовности независимой validation INT-006
+
+**Рабочая ветка:** `feature/image-geometry-optimization`  
+**Результат:** D1–D5 live validation заблокирована до расширения текущего experiment harness.
+
+**Проверены исходники:**
+- `source/preparation/chalk_experiment_matrix.py`;
+- `source/preparation/chalk_test_blocks.py`;
+- `source/preparation/brush_behavior_test_ui.py`;
+- `integrated_app.py`;
+- `tests/analyze_chalk_experiment_matrix.py`.
+
+**Выводы:**
+- D1–D5 отсутствуют в matrix phase/scenario contract и expected stroke counts.
+- Block planner/journal поддерживает G1/G2/G3/V1–V5, но не единый 45-cell validation block.
+- Brush Test UI содержит V1–V5 и V2/V5 follow-up, но не независимые DrawingPlan D1–D5.
+- Executor handoff разрешает override для G3/V1–V5, но не для новой INT006 phase.
+- Analyzer принимает exact telemetry manifests и агрегирует повторы, но пока не сопоставляет их с immutable prediction records и не считает residual/MAE/RMSE/bias по frozen model.
+
+**Документация:**
+- Создан `CHALK_INT006_HARNESS_READINESS_AUDIT_2026-11-02.md`.
+- Статус `CHALK_INT006_INDEPENDENT_VALIDATION_PLAN_2026-11-02.md` исправлен с READY FOR LIVE VALIDATION на BLOCKED.
+- Синхронизированы PROJECT_STATUS, TASKS и ROADMAP.
+
+**Границы:** код и тесты не изменялись; CI и Windows preflight не запускались; live captures не выполнялись. Production estimator/defaults, исходные экспериментальные данные и master не менялись.
+
+**Следующий шаг:** расширить существующий matrix/block/UI/executor/analyzer контракт отдельной INT006 phase, добавить regression tests, пройти полный CI и только затем подготовить локальный Windows 10 preflight.
