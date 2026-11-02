@@ -137,11 +137,11 @@ def build_chalk_test_block_plan(
     if phase_id not in BLOCK_PHASES:
         raise ValueError(f"Неизвестный блок CHALK: {phase_id!r}.")
     if isinstance(repeats, bool) or not isinstance(repeats, int) or repeats != 3:
-        raise ValueError("Для G1/G2/G3/V1-V5 требуется ровно три независимых повтора.")
+        raise ValueError("Для G1/G2/G3/V1-V5/INT006 требуется ровно три независимых повтора.")
     if isinstance(seed, bool) or not isinstance(seed, int):
         raise ValueError("Seed порядка тестов должен быть целым числом.")
     if isinstance(radius, bool) or not isinstance(radius, int) or radius != 10:
-        raise ValueError("Для блоков G1/G2/G3/V1-V5 требуется фиксированный радиус 10.")
+        raise ValueError("Для блоков G1/G2/G3/V1-V5/INT006 требуется фиксированный радиус 10.")
 
     scenarios = PHASE_SCENARIOS[phase_id]
     if phase_id == "G3":
@@ -161,7 +161,7 @@ def build_chalk_test_block_plan(
                         "requested_radius": radius,
                         "executor_parameters": parameters,
                     })
-    elif phase_id in {"V1", "V2", "V3", "V4", "V5"}:
+    elif phase_id in {"V1", "V2", "V3", "V4", "V5", "INT006"}:
         cells = []
         for point_step_px, point_delay_ms in V_SAMPLING_PROFILES:
             parameters = dict(GEOMETRY_EXECUTOR_CONFIG)
@@ -194,7 +194,7 @@ def build_chalk_test_block_plan(
         task_id = (
             f"{cell['scenario_id']}-s{parameters['point_step_px']}-"
             f"d{parameters['point_delay_ms']}-r{cell['repeat_index']}"
-            if phase_id == "G3" or phase_id.startswith("V")
+            if phase_id == "G3" or phase_id.startswith("V") or phase_id == "INT006"
             else f"{cell['scenario_id']}-r{cell['repeat_index']}"
         )
         tasks.append({
@@ -222,7 +222,7 @@ def build_chalk_test_block_plan(
                 [
                     {"point_step_px": step, "point_delay_ms": delay}
                     for step, delay in V_SAMPLING_PROFILES
-                ] if phase_id.startswith("V") else [dict(GEOMETRY_EXECUTOR_CONFIG)]
+                ] if phase_id.startswith("V") or phase_id == "INT006" else [dict(GEOMETRY_EXECUTOR_CONFIG)]
             )
         ),
         "expected_task_count": len(tasks),
@@ -373,6 +373,55 @@ def _validate_chalk_test_block_journal(document: Any, path: Path) -> dict[str, A
             or document.get("executor_parameter_matrix") != expected_parameter_matrix
         ):
             raise ValueError(f"Журнал G3 должен содержать все 27 уникальных ячеек: {path}")
+    elif phase_id == "INT006":
+        expected_cells = {
+            (scenario_id, step, delay, repeat)
+            for scenario_id in PHASE_SCENARIOS[phase_id]
+            for step, delay in V_SAMPLING_PROFILES
+            for repeat in (1, 2, 3)
+        }
+        observed_cells = set()
+        observed_order_indices = set()
+        for task in tasks:
+            parameters = task.get("executor_parameters")
+            if not isinstance(parameters, dict):
+                raise ValueError(f"В INT006-задаче {task['task_id']!r} отсутствуют параметры исполнителя: {path}")
+            step, delay = parameters.get("point_step_px"), parameters.get("point_delay_ms")
+            repeat_index = task.get("repeat_index")
+            order_index = task.get("matrix_order_index")
+            scenario_id = task.get("scenario_id")
+            cell = (scenario_id, step, delay, repeat_index)
+            expected_parameters = dict(GEOMETRY_EXECUTOR_CONFIG)
+            expected_parameters.update({"point_step_px": step, "point_delay_ms": delay})
+            if (
+                scenario_id not in PHASE_SCENARIOS[phase_id]
+                or isinstance(step, bool) or not isinstance(step, int)
+                or isinstance(delay, bool) or not isinstance(delay, int)
+                or isinstance(repeat_index, bool) or not isinstance(repeat_index, int)
+                or isinstance(order_index, bool) or not isinstance(order_index, int)
+                or order_index < 1 or order_index > 45 or order_index in observed_order_indices
+                or task.get("expected_strokes") != EXPECTED_STROKES.get(scenario_id)
+                or task.get("requested_radius") != 10
+                or parameters != expected_parameters
+                or (step, delay) not in V_SAMPLING_PROFILES
+                or cell not in expected_cells
+                or cell in observed_cells
+            ):
+                raise ValueError(f"Некорректная или повторная ячейка INT006 в журнале: {path}")
+            observed_cells.add(cell)
+            observed_order_indices.add(order_index)
+        expected_parameter_matrix = [
+            {"point_step_px": step, "point_delay_ms": delay}
+            for step, delay in V_SAMPLING_PROFILES
+        ]
+        if (
+            observed_cells != expected_cells
+            or observed_order_indices != set(range(1, 46))
+            or len(tasks) != 45
+            or document.get("executor_parameters") != GEOMETRY_EXECUTOR_CONFIG
+            or document.get("executor_parameter_matrix") != expected_parameter_matrix
+        ):
+            raise ValueError(f"Журнал INT006 должен содержать все 45 уникальных ячеек: {path}")
     elif phase_id in {"V1", "V2", "V3", "V4", "V5"}:
         scenario_id = PHASE_SCENARIOS[phase_id][0]
         compatible_scenarios = {scenario_id, *(
