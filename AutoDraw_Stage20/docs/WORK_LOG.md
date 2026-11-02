@@ -1806,3 +1806,15 @@ Brush Test acceptance и матричные валидаторы больше н
 - Создан `CHALK_NEXT_STEPS_PLAN_2026-11-02.md`: геометрическая validation step=4, независимая validation модели, метрики ошибки, safety margin, затем INT-007—INT-009.
 - Синхронизированы G3 Results, preliminary model, ROADMAP и docs README.
 - Исходный код, тесты, конфигурация и первичные экспериментальные данные не менялись; live-эксперименты и workflows не запускались.
+
+
+## 2026-11-02 — фиксация и старт INT-006
+
+- Проверена рабочая ветка `feature/image-geometry-optimization`; исходный HEAD перед записью протокола: `7ea3868248648aed74979f4fab00c5c2e8f878c6`.
+- Сверены README, docs index, PROJECT_STATUS, TASKS, ROADMAP, CHALK plan/model и результаты G1/G2/G3.
+- Создан `docs/CHALK_INT006_EXECUTION_PROTOCOL_2026-11-02.md`: профили P0/P1/P2, сценарии V1–V5, 45 captures, обязательные поля, acceptance/rejection, quality metrics, independent validation и условия safety margin.
+- Проверены `chalk_experiment_matrix.py`, `chalk_test_blocks.py`, `brush_behavior_test_ui.py`, `mouse_executor.py` и `drawing_plan.py`.
+- Найдено ограничение: текущий экспериментальный контракт содержит G1/G2/G3, но не V1–V5. Запускать новые сценарии через текущий runner без расширения matrix/block/UI/analyzer небезопасно.
+- Статус INT-006 сохранён IN_PROGRESS; production executor defaults, estimator и исходные экспериментальные данные не изменялись.
+- Live captures, CI/workflows не запускались.
+- Следующий шаг: расширить экспериментальный harness под V1–V5 и покрыть его regression/orchestration tests.
