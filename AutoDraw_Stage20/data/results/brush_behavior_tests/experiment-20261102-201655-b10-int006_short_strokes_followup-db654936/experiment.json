@@ -1,0 +1,901 @@
+{
+  "schema_version": 1,
+  "record_type": "autodraw_brush_paint_experiment",
+  "experiment_id": "db654936430e4a1aad49d18fccfd863b",
+  "chalk_radius_matrix": null,
+  "chalk_experiment_matrix": {
+    "schema_version": 1,
+    "series_id": "chalk-20261102-201206-f49bcb",
+    "phase_id": "V2",
+    "scenario_id": "int006_short_strokes_followup",
+    "repeat_index": 2,
+    "matrix_order_index": 9,
+    "planned_repeats": 3,
+    "requested_radius": 10,
+    "expected_strokes": 5,
+    "geometry_signature": "cf46934e869202959a4f9d5f3c00d75986d4f5b52b069d2501b771a538f47dfe",
+    "planned_strokes": [
+      {
+        "closed": false,
+        "metadata": {
+          "line_extension_px_override": 0.0,
+          "role": "brush_behavior_test",
+          "test_case": "int006_short_strokes_followup"
+        },
+        "name": "length_12_horizontal",
+        "points": [
+          {
+            "x": 25.0,
+            "y": 35.0
+          },
+          {
+            "x": 37.0,
+            "y": 35.0
+          }
+        ]
+      },
+      {
+        "closed": false,
+        "metadata": {
+          "line_extension_px_override": 0.0,
+          "role": "brush_behavior_test",
+          "test_case": "int006_short_strokes_followup"
+        },
+        "name": "length_16_vertical",
+        "points": [
+          {
+            "x": 90.0,
+            "y": 72.0
+          },
+          {
+            "x": 90.0,
+            "y": 88.0
+          }
+        ]
+      },
+      {
+        "closed": false,
+        "metadata": {
+          "line_extension_px_override": 0.0,
+          "role": "brush_behavior_test",
+          "test_case": "int006_short_strokes_followup"
+        },
+        "name": "length_20_diagonal",
+        "points": [
+          {
+            "x": 150.0,
+            "y": 110.0
+          },
+          {
+            "x": 162.0,
+            "y": 126.0
+          }
+        ]
+      },
+      {
+        "closed": false,
+        "metadata": {
+          "line_extension_px_override": 0.0,
+          "role": "brush_behavior_test",
+          "test_case": "int006_short_strokes_followup"
+        },
+        "name": "length_24_horizontal",
+        "points": [
+          {
+            "x": 250.0,
+            "y": 170.0
+          },
+          {
+            "x": 274.0,
+            "y": 170.0
+          }
+        ]
+      },
+      {
+        "closed": false,
+        "metadata": {
+          "line_extension_px_override": 0.0,
+          "role": "brush_behavior_test",
+          "test_case": "int006_short_strokes_followup"
+        },
+        "name": "length_30_vertical",
+        "points": [
+          {
+            "x": 370.0,
+            "y": 195.0
+          },
+          {
+            "x": 370.0,
+            "y": 225.0
+          }
+        ]
+      }
+    ],
+    "executor_parameters": {
+      "point_step_px": 2,
+      "line_extension_px": 0,
+      "point_delay_ms": 10,
+      "after_mouse_up_ms": 20,
+      "before_mouse_down_ms": 20,
+      "after_mouse_down_ms": 40,
+      "end_hold_ms": 50,
+      "countdown_seconds": 5
+    }
+  },
+  "chalk_test_block": {
+    "block_id": "9a74106757d74c51ad2f2e8f6521d741",
+    "task_id": "int006_short_strokes_followup-s2-d10-r2",
+    "phase_id": "V2"
+  },
+  "updated_at_utc": "2026-11-02T17:17:29+00:00",
+  "test_case": "int006_short_strokes_followup",
+  "brush_value_requested": 10,
+  "drawing_plan_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\brush-plan-int006_short_strokes_followup-b10-20261102-201655-db654936.json",
+  "execution_report_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\execution_20261102_201714_684504_0accd0.json",
+  "execution_report": {
+    "status": "completed",
+    "completed_strokes": 5,
+    "total_strokes": 5,
+    "started_at": "2026-11-02T20:17:07+03:00",
+    "ended_at": "2026-11-02T20:17:14+03:00",
+    "duration_seconds": 6.984,
+    "move_calls": 72,
+    "error": null,
+    "stop_reason": null,
+    "mouse_release": {
+      "attempted": true,
+      "succeeded": true,
+      "errors": []
+    },
+    "executor_config": {
+      "point_step_px": 2,
+      "line_extension_px": 0.0,
+      "point_delay_ms": 10,
+      "after_mouse_up_ms": 20,
+      "before_mouse_down_ms": 20,
+      "after_mouse_down_ms": 40,
+      "end_hold_ms": 50,
+      "countdown_seconds": 5
+    }
+  },
+  "game_monitor_report_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-201655-b10-int006_short_strokes_followup-db654936\\monitor_report.json",
+  "game_monitor_summary": {
+    "source": "loopback_websocket_bridge",
+    "autodraw_experiment_id": "db654936430e4a1aad49d18fccfd863b",
+    "chalk_radius_matrix": null,
+    "chalk_experiment_matrix": {
+      "schema_version": 1,
+      "series_id": "chalk-20261102-201206-f49bcb",
+      "phase_id": "V2",
+      "scenario_id": "int006_short_strokes_followup",
+      "repeat_index": 2,
+      "matrix_order_index": 9,
+      "planned_repeats": 3,
+      "requested_radius": 10,
+      "expected_strokes": 5,
+      "geometry_signature": "cf46934e869202959a4f9d5f3c00d75986d4f5b52b069d2501b771a538f47dfe",
+      "planned_strokes": [
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "int006_short_strokes_followup"
+          },
+          "name": "length_12_horizontal",
+          "points": [
+            {
+              "x": 25.0,
+              "y": 35.0
+            },
+            {
+              "x": 37.0,
+              "y": 35.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "int006_short_strokes_followup"
+          },
+          "name": "length_16_vertical",
+          "points": [
+            {
+              "x": 90.0,
+              "y": 72.0
+            },
+            {
+              "x": 90.0,
+              "y": 88.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "int006_short_strokes_followup"
+          },
+          "name": "length_20_diagonal",
+          "points": [
+            {
+              "x": 150.0,
+              "y": 110.0
+            },
+            {
+              "x": 162.0,
+              "y": 126.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "int006_short_strokes_followup"
+          },
+          "name": "length_24_horizontal",
+          "points": [
+            {
+              "x": 250.0,
+              "y": 170.0
+            },
+            {
+              "x": 274.0,
+              "y": 170.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "int006_short_strokes_followup"
+          },
+          "name": "length_30_vertical",
+          "points": [
+            {
+              "x": 370.0,
+              "y": 195.0
+            },
+            {
+              "x": 370.0,
+              "y": 225.0
+            }
+          ]
+        }
+      ],
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      }
+    },
+    "run_id": "7a86ed64-189e-42e4-84b0-c7d79355d0c6",
+    "session_id": "ee3f841c-cef2-4c75-af0d-7bbd2b6d4cc1",
+    "execution_status": "completed",
+    "brush_radius": 10,
+    "observed_brush_radii": [
+      10.0
+    ],
+    "brush_radius_status": "single",
+    "chalk": {
+      "status": "exact",
+      "consumed_points": 38,
+      "pre_point_count": 1,
+      "post_point_count": 39,
+      "max_points": 6000
+    },
+    "sampled_point_delta_total": 38,
+    "point_delta_matches_chalk": true,
+    "stroke_count": 5,
+    "frame_probe": {
+      "status": "measured",
+      "frame_count": 91,
+      "average_fps": 59.999,
+      "median_fps": 60.024,
+      "median_interval_ms": 16.66,
+      "p95_interval_ms": 16.68,
+      "max_interval_ms": 16.68,
+      "visibility_interruption": false,
+      "stroke_probe_count": 5
+    },
+    "trajectory": {
+      "observed_segment_length_lower_bound": 104.104,
+      "accepted_sample_count": 38,
+      "status": "incomplete_until_verified",
+      "note": "Coalesced pointDelta values mean intermediate accepted coordinates may be missing."
+    },
+    "event_count": 91,
+    "dropped_events": 0,
+    "monitor_dropped_events": 0,
+    "monitor_buffer_dropped_events_start": 0,
+    "monitor_buffer_dropped_events_end": 0,
+    "monitor_buffer_dropped_events_delta": 0,
+    "monitor_error_count_delta": 0,
+    "bridge_send_failures_delta": 0,
+    "collector_sequence_gap_count": 0,
+    "monitor_error_count": 0,
+    "started_at_utc": "2026-11-02T17:17:12.802+00:00",
+    "finished_at_utc": "2026-11-02T17:17:17.596+00:00"
+  },
+  "monitor_capture": {
+    "status": "saved",
+    "transport": "loopback_websocket",
+    "match_reason": "matched_executor_window",
+    "experiment_id": "db654936430e4a1aad49d18fccfd863b",
+    "chalk_radius_matrix": null,
+    "chalk_experiment_matrix": {
+      "schema_version": 1,
+      "series_id": "chalk-20261102-201206-f49bcb",
+      "phase_id": "V2",
+      "scenario_id": "int006_short_strokes_followup",
+      "repeat_index": 2,
+      "matrix_order_index": 9,
+      "planned_repeats": 3,
+      "requested_radius": 10,
+      "expected_strokes": 5,
+      "geometry_signature": "cf46934e869202959a4f9d5f3c00d75986d4f5b52b069d2501b771a538f47dfe",
+      "planned_strokes": [
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "int006_short_strokes_followup"
+          },
+          "name": "length_12_horizontal",
+          "points": [
+            {
+              "x": 25.0,
+              "y": 35.0
+            },
+            {
+              "x": 37.0,
+              "y": 35.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "int006_short_strokes_followup"
+          },
+          "name": "length_16_vertical",
+          "points": [
+            {
+              "x": 90.0,
+              "y": 72.0
+            },
+            {
+              "x": 90.0,
+              "y": 88.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "int006_short_strokes_followup"
+          },
+          "name": "length_20_diagonal",
+          "points": [
+            {
+              "x": 150.0,
+              "y": 110.0
+            },
+            {
+              "x": 162.0,
+              "y": 126.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "int006_short_strokes_followup"
+          },
+          "name": "length_24_horizontal",
+          "points": [
+            {
+              "x": 250.0,
+              "y": 170.0
+            },
+            {
+              "x": 274.0,
+              "y": 170.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "int006_short_strokes_followup"
+          },
+          "name": "length_30_vertical",
+          "points": [
+            {
+              "x": 370.0,
+              "y": 195.0
+            },
+            {
+              "x": 370.0,
+              "y": 225.0
+            }
+          ]
+        }
+      ],
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      }
+    },
+    "session_id": "ee3f841c-cef2-4c75-af0d-7bbd2b6d4cc1",
+    "run_id": "7a86ed64-189e-42e4-84b0-c7d79355d0c6",
+    "source_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\game_monitor_bridge\\ee3f841c-cef2-4c75-af0d-7bbd2b6d4cc1\\game-monitor-run-20261102T171717596504Z-7a86ed64.json",
+    "report_path": "monitor_report.json",
+    "report_event_count": 91,
+    "dropped_events": 0,
+    "monitor_dropped_events": 0,
+    "monitor_buffer_dropped_events_start": 0,
+    "monitor_buffer_dropped_events_end": 0,
+    "monitor_buffer_dropped_events_delta": 0,
+    "monitor_error_count_delta": 0,
+    "bridge_send_failures_delta": 0,
+    "collector_sequence_gap_count": 0,
+    "monitor_error_count": 0,
+    "stroke_count": 5,
+    "expected_stroke_count": 5,
+    "point_delta_matches_chalk": true,
+    "brush_radius_status": "single",
+    "chalk_status": "exact",
+    "chalk_counter_consistent": true,
+    "captured_at_utc": "2026-11-02T17:17:21.678+00:00"
+  },
+  "calibration_profile_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\brush_paint_calibration.json",
+  "phases": {
+    "before_clear": {
+      "status": "restored_within_pixel_tolerance",
+      "board_clear_check": {
+        "status": "restored_within_pixel_tolerance",
+        "tolerance_percent": 0.15,
+        "changed_percent": 0.1047,
+        "comparison": {
+          "width": 581,
+          "height": 304,
+          "total_pixels": 176624,
+          "changed_pixels": 185,
+          "changed_percent": 0.1047,
+          "pixel_similarity_percent": 99.8953,
+          "mean_absolute_rgb_difference": 0.0939,
+          "exact_match": false,
+          "interpretation": "visual_pixel_comparison_only_not_a_reading_of_the_game_resource_counter"
+        },
+        "reference_type": "explicit_blank_board_roi",
+        "note": "Визуальное совпадение с отдельно сохранённым эталоном пустой доски; это не доказательство внутреннего состояния игры."
+      },
+      "captured_at_utc": "2026-11-02T17:16:59+00:00",
+      "screen_size": {
+        "width": 1920,
+        "height": 1080
+      },
+      "files": {
+        "full_screen": "before_clear-screen.png",
+        "board_roi": "before_clear-board.png",
+        "paint_meter_roi": "before_clear-paint-meter.png"
+      }
+    },
+    "before_draw": {
+      "captured_at_utc": "2026-11-02T17:16:59+00:00",
+      "screen_size": {
+        "width": 1920,
+        "height": 1080
+      },
+      "clear_check": {
+        "status": "restored_within_pixel_tolerance",
+        "tolerance_percent": 0.15,
+        "changed_percent": 0.1047,
+        "comparison": {
+          "width": 581,
+          "height": 304,
+          "total_pixels": 176624,
+          "changed_pixels": 185,
+          "changed_percent": 0.1047,
+          "pixel_similarity_percent": 99.8953,
+          "mean_absolute_rgb_difference": 0.0939,
+          "exact_match": false,
+          "interpretation": "visual_pixel_comparison_only_not_a_reading_of_the_game_resource_counter"
+        },
+        "reference_type": "explicit_blank_board_roi",
+        "note": "Визуальное совпадение с отдельно сохранённым эталоном пустой доски; это не доказательство внутреннего состояния игры."
+      },
+      "files": {
+        "full_screen": "before_clear-screen.png",
+        "board_roi": "before_clear-board.png",
+        "paint_meter_roi": "before_clear-paint-meter.png"
+      }
+    },
+    "brush_setup": {
+      "status": "confirmed_by_monitor_for_automated_block",
+      "requested_value": 10,
+      "observed_value": 10,
+      "verification_source": "active_game_monitor_bridge_heartbeat",
+      "session_id": "ee3f841c-cef2-4c75-af0d-7bbd2b6d4cc1",
+      "verified_at_utc": "2026-11-02T17:17:07.589+00:00",
+      "final_position": [
+        1250,
+        305
+      ],
+      "correction_count": 1,
+      "observations": [
+        {
+          "requested_radius": 10,
+          "observed_radius": 9,
+          "observed_at_utc": "2026-11-02T17:17:05.588+00:00",
+          "session_id": "ee3f841c-cef2-4c75-af0d-7bbd2b6d4cc1",
+          "position": [
+            1254,
+            305
+          ]
+        },
+        {
+          "requested_radius": 10,
+          "observed_radius": 10,
+          "observed_at_utc": "2026-11-02T17:17:07.589+00:00",
+          "session_id": "ee3f841c-cef2-4c75-af0d-7bbd2b6d4cc1",
+          "position": [
+            1250,
+            305
+          ]
+        }
+      ],
+      "visual_confirmation_required": false,
+      "confirmed_at_utc": "2026-11-02T17:17:07+00:00"
+    },
+    "execution": {
+      "status": "completed",
+      "report_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\execution_20261102_201714_684504_0accd0.json",
+      "summary": {
+        "status": "completed",
+        "completed_strokes": 5,
+        "total_strokes": 5,
+        "started_at": "2026-11-02T20:17:07+03:00",
+        "ended_at": "2026-11-02T20:17:14+03:00",
+        "duration_seconds": 6.984,
+        "move_calls": 72,
+        "error": null,
+        "stop_reason": null,
+        "mouse_release": {
+          "attempted": true,
+          "succeeded": true,
+          "errors": []
+        },
+        "executor_config": {
+          "point_step_px": 2,
+          "line_extension_px": 0.0,
+          "point_delay_ms": 10,
+          "after_mouse_up_ms": 20,
+          "before_mouse_down_ms": 20,
+          "after_mouse_down_ms": 40,
+          "end_hold_ms": 50,
+          "countdown_seconds": 5
+        }
+      },
+      "captured_at_utc": "2026-11-02T17:17:14+00:00"
+    },
+    "monitor_capture": {
+      "status": "saved",
+      "transport": "loopback_websocket",
+      "match_reason": "matched_executor_window",
+      "experiment_id": "db654936430e4a1aad49d18fccfd863b",
+      "chalk_radius_matrix": null,
+      "chalk_experiment_matrix": {
+        "schema_version": 1,
+        "series_id": "chalk-20261102-201206-f49bcb",
+        "phase_id": "V2",
+        "scenario_id": "int006_short_strokes_followup",
+        "repeat_index": 2,
+        "matrix_order_index": 9,
+        "planned_repeats": 3,
+        "requested_radius": 10,
+        "expected_strokes": 5,
+        "geometry_signature": "cf46934e869202959a4f9d5f3c00d75986d4f5b52b069d2501b771a538f47dfe",
+        "planned_strokes": [
+          {
+            "closed": false,
+            "metadata": {
+              "line_extension_px_override": 0.0,
+              "role": "brush_behavior_test",
+              "test_case": "int006_short_strokes_followup"
+            },
+            "name": "length_12_horizontal",
+            "points": [
+              {
+                "x": 25.0,
+                "y": 35.0
+              },
+              {
+                "x": 37.0,
+                "y": 35.0
+              }
+            ]
+          },
+          {
+            "closed": false,
+            "metadata": {
+              "line_extension_px_override": 0.0,
+              "role": "brush_behavior_test",
+              "test_case": "int006_short_strokes_followup"
+            },
+            "name": "length_16_vertical",
+            "points": [
+              {
+                "x": 90.0,
+                "y": 72.0
+              },
+              {
+                "x": 90.0,
+                "y": 88.0
+              }
+            ]
+          },
+          {
+            "closed": false,
+            "metadata": {
+              "line_extension_px_override": 0.0,
+              "role": "brush_behavior_test",
+              "test_case": "int006_short_strokes_followup"
+            },
+            "name": "length_20_diagonal",
+            "points": [
+              {
+                "x": 150.0,
+                "y": 110.0
+              },
+              {
+                "x": 162.0,
+                "y": 126.0
+              }
+            ]
+          },
+          {
+            "closed": false,
+            "metadata": {
+              "line_extension_px_override": 0.0,
+              "role": "brush_behavior_test",
+              "test_case": "int006_short_strokes_followup"
+            },
+            "name": "length_24_horizontal",
+            "points": [
+              {
+                "x": 250.0,
+                "y": 170.0
+              },
+              {
+                "x": 274.0,
+                "y": 170.0
+              }
+            ]
+          },
+          {
+            "closed": false,
+            "metadata": {
+              "line_extension_px_override": 0.0,
+              "role": "brush_behavior_test",
+              "test_case": "int006_short_strokes_followup"
+            },
+            "name": "length_30_vertical",
+            "points": [
+              {
+                "x": 370.0,
+                "y": 195.0
+              },
+              {
+                "x": 370.0,
+                "y": 225.0
+              }
+            ]
+          }
+        ],
+        "executor_parameters": {
+          "point_step_px": 2,
+          "line_extension_px": 0,
+          "point_delay_ms": 10,
+          "after_mouse_up_ms": 20,
+          "before_mouse_down_ms": 20,
+          "after_mouse_down_ms": 40,
+          "end_hold_ms": 50,
+          "countdown_seconds": 5
+        }
+      },
+      "session_id": "ee3f841c-cef2-4c75-af0d-7bbd2b6d4cc1",
+      "run_id": "7a86ed64-189e-42e4-84b0-c7d79355d0c6",
+      "source_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\game_monitor_bridge\\ee3f841c-cef2-4c75-af0d-7bbd2b6d4cc1\\game-monitor-run-20261102T171717596504Z-7a86ed64.json",
+      "report_path": "monitor_report.json",
+      "report_event_count": 91,
+      "dropped_events": 0,
+      "monitor_dropped_events": 0,
+      "monitor_buffer_dropped_events_start": 0,
+      "monitor_buffer_dropped_events_end": 0,
+      "monitor_buffer_dropped_events_delta": 0,
+      "monitor_error_count_delta": 0,
+      "bridge_send_failures_delta": 0,
+      "collector_sequence_gap_count": 0,
+      "monitor_error_count": 0,
+      "stroke_count": 5,
+      "expected_stroke_count": 5,
+      "point_delta_matches_chalk": true,
+      "brush_radius_status": "single",
+      "chalk_status": "exact",
+      "chalk_counter_consistent": true,
+      "captured_at_utc": "2026-11-02T17:17:21.678+00:00"
+    },
+    "after_draw": {
+      "status": "captured",
+      "captured_at_utc": "2026-11-02T17:17:24+00:00",
+      "screen_size": {
+        "width": 1920,
+        "height": 1080
+      },
+      "cursor_exclusion": {
+        "status": "moved_outside_board_before_capture",
+        "method": "mouse_up_then_move_without_click",
+        "screen_point": {
+          "x": 856,
+          "y": 624
+        },
+        "margin_px": 32,
+        "avoided_regions": [
+          "board_area",
+          "paint_meter_area"
+        ],
+        "destination_policy": "below_board_and_paint_meter"
+      },
+      "files": {
+        "full_screen": "after_draw-screen.png",
+        "board_roi": "after_draw-board.png",
+        "paint_meter_roi": "after_draw-paint-meter.png"
+      },
+      "paint_meter_measurement": {
+        "bar_width_px": 160,
+        "changed_columns": 2,
+        "color_distance_threshold": 24.0,
+        "method": "baseline_color_suffix_estimate",
+        "interpretation": "estimate_only_not_game_counter_or_OCR",
+        "status": "inconclusive",
+        "filled_width_px": null,
+        "fill_fraction": null,
+        "fill_percent": null,
+        "confidence": "low",
+        "note": "Изменения не образуют достаточно чёткую непрерывную правую часть шкалы."
+      },
+      "stroke_visibility_analysis": {
+        "status": "analyzed",
+        "stroke_count": 5,
+        "visible_change_count": 5,
+        "no_change_count": 0,
+        "ambiguous_count": 0,
+        "results": [
+          {
+            "name": "length_12_horizontal",
+            "status": "visible_change_detected",
+            "changed_pixels_in_roi": 315,
+            "roi": {
+              "x": 20,
+              "y": 33,
+              "width": 39,
+              "height": 24
+            },
+            "overlapping_stroke_indices": [],
+            "interpretation": "visual_roi_heuristic_not_game_acceptance"
+          },
+          {
+            "name": "length_16_vertical",
+            "status": "visible_change_detected",
+            "changed_pixels_in_roi": 398,
+            "roi": {
+              "x": 102,
+              "y": 79,
+              "width": 24,
+              "height": 45
+            },
+            "overlapping_stroke_indices": [],
+            "interpretation": "visual_roi_heuristic_not_game_acceptance"
+          },
+          {
+            "name": "length_20_diagonal",
+            "status": "visible_change_detected",
+            "changed_pixels_in_roi": 452,
+            "roi": {
+              "x": 178,
+              "y": 127,
+              "width": 39,
+              "height": 45
+            },
+            "overlapping_stroke_indices": [],
+            "interpretation": "visual_roi_heuristic_not_game_acceptance"
+          },
+          {
+            "name": "length_24_horizontal",
+            "status": "visible_change_detected",
+            "changed_pixels_in_roi": 533,
+            "roi": {
+              "x": 304,
+              "y": 203,
+              "width": 54,
+              "height": 24
+            },
+            "overlapping_stroke_indices": [],
+            "interpretation": "visual_roi_heuristic_not_game_acceptance"
+          },
+          {
+            "name": "length_30_vertical",
+            "status": "visible_change_detected",
+            "changed_pixels_in_roi": 623,
+            "roi": {
+              "x": 455,
+              "y": 235,
+              "width": 24,
+              "height": 62
+            },
+            "overlapping_stroke_indices": [],
+            "interpretation": "visual_roi_heuristic_not_game_acceptance"
+          }
+        ],
+        "note": "ROI могут включать эффекты кисти и фон; пересекающиеся ROI помечаются неоднозначными.",
+        "reference_file": "blank-board-reference.png",
+        "padding_px": 11,
+        "requested_brush_value": 10
+      }
+    },
+    "postdraw_workflow": {
+      "status": "completed",
+      "reason": "Результат сохранён; автоматическая очистка отключена, рисунок оставлен на доске.",
+      "finished_at_utc": "2026-11-02T17:17:24+00:00"
+    },
+    "restore_brush_30": {
+      "status": "drag_completed_unverified",
+      "requested_value": 30,
+      "finished_at_utc": "2026-11-02T17:17:29+00:00",
+      "note": "Жест перетаскивания к позиции кисти 30 завершён; значение необходимо проверить в игре.",
+      "drag_start": [
+        1254,
+        305
+      ],
+      "drag_target": [
+        1168,
+        305
+      ]
+    }
+  },
+  "interpretation_limits": [
+    "Meter fill is a provisional image estimate, not a direct read of the game's internal resource counter.",
+    "A successful executor report does not prove every stroke was registered by the game.",
+    "Execution status and visual evidence are recorded separately."
+  ]
+}

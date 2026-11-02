@@ -1,0 +1,5563 @@
+{
+  "schema_version": 1,
+  "record_type": "autodraw_game_monitor_run",
+  "session_id": "ee3f841c-cef2-4c75-af0d-7bbd2b6d4cc1",
+  "run_id": "b319992e-ddc0-4faa-b7fa-8d6537498a05",
+  "started_at_utc": "2026-11-02T17:15:29.830+00:00",
+  "started_at_performance_ms": 629350,
+  "execution_status": "completed",
+  "pre_test_snapshot": {
+    "logicalWidth": 460,
+    "logicalHeight": 240,
+    "scaleX": 1,
+    "scaleY": 1,
+    "maxPoints": 6000,
+    "remainingPoints": 5999,
+    "pointCount": 1,
+    "sourceMethod": "BoardPane.max+BoardPane.less",
+    "isExact": true,
+    "validationStatus": "valid",
+    "radius": [
+      0,
+      10
+    ],
+    "currentRadius": 10
+  },
+  "post_test_snapshot": {
+    "logicalWidth": 460,
+    "logicalHeight": 240,
+    "scaleX": 1,
+    "scaleY": 1,
+    "maxPoints": 6000,
+    "remainingPoints": 5959,
+    "pointCount": 41,
+    "sourceMethod": "BoardPane.max+BoardPane.less",
+    "isExact": true,
+    "validationStatus": "valid",
+    "radius": [
+      0,
+      10,
+      10,
+      10,
+      10,
+      10
+    ],
+    "currentRadius": 10
+  },
+  "brush_radius": 10,
+  "events": [
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629350,
+      "type": "POINTER_DOWN_CANDIDATE",
+      "strokeId": "pointer-stroke-139",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5999,
+        "pointCount": 1,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "clientX": 598,
+      "clientY": 134,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629350,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-139",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5999,
+        "pointCount": 1,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawStart",
+      "previousSignature": null,
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5999,
+        "pointCount": 1,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 0,
+      "acceptedPoint": null
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629352,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-139",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5999,
+        "pointCount": 1,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629375,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-139",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5999,1,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 25.20833396911621,
+        "y": 36
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629423,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-139",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5997,
+        "pointCount": 3,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5997,
+        "pointCount": 3,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629423,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-139",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5997,
+        "pointCount": 3,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5998,2,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5997,
+        "pointCount": 3,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 26.20833396911621,
+        "y": 36
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629456,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-139",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5996,
+        "pointCount": 4,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5997,
+        "pointCount": 3,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5996,
+        "pointCount": 4,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629457,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-139",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5996,
+        "pointCount": 4,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5997,3,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5996,
+        "pointCount": 4,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 29.20833396911621,
+        "y": 36
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629489,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-139",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5995,
+        "pointCount": 5,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5996,
+        "pointCount": 4,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5995,
+        "pointCount": 5,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629489,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-139",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5995,
+        "pointCount": 5,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5996,4,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5995,
+        "pointCount": 5,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 32.20833396911621,
+        "y": 36
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629520,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-139",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5994,
+        "pointCount": 6,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5995,
+        "pointCount": 5,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5994,
+        "pointCount": 6,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629520,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-139",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5994,
+        "pointCount": 6,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5995,5,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5994,
+        "pointCount": 6,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 35.20833396911621,
+        "y": 36
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629550,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-139",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5993,
+        "pointCount": 7,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5994,
+        "pointCount": 6,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5993,
+        "pointCount": 7,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629551,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-139",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5993,
+        "pointCount": 7,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5994,6,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5993,
+        "pointCount": 7,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 37.20833396911621,
+        "y": 36
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629585,
+      "type": "POINTER_UP_CANDIDATE",
+      "strokeId": "pointer-stroke-139",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5993,
+        "pointCount": 7,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "clientX": 613,
+      "clientY": 134,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629652,
+      "type": "POINTER_DOWN_CANDIDATE",
+      "strokeId": "pointer-stroke-140",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5993,
+        "pointCount": 7,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "clientX": 679,
+      "clientY": 181,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629652,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-140",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5993,
+        "pointCount": 7,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawStart",
+      "previousSignature": null,
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5993,
+        "pointCount": 7,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 0,
+      "acceptedPoint": null
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629653,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-140",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5992,
+        "pointCount": 8,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5993,
+        "pointCount": 7,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5992,
+        "pointCount": 8,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629677,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-140",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5992,
+        "pointCount": 8,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5993,7,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5992,
+        "pointCount": 8,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 90.20833396911621,
+        "y": 74
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629722,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-140",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5991,
+        "pointCount": 9,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5992,
+        "pointCount": 8,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5991,
+        "pointCount": 9,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629722,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-140",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5991,
+        "pointCount": 9,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5992,8,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5991,
+        "pointCount": 9,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 90.20833396911621,
+        "y": 75
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629756,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-140",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5990,
+        "pointCount": 10,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5991,
+        "pointCount": 9,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5990,
+        "pointCount": 10,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629756,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-140",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5990,
+        "pointCount": 10,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5991,9,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5990,
+        "pointCount": 10,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 90.20833396911621,
+        "y": 78
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629788,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-140",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5989,
+        "pointCount": 11,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5990,
+        "pointCount": 10,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5989,
+        "pointCount": 11,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629788,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-140",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5989,
+        "pointCount": 11,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5990,10,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5989,
+        "pointCount": 11,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 90.20833396911621,
+        "y": 81
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629821,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-140",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5988,
+        "pointCount": 12,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5989,
+        "pointCount": 11,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5988,
+        "pointCount": 12,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629821,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-140",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5988,
+        "pointCount": 12,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5989,11,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5988,
+        "pointCount": 12,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 90.20833396911621,
+        "y": 84
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629856,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-140",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5987,
+        "pointCount": 13,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5988,
+        "pointCount": 12,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5987,
+        "pointCount": 13,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629856,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-140",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5987,
+        "pointCount": 13,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5988,12,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5987,
+        "pointCount": 13,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 90.20833396911621,
+        "y": 88
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629884,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-140",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5986,
+        "pointCount": 14,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5987,
+        "pointCount": 13,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5986,
+        "pointCount": 14,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629884,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-140",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5986,
+        "pointCount": 14,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5987,13,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5986,
+        "pointCount": 14,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 90.20833396911621,
+        "y": 90
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629923,
+      "type": "POINTER_UP_CANDIDATE",
+      "strokeId": "pointer-stroke-140",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5986,
+        "pointCount": 14,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "clientX": 679,
+      "clientY": 201,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629999,
+      "type": "POINTER_DOWN_CANDIDATE",
+      "strokeId": "pointer-stroke-141",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5986,
+        "pointCount": 14,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "clientX": 755,
+      "clientY": 229,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 629999,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-141",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5986,
+        "pointCount": 14,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawStart",
+      "previousSignature": null,
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5986,
+        "pointCount": 14,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 0,
+      "acceptedPoint": null
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630000,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-141",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5985,
+        "pointCount": 15,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5986,
+        "pointCount": 14,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5985,
+        "pointCount": 15,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630017,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-141",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5985,
+        "pointCount": 15,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5986,14,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5985,
+        "pointCount": 15,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 151.2083339691162,
+        "y": 112
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630089,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-141",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5984,
+        "pointCount": 16,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5985,
+        "pointCount": 15,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5984,
+        "pointCount": 16,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630089,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-141",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5984,
+        "pointCount": 16,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5985,15,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5984,
+        "pointCount": 16,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 153.2083339691162,
+        "y": 115
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630119,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-141",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5983,
+        "pointCount": 17,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5984,
+        "pointCount": 16,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5983,
+        "pointCount": 17,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630119,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-141",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5983,
+        "pointCount": 17,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5984,16,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5983,
+        "pointCount": 17,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 155.2083339691162,
+        "y": 117
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630155,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-141",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5982,
+        "pointCount": 18,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5983,
+        "pointCount": 17,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5982,
+        "pointCount": 18,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630156,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-141",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5982,
+        "pointCount": 18,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5983,17,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5982,
+        "pointCount": 18,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 157.2083339691162,
+        "y": 119
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630188,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-141",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5981,
+        "pointCount": 19,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5982,
+        "pointCount": 18,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5981,
+        "pointCount": 19,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630189,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-141",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5981,
+        "pointCount": 19,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5982,18,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5981,
+        "pointCount": 19,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 158.2083339691162,
+        "y": 122
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630221,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-141",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5980,
+        "pointCount": 20,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5981,
+        "pointCount": 19,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5980,
+        "pointCount": 20,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630222,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-141",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5980,
+        "pointCount": 20,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5981,19,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5980,
+        "pointCount": 20,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 161.2083339691162,
+        "y": 124
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630255,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-141",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5979,
+        "pointCount": 21,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5980,
+        "pointCount": 20,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5979,
+        "pointCount": 21,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630255,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-141",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5979,
+        "pointCount": 21,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5980,20,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5979,
+        "pointCount": 21,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 162.2083339691162,
+        "y": 127
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630283,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-141",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5978,
+        "pointCount": 22,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5979,
+        "pointCount": 21,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5978,
+        "pointCount": 22,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630283,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-141",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5978,
+        "pointCount": 22,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5979,21,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5978,
+        "pointCount": 22,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 163.2083339691162,
+        "y": 128
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630311,
+      "type": "POINTER_UP_CANDIDATE",
+      "strokeId": "pointer-stroke-141",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5978,
+        "pointCount": 22,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "clientX": 770,
+      "clientY": 249,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630385,
+      "type": "POINTER_DOWN_CANDIDATE",
+      "strokeId": "pointer-stroke-142",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5978,
+        "pointCount": 22,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "clientX": 881,
+      "clientY": 305,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630385,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-142",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5978,
+        "pointCount": 22,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawStart",
+      "previousSignature": null,
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5978,
+        "pointCount": 22,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 0,
+      "acceptedPoint": null
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630386,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-142",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5977,
+        "pointCount": 23,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5978,
+        "pointCount": 22,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5977,
+        "pointCount": 23,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630410,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-142",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5977,
+        "pointCount": 23,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5978,22,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5977,
+        "pointCount": 23,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 252.2083339691162,
+        "y": 173
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630488,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-142",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5976,
+        "pointCount": 24,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5977,
+        "pointCount": 23,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5976,
+        "pointCount": 24,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630488,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-142",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5976,
+        "pointCount": 24,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5977,23,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5976,
+        "pointCount": 24,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 256.2083339691162,
+        "y": 173
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630522,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-142",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5975,
+        "pointCount": 25,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5976,
+        "pointCount": 24,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5975,
+        "pointCount": 25,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630522,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-142",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5975,
+        "pointCount": 25,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5976,24,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5975,
+        "pointCount": 25,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 261.2083339691162,
+        "y": 173
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630555,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-142",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5974,
+        "pointCount": 26,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5975,
+        "pointCount": 25,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5974,
+        "pointCount": 26,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630555,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-142",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5974,
+        "pointCount": 26,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5975,25,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5974,
+        "pointCount": 26,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 263.2083339691162,
+        "y": 173
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630588,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-142",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5973,
+        "pointCount": 27,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5974,
+        "pointCount": 26,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5973,
+        "pointCount": 27,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630588,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-142",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5973,
+        "pointCount": 27,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5974,26,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5973,
+        "pointCount": 27,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 266.2083339691162,
+        "y": 173
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630620,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-142",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5972,
+        "pointCount": 28,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5973,
+        "pointCount": 27,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5972,
+        "pointCount": 28,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630620,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-142",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5972,
+        "pointCount": 28,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5973,27,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5972,
+        "pointCount": 28,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 269.2083339691162,
+        "y": 173
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630655,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-142",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5971,
+        "pointCount": 29,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5972,
+        "pointCount": 28,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5971,
+        "pointCount": 29,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630655,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-142",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5971,
+        "pointCount": 29,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5972,28,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5971,
+        "pointCount": 29,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 273.2083339691162,
+        "y": 173
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630688,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-142",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5970,
+        "pointCount": 30,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5971,
+        "pointCount": 29,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5970,
+        "pointCount": 30,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630688,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-142",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5970,
+        "pointCount": 30,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5971,29,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5970,
+        "pointCount": 30,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 276.2083339691162,
+        "y": 173
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630716,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-142",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5969,
+        "pointCount": 31,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5970,
+        "pointCount": 30,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5969,
+        "pointCount": 31,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630716,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-142",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5969,
+        "pointCount": 31,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5970,30,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5969,
+        "pointCount": 31,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 277.2083339691162,
+        "y": 173
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630745,
+      "type": "POINTER_UP_CANDIDATE",
+      "strokeId": "pointer-stroke-142",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5969,
+        "pointCount": 31,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "clientX": 911,
+      "clientY": 305,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630818,
+      "type": "POINTER_DOWN_CANDIDATE",
+      "strokeId": "pointer-stroke-143",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5969,
+        "pointCount": 31,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "clientX": 1033,
+      "clientY": 336,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630818,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-143",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5969,
+        "pointCount": 31,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawStart",
+      "previousSignature": null,
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5969,
+        "pointCount": 31,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 0,
+      "acceptedPoint": null
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630820,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-143",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5968,
+        "pointCount": 32,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5969,
+        "pointCount": 31,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5968,
+        "pointCount": 32,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630843,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-143",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5968,
+        "pointCount": 32,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "state_poll",
+      "previousSignature": "[6000,5969,31,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5968,
+        "pointCount": 32,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 375.2083339691162,
+        "y": 198
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630924,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-143",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5967,
+        "pointCount": 33,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5968,
+        "pointCount": 32,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5967,
+        "pointCount": 33,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630924,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-143",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5967,
+        "pointCount": 33,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5968,32,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5967,
+        "pointCount": 33,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 375.2083339691162,
+        "y": 201
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630954,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-143",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5966,
+        "pointCount": 34,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5967,
+        "pointCount": 33,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5966,
+        "pointCount": 34,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630955,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-143",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5966,
+        "pointCount": 34,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5967,33,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5966,
+        "pointCount": 34,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 375.2083339691162,
+        "y": 206
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630988,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-143",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5965,
+        "pointCount": 35,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5966,
+        "pointCount": 34,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5965,
+        "pointCount": 35,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 630988,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-143",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5965,
+        "pointCount": 35,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5966,34,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5965,
+        "pointCount": 35,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 375.2083339691162,
+        "y": 210
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 631025,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-143",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5964,
+        "pointCount": 36,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5965,
+        "pointCount": 35,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5964,
+        "pointCount": 36,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 631025,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-143",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5964,
+        "pointCount": 36,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5965,35,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5964,
+        "pointCount": 36,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 375.2083339691162,
+        "y": 213
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 631058,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-143",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5963,
+        "pointCount": 37,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5964,
+        "pointCount": 36,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5963,
+        "pointCount": 37,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 631058,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-143",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5963,
+        "pointCount": 37,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5964,36,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5963,
+        "pointCount": 37,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 375.2083339691162,
+        "y": 216
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 631089,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-143",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5962,
+        "pointCount": 38,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5963,
+        "pointCount": 37,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5962,
+        "pointCount": 38,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 631089,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-143",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5962,
+        "pointCount": 38,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5963,37,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5962,
+        "pointCount": 38,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 375.2083339691162,
+        "y": 219
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 631121,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-143",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5961,
+        "pointCount": 39,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5962,
+        "pointCount": 38,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5961,
+        "pointCount": 39,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 631121,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-143",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5961,
+        "pointCount": 39,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5962,38,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5961,
+        "pointCount": 39,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 375.2083339691162,
+        "y": 222
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 631155,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-143",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5960,
+        "pointCount": 40,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5961,
+        "pointCount": 39,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5960,
+        "pointCount": 40,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 631155,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-143",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5960,
+        "pointCount": 40,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5961,39,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5960,
+        "pointCount": 40,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 375.2083339691162,
+        "y": 226
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 631189,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-143",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5959,
+        "pointCount": 41,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5960,
+        "pointCount": 40,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5959,
+        "pointCount": 41,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "args": []
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 631189,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-143",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5959,
+        "pointCount": 41,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "source": "onDrawing_wrapper",
+      "previousSignature": "[6000,5960,40,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5959,
+        "pointCount": 41,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 375.2083339691162,
+        "y": 229
+      }
+    },
+    {
+      "monitorVersion": "0.2.1",
+      "t": 631227,
+      "type": "POINTER_UP_CANDIDATE",
+      "strokeId": "pointer-stroke-143",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5959,
+        "pointCount": 41,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "currentRadius": 10
+      },
+      "clientX": 1033,
+      "clientY": 374,
+      "pointerType": "mouse"
+    }
+  ],
+  "frame_probes": [],
+  "active_drawing_duration_ms": 1587.0,
+  "dropped_events": 0,
+  "monitor_buffer_dropped_events_start": 0,
+  "monitor_buffer_dropped_events_end": 0,
+  "monitor_buffer_dropped_events_delta": 0,
+  "monitor_error_count_start": 0,
+  "monitor_error_count_end": 0,
+  "monitor_error_count_delta": 0,
+  "bridge_send_failures_start": 0,
+  "bridge_send_failures_end": 0,
+  "bridge_send_failures_delta": 0,
+  "collector_sequence_gap_count": 0,
+  "monitor_errors": [],
+  "interpretation": {
+    "chalk_status": "exact",
+    "path_length_status": "incomplete_until_verified"
+  },
+  "accepted_points": [
+    {
+      "t": 629375,
+      "stroke_id": "pointer-stroke-139",
+      "x": 25.20833396911621,
+      "y": 36,
+      "point_delta": 1
+    },
+    {
+      "t": 629423,
+      "stroke_id": "pointer-stroke-139",
+      "x": 26.20833396911621,
+      "y": 36,
+      "point_delta": 1
+    },
+    {
+      "t": 629457,
+      "stroke_id": "pointer-stroke-139",
+      "x": 29.20833396911621,
+      "y": 36,
+      "point_delta": 1
+    },
+    {
+      "t": 629489,
+      "stroke_id": "pointer-stroke-139",
+      "x": 32.20833396911621,
+      "y": 36,
+      "point_delta": 1
+    },
+    {
+      "t": 629520,
+      "stroke_id": "pointer-stroke-139",
+      "x": 35.20833396911621,
+      "y": 36,
+      "point_delta": 1
+    },
+    {
+      "t": 629551,
+      "stroke_id": "pointer-stroke-139",
+      "x": 37.20833396911621,
+      "y": 36,
+      "point_delta": 1
+    },
+    {
+      "t": 629677,
+      "stroke_id": "pointer-stroke-140",
+      "x": 90.20833396911621,
+      "y": 74,
+      "point_delta": 1
+    },
+    {
+      "t": 629722,
+      "stroke_id": "pointer-stroke-140",
+      "x": 90.20833396911621,
+      "y": 75,
+      "point_delta": 1
+    },
+    {
+      "t": 629756,
+      "stroke_id": "pointer-stroke-140",
+      "x": 90.20833396911621,
+      "y": 78,
+      "point_delta": 1
+    },
+    {
+      "t": 629788,
+      "stroke_id": "pointer-stroke-140",
+      "x": 90.20833396911621,
+      "y": 81,
+      "point_delta": 1
+    },
+    {
+      "t": 629821,
+      "stroke_id": "pointer-stroke-140",
+      "x": 90.20833396911621,
+      "y": 84,
+      "point_delta": 1
+    },
+    {
+      "t": 629856,
+      "stroke_id": "pointer-stroke-140",
+      "x": 90.20833396911621,
+      "y": 88,
+      "point_delta": 1
+    },
+    {
+      "t": 629884,
+      "stroke_id": "pointer-stroke-140",
+      "x": 90.20833396911621,
+      "y": 90,
+      "point_delta": 1
+    },
+    {
+      "t": 630017,
+      "stroke_id": "pointer-stroke-141",
+      "x": 151.2083339691162,
+      "y": 112,
+      "point_delta": 1
+    },
+    {
+      "t": 630089,
+      "stroke_id": "pointer-stroke-141",
+      "x": 153.2083339691162,
+      "y": 115,
+      "point_delta": 1
+    },
+    {
+      "t": 630119,
+      "stroke_id": "pointer-stroke-141",
+      "x": 155.2083339691162,
+      "y": 117,
+      "point_delta": 1
+    },
+    {
+      "t": 630156,
+      "stroke_id": "pointer-stroke-141",
+      "x": 157.2083339691162,
+      "y": 119,
+      "point_delta": 1
+    },
+    {
+      "t": 630189,
+      "stroke_id": "pointer-stroke-141",
+      "x": 158.2083339691162,
+      "y": 122,
+      "point_delta": 1
+    },
+    {
+      "t": 630222,
+      "stroke_id": "pointer-stroke-141",
+      "x": 161.2083339691162,
+      "y": 124,
+      "point_delta": 1
+    },
+    {
+      "t": 630255,
+      "stroke_id": "pointer-stroke-141",
+      "x": 162.2083339691162,
+      "y": 127,
+      "point_delta": 1
+    },
+    {
+      "t": 630283,
+      "stroke_id": "pointer-stroke-141",
+      "x": 163.2083339691162,
+      "y": 128,
+      "point_delta": 1
+    },
+    {
+      "t": 630410,
+      "stroke_id": "pointer-stroke-142",
+      "x": 252.2083339691162,
+      "y": 173,
+      "point_delta": 1
+    },
+    {
+      "t": 630488,
+      "stroke_id": "pointer-stroke-142",
+      "x": 256.2083339691162,
+      "y": 173,
+      "point_delta": 1
+    },
+    {
+      "t": 630522,
+      "stroke_id": "pointer-stroke-142",
+      "x": 261.2083339691162,
+      "y": 173,
+      "point_delta": 1
+    },
+    {
+      "t": 630555,
+      "stroke_id": "pointer-stroke-142",
+      "x": 263.2083339691162,
+      "y": 173,
+      "point_delta": 1
+    },
+    {
+      "t": 630588,
+      "stroke_id": "pointer-stroke-142",
+      "x": 266.2083339691162,
+      "y": 173,
+      "point_delta": 1
+    },
+    {
+      "t": 630620,
+      "stroke_id": "pointer-stroke-142",
+      "x": 269.2083339691162,
+      "y": 173,
+      "point_delta": 1
+    },
+    {
+      "t": 630655,
+      "stroke_id": "pointer-stroke-142",
+      "x": 273.2083339691162,
+      "y": 173,
+      "point_delta": 1
+    },
+    {
+      "t": 630688,
+      "stroke_id": "pointer-stroke-142",
+      "x": 276.2083339691162,
+      "y": 173,
+      "point_delta": 1
+    },
+    {
+      "t": 630716,
+      "stroke_id": "pointer-stroke-142",
+      "x": 277.2083339691162,
+      "y": 173,
+      "point_delta": 1
+    },
+    {
+      "t": 630843,
+      "stroke_id": "pointer-stroke-143",
+      "x": 375.2083339691162,
+      "y": 198,
+      "point_delta": 1
+    },
+    {
+      "t": 630924,
+      "stroke_id": "pointer-stroke-143",
+      "x": 375.2083339691162,
+      "y": 201,
+      "point_delta": 1
+    },
+    {
+      "t": 630955,
+      "stroke_id": "pointer-stroke-143",
+      "x": 375.2083339691162,
+      "y": 206,
+      "point_delta": 1
+    },
+    {
+      "t": 630988,
+      "stroke_id": "pointer-stroke-143",
+      "x": 375.2083339691162,
+      "y": 210,
+      "point_delta": 1
+    },
+    {
+      "t": 631025,
+      "stroke_id": "pointer-stroke-143",
+      "x": 375.2083339691162,
+      "y": 213,
+      "point_delta": 1
+    },
+    {
+      "t": 631058,
+      "stroke_id": "pointer-stroke-143",
+      "x": 375.2083339691162,
+      "y": 216,
+      "point_delta": 1
+    },
+    {
+      "t": 631089,
+      "stroke_id": "pointer-stroke-143",
+      "x": 375.2083339691162,
+      "y": 219,
+      "point_delta": 1
+    },
+    {
+      "t": 631121,
+      "stroke_id": "pointer-stroke-143",
+      "x": 375.2083339691162,
+      "y": 222,
+      "point_delta": 1
+    },
+    {
+      "t": 631155,
+      "stroke_id": "pointer-stroke-143",
+      "x": 375.2083339691162,
+      "y": 226,
+      "point_delta": 1
+    },
+    {
+      "t": 631189,
+      "stroke_id": "pointer-stroke-143",
+      "x": 375.2083339691162,
+      "y": 229,
+      "point_delta": 1
+    }
+  ],
+  "ended_at_performance_ms": 631227,
+  "monitor_dropped_events": 0,
+  "monitor_error_count": 0,
+  "monitor_active": true,
+  "chalk": {
+    "status": "exact",
+    "consumed_points": 40,
+    "pre_point_count": 1,
+    "post_point_count": 41,
+    "max_points": 6000
+  },
+  "stroke_count": 5,
+  "stroke_candidate_count": 5,
+  "non_consuming_stroke_candidate_count": 0,
+  "stroke_lifecycle_sources": [
+    "pointer_observer"
+  ],
+  "sampled_point_delta_total": 40,
+  "point_delta_matches_chalk": true,
+  "observed_brush_radii": [
+    10.0
+  ],
+  "brush_radius_status": "single",
+  "trajectory": {
+    "observed_segment_length_lower_bound": 104.6067,
+    "accepted_sample_count": 40,
+    "status": "incomplete_until_verified",
+    "note": "Coalesced pointDelta values mean intermediate accepted coordinates may be missing."
+  },
+  "frame_probe": {
+    "status": "measured",
+    "frame_count": 89,
+    "average_fps": 59.999,
+    "median_fps": 60.024,
+    "median_interval_ms": 16.66,
+    "p95_interval_ms": 16.68,
+    "max_interval_ms": 16.68,
+    "visibility_interruption": false,
+    "stroke_probe_count": 5
+  },
+  "elapsed_from_first_to_last_stroke_ms": 1877,
+  "finished_at_utc": "2026-11-02T17:15:34.523+00:00",
+  "event_count": 95
+}

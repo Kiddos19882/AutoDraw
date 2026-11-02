@@ -1,0 +1,319 @@
+{
+  "schema_version": 1,
+  "record_type": "autodraw_chalk_test_block",
+  "block_id": "1fd0d4dbb6e14da49093fea0a04fa3a0",
+  "series_id": "chalk-20261102-201731-0d8999",
+  "phase_id": "V3",
+  "repeat_count": 3,
+  "random_seed": 20261101,
+  "requested_radius": 10,
+  "executor_parameters": {
+    "point_step_px": 2,
+    "line_extension_px": 0,
+    "point_delay_ms": 10,
+    "after_mouse_up_ms": 20,
+    "before_mouse_down_ms": 20,
+    "after_mouse_down_ms": 40,
+    "end_hold_ms": 50,
+    "countdown_seconds": 5
+  },
+  "executor_parameter_matrix": [
+    {
+      "point_step_px": 2,
+      "point_delay_ms": 10
+    },
+    {
+      "point_step_px": 4,
+      "point_delay_ms": 5
+    },
+    {
+      "point_step_px": 4,
+      "point_delay_ms": 10
+    }
+  ],
+  "expected_task_count": 9,
+  "status": "completed",
+  "created_at_utc": "2026-11-02T17:17:41.687+00:00",
+  "updated_at_utc": "2026-11-02T17:23:58.550+00:00",
+  "tasks": [
+    {
+      "task_id": "int006_turns-s4-d10-r2",
+      "scenario_id": "int006_turns",
+      "repeat_index": 2,
+      "expected_strokes": 3,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 1,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "d67ebf39b2374ba2ae5479ef7845968a",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T17:17:46.833+00:00",
+          "experiment_id": "f29f35f96f8542489c9e68fa472f5e71",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-201746-b10-int006_turns-f29f35f9",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T17:17:46.907+00:00",
+          "finished_at_utc": "2026-11-02T17:18:25.531+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006_turns-s4-d10-r1",
+      "scenario_id": "int006_turns",
+      "repeat_index": 1,
+      "expected_strokes": 3,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 2,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "78253115835e40649dfd0d4a2eb4abeb",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T17:18:25.535+00:00",
+          "experiment_id": "49cd9eb882a540998fa0805239c4f4b5",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-201825-b10-int006_turns-49cd9eb8",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T17:18:25.613+00:00",
+          "finished_at_utc": "2026-11-02T17:19:04.437+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006_turns-s2-d10-r3",
+      "scenario_id": "int006_turns",
+      "repeat_index": 3,
+      "expected_strokes": 3,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 3,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "26a9f1e2b16841c38e16a54e9b2cce8a",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T17:19:04.440+00:00",
+          "experiment_id": "bd08af513fad4baabbedd85ac55bce3b",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-201904-b10-int006_turns-bd08af51",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T17:19:04.514+00:00",
+          "finished_at_utc": "2026-11-02T17:19:51.225+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006_turns-s4-d5-r2",
+      "scenario_id": "int006_turns",
+      "repeat_index": 2,
+      "expected_strokes": 3,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 4,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "ac2af9ba88914f8993ccec32ea07a791",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T17:19:51.229+00:00",
+          "experiment_id": "f04fdd05ddfa4f6cb19d1f42cfe9ac9b",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-201951-b10-int006_turns-f04fdd05",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T17:19:51.295+00:00",
+          "finished_at_utc": "2026-11-02T17:20:30.954+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006_turns-s4-d5-r3",
+      "scenario_id": "int006_turns",
+      "repeat_index": 3,
+      "expected_strokes": 3,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 5,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "400069d778e74c4682bf54faa92d2f43",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T17:20:30.959+00:00",
+          "experiment_id": "da7abdc73ba54ab5b7536ea3ec418514",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-202031-b10-int006_turns-da7abdc7",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T17:20:31.053+00:00",
+          "finished_at_utc": "2026-11-02T17:21:09.568+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006_turns-s2-d10-r1",
+      "scenario_id": "int006_turns",
+      "repeat_index": 1,
+      "expected_strokes": 3,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 6,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "42392579cd134edb84bd2a2341061302",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T17:21:09.572+00:00",
+          "experiment_id": "e5a8119d6103490bb22e0a9114e35c9c",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-202109-b10-int006_turns-e5a8119d",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T17:21:09.671+00:00",
+          "finished_at_utc": "2026-11-02T17:21:54.756+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006_turns-s4-d5-r1",
+      "scenario_id": "int006_turns",
+      "repeat_index": 1,
+      "expected_strokes": 3,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 7,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "ea3c93a003c04c7fa938b51d30686954",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T17:21:54.761+00:00",
+          "experiment_id": "028cd9f62cf340588a1508f8a70a1a09",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-202154-b10-int006_turns-028cd9f6",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T17:21:54.833+00:00",
+          "finished_at_utc": "2026-11-02T17:22:33.762+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006_turns-s4-d10-r3",
+      "scenario_id": "int006_turns",
+      "repeat_index": 3,
+      "expected_strokes": 3,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 8,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "8c32bb2acc0f4ebfb4ce9e5c3d9a1074",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T17:22:33.766+00:00",
+          "experiment_id": "ec4689ebda7e40ad93ff9ca0db69fceb",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-202233-b10-int006_turns-ec4689eb",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T17:22:33.835+00:00",
+          "finished_at_utc": "2026-11-02T17:23:13.625+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006_turns-s2-d10-r2",
+      "scenario_id": "int006_turns",
+      "repeat_index": 2,
+      "expected_strokes": 3,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 9,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "a80ac92a6a2549af985952dd592f5e76",
+          "status": "completed",
+          "started_at_utc": "2026-11-02T17:23:13.629+00:00",
+          "experiment_id": "32fb86c7a3e64878abe20dbf4e0fc0c8",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\experiment-20261102-202313-b10-int006_turns-32fb86c7",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-02T17:23:13.704+00:00",
+          "finished_at_utc": "2026-11-02T17:23:58.550+00:00"
+        }
+      ]
+    }
+  ]
+}
