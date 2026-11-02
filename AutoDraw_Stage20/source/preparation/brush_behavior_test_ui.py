@@ -370,8 +370,8 @@ TEST_CASES: dict[str, dict[str, Any]] = {
             {"name": "slope_050", "points": [[220, 20], [340, 80]]},
             {"name": "slope_100", "points": [[20, 100], [100, 180]]},
             {"name": "slope_200", "points": [[140, 100], [180, 180]]},
-            {"name": "negative_shallow", "points": [[220, 110], [380, 70]]},
-            {"name": "negative_steep", "points": [[380, 100], [340, 220]]}
+            {"name": "negative_shallow", "points": [[220, 170], [380, 130]]},
+            {"name": "negative_steep", "points": [[410, 60], [400, 220]]}
         ],
     },
     "V2 — короткие штрихи 1–10 px": {
@@ -391,7 +391,7 @@ TEST_CASES: dict[str, dict[str, Any]] = {
         "description": "INT-006 V3: три непрерывные ломаные с прямыми, острыми и последовательными поворотами.",
         "strokes": [
             {"name": "right_angle", "points": [[20, 20], [180, 20], [180, 100], [360, 100]]},
-            {"name": "acute_zigzag", "points": [[20, 140], [100, 80], [180, 140], [260, 80], [340, 140]]},
+            {"name": "acute_zigzag", "points": [[20, 140], [60, 80], [100, 140], [140, 80], [160, 140]]},
             {"name": "multi_turn", "points": [[20, 210], [90, 170], [160, 210], [230, 170], [300, 210], [420, 170]]}
         ],
     },
