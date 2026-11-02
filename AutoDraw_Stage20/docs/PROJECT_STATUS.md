@@ -739,4 +739,12 @@ Workflow `.github/workflows/geometry-tests.yml` запускается на push
 Корень ошибки в учёте: `RunRecorder.heartbeat()` переносит глобальный `status.droppedEvents` в конкретный run, а acceptance gate трактует его как per-run loss. В результате capture ошибочно стал `partial`. Код не менялся; выполнена детерминированная симуляция поведения лимита; live рисование и CI не запускались.
 
 Полный разбор и рекомендуемая схема исправления: [GAME_MONITOR_BUFFER_OVERFLOW_ANALYSIS_2026-11-02.md](GAME_MONITOR_BUFFER_OVERFLOW_ANALYSIS_2026-11-02.md). Исторический G3 journal остаётся неизменным и `stopped`; задним числом не переписывать его статусы. Следующая задача — разделить глобальный buffer overflow, bridge send failures, collector transport gaps и per-run recorder drops, добавить regressions и только после этого открывать новый live G3.
+## 2026-11-02 — исправлена семантика Game Monitor overflow и per-run acceptance
 
+На `feature/image-geometry-optimization` внесено исправление: cumulative `monitor_dropped_events` больше не трактуется как потеря событий конкретного run и не блокирует capture acceptance. RunRecorder фиксирует start/end/delta для локального buffer overflow и Monitor errors; отдельно фиксируются `bridge_send_failures_delta`, `collector_sequence_gap_count` и per-run `dropped_events`. Сервер теперь выявляет пропуски WebSocket sequence и связывает их с активным run.
+
+Brush Test gate и матричные валидаторы G1/G2/G3/radius matrix проверяют только per-run метрики потерь/ошибок. Legacy cumulative aliases остаются в отчётах для диагностики и совместимости. Старые manifests и stopped G3 journal не переписывались.
+
+Добавлены regression tests: Node subscriber delivery после 50 000 buffer entries; Python isolation cumulative overflow/errors от последующего run; WebSocket sequence gap; matrix validators accept cumulative overflow but reject per-run bridge/collector loss.
+
+**Пока не подтверждено:** прохождение нового CI на конечном HEAD, локальный Windows/Firefox preflight и live повтор G3. До этого новый live G3 не запускать. Подробности — `BRUSH_MONITOR_AUTOCAPTURE_DESIGN.md` и `source/game_monitor/README.md`.
