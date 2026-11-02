@@ -462,3 +462,13 @@
 - Executor handoff сверяет prediction ID; Brush Test UI запрещает ручной запуск D1–D5 вне INT006 block.
 - Full CI [41513389663](https://github.com/Kiddos19882/AutoDraw/actions/runs/41513389663) — success: Preparation/G3 667 passed + 82 subtests; integration, executor, Game Monitor/bridge, pixel audit и Windows portable build/startup smoke-test success.
 - Созданы инструкции frozen analyzer и local Windows preflight. Production estimator/defaults и live experiment data не менялись.
+
+
+## 2026-11-03 — INT-006 D1–D5 live captures и предварительный CHALK audit
+
+- Принят live block `chalk-20261102-232320-7cea27`: 45/45 задач completed, radius=10.
+- Для 45 experiment manifests найдены 45 Monitor reports; предварительно проверены exact CHALK, per-stroke delta sum, stroke counts и нулевые Monitor/Bridge integrity counters.
+- Добавлен отчёт [CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md](CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md): 45 plan runs, MAE 1.408, RMSE 1.967, bias -0.875, MAPE 2.134%, maximum underprediction 1.82 CHALK; per-stroke 243 rows, MAE 0.439.
+- Исправлена portability-привязка journal attempt к experiment directory name вместо локального абсолютного Windows path; добавлен regression test.
+- В `.github/workflows/geometry-tests.yml` добавлен официальный запуск analyzer и artifact upload. Новый CI result и официальный analyzer JSON ещё ожидаются.
+- Safety margin не установлен; production estimator, executor/sampling defaults и master не менялись.
