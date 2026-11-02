@@ -1,14 +1,14 @@
 # INT-006 — план независимой validation модели CHALK
 
 **Дата:** 2026-11-02  
-**Статус:** LIVE CAPTURES COMPLETE (45/45); FORMAL QUANTITATIVE VALIDATION PENDING — D1–D5 выполнены, предварительный аудит JSON записей пройден. Требуется официальный analyzer report и hash/binding verification.  
+**Статус:** LIVE CAPTURES COMPLETE (45/45); FORMAL QUANTITATIVE VALIDATION PASS — официальный analyzer принял 45/45 captures, 0 missing/rejected, 15/15 groups complete; hash/binding verification пройдены. Safety margin и production eligibility остаются NOT ESTABLISHED/NOT VALIDATED.  
 **Ветка:** `feature/image-geometry-optimization`  
 **Связанные задачи:** INT-006; gate перед INT-007  
 **Ограничения:** production estimator, executor defaults и исходные экспериментальные данные не изменять.
 
 ## Технический gate перед запуском
 
-Исторический readiness audit ниже был выполнен до реализации и зафиксировал отсутствие D1–D5 в harness. Этот блок сохранён как история выявления проблемы. Текущая реализация и успешный software gate описаны в [отчёте frozen predictions/analyzer](CHALK_INT006_FROZEN_PREDICTIONS_AND_ANALYZER_2026-11-02.md); текущие оставшиеся gates — официальный analyzer JSON, frozen artifact SHA-256 и полный journal/task binding audit.
+Исторический readiness audit ниже был выполнен до реализации и зафиксировал отсутствие D1–D5 в harness. Этот блок сохранён как история выявления проблемы. Текущая реализация и успешный software gate описаны в [отчёте frozen predictions/analyzer](CHALK_INT006_FROZEN_PREDICTIONS_AND_ANALYZER_2026-11-02.md); текущие оставшиеся gates — отдельное решение по safety margin и расширенная проверка на полном разнообразии рисунков.
 
 ## 1. Цель
 
@@ -254,7 +254,7 @@ D1–D5 harness, frozen predictions и analyzer реализованы. След
 
 D1–D5 выполнены в block `chalk-20261102-232320-7cea27`: 45/45 tasks completed, radius=10. Предварительный разбор 45 manifests и 45 Monitor reports подтвердил exact CHALK, совпадение per-stroke sum, ожидаемое число штрихов и нулевые per-run Monitor/Bridge integrity counters.
 
-Предварительные метрики и ограничения вынесены в [CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md](CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md). Эти расчёты не заменяют штатный analyzer: до получения официального JSON report серия не считается количественно validated, safety margin не установлен, INT-007 остаётся BLOCKED.
+Предварительные метрики и ограничения вынесены в [CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md](CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md). Официальный analyzer PASS подтверждён в [CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md): 45 accepted, 0 missing/rejected, 15 complete groups. Safety margin не установлен, production eligibility не подтверждена, INT-007 остаётся BLOCKED.
 
 Workflow `.github/workflows/geometry-tests.yml` дополнен запуском analyzer и загрузкой report artifact. Для поддержки переноса Windows capture bundle в CI analyzer связывает journal attempt с уникальным именем experiment directory, а не с исходным абсолютным путём.
 
@@ -268,7 +268,7 @@ Workflow `.github/workflows/geometry-tests.yml` дополнен запуско�
 - analyzer дополнительно сверяет `task.expected_strokes` с числом strokes в frozen prediction;
 - добавлен regression test, который изменяет task prediction ID и ожидает fail-closed rejection.
 
-Изменение не меняет frozen model, прогнозы, production estimator или executor defaults. После этого изменения нужен новый CI run; официальный report по 45 captures остаётся pending.
+Исправление geometry serialization binding не меняет frozen model, прогнозы, production estimator или executor defaults. Повторный CI run 41532629748 завершился SUCCESS; официальный report содержит 45 accepted и 0 rejected.
 
 
 ## 2026-11-03 — официальный analyzer run: geometry serialization mismatch
@@ -279,3 +279,11 @@ Workflow `.github/workflows/geometry-tests.yml` дополнен запуско�
 - Analyzer исправлен: отдельно проверяется hash фактического manifest representation, затем strokes нормализуются до frozen logical geometry и сравниваются с frozen plan/signature. Коэффициенты, prediction artifact, production estimator, executor defaults и sampling defaults не менялись.
 - Regression fixture обновлён для реального runtime manifest shape. Commits: `8eba34f2ae402bbcf8af096f8b642a5cdcfb5eee` (fix), `dd64730e202ed6f6014fa2dd1a65c3100cc32018` (test).
 - Повторная проверка выполняется workflow [41532629748](https://github.com/Kiddos19882/AutoDraw/actions/runs/41532629748) на HEAD `dd64730`; на момент записи run ещё выполняется. До его завершения quantitative validation остаётся PENDING, INT-006 — IN_PROGRESS, safety margin — not established, production eligibility — not validated.
+
+
+## 2026-11-03 — количественная validation закрыта
+
+- CI run 41532629748 — SUCCESS; штатный analyzer: 45 accepted / 45 expected, 0 missing, 0 rejected, 15 complete groups, 3 repeats per group.
+- Метрики и profile comparison вынесены в [официальный отчёт](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md).
+- P1 (step=4, delay=5 ms) — лучший совокупный профиль в этой выборке; максимальная недооценка 0.92 CHALK. Эмпирический guard 1 CHALK — только наблюдённая нижняя граница для D1–D5, не статистическая гарантия.
+- Safety margin остаётся NOT ESTABLISHED; production eligibility NOT VALIDATED. INT-006 остаётся IN_PROGRESS до отдельного решения и расширенной проверки на полных рисунках. INT-007 остаётся BLOCKED.
