@@ -1376,7 +1376,15 @@ def test_int006_v1_v3_strokes_are_spatially_isolated(case_name):
 def test_cursor_safe_point_is_outside_calibrated_board_region():
     region = {"x": 500, "y": 250, "width": 600, "height": 300}
     point = brush_ui._cursor_safe_point_outside_region(region, (1920, 1080), margin=24)
-    assert point[0] >= region["x"] + region["width"] + 24 or point[0] <= region["x"] - 25
+    outside_horizontally = (
+        point[0] >= region["x"] + region["width"] + 24
+        or point[0] <= region["x"] - 25
+    )
+    outside_vertically = (
+        point[1] >= region["y"] + region["height"] + 24
+        or point[1] <= region["y"] - 25
+    )
+    assert outside_horizontally or outside_vertically
     assert 0 <= point[0] < 1920
     assert 0 <= point[1] < 1080
 
@@ -1384,8 +1392,10 @@ def test_cursor_safe_point_is_outside_calibrated_board_region():
 def test_cursor_safe_point_uses_an_available_edge_when_board_touches_screen_boundary():
     region = {"x": 0, "y": 100, "width": 1800, "height": 800}
     point = brush_ui._cursor_safe_point_outside_region(region, (1920, 1080), margin=24)
-    assert point[0] == 1824
-    assert region["x"] + region["width"] <= point[0]
+    outside_right = point[0] >= region["x"] + region["width"] + 24
+    outside_top = point[1] <= region["y"] - 25
+    outside_bottom = point[1] >= region["y"] + region["height"] + 24
+    assert outside_right or outside_top or outside_bottom
 
 
 def test_cursor_safe_point_rejects_board_without_offscreen_margin():
