@@ -1,10 +1,14 @@
 # INT-006 — план независимой validation модели CHALK
 
 **Дата:** 2026-11-02  
-**Статус:** READY FOR LIVE VALIDATION — протокол подготовлен, live captures ещё не выполнены  
+**Статус:** BLOCKED — D1–D5 протокол подготовлен, но текущий matrix/block/UI/executor harness ещё не поддерживает эту независимую серию. Live captures не запускать до завершения реализации и CI.  
 **Ветка:** `feature/image-geometry-optimization`  
 **Связанные задачи:** INT-006; gate перед INT-007  
 **Ограничения:** production estimator, executor defaults и исходные экспериментальные данные не изменять.
+
+## Технический gate перед запуском
+
+Статический аудит исходников выявил, что D1–D5 отсутствуют в текущих `PHASE_SCENARIOS`/`EXPECTED_STROKES`, block planner/journal validator и Brush Test UI; `integrated_app.py` также не разрешает для них executor override. Общий analyzer пока не сравнивает accepted runs с immutable prediction records. Поэтому протокол ниже является спецификацией эксперимента, а не подтверждением готовности UI к запуску. См. [аудит готовности harness](CHALK_INT006_HARNESS_READINESS_AUDIT_2026-11-02.md).
 
 ## 1. Цель
 
@@ -224,3 +228,14 @@ INT-006 можно закрыть только после:
 - синхронизации PROJECT_STATUS, TASKS, ROADMAP, WORK_LOG и отчёта модели.
 
 До этого INT-007 остаётся BLOCKED, production estimator не меняется.
+
+
+## 11. Текущий статус запуска
+
+- [ ] Реализовать отдельную INT006 phase в matrix metadata, block planner/journal, Brush Test UI и executor handoff.
+- [ ] Подготовить immutable prediction records и INT006 analyzer.
+- [ ] Добавить regression tests и пройти полный CI, включая Windows portable build/startup smoke-test.
+- [ ] После CI выполнить локальный Windows preflight.
+- [ ] Только после preflight и явного подтверждения чистой доски начать 45 live captures.
+
+До выполнения этих пунктов не запускать D1–D5 через существующие V-фазы или вручную. Production estimator/defaults остаются неизменными.
