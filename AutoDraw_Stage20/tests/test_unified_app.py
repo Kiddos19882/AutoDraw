@@ -1346,14 +1346,14 @@ class UnifiedAppCoreTests(unittest.TestCase):
             "generation": {
                 "chalk_test_block": {
                     "block_id": "block-v5-test",
-                    "task_id": "int006_intersections_spacing-s4-d5-r1",
+                    "task_id": "int006_intersections_spacing_sweep-s4-d5-r1",
                     "phase_id": "V5",
                 },
                 "chalk_experiment_matrix": {
                     "phase_id": "V5",
-                    "scenario_id": "int006_intersections_spacing",
+                    "scenario_id": "int006_intersections_spacing_sweep",
                     "requested_radius": 10,
-                    "expected_strokes": 10,
+                    "expected_strokes": 16,
                     "executor_parameters": parameters,
                 },
             }
