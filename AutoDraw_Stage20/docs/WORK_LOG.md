@@ -2098,3 +2098,11 @@ Brush Test acceptance и матричные валидаторы больше н
 - Во всех Monitor reports observed brush radius единственный: 10; experiment ID совпадает с journal attempt.
 - Независимый SHA-256 frozen artifact совпал: `a0eab016e96a81e14bededd32cf5161dd943d6fc85a20b7eec17455f69d0c61c`.
 - Официальный analyzer JSON и доступный CI run/artifact status по-прежнему не получены через доступные endpoints. Production estimator/defaults не менялись.
+
+
+## 2026-11-03 — усиление journal-to-prediction binding
+
+- Статический аудит analyzer выявил непроверенную связь: frozen prediction ID сравнивался с manifest, но не с prediction ID в самой journal task.
+- Analyzer дополнен fail-closed проверкой task prediction ID и expected stroke count против frozen prediction.
+- Добавлен regression test на tampered journal prediction ID.
+- Изменения находятся в `feature/image-geometry-optimization`; CI должен повторно проверить подготовительные тесты и analyzer job. Официальный CI report пока не получен.
