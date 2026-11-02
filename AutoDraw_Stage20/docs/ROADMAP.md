@@ -188,3 +188,10 @@ Harness V1–V5: matrix metadata/validator, block planner/journal, Brush Test UI
 - [x] Выполнить targeted reruns исправленных V1/V3, V2 short-stroke, V4 closure и V5 spacing; 45/45 captures завершены.
 
 Исторический скрининг: [CHALK_INT006_PNG_SCREENING_2026-11-02.md](CHALK_INT006_PNG_SCREENING_2026-11-02.md). Follow-up exact CHALK и pixel audit: [CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md](CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md). INT-006 остаётся IN_PROGRESS только до independent validation/safety margin; production defaults/estimator не менять.
+
+
+## Актуальное уточнение INT-006 — 2026-11-02
+
+Геометрические follow-up V1–V5 и pixel audit завершены. Следующий аналитический gate — независимая validation замороженных моделей P0/P1/P2 на новых DrawingPlan; план эксперимента находится в `CHALK_INT006_INDEPENDENT_VALIDATION_PLAN_2026-11-02.md`.
+
+Отдельно открыт программный gate: commits `f0e05df` и `4847cce` добавили загрузку исторических legacy V2/V5 journals и regression tests, но последний подтверждённый полный CI run `41470680544` относится к более раннему code HEAD `3e8e6c5`. До нового полного CI legacy compatibility не помечать как полностью проверенную.
