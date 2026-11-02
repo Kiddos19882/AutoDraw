@@ -1300,10 +1300,10 @@ def test_destroying_recovery_scan_owner_cancels_pending_callback():
     ("case_name", "scenario_id", "expected_strokes"),
     [
         ("V1 — диагонали разных наклонов", "int006_diagonals", 6),
-        ("V2 — короткие штрихи 1–10 px", "int006_short_strokes", 6),
+        ("V2 — короткие штрихи 12–30 px (follow-up)", "int006_short_strokes_followup", 5),
         ("V3 — непрерывные повороты", "int006_turns", 3),
         ("V4 — замкнутые контуры", "int006_closed_contours", 3),
-        ("V5 — пересечения и параллельные линии", "int006_intersections_spacing", 10),
+        ("V5 — пересечения и sweep параллельных линий", "int006_intersections_spacing_sweep", 16),
     ],
 )
 def test_int006_drawing_plans_have_expected_strokes_and_logical_bounds(case_name, scenario_id, expected_strokes):
