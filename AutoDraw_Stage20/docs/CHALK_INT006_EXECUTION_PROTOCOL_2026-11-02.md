@@ -217,10 +217,10 @@ INT-007 не открывать, пока:
 - [x] Проверить HEAD и рабочую ветку.
 - [x] Сверить базовые документы и текущие результаты G1/G2/G3.
 - [x] Проверить matrix metadata и block planner.
-- [ ] Утвердить и реализовать контракт V1–V5 в экспериментальном harness.
-- [ ] Добавить unit/orchestration tests и подтвердить CI.
-- [ ] После готовности harness и отдельного разрешения выполнить 45 live captures.
-- [ ] Проанализировать геометрию и exact CHALK, оформить V1–V5 results.
+- [x] Утвердить и реализовать контракт V1–V5 в экспериментальном harness.
+- [x] Добавить unit/orchestration tests и подтвердить CI (run #1886; data commit CI run #1887).
+- [x] Выполнить 45 live captures V1–V5; все 45 задач completed и приняты.
+- [x] Проанализировать exact/per-stroke CHALK и оформить первичный отчёт V1–V5; pixel-level quality analysis остаётся открытым.
 - [ ] Провести независимую validation модели на новых рисунках.
 - [ ] Рассчитать обоснованный safety margin и закрыть INT-006.
 
