@@ -325,3 +325,16 @@ G1 per-stroke модель `1.765 + 0.2988×L` проверена без refit �
 Полные координаты, цели, критерии capture acceptance и пошаговая инструкция live-прогона: [CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md](CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md).
 
 Live-прогоны выполняет пользователь в собственной игровой сессии. Подготовка кода и CI не считается live validation. После получения данных отдельно проверить exact pre/post pointCount, per-stroke pointDelta, Monitor integrity, PNG geometry и repeatability. Production executor, estimator и sampling defaults не менять.
+
+
+## 17. Follow-up V1–V5 — live results 2026-11-02
+
+Пользователь выполнил все пять follow-up block series и добавил raw data commit [e879a77](https://github.com/Kiddos19882/AutoDraw/commit/e879a77f63be7a7a68de3f09091eab7dba0d34a2). Все пять journals имеют 9/9 completed; всего 45/45 captures.
+
+Все 45 captures приняты для анализа exact CHALK: radius=10, executor completed, ожидаемые stroke counts, exact pre/post pointCount, sampled delta совпадает с exact CHALK; per-run Monitor/Bridge errors, drops и sequence gaps равны нулю. P0/P1/P2 averages и все repeat values приведены в [отчёте follow-up](CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md).
+
+Step=4 дал снижение расхода на 38.5–49.4% относительно step=2 в зависимости от геометрии. При step=4 разница delay=5/10 ms не превышала примерно 1.4% по среднему расходу. Радиус во всех новых сериях фиксирован на 10, поэтому влияние размера кисти эта выборка не измеряет.
+
+В manifests post-draw cursor placement записан ниже `board_area` и `paint_meter_area` (32 px margin; экранная точка 856,624). Paint-meter image measurement остаётся inconclusive. ROI visibility heuristic помечает часть V3/V4 и все V5 штрихи ambiguous из-за overlap ROI; это не отменяет exact telemetry, но требует pixel-level проверки PNG именно новых follow-up captures.
+
+**Статус:** live follow-up V1–V5 завершён. Следующие gates: pixel-level аудит новых 45 PNG → независимая validation модели на полных DrawingPlan → safety margin → только затем INT-007. Production defaults и estimator не менялись.
