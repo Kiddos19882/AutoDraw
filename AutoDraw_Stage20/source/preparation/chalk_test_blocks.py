@@ -17,6 +17,7 @@ from chalk_experiment_matrix import (
     G3_POINT_STEPS,
     G3_POINT_DELAYS_MS,
     PHASE_SCENARIOS,
+    V_SAMPLING_PROFILES,
 )
 
 
@@ -161,7 +162,7 @@ def build_chalk_test_block_plan(
                     })
     elif phase_id in {"V1", "V2", "V3", "V4", "V5"}:
         cells = []
-        for point_step_px, point_delay_ms in ((2, 10), (4, 5), (4, 10)):
+        for point_step_px, point_delay_ms in V_SAMPLING_PROFILES:
             parameters = dict(GEOMETRY_EXECUTOR_CONFIG)
             parameters.update({"point_step_px": point_step_px, "point_delay_ms": point_delay_ms})
             for repeat_index in range(1, repeats + 1):
@@ -219,7 +220,7 @@ def build_chalk_test_block_plan(
             ] if phase_id == "G3" else (
                 [
                     {"point_step_px": step, "point_delay_ms": delay}
-                    for step, delay in ((2, 10), (4, 5), (4, 10))
+                    for step, delay in V_SAMPLING_PROFILES
                 ] if phase_id.startswith("V") else [dict(GEOMETRY_EXECUTOR_CONFIG)]
             )
         ),
@@ -375,7 +376,7 @@ def _validate_chalk_test_block_journal(document: Any, path: Path) -> dict[str, A
         scenario_id = PHASE_SCENARIOS[phase_id][0]
         expected_cells = {
             (step, delay, repeat)
-            for step, delay in ((2, 10), (4, 5), (4, 10))
+            for step, delay in V_SAMPLING_PROFILES
             for repeat in (1, 2, 3)
         }
         observed_cells = set()
@@ -408,7 +409,7 @@ def _validate_chalk_test_block_journal(document: Any, path: Path) -> dict[str, A
             observed_order_indices.add(order_index)
         expected_parameter_matrix = [
             {"point_step_px": step, "point_delay_ms": delay}
-            for step, delay in ((2, 10), (4, 5), (4, 10))
+            for step, delay in V_SAMPLING_PROFILES
         ]
         if (
             observed_cells != expected_cells
