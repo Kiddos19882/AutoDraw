@@ -1411,6 +1411,32 @@ class BrushBehaviorTestTab:
                 return True
         return False
 
+    def _has_completed_v1_v5_blocks(self) -> bool:
+        """Require accepted V1-V5 blocks before the independent model validation."""
+        journal_dir = self.output_dir / "chalk_test_blocks"
+        if not journal_dir.is_dir():
+            return False
+        for phase_id in ("V1", "V2", "V3", "V4", "V5"):
+            expected = 9
+            found = False
+            for journal_path in journal_dir.glob(f"chalk-block-{phase_id}-*.json"):
+                try:
+                    journal = load_chalk_test_block_journal(journal_path)
+                except (OSError, ValueError, json.JSONDecodeError):
+                    continue
+                if (
+                    journal.get("phase_id") == phase_id
+                    and journal.get("status") == "completed"
+                    and journal.get("expected_task_count") == expected
+                    and len(journal.get("tasks", [])) == expected
+                    and all(task.get("status") == "completed" for task in journal.get("tasks", []))
+                ):
+                    found = True
+                    break
+            if not found:
+                return False
+        return True
+
     def start_chalk_test_block(self) -> None:
         if self._chalk_block_task is not None or self._chalk_block_journal_path is not None:
             messagebox.showwarning("Блок уже активен", "Сначала заверши или останови текущий блок.", parent=self.root)
@@ -1439,6 +1465,13 @@ class BrushBehaviorTestTab:
             messagebox.showwarning(
                 "G3 пока закрыта",
                 "Сначала полностью выполни и прими автоматический блок G2. G3 нельзя запускать до завершения G2.",
+                parent=self.root,
+            )
+            return
+        if phase_id == "INT006" and not self._has_completed_v1_v5_blocks():
+            messagebox.showwarning(
+                "INT006 пока закрыта",
+                "Сначала должны быть полностью приняты блоки V1, V2, V3, V4 и V5. Независимую validation нельзя смешивать с незавершёнными геометрическими сериями.",
                 parent=self.root,
             )
             return
