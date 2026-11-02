@@ -183,8 +183,10 @@ def build_chalk_experiment_matrix_metadata(
     strokes: list[dict[str, Any]],
     matrix_order_index: int = 1,
     executor_parameters: dict[str, Any] | None = None,
+    prediction_id: str | None = None,
 ) -> dict[str, Any]:
     """Create stable identity for one G1/G2/G3/V1-V5/INT006 experiment cell."""
+
     normalized_series = _normalize_series_id(series_id)
     if not isinstance(scenario_id, str):
         raise ValueError("ID сценария должен быть текстом.")
@@ -202,7 +204,7 @@ def build_chalk_experiment_matrix_metadata(
         raise ValueError(f"Сценарий {scenario_id} должен содержать {EXPECTED_STROKES[scenario_id]} штрихов.")
     canonical_geometry = json.dumps(strokes, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     geometry_signature = hashlib.sha256(canonical_geometry.encode("utf-8")).hexdigest()
-    return {
+    metadata = {
         "schema_version": 1,
         "series_id": normalized_series,
         "phase_id": phase_id,
@@ -216,6 +218,13 @@ def build_chalk_experiment_matrix_metadata(
         "planned_strokes": json.loads(canonical_geometry),
         "executor_parameters": parameters,
     }
+    if phase_id == INDEPENDENT_VALIDATION_PHASE:
+        if not isinstance(prediction_id, str) or not prediction_id.strip():
+            raise ValueError("Для INT006 требуется prediction_id из frozen prediction artifact.")
+        metadata["prediction_id"] = prediction_id
+    elif prediction_id is not None:
+        raise ValueError("prediction_id разрешён только для INT006.")
+    return metadata
 
 
 def _stroke_level_breakdown(
@@ -309,12 +318,13 @@ def _validate_manifest(document: dict[str, Any]) -> tuple[bool, str, dict[str, A
             matrix_order_index=metadata.get("matrix_order_index", 1),
             strokes=metadata.get("planned_strokes"),
             executor_parameters=metadata.get("executor_parameters"),
+            prediction_id=metadata.get("prediction_id"),
         )
     except (TypeError, ValueError, OverflowError) as exc:
         return False, f"invalid_matrix_metadata:{exc}", None
     for key in ("schema_version", "series_id", "phase_id", "scenario_id", "repeat_index",
                 "planned_repeats", "requested_radius", "expected_strokes", "geometry_signature",
-                "planned_strokes", "executor_parameters"):
+                "planned_strokes", "executor_parameters", "prediction_id"):
         if metadata.get(key) != expected.get(key):
             return False, f"matrix_metadata_mismatch:{key}", None
     series_id = expected["series_id"]
