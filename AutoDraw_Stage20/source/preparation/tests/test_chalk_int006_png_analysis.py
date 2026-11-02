@@ -112,5 +112,14 @@ class Int006PngAnalysisTests(unittest.TestCase):
             self.assertEqual(report["duplicate_matrix_cells"], [])
             self.assertEqual(report["discovered_runs"], 2)
 
+    def test_duplicate_matrix_cells_within_one_series_are_still_detected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            self.make_run(root, name="first-attempt", series_id="same-series")
+            self.make_run(root, name="duplicate-attempt", series_id="same-series")
+            report=analysis.run(root, root/"out", expected_runs=2)
+            self.assertEqual(len(report["duplicate_matrix_cells"]), 1)
+            self.assertEqual(report["duplicate_matrix_cells"][0][0], "same-series")
+
 if __name__ == "__main__":
     unittest.main()
