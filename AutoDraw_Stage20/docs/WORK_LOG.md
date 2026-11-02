@@ -1795,3 +1795,14 @@ Brush Test acceptance и матричные валидаторы больше н
 - Отмечено ограничение: курсор закрывает часть правого конца шестой линии; точная оценка этого cap невозможна по текущему capture.
 - Визуальный gate закрыт для длинных горизонтальных линий G3, но не для других геометрий. Создан отчёт `CHALK_G3_VISUAL_QUALITY_AUDIT_2026-11-02.md`; обновлены G3 report, preliminary model, README, PROJECT_STATUS, TASKS и ROADMAP.
 - Код не менялся, live-тесты не запускались, production defaults не менялись.
+
+
+## 2026-11-02 — консолидация документации после G3 visual audit
+
+- Проверены актуальные docs index, PROJECT_STATUS, TASKS, ROADMAP, WORK_LOG, CHANGELOG, G3 Results, визуальный аудит и preliminary CHALK model.
+- Выявлены и устранены противоречия: устаревшие статусы до G1/G2/G3, INT-006=TODO, утверждение что G3 PNG ещё не просмотрены, повторение старого открытого visual gate после его закрытия.
+- В начале PROJECT_STATUS выделен актуальный снимок состояния на 2026-11-02; предыдущая полная версия сохранена отдельно в `PROJECT_STATUS_HISTORY_2026-11-02.md`.
+- В TASKS актуализированы статусы INT-001—INT-009: INT-004/005 закрыты в пределах реализованного контура, INT-006 выполняется, INT-007 заблокирована до validation, INT-003 остаётся открытой по A/B/C overhead.
+- Создан `CHALK_NEXT_STEPS_PLAN_2026-11-02.md`: геометрическая validation step=4, независимая validation модели, метрики ошибки, safety margin, затем INT-007—INT-009.
+- Синхронизированы G3 Results, preliminary model, ROADMAP и docs README.
+- Исходный код, тесты, конфигурация и первичные экспериментальные данные не менялись; live-эксперименты и workflows не запускались.
