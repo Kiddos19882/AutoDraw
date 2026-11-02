@@ -17,7 +17,7 @@
 - Предварительная сегментированная модель создана в [CHALK_PRELIMINARY_SEGMENTED_MODEL_2026-11-02.md](CHALK_PRELIMINARY_SEGMENTED_MODEL_2026-11-02.md). Она исследовательская, не production estimator; независимая validation ещё не выполнена.
 - Визуальный аудит всех шести G3 PNG step=4/delay=5 и step=4/delay=10 пройден для длинных горизонтальных линий. Все шесть линий визуально непрерывны. Конец шестой линии частично закрыт курсором. Количественные pixel-level метрики gap/centerline/width не рассчитаны.
 - step=4 подтверждён только как экспериментальный режим для длинных горизонтальных линий в условиях G3. Универсальный production default не утверждён; настройки executor не менялись.
-- INT-006 зафиксирован протоколом `CHALK_INT006_EXECUTION_PROTOCOL_2026-11-02.md`. Аудит показал, что V1–V5 отсутствуют в текущих `PHASE_SCENARIOS`/`EXPECTED_STROKES`; block planner и journal validator поддерживают только G1/G2/G3. Следующий gate — согласованное расширение matrix metadata, block planner/journal, Brush Test UI, capture acceptance, analyzer и tests.
+- INT-006 зафиксирован протоколом `CHALK_INT006_EXECUTION_PROTOCOL_2026-11-02.md`. Экспериментальный harness расширен сценариями V1–V5 поверх G3: matrix metadata/validator, 9-cell block planner/journal, Brush Test UI и task-specific executor override. Добавлены regression tests. CI и 45 live captures ещё не подтверждены; независимая validation модели не выполнена.
 - Код и live-эксперименты в ходе последнего документального аудита не изменялись/не запускались.
 
 ## Статусы инициатив
@@ -38,7 +38,7 @@
 ## Ближайший рабочий приоритет
 
 1. Завершить документальную консолидацию: синхронизировать TASKS, ROADMAP, модель CHALK, G3 Results и индексы.
-2. Подготовить harness для V1–V5 по `CHALK_INT006_EXECUTION_PROTOCOL_2026-11-02.md`; текущий runner эти фазы не поддерживает. Затем выполнить геометрическую валидацию step=4: диагонали, короткие штрихи, повороты, замкнутые контуры и пересечения. Контроль — step=2/delay=10; кандидаты — step=4/delay=5 и step=4/delay=10.
+2. Подтвердить CI расширенного G3 harness для V1–V5. Затем выполнить геометрическую валидацию step=4: диагонали, короткие штрихи, повороты, замкнутые контуры и пересечения. Контроль — step=2/delay=10; кандидаты — step=4/delay=5 и step=4/delay=10.
 3. Для каждого run требовать exact CHALK, per-run Monitor integrity, одинаковую геометрию, визуальный capture и три повтора на профиль.
 4. Собрать независимую validation-выборку реальных планов и сравнить прогноз с exact pre/post pointCount; рассчитать MAE, RMSE, bias и относительную ошибку, отдельно по типам геометрии.
 5. Только после validation определить консервативный safety margin и критерии допуска к квоте.
