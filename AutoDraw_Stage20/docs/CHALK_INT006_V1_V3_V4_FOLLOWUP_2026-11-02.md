@@ -68,7 +68,7 @@ DrawingPlan:
 | `triangle` | (260,20) → (420,120) → (180,120) → (260,20) |
 | `irregular_polygon` | (250,150) → (390,150) → (420,220) → (300,220) → (220,190) → (250,150) |
 
-Для автоматического post-draw capture код выполняет mouseUp, перемещает отпущенный курсор за пределы calibrated board ROI и только затем снимает PNG. Перемещение курсора относится только к автоматическому post-draw capture; ручной capture не изменён.
+Для автоматического post-draw capture код выполняет mouseUp, перемещает отпущенный курсор ниже нижней границы `board_area` и `paint_meter_area` с отступом 32 px и только затем снимает PNG. Ручной capture не изменён. Перемещение курсора относится только к автоматическому post-draw capture; ручной capture не изменён.
 
 Цель — повторно измерить closure seam и проверить, что область последнего endpoint не перекрыта курсором. Если курсор обнаружен в ROI либо endpoint закрыт неоднозначными пикселями, соответствующая метрика помечается ambiguous; не считать её успешной только по отсутствию gap в остальной части контура.
 
@@ -107,3 +107,10 @@ Capture включается в анализ только если одновр�
 - сопоставление с исходной серией только как отдельное сравнение «до/после исправления», не как единая обучающая выборка.
 
 **Не предполагается заранее, что step=4 проходит геометрический gate.** Pixel metrics остаются диагностикой изображения; exact CHALK берётся только из игрового `post.pointCount - pre.pointCount`. Production executor, estimator и sampling defaults не менять по факту подготовки этих серий.
+
+
+## 8. Фактическое выполнение follow-up — 2026-11-02
+
+Серия выполнена пользователем и сохранена в commit [e879a77](https://github.com/Kiddos19882/AutoDraw/commit/e879a77f63be7a7a68de3f09091eab7dba0d34a2). V1, V3 и V4 имеют по 9/9 completed tasks; вместе с V2/V5 follow-up полный пакет составляет 45/45 captures. Exact CHALK и per-run Monitor integrity приняты. Итоги и repeat values: [CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md](CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md).
+
+Все новые captures фиксируют cursor point (856,624), ниже доски и полоски краски. CI cursor-placement fix run [41486593544](https://github.com/Kiddos19882/AutoDraw/actions/runs/41486593544) завершился success. Pixel-level audit новых PNG ещё не выполнен; неоднозначные ROI для V3/V4 требуют проверки масок и overlays. Production defaults не менялись.
