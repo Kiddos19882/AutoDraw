@@ -2,17 +2,18 @@
 
 ## Актуальный статус INT-006 — 2026-11-02
 
-- [x] Harness V1–V5 и regression tests реализованы; CI #1886 пройден.
-- [x] Выполнены и приняты 45/45 live captures: V1 диагонали, V2 короткие штрихи, V3 повороты, V4 замкнутые контуры, V5 пересечения/параллели.
-- [x] CI #1887 на data commit `6479536` завершился success.
+- [x] Harness V1–V5 и regression tests реализованы; исходный CI #1886 пройден.
+- [x] Выполнены и приняты 45/45 исходных live captures V1–V5; CI #1887 на data commit `6479536` завершился success.
+- [x] Выполнен pixel-level audit 45/45 PNG: 252 per-stroke rows, 279 parallel-pair rows; representative overlays просмотрены.
+- [x] Исправлены пересечения в DrawingPlan V1/V3, добавлен isolation gate; для V4 реализован cursor-free automated post-draw capture.
+- [x] Corrective code HEAD `3e8e6c5` прошёл полный CI run [41470680544](https://github.com/Kiddos19882/AutoDraw/actions/runs/41470680544): integration, executor, Game Monitor/bridge, Preparation/G3, Windows portable build и PNG audit — success.
 - [x] Получена первичная holdout-проверка G1-модели на 66 новых штрихах P0 (MAE 1.09, RMSE 1.33, MAPE 1.71%).
-- [ ] Выполнить pixel-level оценку gap/centerline/width по PNG.
-- [ ] Исправить непреднамеренные пересечения в V1/V3 и повторить изолированные проверки.
-- [ ] Завершить независимую validation step=4 и lookup коротких strokes; определить safety margin.
+- [ ] Выполнить live follow-up V1/V3 с исправленной геометрией, V4 cursor-free closure, V2 short-stroke и V5 spacing sweep.
+- [ ] Завершить независимую validation step=4 и полных DrawingPlan; только затем определить safety margin.
 
-Подробные данные и ограничения: [CHALK_INT006_V1_V5_RESULTS_2026-11-02.md](CHALK_INT006_V1_V5_RESULTS_2026-11-02.md). Production defaults и estimator не менялись. Исторические записи ниже сохраняются для хронологии и не переопределяют этот статус.
+Подробные данные и ограничения: [CHALK_INT006_V1_V5_RESULTS_2026-11-02.md](CHALK_INT006_V1_V5_RESULTS_2026-11-02.md), [протокол V2/V5 follow-up](CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md). Production defaults и estimator не менялись. Исторические записи ниже сохраняются для хронологии и не переопределяют этот статус.
 
-Документ объединяет завершённые направления документирования и текущую последовательность работ по измерению игрового CHALK. Разрешения на анализ, документирование, изменение кода и тестирование остаются раздельными.
+Документ объединяет завершённые направления документирования и текущую последовательность работ по измерению игрового CHALK. В текущем продолжении пользователь разрешил все действия; live captures требуют доступной игровой сессии и готовой тестовой доски.
 
 ## Статус аналитических планов
 
