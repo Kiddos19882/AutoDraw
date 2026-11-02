@@ -11,10 +11,12 @@ INT-006 остаётся IN_PROGRESS. Harness V1–V5 и regression tests реа
 
 Сводный отчёт: [CHALK_INT006_V1_V5_RESULTS_2026-11-02.md](CHALK_INT006_V1_V5_RESULTS_2026-11-02.md). Step=4 снизил CHALK примерно на 48–49% для V1/V3/V4/V5 и на 23–25% для V2. G1-модель проверена без refit на 66 новых per-stroke наблюдениях P0: MAE 1.09, RMSE 1.33, bias −1.04, MAPE 1.71%. Исследовательские step=4 fits около 0.149 CHALK/logical px ещё не являются независимой validation.
 
-Pixel-level audit 45/45 и ручной review representative overlays выполнены. DrawingPlan V1/V3 исправлены в harness с isolation gate >20 logical px. Для V4 добавлен cursor-free post-draw capture: mouseUp, перемещение за пределы board ROI, повторный screenshot; добавлены unit/regression tests. CI текущего HEAD `a74f7fd` и live capture ещё ожидаются. Перемещение курсора изолировано только в automated post-draw; ручной capture не затронут. Открыты V2 short-stroke follow-up, V4 closure validation, V5 spacing sweep, независимая validation step=4/полных DrawingPlan и safety margin. Production executor defaults и estimator не менять.
+Pixel-level audit 45/45 и ручной review representative overlays выполнены. DrawingPlan V1/V3 исправлены в harness с isolation gate >20 logical px. Для V4 добавлен cursor-free post-draw capture: mouseUp, перемещение за пределы board ROI, повторный screenshot; добавлены unit/regression tests. Corrective code HEAD `3e8e6c5` прошёл полный CI run [41470680544](https://github.com/Kiddos19882/AutoDraw/actions/runs/41470680544): все обязательные jobs, Windows portable build и PNG audit успешны. Перемещение курсора изолировано только в automated post-draw; ручной capture не затронут. Открыты live follow-up V1/V3, V2 short-stroke, V4 closure, V5 spacing sweep, независимая validation step=4/полных DrawingPlan и safety margin. Production executor defaults и estimator не менять.
 
 Порядок дальнейшей работы:
 1. [x] Зафиксировать контракт V1–V5 и единицы координат (logical DrawingPlan vs screen-pixel sampling step).
+2. [x] Исправить legacy V2/V5 manifest compatibility и V5 integration fixture; полный CI на `3e8e6c5` прошёл run `41470680544`.
+3. [ ] Выполнить live follow-up V1/V3/V2/V4/V5 по протоколам, не смешивая новые scenario IDs с исходными captures.
 2. [x] Реализовать поддержку V1–V5 в экспериментальном harness и добавить regression tests.
 3. [x] Подтвердить CI/Windows startup smoke-test.
 4. [x] Выполнить 45 live captures и сохранить исходные manifests/reports/PNG в commit 6479536.
@@ -59,7 +61,7 @@ Pixel-level audit 45/45 и ручной review representative overlays выпо�
 
 ## Этап 2. Геометрическая валидация sampling step=4
 
-**Текущий статус:** 45/45 исходных live captures приняты; CI #1887 и pixel audit CI `41392156994` пройдены. Pixel-level metrics рассчитаны, representative overlays просмотрены. Геометрия V1/V3 исправлена в test harness (`5047cb7`/`a4a909d`). Для V4 добавлен cursor-free post-draw capture (`a680f51`/`d299259`/`723a410`); новый CI и live validation ожидаются. V2 short-stroke, V4 closure и V5 spacing sweep остаются открытыми.
+**Текущий статус:** 45/45 исходных live captures приняты; CI #1887 и pixel audit исходной серии пройдены. Исправления harness и legacy V2/V5 compatibility прошли полный corrective CI run `41470680544` на code HEAD `3e8e6c5`, включая Windows portable build и PNG audit. Геометрия V1/V3 исправлена в test harness; для V4 подготовлен cursor-free post-draw capture. Live follow-up V1/V3/V2/V4/V5 и независимая validation модели остаются открытыми.
 
 **Цель:** определить, можно ли безопасно применять step=4 не только к длинным горизонтальным линиям. Первичная матрица уже выполнена; текущая работа — quality audit и закрытие ограничений V1/V3/V2.
 
