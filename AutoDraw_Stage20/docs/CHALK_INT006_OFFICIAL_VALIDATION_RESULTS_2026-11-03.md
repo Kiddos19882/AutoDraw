@@ -12,8 +12,6 @@
 
 ## 1. Итоговый gate
 
-<badge>Не применяется в Markdown</badge>
-
 Официальный запуск `chalk_int006_validation.py` завершился успешно. Analyzer report:
 
 | Проверка | Результат |
