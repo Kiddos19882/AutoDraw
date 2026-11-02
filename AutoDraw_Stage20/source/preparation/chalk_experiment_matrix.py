@@ -25,6 +25,13 @@ PHASE_SCENARIOS = {
     "V3": ("int006_turns",),
     "V4": ("int006_closed_contours",),
     "V5": ("int006_intersections_spacing_sweep",),
+    "INT006": (
+        "int006_validation_d1_mixed_lines",
+        "int006_validation_d2_polygon",
+        "int006_validation_d3_intersections",
+        "int006_validation_d4_short_details",
+        "int006_validation_d5_repeated_coverage",
+    ),
 }
 LEGACY_V_SCENARIO_PHASES = {
     "int006_short_strokes": "V2",
@@ -65,12 +72,18 @@ EXPECTED_STROKES = {
     "int006_closed_contours": 3,
     "int006_intersections_spacing_sweep": 16,
     "int006_intersections_spacing": 10,
+    "int006_validation_d1_mixed_lines": 4,
+    "int006_validation_d2_polygon": 5,
+    "int006_validation_d3_intersections": 6,
+    "int006_validation_d4_short_details": 6,
+    "int006_validation_d5_repeated_coverage": 6,
 }
 
 G3_POINT_STEPS = (1, 2, 4)
 G3_POINT_DELAYS_MS = (5, 10, 20)
 V_SAMPLING_PROFILES = ((2, 10), (4, 5), (4, 10))
 V_PHASES = frozenset(("V1", "V2", "V3", "V4", "V5"))
+INDEPENDENT_VALIDATION_PHASE = "INT006"
 
 
 def _validated_executor_parameters(phase_id: str, value: Any = None) -> dict[str, Any]:
@@ -89,7 +102,7 @@ def _validated_executor_parameters(phase_id: str, value: Any = None) -> dict[str
         expected.update({"point_step_px": step, "point_delay_ms": delay})
         if parameters != expected:
             raise ValueError("В G3 разрешено менять только point_step_px и point_delay_ms.")
-    elif phase_id in V_PHASES:
+    elif phase_id in V_PHASES or phase_id == INDEPENDENT_VALIDATION_PHASE:
         step = parameters.get("point_step_px")
         delay = parameters.get("point_delay_ms")
         if (step, delay) not in V_SAMPLING_PROFILES:
@@ -171,7 +184,7 @@ def build_chalk_experiment_matrix_metadata(
     matrix_order_index: int = 1,
     executor_parameters: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Create stable identity for one G1/G2/G3/V1-V5 experiment cell."""
+    """Create stable identity for one G1/G2/G3/V1-V5/INT006 experiment cell."""
     normalized_series = _normalize_series_id(series_id)
     if not isinstance(scenario_id, str):
         raise ValueError("ID сценария должен быть текстом.")
@@ -184,7 +197,7 @@ def build_chalk_experiment_matrix_metadata(
     if isinstance(matrix_order_index, bool) or not isinstance(matrix_order_index, int) or matrix_order_index < 1:
         raise ValueError("Порядковый номер эксперимента должен быть положительным целым числом.")
     if isinstance(requested_radius, bool) or not isinstance(requested_radius, int) or requested_radius != 10:
-        raise ValueError("Для серий G1/G2/G3/V1-V5 требуется фиксированный радиус кисти 10.")
+        raise ValueError("Для серий G1/G2/G3/V1-V5/INT006 требуется фиксированный радиус кисти 10.")
     if not isinstance(strokes, list) or len(strokes) != EXPECTED_STROKES[scenario_id]:
         raise ValueError(f"Сценарий {scenario_id} должен содержать {EXPECTED_STROKES[scenario_id]} штрихов.")
     canonical_geometry = json.dumps(strokes, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
