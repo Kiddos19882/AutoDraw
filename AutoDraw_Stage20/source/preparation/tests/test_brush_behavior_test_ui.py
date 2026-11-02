@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import math
 
 import pytest
 
@@ -1313,3 +1314,60 @@ def test_int006_drawing_plans_have_expected_strokes_and_logical_bounds(case_name
         0 <= point["x"] <= 460 and 0 <= point["y"] <= 240
         for stroke in plan["strokes"] for point in stroke["points"]
     )
+
+
+def _point_segment_distance(point, start, end):
+    dx, dy = end[0] - start[0], end[1] - start[1]
+    length_sq = dx * dx + dy * dy
+    if length_sq <= 1e-12:
+        return math.hypot(point[0] - start[0], point[1] - start[1])
+    ratio = max(0.0, min(1.0, ((point[0] - start[0]) * dx + (point[1] - start[1]) * dy) / length_sq))
+    return math.hypot(point[0] - start[0] - ratio * dx, point[1] - start[1] - ratio * dy)
+
+
+def _orientation(a, b, c):
+    return (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])
+
+
+def _segments_intersect(a, b, c, d):
+    eps = 1e-9
+    o1, o2 = _orientation(a, b, c), _orientation(a, b, d)
+    o3, o4 = _orientation(c, d, a), _orientation(c, d, b)
+
+    def on_segment(p, q, r):
+        return (min(p[0], r[0]) - eps <= q[0] <= max(p[0], r[0]) + eps
+                and min(p[1], r[1]) - eps <= q[1] <= max(p[1], r[1]) + eps)
+
+    if o1 * o2 < -eps and o3 * o4 < -eps:
+        return True
+    return ((abs(o1) <= eps and on_segment(a, c, b))
+            or (abs(o2) <= eps and on_segment(a, d, b))
+            or (abs(o3) <= eps and on_segment(c, a, d))
+            or (abs(o4) <= eps and on_segment(c, b, d)))
+
+
+def _polyline_distance(first, second):
+    distances = []
+    for a, b in zip(first, first[1:]):
+        for c, d in zip(second, second[1:]):
+            if _segments_intersect(a, b, c, d):
+                return 0.0
+            distances.extend((
+                _point_segment_distance(a, c, d),
+                _point_segment_distance(b, c, d),
+                _point_segment_distance(c, a, b),
+                _point_segment_distance(d, a, b),
+            ))
+    return min(distances, default=float("inf"))
+
+
+@pytest.mark.parametrize("case_name", ["V1 — диагонали разных наклонов", "V3 — непрерывные повороты"])
+def test_int006_v1_v3_strokes_are_spatially_isolated(case_name):
+    strokes = TEST_CASES[case_name]["strokes"]
+    for index, first in enumerate(strokes):
+        for second in strokes[index + 1:]:
+            distance = _polyline_distance(first["points"], second["points"])
+            assert distance > 20.0, (
+                f"{case_name}: {first['name']} and {second['name']} are only "
+                f"{distance:.2f} logical px apart; expected > 20 px for radius=10."
+            )
