@@ -1441,3 +1441,30 @@ def test_manual_experiment_capture_does_not_relocate_cursor():
     source = inspect.getsource(brush_ui.BrushBehaviorTestTab._capture_experiment_phase_now)
     assert "pyautogui.mouseUp()" not in source
     assert "pyautogui.moveTo(" not in source
+
+
+def test_postdraw_cursor_moves_below_board_and_paint_meter():
+    board = {"x": 500, "y": 250, "width": 600, "height": 300}
+    paint_meter = {"x": 650, "y": 570, "width": 220, "height": 18}
+
+    point = brush_ui._cursor_safe_point_outside_region(
+        board, (1920, 1080), margin=32, avoid_regions=(paint_meter,)
+    )
+
+    assert point == (800, 620)
+    for region in (board, paint_meter):
+        assert not (
+            region["x"] - 32 <= point[0] <= region["x"] + region["width"] - 1 + 32
+            and region["y"] - 32 <= point[1] <= region["y"] + region["height"] - 1 + 32
+        )
+
+
+def test_postdraw_cursor_avoids_paint_meter_even_when_board_bottom_is_clear():
+    board = {"x": 500, "y": 250, "width": 600, "height": 300}
+    paint_meter = {"x": 700, "y": 570, "width": 180, "height": 20}
+
+    point = brush_ui._cursor_safe_point_outside_region(
+        board, (1920, 1080), margin=32, avoid_regions=(paint_meter,)
+    )
+
+    assert point[1] >= paint_meter["y"] + paint_meter["height"] + 32
