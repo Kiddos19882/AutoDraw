@@ -83,7 +83,7 @@ class Int006PngAnalysisTests(unittest.TestCase):
             pairs=analysis.analyse_capture(folder, root/"out")["parallel_pairs"]
             self.assertEqual(len(pairs), 1)
             self.assertAlmostEqual(pairs[0]["axis_separation_logical"], 120, delta=1)
-            self.assertFalse(pairs[0]["candidate_masks_touch_or_merge"])
+            self.assertFalse(pairs[0]["assigned_ink_masks_touch_or_merge"])
 
     def test_batch_writes_csv_json(self):
         with tempfile.TemporaryDirectory() as tmp:
