@@ -472,3 +472,11 @@
 - Исправлена portability-привязка journal attempt к experiment directory name вместо локального абсолютного Windows path; добавлен regression test.
 - В `.github/workflows/geometry-tests.yml` добавлен официальный запуск analyzer и artifact upload. Новый CI result и официальный analyzer JSON ещё ожидаются.
 - Safety margin не установлен; production estimator, executor/sampling defaults и master не менялись.
+
+
+## 2026-11-03 — повторный полный аудит INT-006 captures
+
+- Повторно прочитаны все 45 experiment manifests и все 45 Monitor reports.
+- Для каждой записи подтверждены exact CHALK, per-stroke pointDelta sum, stroke count, experiment linkage, observed radius=10 и нулевые Monitor/Bridge integrity counters.
+- SHA-256 frozen prediction artifact независимо пересчитан и совпал с journal: `a0eab016e96a81e14bededd32cf5161dd943d6fc85a20b7eec17455f69d0c61c`.
+- Официальный analyzer JSON и результат CI после его подключения пока не получены; quantitative validation и safety margin остаются pending.
