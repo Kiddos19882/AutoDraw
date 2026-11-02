@@ -1966,3 +1966,11 @@ Brush Test acceptance и матричные валидаторы больше н
 - V2: 9 строк `length_10` имеют `path_metrics_sufficient=false`; это ограничение оценки центральной линии, не доказательство разрыва.
 - V5: 9/144 candidate pair rows отмечены как touching/overlap для близкой пары с axis separation 8.0115 logical px и minimum ink-mask distance 2.3718 logical px. Это подтверждает известное ограничение исходной V5 spacing=8 и обосновывает отдельный sweep.
 - Результаты PNG являются геометрической диагностикой и не заменяют exact CHALK telemetry `post.pointCount - pre.pointCount`.
+
+
+### Подготовлен live follow-up V1/V3/V4 — 2026-11-02
+
+- Добавлен `CHALK_INT006_V1_V3_V4_FOLLOWUP_2026-11-02.md`: отдельные серии для исправленных DrawingPlan V1/V3 и cursor-free closure capture V4.
+- Для каждой фазы предусмотрены новый `series_id`, отдельный journal и 9 captures (P0/P1/P2 × 3); суммарно 27 captures и 108 per-stroke observations.
+- Проверены фактические координаты сценариев в `brush_behavior_test_ui.py`: V1 — 6 диагоналей, V3 — 3 полилинии, V4 — 3 замкнутых контура; ожидаемые counts согласованы с `EXPECTED_STROKES`.
+- В документационный индекс, PROJECT_STATUS, TASKS, ROADMAP и CHALK_NEXT_STEPS_PLAN добавлены ссылки на протокол. Live captures не выполнялись.
