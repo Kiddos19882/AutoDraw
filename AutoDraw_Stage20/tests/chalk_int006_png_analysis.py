@@ -350,7 +350,7 @@ def run(results_dir: Path, out: Path, expected_runs: int = 45) -> dict[str, Any]
         "coverage_width_median_logical", "coverage_width_p05_logical", "coverage_width_p95_logical",
         "coverage_width_cv", "mask_component_count", "closure_seam_center_distance_logical", "closure_seam_covered"]
     with (out / "per_stroke_metrics.csv").open("w", encoding="utf-8-sig", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=stroke_fields); writer.writeheader()
+        writer = csv.DictWriter(f, fieldnames=stroke_fields, extrasaction="ignore"); writer.writeheader()
         for r in rows:
             profile = r["sampling_profile"]
             for stroke in r["strokes"]:
@@ -363,7 +363,7 @@ def run(results_dir: Path, out: Path, expected_runs: int = 45) -> dict[str, Any]
         "axis_angle_difference_deg", "candidate_mask_overlap_pixels", "candidate_masks_touch_or_merge",
         "minimum_ink_mask_distance_px", "minimum_ink_mask_distance_logical"]
     with (out / "parallel_pair_metrics.csv").open("w", encoding="utf-8-sig", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=pair_fields); writer.writeheader()
+        writer = csv.DictWriter(f, fieldnames=pair_fields, extrasaction="ignore"); writer.writeheader()
         for r in rows:
             profile = r["sampling_profile"]
             for pair in r["parallel_pairs"]:
