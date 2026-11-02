@@ -1974,3 +1974,12 @@ Brush Test acceptance и матричные валидаторы больше н
 - Для каждой фазы предусмотрены новый `series_id`, отдельный journal и 9 captures (P0/P1/P2 × 3); суммарно 27 captures и 108 per-stroke observations.
 - Проверены фактические координаты сценариев в `brush_behavior_test_ui.py`: V1 — 6 диагоналей, V3 — 3 полилинии, V4 — 3 замкнутых контура; ожидаемые counts согласованы с `EXPECTED_STROKES`.
 - В документационный индекс, PROJECT_STATUS, TASKS, ROADMAP и CHALK_NEXT_STEPS_PLAN добавлены ссылки на протокол. Live captures не выполнялись.
+
+
+## 2026-11-02 — исправлена совместимость журналов старых V2/V5 блоков
+- Проверен непосредственно в GitHub journal `chalk-block-V2-chalk-20261102-060912-a8e1c6-6204351c.json` (series `chalk-20261102-060912-a8e1c6`). В нём 9/9 уникальных matrix cells, все задачи и блок имеют статус `completed`; legacy scenario ID `int006_short_strokes`, expected_strokes=6. Дублирующихся ячеек не обнаружено.
+- Root cause: block journal validator использовал только текущий `PHASE_SCENARIOS[V2]` ID и 5-stroke count. Хотя legacy IDs присутствовали в `LEGACY_V_SCENARIO_PHASES` и `EXPECTED_STROKES`, validator их не учитывал. Из-за отказа загрузки корректный completed journal попадал в unresolved recovery scan; кнопка закрытия повторно вызывала ту же загрузку и завершалась той же ошибкой.
+- Исправлено: validator принимает для V2/V5 как текущие scenario IDs, так и соответствующие legacy IDs; ожидаемое число штрихов сверяется с конкретным ID задачи. Смешение legacy/current scenario IDs в одном блоке по-прежнему запрещено; все 9 matrix cells, уникальность order index и sampling parameters строго проверяются.
+- Добавлены regression tests для legacy V2 (6 strokes) и legacy V5 (10 strokes), оба с полностью completed журналами.
+- Commits: `f0e05df` (validator), `4847cce` (tests). Ветка `feature/image-geometry-optimization`; master не затронут. Production executor, CHALK estimator, sampling defaults и experiment data не менялись.
+- Следующий gate: дождаться полного CI на исправленном коде. После получения обновлённой версии приложения пользователь может просто перезапустить AutoDraw: корректный completed journal должен проходить загрузку и не требовать ни восстановления, ни закрытия. Локальный файл журнала не нужно удалять или редактировать.
