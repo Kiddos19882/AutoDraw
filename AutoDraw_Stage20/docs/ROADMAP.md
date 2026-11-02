@@ -194,4 +194,4 @@ Harness V1–V5: matrix metadata/validator, block planner/journal, Brush Test UI
 
 Геометрические follow-up V1–V5 и pixel audit завершены. Следующий аналитический gate — независимая validation замороженных моделей P0/P1/P2 на новых DrawingPlan; план эксперимента находится в `CHALK_INT006_INDEPENDENT_VALIDATION_PLAN_2026-11-02.md`.
 
-Отдельно открыт программный gate: commits `f0e05df` и `4847cce` добавили загрузку исторических legacy V2/V5 journals и regression tests, но последний подтверждённый полный CI run `41470680544` относится к более раннему code HEAD `3e8e6c5`. До нового полного CI legacy compatibility не помечать как полностью проверенную.
+Программный gate legacy-journal compatibility закрыт: run `41496555297` checkout рабочей ветки после commit `956ce2b`, содержащего commits `f0e05df` и `4847cce` в истории. Preparation/G3 завершился 662 passed и 82 subtests passed; все обязательные jobs, Windows portable build и PNG audit успешны.
