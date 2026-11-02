@@ -98,13 +98,31 @@ Logical DrawingPlan переводился в пиксели изображен�
 4. Нельзя определить точный минимальный spacing параллельных штрихов по одной паре 8/24 px.
 5. Pixel audit не измеряет расход CHALK. Для расхода остаются authoritative exact CHALK/pointCount deltas из Monitor; pixel metrics описывают геометрию следа.
 
-## 7. Следующие действия
+## 7. Ручная проверка representative overlays и follow-up
 
-1. Просмотреть overlay/ink-mask всех проблемных случаев V2 length_10, V4 irregular_polygon и V1/V3 multi-component; при необходимости скорректировать анализатор и повторить CI.
-2. Исправить DrawingPlan V1/V3 так, чтобы тестовые штрихи не пересекались непреднамеренно; сохранить смысл проверки наклонов и поворотов.
-3. Добавить V5 spacing sweep между 8 и 24 logical px, не объявляя порог по текущей паре.
-4. Добавить targeted короткие траектории, длина которых позволяет оценивать линию отдельно от круглого отпечатка.
-5. После reruns сравнить P0/P1/P2 отдельно по каждой геометрии и повторам.
-6. Затем провести независимую validation CHALK model и определить safety margin. До этого INT-007 остаётся BLOCKED.
+После CI run `41392156994` вручную просмотрены representative overlays из artifact `autodraw-int006-png-analysis`:
 
-**Статус:** пакетный pixel-level аудит выполнен; quality gate остаётся OPEN до проверки диагностических исключений и targeted reruns. Production executor, estimator, sampling defaults и первичные captures не изменялись.
+- V2/P1 (`length_10`): круглый footprint кисти перекрывает весь короткий путь; path metric insufficient ожидаем и не является доказательством пропущенного штриха.
+- V4/P0 и P1: курсор расположен на общей начальной/конечной точке `irregular_polygon`; closure seam не виден независимо от фактического замыкания.
+- V1/P1: подтверждено пересечение `slope_050` / `negative_shallow` и пересечение/касание `negative_shallow` / `negative_steep`.
+- V3/P1: подтверждено пересечение `right_angle` / `acute_zigzag`.
+- V5/P1: визуально подтверждено слияние близкой параллельной пары; количественный sweep по-прежнему отсутствует.
+
+### Коррекция экспериментального DrawingPlan
+
+В коммите `5047cb7973a266ca69b6fd9c21ea81af0bd89db3` изменены только тестовые координаты V1/V3. Новый regression test из коммита `a4a909d08b9947cfff139b20d55300f1e97dcc25` проверяет минимальное расстояние между любыми двумя отдельными polyline: >20 logical px при конфигурации radius=10. Геометрический расчёт новых планов даёт минимум около 25.58 px для V1 и 31.62 px для V3. Это плановая изоляция центровых линий, а не измеренный физический диаметр следа.
+
+Существующие 45 captures остаются валидными для исходных telemetry/CHALK сравнений, но не подтверждают новую геометрию. Для новых выводов нужны новые V1/V3 blocks и успешный CI.
+
+## 8. Следующие действия
+
+1. [x] Просмотреть representative overlays V2 length_10, V4 irregular_polygon, V1/V3 и V5; зафиксировать причины неоднозначности.
+2. [x] Исправить DrawingPlan V1/V3 и добавить regression gate межштрихового расстояния >20 logical px.
+3. [ ] Подтвердить CI для code HEAD `a4a909d08b9947cfff139b20d55300f1e97dcc25`.
+4. [ ] Повторить полные V1/V3 blocks с новыми геометриями; не смешивать их с исходными captures.
+5. [ ] Убрать cursor occlusion с closure seam V4 и повторить проверку замыкания.
+6. [ ] Добавить V2 targeted lengths 12/16/20/24/30 logical px и сравнить отдельные штрихи с непрерывной полилинией.
+7. [ ] Выполнить V5 spacing sweep 8/12/16/20/24 logical px.
+8. [ ] Провести независимую validation CHALK model и определить safety margin. До этого INT-007 остаётся BLOCKED.
+
+**Статус:** пакетный pixel-level аудит и ручной review representative overlays выполнены. Геометрия V1/V3 исправлена в экспериментальном harness, но новые captures и CI ещё не подтверждены. Quality gate остаётся OPEN. Production executor, estimator, sampling defaults и первичные captures не изменялись.
