@@ -187,3 +187,14 @@ Fit на тех же 66 новых strokes для каждого профиля 
 При radius=10 визуально эти короткие движения выглядят как точки. Lookup является предварительным и основан на трёх повторах на ячейку; не интерполировать его как универсальную функцию.
 
 Подробности, сырые повторы, визуальные ограничения и следующие действия: [CHALK_INT006_V1_V5_RESULTS_2026-11-02.md](CHALK_INT006_V1_V5_RESULTS_2026-11-02.md).
+
+
+## 10. Addendum — live follow-up V1–V5 и pixel audit (2026-11-02)
+
+Первичные данные и формулы выше относятся к исходной серии и не переписываются. После исправления геометрии пользователь выполнил отдельные follow-up серии: 45/45 captures, по 9 задач на фазу, radius=10. Exact CHALK P0/P1/P2 средние: V1 251.67/131.33/132.33; V2 39.00/24.00/23.67; V3 344.00/175.33/174.00; V4 438.33/229.00/229.33; V5 407.67/216.00/216.33. Step=4 экономит 38.5–49.4% против step=2 в зависимости от геометрии; delay 5/10 ms при step=4 почти не влияет на средний расход.
+
+Series-aware pixel audit run 41496555297 обработал 90 captures (45 исходных +45 follow-up): 90 valid, no missing/duplicate/unexpected cells, 0 batch failures. Для новых 45 captures все 297 strokes имеют coverage=1.0, path metrics sufficient и gap_count=0; 27/27 V4 closure seams covered. Курсор не обнаружен в board crop в 45/45 captures.
+
+V5 spacing sweep при radius=10: целевые пары с axis separation 8.0115 и 12.0172 logical px touch/merge 9/9; пары 16.0229, 20.0286 и 24.0344 — 0/9. Следовательно, 16 logical px — первое проверенное разделённое расстояние в этой конкретной V5 конфигурации; не универсальный порог для иных радиусов/форм.
+
+Подробные raw repeat values, pixel metrics, cursor status и ограничения: [CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md](CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md). Это расширяет геометрическую выборку, но **не является независимой validation модели**: радиус фиксирован на 10, а независимая оценка прогноза на полных DrawingPlan ещё требуется. INT-007 и production estimator остаются заблокированы до этой validation и safety margin.
