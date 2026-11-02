@@ -332,3 +332,16 @@
 - INT-006: экспериментальный harness расширен сценариями V1–V5 на инфраструктуре G3; добавлены три sampling profiles, отдельные 9-task journals и regression tests.
 - Task-specific executor override распространён на V1–V5; production executor defaults и estimator не менялись.
 - CI и live validation ожидаются; экспериментальные результаты V1–V5 пока отсутствуют.
+
+
+## 2026-11-02 — INT-006 V1–V5 live results
+
+### Added
+- `CHALK_INT006_V1_V5_RESULTS_2026-11-02.md`: сводка 45 live captures, exact/per-stroke CHALK, профильных сравнений, первичной holdout-проверки модели и визуальных ограничений.
+
+### Verified
+- V1–V5: 5 block journals × 9 tasks = 45/45 completed; Monitor/Bridge per-run integrity gates пройдены.
+- CI run #1887 на commit `6479536` завершился success.
+- Step=4 снизил расход CHALK примерно на 48–49% для V1/V3/V4/V5 и на 23–25% для коротких штрихов V2.
+- G1-модель на 66 новых штрихах P0: MAE 1.09, RMSE 1.33, MAPE 1.71%; step=4 fits остаются исследовательскими.
+- Production defaults и estimator не изменялись; INT-006 остаётся IN_PROGRESS до pixel-level audit и независимой validation.
