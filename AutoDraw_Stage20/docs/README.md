@@ -22,6 +22,7 @@
 
 - [План дальнейших действий по модели CHALK](CHALK_NEXT_STEPS_PLAN_2026-11-02.md) — актуальная последовательность геометрической validation, независимой проверки estimator, safety margin и INT-007—INT-009.
 - [INT-006 — протокол выполнения](CHALK_INT006_EXECUTION_PROTOCOL_2026-11-02.md) — профили P0/P1/P2, сценарии V1–V5, acceptance gates, независимая validation и аудит готовности лаборатории.
+- [INT-006 — результаты live-матрицы V1–V5](CHALK_INT006_V1_V5_RESULTS_2026-11-02.md) — 45/45 captures, exact/per-stroke CHALK, сравнение sampling profiles, первичная holdout-проверка модели и открытые quality gates.
 - [Исторический снимок PROJECT_STATUS](PROJECT_STATUS_HISTORY_2026-11-02.md) — полный статус до консолидации 2 ноября; только для аудита, не текущий backlog.
 
 ## Данные и очистка
