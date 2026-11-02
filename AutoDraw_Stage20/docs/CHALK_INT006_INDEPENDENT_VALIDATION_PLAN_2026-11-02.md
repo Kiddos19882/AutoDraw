@@ -1,7 +1,7 @@
 # INT-006 — план независимой validation модели CHALK
 
 **Дата:** 2026-11-02  
-**Статус:** SOFTWARE GATE PASS, LIVE GATE BLOCKED — D1–D5 подключены к matrix/block/UI/executor и frozen prediction artifact; CI пройден, локальный Windows preflight ещё не выполнен. Live captures не запускать.  
+**Статус:** LIVE CAPTURES COMPLETE (45/45); FORMAL QUANTITATIVE VALIDATION PENDING — D1–D5 выполнены, предварительный аудит JSON записей пройден. Требуется официальный analyzer report и hash/binding verification.  
 **Ветка:** `feature/image-geometry-optimization`  
 **Связанные задачи:** INT-006; gate перед INT-007  
 **Ограничения:** production estimator, executor defaults и исходные экспериментальные данные не изменять.
@@ -248,3 +248,12 @@ INT-006 можно закрыть только после:
 Кодовый commit `ca8c9b3bd739ea0a5b557b87fc0106ecfde81216` прошёл полный workflow [41513389663](https://github.com/Kiddos19882/AutoDraw/actions/runs/41513389663): Preparation/G3 — 667 passed и 82 subtests passed; Application integration, Executor regression, Game Monitor/bridge, INT-006 pixel audit и Windows portable build/startup smoke-test — success. Portable artifact: `autodraw-g3-preflight-build`.
 
 D1–D5 harness, frozen predictions и analyzer реализованы. Следующий шаг — локальный Windows preflight. 45 live captures не начинать до проверки preflight и подтверждения чистой доски/точного CHALK baseline.
+
+
+## Актуальный результат live блока — 2026-11-03
+
+D1–D5 выполнены в block `chalk-20261102-232320-7cea27`: 45/45 tasks completed, radius=10. Предварительный разбор 45 manifests и 45 Monitor reports подтвердил exact CHALK, совпадение per-stroke sum, ожидаемое число штрихов и нулевые per-run Monitor/Bridge integrity counters.
+
+Предварительные метрики и ограничения вынесены в [CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md](CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md). Эти расчёты не заменяют штатный analyzer: до получения официального JSON report серия не считается количественно validated, safety margin не установлен, INT-007 остаётся BLOCKED.
+
+Workflow `.github/workflows/geometry-tests.yml` дополнен запуском analyzer и загрузкой report artifact. Для поддержки переноса Windows capture bundle в CI analyzer связывает journal attempt с уникальным именем experiment directory, а не с исходным абсолютным путём.
