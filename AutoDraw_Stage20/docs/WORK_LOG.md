@@ -2089,3 +2089,12 @@ Brush Test acceptance и матричные валидаторы больше н
 - Найден portability blocker штатного analyzer: сравнение полного локального Windows пути не подходит для relocated capture bundle в CI. Исправлено сравнение по уникальному experiment directory name; добавлен regression test на Windows-style path.
 - Workflow geometry-tests дополнен запуском `chalk_int006_validation.py` и upload JSON artifact.
 - Официальный analyzer report, проверка frozen artifact SHA-256 и подтверждение полного CI после последних commits остаются pending. Не менять estimator/defaults и не начинать INT-007 до закрытия этих gates.
+
+
+## 2026-11-03 — повторная проверка всех INT-006 Monitor reports и frozen hash
+
+- Повторно прочитаны все 45 experiment manifests и все 45 Monitor reports из block `1f93ddcac07445b78093744c7cbabcde`.
+- Во всех reports подтверждены exact pre/post CHALK, равенство общей delta / sampled delta / суммы per-stroke DRAW_SAMPLE pointDelta, совпадение числа stroke groups, отсутствие dropped events, Monitor errors, Bridge send failures и sequence gaps.
+- Во всех Monitor reports observed brush radius единственный: 10; experiment ID совпадает с journal attempt.
+- Независимый SHA-256 frozen artifact совпал: `a0eab016e96a81e14bededd32cf5161dd943d6fc85a20b7eec17455f69d0c61c`.
+- Официальный analyzer JSON и доступный CI run/artifact status по-прежнему не получены через доступные endpoints. Production estimator/defaults не менялись.
