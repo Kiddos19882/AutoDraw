@@ -113,7 +113,7 @@ def _profile_name(parameters: dict[str, Any]) -> str:
 def _prediction_for_stroke(stroke: dict[str, Any], profile_name: str) -> dict[str, Any]:
     length = _distance(stroke)
     rounded_length = round(length)
-    if abs(length - rounded_length) < 1e-9 and rounded_length in SHORT_LOOKUP:
+    if abs(length - rounded_length) < 1e-9 and str(rounded_length) in SHORT_LOOKUP:
         return {
             "stroke_id": stroke["name"],
             "length_logical_px": length,

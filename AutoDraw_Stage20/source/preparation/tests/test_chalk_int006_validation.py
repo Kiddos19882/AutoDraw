@@ -135,6 +135,8 @@ def test_prediction_artifact_contains_15_frozen_records_and_hash():
             prediction = artifact["predictions"][f"{MODEL_ID}:{scenario_id}:{profile_id}"]
             assert prediction["predicted_chalk"] == EXPECTED_TOTALS[scenario_id][profile_id]
             assert prediction["radius"] == 10
+            if scenario_id == "int006_validation_d4_short_details":
+                assert all(item["rule"] == "exact_short_lookup" for item in prediction["stroke_predictions"])
 
 
 def test_prediction_artifact_rejects_modified_prediction_without_resealing():
