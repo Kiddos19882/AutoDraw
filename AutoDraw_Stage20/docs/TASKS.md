@@ -379,3 +379,15 @@ Software gate закрыт; live gate остаётся открытым. Авт�
 - [ ] Проверить качество сегментации относительно blank-board reference и исключить курсор/UI из маски.
 
 Отчёт: [CHALK_INT006_PNG_SCREENING_2026-11-02.md](CHALK_INT006_PNG_SCREENING_2026-11-02.md). Production defaults и estimator не менять.
+
+
+## INT-006 — V2/V5 follow-up подготовлены (2026-11-02)
+
+- [x] Создать отдельный V2 scenario `int006_short_strokes_followup`: пять штрихов 12/16/20/24/30 logical px.
+- [x] Создать отдельный V5 scenario `int006_intersections_spacing_sweep`: X/T/крест + пять пар spacing 8/12/16/20/24 logical px; 16 штрихов.
+- [x] Подключить сценарии к matrix metadata, block planner, Brush Test UI и regression tests; старые scenario IDs и captures не переиспользуются.
+- [x] Зафиксировать три профиля P0/P1/P2, три повтора и radius=10: по 9 captures на серию.
+- [ ] Подтвердить CI нового code HEAD.
+- [ ] Пользователю выполнить V2 и V5 live blocks; затем проверить все manifests, exact CHALK, per-stroke deltas, Monitor integrity и PNG.
+
+Инструкция: [CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md](CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md). Live-прогоны не выполнялись.
