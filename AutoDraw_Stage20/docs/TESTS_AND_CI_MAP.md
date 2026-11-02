@@ -447,6 +447,6 @@ Workflow и тесты обновлены в feature-ветке; результ�
 - Matrix contract: `source/preparation/chalk_experiment_matrix.py` — отдельные scenario IDs D1R–D5R, радиусы 1/10/30 и единственный sampling profile P1 (4/5).
 - Durable block planner/journal: `source/preparation/chalk_test_blocks.py` — 45 уникальных ячеек `(scenario, radius, repeat)`; проверяются missing/duplicate cells, task IDs, radius, P1 и отсутствие frozen prediction artifact.
 - UI and executor handoff: `source/preparation/brush_behavior_test_ui.py` и `integrated_app.py` — радиус устанавливается из task journal и повторно сверяется с requested brush до запуска штатного executor.
-- Analyzer: `source/preparation/chalk_int006r_validation.py` — exact CHALK, completed journal attempt, experiment/run binding, per-stroke breakdown, per-geometry/per-radius mean/median/range/population SD и сравнение с radius=10.
+- Analyzer: `source/preparation/chalk_int006r_validation.py` — exact CHALK, completed journal attempt, experiment/run binding, per-stroke breakdown, before/after board ROI PNG readability/dimension checks, per-geometry/per-radius mean/median/range/population SD и сравнение с radius=10. Data completeness не закрывает отдельный manual visual-quality gate.
 - Regression: `source/preparation/tests/test_chalk_int006r_validation.py` и `tests/test_unified_app.py`.
 - Live execution запрещён до полного CI и Windows portable build/startup smoke-test PASS. INT006R не использует frozen INT-006 predictions и не меняет production estimator.
