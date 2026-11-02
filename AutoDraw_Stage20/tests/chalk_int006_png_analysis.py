@@ -274,7 +274,7 @@ def analyse_capture(folder: Path, out: Path) -> dict[str, Any]:
     errors = capture_errors(manifest, monitor, expected)
     summary = {
         "experiment_id": manifest.get("experiment_id"), "experiment_dir": str(folder),
-        "phase_id": phase, "scenario_id": matrix.get("scenario_id"), "repeat_index": matrix.get("repeat_index"),
+        "series_id": matrix.get("series_id"), "phase_id": phase, "scenario_id": matrix.get("scenario_id"), "repeat_index": matrix.get("repeat_index"),
         "sampling_profile": {k: (matrix.get("executor_parameters") or {}).get(k) for k in ("point_step_px", "point_delay_ms")},
         "brush_radius": radius, "exact_chalk": (manifest.get("game_monitor_summary") or {}).get("chalk", {}).get("consumed_points"),
         "image_size": {"width": w, "height": h}, "logical_board_size": {"width": logical_w, "height": logical_h},
@@ -303,7 +303,8 @@ def analyse_capture(folder: Path, out: Path) -> dict[str, Any]:
     (out / f"{name}.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return summary
 
-def run(results_dir: Path, out: Path, expected_runs: int = 45) -> dict[str, Any]:
+def run(results_dir: Path, out: Path, expected_runs: int | None = None,
+        expected_runs_per_series: int | None = None) -> dict[str, Any]:
     folders = []
     for path in sorted(results_dir.rglob("experiment.json")):
         try:
@@ -316,18 +317,63 @@ def run(results_dir: Path, out: Path, expected_runs: int = 45) -> dict[str, Any]
     for folder in folders:
         try: rows.append(analyse_capture(folder, out))
         except Exception as exc: failures.append({"experiment_dir": str(folder), "error": f"{type(exc).__name__}: {exc}"})
-    cells = [(r["phase_id"], (r["sampling_profile"] or {}).get("point_step_px"),
-              (r["sampling_profile"] or {}).get("point_delay_ms"), r.get("repeat_index")) for r in rows]
-    expected_cells = {(p, s, d, n) for p in PHASES for s, d in ((2, 10), (4, 5), (4, 10)) for n in (1, 2, 3)}
+
+    # A phase can have multiple independent live series (for example, the original
+    # matrix and a corrected follow-up). Matrix cells are unique within a series,
+    # not globally across historical series.
+    cells = [
+        (str(r.get("series_id") or ""), r["phase_id"],
+         (r["sampling_profile"] or {}).get("point_step_px"),
+         (r["sampling_profile"] or {}).get("point_delay_ms"), r.get("repeat_index"))
+        for r in rows
+    ]
+    series_phases = sorted({(cell[0], cell[1]) for cell in cells})
+    expected_cells = {
+        (series_id, phase, step, delay, repeat)
+        for series_id, phase in series_phases
+        for step, delay in ((2, 10), (4, 5), (4, 10))
+        for repeat in (1, 2, 3)
+    }
+    cell_set = set(cells)
+    duplicate_cells = [list(cell) for cell in sorted(set(c for c in cells if cells.count(c) > 1))]
+    missing_cells = [list(cell) for cell in sorted(expected_cells - cell_set)]
+    unexpected_cells = [list(cell) for cell in sorted(cell_set - expected_cells)]
+
+    series_reports = []
+    series_run_count_mismatches = []
+    for series_id, phase in series_phases:
+        series_rows = [r for r in rows if str(r.get("series_id") or "") == series_id and r["phase_id"] == phase]
+        series_report = {
+            "series_id": series_id,
+            "phase_id": phase,
+            "run_count": len(series_rows),
+            "capture_valid_runs": sum(r["capture_valid"] for r in series_rows),
+            "duplicate_matrix_cells": [cell for cell in duplicate_cells if cell[0] == series_id and cell[1] == phase],
+            "missing_matrix_cells": [cell for cell in missing_cells if cell[0] == series_id and cell[1] == phase],
+            "unexpected_matrix_cells": [cell for cell in unexpected_cells if cell[0] == series_id and cell[1] == phase],
+        }
+        if expected_runs_per_series is not None:
+            series_report["expected_runs"] = expected_runs_per_series
+            if len(series_rows) != expected_runs_per_series:
+                series_run_count_mismatches.append({
+                    "series_id": series_id, "phase_id": phase,
+                    "expected": expected_runs_per_series, "actual": len(series_rows),
+                })
+        series_reports.append(series_report)
+
     counts = {p: sum(r["phase_id"] == p for r in rows) for p in sorted(PHASES)}
     report = {
-        "schema_version": 1, "analysis": "INT-006 V1-V5 differential PNG geometry audit",
-        "expected_runs": expected_runs, "discovered_runs": len(folders), "analysed_runs": len(rows),
+        "schema_version": 2, "analysis": "INT-006 V1-V5 differential PNG geometry audit, series-aware",
+        "expected_runs": expected_runs, "expected_runs_per_series": expected_runs_per_series,
+        "discovered_runs": len(folders), "analysed_runs": len(rows),
         "capture_valid_runs": sum(r["capture_valid"] for r in rows),
         "capture_invalid_runs": sum(not r["capture_valid"] for r in rows), "phase_counts": counts,
-        "duplicate_matrix_cells": [list(c) for c in set(c for c in cells if cells.count(c) > 1)],
-        "missing_matrix_cells": [list(c) for c in sorted(expected_cells - set(cells))],
-        "unexpected_matrix_cells": [list(c) for c in sorted(set(cells) - expected_cells)],
+        "series_count": len({series_id for series_id, _ in series_phases}),
+        "series_reports": series_reports,
+        "series_run_count_mismatches": series_run_count_mismatches,
+        "duplicate_matrix_cells": duplicate_cells,
+        "missing_matrix_cells": missing_cells,
+        "unexpected_matrix_cells": unexpected_cells,
         "batch_failures": failures,
         "method": {
             "reference": "before_clear-board.png", "observed": "after_draw-board.png",
@@ -338,6 +384,7 @@ def run(results_dir: Path, out: Path, expected_runs: int = 45) -> dict[str, Any]
             "coordinates": "logical DrawingPlan mapped using board image dimensions / Monitor logicalWidth and logicalHeight",
             "cursor": "bright cursor component near final planned endpoint excluded with a 13x13 dilation",
             "ambiguous": "pixels equidistant between stroke corridors excluded from per-stroke metrics",
+            "series_identity": "matrix uniqueness is scoped by chalk_experiment_matrix.series_id and phase_id",
             "warning": "Review diagnostic overlays; dark cursor outlines may remain if cursor body detection misses them.",
         },
         "metric_notes": [
@@ -350,7 +397,7 @@ def run(results_dir: Path, out: Path, expected_runs: int = 45) -> dict[str, Any]
     }
     out.mkdir(parents=True, exist_ok=True)
     (out / "summary.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    stroke_fields = ["experiment_id", "phase_id", "scenario_id", "repeat_index", "point_step_px", "point_delay_ms",
+    stroke_fields = ["experiment_id", "series_id", "phase_id", "scenario_id", "repeat_index", "point_step_px", "point_delay_ms",
         "exact_chalk", "capture_valid", "stroke_name", "planned_length_logical", "ink_pixels_assigned",
         "ambiguous_fraction", "coverage_fraction", "evaluable_path_samples", "evaluable_path_fraction", "path_metrics_sufficient",
         "cursor_excluded_path_samples", "ambiguous_excluded_path_samples", "gap_count", "max_gap_logical",
@@ -362,11 +409,12 @@ def run(results_dir: Path, out: Path, expected_runs: int = 45) -> dict[str, Any]
         for r in rows:
             profile = r["sampling_profile"]
             for stroke in r["strokes"]:
-                writer.writerow({"experiment_id": r["experiment_id"], "phase_id": r["phase_id"],
-                    "scenario_id": r["scenario_id"], "repeat_index": r["repeat_index"],
-                    "point_step_px": profile["point_step_px"], "point_delay_ms": profile["point_delay_ms"],
-                    "exact_chalk": r["exact_chalk"], "capture_valid": r["capture_valid"], **stroke})
-    pair_fields = ["experiment_id", "phase_id", "scenario_id", "repeat_index", "point_step_px",
+                writer.writerow({"experiment_id": r["experiment_id"], "series_id": r["series_id"],
+                    "phase_id": r["phase_id"], "scenario_id": r["scenario_id"],
+                    "repeat_index": r["repeat_index"], "point_step_px": profile["point_step_px"],
+                    "point_delay_ms": profile["point_delay_ms"], "exact_chalk": r["exact_chalk"],
+                    "capture_valid": r["capture_valid"], **stroke})
+    pair_fields = ["experiment_id", "series_id", "phase_id", "scenario_id", "repeat_index", "point_step_px",
         "point_delay_ms", "capture_valid", "stroke_a", "stroke_b", "axis_separation_logical",
         "axis_angle_difference_deg", "candidate_mask_overlap_pixels", "assigned_ink_masks_touch_or_merge",
         "minimum_ink_mask_distance_px", "minimum_ink_mask_distance_logical"]
@@ -375,28 +423,29 @@ def run(results_dir: Path, out: Path, expected_runs: int = 45) -> dict[str, Any]
         for r in rows:
             profile = r["sampling_profile"]
             for pair in r["parallel_pairs"]:
-                writer.writerow({"experiment_id": r["experiment_id"], "phase_id": r["phase_id"],
-                    "scenario_id": r["scenario_id"], "repeat_index": r["repeat_index"],
-                    "point_step_px": profile["point_step_px"], "point_delay_ms": profile["point_delay_ms"],
-                    "capture_valid": r["capture_valid"], **pair})
+                writer.writerow({"experiment_id": r["experiment_id"], "series_id": r["series_id"],
+                    "phase_id": r["phase_id"], "scenario_id": r["scenario_id"],
+                    "repeat_index": r["repeat_index"], "point_step_px": profile["point_step_px"],
+                    "point_delay_ms": profile["point_delay_ms"], "capture_valid": r["capture_valid"], **pair})
     return report
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("results_dir", nargs="?", type=Path, default=DEFAULT_RESULTS)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT)
-    parser.add_argument("--expected-runs", type=int, default=45)
+    parser.add_argument("--expected-runs", type=int, default=None, help="Optional expected total across all selected series")
+    parser.add_argument("--expected-runs-per-series", type=int, default=9, help="Expected profile/repeat cells in each independent series")
     parser.add_argument("--allow-incomplete", action="store_true")
     args = parser.parse_args()
     if not args.results_dir.exists(): parser.error(f"Results directory does not exist: {args.results_dir}")
-    report = run(args.results_dir, args.output_dir, args.expected_runs)
-    keys = ("expected_runs", "discovered_runs", "analysed_runs", "capture_valid_runs",
-            "capture_invalid_runs", "phase_counts", "duplicate_matrix_cells", "missing_matrix_cells",
-            "unexpected_matrix_cells", "batch_failures")
+    report = run(args.results_dir, args.output_dir, args.expected_runs, args.expected_runs_per_series)
+    keys = ("expected_runs", "expected_runs_per_series", "discovered_runs", "analysed_runs", "capture_valid_runs",
+            "capture_invalid_runs", "phase_counts", "series_count", "series_reports", "series_run_count_mismatches",
+            "duplicate_matrix_cells", "missing_matrix_cells", "unexpected_matrix_cells", "batch_failures")
     print(json.dumps({k: report[k] for k in keys}, ensure_ascii=False, indent=2))
     if report["batch_failures"] or report["duplicate_matrix_cells"] or report["unexpected_matrix_cells"] or report["capture_invalid_runs"]:
         return 2
-    if not args.allow_incomplete and (report["discovered_runs"] != args.expected_runs or report["missing_matrix_cells"]):
+    if not args.allow_incomplete and (report["missing_matrix_cells"] or report["series_run_count_mismatches"] or (args.expected_runs is not None and report["discovered_runs"] != args.expected_runs)):
         return 2
     return 0
 
