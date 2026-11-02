@@ -334,9 +334,15 @@ def analyze_int006_validation(
             rejected.append({"path": str(manifest_path), "reason": "journal_task_mismatch"})
             continue
         prediction_id = f"{MODEL_ID}:{cell[0]}:{cell[1]}"
+        if task.get("prediction_id") != prediction_id:
+            rejected.append({"path": str(manifest_path), "reason": "journal_prediction_id_mismatch"})
+            continue
         prediction = artifact["predictions"].get(prediction_id)
         if not isinstance(prediction, dict):
             rejected.append({"path": str(manifest_path), "reason": "frozen_prediction_missing"})
+            continue
+        if task.get("expected_strokes") != len(prediction["planned_strokes"]):
+            rejected.append({"path": str(manifest_path), "reason": "journal_expected_stroke_count_mismatch"})
             continue
         if matrix.get("prediction_id") != prediction_id:
             rejected.append({"path": str(manifest_path), "reason": "prediction_id_mismatch"})
