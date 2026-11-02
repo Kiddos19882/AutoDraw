@@ -353,3 +353,7 @@
 - Recorded geometry limitations: unintended intersections in V1/V3, dot-like V2 marks at radius 10, cursor occlusion in V4, and merged close parallel lines in V5.
 - No obvious step=4 continuity regression was seen in the reviewed samples; quantitative pixel-level metrics remain pending.
 - No production code, executor defaults, estimator, or raw captures changed.
+
+
+### INT-006 — корректировка геометрии тестов
+- По результатам ручного review PNG-overlay исправлены пересекающиеся тестовые траектории V1/V3; добавлен regression gate минимального межштрихового расстояния. Первичные captures не переписывались, повторные live-блоки и CI для нового code HEAD остаются следующими проверками.
