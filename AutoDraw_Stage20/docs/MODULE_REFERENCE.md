@@ -90,6 +90,10 @@ Preparation и executor предоставляют совместимые import
 |---|---|
 | brush_behavior_test_ui.py | Интерфейс тестирования кистей и запись метаданных CHALK-матрицы |
 | chalk_radius_matrix.py | Контракт серии/повтора и агрегирование точных CHALK-измерений |
+| chalk_experiment_matrix.py | Phase/scenario metadata, executor profile validation и exact CHALK manifest acceptance |
+| chalk_test_blocks.py | Durable block planner/journal, task progression, recovery и fail-closed acceptance |
+| chalk_int006_validation.py | Frozen INT-006 prediction artifact и независимый analyzer модели при radius=10 |
+| chalk_int006r_validation.py | Независимый analyzer radius × geometry matrix INT006R без изменения frozen model |
 | brush_calibration_ui.py | Интерфейс калибровки кистей |
 | paint_limit_test_ui.py | Интерфейс теста лимита краски |
 
