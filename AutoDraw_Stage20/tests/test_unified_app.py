@@ -1359,6 +1359,7 @@ class UnifiedAppCoreTests(unittest.TestCase):
             }
         }
         app = object.__new__(integrated_app.AutoDrawUnifiedApp)
+        app.root = None
         app.status_var = Status()
         with tempfile.TemporaryDirectory(prefix="AutoDraw V5 handoff ") as temp:
             plan_path = Path(temp) / "current_brush_behavior_test.json"
