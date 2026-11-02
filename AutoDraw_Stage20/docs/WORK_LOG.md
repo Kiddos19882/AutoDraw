@@ -2026,3 +2026,11 @@ Brush Test acceptance и матричные валидаторы больше н
 - Полный запуск CI на текущем кодовом состоянии не выполнен: доступные GitHub Actions-инструменты в этой сессии позволяют читать jobs и повторять failed jobs, но не запускать новый workflow dispatch. Сетевой clone из контейнера недоступен. Поэтому задача оставлена открытой, результат не объявлен тестовым успехом.
 - Подготовлен отдельный протокол независимой validation на пяти новых DrawingPlan с frozen predictions P0/P1/P2, тремя повторами и exact pre/post pointCount. Production estimator, executor defaults и исходные экспериментальные данные не изменялись.
 - Обновлены PROJECT_STATUS, TASKS, CHALK_NEXT_STEPS_PLAN, ROADMAP и индекс документации.
+
+
+## 2026-11-02 — подтверждение CI legacy-journal compatibility
+
+- Углублённо проверены workflow logs run `41496555297`: job Preparation/G3 checkout рабочей ветки выполнен в 18:01:55 UTC; commit `956ce2b` создан в 18:01:05 UTC и содержит commits `f0e05df` и `4847cce` в своей истории.
+- Preparation/G3 job завершился результатом `662 passed, 82 subtests passed`; Application integration, Executor regression, Game Monitor/bridge, Windows portable build и INT-006 PNG audit также завершились success. Optional benchmarks skipped.
+- CI gate для legacy V2/V5 journal compatibility закрыт. Ранее внесённая отметка о неподтверждённом CI исправлена; повторный запуск не требуется.
+- Следующий gate INT-006 — live independent validation по пяти новым DrawingPlan из `CHALK_INT006_INDEPENDENT_VALIDATION_PLAN_2026-11-02.md`.
