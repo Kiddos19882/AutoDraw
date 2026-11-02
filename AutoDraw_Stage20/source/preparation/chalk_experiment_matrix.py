@@ -59,9 +59,12 @@ EXPECTED_STROKES = {
     "paint_consumption_long_lines": 6,
     "int006_diagonals": 6,
     "int006_short_strokes_followup": 5,
+    # Retain counts for manifests created by the original V2/V5 scenario IDs.
+    "int006_short_strokes": 6,
     "int006_turns": 3,
     "int006_closed_contours": 3,
     "int006_intersections_spacing_sweep": 16,
+    "int006_intersections_spacing": 10,
 }
 
 G3_POINT_STEPS = (1, 2, 4)
