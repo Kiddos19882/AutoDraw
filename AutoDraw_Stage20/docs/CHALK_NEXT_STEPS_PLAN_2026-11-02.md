@@ -20,7 +20,7 @@ INT-006 остаётся IN_PROGRESS. Harness V1–V5 и regression tests реа
 4. [x] Выполнить исходные 45 live captures и сохранить raw data в commit 6479536.
 5. [x] Исправить legacy V2/V5 manifest compatibility и V5 integration fixture; полный CI на `3e8e6c5` прошёл run `41470680544`.
 6. [x] Выполнить live follow-up V1–V5: 45/45 captures, commit `e879a77`; exact CHALK и per-run Monitor integrity приняты.
-7. [ ] Выполнить pixel-level аудит новых 45 follow-up PNG и проверить ambiguous overlays V3/V4/V5.
+7. [x] Выполнить pixel-level аудит новых 45 follow-up PNG: 90/90 captures valid, 297/297 новых strokes coverage=1.0 и zero gaps, V4 closure seams 27/27 covered; V5 spacing 8/12 merge, 16/20/24 separated при radius=10 (CI 41496555297).
 8. [ ] Провести независимую validation CHALK-модели на новых DrawingPlan; только после неё рассчитать safety margin.
 
 ## Цель
