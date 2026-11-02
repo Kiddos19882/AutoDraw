@@ -1,6 +1,6 @@
 # INT006R — live preflight и визуальный аудит
 
-**Статус:** READY AFTER SOFTWARE CI — live captures пока не запускались  
+**Статус:** READY FOR LOCAL WINDOWS PREFLIGHT — CI PASS; live captures пока не запускались  
 **Фаза:** INT006R  
 **Матрица:** D1–D5 × radius 1/10/30 × 3 повтора = 45 captures  
 **Sampling:** P1 — point_step_px=4, point_delay_ms=5 ms  
