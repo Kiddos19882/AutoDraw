@@ -15,12 +15,12 @@ Pixel-level audit 45/45 и ручной review representative overlays выпо�
 
 Порядок дальнейшей работы:
 1. [x] Зафиксировать контракт V1–V5 и единицы координат (logical DrawingPlan vs screen-pixel sampling step).
-2. [x] Исправить legacy V2/V5 manifest compatibility и V5 integration fixture; полный CI на `3e8e6c5` прошёл run `41470680544`.
-3. [ ] Выполнить live follow-up V1/V3/V2/V4/V5 по протоколам, не смешивая новые scenario IDs с исходными captures.
 2. [x] Реализовать поддержку V1–V5 в экспериментальном harness и добавить regression tests.
-3. [x] Подтвердить CI/Windows startup smoke-test.
+3. [x] Подтвердить CI/Windows startup smoke-test для исходной реализации.
 4. [x] Выполнить 45 live captures и сохранить исходные manifests/reports/PNG в commit 6479536.
-5. [ ] Подтвердить CI cursor-free capture, выполнить V4 closure capture и pixel-level geometry gate на новых V1/V3 captures; затем провести независимую validation CHALK модели на новых DrawingPlan.
+5. [x] Исправить legacy V2/V5 manifest compatibility и V5 integration fixture; полный CI на `3e8e6c5` прошёл run `41470680544`.
+6. [ ] Выполнить live follow-up V1/V3/V2/V4/V5 по протоколам, не смешивая новые scenario IDs с исходными captures.
+7. [ ] Провести независимую validation CHALK-модели на новых DrawingPlan; только после неё рассчитать safety margin.
 ## Цель
 
 Получить проверенную модель, которая до запуска рисунка прогнозирует расход игрового CHALK и помогает выбрать траектории/режим исполнения так, чтобы рисунок укладывался в доступную квоту без недопустимого ухудшения визуального качества.
