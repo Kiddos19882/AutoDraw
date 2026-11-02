@@ -51,7 +51,7 @@
 - [x] Перевести Application integration fixture на действующий V5 follow-up ID `int006_intersections_spacing_sweep` и expected count `16`.
 - [x] Запустить полный CI на исправленном HEAD `3e8e6c5`; run `41470680544` подтвердил все обязательные jobs, Windows portable build и INT-006 PNG audit.
 - [x] Разрешить переход к live follow-up после green CI; live-прогоны выполняются только при доступной игровой сессии.
-- [ ] Выполнить новые V1/V3 captures с исправленной геометрией и V4 cursor-free closure capture.
+- [ ] Выполнить V1/V3/V4 follow-up по [отдельному протоколу](CHALK_INT006_V1_V3_V4_FOLLOWUP_2026-11-02.md): по 9 captures на фазу.
 - [ ] Выполнить V2 short-stroke follow-up (5 strokes) и V5 spacing sweep (16 strokes) по отдельному протоколу.
 - [ ] Провести независимую validation модели на полных DrawingPlan; после неё определить safety margin.
 
