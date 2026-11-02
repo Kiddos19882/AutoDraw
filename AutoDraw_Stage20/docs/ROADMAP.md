@@ -11,7 +11,7 @@
 - [ ] Выполнить live follow-up V1/V3 с исправленной геометрией, V4 cursor-free closure, V2 short-stroke и V5 spacing sweep.
 - [ ] Завершить независимую validation step=4 и полных DrawingPlan; только затем определить safety margin.
 
-Подробные данные и ограничения: [CHALK_INT006_V1_V5_RESULTS_2026-11-02.md](CHALK_INT006_V1_V5_RESULTS_2026-11-02.md), [протокол V2/V5 follow-up](CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md). Production defaults и estimator не менялись. Исторические записи ниже сохраняются для хронологии и не переопределяют этот статус.
+Подробные данные и ограничения: [CHALK_INT006_V1_V5_RESULTS_2026-11-02.md](CHALK_INT006_V1_V5_RESULTS_2026-11-02.md), [протокол V1/V3/V4 follow-up](CHALK_INT006_V1_V3_V4_FOLLOWUP_2026-11-02.md), [протокол V2/V5 follow-up](CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md). Production defaults и estimator не менялись. Исторические записи ниже сохраняются для хронологии и не переопределяют этот статус.
 
 Документ объединяет завершённые направления документирования и текущую последовательность работ по измерению игрового CHALK. В текущем продолжении пользователь разрешил все действия; live captures требуют доступной игровой сессии и готовой тестовой доски.
 
