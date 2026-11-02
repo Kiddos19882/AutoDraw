@@ -108,3 +108,10 @@ Capture включается в анализ только если одновр�
 - invalid/ambiguous capture audit и итоговые допустимые области применения sampling profiles.
 
 **Никакие live-результаты не предполагаются заранее.** Production executor, estimator и sampling defaults не меняются по факту подготовки этих серий.
+
+
+## 7. Фактическое выполнение follow-up — 2026-11-02
+
+V2 и V5 live blocks выполнены пользователем и сохранены в commit [e879a77](https://github.com/Kiddos19882/AutoDraw/commit/e879a77f63be7a7a68de3f09091eab7dba0d34a2): обе серии завершены 9/9. В составе общего follow-up V1–V5 проверены все 45 captures, exact CHALK и per-run Monitor integrity. Полные raw repeat values и выводы: [CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md](CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md).
+
+V2 step=4 дал около 38.5–39.3% экономии против step=2. V5 дал около 46.9–47.0%. Все runs проведены при radius=10; выводов о влиянии радиуса эта серия не даёт. Pixel-level аудит новых PNG, особенно V5 spacing/overlap masks, остаётся открытым. Production defaults не менялись.
