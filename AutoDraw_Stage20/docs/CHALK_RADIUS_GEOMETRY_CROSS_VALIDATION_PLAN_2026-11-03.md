@@ -104,7 +104,7 @@
 - `chalk_test_blocks.py`: отдельный durable 45-cell block; каждая ячейка определяется `(scenario, radius, repeat)`. Task ID включает радиус. Journal validator отклоняет неподдерживаемый радиус, sampling mismatch, дубликаты, пропуски и лишний prediction artifact.
 - `brush_behavior_test_ui.py`: отдельные UI-сценарии INT006R; перед каждым опытом устанавливается радиус из конкретной задачи журнала, а не фиксированное значение 10. Ручной запуск D1–D5R заблокирован.
 - `integrated_app.py`: executor handoff разрешает только D1–D5R, радиусы 1/10/30 и P1; запрошенный радиус должен совпадать с радиусом task metadata и подтверждением Game Monitor.
-- `chalk_int006r_validation.py`: отдельный analyzer точных captures, journal/task/experiment/run binding, completeness и per-geometry/per-radius статистики. Frozen predictions INT-006 не загружаются и не меняются.
+- `chalk_int006r_validation.py`: отдельный analyzer точных captures, journal/task/experiment/run binding, completeness и per-geometry/per-radius статистики. Frozen predictions INT-006 не загружаются и не меняются. Analyzer дополнительно требует читаемые before/after board ROI PNG одинакового размера; data completeness не закрывает ручной visual quality gate.
 - `tests/test_chalk_int006r_validation.py` и интеграционные проверки `tests/test_unified_app.py` покрывают матрицу, журнал, радиусы, P1 и executor handoff.
 
 ### Software gate
@@ -117,3 +117,6 @@
 - Production estimator, executor defaults и sampling defaults не менялись.
 - `master` не изменялся.
 - Safety margin остаётся `not_established`; production eligibility — `not_validated`.
+
+
+Подробная последовательность локального Windows preflight, запуска блока, CLI analyzer и ручного просмотра 45 пар PNG зафиксирована в [CHALK_INT006R_LIVE_PREFLIGHT_AND_VISUAL_AUDIT_2026-11-03.md](CHALK_INT006R_LIVE_PREFLIGHT_AND_VISUAL_AUDIT_2026-11-03.md).
