@@ -815,7 +815,7 @@ Per-run transport gates чистые: `dropped_events=0`, `monitor_error_count_d
 - Дополнительная совместимость: прежние V2/V5 scenario IDs оставлены в legacy phase map для повторного анализа старых manifests; новые block planners используют только новые follow-up IDs. Regression test подтверждает принятие старых IDs.
 
 
-**Проверка исправления положения курсора:** код и regression tests внесены в `feature/image-geometry-optimization`; CI run [41486593544](https://github.com/Kiddos19882/AutoDraw/actions/runs/41486593544) для code/test HEAD `878bd1f79e3a0249576e36c02cb63ca9825e31d1` создан, на момент записи ожидает запуска jobs. Live-проверка на игровой сессии ещё не выполнена.
+**Проверка исправления положения курсора:** CI run [41486593544](https://github.com/Kiddos19882/AutoDraw/actions/runs/41486593544) для code/test HEAD `878bd1f79e3a0249576e36c02cb63ca9825e31d1` завершился success: Game Monitor/bridge, integration, executor, Preparation/G3, Windows portable build/startup smoke-test и INT-006 PNG audit прошли. В follow-up manifests commit `e879a77` записано перемещение курсора ниже `board_area` и `paint_meter_area` с margin=32 px; визуальный pixel-level аудит новых captures остаётся отдельным gate.
 
 
 ## 2026-11-02 — live follow-up V1–V5 завершён
