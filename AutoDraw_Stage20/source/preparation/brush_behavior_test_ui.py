@@ -408,16 +408,15 @@ TEST_CASES: dict[str, dict[str, Any]] = {
             {"name": "negative_steep", "points": [[410, 60], [400, 220]]}
         ],
     },
-    "V2 — короткие штрихи 1–10 px": {
-        "id": "int006_short_strokes",
-        "description": "INT-006 V2: длины 1, 2, 3, 5, 8 и 10 logical px.",
+    "V2 — короткие штрихи 12–30 px (follow-up)": {
+        "id": "int006_short_strokes_followup",
+        "description": "INT-006 V2 follow-up: изолированные штрихи длиной 12, 16, 20, 24 и 30 logical px; отдельная серия, не смешивать с исходными V2 1–10 px.",
         "strokes": [
-            {"name": "length_1", "points": [[20, 30], [21, 30]]},
-            {"name": "length_2", "points": [[50, 30], [52, 30]]},
-            {"name": "length_3", "points": [[80, 30], [83, 30]]},
-            {"name": "length_5", "points": [[110, 30], [115, 30]]},
-            {"name": "length_8", "points": [[140, 30], [148, 30]]},
-            {"name": "length_10", "points": [[170, 30], [180, 30]]}
+            {"name": "length_12_horizontal", "points": [[25, 35], [37, 35]]},
+            {"name": "length_16_vertical", "points": [[90, 72], [90, 88]]},
+            {"name": "length_20_diagonal", "points": [[150, 110], [162, 126]]},
+            {"name": "length_24_horizontal", "points": [[250, 170], [274, 170]]},
+            {"name": "length_30_vertical", "points": [[370, 195], [370, 225]]}
         ],
     },
     "V3 — непрерывные повороты": {
@@ -438,22 +437,29 @@ TEST_CASES: dict[str, dict[str, Any]] = {
             {"name": "irregular_polygon", "points": [[250, 150], [390, 150], [420, 220], [300, 220], [220, 190], [250, 150]]}
         ],
     },
-    "V5 — пересечения и параллельные линии": {
-        "id": "int006_intersections_spacing",
-        "description": "INT-006 V5: X/T/крестовые пересечения и две пары параллельных линий; 10 штрихов.",
+    "V5 — пересечения и sweep параллельных линий": {
+        "id": "int006_intersections_spacing_sweep",
+        "description": "INT-006 V5 follow-up: X/T/крестовые пересечения и пять независимых пар параллельных линий со spacing 8/12/16/20/24 logical px; 16 штрихов. Отдельная серия, не смешивать с исходным V5.",
         "strokes": [
-            {"name": "x_a", "points": [[20, 20], [110, 110]]},
-            {"name": "x_b", "points": [[20, 110], [110, 20]]},
-            {"name": "t_vertical", "points": [[160, 20], [160, 110]]},
-            {"name": "t_horizontal", "points": [[120, 65], [210, 65]]},
-            {"name": "cross_horizontal", "points": [[250, 65], [430, 65]]},
-            {"name": "cross_vertical", "points": [[340, 20], [340, 110]]},
-            {"name": "parallel_close_a", "points": [[20, 160], [200, 160]]},
-            {"name": "parallel_close_b", "points": [[20, 168], [200, 168]]},
-            {"name": "parallel_wide_a", "points": [[240, 160], [430, 160]]},
-            {"name": "parallel_wide_b", "points": [[240, 184], [430, 184]]}
+            {"name": "x_a", "points": [[20, 20], [100, 100]]},
+            {"name": "x_b", "points": [[20, 100], [100, 20]]},
+            {"name": "t_vertical", "points": [[130, 20], [130, 100]]},
+            {"name": "t_horizontal", "points": [[90, 60], [170, 60]]},
+            {"name": "cross_horizontal", "points": [[200, 60], [270, 60]]},
+            {"name": "cross_vertical", "points": [[235, 20], [235, 100]]},
+            {"name": "parallel_s08_a", "points": [[20, 186], [95, 186]]},
+            {"name": "parallel_s08_b", "points": [[20, 194], [95, 194]]},
+            {"name": "parallel_s12_a", "points": [[105, 184], [180, 184]]},
+            {"name": "parallel_s12_b", "points": [[105, 196], [180, 196]]},
+            {"name": "parallel_s16_a", "points": [[190, 182], [265, 182]]},
+            {"name": "parallel_s16_b", "points": [[190, 198], [265, 198]]},
+            {"name": "parallel_s20_a", "points": [[275, 180], [350, 180]]},
+            {"name": "parallel_s20_b", "points": [[275, 200], [350, 200]]},
+            {"name": "parallel_s24_a", "points": [[360, 178], [435, 178]]},
+            {"name": "parallel_s24_b", "points": [[360, 202], [435, 202]]}
         ],
     },
+
 }
 
 
