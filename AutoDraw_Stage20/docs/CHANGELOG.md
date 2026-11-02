@@ -365,3 +365,12 @@
 - Production executor, estimator, sampling defaults и первичные captures не менялись.
 
 - Дополнительно проверено, что cursor relocation применяется только в automated post-draw capture; ручная процедура захвата сохранена без перемещения курсора и защищена regression test.
+
+
+## 2026-11-02 — отдельные V2/V5 follow-up серии INT-006
+
+- Обновлены Brush Test presets: V2 12/16/20/24/30 logical px (5 strokes) и V5 spacing sweep 8/12/16/20/24 logical px плюс X/T/крестовые узлы (16 strokes).
+- Новые scenario IDs отделяют follow-up captures от исходных V2/V5; исходные данные не перезаписываются и не смешиваются.
+- Обновлены matrix expected counts, block tests и UI geometry regression tests.
+- Добавлен `CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md` с инструкцией для пользовательских live-прогонов.
+- Каждая серия содержит 9 captures: P0/P1/P2 × три повтора, radius=10. Live-прогоны не запускались.
