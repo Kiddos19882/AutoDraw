@@ -2864,22 +2864,7 @@ class BrushBehaviorTestTab:
                     f"профиль {expected_width} × {expected_height}, снимок "
                     f"{screen.width} × {screen.height}. Проверь DPI/масштаб и откалибруй заново."
                 )
-            regions = config.get("regions", {})
-            board_region = regions.get("board_area", {}) if isinstance(regions, dict) else {}
-            safe_cursor_point = _cursor_safe_point_outside_region(
-                board_region, screen.size, margin=24
-            )
-            # Executor completion releases the drawing gesture; explicitly release once more
-            # before moving so a delayed mouse-up cannot extend the final stroke.
-            pyautogui.mouseUp()
-            pyautogui.moveTo(*safe_cursor_point, duration=0)
-            time.sleep(0.15)
-            screen = ImageGrab.grab()
-            if isinstance(expected, dict):
-                ew, eh = expected.get("width"), expected.get("height")
-                if ew is not None and eh is not None and (int(ew), int(eh)) != screen.size:
-                    raise ValueError("Разрешение экрана изменилось после перемещения курсора.")
-            crops = crop_calibrated_regions(screen, regions)
+            crops = crop_calibrated_regions(screen, config.get("regions", {}))
             if self.experiment_dir is None:
                 raise ValueError("Папка эксперимента не создана.")
             screen_path = self.experiment_dir / f"{phase}-screen.png"
@@ -3110,7 +3095,21 @@ class BrushBehaviorTestTab:
                 ew, eh = expected.get("width"), expected.get("height")
                 if ew is not None and eh is not None and (int(ew), int(eh)) != screen.size:
                     raise ValueError("Разрешение экрана изменилось после калибровки.")
-            crops = crop_calibrated_regions(screen, config.get("regions", {}))
+            regions = config.get("regions", {})
+            board_region = regions.get("board_area", {}) if isinstance(regions, dict) else {}
+            safe_cursor_point = _cursor_safe_point_outside_region(
+                board_region, screen.size, margin=24
+            )
+            # Drawing has completed; release any residual button state before moving off-board.
+            pyautogui.mouseUp()
+            pyautogui.moveTo(*safe_cursor_point, duration=0)
+            time.sleep(0.15)
+            screen = ImageGrab.grab()
+            if isinstance(expected, dict):
+                ew, eh = expected.get("width"), expected.get("height")
+                if ew is not None and eh is not None and (int(ew), int(eh)) != screen.size:
+                    raise ValueError("Разрешение экрана изменилось после перемещения курсора.")
+            crops = crop_calibrated_regions(screen, regions)
             if self.experiment_dir is None:
                 raise ValueError("Каталог эксперимента отсутствует.")
             screen_path = self.experiment_dir / "after_draw-screen.png"
