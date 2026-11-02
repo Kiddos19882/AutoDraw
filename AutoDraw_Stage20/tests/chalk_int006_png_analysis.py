@@ -90,7 +90,7 @@ def false_runs(values: np.ndarray, excluded: np.ndarray) -> list[int]:
 
 def cursor_mask(before: np.ndarray, after: np.ndarray, endpoint: np.ndarray) -> np.ndarray:
     bright = ((after.astype(np.int16) - before.astype(np.int16) >= 8) & (after >= 245)).astype(np.uint8)
-    count, labels, stats, centers = cv2.connectedComponentsWithStats(bright, 8)
+    count, labels, stats, centers = cv2.connectedComponentsWithStats(bright, connectivity=8)
     candidates = []
     for label in range(1, count):
         area = int(stats[label, cv2.CC_STAT_AREA])
@@ -160,7 +160,7 @@ def stroke_metrics(g: dict[str, Any], assigned: np.ndarray, candidate_count: int
     abs_offsets = np.abs(offsets)
     width_median = float(np.median(widths)) if widths else None
     width_std = float(np.std(widths)) if widths else None
-    components = int(cv2.connectedComponents((assigned > 0).astype(np.uint8), 8)[0] - 1) if np.any(assigned) else 0
+    components = int(cv2.connectedComponents((assigned > 0).astype(np.uint8), connectivity=8)[0] - 1) if np.any(assigned) else 0
     return {
         "stroke_name": g["name"], "closed": g["closed"], "planned_length_logical": round(g["length"] / scale, 4),
         "ink_pixels_assigned": int(len(x)), "candidate_ink_pixels": candidate_count,
