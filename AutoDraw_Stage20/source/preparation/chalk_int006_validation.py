@@ -18,6 +18,7 @@ from chalk_experiment_matrix import (
     INDEPENDENT_VALIDATION_PHASE,
     V_SAMPLING_PROFILES,
     _validate_manifest,
+    _stroke_level_breakdown,
 )
 
 MODEL_ID = "chalk-int006-frozen-2026-11-02"
@@ -307,8 +308,13 @@ def analyze_int006_validation(
         if not valid or not isinstance(record, dict):
             rejected.append({"path": str(manifest_path), "reason": f"capture_invalid:{reason}"})
             continue
-        if record.get("stroke_level", {}).get("status") != "complete":
-            rejected.append({"path": str(manifest_path), "reason": "stroke_level_incomplete"})
+        stroke_level = _stroke_level_breakdown(
+            manifest_path.parent,
+            expected_strokes=record["expected_strokes"],
+            expected_chalk=record["consumed_points"],
+        )
+        if stroke_level.get("status") != "complete":
+            rejected.append({"path": str(manifest_path), "reason": "stroke_level_incomplete:" + str(stroke_level.get("reason"))})
             continue
         run_id = record.get("run_id")
         if not isinstance(run_id, str) or run_id in seen_runs:
@@ -331,7 +337,7 @@ def analyze_int006_validation(
             "residual": residual,
             "absolute_error": abs(residual),
             "relative_error": abs(residual) / actual if actual else None,
-            "stroke_level": record["stroke_level"],
+            "stroke_level": stroke_level,
         })
 
     missing = sorted(expected_cells - seen_cells)
