@@ -114,15 +114,29 @@ Logical DrawingPlan переводился в пиксели изображен�
 
 Существующие 45 captures остаются валидными для исходных telemetry/CHALK сравнений, но не подтверждают новую геометрию. Для новых выводов нужны новые V1/V3 blocks и успешный CI.
 
-## 8. Следующие действия
+## 8. Коррекция post-draw cursor occlusion для V4
 
-1. [x] Просмотреть representative overlays V2 length_10, V4 irregular_polygon, V1/V3 и V5; зафиксировать причины неоднозначности.
-2. [x] Исправить DrawingPlan V1/V3 и добавить regression gate межштрихового расстояния >20 logical px.
-3. [ ] Подтвердить CI для code HEAD `a4a909d08b9947cfff139b20d55300f1e97dcc25`.
-4. [ ] Повторить полные V1/V3 blocks с новыми геометриями; не смешивать их с исходными captures.
-5. [ ] Убрать cursor occlusion с closure seam V4 и повторить проверку замыкания.
-6. [ ] Добавить V2 targeted lengths 12/16/20/24/30 logical px и сравнить отдельные штрихи с непрерывной полилинией.
-7. [ ] Выполнить V5 spacing sweep 8/12/16/20/24 logical px.
-8. [ ] Провести независимую validation CHALK model и определить safety margin. До этого INT-007 остаётся BLOCKED.
+Проблема была в процедуре захвата: после завершения рисования курсор оставался на конечной точке, а screenshot выполнялся без предварительного перемещения. В экспериментальном UI добавлен cursor-free capture sequence:
 
-**Статус:** пакетный pixel-level аудит и ручной review representative overlays выполнены. Геометрия V1/V3 исправлена в экспериментальном harness, но новые captures и CI ещё не подтверждены. Quality gate остаётся OPEN. Production executor, estimator, sampling defaults и первичные captures не изменялись.
+1. Получить первичный screenshot для проверки фактического разрешения экрана.
+2. Рассчитать ближайшую допустимую точку с отступом 24 screen px за пределами calibrated board ROI.
+3. Выполнить `pyautogui.mouseUp()` для гарантированного освобождения кнопки.
+4. Переместить курсор в рассчитанную точку без клика (`pyautogui.moveTo(..., duration=0)`).
+5. Выдержать 150 ms и сделать новый screenshot; board ROI и paint meter crop формируются только из второго снимка.
+6. Записать в `experiment_phases.after_draw.cursor_exclusion` метод, точку и margin.
+
+Если безопасная точка вне экрана недоступна или координаты некорректны, post-draw capture завершится ошибкой вместо сохранения потенциально закрытого курсором кадра. Это fail-closed поведение. Добавлены тесты геометрии выбора точки и порядка действий. Кодовые коммиты: `a680f51`, `d299259`, `723a410`. CI для нового HEAD и реальный V4 capture ещё не подтверждены; старые captures не изменялись.
+
+## 9. Следующие действия
+
+1. [x] Просмотреть representative overlays и зафиксировать причины неоднозначности.
+2. [x] Исправить DrawingPlan V1/V3 и добавить regression gate межштрихового расстояния.
+3. [x] Добавить cursor-free post-draw capture и unit/regression tests.
+4. [ ] Подтвердить CI для code HEAD `723a410795953e075fbdfefe0c03cdfc28a94dd0`.
+5. [ ] Выполнить V4 closure capture и проверить, что seam не закрыт курсором.
+6. [ ] Повторить полные V1/V3 blocks с новой геометрией.
+7. [ ] Добавить V2 targeted lengths 12/16/20/24/30 logical px.
+8. [ ] Выполнить V5 spacing sweep 8/12/16/20/24 logical px.
+9. [ ] Провести независимую validation CHALK model и определить safety margin; INT-007 остаётся BLOCKED.
+
+**Статус:** код cursor-free capture и его тесты добавлены, но CI и live validation ожидаются. Quality gate остаётся OPEN. Production executor, estimator, sampling defaults и первичные captures не изменялись.
