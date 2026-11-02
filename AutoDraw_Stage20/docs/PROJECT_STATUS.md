@@ -3,7 +3,7 @@
 **Актуально на:** 2 ноября 2026 г.  
 **Репозиторий:** `Kiddos19882/AutoDraw`  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
-**Последний проверенный CI code HEAD:** `d3971e4da66f503e91799729005cea24e32bf466`; run [41392156994](https://github.com/Kiddos19882/AutoDraw/actions/runs/41392156994) завершился success, включая INT-006 pixel audit. **Текущий code HEAD:** `94c3c8760fac574d0f72ed6ac728ad0b71d666bc` (подготовлены отдельные V2/V5 follow-up DrawingPlan и matrix contracts; CI этих изменений ожидается) — исправлены экспериментальные DrawingPlan V1/V3, добавлен regression gate их изоляции и cursor-free post-draw capture (mouseUp → move вне board ROI → screenshot). CI нового HEAD ожидает подтверждения. Исходные live captures остаются в data commit `64795362aa1bf4d0a3587e119b8c959242be6181`.
+**Последний проверенный CI code HEAD:** `d3971e4da66f503e91799729005cea24e32bf466`; run [41392156994](https://github.com/Kiddos19882/AutoDraw/actions/runs/41392156994) завершился success, включая INT-006 pixel audit. **Текущий code HEAD:** `7216eedd238754132d0e61f011b785395b06bc5d` (подготовлены отдельные V2/V5 follow-up DrawingPlan и matrix contracts; CI run `41468581157` ожидает старта/завершения) — исправлены экспериментальные DrawingPlan V1/V3, добавлен regression gate их изоляции и cursor-free post-draw capture (mouseUp → move вне board ROI → screenshot). CI нового HEAD ожидает подтверждения. Исходные live captures остаются в data commit `64795362aa1bf4d0a3587e119b8c959242be6181`.
 
 > Этот верхний блок — единственный источник текущего статуса. Ниже сохранена историческая хронология работ. Более ранние статусы, планы и чек-листы в исторических записях не являются текущим backlog и не должны переопределять сведения этого блока и [TASKS.md](TASKS.md).
 
@@ -804,3 +804,6 @@ Per-run transport gates чистые: `dropped_events=0`, `monitor_error_count_d
 - Новые scenario IDs изолируют результаты от исходных V2/V5 captures. Matrix metadata и block planner ожидают соответственно 5 и 16 strokes; обе серии имеют 9 задач (P0/P1/P2 × 3 повтора), radius=10.
 - Regression tests проверяют точные длины V2 и пять расстояний V5. Кодовые изменения: 1f2917a, 8a012de, 230fe22, 3d6754c, ef8b704, 94c3c87.
 - Новый протокол: [CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md](CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md). Live captures не выполнялись; их выполнит пользователь. Production executor, estimator, sampling defaults и исходные данные не изменялись.
+
+
+- Дополнительная совместимость: прежние V2/V5 scenario IDs оставлены в legacy phase map для повторного анализа старых manifests; новые block planners используют только новые follow-up IDs. Regression test подтверждает принятие старых IDs.
