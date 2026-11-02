@@ -7,6 +7,12 @@
 **Связанные задачи:** INT-006; предпосылки INT-007  
 **Режим:** исследовательская валидация; production executor и estimator не изменять.
 
+## Дополнение 2026-11-02 — corrective CI и отдельные follow-up сценарии
+
+Первоначальная матрица V1–V5 в этом документе описывает исходную серию и сохраняется как исторический протокол. Для повторных/дополнительных испытаний V2 и V5 применяется отдельный документ [CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md](CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md): V2 `int006_short_strokes_followup` содержит 5 штрихов длиной 12/16/20/24/30 logical px; V5 `int006_intersections_spacing_sweep` содержит 16 штрихов — 6 intersection controls и 10 штрихов пяти пар параллельных линий spacing 8/12/16/20/24 logical px. Новые scenario IDs отделены от legacy IDs, а исходные manifests остаются анализируемыми.
+
+Corrective code HEAD `3e8e6c5` прошёл полный GitHub Actions run [41470680544](https://github.com/Kiddos19882/AutoDraw/actions/runs/41470680544): Application integration, Executor, Game Monitor/bridge, Preparation/G3, Windows portable build и INT-006 PNG audit — success. Optional algorithm benchmarks skipped. Live follow-up не входит в CI и требует работающей игровой сессии.
+
 ## 1. Цель и границы
 
 INT-006 должен установить две вещи независимо друг от друга:
