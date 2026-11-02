@@ -24,7 +24,7 @@
 - Предварительная сегментированная модель и результаты первой holdout-проверки изложены в [CHALK_PRELIMINARY_SEGMENTED_MODEL_2026-11-02.md](CHALK_PRELIMINARY_SEGMENTED_MODEL_2026-11-02.md). G1-модель проверена на 66 новых штрихах P0 (MAE 1.09, RMSE 1.33, MAPE 1.71%), но независимая validation step=4 и полных DrawingPlan ещё не завершена; модель остаётся исследовательской, не production estimator.
 - Визуальный аудит всех шести G3 PNG step=4/delay=5 и step=4/delay=10 пройден для длинных горизонтальных линий. Все шесть линий визуально непрерывны. Конец шестой линии частично закрыт курсором. Количественные pixel-level метрики gap/centerline/width не рассчитаны.
 - step=4 экспериментально измерен на G3 и follow-up V1–V5. Новые 45 captures в commit e879a77: exact CHALK экономия 38.5–49.4% против step=2 по геометриям. Series-aware pixel audit 90 исходных + follow-up captures завершён: 90 valid, 0 duplicate/missing/unexpected, 297/297 новых strokes coverage=1.0 и zero gaps; V4 closure seams 27/27 covered. V5 spacing при radius=10: пары 8/12 logical px merge, 16/20/24 separated. V1/V3 исправленные DrawingPlan и V2/V4/V5 follow-up выполнены. Универсальный production default не утверждён; executor defaults не менялись.
-- INT-006: исходные 45 и follow-up 45 live captures V1–V5 приняты; exact CHALK/per-stroke pointDelta согласованы, per-run Monitor/Bridge integrity counters нулевые. Follow-up commit `e879a77`: step=4 экономит 38.5–49.4% относительно step=2 по геометриям; pixel audit 90 captures (549 stroke rows, 900 pair rows) завершён в CI `41496555297`: 297/297 новых strokes coverage=1.0, zero gaps; V4 closure seams 27/27 covered; V5 spacing 8/12 merge, 16/20/24 separated при radius=10. Cursor placement ниже board и paint-meter ROI подтверждён: курсор не обнаружен в board crop 45/45. Независимая validation модели и safety margin остаются открытыми; production defaults/estimator не менялись.
+- INT-006: исходные 45 и follow-up 45 live captures V1–V5 приняты; exact CHALK/per-stroke pointDelta согласованы, per-run Monitor/Bridge integrity counters нулевые. Follow-up commit `e879a77`: step=4 экономит 38.5–49.4% относительно step=2 по геометриям; pixel audit 90 captures (549 stroke rows, 900 pair rows) завершён в CI `41496555297`: 297/297 новых strokes coverage=1.0, zero gaps; V4 closure seams 27/27 covered; V5 spacing 8/12 merge, 16/20/24 separated при radius=10. Cursor placement ниже board и paint-meter ROI подтверждён: курсор не обнаружен в board crop 45/45. Независимая validation модели и safety margin остаются открытыми. Статический аудит подтвердил, что D1–D5 ещё не подключены к matrix/block/UI/executor harness; live validation заблокирована до реализации отдельной INT006 phase, frozen prediction records, analyzer, regression tests и полного CI. См. [harness readiness audit](CHALK_INT006_HARNESS_READINESS_AUDIT_2026-11-02.md). Production defaults/estimator не менялись.
 - Production executor, estimator и sampling defaults не изменялись. Изменён только экспериментальный DrawingPlan V1/V3 и его regression tests; первичные captures/manifests/reports/PNG не переписывались. Новые V1/V3 captures ещё не выполнены.
 
 ## Статусы инициатив
@@ -37,19 +37,19 @@
 | INT-003 | IN_PROGRESS | Точный счётчик и события подтверждены; требуется завершить сопоставимый A/B/C overhead/FPS анализ Monitor off / версий Monitor. |
 | INT-004 | DONE* | WebSocket telemetry, per-run capture, RunRecorder и автоматическая связь Monitor report с экспериментом используются в принятых G1–G3 данных. *Это закрывает сбор/корреляцию данных, но не A/B/C overhead — он остаётся в INT-003.* |
 | INT-005 | DONE* | Автоматические CHALK blocks, manifest, matrix, recovery и fail-closed gates использованы для принятых G1–G3. *Отдельные будущие улучшения лаборатории не блокируют завершение реализованного контура.* |
-| INT-006 | IN_PROGRESS | 90/90 исходных + follow-up captures приняты; series-aware pixel audit завершён (549 stroke rows, 900 pair rows). 45 follow-up CHALK exact; step=4 экономит 38.5–49.4%; V5 spacing 8/12 merge, 16/20/24 separated при radius=10. Full CI 41496555297 success. Открыта только независимая validation модели на полных DrawingPlan и safety margin. |
+| INT-006 | IN_PROGRESS | Исходные/follow-up V1–V5 и pixel audit завершены. Независимый протокол D1–D5 подготовлен, но статический аудит выявил отсутствие этих сценариев в текущих matrix/block/UI/executor contracts и отсутствие frozen-prediction analyzer. Live validation BLOCKED до реализации и полного CI; затем нужен локальный Windows preflight. Production estimator/defaults не менялись. |
 | INT-007 | TODO | Интеграция валидированной модели в preflight/resource estimator запрещена до закрытия INT-006. |
 | INT-008 | TODO | Оптимизация траекторий/покрытия в пределах CHALK после появления валидированного estimator. |
 | INT-009 | TODO | Проверка прогноза на независимых рисунках, визуальное качество и фактическая экономия. |
 
 ## Ближайший рабочий приоритет
 
-1. Pixel-level audit 45/45 PNG и representative overlay review выполнены; post-draw capture обновлён для cursor-free снимка V4.
-2. Полный CI текущего code HEAD `3e8e6c5` подтверждён run `41470680544`; программный gate закрыт.
-3. Выполнить live follow-up в порядке протокола: V1/V3 — новые captures с исправленной геометрией; V4 — cursor-free closure capture; V2 — 5 коротких штрихов 12/16/20/24/30 logical px; V5 — 16 штрихов, spacing sweep 8/12/16/20/24 logical px. Для каждой серии использовать P0/P1/P2 × 3 повтора, radius=10, точный pre/post pointCount и per-run Monitor integrity.
-4. Собрать независимую validation-выборку реальных планов и сравнить прогноз с exact pre/post pointCount; рассчитать MAE, RMSE, bias и относительную ошибку, отдельно по типам геометрии.
-5. Только после validation определить консервативный safety margin и критерии допуска к квоте.
-6. Затем проектировать INT-007/008/009. До этого production defaults и код estimator не менять.
+1. Исходные и follow-up V1–V5 captures и pixel-level audit завершены; CI `41496555297` подтвердил обязательные jobs и Windows portable build.
+2. Статически проверить и расширить действующие matrix/block/UI/executor contracts отдельной INT006 phase для D1–D5; не создавать второй исполнитель или Game Monitor bridge.
+3. Реализовать 45-cell block journal, пять DrawingPlan, task-specific executor override, immutable prediction records и analyzer frozen-model validation.
+4. Добавить regression/orchestration tests и подтвердить полный CI, включая Windows portable build/startup smoke-test.
+5. После CI пользователь выполняет локальный Windows 10 preflight; live validation начинается только после проверки игры, heartbeat и чистой тестовой доски.
+6. После 45 принятых captures рассчитать метрики и только затем обосновать safety margin. До этого production defaults и код estimator не менять.
 
 ## Разрешения и границы
 
@@ -834,3 +834,10 @@ Per-run transport gates чистые: `dropped_events=0`, `monitor_error_count_d
 Первый run на commit e879a77 (41493449244) обнаружил 90 captures вместо ожидаемых 45 и false duplicate matrix cells: анализатор не различал исходную и follow-up серии. При этом все 90 captures были valid, missing/unexpected cells и batch failures отсутствовали. Исправлено: matrix identity включает series_id + phase, проверка 9 cells выполняется отдельно для каждой серии; CSV/JSON сохраняют series_id. Добавлены regression tests для одинаковых ячеек в разных series и для настоящего duplicate внутри одной series.
 
 Полный CI run [41496555297](https://github.com/Kiddos19882/AutoDraw/actions/runs/41496555297) на HEAD 956ce2b — **SUCCESS**: Game Monitor/bridge, integration, executor, Preparation/G3, series-aware pixel audit, Windows portable build/startup smoke-test. PNG artifact: [autodraw-int006-png-analysis](https://github.com/Kiddos19882/AutoDraw/actions/runs/41496555297/artifacts/13165359929). Portable build artifact: [autodraw-g3-preflight-build](https://github.com/Kiddos19882/AutoDraw/actions/runs/41496555297/artifacts/13165884603).
+
+
+## 2026-11-02 — аудит готовности независимой validation
+
+Статически проверены `chalk_experiment_matrix.py`, `chalk_test_blocks.py`, `brush_behavior_test_ui.py`, `integrated_app.py` и `tests/analyze_chalk_experiment_matrix.py`. D1–D5 отсутствуют в текущих matrix scenarios/expected counts, block planner/journal, Brush Test UI и allowlist executor override. Общий analyzer валидирует telemetry manifests и агрегирует repeats, но не сравнивает их с immutable frozen prediction records и не рассчитывает validation residuals.
+
+Поэтому независимый протокол не готов к live запуску, несмотря на ранее указанное READY FOR LIVE VALIDATION. Статус исправлен на BLOCKED. Создан `CHALK_INT006_HARNESS_READINESS_AUDIT_2026-11-02.md`; следующий шаг — расширить существующий harness и добавить regression tests. Production estimator/defaults, исходные данные и master не менялись. Кодовые тесты и live captures в рамках этого аудита не запускались.
