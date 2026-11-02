@@ -485,6 +485,63 @@ TEST_CASES: dict[str, dict[str, Any]] = {
             {"name": "parallel_s24_b", "points": [[360, 202], [435, 202]]}
         ],
     },
+    "INT-006 D1 — смешанные прямые": {
+        "id": "int006_validation_d1_mixed_lines",
+        "description": "Независимая validation D1: четыре изолированных прямых — горизонталь, вертикаль и две диагонали.",
+        "strokes": [
+            {"name": "d1_horizontal_100", "points": [[30, 30], [130, 30]]},
+            {"name": "d1_vertical_80", "points": [[160, 20], [160, 100]]},
+            {"name": "d1_diagonal_1", "points": [[210, 25], [280, 95]]},
+            {"name": "d1_diagonal_2", "points": [[310, 100], [390, 40]]}
+        ],
+    },
+    "INT-006 D2 — пятиугольник отдельными сторонами": {
+        "id": "int006_validation_d2_polygon",
+        "description": "Независимая validation D2: пять отдельных штрихов образуют замкнутый пятиугольник.",
+        "strokes": [
+            {"name": "d2_side_1", "points": [[40, 35], [130, 25]]},
+            {"name": "d2_side_2", "points": [[130, 25], [170, 85]]},
+            {"name": "d2_side_3", "points": [[170, 85], [110, 155]]},
+            {"name": "d2_side_4", "points": [[110, 155], [30, 115]]},
+            {"name": "d2_side_5", "points": [[30, 115], [40, 35]]}
+        ],
+    },
+    "INT-006 D3 — пересечения X, крест и T": {
+        "id": "int006_validation_d3_intersections",
+        "description": "Независимая validation D3: шесть отдельных линий формируют X, крест и T-узел.",
+        "strokes": [
+            {"name": "d3_x_a", "points": [[40, 30], [140, 130]]},
+            {"name": "d3_x_b", "points": [[40, 130], [140, 30]]},
+            {"name": "d3_cross_vertical", "points": [[230, 30], [230, 150]]},
+            {"name": "d3_cross_horizontal", "points": [[170, 90], [290, 90]]},
+            {"name": "d3_t_horizontal", "points": [[330, 40], [390, 40]]},
+            {"name": "d3_t_vertical", "points": [[360, 10], [360, 40]]}
+        ],
+    },
+    "INT-006 D4 — короткие детали": {
+        "id": "int006_validation_d4_short_details",
+        "description": "Независимая validation D4: изолированные штрихи точной длины 1/2/3/5/8/10 logical px; lookup без интерполяции.",
+        "strokes": [
+            {"name": "d4_length_1", "points": [[30, 30], [31, 30]]},
+            {"name": "d4_length_2", "points": [[60, 30], [60, 32]]},
+            {"name": "d4_length_3", "points": [[90, 30], [93, 30]]},
+            {"name": "d4_length_5", "points": [[130, 30], [130, 35]]},
+            {"name": "d4_length_8", "points": [[170, 30], [178, 30]]},
+            {"name": "d4_length_10", "points": [[210, 30], [210, 40]]}
+        ],
+    },
+    "INT-006 D5 — повторное покрытие": {
+        "id": "int006_validation_d5_repeated_coverage",
+        "description": "Независимая validation D5: три траектории выполняются по два раза; каждый проход является отдельным stroke.",
+        "strokes": [
+            {"name": "d5_line_50_pass_1", "points": [[40, 40], [90, 40]]},
+            {"name": "d5_line_50_pass_2", "points": [[40, 40], [90, 40]]},
+            {"name": "d5_line_100_pass_1", "points": [[40, 90], [140, 90]]},
+            {"name": "d5_line_100_pass_2", "points": [[40, 90], [140, 90]]},
+            {"name": "d5_line_120_pass_1", "points": [[40, 150], [160, 150]]},
+            {"name": "d5_line_120_pass_2", "points": [[40, 150], [160, 150]]}
+        ],
+    },
 
 }
 
@@ -850,7 +907,7 @@ class BrushBehaviorTestTab:
         ttk.Label(block_controls, text="Фаза").pack(side="left")
         ttk.Combobox(
             block_controls, textvariable=self.chalk_block_phase_var,
-            values=("G1", "G2", "G3", "V1", "V2", "V3", "V4", "V5"), state="readonly", width=5,
+            values=("G1", "G2", "G3", "V1", "V2", "V3", "V4", "V5", "INT006"), state="readonly", width=8,
         ).pack(side="left", padx=(6, 10))
         ttk.Button(block_controls, text="Запустить полный блок", command=self.start_chalk_test_block).pack(side="left")
         ttk.Button(block_controls, text="Остановить после текущего опыта", command=self.request_stop_chalk_test_block).pack(side="left", padx=6)
@@ -1368,8 +1425,8 @@ class BrushBehaviorTestTab:
             )
             return
         phase_id = self.chalk_block_phase_var.get().strip()
-        if phase_id not in {"G1", "G2", "G3", "V1", "V2", "V3", "V4", "V5"}:
-            messagebox.showwarning("Неизвестная фаза", "Выбери G1/G2/G3 или V1–V5.", parent=self.root)
+        if phase_id not in {"G1", "G2", "G3", "V1", "V2", "V3", "V4", "V5", "INT006"}:
+            messagebox.showwarning("Неизвестная фаза", "Выбери G1/G2/G3, V1–V5 или INT006.", parent=self.root)
             return
         if phase_id == "G2" and not self._has_completed_g1_block():
             messagebox.showwarning(
