@@ -24,6 +24,8 @@ from chalk_experiment_matrix import (
     PHASE_SCENARIOS,
     LEGACY_V_SCENARIO_PHASES,
     V_SAMPLING_PROFILES,
+    RADIUS_GEOMETRY_VALIDATION_RADII,
+    RADIUS_GEOMETRY_VALIDATION_PROFILE,
 )
 
 
@@ -166,6 +168,23 @@ def build_chalk_test_block_plan(
                         "requested_radius": radius,
                         "executor_parameters": parameters,
                     })
+    elif phase_id == "INT006R":
+        cells = []
+        parameters = dict(GEOMETRY_EXECUTOR_CONFIG)
+        parameters.update({
+            "point_step_px": RADIUS_GEOMETRY_VALIDATION_PROFILE[0],
+            "point_delay_ms": RADIUS_GEOMETRY_VALIDATION_PROFILE[1],
+        })
+        for requested_radius in RADIUS_GEOMETRY_VALIDATION_RADII:
+            for scenario_id in scenarios:
+                for repeat_index in range(1, repeats + 1):
+                    cells.append({
+                        "scenario_id": scenario_id,
+                        "repeat_index": repeat_index,
+                        "expected_strokes": EXPECTED_STROKES[scenario_id],
+                        "requested_radius": requested_radius,
+                        "executor_parameters": dict(parameters),
+                    })
     elif phase_id in {"V1", "V2", "V3", "V4", "V5", "INT006"}:
         cells = []
         for point_step_px, point_delay_ms in V_SAMPLING_PROFILES:
@@ -198,10 +217,13 @@ def build_chalk_test_block_plan(
     for order_index, cell in enumerate(cells, start=1):
         parameters = cell["executor_parameters"]
         task_id = (
-            f"{cell['scenario_id']}-s{parameters['point_step_px']}-"
-            f"d{parameters['point_delay_ms']}-r{cell['repeat_index']}"
-            if phase_id == "G3" or phase_id.startswith("V") or phase_id == "INT006"
-            else f"{cell['scenario_id']}-r{cell['repeat_index']}"
+            f"{cell['scenario_id']}-b{cell['requested_radius']}-r{cell['repeat_index']}"
+            if phase_id == "INT006R" else (
+                f"{cell['scenario_id']}-s{parameters['point_step_px']}-"
+                f"d{parameters['point_delay_ms']}-r{cell['repeat_index']}"
+                if phase_id == "G3" or phase_id.startswith("V") or phase_id == "INT006"
+                else f"{cell['scenario_id']}-r{cell['repeat_index']}"
+            )
         )
         task_record = {
             "task_id": task_id,
@@ -231,16 +253,20 @@ def build_chalk_test_block_plan(
         "repeat_count": repeats,
         "random_seed": seed,
         "requested_radius": radius,
+        **({"requested_radii": list(RADIUS_GEOMETRY_VALIDATION_RADII)} if phase_id == "INT006R" else {}),
         "executor_parameters": dict(GEOMETRY_EXECUTOR_CONFIG),
         "executor_parameter_matrix": (
-            [
-                {"point_step_px": step, "point_delay_ms": delay}
-                for step in G3_POINT_STEPS for delay in G3_POINT_DELAYS_MS
-            ] if phase_id == "G3" else (
+            [{"point_step_px": RADIUS_GEOMETRY_VALIDATION_PROFILE[0], "point_delay_ms": RADIUS_GEOMETRY_VALIDATION_PROFILE[1]}]
+            if phase_id == "INT006R" else (
                 [
                     {"point_step_px": step, "point_delay_ms": delay}
-                    for step, delay in V_SAMPLING_PROFILES
-                ] if phase_id.startswith("V") or phase_id == "INT006" else [dict(GEOMETRY_EXECUTOR_CONFIG)]
+                    for step in G3_POINT_STEPS for delay in G3_POINT_DELAYS_MS
+                ] if phase_id == "G3" else (
+                    [
+                        {"point_step_px": step, "point_delay_ms": delay}
+                        for step, delay in V_SAMPLING_PROFILES
+                    ] if phase_id.startswith("V") or phase_id == "INT006" else [dict(GEOMETRY_EXECUTOR_CONFIG)]
+                )
             )
         ),
         "expected_task_count": len(tasks),
@@ -457,6 +483,58 @@ def _validate_chalk_test_block_journal(document: Any, path: Path) -> dict[str, A
             or document.get("executor_parameter_matrix") != expected_parameter_matrix
         ):
             raise ValueError(f"Журнал INT006 должен содержать все 45 уникальных ячеек: {path}")
+    elif phase_id == "INT006R":
+        expected_cells = {
+            (scenario_id, radius, repeat)
+            for scenario_id in PHASE_SCENARIOS[phase_id]
+            for radius in RADIUS_GEOMETRY_VALIDATION_RADII
+            for repeat in (1, 2, 3)
+        }
+        observed_cells = set()
+        observed_order_indices = set()
+        expected_parameters = dict(GEOMETRY_EXECUTOR_CONFIG)
+        expected_parameters.update({
+            "point_step_px": RADIUS_GEOMETRY_VALIDATION_PROFILE[0],
+            "point_delay_ms": RADIUS_GEOMETRY_VALIDATION_PROFILE[1],
+        })
+        for task in tasks:
+            scenario_id = task.get("scenario_id")
+            radius = task.get("requested_radius")
+            repeat_index = task.get("repeat_index")
+            order_index = task.get("matrix_order_index")
+            cell = (scenario_id, radius, repeat_index)
+            if (
+                scenario_id not in PHASE_SCENARIOS[phase_id]
+                or isinstance(radius, bool) or not isinstance(radius, int)
+                or radius not in RADIUS_GEOMETRY_VALIDATION_RADII
+                or isinstance(repeat_index, bool) or not isinstance(repeat_index, int)
+                or isinstance(order_index, bool) or not isinstance(order_index, int)
+                or order_index < 1 or order_index > 45 or order_index in observed_order_indices
+                or task.get("expected_strokes") != EXPECTED_STROKES.get(scenario_id)
+                or task.get("executor_parameters") != expected_parameters
+                or task.get("task_id") != f"{scenario_id}-b{radius}-r{repeat_index}"
+                or "prediction_id" in task
+                or cell not in expected_cells
+                or cell in observed_cells
+            ):
+                raise ValueError(f"Некорректная/повторная ячейка INT006R: {path}")
+            observed_cells.add(cell)
+            observed_order_indices.add(order_index)
+        expected_parameter_matrix = [{
+            "point_step_px": RADIUS_GEOMETRY_VALIDATION_PROFILE[0],
+            "point_delay_ms": RADIUS_GEOMETRY_VALIDATION_PROFILE[1],
+        }]
+        if (
+            observed_cells != expected_cells
+            or observed_order_indices != set(range(1, 46))
+            or len(tasks) != 45
+            or document.get("requested_radius") != 10
+            or document.get("requested_radii") != list(RADIUS_GEOMETRY_VALIDATION_RADII)
+            or document.get("executor_parameters") != GEOMETRY_EXECUTOR_CONFIG
+            or document.get("executor_parameter_matrix") != expected_parameter_matrix
+            or "prediction_artifact" in document
+        ):
+            raise ValueError(f"Журнал INT006R должен содержать 45 уникальных ячеек и три радиуса: {path}")
     elif phase_id in {"V1", "V2", "V3", "V4", "V5"}:
         scenario_id = PHASE_SCENARIOS[phase_id][0]
         compatible_scenarios = {scenario_id, *(
