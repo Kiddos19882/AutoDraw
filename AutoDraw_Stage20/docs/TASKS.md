@@ -431,7 +431,7 @@ Software gate закрыт; live gate остаётся открытым. Авт�
 - [x] Пересчитать предварительные run-level и per-stroke метрики; результат записан в [CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md](CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md).
 - [x] Исправить analyzer path binding для перенесённых capture bundles; добавить regression tests на Windows absolute path и journal task prediction ID / expected stroke count.
 - [x] Добавить analyzer step и JSON artifact upload в `.github/workflows/geometry-tests.yml`.
-- [ ] Подтвердить новый CI после analyzer/workflow/binding changes и получить официальный analyzer JSON report: 45 accepted, 0 missing, 0 rejected.
+- [x] Подтвердить новый CI после analyzer/workflow/binding changes и получить официальный analyzer JSON report: run 41532629748 SUCCESS, 45 accepted, 0 missing, 0 rejected.
 - [ ] Проверка frozen artifact SHA-256 выполнена независимо и совпала; штатным analyzer ещё подтвердить полный journal/task/experiment/run/profile/geometry binding.
 - [ ] На основании официального report определить safety margin и границы применимости модели.
 
