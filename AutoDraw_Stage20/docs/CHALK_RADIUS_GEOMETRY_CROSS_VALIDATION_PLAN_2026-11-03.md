@@ -1,7 +1,7 @@
 # План перекрёстной validation радиуса кисти и геометрии CHALK
 
 **Дата:** 2026-11-03  
-**Статус:** PLANNED — до live-запусков требуется отдельный harness/software gate  
+**Статус:** IMPLEMENTATION IN PROGRESS — отдельная фаза INT006R и тестовый analyzer добавлены; software gate CI ожидается; live-запуски запрещены до PASS  
 **Связь:** продолжение INT-006; не открывает INT-007 автоматически  
 **Рабочая ветка:** `feature/image-geometry-optimization`
 
@@ -92,3 +92,28 @@
 - Не считать радиус единственным фактором качества: ширина покрытия, merges и gaps анализируются отдельно от exact CHALK.
 - Не начинать INT-007 только на основании этой матрицы; дополнительно нужна validation на полных реальных рисунках и отдельное решение по safety margin.
 - `safety_margin_status=not_established`, `production_eligibility=not_validated` до выполнения соответствующих gates.
+
+
+## 8. Реализация INT006R — 2026-11-03
+
+Реализована отдельная фаза `INT006R` в рабочей ветке. Она не изменяет frozen INT-006 model и использует те же D1–D5 logical geometries с новыми scenario IDs.
+
+### Реализованные контракты
+
+- `chalk_experiment_matrix.py`: отдельные IDs D1–D5, expected stroke counts, разрешённые радиусы 1/10/30 и строго фиксированный P1 (step=4, delay=5 ms). Для INT006R prediction ID не требуется.
+- `chalk_test_blocks.py`: отдельный durable 45-cell block; каждая ячейка определяется `(scenario, radius, repeat)`. Task ID включает радиус. Journal validator отклоняет неподдерживаемый радиус, sampling mismatch, дубликаты, пропуски и лишний prediction artifact.
+- `brush_behavior_test_ui.py`: отдельные UI-сценарии INT006R; перед каждым опытом устанавливается радиус из конкретной задачи журнала, а не фиксированное значение 10. Ручной запуск D1–D5R заблокирован.
+- `integrated_app.py`: executor handoff разрешает только D1–D5R, радиусы 1/10/30 и P1; запрошенный радиус должен совпадать с радиусом task metadata и подтверждением Game Monitor.
+- `chalk_int006r_validation.py`: отдельный analyzer точных captures, journal/task/experiment/run binding, completeness и per-geometry/per-radius статистики. Frozen predictions INT-006 не загружаются и не меняются.
+- `tests/test_chalk_int006r_validation.py` и интеграционные проверки `tests/test_unified_app.py` покрывают матрицу, журнал, радиусы, P1 и executor handoff.
+
+### Software gate
+
+На момент этой записи CI ещё не подтверждён. Требуется полный `.github/workflows/geometry-tests.yml` на HEAD с INT006R. Live captures не запускать до успешного CI и Windows portable smoke-test.
+
+### Текущие неизменённые условия
+
+- Frozen INT-006 model, coefficients и artifact не менялись.
+- Production estimator, executor defaults и sampling defaults не менялись.
+- `master` не изменялся.
+- Safety margin остаётся `not_established`; production eligibility — `not_validated`.
