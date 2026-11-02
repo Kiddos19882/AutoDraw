@@ -1858,7 +1858,7 @@ Brush Test acceptance и матричные валидаторы больше н
 
 - Получен data commit [6479536](https://github.com/Kiddos19882/AutoDraw/commit/64795362aa1bf4d0a3587e119b8c959242be6181); актуальный branch HEAD на момент анализа — этот commit.
 - Проверены все пять block journals: V1–V5, каждый 9/9 completed; итого 45/45 captures.
-- Для всех 45 runs: monitor capture saved, exact CHALK, pointDelta matches exact counter, requested/observed radius=10; dropped events, Monitor errors, Bridge failures, collector sequence gaps и per-run buffer drops — 0.
+- Для всех 45 runs: monitor capture saved, exact CHALK, pointDelta matches exact counter, requested/observed requested radius=10; dropped events, Monitor error deltas, Bridge failure deltas, collector sequence gaps и per-run buffer drops — 0.
 - Per-stroke pointDelta сгруппирован по stroke_id: число stroke groups соответствует плану, non-consuming candidates=0, сумма per-stroke расходов совпадает с CHALK delta.
 - Средний расход P0/P1/P2 (step2/delay10; step4/delay5; step4/delay10): V1 243.67/126.67/127.33; V2 20.00/15.00/15.33; V3 380.67/193.67/193.67; V4 448.67/229.00/229.67; V5 441.33/229.33/229.00.
 - Step=4 снизил расход на 48–49% в V1/V3/V4/V5 и на 23–25% в V2. P1/P2 практически равны по CHALK.
@@ -1873,7 +1873,7 @@ Brush Test acceptance и матричные валидаторы больше н
 
 - Проверены оригинальные board ROI из GitHub: 15 representative PNG, по одному capture для каждого профиля P0/P1/P2 в V1–V5.
 - Визуально не выявлено очевидной потери непрерывности у step=4 относительно P0 на просмотренных диагоналях, ломаных, контурах и пересечениях.
-- Зафиксированы дефекты/ограничения геометрии: V1 пересечение slope_050/negative_shallow; V3 пересечение right_angle/acute_zigzag; V2 короткие движения выглядят точками при radius=10; V4 часть контура перекрыта курсором; V5 spacing=8 logical px сливается.
+- Зафиксированы дефекты/ограничения геометрии: V1 пересечение slope_050/negative_shallow; V3 пересечение right_angle/acute_zigzag; V2 короткие движения выглядят точками при requested radius=10; V4 часть контура перекрыта курсором; V5 spacing=8 logical px сливается.
 - P1 и P2 визуально практически неразличимы на выбранных примерах.
 - Численные pixel-level метрики не рассчитаны; этап нельзя считать закрытым. Требуется сегментация всех 45 PNG, вычисление continuity/max gap, centerline deviation, width/width variation, closure и parallel separation с проверкой масок относительно blank-board reference.
 - Отчёт: [CHALK_INT006_PNG_SCREENING_2026-11-02.md](CHALK_INT006_PNG_SCREENING_2026-11-02.md).
@@ -1930,7 +1930,7 @@ Brush Test acceptance и матричные валидаторы больше н
 
 - Новая V2 серия `int006_short_strokes_followup`: пять изолированных штрихов 12/16/20/24/30 logical px, направления горизонталь/вертикаль/диагональ. Исходные V2 captures сохранены.
 - Новая V5 серия `int006_intersections_spacing_sweep`: шесть контрольных штрихов X/T/креста и пять независимых пар параллельных линий spacing 8/12/16/20/24 logical px; всего 16 штрихов. Исходные V5 captures сохранены.
-- Обе серии подключены к PHASE_SCENARIOS/EXPECTED_STROKES, block matrix, UI presets и regression tests. Каждая серия создаёт 9 задач (P0/P1/P2 × 3 повтора), radius=10; всего 18 будущих live captures.
+- Обе серии подключены к PHASE_SCENARIOS/EXPECTED_STROKES, block matrix, UI presets и regression tests. Каждая серия создаёт 9 задач (P0/P1/P2 × 3 повтора), requested radius=10; всего 18 будущих live captures.
 - Добавлены геометрические regression checks точных длин V2 и межосевых расстояний V5.
 - Документ выполнения: `CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md`. Live experiments не запускались; их выполняет пользователь. Production executor, estimator, defaults и старые captures не изменялись.
 - Кодовые коммиты follow-up: `1f2917a`, `8a012de`, `230fe22`, `3d6754c`, `ef8b704`, `94c3c87`. Предыдущий CI run `41466760095` успешен для HEAD `a74f7fd`; CI новых изменений ожидается.
