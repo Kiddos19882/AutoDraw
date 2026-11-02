@@ -318,3 +318,21 @@ Software gate закрыт; live gate остаётся открытым. Авт�
 - [ ] Проверить все новые regression tests и полный CI на конечном HEAD.
 - [ ] Проверить portable build и локальный Windows/Firefox preflight.
 - [ ] После успешных gates выполнить новый G3 block; старый stopped journal не возобновлять и не переписывать.
+
+
+## 2026-11-02 — новая live G3 серия завершена (commit 35ae78e)
+
+Источник первичных данных: [35ae78e31f9b6d357a4e8aa30cd12307d8c322e8](https://github.com/Kiddos19882/AutoDraw/commit/35ae78e31f9b6d357a4e8aa30cd12307d8c322e8). Полная аналитика: [CHALK_G3_RESULTS_2026-11-02.md](CHALK_G3_RESULTS_2026-11-02.md).
+
+- [x] Выполнить новый G3 block `chalk-20261102-031830-a0f325`, block ID `d5d28990cb954610aa7f58534be9d3d7`.
+- [x] Принять 27/27 задач: девять сочетаний `point_step_px` 1/2/4 × `point_delay_ms` 5/10/20, по три повтора.
+- [x] Проверить все 27 experiment summaries: exact CHALK, совпадение sampled pointDelta, radius=10, 6/6 strokes, Monitor capture saved.
+- [x] Проверить per-run транспорт: dropped_events=0, monitor_error_count_delta=0, bridge_send_failures_delta=0, collector_sequence_gap_count=0.
+- [x] Проверить поведение local Monitor buffer overflow: положительный buffer delta в поздних captures не привёл к потере WebSocket/collector events и не блокировал acceptance.
+- [x] Рассчитать средние, диапазоны CHALK и длительности по всем девяти конфигурациям.
+- [x] Записать итоговый отчёт `docs/CHALK_G3_RESULTS_2026-11-02.md`; предыдущий stopped G3 journal не изменять.
+- [ ] Проверить визуальное качество и непрерывность линий для кандидатов step=4 / delay=5 и step=4 / delay=10.
+- [ ] Построить сегментированную модель прогноза CHALK на данных G1/G2/G3 и radius matrix.
+- [ ] Проверить модель на коротких штрихах, диагоналях, кривых, поворотах, перекрытиях и заливках; не переносить коэффициент длинных линий на другие геометрии.
+
+**Текущий статус:** live G3 завершён и принят. Следующая задача — оценка качества экономичного режима и калибровка модели CHALK; не требуется повторять G3.
