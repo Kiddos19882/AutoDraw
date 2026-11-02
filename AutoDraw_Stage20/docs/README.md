@@ -53,6 +53,7 @@
 | [BRUSH_MODULE_QUICK_INDEX.md](BRUSH_MODULE_QUICK_INDEX.md) | Быстрый поиск по документации и исходникам для реализации модуля автоматических тестов кистей |
 | [CHALK_INT006_FROZEN_PREDICTIONS_AND_ANALYZER_2026-11-02.md](CHALK_INT006_FROZEN_PREDICTIONS_AND_ANALYZER_2026-11-02.md) | Frozen predictions, 45-cell journal и независимый analyzer INT-006 |
 | [CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md) | Официальный analyzer report: 45/45 accepted, метрики по профилям и geometry, safety-margin ограничения |
+| [CHALK_RADIUS_GEOMETRY_CROSS_VALIDATION_PLAN_2026-11-03.md](CHALK_RADIUS_GEOMETRY_CROSS_VALIDATION_PLAN_2026-11-03.md) | План проверки взаимодействия радиуса кисти и пяти классов геометрии |
 | [CHALK_INT006_LOCAL_PREFLIGHT_GUIDE_2026-11-02.md](CHALK_INT006_LOCAL_PREFLIGHT_GUIDE_2026-11-02.md) | Локальная проверка portable-сборки на Windows 10 перед live validation |
 | [FILE_STORAGE_CATALOG.md](FILE_STORAGE_CATALOG.md) | Каталог пользовательских файлов, runtime-планов, отчётов, проектов и экспериментальных данных |
 | [CONFIGURATION_AND_DATA.md](CONFIGURATION_AND_DATA.md) | Каталоги данных, профили, форматы и переменные окружения |
