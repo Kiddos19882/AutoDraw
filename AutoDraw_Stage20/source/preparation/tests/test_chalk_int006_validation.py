@@ -36,7 +36,24 @@ def _write_capture(results_dir: Path, journal: dict, task: dict, artifact: dict,
     )
     prediction_id = f"{MODEL_ID}:{scenario_id}:{profile_id}"
     prediction = artifact["predictions"][prediction_id]
-    strokes = prediction["planned_strokes"]
+    # Match the runtime DrawingPlan serialization: logical coordinate arrays
+    # become point objects and each stroke carries execution metadata.
+    strokes = [
+        {
+            "closed": False,
+            "metadata": {
+                "line_extension_px_override": 0.0,
+                "role": "brush_behavior_test",
+                "test_case": scenario_id,
+            },
+            "name": stroke["name"],
+            "points": [
+                {"x": float(point[0]), "y": float(point[1])}
+                for point in stroke["points"]
+            ],
+        }
+        for stroke in prediction["planned_strokes"]
+    ]
     experiment_id = f"exp-{task['task_id']}"
     run_id = f"run-{task['task_id']}"
     folder = results_dir / experiment_id
