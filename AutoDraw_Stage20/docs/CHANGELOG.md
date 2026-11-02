@@ -420,3 +420,11 @@
 - Автоматический курсор теперь уходит ниже доски и полоски краски, а не просто за границу доски.
 - Учитываются обе откалиброванные области (`board_area`, `paint_meter_area`) и 32 px свободного отступа; это предотвращает hover-уведомление от полоски краски поверх доски на `after_draw-board.png`.
 - Ручное снятие снимков и траектории рисования не затронуты.
+
+
+### INT-006 live follow-up V1–V5 — 2026-11-02
+
+- Добавлены и проанализированы 45/45 live captures по V1–V5 (commit [e879a77](https://github.com/Kiddos19882/AutoDraw/commit/e879a77f63be7a7a68de3f09091eab7dba0d34a2)); все пять block journals завершены 9/9.
+- Подтверждены exact CHALK и согласованность per-stroke Monitor deltas для всех 45 runs; per-run Monitor/Bridge errors и drops отсутствуют.
+- Step=4 показал 38.5–49.4% экономии против step=2; различие delay=5/10 ms при step=4 мало. Радиус во всех сериях фиксирован на 10.
+- Добавлен отдельный отчёт repeat values и ограничений `CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md`. Следующий gate — pixel-level audit новых PNG и независимая validation; production defaults не изменены.
