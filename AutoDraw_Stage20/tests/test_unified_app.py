@@ -1444,5 +1444,82 @@ class UnifiedAppCoreTests(unittest.TestCase):
         self.assertIsNone(app.executor.started_with)
 
 
+    def test_brush_test_executor_accepts_only_int006r_declared_radii_and_p1(self):
+        class Status:
+            def set(self, value):
+                self.value = value
+
+        class Executor:
+            running = False
+
+            def __init__(self, plan_path):
+                self.plan_path = plan_path
+                self.started_with = None
+
+            def start_execution_from_workflow(self, *, executor_config_override=None):
+                self.started_with = executor_config_override
+                return True
+
+        from chalk_experiment_matrix import (
+            GEOMETRY_EXECUTOR_CONFIG,
+            RADIUS_GEOMETRY_VALIDATION_PROFILE,
+            RADIUS_GEOMETRY_VALIDATION_RADII,
+        )
+
+        app = object.__new__(integrated_app.AutoDrawUnifiedApp)
+        app.root = None
+        app.status_var = Status()
+
+        def run_handoff(radius, requested_brush=None, profile=RADIUS_GEOMETRY_VALIDATION_PROFILE):
+            parameters = dict(GEOMETRY_EXECUTOR_CONFIG)
+            parameters.update({"point_step_px": profile[0], "point_delay_ms": profile[1]})
+            plan = {
+                "generation": {
+                    "chalk_test_block": {
+                        "block_id": "int006r-block",
+                        "task_id": f"int006r-d{radius}-r1",
+                        "phase_id": "INT006R",
+                    },
+                    "chalk_experiment_matrix": {
+                        "phase_id": "INT006R",
+                        "scenario_id": "int006r_validation_d1_mixed_lines",
+                        "requested_radius": radius,
+                        "expected_strokes": 4,
+                        "executor_parameters": parameters,
+                    },
+                }
+            }
+            with tempfile.TemporaryDirectory(prefix="AutoDraw INT006R handoff ") as temp:
+                plan_path = Path(temp) / "current_brush_behavior_test.json"
+                plan_path.write_text(json.dumps(plan), encoding="utf-8")
+                app.executor = Executor(plan_path)
+                with (
+                    patch("integrated_app.messagebox.showerror") as showerror,
+                    patch("integrated_app.messagebox.showwarning") as showwarning,
+                ):
+                    app._start_brush_test_executor(radius if requested_brush is None else requested_brush)
+            return app.executor.started_with, showerror, showwarning
+
+        for radius in RADIUS_GEOMETRY_VALIDATION_RADII:
+            with self.subTest(radius=radius):
+                started_with, showerror, showwarning = run_handoff(radius)
+                showerror.assert_not_called()
+                showwarning.assert_not_called()
+                self.assertEqual(started_with["point_step_px"], 4)
+                self.assertEqual(started_with["point_delay_ms"], 5)
+
+        started_with, showerror, _ = run_handoff(5)
+        showerror.assert_called_once()
+        self.assertIsNone(started_with)
+
+        started_with, showerror, _ = run_handoff(1, requested_brush=10)
+        showerror.assert_called_once()
+        self.assertIsNone(started_with)
+
+        started_with, showerror, _ = run_handoff(1, profile=(2, 10))
+        showerror.assert_called_once()
+        self.assertIsNone(started_with)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
