@@ -1,6 +1,16 @@
 # История изменений документации и проекта
 
 
+## 2026-11-03 — реализация отдельной фазы INT006R
+
+- Добавлены phase/scenario contracts для D1–D5R, радиусов 1/10/30 и фиксированного P1 (step=4, delay=5 ms).
+- Block planner/journal расширен отдельной 45-cell матрицей `(scenario, radius, repeat)`; добавлены fail-closed проверки уникальности и соответствия параметров.
+- Brush Test и executor handoff поддерживают установку и проверку радиуса конкретной задачи; ручной запуск сценариев INT006R запрещён.
+- Добавлен независимый analyzer exact CHALK и regression tests; frozen INT-006 model и prediction artifact не изменялись.
+- Software CI для нового HEAD ожидается; live captures не выполнялись.
+
+
+
 ## 2026-11-03 — план radius × geometry cross-validation
 
 - Сопоставлены два подтверждённых источника: radius matrix 21/21 на шести длинных горизонтальных линиях (радиусы 1–30, 722–728 CHALK) и официальный INT-006 D1–D5 при фиксированном radius=10.
