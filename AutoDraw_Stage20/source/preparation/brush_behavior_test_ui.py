@@ -361,8 +361,7 @@ TEST_CASES: dict[str, dict[str, Any]] = {
             {"name": "horizontal_offset", "points": [[40, 170], [420, 170]]},
             {"name": "vertical_offset", "points": [[120, 120], [120, 220]]}
         ]
-    }
-
+    },
     "V1 — диагонали разных наклонов": {
         "id": "int006_diagonals",
         "description": "INT-006 V1: шесть диагоналей разных наклонов.",
