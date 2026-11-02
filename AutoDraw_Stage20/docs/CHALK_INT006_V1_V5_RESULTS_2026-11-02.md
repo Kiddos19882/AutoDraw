@@ -142,3 +142,10 @@
 5. Только после этого определить conservative safety margin и завершить INT-006.
 
 **Неизменённые артефакты:** первичные block journals, experiment manifests, monitor reports и PNG. Этот документ — производная аналитическая сводка; raw captures не переписывались.
+
+
+---
+
+## Обновление статуса — 2026-11-02
+
+Этот документ сохраняет результаты **исходной** live-матрицы. Исправленные сценарии и повторная серия V1–V5 выполнены отдельно: 45/45 captures в commit [e879a77](https://github.com/Kiddos19882/AutoDraw/commit/e879a77f63be7a7a68de3f09091eab7dba0d34a2). Follow-up exact CHALK, pixel-level metrics и V5 spacing результаты приведены в [CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md](CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md). Не объединять repeat values исходной и follow-up серий в одну регрессионную выборку без явной маркировки series_id.
