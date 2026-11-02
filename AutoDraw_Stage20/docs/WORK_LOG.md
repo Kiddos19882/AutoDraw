@@ -1890,3 +1890,16 @@ Brush Test acceptance и матричные валидаторы больше н
 - Зафиксированы ограничения: V2 length_10 — 9/9 повторов с evaluable fraction 0.381; V4 irregular_polygon closure metric отсутствует; V1/V3 имеют multi-component/intersection ambiguity; V5 spacing≈8.01 logical px сливает близкую пару в 9/9 повторах.
 - Создан подробный отчёт `CHALK_INT006_PIXEL_AUDIT_2026-11-02.md`, обновляются PROJECT_STATUS/TASKS. Quality gate остаётся OPEN; независимая модельная validation и safety margin не выполнены.
 - Первичные PNG/manifests/Monitor reports не изменялись. Production executor, estimator и defaults не менялись.
+
+
+## 2026-11-02 — INT-006 manual overlay review и коррекция тестовой геометрии
+
+- Скачан и просмотрен CI artifact `autodraw-int006-png-analysis` run `41392156994`; проверены representative overlays V2/P1, V4/P0/P1, V1/P1, V3/P1 и V5/P1.
+- V2 `length_10`: виден округлый отпечаток; при длине 10 logical px и radius=10 центральная линия не отделима от footprint. `path_metrics_sufficient=false` трактуется как недостаточность измерения, а не как подтверждённый разрыв.
+- V4 `irregular_polygon`: курсор перекрывает общую начальную/конечную точку. Closure seam по текущему capture не оценивается; требуется post-draw capture с курсором вне board ROI либо иной подтверждённый способ убрать occlusion.
+- V1: `slope_050` касается/пересекается с `negative_shallow`; `negative_shallow` также пересекается с `negative_steep`. V3: `right_angle` пересекается с `acute_zigzag`.
+- Исправлена только экспериментальная геометрия в `source/preparation/brush_behavior_test_ui.py`: V1 negative_shallow перенесена в нижнюю область, negative_steep сдвинута вправо; V3 acute_zigzag ограничена отдельным левым ROI. Первичные captures соответствуют старой геометрии и сохранены без изменений.
+- Добавлен regression test, вычисляющий минимальное расстояние между разными polyline и требующий >20 logical px для V1/V3 при radius=10. Расчёт по новым DrawingPlan: минимум V1≈25.58 px, V3≈31.62 px.
+- Коммиты: `5047cb7973a266ca69b6fd9c21ea81af0bd89db3` (test DrawingPlan fix), `a4a909d08b9947cfff139b20d55300f1e97dcc25` (isolation regression test). CI для нового code HEAD ещё не подтверждён.
+- Production executor, estimator, sampling defaults и первичные experiment data не менялись. Live reruns не запускались.
+- Следующие действия: подтвердить CI; повторить V1/V3 blocks; улучшить V4 post-draw cursor handling; спроектировать V2 extended short-stroke и V5 spacing sweep; затем независимая validation модели.
