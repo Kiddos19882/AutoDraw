@@ -1,23 +1,20 @@
 # Roadmap AutoDraw
 
-## Актуальный статус INT-006 — 2026-11-02
+## Актуальный статус INT-006 — 2026-11-03
 
-- [x] Harness V1–V5 и regression tests реализованы; исходный CI #1886 пройден.
-- [x] Выполнены и приняты 45/45 исходных live captures V1–V5; CI #1887 на data commit `6479536` завершился success.
-- [x] Выполнен pixel-level audit 45/45 PNG: 252 per-stroke rows, 279 parallel-pair rows; representative overlays просмотрены.
-- [x] Исправлены пересечения в DrawingPlan V1/V3, добавлен isolation gate; для V4 реализован cursor-free automated post-draw capture.
-- [x] Corrective code HEAD `3e8e6c5` прошёл полный CI run [41470680544](https://github.com/Kiddos19882/AutoDraw/actions/runs/41470680544): integration, executor, Game Monitor/bridge, Preparation/G3, Windows portable build и PNG audit — success.
-- [x] Cursor-placement fix и regression tests прошли полный CI run [41486593544](https://github.com/Kiddos19882/AutoDraw/actions/runs/41486593544), включая Windows portable build/startup smoke-test и INT-006 PNG audit.
-- [x] Получена первичная holdout-проверка G1-модели на 66 новых штрихах P0 (MAE 1.09, RMSE 1.33, MAPE 1.71%).
-- [x] Выполнить live follow-up V1/V3/V4 и V2/V5: 45/45 captures в commit `e879a77`; все блоки 9/9 completed, exact CHALK и per-run Monitor integrity приняты.
-- [x] Выполнить pixel-level аудит новых 45 follow-up PNG в CI `41496555297`: 90/90 captures valid; 297/297 новых strokes coverage=1.0, zero gaps; V4 closure seams 27/27 covered; V5 spacing 8/12 merge, 16/20/24 separated при radius=10.
-- [ ] Реализовать D1–D5 в отдельной INT006 matrix/block/UI/executor phase, подготовить frozen prediction records и analyzer; затем regression tests и полный CI.
-- [ ] Провести локальный Windows 10 preflight и только после него выполнить 45 live captures независимой validation.
-- [ ] Рассчитать ошибки модели и только затем определить обоснованный safety margin.
+- [x] Harness D1–D5, 45-cell journal, 15 frozen prediction records, prediction ID handoff и independent analyzer реализованы.
+- [x] Software CI run [41513389663](https://github.com/Kiddos19882/AutoDraw/actions/runs/41513389663) прошёл на code HEAD `ca8c9b3`: 667 passed, 82 subtests; обязательные jobs, Windows portable build/startup smoke-test и PNG audit success.
+- [x] Live block D1–D5 выполнен: 45/45 tasks completed, radius=10.
+- [x] Предварительно проверены 45 experiment manifests и 45 Monitor reports: exact CHALK, per-stroke sums, stroke counts, нулевые Monitor/Bridge integrity errors.
+- [x] Предварительные run-level и per-stroke метрики рассчитаны и записаны в [отдельный отчёт](CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md).
+- [x] Исправлена portability-привязка journal attempt к каталогу эксперимента и добавлен regression test.
+- [x] В `.github/workflows/geometry-tests.yml` добавлен официальный analyzer run и upload JSON report.
+- [ ] Подтвердить CI после последних analyzer/test/workflow commits и получить официальный analyzer JSON: 45 accepted, 0 missing, 0 rejected.
+- [ ] Проверить frozen artifact SHA-256 и все journal/task/experiment/run/profile/geometry bindings штатным analyzer.
+- [ ] После официального результата определить обоснованный safety margin; до этого production estimator/defaults не менять.
+- [ ] INT-007 начинать только после закрытия validation и safety-margin gates.
 
-Текущий blocker независимой validation: [аудит готовности harness](CHALK_INT006_HARNESS_READINESS_AUDIT_2026-11-02.md). Протокол D1–D5 имеет статус BLOCKED до подключения к UI и block runner. Подробные данные: [исходная live-матрица](CHALK_INT006_V1_V5_RESULTS_2026-11-02.md), [новые follow-up результаты](CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md), [протокол V1/V3/V4](CHALK_INT006_V1_V3_V4_FOLLOWUP_2026-11-02.md), [протокол V2/V5](CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md). Production defaults и estimator не менялись. Исторические записи ниже сохраняются для хронологии и не переопределяют этот статус.
-
-Документ объединяет завершённые направления документирования и текущую последовательность работ по измерению игрового CHALK. В текущем продолжении пользователь разрешил все действия; live captures требуют доступной игровой сессии и готовой тестовой доски.
+**Предварительные результаты:** 45 plan runs — MAE 1.408 CHALK, RMSE 1.967, bias -0.875, MAPE 2.134%, max underprediction 1.82 CHALK. Это не официальный analyzer result и не основание для production eligibility. Все live captures были при radius=10; влияние радиуса не проверялось.
 
 ## Статус аналитических планов
 
