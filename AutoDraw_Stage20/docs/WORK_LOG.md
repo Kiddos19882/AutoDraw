@@ -1785,3 +1785,13 @@ Brush Test acceptance и матричные валидаторы больше н
 - G3 sampling coefficients сохранены отдельно от G1/G2 baseline. Radius matrix не показала систематического влияния радиуса на pointCount в проверенной геометрии.
 - Создан `docs/CHALK_PRELIMINARY_SEGMENTED_MODEL_2026-11-02.md`; обновлены README, G3 report, PROJECT_STATUS, TASKS и ROADMAP.
 - Код не менялся, live-тесты не запускались. Следующий шаг — pixel-level audit PNG и независимая validation модели.
+
+
+## 2026-11-02 — непосредственный визуальный аудит G3 step=4
+
+- Получены оригинальные шесть `after_draw-board.png` напрямую из GitHub (step=4/delay=5 — 3 повтора; step=4/delay=10 — 3 повтора).
+- Все шесть captures визуально показывают непрерывные ровные горизонтальные линии; видимых разрывов, пропущенных сегментов и прерывистых точек не обнаружено.
+- Между delay=5 и delay=10 видимой разницы нет; средний CHALK 365.67 и 365.00 соответственно, длительность около 18 секунд, 768 move calls.
+- Отмечено ограничение: курсор закрывает часть правого конца шестой линии; точная оценка этого cap невозможна по текущему capture.
+- Визуальный gate закрыт для длинных горизонтальных линий G3, но не для других геометрий. Создан отчёт `CHALK_G3_VISUAL_QUALITY_AUDIT_2026-11-02.md`; обновлены G3 report, preliminary model, README, PROJECT_STATUS, TASKS и ROADMAP.
+- Код не менялся, live-тесты не запускались, production defaults не менялись.
