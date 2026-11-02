@@ -88,6 +88,40 @@ jobs:
           $env:PYTHONPATH = "$env:GITHUB_WORKSPACE\AutoDraw_Stage20;$env:GITHUB_WORKSPACE\AutoDraw_Stage20\source\preparation;$env:GITHUB_WORKSPACE\AutoDraw_Stage20\source\executor"
           python -m pytest -q -ra tests
 
+  chalk-png-analysis:
+    name: INT-006 pixel-level PNG geometry audit
+    needs:
+      - preparation-tests
+    runs-on: windows-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: AutoDraw_Stage20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: AutoDraw_Stage20/source/preparation/requirements.txt
+      - name: Install image-analysis dependencies
+        run: python -m pip install -r source/preparation/requirements.txt
+      - name: Analyse all INT-006 V1-V5 board captures
+        shell: pwsh
+        run: |
+          python tests\\analyze_chalk_int006_png.py data\\results\\brush_behavior_tests --output-dir "$env:RUNNER_TEMP\\int006-png-analysis" --expected-runs 45
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Upload pixel-level metrics and diagnostic images
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autodraw-int006-png-analysis
+          path: ${{ runner.temp }}/int006-png-analysis/
+          if-no-files-found: warn
+          retention-days: 14
+
   integration-tests:
     name: Application integration tests
     runs-on: windows-latest
