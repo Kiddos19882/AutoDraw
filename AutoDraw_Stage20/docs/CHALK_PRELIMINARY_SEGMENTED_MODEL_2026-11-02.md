@@ -128,11 +128,11 @@ C_est = Σ (1.765 + 0.2988 × L_i)
 ## 9. Следующие обязательные проверки
 
 1. [x] Просмотреть шесть G3 PNG step=4/delay=5 и step=4/delay=10; визуальный gate длинных горизонтальных линий закрыт.
-2. [ ] Проверить step=4 на диагоналях, коротких штрихах, непрерывных поворотах, замкнутых контурах и пересечениях; контроль — step=2/delay=10.
-3. [ ] Сохранить для каждого опыта exact pre/post `pointCount`, per-run Monitor integrity, executor report и before/after PNG; минимум три повтора на профиль.
-4. [ ] Подготовить независимую validation-выборку рисунков, не использованную для построения коэффициентов.
-5. [ ] Сравнить прогноз с exact CHALK delta; рассчитать MAE, RMSE, bias и relative error отдельно по типам геометрии и целому рисунку.
-6. [ ] Определить safety margin по фактической ошибке validation и только затем рассматривать интеграцию модели в preflight.
+2. [x] Выполнить live-матрицу V1–V5: 45 captures, три профиля и три повтора на фазу; exact CHALK и per-run Monitor integrity приняты.
+3. [x] Извлечь per-stroke pointDelta из Monitor reports и проверить сумму по stroke_id против exact CHALK.
+4. [ ] Рассчитать pixel-level continuity/max gap/centerline deviation/width для PNG и устранить геометрические пересечения V1/V3.
+5. [ ] Завершить независимую validation step=4 и short-stroke lookup на новых DrawingPlan; текущий fit step=4 не является holdout validation.
+6. [ ] Определить safety margin по верхней границе ошибки validation и только затем рассматривать интеграцию модели в preflight.
 
 **Решение:** модель остаётся исследовательской калибровкой отдельных сегментов, не production estimator. Step=4 визуально приемлем для длинных горизонтальных линий G3, но не утверждён для произвольной геометрии. До независимой validation не переключать production defaults и не использовать прогноз как единственное основание допуска к квоте.
 
