@@ -1316,6 +1316,30 @@ def test_int006_drawing_plans_have_expected_strokes_and_logical_bounds(case_name
     )
 
 
+
+def test_int006_v2_followup_uses_exact_isolated_lengths():
+    strokes = TEST_CASES["V2 — короткие штрихи 12–30 px (follow-up)"]["strokes"]
+    lengths = [math.dist(stroke["points"][0], stroke["points"][1]) for stroke in strokes]
+    assert lengths == [12.0, 16.0, 20.0, 24.0, 30.0]
+    assert len({stroke["name"] for stroke in strokes}) == 5
+
+
+def test_int006_v5_spacing_sweep_contains_all_five_exact_distances():
+    strokes = TEST_CASES["V5 — пересечения и sweep параллельных линий"]["strokes"]
+    assert len(strokes) == 16
+    expected = {8, 12, 16, 20, 24}
+    measured = set()
+    for spacing in sorted(expected):
+        first = next(item for item in strokes if item["name"] == f"parallel_s{spacing:02d}_a")
+        second = next(item for item in strokes if item["name"] == f"parallel_s{spacing:02d}_b")
+        assert first["points"][0][0] == second["points"][0][0]
+        assert first["points"][1][0] == second["points"][1][0]
+        assert first["points"][0][1] == first["points"][1][1]
+        assert second["points"][0][1] == second["points"][1][1]
+        measured.add(abs(first["points"][0][1] - second["points"][0][1]))
+    assert measured == expected
+
+
 def _point_segment_distance(point, start, end):
     dx, dy = end[0] - start[0], end[1] - start[1]
     length_sq = dx * dx + dy * dy
