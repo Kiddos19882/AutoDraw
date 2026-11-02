@@ -762,3 +762,15 @@ Per-run transport gates чистые: `dropped_events=0`, `monitor_error_count_d
 - Новый отчёт: `docs/CHALK_G3_VISUAL_QUALITY_AUDIT_2026-11-02.md`.
 - Следующий шаг: проверить step=4 на диагоналях, поворотах, коротких штрихах и пересечениях; затем независимая validation модели.
 - Production defaults не менялись; код не менялся; live-тесты не запускались.
+
+
+## INT-006 — первичный скрининг PNG V1–V5 (2026-11-02)
+
+- Просмотрены 15 оригинальных `after_draw-board.png`: по одному representative capture на каждый профиль P0/P1/P2 в каждой фазе V1–V5.
+- В просмотренных PNG не обнаружено очевидных разрывов/пропусков штриха при step=4 относительно P0 для диагоналей, ломаных, контуров и узлов.
+- Подтверждены ограничения тестовых данных: пересечения в V1/V3; короткие штрихи V2 выглядят точками при radius=10; курсор частично закрывает один контур V4; spacing=8 logical px в V5 сливается в общую полосу.
+- Это предварительный визуальный скрининг, не pixel-level segmentation. Численные max gap, centerline deviation, width/width variation и closure metrics не рассчитаны.
+- Следующий активный подэтап: количественный аудит всех 45 PNG с проверкой segmentation masks относительно blank-board reference и исключением курсора/UI.
+- Подробности: [CHALK_INT006_PNG_SCREENING_2026-11-02.md](CHALK_INT006_PNG_SCREENING_2026-11-02.md).
+
+**Статус INT-006:** IN_PROGRESS. Production code, executor defaults и estimator не менялись.
