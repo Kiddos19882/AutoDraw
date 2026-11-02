@@ -7,6 +7,7 @@
 - [x] Выполнен pixel-level audit 45/45 PNG: 252 per-stroke rows, 279 parallel-pair rows; representative overlays просмотрены.
 - [x] Исправлены пересечения в DrawingPlan V1/V3, добавлен isolation gate; для V4 реализован cursor-free automated post-draw capture.
 - [x] Corrective code HEAD `3e8e6c5` прошёл полный CI run [41470680544](https://github.com/Kiddos19882/AutoDraw/actions/runs/41470680544): integration, executor, Game Monitor/bridge, Preparation/G3, Windows portable build и PNG audit — success.
+- [x] Cursor-placement fix и regression tests прошли полный CI run [41486593544](https://github.com/Kiddos19882/AutoDraw/actions/runs/41486593544), включая Windows portable build/startup smoke-test и INT-006 PNG audit.
 - [x] Получена первичная holdout-проверка G1-модели на 66 новых штрихах P0 (MAE 1.09, RMSE 1.33, MAPE 1.71%).
 - [x] Выполнить live follow-up V1/V3/V4 и V2/V5: 45/45 captures в commit `e879a77`; все блоки 9/9 completed, exact CHALK и per-run Monitor integrity приняты.
 - [ ] Выполнить pixel-level аудит новых 45 follow-up PNG; ROI heuristic неоднозначна для V3/V4/V5 и не заменяет image-mask analysis.
