@@ -33,8 +33,9 @@ def safe_name(value: str) -> str:
 
 def geometry(stroke: dict[str, Any], sx: float, sy: float) -> dict[str, Any]:
     points = np.asarray([[float(p["x"]) * sx, float(p["y"]) * sy] for p in stroke["points"]], dtype=np.float64)
-    closed = bool(stroke.get("closed", False))
-    if closed and np.linalg.norm(points[-1] - points[0]) > 1e-6:
+    endpoints_match = np.linalg.norm(points[-1] - points[0]) <= 1e-6
+    closed = bool(stroke.get("closed", False) or endpoints_match)
+    if closed and not endpoints_match:
         points = np.vstack((points, points[0]))
     lengths = np.linalg.norm(np.diff(points, axis=0), axis=1)
     cumulative = np.r_[0.0, np.cumsum(lengths)]
@@ -101,7 +102,7 @@ def cursor_mask(before: np.ndarray, after: np.ndarray, endpoint: np.ndarray) -> 
     if candidates:
         _, label = min(candidates)
         result[labels == label] = 255
-        result = cv2.dilate(result, np.ones((5, 5), np.uint8), iterations=1)
+        result = cv2.dilate(result, np.ones((13, 13), np.uint8), iterations=1)
     return result
 
 def capture_errors(manifest: dict[str, Any], monitor: dict[str, Any], expected: int) -> list[str]:
@@ -329,8 +330,10 @@ def run(results_dir: Path, out: Path, expected_runs: int = 45) -> dict[str, Any]
             "reference": "before_clear-board.png", "observed": "after_draw-board.png",
             "mask": "darkening-only differential, luminance delta >= 22 and observed luminance <= 205",
             "geometry_source": "experiment.json chalk_experiment_matrix.planned_strokes",
+            "stroke_corridor": "max(7 screen px, requested brush radius x mean image scale x 0.65 + 1 screen px)",
+            "parallel_merge_threshold": "assigned-mask minimum distance <= max(5 screen px, mean image scale x 3)",
             "coordinates": "logical DrawingPlan mapped using board image dimensions / Monitor logicalWidth and logicalHeight",
-            "cursor": "bright cursor component near final planned endpoint excluded with a 5x5 dilation",
+            "cursor": "bright cursor component near final planned endpoint excluded with a 13x13 dilation",
             "ambiguous": "pixels equidistant between stroke corridors excluded from per-stroke metrics",
             "warning": "Review diagnostic overlays; dark cursor outlines may remain if cursor body detection misses them.",
         },
