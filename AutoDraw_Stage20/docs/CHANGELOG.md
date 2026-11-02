@@ -363,3 +363,5 @@
 - Post-draw screenshot теперь выполняется после mouseUp и перемещения курсора за пределы calibrated board ROI; выбранная точка и метод фиксируются в experiment manifest.
 - Добавлены regression tests выбора безопасной точки и порядка mouseUp → move → screenshot. CI и live validation нового поведения ожидаются.
 - Production executor, estimator, sampling defaults и первичные captures не менялись.
+
+- Дополнительно проверено, что cursor relocation применяется только в automated post-draw capture; ручная процедура захвата сохранена без перемещения курсора и защищена regression test.
