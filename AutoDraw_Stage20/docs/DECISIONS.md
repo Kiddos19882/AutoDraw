@@ -99,3 +99,14 @@
 **Статус:** принято как ограничение текущей validation, 2026-11-03  
 **Решение:** официальный analyzer INT-006 подтвердил 45/45 captures и метрики frozen model на D1–D5 при radius=10. P1 (step=4, delay=5 ms) — лучший агрегированный исследовательский профиль; максимальная наблюдённая недооценка P1 равна 0.92 CHALK. Округлённый вверх эмпирический guard 1 CHALK можно рассматривать только для этой выборки, но он не принимается как универсальный safety margin и не внедряется в production.  
 **Последствия:** `safety_margin_status=not_established`, `production_eligibility=not_validated`; INT-006 остаётся IN_PROGRESS, INT-007 — BLOCKED. Требуется расширенная проверка на полных рисунках и неподдержанных типах геометрии. Production estimator, executor defaults и sampling defaults остаются без изменений. Подробности: [официальный отчёт](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md).
+
+
+## 2026-11-03 — INT006R как отдельная экспериментальная фаза
+
+**Решение:** проверять влияние радиуса на геометрию через отдельную фазу `INT006R`, не расширяя и не переписывая frozen INT-006 model/journal.
+
+**Причины:** INT-006 закрепляет radius=10 в matrix metadata, block journal, executor handoff и frozen analyzer. Ослабление этих проверок создало бы риск смешивания исторических prediction records и новых радиусных captures.
+
+**Контракт INT006R:** D1–D5 × radius 1/10/30 × 3 повтора = 45 captures; sampling строго P1 (step=4, delay=5 ms); отдельные scenario IDs, task IDs и durable journal; prediction ID отсутствует; exact CHALK и per-stroke Game Monitor telemetry обязательны.
+
+**Границы:** live execution только после полного CI и Windows portable smoke-test. Production estimator, frozen INT-006 artifact, executor defaults, sampling defaults и `master` не изменять по результатам этой фазы автоматически. Safety margin и production eligibility остаются не установленными.
