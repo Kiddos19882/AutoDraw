@@ -292,3 +292,11 @@
 - Подтверждено, что положительный cumulative local Monitor buffer overflow не равен потере событий конкретного run: Bridge/collector captures сохранены и приняты.
 - Для шести длинных горизонтальных линий step=4 / delay=5–10 ms расходует около 365 CHALK; step=1 / delay=5–10 ms — около 1350; delay=20 ms увеличивает расход примерно на 53–95% в зависимости от шага.
 - Полные таблицы и границы применимости: [CHALK_G3_RESULTS_2026-11-02.md](CHALK_G3_RESULTS_2026-11-02.md).
+
+
+## 2026-11-02 — предварительная модель расхода CHALK
+
+- Добавлен `CHALK_PRELIMINARY_SEGMENTED_MODEL_2026-11-02.md` с отдельными сегментами для прямых штрихов, коротких штрихов, sampling profile и повторного покрытия.
+- Для прямых штрихов G1 при radius=10, step=2, delay=10 зафиксирована предварительная оценка `C ≈ 1.765 + 0.2988 × L` (36 обучающих per-stroke наблюдений).
+- Зафиксировано, что ROI visibility heuristic G3 не доказывает непрерывность линий; pixel-level quality gate остаётся открытым.
+- Production estimator и executor defaults не изменялись.
