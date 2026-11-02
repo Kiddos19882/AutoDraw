@@ -754,3 +754,40 @@ def test_int006_block_contains_three_profiles_and_three_repeats(phase, scenario,
     journal_path = tmp_path / f"{phase}.json"
     create_chalk_test_block_journal(journal_path, plan)
     assert load_chalk_test_block_journal(journal_path)["phase_id"] == phase
+
+
+@pytest.mark.parametrize(
+    ("phase", "legacy_scenario", "legacy_strokes"),
+    [
+        ("V2", "int006_short_strokes", 6),
+        ("V5", "int006_intersections_spacing", 10),
+    ],
+)
+def test_legacy_int006_journal_scenario_ids_remain_loadable(
+    phase, legacy_scenario, legacy_strokes, tmp_path
+):
+    plan = build_chalk_test_block_plan(
+        series_id=f"legacy-{phase.lower()}",
+        phase_id=phase,
+        seed=20261101,
+    )
+    for task in plan["tasks"]:
+        parameters = task["executor_parameters"]
+        task["scenario_id"] = legacy_scenario
+        task["expected_strokes"] = legacy_strokes
+        task["task_id"] = (
+            f"{legacy_scenario}-s{parameters['point_step_px']}-"
+            f"d{parameters['point_delay_ms']}-r{task['repeat_index']}"
+        )
+        task["status"] = "completed"
+    plan["status"] = "completed"
+
+    journal_path = tmp_path / f"legacy-{phase}.json"
+    journal_path.write_text(json.dumps(plan), encoding="utf-8")
+
+    loaded = load_chalk_test_block_journal(journal_path)
+
+    assert loaded["status"] == "completed"
+    assert len(loaded["tasks"]) == 9
+    assert {task["scenario_id"] for task in loaded["tasks"]} == {legacy_scenario}
+    assert {task["expected_strokes"] for task in loaded["tasks"]} == {legacy_strokes}
