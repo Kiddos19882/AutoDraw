@@ -23,7 +23,7 @@
 - G1: 12/12; G2: 18/18; G3: 27/27. Исходные и follow-up серии V1–V5: 90/90 captures; pixel audit подтвердил 297/297 новых strokes с coverage=1.0 и zero gaps.
 - Game Monitor exact CHALK определяется как `post.pointCount - pre.pointCount`. Визуальная оценка paint meter не заменяет точный счётчик.
 - **INT-006 D1–D5 live block завершён:** серия `chalk-20261102-232320-7cea27`, block `1f93ddcac07445b78093744c7cbabcde`, 45/45 задач completed, одна completed attempt на задачу, radius=10. Ветка содержит 45 соответствующих experiment manifests и 45 Monitor reports.
-- **Предварительный аудит всех 45 captures выполнен:** exact CHALK, соответствие stroke count, per-stroke `pointDelta` в сумме совпадает с общей delta; dropped events, Monitor errors, Bridge send failures и sequence gaps в проверенных reports равны нулю. Детали и ограничения: [предварительные результаты INT-006](CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md).
+- **Предварительный аудит всех 45 captures выполнен:** exact CHALK, соответствие stroke count, per-stroke `pointDelta` в сумме совпадает с общей delta; dropped events, Monitor error deltas, Bridge send-failure deltas и sequence gaps в проверенных reports равны нулю. Детали и ограничения: [предварительные результаты INT-006](CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md).
 - Предварительные метрики 45 plan runs: MAE 1.408 CHALK, RMSE 1.967, bias -0.875, MAPE 2.134%, maximum underprediction 1.82 CHALK (D5/P2). По 243 stroke rows: MAE 0.439, RMSE 0.544, maximum underprediction 1.085 CHALK. Эти метрики пересчитаны из сохранённых JSON; официальный запуск `chalk_int006_validation.py`, проверка frozen artifact SHA-256 и полного journal/task binding ещё ожидаются.
 - P1 (step=4, delay=5 ms) показал наименьшие предварительные MAE/RMSE и max underprediction среди профилей. Это кандидат для следующей проверки, не утверждённый production default. Step=4 снизил фактический расход на 21–47% относительно P0 в конкретных D1–D5; D4 short strokes дают меньшую экономию.
 - В analyzer исправлено сравнение абсолютного Windows experiment path: relocated capture bundles теперь связываются с journal по имени experiment directory. Добавлен regression test на исходный Windows path при переносе данных.
@@ -775,7 +775,7 @@ Per-run transport gates чистые: `dropped_events=0`, `monitor_error_count_d
 
 - Просмотрены 15 оригинальных `after_draw-board.png`: по одному representative capture на каждый профиль P0/P1/P2 в каждой фазе V1–V5.
 - В просмотренных PNG не обнаружено очевидных разрывов/пропусков штриха при step=4 относительно P0 для диагоналей, ломаных, контуров и узлов.
-- Подтверждены ограничения тестовых данных: пересечения в V1/V3; короткие штрихи V2 выглядят точками при radius=10; курсор частично закрывает один контур V4; spacing=8 logical px в V5 сливается в общую полосу.
+- Подтверждены ограничения тестовых данных: пересечения в V1/V3; короткие штрихи V2 выглядят точками при requested radius=10; курсор частично закрывает один контур V4; spacing=8 logical px в V5 сливается в общую полосу.
 - Это предварительный визуальный скрининг, не pixel-level segmentation. Численные max gap, centerline deviation, width/width variation и closure metrics не рассчитаны.
 - Следующий активный подэтап: количественный аудит всех 45 PNG с проверкой segmentation masks относительно blank-board reference и исключением курсора/UI.
 - Подробности: [CHALK_INT006_PNG_SCREENING_2026-11-02.md](CHALK_INT006_PNG_SCREENING_2026-11-02.md).
@@ -822,11 +822,11 @@ Per-run transport gates чистые: `dropped_events=0`, `monitor_error_count_d
 ## 2026-11-02 — live follow-up V1–V5 завершён
 
 - Пользователь добавил 45 follow-up captures в commit [e879a77](https://github.com/Kiddos19882/AutoDraw/commit/e879a77f63be7a7a68de3f09091eab7dba0d34a2): 5 фаз × 9 задач; все block journals completed.
-- Все 45 captures приняты для exact CHALK: pre/post pointCount валидны, sampled per-stroke delta совпадает с exact delta; radius=10; per-run Monitor/Bridge drops, errors и sequence gaps равны нулю.
+- Все 45 captures приняты для exact CHALK: pre/post pointCount валидны, sampled per-stroke delta совпадает с exact delta; requested radius=10; per-run Monitor/Bridge drops, errors и sequence gaps равны нулю.
 - Step=4 снизил расход на 38.5–49.4% относительно step=2 по пяти геометриям. При step=4 отличие delay=5/10 ms не превышает примерно 1.4% по среднему расходу. Подробные repeat values: [CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md](CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md).
 - Новые captures записывают post-draw cursor ниже доски и paint meter, с исключением обеих ROI и отступом 32 px. Paint-meter estimate inconclusive и не используется как источник расхода.
 - **INT-006 остаётся IN_PROGRESS:** pixel-level аудит новых 45 PNG завершён в run `41496555297`: 297/297 strokes coverage=1.0, zero gaps; V4 seams 27/27 covered; V5 spacing threshold documented. Следующий gate — независимая validation на полных DrawingPlan и safety margin.
-- Все серии выполнены при radius=10; влияние радиуса в этом follow-up не измерялось. Production executor defaults и estimator не менялись.
+- Все серии выполнены при requested radius=10; влияние радиуса в этом follow-up не измерялось. Production executor defaults и estimator не менялись.
 
 
 ## CI: series-aware INT-006 PNG audit — 2026-11-02
