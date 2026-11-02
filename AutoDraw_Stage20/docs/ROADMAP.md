@@ -155,3 +155,10 @@ G3 block `chalk-20261102-031830-a0f325` завершён: 27/27 captures при�
 - [ ] Отдельно закрыть INT-003: сопоставимое A/B/C измерение overhead Game Monitor.
 
 **Порядок:** геометрическая validation → независимая validation estimator → safety margin → INT-007 → INT-008/009. Production defaults не менять до закрытия соответствующих gates.
+
+
+## INT-006 — текущая фиксация (2026-11-02)
+
+INT-006 остаётся IN_PROGRESS. Создан [исполнительный протокол](CHALK_INT006_EXECUTION_PROTOCOL_2026-11-02.md): пять геометрических сценариев V1–V5, три sampling-профиля и три повтора (45 captures), отдельная независимая validation модели CHALK и критерии safety margin.
+
+Аудит HEAD `7ea3868248648aed74979f4fab00c5c2e8f878c6` показал, что текущая лаборатория поддерживает G1/G2/G3, но не V1–V5. Следующая задача — расширить экспериментальный контракт согласованно в matrix metadata/validator, block planner/journal, Brush Test UI, capture acceptance, analyzer и regression tests. Production executor defaults и estimator не менять. Live-серию не запускать до готовности harness и игровой сессии.
