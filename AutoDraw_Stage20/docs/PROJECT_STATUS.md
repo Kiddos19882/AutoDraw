@@ -9,58 +9,58 @@
 
 # Текущее состояние проекта
 
-**Актуально на:** 2 ноября 2026 г.  
+**Актуально на:** 3 ноября 2026 г.  
 **Репозиторий:** `Kiddos19882/AutoDraw`  
-**Последний подтверждённый полный CI code HEAD:** `956ce2be489b5d3d754af2d996f1a2bea0fd7532`; run [41496555297](https://github.com/Kiddos19882/AutoDraw/actions/runs/41496555297) успешно проверил состояние рабочей ветки после commits `f0e05df` и `4847cce`. Ветка была checkout в 18:01:55 UTC; commit `956ce2b` создан в 18:01:05 UTC и содержит оба исправления в своей истории. Все обязательные jobs успешны: Application integration, Executor regression, Game Monitor/bridge, Preparation/G3, Windows portable build/startup smoke-test и INT-006 PNG audit. Preparation/G3: 662 passed, 82 subtests passed. Optional algorithm benchmarks skipped. Предыдущий run [41470680544](https://github.com/Kiddos19882/AutoDraw/actions/runs/41470680544) на HEAD `3e8e6c5` также был успешен, но предшествовал двум legacy-journal commits. Предыдущий run [41468581157](https://github.com/Kiddos19882/AutoDraw/actions/runs/41468581157) на HEAD `7216eedd238754132d0e61f011b785395b06bc5d` завершился failure по двум legacy counts и устаревшему V5 fixture; эти причины исправлены и прошли полный CI. Исходные live captures остаются в data commit `64795362aa1bf4d0a3587e119b8c959242be6181`.
-> Этот верхний блок — единственный источник текущего статуса. Ниже сохранена историческая хронология работ. Более ранние статусы, планы и чек-листы в исторических записях не являются текущим backlog и не должны переопределять сведения этого блока и [TASKS.md](TASKS.md).
+**Рабочая ветка:** `feature/image-geometry-optimization`  
+**Текущий HEAD:** [`e42e38d`](https://github.com/Kiddos19882/AutoDraw/commit/e42e38d7fa9850122bef16e4331a4378ea43c66c) — предварительные количественные результаты INT-006.  
+**Последний подтверждённый полный CI до последних analyzer/workflow изменений:** run [41513389663](https://github.com/Kiddos19882/AutoDraw/actions/runs/41513389663), code HEAD `ca8c9b3bd739ea0a5b557b87fc0106ecfde81216`; последующие commits `f2c182e`, `cf8fb51`, `3f9a408` и `e42e38d` требуют проверки нового CI.  
+> Этот блок — единственный источник текущего статуса. Ниже сохранена историческая хронология; старые статусы и планы не являются текущим backlog.
 
 ## Текущее состояние
 
-- Документационная серия DOC-001—DOC-015 завершена. Ведение проекта продолжается в `docs/`.
-- Аналитический план этапов 7–10 отменён пользователем; его файл сохранён только как архив.
-- Радиусная матрица: 21/21 принятых опытов. В проверенном сценарии длинных линий систематического влияния радиуса 1–30 на exact CHALK не обнаружено.
-- G1: 12/12 принятых опытов. G2: 18/18. G3: 27/27 в блоке `chalk-20261102-031830-a0f325`. Старые stopped/partial блоки остаются историческими и не смешиваются с принятыми данными.
-- Game Monitor exact CHALK рассчитывается как `post.pointCount - pre.pointCount`. Per-run capture/transport acceptance G3 пройдены; cumulative local Monitor buffer overflow не трактуется как потеря конкретного run.
-- Предварительная сегментированная модель и результаты первой holdout-проверки изложены в [CHALK_PRELIMINARY_SEGMENTED_MODEL_2026-11-02.md](CHALK_PRELIMINARY_SEGMENTED_MODEL_2026-11-02.md). G1-модель проверена на 66 новых штрихах P0 (MAE 1.09, RMSE 1.33, MAPE 1.71%), но независимая validation step=4 и полных DrawingPlan ещё не завершена; модель остаётся исследовательской, не production estimator.
-- Визуальный аудит всех шести G3 PNG step=4/delay=5 и step=4/delay=10 пройден для длинных горизонтальных линий. Все шесть линий визуально непрерывны. Конец шестой линии частично закрыт курсором. Количественные pixel-level метрики gap/centerline/width не рассчитаны.
-- step=4 экспериментально измерен на G3 и follow-up V1–V5. Новые 45 captures в commit e879a77: exact CHALK экономия 38.5–49.4% против step=2 по геометриям. Series-aware pixel audit 90 исходных + follow-up captures завершён: 90 valid, 0 duplicate/missing/unexpected, 297/297 новых strokes coverage=1.0 и zero gaps; V4 closure seams 27/27 covered. V5 spacing при radius=10: пары 8/12 logical px merge, 16/20/24 separated. V1/V3 исправленные DrawingPlan и V2/V4/V5 follow-up выполнены. Универсальный production default не утверждён; executor defaults не менялись.
-- INT-006: исходные 45 и follow-up 45 live captures V1–V5 приняты; exact CHALK/per-stroke pointDelta согласованы, per-run Monitor/Bridge integrity counters нулевые. Follow-up commit `e879a77`: step=4 экономит 38.5–49.4% относительно step=2 по геометриям; pixel audit 90 captures (549 stroke rows, 900 pair rows) завершён в CI `41496555297`: 297/297 новых strokes coverage=1.0, zero gaps; V4 closure seams 27/27 covered; V5 spacing 8/12 merge, 16/20/24 separated при radius=10. Cursor placement ниже board и paint-meter ROI подтверждён: курсор не обнаружен в board crop 45/45. Независимая validation модели и safety margin остаются открытыми. Статический аудит подтвердил, что D1–D5 ещё не подключены к matrix/block/UI/executor harness; live validation заблокирована до реализации отдельной INT006 phase, frozen prediction records, analyzer, regression tests и полного CI. См. [harness readiness audit](CHALK_INT006_HARNESS_READINESS_AUDIT_2026-11-02.md). Production defaults/estimator не менялись.
-- Production executor, estimator и sampling defaults не изменялись. Изменён только экспериментальный DrawingPlan V1/V3 и его regression tests; первичные captures/manifests/reports/PNG не переписывались. Новые V1/V3 captures ещё не выполнены.
+- Документационная серия DOC-001—DOC-015 завершена. Аналитические этапы 7–10 отменены пользователем и остаются только в архиве.
+- Радиусная матрица: 21/21 принятых опытов. Результат ограничен испытанными длинными линиями; INT-006 выполнялся при фиксированном radius=10 и не измеряет влияние радиуса.
+- G1: 12/12; G2: 18/18; G3: 27/27. Исходные и follow-up серии V1–V5: 90/90 captures; pixel audit подтвердил 297/297 новых strokes с coverage=1.0 и zero gaps.
+- Game Monitor exact CHALK определяется как `post.pointCount - pre.pointCount`. Визуальная оценка paint meter не заменяет точный счётчик.
+- **INT-006 D1–D5 live block завершён:** серия `chalk-20261102-232320-7cea27`, block `1f93ddcac07445b78093744c7cbabcde`, 45/45 задач completed, одна completed attempt на задачу, radius=10. Ветка содержит 45 соответствующих experiment manifests и 45 Monitor reports.
+- **Предварительный аудит всех 45 captures выполнен:** exact CHALK, соответствие stroke count, per-stroke `pointDelta` в сумме совпадает с общей delta; dropped events, Monitor errors, Bridge send failures и sequence gaps в проверенных reports равны нулю. Детали и ограничения: [предварительные результаты INT-006](CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md).
+- Предварительные метрики 45 plan runs: MAE 1.408 CHALK, RMSE 1.967, bias -0.875, MAPE 2.134%, maximum underprediction 1.82 CHALK (D5/P2). По 243 stroke rows: MAE 0.439, RMSE 0.544, maximum underprediction 1.085 CHALK. Эти метрики пересчитаны из сохранённых JSON; официальный запуск `chalk_int006_validation.py`, проверка frozen artifact SHA-256 и полного journal/task binding ещё ожидаются.
+- P1 (step=4, delay=5 ms) показал наименьшие предварительные MAE/RMSE и max underprediction среди профилей. Это кандидат для следующей проверки, не утверждённый production default. Step=4 снизил фактический расход на 21–47% относительно P0 в конкретных D1–D5; D4 short strokes дают меньшую экономию.
+- В analyzer исправлено сравнение абсолютного Windows experiment path: relocated capture bundles теперь связываются с journal по имени experiment directory. Добавлен regression test на исходный Windows path при переносе данных.
+- В `.github/workflows/geometry-tests.yml` добавлен запуск независимого INT-006 analyzer и загрузка JSON report как CI artifact. Новый workflow result для commits `f2c182e`–`e42e38d` ещё не подтверждён в этой записи.
+- Production estimator, executor defaults, sampling defaults и `master` не менялись.
 
 ## Статусы инициатив
 
 | ID | Текущий статус | Фактическое состояние |
 |---|---|---|
-| DOC-001—DOC-015 | DONE | Структурная документация и базовые файлы ведения проекта созданы. Текущая точечная задача — поддерживать синхронность текущего статуса и планов. |
-| INT-001 | DONE | Определён источник exact CHALK и семантика игрового счётчика. |
-| INT-002 | DONE | Определены resource snapshot и baseline/delta протокол. |
-| INT-003 | IN_PROGRESS | Точный счётчик и события подтверждены; требуется завершить сопоставимый A/B/C overhead/FPS анализ Monitor off / версий Monitor. |
-| INT-004 | DONE* | WebSocket telemetry, per-run capture, RunRecorder и автоматическая связь Monitor report с экспериментом используются в принятых G1–G3 данных. *Это закрывает сбор/корреляцию данных, но не A/B/C overhead — он остаётся в INT-003.* |
-| INT-005 | DONE* | Автоматические CHALK blocks, manifest, matrix, recovery и fail-closed gates использованы для принятых G1–G3. *Отдельные будущие улучшения лаборатории не блокируют завершение реализованного контура.* |
-| INT-006 | IN_PROGRESS | Исходные/follow-up V1–V5 и pixel audit завершены. Независимый протокол D1–D5 подготовлен, но статический аудит выявил отсутствие этих сценариев в текущих matrix/block/UI/executor contracts и отсутствие frozen-prediction analyzer. Live validation BLOCKED до реализации и полного CI; затем нужен локальный Windows preflight. Production estimator/defaults не менялись. |
-| INT-007 | TODO | Интеграция валидированной модели в preflight/resource estimator запрещена до закрытия INT-006. |
-| INT-008 | TODO | Оптимизация траекторий/покрытия в пределах CHALK после появления валидированного estimator. |
-| INT-009 | TODO | Проверка прогноза на независимых рисунках, визуальное качество и фактическая экономия. |
+| DOC-001—DOC-015 | DONE | Основная документация и файлы ведения проекта созданы. |
+| INT-001 | DONE | Источник exact CHALK и семантика игрового счётчика определены. |
+| INT-002 | DONE | Resource snapshot и baseline/delta протокол определены. |
+| INT-003 | IN_PROGRESS | Требуется сопоставимое A/B/C измерение overhead/FPS Monitor off / Monitor versions. |
+| INT-004 | DONE* | WebSocket telemetry, per-run capture и привязка Monitor report к experiment используются; A/B/C overhead остаётся в INT-003. |
+| INT-005 | DONE* | Автоматические CHALK blocks, matrix, journal, recovery и fail-closed gates используются в принятых сериях. |
+| INT-006 | IN_PROGRESS | Live D1–D5 captures и предварительный аудит 45/45 завершены. Ожидаются официальный analyzer report, SHA-256 и полный journal binding audit; затем отдельное решение по safety margin. |
+| INT-007 | BLOCKED | Интеграция валидированной модели в preflight/resource estimator запрещена до закрытия INT-006 и определения safety margin. |
+| INT-008 | TODO | Оптимизация траекторий, кистей, порядка и покрытия в пределах CHALK после INT-007. |
+| INT-009 | TODO | Независимая проверка прогноза на полных рисунках, визуального качества и фактической экономии. |
 
 ## Ближайший рабочий приоритет
 
-1. Исходные и follow-up V1–V5 captures и pixel-level audit завершены; CI `41496555297` подтвердил обязательные jobs и Windows portable build.
-2. Статически проверить и расширить действующие matrix/block/UI/executor contracts отдельной INT006 phase для D1–D5; не создавать второй исполнитель или Game Monitor bridge.
-3. Реализовать 45-cell block journal, пять DrawingPlan, task-specific executor override, immutable prediction records и analyzer frozen-model validation.
-4. Добавить regression/orchestration tests и подтвердить полный CI, включая Windows portable build/startup smoke-test.
-5. После CI пользователь выполняет локальный Windows 10 preflight; live validation начинается только после проверки игры, heartbeat и чистой тестовой доски.
-6. После 45 принятых captures рассчитать метрики и только затем обосновать safety margin. До этого production defaults и код estimator не менять.
+1. Проверить CI после analyzer path fix, regression test и изменения `geometry-tests.yml`.
+2. Получить официальный JSON report штатного analyzer: 45 accepted, 0 missing, 0 rejected, 15 complete profile/scenario groups.
+3. Сверить официальный report с предварительными метриками в [результатах INT-006](CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md).
+4. Только после официальной проверки решить вопрос о консервативном safety margin. Максимальная недооценка 1.82 CHALK пока является только эмпирическим максимумом данной выборки.
+5. Не начинать INT-007 и не менять production estimator/defaults до закрытия этих gates.
 
 ## Разрешения и границы
 
-- Документацию можно обновлять без дополнительного запроса; результаты фиксировать сразу.
+- Документацию и журнал результатов можно обновлять без дополнительного запроса.
 - Изменения репозитория выполнять только в `feature/image-geometry-optimization`; `master` не изменять.
-- Не смешивать экспериментальные block IDs и не переписывать первичные manifests/reports.
-- Пользователь разрешил продолжать все действия в проекте. Live captures всё равно требуют фактически доступной игровой сессии и готовой тестовой доски; без них нельзя заявлять о выполнении live-прогонов.
-- Точный расход — только delta игрового `pointCount`; визуальная оценка paint meter не является источником exact CHALK.
-- Выводы G1/G2/G3 и radius matrix имеют границы применимости, указанные в соответствующих отчётах.
-
----
+- Не переписывать первичные manifests, Monitor reports и PNG; не смешивать разные block IDs.
+- Live captures требуют доступной игровой сессии; не заявлять о новых live-прогонах без фактических данных.
+- Точный расход — только delta игрового `pointCount`; paint meter не является источником exact CHALK.
+- Выводы INT-006 ограничены D1–D5, radius=10 и испытанными sampling profiles. Кривые, заливки и неподдержанные геометрии остаются UNKNOWN/unsupported.
 
 ## Историческая хронология
 
