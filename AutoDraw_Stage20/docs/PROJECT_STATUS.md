@@ -9,6 +9,8 @@
 
 # Текущее состояние проекта
 
+**Последнее обновление:** 2026-11-03 — CI analyzer run выявил несовпадение сериализации geometry; исправление внесено, повторный CI выполняется: [41532629748](https://github.com/Kiddos19882/AutoDraw/actions/runs/41532629748). Предыдущий run [41530634729](https://github.com/Kiddos19882/AutoDraw/actions/runs/41530634729) — FAILURE только на analyzer step; подробности ниже в журнале событий.
+
 **Актуально на:** 3 ноября 2026 г.  
 **Репозиторий:** `Kiddos19882/AutoDraw`  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
@@ -27,7 +29,7 @@
 - Предварительные метрики 45 plan runs: MAE 1.408 CHALK, RMSE 1.967, bias -0.875, MAPE 2.134%, maximum underprediction 1.82 CHALK (D5/P2). По 243 stroke rows: MAE 0.439, RMSE 0.544, maximum underprediction 1.085 CHALK. Эти метрики пересчитаны из сохранённых JSON; SHA-256 frozen artifact независимо пересчитан и совпал с journal (`a0eab016e96a81e14bededd32cf5161dd943d6fc85a20b7eec17455f69d0c61c`). Официальный запуск `chalk_int006_validation.py` и полный journal/task/experiment/run/profile/geometry binding audit ещё ожидаются.
 - P1 (step=4, delay=5 ms) показал наименьшие предварительные MAE/RMSE и max underprediction среди профилей. Это кандидат для следующей проверки, не утверждённый production default. Step=4 снизил фактический расход на 21–47% относительно P0 в конкретных D1–D5; D4 short strokes дают меньшую экономию.
 - В analyzer исправлено сравнение абсолютного Windows experiment path: relocated capture bundles связываются с journal по имени experiment directory. Дополнительно analyzer сверяет `task.prediction_id` и `task.expected_strokes` с frozen prediction; regression tests покрывают Windows path и tampered journal prediction ID.
-- В `.github/workflows/geometry-tests.yml` добавлен запуск независимого INT-006 analyzer и загрузка JSON report как CI artifact. Push-triggered run после commits `284f5f0`/`2d99869` ожидается по конфигурации, но его результат недоступен через текущий GitHub status endpoint.
+- В `.github/workflows/geometry-tests.yml` добавлен запуск независимого INT-006 analyzer и загрузка JSON report как CI artifact. Run `41530634729` фактически выполнился, но analyzer отклонил все 45 captures из-за различий между runtime stroke serialization и frozen logical geometry. Исправление нормализации внесено в commits `8eba34f`/`dd64730`; повторный run `41532629748` выполняется.
 - Production estimator, executor defaults, sampling defaults и `master` не менялись.
 
 ## Статусы инициатив
@@ -47,7 +49,7 @@
 
 ## Ближайший рабочий приоритет
 
-1. Получить результат push-triggered CI после analyzer path fix и journal prediction-binding hardening; скачать artifact `autodraw-int006-chalk-validation`.
+1. Получить итог run `41532629748` после исправления geometry serialization binding; при необходимости изучить analyzer logs/artifact.
 2. Получить официальный JSON report штатного analyzer: 45 accepted, 0 missing, 0 rejected, 15 complete profile/scenario groups.
 3. Сверить официальный report с предварительными метриками в [результатах INT-006](CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md).
 4. Только после официальной проверки решить вопрос о консервативном safety margin. Максимальная недооценка 1.82 CHALK пока является только эмпирическим максимумом данной выборки.
