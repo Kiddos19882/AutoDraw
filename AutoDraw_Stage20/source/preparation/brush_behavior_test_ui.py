@@ -362,6 +362,65 @@ TEST_CASES: dict[str, dict[str, Any]] = {
             {"name": "vertical_offset", "points": [[120, 120], [120, 220]]}
         ]
     }
+
+    "V1 — диагонали разных наклонов": {
+        "id": "int006_diagonals",
+        "description": "INT-006 V1: шесть диагоналей разных наклонов.",
+        "strokes": [
+            {"name": "slope_025", "points": [[20, 30], [420, 130]]},
+            {"name": "slope_050", "points": [[20, 30], [420, 230]]},
+            {"name": "slope_075", "points": [[20, 220], [420, 20]]},
+            {"name": "slope_100", "points": [[20, 20], [220, 220]]},
+            {"name": "slope_150", "points": [[80, 220], [213, 20]]},
+            {"name": "slope_200", "points": [[160, 220], [260, 20]]}
+        ],
+    },
+    "V2 — короткие штрихи 1–10 px": {
+        "id": "int006_short_strokes",
+        "description": "INT-006 V2: длины 1, 2, 3, 5, 8 и 10 logical px.",
+        "strokes": [
+            {"name": "length_1", "points": [[20, 30], [21, 30]]},
+            {"name": "length_2", "points": [[50, 30], [52, 30]]},
+            {"name": "length_3", "points": [[80, 30], [83, 30]]},
+            {"name": "length_5", "points": [[110, 30], [115, 30]]},
+            {"name": "length_8", "points": [[140, 30], [148, 30]]},
+            {"name": "length_10", "points": [[170, 30], [180, 30]]}
+        ],
+    },
+    "V3 — непрерывные повороты": {
+        "id": "int006_turns",
+        "description": "INT-006 V3: три непрерывные ломаные с прямыми, острыми и последовательными поворотами.",
+        "strokes": [
+            {"name": "right_angle", "points": [[20, 20], [180, 20], [180, 100], [360, 100]]},
+            {"name": "acute_zigzag", "points": [[20, 140], [100, 80], [180, 140], [260, 80], [340, 140]]},
+            {"name": "multi_turn", "points": [[20, 210], [90, 170], [160, 210], [230, 170], [300, 210], [420, 170]]}
+        ],
+    },
+    "V4 — замкнутые контуры": {
+        "id": "int006_closed_contours",
+        "description": "INT-006 V4: три замкнутых контура разных типов.",
+        "strokes": [
+            {"name": "rectangle", "points": [[20, 20], [180, 20], [180, 100], [20, 100], [20, 20]]},
+            {"name": "triangle", "points": [[260, 20], [420, 120], [180, 120], [260, 20]]},
+            {"name": "irregular_polygon", "points": [[250, 150], [390, 150], [420, 220], [300, 220], [220, 190], [250, 150]]}
+        ],
+    },
+    "V5 — пересечения и параллельные линии": {
+        "id": "int006_intersections_spacing",
+        "description": "INT-006 V5: X/T/крестовые пересечения и две пары параллельных линий; 10 штрихов.",
+        "strokes": [
+            {"name": "x_a", "points": [[20, 20], [110, 110]]},
+            {"name": "x_b", "points": [[20, 110], [110, 20]]},
+            {"name": "t_vertical", "points": [[160, 20], [160, 110]]},
+            {"name": "t_horizontal", "points": [[120, 65], [210, 65]]},
+            {"name": "cross_horizontal", "points": [[250, 65], [430, 65]]},
+            {"name": "cross_vertical", "points": [[340, 20], [340, 110]]},
+            {"name": "parallel_close_a", "points": [[20, 160], [200, 160]]},
+            {"name": "parallel_close_b", "points": [[20, 168], [200, 168]]},
+            {"name": "parallel_wide_a", "points": [[240, 160], [430, 160]]},
+            {"name": "parallel_wide_b", "points": [[240, 184], [430, 184]]}
+        ],
+    },
 }
 
 
@@ -726,7 +785,7 @@ class BrushBehaviorTestTab:
         ttk.Label(block_controls, text="Фаза").pack(side="left")
         ttk.Combobox(
             block_controls, textvariable=self.chalk_block_phase_var,
-            values=("G1", "G2", "G3"), state="readonly", width=5,
+            values=("G1", "G2", "G3", "V1", "V2", "V3", "V4", "V5"), state="readonly", width=5,
         ).pack(side="left", padx=(6, 10))
         ttk.Button(block_controls, text="Запустить полный блок", command=self.start_chalk_test_block).pack(side="left")
         ttk.Button(block_controls, text="Остановить после текущего опыта", command=self.request_stop_chalk_test_block).pack(side="left", padx=6)
@@ -1244,8 +1303,8 @@ class BrushBehaviorTestTab:
             )
             return
         phase_id = self.chalk_block_phase_var.get().strip()
-        if phase_id not in {"G1", "G2", "G3"}:
-            messagebox.showwarning("Неизвестная фаза", "Выбери G1, G2 или G3.", parent=self.root)
+        if phase_id not in {"G1", "G2", "G3", "V1", "V2", "V3", "V4", "V5"}:
+            messagebox.showwarning("Неизвестная фаза", "Выбери G1/G2/G3 или V1–V5.", parent=self.root)
             return
         if phase_id == "G2" and not self._has_completed_g1_block():
             messagebox.showwarning(
@@ -1648,10 +1707,17 @@ class BrushBehaviorTestTab:
                 )
                 plan["generation"]["chalk_radius_matrix"] = matrix_metadata
             elif scenario_id in GEOMETRY_MATRIX_SCENARIOS:
-                if scenario_id == "paint_consumption_long_lines" and self._chalk_block_task is None:
+                if scenario_id in {
+                    "paint_consumption_long_lines",
+                    "int006_diagonals",
+                    "int006_short_strokes",
+                    "int006_turns",
+                    "int006_closed_contours",
+                    "int006_intersections_spacing",
+                } and self._chalk_block_task is None:
                     raise ValueError(
-                        "G3 разрешено запускать только полным автоматическим блоком после принятия G2. "
-                        "Отдельные ручные опыты G3 запрещены, чтобы не обходить порядок и матрицу повторов."
+                        "G3 и V1–V5 разрешено запускать только полными автоматическими блоками. "
+                        "Отдельные ручные опыты запрещены, чтобы не обходить порядок и матрицу повторов."
                     )
                 series_id = self.matrix_series_var.get()
                 repeat_index = int(self._chalk_block_task["repeat_index"]) if self._chalk_block_task else int(self.matrix_block_var.get().strip())
