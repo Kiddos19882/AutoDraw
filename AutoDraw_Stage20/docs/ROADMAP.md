@@ -134,11 +134,11 @@ G3 block `chalk-20261102-031830-a0f325` завершён: 27/27 captures при�
 - [x] Приняты G1/G2/G3 live blocks и radius matrix.
 - [x] Подготовлена предварительная сегментированная модель: прямые штрихи, короткие штрихи, sampling profile, радиус и повторное покрытие.
 - [x] Задокументирована линейная оценка для прямых сегментов при radius=10, step=2, delay=10: `C ≈ 1.765 + 0.2988 × L`.
-- [ ] Закрыть визуальную проверку G3 step=4: текущая ROI-эвристика обнаруживает изменения, но не доказывает непрерывность.
+- [x] Закрыть визуальную проверку G3 step=4: шесть PNG длинных горизонтальных линий визуально непрерывны; pixel-level audit V1–V5 также завершён на 90 captures.
 - [ ] Выполнить независимую проверку прогноза на новых рисунках, получить error distribution и консервативный safety margin.
 - [ ] После validation перейти к INT-007 — интеграции проверенной оценки в preflight/resource estimator.
 
-**Текущий статус INT-006:** IN_PROGRESS. Предварительная модель документирована, но не должна использоваться для production-решений до pixel-level visual audit и независимой validation.
+**Текущий статус INT-006:** IN_PROGRESS. Live follow-up V1–V5 и pixel-level audit 90 captures завершены; предварительная модель остаётся non-production до независимой validation на полных DrawingPlan и определения safety margin.
 
 
 ## 2026-11-02 — G3 visual quality audit
@@ -149,7 +149,7 @@ G3 block `chalk-20261102-031830-a0f325` завершён: 27/27 captures при�
 - [ ] Проверить step=4 на диагоналях, коротких штрихах, поворотах и пересечениях.
 - [ ] Получить независимую validation CHALK estimator и error distribution.
 
-**Статус:** G3 visual gate для длинных горизонтальных линий закрыт. INT-006 остаётся IN_PROGRESS до проверки остальных геометрий и независимой validation. Production defaults не изменять.
+**Статус:** G3 visual gate и V1–V5 geometry/pixel audit закрыты. INT-006 остаётся IN_PROGRESS только до независимой validation CHALK-модели и safety margin. Production defaults не изменять.
 
 
 ## Актуальный план после принятия G1/G2/G3 — 2026-11-02
@@ -162,7 +162,7 @@ G3 block `chalk-20261102-031830-a0f325` завершён: 27/27 captures при�
 - [x] Radius matrix: 21 принятый опыт; в конкретном сценарии длинных линий систематическое влияние радиуса на exact CHALK не обнаружено.
 - [x] Построена предварительная сегментированная модель CHALK; production estimator не готов.
 - [x] Визуально просмотрены все шесть PNG step=4/delay=5 и step=4/delay=10; длинные горизонтальные линии визуально непрерывны.
-- [ ] Геометрическая validation step=4: диагонали, короткие штрихи, повороты, замкнутые контуры, пересечения.
+- [x] Геометрическая validation step=4: live follow-up диагоналей, коротких штрихов, поворотов, замкнутых контуров и пересечений; pixel-level audit 90 captures подтверждает покрытие и отсутствие gaps.
 - [ ] Независимая validation модели на новых рисунках с MAE/RMSE/bias/relative error.
 - [ ] Определить safety margin и правила неизвестной/непроверенной геометрии.
 - [ ] INT-007: интегрировать validated estimator в preflight.
@@ -174,17 +174,17 @@ G3 block `chalk-20261102-031830-a0f325` завершён: 27/27 captures при�
 
 ## INT-006 — текущая фиксация (2026-11-02)
 
-INT-006 остаётся IN_PROGRESS. Создан [исполнительный протокол](CHALK_INT006_EXECUTION_PROTOCOL_2026-11-02.md): пять геометрических сценариев V1–V5, три sampling-профиля и три повтора (45 captures), отдельная независимая validation модели CHALK и критерии safety margin.
+INT-006 остаётся IN_PROGRESS. Harness V1–V5 и пять live follow-up block series завершены: 45/45 новых captures, exact CHALK/Monitor integrity приняты. Series-aware pixel audit обработал 90 исходных + follow-up captures, 0 invalid/duplicate/missing/unexpected; 297/297 новых stroke rows имеют coverage=1.0 и zero gaps. Следующий gate — независимая validation модели CHALK на полных DrawingPlan и критерии safety margin.
 
-Harness V1–V5 расширен поверх G3: matrix metadata/validator, block planner/journal, Brush Test UI и task-specific executor override поддерживают пять фаз по 9 задач (три профиля × три повтора). Добавлены regression tests. Следующий gate — полный CI и Windows portable smoke-test; затем 45 live captures. Production executor defaults и estimator не менять.
+Harness V1–V5: matrix metadata/validator, block planner/journal, Brush Test UI и task-specific executor override; regression tests прошли. Full CI run 41496555297 включая Windows portable smoke-test и PNG audit — success. Production executor defaults и estimator не менять.
 
 
 ## 2026-11-02 — INT-006 PNG screening progress
 
 - [x] Просмотрены 15 representative PNG V1–V5 × P0/P1/P2.
 - [x] Зафиксированы ограничения исходной геометрии и отсутствие очевидного визуального ухудшения непрерывности step=4 в выбранных примерах.
-- [ ] Выполнить количественный pixel-level аудит всех 45 PNG: continuity/max gap, centerline deviation, coverage width/variation, contour closure, parallel separation.
-- [ ] Проверить segmentation masks на blank-board reference и исключить курсор/UI.
-- [ ] После количественного аудита выполнить targeted reruns исправленных V1/V3, если доступна игровая сессия.
+- [x] Выполнить количественный pixel-level аудит всех 90 PNG: continuity/max gap, centerline deviation, coverage width/variation, contour closure, parallel separation; 549 stroke rows и 900 pair rows.
+- [x] Проверить segmentation masks на blank-board reference и cursor exclusion; для новых 45 captures cursor_detected=false, cursor_exclusion_pixels=0.
+- [x] Выполнить targeted reruns исправленных V1/V3, V2 short-stroke, V4 closure и V5 spacing; 45/45 captures завершены.
 
-Отчёт текущего скрининга: [CHALK_INT006_PNG_SCREENING_2026-11-02.md](CHALK_INT006_PNG_SCREENING_2026-11-02.md). INT-006 остаётся IN_PROGRESS; production defaults/estimator не менять.
+Исторический скрининг: [CHALK_INT006_PNG_SCREENING_2026-11-02.md](CHALK_INT006_PNG_SCREENING_2026-11-02.md). Follow-up exact CHALK и pixel audit: [CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md](CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md). INT-006 остаётся IN_PROGRESS только до independent validation/safety margin; production defaults/estimator не менять.
