@@ -55,6 +55,7 @@
 | [CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md) | Официальный analyzer report: 45/45 accepted, метрики по профилям и geometry, safety-margin ограничения |
 | [CHALK_RADIUS_GEOMETRY_CROSS_VALIDATION_PLAN_2026-11-03.md](CHALK_RADIUS_GEOMETRY_CROSS_VALIDATION_PLAN_2026-11-03.md) | План и текущий статус реализации INT006R: D1–D5 × radius 1/10/30 × 3 повтора при P1 |
 | [CHALK_INT006R_LIVE_PREFLIGHT_AND_VISUAL_AUDIT_2026-11-03.md](CHALK_INT006R_LIVE_PREFLIGHT_AND_VISUAL_AUDIT_2026-11-03.md) | Windows preflight, запуск 45 captures, CLI analyzer и отдельный визуальный audit gate |
+| [CHALK_INT006R_SOFTWARE_GATE_RESULTS_2026-11-03.md](CHALK_INT006R_SOFTWARE_GATE_RESULTS_2026-11-03.md) | Полный CI PASS INT006R: 682 tests, integration, bridge, PNG audit и Windows portable build |
 | [chalk_int006r_validation.py](../source/preparation/chalk_int006r_validation.py) | Независимый analyzer INT006R: exact CHALK, journal binding и статистика по геометрии/радиусу |
 | [CHALK_INT006_LOCAL_PREFLIGHT_GUIDE_2026-11-02.md](CHALK_INT006_LOCAL_PREFLIGHT_GUIDE_2026-11-02.md) | Локальная проверка portable-сборки на Windows 10 перед live validation |
 | [FILE_STORAGE_CATALOG.md](FILE_STORAGE_CATALOG.md) | Каталог пользовательских файлов, runtime-планов, отчётов, проектов и экспериментальных данных |
