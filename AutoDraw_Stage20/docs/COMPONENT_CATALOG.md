@@ -36,6 +36,8 @@
 - `board_resource_model.py`, `game_point_calibration.py`, `engine_point_calibration.py`, `interval_quota_fit.py` — модели и материалы калибровок.
 - `paint_cost_model.py`, `paint_budget_optimizer.py`, `paint_limit_test.py` — модули, относящиеся к учёту бюджета и тестовым сценариям.
 - `brush_calibration.py`, `brush_experiment_capture.py`, `brush_test_workflow.py`, `brush_footprint_geometry.py`, `brush_planner.py` — модули калибровки и лаборатории кистей.
+- `chalk_experiment_matrix.py`, `chalk_test_blocks.py` — контракты CHALK matrix, пакетное планирование, durable journal и capture acceptance.
+- `chalk_int006_validation.py`, `chalk_int006r_validation.py` — отдельные анализаторы независимой INT-006 model validation и INT006R radius × geometry captures.
 - `geometry_budget_optimizer.py`, `skeletonization.py`, `stroke_simplification.py`, `stroke_order_optimizer.py`, `interior_fill_planner.py`, `outline_first_fill_planner.py`, `swept_footprint_geometry.py` — модули геометрической подготовки планов.
 - `drawing_algorithm_benchmark.py` — вспомогательный benchmark-модуль.
 
