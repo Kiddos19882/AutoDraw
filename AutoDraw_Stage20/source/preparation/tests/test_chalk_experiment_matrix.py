@@ -444,3 +444,31 @@ def test_int006_matrix_rejects_unplanned_sampling_profile():
             repeat_index=1, requested_radius=10, strokes=_strokes(6),
             executor_parameters=parameters,
         )
+
+
+def test_int006_metadata_requires_a_frozen_prediction_id():
+    strokes = _strokes(4)
+    parameters = {
+        **GEOMETRY_EXECUTOR_CONFIG,
+        "point_step_px": 2,
+        "point_delay_ms": 10,
+    }
+    with pytest.raises(ValueError, match="prediction_id"):
+        build_chalk_experiment_matrix_metadata(
+            series_id="int006-series",
+            scenario_id="int006_validation_d1_mixed_lines",
+            repeat_index=1,
+            requested_radius=10,
+            strokes=strokes,
+            executor_parameters=parameters,
+        )
+    metadata = build_chalk_experiment_matrix_metadata(
+        series_id="int006-series",
+        scenario_id="int006_validation_d1_mixed_lines",
+        repeat_index=1,
+        requested_radius=10,
+        strokes=strokes,
+        executor_parameters=parameters,
+        prediction_id="chalk-int006-frozen-2026-11-02:int006_validation_d1_mixed_lines:P0",
+    )
+    assert metadata["prediction_id"].endswith(":P0")

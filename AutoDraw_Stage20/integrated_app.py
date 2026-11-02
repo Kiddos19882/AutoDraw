@@ -716,8 +716,19 @@ class AutoDrawUnifiedApp:
                     expected_scenario = "paint_consumption_long_lines"
                     allowed_profiles = {(step, delay) for step in (1, 2, 4) for delay in (5, 10, 20)}
                 elif matrix_phase == "INT006":
+                    from chalk_int006_validation import MODEL_ID as INT006_MODEL_ID
+
                     expected_scenario = scenario_id if scenario_id in PHASE_SCENARIOS[matrix_phase] else None
                     allowed_profiles = set(V_SAMPLING_PROFILES)
+                    profile_id = {
+                        (2, 10): "P0",
+                        (4, 5): "P1",
+                        (4, 10): "P2",
+                    }.get((step, delay))
+                    expected_prediction_id = (
+                        f"{INT006_MODEL_ID}:{scenario_id}:{profile_id}"
+                        if expected_scenario and profile_id else None
+                    )
                 else:
                     expected_scenario = PHASE_SCENARIOS[matrix_phase][0]
                     allowed_profiles = set(V_SAMPLING_PROFILES)
@@ -733,6 +744,10 @@ class AutoDrawUnifiedApp:
                     or isinstance(delay, bool) or type(delay) is not int
                     or (step, delay) not in allowed_profiles
                     or parameters != expected_parameters
+                    or (
+                        matrix_phase == "INT006"
+                        and matrix.get("prediction_id") != expected_prediction_id
+                    )
                 ):
                     raise ValueError(f"{matrix_phase}: параметры плана не соответствуют фиксированному протоколу матрицы.")
                 executor_config_override = dict(parameters)

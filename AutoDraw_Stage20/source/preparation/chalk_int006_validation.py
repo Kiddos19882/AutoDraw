@@ -30,12 +30,12 @@ PROFILES = {
     "P2": {"point_step_px": 4, "point_delay_ms": 10, "intercept": 1.440, "slope": 0.149151},
 }
 SHORT_LOOKUP = {
-    1: {"P0": 2.00, "P1": 2.00, "P2": 2.00},
-    2: {"P0": 2.67, "P1": 2.00, "P2": 2.00},
-    3: {"P0": 2.67, "P1": 2.00, "P2": 2.00},
-    5: {"P0": 3.67, "P1": 2.33, "P2": 2.67},
-    8: {"P0": 4.00, "P1": 3.00, "P2": 3.00},
-    10: {"P0": 5.00, "P1": 3.67, "P2": 3.67},
+    "1": {"P0": 2.00, "P1": 2.00, "P2": 2.00},
+    "2": {"P0": 2.67, "P1": 2.00, "P2": 2.00},
+    "3": {"P0": 2.67, "P1": 2.00, "P2": 2.00},
+    "5": {"P0": 3.67, "P1": 2.33, "P2": 2.67},
+    "8": {"P0": 4.00, "P1": 3.00, "P2": 3.00},
+    "10": {"P0": 5.00, "P1": 3.67, "P2": 3.67},
 }
 EXPECTED_TOTALS = {
     "int006_validation_d1_mixed_lines": {"P0": 120.30, "P1": 62.32, "P2": 62.29},
@@ -118,7 +118,7 @@ def _prediction_for_stroke(stroke: dict[str, Any], profile_name: str) -> dict[st
             "stroke_id": stroke["name"],
             "length_logical_px": length,
             "rule": "exact_short_lookup",
-            "predicted_chalk": SHORT_LOOKUP[rounded_length][profile_name],
+            "predicted_chalk": SHORT_LOOKUP[str(rounded_length)][profile_name],
         }
     profile = PROFILES[profile_name]
     return {

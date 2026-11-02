@@ -124,6 +124,7 @@ def _write_capture(results_dir: Path, journal: dict, task: dict, artifact: dict,
 
 def test_prediction_artifact_contains_15_frozen_records_and_hash():
     artifact = build_int006_prediction_artifact("int006-test-series")
+    artifact = json.loads(json.dumps(artifact, ensure_ascii=False))
     valid, reason = validate_int006_prediction_artifact(artifact, expected_series_id="int006-test-series")
     assert valid is True
     assert reason == "valid"
