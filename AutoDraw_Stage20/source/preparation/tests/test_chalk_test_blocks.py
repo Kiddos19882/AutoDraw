@@ -730,10 +730,10 @@ def test_g3_journal_rejects_boolean_repeat_and_duplicate_matrix_order_index(tmp_
     ("phase", "scenario", "stroke_count"),
     [
         ("V1", "int006_diagonals", 6),
-        ("V2", "int006_short_strokes", 6),
+        ("V2", "int006_short_strokes_followup", 5),
         ("V3", "int006_turns", 3),
         ("V4", "int006_closed_contours", 3),
-        ("V5", "int006_intersections_spacing", 10),
+        ("V5", "int006_intersections_spacing_sweep", 16),
     ],
 )
 def test_int006_block_contains_three_profiles_and_three_repeats(phase, scenario, stroke_count, tmp_path):
