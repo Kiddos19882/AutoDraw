@@ -161,7 +161,7 @@ def build_int006_prediction_artifact(series_id: str) -> dict[str, Any]:
                 "drawing_plan_sha256": geometry_signature,
                 "planned_strokes": strokes,
                 "stroke_predictions": stroke_predictions,
-                "prediction_rule": "mixed_lookup_and_straight_line_linear" if scenario_id == "int006_validation_d4_short_details" else "straight_line_linear",
+                "prediction_rule": "exact_short_lookup" if scenario_id == "int006_validation_d4_short_details" else "straight_line_linear",
                 "predicted_chalk": frozen_total,
                 "calculated_unrounded_total": calculated_total,
                 "created_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -180,6 +180,8 @@ def build_int006_prediction_artifact(series_id: str) -> dict[str, Any]:
         "expected_cell_count": 45,
         "predictions": records,
     }
+    # Seal the exact JSON representation persisted by the block journal.
+    body = json.loads(json.dumps(body, ensure_ascii=False, allow_nan=False))
     body["artifact_sha256"] = _sha256(body)
     return body
 
@@ -195,6 +197,14 @@ def validate_int006_prediction_artifact(artifact: Any, *, expected_series_id: st
         return False, "prediction_model_version_mismatch"
     if expected_series_id is not None and artifact.get("series_id") != expected_series_id:
         return False, "prediction_series_mismatch"
+    if artifact.get("artifact_id") != f"{MODEL_ID}:{artifact.get('series_id')}":
+        return False, "prediction_artifact_identity_mismatch"
+    if artifact.get("phase_id") != INDEPENDENT_VALIDATION_PHASE or artifact.get("radius") != RADIUS:
+        return False, "prediction_artifact_contract_mismatch"
+    if artifact.get("expected_cell_count") != 45:
+        return False, "prediction_expected_cell_count_mismatch"
+    if artifact.get("profiles") != PROFILES or artifact.get("short_lookup") != SHORT_LOOKUP:
+        return False, "prediction_model_parameters_mismatch"
     predictions = artifact.get("predictions")
     if not isinstance(predictions, dict) or len(predictions) != 15:
         return False, "prediction_record_count_mismatch"
@@ -205,19 +215,43 @@ def validate_int006_prediction_artifact(artifact: Any, *, expected_series_id: st
     if set(predictions) != expected_ids:
         return False, "prediction_record_identity_mismatch"
     for prediction_id, record in predictions.items():
-        scenario_id = record.get("scenario_id") if isinstance(record, dict) else None
-        profile_id = record.get("profile_id") if isinstance(record, dict) else None
+        if not isinstance(record, dict):
+            return False, "prediction_record_schema_invalid"
+        scenario_id = record.get("scenario_id")
+        profile_id = record.get("profile_id")
         if scenario_id not in DRAWING_PLANS or profile_id not in PROFILES:
             return False, "prediction_record_schema_invalid"
-        if record.get("prediction_id") != prediction_id or record.get("series_id") != artifact.get("series_id"):
-            return False, "prediction_record_binding_mismatch"
-        if record.get("geometry_signature") != _sha256(DRAWING_PLANS[scenario_id]):
-            return False, "prediction_geometry_signature_mismatch"
-        if record.get("planned_strokes") != DRAWING_PLANS[scenario_id]:
-            return False, "prediction_geometry_mismatch"
-        if record.get("predicted_chalk") != EXPECTED_TOTALS[scenario_id][profile_id]:
-            return False, "prediction_total_mismatch"
+        profile = PROFILES[profile_id]
+        expected_parameters = {
+            **GEOMETRY_EXECUTOR_CONFIG,
+            "point_step_px": profile["point_step_px"],
+            "point_delay_ms": profile["point_delay_ms"],
+        }
+        expected_strokes = DRAWING_PLANS[scenario_id]
+        expected_signature = _sha256(expected_strokes)
+        expected_stroke_predictions = [
+            _prediction_for_stroke(stroke, profile_id) for stroke in expected_strokes
+        ]
+        expected_rule = "exact_short_lookup" if scenario_id == "int006_validation_d4_short_details" else "straight_line_linear"
+        if (
+            record.get("prediction_id") != prediction_id
+            or record.get("model_id") != MODEL_ID
+            or record.get("model_version") != MODEL_VERSION
+            or record.get("series_id") != artifact.get("series_id")
+            or record.get("phase_id") != INDEPENDENT_VALIDATION_PHASE
+            or record.get("radius") != RADIUS
+            or record.get("executor_parameters") != expected_parameters
+            or record.get("geometry_signature") != expected_signature
+            or record.get("drawing_plan_sha256") != expected_signature
+            or record.get("planned_strokes") != expected_strokes
+            or record.get("stroke_predictions") != expected_stroke_predictions
+            or record.get("prediction_rule") != expected_rule
+            or record.get("predicted_chalk") != EXPECTED_TOTALS[scenario_id][profile_id]
+            or not isinstance(record.get("created_at_utc"), str)
+        ):
+            return False, "prediction_record_content_mismatch"
     return True, "valid"
+
 
 
 def analyze_int006_validation(
