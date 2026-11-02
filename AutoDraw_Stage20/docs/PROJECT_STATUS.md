@@ -816,3 +816,13 @@ Per-run transport gates чистые: `dropped_events=0`, `monitor_error_count_d
 
 
 **Проверка исправления положения курсора:** код и regression tests внесены в `feature/image-geometry-optimization`; CI run [41486593544](https://github.com/Kiddos19882/AutoDraw/actions/runs/41486593544) для code/test HEAD `878bd1f79e3a0249576e36c02cb63ca9825e31d1` создан, на момент записи ожидает запуска jobs. Live-проверка на игровой сессии ещё не выполнена.
+
+
+## 2026-11-02 — live follow-up V1–V5 завершён
+
+- Пользователь добавил 45 follow-up captures в commit [e879a77](https://github.com/Kiddos19882/AutoDraw/commit/e879a77f63be7a7a68de3f09091eab7dba0d34a2): 5 фаз × 9 задач; все block journals completed.
+- Все 45 captures приняты для exact CHALK: pre/post pointCount валидны, sampled per-stroke delta совпадает с exact delta; radius=10; per-run Monitor/Bridge drops, errors и sequence gaps равны нулю.
+- Step=4 снизил расход на 38.5–49.4% относительно step=2 по пяти геометриям. При step=4 отличие delay=5/10 ms не превышает примерно 1.4% по среднему расходу. Подробные repeat values: [CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md](CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md).
+- Новые captures записывают post-draw cursor ниже доски и paint meter, с исключением обеих ROI и отступом 32 px. Paint-meter estimate inconclusive и не используется как источник расхода.
+- **INT-006 остаётся IN_PROGRESS:** pixel-level аудит именно новых 45 PNG ещё впереди; ROI visibility heuristic неоднозначна на V3/V4/V5. Затем независимая validation на полных DrawingPlan и safety margin.
+- Все серии выполнены при radius=10; влияние радиуса в этом follow-up не измерялось. Production executor defaults и estimator не менялись.
