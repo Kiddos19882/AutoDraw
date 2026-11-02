@@ -129,3 +129,26 @@
 - матричные валидаторы: cumulative overflow принимается как диагностический счётчик, реальные per-run transport loss отвергаются.
 
 **Статус:** код и тесты добавлены, но CI на конечном HEAD ещё не подтверждён. Live Firefox/game test не запускался. Исторический G3 journal и manifest `s4-d10-r2` не переписывались. До успешного CI и локального preflight live G3 не запускать.
+
+
+## 10. Повторная live-проверка исправления в полной G3 серии — 2026-11-02
+
+После исправления per-run метрик выполнен отдельный новый G3 block `chalk-20261102-031830-a0f325`, block ID `d5d28990cb954610aa7f58534be9d3d7`. Старый stopped block `chalk-20261102-015749-7c1141` не возобновлялся и не переписывался.
+
+Результат:
+- 27/27 задач completed; все девять комбинаций sampling имеют по три повтора.
+- Все 27 captures имеют `monitor_capture.status=saved`, exact CHALK, совпадение sampled pointDelta, 6/6 strokes и radius=10.
+- Во всех 27 runs: `dropped_events=0`, `monitor_error_count_delta=0`, `bridge_send_failures_delta=0`, `collector_sequence_gap_count=0`.
+- В шести поздних runs `monitor_buffer_dropped_events_delta` положителен (536, 2718, 1456, 2700, 2706, 750). Это локальные потери сохранения в ограниченный export array Monitor, а не потеря доставки подписчику/Bridge/collector.
+- Для проверенных overflow runs event count совпадает с `report_event_count`; RunRecorder drops, Bridge send failures и sequence gaps равны нулю. Например, run `515fa1ae` сохранил 2718/2718 событий при local buffer delta=2718.
+- Session-cumulative alias `monitor_dropped_events` достиг 12 237, но ни один capture не был отклонён только по этому глобальному значению.
+
+Это подтверждает, что исправленное разделение cumulative local-buffer overflow и per-run transport loss работает в реальной длительной сессии, а не только в regression tests.
+
+Полные экспериментальные результаты и таблица CHALK: [CHALK_G3_RESULTS_2026-11-02.md](CHALK_G3_RESULTS_2026-11-02.md).
+
+### CI и границы проверки
+
+Перед этой серией полный workflow [41364954177](https://github.com/Kiddos19882/AutoDraw/actions/runs/41364954177) завершился успешно на code HEAD `09ef6283d8f02df64c458fe412049a1a190aff77`: все обязательные jobs, включая Windows portable build/startup smoke-test, success; optional benchmarks skipped. Коммит `35ae78e` добавил только экспериментальные результаты в `data/results/brush_behavior_tests/` и не менял исходный код или workflow, поэтому повторный CI для него не требовался.
+
+**Итог:** G3 live block принят 27/27; overflow fix подтверждён live; исторические stopped journals сохранены без изменений. Секция 9 отражает состояние на момент её создания и более не описывает текущий статус CI/G3.
