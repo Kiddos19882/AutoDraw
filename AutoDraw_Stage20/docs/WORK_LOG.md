@@ -1878,3 +1878,15 @@ Brush Test acceptance и матричные валидаторы больше н
 - Численные pixel-level метрики не рассчитаны; этап нельзя считать закрытым. Требуется сегментация всех 45 PNG, вычисление continuity/max gap, centerline deviation, width/width variation, closure и parallel separation с проверкой масок относительно blank-board reference.
 - Отчёт: [CHALK_INT006_PNG_SCREENING_2026-11-02.md](CHALK_INT006_PNG_SCREENING_2026-11-02.md).
 - Production code, executor defaults, estimator и первичные captures не изменялись.
+
+
+
+## 2026-11-02 — INT-006 quantitative PNG audit
+
+- Добавлен изолированный исследовательский анализатор дифференциальных board PNG, использующий blank reference и planned DrawingPlan geometry; production executor не затронут.
+- Исправлены обнаруженные по CI дефекты: CSV extra fields, OpenCV connectivity arguments, узкий per-stroke corridor/параллельные assigned masks, inference закрытого контура по совпадающим endpoints и cursor exclusion.
+- Финальный кодовый HEAD: `d3971e4da66f503e91799729005cea24e32bf466`; CI run [41392156994](https://github.com/Kiddos19882/AutoDraw/actions/runs/41392156994) — success, включая Windows build/smoke и pixel audit.
+- Пакет: 45/45 captures, invalid=0, matrix gaps/duplicates=0; 252 stroke rows и 279 parallel-pair rows; artifact [13117572972](https://github.com/Kiddos19882/AutoDraw/actions/runs/41392156994/artifacts/13117572972).
+- Зафиксированы ограничения: V2 length_10 — 9/9 повторов с evaluable fraction 0.381; V4 irregular_polygon closure metric отсутствует; V1/V3 имеют multi-component/intersection ambiguity; V5 spacing≈8.01 logical px сливает близкую пару в 9/9 повторах.
+- Создан подробный отчёт `CHALK_INT006_PIXEL_AUDIT_2026-11-02.md`, обновляются PROJECT_STATUS/TASKS. Quality gate остаётся OPEN; независимая модельная validation и safety margin не выполнены.
+- Первичные PNG/manifests/Monitor reports не изменялись. Production executor, estimator и defaults не менялись.
