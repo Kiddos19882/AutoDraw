@@ -413,3 +413,10 @@
 - The reported V2 journal contains 9 unique completed tasks and no duplicate matrix cell. Its legacy ID was the sole compatibility mismatch.
 - Commits: `f0e05df`, `4847cce`. CI validation pending.
 - No experiment records were modified; no production drawing or CHALK calculation behavior changed.
+
+
+### Исправление after-draw cursor placement — 2026-11-02
+
+- Автоматический курсор теперь уходит ниже доски и полоски краски, а не просто за границу доски.
+- Учитываются обе откалиброванные области (`board_area`, `paint_meter_area`) и 32 px свободного отступа; это предотвращает hover-уведомление от полоски краски поверх доски на `after_draw-board.png`.
+- Ручное снятие снимков и траектории рисования не затронуты.
