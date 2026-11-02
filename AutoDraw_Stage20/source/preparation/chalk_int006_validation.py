@@ -366,7 +366,14 @@ def analyze_int006_validation(
             rejected.append({"path": str(manifest_path), "reason": "journal_attempt_not_accepted"})
             continue
         attempt_dir = matching_attempts[0].get("experiment_dir")
-        if not isinstance(attempt_dir, str) or Path(attempt_dir).resolve() != manifest_path.parent.resolve():
+        # Captures retain the absolute path from the originating Windows machine.
+        # Validation bundles may be relocated (for example, into a CI checkout),
+        # so bind the journal attempt to the unique experiment directory name.
+        attempt_dir_name = (
+            str(attempt_dir).replace(chr(92), "/").rstrip("/").rsplit("/", 1)[-1]
+            if isinstance(attempt_dir, str) else ""
+        )
+        if not attempt_dir_name or attempt_dir_name != manifest_path.parent.name:
             rejected.append({"path": str(manifest_path), "reason": "journal_experiment_directory_mismatch"})
             continue
         if experiment_id in seen_experiments:
