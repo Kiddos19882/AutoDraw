@@ -119,3 +119,16 @@ P1 имеет наименьшие MAE/RMSE и меньшую максималь
 - [ ] Только после решения по safety margin рассматривать INT-007.
 
 **Production estimator, executor defaults, sampling defaults и master в рамках этого аудита не менялись.**
+
+
+## Повторная проверка первичных captures и frozen hash — 2026-11-03
+
+Проведена дополнительная независимая проверка содержимого репозитория:
+
+- Из block journal извлечены все 45 experiment directory paths; повторно прочитаны 45 `experiment.json` и 45 `monitor_report.json`.
+- Все 45 manifests относятся к ожидаемому block ID и фазе INT006; в каждом report `autodraw_experiment_id` совпадает с experiment ID соответствующей journal attempt.
+- Во всех 45 Monitor reports: `chalk.status=exact`; `post_point_count - pre_point_count = consumed_points`; `sampled_point_delta_total = consumed_points`; сумма `DRAW_SAMPLE.pointDelta` по stroke ID совпадает с consumed CHALK; число stroke groups совпадает с `stroke_count`.
+- Во всех 45 reports: `point_delta_matches_chalk=true`, dropped events=0, Monitor error delta=0, Bridge send-failure delta=0, collector sequence gaps=0, `brush_radius_status=single`, `observed_brush_radii=[10]`.
+- SHA-256 frozen prediction artifact независимо пересчитан по canonical JSON (sorted keys, compact separators, UTF-8) и совпал с journal: `a0eab016e96a81e14bededd32cf5161dd943d6fc85a20b7eec17455f69d0c61c`. В artifact 15 prediction records.
+
+Эта проверка подтверждает целостность всех сохранённых Monitor captures и frozen artifact. Она всё ещё не заменяет запуск штатного `chalk_int006_validation.py`: официальный JSON report с итоговыми accepted/missing/rejected и per-stroke метриками пока не получен. CI status/run artifact не удалось прочитать доступными GitHub connector endpoints; это не трактуется ни как успех, ни как ошибка CI.
