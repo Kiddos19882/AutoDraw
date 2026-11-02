@@ -85,6 +85,13 @@ class Int006PngAnalysisTests(unittest.TestCase):
             self.assertAlmostEqual(pairs[0]["axis_separation_logical"], 120, delta=1)
             self.assertFalse(pairs[0]["assigned_ink_masks_touch_or_merge"])
 
+    def test_repeated_endpoints_infer_closed_contour(self):
+        stroke = {"name":"loop", "closed":False, "points":[
+            {"x":10,"y":10}, {"x":40,"y":10}, {"x":40,"y":40}, {"x":10,"y":40}, {"x":10,"y":10}]}
+        result = analysis.geometry(stroke, 1.0, 1.0)
+        self.assertTrue(result["closed"])
+        self.assertAlmostEqual(result["length"], 120.0)
+
     def test_batch_writes_csv_json(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp); self.make_run(root)
