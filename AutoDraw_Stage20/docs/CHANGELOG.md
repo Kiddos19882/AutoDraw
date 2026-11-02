@@ -326,3 +326,9 @@
 
 - Добавлен исполнительный протокол INT-006 с матрицей V1–V5, тремя sampling-профилями, 45 запланированными captures, критериями качества и независимой validation модели CHALK.
 - Зафиксировано ограничение текущей лаборатории: V1–V5 отсутствуют в контракте G1/G2/G3 и требуют расширения harness до live-испытаний.
+
+
+## 2026-11-02
+- INT-006: экспериментальный harness расширен сценариями V1–V5 на инфраструктуре G3; добавлены три sampling profiles, отдельные 9-task journals и regression tests.
+- Task-specific executor override распространён на V1–V5; production executor defaults и estimator не менялись.
+- CI и live validation ожидаются; экспериментальные результаты V1–V5 пока отсутствуют.
