@@ -374,3 +374,14 @@
 - Обновлены matrix expected counts, block tests и UI geometry regression tests.
 - Добавлен `CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md` с инструкцией для пользовательских live-прогонов.
 - Каждая серия содержит 9 captures: P0/P1/P2 × три повтора, radius=10. Live-прогоны не запускались.
+
+
+## 2026-11-02 — INT-006 CI regression fixes
+
+### Fixed
+- Restored expected stroke counts for legacy V2/V5 scenario IDs (6 and 10) so existing manifests remain analyzable without reintroducing legacy IDs into current block planners.
+- Updated the V5 application integration fixture to use `int006_intersections_spacing_sweep` and its 16-stroke contract.
+
+### Validation
+- Previous CI run `41468581157` had two legacy-count failures and one stale V5 fixture failure. Corrective commits: `0cac37c`, `706be60`.
+- Full CI rerun is pending; no live experiments were started.
