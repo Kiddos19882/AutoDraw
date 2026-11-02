@@ -3,7 +3,7 @@
 **Актуально на:** 2 ноября 2026 г.  
 **Репозиторий:** `Kiddos19882/AutoDraw`  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
-**Последний кодовый HEAD:** `b60d9aef5b9a95ebefa85f42d99956f181bec7ee` (реализация harness V1–V5 и regression tests); обязательный CI run #1886 завершился успешно. Live-результаты V1–V5 добавлены коммитом `64795362aa1bf4d0a3587e119b8c959242be6181`; CI run #1887 на этом коммите также завершился успешно.
+**Последний проверенный CI code HEAD:** `d3971e4da66f503e91799729005cea24e32bf466`; run [41392156994](https://github.com/Kiddos19882/AutoDraw/actions/runs/41392156994) завершился success, включая INT-006 pixel audit. **Текущий code HEAD:** `a4a909d08b9947cfff139b20d55300f1e97dcc25` — исправлены только экспериментальные DrawingPlan V1/V3 и добавлен regression test изоляции; CI для этих изменений ожидает проверки. Исходные live captures остаются в data commit `64795362aa1bf4d0a3587e119b8c959242be6181`.
 
 > Этот верхний блок — единственный источник текущего статуса. Ниже сохранена историческая хронология работ. Более ранние статусы, планы и чек-листы в исторических записях не являются текущим backlog и не должны переопределять сведения этого блока и [TASKS.md](TASKS.md).
 
@@ -16,9 +16,9 @@
 - Game Monitor exact CHALK рассчитывается как `post.pointCount - pre.pointCount`. Per-run capture/transport acceptance G3 пройдены; cumulative local Monitor buffer overflow не трактуется как потеря конкретного run.
 - Предварительная сегментированная модель и результаты первой holdout-проверки изложены в [CHALK_PRELIMINARY_SEGMENTED_MODEL_2026-11-02.md](CHALK_PRELIMINARY_SEGMENTED_MODEL_2026-11-02.md). G1-модель проверена на 66 новых штрихах P0 (MAE 1.09, RMSE 1.33, MAPE 1.71%), но независимая validation step=4 и полных DrawingPlan ещё не завершена; модель остаётся исследовательской, не production estimator.
 - Визуальный аудит всех шести G3 PNG step=4/delay=5 и step=4/delay=10 пройден для длинных горизонтальных линий. Все шесть линий визуально непрерывны. Конец шестой линии частично закрыт курсором. Количественные pixel-level метрики gap/centerline/width не рассчитаны.
-- step=4 экспериментально измерен на длинных линиях G3 и live-геометриях V1–V5: экономия exact CHALK около 48–49% для V1/V3/V4/V5 и 23–25% для V2. Обзорные PNG не показывают очевидной деградации в выбранных примерах, но pixel-level метрики не рассчитаны, а V1/V3 содержат непреднамеренные пересечения. Универсальный production default не утверждён; настройки executor не менялись.
-- INT-006: все 45 live captures V1–V5 выполнены и приняты (5 блоков × 9 задач); exact CHALK и per-stroke pointDelta согласованы во всех runs, все Monitor/Bridge per-run integrity counters нулевые. CI run #1887 на data commit `6479536` — success. Отчёт: `CHALK_INT006_V1_V5_RESULTS_2026-11-02.md`. Первичная holdout-проверка G1-модели на 66 новых штрихах P0 дала MAE 1.09, RMSE 1.33 CHALK, MAPE 1.71%; step=4 fit исследовательский. INT-006 остаётся IN_PROGRESS из-за пересечений в геометриях V1/V3, отсутствия pixel-level quality metrics и незавершённой независимой validation step=4/коротких strokes.
-- Production-код, executor defaults и estimator не изменялись. Live captures V1–V5 выполнены пользователем и сохранены в commit `6479536`; дальнейшие изменения пока документальные.
+- step=4 экспериментально измерен на длинных линиях G3 и live-геометриях V1–V5: экономия exact CHALK около 48–49% для V1/V3/V4/V5 и 23–25% для V2. Pixel audit 45 PNG выполнен; representative overlays подтвердили неоднозначности V1/V3 и V4, а V2 length_10 не позволяет оценить центральную линию отдельно от круглого отпечатка. V1/V3 DrawingPlan исправлены после исходной серии; новые live captures обязательны до повторного геометрического вывода. Универсальный production default не утверждён; executor defaults не менялись.
+- INT-006: все 45 исходных live captures V1–V5 приняты; exact CHALK/per-stroke pointDelta согласованы, per-run Monitor/Bridge integrity counters нулевые. CI #1887 на data commit `6479536` и pixel-audit CI `41392156994` успешны. Pixel audit: 252 stroke rows, 279 parallel-pair rows. Representative overlays вручную просмотрены; подтверждены V1/V3 пересечения и V4 cursor occlusion. DrawingPlan V1/V3 исправлены в `5047cb7`, regression test добавлен в `a4a909d`; этот новый код ещё ожидает CI и live rerun. G1 holdout P0: 66 штрихов, MAE 1.09, RMSE 1.33 CHALK, MAPE 1.71%; step=4 fit исследовательский. INT-006 IN_PROGRESS: V2 short-stroke follow-up, V4 closure capture, V5 spacing sweep и независимая validation не завершены.
+- Production executor, estimator и sampling defaults не изменялись. Изменён только экспериментальный DrawingPlan V1/V3 и его regression tests; первичные captures/manifests/reports/PNG не переписывались. Новые V1/V3 captures ещё не выполнены.
 
 ## Статусы инициатив
 
@@ -37,9 +37,9 @@
 
 ## Ближайший рабочий приоритет
 
-1. Выполнить pixel-level аудит сохранённых PNG и зафиксировать критерии continuity/gap/centerline/width до дальнейших сравнений.
-2. Live captures V1–V5 завершены: см. `CHALK_INT006_V1_V5_RESULTS_2026-11-02.md`. Следующий gate — pixel-level audit PNG, исправление непреднамеренных пересечений V1/V3 и targeted reruns, где геометрическая изоляция нужна для выводов.
-3. Подготовить изолированные повторные сценарии V1/V3 и короткую серию V2 для сравнения отдельных strokes с непрерывной полилинией; сохранять exact CHALK и per-run Monitor integrity.
+1. Pixel-level audit 45/45 PNG выполнен, representative overlays проверены вручную; см. `CHALK_INT006_PIXEL_AUDIT_2026-11-02.md`.
+2. DrawingPlan V1/V3 исправлены в harness; после успешного CI выполнить новые полные V1/V3 blocks с exact CHALK и per-run Monitor integrity.
+3. Подготовить V2 targeted series для длин 12/16/20/24/30 logical px и сравнить отдельные короткие strokes с одной связанной полилинией; устранить cursor occlusion V4 перед повторной оценкой closure; расширить V5 spacing sweep.
 4. Собрать независимую validation-выборку реальных планов и сравнить прогноз с exact pre/post pointCount; рассчитать MAE, RMSE, bias и относительную ошибку, отдельно по типам геометрии.
 5. Только после validation определить консервативный safety margin и критерии допуска к квоте.
 6. Затем проектировать INT-007/008/009. До этого production defaults и код estimator не менять.
