@@ -432,7 +432,7 @@ Software gate закрыт; live gate остаётся открытым. Авт�
 - [x] Исправить analyzer path binding для перенесённых capture bundles и добавить regression test на исходный Windows absolute path.
 - [x] Добавить analyzer step и JSON artifact upload в `.github/workflows/geometry-tests.yml`.
 - [ ] Подтвердить новый CI после analyzer/workflow изменений и получить официальный analyzer JSON report: 45 accepted, 0 missing, 0 rejected.
-- [ ] Подтвердить SHA-256 frozen artifact и все journal/task/experiment/run/profile/geometry bindings штатным analyzer.
+- [ ] Проверка frozen artifact SHA-256 выполнена независимо и совпала; штатным analyzer ещё подтвердить полный journal/task/experiment/run/profile/geometry binding.
 - [ ] На основании официального report определить safety margin и границы применимости модели.
 
 INT-006 остаётся IN_PROGRESS до официального analyzer report и решения по safety margin; INT-007 — BLOCKED. Production estimator, executor defaults и sampling defaults не менять.
