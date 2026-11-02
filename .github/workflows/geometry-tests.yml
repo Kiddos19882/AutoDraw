@@ -111,7 +111,7 @@ jobs:
       - name: Analyse all INT-006 V1-V5 board captures
         shell: pwsh
         run: |
-          python tests\\analyze_chalk_int006_png.py data\\results\\brush_behavior_tests --output-dir "$env:RUNNER_TEMP\\int006-png-analysis" --expected-runs 45
+          python tests\\analyze_chalk_int006_png.py data\\results\\brush_behavior_tests --output-dir "$env:RUNNER_TEMP\\int006-png-analysis" --expected-runs-per-series 9
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Upload pixel-level metrics and diagnostic images
         if: always()
