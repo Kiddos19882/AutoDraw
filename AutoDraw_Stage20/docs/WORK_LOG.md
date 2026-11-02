@@ -2126,3 +2126,11 @@ Brush Test acceptance и матричные валидаторы больше н
 - P1 (step=4, delay=5 ms) — лучший совокупный профиль на D1–D5: MAE 0.657, RMSE 0.838, MAPE 1.178%, max underprediction 0.92 CHALK. P1 остаётся экспериментальным кандидатом, не production default. Эмпирический guard 1 CHALK покрывает максимум этой выборки, но не является статистической гарантией; D3/P1 repeat σ≈1.41.
 - Полный отчёт: [CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md). Analyzer geometry serialization fix и runtime-shaped regression fixture: commits `8eba34f` и `dd64730`.
 - `safety_margin_status=not_established`, `production_eligibility=not_validated`; production estimator/defaults и master не менялись. INT-006 остаётся IN_PROGRESS до отдельного решения по safety margin и расширения domain validation; INT-007 остаётся BLOCKED.
+
+
+## 2026-11-03 — план radius × geometry cross-validation
+
+- Сопоставлены два подтверждённых источника: radius matrix 21/21 на шести длинных горизонтальных линиях (радиусы 1–30, 722–728 CHALK) и официальный INT-006 D1–D5 при фиксированном radius=10.
+- Вывод: radius matrix не показывает систематического эффекта для длинных горизонтальных линий, но не отвечает на вопрос для коротких деталей, диагоналей, пересечений и повторного покрытия.
+- Создан [CHALK_RADIUS_GEOMETRY_CROSS_VALIDATION_PLAN_2026-11-03.md](CHALK_RADIUS_GEOMETRY_CROSS_VALIDATION_PLAN_2026-11-03.md): предложена матрица D1–D5 × radius 1/10/30 × 3 повтора при P1 (45 captures). Требуется отдельная experimental phase/harness и успешный CI до live запуска.
+- До результатов не вводить radius multiplier и не менять production estimator/defaults.
