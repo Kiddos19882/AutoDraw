@@ -724,3 +724,33 @@ def test_g3_journal_rejects_boolean_repeat_and_duplicate_matrix_order_index(tmp_
     order_path.write_text(json.dumps(invalid_order), encoding="utf-8")
     with pytest.raises(ValueError, match="Некорректная или повторная ячейка G3"):
         load_chalk_test_block_journal(order_path)
+
+
+@pytest.mark.parametrize(
+    ("phase", "scenario", "stroke_count"),
+    [
+        ("V1", "int006_diagonals", 6),
+        ("V2", "int006_short_strokes", 6),
+        ("V3", "int006_turns", 3),
+        ("V4", "int006_closed_contours", 3),
+        ("V5", "int006_intersections_spacing", 10),
+    ],
+)
+def test_int006_block_contains_three_profiles_and_three_repeats(phase, scenario, stroke_count, tmp_path):
+    plan = build_chalk_test_block_plan(series_id="int006-series", phase_id=phase, seed=20261102)
+    assert plan["expected_task_count"] == 9
+    assert {task["scenario_id"] for task in plan["tasks"]} == {scenario}
+    assert {task["expected_strokes"] for task in plan["tasks"]} == {stroke_count}
+    cells = {
+        (task["executor_parameters"]["point_step_px"], task["executor_parameters"]["point_delay_ms"], task["repeat_index"])
+        for task in plan["tasks"]
+    }
+    assert cells == {
+        (2, 10, 1), (2, 10, 2), (2, 10, 3),
+        (4, 5, 1), (4, 5, 2), (4, 5, 3),
+        (4, 10, 1), (4, 10, 2), (4, 10, 3),
+    }
+    assert sorted(task["matrix_order_index"] for task in plan["tasks"]) == list(range(1, 10))
+    journal_path = tmp_path / f"{phase}.json"
+    create_chalk_test_block_journal(journal_path, plan)
+    assert load_chalk_test_block_journal(journal_path)["phase_id"] == phase
