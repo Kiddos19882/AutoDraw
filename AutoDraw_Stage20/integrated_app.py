@@ -693,8 +693,12 @@ class AutoDrawUnifiedApp:
                 raise ValueError(f"Не удалось прочитать метаданные плана теста: {exc}") from exc
             generation = plan_document.get("generation", {})
             matrix = generation.get("chalk_experiment_matrix") if isinstance(generation, dict) else None
-            if isinstance(matrix, dict) and matrix.get("phase_id") == "G3":
-                from chalk_experiment_matrix import GEOMETRY_EXECUTOR_CONFIG
+            matrix_phase = matrix.get("phase_id") if isinstance(matrix, dict) else None
+            if isinstance(matrix, dict) and matrix_phase in {"G3", "V1", "V2", "V3", "V4", "V5"}:
+                from chalk_experiment_matrix import (
+                    GEOMETRY_EXECUTOR_CONFIG, EXPECTED_STROKES, PHASE_SCENARIOS,
+                    V_PHASES, V_SAMPLING_PROFILES,
+                )
 
                 parameters = matrix.get("executor_parameters")
                 required = {
@@ -703,19 +707,31 @@ class AutoDrawUnifiedApp:
                     "after_mouse_down_ms", "end_hold_ms", "countdown_seconds",
                 }
                 if not isinstance(parameters, dict) or set(parameters) != required:
-                    raise ValueError("G3: отсутствует полный набор параметров исполнителя в metadata.")
+                    raise ValueError(f"{matrix_phase}: отсутствует полный набор параметров исполнителя в metadata.")
                 step, delay = parameters.get("point_step_px"), parameters.get("point_delay_ms")
                 expected_parameters = dict(GEOMETRY_EXECUTOR_CONFIG)
                 expected_parameters.update({"point_step_px": step, "point_delay_ms": delay})
+                scenario_id = matrix.get("scenario_id")
+                if matrix_phase == "G3":
+                    expected_scenario = "paint_consumption_long_lines"
+                    allowed_profiles = {(step, delay) for step in (1, 2, 4) for delay in (5, 10, 20)}
+                else:
+                    expected_scenario = PHASE_SCENARIOS[matrix_phase][0]
+                    allowed_profiles = set(V_SAMPLING_PROFILES)
+                expected_strokes = EXPECTED_STROKES[expected_scenario]
+                block = generation.get("chalk_test_block") if isinstance(generation, dict) else None
                 if (
-                    matrix.get("scenario_id") != "paint_consumption_long_lines"
+                    scenario_id != expected_scenario
                     or matrix.get("requested_radius") != 10
-                    or matrix.get("expected_strokes") != 6
-                    or isinstance(step, bool) or type(step) is not int or step not in (1, 2, 4)
-                    or isinstance(delay, bool) or type(delay) is not int or delay not in (5, 10, 20)
+                    or matrix.get("expected_strokes") != expected_strokes
+                    or not isinstance(block, dict)
+                    or block.get("phase_id") != matrix_phase
+                    or isinstance(step, bool) or type(step) is not int
+                    or isinstance(delay, bool) or type(delay) is not int
+                    or (step, delay) not in allowed_profiles
                     or parameters != expected_parameters
                 ):
-                    raise ValueError("G3: параметры плана не соответствуют фиксированному протоколу матрицы.")
+                    raise ValueError(f"{matrix_phase}: параметры плана не соответствуют фиксированному протоколу матрицы.")
                 executor_config_override = dict(parameters)
             started = self.executor.start_execution_from_workflow(
                 executor_config_override=executor_config_override
