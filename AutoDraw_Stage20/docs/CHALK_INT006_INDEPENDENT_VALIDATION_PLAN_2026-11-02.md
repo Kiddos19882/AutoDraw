@@ -257,3 +257,15 @@ D1–D5 выполнены в block `chalk-20261102-232320-7cea27`: 45/45 tasks 
 Предварительные метрики и ограничения вынесены в [CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md](CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md). Эти расчёты не заменяют штатный analyzer: до получения официального JSON report серия не считается количественно validated, safety margin не установлен, INT-007 остаётся BLOCKED.
 
 Workflow `.github/workflows/geometry-tests.yml` дополнен запуском analyzer и загрузкой report artifact. Для поддержки переноса Windows capture bundle в CI analyzer связывает journal attempt с уникальным именем experiment directory, а не с исходным абсолютным путём.
+
+
+## Дополнительная проверка binding журнала — 2026-11-03
+
+При статическом аудите analyzer обнаружено, что prediction ID проверялся в manifest metadata, но не сравнивался напрямую с `prediction_id` в соответствующей journal task. Это оставляло непроверенным одно звено цепочки frozen artifact → journal task → manifest.
+
+Исправлено:
+- analyzer теперь отклоняет запись с `journal_prediction_id_mismatch`, если task prediction ID не совпадает с вычисленным ID для scenario/profile;
+- analyzer дополнительно сверяет `task.expected_strokes` с числом strokes в frozen prediction;
+- добавлен regression test, который изменяет task prediction ID и ожидает fail-closed rejection.
+
+Изменение не меняет frozen model, прогнозы, production estimator или executor defaults. После этого изменения нужен новый CI run; официальный report по 45 captures остаётся pending.
