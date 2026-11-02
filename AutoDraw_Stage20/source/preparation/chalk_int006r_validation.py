@@ -78,6 +78,8 @@ def analyze_int006r_validation(
             "expected_count": 45, "accepted_count": 0, "missing_count": 45,
             "missing_cells": [list(cell) for cell in sorted(expected_cells)],
             "rejected": [],
+            "safety_margin_status": "not_established",
+            "production_eligibility": "not_validated",
         }
 
     for manifest_path in sorted(results_dir.rglob("experiment.json")):
