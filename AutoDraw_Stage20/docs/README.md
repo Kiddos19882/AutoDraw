@@ -50,6 +50,8 @@
 | [DATA_FORMATS_AND_PROFILES.md](DATA_FORMATS_AND_PROFILES.md) | Профили, палитры, планы, лабораторные и калибровочные результаты, экспорт Game Monitor |
 | [BRUSH_TEST_AUTOMATION_VISION.md](BRUSH_TEST_AUTOMATION_VISION.md) | Целевая архитектура автоматизированной лаборатории кистей, CHALK-экспериментов и сбора данных |
 | [BRUSH_MODULE_QUICK_INDEX.md](BRUSH_MODULE_QUICK_INDEX.md) | Быстрый поиск по документации и исходникам для реализации модуля автоматических тестов кистей |
+| [CHALK_INT006_FROZEN_PREDICTIONS_AND_ANALYZER_2026-11-02.md](CHALK_INT006_FROZEN_PREDICTIONS_AND_ANALYZER_2026-11-02.md) | Frozen predictions, 45-cell journal и независимый analyzer INT-006 |
+| [CHALK_INT006_LOCAL_PREFLIGHT_GUIDE_2026-11-02.md](CHALK_INT006_LOCAL_PREFLIGHT_GUIDE_2026-11-02.md) | Локальная проверка portable-сборки на Windows 10 перед live validation |
 | [FILE_STORAGE_CATALOG.md](FILE_STORAGE_CATALOG.md) | Каталог пользовательских файлов, runtime-планов, отчётов, проектов и экспериментальных данных |
 | [CONFIGURATION_AND_DATA.md](CONFIGURATION_AND_DATA.md) | Каталоги данных, профили, форматы и переменные окружения |
 | [DEVELOPMENT.md](DEVELOPMENT.md) | Подготовка Windows-среды, запуск, тесты и сборка |

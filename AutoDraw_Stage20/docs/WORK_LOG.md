@@ -2063,3 +2063,19 @@ Brush Test acceptance и матричные валидаторы больше н
 **Границы:** код и тесты не изменялись; CI и Windows preflight не запускались; live captures не выполнялись. Production estimator/defaults, исходные экспериментальные данные и master не менялись.
 
 **Следующий шаг:** расширить существующий matrix/block/UI/executor/analyzer контракт отдельной INT006 phase, добавить regression tests, пройти полный CI и только затем подготовить локальный Windows 10 preflight.
+
+
+## 2026-11-02 — INT-006 frozen predictions/analyzer: software gate PASS
+
+**Ветка:** `feature/image-geometry-optimization`  
+**Code HEAD:** `ca8c9b3bd739ea0a5b557b87fc0106ecfde81216`  
+**CI:** [41513389663](https://github.com/Kiddos19882/AutoDraw/actions/runs/41513389663) — **SUCCESS**.
+
+- Реализованы frozen model ID/version, коэффициенты P0/P1/P2 и exact short lookup.
+- Block planner добавляет hash-sealed artifact с 15 predictions в durable journal до первого live capture; все 45 задач получают prediction ID.
+- Matrix metadata требует prediction ID для INT006; Brush Test UI записывает его и блокирует ручной запуск D1–D5; integrated executor handoff сверяет model/scenario/profile identity.
+- Analyzer связывает manifest с completed journal attempt, сверяет exact CHALK/Monitor integrity, geometry/profile/series/task identity, рассчитывает run-level и per-stroke residuals, MAE/RMSE/bias/MAPE/max underprediction и repeatability.
+- Regression suites: Preparation/G3 — 667 passed, 82 subtests passed; Application integration, Executor regression и Game Monitor/bridge — success.
+- INT-006 pixel-level PNG audit — success. Windows portable build/startup smoke-test — success. Artifact `autodraw-g3-preflight-build`, ID `13173632860`; PNG audit artifact ID `13174616232`.
+
+**Следующий шаг:** пользователь выполняет локальный Windows 10 preflight по `CHALK_INT006_LOCAL_PREFLIGHT_GUIDE_2026-11-02.md`. 45 live captures не запускались. Production estimator/defaults, исходные экспериментальные данные и master не менялись.

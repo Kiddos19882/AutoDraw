@@ -266,3 +266,11 @@ Live G3 остаётся закрытым до прохождения regression
 Проверка 22 manifests: task metadata совпадает с фактическим executor config; radius=10; шесть штрихов; внутренний CHALK counter exact. 21 Monitor capture saved, один partial. Траектория во всех случаях помечена `incomplete_until_verified` из-за coalesced pointDelta.
 
 Таблица CHALK по всем девяти конфигурациям, пять полностью собранных ячеек, четыре неполных ячейки и ограничения вывода находятся в `CHALK_G3_PARTIAL_RESULTS_2026-11-02.md`. До завершения повторов и проверки continuation semantics модель расхода остаётся предварительной.undefined
+
+## 2026-11-02 — INT-006 independent validation software gate
+
+D1–D5 подключены к отдельной фазе INT006. Block journal формирует 45 уникальных задач (5 DrawingPlan × 3 sampling profiles × 3 repeats) и содержит frozen prediction artifact из 15 records до первого live capture. Prediction ID связан с task, manifest и executor handoff. Независимый analyzer проверяет exact CHALK, Monitor integrity, geometry/profile/task/journal identity и считает run/per-stroke errors.
+
+Full CI [41513389663](https://github.com/Kiddos19882/AutoDraw/actions/runs/41513389663) завершился success: Preparation/G3 667 passed, 82 subtests; остальные обязательные jobs, pixel audit и Windows portable build/startup smoke-test — success. Artifact `autodraw-g3-preflight-build` ID `13173632860`.
+
+Следующий шаг — локальный Windows 10 preflight. До его проверки не запускать 45 live captures. См. [INT-006 frozen analyzer](CHALK_INT006_FROZEN_PREDICTIONS_AND_ANALYZER_2026-11-02.md) и [preflight guide](CHALK_INT006_LOCAL_PREFLIGHT_GUIDE_2026-11-02.md).

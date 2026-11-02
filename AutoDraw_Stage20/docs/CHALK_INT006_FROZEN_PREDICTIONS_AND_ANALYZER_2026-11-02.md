@@ -1,0 +1,47 @@
+# INT-006 — frozen predictions и независимый analyzer
+
+**Model ID:** `chalk-int006-frozen-2026-11-02`, version 1; **radius:** 10; **phase:** `INT006`.  
+**Software gate:** PASS — [CI run 41513389663](https://github.com/Kiddos19882/AutoDraw/actions/runs/41513389663).  
+**Live gate:** BLOCKED до локального Windows preflight.
+
+## Frozen model
+
+| Profile | point_step_px | point_delay_ms | intercept | slope |
+|---|---:|---:|---:|---:|
+| P0 | 2 | 10 | 1.765 | 0.2988 |
+| P1 | 4 | 5 | 1.475 | 0.148865 |
+| P2 | 4 | 10 | 1.440 | 0.149151 |
+
+Для прямого штриха вне short lookup применяется (C=a+bL), где (L) — logical px. Для точных длин 1/2/3/5/8/10 используется lookup без интерполяции:
+
+| L | P0 | P1 | P2 |
+|---:|---:|---:|---:|
+| 1 | 2.00 | 2.00 | 2.00 |
+| 2 | 2.67 | 2.00 | 2.00 |
+| 3 | 2.67 | 2.00 | 2.00 |
+| 5 | 3.67 | 2.33 | 2.67 |
+| 8 | 4.00 | 3.00 | 3.00 |
+| 10 | 5.00 | 3.67 | 3.67 |
+
+Неизвестная длина или неподдерживаемая геометрия не интерполируется автоматически. Кривые, заливки и классы вне D1–D5 остаются unsupported/UNKNOWN.
+
+## Frozen artifact
+
+`build_int006_prediction_artifact(series_id)` создаёт 15 записей: D1–D5 × P0/P1/P2. Каждая запись содержит model/version, profile, radius, geometry signature, полный DrawingPlan, stroke lengths/rules, per-stroke prediction и frozen total.
+
+Artifact включается в INT006 block journal до первого live capture. SHA-256 вычисляется по канонической JSON-репрезентации. Каждая из 45 задач получает `prediction_id`; он записывается в `chalk_experiment_matrix` manifest metadata.
+
+## Analyzer
+
+Запуск из корня репозитория в PowerShell:
+
+```powershell
+$env:PYTHONPATH = "AutoDraw_Stage20\source\preparation"
+python AutoDraw_Stage20\source\preparation\chalk_int006_validation.py --journal "<path-to-block-journal.json>" --results-dir "<path-to-brush_behavior_tests>" --output "<path-to-int006-analysis.json>"
+```
+
+Analyzer проверяет hash/содержимое artifact; 45 уникальных cells; series/phase/scenario/profile/repeat/order/task/block/experiment/run; completed accepted journal attempts; radius=10, executor parameters, prediction ID и geometry signature; exact pre/post CHALK, Monitor integrity и per-stroke breakdown. Считает residual = actual − predicted, MAE, RMSE, bias, MAPE, max absolute error, max underprediction, repeatability и per-stroke MAE/RMSE/bias.
+
+Неполные, duplicate, unexpected, повреждённые или не связанные с journal captures отражаются в `rejected`/`missing_cells`. `status=complete` возможен только при 45 валидных captures без пропусков и rejected rows.
+
+Положительный residual означает недооценку расхода. Максимальная наблюдённая недооценка — только provisional empirical guard выборки. Analyzer всегда выставляет `safety_margin_status=not_established` и `production_eligibility=not_validated`. Production estimator/defaults не менялись. Radius в INT-006 фиксирован; влияние размера кисти требует отдельного controlled experiment.

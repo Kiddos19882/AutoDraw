@@ -453,3 +453,12 @@
 - Независимый validation protocol переведён в BLOCKED: D1–D5 пока не подключены к matrix/block/UI/executor harness, а analyzer не сравнивает captures с immutable frozen predictions.
 - PROJECT_STATUS, TASKS, ROADMAP, WORK_LOG и docs index синхронизированы с фактическим состоянием исходников.
 - Production estimator/defaults, исходные экспериментальные данные и master не изменялись; code/tests/CI/live captures в рамках readiness audit не запускались.
+
+
+### INT-006 frozen prediction harness — 2026-11-02
+
+- Добавлены 15 frozen prediction records (D1–D5 × P0/P1/P2), hash-sealed artifact в durable block journal и prediction ID в 45 task/manifest cells.
+- Реализован независимый analyzer: exact CHALK, geometry/profile/task/journal binding, completed attempt integrity, run/per-stroke residuals и error metrics.
+- Executor handoff сверяет prediction ID; Brush Test UI запрещает ручной запуск D1–D5 вне INT006 block.
+- Full CI [41513389663](https://github.com/Kiddos19882/AutoDraw/actions/runs/41513389663) — success: Preparation/G3 667 passed + 82 subtests; integration, executor, Game Monitor/bridge, pixel audit и Windows portable build/startup smoke-test success.
+- Созданы инструкции frozen analyzer и local Windows preflight. Production estimator/defaults и live experiment data не менялись.

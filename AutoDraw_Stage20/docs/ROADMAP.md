@@ -206,3 +206,17 @@ Harness V1–V5: matrix metadata/validator, block planner/journal, Brush Test UI
 - [x] Исправить статус D1–D5 protocol на BLOCKED; создать отдельный readiness audit.
 - [ ] Расширить существующий harness отдельной INT006 phase, не меняя production estimator/defaults.
 - [ ] Пройти полный CI и Windows portable smoke-test; затем передать локальную инструкцию preflight.
+
+
+## 2026-11-02 — INT-006 software gate PASS
+
+- [x] D1–D5 matrix/UI/executor handoff и 45-cell block journal.
+- [x] 15 frozen prediction records и hash-sealed journal artifact.
+- [x] Независимый analyzer exact CHALK с run-level/per-stroke metrics.
+- [x] Regression tests для artifact, geometry, matrix cells и handoff.
+- [x] Full CI [41513389663](https://github.com/Kiddos19882/AutoDraw/actions/runs/41513389663): 667 passed, 82 subtests; pixel audit и Windows portable build/startup smoke-test success.
+- [ ] Локальный Windows 10 preflight.
+- [ ] 45 live captures и анализ safety margin.
+- [ ] INT-007 integration только после принятия результатов INT-006.
+
+Подробности: [frozen predictions/analyzer](CHALK_INT006_FROZEN_PREDICTIONS_AND_ANALYZER_2026-11-02.md), [local preflight](CHALK_INT006_LOCAL_PREFLIGHT_GUIDE_2026-11-02.md).

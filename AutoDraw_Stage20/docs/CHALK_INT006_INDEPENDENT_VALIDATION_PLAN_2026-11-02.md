@@ -232,10 +232,19 @@ INT-006 можно закрыть только после:
 
 ## 11. Текущий статус запуска
 
-- [ ] Реализовать отдельную INT006 phase в matrix metadata, block planner/journal, Brush Test UI и executor handoff.
-- [ ] Подготовить immutable prediction records и INT006 analyzer.
-- [ ] Добавить regression tests и пройти полный CI, включая Windows portable build/startup smoke-test.
-- [ ] После CI выполнить локальный Windows preflight.
+- [x] Реализовать отдельную INT006 phase в matrix metadata, block planner/journal, Brush Test UI и executor handoff.
+- [x] Подготовить 15 immutable prediction records (D1–D5 × P0/P1/P2), связать их с 45 задачами журнала и manifest metadata.
+- [x] Добавить analyzer exact capture matching, journal-attempt binding, per-run/per-stroke residuals и error metrics.
+- [x] Добавить regression tests на artifact integrity, 45 cells, geometry binding и executor handoff.
+- [x] Пройти полный CI [41513389663](https://github.com/Kiddos19882/AutoDraw/actions/runs/41513389663): 667 passed, 82 subtests passed; pixel audit и Windows portable build/startup smoke-test success.
+- [ ] Выполнить локальный Windows 10 preflight по [инструкции](CHALK_INT006_LOCAL_PREFLIGHT_GUIDE_2026-11-02.md).
 - [ ] Только после preflight и явного подтверждения чистой доски начать 45 live captures.
 
 До выполнения этих пунктов не запускать D1–D5 через существующие V-фазы или вручную. Production estimator/defaults остаются неизменными.
+
+
+## 12. Software gate закрыт — 2026-11-02
+
+Кодовый commit `ca8c9b3bd739ea0a5b557b87fc0106ecfde81216` прошёл полный workflow [41513389663](https://github.com/Kiddos19882/AutoDraw/actions/runs/41513389663): Preparation/G3 — 667 passed и 82 subtests passed; Application integration, Executor regression, Game Monitor/bridge, INT-006 pixel audit и Windows portable build/startup smoke-test — success. Portable artifact: `autodraw-g3-preflight-build`.
+
+D1–D5 harness, frozen predictions и analyzer реализованы. Следующий шаг — локальный Windows preflight. 45 live captures не начинать до проверки preflight и подтверждения чистой доски/точного CHALK baseline.

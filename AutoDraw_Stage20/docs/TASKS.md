@@ -416,3 +416,18 @@ Software gate закрыт; live gate остаётся открытым. Авт�
 - [x] Создать [аудит готовности harness](CHALK_INT006_HARNESS_READINESS_AUDIT_2026-11-02.md) и изменить статус validation protocol с READY FOR LIVE VALIDATION на BLOCKED.
 - [ ] Реализовать отдельную INT006 phase без изменения production estimator/defaults.
 - [ ] Добавить regression tests, подтвердить полный CI и подготовить Windows 10 preflight.
+
+
+## INT-006 — frozen validation software gate (2026-11-02)
+
+- [x] Подключить D1–D5 к отдельной фазе INT006 и 45-cell block journal.
+- [x] Создать 15 frozen prediction records и hash-sealed artifact в journal до первого capture.
+- [x] Связать prediction ID с каждой task/manifest и проверить ID на executor handoff.
+- [x] Реализовать independent analyzer exact CHALK, journal/attempt/geometry/profile binding и run/per-stroke metrics.
+- [x] Добавить regression tests: artifact round-trip/integrity, 45 cells, geometry mismatch, prediction ID и executor handoff.
+- [x] Подтвердить полный CI [41513389663](https://github.com/Kiddos19882/AutoDraw/actions/runs/41513389663): 667 passed, 82 subtests passed; Windows portable build/startup smoke-test и pixel audit success.
+- [ ] Выполнить локальный Windows 10 preflight по [инструкции](CHALK_INT006_LOCAL_PREFLIGHT_GUIDE_2026-11-02.md).
+- [ ] Только после preflight и проверки чистой доски начать 45 live captures.
+- [ ] Рассчитать safety margin и границы применимости модели.
+
+До завершения live validation INT-006 остаётся IN_PROGRESS, INT-007 — BLOCKED; production estimator/defaults не менять.

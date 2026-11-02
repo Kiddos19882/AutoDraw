@@ -841,3 +841,12 @@ Per-run transport gates чистые: `dropped_events=0`, `monitor_error_count_d
 Статически проверены `chalk_experiment_matrix.py`, `chalk_test_blocks.py`, `brush_behavior_test_ui.py`, `integrated_app.py` и `tests/analyze_chalk_experiment_matrix.py`. D1–D5 отсутствуют в текущих matrix scenarios/expected counts, block planner/journal, Brush Test UI и allowlist executor override. Общий analyzer валидирует telemetry manifests и агрегирует repeats, но не сравнивает их с immutable frozen prediction records и не рассчитывает validation residuals.
 
 Поэтому независимый протокол не готов к live запуску, несмотря на ранее указанное READY FOR LIVE VALIDATION. Статус исправлен на BLOCKED. Создан `CHALK_INT006_HARNESS_READINESS_AUDIT_2026-11-02.md`; следующий шаг — расширить существующий harness и добавить regression tests. Production estimator/defaults, исходные данные и master не менялись. Кодовые тесты и live captures в рамках этого аудита не запускались.
+
+
+## 2026-11-02 — INT-006 software gate PASS
+
+В ветке `feature/image-geometry-optimization` реализованы D1–D5, 45-cell block journal, 15 frozen prediction records, hash-sealed artifact и независимый analyzer. Prediction ID связывает journal task, matrix metadata и executor handoff.
+
+Полный CI [41513389663](https://github.com/Kiddos19882/AutoDraw/actions/runs/41513389663) завершился **SUCCESS** на code commit `ca8c9b3bd739ea0a5b557b87fc0106ecfde81216`: Preparation/G3 — 667 passed, 82 subtests passed; Application integration, Executor regression, Game Monitor/bridge, pixel-level audit и Windows portable build/startup smoke-test — success. Artifact `autodraw-g3-preflight-build` ID `13173632860`.
+
+Следующий gate — локальный Windows 10 preflight. 45 live captures не выполнялись. Production estimator/defaults и master не менялись. См. [frozen predictions/analyzer](CHALK_INT006_FROZEN_PREDICTIONS_AND_ANALYZER_2026-11-02.md) и [local preflight guide](CHALK_INT006_LOCAL_PREFLIGHT_GUIDE_2026-11-02.md).
