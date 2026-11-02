@@ -40,7 +40,7 @@
 | INT-003 | IN_PROGRESS | Завершить оценку overhead Game Monitor | Exact counter и telemetry подтверждены. Осталось сопоставимое A/B/C измерение Monitor off / версий Monitor с отдельными FPS, длительностью и overhead. Не блокирует точность CHALK capture, но нужен для оценки накладных расходов. |
 | INT-004 | DONE | Автоматически собирать telemetry и связывать её с experiment ID | WebSocket bridge, per-run capture, RunRecorder и запись monitor report/идентификаторов в experiment manifest использованы в принятых G1–G3 captures. Overhead comparison относится к INT-003. |
 | INT-005 | DONE | Реализовать автоматизированную лабораторию CHALK-экспериментов | Matrix/block runner, task identity, повторения, manifest, recovery/fail-closed gates и capture acceptance использованы для G1 12/12, G2 18/18 и G3 27/27. |
-| INT-006 | IN_PROGRESS | Исходные и follow-up V1–V5 captures/pixel audit приняты. Следующий gate — реализация отдельной INT006 harness phase для D1–D5: matrix, 45-cell block journal, UI plans, executor override, immutable predictions и analyzer. До прохождения CI и Windows preflight live validation заблокирована. Production defaults/estimator не менять. См. [harness readiness audit](CHALK_INT006_HARNESS_READINESS_AUDIT_2026-11-02.md) и [validation protocol](CHALK_INT006_INDEPENDENT_VALIDATION_PLAN_2026-11-02.md). |
+| INT-006 | IN_PROGRESS | D1–D5 live block выполнен: 45/45 captures. Все 45 manifest/Monitor report доступны; предварительный разбор подтвердил exact CHALK, per-stroke sum и нулевые Monitor/Bridge integrity counters. Предварительные метрики: MAE 1.408, RMSE 1.967, bias -0.875, MAPE 2.134%, max underprediction 1.82 CHALK. Ожидаются официальный analyzer JSON, hash/binding validation и отдельное решение по safety margin. См. [предварительные результаты](CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md) и [frozen analyzer](CHALK_INT006_FROZEN_PREDICTIONS_AND_ANALYZER_2026-11-02.md). Production estimator/defaults не менять. |
 | INT-007 | BLOCKED | Интегрировать валидированную модель в preflight/resource estimator AutoDraw | Начинать только после независимой validation INT-006 и определения консервативного safety margin. |
 | INT-008 | TODO | Оптимизировать кисти, траектории, порядок и покрытие | Подбирать способ построения рисунка в пределах квоты CHALK с учётом качества покрытия; зависит от INT-006/007. |
 | INT-009 | TODO | Сравнить прогноз с фактом и проверить качество | Проверить на независимых рисунках прогноз, exact CHALK delta, визуальное качество и устойчивость к разным типам геометрии. |
@@ -425,9 +425,14 @@ Software gate закрыт; live gate остаётся открытым. Авт�
 - [x] Связать prediction ID с каждой task/manifest и проверить ID на executor handoff.
 - [x] Реализовать independent analyzer exact CHALK, journal/attempt/geometry/profile binding и run/per-stroke metrics.
 - [x] Добавить regression tests: artifact round-trip/integrity, 45 cells, geometry mismatch, prediction ID и executor handoff.
-- [x] Подтвердить полный CI [41513389663](https://github.com/Kiddos19882/AutoDraw/actions/runs/41513389663): 667 passed, 82 subtests passed; Windows portable build/startup smoke-test и pixel audit success.
-- [ ] Выполнить локальный Windows 10 preflight по [инструкции](CHALK_INT006_LOCAL_PREFLIGHT_GUIDE_2026-11-02.md).
-- [ ] Только после preflight и проверки чистой доски начать 45 live captures.
-- [ ] Рассчитать safety margin и границы применимости модели.
+- [x] Подтвердить software CI [41513389663](https://github.com/Kiddos19882/AutoDraw/actions/runs/41513389663): 667 passed, 82 subtests passed; Windows portable build/startup smoke-test и pixel audit success.
+- [x] Выполнить live block D1–D5: 45/45 tasks completed, одна завершённая попытка на задачу, radius=10.
+- [x] Провести предварительный аудит 45 experiment manifests и 45 Monitor reports: exact CHALK, stroke count/sum, zero dropped events/errors/Bridge failures/sequence gaps.
+- [x] Пересчитать предварительные run-level и per-stroke метрики; результат записан в [CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md](CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md).
+- [x] Исправить analyzer path binding для перенесённых capture bundles и добавить regression test на исходный Windows absolute path.
+- [x] Добавить analyzer step и JSON artifact upload в `.github/workflows/geometry-tests.yml`.
+- [ ] Подтвердить новый CI после analyzer/workflow изменений и получить официальный analyzer JSON report: 45 accepted, 0 missing, 0 rejected.
+- [ ] Подтвердить SHA-256 frozen artifact и все journal/task/experiment/run/profile/geometry bindings штатным analyzer.
+- [ ] На основании официального report определить safety margin и границы применимости модели.
 
-До завершения live validation INT-006 остаётся IN_PROGRESS, INT-007 — BLOCKED; production estimator/defaults не менять.
+INT-006 остаётся IN_PROGRESS до официального analyzer report и решения по safety margin; INT-007 — BLOCKED. Production estimator, executor defaults и sampling defaults не менять.
