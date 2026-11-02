@@ -1,5 +1,21 @@
 # Журнал работ AutoDraw
 
+## 2026-11-03 — реализация INT006R radius × geometry harness
+
+**Ветка:** `feature/image-geometry-optimization`  
+**Основание:** разрешение пользователя на продолжение проекта и все необходимые действия.
+
+- В `chalk_experiment_matrix.py` добавлены отдельные D1–D5R scenario IDs, expected stroke counts, допустимые радиусы 1/10/30 и строгий sampling P1 (step=4, delay=5 ms). Обычные фазы и frozen INT-006 radius=10 contract сохранены.
+- В `chalk_test_blocks.py` добавлен отдельный детерминированный 45-cell block: пять геометрий × три радиуса × три повтора. Journal validator проверяет полный набор ячеек, уникальность task/order IDs, радиус, P1, отсутствие prediction artifact и запрет смешивания серий.
+- В Brush Test добавлены отдельные D1–D5R сценарии; радиус для каждой задачи устанавливается из task journal. Ручной запуск этих сценариев вне полного блока заблокирован.
+- В `integrated_app.py` добавлен fail-closed executor handoff: только INT006R, D1–D5R, radius 1/10/30 и P1; requested brush должен совпадать с task metadata.
+- Добавлен независимый `chalk_int006r_validation.py`, который не загружает frozen INT-006 model и анализирует exact CHALK, journal/task/experiment/run binding, полноту 45 captures, разброс по геометрии/радиусу и разницу относительно radius=10.
+- Добавлены unit tests `test_chalk_int006r_validation.py` и интеграционный тест executor handoff в `test_unified_app.py`.
+- Обновлены TASKS, PROJECT_STATUS, план INT006R и индексные документы.
+
+**Границы:** кодовая реализация добавлена, но CI для нового HEAD ещё не подтверждён. Live captures не запускались. Production estimator, frozen INT-006 artifact, executor defaults, sampling defaults и `master` не менялись. Следующий gate — полный CI, включая Windows portable build/startup smoke-test.
+
+
 ## 2026-10-31 — создание базового комплекта документации
 
 - Проверено дерево репозитория и основные конфигурационные файлы.
