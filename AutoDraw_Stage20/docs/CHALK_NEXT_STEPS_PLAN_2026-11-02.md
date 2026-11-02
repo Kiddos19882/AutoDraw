@@ -7,20 +7,21 @@
 
 ## Текущий статус INT-006 — 2026-11-02
 
-INT-006 остаётся IN_PROGRESS. Harness V1–V5 и regression tests реализованы; CI #1886 пройден. Пользователь выполнил и загрузил все 45 live captures коммитом [6479536](https://github.com/Kiddos19882/AutoDraw/commit/64795362aa1bf4d0a3587e119b8c959242be6181); CI #1887 на этом commit завершился success. Каждый из пяти block journals имеет 9/9 completed, exact CHALK и per-run Monitor integrity подтверждены для 45/45 runs.
+INT-006 остаётся IN_PROGRESS. Harness V1–V5 и regression tests реализованы. Исходные 45 captures и исходный pixel-level audit сохранены отдельно. После исправлений сценариев пользователь выполнил полный follow-up: commit [e879a77](https://github.com/Kiddos19882/AutoDraw/commit/e879a77f63be7a7a68de3f09091eab7dba0d34a2) содержит пять block journals (каждый 9/9 completed), 45 experiment manifests, 45 Game Monitor reports и соответствующие PNG. Все 45 captures приняты для анализа exact CHALK и Monitor integrity.
 
-Сводный отчёт: [CHALK_INT006_V1_V5_RESULTS_2026-11-02.md](CHALK_INT006_V1_V5_RESULTS_2026-11-02.md). Step=4 снизил CHALK примерно на 48–49% для V1/V3/V4/V5 и на 23–25% для V2. G1-модель проверена без refit на 66 новых per-stroke наблюдениях P0: MAE 1.09, RMSE 1.33, bias −1.04, MAPE 1.71%. Исследовательские step=4 fits около 0.149 CHALK/logical px ещё не являются независимой validation.
+Новые средние exact CHALK P0/P1/P2 (step2/delay10; step4/delay5; step4/delay10): V1 251.67/131.33/132.33; V2 39.00/24.00/23.67; V3 344.00/175.33/174.00; V4 438.33/229.00/229.33; V5 407.67/216.00/216.33. Step=4 дал экономию 38.5–49.4% относительно step=2. Разница delay=5/10 ms при step=4 не превышает примерно 1.4% по среднему расходу. Все новые серии проведены при radius=10; они не дают новых данных о влиянии размера кисти. Подробные raw repeat values: [CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md](CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md).
 
-Pixel-level audit 45/45 и ручной review representative overlays выполнены. DrawingPlan V1/V3 исправлены в harness с isolation gate >20 logical px. Для V4 добавлен cursor-free post-draw capture: mouseUp, перемещение за пределы board ROI, повторный screenshot; добавлены unit/regression tests. Corrective code HEAD `3e8e6c5` прошёл полный CI run [41470680544](https://github.com/Kiddos19882/AutoDraw/actions/runs/41470680544): все обязательные jobs, Windows portable build и PNG audit успешны. Перемещение курсора изолировано только в automated post-draw; ручной capture не затронут. Открыты live follow-up V1/V3/V4 (см. [протокол повторных геометрических серий](CHALK_INT006_V1_V3_V4_FOLLOWUP_2026-11-02.md)) и V2/V5 (см. [отдельный протокол](CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md)), независимая validation step=4/полных DrawingPlan и safety margin. Production executor defaults и estimator не менять.
+В новых manifests записано перемещение курсора ниже `board_area` и `paint_meter_area` с отступом 32 px; paint-meter screenshot estimate остаётся inconclusive. ROI visibility heuristic неоднозначна на V3/V4/V5, поэтому количественный pixel-level аудит новых 45 PNG — следующий gate. Не переносить выводы исходного pixel-level аудита автоматически на новые captures. После pixel audit требуется независимая validation модели на полных DrawingPlan, затем safety margin. Production executor defaults и estimator не менять.
 
 Порядок дальнейшей работы:
 1. [x] Зафиксировать контракт V1–V5 и единицы координат (logical DrawingPlan vs screen-pixel sampling step).
 2. [x] Реализовать поддержку V1–V5 в экспериментальном harness и добавить regression tests.
 3. [x] Подтвердить CI/Windows startup smoke-test для исходной реализации.
-4. [x] Выполнить 45 live captures и сохранить исходные manifests/reports/PNG в commit 6479536.
+4. [x] Выполнить исходные 45 live captures и сохранить raw data в commit 6479536.
 5. [x] Исправить legacy V2/V5 manifest compatibility и V5 integration fixture; полный CI на `3e8e6c5` прошёл run `41470680544`.
-6. [ ] Выполнить live follow-up V1/V3/V4 по [протоколу повторных геометрических серий](CHALK_INT006_V1_V3_V4_FOLLOWUP_2026-11-02.md) и V2/V5 по [отдельному протоколу](CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md), не смешивая новые серии с исходными captures.
-7. [ ] Провести независимую validation CHALK-модели на новых DrawingPlan; только после неё рассчитать safety margin.
+6. [x] Выполнить live follow-up V1–V5: 45/45 captures, commit `e879a77`; exact CHALK и per-run Monitor integrity приняты.
+7. [ ] Выполнить pixel-level аудит новых 45 follow-up PNG и проверить ambiguous overlays V3/V4/V5.
+8. [ ] Провести независимую validation CHALK-модели на новых DrawingPlan; только после неё рассчитать safety margin.
 
 ## Цель
 
