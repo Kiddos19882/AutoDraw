@@ -774,3 +774,13 @@ Per-run transport gates чистые: `dropped_events=0`, `monitor_error_count_d
 - Подробности: [CHALK_INT006_PNG_SCREENING_2026-11-02.md](CHALK_INT006_PNG_SCREENING_2026-11-02.md).
 
 **Статус INT-006:** IN_PROGRESS. Production code, executor defaults и estimator не менялись.
+
+
+## INT-006 — инвентаризация PNG и блокер количественного аудита (2026-11-02)
+
+- По Git tree data commit `6479536` подтверждено наличие 45/45 experiment manifests, 45/45 Monitor reports, 45/45 blank board references и 45/45 after-draw board PNG (270 PNG всего в шести capture-категориях).
+- Blank/reference board сохранён для каждого run; данные достаточны для differential segmentation.
+- Количественные pixel metrics не публиковались: бинарные PNG доступны через GitHub connector preview/base64, но не доступны как локальные файлы для OpenCV в текущем runtime; raw GitHub download из контейнера блокируется отсутствием DNS/network.
+- Отчёт: [CHALK_INT006_PNG_SCREENING_2026-11-02.md](CHALK_INT006_PNG_SCREENING_2026-11-02.md), разделы 7–8.
+- Следующий шаг: выполнить пакетную сегментацию в checkout-среде, где доступны PNG и зависимости Pillow/NumPy/OpenCV; сохранить per-stroke JSON/CSV и diagnostic overlays. Сначала проверить маски на одном capture каждой фазы/профиля.
+- Pixel-level gate остаётся OPEN. Production code, defaults и estimator не менялись.
