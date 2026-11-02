@@ -10,7 +10,7 @@
 - [x] Cursor-placement fix и regression tests прошли полный CI run [41486593544](https://github.com/Kiddos19882/AutoDraw/actions/runs/41486593544), включая Windows portable build/startup smoke-test и INT-006 PNG audit.
 - [x] Получена первичная holdout-проверка G1-модели на 66 новых штрихах P0 (MAE 1.09, RMSE 1.33, MAPE 1.71%).
 - [x] Выполнить live follow-up V1/V3/V4 и V2/V5: 45/45 captures в commit `e879a77`; все блоки 9/9 completed, exact CHALK и per-run Monitor integrity приняты.
-- [ ] Выполнить pixel-level аудит новых 45 follow-up PNG; ROI heuristic неоднозначна для V3/V4/V5 и не заменяет image-mask analysis.
+- [x] Выполнить pixel-level аудит новых 45 follow-up PNG в CI `41496555297`: 90/90 captures valid; 297/297 новых strokes coverage=1.0, zero gaps; V4 closure seams 27/27 covered; V5 spacing 8/12 merge, 16/20/24 separated при radius=10.
 - [ ] Завершить независимую validation step=4 и полных DrawingPlan; только затем определить safety margin.
 
 Подробные данные: [исходная live-матрица](CHALK_INT006_V1_V5_RESULTS_2026-11-02.md), [новые follow-up результаты](CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md), [протокол V1/V3/V4](CHALK_INT006_V1_V3_V4_FOLLOWUP_2026-11-02.md), [протокол V2/V5](CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md). Production defaults и estimator не менялись. Исторические записи ниже сохраняются для хронологии и не переопределяют этот статус.
