@@ -93,6 +93,33 @@ def _sha256(value: Any) -> str:
     return hashlib.sha256(_canonical_json(value).encode("utf-8")).hexdigest()
 
 
+def _normalize_manifest_strokes(strokes: Any) -> list[dict[str, Any]]:
+    """Project runtime stroke records onto the frozen logical geometry contract."""
+    if not isinstance(strokes, list):
+        raise ValueError("planned_strokes_not_a_list")
+    normalized = []
+    for stroke in strokes:
+        if not isinstance(stroke, dict) or stroke.get("closed") is not False:
+            raise ValueError("planned_stroke_schema_invalid")
+        name = stroke.get("name")
+        points = stroke.get("points")
+        if not isinstance(name, str) or not name or not isinstance(points, list) or len(points) != 2:
+            raise ValueError("planned_stroke_geometry_invalid")
+        normalized_points = []
+        for point in points:
+            if not isinstance(point, dict) or set(point) != {"x", "y"}:
+                raise ValueError("planned_stroke_point_invalid")
+            coordinates = []
+            for axis in ("x", "y"):
+                value = point.get(axis)
+                if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+                    raise ValueError("planned_stroke_coordinate_invalid")
+                coordinates.append(int(value) if float(value).is_integer() else float(value))
+            normalized_points.append(coordinates)
+        normalized.append({"name": name, "points": normalized_points})
+    return normalized
+
+
 def _distance(stroke: dict[str, Any]) -> float:
     points = stroke.get("points")
     if not isinstance(points, list) or len(points) != 2:
@@ -347,10 +374,23 @@ def analyze_int006_validation(
         if matrix.get("prediction_id") != prediction_id:
             rejected.append({"path": str(manifest_path), "reason": "prediction_id_mismatch"})
             continue
-        if matrix.get("geometry_signature") != prediction["geometry_signature"]:
+        manifest_strokes = matrix.get("planned_strokes")
+        try:
+            normalized_strokes = _normalize_manifest_strokes(manifest_strokes)
+        except (TypeError, ValueError, OverflowError):
             rejected.append({"path": str(manifest_path), "reason": "geometry_signature_mismatch"})
             continue
-        if matrix.get("requested_radius") != RADIUS or matrix.get("planned_strokes") != prediction["planned_strokes"]:
+        # The live DrawingPlan serializer enriches strokes with runtime metadata,
+        # closed flags and {x, y} point objects. Verify that representation's own
+        # hash, then compare its normalized logical geometry to the frozen plan.
+        if (
+            matrix.get("geometry_signature") != _sha256(manifest_strokes)
+            or normalized_strokes != prediction["planned_strokes"]
+            or _sha256(normalized_strokes) != prediction["geometry_signature"]
+        ):
+            rejected.append({"path": str(manifest_path), "reason": "geometry_signature_mismatch"})
+            continue
+        if matrix.get("requested_radius") != RADIUS:
             rejected.append({"path": str(manifest_path), "reason": "radius_or_geometry_mismatch"})
             continue
         if matrix.get("executor_parameters") != prediction["executor_parameters"]:
