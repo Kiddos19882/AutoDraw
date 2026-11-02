@@ -826,3 +826,10 @@ Per-run transport gates чистые: `dropped_events=0`, `monitor_error_count_d
 - Новые captures записывают post-draw cursor ниже доски и paint meter, с исключением обеих ROI и отступом 32 px. Paint-meter estimate inconclusive и не используется как источник расхода.
 - **INT-006 остаётся IN_PROGRESS:** pixel-level аудит именно новых 45 PNG ещё впереди; ROI visibility heuristic неоднозначна на V3/V4/V5. Затем независимая validation на полных DrawingPlan и safety margin.
 - Все серии выполнены при radius=10; влияние радиуса в этом follow-up не измерялось. Production executor defaults и estimator не менялись.
+
+
+## CI: series-aware INT-006 PNG audit — 2026-11-02
+
+Первый run на commit e879a77 (41493449244) обнаружил 90 captures вместо ожидаемых 45 и false duplicate matrix cells: анализатор не различал исходную и follow-up серии. При этом все 90 captures были valid, missing/unexpected cells и batch failures отсутствовали. Исправлено: matrix identity включает series_id + phase, проверка 9 cells выполняется отдельно для каждой серии; CSV/JSON сохраняют series_id. Добавлены regression tests для одинаковых ячеек в разных series и для настоящего duplicate внутри одной series.
+
+Полный CI run [41496555297](https://github.com/Kiddos19882/AutoDraw/actions/runs/41496555297) на HEAD 956ce2b — **SUCCESS**: Game Monitor/bridge, integration, executor, Preparation/G3, series-aware pixel audit, Windows portable build/startup smoke-test. PNG artifact: [autodraw-int006-png-analysis](https://github.com/Kiddos19882/AutoDraw/actions/runs/41496555297/artifacts/13165359929). Portable build artifact: [autodraw-g3-preflight-build](https://github.com/Kiddos19882/AutoDraw/actions/runs/41496555297/artifacts/13165884603).
