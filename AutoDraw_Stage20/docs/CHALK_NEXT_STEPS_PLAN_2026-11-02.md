@@ -9,11 +9,11 @@
 
 INT-006 активна. Исполнительный протокол и детальная матрица V1–V5 зафиксированы в [CHALK_INT006_EXECUTION_PROTOCOL_2026-11-02.md](CHALK_INT006_EXECUTION_PROTOCOL_2026-11-02.md).
 
-Первичный аудит показал, что текущая реализация лаборатории содержит G1/G2/G3, но не V1–V5. До live-испытаний требуется расширить и согласовать matrix metadata/validator, block planner/journal, Brush Test UI, capture acceptance, analyzer и regression tests. Это подготовительная инженерная часть INT-006; production executor defaults и estimator менять нельзя.
+Поддержка V1–V5 реализована поверх lifecycle G3: расширены matrix metadata/validator, block planner/journal, Brush Test UI и task-specific executor override; добавлены regression tests. Каждая V-фаза формирует 9 задач (3 sampling profiles × 3 повтора), всего 45 captures. Обязательный CI ещё не подтверждён. Production executor defaults и estimator менять нельзя.
 
 Порядок старта:
 1. Зафиксировать контракт V1–V5 и единицы координат (logical DrawingPlan vs screen-pixel sampling step).
-2. Реализовать поддержку V1–V5 в экспериментальном harness и покрыть её тестами.
+2. [x] Реализовать поддержку V1–V5 в экспериментальном harness и добавить regression tests.
 3. Подтвердить CI/Windows startup smoke-test.
 4. После проверки игровой сессии и тестовой доски выполнить 45 live captures.
 5. Выполнить независимую validation CHALK модели на новых DrawingPlan.
@@ -47,16 +47,18 @@ INT-006 активна. Исполнительный протокол и дет�
 
 ## Этап 1. Консолидация документации
 
-**Статус:** выполняется в рамках текущего запроса.
+**Статус:** DONE; консолидация выполнена и проверена 2026-11-02.
 
 - [x] Выделить актуальный статус проекта в начале PROJECT_STATUS.
 - [x] Сохранить предыдущую полную версию статуса как исторический снимок.
 - [x] Синхронизировать верхнюю таблицу TASKS с принятыми результатами.
-- [ ] Устранить противоречия в CHALK model и G3 Results.
-- [ ] Обновить ROADMAP, docs index, WORK_LOG и CHANGELOG.
-- [ ] Проверить все локальные ссылки, названия файлов и итоговый diff.
+- [x] Устранить противоречия в CHALK model и G3 Results.
+- [x] Обновить ROADMAP, docs index, WORK_LOG и CHANGELOG.
+- [x] Проверить локальные ссылки, названия файлов и документальный diff.
 
 ## Этап 2. Геометрическая валидация sampling step=4
+
+**Текущий статус:** harness V1–V5 готов к проверке CI; live captures не запускались.
 
 **Цель:** определить, можно ли безопасно применять step=4 не только к длинным горизонтальным линиям.
 
