@@ -391,13 +391,14 @@ Software gate закрыт; live gate остаётся открытым. Авт�
 Отчёт: [CHALK_INT006_PNG_SCREENING_2026-11-02.md](CHALK_INT006_PNG_SCREENING_2026-11-02.md). Production defaults и estimator не менять.
 
 
-## INT-006 — V2/V5 follow-up подготовлены (2026-11-02)
+## INT-006 — V2/V5 follow-up выполнены (2026-11-02)
 
 - [x] Создать отдельный V2 scenario `int006_short_strokes_followup`: пять штрихов 12/16/20/24/30 logical px.
 - [x] Создать отдельный V5 scenario `int006_intersections_spacing_sweep`: X/T/крест + пять пар spacing 8/12/16/20/24 logical px; 16 штрихов.
 - [x] Подключить сценарии к matrix metadata, block planner, Brush Test UI и regression tests; старые scenario IDs и captures не переиспользуются.
 - [x] Зафиксировать три профиля P0/P1/P2, три повтора и radius=10: по 9 captures на серию.
-- [ ] Подтвердить CI нового code HEAD.
-- [ ] Пользователю выполнить V2 и V5 live blocks; затем проверить все manifests, exact CHALK, per-stroke deltas, Monitor integrity и PNG.
+- [x] Подтвердить CI code HEAD `878bd1f`; обязательные jobs, Windows portable build/startup smoke-test и INT-006 PNG audit завершились success в run `41486593544`.
+- [x] Пользователь выполнил V2 и V5 live blocks; вместе с V1/V3/V4 получено 45/45 captures. Exact CHALK и per-run Monitor integrity подтверждены.
+- [ ] Выполнить pixel-level аудит новых 45 follow-up PNG; отдельно проверить ambiguous ROI V3/V4/V5.
 
-Инструкция: [CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md](CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md). Live-прогоны не выполнялись.
+Инструкции: [V1/V3/V4](CHALK_INT006_V1_V3_V4_FOLLOWUP_2026-11-02.md), [V2/V5](CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md). Итоги: [CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md](CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md).
