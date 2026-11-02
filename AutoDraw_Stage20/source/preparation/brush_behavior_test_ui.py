@@ -146,6 +146,40 @@ def select_execution_monitor_run(
     return None, "no_run_matches_executor_window", 0
 
 
+def _cursor_safe_point_outside_region(
+    region: dict[str, Any], screen_size: tuple[int, int], *, margin: int = 24
+) -> tuple[int, int]:
+    """Choose a screen point safely outside a calibrated ROI for unobstructed capture."""
+    if not isinstance(region, dict):
+        raise ValueError("Область доски не задана.")
+    try:
+        x, y, width, height = (int(region[key]) for key in ("x", "y", "width", "height"))
+        screen_width, screen_height = (int(value) for value in screen_size)
+        margin = int(margin)
+    except (KeyError, TypeError, ValueError):
+        raise ValueError("Некорректные размеры области доски или экрана.") from None
+    if width <= 0 or height <= 0 or screen_width <= 0 or screen_height <= 0 or margin < 1:
+        raise ValueError("Размеры области доски, экрана и отступ должны быть положительными.")
+    if x < 0 or y < 0 or x + width > screen_width or y + height > screen_height:
+        raise ValueError("Область доски выходит за пределы экрана.")
+
+    center_x, center_y = x + width // 2, y + height // 2
+    candidates = [
+        (x - margin - 1, center_y),
+        (x + width + margin, center_y),
+        (center_x, y - margin - 1),
+        (center_x, y + height + margin),
+    ]
+    valid = [
+        point for point in candidates
+        if 0 <= point[0] < screen_width and 0 <= point[1] < screen_height
+    ]
+    if not valid:
+        raise ValueError("Не удалось найти безопасную точку курсора за пределами доски.")
+    # Prefer the nearest valid off-board position to minimize unrelated pointer movement.
+    return min(valid, key=lambda point: (point[0] - center_x) ** 2 + (point[1] - center_y) ** 2)
+
+
 def _screen_local_strokes_for_capture(
     plan: dict[str, Any],
     board_size: tuple[int, int],
@@ -2830,7 +2864,22 @@ class BrushBehaviorTestTab:
                     f"профиль {expected_width} × {expected_height}, снимок "
                     f"{screen.width} × {screen.height}. Проверь DPI/масштаб и откалибруй заново."
                 )
-            crops = crop_calibrated_regions(screen, config.get("regions", {}))
+            regions = config.get("regions", {})
+            board_region = regions.get("board_area", {}) if isinstance(regions, dict) else {}
+            safe_cursor_point = _cursor_safe_point_outside_region(
+                board_region, screen.size, margin=24
+            )
+            # Executor completion releases the drawing gesture; explicitly release once more
+            # before moving so a delayed mouse-up cannot extend the final stroke.
+            pyautogui.mouseUp()
+            pyautogui.moveTo(*safe_cursor_point, duration=0)
+            time.sleep(0.15)
+            screen = ImageGrab.grab()
+            if isinstance(expected, dict):
+                ew, eh = expected.get("width"), expected.get("height")
+                if ew is not None and eh is not None and (int(ew), int(eh)) != screen.size:
+                    raise ValueError("Разрешение экрана изменилось после перемещения курсора.")
+            crops = crop_calibrated_regions(screen, regions)
             if self.experiment_dir is None:
                 raise ValueError("Папка эксперимента не создана.")
             screen_path = self.experiment_dir / f"{phase}-screen.png"
@@ -3074,6 +3123,12 @@ class BrushBehaviorTestTab:
                 "status": "captured",
                 "captured_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
                 "screen_size": {"width": screen.width, "height": screen.height},
+                "cursor_exclusion": {
+                    "status": "moved_outside_board_before_capture",
+                    "method": "mouse_up_then_move_without_click",
+                    "screen_point": {"x": safe_cursor_point[0], "y": safe_cursor_point[1]},
+                    "margin_px": 24,
+                },
                 "files": {"full_screen": screen_path.name, "board_roi": board_path.name, "paint_meter_roi": meter_path.name},
             }
             before = self.experiment_phases.get("before_draw")
