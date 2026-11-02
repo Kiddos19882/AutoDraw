@@ -55,3 +55,8 @@ Analyzer проверяет hash/содержимое artifact; 45 уникал�
 - Analyzer изменён только в части journal experiment-directory binding: вместо сравнения абсолютных путей используется уникальное имя каталога эксперимента, чтобы Windows captures можно было проверять после переноса в CI workspace. Добавлен regression test.
 - Workflow `.github/workflows/geometry-tests.yml` теперь запускает этот analyzer и сохраняет JSON report как artifact.
 - **Официальная quantitative validation пока не закрыта:** требуется подтвердить CI, получить analyzer JSON, проверить SHA-256 frozen artifact и accepted/missing/rejected counters. До этого `safety_margin_status=not_established`, `production_eligibility=not_validated`.
+
+
+## Hash and capture audit — 2026-11-03
+
+The frozen prediction artifact SHA-256 was independently recomputed from canonical JSON and matches the journal value: `a0eab016e96a81e14bededd32cf5161dd943d6fc85a20b7eec17455f69d0c61c`. All 45 Monitor reports were re-read and checked for exact CHALK, stroke-level pointDelta sum, unique observed radius=10, and zero Monitor/Bridge integrity counters. The official analyzer JSON remains pending.
