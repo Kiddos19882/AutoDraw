@@ -385,3 +385,11 @@
 ### Validation
 - Previous CI run `41468581157` had two legacy-count failures and one stale V5 fixture failure. Corrective commits: `0cac37c`, `706be60`.
 - Full CI rerun is pending; no live experiments were started.
+
+
+## 2026-11-02 — INT-006 corrective CI и синхронизация статусов
+
+- Полный CI run [41470680544](https://github.com/Kiddos19882/AutoDraw/actions/runs/41470680544) на code HEAD `3e8e6c5` завершился success: Application integration, Executor regression, Game Monitor/bridge, Preparation/G3, Windows portable build/startup smoke-test и INT-006 PNG audit.
+- Исправления legacy V2/V5 counts и V5 integration fixture подтверждены обязательными jobs. Optional algorithm benchmarks пропущены.
+- Уточнено разделение исходных V2/V5 сценариев и follow-up контрактов; исходные manifests остаются обратно совместимыми.
+- Обновлены PROJECT_STATUS, TASKS, CHALK_NEXT_STEPS_PLAN и CHALK_INT006_EXECUTION_PROTOCOL. Live follow-up и независимая validation модели остаются незавершёнными.
