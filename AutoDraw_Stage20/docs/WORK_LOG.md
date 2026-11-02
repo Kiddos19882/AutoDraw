@@ -1818,3 +1818,16 @@ Brush Test acceptance и матричные валидаторы больше н
 - Статус INT-006 сохранён IN_PROGRESS; production executor defaults, estimator и исходные экспериментальные данные не изменялись.
 - Live captures, CI/workflows не запускались.
 - Следующий шаг: расширить экспериментальный harness под V1–V5 и покрыть его regression/orchestration tests.
+
+
+## 2026-11-02 — реализация INT-006 V1–V5 на инфраструктуре G3
+
+- Расширен `chalk_experiment_matrix.py`: добавлены V1–V5, expected stroke counts и allowlist профилей P0=2/10, P1=4/5, P2=4/10.
+- Расширен `chalk_test_blocks.py`: каждая V-фаза создаёт 9 уникальных задач, валидатор журнала проверяет полный набор профилей/повторов, порядок и число штрихов.
+- В `brush_behavior_test_ui.py` добавлены пять DrawingPlan и фазы в selector автоматического блока; одиночные ручные запуски V-сценариев запрещены.
+- В `integrated_app.py` task-specific executor override распространён на V1–V5 с fail-closed проверкой phase/scenario/radius/strokes/profile.
+- Добавлены tests для matrix metadata, sampling profiles, 9-cell block/journal, DrawingPlan и executor handoff V5.
+- V1 скорректирован: диагонали разнесены по ROI, чтобы не смешивать наклоны с непредусмотренными пересечениями.
+- Серия кодовых коммитов: `5e5655bc`, `9275b875`, `097cf50`, `47828c4`, `b8602b3`, `d0786e9`, `de30c6b`, `d2745f0`, `d8d43b0`, `b328eb1`, `5e4b78b`, `28b49f4`.
+- CI для конечного HEAD ещё не подтверждён; live captures не запускались.
+- Production defaults, estimator и исходные G1/G2/G3 datasets не изменялись.
