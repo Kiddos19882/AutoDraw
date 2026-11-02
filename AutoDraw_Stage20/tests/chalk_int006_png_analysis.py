@@ -169,6 +169,8 @@ def stroke_metrics(g: dict[str, Any], assigned: np.ndarray, candidate_count: int
         "ambiguous_fraction": round(ambiguous_count / candidate_count, 5) if candidate_count else None,
         "coverage_fraction": round(float(np.mean(covered[evaluable])), 5) if np.any(evaluable) else None,
         "evaluable_path_samples": int(np.count_nonzero(evaluable)),
+        "evaluable_path_fraction": round(float(np.mean(evaluable)), 5) if len(evaluable) else 0.0,
+        "path_metrics_sufficient": bool(np.mean(evaluable) >= .8) if len(evaluable) else False,
         "cursor_excluded_path_samples": int(np.count_nonzero(cursor_samples)),
         "ambiguous_excluded_path_samples": int(np.count_nonzero(ambiguous_samples)),
         "gap_count": len(gaps),
@@ -187,7 +189,7 @@ def stroke_metrics(g: dict[str, Any], assigned: np.ndarray, candidate_count: int
         "closure_seam_covered": (bool(start <= tolerance) if g["closed"] and start is not None else None),
     }
 
-def parallel_pairs(geometries: list[dict[str, Any]], masks: list[np.ndarray], scale: float) -> list[dict[str, Any]]:
+def parallel_pairs(geometries: list[dict[str, Any]], candidate_masks: list[np.ndarray], assigned_masks: list[np.ndarray], scale: float) -> list[dict[str, Any]]:
     result = []
     for i, a in enumerate(geometries):
         if len(a["points"]) != 2 or a["lengths"][0] <= 1: continue
@@ -199,8 +201,9 @@ def parallel_pairs(geometries: list[dict[str, Any]], masks: list[np.ndarray], sc
             angle = math.degrees(math.acos(float(np.clip(abs(np.dot(ua, ub)), -1, 1))))
             if angle > 5: continue
             separation = abs(float(np.dot(b["points"][0] - a["points"][0], [-ua[1], ua[0]])))
-            ma, mb = masks[i], masks[j]
-            overlap = int(np.count_nonzero((ma > 0) & (mb > 0)))
+            ca, cb = candidate_masks[i], candidate_masks[j]
+            ma, mb = assigned_masks[i], assigned_masks[j]
+            overlap = int(np.count_nonzero((ca > 0) & (cb > 0)))
             if np.any(ma) and np.any(mb):
                 dm = cv2.distanceTransform((mb == 0).astype(np.uint8), cv2.DIST_L2, 5)
                 distance = float(np.min(dm[ma > 0]))
@@ -209,7 +212,7 @@ def parallel_pairs(geometries: list[dict[str, Any]], masks: list[np.ndarray], sc
                 touching, distance = False, None
             result.append({"stroke_a": a["name"], "stroke_b": b["name"],
                 "axis_separation_logical": round(separation / scale, 4), "axis_angle_difference_deg": round(angle, 4),
-                "assigned_mask_overlap_pixels": overlap, "assigned_ink_masks_touch_or_merge": touching,
+                "candidate_mask_overlap_pixels": overlap, "assigned_ink_masks_touch_or_merge": touching,
                 "minimum_ink_mask_distance_px": round(distance, 4) if distance is not None else None,
                 "minimum_ink_mask_distance_logical": round(distance / scale, 4) if distance is not None else None})
     return result
@@ -267,7 +270,7 @@ def analyse_capture(folder: Path, out: Path) -> dict[str, Any]:
         stroke_rows.append(stroke_metrics(g, am, int(np.count_nonzero(candidate)),
             int(np.count_nonzero(candidate & ambiguous_pixels)) if len(x) else 0,
             cursor, ambiguous_mask, scale, radius))
-    pairs = parallel_pairs(gs, assigned_masks, scale)
+    pairs = parallel_pairs(gs, candidate_masks, assigned_masks, scale)
     errors = capture_errors(manifest, monitor, expected)
     summary = {
         "experiment_id": manifest.get("experiment_id"), "experiment_dir": str(folder),
@@ -349,7 +352,8 @@ def run(results_dir: Path, out: Path, expected_runs: int = 45) -> dict[str, Any]
     (out / "summary.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     stroke_fields = ["experiment_id", "phase_id", "scenario_id", "repeat_index", "point_step_px", "point_delay_ms",
         "exact_chalk", "capture_valid", "stroke_name", "planned_length_logical", "ink_pixels_assigned",
-        "ambiguous_fraction", "coverage_fraction", "gap_count", "max_gap_logical",
+        "ambiguous_fraction", "coverage_fraction", "evaluable_path_samples", "evaluable_path_fraction", "path_metrics_sufficient",
+        "cursor_excluded_path_samples", "ambiguous_excluded_path_samples", "gap_count", "max_gap_logical",
         "centerline_deviation_median_logical", "centerline_deviation_p95_logical", "centerline_deviation_max_logical",
         "coverage_width_median_logical", "coverage_width_p05_logical", "coverage_width_p95_logical",
         "coverage_width_cv", "mask_component_count", "closure_seam_center_distance_logical", "closure_seam_covered"]
@@ -364,7 +368,7 @@ def run(results_dir: Path, out: Path, expected_runs: int = 45) -> dict[str, Any]
                     "exact_chalk": r["exact_chalk"], "capture_valid": r["capture_valid"], **stroke})
     pair_fields = ["experiment_id", "phase_id", "scenario_id", "repeat_index", "point_step_px",
         "point_delay_ms", "capture_valid", "stroke_a", "stroke_b", "axis_separation_logical",
-        "axis_angle_difference_deg", "assigned_mask_overlap_pixels", "assigned_ink_masks_touch_or_merge",
+        "axis_angle_difference_deg", "candidate_mask_overlap_pixels", "assigned_ink_masks_touch_or_merge",
         "minimum_ink_mask_distance_px", "minimum_ink_mask_distance_logical"]
     with (out / "parallel_pair_metrics.csv").open("w", encoding="utf-8-sig", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=pair_fields, extrasaction="ignore"); writer.writeheader()
