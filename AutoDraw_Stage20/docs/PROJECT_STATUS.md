@@ -9,13 +9,13 @@
 
 # Текущее состояние проекта
 
-**Последнее обновление:** 2026-11-03 — CI analyzer run выявил несовпадение сериализации geometry; исправление внесено, повторный CI выполняется: [41532629748](https://github.com/Kiddos19882/AutoDraw/actions/runs/41532629748). Предыдущий run [41530634729](https://github.com/Kiddos19882/AutoDraw/actions/runs/41530634729) — FAILURE только на analyzer step; подробности ниже в журнале событий.
+**Последнее обновление:** 2026-11-03 — официальный INT-006 analyzer принял 45/45 captures, 0 missing/rejected; полный CI run [41532629748](https://github.com/Kiddos19882/AutoDraw/actions/runs/41532629748) завершился SUCCESS. Quantitative gate закрыт; safety margin и production eligibility остаются не установленными.
 
 **Актуально на:** 3 ноября 2026 г.  
 **Репозиторий:** `Kiddos19882/AutoDraw`  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
 **Состояние ветки:** analyzer portability и journal-binding fixes, regression tests, CI workflow и документационная синхронизация внесены в `feature/image-geometry-optimization`; `master` не менялся.
-**Последний подтверждённый полный CI до последних analyzer/workflow изменений:** run [41513389663](https://github.com/Kiddos19882/AutoDraw/actions/runs/41513389663), code HEAD `ca8c9b3bd739ea0a5b557b87fc0106ecfde81216`. Последние analyzer/test commits `284f5f0` и `2d99869` соответствуют push-фильтрам workflow; GitHub status endpoint не вернул check-run entries, поэтому новый CI result и analyzer artifact пока не подтверждены.  
+**Последний подтверждённый полный CI:** run [41532629748](https://github.com/Kiddos19882/AutoDraw/actions/runs/41532629748), code HEAD `dd64730e202ed6f6014fa2dd1a65c3100cc32018`; все обязательные jobs и независимый analyzer завершились success. Preparation/G3: 669 passed, 82 subtests passed; optional algorithm benchmarks skipped. Analyzer artifact `13182727663` содержит 45 accepted, 0 missing, 0 rejected и 15 complete groups.  
 > Этот блок — единственный источник текущего статуса. Ниже сохранена историческая хронология; старые статусы и планы не являются текущим backlog.
 
 ## Текущее состояние
@@ -26,10 +26,10 @@
 - Game Monitor exact CHALK определяется как `post.pointCount - pre.pointCount`. Визуальная оценка paint meter не заменяет точный счётчик.
 - **INT-006 D1–D5 live block завершён:** серия `chalk-20261102-232320-7cea27`, block `1f93ddcac07445b78093744c7cbabcde`, 45/45 задач completed, одна completed attempt на задачу, radius=10. Ветка содержит 45 соответствующих experiment manifests и 45 Monitor reports.
 - **Полный повторный аудит 45 captures выполнен:** все 45 manifests и 45 Monitor reports перечитаны. Exact CHALK, `sampled_point_delta_total` и сумма per-stroke `DRAW_SAMPLE.pointDelta` совпадают; stroke groups/count совпадают; observed radius=[10]; dropped events, Monitor error delta, Bridge send-failure delta и sequence gaps равны нулю. Experiment ID каждого report совпадает с journal attempt. Детали: [результаты INT-006](CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md).
-- Предварительные метрики 45 plan runs: MAE 1.408 CHALK, RMSE 1.967, bias -0.875, MAPE 2.134%, maximum underprediction 1.82 CHALK (D5/P2). По 243 stroke rows: MAE 0.439, RMSE 0.544, maximum underprediction 1.085 CHALK. Эти метрики пересчитаны из сохранённых JSON; SHA-256 frozen artifact независимо пересчитан и совпал с journal (`a0eab016e96a81e14bededd32cf5161dd943d6fc85a20b7eec17455f69d0c61c`). Официальный запуск `chalk_int006_validation.py` и полный journal/task/experiment/run/profile/geometry binding audit ещё ожидаются.
+- **Официальные метрики 45 plan runs:** MAE 1.408 CHALK, RMSE 1.967, bias -0.875, MAPE 2.134%, maximum underprediction 1.82 CHALK (D5/P2). По 243 stroke rows: MAE 0.439, RMSE 0.544, maximum underprediction 1.085 CHALK. Штатный analyzer завершился `status=complete`, 45 accepted, 0 missing, 0 rejected; все 15 groups имеют 3/3 repeats. Frozen artifact SHA-256 совпадает с journal. Подробности: [официальный отчёт INT-006](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md).
 - P1 (step=4, delay=5 ms) показал наименьшие предварительные MAE/RMSE и max underprediction среди профилей. Это кандидат для следующей проверки, не утверждённый production default. Step=4 снизил фактический расход на 21–47% относительно P0 в конкретных D1–D5; D4 short strokes дают меньшую экономию.
 - В analyzer исправлено сравнение абсолютного Windows experiment path: relocated capture bundles связываются с journal по имени experiment directory. Дополнительно analyzer сверяет `task.prediction_id` и `task.expected_strokes` с frozen prediction; regression tests покрывают Windows path и tampered journal prediction ID.
-- В `.github/workflows/geometry-tests.yml` добавлен запуск независимого INT-006 analyzer и загрузка JSON report как CI artifact. Run `41530634729` фактически выполнился, но analyzer отклонил все 45 captures из-за различий между runtime stroke serialization и frozen logical geometry. Исправление нормализации внесено в commits `8eba34f`/`dd64730`; повторный run `41532629748` выполняется.
+- В `.github/workflows/geometry-tests.yml` analyzer проверяет runtime manifest hash и нормализованную logical geometry против frozen plan. Первый run `41530634729` обнаружил несовпадение сериализаций; fix `8eba34f` и regression fixture `dd64730` устранили ошибку. Повторный run `41532629748` завершился SUCCESS, официальный JSON artifact проверен.
 - Production estimator, executor defaults, sampling defaults и `master` не менялись.
 
 ## Статусы инициатив
@@ -42,18 +42,18 @@
 | INT-003 | IN_PROGRESS | Требуется сопоставимое A/B/C измерение overhead/FPS Monitor off / Monitor versions. |
 | INT-004 | DONE* | WebSocket telemetry, per-run capture и привязка Monitor report к experiment используются; A/B/C overhead остаётся в INT-003. |
 | INT-005 | DONE* | Автоматические CHALK blocks, matrix, journal, recovery и fail-closed gates используются в принятых сериях. |
-| INT-006 | IN_PROGRESS | Live D1–D5 captures, повторный аудит 45/45 Monitor reports и SHA-256 frozen artifact завершены. Ожидаются CI confirmation, официальный analyzer report и полный journal/task/experiment/run/profile/geometry binding audit; затем отдельное решение по safety margin. |
+| INT-006 | IN_PROGRESS | Live captures, 45/45 Monitor audit, официальный analyzer (45 accepted, 0 missing/rejected), 15/15 complete groups и полный binding audit завершены. Осталось отдельно решить вопрос safety margin и расширить domain validation; production eligibility не подтверждена. |
 | INT-007 | BLOCKED | Интеграция валидированной модели в preflight/resource estimator запрещена до закрытия INT-006 и определения safety margin. |
 | INT-008 | TODO | Оптимизация траекторий, кистей, порядка и покрытия в пределах CHALK после INT-007. |
 | INT-009 | TODO | Независимая проверка прогноза на полных рисунках, визуального качества и фактической экономии. |
 
 ## Ближайший рабочий приоритет
 
-1. Получить итог run `41532629748` после исправления geometry serialization binding; при необходимости изучить analyzer logs/artifact.
-2. Получить официальный JSON report штатного analyzer: 45 accepted, 0 missing, 0 rejected, 15 complete profile/scenario groups.
-3. Сверить официальный report с предварительными метриками в [результатах INT-006](CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md).
-4. Только после официальной проверки решить вопрос о консервативном safety margin. Максимальная недооценка 1.82 CHALK пока является только эмпирическим максимумом данной выборки.
-5. Не начинать INT-007 и не менять production estimator/defaults до закрытия этих gates.
+1. Зафиксировать официальный analyzer PASS и сверить report с предварительными расчётами — выполнено; см. [официальный отчёт](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md).
+2. Рассмотреть P1 (step=4, delay=5 ms) как исследовательского кандидата: MAE 0.657, RMSE 0.838, MAPE 1.178%, max underprediction 0.92 CHALK на D1–D5.
+3. Принять отдельное решение о provisional empirical guard. Округлённый вверх наблюдённый максимум P1 равен 1 CHALK, но это не статистическая гарантия; D3/P1 имеет repeat σ≈1.41 CHALK.
+4. Расширить validation на полные реальные рисунки, кривые, заливки, повторное покрытие и другие радиусы. Unsupported geometry остаётся UNKNOWN.
+5. Не начинать INT-007 и не менять production estimator/defaults до отдельного решения о safety margin и расширенной проверке.
 
 ## Разрешения и границы
 
