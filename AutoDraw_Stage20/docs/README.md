@@ -22,6 +22,7 @@
 
 - [План дальнейших действий по модели CHALK](CHALK_NEXT_STEPS_PLAN_2026-11-02.md) — актуальная последовательность геометрической validation, независимой проверки estimator, safety margin и INT-007—INT-009.
 - [INT-006 — план независимой validation CHALK](CHALK_INT006_INDEPENDENT_VALIDATION_PLAN_2026-11-02.md) — новые DrawingPlan, замороженные прогнозы P0/P1/P2, повторения, критерии приёмки и расчёт ошибок.
+- [INT-006 — предварительные результаты D1–D5](CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md) — предварительный разбор 45 live captures, точные CHALK delta, run-level/per-stroke метрики и оставшиеся gates.
 - [INT-006 — аудит готовности harness](CHALK_INT006_HARNESS_READINESS_AUDIT_2026-11-02.md) — подтверждённые пробелы D1–D5 в matrix/block/UI/executor/analyzer и gates до live validation.
 - [INT-006 — протокол выполнения](CHALK_INT006_EXECUTION_PROTOCOL_2026-11-02.md) — профили P0/P1/P2, сценарии V1–V5, acceptance gates, независимая validation и аудит готовности лаборатории.
 - [INT-006 — отдельные live follow-up серии V1/V3/V4](CHALK_INT006_V1_V3_V4_FOLLOWUP_2026-11-02.md) — повторные captures исправленной геометрии, cursor-free closure validation и 9 captures на фазу.
