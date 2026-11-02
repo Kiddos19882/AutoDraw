@@ -366,12 +366,12 @@ TEST_CASES: dict[str, dict[str, Any]] = {
         "id": "int006_diagonals",
         "description": "INT-006 V1: шесть диагоналей разных наклонов.",
         "strokes": [
-            {"name": "slope_025", "points": [[20, 30], [420, 130]]},
-            {"name": "slope_050", "points": [[20, 30], [420, 230]]},
-            {"name": "slope_075", "points": [[20, 220], [420, 20]]},
-            {"name": "slope_100", "points": [[20, 20], [220, 220]]},
-            {"name": "slope_150", "points": [[80, 220], [213, 20]]},
-            {"name": "slope_200", "points": [[160, 220], [260, 20]]}
+            {"name": "slope_025", "points": [[20, 25], [180, 65]]},
+            {"name": "slope_050", "points": [[220, 20], [340, 80]]},
+            {"name": "slope_100", "points": [[20, 100], [100, 180]]},
+            {"name": "slope_200", "points": [[140, 100], [180, 180]]},
+            {"name": "negative_shallow", "points": [[220, 110], [380, 70]]},
+            {"name": "negative_steep", "points": [[380, 100], [340, 220]]}
         ],
     },
     "V2 — короткие штрихи 1–10 px": {
