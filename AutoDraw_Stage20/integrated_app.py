@@ -697,7 +697,7 @@ class AutoDrawUnifiedApp:
             if isinstance(matrix, dict) and matrix_phase in {"G3", "V1", "V2", "V3", "V4", "V5"}:
                 from chalk_experiment_matrix import (
                     GEOMETRY_EXECUTOR_CONFIG, EXPECTED_STROKES, PHASE_SCENARIOS,
-                    V_PHASES, V_SAMPLING_PROFILES,
+                    V_SAMPLING_PROFILES,
                 )
 
                 parameters = matrix.get("executor_parameters")
