@@ -11,7 +11,7 @@ INT-006 остаётся IN_PROGRESS. Harness V1–V5 и regression tests реа
 
 Новые средние exact CHALK P0/P1/P2 (step2/delay10; step4/delay5; step4/delay10): V1 251.67/131.33/132.33; V2 39.00/24.00/23.67; V3 344.00/175.33/174.00; V4 438.33/229.00/229.33; V5 407.67/216.00/216.33. Step=4 дал экономию 38.5–49.4% относительно step=2. Разница delay=5/10 ms при step=4 не превышает примерно 1.4% по среднему расходу. Все новые серии проведены при radius=10; они не дают новых данных о влиянии размера кисти. Подробные raw repeat values: [CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md](CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md).
 
-В новых manifests записано перемещение курсора ниже `board_area` и `paint_meter_area` с отступом 32 px; paint-meter screenshot estimate остаётся inconclusive. ROI visibility heuristic неоднозначна на V3/V4/V5, поэтому количественный pixel-level аудит новых 45 PNG — следующий gate. Не переносить выводы исходного pixel-level аудита автоматически на новые captures. После pixel audit требуется независимая validation модели на полных DrawingPlan, затем safety margin. Production executor defaults и estimator не менять.
+В новых manifests записано перемещение курсора ниже `board_area` и `paint_meter_area` с отступом 32 px; pixel audit подтвердил cursor_detected=false и cursor_exclusion_pixels=0 для всех 45 follow-up captures. Paint-meter screenshot estimate остаётся inconclusive. Pixel-level audit новых 45 PNG завершён: 297/297 strokes coverage=1.0 и zero gaps; V4 seams 27/27 covered; V5 spacing 8/12 merge, 16/20/24 separated при radius=10. Следующий gate — независимая validation модели на полных DrawingPlan, затем safety margin. Production executor defaults и estimator не менять.
 
 Порядок дальнейшей работы:
 1. [x] Зафиксировать контракт V1–V5 и единицы координат (logical DrawingPlan vs screen-pixel sampling step).
@@ -63,7 +63,7 @@ INT-006 остаётся IN_PROGRESS. Harness V1–V5 и regression tests реа
 
 ## Этап 2. Геометрическая валидация sampling step=4
 
-**Текущий статус:** 45/45 исходных live captures приняты; CI #1887 и pixel audit исходной серии пройдены. Исправления harness и legacy V2/V5 compatibility прошли полный corrective CI run `41470680544` на code HEAD `3e8e6c5`, включая Windows portable build и PNG audit. Геометрия V1/V3 исправлена в test harness; для V4 подготовлен cursor-free post-draw capture. Live follow-up V1/V3/V2/V4/V5 и независимая validation модели остаются открытыми.
+**Текущий статус:** 90/90 исходных + follow-up captures приняты; pixel audit обеих серий пройден. Исправления harness/legacy compatibility и cursor placement прошли CI `41470680544`/`41486593544`; новый series-aware audit и Windows build прошли run `41496555297`. Live follow-up V1/V3/V2/V4/V5 завершён (45/45); pixel metrics 297/297 strokes gap-free. Открыта независимая validation модели и safety margin.
 
 **Цель:** определить, можно ли безопасно применять step=4 не только к длинным горизонтальным линиям. Первичная матрица уже выполнена; текущая работа — quality audit и закрытие ограничений V1/V3/V2.
 
