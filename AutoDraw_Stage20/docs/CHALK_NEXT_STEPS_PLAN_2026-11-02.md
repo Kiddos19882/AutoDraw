@@ -5,6 +5,19 @@
 **Ветка:** `feature/image-geometry-optimization`  
 **Зависимости:** принятые G1 12/12, G2 18/18, G3 27/27 и radius matrix 21 опыта
 
+## Текущий статус INT-006 — 2026-11-02
+
+INT-006 активна. Исполнительный протокол и детальная матрица V1–V5 зафиксированы в [CHALK_INT006_EXECUTION_PROTOCOL_2026-11-02.md](CHALK_INT006_EXECUTION_PROTOCOL_2026-11-02.md).
+
+Первичный аудит показал, что текущая реализация лаборатории содержит G1/G2/G3, но не V1–V5. До live-испытаний требуется расширить и согласовать matrix metadata/validator, block planner/journal, Brush Test UI, capture acceptance, analyzer и regression tests. Это подготовительная инженерная часть INT-006; production executor defaults и estimator менять нельзя.
+
+Порядок старта:
+1. Зафиксировать контракт V1–V5 и единицы координат (logical DrawingPlan vs screen-pixel sampling step).
+2. Реализовать поддержку V1–V5 в экспериментальном harness и покрыть её тестами.
+3. Подтвердить CI/Windows startup smoke-test.
+4. После проверки игровой сессии и тестовой доски выполнить 45 live captures.
+5. Выполнить независимую validation CHALK модели на новых DrawingPlan.
+
 ## Цель
 
 Получить проверенную модель, которая до запуска рисунка прогнозирует расход игрового CHALK и помогает выбрать траектории/режим исполнения так, чтобы рисунок укладывался в доступную квоту без недопустимого ухудшения визуального качества.
