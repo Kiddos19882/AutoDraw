@@ -1,0 +1,474 @@
+{
+  "schema_version": 1,
+  "name": "Brush behavior test — int006_intersections_spacing",
+  "created_at": "2026-11-02T03:32:53+00:00",
+  "coordinate_system": "logical_board_pixels",
+  "canvas": {
+    "width": 460,
+    "height": 240
+  },
+  "width": 460,
+  "height": 240,
+  "strokes": [
+    {
+      "name": "x_a",
+      "points": [
+        {
+          "x": 20.0,
+          "y": 20.0
+        },
+        {
+          "x": 110.0,
+          "y": 110.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "int006_intersections_spacing",
+        "line_extension_px_override": 0.0
+      }
+    },
+    {
+      "name": "x_b",
+      "points": [
+        {
+          "x": 20.0,
+          "y": 110.0
+        },
+        {
+          "x": 110.0,
+          "y": 20.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "int006_intersections_spacing",
+        "line_extension_px_override": 0.0
+      }
+    },
+    {
+      "name": "t_vertical",
+      "points": [
+        {
+          "x": 160.0,
+          "y": 20.0
+        },
+        {
+          "x": 160.0,
+          "y": 110.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "int006_intersections_spacing",
+        "line_extension_px_override": 0.0
+      }
+    },
+    {
+      "name": "t_horizontal",
+      "points": [
+        {
+          "x": 120.0,
+          "y": 65.0
+        },
+        {
+          "x": 210.0,
+          "y": 65.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "int006_intersections_spacing",
+        "line_extension_px_override": 0.0
+      }
+    },
+    {
+      "name": "cross_horizontal",
+      "points": [
+        {
+          "x": 250.0,
+          "y": 65.0
+        },
+        {
+          "x": 430.0,
+          "y": 65.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "int006_intersections_spacing",
+        "line_extension_px_override": 0.0
+      }
+    },
+    {
+      "name": "cross_vertical",
+      "points": [
+        {
+          "x": 340.0,
+          "y": 20.0
+        },
+        {
+          "x": 340.0,
+          "y": 110.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "int006_intersections_spacing",
+        "line_extension_px_override": 0.0
+      }
+    },
+    {
+      "name": "parallel_close_a",
+      "points": [
+        {
+          "x": 20.0,
+          "y": 160.0
+        },
+        {
+          "x": 200.0,
+          "y": 160.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "int006_intersections_spacing",
+        "line_extension_px_override": 0.0
+      }
+    },
+    {
+      "name": "parallel_close_b",
+      "points": [
+        {
+          "x": 20.0,
+          "y": 168.0
+        },
+        {
+          "x": 200.0,
+          "y": 168.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "int006_intersections_spacing",
+        "line_extension_px_override": 0.0
+      }
+    },
+    {
+      "name": "parallel_wide_a",
+      "points": [
+        {
+          "x": 240.0,
+          "y": 160.0
+        },
+        {
+          "x": 430.0,
+          "y": 160.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "int006_intersections_spacing",
+        "line_extension_px_override": 0.0
+      }
+    },
+    {
+      "name": "parallel_wide_b",
+      "points": [
+        {
+          "x": 240.0,
+          "y": 184.0
+        },
+        {
+          "x": 430.0,
+          "y": 184.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "int006_intersections_spacing",
+        "line_extension_px_override": 0.0
+      }
+    }
+  ],
+  "generation": {
+    "method": "manual_brush_behavior_test",
+    "test_case": "int006_intersections_spacing",
+    "brush_value_must_be_set_manually": true,
+    "note": "Set the requested brush size in the browser before executing this plan.",
+    "experiment_id": "ef48067b72ac48afa98364b9a58a4117",
+    "requested_brush_value": 10,
+    "chalk_test_block": {
+      "block_id": "bbd3b0a20f704291ba1833f401473cf8",
+      "task_id": "int006_intersections_spacing-s2-d10-r2",
+      "phase_id": "V5"
+    },
+    "chalk_experiment_matrix": {
+      "schema_version": 1,
+      "series_id": "chalk-20261102-062713-6bff0e",
+      "phase_id": "V5",
+      "scenario_id": "int006_intersections_spacing",
+      "repeat_index": 2,
+      "matrix_order_index": 9,
+      "planned_repeats": 3,
+      "requested_radius": 10,
+      "expected_strokes": 10,
+      "geometry_signature": "a78aede66e816d1d5f00d52b3fc66c6139033a941698c9886ab34cb2694c2955",
+      "planned_strokes": [
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "int006_intersections_spacing"
+          },
+          "name": "x_a",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 20.0
+            },
+            {
+              "x": 110.0,
+              "y": 110.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "int006_intersections_spacing"
+          },
+          "name": "x_b",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 110.0
+            },
+            {
+              "x": 110.0,
+              "y": 20.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "int006_intersections_spacing"
+          },
+          "name": "t_vertical",
+          "points": [
+            {
+              "x": 160.0,
+              "y": 20.0
+            },
+            {
+              "x": 160.0,
+              "y": 110.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "int006_intersections_spacing"
+          },
+          "name": "t_horizontal",
+          "points": [
+            {
+              "x": 120.0,
+              "y": 65.0
+            },
+            {
+              "x": 210.0,
+              "y": 65.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "int006_intersections_spacing"
+          },
+          "name": "cross_horizontal",
+          "points": [
+            {
+              "x": 250.0,
+              "y": 65.0
+            },
+            {
+              "x": 430.0,
+              "y": 65.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "int006_intersections_spacing"
+          },
+          "name": "cross_vertical",
+          "points": [
+            {
+              "x": 340.0,
+              "y": 20.0
+            },
+            {
+              "x": 340.0,
+              "y": 110.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "int006_intersections_spacing"
+          },
+          "name": "parallel_close_a",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 160.0
+            },
+            {
+              "x": 200.0,
+              "y": 160.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "int006_intersections_spacing"
+          },
+          "name": "parallel_close_b",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 168.0
+            },
+            {
+              "x": 200.0,
+              "y": 168.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "int006_intersections_spacing"
+          },
+          "name": "parallel_wide_a",
+          "points": [
+            {
+              "x": 240.0,
+              "y": 160.0
+            },
+            {
+              "x": 430.0,
+              "y": 160.0
+            }
+          ]
+        },
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "int006_intersections_spacing"
+          },
+          "name": "parallel_wide_b",
+          "points": [
+            {
+              "x": 240.0,
+              "y": 184.0
+            },
+            {
+              "x": 430.0,
+              "y": 184.0
+            }
+          ]
+        }
+      ],
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      }
+    },
+    "screen_transform": {
+      "method": "inclusive_logical_bounds_to_screen_pixel_centers",
+      "source_coordinate_system": "logical_board_pixels",
+      "target_coordinate_system": "local_canvas_pixels",
+      "logical_board": {
+        "width": 460,
+        "height": 240
+      },
+      "screen_roi": {
+        "x": 566,
+        "y": 253,
+        "width": 581,
+        "height": 304
+      },
+      "scale_x": 1.2608695652173914,
+      "scale_y": 1.2625,
+      "expected_uniform_scale": true,
+      "uniform_scale_relative_error": 0.0012914334911751312,
+      "uniform_scale_tolerance": 0.01,
+      "logical_bounds": {
+        "x": [
+          0,
+          460
+        ],
+        "y": [
+          0,
+          240
+        ]
+      },
+      "screen_local_bounds": {
+        "x": [
+          0,
+          580
+        ],
+        "y": [
+          0,
+          303
+        ]
+      },
+      "boundary_mapping": "logical_max_to_last_screen_pixel",
+      "executor_coordinate_units": "screen_pixels",
+      "point_step_px_units": "screen_pixels"
+    }
+  }
+}
