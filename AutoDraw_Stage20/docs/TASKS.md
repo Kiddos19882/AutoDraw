@@ -385,10 +385,11 @@ Software gate закрыт; live gate остаётся открытым. Авт�
 - [x] Получить и просмотреть по одному representative `after_draw-board.png` для каждого сочетания V1–V5 × P0/P1/P2 (15 изображений).
 - [x] Зафиксировать наблюдения по непрерывности, пересечениям, коротким отпечаткам, замыканию контуров и слиянию параллельных линий.
 - [x] Зафиксировать ограничения V1/V3 (непреднамеренные пересечения), V2 (короткие движения как точки), V4 (курсором закрыта часть контура), V5 (spacing=8 сливается).
-- [ ] Рассчитать численные pixel-level метрики на всех 45 captures; текущий просмотр не является количественным аудитом.
-- [ ] Проверить качество сегментации относительно blank-board reference и исключить курсор/UI из маски.
+- [x] Рассчитать pixel-level метрики для исходных 45 captures: 252 per-stroke rows и 279 parallel-pair rows; CI artifact run `41392156994`.
+- [x] Проверить сегментацию/маски на исходных captures и сохранить диагностические overlays; ограничения и ambiguous cases задокументированы.
+- [ ] Повторить pixel-level аудит на новых 45 follow-up captures из `e879a77`; отдельно проверить ambiguous ROI V3/V4/V5.
 
-Отчёт: [CHALK_INT006_PNG_SCREENING_2026-11-02.md](CHALK_INT006_PNG_SCREENING_2026-11-02.md). Production defaults и estimator не менять.
+Отчёт исходного аудита: [CHALK_INT006_PIXEL_AUDIT_2026-11-02.md](CHALK_INT006_PIXEL_AUDIT_2026-11-02.md). Новые live-результаты: [CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md](CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md). Production defaults и estimator не менять.
 
 
 ## INT-006 — V2/V5 follow-up выполнены (2026-11-02)
