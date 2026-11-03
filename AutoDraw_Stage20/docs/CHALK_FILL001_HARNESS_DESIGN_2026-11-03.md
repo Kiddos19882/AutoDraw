@@ -136,3 +136,26 @@ FILL-001 capture contract в текущем виде требует уже аг�
 Дополнительное несоответствие для устранения: design ранее упоминал проверку sampling P1, однако текущие task/capture schema и `validate_fill001_capture()` не содержат проверки sampling profile/step/delay. До добавления и проверки этого binding нельзя считать P1 зафиксированным в 45-cell matrix.
 
 До завершения этих работ: live execution запрещён; synthetic analyzer PASS не равен реальной интеграции; production estimator/defaults и frozen INT-006 model не менять.
+
+
+## Capture adapter implementation increment — 2026-11-03
+
+Добавлен `source/preparation/chalk_fill_capture_adapter.py` и отдельный набор тестов `source/preparation/tests/test_chalk_fill_capture_adapter.py`.
+
+Реализовано:
+- вход — Game Monitor export schemaVersion=1 с полным `events`, `eventCount`, `droppedEvents`, `errors`; проверяется длина массива и монотонность `t`;
+- pairing `DRAW_START`/`DRAW_END` по уникальному `strokeId`, проверка `DRAW_START_APPLIED` и каждого `DRAW_SAMPLE.pointDelta`;
+- per-stroke CHALK вычисляется как `DRAW_END.after.pointCount - DRAW_START.before.pointCount`; отдельно учитывается первая точка, добавленная в `onDrawStart` до начала polling. Сумма per-stroke deltas сверяется с run-level pre/post pointCount;
+- observed radius сверяется с `BRUSH_CHANGE_APPLIED.after.currentRadius`;
+- sampling profile P1 (step=4, delay=5 ms) добавлен в frozen matrix task и проверяется в capture;
+- PNG-файлы реально открываются, проверяется PNG format, одинаковый crop 460×240, вычисляются SHA-256, coverage и leakage через RGB before/after difference (threshold=8);
+- внешний `run_id` и bridge diagnostics обязательны и привязаны к eventCount/run identity; bridge failures и sequence gaps должны быть нулевыми.
+
+Ограничения и нерешённые вопросы:
+- Game Monitor export schema не содержит собственного `runId` и per-event sequence number; run ID приходит из внешнего journal/runner, а sequence integrity — из отдельного bridge diagnostics report. Текущая связка проверяет значения и совпадение run/eventCount, но не криптографическую подлинность внешнего отчёта.
+- Sampling P1 пока передаётся adapter как execution metadata; Game Monitor не наблюдает фактический step/delay. Для live acceptance нужна связка с фактическим runner journal, а не только caller-supplied словарь.
+- PNG audit рассчитан на точный logical-board crop 460×240 и использует RGB difference threshold=8. Реальные screenshots, crop registration, UI/cursor exclusion и устойчивость порога ещё не проверены. Synthetic PNG tests не подтверждают реальную игровую визуализацию.
+- Monitor event stream не имеет sequence counter; adapter проверяет eventCount, droppedEvents, errors и монотонность времени, но не может сам обнаружить пропуск события, если export count не отражает его. Для этого обязателен bridge report.
+- Live execution по-прежнему запрещён до успешного полного CI, проверки фактического bridge report schema, runner binding, реальных PNG preflight и Windows preflight.
+
+Добавлены adapter tests для event schema, exact/per-stroke CHALK, PNG hashes/coverage/leakage и отказа на truncated export/bridge failure. **Тесты пока не запускались; CI не подтверждён.**
