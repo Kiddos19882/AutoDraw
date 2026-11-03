@@ -34,6 +34,7 @@
 INT006R visual audit закрыт с geometry-specific limitations: radius 30 сливает короткие детали D4, radius 1 оставляет разрыв на соединении D2 polygon. Эти ограничения должны быть учтены при выборе формы целевых масок и критериев качества FILL-001.
 
 - [x] Зафиксировать экспериментальный дизайн: три формы одноцветной области × радиусы 1/5/10/20/30 × три повтора = 45 captures.
+- [x] Проверить engine semantics и ограничения существующих fill planners; зафиксировать отдельный fixed-radius harness design. См. [design](CHALK_FILL001_HARNESS_DESIGN_2026-11-03.md).
 - [ ] Завершить калибровку footprint для всех радиусов 1/5/10/20/30; INT006R уже подтвердил raster width и выявил D2/D4 quality limits для 1/10/30.
 - [ ] Реализовать отдельный matrix/block harness, analyzer и regression tests.
 - [ ] Получить полный CI PASS и Windows preflight.
