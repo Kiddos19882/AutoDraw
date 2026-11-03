@@ -5,7 +5,7 @@
 ## Временный план FILL-001 на пять шагов
 
 **Документ:** [CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md](CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md)  
-**Статус:** IN_PROGRESS — software gates закрыты на предыдущем HEAD; после live попытки исправлен runtime JSON handoff и добавлен regression test, новый CI ожидается; Windows live preflight не пройден; шаги 4–5 заблокированы.
+**Статус:** IN_PROGRESS — software gates закрыты на предыдущем HEAD; после пользовательской попытки исправлен runtime JSON handoff и добавлен regression test; CI [41692129486](https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486) выполняется, первые три jobs (Game Monitor/Bridge, Preparation/G3, INT-006 pixel audit) завершились SUCCESS; Application integration и Executor jobs ещё выполняются; Windows live preflight не пройден; шаги 4–5 заблокированы.
 
 | Шаг | Статус | Критерий |
 |---|---|---|
