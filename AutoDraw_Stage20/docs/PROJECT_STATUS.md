@@ -9,13 +9,14 @@
 
 # Текущее состояние проекта
 
-**Последнее обновление:** 2026-11-03 — INT006R harness и независимый analyzer прошли полный CI [41540054975](https://github.com/Kiddos19882/AutoDraw/actions/runs/41540054975) на code HEAD `28b56a9`: 682 passed, 82 subtests passed; Application integration, Executor, Game Monitor/Bridge, INT-006 PNG audit и Windows portable build/startup smoke-test — SUCCESS. Live captures INT006R не запускались; следующий gate — локальный Windows preflight.
+**Последнее обновление:** 2026-11-03 — INT006R live block завершён: 45/45 задач completed; raw-data audit всех 45 Monitor reports подтверждает exact CHALK, совпадение sampled/per-stroke delta и нулевые transport/error counters. Результаты: [INT006R live report](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md).
 
 **Актуально на:** 3 ноября 2026 г.  
 **Репозиторий:** `Kiddos19882/AutoDraw`  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
-**Состояние ветки:** INT006R harness, PNG-evidence analyzer и regression suite находятся в `feature/image-geometry-optimization`; code HEAD `28b56a97255b57b50072ba973533ce349c706bd1` прошёл полный CI. После него выполнены только документационные обновления в этой же ветке. `master` не менялся.
-**Последний подтверждённый полный CI:** run [41540054975](https://github.com/Kiddos19882/AutoDraw/actions/runs/41540054975), code HEAD `28b56a97255b57b50072ba973533ce349c706bd1`; все обязательные jobs завершились success. Preparation/G3: 682 passed, 82 subtests passed, 24 warnings; Application integration, Executor regression, Game Monitor/Bridge, INT-006 PNG audit и Windows portable build/startup smoke-test — success; optional benchmarks skipped. INT006R synthetic analyzer test подтвердил complete 45/45 fixture с PNG evidence. Live captures INT006R не выполнялись.  
+**Последний commit с данными:** `138c9fbeaf612a86819f7ff9ea0db7bb1fe4296a`. Последний подтверждённый code HEAD INT006R: `28b56a97255b57b50072ba973533ce349c706bd1`.  
+**Последний подтверждённый полный CI:** [41540054975](https://github.com/Kiddos19882/AutoDraw/actions/runs/41540054975) на code HEAD `28b56a9`: обязательные jobs SUCCESS, Preparation/G3 — 682 passed и 82 subtests, Windows portable build/startup smoke-test — SUCCESS. Для data commit `138c9fbe` отдельный workflow run/status check не найден.  
+**Git-сверка:** сравнение `master...feature/image-geometry-optimization` возвращает `diverged`, feature ahead 2297 / behind 5. Никакого merge/rebase не выполнялось; пять master-only commits требуют отдельного просмотра. В рамках этой актуализации `master` не изменялся.  
 > Этот блок — единственный источник текущего статуса. Ниже сохранена историческая хронология; старые статусы и планы не являются текущим backlog.
 
 ## Текущее состояние
@@ -31,7 +32,7 @@
 - В analyzer исправлено сравнение абсолютного Windows experiment path: relocated capture bundles связываются с journal по имени experiment directory. Дополнительно analyzer сверяет `task.prediction_id` и `task.expected_strokes` с frozen prediction; regression tests покрывают Windows path и tampered journal prediction ID.
 - В `.github/workflows/geometry-tests.yml` analyzer проверяет runtime manifest hash и нормализованную logical geometry против frozen plan. Первый run `41530634729` обнаружил несовпадение сериализаций; fix `8eba34f` и regression fixture `dd64730` устранили ошибку. Повторный run `41532629748` завершился SUCCESS, официальный JSON artifact проверен.
 - Production estimator, executor defaults, sampling defaults и `master` не менялись.
-- **INT006R software gate PASS:** отдельные scenario IDs D1R–D5R, 45 уникальных cells `(scenario, radius, repeat)`, радиусы 1/10/30, строго P1 (4/5), отдельный journal без frozen prediction artifact. UI устанавливает радиус из текущей task; executor handoff сверяет радиус с requested brush и phase contract. Analyzer `chalk_int006r_validation.py` валидирует exact CHALK, per-stroke telemetry, journal/run/experiment binding и читаемость before/after board ROI PNG. Положительный synthetic fixture принял 45/45.
+- **INT006R live block завершён:** series `chalk-20261103-030837-a20df5`, block `a8e0b9ec87984f60aa294910d366e987`, 45/45 tasks completed (D1–D5 × radius 1/10/30 × 3 repeats, P1 step=4/delay=5). Все 45 Monitor reports проверены по exact pre/post pointCount, per-stroke delta, observed radius и transport counters; подробности и таблицы: [INT006R live results](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md). Ручной visual audit всех 45 PNG и официальный CLI analyzer на реальном bundle остаются pending.
 - Полный CI [41540054975](https://github.com/Kiddos19882/AutoDraw/actions/runs/41540054975) прошёл: Preparation/G3 682 passed + 82 subtests; Application integration, Executor regression, Game Monitor/Bridge, INT-006 PNG audit и Windows portable build/startup smoke-test — success. 24 warnings, optional benchmarks skipped. Подробности: [INT006R software gate report](CHALK_INT006R_SOFTWARE_GATE_RESULTS_2026-11-03.md).
 - Live captures INT006R не выполнялись. Следующий gate — локальный Windows preflight, подключённая игра/Game Monitor, калиброванный slider 1–30 и подтверждённая пустая доска. После 45 captures потребуется отдельный ручной визуальный аудит всех PNG; production estimator и defaults не менять.
 
@@ -46,12 +47,18 @@
 | INT-004 | DONE* | WebSocket telemetry, per-run capture и привязка Monitor report к experiment используются; A/B/C overhead остаётся в INT-003. |
 | INT-005 | DONE* | Автоматические CHALK blocks, matrix, journal, recovery и fail-closed gates используются в принятых сериях. |
 | INT-006 | IN_PROGRESS | Live captures, 45/45 Monitor audit, официальный analyzer (45 accepted, 0 missing/rejected), 15/15 complete groups и полный binding audit завершены. Осталось отдельно решить вопрос safety margin и расширить domain validation; production eligibility не подтверждена. |
-| INT-006R | IN_PROGRESS | Отдельная фаза, analyzer, PNG evidence gate и regression tests прошли полный CI. Ожидаются локальный Windows preflight, 45 live captures и ручной visual audit. |
+| INT-006R | IN_PROGRESS | 45/45 live captures завершены; exact CHALK и per-stroke integrity подтверждены по всем Monitor reports. Остались официальный CLI analyzer на реальном bundle и ручной visual audit всех PNG. |
 | INT-007 | BLOCKED | Интеграция валидированной модели в preflight/resource estimator запрещена до закрытия INT-006 и определения safety margin. |
 | INT-008 | TODO | Оптимизация траекторий, кистей, порядка и покрытия в пределах CHALK после INT-007. |
 | INT-009 | TODO | Независимая проверка прогноза на полных рисунках, визуального качества и фактической экономии. |
 
 ## Ближайший рабочий приоритет
+
+1. Закрыть официальный analyzer и ручной visual audit INT006R.
+2. Подготовить и выполнить FILL-001: три типа одноцветных областей × пять радиусов × три повтора (45 captures); измерять площадь качественного покрытия на exact CHALK.
+3. После FILL-001 перейти к смешанным радиусам и независимым полным DrawingPlan.
+4. Safety margin не установлен; INT-007 остаётся BLOCKED. Production estimator/defaults не менять.
+
 
 1. Зафиксировать официальный analyzer PASS и сверить report с предварительными расчётами — выполнено; см. [официальный отчёт](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md).
 2. Рассмотреть P1 (step=4, delay=5 ms) как исследовательского кандидата: MAE 0.657, RMSE 0.838, MAPE 1.178%, max underprediction 0.92 CHALK на D1–D5.
