@@ -1,3 +1,13 @@
+## 2026-11-03 — FILL-001: исправление runtime JSON handoff
+- Проверены ветка `feature/image-geometry-optimization`, HEAD и последние 20 коммитов; изучены README приложения, индекс docs, управляющие документы, временный план FILL-001 и call graph UI → integrated_app → Stage 6.
+- Изучен пользовательский data commit [6b1cba9](https://github.com/Kiddos19882/AutoDraw/commit/6b1cba9b1c40a030ac6bd7b29365bf19ac3c9149): manifest FILL-001, DrawingPlan `rectangle/radius=10/repeat=1` на 131 штрих, before PNG, Bridge session и runtime plan.
+- В Bridge session Monitor active/boardDetected и exact snapshot pointCount=1/remainingPoints=5999; `received_event_count=0`, `sentEventCount=0`; after PNG и executor report отсутствуют. Передача не дошла до рисования.
+- Причина двух сообщений установлена в `integrated_app.py::_transfer_brush_test_plan()`: после добавления `autodraw_experiment` runtime JSON записывался с буквальной последовательностью `\n` после закрывающей скобки. `Stage6App.load_plan_from_path()` не мог разобрать файл; callback возвращал False, после чего `Fill001Tab` показывал вторичное сообщение об отказе Stage 6.
+- Исправлено добавление настоящего перевода строки и форматирование текста исключения в commit [8dfd1b5](https://github.com/Kiddos19882/AutoDraw/commit/8dfd1b541f54a1b416dfb2907739cf4b1a99c58d).
+- Добавлен integration regression test `test_fill001_plan_transfers_valid_json_context_to_stage6`: генерирует frozen FILL-001 task, передаёт план через `_transfer_brush_test_plan()`, проверяет JSON, experiment context и фактическую загрузку Stage 6. Test commit [1b2d8a1](https://github.com/Kiddos19882/AutoDraw/commit/1b2d8a128c99ab8ad1abb1e9f480702676cd9f56).
+- Обновлены PROJECT_STATUS, TASKS, ROADMAP, временный план FILL-001 и CHANGELOG. 45-cell live matrix остаётся BLOCKED.
+- Проверка на момент записи: исходники и тесты сверены статически через GitHub; локальный pytest не запускался, CI для новых commits ещё не подтверждён, повторный Windows live preflight не выполнялся. GitHub API не предоставляет локальный `git status`; чистота локального worktree не заявляется.
+
 ## 2026-11-03 — устранение несогласованностей документации
 
 - Повторно проверены управляющие документы и профильная карта UI в рабочей ветке.
