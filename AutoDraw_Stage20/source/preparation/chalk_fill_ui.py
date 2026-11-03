@@ -309,6 +309,16 @@ class Fill001Tab:
             plan_path.write_text(json.dumps(plan, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
             if not self.on_transfer_plan(plan, plan_path):
                 raise RuntimeError("AutoDraw отклонил передачу FILL-001 плана в Stage 6.")
+            generation = plan.get("generation")
+            screen_transform = generation.get("screen_transform") if isinstance(generation, dict) else None
+            if (
+                not isinstance(screen_transform, dict)
+                or screen_transform.get("screen_roi") != self.capture_region
+            ):
+                raise RuntimeError(
+                    "Logical→screen transform DrawingPlan не совпадает с ROI, "
+                    "с которого снят before PNG."
+                )
             self.active_task = selected
             self.active_plan_path = plan_path
             self.status_var.set(
