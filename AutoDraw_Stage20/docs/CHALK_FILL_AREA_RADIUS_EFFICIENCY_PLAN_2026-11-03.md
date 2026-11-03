@@ -1,7 +1,7 @@
 # FILL-001 — проверка эффективности заполнения областей разными радиусами
 
 **Дата:** 2026-11-03  
-**Статус:** FROZEN MASK GENERATOR IMPLEMENTED; fixed-radius planner, harness и live execution pending  
+**Статус:** FROZEN MASK GENERATOR, FIXED-RADIUS PLANNER И 45-CELL MATRIX/ANALYZER IMPLEMENTED; CI, preflight и live execution pending  
 **Связь:** продолжение INT-006 после INT006R; не открывает INT-007 автоматически  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
 **Приоритет:** высокий — проверка гипотезы об экономии CHALK при заполнении больших одноцветных областей
@@ -127,12 +127,12 @@ Capture принимается только если:
 
 ## 8. Порядок выполнения и gates
 
-1. [ ] Проверить текущий code HEAD, существующие fill planner и тесты; зафиксировать их ограничения.
-2. [ ] Подготовить frozen masks и генератор трёх DrawingPlan.
-3. [ ] Реализовать отдельную experimental phase/journal на 45 уникальных ячеек.
-4. [ ] Добавить fail-closed validation radius, profile, geometry signature, repeat, run identity и exact CHALK.
-5. [ ] Добавить analyzer и regression tests; PNG evidence обязательны.
-6. [ ] Получить полный CI PASS и Windows portable build.
+1. [x] Проверить текущий code HEAD, существующие fill planner и тесты; зафиксировать их ограничения.
+2. [x] Подготовить frozen masks и генератор fixed-radius DrawingPlan.
+3. [x] Реализовать отдельный 45-cell matrix manifest с тремя повторами на ячейку.
+4. [x] Добавить fail-closed validation radius, mask/plan signature, repeat, task/run identity, exact CHALK и динамический expected stroke count.
+5. [x] Добавить offline analyzer и regression tests; live PNG evidence остаётся обязательным для каждого capture.
+6. [ ] Получить полный CI PASS и Windows portable build на актуальном HEAD.
 7. [ ] Выполнить локальный Windows preflight: игра, Game Monitor heartbeat, точный pointCount, калибровка slider 1–30, чистая доска.
 8. [ ] Выполнить 45 live captures; не запускать более 10 workflow за один раз.
 9. [ ] Запустить analyzer на реальных данных и завершить ручной visual audit всех PNG.
