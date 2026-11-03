@@ -1,6 +1,6 @@
 ## 2026-11-03 — FILL-001 software regression gate закрыт
 
-- Проверена ветка `feature/image-geometry-optimization`; последние 20 коммитов просмотрены. Code HEAD для CI: `b4cc45a80231e6bad2f878b2a5a2f16b48b9d68b`; последующие коммиты до `9fb9a9284a4b833f0bd408a3cf8571381089cba8` относятся к документации.
+- Проверена ветка `feature/image-geometry-optimization`; последние 20 коммитов просмотрены. Code HEAD для CI: `b4cc45a80231e6bad2f878b2a5a2f16b48b9d68b`; последующие коммиты до `f72d4d3c9a2b9236b45d6c2f45ea5c6dcccbc456` относятся к документации.
 - Проверен diff `b4cc45a`: из сигнатуры `audit_fill001_png_pair()` удалены ошибочно добавленные обязательные аргументы `run_id` и `bridge_diagnostics`. Проверены определение, внутренний вызов из `build_fill001_capture()` и тестовый вызов — все используют три аргумента: shape_id, before_png, after_png.
 - GitHub Actions [41579136690](https://github.com/Kiddos19882/AutoDraw/actions/runs/41579136690) привязан к этой ветке и code SHA `b4cc45a80231e6bad2f878b2a5a2f16b48b9d68b`; все обязательные jobs завершились SUCCESS.
 - Preparation/G3 log: `754 passed, 24 warnings, 82 subtests passed`; запускал полный `pytest -q -ra tests` в `source/preparation`, включая FILL-001 matrix/capture adapter regression tests.
