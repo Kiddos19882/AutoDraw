@@ -2403,3 +2403,12 @@ Brush Test acceptance и матричные валидаторы больше н
 - Preparation and G3 matrix tests: `778 passed, 24 warnings, 82 subtests passed` (Windows runner). Game Monitor/Bridge, Executor regression, Application integration, INT-006 pixel-level PNG audit — SUCCESS. Optional algorithm benchmarks — SKIPPED.
 - Windows portable build и startup smoke-test — SUCCESS; artifact `autodraw-g3-preflight-build` (636,529,516 bytes, artifact ID `13254104951`, retention 7 days) загружен: https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985/artifacts/13254104951
 - Software gate шага 1 подтверждён на исправленном code/test HEAD. Это не live game session: FILL-001 one-task Windows preflight, реальные PNG/coverage/leakage и Bridge/executor runtime evidence всё ещё не получены. Шаги 4–5 остаются BLOCKED.
+
+
+## 2026-11-03 — FILL-001 CI run 41692129486 завершён SUCCESS
+
+- Повторно проверен GitHub Actions run [41692129486](https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486).
+- Application integration, Game Monitor/Bridge, Preparation/G3, Executor regression и INT-006 pixel-level PNG audit завершились SUCCESS; Windows portable build и startup smoke-test также SUCCESS. Optional algorithm benchmarks — SKIPPED.
+- Получен список artifacts. Windows portable build `autodraw-g3-preflight-build`, ID `13258221572`, доступен и не истёк: https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486/artifacts/13258221572.
+- Программный gate FILL-001 закрыт. Следующий шаг — пользовательский one-task Windows live preflight `rectangle / radius 10 / repeat 1`; live evidence в этой проверке не создавались.
+- 45-cell FILL-001 matrix не запускалась. Код, production defaults, estimator и `master` не изменялись.
