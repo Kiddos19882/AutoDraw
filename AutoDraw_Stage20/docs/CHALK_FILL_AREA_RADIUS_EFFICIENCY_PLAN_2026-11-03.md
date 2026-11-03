@@ -1,7 +1,7 @@
 # FILL-001 — проверка эффективности заполнения областей разными радиусами
 
 **Дата:** 2026-11-03  
-**Статус:** FROZEN MASKS, FIXED-RADIUS PLANNER, 45-CELL MATRIX/ANALYZER И MONITOR CAPTURE ADAPTER IMPLEMENTED; CI, runner binding, preflight и live execution pending  
+**Статус:** SOFTWARE REGRESSION GATE PASS (CI 41579136690, code HEAD b4cc45a); runner binding, Windows preflight и live execution pending  
 **Связь:** продолжение INT-006 после INT006R; не открывает INT-007 автоматически  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
 **Приоритет:** высокий — проверка гипотезы об экономии CHALK при заполнении больших одноцветных областей
@@ -132,7 +132,7 @@ Capture принимается только если:
 3. [x] Реализовать отдельный 45-cell matrix manifest с тремя повторами на ячейку.
 4. [x] Добавить fail-closed validation radius, mask/plan signature, repeat, task/run identity, exact CHALK и динамический expected stroke count.
 5. [x] Добавить offline analyzer и regression tests; live PNG evidence остаётся обязательным для каждого capture.
-6. [ ] Получить полный CI PASS и Windows portable build на актуальном HEAD.
+6. [x] Получить полный CI PASS и Windows portable build: run [41579136690](https://github.com/Kiddos19882/AutoDraw/actions/runs/41579136690), code HEAD `b4cc45a`; Preparation/G3 — 754 passed, 24 warnings, 82 subtests; Windows portable build/startup smoke-test — SUCCESS.
 7. [ ] Выполнить локальный Windows preflight: игра, Game Monitor heartbeat, точный pointCount, калибровка slider 1–30, чистая доска.
 8. [ ] Выполнить 45 live captures; не запускать более 10 workflow за один раз.
 9. [ ] Запустить analyzer на реальных данных и завершить ручной visual audit всех PNG.
@@ -191,4 +191,4 @@ Capture принимается только если:
 - PNG existence/format/dimensions, SHA-256, coverage/leakage по RGB difference;
 - внешний run ID и bridge diagnostics.
 
-Matrix manifest обновлён до schema v2, поскольку sampling metadata изменяет frozen task identity. Это **software implementation candidate**, а не закрытый gate. Adapter пока не связан с фактическим runner/journal call site; Game Monitor не экспортирует runId или sequence counter; P1 и bridge report поступают внешними параметрами; реальный screenshot crop/threshold не прошёл preflight. Pytest/CI не подтверждены. Live 45-cell matrix не запускать.
+Matrix manifest обновлён до schema v2, поскольку sampling metadata изменяет frozen task identity. Software regression gate закрыт по run [41579136690](https://github.com/Kiddos19882/AutoDraw/actions/runs/41579136690): Preparation/G3 754 passed + 82 subtests, обязательные jobs и Windows portable build/startup smoke-test успешны на code HEAD `b4cc45a`. Adapter пока не связан с фактическим runner/journal call site; Game Monitor не экспортирует runId или sequence counter; P1 и bridge report поступают внешними параметрами; реальный screenshot crop/threshold не прошёл preflight. Live 45-cell matrix не запускать до завершения runtime binding и Windows preflight.
