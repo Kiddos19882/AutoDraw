@@ -2,8 +2,8 @@
 
 - Добавлен `source/preparation/chalk_fill_experiment.py` с тремя детерминированными frozen masks на logical canvas 460×240: rectangle, wide_irregular, narrow_irregular.
 - Площади 44 653 / 45 159 / 44 879 px; разброс max/min — 1,133%, в пределах ±5%.
-- SHA-256 масок закреплены в коде; добавлены 7 regression tests на hash, площадь, геометрию, связность и invalid input.
-- Локальный тестовый прогон — 7 passed. Полный GitHub Actions для новых commits пока не подтверждён; fixed-radius generator, matrix/block harness и live captures не готовы.
+- SHA-256 масок закреплены в коде; добавлены 8 regression tests на hash, площадь, геометрию, связность и invalid input.
+- Локальный тестовый прогон — 8 passed. Полный GitHub Actions для новых commits пока не подтверждён; fixed-radius generator, matrix/block harness и live captures не готовы.
 
 ## 2026-11-03 — FILL-001 technical design review
 
