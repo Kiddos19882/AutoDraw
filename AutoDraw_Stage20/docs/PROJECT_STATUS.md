@@ -873,3 +873,13 @@ Per-run transport gates чистые: `dropped_events=0`, `monitor_error_count_d
 - Полный CI для commits `f0e05df` и `4847cce` подтверждён run `41496555297`. Workflow checkout рабочей ветки выполнен в 18:01:55 UTC после появления commit `956ce2b`; compare подтверждает, что `f0e05df` и `4847cce` являются его предками. Job Preparation/G3 завершился: 662 passed, 82 subtests passed. Все обязательные jobs, Windows portable build и INT-006 PNG audit — success; optional benchmarks skipped. Не удалять и не редактировать старые journals вручную.
 - Production executor, estimator, defaults, experiment data и master не менялись.
 - Статическая проверка `chalk_test_blocks.py`, `chalk_experiment_matrix.py` и regression tests подтвердила legacy ID mapping V2/V5, собственные expected stroke counts и запрет смешивания сценариев внутри одного журнала. Дополнительно CI `41496555297` успешно выполнил Preparation/G3 suite: 662 passed, 82 subtests passed. Legacy compatibility gate закрыт.
+
+
+## 2026-11-03 — FILL-001 CI run 41692129486: software gate подтверждён
+
+- GitHub Actions run [41692129486](https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486) завершился SUCCESS. Application integration, Game Monitor/Bridge, Preparation/G3, Executor regression, INT-006 pixel-level PNG audit и Windows portable build/startup smoke-test — SUCCESS; optional algorithm benchmarks — SKIPPED.
+- Windows portable artifact `autodraw-g3-preflight-build`, ID `13258221572`, не истёк: [скачать artifact](https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486/artifacts/13258221572).
+- Дополнительно опубликованы INT-006 CHALK validation, INT006R live validation, PNG analysis и visual-review source artifacts.
+- FILL-001 шаги 1–2 и программная часть шага 3 подтверждены CI. Шаг 3 остаётся IN_PROGRESS до одного Windows live preflight из вкладки FILL-001 с проверкой runtime identity, фактического P1 и before/after PNG на реальном client ROI.
+- Шаги 4–5 остаются BLOCKED. 45 live captures не запускались и не разрешаются этим CI результатом.
+- Изменения кода, production estimator/defaults и `master` в рамках этой проверки не выполнялись; локальный `git status` недоступен через GitHub API.
