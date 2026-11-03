@@ -13,14 +13,15 @@
 
 ### Шаг 1. Закрыть программный regression gate
 
-**Статус:** TODO
+**Статус:** DONE
 
-- Проверить исправление сигнатуры `audit_fill001_png_pair()` и все места её вызова.
-- Запустить Preparation/G3 tests, включая matrix и capture adapter.
-- Получить подтверждённый полный GitHub Actions результат для актуального HEAD, включая Windows portable build/startup smoke-test.
-- Разобрать и устранить все ошибки; не считать пустой combined status подтверждением PASS.
+- Исправление сигнатуры `audit_fill001_png_pair()` подтверждено commit [b4cc45a](https://github.com/Kiddos19882/AutoDraw/commit/b4cc45a80231e6bad2f878b2a5a2f16b48b9d68b): helper принимает `shape_id`, `before_png`, `after_png`; внутренний вызов и тест используют эту сигнатуру.
+- Полный Preparation/G3 suite на Windows runner: **754 passed, 24 warnings, 82 subtests passed**; включает matrix и capture adapter tests.
+- Полный GitHub Actions run [41579136690](https://github.com/Kiddos19882/AutoDraw/actions/runs/41579136690) завершился SUCCESS на code HEAD `b4cc45a80231e6bad2f878b2a5a2f16b48b9d68b`; обязательные Game Monitor/Bridge, Preparation/G3, Application integration, Executor regression, INT-006 audit и Windows portable build jobs успешны.
+- Windows portable build создал артефакт [autodraw-g3-preflight-build](https://github.com/Kiddos19882/AutoDraw/actions/runs/41579136690/artifacts/13204044319); лог подтверждает запуск `AutoDraw.exe`, 10 секунд активного процесса и успешный smoke-test.
+- Optional algorithm benchmarks были skipped по настройке workflow; локальный pytest в этой среде не запускался. Ошибок обязательных jobs нет.
 
-**Критерий завершения:** все обязательные тестовые jobs и Windows build успешны на одном актуальном code HEAD; результат CI и commit SHA записаны.
+**Критерий завершения:** выполнен — все обязательные тестовые jobs и Windows build/smoke-test успешны на одном code HEAD; CI run и SHA зафиксированы.
 
 ### Шаг 2. Привязать captures к фактическому runtime
 
@@ -80,7 +81,7 @@
 
 | Шаг | Статус | Подтверждение |
 |---|---|---|
-| 1 | TODO | CI run и code HEAD будут внесены после проверки |
+| 1 | DONE | CI [41579136690](https://github.com/Kiddos19882/AutoDraw/actions/runs/41579136690), code HEAD `b4cc45a80231e6bad2f878b2a5a2f16b48b9d68b`; Preparation/G3 754 passed + 82 subtests; Windows build/smoke-test success |
 | 2 | TODO | Runtime binding evidence будет внесено после интеграции |
 | 3 | TODO | Windows preflight report будет внесён после проверки |
 | 4 | BLOCKED | Ожидает шаги 1–3 |
