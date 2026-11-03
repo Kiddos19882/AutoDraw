@@ -766,6 +766,7 @@ class BrushBehaviorTestTab:
         self.on_transfer_plan = on_transfer_plan
         self.on_brush_ready = on_brush_ready
         self._start_executor_after_brush_drag = False
+        self._workflow_brush_ready_callback = None
         self.experiment_dir: Path | None = None
         self.experiment_phases: dict[str, dict[str, Any]] = {}
         self.current_plan: dict[str, Any] | None = None
@@ -2010,6 +2011,21 @@ class BrushBehaviorTestTab:
         except ValueError as exc:
             raise ValueError(f"{field}: X и Y должны быть целыми числами.") from exc
 
+    def set_brush_size_for_workflow(self, brush: int, on_verified) -> bool:
+        """Reuse the verified drag/heartbeat state machine for a separate experiment runner."""
+        if not callable(on_verified):
+            raise ValueError("Для автоматического запуска требуется callback подтверждения радиуса.")
+        if self._workflow_brush_ready_callback is not None or self._start_executor_after_brush_drag:
+            raise RuntimeError("Другой автоматический запуск кисти уже ожидает подтверждения.")
+        self.brush_var.set(str(int(brush)))
+        self._workflow_brush_ready_callback = on_verified
+        self._start_executor_after_brush_drag = True
+        if not self.set_brush_size():
+            self._workflow_brush_ready_callback = None
+            self._start_executor_after_brush_drag = False
+            return False
+        return True
+
     def set_brush_size(self) -> bool:
         """Set brush size only by dragging the calibrated extended-mode slider."""
         try:
@@ -2493,6 +2509,7 @@ class BrushBehaviorTestTab:
         self._brush_feedback_state = None
         self._stop_brush_hotkey_listener()
         self._start_executor_after_brush_drag = False
+        self._workflow_brush_ready_callback = None
         phase = {
             "status": "verification_failed",
             "reason": reason,
@@ -2555,7 +2572,12 @@ class BrushBehaviorTestTab:
                 if self._chalk_block_task is not None:
                     self._fail_chalk_test_block(f"brush_confirmation_manifest_failed:{exc}")
                 return
-        if callable(self.on_brush_ready):
+        workflow_callback = self._workflow_brush_ready_callback
+        if callable(workflow_callback):
+            self._workflow_brush_ready_callback = None
+            self.status_var.set(f"Размер {brush} подтверждён Game Monitor; запуск FILL-001.")
+            self.root.after(0, lambda: workflow_callback(brush))
+        elif callable(self.on_brush_ready):
             self.status_var.set(f"Размер {brush} подтверждён Game Monitor; запуск тестового исполнения.")
             self.root.after(0, lambda: self.on_brush_ready(brush))
         elif self._chalk_block_task is not None:
