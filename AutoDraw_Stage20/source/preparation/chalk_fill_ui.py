@@ -405,7 +405,7 @@ class Fill001Tab:
         record["finished_at_utc"] = datetime.now(timezone.utc).isoformat()
         record["executor_status"] = summary.get("status")
         record["status"] = "execution_completed_pending_runtime_and_png_audit" if summary.get("status") == "completed" else "execution_failed"
-        self.active_run_record.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+        self.active_run_record.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         if summary.get("status") == "completed":
             self.root.after(1000, self._capture_after_png)
         else:
@@ -500,7 +500,7 @@ class Fill001Tab:
             record = json.loads(self.active_run_record.read_text(encoding="utf-8"))
             record["after_png"] = str(self.after_png_path)
             record["after_png_captured_at_utc"] = datetime.now(timezone.utc).isoformat()
-            self.active_run_record.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+            self.active_run_record.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
             self.status_var.set(
                 f"After PNG сохранён: {self.after_png_path}. Нажмите «Проверить runtime + PNG и принять capture» "
                 "после завершения runtime binding."
@@ -551,7 +551,7 @@ class Fill001Tab:
                 screen_roi=record.get("screen_roi"),
             )
             capture_path = self.output_dir / "captures" / f"{self.active_task['task_id']}-capture.json"
-            capture_path.write_text(json.dumps(capture, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+            capture_path.write_text(json.dumps(capture, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
             task_id = self.active_task["task_id"]
             matching = [task for task in self.matrix["tasks"] if task.get("task_id") == task_id]
             if len(matching) != 1:
@@ -577,7 +577,7 @@ class Fill001Tab:
                 "png_audit_status": capture["png_audit_status"],
                 "runtime_binding_status": capture["runtime_binding_status"],
             }
-            self.active_run_record.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+            self.active_run_record.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
             self.status_var.set(
                 f"FILL-001 capture принят: exact CHALK={capture['exact_chalk']}, "
                 f"coverage={capture['coverage_fraction']:.3%}, leakage={capture['leakage_pixels']}. "

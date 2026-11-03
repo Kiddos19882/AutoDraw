@@ -17,6 +17,7 @@ from chalk_fill_runtime_binding import (
     bind_fill001_runtime_evidence,
     build_fill001_experiment_context,
     find_fill001_runtime_binding,
+    _verify_executor_source_plan,
 )
 
 
@@ -351,3 +352,36 @@ def test_find_runtime_binding_rejects_multiple_active_sessions(tmp_path):
     with pytest.raises(FillMatrixError, match="несколько активных Bridge sessions"):
         find_fill001_runtime_binding(task, bridge_root, report_path)
 
+
+
+def test_executor_source_plan_hash_uses_drawing_plan_model_normalization(tmp_path):
+    task = _task()
+    raw_plan = {
+        "schema_version": 1,
+        "name": "normalization-regression",
+        "created_at": "2026-11-04T00:00:00+00:00",
+        "canvas": {"width": 460, "height": 240},
+        "strokes": [{
+            "name": "numeric-metadata",
+            "closed": False,
+            "points": [{"x": 1.23456, "y": 2.34567}, {"x": 19.87654, "y": 2.34567}],
+            "metadata": {"scanline_index": 7, "brush_value": 10},
+        }],
+    }
+    plan_document = attach_fill001_experiment_context(raw_plan, task)
+    source_path = tmp_path / "normalized-plan.json"
+    source_path.write_text(json.dumps(plan_document, ensure_ascii=False), encoding="utf-8")
+    raw_canonical = json.dumps(
+        raw_plan, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False
+    )
+    assert hashlib.sha256(raw_canonical.encode("utf-8")).hexdigest() != (
+        plan_document["autodraw_experiment"]["executor_plan_sha256"]
+    )
+    report = {
+        "source_plan_file": str(source_path),
+        "source_plan_file_sha256": hashlib.sha256(source_path.read_bytes()).hexdigest(),
+        "experiment_context": plan_document["autodraw_experiment"],
+        "source_plan_sha256": plan_document["autodraw_experiment"]["executor_plan_sha256"],
+    }
+
+    _verify_executor_source_plan(report)

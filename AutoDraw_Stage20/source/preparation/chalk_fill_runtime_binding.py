@@ -103,6 +103,16 @@ def build_fill001_experiment_context(task: dict[str, Any]) -> dict[str, Any]:
     return {field: task[field] for field in _CONTEXT_FIELDS}
 
 
+def _canonical_drawing_plan_document(plan_document: dict[str, Any]) -> dict[str, Any]:
+    """Normalize raw JSON through the same DrawingPlan model used by Stage 6."""
+    try:
+        from geometry_models import DrawingPlan
+
+        return DrawingPlan.from_dict(plan_document).to_dict()
+    except (KeyError, TypeError, ValueError) as exc:
+        raise FillMatrixError(f"Не удалось нормализовать DrawingPlan для SHA-256: {exc}") from exc
+
+
 def attach_fill001_experiment_context(
     plan_document: dict[str, Any], task: dict[str, Any]
 ) -> dict[str, Any]:
@@ -111,8 +121,9 @@ def attach_fill001_experiment_context(
         raise FillMatrixError("DrawingPlan document должен быть JSON object.")
     if "autodraw_experiment" in plan_document:
         raise FillMatrixError("DrawingPlan уже содержит autodraw_experiment context.")
+    canonical_document = _canonical_drawing_plan_document(plan_document)
     canonical = json.dumps(
-        plan_document, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False
+        canonical_document, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False
     )
     context = build_fill001_experiment_context(task)
     context["executor_plan_sha256"] = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
@@ -499,8 +510,9 @@ def _verify_executor_source_plan(report: dict[str, Any]) -> None:
         raise FillMatrixError("Source DrawingPlan context не совпадает с executor report.")
     plan_document = dict(document)
     plan_document.pop("autodraw_experiment", None)
+    canonical_document = _canonical_drawing_plan_document(plan_document)
     canonical = json.dumps(
-        plan_document, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False
+        canonical_document, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False
     )
     plan_hash = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
     if plan_hash != report.get("source_plan_sha256"):
