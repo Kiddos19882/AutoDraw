@@ -28,6 +28,7 @@
 | `source/preparation/tests/test_chalk_experiment_matrix.py` | `chalk_experiment_matrix` | G1/G2 metadata, exact capture, уникальность repeat cells, per-stroke pointDelta и статистика |
 | `source/preparation/tests/test_chalk_test_blocks.py` | `chalk_test_blocks` | Полные планы G1/G2/G3/INT006R, три повтора, детерминированный порядок, журнал, последовательный claim, fail-closed и interrupted recovery |
 | `source/preparation/tests/test_chalk_int006r_validation.py` | `chalk_experiment_matrix`, `chalk_test_blocks`, `chalk_int006r_validation` | 45-cell radius × geometry matrix, радиусы 1/10/30, P1-only, journal tampering, duplicate cells и incomplete analyzer gate |
+| `source/preparation/tests/test_chalk_fill_experiment.py` | `chalk_fill_experiment` | Frozen FILL-001 masks, SHA-256, area matching ±5%, shape aspect ratios, row connectivity и fail-closed input validation |
 
 Дополнительные импорты в `test_geometry_color_plan.py` подтверждают, что тест напрямую обращается к внутренним функциям и модулям-реализациям, а не только к публичному API. При изменении внутренних контрактов этот тестовый файл следует рассматривать как интеграционный тест нескольких алгоритмических компонентов.
 
