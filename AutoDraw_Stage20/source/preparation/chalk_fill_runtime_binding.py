@@ -127,7 +127,7 @@ def attach_fill001_experiment_context(
     )
     context = build_fill001_experiment_context(task)
     context["executor_plan_sha256"] = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
-    result = dict(plan_document)
+    result = dict(canonical_document)
     result["autodraw_experiment"] = context
     return result
 
