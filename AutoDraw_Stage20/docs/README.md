@@ -31,6 +31,7 @@
 - [INT-006 — результаты follow-up V1–V5](CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md) — 45/45 новых captures после исправления геометрии/сценариев, raw repeat CHALK, сравнение P0/P1/P2 и следующие pixel-level/validation gates.
 - [INT006R — live results](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md) — 45 captures D1–D5 × radius 1/10/30, exact CHALK и raw-data integrity audit; ручной visual gate остаётся pending.
 - [FILL-001 — план эффективности заливки](CHALK_FILL_AREA_RADIUS_EFFICIENCY_PLAN_2026-11-03.md) — 45 captures для трёх форм областей и пяти радиусов, критерии качества покрытия и CHALK/area metric.
+- [Игровой движок — стоимость точки и ширина кисти](CHALK_GAME_ENGINE_POINT_COST_AND_BRUSH_WIDTH_2026-11-03.md) — статический разбор `BoardPane.updateLess`, `setRadius`, `lineStyle` и влияния размера кисти на расход.
 - [Исторический снимок PROJECT_STATUS](PROJECT_STATUS_HISTORY_2026-11-02.md) — полный статус до консолидации 2 ноября; только для аудита, не текущий backlog.
 
 ## Данные и очистка
