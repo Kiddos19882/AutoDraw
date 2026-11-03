@@ -1,7 +1,7 @@
 # FILL-001 — проверка эффективности заполнения областей разными радиусами
 
 **Дата:** 2026-11-03  
-**Статус:** DESIGN REVIEW COMPLETE; frozen masks, harness и live execution ещё не выполнены  
+**Статус:** FROZEN MASK GENERATOR IMPLEMENTED; fixed-radius planner, harness и live execution pending  
 **Связь:** продолжение INT-006 после INT006R; не открывает INT-007 автоматически  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
 **Приоритет:** высокий — проверка гипотезы об экономии CHALK при заполнении больших одноцветных областей
@@ -159,3 +159,16 @@ Capture принимается только если:
 Принято решение реализовать изолированный модуль `source/preparation/chalk_fill_experiment.py` с frozen target masks, fixed-radius DrawingPlan generator и raster simulator с округлыми caps. Подробный контракт, matrix/journal integration и порядок реализации: [CHALK_FILL001_HARNESS_DESIGN_2026-11-03.md](CHALK_FILL001_HARNESS_DESIGN_2026-11-03.md).
 
 **Следующий шаг:** подготовить три frozen target masks и проверить, что их площади сопоставимы, а каждый радиус либо проходит заранее заданный quality gate (coverage ≥99%, leakage=0), либо помечается unsupported до live запуска. Production planner и executor defaults не менять.
+
+
+## 11. Frozen target masks — первый implementation increment
+
+Добавлен `source/preparation/chalk_fill_experiment.py`: детерминированные bool-маски на canvas 460 × 240 logical pixels. Их площади выровнены в пределах 1,133% (допуск плана ±5%). SHA-256 закреплены константами и regression tests:
+
+| Shape | Area | SHA-256 |
+|---|---:|---|
+| rectangle | 44 653 | `ac1c6660e5986cdf534328c6dbcd5020f631168b1473c24b29e7609eb827998b` |
+| wide_irregular | 45 159 | `ffff041d8fcaf53ce4f680ddbefb43a949dd72fdb10f44d6c95cf4832555d7db` |
+| narrow_irregular | 44 879 | `50d45794d9594b5b11f93ddfe407c47210eb315ae10f3d70e0b3978eff5764a3` |
+
+Добавлены 7 regression tests для размеров, площади, формы, связности строк, metadata, разрешённых радиусов и отказа от неизвестных масок. Локальный прогон — 7/7 PASS; полный GitHub Actions для последних commits пока не подтверждён. Fixed-radius DrawingPlan generator ещё не реализован, поэтому live matrix не запускать.
