@@ -115,9 +115,9 @@ Production estimator, frozen INT-006 model, executor/sampling defaults и `maste
 Добавлены regression tests на 45 cells, deterministic manifest, target area/plan identities, duplicate/missing cells, signature tampering, unsupported planner, manifest round-trip, exact CHALK/quality gates, полный 45-capture analyzer и duplicate run identity. CI для актуального HEAD ещё не подтверждён; до CI PASS и Windows preflight live captures запрещены.
 
 
-## Текущая граница реализации — проверка 2026-11-03
+## Исторический аудит до реализации adapter — 2026-11-03
 
-Код `chalk_fill_matrix.py` реализует manifest, агрегированный capture validator и analyzer. Он **не является адаптером Game Monitor** и сам не собирает capture из monitor event stream.
+На момент этого аудита `chalk_fill_matrix.py` реализовывал manifest, агрегированный capture validator и analyzer; отдельного Game Monitor adapter ещё не было. Последующая реализация зафиксирована в разделе «Capture adapter implementation increment» ниже.
 
 Подтверждённый интерфейс Game Monitor в `source/game_monitor/game_monitor.js`:
 
@@ -127,13 +127,13 @@ Production estimator, frozen INT-006 model, executor/sampling defaults и `maste
 - `POINT_QUOTA_UPDATE` сообщает изменение quota snapshot;
 - `exportData()` сохраняет event stream и aggregate monitor diagnostics.
 
-FILL-001 capture contract в текущем виде требует уже агрегированные `pre_point_count`, `post_point_count`, `stroke_chalk_deltas`, integrity counters и PNG evidence paths. Отдельного кода, который надёжно связывает события по `strokeId`, выводит per-stroke deltas, проверяет непрерывность sequence, сопоставляет radius и формирует capture из реального export, в текущем increment нет.
+FILL-001 capture contract в текущем виде требует уже агрегированные `pre_point_count`, `post_point_count`, `stroke_chalk_deltas`, integrity counters и PNG evidence paths. Отдельного кода, который надёжно связывает события по `strokeId`, выводит per-stroke deltas, проверяет непрерывность sequence, сопоставляет radius и формирует capture из реального export, на момент аудита отсутствовал.
 
-Также текущий validator проверяет, что PNG path — непустая строка и `png_audit_status == "passed"`; он не открывает PNG, не проверяет существование файла, SHA-256, размеры или соответствие frozen target mask. Следовательно, эти поля сейчас являются заявлением вызывающего кода, а не самостоятельным доказательством аудита. Unit-test placeholders намеренно фиктивны и не должны попадать в live journal.
+На момент аудита validator проверял только непустые PNG paths и строку `png_audit_status == "passed"`; файловая и pixel-level проверки были добавлены позднее в adapter. Следовательно, эти поля сейчас являются заявлением вызывающего кода, а не самостоятельным доказательством аудита. Unit-test placeholders намеренно фиктивны и не должны попадать в live journal.
 
 **Следующий обязательный engineering gate до live execution:** реализовать отдельный fail-closed adapter/analyzer, который принимает настоящий Game Monitor export и реальные experiment/PNG artifacts; связывает события по run/stroke identity; независимо вычисляет pre/post exact CHALK и per-stroke deltas; проверяет отсутствие dropped events/errors/sequence gaps; валидирует наличие и SHA-256 PNG; запускает pixel audit against frozen target mask; проверяет observed radius и task/plan/mask identity. Добавить fixture из реального формата Monitor export и негативные regression tests. Только после software CI PASS и Windows preflight можно обсуждать live captures.
 
-Дополнительное несоответствие для устранения: design ранее упоминал проверку sampling P1, однако текущие task/capture schema и `validate_fill001_capture()` не содержат проверки sampling profile/step/delay. До добавления и проверки этого binding нельзя считать P1 зафиксированным в 45-cell matrix.
+На момент аудита sampling P1 не был закреплён в task/capture schema. Позднее P1 metadata была добавлена в matrix schema v2 и валидатор; фактическое соблюдение step/delay всё ещё требует runner binding.
 
 До завершения этих работ: live execution запрещён; synthetic analyzer PASS не равен реальной интеграции; production estimator/defaults и frozen INT-006 model не менять.
 
