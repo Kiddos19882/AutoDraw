@@ -1,7 +1,7 @@
 # FILL-001 — технический дизайн экспериментального harness
 
 **Дата:** 2026-11-03  
-**Статус:** FROZEN MASKS, FIXED-RADIUS PLANNER, MATRIX/ANALYZER AND MONITOR CAPTURE ADAPTER IMPLEMENTED; CI AND LIVE PREFLIGHT PENDING  
+**Статус:** SOFTWARE REGRESSION GATE PASS (CI 41579136690, code HEAD b4cc45a); runtime binding and Windows live preflight pending  
 **Связь:** [план FILL-001](CHALK_FILL_AREA_RADIUS_EFFICIENCY_PLAN_2026-11-03.md)
 
 ## Подтверждённые ограничения
@@ -159,3 +159,12 @@ FILL-001 capture contract в текущем виде требует уже аг�
 - Live execution по-прежнему запрещён до успешного полного CI, проверки фактического bridge report schema, runner binding, реальных PNG preflight и Windows preflight.
 
 Добавлены adapter tests для event schema, exact/per-stroke CHALK, PNG hashes/coverage/leakage и отказа на truncated export/bridge failure. **Тесты пока не запускались; CI не подтверждён.**
+
+
+## Актуальное состояние software gate — 2026-11-03
+
+Полный GitHub Actions run [41579136690](https://github.com/Kiddos19882/AutoDraw/actions/runs/41579136690) привязан к code HEAD `b4cc45a80231e6bad2f878b2a5a2f16b48b9d68b` и завершился SUCCESS. Preparation/G3 — 754 passed, 24 warnings, 82 subtests passed; Game Monitor/Bridge, Application integration, Executor regression, INT-006 audit и Windows portable build/startup smoke-test успешны. Windows startup log подтвердил активный процесс AutoDraw.exe в течение 10 секунд.
+
+Исторические записи выше о неподтверждённом CI отражают состояние на дату соответствующих implementation increments. Они не являются текущим статусом software gate.
+
+Остаются открытыми: фактическая связка adapter с Bridge/executor journal, подтверждение P1 из runtime-конфигурации, проверка реального PNG crop/threshold/cursor exclusion на Windows. До закрытия этих gates live captures не запускать.
