@@ -108,3 +108,15 @@
 | 3 | IN_PROGRESS | Commit `6b1cba9` выявил invalid runtime JSON handoff; fix `8dfd1b5` и regression test `1b2d8a1` добавлены, новый CI ожидается; затем требуется повторный Windows live runtime/PNG preflight и evidence report |
 | 4 | BLOCKED | Ожидает шаги 1–3 |
 | 5 | BLOCKED | Ожидает 45 принятых captures |
+
+
+## Актуальное уточнение статуса после CI run 41692129486 — 2026-11-03
+
+Предыдущая запись о том, что Windows portable build ещё выполняется, устарела и заменяется этим уточнением.
+
+- CI run [41692129486](https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486) завершился **SUCCESS**. Все обязательные jobs, INT-006 pixel audit, Windows portable build и startup smoke-test успешны; optional benchmarks skipped.
+- Artifact `autodraw-g3-preflight-build` ID `13258221572` опубликован и не истёк: [скачать Windows portable build](https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486/artifacts/13258221572).
+- Программная интеграция FILL-001 и software regression gate подтверждены CI. Шаг 3 остаётся **IN_PROGRESS** до одного реального Windows live preflight.
+- Следующее действие оператора: скачать artifact, запустить AutoDraw, открыть вкладку FILL-001 и выполнить ровно одну задачу `rectangle / radius 10 / repeat 1`.
+- После запуска сохранить и предоставить execution report, Bridge session/run artifacts, Game Monitor export и before/after PNG. Проверить идентичность task/plan/run, фактический P1 (`point_step=4`, `point_delay=5ms`, `line_extension=0`), exact `pointCount` delta, coverage ≥99% и leakage=0 на реальном client ROI.
+- До принятия этого preflight шаги 4–5 остаются **BLOCKED**. CI не является доказательством live game runtime; 45 captures этим обновлением не запускались и не разрешаются.
