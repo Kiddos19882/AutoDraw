@@ -172,3 +172,10 @@ Capture принимается только если:
 | narrow_irregular | 44 879 | `50d45794d9594b5b11f93ddfe407c47210eb315ae10f3d70e0b3978eff5764a3` |
 
 Добавлены 8 regression tests для размеров, площади, формы, связности строк, metadata, разрешённых радиусов и отказа от неизвестных масок. Локальный прогон — 8/8 PASS; полный GitHub Actions для последних commits пока не подтверждён. Fixed-radius DrawingPlan generator ещё не реализован, поэтому live matrix не запускать.
+
+
+## 12. Ограничения первых raster prototypes
+
+Офлайн-проверка простого горизонтально-вертикального grid показала, что он не обеспечивает coverage ≥99% на радиусах 20/30, хотя leakage равен нулю. Eroded-contour + interior scanlines улучшает coverage, но не проходит строгий combined gate для всех cells: radius 1 оставляет недозаполненную границу, radius 10/30 дают небольшое leakage в OpenCV simulation. Это не live renderer measurement и не production planner.
+
+Поэтому следующий шаг — boundary-aware centerline paths с консервативным offset и двойной raster validation (coverage ≥99%, leakage=0). До прохождения обоих критериев DrawingPlan не передавать executor и не запускать live matrix.
