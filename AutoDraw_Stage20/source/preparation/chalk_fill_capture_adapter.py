@@ -9,7 +9,7 @@ from typing import Any
 import numpy as np
 from PIL import Image
 
-from chalk_fill_experiment import build_fill_target_mask
+from chalk_fill_experiment import build_fill_target_mask, fill_target_mask_sha256
 from chalk_fill_matrix import FillMatrixError
 
 FILL001_SAMPLING_PROFILE = {
@@ -204,6 +204,8 @@ def build_fill001_capture(
     if sum(stroke_deltas) != exact_chalk:
         raise FillMatrixError("Сумма per-stroke CHALK не совпадает с run-level exact CHALK.")
 
+    if fill_target_mask_sha256(task["shape_id"]) != task.get("target_mask_sha256"):
+        raise FillMatrixError("Task target_mask_sha256 не совпадает с frozen mask.")
     png_audit = audit_fill001_png_pair(task["shape_id"], before_png, after_png)
     capture = {
         "task_id": task["task_id"],
