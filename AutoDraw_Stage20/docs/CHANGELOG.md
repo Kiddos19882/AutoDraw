@@ -1,5 +1,14 @@
 # История изменений документации и проекта
 
+## 2026-11-03 — INT006R live results и FILL-001
+
+- Добавлен [отчёт INT006R live results](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md): 45/45 задач, exact CHALK, sampled/per-stroke delta match, observed radius match и нулевые Monitor/Bridge integrity errors.
+- Зафиксированы средние расходы radius 1/10/30: 67.40/67.67/67.80 CHALK; разница суммарных расходов — около 0.6%.
+- INT006R остаётся IN_PROGRESS до официального CLI analyzer на реальном bundle и ручного visual audit всех PNG.
+- Добавлен действующий план [FILL-001](CHALK_FILL_AREA_RADIUS_EFFICIENCY_PLAN_2026-11-03.md): 3 формы областей × 5 радиусов × 3 повтора (45 captures).
+- Production estimator, frozen model, executor/sampling defaults и master не менялись.
+
+
 
 ## 2026-11-03 — INT006R software gate PASS
 
