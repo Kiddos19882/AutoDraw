@@ -2,12 +2,16 @@ from __future__ import annotations
 
 """Tkinter single-task FILL-001 preflight UI."""
 
+import hashlib
 import json
 import re
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
 import tkinter as tk
+from PIL import Image, ImageGrab
+import pyautogui
 from typing import Any, Callable
 
 from chalk_fill_execution import prepare_fill001_single_task_plan
@@ -17,6 +21,7 @@ from chalk_fill_matrix import (
     load_fill001_matrix,
     write_fill001_matrix,
 )
+from brush_behavior_test_ui import _cursor_safe_point_outside_region
 
 
 class Fill001Tab:
@@ -43,6 +48,8 @@ class Fill001Tab:
         self.active_task: dict[str, Any] | None = None
         self.active_plan_path: Path | None = None
         self.active_run_record: Path | None = None
+        self.before_png_path: Path | None = None
+        self.after_png_path: Path | None = None
         self.series_var = tk.StringVar(
             value=f"fill001-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
         )
@@ -83,6 +90,7 @@ class Fill001Tab:
         self.task_combo.pack(side="left", padx=6)
         ttk.Button(task, text="Обновить список", command=self._refresh_tasks).pack(side="left", padx=4)
         ttk.Button(task, text="Подготовить и запустить одну задачу", command=self.prepare_and_run).pack(side="left", padx=4)
+        ttk.Button(task, text="Проверить runtime + PNG и принять capture", command=self.finalize_capture).pack(side="left", padx=4)
 
         self.task_details = tk.Text(outer, height=10, wrap="word", state="disabled")
         self.task_details.pack(fill="both", expand=True, pady=(0, 8))
@@ -198,11 +206,20 @@ class Fill001Tab:
             return
         if tuple(map(int, canvas_size)) != (460, 240):
             messagebox.showwarning(
-                "Размер области не совпадает",
-                f"FILL-001 frozen canvas — 460×240, текущая logical area — {canvas_size[0]}×{canvas_size[1]}. "
-                "Изменять или масштабировать frozen mask нельзя.",
+                "Размер logical canvas не совпадает",
+                "FILL-001 frozen canvas — 460×240 logical pixels. Изменять или масштабировать frozen mask нельзя.",
                 parent=self.root,
             )
+            return
+        try:
+            self.before_png_path = self._capture_board_png(task, phase="before")
+        except Exception as exc:
+            messagebox.showwarning(
+                "FILL-001 preflight не пройден",
+                f"Не удалось подтвердить пустую доску и сохранить before PNG. Рисование не запущено.\n\n{exc}",
+                parent=self.root,
+            )
+            self.before_png_path = None
             return
         if not messagebox.askyesno(
             "Разрешить один экспериментальный запуск?",
@@ -269,6 +286,9 @@ class Fill001Tab:
             "status": "start_requested",
             "created_at_utc": datetime.now(timezone.utc).isoformat(),
             "execution_report_path": None,
+            "before_png": str(self.before_png_path) if self.before_png_path else None,
+            "after_png": None,
+            "capture_path": None,
         }
         attempt_path.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         self.active_run_record = attempt_path
@@ -294,9 +314,158 @@ class Fill001Tab:
         record["finished_at_utc"] = datetime.now(timezone.utc).isoformat()
         record["executor_status"] = summary.get("status")
         record["status"] = "execution_completed_pending_runtime_and_png_audit" if summary.get("status") == "completed" else "execution_failed"
-        self.active_run_record.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        self.status_var.set(
-            f"FILL-001 {self.active_task['task_id']}: Executor {summary.get('status')}. "
-            f"Отчёт: {report_path or 'не сохранён'}. Runtime binding и реальные PNG ещё должны быть проверены."
-        )
+        self.active_run_record.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+        if summary.get("status") == "completed":
+            self.root.after(1000, self._capture_after_png)
+        else:
+            self.status_var.set(
+                f"FILL-001 {self.active_task['task_id']}: Executor {summary.get('status')}. "
+                f"Отчёт: {report_path or 'не сохранён'}. Task не принят."
+            )
         return True
+
+    def _capture_board_png(self, task: dict[str, Any], *, phase: str) -> Path:
+        """Capture exact 460x240 board ROI with cursor moved outside calibrated regions."""
+        config = self.brush_tab.get_calibration_profile() if callable(self.brush_tab.get_calibration_profile) else None
+        if not isinstance(config, dict):
+            raise ValueError("Профиль калибровки доски отсутствует.")
+        region = self.brush_tab.get_canvas_area()
+        if not isinstance(region, dict):
+            raise ValueError("Screen ROI доски отсутствует.")
+        region = {key: int(region[key]) for key in ("x", "y", "width", "height")}
+        if (region["width"], region["height"]) != (460, 240):
+            raise ValueError(
+                "Для FILL-001 pixel audit требуется screen ROI ровно 460×240 px; "
+                "масштабированный ROI пока не поддерживается."
+            )
+        screen = ImageGrab.grab()
+        expected_screen = config.get("screen_size", {})
+        if isinstance(expected_screen, dict) and (
+            expected_screen.get("width") != screen.width or expected_screen.get("height") != screen.height
+        ):
+            raise ValueError("Разрешение экрана изменилось после калибровки.")
+        meter = config.get("regions", {}).get("paint_meter_area")
+        avoid = (meter,) if isinstance(meter, dict) else ()
+        safe_point = _cursor_safe_point_outside_region(
+            region, (screen.width, screen.height), avoid_regions=avoid
+        )
+        pyautogui.moveTo(*safe_point)
+        time.sleep(0.25)
+        screen = ImageGrab.grab()
+        crop = screen.crop((
+            region["x"], region["y"],
+            region["x"] + region["width"], region["y"] + region["height"],
+        )).convert("RGB")
+        if crop.size != (460, 240):
+            raise ValueError("Сохранённый board crop не равен 460×240 px.")
+        directory = self.output_dir / "captures"
+        directory.mkdir(parents=True, exist_ok=True)
+        destination = directory / f"{task['task_id']}-{phase}.png"
+        if phase == "before":
+            reference_path, metadata_path = self.brush_tab._blank_board_reference_paths()
+            if not reference_path.is_file() or not metadata_path.is_file():
+                raise ValueError("Не найден подтверждённый эталон пустой доски.")
+            metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+            if (
+                metadata.get("reference_type") != "user_confirmed_blank_board_roi"
+                or metadata.get("user_confirmed_blank") is not True
+                or metadata.get("board_region") != region
+                or metadata.get("screen_size") != {"width": screen.width, "height": screen.height}
+            ):
+                raise ValueError("Эталон пустой доски не совпадает с текущими ROI/разрешением.")
+            from brush_experiment_capture import evaluate_board_clear
+
+            with Image.open(reference_path) as reference:
+                if reference.size != crop.size:
+                    raise ValueError("Размер эталона пустой доски не совпадает с FILL-001 crop.")
+                clear_result = evaluate_board_clear(reference.copy(), crop)
+            if clear_result.get("status") not in {"restored", "restored_within_pixel_tolerance"}:
+                raise ValueError(
+                    f"Пустая доска не подтверждена эталоном: {clear_result.get('status')}."
+                )
+        crop.save(destination)
+        return destination
+
+    def _capture_after_png(self) -> None:
+        if self.active_task is None or self.active_run_record is None:
+            return
+        try:
+            self.after_png_path = self._capture_board_png(self.active_task, phase="after")
+            record = json.loads(self.active_run_record.read_text(encoding="utf-8"))
+            record["after_png"] = str(self.after_png_path)
+            record["after_png_captured_at_utc"] = datetime.now(timezone.utc).isoformat()
+            self.active_run_record.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+            self.status_var.set(
+                f"After PNG сохранён: {self.after_png_path}. Нажмите «Проверить runtime + PNG и принять capture» "
+                "после завершения runtime binding."
+            )
+        except Exception as exc:
+            self.status_var.set(f"Не удалось сохранить after PNG: {exc}. Capture не принят.")
+
+    def finalize_capture(self) -> None:
+        if self.active_task is None or self.active_run_record is None:
+            messagebox.showwarning("Нет активной FILL-001 задачи", "Сначала выполните одну задачу FILL-001.", parent=self.root)
+            return
+        try:
+            record = json.loads(self.active_run_record.read_text(encoding="utf-8"))
+            report_path = Path(record["execution_report_path"])
+            report = json.loads(report_path.read_text(encoding="utf-8"))
+            if report.get("runtime_binding_status") != "passed":
+                raise FillMatrixError(
+                    "Runtime binding ещё не прошёл. Дождитесь обновления executor report и повторите проверку."
+                )
+            binding = report.get("runtime_binding")
+            session_path = binding.get("session_file") if isinstance(binding, dict) else None
+            before_png, after_png = record.get("before_png"), record.get("after_png")
+            if not session_path or not before_png or not after_png:
+                raise FillMatrixError("Не хватает session.json, before PNG или after PNG.")
+            from chalk_fill_capture_adapter import build_fill001_capture_from_runtime
+
+            capture = build_fill001_capture_from_runtime(
+                self.active_task,
+                session_path=session_path,
+                executor_report_path=report_path,
+                before_png=before_png,
+                after_png=after_png,
+            )
+            capture_path = self.output_dir / "captures" / f"{self.active_task['task_id']}-capture.json"
+            capture_path.write_text(json.dumps(capture, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+            task_id = self.active_task["task_id"]
+            matching = [task for task in self.matrix["tasks"] if task.get("task_id") == task_id]
+            if len(matching) != 1:
+                raise FillMatrixError("Task отсутствует или неоднозначен в текущем manifest.")
+            matching[0]["capture_status"] = "completed"
+            matching[0]["capture_path"] = str(capture_path)
+            self.matrix["status"] = "in_progress"
+            identity = {
+                key: self.matrix[key]
+                for key in ("schema_version", "phase_id", "series_id", "shapes", "radii", "repeats", "tasks")
+            }
+            self.matrix["matrix_signature"] = hashlib.sha256(
+                json.dumps(identity, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
+            ).hexdigest()
+            write_fill001_matrix(self.matrix, self.manifest_path)
+            record["status"] = "capture_accepted"
+            record["capture_path"] = str(capture_path)
+            record["capture_summary"] = {
+                "run_id": capture["run_id"],
+                "exact_chalk": capture["exact_chalk"],
+                "coverage_fraction": capture["coverage_fraction"],
+                "leakage_pixels": capture["leakage_pixels"],
+                "png_audit_status": capture["png_audit_status"],
+                "runtime_binding_status": capture["runtime_binding_status"],
+            }
+            self.active_run_record.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+            self.status_var.set(
+                f"FILL-001 capture принят: exact CHALK={capture['exact_chalk']}, "
+                f"coverage={capture['coverage_fraction']:.3%}, leakage={capture['leakage_pixels']}. "
+                "Результат записан в manifest."
+            )
+            self.active_task = None
+            self.active_plan_path = None
+            self.active_run_record = None
+            self.before_png_path = None
+            self.after_png_path = None
+            self._refresh_tasks()
+        except Exception as exc:
+            messagebox.showerror("FILL-001 capture не принят", str(exc), parent=self.root)
