@@ -14,8 +14,8 @@
 - [x] Software gate и Windows portable build/startup smoke-test прошли на code HEAD `28b56a9`, CI [41540054975](https://github.com/Kiddos19882/AutoDraw/actions/runs/41540054975).
 - [x] Live block D1–D5 × radius 1/10/30 × 3 повтора при P1 завершён: 45/45 задач.
 - [x] Raw-data audit всех 45 Monitor reports: exact CHALK, sampled/per-stroke delta совпадают, observed radius соответствует запросу, dropped events/errors/Bridge failures/sequence gaps — 0.
-- [ ] Запустить официальный CLI analyzer на реальном committed journal/capture bundle.
-- [ ] Завершить ручной visual audit всех 45 пар PNG.
+- [x] Запустить официальный CLI analyzer на реальном committed journal/capture bundle: run [41559932955](https://github.com/Kiddos19882/AutoDraw/actions/runs/41559932955), 45 accepted, 0 missing/rejected, PNG evidence complete.
+- [ ] Завершить ручной visual audit всех 45 пар PNG. Отдельный CI gate не заменяет ручную оценку качества следа.
 - Результаты: [INT006R live report](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md).
 
 | Геометрия | Radius 1 | Radius 10 | Radius 30 |
