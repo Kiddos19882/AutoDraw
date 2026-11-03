@@ -9,7 +9,7 @@
 
 | Шаг | Статус | Критерий |
 |---|---|---|
-| 1. Regression gate: tests, полный CI, Windows build | DONE | CI [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178), code/test HEAD `e3774a3`; Preparation/G3 772 passed, 24 warnings, 82 subtests; обязательные jobs и Windows portable smoke-test SUCCESS |
+| 1. Regression gate: tests, полный CI, Windows build | DONE | CI [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985), code/test HEAD `031913c`; Preparation/G3 778 passed, 24 warnings, 82 subtests; обязательные jobs и Windows portable build/startup smoke-test SUCCESS |
 | 2. Runtime binding: Bridge, executor journal, P1 | DONE | Binder, Stage 6 completion hook и связь с FILL-001 experiment context покрыты regression CI; live binding будет подтверждён на шаге 3 |
 | 3. UI/runner handoff и Windows preflight | IN_PROGRESS | Исправлена путаница logical 460×240 и физического client ROI; остаётся один Windows live run с Bridge/executor binding и реальными PNG |
 | 4. 45 live captures | BLOCKED | 45 уникальных принятых ячеек либо документированные отклонения |
@@ -29,10 +29,10 @@
 - [x] Добавить synthetic regression fixtures для event stream, Bridge/session/run artifacts, executor report и PNG.
 - [x] Реализовать `chalk_fill_runtime_binding.py`: проверка Bridge session schema v2, session/run identity, executor time window, timestamps, lifecycle, radius, exact snapshots/CHALK, sequence gaps и send failures.
 - [x] Добавить post-execution runtime binding hook в Stage 6 для отчётов с FILL-001 experiment context. Сам hook не создаёт пользовательский workflow; отдельный UI/runner handoff реализован в `chalk_fill_ui.py` и `integrated_app.py`.
-- [x] Полный CI [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178) на code/test HEAD `e3774a3`: Preparation/G3 772 passed, 24 warnings, 82 subtests; обязательные jobs SUCCESS, включая Game Monitor/Bridge, integration, executor, INT-006 audit и Windows portable build/startup.
+- [x] Полный CI [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985) на code/test HEAD `031913c`: Preparation/G3 778 passed, 24 warnings, 82 subtests; обязательные jobs SUCCESS, включая Game Monitor/Bridge, integration, executor, INT-006 audit и Windows portable build/startup.
 - [x] Реализовать отдельную вкладку FILL-001, single-task planner handoff, сохранение experiment context и task-specific P1 override; registration/UI integration tests включены в CI.
 - [x] Устранить требование физического screen ROI 460×240: UI захватывает actual calibrated ROI, adapter сохраняет ROI и logical→screen raster transform.
-- [x] Добавить synthetic regression coverage для client ROI 581×304, uniform-scale rejection, ROI metadata mismatch и leakage после rasterization; выполнение CI для текущего HEAD ожидается.
+- [x] Добавить synthetic regression coverage для client ROI 581×304, uniform-scale rejection, ROI metadata mismatch и leakage после rasterization; CI [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985) — SUCCESS.
 - [ ] Провести один реальный Windows FILL-001 runtime preflight и подтвердить task ↔ executor report ↔ Bridge session/run binding.
 - [ ] Проверить реальные before/after PNG crop, RGB threshold, cursor/UI exclusion и frozen mask alignment.
 - [ ] Только после preflight разрешить 45 live captures.
