@@ -1,7 +1,7 @@
 # FILL-001 — технический дизайн экспериментального harness
 
 **Дата:** 2026-11-03  
-**Статус:** planner/matrix/adapter/runtime-binder software gates реализованы; Stage 6 содержит только post-execution binding hook. Пользовательский FILL-001 UI/runner handoff отсутствует; Windows live preflight не выполнен. См. [аудит интеграции](CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md).  
+**Статус:** planner/matrix/adapter/runtime binder и отдельная вкладка FILL-001 с single-task UI/runner handoff реализованы; software regression gate подтверждён CI [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178) на `e3774a3`. Windows live runtime/PNG preflight не выполнен. Исторический снимок раннего состояния: [аудит интеграции](CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md).  
 **Связь:** [план FILL-001](CHALK_FILL_AREA_RADIUS_EFFICIENCY_PLAN_2026-11-03.md)
 
 ## Подтверждённые ограничения
