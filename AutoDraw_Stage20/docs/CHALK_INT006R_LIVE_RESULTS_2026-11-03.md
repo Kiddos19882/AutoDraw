@@ -77,7 +77,9 @@
 
 Software gate INT006R прошёл ранее на code HEAD `28b56a97255b57b50072ba973533ce349c706bd1`, workflow [41540054975](https://github.com/Kiddos19882/AutoDraw/actions/runs/41540054975): все обязательные jobs SUCCESS, Preparation/G3 — 682 passed и 82 subtests; Windows portable build/startup smoke-test — SUCCESS.
 
-Commit `138c9fbe` содержит live experiment data. Для этого data commit GitHub connector не вернул workflow runs или status checks; CI PASS выше относится к code HEAD, а не к отдельному повторному запуску на data commit.
+Commit `138c9fbe` содержит live experiment data. Data commit `138c9fbe` вызвал три успешных workflow: [41554658238](https://github.com/Kiddos19882/AutoDraw/actions/runs/41554658238) AutoDraw validation (стандартные jobs, PNG audit, Windows build), [41554658255](https://github.com/Kiddos19882/AutoDraw/actions/runs/41554658255) brush screenshot measurements и [41554658193](https://github.com/Kiddos19882/AutoDraw/actions/runs/41554658193) brush centerline measurements. Эти runs ещё не содержали отдельный INT006R real-data analyzer.
 
-После raw-data audit в `.github/workflows/geometry-tests.yml` добавлен отдельный analyzer step для committed INT006R dataset. Workflow [41559932955](https://github.com/Kiddos19882/AutoDraw/actions/runs/41559932955) на CI commit `2b8812d9` выполняется; он должен подтвердить accepted/missing/rejected counters и PNG evidence на реальных файлах.
+В CI commit `2b8812d9` добавлен analyzer step для committed live dataset. Workflow [41559932955](https://github.com/Kiddos19882/AutoDraw/actions/runs/41559932955) завершился SUCCESS: report `status=complete`, 45 accepted, 0 missing, 0 rejected, PNG evidence complete, 15/15 groups с тремя повторами. Artifact: `autodraw-int006r-live-validation` (ID `13195648536`). В отчёте подтверждено `visual_quality_gate=pending_manual_review`; читаемость PNG проверена автоматически, ручная оценка качества остаётся отдельным gate.
+
+Обнаруженное несоответствие в поле `sampling_profile.other_executor_parameters` исправлено в коде/тесте; повторный CI [41560787871](https://github.com/Kiddos19882/AutoDraw/actions/runs/41560787871) проверяет корректность отчётных метаданных.
 
