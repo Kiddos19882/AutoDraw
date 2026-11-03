@@ -1,0 +1,1432 @@
+{
+  "schema_version": 1,
+  "record_type": "autodraw_chalk_test_block",
+  "block_id": "a8e0b9ec87984f60aa294910d366e987",
+  "series_id": "chalk-20261103-030837-a20df5",
+  "phase_id": "INT006R",
+  "repeat_count": 3,
+  "random_seed": 20261101,
+  "requested_radius": 10,
+  "requested_radii": [
+    1,
+    10,
+    30
+  ],
+  "executor_parameters": {
+    "point_step_px": 2,
+    "line_extension_px": 0,
+    "point_delay_ms": 10,
+    "after_mouse_up_ms": 20,
+    "before_mouse_down_ms": 20,
+    "after_mouse_down_ms": 40,
+    "end_hold_ms": 50,
+    "countdown_seconds": 5
+  },
+  "executor_parameter_matrix": [
+    {
+      "point_step_px": 4,
+      "point_delay_ms": 5
+    }
+  ],
+  "expected_task_count": 45,
+  "status": "completed",
+  "created_at_utc": "2026-11-03T00:12:02.315+00:00",
+  "updated_at_utc": "2026-11-03T00:37:25.704+00:00",
+  "tasks": [
+    {
+      "task_id": "int006r_validation_d5_repeated_coverage-b1-r2",
+      "scenario_id": "int006r_validation_d5_repeated_coverage",
+      "repeat_index": 2,
+      "expected_strokes": 6,
+      "requested_radius": 1,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 1,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "a7dae7c790814ad7a9a7a9712d86470b",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:12:05.318+00:00",
+          "experiment_id": "af35d7e8105046b388f2c1933aa73f38",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-031205-b1-int006r_validation_d5_repeated_coverage-af35d7e8",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:12:05.386+00:00",
+          "finished_at_utc": "2026-11-03T00:12:40.492+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d4_short_details-b10-r3",
+      "scenario_id": "int006r_validation_d4_short_details",
+      "repeat_index": 3,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 2,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "1196905449a940f5a61a6c8d100e4c9a",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:12:40.497+00:00",
+          "experiment_id": "cadb4ca19dcd479fb0df15887f9fedc4",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-031240-b10-int006r_validation_d4_short_details-cadb4ca1",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:12:40.570+00:00",
+          "finished_at_utc": "2026-11-03T00:13:14.161+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d2_polygon-b30-r3",
+      "scenario_id": "int006r_validation_d2_polygon",
+      "repeat_index": 3,
+      "expected_strokes": 5,
+      "requested_radius": 30,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 3,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "2c8951e59c334a3a9fd37379ed038bf3",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:13:14.165+00:00",
+          "experiment_id": "81c37493bd234986ae7f52992da23537",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-031314-b30-int006r_validation_d2_polygon-81c37493",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:13:14.237+00:00",
+          "finished_at_utc": "2026-11-03T00:13:45.580+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d1_mixed_lines-b10-r2",
+      "scenario_id": "int006r_validation_d1_mixed_lines",
+      "repeat_index": 2,
+      "expected_strokes": 4,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 4,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "356b84406b864ce5843cc4e75cfedcc5",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:13:45.585+00:00",
+          "experiment_id": "f823c8611edf430c93453e6425b8a505",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-031345-b10-int006r_validation_d1_mixed_lines-f823c861",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:13:45.655+00:00",
+          "finished_at_utc": "2026-11-03T00:14:20.898+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d2_polygon-b30-r2",
+      "scenario_id": "int006r_validation_d2_polygon",
+      "repeat_index": 2,
+      "expected_strokes": 5,
+      "requested_radius": 30,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 5,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "bacd50e2656746e1a07ffcab20e73724",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:14:20.902+00:00",
+          "experiment_id": "84a1795555034db6a53ac2d0158f52d3",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-031420-b30-int006r_validation_d2_polygon-84a17955",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:14:20.973+00:00",
+          "finished_at_utc": "2026-11-03T00:14:52.715+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d1_mixed_lines-b1-r2",
+      "scenario_id": "int006r_validation_d1_mixed_lines",
+      "repeat_index": 2,
+      "expected_strokes": 4,
+      "requested_radius": 1,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 6,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "f6a25371bb57417981d15257d86e89fb",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:14:52.719+00:00",
+          "experiment_id": "1d4f9472f94d493aa71edc4ad57cf32b",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-031452-b1-int006r_validation_d1_mixed_lines-1d4f9472",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:14:52.775+00:00",
+          "finished_at_utc": "2026-11-03T00:15:25.945+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d3_intersections-b30-r2",
+      "scenario_id": "int006r_validation_d3_intersections",
+      "repeat_index": 2,
+      "expected_strokes": 6,
+      "requested_radius": 30,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 7,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "c18f8f1874424f9e878f75e761dcfa3b",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:15:25.950+00:00",
+          "experiment_id": "c2ae66e06a7b475bb5b16e491b375272",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-031526-b30-int006r_validation_d3_intersections-c2ae66e0",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:15:26.011+00:00",
+          "finished_at_utc": "2026-11-03T00:15:58.744+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d3_intersections-b30-r3",
+      "scenario_id": "int006r_validation_d3_intersections",
+      "repeat_index": 3,
+      "expected_strokes": 6,
+      "requested_radius": 30,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 8,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "0700e5b848484a85a83cc85d4d1d0836",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:15:58.749+00:00",
+          "experiment_id": "0d08bd8b3bc54bf29bde63301fddaea4",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-031558-b30-int006r_validation_d3_intersections-0d08bd8b",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:15:58.814+00:00",
+          "finished_at_utc": "2026-11-03T00:16:31.579+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d3_intersections-b1-r1",
+      "scenario_id": "int006r_validation_d3_intersections",
+      "repeat_index": 1,
+      "expected_strokes": 6,
+      "requested_radius": 1,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 9,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "12a8734dad4c4b85aa14de9f8c9f7855",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:16:31.583+00:00",
+          "experiment_id": "ae26477e0a8b4a77a90d51540d586d90",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-031631-b1-int006r_validation_d3_intersections-ae26477e",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:16:31.645+00:00",
+          "finished_at_utc": "2026-11-03T00:17:06.901+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d2_polygon-b10-r1",
+      "scenario_id": "int006r_validation_d2_polygon",
+      "repeat_index": 1,
+      "expected_strokes": 5,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 10,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "64cd8dd1364449cc9d18d72fc407def5",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:17:06.907+00:00",
+          "experiment_id": "de17eb426eaf48d78af58d2f1a0c3850",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-031706-b10-int006r_validation_d2_polygon-de17eb42",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:17:06.969+00:00",
+          "finished_at_utc": "2026-11-03T00:17:42.454+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d4_short_details-b30-r2",
+      "scenario_id": "int006r_validation_d4_short_details",
+      "repeat_index": 2,
+      "expected_strokes": 6,
+      "requested_radius": 30,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 11,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "73eba016abe34a1bb4131a74af01d360",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:17:42.461+00:00",
+          "experiment_id": "74741d9d2652415c95fc037e271fd221",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-031742-b30-int006r_validation_d4_short_details-74741d9d",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:17:42.538+00:00",
+          "finished_at_utc": "2026-11-03T00:18:11.303+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d2_polygon-b10-r3",
+      "scenario_id": "int006r_validation_d2_polygon",
+      "repeat_index": 3,
+      "expected_strokes": 5,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 12,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "b5843254568042399d756f8962efc909",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:18:11.308+00:00",
+          "experiment_id": "b821db5e0c08470a86bcd68949d4161f",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-031811-b10-int006r_validation_d2_polygon-b821db5e",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:18:11.380+00:00",
+          "finished_at_utc": "2026-11-03T00:18:46.647+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d3_intersections-b10-r3",
+      "scenario_id": "int006r_validation_d3_intersections",
+      "repeat_index": 3,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 13,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "77e17fb53f204f088f711944db204805",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:18:46.652+00:00",
+          "experiment_id": "234461113f8244bdbb940be138ba51be",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-031846-b10-int006r_validation_d3_intersections-23446111",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:18:46.726+00:00",
+          "finished_at_utc": "2026-11-03T00:19:23.767+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d3_intersections-b30-r1",
+      "scenario_id": "int006r_validation_d3_intersections",
+      "repeat_index": 1,
+      "expected_strokes": 6,
+      "requested_radius": 30,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 14,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "b2ca4476ed6d480780f903f126206ae0",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:19:23.772+00:00",
+          "experiment_id": "8d778bb389eb4b0b84a7a773db2754f4",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-031923-b30-int006r_validation_d3_intersections-8d778bb3",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:19:23.844+00:00",
+          "finished_at_utc": "2026-11-03T00:19:55.318+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d1_mixed_lines-b30-r1",
+      "scenario_id": "int006r_validation_d1_mixed_lines",
+      "repeat_index": 1,
+      "expected_strokes": 4,
+      "requested_radius": 30,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 15,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "646c9936f9da457dae7de03756314289",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:19:55.322+00:00",
+          "experiment_id": "28601b8a6b314a43ae9f27e5f36dcd31",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-031955-b30-int006r_validation_d1_mixed_lines-28601b8a",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:19:55.378+00:00",
+          "finished_at_utc": "2026-11-03T00:20:26.088+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d2_polygon-b30-r1",
+      "scenario_id": "int006r_validation_d2_polygon",
+      "repeat_index": 1,
+      "expected_strokes": 5,
+      "requested_radius": 30,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 16,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "5cf70c3c76b24a52a96162eb6952008e",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:20:26.093+00:00",
+          "experiment_id": "593599a7009b46a0ab432591bd04d620",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-032026-b30-int006r_validation_d2_polygon-593599a7",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:20:26.180+00:00",
+          "finished_at_utc": "2026-11-03T00:20:58.207+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d5_repeated_coverage-b30-r2",
+      "scenario_id": "int006r_validation_d5_repeated_coverage",
+      "repeat_index": 2,
+      "expected_strokes": 6,
+      "requested_radius": 30,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 17,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "aa963fa10b88498a8427e9e660a06801",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:20:58.213+00:00",
+          "experiment_id": "72d1da47e44546758776448df5798931",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-032058-b30-int006r_validation_d5_repeated_coverage-72d1da47",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:20:58.273+00:00",
+          "finished_at_utc": "2026-11-03T00:21:30.285+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d4_short_details-b1-r2",
+      "scenario_id": "int006r_validation_d4_short_details",
+      "repeat_index": 2,
+      "expected_strokes": 6,
+      "requested_radius": 1,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 18,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "b0ac0901df02424e809a5154a833e96e",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:21:30.290+00:00",
+          "experiment_id": "d1553a14c5d84ee28c8ecf77607cdd6e",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-032130-b1-int006r_validation_d4_short_details-d1553a14",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:21:30.362+00:00",
+          "finished_at_utc": "2026-11-03T00:22:02.402+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d3_intersections-b10-r2",
+      "scenario_id": "int006r_validation_d3_intersections",
+      "repeat_index": 2,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 19,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "d9235b6a59ce4fa6a5f6dcb27b3b1119",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:22:02.407+00:00",
+          "experiment_id": "fbc5fcefa26f4d2aa2888197bd4646e8",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-032202-b10-int006r_validation_d3_intersections-fbc5fcef",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:22:02.479+00:00",
+          "finished_at_utc": "2026-11-03T00:22:38.904+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d1_mixed_lines-b30-r3",
+      "scenario_id": "int006r_validation_d1_mixed_lines",
+      "repeat_index": 3,
+      "expected_strokes": 4,
+      "requested_radius": 30,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 20,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "fabffc7e255c4b63a01496e8ddffe425",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:22:38.909+00:00",
+          "experiment_id": "2fbe516e77f14444878daf0edfe22a73",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-032238-b30-int006r_validation_d1_mixed_lines-2fbe516e",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:22:38.971+00:00",
+          "finished_at_utc": "2026-11-03T00:23:09.835+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d5_repeated_coverage-b30-r1",
+      "scenario_id": "int006r_validation_d5_repeated_coverage",
+      "repeat_index": 1,
+      "expected_strokes": 6,
+      "requested_radius": 30,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 21,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "35da75fe503d4bf0b0f09c3c5fed3900",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:23:09.841+00:00",
+          "experiment_id": "ac5d5accd49f43799b4a910082583cef",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-032309-b30-int006r_validation_d5_repeated_coverage-ac5d5acc",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:23:09.927+00:00",
+          "finished_at_utc": "2026-11-03T00:23:41.776+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d4_short_details-b10-r1",
+      "scenario_id": "int006r_validation_d4_short_details",
+      "repeat_index": 1,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 22,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "90806e35a8d54eeba6e21d5893c7d38e",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:23:41.781+00:00",
+          "experiment_id": "ec7d82e230014897951f33258e47eb8e",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-032341-b10-int006r_validation_d4_short_details-ec7d82e2",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:23:41.852+00:00",
+          "finished_at_utc": "2026-11-03T00:24:17.352+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d4_short_details-b30-r1",
+      "scenario_id": "int006r_validation_d4_short_details",
+      "repeat_index": 1,
+      "expected_strokes": 6,
+      "requested_radius": 30,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 23,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "dd5d23432a5f4be39bd9d84ee45e55ca",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:24:17.358+00:00",
+          "experiment_id": "76277a69d87e460c944e8cb9fac1169f",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-032417-b30-int006r_validation_d4_short_details-76277a69",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:24:17.444+00:00",
+          "finished_at_utc": "2026-11-03T00:24:47.433+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d5_repeated_coverage-b1-r1",
+      "scenario_id": "int006r_validation_d5_repeated_coverage",
+      "repeat_index": 1,
+      "expected_strokes": 6,
+      "requested_radius": 1,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 24,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "b9b76f510d2c48e3b31619982f00479e",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:24:47.438+00:00",
+          "experiment_id": "45f5018e8dfc40beb5e6dbf56384aa05",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-032447-b1-int006r_validation_d5_repeated_coverage-45f5018e",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:24:47.513+00:00",
+          "finished_at_utc": "2026-11-03T00:25:21.959+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d1_mixed_lines-b10-r1",
+      "scenario_id": "int006r_validation_d1_mixed_lines",
+      "repeat_index": 1,
+      "expected_strokes": 4,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 25,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "0c6e43e9f8be41d096f83d0503f7bcc1",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:25:21.964+00:00",
+          "experiment_id": "6a2bf925f4e14daeba2f30f156dcb46b",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-032522-b10-int006r_validation_d1_mixed_lines-6a2bf925",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:25:22.044+00:00",
+          "finished_at_utc": "2026-11-03T00:25:58.189+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d5_repeated_coverage-b10-r1",
+      "scenario_id": "int006r_validation_d5_repeated_coverage",
+      "repeat_index": 1,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 26,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "02903ab786e44d96a5bb82faea021810",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:25:58.195+00:00",
+          "experiment_id": "b5666c18b0de4d9dacf94f6833844720",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-032558-b10-int006r_validation_d5_repeated_coverage-b5666c18",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:25:58.256+00:00",
+          "finished_at_utc": "2026-11-03T00:26:36.388+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d4_short_details-b1-r3",
+      "scenario_id": "int006r_validation_d4_short_details",
+      "repeat_index": 3,
+      "expected_strokes": 6,
+      "requested_radius": 1,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 27,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "9271de10e2a74d3eb3fffdeca6b02e80",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:26:36.393+00:00",
+          "experiment_id": "5c472e8d7ddf475d8cda26a2b682c8d4",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-032636-b1-int006r_validation_d4_short_details-5c472e8d",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:26:36.462+00:00",
+          "finished_at_utc": "2026-11-03T00:27:08.902+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d1_mixed_lines-b1-r1",
+      "scenario_id": "int006r_validation_d1_mixed_lines",
+      "repeat_index": 1,
+      "expected_strokes": 4,
+      "requested_radius": 1,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 28,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "0359b35dee044683b84fcc7bf5858d1f",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:27:08.907+00:00",
+          "experiment_id": "7e0843d0dcfc413cb0f94042248e6c54",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-032708-b1-int006r_validation_d1_mixed_lines-7e0843d0",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:27:08.967+00:00",
+          "finished_at_utc": "2026-11-03T00:27:42.738+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d2_polygon-b10-r2",
+      "scenario_id": "int006r_validation_d2_polygon",
+      "repeat_index": 2,
+      "expected_strokes": 5,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 29,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "52969fb92d1a49489b9263c302c4169f",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:27:42.744+00:00",
+          "experiment_id": "2fdd558c322848c8934e5153b3130c8e",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-032742-b10-int006r_validation_d2_polygon-2fdd558c",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:27:42.808+00:00",
+          "finished_at_utc": "2026-11-03T00:28:18.396+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d5_repeated_coverage-b10-r3",
+      "scenario_id": "int006r_validation_d5_repeated_coverage",
+      "repeat_index": 3,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 30,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "41f58e3e41d44190a108fef6cde74a53",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:28:18.401+00:00",
+          "experiment_id": "17e1043333f24dbdbc7fd7244d3b64c0",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-032818-b10-int006r_validation_d5_repeated_coverage-17e10433",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:28:18.462+00:00",
+          "finished_at_utc": "2026-11-03T00:28:55.291+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d2_polygon-b1-r2",
+      "scenario_id": "int006r_validation_d2_polygon",
+      "repeat_index": 2,
+      "expected_strokes": 5,
+      "requested_radius": 1,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 31,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "8da06b674f064586a3c0e9c7ad3403e2",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:28:55.297+00:00",
+          "experiment_id": "54944d11ab31416983b81d289241e2f7",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-032855-b1-int006r_validation_d2_polygon-54944d11",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:28:55.396+00:00",
+          "finished_at_utc": "2026-11-03T00:29:29.630+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d5_repeated_coverage-b30-r3",
+      "scenario_id": "int006r_validation_d5_repeated_coverage",
+      "repeat_index": 3,
+      "expected_strokes": 6,
+      "requested_radius": 30,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 32,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "2fdfda9597aa4af78e550c0ecd98e316",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:29:29.635+00:00",
+          "experiment_id": "c440d9ee3f474edeab58b6c5b9adcf0f",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-032929-b30-int006r_validation_d5_repeated_coverage-c440d9ee",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:29:29.711+00:00",
+          "finished_at_utc": "2026-11-03T00:30:01.951+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d1_mixed_lines-b30-r2",
+      "scenario_id": "int006r_validation_d1_mixed_lines",
+      "repeat_index": 2,
+      "expected_strokes": 4,
+      "requested_radius": 30,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 33,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "ad883140381948bfac3ddb70d3cc80dd",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:30:01.957+00:00",
+          "experiment_id": "9e0a66f10bf34f6bbf22668e733fef38",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-033002-b30-int006r_validation_d1_mixed_lines-9e0a66f1",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:30:02.033+00:00",
+          "finished_at_utc": "2026-11-03T00:30:32.299+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d5_repeated_coverage-b10-r2",
+      "scenario_id": "int006r_validation_d5_repeated_coverage",
+      "repeat_index": 2,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 34,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "6b60cd71c43044f4a704c38a77e7bd9f",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:30:32.305+00:00",
+          "experiment_id": "0f71c12e29bb4002acfabf951afb787d",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-033032-b10-int006r_validation_d5_repeated_coverage-0f71c12e",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:30:32.368+00:00",
+          "finished_at_utc": "2026-11-03T00:31:08.818+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d4_short_details-b1-r1",
+      "scenario_id": "int006r_validation_d4_short_details",
+      "repeat_index": 1,
+      "expected_strokes": 6,
+      "requested_radius": 1,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 35,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "f0140b7b986f45a587892e334f5cf3ac",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:31:08.823+00:00",
+          "experiment_id": "3a56b8ed2fda4e2b98df16e2399759fb",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-033108-b1-int006r_validation_d4_short_details-3a56b8ed",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:31:08.894+00:00",
+          "finished_at_utc": "2026-11-03T00:31:41.079+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d3_intersections-b1-r3",
+      "scenario_id": "int006r_validation_d3_intersections",
+      "repeat_index": 3,
+      "expected_strokes": 6,
+      "requested_radius": 1,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 36,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "331f7aabee1849cd81bdc546f1258aad",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:31:41.085+00:00",
+          "experiment_id": "31ec65e69b444515a6351042961549b4",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-033141-b1-int006r_validation_d3_intersections-31ec65e6",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:31:41.160+00:00",
+          "finished_at_utc": "2026-11-03T00:32:16.695+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d3_intersections-b10-r1",
+      "scenario_id": "int006r_validation_d3_intersections",
+      "repeat_index": 1,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 37,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "d9b7b188c854482b99c1ff3c99fe3cae",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:32:16.700+00:00",
+          "experiment_id": "47ee65fb0e4a49c6bf45a5655381edbb",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-033216-b10-int006r_validation_d3_intersections-47ee65fb",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:32:16.769+00:00",
+          "finished_at_utc": "2026-11-03T00:32:53.466+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d1_mixed_lines-b10-r3",
+      "scenario_id": "int006r_validation_d1_mixed_lines",
+      "repeat_index": 3,
+      "expected_strokes": 4,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 38,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "b306537774324a8ca876e913d13ab216",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:32:53.472+00:00",
+          "experiment_id": "2081d36df1f0481c903c4011289b5f45",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-033253-b10-int006r_validation_d1_mixed_lines-2081d36d",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:32:53.542+00:00",
+          "finished_at_utc": "2026-11-03T00:33:29.661+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d5_repeated_coverage-b1-r3",
+      "scenario_id": "int006r_validation_d5_repeated_coverage",
+      "repeat_index": 3,
+      "expected_strokes": 6,
+      "requested_radius": 1,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 39,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "96d4d1deb4e14ed386a5245e2365fdff",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:33:29.668+00:00",
+          "experiment_id": "603fc7476a3d4b24913cd59c02d1fa1f",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-033329-b1-int006r_validation_d5_repeated_coverage-603fc747",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:33:29.731+00:00",
+          "finished_at_utc": "2026-11-03T00:34:04.446+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d4_short_details-b30-r3",
+      "scenario_id": "int006r_validation_d4_short_details",
+      "repeat_index": 3,
+      "expected_strokes": 6,
+      "requested_radius": 30,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 40,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "f587c3de49664f5a98e6dbdc5d58cdc9",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:34:04.452+00:00",
+          "experiment_id": "4206ec504afc476e9bb2567972d0bfce",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-033404-b30-int006r_validation_d4_short_details-4206ec50",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:34:04.548+00:00",
+          "finished_at_utc": "2026-11-03T00:34:34.766+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d1_mixed_lines-b1-r3",
+      "scenario_id": "int006r_validation_d1_mixed_lines",
+      "repeat_index": 3,
+      "expected_strokes": 4,
+      "requested_radius": 1,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 41,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "e85a568a723f45758b2e2f3e5c288224",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:34:34.772+00:00",
+          "experiment_id": "759299e3ba754bfab15884f5a81cda5e",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-033434-b1-int006r_validation_d1_mixed_lines-759299e3",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:34:34.847+00:00",
+          "finished_at_utc": "2026-11-03T00:35:08.367+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d2_polygon-b1-r1",
+      "scenario_id": "int006r_validation_d2_polygon",
+      "repeat_index": 1,
+      "expected_strokes": 5,
+      "requested_radius": 1,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 42,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "d20d21b12c9648f7a22facca4fc7f272",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:35:08.373+00:00",
+          "experiment_id": "cba838b9a81a46b6b6420acd5a4661db",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-033508-b1-int006r_validation_d2_polygon-cba838b9",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:35:08.447+00:00",
+          "finished_at_utc": "2026-11-03T00:35:42.632+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d4_short_details-b10-r2",
+      "scenario_id": "int006r_validation_d4_short_details",
+      "repeat_index": 2,
+      "expected_strokes": 6,
+      "requested_radius": 10,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 43,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "fae1b24156c842159bcf7d3cfd0871de",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:35:42.637+00:00",
+          "experiment_id": "e728e098b87e4121a4dd3bd831a12caf",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-033542-b10-int006r_validation_d4_short_details-e728e098",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:35:42.701+00:00",
+          "finished_at_utc": "2026-11-03T00:36:16.858+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d3_intersections-b1-r2",
+      "scenario_id": "int006r_validation_d3_intersections",
+      "repeat_index": 2,
+      "expected_strokes": 6,
+      "requested_radius": 1,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 44,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "88c324ef761644d6a45aac65f6830988",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:36:16.864+00:00",
+          "experiment_id": "6ba4fdc7a27a4f51a9d54d4b5402659c",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-033616-b1-int006r_validation_d3_intersections-6ba4fdc7",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:36:16.936+00:00",
+          "finished_at_utc": "2026-11-03T00:36:51.986+00:00"
+        }
+      ]
+    },
+    {
+      "task_id": "int006r_validation_d2_polygon-b1-r3",
+      "scenario_id": "int006r_validation_d2_polygon",
+      "repeat_index": 3,
+      "expected_strokes": 5,
+      "requested_radius": 1,
+      "executor_parameters": {
+        "point_step_px": 4,
+        "line_extension_px": 0,
+        "point_delay_ms": 5,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      },
+      "matrix_order_index": 45,
+      "status": "completed",
+      "attempts": [
+        {
+          "attempt_id": "19873c6f4154486094eaca60a4245fa5",
+          "status": "completed",
+          "started_at_utc": "2026-11-03T00:36:51.992+00:00",
+          "experiment_id": "b709dbe8e6c2495aa5fce496f4c0d5c9",
+          "experiment_dir": "C:\\Users\\Kiddos\\Desktop\\autodraw-g3-preflight-build\\data\\results\\brush_behavior_tests\\experiment-20261103-033652-b1-int006r_validation_d2_polygon-b709dbe8",
+          "reason": null,
+          "experiment_registered_at_utc": "2026-11-03T00:36:52.087+00:00",
+          "finished_at_utc": "2026-11-03T00:37:25.704+00:00"
+        }
+      ]
+    }
+  ]
+}

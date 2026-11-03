@@ -6,7 +6,7 @@
   "environment": {
     "screen_width": 1920,
     "screen_height": 1080,
-    "calibrated_at_utc": "2026-10-31T18:05:22+00:00",
+    "calibrated_at_utc": "2026-11-03T00:09:04+00:00",
     "windows_scale_percent": 100,
     "browser_zoom_percent": 100,
     "browser": "Firefox",
@@ -34,8 +34,8 @@
       "y": 305
     },
     "brush_slider_value_30": {
-      "x": 1168,
-      "y": 305
+      "x": 1162,
+      "y": 303
     },
     "editor_open": null,
     "save_drawing": null
