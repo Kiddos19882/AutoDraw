@@ -426,7 +426,9 @@ class Fill001Tab:
         region = {key: int(region[key]) for key in ("x", "y", "width", "height")}
         if region["width"] < 2 or region["height"] < 2:
             raise ValueError("Calibrated screen ROI должен быть не меньше 2×2 px.")
-        if phase == "after" and self.capture_region is not None and region != self.capture_region:
+        if phase == "after" and self.capture_region is None:
+            raise ValueError("Before capture ROI отсутствует; after PNG не может быть принят без пары.")
+        if phase == "after" and region != self.capture_region:
             raise ValueError("ROI доски изменился между before/after capture.")
         if phase == "before":
             self.capture_region = dict(region)
@@ -536,6 +538,8 @@ class Fill001Tab:
             before_png, after_png = record.get("before_png"), record.get("after_png")
             if not session_path or not before_png or not after_png:
                 raise FillMatrixError("Не хватает session.json, before PNG или after PNG.")
+            if not isinstance(record.get("screen_roi"), dict):
+                raise FillMatrixError("В attempt record отсутствует calibrated screen ROI.")
             from chalk_fill_capture_adapter import build_fill001_capture_from_runtime
 
             capture = build_fill001_capture_from_runtime(
