@@ -399,8 +399,18 @@ class Fill001Tab:
                 f"After PNG сохранён: {self.after_png_path}. Нажмите «Проверить runtime + PNG и принять capture» "
                 "после завершения runtime binding."
             )
+            try:
+                self.root.deiconify()
+                self.root.lift()
+            except tk.TclError:
+                pass
         except Exception as exc:
             self.status_var.set(f"Не удалось сохранить after PNG: {exc}. Capture не принят.")
+            try:
+                self.root.deiconify()
+                self.root.lift()
+            except tk.TclError:
+                pass
 
     def finalize_capture(self) -> None:
         if self.active_task is None or self.active_run_record is None:
