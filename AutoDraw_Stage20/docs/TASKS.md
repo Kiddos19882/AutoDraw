@@ -41,7 +41,8 @@
 | INT-004 | DONE | Автоматически собирать telemetry и связывать её с experiment ID | WebSocket bridge, per-run capture, RunRecorder и запись monitor report/идентификаторов в experiment manifest использованы в принятых G1–G3 captures. Overhead comparison относится к INT-003. |
 | INT-005 | DONE | Реализовать автоматизированную лабораторию CHALK-экспериментов | Matrix/block runner, task identity, повторения, manifest, recovery/fail-closed gates и capture acceptance использованы для G1 12/12, G2 18/18 и G3 27/27. |
 | INT-006 | IN_PROGRESS | Официальный analyzer PASS: 45/45 accepted, 0 missing/rejected, 15/15 groups complete; SHA-256 и journal/task/experiment/run/profile/geometry binding проверены. Метрики: MAE 1.408, RMSE 1.967, bias -0.875, MAPE 2.134%, max underprediction 1.82 CHALK. Остаются safety-margin decision и расширение domain validation. См. [официальный отчёт](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md). Production estimator/defaults не менять. |
-| INT-006R | IN_PROGRESS | Реализовать и проверить отдельную фазу D1–D5 × radius 1/10/30 × 3 повтора при P1; harness, UI, executor handoff, journal validator и независимый analyzer добавлены. Ожидается полный CI; live captures заблокированы до PASS. |
+| INT-006R | IN_PROGRESS | 45/45 live captures завершены; exact CHALK, per-stroke delta, requested/observed radius и нулевые Monitor/Bridge transport errors подтверждены по 45 reports. Остались официальный CLI analyzer на реальном bundle и ручной visual audit всех PNG. См. [live results](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md). |
+| INT-006F | IN_PROGRESS | Проверить эффективность заполнения одноцветных областей по радиусу | Подготовлен план FILL-001: прямоугольная, широкая неправильная и узкая неправильная области × радиусы 1/5/10/20/30 × 3 повтора. Harness/CI/live captures ещё не выполнены. Основная метрика — качественно покрытая площадь на exact CHALK. |
 | INT-007 | BLOCKED | Интегрировать валидированную модель в preflight/resource estimator AutoDraw | Начинать только после независимой validation INT-006 и определения консервативного safety margin. |
 | INT-008 | TODO | Оптимизировать кисти, траектории, порядок и покрытие | Подбирать способ построения рисунка в пределах квоты CHALK с учётом качества покрытия; зависит от INT-006/007. |
 | INT-009 | TODO | Сравнить прогноз с фактом и проверить качество | Проверить на независимых рисунках прогноз, exact CHALK delta, визуальное качество и устойчивость к разным типам геометрии. |
@@ -60,7 +61,7 @@
 - [x] Выполнить 45 независимых live captures D1–D5; предварительно сверить exact CHALK и per-stroke breakdown по всем 45 Monitor reports. Отдельный preflight log в capture bundle не найден.
 - [ ] После validation определить обоснованный safety margin.
 
-**Актуальный приоритет INT-006:** официальный quantitative analyzer gate закрыт. Следующий gate — отдельное решение о provisional empirical guard и расширенная проверка модели на полном разнообразии рисунков. См. [официальный отчёт](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md) и [план validation](CHALK_INT006_INDEPENDENT_VALIDATION_PLAN_2026-11-02.md). Исторические чек-листы ниже сохраняют ход выполнения и не переопределяют статусы таблицы.
+**Актуальный приоритет INT-006:** quantitative gate D1–D5 закрыт, но safety margin не установлен. INT006R live captures 45/45 завершены; ожидаются реальный CLI analyzer и ручной visual audit. Следующий эксперимент — FILL-001 для измерения эффективности заполнения областей; затем mixed-radius и полные независимые DrawingPlan. INT-007 остаётся BLOCKED. Исторические чек-листы ниже сохраняют ход выполнения и не переопределяют статусы таблицы.
 ## Отменённые работы
 
 | ID | Статус | Задача | Основание |
