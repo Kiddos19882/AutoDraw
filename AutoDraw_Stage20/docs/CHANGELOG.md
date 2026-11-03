@@ -1,3 +1,8 @@
+## 2026-11-03 — FILL-001 client ROI correction CI
+
+- GitHub Actions [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985) завершился SUCCESS на code/test HEAD `031913c`: Preparation/G3 778 passed, 24 warnings, 82 subtests; Game Monitor/Bridge, Executor, Application integration, INT-006 pixel audit и Windows portable build/startup smoke-test успешны; optional benchmarks skipped.
+- Portable artifact `autodraw-g3-preflight-build` загружен (artifact ID `13254104951`, 636,529,516 bytes, retention 7 days). Live Windows/game preflight не выполнялся и остаётся следующим gate.
+
 ## 2026-11-03 — FILL-001 client-resolution ROI correction
 
 - Исправлено ошибочное требование screen ROI ровно 460×240. 460×240 остаётся logical board size движка и frozen masks; клиентский ROI берётся из калибровки и сохраняется в фактическом размере.
