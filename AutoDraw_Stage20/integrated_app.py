@@ -832,8 +832,6 @@ class AutoDrawUnifiedApp:
         if active_path is None or Path(active_path).resolve() != Path(self.data_paths["runtime"] / "current_brush_behavior_test.json").resolve():
             messagebox.showerror("Нет FILL-001 плана", "В Stage 6 не загружен ожидаемый runtime plan.", parent=self.root)
             return False
-        if Path(plan_path).resolve() != Path(plan_path):
-            return False
         try:
             document = json.loads(Path(active_path).read_text(encoding="utf-8"))
             context = document.get("autodraw_experiment")
