@@ -109,3 +109,41 @@ def test_monitor_adapter_rejects_truncated_or_untrusted_evidence(tmp_path):
             before_png=before, after_png=after, run_id="live-run-003",
             bridge_diagnostics={"run_id": "live-run-003", "event_count": len(_monitor_export(task)["events"]), "bridge_failures": 1, "sequence_gaps": 0},
         )
+
+
+def test_monitor_adapter_rejects_bad_sample_totals_and_wrong_bridge_run(tmp_path):
+    matrix = build_fill001_matrix("ADAPTER-TEST")
+    task = matrix["tasks"][0]
+    before, after = _png_pair(tmp_path, task["shape_id"])
+    export = _monitor_export(task)
+    sample = next(event for event in export["events"] if event["type"] == "DRAW_SAMPLE")
+    sample["pointDelta"] += 1
+    with pytest.raises(FillMatrixError):
+        build_fill001_capture(
+            task, export, sampling_profile=FILL001_SAMPLING_PROFILE,
+            before_png=before, after_png=after, run_id="live-run-004",
+            bridge_diagnostics={"run_id": "live-run-004", "event_count": len(export["events"]), "bridge_failures": 0, "sequence_gaps": 0},
+        )
+
+    export = _monitor_export(task)
+    with pytest.raises(FillMatrixError):
+        build_fill001_capture(
+            task, export, sampling_profile=FILL001_SAMPLING_PROFILE,
+            before_png=before, after_png=after, run_id="live-run-005",
+            bridge_diagnostics={"run_id": "other-run", "event_count": len(export["events"]), "bridge_failures": 0, "sequence_gaps": 0},
+        )
+
+
+def test_png_audit_detects_pixels_outside_frozen_target(tmp_path):
+    matrix = build_fill001_matrix("ADAPTER-TEST")
+    task = matrix["tasks"][0]
+    before, after = _png_pair(tmp_path, task["shape_id"])
+    with Image.open(after) as image:
+        pixels = np.asarray(image.convert("RGB")).copy()
+    mask = build_fill_target_mask(task["shape_id"])
+    outside_y, outside_x = np.argwhere(~mask)[0]
+    pixels[outside_y, outside_x] = 255
+    Image.fromarray(pixels).save(after)
+    result = audit_fill001_png_pair(task["shape_id"], before, after)
+    assert result["png_audit_status"] == "failed"
+    assert result["leakage_pixels"] == 1
