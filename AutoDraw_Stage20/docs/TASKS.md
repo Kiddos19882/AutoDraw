@@ -2,20 +2,20 @@
 
 ## Актуальное состояние FILL-001 на 2026-11-04
 
-Binder fix committed [95a8d17](https://github.com/Kiddos19882/AutoDraw/commit/95a8d1799cd2cbbba09929cc5086a3655ba90c78): activity window определяется последним event t относительно started_at_performance_ms; finished_at_utc ограничен idle finalization grace. Regression tests [870bebc](https://github.com/Kiddos19882/AutoDraw/commit/870bebce6b39e782f70ef9f476a324ee840c05ae) покрывают calibration false-overlap и JSON более 27 MiB. CI на этих commits пока не подтверждён. Предыдущий preflight остаётся rejected, session CHALK=5999 и доска исчерпана; 45-cell matrix BLOCKED до CI и нового принятого live preflight. См. [postmortem](CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md).
+Binder fix committed [95a8d17](https://github.com/Kiddos19882/AutoDraw/commit/95a8d1799cd2cbbba09929cc5086a3655ba90c78): activity window определяется последним event t относительно started_at_performance_ms; finished_at_utc ограничен idle finalization grace. Regression tests [870bebc](https://github.com/Kiddos19882/AutoDraw/commit/870bebce6b39e782f70ef9f476a324ee840c05ae) покрывают calibration false-overlap и JSON более 27 MiB. Полный CI [41737923777](https://github.com/Kiddos19882/AutoDraw/actions/runs/41737923777) завершился SUCCESS на `870bebc`, включая Windows portable build/startup smoke-test; optional benchmarks skipped. Предыдущий preflight остаётся REJECTED, session CHALK=5999 и доска исчерпана; 45-cell matrix BLOCKED до нового принятого live preflight. См. [postmortem](CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md).
 
 Реестр содержит документационные и технические задачи проекта. Аналитические этапы 7–10 отменены и в backlog не включаются; INT-001 и последующие задачи ресурсной оптимизации являются отдельной инициативой.
 
 ## Временный план FILL-001 на пять шагов
 
 **Документ:** [CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md](CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md)  
-**Статус:** IN_PROGRESS — software fixes и regression tests прошли полный CI [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881) на code HEAD `fe6d446`, включая Windows portable build/startup smoke-test. Live execution завершён 131/131 strokes, session CHALK=5999, но capture не принят. Найден binder false-overlap на калибровочном Bridge run; требуется исправление и новый preflight на восстановленной доске. Шаги 4–5 BLOCKED.
+**Статус:** IN_PROGRESS — binder activity-window fix и regression tests (`95a8d17`, `870bebc`) прошли полный CI [41737923777](https://github.com/Kiddos19882/AutoDraw/actions/runs/41737923777), включая Windows portable build/startup smoke-test. Предыдущий live execution завершился 131/131 strokes, session CHALK=5999, но capture не принят. Текущая доска исчерпана; следующий gate — новый Windows live preflight на восстановленной доске. Шаги 4–5 BLOCKED.
 
 | Шаг | Статус | Критерий |
 |---|---|---|
 | 1. Regression gate: tests, полный CI, Windows build | DONE | CI [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881), code HEAD `fe6d446`; Preparation/G3 782 passed, 24 warnings, 82 subtests; все обязательные jobs, INT-006 pixel audit и Windows portable build/startup smoke-test SUCCESS; optional benchmarks skipped |
 | 2. Runtime binding: Bridge, executor journal, P1 | DONE | Binder, Stage 6 completion hook и связь с FILL-001 experiment context покрыты regression CI; live binding будет подтверждён на шаге 3 |
-| 3. UI/runner handoff и Windows preflight | IN_PROGRESS | Binder исправлен в `95a8d17`; regression tests calibration false-overlap и large JSON >27 MiB добавлены в `870bebc`. Ожидается CI на новом HEAD; затем один preflight на восстановленной доске |
+| 3. UI/runner handoff и Windows preflight | IN_PROGRESS | Binder fix `95a8d17` и regression tests `870bebc` подтверждены полным CI [41737923777] SUCCESS; требуется один live preflight на восстановленной доске |
 | 4. 45 live captures | BLOCKED | 45 уникальных принятых ячеек либо документированные отклонения |
 | 5. CHALK/quality analysis и рекомендация | BLOCKED | Подготовлен отчёт о влиянии радиуса и лучшей стратегии заливки |
 
@@ -40,12 +40,12 @@ Binder fix committed [95a8d17](https://github.com/Kiddos19882/AutoDraw/commit/95
 - [x] Добавить интеграционный regression test, который передаёт реальный FILL-001 plan в Stage 6 и проверяет JSON/context (commit `1b2d8a1`); последующие JSON persistence/hash regression tests подтверждены полным CI `41730717881`.
 - [x] Добавить synthetic regression coverage для client ROI 581×304, uniform-scale rejection, ROI metadata mismatch и leakage после rasterization; полный CI `41730717881` — SUCCESS.
 - [x] Исправить runtime binder: определять Bridge run overlap по последнему событию и performance clock, а не по позднему `finished_at_utc` (commit `95a8d17`).
-- [x] Добавить regression tests на calibration false-overlap и полный разбор/hash Bridge JSON размером более 27 MiB (commit `870bebc`); фактический запуск тестов ожидает CI.
+- [x] Добавить regression tests на calibration false-overlap и полный разбор/hash Bridge JSON размером более 27 MiB (commit `870bebc`); полный CI [41737923777](https://github.com/Kiddos19882/AutoDraw/actions/runs/41737923777) — SUCCESS.
 - [ ] Провести один новый Windows FILL-001 runtime preflight на восстановленной доске и подтвердить task ↔ executor report ↔ Bridge session/run binding.
 - [ ] Проверить реальные before/after PNG crop, RGB threshold, cursor/UI exclusion и frozen mask alignment.
 - [ ] Только после preflight разрешить 45 live captures.
 
-**Ограничения:** software UI/runner и CI gate готовы, но live capture не принят. Session-level exact CHALK известен (5999), task-level/per-stroke attribution второго Bridge run не проверена; after PNG просмотрен визуально, количественный mask audit не выполнен. Текущая доска исчерпана. 45-cell matrix заблокирована до binder fix и нового preflight. Production estimator/defaults и frozen INT-006 model не менять.
+**Ограничения:** software UI/runner и CI gate готовы, но live capture не принят. Session-level exact CHALK известен (5999), task-level/per-stroke attribution второго Bridge run не проверена; after PNG просмотрен визуально, количественный mask audit не выполнен. Текущая доска исчерпана. 45-cell matrix заблокирована до нового принятого live preflight. Production estimator/defaults и frozen INT-006 model не менять.
 
 ## Статусы
 
