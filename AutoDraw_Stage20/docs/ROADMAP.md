@@ -2,7 +2,7 @@
 
 ## Актуальный статус FILL-001 на 2026-11-04
 
-Полный CI [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881) SUCCESS на code HEAD `fe6d446`, включая Preparation/G3 (782 passed, 24 warnings, 82 subtests), INT-006 pixel audit и Windows portable build/startup smoke-test. Live preflight завершил 131/131 strokes; exact session CHALK=5999, но capture rejected. Attempt JSON invalid, after PNG существует, второй Bridge run file 27.9 MB не прочитан целиком. Найден binder false-overlap: калибровочный run завершил события до executor start, но финализировался после него и ошибочно попадает в executor interval. Следующий шаг — event activity-window fix + regression test; затем новый preflight на восстановленной доске. 45-cell matrix BLOCKED. Подробности: [FILL-001 postmortem](CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md).
+Binder fix committed `95a8d17`: Bridge activity window now uses `started_at_utc` + event performance-clock end (`max(events[].t) - started_at_performance_ms`); `finished_at_utc` is used for finalization-grace validation only. Regression tests committed `870bebc` cover calibration false-overlap and a Bridge JSON file larger than 27 MiB. CI for these commits has not yet been confirmed. Previous live preflight remains rejected (session CHALK=5999; board quota exhausted); next gate is software CI, then one preflight on a restored board. The 45-cell matrix remains BLOCKED. Подробности: [FILL-001 postmortem](CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md).
 
 ## Постоянная система управления знаниями ИИ
 
@@ -31,13 +31,14 @@
 - [x] Исправить runtime JSON serialization после добавления `autodraw_experiment`: runtime-файл больше не получает буквальный `\n` после JSON object (commit `8dfd1b5`).
 - [x] Добавить integration regression test реального FILL-001 plan → Stage 6 load с проверкой experiment context (commit `1b2d8a1`); JSON persistence/hash regression coverage подтверждены полным CI `41730717881`.
 - [x] Полный regression gate FILL-001 закрыт CI [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881) SUCCESS на `fe6d446`, включая Preparation/G3, Application integration, Game Monitor/Bridge, Executor, INT-006 audit и Windows build.
-- [ ] Исправить binder false-overlap: выбирать Bridge run по event activity window, а не по `finished_at_utc`; добавить regression test на idle finalization grace.
+- [x] Исправить binder false-overlap: Bridge run выбирается по event activity window, а не по `finished_at_utc` (commit `95a8d17`).
+- [x] Добавить regression tests на позднюю финализацию pre-execution calibration run и полный разбор/hash JSON >27 MiB (commit `870bebc`); запуск тестов/CI ожидается.
 - [ ] Провести новый Windows live runtime preflight на восстановленной доске и подтвердить P1 из фактического executor report.
 - [x] Исправить физическое требование crop 460×240: UI снимает фактический calibrated client ROI, adapter преобразует frozen logical mask в размер PNG и сохраняет transform.
 - [ ] Проверить реальные board PNG в client ROI: RGB threshold=8, cursor/UI exclusion и coverage/leakage против frozen masks.
 - [ ] Только после preflight — 45 live captures и анализ расхода CHALK по shape/radius.
 
-**Текущий gate:** JSON persistence и canonical plan hash исправлены, regression tests и полный CI [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881) SUCCESS. Live execution завершился, но capture rejected. Binder ошибочно учитывает Bridge idle-finalization time как activity overlap. Требуется fix + regression, затем один preflight на восстановленной доске. Live execution 45-cell matrix остаётся BLOCKED.
+**Текущий gate:** binder activity-window correction и regression tests добавлены (`95a8d17`, `870bebc`); CI на новом code/test HEAD ещё не подтверждён. Live execution завершился, но capture rejected; session CHALK=5999, доска исчерпана. Следующий шаг — подтвердить software CI, затем один preflight на восстановленной доске. Live execution 45-cell matrix остаётся BLOCKED.
 
 ## Актуальный статус CHALK — 2026-11-03
 
