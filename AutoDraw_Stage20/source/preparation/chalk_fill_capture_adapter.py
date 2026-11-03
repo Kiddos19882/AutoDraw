@@ -84,6 +84,10 @@ def audit_fill001_png_pair(
             for key in required
         ):
             raise FillMatrixError("screen_roi должен содержать целые x, y, width и height.")
+        if screen_roi["x"] < 0 or screen_roi["y"] < 0:
+            raise FillMatrixError("Координаты calibrated screen ROI не могут быть отрицательными.")
+        if screen_roi["width"] < 2 or screen_roi["height"] < 2:
+            raise FillMatrixError("Calibrated screen ROI должен быть не меньше 2x2 px.")
         if (screen_roi["width"], screen_roi["height"]) != (screen_width, screen_height):
             raise FillMatrixError("Размер PNG не совпадает с фактическим calibrated screen ROI.")
         roi_record = {key: int(screen_roi[key]) for key in required}
