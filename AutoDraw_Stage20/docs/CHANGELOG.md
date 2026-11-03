@@ -1,3 +1,11 @@
+## 2026-11-03 — FILL-001 runtime binding integration
+
+- Runtime binder `chalk_fill_runtime_binding.py` добавлен и подключён к завершению FILL-001 исполнения в Stage 6.
+- Реализована fail-closed проверка Bridge session/run, executor report, timestamps, lifecycle, observed radius, exact CHALK, sequence/send-failure diagnostics и P1 config.
+- Runtime capture adapter получает данные из persisted runtime artifacts и сохраняет их SHA-256.
+- Полный GitHub Actions [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009) на code HEAD `d7466c5` завершился SUCCESS по всем обязательным jobs; optional algorithm benchmarks skipped.
+- Шаг 2 временного плана FILL-001 закрыт как программная интеграция и regression gate. Реальный Windows runtime/PNG preflight остаётся TODO; 45 live captures остаются заблокированы.
+
 ## 2026-11-03 — FILL-001 software regression gate PASS
 
 - Подтверждён полный GitHub Actions run [41579136690](https://github.com/Kiddos19882/AutoDraw/actions/runs/41579136690) на code HEAD `b4cc45a80231e6bad2f878b2a5a2f16b48b9d68b`.

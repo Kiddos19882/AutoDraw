@@ -9,14 +9,15 @@
 
 # Текущее состояние проекта
 
-**Последнее обновление:** 2026-11-03 — FILL-001 software regression gate закрыт. GitHub Actions [41579136690](https://github.com/Kiddos19882/AutoDraw/actions/runs/41579136690) завершился SUCCESS на code HEAD `b4cc45a80231e6bad2f878b2a5a2f16b48b9d68b`: Preparation/G3 — 754 passed, 24 warnings, 82 subtests passed; Game Monitor/Bridge, Application integration, Executor regression, INT-006 audit и Windows portable build/startup smoke-test успешны. Windows log подтвердил, что `AutoDraw.exe` оставался активным 10 секунд; portable artifact загружен (ID 13204044319). Исправление сигнатуры `audit_fill001_png_pair()` и внутренний вызов проверены. Run ID и фактический Bridge/executor runtime binding ещё не реализованы; P1 не подтверждается фактической конфигурацией runner; PNG crop/threshold/cursor exclusion на реальных FILL-001 screenshots не проверены. Поэтому live FILL-001 captures остаются заблокированы до шагов 2–3. См. [FILL-001 design](CHALK_FILL001_HARNESS_DESIGN_2026-11-03.md), [FILL-001 plan](CHALK_FILL_AREA_RADIUS_EFFICIENCY_PLAN_2026-11-03.md) и [временный план из пяти шагов](CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md).
+**Последнее обновление:** 2026-11-03 — FILL-001 runtime binding реализован и подключён к завершению исполнения Stage 6. Кодовый HEAD: [d7466c5](https://github.com/Kiddos19882/AutoDraw/commit/d7466c5452c83cf6aeab579fdc73c1358ac931c4). Полный GitHub Actions [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009) завершился SUCCESS на этом SHA: Executor regression, Game Monitor/Bridge, Application integration, Preparation/G3, Windows portable build/startup и INT-006/INT006R audit jobs успешны; optional algorithm benchmarks skipped. Runtime binding сверяет executor report, Bridge session/run artifacts, P1, timestamps, lifecycle, radius и exact CHALK. **Это подтверждение программной реализации и регрессионных тестов, но не live FILL-001 run и не Windows PNG preflight.** Поэтому 45 live captures пока заблокированы.
 
 **Актуально на:** 3 ноября 2026 г.  
 **Репозиторий:** `Kiddos19882/AutoDraw`  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
-**Последний проверенный code HEAD рабочей ветки:** `b4cc45a80231e6bad2f878b2a5a2f16b48b9d68b` — исправлена сигнатура PNG audit helper. После него выполнялись только документационные коммиты; исходный код не менялся. Последний кодовый/test commit: [b4cc45a](https://github.com/Kiddos19882/AutoDraw/commit/b4cc45a80231e6bad2f878b2a5a2f16b48b9d68b) — исправлена сигнатура PNG audit helper; предыдущий integrity regression commit — [a3b00cd](https://github.com/Kiddos19882/AutoDraw/commit/a3b00cd01363d14c25c4ff3f73b74cda77bd059f). Adapter implementation: [2aae6a8](https://github.com/Kiddos19882/AutoDraw/commit/2aae6a8cee396b79ad149f2dd1be3b42029e44f8); matrix schema v2: [04500cf](https://github.com/Kiddos19882/AutoDraw/commit/04500cff3fc7515e52b52bf0df3d7c39836a487c). FILL-001 matrix/analyzer: [816bf4d](https://github.com/Kiddos19882/AutoDraw/commit/816bf4d1ac3d6534e2a1d3b5768e7e2601501eee), metadata fix [9d664d6](https://github.com/Kiddos19882/AutoDraw/commit/9d664d6150f8416167096ef6e11d1c4247ce808e), tests [afe4a9b](https://github.com/Kiddos19882/AutoDraw/commit/afe4a9b95a42b2a04ff9dc04236ef9a24ceabfc7), run identity guard [e360066](https://github.com/Kiddos19882/AutoDraw/commit/e360066427f292ff2725332162005aa4b7cdb2ab). Новый planner: [5a33da3](https://github.com/Kiddos19882/AutoDraw/commit/5a33da337fabdfbae61f6ec1d8ead9db40d02057); regression tests: [07bda99](https://github.com/Kiddos19882/AutoDraw/commit/07bda99f1cf2db7c814a5e1579fc9e0a7534862a); validation fix: [358b0ea](https://github.com/Kiddos19882/AutoDraw/commit/358b0ea48d1df0103246ccd04fd9eb09e9e7b2d2). Предыдущий INT006R packaging fix: [c60b8cf](https://github.com/Kiddos19882/AutoDraw/commit/c60b8cf7ac7f9652d64b8f042343107f2473abb1). FILL-001 mask generator/test commits: [84f8897](https://github.com/Kiddos19882/AutoDraw/commit/84f889765bc0d7d1c8c0ff09e625db0b50ac893e), [1b2dc33](https://github.com/Kiddos19882/AutoDraw/commit/1b2dc3366abdcf98635176c036b9846f65e4a28e), [1588fa4](https://github.com/Kiddos19882/AutoDraw/commit/1588fa4ff413092af75834de262f0cfe40d6657e). Production estimator, frozen INT-006 model и executor defaults не менялись.  
-**Последний подтверждённый полный CI:** [41579136690](https://github.com/Kiddos19882/AutoDraw/actions/runs/41579136690) на code HEAD `b4cc45a80231e6bad2f878b2a5a2f16b48b9d68b` — **SUCCESS**. Preparation/G3 — 754 passed, 24 warnings, 82 subtests passed; Game Monitor/Bridge, Application integration, Executor regression, INT-006 audit и Windows portable build/startup smoke-test — success. Portable artifact: [autodraw-g3-preflight-build, ID 13204044319](https://github.com/Kiddos19882/AutoDraw/actions/runs/41579136690/artifacts/13204044319). Optional algorithm benchmarks skipped by workflow configuration. Local pytest в текущей среде не запускался; CI на этом code HEAD подтверждён.  
-**Git-сверка:** сравнение `master...feature/image-geometry-optimization` возвращает `diverged`, ветка diverged относительно master; сравнение выполнено 2026-11-03. Точные ahead/behind меняются при документационных коммитах. Никакого merge/rebase не выполнялось. Пять master-only commits просмотрены: игровой engine bundle, CI workflow и test image. `testImages/images.png` уже присутствует в обеих ветках с одинаковым blob SHA; engine bundle пока только в master. Никакого merge/rebase не выполнялось; `master` в рамках работы не изменялся.  
+**Последний code/test HEAD:** [d7466c5](https://github.com/Kiddos19882/AutoDraw/commit/d7466c5452c83cf6aeab579fdc73c1358ac931c4).  
+**Текущий документационный HEAD до этой актуализации:** [ec11a0f](https://github.com/Kiddos19882/AutoDraw/commit/ec11a0ffd4f43bb8c3c6113cad413f84d5b8571f). После code HEAD выполнены только документационные коммиты DOC-017.  
+**Последний подтверждённый полный CI:** [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009), SUCCESS на code HEAD `d7466c5`. Все обязательные jobs завершились SUCCESS; optional algorithm benchmarks skipped. Windows portable build/startup smoke-test прошёл, но он не заменяет ручной запуск игры и проверку реальных board PNG.  
+**Git-сверка:** на HEAD `ec11a0f` ветка `feature/image-geometry-optimization` опережала `master` на 28 коммитов и не отставала от него (compare status `ahead`, behind=0). После документационной актуализации число ahead увеличится; merge/rebase не выполнялся. `master` не изменялся.  
 > Этот блок — единственный источник текущего статуса. Ниже сохранена историческая хронология; старые статусы и планы не являются текущим backlog.
 
 ## Текущее состояние
@@ -40,7 +41,7 @@
 
 | ID | Текущий статус | Фактическое состояние |
 |---|---|---|
-| DOC-001—DOC-015 | DONE | Основная документация и файлы ведения проекта созданы. |
+| DOC-001—DOC-017 | DONE | Основная документация, инвентаризация и справочник Game Monitor/Bridge завершены. |
 | INT-001 | DONE | Источник exact CHALK и семантика игрового счётчика определены. |
 | INT-002 | DONE | Resource snapshot и baseline/delta протокол определены. |
 | INT-003 | IN_PROGRESS | Требуется сопоставимое A/B/C измерение overhead/FPS Monitor off / Monitor versions. |
@@ -48,24 +49,18 @@
 | INT-005 | DONE* | Автоматические CHALK blocks, matrix, journal, recovery и fail-closed gates используются в принятых сериях. |
 | INT-006 | IN_PROGRESS | Live captures, 45/45 Monitor audit, официальный analyzer (45 accepted, 0 missing/rejected), 15/15 complete groups и полный binding audit завершены. Осталось отдельно решить вопрос safety margin и расширить domain validation; production eligibility не подтверждена. |
 | INT-006R | DONE | 45/45 live captures, raw-data audit, официальный CLI analyzer и ручной visual audit завершены. Зафиксированы geometry-specific limitations для D2/radius=1 и D4/radius=30. |
-| INT-006F | IN_PROGRESS | Frozen masks, fixed-radius planner, 45-cell matrix/analyzer и Monitor capture adapter реализованы. Software regression gate закрыт: CI [41579136690](https://github.com/Kiddos19882/AutoDraw/actions/runs/41579136690) SUCCESS на code HEAD `b4cc45a`; Preparation/G3 754 passed + 82 subtests; Windows portable build/startup smoke-test успешен. Следующее: runtime binding к Bridge/executor и Windows PNG preflight; 45 live captures остаются заблокированы. См. FILL-001 plan/design. |
+| INT-006F / FILL-001 | IN_PROGRESS | Frozen masks, fixed-radius planner, matrix/analyzer и capture adapter реализованы. Runtime binding реализован и подключён к Stage 6; CI [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009) SUCCESS на `d7466c5`. Остаётся Windows live preflight (runtime proof + PNG crop/threshold/cursor/UI), после него — 45 captures. |
 | INT-007 | BLOCKED | Интеграция валидированной модели в preflight/resource estimator запрещена до закрытия INT-006 и определения safety margin. |
 | INT-008 | TODO | Оптимизация траекторий, кистей, порядка и покрытия в пределах CHALK после INT-007. |
 | INT-009 | TODO | Независимая проверка прогноза на полных рисунках, визуального качества и фактической экономии. |
 
 ## Ближайший рабочий приоритет
 
-1. INT006R закрыт; использовать visual findings как ограничения для генератора FILL-001.
-2. Связать FILL-001 captures с фактическими Bridge/executor journals и подтвердить runtime P1; software regression gate закрыт. Контракт: [FILL-001 design](CHALK_FILL001_HARNESS_DESIGN_2026-11-03.md).
-3. После CI PASS выполнить Windows preflight и 45 live captures; принимать только captures с exact CHALK и заранее определённым качеством покрытия.
-4. Safety margin INT-006 не установлен; INT-007 остаётся BLOCKED. Production estimator/defaults не менять.
-
-
-1. Зафиксировать официальный analyzer PASS и сверить report с предварительными расчётами — выполнено; см. [официальный отчёт](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md).
-2. Рассмотреть P1 (step=4, delay=5 ms) как исследовательского кандидата: MAE 0.657, RMSE 0.838, MAPE 1.178%, max underprediction 0.92 CHALK на D1–D5.
-3. Принять отдельное решение о provisional empirical guard. Округлённый вверх наблюдённый максимум P1 равен 1 CHALK, но это не статистическая гарантия; D3/P1 имеет repeat σ≈1.41 CHALK.
-4. Расширить validation на полные реальные рисунки, кривые, заливки, повторное покрытие и другие радиусы. Unsupported geometry остаётся UNKNOWN.
-5. Не начинать INT-007 и не менять production estimator/defaults до отдельного решения о safety margin и расширенной проверке.
+1. Завершить Windows preflight: один контролируемый FILL-001 runtime run, проверка связки task ↔ executor report ↔ Bridge session/run и фактического P1.
+2. На том же preflight проверить реальные before/after PNG: crop 460×240, threshold=8, положение курсора, исключение UI/paint meter, соответствие frozen mask, coverage ≥99% и leakage=0.
+3. Только после успешного preflight запустить 45 live captures (3 формы × 5 радиусов × 3 повтора) и сохранить первичные evidence.
+4. Проанализировать exact CHALK, покрытие, leakage, число точек/штрихов и время по каждой форме/радиусу; не считать экономией неполное покрытие.
+5. INT-006 safety margin не установлен; INT-007 остаётся BLOCKED. Production estimator/defaults не менять.
 
 ## Разрешения и границы
 

@@ -168,3 +168,21 @@ FILL-001 capture contract в текущем виде требует уже аг�
 Исторические записи выше о неподтверждённом CI отражают состояние на дату соответствующих implementation increments. Они не являются текущим статусом software gate.
 
 Остаются открытыми: фактическая связка adapter с Bridge/executor journal, подтверждение P1 из runtime-конфигурации, проверка реального PNG crop/threshold/cursor exclusion на Windows. До закрытия этих gates live captures не запускать.
+
+
+## Актуализация runtime integration — 2026-11-03
+
+После первоначальных implementation increments программный runtime binding реализован в `source/preparation/chalk_fill_runtime_binding.py` и подключён к завершению FILL-001 исполнения в `source/executor/stage6_execute_plan.py`.
+
+Текущая реализация:
+- формирует frozen experiment context и сверяет его с task metadata;
+- валидирует executor report, source plan evidence, временные границы и фактический P1 (`point_step_px=4`, `point_delay_ms=5`);
+- загружает persisted Bridge session schema v2 и run artifacts;
+- проверяет session/run identity, timestamps, финализацию run, sequence gaps, send failures, Monitor errors, lifecycle pairs и единственный observed radius;
+- сверяет exact pre/post pointCount, run-level CHALK и сумму sampled/per-stroke deltas;
+- фиксирует SHA-256 исходных runtime artifacts;
+- Stage 6 запускает binding worker после завершения FILL-001 run и обновляет execution report статусом binding.
+
+Регрессионное подтверждение: code commits `fbf1fd6`–`d7466c5`; полный GitHub Actions [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009) — SUCCESS на `d7466c5`, включая Preparation/G3, executor, integration, Game Monitor/Bridge и Windows portable build/startup jobs.
+
+**Ограничение:** CI подтверждает программную интеграцию на тестовых runtime artifacts. Он не подтверждает live FILL-001 execution в пользовательской Windows/game session, реальный crop/cursor/UI PNG evidence или визуальное соответствие frozen masks. Эти проверки остаются Windows preflight gate; до их завершения 45 live captures не запускать.

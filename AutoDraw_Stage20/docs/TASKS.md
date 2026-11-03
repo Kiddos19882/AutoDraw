@@ -5,34 +5,36 @@
 ## Временный план FILL-001 на пять шагов
 
 **Документ:** [CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md](CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md)  
-**Статус:** IN_PROGRESS — план утверждён к выполнению; шаги 4–5 заблокированы до закрытия software/runtime/preflight gates.
+**Статус:** IN_PROGRESS — программные шаги 1–2 закрыты; шаг 3 (Windows live preflight) открыт; шаги 4–5 заблокированы.
 
 | Шаг | Статус | Критерий |
 |---|---|---|
-| 1. Regression gate: tests, полный CI, Windows build | DONE | CI [41579136690](https://github.com/Kiddos19882/AutoDraw/actions/runs/41579136690), code HEAD `b4cc45a`; Preparation/G3 754 passed + 82 subtests; Windows smoke-test success |
-| 2. Runtime binding: Bridge, executor journal, P1 | TODO | Capture однозначно связан с фактическим run/task |
-| 3. PNG evidence и Windows preflight | TODO | Повторная проверка PNG и реальные crop/quality gates пройдены |
+| 1. Regression gate: tests, полный CI, Windows build | DONE | CI [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009), code HEAD `d7466c5`; все обязательные jobs и Windows portable build/startup smoke-test SUCCESS |
+| 2. Runtime binding: Bridge, executor journal, P1 | DONE (software gate) | Runtime binder подключён к Stage 6; executor/Bridge artifacts, session/run identity, timestamps, lifecycle, radius, exact CHALK и P1 проверяются fail-closed; regression CI SUCCESS |
+| 3. PNG evidence и Windows preflight | TODO | Реальный FILL-001 runtime run и реальные board PNG проходят crop/quality/evidence gates на Windows |
 | 4. 45 live captures | BLOCKED | 45 уникальных принятых ячеек либо документированные отклонения |
 | 5. CHALK/quality analysis и рекомендация | BLOCKED | Подготовлен отчёт о влиянии радиуса и лучшей стратегии заливки |
 
-План временный и не подлежит удалению до выполнения всех пяти шагов или отдельного решения пользователя.
+Шаг 2 закрывает программную реализацию и регрессионное покрытие, но не означает, что уже получен live capture. План временный и не подлежит удалению до выполнения всех пяти шагов или отдельного решения пользователя.
 
-## FILL-001 — Monitor capture adapter и software gate
+## FILL-001 — Monitor capture adapter и runtime binding
 
 **Статус:** IN_PROGRESS  
-**Цель:** получать достоверные captures из Game Monitor и PNG evidence для 45-cell заливочной матрицы.
+**Цель:** получать достоверные captures из Game Monitor, Bridge/executor runtime artifacts и PNG evidence для 45-cell заливочной матрицы.
 
 - [x] Реализовать отдельный adapter Monitor export → FILL-001 capture.
-- [x] Рассчитывать per-stroke CHALK по DRAW_START/DRAW_END snapshots и сверять DRAW_SAMPLE deltas.
-- [x] Закрепить P1 (step=4, delay=5 ms) в frozen matrix metadata.
-- [x] Добавить PNG file/hash/pixel audit для logical crop 460×240.
-- [x] Добавить synthetic regression fixtures для event stream и PNG.
-- [x] Preparation/G3 suite: 754 passed, 24 warnings, 82 subtests passed; полный CI [41579136690](https://github.com/Kiddos19882/AutoDraw/actions/runs/41579136690) и Windows portable build/startup smoke-test прошли на code HEAD `b4cc45a80231e6bad2f878b2a5a2f16b48b9d68b`.
-- [ ] Проверить фактический bridge diagnostics schema и связать adapter с runner/journal call site.
-- [ ] Проверить реальные before/after PNG crop, RGB threshold и cursor/UI exclusion на Windows preflight.
-- [ ] Только после всех gates разрешить 45 live captures.
+- [x] Рассчитывать per-stroke CHALK по подтверждённым lifecycle boundaries и сверять DRAW_SAMPLE deltas.
+- [x] Закрепить P1 (step=4, delay=5 ms) в frozen matrix metadata и сверять с фактическим ExecutorConfig.
+- [x] Добавить PNG file/hash/pixel audit для logical crop 460×240, coverage/leakage и RGB threshold.
+- [x] Добавить synthetic regression fixtures для event stream, Bridge/session/run artifacts, executor report и PNG.
+- [x] Реализовать `chalk_fill_runtime_binding.py`: проверка Bridge session schema v2, session/run identity, executor time window, timestamps, lifecycle, radius, exact snapshots/CHALK, sequence gaps и send failures.
+- [x] Подключить runtime binding к завершению успешного FILL-001 исполнения в Stage 6; сохранить runtime binding result в execution report.
+- [x] Полный CI [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009) на code HEAD `d7466c5`: обязательные jobs SUCCESS, включая Preparation/G3, Game Monitor/Bridge, integration, executor, INT-006/INT006R audit и Windows portable build/startup.
+- [ ] Провести один реальный Windows FILL-001 runtime preflight и подтвердить task ↔ executor report ↔ Bridge session/run binding.
+- [ ] Проверить реальные before/after PNG crop, RGB threshold, cursor/UI exclusion и frozen mask alignment.
+- [ ] Только после preflight разрешить 45 live captures.
 
-**Ограничения:** software regression gate закрыт. Monitor export не содержит runId/sequence counter; run ID и bridge report передаются извне. P1 metadata пока не подтверждается самим Monitor. Synthetic fixtures не являются live evidence. Production estimator/defaults и frozen INT-006 model не менять.
+**Ограничения:** программная связка и regression tests готовы. Реальный runtime run и реальные FILL-001 PNG ещё не подтверждены. Synthetic fixtures и portable startup smoke-test не являются live evidence. Production estimator/defaults и frozen INT-006 model не менять.
 
 ## Статусы
 

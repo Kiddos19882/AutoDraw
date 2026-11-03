@@ -192,3 +192,10 @@ Capture принимается только если:
 - внешний run ID и bridge diagnostics.
 
 Matrix manifest обновлён до schema v2, поскольку sampling metadata изменяет frozen task identity. Software regression gate закрыт по run [41579136690](https://github.com/Kiddos19882/AutoDraw/actions/runs/41579136690): Preparation/G3 754 passed + 82 subtests, обязательные jobs и Windows portable build/startup smoke-test успешны на code HEAD `b4cc45a`. Adapter пока не связан с фактическим runner/journal call site; Game Monitor не экспортирует runId или sequence counter; P1 и bridge report поступают внешними параметрами; реальный screenshot crop/threshold не прошёл preflight. Live 45-cell matrix не запускать до завершения runtime binding и Windows preflight.
+
+
+## Актуализация gate — 2026-11-03
+
+Программная связка FILL-001 с runtime evidence реализована: `chalk_fill_runtime_binding.py` проверяет persisted Bridge session/run и executor report, а Stage 6 запускает binding после успешного FILL-001 execution. Фактический P1 сверяется по executor config. Regression CI [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009) на code HEAD `d7466c5` завершился SUCCESS.
+
+Это закрывает программную интеграцию, но не live preflight. Перед 45 captures остаётся выполнить на Windows один реальный FILL-001 run, подтвердить Bridge/executor binding и проверить board PNG crop/threshold/cursor/UI exclusion и frozen mask quality. До этого live matrix заблокирована.

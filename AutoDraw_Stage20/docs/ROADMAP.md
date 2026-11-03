@@ -5,12 +5,12 @@
 Действует отдельный [план из пяти шагов](CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md), обязательный к сохранению до завершения или отдельного решения пользователя:
 
 1. Закрыть regression tests, полный CI и Windows portable build.
-2. Связать captures с фактическими Bridge/executor journals и P1.
-3. Усилить PNG evidence analyzer и пройти Windows preflight.
-4. Выполнить 45 live captures (3 формы × 5 радиусов × 3 повтора); до шагов 1–3 запуск заблокирован.
+2. Реализовать и подключить runtime binding captures к Bridge/executor artifacts и P1.
+3. Провести Windows live preflight: runtime proof, PNG crop/threshold/cursor/UI exclusion и frozen mask quality.
+4. Выполнить 45 live captures (3 формы × 5 радиусов × 3 повтора); до шага 3 запуск заблокирован.
 5. Проанализировать exact CHALK и качество, определить влияние радиуса и лучшую стратегию заливки.
 
-**Текущий статус:** шаг 1 DONE (полный CI и Windows portable build/smoke-test на code HEAD `b4cc45a`); шаги 2–3 TODO; шаги 4–5 BLOCKED до завершения gates. Детальные критерии — в отдельном плане.
+**Текущий статус:** шаги 1–2 DONE как software/regression gates; шаг 3 TODO (Windows live preflight); шаги 4–5 BLOCKED. CI [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009) SUCCESS на code HEAD `d7466c5`; live runtime/PNG evidence пока отсутствует.
 
 ## Актуальный статус CHALK — 2026-11-03
 
@@ -18,13 +18,14 @@
 
 - [x] Frozen masks, fixed-radius planner и 45-cell manifest/analyzer.
 - [x] Реализован Monitor capture adapter с per-stroke exact CHALK, radius/P1 binding и PNG hash/pixel audit.
-- [x] Добавлены synthetic adapter regression tests.
-- [x] Regression gate закрыт: Preparation/G3 — 754 passed, 24 warnings, 82 subtests; полный CI [41579136690](https://github.com/Kiddos19882/AutoDraw/actions/runs/41579136690) и Windows portable build/startup smoke-test — SUCCESS на code HEAD `b4cc45a`.
-- [ ] Связать adapter с фактическим runner/journal и проверить bridge diagnostics schema.
-- [ ] Windows preflight: проверить logical crop 460×240, PNG threshold и exclusion cursor/UI.
-- [ ] Только после software/preflight gates — 45 live captures и анализ расхода CHALK по shape/radius.
+- [x] Реализован fail-closed runtime binding к Bridge session/run и executor report; интегрирован в Stage 6 completion flow.
+- [x] Добавлены synthetic adapter/runtime-binding regression tests.
+- [x] Regression gate закрыт: CI [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009) SUCCESS на code HEAD `d7466c5`; все обязательные jobs и Windows portable build/startup smoke-test успешны.
+- [ ] Провести Windows live runtime preflight и подтвердить P1 из фактического executor report.
+- [ ] Проверить реальные board PNG: logical crop 460×240, RGB threshold, cursor/UI exclusion и coverage/leakage против frozen masks.
+- [ ] Только после preflight — 45 live captures и анализ расхода CHALK по shape/radius.
 
-**Текущий gate:** программные regression tests и CI закрыты; runtime binding и Windows PNG preflight ещё не выполнены, поэтому live execution BLOCKED.
+**Текущий gate:** программная реализация, runtime integration и CI закрыты; реальный Windows runtime/PNG preflight ещё не выполнен, поэтому live execution BLOCKED.
 
 ### INT-006
 

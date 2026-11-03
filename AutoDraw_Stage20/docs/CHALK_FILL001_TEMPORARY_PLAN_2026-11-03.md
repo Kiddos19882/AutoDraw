@@ -25,25 +25,28 @@
 
 ### Шаг 2. Привязать captures к фактическому runtime
 
+**Статус:** DONE (software implementation и regression gate)
+
+- Добавлен `chalk_fill_runtime_binding.py`, который читает persisted Bridge `session.json`, run JSON и executor report.
+- Проверяются Bridge schema v2, session/run identity, временное окно executor, timezone-aware timestamps, sequence gaps, send failures, Monitor errors, stroke lifecycle, единый observed radius, exact pre/post snapshots и совпадение exact CHALK с sampled/per-stroke deltas.
+- Фактические `ExecutorConfig.point_step_px=4` и `point_delay_ms=5` сверяются с frozen P1.
+- Runtime binding подключён к завершению успешного FILL-001 исполнения в Stage 6; report обновляется результатом фоновой проверки.
+- Capture adapter получает runtime evidence через `build_fill001_capture_from_runtime()` и фиксирует SHA-256 session/run/executor artifacts.
+- Изменения кода и тестов вошли в commits `fbf1fd6`–`d7466c5`; полный CI [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009) завершился SUCCESS на code HEAD `d7466c5`.
+
+**Критерий завершения:** программная интеграция и fail-closed regression tests подтверждены CI. Реальное live подтверждение на Windows относится к шагу 3 и ещё не выполнено.
+
+### Шаг 3. Провести Windows live preflight и проверить evidence
+
 **Статус:** TODO
 
-- Сверить ожидаемую схему adapter с реальными Bridge `session.json`, run-файлами и executor journal.
-- Получать run identity, sequence gaps и send failures из фактических журналов, а не из неподтверждённого caller metadata.
-- Подтверждать P1 (sampling step=4, delay=5 ms) по фактической конфигурации runner/executor.
-- Подключить adapter к реальной точке завершения run и обеспечить однозначную связь Monitor export, Bridge diagnostics, executor journal и experiment task.
+- Кодовый PNG audit уже открывает реальные PNG, проверяет формат/размер crop 460×240, рассчитывает SHA-256, coverage/leakage по RGB difference threshold=8; synthetic regression tests включены в CI.
+- На Windows выполнить один контролируемый FILL-001 runtime run и проверить, что execution report получил успешный runtime binding к правильным Bridge session/run artifacts.
+- Подтвердить P1 по фактическому ExecutorConfig в отчёте, а не только по frozen task metadata.
+- Проверить реальные before/after board PNG: crop 460×240, положение курсора, исключение UI/paint meter, frozen mask alignment, coverage ≥99% и leakage=0.
+- Проверить fail-closed поведение на отсутствующем/изменённом PNG, несовпадающем run ID, ошибках Bridge и неверном P1.
 
-**Критерий завершения:** интеграционный тест доказывает, что один capture связан с одним реальным run/task, а P1 и Bridge integrity извлечены из соответствующих runtime artifacts.
-
-### Шаг 3. Усилить независимую проверку evidence и провести Windows preflight
-
-**Статус:** TODO
-
-- Сделать analyzer повторно проверяющим доступные PNG-файлы и их SHA-256, а не доверять только переданным статусу и строкам хешей.
-- На Windows проверить реальный crop 460×240, RGB threshold, положение курсора и исключение UI/paint meter.
-- Проверить пустой before image, корректный after image, frozen mask alignment, coverage ≥99% и leakage=0.
-- Проверить fail-closed поведение при отсутствующем/изменённом PNG, несовпадающем run ID, ошибках Bridge и неверном P1.
-
-**Критерий завершения:** preflight evidence проходит независимую повторную проверку; все негативные случаи отклоняются. До этого live matrix не запускать.
+**Критерий завершения:** один live runtime capture проходит независимую проверку Bridge/executor/PNG evidence на Windows; негативные случаи отклоняются. До этого live matrix не запускать.
 
 ### Шаг 4. Выполнить 45 live captures FILL-001
 
@@ -82,7 +85,7 @@
 | Шаг | Статус | Подтверждение |
 |---|---|---|
 | 1 | DONE | CI [41579136690](https://github.com/Kiddos19882/AutoDraw/actions/runs/41579136690), code HEAD `b4cc45a80231e6bad2f878b2a5a2f16b48b9d68b`; Preparation/G3 754 passed + 82 subtests; Windows build/smoke-test success |
-| 2 | TODO | Runtime binding evidence будет внесено после интеграции |
-| 3 | TODO | Windows preflight report будет внесён после проверки |
+| 2 | DONE (software) | Runtime binder + Stage 6 integration + regression CI [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009), code HEAD `d7466c5`; live proof переносится в шаг 3 |
+| 3 | TODO | Ожидает Windows live runtime/PNG preflight и evidence report |
 | 4 | BLOCKED | Ожидает шаги 1–3 |
 | 5 | BLOCKED | Ожидает 45 принятых captures |
