@@ -185,6 +185,18 @@ def validate_fill001_capture(task: dict[str, Any], capture: Any) -> dict[str, An
         raise FillMatrixError("Exact CHALK не совпадает с post-pre pointCount.")
     if capture["expected_strokes"] != task["expected_strokes"] or capture["completed_strokes"] != task["expected_strokes"]:
         raise FillMatrixError("Число завершённых штрихов не совпадает с dynamic expected_strokes.")
+    deltas = capture["stroke_chalk_deltas"]
+    if not isinstance(deltas, list) or len(deltas) != task["expected_strokes"]:
+        raise FillMatrixError("Per-stroke CHALK deltas не совпадают с expected_strokes.")
+    if any(isinstance(value, bool) or not isinstance(value, int) or value < 0 for value in deltas):
+        raise FillMatrixError("Per-stroke CHALK delta должен быть неотрицательным целым.")
+    if sum(deltas) != capture["exact_chalk"]:
+        raise FillMatrixError("Сумма per-stroke CHALK не совпадает с exact CHALK.")
+    for field in ("before_png", "after_png"):
+        if not isinstance(capture[field], str) or not capture[field].strip():
+            raise FillMatrixError(f"{field} evidence path обязателен.")
+    if capture["png_audit_status"] != "passed":
+        raise FillMatrixError("PNG evidence не прошёл независимый audit.")
     if capture["leakage_pixels"] != 0:
         raise FillMatrixError("Live capture не прошёл leakage=0.")
     coverage = capture["coverage_fraction"]
