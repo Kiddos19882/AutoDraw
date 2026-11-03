@@ -2,7 +2,7 @@
 
 - Создан `source/preparation/chalk_fill_experiment.py`: три deterministic bool masks, canvas 460×240 logical board pixels, frozen SHA-256.
 - Площади: rectangle 44 653 px, wide_irregular 45 159 px, narrow_irregular 44 879 px; разброс max/min 1,133% (допуск ±5%).
-- Добавлен `source/preparation/tests/test_chalk_fill_experiment.py` — 7 тестов. Локальный прогон точной копии исходника и теста: 7 passed.
+- Добавлен `source/preparation/tests/test_chalk_fill_experiment.py` — 8 тестов. Локальный прогон точной копии исходника и теста: 8 passed.
 - Полный GitHub Actions для commits FILL001 пока не подтверждён; fixed-radius DrawingPlan generator и block harness ещё не реализованы. Live запуск запрещён до завершения этих gates.
 
 ## 2026-11-03 — FILL-001 technical design review
