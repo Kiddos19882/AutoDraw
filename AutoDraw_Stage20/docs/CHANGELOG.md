@@ -1,3 +1,10 @@
+## 2026-11-04 — FILL-001 binder activity-window fix: CI SUCCESS
+
+- Binder fix `95a8d17` и regression tests `870bebc` подтверждены полным GitHub Actions [41737923777](https://github.com/Kiddos19882/AutoDraw/actions/runs/41737923777): все обязательные jobs, включая Windows portable build/startup smoke-test, завершились SUCCESS; optional benchmarks skipped.
+- Portable artifact [autodraw-g3-preflight-build](https://github.com/Kiddos19882/AutoDraw/actions/runs/41737923777/artifacts/13280731107) опубликован.
+- Предыдущий live preflight остаётся REJECTED/UNACCEPTED (131/131 strokes, session CHALK=5999); доска исчерпана, 45-cell matrix заблокирована до нового принятого preflight на восстановленной доске.
+- Обновлены PROJECT_STATUS, TASKS, ROADMAP, временный план FILL-001 и WORK_LOG. Исходники, тесты, workflow и первичные runtime evidence в рамках этой синхронизации не менялись.
+
 ## 2026-11-04 — FILL-001 preflight postmortem и software gate
 
 - Полный CI [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881) прошёл на code HEAD `fe6d446`: Executor, Game Monitor/Bridge, Application integration, Preparation/G3 (782 passed, 24 warnings, 82 subtests), INT-006 pixel audit и Windows portable build/startup smoke-test — SUCCESS; optional benchmarks skipped.
