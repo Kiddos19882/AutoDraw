@@ -1,3 +1,10 @@
+## 2026-11-03 — FILL-001 technical design review
+
+- Проверены `interior_fill_planner.py`, `outline_first_fill_planner.py`, `brush_footprint_geometry.py` и существующие tests.
+- Подтверждено, что существующие planners не обеспечивают single-radius comparison: interior-fill использует mixed brush widths/fallback=1 и max=20; outline-first использует boundary brush=1. Automatic execution у обоих запрещён.
+- Принят отдельный дизайн `CHALK_FILL001_HARNESS_DESIGN_2026-11-03.md`: fixed-radius generator, frozen masks, raster simulator с round caps, dynamic expected_strokes в task journal и independent analyzer.
+- Критерии не изменены: coverage ≥99%, leakage=0; unsupported cells не исполняются. Код и harness пока не менялись.
+
 ## 2026-11-03 — INT006R manual visual audit и закрытие фазы
 
 - Исправление CI packaging в commit `c60b8cf` использует фактический файл `before_clear-board.png`.
