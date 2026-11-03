@@ -310,9 +310,12 @@ class UnifiedAppCoreTests(unittest.TestCase):
             self.assertFalse(executor.running)
         finally:
             if app is not None:
-                app.destroy()
-            elif root is not None:
-                root.destroy()
+                app.workbench.cleanup()
+            if root is not None:
+                try:
+                    root.destroy()
+                except tk.TclError:
+                    pass
 
     def test_unified_window_has_preparation_and_execution_tabs(self):
         root = None
