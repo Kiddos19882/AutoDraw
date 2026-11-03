@@ -5,12 +5,25 @@
 Действует отдельный [план из пяти шагов](CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md), обязательный к сохранению до завершения или отдельного решения пользователя:
 
 1. Закрыть regression tests, полный CI и Windows portable build.
-2. Реализовать и подключить runtime binding captures к Bridge/executor artifacts и P1.
-3. Провести Windows live preflight: runtime proof, PNG crop/threshold/cursor/UI exclusion и frozen mask quality.
-4. Выполнить 45 live captures (3 формы × 5 радиусов × 3 повтора); до шага 3 запуск заблокирован.
+2. Реализовать runtime binding captures к Bridge/executor artifacts и P1.
+3. Подключить отдельный FILL-001 UI/runner и провести один Windows live preflight.
+4. Выполнить 45 live captures (3 формы × 5 радиусов × 3 повтора); до успешного шага 3 запуск заблокирован.
 5. Проанализировать exact CHALK и качество, определить влияние радиуса и лучшую стратегию заливки.
 
-**Текущий статус:** шаги 1–2 DONE только как software/regression gates; шаг 3 TODO (UI/runner handoff в AutoDraw, затем Windows live preflight); шаги 4–5 BLOCKED. CI [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009) SUCCESS на code HEAD `d7466c5`; live runtime/PNG evidence пока отсутствует.
+**Текущий статус:** шаги 1–2 DONE как software/regression gates; UI/runner handoff шага 3 DONE; Windows live preflight шага 3 TODO; шаги 4–5 BLOCKED. CI [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178) SUCCESS на code/test HEAD `e3774a3`: Preparation/G3 772 passed, 24 warnings, 82 subtests; все обязательные jobs и Windows portable startup smoke-test успешны, optional benchmarks skipped.
+
+### FILL-001 — fill efficiency matrix
+
+- [x] Frozen masks, fixed-radius planner и 45-cell manifest/analyzer.
+- [x] Monitor capture adapter с per-stroke exact CHALK, radius/P1 binding и PNG hash/pixel audit.
+- [x] Fail-closed runtime binding к Bridge session/run и executor report.
+- [x] Отдельная вкладка FILL-001: manifest create/load, single-task selection, planner validation, operator approval, brush-size handoff, Stage 6 start с P1 override и capture finalization.
+- [x] Regression gate закрыт: CI [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178) SUCCESS на `e3774a3`.
+- [ ] Провести Windows live runtime preflight и подтвердить P1 из фактического executor report.
+- [ ] Проверить реальные board PNG: logical crop 460×240, RGB threshold=8, cursor/UI exclusion и coverage/leakage против frozen masks.
+- [ ] Только после preflight — 45 live captures и анализ расхода CHALK по shape/radius.
+
+**Текущий gate:** программная реализация UI/runner и regression gate завершены. Требуется реальная Windows/game session для runtime/PNG preflight. Live execution всей 45-cell matrix остаётся BLOCKED.
 
 ## Актуальный статус CHALK — 2026-11-03
 
