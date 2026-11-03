@@ -28,8 +28,8 @@
 - [x] Добавить PNG file/hash/pixel audit для logical crop 460×240, coverage/leakage и RGB threshold.
 - [x] Добавить synthetic regression fixtures для event stream, Bridge/session/run artifacts, executor report и PNG.
 - [x] Реализовать `chalk_fill_runtime_binding.py`: проверка Bridge session schema v2, session/run identity, executor time window, timestamps, lifecycle, radius, exact snapshots/CHALK, sequence gaps и send failures.
-- [x] Добавить post-execution runtime binding hook в Stage 6 для отчётов, уже содержащих FILL-001 experiment context. Пользовательский UI/runner handoff этим не реализован.
-- [x] Полный CI [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009) на code HEAD `d7466c5`: обязательные jobs SUCCESS, включая Preparation/G3, Game Monitor/Bridge, integration, executor, INT-006/INT006R audit и Windows portable build/startup.
+- [x] Добавить post-execution runtime binding hook в Stage 6 для отчётов с FILL-001 experiment context. Сам hook не создаёт пользовательский workflow; отдельный UI/runner handoff реализован в `chalk_fill_ui.py` и `integrated_app.py`.
+- [x] Полный CI [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178) на code/test HEAD `e3774a3`: Preparation/G3 772 passed, 24 warnings, 82 subtests; обязательные jobs SUCCESS, включая Game Monitor/Bridge, integration, executor, INT-006 audit и Windows portable build/startup.
 - [x] Реализовать отдельную вкладку FILL-001, single-task planner handoff, сохранение experiment context и task-specific P1 override; registration/UI integration tests включены в CI.
 - [ ] Провести один реальный Windows FILL-001 runtime preflight и подтвердить task ↔ executor report ↔ Bridge session/run binding.
 - [ ] Проверить реальные before/after PNG crop, RGB threshold, cursor/UI exclusion и frozen mask alignment.
@@ -97,7 +97,7 @@
 - [x] Выполнить 45 независимых live captures D1–D5; предварительно сверить exact CHALK и per-stroke breakdown по всем 45 Monitor reports. Отдельный preflight log в capture bundle не найден.
 - [ ] После validation определить обоснованный safety margin.
 
-**Актуальный приоритет:** INT-006 quantitative gate D1–D5 завершён, но safety margin не установлен и domain validation требуется расширить. INT006R завершён: 45/45 captures, raw-data audit, реальный CLI analyzer и ручной visual audit; выявленные ограничения радиусов задокументированы. В FILL-001 добавлены frozen masks, fixed-radius planner, 45-cell matrix/analyzer и Game Monitor capture adapter с PNG audit. Текущий этап — тестирование adapter, подтверждение полного CI/Windows build и binding к реальному runner/bridge report; live matrix заблокирована. INT-007 остаётся BLOCKED. Исторические чек-листы ниже сохраняют ход выполнения и не переопределяют статусы таблицы.
+**Актуальный приоритет:** FILL-001 UI/runner, planner handoff, runtime binding и software regression gate завершены. Текущий этап — один Windows live preflight из отдельной вкладки с проверкой фактического P1, Bridge/executor binding и реальных before/after PNG. 45-cell matrix остаётся BLOCKED до успешного preflight. INT-006 safety margin не установлен; INT-007 остаётся BLOCKED. Исторические чек-листы ниже сохраняют ход выполнения и не переопределяют статусы таблицы.
 ## Отменённые работы
 
 | ID | Статус | Задача | Основание |
@@ -507,12 +507,12 @@ INT-006 остаётся IN_PROGRESS до официального analyzer repo
 **Результат:** [GAME_MONITOR_BRIDGE_REFERENCE.md](GAME_MONITOR_BRIDGE_REFERENCE.md). Изменения кода и live-проверки не входят в задачу.
 
 
-## Уточнение FILL-001 после аудита пользовательского запуска
+## Историческая запись — FILL-001 до реализации UI/runner (2026-11-03)
 
 - [x] Проверить фактический UI → integrated_app → Stage 6 → runtime binder call graph.
-- [x] Зафиксировать, что `brush_behavior_test_ui.py` не содержит FILL001 workflow, а executor override allowlist не включает FILL001.
-- [ ] Реализовать FILL-001 UI/runner и fail-closed handoff в DrawingPlan/Stage 6.
-- [ ] Выполнить один Windows live preflight после software gate.
+- [x] Зафиксировать исходное отсутствие UI/runner handoff и task-specific FILL001 override на момент аудита.
+- [x] Реализовать отдельную вкладку FILL-001 и fail-closed handoff в DrawingPlan/Stage 6.
+- [ ] Выполнить один Windows live preflight.
 - [ ] Только после успешного preflight разрешить 45-cell live matrix.
 
 Подробные основания и критерии: [CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md](CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md).
