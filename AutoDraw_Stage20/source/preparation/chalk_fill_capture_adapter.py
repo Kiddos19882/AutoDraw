@@ -12,6 +12,7 @@ from PIL import Image
 from chalk_fill_experiment import build_fill_target_mask, fill_target_mask_sha256
 from chalk_fill_matrix import FillMatrixError
 
+FILL001_MONITOR_VERSION = "0.2.1"
 FILL001_SAMPLING_PROFILE = {
     "profile_id": "P1",
     "sampling_step": 4,
@@ -109,8 +110,8 @@ def build_fill001_capture(
             raise FillMatrixError(f"Некорректный bridge diagnostic: {key}.")
     if monitor_export.get("schemaVersion") != 1:
         raise FillMatrixError("Неподдерживаемая schemaVersion Game Monitor.")
-    if not isinstance(monitor_export.get("monitorVersion"), str):
-        raise FillMatrixError("Отсутствует monitorVersion.")
+    if monitor_export.get("monitorVersion") != FILL001_MONITOR_VERSION:
+        raise FillMatrixError("Game Monitor version не совпадает с проверенной schema adapter.")
     events = monitor_export.get("events")
     if not isinstance(events, list) or not events:
         raise FillMatrixError("Monitor export не содержит event list.")
