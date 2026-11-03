@@ -1,3 +1,15 @@
+## 2026-11-03 — FILL-001 UI/runner integration и подтверждение regression gate
+
+- Повторно сверены рабочая ветка `feature/image-geometry-optimization`, branch HEAD до документационной актуализации `e3774a3c07f7abbefe8c39eecdd9578743b70678`, последние 20 коммитов и управляющие документы. GitHub Contents API не предоставляет локальный `git status`; чистота локального worktree не заявляется.
+- Проверен последний code/test commit `e3774a3`: изменён только тестовый fixture `test_brush_behavior_test_ui.py`, добавлена инициализация `_workflow_brush_ready_callback`.
+- Подтверждена реализация отдельного `Fill001Tab` в `chalk_fill_ui.py`, регистрация в `integrated_app.py`, single-task plan handoff, experiment context, P1 executor override, Stage 6 launch guard и post-execution Bridge/executor binding.
+- Unified app test проверяет наличие `fill001_tab` и подпись вкладки `8. FILL-001`; калибровка теста отображается следующей вкладкой `9. Калибровка теста`. По решению пользователя FILL-001 сохраняется отдельной вкладкой, не объединяется с седьмой вкладкой «Тест кистей».
+- Полный GitHub Actions [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178) завершился SUCCESS на HEAD `e3774a3`: Preparation/G3 — 772 passed, 24 warnings, 82 subtests; Executor regression, Game Monitor/Bridge, Application integration, INT-006 pixel audit и Windows portable build/startup smoke-test — SUCCESS; optional benchmarks skipped.
+- Windows portable artifact: [autodraw-g3-preflight-build](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178/artifacts/13248469807). CI smoke-test не является live FILL-001 запуском в игре.
+- Обновлены текущие статусы FILL-001 и временный план. Исторический аудит до UI integration сохранён и помечен как исторический снимок.
+- Оставшийся gate: один контролируемый Windows live run из FILL-001 UI, проверка реального P1 в executor report, однозначного Bridge session/run binding и реальных before/after PNG (crop 460×240, RGB threshold=8, cursor/UI exclusion, coverage ≥99%, leakage=0). До прохождения gate 45-cell matrix не запускать.
+- Исходники, тесты, workflow, production estimator/defaults, experiment data и `master` в рамках этой документационной актуализации не изменялись.
+
 ## 2026-11-03 — FILL-001 runtime binding integration и актуализация статусов
 
 - Проверены текущая ветка, HEAD, последние 20 коммитов, управляющие документы, временный план FILL-001 и профильная реализация adapter/runtime binding.
