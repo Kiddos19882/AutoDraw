@@ -1,7 +1,7 @@
 # FILL-001 — проверка эффективности заполнения областей разными радиусами
 
 **Дата:** 2026-11-03  
-**Статус:** FROZEN MASK GENERATOR, FIXED-RADIUS PLANNER И 45-CELL MATRIX/ANALYZER IMPLEMENTED; CI, preflight и live execution pending  
+**Статус:** FROZEN MASKS, FIXED-RADIUS PLANNER, 45-CELL MATRIX/ANALYZER И MONITOR CAPTURE ADAPTER IMPLEMENTED; CI, runner binding, preflight и live execution pending  
 **Связь:** продолжение INT-006 после INT006R; не открывает INT-007 автоматически  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
 **Приоритет:** высокий — проверка гипотезы об экономии CHALK при заполнении больших одноцветных областей
