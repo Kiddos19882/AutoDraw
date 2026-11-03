@@ -18,6 +18,11 @@
 - [План измерения CHALK по геометрии и режиму ввода](../CHALK_GEOMETRY_MATRIX_PLAN.md) — следующие серии G1–G3, 57 экспериментов с последовательными gates.
 - [Архитектура автоматических блоков CHALK](CHALK_TEST_BLOCKS_DESIGN.md) — пакетный запуск всех сценариев и повторов, критерии принятия, журналирование и восстановление.
 
+- [INT-006 — официальная независимая validation CHALK](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md) — 45/45 accepted, метрики ошибки модели, ограничения и статус safety margin.
+- [INT006R — live validation радиуса и геометрии](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md) — 45 captures, точный CHALK и сравнение радиусов 1/10/30.
+- [INT006R — ручной визуальный аудит](CHALK_INT006R_VISUAL_AUDIT_2026-11-03.md) — просмотр 45 пар PNG и выявленные ограничения коротких деталей/контуров.
+- [FILL-001 — план эффективности заливки](CHALK_FILL_AREA_RADIUS_EFFICIENCY_PLAN_2026-11-03.md) — три формы областей, пять радиусов, 45 captures.
+
 ## Действующий план CHALK и история статуса
 
 - [План дальнейших действий по модели CHALK](CHALK_NEXT_STEPS_PLAN_2026-11-02.md) — актуальная последовательность геометрической validation, независимой проверки estimator, safety margin и INT-007—INT-009.
