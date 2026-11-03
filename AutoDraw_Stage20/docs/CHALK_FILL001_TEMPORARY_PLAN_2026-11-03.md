@@ -39,7 +39,7 @@
 
 ### Шаг 3. Интегрировать запуск в AutoDraw и провести Windows live preflight
 
-**Статус:** IN_PROGRESS — JSON persistence и canonical DrawingPlan hash fixes (commits `2b7577c`, `3b67aea`) и дополнительные tests (`fe6d446`) прошли полный CI [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881) на code HEAD `fe6d446`; все обязательные jobs и Windows portable build/startup smoke-test SUCCESS. Live run завершил 131/131 strokes; session CHALK=5999, но capture rejected. Выявлен false overlap: Bridge калибровочный run закончил события до executor start, но `finished_at_utc` позже executor start из-за idle finalization. Требуется исправить binder event activity-window matching, добавить regression test и повторить preflight на восстановленной доске. Текущая доска исчерпана (`pointCount=6000/6000`).
+**Статус:** IN_PROGRESS — binder activity-window fix внесён в `95a8d17`; тесты calibration false-overlap и large Bridge JSON >27 MiB добавлены в `870bebc`. CI для этих коммитов ожидается. Предыдущий live run завершил 131/131 strokes; session CHALK=5999, capture rejected, доска исчерпана. Следующий gate — software CI, затем один preflight на восстановленной доске.
 
 **Подтверждённая реализация UI/runner:**
 - Добавлен `source/preparation/chalk_fill_ui.py` и самостоятельная вкладка FILL-001 в `integrated_app.py`, отдельная от седьмой вкладки «Тест кистей».
