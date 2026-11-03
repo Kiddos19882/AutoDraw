@@ -2222,7 +2222,7 @@ Brush Test acceptance и матричные валидаторы больше н
 
 ## 2026-11-03 — Инвентаризация документации
 
-- Проверено дерево Markdown-файлов ветки `feature/image-geometry-optimization`: 55 файлов в `AutoDraw_Stage20/docs/` и 16 файлов в корне `AutoDraw_Stage20/`.
+- Проверено дерево Markdown-файлов ветки `feature/image-geometry-optimization`: 56 файлов в `AutoDraw_Stage20/docs/` и 16 файлов в корне `AutoDraw_Stage20/`.
 - Создан `DOCUMENTATION_INVENTORY_2026-11-03.md` с классификацией, назначением, статусом использования, выявленными расхождениями и правилами дальнейшего ведения.
 - В `docs/README.md` исправлено устаревшее описание INT006R visual gate, ранний CHALK next-steps plan помечен историческим, убраны дубли FILL-001 и добавлена ссылка на инвентаризацию.
 - В `TASKS.md` зарегистрирована завершённая задача DOC-016; в `DECISIONS.md` добавлено DEC-013 о едином источнике текущего статуса.
