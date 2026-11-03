@@ -28,7 +28,7 @@ def test_single_task_handoff_requires_explicit_operator_approval(matrix):
 
 def test_single_task_handoff_rejects_tampered_matrix_signature(matrix):
     altered = deepcopy(matrix)
-    altered["tasks"][0]["requested_radius"] = 10
+    altered["tasks"][0]["plan_signature"] = "0" * 64
     with pytest.raises(FillMatrixError, match="matrix_signature"):
         prepare_fill001_single_task_plan(
             altered,
