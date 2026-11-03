@@ -702,3 +702,10 @@
 - Добавлен аудит пользовательского пути запуска FILL-001 в AutoDraw.
 - Уточнён статус: Stage 6 runtime binding — post-execution hook; UI/runner workflow и FILL001 executor override отсутствуют.
 - Временный план и roadmap обновлены: UI/runner handoff должен быть реализован до Windows live preflight; 45 captures остаются заблокированными.
+
+
+## 2026-11-03 — FILL-001 CI confirmation
+
+- GitHub Actions run `41692129486` завершился SUCCESS: обязательные regression jobs, INT-006 pixel audit, Windows portable build и startup smoke-test прошли.
+- Опубликован Windows portable artifact `autodraw-g3-preflight-build` (ID `13258221572`): https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486/artifacts/13258221572.
+- Это подтверждает software gate, но не live runtime. Следующий шаг — один пользовательский Windows preflight; 45 captures остаются заблокированными.
