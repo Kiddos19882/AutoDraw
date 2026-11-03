@@ -38,7 +38,7 @@ def _monitor_export(task):
         point_count += 5
     return {
         "schemaVersion": 1,
-        "monitorVersion": "test-monitor",
+        "monitorVersion": "0.2.1",
         "eventCount": len(events),
         "droppedEvents": 0,
         "errors": [],
