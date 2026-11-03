@@ -9,6 +9,11 @@ from typing import Any
 import numpy as np
 from PIL import Image
 
+from brush_coordinate_transform import (
+    LOGICAL_BOARD_HEIGHT,
+    LOGICAL_BOARD_WIDTH,
+    MAX_UNIFORM_SCALE_RELATIVE_ERROR,
+)
 from chalk_fill_experiment import build_fill_target_mask, fill_target_mask_sha256
 from chalk_fill_matrix import FillMatrixError
 
@@ -52,28 +57,86 @@ def audit_fill001_png_pair(
     shape_id: str,
     before_png: str | Path,
     after_png: str | Path,
+    *,
+    screen_roi: dict[str, int] | None = None,
 ) -> dict[str, Any]:
-    """Audit a tightly cropped 460x240 logical-board PNG pair."""
+    """Compare a client-resolution screen crop against the frozen logical mask.
+
+    The game canvas and frozen mask remain 460x240 logical pixels. The captured
+    PNG is the calibrated client ROI and may have any dimensions whose aspect
+    ratio matches the game's uniform BoardPane scale.
+    """
     before, before_hash = _png_pixels(before_png)
     after, after_hash = _png_pixels(after_png)
-    if before.shape != after.shape or before.shape != (240, 460, 3):
-        raise FillMatrixError("PNG pair должен быть одинакового размера 460x240 logical board.")
+    if before.shape != after.shape or before.ndim != 3 or before.shape[2] != 3:
+        raise FillMatrixError("PNG before/after должны иметь одинаковый RGB размер.")
+    screen_height, screen_width = before.shape[:2]
+    if screen_width < 2 or screen_height < 2:
+        raise FillMatrixError("Screen ROI PNG должен быть не меньше 2x2 px.")
+
+    roi_record = None
+    if screen_roi is not None:
+        if not isinstance(screen_roi, dict):
+            raise FillMatrixError("screen_roi должен быть объектом калибровки.")
+        required = ("x", "y", "width", "height")
+        if any(
+            isinstance(screen_roi.get(key), bool) or not isinstance(screen_roi.get(key), int)
+            for key in required
+        ):
+            raise FillMatrixError("screen_roi должен содержать целые x, y, width и height.")
+        if (screen_roi["width"], screen_roi["height"]) != (screen_width, screen_height):
+            raise FillMatrixError("Размер PNG не совпадает с фактическим calibrated screen ROI.")
+        roi_record = {key: int(screen_roi[key]) for key in required}
+
+    scale_x = (screen_width - 1) / LOGICAL_BOARD_WIDTH
+    scale_y = (screen_height - 1) / LOGICAL_BOARD_HEIGHT
+    scale_error = abs(scale_x - scale_y) / max(scale_x, scale_y)
+    if scale_error > MAX_UNIFORM_SCALE_RELATIVE_ERROR:
+        raise FillMatrixError(
+            "Пропорции screen ROI не соответствуют равномерному масштабу BoardPane: "
+            f"scaleX={scale_x:.6f}, scaleY={scale_y:.6f}, "
+            f"расхождение={scale_error:.2%} (допуск {MAX_UNIFORM_SCALE_RELATIVE_ERROR:.0%}). "
+            "Проверьте калибровку границ игровой доски."
+        )
+
+    logical_mask = build_fill_target_mask(shape_id)
+    mask_image = Image.fromarray(logical_mask.astype(np.uint8) * 255, mode="L")
+    screen_mask = np.asarray(
+        mask_image.resize((screen_width, screen_height), resample=Image.Resampling.NEAREST),
+        dtype=np.uint8,
+    ) > 0
     changed = np.any(np.abs(after - before) > PNG_CHANGE_THRESHOLD, axis=2)
-    mask = build_fill_target_mask(shape_id)
-    target_area = int(np.count_nonzero(mask))
-    covered = int(np.count_nonzero(changed & mask))
-    leakage = int(np.count_nonzero(changed & ~mask))
+    target_area = int(np.count_nonzero(screen_mask))
+    if target_area <= 0:
+        raise FillMatrixError("После rasterization frozen mask стала пустой.")
+    covered = int(np.count_nonzero(changed & screen_mask))
+    leakage = int(np.count_nonzero(changed & ~screen_mask))
+    coverage = covered / target_area
+    transform = {
+        "method": "logical_mask_nearest_neighbor_to_calibrated_screen_roi",
+        "source_coordinate_system": "logical_board_pixels",
+        "target_coordinate_system": "screen_roi_pixels",
+        "logical_board": {"width": LOGICAL_BOARD_WIDTH, "height": LOGICAL_BOARD_HEIGHT},
+        "screen_roi": roi_record or {"width": screen_width, "height": screen_height},
+        "scale_x": scale_x,
+        "scale_y": scale_y,
+        "uniform_scale_relative_error": scale_error,
+        "uniform_scale_tolerance": MAX_UNIFORM_SCALE_RELATIVE_ERROR,
+        "mask_resampling": "nearest_neighbor",
+    }
     return {
         "before_png": str(Path(before_png)),
         "after_png": str(Path(after_png)),
         "before_png_sha256": before_hash,
         "after_png_sha256": after_hash,
-        "coverage_fraction": covered / target_area,
+        "coverage_fraction": coverage,
         "leakage_pixels": leakage,
         "changed_pixels": int(np.count_nonzero(changed)),
-        "png_audit_status": "passed" if covered / target_area >= 0.99 and leakage == 0 else "failed",
+        "target_pixels": target_area,
+        "png_audit_status": "passed" if coverage >= 0.99 and leakage == 0 else "failed",
         "change_threshold": PNG_CHANGE_THRESHOLD,
-        "audit_method": "rgb_absolute_difference_on_logical_board_crop",
+        "audit_method": "rgb_absolute_difference_on_calibrated_screen_roi",
+        "logical_to_screen_transform": transform,
     }
 
 
@@ -192,6 +255,7 @@ def build_fill001_capture(
     bridge_diagnostics: dict[str, Any],
     stroke_lifecycle_source: str | None = None,
     observed_radius: int | float | None = None,
+    screen_roi: dict[str, int] | None = None,
 ) -> dict[str, Any]:
     """Convert one unmodified Game Monitor export into a validated capture.
 
@@ -279,7 +343,9 @@ def build_fill001_capture(
 
     if fill_target_mask_sha256(task["shape_id"]) != task.get("target_mask_sha256"):
         raise FillMatrixError("Task target_mask_sha256 не совпадает с frozen mask.")
-    png_audit = audit_fill001_png_pair(task["shape_id"], before_png, after_png)
+    png_audit = audit_fill001_png_pair(
+        task["shape_id"], before_png, after_png, screen_roi=screen_roi
+    )
     capture = {
         "task_id": task["task_id"],
         "run_id": run_id,
@@ -309,6 +375,8 @@ def build_fill001_capture(
         "monitor_version": monitor_export["monitorVersion"],
         "event_count": len(events),
         "png_audit": png_audit,
+        "screen_roi": png_audit["logical_to_screen_transform"]["screen_roi"],
+        "logical_to_screen_transform": png_audit["logical_to_screen_transform"],
     }
     from chalk_fill_matrix import validate_fill001_capture
     validate_fill001_capture(task, capture)
@@ -322,6 +390,7 @@ def build_fill001_capture_from_runtime(
     executor_report_path: str | Path,
     before_png: str | Path,
     after_png: str | Path,
+    screen_roi: dict[str, int] | None = None,
 ) -> dict[str, Any]:
     """Build a live capture only from persisted Bridge and executor runtime artifacts.
 
@@ -341,6 +410,7 @@ def build_fill001_capture_from_runtime(
         bridge_diagnostics=binding["bridge_diagnostics"],
         stroke_lifecycle_source=binding["stroke_lifecycle_source"],
         observed_radius=binding["observed_radius"],
+        screen_roi=screen_roi,
     )
     capture.update({
         "session_id": binding["session_id"],
