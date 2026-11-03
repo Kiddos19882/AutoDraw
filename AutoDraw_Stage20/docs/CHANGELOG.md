@@ -1,3 +1,8 @@
+## 2026-11-03 — временный план FILL-001
+
+- Добавлен обязательный к сохранению временный план из пяти шагов: software gate, runtime binding, Windows PNG preflight, 45 live captures и анализ расхода/качества.
+- Уточнено, что live captures заблокированы до прохождения первых трёх шагов; production estimator и defaults не меняются автоматически.
+
 ## 2026-11-03 — Инвентаризация документации DOC-016
 
 - Проведена инвентаризация 56 Markdown-файлов `docs/` и 16 Markdown-файлов корня `AutoDraw_Stage20/`.
