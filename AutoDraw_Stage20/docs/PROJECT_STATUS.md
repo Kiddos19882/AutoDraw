@@ -9,7 +9,7 @@
 
 # Текущее состояние проекта
 
-**Последнее обновление:** 2026-11-03 — FILL-001 runtime binding реализован и подключён к завершению исполнения Stage 6. Кодовый HEAD: [d7466c5](https://github.com/Kiddos19882/AutoDraw/commit/d7466c5452c83cf6aeab579fdc73c1358ac931c4). Полный GitHub Actions [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009) завершился SUCCESS на этом SHA: Executor regression, Game Monitor/Bridge, Application integration, Preparation/G3, Windows portable build/startup и INT-006/INT006R audit jobs успешны; optional algorithm benchmarks skipped. Runtime binding сверяет executor report, Bridge session/run artifacts, P1, timestamps, lifecycle, radius и exact CHALK. **Это подтверждение программной реализации и регрессионных тестов, но не live FILL-001 run и не Windows PNG preflight.** Поэтому 45 live captures пока заблокированы.
+**Последнее обновление:** 2026-11-03 — аудит подтвердил, что FILL-001 UI/runner handoff в AutoDraw отсутствует. Runtime binder реализован как post-execution hook Stage 6, но пользовательский запуск не подключён. Кодовый HEAD: [d7466c5](https://github.com/Kiddos19882/AutoDraw/commit/d7466c5452c83cf6aeab579fdc73c1358ac931c4). Полный GitHub Actions [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009) завершился SUCCESS на этом SHA: Executor regression, Game Monitor/Bridge, Application integration, Preparation/G3, Windows portable build/startup и INT-006/INT006R audit jobs успешны; optional algorithm benchmarks skipped. Runtime binding сверяет executor report, Bridge session/run artifacts, P1, timestamps, lifecycle, radius и exact CHALK. **Это подтверждение программной реализации и регрессионных тестов, но не live FILL-001 run и не Windows PNG preflight.** Поэтому 45 live captures пока заблокированы.
 
 **Актуально на:** 3 ноября 2026 г.  
 **Репозиторий:** `Kiddos19882/AutoDraw`  
@@ -49,7 +49,7 @@
 | INT-005 | DONE* | Автоматические CHALK blocks, matrix, journal, recovery и fail-closed gates используются в принятых сериях. |
 | INT-006 | IN_PROGRESS | Live captures, 45/45 Monitor audit, официальный analyzer (45 accepted, 0 missing/rejected), 15/15 complete groups и полный binding audit завершены. Осталось отдельно решить вопрос safety margin и расширить domain validation; production eligibility не подтверждена. |
 | INT-006R | DONE | 45/45 live captures, raw-data audit, официальный CLI analyzer и ручной visual audit завершены. Зафиксированы geometry-specific limitations для D2/radius=1 и D4/radius=30. |
-| INT-006F / FILL-001 | IN_PROGRESS | Frozen masks, fixed-radius planner, matrix/analyzer и capture adapter реализованы. Runtime binding реализован и подключён к Stage 6; CI [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009) SUCCESS на `d7466c5`. Остаётся Windows live preflight (runtime proof + PNG crop/threshold/cursor/UI), после него — 45 captures. |
+| INT-006F / FILL-001 | IN_PROGRESS | Frozen masks, fixed-radius planner, matrix/analyzer, capture adapter и post-execution runtime binder реализованы; CI [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009) SUCCESS на `d7466c5`. Аудит выявил отсутствие UI/runner handoff и FILL001 в executor allowlist. Сначала требуется интеграция пользовательского запуска, затем Windows live preflight и 45 captures. См. [аудит](CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md).
 | INT-007 | BLOCKED | Интеграция валидированной модели в preflight/resource estimator запрещена до закрытия INT-006 и определения safety margin. |
 | INT-008 | TODO | Оптимизация траекторий, кистей, порядка и покрытия в пределах CHALK после INT-007. |
 | INT-009 | TODO | Независимая проверка прогноза на полных рисунках, визуального качества и фактической экономии. |
@@ -859,3 +859,10 @@ Per-run transport gates чистые: `dropped_events=0`, `monitor_error_count_d
 Полный CI [41513389663](https://github.com/Kiddos19882/AutoDraw/actions/runs/41513389663) завершился **SUCCESS** на code commit `ca8c9b3bd739ea0a5b557b87fc0106ecfde81216`: Preparation/G3 — 667 passed, 82 subtests passed; Application integration, Executor regression, Game Monitor/bridge, pixel-level audit и Windows portable build/startup smoke-test — success. Artifact `autodraw-g3-preflight-build` ID `13173632860`.
 
 Следующий gate — локальный Windows 10 preflight. 45 live captures не выполнялись. Production estimator/defaults и master не менялись. См. [frozen predictions/analyzer](CHALK_INT006_FROZEN_PREDICTIONS_AND_ANALYZER_2026-11-02.md) и [local preflight guide](CHALK_INT006_LOCAL_PREFLIGHT_GUIDE_2026-11-02.md).
+
+
+## Уточнение статуса FILL-001 после аудита UI/runner — 2026-11-03
+
+Проверка текущего дерева на HEAD `01cb37d6cb8fc7c5ec56e648330abda31875f15b` показала, что FILL-001 пока нельзя запустить через интерфейс AutoDraw. Stage 6 runtime binding — только post-execution hook, ожидающий готовый `experiment_context`; UI/runner не создаёт FILL-001 task и не передаёт её в Executor. В Brush Test UI нет FILL001 phase, а executor override allowlist её не содержит.
+
+Следовательно, software gate runtime binder закрыт, но пользовательская интеграция не завершена. Шаг 3 временного плана расширен: сначала UI/runner и fail-closed DrawingPlan handoff, затем Windows live preflight. Шаги 4–5 остаются BLOCKED. Подробности — [аудит интеграции](CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md).
