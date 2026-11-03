@@ -15,7 +15,7 @@
 **Репозиторий:** `Kiddos19882/AutoDraw`  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
 **Последний code/test HEAD:** [d7466c5](https://github.com/Kiddos19882/AutoDraw/commit/d7466c5452c83cf6aeab579fdc73c1358ac931c4).  
-**Текущий документационный HEAD до этой актуализации:** [ec11a0f](https://github.com/Kiddos19882/AutoDraw/commit/ec11a0ffd4f43bb8c3c6113cad413f84d5b8571f). После code HEAD выполнены только документационные коммиты DOC-017.  
+**Документационный HEAD:** актуальный HEAD рабочей ветки; после последнего code HEAD выполнены только документационные коммиты. Точный SHA сверяется по Git log.  
 **Последний подтверждённый полный CI:** [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009), SUCCESS на code HEAD `d7466c5`. Все обязательные jobs завершились SUCCESS; optional algorithm benchmarks skipped. Windows portable build/startup smoke-test прошёл, но он не заменяет ручной запуск игры и проверку реальных board PNG.  
 **Git-сверка:** на текущем HEAD `37d118f` сравнение с `master` возвращает `diverged`; feature branch отстаёт от `master` на 5 коммитов. Количество feature-only коммитов растёт при каждом новом commit и здесь отдельно не фиксируется. Merge/rebase не выполнялся; `master` не изменялся.  
 > Этот блок — единственный источник текущего статуса. Ниже сохранена историческая хронология; старые статусы и планы не являются текущим backlog.
@@ -56,7 +56,7 @@
 
 ## Ближайший рабочий приоритет
 
-1. Завершить Windows preflight: один контролируемый FILL-001 runtime run, проверка связки task ↔ executor report ↔ Bridge session/run и фактического P1.
+1. Реализовать пользовательский FILL-001 UI/runner handoff в Stage 6; затем провести Windows preflight одного контролируемого runtime run и проверить task ↔ executor report ↔ Bridge session/run и фактический P1.
 2. На том же preflight проверить реальные before/after PNG: crop 460×240, threshold=8, положение курсора, исключение UI/paint meter, соответствие frozen mask, coverage ≥99% и leakage=0.
 3. Только после успешного preflight запустить 45 live captures (3 формы × 5 радиусов × 3 повтора) и сохранить первичные evidence.
 4. Проанализировать exact CHALK, покрытие, leakage, число точек/штрихов и время по каждой форме/радиусу; не считать экономией неполное покрытие.
