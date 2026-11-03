@@ -1,3 +1,14 @@
+## 2026-11-04 — FILL-001 binder activity-window fix: CI verification
+
+- Проверены рабочая ветка `feature/image-geometry-optimization`, последние 20 коммитов, README Stage20, основной индекс, управляющие документы, постоянные регламенты, runtime binder и его regression tests.
+- На начало проверки branch HEAD: `1d41deea36dd1f821a0fb6155d2945beb849b009`; последний code/test commit — `870bebce6b39e782f70ef9f476a324ee840c05ae`; master — `9a3453aeb847b66041bc83d6f4a56ecaf33a993a`. Compare: feature diverged, ahead 2700 / behind 5, merge base `d4a07702e45c01648f343bc6440a3287c45d3f9c`. GitHub API не предоставляет локальный `git status`.
+- Подтверждён GitHub Actions [41737923777](https://github.com/Kiddos19882/AutoDraw/actions/runs/41737923777) на commit `870bebc`: Application integration, Executor regression, Preparation/G3, Game Monitor/Bridge, INT-006 pixel audit и Windows portable build/startup smoke-test — SUCCESS; optional benchmarks — SKIPPED.
+- Portable artifact [autodraw-g3-preflight-build](https://github.com/Kiddos19882/AutoDraw/actions/runs/41737923777/artifacts/13280731107) опубликован, не истёк.
+- Проверены regression tests на исключение pre-execution calibration run при поздней idle finalization и на загрузку/hash Bridge JSON размером более 27 MiB. Код binder использует performance-clock timestamp последнего события для конца activity window; `finished_at_utc` ограничен проверкой finalization grace.
+- Предыдущий FILL-001 live preflight остаётся REJECTED/UNACCEPTED: 131/131 strokes, session CHALK=5999; per-run/per-stroke attribution второго Bridge run и quantitative PNG audit не подтверждены. Использованная доска исчерпала квоту. 45-cell matrix остаётся BLOCKED.
+- В этой сессии исходники, тесты, конфигурации, workflow и первичные runtime evidence не изменялись. Синхронизированы только управляющие Markdown-документы. `master` не изменялся; live-эксперименты не запускались.
+- Следующий шаг: восстановить/заменить игровую доску, запустить portable build и выполнить ровно один Windows live preflight `rectangle / radius 10 / repeat 1`; сохранить execution report, Bridge session/run, Game Monitor export и before/after PNG для проверки runtime binding и frozen-mask quality gates.
+
 ## 2026-11-04 — FILL-001 postmortem и актуализация gates
 
 - Проверены feature branch, code HEAD `fe6d4469a5294fdf8284978d4e2b5c47582fa2d4`, последние 20 коммитов, master reference, compare и полный CI run [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881).
