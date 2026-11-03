@@ -209,13 +209,19 @@ def analyze_fill001_captures(matrix: dict[str, Any], captures: list[dict[str, An
     if not isinstance(captures, list):
         raise FillMatrixError("captures должен быть списком.")
     by_id = {task["task_id"]: task for task in matrix["tasks"]}
-    accepted, rejected, seen = [], [], set()
+    accepted, rejected, seen, seen_runs = [], [], set(), set()
     for capture in captures:
         task_id = capture.get("task_id") if isinstance(capture, dict) else None
         if task_id in seen:
             rejected.append({"task_id": task_id, "reason": "duplicate_capture"})
             continue
         seen.add(task_id)
+        run_id = capture.get("run_id") if isinstance(capture, dict) else None
+        if isinstance(run_id, str) and run_id in seen_runs:
+            rejected.append({"task_id": task_id, "reason": "duplicate_run_id"})
+            continue
+        if isinstance(run_id, str):
+            seen_runs.add(run_id)
         task = by_id.get(task_id)
         if task is None:
             rejected.append({"task_id": task_id, "reason": "unexpected_task_id"})
