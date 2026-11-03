@@ -99,11 +99,39 @@ def test_png_audit_accepts_actual_client_roi_581x304(tmp_path):
     assert result["png_audit_status"] == "passed"
     assert result["coverage_fraction"] == 1.0
     assert result["leakage_pixels"] == 0
-    assert result["screen_roi"] if "screen_roi" in result else True
     transform = result["logical_to_screen_transform"]
     assert transform["logical_board"] == {"width": 460, "height": 240}
     assert transform["screen_roi"] == roi
     assert transform["mask_resampling"] == "nearest_neighbor"
+
+
+def test_runtime_capture_preserves_client_roi_transform(tmp_path):
+    matrix = build_fill001_matrix("CLIENT-ROI-CAPTURE")
+    task = matrix["tasks"][0]
+    before, after, _ = _png_pair_for_roi(tmp_path, task["shape_id"], 581, 304)
+    roi = {"x": 120, "y": 80, "width": 581, "height": 304}
+
+    capture = build_fill001_capture(
+        task,
+        _monitor_export(task),
+        sampling_profile=FILL001_SAMPLING_PROFILE,
+        before_png=before,
+        after_png=after,
+        run_id="client-roi-run-001",
+        bridge_diagnostics={
+            "run_id": "client-roi-run-001",
+            "event_count": len(_monitor_export(task)["events"]),
+            "bridge_failures": 0,
+            "sequence_gaps": 0,
+        },
+        screen_roi=roi,
+    )
+
+    assert capture["png_audit_status"] == "passed"
+    assert capture["screen_roi"] == roi
+    assert capture["logical_to_screen_transform"]["logical_board"] == {
+        "width": 460, "height": 240
+    }
 
 
 def test_png_audit_rejects_nonuniform_client_roi(tmp_path):
