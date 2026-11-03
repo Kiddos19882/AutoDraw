@@ -14,7 +14,7 @@
 **Актуально на:** 3 ноября 2026 г.  
 **Репозиторий:** `Kiddos19882/AutoDraw`  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
-**Последний commit с данными:** `138c9fbeaf612a86819f7ff9ea0db7bb1fe4296a`. Последний подтверждённый code HEAD INT006R: `28b56a97255b57b50072ba973533ce349c706bd1`.  
+**Последний commit с данными:** `138c9fbeaf612a86819f7ff9ea0db7bb1fe4296a`. Последний подтверждённый code HEAD INT006R: `28b56a97255b57b50072ba973533ce349c706bd1`. Документация актуализирована последовательно; последний документальный commit этой серии — `c995fee23288460756431c52664c94579f2566a8`.  
 **Последний подтверждённый полный CI:** [41540054975](https://github.com/Kiddos19882/AutoDraw/actions/runs/41540054975) на code HEAD `28b56a9`: обязательные jobs SUCCESS, Preparation/G3 — 682 passed и 82 subtests, Windows portable build/startup smoke-test — SUCCESS. Для data commit `138c9fbe` отдельный workflow run/status check не найден.  
 **Git-сверка:** сравнение `master...feature/image-geometry-optimization` возвращает `diverged`, feature ahead 2297 / behind 5. Никакого merge/rebase не выполнялось; пять master-only commits требуют отдельного просмотра. В рамках этой актуализации `master` не изменялся.  
 > Этот блок — единственный источник текущего статуса. Ниже сохранена историческая хронология; старые статусы и планы не являются текущим backlog.
@@ -34,7 +34,7 @@
 - Production estimator, executor defaults, sampling defaults и `master` не менялись.
 - **INT006R live block завершён:** series `chalk-20261103-030837-a20df5`, block `a8e0b9ec87984f60aa294910d366e987`, 45/45 tasks completed (D1–D5 × radius 1/10/30 × 3 repeats, P1 step=4/delay=5). Все 45 Monitor reports проверены по exact pre/post pointCount, per-stroke delta, observed radius и transport counters; подробности и таблицы: [INT006R live results](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md). Ручной visual audit всех 45 PNG и официальный CLI analyzer на реальном bundle остаются pending.
 - Полный CI [41540054975](https://github.com/Kiddos19882/AutoDraw/actions/runs/41540054975) прошёл: Preparation/G3 682 passed + 82 subtests; Application integration, Executor regression, Game Monitor/Bridge, INT-006 PNG audit и Windows portable build/startup smoke-test — success. 24 warnings, optional benchmarks skipped. Подробности: [INT006R software gate report](CHALK_INT006R_SOFTWARE_GATE_RESULTS_2026-11-03.md).
-- Live captures INT006R не выполнялись. Следующий gate — локальный Windows preflight, подключённая игра/Game Monitor, калиброванный slider 1–30 и подтверждённая пустая доска. После 45 captures потребуется отдельный ручной визуальный аудит всех PNG; production estimator и defaults не менять.
+- Live captures INT006R завершены: 45/45. Raw-data audit всех 45 Monitor reports подтверждает exact CHALK и integrity. Остались запуск CLI analyzer на реальном bundle и ручной visual audit всех PNG; production estimator и defaults не менять.
 
 ## Статусы инициатив
 
