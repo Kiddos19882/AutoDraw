@@ -113,3 +113,26 @@ Production estimator, frozen INT-006 model, executor/sampling defaults и `maste
 - Матрица не запускает игру и не исполняет планы. `execution_allowed=false`, `safe_to_execute=false` остаются обязательными.
 
 Добавлены regression tests на 45 cells, deterministic manifest, target area/plan identities, duplicate/missing cells, signature tampering, unsupported planner, manifest round-trip, exact CHALK/quality gates, полный 45-capture analyzer и duplicate run identity. CI для актуального HEAD ещё не подтверждён; до CI PASS и Windows preflight live captures запрещены.
+
+
+## Текущая граница реализации — проверка 2026-11-03
+
+Код `chalk_fill_matrix.py` реализует manifest, агрегированный capture validator и analyzer. Он **не является адаптером Game Monitor** и сам не собирает capture из monitor event stream.
+
+Подтверждённый интерфейс Game Monitor в `source/game_monitor/game_monitor.js`:
+
+- `DRAW_SAMPLE` содержит `strokeId`, `pointDelta`, `after.pointCount` и `acceptedPoint`;
+- `DRAW_START` / `DRAW_START_APPLIED` и `DRAW_END` обозначают границы штриха;
+- `BRUSH_CHANGE` / `BRUSH_CHANGE_APPLIED` содержат snapshots до/после изменения радиуса;
+- `POINT_QUOTA_UPDATE` сообщает изменение quota snapshot;
+- `exportData()` сохраняет event stream и aggregate monitor diagnostics.
+
+FILL-001 capture contract в текущем виде требует уже агрегированные `pre_point_count`, `post_point_count`, `stroke_chalk_deltas`, integrity counters и PNG evidence paths. Отдельного кода, который надёжно связывает события по `strokeId`, выводит per-stroke deltas, проверяет непрерывность sequence, сопоставляет radius и формирует capture из реального export, в текущем increment нет.
+
+Также текущий validator проверяет, что PNG path — непустая строка и `png_audit_status == "passed"`; он не открывает PNG, не проверяет существование файла, SHA-256, размеры или соответствие frozen target mask. Следовательно, эти поля сейчас являются заявлением вызывающего кода, а не самостоятельным доказательством аудита. Unit-test placeholders намеренно фиктивны и не должны попадать в live journal.
+
+**Следующий обязательный engineering gate до live execution:** реализовать отдельный fail-closed adapter/analyzer, который принимает настоящий Game Monitor export и реальные experiment/PNG artifacts; связывает события по run/stroke identity; независимо вычисляет pre/post exact CHALK и per-stroke deltas; проверяет отсутствие dropped events/errors/sequence gaps; валидирует наличие и SHA-256 PNG; запускает pixel audit against frozen target mask; проверяет observed radius и task/plan/mask identity. Добавить fixture из реального формата Monitor export и негативные regression tests. Только после software CI PASS и Windows preflight можно обсуждать live captures.
+
+Дополнительное несоответствие для устранения: design ранее упоминал проверку sampling P1, однако текущие task/capture schema и `validate_fill001_capture()` не содержат проверки sampling profile/step/delay. До добавления и проверки этого binding нельзя считать P1 зафиксированным в 45-cell matrix.
+
+До завершения этих работ: live execution запрещён; synthetic analyzer PASS не равен реальной интеграции; production estimator/defaults и frozen INT-006 model не менять.
