@@ -675,7 +675,7 @@ class AutoDrawUnifiedApp:
                 bound_document = attach_fill001_experiment_context(persisted_document, fill_task)
                 temporary = path.with_name(f".{path.name}.{uuid.uuid4().hex}.tmp")
                 temporary.write_text(
-                    json.dumps(bound_document, ensure_ascii=False, indent=2) + "\\n",
+                    json.dumps(bound_document, ensure_ascii=False, indent=2) + "\n",
                     encoding="utf-8",
                 )
                 temporary.replace(path)
@@ -683,7 +683,7 @@ class AutoDrawUnifiedApp:
         except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError, RuntimeError) as exc:
             messagebox.showerror(
                 "Не удалось передать тест кисти",
-                f"План не передан исполнителю. Исходный тестовый план сохранён отдельно.\\n\\n{exc}",
+                f"План не передан исполнителю. Исходный тестовый план сохранён отдельно.\n\n{exc}",
                 parent=self.root,
             )
             return False
