@@ -40,7 +40,8 @@ INT006R visual audit закрыт с geometry-specific limitations: radius 30 с
 - [x] Проверить H/V grid и eroded-contour prototypes; оба не проходят combined coverage/leakage gate, не интегрировать.
 - [x] Реализовать boundary-aware fixed-radius centerline planner и raster simulator; отдельная Python simulation: 15/15 cells прошли coverage ≥99% / leakage=0. Regression tests добавлены, автоматический pytest/CI ещё pending.
 - [ ] Подтвердить regression suite и полный CI на актуальном HEAD.
-- [ ] Реализовать отдельный matrix/block harness, analyzer и dynamic expected stroke validation.
+- [x] Реализовать отдельный 45-cell matrix manifest, journal/capture validation, analyzer и dynamic expected stroke validation; regression tests добавлены.
+- [ ] Подтвердить полный CI и Windows portable build на актуальном HEAD.
 - [ ] Получить полный CI PASS и Windows preflight.
 - [ ] Выполнить 45 live captures, exact CHALK audit и визуальную оценку покрытия.
 - План: [FILL-001 — area fill radius efficiency](CHALK_FILL_AREA_RADIUS_EFFICIENCY_PLAN_2026-11-03.md).
