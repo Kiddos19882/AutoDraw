@@ -163,6 +163,7 @@ flowchart TD
 | `outline_first_fill_planner.py` | `brush_footprint_geometry`, `interior_fill_planner` |
 | `swept_footprint_geometry.py` | `brush_footprint_geometry` |
 | `geometry_budget_optimizer.py` | — |
+| `chalk_fill_experiment.py` | `numpy` |
 | `brush_footprint_geometry.py` | — |
 | `brush_planner.py` | `brush_footprint_geometry` |
 | `brush_calibration.py` | — |
