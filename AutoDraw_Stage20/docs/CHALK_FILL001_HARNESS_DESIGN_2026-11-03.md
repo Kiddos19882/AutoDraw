@@ -1,7 +1,7 @@
 # FILL-001 — технический дизайн экспериментального harness
 
 **Дата:** 2026-11-03  
-**Статус:** DESIGN REVIEW COMPLETE; реализация не начата  
+**Статус:** FROZEN MASK GENERATOR IMPLEMENTED; fixed-radius planner and harness pending  
 **Связь:** [план FILL-001](CHALK_FILL_AREA_RADIUS_EFFICIENCY_PLAN_2026-11-03.md)
 
 ## Подтверждённые ограничения
@@ -39,10 +39,28 @@
 
 Нельзя использовать INT-006 frozen prediction artifact: FILL001 — отдельная геометрическая проверка, не переобучение модели INT-006.
 
+## Реализация frozen masks — 2026-11-03
+
+Добавлен `source/preparation/chalk_fill_experiment.py` и `source/preparation/tests/test_chalk_fill_experiment.py`.
+
+- Canvas: 460 × 240 logical board pixels.
+- Маски являются одной связной областью с непрерывным диапазоном X в каждой активной строке.
+- Площади: rectangle 44 653 px; wide_irregular 45 159 px; narrow_irregular 44 879 px.
+- Разброс max/min — 1,133%, меньше допуска ±5%.
+- Geometry SHA-256 закреплены в `FILL001_EXPECTED_MASK_SHA256` и проверяются regression tests.
+
+| Shape | Area | SHA-256 |
+|---|---:|---|
+| rectangle | 44 653 | `ac1c6660e5986cdf534328c6dbcd5020f631168b1473c24b29e7609eb827998b` |
+| wide_irregular | 45 159 | `ffff041d8fcaf53ce4f680ddbefb43a949dd72fdb10f44d6c95cf4832555d7db` |
+| narrow_irregular | 44 879 | `50d45794d9594b5b11f93ddfe407c47210eb315ae10f3d70e0b3978eff5764a3` |
+
+Локально воспроизведённый набор тестов масок: 7 passed. Полный GitHub Actions result для последних code commits пока не подтверждён; live FILL001 не запускался.
+
 ## Порядок реализации
 
 1. [x] Проверить game engine semantics, существующие planners и их тесты.
-2. [ ] Создать frozen target masks и проверить площади/signatures.
+2. [x] Создать frozen target masks, проверить площади и закрепить SHA-256; локальные tests 7/7 PASS (CI status pending).
 3. [ ] Реализовать fixed-radius generator и raster footprint simulator.
 4. [ ] Добавить deterministic/property tests: no leakage, radius isolation, coverage threshold и rejection узкой геометрии.
 5. [ ] Добавить FILL001 matrix/block/journal validation с динамическим expected stroke count.
