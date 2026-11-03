@@ -138,3 +138,11 @@ def test_analyzer_fails_closed_on_missing_duplicate_and_bad_capture(matrix):
     report = analyze_fill001_captures(matrix, captures)
     assert report["status"] == "incomplete"
     assert report["accepted_count"] == 44
+
+
+def test_analyzer_rejects_reused_run_identity(matrix):
+    captures = [_capture(task) for task in matrix["tasks"]]
+    captures[1]["run_id"] = captures[0]["run_id"]
+    report = analyze_fill001_captures(matrix, captures)
+    assert report["status"] == "incomplete"
+    assert any(item["reason"] == "duplicate_run_id" for item in report["rejected"])
