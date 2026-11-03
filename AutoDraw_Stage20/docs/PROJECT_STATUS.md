@@ -9,7 +9,7 @@
 
 # Текущее состояние проекта
 
-**Последнее обновление:** 2026-11-03 — INT006R полностью закрыт (45/45 captures, raw-data audit, CLI analyzer и visual audit). Для FILL-001 добавлен `chalk_fill_experiment.py`: три frozen masks на canvas 460×240, площади выровнены с разбросом 1,133%, SHA-256 закреплены; добавлено 7 tests (локально 7/7 PASS). CI для новых commits пока не подтверждён. Следующий шаг — fixed-radius planner/simulator. См. [INT006R visual audit](CHALK_INT006R_VISUAL_AUDIT_2026-11-03.md) и [FILL-001 design](CHALK_FILL001_HARNESS_DESIGN_2026-11-03.md).
+**Последнее обновление:** 2026-11-03 — INT006R полностью закрыт (45/45 captures, raw-data audit, CLI analyzer и visual audit). Для FILL-001 добавлен `chalk_fill_experiment.py`: три frozen masks на canvas 460×240, площади выровнены с разбросом 1,133%, SHA-256 закреплены; добавлено 8 tests (локально 8/8 PASS). CI для новых commits пока не подтверждён. Следующий шаг — fixed-radius planner/simulator. См. [INT006R visual audit](CHALK_INT006R_VISUAL_AUDIT_2026-11-03.md) и [FILL-001 design](CHALK_FILL001_HARNESS_DESIGN_2026-11-03.md).
 
 **Актуально на:** 3 ноября 2026 г.  
 **Репозиторий:** `Kiddos19882/AutoDraw`  
@@ -48,7 +48,7 @@
 | INT-005 | DONE* | Автоматические CHALK blocks, matrix, journal, recovery и fail-closed gates используются в принятых сериях. |
 | INT-006 | IN_PROGRESS | Live captures, 45/45 Monitor audit, официальный analyzer (45 accepted, 0 missing/rejected), 15/15 complete groups и полный binding audit завершены. Осталось отдельно решить вопрос safety margin и расширить domain validation; production eligibility не подтверждена. |
 | INT-006R | DONE | 45/45 live captures, raw-data audit, официальный CLI analyzer и ручной visual audit завершены. Зафиксированы geometry-specific limitations для D2/radius=1 и D4/radius=30. |
-| INT-006F | IN_PROGRESS | Добавлен `chalk_fill_experiment.py`: три frozen masks, площади выровнены с разбросом 1,133%, SHA-256 закреплены; 7 mask tests локально PASS. CI pending/not confirmed. Следующее: fixed-radius generator/simulator, matrix/block harness и analyzer. См. FILL-001 plan/design. |
+| INT-006F | IN_PROGRESS | Добавлен `chalk_fill_experiment.py`: три frozen masks, площади выровнены с разбросом 1,133%, SHA-256 закреплены; 8 mask tests локально PASS. CI pending/not confirmed. Следующее: fixed-radius generator/simulator, matrix/block harness и analyzer. См. FILL-001 plan/design. |
 | INT-007 | BLOCKED | Интеграция валидированной модели в preflight/resource estimator запрещена до закрытия INT-006 и определения safety margin. |
 | INT-008 | TODO | Оптимизация траекторий, кистей, порядка и покрытия в пределах CHALK после INT-007. |
 | INT-009 | TODO | Независимая проверка прогноза на полных рисунках, визуального качества и фактической экономии. |
