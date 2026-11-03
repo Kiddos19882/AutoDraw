@@ -47,6 +47,8 @@ def _rounded_row_inset(
 def _build_masks() -> dict[str, np.ndarray]:
     yy, xx = np.indices((FILL001_CANVAS_HEIGHT, FILL001_CANVAS_WIDTH), dtype=np.float64)
 
+    # Broad rectangle with rounded corners. Its area is the reference for the
+    # approximately area-matched irregular shapes below.
     rect_y_min, rect_y_max, rect_radius = 50, 190, 24.0
     rect_inset = _rounded_row_inset(
         yy, y_min=rect_y_min, y_max=rect_y_max, corner_radius=rect_radius
@@ -58,6 +60,8 @@ def _build_masks() -> dict[str, np.ndarray]:
         & (xx <= 390.0 - rect_inset)
     )
 
+    # Wide irregular area: gently varying left/right boundaries and rounded
+    # top/bottom ends. The geometry remains broad enough for radius 30.
     wide_y_min, wide_y_max, wide_radius = 45, 195, 24.0
     wide_inset = _rounded_row_inset(
         yy, y_min=wide_y_min, y_max=wide_y_max, corner_radius=wide_radius
@@ -71,6 +75,8 @@ def _build_masks() -> dict[str, np.ndarray]:
         & (xx <= wide_right)
     )
 
+    # Narrower, taller irregular area. Its width varies smoothly but remains
+    # safely above the largest tested line width in the central region.
     narrow_y_min, narrow_y_max, narrow_radius = 10, 230, 24.0
     narrow_inset = _rounded_row_inset(
         yy, y_min=narrow_y_min, y_max=narrow_y_max, corner_radius=narrow_radius
