@@ -490,3 +490,15 @@ INT-006 остаётся IN_PROGRESS до официального analyzer repo
 - [x] Сопоставить официальный report с предварительными метриками — расхождений, влияющих на выводы, нет.
 - [ ] Отдельно принять решение по safety margin и расширить domain validation; до этого не менять production estimator/defaults и не запускать INT-007.
 - [ ] INT-006R: реализовать отдельную radius × geometry matrix phase и CI gate по [плану](CHALK_RADIUS_GEOMETRY_CROSS_VALIDATION_PLAN_2026-11-03.md); live tests до software gate не запускать.
+
+
+## DOC-017 — справочник Game Monitor и Bridge
+
+**Статус:** DONE  
+**Цель:** зафиксировать фактический API и поток данных Game Monitor/Bridge для дальнейшей разработки и диагностики.
+
+- [x] Сверить Monitor 0.2.1, browser bridge и Python collector по исходникам рабочей ветки.
+- [x] Описать методы, события, lifecycle, transport protocol, RunRecorder и JSON artifacts.
+- [x] Добавить документ в `docs/README.md` и `MODULE_REFERENCE.md`.
+
+**Результат:** [GAME_MONITOR_BRIDGE_REFERENCE.md](GAME_MONITOR_BRIDGE_REFERENCE.md). Изменения кода и live-проверки не входят в задачу.
