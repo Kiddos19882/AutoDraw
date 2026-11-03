@@ -294,9 +294,19 @@ class Fill001Tab:
     def _start_after_brush_verified(self, brush: int) -> None:
         if self.active_task is None or self.active_plan_path is None:
             self.status_var.set("FILL-001 handoff отменён: активная задача отсутствует.")
+            try:
+                self.root.deiconify()
+                self.root.lift()
+            except tk.TclError:
+                pass
             return
         if brush != self.active_task.get("requested_radius"):
             self.status_var.set("FILL-001 заблокирован: подтверждённый радиус не совпадает с задачей.")
+            try:
+                self.root.deiconify()
+                self.root.lift()
+            except tk.TclError:
+                pass
             return
         attempt_path = self.output_dir / "attempts" / f"{self.active_task['task_id']}.json"
         attempt_path.parent.mkdir(parents=True, exist_ok=True)
@@ -331,6 +341,11 @@ class Fill001Tab:
             record["status"] = "start_rejected"
             attempt_path.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
             self.status_var.set("Stage 6 не принял FILL-001. Попытка зафиксирована; задача не будет запущена повторно автоматически.")
+            try:
+                self.root.deiconify()
+                self.root.lift()
+            except tk.TclError:
+                pass
             return
         record["status"] = "running"
         attempt_path.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
