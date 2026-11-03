@@ -288,6 +288,17 @@ class Fill001Tab:
         ):
             return
         try:
+            current_region = self.brush_tab.get_canvas_area()
+            if not isinstance(current_region, dict):
+                raise ValueError("Calibrated screen ROI стал недоступен после before capture.")
+            current_region = {
+                key: int(current_region[key]) for key in ("x", "y", "width", "height")
+            }
+            if current_region != self.capture_region:
+                raise ValueError(
+                    "Calibrated screen ROI изменился после before capture; "
+                    "переснимите before PNG и повторите подготовку задачи."
+                )
             plan, selected = prepare_fill001_single_task_plan(
                 self.matrix,
                 task["task_id"],
