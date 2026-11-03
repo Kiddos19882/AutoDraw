@@ -129,18 +129,22 @@ Preparation и executor предоставляют совместимые import
 | models/ | Совместимые импорты общих Point, Stroke и DrawingPlan |
 | tests/ | Тесты модулей executor |
 
-## 4. Game Monitor — source/game_monitor/
+## 4. Game Monitor и Bridge — source/game_monitor/
 
 | Файл | Структурная роль |
 |---|---|
-| game_monitor.js | Браузерный JavaScript-инструмент Monitor |
-| README.md | Инструкция и описание инструмента |
+| game_monitor.js | Браузерный Game Monitor 0.2.1: BoardPane hooks, CHALK snapshots и event API |
+| game_monitor_bridge.js | Browser-side WebSocket agent, session/sequence, heartbeat и frame probe |
+| game_monitor_bridge_server.py | Локальный WebSocket collector, RunRecorder и запись session/run JSON |
+| start_game_monitor_bridge.bat | Windows launcher локального collector |
+| requirements-bridge.txt | Зависимости Bridge collector |
+| README.md | Ручное подключение Monitor и команды DevTools |
 | websocket_smoke_server.py | Отдельный локальный WebSocket smoke server |
 | requirements-smoke.txt | Зависимости smoke server |
-| status.json | Сохранённый статусный артефакт |
-| autodraw-game-monitor-*.json | Экспортированные JSON-материалы |
+| status.json | Сохранённый статусный артефакт, если присутствует в конкретной ревизии |
+| autodraw-game-monitor-*.json | Standalone Monitor exports |
 
-Game Monitor документируется как самостоятельная вспомогательная подсистема. Он не является Python-пакетом основного приложения.
+Подробные методы, события, транспортный протокол, RunRecorder и JSON schema описаны в [GAME_MONITOR_BRIDGE_REFERENCE.md](GAME_MONITOR_BRIDGE_REFERENCE.md). Game Monitor/Bridge — вспомогательная подсистема; Python collector запускается отдельным процессом и не является импортируемой частью GUI package.
 
 ## 5. Тестовые каталоги
 
