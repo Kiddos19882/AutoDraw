@@ -280,7 +280,7 @@ class Fill001Tab:
             (
                 f"Будет запущена только задача {task['task_id']} с радиусом {task['requested_radius']}.\n\n"
                 "Проверьте, что это отдельная тестовая доска, она очищена, запас краски достаточен, "
-                "Game Monitor Bridge подключён, а область доски совпадает с frozen canvas. "
+                "Game Monitor Bridge подключён, а calibrated ROI точно охватывает игровую доску. "
                 "Пакетное выполнение остальных 44 задач останется запрещено. Продолжить?"
             ),
             icon="warning",
@@ -351,6 +351,7 @@ class Fill001Tab:
             "created_at_utc": datetime.now(timezone.utc).isoformat(),
             "execution_report_path": None,
             "before_png": str(self.before_png_path) if self.before_png_path else None,
+            "screen_roi": dict(self.capture_region) if self.capture_region else None,
             "after_png": None,
             "capture_path": None,
         }
@@ -394,7 +395,7 @@ class Fill001Tab:
         return True
 
     def _capture_board_png(self, task: dict[str, Any], *, phase: str) -> Path:
-        """Capture exact 460x240 board ROI with cursor moved outside calibrated regions."""
+        """Capture the actual calibrated client ROI; logical 460x240 is handled separately."""
         config = self.brush_tab.get_calibration_profile() if callable(self.brush_tab.get_calibration_profile) else None
         if not isinstance(config, dict):
             raise ValueError("Профиль калибровки доски отсутствует.")
@@ -402,11 +403,8 @@ class Fill001Tab:
         if not isinstance(region, dict):
             raise ValueError("Screen ROI доски отсутствует.")
         region = {key: int(region[key]) for key in ("x", "y", "width", "height")}
-        if (region["width"], region["height"]) != (460, 240):
-            raise ValueError(
-                "Для FILL-001 pixel audit требуется screen ROI ровно 460×240 px; "
-                "масштабированный ROI пока не поддерживается."
-            )
+        if region["width"] < 2 or region["height"] < 2:
+            raise ValueError("Calibrated screen ROI должен быть не меньше 2×2 px.")
         if phase == "after" and self.capture_region is not None and region != self.capture_region:
             raise ValueError("ROI доски изменился между before/after capture.")
         if phase == "before":
@@ -417,6 +415,12 @@ class Fill001Tab:
             expected_screen.get("width") != screen.width or expected_screen.get("height") != screen.height
         ):
             raise ValueError("Разрешение экрана изменилось после калибровки.")
+        if (
+            region["x"] < 0 or region["y"] < 0
+            or region["x"] + region["width"] > screen.width
+            or region["y"] + region["height"] > screen.height
+        ):
+            raise ValueError("Calibrated screen ROI выходит за границы текущего снимка экрана.")
         configured_regions = config.get("regions", {})
         avoid = tuple(
             value for name, value in configured_regions.items()
@@ -434,8 +438,8 @@ class Fill001Tab:
             region["x"], region["y"],
             region["x"] + region["width"], region["y"] + region["height"],
         )).convert("RGB")
-        if crop.size != (460, 240):
-            raise ValueError("Сохранённый board crop не равен 460×240 px.")
+        if crop.size != (region["width"], region["height"]):
+            raise ValueError("Размер PNG crop не совпадает с фактическим calibrated screen ROI.")
         directory = self.output_dir / "captures"
         directory.mkdir(parents=True, exist_ok=True)
         destination = directory / f"{task['task_id']}-{phase}.png"
@@ -519,6 +523,7 @@ class Fill001Tab:
                 executor_report_path=report_path,
                 before_png=before_png,
                 after_png=after_png,
+                screen_roi=record.get("screen_roi"),
             )
             capture_path = self.output_dir / "captures" / f"{self.active_task['task_id']}-capture.json"
             capture_path.write_text(json.dumps(capture, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
