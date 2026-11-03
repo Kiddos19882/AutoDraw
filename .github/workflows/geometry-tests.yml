@@ -149,6 +149,40 @@ jobs:
           path: ${{ runner.temp }}/int006r-live-validation/
           if-no-files-found: warn
           retention-days: 14
+      - name: Package INT006R before/after PNGs for manual visual review
+        if: always()
+        shell: pwsh
+        run: |
+          $journalPath = "data/results/brush_behavior_tests/chalk_test_blocks/chalk-block-INT006R-chalk-20261103-030837-a20df5-a8e0b9ec.json"
+          $journal = Get-Content $journalPath -Raw | ConvertFrom-Json
+          if ($journal.tasks.Count -ne 45) { throw "Expected 45 INT006R tasks, found $($journal.tasks.Count)." }
+          $sourceRoot = "data/results/brush_behavior_tests"
+          $targetRoot = Join-Path $env:RUNNER_TEMP "int006r-visual-review-source"
+          New-Item -ItemType Directory -Path $targetRoot -Force | Out-Null
+          $copied = 0
+          foreach ($task in $journal.tasks) {
+            $attempt = $task.attempts | Where-Object { $_.status -eq "completed" } | Select-Object -First 1
+            if ($null -eq $attempt) { throw "Completed attempt missing for task $($task.task_id)." }
+            $directoryName = Split-Path -Path $attempt.experiment_dir -Leaf
+            $sourceDirectory = Join-Path $sourceRoot $directoryName
+            $targetDirectory = Join-Path $targetRoot $directoryName
+            New-Item -ItemType Directory -Path $targetDirectory -Force | Out-Null
+            foreach ($fileName in @("before_draw-board.png", "after_draw-board.png", "experiment.json", "monitor_report.json")) {
+              $sourceFile = Join-Path $sourceDirectory $fileName
+              if (-not (Test-Path $sourceFile -PathType Leaf)) { throw "Missing $fileName for $($task.task_id)." }
+              Copy-Item $sourceFile (Join-Path $targetDirectory $fileName) -Force
+              $copied++
+            }
+          }
+          if ($copied -ne 180) { throw "Expected 180 visual review source files, copied $copied." }
+      - name: Upload INT006R visual review source captures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autodraw-int006r-visual-review-source
+          path: ${{ runner.temp }}/int006r-visual-review-source/
+          if-no-files-found: error
+          retention-days: 14
 
   integration-tests:
     name: Application integration tests
