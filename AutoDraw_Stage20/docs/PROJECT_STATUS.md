@@ -1,12 +1,3 @@
-## Историческая запись — совместимость legacy CHALK journals (2026-11-02)
-
-- Подтверждён источник ошибки при запуске: корректный completed V2 journal использует исторический `int006_short_strokes` (6 штрихов), тогда как validator принимал только follow-up ID `int006_short_strokes_followup` (5 штрихов). Все 9 задач в найденном журнале completed, matrix cells уникальны.
-- Validator обновлён: V2/V5 принимают соответствующие legacy IDs с собственными expected stroke counts; запрет дублирования и смешения сценариев сохранён.
-- Regression tests добавлены для legacy V2 и V5. Commits: `f0e05df`, `4847cce`.
-- Полный CI для commits `f0e05df` и `4847cce` подтверждён run `41496555297`. Workflow checkout рабочей ветки выполнен в 18:01:55 UTC после появления commit `956ce2b`; compare подтверждает, что `f0e05df` и `4847cce` являются его предками. Job Preparation/G3 завершился: 662 passed, 82 subtests passed. Все обязательные jobs, Windows portable build и INT-006 PNG audit — success; optional benchmarks skipped. Не удалять и не редактировать старые journals вручную.
-- Production executor, estimator, defaults, experiment data и master не менялись.
-- Статическая проверка `chalk_test_blocks.py`, `chalk_experiment_matrix.py` и regression tests подтвердила legacy ID mapping V2/V5, собственные expected stroke counts и запрет смешивания сценариев внутри одного журнала. Дополнительно CI `41496555297` успешно выполнил Preparation/G3 suite: 662 passed, 82 subtests passed. Legacy compatibility gate закрыт.
-
 # Текущее состояние проекта
 
 **Последнее обновление:** 2026-11-03 — FILL-001 UI/runner handoff реализован отдельной вкладкой; software regression gate подтверждён CI [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178) на code/test HEAD `e3774a3`. Preparation/G3: 772 passed, 24 warnings, 82 subtests; все обязательные jobs и Windows portable build/startup smoke-test SUCCESS, optional benchmarks skipped. Вкладка создаёт/открывает 45-cell manifest, выбирает одну approved task, проверяет frozen plan/mask identity, передаёт кисть и DrawingPlan в Stage 6 с P1 override, затем связывает runtime report с Bridge evidence и выполняет PNG capture/audit. **Windows live preflight на реальной игровой сессии и реальные FILL-001 PNG ещё не подтверждены; 45 live captures остаются заблокированы.**
@@ -866,3 +857,15 @@ Per-run transport gates чистые: `dropped_events=0`, `monitor_error_count_d
 Проверка текущего дерева на HEAD `01cb37d6cb8fc7c5ec56e648330abda31875f15b` показала, что FILL-001 пока нельзя запустить через интерфейс AutoDraw. Stage 6 runtime binding — только post-execution hook, ожидающий готовый `experiment_context`; UI/runner не создаёт FILL-001 task и не передаёт её в Executor. В Brush Test UI нет FILL001 phase, а executor override allowlist её не содержит.
 
 Следовательно, software gate runtime binder закрыт, но пользовательская интеграция не завершена. Шаг 3 временного плана расширен: сначала UI/runner и fail-closed DrawingPlan handoff, затем Windows live preflight. Шаги 4–5 остаются BLOCKED. Подробности — [аудит интеграции](CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md).
+
+
+---
+
+## Историческая запись — совместимость legacy CHALK journals (2026-11-02)
+
+- Подтверждён источник ошибки при запуске: корректный completed V2 journal использует исторический `int006_short_strokes` (6 штрихов), тогда как validator принимал только follow-up ID `int006_short_strokes_followup` (5 штрихов). Все 9 задач в найденном журнале completed, matrix cells уникальны.
+- Validator обновлён: V2/V5 принимают соответствующие legacy IDs с собственными expected stroke counts; запрет дублирования и смешения сценариев сохранён.
+- Regression tests добавлены для legacy V2 и V5. Commits: `f0e05df`, `4847cce`.
+- Полный CI для commits `f0e05df` и `4847cce` подтверждён run `41496555297`. Workflow checkout рабочей ветки выполнен в 18:01:55 UTC после появления commit `956ce2b`; compare подтверждает, что `f0e05df` и `4847cce` являются его предками. Job Preparation/G3 завершился: 662 passed, 82 subtests passed. Все обязательные jobs, Windows portable build и INT-006 PNG audit — success; optional benchmarks skipped. Не удалять и не редактировать старые journals вручную.
+- Production executor, estimator, defaults, experiment data и master не менялись.
+- Статическая проверка `chalk_test_blocks.py`, `chalk_experiment_matrix.py` и regression tests подтвердила legacy ID mapping V2/V5, собственные expected stroke counts и запрет смешивания сценариев внутри одного журнала. Дополнительно CI `41496555297` успешно выполнил Preparation/G3 suite: 662 passed, 82 subtests passed. Legacy compatibility gate закрыт.
