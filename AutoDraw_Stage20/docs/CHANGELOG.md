@@ -606,3 +606,10 @@
 - Добавлены fail-closed capture validation по exact CHALK, dynamic expected strokes, geometry/mask/run identity, coverage/leakage и целостности Game Monitor.
 - Добавлен analyzer с отдельной статистикой exact CHALK по форме и радиусу и regression tests.
 - CI/pytest для актуального HEAD пока не подтверждены; live execution не запускалось.
+
+
+## 2026-11-03 — FILL-001 capture fixture correction
+
+- Исправлен тестовый capture helper: теперь он формирует обязательные per-stroke CHALK deltas и PNG evidence fields, соответствующие текущему validator contract.
+- Добавлены negative checks для отсутствующего PNG evidence и неверного количества per-stroke deltas.
+- Commit: [70323a8](https://github.com/Kiddos19882/AutoDraw/commit/70323a8e65ccddd201aa412263aac9efe18ec099). Pytest/CI для этого изменения ещё не подтверждены.
