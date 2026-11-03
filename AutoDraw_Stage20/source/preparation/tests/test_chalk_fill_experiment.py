@@ -70,6 +70,15 @@ def test_each_frozen_mask_is_one_contiguous_run_per_active_row():
             assert np.all(np.diff(xs) == 1), f"{shape_id} has a disconnected row at y={y}"
 
 
+def test_frozen_masks_are_connected_across_adjacent_rows():
+    for shape_id in FILL001_SHAPES:
+        mask = build_fill_target_mask(shape_id)
+        active_rows = np.flatnonzero(np.any(mask, axis=1))
+        assert np.all(np.diff(active_rows) == 1)
+        for y1, y2 in zip(active_rows[:-1], active_rows[1:]):
+            assert np.any(mask[y1] & mask[y2]), f"{shape_id} is disconnected between rows {y1} and {y2}"
+
+
 def test_mask_metadata_contains_stable_identity_and_area():
     metadata = describe_fill_target_mask("wide_irregular")
 
