@@ -135,6 +135,20 @@ jobs:
           path: ${{ runner.temp }}/int006-chalk-validation/
           if-no-files-found: warn
           retention-days: 14
+      - name: Run independent INT006R radius × geometry validation on live captures
+        shell: pwsh
+        run: |
+          $env:PYTHONPATH = "$env:GITHUB_WORKSPACE/AutoDraw_Stage20;$env:GITHUB_WORKSPACE/AutoDraw_Stage20/source/preparation;$env:GITHUB_WORKSPACE/AutoDraw_Stage20/source/executor"
+          python source/preparation/chalk_int006r_validation.py --journal data/results/brush_behavior_tests/chalk_test_blocks/chalk-block-INT006R-chalk-20261103-030837-a20df5-a8e0b9ec.json --results-dir data/results/brush_behavior_tests --output "$env:RUNNER_TEMP/int006r-live-validation/analysis.json"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Upload INT006R live validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autodraw-int006r-live-validation
+          path: ${{ runner.temp }}/int006r-live-validation/
+          if-no-files-found: warn
+          retention-days: 14
 
   integration-tests:
     name: Application integration tests
