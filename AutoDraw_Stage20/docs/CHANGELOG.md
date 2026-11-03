@@ -620,3 +620,10 @@
 - Добавлен адаптер Monitor export → FILL-001 capture с per-stroke/run exact CHALK, radius, P1 sampling binding, external bridge/run identity и PNG file/hash/pixel audit.
 - Добавлен отдельный набор regression tests с синтетическими Monitor events и PNG fixtures.
 - Software tests/CI ещё не запускались или не подтверждены; live execution остаётся заблокированным до CI и preflight.
+
+
+## 2026-11-03 — FILL-001 matrix schema v2
+
+- Matrix manifest теперь фиксирует P1 sampling metadata в каждой task; validator отклоняет изменённый профиль.
+- Adapter закреплён за Game Monitor 0.2.1 и проверяет frozen mask SHA-256 и bridge diagnostics binding.
+- Тесты добавлены, но ещё не запускались; CI pending.
