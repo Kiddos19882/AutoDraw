@@ -97,13 +97,18 @@ def build_fill001_experiment_context(task: dict[str, Any]) -> dict[str, Any]:
 def attach_fill001_experiment_context(
     plan_document: dict[str, Any], task: dict[str, Any]
 ) -> dict[str, Any]:
-    """Return a DrawingPlan JSON document with immutable FILL-001 task metadata."""
+    """Return a DrawingPlan JSON document with task metadata and its canonical plan hash."""
     if not isinstance(plan_document, dict):
         raise FillMatrixError("DrawingPlan document должен быть JSON object.")
     if "autodraw_experiment" in plan_document:
         raise FillMatrixError("DrawingPlan уже содержит autodraw_experiment context.")
+    canonical = json.dumps(
+        plan_document, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False
+    )
+    context = build_fill001_experiment_context(task)
+    context["executor_plan_sha256"] = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
     result = dict(plan_document)
-    result["autodraw_experiment"] = build_fill001_experiment_context(task)
+    result["autodraw_experiment"] = context
     return result
 
 
@@ -116,8 +121,20 @@ def _validate_executor_report(task: dict[str, Any], report: dict[str, Any]) -> t
         raise FillMatrixError("Executor report не содержит корректный execution_id.") from exc
     if report.get("status") != "completed":
         raise FillMatrixError("Executor report не завершён успешно.")
-    if report.get("experiment_context") != build_fill001_experiment_context(task):
+    context = report.get("experiment_context")
+    expected_context = build_fill001_experiment_context(task)
+    if not isinstance(context, dict) or any(
+        context.get(field) != value for field, value in expected_context.items()
+    ):
         raise FillMatrixError("Executor report связан с другой FILL-001 task.")
+    plan_hash = context.get("executor_plan_sha256")
+    if (
+        not isinstance(plan_hash, str)
+        or len(plan_hash) != 64
+        or any(c not in "0123456789abcdef" for c in plan_hash)
+        or report.get("source_plan_sha256") != plan_hash
+    ):
+        raise FillMatrixError("Executor report source_plan_sha256 не совпадает с FILL-001 DrawingPlan hash.")
     source_hash = report.get("source_plan_file_sha256")
     if not isinstance(source_hash, str) or len(source_hash) != 64 or any(c not in "0123456789abcdef" for c in source_hash):
         raise FillMatrixError("Executor report не содержит SHA-256 исходного plan-файла.")
@@ -197,7 +214,10 @@ def _validate_session(session: dict[str, Any], run: dict[str, Any]) -> str:
         raise FillMatrixError("Bridge session содержит ошибки атомарной записи.")
     if received_events < run_event_count:
         raise FillMatrixError("Bridge session event count меньше числа событий run.")
-    if sequence_gaps < run.get("collector_sequence_gap_count", 0):
+    run_sequence_gaps = _nonnegative_int(
+        run.get("collector_sequence_gap_count"), "bridge_run.collector_sequence_gap_count"
+    )
+    if sequence_gaps < run_sequence_gaps:
         raise FillMatrixError("Bridge session не подтверждает sequence gaps из run.")
     run_send_end = run.get("bridge_send_failures_end")
     if type(run_send_end) is not int or send_failures < run_send_end:
@@ -322,11 +342,13 @@ def bind_fill001_runtime_evidence(
     session_id = session.get("session_id") if isinstance(session, dict) else None
     candidates = []
     for run in bridge_runs:
-        if not isinstance(run, dict) or run.get("session_id") != session_id:
-            continue
+        if not isinstance(run, dict):
+            raise FillMatrixError("Bridge run должен быть JSON object.")
         started = _parse_aware_datetime(run.get("started_at_utc"), "bridge_run.started_at_utc")
         ended = _parse_aware_datetime(run.get("finished_at_utc"), "bridge_run.finished_at_utc")
         if executor_started <= started < ended <= executor_ended:
+            if run.get("session_id") != session_id:
+                raise FillMatrixError("Bridge run из executor interval принадлежит другой session.")
             candidates.append(run)
     if len(candidates) != 1:
         raise FillMatrixError(

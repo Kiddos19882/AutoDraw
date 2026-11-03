@@ -82,6 +82,7 @@ def _runtime_documents(tmp_path):
         "status": "completed",
         "experiment_context": plan_document["autodraw_experiment"],
         "source_plan_file": str(plan_path),
+        "source_plan_sha256": plan_document["autodraw_experiment"]["executor_plan_sha256"],
         "source_plan_file_sha256": "c" * 64,
         "summary": summary,
         "executor_config": config,
@@ -226,7 +227,7 @@ def test_runtime_binding_rejects_wrong_sampling_or_line_extension(tmp_path):
 def test_runtime_binding_rejects_run_session_mismatch_and_sequence_gap(tmp_path):
     task, _, _, _, run, session, report = _runtime_documents(tmp_path)
     run["session_id"] = str(uuid.uuid4())
-    with pytest.raises(FillMatrixError, match="different session"):
+    with pytest.raises(FillMatrixError, match="другой session"):
         bind_fill001_runtime_evidence(task, session, [run], report)
 
     task, _, _, _, run, session, report = _runtime_documents(tmp_path)
