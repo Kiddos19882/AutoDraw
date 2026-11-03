@@ -35,7 +35,7 @@ INT006R visual audit закрыт с geometry-specific limitations: radius 30 с
 
 - [x] Зафиксировать экспериментальный дизайн: три формы одноцветной области × радиусы 1/5/10/20/30 × три повтора = 45 captures.
 - [x] Проверить engine semantics и ограничения существующих fill planners; зафиксировать отдельный fixed-radius harness design. См. [design](CHALK_FILL001_HARNESS_DESIGN_2026-11-03.md).
-- [x] Создать frozen target masks на canvas 460×240; площади 44 653/45 159/44 879 px, разброс 1,133%, SHA-256 закреплены в коде. Локальные mask tests — 7/7 PASS; CI ещё не подтверждён.
+- [x] Создать frozen target masks на canvas 460×240; площади 44 653/45 159/44 879 px, разброс 1,133%, SHA-256 закреплены в коде. Локальные mask tests — 8/8 PASS; CI ещё не подтверждён.
 - [ ] Завершить калибровку footprint для всех радиусов 1/5/10/20/30; INT006R уже подтвердил raster width и выявил D2/D4 quality limits для 1/10/30.
 - [ ] Реализовать отдельный matrix/block harness, analyzer и regression tests.
 - [ ] Получить полный CI PASS и Windows preflight.
