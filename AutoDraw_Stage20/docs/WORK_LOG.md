@@ -2260,3 +2260,11 @@ Brush Test acceptance и матричные валидаторы больше н
 - Изменение: [70323a8](https://github.com/Kiddos19882/AutoDraw/commit/70323a8e65ccddd201aa412263aac9efe18ec099).
 - Проверено чтением committed test file и diff. Pytest не запускался; combined status пуст, workflow run через доступный commit-run endpoint не возвращён. CI PASS не заявляется.
 - Это исправление касается только synthetic unit-test fixtures. Оно не создаёт PNG-файлы, не доказывает независимый PNG audit и не интегрирует FILL-001 matrix с реальными Game Monitor reports. Live execution запрещён до отдельного software gate и подтверждения evidence adapter.
+
+
+## 2026-11-03 — FILL-001 Game Monitor/evidence contract audit
+
+- Сверен реальный event stream `game_monitor.js` с агрегированным capture schema. Monitor выдаёт `DRAW_SAMPLE` с `strokeId`, `pointDelta`, `after.pointCount`, а также DRAW_START/DRAW_END, BRUSH_CHANGE и POINT_QUOTA_UPDATE; FILL-001 adapter, который преобразует export в validated capture, пока отсутствует.
+- Установлено, что текущая PNG validation проверяет только непустые пути и строку `png_audit_status=passed`; существование файлов, SHA-256 и pixel-level соответствие frozen mask не проверяются. Unit-test PNG paths — placeholders.
+- Выявлено, что sampling P1 не записан и не проверяется в текущем matrix task/capture schema, несмотря на упоминание P1 в design.
+- В [FILL-001 harness design](CHALK_FILL001_HARNESS_DESIGN_2026-11-03.md) добавлена точная граница реализации и обязательные software gates. Live execution остаётся запрещённым до реального Monitor adapter, независимой PNG/mask validation, sampling binding, CI PASS и Windows preflight.
