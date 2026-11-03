@@ -27,7 +27,7 @@ CAPTURE_FIELDS = (
     "requested_radius", "observed_radius", "pre_point_count", "post_point_count",
     "exact_chalk", "coverage_fraction", "leakage_pixels", "completed_strokes",
     "expected_strokes", "dropped_events", "monitor_errors", "bridge_failures",
-    "sequence_gaps", "stroke_chalk_deltas", "before_png", "after_png", "png_audit_status",
+    "sequence_gaps", "stroke_chalk_deltas", "before_png", "after_png", "before_png_sha256",\n    "after_png_sha256", "png_audit_status", "sampling_profile", "monitor_version", "event_count",
 )
 
 
@@ -195,7 +195,7 @@ def validate_fill001_capture(task: dict[str, Any], capture: Any) -> dict[str, An
     for field in ("before_png", "after_png"):
         if not isinstance(capture[field], str) or not capture[field].strip():
             raise FillMatrixError(f"{field} evidence path обязателен.")
-    if capture["png_audit_status"] != "passed":
+    for field in ("before_png_sha256", "after_png_sha256"):\n        value = capture[field]\n        if not isinstance(value, str) or len(value) != 64 or any(ch not in "0123456789abcdef" for ch in value):\n            raise FillMatrixError(f"{field} должен быть SHA-256.")\n    if capture["sampling_profile"] != task.get("sampling_profile") or capture["sampling_profile"] != {"profile_id": "P1", "sampling_step": 4, "delay_ms": 5}:\n        raise FillMatrixError("Sampling profile не совпадает с frozen P1.")\n    if not isinstance(capture["monitor_version"], str) or not capture["monitor_version"]:\n        raise FillMatrixError("monitor_version обязателен.")\n    if isinstance(capture["event_count"], bool) or not isinstance(capture["event_count"], int) or capture["event_count"] < 1:\n        raise FillMatrixError("event_count должен быть положительным целым.")\n    if capture["png_audit_status"] != "passed":
         raise FillMatrixError("PNG evidence не прошёл независимый audit.")
     if capture["leakage_pixels"] != 0:
         raise FillMatrixError("Live capture не прошёл leakage=0.")
