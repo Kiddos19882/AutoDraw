@@ -195,6 +195,14 @@ class Fill001Tab:
         if task is None:
             messagebox.showwarning("Нет задачи", "Выберите одну pending задачу.", parent=self.root)
             return
+        prior_attempt = self.output_dir / "attempts" / f"{task['task_id']}.json"
+        if prior_attempt.exists():
+            messagebox.showwarning(
+                "Задача уже имеет попытку",
+                "Для выбранной задачи уже существует журнал запуска. Повторная установка кисти и исполнение заблокированы.",
+                parent=self.root,
+            )
+            return
         if not callable(self.on_transfer_plan) or not callable(self.on_start):
             messagebox.showerror("FILL-001 не подключён", "Callback передачи в Stage 6 отсутствует.", parent=self.root)
             return
@@ -344,8 +352,11 @@ class Fill001Tab:
             expected_screen.get("width") != screen.width or expected_screen.get("height") != screen.height
         ):
             raise ValueError("Разрешение экрана изменилось после калибровки.")
-        meter = config.get("regions", {}).get("paint_meter_area")
-        avoid = (meter,) if isinstance(meter, dict) else ()
+        configured_regions = config.get("regions", {})
+        avoid = tuple(
+            value for name, value in configured_regions.items()
+            if name != "board_area" and isinstance(value, dict)
+        ) if isinstance(configured_regions, dict) else ()
         safe_point = _cursor_safe_point_outside_region(
             region, (screen.width, screen.height), avoid_regions=avoid
         )
