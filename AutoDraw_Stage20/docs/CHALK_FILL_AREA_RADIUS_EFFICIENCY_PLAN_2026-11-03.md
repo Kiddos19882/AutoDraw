@@ -179,3 +179,16 @@ Capture принимается только если:
 Офлайн-проверка простого горизонтально-вертикального grid показала, что он не обеспечивает coverage ≥99% на радиусах 20/30, хотя leakage равен нулю. Eroded-contour + interior scanlines улучшает coverage, но не проходит строгий combined gate для всех cells: radius 1 оставляет недозаполненную границу, radius 10/30 дают небольшое leakage в OpenCV simulation. Это не live renderer measurement и не production planner.
 
 Поэтому следующий шаг — boundary-aware centerline paths с консервативным offset и двойной raster validation (coverage ≥99%, leakage=0). До прохождения обоих критериев DrawingPlan не передавать executor и не запускать live matrix.
+
+
+## 13. Capture adapter — implementation status (2026-11-03)
+
+Реализованы `chalk_fill_capture_adapter.py` и regression fixtures:
+- Monitor event pairing по strokeId и exact pointCount;
+- per-stroke CHALK включая первую точку onDrawStart;
+- requested/observed radius binding;
+- frozen P1 metadata (step=4, delay=5 ms);
+- PNG existence/format/dimensions, SHA-256, coverage/leakage по RGB difference;
+- внешний run ID и bridge diagnostics.
+
+Это **software implementation candidate**, а не закрытый gate. Adapter пока не связан с фактическим runner/journal call site; Game Monitor не экспортирует runId или sequence counter; P1 и bridge report поступают внешними параметрами; реальный screenshot crop/threshold не прошёл preflight. Pytest/CI не подтверждены. Live 45-cell matrix не запускать.
