@@ -55,12 +55,12 @@
 | wide_irregular | 45 159 | `ffff041d8fcaf53ce4f680ddbefb43a949dd72fdb10f44d6c95cf4832555d7db` |
 | narrow_irregular | 44 879 | `50d45794d9594b5b11f93ddfe407c47210eb315ae10f3d70e0b3978eff5764a3` |
 
-Локально воспроизведённый набор тестов масок: 7 passed. Полный GitHub Actions result для последних code commits пока не подтверждён; live FILL001 не запускался.
+Локально воспроизведённый набор тестов масок: 8 passed. Полный GitHub Actions result для последних code commits пока не подтверждён; live FILL001 не запускался.
 
 ## Порядок реализации
 
 1. [x] Проверить game engine semantics, существующие planners и их тесты.
-2. [x] Создать frozen target masks, проверить площади и закрепить SHA-256; локальные tests 7/7 PASS (CI status pending).
+2. [x] Создать frozen target masks, проверить площади и закрепить SHA-256; локальные tests 8/8 PASS (CI status pending).
 3. [ ] Реализовать fixed-radius generator и raster footprint simulator.
 4. [ ] Добавить deterministic/property tests: no leakage, radius isolation, coverage threshold и rejection узкой геометрии.
 5. [ ] Добавить FILL001 matrix/block/journal validation с динамическим expected stroke count.
