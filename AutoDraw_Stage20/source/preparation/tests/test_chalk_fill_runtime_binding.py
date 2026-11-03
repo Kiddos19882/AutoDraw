@@ -150,6 +150,7 @@ def _runtime_documents(tmp_path):
     session = {
         "schema_version": 2,
         "session_id": session_id,
+        "started_at_utc": "2026-11-03T09:59:00+00:00",
         "run_idle_seconds": 2.5,
         "monitor_status_at_connect": {"version": "0.2.1"},
         "bridge_diagnostics": {

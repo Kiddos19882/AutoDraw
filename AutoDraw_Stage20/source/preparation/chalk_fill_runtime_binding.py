@@ -617,7 +617,7 @@ def find_fill001_runtime_binding(
             closed_at = _parse_aware_datetime(closed_at_value, "session.connection_closed_at_utc")
             if closed_at < executor_started:
                 continue
-        if session_started > executor_ended + timedelta(seconds=4.0) or last_message < executor_started:
+        if session_started > executor_ended or last_message < executor_started:
             continue
         if session.get("schema_version") != 2:
             raise FillMatrixError("Активная Bridge session создана по устаревшей schema; требуется schema_version=2.")

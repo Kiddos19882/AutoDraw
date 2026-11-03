@@ -1811,12 +1811,21 @@ class Stage6App:
             self.last_report_path = report_path
             report_status = f"Отчёт: {report_path}"
             if fill001_runtime_binding_pending:
-                threading.Thread(
-                    target=self._bind_fill001_runtime_after_execution,
-                    args=(report_path,),
-                    name="FILL001-runtime-binding",
-                    daemon=False,
-                ).start()
+                try:
+                    threading.Thread(
+                        target=self._bind_fill001_runtime_after_execution,
+                        args=(report_path,),
+                        name="FILL001-runtime-binding",
+                        daemon=False,
+                    ).start()
+                except Exception as binding_start_error:
+                    update_execution_report(
+                        report_path,
+                        {
+                            "runtime_binding_status": "failed",
+                            "runtime_binding_error": f"Не удалось запустить runtime binding worker: {binding_start_error}",
+                        },
+                    )
         except OSError as exc:
             report_status = f"Не удалось сохранить отчёт: {exc}"
 
