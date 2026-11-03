@@ -51,7 +51,12 @@ def _capture(task):
         # Unit-test placeholders only; live captures must reference audited PNG files.
         "before_png": "test-evidence/before.png",
         "after_png": "test-evidence/after.png",
-        "png_audit_status": "passed",\n        "before_png_sha256": "a" * 64,\n        "after_png_sha256": "b" * 64,\n        "sampling_profile": task["sampling_profile"],\n        "monitor_version": "test-monitor",\n        "event_count": 10,
+        "png_audit_status": "passed",
+        "before_png_sha256": "a" * 64,
+        "after_png_sha256": "b" * 64,
+        "sampling_profile": task["sampling_profile"],
+        "monitor_version": "test-monitor",
+        "event_count": 10,
     }
 
 
