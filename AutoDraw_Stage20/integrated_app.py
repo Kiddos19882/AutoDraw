@@ -662,6 +662,21 @@ class AutoDrawUnifiedApp:
         destination = self.data_paths["runtime"] / "current_brush_behavior_test.json"
         try:
             path = write_validated_execution_plan(execution_plan, destination, save_plan, DrawingPlan)
+            fill_task = None
+            generation = plan.get("generation")
+            if isinstance(generation, dict):
+                fill_task = generation.get("chalk_fill001_task")
+            if isinstance(fill_task, dict):
+                from chalk_fill_runtime_binding import attach_fill001_experiment_context
+
+                persisted_document = json.loads(path.read_text(encoding="utf-8"))
+                bound_document = attach_fill001_experiment_context(persisted_document, fill_task)
+                temporary = path.with_name(f".{path.name}.{uuid.uuid4().hex}.tmp")
+                temporary.write_text(
+                    json.dumps(bound_document, ensure_ascii=False, indent=2) + "\\n",
+                    encoding="utf-8",
+                )
+                temporary.replace(path)
             self.executor.load_plan_from_path(path)
         except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError, RuntimeError) as exc:
             messagebox.showerror(
@@ -800,11 +815,71 @@ class AutoDrawUnifiedApp:
             "После завершения требуется проверка результата и очистки."
         )
 
+    def _start_fill001_executor(
+        self, requested_brush: int, task: dict[str, Any], plan_path: Path
+    ) -> bool:
+        """Start exactly one operator-approved FILL-001 task with frozen P1 settings."""
+        if self.executor.running:
+            messagebox.showwarning(
+                "Исполнение уже запущено",
+                "FILL-001 не может запускать второй экземпляр исполнителя.",
+                parent=self.root,
+            )
+            return False
+        active_path = getattr(self.executor, "plan_path", None)
+        if active_path is None or Path(active_path).resolve() != Path(self.data_paths["runtime"] / "current_brush_behavior_test.json").resolve():
+            messagebox.showerror("Нет FILL-001 плана", "В Stage 6 не загружен ожидаемый runtime plan.", parent=self.root)
+            return False
+        if Path(plan_path).resolve() != Path(plan_path):
+            return False
+        try:
+            document = json.loads(Path(active_path).read_text(encoding="utf-8"))
+            context = document.get("autodraw_experiment")
+            from chalk_fill_runtime_binding import build_fill001_experiment_context
+            from chalk_fill_execution import FILL001_EXECUTOR_OVERRIDE
+
+            expected = build_fill001_experiment_context(task)
+            if not isinstance(context, dict) or any(context.get(key) != value for key, value in expected.items()):
+                raise ValueError("Runtime DrawingPlan не связан с выбранной FILL-001 task.")
+            if requested_brush != task.get("requested_radius"):
+                raise ValueError("Подтверждённый Game Monitor радиус не совпадает с task.")
+            if document.get("canvas", {}).get("width") != self.executor.execution_plan.width:
+                raise ValueError("Canvas runtime plan не совпадает с загруженным DrawingPlan.")
+            if self.executor.execution_plan.stroke_count != task.get("expected_strokes"):
+                raise ValueError("Число штрихов runtime plan не совпадает с frozen task.")
+            if document.get("autodraw_experiment", {}).get("phase_id") != "FILL001":
+                raise ValueError("Отсутствует FILL-001 experiment context.")
+            started = self.executor.start_execution_from_workflow(
+                executor_config_override=dict(FILL001_EXECUTOR_OVERRIDE)
+            )
+            if not started:
+                self.status_var.set("Stage 6 отклонил FILL-001 запуск.")
+                return False
+            self.status_var.set(
+                f"FILL-001 {task['task_id']} запущен. P1: step=4, delay=5 ms, line extension=0."
+            )
+            return True
+        except Exception as exc:
+            messagebox.showerror(
+                "FILL-001 заблокирован",
+                f"Исполнитель не запущен: {exc}",
+                parent=self.root,
+            )
+            return False
+
     def _on_executor_finished(self, summary: dict[str, Any], report_path: str | Path | None) -> bool:
         """Route completion only for the generated brush-test plan."""
         plan_path = getattr(self.executor, "plan_path", None)
         if plan_path is None or Path(plan_path).name != "current_brush_behavior_test.json":
             return False
+        try:
+            plan_document = json.loads(Path(plan_path).read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError):
+            plan_document = {}
+        context = plan_document.get("autodraw_experiment")
+        if isinstance(context, dict) and context.get("phase_id") == "FILL001":
+            fill_tab = getattr(self, "fill001_tab", None)
+            return bool(fill_tab and fill_tab.handle_executor_finished(summary, report_path))
         brush_tab = getattr(self, "brush_behavior_tab", None)
         if brush_tab is None:
             return False
