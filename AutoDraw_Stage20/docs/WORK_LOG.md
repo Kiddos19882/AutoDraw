@@ -2365,3 +2365,13 @@ Brush Test acceptance и матричные валидаторы больше н
 - Создан [CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md](CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md); обновлены UI integration map, FILL-001 design/temporary plan, PROJECT_STATUS, TASKS, ROADMAP и docs index.
 - Вывод: runtime binder software gate не равен интеграции пользовательского запуска. Шаг 3 FILL-001 должен включать UI/runner handoff до Windows live preflight. Код, тесты, production defaults, данные экспериментов и master в этой работе не менялись.
 - Проверки: статическое чтение исходников и GitHub compare. Локальные тесты, Windows live run, PNG preflight и CI для документационных изменений не запускались.
+
+## 2026-11-03 — FILL-001: исправление разделения logical canvas и client ROI
+
+- Повторно проверены branch `feature/image-geometry-optimization`, HEAD до начала работы `f18cfb3fb595bce5f2f233ccbd31a01a27567b7e`, последние 20 коммитов, управляющие документы, временный план FILL-001, UI, capture adapter и существующий logical→screen transform. GitHub Contents API не предоставляет локальный `git status`; чистота локального worktree не подтверждается.
+- Код подтверждает: `get_canvas_size()` возвращает логические 460×240; `get_canvas_area()` возвращает фактический calibrated screen ROI. Блокировка находилась в `chalk_fill_ui.py`, где PNG crop принудительно требовал физические 460×240, и в `chalk_fill_capture_adapter.py`, где audit принимал только `(240,460,3)`.
+- Удалено требование физического ROI 460×240. UI теперь проверяет границы actual ROI в screenshot, сохраняет crop в его фактическом размере, фиксирует ROI в attempt record и требует совпадения before/after ROI.
+- PNG adapter теперь rasterize frozen logical mask 460×240 в размеры screen PNG методом nearest-neighbor; проверяет uniform scale с допуском 1%, сохраняет ROI, transform и raster scale, продолжает применять RGB threshold=8, coverage ≥99% и leakage=0. Runtime adapter принимает calibrated screen ROI.
+- Добавлены regression tests для client ROI 581×304, runtime capture transform, non-uniform ROI rejection, ROI metadata mismatch, scaled leakage и UI crop 581×304. Эти тесты добавлены, но их локальный/CI запуск пока не подтверждён.
+- Документация синхронизирована: DEC-016, FILL-001 harness design, временный план, TASKS, PROJECT_STATUS, ROADMAP, UI_INTEGRATION_MAP, CHANGELOG. Зафиксировано: 460×240 — логическая система координат движка, не физическое требование к клиентскому экрану. Размер игровой доски не меняется ради AutoDraw.
+- Windows live preflight не выполнялся; 45 live captures остаются BLOCKED. `master`, production estimator/defaults и исходные experiment captures не изменялись.
