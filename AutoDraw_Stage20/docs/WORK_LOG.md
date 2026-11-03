@@ -15,6 +15,7 @@
 - Подготовлен план FILL-001: три формы областей × пять радиусов × три повтора; основной показатель — качественно покрытая площадь на exact CHALK.
 - Обнаружено ограничение существующего `interior_fill_planner.py`: `max_brush_value <= 20`, strokes не готовы к automatic execution; семантика radius vs footprint width требует проверки.
 - Production estimator, frozen INT-006 model, executor/sampling defaults и `master` не менялись.
+- В `.github/workflows/geometry-tests.yml` добавлен запуск `chalk_int006r_validation.py` на реальном committed journal/capture bundle с отдельным artifact `autodraw-int006r-live-validation`. Workflow [41559932955](https://github.com/Kiddos19882/AutoDraw/actions/runs/41559932955) запущен; на момент записи jobs ещё выполняются.
 
 
 ## 2026-11-03 — INT006R full software gate PASS
