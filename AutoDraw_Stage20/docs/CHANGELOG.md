@@ -1,3 +1,10 @@
+## 2026-11-03 — FILL-001 technical design review
+
+- Проверены существующие interior-fill и outline-first planners: оба используют смешанные ширины кисти и не подходят для контролируемого сравнения одного фиксированного радиуса.
+- Определена изолированная архитектура `chalk_fill_experiment.py`: frozen masks, fixed-radius plans, raster footprint simulation, matrix/journal/analyzer gates.
+- Зафиксированы критерии FILL-001: coverage ≥99%, leakage=0, три формы × пять радиусов × три повтора. Подробности: [harness design](CHALK_FILL001_HARNESS_DESIGN_2026-11-03.md).
+- Production planners, estimator, executor/sampling defaults и `master` не менялись; harness пока не реализован.
+
 ## 2026-11-03 — INT006R visual audit завершён и packaging CI исправлен
 
 - Исправлено имя before-capture PNG в CI packaging: использовано фактическое `before_clear-board.png` вместо `before_draw-board.png` (commit `c60b8cf`).
