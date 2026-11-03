@@ -195,12 +195,19 @@ Bridge server получает временный путь через --snippet-
 Stage6 валидирует override через `ExecutorConfig`, применяет его к текущему запуску и не сохраняет временные значения в пользовательский профиль. Фактическая конфигурация попадает в execution report и сверяется analyzer с metadata.
 
 
-## Дополнение 2026-11-03 — аудит FILL-001
+## Исторический снимок — аудит FILL-001 до UI/runner integration (2026-11-03)
 
-Отдельный аудит текущего дерева исходников зафиксирован в [CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md](CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md).
+Аудит [CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md](CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md) описывает состояние исходников до реализации отдельного UI/runner workflow. Его выводы о полном отсутствии пользовательского пути запуска больше не являются текущим состоянием.
 
-**FILL-001 не подключён к пользовательскому UI/runner workflow.** В `brush_behavior_test_ui.py` нет регистрации FILL001, выбора его manifest/task или отдельного runner. В `integrated_app.py` штатный Brush Test передаёт `current_brush_behavior_test.json`; task-specific executor override распознаёт G3, V1–V5, INT006 и INT006R, но не FILL001.
+## Актуальная интеграция FILL-001 — 2026-11-03
 
-В Stage 6 присутствует только post-execution hook: он запускает runtime binding, если уже завершённый execution report содержит `experiment_context.phase_id == "FILL001"`. Этот hook не создаёт DrawingPlan и не инициирует запуск. Helper `attach_fill001_experiment_context()` существует, но его вызов из UI/runner handoff не обнаружен.
+FILL-001 подключён как отдельная вкладка `8. FILL-001` в `integrated_app.py`; следующая вкладка — `9. Калибровка теста`. Седьмая вкладка «Тест кистей» и её автоматический CHALK block runner не объединяются с FILL-001.
 
-Матрица FILL-001 по-прежнему задаёт `execution_allowed=false` и `safe_to_execute=false`. До отдельной реализации fail-closed UI/runner handoff FILL-001 не считается доступным в AutoDraw.
+- `source/preparation/chalk_fill_ui.py` реализует `Fill001Tab`: создание/загрузка manifest, выбор одной pending task, отображение frozen metadata и capture finalization.
+- Перед передачей task повторно валидируются manifest, plan signature, target mask SHA-256, expected strokes, coverage/leakage и operator approval.
+- Размер кисти устанавливается через существующий Brush Test controller; затем создаётся DrawingPlan с FILL-001 experiment context.
+- `integrated_app.py` запускает Stage 6 с временным executor override P1: `point_step_px=4`, `point_delay_ms=5`, `line_extension_px=0`. Override относится только к текущему FILL-001 запуску.
+- Stage 6 guard блокирует прямой запуск FILL-001 plan в обход специализированного workflow. После исполнения runtime binder связывает executor report с persisted Bridge session/run; UI сохраняет before/after PNG и запускает capture adapter/PNG audit.
+- Unified app regression test проверяет регистрацию вкладки и её подпись; полный CI [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178) подтвердил обязательные test jobs и Windows portable startup smoke-test.
+
+**Оставшееся ограничение:** CI и synthetic fixtures не заменяют live game session. До одного успешного Windows runtime/PNG preflight нельзя запускать все 45 matrix cells. Требуется проверить фактический P1, Bridge identity/integrity и реальные PNG crop 460×240, threshold=8, cursor/UI exclusion, coverage ≥99%, leakage=0.
