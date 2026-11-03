@@ -1,0 +1,80 @@
+{
+  "schema_version": 2,
+  "session_id": "89b7950c-4ddb-4369-81db-cce52d367133",
+  "started_at_utc": "2026-11-03T18:05:29.436+00:00",
+  "run_idle_seconds": 2.5,
+  "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:159.0) Gecko/20100101 Firefox/159.0",
+  "page": {
+    "origin": "https://eufbpet.hust.me",
+    "pathname": "/pet.php"
+  },
+  "monitor_status_at_connect": {
+    "version": "0.2.1",
+    "active": true,
+    "boardDetected": true,
+    "boardLabel": "o",
+    "snapshot": {
+      "logicalWidth": 460,
+      "logicalHeight": 240,
+      "scaleX": 1,
+      "scaleY": 1,
+      "maxPoints": 6000,
+      "remainingPoints": 5999,
+      "pointCount": 1,
+      "sourceMethod": "BoardPane.max+BoardPane.less",
+      "isExact": true,
+      "validationStatus": "valid",
+      "radius": [
+        0,
+        30
+      ],
+      "currentRadius": 30
+    },
+    "eventCount": 252,
+    "droppedEvents": 0,
+    "errors": 0
+  },
+  "bridge_diagnostics": {
+    "received_message_count": 257,
+    "received_event_count": 0,
+    "received_event_types": {},
+    "last_message_type": "heartbeat",
+    "last_sequence": 257,
+    "collector_sequence_gap_count": 0,
+    "last_message_at_utc": "2026-11-03T18:09:45.565+00:00",
+    "last_monitor_status": {
+      "version": "0.2.1",
+      "active": true,
+      "boardDetected": true,
+      "boardLabel": "o",
+      "snapshot": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5999,
+        "pointCount": 1,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "eventCount": 252,
+      "droppedEvents": 0,
+      "errors": 0
+    },
+    "browser_bridge": {
+      "sentEventCount": 0,
+      "lastEventType": null,
+      "lastEventAtPerformanceMs": null,
+      "sendFailureCount": 0
+    },
+    "frame_probe_count": 0,
+    "connection_closed": false
+  }
+}
