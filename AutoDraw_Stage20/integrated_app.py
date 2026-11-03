@@ -849,6 +849,14 @@ class AutoDrawUnifiedApp:
                 raise ValueError("Исходный logical plan не связан с выбранной manifest task.")
             if source_document.get("coordinate_system") != "logical_board_pixels":
                 raise ValueError("FILL-001 source plan должен оставаться в logical_board_pixels.")
+            if source_document.get("canvas") != {"width": 460, "height": 240}:
+                raise ValueError("FILL-001 source plan не совпадает с frozen 460×240 canvas.")
+            if (
+                source_generation.get("execution_scope") != "single_task_preflight"
+                or source_generation.get("operator_approved") is not True
+                or source_generation.get("matrix_batch_execution_allowed") is not False
+            ):
+                raise ValueError("Source plan не содержит разрешённый single-task preflight contract.")
             rebuilt = build_fixed_radius_fill_plan(task["shape_id"], task["requested_radius"])
             if (
                 source_generation.get("plan_signature") != rebuilt.get("plan_signature")
