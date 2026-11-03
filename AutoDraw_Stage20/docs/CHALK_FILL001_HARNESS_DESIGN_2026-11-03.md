@@ -57,6 +57,17 @@
 
 Локально воспроизведённый набор тестов масок: 8 passed. Полный GitHub Actions result для последних code commits пока не подтверждён; live FILL001 не запускался.
 
+## Exploratory raster prototypes — не production planner
+
+После создания frozen masks проверены два офлайн-подхода на OpenCV raster model с round caps:
+
+- Простая сетка горизонтальных/вертикальных проходов при spacing около половины line width не даёт стабильного coverage ≥99% для крупных радиусов. Для radius 20/30 остаются незакрытые граничные пиксели, хотя leakage в этой модели равен нулю.
+- Eroded-contour + interior scanlines достигает coverage ≥99% для радиусов 5/10/20/30, но у radius 10/30 остаётся небольшое число пикселей вне target mask; radius 1 недозаполняет границу примерно на 1,8–1,9%.
+
+Это только исследовательская симуляция OpenCV, не измерение игрового renderer и не пригодный к исполнению DrawingPlan. Ни один из этих алгоритмов не принят: оба не проходят одновременно строгие критерии coverage ≥99% и leakage=0 для всех shape/radius cells.
+
+Следующий алгоритмический шаг — построить boundary-aware centerline paths с консервативным offset, затем проверить их двумя независимыми raster checks: полное покрытие target и отсутствие касания пикселей вне target. После этого сопоставить raster prediction с реальными INT006R captures для калибровки ширины и caps. Не ослаблять quality gate ради получения 45 cells.
+
 ## Порядок реализации
 
 1. [x] Проверить game engine semantics, существующие planners и их тесты.
