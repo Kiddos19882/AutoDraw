@@ -2251,3 +2251,12 @@ Brush Test acceptance и матричные валидаторы больше н
 - Следующий gate: получить полный CI PASS/Windows portable build; затем preflight, live 45 captures и PNG audit.
 
 - Ужесточен capture contract: обязательны per-stroke CHALK deltas с суммой exact CHALK, before/after PNG evidence и `png_audit_status=passed`; добавлены regression tests на несоответствие stroke sum и pending PNG audit.
+
+
+## 2026-11-03 — FILL-001 capture fixture contract correction
+
+- При проверке актуальных исходников обнаружено несоответствие: `CAPTURE_FIELDS` и validator требуют `stroke_chalk_deltas`, `before_png`, `after_png`, `png_audit_status`, но тестовый helper `_capture()` эти поля не формировал. Тесты полного 45-capture журнала поэтому не могли корректно пройти.
+- Исправлен `source/preparation/tests/test_chalk_fill_matrix.py`: helper формирует per-stroke deltas, сумма которых равна exact CHALK, и явные тестовые PNG placeholders со статусом audit; добавлены проверки отсутствующих/неверных evidence fields.
+- Изменение: [70323a8](https://github.com/Kiddos19882/AutoDraw/commit/70323a8e65ccddd201aa412263aac9efe18ec099).
+- Проверено чтением committed test file и diff. Pytest не запускался; combined status пуст, workflow run через доступный commit-run endpoint не возвращён. CI PASS не заявляется.
+- Это исправление касается только synthetic unit-test fixtures. Оно не создаёт PNG-файлы, не доказывает независимый PNG audit и не интегрирует FILL-001 matrix с реальными Game Monitor reports. Live execution запрещён до отдельного software gate и подтверждения evidence adapter.
