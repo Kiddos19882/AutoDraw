@@ -118,6 +118,8 @@ def validate_fill001_matrix(matrix: Any) -> None:
         actual.add(cell)
         if task.get("phase_id") != FILL001_PHASE_ID or task.get("safe_to_execute") is not False:
             raise FillMatrixError("Неверная фаза или unsafe execution flag.")
+        if task.get("sampling_profile") != {"profile_id": "P1", "sampling_step": 4, "delay_ms": 5}:
+            raise FillMatrixError("Matrix task не закрепляет frozen sampling P1.")
         if task.get("capture_status") not in {"pending", "running", "completed", "failed", "unsupported"}:
             raise FillMatrixError("Неизвестный capture_status.")
         if task.get("quality_gate_passed") is not True or task.get("unsupported") is not False:
