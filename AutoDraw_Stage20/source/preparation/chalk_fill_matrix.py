@@ -65,6 +65,7 @@ def build_fill001_matrix(series_id: str) -> dict[str, Any]:
                     "plan_signature": plan["plan_signature"],
                     "target_mask_sha256": plan["target_mask_sha256"],
                     "expected_strokes": summary["stroke_count"],
+                    "target_area_pixels": summary["target_area_pixels"],
                     "planned_path_length": summary["path_length_logical_pixels"],
                     "planned_coverage_fraction": summary["coverage_fraction"],
                     "planned_leakage_pixels": summary["leakage_pixels"],
