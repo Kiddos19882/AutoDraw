@@ -8,6 +8,7 @@
 - Дополнительно успешны Game Monitor/Bridge, Application integration, Executor regression и INT-006 audit. Optional algorithm benchmarks были skipped.
 - Локальный pytest в текущем runtime не запускался; подтверждение получено из GitHub Actions. Runtime binding к Bridge/executor и Windows preflight реальных FILL-001 PNG не входят в шаг 1 и остаются следующими gates.
 - Исходный код в этом шаге не изменялся; `master` не изменялся. Статусы временного плана, TASKS, ROADMAP и PROJECT_STATUS синхронизированы.
+- Синхронизированы статусы в `CHALK_FILL_AREA_RADIUS_EFFICIENCY_PLAN_2026-11-03.md` и `CHALK_FILL001_HARNESS_DESIGN_2026-11-03.md`; прежние записи о pending CI сохранены как исторические snapshots.
 
 ## 2026-11-03 — временный план дальнейших работ FILL-001
 
