@@ -7,7 +7,7 @@
 
 ## 1. Точка сборки
 
-`AutoDrawUnifiedApp` создаёт единое окно и восемь вкладок:
+`AutoDrawUnifiedApp` создаёт единое окно и девять вкладок:
 
 | № | Вкладка | UI-компонент |
 |---|---|---|
@@ -18,7 +18,8 @@
 | 5 | Цветной scanline-план | `ColorScanlineTab` |
 | 6 | Тест лимита краски | `PaintLimitTestTab` |
 | 7 | Тест кистей | `BrushBehaviorTestTab` |
-| 8 | Калибровка теста | `BrushCalibrationTab` |
+| 8 | FILL-001 | `Fill001Tab` |
+| 9 | Калибровка теста | `BrushCalibrationTab` |
 
 Импорты выполняются после `ensure_import_paths()` и `configure_environment()`: приложение добавляет каталоги preparation/executor в `sys.path` и задаёт общие пути данных до импорта модулей, которые читают настройки при загрузке.
 
@@ -32,7 +33,8 @@
 | `PaletteQuantizationTab` | Вкладка 4 | Каталог профилей палитр, каталог результатов, `get_prepared_image` |
 | `ColorScanlineTab` | Прокручиваемая область вкладки 5 | Каталог цветных планов, `get_quantized_data` |
 | `PaintLimitTestTab` | Вкладка 6 | Каталоги результатов и профилей, `get_canvas_size`, `on_transfer_plan` |
-| `BrushCalibrationTab` | Вкладка 8 | Путь JSON калибровки, `on_profile_saved` |
+| `Fill001Tab` | Вкладка 8 | FILL-001 manifest, single-task planner handoff, operator approval и capture finalization |
+| `BrushCalibrationTab` | Вкладка 9 | Путь JSON калибровки, `on_profile_saved` |
 | `BrushBehaviorTestTab` | Вкладка 7 | `AreaSelector`, callbacks размера/области/калибровки/передачи плана/старта исполнителя |
 
 Прокрутка включена для вкладок 1, 3 и 5 через `ScrollableTabContent`; другие компоненты управляют собственными областями прокрутки либо размещаются напрямую в родительской вкладке.
