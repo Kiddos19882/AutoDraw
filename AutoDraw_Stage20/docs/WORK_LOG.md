@@ -1,3 +1,12 @@
+## 2026-11-03 — INT006R manual visual audit и закрытие фазы
+
+- Исправление CI packaging в commit `c60b8cf` использует фактический файл `before_clear-board.png`.
+- Полный workflow [41563236073](https://github.com/Kiddos19882/AutoDraw/actions/runs/41563236073) завершился SUCCESS; обязательные jobs, независимые анализаторы и Windows portable build прошли.
+- Артефакт [autodraw-int006r-visual-review-source](https://github.com/Kiddos19882/AutoDraw/actions/runs/41563236073/artifacts/13198192445) содержит 45 пар before/after PNG и связанные manifests/reports.
+- Ручной просмотр 45 пар завершён: все before images пустые, все after images соответствуют планам, размер PNG 581×304, посторонние следы/курсор в рабочей области не обнаружены.
+- Зафиксированы quality limits: radius 1 — видимый разрыв верхнего левого соединения D2 polygon; radius 30 — слияние первых трёх коротких деталей D4 (длины 1/2/3 logical px); radius 10 сохраняет их разделение в этой матрице. См. `CHALK_INT006R_VISUAL_AUDIT_2026-11-03.md`.
+- INT006R закрыт как завершённая измерительная фаза с ограничениями; FILL-001 остаётся следующим активным направлением. Production estimator/defaults, frozen model и master не менялись.
+
 # Журнал работ AutoDraw
 
 ## 2026-11-03 — INT006R live data audit и план FILL-001
