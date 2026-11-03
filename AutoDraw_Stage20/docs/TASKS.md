@@ -523,3 +523,14 @@ INT-006 остаётся IN_PROGRESS до официального analyzer repo
 - [ ] Только после успешного preflight разрешить 45-cell live matrix.
 
 Подробные основания и критерии: [CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md](CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md).
+
+
+## FILL-001 — CI closure, ожидается Windows live preflight (2026-11-03)
+
+- [x] Подтвердить полный GitHub Actions run [41692129486](https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486): все обязательные jobs, включая Windows portable build/startup smoke-test, SUCCESS.
+- [x] Получить действующий artifact `autodraw-g3-preflight-build` ID `13258221572`: [artifact](https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486/artifacts/13258221572).
+- [ ] Пользователь выполняет ровно один live preflight: `rectangle / radius 10 / repeat 1` через вкладку FILL-001.
+- [ ] Проверить task ↔ DrawingPlan ↔ executor report ↔ Bridge session/run identity, фактические P1 параметры, exact `pointCount` delta и реальные before/after PNG/ROI; подтвердить coverage ≥99% и leakage=0.
+- [ ] Только после успешного preflight и отдельного согласования переходить к 45 live captures.
+
+CI SUCCESS не является live evidence; 45-cell matrix остаётся BLOCKED.
