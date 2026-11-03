@@ -12,6 +12,7 @@ def _make_test_tab():
     """Build a UI controller shell with the same lifecycle defaults as __init__ without creating Tk."""
     tab = brush_ui.BrushBehaviorTestTab.__new__(brush_ui.BrushBehaviorTestTab)
     tab._start_executor_after_brush_drag = False
+    tab._workflow_brush_ready_callback = None
     tab._brush_drag_state = None
     tab._brush_drag_after_id = None
     tab._brush_drag_countdown_id = None
