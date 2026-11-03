@@ -88,6 +88,8 @@ def test_unknown_shape_and_invalid_mask_are_rejected():
     with pytest.raises(ValueError):
         build_fill_target_mask("not-a-fill-shape")
     with pytest.raises(ValueError):
+        fill_target_mask_sha256("not-a-fill-shape", np.zeros((FILL001_CANVAS_HEIGHT, FILL001_CANVAS_WIDTH), dtype=bool))
+    with pytest.raises(ValueError):
         fill_target_mask_sha256("rectangle", np.zeros((4, 4), dtype=bool))
     with pytest.raises(ValueError):
         fill_target_mask_sha256("rectangle", np.zeros((FILL001_CANVAS_HEIGHT, FILL001_CANVAS_WIDTH), dtype=np.uint8))
