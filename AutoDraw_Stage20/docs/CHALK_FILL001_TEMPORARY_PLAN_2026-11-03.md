@@ -49,7 +49,7 @@
 - После исполнения UI сохраняет before/after board PNG и передаёт runtime evidence в capture adapter; прямой запуск FILL-001 plan в обход специализированного workflow закрыт fail-closed guard.
 - Unified app regression test проверяет регистрацию вкладки `8. FILL-001`; следующая вкладка — `9. Калибровка теста`.
 
-**Исправление client ROI — реализовано в коде, regression confirmation ожидается:**
+**Исправление client ROI — реализовано и подтверждено software CI:**
 - Логический BoardPane движка и frozen masks имеют размер 460×240 logical pixels. Это не физический размер доски на клиентском экране.
 - UI сохраняет PNG в фактическом размере calibrated screen ROI; физическое требование 460×240 удалено.
 - Capture adapter растеризует frozen logical mask в размер PNG ROI методом nearest-neighbor и сохраняет logical→screen transform; пропорции ROI проверяются по uniform-scale tolerance 1%.
@@ -99,8 +99,8 @@
 
 | Шаг | Статус | Подтверждение |
 |---|---|---|
-| 1 | DONE | CI [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178), code/test HEAD `e3774a3`; Preparation/G3 772 passed, 24 warnings, 82 subtests; обязательные jobs и Windows smoke-test success |
+| 1 | DONE | CI [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985), code/test HEAD `031913c`; Preparation/G3 778 passed, 24 warnings, 82 subtests; все обязательные jobs и Windows portable build/startup smoke-test SUCCESS; optional benchmarks skipped |
 | 2 | DONE (software) | Runtime binder, Stage 6 completion hook, UI experiment context и regression CI [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178), code/test HEAD `e3774a3`; live proof переносится в шаг 3 |
-| 3 | IN_PROGRESS | UI/runner handoff реализован и покрыт CI; ожидается Windows live runtime/PNG preflight и evidence report |
+| 3 | IN_PROGRESS | UI/runner handoff и client-ROI correction покрыты успешным CI [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985); ожидается Windows live runtime/PNG preflight и evidence report |
 | 4 | BLOCKED | Ожидает шаги 1–3 |
 | 5 | BLOCKED | Ожидает 45 принятых captures |
