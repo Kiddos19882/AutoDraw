@@ -51,6 +51,8 @@ def audit_fill001_png_pair(
     shape_id: str,
     before_png: str | Path,
     after_png: str | Path,
+    run_id: str,
+    bridge_diagnostics: dict[str, Any],
 ) -> dict[str, Any]:
     """Audit a tightly cropped 460x240 logical-board PNG pair."""
     before, before_hash = _png_pixels(before_png)
@@ -91,8 +93,16 @@ def build_fill001_capture(
     """
     if not isinstance(task, dict) or not isinstance(monitor_export, dict):
         raise FillMatrixError("Task и Monitor export должны быть JSON objects.")
-    if sampling_profile != FILL001_SAMPLING_PROFILE:
+    if sampling_profile != FILL001_SAMPLING_PROFILE or sampling_profile != task.get("sampling_profile"):
         raise FillMatrixError("Sampling profile не совпадает с frozen P1 (step=4, delay=5 ms).")
+    if not isinstance(run_id, str) or not run_id.strip():
+        raise FillMatrixError("Требуется внешний уникальный run_id.")
+    if not isinstance(bridge_diagnostics, dict):
+        raise FillMatrixError("Требуется отдельный bridge diagnostics report.")
+    for key in ("bridge_failures", "sequence_gaps"):
+        value = bridge_diagnostics.get(key)
+        if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+            raise FillMatrixError(f"Некорректный bridge diagnostic: {key}.")
     if monitor_export.get("schemaVersion") != 1:
         raise FillMatrixError("Неподдерживаемая schemaVersion Game Monitor.")
     if not isinstance(monitor_export.get("monitorVersion"), str):
@@ -116,14 +126,11 @@ def build_fill001_capture(
             raise FillMatrixError(f"Нарушен порядок событий по t у события #{index}.")
         previous_time = event_time
 
-    run_id = monitor_export.get("runId")
-    if not isinstance(run_id, str) or not run_id.strip():
-        raise FillMatrixError("Monitor export должен быть связан с внешним уникальным runId.")
     starts = [i for i, event in enumerate(events) if event.get("type") == "DRAW_START"]
     ends = [i for i, event in enumerate(events) if event.get("type") == "DRAW_END"]
     if len(starts) != task.get("expected_strokes") or len(ends) != len(starts):
         raise FillMatrixError("Число DRAW_START/DRAW_END не совпадает с expected_strokes.")
-    if starts[0] >= ends[0] or starts[-1] >= ends[-1]:
+    if any(start_index >= end_index for start_index, end_index in zip(starts, ends)):
         raise FillMatrixError("Нарушен порядок границ штрихов.")
 
     stroke_deltas: list[int] = []
@@ -160,8 +167,13 @@ def build_fill001_capture(
             if isinstance(point_delta, bool) or not isinstance(point_delta, int) or point_delta < 0:
                 raise FillMatrixError("Некорректный DRAW_SAMPLE.pointDelta.")
             sample_deltas.append(point_delta)
-        if sum(sample_deltas) != delta:
-            raise FillMatrixError("Сумма DRAW_SAMPLE.pointDelta не совпадает с delta штриха.")
+        start_applied = next((event for event in events[start_index + 1:end_index] if event.get("type") == "DRAW_START_APPLIED"), None)
+        if not isinstance(start_applied, dict):
+            raise FillMatrixError("Отсутствует DRAW_START_APPLIED.")
+        applied_count = _snapshot_point_count(start_applied.get("after"), "DRAW_START_APPLIED.after")
+        initial_delta = applied_count - before_count
+        if initial_delta < 0 or sum(sample_deltas) + initial_delta != delta:
+            raise FillMatrixError("Сумма initial point и DRAW_SAMPLE.pointDelta не совпадает с delta штриха.")
         stroke_deltas.append(delta)
 
     radius_events = [
@@ -205,8 +217,8 @@ def build_fill001_capture(
         "expected_strokes": task["expected_strokes"],
         "dropped_events": dropped,
         "monitor_errors": len(errors),
-        "bridge_failures": 0,
-        "sequence_gaps": 0,
+        "bridge_failures": bridge_diagnostics["bridge_failures"],
+        "sequence_gaps": bridge_diagnostics["sequence_gaps"],
         "stroke_chalk_deltas": stroke_deltas,
         "before_png": png_audit["before_png"],
         "after_png": png_audit["after_png"],
@@ -214,6 +226,8 @@ def build_fill001_capture(
         "after_png_sha256": png_audit["after_png_sha256"],
         "png_audit_status": png_audit["png_audit_status"],
         "sampling_profile": dict(sampling_profile),
+        "monitor_version": monitor_export["monitorVersion"],
+        "event_count": len(events),
         "monitor_version": monitor_export["monitorVersion"],
         "event_count": len(events),
         "png_audit": png_audit,
