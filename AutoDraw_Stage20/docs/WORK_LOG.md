@@ -1,3 +1,10 @@
+## 2026-11-03 — FILL-001 raster prototype review
+
+- На frozen masks проверены два офлайн подхода: простой H/V grid и eroded-contour + interior scanlines.
+- Grid сохраняет zero leakage, но не достигает coverage ≥99% для части радиусов 20/30. Contour approach повышает coverage, но оставляет небольшой leakage для radius 10/30 и недозаполнение границы при radius 1.
+- Это OpenCV simulation, не game renderer measurement; ни один вариант не интегрирован и не разрешён к исполнению.
+- Следующий шаг — boundary-aware centerline planner, который одновременно проходит coverage ≥99% и leakage=0 на всех поддерживаемых cells.
+
 ## 2026-11-03 — FILL-001 frozen masks implementation
 
 - Создан `source/preparation/chalk_fill_experiment.py`: три deterministic bool masks, canvas 460×240 logical board pixels, frozen SHA-256.
