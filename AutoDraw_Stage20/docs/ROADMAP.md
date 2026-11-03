@@ -10,7 +10,7 @@
 4. Выполнить 45 live captures (3 формы × 5 радиусов × 3 повтора); до шагов 1–3 запуск заблокирован.
 5. Проанализировать exact CHALK и качество, определить влияние радиуса и лучшую стратегию заливки.
 
-**Текущий статус:** шаги 1–3 ожидают выполнения; шаги 4–5 BLOCKED. Детальные критерии — в отдельном плане.
+**Текущий статус:** шаг 1 DONE (полный CI и Windows portable build/smoke-test на code HEAD `b4cc45a`); шаги 2–3 TODO; шаги 4–5 BLOCKED до завершения gates. Детальные критерии — в отдельном плане.
 
 ## Актуальный статус CHALK — 2026-11-03
 
@@ -19,12 +19,12 @@
 - [x] Frozen masks, fixed-radius planner и 45-cell manifest/analyzer.
 - [x] Реализован Monitor capture adapter с per-stroke exact CHALK, radius/P1 binding и PNG hash/pixel audit.
 - [x] Добавлены synthetic adapter regression tests.
-- [ ] Полный pytest/CI и Windows portable build должны пройти на текущем HEAD.
+- [x] Regression gate закрыт: Preparation/G3 — 754 passed, 24 warnings, 82 subtests; полный CI [41579136690](https://github.com/Kiddos19882/AutoDraw/actions/runs/41579136690) и Windows portable build/startup smoke-test — SUCCESS на code HEAD `b4cc45a`.
 - [ ] Связать adapter с фактическим runner/journal и проверить bridge diagnostics schema.
 - [ ] Windows preflight: проверить logical crop 460×240, PNG threshold и exclusion cursor/UI.
 - [ ] Только после software/preflight gates — 45 live captures и анализ расхода CHALK по shape/radius.
 
-**Текущий gate:** adapter implementation добавлен, но не протестирован; live execution BLOCKED.
+**Текущий gate:** программные regression tests и CI закрыты; runtime binding и Windows PNG preflight ещё не выполнены, поэтому live execution BLOCKED.
 
 ### INT-006
 
