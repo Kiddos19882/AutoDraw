@@ -79,7 +79,7 @@
 - [x] Выполнить 45 независимых live captures D1–D5; предварительно сверить exact CHALK и per-stroke breakdown по всем 45 Monitor reports. Отдельный preflight log в capture bundle не найден.
 - [ ] После validation определить обоснованный safety margin.
 
-**Актуальный приоритет:** INT-006 quantitative gate D1–D5 завершён, но safety margin не установлен и domain validation требуется расширить. INT006R завершён: 45/45 captures, raw-data audit, реальный CLI analyzer и ручной visual audit; выявленные ограничения радиусов задокументированы. В FILL-001 уже добавлены frozen masks и tests; следующий этап — fixed-radius generator/simulator, затем matrix/block harness и analyzer (три формы × пять радиусов × три повтора). INT-007 остаётся BLOCKED. Исторические чек-листы ниже сохраняют ход выполнения и не переопределяют статусы таблицы.
+**Актуальный приоритет:** INT-006 quantitative gate D1–D5 завершён, но safety margin не установлен и domain validation требуется расширить. INT006R завершён: 45/45 captures, raw-data audit, реальный CLI analyzer и ручной visual audit; выявленные ограничения радиусов задокументированы. В FILL-001 добавлены frozen masks, fixed-radius planner, 45-cell matrix/analyzer и Game Monitor capture adapter с PNG audit. Текущий этап — тестирование adapter, подтверждение полного CI/Windows build и binding к реальному runner/bridge report; live matrix заблокирована. INT-007 остаётся BLOCKED. Исторические чек-листы ниже сохраняют ход выполнения и не переопределяют статусы таблицы.
 ## Отменённые работы
 
 | ID | Статус | Задача | Основание |
