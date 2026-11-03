@@ -2459,9 +2459,11 @@ class BrushBehaviorTestTab:
             "correction_count": int(feedback.get("attempt", 0)),
             "observations": list(feedback.get("observations", [])),
         }
-        self.experiment_phases["brush_setup"] = phase
+        workflow_mode = callable(self._workflow_brush_ready_callback)
+        if not workflow_mode:
+            self.experiment_phases["brush_setup"] = phase
         self._stop_brush_hotkey_listener()
-        if self.experiment_dir is not None:
+        if not workflow_mode and self.experiment_dir is not None:
             try:
                 self._write_experiment_manifest()
             except (OSError, ValueError, TypeError) as exc:
@@ -2508,6 +2510,7 @@ class BrushBehaviorTestTab:
             self._brush_feedback_poll_id = None
         self._brush_feedback_state = None
         self._stop_brush_hotkey_listener()
+        workflow_mode = callable(self._workflow_brush_ready_callback)
         self._start_executor_after_brush_drag = False
         self._workflow_brush_ready_callback = None
         phase = {
@@ -2518,12 +2521,13 @@ class BrushBehaviorTestTab:
             "observations": list(feedback.get("observations", [])) if isinstance(feedback, dict) else [],
             "failed_at_utc": datetime.now(timezone.utc).isoformat(timespec="milliseconds"),
         }
-        self.experiment_phases["brush_setup"] = phase
-        if self.experiment_dir is not None:
-            try:
-                self._write_experiment_manifest()
-            except (OSError, ValueError, TypeError):
-                pass
+        if not workflow_mode:
+            self.experiment_phases["brush_setup"] = phase
+            if self.experiment_dir is not None:
+                try:
+                    self._write_experiment_manifest()
+                except (OSError, ValueError, TypeError):
+                    pass
         try:
             self.root.deiconify()
             self.root.lift()
@@ -2545,7 +2549,9 @@ class BrushBehaviorTestTab:
         self, brush: int, state: dict[str, Any], observation: dict[str, Any]
     ) -> None:
         """Continue automatically after an exact, fresh Game Monitor radius match."""
-        phase = self.experiment_phases.setdefault("brush_setup", {})
+        workflow_callback = self._workflow_brush_ready_callback
+        workflow_mode = callable(workflow_callback)
+        phase = {} if workflow_mode else self.experiment_phases.setdefault("brush_setup", {})
         if int(observation.get("radius", -1)) != int(brush):
             self._fail_brush_radius_feedback(
                 "monitor_radius_mismatch_at_handoff",
@@ -2560,7 +2566,7 @@ class BrushBehaviorTestTab:
         phase["verification_source"] = "active_game_monitor_bridge_heartbeat"
         phase["visual_confirmation_required"] = False
         phase["confirmed_at_utc"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
-        if self.experiment_dir is not None:
+        if not workflow_mode and self.experiment_dir is not None:
             try:
                 self._write_experiment_manifest()
             except (OSError, ValueError, TypeError) as exc:
@@ -2572,7 +2578,6 @@ class BrushBehaviorTestTab:
                 if self._chalk_block_task is not None:
                     self._fail_chalk_test_block(f"brush_confirmation_manifest_failed:{exc}")
                 return
-        workflow_callback = self._workflow_brush_ready_callback
         if callable(workflow_callback):
             self._workflow_brush_ready_callback = None
             self.status_var.set(f"Размер {brush} подтверждён Game Monitor; запуск FILL-001.")
