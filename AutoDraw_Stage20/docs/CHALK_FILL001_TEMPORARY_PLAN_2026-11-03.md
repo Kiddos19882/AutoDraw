@@ -38,7 +38,7 @@
 
 ### Шаг 3. Интегрировать запуск в AutoDraw и провести Windows live preflight
 
-**Статус:** IN_PROGRESS — UI/runner handoff DONE; Windows live preflight TODO.
+**Статус:** IN_PROGRESS — первая пользовательская попытка остановилась на handoff из-за невалидного runtime JSON; исправление и regression test внесены, новый CI и повторный Windows live preflight ожидаются.
 
 **Подтверждённая реализация UI/runner:**
 - Добавлен `source/preparation/chalk_fill_ui.py` и самостоятельная вкладка FILL-001 в `integrated_app.py`, отдельная от седьмой вкладки «Тест кистей».
@@ -48,6 +48,9 @@
 - Размер кисти устанавливается через существующий Brush Test workflow; затем создаётся DrawingPlan с FILL-001 experiment context и запускается Stage 6 с P1 override.
 - После исполнения UI сохраняет before/after board PNG и передаёт runtime evidence в capture adapter; прямой запуск FILL-001 plan в обход специализированного workflow закрыт fail-closed guard.
 - Unified app regression test проверяет регистрацию вкладки `8. FILL-001`; следующая вкладка — `9. Калибровка теста`.
+- Первая пользовательская попытка сохранена в commit [6b1cba9](https://github.com/Kiddos19882/AutoDraw/commit/6b1cba9b1c40a030ac6bd7b29365bf19ac3c9149): manifest, logical DrawingPlan (131 strokes), before PNG и Bridge session. Передача была отклонена до brush handoff: `_transfer_brush_test_plan()` добавлял `autodraw_experiment` и записывал после JSON object буквальные символы `\\n`; Stage 6 не мог прочитать runtime-файл.
+- Bridge session этой попытки показывает Monitor active/boardDetected, exact snapshot `pointCount=1`, `remainingPoints=5999`, `received_event_count=0`, `sentEventCount=0`; after PNG и executor report отсутствуют. Попытка не является live capture и не подтверждает расход CHALK.
+- Исправлена запись runtime JSON: добавлен настоящий перевод строки; сообщение ошибки также форматируется с переносами строк. Code commit [8dfd1b5](https://github.com/Kiddos19882/AutoDraw/commit/8dfd1b541f54a1b416dfb2907739cf4b1a99c58d). Добавлен regression test полного FILL-001 plan → Stage 6 load с проверкой experiment context: [1b2d8a1](https://github.com/Kiddos19882/AutoDraw/commit/1b2d8a128c99ab8ad1abb1e9f480702676cd9f56). CI для fix ещё не подтверждён.
 
 **Исправление client ROI — реализовано и подтверждено software CI:**
 - Логический BoardPane движка и frozen masks имеют размер 460×240 logical pixels. Это не физический размер доски на клиентском экране.
@@ -56,7 +59,8 @@
 - Before/after должны иметь одинаковые фактические ROI; курсор и UI/paint meter исключаются из crop по существующей процедуре.
 
 **Оставшийся Windows live preflight:**
-- Запустить из AutoDraw одну задачу (первая предпочтительная ячейка — rectangle/radius 10/repeat 1) на реальной игровой сессии.
+- Сначала получить SUCCESS CI для исправления runtime JSON и нового FILL-001 integration regression test.
+- Затем повторно запустить из AutoDraw одну задачу (первая предпочтительная ячейка — rectangle/radius 10/repeat 1) на реальной игровой сессии.
 - Подтвердить task ↔ DrawingPlan ↔ executor report ↔ Bridge session/run identity и фактический P1 в execution report.
 - Проверить реальные before/after PNG в реальном client ROI, RGB threshold 8, cursor/UI exclusion, frozen mask alignment, coverage ≥99% и leakage=0.
 - Проверить fail-closed поведение на mismatch run/task/plan, неверном P1, Bridge errors и отсутствующих/изменённых PNG.
@@ -101,6 +105,6 @@
 |---|---|---|
 | 1 | DONE | CI [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985), code/test HEAD `031913c`; Preparation/G3 778 passed, 24 warnings, 82 subtests; все обязательные jobs и Windows portable build/startup smoke-test SUCCESS; optional benchmarks skipped |
 | 2 | DONE (software) | Runtime binder, Stage 6 completion hook, UI experiment context и regression CI [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985), code/test HEAD `031913c`; live proof переносится в шаг 3 |
-| 3 | IN_PROGRESS | UI/runner handoff и client-ROI correction покрыты успешным CI [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985); ожидается Windows live runtime/PNG preflight и evidence report |
+| 3 | IN_PROGRESS | Commit `6b1cba9` выявил invalid runtime JSON handoff; fix `8dfd1b5` и regression test `1b2d8a1` добавлены, новый CI ожидается; затем требуется повторный Windows live runtime/PNG preflight и evidence report |
 | 4 | BLOCKED | Ожидает шаги 1–3 |
 | 5 | BLOCKED | Ожидает 45 принятых captures |
