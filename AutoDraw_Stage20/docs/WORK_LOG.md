@@ -2376,3 +2376,10 @@ Brush Test acceptance и матричные валидаторы больше н
 - Добавлены regression tests для client ROI 581×304, runtime capture transform, non-uniform ROI rejection, ROI metadata mismatch, scaled leakage и UI crop 581×304. Эти тесты добавлены, но их локальный/CI запуск пока не подтверждён.
 - Документация синхронизирована: DEC-016, FILL-001 harness design, временный план, TASKS, PROJECT_STATUS, ROADMAP, UI_INTEGRATION_MAP, `source/game_monitor/README.md`, CHANGELOG. Зафиксировано: 460×240 — логическая система координат движка, не физическое требование к клиентскому экрану. Размер игровой доски не меняется ради AutoDraw.
 - Windows live preflight не выполнялся; 45 live captures остаются BLOCKED. `master`, production estimator/defaults и исходные experiment captures не изменялись.
+
+## 2026-11-03 — FILL-001 client ROI correction: CI confirmation
+
+- Проверен GitHub Actions workflow run [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985) для code/test HEAD `031913c64da5f25921d74f426a2c7778c02130ee`: общий conclusion SUCCESS.
+- Preparation and G3 matrix tests: `778 passed, 24 warnings, 82 subtests passed` (Windows runner). Game Monitor/Bridge, Executor regression, Application integration, INT-006 pixel-level PNG audit — SUCCESS. Optional algorithm benchmarks — SKIPPED.
+- Windows portable build и startup smoke-test — SUCCESS; artifact `autodraw-g3-preflight-build` (636,529,516 bytes, artifact ID `13254104951`, retention 7 days) загружен: https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985/artifacts/13254104951
+- Software gate шага 1 подтверждён на исправленном code/test HEAD. Это не live game session: FILL-001 one-task Windows preflight, реальные PNG/coverage/leakage и Bridge/executor runtime evidence всё ещё не получены. Шаги 4–5 остаются BLOCKED.
