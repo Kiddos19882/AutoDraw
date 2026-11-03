@@ -4,7 +4,7 @@
 - Установлено, что после ранее документированного code HEAD `b4cc45a` добавлены commits `fbf1fd6`–`d7466c5`: runtime binder, fail-closed validation, session/run correlation, Bridge lifecycle/timestamps, фактический P1 check и Stage 6 completion integration.
 - Проверен полный GitHub Actions run [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009) на code HEAD `d7466c5`: все обязательные jobs SUCCESS; optional algorithm benchmarks skipped. Windows portable build/startup smoke-test прошёл.
 - Уточнено разделение статусов: шаг 2 FILL-001 закрыт как software/runtime integration + regression gate; реальный Windows runtime proof и PNG preflight остаются шагом 3 TODO. 45 live captures и итоговый CHALK analysis остаются BLOCKED.
-- Сверка веток на исходном documentation HEAD `ec11a0f`: feature branch ahead 28, behind 0 относительно master. Merge/rebase не выполнялся; master не менялся.
+- Сверка веток на HEAD `d77a31b`: GitHub compare показывает `diverged`, feature ahead 2527 и behind 5 относительно master. Merge/rebase не выполнялся; master не менялся.
 - Обновлены PROJECT_STATUS, TASKS, ROADMAP, временный план FILL-001, harness design, этот журнал и CHANGELOG. Исходный код, тесты, настройки и experiment data в этой документационной актуализации не менялись.
 
 ## 2026-11-03 — FILL-001 software regression gate закрыт

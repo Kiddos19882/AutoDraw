@@ -17,7 +17,7 @@
 **Последний code/test HEAD:** [d7466c5](https://github.com/Kiddos19882/AutoDraw/commit/d7466c5452c83cf6aeab579fdc73c1358ac931c4).  
 **Текущий документационный HEAD до этой актуализации:** [ec11a0f](https://github.com/Kiddos19882/AutoDraw/commit/ec11a0ffd4f43bb8c3c6113cad413f84d5b8571f). После code HEAD выполнены только документационные коммиты DOC-017.  
 **Последний подтверждённый полный CI:** [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009), SUCCESS на code HEAD `d7466c5`. Все обязательные jobs завершились SUCCESS; optional algorithm benchmarks skipped. Windows portable build/startup smoke-test прошёл, но он не заменяет ручной запуск игры и проверку реальных board PNG.  
-**Git-сверка:** на HEAD `ec11a0f` ветка `feature/image-geometry-optimization` опережала `master` на 28 коммитов и не отставала от него (compare status `ahead`, behind=0). После документационной актуализации число ahead увеличится; merge/rebase не выполнялся. `master` не изменялся.  
+**Git-сверка:** сравнение текущего HEAD `d77a31b` с `master` через GitHub compare возвращает `diverged`: feature ahead на 2527 коммитов и behind на 5. Это отражает фактическую историю Git на момент проверки; merge/rebase не выполнялся. `master` не изменялся.  
 > Этот блок — единственный источник текущего статуса. Ниже сохранена историческая хронология; старые статусы и планы не являются текущим backlog.
 
 ## Текущее состояние
