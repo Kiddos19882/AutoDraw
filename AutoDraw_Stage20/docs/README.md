@@ -21,7 +21,7 @@
 - [INT006R — ручной визуальный аудит](CHALK_INT006R_VISUAL_AUDIT_2026-11-03.md) — просмотр 45 пар PNG и выявленные ограничения коротких деталей/контуров.
 - [FILL-001 — план эффективности заливки](CHALK_FILL_AREA_RADIUS_EFFICIENCY_PLAN_2026-11-03.md) — три формы областей, пять радиусов, 45 captures.
 - [FILL-001 — технический дизайн harness](CHALK_FILL001_HARNESS_DESIGN_2026-11-03.md) — fixed-radius planner, frozen masks, 45-cell matrix, capture validation и analyzer.
-- [FILL-001 matrix/analyzer](../source/preparation/chalk_fill_matrix.py) — отдельный экспериментальный manifest и fail-closed validation 45 captures.
+- [FILL-001 matrix/analyzer](../source/preparation/chalk_fill_matrix.py) — экспериментальный manifest schema v2, frozen P1 metadata и fail-closed validation 45 captures.
 - [FILL-001 Game Monitor capture adapter](../source/preparation/chalk_fill_capture_adapter.py) — сборка capture из Monitor events, exact per-stroke CHALK и PNG evidence audit; software gate pending.
 
 ## Действующий план CHALK и история статуса
