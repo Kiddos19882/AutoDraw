@@ -591,3 +591,10 @@
 - Added a fail-closed regression test for a tampered journal prediction ID.
 - No prediction coefficients, sampling defaults, executor defaults, or production estimator changes.
 - CI confirmation and the official 45-capture analyzer JSON remain pending.
+
+
+## 2026-11-03 — FILL-001 fixed-radius planner
+
+- Добавлен изолированный boundary-aware fixed-radius scanline planner и raster simulator для трёх frozen masks и радиусов 1/5/10/20/30.
+- Добавлены regression tests для 15 shape×radius cells, coverage/leakage gate, radius isolation и deterministic signature.
+- Офлайн Python simulation прошла 15/15 cells (coverage 99,962–100%, leakage=0); pytest/CI для нового HEAD пока не подтверждены. Executor handoff и production defaults не менялись.
