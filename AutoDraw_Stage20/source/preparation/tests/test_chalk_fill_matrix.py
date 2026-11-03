@@ -23,6 +23,12 @@ def matrix():
 
 
 def _capture(task):
+    stroke_count = task["expected_strokes"]
+    base_delta, remainder = divmod(100, stroke_count)
+    stroke_chalk_deltas = [
+        base_delta + (1 if index < remainder else 0)
+        for index in range(stroke_count)
+    ]
     return {
         "task_id": task["task_id"],
         "run_id": f"run-{task['matrix_order_index']}",
@@ -41,6 +47,11 @@ def _capture(task):
         "monitor_errors": 0,
         "bridge_failures": 0,
         "sequence_gaps": 0,
+        "stroke_chalk_deltas": stroke_chalk_deltas,
+        # Unit-test placeholders only; live captures must reference audited PNG files.
+        "before_png": "test-evidence/before.png",
+        "after_png": "test-evidence/after.png",
+        "png_audit_status": "passed",
     }
 
 
@@ -156,5 +167,13 @@ def test_capture_requires_per_stroke_chalk_sum_and_png_audit(matrix):
         validate_fill001_capture(task, invalid)
     invalid = _capture(task)
     invalid["png_audit_status"] = "pending"
+    with pytest.raises(FillMatrixError):
+        validate_fill001_capture(task, invalid)
+    invalid = _capture(task)
+    invalid.pop("before_png")
+    with pytest.raises(FillMatrixError):
+        validate_fill001_capture(task, invalid)
+    invalid = _capture(task)
+    invalid["stroke_chalk_deltas"] = [100]
     with pytest.raises(FillMatrixError):
         validate_fill001_capture(task, invalid)
