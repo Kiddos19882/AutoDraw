@@ -4,6 +4,16 @@
 **Статус:** planner/matrix/adapter/runtime binder и отдельная вкладка FILL-001 с single-task UI/runner handoff реализованы; software regression gate подтверждён CI [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178) на `e3774a3`. Windows live runtime/PNG preflight не выполнен. Исторический снимок раннего состояния: [аудит интеграции](CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md).  
 **Связь:** [план FILL-001](CHALK_FILL_AREA_RADIUS_EFFICIENCY_PLAN_2026-11-03.md)
 
+## Logical board и фактический client screen ROI — исправленная архитектура
+
+- Game engine bundle задаёт `BoardPane.BLACK_BOARD_WIDTH=460` и `BoardPane.BLACK_BOARD_HEIGHT=240`. Это logical coordinate space движка и frozen masks FILL-001, а не гарантированный физический размер отображаемой доски на клиенте.
+- Клиентский BoardPane масштабируется; фактические размеры screen ROI определяются браузером, viewport, размером окна и калибровкой. В INT006R сохранённые PNG имели размер 581×304 px; 578×301 px также встречался в предыдущих screen ROI наблюдениях. Эти значения — примеры, не константы.
+- `get_canvas_size()` в Brush Test возвращает logical 460×240, а `get_canvas_area()` возвращает физический calibrated ROI. Эти величины нельзя сравнивать друг с другом как одинаковые типы размеров.
+- FILL-001 UI сохраняет before/after PNG в фактическом размере calibrated ROI. Требование screen crop ровно 460×240 удалено; профиль/ROI должны совпадать между before и after, crop должен полностью находиться внутри снимка экрана.
+- PNG adapter преобразует frozen logical mask в размеры captured ROI методом nearest-neighbor, считает RGB difference с threshold=8 в screen-pixel space и записывает logical→screen transform, фактический ROI и raster scale в capture evidence.
+- Пропорции ROI проверяются по тому же uniform-scale допуску 1%, который использует logical→screen transform планов. Non-uniform ROI отклоняется fail-closed; размер доски в игре не меняется ради AutoDraw.
+- Synthetic tests на разных ROI проверяют преобразование и leakage, но не доказывают реальное выравнивание маски с игровым renderer. Windows live preflight и критерии coverage ≥99% / leakage=0 остаются обязательными.
+
 ## Подтверждённые ограничения
 
 - Игровой счётчик CHALK увеличивается на каждую принятую точку `atom.points`; размер кисти передаётся в `Graphics.lineStyle(value, ...)` как ширина линии. Прямого множителя CHALK от радиуса нет.
@@ -148,13 +158,13 @@ FILL-001 capture contract в текущем виде требует уже аг�
 - per-stroke CHALK вычисляется как `DRAW_END.after.pointCount - DRAW_START.before.pointCount`; отдельно учитывается первая точка, добавленная в `onDrawStart` до начала polling. Сумма per-stroke deltas сверяется с run-level pre/post pointCount;
 - observed radius сверяется с `BRUSH_CHANGE_APPLIED.after.currentRadius`;
 - sampling profile P1 (step=4, delay=5 ms) добавлен в frozen matrix task и проверяется в capture;
-- PNG-файлы реально открываются, проверяется PNG format, одинаковый crop 460×240, вычисляются SHA-256, coverage и leakage через RGB before/after difference (threshold=8);
+- PNG-файлы реально открываются, проверяется PNG format и одинаковый calibrated client ROI; frozen logical mask 460×240 rasterize в фактический crop size, вычисляются SHA-256, coverage и leakage через RGB before/after difference (threshold=8);
 - внешний `run_id` и bridge diagnostics обязательны и привязаны к eventCount/run identity; bridge failures и sequence gaps должны быть нулевыми.
 
 Ограничения и нерешённые вопросы:
 - Game Monitor export schema не содержит собственного `runId` и per-event sequence number; run ID приходит из внешнего journal/runner, а sequence integrity — из отдельного bridge diagnostics report. Текущая связка проверяет значения и совпадение run/eventCount, но не криптографическую подлинность внешнего отчёта.
 - Sampling P1 пока передаётся adapter как execution metadata; Game Monitor не наблюдает фактический step/delay. Для live acceptance нужна связка с фактическим runner journal, а не только caller-supplied словарь.
-- PNG audit рассчитан на точный logical-board crop 460×240 и использует RGB difference threshold=8. Реальные screenshots, crop registration, UI/cursor exclusion и устойчивость порога ещё не проверены. Synthetic PNG tests не подтверждают реальную игровую визуализацию.
+- Историческое ограничение ранней реализации: PNG audit требовал точный crop 460×240. Это требование признано ошибочным и superseded решением DEC-016; текущая реализация использует фактический calibrated client ROI. Реальные screenshots, crop registration, UI/cursor exclusion и устойчивость порога ещё требуют Windows live preflight. Synthetic PNG tests не подтверждают реальную игровую визуализацию.
 - Monitor event stream не имеет sequence counter; adapter проверяет eventCount, droppedEvents, errors и монотонность времени, но не может сам обнаружить пропуск события, если export count не отражает его. Для этого обязателен bridge report.
 - Live execution по-прежнему запрещён до успешного полного CI, проверки фактического bridge report schema, runner binding, реальных PNG preflight и Windows preflight.
 
