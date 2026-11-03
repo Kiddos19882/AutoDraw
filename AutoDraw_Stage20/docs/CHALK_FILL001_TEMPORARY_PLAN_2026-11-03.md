@@ -15,41 +15,47 @@
 
 **Статус:** DONE
 
-- Исправление сигнатуры `audit_fill001_png_pair()` подтверждено commit [b4cc45a](https://github.com/Kiddos19882/AutoDraw/commit/b4cc45a80231e6bad2f878b2a5a2f16b48b9d68b): helper принимает `shape_id`, `before_png`, `after_png`; внутренний вызов и тест используют эту сигнатуру.
-- Полный Preparation/G3 suite на Windows runner: **754 passed, 24 warnings, 82 subtests passed**; включает matrix и capture adapter tests.
-- Полный GitHub Actions run [41579136690](https://github.com/Kiddos19882/AutoDraw/actions/runs/41579136690) завершился SUCCESS на code HEAD `b4cc45a80231e6bad2f878b2a5a2f16b48b9d68b`; обязательные Game Monitor/Bridge, Preparation/G3, Application integration, Executor regression, INT-006 audit и Windows portable build jobs успешны.
-- Windows portable build создал артефакт [autodraw-g3-preflight-build](https://github.com/Kiddos19882/AutoDraw/actions/runs/41579136690/artifacts/13204044319); лог подтверждает запуск `AutoDraw.exe`, 10 секунд активного процесса и успешный smoke-test.
-- Optional algorithm benchmarks были skipped по настройке workflow; локальный pytest в этой среде не запускался. Ошибок обязательных jobs нет.
+- GitHub Actions [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178) — SUCCESS на code/test HEAD `e3774a3c07f7abbefe8c39eecdd9578743b70678`.
+- Preparation/G3: **772 passed, 24 warnings, 82 subtests passed**.
+- Executor regression, Game Monitor/Bridge, Application integration, INT-006 pixel audit и Windows portable build/startup smoke-test — SUCCESS; optional algorithm benchmarks — SKIPPED.
+- Windows portable artifact: [autodraw-g3-preflight-build](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178/artifacts/13248469807).
+- CI подтверждает software regression gate, но не live FILL-001 запуск в браузерной игре и не проверку реальных board PNG.
 
-**Критерий завершения:** выполнен — все обязательные тестовые jobs и Windows build/smoke-test успешны на одном code HEAD; CI run и SHA зафиксированы.
+**Критерий завершения:** выполнен — все обязательные jobs и Windows portable build/startup smoke-test успешны на одном code/test HEAD.
 
 ### Шаг 2. Привязать captures к фактическому runtime
 
-**Статус:** DONE (software implementation и regression gate)
+**Статус:** DONE (software/runtime integration и regression gate)
 
-- Добавлен `chalk_fill_runtime_binding.py`, который читает persisted Bridge `session.json`, run JSON и executor report.
+- `chalk_fill_runtime_binding.py` читает persisted Bridge `session.json`, run JSON и executor report.
 - Проверяются Bridge schema v2, session/run identity, временное окно executor, timezone-aware timestamps, sequence gaps, send failures, Monitor errors, stroke lifecycle, единый observed radius, exact pre/post snapshots и совпадение exact CHALK с sampled/per-stroke deltas.
-- Фактические `ExecutorConfig.point_step_px=4` и `point_delay_ms=5` сверяются с frozen P1.
-- Stage 6 содержит post-execution hook: он проверяет уже завершённый FILL-001 report при наличии experiment context. Это не создаёт UI/runner запуск; соответствующий gap выявлен аудитом интеграции.
-- Capture adapter получает runtime evidence через `build_fill001_capture_from_runtime()` и фиксирует SHA-256 session/run/executor artifacts.
-- Изменения кода и тестов вошли в commits `fbf1fd6`–`d7466c5`; полный CI [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009) завершился SUCCESS на code HEAD `d7466c5`.
+- Фактические `ExecutorConfig.point_step_px=4`, `point_delay_ms=5` и `line_extension_px=0` сверяются с frozen P1.
+- Stage 6 выполняет post-execution binding после успешного завершения FILL-001 task и записывает результат в execution report.
+- UI handoff передаёт experiment context в DrawingPlan; runtime binder связывает executor report с Bridge session/run и фиксирует SHA-256 исходных runtime artifacts.
+- Regression gate подтверждён CI [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178) на code/test HEAD `e3774a3`.
 
-**Критерий завершения:** программная интеграция и fail-closed regression tests подтверждены CI. Реальное live подтверждение на Windows относится к шагу 3 и ещё не выполнено.
+**Критерий завершения:** программная интеграция и fail-closed regression tests подтверждены CI. Реальное live подтверждение на Windows относится к шагу 3.
 
-### Шаг 3. Интегрировать запуск в AutoDraw, затем провести Windows live preflight
+### Шаг 3. Интегрировать запуск в AutoDraw и провести Windows live preflight
 
-**Статус:** TODO — пользовательский UI/runner handoff отсутствует; live preflight ещё не может быть запущен штатным workflow AutoDraw.
+**Статус:** IN_PROGRESS — UI/runner handoff DONE; Windows live preflight TODO.
 
-- Реализовать отдельный FILL-001 UI/runner: создание/загрузка серии, выбор task, журнал, Start/Stop и progress. Точный gap и критерии: [аудит интеграции](CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md).
-- Добавить fail-closed преобразование planner output в DrawingPlan и сохранение `autodraw_experiment` context; разрешать исполнение только выбранной валидной task.
-- Добавить FILL001 в task-specific executor configuration allowlist с проверкой P1 до первого mouse action.
-- Кодовый PNG audit уже открывает реальные PNG, проверяет формат/размер crop 460×240, рассчитывает SHA-256, coverage/leakage по RGB difference threshold=8; synthetic regression tests включены в CI.
-- На Windows выполнить один контролируемый FILL-001 runtime run и проверить, что execution report получил успешный runtime binding к правильным Bridge session/run artifacts.
-- Подтвердить P1 по фактическому ExecutorConfig в отчёте, а не только по frozen task metadata.
-- Проверить реальные before/after board PNG: crop 460×240, положение курсора, исключение UI/paint meter, frozen mask alignment, coverage ≥99% и leakage=0.
-- Проверить fail-closed поведение на отсутствующем/изменённом PNG, несовпадающем run ID, ошибках Bridge и неверном P1.
+**Подтверждённая реализация UI/runner:**
+- Добавлен `source/preparation/chalk_fill_ui.py` и самостоятельная вкладка FILL-001 в `integrated_app.py`, отдельная от седьмой вкладки «Тест кистей».
+- UI создаёт/загружает manifest из 45 задач, показывает task identity/shape/radius/repeat/expected strokes/plan signature и выбирает только pending task с пройденным quality gate.
+- Перед передачей пересчитывается fixed-radius plan и сверяются frozen plan signature, mask SHA-256, coverage/leakage, expected strokes и matrix/task identity.
+- Исполнение ограничено одной выбранной task с явным подтверждением оператора; batch execution всей матрицы запрещён.
+- Размер кисти устанавливается через существующий Brush Test workflow; затем создаётся DrawingPlan с FILL-001 experiment context и запускается Stage 6 с P1 override.
+- После исполнения UI сохраняет before/after board PNG и передаёт runtime evidence в capture adapter; прямой запуск FILL-001 plan в обход специализированного workflow закрыт fail-closed guard.
+- Unified app regression test проверяет регистрацию вкладки `8. FILL-001`; следующая вкладка — `9. Калибровка теста`.
 
-**Критерий завершения:** из UI AutoDraw запускается одна выбранная task; executor report содержит её context; runtime binder однозначно связывает report с Bridge session/run; реальные PNG проходят crop/quality/evidence gates на Windows; негативные случаи отклоняются. До этого live matrix не запускать.
+**Оставшийся Windows live preflight:**
+- Запустить из AutoDraw одну задачу (первая предпочтительная ячейка — rectangle/radius 10/repeat 1) на реальной игровой сессии.
+- Подтвердить task ↔ DrawingPlan ↔ executor report ↔ Bridge session/run identity и фактический P1 в execution report.
+- Проверить реальные before/after PNG: crop 460×240, RGB threshold 8, положение курсора, исключение UI/paint meter, frozen mask alignment, coverage ≥99% и leakage=0.
+- Проверить fail-closed поведение на mismatch run/task/plan, неверном P1, Bridge errors и отсутствующих/изменённых PNG.
+
+**Критерий завершения:** один реальный запуск из FILL-001 UI однозначно связан с executor report и Bridge session/run; реальные PNG проходят quality/evidence gates на Windows. До этого 45-cell live matrix не запускать.
 
 ### Шаг 4. Выполнить 45 live captures FILL-001
 
@@ -87,8 +93,8 @@
 
 | Шаг | Статус | Подтверждение |
 |---|---|---|
-| 1 | DONE | CI [41579136690](https://github.com/Kiddos19882/AutoDraw/actions/runs/41579136690), code HEAD `b4cc45a80231e6bad2f878b2a5a2f16b48b9d68b`; Preparation/G3 754 passed + 82 subtests; Windows build/smoke-test success |
-| 2 | DONE (software) | Runtime binder + Stage 6 integration + regression CI [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009), code HEAD `d7466c5`; live proof переносится в шаг 3 |
-| 3 | TODO | Сначала требуется UI/runner handoff FILL-001, затем Windows live runtime/PNG preflight и evidence report |
+| 1 | DONE | CI [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178), code/test HEAD `e3774a3`; Preparation/G3 772 passed, 24 warnings, 82 subtests; обязательные jobs и Windows smoke-test success |
+| 2 | DONE (software) | Runtime binder, Stage 6 completion hook, UI experiment context и regression CI [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178), code/test HEAD `e3774a3`; live proof переносится в шаг 3 |
+| 3 | IN_PROGRESS | UI/runner handoff реализован и покрыт CI; ожидается Windows live runtime/PNG preflight и evidence report |
 | 4 | BLOCKED | Ожидает шаги 1–3 |
 | 5 | BLOCKED | Ожидает 45 принятых captures |
