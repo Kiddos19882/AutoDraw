@@ -94,6 +94,7 @@ Preparation и executor предоставляют совместимые import
 | chalk_test_blocks.py | Durable block planner/journal, task progression, recovery и fail-closed acceptance |
 | chalk_int006_validation.py | Frozen INT-006 prediction artifact и независимый analyzer модели при radius=10 |
 | chalk_int006r_validation.py | Независимый analyzer radius × geometry matrix INT006R без изменения frozen model |
+| chalk_fill_experiment.py | Frozen target masks и SHA-256 для FILL-001; без executor plan generation |
 | brush_calibration_ui.py | Интерфейс калибровки кистей |
 | paint_limit_test_ui.py | Интерфейс теста лимита краски |
 
