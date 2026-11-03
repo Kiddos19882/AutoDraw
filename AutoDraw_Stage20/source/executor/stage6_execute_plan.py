@@ -1177,7 +1177,6 @@ class Stage6App:
         document = json.loads(plan_path.read_text(encoding="utf-8"))
         plan_type = document.get("plan_type") if isinstance(document, dict) else None
         del document
-        self._fill001_execution_required = False
         if plan_type == "autodraw_color_scanline_plan":
             color_plan = load_color_scanline_plan(plan_path)
         elif plan_type == "autodraw_geometry_color_plan":
@@ -1189,6 +1188,7 @@ class Stage6App:
             )
         converted = color_plan_to_drawing_plan(color_plan)
         converted.validate_bounds()
+        self._fill001_execution_required = False
         self.color_plan_data = color_plan
         self.adaptive_brush_plan = None
         self.adaptive_brush_plan_path = None
