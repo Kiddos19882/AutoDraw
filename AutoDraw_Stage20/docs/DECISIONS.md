@@ -110,3 +110,11 @@
 **Контракт INT006R:** D1–D5 × radius 1/10/30 × 3 повтора = 45 captures; sampling строго P1 (step=4, delay=5 ms); отдельные scenario IDs, task IDs и durable journal; prediction ID отсутствует; exact CHALK и per-stroke Game Monitor telemetry обязательны.
 
 **Границы:** live execution только после полного CI и Windows portable smoke-test. Production estimator, frozen INT-006 artifact, executor defaults, sampling defaults и `master` не изменять по результатам этой фазы автоматически. Safety margin и production eligibility остаются не установленными.
+
+
+## DEC-013. Единый источник текущего состояния документации
+
+**Статус:** принято, 2026-11-03  
+**Контекст:** в репозитории накоплены параллельные планы и исторические Markdown-файлы; отдельные описания статуса отстают от фактических итогов.  
+**Решение:** текущая навигация и классификация ведутся через `docs/README.md` и `docs/DOCUMENTATION_INVENTORY_2026-11-03.md`. Актуальные состояние, задачи и последовательность работ определяются только `PROJECT_STATUS.md`, `TASKS.md` и `ROADMAP.md`. Root-level документы с историческими планами не являются действующим backlog.  
+**Последствия:** исторические материалы сохраняются; новые общие документы размещаются в `docs/`; удаление архивных документов допускается только после проверки ссылок и уникальных сведений и пересмотра DEC-002.
