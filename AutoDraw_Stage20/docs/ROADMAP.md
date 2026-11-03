@@ -2,7 +2,7 @@
 
 ## Актуальный статус FILL-001 на 2026-11-04
 
-Binder fix committed `95a8d17`: Bridge activity window now uses `started_at_utc` + event performance-clock end (`max(events[].t) - started_at_performance_ms`); `finished_at_utc` is used for finalization-grace validation only. Regression tests committed `870bebc` cover calibration false-overlap and a Bridge JSON file larger than 27 MiB. CI for these commits has not yet been confirmed. Previous live preflight remains rejected (session CHALK=5999; board quota exhausted); next gate is software CI, then one preflight on a restored board. The 45-cell matrix remains BLOCKED. Подробности: [FILL-001 postmortem](CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md).
+Binder fix committed `95a8d17`: Bridge activity window uses `started_at_utc` plus event performance-clock end (`max(events[].t) - started_at_performance_ms`); `finished_at_utc` is used only for finalization-grace validation. Regression tests committed `870bebc` cover calibration false-overlap and Bridge JSON >27 MiB. Полный CI [41737923777](https://github.com/Kiddos19882/AutoDraw/actions/runs/41737923777) завершился SUCCESS, включая Windows portable build/startup smoke-test; optional benchmarks skipped. Предыдущий live preflight остаётся rejected (session CHALK=5999; board quota exhausted); следующий gate — один preflight на восстановленной доске. The 45-cell matrix remains BLOCKED. Подробности: [FILL-001 postmortem](CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md).
 
 ## Постоянная система управления знаниями ИИ
 
@@ -20,7 +20,7 @@ Binder fix committed `95a8d17`: Bridge activity window now uses `started_at_utc`
 4. Выполнить 45 live captures (3 формы × 5 радиусов × 3 повтора); до успешного шага 3 запуск заблокирован.
 5. Проанализировать exact CHALK и качество, определить влияние радиуса и лучшую стратегию заливки.
 
-**Текущий статус:** шаги 1–2 DONE как software/regression gates; полный CI [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881) прошёл на code HEAD `fe6d446`, включая Windows portable build. Пользовательский live run завершил 131/131 strokes, session CHALK=5999, но capture не принят. Выявлен false overlap в runtime binder из-за idle finalization timestamp; шаг 3 остаётся IN_PROGRESS до исправления activity-window matching и нового preflight на восстановленной доске. Шаги 4–5 BLOCKED.
+**Текущий статус:** шаги 1–2 DONE; binder activity-window fix и regression tests прошли полный CI [41737923777](https://github.com/Kiddos19882/AutoDraw/actions/runs/41737923777), включая Windows portable build/startup smoke-test. Предыдущий live run завершил 131/131 strokes, session CHALK=5999, но capture не принят. Шаг 3 остаётся IN_PROGRESS до одного нового live preflight на восстановленной доске. Шаги 4–5 BLOCKED.
 
 ### FILL-001 — fill efficiency matrix
 
@@ -32,13 +32,13 @@ Binder fix committed `95a8d17`: Bridge activity window now uses `started_at_utc`
 - [x] Добавить integration regression test реального FILL-001 plan → Stage 6 load с проверкой experiment context (commit `1b2d8a1`); JSON persistence/hash regression coverage подтверждены полным CI `41730717881`.
 - [x] Полный regression gate FILL-001 закрыт CI [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881) SUCCESS на `fe6d446`, включая Preparation/G3, Application integration, Game Monitor/Bridge, Executor, INT-006 audit и Windows build.
 - [x] Исправить binder false-overlap: Bridge run выбирается по event activity window, а не по `finished_at_utc` (commit `95a8d17`).
-- [x] Добавить regression tests на позднюю финализацию pre-execution calibration run и полный разбор/hash JSON >27 MiB (commit `870bebc`); запуск тестов/CI ожидается.
+- [x] Добавить regression tests на позднюю финализацию pre-execution calibration run и полный разбор/hash JSON >27 MiB (commit `870bebc`); полный CI [41737923777](https://github.com/Kiddos19882/AutoDraw/actions/runs/41737923777) — SUCCESS.
 - [ ] Провести новый Windows live runtime preflight на восстановленной доске и подтвердить P1 из фактического executor report.
 - [x] Исправить физическое требование crop 460×240: UI снимает фактический calibrated client ROI, adapter преобразует frozen logical mask в размер PNG и сохраняет transform.
 - [ ] Проверить реальные board PNG в client ROI: RGB threshold=8, cursor/UI exclusion и coverage/leakage против frozen masks.
 - [ ] Только после preflight — 45 live captures и анализ расхода CHALK по shape/radius.
 
-**Текущий gate:** binder activity-window correction и regression tests добавлены (`95a8d17`, `870bebc`); CI на новом code/test HEAD ещё не подтверждён. Live execution завершился, но capture rejected; session CHALK=5999, доска исчерпана. Следующий шаг — подтвердить software CI, затем один preflight на восстановленной доске. Live execution 45-cell matrix остаётся BLOCKED.
+**Текущий gate:** binder activity-window correction и regression tests (`95a8d17`, `870bebc`) прошли CI [41737923777] SUCCESS. Предыдущий live execution завершился, но capture rejected; session CHALK=5999, доска исчерпана. Следующий шаг — один preflight на восстановленной доске. Live execution 45-cell matrix остаётся BLOCKED.
 
 ## Актуальный статус CHALK — 2026-11-03
 
