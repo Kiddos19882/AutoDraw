@@ -1,3 +1,13 @@
+## 2026-11-03 — DOC-018: постоянная система управления знаниями для ИИ
+
+- Повторно проверены рабочая ветка `feature/image-geometry-optimization`, HEAD `759f6531f3e715c5ff67a7692f707b0f8269fd42`, последние 20 коммитов, README Stage20, основной индекс, управляющие документы и инвентаризация Markdown.
+- Созданы пять постоянных регламентов: `AI_WORK_GUIDE.md`, `KNOWLEDGE_ARCHITECTURE.md`, `EVIDENCE_AND_VALIDATION.md`, `ENGINEERING_INVARIANTS.md`, `EXPERIMENT_STANDARD.md`.
+- Регламенты определяют единый старт ИИ, роли источников знаний, владельца изменяемого факта, уровни E0–E5, статусы проверок, критические инварианты и воспроизводимую методику экспериментов.
+- Система не создаёт второй текущий статус, динамический дублирующий список ограничений или копию экспериментальных результатов. Исторические материалы и первичные данные не удалялись.
+- Обновлены README Stage20, docs/README.md, PROJECT_STATUS.md, TASKS.md, ROADMAP.md, DECISIONS.md и CHANGELOG.md. Добавлено решение DEC-016 и задача DOC-018.
+- Изменения ограничены Markdown-документацией. Исходники, тесты, конфигурации, workflow и экспериментальные данные не изменялись; тесты и CI не запускались.
+- GitHub API использован для чтения ветки и истории; локальный `git status` через этот интерфейс недоступен.
+
 ## 2026-11-03 — FILL-001: исправление runtime JSON handoff
 - Проверены ветка `feature/image-geometry-optimization`, HEAD и последние 20 коммитов; изучены README приложения, индекс docs, управляющие документы, временный план FILL-001 и call graph UI → integrated_app → Stage 6.
 - Изучен пользовательский data commit [6b1cba9](https://github.com/Kiddos19882/AutoDraw/commit/6b1cba9b1c40a030ac6bd7b29365bf19ac3c9149): manifest FILL-001, DrawingPlan `rectangle/radius=10/repeat=1` на 131 штрих, before PNG, Bridge session и runtime plan.
