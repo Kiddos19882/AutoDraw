@@ -193,3 +193,14 @@ Bridge server получает временный путь через --snippet-
 Автоматический CHALK block runner поддерживает G3 только после принятого G2. Каждая задача передаёт `executor_parameters` в `chalk_experiment_matrix` metadata и сохраняет их в runtime plan. Интеграционный слой читает runtime plan при подтверждении кисти, проверяет фиксированный G3 protocol и передаёт полный набор параметров в `Stage6App.start_execution_from_workflow(executor_config_override=...)`.
 
 Stage6 валидирует override через `ExecutorConfig`, применяет его к текущему запуску и не сохраняет временные значения в пользовательский профиль. Фактическая конфигурация попадает в execution report и сверяется analyzer с metadata.
+
+
+## Дополнение 2026-11-03 — аудит FILL-001
+
+Отдельный аудит текущего дерева исходников зафиксирован в [CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md](CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md).
+
+**FILL-001 не подключён к пользовательскому UI/runner workflow.** В `brush_behavior_test_ui.py` нет регистрации FILL001, выбора его manifest/task или отдельного runner. В `integrated_app.py` штатный Brush Test передаёт `current_brush_behavior_test.json`; task-specific executor override распознаёт G3, V1–V5, INT006 и INT006R, но не FILL001.
+
+В Stage 6 присутствует только post-execution hook: он запускает runtime binding, если уже завершённый execution report содержит `experiment_context.phase_id == "FILL001"`. Этот hook не создаёт DrawingPlan и не инициирует запуск. Helper `attach_fill001_experiment_context()` существует, но его вызов из UI/runner handoff не обнаружен.
+
+Матрица FILL-001 по-прежнему задаёт `execution_allowed=false` и `safe_to_execute=false`. До отдельной реализации fail-closed UI/runner handoff FILL-001 не считается доступным в AutoDraw.
