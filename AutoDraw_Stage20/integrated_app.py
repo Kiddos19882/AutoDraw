@@ -835,12 +835,30 @@ class AutoDrawUnifiedApp:
         try:
             document = json.loads(Path(active_path).read_text(encoding="utf-8"))
             context = document.get("autodraw_experiment")
+            source_document = json.loads(Path(plan_path).read_text(encoding="utf-8"))
+            source_generation = source_document.get("generation")
+            source_task = source_generation.get("chalk_fill001_task") if isinstance(source_generation, dict) else None
             from chalk_fill_runtime_binding import build_fill001_experiment_context
             from chalk_fill_execution import FILL001_EXECUTOR_OVERRIDE
+            from chalk_fill_fixed_radius_planner import build_fixed_radius_fill_plan
 
             expected = build_fill001_experiment_context(task)
             if not isinstance(context, dict) or any(context.get(key) != value for key, value in expected.items()):
                 raise ValueError("Runtime DrawingPlan не связан с выбранной FILL-001 task.")
+            if source_task != task:
+                raise ValueError("Исходный logical plan не связан с выбранной manifest task.")
+            if source_document.get("coordinate_system") != "logical_board_pixels":
+                raise ValueError("FILL-001 source plan должен оставаться в logical_board_pixels.")
+            rebuilt = build_fixed_radius_fill_plan(task["shape_id"], task["requested_radius"])
+            if (
+                source_generation.get("plan_signature") != rebuilt.get("plan_signature")
+                or source_generation.get("target_mask_sha256") != rebuilt.get("target_mask_sha256")
+                or len(source_document.get("strokes", [])) != task.get("expected_strokes")
+            ):
+                raise ValueError("Исходный FILL-001 plan не совпадает с повторно построенной frozen geometry.")
+            for source_stroke, planned_stroke in zip(source_document["strokes"], rebuilt["strokes"]):
+                if source_stroke.get("points") != planned_stroke.get("points"):
+                    raise ValueError("Геометрия FILL-001 была изменена после planner handoff.")
             if requested_brush != task.get("requested_radius"):
                 raise ValueError("Подтверждённый Game Monitor радиус не совпадает с task.")
             runtime_canvas = document.get("canvas", {})
