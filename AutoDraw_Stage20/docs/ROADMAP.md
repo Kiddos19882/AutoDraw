@@ -15,7 +15,7 @@
 - [x] Live block D1–D5 × radius 1/10/30 × 3 повтора при P1 завершён: 45/45 задач.
 - [x] Raw-data audit всех 45 Monitor reports: exact CHALK, sampled/per-stroke delta совпадают, observed radius соответствует запросу, dropped events/errors/Bridge failures/sequence gaps — 0.
 - [x] Запустить официальный CLI analyzer на реальном committed journal/capture bundle: run [41559932955](https://github.com/Kiddos19882/AutoDraw/actions/runs/41559932955), 45 accepted, 0 missing/rejected, PNG evidence complete.
-- [ ] Завершить ручной visual audit всех 45 пар PNG. Отдельный CI gate не заменяет ручную оценку качества следа.
+- [x] Завершить ручной visual audit всех 45 пар PNG; зафиксировать ограничения D2/radius=1 (разрыв соединения) и D4/radius=30 (слияние коротких деталей). См. [visual audit report](CHALK_INT006R_VISUAL_AUDIT_2026-11-03.md).
 - Результаты: [INT006R live report](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md).
 
 | Геометрия | Radius 1 | Radius 10 | Radius 30 |
@@ -31,8 +31,10 @@
 
 ### Следующий эксперимент — FILL-001
 
+INT006R visual audit закрыт с geometry-specific limitations: radius 30 сливает короткие детали D4, radius 1 оставляет разрыв на соединении D2 polygon. Эти ограничения должны быть учтены при выборе формы целевых масок и критериев качества FILL-001.
+
 - [x] Зафиксировать экспериментальный дизайн: три формы одноцветной области × радиусы 1/5/10/20/30 × три повтора = 45 captures.
-- [ ] Проверить фактический footprint кистей и соответствие radius параметрам геометрического planner.
+- [ ] Завершить калибровку footprint для всех радиусов 1/5/10/20/30; INT006R уже подтвердил raster width и выявил D2/D4 quality limits для 1/10/30.
 - [ ] Реализовать отдельный matrix/block harness, analyzer и regression tests.
 - [ ] Получить полный CI PASS и Windows preflight.
 - [ ] Выполнить 45 live captures, exact CHALK audit и визуальную оценку покрытия.
