@@ -2,13 +2,13 @@
 
 ## Актуальное состояние на 2026-11-04
 
-- Рабочая ветка: `feature/image-geometry-optimization`. Текущий branch HEAD: `c225df3cbcb61697ad58ed85d19bb871db2578d7`; compare с `master`: diverged, ahead 2699 / behind 5, merge base `d4a07702e45c01648f343bc6440a3287c45d3f9c`. `master` = `9a3453aeb847b66041bc83d6f4a56ecaf33a993a`, не изменялся; локальный `git status` через GitHub API недоступен. Code/test commits: [95a8d17](https://github.com/Kiddos19882/AutoDraw/commit/95a8d1799cd2cbbba09929cc5086a3655ba90c78) (Bridge activity-window fix) и [870bebc](https://github.com/Kiddos19882/AutoDraw/commit/870bebce6b39e782f70ef9f476a324ee840c05ae) (regression tests). Текущий HEAD на момент обновления документа проверяется отдельно; локальный `git status` через GitHub API недоступен. `master` не изменялся.
+- Рабочая ветка: `feature/image-geometry-optimization`. Проверенный branch HEAD до текущей документационной синхронизации: `1d41deea36dd1f821a0fb6155d2945beb849b009`; compare с `master`: diverged, ahead 2700 / behind 5, merge base `d4a07702e45c01648f343bc6440a3287c45d3f9c`. `master` = `9a3453aeb847b66041bc83d6f4a56ecaf33a993a`, не изменялся. Последний code/test commit — [870bebc](https://github.com/Kiddos19882/AutoDraw/commit/870bebce6b39e782f70ef9f476a324ee840c05ae); binder fix — [95a8d17](https://github.com/Kiddos19882/AutoDraw/commit/95a8d1799cd2cbbba09929cc5086a3655ba90c78). Локальный `git status` через GitHub API недоступен.
 - Исправлен runtime binder: Bridge activity end теперь вычисляется из `started_at_utc`, `started_at_performance_ms` и максимального event `t`. `finished_at_utc` используется только как время persistence/finalization и для проверки idle grace.
 - Сохранён строгий guard: выбранный task run обязан иметь `non_consuming_stroke_candidate_count=0`; временная фильтрация не ослабляет требования к качеству выбранного run.
 - Добавлены regression tests: pre-execution calibration run, чьи события закончились до executor start, исключается даже при финализации после executor start; большой Bridge JSON (более 27 MiB) полностью загружается, разбирается и связывается по SHA-256.
-- Новые тесты записаны в репозиторий, но их фактический запуск и CI на этих коммитах ещё не подтверждены.
+- Regression tests из `870bebc` прошли GitHub Actions [41737923777](https://github.com/Kiddos19882/AutoDraw/actions/runs/41737923777): Application integration, Executor regression, Preparation/G3, Game Monitor/Bridge, INT-006 pixel audit и Windows portable build/startup smoke-test — SUCCESS; optional algorithm benchmarks — SKIPPED.
 - Предыдущий FILL-001 preflight остаётся REJECTED/UNACCEPTED: Stage 6 завершил 131/131 strokes, session CHALK=5999, доска исчерпала квоту. Per-run/per-stroke CHALK второго Bridge run и quantitative PNG audit не подтверждены.
-- 45-cell matrix остаётся BLOCKED до успешного software CI, восстановления/замены доски и принятого нового Windows live preflight.
+- 45-cell matrix остаётся BLOCKED до восстановления/замены доски и принятого нового Windows live preflight; software CI для binder fix и regression tests уже SUCCESS.
 - Подробный postmortem: [CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md](CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md).
 
 
@@ -58,18 +58,18 @@
 | INT-005 | DONE* | Автоматические CHALK blocks, matrix, journal, recovery и fail-closed gates используются в принятых сериях. |
 | INT-006 | IN_PROGRESS | Live captures, 45/45 Monitor audit, официальный analyzer (45 accepted, 0 missing/rejected), 15/15 complete groups и полный binding audit завершены. Осталось отдельно решить вопрос safety margin и расширить domain validation; production eligibility не подтверждена. |
 | INT-006R | DONE | 45/45 live captures, raw-data audit, официальный CLI analyzer и ручной visual audit завершены. Зафиксированы geometry-specific limitations для D2/radius=1 и D4/radius=30. |
-| INT-006F / FILL-001 | IN_PROGRESS | Software fixes в commits 2b7577c/3b67aea; CI 41728163369 partial (Monitor/Bridge + Executor SUCCESS; Preparation/G3 + Application integration running). Live run: 131/131 strokes, after PNG present, capture unaccepted. Bridge run file 27.9 MB needs full artifact audit; CHALK quota on the board exhausted. 45-cell matrix BLOCKED. |
+| INT-006F / FILL-001 | IN_PROGRESS | Binder activity-window fix `95a8d17` и regression tests `870bebc` прошли полный CI [41737923777](https://github.com/Kiddos19882/AutoDraw/actions/runs/41737923777); portable artifact доступен. Предыдущий live preflight остаётся REJECTED: 131/131 strokes, session CHALK=5999, task-level/per-stroke attribution и quantitative PNG audit не подтверждены; доска исчерпана. Следующий gate — один новый Windows live preflight на восстановленной доске; 45-cell matrix BLOCKED. |
 | INT-007 | BLOCKED | Интеграция валидированной модели в preflight/resource estimator запрещена до закрытия INT-006 и определения safety margin. |
 | INT-008 | TODO | Оптимизация траекторий, кистей, порядка и покрытия в пределах CHALK после INT-007. |
 | INT-009 | TODO | Независимая проверка прогноза на полных рисунках, визуального качества и фактической экономии. |
 
 ## Ближайший рабочий приоритет
 
-1. Дождаться полного CI 41728163369, включая Preparation/G3, Application integration, INT-006 pixel audit и Windows portable build/startup smoke-test.
-2. Проверить attempt, executor report, Bridge session и большой Bridge run file целиком; подтвердить exact run binding и per-stroke CHALK, сохранив raw evidence неизменным.
-3. Провести визуальный audit before/after PNG, frozen mask, calibrated ROI, coverage и leakage. До этого capture не принимать.
-4. Для нового preflight потребуется восстановленная/свежая доска с доступной CHALK quota; текущая доска исчерпана.
-5. Только после успешного software gate и принятого preflight запускать 45-cell matrix. Production estimator/defaults не менять.
+1. Software gate для binder fix и regression tests подтверждён: GitHub Actions [41737923777](https://github.com/Kiddos19882/AutoDraw/actions/runs/41737923777) — все обязательные jobs SUCCESS; portable artifact ID `13280731107` доступен.
+2. Подготовить восстановленную/свежую доску с полной доступной CHALK quota; предыдущая доска исчерпана.
+3. Провести ровно один Windows live preflight `rectangle / radius 10 / repeat 1`; проверить task ↔ DrawingPlan ↔ executor report ↔ Bridge session/run binding, exact per-run/per-stroke CHALK и фактический P1.
+4. Проверить реальные before/after PNG в calibrated ROI: frozen-mask alignment, coverage ≥99%, leakage=0, RGB threshold и cursor/UI exclusion.
+5. Только после принятия preflight разрешать 45-cell matrix. Production estimator/defaults не менять.
 
 ## Разрешения и границы
 
