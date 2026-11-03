@@ -64,16 +64,13 @@ INT006R visual audit закрыт с geometry-specific limitations: radius 30 с
 
 - [x] Зафиксировать экспериментальный дизайн: три формы одноцветной области × радиусы 1/5/10/20/30 × три повтора = 45 captures.
 - [x] Проверить engine semantics и ограничения существующих fill planners; зафиксировать отдельный fixed-radius harness design. См. [design](CHALK_FILL001_HARNESS_DESIGN_2026-11-03.md).
-- [x] Создать frozen target masks на canvas 460×240; площади 44 653/45 159/44 879 px, разброс 1,133%, SHA-256 закреплены в коде. Локальные mask tests — 8/8 PASS; CI ещё не подтверждён.
+- [x] Создать frozen target masks на canvas 460×240; площади 44 653/45 159/44 879 px, разброс 1,133%, SHA-256 закреплены в коде. Software regression gate подтверждён CI [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178) на code/test HEAD `e3774a3`.
 - [ ] Завершить калибровку footprint для всех радиусов 1/5/10/20/30; INT006R уже подтвердил raster width и выявил D2/D4 quality limits для 1/10/30.
 - [x] Проверить H/V grid и eroded-contour prototypes; оба не проходят combined coverage/leakage gate, не интегрировать.
 - [x] Реализовать boundary-aware fixed-radius centerline planner и raster simulator; отдельная Python simulation: 15/15 cells прошли coverage ≥99% / leakage=0. Regression tests добавлены, автоматический pytest/CI ещё pending.
 - [x] Реализовать отдельный 45-cell matrix manifest, capture validation, analyzer и dynamic expected stroke validation; regression tests добавлены.
-- [ ] Подтвердить полный pytest/CI и Windows portable build на актуальном HEAD.
-- [ ] Выполнить Windows preflight и проверить соответствие игровых PNG frozen masks до запуска 45 live captures.
-- [ ] Подтвердить полный CI и Windows portable build на актуальном HEAD.
-- [ ] Получить полный CI PASS и Windows preflight.
-- [ ] Выполнить 45 live captures, exact CHALK audit и визуальную оценку покрытия.
+- [ ] Выполнить Windows live preflight из отдельной вкладки FILL-001: проверить фактический P1, Bridge/executor binding и реальные PNG против frozen masks.
+- [ ] Только после успешного preflight выполнить 45 live captures, exact CHALK audit и визуальную оценку покрытия.
 - План: [FILL-001 — area fill radius efficiency](CHALK_FILL_AREA_RADIUS_EFFICIENCY_PLAN_2026-11-03.md).
 
 **INT-007 остаётся BLOCKED.** Не менять production estimator, frozen INT-006 model, executor defaults или sampling defaults до закрытия расширенной validation и решения о safety margin.
