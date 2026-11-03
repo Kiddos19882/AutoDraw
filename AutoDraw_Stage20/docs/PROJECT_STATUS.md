@@ -9,7 +9,7 @@
 
 # Текущее состояние проекта
 
-**Последнее обновление:** 2026-11-03 — INT006R полностью закрыт: 45/45 live captures, raw-data audit, официальный CLI analyzer и ручной visual audit 45 пар PNG завершены. Ограничения качества: radius 1 оставляет разрыв соединения D2 polygon; radius 30 сливает короткие детали D4. Следующий этап — FILL-001. См. [live report](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md) и [visual audit](CHALK_INT006R_VISUAL_AUDIT_2026-11-03.md).
+**Последнее обновление:** 2026-11-03 — INT006R полностью закрыт (45/45 captures, raw-data audit, CLI analyzer и visual audit). Ограничения: radius 1 оставляет разрыв D2 polygon; radius 30 сливает короткие детали D4. Для FILL-001 завершён технический design review: существующие planners не подходят для single-radius comparison; следующий шаг — frozen masks и отдельный fixed-radius generator. См. [INT006R visual audit](CHALK_INT006R_VISUAL_AUDIT_2026-11-03.md) и [FILL-001 design](CHALK_FILL001_HARNESS_DESIGN_2026-11-03.md).
 
 **Актуально на:** 3 ноября 2026 г.  
 **Репозиторий:** `Kiddos19882/AutoDraw`  
@@ -56,7 +56,7 @@
 ## Ближайший рабочий приоритет
 
 1. INT006R закрыт; использовать visual findings как ограничения для генератора FILL-001.
-2. Реализовать отдельный planner/matrix/block harness, analyzer и regression tests для трёх frozen masks × радиусы 1/5/10/20/30 × три повтора.
+2. Подготовить frozen masks и реализовать отдельный fixed-radius planner/simulator, затем matrix/block harness, analyzer и regression tests для трёх форм × радиусы 1/5/10/20/30 × три повтора. Контракт: [FILL-001 design](CHALK_FILL001_HARNESS_DESIGN_2026-11-03.md).
 3. После CI PASS выполнить Windows preflight и 45 live captures; принимать только captures с exact CHALK и заранее определённым качеством покрытия.
 4. Safety margin INT-006 не установлен; INT-007 остаётся BLOCKED. Production estimator/defaults не менять.
 
