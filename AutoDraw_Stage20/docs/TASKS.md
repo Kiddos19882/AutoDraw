@@ -2,6 +2,23 @@
 
 Реестр содержит документационные и технические задачи проекта. Аналитические этапы 7–10 отменены и в backlog не включаются; INT-001 и последующие задачи ресурсной оптимизации являются отдельной инициативой.
 
+## FILL-001 — Monitor capture adapter и software gate
+
+**Статус:** IN_PROGRESS  
+**Цель:** получать достоверные captures из Game Monitor и PNG evidence для 45-cell заливочной матрицы.
+
+- [x] Реализовать отдельный adapter Monitor export → FILL-001 capture.
+- [x] Рассчитывать per-stroke CHALK по DRAW_START/DRAW_END snapshots и сверять DRAW_SAMPLE deltas.
+- [x] Закрепить P1 (step=4, delay=5 ms) в frozen matrix metadata.
+- [x] Добавить PNG file/hash/pixel audit для logical crop 460×240.
+- [x] Добавить synthetic regression fixtures для event stream и PNG.
+- [ ] Запустить Preparation/G3 pytest suite и получить полный CI + Windows portable build PASS.
+- [ ] Проверить фактический bridge diagnostics schema и связать adapter с runner/journal call site.
+- [ ] Проверить реальные before/after PNG crop, RGB threshold и cursor/UI exclusion на Windows preflight.
+- [ ] Только после всех gates разрешить 45 live captures.
+
+**Ограничения:** Monitor export не содержит runId/sequence counter; run ID и bridge report передаются извне. P1 metadata пока не подтверждается самим Monitor. Synthetic fixtures не являются live evidence. Production estimator/defaults и frozen INT-006 model не менять.
+
 ## Статусы
 
 - TODO — не начато.
