@@ -16,7 +16,7 @@
 **Рабочая ветка:** `feature/image-geometry-optimization`  
 **Последний commit с данными:** `138c9fbeaf612a86819f7ff9ea0db7bb1fe4296a`. Последний подтверждённый application code HEAD INT006R: `28b56a97255b57b50072ba973533ce349c706bd1`; текущий branch HEAD `2b8812d9a306c16e7f68aca1f881a7b01b29be1e` добавляет реальный INT006R analyzer в CI. Последний документальный commit серии — `ad6a89027755507f9cd5861397967ba7dbb98269`.  
 **Последний подтверждённый полный CI:** [41540054975](https://github.com/Kiddos19882/AutoDraw/actions/runs/41540054975) на code HEAD `28b56a9`: обязательные jobs SUCCESS, Preparation/G3 — 682 passed и 82 subtests, Windows portable build/startup smoke-test — SUCCESS. Для data commit `138c9fbe` отдельный workflow run/status check не найден; новый workflow [41559932955](https://github.com/Kiddos19882/AutoDraw/actions/runs/41559932955) проверяет committed live dataset и пока выполняется.  
-**Git-сверка:** сравнение `master...feature/image-geometry-optimization` возвращает `diverged`, feature ahead 2297 / behind 5. Никакого merge/rebase не выполнялось; пять master-only commits требуют отдельного просмотра. В рамках этой актуализации `master` не изменялся.  
+**Git-сверка:** сравнение `master...feature/image-geometry-optimization` возвращает `diverged`, feature ahead 2297 / behind 5. Пять master-only commits просмотрены: игровой engine bundle, CI workflow и test image. `testImages/images.png` уже присутствует в обеих ветках с одинаковым blob SHA; engine bundle пока только в master. Никакого merge/rebase не выполнялось; `master` в рамках работы не изменялся.  
 > Этот блок — единственный источник текущего статуса. Ниже сохранена историческая хронология; старые статусы и планы не являются текущим backlog.
 
 ## Текущее состояние
@@ -48,6 +48,7 @@
 | INT-005 | DONE* | Автоматические CHALK blocks, matrix, journal, recovery и fail-closed gates используются в принятых сериях. |
 | INT-006 | IN_PROGRESS | Live captures, 45/45 Monitor audit, официальный analyzer (45 accepted, 0 missing/rejected), 15/15 complete groups и полный binding audit завершены. Осталось отдельно решить вопрос safety margin и расширить domain validation; production eligibility не подтверждена. |
 | INT-006R | IN_PROGRESS | 45/45 live captures завершены; exact CHALK и per-stroke integrity подтверждены по всем Monitor reports. Остались официальный CLI analyzer на реальном bundle и ручной visual audit всех PNG. |
+| INT-006F | IN_PROGRESS | Подготовлен FILL-001 на 45 captures; требуется проверить фактический raster footprint и реализовать отдельный experimental harness/analyzer. См. `CHALK_FILL_AREA_RADIUS_EFFICIENCY_PLAN_2026-11-03.md`. |
 | INT-007 | BLOCKED | Интеграция валидированной модели в preflight/resource estimator запрещена до закрытия INT-006 и определения safety margin. |
 | INT-008 | TODO | Оптимизация траекторий, кистей, порядка и покрытия в пределах CHALK после INT-007. |
 | INT-009 | TODO | Независимая проверка прогноза на полных рисунках, визуального качества и фактической экономии. |
