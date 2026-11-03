@@ -11,7 +11,7 @@
 |---|---|---|
 | 1. Regression gate: tests, полный CI, Windows build | DONE | CI [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178), code/test HEAD `e3774a3`; Preparation/G3 772 passed, 24 warnings, 82 subtests; обязательные jobs и Windows portable smoke-test SUCCESS |
 | 2. Runtime binding: Bridge, executor journal, P1 | DONE | Binder, Stage 6 completion hook и связь с FILL-001 experiment context покрыты regression CI; live binding будет подтверждён на шаге 3 |
-| 3. UI/runner handoff и Windows preflight | IN_PROGRESS | Исправлена путаница logical 460×240 и физического client ROI; остаются CI regression gate и один Windows live run с Bridge/executor binding и реальными PNG |
+| 3. UI/runner handoff и Windows preflight | IN_PROGRESS | Исправлена путаница logical 460×240 и физического client ROI; остаётся один Windows live run с Bridge/executor binding и реальными PNG |
 | 4. 45 live captures | BLOCKED | 45 уникальных принятых ячеек либо документированные отклонения |
 | 5. CHALK/quality analysis и рекомендация | BLOCKED | Подготовлен отчёт о влиянии радиуса и лучшей стратегии заливки |
 
