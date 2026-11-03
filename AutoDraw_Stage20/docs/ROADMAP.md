@@ -1,5 +1,10 @@
 # Roadmap AutoDraw
 
+## Актуальный статус FILL-001 на 2026-11-04
+
+Исправления JSON persistence и canonical DrawingPlan hash опубликованы в commits 2b7577c и 3b67aea; добавлены regression tests. CI 41728163369 частично завершён: Game Monitor/Bridge и Executor SUCCESS, Preparation/G3 и Application integration IN_PROGRESS, Windows build ожидает их завершения. Live preflight завершил 131/131 strokes, after PNG существует, capture не принят. CHALK quota использованной доски исчерпана. 45-cell matrix остаётся BLOCKED до проверки artifacts/PNG и нового успешного preflight на восстановленной доске.
+
+
 ## Постоянная система управления знаниями ИИ
 
 **Статус:** DONE — DOC-018. Постоянная система создана и подключена к основной навигации. Она состоит из AI_WORK_GUIDE.md, KNOWLEDGE_ARCHITECTURE.md, EVIDENCE_AND_VALIDATION.md, ENGINEERING_INVARIANTS.md и EXPERIMENT_STANDARD.md.

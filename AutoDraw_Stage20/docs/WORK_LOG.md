@@ -1,3 +1,16 @@
+## 2026-11-04 — FILL-001 post-run persistence and canonical hash fixes
+
+- Повторно проверены ветка feature/image-geometry-optimization, code HEAD 3b67aea0145170ec23df089916bedf7828de9a68, последние коммиты, README Stage20/docs index, управляющие документы и постоянные регламенты.
+- Разобран пользовательский live preflight: Stage 6 завершил 131/131 strokes; after PNG присутствует. Attempt JSON был повреждён буквальными символами \\n в конце записи, что блокировало последующее чтение/финализацию.
+- Исправлены все четыре ошибочных JSON suffixes в chalk_fill_ui.py: completion attempt, after PNG update, capture JSON и финальный attempt record.
+- Выявлено расхождение hash contract: подготовка использовала DrawingPlan-normalized document, а validator хешировал сырой JSON. Добавлена единая нормализация через geometry_models.DrawingPlan.from_dict(...).to_dict(); attach теперь сохраняет нормализованный документ, чтобы default fields/created_at были стабильны при повторной загрузке.
+- Добавлены regression tests для executor completion → after PNG → valid attempt JSON; finalize_capture → valid capture/attempt JSON; model normalization of metadata/coordinates before hash validation.
+- Code commits: [2b7577c](https://github.com/Kiddos19882/AutoDraw/commit/2b7577c3a3289871b7fff300fd6013f12c7cb54e), [3b67aea](https://github.com/Kiddos19882/AutoDraw/commit/3b67aea0145170ec23df089916bedf7828de9a68).
+- CI [41728163369](https://github.com/Kiddos19882/AutoDraw/actions/runs/41728163369) на 3b67aea: Game Monitor/Bridge SUCCESS; Executor regression SUCCESS; Preparation/G3 и Application integration ещё выполняются; Windows portable build ждёт обязательные jobs; optional benchmarks SKIPPED. Run [41727944296] был отменён последующим push и не считается failed.
+- Bridge run file для второго запуска имеет размер 27,934,553 bytes в Git tree; API fetch не вернул содержимое из-за размера, поэтому нельзя называть файл пустым. Требуется full artifact audit.
+- Game pointCount: 1 → 6000; квота CHALK на использованной доске исчерпана. Capture не принят, per-stroke attribution/PNG quality audit ещё не подтверждены. Повторный live run на этой доске не выполнялся; 45-cell matrix остаётся BLOCKED.
+- Изменены только два исходных файла и два тестовых файла. Production estimator/defaults, sampling defaults и master не менялись. Локальные pytest недоступны из-за отсутствия DNS к github.com; CI используется как удалённая проверка. Локальный git status недоступен через GitHub API.
+
 ## 2026-11-03 — DOC-018: постоянная система управления знаниями для ИИ
 
 - Повторно проверены рабочая ветка `feature/image-geometry-optimization`, HEAD `759f6531f3e715c5ff67a7692f707b0f8269fd42`, последние 20 коммитов, README Stage20, основной индекс, управляющие документы и инвентаризация Markdown.

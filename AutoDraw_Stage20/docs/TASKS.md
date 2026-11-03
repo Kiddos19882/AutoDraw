@@ -1,5 +1,10 @@
 # Реестр задач AutoDraw
 
+## Актуальное состояние FILL-001 на 2026-11-04
+
+Software fixes внесены: JSON persistence в attempt/after PNG/capture/attempt finalization (commit 2b7577c) и canonical DrawingPlan hash normalization (commit 3b67aea). Добавлены regression tests. CI 41728163369: Game Monitor/Bridge и Executor SUCCESS; Preparation/G3 и Application integration выполняются; Windows build ожидает их завершения. Пользовательский запуск завершил 131/131 strokes, after PNG существует, но capture не принят. Квота CHALK на этой доске исчерпана; 45-cell matrix остаётся BLOCKED до audit evidence и успешного preflight на восстановленной доске.
+
+
 Реестр содержит документационные и технические задачи проекта. Аналитические этапы 7–10 отменены и в backlog не включаются; INT-001 и последующие задачи ресурсной оптимизации являются отдельной инициативой.
 
 ## Временный план FILL-001 на пять шагов

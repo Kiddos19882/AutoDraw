@@ -1,3 +1,10 @@
+## 2026-11-04 — FILL-001 persistence and hash validation fixes
+
+- Исправлены четыре записи JSON в chalk_fill_ui.py: теперь используются реальные переводы строк, а не буквальная последовательность \\n. Добавлены regression tests для completion/after PNG, capture JSON и attempt finalization.
+- Canonical plan hash теперь вычисляется по нормализованному DrawingPlan через общий model round-trip; attach сохраняет тот же normalized document, что Stage 6 повторно загружает. Добавлен regression test для numeric metadata и точности координат.
+- Commits: [2b7577c](https://github.com/Kiddos19882/AutoDraw/commit/2b7577c3a3289871b7fff300fd6013f12c7cb54e), [3b67aea](https://github.com/Kiddos19882/AutoDraw/commit/3b67aea0145170ec23df089916bedf7828de9a68).
+- CI [41728163369](https://github.com/Kiddos19882/AutoDraw/actions/runs/41728163369): Game Monitor/Bridge и Executor SUCCESS; Preparation/G3 и Application integration выполняются; Windows build ожидает их завершения. Live capture не принят; 45-cell matrix остаётся BLOCKED.
+
 ## 2026-11-03 — DOC-018: введена постоянная система управления знаниями ИИ
 
 - Добавлены пять универсальных регламентов: рабочий процесс ИИ, архитектура знаний, доказательность и validation, инженерные инварианты, стандарт экспериментов.

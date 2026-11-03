@@ -38,7 +38,7 @@
 
 ### Шаг 3. Интегрировать запуск в AutoDraw и провести Windows live preflight
 
-**Статус:** IN_PROGRESS — первая пользовательская попытка остановилась на handoff из-за невалидного runtime JSON; исправление и regression test внесены, CI [41692129486](https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486) выполняется: Application integration, Game Monitor/Bridge, Preparation/G3, Executor и INT-006 pixel audit — SUCCESS; Windows portable build/startup smoke-test ещё выполняется. Повторный Windows live preflight ожидает завершения CI.
+**Статус:** IN_PROGRESS — software fixes внесены в commits 2b7577c и 3b67aea; CI [41728163369](https://github.com/Kiddos19882/AutoDraw/actions/runs/41728163369) частично завершён: Game Monitor/Bridge и Executor SUCCESS; Preparation/G3 и Application integration IN_PROGRESS; Windows build ожидает обязательные jobs. Второй пользовательский live run завершил 131/131 strokes и сохранил after PNG, но capture не принят. На доске pointCount достиг 6000 из 6000; повторный запуск на ней невозможен.
 
 **Подтверждённая реализация UI/runner:**
 - Добавлен `source/preparation/chalk_fill_ui.py` и самостоятельная вкладка FILL-001 в `integrated_app.py`, отдельная от седьмой вкладки «Тест кистей».
@@ -66,6 +66,14 @@
 - Проверить fail-closed поведение на mismatch run/task/plan, неверном P1, Bridge errors и отсутствующих/изменённых PNG.
 
 **Критерий завершения:** один реальный запуск из FILL-001 UI однозначно связан с executor report и Bridge session/run; реальные PNG проходят quality/evidence gates на Windows с фактическим ROI клиента и сохранённым logical→screen transform. До этого 45-cell live matrix не запускать.
+
+
+**Актуальное уточнение 2026-11-04:**
+- В chalk_fill_ui.py исправлены все четыре JSON writes с буквальным \\n: executor completion, after PNG, capture JSON и финальный attempt record.
+- В chalk_fill_runtime_binding.py preparation и validation используют один normalized DrawingPlan document; attach сохраняет canonical document до записи runtime plan.
+- Добавлены regression tests для completion/after PNG/capture persistence и hash normalization. Полный CI ещё выполняется.
+- Bridge run file второго запуска присутствует в Git tree, размер 27,934,553 bytes. Пустой ответ fetch API был ограничением обработки большого файла, не доказательством пустого файла.
+- Capture остаётся unaccepted до полной проверки run binding, per-stroke CHALK и визуального PNG audit. 45-cell matrix остаётся BLOCKED.
 
 ### Шаг 4. Выполнить 45 live captures FILL-001
 
@@ -105,7 +113,7 @@
 |---|---|---|
 | 1 | DONE | CI [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985), code/test HEAD `031913c`; Preparation/G3 778 passed, 24 warnings, 82 subtests; все обязательные jobs и Windows portable build/startup smoke-test SUCCESS; optional benchmarks skipped |
 | 2 | DONE (software) | Runtime binder, Stage 6 completion hook, UI experiment context и regression CI [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985), code/test HEAD `031913c`; live proof переносится в шаг 3 |
-| 3 | IN_PROGRESS | Commit `6b1cba9` выявил invalid runtime JSON handoff; fix `8dfd1b5` и regression test `1b2d8a1` добавлены, новый CI ожидается; затем требуется повторный Windows live runtime/PNG preflight и evidence report |
+| 3 | IN_PROGRESS | Commits `2b7577c`/`3b67aea` исправляют JSON persistence и normalized plan hash; CI `41728163369` partial (Monitor/Bridge + Executor SUCCESS; Preparation/G3 + Application integration running; Windows build pending). Live run 131/131 strokes, after PNG present, capture unaccepted; доска исчерпала CHALK quota. Нужны artifact/PNG audit и preflight на восстановленной доске. |
 | 4 | BLOCKED | Ожидает шаги 1–3 |
 | 5 | BLOCKED | Ожидает 45 принятых captures |
 

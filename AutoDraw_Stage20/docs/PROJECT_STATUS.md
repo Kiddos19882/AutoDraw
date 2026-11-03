@@ -1,8 +1,20 @@
 # Текущее состояние проекта
 
+## Актуальное состояние на 2026-11-04
+
+- Рабочая ветка: feature/image-geometry-optimization. Кодовый HEAD: 3b67aea0145170ec23df089916bedf7828de9a68. master: 9a3453aeb847b66041bc83d6f4a56ecaf33a993a; не изменялся.
+- FILL-001 user preflight завершил Stage 6 штатно: 131/131 strokes. After PNG физически существует, но capture не принят.
+- Исправлены четыре ошибочных JSON suffixes в chalk_fill_ui.py и нормализация DrawingPlan hash в chalk_fill_runtime_binding.py. Code commits: 2b7577c3a3289871b7fff300fd6013f12c7cb54e и 3b67aea0145170ec23df089916bedf7828de9a68.
+- Добавлены regression tests на executor completion/after PNG/capture persistence и normalized plan hash.
+- CI 41728163369: Game Monitor/Bridge и Executor regression — SUCCESS; Preparation/G3 и Application integration — IN_PROGRESS; Windows portable build ждёт обязательные jobs. Optional benchmarks SKIPPED.
+- Bridge run file в commit d0acb0f имеет размер 27,934,553 bytes. Ранее пустой ответ API был ограничением извлечения большого файла, а не доказательством нулевого размера.
+- Игровой pointCount изменился с 1 до 6000; квота CHALK на использованной доске исчерпана. Повторный live run на этой доске не выполнять. Capture и 45-cell matrix остаются BLOCKED до проверки runtime evidence, PNG и успешного нового preflight на восстановленной доске.
+
+Историческая запись статуса на 2026-11-03 (сохранена для истории; её CI/HEAD сведения superseded текущим блоком выше):
+
 **Последнее обновление:** 2026-11-03 — после первой пользовательской попытки FILL-001 (commit [6b1cba9](https://github.com/Kiddos19882/AutoDraw/commit/6b1cba9b1c40a030ac6bd7b29365bf19ac3c9149)) выявлена ошибка сериализации runtime DrawingPlan: к JSON добавлялась буквальная последовательность `\n`, из-за чего Stage 6 отклонял файл. Исправлено в code commit [8dfd1b5](https://github.com/Kiddos19882/AutoDraw/commit/8dfd1b541f54a1b416dfb2907739cf4b1a99c58d); добавлен интеграционный regression test в [1b2d8a1](https://github.com/Kiddos19882/AutoDraw/commit/1b2d8a128c99ab8ad1abb1e9f480702676cd9f56). GitHub Actions [41692129486](https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486) выполняется на code/test HEAD `1b2d8a1`: Application integration, Game Monitor/Bridge, Preparation/G3, Executor и INT-006 pixel audit jobs — SUCCESS; Windows portable build/startup smoke-test ещё выполняется. **Повторный Windows live preflight не выполнен; 45 live captures остаются заблокированы.**
 
-**Актуально на:** 3 ноября 2026 г.  
+**Актуально на:** 4 ноября 2026 г.  
 **Репозиторий:** `Kiddos19882/AutoDraw`  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
 **Последний code/test candidate:** [1b2d8a1](https://github.com/Kiddos19882/AutoDraw/commit/1b2d8a128c99ab8ad1abb1e9f480702676cd9f56), включает исправление FILL-001 runtime JSON handoff и интеграционный regression test; CI [41692129486](https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486) выполняется; все regression jobs завершились SUCCESS, ожидается Windows portable build/startup smoke-test. Предыдущий подтверждённый code/test HEAD — `031913c` (client-ROI correction).  
@@ -44,18 +56,18 @@
 | INT-005 | DONE* | Автоматические CHALK blocks, matrix, journal, recovery и fail-closed gates используются в принятых сериях. |
 | INT-006 | IN_PROGRESS | Live captures, 45/45 Monitor audit, официальный analyzer (45 accepted, 0 missing/rejected), 15/15 complete groups и полный binding audit завершены. Осталось отдельно решить вопрос safety margin и расширить domain validation; production eligibility не подтверждена. |
 | INT-006R | DONE | 45/45 live captures, raw-data audit, официальный CLI analyzer и ручной visual audit завершены. Зафиксированы geometry-specific limitations для D2/radius=1 и D4/radius=30. |
-| INT-006F / FILL-001 | IN_PROGRESS | Frozen masks, fixed-radius planner, matrix/analyzer, capture adapter, runtime binding и отдельная вкладка FILL-001 реализованы. Исправлено смешение logical 460×240 и физического client ROI: capture и pixel audit работают с фактическим calibrated ROI. Regression tests добавлены, CI [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985) SUCCESS на `031913c`; Windows live preflight остаётся незавершённым. Остаётся Windows live preflight с реальными Bridge/executor artifacts и PNG; 45 captures заблокированы до его успешного завершения. Исторический аудит до UI-интеграции: [аудит](CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md).
+| INT-006F / FILL-001 | IN_PROGRESS | Software fixes в commits 2b7577c/3b67aea; CI 41728163369 partial (Monitor/Bridge + Executor SUCCESS; Preparation/G3 + Application integration running). Live run: 131/131 strokes, after PNG present, capture unaccepted. Bridge run file 27.9 MB needs full artifact audit; CHALK quota on the board exhausted. 45-cell matrix BLOCKED. |
 | INT-007 | BLOCKED | Интеграция валидированной модели в preflight/resource estimator запрещена до закрытия INT-006 и определения safety margin. |
 | INT-008 | TODO | Оптимизация траекторий, кистей, порядка и покрытия в пределах CHALK после INT-007. |
 | INT-009 | TODO | Независимая проверка прогноза на полных рисунках, визуального качества и фактической экономии. |
 
 ## Ближайший рабочий приоритет
 
-1. Провести Windows live preflight одной выбранной задачи из отдельной вкладки FILL-001; проверить task ↔ DrawingPlan ↔ executor report ↔ Bridge session/run и фактический P1.
-2. На том же preflight проверить реальные before/after PNG в фактическом calibrated client ROI: RGB threshold=8, положение курсора, исключение UI/paint meter, logical→screen mask alignment, coverage ≥99% и leakage=0.
-3. Только после успешного preflight запустить 45 live captures (3 формы × 5 радиусов × 3 повтора) и сохранить первичные evidence.
-4. Проанализировать exact CHALK, покрытие, leakage, число точек/штрихов и время по каждой форме/радиусу; не считать экономией неполное покрытие.
-5. INT-006 safety margin не установлен; INT-007 остаётся BLOCKED. Production estimator/defaults не менять.
+1. Дождаться полного CI 41728163369, включая Preparation/G3, Application integration, INT-006 pixel audit и Windows portable build/startup smoke-test.
+2. Проверить attempt, executor report, Bridge session и большой Bridge run file целиком; подтвердить exact run binding и per-stroke CHALK, сохранив raw evidence неизменным.
+3. Провести визуальный audit before/after PNG, frozen mask, calibrated ROI, coverage и leakage. До этого capture не принимать.
+4. Для нового preflight потребуется восстановленная/свежая доска с доступной CHALK quota; текущая доска исчерпана.
+5. Только после успешного software gate и принятого preflight запускать 45-cell matrix. Production estimator/defaults не менять.
 
 ## Разрешения и границы
 
