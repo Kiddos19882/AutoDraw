@@ -2,7 +2,7 @@
 
 ## Актуальное состояние FILL-001 на 2026-11-04
 
-Полный CI [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881) прошёл на code HEAD `fe6d446`: все обязательные jobs, INT-006 pixel audit и Windows portable build/startup smoke-test SUCCESS; Preparation/G3 — 782 passed, 24 warnings, 82 subtests. Пользовательский preflight завершил 131/131 strokes; session exact CHALK=5999 (pointCount 1→6000), но capture не принят. Attempt JSON повреждён буквальным `\\n`, after PNG физически существует, но attempt не содержит его path. Второй Bridge run file — 27.9 MB и недоступен для полного чтения через GitHub file API. Обнаружен следующий binder blocker: время финализации калибровочного run создаёт ложное overlap с executor, хотя его последнее событие произошло до executor start. См. [postmortem](CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md). 45-cell matrix BLOCKED; текущая доска исчерпала CHALK quota.
+Binder fix committed [95a8d17](https://github.com/Kiddos19882/AutoDraw/commit/95a8d1799cd2cbbba09929cc5086a3655ba90c78): activity window определяется последним event t относительно started_at_performance_ms; finished_at_utc ограничен idle finalization grace. Regression tests [870bebc](https://github.com/Kiddos19882/AutoDraw/commit/870bebce6b39e782f70ef9f476a324ee840c05ae) покрывают calibration false-overlap и JSON более 27 MiB. CI на этих commits пока не подтверждён. Предыдущий preflight остаётся rejected, session CHALK=5999 и доска исчерпана; 45-cell matrix BLOCKED до CI и нового принятого live preflight. См. [postmortem](CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md).
 
 Реестр содержит документационные и технические задачи проекта. Аналитические этапы 7–10 отменены и в backlog не включаются; INT-001 и последующие задачи ресурсной оптимизации являются отдельной инициативой.
 
@@ -15,7 +15,7 @@
 |---|---|---|
 | 1. Regression gate: tests, полный CI, Windows build | DONE | CI [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881), code HEAD `fe6d446`; Preparation/G3 782 passed, 24 warnings, 82 subtests; все обязательные jobs, INT-006 pixel audit и Windows portable build/startup smoke-test SUCCESS; optional benchmarks skipped |
 | 2. Runtime binding: Bridge, executor journal, P1 | DONE | Binder, Stage 6 completion hook и связь с FILL-001 experiment context покрыты regression CI; live binding будет подтверждён на шаге 3 |
-| 3. UI/runner handoff и Windows preflight | IN_PROGRESS | JSON persistence/hash fixes и tests прошли CI `41730717881` (полный SUCCESS на `fe6d446`). Live run 131/131 strokes; session CHALK=5999; capture rejected. Binder использует `finished_at_utc` и ошибочно считает калибровочный run overlapping, хотя последнее событие было до executor start. Следующий шаг — исправить activity-window matching, добавить regression test и провести новый preflight на восстановленной доске |
+| 3. UI/runner handoff и Windows preflight | IN_PROGRESS | Binder исправлен в `95a8d17`; regression tests calibration false-overlap и large JSON >27 MiB добавлены в `870bebc`. Ожидается CI на новом HEAD; затем один preflight на восстановленной доске |
 | 4. 45 live captures | BLOCKED | 45 уникальных принятых ячеек либо документированные отклонения |
 | 5. CHALK/quality analysis и рекомендация | BLOCKED | Подготовлен отчёт о влиянии радиуса и лучшей стратегии заливки |
 
@@ -39,7 +39,8 @@
 - [x] Исправить FILL-001 runtime handoff: после добавления `autodraw_experiment` в runtime DrawingPlan записывался буквальный `\n`, что делало JSON невалидным; запись исправлена в `integrated_app.py` (commit `8dfd1b5`).
 - [x] Добавить интеграционный regression test, который передаёт реальный FILL-001 plan в Stage 6 и проверяет JSON/context (commit `1b2d8a1`); последующие JSON persistence/hash regression tests подтверждены полным CI `41730717881`.
 - [x] Добавить synthetic regression coverage для client ROI 581×304, uniform-scale rejection, ROI metadata mismatch и leakage после rasterization; полный CI `41730717881` — SUCCESS.
-- [ ] Исправить runtime binder: определять Bridge run overlap по времени активности событий, а не по позднему `finished_at_utc`; покрыть калибровочный run с idle finalization grace regression test.
+- [x] Исправить runtime binder: определять Bridge run overlap по последнему событию и performance clock, а не по позднему `finished_at_utc` (commit `95a8d17`).
+- [x] Добавить regression tests на calibration false-overlap и полный разбор/hash Bridge JSON размером более 27 MiB (commit `870bebc`); фактический запуск тестов ожидает CI.
 - [ ] Провести один новый Windows FILL-001 runtime preflight на восстановленной доске и подтвердить task ↔ executor report ↔ Bridge session/run binding.
 - [ ] Проверить реальные before/after PNG crop, RGB threshold, cursor/UI exclusion и frozen mask alignment.
 - [ ] Только после preflight разрешить 45 live captures.
