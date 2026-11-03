@@ -1,20 +1,44 @@
 # Roadmap AutoDraw
 
-## Актуальный статус INT-006 — 2026-11-03
+## Актуальный статус CHALK — 2026-11-03
 
-- [x] Harness D1–D5, 45-cell journal, 15 frozen prediction records, prediction ID handoff и independent analyzer реализованы.
-- [x] Live block D1–D5 выполнен: 45/45 tasks completed, radius=10; все 45 Monitor reports прошли повторный аудит exact CHALK и per-stroke integrity.
-- [x] Официальный analyzer run [41532629748](https://github.com/Kiddos19882/AutoDraw/actions/runs/41532629748) завершился SUCCESS: 45 accepted, 0 missing, 0 rejected, 15/15 groups complete, 3 repeats per group, 243 stroke rows.
-- [x] Frozen artifact SHA-256 и полный journal/task/experiment/run/profile/normalized-geometry binding проверены штатным analyzer.
-- [x] Полный CI: Preparation/G3 669 passed + 82 subtests; Application integration, Executor regression, Game Monitor/bridge, Windows portable build/startup smoke-test, PNG audit и CHALK analyzer — success; optional benchmarks skipped.
-- [x] Analyzer runtime geometry serialization mismatch исправлен в `8eba34f`; runtime-shaped regression fixture добавлен в `dd64730`.
-- [x] Официальные run-level и per-stroke metrics записаны в [официальный отчёт](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md).
-- [ ] Отдельно принять решение о safety margin и расширить domain validation на полные рисунки, кривые, заливки, повторное покрытие и другие радиусы.
-- [ ] INT-007 начинать только после решения о safety margin и расширенной проверки. Production estimator/defaults не менять до этого.
+### INT-006
 
-**Итог quantitative gate:** PASS. **INT-006 остаётся IN_PROGRESS** только из-за неустановленного safety margin и ограниченной области применимости (пять DrawingPlan, три повтора на cell, radius=10). P1 (step=4, delay=5 ms) — лучший совокупный исследовательский профиль: MAE 0.657, RMSE 0.838, MAPE 1.178%, max underprediction 0.92 CHALK. P1/1 CHALK — лишь provisional empirical guard для этой выборки, не статистическая гарантия и не production rule.
+- [x] Независимая validation D1–D5: 45/45 accepted, 0 missing/rejected, 15/15 groups complete; официальный analyzer и CI [41532629748](https://github.com/Kiddos19882/AutoDraw/actions/runs/41532629748) — SUCCESS.
+- [x] P1 (step=4/delay=5) определён как исследовательский кандидат; наблюдённая недооценка 0.92 CHALK на этой выборке не является статистической гарантией.
+- [ ] Расширить validation на полные рисунки, кривые, заливки, повторное покрытие и другие радиусы.
+- [ ] Установить safety margin на основе расширенной ошибки; до этого INT-007 BLOCKED.
 
-Следующая исследовательская задача: [перекрёстная validation радиуса и геометрии](CHALK_RADIUS_GEOMETRY_CROSS_VALIDATION_PLAN_2026-11-03.md) — отдельная phase/harness, CI gate и только затем live matrix 1/10/30 на D1–D5.
+### INT006R — radius × geometry
+
+- [x] Software gate и Windows portable build/startup smoke-test прошли на code HEAD `28b56a9`, CI [41540054975](https://github.com/Kiddos19882/AutoDraw/actions/runs/41540054975).
+- [x] Live block D1–D5 × radius 1/10/30 × 3 повтора при P1 завершён: 45/45 задач.
+- [x] Raw-data audit всех 45 Monitor reports: exact CHALK, sampled/per-stroke delta совпадают, observed radius соответствует запросу, dropped events/errors/Bridge failures/sequence gaps — 0.
+- [ ] Запустить официальный CLI analyzer на реальном committed journal/capture bundle.
+- [ ] Завершить ручной visual audit всех 45 пар PNG.
+- Результаты: [INT006R live report](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md).
+
+| Геометрия | Radius 1 | Radius 10 | Radius 30 |
+|---|---:|---:|---:|
+| D1 — mixed lines | 62.67 | 62.33 | 63.33 |
+| D2 — polygon | 71.67 | 71.00 | 71.00 |
+| D3 — intersections | 100.00 | 100.67 | 99.67 |
+| D4 — short details | 14.33 | 14.67 | 15.33 |
+| D5 — repeated coverage | 88.33 | 89.67 | 89.67 |
+| **Среднее по 15 опытам** | **67.40** | **67.67** | **67.80** |
+
+Наблюдаемая разница суммарного CHALK между крайними радиусами — 6 единиц (около 0.6%). Это не доказывает отсутствие влияния радиуса на эффективность заливки: область заполнения одинаковой площади в INT006R не сравнивалась.
+
+### Следующий эксперимент — FILL-001
+
+- [x] Зафиксировать экспериментальный дизайн: три формы одноцветной области × радиусы 1/5/10/20/30 × три повтора = 45 captures.
+- [ ] Проверить фактический footprint кистей и соответствие radius параметрам геометрического planner.
+- [ ] Реализовать отдельный matrix/block harness, analyzer и regression tests.
+- [ ] Получить полный CI PASS и Windows preflight.
+- [ ] Выполнить 45 live captures, exact CHALK audit и визуальную оценку покрытия.
+- План: [FILL-001 — area fill radius efficiency](CHALK_FILL_AREA_RADIUS_EFFICIENCY_PLAN_2026-11-03.md).
+
+**INT-007 остаётся BLOCKED.** Не менять production estimator, frozen INT-006 model, executor defaults или sampling defaults до закрытия расширенной validation и решения о safety margin.
 
 ## Статус аналитических планов
 
