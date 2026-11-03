@@ -1,7 +1,7 @@
 # FILL-001 — проверка эффективности заполнения областей разными радиусами
 
 **Дата:** 2026-11-03  
-**Статус:** PLAN READY; harness и live execution ещё не выполнены  
+**Статус:** DESIGN REVIEW COMPLETE; frozen masks, harness и live execution ещё не выполнены  
 **Связь:** продолжение INT-006 после INT006R; не открывает INT-007 автоматически  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
 **Приоритет:** высокий — проверка гипотезы об экономии CHALK при заполнении больших одноцветных областей
@@ -145,3 +145,17 @@ Capture принимается только если:
 - Не считать длину пути или число штрихов заменой exact CHALK.
 - Не переносить результаты на контуры, смешанные радиусы или полные рисунки без проверки.
 - INT-007 остаётся BLOCKED до расширенной validation и решения о safety margin.
+
+
+## 10. Результат технического аудита перед harness
+
+Проверены текущие реализации `interior_fill_planner.py`, `outline_first_fill_planner.py`, `brush_footprint_geometry.py` и их regression tests.
+
+- `interior_fill_planner.py` комбинирует несколько ширин кисти, добавляет fallback brush=1 и ограничивает max brush значением 20. Его нельзя напрямую использовать для FILL-001, где каждый capture должен сравнивать один фиксированный радиус.
+- `outline_first_fill_planner.py` использует brush=1 для границы и другие размеры для внутренней заливки; это также смешанная стратегия.
+- Оба planner помечают strokes как неготовые к автоматическому исполнению.
+- Ручной аудит INT006R подтвердил геометрические риски: radius 1 — разрыв соединения D2 polygon; radius 30 — слияние коротких деталей D4.
+
+Принято решение реализовать изолированный модуль `source/preparation/chalk_fill_experiment.py` с frozen target masks, fixed-radius DrawingPlan generator и raster simulator с округлыми caps. Подробный контракт, matrix/journal integration и порядок реализации: [CHALK_FILL001_HARNESS_DESIGN_2026-11-03.md](CHALK_FILL001_HARNESS_DESIGN_2026-11-03.md).
+
+**Следующий шаг:** подготовить три frozen target masks и проверить, что их площади сопоставимы, а каждый радиус либо проходит заранее заданный quality gate (coverage ≥99%, leakage=0), либо помечается unsupported до live запуска. Production planner и executor defaults не менять.
