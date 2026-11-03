@@ -2,17 +2,7 @@
 
 ## Актуальное состояние на 2026-11-04
 
-- Рабочая ветка: feature/image-geometry-optimization. Кодовый HEAD: 3b67aea0145170ec23df089916bedf7828de9a68. master: 9a3453aeb847b66041bc83d6f4a56ecaf33a993a; не изменялся.
-- FILL-001 user preflight завершил Stage 6 штатно: 131/131 strokes. After PNG физически существует, но capture не принят.
-- Исправлены четыре ошибочных JSON suffixes в chalk_fill_ui.py и нормализация DrawingPlan hash в chalk_fill_runtime_binding.py. Code commits: 2b7577c3a3289871b7fff300fd6013f12c7cb54e и 3b67aea0145170ec23df089916bedf7828de9a68.
-- Добавлены regression tests на executor completion/after PNG/capture persistence и normalized plan hash.
-- CI 41728163369: Game Monitor/Bridge и Executor regression — SUCCESS; Preparation/G3 и Application integration — IN_PROGRESS; Windows portable build ждёт обязательные jobs. Optional benchmarks SKIPPED.
-- Bridge run file в commit d0acb0f имеет размер 27,934,553 bytes. Ранее пустой ответ API был ограничением извлечения большого файла, а не доказательством нулевого размера.
-- Игровой pointCount изменился с 1 до 6000; квота CHALK на использованной доске исчерпана. Повторный live run на этой доске не выполнять. Capture и 45-cell matrix остаются BLOCKED до проверки runtime evidence, PNG и успешного нового preflight на восстановленной доске.
-
-## Актуальное состояние на 2026-11-04
-
-- Рабочая ветка: `feature/image-geometry-optimization`. Проверенный code HEAD: `fe6d4469a5294fdf8284978d4e2b5c47582fa2d4`. Последние 20 коммитов проверены. `master` = `9a3453aeb847b66041bc83d6f4a56ecaf33a993a`, не изменялся; compare feature/master: ahead 2688 / behind 5, merge base `d4a07702e45c01648f343bc6440a3287c45d3f9c`; merge/rebase не выполнялись. Локальный `git status` через GitHub API недоступен.
+- Рабочая ветка: `feature/image-geometry-optimization`. Текущий branch HEAD (документационный commit): `d82b3e15bad945d5c087d1a7a833c3a5bf9de515`; проверенный code HEAD: `fe6d4469a5294fdf8284978d4e2b5c47582fa2d4`. Последние 20 коммитов проверены. `master` = `9a3453aeb847b66041bc83d6f4a56ecaf33a993a`, не изменялся; compare feature/master: ahead 2689 / behind 5, merge base `d4a07702e45c01648f343bc6440a3287c45d3f9c`; merge/rebase не выполнялись. Локальный `git status` через GitHub API недоступен.
 - Полный CI [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881) — SUCCESS на code HEAD `fe6d446`: Executor, Game Monitor/Bridge, Application integration, Preparation/G3 (782 passed, 24 warnings, 82 subtests), INT-006 pixel audit и Windows portable build/startup smoke-test — SUCCESS; optional benchmarks SKIPPED.
 - FILL-001 task `fill001-20261104-001636-rectangle-r10-rep1`: Stage 6 завершил 131/131 strokes, 225.61 s, 12 857 move calls, P1 step=4/delay=5, line extension=0, executor error отсутствует.
 - Game Monitor session exact `pointCount=1 → 6000`, session CHALK delta=5999; dropped events/errors/sequence gaps/send failures=0. Доска исчерпала квоту 6000.

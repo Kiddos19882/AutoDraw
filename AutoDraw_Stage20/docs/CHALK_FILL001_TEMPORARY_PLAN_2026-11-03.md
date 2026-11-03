@@ -33,7 +33,7 @@
 - Фактические `ExecutorConfig.point_step_px=4`, `point_delay_ms=5` и `line_extension_px=0` сверяются с frozen P1.
 - Stage 6 выполняет post-execution binding после успешного завершения FILL-001 task и записывает результат в execution report.
 - UI handoff передаёт experiment context в DrawingPlan; runtime binder связывает executor report с Bridge session/run и фиксирует SHA-256 исходных runtime artifacts.
-- Regression gate подтверждён CI [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985) на code/test HEAD `031913c`.
+- Regression gate подтверждён полным CI [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881) на code HEAD `fe6d446`; все обязательные jobs и Windows portable build/startup smoke-test SUCCESS.
 
 **Критерий завершения:** программная интеграция и fail-closed regression tests подтверждены CI. Реальное live подтверждение на Windows относится к шагу 3.
 
@@ -59,14 +59,14 @@
 - Capture adapter растеризует frozen logical mask в размер PNG ROI методом nearest-neighbor и сохраняет logical→screen transform; пропорции ROI проверяются по uniform-scale tolerance 1%.
 - Before/after должны иметь одинаковые фактические ROI; курсор и UI/paint meter исключаются из crop по существующей процедуре.
 
-**Оставшийся Windows live preflight:**
-- Сначала получить SUCCESS CI для исправления runtime JSON и нового FILL-001 integration regression test.
-- Затем повторно запустить из AutoDraw одну задачу (первая предпочтительная ячейка — rectangle/radius 10/repeat 1) на реальной игровой сессии.
-- Подтвердить task ↔ DrawingPlan ↔ executor report ↔ Bridge session/run identity и фактический P1 в execution report.
-- Проверить реальные before/after PNG в реальном client ROI, RGB threshold 8, cursor/UI exclusion, frozen mask alignment, coverage ≥99% и leakage=0.
-- Проверить fail-closed поведение на mismatch run/task/plan, неверном P1, Bridge errors и отсутствующих/изменённых PNG.
-
-**Критерий завершения:** один реальный запуск из FILL-001 UI однозначно связан с executor report и Bridge session/run; реальные PNG проходят quality/evidence gates на Windows с фактическим ROI клиента и сохранённым logical→screen transform. До этого 45-cell live matrix не запускать.
+**Следующий Windows live preflight после binder fix:**
+- Исправить runtime binder: activity window Bridge run определяется по времени событий, а не по позднему `finished_at_utc`; добавить regression на calibration run, чьи события закончились до executor start, но файл finalized после него.
+- Повторно пройти полный CI и Windows portable build/startup smoke-test на исправленном code HEAD.
+- Использовать восстановленную/новую доску с полной доступной квотой CHALK; текущая доска исчерпана.
+- Запустить ровно одну задачу `rectangle / radius 10 / repeat 1` из вкладки FILL-001.
+- Подтвердить task ↔ DrawingPlan ↔ executor report ↔ Bridge session/run identity, фактический P1, exact run/per-stroke CHALK и отсутствие non-consuming candidates в выбранном task run.
+- Проверить реальные before/after PNG в calibrated client ROI, RGB threshold 8, cursor/UI exclusion, frozen mask alignment, coverage ≥99% и leakage=0.
+- Не запускать 45-cell matrix до принятия preflight.
 
 
 **Актуальное уточнение 2026-11-04:**
@@ -115,14 +115,14 @@
 
 | Шаг | Статус | Подтверждение |
 |---|---|---|
-| 1 | DONE | CI [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985), code/test HEAD `031913c`; Preparation/G3 778 passed, 24 warnings, 82 subtests; все обязательные jobs и Windows portable build/startup smoke-test SUCCESS; optional benchmarks skipped |
-| 2 | DONE (software) | Runtime binder, Stage 6 completion hook, UI experiment context и regression CI [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985), code/test HEAD `031913c`; live proof переносится в шаг 3 |
-| 3 | IN_PROGRESS | Commits `2b7577c`/`3b67aea` исправляют JSON persistence и normalized plan hash; CI `41728163369` partial (Monitor/Bridge + Executor SUCCESS; Preparation/G3 + Application integration running; Windows build pending). Live run 131/131 strokes, after PNG present, capture unaccepted; доска исчерпала CHALK quota. Нужны artifact/PNG audit и preflight на восстановленной доске. |
+| 1 | DONE | CI [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881), code HEAD `fe6d446`; Preparation/G3 782 passed, 24 warnings, 82 subtests; все обязательные jobs, INT-006 audit и Windows portable build/startup smoke-test SUCCESS; optional benchmarks skipped |
+| 2 | DONE (software) | Runtime binder, Stage 6 completion hook, UI experiment context и regression coverage прошли CI `41730717881` на `fe6d446`; live proof остаётся частью шага 3 |
+| 3 | IN_PROGRESS | Commits `2b7577c`/`3b67aea` исправляют JSON persistence и normalized plan hash; tests `fe6d446`; полный CI `41730717881` SUCCESS. Live run 131/131 strokes, session CHALK=5999, capture rejected. Binder false-overlap из-за idle finalization выявлен; нужен fix + regression, затем preflight на восстановленной доске. |
 | 4 | BLOCKED | Ожидает шаги 1–3 |
 | 5 | BLOCKED | Ожидает 45 принятых captures |
 
 
-## Актуальное уточнение статуса после CI run 41692129486 — 2026-11-03
+## Историческая запись статуса после CI run 41692129486 — 2026-11-03 (superseded обновлением 2026-11-04)
 
 Предыдущая запись о том, что Windows portable build ещё выполняется, устарела и заменяется этим уточнением.
 

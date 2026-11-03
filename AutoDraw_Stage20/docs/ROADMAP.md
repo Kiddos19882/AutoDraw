@@ -29,9 +29,10 @@
 - [x] Fail-closed runtime binding к Bridge session/run и executor report.
 - [x] Отдельная вкладка FILL-001: manifest create/load, single-task selection, planner validation, operator approval, brush-size handoff, Stage 6 start с P1 override и capture finalization.
 - [x] Исправить runtime JSON serialization после добавления `autodraw_experiment`: runtime-файл больше не получает буквальный `\n` после JSON object (commit `8dfd1b5`).
-- [x] Добавить integration regression test реального FILL-001 plan → Stage 6 load с проверкой experiment context (commit `1b2d8a1`); новый CI ещё не подтверждён.
-- [x] Regression gate и client-ROI correction закрыты software CI: [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985) SUCCESS на `031913c`.
-- [ ] Провести Windows live runtime preflight и подтвердить P1 из фактического executor report.
+- [x] Добавить integration regression test реального FILL-001 plan → Stage 6 load с проверкой experiment context (commit `1b2d8a1`); JSON persistence/hash regression coverage подтверждены полным CI `41730717881`.
+- [x] Полный regression gate FILL-001 закрыт CI [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881) SUCCESS на `fe6d446`, включая Preparation/G3, Application integration, Game Monitor/Bridge, Executor, INT-006 audit и Windows build.
+- [ ] Исправить binder false-overlap: выбирать Bridge run по event activity window, а не по `finished_at_utc`; добавить regression test на idle finalization grace.
+- [ ] Провести новый Windows live runtime preflight на восстановленной доске и подтвердить P1 из фактического executor report.
 - [x] Исправить физическое требование crop 460×240: UI снимает фактический calibrated client ROI, adapter преобразует frozen logical mask в размер PNG и сохраняет transform.
 - [ ] Проверить реальные board PNG в client ROI: RGB threshold=8, cursor/UI exclusion и coverage/leakage против frozen masks.
 - [ ] Только после preflight — 45 live captures и анализ расхода CHALK по shape/radius.
