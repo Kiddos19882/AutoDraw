@@ -27,7 +27,7 @@ CAPTURE_FIELDS = (
     "requested_radius", "observed_radius", "pre_point_count", "post_point_count",
     "exact_chalk", "coverage_fraction", "leakage_pixels", "completed_strokes",
     "expected_strokes", "dropped_events", "monitor_errors", "bridge_failures",
-    "sequence_gaps",
+    "sequence_gaps", "stroke_chalk_deltas", "before_png", "after_png", "png_audit_status",
 )
 
 
