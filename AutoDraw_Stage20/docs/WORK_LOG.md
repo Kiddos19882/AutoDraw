@@ -2315,3 +2315,11 @@ Brush Test acceptance и матричные валидаторы больше н
 - Добавлены negative tests на несовпадение суммы DRAW_SAMPLE и exact per-stroke CHALK, неверную привязку bridge report к run_id и leakage за пределами frozen mask.
 - Adapter дополнительно проверяет frozen target mask SHA-256 и закреплён за Game Monitor 0.2.1.
 - Текущий HEAD на момент этой записи: `a3b00cd01363d14c25c4ff3f73b74cda77bd059f`. Pytest/CI не запускались или не подтверждены; live execution остаётся BLOCKED.
+
+
+## 2026-11-03 — справочник Game Monitor и Bridge
+
+- Проверены актуальные исходники `game_monitor.js` (Monitor 0.2.1), `game_monitor_bridge.js`, `game_monitor_bridge_server.py`, профильный README, docs index и module reference в `feature/image-geometry-optimization`.
+- Создан `docs/GAME_MONITOR_BRIDGE_REFERENCE.md`: публичные методы Monitor и Bridge, оборачиваемые методы BoardPane, события, snapshot CHALK, WebSocket протокол, функции collector/методы RunRecorder, session/run JSON schema, запуск, интеграция и ограничения.
+- В `docs/README.md` добавлена ссылка в раздел справочников; `docs/MODULE_REFERENCE.md` дополнен фактическим составом компонентов.
+- Изменялись только Markdown-файлы. Исходники, тесты, конфигурации, workflow и экспериментальные данные не менялись; live-тесты не запускались.
