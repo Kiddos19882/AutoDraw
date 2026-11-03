@@ -1,7 +1,7 @@
 # План перекрёстной validation радиуса кисти и геометрии CHALK
 
 **Дата:** 2026-11-03  
-**Статус:** LIVE CAPTURES 45/45 COMPLETED; raw-data audit PASS; ручной visual audit и реальный CLI analyzer pending  
+**Статус:** LIVE CAPTURES 45/45 COMPLETED; raw-data audit PASS; real-data analyzer PASS; ручной visual audit pending  
 **Связь:** продолжение INT-006; не открывает INT-007 автоматически  
 **Рабочая ветка:** `feature/image-geometry-optimization`
 
@@ -144,5 +144,7 @@ Software gate закрыт. Live execution остаётся отдельным �
 
 **Вывод ограничен** D1–D5 и P1: обнаруженного преимущества большого радиуса по exact CHALK нет. Это не тест заполнения областей одинаковой площади. Для него создан отдельный [FILL-001 plan](CHALK_FILL_AREA_RADIUS_EFFICIENCY_PLAN_2026-11-03.md).
 
-**Оставшиеся gates:** выполнить `chalk_int006r_validation.py` на реальном journal/capture bundle, проверить все before/after PNG и завершить ручной visual audit. До этого INT006R не закрывать полностью. INT-007 остаётся BLOCKED; production estimator/defaults не менять.
+**Закрытый gate:** `chalk_int006r_validation.py` выполнен на реальном journal/capture bundle в [CI 41559932955](https://github.com/Kiddos19882/AutoDraw/actions/runs/41559932955): `status=complete`, 45 accepted, 0 missing, 0 rejected, `png_evidence_status=complete`. Исправление отчётного поля `other_executor_parameters` перепроверяется в CI 41560787871.
+
+**Оставшийся gate:** проверить все before/after PNG и завершить ручной visual audit. До этого INT006R не закрывать полностью. INT-007 остаётся BLOCKED; production estimator/defaults не менять.
 
