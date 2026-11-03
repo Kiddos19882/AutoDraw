@@ -9,7 +9,7 @@
 
 | Шаг | Статус | Критерий |
 |---|---|---|
-| 1. Regression gate: tests, полный CI, Windows build | TODO | Все обязательные jobs успешны на одном HEAD |
+| 1. Regression gate: tests, полный CI, Windows build | DONE | CI [41579136690](https://github.com/Kiddos19882/AutoDraw/actions/runs/41579136690), code HEAD `b4cc45a`; Preparation/G3 754 passed + 82 subtests; Windows smoke-test success |
 | 2. Runtime binding: Bridge, executor journal, P1 | TODO | Capture однозначно связан с фактическим run/task |
 | 3. PNG evidence и Windows preflight | TODO | Повторная проверка PNG и реальные crop/quality gates пройдены |
 | 4. 45 live captures | BLOCKED | 45 уникальных принятых ячеек либо документированные отклонения |
@@ -27,12 +27,12 @@
 - [x] Закрепить P1 (step=4, delay=5 ms) в frozen matrix metadata.
 - [x] Добавить PNG file/hash/pixel audit для logical crop 460×240.
 - [x] Добавить synthetic regression fixtures для event stream и PNG.
-- [ ] Запустить Preparation/G3 pytest suite и получить полный CI + Windows portable build PASS.
+- [x] Preparation/G3 suite: 754 passed, 24 warnings, 82 subtests passed; полный CI [41579136690](https://github.com/Kiddos19882/AutoDraw/actions/runs/41579136690) и Windows portable build/startup smoke-test прошли на code HEAD `b4cc45a80231e6bad2f878b2a5a2f16b48b9d68b`.
 - [ ] Проверить фактический bridge diagnostics schema и связать adapter с runner/journal call site.
 - [ ] Проверить реальные before/after PNG crop, RGB threshold и cursor/UI exclusion на Windows preflight.
 - [ ] Только после всех gates разрешить 45 live captures.
 
-**Ограничения:** Monitor export не содержит runId/sequence counter; run ID и bridge report передаются извне. P1 metadata пока не подтверждается самим Monitor. Synthetic fixtures не являются live evidence. Production estimator/defaults и frozen INT-006 model не менять.
+**Ограничения:** software regression gate закрыт. Monitor export не содержит runId/sequence counter; run ID и bridge report передаются извне. P1 metadata пока не подтверждается самим Monitor. Synthetic fixtures не являются live evidence. Production estimator/defaults и frozen INT-006 model не менять.
 
 ## Статусы
 
