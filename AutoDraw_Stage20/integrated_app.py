@@ -843,7 +843,11 @@ class AutoDrawUnifiedApp:
                 raise ValueError("Runtime DrawingPlan не связан с выбранной FILL-001 task.")
             if requested_brush != task.get("requested_radius"):
                 raise ValueError("Подтверждённый Game Monitor радиус не совпадает с task.")
-            if document.get("canvas", {}).get("width") != self.executor.execution_plan.width:
+            runtime_canvas = document.get("canvas", {})
+            if (
+                runtime_canvas.get("width") != self.executor.execution_plan.width
+                or runtime_canvas.get("height") != self.executor.execution_plan.height
+            ):
                 raise ValueError("Canvas runtime plan не совпадает с загруженным DrawingPlan.")
             if self.executor.execution_plan.stroke_count != task.get("expected_strokes"):
                 raise ValueError("Число штрихов runtime plan не совпадает с frozen task.")
