@@ -29,6 +29,8 @@
 - [INT-006 — отдельные live follow-up серии V2/V5](CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md) — координаты новых сценариев, 9 captures на серию, критерии приёмки и инструкция ручного live-прогона.
 - [INT-006 — результаты live-матрицы V1–V5](CHALK_INT006_V1_V5_RESULTS_2026-11-02.md) — 45/45 captures, exact/per-stroke CHALK, сравнение sampling profiles, первичная holdout-проверка модели и открытые quality gates.
 - [INT-006 — результаты follow-up V1–V5](CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md) — 45/45 новых captures после исправления геометрии/сценариев, raw repeat CHALK, сравнение P0/P1/P2 и следующие pixel-level/validation gates.
+- [INT006R — live results](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md) — 45 captures D1–D5 × radius 1/10/30, exact CHALK и raw-data integrity audit; ручной visual gate остаётся pending.
+- [FILL-001 — план эффективности заливки](CHALK_FILL_AREA_RADIUS_EFFICIENCY_PLAN_2026-11-03.md) — 45 captures для трёх форм областей и пяти радиусов, критерии качества покрытия и CHALK/area metric.
 - [Исторический снимок PROJECT_STATUS](PROJECT_STATUS_HISTORY_2026-11-02.md) — полный статус до консолидации 2 ноября; только для аудита, не текущий backlog.
 
 ## Данные и очистка
