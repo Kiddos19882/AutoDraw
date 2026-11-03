@@ -97,6 +97,10 @@ def test_matrix_rejects_signature_tampering_and_unsupported_cell(matrix):
     altered["tasks"][0]["quality_gate_passed"] = False
     with pytest.raises(FillMatrixError):
         validate_fill001_matrix(altered)
+    altered = copy.deepcopy(matrix)
+    altered["tasks"][0]["sampling_profile"]["delay_ms"] = 10
+    with pytest.raises(FillMatrixError):
+        validate_fill001_matrix(altered)
 
 
 def test_manifest_round_trip_is_atomic_and_validated(matrix, tmp_path):
