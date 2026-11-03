@@ -2,7 +2,7 @@
 - По данным пользовательского запуска в commit [6b1cba9](https://github.com/Kiddos19882/AutoDraw/commit/6b1cba9b1c40a030ac6bd7b29365bf19ac3c9149) обнаружено, что `integrated_app.py::_transfer_brush_test_plan()` добавлял к runtime DrawingPlan буквальную последовательность `\n` после JSON object. Stage 6 отклонял невалидный JSON, поэтому FILL-001 callback возвращал отказ.
 - Исправлена сериализация runtime JSON и форматирование сообщения исключения: commit [8dfd1b5](https://github.com/Kiddos19882/AutoDraw/commit/8dfd1b541f54a1b416dfb2907739cf4b1a99c58d).
 - Добавлен интеграционный regression test FILL-001 plan → Stage 6 load с проверкой `autodraw_experiment`: commit [1b2d8a1](https://github.com/Kiddos19882/AutoDraw/commit/1b2d8a128c99ab8ad1abb1e9f480702676cd9f56).
-- CI нового code/test HEAD и повторный Windows live preflight ещё не подтверждены; 45-cell captures остаются заблокированы.
+- GitHub Actions [41692129486](https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486): Application integration, Game Monitor/Bridge, Preparation/G3, Executor и INT-006 pixel audit — SUCCESS; Windows portable build/startup smoke-test ещё выполняется. Повторный Windows live preflight не выполнялся; 45-cell captures остаются заблокированы.
 
 ## 2026-11-03 — FILL-001 client ROI correction CI
 
