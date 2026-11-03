@@ -26,6 +26,7 @@ _CONTEXT_FIELDS = (
     "shape_id",
     "requested_radius",
     "repeat_index",
+    "expected_strokes",
     "plan_signature",
     "target_mask_sha256",
     "sampling_profile",
@@ -81,10 +82,12 @@ def build_fill001_experiment_context(task: dict[str, Any]) -> dict[str, Any]:
     for field in ("series_id", "task_id", "shape_id"):
         if not isinstance(task[field], str) or not task[field].strip():
             raise FillMatrixError(f"{field} должен быть непустой строкой.")
-    if task["requested_radius"] not in {1, 5, 10, 20, 30}:
+    if type(task["requested_radius"]) is not int or task["requested_radius"] not in {1, 5, 10, 20, 30}:
         raise FillMatrixError("Недопустимый requested_radius в FILL-001 context.")
-    if task["repeat_index"] not in {1, 2, 3}:
+    if type(task["repeat_index"]) is not int or task["repeat_index"] not in {1, 2, 3}:
         raise FillMatrixError("repeat_index должен быть 1, 2 или 3.")
+    if type(task["expected_strokes"]) is not int or task["expected_strokes"] < 1:
+        raise FillMatrixError("expected_strokes должен быть положительным целым числом.")
     for field in ("plan_signature", "target_mask_sha256"):
         value = task[field]
         if not isinstance(value, str) or len(value) != 64 or any(c not in "0123456789abcdef" for c in value):
@@ -213,7 +216,8 @@ def _validate_session(session: dict[str, Any], run: dict[str, Any]) -> str:
     received_events = _nonnegative_int(diagnostics.get("received_event_count"), "session.received_event_count")
     sequence_gaps = _nonnegative_int(diagnostics.get("collector_sequence_gap_count"), "session.collector_sequence_gap_count")
     run_event_count = _nonnegative_int(run.get("event_count"), "bridge_run.event_count")
-    _nonnegative_int(diagnostics.get("last_sequence"), "session.last_sequence")
+    if _nonnegative_int(diagnostics.get("last_sequence"), "session.last_sequence") < 1:
+        raise FillMatrixError("Bridge session last_sequence должен быть не меньше 1.")
     browser_bridge = diagnostics.get("browser_bridge")
     if not isinstance(browser_bridge, dict):
         raise FillMatrixError("Bridge session не содержит browser_bridge diagnostics.")
@@ -221,8 +225,10 @@ def _validate_session(session: dict[str, Any], run: dict[str, Any]) -> str:
     send_failures = _nonnegative_int(browser_bridge.get("sendFailureCount"), "session.browser_bridge.sendFailureCount")
     if sent_events < received_events:
         raise FillMatrixError("Bridge sentEventCount меньше числа принятых событий.")
-    if "session_persist_failures" in diagnostics and diagnostics["session_persist_failures"] != 0:
-        raise FillMatrixError("Bridge session содержит ошибки атомарной записи.")
+    if "session_persist_failures" in diagnostics:
+        persist_failures = diagnostics["session_persist_failures"]
+        if type(persist_failures) is not int or persist_failures != 0:
+            raise FillMatrixError("Bridge session содержит ошибки атомарной записи.")
     if received_events < run_event_count:
         raise FillMatrixError("Bridge session event count меньше числа событий run.")
     run_sequence_gaps = _nonnegative_int(
@@ -286,11 +292,10 @@ def _validate_bridge_run(
         raise FillMatrixError("Bridge run не совпадает с executor window или превысил idle finalization grace.")
 
     expected_strokes = task["expected_strokes"]
-    if run.get("stroke_count") != expected_strokes:
-        raise FillMatrixError("Bridge run stroke_count не совпадает с task.")
-    if run.get("stroke_candidate_count") != expected_strokes:
-        raise FillMatrixError("Bridge run stroke_candidate_count не совпадает с task.")
-    if run.get("non_consuming_stroke_candidate_count") != 0:
+    for field in ("stroke_count", "stroke_candidate_count"):
+        if type(run.get(field)) is not int or run[field] != expected_strokes:
+            raise FillMatrixError(f"Bridge run {field} не совпадает с task.")
+    if type(run.get("non_consuming_stroke_candidate_count")) is not int or run["non_consuming_stroke_candidate_count"] != 0:
         raise FillMatrixError("Bridge run содержит non-consuming stroke candidates.")
     if run.get("brush_radius_status") != "single":
         raise FillMatrixError("Bridge run не подтверждает один фиксированный радиус.")
@@ -344,7 +349,12 @@ def _validate_bridge_run(
         or chalk.get("consumed_points") != post_count - pre_count
     ):
         raise FillMatrixError("Bridge run exact CHALK не совпадает с pre/post pointCount.")
-    if run.get("sampled_point_delta_total") != post_count - pre_count or run.get("point_delta_matches_chalk") is not True:
+    sampled_total = run.get("sampled_point_delta_total")
+    if (
+        type(sampled_total) is not int
+        or sampled_total != post_count - pre_count
+        or run.get("point_delta_matches_chalk") is not True
+    ):
         raise FillMatrixError("Bridge run sampled point deltas не совпадают с exact CHALK.")
 
     lifecycle_sources = run.get("stroke_lifecycle_sources")
@@ -453,6 +463,8 @@ def bind_fill001_runtime_evidence(
         "event_count": verified["event_count"],
         "bridge_failures": verified["bridge_failures"],
         "sequence_gaps": verified["sequence_gaps"],
+        "stroke_lifecycle_source": verified["stroke_lifecycle_source"],
+        "observed_radius": verified["observed_radius"],
         "monitor_export": monitor_export,
         "bridge_diagnostics": bridge_diagnostics,
         "bridge_run": bridge_run,
