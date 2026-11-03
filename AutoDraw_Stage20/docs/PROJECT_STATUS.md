@@ -9,14 +9,14 @@
 
 # Текущее состояние проекта
 
-**Последнее обновление:** 2026-11-03 — аудит подтвердил, что FILL-001 UI/runner handoff в AutoDraw отсутствует. Runtime binder реализован как post-execution hook Stage 6, но пользовательский запуск не подключён. Кодовый HEAD: [d7466c5](https://github.com/Kiddos19882/AutoDraw/commit/d7466c5452c83cf6aeab579fdc73c1358ac931c4). Полный GitHub Actions [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009) завершился SUCCESS на этом SHA: Executor regression, Game Monitor/Bridge, Application integration, Preparation/G3, Windows portable build/startup и INT-006/INT006R audit jobs успешны; optional algorithm benchmarks skipped. Runtime binding сверяет executor report, Bridge session/run artifacts, P1, timestamps, lifecycle, radius и exact CHALK. **Это подтверждение программной реализации и регрессионных тестов, но не live FILL-001 run и не Windows PNG preflight.** Поэтому 45 live captures пока заблокированы.
+**Последнее обновление:** 2026-11-03 — FILL-001 UI/runner handoff реализован отдельной вкладкой; software regression gate подтверждён CI [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178) на code/test HEAD `e3774a3`. Preparation/G3: 772 passed, 24 warnings, 82 subtests; все обязательные jobs и Windows portable build/startup smoke-test SUCCESS, optional benchmarks skipped. Вкладка создаёт/открывает 45-cell manifest, выбирает одну approved task, проверяет frozen plan/mask identity, передаёт кисть и DrawingPlan в Stage 6 с P1 override, затем связывает runtime report с Bridge evidence и выполняет PNG capture/audit. **Windows live preflight на реальной игровой сессии и реальные FILL-001 PNG ещё не подтверждены; 45 live captures остаются заблокированы.**
 
 **Актуально на:** 3 ноября 2026 г.  
 **Репозиторий:** `Kiddos19882/AutoDraw`  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
-**Последний code/test HEAD:** [d7466c5](https://github.com/Kiddos19882/AutoDraw/commit/d7466c5452c83cf6aeab579fdc73c1358ac931c4).  
-**Документационный HEAD:** актуальный HEAD рабочей ветки; после последнего code HEAD выполнены только документационные коммиты. Точный SHA сверяется по Git log.  
-**Последний подтверждённый полный CI:** [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009), SUCCESS на code HEAD `d7466c5`. Все обязательные jobs завершились SUCCESS; optional algorithm benchmarks skipped. Windows portable build/startup smoke-test прошёл, но он не заменяет ручной запуск игры и проверку реальных board PNG.  
+**Последний code/test HEAD:** [e3774a3](https://github.com/Kiddos19882/AutoDraw/commit/e3774a3c07f7abbefe8c39eecdd9578743b70678).  
+**Документационный HEAD:** документационные обновления выполняются поверх code/test HEAD `e3774a3`; точный текущий branch HEAD проверяется по GitHub branch reference после последнего docs commit.  
+**Последний подтверждённый полный CI:** [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178), SUCCESS на code/test HEAD `e3774a3`. Preparation/G3 — 772 passed, 24 warnings, 82 subtests passed; Executor regression, Game Monitor/Bridge, Application integration, INT-006 PNG audit и Windows portable build/startup smoke-test — SUCCESS; optional algorithm benchmarks skipped. Это не заменяет ручной live запуск FILL-001 в игре и проверку реальных board PNG.  
 **Git-сверка:** на текущем HEAD `37d118f` сравнение с `master` возвращает `diverged`; feature branch отстаёт от `master` на 5 коммитов. Количество feature-only коммитов растёт при каждом новом commit и здесь отдельно не фиксируется. Merge/rebase не выполнялся; `master` не изменялся.  
 > Этот блок — единственный источник текущего статуса. Ниже сохранена историческая хронология; старые статусы и планы не являются текущим backlog.
 
@@ -49,14 +49,14 @@
 | INT-005 | DONE* | Автоматические CHALK blocks, matrix, journal, recovery и fail-closed gates используются в принятых сериях. |
 | INT-006 | IN_PROGRESS | Live captures, 45/45 Monitor audit, официальный analyzer (45 accepted, 0 missing/rejected), 15/15 complete groups и полный binding audit завершены. Осталось отдельно решить вопрос safety margin и расширить domain validation; production eligibility не подтверждена. |
 | INT-006R | DONE | 45/45 live captures, raw-data audit, официальный CLI analyzer и ручной visual audit завершены. Зафиксированы geometry-specific limitations для D2/radius=1 и D4/radius=30. |
-| INT-006F / FILL-001 | IN_PROGRESS | Frozen masks, fixed-radius planner, matrix/analyzer, capture adapter и post-execution runtime binder реализованы; CI [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009) SUCCESS на `d7466c5`. Аудит выявил отсутствие UI/runner handoff и FILL001 в executor allowlist. Сначала требуется интеграция пользовательского запуска, затем Windows live preflight и 45 captures. См. [аудит](CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md).
+| INT-006F / FILL-001 | IN_PROGRESS | Frozen masks, fixed-radius planner, matrix/analyzer, capture adapter, runtime binding и отдельная вкладка FILL-001 реализованы. CI [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178) SUCCESS на `e3774a3`; UI registration и single-task workflow включены в regression suite. Остаётся Windows live preflight с реальными Bridge/executor artifacts и PNG; 45 captures заблокированы до его успешного завершения. Исторический аудит до UI-интеграции: [аудит](CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md).
 | INT-007 | BLOCKED | Интеграция валидированной модели в preflight/resource estimator запрещена до закрытия INT-006 и определения safety margin. |
 | INT-008 | TODO | Оптимизация траекторий, кистей, порядка и покрытия в пределах CHALK после INT-007. |
 | INT-009 | TODO | Независимая проверка прогноза на полных рисунках, визуального качества и фактической экономии. |
 
 ## Ближайший рабочий приоритет
 
-1. Реализовать пользовательский FILL-001 UI/runner handoff в Stage 6; затем провести Windows preflight одного контролируемого runtime run и проверить task ↔ executor report ↔ Bridge session/run и фактический P1.
+1. Провести Windows live preflight одной выбранной задачи из отдельной вкладки FILL-001; проверить task ↔ DrawingPlan ↔ executor report ↔ Bridge session/run и фактический P1.
 2. На том же preflight проверить реальные before/after PNG: crop 460×240, threshold=8, положение курсора, исключение UI/paint meter, соответствие frozen mask, coverage ≥99% и leakage=0.
 3. Только после успешного preflight запустить 45 live captures (3 формы × 5 радиусов × 3 повтора) и сохранить первичные evidence.
 4. Проанализировать exact CHALK, покрытие, leakage, число точек/штрихов и время по каждой форме/радиусу; не считать экономией неполное покрытие.
