@@ -2228,3 +2228,12 @@ Brush Test acceptance и матричные валидаторы больше н
 - В `TASKS.md` зарегистрирована завершённая задача DOC-016; в `DECISIONS.md` добавлено DEC-013 о едином источнике текущего статуса.
 - Удаление файлов не выполнялось: действует DEC-002 о сохранении исторических Markdown-материалов; `TEMP_PLAN_OUTLINE_FIRST_FILL.md` дополнительно защищён до закрытия временного плана.
 - Изменялись только Markdown-файлы. Исходники, тесты, конфигурации, workflow и экспериментальные данные не затрагивались. Проверка полного набора ссылок после этих изменений ещё требует отдельного прохода.
+
+
+## 2026-11-03 — FILL-001 fixed-radius planner increment
+
+- Добавлен `source/preparation/chalk_fill_fixed_radius_planner.py`: boundary-aware distance-transform inset, fixed-radius horizontal centerlines, round-capped raster simulation, coverage/leakage gate и deterministic plan signature.
+- Добавлен `source/preparation/tests/test_chalk_fill_fixed_radius_planner.py`: параметризованные проверки 15 shape×radius cells, radius isolation, deterministic output и invalid-input rejection.
+- Отдельная Python raster simulation на frozen masks: 15/15 cells, coverage 99,962–100%, leakage=0. Это не pytest и не CI.
+- Все generated plans остаются non-executable; sampling estimate не трактуется как exact CHALK. Live captures и production planner не затрагивались.
+- CI/pytest для актуального HEAD ожидаются; следующий gate — подтвердить тесты, затем matrix/block/journal harness.
