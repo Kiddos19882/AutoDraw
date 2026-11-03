@@ -26,7 +26,7 @@
 - [ ] Проверить реальные board PNG в client ROI: RGB threshold=8, cursor/UI exclusion и coverage/leakage против frozen masks.
 - [ ] Только после preflight — 45 live captures и анализ расхода CHALK по shape/radius.
 
-**Текущий gate:** runtime JSON handoff исправлен, интеграционный regression test добавлен, но CI нового code/test HEAD ожидается. Первая live попытка остановилась до запуска исполнителя; требуется повторная Windows/game session для проверки Stage 6, Bridge/executor binding и реальных PNG. Live execution всей 45-cell matrix остаётся BLOCKED.
+**Текущий gate:** runtime JSON handoff исправлен, интеграционный regression test добавлен; CI [41692129486](https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486) выполняется (часть обязательных jobs уже SUCCESS). Первая live попытка остановилась до запуска исполнителя; требуется повторная Windows/game session для проверки Stage 6, Bridge/executor binding и реальных PNG. Live execution всей 45-cell matrix остаётся BLOCKED.
 
 ## Актуальный статус CHALK — 2026-11-03
 
