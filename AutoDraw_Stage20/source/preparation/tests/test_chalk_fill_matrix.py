@@ -146,3 +146,15 @@ def test_analyzer_rejects_reused_run_identity(matrix):
     report = analyze_fill001_captures(matrix, captures)
     assert report["status"] == "incomplete"
     assert any(item["reason"] == "duplicate_run_id" for item in report["rejected"])
+
+
+def test_capture_requires_per_stroke_chalk_sum_and_png_audit(matrix):
+    task = matrix["tasks"][0]
+    invalid = _capture(task)
+    invalid["stroke_chalk_deltas"][0] += 1
+    with pytest.raises(FillMatrixError):
+        validate_fill001_capture(task, invalid)
+    invalid = _capture(task)
+    invalid["png_audit_status"] = "pending"
+    with pytest.raises(FillMatrixError):
+        validate_fill001_capture(task, invalid)
