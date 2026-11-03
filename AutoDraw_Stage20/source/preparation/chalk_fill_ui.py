@@ -199,7 +199,8 @@ class Fill001Tab:
         if task is None:
             messagebox.showwarning("Нет задачи", "Выберите одну pending задачу.", parent=self.root)
             return
-        if re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,127}", task.get("task_id", "")) is None:
+        task_id_value = task.get("task_id")
+        if not isinstance(task_id_value, str) or re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,127}", task_id_value) is None:
             messagebox.showwarning("Некорректный task_id", "Task ID содержит символы, запрещённые для файлов журнала.", parent=self.root)
             return
         try:
