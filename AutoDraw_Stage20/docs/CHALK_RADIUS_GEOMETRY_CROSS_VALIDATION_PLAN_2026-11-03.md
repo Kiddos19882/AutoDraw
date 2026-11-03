@@ -1,7 +1,7 @@
 # План перекрёстной validation радиуса кисти и геометрии CHALK
 
 **Дата:** 2026-11-03  
-**Статус:** SOFTWARE GATE PASS — отдельная фаза INT006R прошла полный CI; следующий шаг — локальный Windows preflight и 45 live captures  
+**Статус:** LIVE CAPTURES 45/45 COMPLETED; raw-data audit PASS; ручной visual audit и реальный CLI analyzer pending  
 **Связь:** продолжение INT-006; не открывает INT-007 автоматически  
 **Рабочая ветка:** `feature/image-geometry-optimization`
 
@@ -123,3 +123,26 @@
 
 
 Software gate закрыт. Live execution остаётся отдельным следующим этапом и требует доступной Windows-сессии с игрой, подключённым Game Monitor, откалиброванным slider и подтверждённой пустой доской. Следовать [live preflight guide](CHALK_INT006R_LIVE_PREFLIGHT_AND_VISUAL_AUDIT_2026-11-03.md).
+
+
+## 9. Live results — 2026-11-03
+
+Матрица выполнена: D1–D5 × radius 1/10/30 × 3 повтора = 45/45 completed. Series `chalk-20261103-030837-a20df5`, block `a8e0b9ec87984f60aa294910d366e987`, commit с результатами `138c9fbe`.
+
+Все 45 Monitor reports проверены: exact pre/post CHALK, sampled per-stroke delta совпадает с расходом, observed radius соответствует requested radius, dropped events/errors/Bridge failures/sequence gaps — 0.
+
+| Геометрия | Radius 1 | Radius 10 | Radius 30 |
+|---|---:|---:|---:|
+| D1 — mixed lines | 62.67 | 62.33 | 63.33 |
+| D2 — polygon | 71.67 | 71.00 | 71.00 |
+| D3 — intersections | 100.00 | 100.67 | 99.67 |
+| D4 — short details | 14.33 | 14.67 | 15.33 |
+| D5 — repeated coverage | 88.33 | 89.67 | 89.67 |
+| **Среднее** | **67.40** | **67.67** | **67.80** |
+
+Суммарный расход: 1011/1015/1017 CHALK для radius 1/10/30 соответственно. Разница крайних значений — 6 CHALK (около 0.6%).
+
+**Вывод ограничен** D1–D5 и P1: обнаруженного преимущества большого радиуса по exact CHALK нет. Это не тест заполнения областей одинаковой площади. Для него создан отдельный [FILL-001 plan](CHALK_FILL_AREA_RADIUS_EFFICIENCY_PLAN_2026-11-03.md).
+
+**Оставшиеся gates:** выполнить `chalk_int006r_validation.py` на реальном journal/capture bundle, проверить все before/after PNG и завершить ручной visual audit. До этого INT006R не закрывать полностью. INT-007 остаётся BLOCKED; production estimator/defaults не менять.
+
