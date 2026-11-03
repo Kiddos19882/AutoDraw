@@ -284,6 +284,36 @@ class UnifiedAppCoreTests(unittest.TestCase):
             self.assertFalse(executor.start_execution_from_workflow())
             start.assert_not_called()
 
+    def test_fill001_plan_cannot_start_through_regular_executor_button(self):
+        root = None
+        app = None
+        try:
+            root = tk.Tk()
+            root.withdraw()
+            app = integrated_app.AutoDrawUnifiedApp(root)
+            executor = app.executor
+            executor.execution_plan = object()
+            executor.area = object()
+            executor.plan_path = Path("fill001-runtime.json")
+            executor._fill001_execution_required = True
+            with patch("stage6_execute_plan.messagebox.showwarning") as warning:
+                executor._start_execution()
+                executor._start_execution(
+                    confirmed=True,
+                    executor_config_override={
+                        "point_step_px": 2.0,
+                        "point_delay_ms": 10,
+                        "line_extension_px": 2.0,
+                    },
+                )
+            self.assertEqual(warning.call_count, 2)
+            self.assertFalse(executor.running)
+        finally:
+            if app is not None:
+                app.destroy()
+            elif root is not None:
+                root.destroy()
+
     def test_unified_window_has_preparation_and_execution_tabs(self):
         root = None
         app = None
