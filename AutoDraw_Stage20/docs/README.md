@@ -26,7 +26,7 @@
 
 ## Действующий план CHALK и история статуса
 
-- [План дальнейших действий по модели CHALK](CHALK_NEXT_STEPS_PLAN_2026-11-02.md) — актуальная последовательность геометрической validation, независимой проверки estimator, safety margin и INT-007—INT-009.
+- [План дальнейших действий по модели CHALK](CHALK_NEXT_STEPS_PLAN_2026-11-02.md) — исторический план раннего этапа; текущие задачи и gates определяются `ROADMAP.md` и FILL-001 plan/design.
 - [INT-006 — план независимой validation CHALK](CHALK_INT006_INDEPENDENT_VALIDATION_PLAN_2026-11-02.md) — новые DrawingPlan, замороженные прогнозы P0/P1/P2, повторения, критерии приёмки и расчёт ошибок.
 - [INT-006 — предварительные результаты D1–D5](CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md) — предварительный разбор 45 live captures, точные CHALK delta, run-level/per-stroke метрики и оставшиеся gates.
 - [INT-006 — аудит готовности harness](CHALK_INT006_HARNESS_READINESS_AUDIT_2026-11-02.md) — подтверждённые пробелы D1–D5 в matrix/block/UI/executor/analyzer и gates до live validation.
@@ -35,14 +35,17 @@
 - [INT-006 — отдельные live follow-up серии V2/V5](CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md) — координаты новых сценариев, 9 captures на серию, критерии приёмки и инструкция ручного live-прогона.
 - [INT-006 — результаты live-матрицы V1–V5](CHALK_INT006_V1_V5_RESULTS_2026-11-02.md) — 45/45 captures, exact/per-stroke CHALK, сравнение sampling profiles, первичная holdout-проверка модели и открытые quality gates.
 - [INT-006 — результаты follow-up V1–V5](CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md) — 45/45 новых captures после исправления геометрии/сценариев, raw repeat CHALK, сравнение P0/P1/P2 и следующие pixel-level/validation gates.
-- [INT006R — live results](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md) — 45 captures D1–D5 × radius 1/10/30, exact CHALK и raw-data integrity audit; ручной visual gate остаётся pending.
-- [FILL-001 — план эффективности заливки](CHALK_FILL_AREA_RADIUS_EFFICIENCY_PLAN_2026-11-03.md) — 45 captures для трёх форм областей и пяти радиусов, критерии качества покрытия и CHALK/area metric.
+- [INT006R — live results](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md) — 45 captures D1–D5 × radius 1/10/30, exact CHALK и raw-data integrity audit; ручной visual audit завершён; ограничения D2/radius=1 и D4/radius=30 зафиксированы в отдельном отчёте.
 - [Игровой движок — стоимость точки и ширина кисти](CHALK_GAME_ENGINE_POINT_COST_AND_BRUSH_WIDTH_2026-11-03.md) — статический разбор `BoardPane.updateLess`, `setRadius`, `lineStyle` и влияния размера кисти на расход.
 - [Исторический снимок PROJECT_STATUS](PROJECT_STATUS_HISTORY_2026-11-02.md) — полный статус до консолидации 2 ноября; только для аудита, не текущий backlog.
 
 ## Данные и очистка
 
 - [Инвентаризация данных и кандидаты на безопасную очистку](DATA_CLEANUP_INVENTORY_2026-11-01.md) — назначение накопленных результатов, что можно удалить условно, что требует миграции/архивации и какие первичные данные сохранять.
+
+## Инвентаризация и обслуживание документации
+
+- [Инвентаризация документации](DOCUMENTATION_INVENTORY_2026-11-03.md) — 71 Markdown-файл, классификация действующих и архивных материалов, выявленные несогласованности и правила сохранения/удаления.
 
 ## Навигация
 
@@ -80,9 +83,9 @@
 ## Архивные и специализированные документы
 
 - [README.md](../README.md) — точка входа приложения.
-- [PROJECT_GUIDE.md](../PROJECT_GUIDE.md) — ранее созданный технический справочник.
-- [MASTER_ROADMAP.md](../MASTER_ROADMAP.md) — исторический план разработки.
-- [PROJECT_DOCUMENTATION.md](../PROJECT_DOCUMENTATION.md) — накопленная документация Stage20.
+- [PROJECT_GUIDE.md](../PROJECT_GUIDE.md) — ранее созданный технический справочник; архивный, статусы устарели.
+- [MASTER_ROADMAP.md](../MASTER_ROADMAP.md) — исторический план разработки; не использовать как действующий roadmap.
+- [PROJECT_DOCUMENTATION.md](../PROJECT_DOCUMENTATION.md) — накопленная документация Stage20; архив, не расширять параллельно с docs.
 - [PROJECT_ANALYSIS_PLAN_10_STAGES.md](../PROJECT_ANALYSIS_PLAN_10_STAGES.md) — архивный аналитический план; этапы 7–10 отменены.
 - [source/game_monitor/README.md](../source/game_monitor/README.md) — документация Game Monitor.
 
