@@ -3,7 +3,7 @@
 - Проверена ветка `feature/image-geometry-optimization`; последние 20 коммитов просмотрены. Code HEAD для CI: `b4cc45a80231e6bad2f878b2a5a2f16b48b9d68b`; последующие коммиты до `f72d4d3c9a2b9236b45d6c2f45ea5c6dcccbc456` относятся к документации.
 - Проверен diff `b4cc45a`: из сигнатуры `audit_fill001_png_pair()` удалены ошибочно добавленные обязательные аргументы `run_id` и `bridge_diagnostics`. Проверены определение, внутренний вызов из `build_fill001_capture()` и тестовый вызов — все используют три аргумента: shape_id, before_png, after_png.
 - GitHub Actions [41579136690](https://github.com/Kiddos19882/AutoDraw/actions/runs/41579136690) привязан к этой ветке и code SHA `b4cc45a80231e6bad2f878b2a5a2f16b48b9d68b`; все обязательные jobs завершились SUCCESS.
-- Preparation/G3 log: `754 passed, 24 warnings, 82 subtests passed`; запускал полный `pytest -q -ra tests` в `source/preparation`, включая FILL-001 matrix/capture adapter regression tests.
+- Preparation/G3 log: `754 passed, 24 warnings, 82 subtests passed`; GitHub Actions выполнил полный `pytest -q -ra tests` в `source/preparation`, включая FILL-001 matrix/capture adapter regression tests.
 - Windows portable build прошёл; лог подтверждает запуск `release/AutoDrawPortable/AutoDraw.exe`, процесс оставался активным 10 секунд, portable layout и startup smoke-test пройдены. Artifact ID: `13204044319`.
 - Дополнительно успешны Game Monitor/Bridge, Application integration, Executor regression и INT-006 audit. Optional algorithm benchmarks были skipped.
 - Локальный pytest в текущем runtime не запускался; подтверждение получено из GitHub Actions. Runtime binding к Bridge/executor и Windows preflight реальных FILL-001 PNG не входят в шаг 1 и остаются следующими gates.
