@@ -5,13 +5,13 @@
 ## Временный план FILL-001 на пять шагов
 
 **Документ:** [CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md](CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md)  
-**Статус:** IN_PROGRESS — software gate и UI/runner handoff закрыты; шаг 3 ожидает Windows live preflight; шаги 4–5 заблокированы.
+**Статус:** IN_PROGRESS — software gates закрыты на предыдущем HEAD; после live попытки исправлен runtime JSON handoff и добавлен regression test, новый CI ожидается; Windows live preflight не пройден; шаги 4–5 заблокированы.
 
 | Шаг | Статус | Критерий |
 |---|---|---|
 | 1. Regression gate: tests, полный CI, Windows build | DONE | CI [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985), code/test HEAD `031913c`; Preparation/G3 778 passed, 24 warnings, 82 subtests; обязательные jobs и Windows portable build/startup smoke-test SUCCESS |
 | 2. Runtime binding: Bridge, executor journal, P1 | DONE | Binder, Stage 6 completion hook и связь с FILL-001 experiment context покрыты regression CI; live binding будет подтверждён на шаге 3 |
-| 3. UI/runner handoff и Windows preflight | IN_PROGRESS | Исправлена путаница logical 460×240 и физического client ROI; остаётся один Windows live run с Bridge/executor binding и реальными PNG |
+| 3. UI/runner handoff и Windows preflight | IN_PROGRESS | После попытки из commit `6b1cba9` исправлена сериализация FILL-001 runtime JSON (commit `8dfd1b5`), добавлен интеграционный test (`1b2d8a1`); CI нового fix и один успешный Windows live run с Bridge/executor binding и реальными PNG ещё впереди |
 | 4. 45 live captures | BLOCKED | 45 уникальных принятых ячеек либо документированные отклонения |
 | 5. CHALK/quality analysis и рекомендация | BLOCKED | Подготовлен отчёт о влиянии радиуса и лучшей стратегии заливки |
 
@@ -32,6 +32,8 @@
 - [x] Полный CI [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985) на code/test HEAD `031913c`: Preparation/G3 778 passed, 24 warnings, 82 subtests; обязательные jobs SUCCESS, включая Game Monitor/Bridge, integration, executor, INT-006 audit и Windows portable build/startup.
 - [x] Реализовать отдельную вкладку FILL-001, single-task planner handoff, сохранение experiment context и task-specific P1 override; registration/UI integration tests включены в CI.
 - [x] Устранить требование физического screen ROI 460×240: UI захватывает actual calibrated ROI, adapter сохраняет ROI и logical→screen raster transform.
+- [x] Исправить FILL-001 runtime handoff: после добавления `autodraw_experiment` в runtime DrawingPlan записывался буквальный `\\n`, что делало JSON невалидным; запись исправлена в `integrated_app.py` (commit `8dfd1b5`).
+- [x] Добавить интеграционный regression test, который передаёт реальный FILL-001 plan в Stage 6 и проверяет JSON/context (commit `1b2d8a1`); CI для этих изменений ожидается.
 - [x] Добавить synthetic regression coverage для client ROI 581×304, uniform-scale rejection, ROI metadata mismatch и leakage после rasterization; CI [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985) — SUCCESS.
 - [ ] Провести один реальный Windows FILL-001 runtime preflight и подтвердить task ↔ executor report ↔ Bridge session/run binding.
 - [ ] Проверить реальные before/after PNG crop, RGB threshold, cursor/UI exclusion и frozen mask alignment.
