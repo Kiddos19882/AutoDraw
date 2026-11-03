@@ -18,14 +18,14 @@
 
 - [x] Frozen masks, fixed-radius planner и 45-cell manifest/analyzer.
 - [x] Реализован Monitor capture adapter с per-stroke exact CHALK, radius/P1 binding и PNG hash/pixel audit.
-- [x] Реализован fail-closed runtime binding к Bridge session/run и executor report; интегрирован в Stage 6 completion flow.
+- [x] Реализован fail-closed post-execution runtime binding к Bridge session/run и executor report; Stage 6 hook обрабатывает завершённый report с FILL-001 context. Это не пользовательский запуск.
 - [x] Добавлены synthetic adapter/runtime-binding regression tests.
 - [x] Regression gate закрыт: CI [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009) SUCCESS на code HEAD `d7466c5`; все обязательные jobs и Windows portable build/startup smoke-test успешны.
 - [ ] Провести Windows live runtime preflight и подтвердить P1 из фактического executor report.
 - [ ] Проверить реальные board PNG: logical crop 460×240, RGB threshold, cursor/UI exclusion и coverage/leakage против frozen masks.
 - [ ] Только после preflight — 45 live captures и анализ расхода CHALK по shape/radius.
 
-**Текущий gate:** программная реализация, runtime integration и CI закрыты; реальный Windows runtime/PNG preflight ещё не выполнен, поэтому live execution BLOCKED.
+**Текущий gate:** software gate planner/matrix/adapter/runtime binder подтверждён CI, но пользовательский UI/runner handoff отсутствует. Сначала реализовать безопасный FILL-001 launch path в AutoDraw; затем Windows runtime/PNG preflight. Live execution и 45-cell matrix BLOCKED.
 
 ### INT-006
 
@@ -297,3 +297,10 @@ Harness V1–V5: matrix metadata/validator, block planner/journal, Brush Test UI
 - [ ] Проверить 45 пар before/after PNG вручную, закрыть visual quality gate и оценить radius × geometry interaction отдельно по каждой геометрии; при обнаружении эффекта добавить промежуточные радиусы.
 
 **Текущий gate:** SOFTWARE PASS. **Live gate:** BLOCKED до локального Windows preflight. Frozen INT-006 model, production estimator/defaults и master не менялись.
+
+
+## Уточнение roadmap после аудита интеграции FILL-001 — 2026-11-03
+
+Нельзя переходить сразу к Windows preflight: текущий интерфейс Brush Test не создаёт FILL-001 task, а Stage 6 hook лишь связывает runtime evidence после уже завершённого запуска. Следующий engineering increment — отдельный FILL-001 UI/runner, task-to-DrawingPlan conversion, experiment-context propagation и task-specific P1 override. Требования и acceptance criteria записаны в [аудите интеграции](CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md).
+
+До закрытия этого increment и последующего Windows preflight live captures не запускать; matrix flags `execution_allowed=false` и `safe_to_execute=false` сохранять.
