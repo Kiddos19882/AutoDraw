@@ -655,3 +655,10 @@
 - Добавлен `GAME_MONITOR_BRIDGE_REFERENCE.md` с описанием Monitor 0.2.1 API, событий BoardPane, Browser Bridge transport, Python collector/RunRecorder, JSON форматов и ограничений evidence.
 - Справочник добавлен в основной `docs/README.md` и структурный `MODULE_REFERENCE.md`.
 - Изменения документационные; runtime-код и тесты не изменялись.
+
+
+## 2026-11-03 — FILL-001 launch integration audit
+
+- Добавлен аудит пользовательского пути запуска FILL-001 в AutoDraw.
+- Уточнён статус: Stage 6 runtime binding — post-execution hook; UI/runner workflow и FILL001 executor override отсутствуют.
+- Временный план и roadmap обновлены: UI/runner handoff должен быть реализован до Windows live preflight; 45 captures остаются заблокированными.
