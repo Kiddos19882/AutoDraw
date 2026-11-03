@@ -255,6 +255,8 @@ class Fill001Tab:
         try:
             # The board ROI must be visible, not covered by the AutoDraw window.
             self.root.iconify()
+            self.root.update_idletasks()
+            self.root.update()
             time.sleep(0.5)
             self.before_png_path = self._capture_board_png(task, phase="before")
         except Exception as exc:
