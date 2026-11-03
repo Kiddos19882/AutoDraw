@@ -1,3 +1,8 @@
+## 2026-11-03 — FILL-001 raster prototype gates
+
+- Проверены grid и eroded-contour fill prototypes на frozen masks. Первый не покрывает ≥99% на части больших радиусов; второй оставляет небольшой leakage/undercoverage в отдельных cells.
+- Ни один prototype не принят для executor. Следующая реализация должна быть boundary-aware и одновременно пройти coverage ≥99% / leakage=0.
+
 ## 2026-11-03 — FILL-001 frozen target masks implementation
 
 - Добавлен `source/preparation/chalk_fill_experiment.py` с тремя детерминированными frozen masks на logical canvas 460×240: rectangle, wide_irregular, narrow_irregular.
