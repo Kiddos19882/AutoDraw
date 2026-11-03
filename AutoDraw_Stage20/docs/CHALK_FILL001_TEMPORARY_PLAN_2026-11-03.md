@@ -30,7 +30,7 @@
 - Добавлен `chalk_fill_runtime_binding.py`, который читает persisted Bridge `session.json`, run JSON и executor report.
 - Проверяются Bridge schema v2, session/run identity, временное окно executor, timezone-aware timestamps, sequence gaps, send failures, Monitor errors, stroke lifecycle, единый observed radius, exact pre/post snapshots и совпадение exact CHALK с sampled/per-stroke deltas.
 - Фактические `ExecutorConfig.point_step_px=4` и `point_delay_ms=5` сверяются с frozen P1.
-- Runtime binding подключён к завершению успешного FILL-001 исполнения в Stage 6; report обновляется результатом фоновой проверки.
+- Stage 6 содержит post-execution hook: он проверяет уже завершённый FILL-001 report при наличии experiment context. Это не создаёт UI/runner запуск; соответствующий gap выявлен аудитом интеграции.
 - Capture adapter получает runtime evidence через `build_fill001_capture_from_runtime()` и фиксирует SHA-256 session/run/executor artifacts.
 - Изменения кода и тестов вошли в commits `fbf1fd6`–`d7466c5`; полный CI [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009) завершился SUCCESS на code HEAD `d7466c5`.
 
