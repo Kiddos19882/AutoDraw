@@ -10,7 +10,7 @@
 4. Выполнить 45 live captures (3 формы × 5 радиусов × 3 повтора); до шага 3 запуск заблокирован.
 5. Проанализировать exact CHALK и качество, определить влияние радиуса и лучшую стратегию заливки.
 
-**Текущий статус:** шаги 1–2 DONE как software/regression gates; шаг 3 TODO (Windows live preflight); шаги 4–5 BLOCKED. CI [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009) SUCCESS на code HEAD `d7466c5`; live runtime/PNG evidence пока отсутствует.
+**Текущий статус:** шаги 1–2 DONE только как software/regression gates; шаг 3 TODO (UI/runner handoff в AutoDraw, затем Windows live preflight); шаги 4–5 BLOCKED. CI [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009) SUCCESS на code HEAD `d7466c5`; live runtime/PNG evidence пока отсутствует.
 
 ## Актуальный статус CHALK — 2026-11-03
 
