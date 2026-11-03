@@ -5,13 +5,13 @@
 ## Временный план FILL-001 на пять шагов
 
 **Документ:** [CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md](CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md)  
-**Статус:** IN_PROGRESS — программные шаги 1–2 закрыты; шаг 3 (Windows live preflight) открыт; шаги 4–5 заблокированы.
+**Статус:** IN_PROGRESS — software gate и UI/runner handoff закрыты; шаг 3 ожидает Windows live preflight; шаги 4–5 заблокированы.
 
 | Шаг | Статус | Критерий |
 |---|---|---|
-| 1. Regression gate: tests, полный CI, Windows build | DONE | CI [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009), code HEAD `d7466c5`; все обязательные jobs и Windows portable build/startup smoke-test SUCCESS |
-| 2. Runtime binding: Bridge, executor journal, P1 | DONE (post-execution software gate) | Binder и Stage 6 completion hook проверяют готовый FILL-001 execution report; это не пользовательский запуск и не UI/runner integration |
-| 3. UI/runner handoff и Windows preflight | TODO | AutoDraw создаёт/выбирает FILL-001 task, передаёт её в Stage 6 с context/P1, затем один live run и реальные PNG проходят gates на Windows |
+| 1. Regression gate: tests, полный CI, Windows build | DONE | CI [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178), code/test HEAD `e3774a3`; Preparation/G3 772 passed, 24 warnings, 82 subtests; обязательные jobs и Windows portable smoke-test SUCCESS |
+| 2. Runtime binding: Bridge, executor journal, P1 | DONE | Binder, Stage 6 completion hook и связь с FILL-001 experiment context покрыты regression CI; live binding будет подтверждён на шаге 3 |
+| 3. UI/runner handoff и Windows preflight | IN_PROGRESS | Отдельная вкладка FILL-001, single-task handoff и P1 override реализованы; остался один Windows live run с проверкой Bridge/executor binding и реальных PNG |
 | 4. 45 live captures | BLOCKED | 45 уникальных принятых ячеек либо документированные отклонения |
 | 5. CHALK/quality analysis и рекомендация | BLOCKED | Подготовлен отчёт о влиянии радиуса и лучшей стратегии заливки |
 
@@ -30,11 +30,12 @@
 - [x] Реализовать `chalk_fill_runtime_binding.py`: проверка Bridge session schema v2, session/run identity, executor time window, timestamps, lifecycle, radius, exact snapshots/CHALK, sequence gaps и send failures.
 - [x] Добавить post-execution runtime binding hook в Stage 6 для отчётов, уже содержащих FILL-001 experiment context. Пользовательский UI/runner handoff этим не реализован.
 - [x] Полный CI [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009) на code HEAD `d7466c5`: обязательные jobs SUCCESS, включая Preparation/G3, Game Monitor/Bridge, integration, executor, INT-006/INT006R audit и Windows portable build/startup.
+- [x] Реализовать отдельную вкладку FILL-001, single-task planner handoff, сохранение experiment context и task-specific P1 override; registration/UI integration tests включены в CI.
 - [ ] Провести один реальный Windows FILL-001 runtime preflight и подтвердить task ↔ executor report ↔ Bridge session/run binding.
 - [ ] Проверить реальные before/after PNG crop, RGB threshold, cursor/UI exclusion и frozen mask alignment.
 - [ ] Только после preflight разрешить 45 live captures.
 
-**Ограничения:** программная связка и regression tests готовы. Реальный runtime run и реальные FILL-001 PNG ещё не подтверждены. Synthetic fixtures и portable startup smoke-test не являются live evidence. Production estimator/defaults и frozen INT-006 model не менять.
+**Ограничения:** software UI/runner и regression tests готовы. Реальный runtime run и реальные FILL-001 PNG ещё не подтверждены; 45-cell matrix остаётся заблокированной до успешного preflight. Synthetic fixtures и portable startup smoke-test не являются live evidence. Production estimator/defaults и frozen INT-006 model не менять.
 
 ## Статусы
 
@@ -59,7 +60,7 @@
 | DOC-008 | DONE | Создать структурный справочник модулей | docs/MODULE_REFERENCE.md |
 | DOC-009 | DONE | Документировать публичные интерфейсы preparation | PREPARATION_API_REFERENCE.md охватывает все 40 модулей подсистемы preparation из MODULE_REFERENCE; сигнатуры и UI-контракты сверены с объявлениями исходников |
 | DOC-010 | DONE | Документировать публичные интерфейсы executor | EXECUTOR_API_REFERENCE.md охватывает все 13 модулей executor из MODULE_REFERENCE, общие модели, адаптер image processing и основные контракты исполнения |
-| DOC-011 | DONE | Документировать UI и интеграционные точки | docs/UI_INTEGRATION_MAP.md: восемь вкладок, создание компонентов, callbacks, синхронизация области и передача планов |
+| DOC-011 | DONE | Документировать UI и интеграционные точки | docs/UI_INTEGRATION_MAP.md: девять вкладок, включая отдельную FILL-001, создание компонентов, callbacks, синхронизация области и передача планов |
 | DOC-012 | DONE | Документировать профили, настройки и результаты | DATA_FORMATS_AND_PROFILES.md и FILE_STORAGE_CATALOG.md: схемы, пути, результаты, runtime-файлы и резервное копирование |
 | DOC-013 | DONE | Составить карту импортов | DEPENDENCY_MAP.md содержит прямые импорты всех 40 preparation и 13 executor production-модулей; TESTS_AND_CI_MAP.md содержит прямые импорты всех 46 найденных test_*.py файлов из трёх тестовых каталогов и отдельную отметку helper-модуля |
 | DOC-014 | DONE | Проверить относительные Markdown-ссылки и индекс | Проверены 67 относительных ссылок в 35 документах; все цели существуют, якорные фрагменты в ссылках отсутствуют; цели основного docs-индекса существуют |
@@ -77,7 +78,7 @@
 | INT-005 | DONE | Реализовать автоматизированную лабораторию CHALK-экспериментов | Matrix/block runner, task identity, повторения, manifest, recovery/fail-closed gates и capture acceptance использованы для G1 12/12, G2 18/18 и G3 27/27. |
 | INT-006 | IN_PROGRESS | Официальный analyzer PASS: 45/45 accepted, 0 missing/rejected, 15/15 groups complete; SHA-256 и journal/task/experiment/run/profile/geometry binding проверены. Метрики: MAE 1.408, RMSE 1.967, bias -0.875, MAPE 2.134%, max underprediction 1.82 CHALK. Остаются safety-margin decision и расширение domain validation. См. [официальный отчёт](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md). Production estimator/defaults не менять. |
 | INT-006R | DONE | 45/45 live captures, raw-data audit, официальный CLI analyzer (45 accepted, 0 missing/rejected) и ручной аудит всех 45 пар PNG завершены. Зафиксированы ограничения: radius 1 — разрыв соединения D2 polygon; radius 30 — слияние коротких деталей D4. См. [live results](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md) и [visual audit](CHALK_INT006R_VISUAL_AUDIT_2026-11-03.md). |
-| INT-006F | IN_PROGRESS | Проверить эффективность заполнения одноцветных областей по радиусу | Frozen masks закреплены SHA-256. Добавлен boundary-aware fixed-radius scanline planner и raster simulator; отдельная Python simulation прошла 15/15 shape×radius cells (coverage 99,962–100%, leakage=0). Regression tests для planner и matrix добавлены; pytest/CI для актуального HEAD не подтверждены. Реализованы 45-cell matrix manifest, dynamic expected_strokes, mask/plan/task/run identity, exact/per-stroke CHALK capture validation, обязательные before/after PNG и независимый PNG audit gate, analyzer. Следующий gate — полный CI/Windows build, затем preflight и live captures. |
+| INT-006F | IN_PROGRESS | Проверить эффективность заполнения одноцветных областей по радиусу | Frozen masks, fixed-radius planner, 45-cell matrix/analyzer, Monitor capture adapter, runtime binding и отдельная вкладка FILL-001 реализованы. CI [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178) SUCCESS на `e3774a3`; Preparation/G3 772 passed, 24 warnings, 82 subtests; Windows portable build/startup smoke-test SUCCESS. Остался Windows live preflight; 45 captures заблокированы до его прохождения. |
 | INT-007 | BLOCKED | Интегрировать валидированную модель в preflight/resource estimator AutoDraw | Начинать только после независимой validation INT-006 и определения консервативного safety margin. |
 | INT-008 | TODO | Оптимизировать кисти, траектории, порядок и покрытие | Подбирать способ построения рисунка в пределах квоты CHALK с учётом качества покрытия; зависит от INT-006/007. |
 | INT-009 | TODO | Сравнить прогноз с фактом и проверить качество | Проверить на независимых рисунках прогноз, exact CHALK delta, визуальное качество и устойчивость к разным типам геометрии. |
