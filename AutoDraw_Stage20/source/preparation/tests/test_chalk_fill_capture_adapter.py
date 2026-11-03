@@ -81,7 +81,7 @@ def test_monitor_adapter_builds_exact_capture_from_real_event_schema(tmp_path):
         before_png=before,
         after_png=after,
         run_id="live-run-001",
-        bridge_diagnostics={"bridge_failures": 0, "sequence_gaps": 0},
+        bridge_diagnostics={"run_id": "live-run-001", "event_count": len(_monitor_export(task)["events"]), "bridge_failures": 0, "sequence_gaps": 0},
     )
     assert capture["exact_chalk"] == task["expected_strokes"] * 5
     assert sum(capture["stroke_chalk_deltas"]) == capture["exact_chalk"]
@@ -99,7 +99,7 @@ def test_monitor_adapter_rejects_truncated_or_untrusted_evidence(tmp_path):
         build_fill001_capture(
             task, export, sampling_profile=FILL001_SAMPLING_PROFILE,
             before_png=before, after_png=after, run_id="live-run-002",
-            bridge_diagnostics={"bridge_failures": 0, "sequence_gaps": 0},
+            bridge_diagnostics={"run_id": "live-run-002", "event_count": len(_monitor_export(task)["events"]), "bridge_failures": 0, "sequence_gaps": 0},
         )
 
     export = _monitor_export(task)
@@ -107,5 +107,5 @@ def test_monitor_adapter_rejects_truncated_or_untrusted_evidence(tmp_path):
         build_fill001_capture(
             task, export, sampling_profile=FILL001_SAMPLING_PROFILE,
             before_png=before, after_png=after, run_id="live-run-003",
-            bridge_diagnostics={"bridge_failures": 1, "sequence_gaps": 0},
+            bridge_diagnostics={"run_id": "live-run-003", "event_count": len(_monitor_export(task)["events"]), "bridge_failures": 1, "sequence_gaps": 0},
         )
