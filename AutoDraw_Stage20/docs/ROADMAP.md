@@ -314,3 +314,13 @@ Harness V1–V5: matrix metadata/validator, block planner/journal, Brush Test UI
 Нельзя переходить сразу к Windows preflight: текущий интерфейс Brush Test не создаёт FILL-001 task, а Stage 6 hook лишь связывает runtime evidence после уже завершённого запуска. Следующий engineering increment — отдельный FILL-001 UI/runner, task-to-DrawingPlan conversion, experiment-context propagation и task-specific P1 override. Требования и acceptance criteria записаны в [аудите интеграции](CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md).
 
 До закрытия этого increment и последующего Windows preflight live captures не запускать; matrix flags `execution_allowed=false` и `safe_to_execute=false` сохранять.
+
+
+## FILL-001 — актуальный gate после CI run 41692129486 (2026-11-03)
+
+1. Software regression и UI/runner integration: PASS. Run [41692129486](https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486) завершился SUCCESS, включая Windows portable build/startup smoke-test.
+2. Portable artifact доступен: [autodraw-g3-preflight-build, ID 13258221572](https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486/artifacts/13258221572).
+3. Следующий шаг — один Windows live preflight `rectangle / radius 10 / repeat 1`, выполняемый пользователем. Проверить runtime binding и визуальные evidence на реальном client ROI.
+4. До принятия preflight 45 live captures и CHALK/quality analysis остаются BLOCKED.
+
+Не менять production estimator/defaults и не считать CI/synthetic tests доказательством поведения в игре.
