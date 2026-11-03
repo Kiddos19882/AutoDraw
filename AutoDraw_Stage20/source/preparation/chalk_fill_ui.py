@@ -50,6 +50,7 @@ class Fill001Tab:
         self.active_run_record: Path | None = None
         self.before_png_path: Path | None = None
         self.after_png_path: Path | None = None
+        self.capture_region: dict[str, int] | None = None
         self.series_var = tk.StringVar(
             value=f"fill001-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
         )
@@ -88,6 +89,7 @@ class Fill001Tab:
         ttk.Label(task, text="Pending task").pack(side="left")
         self.task_combo = ttk.Combobox(task, textvariable=self.task_var, state="readonly", width=62)
         self.task_combo.pack(side="left", padx=6)
+        self.task_combo.bind("<<ComboboxSelected>>", lambda _event: self._show_selected_task())
         ttk.Button(task, text="Обновить список", command=self._refresh_tasks).pack(side="left", padx=4)
         ttk.Button(task, text="Подготовить и запустить одну задачу", command=self.prepare_and_run).pack(side="left", padx=4)
         ttk.Button(task, text="Проверить runtime + PNG и принять capture", command=self.finalize_capture).pack(side="left", padx=4)
@@ -108,6 +110,8 @@ class Fill001Tab:
         try:
             matrix = build_fill001_matrix(raw_id)
             path = self.output_dir / f"{raw_id}.json"
+            if path.exists():
+                raise FileExistsError(f"Серия уже существует: {path}. Откройте её вместо перезаписи.")
             write_fill001_matrix(matrix, path)
             self.matrix, self.manifest_path = matrix, path
             self.manifest_label.configure(text=path.name)
@@ -194,6 +198,23 @@ class Fill001Tab:
         task = self._selected_task()
         if task is None:
             messagebox.showwarning("Нет задачи", "Выберите одну pending задачу.", parent=self.root)
+            return
+        if re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,127}", task.get("task_id", "")) is None:
+            messagebox.showwarning("Некорректный task_id", "Task ID содержит символы, запрещённые для файлов журнала.", parent=self.root)
+            return
+        try:
+            disk_matrix = load_fill001_matrix(self.manifest_path)
+        except Exception as exc:
+            messagebox.showerror("Manifest недоступен", str(exc), parent=self.root)
+            return
+        if disk_matrix.get("matrix_signature") != self.matrix.get("matrix_signature"):
+            messagebox.showerror("Manifest изменился", "Файл manifest изменился после загрузки. Загрузите его заново.", parent=self.root)
+            return
+        self.matrix = disk_matrix
+        task = self._selected_task()
+        if task is None:
+            messagebox.showwarning("Задача изменилась", "Выбранная задача больше не является pending.", parent=self.root)
+            self._refresh_tasks()
             return
         prior_attempt = self.output_dir / "attempts" / f"{task['task_id']}.json"
         if prior_attempt.exists():
@@ -346,6 +367,10 @@ class Fill001Tab:
                 "Для FILL-001 pixel audit требуется screen ROI ровно 460×240 px; "
                 "масштабированный ROI пока не поддерживается."
             )
+        if phase == "after" and self.capture_region is not None and region != self.capture_region:
+            raise ValueError("ROI доски изменился между before/after capture.")
+        if phase == "before":
+            self.capture_region = dict(region)
         screen = ImageGrab.grab()
         expected_screen = config.get("screen_size", {})
         if isinstance(expected_screen, dict) and (
@@ -429,6 +454,9 @@ class Fill001Tab:
             return
         try:
             record = json.loads(self.active_run_record.read_text(encoding="utf-8"))
+            disk_matrix = load_fill001_matrix(self.manifest_path)
+            if disk_matrix.get("matrix_signature") != self.matrix.get("matrix_signature"):
+                raise FillMatrixError("Manifest изменился после запуска; capture не будет перезаписывать внешние изменения.")
             report_path = Path(record["execution_report_path"])
             report = json.loads(report_path.read_text(encoding="utf-8"))
             if report.get("runtime_binding_status") != "passed":
@@ -487,6 +515,7 @@ class Fill001Tab:
             self.active_run_record = None
             self.before_png_path = None
             self.after_png_path = None
+            self.capture_region = None
             self._refresh_tasks()
         except Exception as exc:
             messagebox.showerror("FILL-001 capture не принят", str(exc), parent=self.root)
