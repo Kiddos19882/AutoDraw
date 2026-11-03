@@ -52,8 +52,6 @@ def audit_fill001_png_pair(
     shape_id: str,
     before_png: str | Path,
     after_png: str | Path,
-    run_id: str,
-    bridge_diagnostics: dict[str, Any],
 ) -> dict[str, Any]:
     """Audit a tightly cropped 460x240 logical-board PNG pair."""
     before, before_hash = _png_pixels(before_png)
