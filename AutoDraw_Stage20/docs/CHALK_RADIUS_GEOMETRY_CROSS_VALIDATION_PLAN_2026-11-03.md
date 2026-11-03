@@ -109,7 +109,7 @@
 
 ### Software gate
 
-Полный workflow [41540054975](https://github.com/Kiddos19882/AutoDraw/actions/runs/41540054975) на code HEAD `28b56a97255b57b50072ba973533ce349c706bd1` завершился SUCCESS. Preparation/G3 — 682 passed, 82 subtests passed, 24 warnings; Application integration, Executor regression, Game Monitor/Bridge, INT-006 PNG audit и Windows portable build/startup smoke-test — success. Подробности: [INT006R software gate report](CHALK_INT006R_SOFTWARE_GATE_RESULTS_2026-11-03.md). Live captures по-прежнему запрещены до локального Windows preflight.
+Полный workflow [41540054975](https://github.com/Kiddos19882/AutoDraw/actions/runs/41540054975) на code HEAD `28b56a97255b57b50072ba973533ce349c706bd1` завершился SUCCESS. Preparation/G3 — 682 passed, 82 subtests passed, 24 warnings; Application integration, Executor regression, Game Monitor/Bridge, INT-006 PNG audit и Windows portable build/startup smoke-test — success. Подробности: [INT006R software gate report](CHALK_INT006R_SOFTWARE_GATE_RESULTS_2026-11-03.md). На момент закрытия software gate live captures ещё были заблокированы; позднее отдельный live block был выполнен 45/45. См. раздел 9 и [live results](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md).
 
 ### Текущие неизменённые условия
 
