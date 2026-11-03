@@ -10,8 +10,8 @@
 | Шаг | Статус | Критерий |
 |---|---|---|
 | 1. Regression gate: tests, полный CI, Windows build | DONE | CI [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009), code HEAD `d7466c5`; все обязательные jobs и Windows portable build/startup smoke-test SUCCESS |
-| 2. Runtime binding: Bridge, executor journal, P1 | DONE (software gate) | Runtime binder подключён к Stage 6; executor/Bridge artifacts, session/run identity, timestamps, lifecycle, radius, exact CHALK и P1 проверяются fail-closed; regression CI SUCCESS |
-| 3. PNG evidence и Windows preflight | TODO | Реальный FILL-001 runtime run и реальные board PNG проходят crop/quality/evidence gates на Windows |
+| 2. Runtime binding: Bridge, executor journal, P1 | DONE (post-execution software gate) | Binder и Stage 6 completion hook проверяют готовый FILL-001 execution report; это не пользовательский запуск и не UI/runner integration |
+| 3. UI/runner handoff и Windows preflight | TODO | AutoDraw создаёт/выбирает FILL-001 task, передаёт её в Stage 6 с context/P1, затем один live run и реальные PNG проходят gates на Windows |
 | 4. 45 live captures | BLOCKED | 45 уникальных принятых ячеек либо документированные отклонения |
 | 5. CHALK/quality analysis и рекомендация | BLOCKED | Подготовлен отчёт о влиянии радиуса и лучшей стратегии заливки |
 
@@ -28,7 +28,7 @@
 - [x] Добавить PNG file/hash/pixel audit для logical crop 460×240, coverage/leakage и RGB threshold.
 - [x] Добавить synthetic regression fixtures для event stream, Bridge/session/run artifacts, executor report и PNG.
 - [x] Реализовать `chalk_fill_runtime_binding.py`: проверка Bridge session schema v2, session/run identity, executor time window, timestamps, lifecycle, radius, exact snapshots/CHALK, sequence gaps и send failures.
-- [x] Подключить runtime binding к завершению успешного FILL-001 исполнения в Stage 6; сохранить runtime binding result в execution report.
+- [x] Добавить post-execution runtime binding hook в Stage 6 для отчётов, уже содержащих FILL-001 experiment context. Пользовательский UI/runner handoff этим не реализован.
 - [x] Полный CI [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009) на code HEAD `d7466c5`: обязательные jobs SUCCESS, включая Preparation/G3, Game Monitor/Bridge, integration, executor, INT-006/INT006R audit и Windows portable build/startup.
 - [ ] Провести один реальный Windows FILL-001 runtime preflight и подтвердить task ↔ executor report ↔ Bridge session/run binding.
 - [ ] Проверить реальные before/after PNG crop, RGB threshold, cursor/UI exclusion и frozen mask alignment.
@@ -504,3 +504,14 @@ INT-006 остаётся IN_PROGRESS до официального analyzer repo
 - [x] Добавить документ в `docs/README.md` и `MODULE_REFERENCE.md`.
 
 **Результат:** [GAME_MONITOR_BRIDGE_REFERENCE.md](GAME_MONITOR_BRIDGE_REFERENCE.md). Изменения кода и live-проверки не входят в задачу.
+
+
+## Уточнение FILL-001 после аудита пользовательского запуска
+
+- [x] Проверить фактический UI → integrated_app → Stage 6 → runtime binder call graph.
+- [x] Зафиксировать, что `brush_behavior_test_ui.py` не содержит FILL001 workflow, а executor override allowlist не включает FILL001.
+- [ ] Реализовать FILL-001 UI/runner и fail-closed handoff в DrawingPlan/Stage 6.
+- [ ] Выполнить один Windows live preflight после software gate.
+- [ ] Только после успешного preflight разрешить 45-cell live matrix.
+
+Подробные основания и критерии: [CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md](CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md).
