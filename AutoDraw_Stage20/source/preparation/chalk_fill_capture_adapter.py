@@ -101,6 +101,8 @@ def build_fill001_capture(
         raise FillMatrixError("Требуется внешний уникальный run_id.")
     if not isinstance(bridge_diagnostics, dict):
         raise FillMatrixError("Требуется отдельный bridge diagnostics report.")
+    if bridge_diagnostics.get("run_id") != run_id or bridge_diagnostics.get("event_count") != monitor_export.get("eventCount"):
+        raise FillMatrixError("Bridge diagnostics не связаны с этим run_id/eventCount.")
     for key in ("bridge_failures", "sequence_gaps"):
         value = bridge_diagnostics.get(key)
         if isinstance(value, bool) or not isinstance(value, int) or value < 0:
