@@ -2268,3 +2268,15 @@ Brush Test acceptance и матричные валидаторы больше н
 - Установлено, что текущая PNG validation проверяет только непустые пути и строку `png_audit_status=passed`; существование файлов, SHA-256 и pixel-level соответствие frozen mask не проверяются. Unit-test PNG paths — placeholders.
 - Выявлено, что sampling P1 не записан и не проверяется в текущем matrix task/capture schema, несмотря на упоминание P1 в design.
 - В [FILL-001 harness design](CHALK_FILL001_HARNESS_DESIGN_2026-11-03.md) добавлена точная граница реализации и обязательные software gates. Live execution остаётся запрещённым до реального Monitor adapter, независимой PNG/mask validation, sampling binding, CI PASS и Windows preflight.
+
+
+## 2026-11-03 — FILL-001 Game Monitor capture adapter implementation
+
+- Добавлен `chalk_fill_capture_adapter.py`: преобразование export schemaVersion=1 в FILL-001 capture; pairing DRAW_START/DRAW_END по strokeId; расчёт per-stroke/run CHALK по exact pointCount; observed radius validation.
+- Учтена семантика Game Monitor: первая точка штриха добавляется в onDrawStart до polling baseline, поэтому initial delta сверяется отдельно от последующих DRAW_SAMPLE.pointDelta.
+- Sampling P1 (step=4, delay=5 ms) закреплён в каждой matrix task и capture contract.
+- Добавлена фактическая PNG validation: чтение PNG 460×240, SHA-256, RGB difference threshold=8, coverage и leakage against frozen mask.
+- Добавлены обязательные external run_id и bridge diagnostics с binding по run_id/eventCount; bridge failures/sequence gaps проверяются fail-closed.
+- Добавлены `test_chalk_fill_capture_adapter.py` с синтетическим Monitor event stream и PNG fixtures. Это unit fixtures, не реальные captures.
+- Ограничения: Monitor export сам не содержит runId/sequence number; sampling profile не наблюдается самим Monitor; bridge report пока передаётся вызывающим кодом и не имеет криптографической подписи; PNG crop threshold требует реального preflight.
+- Проверка: committed source/test files перечитаны через GitHub. Pytest не запускался, CI status для новых commits не подтверждён; live execution запрещён.
