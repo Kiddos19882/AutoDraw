@@ -167,7 +167,7 @@ jobs:
             $sourceDirectory = Join-Path $sourceRoot $directoryName
             $targetDirectory = Join-Path $targetRoot $directoryName
             New-Item -ItemType Directory -Path $targetDirectory -Force | Out-Null
-            foreach ($fileName in @("before_draw-board.png", "after_draw-board.png", "experiment.json", "monitor_report.json")) {
+            foreach ($fileName in @("before_clear-board.png", "after_draw-board.png", "experiment.json", "monitor_report.json")) {
               $sourceFile = Join-Path $sourceDirectory $fileName
               if (-not (Test-Path $sourceFile -PathType Leaf)) { throw "Missing $fileName for $($task.task_id)." }
               Copy-Item $sourceFile (Join-Path $targetDirectory $fileName) -Force
