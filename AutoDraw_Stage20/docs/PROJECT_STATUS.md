@@ -14,8 +14,8 @@
 **Актуально на:** 3 ноября 2026 г.  
 **Репозиторий:** `Kiddos19882/AutoDraw`  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
-**Последний commit с данными:** `138c9fbeaf612a86819f7ff9ea0db7bb1fe4296a`. Последний подтверждённый code HEAD INT006R: `28b56a97255b57b50072ba973533ce349c706bd1`. Документация актуализирована последовательно; последний документальный commit этой серии — `c995fee23288460756431c52664c94579f2566a8`.  
-**Последний подтверждённый полный CI:** [41540054975](https://github.com/Kiddos19882/AutoDraw/actions/runs/41540054975) на code HEAD `28b56a9`: обязательные jobs SUCCESS, Preparation/G3 — 682 passed и 82 subtests, Windows portable build/startup smoke-test — SUCCESS. Для data commit `138c9fbe` отдельный workflow run/status check не найден.  
+**Последний commit с данными:** `138c9fbeaf612a86819f7ff9ea0db7bb1fe4296a`. Последний подтверждённый application code HEAD INT006R: `28b56a97255b57b50072ba973533ce349c706bd1`; текущий branch HEAD `2b8812d9a306c16e7f68aca1f881a7b01b29be1e` добавляет реальный INT006R analyzer в CI. Последний документальный commit серии — `ad6a89027755507f9cd5861397967ba7dbb98269`.  
+**Последний подтверждённый полный CI:** [41540054975](https://github.com/Kiddos19882/AutoDraw/actions/runs/41540054975) на code HEAD `28b56a9`: обязательные jobs SUCCESS, Preparation/G3 — 682 passed и 82 subtests, Windows portable build/startup smoke-test — SUCCESS. Для data commit `138c9fbe` отдельный workflow run/status check не найден; новый workflow [41559932955](https://github.com/Kiddos19882/AutoDraw/actions/runs/41559932955) проверяет committed live dataset и пока выполняется.  
 **Git-сверка:** сравнение `master...feature/image-geometry-optimization` возвращает `diverged`, feature ahead 2297 / behind 5. Никакого merge/rebase не выполнялось; пять master-only commits требуют отдельного просмотра. В рамках этой актуализации `master` не изменялся.  
 > Этот блок — единственный источник текущего статуса. Ниже сохранена историческая хронология; старые статусы и планы не являются текущим backlog.
 
