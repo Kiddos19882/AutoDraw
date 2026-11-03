@@ -184,6 +184,7 @@ def _validate_session(session: dict[str, Any], run: dict[str, Any]) -> str:
         raise FillMatrixError("Bridge session не содержит bridge_diagnostics.")
     received_events = _nonnegative_int(diagnostics.get("received_event_count"), "session.received_event_count")
     sequence_gaps = _nonnegative_int(diagnostics.get("collector_sequence_gap_count"), "session.collector_sequence_gap_count")
+    run_event_count = _nonnegative_int(run.get("event_count"), "bridge_run.event_count")
     _nonnegative_int(diagnostics.get("last_sequence"), "session.last_sequence")
     browser_bridge = diagnostics.get("browser_bridge")
     if not isinstance(browser_bridge, dict):
@@ -194,7 +195,7 @@ def _validate_session(session: dict[str, Any], run: dict[str, Any]) -> str:
         raise FillMatrixError("Bridge sentEventCount меньше числа принятых событий.")
     if "session_persist_failures" in diagnostics and diagnostics["session_persist_failures"] != 0:
         raise FillMatrixError("Bridge session содержит ошибки атомарной записи.")
-    if received_events < run.get("event_count", 0):
+    if received_events < run_event_count:
         raise FillMatrixError("Bridge session event count меньше числа событий run.")
     if sequence_gaps < run.get("collector_sequence_gap_count", 0):
         raise FillMatrixError("Bridge session не подтверждает sequence gaps из run.")
@@ -230,15 +231,23 @@ def _validate_bridge_run(
     if run.get("brush_radius_status") != "single":
         raise FillMatrixError("Bridge run не подтверждает один фиксированный радиус.")
     radii = run.get("observed_brush_radii")
-    if not isinstance(radii, list) or len(radii) != 1 or float(radii[0]) != float(task["requested_radius"]):
+    if (
+        not isinstance(radii, list)
+        or len(radii) != 1
+        or isinstance(radii[0], bool)
+        or not isinstance(radii[0], (int, float))
+        or float(radii[0]) != float(task["requested_radius"])
+    ):
         raise FillMatrixError("Bridge observed_brush_radii не совпадает с requested_radius.")
 
     events = run.get("events")
     event_count = _nonnegative_int(run.get("event_count"), "bridge_run.event_count")
     if not isinstance(events, list) or not events or len(events) != event_count:
         raise FillMatrixError("Bridge run event_count не совпадает с events.")
-    monitor_versions = {event.get("monitorVersion") for event in events if isinstance(event, dict)}
-    if monitor_versions != {"0.2.1"} or len(monitor_versions) != 1:
+    if any(not isinstance(event, dict) for event in events):
+        raise FillMatrixError("Bridge run содержит некорректный event.")
+    monitor_versions = {event.get("monitorVersion") for event in events}
+    if monitor_versions != {"0.2.1"}:
         raise FillMatrixError("Bridge run events не подтверждают единый Game Monitor version.")
 
     for field in (
@@ -315,11 +324,8 @@ def bind_fill001_runtime_evidence(
     for run in bridge_runs:
         if not isinstance(run, dict) or run.get("session_id") != session_id:
             continue
-        try:
-            started = _parse_aware_datetime(run.get("started_at_utc"), "bridge_run.started_at_utc")
-            ended = _parse_aware_datetime(run.get("finished_at_utc"), "bridge_run.finished_at_utc")
-        except FillMatrixError:
-            continue
+        started = _parse_aware_datetime(run.get("started_at_utc"), "bridge_run.started_at_utc")
+        ended = _parse_aware_datetime(run.get("finished_at_utc"), "bridge_run.finished_at_utc")
         if executor_started <= started < ended <= executor_ended:
             candidates.append(run)
     if len(candidates) != 1:

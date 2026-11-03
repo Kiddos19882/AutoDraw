@@ -16,8 +16,6 @@ from chalk_fill_runtime_binding import (
     bind_fill001_runtime_evidence,
     build_fill001_experiment_context,
 )
-from drawing.execution_diagnostics import build_execution_report
-from models import DrawingPlan, Point, Stroke
 
 
 def _task():
@@ -52,8 +50,11 @@ def _runtime_documents(tmp_path):
     task = _task()
     session_id = str(uuid.uuid4())
     run_id = str(uuid.uuid4())
-    plan = DrawingPlan(20, 20, [Stroke("fill001", [Point(1, 1), Point(19, 1)])], name="FILL-001 rectangle r5")
-    plan_document = attach_fill001_experiment_context(plan.to_dict(), task)
+    plan_document = attach_fill001_experiment_context({
+        "schema_version": 1,
+        "canvas": {"width": 460, "height": 240},
+        "strokes": [{"name": "fill001", "points": [{"x": 1, "y": 1}, {"x": 19, "y": 1}]}],
+    }, task)
     plan_path = tmp_path / "fill001-plan.json"
     plan_path.write_text(json.dumps(plan_document), encoding="utf-8")
 
@@ -75,17 +76,17 @@ def _runtime_documents(tmp_path):
         "ended_at": "2026-11-03T10:00:10+00:00",
         "executor_config": config,
     }
-    report = build_execution_report(
-        stage=14,
-        source_plan_path=plan_path,
-        source_plan=plan,
-        executed_plan=plan,
-        target_area={"x": 0, "y": 0, "width": 20, "height": 20},
-        fit_info=None,
-        summary=summary,
-        config=config,
-        status="completed",
-    )
+    report = {
+        "schema_version": 3,
+        "execution_id": str(uuid.uuid4()),
+        "status": "completed",
+        "experiment_context": plan_document["autodraw_experiment"],
+        "source_plan_file": str(plan_path),
+        "source_plan_file_sha256": "c" * 64,
+        "summary": summary,
+        "executor_config": config,
+        "executed_plan": {"stroke_count": 1},
+    }
     report_path = tmp_path / "execution_fill001.json"
     report_path.write_text(json.dumps(report), encoding="utf-8")
 
