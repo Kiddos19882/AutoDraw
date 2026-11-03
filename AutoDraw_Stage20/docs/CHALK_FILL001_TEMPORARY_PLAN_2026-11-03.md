@@ -38,7 +38,7 @@
 
 ### Шаг 3. Интегрировать запуск в AutoDraw и провести Windows live preflight
 
-**Статус:** IN_PROGRESS — первая пользовательская попытка остановилась на handoff из-за невалидного runtime JSON; исправление и regression test внесены, новый CI и повторный Windows live preflight ожидаются.
+**Статус:** IN_PROGRESS — первая пользовательская попытка остановилась на handoff из-за невалидного runtime JSON; исправление и regression test внесены, CI [41692129486](https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486) выполняется: Game Monitor/Bridge, Preparation/G3 и INT-006 pixel audit — SUCCESS; Application integration и Executor jobs ещё выполняются. Повторный Windows live preflight ожидает завершения CI.
 
 **Подтверждённая реализация UI/runner:**
 - Добавлен `source/preparation/chalk_fill_ui.py` и самостоятельная вкладка FILL-001 в `integrated_app.py`, отдельная от седьмой вкладки «Тест кистей».
