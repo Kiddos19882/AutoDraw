@@ -1,7 +1,7 @@
 # FILL-001 — технический дизайн экспериментального harness
 
 **Дата:** 2026-11-03  
-**Статус:** FROZEN MASK GENERATOR AND FIXED-RADIUS PLANNER IMPLEMENTED; matrix harness pending  
+**Статус:** FROZEN MASK GENERATOR, FIXED-RADIUS PLANNER, 45-CELL MATRIX AND ANALYZER IMPLEMENTED; CI PENDING  
 **Связь:** [план FILL-001](CHALK_FILL_AREA_RADIUS_EFFICIENCY_PLAN_2026-11-03.md)
 
 ## Подтверждённые ограничения
@@ -97,3 +97,19 @@
 ## Границы
 
 Production estimator, frozen INT-006 model, executor/sampling defaults и `master` не менять. Не смешивать радиусы в одной cell. Не считать prediction points фактическим CHALK. INT-007 остаётся BLOCKED до расширенной validation и решения о safety margin.
+
+
+## Matrix, journal contract и analyzer — 2026-11-03
+
+Добавлены `source/preparation/chalk_fill_matrix.py` и `source/preparation/tests/test_chalk_fill_matrix.py`.
+
+- `build_fill001_matrix(series_id)` формирует 45 уникальных task cells: 3 frozen shapes × 5 радиусов × 3 повтора.
+- В каждую задачу входят динамический `expected_strokes`, target area, mask SHA-256, plan signature, planned coverage/leakage и уникальный task ID.
+- Manifest имеет canonical SHA-256 подпись; `validate_fill001_matrix` проверяет полный набор ячеек, отсутствие дубликатов, неизменность подписи, frozen mask/plan identity и quality gates.
+- `write_fill001_matrix` сохраняет manifest атомарно; `load_fill001_matrix` проверяет его при чтении.
+- `validate_fill001_capture` требует run/task/plan/mask/radius identity, точный CHALK = post pointCount − pre pointCount, совпадение completed strokes с dynamic expected_strokes, coverage ≥99%, leakage=0 и нулевые dropped events/Monitor errors/bridge failures/sequence gaps.
+- `analyze_fill001_captures` отклоняет отсутствующие, неожиданные, повторные task/run IDs и неполные captures; агрегирует exact CHALK по каждой паре shape/radius с тремя повторами.
+- Analyzer не выводит площадь/CHALK до подтверждения live target area из PNG; поле effective_area_per_chalk остаётся null. Production model/safety margin не меняются.
+- Матрица не запускает игру и не исполняет планы. `execution_allowed=false`, `safe_to_execute=false` остаются обязательными.
+
+Добавлены regression tests на 45 cells, deterministic manifest, target area/plan identities, duplicate/missing cells, signature tampering, unsupported planner, manifest round-trip, exact CHALK/quality gates, полный 45-capture analyzer и duplicate run identity. CI для актуального HEAD ещё не подтверждён; до CI PASS и Windows preflight live captures запрещены.
