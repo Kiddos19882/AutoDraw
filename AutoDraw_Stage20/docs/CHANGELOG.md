@@ -1,5 +1,10 @@
 # История изменений документации и проекта
 
+## 2026-11-03 — CI для реального INT006R dataset
+
+- В `.github/workflows/geometry-tests.yml` добавлен отдельный запуск `chalk_int006r_validation.py` на committed live journal/capture bundle и загрузка JSON artifact `autodraw-int006r-live-validation`.
+- Workflow [41559932955](https://github.com/Kiddos19882/AutoDraw/actions/runs/41559932955) запущен; результат ожидается. Это отдельная проверка реальных данных, а не synthetic fixture.
+
 ## 2026-11-03 — INT006R live results и FILL-001
 
 - Добавлен [отчёт INT006R live results](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md): 45/45 задач, exact CHALK, sampled/per-stroke delta match, observed radius match и нулевые Monitor/Bridge integrity errors.
