@@ -1,10 +1,22 @@
 # INT006R — live preflight и визуальный аудит
 
-**Статус:** READY FOR LOCAL WINDOWS PREFLIGHT — CI PASS; live captures пока не запускались  
+**Статус:** LIVE BLOCK COMPLETED 45/45; raw-data audit PASS; official CLI analyzer on real bundle and manual visual audit pending  
 **Фаза:** INT006R  
 **Матрица:** D1–D5 × radius 1/10/30 × 3 повтора = 45 captures  
 **Sampling:** P1 — point_step_px=4, point_delay_ms=5 ms  
 **Рабочая ветка:** feature/image-geometry-optimization
+
+## Текущий статус live серии — 2026-11-03
+
+Live block выполнен и сохранён в commit `138c9fbeaf612a86819f7ff9ea0db7bb1fe4296a`:
+- series `chalk-20261103-030837-a20df5`;
+- block `a8e0b9ec87984f60aa294910d366e987`;
+- 45/45 tasks completed;
+- exact CHALK и per-stroke delta совпадают; observed radius соответствует requested; dropped events, Monitor errors, Bridge failures и sequence gaps — 0.
+
+Raw-data результаты: [CHALK_INT006R_LIVE_RESULTS_2026-11-03.md](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md).
+
+Этот документ сохраняет инструкцию как воспроизводимый протокол. Следующие действия: запустить CLI analyzer на committed live journal/capture bundle, затем вручную проверить все 45 пар before/after PNG и заполнить таблицу visual audit. До этого visual quality gate не закрывать.
 
 ## 1. Обязательные условия до live запуска
 
