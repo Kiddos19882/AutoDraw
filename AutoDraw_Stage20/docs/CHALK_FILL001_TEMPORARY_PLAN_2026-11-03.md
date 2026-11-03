@@ -38,7 +38,7 @@
 
 ### Шаг 3. Интегрировать запуск в AutoDraw и провести Windows live preflight
 
-**Статус:** IN_PROGRESS — первая пользовательская попытка остановилась на handoff из-за невалидного runtime JSON; исправление и regression test внесены, CI [41692129486](https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486) выполняется: Game Monitor/Bridge, Preparation/G3 и INT-006 pixel audit — SUCCESS; Application integration и Executor jobs ещё выполняются. Повторный Windows live preflight ожидает завершения CI.
+**Статус:** IN_PROGRESS — первая пользовательская попытка остановилась на handoff из-за невалидного runtime JSON; исправление и regression test внесены, CI [41692129486](https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486) выполняется: Application integration, Game Monitor/Bridge, Preparation/G3, Executor и INT-006 pixel audit — SUCCESS; Windows portable build/startup smoke-test ещё выполняется. Повторный Windows live preflight ожидает завершения CI.
 
 **Подтверждённая реализация UI/runner:**
 - Добавлен `source/preparation/chalk_fill_ui.py` и самостоятельная вкладка FILL-001 в `integrated_app.py`, отдельная от седьмой вкладки «Тест кистей».
@@ -50,7 +50,7 @@
 - Unified app regression test проверяет регистрацию вкладки `8. FILL-001`; следующая вкладка — `9. Калибровка теста`.
 - Первая пользовательская попытка сохранена в commit [6b1cba9](https://github.com/Kiddos19882/AutoDraw/commit/6b1cba9b1c40a030ac6bd7b29365bf19ac3c9149): manifest, logical DrawingPlan (131 strokes), before PNG и Bridge session. Передача была отклонена до brush handoff: `_transfer_brush_test_plan()` добавлял `autodraw_experiment` и записывал после JSON object буквальные символы `\n`; Stage 6 не мог прочитать runtime-файл.
 - Bridge session этой попытки показывает Monitor active/boardDetected, exact snapshot `pointCount=1`, `remainingPoints=5999`, `received_event_count=0`, `sentEventCount=0`; after PNG и executor report отсутствуют. Попытка не является live capture и не подтверждает расход CHALK.
-- Исправлена запись runtime JSON: добавлен настоящий перевод строки; сообщение ошибки также форматируется с переносами строк. Code commit [8dfd1b5](https://github.com/Kiddos19882/AutoDraw/commit/8dfd1b541f54a1b416dfb2907739cf4b1a99c58d). Добавлен regression test полного FILL-001 plan → Stage 6 load с проверкой experiment context: [1b2d8a1](https://github.com/Kiddos19882/AutoDraw/commit/1b2d8a128c99ab8ad1abb1e9f480702676cd9f56). CI [41692129486](https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486) выполняется; на момент обновления Game Monitor/Bridge, Preparation/G3 и INT-006 pixel audit — SUCCESS, Application integration/Executor — IN_PROGRESS.
+- Исправлена запись runtime JSON: добавлен настоящий перевод строки; сообщение ошибки также форматируется с переносами строк. Code commit [8dfd1b5](https://github.com/Kiddos19882/AutoDraw/commit/8dfd1b541f54a1b416dfb2907739cf4b1a99c58d). Добавлен regression test полного FILL-001 plan → Stage 6 load с проверкой experiment context: [1b2d8a1](https://github.com/Kiddos19882/AutoDraw/commit/1b2d8a128c99ab8ad1abb1e9f480702676cd9f56). CI [41692129486](https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486) выполняется; все regression jobs — SUCCESS; Windows portable build/startup smoke-test — IN_PROGRESS.
 
 **Исправление client ROI — реализовано и подтверждено software CI:**
 - Логический BoardPane движка и frozen masks имеют размер 460×240 logical pixels. Это не физический размер доски на клиентском экране.
