@@ -15,7 +15,10 @@
 - Подготовлен план FILL-001: три формы областей × пять радиусов × три повтора; основной показатель — качественно покрытая площадь на exact CHALK.
 - Обнаружено ограничение существующего `interior_fill_planner.py`: `max_brush_value <= 20`, strokes не готовы к automatic execution; семантика radius vs footprint width требует проверки.
 - Production estimator, frozen INT-006 model, executor/sampling defaults и `master` не менялись.
-- В `.github/workflows/geometry-tests.yml` добавлен запуск `chalk_int006r_validation.py` на реальном committed journal/capture bundle с отдельным artifact `autodraw-int006r-live-validation`. Workflow [41559932955](https://github.com/Kiddos19882/AutoDraw/actions/runs/41559932955) запущен; на момент записи jobs ещё выполняются.
+- В `.github/workflows/geometry-tests.yml` добавлен запуск `chalk_int006r_validation.py` на реальном committed journal/capture bundle с отдельным artifact `autodraw-int006r-live-validation`. Workflow [41559932955](https://github.com/Kiddos19882/AutoDraw/actions/runs/41559932955) завершился SUCCESS: 45 accepted, 0 missing/rejected, PNG evidence complete.
+- В отчёте обнаружено противоречие: P1=4/5 корректно выводился отдельно, но `other_executor_parameters` включал устаревшие значения 2/10. Исправлены analyzer и regression test; повторный workflow [41560787871](https://github.com/Kiddos19882/AutoDraw/actions/runs/41560787871) выполняется.
+- Статически проверен engine bundle из master commit `bd8815c`: CHALK считается по числу `atom.points`; radius передаётся в `lineStyle` как ширина линии. Создан [engine analysis](CHALK_GAME_ENGINE_POINT_COST_AND_BRUSH_WIDTH_2026-11-03.md).
+- Подтверждено, что `testImages/images.png` уже есть в обеих ветках с одинаковым blob SHA; engine bundle пока только в master. Merge/rebase не выполнялся.
 
 
 ## 2026-11-03 — INT006R full software gate PASS
