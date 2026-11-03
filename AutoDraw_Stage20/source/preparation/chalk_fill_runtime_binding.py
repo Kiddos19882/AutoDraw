@@ -19,6 +19,12 @@ FILL001_RUNTIME_PROFILE = {
 FILL001_EXECUTOR_STEP_PX = 4.0
 FILL001_EXECUTOR_DELAY_MS = 5
 FILL001_LINE_EXTENSION_PX = 0.0
+
+
+class RuntimeBindingNotReady(FillMatrixError):
+    """The Bridge run has not been finalized or persisted yet."""
+
+
 _CONTEXT_FIELDS = (
     "phase_id",
     "series_id",
@@ -428,6 +434,8 @@ def bind_fill001_runtime_evidence(
             if ended > executor_ended + grace:
                 raise FillMatrixError("Bridge run превысил idle finalization grace.")
             candidates.append(run)
+    if not candidates:
+        raise RuntimeBindingNotReady("Bridge run ещё не finalized/persisted для executor interval.")
     if len(candidates) != 1:
         raise FillMatrixError(
             f"Executor interval должен содержать ровно один Bridge run; найдено: {len(candidates)}."
@@ -525,7 +533,7 @@ def load_fill001_runtime_binding(
 
     run_files = sorted(session_file.parent.glob("game-monitor-run-*.json"))
     if not run_files:
-        raise FillMatrixError("В каталоге Bridge session нет run-файлов.")
+        raise RuntimeBindingNotReady("В каталоге Bridge session пока нет finalized run-файлов.")
     bridge_runs = []
     run_hashes: dict[str, str] = {}
     for run_file in run_files:
@@ -555,3 +563,75 @@ def load_fill001_runtime_binding(
         raise FillMatrixError("Не удалось однозначно определить Bridge run-файл по run_id.")
     binding["bridge_run_file"] = str(matching[0])
     return binding
+
+
+def find_fill001_runtime_binding(
+    task: dict[str, Any],
+    bridge_root: str | Path,
+    executor_report_path: str | Path,
+) -> dict[str, Any] | None:
+    """Discover the unique active Bridge session for an executor report.
+
+    Returns None while the Bridge idle-finalization heartbeat has not persisted
+    the run file. Multiple active sessions are rejected rather than guessed.
+    """
+    report_file = Path(executor_report_path)
+    try:
+        report = json.loads(report_file.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise FillMatrixError(f"Не удалось прочитать executor report: {exc}") from exc
+    if not isinstance(report, dict):
+        raise FillMatrixError("Executor report должен быть JSON object.")
+    _verify_executor_source_plan(report)
+    executor_started, executor_ended, _ = _validate_executor_report(task, report)
+
+    root = Path(bridge_root)
+    if not root.is_dir():
+        return None
+    active_sessions: list[Path] = []
+    for session_file in sorted(root.glob("*/session.json")):
+        try:
+            session = json.loads(session_file.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+            raise FillMatrixError(f"Не удалось прочитать Bridge session {session_file}: {exc}") from exc
+        if not isinstance(session, dict):
+            raise FillMatrixError(f"Bridge session {session_file} должен быть JSON object.")
+        session_id = session.get("session_id")
+        if not isinstance(session_id, str) or session_file.parent.name != session_id:
+            raise FillMatrixError(f"Каталог Bridge session не совпадает с session_id: {session_file}.")
+        try:
+            session_started = _parse_aware_datetime(session.get("started_at_utc"), "session.started_at_utc")
+            diagnostics = session.get("bridge_diagnostics")
+            if not isinstance(diagnostics, dict):
+                raise FillMatrixError("Bridge session не содержит bridge_diagnostics.")
+            last_message = _parse_aware_datetime(
+                diagnostics.get("last_message_at_utc"), "session.bridge_diagnostics.last_message_at_utc"
+            )
+        except FillMatrixError:
+            # A session without timestamps cannot safely be excluded from the
+            # executor window, so fail closed instead of silently skipping it.
+            raise
+
+        closed_at_value = session.get("connection_closed_at_utc")
+        if closed_at_value:
+            closed_at = _parse_aware_datetime(closed_at_value, "session.connection_closed_at_utc")
+            if closed_at < executor_started:
+                continue
+        if session_started > executor_ended + timedelta(seconds=4.0) or last_message < executor_started:
+            continue
+        if session.get("schema_version") != 2:
+            raise FillMatrixError("Активная Bridge session создана по устаревшей schema; требуется schema_version=2.")
+        _session_finalize_grace_seconds(session)
+        active_sessions.append(session_file)
+
+    if not active_sessions:
+        return None
+    if len(active_sessions) != 1:
+        raise FillMatrixError(
+            f"Во время FILL-001 execution обнаружено несколько активных Bridge sessions: {len(active_sessions)}."
+        )
+    try:
+        return load_fill001_runtime_binding(task, active_sessions[0], report_file)
+    except RuntimeBindingNotReady:
+        return None
+

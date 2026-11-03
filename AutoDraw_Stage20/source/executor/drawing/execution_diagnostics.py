@@ -138,3 +138,30 @@ def write_execution_report(results_dir: str | Path, report: dict[str, Any]) -> P
             pass
         raise
     return destination
+
+
+def update_execution_report(report_path: str | Path, updates: dict[str, Any]) -> Path:
+    """Atomically update an existing execution report with post-run evidence."""
+    destination = Path(report_path)
+    try:
+        report = json.loads(destination.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise ValueError(f"Не удалось прочитать execution report для обновления: {exc}") from exc
+    if not isinstance(report, dict) or not isinstance(updates, dict):
+        raise ValueError("Execution report и updates должны быть JSON objects.")
+    report.update(updates)
+    payload = json.dumps(report, ensure_ascii=False, indent=2, allow_nan=False) + "\n"
+    fd, temp_name = tempfile.mkstemp(prefix=".execution_update_", suffix=".tmp", dir=str(destination.parent))
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as stream:
+            stream.write(payload)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temp_name, destination)
+    except Exception:
+        try:
+            os.unlink(temp_name)
+        except OSError:
+            pass
+        raise
+    return destination

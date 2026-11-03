@@ -4,6 +4,7 @@ import ctypes
 import json
 import os
 import sys
+import time
 from dataclasses import dataclass, replace
 from datetime import datetime
 from pathlib import Path
@@ -35,7 +36,7 @@ from drawing.color_plan_execution import (
 from brush_planner import BrushPlannerError, load_adaptive_brush_plan
 from brush_radius_feedback import read_active_bridge_radius
 from drawing.execution_diagnostics import (
-    build_crash_summary, build_execution_report, validate_target_area, write_execution_report,
+    build_crash_summary, build_execution_report, update_execution_report, validate_target_area, write_execution_report,
 )
 from drawing.plan_transform import PlanFitInfo, fit_plan_to_size
 from models import DrawingPlan, Point, Stroke
@@ -1798,10 +1799,24 @@ class Stage6App:
                     "final_brush_slider_x": color_details.get("final_brush_slider_x"),
                     "slider_calibration": color_details.get("brush_slider_calibration"),
                 }
+        fill001_runtime_binding_pending = (
+            summary.status == "completed"
+            and isinstance(report.get("experiment_context"), dict)
+            and report["experiment_context"].get("phase_id") == "FILL001"
+        )
+        if fill001_runtime_binding_pending:
+            report["runtime_binding_status"] = "pending"
         try:
             report_path = write_execution_report(RESULTS_DIR, report)
             self.last_report_path = report_path
             report_status = f"Отчёт: {report_path}"
+            if fill001_runtime_binding_pending:
+                threading.Thread(
+                    target=self._bind_fill001_runtime_after_execution,
+                    args=(report_path,),
+                    name="FILL001-runtime-binding",
+                    daemon=False,
+                ).start()
         except OSError as exc:
             report_status = f"Не удалось сохранить отчёт: {exc}"
 
@@ -1846,6 +1861,68 @@ class Stage6App:
 
         if self.close_after_execution:
             self.root.destroy()
+
+
+    def _bind_fill001_runtime_after_execution(self, report_path: str | Path) -> None:
+        """Persist the unique Bridge run binding after RunRecorder idle finalization."""
+        preparation_dir = Path(__file__).resolve().parents[1] / "preparation"
+        if str(preparation_dir) not in sys.path:
+            sys.path.insert(0, str(preparation_dir))
+        try:
+            from chalk_fill_runtime_binding import find_fill001_runtime_binding
+
+            report_file = Path(report_path)
+            bridge_root = RESULTS_DIR / "brush_behavior_tests" / "game_monitor_bridge"
+            for _attempt in range(80):  # 20 s; covers the configured 15 s idle window plus heartbeat grace.
+                report = json.loads(report_file.read_text(encoding="utf-8"))
+                context = report.get("experiment_context")
+                if not isinstance(context, dict) or context.get("phase_id") != "FILL001":
+                    return
+                binding = find_fill001_runtime_binding(context, bridge_root, report_file)
+                if binding is not None:
+                    summary = {
+                        "binding_method": "unique_run_in_executor_window",
+                        "task_id": binding["task_id"],
+                        "session_id": binding["session_id"],
+                        "run_id": binding["run_id"],
+                        "execution_id": binding["execution_id"],
+                        "stroke_lifecycle_source": binding["stroke_lifecycle_source"],
+                        "observed_radius": binding["observed_radius"],
+                        "sampling_profile": binding["sampling_profile"],
+                        "executor_config": binding["executor_config"],
+                        "source_plan_file_sha256": binding["source_plan_file_sha256"],
+                        "pre_point_count": binding["pre_point_count"],
+                        "post_point_count": binding["post_point_count"],
+                        "exact_chalk": binding["exact_chalk"],
+                        "event_count": binding["event_count"],
+                        "bridge_failures": binding["bridge_failures"],
+                        "sequence_gaps": binding["sequence_gaps"],
+                        "session_file": binding["session_file"],
+                        "session_file_sha256": binding["session_file_sha256"],
+                        "bridge_run_file": binding["bridge_run_file"],
+                        "bridge_run_file_sha256": binding["bridge_run_file_sha256"],
+                    }
+                    update_execution_report(
+                        report_file,
+                        {"runtime_binding_status": "passed", "runtime_binding": summary},
+                    )
+                    return
+                time.sleep(0.25)
+            update_execution_report(
+                report_file,
+                {
+                    "runtime_binding_status": "not_found",
+                    "runtime_binding_error": "No unique finalized Bridge run appeared within 20 seconds.",
+                },
+            )
+        except Exception as exc:
+            try:
+                update_execution_report(
+                    report_path,
+                    {"runtime_binding_status": "failed", "runtime_binding_error": str(exc)},
+                )
+            except Exception:
+                pass
 
     def _execution_crashed(
         self,

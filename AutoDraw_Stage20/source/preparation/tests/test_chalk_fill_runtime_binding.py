@@ -16,6 +16,7 @@ from chalk_fill_runtime_binding import (
     attach_fill001_experiment_context,
     bind_fill001_runtime_evidence,
     build_fill001_experiment_context,
+    find_fill001_runtime_binding,
 )
 
 
@@ -153,6 +154,7 @@ def _runtime_documents(tmp_path):
         "monitor_status_at_connect": {"version": "0.2.1"},
         "bridge_diagnostics": {
             "received_event_count": len(events),
+            "last_message_at_utc": "2026-11-03T10:00:12+00:00",
             "collector_sequence_gap_count": 0,
             "last_sequence": len(events) + 2,
             "browser_bridge": {
@@ -307,3 +309,44 @@ def test_runtime_context_rejects_task_mismatch_and_duplicate_context(tmp_path):
     _, _, _, _, run, session, report = _runtime_documents(tmp_path)
     with pytest.raises(FillMatrixError, match="другой FILL-001 task"):
         bind_fill001_runtime_evidence(task, session, [run], report)
+
+
+def test_find_runtime_binding_discovers_the_unique_active_session(tmp_path):
+    task, session_path, report_path, _, _, _, _ = _runtime_documents(tmp_path)
+    bridge_root = tmp_path / "bridge-root"
+    bridge_root.mkdir()
+    destination = bridge_root / session_path.parent.name
+    session_path.parent.rename(destination)
+    binding = find_fill001_runtime_binding(
+        task, bridge_root, report_path
+    )
+    assert binding is not None
+    assert binding["task_id"] == task["task_id"]
+    assert binding["run_id"]
+
+
+def test_find_runtime_binding_waits_until_bridge_run_file_is_finalized(tmp_path):
+    task, session_path, report_path, run_path, _, _, _ = _runtime_documents(tmp_path)
+    bridge_root = tmp_path / "bridge-root"
+    bridge_root.mkdir()
+    destination = bridge_root / session_path.parent.name
+    session_path.parent.rename(destination)
+    (destination / run_path.name).unlink()
+    assert find_fill001_runtime_binding(task, bridge_root, report_path) is None
+
+
+def test_find_runtime_binding_rejects_multiple_active_sessions(tmp_path):
+    task, session_path, report_path, _, _, session, _ = _runtime_documents(tmp_path)
+    bridge_root = tmp_path / "bridge-root"
+    bridge_root.mkdir()
+    destination = bridge_root / session_path.parent.name
+    session_path.parent.rename(destination)
+    second_id = str(uuid.uuid4())
+    second_dir = bridge_root / second_id
+    second_dir.mkdir()
+    second_session = dict(session)
+    second_session["session_id"] = second_id
+    (second_dir / "session.json").write_text(json.dumps(second_session), encoding="utf-8")
+    with pytest.raises(FillMatrixError, match="несколько активных Bridge sessions"):
+        find_fill001_runtime_binding(task, bridge_root, report_path)
+

@@ -10,6 +10,7 @@ from drawing.execution_diagnostics import (
     build_execution_report,
     canonical_sha256,
     validate_target_area,
+    update_execution_report,
     write_execution_report,
 )
 from models import DrawingPlan, Point, Stroke
@@ -18,6 +19,18 @@ from models import DrawingPlan, Point, Stroke
 class ExecutionDiagnosticsTests(unittest.TestCase):
     def make_plan(self):
         return DrawingPlan(20, 20, [Stroke("line", [Point(1, 1), Point(10, 1)])], name="fixture")
+
+
+    def test_update_execution_report_is_atomic_and_preserves_existing_fields(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            path = write_execution_report(temp_dir, {"status": "completed", "existing": 1})
+            updated = update_execution_report(path, {"runtime_binding_status": "passed"})
+            self.assertEqual(updated, path)
+            report = json.loads(path.read_text(encoding="utf-8"))
+            self.assertEqual(report["status"], "completed")
+            self.assertEqual(report["existing"], 1)
+            self.assertEqual(report["runtime_binding_status"], "passed")
+            self.assertFalse(list(Path(temp_dir).glob(".execution_update_*.tmp")))
 
     def test_hash_ignores_object_key_order_but_detects_changes(self):
         self.assertEqual(canonical_sha256({"a": 1, "b": 2}), canonical_sha256({"b": 2, "a": 1}))
