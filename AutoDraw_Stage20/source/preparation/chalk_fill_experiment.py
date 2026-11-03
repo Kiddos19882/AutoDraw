@@ -20,6 +20,7 @@ from chalk_fill_experiment import (
     FILL001_CANVAS_HEIGHT,
     FILL001_CANVAS_WIDTH,
     FILL001_RADII,
+    FILL001_EXPECTED_MASK_SHA256,
     FILL001_SHAPES,
     build_fill_target_mask,
     fill_target_mask_sha256,
@@ -103,7 +104,7 @@ def rasterize_fill_strokes(
         or not bool(np.any(target))
     ):
         raise FillPlannerError("Некорректная frozen mask FILL-001.")
-    if isinstance(brush_value, bool) or brush_value not in FILL001_RADII:
+    if isinstance(brush_value, bool) or not isinstance(brush_value, int) or brush_value not in FILL001_RADII:
         raise FillPlannerError("Недопустимый фиксированный размер кисти FILL-001.")
     if not isinstance(strokes, list):
         raise FillPlannerError("Список штрихов должен быть массивом.")
@@ -168,7 +169,7 @@ def build_fixed_radius_fill_plan(
 
     mask = build_fill_target_mask(shape_id)
     mask_hash = fill_target_mask_sha256(shape_id, mask)
-    if mask_hash != __import__("chalk_fill_experiment").FILL001_EXPECTED_MASK_SHA256[shape_id]:
+    if mask_hash != FILL001_EXPECTED_MASK_SHA256[shape_id]:
         raise FillPlannerError("SHA-256 frozen mask не совпадает с закреплённым значением.")
 
     distance = cv2.distanceTransform(mask.astype(np.uint8), cv2.DIST_L2, 5)
