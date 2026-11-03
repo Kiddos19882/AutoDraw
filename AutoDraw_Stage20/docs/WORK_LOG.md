@@ -1,5 +1,22 @@
 # Журнал работ AutoDraw
 
+## 2026-11-03 — INT006R live data audit и план FILL-001
+
+**Live data commit:** [138c9fbe](https://github.com/Kiddos19882/AutoDraw/commit/138c9fbeaf612a86819f7ff9ea0db7bb1fe4296a)  
+**Series:** `chalk-20261103-030837-a20df5`  
+**Block:** `a8e0b9ec87984f60aa294910d366e987`
+
+- Проверен durable journal: 45/45 задач completed, матрица D1–D5 × radius 1/10/30 × 3 повтора, профиль P1 (step=4, delay=5 ms).
+- По всем 45 Monitor reports проверены точные pre/post pointCount, расход, sampled per-stroke delta, requested/observed radius и integrity counters.
+- Во всех проверенных reports `sampled_point_delta_total` совпал с exact CHALK; dropped events, Monitor errors, Bridge send failures и sequence gaps — 0.
+- Средний расход: radius 1 — 67.40 (total 1011); radius 10 — 67.67 (total 1015); radius 30 — 67.80 (total 1017). Полная таблица: [INT006R live report](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md).
+- Не объявляли visual quality gate закрытым: требуется ручной просмотр всех 45 пар PNG и официальный CLI analyzer на реальном bundle.
+- Обновлены PROJECT_STATUS, TASKS, ROADMAP, CHANGELOG и docs index.
+- Подготовлен план FILL-001: три формы областей × пять радиусов × три повтора; основной показатель — качественно покрытая площадь на exact CHALK.
+- Обнаружено ограничение существующего `interior_fill_planner.py`: `max_brush_value <= 20`, strokes не готовы к automatic execution; семантика radius vs footprint width требует проверки.
+- Production estimator, frozen INT-006 model, executor/sampling defaults и `master` не менялись.
+
+
 ## 2026-11-03 — INT006R full software gate PASS
 
 **CI:** [run 41540054975](https://github.com/Kiddos19882/AutoDraw/actions/runs/41540054975)  
