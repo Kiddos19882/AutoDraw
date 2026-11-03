@@ -79,3 +79,5 @@ Software gate INT006R прошёл ранее на code HEAD `28b56a97255b57b500
 
 Commit `138c9fbe` содержит live experiment data. Для этого data commit GitHub connector не вернул workflow runs или status checks; CI PASS выше относится к code HEAD, а не к отдельному повторному запуску на data commit.
 
+После raw-data audit в `.github/workflows/geometry-tests.yml` добавлен отдельный analyzer step для committed INT006R dataset. Workflow [41559932955](https://github.com/Kiddos19882/AutoDraw/actions/runs/41559932955) на CI commit `2b8812d9` выполняется; он должен подтвердить accepted/missing/rejected counters и PNG evidence на реальных файлах.
+
