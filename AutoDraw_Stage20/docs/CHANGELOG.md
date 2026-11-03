@@ -1,3 +1,11 @@
+## 2026-11-03 — FILL-001 software regression gate PASS
+
+- Подтверждён полный GitHub Actions run [41579136690](https://github.com/Kiddos19882/AutoDraw/actions/runs/41579136690) на code HEAD `b4cc45a80231e6bad2f878b2a5a2f16b48b9d68b`.
+- Preparation/G3: 754 passed, 24 warnings, 82 subtests passed; Game Monitor/Bridge, Application integration, Executor regression, INT-006 audit и Windows portable build/startup smoke-test — SUCCESS.
+- Windows smoke-test подтвердил запуск portable `AutoDraw.exe` с активным процессом в течение 10 секунд; artifact ID 13204044319.
+- Исправление сигнатуры `audit_fill001_png_pair()` подтверждено; production estimator, executor defaults и live captures не менялись.
+- Шаг 1 временного плана FILL-001 переведён в DONE. Runtime binding и Windows PNG preflight остаются открытыми.
+
 ## 2026-11-03 — временный план FILL-001
 
 - Добавлен обязательный к сохранению временный план из пяти шагов: software gate, runtime binding, Windows PNG preflight, 45 live captures и анализ расхода/качества.
