@@ -118,7 +118,8 @@ def _runtime_documents(tmp_path):
         "session_id": session_id,
         "run_id": run_id,
         "started_at_utc": "2026-11-03T10:00:02+00:00",
-        "finished_at_utc": "2026-11-03T10:00:12+00:00",
+        "started_at_performance_ms": 100.0,
+        "finished_at_utc": "2026-11-03T10:00:05+00:00",
         "execution_status": "completed",
         "pre_test_snapshot": _snapshot(100),
         "post_test_snapshot": _snapshot(105),
@@ -156,7 +157,7 @@ def _runtime_documents(tmp_path):
         "monitor_status_at_connect": {"version": "0.2.1"},
         "bridge_diagnostics": {
             "received_event_count": len(events),
-            "last_message_at_utc": "2026-11-03T10:00:12+00:00",
+            "last_message_at_utc": "2026-11-03T10:00:05+00:00",
             "collector_sequence_gap_count": 0,
             "last_sequence": len(events) + 2,
             "browser_bridge": {
@@ -243,9 +244,44 @@ def test_pointer_observer_parser_matches_committed_bridge_capture():
 
 def test_runtime_binding_accepts_bridge_idle_finalization_after_executor_end(tmp_path):
     task, _, _, _, run, session, report = _runtime_documents(tmp_path)
+    report["summary"]["ended_at"] = "2026-11-03T10:00:01+00:00"
+    run["started_at_utc"] = "2026-11-03T10:00:00.500+00:00"
+    run["finished_at_utc"] = "2026-11-03T10:00:02+00:00"
+    run["started_at_performance_ms"] = 100.0
     assert report["summary"]["ended_at"] < run["finished_at_utc"]
     binding = bind_fill001_runtime_evidence(task, session, [run], report)
     assert binding["run_id"] == run["run_id"]
+
+
+def test_runtime_binding_excludes_pre_execution_calibration_finalized_during_executor(tmp_path):
+    task, _, _, _, task_run, session, report = _runtime_documents(tmp_path)
+    calibration = dict(task_run)
+    calibration["run_id"] = str(uuid.uuid4())
+    calibration["started_at_utc"] = "2026-11-03T09:59:58+00:00"
+    calibration["started_at_performance_ms"] = 100.0
+    calibration["finished_at_utc"] = "2026-11-03T10:00:02+00:00"
+    calibration["events"] = [dict(event) for event in task_run["events"]]
+    for event, event_time in zip(calibration["events"], (100.0, 500.0, 900.0, 1100.0)):
+        event["t"] = event_time
+
+    binding = bind_fill001_runtime_evidence(task, session, [calibration, task_run], report)
+
+    assert binding["run_id"] == task_run["run_id"]
+
+
+def test_runtime_loader_reads_and_hashes_large_bridge_run_file(tmp_path):
+    from chalk_fill_runtime_binding import load_fill001_runtime_binding
+
+    task, session_path, report_path, run_path, run, _, _ = _runtime_documents(tmp_path)
+    run["diagnostic_padding"] = "x" * (28 * 1024 * 1024)
+    run_path.write_text(json.dumps(run), encoding="utf-8")
+
+    assert run_path.stat().st_size > 27 * 1024 * 1024
+    binding = load_fill001_runtime_binding(task, session_path, report_path)
+
+    assert binding["event_count"] == len(run["events"])
+    assert binding["exact_chalk"] == 5
+    assert binding["bridge_run_file_sha256"] == hashlib.sha256(run_path.read_bytes()).hexdigest()
 
 
 def test_runtime_binding_rejects_run_past_bridge_idle_finalization_grace(tmp_path):
