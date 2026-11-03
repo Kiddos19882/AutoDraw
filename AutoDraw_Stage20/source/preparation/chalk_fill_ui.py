@@ -242,15 +242,24 @@ class Fill001Tab:
             )
             return
         try:
+            # The board ROI must be visible, not covered by the AutoDraw window.
+            self.root.iconify()
+            time.sleep(0.5)
             self.before_png_path = self._capture_board_png(task, phase="before")
         except Exception as exc:
             messagebox.showwarning(
                 "FILL-001 preflight не пройден",
-                f"Не удалось подтвердить пустую доску и сохранить before PNG. Рисование не запущено.\n\n{exc}",
+                f"Не удалось подтвердить пустую доску и сохранить before PNG. Рисование не запущено.\\n\\n{exc}",
                 parent=self.root,
             )
             self.before_png_path = None
             return
+        finally:
+            try:
+                self.root.deiconify()
+                self.root.lift()
+            except tk.TclError:
+                pass
         if not messagebox.askyesno(
             "Разрешить один экспериментальный запуск?",
             (
