@@ -21,6 +21,8 @@ from paint_limit_test import build_paint_limit_test_plan
 from color_scanline import save_color_scanline_plan
 from palette_detection import create_palette_document
 from palette_profiles import create_palette_profile
+from chalk_fill_matrix import build_fill001_matrix
+from chalk_fill_execution import prepare_fill001_single_task_plan
 
 
 class UnifiedAppCoreTests(unittest.TestCase):
@@ -189,6 +191,64 @@ class UnifiedAppCoreTests(unittest.TestCase):
                     self.assertEqual(source_plan["coordinate_system"], "logical_board_pixels")
                     self.assertIn("screen_transform", source_plan["generation"])
                     self.assertEqual(app.notebook.select(), str(app.execution_tab))
+        except tk.TclError as exc:
+            self.skipTest(f"Tk desktop session unavailable: {exc}")
+        finally:
+            if app is not None:
+                app.workbench.cleanup()
+            if root is not None:
+                try:
+                    root.destroy()
+                except tk.TclError:
+                    pass
+
+    def test_fill001_plan_transfers_valid_json_context_to_stage6(self):
+        root = None
+        app = None
+        try:
+            root = tk.Tk()
+            root.withdraw()
+            app = integrated_app.AutoDrawUnifiedApp(root)
+            app.executor.area = TargetArea(x=100, y=80, width=646, height=338)
+
+            matrix = build_fill001_matrix("fill001-handoff-regression")
+            task = next(
+                item for item in matrix["tasks"]
+                if item["shape_id"] == "rectangle"
+                and item["requested_radius"] == 10
+                and item["repeat_index"] == 1
+            )
+            plan, selected = prepare_fill001_single_task_plan(
+                matrix,
+                task["task_id"],
+                operator_approved_single_task_preflight=True,
+            )
+            self.assertEqual(selected["task_id"], task["task_id"])
+            self.assertFalse(matrix["execution_allowed"])
+
+            with tempfile.TemporaryDirectory(prefix="AutoDraw FILL-001 handoff ") as temp:
+                app.data_paths["runtime"] = Path(temp) / "runtime"
+                source_path = Path(temp) / "fill001-source-plan.json"
+                source_path.write_text(
+                    json.dumps(plan, ensure_ascii=False, indent=2) + "\n",
+                    encoding="utf-8",
+                )
+
+                self.assertTrue(app._transfer_brush_test_plan(plan, source_path))
+
+                runtime_path = app.executor.plan_path
+                runtime_document = json.loads(runtime_path.read_text(encoding="utf-8"))
+                context = runtime_document["autodraw_experiment"]
+                self.assertEqual(context["phase_id"], "FILL001")
+                self.assertEqual(context["task_id"], task["task_id"])
+                self.assertEqual(context["requested_radius"], 10)
+                self.assertEqual(context["expected_strokes"], task["expected_strokes"])
+                self.assertEqual(
+                    app.executor.source_plan.stroke_count,
+                    task["expected_strokes"],
+                )
+                self.assertTrue(app.executor._fill001_execution_required)
+                self.assertEqual(app.notebook.select(), str(app.execution_tab))
         except tk.TclError as exc:
             self.skipTest(f"Tk desktop session unavailable: {exc}")
         finally:
