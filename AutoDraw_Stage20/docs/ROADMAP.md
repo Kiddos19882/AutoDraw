@@ -10,7 +10,7 @@
 4. Выполнить 45 live captures (3 формы × 5 радиусов × 3 повтора); до успешного шага 3 запуск заблокирован.
 5. Проанализировать exact CHALK и качество, определить влияние радиуса и лучшую стратегию заливки.
 
-**Текущий статус:** шаги 1–2 DONE как software/regression gates; UI/runner handoff шага 3 DONE; Windows live preflight шага 3 TODO; шаги 4–5 BLOCKED. CI [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985) SUCCESS на code/test HEAD `031913c`: Preparation/G3 778 passed, 24 warnings, 82 subtests; все обязательные jobs и Windows portable startup smoke-test успешны, optional benchmarks skipped.
+**Текущий статус:** шаги 1–2 DONE как software/regression gates; UI/runner реализован, но первая live попытка из commit `6b1cba9` выявила ошибку записи FILL-001 runtime JSON. Исправление внесено в `integrated_app.py` (commit `8dfd1b5`), интеграционный regression test добавлен (commit `1b2d8a1`); CI нового HEAD ожидается. Windows live preflight шага 3 не пройден; шаги 4–5 BLOCKED. Предыдущий CI [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985) остаётся успешным только для code/test HEAD `031913c`.
 
 ### FILL-001 — fill efficiency matrix
 
@@ -18,13 +18,15 @@
 - [x] Monitor capture adapter с per-stroke exact CHALK, radius/P1 binding и PNG hash/pixel audit.
 - [x] Fail-closed runtime binding к Bridge session/run и executor report.
 - [x] Отдельная вкладка FILL-001: manifest create/load, single-task selection, planner validation, operator approval, brush-size handoff, Stage 6 start с P1 override и capture finalization.
+- [x] Исправить runtime JSON serialization после добавления `autodraw_experiment`: runtime-файл больше не получает буквальный `\\n` после JSON object (commit `8dfd1b5`).
+- [x] Добавить integration regression test реального FILL-001 plan → Stage 6 load с проверкой experiment context (commit `1b2d8a1`); новый CI ещё не подтверждён.
 - [x] Regression gate и client-ROI correction закрыты software CI: [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985) SUCCESS на `031913c`.
 - [ ] Провести Windows live runtime preflight и подтвердить P1 из фактического executor report.
 - [x] Исправить физическое требование crop 460×240: UI снимает фактический calibrated client ROI, adapter преобразует frozen logical mask в размер PNG и сохраняет transform.
 - [ ] Проверить реальные board PNG в client ROI: RGB threshold=8, cursor/UI exclusion и coverage/leakage против frozen masks.
 - [ ] Только после preflight — 45 live captures и анализ расхода CHALK по shape/radius.
 
-**Текущий gate:** UI/runner реализованы; ошибочное ограничение физического ROI устранено, regression tests добавлены, CI [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985) SUCCESS. Требуется реальная Windows/game session для runtime/PNG preflight. Live execution всей 45-cell matrix остаётся BLOCKED.
+**Текущий gate:** runtime JSON handoff исправлен, интеграционный regression test добавлен, но CI нового code/test HEAD ожидается. Первая live попытка остановилась до запуска исполнителя; требуется повторная Windows/game session для проверки Stage 6, Bridge/executor binding и реальных PNG. Live execution всей 45-cell matrix остаётся BLOCKED.
 
 ## Актуальный статус CHALK — 2026-11-03
 
