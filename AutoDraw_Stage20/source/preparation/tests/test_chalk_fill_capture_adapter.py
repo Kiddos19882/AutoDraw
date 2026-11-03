@@ -70,6 +70,84 @@ def test_png_audit_checks_real_files_hash_coverage_and_leakage(tmp_path):
     assert len(result["after_png_sha256"]) == 64
 
 
+def _png_pair_for_roi(tmp_path, shape_id, width, height):
+    logical = build_fill_target_mask(shape_id)
+    screen_mask = np.asarray(
+        Image.fromarray(logical.astype(np.uint8) * 255, mode="L").resize(
+            (width, height), resample=Image.Resampling.NEAREST
+        ),
+        dtype=np.uint8,
+    ) > 0
+    before = np.zeros((height, width, 3), dtype=np.uint8)
+    after = before.copy()
+    after[screen_mask] = 255
+    before_path = tmp_path / f"before-{width}x{height}.png"
+    after_path = tmp_path / f"after-{width}x{height}.png"
+    Image.fromarray(before).save(before_path)
+    Image.fromarray(after).save(after_path)
+    return before_path, after_path, screen_mask
+
+
+def test_png_audit_accepts_actual_client_roi_581x304(tmp_path):
+    matrix = build_fill001_matrix("CLIENT-ROI-581")
+    task = matrix["tasks"][0]
+    before, after, _ = _png_pair_for_roi(tmp_path, task["shape_id"], 581, 304)
+    roi = {"x": 120, "y": 80, "width": 581, "height": 304}
+
+    result = audit_fill001_png_pair(task["shape_id"], before, after, screen_roi=roi)
+
+    assert result["png_audit_status"] == "passed"
+    assert result["coverage_fraction"] == 1.0
+    assert result["leakage_pixels"] == 0
+    assert result["screen_roi"] if "screen_roi" in result else True
+    transform = result["logical_to_screen_transform"]
+    assert transform["logical_board"] == {"width": 460, "height": 240}
+    assert transform["screen_roi"] == roi
+    assert transform["mask_resampling"] == "nearest_neighbor"
+
+
+def test_png_audit_rejects_nonuniform_client_roi(tmp_path):
+    matrix = build_fill001_matrix("CLIENT-ROI-NONUNIFORM")
+    task = matrix["tasks"][0]
+    before, after, _ = _png_pair_for_roi(tmp_path, task["shape_id"], 581, 320)
+
+    with pytest.raises(FillMatrixError, match="равномерному масштабу"):
+        audit_fill001_png_pair(
+            task["shape_id"], before, after,
+            screen_roi={"x": 0, "y": 0, "width": 581, "height": 320},
+        )
+
+
+def test_png_audit_rejects_roi_metadata_size_mismatch(tmp_path):
+    matrix = build_fill001_matrix("CLIENT-ROI-MISMATCH")
+    task = matrix["tasks"][0]
+    before, after, _ = _png_pair_for_roi(tmp_path, task["shape_id"], 581, 304)
+
+    with pytest.raises(FillMatrixError, match="не совпадает с фактическим calibrated screen ROI"):
+        audit_fill001_png_pair(
+            task["shape_id"], before, after,
+            screen_roi={"x": 0, "y": 0, "width": 460, "height": 240},
+        )
+
+
+def test_png_audit_detects_leakage_on_scaled_client_roi(tmp_path):
+    matrix = build_fill001_matrix("CLIENT-ROI-LEAKAGE")
+    task = matrix["tasks"][0]
+    before, after, screen_mask = _png_pair_for_roi(tmp_path, task["shape_id"], 581, 304)
+    pixels = np.asarray(Image.open(after).convert("RGB")).copy()
+    outside_y, outside_x = np.argwhere(~screen_mask)[0]
+    pixels[outside_y, outside_x] = 255
+    Image.fromarray(pixels).save(after)
+
+    result = audit_fill001_png_pair(
+        task["shape_id"], before, after,
+        screen_roi={"x": 120, "y": 80, "width": 581, "height": 304},
+    )
+
+    assert result["png_audit_status"] == "failed"
+    assert result["leakage_pixels"] == 1
+
+
 def test_monitor_adapter_builds_exact_capture_from_real_event_schema(tmp_path):
     matrix = build_fill001_matrix("ADAPTER-TEST")
     task = matrix["tasks"][0]
