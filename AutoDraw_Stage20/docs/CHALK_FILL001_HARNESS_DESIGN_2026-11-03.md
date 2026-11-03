@@ -188,10 +188,10 @@ FILL-001 capture contract в текущем виде требует уже аг�
 **Ограничение:** CI подтверждает программную интеграцию на тестовых runtime artifacts. Он не подтверждает live FILL-001 execution в пользовательской Windows/game session, реальный crop/cursor/UI PNG evidence или визуальное соответствие frozen masks. Эти проверки остаются Windows preflight gate; до их завершения 45 live captures не запускать.
 
 
-## Аудит пользовательской интеграции — 2026-11-03
+## Исторический аудит пользовательской интеграции до реализации UI/runner — 2026-11-03
 
-Наличие runtime binder и его Stage 6 completion hook не означает, что FILL-001 можно запустить из AutoDraw. Проверка `brush_behavior_test_ui.py`, `integrated_app.py`, `stage6_execute_plan.py` и execution diagnostics выявила, что пользовательский путь создания/выбора FILL-001 task, преобразования planner output в DrawingPlan, сохранения experiment context и task-specific запуска отсутствует.
+На момент этого исторического аудита runtime binder и Stage 6 hook уже существовали, но отдельный пользовательский путь создания/выбора FILL-001 task, преобразования planner output в DrawingPlan и передачи experiment context ещё отсутствовал. Последующая реализация зафиксирована в актуальном статусе и временном плане.
 
-Текущий runtime binder является post-execution валидатором: он может связать уже выполненное задание с Bridge session/run при наличии правильного context в executor report. Его software tests не доказывают существование инициирующего workflow.
+На момент аудита runtime binder являлся post-execution валидатором. Это историческое ограничение устранено последующей реализацией отдельного UI/runner handoff.
 
 Matrix tasks сохраняют fail-closed flags `execution_allowed=false` и `safe_to_execute=false`. Следующий шаг — отдельная реализация UI/runner и безопасного handoff по критериям аудита. Не снимать запрет исполнения в planner/matrix напрямую и не запускать live captures до software gate и Windows preflight.
