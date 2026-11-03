@@ -152,7 +152,17 @@ class Fill001Tab:
         ]
         self.task_combo.configure(values=pending)
         if self.task_var.get() not in pending:
-            self.task_var.set(pending[0] if pending else "")
+            preferred = next(
+                (
+                    task["task_id"] for task in self.matrix.get("tasks", [])
+                    if task.get("shape_id") == "rectangle"
+                    and task.get("requested_radius") == 10
+                    and task.get("repeat_index") == 1
+                    and task.get("task_id") in pending
+                ),
+                None,
+            )
+            self.task_var.set(preferred or (pending[0] if pending else ""))
         self._show_selected_task()
 
     def _show_selected_task(self) -> None:
