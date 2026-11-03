@@ -241,25 +241,28 @@ class Fill001Tab:
                 parent=self.root,
             )
             return
+        capture_error = None
         try:
             # The board ROI must be visible, not covered by the AutoDraw window.
             self.root.iconify()
             time.sleep(0.5)
             self.before_png_path = self._capture_board_png(task, phase="before")
         except Exception as exc:
-            messagebox.showwarning(
-                "FILL-001 preflight не пройден",
-                f"Не удалось подтвердить пустую доску и сохранить before PNG. Рисование не запущено.\\n\\n{exc}",
-                parent=self.root,
-            )
+            capture_error = exc
             self.before_png_path = None
-            return
         finally:
             try:
                 self.root.deiconify()
                 self.root.lift()
             except tk.TclError:
                 pass
+        if capture_error is not None:
+            messagebox.showwarning(
+                "FILL-001 preflight не пройден",
+                f"Не удалось подтвердить пустую доску и сохранить before PNG. Рисование не запущено.\\n\\n{capture_error}",
+                parent=self.root,
+            )
+            return
         if not messagebox.askyesno(
             "Разрешить один экспериментальный запуск?",
             (
@@ -410,6 +413,8 @@ class Fill001Tab:
         safe_point = _cursor_safe_point_outside_region(
             region, (screen.width, screen.height), avoid_regions=avoid
         )
+        if phase == "after":
+            pyautogui.mouseUp()
         pyautogui.moveTo(*safe_point)
         time.sleep(0.25)
         screen = ImageGrab.grab()
@@ -432,6 +437,7 @@ class Fill001Tab:
                 or metadata.get("user_confirmed_blank") is not True
                 or metadata.get("board_region") != region
                 or metadata.get("screen_size") != {"width": screen.width, "height": screen.height}
+                or metadata.get("image_file") != reference_path.name
             ):
                 raise ValueError("Эталон пустой доски не совпадает с текущими ROI/разрешением.")
             from brush_experiment_capture import evaluate_board_clear
