@@ -23,9 +23,9 @@
 - [FILL-001 — технический дизайн harness](CHALK_FILL001_HARNESS_DESIGN_2026-11-03.md) — fixed-radius planner, frozen masks, 45-cell matrix, capture validation и analyzer.
 - [FILL-001 — аудит интеграции AutoDraw](CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md) — проверка пользовательского пути запуска, пробелы UI/runner/Executor и критерии интеграции.
 - [FILL-001 matrix/analyzer](../source/preparation/chalk_fill_matrix.py) — экспериментальный manifest schema v2, frozen P1 metadata и fail-closed validation 45 captures.
-- [FILL-001 Game Monitor capture adapter](../source/preparation/chalk_fill_capture_adapter.py) — сборка capture из Monitor events, exact per-stroke CHALK и PNG evidence audit; software gate pending.
+- [FILL-001 Game Monitor capture adapter](../source/preparation/chalk_fill_capture_adapter.py) — сборка capture из Monitor events, exact per-stroke CHALK и PNG evidence audit; software regression gate подтверждён CI, live evidence pending.
 
-- [FILL-001 — временный план дальнейших работ на пять шагов](CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md) — обязательная последовательность software gate, runtime binding, Windows preflight, 45 live captures и анализа эффективности.
+- [FILL-001 — временный план дальнейших работ на пять шагов](CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md) — обязательная последовательность software gate, UI/runner integration, Windows preflight, 45 live captures и анализа эффективности.
 
 ## Действующий план CHALK и история статуса
 
