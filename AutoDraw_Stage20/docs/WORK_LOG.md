@@ -2236,4 +2236,5 @@ Brush Test acceptance и матричные валидаторы больше н
 - Добавлен `source/preparation/tests/test_chalk_fill_fixed_radius_planner.py`: параметризованные проверки 15 shape×radius cells, radius isolation, deterministic output и invalid-input rejection.
 - Отдельная Python raster simulation на frozen masks: 15/15 cells, coverage 99,962–100%, leakage=0. Это не pytest и не CI.
 - Все generated plans остаются non-executable; sampling estimate не трактуется как exact CHALK. Live captures и production planner не затрагивались.
+- Commits: planner `8ed85d04ac92aa9dae26cded3628f618e30f2135`, validation fix `358b0ea48d1df0103246ccd04fd9eb09e9e7b2d2`, regression tests `07bda99f1cf2db7c814a5e1579fc9e0a7534862a`.
 - CI/pytest для актуального HEAD ожидаются; следующий gate — подтвердить тесты, затем matrix/block/journal harness.
