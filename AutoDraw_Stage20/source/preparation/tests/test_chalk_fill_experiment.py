@@ -8,6 +8,7 @@ import pytest
 from chalk_fill_experiment import (
     FILL001_CANVAS_HEIGHT,
     FILL001_CANVAS_WIDTH,
+    FILL001_EXPECTED_MASK_SHA256,
     FILL001_RADII,
     FILL001_SHAPES,
     build_fill_target_mask,
@@ -25,7 +26,9 @@ def test_frozen_masks_are_deterministic_read_only_and_have_expected_dimensions()
         assert first.shape == (FILL001_CANVAS_HEIGHT, FILL001_CANVAS_WIDTH)
         assert np.array_equal(first, second)
         assert not first.flags.writeable
-        assert fill_target_mask_sha256(shape_id, first) == fill_target_mask_sha256(shape_id, second)
+        observed_hash = fill_target_mask_sha256(shape_id, first)
+        assert observed_hash == fill_target_mask_sha256(shape_id, second)
+        assert observed_hash == FILL001_EXPECTED_MASK_SHA256[shape_id]
 
 
 def test_frozen_mask_areas_are_matched_within_five_percent():
