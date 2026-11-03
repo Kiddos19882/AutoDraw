@@ -1,3 +1,11 @@
+## 2026-11-03 — INT006R visual audit завершён и packaging CI исправлен
+
+- Исправлено имя before-capture PNG в CI packaging: использовано фактическое `before_clear-board.png` вместо `before_draw-board.png` (commit `c60b8cf`).
+- Полный workflow [41563236073](https://github.com/Kiddos19882/AutoDraw/actions/runs/41563236073) завершился SUCCESS: все обязательные regression, integration, Game Monitor/Bridge, PNG analyzer и Windows portable build jobs прошли.
+- Упакованы все 45 пар PNG (90 board images); ручной визуальный аудит завершён.
+- Найдены ограничения качества: radius 1 оставляет видимый разрыв соединения D2 polygon; radius 30 объединяет первые три короткие детали D4. Подробности: [visual audit report](CHALK_INT006R_VISUAL_AUDIT_2026-11-03.md).
+- INT006R закрыт как измерительная фаза с геометрическими ограничениями; следующий этап — FILL-001. INT-007 остаётся BLOCKED.
+
 # История изменений документации и проекта
 
 ## 2026-11-03 — engine audit и уточнение отчёта INT006R
