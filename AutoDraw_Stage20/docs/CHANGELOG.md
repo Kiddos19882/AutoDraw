@@ -598,3 +598,11 @@
 - Добавлен изолированный boundary-aware fixed-radius scanline planner и raster simulator для трёх frozen masks и радиусов 1/5/10/20/30.
 - Добавлены regression tests для 15 shape×radius cells, coverage/leakage gate, radius isolation и deterministic signature.
 - Офлайн Python simulation прошла 15/15 cells (coverage 99,962–100%, leakage=0); pytest/CI для нового HEAD пока не подтверждены. Executor handoff и production defaults не менялись.
+
+
+## 2026-11-03 — FILL-001 matrix and analyzer
+
+- Добавлен отдельный 45-cell manifest для трёх форм, пяти радиусов и трёх повторов.
+- Добавлены fail-closed capture validation по exact CHALK, dynamic expected strokes, geometry/mask/run identity, coverage/leakage и целостности Game Monitor.
+- Добавлен analyzer с отдельной статистикой exact CHALK по форме и радиусу и regression tests.
+- CI/pytest для актуального HEAD пока не подтверждены; live execution не запускалось.
