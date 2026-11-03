@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
@@ -54,6 +55,47 @@ def _parse_aware_datetime(value: Any, label: str) -> datetime:
         raise FillMatrixError(f"{label}: timestamp должен содержать timezone.")
     return parsed.astimezone(timezone.utc)
 
+
+def _bridge_run_activity_window(run: dict[str, Any], session: dict[str, Any]) -> tuple[datetime, datetime, datetime]:
+    """Return run start, last-event time, and persisted finalization time.
+
+    Bridge event t values and started_at_performance_ms share the browser
+    performance clock. finished_at_utc is a persistence timestamp and may
+    be later than the actual event window because of idle finalization.
+    """
+    started = _parse_aware_datetime(run.get("started_at_utc"), "bridge_run.started_at_utc")
+    finalized = _parse_aware_datetime(run.get("finished_at_utc"), "bridge_run.finished_at_utc")
+    started_perf = run.get("started_at_performance_ms")
+    if (
+        isinstance(started_perf, bool)
+        or not isinstance(started_perf, (int, float))
+        or not math.isfinite(float(started_perf))
+        or float(started_perf) < 0
+    ):
+        raise FillMatrixError("bridge_run.started_at_performance_ms должен быть конечным неотрицательным числом.")
+    events = run.get("events")
+    if not isinstance(events, list) or not events:
+        raise FillMatrixError("Bridge run не содержит events для определения activity window.")
+    event_times = []
+    for index, event in enumerate(events):
+        if not isinstance(event, dict):
+            raise FillMatrixError(f"Bridge run event[{index}] должен быть object.")
+        event_time = event.get("t")
+        if (
+            isinstance(event_time, bool)
+            or not isinstance(event_time, (int, float))
+            or not math.isfinite(float(event_time))
+            or float(event_time) < float(started_perf)
+        ):
+            raise FillMatrixError(f"Bridge run event[{index}].t некорректен для performance clock.")
+        event_times.append(float(event_time))
+    activity_ended = started + timedelta(milliseconds=max(event_times) - float(started_perf))
+    if activity_ended < started or finalized < activity_ended:
+        raise FillMatrixError("Bridge run finalization timestamp предшествует activity window.")
+    grace = timedelta(seconds=_session_finalize_grace_seconds(session))
+    if finalized - activity_ended > grace:
+        raise FillMatrixError("Bridge run превысил idle finalization grace после последнего события.")
+    return started, activity_ended, finalized
 
 def _nonnegative_int(value: Any, label: str) -> int:
     if type(value) is not int or value < 0:
@@ -302,11 +344,10 @@ def _validate_bridge_run(
     run_id = str(uuid.UUID(run["run_id"]))
     if run.get("execution_status") != "completed":
         raise FillMatrixError("Bridge run не завершён.")
-    run_started = _parse_aware_datetime(run.get("started_at_utc"), "bridge_run.started_at_utc")
-    run_ended = _parse_aware_datetime(run.get("finished_at_utc"), "bridge_run.finished_at_utc")
+    run_started, activity_ended, _ = _bridge_run_activity_window(run, session)
     grace = timedelta(seconds=_session_finalize_grace_seconds(session))
-    if not executor_started <= run_started < run_ended <= executor_ended + grace or run_started > executor_ended:
-        raise FillMatrixError("Bridge run не совпадает с executor window или превысил idle finalization grace.")
+    if run_started < executor_started or run_started > executor_ended or activity_ended > executor_ended + grace:
+        raise FillMatrixError("Bridge run activity window не совпадает с executor window или превысил idle finalization grace.")
 
     expected_strokes = task["expected_strokes"]
     for field in ("stroke_count", "stroke_candidate_count"):
@@ -432,18 +473,15 @@ def bind_fill001_runtime_evidence(
     for run in bridge_runs:
         if not isinstance(run, dict):
             raise FillMatrixError("Bridge run должен быть JSON object.")
-        started = _parse_aware_datetime(run.get("started_at_utc"), "bridge_run.started_at_utc")
-        ended = _parse_aware_datetime(run.get("finished_at_utc"), "bridge_run.finished_at_utc")
-        if ended <= started:
-            raise FillMatrixError("Bridge run имеет пустой или обратный временной интервал.")
-        overlaps_executor = started < executor_ended and ended > executor_started
+        started, activity_ended, _ = _bridge_run_activity_window(run, session)
+        overlaps_executor = started < executor_ended and activity_ended > executor_started
         if overlaps_executor:
             if run.get("session_id") != session_id:
-                raise FillMatrixError("Bridge run из executor interval принадлежит другой session.")
+                raise FillMatrixError("Bridge run из executor activity window принадлежит другой session.")
             if started < executor_started:
-                raise FillMatrixError("Bridge run начался до executor execution window.")
-            if ended > executor_ended + grace:
-                raise FillMatrixError("Bridge run превысил idle finalization grace.")
+                raise FillMatrixError("Bridge run activity началась до executor execution window.")
+            if activity_ended > executor_ended + grace:
+                raise FillMatrixError("Bridge run activity превысила executor window и idle finalization grace.")
             candidates.append(run)
     if not candidates:
         raise RuntimeBindingNotReady("Bridge run ещё не finalized/persisted для executor interval.")
