@@ -2249,3 +2249,5 @@ Brush Test acceptance и матричные валидаторы больше н
 - Live execution не реализовано и не запускалось. Manifest/tasks запрещают automatic execution; exact CHALK не заменяется геометрическими estimates.
 - GitHub combined status для новых commits возвращает пустой список checks; pytest и полный CI на актуальном HEAD не подтверждены.
 - Следующий gate: получить полный CI PASS/Windows portable build; затем preflight, live 45 captures и PNG audit.
+
+- Ужесточен capture contract: обязательны per-stroke CHALK deltas с суммой exact CHALK, before/after PNG evidence и `png_audit_status=passed`; добавлены regression tests на несоответствие stroke sum и pending PNG audit.
