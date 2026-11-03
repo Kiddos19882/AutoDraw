@@ -1,7 +1,7 @@
 ## 2026-11-03 — FILL-001 client-resolution ROI correction
 
 - Исправлено ошибочное требование screen ROI ровно 460×240. 460×240 остаётся logical board size движка и frozen masks; клиентский ROI берётся из калибровки и сохраняется в фактическом размере.
-- UI проверяет границы crop, сохраняет ROI в attempt record и сверяет before/after ROI. PNG adapter масштабирует frozen logical mask методом nearest-neighbor, сохраняет transform и raster scale, проверяет uniform scale ≤1% и выполняет coverage/leakage audit на screen-resolution crop.
+- UI проверяет границы crop, сохраняет ROI в attempt record, сверяет before/after ROI и DrawingPlan transform, требует парный before/after capture и блокирует finalize без calibrated ROI. PNG adapter масштабирует frozen logical mask методом nearest-neighbor, сохраняет transform и raster scale, проверяет uniform scale ≤1% и выполняет coverage/leakage audit на screen-resolution crop.
 - Добавлены synthetic regression tests для ROI 581×304, runtime transform, non-uniform/mismatch rejection, scaled leakage и фактического UI crop. CI для нового HEAD ожидается; live Windows preflight не выполнялся.
 
 ## 2026-11-03 — синхронизация управляющей документации
