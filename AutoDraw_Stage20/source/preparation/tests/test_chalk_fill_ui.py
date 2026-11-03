@@ -110,3 +110,48 @@ def test_finalize_capture_writes_valid_capture_and_attempt_json(tmp_path, monkey
     assert saved_capture["exact_chalk"] == 5999
     assert saved_attempt["status"] == "capture_accepted"
     assert saved_attempt["capture_path"] == str(capture_path)
+
+
+class _Var:
+    def __init__(self):
+        self.value = None
+
+    def set(self, value):
+        self.value = value
+
+
+class _Root:
+    def after(self, _delay, callback):
+        self.callback = callback
+
+    def deiconify(self):
+        pass
+
+    def lift(self):
+        pass
+
+
+def test_executor_completion_and_after_png_keep_attempt_record_valid(tmp_path):
+    import json
+
+    attempt_path = tmp_path / "attempt.json"
+    attempt_path.write_text('{"status": "running"}', encoding="utf-8")
+    after_png = tmp_path / "after.png"
+    after_png.write_bytes(b"png-placeholder")
+
+    tab = chalk_fill_ui.Fill001Tab.__new__(chalk_fill_ui.Fill001Tab)
+    tab.active_task = {"task_id": "task-1"}
+    tab.active_run_record = attempt_path
+    tab.root = _Root()
+    tab.status_var = _Var()
+    tab._capture_board_png = lambda _task, *, phase: after_png
+
+    assert tab.handle_executor_finished({"status": "completed"}, tmp_path / "report.json") is True
+    completed = json.loads(attempt_path.read_text(encoding="utf-8"))
+    assert completed["status"] == "execution_completed_pending_runtime_and_png_audit"
+    assert tab.root.callback is not None
+
+    tab._capture_after_png()
+    saved = json.loads(attempt_path.read_text(encoding="utf-8"))
+    assert saved["after_png"] == str(after_png)
+    assert saved["after_png_captured_at_utc"]

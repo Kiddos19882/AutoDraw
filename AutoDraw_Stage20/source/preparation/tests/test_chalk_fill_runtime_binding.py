@@ -385,3 +385,11 @@ def test_executor_source_plan_hash_uses_drawing_plan_model_normalization(tmp_pat
     }
 
     _verify_executor_source_plan(report)
+
+
+def test_runtime_binding_rejects_non_consuming_stroke_candidates(tmp_path):
+    task, _, _, _, run, session, report = _runtime_documents(tmp_path)
+    run["non_consuming_stroke_candidate_count"] = 1
+
+    with pytest.raises(FillMatrixError, match="non-consuming stroke candidates"):
+        bind_fill001_runtime_evidence(task, session, [run], report)
