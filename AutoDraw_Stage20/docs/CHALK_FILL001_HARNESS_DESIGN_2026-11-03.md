@@ -1,7 +1,7 @@
 # FILL-001 — технический дизайн экспериментального harness
 
 **Дата:** 2026-11-03  
-**Статус:** SOFTWARE REGRESSION GATE PASS (CI 41579136690, code HEAD b4cc45a); runtime binding and Windows live preflight pending  
+**Статус:** planner/matrix/adapter/runtime-binder software gates реализованы; Stage 6 содержит только post-execution binding hook. Пользовательский FILL-001 UI/runner handoff отсутствует; Windows live preflight не выполнен. См. [аудит интеграции](CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md).  
 **Связь:** [план FILL-001](CHALK_FILL_AREA_RADIUS_EFFICIENCY_PLAN_2026-11-03.md)
 
 ## Подтверждённые ограничения
@@ -186,3 +186,12 @@ FILL-001 capture contract в текущем виде требует уже аг�
 Регрессионное подтверждение: code commits `fbf1fd6`–`d7466c5`; полный GitHub Actions [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009) — SUCCESS на `d7466c5`, включая Preparation/G3, executor, integration, Game Monitor/Bridge и Windows portable build/startup jobs.
 
 **Ограничение:** CI подтверждает программную интеграцию на тестовых runtime artifacts. Он не подтверждает live FILL-001 execution в пользовательской Windows/game session, реальный crop/cursor/UI PNG evidence или визуальное соответствие frozen masks. Эти проверки остаются Windows preflight gate; до их завершения 45 live captures не запускать.
+
+
+## Аудит пользовательской интеграции — 2026-11-03
+
+Наличие runtime binder и его Stage 6 completion hook не означает, что FILL-001 можно запустить из AutoDraw. Проверка `brush_behavior_test_ui.py`, `integrated_app.py`, `stage6_execute_plan.py` и execution diagnostics выявила, что пользовательский путь создания/выбора FILL-001 task, преобразования planner output в DrawingPlan, сохранения experiment context и task-specific запуска отсутствует.
+
+Текущий runtime binder является post-execution валидатором: он может связать уже выполненное задание с Bridge session/run при наличии правильного context в executor report. Его software tests не доказывают существование инициирующего workflow.
+
+Matrix tasks сохраняют fail-closed flags `execution_allowed=false` и `safe_to_execute=false`. Следующий шаг — отдельная реализация UI/runner и безопасного handoff по критериям аудита. Не снимать запрет исполнения в planner/matrix напрямую и не запускать live captures до software gate и Windows preflight.
