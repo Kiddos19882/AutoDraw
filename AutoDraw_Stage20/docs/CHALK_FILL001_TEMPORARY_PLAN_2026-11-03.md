@@ -15,7 +15,7 @@
 
 **Статус:** DONE
 
-- GitHub Actions [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178) — SUCCESS на code/test HEAD `e3774a3c07f7abbefe8c39eecdd9578743b70678`.
+- GitHub Actions [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985) — SUCCESS на code/test HEAD `031913c64da5f25921d74f426a2c7778c02130ee` (включает client-ROI correction).
 - Preparation/G3: **772 passed, 24 warnings, 82 subtests passed**.
 - Executor regression, Game Monitor/Bridge, Application integration, INT-006 pixel audit и Windows portable build/startup smoke-test — SUCCESS; optional algorithm benchmarks — SKIPPED.
 - Windows portable artifact: [autodraw-g3-preflight-build](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178/artifacts/13248469807).
@@ -32,7 +32,7 @@
 - Фактические `ExecutorConfig.point_step_px=4`, `point_delay_ms=5` и `line_extension_px=0` сверяются с frozen P1.
 - Stage 6 выполняет post-execution binding после успешного завершения FILL-001 task и записывает результат в execution report.
 - UI handoff передаёт experiment context в DrawingPlan; runtime binder связывает executor report с Bridge session/run и фиксирует SHA-256 исходных runtime artifacts.
-- Regression gate подтверждён CI [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178) на code/test HEAD `e3774a3`.
+- Regression gate подтверждён CI [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985) на code/test HEAD `031913c`.
 
 **Критерий завершения:** программная интеграция и fail-closed regression tests подтверждены CI. Реальное live подтверждение на Windows относится к шагу 3.
 
@@ -100,7 +100,7 @@
 | Шаг | Статус | Подтверждение |
 |---|---|---|
 | 1 | DONE | CI [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985), code/test HEAD `031913c`; Preparation/G3 778 passed, 24 warnings, 82 subtests; все обязательные jobs и Windows portable build/startup smoke-test SUCCESS; optional benchmarks skipped |
-| 2 | DONE (software) | Runtime binder, Stage 6 completion hook, UI experiment context и regression CI [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178), code/test HEAD `e3774a3`; live proof переносится в шаг 3 |
+| 2 | DONE (software) | Runtime binder, Stage 6 completion hook, UI experiment context и regression CI [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985), code/test HEAD `031913c`; live proof переносится в шаг 3 |
 | 3 | IN_PROGRESS | UI/runner handoff и client-ROI correction покрыты успешным CI [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985); ожидается Windows live runtime/PNG preflight и evidence report |
 | 4 | BLOCKED | Ожидает шаги 1–3 |
 | 5 | BLOCKED | Ожидает 45 принятых captures |
