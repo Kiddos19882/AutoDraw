@@ -2,6 +2,21 @@
 
 Реестр содержит документационные и технические задачи проекта. Аналитические этапы 7–10 отменены и в backlog не включаются; INT-001 и последующие задачи ресурсной оптимизации являются отдельной инициативой.
 
+## Временный план FILL-001 на пять шагов
+
+**Документ:** [CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md](CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md)  
+**Статус:** IN_PROGRESS — план утверждён к выполнению; шаги 4–5 заблокированы до закрытия software/runtime/preflight gates.
+
+| Шаг | Статус | Критерий |
+|---|---|---|
+| 1. Regression gate: tests, полный CI, Windows build | TODO | Все обязательные jobs успешны на одном HEAD |
+| 2. Runtime binding: Bridge, executor journal, P1 | TODO | Capture однозначно связан с фактическим run/task |
+| 3. PNG evidence и Windows preflight | TODO | Повторная проверка PNG и реальные crop/quality gates пройдены |
+| 4. 45 live captures | BLOCKED | 45 уникальных принятых ячеек либо документированные отклонения |
+| 5. CHALK/quality analysis и рекомендация | BLOCKED | Подготовлен отчёт о влиянии радиуса и лучшей стратегии заливки |
+
+План временный и не подлежит удалению до выполнения всех пяти шагов или отдельного решения пользователя.
+
 ## FILL-001 — Monitor capture adapter и software gate
 
 **Статус:** IN_PROGRESS  
