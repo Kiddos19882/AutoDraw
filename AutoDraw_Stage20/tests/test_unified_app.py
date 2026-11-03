@@ -292,7 +292,7 @@ class UnifiedAppCoreTests(unittest.TestCase):
             root.withdraw()
             app = integrated_app.AutoDrawUnifiedApp(root)
             labels = [app.notebook.tab(tab, "text") for tab in app.notebook.tabs()]
-            self.assertEqual(labels, ["1. Подготовка изображения", "2. Исполнение рисунка", "3. Палитра браузера", "4. Преобразование в палитру", "5. Цветной scanline-план", "6. Тест лимита краски", "7. Тест кистей", "8. Калибровка теста"])
+            self.assertEqual(labels, ["1. Подготовка изображения", "2. Исполнение рисунка", "3. Палитра браузера", "4. Преобразование в палитру", "5. Цветной scanline-план", "6. Тест лимита краски", "7. Тест кистей", "8. FILL-001", "9. Калибровка теста"])
             self.assertIsNotNone(app.workbench.on_select_canvas_area)
             self.assertIs(app.executor.area_change_callback.__self__, app)
             self.assertIs(app.executor.execution_finished_callback.__self__, app)
@@ -305,6 +305,8 @@ class UnifiedAppCoreTests(unittest.TestCase):
             self.assertIsNotNone(app.color_scanline_tab)
             self.assertIsNotNone(app.paint_limit_tab)
             self.assertIsNotNone(app.brush_behavior_tab)
+            self.assertIsNotNone(app.fill001_tab)
+            self.assertEqual(app.notebook.tab(app.fill001_tab_frame, "text"), "8. FILL-001")
             self.assertTrue((app.data_paths["paint_limit_tests"]).is_dir())
             self.assertTrue((app.data_paths["brush_tests"]).is_dir())
             self.assertEqual(app.notebook.tab(app.paint_limit_tab_frame, "text"), "6. Тест лимита краски")
