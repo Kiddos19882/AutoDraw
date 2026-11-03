@@ -1,7 +1,7 @@
 # FILL-001 — технический дизайн экспериментального harness
 
 **Дата:** 2026-11-03  
-**Статус:** FROZEN MASK GENERATOR IMPLEMENTED; fixed-radius planner and harness pending  
+**Статус:** FROZEN MASK GENERATOR AND FIXED-RADIUS PLANNER IMPLEMENTED; matrix harness pending  
 **Связь:** [план FILL-001](CHALK_FILL_AREA_RADIUS_EFFICIENCY_PLAN_2026-11-03.md)
 
 ## Подтверждённые ограничения
@@ -68,12 +68,25 @@
 
 Следующий алгоритмический шаг — построить boundary-aware centerline paths с консервативным offset, затем проверить их двумя независимыми raster checks: полное покрытие target и отсутствие касания пикселей вне target. После этого сопоставить raster prediction с реальными INT006R captures для калибровки ширины и caps. Не ослаблять quality gate ради получения 45 cells.
 
+## Реализация fixed-radius planner — 2026-11-03
+
+Добавлен `source/preparation/chalk_fill_fixed_radius_planner.py` и regression suite `source/preparation/tests/test_chalk_fill_fixed_radius_planner.py`.
+
+- Планировщик строит отдельный DrawingPlan для каждой пары shape/radius; все штрихи внутри плана используют один размер кисти.
+- Boundary-aware centerline строится по distance transform frozen mask. Для покрытия используются горизонтальные проходы по каждому логическому ряду; центр-линии ограничены внутренней областью, вмещающей моделируемый след.
+- Raster simulator использует round-capped OpenCV line model и отдельно считает `coverage_fraction`, `uncovered_target_pixels` и `leakage_pixels`.
+- Качество принимается только при coverage ≥99% и leakage=0. Порог не ослабляется; не прошедший cell возвращается как unsupported.
+- Plan signature связывает форму, радиус, frozen mask hash и координаты проходов. Sampling-point estimate отделён от exact CHALK.
+- Все планы остаются `safe_to_execute=false` / `ready_for_automatic_execution=false`: это офлайн-модель, не доказательство соответствия игровому renderer.
+
+Отдельная Python raster simulation на точных frozen masks проверила 15/15 shape×radius cells: coverage 99,962–100%, leakage 0. Для radius 1/5/10/20/30 минимальное coverage по трём формам составило соответственно 100%, 100%, 99,996%, 99,976% и 99,962%. Это результат отдельной симуляции алгоритма, а не подтверждение pytest/CI. Regression tests добавлены; GitHub Actions для нового HEAD ожидается.
+
 ## Порядок реализации
 
 1. [x] Проверить game engine semantics, существующие planners и их тесты.
 2. [x] Создать frozen target masks, проверить площади и закрепить SHA-256; локальные tests 8/8 PASS (CI status pending).
-3. [ ] Реализовать fixed-radius generator и raster footprint simulator.
-4. [ ] Добавить deterministic/property tests: no leakage, radius isolation, coverage threshold и rejection узкой геометрии.
+3. [x] Реализовать fixed-radius generator и raster footprint simulator.
+4. [x] Добавить regression tests: no leakage, radius isolation, coverage threshold, deterministic signature и fail-closed validation; CI result pending.
 5. [ ] Добавить FILL001 matrix/block/journal validation с динамическим expected stroke count.
 6. [ ] Добавить Brush Test UI и fail-closed executor handoff.
 7. [ ] Добавить independent analyzer и PNG evidence gate.
