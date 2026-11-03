@@ -72,6 +72,7 @@ def build_fill001_matrix(series_id: str) -> dict[str, Any]:
                     "planned_leakage_pixels": summary["leakage_pixels"],
                     "quality_gate_passed": summary["quality_gate_passed"],
                     "unsupported": summary["unsupported"],
+                    "sampling_profile": {"profile_id": "P1", "sampling_step": 4, "delay_ms": 5},
                     "safe_to_execute": False,
                     "capture_status": "pending",
                 })
@@ -196,7 +197,18 @@ def validate_fill001_capture(task: dict[str, Any], capture: Any) -> dict[str, An
     for field in ("before_png", "after_png"):
         if not isinstance(capture[field], str) or not capture[field].strip():
             raise FillMatrixError(f"{field} evidence path обязателен.")
-    for field in ("before_png_sha256", "after_png_sha256"):\n        value = capture[field]\n        if not isinstance(value, str) or len(value) != 64 or any(ch not in "0123456789abcdef" for ch in value):\n            raise FillMatrixError(f"{field} должен быть SHA-256.")\n    if capture["sampling_profile"] != task.get("sampling_profile") or capture["sampling_profile"] != {"profile_id": "P1", "sampling_step": 4, "delay_ms": 5}:\n        raise FillMatrixError("Sampling profile не совпадает с frozen P1.")\n    if not isinstance(capture["monitor_version"], str) or not capture["monitor_version"]:\n        raise FillMatrixError("monitor_version обязателен.")\n    if isinstance(capture["event_count"], bool) or not isinstance(capture["event_count"], int) or capture["event_count"] < 1:\n        raise FillMatrixError("event_count должен быть положительным целым.")\n    if capture["png_audit_status"] != "passed":
+    for field in ("before_png_sha256", "after_png_sha256"):
+        value = capture[field]
+        if not isinstance(value, str) or len(value) != 64 or any(ch not in "0123456789abcdef" for ch in value):
+            raise FillMatrixError(f"{field} должен быть SHA-256.")
+    expected_sampling = {"profile_id": "P1", "sampling_step": 4, "delay_ms": 5}
+    if capture["sampling_profile"] != task.get("sampling_profile") or capture["sampling_profile"] != expected_sampling:
+        raise FillMatrixError("Sampling profile не совпадает с frozen P1.")
+    if not isinstance(capture["monitor_version"], str) or not capture["monitor_version"]:
+        raise FillMatrixError("monitor_version обязателен.")
+    if isinstance(capture["event_count"], bool) or not isinstance(capture["event_count"], int) or capture["event_count"] < 1:
+        raise FillMatrixError("event_count должен быть положительным целым.")
+    if capture["png_audit_status"] != "passed":
         raise FillMatrixError("PNG evidence не прошёл независимый audit.")
     if capture["leakage_pixels"] != 0:
         raise FillMatrixError("Live capture не прошёл leakage=0.")
