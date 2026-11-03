@@ -1,6 +1,6 @@
 # Текущее состояние проекта
 
-**Последнее обновление:** 2026-11-03 — FILL-001 UI/runner handoff реализован отдельной вкладкой; software regression gate подтверждён CI [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178) на code/test HEAD `e3774a3`. Preparation/G3: 772 passed, 24 warnings, 82 subtests; все обязательные jobs и Windows portable build/startup smoke-test SUCCESS, optional benchmarks skipped. Вкладка создаёт/открывает 45-cell manifest, выбирает одну approved task, проверяет frozen plan/mask identity, передаёт кисть и DrawingPlan в Stage 6 с P1 override, затем связывает runtime report с Bridge evidence и выполняет PNG capture/audit. **Windows live preflight на реальной игровой сессии и реальные FILL-001 PNG ещё не подтверждены; 45 live captures остаются заблокированы.**
+**Последнее обновление:** 2026-11-03 — устранено ошибочное требование физического screen ROI 460×240 в FILL-001. В движке BoardPane и frozen masks остаются 460×240 logical pixels; UI теперь снимает реальный calibrated client ROI, а PNG adapter преобразует frozen mask в фактический размер crop и сохраняет transform. Добавлены regression tests для 581×304 и fail-closed случаев; CI для нового HEAD ещё не подтверждён. **Windows live preflight и реальные FILL-001 PNG ещё не подтверждены; 45 live captures остаются заблокированы.**
 
 **Актуально на:** 3 ноября 2026 г.  
 **Репозиторий:** `Kiddos19882/AutoDraw`  
@@ -40,7 +40,7 @@
 | INT-005 | DONE* | Автоматические CHALK blocks, matrix, journal, recovery и fail-closed gates используются в принятых сериях. |
 | INT-006 | IN_PROGRESS | Live captures, 45/45 Monitor audit, официальный analyzer (45 accepted, 0 missing/rejected), 15/15 complete groups и полный binding audit завершены. Осталось отдельно решить вопрос safety margin и расширить domain validation; production eligibility не подтверждена. |
 | INT-006R | DONE | 45/45 live captures, raw-data audit, официальный CLI analyzer и ручной visual audit завершены. Зафиксированы geometry-specific limitations для D2/radius=1 и D4/radius=30. |
-| INT-006F / FILL-001 | IN_PROGRESS | Frozen masks, fixed-radius planner, matrix/analyzer, capture adapter, runtime binding и отдельная вкладка FILL-001 реализованы. CI [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178) SUCCESS на `e3774a3`; UI registration и single-task workflow включены в regression suite. Остаётся Windows live preflight с реальными Bridge/executor artifacts и PNG; 45 captures заблокированы до его успешного завершения. Исторический аудит до UI-интеграции: [аудит](CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md).
+| INT-006F / FILL-001 | IN_PROGRESS | Frozen masks, fixed-radius planner, matrix/analyzer, capture adapter, runtime binding и отдельная вкладка FILL-001 реализованы. Исправлено смешение logical 460×240 и физического client ROI: capture и pixel audit работают с фактическим calibrated ROI. Regression tests добавлены, CI для нового HEAD ожидается. Остаётся Windows live preflight с реальными Bridge/executor artifacts и PNG; 45 captures заблокированы до его успешного завершения. Исторический аудит до UI-интеграции: [аудит](CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md).
 | INT-007 | BLOCKED | Интеграция валидированной модели в preflight/resource estimator запрещена до закрытия INT-006 и определения safety margin. |
 | INT-008 | TODO | Оптимизация траекторий, кистей, порядка и покрытия в пределах CHALK после INT-007. |
 | INT-009 | TODO | Независимая проверка прогноза на полных рисунках, визуального качества и фактической экономии. |
@@ -48,7 +48,7 @@
 ## Ближайший рабочий приоритет
 
 1. Провести Windows live preflight одной выбранной задачи из отдельной вкладки FILL-001; проверить task ↔ DrawingPlan ↔ executor report ↔ Bridge session/run и фактический P1.
-2. На том же preflight проверить реальные before/after PNG: crop 460×240, threshold=8, положение курсора, исключение UI/paint meter, соответствие frozen mask, coverage ≥99% и leakage=0.
+2. На том же preflight проверить реальные before/after PNG в фактическом calibrated client ROI: RGB threshold=8, положение курсора, исключение UI/paint meter, logical→screen mask alignment, coverage ≥99% и leakage=0.
 3. Только после успешного preflight запустить 45 live captures (3 формы × 5 радиусов × 3 повтора) и сохранить первичные evidence.
 4. Проанализировать exact CHALK, покрытие, leakage, число точек/штрихов и время по каждой форме/радиусу; не считать экономией неполное покрытие.
 5. INT-006 safety margin не установлен; INT-007 остаётся BLOCKED. Production estimator/defaults не менять.
