@@ -122,6 +122,8 @@ def audit_fill001_png_pair(
         "scale_y": scale_y,
         "uniform_scale_relative_error": scale_error,
         "uniform_scale_tolerance": MAX_UNIFORM_SCALE_RELATIVE_ERROR,
+        "mask_raster_scale_x": screen_width / LOGICAL_BOARD_WIDTH,
+        "mask_raster_scale_y": screen_height / LOGICAL_BOARD_HEIGHT,
         "mask_resampling": "nearest_neighbor",
     }
     return {
