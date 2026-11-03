@@ -36,17 +36,20 @@
 
 **Критерий завершения:** программная интеграция и fail-closed regression tests подтверждены CI. Реальное live подтверждение на Windows относится к шагу 3 и ещё не выполнено.
 
-### Шаг 3. Провести Windows live preflight и проверить evidence
+### Шаг 3. Интегрировать запуск в AutoDraw, затем провести Windows live preflight
 
-**Статус:** TODO
+**Статус:** TODO — пользовательский UI/runner handoff отсутствует; live preflight ещё не может быть запущен штатным workflow AutoDraw.
 
+- Реализовать отдельный FILL-001 UI/runner: создание/загрузка серии, выбор task, журнал, Start/Stop и progress. Точный gap и критерии: [аудит интеграции](CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md).
+- Добавить fail-closed преобразование planner output в DrawingPlan и сохранение `autodraw_experiment` context; разрешать исполнение только выбранной валидной task.
+- Добавить FILL001 в task-specific executor configuration allowlist с проверкой P1 до первого mouse action.
 - Кодовый PNG audit уже открывает реальные PNG, проверяет формат/размер crop 460×240, рассчитывает SHA-256, coverage/leakage по RGB difference threshold=8; synthetic regression tests включены в CI.
 - На Windows выполнить один контролируемый FILL-001 runtime run и проверить, что execution report получил успешный runtime binding к правильным Bridge session/run artifacts.
 - Подтвердить P1 по фактическому ExecutorConfig в отчёте, а не только по frozen task metadata.
 - Проверить реальные before/after board PNG: crop 460×240, положение курсора, исключение UI/paint meter, frozen mask alignment, coverage ≥99% и leakage=0.
 - Проверить fail-closed поведение на отсутствующем/изменённом PNG, несовпадающем run ID, ошибках Bridge и неверном P1.
 
-**Критерий завершения:** один live runtime capture проходит независимую проверку Bridge/executor/PNG evidence на Windows; негативные случаи отклоняются. До этого live matrix не запускать.
+**Критерий завершения:** из UI AutoDraw запускается одна выбранная task; executor report содержит её context; runtime binder однозначно связывает report с Bridge session/run; реальные PNG проходят crop/quality/evidence gates на Windows; негативные случаи отклоняются. До этого live matrix не запускать.
 
 ### Шаг 4. Выполнить 45 live captures FILL-001
 
@@ -86,6 +89,6 @@
 |---|---|---|
 | 1 | DONE | CI [41579136690](https://github.com/Kiddos19882/AutoDraw/actions/runs/41579136690), code HEAD `b4cc45a80231e6bad2f878b2a5a2f16b48b9d68b`; Preparation/G3 754 passed + 82 subtests; Windows build/smoke-test success |
 | 2 | DONE (software) | Runtime binder + Stage 6 integration + regression CI [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009), code HEAD `d7466c5`; live proof переносится в шаг 3 |
-| 3 | TODO | Ожидает Windows live runtime/PNG preflight и evidence report |
+| 3 | TODO | Сначала требуется UI/runner handoff FILL-001, затем Windows live runtime/PNG preflight и evidence report |
 | 4 | BLOCKED | Ожидает шаги 1–3 |
 | 5 | BLOCKED | Ожидает 45 принятых captures |
