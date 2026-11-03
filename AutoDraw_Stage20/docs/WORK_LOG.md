@@ -2437,3 +2437,11 @@ Brush Test acceptance и матричные валидаторы больше н
 - Получен список artifacts. Windows portable build `autodraw-g3-preflight-build`, ID `13258221572`, доступен и не истёк: https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486/artifacts/13258221572.
 - Программный gate FILL-001 закрыт. Следующий шаг — пользовательский one-task Windows live preflight `rectangle / radius 10 / repeat 1`; live evidence в этой проверке не создавались.
 - 45-cell FILL-001 matrix не запускалась. Код, production defaults, estimator и `master` не изменялись.
+
+
+## 2026-11-04 — FILL-001 Bridge activity-window correction
+
+- Исправлен `chalk_fill_runtime_binding.py`: фактическое окончание активности Bridge run вычисляется по browser performance clock (`started_at_performance_ms` и максимальному `events[].t`); `finished_at_utc` остаётся временем persistence и проверяется относительно idle finalization grace.
+- Строгий guard `non_consuming_stroke_candidate_count == 0` для выбранного task run сохранён.
+- Добавлены regression tests на calibration run, чьи события закончились до executor start, несмотря на позднюю финализацию, и на полную загрузку/разбор/hash Bridge JSON размером более 27 MiB.
+- Code commit `95a8d1799cd2cbbba09929cc5086a3655ba90c78`; test commit `870bebce6b39e782f70ef9f476a324ee840c05ae`. Тесты/CI на новом HEAD пока не подтверждены; live preflight не запускался.
