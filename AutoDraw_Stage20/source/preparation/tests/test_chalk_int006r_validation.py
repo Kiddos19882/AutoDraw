@@ -299,6 +299,17 @@ def test_int006r_analyzer_accepts_complete_45_capture_set_with_png_and_monitor_e
     assert report["rejected"] == []
     assert report["png_evidence_status"] == "complete"
     assert report["visual_quality_gate"] == "pending_manual_review"
+    sampling_profile = report["sampling_profile"]
+    assert sampling_profile["name"] == "P1"
+    assert sampling_profile["point_step_px"] == 4
+    assert sampling_profile["point_delay_ms"] == 5
+    assert sampling_profile["other_executor_parameters"] == {
+        key: value
+        for key, value in GEOMETRY_EXECUTOR_CONFIG.items()
+        if key not in {"point_step_px", "point_delay_ms"}
+    }
+    assert "point_step_px" not in sampling_profile["other_executor_parameters"]
+    assert "point_delay_ms" not in sampling_profile["other_executor_parameters"]
     for scenario_id in PHASE_SCENARIOS[RADIUS_GEOMETRY_VALIDATION_PHASE]:
         for radius in RADIUS_GEOMETRY_VALIDATION_RADII:
             group = report["groups"][scenario_id][str(radius)]
