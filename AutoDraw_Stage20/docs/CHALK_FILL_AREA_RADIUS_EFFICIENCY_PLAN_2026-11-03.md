@@ -191,4 +191,4 @@ Capture принимается только если:
 - PNG existence/format/dimensions, SHA-256, coverage/leakage по RGB difference;
 - внешний run ID и bridge diagnostics.
 
-Это **software implementation candidate**, а не закрытый gate. Adapter пока не связан с фактическим runner/journal call site; Game Monitor не экспортирует runId или sequence counter; P1 и bridge report поступают внешними параметрами; реальный screenshot crop/threshold не прошёл preflight. Pytest/CI не подтверждены. Live 45-cell matrix не запускать.
+Matrix manifest обновлён до schema v2, поскольку sampling metadata изменяет frozen task identity. Это **software implementation candidate**, а не закрытый gate. Adapter пока не связан с фактическим runner/journal call site; Game Monitor не экспортирует runId или sequence counter; P1 и bridge report поступают внешними параметрами; реальный screenshot crop/threshold не прошёл preflight. Pytest/CI не подтверждены. Live 45-cell matrix не запускать.
