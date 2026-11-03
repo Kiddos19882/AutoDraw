@@ -49,13 +49,19 @@
 - После исполнения UI сохраняет before/after board PNG и передаёт runtime evidence в capture adapter; прямой запуск FILL-001 plan в обход специализированного workflow закрыт fail-closed guard.
 - Unified app regression test проверяет регистрацию вкладки `8. FILL-001`; следующая вкладка — `9. Калибровка теста`.
 
+**Исправление client ROI — реализовано в коде, regression confirmation ожидается:**
+- Логический BoardPane движка и frozen masks имеют размер 460×240 logical pixels. Это не физический размер доски на клиентском экране.
+- UI сохраняет PNG в фактическом размере calibrated screen ROI; физическое требование 460×240 удалено.
+- Capture adapter растеризует frozen logical mask в размер PNG ROI методом nearest-neighbor и сохраняет logical→screen transform; пропорции ROI проверяются по uniform-scale tolerance 1%.
+- Before/after должны иметь одинаковые фактические ROI; курсор и UI/paint meter исключаются из crop по существующей процедуре.
+
 **Оставшийся Windows live preflight:**
 - Запустить из AutoDraw одну задачу (первая предпочтительная ячейка — rectangle/radius 10/repeat 1) на реальной игровой сессии.
 - Подтвердить task ↔ DrawingPlan ↔ executor report ↔ Bridge session/run identity и фактический P1 в execution report.
-- Проверить реальные before/after PNG: crop 460×240, RGB threshold 8, положение курсора, исключение UI/paint meter, frozen mask alignment, coverage ≥99% и leakage=0.
+- Проверить реальные before/after PNG в реальном client ROI, RGB threshold 8, cursor/UI exclusion, frozen mask alignment, coverage ≥99% и leakage=0.
 - Проверить fail-closed поведение на mismatch run/task/plan, неверном P1, Bridge errors и отсутствующих/изменённых PNG.
 
-**Критерий завершения:** один реальный запуск из FILL-001 UI однозначно связан с executor report и Bridge session/run; реальные PNG проходят quality/evidence gates на Windows. До этого 45-cell live matrix не запускать.
+**Критерий завершения:** один реальный запуск из FILL-001 UI однозначно связан с executor report и Bridge session/run; реальные PNG проходят quality/evidence gates на Windows с фактическим ROI клиента и сохранённым logical→screen transform. До этого 45-cell live matrix не запускать.
 
 ### Шаг 4. Выполнить 45 live captures FILL-001
 
