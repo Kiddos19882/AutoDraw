@@ -8,7 +8,6 @@ are frozen inputs for the later fixed-radius planner and coverage simulator.
 
 import hashlib
 import json
-import math
 from typing import Any
 
 import numpy as np
@@ -107,6 +106,8 @@ def build_fill_target_mask(shape_id: str) -> np.ndarray:
 
 def fill_target_mask_sha256(shape_id: str, mask: Any | None = None) -> str:
     """Hash the canonical shape ID, dimensions and packed binary mask."""
+    if not isinstance(shape_id, str) or shape_id not in FILL001_SHAPES:
+        raise ValueError(f"Неизвестная форма FILL-001: {shape_id!r}.")
     target = build_fill_target_mask(shape_id) if mask is None else np.asarray(mask)
     if target.ndim != 2 or target.dtype.kind != "b" or not target.size:
         raise ValueError("FILL-001 mask должна быть непустым двумерным bool-массивом.")
