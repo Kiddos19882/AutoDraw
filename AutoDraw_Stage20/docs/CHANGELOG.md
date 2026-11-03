@@ -723,3 +723,10 @@
 - GitHub Actions run `41692129486` завершился SUCCESS: обязательные regression jobs, INT-006 pixel audit, Windows portable build и startup smoke-test прошли.
 - Опубликован Windows portable artifact `autodraw-g3-preflight-build` (ID `13258221572`): https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486/artifacts/13258221572.
 - Это подтверждает software gate, но не live runtime. Следующий шаг — один пользовательский Windows preflight; 45 captures остаются заблокированными.
+
+
+## 2026-11-04 — FILL-001 Bridge activity-window fix
+
+- Runtime binding больше не принимает поздний `finished_at_utc` за время последнего события. Activity window восстанавливается по `started_at_utc`, `started_at_performance_ms` и максимальному `events[].t`; idle finalization grace проверяется отдельно.
+- Добавлены regression tests для pre-execution calibration run и Bridge JSON >27 MiB, включая проверку полного чтения и SHA-256.
+- Commits: `95a8d1799cd2cbbba09929cc5086a3655ba90c78` (fix), `870bebce6b39e782f70ef9f476a324ee840c05ae` (tests). CI ожидается.
