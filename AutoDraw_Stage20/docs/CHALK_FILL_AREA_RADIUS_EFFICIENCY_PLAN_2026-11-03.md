@@ -171,4 +171,4 @@ Capture принимается только если:
 | wide_irregular | 45 159 | `ffff041d8fcaf53ce4f680ddbefb43a949dd72fdb10f44d6c95cf4832555d7db` |
 | narrow_irregular | 44 879 | `50d45794d9594b5b11f93ddfe407c47210eb315ae10f3d70e0b3978eff5764a3` |
 
-Добавлены 7 regression tests для размеров, площади, формы, связности строк, metadata, разрешённых радиусов и отказа от неизвестных масок. Локальный прогон — 7/7 PASS; полный GitHub Actions для последних commits пока не подтверждён. Fixed-radius DrawingPlan generator ещё не реализован, поэтому live matrix не запускать.
+Добавлены 8 regression tests для размеров, площади, формы, связности строк, metadata, разрешённых радиусов и отказа от неизвестных масок. Локальный прогон — 8/8 PASS; полный GitHub Actions для последних commits пока не подтверждён. Fixed-radius DrawingPlan generator ещё не реализован, поэтому live matrix не запускать.
