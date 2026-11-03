@@ -320,6 +320,7 @@ class Stage6App:
             self.root.minsize(1050, 720)
 
         self.plan_path: Path | None = None
+        self._fill001_execution_required = False
         self.source_plan: DrawingPlan | None = None
         self.execution_plan: DrawingPlan | None = None
         self.color_plan_data: dict[str, Any] | None = None
@@ -1156,6 +1157,10 @@ class Stage6App:
             )
         plan = DrawingPlan.from_dict(document)
         plan.validate_bounds()
+        experiment_context = document.get("autodraw_experiment") if isinstance(document, dict) else None
+        self._fill001_execution_required = (
+            isinstance(experiment_context, dict) and experiment_context.get("phase_id") == "FILL001"
+        )
         self.color_plan_data = None
         self.adaptive_brush_plan = None
         self.adaptive_brush_plan_path = None
@@ -1172,6 +1177,7 @@ class Stage6App:
         document = json.loads(plan_path.read_text(encoding="utf-8"))
         plan_type = document.get("plan_type") if isinstance(document, dict) else None
         del document
+        self._fill001_execution_required = False
         if plan_type == "autodraw_color_scanline_plan":
             color_plan = load_color_scanline_plan(plan_path)
         elif plan_type == "autodraw_geometry_color_plan":
@@ -1533,6 +1539,20 @@ class Stage6App:
         if self.execution_plan is None or self.area is None or self.plan_path is None:
             messagebox.showwarning("План не готов", "Сначала загрузите план и выберите область доски.", parent=self.root)
             return
+        if self._fill001_execution_required:
+            expected_fill001_override = {
+                "point_step_px": 4.0,
+                "point_delay_ms": 5,
+                "line_extension_px": 0.0,
+            }
+            if not confirmed or executor_config_override != expected_fill001_override:
+                messagebox.showwarning(
+                    "FILL-001 требует контролируемого запуска",
+                    "Этот план можно запустить только через вкладку FILL-001 после подтверждения радиуса Game Monitor "
+                    "и с неизменным профилем P1 (step=4, delay=5 ms, line extension=0).",
+                    parent=self.root,
+                )
+                return
         try:
             config = self._resolve_workflow_executor_config(executor_config_override)
             self.execution_plan.validate_bounds()
