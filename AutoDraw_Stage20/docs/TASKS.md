@@ -2,21 +2,20 @@
 
 ## Актуальное состояние FILL-001 на 2026-11-04
 
-Software fixes внесены: JSON persistence в attempt/after PNG/capture/attempt finalization (commit 2b7577c) и canonical DrawingPlan hash normalization (commit 3b67aea). Добавлены regression tests. CI 41728163369: Game Monitor/Bridge и Executor SUCCESS; Preparation/G3 и Application integration выполняются; Windows build ожидает их завершения. Пользовательский запуск завершил 131/131 strokes, after PNG существует, но capture не принят. Квота CHALK на этой доске исчерпана; 45-cell matrix остаётся BLOCKED до audit evidence и успешного preflight на восстановленной доске.
-
+Полный CI [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881) прошёл на code HEAD `fe6d446`: все обязательные jobs, INT-006 pixel audit и Windows portable build/startup smoke-test SUCCESS; Preparation/G3 — 782 passed, 24 warnings, 82 subtests. Пользовательский preflight завершил 131/131 strokes; session exact CHALK=5999 (pointCount 1→6000), но capture не принят. Attempt JSON повреждён буквальным `\\n`, after PNG физически существует, но attempt не содержит его path. Второй Bridge run file — 27.9 MB и недоступен для полного чтения через GitHub file API. Обнаружен следующий binder blocker: время финализации калибровочного run создаёт ложное overlap с executor, хотя его последнее событие произошло до executor start. См. [postmortem](CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md). 45-cell matrix BLOCKED; текущая доска исчерпала CHALK quota.
 
 Реестр содержит документационные и технические задачи проекта. Аналитические этапы 7–10 отменены и в backlog не включаются; INT-001 и последующие задачи ресурсной оптимизации являются отдельной инициативой.
 
 ## Временный план FILL-001 на пять шагов
 
 **Документ:** [CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md](CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md)  
-**Статус:** IN_PROGRESS — software gates закрыты на предыдущем HEAD; после пользовательской попытки исправлен runtime JSON handoff и добавлен regression test; CI [41692129486](https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486) выполняется, первые три jobs (Game Monitor/Bridge, Preparation/G3, INT-006 pixel audit) завершились SUCCESS; Application integration и Executor jobs ещё выполняются; Windows live preflight не пройден; шаги 4–5 заблокированы.
+**Статус:** IN_PROGRESS — software fixes и regression tests прошли полный CI [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881) на code HEAD `fe6d446`, включая Windows portable build/startup smoke-test. Live execution завершён 131/131 strokes, session CHALK=5999, но capture не принят. Найден binder false-overlap на калибровочном Bridge run; требуется исправление и новый preflight на восстановленной доске. Шаги 4–5 BLOCKED.
 
 | Шаг | Статус | Критерий |
 |---|---|---|
 | 1. Regression gate: tests, полный CI, Windows build | DONE | CI [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985), code/test HEAD `031913c`; Preparation/G3 778 passed, 24 warnings, 82 subtests; обязательные jobs и Windows portable build/startup smoke-test SUCCESS |
 | 2. Runtime binding: Bridge, executor journal, P1 | DONE | Binder, Stage 6 completion hook и связь с FILL-001 experiment context покрыты regression CI; live binding будет подтверждён на шаге 3 |
-| 3. UI/runner handoff и Windows preflight | IN_PROGRESS | После попытки из commit `6b1cba9` исправлена сериализация FILL-001 runtime JSON (commit `8dfd1b5`), добавлен интеграционный test (`1b2d8a1`); CI [41692129486](https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486) выполняется (Application integration, Game Monitor/Bridge, Preparation/G3, Executor и INT-006 pixel audit — SUCCESS; Windows portable build/startup smoke-test — IN_PROGRESS); затем требуется один успешный Windows live run с Bridge/executor binding и реальными PNG |
+| 3. UI/runner handoff и Windows preflight | IN_PROGRESS | JSON persistence/hash fixes и tests прошли CI `41730717881` (полный SUCCESS на `fe6d446`). Live run 131/131 strokes; session CHALK=5999; capture rejected. Binder использует `finished_at_utc` и ошибочно считает калибровочный run overlapping, хотя последнее событие было до executor start. Следующий шаг — исправить activity-window matching, добавить regression test и провести новый preflight на восстановленной доске |
 | 4. 45 live captures | BLOCKED | 45 уникальных принятых ячеек либо документированные отклонения |
 | 5. CHALK/quality analysis и рекомендация | BLOCKED | Подготовлен отчёт о влиянии радиуса и лучшей стратегии заливки |
 
@@ -40,11 +39,12 @@ Software fixes внесены: JSON persistence в attempt/after PNG/capture/att
 - [x] Исправить FILL-001 runtime handoff: после добавления `autodraw_experiment` в runtime DrawingPlan записывался буквальный `\n`, что делало JSON невалидным; запись исправлена в `integrated_app.py` (commit `8dfd1b5`).
 - [x] Добавить интеграционный regression test, который передаёт реальный FILL-001 plan в Stage 6 и проверяет JSON/context (commit `1b2d8a1`); CI для этих изменений ожидается.
 - [x] Добавить synthetic regression coverage для client ROI 581×304, uniform-scale rejection, ROI metadata mismatch и leakage после rasterization; CI [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985) — SUCCESS.
-- [ ] Провести один реальный Windows FILL-001 runtime preflight и подтвердить task ↔ executor report ↔ Bridge session/run binding.
+- [ ] Исправить runtime binder: определять Bridge run overlap по времени активности событий, а не по позднему `finished_at_utc`; покрыть калибровочный run с idle finalization grace regression test.
+- [ ] Провести один новый Windows FILL-001 runtime preflight на восстановленной доске и подтвердить task ↔ executor report ↔ Bridge session/run binding.
 - [ ] Проверить реальные before/after PNG crop, RGB threshold, cursor/UI exclusion и frozen mask alignment.
 - [ ] Только после preflight разрешить 45 live captures.
 
-**Ограничения:** software UI/runner и regression tests готовы. Реальный runtime run и реальные FILL-001 PNG ещё не подтверждены; 45-cell matrix остаётся заблокированной до успешного preflight. Synthetic fixtures и portable startup smoke-test не являются live evidence. Production estimator/defaults и frozen INT-006 model не менять.
+**Ограничения:** software UI/runner и CI gate готовы, но live capture не принят. Session-level exact CHALK известен (5999), task-level/per-stroke attribution второго Bridge run не проверена; after PNG просмотрен визуально, количественный mask audit не выполнен. Текущая доска исчерпана. 45-cell matrix заблокирована до binder fix и нового preflight. Production estimator/defaults и frozen INT-006 model не менять.
 
 ## Статусы
 
@@ -90,7 +90,7 @@ Software fixes внесены: JSON persistence в attempt/after PNG/capture/att
 | INT-005 | DONE | Реализовать автоматизированную лабораторию CHALK-экспериментов | Matrix/block runner, task identity, повторения, manifest, recovery/fail-closed gates и capture acceptance использованы для G1 12/12, G2 18/18 и G3 27/27. |
 | INT-006 | IN_PROGRESS | Официальный analyzer PASS: 45/45 accepted, 0 missing/rejected, 15/15 groups complete; SHA-256 и journal/task/experiment/run/profile/geometry binding проверены. Метрики: MAE 1.408, RMSE 1.967, bias -0.875, MAPE 2.134%, max underprediction 1.82 CHALK. Остаются safety-margin decision и расширение domain validation. См. [официальный отчёт](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md). Production estimator/defaults не менять. |
 | INT-006R | DONE | 45/45 live captures, raw-data audit, официальный CLI analyzer (45 accepted, 0 missing/rejected) и ручной аудит всех 45 пар PNG завершены. Зафиксированы ограничения: radius 1 — разрыв соединения D2 polygon; radius 30 — слияние коротких деталей D4. См. [live results](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md) и [visual audit](CHALK_INT006R_VISUAL_AUDIT_2026-11-03.md). |
-| INT-006F | IN_PROGRESS | Проверить эффективность заполнения одноцветных областей по радиусу | Frozen masks, fixed-radius planner, 45-cell matrix/analyzer, Monitor capture adapter, runtime binding и отдельная вкладка FILL-001 реализованы. CI [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178) SUCCESS на `e3774a3`; Preparation/G3 772 passed, 24 warnings, 82 subtests; Windows portable build/startup smoke-test SUCCESS. Остался Windows live preflight; 45 captures заблокированы до его прохождения. |
+| INT-006F | IN_PROGRESS | Проверить эффективность заполнения одноцветных областей по радиусу | Полный CI `41730717881` SUCCESS на `fe6d446` (Preparation/G3 782 passed, 24 warnings, 82 subtests; все обязательные jobs, pixel audit и Windows build SUCCESS). Live task 131/131 strokes, session CHALK=5999, capture rejected. Новый blocker: Bridge finalization timestamp даёт false overlap калибровочного run; требуется event activity-window fix, затем новый preflight. 45-cell matrix BLOCKED. См. `CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md`. |
 | INT-007 | BLOCKED | Интегрировать валидированную модель в preflight/resource estimator AutoDraw | Начинать только после независимой validation INT-006 и определения консервативного safety margin. |
 | INT-008 | TODO | Оптимизировать кисти, траектории, порядок и покрытие | Подбирать способ построения рисунка в пределах квоты CHALK с учётом качества покрытия; зависит от INT-006/007. |
 | INT-009 | TODO | Сравнить прогноз с фактом и проверить качество | Проверить на независимых рисунках прогноз, exact CHALK delta, визуальное качество и устойчивость к разным типам геометрии. |
@@ -109,8 +109,7 @@ Software fixes внесены: JSON persistence в attempt/after PNG/capture/att
 - [x] Выполнить 45 независимых live captures D1–D5; предварительно сверить exact CHALK и per-stroke breakdown по всем 45 Monitor reports. Отдельный preflight log в capture bundle не найден.
 - [ ] После validation определить обоснованный safety margin.
 
-**Актуальный приоритет:** FILL-001 UI/runner, planner handoff, runtime binding и software regression gate завершены. Текущий этап — один Windows live preflight из отдельной вкладки с проверкой фактического P1, Bridge/executor binding и реальных before/after PNG. 45-cell matrix остаётся BLOCKED до успешного preflight. INT-006 safety margin не установлен; INT-007 остаётся BLOCKED. Исторические чек-листы ниже сохраняют ход выполнения и не переопределяют статусы таблицы.
-## Отменённые работы
+**Актуальный приоритет:** устранить false-overlap в FILL-001 runtime binder, пройти полный CI, затем выполнить один preflight на восстановленной доске. 45-cell matrix остаётся BLOCKED; INT-006 safety margin и INT-007 не меняются.
 
 | ID | Статус | Задача | Основание |
 |---|---|---|---|

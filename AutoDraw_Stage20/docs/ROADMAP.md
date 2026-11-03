@@ -2,8 +2,7 @@
 
 ## Актуальный статус FILL-001 на 2026-11-04
 
-Исправления JSON persistence и canonical DrawingPlan hash опубликованы в commits 2b7577c и 3b67aea; добавлены regression tests. CI 41728163369 частично завершён: Game Monitor/Bridge и Executor SUCCESS, Preparation/G3 и Application integration IN_PROGRESS, Windows build ожидает их завершения. Live preflight завершил 131/131 strokes, after PNG существует, capture не принят. CHALK quota использованной доски исчерпана. 45-cell matrix остаётся BLOCKED до проверки artifacts/PNG и нового успешного preflight на восстановленной доске.
-
+Полный CI [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881) SUCCESS на code HEAD `fe6d446`, включая Preparation/G3 (782 passed, 24 warnings, 82 subtests), INT-006 pixel audit и Windows portable build/startup smoke-test. Live preflight завершил 131/131 strokes; exact session CHALK=5999, но capture rejected. Attempt JSON invalid, after PNG существует, второй Bridge run file 27.9 MB не прочитан целиком. Найден binder false-overlap: калибровочный run завершил события до executor start, но финализировался после него и ошибочно попадает в executor interval. Следующий шаг — event activity-window fix + regression test; затем новый preflight на восстановленной доске. 45-cell matrix BLOCKED. Подробности: [FILL-001 postmortem](CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md).
 
 ## Постоянная система управления знаниями ИИ
 
@@ -21,7 +20,7 @@
 4. Выполнить 45 live captures (3 формы × 5 радиусов × 3 повтора); до успешного шага 3 запуск заблокирован.
 5. Проанализировать exact CHALK и качество, определить влияние радиуса и лучшую стратегию заливки.
 
-**Текущий статус:** шаги 1–2 DONE как software/regression gates; UI/runner реализован, но первая live попытка из commit `6b1cba9` выявила ошибку записи FILL-001 runtime JSON. Исправление внесено в `integrated_app.py` (commit `8dfd1b5`), интеграционный regression test добавлен (commit `1b2d8a1`); CI [41692129486](https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486) выполняется: Application integration, Game Monitor/Bridge, Preparation/G3, Executor и INT-006 pixel audit — SUCCESS; Windows portable build/startup smoke-test ещё выполняется. Windows live preflight шага 3 не пройден; шаги 4–5 BLOCKED. Предыдущий CI [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985) остаётся успешным только для code/test HEAD `031913c`.
+**Текущий статус:** шаги 1–2 DONE как software/regression gates; полный CI [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881) прошёл на code HEAD `fe6d446`, включая Windows portable build. Пользовательский live run завершил 131/131 strokes, session CHALK=5999, но capture не принят. Выявлен false overlap в runtime binder из-за idle finalization timestamp; шаг 3 остаётся IN_PROGRESS до исправления activity-window matching и нового preflight на восстановленной доске. Шаги 4–5 BLOCKED.
 
 ### FILL-001 — fill efficiency matrix
 
@@ -37,7 +36,7 @@
 - [ ] Проверить реальные board PNG в client ROI: RGB threshold=8, cursor/UI exclusion и coverage/leakage против frozen masks.
 - [ ] Только после preflight — 45 live captures и анализ расхода CHALK по shape/radius.
 
-**Текущий gate:** runtime JSON handoff исправлен, интеграционный regression test добавлен; CI [41692129486](https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486): все regression jobs SUCCESS; Windows portable build/startup smoke-test выполняется. Первая live попытка остановилась до запуска исполнителя; требуется повторная Windows/game session для проверки Stage 6, Bridge/executor binding и реальных PNG. Live execution всей 45-cell matrix остаётся BLOCKED.
+**Текущий gate:** JSON persistence и canonical plan hash исправлены, regression tests и полный CI [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881) SUCCESS. Live execution завершился, но capture rejected. Binder ошибочно учитывает Bridge idle-finalization time как activity overlap. Требуется fix + regression, затем один preflight на восстановленной доске. Live execution 45-cell matrix остаётся BLOCKED.
 
 ## Актуальный статус CHALK — 2026-11-03
 

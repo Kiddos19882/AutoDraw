@@ -1,3 +1,15 @@
+## 2026-11-04 — FILL-001 postmortem и актуализация gates
+
+- Проверены feature branch, code HEAD `fe6d4469a5294fdf8284978d4e2b5c47582fa2d4`, последние 20 коммитов, master reference, compare и полный CI run [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881).
+- Все обязательные CI jobs завершились SUCCESS: Executor regression, Game Monitor/Bridge, Application integration, Preparation/G3 (782 passed, 24 warnings, 82 subtests), INT-006 pixel audit и Windows portable build/startup smoke-test. Optional benchmarks skipped.
+- Проанализирован пользовательский FILL-001 run: Stage 6 131/131 strokes, 225.61 s, 12 857 move calls, P1 step=4/delay=5, exact session pointCount 1→6000 (CHALK=5999), no dropped events/errors/sequence gaps/send failures.
+- Первый Bridge run разобран полностью: calibration, 2 non-consuming candidates, CHALK=0, 69 brush changes, radius 8–30. Второй Bridge run file присутствует (27 934 553 bytes), но его содержимое не удалось получить через GitHub file API; task-level/per-stroke CHALK не объявлен подтверждённым.
+- Attempt JSON invalid из-за буквального `\\n`; after PNG физически существует и визуально просмотрен, но количественный frozen-mask audit не проведён. Capture остаётся rejected.
+- Найдено дополнительное статическое несоответствие binder: он использует `finished_at_utc` как конец activity interval. Калибровочный run закончил события 21:26:17.416Z, executor начался 21:26:19Z, но idle finalization завершилась 21:26:20.862Z; текущая логика ошибочно считает его overlapping. Исправление кода не выполнялось; следующий gate — activity-window matching + regression.
+- Создан postmortem `CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md`; обновлены PROJECT_STATUS, TASKS, ROADMAP, временный FILL-001 plan, docs index и CHANGELOG.
+- Исходники, тесты, workflow, настройки и raw experiment data в рамках этой аналитической задачи не менялись. `master` не изменялся. Локальный git status через GitHub API недоступен.
+- Следующий шаг: исправить binder, добавить regression на idle finalization grace, повторить CI; затем один live preflight на восстановленной доске. 45-cell matrix и production estimator/defaults не менять.
+
 ## 2026-11-04 — FILL-001 post-run persistence and canonical hash fixes
 
 - Повторно проверены ветка feature/image-geometry-optimization, code HEAD 3b67aea0145170ec23df089916bedf7828de9a68, последние коммиты, README Stage20/docs index, управляющие документы и постоянные регламенты.

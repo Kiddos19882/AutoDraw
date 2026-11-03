@@ -1,7 +1,8 @@
 # Временный план дальнейших работ FILL-001
 
 **Статус:** актуальный временный план, обязателен к сохранению до выполнения всех пяти шагов или отдельного решения пользователя.  
-**Дата:** 2026-11-03  
+**Дата создания:** 2026-11-03  
+**Последнее обновление:** 2026-11-04  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
 **Область:** подготовка и проведение контролируемого эксперимента по расходу CHALK при заполнении областей кистями разных радиусов.
 
@@ -15,10 +16,10 @@
 
 **Статус:** DONE
 
-- GitHub Actions [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985) — SUCCESS на code/test HEAD `031913c64da5f25921d74f426a2c7778c02130ee` (включает client-ROI correction).
-- Preparation/G3: **772 passed, 24 warnings, 82 subtests passed**.
+- GitHub Actions [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881) — SUCCESS на code HEAD `fe6d4469a5294fdf8284978d4e2b5c47582fa2d4`.
+- Preparation/G3: **782 passed, 24 warnings, 82 subtests passed**.
 - Executor regression, Game Monitor/Bridge, Application integration, INT-006 pixel audit и Windows portable build/startup smoke-test — SUCCESS; optional algorithm benchmarks — SKIPPED.
-- Windows portable artifact: [autodraw-g3-preflight-build](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178/artifacts/13248469807).
+- Windows portable artifact: [autodraw-g3-preflight-build](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881/artifacts/13278132576), 637 057 007 bytes.
 - CI подтверждает software regression gate, но не live FILL-001 запуск в браузерной игре и не проверку реальных board PNG.
 
 **Критерий завершения:** выполнен — все обязательные jobs и Windows portable build/startup smoke-test успешны на одном code/test HEAD.
@@ -38,7 +39,7 @@
 
 ### Шаг 3. Интегрировать запуск в AutoDraw и провести Windows live preflight
 
-**Статус:** IN_PROGRESS — software fixes внесены в commits 2b7577c и 3b67aea; CI [41728163369](https://github.com/Kiddos19882/AutoDraw/actions/runs/41728163369) частично завершён: Game Monitor/Bridge и Executor SUCCESS; Preparation/G3 и Application integration IN_PROGRESS; Windows build ожидает обязательные jobs. Второй пользовательский live run завершил 131/131 strokes и сохранил after PNG, но capture не принят. На доске pointCount достиг 6000 из 6000; повторный запуск на ней невозможен.
+**Статус:** IN_PROGRESS — JSON persistence и canonical DrawingPlan hash fixes (commits `2b7577c`, `3b67aea`) и дополнительные tests (`fe6d446`) прошли полный CI [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881) на code HEAD `fe6d446`; все обязательные jobs и Windows portable build/startup smoke-test SUCCESS. Live run завершил 131/131 strokes; session CHALK=5999, но capture rejected. Выявлен false overlap: Bridge калибровочный run закончил события до executor start, но `finished_at_utc` позже executor start из-за idle finalization. Требуется исправить binder event activity-window matching, добавить regression test и повторить preflight на восстановленной доске. Текущая доска исчерпана (`pointCount=6000/6000`).
 
 **Подтверждённая реализация UI/runner:**
 - Добавлен `source/preparation/chalk_fill_ui.py` и самостоятельная вкладка FILL-001 в `integrated_app.py`, отдельная от седьмой вкладки «Тест кистей».
@@ -69,11 +70,14 @@
 
 
 **Актуальное уточнение 2026-11-04:**
-- В chalk_fill_ui.py исправлены все четыре JSON writes с буквальным \\n: executor completion, after PNG, capture JSON и финальный attempt record.
-- В chalk_fill_runtime_binding.py preparation и validation используют один normalized DrawingPlan document; attach сохраняет canonical document до записи runtime plan.
-- Добавлены regression tests для completion/after PNG/capture persistence и hash normalization. Полный CI ещё выполняется.
-- Bridge run file второго запуска присутствует в Git tree, размер 27,934,553 bytes. Пустой ответ fetch API был ограничением обработки большого файла, не доказательством пустого файла.
-- Capture остаётся unaccepted до полной проверки run binding, per-stroke CHALK и визуального PNG audit. 45-cell matrix остаётся BLOCKED.
+- В `chalk_fill_ui.py` исправлены четыре JSON writes с буквальным `\\n`: executor completion, after PNG, capture JSON и финальный attempt record.
+- В `chalk_fill_runtime_binding.py` preparation и validation используют один normalized DrawingPlan document; attach сохраняет canonical document до записи runtime plan.
+- Добавлены regression tests на JSON persistence, canonical plan hash и отказ при non-consuming stroke candidates.
+- Полный CI [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881) — SUCCESS: все обязательные jobs, INT-006 pixel audit и Windows portable build/startup smoke-test прошли.
+- Live run 131/131 strokes; session exact CHALK=5999. Первый Bridge run — calibration (CHALK=0, 2 non-consuming candidates). Второй run file присутствует, размер 27 934 553 bytes, но содержимое не удалось получить целиком; per-run/per-stroke CHALK не подтверждён.
+- Before/after PNG существуют; визуальный просмотр after показывает заполненную прямоугольную область. Количественный mask audit не выполнен. Attempt JSON невалиден, after_png в attempt не записан; capture не принят.
+- Обнаружена следующая ошибка binder: `finished_at_utc` idle-finalization time используется как конец activity interval. У calibration run последнее событие 21:26:17.416Z, executor начался 21:26:19Z, но Bridge файл finalized в 21:26:20.862Z. Binder ошибочно видит overlap и отклонит этот pre-execution run. Нужны event-window matching и regression test.
+- Полный разбор: [CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md](CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md). 45-cell matrix остаётся BLOCKED; текущая доска исчерпала CHALK quota.
 
 ### Шаг 4. Выполнить 45 live captures FILL-001
 

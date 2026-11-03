@@ -1,3 +1,10 @@
+## 2026-11-04 — FILL-001 preflight postmortem и software gate
+
+- Полный CI [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881) прошёл на code HEAD `fe6d446`: Executor, Game Monitor/Bridge, Application integration, Preparation/G3 (782 passed, 24 warnings, 82 subtests), INT-006 pixel audit и Windows portable build/startup smoke-test — SUCCESS; optional benchmarks skipped.
+- Добавлен postmortem `CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md`: executor завершил 131/131 strokes; session exact CHALK=5999; attempt JSON invalid; after PNG физически существует, capture не принят; большой Bridge run file не проверен целиком.
+- Выявлен дополнительный runtime binder blocker: idle finalization timestamp ошибочно считается временем активности Bridge run, что создаёт false overlap с executor window. Следующее исправление и regression test зарегистрированы в TASKS/ROADMAP.
+- Обновлены PROJECT_STATUS, TASKS, ROADMAP, временный FILL-001 plan и docs index. Исходники, тесты, workflow и первичные runtime evidence в рамках отчётной задачи не менялись.
+
 ## 2026-11-04 — FILL-001 persistence and hash validation fixes
 
 - Исправлены четыре записи JSON в chalk_fill_ui.py: теперь используются реальные переводы строк, а не буквальная последовательность \\n. Добавлены regression tests для completion/after PNG, capture JSON и attempt finalization.
