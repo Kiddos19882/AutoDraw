@@ -39,7 +39,7 @@
 
 ### Шаг 3. Интегрировать запуск в AutoDraw и провести Windows live preflight
 
-**Статус:** IN_PROGRESS — binder activity-window fix внесён в `95a8d17`; тесты calibration false-overlap и large Bridge JSON >27 MiB добавлены в `870bebc`. CI для этих коммитов ожидается. Предыдущий live run завершил 131/131 strokes; session CHALK=5999, capture rejected, доска исчерпана. Следующий gate — software CI, затем один preflight на восстановленной доске.
+**Статус:** IN_PROGRESS — binder activity-window fix (`95a8d17`) и regression tests (`870bebc`) прошли полный CI [41737923777](https://github.com/Kiddos19882/AutoDraw/actions/runs/41737923777), включая Windows portable build/startup smoke-test. Предыдущий live run завершил 131/131 strokes; session CHALK=5999, capture rejected, доска исчерпана. Следующий gate — один preflight на восстановленной доске.
 
 **Подтверждённая реализация UI/runner:**
 - Добавлен `source/preparation/chalk_fill_ui.py` и самостоятельная вкладка FILL-001 в `integrated_app.py`, отдельная от седьмой вкладки «Тест кистей».
@@ -59,9 +59,9 @@
 - Capture adapter растеризует frozen logical mask в размер PNG ROI методом nearest-neighbor и сохраняет logical→screen transform; пропорции ROI проверяются по uniform-scale tolerance 1%.
 - Before/after должны иметь одинаковые фактические ROI; курсор и UI/paint meter исключаются из crop по существующей процедуре.
 
-**Следующий Windows live preflight после binder fix:**
-- Исправить runtime binder: activity window Bridge run определяется по времени событий, а не по позднему `finished_at_utc`; добавить regression на calibration run, чьи события закончились до executor start, но файл finalized после него.
-- Повторно пройти полный CI и Windows portable build/startup smoke-test на исправленном code HEAD.
+**Следующий Windows live preflight (software gate подтверждён CI 41737923777):**
+- Binder activity-window fix и regression coverage находятся в `95a8d17`/`870bebc`; полный CI и Windows portable build/startup smoke-test завершились SUCCESS.
+- Использовать актуальную portable-сборку из [CI artifact 13280731107](https://github.com/Kiddos19882/AutoDraw/actions/runs/41737923777/artifacts/13280731107).
 - Использовать восстановленную/новую доску с полной доступной квотой CHALK; текущая доска исчерпана.
 - Запустить ровно одну задачу `rectangle / radius 10 / repeat 1` из вкладки FILL-001.
 - Подтвердить task ↔ DrawingPlan ↔ executor report ↔ Bridge session/run identity, фактический P1, exact run/per-stroke CHALK и отсутствие non-consuming candidates в выбранном task run.
@@ -73,10 +73,10 @@
 - В `chalk_fill_ui.py` исправлены четыре JSON writes с буквальным `\\n`: executor completion, after PNG, capture JSON и финальный attempt record.
 - В `chalk_fill_runtime_binding.py` preparation и validation используют один normalized DrawingPlan document; attach сохраняет canonical document до записи runtime plan.
 - Добавлены regression tests на JSON persistence, canonical plan hash и отказ при non-consuming stroke candidates.
-- Полный CI [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881) — SUCCESS: все обязательные jobs, INT-006 pixel audit и Windows portable build/startup smoke-test прошли.
+- Полный CI [41737923777](https://github.com/Kiddos19882/AutoDraw/actions/runs/41737923777) на `870bebc` — SUCCESS: все обязательные jobs, INT-006 pixel audit и Windows portable build/startup smoke-test прошли; optional benchmarks skipped.
 - Live run 131/131 strokes; session exact CHALK=5999. Первый Bridge run — calibration (CHALK=0, 2 non-consuming candidates). Второй run file присутствует, размер 27 934 553 bytes, но содержимое не удалось получить целиком; per-run/per-stroke CHALK не подтверждён.
 - Before/after PNG существуют; визуальный просмотр after показывает заполненную прямоугольную область. Количественный mask audit не выполнен. Attempt JSON невалиден, after_png в attempt не записан; capture не принят.
-- Обнаружена следующая ошибка binder: `finished_at_utc` idle-finalization time используется как конец activity interval. У calibration run последнее событие 21:26:17.416Z, executor начался 21:26:19Z, но Bridge файл finalized в 21:26:20.862Z. Binder ошибочно видит overlap и отклонит этот pre-execution run. Нужны event-window matching и regression test.
+- Ошибка false-overlap устранена в `95a8d17`: binder определяет конец активности по последнему event `t` на performance clock, а `finished_at_utc` использует только для проверки idle finalization grace. Regression test на calibration run с поздней финализацией добавлен в `870bebc`; CI `41737923777` прошёл.
 - Полный разбор: [CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md](CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md). 45-cell matrix остаётся BLOCKED; текущая доска исчерпала CHALK quota.
 
 ### Шаг 4. Выполнить 45 live captures FILL-001
@@ -117,7 +117,7 @@
 |---|---|---|
 | 1 | DONE | CI [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881), code HEAD `fe6d446`; Preparation/G3 782 passed, 24 warnings, 82 subtests; все обязательные jobs, INT-006 audit и Windows portable build/startup smoke-test SUCCESS; optional benchmarks skipped |
 | 2 | DONE (software) | Runtime binder, Stage 6 completion hook, UI experiment context и regression coverage прошли CI `41730717881` на `fe6d446`; live proof остаётся частью шага 3 |
-| 3 | IN_PROGRESS | Commits `2b7577c`/`3b67aea` исправляют JSON persistence и normalized plan hash; tests `fe6d446`; полный CI `41730717881` SUCCESS. Live run 131/131 strokes, session CHALK=5999, capture rejected. Binder false-overlap из-за idle finalization выявлен; нужен fix + regression, затем preflight на восстановленной доске. |
+| 3 | IN_PROGRESS | Binder fix `95a8d17` и regression tests `870bebc` прошли полный CI `41737923777`. Предыдущий live run: 131/131 strokes, session CHALK=5999, capture rejected. Нужен один новый preflight на восстановленной доске. |
 | 4 | BLOCKED | Ожидает шаги 1–3 |
 | 5 | BLOCKED | Ожидает 45 принятых captures |
 
