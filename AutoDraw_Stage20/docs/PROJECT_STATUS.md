@@ -9,7 +9,7 @@
 
 # Текущее состояние проекта
 
-**Последнее обновление:** 2026-11-03 — INT006R полностью закрыт (45/45 captures, raw-data audit, CLI analyzer и visual audit). Для FILL-001 добавлен `chalk_fill_experiment.py`: три frozen masks на canvas 460×240, площади выровнены с разбросом 1,133%, SHA-256 закреплены; добавлено 8 tests (локально 8/8 PASS). H/V grid и eroded-contour prototypes не прошли combined gate coverage ≥99% / leakage=0; CI для новых commits пока не подтверждён. Два raster prototypes не прошли combined gate coverage ≥99% / leakage=0; следующий шаг — boundary-aware fixed-radius centerline planner. См. [INT006R visual audit](CHALK_INT006R_VISUAL_AUDIT_2026-11-03.md) и [FILL-001 design](CHALK_FILL001_HARNESS_DESIGN_2026-11-03.md).
+**Последнее обновление:** 2026-11-03 — INT006R полностью закрыт (45/45 captures, raw-data audit, CLI analyzer и visual audit). Для FILL-001 добавлен `chalk_fill_experiment.py`: три frozen masks на canvas 460×240, площади выровнены с разбросом 1,133%, SHA-256 закреплены; добавлено 8 tests (локально 8/8 PASS). H/V grid и eroded-contour prototypes не прошли combined gate coverage ≥99% / leakage=0; CI для новых commits пока не подтверждён. Два raster prototypes не прошли combined gate coverage ≥99% / leakage=0; следующий шаг — boundary-aware fixed-radius centerline planner. Инвентаризация документации DOC-016 завершена: проверены 55 Markdown-файлов `docs/` и 16 файлов корня Stage20; актуальный индекс и архивные документы классифицированы в [отчёте](DOCUMENTATION_INVENTORY_2026-11-03.md). См. [INT006R visual audit](CHALK_INT006R_VISUAL_AUDIT_2026-11-03.md) и [FILL-001 design](CHALK_FILL001_HARNESS_DESIGN_2026-11-03.md).
 
 **Актуально на:** 3 ноября 2026 г.  
 **Репозиторий:** `Kiddos19882/AutoDraw`  
