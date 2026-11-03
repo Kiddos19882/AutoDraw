@@ -107,7 +107,7 @@ Production estimator, frozen INT-006 model, executor/sampling defaults и `maste
 - В каждую задачу входят динамический `expected_strokes`, target area, mask SHA-256, plan signature, planned coverage/leakage и уникальный task ID.
 - Manifest имеет canonical SHA-256 подпись; `validate_fill001_matrix` проверяет полный набор ячеек, отсутствие дубликатов, неизменность подписи, frozen mask/plan identity и quality gates.
 - `write_fill001_matrix` сохраняет manifest атомарно; `load_fill001_matrix` проверяет его при чтении.
-- `validate_fill001_capture` требует run/task/plan/mask/radius identity, точный CHALK = post pointCount − pre pointCount, совпадение completed strokes с dynamic expected_strokes, coverage ≥99%, leakage=0 и нулевые dropped events/Monitor errors/bridge failures/sequence gaps.
+- `validate_fill001_capture` требует run/task/plan/mask/radius identity, точный CHALK = post pointCount − pre pointCount, сумму per-stroke `DRAW_SAMPLE.pointDelta` равную exact CHALK, совпадение completed strokes с dynamic expected_strokes, before/after PNG и успешный PNG audit, coverage ≥99%, leakage=0 и нулевые dropped events/Monitor errors/bridge failures/sequence gaps.
 - `analyze_fill001_captures` отклоняет отсутствующие, неожиданные, повторные task/run IDs и неполные captures; агрегирует exact CHALK по каждой паре shape/radius с тремя повторами.
 - Analyzer не выводит площадь/CHALK до подтверждения live target area из PNG; поле effective_area_per_chalk остаётся null. Production model/safety margin не меняются.
 - Матрица не запускает игру и не исполняет планы. `execution_allowed=false`, `safe_to_execute=false` остаются обязательными.
