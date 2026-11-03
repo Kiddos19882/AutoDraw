@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 import uuid
@@ -83,7 +84,7 @@ def _runtime_documents(tmp_path):
         "experiment_context": plan_document["autodraw_experiment"],
         "source_plan_file": str(plan_path),
         "source_plan_sha256": plan_document["autodraw_experiment"]["executor_plan_sha256"],
-        "source_plan_file_sha256": "c" * 64,
+        "source_plan_file_sha256": hashlib.sha256(plan_path.read_bytes()).hexdigest(),
         "summary": summary,
         "executor_config": config,
         "executed_plan": {"stroke_count": 1},
@@ -93,24 +94,20 @@ def _runtime_documents(tmp_path):
 
     events = [
         {
-            "monitorVersion": "0.2.1", "t": 100.0, "type": "BRUSH_CHANGE_APPLIED",
-            "strokeId": None, "after": {"currentRadius": 5},
+            "monitorVersion": "0.2.1", "t": 100.0, "type": "POINTER_DOWN_CANDIDATE",
+            "strokeId": "pointer-stroke-1", "board": _snapshot(100),
         },
         {
-            "monitorVersion": "0.2.1", "t": 101.0, "type": "DRAW_START",
-            "strokeId": "stroke-1", "before": _snapshot(100),
+            "monitorVersion": "0.2.1", "t": 101.0, "type": "DRAW_SAMPLE",
+            "strokeId": "pointer-stroke-1", "pointDelta": 0, "after": _snapshot(100),
         },
         {
-            "monitorVersion": "0.2.1", "t": 102.0, "type": "DRAW_START_APPLIED",
-            "strokeId": "stroke-1", "after": _snapshot(101),
+            "monitorVersion": "0.2.1", "t": 102.0, "type": "DRAW_SAMPLE",
+            "strokeId": "pointer-stroke-1", "pointDelta": 5, "after": _snapshot(105),
         },
         {
-            "monitorVersion": "0.2.1", "t": 103.0, "type": "DRAW_SAMPLE",
-            "strokeId": "stroke-1", "pointDelta": 4, "after": _snapshot(105),
-        },
-        {
-            "monitorVersion": "0.2.1", "t": 104.0, "type": "DRAW_END",
-            "strokeId": "stroke-1", "before": _snapshot(105), "after": _snapshot(105),
+            "monitorVersion": "0.2.1", "t": 103.0, "type": "POINTER_UP_CANDIDATE",
+            "strokeId": "pointer-stroke-1", "board": _snapshot(105),
         },
     ]
     run = {
@@ -119,7 +116,7 @@ def _runtime_documents(tmp_path):
         "session_id": session_id,
         "run_id": run_id,
         "started_at_utc": "2026-11-03T10:00:02+00:00",
-        "finished_at_utc": "2026-11-03T10:00:08+00:00",
+        "finished_at_utc": "2026-11-03T10:00:12+00:00",
         "execution_status": "completed",
         "pre_test_snapshot": _snapshot(100),
         "post_test_snapshot": _snapshot(105),
@@ -138,6 +135,9 @@ def _runtime_documents(tmp_path):
         "collector_sequence_gap_count": 0,
         "monitor_errors": [],
         "stroke_count": 1,
+        "stroke_candidate_count": 1,
+        "non_consuming_stroke_candidate_count": 0,
+        "stroke_lifecycle_sources": ["pointer_observer"],
         "brush_radius_status": "single",
         "observed_brush_radii": [5],
         "sampled_point_delta_total": 5,
@@ -147,7 +147,9 @@ def _runtime_documents(tmp_path):
     session_dir.mkdir()
     session_path = session_dir / "session.json"
     session = {
+        "schema_version": 2,
         "session_id": session_id,
+        "run_idle_seconds": 2.5,
         "monitor_status_at_connect": {"version": "0.2.1"},
         "bridge_diagnostics": {
             "received_event_count": len(events),
@@ -161,7 +163,7 @@ def _runtime_documents(tmp_path):
         },
     }
     session_path.write_text(json.dumps(session), encoding="utf-8")
-    run_path = session_dir / f"game-monitor-run-20261103T100008000000Z-{run_id[:8]}.json"
+    run_path = session_dir / f"game-monitor-run-20261103T100012000000Z-{run_id[:8]}.json"
     run_path.write_text(json.dumps(run), encoding="utf-8")
     return task, session_path, report_path, run_path, run, session, report
 
@@ -186,6 +188,8 @@ def test_runtime_binding_uses_bridge_session_run_and_executor_config(tmp_path):
     assert binding["session_id"] == session["session_id"]
     assert binding["sampling_profile"] == task["sampling_profile"]
     assert binding["exact_chalk"] == 5
+    assert binding["stroke_lifecycle_source"] == "pointer_observer"
+    assert binding["observed_radius"] == 5
     assert binding["bridge_failures"] == 0
     assert binding["sequence_gaps"] == 0
 
@@ -203,11 +207,59 @@ def test_runtime_capture_entrypoint_loads_real_artifact_shapes_and_pngs(tmp_path
     assert capture["runtime_binding_status"] == "passed"
     assert capture["task_id"] == task["task_id"]
     assert capture["exact_chalk"] == 5
+    assert capture["stroke_lifecycle_source"] == "pointer_observer"
     assert capture["executor_config"]["point_step_px"] == 4.0
     assert capture["executor_config"]["point_delay_ms"] == 5
     assert len(capture["session_file_sha256"]) == 64
     assert len(capture["bridge_run_file_sha256"]) == 64
     assert len(capture["executor_report_file_sha256"]) == 64
+
+
+def test_pointer_observer_parser_matches_committed_bridge_capture():
+    from chalk_fill_capture_adapter import _extract_stroke_chalk_deltas
+
+    repo_root = Path(__file__).resolve().parents[3]
+    run_path = (
+        repo_root / "data/results/brush_behavior_tests/game_monitor_bridge/"
+        "ee3f841c-cef2-4c75-af0d-7bbd2b6d4cc1/"
+        "game-monitor-run-20261102T173651271503Z-5aeab741.json"
+    )
+    run = json.loads(run_path.read_text(encoding="utf-8"))
+    assert run["stroke_lifecycle_sources"] == ["pointer_observer"]
+    deltas, pre_count, post_count = _extract_stroke_chalk_deltas(
+        run["events"], run["stroke_count"], "pointer_observer"
+    )
+    assert len(deltas) == 16
+    assert pre_count == run["pre_test_snapshot"]["pointCount"]
+    assert post_count == run["post_test_snapshot"]["pointCount"]
+    assert sum(deltas) == run["chalk"]["consumed_points"] == 219
+    assert sum(deltas) == run["sampled_point_delta_total"]
+    assert run["point_delta_matches_chalk"] is True
+
+
+def test_runtime_binding_accepts_bridge_idle_finalization_after_executor_end(tmp_path):
+    task, _, _, _, run, session, report = _runtime_documents(tmp_path)
+    assert report["summary"]["ended_at"] < run["finished_at_utc"]
+    binding = bind_fill001_runtime_evidence(task, session, [run], report)
+    assert binding["run_id"] == run["run_id"]
+
+
+def test_runtime_binding_rejects_run_past_bridge_idle_finalization_grace(tmp_path):
+    task, _, _, _, run, session, report = _runtime_documents(tmp_path)
+    run["finished_at_utc"] = "2026-11-03T10:00:15+00:00"
+    with pytest.raises(FillMatrixError, match="idle finalization grace"):
+        bind_fill001_runtime_evidence(task, session, [run], report)
+
+
+def test_runtime_loader_rejects_source_plan_changed_after_executor_report(tmp_path):
+    task, session_path, report_path, _, _, _, report = _runtime_documents(tmp_path)
+    source_path = Path(report["source_plan_file"])
+    document = json.loads(source_path.read_text(encoding="utf-8"))
+    document["strokes"][0]["points"][0]["x"] = 999
+    source_path.write_text(json.dumps(document), encoding="utf-8")
+    with pytest.raises(FillMatrixError, match="Source DrawingPlan file SHA-256"):
+        from chalk_fill_runtime_binding import load_fill001_runtime_binding
+        load_fill001_runtime_binding(task, session_path, report_path)
 
 
 def test_runtime_binding_rejects_wrong_sampling_or_line_extension(tmp_path):

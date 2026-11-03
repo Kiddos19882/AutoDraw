@@ -510,8 +510,10 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
                     session_dir.mkdir(parents=True, exist_ok=True)
                     session_path = session_dir / "session.json"
                     session_record = {
+                        "schema_version": 2,
                         "session_id": session_id,
                         "started_at_utc": utc_now(),
+                        "run_idle_seconds": idle_seconds,
                         "browser": message.get("browser"),
                         "page": message.get("page"),
                         "monitor_status_at_connect": message.get("monitorStatus"),

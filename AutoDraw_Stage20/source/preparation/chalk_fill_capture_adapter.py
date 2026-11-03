@@ -77,6 +77,110 @@ def audit_fill001_png_pair(
     }
 
 
+
+def _complete_lifecycle_pairs(
+    events: list[dict[str, Any]],
+    start_type: str,
+    end_type: str,
+    expected_strokes: int,
+) -> list[tuple[int, int, str]] | None:
+    starts = [i for i, event in enumerate(events) if event.get("type") == start_type]
+    ends = [i for i, event in enumerate(events) if event.get("type") == end_type]
+    if len(starts) != expected_strokes or len(ends) != expected_strokes:
+        return None
+    pairs: list[tuple[int, int, str]] = []
+    seen: set[str] = set()
+    for start_index, end_index in zip(starts, ends):
+        if start_index >= end_index:
+            return None
+        stroke_id = events[start_index].get("strokeId")
+        if not isinstance(stroke_id, str) or not stroke_id or stroke_id in seen:
+            return None
+        if events[end_index].get("strokeId") != stroke_id:
+            return None
+        if any(events[index].get("type") == start_type for index in range(start_index + 1, end_index)):
+            return None
+        seen.add(stroke_id)
+        pairs.append((start_index, end_index, stroke_id))
+    return pairs
+
+
+def _extract_stroke_chalk_deltas(
+    events: list[dict[str, Any]],
+    expected_strokes: int,
+    lifecycle_source: str,
+) -> tuple[list[int], int, int]:
+    if lifecycle_source == "engine":
+        pairs = _complete_lifecycle_pairs(events, "DRAW_START", "DRAW_END", expected_strokes)
+        start_snapshot_key, end_snapshot_key = "before", "after"
+    elif lifecycle_source == "pointer_observer":
+        pairs = _complete_lifecycle_pairs(
+            events, "POINTER_DOWN_CANDIDATE", "POINTER_UP_CANDIDATE", expected_strokes
+        )
+        start_snapshot_key = end_snapshot_key = "board"
+    else:
+        raise FillMatrixError("Неизвестный stroke lifecycle source.")
+    if pairs is None:
+        raise FillMatrixError(f"Нет полного {lifecycle_source} lifecycle для всех штрихов.")
+
+    stroke_deltas: list[int] = []
+    assigned_samples: set[int] = set()
+    for start_index, end_index, stroke_id in pairs:
+        start, end = events[start_index], events[end_index]
+        before_count = _snapshot_point_count(
+            start.get(start_snapshot_key), f"{lifecycle_source} start snapshot"
+        )
+        after_count = _snapshot_point_count(
+            end.get(end_snapshot_key), f"{lifecycle_source} end snapshot"
+        )
+        delta = after_count - before_count
+        if delta <= 0:
+            raise FillMatrixError("Штрих не добавил точек или pointCount уменьшился.")
+        samples = []
+        for index in range(start_index + 1, end_index):
+            event = events[index]
+            if event.get("type") == "DRAW_SAMPLE":
+                if event.get("strokeId") != stroke_id:
+                    raise FillMatrixError("DRAW_SAMPLE внутри stroke lifecycle привязан к другому strokeId.")
+                point_delta = event.get("pointDelta")
+                if isinstance(point_delta, bool) or not isinstance(point_delta, int) or point_delta < 0:
+                    raise FillMatrixError("Некорректный или отсутствующий DRAW_SAMPLE.pointDelta.")
+                samples.append(point_delta)
+                assigned_samples.add(index)
+
+        if not samples:
+            raise FillMatrixError("В stroke lifecycle отсутствуют DRAW_SAMPLE events.")
+        if lifecycle_source == "engine":
+            applied = [
+                event for event in events[start_index + 1:end_index]
+                if event.get("type") == "DRAW_START_APPLIED"
+            ]
+            if len(applied) != 1 or applied[0].get("strokeId") != stroke_id:
+                raise FillMatrixError("Отсутствует однозначный DRAW_START_APPLIED.")
+            applied_count = _snapshot_point_count(
+                applied[0].get("after"), "DRAW_START_APPLIED.after"
+            )
+            initial_delta = applied_count - before_count
+            if initial_delta < 0 or sum(samples) + initial_delta != delta:
+                raise FillMatrixError("Initial point + DRAW_SAMPLE deltas не совпадают с delta штриха.")
+        elif sum(samples) != delta:
+            raise FillMatrixError("Pointer-observer DRAW_SAMPLE deltas не совпадают с board snapshot delta.")
+        stroke_deltas.append(delta)
+
+    all_sample_indices = {
+        index for index, event in enumerate(events) if event.get("type") == "DRAW_SAMPLE"
+    }
+    if assigned_samples != all_sample_indices:
+        raise FillMatrixError("Есть DRAW_SAMPLE вне подтверждённых stroke lifecycle boundaries.")
+    pre_count = _snapshot_point_count(
+        events[pairs[0][0]].get(start_snapshot_key), f"first {lifecycle_source} start"
+    )
+    post_count = _snapshot_point_count(
+        events[pairs[-1][1]].get(end_snapshot_key), f"last {lifecycle_source} end"
+    )
+    return stroke_deltas, pre_count, post_count
+
+
 def build_fill001_capture(
     task: dict[str, Any],
     monitor_export: Any,
@@ -86,6 +190,8 @@ def build_fill001_capture(
     after_png: str | Path,
     run_id: str,
     bridge_diagnostics: dict[str, Any],
+    stroke_lifecycle_source: str | None = None,
+    observed_radius: int | float | None = None,
 ) -> dict[str, Any]:
     """Convert one unmodified Game Monitor export into a validated capture.
 
@@ -129,76 +235,44 @@ def build_fill001_capture(
             raise FillMatrixError(f"Нарушен порядок событий по t у события #{index}.")
         previous_time = event_time
 
-    starts = [i for i, event in enumerate(events) if event.get("type") == "DRAW_START"]
-    ends = [i for i, event in enumerate(events) if event.get("type") == "DRAW_END"]
-    if len(starts) != task.get("expected_strokes") or len(ends) != len(starts):
-        raise FillMatrixError("Число DRAW_START/DRAW_END не совпадает с expected_strokes.")
-    if any(start_index >= end_index for start_index, end_index in zip(starts, ends)):
-        raise FillMatrixError("Нарушен порядок границ штрихов.")
-
-    stroke_deltas: list[int] = []
-    seen_stroke_ids: set[str] = set()
-    for start_index, end_index in zip(starts, ends):
-        start, end = events[start_index], events[end_index]
-        stroke_id = start.get("strokeId")
-        if not isinstance(stroke_id, str) or not stroke_id or stroke_id in seen_stroke_ids:
-            raise FillMatrixError("Отсутствует или повторяется strokeId.")
-        seen_stroke_ids.add(stroke_id)
-        if end.get("strokeId") != stroke_id:
-            raise FillMatrixError("DRAW_END не соответствует DRAW_START по strokeId.")
-        if any(
-            event.get("type") == "DRAW_START"
-            for event in events[start_index + 1:end_index]
-        ):
-            raise FillMatrixError("Вложенные/перекрывающиеся штрихи не поддерживаются.")
-        before_count = _snapshot_point_count(start.get("before"), "DRAW_START.before")
-        after_count = _snapshot_point_count(end.get("after"), "DRAW_END.after")
-        delta = after_count - before_count
-        if delta <= 0:
-            raise FillMatrixError("Штрих не добавил точек или pointCount уменьшился.")
-        samples = [
-            event for event in events[start_index + 1:end_index]
-            if event.get("type") == "DRAW_SAMPLE"
-        ]
-        sample_deltas = []
-        for sample in samples:
-            if sample.get("strokeId") != stroke_id:
-                raise FillMatrixError("DRAW_SAMPLE привязан к другому strokeId.")
-            point_delta = sample.get("pointDelta")
-            if point_delta is None:
-                continue
-            if isinstance(point_delta, bool) or not isinstance(point_delta, int) or point_delta < 0:
-                raise FillMatrixError("Некорректный DRAW_SAMPLE.pointDelta.")
-            sample_deltas.append(point_delta)
-        start_applied = next((event for event in events[start_index + 1:end_index] if event.get("type") == "DRAW_START_APPLIED"), None)
-        if not isinstance(start_applied, dict):
-            raise FillMatrixError("Отсутствует DRAW_START_APPLIED.")
-        applied_count = _snapshot_point_count(start_applied.get("after"), "DRAW_START_APPLIED.after")
-        initial_delta = applied_count - before_count
-        if initial_delta < 0 or sum(sample_deltas) + initial_delta != delta:
-            raise FillMatrixError("Сумма initial point и DRAW_SAMPLE.pointDelta не совпадает с delta штриха.")
-        stroke_deltas.append(delta)
+    expected_strokes = task.get("expected_strokes")
+    engine_pairs = _complete_lifecycle_pairs(events, "DRAW_START", "DRAW_END", expected_strokes)
+    pointer_pairs = _complete_lifecycle_pairs(
+        events, "POINTER_DOWN_CANDIDATE", "POINTER_UP_CANDIDATE", expected_strokes
+    )
+    if stroke_lifecycle_source is None:
+        if engine_pairs is not None:
+            stroke_lifecycle_source = "engine"
+        elif pointer_pairs is not None:
+            stroke_lifecycle_source = "pointer_observer"
+        else:
+            raise FillMatrixError("Нет полного engine или pointer lifecycle для всех штрихов.")
+    stroke_deltas, pre_count, post_count = _extract_stroke_chalk_deltas(
+        events, expected_strokes, stroke_lifecycle_source
+    )
 
     radius_events = [
         event for event in events
         if event.get("type") == "BRUSH_CHANGE_APPLIED"
     ]
-    if not radius_events:
-        raise FillMatrixError("Нет BRUSH_CHANGE_APPLIED для подтверждения observed radius.")
-    observed_radii = {
+    event_radii = {
         event.get("after", {}).get("currentRadius")
         for event in radius_events
         if isinstance(event.get("after"), dict)
     }
-    if observed_radii != {task.get("requested_radius")}:
-        raise FillMatrixError("Observed radius отсутствует, неоднозначен или отличается от task.")
+    if observed_radius is None:
+        if not radius_events or event_radii != {task.get("requested_radius")}:
+            raise FillMatrixError("Observed radius отсутствует, неоднозначен или отличается от task.")
+        observed_radius = next(iter(event_radii))
+    elif observed_radius != task.get("requested_radius"):
+        raise FillMatrixError("Runtime observed radius отличается от task.")
+    elif event_radii and event_radii != {task.get("requested_radius")}:
+        raise FillMatrixError("BRUSH_CHANGE_APPLIED расходится с runtime observed radius.")
 
     relevant_errors = [event for event in events if event.get("type") == "GAME_METHOD_ERROR"]
     if relevant_errors:
         raise FillMatrixError("Game Monitor зафиксировал GAME_METHOD_ERROR.")
 
-    pre_count = _snapshot_point_count(events[starts[0]].get("before"), "first DRAW_START.before")
-    post_count = _snapshot_point_count(events[ends[-1]].get("after"), "last DRAW_END.after")
     exact_chalk = post_count - pre_count
     if sum(stroke_deltas) != exact_chalk:
         raise FillMatrixError("Сумма per-stroke CHALK не совпадает с run-level exact CHALK.")
@@ -212,7 +286,8 @@ def build_fill001_capture(
         "plan_signature": task["plan_signature"],
         "target_mask_sha256": task["target_mask_sha256"],
         "requested_radius": task["requested_radius"],
-        "observed_radius": next(iter(observed_radii)),
+        "observed_radius": observed_radius,
+        "stroke_lifecycle_source": stroke_lifecycle_source,
         "pre_point_count": pre_count,
         "post_point_count": post_count,
         "exact_chalk": exact_chalk,
@@ -264,6 +339,8 @@ def build_fill001_capture_from_runtime(
         after_png=after_png,
         run_id=binding["run_id"],
         bridge_diagnostics=binding["bridge_diagnostics"],
+        stroke_lifecycle_source=binding["stroke_lifecycle_source"],
+        observed_radius=binding["observed_radius"],
     )
     capture.update({
         "session_id": binding["session_id"],

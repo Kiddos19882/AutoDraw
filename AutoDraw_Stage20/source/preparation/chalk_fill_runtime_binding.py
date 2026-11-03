@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 import uuid
@@ -178,9 +178,20 @@ def _validate_executor_report(task: dict[str, Any], report: dict[str, Any]) -> t
     }
 
 
+def _session_finalize_grace_seconds(session: dict[str, Any]) -> float:
+    if not isinstance(session, dict) or session.get("schema_version") != 2:
+        raise FillMatrixError("Требуется Bridge session schema_version=2.")
+    idle = session.get("run_idle_seconds")
+    if isinstance(idle, bool) or not isinstance(idle, (int, float)) or not 0.5 <= float(idle) <= 15.0:
+        raise FillMatrixError("Bridge session не содержит допустимый run_idle_seconds.")
+    # RunRecorder finalizes on the next 1 s heartbeat after the configured idle window.
+    return float(idle) + 1.5
+
+
 def _validate_session(session: dict[str, Any], run: dict[str, Any]) -> str:
     if not isinstance(session, dict):
         raise FillMatrixError("Bridge session должен быть JSON object.")
+    _session_finalize_grace_seconds(session)
     session_id = session.get("session_id")
     try:
         normalized_session_id = str(uuid.UUID(session_id))
@@ -242,12 +253,17 @@ def _validate_bridge_run(
         raise FillMatrixError("Bridge run не завершён.")
     run_started = _parse_aware_datetime(run.get("started_at_utc"), "bridge_run.started_at_utc")
     run_ended = _parse_aware_datetime(run.get("finished_at_utc"), "bridge_run.finished_at_utc")
-    if not executor_started <= run_started < run_ended <= executor_ended:
-        raise FillMatrixError("Bridge run не находится внутри временного окна executor report.")
+    grace = timedelta(seconds=_session_finalize_grace_seconds(session))
+    if not executor_started <= run_started < run_ended <= executor_ended + grace or run_started > executor_ended:
+        raise FillMatrixError("Bridge run не совпадает с executor window или превысил idle finalization grace.")
 
     expected_strokes = task["expected_strokes"]
     if run.get("stroke_count") != expected_strokes:
         raise FillMatrixError("Bridge run stroke_count не совпадает с task.")
+    if run.get("stroke_candidate_count") != expected_strokes:
+        raise FillMatrixError("Bridge run stroke_candidate_count не совпадает с task.")
+    if run.get("non_consuming_stroke_candidate_count") != 0:
+        raise FillMatrixError("Bridge run содержит non-consuming stroke candidates.")
     if run.get("brush_radius_status") != "single":
         raise FillMatrixError("Bridge run не подтверждает один фиксированный радиус.")
     radii = run.get("observed_brush_radii")
@@ -303,15 +319,31 @@ def _validate_bridge_run(
     if run.get("sampled_point_delta_total") != post_count - pre_count or run.get("point_delta_matches_chalk") is not True:
         raise FillMatrixError("Bridge run sampled point deltas не совпадают с exact CHALK.")
 
-    starts = [event for event in events if event.get("type") == "DRAW_START"]
-    ends = [event for event in events if event.get("type") == "DRAW_END"]
-    if len(starts) != expected_strokes or len(ends) != expected_strokes:
-        raise FillMatrixError("Bridge run не содержит ожидаемое число DRAW_START/DRAW_END.")
+    lifecycle_sources = run.get("stroke_lifecycle_sources")
+    if (
+        not isinstance(lifecycle_sources, list)
+        or not lifecycle_sources
+        or any(source not in {"engine", "pointer_observer"} for source in lifecycle_sources)
+        or len(set(lifecycle_sources)) != len(lifecycle_sources)
+    ):
+        raise FillMatrixError("Bridge run не содержит допустимый stroke_lifecycle_sources.")
+    engine_pairs = _complete_lifecycle_pairs(events, "DRAW_START", "DRAW_END", expected_strokes)
+    pointer_pairs = _complete_lifecycle_pairs(
+        events, "POINTER_DOWN_CANDIDATE", "POINTER_UP_CANDIDATE", expected_strokes
+    )
+    if engine_pairs is not None and "engine" in lifecycle_sources:
+        lifecycle_source = "engine"
+    elif pointer_pairs is not None and "pointer_observer" in lifecycle_sources:
+        lifecycle_source = "pointer_observer"
+    else:
+        raise FillMatrixError("Bridge run не содержит полного engine или pointer stroke lifecycle.")
     if any(event.get("monitorVersion") != "0.2.1" for event in events):
         raise FillMatrixError("Bridge run содержит событие с неизвестной версией Monitor.")
 
     return {
         "session_id": session_id,
+        "stroke_lifecycle_source": lifecycle_source,
+        "observed_radius": radii[0],
         "run_id": run_id,
         "monitor_version": "0.2.1",
         "event_count": event_count,
@@ -340,15 +372,23 @@ def bind_fill001_runtime_evidence(
         raise FillMatrixError("bridge_runs должен быть списком run records.")
 
     session_id = session.get("session_id") if isinstance(session, dict) else None
+    grace = timedelta(seconds=_session_finalize_grace_seconds(session))
     candidates = []
     for run in bridge_runs:
         if not isinstance(run, dict):
             raise FillMatrixError("Bridge run должен быть JSON object.")
         started = _parse_aware_datetime(run.get("started_at_utc"), "bridge_run.started_at_utc")
         ended = _parse_aware_datetime(run.get("finished_at_utc"), "bridge_run.finished_at_utc")
-        if executor_started <= started < ended <= executor_ended:
+        if ended <= started:
+            raise FillMatrixError("Bridge run имеет пустой или обратный временной интервал.")
+        overlaps_executor = started < executor_ended and ended > executor_started
+        if overlaps_executor:
             if run.get("session_id") != session_id:
                 raise FillMatrixError("Bridge run из executor interval принадлежит другой session.")
+            if started < executor_started:
+                raise FillMatrixError("Bridge run начался до executor execution window.")
+            if ended > executor_ended + grace:
+                raise FillMatrixError("Bridge run превысил idle finalization grace.")
             candidates.append(run)
     if len(candidates) != 1:
         raise FillMatrixError(
@@ -391,6 +431,34 @@ def bind_fill001_runtime_evidence(
     }
 
 
+
+def _verify_executor_source_plan(report: dict[str, Any]) -> None:
+    source_value = report.get("source_plan_file")
+    if not isinstance(source_value, str) or not source_value.strip():
+        raise FillMatrixError("Executor report не содержит source_plan_file.")
+    source_path = Path(source_value)
+    try:
+        raw = source_path.read_bytes()
+    except OSError as exc:
+        raise FillMatrixError(f"Source DrawingPlan недоступен: {exc}") from exc
+    if hashlib.sha256(raw).hexdigest() != report.get("source_plan_file_sha256"):
+        raise FillMatrixError("Source DrawingPlan file SHA-256 не совпадает с executor report.")
+    try:
+        document = json.loads(raw.decode("utf-8"))
+    except (UnicodeError, json.JSONDecodeError) as exc:
+        raise FillMatrixError("Source DrawingPlan не является корректным UTF-8 JSON.") from exc
+    if not isinstance(document, dict) or document.get("autodraw_experiment") != report.get("experiment_context"):
+        raise FillMatrixError("Source DrawingPlan context не совпадает с executor report.")
+    plan_document = dict(document)
+    plan_document.pop("autodraw_experiment", None)
+    canonical = json.dumps(
+        plan_document, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False
+    )
+    plan_hash = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+    if plan_hash != report.get("source_plan_sha256"):
+        raise FillMatrixError("Source DrawingPlan content не совпадает с executor source_plan_sha256.")
+
+
 def load_fill001_runtime_binding(
     task: dict[str, Any],
     session_path: str | Path,
@@ -408,6 +476,7 @@ def load_fill001_runtime_binding(
         raise FillMatrixError(f"Не удалось прочитать runtime evidence: {exc}") from exc
     if not isinstance(session, dict):
         raise FillMatrixError("session.json должен содержать JSON object.")
+    _verify_executor_source_plan(executor_report)
     session_id = session.get("session_id")
     if session_file.parent.name != session_id:
         raise FillMatrixError("session.json расположен не в каталоге своего session_id.")
