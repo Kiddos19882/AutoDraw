@@ -1,3 +1,11 @@
+## 2026-11-03 — FILL-001 UI/runner integration и CI regression gate
+
+- Подтверждена отдельная вкладка FILL-001: создание/загрузка 45-cell manifest, выбор одной pending task, frozen plan/mask validation, operator approval, brush-size handoff и запуск Stage 6 с P1 override.
+- Реализована связь DrawingPlan experiment context → executor report → Bridge session/run runtime binding; direct Stage 6 bypass для FILL-001 блокируется fail-closed guard.
+- Unified application tests подтверждают регистрацию отдельной вкладки `8. FILL-001`; вкладка калибровки отображается как `9. Калибровка теста`. По DEC-014 FILL-001 остаётся отдельной.
+- Полный CI [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178) SUCCESS на code/test HEAD `e3774a3`: Preparation/G3 772 passed, 24 warnings, 82 subtests; все обязательные jobs и Windows portable build/startup smoke-test успешны; optional benchmarks skipped.
+- Остаётся Windows live runtime/PNG preflight; 45 live captures заблокированы до успешного preflight. Production estimator, executor defaults, sampling defaults и `master` не менялись.
+
 ## 2026-11-03 — FILL-001 runtime binding integration
 
 - Runtime binder `chalk_fill_runtime_binding.py` добавлен и подключён к завершению FILL-001 исполнения в Stage 6.
