@@ -9,13 +9,13 @@
 
 # Текущее состояние проекта
 
-**Последнее обновление:** 2026-11-03 — INT006R live block завершён: 45/45 задач completed; raw-data audit всех 45 Monitor reports подтверждает exact CHALK, совпадение sampled/per-stroke delta и нулевые transport/error counters. Результаты: [INT006R live report](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md).
+**Последнее обновление:** 2026-11-03 — INT006R полностью закрыт: 45/45 live captures, raw-data audit, официальный CLI analyzer и ручной visual audit 45 пар PNG завершены. Ограничения качества: radius 1 оставляет разрыв соединения D2 polygon; radius 30 сливает короткие детали D4. Следующий этап — FILL-001. См. [live report](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md) и [visual audit](CHALK_INT006R_VISUAL_AUDIT_2026-11-03.md).
 
 **Актуально на:** 3 ноября 2026 г.  
 **Репозиторий:** `Kiddos19882/AutoDraw`  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
-**Последний commit с данными:** `138c9fbeaf612a86819f7ff9ea0db7bb1fe4296a`. Production estimator, frozen INT-006 model и executor defaults не менялись. Для отчётности INT006R: CI workflow commit `2b8812d9` добавил реальный analyzer; analyzer fix commit `38e3d00` и regression test commit `04836b8` устраняют конфликт P1/other_executor_parameters.  
-**Последний подтверждённый полный CI:** [41540054975](https://github.com/Kiddos19882/AutoDraw/actions/runs/41540054975) на code HEAD `28b56a9`: обязательные jobs SUCCESS, Preparation/G3 — 682 passed и 82 subtests, Windows portable build/startup smoke-test — SUCCESS. Data commit `138c9fbe` вызвал три workflow: [41554658238](https://github.com/Kiddos19882/AutoDraw/actions/runs/41554658238) AutoDraw validation SUCCESS (все стандартные jobs, PNG audit и Windows build), [41554658255](https://github.com/Kiddos19882/AutoDraw/actions/runs/41554658255) brush screenshot SUCCESS и [41554658193](https://github.com/Kiddos19882/AutoDraw/actions/runs/41554658193) brush centerline SUCCESS. Дополнительный [41559932955](https://github.com/Kiddos19882/AutoDraw/actions/runs/41559932955) добавил и успешно выполнил реальный INT006R analyzer: 45 accepted, 0 missing/rejected, PNG evidence complete. Analyzer job в [41560787871](https://github.com/Kiddos19882/AutoDraw/actions/runs/41560787871) прошёл SUCCESS и выдал корректный P1 report; полный run был отменён при запуске следующего workflow. Текущий полный re-run [41561422754](https://github.com/Kiddos19882/AutoDraw/actions/runs/41561422754) проверяет исправленные метаданные и упаковывает 90 board PNG для ручного visual audit.  
+**Последний commit с данными:** `138c9fbeaf612a86819f7ff9ea0db7bb1fe4296a`. Последний кодовый commit INT006R packaging fix: [c60b8cf](https://github.com/Kiddos19882/AutoDraw/commit/c60b8cf7ac7f9652d64b8f042343107f2473abb1). Документация синхронизирована отдельными commits; production estimator, frozen INT-006 model и executor defaults не менялись.  
+**Последний подтверждённый полный CI:** [41563236073](https://github.com/Kiddos19882/AutoDraw/actions/runs/41563236073) на code HEAD `c60b8cf` — SUCCESS. Executor regression, Application integration, Game Monitor/Bridge, Preparation/G3, INT-006 PNG audit, независимые INT-006/INT006R analyzers и Windows portable build/startup smoke-test прошли; optional benchmarks skipped. Упаковка 45 пар PNG также прошла. Артефакты: [visual review source, ID 13198192445](https://github.com/Kiddos19882/AutoDraw/actions/runs/41563236073/artifacts/13198192445), [INT006R analyzer, ID 13197368355](https://github.com/Kiddos19882/AutoDraw/actions/runs/41563236073/artifacts/13197368355). Предыдущий run `41561422754` упал только на неверном имени before PNG; исправление зафиксировано в `c60b8cf` и повторная проверка успешна.  
 **Git-сверка:** сравнение `master...feature/image-geometry-optimization` возвращает `diverged`, feature ahead 2327 / behind 5 (сверка 2026-11-03). Пять master-only commits просмотрены: игровой engine bundle, CI workflow и test image. `testImages/images.png` уже присутствует в обеих ветках с одинаковым blob SHA; engine bundle пока только в master. Никакого merge/rebase не выполнялось; `master` в рамках работы не изменялся.  
 > Этот блок — единственный источник текущего статуса. Ниже сохранена историческая хронология; старые статусы и планы не являются текущим backlog.
 
@@ -32,9 +32,9 @@
 - В analyzer исправлено сравнение абсолютного Windows experiment path: relocated capture bundles связываются с journal по имени experiment directory. Дополнительно analyzer сверяет `task.prediction_id` и `task.expected_strokes` с frozen prediction; regression tests покрывают Windows path и tampered journal prediction ID.
 - В `.github/workflows/geometry-tests.yml` analyzer проверяет runtime manifest hash и нормализованную logical geometry против frozen plan. Первый run `41530634729` обнаружил несовпадение сериализаций; fix `8eba34f` и regression fixture `dd64730` устранили ошибку. Повторный run `41532629748` завершился SUCCESS, официальный JSON artifact проверен.
 - Production estimator, executor defaults, sampling defaults и `master` не менялись.
-- **INT006R live block завершён:** series `chalk-20261103-030837-a20df5`, block `a8e0b9ec87984f60aa294910d366e987`, 45/45 tasks completed (D1–D5 × radius 1/10/30 × 3 repeats, P1 step=4/delay=5). Все 45 Monitor reports проверены по exact pre/post pointCount, per-stroke delta, observed radius и transport counters; подробности и таблицы: [INT006R live results](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md). Ручной visual audit всех 45 PNG и официальный CLI analyzer на реальном bundle остаются pending.
+- **INT006R полностью завершён:** series `chalk-20261103-030837-a20df5`, block `a8e0b9ec87984f60aa294910d366e987`, 45/45 tasks completed (D1–D5 × radius 1/10/30 × 3 repeats, P1 step=4/delay=5). Raw-data audit и официальный CLI analyzer приняли 45/45 captures; ручной visual audit всех 45 пар PNG завершён. Ограничения: D2/radius=1 — видимый разрыв соединения polygon; D4/radius=30 — слияние коротких деталей. Отчёты: [live results](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md), [visual audit](CHALK_INT006R_VISUAL_AUDIT_2026-11-03.md).
 - Полный CI [41540054975](https://github.com/Kiddos19882/AutoDraw/actions/runs/41540054975) прошёл: Preparation/G3 682 passed + 82 subtests; Application integration, Executor regression, Game Monitor/Bridge, INT-006 PNG audit и Windows portable build/startup smoke-test — success. 24 warnings, optional benchmarks skipped. Подробности: [INT006R software gate report](CHALK_INT006R_SOFTWARE_GATE_RESULTS_2026-11-03.md).
-- Live captures INT006R завершены: 45/45. Raw-data audit всех 45 Monitor reports подтверждает exact CHALK и integrity. Остались запуск CLI analyzer на реальном bundle и ручной visual audit всех PNG; production estimator и defaults не менять.
+- INT006R: live captures, raw-data audit, официальный CLI analyzer и ручной visual audit завершены. Результаты ограничены проверенными D1–D5; FILL-001 отдельно проверит заполнение площадей.
 
 ## Статусы инициатив
 
@@ -47,7 +47,7 @@
 | INT-004 | DONE* | WebSocket telemetry, per-run capture и привязка Monitor report к experiment используются; A/B/C overhead остаётся в INT-003. |
 | INT-005 | DONE* | Автоматические CHALK blocks, matrix, journal, recovery и fail-closed gates используются в принятых сериях. |
 | INT-006 | IN_PROGRESS | Live captures, 45/45 Monitor audit, официальный analyzer (45 accepted, 0 missing/rejected), 15/15 complete groups и полный binding audit завершены. Осталось отдельно решить вопрос safety margin и расширить domain validation; production eligibility не подтверждена. |
-| INT-006R | IN_PROGRESS | 45/45 live captures завершены; exact CHALK и per-stroke integrity подтверждены по всем Monitor reports. Реальный CLI analyzer PASS (45 accepted, 0 missing/rejected, PNG evidence complete); остаётся ручной visual audit всех PNG. Исправление поля other_executor_parameters проходит повторный CI. |
+| INT-006R | DONE | 45/45 live captures, raw-data audit, официальный CLI analyzer и ручной visual audit завершены. Зафиксированы geometry-specific limitations для D2/radius=1 и D4/radius=30. |
 | INT-006F | IN_PROGRESS | Подготовлен FILL-001 на 45 captures; требуется проверить фактический raster footprint и реализовать отдельный experimental harness/analyzer. См. `CHALK_FILL_AREA_RADIUS_EFFICIENCY_PLAN_2026-11-03.md`. |
 | INT-007 | BLOCKED | Интеграция валидированной модели в preflight/resource estimator запрещена до закрытия INT-006 и определения safety margin. |
 | INT-008 | TODO | Оптимизация траекторий, кистей, порядка и покрытия в пределах CHALK после INT-007. |
@@ -55,10 +55,10 @@
 
 ## Ближайший рабочий приоритет
 
-1. Закрыть официальный analyzer и ручной visual audit INT006R.
-2. Подготовить и выполнить FILL-001: три типа одноцветных областей × пять радиусов × три повтора (45 captures); измерять площадь качественного покрытия на exact CHALK.
-3. После FILL-001 перейти к смешанным радиусам и независимым полным DrawingPlan.
-4. Safety margin не установлен; INT-007 остаётся BLOCKED. Production estimator/defaults не менять.
+1. INT006R закрыт; использовать visual findings как ограничения для генератора FILL-001.
+2. Реализовать отдельный planner/matrix/block harness, analyzer и regression tests для трёх frozen masks × радиусы 1/5/10/20/30 × три повтора.
+3. После CI PASS выполнить Windows preflight и 45 live captures; принимать только captures с exact CHALK и заранее определённым качеством покрытия.
+4. Safety margin INT-006 не установлен; INT-007 остаётся BLOCKED. Production estimator/defaults не менять.
 
 
 1. Зафиксировать официальный analyzer PASS и сверить report с предварительными расчётами — выполнено; см. [официальный отчёт](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md).
