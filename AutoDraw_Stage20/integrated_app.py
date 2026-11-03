@@ -669,7 +669,9 @@ class AutoDrawUnifiedApp:
             if isinstance(fill_task, dict):
                 from chalk_fill_runtime_binding import attach_fill001_experiment_context
 
-                persisted_document = json.loads(path.read_text(encoding="utf-8"))
+                # Hash the exact DrawingPlan serialization Stage 6 will load; remove
+                # preparation-only generation metadata before attaching the context.
+                persisted_document = DrawingPlan.load(path).to_dict()
                 bound_document = attach_fill001_experiment_context(persisted_document, fill_task)
                 temporary = path.with_name(f".{path.name}.{uuid.uuid4().hex}.tmp")
                 temporary.write_text(
