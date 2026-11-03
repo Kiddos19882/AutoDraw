@@ -85,6 +85,8 @@ def build_fill001_capture(
     sampling_profile: dict[str, Any],
     before_png: str | Path,
     after_png: str | Path,
+    run_id: str,
+    bridge_diagnostics: dict[str, Any],
 ) -> dict[str, Any]:
     """Convert one unmodified Game Monitor export into a validated capture.
 
@@ -226,8 +228,6 @@ def build_fill001_capture(
         "after_png_sha256": png_audit["after_png_sha256"],
         "png_audit_status": png_audit["png_audit_status"],
         "sampling_profile": dict(sampling_profile),
-        "monitor_version": monitor_export["monitorVersion"],
-        "event_count": len(events),
         "monitor_version": monitor_export["monitorVersion"],
         "event_count": len(events),
         "png_audit": png_audit,
