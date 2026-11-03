@@ -113,6 +113,7 @@ try:
     from geometry_color_plan import save_geometry_color_plan
     from paint_limit_test_ui import PaintLimitTestTab
     from brush_behavior_test_ui import BrushBehaviorTestTab
+    from chalk_fill_ui import Fill001Tab
     from brush_coordinate_transform import LOGICAL_BOARD_SIZE, transform_logical_brush_plan_to_screen
     from brush_calibration_ui import BrushCalibrationTab
 except ImportError as exc:  # pragma: no cover - exercised by packaging smoke test
@@ -256,6 +257,7 @@ class AutoDrawUnifiedApp:
         self.color_scanline_tab_frame = ttk.Frame(self.notebook)
         self.paint_limit_tab_frame = ttk.Frame(self.notebook)
         self.brush_test_tab_frame = ttk.Frame(self.notebook)
+        self.fill001_tab_frame = ttk.Frame(self.notebook)
         self.brush_calibration_tab_frame = ttk.Frame(self.notebook)
         # The executor (tab 2), quantizer (tab 4), and paint-limit test (tab 6)
         # already own scrollable content areas. Wrap only tabs that need scrolling.
@@ -269,7 +271,8 @@ class AutoDrawUnifiedApp:
         self.notebook.add(self.color_scanline_tab_frame, text="5. Цветной scanline-план")
         self.notebook.add(self.paint_limit_tab_frame, text="6. Тест лимита краски")
         self.notebook.add(self.brush_test_tab_frame, text="7. Тест кистей")
-        self.notebook.add(self.brush_calibration_tab_frame, text="8. Калибровка теста")
+        self.notebook.add(self.fill001_tab_frame, text="8. FILL-001")
+        self.notebook.add(self.brush_calibration_tab_frame, text="9. Калибровка теста")
 
         self.workbench = AutoDrawWorkbench(
             root,
@@ -324,8 +327,16 @@ class AutoDrawUnifiedApp:
             on_transfer_plan=self._transfer_brush_test_plan,
             on_brush_ready=self._start_brush_test_executor,
         )
-        # Only brush-test plans use this callback; ordinary drawing keeps the executor's
-        # standard completion dialog and behavior.
+        self.fill001_tab = Fill001Tab(
+            root,
+            self.fill001_tab_frame,
+            self.data_paths["brush_tests"],
+            brush_tab=self.brush_behavior_tab,
+            on_transfer_plan=self._transfer_brush_test_plan,
+            on_start=self._start_fill001_executor,
+        )
+        # Only experiment plans are routed through their own completion handler;
+        # ordinary drawing keeps the executor's standard completion dialog.
         self.executor.execution_finished_callback = self._on_executor_finished
 
         for scrollable in (
