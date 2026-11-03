@@ -5,9 +5,9 @@
 **Актуально на:** 3 ноября 2026 г.  
 **Репозиторий:** `Kiddos19882/AutoDraw`  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
-**Последний code/test HEAD:** [e3774a3](https://github.com/Kiddos19882/AutoDraw/commit/e3774a3c07f7abbefe8c39eecdd9578743b70678).  
-**Документационный HEAD:** документационные обновления выполняются поверх code/test HEAD `e3774a3`; точный текущий branch HEAD проверяется по GitHub branch reference после последнего docs commit.  
-**Последний подтверждённый полный CI:** [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178), SUCCESS на code/test HEAD `e3774a3`. Preparation/G3 — 772 passed, 24 warnings, 82 subtests passed; Executor regression, Game Monitor/Bridge, Application integration, INT-006 PNG audit и Windows portable build/startup smoke-test — SUCCESS; optional algorithm benchmarks skipped. Это не заменяет ручной live запуск FILL-001 в игре и проверку реальных board PNG.  
+**Последний code/test HEAD:** [3dae04e](https://github.com/Kiddos19882/AutoDraw/commit/3dae04e6bea0173f8167be2c14c90c6f67acb4dd), включает client-ROI capture, screen-resolution mask audit и сверку ROI с DrawingPlan transform.  
+**Текущий branch HEAD:** проверяется по GitHub branch reference; документационные коммиты выполняются последовательно поверх code/test изменений.  
+**Последний подтверждённый полный CI baseline:** [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178), SUCCESS на code/test HEAD `e3774a3`. **CI для client-ROI correction:** workflow run [41685608919](https://github.com/Kiddos19882/AutoDraw/actions/runs/41685608919) ожидает выполнения на HEAD `3dae04e`; PASS пока не подтверждён. Preparation/G3 — 772 passed, 24 warnings, 82 subtests passed; Executor regression, Game Monitor/Bridge, Application integration, INT-006 PNG audit и Windows portable build/startup smoke-test — SUCCESS; optional algorithm benchmarks skipped. Это не заменяет ручной live запуск FILL-001 в игре и проверку реальных board PNG.  
 **Git-сверка:** branch reference проверен; текущий HEAD фиксируется по GitHub branch. Локальный `git status` через доступный GitHub API не читается. Сравнение веток с `master` на текущем HEAD не выполнялось; merge/rebase не выполнялся, `master` не изменялся.  
 > Этот блок — единственный источник текущего статуса. Ниже сохранена историческая хронология; старые статусы и планы не являются текущим backlog.
 
