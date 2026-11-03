@@ -640,3 +640,10 @@
 - Matrix manifest теперь фиксирует P1 sampling metadata в каждой task; validator отклоняет изменённый профиль.
 - Adapter закреплён за Game Monitor 0.2.1 и проверяет frozen mask SHA-256 и bridge diagnostics binding.
 - Тесты добавлены, но ещё не запускались; CI pending.
+
+
+## 2026-11-03 — справочник Game Monitor и Bridge
+
+- Добавлен `GAME_MONITOR_BRIDGE_REFERENCE.md` с описанием Monitor 0.2.1 API, событий BoardPane, Browser Bridge transport, Python collector/RunRecorder, JSON форматов и ограничений evidence.
+- Справочник добавлен в основной `docs/README.md` и структурный `MODULE_REFERENCE.md`.
+- Изменения документационные; runtime-код и тесты не изменялись.
