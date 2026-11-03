@@ -1,5 +1,12 @@
 # История изменений документации и проекта
 
+## 2026-11-03 — engine audit и уточнение отчёта INT006R
+
+- Добавлен статический разбор клиентского engine bundle: `updateLess()` считает точки, а `setRadius()` задаёт толщину линии через `lineStyle`; прямого radius multiplier в CHALK counter нет.
+- Уточнён FILL-001: для каждого радиуса требуется собственный путь покрытия одной frozen target mask, а не одинаковая траектория с разным размером кисти.
+- Исправлено поле `sampling_profile.other_executor_parameters`, чтобы в нём не дублировались устаревшие P0 значения `point_step_px=2` и `point_delay_ms=10`.
+- Regression test фиксирует точное представление P1; повторный CI run [41560787871](https://github.com/Kiddos19882/AutoDraw/actions/runs/41560787871) выполняется.
+
 ## 2026-11-03 — CI для реального INT006R dataset
 
 - В `.github/workflows/geometry-tests.yml` добавлен отдельный запуск `chalk_int006r_validation.py` на committed live journal/capture bundle и загрузка JSON artifact `autodraw-int006r-live-validation`.
