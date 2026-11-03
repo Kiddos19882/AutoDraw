@@ -236,6 +236,34 @@ def _validate_session(session: dict[str, Any], run: dict[str, Any]) -> str:
     return normalized_session_id
 
 
+
+def _complete_lifecycle_pairs(
+    events: list[dict[str, Any]],
+    start_type: str,
+    end_type: str,
+    expected_strokes: int,
+) -> list[tuple[int, int, str]] | None:
+    starts = [index for index, event in enumerate(events) if event.get("type") == start_type]
+    ends = [index for index, event in enumerate(events) if event.get("type") == end_type]
+    if len(starts) != expected_strokes or len(ends) != expected_strokes:
+        return None
+    pairs: list[tuple[int, int, str]] = []
+    seen: set[str] = set()
+    for start_index, end_index in zip(starts, ends):
+        if start_index >= end_index:
+            return None
+        stroke_id = events[start_index].get("strokeId")
+        if not isinstance(stroke_id, str) or not stroke_id or stroke_id in seen:
+            return None
+        if events[end_index].get("strokeId") != stroke_id:
+            return None
+        if any(events[index].get("type") == start_type for index in range(start_index + 1, end_index)):
+            return None
+        seen.add(stroke_id)
+        pairs.append((start_index, end_index, stroke_id))
+    return pairs
+
+
 def _validate_bridge_run(
     task: dict[str, Any],
     session: dict[str, Any],
@@ -323,7 +351,7 @@ def _validate_bridge_run(
     if (
         not isinstance(lifecycle_sources, list)
         or not lifecycle_sources
-        or any(source not in {"engine", "pointer_observer"} for source in lifecycle_sources)
+        or any(not isinstance(source, str) or source not in {"engine", "pointer_observer"} for source in lifecycle_sources)
         or len(set(lifecycle_sources)) != len(lifecycle_sources)
     ):
         raise FillMatrixError("Bridge run не содержит допустимый stroke_lifecycle_sources.")
@@ -476,6 +504,8 @@ def load_fill001_runtime_binding(
         raise FillMatrixError(f"Не удалось прочитать runtime evidence: {exc}") from exc
     if not isinstance(session, dict):
         raise FillMatrixError("session.json должен содержать JSON object.")
+    if not isinstance(executor_report, dict):
+        raise FillMatrixError("Executor report должен содержать JSON object.")
     _verify_executor_source_plan(executor_report)
     session_id = session.get("session_id")
     if session_file.parent.name != session_id:
