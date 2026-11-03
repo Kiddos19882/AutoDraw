@@ -2332,3 +2332,14 @@ Brush Test acceptance и матричные валидаторы больше н
 - Создан `docs/GAME_MONITOR_BRIDGE_REFERENCE.md`: публичные методы Monitor и Bridge, оборачиваемые методы BoardPane, события, snapshot CHALK, WebSocket протокол, функции collector/методы RunRecorder, session/run JSON schema, запуск, интеграция и ограничения.
 - В `docs/README.md` добавлена ссылка в раздел справочников; `docs/MODULE_REFERENCE.md` дополнен фактическим составом компонентов.
 - Изменялись только Markdown-файлы. Исходники, тесты, конфигурации, workflow и экспериментальные данные не менялись; live-тесты не запускались.
+
+
+## 2026-11-03 — аудит пользовательской интеграции FILL-001
+
+- Проверены текущая ветка/HEAD, последние 20 коммитов, README приложения, docs index, PROJECT_STATUS, TASKS, ROADMAP, DECISIONS, UI integration map, FILL-001 temporary plan/design и профильные исходники.
+- Подтверждён HEAD `01cb37d6cb8fc7c5ec56e648330abda31875f15b`; последние три коммита перед аудитом — документационные. Compare `master...feature/image-geometry-optimization` вернул `diverged`, ahead=2529, behind=5. Merge/rebase не выполнялся; master не менялся.
+- Прослежен call graph: BrushBehaviorTestTab → integrated_app transfer/start callbacks → Stage 6 → execution diagnostics. В Brush Test UI не найден FILL001 workflow; в executor override allowlist отсутствует FILL001; runtime binder в Stage 6 является post-execution hook.
+- Подтверждено, что `attach_fill001_experiment_context()` существует, но его вызов из пользовательского UI/runner не обнаружен. Matrix сохраняет `execution_allowed=false` и `safe_to_execute=false`.
+- Создан [CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md](CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md); обновлены UI integration map, FILL-001 design/temporary plan, PROJECT_STATUS, TASKS, ROADMAP и docs index.
+- Вывод: runtime binder software gate не равен интеграции пользовательского запуска. Шаг 3 FILL-001 должен включать UI/runner handoff до Windows live preflight. Код, тесты, production defaults, данные экспериментов и master в этой работе не менялись.
+- Проверки: статическое чтение исходников и GitHub compare. Локальные тесты, Windows live run, PNG preflight и CI для документационных изменений не запускались.
