@@ -45,7 +45,7 @@
 |---|---|---|
 | `tests/test_import_resolution_diagnostics.py` | `models`, `geometry_models`, preparation/executor adapters, `shared_image_processing` | Проверка разрешения коротких импортов, идентичности общих классов и pipeline, загрузки legacy DrawingPlan |
 | `tests/test_stage7_validator_rules.py` | `stage7_validator_rules` | Граничные правила валидации skeleton-плана |
-| `tests/test_unified_app.py` | `integrated_app`, `stage8_optimizer`, `models`, `stage6_execute_plan`, `paint_limit_test`, `color_scanline`, `palette_detection`, `palette_profiles` | Передача планов, единые каталоги, UI-вкладки, прокрутка, профили палитры, преобразование изображения и интеграция цветного/геометрического исполнения |
+| `tests/test_unified_app.py` | `integrated_app`, `stage8_optimizer`, `models`, `stage6_execute_plan`, `paint_limit_test`, `color_scanline`, `palette_detection`, `palette_profiles`, `chalk_fill_matrix`, `chalk_fill_execution` | Передача планов, единые каталоги, UI-вкладки, прокрутка, профили палитры, преобразование изображения, цветное/геометрическое исполнение и FILL-001 runtime JSON/context handoff в Stage 6 |
 
 `test_unified_app.py` импортирует `integrated_app` и создаёт Tkinter UI с использованием тестовых сценариев. Это не изолированный unit test: для него важны корректные import roots, доступность графической среды Windows и согласованность нескольких вкладок.
 
@@ -295,6 +295,8 @@ node --test ..\\game_monitor\\tests\\game_monitor.test.js
 
 
 Дополнительно в `tests/test_unified_app.py` добавлен regression test: Stage6 должен отклонять исходный `logical_board_pixels` план, если он загружается напрямую, минуя преобразование Brush Test.
+
+В commit `1b2d8a1` добавлен `test_fill001_plan_transfers_valid_json_context_to_stage6`: frozen FILL-001 task проходит `_transfer_brush_test_plan()`, runtime JSON повторно читается, experiment context проверяется, Stage 6 загружает DrawingPlan. Regression закрывает ошибку буквального `\\n` после JSON object; CI run `41692129486` проверяет новый HEAD.
 
 
 
