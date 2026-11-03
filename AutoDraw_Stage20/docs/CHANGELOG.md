@@ -613,3 +613,10 @@
 - Исправлен тестовый capture helper: теперь он формирует обязательные per-stroke CHALK deltas и PNG evidence fields, соответствующие текущему validator contract.
 - Добавлены negative checks для отсутствующего PNG evidence и неверного количества per-stroke deltas.
 - Commit: [70323a8](https://github.com/Kiddos19882/AutoDraw/commit/70323a8e65ccddd201aa412263aac9efe18ec099). Pytest/CI для этого изменения ещё не подтверждены.
+
+
+## 2026-11-03 — FILL-001 Game Monitor capture adapter
+
+- Добавлен адаптер Monitor export → FILL-001 capture с per-stroke/run exact CHALK, radius, P1 sampling binding, external bridge/run identity и PNG file/hash/pixel audit.
+- Добавлен отдельный набор regression tests с синтетическими Monitor events и PNG fixtures.
+- Software tests/CI ещё не запускались или не подтверждены; live execution остаётся заблокированным до CI и preflight.
