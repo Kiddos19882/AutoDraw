@@ -18,7 +18,7 @@
 - [x] Monitor capture adapter с per-stroke exact CHALK, radius/P1 binding и PNG hash/pixel audit.
 - [x] Fail-closed runtime binding к Bridge session/run и executor report.
 - [x] Отдельная вкладка FILL-001: manifest create/load, single-task selection, planner validation, operator approval, brush-size handoff, Stage 6 start с P1 override и capture finalization.
-- [x] Исправить runtime JSON serialization после добавления `autodraw_experiment`: runtime-файл больше не получает буквальный `\\n` после JSON object (commit `8dfd1b5`).
+- [x] Исправить runtime JSON serialization после добавления `autodraw_experiment`: runtime-файл больше не получает буквальный `\n` после JSON object (commit `8dfd1b5`).
 - [x] Добавить integration regression test реального FILL-001 plan → Stage 6 load с проверкой experiment context (commit `1b2d8a1`); новый CI ещё не подтверждён.
 - [x] Regression gate и client-ROI correction закрыты software CI: [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985) SUCCESS на `031913c`.
 - [ ] Провести Windows live runtime preflight и подтвердить P1 из фактического executor report.
