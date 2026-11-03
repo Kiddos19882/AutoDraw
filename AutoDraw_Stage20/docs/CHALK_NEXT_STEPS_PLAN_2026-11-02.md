@@ -1,7 +1,7 @@
 # План дальнейших действий по модели CHALK и оптимизации рисования
 
 **Дата:** 2026-11-02  
-**Статус:** действующий план INT-006 → INT-009  
+**Статус:** действующий план INT-006 → INT-009; актуализирован 2026-11-03 после live INT006R  
 **Ветка:** `feature/image-geometry-optimization`  
 **Зависимости:** принятые G1 12/12, G2 18/18, G3 27/27 и radius matrix 21 опыта
 
@@ -13,7 +13,7 @@ INT-006 live captures и quantitative analyzer gate завершены: D1–D5 
 
 Новые средние exact CHALK P0/P1/P2 (step2/delay10; step4/delay5; step4/delay10): V1 251.67/131.33/132.33; V2 39.00/24.00/23.67; V3 344.00/175.33/174.00; V4 438.33/229.00/229.33; V5 407.67/216.00/216.33. Step=4 дал экономию 38.5–49.4% относительно step=2. Разница delay=5/10 ms при step=4 не превышает примерно 1.4% по среднему расходу. Все новые серии проведены при radius=10; они не дают новых данных о влиянии размера кисти. Подробные raw repeat values: [CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md](CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md).
 
-В новых manifests записано перемещение курсора ниже `board_area` и `paint_meter_area` с отступом 32 px; pixel audit подтвердил cursor_detected=false и cursor_exclusion_pixels=0 для всех 45 follow-up captures. Paint-meter screenshot estimate остаётся inconclusive. Pixel-level audit новых 45 PNG завершён: 297/297 strokes coverage=1.0 и zero gaps; V4 seams 27/27 covered; V5 spacing 8/12 merge, 16/20/24 separated при radius=10. Следующий gate — независимая validation модели на полных DrawingPlan, затем safety margin. Production executor defaults и estimator не менять.
+В новых manifests записано перемещение курсора ниже `board_area` и `paint_meter_area` с отступом 32 px; pixel audit подтвердил cursor_detected=false и cursor_exclusion_pixels=0 для всех 45 follow-up captures. Paint-meter screenshot estimate остаётся inconclusive. Pixel-level audit новых 45 PNG завершён: 297/297 strokes coverage=1.0 и zero gaps; V4 seams 27/27 covered; V5 spacing 8/12 merge, 16/20/24 separated при radius=10. Следующий gate — закрыть визуальную/CLI проверку INT006R, затем FILL-001, mixed-radius и расширенную validation на полных DrawingPlan. Safety margin остаётся NOT ESTABLISHED; production executor defaults и estimator не менять.
 
 Порядок дальнейшей работы:
 1. [x] Зафиксировать контракт V1–V5 и единицы координат (logical DrawingPlan vs screen-pixel sampling step).
@@ -26,7 +26,8 @@ INT-006 live captures и quantitative analyzer gate завершены: D1–D5 
 7. [x] Выполнить pixel-level аудит новых 45 follow-up PNG: 90/90 captures valid, 297/297 новых strokes coverage=1.0 и zero gaps, V4 closure seams 27/27 covered; V5 spacing 8/12 merge, 16/20/24 separated при radius=10 (CI 41496555297).
 8. [x] Провести независимую validation CHALK-модели на новых DrawingPlan D1–D5; официальный analyzer PASS, 45 accepted, 0 missing/rejected. Протокол и результаты: [CHALK_INT006_INDEPENDENT_VALIDATION_PLAN_2026-11-02.md](CHALK_INT006_INDEPENDENT_VALIDATION_PLAN_2026-11-02.md), [официальный отчёт](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md).
 9. [ ] Отдельно оценить provisional empirical guard P1=1 CHALK и спланировать расширенную проверку на полных реальных рисунках, кривых/заливках и повторном покрытии. Не считать 1 CHALK статистической гарантией.
-10. [ ] Выполнить отдельную radius × geometry validation по [CHALK_RADIUS_GEOMETRY_CROSS_VALIDATION_PLAN_2026-11-03.md](CHALK_RADIUS_GEOMETRY_CROSS_VALIDATION_PLAN_2026-11-03.md): сначала harness/CI, затем 45 live captures.
+10. [x] Реализовать INT006R harness и пройти CI; [x] выполнить 45 live captures D1–D5 × radius 1/10/30 × 3 повтора при P1. Raw-data audit PASS; официальный CLI analyzer на реальном bundle и ручной visual audit всех PNG остаются pending. Результаты: [INT006R live report](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md).
+11. [ ] Выполнить FILL-001 по [плану эффективности заливки](CHALK_FILL_AREA_RADIUS_EFFICIENCY_PLAN_2026-11-03.md): три формы одноцветных областей × радиусы 1/5/10/20/30 × три повтора. До live запусков проверить footprint planner и radius semantics.
 
 ## Цель
 
