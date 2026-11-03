@@ -6,7 +6,7 @@
 - Исправлено добавление настоящего перевода строки и форматирование текста исключения в commit [8dfd1b5](https://github.com/Kiddos19882/AutoDraw/commit/8dfd1b541f54a1b416dfb2907739cf4b1a99c58d).
 - Добавлен integration regression test `test_fill001_plan_transfers_valid_json_context_to_stage6`: генерирует frozen FILL-001 task, передаёт план через `_transfer_brush_test_plan()`, проверяет JSON, experiment context и фактическую загрузку Stage 6. Test commit [1b2d8a1](https://github.com/Kiddos19882/AutoDraw/commit/1b2d8a128c99ab8ad1abb1e9f480702676cd9f56).
 - Обновлены PROJECT_STATUS, TASKS, ROADMAP, временный план FILL-001 и CHANGELOG. 45-cell live matrix остаётся BLOCKED.
-- Проверка на момент записи: исходники и тесты сверены статически через GitHub; локальный pytest не запускался, CI для новых commits ещё не подтверждён, повторный Windows live preflight не выполнялся. GitHub API не предоставляет локальный `git status`; чистота локального worktree не заявляется.
+- Проверка CI после code/test commits: GitHub Actions [41692129486](https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486) на HEAD `1b2d8a1` — Application integration, Game Monitor/Bridge, Preparation/G3, Executor regression и INT-006 pixel audit завершились SUCCESS; optional benchmarks SKIPPED; Windows portable build/startup smoke-test ещё выполняется. Локальный pytest не запускался; повторный Windows live preflight не выполнялся. GitHub API не предоставляет локальный `git status`; чистота локального worktree не заявляется.
 
 ## 2026-11-03 — устранение несогласованностей документации
 
