@@ -296,7 +296,7 @@ node --test ..\\game_monitor\\tests\\game_monitor.test.js
 
 Дополнительно в `tests/test_unified_app.py` добавлен regression test: Stage6 должен отклонять исходный `logical_board_pixels` план, если он загружается напрямую, минуя преобразование Brush Test.
 
-В commit `1b2d8a1` добавлен `test_fill001_plan_transfers_valid_json_context_to_stage6`: frozen FILL-001 task проходит `_transfer_brush_test_plan()`, runtime JSON повторно читается, experiment context проверяется, Stage 6 загружает DrawingPlan. Regression закрывает ошибку буквального `\\n` после JSON object; CI run `41692129486` проверяет новый HEAD.
+В commit `1b2d8a1` добавлен `test_fill001_plan_transfers_valid_json_context_to_stage6`: frozen FILL-001 task проходит `_transfer_brush_test_plan()`, runtime JSON повторно читается, experiment context проверяется, Stage 6 загружает DrawingPlan. Regression закрывает ошибку буквального `\n` после JSON object; CI run `41692129486` проверяет новый HEAD.
 
 
 
