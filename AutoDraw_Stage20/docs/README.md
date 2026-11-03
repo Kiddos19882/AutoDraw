@@ -20,7 +20,8 @@
 - [INT006R — live validation радиуса и геометрии](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md) — 45 captures, точный CHALK и сравнение радиусов 1/10/30.
 - [INT006R — ручной визуальный аудит](CHALK_INT006R_VISUAL_AUDIT_2026-11-03.md) — просмотр 45 пар PNG и выявленные ограничения коротких деталей/контуров.
 - [FILL-001 — план эффективности заливки](CHALK_FILL_AREA_RADIUS_EFFICIENCY_PLAN_2026-11-03.md) — три формы областей, пять радиусов, 45 captures.
-- [FILL-001 — технический дизайн harness](CHALK_FILL001_HARNESS_DESIGN_2026-11-03.md) — fixed-radius planner, frozen masks, footprint simulation и интеграция matrix/block/analyzer.
+- [FILL-001 — технический дизайн harness](CHALK_FILL001_HARNESS_DESIGN_2026-11-03.md) — fixed-radius planner, frozen masks, 45-cell matrix, capture validation и analyzer.
+- [FILL-001 matrix/analyzer](../source/preparation/chalk_fill_matrix.py) — отдельный экспериментальный manifest и fail-closed validation 45 live captures.
 
 ## Действующий план CHALK и история статуса
 
@@ -43,7 +44,7 @@
 
 ## Инвентаризация и обслуживание документации
 
-- [Инвентаризация документации](DOCUMENTATION_INVENTORY_2026-11-03.md) — 71 Markdown-файл, классификация действующих и архивных материалов, выявленные несогласованности и правила сохранения/удаления.
+- [Инвентаризация документации](DOCUMENTATION_INVENTORY_2026-11-03.md) — 72 Markdown-файла, классификация действующих и архивных материалов, выявленные несогласованности и правила сохранения/удаления.
 
 ## Навигация
 
