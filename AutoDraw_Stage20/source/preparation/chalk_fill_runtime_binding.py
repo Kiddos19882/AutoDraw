@@ -1,0 +1,418 @@
+from __future__ import annotations
+
+"""Fail-closed binding of FILL-001 tasks to real Bridge and executor artifacts."""
+
+import hashlib
+import json
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+import uuid
+
+from chalk_fill_matrix import FillMatrixError
+
+FILL001_RUNTIME_PROFILE = {
+    "profile_id": "P1",
+    "sampling_step": 4,
+    "delay_ms": 5,
+}
+FILL001_EXECUTOR_STEP_PX = 4.0
+FILL001_EXECUTOR_DELAY_MS = 5
+FILL001_LINE_EXTENSION_PX = 0.0
+_CONTEXT_FIELDS = (
+    "phase_id",
+    "series_id",
+    "task_id",
+    "shape_id",
+    "requested_radius",
+    "repeat_index",
+    "plan_signature",
+    "target_mask_sha256",
+    "sampling_profile",
+)
+
+
+def _sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _parse_aware_datetime(value: Any, label: str) -> datetime:
+    if not isinstance(value, str) or not value.strip():
+        raise FillMatrixError(f"{label}: отсутствует timestamp.")
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise FillMatrixError(f"{label}: некорректный timestamp.") from exc
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise FillMatrixError(f"{label}: timestamp должен содержать timezone.")
+    return parsed.astimezone(timezone.utc)
+
+
+def _nonnegative_int(value: Any, label: str) -> int:
+    if type(value) is not int or value < 0:
+        raise FillMatrixError(f"{label}: требуется неотрицательное целое число.")
+    return value
+
+
+def _exact_snapshot(snapshot: Any, label: str) -> tuple[int, int]:
+    if not isinstance(snapshot, dict) or snapshot.get("isExact") is not True:
+        raise FillMatrixError(f"{label}: Bridge snapshot не является exact.")
+    point_count = snapshot.get("pointCount")
+    max_points = snapshot.get("maxPoints")
+    if type(point_count) is not int or type(max_points) is not int:
+        raise FillMatrixError(f"{label}: pointCount/maxPoints должны быть целыми.")
+    if max_points <= 0 or not 0 <= point_count <= max_points:
+        raise FillMatrixError(f"{label}: pointCount вне допустимого диапазона.")
+    remaining = snapshot.get("remainingPoints")
+    if type(remaining) is not int or point_count + remaining != max_points:
+        raise FillMatrixError(f"{label}: exact resource snapshot противоречив.")
+    return point_count, max_points
+
+
+def build_fill001_experiment_context(task: dict[str, Any]) -> dict[str, Any]:
+    """Create the immutable task metadata stored beside an executor DrawingPlan."""
+    if not isinstance(task, dict):
+        raise FillMatrixError("FILL-001 task должен быть JSON object.")
+    missing = [key for key in _CONTEXT_FIELDS if key not in task]
+    if missing:
+        raise FillMatrixError("В FILL-001 task отсутствуют поля: " + ", ".join(missing))
+    if task["phase_id"] != "FILL001":
+        raise FillMatrixError("Experiment context относится не к FILL-001.")
+    for field in ("series_id", "task_id", "shape_id"):
+        if not isinstance(task[field], str) or not task[field].strip():
+            raise FillMatrixError(f"{field} должен быть непустой строкой.")
+    if task["requested_radius"] not in {1, 5, 10, 20, 30}:
+        raise FillMatrixError("Недопустимый requested_radius в FILL-001 context.")
+    if task["repeat_index"] not in {1, 2, 3}:
+        raise FillMatrixError("repeat_index должен быть 1, 2 или 3.")
+    for field in ("plan_signature", "target_mask_sha256"):
+        value = task[field]
+        if not isinstance(value, str) or len(value) != 64 or any(c not in "0123456789abcdef" for c in value):
+            raise FillMatrixError(f"{field} должен быть SHA-256.")
+    if task["sampling_profile"] != FILL001_RUNTIME_PROFILE:
+        raise FillMatrixError("FILL-001 task не закрепляет sampling profile P1.")
+    return {field: task[field] for field in _CONTEXT_FIELDS}
+
+
+def attach_fill001_experiment_context(
+    plan_document: dict[str, Any], task: dict[str, Any]
+) -> dict[str, Any]:
+    """Return a DrawingPlan JSON document with immutable FILL-001 task metadata."""
+    if not isinstance(plan_document, dict):
+        raise FillMatrixError("DrawingPlan document должен быть JSON object.")
+    if "autodraw_experiment" in plan_document:
+        raise FillMatrixError("DrawingPlan уже содержит autodraw_experiment context.")
+    result = dict(plan_document)
+    result["autodraw_experiment"] = build_fill001_experiment_context(task)
+    return result
+
+
+def _validate_executor_report(task: dict[str, Any], report: dict[str, Any]) -> tuple[datetime, datetime, dict[str, Any]]:
+    if not isinstance(report, dict) or report.get("schema_version") != 3:
+        raise FillMatrixError("Требуется executor report schema_version=3.")
+    try:
+        execution_id = str(uuid.UUID(report.get("execution_id", "")))
+    except (ValueError, TypeError, AttributeError) as exc:
+        raise FillMatrixError("Executor report не содержит корректный execution_id.") from exc
+    if report.get("status") != "completed":
+        raise FillMatrixError("Executor report не завершён успешно.")
+    if report.get("experiment_context") != build_fill001_experiment_context(task):
+        raise FillMatrixError("Executor report связан с другой FILL-001 task.")
+    source_hash = report.get("source_plan_file_sha256")
+    if not isinstance(source_hash, str) or len(source_hash) != 64 or any(c not in "0123456789abcdef" for c in source_hash):
+        raise FillMatrixError("Executor report не содержит SHA-256 исходного plan-файла.")
+
+    summary = report.get("summary")
+    if not isinstance(summary, dict) or summary.get("status") != "completed":
+        raise FillMatrixError("Executor summary не завершён успешно.")
+    expected_strokes = task.get("expected_strokes")
+    if type(expected_strokes) is not int or expected_strokes < 1:
+        raise FillMatrixError("Task expected_strokes некорректен.")
+    for field in ("completed_strokes", "total_strokes"):
+        if summary.get(field) != expected_strokes:
+            raise FillMatrixError(f"Executor summary.{field} не совпадает с expected_strokes.")
+    executed_plan = report.get("executed_plan")
+    if not isinstance(executed_plan, dict) or executed_plan.get("stroke_count") != expected_strokes:
+        raise FillMatrixError("Executed DrawingPlan stroke_count не совпадает с task.")
+
+    config = report.get("executor_config")
+    summary_config = summary.get("executor_config")
+    if not isinstance(config, dict) or not isinstance(summary_config, dict) or config != summary_config:
+        raise FillMatrixError("Executor config отсутствует или расходится с summary.")
+    step = config.get("point_step_px")
+    delay = config.get("point_delay_ms")
+    extension = config.get("line_extension_px")
+    if isinstance(step, bool) or not isinstance(step, (int, float)) or float(step) != FILL001_EXECUTOR_STEP_PX:
+        raise FillMatrixError("Фактический ExecutorConfig.point_step_px не соответствует P1 step=4.")
+    if type(delay) is not int or delay != FILL001_EXECUTOR_DELAY_MS:
+        raise FillMatrixError("Фактический ExecutorConfig.point_delay_ms не соответствует P1 delay=5.")
+    if isinstance(extension, bool) or not isinstance(extension, (int, float)) or float(extension) != FILL001_LINE_EXTENSION_PX:
+        raise FillMatrixError("FILL-001 требует line_extension_px=0 для неизменной геометрии.")
+
+    started = _parse_aware_datetime(summary.get("started_at"), "executor.started_at")
+    ended = _parse_aware_datetime(summary.get("ended_at"), "executor.ended_at")
+    if ended <= started:
+        raise FillMatrixError("Executor execution window пуст или имеет обратный порядок.")
+    return started, ended, {
+        "execution_id": execution_id,
+        "executor_config": dict(config),
+        "sampling_profile": dict(FILL001_RUNTIME_PROFILE),
+        "source_plan_file_sha256": source_hash,
+    }
+
+
+def _validate_session(session: dict[str, Any], run: dict[str, Any]) -> str:
+    if not isinstance(session, dict):
+        raise FillMatrixError("Bridge session должен быть JSON object.")
+    session_id = session.get("session_id")
+    try:
+        normalized_session_id = str(uuid.UUID(session_id))
+    except (ValueError, TypeError, AttributeError) as exc:
+        raise FillMatrixError("Bridge session не содержит корректный session_id.") from exc
+    if run.get("session_id") != normalized_session_id:
+        raise FillMatrixError("Bridge run принадлежит другой session.")
+    try:
+        str(uuid.UUID(run.get("run_id", "")))
+    except (ValueError, TypeError, AttributeError) as exc:
+        raise FillMatrixError("Bridge run не содержит корректный run_id.") from exc
+
+    monitor_status = session.get("monitor_status_at_connect")
+    if not isinstance(monitor_status, dict) or monitor_status.get("version") != "0.2.1":
+        raise FillMatrixError("Bridge session не подтверждает Game Monitor 0.2.1.")
+    diagnostics = session.get("bridge_diagnostics")
+    if not isinstance(diagnostics, dict):
+        raise FillMatrixError("Bridge session не содержит bridge_diagnostics.")
+    received_events = _nonnegative_int(diagnostics.get("received_event_count"), "session.received_event_count")
+    sequence_gaps = _nonnegative_int(diagnostics.get("collector_sequence_gap_count"), "session.collector_sequence_gap_count")
+    _nonnegative_int(diagnostics.get("last_sequence"), "session.last_sequence")
+    browser_bridge = diagnostics.get("browser_bridge")
+    if not isinstance(browser_bridge, dict):
+        raise FillMatrixError("Bridge session не содержит browser_bridge diagnostics.")
+    sent_events = _nonnegative_int(browser_bridge.get("sentEventCount"), "session.browser_bridge.sentEventCount")
+    send_failures = _nonnegative_int(browser_bridge.get("sendFailureCount"), "session.browser_bridge.sendFailureCount")
+    if sent_events < received_events:
+        raise FillMatrixError("Bridge sentEventCount меньше числа принятых событий.")
+    if "session_persist_failures" in diagnostics and diagnostics["session_persist_failures"] != 0:
+        raise FillMatrixError("Bridge session содержит ошибки атомарной записи.")
+    if received_events < run.get("event_count", 0):
+        raise FillMatrixError("Bridge session event count меньше числа событий run.")
+    if sequence_gaps < run.get("collector_sequence_gap_count", 0):
+        raise FillMatrixError("Bridge session не подтверждает sequence gaps из run.")
+    run_send_end = run.get("bridge_send_failures_end")
+    if type(run_send_end) is not int or send_failures < run_send_end:
+        raise FillMatrixError("Bridge session не подтверждает sendFailureCount из run.")
+    return normalized_session_id
+
+
+def _validate_bridge_run(
+    task: dict[str, Any],
+    session: dict[str, Any],
+    run: dict[str, Any],
+    executor_started: datetime,
+    executor_ended: datetime,
+) -> dict[str, Any]:
+    if not isinstance(run, dict) or run.get("schema_version") != 1:
+        raise FillMatrixError("Неподдерживаемая Bridge run schema.")
+    if run.get("record_type") != "autodraw_game_monitor_run":
+        raise FillMatrixError("Неизвестный Bridge run record_type.")
+    session_id = _validate_session(session, run)
+    run_id = str(uuid.UUID(run["run_id"]))
+    if run.get("execution_status") != "completed":
+        raise FillMatrixError("Bridge run не завершён.")
+    run_started = _parse_aware_datetime(run.get("started_at_utc"), "bridge_run.started_at_utc")
+    run_ended = _parse_aware_datetime(run.get("finished_at_utc"), "bridge_run.finished_at_utc")
+    if not executor_started <= run_started < run_ended <= executor_ended:
+        raise FillMatrixError("Bridge run не находится внутри временного окна executor report.")
+
+    expected_strokes = task["expected_strokes"]
+    if run.get("stroke_count") != expected_strokes:
+        raise FillMatrixError("Bridge run stroke_count не совпадает с task.")
+    if run.get("brush_radius_status") != "single":
+        raise FillMatrixError("Bridge run не подтверждает один фиксированный радиус.")
+    radii = run.get("observed_brush_radii")
+    if not isinstance(radii, list) or len(radii) != 1 or float(radii[0]) != float(task["requested_radius"]):
+        raise FillMatrixError("Bridge observed_brush_radii не совпадает с requested_radius.")
+
+    events = run.get("events")
+    event_count = _nonnegative_int(run.get("event_count"), "bridge_run.event_count")
+    if not isinstance(events, list) or not events or len(events) != event_count:
+        raise FillMatrixError("Bridge run event_count не совпадает с events.")
+    monitor_versions = {event.get("monitorVersion") for event in events if isinstance(event, dict)}
+    if monitor_versions != {"0.2.1"} or len(monitor_versions) != 1:
+        raise FillMatrixError("Bridge run events не подтверждают единый Game Monitor version.")
+
+    for field in (
+        "dropped_events",
+        "monitor_buffer_dropped_events_delta",
+        "monitor_error_count_delta",
+        "bridge_send_failures_delta",
+        "collector_sequence_gap_count",
+    ):
+        if _nonnegative_int(run.get(field), f"bridge_run.{field}") != 0:
+            raise FillMatrixError(f"Bridge run содержит {field}.")
+
+    if run.get("monitor_errors") != []:
+        raise FillMatrixError("Bridge run содержит monitor_errors.")
+    for field in ("bridge_send_failures_start", "bridge_send_failures_end", "bridge_send_failures_delta"):
+        _nonnegative_int(run.get(field), f"bridge_run.{field}")
+    if run["bridge_send_failures_end"] - run["bridge_send_failures_start"] != run["bridge_send_failures_delta"]:
+        raise FillMatrixError("Bridge run bridge_send_failures delta противоречив.")
+
+    pre_count, pre_max = _exact_snapshot(run.get("pre_test_snapshot"), "bridge_run.pre_test_snapshot")
+    post_count, post_max = _exact_snapshot(run.get("post_test_snapshot"), "bridge_run.post_test_snapshot")
+    if pre_max != post_max or post_count <= pre_count:
+        raise FillMatrixError("Bridge run pre/post resource snapshots несовместимы.")
+    chalk = run.get("chalk")
+    if (
+        not isinstance(chalk, dict)
+        or chalk.get("status") != "exact"
+        or chalk.get("pre_point_count") != pre_count
+        or chalk.get("post_point_count") != post_count
+        or chalk.get("consumed_points") != post_count - pre_count
+    ):
+        raise FillMatrixError("Bridge run exact CHALK не совпадает с pre/post pointCount.")
+    if run.get("sampled_point_delta_total") != post_count - pre_count or run.get("point_delta_matches_chalk") is not True:
+        raise FillMatrixError("Bridge run sampled point deltas не совпадают с exact CHALK.")
+
+    starts = [event for event in events if event.get("type") == "DRAW_START"]
+    ends = [event for event in events if event.get("type") == "DRAW_END"]
+    if len(starts) != expected_strokes or len(ends) != expected_strokes:
+        raise FillMatrixError("Bridge run не содержит ожидаемое число DRAW_START/DRAW_END.")
+    if any(event.get("monitorVersion") != "0.2.1" for event in events):
+        raise FillMatrixError("Bridge run содержит событие с неизвестной версией Monitor.")
+
+    return {
+        "session_id": session_id,
+        "run_id": run_id,
+        "monitor_version": "0.2.1",
+        "event_count": event_count,
+        "events": events,
+        "pre_point_count": pre_count,
+        "post_point_count": post_count,
+        "exact_chalk": post_count - pre_count,
+        "bridge_failures": run["bridge_send_failures_delta"],
+        "sequence_gaps": run["collector_sequence_gap_count"],
+        "dropped_events": run["dropped_events"] + run["monitor_buffer_dropped_events_delta"],
+        "monitor_errors": list(run["monitor_errors"]),
+        "bridge_run": run,
+    }
+
+
+def bind_fill001_runtime_evidence(
+    task: dict[str, Any],
+    session: dict[str, Any],
+    bridge_runs: list[dict[str, Any]],
+    executor_report: dict[str, Any],
+) -> dict[str, Any]:
+    """Bind exactly one real Bridge run to one executor report and frozen task."""
+    context = build_fill001_experiment_context(task)
+    executor_started, executor_ended, executor_meta = _validate_executor_report(task, executor_report)
+    if not isinstance(bridge_runs, list):
+        raise FillMatrixError("bridge_runs должен быть списком run records.")
+
+    session_id = session.get("session_id") if isinstance(session, dict) else None
+    candidates = []
+    for run in bridge_runs:
+        if not isinstance(run, dict) or run.get("session_id") != session_id:
+            continue
+        try:
+            started = _parse_aware_datetime(run.get("started_at_utc"), "bridge_run.started_at_utc")
+            ended = _parse_aware_datetime(run.get("finished_at_utc"), "bridge_run.finished_at_utc")
+        except FillMatrixError:
+            continue
+        if executor_started <= started < ended <= executor_ended:
+            candidates.append(run)
+    if len(candidates) != 1:
+        raise FillMatrixError(
+            f"Executor interval должен содержать ровно один Bridge run; найдено: {len(candidates)}."
+        )
+
+    verified = _validate_bridge_run(task, session, candidates[0], executor_started, executor_ended)
+    bridge_run = verified["bridge_run"]
+    monitor_export = {
+        "schemaVersion": 1,
+        "monitorVersion": verified["monitor_version"],
+        "eventCount": verified["event_count"],
+        "droppedEvents": verified["dropped_events"],
+        "errors": verified["monitor_errors"],
+        "events": verified["events"],
+    }
+    bridge_diagnostics = {
+        "run_id": verified["run_id"],
+        "event_count": verified["event_count"],
+        "bridge_failures": verified["bridge_failures"],
+        "sequence_gaps": verified["sequence_gaps"],
+    }
+    return {
+        "task_id": context["task_id"],
+        "session_id": verified["session_id"],
+        "run_id": verified["run_id"],
+        "execution_id": executor_meta["execution_id"],
+        "sampling_profile": executor_meta["sampling_profile"],
+        "executor_config": executor_meta["executor_config"],
+        "source_plan_file_sha256": executor_meta["source_plan_file_sha256"],
+        "pre_point_count": verified["pre_point_count"],
+        "post_point_count": verified["post_point_count"],
+        "exact_chalk": verified["exact_chalk"],
+        "event_count": verified["event_count"],
+        "bridge_failures": verified["bridge_failures"],
+        "sequence_gaps": verified["sequence_gaps"],
+        "monitor_export": monitor_export,
+        "bridge_diagnostics": bridge_diagnostics,
+        "bridge_run": bridge_run,
+    }
+
+
+def load_fill001_runtime_binding(
+    task: dict[str, Any],
+    session_path: str | Path,
+    executor_report_path: str | Path,
+) -> dict[str, Any]:
+    """Load session.json, all sibling run files, and the executor report from disk."""
+    session_file = Path(session_path)
+    report_file = Path(executor_report_path)
+    if not session_file.is_file() or not report_file.is_file():
+        raise FillMatrixError("Bridge session.json или executor report отсутствует.")
+    try:
+        session = json.loads(session_file.read_text(encoding="utf-8"))
+        executor_report = json.loads(report_file.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise FillMatrixError(f"Не удалось прочитать runtime evidence: {exc}") from exc
+    if not isinstance(session, dict):
+        raise FillMatrixError("session.json должен содержать JSON object.")
+    session_id = session.get("session_id")
+    if session_file.parent.name != session_id:
+        raise FillMatrixError("session.json расположен не в каталоге своего session_id.")
+
+    run_files = sorted(session_file.parent.glob("game-monitor-run-*.json"))
+    if not run_files:
+        raise FillMatrixError("В каталоге Bridge session нет run-файлов.")
+    bridge_runs = []
+    run_hashes: dict[str, str] = {}
+    for run_file in run_files:
+        try:
+            run = json.loads(run_file.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+            raise FillMatrixError(f"Не удалось прочитать Bridge run {run_file.name}: {exc}") from exc
+        if not isinstance(run, dict):
+            raise FillMatrixError(f"Bridge run {run_file.name} должен быть JSON object.")
+        run_id = run.get("run_id")
+        if not isinstance(run_id, str) or not run_file.name.endswith(f"-{run_id[:8]}.json"):
+            raise FillMatrixError(f"Имя Bridge run-файла не соответствует run_id: {run_file.name}.")
+        bridge_runs.append(run)
+        run_hashes[run_id] = _sha256(run_file)
+
+    binding = bind_fill001_runtime_evidence(task, session, bridge_runs, executor_report)
+    binding["session_file"] = str(session_file)
+    binding["session_file_sha256"] = _sha256(session_file)
+    binding["executor_report_file"] = str(report_file)
+    binding["executor_report_file_sha256"] = _sha256(report_file)
+    binding["bridge_run_file_sha256"] = run_hashes[binding["run_id"]]
+    matching = [
+        path for path in run_files
+        if path.name.endswith(f"-{binding['run_id'][:8]}.json")
+    ]
+    if len(matching) != 1:
+        raise FillMatrixError("Не удалось однозначно определить Bridge run-файл по run_id.")
+    binding["bridge_run_file"] = str(matching[0])
+    return binding

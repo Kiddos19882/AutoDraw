@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 import hashlib
 import json
+import json
 import os
 from pathlib import Path
 import platform
@@ -36,6 +37,23 @@ def canonical_sha256(value: Any) -> str:
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
+def _source_plan_evidence(source_plan_path: str | Path | None) -> tuple[str | None, dict[str, Any] | None]:
+    """Return the exact source-file SHA-256 and optional FILL-001 task context."""
+    if source_plan_path is None:
+        return None, None
+    path = Path(source_plan_path)
+    try:
+        raw = path.read_bytes()
+    except OSError:
+        return None, None
+    try:
+        document = json.loads(raw.decode("utf-8"))
+    except (UnicodeError, json.JSONDecodeError):
+        return hashlib.sha256(raw).hexdigest(), None
+    context = document.get("autodraw_experiment") if isinstance(document, dict) else None
+    return hashlib.sha256(raw).hexdigest(), dict(context) if isinstance(context, dict) else None
+
+
 def build_execution_report(
     *,
     stage: int,
@@ -51,14 +69,18 @@ def build_execution_report(
 ) -> dict[str, Any]:
     source_doc = source_plan.to_dict() if source_plan is not None else None
     executed_doc = executed_plan.to_dict() if executed_plan is not None else None
+    source_file_sha256, experiment_context = _source_plan_evidence(source_plan_path)
     return {
-        "schema_version": 2,
+        "schema_version": 3,
+        "execution_id": str(uuid.uuid4()),
         "created_at": datetime.now().astimezone().isoformat(timespec="seconds"),
         "stage": stage,
         "status": status,
         "source_plan_file": str(source_plan_path) if source_plan_path is not None else None,
         "source_plan_name": getattr(source_plan, "name", None),
         "source_plan_sha256": canonical_sha256(source_doc) if source_doc is not None else None,
+        "source_plan_file_sha256": source_file_sha256,
+        "experiment_context": experiment_context,
         "executed_plan": {
             "name": getattr(executed_plan, "name", None),
             "width": getattr(executed_plan, "width", None),

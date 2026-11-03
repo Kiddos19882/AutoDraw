@@ -238,3 +238,44 @@ def build_fill001_capture(
     from chalk_fill_matrix import validate_fill001_capture
     validate_fill001_capture(task, capture)
     return capture
+
+
+def build_fill001_capture_from_runtime(
+    task: dict[str, Any],
+    *,
+    session_path: str | Path,
+    executor_report_path: str | Path,
+    before_png: str | Path,
+    after_png: str | Path,
+) -> dict[str, Any]:
+    """Build a live capture only from persisted Bridge and executor runtime artifacts.
+
+    Unlike build_fill001_capture(), this entrypoint does not accept caller-supplied
+    run IDs, Bridge diagnostics, or sampling metadata.
+    """
+    from chalk_fill_runtime_binding import load_fill001_runtime_binding
+
+    binding = load_fill001_runtime_binding(task, session_path, executor_report_path)
+    capture = build_fill001_capture(
+        task,
+        binding["monitor_export"],
+        sampling_profile=binding["sampling_profile"],
+        before_png=before_png,
+        after_png=after_png,
+        run_id=binding["run_id"],
+        bridge_diagnostics=binding["bridge_diagnostics"],
+    )
+    capture.update({
+        "session_id": binding["session_id"],
+        "execution_id": binding["execution_id"],
+        "executor_config": binding["executor_config"],
+        "source_plan_file_sha256": binding["source_plan_file_sha256"],
+        "session_file": binding["session_file"],
+        "session_file_sha256": binding["session_file_sha256"],
+        "bridge_run_file": binding["bridge_run_file"],
+        "bridge_run_file_sha256": binding["bridge_run_file_sha256"],
+        "executor_report_file": binding["executor_report_file"],
+        "executor_report_file_sha256": binding["executor_report_file_sha256"],
+        "runtime_binding_status": "passed",
+    })
+    return capture

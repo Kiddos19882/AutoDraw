@@ -41,6 +41,43 @@ class ExecutionDiagnosticsTests(unittest.TestCase):
         self.assertEqual(report["status"], "completed")
         self.assertIn("python_version", report["environment"])
 
+    def test_report_embeds_frozen_fill001_context_and_source_file_hash(self):
+        from hashlib import sha256
+
+        plan = self.make_plan()
+        context = {
+            "phase_id": "FILL001",
+            "series_id": "SERIES-1",
+            "task_id": "SERIES-1-rectangle-r5-rep1",
+            "shape_id": "rectangle",
+            "requested_radius": 5,
+            "repeat_index": 1,
+            "plan_signature": "a" * 64,
+            "target_mask_sha256": "b" * 64,
+            "sampling_profile": {"profile_id": "P1", "sampling_step": 4, "delay_ms": 5},
+        }
+        with tempfile.TemporaryDirectory() as temp_dir:
+            source_path = Path(temp_dir) / "fill001-plan.json"
+            source_path.write_text(json.dumps({
+                **plan.to_dict(),
+                "autodraw_experiment": context,
+            }), encoding="utf-8")
+            report = build_execution_report(
+                stage=14,
+                source_plan_path=source_path,
+                source_plan=plan,
+                executed_plan=plan,
+                target_area={"x": 10, "y": 20, "width": 20, "height": 20},
+                fit_info=None,
+                summary={"status": "completed"},
+                config={"point_step_px": 4.0, "point_delay_ms": 5, "line_extension_px": 0.0},
+                status="completed",
+            )
+            self.assertEqual(report["schema_version"], 3)
+            self.assertEqual(report["experiment_context"], context)
+            self.assertEqual(report["source_plan_file_sha256"], sha256(source_path.read_bytes()).hexdigest())
+            self.assertTrue(report["execution_id"])
+
     def test_crash_summary_marks_mouse_state_as_unconfirmed(self):
         summary = build_crash_summary("RuntimeError: setup failed")
         self.assertEqual(summary["status"], "failed")
