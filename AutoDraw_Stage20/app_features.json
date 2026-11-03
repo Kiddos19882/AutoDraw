@@ -31,6 +31,11 @@
     "explicit-brush-control-mode",
     "game-monitor-websocket-bridge",
     "brush-test-websocket-launcher",
-    "brush-test-monitor-snippet-copy"
+    "brush-test-monitor-snippet-copy",
+    "chalk-fill001-single-task-preflight",
+    "chalk-fill001-fixed-radius-planner-handoff",
+    "chalk-fill001-game-monitor-runtime-binding",
+    "chalk-fill001-before-after-png-audit",
+    "chalk-fill001-ephemeral-p1-executor-profile"
   ]
 }
