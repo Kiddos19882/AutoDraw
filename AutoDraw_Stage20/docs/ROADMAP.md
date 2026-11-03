@@ -2,6 +2,18 @@
 
 ## Актуальный статус CHALK — 2026-11-03
 
+### FILL-001 — fill efficiency matrix
+
+- [x] Frozen masks, fixed-radius planner и 45-cell manifest/analyzer.
+- [x] Реализован Monitor capture adapter с per-stroke exact CHALK, radius/P1 binding и PNG hash/pixel audit.
+- [x] Добавлены synthetic adapter regression tests.
+- [ ] Полный pytest/CI и Windows portable build должны пройти на текущем HEAD.
+- [ ] Связать adapter с фактическим runner/journal и проверить bridge diagnostics schema.
+- [ ] Windows preflight: проверить logical crop 460×240, PNG threshold и exclusion cursor/UI.
+- [ ] Только после software/preflight gates — 45 live captures и анализ расхода CHALK по shape/radius.
+
+**Текущий gate:** adapter implementation добавлен, но не протестирован; live execution BLOCKED.
+
 ### INT-006
 
 - [x] Независимая validation D1–D5: 45/45 accepted, 0 missing/rejected, 15/15 groups complete; официальный analyzer и CI [41532629748](https://github.com/Kiddos19882/AutoDraw/actions/runs/41532629748) — SUCCESS.
