@@ -2238,3 +2238,14 @@ Brush Test acceptance и матричные валидаторы больше н
 - Все generated plans остаются non-executable; sampling estimate не трактуется как exact CHALK. Live captures и production planner не затрагивались.
 - Commits: initial planner edit `8ed85d04ac92aa9dae26cded3628f618e30f2135`, validation fix `358b0ea48d1df0103246ccd04fd9eb09e9e7b2d2`, regression tests `07bda99f1cf2db7c814a5e1579fc9e0a7534862a`, separate planner module `5a33da337fabdfbae61f6ec1d8ead9db40d02057`. Frozen-mask module was restored byte-for-byte from the pre-change branch version in `5b7c6e8bb98cbcedc12ca6a3e6c78c2d64cd385d`; it is not part of the final functional diff.
 - CI/pytest для актуального HEAD ожидаются; следующий gate — подтвердить тесты, затем matrix/block/journal harness.
+
+
+## 2026-11-03 — FILL-001 matrix and analyzer increment
+
+- Добавлен `source/preparation/chalk_fill_matrix.py`: детерминированный manifest на 45 ячеек (3 формы × 5 радиусов × 3 повтора), mask/plan/task identity, dynamic expected_strokes, atomic manifest write/load.
+- Реализована fail-closed capture validation: requested/observed radius, exact CHALK = post-pre pointCount, completed stroke count, coverage ≥99%, leakage=0, Monitor/Bridge/event integrity.
+- Analyzer проверяет полноту матрицы, duplicate/missing/unexpected task IDs и duplicate run IDs; считает exact CHALK statistics отдельно по shape/radius.
+- Добавлен `tests/test_chalk_fill_matrix.py` с offline regression coverage для 45 cells, signature tampering, duplicate/missing cells, manifest round-trip, capture gates и analyzer.
+- Live execution не реализовано и не запускалось. Manifest/tasks запрещают automatic execution; exact CHALK не заменяется геометрическими estimates.
+- GitHub combined status для новых commits возвращает пустой список checks; pytest и полный CI на актуальном HEAD не подтверждены.
+- Следующий gate: получить полный CI PASS/Windows portable build; затем preflight, live 45 captures и PNG audit.
