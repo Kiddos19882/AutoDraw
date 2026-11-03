@@ -18,6 +18,11 @@ FILL001_CANVAS_HEIGHT = 240
 FILL001_SHAPES = ("rectangle", "wide_irregular", "narrow_irregular")
 FILL001_RADII = (1, 5, 10, 20, 30)
 FILL001_MASK_SCHEMA_VERSION = 1
+FILL001_EXPECTED_MASK_SHA256 = {
+    "rectangle": "f7cf9a0ba1f77477d85cd4495cde8b0e1f823f2b6ffc2566c62723a2eb623736",
+    "wide_irregular": "e3f81349faccd4481ab62bf53dc15e5354c2a20d4cfbe7eeb2b93480b9054343",
+    "narrow_irregular": "6b1437bad0e550419f805d7919d3a613ea8444017d3d3300a07c23107c1510df",
+}
 
 
 def _rounded_row_inset(
