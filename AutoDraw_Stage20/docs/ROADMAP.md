@@ -20,10 +20,11 @@
 - [x] Отдельная вкладка FILL-001: manifest create/load, single-task selection, planner validation, operator approval, brush-size handoff, Stage 6 start с P1 override и capture finalization.
 - [x] Regression gate закрыт: CI [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178) SUCCESS на `e3774a3`.
 - [ ] Провести Windows live runtime preflight и подтвердить P1 из фактического executor report.
-- [ ] Проверить реальные board PNG: logical crop 460×240, RGB threshold=8, cursor/UI exclusion и coverage/leakage против frozen masks.
+- [x] Исправить физическое требование crop 460×240: UI снимает фактический calibrated client ROI, adapter преобразует frozen logical mask в размер PNG и сохраняет transform.
+- [ ] Проверить реальные board PNG в client ROI: RGB threshold=8, cursor/UI exclusion и coverage/leakage против frozen masks.
 - [ ] Только после preflight — 45 live captures и анализ расхода CHALK по shape/radius.
 
-**Текущий gate:** программная реализация UI/runner и regression gate завершены. Требуется реальная Windows/game session для runtime/PNG preflight. Live execution всей 45-cell matrix остаётся BLOCKED.
+**Текущий gate:** UI/runner реализованы; ошибочное ограничение физического ROI устранено, regression tests добавлены, CI нового HEAD ожидается. Требуется реальная Windows/game session для runtime/PNG preflight. Live execution всей 45-cell matrix остаётся BLOCKED.
 
 ## Актуальный статус CHALK — 2026-11-03
 
