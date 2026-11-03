@@ -3,7 +3,7 @@
 **Дата:** 2026-11-03  
 **Репозиторий:** `Kiddos19882/AutoDraw`  
 **Ветка:** `feature/image-geometry-optimization`  
-**Результат:** RAW DATA AUDIT PASS; ручной visual quality gate остаётся PENDING  
+**Результат:** RAW DATA AUDIT PASS; ручной visual audit COMPLETE WITH GEOMETRY-SPECIFIC LIMITATIONS  
 **Последний commit с данными:** [138c9fbeaf612a86819f7ff9ea0db7bb1fe4296a](https://github.com/Kiddos19882/AutoDraw/commit/138c9fbeaf612a86819f7ff9ea0db7bb1fe4296a)
 
 ## 1. Матрица и идентификаторы
@@ -65,13 +65,12 @@
 - выбирать радиус по геометрии и детализации, а влияние на покрытие проверять отдельно;
 - не менять production estimator, executor defaults и sampling defaults.
 
-## 5. Незакрытые gates
+## 5. Завершение gates
 
-1. Выполнить официальный запуск `chalk_int006r_validation.py` на реальном journal и capture bundle; сохранить JSON report и его SHA-256.
-2. Проверить читаемость и соответствие before/after board PNG во всех 45 capture bundles.
-3. Завершить ручной visual audit всех 45 пар: покрытие, пропуски, слияния, ширина следа, форма концов и сохранение границ.
-4. После этого закрыть visual gate INT006R.
-5. Перейти к отдельному эксперименту эффективности заливки областей по [плану FILL-001](CHALK_FILL_AREA_RADIUS_EFFICIENCY_PLAN_2026-11-03.md).
+- Официальный CLI analyzer на реальном journal/capture bundle завершился PASS: run [41563236073](https://github.com/Kiddos19882/AutoDraw/actions/runs/41563236073), 45 accepted, 0 missing/rejected, PNG evidence complete.
+- Ручной аудит всех 45 пар (90 PNG) завершён; результаты и ограничения приведены в [отдельном отчёте](CHALK_INT006R_VISUAL_AUDIT_2026-11-03.md).
+- INT006R закрыт как измерительная фаза с geometry-specific quality limitations; это не универсальная рекомендация по радиусу.
+- Следующий эксперимент — FILL-001 по [плану эффективности заливки](CHALK_FILL_AREA_RADIUS_EFFICIENCY_PLAN_2026-11-03.md).
 
 ## 6. CI и Git
 
@@ -83,3 +82,8 @@ Commit `138c9fbe` содержит live experiment data. Data commit `138c9fbe` 
 
 Обнаруженное несоответствие в поле `sampling_profile.other_executor_parameters` исправлено в коде/тесте; analyzer job в [41560787871](https://github.com/Kiddos19882/AutoDraw/actions/runs/41560787871) завершился SUCCESS; скачанный artifact подтверждает корректный P1 profile и отсутствие point_step/delay в `other_executor_parameters`. Полный run был отменён при запуске следующего workflow. Текущий полный re-run [41561422754](https://github.com/Kiddos19882/AutoDraw/actions/runs/41561422754) дополнительно упаковывает 45 пар before/after board PNG для ручного visual audit.
 
+
+
+## 7. Ручной визуальный аудит
+
+Ручной просмотр всех 45 пар PNG выполнен после успешной упаковки артефакта в CI [41563236073](https://github.com/Kiddos19882/AutoDraw/actions/runs/41563236073). В отчёте [CHALK_INT006R_VISUAL_AUDIT_2026-11-03.md](CHALK_INT006R_VISUAL_AUDIT_2026-11-03.md) зафиксированы два геометрических ограничения: radius 1 оставляет видимый разрыв в одном соединении D2 polygon, а radius 30 объединяет первые три короткие детали D4. Radius 10 сохранил раздельность этих деталей и замыкание контура в проверенной матрице. Эти наблюдения ограничены D1–D5 и не распространяются автоматически на заливки или произвольные рисунки.
