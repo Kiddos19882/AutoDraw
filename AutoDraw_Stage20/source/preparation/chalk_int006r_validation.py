@@ -268,7 +268,11 @@ def analyze_int006r_validation(
             "name": "P1",
             "point_step_px": RADIUS_GEOMETRY_VALIDATION_PROFILE[0],
             "point_delay_ms": RADIUS_GEOMETRY_VALIDATION_PROFILE[1],
-            "other_executor_parameters": GEOMETRY_EXECUTOR_CONFIG,
+            "other_executor_parameters": {
+                key: value
+                for key, value in GEOMETRY_EXECUTOR_CONFIG.items()
+                if key not in {"point_step_px", "point_delay_ms"}
+            },
         },
         "radii": list(RADIUS_GEOMETRY_VALIDATION_RADII),
         "groups": groups,
