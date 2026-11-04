@@ -1,3 +1,16 @@
+## Актуальная сводка — 2026-11-04, CI и telemetry
+
+- Рабочая ветка: `feature/image-geometry-optimization`; проверенный HEAD перед синхронизацией документации: `7ff5813f8d1745fafb39f9e0152c2586a1527547`. GitHub compare: ahead 2895 / behind 5 относительно `master`; merge/rebase не выполнялся, `master` не изменялся. Локальный `git status` недоступен через GitHub API.
+- Workflow [41840582147](https://github.com/Kiddos19882/AutoDraw/actions/runs/41840582147) завершился **SUCCESS**. Run checkout SHA `6fd3c91c3c08ea05cb9ef83ff599eb52a6f9527e`; после него в ветке добавлены только документационные commits до HEAD `7ff5813`. Application integration, Game Monitor/Bridge, Preparation/G3, Executor regression, Windows portable build/startup smoke-test и INT-006 PNG audit — SUCCESS; optional algorithm benchmarks — SKIPPED. Артефакты: static sweep `13329415914`, INT-006R validation `13329411251`, INT-006 PNG `13329261288`, CHALK validation `13329096463`, visual review source `13328976562`, Windows build `13328458043`.
+- Run `41840281018` на HEAD `730590d` был отменён (CANCELLED), а не провален. Его успешные отдельные jobs не заменяют полный CI. Run `41840582147` — подтверждённый полный SUCCESS для telemetry code lineage.
+- Per-stroke telemetry проверена по исходникам: Browser Bridge передаёт `strokeId` и raw requestAnimationFrame intervals; Bridge Server сохраняет `frame_probes`, формирует `frame_probe_by_stroke` и `per_stroke_metrics`. Важно: browser rAF — не Egret `ENTER_FRAME`; события `POINT_QUOTA_UPDATE` отражают изменения resource snapshot/принятые point updates, а не каждый кадр.
+- Сохранённый старый run `6a17a297` даёт 1260 point updates, median интервал 33 ms, cadence 28.26–29.50 points/s; первые/последние 9 штрихов — 28.734/29.049 points/s. Старые per-stroke rAF intervals не сохранены старым finalizer, поэтому новую frame_probe корреляцию нужно получить в будущем run после прохождения offline gate.
+- Уточнён статический renderer context: nominal stage.frameRate=48, StageScaleMode.NO_SCALE; PainterPopup 676×379, BoardPane 460×240 без собственного scaleX/scaleY. Это не определяет parent/global transform и device-pixel ratio. Egret 5.2.18 API указывает ROUND defaults для omitted caps/joints, но deployed runtime version не установлена; zero-length rasterization и фактический footprint остаются UNKNOWN.
+- FILL-001-RS остаётся **BLOCKED**: capture REJECTED, coverage=98.430600%, leakage=11; exact CHALK=1260 (pointCount 1→1261) относится только к этому запуску. Критерии coverage≥99% и leakage=0 не выполнены. 45-task matrix не открывать.
+- Следующий gate: установить deployed Egret runtime identity, измерить popup global transform, отдельно проверить zero-length path rasterization и откалибровать фактический screen-space footprint на frozen geometry. Live preflight и 45-task matrix не запускать до прохождения offline gate; frozen plans/masks/thresholds/defaults не менять.
+
+---
+
 ## Текущий блокирующий шаг: FILL-001-RS калибровка renderer footprint и sampling
 
 **Задача:** FILL-001-RS-ENGINE-FOOTPRINT-001.  
