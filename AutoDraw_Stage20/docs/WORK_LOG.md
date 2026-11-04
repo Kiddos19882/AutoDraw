@@ -2711,3 +2711,14 @@ Bundle дополнительно подтверждает: Main UI задаёт
 Обнаружен отдельный риск planner-ов: footprint_pixel_bounds даёт bbox capsule, а interior_fill_planner._mark_footprint и outline_first_fill_planner помечают весь bbox covered. У круглых концов bbox углы могут не касаться фактического capsule. Это потенциальный underfill в этих planner-ах, не доказанная причина FILL-001-RS. Добавлена задача BRUSH-FOOTPRINT-CAPSULE-001; production planners не менялись.
 
 CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3c08ea05cb9ef83ff599eb52a6f9527e. Все обязательные jobs PASS, optional algorithm benchmarks SKIPPED. Более поздние commits — documentation-only.
+
+
+## 2026-11-04 — BRUSH-FOOTPRINT-CAPSULE-001 static code audit
+
+- Проверены `brush_footprint_geometry.py`, `swept_footprint_geometry.py`, `interior_fill_planner.py`, `outline_first_fill_planner.py` и соответствующие tests.
+- Подтверждено: `footprint_pixel_bounds()` возвращает AABB; generic interior planner использует AABB и как safety check, и как coverage mask. Последнее overclaims cells около round-cap ends и может пропускать fallback. Тестовый independent oracle повторяет rectangular assumption.
+- `swept_footprint_geometry` использует bbox как conservative safety envelope; `outline_first_fill_planner` — для safety check, но отмечает residual только по centerline pixels.
+- FILL-001/FILL-001-RS использует отдельный OpenCV round-capped rasterizer (line + endpoint circles), не вызывает generic bounds helper. Причинная связь с FILL-001-RS rejected PNG не установлена.
+- Источниковая версия Egret и deployed renderer footprint не подтверждены. Это static code finding, не live/render validation.
+- Изменения исходников, тестов, конфигураций и workflow не выполнялись; frozen evidence и thresholds не затрагивались.
+- Следующий шаг — offline possible/guaranteed cell masks, независимые geometric tests и old/new frozen-fixture comparison; production behavior не менять до acceptance.
