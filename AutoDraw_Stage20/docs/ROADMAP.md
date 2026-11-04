@@ -1,3 +1,16 @@
+# Дополнение к дорожной карте — 2026-11-04
+
+INT-003 и CHALK-SAMPLING-DOMAIN закрыты как NOT_REQUIRED по решению пользователя; не планировать отдельные работы по A/B/C overhead Monitor и расширению sampling-domain. Исторические evidence остаются.
+
+Текущая последовательность обязательных работ:
+1. **P0 — FILL-001-RS renderer footprint:** установить deployed renderer и полный popup→board transform; откалибровать footprint; пройти offline PNG gate coverage≥99%, leakage=0.
+2. **P0 — single-task live preflight:** только после offline PASS и отдельного разрешения пользователя. Последний capture (coverage 98.430600%, leakage 11) отклонён.
+3. **P0 — FILL-001-RS 45-cell matrix:** только после принятого single-task preflight и отдельного разрешения; 15 shape×radius cells × 3 повтора.
+4. **P1 — BRUSH-FOOTPRINT-CAPSULE-001:** завершить offline fixture comparison/renderer agreement и решить, нужна ли интеграция generic planner. Это отдельная геометрическая корректность; не установленная причина RS rejection.
+5. **P1 — INT-006:** расширить domain модели CHALK и установить error bounds/safety margin; до этого estimator/defaults не менять и INT-007 не начинать.
+
+INT-006 можно вести как отдельную offline/validation работу без запуска live экспериментов; для любых новых live captures требуется отдельное разрешение.
+
 ## Приоритетная гипотеза для FILL-001-RS — sparse fill + connected contour (2026-11-04)
 
 При остаточных пропусках, локализованных преимущественно по внешнему периметру, первым отдельным offline-кандидатом после прохождения renderer/footprint gates проверять **редкий внутренний scanline-fill + один связный обход контура + локальные внутренние коррекции**. Не считать глобальное уплотнение горизонтальных проходов вариантом по умолчанию.
