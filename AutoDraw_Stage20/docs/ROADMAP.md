@@ -1,9 +1,9 @@
 ## Обязательный ближайший gate — FILL-001-RS-PRE-REPLAY-001
 
-До любого следующего live запуска FILL-001-RS выполнить offline replay исходных PNG и evidence запуска `fill001-rs-preflight-20261104-7.04` через исправленный `chalk_fill_capture_adapter.py`. Проверить task/run/session binding, plan signature, executor report, Bridge/Monitor diagnostics, неизменённые before/after PNG, coverage≥99% и leakage=0. Сохранить hashes и отдельный replay report.
+Offline replay исходных PNG и evidence запуска `fill001-rs-preflight-20261104-7.04` выполнен через исправленный `chalk_fill_capture_adapter.py` внутри `Fill001Tab.finalize_capture()`. Binding PASS; corrected audit дал coverage=98.430600%, leakage=11 и status=failed. SHA-256 и полный evidence mapping сохранены в [отчёте replay](CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md).
 
-- Replay PASS: пересмотреть принятие исходного capture по полному контракту; затем отдельно запросить/получить разрешение на следующий одиночный live preflight.
-- Replay FAIL или отсутствуют исходные бинарные evidence: оставить capture BLOCKED, определить конкретную недостающую/ошибочную составляющую и не запускать игру.
+- **Текущий шаг:** локализовать координаты 11 leakage pixels и uncovered target pixels на той же неизменённой PNG паре; определить остаточное расхождение между frozen mask и фактическим renderer footprint.
+- До успешного повторного quality gate capture остаётся REJECTED/BLOCKED; live запуск не выполнять.
 - 45-task matrix остаётся BLOCKED до успешного принятого live preflight и отдельного разрешения на batch.
 - Не менять thresholds, frozen masks, исходный manifest, production defaults или production-код в рамках этой задачи.
 
@@ -23,7 +23,7 @@
 
 Runtime binding для последнего rectangle/r10/step=5/offset=0 запуска восстановлен: legacy Bridge session без schema v2 больше не блокирует поиск. Replay через обработчик capture-кнопки подтвердил task↔executor↔Bridge binding, 27/27 strokes и exact CHALK=1260.
 
-Однако live capture **не принят**: фактический PNG audit — coverage=97.673218% при пороге ≥99%, leakage=28 при требовании 0. Следующий этап — диагностировать raster/ROI/transform discrepancy и добиться прохождения PNG gate без ослабления frozen criteria. До этого FILL-001 capture и 45-task matrix остаются BLOCKED.
+Однако live capture **не принят**. Первоначальный audit до affine correction: coverage=97.673218%, leakage=28. Replay исходных PNG исправленным audit в CI [41780241017](https://github.com/Kiddos19882/AutoDraw/actions/runs/41780241017): coverage=98.430600%, leakage=11. Улучшение подтверждено, но критерии ≥99% / 0 не пройдены. Следующий этап — offline локализация остаточных пикселей и диагностика renderer/raster discrepancy. До этого FILL-001 capture и 45-task matrix остаются BLOCKED.
 
 Software gate: [CI 41772866679](https://github.com/Kiddos19882/AutoDraw/actions/runs/41772866679) SUCCESS на code/test HEAD `974f949`; Preparation/G3 804 passed, 24 warnings, 82 subtests; Executor, Game Monitor/Bridge, Application integration, INT-006 pixel audit и Windows portable build/startup smoke-test SUCCESS.
 
