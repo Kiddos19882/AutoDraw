@@ -104,11 +104,16 @@ def audit_fill001_png_pair(
         )
 
     logical_mask = build_fill_target_mask(shape_id)
-    mask_image = Image.fromarray(logical_mask.astype(np.uint8) * 255, mode="L")
-    screen_mask = np.asarray(
-        mask_image.resize((screen_width, screen_height), resample=Image.Resampling.NEAREST),
-        dtype=np.uint8,
-    ) > 0
+    # Keep mask rasterization on the exact inclusive-bound transform used by
+    # transform_logical_brush_plan_to_screen(): logical [0..460] × [0..240]
+    # maps to screen pixel centers [0..width-1] × [0..height-1]. PIL.resize()
+    # instead scales by width/460 and height/240, which is a different affine
+    # transform and can create a false one-pixel perimeter mismatch.
+    logical_x = np.arange(screen_width, dtype=np.float64) / scale_x
+    logical_y = np.arange(screen_height, dtype=np.float64) / scale_y
+    source_x = np.clip(np.rint(logical_x).astype(np.intp), 0, LOGICAL_BOARD_WIDTH - 1)
+    source_y = np.clip(np.rint(logical_y).astype(np.intp), 0, LOGICAL_BOARD_HEIGHT - 1)
+    screen_mask = logical_mask[np.ix_(source_y, source_x)]
     changed = np.any(np.abs(after - before) > PNG_CHANGE_THRESHOLD, axis=2)
     target_area = int(np.count_nonzero(screen_mask))
     if target_area <= 0:
@@ -126,9 +131,9 @@ def audit_fill001_png_pair(
         "scale_y": scale_y,
         "uniform_scale_relative_error": scale_error,
         "uniform_scale_tolerance": MAX_UNIFORM_SCALE_RELATIVE_ERROR,
-        "mask_raster_scale_x": screen_width / LOGICAL_BOARD_WIDTH,
-        "mask_raster_scale_y": screen_height / LOGICAL_BOARD_HEIGHT,
-        "mask_resampling": "nearest_neighbor",
+        "mask_raster_scale_x": scale_x,
+        "mask_raster_scale_y": scale_y,
+        "mask_resampling": "inverse_affine_nearest_neighbor",
     }
     return {
         "before_png": str(Path(before_png)),
