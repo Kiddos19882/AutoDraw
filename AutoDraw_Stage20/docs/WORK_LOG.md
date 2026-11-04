@@ -2608,3 +2608,21 @@ Production source, frozen masks, PNG thresholds, исходные live captures 
 Исходные данные задачи: 27/27 strokes, pointCount 1→1261 (exact CHALK=1260), Bridge diagnostics без ошибок; прежний PNG gate отклонил capture с coverage=97.673218% и leakage=28 при неизменных критериях ≥99% / 0. Успешный CI 41780241017 проверяет software gates, но не подтверждает replay исходных live PNG.
 
 До закрытия задачи запрещены новый live запуск FILL-001-RS и запуск 45-task matrix; игровые эксперименты не входят в offline replay и требуют отдельного разрешения. Изменение production-кода/defaults, frozen masks, исходных plans/manifest и acceptance thresholds не разрешено. Доступность бинарных PNG из предполагаемого commit `530821497ce3a6bd5152318a78e1f06cb836f288` ещё не подтверждена.
+
+## 2026-11-04 — offline raster diagnosis: краевые пропуски и contour-pass sweep
+
+Повторно построена frozen rectangle mask из исходной формулы `chalk_fill_experiment.py` и воспроизведена геометрия committed plan `fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1`. Получены 27 centerlines (y=55..185 с шагом 5), target area=44 653 px. Rasterization по текущей OpenCV line/cap модели оставляет 304 uncovered target pixels: 80 в верхней полосе, 80 в нижней, 72 у левой боковой границы и 72 у правой; в центральной внутренней области пропусков нет. Leakage=0. Это относится только к planner model; фактический PNG audit имеет coverage=98.430600%, leakage=11, и его пиксельные координаты пока не извлечены.
+
+Затем выполнен exploratory sweep единственного замкнутого contour pass поверх текущих scanlines. Контур получен из frozen mask после erosion эллиптическим ядром:
+
+| Inward offset | Coverage | Leakage | Uncovered | Offline gate |
+|---:|---:|---:|---:|---|
+| 5 px | 99.964168% | 32 | 16 | FAIL |
+| 6 px | 99.516270% | 0 | 216 | PASS |
+| 7 px | 99.372942% | 0 | 280 | PASS |
+| 8 px | 99.328153% | 0 | 300 | PASS |
+
+Для offset=6 contour представлен одной замкнутой линией с 64 вершинами и длиной около 846.225 logical px в этой OpenCV approximation. Длина пути не является оценкой расхода CHALK. Разница между offset 5 и 6 показывает узкий trade-off coverage/leakage и необходимость точной подгонки под реальный renderer footprint.
+
+Статус: edge concentration подтверждена для offline planner model (E1), но остаётся E0 для actual PNG residuals. Contour pass — exploratory candidate, не внедрён, не выбран и не live-validated. Не менялись код, тесты, конфигурации, frozen plan, thresholds, production defaults; live experiment не запускался. Следующий шаг — actual PNG coordinate breakdown и сравнение с renderer footprint.
+
