@@ -829,14 +829,26 @@ CI evidence: workflow 41787492122, commit d337f4240e83488273152f65992032beca3957
 - [x] Добавлен independent analytic oracle для horizontal capsule и уточнены tolerance boundaries: potential mask не отбрасывает малые положительные пересечения; guaranteed mask использует строгую внутреннюю границу; boolean scales отклоняются.
 - [x] Проверить последующие исправления в полном CI: run [41843716918](https://github.com/Kiddos19882/AutoDraw/actions/runs/41843716918) на HEAD `7357f3e198c729b194b87eec7c591242314c2782` завершился SUCCESS; обязательные jobs успешны, optional benchmarks SKIPPED.
 
-Initial full CI PASS не распространяется автоматически на последующие threshold/oracle commits. Planner integration по-прежнему не выполнена; модель не подтверждена deployed Egret runtime.
+### BRUSH-FOOTPRINT-CAPSULE-001 — per-segment broad-phase, independent oracle и benchmark (2026-11-04)
 
+- [x] Перевести raster candidate enumeration с единого global AABB на отдельные расширенные bounds каждого segment capsule; potential/guaranteed masks объединяются по сегментам.
+- [x] Сохранить API, global `bounds`, геометрические предикаты и fail-closed validation.
+- [x] Добавить независимый full-canvas oracle, не использующий production geometry helpers: собственные point-segment distance и orientation-based closed-segment intersection.
+- [x] Проверить семь параметризованных случаев (диагонали, reverse diagonal, касание границ, поворот, polyline, point segment, clipping) и 16 seeded random polylines; potential и guaranteed masks совпадают.
+- [x] Добавить `tests/benchmark_capsule_rasterization.py` и обязательный preparation CI step с JSON artifact.
+- [x] Полный CI [41859709320](https://github.com/Kiddos19882/AutoDraw/actions/runs/41859709320) на HEAD `af30b5fdf1c926d3493bff90706806f5d3a28c43` — SUCCESS: Preparation/G3 832 passed, 24 warnings, 82 subtests; все обязательные jobs, INT-006 pixel audit и Windows portable build/startup smoke-test — SUCCESS; optional algorithm benchmarks — SKIPPED. Capsule benchmark artifact `13338434277`.
+- [x] Сравнить global-AABB reference и per-segment implementation на пяти synthetic polylines, семь timing repeats; во всех пяти случаях masks совпали.
 
-### BRUSH-FOOTPRINT-CAPSULE-001 — per-segment broad-phase increment (2026-11-04)
+**Результаты benchmark (Windows GitHub runner):**
 
-- [x] Перевести raster candidate enumeration с единого глобального AABB на отдельные расширенные bounds каждого segment capsule; объединение potential/guaranteed masks остаётся union по сегментам.
-- [x] Сохранить прежнюю геометрическую семантику и global `bounds` в API.
-- [x] Добавить regression test сравнения с медленным global-AABB reference на winding polyline и test инвариантности при разбиении прямого сегмента коллинеарными вершинами.
-- [ ] Получить полный CI для новых code/test commits: [41848358502](https://github.com/Kiddos19882/AutoDraw/actions/runs/41848358502), HEAD `6afdefc7ff2f18db544e55572ed918841d448164`; ожидается.
+| Сценарий | Candidate slots reduction | Geometry predicate calls reduction | Median speedup |
+|---|---:|---:|---:|
+| Winding polyline | 91.09% | 89.30% | 10.91× |
+| Large zigzag | 96.23% | 94.08% | 20.57× |
+| Diagonal turns | 59.53% | 58.95% | 2.76× |
+| Compact many-segment | 92.24% | 92.09% | 14.10× |
+| Single long segment | 0% | 0% | 1.16× |
 
-**Ожидаемый эффект:** уменьшение числа проверяемых raster cells для ломаных, у которых global AABB велик относительно локальных bounds отдельных сегментов. Это структурное сокращение области перебора; фактическое ускорение пока не измерено и требует отдельного benchmark. Geometry output equivalence проверяется regression reference; runtime renderer equivalence и planner integration не заявляются.
+**Вывод:** per-segment broad phase полезен для winding/zigzag полилиний с большим global AABB. Выигрыш зависит от геометрии; при одном сегменте candidate count и predicate count не уменьшаются. Wall-clock значения специфичны для CI runner и не переносятся напрямую на пользовательскую среду.
+
+**Ограничения и следующий gate:** модель остаётся ideal round-capsule offline candidate. Не подтверждены deployed Egret runtime, фактические caps/joins, popup global transform и screen/canvas mapping. Не выполнены frozen renderer PNG comparison, planner integration и live capture. Не менять production planner/defaults и FILL-001-RS frozen gates до отдельного acceptance. Это не измерение CHALK и не доказательство renderer equivalence.
