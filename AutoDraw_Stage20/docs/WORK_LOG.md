@@ -2663,3 +2663,17 @@ No production code, frozen plan, mask, thresholds or live game state changed. No
 Bridge JS уже формирует frame_probe intervals между началом и концом штриха. Следующая задача — проверить, что intervals сохраняются/доступны в Bridge run evidence, затем сопоставить с per-stroke CHALK. Номинальные 48 FPS не считать фактической частотой кадров конкретного запуска.
 
 Не установлены: renderer caps/joints defaults, реальная rasterization нулевого сегмента, popup board transform и screen-space brush footprint. Статический уровень E1; runtime/live capture не выполнялись. Production code, tests, configs, frozen plan, thresholds и raw evidence не менялись.
+
+
+## 2026-11-04 — FILL-001-RS: per-stroke point cadence и Bridge telemetry
+
+Прочитан сохранённый Bridge run 6a17a297 (JSON 4 655 454 bytes): 27 strokes, 1260 POINT_QUOTA_UPDATE events, exact CHALK=1260. По каждому stroke вычислены duration, pointCount delta и интервалы между событиями. Диапазон 41–48 точек/штрих, duration 1450–1645 ms, median update interval 33 ms, cadence 28.26–29.50 points/s. Первые 9 strokes в среднем 28.734 points/s, последние 9 — 29.049; явного падения cadence при росте pointCount до 1261 не видно в этом run.
+
+Run-level frame_probe: 2579 browser requestAnimationFrame intervals, average 59.997 FPS, median 60.024 FPS, 27 probes. Это не прямое измерение Egret ENTER_FRAME. Старый finalizer агрегировал raw intervals и очищал frame_probes; исходная per-stroke rAF серия для этого run потеряна, но cadence принятых точек восстановлена из сохранённых POINT_QUOTA_UPDATE timestamps.
+
+Изменения телеметрии:
+- 02907aca — browser frame_probe включает strokeId;
+- ec2ed77 — Bridge Server сохраняет raw intervals, формирует frame_probe_by_stroke и per_stroke_metrics;
+- ead8808 и 730590d — regression test для per-stroke timing и точного 60-Hz fixture.
+
+CI 41840281018 для HEAD 730590d на момент записи выполняется; результаты не объявляются PASS. Новых live runs не было. Frozen plans, masks, thresholds, production defaults и raw capture evidence не менялись.
