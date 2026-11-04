@@ -5,6 +5,7 @@
 - Runtime binding PASS: выбран run `6a17a297-ea14-4527-9527-bfd8de3bd335`, session `bb261898-8296-41f5-a333-eb0b81016410`, 27/27 strokes, observed radius=10, exact pointCount 1→1261, CHALK=1260; sampled point delta совпадает с CHALK, dropped events/Monitor errors/Bridge send failures/sequence gaps — 0.
 - Corrected audit улучшил прежние 97.673218% / 28 до 98.430600% / 11, но оба неизменённых gate conditions всё ещё нарушены (coverage≥99%, leakage=0). Capture остаётся REJECTED/PENDING, 45-task matrix BLOCKED.
 - SHA-256 исходных PNG и всех входных JSON сохранены в [CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md](CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md).
+- Дополнительно разрешено расхождение `source_plan_file_sha256`: hash committed runtime plan с LF отличается от runtime report, но hash того же текста с CRLF точно совпадает с `644cbf85a44481a5ecbe0fb2d88383dd1b13835c443dc240c0aa5700b4a8565f`. Это подтверждает line-ending normalization; содержательного mismatch plan file не обнаружено.
 - Остаточная причина не установлена. Следующий шаг — offline coordinate breakdown uncovered/leakage pixels и диагностические overlays на той же паре PNG. Live запуск и изменения production-кода не выполнялись.
 
 ## 2026-11-04 — FILL-001-RS runtime discovery replay и live PNG rejection
