@@ -6,8 +6,8 @@ Offline pixel localization завершена: исходный capture fill001-
 
 **Порядок следующего increment:**
 1. Извлечь per-stroke Bridge frame_probe intervals и связать с pointCount deltas / Executor step-delay.
-2. Проверить display transform интерактивного painter popup BoardPane, отдельно от BoardPane внутри BlackBoardItem.
-3. Подтвердить caps/joints и rasterization короткого/нулевого сегмента; если исходник Egret runtime недоступен — controlled PNG calibration, без изменения frozen preflight.
+2. Измерить global/display transform интерактивного painter popup BoardPane; локальный scale не задаётся, но родительский/CSS/devicePixelRatio transform не установлен.
+3. Установить фактически подключённую версию Egret runtime. Egret 5.2.18 API указывает ROUND caps/joins по умолчанию, однако это ещё не подтверждено для deployed runtime. Проверить zero-length path rasterization отдельным controlled PNG capture.
 4. Построить независимую versioned модель footprint и perimeter/endpoint candidates; проверить coverage≥99%, leakage=0.
 5. Только после offline gate выполнить отдельный live preflight; 45-task matrix открывать лишь после его принятия.
 
@@ -422,3 +422,6 @@ Offline повторение planner model локализовало её 304 unc
 5. Unlock the 45-experiment matrix only after successful preflight acceptance.
 
 Current evidence does not justify changing scanline row spacing: diagnostic reports 0 residual pixels in interior/other, while edge zones contain all 1116.
+
+
+**Дополнение 2026-11-04:** сохранённый run показал accepted-point cadence около 29 updates/s при browser requestAnimationFrame около 60 FPS. Browser probe и игровые point updates теперь разделяются в Bridge schema. Egret bundle задаёт nominal stage.frameRate=48; фактическая частота принятия координат в run ниже и должна измеряться per-stroke.
