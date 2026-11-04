@@ -77,11 +77,11 @@
 
 ## Ближайший рабочий приоритет
 
-1. Software gate для binder fix и regression tests подтверждён: GitHub Actions [41737923777](https://github.com/Kiddos19882/AutoDraw/actions/runs/41737923777) — все обязательные jobs SUCCESS; portable artifact ID `13280731107` доступен.
-2. Подготовить восстановленную/свежую доску с полной доступной CHALK quota; предыдущая доска исчерпана.
-3. Провести ровно один Windows live preflight `rectangle / radius 10 / repeat 1`; проверить task ↔ DrawingPlan ↔ executor report ↔ Bridge session/run binding, exact per-run/per-stroke CHALK и фактический P1.
-4. Проверить реальные before/after PNG в calibrated ROI: frozen-mask alignment, coverage ≥99%, leakage=0, RGB threshold и cursor/UI exclusion.
-5. Только после принятия preflight разрешать 45-cell matrix. Production estimator/defaults не менять.
+1. Подтвердить новый FILL-001-RS GitHub Actions workflow на code HEAD: preparation regressions, exhaustive 2 238-candidate sweep artifact, остальные required jobs и Windows portable build/startup smoke-test.
+2. На локальной Windows машине создать новый fill001-rs manifest командой source/preparation/create_fill001_rs_manifest.py и открыть его во вкладке FILL-001.
+3. На восстановленной доске с полной квотой выполнить только rectangle / radius=10 / scanline_row_step=5 / offset=0 / repeat=1.
+4. Проверить task↔DrawingPlan↔executor report↔Bridge session/run binding, exact pre/post pointCount и PNG audit на calibrated ROI (coverage≥99%, leakage=0).
+5. Только после принятия preflight решать вопрос о новой 45-task RS matrix. Production estimator/defaults не менять.
 
 ## Разрешения и границы
 
