@@ -91,10 +91,15 @@ def analyze_run(run: dict[str, Any]) -> dict[str, Any]:
         grouped[stroke_id].append((t, x, y))
 
     all_segments: list[float] = []
+    all_time_intervals: list[float] = []
     final_segments: list[float] = []
     per_stroke: list[dict[str, Any]] = []
     for stroke_id, raw_stroke_points in grouped.items():
         points = sorted(raw_stroke_points, key=lambda item: item[0])
+        time_intervals = [b[0] - a[0] for a, b in zip(points, points[1:])]
+        if any(interval < 0 for interval in time_intervals):
+            raise ValueError(f"Stroke {stroke_id} has decreasing point timestamps.")
+        all_time_intervals.extend(time_intervals)
         segments = [
             math.hypot(b[1] - a[1], b[2] - a[2])
             for a, b in zip(points, points[1:])
@@ -129,6 +134,7 @@ def analyze_run(run: dict[str, Any]) -> dict[str, Any]:
             "ideal_round_cap_margin_to_last_sample": cap_margin,
             "ideal_round_cap_covers_last_sample_center": cap_covers_last_sample,
             "ideal_geometric_gap_to_last_sample_center": estimated_gap,
+            "accepted_point_time_intervals_ms": _distance_summary(time_intervals),
         })
 
     draw_samples = [
@@ -165,6 +171,12 @@ def analyze_run(run: dict[str, Any]) -> dict[str, Any]:
     segment_summary["over_line_width"] = sum(
         1 for distance in all_segments if distance > line_width
     )
+    time_summary = _distance_summary(all_time_intervals)
+    time_median = time_summary["median"]
+    time_summary["median_interval_equivalent_hz"] = (
+        1000.0 / time_median if time_median is not None and time_median > 0 else None
+    )
+    time_summary["over_40ms"] = sum(1 for interval in all_time_intervals if interval > 40)
     final_summary = _distance_summary(final_segments)
     final_summary["over_line_width"] = sum(
         1 for distance in final_segments if distance > line_width
@@ -192,6 +204,7 @@ def analyze_run(run: dict[str, Any]) -> dict[str, Any]:
         "point_quota_update_count": quota_updates,
         "accepted_point_coordinates_complete_for_observed_deltas": coordinate_capture_complete,
         "within_stroke_segment_lengths": segment_summary,
+        "accepted_point_time_intervals_ms": time_summary,
         "last_segment_per_stroke": final_summary,
         "ideal_round_cap_covers_last_accepted_sample_centers": final_cap_covered,
         "last_sample_center_coverage_evaluable_strokes": final_cap_evaluable,
