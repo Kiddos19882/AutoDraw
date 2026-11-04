@@ -1,3 +1,9 @@
+## 2026-11-04 — подтверждены WebGL texture sampling defaults
+
+- Статическая трассировка `mergeEngine_df2e5bc5.js`: `WebGLRenderContext.createTexture()` делегирует `sys.createTexture()`, где выставляются `TEXTURE_MIN_FILTER=LINEAR`, `TEXTURE_MAG_FILTER=LINEAR`, `TEXTURE_WRAP_S/T=CLAMP_TO_EDGE` и `UNPACK_PREMULTIPLY_ALPHA_WEBGL=1`.
+- `WebGLRenderer.renderGraphics()` передаёт CanvasRenderBuffer texture в `drawTexture()` без явного smoothing override; для этого пути действуют LINEAR texture defaults.
+- Harness уже использует `CanvasRenderingContext2D.imageSmoothingEnabled=true`, что соответствует линейной фильтрации концептуально, но не является pixel-equivalent WebGL implementation. Subpixel transform, premultiplied-alpha edge behavior и mask stencil всё ещё требуют PNG comparison.
+
 ## 2026-11-04 — добавлен offline Egret CanvasRenderer reference harness
 
 - Созданы `tests/game_renderer_reference.html`, `tests/game_renderer_reference.js`, `tests/game_renderer_reference.test.js`.
