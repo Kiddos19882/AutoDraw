@@ -7,7 +7,7 @@
 
 - Game Monitor version поднят до 0.2.2.
 - Добавлен opt-in `MOUSE_MOVE_SAMPLE` (выключен по умолчанию, включается через `setInputTelemetryEnabled(true)`): DOM mousemove, доставленный canvas во время активного штриха; сохраняются DOM/Monitor timestamps, client/page/screen/movement coordinates, buttons, stage mouse coordinates и BoardPane-local coordinates.
-- `POINT_QUOTA_UPDATE` при положительной точной pointDelta включает acceptedPoint и stage/local coordinates после `updateLess()`.
+- `POINT_QUOTA_UPDATE` при положительной точной pointDelta включает acceptedPoint; stage/local coordinates добавляются только при включённой input telemetry.
 - Browser Bridge и Python collector allowlists обновлены; добавлены regression tests.
 - Статическая трассировка Egret 5.4.1 подтверждает округление координат `Math.round()`, suppression повторных stage coordinates и throttle `ENTER_FRAME` через stage.frameRate. Это конкретный механизм, способный объяснить вариативность одинаковых геометрических траекторий, но для подтверждения нужны повторные live captures.
 - Ограничение: Monitor видит DOM-delivered mousemove, а не каждый OS/PyAutoGUI call до browser dispatch. `frame_probe` остаётся browser rAF, не Egret ENTER_FRAME.
