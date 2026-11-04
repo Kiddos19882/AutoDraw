@@ -1,8 +1,12 @@
-## Дополнение — capsule model per-segment broad-phase (2026-11-04)
+## Дополнение — capsule model per-segment broad-phase и benchmark (2026-11-04)
 
-В `swept_capsule_pixel_masks()` добавлен per-segment raster candidate enumeration вместо проверки каждого segment для каждой клетки общего polyline AABB. API global bounds и union semantics potential/guaranteed masks сохранены. Добавлены regression tests на winding polyline против global-AABB reference и инвариантность коллинеарного subdivision.
+В `swept_capsule_pixel_masks()` сохранена union-семантика potential/guaranteed masks, но candidate enumeration выполняется в расширенном AABB каждого сегмента, а не во всём global polyline AABB. Добавлены независимый full-canvas geometry oracle (ориентационный тест пересечения сегментов с прямоугольником и собственная point-segment distance реализация), seven parametrized edge cases и 16 воспроизводимых seeded polylines.
 
-Изменение находится в offline geometry model; фактическое ускорение не измерено, planner integration отсутствует, deployed Egret renderer не валидирован. CI для новых commits ожидается; live run не проводился.
+Offline benchmark сравнил global-AABB reference и per-segment реализацию на пяти типах полилиний, по 7 timing repeats. Во всех случаях masks совпали. Candidate slots уменьшились на 91.09% для winding, 96.23% для large zigzag, 59.53% для diagonal turns и 92.24% для compact polyline; для single segment сокращения нет. Медианное wall-clock ускорение в Windows GitHub runner: 10.91×, 20.57×, 2.76×, 14.10× и 1.16× соответственно. Это результаты пяти synthetic scenarios, не универсальная гарантия.
+
+Полный CI [41859709320](https://github.com/Kiddos19882/AutoDraw/actions/runs/41859709320) на HEAD `af30b5fdf1c926d3493bff90706806f5d3a28c43` — SUCCESS: Preparation/G3 832 passed, 24 warnings, 82 subtests; Game Monitor/Bridge, Executor, Application integration, INT-006 PNG audit и Windows portable build/startup smoke-test — SUCCESS; optional algorithm benchmarks — SKIPPED. Capsule benchmark artifact: `13338434277`; FILL-001-RS static sweep artifact: `13338359373`.
+
+Модель остаётся offline ideal-geometry candidate. Deployed Egret renderer/transform не подтверждены; planner integration и live capture не выполнялись. Benchmark не измеряет игровой CHALK и не доказывает renderer equivalence.
 
 ---
 
