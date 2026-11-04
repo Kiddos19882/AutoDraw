@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-11-04 — runtime renderer snapshot и уточнение WebGL raster path
+
+- Сохранён пользовательский runtime snapshot в `data/runtime/renderer_snapshot_2026-11-04.json`.
+- Подтверждён активный WebGL backend Egret 5.4.1 и восстановлена stage→client геометрия для текущей сессии; прямой `getBoxQuads()` evidence отсутствует, client corners помечены как derived.
+- Статический audit bundle установил, что WebGLRenderer растеризует GraphicsNode через CanvasRenderer и затем загружает canvas texture в WebGL; round caps/joins defaults подтверждены.
+- Уточнено, что UI `radius` передаётся как line width, а не математический радиус. Pixel equivalence и exact footprint остаются открытыми.
+
+
 ## 2026-11-04 — Game Monitor renderer/transform diagnostics
 
 - Добавлены `rendererSnapshot()` и расширенный read-only `inspect()` для фактического Egret backend, canvas scale/DPR, viewport, canvas CSS geometry, BoardPane parent transforms, mask и stage/client corners.
