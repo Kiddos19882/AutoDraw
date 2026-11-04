@@ -102,9 +102,9 @@ try {
 
     $pngPattern = '<a(?=[^>]*href="data:image/png;base64,([^"]+)")(?=[^>]*download="([^"]+)")[^>]*>'
     $pngMatches = [regex]::Matches($dom, $pngPattern)
-    if ($pngMatches.Count -ne 37) {
+    if ($pngMatches.Count -ne 54) {
         Save-FailureDiagnostics
-        throw "Expected 37 PNG download links (36 fixture PNGs + 1 WebGL probe), found $($pngMatches.Count)."
+        throw "Expected 54 PNG download links (36 CanvasRenderer PNGs + 18 WebGL PNGs), found $($pngMatches.Count)."
     }
 
     foreach ($match in $pngMatches) {
@@ -113,12 +113,12 @@ try {
         [System.IO.File]::WriteAllBytes((Join-Path $outputDir $pngName), $pngBytes)
     }
 
-    if ($manifest.webglProbe.status -ne "complete") {
+    if ($manifest.webglProbe.status -ne "complete" -or $manifest.webglProbe.comparisonCount -ne 18) {
         Save-FailureDiagnostics
-        throw "WebGL probe did not complete."
+        throw "WebGL renderer did not complete all 18 fixture comparisons."
     }
 
-    Write-Host "Egret actual BoardPane CanvasRenderer + WebGLRenderer generated $($manifest.fixtures.Count) fixtures and $($pngMatches.Count) PNG files."
+    Write-Host "Egret actual BoardPane CanvasRenderer + WebGLRenderer generated $($manifest.fixtures.Count) fixtures, 18 WebGL comparisons and $($pngMatches.Count) PNG files."
 } finally {
     if ($server -and -not $server.HasExited) {
         Stop-Process -Id $server.Id -Force
