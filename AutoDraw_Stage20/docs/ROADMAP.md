@@ -6,7 +6,7 @@
 
 Exhaustive OpenCV sweep проверил 2 238 step/offset кандидатов; 62 прошли gate coverage ≥99% / leakage=0. Все 15 shape/radius cells получили frozen config. Реализованы planner version 2, отдельный 45-task RS manifest builder, single-task handoff, runtime context binding и генератор manifest. Полные результаты: [FILL-001-RS static sweep](CHALK_FILL001_RS_STATIC_SWEEP_2026-11-04.md). Это не live renderer evidence и не доказательство экономии CHALK.
 
-**Текущий порядок:** (1) подтвердить новый code/test HEAD полным CI, включая exhaustive sweep artifact; (2) создать `fill001-rs-*` manifest и выполнить один локальный Windows/browser live preflight `rectangle/r10/step=5/offset=0/repeat=1` на доске с полной квотой; (3) принять capture только после exact runtime binding и quantitative PNG audit; (4) затем отдельно решать вопрос новой 45-task matrix. Удалённый GitHub runner не имеет доступа к локальной игровой сессии/экрану, поэтому live preflight здесь не запускался. FILL-001 45-cell matrix остаётся BLOCKED; INT-006 safety margin не установлен; INT-007 остаётся BLOCKED.
+**Текущий порядок:** (1) локально создать `fill001-rs-*` manifest; (2) на восстановленной доске с полной квотой выполнить один Windows/browser live preflight `rectangle/r10/step=5/offset=0/repeat=1`; (3) принять capture только после exact runtime binding и quantitative PNG audit; (4) затем отдельно решать вопрос новой 45-task matrix. Удалённый GitHub runner не имеет доступа к локальной игровой сессии/экрану, поэтому live preflight здесь не запускался. FILL-001 45-cell matrix остаётся BLOCKED; INT-006 safety margin не установлен; INT-007 остаётся BLOCKED.
 
 ## FILL-001-RS — исследование расстояния между проходами
 
