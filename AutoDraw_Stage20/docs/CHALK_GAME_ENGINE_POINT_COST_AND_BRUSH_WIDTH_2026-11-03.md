@@ -54,9 +54,9 @@ FILL-001 должен проверять не «сколько CHALK стоит 
 
 ## 6. Состояние Git
 
-- `main.min_570122a1.js` присутствует в `master`, но отсутствует в `feature/image-geometry-optimization`.
-- `AutoDraw_Stage20/testImages/images.png` присутствует в обеих ветках с одинаковым blob SHA `fc9c984d15e9dda7d6511b01b5a88ca52ba2380f`; повторный перенос не требуется.
-- Ветки diverged; merge/rebase не выполнялся. Engine bundle не копировался в feature branch.
+- **Историческое состояние на момент исходного аудита:** `main.min_570122a1.js` присутствовал в `master`, но отсутствовал в `feature/image-geometry-optimization`; engine bundle ещё не был скопирован в рабочую ветку.
+- `AutoDraw_Stage20/testImages/images.png` присутствовал в обеих ветках с одинаковым blob SHA `fc9c984d15e9dda7d6511b01b5a88ca52ba2380f`; повторный перенос не требовался.
+- Последующее изменение состояния зафиксировано в разделе 9: commit `d3322fe` добавил отдельные engine assets в feature branch. Это не изменяет исторический факт, описанный выше.
 
 
 ## 7. Повторный разбор исходного bundle — 2026-11-04
@@ -240,3 +240,18 @@ brush_footprint_geometry.footprint_pixel_bounds() возвращает прям�
 - **Не подтверждено:** содержимое этих ресурсов, SHA-256, Egret runtime version, Canvas/WebGL path и связь исторических assets с текущей игрой.
 - **Не делать:** не объявлять 5.2.18 runtime фактом; не копировать upstream renderer и не принимать capsule mask как pixel-identical.
 - **Нужное evidence:** получить response bodies `manifest.json`, `mergeEngine_df2e5bc5.js`, `main.min_6ecc02a4.js` из браузерного cache/DevTools Network (без авторизационных cookies/tokens), записать SHA-256 и сравнить symbols/implementation. Если assets уже обновились, зафиксировать новый набор в одном session capture. Live drawing не требуется для самого чтения статических файлов; любые игровые испытания остаются под отдельным разрешением.
+
+
+## 9. Копия игровых engine assets в feature branch — 2026-11-04
+
+Commit [d3322fe35c808bde079c79545cc839636b7cda2a](https://github.com/Kiddos19882/AutoDraw/commit/d3322fe35c808bde079c79545cc839636b7cda2a) добавил каталог `AutoDraw_Stage20/gameEngine/` (п):
+
+| Файл | Git blob SHA |
+|---|---|
+| `main.min_653f95bc.js` (ф) | `46cc74de00b6cb5d207b1e1a2ffcd81613b6d388` |
+| `mergeEngine_df2e5bc5.js` (ф) | `d613d2b97e2436521aa3870478c69e99eac1f19f` |
+| `manifest.json` (ф) | `0aea9b5c89eef7e4cd9552f9d1302eed29bcc28e` |
+
+Манифест указывает runtime paths `js/mergeEngine_df2e5bc5.js` и `js/main.min_653f95bc.js`. В репозитории файлы лежат непосредственно в `gameEngine/`, а не в `gameEngine/js/`.
+
+Наличие этих файлов позволяет анализировать новую копию игровых bundles в feature branch. Пока не установлено, что она байт-в-байт совпадает с историческими assets из Game Monitor captures или с ранее прочитанным `master:fileGameEngine/main.min_570122a1.js`. Имя merge bundle совпадает с историческим URL, но это не заменяет hash comparison; имя основного bundle отличается. Поэтому deployed Egret/runtime identity остаётся UNKNOWN до статического сравнения содержимого и подтверждения источника.
