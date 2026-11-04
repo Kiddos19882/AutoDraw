@@ -833,3 +833,11 @@
 ## 2026-11-04
 
 - Зафиксирована блокирующая задача FILL-001-RS-PRE-REPLAY-001: replay неизменённых исходных live PNG/evidence через исправленный PNG audit обязателен до следующего live запуска FILL-001-RS. Установлены критерии закрытия, сохранение hashes/raw evidence и запрет на ослабление PNG thresholds. 45-task matrix остаётся заблокированной.
+
+## 2026-11-04 — FILL-001-RS offline edge diagnosis and contour candidate
+
+- Зафиксировано offline OpenCV model breakdown: 304 uncovered target pixels planner model распределены по краевым полосам (80 top, 80 bottom, 72 left, 72 right; interior=0), leakage=0.
+- Добавлен exploratory sweep одного contour pass поверх scanline fill: inward offsets 6–8 px проходят модельные coverage≥99% / leakage=0; offset 5 px имеет 32 leakage pixels.
+- Actual PNG residual pixel coordinates остаются неразобранными; capture по-прежнему REJECTED. Contour pass не реализован и не live-validated; CHALK не прогнозировался.
+- Только документация; исходники, тесты, настройки, frozen plan, thresholds и production defaults не изменялись.
+
