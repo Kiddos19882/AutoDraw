@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-11-04 — offline Egret CanvasRenderer reference harness
+
+- Добавлены browser page, JS renderer harness и Node tests path semantics; создаются 18 source/masked fixtures при lineWidth 10/30.
+- Workflow запускает syntax check и Node tests; browser execution и WebGL pixel equivalence пока не подтверждены.
+
+
 ## 2026-11-04 — offline endpoint analysis на реальном FILL-001 capture
 
 - Для run `6a17a297-ea14-4527-9527-bfd8de3bd335` разобраны 1260 accepted points / 27 штрихов. Все 1260 positive DRAW_SAMPLE имеют pointDelta=1; coalesced deltas отсутствуют.
