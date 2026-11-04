@@ -1,26 +1,31 @@
-## BLOCKER: FILL-001-RS — replay исходного live preflight до возобновления запуска
+## BLOCKER: FILL-001-RS — остаточное PNG несоответствие после replay
 
 **ID:** FILL-001-RS-PRE-REPLAY-001  
-**Статус:** IN PROGRESS — обязательный незавершённый gate  
-**Приоритет:** BLOCKER для любого следующего live запуска FILL-001-RS и для 45-task matrix  
-**Условие закрытия:** завершён replay исходных неизменённых before/after PNG и связанных evidence исходного запуска `fill001-rs-preflight-20261104-7.04` через актуальный PNG audit; результат, hashes и все gates проверены и записаны; принято обоснованное решение о статусе capture.
+**Статус:** IN PROGRESS / BLOCKER — replay выполнен, capture REJECTED, локализация остаточного расхождения открыта  
+**Приоритет:** блокирует любой следующий live запуск FILL-001-RS и 45-task matrix  
+**Условие закрытия:** исходные evidence повторно проверены исправленным audit; hashes и runtime binding записаны; остаточные uncovered/leakage pixels локализованы и причина подтверждена либо строго ограничена доказательствами; принято решение по capture. Следующий live preflight требует отдельного разрешения.
 
-### Обязательная последовательность
+### Фактический результат replay — 2026-11-04
 
-1. Найти и получить исходные before/after PNG, manifest, executor report, Bridge/Monitor evidence и metadata именно запуска `fill001-rs-preflight-20261104-7.04`. Не подменять их синтетическими fixtures или PNG другого запуска.
-2. Сверить принадлежность всех файлов одному task/run/session, plan signature, executor window и исходным значениям pointCount. Исходные файлы не изменять.
-3. Выполнить повторный audit этими PNG через актуальный `chalk_fill_capture_adapter.py` с согласованным executor affine transform.
-4. Сохранить отдельный replay report с SHA-256 входов, версией/commit analyzer, coverage, leakage, результатами binding и причинами отказа.
-5. При coverage ≥99%, leakage=0 и прохождении всех остальных неизменённых gates — пересмотреть принятие исходного capture по установленному контракту. При любом отказе — локализовать конкретную причину, не ослабляя thresholds и не переписывая raw evidence.
-6. Только после закрытия replay gate отдельно определить и разрешить следующий одиночный Windows live preflight. 45-task matrix не запускать автоматически.
+- Исходные PNG и связанные evidence подтверждены в commit [5308214](https://github.com/Kiddos19882/AutoDraw/commit/530821497ce3a6bd5152318a78e1f06cb836f288).
+- Replay выполнен тестом `test_chalk_fill_committed_capture_replay.py` через реальный `Fill001Tab.finalize_capture()`; подтверждающий CI — [41780241017](https://github.com/Kiddos19882/AutoDraw/actions/runs/41780241017), checkout HEAD `0f23731848f0c148fe5e1309d1e305576dd4b6b7`.
+- Runtime binding PASS: task/session/run связаны с run `6a17a297-ea14-4527-9527-bfd8de3bd335`; 27/27 strokes, radius=10, exact pointCount 1→1261, CHALK=1260; sample delta совпадает с CHALK; dropped events, Monitor errors, Bridge send failures и sequence gaps — 0.
+- Исправленный PNG audit: **coverage=98.430600%, leakage=11**. Критерии остаются coverage≥99% и leakage=0; audit status=failed. Предыдущие 97.673218%/28 относятся к audit до affine correction.
+- Полный replay report и SHA-256 всех входов: [CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md](CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md).
 
-**Не входит в задачу:** изменение production-кода/defaults, frozen masks, исходного manifest/plan, acceptance thresholds, запуск игры или новая live-серия в рамках replay. Никакие live-действия не выполнять без отдельного разрешения пользователя.
+### Следующие действия
 
-**Известные исходные факты:** исходный запуск выполнил 27/27 strokes; pointCount 1→1261, exact CHALK=1260; Bridge diagnostics — 0 sequence gaps, 0 dropped events, 0 Monitor errors, 0 send failures. Исходный PNG audit отклонил capture: coverage=97.673218%, leakage=28 при критериях coverage≥99%, leakage=0. Эти результаты не заменяют replay.
+1. [x] Найти и связать исходные before/after PNG, manifest, executor report, plan, Bridge session и run records.
+2. [x] Проверить task/run/session binding, executor completion, radius, pointCount и per-sample CHALK.
+3. [x] Выполнить replay исправленным `chalk_fill_capture_adapter.py` на исходных PNG.
+4. [x] Зафиксировать SHA-256 входов, code/test revision и audit result.
+5. [ ] Локализовать 11 leakage pixels и недостающую область покрытия по координатам/границам/штрихам; сохранить диагностические overlays и breakdown.
+6. [ ] После диагностики принять решение о capture. Не ослаблять thresholds и не переписывать raw evidence.
 
-**Зависимости/ограничение:** commit `530821497ce3a6bd5152318a78e1f06cb836f288` ранее был обозначен как возможный источник evidence, но состав файлов и доступность бинарных PNG ещё не подтверждены. До получения реальных исходных PNG replay не считается выполненным.
+**Ограничения:** не менять production-код/defaults, frozen masks, исходные plans/manifest или thresholds; не запускать игру и 45-task matrix. Новый live preflight возможен только после закрытия offline gate и отдельного разрешения пользователя.
 
 ---
+
 
 # Реестр задач AutoDraw
 
@@ -49,7 +54,8 @@
 - [x] Исправить блокировку runtime discovery устаревшей legacy Bridge session без schema v2/diagnostics — commit [a7e37d6](https://github.com/Kiddos19882/AutoDraw/commit/a7e37d6eb0031094ffd962bc11ef01860a3af74a).
 - [x] Добавить replay реальных данных через `Fill001Tab.finalize_capture()`, включая legacy session, manifest, executor report, Bridge run records и PNG — commit [974f949](https://github.com/Kiddos19882/AutoDraw/commit/974f949e9639acc90e7f4d6f4588c3fb96f9abb2).
 - [x] Подтвердить, что runtime binding проходит и связывает run `6a17a297-ea14-4527-9527-bfd8de3bd335` с executor; exact CHALK=1260.
-- [ ] Исправить фактическое несоответствие PNG: coverage=97.673218% (требуется ≥99%), leakage=28 (требуется 0). Capture остаётся pending; не принимать и не запускать 45-task matrix до прохождения gate.
+- [x] Повторно выполнить corrected PNG audit на исходных PNG в CI run [41780241017](https://github.com/Kiddos19882/AutoDraw/actions/runs/41780241017): coverage=98.430600%, leakage=11; capture REJECTED.
+- [ ] Локализовать остаточные uncovered/leakage pixels; thresholds ≥99% / 0 не менять. Capture и 45-task matrix остаются BLOCKED.
 - [x] Полный CI [41772866679](https://github.com/Kiddos19882/AutoDraw/actions/runs/41772866679) — SUCCESS: Preparation/G3 804 passed, 24 warnings, 82 subtests; остальные обязательные jobs, INT-006 audit и Windows portable build/startup smoke-test — SUCCESS; optional benchmarks skipped.
 
 
