@@ -180,6 +180,8 @@ def swept_capsule_pixel_masks(
         raise ValueError("width must be a positive integer.")
     if isinstance(height, bool) or not isinstance(height, int) or height <= 0:
         raise ValueError("height must be a positive integer.")
+    if isinstance(scale_x, bool) or isinstance(scale_y, bool):
+        raise ValueError("Axis scales must be finite positive numbers.")
     try:
         sx, sy = float(scale_x), float(scale_y)
     except (TypeError, ValueError) as exc:
@@ -262,11 +264,11 @@ def swept_capsule_pixel_masks(
                 minimum_distance = _segment_rectangle_distance_squared(
                     start, end, cell_left, cell_top, cell_right, cell_bottom
                 )
-                if minimum_distance < radius_squared - tolerance:
+                if minimum_distance < radius_squared:
                     may_be_painted = True
                 if all(
                     _point_segment_distance_squared(corner, start, end)
-                    <= radius_squared + tolerance
+                    <= radius_squared - tolerance
                     for corner in corners
                 ):
                     fully_inside_one_capsule = True
