@@ -6,7 +6,9 @@
 **Source/test HEAD:** f6df3f9f6d513efd44c093aae17c2c70c05e03ac  
 **Input sampling analyzer:** реализован; offline trace report доступен через source/preparation/game_input_sampling_analysis.py.  
 **Paired renderer replay:** tests/game_renderer_reference.html принимает Game Monitor run JSON, извлекает acceptedPoint одного strokeId и рендерит ту же геометрию через actual BoardPane/Egret CanvasRenderer/WebGLRenderer. Fail-closed guards проверяют полную последовательность точек.  
-**CI на предыдущем HEAD:** run 41929641436 — SUCCESS; все обязательные jobs прошли, optional algorithm benchmarks SKIPPED.
+**Implementation commits:** 94b62bd (accepted-point replay), f9fcdbf (UI wiring), f6df3f9 (single-stroke fail-closed validation).  
+**Full CI:** run [41933396072](https://github.com/Kiddos19882/AutoDraw/actions/runs/41933396072) на source/test HEAD f6df3f9 — SUCCESS; все обязательные jobs прошли, optional algorithm benchmarks SKIPPED.  
+**Browser artifact:** autodraw-egret-renderer-reference, ID 13371659297, 763,022 bytes; 20 fixtures, 20 WebGL comparisons, 60 PNG.
 
 **Оставшийся блокер:** пользовательский live capture. Нужны Game Monitor run JSON, Bridge session JSON, runtime renderer snapshot, точные pointCount before/after и final board PNG одной сессии. Только пользователь может выполнить этот шаг в реальной игре. До получения capture pixel equivalence с live game не подтверждена.
 
