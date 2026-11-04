@@ -50,45 +50,62 @@ def _global_aabb_reference(points, brush, sx, sy, width, height):
     bounds = _bounds(points, brush, sx, sy, width, height)
     potential: set[tuple[int, int]] = set()
     guaranteed: set[tuple[int, int]] = set()
-    counters = {"segment_cell_visits": 0, "potential_distance_calls": 0, "guaranteed_corner_distance_calls": 0}
+    counters = {
+        "segment_cell_visits": 0,
+        "segment_rectangle_distance_calls": 0,
+        "point_segment_distance_calls": 0,
+    }
     if bounds is None:
         return {"potential_cells": potential, "guaranteed_cells": guaranteed}, counters
 
-    left, right, top, bottom = bounds
-    radius_squared = (brush / 2.0) ** 2
-    tolerance = 1e-12 * max(1.0, radius_squared)
-    segments = list(zip(points, points[1:])) or [(points[0], points[0])]
+    original_rectangle_distance = geometry._segment_rectangle_distance_squared
+    original_point_distance = geometry._point_segment_distance_squared
 
-    for py in range(top, bottom + 1):
-        cell_top, cell_bottom = (py - 0.5) / sy, (py + 0.5) / sy
-        for px in range(left, right + 1):
-            cell_left, cell_right = (px - 0.5) / sx, (px + 0.5) / sx
-            cell = (px, py)
-            corners = (
-                (cell_left, cell_top), (cell_right, cell_top),
-                (cell_left, cell_bottom), (cell_right, cell_bottom),
-            )
-            for start, end in segments:
-                if cell in potential and cell in guaranteed:
-                    break
-                counters["segment_cell_visits"] += 1
-                if cell not in potential:
-                    counters["potential_distance_calls"] += 1
-                    if geometry._segment_rectangle_distance_squared(
-                        start, end, cell_left, cell_top, cell_right, cell_bottom
-                    ) < radius_squared:
-                        potential.add(cell)
-                if cell not in guaranteed:
-                    wholly_inside = True
-                    for corner in corners:
-                        counters["guaranteed_corner_distance_calls"] += 1
-                        if geometry._point_segment_distance_squared(
-                            corner, start, end
-                        ) > radius_squared - tolerance:
-                            wholly_inside = False
-                            break
-                    if wholly_inside:
-                        guaranteed.add(cell)
+    def count_rectangle_distance(*args):
+        counters["segment_rectangle_distance_calls"] += 1
+        return original_rectangle_distance(*args)
+
+    def count_point_distance(*args):
+        counters["point_segment_distance_calls"] += 1
+        return original_point_distance(*args)
+
+    geometry._segment_rectangle_distance_squared = count_rectangle_distance
+    geometry._point_segment_distance_squared = count_point_distance
+    try:
+        left, right, top, bottom = bounds
+        radius_squared = (brush / 2.0) ** 2
+        tolerance = 1e-12 * max(1.0, radius_squared)
+        segments = list(zip(points, points[1:])) or [(points[0], points[0])]
+
+        for py in range(top, bottom + 1):
+            cell_top, cell_bottom = (py - 0.5) / sy, (py + 0.5) / sy
+            for px in range(left, right + 1):
+                cell_left, cell_right = (px - 0.5) / sx, (px + 0.5) / sx
+                cell = (px, py)
+                corners = (
+                    (cell_left, cell_top), (cell_right, cell_top),
+                    (cell_left, cell_bottom), (cell_right, cell_bottom),
+                )
+                for start, end in segments:
+                    if cell in potential and cell in guaranteed:
+                        break
+                    counters["segment_cell_visits"] += 1
+                    if cell not in potential:
+                        if geometry._segment_rectangle_distance_squared(
+                            start, end, cell_left, cell_top, cell_right, cell_bottom
+                        ) < radius_squared:
+                            potential.add(cell)
+                    if cell not in guaranteed:
+                        wholly_inside = all(
+                            geometry._point_segment_distance_squared(corner, start, end)
+                            <= radius_squared - tolerance
+                            for corner in corners
+                        )
+                        if wholly_inside:
+                            guaranteed.add(cell)
+    finally:
+        geometry._segment_rectangle_distance_squared = original_rectangle_distance
+        geometry._point_segment_distance_squared = original_point_distance
 
     return {"potential_cells": potential, "guaranteed_cells": guaranteed}, counters
 
@@ -96,14 +113,17 @@ def _global_aabb_reference(points, brush, sx, sy, width, height):
 def _optimized_instrumented(points, brush, sx, sy, width, height):
     original_potential = geometry._segment_rectangle_distance_squared
     original_guaranteed = geometry._point_segment_distance_squared
-    counters = {"potential_distance_calls": 0, "guaranteed_corner_distance_calls": 0}
+    counters = {
+        "segment_rectangle_distance_calls": 0,
+        "point_segment_distance_calls": 0,
+    }
 
     def count_potential(*args):
-        counters["potential_distance_calls"] += 1
+        counters["segment_rectangle_distance_calls"] += 1
         return original_potential(*args)
 
     def count_guaranteed(*args):
-        counters["guaranteed_corner_distance_calls"] += 1
+        counters["point_segment_distance_calls"] += 1
         return original_guaranteed(*args)
 
     geometry._segment_rectangle_distance_squared = count_potential
@@ -222,16 +242,16 @@ def _benchmark_case(case: dict[str, Any], repeats: int):
                 100.0 * (
                     1.0
                     - (
-                        optimized_counts["potential_distance_calls"]
-                        + optimized_counts["guaranteed_corner_distance_calls"]
+                        optimized_counts["segment_rectangle_distance_calls"]
+                        + optimized_counts["point_segment_distance_calls"]
                     )
                     / (
-                        reference_counts["potential_distance_calls"]
-                        + reference_counts["guaranteed_corner_distance_calls"]
+                        reference_counts["segment_rectangle_distance_calls"]
+                        + reference_counts["point_segment_distance_calls"]
                     )
                 )
-                if reference_counts["potential_distance_calls"]
-                + reference_counts["guaranteed_corner_distance_calls"] else 0.0
+                if reference_counts["segment_rectangle_distance_calls"]
+                + reference_counts["point_segment_distance_calls"] else 0.0
             ),
         },
         "timing_ms": {
