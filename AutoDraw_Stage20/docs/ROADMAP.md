@@ -3,6 +3,21 @@
 Offline replay исходных PNG и evidence запуска `fill001-rs-preflight-20261104-7.04` выполнен через исправленный `chalk_fill_capture_adapter.py` внутри `Fill001Tab.finalize_capture()`. Binding PASS; corrected audit дал coverage=98.430600%, leakage=11 и status=failed. SHA-256 и полный evidence mapping сохранены в [отчёте replay](CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md).
 
 - **Текущий шаг:** локализовать координаты 11 leakage pixels и uncovered target pixels на той же неизменённой PNG паре; определить остаточное расхождение между frozen mask и фактическим renderer footprint.
+
+## Дополнение — краевые промежутки и будущая контурная обводка (2026-11-04)
+
+При просмотре исходного `after.png` отмечен округлый профиль боковых краёв заливки. Пользовательская гипотеза: между круглыми окончаниями соседних scanline-проходов остаются незаполненные промежутки. В предпоследнем тесте, по наблюдению пользователя, следующая линия начиналась ниже и такого эффекта не было. Это направление offline-проверки, а не установленная причина.
+
+Проверить на неизменённых исходных данных:
+1. Разложить uncovered target pixels по боковым краям, верхней/нижней границам, углам и внутренней области.
+2. Сопоставить пропуски с координатами начала/конца линий, вертикальным шагом и фактической rasterized footprint/cap кисти.
+3. Отдельно локализовать 11 leakage pixels.
+4. Сопоставить с предпоследним тестом по первичным PNG/plan evidence, если они доступны.
+5. Не менять frozen masks, thresholds, исходный plan или production defaults.
+
+**Будущий кандидат:** после основной заливки выполнить одну непрерывную обводку контура, правильно сместив центральную линию внутрь области с учётом фактического renderer footprint, чтобы край кисти закрывал границу без выхода наружу. Это не реализовано и не подтверждено. До рассмотрения нужны offline geometry/raster validation, затем отдельное разрешение на live проверку; критерии — coverage≥99%, leakage=0 и exact CHALK по `pointCount_after - pointCount_before`. Длина контура и proxy points не заменяют измерение расхода.
+
+
 - До успешного повторного quality gate capture остаётся REJECTED/BLOCKED; live запуск не выполнять.
 - 45-task matrix остаётся BLOCKED до успешного принятого live preflight и отдельного разрешения на batch.
 - Не менять thresholds, frozen masks, исходный manifest, production defaults или production-код в рамках этой задачи.
