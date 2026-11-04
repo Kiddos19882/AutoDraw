@@ -2,7 +2,7 @@
 
 ## 2026-11-04 — Game Monitor 0.2.2: input sampling telemetry
 
-- Добавлено событие `MOUSE_MOVE_SAMPLE`: DOM mousemove после Egret canvas handler с DOM timestamp, client/page/screen coordinates, stage.mouseX/Y и BoardPane-local coordinates.
+- Добавлено opt-in событие `MOUSE_MOVE_SAMPLE` (выключено по умолчанию, `setInputTelemetryEnabled(true/false)`): DOM mousemove после Egret canvas handler с DOM timestamp, client/page/screen coordinates, stage.mouseX/Y и BoardPane-local coordinates.
 - `POINT_QUOTA_UPDATE` при положительной exact pointDelta теперь содержит acceptedPoint и stage/local coordinates, связывая точку с моментом обновления quota.
 - Browser Bridge и Python collector allowlists расширены; добавлены Node и Python regression tests.
 - Source trace зафиксировал цепочку WebTouchHandler page→stage mapping с Math.round(), TouchHandler duplicate suppression и SystemTicker frameRate throttle. Это обоснованный механизм вариативности повторных линий, но парные live captures ещё нужны для подтверждения.
