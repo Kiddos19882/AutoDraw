@@ -2731,3 +2731,11 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - Commits: `5a090948ecbe927807fde4ffc5337132d131b765` (implementation), `7ffdd150ba42840737cba5f2143370e56d67bed3` (tests).
 - CI run [41842587672](https://github.com/Kiddos19882/AutoDraw/actions/runs/41842587672) ещё выполняется. Independent analytic oracle и frozen fixture comparison пока не добавлены; модель не подтверждена deployed Egret runtime.
 - Live tests не проводились; raw evidence, frozen plans/masks, thresholds и production defaults не менялись.
+
+## 2026-11-04 — capsule mask candidate: first full CI and conservative-boundary follow-up
+
+- Full CI [41842587672](https://github.com/Kiddos19882/AutoDraw/actions/runs/41842587672) на test commit `7ffdd150` завершился SUCCESS: 820 passed, 24 warnings, 82 subtests; Game Monitor/Bridge, Executor, Application integration, Preparation/G3, INT-006 PNG audit и Windows portable build/startup smoke-test — SUCCESS; optional benchmarks SKIPPED.
+- FILL-001-RS static sweep в этом run: 2 238 candidates, 62 accepted, 15/15 selected cells passed; Windows portable artifact `13329303700`.
+- Последующий review уточнил строгую разницу между positive-area potential и guaranteed interior: убрано epsilon вычитание из potential predicate, гарантированное покрытие получило inward tolerance; boolean scales запрещены. Добавлен независимый analytic oracle для horizontal capsule.
+- Follow-up commits: `336d66f` (oracle), `8aeb66a` (conservative predicate fix), `7357f3e` (boolean scale test). CI [41843716918](https://github.com/Kiddos19882/AutoDraw/actions/runs/41843716918) на последнем commit ещё ожидает завершения.
+- Planner outputs/defaults не менялись; live experiments не проводились; FILL-001-RS quality gate не затронут.
