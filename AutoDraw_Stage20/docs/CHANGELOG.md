@@ -1,3 +1,11 @@
+## 2026-11-04 — FILL-001-RS — документирован этап исследования scanline spacing
+
+- В существующий временный FILL-001 plan добавлен отдельный этап исследования `scanline_row_step`, не смешиваемый с `point_step_px`.
+- Зафиксированы предварительные OpenCV-кандидаты для 15 shape×radius combinations и подробные r10/step=5 metrics для трёх frozen masks.
+- Обозначено, что step=5 — кандидат, а не принятая настройка; estimated sampling points/path length не являются измерением CHALK.
+- Определены обязательные versioned plan/signature и отдельный live preflight gate; FILL-001 45-cell matrix и INT-007 остаются BLOCKED.
+- Изменения только в Markdown-документации. Код, тесты, конфигурации, workflow, экспериментальные данные и `master` не изменялись.
+
 ## 2026-11-04 — FILL-001: полный runtime evidence и quota exhaustion
 
 - Добавлен пользовательский evidence commit [73d14a1](https://github.com/Kiddos19882/AutoDraw/commit/73d14a1784a5a9f8ef29bc0e197b75352f2650af): attempt, manifest, DrawingPlan, executor report, Bridge session, два run JSON и before/after PNG.
