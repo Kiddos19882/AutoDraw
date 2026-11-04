@@ -2,7 +2,7 @@
 
 ## Актуальный статус FILL-001 на 2026-11-04
 
-Binder fix committed `95a8d17`: Bridge activity window uses `started_at_utc` plus event performance-clock end (`max(events[].t) - started_at_performance_ms`); `finished_at_utc` is used only for finalization-grace validation. Regression tests committed `870bebc` cover calibration false-overlap and Bridge JSON >27 MiB. Полный CI [41737923777](https://github.com/Kiddos19882/AutoDraw/actions/runs/41737923777) завершился SUCCESS, включая Windows portable build/startup smoke-test; optional benchmarks skipped. Предыдущий live preflight остаётся rejected (session CHALK=5999; board quota exhausted); следующий gate — один preflight на восстановленной доске. The 45-cell matrix remains BLOCKED. Подробности: [FILL-001 postmortem](CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md).
+Binder activity-window fix `95a8d17` дополнен transient-session/UI retry correction в [5cde7a1](https://github.com/Kiddos19882/AutoDraw/commit/5cde7a109a669bebf790ecbeb21f8bbc4feae182): incomplete potentially relevant Bridge session теперь pending, а кнопка FILL-001 повторно выполняет binder перед PNG audit. Полный CI [41754801210](https://github.com/Kiddos19882/AutoDraw/actions/runs/41754801210) — SUCCESS: Preparation/G3 787 passed, 24 warnings, 82 subtests; Executor, Game Monitor/Bridge, Application integration, INT-006 pixel audit и Windows portable build/startup smoke-test — SUCCESS; optional benchmarks skipped. Предыдущий live preflight остаётся rejected (session CHALK=5999; доска исчерпана); следующий gate — один новый preflight на восстановленной доске. The 45-cell matrix remains BLOCKED. Подробности: [FILL-001 postmortem](CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md).
 
 ## Постоянная система управления знаниями ИИ
 
@@ -33,6 +33,9 @@ Binder fix committed `95a8d17`: Bridge activity window uses `started_at_utc` plu
 - [x] Полный regression gate FILL-001 закрыт CI [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881) SUCCESS на `fe6d446`, включая Preparation/G3, Application integration, Game Monitor/Bridge, Executor, INT-006 audit и Windows build.
 - [x] Исправить binder false-overlap: Bridge run выбирается по event activity window, а не по `finished_at_utc` (commit `95a8d17`).
 - [x] Добавить regression tests на позднюю финализацию pre-execution calibration run и полный разбор/hash JSON >27 MiB (commit `870bebc`); полный CI [41737923777](https://github.com/Kiddos19882/AutoDraw/actions/runs/41737923777) — SUCCESS.
+- [x] Обработать incomplete Bridge sessions как pending только после фильтрации по времени executor и connection close; не принимать другой session, пока потенциально пересекающаяся session остаётся неполной.
+- [x] Добавить retry runtime binding в FILL-001 кнопке «Проверить runtime + PNG и принять capture»; acceptance по-прежнему требует полного runtime binding и PNG audit.
+- [x] Полный CI [41754801210](https://github.com/Kiddos19882/AutoDraw/actions/runs/41754801210) — SUCCESS; portable artifact ID 13288855067.
 - [ ] Провести новый Windows live runtime preflight на восстановленной доске и подтвердить P1 из фактического executor report.
 - [x] Исправить физическое требование crop 460×240: UI снимает фактический calibrated client ROI, adapter преобразует frozen logical mask в размер PNG и сохраняет transform.
 - [ ] Проверить реальные board PNG в client ROI: RGB threshold=8, cursor/UI exclusion и coverage/leakage против frozen masks.

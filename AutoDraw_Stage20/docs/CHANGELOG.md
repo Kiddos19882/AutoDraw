@@ -1,3 +1,12 @@
+## 2026-11-04 — FILL-001 transient Bridge session retry: CI SUCCESS
+
+- Исправлена race/fail-fast обработка неполной Bridge session: после фильтрации по executor window отсутствие bridge_diagnostics/last_message_at_utc у потенциально подходящей session означает pending, а не окончательную ошибку.
+- Кнопка FILL-001 capture finalization повторно выполняет runtime binding и принимает capture только после строгого binding и PNG audit. Stage 6 и UI используют общий summary builder; worker не перезаписывает passed status.
+- Добавлены regression tests на incomplete session → обновлённая session → successful binding, исключение future session и UI retry.
+- Commit [5cde7a1](https://github.com/Kiddos19882/AutoDraw/commit/5cde7a109a669bebf790ecbeb21f8bbc4feae182). Полный CI [41754801210](https://github.com/Kiddos19882/AutoDraw/actions/runs/41754801210) — SUCCESS: Preparation/G3 787 passed, 24 warnings, 82 subtests; все обязательные jobs, Windows portable build/startup smoke-test и INT-006 pixel audit успешны; optional benchmarks skipped.
+- Portable artifact ID 13288855067, 637,575,055 bytes.
+- Live capture не принят; 45-cell matrix остаётся BLOCKED до нового успешного Windows live preflight.
+
 ## 2026-11-04 — FILL-001 binder activity-window fix: CI SUCCESS
 
 - Binder fix `95a8d17` и regression tests `870bebc` подтверждены полным GitHub Actions [41737923777](https://github.com/Kiddos19882/AutoDraw/actions/runs/41737923777): все обязательные jobs, включая Windows portable build/startup smoke-test, завершились SUCCESS; optional benchmarks skipped.

@@ -185,3 +185,22 @@ Windows artifact: [autodraw-g3-preflight-build](https://github.com/Kiddos19882/A
 - `master` не изменялся.
 - Через GitHub API нельзя подтвердить локальный `git status`.
 - В рамках этого отчёта исходники, тесты, конфигурации и первичные runtime evidence не изменялись. Добавлен только анализ/документация.
+
+## 11. Follow-up 2026-11-04 — incomplete Bridge session и повторная привязка
+
+Пользовательский commit [b4a107a](https://github.com/Kiddos19882/AutoDraw/commit/b4a107abfd33d3e4c0ded723154444c84c97b2ad) добавил артефакты нового запуска: executor report завершён на 131/131 strokes, after PNG сохранён, но кнопка capture acceptance получила ошибку «Bridge session не содержит bridge_diagnostics». При последующей проверке Bridge session уже содержала bridge_diagnostics; session-level pointCount delta осталась 1 → 6000 (CHALK=5999).
+
+Статический разбор выявил отдельный fail-fast/race defect в find_fill001_runtime_binding(): проверка diagnostics выполнялась до фильтрации session по executor window. Поэтому даже старая или ещё не завершённая потенциально подходящая session могла остановить поиск окончательной FillMatrixError. Stage 6 worker не повторял такую ошибку, а UI-кнопка только читала старый executor report.
+
+Исправление опубликовано в [5cde7a1](https://github.com/Kiddos19882/AutoDraw/commit/5cde7a109a669bebf790ecbeb21f8bbc4feae182):
+
+- Сначала проверяются timezone-aware started_at_utc, connection_closed_at_utc и возможность исключить session из executor window.
+- Отсутствующие bridge_diagnostics или last_message_at_utc у потенциально подходящей session трактуются как pending; неполная session блокирует выбор другой session до разрешения неоднозначности.
+- Строгие проверки schema v2, task/session/run identity, source-plan hashes, точного CHALK/per-stroke attribution, radius, P1, sequence gaps, Bridge failures и PNG audit не ослаблены.
+- FILL-001 кнопка повторно вызывает runtime binder для отчёта со статусом, отличным от passed; только успешный binding записывается в report и допускает следующий PNG audit.
+- Stage 6 и UI используют общий summary builder; background worker не перезаписывает уже подтверждённый passed status.
+- Добавлены regression tests на неполную session → последующее обновление → успешный binding, исключение future session без diagnostics и повторную привязку из UI.
+
+Полный GitHub Actions [41754801210](https://github.com/Kiddos19882/AutoDraw/actions/runs/41754801210) завершился **SUCCESS** на commit 5cde7a1: Preparation/G3 — 787 passed, 24 warnings, 82 subtests; Executor regression, Game Monitor/Bridge, Application integration, INT-006 pixel audit и Windows portable build/startup smoke-test — SUCCESS; optional benchmarks — SKIPPED. Portable artifact ID 13288855067.
+
+**Граница результата:** это подтверждает software regression/build gate, но не принимает пользовательский capture. Session-level CHALK=5999 подтверждён, однако второй Bridge run не был полностью проверен в рамках этого исправления; task-level/per-stroke attribution и quantitative FILL-001 PNG audit остаются неподтверждёнными. Новый live preflight не запускался; доска из предыдущей попытки исчерпана. 45-cell matrix остаётся BLOCKED.

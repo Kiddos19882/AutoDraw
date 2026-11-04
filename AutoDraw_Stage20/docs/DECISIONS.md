@@ -142,3 +142,14 @@
 **Решение:** принять пять документов: AI_WORK_GUIDE.md (процесс ИИ), KNOWLEDGE_ARCHITECTURE.md (роли источников), EVIDENCE_AND_VALIDATION.md (уровни подтверждения), ENGINEERING_INVARIANTS.md (критические свойства) и EXPERIMENT_STANDARD.md (методика экспериментов).  
 **Правила применения:** документы универсальны для всех подсистем и этапов AutoDraw; они не дублируют текущий статус, roadmap или результаты исследований. Пересматривать их только при системном изменении процесса разработки, архитектуры знаний или постоянных инженерных контрактов. Исторические документы и первичные данные сохраняются.  
 **Последствия:** ИИ использует AI_WORK_GUIDE.md при начале каждой новой задачи и профильные регламенты по типу работы. Изменения системы фиксируются в DECISIONS.md, WORK_LOG.md и CHANGELOG.md.
+
+## DEC-017. Повторная проверка неполного FILL-001 Bridge runtime binding
+
+**Статус:** принято, 2026-11-04  
+**Контекст:** Bridge session может быть создана до запуска executor, но первоначальный JSON snapshot ещё не содержит bridge_diagnostics или last_message_at_utc. Проверка такого snapshot до временной фильтрации приводила к окончательному FillMatrixError; Stage 6 прекращал retry, а UI-кнопка не могла повторить привязку после обновления session.
+
+**Решение:** сначала исключать Bridge sessions, которые доказуемо находятся вне executor window (по timezone-aware start/close timestamps). Если потенциально пересекающаяся session ещё не содержит diagnostics/finalization timestamp, считать binding pending и не выбирать другую session до разрешения неоднозначности. Кнопка FILL-001 capture finalization повторно запускает binder и обновляет executor report только после полного успешного binding. Stage 6 и UI используют общий summary contract.
+
+**Инварианты:** не ослаблять task/session/run identity, schema v2, source-plan SHA-256, exact pre/post pointCount, per-stroke CHALK, observed radius, P1, lifecycle, non-consuming candidates, sequence gaps, dropped events, Bridge failures и PNG quality gates. Наличие after PNG или session-level CHALK само по себе не означает принятие capture.
+
+**Последствия:** transient persistence race больше не превращается в окончательную binder error; incomplete/ambiguous evidence остаётся fail-closed. Software gate подтверждён CI [41754801210](https://github.com/Kiddos19882/AutoDraw/actions/runs/41754801210) на commit 5cde7a1. Live preflight и 45-cell matrix остаются отдельными gates.

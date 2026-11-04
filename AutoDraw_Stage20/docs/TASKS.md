@@ -2,14 +2,14 @@
 
 ## Актуальное состояние FILL-001 на 2026-11-04
 
-Binder fix committed [95a8d17](https://github.com/Kiddos19882/AutoDraw/commit/95a8d1799cd2cbbba09929cc5086a3655ba90c78): activity window определяется последним event t относительно started_at_performance_ms; finished_at_utc ограничен idle finalization grace. Regression tests [870bebc](https://github.com/Kiddos19882/AutoDraw/commit/870bebce6b39e782f70ef9f476a324ee840c05ae) покрывают calibration false-overlap и JSON более 27 MiB. Полный CI [41737923777](https://github.com/Kiddos19882/AutoDraw/actions/runs/41737923777) завершился SUCCESS на `870bebc`, включая Windows portable build/startup smoke-test; optional benchmarks skipped. Предыдущий preflight остаётся REJECTED, session CHALK=5999 и доска исчерпана; 45-cell matrix BLOCKED до нового принятого live preflight. См. [postmortem](CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md).
+Binder activity-window fix `95a8d17` сохранён. Дополнительно в [5cde7a1](https://github.com/Kiddos19882/AutoDraw/commit/5cde7a109a669bebf790ecbeb21f8bbc4feae182) исправлена race/fail-fast обработка incomplete Bridge session и добавлена повторная runtime binding проверка из кнопки FILL-001 capture finalization. Полный CI [41754801210](https://github.com/Kiddos19882/AutoDraw/actions/runs/41754801210) — SUCCESS: Preparation/G3 787 passed, 24 warnings, 82 subtests; остальные обязательные jobs, INT-006 pixel audit и Windows portable build/startup smoke-test — SUCCESS; optional benchmarks skipped. Предыдущий live preflight остаётся REJECTED, session CHALK=5999, task-level/per-stroke attribution и FILL-001 PNG audit не подтверждены, доска исчерпана; 45-cell matrix BLOCKED до нового принятого live preflight. См. [postmortem](CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md).
 
 Реестр содержит документационные и технические задачи проекта. Аналитические этапы 7–10 отменены и в backlog не включаются; INT-001 и последующие задачи ресурсной оптимизации являются отдельной инициативой.
 
 ## Временный план FILL-001 на пять шагов
 
 **Документ:** [CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md](CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md)  
-**Статус:** IN_PROGRESS — binder activity-window fix и regression tests (`95a8d17`, `870bebc`) прошли полный CI [41737923777](https://github.com/Kiddos19882/AutoDraw/actions/runs/41737923777), включая Windows portable build/startup smoke-test. Предыдущий live execution завершился 131/131 strokes, session CHALK=5999, но capture не принят. Текущая доска исчерпана; следующий gate — новый Windows live preflight на восстановленной доске. Шаги 4–5 BLOCKED.
+**Статус:** IN_PROGRESS — activity-window fix (`95a8d17`) и transient-session/UI retry correction (`5cde7a1`) прошли полный CI [41754801210](https://github.com/Kiddos19882/AutoDraw/actions/runs/41754801210), включая Windows portable build/startup smoke-test и INT-006 pixel audit. Предыдущий live execution завершился 131/131 strokes, session CHALK=5999, но capture не принят. Текущая доска исчерпана; следующий gate — один новый Windows live preflight на восстановленной доске. Шаги 4–5 BLOCKED.
 
 | Шаг | Статус | Критерий |
 |---|---|---|
@@ -41,6 +41,11 @@ Binder fix committed [95a8d17](https://github.com/Kiddos19882/AutoDraw/commit/95
 - [x] Добавить synthetic regression coverage для client ROI 581×304, uniform-scale rejection, ROI metadata mismatch и leakage после rasterization; полный CI `41730717881` — SUCCESS.
 - [x] Исправить runtime binder: определять Bridge run overlap по последнему событию и performance clock, а не по позднему `finished_at_utc` (commit `95a8d17`).
 - [x] Добавить regression tests на calibration false-overlap и полный разбор/hash Bridge JSON размером более 27 MiB (commit `870bebc`); полный CI [41737923777](https://github.com/Kiddos19882/AutoDraw/actions/runs/41737923777) — SUCCESS.
+- [x] Исправить transient Bridge session race: после временной фильтрации incomplete session без bridge_diagnostics или last_message_at_utc считается pending, а не окончательной binder error (commit 5cde7a1).
+- [x] Добавить повторный runtime binding в Fill001Tab.finalize_capture(): при непрошедшем binding кнопка повторно проверяет persisted Bridge session/run, записывает summary только после полной проверки и продолжает PNG audit только после passed.
+- [x] Свести Stage 6 и UI к общему build_fill001_runtime_binding_summary(); Stage 6 не перезаписывает уже подтверждённый passed статус при завершении retry worker.
+- [x] Добавить regression tests: incomplete session → diagnostics persisted → binding succeeds; future session без diagnostics исключается до строгой проверки; UI повторно привязывает runtime evidence перед PNG acceptance.
+- [x] Полный GitHub Actions [41754801210](https://github.com/Kiddos19882/AutoDraw/actions/runs/41754801210) на 5cde7a1: Preparation/G3 787 passed, 24 warnings, 82 subtests; Executor, Game Monitor/Bridge, Application integration, INT-006 pixel audit и Windows portable build/startup smoke-test — SUCCESS; optional benchmarks skipped.
 - [ ] Провести один новый Windows FILL-001 runtime preflight на восстановленной доске и подтвердить task ↔ executor report ↔ Bridge session/run binding.
 - [ ] Проверить реальные before/after PNG crop, RGB threshold, cursor/UI exclusion и frozen mask alignment.
 - [ ] Только после preflight разрешить 45 live captures.

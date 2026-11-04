@@ -1,3 +1,16 @@
+## 2026-11-04 — FILL-001 transient Bridge session retry: CI SUCCESS
+
+- Повторно проверены ветка feature/image-geometry-optimization, branch HEAD после пользовательского evidence commit b4a107a, последние 20 коммитов, README Stage20, docs index, управляющие документы и пять постоянных регламентов.
+- На commit b4a107a подтверждены executor completed 131/131 strokes, сохранённый after PNG и runtime_binding_status=failed с сообщением об отсутствии bridge_diagnostics. Финальная версия Bridge session в этом commit уже содержала diagnostics; session-level CHALK delta — 5999. Capture не принят.
+- Найдена причина: binder проверял bridge_diagnostics до фильтрации session по executor time window; transient incomplete session выбрасывала fatal FillMatrixError. Stage 6 worker прекращал retry, а FILL-001 UI не запускал binder повторно.
+- Исправлено в [5cde7a1](https://github.com/Kiddos19882/AutoDraw/commit/5cde7a109a669bebf790ecbeb21f8bbc4feae182): incomplete potentially relevant session возвращает pending; будущие/закрытые до executor sessions исключаются до строгой проверки diagnostics; кнопка FILL-001 повторно запускает binder; summary builder общий для Stage 6/UI; worker не перезаписывает уже подтверждённый passed status.
+- Добавлены regression tests на incomplete → finalized session retry, filtering future session и повторную привязку из UI до PNG acceptance.
+- Полный GitHub Actions [41754801210](https://github.com/Kiddos19882/AutoDraw/actions/runs/41754801210) завершился SUCCESS: Preparation/G3 — 787 passed, 24 warnings, 82 subtests; Executor regression, Game Monitor/Bridge, Application integration, INT-006 pixel audit и Windows portable build/startup smoke-test — SUCCESS; optional algorithm benchmarks — SKIPPED.
+- Windows portable artifact [autodraw-g3-preflight-build](https://github.com/Kiddos19882/AutoDraw/actions/runs/41754801210/artifacts/13288855067), 637,575,055 bytes.
+- Обновлены PROJECT_STATUS, TASKS, ROADMAP, временный FILL-001 plan, postmortem, DECISIONS и CHANGELOG. Первичные runtime evidence и PNG не изменялись. Production estimator/defaults, sampling defaults и master не менялись.
+- Локальный clone/pytest не запускался: попытка Git clone завершилась ошибкой DNS; GitHub Actions использован как удалённая проверка. Через GitHub API локальный git status недоступен.
+- Live preflight не выполнялся. Capture остаётся REJECTED/UNACCEPTED: session-level CHALK=5999, task-level/per-stroke attribution и quantitative FILL-001 PNG audit не подтверждены; использованная доска исчерпана. Следующий gate — один новый Windows live preflight на восстановленной доске; 45-cell matrix остаётся BLOCKED.
+
 ## 2026-11-04 — FILL-001 binder activity-window fix: CI verification
 
 - Проверены рабочая ветка `feature/image-geometry-optimization`, последние 20 коммитов, README Stage20, основной индекс, управляющие документы, постоянные регламенты, runtime binder и его regression tests.

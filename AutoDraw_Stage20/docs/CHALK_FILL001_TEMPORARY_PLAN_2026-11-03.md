@@ -39,7 +39,7 @@
 
 ### Шаг 3. Интегрировать запуск в AutoDraw и провести Windows live preflight
 
-**Статус:** IN_PROGRESS — binder activity-window fix (`95a8d17`) и regression tests (`870bebc`) прошли полный CI [41737923777](https://github.com/Kiddos19882/AutoDraw/actions/runs/41737923777), включая Windows portable build/startup smoke-test. Предыдущий live run завершил 131/131 strokes; session CHALK=5999, capture rejected, доска исчерпана. Следующий gate — один preflight на восстановленной доске.
+**Статус:** IN_PROGRESS — activity-window fix (`95a8d17`) и transient Bridge session/UI retry correction (`5cde7a1`) прошли полный CI [41754801210](https://github.com/Kiddos19882/AutoDraw/actions/runs/41754801210), включая Windows portable build/startup smoke-test и INT-006 pixel audit. Предыдущий live run завершил 131/131 strokes; session CHALK=5999, capture rejected, доска исчерпана. Следующий gate — один preflight на восстановленной доске.
 
 **Подтверждённая реализация UI/runner:**
 - Добавлен `source/preparation/chalk_fill_ui.py` и самостоятельная вкладка FILL-001 в `integrated_app.py`, отдельная от седьмой вкладки «Тест кистей».
@@ -132,3 +132,12 @@
 - Следующее действие оператора: скачать artifact, запустить AutoDraw, открыть вкладку FILL-001 и выполнить ровно одну задачу `rectangle / radius 10 / repeat 1`.
 - После запуска сохранить и предоставить execution report, Bridge session/run artifacts, Game Monitor export и before/after PNG. Проверить идентичность task/plan/run, фактический P1 (`point_step=4`, `point_delay=5ms`, `line_extension=0`), exact `pointCount` delta, coverage ≥99% и leakage=0 на реальном client ROI.
 - До принятия этого preflight шаги 4–5 остаются **BLOCKED**. CI не является доказательством live game runtime; 45 captures этим обновлением не запускались и не разрешаются.
+
+## Актуальное уточнение 2026-11-04 — retry неполного runtime binding
+
+- Пользовательский evidence commit [b4a107a](https://github.com/Kiddos19882/AutoDraw/commit/b4a107abfd33d3e4c0ded723154444c84c97b2ad) содержал завершённый executor report и after PNG, но runtime_binding_status=failed из-за временно отсутствующего bridge_diagnostics в Bridge session. Поздняя версия session уже содержала diagnostics; capture не был принят.
+- В [5cde7a1](https://github.com/Kiddos19882/AutoDraw/commit/5cde7a109a669bebf790ecbeb21f8bbc4feae182) исправлен порядок обработки: session сначала исключается по временному окну/connection close, затем неполная потенциально подходящая session возвращает pending. UI-кнопка повторно запускает binder и продолжает acceptance только после runtime_binding_status=passed.
+- Stage 6 и UI используют общий builder runtime summary; worker не перезаписывает уже установленный passed статус.
+- Добавлены regression tests на неполную session, её последующее обновление, исключение future session и retry из UI.
+- Полный CI [41754801210](https://github.com/Kiddos19882/AutoDraw/actions/runs/41754801210) — SUCCESS; Preparation/G3 787 passed, 24 warnings, 82 subtests; все обязательные jobs, Windows portable build/startup smoke-test и INT-006 pixel audit успешны. Artifact ID 13288855067.
+- Это закрывает software retry gate, но не live gate: существующий capture остаётся REJECTED/UNACCEPTED, task-level/per-stroke CHALK и quantitative FILL-001 PNG audit не подтверждены. 45-cell matrix остаётся BLOCKED до нового принятого Windows live preflight на восстановленной доске.
