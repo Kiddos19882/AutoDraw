@@ -669,3 +669,16 @@ CI SUCCESS не является live evidence; 45-cell matrix остаётся 
 - [ ] Отдельно повторно оценить FILL-001-RS live preflight capture по фактическим неизменённым PNG и executor mapping; CI static sweep не заменяет live CHALK/capture evidence.
 
 Радиус не показал монотонного влияния на расход в пяти geometry scenarios. Средние CHALK radius 1/10/30: D1 62.667/62.333/63.333; D2 71.667/71.000/71.000; D3 100.000/100.667/99.667; D4 14.333/14.667/15.333; D5 88.333/89.667/89.667. Не делать вывод о незначимости радиуса за пределами протестированных геометрий, P1 и радиусов.
+
+## FILL-001-RS — offline диагностика краёв и contour-pass candidate (2026-11-04)
+
+- [x] Повторить offline OpenCV rasterization для committed rectangle/r10/step5/offset0 plan: 27 strokes, target area 44 653 px, 304 uncovered pixels, leakage=0.
+- [x] Разложить uncovered pixels **в planner model**: top band 80, bottom band 80, left middle band 72, right middle band 72, interior 0. Это не координатный разбор actual PNG.
+- [x] Выполнить exploratory contour-pass sweep на той же frozen mask: inward offsets 5–8 px. Offset 5: coverage 99,964168%, leakage 32 (FAIL); offsets 6/7/8: coverage 99,516270% / 99,372942% / 99,328153%, leakage 0 (offline model PASS).
+- [ ] Получить точные координаты actual uncovered target pixels и всех 11 leakage pixels из неизменённой PNG pair; сопоставить с 27 screen-transformed centerlines и renderer footprint.
+- [ ] Найти предыдущий comparable live capture и провести side-by-side pixel breakdown, если raw evidence доступно.
+- [ ] Проверить contour pass с фактической brush cap/footprint в offline модели, включая точную геометрию пути, углы и screen transform; сохранить новый versioned candidate отдельно от frozen plan.
+- [ ] Только после завершения offline gate и отдельного разрешения пользователя выполнить новый live preflight. 45-cell matrix остаётся BLOCKED.
+
+Ограничение: contour-pass числа получены в OpenCV raster model и не предсказывают exact CHALK. Расход измеряется только `pointCount_after - pointCount_before`.
+
