@@ -1,22 +1,17 @@
 # Актуальная точка продолжения — 2026-11-04
 
 
-## Дополнение — Egret CanvasRenderer browser harness PASS (2026-11-04)
+## Дополнение — manual-only renderer harness superseded; actual BoardPane integration in progress (2026-11-04)
 
-**Подтверждённый browser run:** GitHub Actions `41914478746`, job `126871096410`, commit `a5b4b2978006960845ef04d021e4174a5c6425ea`.
+Предыдущий run `41914478746` (18/18 fixtures, 36 PNG, artifact `13365080566`) подтвердил только manual GraphicsNode transcription и Egret CanvasRenderer raster. Он не включал настоящий `BoardPane.resetBg()`; single-point output как empty GraphicsNode было ошибочным выводом для actual BoardPane. Этот artifact сохраняется исторически, но не используется как actual game reference.
 
-- Egret 5.4.1 CanvasRenderer harness завершил 18/18 fixtures (9 path cases × lineWidth 10/30).
-- Сформированы 36 PNG (source texture + masked-board comparison) и manifest.
-- Artifact: `autodraw-egret-renderer-reference`, ID `13365080566`, ZIP 362,990 bytes, 37 entries.
-- Browser metadata: Microsoft Edge 156.0.0.0, Win32, DPR=1, viewport 756×441; rasterScale=3.
-- Local archive integrity validation PASS: 36 PNG успешно декодируются; source dimensions соответствуют GraphicsNode bounds × 3; masked outputs 1380×720; smooth-single-point outputs прозрачные no-op.
-- Manifest SHA-256: `eafdf4612aa86c16f1ae70db74d40f13600a064abc2fc7115c131eef7dbf2642`.
+Новая реализация загружает оба bundle, создаёт реальный `com.magnetjoy.pet.ui.board.BoardPane`, устанавливает points/radius/colors/options и вызывает `redraw()`. Второй BoardPane instance использует manual transcription через временную подмену Painter method; два GraphicsNode raster outputs сравниваются попиксельно. В обоих случаях присутствует прозрачный resetBg rect 460×240 и scrollRect.
 
-**Что доказано:** в headless Edge загружен локальный bundle (HTTP 200, 875,614 chars), Egret CanvasRenderer напрямую сгенерировал source raster fixtures и browser manifest. Smooth single-point fixture корректно представлен прозрачным no-op, поскольку WebGLRenderer skip-ит GraphicsNode с пустыми bounds/drawData.
+- Исправлена сигнатура `Painter.drawSmoothLine(graphics, points, drawFirstHalf, drawLast)`; defaults true/true, BoardPane явно передаёт false.
+- Run `41916087170` выявил dimension mismatch при сравнении actual BoardPane с plain Shape. Это не ошибка игрового bundle, а несопоставимые контейнеры теста.
+- Исправлено: manual transcription теперь выполняется на втором экземпляре BoardPane с теми же dimensions/resetBg. Run `41916449025` ожидает запуска/результата.
+- Actual BoardPane browser artifact ещё не получен. WebGL texture/mask и pixel equivalence с game capture не подтверждены.
 
-**Что не доказано:** harness не создаёт WebGL context; masked-board PNG — Canvas2D composite, не WebGL mask stencil/texture sampling. Pixel equivalence с игрой не проверена. Для run `6a17a297-ea14-4527-9527-bfd8de3bd335` пока не найден подтверждённый paired screenshot того же игрового запуска; его exact CHALK=1260 и accepted point stream не следует сопоставлять с PNG из другой попытки.
-
-**Полный workflow `41914478746`:** Game Monitor/Bridge, Executor, Application integration, Preparation/G3, Egret renderer browser job и INT-006 pixel PNG audit завершились SUCCESS. Windows portable build/startup job был IN_PROGRESS при последней проверке; общий workflow conclusion ещё не подтверждён. Optional algorithm benchmarks SKIPPED.
 
 ## Дополнение — renderer browser gate изолирован от preparation suite (2026-11-04)
 
