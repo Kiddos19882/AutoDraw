@@ -105,6 +105,53 @@ class BridgeRecorderTests(unittest.TestCase):
         self.assertEqual(data["frame_probe"]["stroke_probe_count"], 1)
         self.assertEqual(data["active_drawing_duration_ms"], 20)
 
+    def test_per_stroke_point_timing_and_frame_probe_are_preserved(self):
+        def snapshot(point_count):
+            return {
+                "maxPoints": 6000,
+                "remainingPoints": 6000 - point_count,
+                "pointCount": point_count,
+                "isExact": True,
+            }
+
+        self.recorder.event({
+            "type": "POINTER_DOWN_CANDIDATE", "t": 100, "strokeId": "s1",
+            "board": snapshot(10),
+        }, 1.0)
+        self.recorder.event({
+            "type": "POINT_QUOTA_UPDATE", "t": 110, "strokeId": "s1",
+            "before": snapshot(10), "after": snapshot(11),
+        }, 1.1)
+        self.recorder.event({
+            "type": "POINT_QUOTA_UPDATE", "t": 143, "strokeId": "s1",
+            "before": snapshot(11), "after": snapshot(12),
+        }, 1.2)
+        self.recorder.event({
+            "type": "POINTER_UP_CANDIDATE", "t": 150, "strokeId": "s1",
+            "board": snapshot(12),
+        }, 1.3)
+        self.recorder.frame_probe({
+            "strokeId": "s1", "startedAtPerformanceMs": 100,
+            "endedAtPerformanceMs": 150, "visible": True,
+            "intervals": [16.667, 16.667, 16.667],
+        })
+
+        path = self.recorder.finalize("completed")
+        data = json.loads(path.read_text(encoding="utf-8"))
+        metrics = data["per_stroke_metrics"][0]
+        self.assertEqual(metrics["stroke_id"], "s1")
+        self.assertEqual(metrics["lifecycle_status"], "complete")
+        self.assertEqual(metrics["duration_ms"], 50)
+        self.assertEqual(metrics["point_count_delta"], 2)
+        self.assertEqual(metrics["point_update_event_count"], 2)
+        self.assertEqual(metrics["point_update_delta_sum"], 2)
+        self.assertTrue(metrics["point_count_delta_matches_updates"])
+        self.assertEqual(metrics["accepted_points_per_second"], 40)
+        self.assertEqual(metrics["median_point_update_interval_ms"], 33)
+        self.assertEqual(data["frame_probe_by_stroke"][0]["stroke_id"], "s1")
+        self.assertEqual(data["frame_probe_by_stroke"][0]["median_fps"], 60)
+        self.assertEqual(data["frame_probes"][0]["intervals"], [16.667, 16.667, 16.667])
+
     def test_coalesced_samples_mark_path_as_incomplete(self):
         before = {"maxPoints": 6000, "remainingPoints": 6000, "pointCount": 0, "isExact": True}
         self.recorder.event({"type": "DRAW_START", "t": 1, "before": before}, 1.0)
