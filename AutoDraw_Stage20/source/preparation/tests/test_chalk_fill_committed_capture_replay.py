@@ -4,8 +4,12 @@ import json
 from pathlib import Path
 import shutil
 
+import cv2
+import numpy as np
+
 import chalk_fill_ui
 from chalk_fill_matrix import load_fill001_matrix
+from chalk_fill_experiment import build_fill_target_mask
 
 
 TASK_ID = "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1"
@@ -164,6 +168,119 @@ def test_real_committed_fill001_evidence_runs_through_capture_button(tmp_path, m
             f"leakage={png_audit_result['leakage_pixels']}, "
             f"status={png_audit_result['png_audit_status']}"
         )
+
+        # Pixel-coordinate diagnosis on the immutable committed PNG pair.
+        # This is test-only reporting: it does not alter the capture or gate.
+        before_pixels, _ = chalk_fill_capture_adapter._png_pixels(before_png)
+        after_pixels, _ = chalk_fill_capture_adapter._png_pixels(after_png)
+        changed = np.any(
+            np.abs(after_pixels.astype(np.int16) - before_pixels.astype(np.int16)) > 8,
+            axis=2,
+        )
+        screen_height, screen_width = changed.shape
+        scale_x = (screen_width - 1) / 460
+        scale_y = (screen_height - 1) / 240
+        logical_mask = build_fill_target_mask(task["shape_id"])
+        logical_x = np.clip(
+            np.rint(np.arange(screen_width, dtype=np.float64) / scale_x).astype(np.intp),
+            0, 459,
+        )
+        logical_y = np.clip(
+            np.rint(np.arange(screen_height, dtype=np.float64) / scale_y).astype(np.intp),
+            0, 239,
+        )
+        screen_mask = logical_mask[np.ix_(logical_y, logical_x)]
+        uncovered = screen_mask & ~changed
+        leakage = ~screen_mask & changed
+        yy, xx = np.indices(changed.shape)
+        lx = logical_x[xx]
+        ly = logical_y[yy]
+        zones = {
+            "top_y_lt_75": uncovered & (ly < 75),
+            "bottom_y_gt_165": uncovered & (ly > 165),
+            "left_middle_x_le_94": uncovered & (lx <= 94) & (ly >= 75) & (ly <= 165),
+            "right_middle_x_ge_366": uncovered & (lx >= 366) & (ly >= 75) & (ly <= 165),
+        }
+        classified = np.zeros_like(uncovered)
+        for zone_mask in zones.values():
+            classified |= zone_mask
+        zones["interior_or_other"] = uncovered & ~classified
+
+        def _components(mask):
+            count, labels, stats, _centroids = cv2.connectedComponentsWithStats(
+                mask.astype(np.uint8), connectivity=8
+            )
+            components = [
+                {
+                    "area": int(stats[index, cv2.CC_STAT_AREA]),
+                    "bbox_xywh": [
+                        int(stats[index, cv2.CC_STAT_LEFT]),
+                        int(stats[index, cv2.CC_STAT_TOP]),
+                        int(stats[index, cv2.CC_STAT_WIDTH]),
+                        int(stats[index, cv2.CC_STAT_HEIGHT]),
+                    ],
+                }
+                for index in range(1, count)
+            ]
+            return sorted(components, key=lambda item: item["area"], reverse=True)
+
+        plan_source = results_root / "fill001" / "plans" / f"{TASK_ID}.json"
+        plan_data = json.loads(plan_source.read_text(encoding="utf-8"))
+        transformed_segments = []
+        for stroke in plan_data["strokes"]:
+            p0, p1 = stroke["points"]
+            x0, y0 = round(float(p0["x"]) * scale_x), round(float(p0["y"]) * scale_y)
+            x1, y1 = round(float(p1["x"]) * scale_x), round(float(p1["y"]) * scale_y)
+            transformed_segments.append((x0, y0, x1, y1))
+
+        def _nearest_segment_distances(points):
+            distances = []
+            for py, px in points:
+                best = float("inf")
+                for x0, y0, x1, y1 in transformed_segments:
+                    dx, dy = x1 - x0, y1 - y0
+                    denom = dx * dx + dy * dy
+                    t = 0.0 if denom == 0 else max(
+                        0.0, min(1.0, ((px - x0) * dx + (py - y0) * dy) / denom)
+                    )
+                    qx, qy = x0 + t * dx, y0 + t * dy
+                    best = min(best, float(np.hypot(px - qx, py - qy)))
+                distances.append(best)
+            return distances
+
+        uncovered_coords = [tuple(map(int, point)) for point in np.argwhere(uncovered)]
+        leakage_coords = [tuple(map(int, point)) for point in np.argwhere(leakage)]
+        distances = _nearest_segment_distances(uncovered_coords)
+        distance_bands = {
+            "le_2px": sum(value <= 2 for value in distances),
+            "2_to_5px": sum(2 < value <= 5 for value in distances),
+            "5_to_10px": sum(5 < value <= 10 for value in distances),
+            "gt_10px": sum(value > 10 for value in distances),
+        }
+        print("FILL-001 actual PNG residual diagnostics: " + json.dumps({
+            "screen_size": [screen_width, screen_height],
+            "screen_scale": [scale_x, scale_y],
+            "uncovered_target_pixels": int(np.count_nonzero(uncovered)),
+            "uncovered_zones": {name: int(np.count_nonzero(mask)) for name, mask in zones.items()},
+            "uncovered_bbox_xywh": (
+                [int(np.min(np.where(uncovered)[1])), int(np.min(np.where(uncovered)[0])),
+                 int(np.max(np.where(uncovered)[1]) - np.min(np.where(uncovered)[1]) + 1),
+                 int(np.max(np.where(uncovered)[0]) - np.min(np.where(uncovered)[0]) + 1)]
+                if uncovered_coords else None
+            ),
+            "uncovered_components_largest_20": _components(uncovered)[:20],
+            "uncovered_nearest_scanline_distance_bands": distance_bands,
+            "uncovered_rows": {
+                str(int(row)): int(value)
+                for row, value in enumerate(np.count_nonzero(uncovered, axis=1)) if value
+            },
+            "leakage_pixels": int(np.count_nonzero(leakage)),
+            "leakage_coordinates_xy": [[x, y] for y, x in leakage_coords],
+            "leakage_components": _components(leakage),
+            "transformed_scanline_endpoints_xy": [
+                [[x0, y0], [x1, y1]] for x0, y0, x1, y1 in transformed_segments
+            ],
+        }, ensure_ascii=False, sort_keys=True))
 
     saved_report = json.loads(report_path.read_text(encoding="utf-8"))
     saved_attempt = json.loads(attempt_path.read_text(encoding="utf-8"))
