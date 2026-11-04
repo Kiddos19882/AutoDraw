@@ -128,6 +128,7 @@
 - [PROJECT_DOCUMENTATION.md](../PROJECT_DOCUMENTATION.md) — накопленная документация Stage20; архив, не расширять параллельно с docs.
 - [PROJECT_ANALYSIS_PLAN_10_STAGES.md](../PROJECT_ANALYSIS_PLAN_10_STAGES.md) — архивный аналитический план; этапы 7–10 отменены.
 - [source/game_monitor/README.md](../source/game_monitor/README.md) — документация Game Monitor.
+- [tests/game_renderer_reference.html](../tests/game_renderer_reference.html) — offline Egret CanvasRenderer source-raster harness; masked composite является approximation, не WebGL equivalence.
 
 ## Приоритет источников
 
