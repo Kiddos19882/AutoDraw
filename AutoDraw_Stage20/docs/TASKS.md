@@ -8,7 +8,7 @@
 
 | ID | Приоритет | Статус | Содержание |
 |---|---|---|---|
-| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | IN_PROGRESS | Runtime WebGL/transform подтверждены; offline renderer fixtures, pixel footprint и PNG gate остаются |
+| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | IN_PROGRESS | Runtime WebGL/transform подтверждены; reference harness исправлен для empty GraphicsNode, browser PNG fixtures и pixel gate остаются |
 | FILL-001-RS-MATRIX | P0 | BLOCKED | 45 captures только после принятого single-task preflight |
 | BRUSH-FOOTPRINT-CAPSULE-001 | P1 | OPEN | Offline capsule model готова; renderer acceptance/planner integration не выполнены |
 | INT-006 | P1 | IN_PROGRESS | D1-D5 45/45 и analyzer завершены; domain validation/safety margin не завершены |
@@ -40,7 +40,7 @@
 
 ### GAME-BRUSH-REPLICATION — воспроизведение цепочки игровой кисти
 
-**Статус:** SOURCE TRACE COMPLETE (E1); OFFLINE REPLICA NOT IMPLEMENTED; PIXEL EQUIVALENCE NOT VALIDATED. Это исследовательский подэтап FILL-001-RS renderer footprint, а не замена измерениям CHALK или отдельное разрешение на live run.
+**Статус:** SOURCE TRACE COMPLETE (E1); OFFLINE PATH/RENDERER REFERENCE HARNESS IMPLEMENTED (partial; browser run pending); PIXEL EQUIVALENCE NOT VALIDATED. Это исследовательский подэтап FILL-001-RS renderer footprint, а не замена измерениям CHALK или отдельное разрешение на live run.
 
 **Что установлено по согласованному набору assets:** ввод проходит через BoardPane.onMouseDown → onDrawStart → ENTER_FRAME/onDrawing → onDrawingEnd; принятые координаты переводятся через globalToLocal, проверяются по локальным границам и deduplicate через BlackBoardAtom.pushPoint. Геометрия строится Painter.drawNormalLine или midpoint/curveTo smooth path. Значение UI передаётся в Egret как line width; caps/joints по умолчанию round. Подробная трассировка и ссылки на Git blob SHA — в [отчёте игрового движка, раздел 14](CHALK_GAME_ENGINE_POINT_COST_AND_BRUSH_WIDTH_2026-11-03.md#14-полная-трассировка-цепочки-игровой-кисти-и-границы-воспроизведения--2026-11-04).
 
@@ -56,9 +56,13 @@
 
 **Диагностический инструмент реализован (2026-11-04):** в `source/game_monitor/game_monitor.js` добавлены `rendererSnapshot()` и расширенный `inspect()`. Они собирают runtime `Capabilities.renderMode`/renderer, canvas scale/DPR, CSS canvas geometry, BoardPane parent chain, mask и stage/client corners. `boardClientCorners` вычисляются только при доступном `getBoxQuads()`; координаты являются CSS client pixels. Новые mock tests проверяют WebGL snapshot, преобразование углов и отсутствие runtime. Code/test commits: `34042f02a4fd8bd98b8348e7d6ffdb933e2b6d1e`, `03893b8b67d4a599b66307cd786e884dfd462b7a`, `b2d467de6d7fb247d9014e47b1b58da782ff6d68`. CI run [41896024383](https://github.com/Kiddos19882/AutoDraw/actions/runs/41896024383): Game Monitor/Bridge job PASS (18 Node tests, JS syntax, WebSocket smoke); полный GitHub Actions workflow SUCCESS: Game Monitor/Bridge (18 Node tests + JS syntax + WebSocket smoke), Executor, Application integration, Preparation/G3, capsule broad-phase benchmark, FILL-001-RS static sweep, Windows portable build/startup smoke-test и INT-006 PNG/CHALK/INT006R validation. Portable artifact `autodraw-g3-preflight-build` загружен. Optional algorithm benchmarks SKIPPED по настройке workflow.
 
-**Текущий статус harness:** реализованы `tests/game_renderer_reference.html`, `tests/game_renderer_reference.js` и `tests/game_renderer_reference.test.js`. Страница генерирует 18 fixtures (9 случаев × lineWidth 10/30), используя локальный Egret 5.4.1 `CanvasRenderer.renderGraphics()` для source GraphicsNode raster; дополнительный masked-board output использует Canvas2D composite и явно не считается финальным WebGL output. Node path tests проверяют smooth 1/2/3+ points и normal path. Workflow `geometry-tests.yml` запускает `node --check` и `node --test`; CI run [41901639258](https://github.com/Kiddos19882/AutoDraw/actions/runs/41901639258) выполняется.
+**Текущий статус harness:** реализованы `tests/game_renderer_reference.html`, `tests/game_renderer_reference.js` и `tests/game_renderer_reference.test.js`. Страница генерирует 18 fixtures (9 случаев × lineWidth 10/30). Для непустых GraphicsNode source raster выполняется Egret 5.4.1 `CanvasRenderer.renderGraphics()`; дополнительный masked-board output использует Canvas2D composite и не считается финальным WebGL output. Node tests покрывают path semantics и WebGLRenderer empty-bounds guard.
 
-**Следующий шаг:** из корня локального checkout выполнить `python -m http.server 8765` и открыть `http://localhost:8765/AutoDraw_Stage20/tests/game_renderer_reference.html`; сохранить 18 source texture PNG, 18 masked-board PNG и manifest. Сравнить их с game capture той же browser/runtime. Затем отдельно проверить фактическую WebGL LINEAR sampling при subpixel destination coordinates и mask stencil; статические LINEAR/CLAMP_TO_EDGE/premultiplied-alpha defaults уже установлены. Не менять production planner/defaults до pixel acceptance; FILL-001-RS 45-cell matrix остаётся BLOCKED.
+**Причина прежнего browser CI failure — локализована статически:** первый fixture `smooth-single-point` создаёт только moveTo-команды. В Egret 5.4.1 `Graphics.moveTo()` не обновляет GraphicsNode bounds; WebGLRenderer пропускает GraphicsNode при нулевых/неустановленных width/height или пустом drawData. Старый harness вместо воспроизведения этого no-op выбрасывал `GraphicsNode has empty bounds.` и прекращал всю генерацию. Harness теперь отражает guard: создаёт прозрачный no-op reference, помечает `rasterDisposition` в manifest и продолжает остальные fixtures. Добавлен Node regression test для renderer guard.
+
+Workflow `.github/workflows/geometry-tests.yml` дополнен проверкой доступности локального Egret bundle и сохранением/выводом DOM diagnostic при неуспехе. Изменения: workflow commit `167661b09417c107aa39ab58891302e1ea8b4c76`, harness commit `e1caaba6e92dffabc50794c5687cb7c81cc5db08`, regression test commit `e2cdafaf3249ba4168082e7a6fcac67d850d9119`. **CI для нового HEAD пока не подтверждён**; предыдущий run `41903225993` остаётся FAILURE, причина там не была выведена в лог DOM.
+
+**Следующий шаг:** подтвердить browser run 18/18 fixtures, 36 PNG reference outputs и manifest. Если запуск всё ещё упадёт, прочитать DOM diagnostic и Edge stderr artifact. Затем сравнить source raster с game capture той же browser/runtime; после этого отдельно проверять WebGL LINEAR sampling, subpixel destination coordinates и mask stencil. Не менять production planner/defaults до pixel acceptance; FILL-001-RS 45-cell matrix остаётся BLOCKED.
 
 ### Историческое наблюдение о двух экземплярах BoardPane — NOT_APPLICABLE_TO_CURRENT_USER_SCENARIO
 
