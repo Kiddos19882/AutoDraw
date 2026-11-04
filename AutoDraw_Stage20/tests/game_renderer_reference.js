@@ -112,7 +112,8 @@
     buildSmoothPathCommands,
     buildNormalPathCommands,
     terminalPoint,
-    shouldWebGLRendererRasterize
+    shouldWebGLRendererRasterize,
+    extractAcceptedPoints
   };
 
   if (typeof module !== "undefined" && module.exports) {
@@ -133,6 +134,18 @@
   const manifestNode = document.getElementById("renderer-manifest");
 
   function fixtureList() {
+    const liveInput = document.getElementById("live-points-json");
+    if (liveInput && liveInput.value.trim()) {
+      const parsed = JSON.parse(liveInput.value);
+      const points = extractAcceptedPoints(parsed);
+      const mode = document.getElementById("live-path-mode").value;
+      const lineWidth = Number(document.getElementById("live-line-width").value);
+      if (!Number.isFinite(lineWidth) || lineWidth <= 0 || lineWidth > 100) {
+        throw new Error("Line width must be greater than 0 and no more than 100.");
+      }
+      return [{ id: "live-accepted-points", mode, points, lineWidths: [lineWidth],
+        sourceRunId: parsed && !Array.isArray(parsed) ? parsed.run_id || null : null }];
+    }
     return [
       { id: "smooth-single-point", mode: "smooth", points: [{ x: 40, y: 40 }] },
       { id: "smooth-two-points", mode: "smooth", points: [{ x: 35, y: 65 }, { x: 145, y: 65 }] },
@@ -551,7 +564,7 @@
       manifest.webglProbe.contextAttributes = webglState.contextAttributes;
 
       for (const fixture of fixtureList()) {
-        for (const lineWidth of LINE_WIDTHS) {
+        for (const lineWidth of fixture.lineWidths || LINE_WIDTHS) {
           const actual = makeActualBoardPane(fixture.mode, fixture.points, lineWidth);
           const manual = makeManualBoardPane(fixture.mode, fixture.points, lineWidth);
           const source = renderGraphicsNode(actual.shape.$renderNode, false);
@@ -578,6 +591,7 @@
           const entry = {
             id: fixture.id,
             mode: fixture.mode,
+            sourceRunId: fixture.sourceRunId || null,
             lineWidth,
             points: fixture.points,
             commands: actual.commands,
