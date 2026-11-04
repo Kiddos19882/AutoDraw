@@ -335,6 +335,12 @@ jobs:
             }
             if (-not $ready) { throw "Local HTTP server did not become ready." }
 
+            $bundleResponse = Invoke-WebRequest -Uri "http://127.0.0.1:8765/AutoDraw_Stage20/gameEngine/mergeEngine_df2e5bc5.js" -TimeoutSec 10
+            if ($bundleResponse.StatusCode -ne 200 -or $bundleResponse.Content.Length -lt 100000) {
+              throw "Egret bundle HTTP check failed: status=$($bundleResponse.StatusCode), chars=$($bundleResponse.Content.Length)."
+            }
+            Write-Host "Egret bundle HTTP check: status=$($bundleResponse.StatusCode), chars=$($bundleResponse.Content.Length)."
+
             $edgeCandidates = @(
               (Join-Path ${env:ProgramFiles(x86)} "Microsoft\Edge\Application\msedge.exe"),
               (Join-Path $env:ProgramFiles "Microsoft\Edge\Application\msedge.exe")
@@ -361,8 +367,22 @@ jobs:
 
             $dom = Get-Content -Raw $domPath
             if ($dom -notmatch 'data-reference-status="complete"' -or $dom -notmatch 'data-fixture-count="18"') {
-              if (Test-Path $stderrPath) { Get-Content $stderrPath }
-              throw "Egret reference page did not report 18 completed fixtures."
+              $diagnosticDomPath = Join-Path $outputDir "page-dom-diagnostic.html"
+              Set-Content -Path $diagnosticDomPath -Value $dom -Encoding utf8
+              if (Test-Path $stderrPath) {
+                Copy-Item $stderrPath (Join-Path $outputDir "edge-stderr.log") -Force
+                Write-Host "Headless Edge stderr:"
+                Get-Content $stderrPath
+              }
+              $statusMatch = [regex]::Match($dom, '<p id="renderer-status"[^>]*>(.*?)</p>', [System.Text.RegularExpressions.RegexOptions]::Singleline)
+              if ($statusMatch.Success) {
+                Write-Host "Renderer status from DOM: $([System.Net.WebUtility]::HtmlDecode($statusMatch.Groups[1].Value))"
+              } else {
+                Write-Host "Renderer status element was not present in dumped DOM."
+              }
+              Write-Host "Headless Edge DOM diagnostic (first 16000 characters):"
+              Write-Host $dom.Substring(0, [Math]::Min(16000, $dom.Length))
+              throw "Egret reference page did not report 18 completed fixtures; diagnostic DOM saved to artifact."
             }
 
             $manifestMatch = [regex]::Match($dom, '<pre id="renderer-manifest-json"[^>]*>(.*?)</pre>', [System.Text.RegularExpressions.RegexOptions]::Singleline)
