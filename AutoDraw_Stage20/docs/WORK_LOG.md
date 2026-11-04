@@ -2739,3 +2739,11 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - Последующий review уточнил строгую разницу между positive-area potential и guaranteed interior: убрано epsilon вычитание из potential predicate, гарантированное покрытие получило inward tolerance; boolean scales запрещены. Добавлен независимый analytic oracle для horizontal capsule.
 - Follow-up commits: `336d66f` (oracle), `8aeb66a` (conservative predicate fix), `7357f3e` (boolean scale test). CI [41843716918](https://github.com/Kiddos19882/AutoDraw/actions/runs/41843716918) на последнем commit ещё ожидает завершения.
 - Planner outputs/defaults не менялись; live experiments не проводились; FILL-001-RS quality gate не затронут.
+
+
+## 2026-11-04 — приоритет connected-contour кандидата для FILL-001-RS
+
+- По запросу пользователя зафиксирован ключевой концептуальный вывод: для периметр-доминантных пропусков сравнивать редкий внутренний scanline-fill + один связный обход контура + локальные внутренние коррекции с глобальным уплотнением scanline и с горизонтальными коррекциями.
+- Уточнено, что исторический outline-first prototype использовал независимые горизонтальные boundary runs, а не единый связный contour route; его результаты не опровергают новую гипотезу.
+- Вывод классифицирован как OPEN / OFFLINE CANDIDATE / HYPOTHESIS. Экономия CHALK не доказана; exact расход определяется только pointCount delta. Сохранены PNG acceptance thresholds и текущие renderer/live gates.
+- Изменены только документационные файлы: AI_WORK_GUIDE, docs index, TASKS, ROADMAP, WORK_LOG и CHANGELOG. Исходники, тесты, конфигурации, frozen plans/masks и экспериментальные данные не менялись; live run не выполнялся.
