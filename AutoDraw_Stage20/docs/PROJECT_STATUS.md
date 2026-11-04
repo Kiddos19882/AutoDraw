@@ -2,6 +2,17 @@
 
 ## Актуальное состояние на 2026-11-04
 
+## FILL-001-RS — согласование координат PNG audit — 2026-11-04
+
+В live preflight серии `fill001-rs-preflight-20261104-7.04` runtime binding подтверждён: rectangle/r10/step=5/offset=0, 27/27 штрихов, observed radius=10, exact CHALK=1260 (pointCount 1→1261). Bridge diagnostics: 0 sequence gaps, 0 dropped events, 0 Monitor errors, 0 send failures. Capture отклонён исходным PNG audit: coverage=97.673218%, leakage=28.
+
+Статический разбор обнаружил несовпадение преобразований logical canvas 460×240 в ROI 581×304: executor использует (width−1)/460 и (height−1)/240, а PNG audit ранее использовал PIL.resize с width/460 и height/240. Это разные affine transforms. На frozen rectangle mask два raster masks различаются на 606 screen pixels. Это подтверждает дефект выравнивания validation mask, но само по себе не доказывает, что им объясняется вся потеря coverage или leakage.
+
+Исправление: [4797aa5](https://github.com/Kiddos19882/AutoDraw/commit/4797aa5e2e3d9f78656c91dcddf285304eae55c1) согласует PNG mask rasterization с executor transform; [a950084](https://github.com/Kiddos19882/AutoDraw/commit/a950084db14fd1560aa15f099da4a0108c9631e7) обновляет regression fixture/assertions.
+
+**Проверка после исправления не завершена:** локальные pytest недоступны через GitHub API; для новых commits нет подтверждённых CI statuses. Реальные PNG ещё не пересчитаны исправленным audit. Capture не принят, пороги coverage≥99% / leakage=0 не менялись, 45-task matrix остаётся BLOCKED. Следующий gate — полный CI/replay на текущем HEAD; при повторном fail исследовать footprint игрового renderer, brush radius semantics и raster sampling.
+
+
 ## FILL-001-RS — runtime binding и PNG audit по live evidence — 2026-11-04
 
 Пользовательский evidence commit [5308214](https://github.com/Kiddos19882/AutoDraw/commit/530821497ce3a6bd5152318a78e1f06cb836f288) содержит завершённый single-task run rectangle/r10/step=5/offset=0: 27/27 штрихов, radius=10, exact CHALK = 1261 − 1 = 1260. Bridge run `6a17a297-ea14-4527-9527-bfd8de3bd335` завершён без dropped events, Monitor errors, Bridge send failures и sequence gaps.
