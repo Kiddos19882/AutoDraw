@@ -1,8 +1,22 @@
 # Актуальная точка продолжения — 2026-11-04
 
+
+## Дополнение — исправление empty GraphicsNode в reference harness (2026-11-04)
+
+**Последние harness/test commits:** `e1caaba6e92dffabc50794c5687cb7c81cc5db08` и `e2cdafaf3249ba4168082e7a6fcac67d850d9119`. CI diagnostics workflow: `167661b09417c107aa39ab58891302e1ea8b4c76`.
+
+- Статически локализована причина прежнего browser harness failure: первый fixture `smooth-single-point` создаёт только moveTo-команды. Egret `Graphics.moveTo()` не обновляет GraphicsNode bounds; WebGLRenderer пропускает GraphicsNode без положительных width/height или без drawData. Старый harness выбрасывал исключение на empty bounds и останавливал batch.
+- Harness теперь повторяет WebGLRenderer guard: empty node формирует прозрачный no-op reference и manifest disposition; остальные fixtures продолжают рендериться через Egret CanvasRenderer. Добавлен Node regression test для renderer guard.
+- CI step дополнен проверкой HTTP-доступности локального Egret bundle и диагностикой DOM/Edge stderr при failure.
+- **CI нового HEAD не подтверждён.** Предыдущий run `41903225993` завершился FAILURE; новый результат не заявляется. 18 fixtures, 36 PNG reference outputs и manifest ещё должны быть подтверждены browser run.
+- Это не WebGL texture/mask implementation и не pixel equivalence. Production planner/defaults, FILL-001 matrix и live game experiments не менялись.
+
+**Следующий gate:** подтвердить 18/18 browser fixtures и artifacts; затем сравнить source raster с game capture той же browser/runtime и отдельно проверить WebGL sampling/mask stencil. Не переходить к planner integration до pixel acceptance.
+
+
 ## Дополнение — runtime renderer diagnostics (2026-11-04)
 
-**Последний code commit:** `b2d467de6d7fb247d9014e47b1b58da782ff6d68`; последующий HEAD содержит документальные фиксации и runtime evidence в `feature/image-geometry-optimization`.
+**Последний code/test commit:** `e2cdafaf3249ba4168082e7a6fcac67d850d9119`; последующий HEAD содержит документальные фиксации и runtime evidence в `feature/image-geometry-optimization`.
 
 - В Game Monitor реализован read-only `rendererSnapshot()`; `inspect()` теперь возвращает объект `renderer` вместе с прежним CHALK snapshot.
 - Снимок фиксирует фактический Egret renderMode/systemRenderer, canvas scale factors, DPR, viewport scale, экранную геометрию canvas и CSS transform, цепочку преобразований BoardPane, mask и stage/client corner coordinates (client corners доступны при поддержке `getBoxQuads()`).
