@@ -1013,3 +1013,21 @@ Per-run transport gates чистые: `dropped_events=0`, `monitor_error_count_d
 - Commits: `e62b69295f9df1c67a485a5c900fbcf1ceba87eb`, `d337f4240e83488273152f65992032beca395781`.
 - Результат вычисления пока PENDING: локальная рабочая копия недоступна, GitHub combined status не вернул CI statuses; запуск и лог Preparation/G3 требуют подтверждения. Не считать actual pixel breakdown завершённым.
 - Capture остаётся REJECTED, 45-task matrix BLOCKED. Live эксперименты не запускались.
+## 2026-11-04 — FILL-001-RS actual PNG residual coordinates confirmed
+
+Workflow 41787492122 for commit d337f4240e83488273152f65992032beca395781 completed successfully. Preparation/G3 job 126432951884: 804 passed, 24 warnings, 82 subtests passed. Executor regression, Game Monitor/Bridge, application integration, INT-006 PNG audit, Windows portable build/startup smoke-test all SUCCESS; optional algorithm benchmarks SKIPPED.
+
+Committed before/after PNG replay:
+- corrected PNG audit: coverage=98.430600%, leakage=11, status=failed;
+- uncovered target pixels: 1116;
+- spatial zones: top=244, bottom=239, left-middle=134, right-middle=499, interior/other=0;
+- largest uncovered component bbox screen xywh=[460,63,33,178], area=870;
+- other components: [88,90,2,122] area=142; [101,233,13,7] area=54; [101,64,13,6] area=41; small components 6,1,1,1 pixels;
+- nearest scanline centerline distance bands: <=2px=10, 2–5px=320, 5–10px=786, >10px=0;
+- leakage coordinates: (116,63),(117,63),(92,78),(91,81),(90,83),(90,84),(89,85),(90,85),(90,218),(116,240),(117,240).
+
+Direct pixel evidence shows residuals concentrated at target perimeter / scanline endpoint zones; the configured interior/other zone contains 0 pixels. The largest residual is along the right perimeter. Leakage is sparse near the left perimeter and upper/lower rounded corners. This supports prioritizing perimeter/endpoint coverage rather than changing the interior row step. It does NOT prove game brush footprint, cap shape, radius semantics, or a particular contour offset.
+
+Planner OpenCV model had 304 uncovered logical pixels, actual PNG diagnostic found 1116 screen pixels. These are different raster spaces and renderer models; do not treat counts as interchangeable.
+
+Capture remains REJECTED; 45-task matrix remains BLOCKED. Exact CHALK remains 1260 from the existing live run. No new live experiment. Frozen plan, mask, thresholds and production code unchanged.
