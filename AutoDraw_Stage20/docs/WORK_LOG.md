@@ -2722,3 +2722,12 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - Источниковая версия Egret и deployed renderer footprint не подтверждены. Это static code finding, не live/render validation.
 - Изменения исходников, тестов, конфигураций и workflow не выполнялись; frozen evidence и thresholds не затрагивались.
 - Следующий шаг — offline possible/guaranteed cell masks, независимые geometric tests и old/new frozen-fixture comparison; production behavior не менять до acceptance.
+
+## 2026-11-04 — BRUSH-FOOTPRINT-CAPSULE-001 offline candidate implementation
+
+- Добавлена функция `swept_capsule_pixel_masks()` в `brush_footprint_geometry.py`: potential cells (positive-area intersection with ideal capsule sweep) и guaranteed cells (pixel cell fully inside at least one segment capsule); pixel cells mapped back to logical space for non-uniform scale.
+- Bbox остаётся broad-phase; существующий `footprint_pixel_bounds()` не удалён и не изменён. `interior_fill_planner`, `outline_first_fill_planner`, FILL-001 planner outputs/defaults не интегрированы с новой моделью.
+- Добавлен `test_capsule_footprint_masks.py`: endpoints/AABB corner distinction, point disk, anisotropic scaling, polyline reversal/round join, clipping, invalid inputs.
+- Commits: `5a090948ecbe927807fde4ffc5337132d131b765` (implementation), `7ffdd150ba42840737cba5f2143370e56d67bed3` (tests).
+- CI run [41842587672](https://github.com/Kiddos19882/AutoDraw/actions/runs/41842587672) ещё выполняется. Independent analytic oracle и frozen fixture comparison пока не добавлены; модель не подтверждена deployed Egret runtime.
+- Live tests не проводились; raw evidence, frozen plans/masks, thresholds и production defaults не менялись.
