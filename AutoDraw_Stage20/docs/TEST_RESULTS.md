@@ -61,7 +61,7 @@ GitHub tree на HEAD `0a5fa41c` содержит 5 413 файлов; 5 011 фа
 | scrollrect-edges | 10 / 30 | 0 / 0 | 0 / 0 |
 | mask-corner | 10 | 145 | 1 |
 | mask-corner | 30 | 36 | 1 |
-| Остальные 12 comparisons | 10 / 30 | 14 comparisons суммарно имеют отличия | 1 |
+| Остальные fixtures (12 comparisons) | 10 / 30 | differing pixels присутствуют во всех 12 comparisons | 1 |
 
 Итого: 18/18 WebGL comparisons созданы; 4 exact, 14 имеют max channel delta=1, ни одного delta выше 1. Для сравнения, до stage-binding correction mask-corner имел 193/84 differing pixels и max delta=255. Среда: Egret 5.4.1, Edge 156, WebGL 1 / ANGLE SwiftShader, rasterScale=3, board output 1380×720. Это E3 browser/CI evidence для offline renderer harness, не E4 live game capture.
 
