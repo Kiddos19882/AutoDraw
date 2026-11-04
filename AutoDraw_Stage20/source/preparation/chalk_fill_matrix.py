@@ -238,14 +238,17 @@ def validate_fill001_matrix(matrix: Any) -> None:
         if isinstance(count, bool) or not isinstance(count, int) or count < 1:
             raise FillMatrixError("expected_strokes должен быть положительным целым.")
         if plan_variant == FILL001_RS_PLAN_VARIANT:
-            if task.get("plan_variant") != FILL001_RS_PLAN_VARIANT or task.get("planner_version") != 2:
-                raise FillMatrixError("FILL-001-RS task не закрепляет planner version 2.")
+            if task.get("plan_variant") != FILL001_RS_PLAN_VARIANT:
+                raise FillMatrixError("FILL-001-RS task не закрепляет plan variant.")
             step, offset = task.get("scanline_row_step"), task.get("scanline_offset")
             if (
                 type(step) is not int or not 1 <= step <= task.get("requested_radius", 0)
                 or type(offset) is not int or not 0 <= offset < step
             ):
                 raise FillMatrixError("Некорректные scanline spacing parameters в FILL-001-RS task.")
+            expected_planner_version = 1 if step == 1 and offset == 0 else 2
+            if task.get("planner_version") != expected_planner_version:
+                raise FillMatrixError("FILL-001-RS task не закрепляет ожидаемую planner version.")
             if (task.get("shape_id"), task.get("requested_radius")) not in FILL001_RS_SCANLINE_CONFIGS:
                 raise FillMatrixError("Неизвестная shape/radius ячейка FILL-001-RS.")
             if FILL001_RS_SCANLINE_CONFIGS[(task["shape_id"], task["requested_radius"])] != (step, offset):
