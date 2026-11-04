@@ -689,3 +689,13 @@ CI SUCCESS не является live evidence; 45-cell matrix остаётся 
 - [ ] На основании координат определить, связаны ли пропуски с краевыми участками, окончаниями штрихов, footprint/cap renderer или другими факторами; не подменять этот вывод planner model.
 
 Commits: `e62b69295f9df1c67a485a5c900fbcf1ceba87eb`, `d337f4240e83488273152f65992032beca395781`. Diagnostic code добавлен, его execution result ещё не подтверждён. Capture REJECTED; 45-cell matrix BLOCKED.
+## FILL-001-RS — actual PNG residual localization (2026-11-04)
+
+- [x] Run committed-evidence replay diagnostic in CI and obtain actual PNG residual coordinates.
+- [x] Confirm spatial distribution: 1116 uncovered target pixels; top 244, bottom 239, left-middle 134, right-middle 499, interior/other 0.
+- [x] Localize 11 leakage pixels: six small components, primarily left perimeter / upper and lower rounded corners.
+- [ ] Establish actual rendered brush footprint and endpoint/cap behavior against the game engine; current evidence does not prove radius semantics or effective radius.
+- [ ] Build and compare perimeter/contour candidate variants against actual-renderer evidence without changing frozen preflight.
+- [ ] Re-run preflight and meet coverage >=99%, leakage=0 before unlocking the 45-experiment matrix.
+
+CI evidence: workflow 41787492122, commit d337f4240e83488273152f65992032beca395781; Preparation/G3 804 passed, 82 subtests passed. Capture still REJECTED; 45-task matrix BLOCKED. Do not infer CHALK from geometric path estimates.
