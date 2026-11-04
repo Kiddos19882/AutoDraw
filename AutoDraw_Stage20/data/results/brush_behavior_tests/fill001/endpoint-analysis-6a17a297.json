@@ -1,0 +1,608 @@
+{
+  "analysis_version": 1,
+  "source": {
+    "path": "AutoDraw_Stage20/data/results/brush_behavior_tests/game_monitor_bridge/bb261898-8296-41f5-a333-eb0b81016410/game-monitor-run-20261104T040548835772Z-6a17a297.json",
+    "blob_sha": "8eb04ad7331d1e56f4aeb7d0f625c59c1dc57c24",
+    "run_id": "6a17a297-ea14-4527-9527-bfd8de3bd335",
+    "started_at_utc": "2026-11-04T04:05:00.101+00:00",
+    "finished_at_utc": "2026-11-04T04:05:48.835+00:00"
+  },
+  "exact_chalk": {
+    "consumed_points": 1260,
+    "pre_point_count": 1,
+    "post_point_count": 1261,
+    "point_delta_matches_chalk": true
+  },
+  "brush": {
+    "line_width": 10,
+    "observed_radii": [
+      10
+    ]
+  },
+  "capture_completeness": {
+    "draw_sample_events": 1287,
+    "positive_delta_samples": 1260,
+    "positive_point_delta_sum": 1260,
+    "max_positive_point_delta": 1,
+    "point_quota_update_events": 1260,
+    "accepted_point_coordinates": 1260,
+    "all_accepted_point_coordinates_accounted_for": true
+  },
+  "geometry": {
+    "stroke_count": 27,
+    "accepted_points": 1260,
+    "within_stroke_segments": {
+      "count": 1233,
+      "min": 3,
+      "median": 6,
+      "p90": 9,
+      "p95": 10,
+      "max": 13,
+      "over_line_width": 3
+    },
+    "final_segment_per_stroke": {
+      "count": 27,
+      "min": 3,
+      "median": 6,
+      "p90": 7,
+      "p95": 9,
+      "max": 9,
+      "over_line_width": 0,
+      "ideal_round_cap_covers_last_accepted_sample_centers": 27,
+      "estimated_ideal_geometric_gaps_to_last_sample_center": []
+    },
+    "per_stroke": [
+      {
+        "stroke_id": "pointer-stroke-3",
+        "accepted_point_count": 41,
+        "first_accepted_point": {
+          "x": 95.20833396911621,
+          "y": 56
+        },
+        "last_accepted_point": {
+          "x": 370.2083339691162,
+          "y": 56
+        },
+        "smooth_path_terminal_point": {
+          "x": 367.2083339691162,
+          "y": 56
+        },
+        "last_accepted_segment_length": 6,
+        "ideal_round_cap_margin_to_last_sample": 2,
+        "ideal_round_cap_covers_last_sample_center": true,
+        "ideal_geometric_gap_to_last_sample_center": 0
+      },
+      {
+        "stroke_id": "pointer-stroke-4",
+        "accepted_point_count": 45,
+        "first_accepted_point": {
+          "x": 82.20833396911621,
+          "y": 62
+        },
+        "last_accepted_point": {
+          "x": 383.2083339691162,
+          "y": 62
+        },
+        "smooth_path_terminal_point": {
+          "x": 379.7083339691162,
+          "y": 62
+        },
+        "last_accepted_segment_length": 7,
+        "ideal_round_cap_margin_to_last_sample": 1.5,
+        "ideal_round_cap_covers_last_sample_center": true,
+        "ideal_geometric_gap_to_last_sample_center": 0
+      },
+      {
+        "stroke_id": "pointer-stroke-5",
+        "accepted_point_count": 46,
+        "first_accepted_point": {
+          "x": 78.20833396911621,
+          "y": 66
+        },
+        "last_accepted_point": {
+          "x": 387.2083339691162,
+          "y": 66
+        },
+        "smooth_path_terminal_point": {
+          "x": 383.7083339691162,
+          "y": 66
+        },
+        "last_accepted_segment_length": 7,
+        "ideal_round_cap_margin_to_last_sample": 1.5,
+        "ideal_round_cap_covers_last_sample_center": true,
+        "ideal_geometric_gap_to_last_sample_center": 0
+      },
+      {
+        "stroke_id": "pointer-stroke-6",
+        "accepted_point_count": 47,
+        "first_accepted_point": {
+          "x": 76.20833396911621,
+          "y": 71
+        },
+        "last_accepted_point": {
+          "x": 388.2083339691162,
+          "y": 71
+        },
+        "smooth_path_terminal_point": {
+          "x": 383.7083339691162,
+          "y": 71
+        },
+        "last_accepted_segment_length": 9,
+        "ideal_round_cap_margin_to_last_sample": 0.5,
+        "ideal_round_cap_covers_last_sample_center": true,
+        "ideal_geometric_gap_to_last_sample_center": 0
+      },
+      {
+        "stroke_id": "pointer-stroke-7",
+        "accepted_point_count": 47,
+        "first_accepted_point": {
+          "x": 76.20833396911621,
+          "y": 77
+        },
+        "last_accepted_point": {
+          "x": 389.2083339691162,
+          "y": 77
+        },
+        "smooth_path_terminal_point": {
+          "x": 387.7083339691162,
+          "y": 77
+        },
+        "last_accepted_segment_length": 3,
+        "ideal_round_cap_margin_to_last_sample": 3.5,
+        "ideal_round_cap_covers_last_sample_center": true,
+        "ideal_geometric_gap_to_last_sample_center": 0
+      },
+      {
+        "stroke_id": "pointer-stroke-8",
+        "accepted_point_count": 47,
+        "first_accepted_point": {
+          "x": 76.20833396911621,
+          "y": 82
+        },
+        "last_accepted_point": {
+          "x": 389.2083339691162,
+          "y": 82
+        },
+        "smooth_path_terminal_point": {
+          "x": 386.2083339691162,
+          "y": 82
+        },
+        "last_accepted_segment_length": 6,
+        "ideal_round_cap_margin_to_last_sample": 2,
+        "ideal_round_cap_covers_last_sample_center": true,
+        "ideal_geometric_gap_to_last_sample_center": 0
+      },
+      {
+        "stroke_id": "pointer-stroke-9",
+        "accepted_point_count": 47,
+        "first_accepted_point": {
+          "x": 76.20833396911621,
+          "y": 86
+        },
+        "last_accepted_point": {
+          "x": 389.2083339691162,
+          "y": 86
+        },
+        "smooth_path_terminal_point": {
+          "x": 386.2083339691162,
+          "y": 86
+        },
+        "last_accepted_segment_length": 6,
+        "ideal_round_cap_margin_to_last_sample": 2,
+        "ideal_round_cap_covers_last_sample_center": true,
+        "ideal_geometric_gap_to_last_sample_center": 0
+      },
+      {
+        "stroke_id": "pointer-stroke-10",
+        "accepted_point_count": 47,
+        "first_accepted_point": {
+          "x": 76.20833396911621,
+          "y": 92
+        },
+        "last_accepted_point": {
+          "x": 389.2083339691162,
+          "y": 92
+        },
+        "smooth_path_terminal_point": {
+          "x": 386.2083339691162,
+          "y": 92
+        },
+        "last_accepted_segment_length": 6,
+        "ideal_round_cap_margin_to_last_sample": 2,
+        "ideal_round_cap_covers_last_sample_center": true,
+        "ideal_geometric_gap_to_last_sample_center": 0
+      },
+      {
+        "stroke_id": "pointer-stroke-11",
+        "accepted_point_count": 48,
+        "first_accepted_point": {
+          "x": 76.20833396911621,
+          "y": 97
+        },
+        "last_accepted_point": {
+          "x": 389.2083339691162,
+          "y": 97
+        },
+        "smooth_path_terminal_point": {
+          "x": 387.7083339691162,
+          "y": 97
+        },
+        "last_accepted_segment_length": 3,
+        "ideal_round_cap_margin_to_last_sample": 3.5,
+        "ideal_round_cap_covers_last_sample_center": true,
+        "ideal_geometric_gap_to_last_sample_center": 0
+      },
+      {
+        "stroke_id": "pointer-stroke-12",
+        "accepted_point_count": 48,
+        "first_accepted_point": {
+          "x": 76.20833396911621,
+          "y": 102
+        },
+        "last_accepted_point": {
+          "x": 389.2083339691162,
+          "y": 102
+        },
+        "smooth_path_terminal_point": {
+          "x": 387.7083339691162,
+          "y": 102
+        },
+        "last_accepted_segment_length": 3,
+        "ideal_round_cap_margin_to_last_sample": 3.5,
+        "ideal_round_cap_covers_last_sample_center": true,
+        "ideal_geometric_gap_to_last_sample_center": 0
+      },
+      {
+        "stroke_id": "pointer-stroke-13",
+        "accepted_point_count": 47,
+        "first_accepted_point": {
+          "x": 76.20833396911621,
+          "y": 107
+        },
+        "last_accepted_point": {
+          "x": 389.2083339691162,
+          "y": 107
+        },
+        "smooth_path_terminal_point": {
+          "x": 387.7083339691162,
+          "y": 107
+        },
+        "last_accepted_segment_length": 3,
+        "ideal_round_cap_margin_to_last_sample": 3.5,
+        "ideal_round_cap_covers_last_sample_center": true,
+        "ideal_geometric_gap_to_last_sample_center": 0
+      },
+      {
+        "stroke_id": "pointer-stroke-14",
+        "accepted_point_count": 48,
+        "first_accepted_point": {
+          "x": 76.20833396911621,
+          "y": 112
+        },
+        "last_accepted_point": {
+          "x": 389.2083339691162,
+          "y": 112
+        },
+        "smooth_path_terminal_point": {
+          "x": 387.7083339691162,
+          "y": 112
+        },
+        "last_accepted_segment_length": 3,
+        "ideal_round_cap_margin_to_last_sample": 3.5,
+        "ideal_round_cap_covers_last_sample_center": true,
+        "ideal_geometric_gap_to_last_sample_center": 0
+      },
+      {
+        "stroke_id": "pointer-stroke-15",
+        "accepted_point_count": 48,
+        "first_accepted_point": {
+          "x": 76.20833396911621,
+          "y": 117
+        },
+        "last_accepted_point": {
+          "x": 389.2083339691162,
+          "y": 117
+        },
+        "smooth_path_terminal_point": {
+          "x": 387.7083339691162,
+          "y": 117
+        },
+        "last_accepted_segment_length": 3,
+        "ideal_round_cap_margin_to_last_sample": 3.5,
+        "ideal_round_cap_covers_last_sample_center": true,
+        "ideal_geometric_gap_to_last_sample_center": 0
+      },
+      {
+        "stroke_id": "pointer-stroke-16",
+        "accepted_point_count": 47,
+        "first_accepted_point": {
+          "x": 76.20833396911621,
+          "y": 122
+        },
+        "last_accepted_point": {
+          "x": 389.2083339691162,
+          "y": 122
+        },
+        "smooth_path_terminal_point": {
+          "x": 387.7083339691162,
+          "y": 122
+        },
+        "last_accepted_segment_length": 3,
+        "ideal_round_cap_margin_to_last_sample": 3.5,
+        "ideal_round_cap_covers_last_sample_center": true,
+        "ideal_geometric_gap_to_last_sample_center": 0
+      },
+      {
+        "stroke_id": "pointer-stroke-17",
+        "accepted_point_count": 47,
+        "first_accepted_point": {
+          "x": 76.20833396911621,
+          "y": 127
+        },
+        "last_accepted_point": {
+          "x": 389.2083339691162,
+          "y": 127
+        },
+        "smooth_path_terminal_point": {
+          "x": 386.2083339691162,
+          "y": 127
+        },
+        "last_accepted_segment_length": 6,
+        "ideal_round_cap_margin_to_last_sample": 2,
+        "ideal_round_cap_covers_last_sample_center": true,
+        "ideal_geometric_gap_to_last_sample_center": 0
+      },
+      {
+        "stroke_id": "pointer-stroke-18",
+        "accepted_point_count": 47,
+        "first_accepted_point": {
+          "x": 76.20833396911621,
+          "y": 132
+        },
+        "last_accepted_point": {
+          "x": 389.2083339691162,
+          "y": 132
+        },
+        "smooth_path_terminal_point": {
+          "x": 384.7083339691162,
+          "y": 132
+        },
+        "last_accepted_segment_length": 9,
+        "ideal_round_cap_margin_to_last_sample": 0.5,
+        "ideal_round_cap_covers_last_sample_center": true,
+        "ideal_geometric_gap_to_last_sample_center": 0
+      },
+      {
+        "stroke_id": "pointer-stroke-19",
+        "accepted_point_count": 47,
+        "first_accepted_point": {
+          "x": 76.20833396911621,
+          "y": 137
+        },
+        "last_accepted_point": {
+          "x": 389.2083339691162,
+          "y": 137
+        },
+        "smooth_path_terminal_point": {
+          "x": 387.7083339691162,
+          "y": 137
+        },
+        "last_accepted_segment_length": 3,
+        "ideal_round_cap_margin_to_last_sample": 3.5,
+        "ideal_round_cap_covers_last_sample_center": true,
+        "ideal_geometric_gap_to_last_sample_center": 0
+      },
+      {
+        "stroke_id": "pointer-stroke-20",
+        "accepted_point_count": 47,
+        "first_accepted_point": {
+          "x": 76.20833396911621,
+          "y": 143
+        },
+        "last_accepted_point": {
+          "x": 389.2083339691162,
+          "y": 143
+        },
+        "smooth_path_terminal_point": {
+          "x": 386.2083339691162,
+          "y": 143
+        },
+        "last_accepted_segment_length": 6,
+        "ideal_round_cap_margin_to_last_sample": 2,
+        "ideal_round_cap_covers_last_sample_center": true,
+        "ideal_geometric_gap_to_last_sample_center": 0
+      },
+      {
+        "stroke_id": "pointer-stroke-21",
+        "accepted_point_count": 48,
+        "first_accepted_point": {
+          "x": 76.20833396911621,
+          "y": 148
+        },
+        "last_accepted_point": {
+          "x": 389.2083339691162,
+          "y": 148
+        },
+        "smooth_path_terminal_point": {
+          "x": 387.7083339691162,
+          "y": 148
+        },
+        "last_accepted_segment_length": 3,
+        "ideal_round_cap_margin_to_last_sample": 3.5,
+        "ideal_round_cap_covers_last_sample_center": true,
+        "ideal_geometric_gap_to_last_sample_center": 0
+      },
+      {
+        "stroke_id": "pointer-stroke-22",
+        "accepted_point_count": 47,
+        "first_accepted_point": {
+          "x": 76.20833396911621,
+          "y": 152
+        },
+        "last_accepted_point": {
+          "x": 389.2083339691162,
+          "y": 152
+        },
+        "smooth_path_terminal_point": {
+          "x": 386.2083339691162,
+          "y": 152
+        },
+        "last_accepted_segment_length": 6,
+        "ideal_round_cap_margin_to_last_sample": 2,
+        "ideal_round_cap_covers_last_sample_center": true,
+        "ideal_geometric_gap_to_last_sample_center": 0
+      },
+      {
+        "stroke_id": "pointer-stroke-23",
+        "accepted_point_count": 47,
+        "first_accepted_point": {
+          "x": 76.20833396911621,
+          "y": 158
+        },
+        "last_accepted_point": {
+          "x": 389.2083339691162,
+          "y": 158
+        },
+        "smooth_path_terminal_point": {
+          "x": 386.2083339691162,
+          "y": 158
+        },
+        "last_accepted_segment_length": 6,
+        "ideal_round_cap_margin_to_last_sample": 2,
+        "ideal_round_cap_covers_last_sample_center": true,
+        "ideal_geometric_gap_to_last_sample_center": 0
+      },
+      {
+        "stroke_id": "pointer-stroke-24",
+        "accepted_point_count": 48,
+        "first_accepted_point": {
+          "x": 76.20833396911621,
+          "y": 163
+        },
+        "last_accepted_point": {
+          "x": 389.2083339691162,
+          "y": 163
+        },
+        "smooth_path_terminal_point": {
+          "x": 387.7083339691162,
+          "y": 163
+        },
+        "last_accepted_segment_length": 3,
+        "ideal_round_cap_margin_to_last_sample": 3.5,
+        "ideal_round_cap_covers_last_sample_center": true,
+        "ideal_geometric_gap_to_last_sample_center": 0
+      },
+      {
+        "stroke_id": "pointer-stroke-25",
+        "accepted_point_count": 48,
+        "first_accepted_point": {
+          "x": 76.20833396911621,
+          "y": 168
+        },
+        "last_accepted_point": {
+          "x": 389.2083339691162,
+          "y": 168
+        },
+        "smooth_path_terminal_point": {
+          "x": 387.7083339691162,
+          "y": 168
+        },
+        "last_accepted_segment_length": 3,
+        "ideal_round_cap_margin_to_last_sample": 3.5,
+        "ideal_round_cap_covers_last_sample_center": true,
+        "ideal_geometric_gap_to_last_sample_center": 0
+      },
+      {
+        "stroke_id": "pointer-stroke-26",
+        "accepted_point_count": 47,
+        "first_accepted_point": {
+          "x": 76.20833396911621,
+          "y": 173
+        },
+        "last_accepted_point": {
+          "x": 388.2083339691162,
+          "y": 173
+        },
+        "smooth_path_terminal_point": {
+          "x": 385.2083339691162,
+          "y": 173
+        },
+        "last_accepted_segment_length": 6,
+        "ideal_round_cap_margin_to_last_sample": 2,
+        "ideal_round_cap_covers_last_sample_center": true,
+        "ideal_geometric_gap_to_last_sample_center": 0
+      },
+      {
+        "stroke_id": "pointer-stroke-27",
+        "accepted_point_count": 46,
+        "first_accepted_point": {
+          "x": 78.20833396911621,
+          "y": 178
+        },
+        "last_accepted_point": {
+          "x": 387.2083339691162,
+          "y": 178
+        },
+        "smooth_path_terminal_point": {
+          "x": 385.7083339691162,
+          "y": 178
+        },
+        "last_accepted_segment_length": 3,
+        "ideal_round_cap_margin_to_last_sample": 3.5,
+        "ideal_round_cap_covers_last_sample_center": true,
+        "ideal_geometric_gap_to_last_sample_center": 0
+      },
+      {
+        "stroke_id": "pointer-stroke-28",
+        "accepted_point_count": 46,
+        "first_accepted_point": {
+          "x": 82.20833396911621,
+          "y": 183
+        },
+        "last_accepted_point": {
+          "x": 383.2083339691162,
+          "y": 183
+        },
+        "smooth_path_terminal_point": {
+          "x": 381.7083339691162,
+          "y": 183
+        },
+        "last_accepted_segment_length": 3,
+        "ideal_round_cap_margin_to_last_sample": 3.5,
+        "ideal_round_cap_covers_last_sample_center": true,
+        "ideal_geometric_gap_to_last_sample_center": 0
+      },
+      {
+        "stroke_id": "pointer-stroke-29",
+        "accepted_point_count": 42,
+        "first_accepted_point": {
+          "x": 95.20833396911621,
+          "y": 189
+        },
+        "last_accepted_point": {
+          "x": 370.2083339691162,
+          "y": 189
+        },
+        "smooth_path_terminal_point": {
+          "x": 367.2083339691162,
+          "y": 189
+        },
+        "last_accepted_segment_length": 6,
+        "ideal_round_cap_margin_to_last_sample": 2,
+        "ideal_round_cap_covers_last_sample_center": true,
+        "ideal_geometric_gap_to_last_sample_center": 0
+      }
+    ]
+  },
+  "interpretation": [
+    "The smooth path ends at the midpoint of the final accepted point pair because BoardPane.redraw calls Painter.drawSmoothLine(..., true, false).",
+    "For this run, all 27 final accepted segment lengths are <= 9 logical units, while the line width is 10; an ideal round cap of radius 5 therefore reaches each last accepted sample center.",
+    "This ideal-cap result does not establish browser pixel coverage or coverage at the mouseup coordinate; BoardPane.onDrawingEnd does not sample mouseup.",
+    "No positive DRAW_SAMPLE pointDelta exceeded 1 in this run; accepted point coordinates match the exact 1260-point CHALK delta."
+  ],
+  "limitations": [
+    "No Canvas2D/WebGL PNG comparison is performed.",
+    "No mouseup-to-last-accepted-point distance is calculated because this run does not contain a same-session verified client-to-board transform.",
+    "Ideal round-cap geometry is not a substitute for measured antialiasing, texture filtering, mask clipping or screenshot coverage."
+  ]
+}
