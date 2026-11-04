@@ -2,7 +2,7 @@
 
 **Статус:** актуальный временный план, обязателен к сохранению до выполнения всех пяти шагов или отдельного решения пользователя.  
 **Дата создания:** 2026-11-03  
-**Последнее обновление:** 2026-11-04 (добавлен отдельный этап FILL-001-RS)  
+**Последнее обновление:** 2026-11-04 (FILL-001-RS static sweep и versioned planner implementation)  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
 **Область:** подготовка и проведение контролируемого эксперимента по расходу CHALK при заполнении областей кистями разных радиусов; после quota-exhausted preflight добавлен отдельный versioned этап FILL-001-RS для исследования расстояния между проходами.
 
@@ -146,7 +146,7 @@
 
 ## FILL-001-RS — исследование расстояния между проходами заливки
 
-**Статус:** подготовительный этап документирован; предварительная OpenCV-симуляция выполнена; live-проверка и изменение планировщика не разрешены этим этапом.  
+**Статус:** exhaustive static sweep выполнен; versioned planner/matrix/handoff реализованы; CI validation выполняется; live preflight NOT RUN.  
 **Назначение:** проверить, как расстояние между соседними scanline-проходами влияет на геометрическое покрытие и затем — отдельным разрешённым live-экспериментом — на фактический расход CHALK.  
 **Связь с FILL-001:** это отдельная versioned ветка исследования геометрии. Исходные frozen masks, FILL-001 plans, signatures, manifest, P1 и captures не переписываются.
 
@@ -160,18 +160,18 @@
 
 Текущий fixed-radius planner размещает проходы практически на каждой строке (`scanline_row_step=1`). При ширине кисти 10 соседние линии перекрываются примерно на 90%. OpenCV-симуляция воспроизвела базовый frozen rectangle r10 plan: 131 штрих, path length 40 218, estimated sampling points 10 237, coverage 100%, leakage 0.
 
-В предварительном поиске проверялись шаги и смещения проходов в пределах ранее исследованного диапазона для трёх frozen masks и радиусов 1/5/10/20/30. Ниже — лучшие найденные кандидаты в проверенном диапазоне; это не универсальные настройки и не доказательство глобального оптимума.
+Полный sweep проверил 2 238 сочетаний step/offset в домене step=1..radius и offset=0..step-1; 62 сочетания прошли coverage ≥99% / leakage=0. Выбор: максимальный прошедший row step, затем максимальное coverage и минимальные proxy-метрики. Полный отчёт: [FILL-001-RS static sweep](CHALK_FILL001_RS_STATIC_SWEEP_2026-11-04.md).
 
 | Форма | Радиус | Найденный `scanline_row_step` | Offset |
 |---|---:|---:|---:|
 | rectangle | 1 | 1 | 0 |
-| rectangle | 5 | 2 | 0 |
+| rectangle | 5 | 2 | 1 |
 | rectangle | 10 | 5 | 0 |
-| rectangle | 20 | 8 | 0 |
-| rectangle | 30 | 11 | 0 |
+| rectangle | 20 | 8 | 4 |
+| rectangle | 30 | 11 | 10 |
 | wide_irregular | 1 | 1 | 0 |
 | wide_irregular | 5 | 4 | 0 |
-| wide_irregular | 10 | 7 | 0 |
+| wide_irregular | 10 | 7 | 1 |
 | wide_irregular | 20 | 5 | 0 |
 | wide_irregular | 30 | 10 | 0 |
 | narrow_irregular | 1 | 1 | 0 |
@@ -194,14 +194,13 @@
 
 ### Последовательность FILL-001-RS
 
-1. **Сохранить baseline.** Не менять существующие frozen masks, исходный FILL-001 plan, plan signatures, matrix manifest, P1 или первичные runtime evidence.
-2. **Завершить офлайн-матрицу.** Для всех 15 shape×radius комбинаций воспроизводимо зафиксировать варианты step/offset, coverage, uncovered pixels, leakage, stroke count, path length и estimated sampling points. Поиск ограничен явно указанным диапазоном; результаты вне него неизвестны.
-3. **Проверить геометрию.** Сохранять исходный критерий coverage ≥99% и leakage=0; отдельно отмечать малый запас до порога, узкие участки, углы и границы. Не менять порог после просмотра результатов.
-4. **Зафиксировать отдельный вариант плана.** Любой кандидат получает новый experiment/plan version, новый plan signature и явную ссылку на неизменённый frozen mask SHA. Старые signatures и captures остаются неизменными. В плановом контракте параметр `scanline_row_step` должен быть отдельным от `point_step_px`.
-5. **Подготовить live preflight отдельно.** До запуска проверить, что игровая доска восстановлена и доступна полная квота. Estimated sampling points нельзя использовать как гарантию попадания в бюджет; предусмотреть контролируемое прекращение при приближении к лимиту, если исполнитель и Game Monitor позволяют это сделать без потери доказательств.
-6. **Только после отдельного разрешения пользователя** выполнить один preflight выбранного versioned candidate. Снять exact pre/post `pointCount`, связать executor task, Bridge session/run и Game Monitor, сохранить PNG и выполнить количественный audit coverage/leakage на calibrated ROI.
-7. **Классифицировать результат.** Полный валидный run может быть принят только при прохождении всех runtime и PNG gates. Если квота исчерпана до завершения, записать фактический CHALK до лимита как censored/over-budget attempt; полную стоимость незавершённого плана не подменять наблюдённой delta. Не ослаблять validator и не смешивать такой attempt с accepted capture.
-8. **Решение о расширении.** Только после принятого preflight отдельно решить, можно ли запускать изменённую матрицу. Изменённые геометрия и signatures требуют собственного manifest/experiment ID; исходная 45-cell FILL-001 matrix не переписывается задним числом.
+1. **DONE — сохранить baseline.** Frozen masks, исходные FILL-001 plans/signatures, manifest, P1 и первичные runtime evidence сохранены без изменений.
+2. **DONE — exhaustive static sweep.** Проверены все 2 238 step/offset кандидатов; все 15 shape×radius ячеек имеют выбранную конфигурацию, а все candidate records формируются отдельным CI artifact.
+3. **DONE — versioned planner/matrix/handoff.** Legacy planner version 1 сохраняет прежнюю геометрию/signature. FILL-001-RS использует versioned planner v2 там, где геометрия меняется; `scanline_row_step` независим от `point_step_px`. Создаётся отдельный 45-task manifest с `execution_allowed=false`; CLI: `source/preparation/create_fill001_rs_manifest.py`.
+4. **IN_PROGRESS — software/CI validation.** Пройти preparation regressions, exhaustive sweep script, остальные обязательные CI jobs и Windows portable build/startup smoke-test. До подтверждённого CI не считать реализацию принятой.
+5. **READY FOR LOCAL PREFLIGHT — один candidate.** После успешного CI создать новый `fill001-rs-*` manifest, открыть его существующей вкладкой FILL-001 и запустить только `rectangle/r10/step=5/offset=0/repeat=1`. Требуются восстановленная доска с полной квотой и фактический Windows/browser game session.
+6. **BLOCKED — capture acceptance.** Принять только при exact task↔executor↔Bridge↔Monitor binding, completed 27/27 strokes, exact pointCount delta, неизменном P1 и quantitative PNG gate coverage≥99%/leakage=0. При quota exhaustion сохранить censored attempt, не оценивать полную стоимость.
+7. **BLOCKED — расширение матрицы.** Решать вопрос о 45 live captures FILL-001-RS только после принятого одиночного preflight. Исходную FILL-001 matrix не переписывать.
 
 ### Критерии завершения и блокировки
 
@@ -211,4 +210,4 @@
 - INT-006 safety margin не считается установленным, INT-007 остаётся BLOCKED.
 - Production estimator, production planner, executor defaults, P1 sampling defaults, исходные FILL-001 plans/captures и `master` не изменяются этим этапом.
 
-**Текущее решение:** r10 / step=5 — кандидат для дальнейшей проверки, а не утверждённая настройка AutoDraw. Текущий согласованный объём (документирование) завершён. Воспроизведение расширенного статического sweep, кодовые изменения, тесты, конфигурации и live-эксперименты являются отдельными видами работ и требуют отдельного разрешения пользователя.
+**Текущее решение:** статический sweep и versioned implementation выполнены; r10 / rectangle / step=5 / offset=0 — первый live preflight candidate, но не утверждённая настройка AutoDraw. Code/tests/config/workflow изменены только в рамках данного прямого разрешения пользователя. Live preflight ещё не выполнен: удалённый GitHub workflow не имеет доступа к локальной браузерной игровой сессии и calibrated board.
