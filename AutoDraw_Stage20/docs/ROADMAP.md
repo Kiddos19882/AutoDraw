@@ -1,3 +1,14 @@
+## Обязательный ближайший gate — FILL-001-RS-PRE-REPLAY-001
+
+До любого следующего live запуска FILL-001-RS выполнить offline replay исходных PNG и evidence запуска `fill001-rs-preflight-20261104-7.04` через исправленный `chalk_fill_capture_adapter.py`. Проверить task/run/session binding, plan signature, executor report, Bridge/Monitor diagnostics, неизменённые before/after PNG, coverage≥99% и leakage=0. Сохранить hashes и отдельный replay report.
+
+- Replay PASS: пересмотреть принятие исходного capture по полному контракту; затем отдельно запросить/получить разрешение на следующий одиночный live preflight.
+- Replay FAIL или отсутствуют исходные бинарные evidence: оставить capture BLOCKED, определить конкретную недостающую/ошибочную составляющую и не запускать игру.
+- 45-task matrix остаётся BLOCKED до успешного принятого live preflight и отдельного разрешения на batch.
+- Не менять thresholds, frozen masks, исходный manifest, production defaults или production-код в рамках этой задачи.
+
+Подробный контракт и критерии закрытия: [TASKS.md](TASKS.md), задача FILL-001-RS-PRE-REPLAY-001.
+
 # Roadmap AutoDraw
 
 ## FILL-001-RS — следующий gate после коррекции PNG transform
