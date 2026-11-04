@@ -2909,3 +2909,13 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - Обновлены TASKS/ROADMAP/PROJECT_STATUS и существующий engine report; отдельный дублирующий документ не создавался.
 - Только статический анализ и Markdown. Код, тесты, конфигурации, workflow, primary evidence и master не изменялись. Скрипты/тесты/CI не запускались. Live drawing и игровые эксперименты не выполнялись.
 - Неизвестными остаются backend конкретной сессии, полный display/CSS/device-pixel transform, zero-length rasterization и точный pixel footprint. Следующий gate — offline renderer mode/transform evidence и frozen PNG fixtures.
+
+## 2026-11-04 — GAME-BRUSH-REPLICATION: empty GraphicsNode и browser harness fix
+
+- По согласованному Egret 5.4.1 bundle прослежено поведение moveTo-only path: `Graphics.moveTo()` не обновляет GraphicsNode bounds; WebGLRenderer пропускает rasterization/texture upload для node без положительных width/height либо без drawData.
+- Локализована причина прежнего harness failure: первым выполняется `smooth-single-point`, у него только moveTo-команды; старый `renderGraphicsNode()` выбрасывал исключение на пустых bounds и прекращал batch.
+- Harness изменён так, чтобы повторять WebGLRenderer guard: empty GraphicsNode даёт прозрачный no-op reference и manifest disposition, остальные fixtures продолжают обрабатываться. Добавлен Node regression test для bounds/drawData guard.
+- CI workflow дополнен HTTP-проверкой локального Egret bundle и сохранением/выводом DOM diagnostic и Edge stderr при неуспехе.
+- Commits: `167661b09417c107aa39ab58891302e1ea8b4c76` (CI diagnostics), `e1caaba6e92dffabc50794c5687cb7c81cc5db08` (harness), `e2cdafaf3249ba4168082e7a6fcac67d850d9119` (tests).
+- CI нового HEAD пока не подтверждён; previous run `41903225993` остаётся FAILURE. Browser fixtures/PNG и pixel equivalence не заявляются.
+- Live game, CHALK experiments, production planner/defaults и master не изменялись.
