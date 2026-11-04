@@ -271,7 +271,8 @@ Workflow `.github/workflows/geometry-tests.yml` дополнен независ�
 - [x] Установить, что старый run не сохранил raw per-stroke frame_probe intervals; реализовать их сбор/сохранение для будущих runs (см. сводку выше).
 - [x] Измерить global/display transform именно PainterPopup BoardPane по runtime snapshot: BoardPane local=(30,75), parent PainterPopup=(489.791666,-3), concatenated translation=(519.791666,72), scale=1; boardMask имеет ту же матрицу. Client corners отсутствуют в snapshot и остаются derived.
 - [ ] Получить парный live capture из одной сессии: final board PNG, accepted coordinates/points и pre/post pointCount; offline artifact не заменяет этот capture.
-- [ ] Установить фактически подключённую версию Egret runtime; проверить round caps/joins defaults и raster behavior нулевого сегмента по точной runtime версии либо независимому controlled PNG capture.
+- [x] Подтвердить фактически подключённую версию Egret runtime 5.4.1 по read-only runtime snapshot; статический source trace подтверждает default round caps/joins.
+- [ ] Проверить raster behavior именно нулевого `lineTo` segment (одинаковые start/end coordinates) по точной runtime версии либо controlled PNG capture. Уже проверенный single-point smooth path содержит только `moveTo` и не эквивалентен нулевому сегменту.
 - [ ] Откалибровать screen-space footprint для нескольких значений кисти на одинаковой frozen geometry; сохранить raw before/after PNG и hashes.
 - [ ] Построить отдельные perimeter/endpoint candidates и проверить coverage≥99%, leakage=0 на независимом audit, не меняя frozen preflight.
 - [ ] Только после принятия offline candidate выполнить отдельный live preflight; 45-task matrix не открывать автоматически.

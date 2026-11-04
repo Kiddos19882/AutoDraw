@@ -74,6 +74,7 @@ GitHub tree на HEAD `0a5fa41c` содержит 5 413 файлов; 5 011 фа
 - BoardPane local position `(30,75)`, size `460×240`, scale `(1,1)`.
 - Parent PainterPopup position `(489.791666,-3)`, size `676×379`.
 - BoardPane concatenated matrix: `a=1, b=0, c=0, d=1, tx=519.7916660308838, ty=72`.
+- Runtime snapshot фиксирует Egret `engineVersion=5.4.1`; согласованный source trace подтверждает default round caps/joints.
 - boardMask concatenated matrix совпадает с BoardPane matrix.
 - Canvas CSS rect: `(left=0, top=-0.5, width=1920, height=690)`; Stage `1672×600`; client-space affine scale выводится из этих размеров.
 - `boardClientCorners=null`, `getBoxQuads()` недоступен. Следовательно, screen/client corners — derived values, не direct runtime measurements.
