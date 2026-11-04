@@ -13,8 +13,8 @@
 
 ### Открытые пункты
 - [ ] Получить per-stroke frame_probe intervals из сохранённого Bridge evidence и сопоставить с pointCount deltas, stroke duration и Executor point_step/delay.
-- [ ] Установить display transform именно painter popup BoardPane (не подменять его transform доски внутри BlackBoardItem).
-- [ ] Установить caps/joints и raster behavior нулевого сегмента по Egret Graphics/runtime либо независимому controlled PNG capture.
+- [ ] Измерить global/display transform именно painter popup BoardPane (локальный scale не задаётся; не подменять его transform доски внутри BlackBoardItem).
+- [ ] Установить фактически подключённую версию Egret runtime; проверить round caps/joins defaults и raster behavior нулевого сегмента по точной runtime версии либо независимому controlled PNG capture.
 - [ ] Откалибровать screen-space footprint для нескольких значений кисти на одинаковой frozen geometry; сохранить raw before/after PNG и hashes.
 - [ ] Построить отдельные perimeter/endpoint candidates и проверить coverage≥99%, leakage=0 на независимом audit, не меняя frozen preflight.
 - [ ] Только после принятия offline candidate выполнить отдельный live preflight; 45-task matrix не открывать автоматически.
@@ -708,3 +708,8 @@ Commits: `e62b69295f9df1c67a485a5c900fbcf1ceba87eb`, `d337f4240e83488273152f6599
 - [ ] Re-run preflight and meet coverage >=99%, leakage=0 before unlocking the 45-experiment matrix.
 
 CI evidence: workflow 41787492122, commit d337f4240e83488273152f65992032beca395781; Preparation/G3 804 passed, 82 subtests passed. Capture still REJECTED; 45-task matrix BLOCKED. Do not infer CHALK from geometric path estimates.
+
+
+### Уточнение Egret API — 2026-11-04
+
+Официальный Egret Engine 5.2.18 API описывает lineStyle thickness как ширину линии и defaults CapsStyle.ROUND / JointStyle.ROUND при опущенных аргументах. Bundle передаёт только первые четыре аргумента lineStyle. Версия runtime, реально подключённая игрой, не подтверждена, поэтому defaults считаются обоснованным ожиданием, а не установленным runtime фактом. Источник и ограничения добавлены в engine audit.
