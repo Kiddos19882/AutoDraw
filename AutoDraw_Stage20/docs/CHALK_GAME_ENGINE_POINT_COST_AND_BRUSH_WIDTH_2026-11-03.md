@@ -571,3 +571,22 @@ Manifest содержит Egret engine version, source bundle, browser userAgent
 - regression test: `e2cdafaf3249ba4168082e7a6fcac67d850d9119`.
 
 **Статус проверки:** CI нового HEAD не подтверждён. Предыдущий browser run `41903225993` завершился FAILURE; новый workflow теперь должен проверять HTTP-доступность bundle и сохранять DOM/Edge diagnostics при повторном failure. Не считать harness PASS, пока не получены 18 fixture entries, 36 PNG reference files и manifest.
+
+
+### 15.13 Input delivery → stage rounding → ENTER_FRAME sampling
+
+По согласованному Egret 5.4.1 bundle статически подтверждены следующие звенья:
+
+1. `WebTouchHandler.addMouseListener()` регистрирует `mousedown`, `mousemove`, `mouseup` непосредственно на canvas.
+2. `WebTouchHandler.getLocation(event)` получает canvas `getBoundingClientRect()`, вычитает его page offset, делит координаты на `scaleX/scaleY`, затем применяет `Math.round()`. Поэтому координаты, переданные браузером в CSS/page space, сначала квантуются в целые stage coordinates.
+3. `TouchHandler.onTouchMove(x,y,id)` сравнивает новые координаты с `lastTouchX/lastTouchY`; при полном совпадении не dispatch-ит новый TOUCH_MOVE.
+4. `egret.sys.SystemTicker.update()` вызывается browser RAF loop, но `broadcastEnterFrame()` выполняется только при достижении `frameDeltaTime=1000/frameRate` либо при срабатывании внутреннего countdown. Для runtime snapshot от 2026-11-04 stage.frameRate был 30; browser rAF aggregate около 60 FPS не равен частоте Egret ENTER_FRAME.
+5. По ранее подтверждённой трассировке `BoardPane.onDrawing()` читает текущие stage mouse coordinates на ENTER_FRAME, переводит их через `globalToLocal()` и добавляет точку; повторная координата дополнительно отбрасывается в `BlackBoardAtom.pushPoint()`.
+
+Это даёт конкретную модель вариативности повторов: при одинаковой геометрии траектории разные времена доставки mousemove относительно Egret ENTER_FRAME могут оставлять разные текущие stage coordinates в моменты выборки. Округление `getLocation()` и подавление повторов добавляют дискретизацию. Различие длины двух линий поэтому может возникнуть до Smooth Path и renderer — на уровне input delivery/sampling. Это объяснение является статически обоснованным механизмом, но ещё не доказано на паре повторных captures с одинаковой траекторией.
+
+**Game Monitor 0.2.2 instrumentation:** `MOUSE_MOVE_SAMPLE` фиксирует DOM mousemove после canvas handler: DOM timestamp, client/page/screen/movement coordinates, buttons, stage.mouseX/Y и BoardPane-local coordinates. `POINT_QUOTA_UPDATE` при положительной exact pointDelta фиксирует acceptedPoint и stage/local coordinates после updateLess(). Bridge и collector allowlists расширены. `DRAW_SAMPLE` остаётся polling 25 ms и может объединять точки; `frame_probe` остаётся browser RAF, не Egret ENTER_FRAME.
+
+**Ограничения:** MOUSE_MOVE_SAMPLE фиксирует события, доставленные DOM listener, но не OS/PyAutoGUI calls, которые могли быть объединены до DOM dispatch. POINT_QUOTA_UPDATE даёт точную последнюю acceptedPoint на конкретном quota update; при pointDelta>1 промежуточные координаты не восстанавливаются этим полем. Runtime snapshot и stage.frameRate относятся к одной сессии.
+
+**Следующий evidence gate:** после подтверждения browser renderer harness выполнить повторные одинаковые траектории с разными delay/phase, сохраняя MOUSE_MOVE_SAMPLE, POINT_QUOTA_UPDATE.acceptedPoint, DRAW_SAMPLE, frame_probe и PNG. Не делать вывод о причине старых различий без этих парных данных.
