@@ -36,7 +36,7 @@ Telemetry implementation для будущих запусков завершен
 Статический renderer audit уточнён: PainterPopup 676×379, BoardPane 460×240 без локального scale; stage NO_SCALE, nominal frameRate 48. Egret 5.2.18 API указывает ROUND caps/joints defaults, однако deployed runtime identity не установлена. Parent/global transform, device-pixel ratio, zero-length rasterization и фактический screen footprint остаются открытыми.
 
 **Следующие шаги:**
-1. Установить deployed Egret runtime identity по фактически загружаемым runtime assets/manifest.
+1. Получить response bodies исторических assets из captures (`/old/manifest.json`, `/old/js/mergeEngine_df2e5bc5.js`, `/old/js/main.min_6ecc02a4.js`), зафиксировать SHA-256 и определить фактический Egret runtime. Resource Timing metadata подтверждает URL, но не содержимое. Bundle из master `main.min_570122a1.js` имеет другое имя; не считать его идентичным без hash/body comparison.
 2. Измерить полный global/display transform painter popup BoardPane, включая родительские контейнеры и browser pixel mapping.
 3. Проверить zero-length stroke rasterization на соответствующем runtime или независимом controlled PNG capture.
 4. Откалибровать screen-space footprint и endpoints для нескольких brush widths на одной frozen geometry; сохранить raw PNG и hashes.
