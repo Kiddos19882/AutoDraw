@@ -1,3 +1,12 @@
+## 2026-11-04 — получен runtime renderer snapshot и уточнён путь растеризации кисти
+
+- Пользователь предоставил полный `AutoDrawGameMonitor.inspect()` JSON; сохранён как `data/runtime/renderer_snapshot_2026-11-04.json` без изменения значений.
+- Runtime подтвердил Egret 5.4.1, `renderMode=webgl`, один player, stage 1672×600, BoardPane 460×240, frameRate=30, canvas backing 5016×1800, `canvasScaleFactor=2`, `canvasScaleX/Y=3`, DPR=1 и CSS transform matrix(0.382775,0,0,0.383333,0,0).
+- По формуле Egret WebPlayer и DOM rect получен derived stage→client mapping X=1920/1672=1.1483253589, Y=690/600=1.15, origin=(0,-0.5). Derived board client corners ≈ (596.89,82.30), (1125.12,82.30), (1125.12,358.30), (596.89,358.30) CSS px. Прямые `boardClientCorners`/`screenQuad` отсутствуют (`null`), поэтому это вычисленная геометрия, не runtime quad measurement.
+- Статически проверен `mergeEngine_df2e5bc5.js`: WebGLRenderer для GraphicsNode вызывает CanvasRenderer rasterization в canvas buffer и затем texture upload в WebGL. GraphicsNode defaults caps/joints — round. `BoardPane.redraw()` передаёт UI radius как `Graphics.lineStyle` line width.
+- `pointCount=1` и `remainingPoints=5999` — моментальный snapshot; без парного baseline не трактуется как CHALK delta.
+- Новых игровых штрихов/CHALK experiments не было. Следующий шаг — offline renderer reference harness и PNG fixtures; production planner/defaults и FILL-001-RS matrix остаются заблокированы до acceptance.
+
 ## 2026-11-04 — Game Monitor runtime renderer diagnostics
 
 - В `source/game_monitor/game_monitor.js` реализованы read-only `rendererSnapshot()` и расширенный `inspect()`: фактический Egret renderMode/systemRenderer, canvas scale/DPR, viewport scale, DOM canvas rect/CSS transform/screen quad, BoardPane stage corners, parent display chain, scrollRect и mask.
