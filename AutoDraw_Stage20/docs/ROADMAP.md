@@ -1,3 +1,21 @@
+## Актуализация ближайшего FILL-001-RS gate — 2026-11-04
+
+Telemetry implementation для будущих запусков завершена и прошла полный CI: run [41840582147](https://github.com/Kiddos19882/AutoDraw/actions/runs/41840582147) SUCCESS. Browser Bridge связывает frame_probe с strokeId и сохраняет rAF intervals; Bridge Server сохраняет raw frame probes, per-stroke frame summaries и per-stroke point-count metrics. Старый run `6a17a297` не содержит raw per-stroke rAF series, но его point cadence восстановлена по 1260 POINT_QUOTA_UPDATE: median 33 ms, 28.26–29.50 accepted points/s. Не смешивать browser rAF (~60 FPS), nominal Egret stage.frameRate=48 и фактическую cadence принятия точек.
+
+Статический renderer audit уточнён: PainterPopup 676×379, BoardPane 460×240 без локального scale; stage NO_SCALE, nominal frameRate 48. Egret 5.2.18 API указывает ROUND caps/joints defaults, однако deployed runtime identity не установлена. Parent/global transform, device-pixel ratio, zero-length rasterization и фактический screen footprint остаются открытыми.
+
+**Следующие шаги:**
+1. Установить deployed Egret runtime identity по фактически загружаемым runtime assets/manifest.
+2. Измерить полный global/display transform painter popup BoardPane, включая родительские контейнеры и browser pixel mapping.
+3. Проверить zero-length stroke rasterization на соответствующем runtime или независимом controlled PNG capture.
+4. Откалибровать screen-space footprint и endpoints для нескольких brush widths на одной frozen geometry; сохранить raw PNG и hashes.
+5. Проверить versioned perimeter/endpoint candidates независимым PNG audit: coverage≥99%, leakage=0.
+6. Только после offline PASS выполнить отдельный live preflight; 45-task matrix остаётся отдельным последующим gate.
+
+Run [41840281018](https://github.com/Kiddos19882/AutoDraw/actions/runs/41840281018) был CANCELLED; run 41840582147 — SUCCESS. Ни один из них не меняет факта, что исходный live capture REJECTED (coverage=98.430600%, leakage=11, exact CHALK=1260). Frozen plans/masks/thresholds/production defaults не менять.
+
+---
+
 ## Обязательный ближайший gate — калибровка renderer footprint FILL-001-RS
 
 Offline pixel localization завершена: исходный capture fill001-rs-preflight-20261104-7.04 остаётся REJECTED (coverage=98.430600%, leakage=11); 1116 uncovered pixels распределены по периметру, interior/other=0. 45-task matrix остаётся BLOCKED.
