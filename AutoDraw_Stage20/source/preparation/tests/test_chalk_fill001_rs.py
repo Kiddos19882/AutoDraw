@@ -5,6 +5,7 @@ import copy
 import pytest
 
 from chalk_fill_execution import prepare_fill001_single_task_plan
+from chalk_fill_runtime_binding import build_fill001_experiment_context
 from chalk_fill_matrix import (
     FILL001_RS_PLAN_VARIANT,
     FILL001_RS_SCANLINE_CONFIGS,
@@ -80,3 +81,31 @@ def test_single_task_handoff_preserves_rs_scanline_spacing():
     }
     assert plan["generation"]["matrix_batch_execution_allowed"] is False
     assert matrix["execution_allowed"] is False
+
+
+def test_rs_runtime_context_binds_spacing_parameters():
+    matrix = build_fill001_rs_matrix("fill001-rs-context")
+    task = next(
+        item for item in matrix["tasks"]
+        if item["shape_id"] == "rectangle"
+        and item["requested_radius"] == 10
+        and item["repeat_index"] == 1
+    )
+    context = build_fill001_experiment_context(task)
+    assert context["plan_variant"] == FILL001_RS_PLAN_VARIANT
+    assert context["planner_version"] == 2
+    assert context["scanline_row_step"] == 5
+    assert context["scanline_offset"] == 0
+
+
+def test_rs_runtime_context_rejects_invalid_spacing():
+    matrix = build_fill001_rs_matrix("fill001-rs-invalid-context")
+    task = next(
+        item for item in matrix["tasks"]
+        if item["shape_id"] == "rectangle"
+        and item["requested_radius"] == 10
+        and item["repeat_index"] == 1
+    )
+    task["scanline_offset"] = task["scanline_row_step"]
+    with pytest.raises(FillMatrixError):
+        build_fill001_experiment_context(task)
