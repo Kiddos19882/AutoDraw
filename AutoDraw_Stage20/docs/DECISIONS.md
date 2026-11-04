@@ -153,3 +153,12 @@
 **Инварианты:** не ослаблять task/session/run identity, schema v2, source-plan SHA-256, exact pre/post pointCount, per-stroke CHALK, observed radius, P1, lifecycle, non-consuming candidates, sequence gaps, dropped events, Bridge failures и PNG quality gates. Наличие after PNG или session-level CHALK само по себе не означает принятие capture.
 
 **Последствия:** transient persistence race больше не превращается в окончательную binder error; incomplete/ambiguous evidence остаётся fail-closed. Software gate подтверждён CI [41754801210](https://github.com/Kiddos19882/AutoDraw/actions/runs/41754801210) на commit 5cde7a1. Live preflight и 45-cell matrix остаются отдельными gates.
+
+
+## DEC-018. Изолировать исследование расстояния между проходами FILL-001-RS
+
+**Статус:** принято в рамках согласованного документационного этапа, 2026-11-04  
+**Контекст:** live preflight FILL-001 для rectangle/radius=10 исчерпал квоту на 5999 CHALK до завершения 3 последних consuming strokes. Статический OpenCV-анализ выявил, что текущий planner строит проходы практически на каждой строке; для ширины кисти 10 это создаёт около 90% перекрытия соседних линий. Кандидат `scanline_row_step=5` прошёл существующий геометрический gate для трёх frozen masks, но не проверен игровым renderer.
+**Решение:** выделить исследование расстояния между scanline-проходами в отдельный этап FILL-001-RS. Параметры `scanline_row_step` и `point_step_px` считать независимыми. Любое изменение геометрии оформлять новой версией плана, новым plan signature и отдельным experiment ID; существующие frozen masks, FILL-001 plans, manifest и captures не переписывать.
+**Границы доказательности:** OpenCV coverage/leakage и estimated sampling points являются статическими proxy. Они не доказывают фактическую экономию CHALK. Точный расход определяется только exact `pointCount_after - pointCount_before`; неполный run при исчерпании квоты фиксируется как censored attempt, полная стоимость неизвестна.
+**Последствия:** FILL-001 45-cell matrix остаётся BLOCKED до отдельного принятого live preflight. INT-006 safety margin и INT-007 не меняются. Код, тесты, конфигурации, workflow, production estimator/defaults и `master` не меняются без отдельного разрешения.
