@@ -67,11 +67,20 @@ test("empty paths produce no drawing commands", () => {
   assert.equal(terminalPoint([], true, false), null);
 });
 
-test("the source call's fourth formal argument is not the final-line flag", () => {
+test("Painter.drawSmoothLine defaults drawLast to true", () => {
   const points = [{ x: 0, y: 0 }, { x: 10, y: 10 }];
-  const sourceCall = buildSmoothPathCommands(points, true, false);
-  const explicitFinalLine = buildSmoothPathCommands(points, true, false, true);
+  const commands = buildSmoothPathCommands(points);
 
-  assert.deepEqual(sourceCall.at(-1), { type: "lineTo", x: 5, y: 5 });
-  assert.deepEqual(explicitFinalLine.at(-1), { type: "lineTo", x: 10, y: 10 });
+  assert.deepEqual(commands.at(-1), { type: "lineTo", x: 10, y: 10 });
+  assert.deepEqual(terminalPoint(points, true), { x: 10, y: 10 });
+});
+
+test("BoardPane explicitly passes drawLast=false to Painter.drawSmoothLine", () => {
+  const points = [{ x: 0, y: 0 }, { x: 10, y: 10 }];
+  const boardPaneCall = buildSmoothPathCommands(points, true, false);
+
+  assert.deepEqual(boardPaneCall.at(-1), { type: "lineTo", x: 5, y: 5 });
+  assert.deepEqual(terminalPoint(points, true, false), { x: 5, y: 5 });
+  assert.equal(boardPaneCall.some(command =>
+    command.type === "lineTo" && command.x === 10 && command.y === 10), false);
 });
