@@ -485,5 +485,5 @@ test("read-only renderer inspection degrades safely when Egret and canvas are un
   assert.equal(result.renderMode, null);
   assert.equal(result.playerCount, 0);
   assert.equal(result.boardDetected, false);
-  assert.deepEqual(result.players, []);
+  assert.equal(result.players.length, 0);
 });

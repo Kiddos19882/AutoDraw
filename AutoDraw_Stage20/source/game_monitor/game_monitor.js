@@ -710,6 +710,7 @@
     clear() { state.events.length = 0; state.droppedEvents = 0; state.errors.length = 0; },
     attach,
     diagnosticSnapshot,
+    rendererSnapshot,
     inspect
   };
   Object.defineProperty(window, "AutoDrawGameMonitor", { configurable: true, value: api });
