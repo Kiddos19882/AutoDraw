@@ -484,15 +484,200 @@
     URL.revokeObjectURL(url);
   }
 
-  // Read-only checkpoint inspection. When the monitor is stopped this locates
-  // BoardPane on demand, reads max/less, and does not attach wrappers or timers.
+  function finiteNumber(value) {
+    return typeof value === "number" && Number.isFinite(value) ? value : null;
+  }
+
+  function rectangleSnapshot(element) {
+    if (!element || typeof element.getBoundingClientRect !== "function") return null;
+    try {
+      const rect = element.getBoundingClientRect();
+      return {
+        left: finiteNumber(rect.left), top: finiteNumber(rect.top),
+        right: finiteNumber(rect.right), bottom: finiteNumber(rect.bottom),
+        width: finiteNumber(rect.width), height: finiteNumber(rect.height)
+      };
+    } catch (_) { return null; }
+  }
+
+  function matrixSnapshot(displayObject) {
+    if (!displayObject || typeof displayObject.$getConcatenatedMatrix !== "function") return null;
+    try {
+      const m = displayObject.$getConcatenatedMatrix();
+      if (!m) return null;
+      return { a: finiteNumber(m.a), b: finiteNumber(m.b), c: finiteNumber(m.c),
+        d: finiteNumber(m.d), tx: finiteNumber(m.tx), ty: finiteNumber(m.ty) };
+    } catch (_) { return null; }
+  }
+
+  function displayObjectChainSnapshot(board, stage) {
+    const chain = [], seen = new WeakSet();
+    let current = board;
+    while (current && typeof current === "object" && chain.length < 16 && !seen.has(current)) {
+      seen.add(current);
+      const r = current.scrollRect || current.$scrollRect || null;
+      chain.push({
+        className: current.constructor && current.constructor.name || null,
+        x: finiteNumber(current.x), y: finiteNumber(current.y),
+        width: finiteNumber(current.width), height: finiteNumber(current.height),
+        scaleX: finiteNumber(current.scaleX), scaleY: finiteNumber(current.scaleY),
+        rotation: finiteNumber(current.rotation),
+        scrollRect: r ? { x: finiteNumber(r.x), y: finiteNumber(r.y),
+          width: finiteNumber(r.width), height: finiteNumber(r.height) } : null,
+        concatenatedMatrix: matrixSnapshot(current)
+      });
+      if (current === stage) break;
+      current = current.$parent || null;
+    }
+    return chain;
+  }
+
+  function displayObjectCorners(board) {
+    if (!board || typeof board.localToGlobal !== "function") return null;
+    const width = finiteNumber(board.width), height = finiteNumber(board.height);
+    if (width === null || height === null || width <= 0 || height <= 0) return null;
+    const input = { topLeft: [0, 0], topRight: [width, 0],
+      bottomRight: [width, height], bottomLeft: [0, height] };
+    const output = {};
+    try {
+      for (const [name, xy] of Object.entries(input)) {
+        const point = board.localToGlobal(xy[0], xy[1]);
+        if (!point || !Number.isFinite(point.x) || !Number.isFinite(point.y)) return null;
+        output[name] = { x: point.x, y: point.y };
+      }
+      return output;
+    } catch (_) { return null; }
+  }
+
+  function canvasQuadSnapshot(canvas) {
+    if (!canvas || typeof canvas.getBoxQuads !== "function") return null;
+    try {
+      const quads = canvas.getBoxQuads({ box: "content" }), q = quads && quads[0];
+      if (!q) return null;
+      const output = {};
+      for (const name of ["p1", "p2", "p3", "p4"]) {
+        const point = q[name];
+        if (!point || !Number.isFinite(point.x) || !Number.isFinite(point.y)) return null;
+        output[name] = { x: point.x, y: point.y };
+      }
+      return output;
+    } catch (_) { return null; }
+  }
+
+  function mapStagePointToClient(point, quad, stageWidth, stageHeight) {
+    if (!point || !quad || !(stageWidth > 0) || !(stageHeight > 0)) return null;
+    const u = point.x / stageWidth, v = point.y / stageHeight;
+    return {
+      x: quad.p1.x + u * (quad.p2.x - quad.p1.x) + v * (quad.p4.x - quad.p1.x),
+      y: quad.p1.y + u * (quad.p2.y - quad.p1.y) + v * (quad.p4.y - quad.p1.y)
+    };
+  }
+
+  // Read-only runtime evidence. Screen-space corners are derived only when the
+  // browser exposes the canvas content quad; a bounding rectangle alone is not
+  // treated as an exact affine transform (notably when the canvas is rotated).
+  function rendererSnapshot(board = null) {
+    const egret = window.egret || null;
+    const stage = findStage();
+    const activeBoard = board || (stage ? findBoard(stage) : null);
+    const capabilities = egret && egret.Capabilities || {};
+    const sys = egret && egret.sys || {};
+    const displayList = sys.DisplayList || {};
+    const players = typeof document.querySelectorAll === "function"
+      ? Array.from(document.querySelectorAll(".egret-player") || []) : [];
+
+    const playerSnapshots = players.map(element => {
+      let webPlayer = null, canvas = null, computed = null;
+      try {
+        webPlayer = element && element["egret-player"] || null;
+        canvas = webPlayer && webPlayer.canvas ||
+          (element && typeof element.querySelector === "function" ? element.querySelector("canvas") : null);
+        computed = canvas && typeof window.getComputedStyle === "function"
+          ? window.getComputedStyle(canvas) : null;
+      } catch (_) {}
+      const style = canvas && canvas.style || {};
+      const playerStage = webPlayer && webPlayer.stage || stage;
+      const options = webPlayer && webPlayer.playerOption || {};
+      const stageWidth = finiteNumber(playerStage && (playerStage.stageWidth ?? playerStage.$stageWidth));
+      const stageHeight = finiteNumber(playerStage && (playerStage.stageHeight ?? playerStage.$stageHeight));
+      const quad = canvasQuadSnapshot(canvas);
+      const stageCorners = activeBoard ? displayObjectCorners(activeBoard) : null;
+      const clientCorners = stageCorners && quad && stageWidth > 0 && stageHeight > 0
+        ? Object.fromEntries(Object.entries(stageCorners).map(([name, point]) =>
+            [name, mapStagePointToClient(point, quad, stageWidth, stageHeight)])) : null;
+      const mask = activeBoard && (activeBoard.mask || activeBoard.$mask);
+      return {
+        playerFound: !!webPlayer,
+        playerMatchesStage: !!(webPlayer && webPlayer.stage && webPlayer.stage === stage),
+        containerRect: rectangleSnapshot(webPlayer && webPlayer.container || element),
+        playerOptions: {
+          scaleMode: safeValue(options.scaleMode), frameRate: finiteNumber(options.frameRate),
+          contentWidth: finiteNumber(options.contentWidth), contentHeight: finiteNumber(options.contentHeight),
+          renderModeOption: safeValue(options.renderMode)
+        },
+        stage: playerStage ? {
+          width: stageWidth, height: stageHeight, frameRate: finiteNumber(playerStage.frameRate),
+          scaleMode: safeValue(playerStage.$scaleMode), orientation: safeValue(playerStage.$orientation)
+        } : null,
+        canvas: canvas ? {
+          width: finiteNumber(canvas.width), height: finiteNumber(canvas.height),
+          clientWidth: finiteNumber(canvas.clientWidth), clientHeight: finiteNumber(canvas.clientHeight),
+          offsetLeft: finiteNumber(canvas.offsetLeft), offsetTop: finiteNumber(canvas.offsetTop),
+          rect: rectangleSnapshot(canvas), screenQuad: quad,
+          style: {
+            left: safeValue(style.left), top: safeValue(style.top),
+            width: safeValue(style.width), height: safeValue(style.height),
+            transform: safeValue(style.transform), transformOrigin: safeValue(style.transformOrigin),
+            computedTransform: safeValue(computed && computed.transform),
+            computedTransformOrigin: safeValue(computed && computed.transformOrigin)
+          }
+        } : null,
+        boardStageCorners: stageCorners,
+        boardClientCorners: clientCorners,
+        boardDisplayChain: activeBoard ? displayObjectChainSnapshot(activeBoard, playerStage) : null,
+        boardMask: mask ? {
+          className: mask.constructor && mask.constructor.name || null,
+          x: finiteNumber(mask.x), y: finiteNumber(mask.y),
+          width: finiteNumber(mask.width), height: finiteNumber(mask.height),
+          concatenatedMatrix: matrixSnapshot(mask)
+        } : null
+      };
+    });
+
+    const viewport = window.visualViewport || null;
+    const renderer = sys.systemRenderer || null, canvasRenderer = sys.canvasRenderer || null;
+    return {
+      inspectionMode: "read_only",
+      engineVersion: safeValue(capabilities.engineVersion),
+      renderMode: safeValue(capabilities.renderMode),
+      runtimeType: safeValue(capabilities.runtimeType),
+      systemRenderer: renderer && renderer.constructor && renderer.constructor.name || null,
+      canvasRenderer: canvasRenderer && canvasRenderer.constructor && canvasRenderer.constructor.name || null,
+      canvasScaleFactor: finiteNumber(displayList.$canvasScaleFactor),
+      canvasScaleX: finiteNumber(displayList.$canvasScaleX),
+      canvasScaleY: finiteNumber(displayList.$canvasScaleY),
+      devicePixelRatio: finiteNumber(window.devicePixelRatio),
+      visualViewportScale: finiteNumber(viewport && viewport.scale),
+      playerCount: playerSnapshots.length,
+      players: playerSnapshots,
+      boardDetected: !!activeBoard,
+      boardLabel: activeBoard && activeBoard.constructor && activeBoard.constructor.name || null,
+      boardLogicalSize: activeBoard ? {
+        width: finiteNumber(activeBoard.width), height: finiteNumber(activeBoard.height)
+      } : null,
+      boardDisplayChain: activeBoard ? displayObjectChainSnapshot(activeBoard, stage) : null
+    };
+  }
+
+  // Read-only checkpoint inspection. No wrappers, timers, renderer changes or game commands.
   function inspect() {
     const board = state.board || findBoard(findStage());
     return {
       inspectionMode: "read_only",
       boardDetected: !!board,
       boardLabel: board && board.constructor && board.constructor.name ? board.constructor.name : null,
-      snapshot: board ? resourceSnapshot(board) : null
+      snapshot: board ? resourceSnapshot(board) : null,
+      renderer: rendererSnapshot(board)
     };
   }
 

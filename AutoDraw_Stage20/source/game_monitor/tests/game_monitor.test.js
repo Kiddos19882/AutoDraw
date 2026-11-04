@@ -26,6 +26,9 @@ function createMonitor() {
   };
   window.top = window;
 
+
+  const document = { querySelectorAll: () => [] };
+
   const sandbox = {
     window,
     performance: { now: () => 123.456 },
@@ -34,14 +37,14 @@ function createMonitor() {
       pathname: "/game",
       href: "https://game.example/game"
     },
-    document: { querySelectorAll: () => [] },
+    document,
     URL,
     HTMLCanvasElement: class HTMLCanvasElement {},
     console
   };
 
   vm.runInNewContext(monitorSource, sandbox, { filename: "game_monitor.js" });
-  return { monitor: window.AutoDrawGameMonitor, timers, window };
+  return { monitor: window.AutoDrawGameMonitor, timers, window, document };
 }
 
 function createBoard() {
@@ -398,4 +401,89 @@ test("subscribe streams emitted monitor events and unsubscribe stops delivery", 
 test("WebSocket bridge browser agent parses without executing", () => {
   const bridgeSource = fs.readFileSync(path.join(__dirname, "..", "game_monitor_bridge.js"), "utf8");
   assert.doesNotThrow(() => new vm.Script(bridgeSource, { filename: "game_monitor_bridge.js" }));
+});
+
+
+test("read-only renderer inspection captures Egret mode, canvas geometry and board transforms", () => {
+  const { monitor, window, document } = createMonitor();
+  const { board } = createBoard();
+  const stage = {
+    stageWidth: 460, stageHeight: 240, frameRate: 48,
+    $scaleMode: "noScale", $orientation: "auto", $children: [board]
+  };
+  Object.assign(board, { width: 400, height: 200, x: 10, y: 20, scaleX: 1, scaleY: 1 });
+  board.$parent = stage;
+  board.localToGlobal = (x, y) => ({ x: x + 10, y: y + 20 });
+  board.$getConcatenatedMatrix = () => ({ a: 1, b: 0, c: 0, d: 1, tx: 10, ty: 20 });
+  board.mask = {
+    x: 10, y: 20, width: 400, height: 200,
+    constructor: { name: "Shape" },
+    $getConcatenatedMatrix: () => ({ a: 1, b: 0, c: 0, d: 1, tx: 10, ty: 20 })
+  };
+  const canvas = {
+    width: 460, height: 240, clientWidth: 460, clientHeight: 240,
+    offsetLeft: 0, offsetTop: 0,
+    style: { left: "0px", top: "0px", transform: "matrix(1,0,0,1,0,0)", transformOrigin: "0% 0% 0px" },
+    getBoundingClientRect: () => ({ left: 100, top: 200, right: 560, bottom: 440, width: 460, height: 240 }),
+    getBoxQuads: () => [{
+      p1: { x: 100, y: 200 }, p2: { x: 560, y: 200 },
+      p3: { x: 560, y: 440 }, p4: { x: 100, y: 440 }
+    }]
+  };
+  const playerElement = {
+    getBoundingClientRect: () => ({ left: 90, top: 190, right: 570, bottom: 450, width: 480, height: 260 }),
+    "egret-player": {
+      canvas, stage, container: null,
+      playerOption: { scaleMode: "noScale", frameRate: 48, contentWidth: 460, contentHeight: 240, renderMode: "webgl" }
+    }
+  };
+  playerElement["egret-player"].container = playerElement;
+  document.querySelectorAll = selector => selector === ".egret-player" ? [playerElement] : [];
+  window.devicePixelRatio = 2;
+  window.visualViewport = { scale: 1.25 };
+  window.getComputedStyle = () => ({ transform: "matrix(1,0,0,1,0,0)", transformOrigin: "0px 0px" });
+  window.egret = {
+    MainContext: { instance: { stage } },
+    Capabilities: { engineVersion: "5.4.1", renderMode: "webgl", runtimeType: "web" },
+    sys: {
+      DisplayList: { $canvasScaleFactor: 2, $canvasScaleX: 2, $canvasScaleY: 2 },
+      systemRenderer: { constructor: { name: "WebGLRenderer" } },
+      canvasRenderer: { constructor: { name: "CanvasRenderer" } }
+    }
+  };
+
+  monitor.stop();
+  const result = monitor.inspect();
+  assert.equal(result.inspectionMode, "read_only");
+  assert.equal(result.renderer.engineVersion, "5.4.1");
+  assert.equal(result.renderer.renderMode, "webgl");
+  assert.equal(result.renderer.systemRenderer, "WebGLRenderer");
+  assert.equal(result.renderer.canvasRenderer, "CanvasRenderer");
+  assert.equal(result.renderer.devicePixelRatio, 2);
+  assert.equal(result.renderer.visualViewportScale, 1.25);
+  assert.equal(result.renderer.playerCount, 1);
+  assert.equal(result.renderer.players[0].stage.frameRate, 48);
+  assert.equal(result.renderer.players[0].canvas.screenQuad.p1.x, 100);
+  assert.equal(result.renderer.players[0].canvas.screenQuad.p1.y, 200);
+  assert.equal(result.renderer.players[0].boardStageCorners.topLeft.x, 10);
+  assert.equal(result.renderer.players[0].boardStageCorners.topLeft.y, 20);
+  assert.equal(result.renderer.players[0].boardClientCorners.topLeft.x, 110);
+  assert.equal(result.renderer.players[0].boardClientCorners.topLeft.y, 220);
+  assert.equal(result.renderer.players[0].boardClientCorners.bottomRight.x, 510);
+  assert.equal(result.renderer.players[0].boardClientCorners.bottomRight.y, 420);
+  assert.equal(result.renderer.players[0].boardDisplayChain.length, 2);
+  assert.equal(result.renderer.players[0].boardMask.className, "Shape");
+  assert.equal(monitor.status().active, false);
+  assert.equal(board.updateLess.name, "updateLess");
+});
+
+test("read-only renderer inspection degrades safely when Egret and canvas are unavailable", () => {
+  const { monitor } = createMonitor();
+  const result = monitor.rendererSnapshot();
+  assert.equal(result.inspectionMode, "read_only");
+  assert.equal(result.engineVersion, null);
+  assert.equal(result.renderMode, null);
+  assert.equal(result.playerCount, 0);
+  assert.equal(result.boardDetected, false);
+  assert.deepEqual(result.players, []);
 });
