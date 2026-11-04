@@ -39,8 +39,9 @@ try {
     }
     Write-Host "Egret bundle HTTP check: status=$($bundleResponse.StatusCode), chars=$($bundleResponse.Content.Length)."
 
+    $programFilesX86 = [Environment]::GetEnvironmentVariable("ProgramFiles(x86)")
     $edgeCandidates = @(
-        (Join-Path \${env:ProgramFiles(x86)} "Microsoft\Edge\Application\msedge.exe"),
+        (Join-Path $programFilesX86 "Microsoft\Edge\Application\msedge.exe"),
         (Join-Path $env:ProgramFiles "Microsoft\Edge\Application\msedge.exe")
     )
     $edgePath = $edgeCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
