@@ -216,3 +216,27 @@ brush_footprint_geometry.footprint_pixel_bounds() возвращает прям�
 6. До renderer identity и frozen PNG comparison не менять production planner/defaults и не разблокировать FILL-001-RS matrix.
 
 **Уровень evidence:** E1 — статически прочитаны конкретные методы bundle и их связи; E0/E1 для вывода о deployed round caps/joins; пользовательское визуальное наблюдение отдельно зафиксировано. Runtime equivalence — NOT VALIDATED.
+## 12. Проверка фактически загружавшихся runtime assets — 2026-11-04
+
+Проверены сохранённые Resource Timing events в Game Monitor captures:
+- `source/game_monitor/autodraw-game-monitor-2026-10-30T01-57-14-095Z.json`;
+- `source/game_monitor/autodraw-game-monitor-2026-10-30T02-13-35-704Z.json`;
+- `data/a,b,c -test/run_01/test-B/autodraw-game-monitor-2026-10-31T16-35-43-311Z.json`.
+
+Во всех этих исторических captures зафиксированы загрузки с `https://eufbpet.hust.me`:
+- `/old/manifest.json?v=1793325121145` (initiator `xmlhttprequest`, Resource Timing `transferSize=396`);
+- `/old/js/mergeEngine_df2e5bc5.js` (initiator `script`, `transferSize=202755`);
+- `/old/js/main.min_6ecc02a4.js` (initiator `script`, `transferSize=722697`).
+
+Это metadata из Resource Timing, а не содержимое файлов и не криптографические размеры response body. Содержимое manifest и двух JavaScript assets в репозитории не сохранено. Попытка открыть эти URL напрямую через доступный web fetch завершилась недоступностью домена; поэтому версии runtime по их содержимому установить не удалось.
+
+**Важное расхождение источников:** bundle, статически разобранный ранее в `master`, называется `main.min_570122a1.js` (Git blob SHA `28838e803dcc6f85efb13febd93cc9e0f5046ffc`; документированный размер 4 785 687 bytes). Он не совпадает по имени с исторически загружавшимся `main.min_6ecc02a4.js`. Пока не получены body/hash обеих сетевых загрузок, нельзя считать их одной версией или переносить runtime-выводы с одного bundle на другой.
+
+В `main.min_570122a1.js` присутствуют game-side Egret references и BoardPane/Painter logic; runtime asset `mergeEngine_df2e5bc5.js` в capture отдельно загружался как script. Но по одному имени файла нельзя утверждать, что это конкретная версия Egret или что он содержит весь renderer. Egret 5.2.18 upstream source остаётся reference implementation, не доказанной версией deployed runtime.
+
+### Результат и следующий шаг
+
+- **Подтверждено:** историческая игра загружала manifest и два отдельных JS assets с указанными именами; Game Monitor зафиксировал URL и Resource Timing metadata.
+- **Не подтверждено:** содержимое этих ресурсов, SHA-256, Egret runtime version, Canvas/WebGL path и связь исторических assets с текущей игрой.
+- **Не делать:** не объявлять 5.2.18 runtime фактом; не копировать upstream renderer и не принимать capsule mask как pixel-identical.
+- **Нужное evidence:** получить response bodies `manifest.json`, `mergeEngine_df2e5bc5.js`, `main.min_6ecc02a4.js` из браузерного cache/DevTools Network (без авторизационных cookies/tokens), записать SHA-256 и сравнить symbols/implementation. Если assets уже обновились, зафиксировать новый набор в одном session capture. Live drawing не требуется для самого чтения статических файлов; любые игровые испытания остаются под отдельным разрешением.
