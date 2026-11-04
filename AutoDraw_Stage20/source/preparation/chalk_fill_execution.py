@@ -58,7 +58,12 @@ def prepare_fill001_single_task_plan(
     if task.get("planned_coverage_fraction", 0) < 0.99 or task.get("planned_leakage_pixels") != 0:
         raise FillMatrixError("Требуются coverage >=99% и leakage=0.")
 
-    plan = build_fixed_radius_fill_plan(task["shape_id"], task["requested_radius"])
+    plan = build_fixed_radius_fill_plan(
+        task["shape_id"],
+        task["requested_radius"],
+        scanline_row_step=task.get("scanline_row_step", 1),
+        scanline_offset=task.get("scanline_offset", 0),
+    )
     if (
         plan.get("plan_signature") != task.get("plan_signature")
         or plan.get("target_mask_sha256") != task.get("target_mask_sha256")
@@ -88,7 +93,11 @@ def prepare_fill001_single_task_plan(
 
     document = {
         "schema_version": 1,
-        "name": f"FILL-001 {task['task_id']}",
+        "name": (
+            f"FILL-001-RS {task['task_id']}"
+            if task.get("plan_variant") == "FILL001_RS_V1"
+            else f"FILL-001 {task['task_id']}"
+        ),
         "created_at": matrix.get("created_at_utc"),
         "coordinate_system": "logical_board_pixels",
         "canvas": {"width": FILL001_CANVAS_WIDTH, "height": FILL001_CANVAS_HEIGHT},
@@ -96,8 +105,17 @@ def prepare_fill001_single_task_plan(
         "height": FILL001_CANVAS_HEIGHT,
         "strokes": strokes,
         "generation": {
-            "method": "fill001_fixed_radius_single_task_preflight",
+            "method": (
+                "fill001_rs_fixed_radius_single_task_preflight"
+                if task.get("plan_variant") == "FILL001_RS_V1"
+                else "fill001_fixed_radius_single_task_preflight"
+            ),
+            "plan_variant": task.get("plan_variant", "FILL001_V1"),
             "planner_version": plan["planner_version"],
+            "scanline_spacing": {
+                "scanline_row_step": task.get("scanline_row_step", 1),
+                "scanline_offset": task.get("scanline_offset", 0),
+            },
             "plan_signature": plan["plan_signature"],
             "target_mask_sha256": plan["target_mask_sha256"],
             "chalk_fill001_task": task,
