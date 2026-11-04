@@ -185,3 +185,11 @@
 
 **Последствия:** старые несовместимые session files больше не блокируют runtime binding новых экспериментов. Replay test на реальных данных подтверждает binding PASS. Capture при этом остаётся REJECTED по PNG gate (coverage=97.673218%, leakage=28); это решение не меняет критерии качества и не разрешает 45-task matrix.
 
+
+## DEC-021. Единая affine-конвенция для FILL-001 PNG audit
+
+**Статус:** принято как implementation contract, validation pending, 2026-11-04  
+**Контекст:** `transform_logical_brush_plan_to_screen()` переводит inclusive logical bounds [0..460]×[0..240] в screen pixel-center bounds [0..W−1]×[0..H−1] через scales (W−1)/460 и (H−1)/240. PNG audit ранее использовал PIL.resize(), то есть фактически W/460 и H/240. Для client ROI 581×304 это создавало несовпадающие raster transforms и 606 различающихся пикселей на frozen rectangle mask.
+**Решение:** rasterize frozen mask в screen ROI обратным nearest-neighbor mapping, используя ровно те же scale_x/scale_y, что и executor coordinate transform. Audit не должен использовать самостоятельную альтернативную формулу масштаба.
+**Инварианты:** coverage ≥99%, leakage=0, RGB threshold=8, frozen mask/hash, executor transform и исходные PNG остаются неизменными. Исправление audit не может автоматически принимать capture; committed PNG должны пройти повторный audit на исправленном коде.
+**Последствия:** code/test commits 4797aa5 и a950084 реализуют и закрепляют contract. До подтверждённого CI/replay и прохождения PNG gate FILL-001 capture и 45-task matrix остаются BLOCKED.
