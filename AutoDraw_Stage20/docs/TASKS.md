@@ -8,8 +8,7 @@
 - [x] Добавить regression coverage масштаба и raster contract — [a950084](https://github.com/Kiddos19882/AutoDraw/commit/a950084db14fd1560aa15f099da4a0108c9631e7).
 - [x] Усилить fixture: эталонный масштаб теперь извлекается непосредственно из `transform_logical_brush_plan_to_screen()`, а не только повторяет формулу — [c399433](https://github.com/Kiddos19882/AutoDraw/commit/c399433af7f2e7bc547a9f35274aaf24d3c3a52e).
 - [ ] Получить полный CI на code/test commits `4797aa5` / `a950084` / `c399433` (CI 41772866679 SUCCESS относится к более раннему HEAD `974f949` и не валидирует affine correction).
-- [ ] Выполнить committed evidence replay и повторный PNG audit неизменённых before/after PNG исправленным кодом.
-- [ ] Проверить повторные coverage/leakage на неизменённых before/after PNG.
+- [ ] Выполнить committed evidence replay и повторный PNG audit неизменённых before/after PNG исправленным кодом; сохранить coverage/leakage и hashes.
 - [ ] Если gate всё ещё fail — исследовать фактический footprint игрового renderer, не ослабляя критерии.
 - [ ] Только после принятого PNG/runtime preflight отдельно разрешать 45-cell matrix.
 
