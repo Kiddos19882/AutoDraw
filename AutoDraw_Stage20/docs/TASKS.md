@@ -10,7 +10,7 @@ Exhaustive OpenCV sweep завершён: 2 238 step/offset кандидатов
 
 Предыдущее сообщение UI о pending runtime binding объясняется временем записи: executor report завершился раньше persistence второго Bridge run примерно на 3.44 секунды. После финализации run доступен для проверки, но содержимое не проходит строгие acceptance invariants. Код binder не ослаблять. Before/after PNG просмотрены визуально; количественный pixel audit не выполнен.
 
-**Временный план:** [CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md](CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md). Шаги 1–2 DONE (software/CI); шаг 3 IN_PROGRESS (live attempt выполнен, capture rejected); FILL-001-RS — документирован, статические кандидаты зафиксированы; новый versioned live preflight не выполнялся. Шаги 4–5 BLOCKED.
+**Временный план:** [CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md](CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md). Шаги 1–2 DONE на предыдущем code baseline; шаг 3 IN_PROGRESS: прежний live attempt rejected, FILL-001-RS planner/matrix/handoff реализованы, новый CI pending, live preflight ожидает локальную Windows/game session. Шаги 4–5 BLOCKED.
 
 Реестр содержит документационные и технические задачи проекта. Аналитические этапы 7–10 отменены и в backlog не включаются; INT-001 и последующие задачи ресурсной оптимизации являются отдельной инициативой.
 
