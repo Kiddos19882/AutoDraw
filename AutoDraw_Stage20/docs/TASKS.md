@@ -1,14 +1,31 @@
 # Реестр задач AutoDraw
 
-## Актуальное состояние FILL-001 на 2026-11-04
+## Актуальное состояние FILL-001 / FILL-001-RS на 2026-11-04
+
+После live run из [73d14a1](https://github.com/Kiddos19882/AutoDraw/commit/73d14a1784a5a9f8ef29bc0e197b75352f2650af) подтверждены exact CHALK=5999 и per-stroke accounting, но исполнено только 128/131 consuming strokes; три кандидата не потребили ресурс после исчерпания квоты. Capture REJECTED, полная стоимость незавершённого плана неизвестна. Строгие runtime/PNG gates не ослаблять.
+
+Статическая OpenCV-проверка выявила избыточно плотную сетку проходов. Добавлен отдельный этап FILL-001-RS для исследования `scanline_row_step`; r10/step=5 прошёл текущий офлайн-критерий для трёх frozen shapes, но остаётся гипотезой до проверки игровым renderer и exact pointCount. Подробности и последовательность — во [временном плане](CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md).
 
 Новый пользовательский evidence commit [73d14a1](https://github.com/Kiddos19882/AutoDraw/commit/73d14a1784a5a9f8ef29bc0e197b75352f2650af) содержит полный второй Bridge run (27.9 MB), session diagnostics, executor report и PNG pair. Task run подтверждён: radius=10, exact CHALK=5999, sampled/per-stroke delta=5999, 131 pointer candidates, 128 consuming strokes и 3 non-consuming candidates. Strict runtime binder корректно отклоняет его, поскольку stroke_count=128 вместо ожидаемых 131 и non_consuming_stroke_candidate_count=3. Capture не принят; доска исчерпала квоту. Первый Bridge run — отдельная калибровка с CHALK=0 и исключается по event activity window.
 
 Предыдущее сообщение UI о pending runtime binding объясняется временем записи: executor report завершился раньше persistence второго Bridge run примерно на 3.44 секунды. После финализации run доступен для проверки, но содержимое не проходит строгие acceptance invariants. Код binder не ослаблять. Before/after PNG просмотрены визуально; количественный pixel audit не выполнен.
 
-**Временный план:** [CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md](CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md). Шаги 1–2 DONE (software/CI); шаг 3 IN_PROGRESS (live attempt выполнен, capture rejected); шаги 4–5 BLOCKED. Не повторять тот же radius=10 / rectangle run без предварительного анализа ресурсоёмкости и зафиксированного решения по over-budget outcome.
+**Временный план:** [CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md](CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md). Шаги 1–2 DONE (software/CI); шаг 3 IN_PROGRESS (live attempt выполнен, capture rejected); FILL-001-RS — документирован, статические кандидаты зафиксированы; новый versioned live preflight не выполнялся. Шаги 4–5 BLOCKED.
 
 Реестр содержит документационные и технические задачи проекта. Аналитические этапы 7–10 отменены и в backlog не включаются; INT-001 и последующие задачи ресурсной оптимизации являются отдельной инициативой.
+
+## FILL-001-RS — расстояние между проходами
+
+**Статус:** DOCUMENTED / STATIC CANDIDATE AVAILABLE; live validation BLOCKED pending separate authorization.
+
+- [x] Разделить `point_step_px` и `scanline_row_step` в документационном контракте.
+- [x] Зафиксировать предварительные варианты step/offset для 15 shape×radius combinations и r10/step=5 raster metrics.
+- [ ] Повторно воспроизвести полный статический sweep и сохранить все варианты/метрики как отдельный versioned result.
+- [ ] После отдельного разрешения подготовить versioned plan/signature и провести один live preflight на доске с полной квотой.
+- [ ] Принять/отклонить candidate по runtime binding, exact CHALK и quantitative PNG audit; при quota exhaustion фиксировать censored attempt, не полную стоимость.
+- [ ] Только после принятого preflight отдельно решить вопрос запуска новой матрицы.
+
+**Ограничения:** code, tests, config, workflow и live experiment не входят в текущее документальное разрешение. Исходные FILL-001 frozen plans и 45-cell manifest не изменять.
 
 ## Временный план FILL-001 на пять шагов
 
@@ -100,7 +117,7 @@
 | INT-005 | DONE | Реализовать автоматизированную лабораторию CHALK-экспериментов | Matrix/block runner, task identity, повторения, manifest, recovery/fail-closed gates и capture acceptance использованы для G1 12/12, G2 18/18 и G3 27/27. |
 | INT-006 | IN_PROGRESS | Официальный analyzer PASS: 45/45 accepted, 0 missing/rejected, 15/15 groups complete; SHA-256 и journal/task/experiment/run/profile/geometry binding проверены. Метрики: MAE 1.408, RMSE 1.967, bias -0.875, MAPE 2.134%, max underprediction 1.82 CHALK. Остаются safety-margin decision и расширение domain validation. См. [официальный отчёт](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md). Production estimator/defaults не менять. |
 | INT-006R | DONE | 45/45 live captures, raw-data audit, официальный CLI analyzer (45 accepted, 0 missing/rejected) и ручной аудит всех 45 пар PNG завершены. Зафиксированы ограничения: radius 1 — разрыв соединения D2 polygon; radius 30 — слияние коротких деталей D4. См. [live results](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md) и [visual audit](CHALK_INT006R_VISUAL_AUDIT_2026-11-03.md). |
-| INT-006F / FILL-001 | IN_PROGRESS | Новый live run подтверждает exact CHALK=5999, но только 128/131 consuming strokes; 3 non-consuming candidates после исчерпания квоты. Capture REJECTED, quantitative PNG audit не выполнен. 45-cell matrix BLOCKED; следующий шаг — статический resource/plan analysis и решение по over-budget outcomes. См. CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md. |
+| INT-006F / FILL-001 | IN_PROGRESS | Exact CHALK=5999 подтверждён для завершённой части run, но 128/131 consuming strokes; 3 non-consuming candidates после исчерпания квоты. Capture REJECTED, quantitative PNG audit не выполнен. FILL-001-RS документирован: r10/step=5 — офлайн-кандидат, не live-validated. 45-cell matrix BLOCKED до принятого versioned preflight. См. временный план и postmortem. |
 | INT-007 | BLOCKED | Интегрировать валидированную модель в preflight/resource estimator AutoDraw | Начинать только после независимой validation INT-006 и определения консервативного safety margin. |
 | INT-008 | TODO | Оптимизировать кисти, траектории, порядок и покрытие | Подбирать способ построения рисунка в пределах квоты CHALK с учётом качества покрытия; зависит от INT-006/007. |
 | INT-009 | TODO | Сравнить прогноз с фактом и проверить качество | Проверить на независимых рисунках прогноз, exact CHALK delta, визуальное качество и устойчивость к разным типам геометрии. |
@@ -119,7 +136,7 @@
 - [x] Выполнить 45 независимых live captures D1–D5; предварительно сверить exact CHALK и per-stroke breakdown по всем 45 Monitor reports. Отдельный preflight log в capture bundle не найден.
 - [ ] После validation определить обоснованный safety margin.
 
-**Актуальный приоритет:** устранить false-overlap в FILL-001 runtime binder, пройти полный CI, затем выполнить один preflight на восстановленной доске. 45-cell matrix остаётся BLOCKED; INT-006 safety margin и INT-007 не меняются.
+**Актуальный приоритет:** FILL-001-RS — воспроизвести и зафиксировать полный статический sweep, затем отдельным решением разрешить versioned live preflight. Не менять code/tests/config и не запускать игру в рамках текущего документационного этапа. 45-cell matrix остаётся BLOCKED; INT-006 safety margin и INT-007 не меняются.
 
 | ID | Статус | Задача | Основание |
 |---|---|---|---|
