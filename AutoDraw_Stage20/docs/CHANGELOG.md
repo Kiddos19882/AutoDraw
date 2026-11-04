@@ -875,3 +875,12 @@
 
 - Зафиксирован nominal stage.frameRate=48 и локальная геометрия PainterPopup/BoardPane 676×379 / 460×240.
 - Egret Engine 5.2.18 API документирует lineStyle thickness как толщину линии и ROUND defaults для caps/joints. Deployed runtime version не подтверждена; фактический footprint и zero-length rasterization остаются открытыми.
+
+
+## 2026-11-04 — Game Monitor per-stroke telemetry CI verification
+
+- Per-stroke frame_probe и point timing telemetry прошли полный CI run [41840582147](https://github.com/Kiddos19882/AutoDraw/actions/runs/41840582147): Application integration, Game Monitor/Bridge, Preparation/G3, Executor regression, Windows portable build/startup smoke-test и INT-006 PNG audit — SUCCESS; optional benchmarks SKIPPED.
+- Run [41840281018](https://github.com/Kiddos19882/AutoDraw/actions/runs/41840281018) завершился CANCELLED; не считать его успешным.
+- Сохранённые per-stroke frame probes для будущих запусков связаны через strokeId; старый run не содержит raw per-stroke rAF intervals. Измеренная ранее cadence POINT_QUOTA_UPDATE остаётся 28.26–29.50 points/s, median 33 ms; browser rAF около 60 FPS не является частотой Egret ENTER_FRAME.
+- Renderer gate уточнён: nominal stage.frameRate=48, NO_SCALE, PainterPopup 676×379, BoardPane 460×240 без локального scale; deployed Egret runtime, global transform, zero-length rasterization и реальный brush footprint ещё не подтверждены.
+- Capture FILL-001-RS остаётся REJECTED (coverage=98.430600%, leakage=11; exact CHALK=1260); 45-task matrix BLOCKED. Production defaults, frozen plans/masks/thresholds и raw evidence не изменялись.
