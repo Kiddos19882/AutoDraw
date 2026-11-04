@@ -13,7 +13,7 @@ Exhaustive OpenCV sweep проверил 2 238 step/offset кандидатов;
 1. **DONE — exhaustive static sweep:** 2 238 candidates, 62 accepted by frozen geometric gate; 15 shape/radius configs saved in report and source constants.
 2. **DONE — versioned planner and matrix:** legacy planner v1 unchanged; RS planner v2, separate 45-task manifest, new plan signatures and frozen spacing metadata.
 3. **DONE — single-task handoff:** RS plan passes through existing FILL-001 handoff; runtime context binds plan variant/version and spacing; P1 remains unchanged.
-4. **IN_PROGRESS — CI validation:** preparation regressions, exhaustive sweep artifact, other required jobs and Windows portable build/startup smoke-test must pass on new HEAD.
+4. **DONE — CI validation:** preparation regressions (800 passed, 24 warnings, 82 subtests), exhaustive sweep artifact, all required jobs, Windows portable build/startup smoke-test and INT-006 pixel audit passed on code/test commit dac985e. Optional benchmarks skipped.
 5. **READY FOR LOCAL PREFLIGHT — one task:** after CI success, generate manifest and run rectangle/r10/step=5/offset=0/repeat=1 in the local game with full quota; remote runner cannot access the user's local game session.
 6. **BLOCKED — matrix expansion:** only after an accepted live capture; separate manifest/experiment ID, no mutation of the original FILL-001 series.
 
