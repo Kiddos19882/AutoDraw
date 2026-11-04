@@ -1,6 +1,23 @@
 # Актуальная точка продолжения — 2026-11-04
 
 
+## Дополнение — Egret CanvasRenderer browser harness PASS (2026-11-04)
+
+**Подтверждённый browser run:** GitHub Actions `41914478746`, job `126871096410`, commit `a5b4b2978006960845ef04d021e4174a5c6425ea`.
+
+- Egret 5.4.1 CanvasRenderer harness завершил 18/18 fixtures (9 path cases × lineWidth 10/30).
+- Сформированы 36 PNG (source texture + masked-board comparison) и manifest.
+- Artifact: `autodraw-egret-renderer-reference`, ID `13365080566`, ZIP 362,990 bytes, 37 entries.
+- Browser metadata: Microsoft Edge 156.0.0.0, Win32, DPR=1, viewport 756×441; rasterScale=3.
+- Local archive integrity validation PASS: 36 PNG успешно декодируются; source dimensions соответствуют GraphicsNode bounds × 3; masked outputs 1380×720; smooth-single-point outputs прозрачные no-op.
+- Manifest SHA-256: `eafdf4612aa86c16f1ae70db74d40f13600a064abc2fc7115c131eef7dbf2642`.
+
+**Что доказано:** в headless Edge загружен локальный bundle (HTTP 200, 875,614 chars), Egret CanvasRenderer напрямую сгенерировал source raster fixtures и browser manifest. Smooth single-point fixture корректно представлен прозрачным no-op, поскольку WebGLRenderer skip-ит GraphicsNode с пустыми bounds/drawData.
+
+**Что не доказано:** harness не создаёт WebGL context; masked-board PNG — Canvas2D composite, не WebGL mask stencil/texture sampling. Pixel equivalence с игрой не проверена. Для run `6a17a297-ea14-4527-9527-bfd8de3bd335` пока не найден подтверждённый paired screenshot того же игрового запуска; его exact CHALK=1260 и accepted point stream не следует сопоставлять с PNG из другой попытки.
+
+**Полный workflow `41914478746`:** Game Monitor/Bridge, Executor, Application integration, Preparation/G3, Egret renderer browser job и INT-006 pixel PNG audit завершились SUCCESS. Windows portable build/startup job был IN_PROGRESS при последней проверке; общий workflow conclusion ещё не подтверждён. Optional algorithm benchmarks SKIPPED.
+
 ## Дополнение — renderer browser gate изолирован от preparation suite (2026-11-04)
 
 Новый job `egret-renderer-reference` запускает Edge harness независимо от Preparation/G3 и portable build. Это устраняет зависимость browser evidence от длительного unrelated test job. Inline PowerShell вынесен в `AutoDraw_Stage20/tests/run_egret_renderer_reference.ps1`; artifact `autodraw-egret-renderer-reference` должен содержать manifest и 36 PNG при PASS либо DOM/Edge stderr diagnostics при failure.
