@@ -1,17 +1,21 @@
 # Актуальная точка продолжения — 2026-11-04
 
 
-## Дополнение — manual-only renderer harness superseded; actual BoardPane integration in progress (2026-11-04)
+## Дополнение — actual BoardPane CanvasRenderer harness PASS (2026-11-04)
 
-Предыдущий run `41914478746` (18/18 fixtures, 36 PNG, artifact `13365080566`) подтвердил только manual GraphicsNode transcription и Egret CanvasRenderer raster. Он не включал настоящий `BoardPane.resetBg()`; single-point output как empty GraphicsNode было ошибочным выводом для actual BoardPane. Этот artifact сохраняется исторически, но не используется как actual game reference.
+**Подтверждённый run:** GitHub Actions `41916449025`, job `126877971003`, commit `63d9dab586d6a6801b2afbbe964686877419131f`.
 
-Новая реализация загружает оба bundle, создаёт реальный `com.magnetjoy.pet.ui.board.BoardPane`, устанавливает points/radius/colors/options и вызывает `redraw()`. Второй BoardPane instance использует manual transcription через временную подмену Painter method; два GraphicsNode raster outputs сравниваются попиксельно. В обоих случаях присутствует прозрачный resetBg rect 460×240 и scrollRect.
-
-- Исправлена сигнатура `Painter.drawSmoothLine(graphics, points, drawFirstHalf, drawLast)`; defaults true/true, BoardPane явно передаёт false.
-- Run `41916087170` выявил dimension mismatch при сравнении actual BoardPane с plain Shape. Это не ошибка игрового bundle, а несопоставимые контейнеры теста.
-- Исправлено: manual transcription теперь выполняется на втором экземпляре BoardPane с теми же dimensions/resetBg. Run `41916449025` ожидает запуска/результата.
-- Actual BoardPane browser artifact ещё не получен. WebGL texture/mask и pixel equivalence с game capture не подтверждены.
-
+- Loaded bundles: Egret `mergeEngine_df2e5bc5.js` (blob `d613d2b97e2436521aa3870478c69e99eac1f19f`) and game `main.min_653f95bc.js` (blob `46cc74de00b6cb5d207b1e1a2ffcd81613b6d388`).
+- Browser: Edge 156.0.0.0 / Win32, DPR=1, viewport 756×441; Egret 5.4.1; rasterScale=3.
+- Создан настоящий `com.magnetjoy.pet.ui.board.BoardPane`; `atom.points/radius/colors/options` задаются напрямую, затем вызывается реальный `redraw()`.
+- Для каждого fixture построен второй BoardPane с временно подменённым Painter path method. Все 18/18 source raster outputs совпали пиксель-в-пиксель: `equal=true`, `differingPixels=0`.
+- Artifact `autodraw-egret-renderer-reference`, ID `13365670726`, 520,477 bytes, 37 entries (manifest + 36 PNG).
+- Local archive integrity PASS: все 36 PNG декодируются; source dimensions = ceil(GraphicsNode bounds × 3); masked outputs 1380×720; single-point source/masked images имеют пустой alpha bbox.
+- Manifest SHA-256: `45e666ca2fe8b852105e08e72bf44665fc2ae0d8724bf14b4b9875dad3438fbc`.
+- Измеренные GraphicsNode bounds: обычные fixture — `(-2,-2,464,244)`; mask-corner width10/30 — `(-5,-5,467,247)` / `(-15,-15,477,257)`; scrollrect-edges width10/30 — `(-25,-2,510,244)` / `(-35,-2,530,244)`.
+- Single-point path содержит только moveTo и не даёт видимого alpha, но BoardPane.resetBg() создаёт full-board GraphicsNode. Поэтому этот реальный BoardPane не является empty-node case и не должен пропускаться generic WebGLRenderer empty-bounds guard.
+- Это подтверждает точное совпадение manual path transcription с actual BoardPane в Egret CanvasRenderer. WebGL context не создавался; texture LINEAR sampling, premultiplied-alpha upload, mask stencil, scrollRect в WebGL и pixel equivalence с live game capture ещё не подтверждены.
+- Run `41916449025` на момент записи: browser, Game Monitor/Bridge, Executor и Application integration jobs SUCCESS; Preparation/G3 ещё выполнялся. Full workflow conclusion пока не заявляется.
 
 ## Дополнение — renderer browser gate изолирован от preparation suite (2026-11-04)
 
