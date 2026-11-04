@@ -5,12 +5,13 @@
 - Harness теперь загружает настоящий `BoardPane` из game bundle, вызывает `redraw()` и сравнивает source raster с manual path transcription на втором BoardPane instance.
 - Run `41916449025`, job `126877971003`: 18/18 fixture comparisons pixel-identical (`differingPixels=0`); artifact `13365670726` содержит manifest и 36 PNG.
 - Single-point BoardPane GraphicsNode не пустой из-за transparent `resetBg()` rectangle, но его raster полностью прозрачный. Предыдущий manual-only empty-node вывод superseded.
+- Full CI run `41916449025` на commit `63d9dab` завершился SUCCESS, включая Windows portable build и INT-006 pixel audit; optional algorithm benchmarks SKIPPED.
 - WebGL texture sampling/mask stencil и live game pixel equivalence остаются pending.
 ## 2026-11-04 — correction: actual BoardPane reference and explicit drawLast=false
 
 - Corrected `Painter.drawSmoothLine` signature to four parameters `(graphics, points, drawFirstHalf, drawLast)`, with default `drawLast=true`; `BoardPane.redraw()` explicitly passes `false`.
 - Previous manual-only single-point fixture omitted `BoardPane.resetBg()`. Actual `resetBg()` adds a transparent 460×240 rectangle, so the BoardPane GraphicsNode is non-empty even when the stroke path contains only moveTo commands. The previous empty-node/skip conclusion does not apply to actual BoardPane.
-- Browser harness now loads `main.min_653f95bc.js`, instantiates actual BoardPane, and pixel-compares its CanvasRenderer output with the manual transcription including resetBg. New CI result pending.
+- Browser harness now loads `main.min_653f95bc.js`, instantiates actual BoardPane, and pixel-compares its CanvasRenderer output with the manual transcription including resetBg. Run `41916449025` confirms 18/18 pixel-identical comparisons and full workflow SUCCESS.
 ## 2026-11-04 — Game Monitor 0.2.2: input sampling telemetry
 
 - Добавлено opt-in событие `MOUSE_MOVE_SAMPLE` (выключено по умолчанию, `setInputTelemetryEnabled(true/false)`): DOM mousemove после Egret canvas handler с DOM timestamp, client/page/screen coordinates, stage.mouseX/Y и BoardPane-local coordinates.
