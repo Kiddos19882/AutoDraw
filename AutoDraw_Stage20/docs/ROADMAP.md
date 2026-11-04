@@ -1,4 +1,4 @@
-## Обязательный ближайший gate — FILL-001-RS-PRE-REPLAY-001
+## Обязательный ближайший gate — остаточная PNG диагностика FILL-001-RS
 
 Offline replay исходных PNG и evidence запуска `fill001-rs-preflight-20261104-7.04` выполнен через исправленный `chalk_fill_capture_adapter.py` внутри `Fill001Tab.finalize_capture()`. Binding PASS; corrected audit дал coverage=98.430600%, leakage=11 и status=failed. SHA-256 и полный evidence mapping сохранены в [отчёте replay](CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md).
 
@@ -15,7 +15,7 @@ Offline replay исходных PNG и evidence запуска `fill001-rs-prefl
 
 Кодовая коррекция alignment внесена в [4797aa5](https://github.com/Kiddos19882/AutoDraw/commit/4797aa5e2e3d9f78656c91dcddf285304eae55c1), regression assertions — [a950084](https://github.com/Kiddos19882/AutoDraw/commit/a950084db14fd1560aa15f099da4a0108c9631e7). До коррекции audit использовал W/460 и H/240, тогда как executor использует (W−1)/460 и (H−1)/240. На ROI 581×304 две версии mask rasterization различаются на 606 пикселей.
 
-**CI evidence:** run [41772866679](https://github.com/Kiddos19882/AutoDraw/actions/runs/41772866679) SUCCESS на более раннем HEAD `974f949`, не валидирует affine correction. Следующий run [41778045384](https://github.com/Kiddos19882/AutoDraw/actions/runs/41778045384) завершился FAILURE: Preparation/G3 — 799 passed, 5 failed; 3 других test jobs success, PNG audit и Windows build skipped. Пять отказов отнесены к несогласованным synthetic fixtures и одному тесту, который падал до вызова audit. Test-only corrections committed: `1f28436`, `0f23731`; повторный CI ожидается. **Очередность:** CI PASS на новых test commits → committed PNG replay без изменения live PNG и thresholds → при pass пересмотреть preflight acceptance → при fail локализовать footprint игрового renderer. До выполнения gate 45-task matrix BLOCKED; CHALK=1260 остаётся измерением только этой задачи и не означает принятия качества.
+**CI evidence:** run [41772866679](https://github.com/Kiddos19882/AutoDraw/actions/runs/41772866679) SUCCESS на более раннем HEAD `974f949`, не валидировал affine correction. Run [41778045384](https://github.com/Kiddos19882/AutoDraw/actions/runs/41778045384) завершился FAILURE из-за пяти synthetic fixture/test failures. Test-only corrections committed: `1f28436`, `0f23731`. Последующий run [41780241017](https://github.com/Kiddos19882/AutoDraw/actions/runs/41780241017) на HEAD `0f23731` завершился SUCCESS и выполнил replay исходных PNG: coverage=98.430600%, leakage=11, PNG gate failed. Текущий этап — offline pixel localization, а не повторный CI или live запуск. До прохождения quality gate 45-task matrix BLOCKED; CHALK=1260 остаётся измерением только этой задачи и не означает принятия качества.
 
 ## Актуальный статус FILL-001 / FILL-001-RS на 2026-11-04
 
