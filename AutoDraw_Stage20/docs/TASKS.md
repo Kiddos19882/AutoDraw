@@ -40,7 +40,7 @@
 
 ### GAME-BRUSH-REPLICATION — воспроизведение цепочки игровой кисти
 
-**Статус:** SOURCE TRACE COMPLETE (E1); ACTUAL BOARDPANE CANVASRENDERER HARNESS PASS (18/18); MANUAL TRANSCRIPTION PIXEL EQUALITY PASS (18/18); EGRET WEBGL MASK/SCROLLRECT/ZERO-LENGTH REFERENCE PASS (20/20; 6 exact, 14 max channel delta 1); LIVE GAME PNG EQUIVALENCE NOT VALIDATED. Это исследовательский подэтап FILL-001-RS renderer footprint, а не замена измерениям CHALK или отдельное разрешение на live run.
+**Статус:** SOURCE TRACE COMPLETE (E1); ACTUAL BOARDPANE CANVASRENDERER HARNESS PASS (20/20); MANUAL TRANSCRIPTION PIXEL EQUALITY PASS (20/20); EGRET WEBGL MASK/SCROLLRECT/ZERO-LENGTH REFERENCE PASS (20/20; 6 exact, 14 max channel delta 1); LIVE GAME PNG EQUIVALENCE NOT VALIDATED. Это исследовательский подэтап FILL-001-RS renderer footprint, а не замена измерениям CHALK или отдельное разрешение на live run.
 
 **Что установлено по согласованному набору assets:** ввод проходит через BoardPane.onMouseDown → onDrawStart → ENTER_FRAME/onDrawing → onDrawingEnd; принятые координаты переводятся через globalToLocal, проверяются по локальным границам и deduplicate через BlackBoardAtom.pushPoint. Геометрия строится Painter.drawNormalLine или midpoint/curveTo smooth path. Значение UI передаётся в Egret как line width; caps/joints по умолчанию round. Подробная трассировка и ссылки на Git blob SHA — в [отчёте игрового движка, раздел 14](CHALK_GAME_ENGINE_POINT_COST_AND_BRUSH_WIDTH_2026-11-03.md#14-полная-трассировка-цепочки-игровой-кисти-и-границы-воспроизведения--2026-11-04).
 
@@ -265,7 +265,7 @@ Workflow `.github/workflows/geometry-tests.yml` дополнен независ�
 - [x] Повторить corrected PNG audit: coverage=98.430600%, leakage=11.
 - [x] Получить actual PNG pixel diagnostic: 1116 uncovered pixels, top=244, bottom=239, left-middle=134, right-middle=499, interior/other=0; 11 leakage coordinates.
 - [x] Прочитать bundle из master через GitHub Contents API и подтвердить статические вызовы BoardPane sampling, pushPoint dedup, updateLess и Painter path construction.
-- [x] Исправить WebGL reference scene: board и mask прикреплены к общему Egret Stage; проверить mask renderMode=3 и повторить 18 WebGL comparisons — max channel delta 1.
+- [x] Исправить WebGL reference scene: board и mask прикреплены к общему Egret Stage; проверить mask renderMode=3 и повторить 20 WebGL comparisons — max channel delta 1.
 
 ### Открытые пункты
 - [x] Установить, что старый run не сохранил raw per-stroke frame_probe intervals; реализовать их сбор/сохранение для будущих runs (см. сводку выше).
