@@ -8,6 +8,13 @@
 - Source trace зафиксировал цепочку WebTouchHandler page→stage mapping с Math.round(), TouchHandler duplicate suppression и SystemTicker frameRate throttle. Это обоснованный механизм вариативности повторных линий, но парные live captures ещё нужны для подтверждения.
 - Monitor version 0.2.2; raw mousemove listener выключен по умолчанию и управляется через `setInputTelemetryEnabled(true/false)`. Code/test commits: `981b2c6`, `216361d`, `b9899b2`, `6e0867b`, `7a17802`, `8bc19ab`, `e3ca5fd`. Static JS syntax parse и isolated mock-browser execution Monitor PASS; Node suite, CI нового HEAD и live experiments не подтверждены.
 
+## 2026-11-04 — Egret CanvasRenderer browser reference: 18/18 PASS
+
+- Run `41914478746`, job `126871096410`: Egret 5.4.1 harness завершил 18 fixtures и сформировал 36 PNG + manifest.
+- Artifact `autodraw-egret-renderer-reference`, ID `13365080566`; локальная проверка архива и всех PNG PASS.
+- Edge 156.0.0.0, DPR=1, viewport 756×441, rasterScale 3.
+- Browser PASS подтверждает CanvasRenderer source raster generation; WebGL texture/mask и game pixel equivalence остаются не проверены.
+
 ## 2026-11-04 — renderer browser gate изолирован от Preparation/G3
 
 - Добавлен отдельный Windows job `egret-renderer-reference`, запускающий Edge harness независимо от длинной Preparation/G3 suite и portable build.
