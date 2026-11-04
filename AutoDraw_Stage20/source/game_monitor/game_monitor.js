@@ -611,13 +611,13 @@
         playerMatchesStage: !!(webPlayer && webPlayer.stage && webPlayer.stage === stage),
         containerRect: rectangleSnapshot(webPlayer && webPlayer.container || element),
         playerOptions: {
-          scaleMode: safeValue(options.scaleMode), frameRate: finiteNumber(options.frameRate),
+          scaleMode: safeValue(options.scaleMode) ?? null, frameRate: finiteNumber(options.frameRate),
           contentWidth: finiteNumber(options.contentWidth), contentHeight: finiteNumber(options.contentHeight),
-          renderModeOption: safeValue(options.renderMode)
+          renderModeOption: safeValue(options.renderMode) ?? null
         },
         stage: playerStage ? {
           width: stageWidth, height: stageHeight, frameRate: finiteNumber(playerStage.frameRate),
-          scaleMode: safeValue(playerStage.$scaleMode), orientation: safeValue(playerStage.$orientation)
+          scaleMode: safeValue(playerStage.$scaleMode) ?? null, orientation: safeValue(playerStage.$orientation) ?? null
         } : null,
         canvas: canvas ? {
           width: finiteNumber(canvas.width), height: finiteNumber(canvas.height),
@@ -625,11 +625,11 @@
           offsetLeft: finiteNumber(canvas.offsetLeft), offsetTop: finiteNumber(canvas.offsetTop),
           rect: rectangleSnapshot(canvas), screenQuad: quad,
           style: {
-            left: safeValue(style.left), top: safeValue(style.top),
-            width: safeValue(style.width), height: safeValue(style.height),
-            transform: safeValue(style.transform), transformOrigin: safeValue(style.transformOrigin),
-            computedTransform: safeValue(computed && computed.transform),
-            computedTransformOrigin: safeValue(computed && computed.transformOrigin)
+            left: safeValue(style.left) ?? null, top: safeValue(style.top) ?? null,
+            width: safeValue(style.width) ?? null, height: safeValue(style.height) ?? null,
+            transform: safeValue(style.transform) ?? null, transformOrigin: safeValue(style.transformOrigin) ?? null,
+            computedTransform: safeValue(computed && computed.transform) ?? null,
+            computedTransformOrigin: safeValue(computed && computed.transformOrigin) ?? null
           }
         } : null,
         boardStageCorners: stageCorners,
@@ -648,9 +648,9 @@
     const renderer = sys.systemRenderer || null, canvasRenderer = sys.canvasRenderer || null;
     return {
       inspectionMode: "read_only",
-      engineVersion: safeValue(capabilities.engineVersion),
-      renderMode: safeValue(capabilities.renderMode),
-      runtimeType: safeValue(capabilities.runtimeType),
+      engineVersion: safeValue(capabilities.engineVersion) ?? null,
+      renderMode: safeValue(capabilities.renderMode) ?? null,
+      runtimeType: safeValue(capabilities.runtimeType) ?? null,
       systemRenderer: renderer && renderer.constructor && renderer.constructor.name || null,
       canvasRenderer: canvasRenderer && canvasRenderer.constructor && canvasRenderer.constructor.name || null,
       canvasScaleFactor: finiteNumber(displayList.$canvasScaleFactor),
