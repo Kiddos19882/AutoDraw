@@ -530,9 +530,42 @@ class Fill001Tab:
             report_path = Path(record["execution_report_path"])
             report = json.loads(report_path.read_text(encoding="utf-8"))
             if report.get("runtime_binding_status") != "passed":
-                raise FillMatrixError(
-                    "Runtime binding ещё не прошёл. Дождитесь обновления executor report и повторите проверку."
+                context = report.get("experiment_context")
+                if not isinstance(context, dict) or context.get("phase_id") != "FILL001":
+                    raise FillMatrixError(
+                        "Executor report не содержит корректный FILL-001 experiment context."
+                    )
+                from chalk_fill_runtime_binding import (
+                    build_fill001_runtime_binding_summary,
+                    find_fill001_runtime_binding,
                 )
+                from drawing.execution_diagnostics import update_execution_report
+
+                bridge_root = self.output_dir.parent / "game_monitor_bridge"
+                runtime_binding = find_fill001_runtime_binding(context, bridge_root, report_path)
+                if runtime_binding is None:
+                    update_execution_report(
+                        report_path,
+                        {
+                            "runtime_binding_status": "not_ready",
+                            "runtime_binding_error": (
+                                "Bridge session/run ещё не содержит полный набор runtime evidence."
+                            ),
+                        },
+                    )
+                    raise FillMatrixError(
+                        "Runtime binding пока не готов: Bridge session/run ещё обновляется "
+                        "или не найден в окне этого исполнения. Повторите проверку после завершения записи Bridge."
+                    )
+                update_execution_report(
+                    report_path,
+                    {
+                        "runtime_binding_status": "passed",
+                        "runtime_binding": build_fill001_runtime_binding_summary(runtime_binding),
+                        "runtime_binding_error": None,
+                    },
+                )
+                report = json.loads(report_path.read_text(encoding="utf-8"))
             binding = report.get("runtime_binding")
             session_path = binding.get("session_file") if isinstance(binding, dict) else None
             before_png, after_png = record.get("before_png"), record.get("after_png")

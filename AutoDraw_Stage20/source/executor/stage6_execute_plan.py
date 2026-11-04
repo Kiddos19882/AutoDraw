@@ -1898,7 +1898,10 @@ class Stage6App:
         if str(preparation_dir) not in sys.path:
             sys.path.insert(0, str(preparation_dir))
         try:
-            from chalk_fill_runtime_binding import find_fill001_runtime_binding
+            from chalk_fill_runtime_binding import (
+                build_fill001_runtime_binding_summary,
+                find_fill001_runtime_binding,
+            )
 
             report_file = Path(report_path)
             bridge_root = RESULTS_DIR / "brush_behavior_tests" / "game_monitor_bridge"
@@ -1907,45 +1910,35 @@ class Stage6App:
                 context = report.get("experiment_context")
                 if not isinstance(context, dict) or context.get("phase_id") != "FILL001":
                     return
+                if report.get("runtime_binding_status") == "passed":
+                    return
                 binding = find_fill001_runtime_binding(context, bridge_root, report_file)
                 if binding is not None:
-                    summary = {
-                        "binding_method": "unique_run_in_executor_window",
-                        "task_id": binding["task_id"],
-                        "session_id": binding["session_id"],
-                        "run_id": binding["run_id"],
-                        "execution_id": binding["execution_id"],
-                        "stroke_lifecycle_source": binding["stroke_lifecycle_source"],
-                        "observed_radius": binding["observed_radius"],
-                        "sampling_profile": binding["sampling_profile"],
-                        "executor_config": binding["executor_config"],
-                        "source_plan_file_sha256": binding["source_plan_file_sha256"],
-                        "pre_point_count": binding["pre_point_count"],
-                        "post_point_count": binding["post_point_count"],
-                        "exact_chalk": binding["exact_chalk"],
-                        "event_count": binding["event_count"],
-                        "bridge_failures": binding["bridge_failures"],
-                        "sequence_gaps": binding["sequence_gaps"],
-                        "session_file": binding["session_file"],
-                        "session_file_sha256": binding["session_file_sha256"],
-                        "bridge_run_file": binding["bridge_run_file"],
-                        "bridge_run_file_sha256": binding["bridge_run_file_sha256"],
-                    }
+                    summary = build_fill001_runtime_binding_summary(binding)
                     update_execution_report(
                         report_file,
-                        {"runtime_binding_status": "passed", "runtime_binding": summary},
+                        {
+                            "runtime_binding_status": "passed",
+                            "runtime_binding": summary,
+                            "runtime_binding_error": None,
+                        },
                     )
                     return
                 time.sleep(0.25)
-            update_execution_report(
-                report_file,
-                {
-                    "runtime_binding_status": "not_found",
-                    "runtime_binding_error": "No unique finalized Bridge run appeared within 20 seconds.",
-                },
-            )
+            latest_report = json.loads(report_file.read_text(encoding="utf-8"))
+            if latest_report.get("runtime_binding_status") != "passed":
+                update_execution_report(
+                    report_file,
+                    {
+                        "runtime_binding_status": "not_found",
+                        "runtime_binding_error": "No unique finalized Bridge run appeared within 20 seconds.",
+                    },
+                )
         except Exception as exc:
             try:
+                latest_report = json.loads(Path(report_path).read_text(encoding="utf-8"))
+                if latest_report.get("runtime_binding_status") == "passed":
+                    return
                 update_execution_report(
                     report_path,
                     {"runtime_binding_status": "failed", "runtime_binding_error": str(exc)},

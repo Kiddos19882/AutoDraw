@@ -615,6 +615,40 @@ def load_fill001_runtime_binding(
     return binding
 
 
+def build_fill001_runtime_binding_summary(binding: dict[str, Any]) -> dict[str, Any]:
+    """Return the stable executor-report projection of a validated runtime binding."""
+    fields = (
+        "task_id",
+        "session_id",
+        "run_id",
+        "execution_id",
+        "stroke_lifecycle_source",
+        "observed_radius",
+        "sampling_profile",
+        "executor_config",
+        "source_plan_file_sha256",
+        "pre_point_count",
+        "post_point_count",
+        "exact_chalk",
+        "event_count",
+        "bridge_failures",
+        "sequence_gaps",
+        "session_file",
+        "session_file_sha256",
+        "bridge_run_file",
+        "bridge_run_file_sha256",
+    )
+    missing = [field for field in fields if field not in binding]
+    if missing:
+        raise FillMatrixError(
+            "Runtime binding не содержит обязательные поля summary: " + ", ".join(missing)
+        )
+    return {
+        "binding_method": "unique_run_in_executor_window",
+        **{field: binding[field] for field in fields},
+    }
+
+
 def find_fill001_runtime_binding(
     task: dict[str, Any],
     bridge_root: str | Path,
@@ -622,8 +656,8 @@ def find_fill001_runtime_binding(
 ) -> dict[str, Any] | None:
     """Discover the unique active Bridge session for an executor report.
 
-    Returns None while the Bridge idle-finalization heartbeat has not persisted
-    the run file. Multiple active sessions are rejected rather than guessed.
+    Returns None while a potentially relevant session or Bridge run is still
+    being persisted. Multiple complete active sessions are rejected.
     """
     report_file = Path(executor_report_path)
     try:
@@ -639,6 +673,7 @@ def find_fill001_runtime_binding(
     if not root.is_dir():
         return None
     active_sessions: list[Path] = []
+    pending_sessions: list[Path] = []
     for session_file in sorted(root.glob("*/session.json")):
         try:
             session = json.loads(session_file.read_text(encoding="utf-8"))
@@ -649,31 +684,42 @@ def find_fill001_runtime_binding(
         session_id = session.get("session_id")
         if not isinstance(session_id, str) or session_file.parent.name != session_id:
             raise FillMatrixError(f"Каталог Bridge session не совпадает с session_id: {session_file}.")
-        try:
-            session_started = _parse_aware_datetime(session.get("started_at_utc"), "session.started_at_utc")
-            diagnostics = session.get("bridge_diagnostics")
-            if not isinstance(diagnostics, dict):
-                raise FillMatrixError("Bridge session не содержит bridge_diagnostics.")
-            last_message = _parse_aware_datetime(
-                diagnostics.get("last_message_at_utc"), "session.bridge_diagnostics.last_message_at_utc"
-            )
-        except FillMatrixError:
-            # A session without timestamps cannot safely be excluded from the
-            # executor window, so fail closed instead of silently skipping it.
-            raise
+        session_started = _parse_aware_datetime(
+            session.get("started_at_utc"), "session.started_at_utc"
+        )
 
         closed_at_value = session.get("connection_closed_at_utc")
         if closed_at_value:
             closed_at = _parse_aware_datetime(closed_at_value, "session.connection_closed_at_utc")
             if closed_at < executor_started:
                 continue
-        if session_started > executor_ended or last_message < executor_started:
+        if session_started > executor_ended:
+            continue
+
+        diagnostics = session.get("bridge_diagnostics")
+        if not isinstance(diagnostics, dict):
+            # A possibly relevant session may still be persisting its first
+            # diagnostics snapshot. Wait rather than treating this race as fatal.
+            pending_sessions.append(session_file)
+            continue
+        last_message_value = diagnostics.get("last_message_at_utc")
+        if not isinstance(last_message_value, str) or not last_message_value.strip():
+            pending_sessions.append(session_file)
+            continue
+        last_message = _parse_aware_datetime(
+            last_message_value, "session.bridge_diagnostics.last_message_at_utc"
+        )
+        if last_message < executor_started:
             continue
         if session.get("schema_version") != 2:
             raise FillMatrixError("Активная Bridge session создана по устаревшей schema; требуется schema_version=2.")
         _session_finalize_grace_seconds(session)
         active_sessions.append(session_file)
 
+    # An incomplete session that could overlap the executor window makes the
+    # candidate set unresolved. Do not bind another session while ambiguity remains.
+    if pending_sessions:
+        return None
     if not active_sessions:
         return None
     if len(active_sessions) != 1:

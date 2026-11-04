@@ -373,6 +373,53 @@ def test_find_runtime_binding_waits_until_bridge_run_file_is_finalized(tmp_path)
     assert find_fill001_runtime_binding(task, bridge_root, report_path) is None
 
 
+def test_find_runtime_binding_waits_for_incomplete_session_diagnostics_then_retries(tmp_path):
+    task, session_path, report_path, _, _, session, _ = _runtime_documents(tmp_path)
+    bridge_root = tmp_path / "bridge-root"
+    bridge_root.mkdir()
+    destination = bridge_root / session_path.parent.name
+    session_path.parent.rename(destination)
+    incomplete_session = dict(session)
+    incomplete_session.pop("bridge_diagnostics")
+    (destination / "session.json").write_text(
+        json.dumps(incomplete_session), encoding="utf-8"
+    )
+
+    assert find_fill001_runtime_binding(task, bridge_root, report_path) is None
+
+    (destination / "session.json").write_text(
+        json.dumps(session), encoding="utf-8"
+    )
+    binding = find_fill001_runtime_binding(task, bridge_root, report_path)
+    assert binding is not None
+    assert binding["task_id"] == task["task_id"]
+    assert binding["run_id"]
+
+
+def test_find_runtime_binding_filters_future_incomplete_session_before_diagnostics(tmp_path):
+    task, session_path, report_path, _, _, session, _ = _runtime_documents(tmp_path)
+    bridge_root = tmp_path / "bridge-root"
+    bridge_root.mkdir()
+    destination = bridge_root / session_path.parent.name
+    session_path.parent.rename(destination)
+
+    future_id = str(uuid.uuid4())
+    future_dir = bridge_root / future_id
+    future_dir.mkdir()
+    future_session = {
+        "schema_version": 2,
+        "session_id": future_id,
+        "started_at_utc": "2026-11-03T10:00:11+00:00",
+    }
+    (future_dir / "session.json").write_text(
+        json.dumps(future_session), encoding="utf-8"
+    )
+
+    binding = find_fill001_runtime_binding(task, bridge_root, report_path)
+    assert binding is not None
+    assert binding["session_id"] == session["session_id"]
+
+
 def test_find_runtime_binding_rejects_multiple_active_sessions(tmp_path):
     task, session_path, report_path, _, _, session, _ = _runtime_documents(tmp_path)
     bridge_root = tmp_path / "bridge-root"
