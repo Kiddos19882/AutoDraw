@@ -1,3 +1,11 @@
+## Дополнение — capsule model per-segment broad-phase (2026-11-04)
+
+В `swept_capsule_pixel_masks()` добавлен per-segment raster candidate enumeration вместо проверки каждого segment для каждой клетки общего polyline AABB. API global bounds и union semantics potential/guaranteed masks сохранены. Добавлены regression tests на winding polyline против global-AABB reference и инвариантность коллинеарного subdivision.
+
+Изменение находится в offline geometry model; фактическое ускорение не измерено, planner integration отсутствует, deployed Egret renderer не валидирован. CI для новых commits ожидается; live run не проводился.
+
+---
+
 ## Дополнение — аудит BRUSH-FOOTPRINT-CAPSULE-001 (2026-11-04)
 
 Статически подтверждено, что generic `interior_fill_planner` использует AABB bounds не только для color-safety, но и как уже покрытую область (`_mark_footprint`). Для круглой capsule кисти AABB содержит угловые клетки, которые не принадлежат фактическому footprint; они могут ошибочно исключаться из fallback, завышая модельное coverage. Тестовый oracle также моделирует прямоугольник, а не независимую capsule.
