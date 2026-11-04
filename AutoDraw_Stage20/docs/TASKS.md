@@ -827,6 +827,16 @@ CI evidence: workflow 41787492122, commit d337f4240e83488273152f65992032beca3957
 - [x] Первоначальная реализация и базовые tests прошли полный CI [41842587672](https://github.com/Kiddos19882/AutoDraw/actions/runs/41842587672): 820 passed, 24 warnings, 82 subtests; Preparation/G3, Game Monitor/Bridge, Executor, Application integration, INT-006 PNG audit и Windows portable build/startup smoke-test — SUCCESS; optional benchmarks SKIPPED.
 - [x] Подтверждён static sweep в том же run: 2 238 candidates, 62 accepted, 15/15 selected cells passed offline gate.
 - [x] Добавлен independent analytic oracle для horizontal capsule и уточнены tolerance boundaries: potential mask не отбрасывает малые положительные пересечения; guaranteed mask использует строгую внутреннюю границу; boolean scales отклоняются.
-- [ ] Проверить последующие исправления в полном CI: run [41843716918](https://github.com/Kiddos19882/AutoDraw/actions/runs/41843716918) на HEAD `7357f3e198c729b194b87eec7c591242314c2782` ожидает выполнения.
+- [x] Проверить последующие исправления в полном CI: run [41843716918](https://github.com/Kiddos19882/AutoDraw/actions/runs/41843716918) на HEAD `7357f3e198c729b194b87eec7c591242314c2782` завершился SUCCESS; обязательные jobs успешны, optional benchmarks SKIPPED.
 
 Initial full CI PASS не распространяется автоматически на последующие threshold/oracle commits. Planner integration по-прежнему не выполнена; модель не подтверждена deployed Egret runtime.
+
+
+### BRUSH-FOOTPRINT-CAPSULE-001 — per-segment broad-phase increment (2026-11-04)
+
+- [x] Перевести raster candidate enumeration с единого глобального AABB на отдельные расширенные bounds каждого segment capsule; объединение potential/guaranteed masks остаётся union по сегментам.
+- [x] Сохранить прежнюю геометрическую семантику и global `bounds` в API.
+- [x] Добавить regression test сравнения с медленным global-AABB reference на winding polyline и test инвариантности при разбиении прямого сегмента коллинеарными вершинами.
+- [ ] Получить полный CI для новых code/test commits: [41848358502](https://github.com/Kiddos19882/AutoDraw/actions/runs/41848358502), HEAD `6afdefc7ff2f18db544e55572ed918841d448164`; ожидается.
+
+**Ожидаемый эффект:** уменьшение числа проверяемых raster cells для ломаных, у которых global AABB велик относительно локальных bounds отдельных сегментов. Это структурное сокращение области перебора; фактическое ускорение пока не измерено и требует отдельного benchmark. Geometry output equivalence проверяется regression reference; runtime renderer equivalence и planner integration не заявляются.
