@@ -25,15 +25,17 @@
   <p class="notice">
     Страница загружает локальные Egret engine и game bundles, создаёт настоящий
     <code>com.magnetjoy.pet.ui.board.BoardPane</code>, вызывает его <code>redraw()</code> и напрямую
-    растеризует его GraphicsNode через Egret CanvasRenderer. Она не запускает игровой клиент,
-    не создаёт WebGL context, не отправляет события мыши и не расходует CHALK.
+    растеризует его GraphicsNode через Egret CanvasRenderer, а отдельный probe запускает
+    настоящий Egret WebGLRenderer с offscreen WebGL buffer. Это не live game session:
+    pointer input не отправляется и CHALK не расходуется.
   </p>
   <p class="notice">
     PNG <strong>source texture</strong> строится из GraphicsNode реального BoardPane, включая прозрачный
     прямоугольник <code>resetBg()</code> и board scrollRect; manual path transcription проверяется
     попиксельным сравнением с настоящим BoardPane. PNG <strong>masked board</strong> дополнительно композитит
-    результат через Canvas2D. Это не доказанная копия WebGL texture sampling / mask stencil и требует
-    сравнения с game capture.
+    результат через Canvas2D как контрольный composite. Отдельный <strong>WebGL probe</strong> использует
+    настоящий Egret WebGLRenderer с BoardPane mask и scrollRect; его PNG и параметры texture
+    сохраняются отдельно. Это offscreen engine test, не доказательство pixel equivalence с live game capture.
   </p>
   <p id="renderer-status">Loading local Egret bundle…</p>
   <a id="renderer-manifest"></a>
