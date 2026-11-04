@@ -314,3 +314,76 @@ Commit [d3322fe35c808bde079c79545cc839636b7cda2a](https://github.com/Kiddos19882
 Отдельно уточняется доказательность версии движка: в пользовательски подтверждённом согласованном наборе `gameEngine/main.min_653f95bc.js`, `mergeEngine_df2e5bc5.js` и `manifest.json` статически указана версия Egret 5.4.1. ROUND caps/joints defaults и реализация CanvasRenderer присутствуют в этом merge bundle. Более ранние Resource Timing captures с иным именем main bundle остаются историческими свидетельствами загрузок; их содержимое не подменяется текущим набором.
 
 **Остаются неизвестными:** какой render backend фактически использовался в конкретной старой capture-сессии; полный popup/global→screen transform и clipping; pixel footprint и rasterization zero-length path. Эти вопросы не закрываются одним номером версии движка и требуют соответствующих frozen fixtures/измерений.
+
+
+## 14. Полная трассировка цепочки игровой кисти и границы воспроизведения — 2026-11-04
+
+**Источник:** пользовательски подтверждённый согласованный набор gameEngine/main.min_653f95bc.js и gameEngine/mergeEngine_df2e5bc5.js. Основной bundle прочитан как Git blob SHA 46cc74de00b6cb5d207b1e1a2ffcd81613b6d388 (4 857 523 символа); merge bundle — blob SHA d613d2b97e2436521aa3870478c69e99eac1f19f. Сверка с историческим master/fileGameEngine/main.min_570122a1.js не выполнялась и не требуется.
+
+### 14.1. Ввод → принятые точки
+
+1. BoardPane.initAction() подписывает BoardPane на TOUCH_BEGIN и TOUCH_END; при добавлении на stage подписывается также на stage-level TOUCH_END.
+2. BoardPane.onMouseDown() копирует event.stageX/stageY в stage.mouseX/mouseY и отправляет DRAG_START.
+3. BoardPane.onDrawStart() при положительном остатке CHALK ставит _isStart=true, преобразует текущие stage/global координаты через globalToLocal(), передаёт точку в atom.pushPoint(), обновляет счётчик и подписывается на ENTER_FRAME.
+4. BoardPane.onDrawing() на каждом ENTER_FRAME снова читает stage.mouseX/mouseY, выполняет globalToLocal(), проверяет попадание в локальный прямоугольник 0..width × 0..height. Только внутри него вызывает pushPoint(), updateLess() и redraw(false).
+5. BlackBoardAtom.pushPoint() добавляет точку, если текущий массив пуст или Point.equals() с последней точкой возвращает false. Соседняя повторная координата не увеличивает pointCount.
+6. BoardPane.onDrawingEnd() снимает ENTER_FRAME listener, вызывает redraw(false) и atom.add(). Отдельного финального чтения координат мыши в обработчике завершения нет.
+
+**Следствие:** игра хранит не все перемещения, отправленные AutoDraw, а выборку координат, доступную игровому циклу ENTER_FRAME, с последующим удалением соседних повторов. Номинальный stage.frameRate=48 — целевой параметр, не измеренная частота выборки. Поэтому количество AutoDraw move calls нельзя приравнивать к принятым игровым точкам.
+
+### 14.2. Точки → геометрическая команда
+
+BoardPane.redraw() перебирает сохранённые штрихи, вызывает graphics.lineStyle(value, color, 1, false) и выбирает функцию по atom.options:
+
+- Painter.drawNormalLine(): moveTo(P0), затем lineTo(P1...Pn).
+- Painter.drawSmoothLine(): рассчитывает midpoint каждой пары соседних точек; начинает с moveTo(P0), ведёт линию к первому midpoint, далее использует curveTo(Pi, midpoint(i,i+1)), затем ведёт линию к последней исходной точке.
+- В PainterPopup smooth включается при инициализации через painterBoard.setSmooth(true). При отсутствии явной опции redraw() также выбирает smooth path.
+- Для одного сохранённого пункта normal path содержит только moveTo; smooth path дополнительно вызывает lineTo к той же координате. Это создаёт разные команды пути, но не доказывает, какие пиксели будут закрашены нулевым сегментом.
+
+### 14.3. Значение кисти → Graphics/Egret
+
+Игровой вызов graphics.lineStyle(value, color, 1, false) передаёт:
+- value как толщину линии;
+- color и alpha=1;
+- false как четвёртый аргумент pixelHinting, а не как настройку caps.
+
+Параметры caps и joints не передаются. В Graphics.lineStyle() они остаются неопределёнными; GraphicsNode.lineStyle() нормализует неподдерживаемые/отсутствующие значения к round. Для CanvasRenderer renderGraphics() назначает context.lineWidth, context.lineCap, context.lineJoin и вызывает stroke().
+
+Следовательно, в Canvas path значение UI является **line width**, а не радиусом круга. Геометрическая половина толщины — лишь математическая интерпретация ширины stroke; она не задаёт точную пиксельную маску браузерного rasterizer.
+
+### 14.4. Renderer backend
+
+В merge bundle присутствуют CanvasRenderer и WebGLRenderer. Функция egret.sys.setRenderMode(mode) выбирает WebGL при mode === "webgl" и успешной проверке доступности WebGL; в остальных случаях устанавливает CanvasRenderer и Capabilities.renderMode="canvas". Начальное значение Capabilities.renderMode — "Unknown".
+
+Сохранённый набор assets не содержит boot HTML/конфигурации запуска или runtime capture, которые показывали бы аргумент setRenderMode и выбранный backend конкретной сессии. Поэтому наличие CanvasRenderer и его реализация доказаны статически, но использование именно CanvasRenderer в игровой сессии не доказано. Canvas-only реплика до выяснения этого условия преждевременна.
+
+### 14.5. Локальные границы и clipping
+
+- Рабочий PainterPopup.painterBoard создаётся с logical width=460 и height=240, x=boardX, y=75; в этом месте отдельный локальный scale не назначается.
+- BoardPane.resetBg() задаёт scrollRect=(0,0,width,height).
+- PainterPopup.createBlackBackground() создаёт rounded-rectangle mask размером 460×240 с радиусом угла 10 и назначает её painterBoard.mask.
+- Координаты указателя переводятся из stage/global в локальные через globalToLocal().
+
+Таким образом, путь проходит как минимум через локальную прямоугольную проверку/scrollRect и popup mask. Полная цепочка родительских display transforms, фактический экранный ROI, browser device-pixel mapping и backend-specific clipping не установлены.
+
+### 14.6. Сопоставление с текущей реализацией AutoDraw
+
+- source/executor/drawing/mouse_executor.py генерирует последовательность экранных moveTo по point_step_px и point_delay_ms; игровой BoardPane затем независимо выбирает координату на ENTER_FRAME. AutoDraw отправляет ввод, но не управляет списком точек, который фактически сохранит игра.
+- chalk_fill_fixed_radius_planner.py строит двухточечные горизонтальные штрихи и моделирует их через OpenCV line плюс окружности для round caps. Это отдельный OpenCV rasterizer, не Egret Graphics/Canvas/WebGL.
+- swept_capsule_pixel_masks() моделирует идеальную round-capped polyline; она не воспроизводит автоматически midpoint/curveTo, кадровую выборку и конкретный renderer.
+- interior_fill_planner.py использует прямоугольные pixel bounds как safety check; этот путь не является renderer replica и не готов к исполнению.
+- Существующие тесты проверяют математические модели/их oracle, а не pixel identity с игровым Egret renderer.
+
+### 14.7. Дополнительное поведение redraw
+
+redraw(false) не вызывает resetBg(), а повторно строит путь последнего штриха. В merge bundle GraphicsNode.lineStyle() создаёт новый StrokePath и добавляет его в drawData. Поэтому статический call path указывает на повторное добавление команд текущего штриха при последовательных кадрах до следующего полного redraw(), который очищает Graphics. Влияние этого поведения на runtime performance и antialiasing не измерялось; оно не меняет формулу pointCount.
+
+### 14.8. Вывод и следующий offline gate
+
+**Подтверждено (E1):** цепочка ввода, кадровой выборки, локального преобразования, dedup точек, smooth/normal path construction, передачи толщины и renderer backend selection. Это позволяет реализовать совместимый генератор входных path commands и модель point sampling.
+
+**Не подтверждено:** фактически выбранный backend конкретной сессии, полный display/CSS/device-pixel transform, zero-length rasterization, точный pixel footprint концов/joins/кривых и pixel identity с игрой.
+
+**Рекомендуемый следующий шаг GAME-BRUSH-REPLICATION:** подготовить offline reference harness, который воспроизводит (а) последовательность принятых точек из заданного временного ряда ввода, (б) normal/smooth path commands, (в) выбранный Egret renderer и clipping/transform. До создания renderer fixtures нельзя считать OpenCV/capsule model заменой игровому rasterizer. Сначала получить evidence выбранного backend и transform; затем frozen fixtures для одиночной точки, горизонтального/диагонального сегмента, нескольких smooth points, поворота, разных толщин и границ маски; сравнить PNG и локализовать расхождения.
+
+**Границы текущей работы:** исходники, тесты, конфигурации и workflow AutoDraw не изменялись; скрипты анализа не запускались; live drawing/игровые эксперименты не выполнялись. Статический вывод не подтверждает экономию CHALK: exact расход по-прежнему определяется только дельтой игрового pointCount.
