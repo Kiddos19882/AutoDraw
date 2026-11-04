@@ -173,6 +173,7 @@ test("POINT_QUOTA_UPDATE carries the exact accepted point and current transforme
   const stage = { mouseX: 135, mouseY: 77 };
   const { monitor } = createMonitor({ stage });
   const { board } = createBoard();
+  monitor.start();
   monitor.attach(board);
   monitor.setInputTelemetryEnabled(true);
   board.onDrawStart();
