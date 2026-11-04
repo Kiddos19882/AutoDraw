@@ -1,6 +1,6 @@
 # Игровой движок: связь размера кисти и расхода CHALK
 
-> **Актуальность источников на 2026-11-04.** Разделы 1–10 и 12 сохраняют исторические выводы для прежнего bundle/Resource Timing и не должны использоваться для определения текущей версии игры. Для текущего анализа приоритетны разделы 11, 13 и 14: пользовательски подтверждённый комплект `gameEngine/main.min_653f95bc.js`, `mergeEngine_df2e5bc5.js`, `manifest.json`. По нему статически установлены Egret 5.4.1, наличие Canvas/WebGL backend и цепочка кисти. Фактически выбранный backend активной сессии, полный transform и pixel footprint остаются UNKNOWN / NOT VALIDATED. Не считать offline OpenCV/Capsule модель пиксельно эквивалентной игре.
+> **Актуальность источников на 2026-11-04.** Разделы 1–10 и 12 сохраняют исторические выводы для прежнего bundle/Resource Timing. Для текущего анализа приоритетны разделы 11, 13, 14 и 15: пользовательски подтверждённый комплект `gameEngine/main.min_653f95bc.js`, `mergeEngine_df2e5bc5.js`, `manifest.json` плюс runtime snapshot от 2026-11-04. Подтверждены Egret 5.4.1, активный WebGL backend и stage→client transform текущей сессии. Точный pixel footprint, browser antialiasing/texture sampling и pixel equivalence остаются NOT VALIDATED. Не считать offline OpenCV/Capsule модель пиксельно эквивалентной игре.
 
 
 **Дата аудита:** 2026-11-03  
@@ -390,3 +390,84 @@ redraw(false) не вызывает resetBg(), а повторно строит 
 **Рекомендуемый следующий шаг GAME-BRUSH-REPLICATION:** подготовить offline reference harness, который воспроизводит (а) последовательность принятых точек из заданного временного ряда ввода, (б) normal/smooth path commands, (в) выбранный Egret renderer и clipping/transform. До создания renderer fixtures нельзя считать OpenCV/capsule model заменой игровому rasterizer. Сначала получить evidence выбранного backend и transform; затем frozen fixtures для одиночной точки, горизонтального/диагонального сегмента, нескольких smooth points, поворота, разных толщин и границ маски; сравнить PNG и локализовать расхождения.
 
 **Границы текущей работы:** исходники, тесты, конфигурации и workflow AutoDraw не изменялись; скрипты анализа не запускались; live drawing/игровые эксперименты не выполнялись. Статический вывод не подтверждает экономию CHALK: exact расход по-прежнему определяется только дельтой игрового pointCount.
+
+
+## 15. Runtime renderer snapshot и восстановление stage→screen transform — 2026-11-04
+
+### 15.1 Первичное runtime evidence
+
+Пользователь предоставил полный вывод `AutoDrawGameMonitor.inspect()` из игрового iframe. Неизменённая запись сохранена в [`../data/runtime/renderer_snapshot_2026-11-04.json`](../data/runtime/renderer_snapshot_2026-11-04.json).
+
+Подтверждённые значения:
+
+| Параметр | Значение |
+|---|---:|
+| Egret engineVersion | 5.4.1 |
+| renderMode | `webgl` |
+| player count / playerMatchesStage | 1 / true |
+| stage | 1672×600 |
+| stage frameRate | 30 |
+| stage scaleMode | `fixedHeight` |
+| BoardPane logical size | 460×240 |
+| BoardPane stage origin | (519.791666, 72) |
+| BoardPane stage scale / rotation | 1 / 0° |
+| canvas backing size | 5016×1800 |
+| canvasScaleFactor | 2 |
+| canvasScaleX / canvasScaleY | 3 / 3 |
+| devicePixelRatio / visualViewportScale | 1 / 1 |
+| canvas CSS rect | left=0, top=−0.5, width=1920, height=690 |
+| canvas CSS transform | `matrix(0.382775, 0, 0, 0.383333, 0, 0)` |
+| current pointCount / remaining / max | 1 / 5999 / 6000 |
+| currentRadius | 30 |
+
+`systemRenderer` и `canvasRenderer` в JSON имеют constructor name `n` (minified name); идентификация активного backend основана на `Capabilities.renderMode=webgl` и согласованной реализации `setRenderMode()` в bundle, а не на строке `n`.
+
+### 15.2 Проверка формулы canvas scale
+
+В Egret WebPlayer scale вычисляется как:
+
+`canvasScaleX = ceil((displayWidth / stageWidth) × canvasScaleFactor)`
+
+`canvasScaleY = ceil((displayHeight / stageHeight) × canvasScaleFactor)`
+
+Для snapshot:
+
+- X: `ceil((1920 / 1672) × 2) = ceil(2.29665…) = 3`;
+- Y: `ceil((690 / 600) × 2) = ceil(2.3) = 3`.
+
+Canvas backing size согласован с stage: `1672×3=5016`, `600×3=1800`. CSS transform является обратным переводом backing pixels в display dimensions: X≈`(1920/1672)/3 = 0.382775`, Y=`(690/600)/3 = 0.383333`. Поэтому `canvasScaleFactor=2` нельзя подменять фактическим `canvasScaleX/Y=3`.
+
+### 15.3 Stage→client mapping текущей сессии
+
+`canvas.screenQuad` и `boardClientCorners` равны `null`: браузер не предоставил `getBoxQuads()` для этого вызова. При этом snapshot содержит axis-aligned CSS matrix, transform origin 0% 0%, canvas rect и stage dimensions. По ним восстановлено вычисленное affine mapping:
+
+- `clientX ≈ stageX × (1920/1672)`;
+- `clientY ≈ stageY × (690/600) − 0.5`.
+
+BoardPane stage corners из runtime: TL=(519.791666,72), TR=(979.791666,72), BR=(979.791666,312), BL=(519.791666,312). Derived client corners: TL≈(596.890,82.300), TR≈(1125.120,82.300), BR≈(1125.120,358.300), BL≈(596.890,358.300) CSS pixels. Эти client corners являются вычислением по DOM rect/transform, а не прямым `getBoxQuads()` измерением. Не переносить коэффициенты на другую viewport/window/browser session без нового snapshot.
+
+### 15.4 WebGL GraphicsNode raster path
+
+Статическая трассировка согласованного `mergeEngine_df2e5bc5.js` показывает:
+
+1. `egret.sys.setRenderMode("webgl")` создаёт `WebGLRenderer` как `sys.systemRenderer` и отдельный `CanvasRenderer` как `sys.canvasRenderer`.
+2. `WebGLRenderer.renderGraphics()` создаёт/обновляет `CanvasRenderBuffer` с размерами, рассчитанными из `DisplayList.$canvasScaleX/Y`.
+3. Ветка GraphicsNode вызывает `canvasRenderer.renderGraphics(graphicsNode, canvasRenderBuffer.context)`.
+4. CanvasRenderer устанавливает `lineWidth`, `lineCap`, `lineJoin`, строит Canvas2D path и вызывает `stroke()`.
+5. Результат canvas buffer загружается в WebGL texture и выводится через WebGL context.
+
+Следовательно, для кисти `GraphicsNode` фактическая геометрия stroke проходит Canvas2D rasterization даже при `renderMode=webgl`; собственная идеальная capsule-модель не является pixel replica. Runtime browser Canvas2D implementation, antialiasing, texture filtering и mask/scrollRect interaction всё ещё требуют PNG fixtures.
+
+### 15.5 Связь UI radius с толщиной линии
+
+В согласованном game bundle `BoardPane.redraw()` вызывает `graphics.lineStyle(value, color, 1, false)`, передавая UI radius как первый аргумент `lineStyle`, то есть `lineWidth`. `GraphicsNode.lineStyle()` задаёт round defaults для caps и joints, если они не указаны. Поэтому `currentRadius=30` в snapshot не означает геометрический диск радиуса 30 и не должен преобразовываться в диаметр 60 без отдельной калибровки. Для прямого штриха номинальная толщина линии равна значению lineWidth в логических координатах; фактическая пиксельная маска с antialiasing ещё не измерена.
+
+### 15.6 Границы доказательства и следующий шаг
+
+- Snapshot — один runtime capture, не live drawing и не brush experiment.
+- `pointCount=1` / remaining=5999 — текущее состояние; без pre/post pair это не расход CHALK отдельного запуска.
+- `boardClientCorners=null` и `screenQuad=null`; client corners в 15.3 derived.
+- `systemRenderer` constructor name `n` не идентифицирует класс без статической связи с `renderMode`.
+- Не установлены: фактический pixel footprint single point/zero-length path, Canvas2D antialiasing, texture interpolation, точное clipping/mask поведение на границе и PNG pixel equivalence.
+
+**Следующий этап:** offline renderer reference harness с fixtures для single point/zero-length, normal lines (horizontal/vertical/diagonal), smooth midpoint curves, caps/joins, turns и board clipping. Сравнивать с PNG из той же browser/runtime сессии; не менять planner/defaults до acceptance. FILL-001-RS live preflight и 45-cell matrix остаются закрытыми до прохождения offline gate и отдельного разрешения.
