@@ -133,7 +133,7 @@ Preparation и executor предоставляют совместимые import
 
 | Файл | Структурная роль |
 |---|---|
-| game_monitor.js | Браузерный Game Monitor 0.2.1: BoardPane hooks, CHALK snapshots и event API |
+| game_monitor.js | Браузерный Game Monitor 0.2.2: BoardPane hooks, CHALK snapshots, mousemove и accepted-point telemetry |
 | game_monitor_bridge.js | Browser-side WebSocket agent, session/sequence, heartbeat и frame probe |
 | game_monitor_bridge_server.py | Локальный WebSocket collector, RunRecorder и запись session/run JSON |
 | start_game_monitor_bridge.bat | Windows launcher локального collector |
