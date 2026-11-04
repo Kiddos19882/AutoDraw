@@ -547,3 +547,27 @@ Manifest содержит Egret engine version, source bundle, browser userAgent
 - Не установлены: фактический pixel footprint single point/zero-length path, Canvas2D antialiasing, texture interpolation, точное clipping/mask поведение на границе и PNG pixel equivalence.
 
 **Следующий этап:** выполнить browser harness, сохранить 18 source texture PNG, 18 masked-board PNG и manifest. Сопоставить source texture с PNG из той же игровой сессии; затем отдельно получить reference финального WebGL texture/mask output (текущий harness его не выполняет). Проверить mouseup-to-last-sample и реальную пиксельную маску/texture filtering. Не менять planner/defaults до acceptance. FILL-001-RS live preflight и 45-cell matrix остаются закрытыми до прохождения offline gate и отдельного разрешения.
+
+
+### 15.12 Empty GraphicsNode: moveTo-only path и WebGL raster guard
+
+В согласованном `mergeEngine_df2e5bc5.js` проверена цепочка для single-point fixture:
+
+1. Конструктор `egret.Graphics` инициализирует bounds как `minX/minY=Infinity`, `maxX/maxY=-Infinity`; render node получает bounds только через `extendBoundsByX/Y()` → `updateNodeBounds()`.
+2. `Graphics.lineStyle()` создаёт `StrokePath` в `GraphicsNode.drawData` и задаёт stroke width, но сам по себе не обновляет bounds.
+3. `Graphics.moveTo(x,y)` добавляет moveTo в fill/stroke path, сохраняет `lastX/lastY`, устанавливает `includeLastPosition=false` и вызывает dirty; он **не вызывает** `extendBoundsByPoint()` или `updateNodeBounds()`.
+4. Поэтому path из одного или нескольких moveTo без последующей lineTo/curveTo оставляет GraphicsNode с неустановленными/нулевыми bounds.
+5. `WebGLRenderer.renderGraphics()` выполняет raster path только при положительных `width`, `height` и непустом `drawData`; иначе он пропускает canvas rasterization и texture upload.
+
+Для игрового `renderMode=webgl` moveTo-only single-point path не создаёт видимого raster output, хотя координата уже может быть сохранена в `atom.points` и учтена в `pointCount`. Это разделяет измерение CHALK и визуальный след: quota point не гарантирует появления пикселей.
+
+**Почему падал прежний reference harness:** первый fixture `smooth-single-point` строил только moveTo-команды. Harness требовал положительные размеры GraphicsNode и выбрасывал `GraphicsNode has empty bounds.`, останавливая batch до генерации остальных fixtures. Это объяснение следует из точной статической цепочки движка; повторный browser CI result ещё нужен для подтверждения исправления.
+
+**Исправление harness:** `shouldWebGLRendererRasterize(node)` повторяет guard WebGLRenderer. Для empty-bounds node harness формирует прозрачный no-op reference и manifest entry `skipped-by-WebGLRenderer-empty-graphics-node`; masked-board output остаётся прозрачным. Для непустых nodes по-прежнему вызывается Egret CanvasRenderer. Добавлен Node test для empty width/height/drawData. Это не исполняет WebGL texture/mask pipeline и не доказывает pixel equivalence.
+
+Изменения:
+- workflow diagnostics: `167661b09417c107aa39ab58891302e1ea8b4c76`;
+- harness guard: `e1caaba6e92dffabc50794c5687cb7c81cc5db08`;
+- regression test: `e2cdafaf3249ba4168082e7a6fcac67d850d9119`.
+
+**Статус проверки:** CI нового HEAD не подтверждён. Предыдущий browser run `41903225993` завершился FAILURE; новый workflow теперь должен проверять HTTP-доступность bundle и сохранять DOM/Edge diagnostics при повторном failure. Не считать harness PASS, пока не получены 18 fixture entries, 36 PNG reference files и manifest.
