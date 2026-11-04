@@ -1,3 +1,11 @@
+## 2026-11-04 — Game Monitor runtime renderer diagnostics
+
+- В `source/game_monitor/game_monitor.js` реализованы read-only `rendererSnapshot()` и расширенный `inspect()`: фактический Egret renderMode/systemRenderer, canvas scale/DPR, viewport scale, DOM canvas rect/CSS transform/screen quad, BoardPane stage corners, parent display chain, scrollRect и mask.
+- Добавлены Node tests для runtime snapshot с WebGL fixture, stage→client corner mapping через quad и безопасного поведения без Egret/canvas. Исправлена нормализация отсутствующих полей к `null`.
+- Game Monitor CI job в run [41895277128](https://github.com/Kiddos19882/AutoDraw/actions/runs/41895277128) — SUCCESS: JS syntax, 18 Node tests, local WebSocket smoke test. Executor и Application integration jobs также SUCCESS; Preparation/G3 job ещё выполнялся на момент записи.
+- Live game drawing и CHALK experiments не запускались. Runtime snapshot реальной игры пока не получен; backend/transform/pixel footprint остаются неизвестными.
+- Следующий шаг: пользовательский read-only вызов `AutoDrawGameMonitor.inspect()` в игровом iframe; затем offline renderer fixtures/harness. Exact CHALK остаётся delta `pointCount_after - pointCount_before`.
+
 ## 2026-11-04 — синхронизация документации AutoDraw
 
 - Повторно проверены рабочая ветка `feature/image-geometry-optimization`, HEAD до работы `a442ee3790d360a9fc947995cd01daf0d96d6301`, последние 20 commits и compare с последним подтверждённым code/test HEAD `af30b5fdf1c926d3493bff90706806f5d3a28c43`.

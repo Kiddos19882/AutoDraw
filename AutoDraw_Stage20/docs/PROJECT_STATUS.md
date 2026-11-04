@@ -1,5 +1,16 @@
 # Актуальная точка продолжения — 2026-11-04
 
+## Дополнение — runtime renderer diagnostics (2026-11-04)
+
+**Текущий code HEAD:** `b2d467de6d7fb247d9014e47b1b58da782ff6d68` в `feature/image-geometry-optimization`.
+
+- В Game Monitor реализован read-only `rendererSnapshot()`; `inspect()` теперь возвращает объект `renderer` вместе с прежним CHALK snapshot.
+- Снимок фиксирует фактический Egret renderMode/systemRenderer, canvas scale factors, DPR, viewport scale, экранную геометрию canvas и CSS transform, цепочку преобразований BoardPane, mask и stage/client corner coordinates (client corners доступны при поддержке `getBoxQuads()`).
+- Новые Node.js проверки: renderer snapshot и безопасная деградация при отсутствии Egret/canvas. В CI run [41895277128](https://github.com/Kiddos19882/AutoDraw/actions/runs/41895277128) job **Game Monitor and bridge tests** — SUCCESS; синтаксис JS, 18 Node tests и локальный WebSocket smoke test прошли. Executor и Application integration jobs также SUCCESS; Preparation/G3 job ещё выполнялся на момент записи.
+- **Runtime capture ещё не получен.** Статический bundle не содержит boot HTML/runtime configuration. Фактический backend и полный screen transform нельзя подтвердить только по bundle; следующий шаг — выполнить `AutoDrawGameMonitor.inspect()` в игровом iframe после загрузки обновлённого snippet. Это read-only inspection, не live drawing.
+- Offline replica, frozen renderer fixtures, pixel equivalence и FILL-001-RS PNG gate остаются незавершёнными. Exact CHALK определяется только delta игрового `pointCount`.
+
+
 **Срез проверен:** 4 ноября 2026 г.  
 **Рабочая ветка:** `feature/image-geometry-optimization`.  
 **HEAD до документальной синхронизации:** `a442ee3790d360a9fc947995cd01daf0d96d6301` (`docs: changelog game brush source trace`).

@@ -10,6 +10,30 @@
 
 Game Monitor ориентируется на исследованные методы `BoardPane`: `onDrawStart`, `onDrawing`, `onDrawingEnd`, `setRadius`, `updateLess`, а также на `atom.points`. Статический source trace не устанавливает фактически выбранный Canvas/WebGL backend активной сессии, полный popup/global→screen transform или pixel footprint. BoardPane имеет внутренний логический размер 460×240. Это не физический размер доски на клиентском экране и не ограничение для screen ROI AutoDraw: клиентский BoardPane отображается в масштабе, а фактические пиксельные размеры ROI зависят от viewport, окна и браузера и определяются отдельной калибровкой (например, сохранённые INT006R PNG имели 581×304 px). Не подгонять клиентскую доску под 460×240; AutoDraw должен преобразовывать logical coordinates в фактический calibrated ROI. Клиентский код сам добавляет точки и перерисовывает доску во время активного штриха; сервер не участвует непосредственно в обработке движения и перерисовке. Последующее сохранение/синхронизация — отдельный процесс.
 
+## Снимок renderer и преобразований — runtime diagnostics
+
+После загрузки `game_monitor.js` в **игровом iframe** выполните:
+
+```js
+const snapshot = AutoDrawGameMonitor.inspect();
+console.log(JSON.stringify(snapshot, null, 2));
+```
+
+`inspect()` сохраняет прежние поля (`boardDetected`, `snapshot`) и добавляет объект `renderer`. Его также можно получить отдельно через `AutoDrawGameMonitor.rendererSnapshot()`.
+
+Снимок собирает:
+- фактические `egret.Capabilities.engineVersion` и `renderMode`, тип `systemRenderer`/`canvasRenderer`;
+- `DisplayList` canvas scale factors, `devicePixelRatio` и `visualViewport.scale`;
+- для каждого `.egret-player`: stage dimensions/frameRate/scaleMode, player options, canvas intrinsic/client dimensions, `getBoundingClientRect()`, CSS transform и transform origin;
+- display-object chain BoardPane→родители, concatenated matrices, scrollRect, маску и углы доски в stage coordinates;
+- `canvas.screenQuad` и `boardClientCorners`, если браузер предоставляет `Element.getBoxQuads()`.
+
+`boardClientCorners` выражены в **CSS client pixels** относительно viewport, не в физических пикселях screenshot. `devicePixelRatio` и `visualViewportScale` сохраняются отдельно. Если `getBoxQuads()` отсутствует или вызов недоступен, `screenQuad` и `boardClientCorners` будут `null`: не выводите точное экранное преобразование только из axis-aligned bounding rectangle, особенно при повороте canvas.
+
+Диагностика не меняет `renderMode`, размеры/позиции доски, кисть или игровые данные; не рисует, не управляет мышью, не создаёт таймеры и не добавляет method wrappers. Она предназначена для получения runtime evidence до построения offline renderer fixtures. Она не измеряет footprint кисти и не подтверждает pixel equivalence.
+
+Сохраните полный JSON `inspect()` и передайте его для анализа. Запускать CHALK/brush live experiment для этого снимка не требуется.
+
 ## Подключение
 
 1. Откройте игру в Chrome или Edge и дождитесь появления доски.

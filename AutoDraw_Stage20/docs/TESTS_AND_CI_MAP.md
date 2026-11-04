@@ -93,7 +93,7 @@
 
 ### 4.1. Job: game-monitor-tests
 
-Платформа: Windows. Проверяет JavaScript syntax, Game Monitor resource snapshot, зависимости локального Bridge smoke server и WebSocket smoke test.
+Платформа: Windows. Проверяет JavaScript syntax, 18 Node.js Game Monitor tests (включая renderer/transform diagnostics), зависимости локального Bridge smoke server и WebSocket smoke test. Run [41895277128](https://github.com/Kiddos19882/AutoDraw/actions/runs/41895277128): job SUCCESS.
 
 ### 4.2. Job: preparation-tests
 
@@ -280,7 +280,10 @@
 - отсутствие индексных чтений `atom.points` со стороны Monitor в `status()`, `export()` и wrappers;
 - явный `diagnosticSnapshot()` выполняет полный подсчёт и сверяет его с ресурсным snapshot;
 - отсутствие скрытого array fallback, если engine fields отсутствуют/невалидны;
-- восстановление исходного метода после `stop()`.
+- восстановление исходного метода после `stop()`;
+- read-only `rendererSnapshot()`: engineVersion/renderMode/systemRenderer, canvas scale factors, DPR/viewport scale, stage/canvas dimensions и CSS transforms;
+- stage→client mapping углов BoardPane через canvas content quad, display-object parent chain и mask metadata;
+- безопасная деградация с `null`/пустым player list при отсутствии Egret runtime/canvas.
 
 В `.github/workflows/geometry-tests.yml` добавлен отдельный шаг:
 ```powershell
