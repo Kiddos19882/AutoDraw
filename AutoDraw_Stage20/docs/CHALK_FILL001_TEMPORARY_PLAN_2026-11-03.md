@@ -57,7 +57,7 @@ Replay test [974f949](https://github.com/Kiddos19882/AutoDraw/commit/974f949e963
 
 ### Шаг 3. Интегрировать запуск в AutoDraw и провести Windows live preflight
 
-**Статус:** IN_PROGRESS — software/CI gates пройдены; runtime binding реального RS candidate подтверждён, но независимый PNG audit отклонил capture (coverage=97.673218%, leakage=28). Live preflight из commit [73d14a1](https://github.com/Kiddos19882/AutoDraw/commit/73d14a1784a5a9f8ef29bc0e197b75352f2650af) подтвердил exact CHALK=5999, но только 128/131 consuming strokes; три последних кандидата не потребили ресурс после исчерпания квоты. Capture REJECTED, полная стоимость плана неизвестна. Последующий статический анализ выявил избыточно плотные проходы и сформировал кандидатов FILL-001-RS; ни один кандидат ещё не подтверждён live.
+**Статус:** IN_PROGRESS — software/CI gates пройдены; runtime binding реального RS candidate подтверждён, но независимый PNG audit отклонил capture (coverage=97.673218%, leakage=28). Live preflight из commit [73d14a1](https://github.com/Kiddos19882/AutoDraw/commit/73d14a1784a5a9f8ef29bc0e197b75352f2650af) подтвердил exact CHALK=5999, но только 128/131 consuming strokes; три последних кандидата не потребили ресурс после исчерпания квоты. Capture REJECTED, полная стоимость плана неизвестна. Последующий статический анализ выявил избыточно плотные проходы и сформировал кандидатов FILL-001-RS; кандидат rectangle/r10/step=5/offset=0 уже исполнен: runtime binding PASS, но capture REJECTED независимым PNG audit; ни один кандидат пока не принят как valid live capture.
 
 **Подтверждённая реализация UI/runner:**
 - Добавлен `source/preparation/chalk_fill_ui.py` и самостоятельная вкладка FILL-001 в `integrated_app.py`, отдельная от седьмой вкладки «Тест кистей».
