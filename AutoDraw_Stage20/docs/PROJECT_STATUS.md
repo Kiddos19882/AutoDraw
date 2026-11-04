@@ -1,3 +1,13 @@
+## Текущий блокирующий шаг: FILL-001-RS исходный PNG replay
+
+**Задача:** FILL-001-RS-PRE-REPLAY-001 — повторно проверить неизменённые before/after PNG исходного live preflight `fill001-rs-preflight-20261104-7.04` актуальным PNG audit и подтвердить полный evidence binding.
+
+**Статус:** IN PROGRESS / BLOCKER. До завершения replay не начинать новый live запуск FILL-001-RS и не открывать 45-task matrix. Сам replay — offline-проверка сохранённых evidence; игровые эксперименты не выполняются.
+
+Исходный run: 27/27 strokes, pointCount 1→1261, exact CHALK=1260; Bridge diagnostics без ошибок. Исходный PNG gate: coverage=97.673218%, leakage=28 (требуется ≥99% и 0). Исправление affine mapping и успешный CI run 41780241017 не являются доказательством прохождения replay исходных PNG.
+
+**Следующий результат, необходимый для снятия блокировки:** доступность и hash исходных PNG/evidence → replay актуальным adapter → отчёт по binding, coverage/leakage и hashes → решение PASS/REJECT с сохранением исходных данных. Thresholds не менять. Если бинарные исходники недоступны через GitHub, зафиксировать точную недостающую пару/архив и запросить только эти файлы.
+
 # Текущее состояние проекта
 
 ## Актуальное состояние на 2026-11-04
