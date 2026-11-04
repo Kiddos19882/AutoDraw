@@ -742,3 +742,18 @@ CI evidence: workflow 41787492122, commit d337f4240e83488273152f65992032beca3957
 - [ ] Сравнить старую bbox-модель и новую модель на frozen fixtures; не менять production planner до прохождения acceptance.
 - [ ] Проверить отдельным PNG capture только после offline acceptance и отдельного разрешения на live run.
 
+
+
+### BRUSH-FOOTPRINT-CAPSULE-001 — результат статического аудита
+
+**Подтверждено по текущему коду (не runtime):**
+- `brush_footprint_geometry.footprint_pixel_bounds()` возвращает только осевой bounding box горизонтального штриха с полуразмерами `brush_value × scale / 2`; это не capsule mask.
+- `interior_fill_planner._footprint_is_color()` проверяет весь bbox. Для safety это консервативно (может отклонить допустимый штрих), но `_mark_footprint()` помечает весь bbox как уже покрытый. У круглых концов угловые клетки вне capsule могут быть ошибочно объявлены covered; fallback может их пропустить, а coverage summary — завыситься.
+- Тесты `test_brush_footprint_geometry.py` проверяют bounds; независимый oracle в `test_interior_fill_planner.py` явно моделирует прямоугольный footprint. Эти тесты не проверяют round-cap capsule geometry.
+- `swept_footprint_geometry.check_swept_footprint()` применяет bbox к клеткам supercover centerline. Это conservative safety envelope, а не точная swept mask; возможны false rejects, но функция не строит coverage map.
+- `outline_first_fill_planner` использует bbox для color-safety проверки, однако residual помечает только по центральным пикселям boundary run; прямого bbox coverage overclaim как в `interior_fill_planner._mark_footprint` здесь не найдено.
+- FILL-001 / FILL-001-RS используют отдельный `chalk_fill_fixed_radius_planner.py`: rasterizer строит OpenCV line и endpoint circles (`opencv_round_capped_line`). Он не вызывает `footprint_pixel_bounds()`. Следовательно, дефект generic bbox coverage не является доказанной причиной FILL-001-RS PNG residual и не должен автоматически переноситься на этот planner.
+
+**Вывод:** проблема bbox overclaim подтверждена для experimental `interior_fill_planner`; влияние на качество AutoDraw и соответствие реальному Egret renderer не доказано. Изменения исходников и тестов не выполнялись.
+
+**Следующий offline increment:** добавить отдельные masks для потенциально затронутых pixel cells (safety/leakage) и гарантированно покрытых cells (coverage), используя bbox только как broad-phase. Для горизонтального штриха базовая модель — capsule в logical space; при non-uniform scale учитывать обратное преобразование pixel-cell rectangle. Для polyline — отдельная swept-union модель и тесты концов/поворотов/анизотропии. Сравнить старый и новый planner на frozen fixtures; не менять текущий planner/defaults до независимого acceptance и не проводить live capture без прохождения offline gate.
