@@ -22,6 +22,28 @@ FILL001_PHASE_ID = "FILL001"
 FILL001_SCHEMA_VERSION = 2
 FILL001_REPEATS = (1, 2, 3)
 FILL001_TASK_COUNT = len(FILL001_SHAPES) * len(FILL001_RADII) * len(FILL001_REPEATS)
+FILL001_RS_PLAN_VARIANT = "FILL001_RS_V1"
+FILL001_RS_SELECTION_POLICY = (
+    "max_scanline_row_step_with_coverage_ge_0.99_and_leakage_eq_0;"
+    "tie_break_max_coverage_then_min_estimated_points_path_strokes"
+)
+FILL001_RS_SCANLINE_CONFIGS = {
+    ("rectangle", 1): (1, 0),
+    ("rectangle", 5): (2, 1),
+    ("rectangle", 10): (5, 0),
+    ("rectangle", 20): (8, 4),
+    ("rectangle", 30): (11, 10),
+    ("wide_irregular", 1): (1, 0),
+    ("wide_irregular", 5): (4, 0),
+    ("wide_irregular", 10): (7, 1),
+    ("wide_irregular", 20): (5, 0),
+    ("wide_irregular", 30): (10, 0),
+    ("narrow_irregular", 1): (1, 0),
+    ("narrow_irregular", 5): (3, 1),
+    ("narrow_irregular", 10): (5, 0),
+    ("narrow_irregular", 20): (5, 0),
+    ("narrow_irregular", 30): (5, 0),
+}
 CAPTURE_FIELDS = (
     "task_id", "run_id", "plan_signature", "target_mask_sha256",
     "requested_radius", "observed_radius", "pre_point_count", "post_point_count",
@@ -95,10 +117,90 @@ def build_fill001_matrix(series_id: str) -> dict[str, Any]:
     }
 
 
+def build_fill001_rs_matrix(series_id: str) -> dict[str, Any]:
+    """Create a separate 45-task FILL-001-RS matrix with frozen scanline spacing."""
+    if not isinstance(series_id, str) or not 1 <= len(series_id.strip()) <= 64:
+        raise FillMatrixError("series_id должен содержать от 1 до 64 символов.")
+    series_id = series_id.strip()
+    tasks = []
+    order = 0
+    for shape in FILL001_SHAPES:
+        for radius in FILL001_RADII:
+            scanline_row_step, scanline_offset = FILL001_RS_SCANLINE_CONFIGS[(shape, radius)]
+            plan = build_fixed_radius_fill_plan(
+                shape,
+                radius,
+                scanline_row_step=scanline_row_step,
+                scanline_offset=scanline_offset,
+            )
+            summary = plan["summary"]
+            if summary["quality_gate_passed"] is not True or summary["leakage_pixels"] != 0:
+                raise FillMatrixError(
+                    f"FILL-001-RS candidate не прошёл quality gate: {shape}/r{radius}."
+                )
+            for repeat in FILL001_REPEATS:
+                order += 1
+                tasks.append({
+                    "task_id": (
+                        f"{series_id}-{shape}-r{radius}-s{scanline_row_step}"
+                        f"-o{scanline_offset}-rep{repeat}"
+                    ),
+                    "matrix_order_index": order,
+                    "phase_id": FILL001_PHASE_ID,
+                    "series_id": series_id,
+                    "shape_id": shape,
+                    "requested_radius": radius,
+                    "repeat_index": repeat,
+                    "planned_repeats": 3,
+                    "plan_variant": FILL001_RS_PLAN_VARIANT,
+                    "planner_version": plan["planner_version"],
+                    "scanline_row_step": scanline_row_step,
+                    "scanline_offset": scanline_offset,
+                    "plan_signature": plan["plan_signature"],
+                    "target_mask_sha256": plan["target_mask_sha256"],
+                    "expected_strokes": summary["stroke_count"],
+                    "target_area_pixels": summary["target_area_pixels"],
+                    "planned_path_length": summary["path_length_logical_pixels"],
+                    "planned_coverage_fraction": summary["coverage_fraction"],
+                    "planned_leakage_pixels": summary["leakage_pixels"],
+                    "quality_gate_passed": summary["quality_gate_passed"],
+                    "unsupported": summary["unsupported"],
+                    "sampling_profile": {"profile_id": "P1", "sampling_step": 4, "delay_ms": 5},
+                    "safe_to_execute": False,
+                    "capture_status": "pending",
+                })
+    identity = {
+        "schema_version": FILL001_SCHEMA_VERSION,
+        "phase_id": FILL001_PHASE_ID,
+        "series_id": series_id,
+        "shapes": list(FILL001_SHAPES),
+        "radii": list(FILL001_RADII),
+        "repeats": list(FILL001_REPEATS),
+        "tasks": tasks,
+        "plan_variant": FILL001_RS_PLAN_VARIANT,
+        "candidate_selection_policy": FILL001_RS_SELECTION_POLICY,
+    }
+    matrix = {
+        **identity,
+        "matrix_signature": _hash(identity),
+        "expected_task_count": FILL001_TASK_COUNT,
+        "created_at_utc": datetime.now(timezone.utc).isoformat(),
+        "execution_allowed": False,
+        "status": "planned",
+    }
+    validate_fill001_matrix(matrix)
+    return matrix
+
+
 def validate_fill001_matrix(matrix: Any) -> None:
     """Fail closed on duplicate/missing cells, altered signatures or unsafe plans."""
     if not isinstance(matrix, dict) or matrix.get("phase_id") != FILL001_PHASE_ID:
         raise FillMatrixError("Некорректный FILL-001 manifest.")
+    plan_variant = matrix.get("plan_variant")
+    if plan_variant not in (None, FILL001_RS_PLAN_VARIANT):
+        raise FillMatrixError("Неизвестная версия FILL-001 plan_variant.")
+    if plan_variant == FILL001_RS_PLAN_VARIANT and matrix.get("candidate_selection_policy") != FILL001_RS_SELECTION_POLICY:
+        raise FillMatrixError("FILL-001-RS candidate selection policy не совпадает с frozen contract.")
     tasks = matrix.get("tasks")
     if not isinstance(tasks, list) or len(tasks) != FILL001_TASK_COUNT:
         raise FillMatrixError(f"Матрица должна содержать {FILL001_TASK_COUNT} задач.")
@@ -135,9 +237,40 @@ def validate_fill001_matrix(matrix: Any) -> None:
         count = task.get("expected_strokes")
         if isinstance(count, bool) or not isinstance(count, int) or count < 1:
             raise FillMatrixError("expected_strokes должен быть положительным целым.")
+        if plan_variant == FILL001_RS_PLAN_VARIANT:
+            if task.get("plan_variant") != FILL001_RS_PLAN_VARIANT or task.get("planner_version") != 2:
+                raise FillMatrixError("FILL-001-RS task не закрепляет planner version 2.")
+            step, offset = task.get("scanline_row_step"), task.get("scanline_offset")
+            if (
+                type(step) is not int or not 1 <= step <= task.get("requested_radius", 0)
+                or type(offset) is not int or not 0 <= offset < step
+            ):
+                raise FillMatrixError("Некорректные scanline spacing parameters в FILL-001-RS task.")
+            if (task.get("shape_id"), task.get("requested_radius")) not in FILL001_RS_SCANLINE_CONFIGS:
+                raise FillMatrixError("Неизвестная shape/radius ячейка FILL-001-RS.")
+            if FILL001_RS_SCANLINE_CONFIGS[(task["shape_id"], task["requested_radius"])] != (step, offset):
+                raise FillMatrixError("Scanline spacing не совпадает с frozen FILL-001-RS candidate.")
+            plan = build_fixed_radius_fill_plan(
+                task["shape_id"], task["requested_radius"],
+                scanline_row_step=step, scanline_offset=offset,
+            )
+            plan_summary = plan["summary"]
+            if (
+                plan["plan_signature"] != task["plan_signature"]
+                or plan["target_mask_sha256"] != task["target_mask_sha256"]
+                or plan_summary["stroke_count"] != count
+                or plan_summary["coverage_fraction"] != task["planned_coverage_fraction"]
+                or plan_summary["leakage_pixels"] != task["planned_leakage_pixels"]
+            ):
+                raise FillMatrixError("FILL-001-RS task не совпадает с пересчитанным versioned plan.")
+        elif any(field in task for field in ("plan_variant", "planner_version", "scanline_row_step", "scanline_offset")):
+            raise FillMatrixError("FILL-001 legacy matrix не может содержать FILL-001-RS fields.")
     if actual != expected:
         raise FillMatrixError("Матрица не покрывает все shape/radius/repeat cells.")
-    identity = {k: matrix[k] for k in ("schema_version", "phase_id", "series_id", "shapes", "radii", "repeats", "tasks")}
+    identity_fields = ("schema_version", "phase_id", "series_id", "shapes", "radii", "repeats", "tasks")
+    if plan_variant == FILL001_RS_PLAN_VARIANT:
+        identity_fields += ("plan_variant", "candidate_selection_policy")
+    identity = {k: matrix[k] for k in identity_fields}
     if matrix.get("matrix_signature") != _hash(identity):
         raise FillMatrixError("matrix_signature не совпадает с manifest.")
 
