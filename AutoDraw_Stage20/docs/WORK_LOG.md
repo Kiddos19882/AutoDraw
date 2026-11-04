@@ -1,3 +1,9 @@
+## 2026-11-04 — подтверждена фактическая геометрия mask игровой доски
+
+- В `main.min_653f95bc.js` `PainterPopup.createBlackBackground()` создаёт `boardMask` через `drawRoundRect(0,0,BLACK_BOARD_WIDTH,BLACK_BOARD_HEIGHT,10)`; `createBlackBoard()` присваивает `painterBoard.mask=boardMask`.
+- Egret 5.4.1 `Path2D.drawRoundRect()` вычисляет внутренние полуоси как `0.5 * ellipseWidth/ellipseHeight`, поэтому аргумент 10 даёт фактическое скругление 5 логических пикселей, не 10.
+- `BoardPane` дополнительно использует `scrollRect=(0,0,460,240)`. Renderer reference harness должен отдельно воспроизвести прямоугольный scrollRect и roundRect mask с radius=5 logical px.
+
 ## 2026-11-04 — offline analysis smooth endpoint на FILL-001 run 6a17a297
 
 - Исходный Game Monitor JSON: `data/results/brush_behavior_tests/game_monitor_bridge/bb261898-8296-41f5-a333-eb0b81016410/game-monitor-run-20261104T040548835772Z-6a17a297.json`; exact CHALK=1260, 27 strokes, radius/lineWidth=10.
