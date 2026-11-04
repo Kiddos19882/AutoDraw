@@ -1,3 +1,15 @@
+## 2026-11-04 — FILL-001-RS — scanline spacing documentation
+
+- Повторно сверены branch `feature/image-geometry-optimization`, HEAD `4f1fb945f384aba0b3454e4301b248cf74101800`, последние 20 коммитов и актуальные управляющие документы. GitHub API не предоставляет локальный `git status`.
+- Проверено, что commit 4f1fb94 содержит документационные изменения по FILL-001; commit 73d14a1 добавил пользовательские runtime artifacts; последний code/test commit — 5cde7a1. CI [41754801210](https://github.com/Kiddos19882/AutoDraw/actions/runs/41754801210) SUCCESS относится к 5cde7a1, не к текущему документационному HEAD.
+- Основание этапа: live task run подтвердил exact CHALK=5999, но 128/131 consuming strokes; три последних кандидата не потребили ресурс после quota exhaustion. Capture rejected, полная стоимость незавершённого плана неизвестна.
+- Зафиксирован статический OpenCV baseline: rectangle/r10 — 131 strokes, path 40 218, estimated sampling points 10 237, coverage 100%, leakage 0; текущие проходы располагаются практически на каждой строке.
+- Задокументированы результаты r10/step=5/offset=0 для трёх форм: 27/29/43 strokes; coverage 99,319%/99,395%/99,173%; leakage 0. Для rectangle estimated sampling points 2 099 против 10 237 baseline. Это офлайн proxy, не игровой результат и не CHALK.
+- Временный FILL-001 plan дополнен этапом FILL-001-RS: отделены `scanline_row_step` и `point_step_px`, сохранены предварительные step/offset candidates для 15 shape×radius combinations, описаны versioned plan/signature, static/live gates и обработка quota-censored attempts.
+- Обновлены PROJECT_STATUS, TASKS, ROADMAP, DECISIONS, CHANGELOG и docs index. Изменения ограничены Markdown; исходники, тесты, конфигурации, workflow, runtime/experimental data и `master` не менялись.
+- Live experiment и тесты не запускались; CI для документальных изменений не запускался. Commit не создавался отдельно по окончании серии; обновления GitHub Contents API создают отдельные последовательные commits.
+- Следующий шаг: воспроизвести полный статический sweep и сохранить исходные метрики; после этого запросить отдельное разрешение на код/тесты и live preflight. FILL-001 45-cell matrix остаётся BLOCKED; INT-007 остаётся BLOCKED.
+
 ## 2026-11-04 — FILL-001 transient Bridge session retry: CI SUCCESS
 
 - Повторно проверены ветка feature/image-geometry-optimization, branch HEAD после пользовательского evidence commit b4a107a, последние 20 коммитов, README Stage20, docs index, управляющие документы и пять постоянных регламентов.
