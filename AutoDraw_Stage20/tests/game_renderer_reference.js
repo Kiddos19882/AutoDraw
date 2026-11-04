@@ -288,6 +288,9 @@
       }
 
       const json = JSON.stringify(manifest, null, 2);
+      document.getElementById("renderer-manifest-json").textContent = json;
+      document.body.dataset.referenceStatus = "complete";
+      document.body.dataset.fixtureCount = String(manifest.fixtures.length);
       const blob = new Blob([json], { type: "application/json" });
       manifestNode.href = URL.createObjectURL(blob);
       manifestNode.download = "egret-5.4.1-renderer-reference-manifest.json";
@@ -296,6 +299,7 @@
         "Generated " + manifest.fixtures.length + " fixtures using Egret " +
         manifest.engineVersion + " CanvasRenderer. No game session, WebGL context, pointer input or CHALK was used.";
     } catch (error) {
+      document.body.dataset.referenceStatus = "error";
       statusNode.textContent = "Reference harness error: " + (error && error.stack ? error.stack : String(error));
       statusNode.className = "error";
     }
