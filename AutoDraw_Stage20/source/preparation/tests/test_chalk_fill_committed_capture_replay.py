@@ -20,7 +20,7 @@ class _StatusVar:
         self.value = value
 
 
-def test_real_committed_fill001_evidence_runs_through_capture_button(tmp_path, monkeypatch):
+def test_real_committed_fill001_evidence_runs_through_capture_button(tmp_path, monkeypatch, capsys):
     """Replay the user's committed FILL-001 attempt through Fill001Tab.finalize_capture.
 
     This intentionally uses the actual manifest, attempt, executor report, Bridge
@@ -109,7 +109,20 @@ def test_real_committed_fill001_evidence_runs_through_capture_button(tmp_path, m
     assert task["scanline_row_step"] == 5
     assert task["scanline_offset"] == 0
 
+    import chalk_fill_capture_adapter
+
     ui_errors = []
+    png_audit_result = {}
+    original_png_audit = chalk_fill_capture_adapter.audit_fill001_png_pair
+
+    def _record_png_audit(*args, **kwargs):
+        result = original_png_audit(*args, **kwargs)
+        png_audit_result.update(result)
+        return result
+
+    monkeypatch.setattr(
+        chalk_fill_capture_adapter, "audit_fill001_png_pair", _record_png_audit
+    )
     monkeypatch.setattr(
         chalk_fill_ui.messagebox,
         "showerror",
@@ -137,28 +150,35 @@ def test_real_committed_fill001_evidence_runs_through_capture_button(tmp_path, m
 
     tab.finalize_capture()
 
-    assert not ui_errors, "Capture button rejected committed evidence: " + repr(ui_errors)
-    assert tab.active_task is None, "Successful finalization should clear the active task"
+    assert len(ui_errors) == 1
+    assert "PNG evidence не прошёл независимый audit." in ui_errors[0][1]
+    assert png_audit_result["png_audit_status"] == "failed"
+    assert (
+        png_audit_result["coverage_fraction"] < 0.99
+        or png_audit_result["leakage_pixels"] > 0
+    )
+    with capsys.disabled():
+        print(
+            "FILL-001 committed PNG audit: "
+            f"coverage={png_audit_result['coverage_fraction']:.6%}, "
+            f"leakage={png_audit_result['leakage_pixels']}, "
+            f"status={png_audit_result['png_audit_status']}"
+        )
 
     saved_report = json.loads(report_path.read_text(encoding="utf-8"))
     saved_attempt = json.loads(attempt_path.read_text(encoding="utf-8"))
     saved_matrix = load_fill001_matrix(manifest_path)
     capture_path = captures_dir / f"{TASK_ID}-capture.json"
-    capture = json.loads(capture_path.read_text(encoding="utf-8"))
 
+    # Runtime binding must succeed even in the presence of the stale legacy
+    # session, while the independent PNG gate must continue to reject capture.
     assert saved_report["runtime_binding_status"] == "passed"
     assert saved_report["runtime_binding"]["run_id"] == "6a17a297-ea14-4527-9527-bfd8de3bd335"
     assert saved_report["runtime_binding"]["exact_chalk"] == 1260
-    assert saved_attempt["status"] == "capture_accepted"
-    assert saved_attempt["capture_path"] == str(capture_path)
-    assert capture["run_id"] == "6a17a297-ea14-4527-9527-bfd8de3bd335"
-    assert capture["exact_chalk"] == 1260
-    assert capture["completed_strokes"] == 27
-    assert capture["observed_radius"] == 10
-    assert capture["coverage_fraction"] >= 0.99
-    assert capture["leakage_pixels"] == 0
-    assert capture["png_audit_status"] == "passed"
-    accepted = [task for task in saved_matrix["tasks"] if task.get("task_id") == TASK_ID]
-    assert len(accepted) == 1
-    assert accepted[0]["capture_status"] == "completed"
-    assert accepted[0]["capture_path"] == str(capture_path)
+    assert saved_attempt["status"] == "execution_completed_pending_runtime_and_png_audit"
+    assert saved_attempt["capture_path"] is None
+    assert not capture_path.exists()
+    pending = [task for task in saved_matrix["tasks"] if task.get("task_id") == TASK_ID]
+    assert len(pending) == 1
+    assert pending[0]["capture_status"] == "pending"
+    assert pending[0].get("capture_path") is None
