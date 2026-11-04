@@ -2777,3 +2777,12 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 ## 2026-11-04 — консолидация незавершённых задач
 
 Проведена инвентаризация Markdown-документации Stage20 и сверка текущих задач с TEST_RESULTS.md. В начало TASKS.md добавлен канонический backlog: FILL-001-RS renderer blocker, capsule renderer acceptance, INT-006 domain validation/safety margin, INT-003 Monitor overhead, sampling domain, INT-007/008/009 и документационное расхождение по auto-capture. Старые чек-листы сохранены как история; отменённые и архивные планы отделены от активного backlog. Код, тесты, конфигурации и live experiments не изменялись.
+
+
+## 2026-11-04 — пересмотр необходимости INT-003 и CHALK-SAMPLING-DOMAIN
+
+- По прямому решению пользователя INT-003 и CHALK-SAMPLING-DOMAIN закрыты со статусом CLOSED_NOT_REQUIRED; это не DONE и не утверждение, что ранее собранные данные бесполезны.
+- INT-003 закрыта как отдельная A/B/C оценка overhead Monitor: она не отвечает на ключевые вопросы расхода CHALK/радиуса/качества покрытия. Существующая telemetry и integrity validation сохраняются.
+- CHALK-SAMPLING-DOMAIN закрыта как отдельная расширенная матрица step×delay: текущий фокус — renderer footprint, геометрия заливки и модель расхода. G3 не экстраполируется за пределы длинных горизонтальных линий.
+- В TASKS добавлено обоснование оставшихся направлений: реальный renderer footprint, условная 45-cell matrix, capsule geometry и расширение domain INT-006.
+- Live эксперименты, код, тесты, конфигурации и workflow не менялись. master не изменялся. GitHub API не предоставляет локальный git status.
