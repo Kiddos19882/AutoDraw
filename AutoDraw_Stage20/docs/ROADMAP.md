@@ -5,6 +5,8 @@ INT-003 и CHALK-SAMPLING-DOMAIN закрыты как NOT_REQUIRED по реш�
 ## Актуальная последовательность работ
 
 1. **P0 — FILL-001-RS renderer footprint/transform:** Egret 5.4.1, ROUND caps/joints defaults и CanvasRenderer implementation подтверждены в согласованном наборе assets, происхождение которого пользователь подтвердил как скачивание с сайта запущенной игры. Остаётся установить фактический render backend активной сессии, полный popup→board→screen transform, clipping/device-pixel mapping и footprint на frozen fixtures; пройти offline PNG gate coverage≥99%, leakage=0.
+**Подэтап GAME-BRUSH-REPLICATION (внутри пункта 1):** статическая трассировка текущего игрового набора завершена (E1). Следующий offline gate — установить фактический Canvas/WebGL mode и полный transform, затем подготовить frozen fixtures/reference harness для кадровой выборки точек, normal/smooth path, clipping и PNG comparison. OpenCV и Capsule остаются моделями, а не подтверждённой копией renderer. Реализация в AutoDraw и live captures пока не выполнялись.
+
 2. **P0 — single-task live preflight:** только после offline PASS и отдельного разрешения пользователя. Последний capture (coverage 98.430600%, leakage 11) отклонён; exact CHALK=1260 относится только к этому capture.
 3. **P0 — FILL-001-RS 45-cell matrix:** только после принятого single-task preflight и отдельного разрешения; 15 shape×radius cells × 3 повтора.
 4. **P1 — BRUSH-FOOTPRINT-CAPSULE-001:** завершить offline fixture comparison/renderer agreement и решить, нужна ли интеграция generic planner. Это отдельная геометрическая корректность; не установленная причина RS rejection.
