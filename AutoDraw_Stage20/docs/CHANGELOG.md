@@ -841,3 +841,8 @@
 - Actual PNG residual pixel coordinates остаются неразобранными; capture по-прежнему REJECTED. Contour pass не реализован и не live-validated; CHALK не прогнозировался.
 - Только документация; исходники, тесты, настройки, frozen plan, thresholds и production defaults не изменялись.
 
+## 2026-11-04 — FILL-001-RS actual PNG residual diagnostics
+
+- В committed capture replay test добавлен вывод координат фактических uncovered/leakage pixels исходной PNG pair, пространственного распределения, connected components и расстояний до affine-transformed scanline centerlines.
+- Изменение ограничено тестовой диагностикой; production audit, исходные evidence, frozen plan/mask, thresholds и defaults не менялись.
+- Commits: `e62b692`, `d337f42`. Выполнение диагностического теста и его численный результат ожидают подтверждения CI.
