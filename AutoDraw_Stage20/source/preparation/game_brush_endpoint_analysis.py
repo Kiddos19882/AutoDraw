@@ -5,7 +5,7 @@ from __future__ import annotations
 This is an evidence-analysis utility, not a production brush renderer and not a
 pixel-coverage oracle. It measures accepted point spacing and the geometric
 reach of an ideal round cap around the midpoint endpoint used by the game's
-smooth-path call when its final-line flag is false.
+smooth-path call when its final-line argument is omitted/falsy.
 """
 
 import argparse
