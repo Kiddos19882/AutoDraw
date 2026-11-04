@@ -110,12 +110,18 @@ def prepare_fill001_single_task_plan(
                 if task.get("plan_variant") == "FILL001_RS_V1"
                 else "fill001_fixed_radius_single_task_preflight"
             ),
-            "plan_variant": task.get("plan_variant", "FILL001_V1"),
             "planner_version": plan["planner_version"],
-            "scanline_spacing": {
-                "scanline_row_step": task.get("scanline_row_step", 1),
-                "scanline_offset": task.get("scanline_offset", 0),
-            },
+            **(
+                {
+                    "plan_variant": task["plan_variant"],
+                    "scanline_spacing": {
+                        "scanline_row_step": task["scanline_row_step"],
+                        "scanline_offset": task["scanline_offset"],
+                    },
+                }
+                if task.get("plan_variant") == "FILL001_RS_V1"
+                else {}
+            ),
             "plan_signature": plan["plan_signature"],
             "target_mask_sha256": plan["target_mask_sha256"],
             "chalk_fill001_task": task,
