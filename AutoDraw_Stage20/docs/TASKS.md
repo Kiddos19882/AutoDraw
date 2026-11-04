@@ -1,3 +1,27 @@
+## BLOCKER: FILL-001-RS — replay исходного live preflight до возобновления запуска
+
+**ID:** FILL-001-RS-PRE-REPLAY-001  
+**Статус:** IN PROGRESS — обязательный незавершённый gate  
+**Приоритет:** BLOCKER для любого следующего live запуска FILL-001-RS и для 45-task matrix  
+**Условие закрытия:** завершён replay исходных неизменённых before/after PNG и связанных evidence исходного запуска `fill001-rs-preflight-20261104-7.04` через актуальный PNG audit; результат, hashes и все gates проверены и записаны; принято обоснованное решение о статусе capture.
+
+### Обязательная последовательность
+
+1. Найти и получить исходные before/after PNG, manifest, executor report, Bridge/Monitor evidence и metadata именно запуска `fill001-rs-preflight-20261104-7.04`. Не подменять их синтетическими fixtures или PNG другого запуска.
+2. Сверить принадлежность всех файлов одному task/run/session, plan signature, executor window и исходным значениям pointCount. Исходные файлы не изменять.
+3. Выполнить повторный audit этими PNG через актуальный `chalk_fill_capture_adapter.py` с согласованным executor affine transform.
+4. Сохранить отдельный replay report с SHA-256 входов, версией/commit analyzer, coverage, leakage, результатами binding и причинами отказа.
+5. При coverage ≥99%, leakage=0 и прохождении всех остальных неизменённых gates — пересмотреть принятие исходного capture по установленному контракту. При любом отказе — локализовать конкретную причину, не ослабляя thresholds и не переписывая raw evidence.
+6. Только после закрытия replay gate отдельно определить и разрешить следующий одиночный Windows live preflight. 45-task matrix не запускать автоматически.
+
+**Не входит в задачу:** изменение production-кода/defaults, frozen masks, исходного manifest/plan, acceptance thresholds, запуск игры или новая live-серия в рамках replay. Никакие live-действия не выполнять без отдельного разрешения пользователя.
+
+**Известные исходные факты:** исходный запуск выполнил 27/27 strokes; pointCount 1→1261, exact CHALK=1260; Bridge diagnostics — 0 sequence gaps, 0 dropped events, 0 Monitor errors, 0 send failures. Исходный PNG audit отклонил capture: coverage=97.673218%, leakage=28 при критериях coverage≥99%, leakage=0. Эти результаты не заменяют replay.
+
+**Зависимости/ограничение:** commit `530821497ce3a6bd5152318a78e1f06cb836f288` ранее был обозначен как возможный источник evidence, но состав файлов и доступность бинарных PNG ещё не подтверждены. До получения реальных исходных PNG replay не считается выполненным.
+
+---
+
 # Реестр задач AutoDraw
 
 ## FILL-001-RS — согласование PNG audit transform
