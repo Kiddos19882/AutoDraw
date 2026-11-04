@@ -66,14 +66,19 @@ def _monitor_version(run: dict[str, Any], session: dict[str, Any] | None) -> str
 
 def _telemetry_status(run: dict[str, Any], session: dict[str, Any] | None) -> str:
     status = session.get("monitor_status_at_connect") if isinstance(session, dict) else None
+    has_samples = any(
+        isinstance(event, dict) and event.get("type") == "MOUSE_MOVE_SAMPLE"
+        for event in run.get("events", [])
+    )
     if isinstance(status, dict):
         enabled = status.get("inputTelemetryEnabled")
         if enabled is True:
-            return "enabled"
+            return "enabled" if has_samples else "enabled_no_samples"
         if enabled is False:
-            return "disabled"
-    if any(isinstance(event, dict) and event.get("type") == "MOUSE_MOVE_SAMPLE"
-           for event in run.get("events", [])):
+            # This is only the connection-time status. The API can be toggled
+            # later while Bridge is connected, so observed events take priority.
+            return "observed_after_connect_or_status_conflict" if has_samples else "disabled"
+    if has_samples:
         return "observed"
     version = _monitor_version(run, session)
     if version:
@@ -226,6 +231,11 @@ def analyze_run(run: dict[str, Any], session: dict[str, Any] | None = None) -> d
         event.get("type") for event in events
         if isinstance(event, dict) and isinstance(event.get("type"), str)
     )
+    for event_type in (
+        "MOUSE_MOVE_SAMPLE", "POINT_QUOTA_UPDATE", "DRAW_SAMPLE",
+        "DRAW_START", "DRAW_END", "POINTER_DOWN_CANDIDATE", "POINTER_UP_CANDIDATE"
+    ):
+        counts.setdefault(event_type, 0)
     by_stroke: dict[str, list[dict[str, Any]]] = defaultdict(list)
     events_without_stroke_id = 0
     for event in events:
@@ -248,11 +258,6 @@ def analyze_run(run: dict[str, Any], session: dict[str, Any] | None = None) -> d
         match["input_to_accept_ms"]
         for stroke in strokes for match in stroke["matches"]
         if isinstance(match.get("input_to_accept_ms"), (int, float))
-    ]
-    all_board_distance = [
-        stroke["input_to_accepted_board_distance"]["median"]
-        for stroke in strokes
-        if stroke["input_to_accepted_board_distance"]["median"] is not None
     ]
     probes = run.get("frame_probes") if isinstance(run.get("frame_probes"), list) else []
     probe_intervals = [

@@ -82,3 +82,23 @@ def test_rejects_missing_events_array():
         assert "events array" in str(error)
     else:
         raise AssertionError("Expected ValueError for a missing events array.")
+
+
+
+def test_reports_input_events_observed_even_if_connect_snapshot_was_disabled():
+    run = {
+        "events": [
+            _event("MOUSE_MOVE_SAMPLE", 10, stageX=10, stageY=20),
+        ]
+    }
+    session = {"monitor_status_at_connect": {"version": "0.2.2", "inputTelemetryEnabled": False}}
+    report = analyze_run(run, session)
+    assert report["input_telemetry_status"] == "observed_after_connect_or_status_conflict"
+
+
+def test_enabled_telemetry_without_mouse_events_is_not_reported_as_observed():
+    report = analyze_run(
+        {"events": []},
+        {"monitor_status_at_connect": {"version": "0.2.2", "inputTelemetryEnabled": True}}
+    )
+    assert report["input_telemetry_status"] == "enabled_no_samples"
