@@ -356,10 +356,16 @@ def build_fill001_capture(
         "task_id": task["task_id"],
         "run_id": run_id,
         "plan_signature": task["plan_signature"],
-        "plan_variant": task.get("plan_variant", "FILL001_V1"),
-        "planner_version": task.get("planner_version", 1),
-        "scanline_row_step": task.get("scanline_row_step", 1),
-        "scanline_offset": task.get("scanline_offset", 0),
+        **(
+            {
+                "plan_variant": task["plan_variant"],
+                "planner_version": task["planner_version"],
+                "scanline_row_step": task["scanline_row_step"],
+                "scanline_offset": task["scanline_offset"],
+            }
+            if task.get("plan_variant") == "FILL001_RS_V1"
+            else {}
+        ),
         "target_mask_sha256": task["target_mask_sha256"],
         "requested_radius": task["requested_radius"],
         "observed_radius": observed_radius,
