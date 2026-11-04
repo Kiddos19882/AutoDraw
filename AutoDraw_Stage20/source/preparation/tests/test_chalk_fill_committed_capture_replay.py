@@ -229,8 +229,8 @@ def test_real_committed_fill001_evidence_runs_through_capture_button(tmp_path, m
         transformed_segments = []
         for stroke in plan_data["strokes"]:
             p0, p1 = stroke["points"]
-            x0, y0 = round(float(p0["x"]) * scale_x), round(float(p0["y"]) * scale_y)
-            x1, y1 = round(float(p1["x"]) * scale_x), round(float(p1["y"]) * scale_y)
+            x0, y0 = float(p0["x"]) * scale_x, float(p0["y"]) * scale_y
+            x1, y1 = float(p1["x"]) * scale_x, float(p1["y"]) * scale_y
             transformed_segments.append((x0, y0, x1, y1))
 
         def _nearest_segment_distances(points):
