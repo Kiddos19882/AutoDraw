@@ -2,7 +2,7 @@
 
 ## Актуальный статус FILL-001 / FILL-001-RS на 2026-11-04
 
-Последний code/test commit: [7203c15](https://github.com/Kiddos19882/AutoDraw/commit/7203c15a5d8c2ffe6fb7bb68a780f8b7b77f2808); полный workflow [41765865098](https://github.com/Kiddos19882/AutoDraw/actions/runs/41765865098) выполняется. Предыдущий baseline CI [41754801210](https://github.com/Kiddos19882/AutoDraw/actions/runs/41754801210) прошёл на code/test commit 5cde7a1, но не включает FILL-001-RS changes.
+Последний code/test commit: [dac985e](https://github.com/Kiddos19882/AutoDraw/commit/dac985e147319d2275318531ab9063cdf410e5a4); полный workflow [41766148192](https://github.com/Kiddos19882/AutoDraw/actions/runs/41766148192) ожидает запуска. Предыдущие попытки CI отменены concurrency при последовательных code/test commits; подтверждённого результата для FILL-001-RS ещё нет.
 
 Exhaustive OpenCV sweep проверил 2 238 step/offset кандидатов; 62 прошли gate coverage ≥99% / leakage=0. Все 15 shape/radius cells получили frozen config. Реализованы planner version 2, отдельный 45-task RS manifest builder, single-task handoff, runtime context binding и генератор manifest. Полные результаты: [FILL-001-RS static sweep](CHALK_FILL001_RS_STATIC_SWEEP_2026-11-04.md). Это не live renderer evidence и не доказательство экономии CHALK.
 
