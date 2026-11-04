@@ -135,3 +135,39 @@ Per-stroke timing пересчитан по timestamps событий POINT_QUOT
 Источник: https://app.unpkg.com/egret-engine@5.2.18/files/build/egret-wasm/egret.d.ts (Graphics.lineStyle, строки 6063–6090 в просмотренной версии).
 
 **Ограничение:** фактически подключённая игрой версия Egret runtime не установлена по доступным репозиторным материалам. Поэтому round caps/joins — сильная API-совместимая гипотеза, но не доказательство конкретной сборки. Также не установлено, как renderer растеризует moveTo(p)+lineTo(p) при round cap. Нужны deployed runtime identity или независимый PNG capture. Не считать круглую форму footprint полностью подтверждённой.
+
+
+## 10. Renderer path semantics from Egret source — 2026-11-04
+
+Дополнительно проверены исходники Egret core (внешний upstream; это reference implementation, не файл из AutoDraw):
+- GraphicsNode.ts blob SHA e4ec07f9d50e5fca450cc6fc93bab6b0f4dc2541. GraphicsNode.lineStyle() заменяет неподдерживаемые/отсутствующие caps на "round" и joints на "round"; StrokePath сохраняет эти значения.
+- CanvasRenderer.ts blob SHA 80cbfb6c5dde6c66adfadc84cd5cb7283e71f391. Для StrokePath устанавливает context.lineCap и context.lineJoin, вызывает renderPath(), затем context.stroke().
+- WebGLRenderer.ts blob SHA a1c0c9ebbe4a5dfd0ac53621c8133ac741b7062c. Его renderGraphics() использует canvasRenderer.renderGraphics() для растрирования GraphicsNode в canvas и затем переносит результат в texture. В этой версии Egret GraphicsNode использует тот же CanvasRenderer и при WebGL.
+- Egret 5.2.18 egret.d.ts также документирует ROUND defaults для caps/joints и thickness как line width. Ссылки: https://github.com/egret-labs/egret-core/blob/master/src/egret/player/nodes/GraphicsNode.ts ; https://github.com/egret-labs/egret-core/blob/master/src/egret/player/rendering/CanvasRenderer.ts ; https://github.com/egret-labs/egret-core/blob/master/src/egret/web/rendering/webgl/WebGLRenderer.ts ; https://app.unpkg.com/egret-engine@5.2.18/files/build/egret-wasm/egret.d.ts
+
+### 10.1 Вывод для многоточечного штриха
+
+Для совместимой реализации Egret:
+- lineStyle thickness=brush value; фактическая ширина линии равна brush value в координатном пространстве Graphics;
+- отсутствующие caps/joints становятся ROUND;
+- прямой многоточечный штрих имеет swept/capsule footprint с полукруглыми окончаниями; в углах используются round joins;
+- на прямом сегменте геометрическая полуширина равна thickness/2, до преобразования board/global/canvas scale.
+
+### 10.2 Одноточечный штрих
+
+Painter.drawSmoothLine() для одного point формирует moveTo(p)+lineTo(p), то есть нулевой сегмент. drawNormalLine() формирует только moveTo(p).
+
+HTML Canvas Standard требует удалить zero-length line segments перед построением stroke и удалить subpaths без линий. Следовательно, в CanvasRenderer такой путь не даёт видимого следа, хотя BoardPane.onDrawStart() уже добавил координату и updateLess() увеличил pointCount. WebGLRenderer в рассмотренной версии Egret тоже делегирует GraphicsNode растрирование в CanvasRenderer.
+
+Источник Canvas path algorithm: https://html.spec.whatwg.org/multipage/canvas.html (раздел 4.12.5.1.4, lineCap; 4.12.5.1.6, path construction). Это вывод для совместимого CanvasRenderer; deployed Egret runtime/version игры пока не идентифицирован. В FILL-001-RS run все 27 штрихов имели 41–48 point updates, поэтому одноточечный случай к этому capture не относится.
+
+### 10.3 Риск прямоугольной footprint-модели в planner
+
+brush_footprint_geometry.footprint_pixel_bounds() возвращает прямоугольные границы capsule. Это пригодно как broad-phase bounds и как строгий prefilter безопасности (проверить, что весь bbox одного цвета), но bbox не равен фактическому capsule raster mask.
+
+В частности:
+- interior_fill_planner._mark_footprint() помечает весь прямоугольник covered=True;
+- outline_first_fill_planner также вычитает прямоугольные bounds из residual;
+- угловые пиксели bbox у круглых окончаний могут быть помечены как покрытые, хотя capsule их не касается.
+
+Это способно привести к underfill в этих planner-ах. Это отдельная гипотеза/дефект модели, не установленная причина FILL-001-RS: текущий FILL capture строился scanline plan и требует отдельного аудита. До изменения кода сначала установить deployed renderer/transform и добавить точный pixel-cell capsule/swept footprint с regression tests.
