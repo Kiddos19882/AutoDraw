@@ -133,7 +133,7 @@ class BridgeRecorderTests(unittest.TestCase):
         self.recorder.frame_probe({
             "strokeId": "s1", "startedAtPerformanceMs": 100,
             "endedAtPerformanceMs": 150, "visible": True,
-            "intervals": [16.667, 16.667, 16.667],
+            "intervals": [16.6667, 16.6667, 16.6667],
         })
 
         path = self.recorder.finalize("completed")
@@ -150,7 +150,7 @@ class BridgeRecorderTests(unittest.TestCase):
         self.assertEqual(metrics["median_point_update_interval_ms"], 33)
         self.assertEqual(data["frame_probe_by_stroke"][0]["stroke_id"], "s1")
         self.assertEqual(data["frame_probe_by_stroke"][0]["median_fps"], 60)
-        self.assertEqual(data["frame_probes"][0]["intervals"], [16.667, 16.667, 16.667])
+        self.assertEqual(data["frame_probes"][0]["intervals"], [16.6667, 16.6667, 16.6667])
 
     def test_coalesced_samples_mark_path_as_incomplete(self):
         before = {"maxPoints": 6000, "remainingPoints": 6000, "pointCount": 0, "isExact": True}
