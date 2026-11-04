@@ -1,3 +1,14 @@
+## 2026-11-04 — зафиксировано расположение копии игровых engine assets
+
+- Проверен commit [d3322fe35c808bde079c79545cc839636b7cda2a](https://github.com/Kiddos19882/AutoDraw/commit/d3322fe35c808bde079c79545cc839636b7cda2a) в `feature/image-geometry-optimization`.
+- Commit добавил `AutoDraw_Stage20/gameEngine/` (п): `main.min_653f95bc.js`, `mergeEngine_df2e5bc5.js`, `manifest.json`.
+- В manifest перечислены runtime paths `js/mergeEngine_df2e5bc.js` and `js/main.min_653f95bc.js`; физически в репозитории файлы лежат непосредственно в `gameEngine/`.
+- Зафиксированы Git blob SHA: main `46cc74de00b6cb5d207b1e1a2ffcd81613b6d388`, merge `d613d2b97e2436521aa3870478c69e99eac1f19f`, manifest `0aea9b5c89eef7e4cd9552f9d1302eed29bcc28e`.
+- Обновлены Stage20 README, docs README, PROJECT_STATUS, TASKS, ROADMAP и engine audit. Исходники, тесты, конфигурации, workflow и master не менялись; live drawing и игровые эксперименты не запускались.
+- Идентичность новой копии с историческими runtime assets и ранее изученным master bundle не подтверждена; следующий шаг — статическое сравнение содержимого/hash и уточнение происхождения файлов.
+
+---
+
 ## 2026-11-04 — аудит исторических runtime asset references
 
 - Проверены три сохранённых Game Monitor captures от 2026-10-30/31.
