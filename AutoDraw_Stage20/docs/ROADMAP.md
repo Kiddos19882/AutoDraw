@@ -1,3 +1,13 @@
+## Приоритетная гипотеза для FILL-001-RS — sparse fill + connected contour (2026-11-04)
+
+При остаточных пропусках, локализованных преимущественно по внешнему периметру, первым отдельным offline-кандидатом после прохождения renderer/footprint gates проверять **редкий внутренний scanline-fill + один связный обход контура + локальные внутренние коррекции**. Не считать глобальное уплотнение горизонтальных проходов вариантом по умолчанию.
+
+Это гипотеза о возможном снижении exact CHALK, а не доказанный результат. Исторический `outline-first` benchmark использовал множество независимых горизонтальных boundary runs, а не один связный contour route; его отрицательный результат не опровергает эту стратегию. Сравнивать A) плотный scanline, B) редкий scanline с дополнительными горизонтальными штрихами и C) редкий scanline со связным контуром по exact `pointCount_after - pointCount_before`, PNG coverage/leakage и отдельным диагностическим метрикам.
+
+Связный контур должен пройти swept-footprint/color-safety проверку. Не менять frozen plans/masks/thresholds/defaults, не открывать 45-task matrix и не запускать live experiment до закрытия текущих gates и отдельного разрешения. Полная формулировка, критерии и ограничения — в [приоритетном выводе TASKS.md](TASKS.md#ключевой-технический-вывод-для-fill-001-rs--связный-контур-вместо-глобального-уплотнения-scanline).
+
+---
+
 ## Дополнительная offline ветка — BRUSH-FOOTPRINT-CAPSULE-001 (2026-11-04)
 
 Статический аудит обнаружил coverage overclaim в generic `interior_fill_planner`: прямоугольный bbox horizontal brush stroke помечается полностью covered, хотя для round caps реальный footprint имеет capsule shape. Независимые tests сейчас также используют rectangular oracle. Это отдельная задача геометрической модели и не доказанная причина FILL-001-RS: fixed-radius FILL-001 planner использует отдельный OpenCV round-capped rasterizer.
