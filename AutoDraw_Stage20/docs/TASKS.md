@@ -1,5 +1,18 @@
 # Реестр задач AutoDraw
 
+## FILL-001-RS — согласование PNG audit transform
+
+- [x] Сопоставить executor logical→screen transform с преобразованием frozen mask в PNG audit.
+- [x] Установить несовпадение: executor использовал (W−1)/460 и (H−1)/240, audit использовал PIL resize W/460 и H/240.
+- [x] Исправить mask rasterization по тому же inverse affine transform — [4797aa5](https://github.com/Kiddos19882/AutoDraw/commit/4797aa5e2e3d9f78656c91dcddf285304eae55c1).
+- [x] Добавить regression coverage масштаба и raster contract — [a950084](https://github.com/Kiddos19882/AutoDraw/commit/a950084db14fd1560aa15f099da4a0108c9631e7).
+- [ ] Запустить полный CI и committed evidence replay на новом HEAD.
+- [ ] Проверить повторные coverage/leakage на неизменённых before/after PNG.
+- [ ] Если gate всё ещё fail — исследовать фактический footprint игрового renderer, не ослабляя критерии.
+- [ ] Только после принятого PNG/runtime preflight отдельно разрешать 45-cell matrix.
+
+**Текущий статус:** CODE CHANGES COMMITTED / VALIDATION PENDING. Live capture и matrix остаются BLOCKED.
+
 ## Актуальное состояние FILL-001 / FILL-001-RS на 2026-11-04
 
 ## FILL-001-RS — runtime binding и live PNG gate — 2026-11-04
