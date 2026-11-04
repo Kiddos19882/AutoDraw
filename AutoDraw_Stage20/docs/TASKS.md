@@ -925,6 +925,10 @@ CI evidence: workflow 41787492122, commit d337f4240e83488273152f65992032beca3957
 - [ ] Сравнить старую bbox-модель и новую модель на frozen fixtures; не менять production planner до прохождения acceptance.
 - [ ] Проверить отдельным PNG capture только после offline acceptance и отдельного разрешения на live run.
 
+**Дополнение 2026-11-04 — runtime asset trace:** исторические Monitor captures (2026-10-30/31) фиксируют `/old/manifest.json`, `/old/js/mergeEngine_df2e5bc5.js` и `/old/js/main.min_6ecc02a4.js`. Это Resource Timing URL/transferSize metadata; response bodies и hashes отсутствуют. Файл `master:AutoDraw_Stage20/fileGameEngine/main.min_570122a1.js` имеет другое имя, поэтому его нельзя считать тем же deployed bundle. Egret 5.2.18 остаётся upstream reference, не установленной runtime version.
+
+**Следующий шаг без live drawing:** получить response bodies этих трёх исторических assets из browser cache/DevTools Network, сохранить их hashes и установить, где находится Egret renderer/version. До получения тел файлов runtime identity и pixel-equivalence остаются UNKNOWN.
+
 
 
 ### BRUSH-FOOTPRINT-CAPSULE-001 — результат статического аудита
