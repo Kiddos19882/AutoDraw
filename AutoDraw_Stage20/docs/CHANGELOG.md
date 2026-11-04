@@ -955,7 +955,7 @@
 
 ## 2026-11-04 — Egret renderer audit refinement
 
-- Зафиксирован nominal stage.frameRate=48 и локальная геометрия PainterPopup/BoardPane 676×379 / 460×240.
+- Зафиксированы nominal static bundle значения stage.frameRate=48 и NO_SCALE; более поздний пользовательский runtime snapshot показывает effective frameRate=30 и fixedHeight для конкретной сессии. Локальная геометрия PainterPopup/BoardPane — 676×379 / 460×240.
 - Egret Engine 5.2.18 API документирует lineStyle thickness как толщину линии и ROUND defaults для caps/joints. Deployed runtime version не подтверждена; фактический footprint и zero-length rasterization остаются открытыми.
 
 
