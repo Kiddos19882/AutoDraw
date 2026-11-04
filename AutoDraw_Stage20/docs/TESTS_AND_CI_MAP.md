@@ -107,7 +107,9 @@
 9. Benchmark Stage 8 и проверка его отчёта.
 10. Проверки fallback sweep, outline-first fill и сравнение стратегий.
 11. Полный pytest-набор `source/preparation/tests/`.
-12. Проверка правил валидатора Stage 7.
+12. Benchmark capsule global-AABB vs per-segment broad phase; JSON report загружается как artifact `autodraw-capsule-broad-phase-benchmark`.
+13. Exhaustive FILL-001-RS static spacing sweep и загрузка evidence artifact.
+14. Проверка правил валидатора Stage 7.
 13. Диагностика разрешения импортов.
 14. UI-регрессии `tests/test_unified_app.py`, включая передачу G3 task-specific executor parameters из matrix metadata в Stage6.
 
@@ -145,6 +147,7 @@
 | `tests/test_fallback_sweep_metrics.py` | Тест метрик fallback sweep |
 | `source/preparation/tests/test_outline_first_fill_planner.py` | Тест экспериментального outline-first planner |
 | `tests/benchmark_outline_first_fill.py` | Сравнение outline-first и interior-fill стратегий |
+| `tests/benchmark_capsule_rasterization.py` | Offline comparison global-AABB/per-segment capsule rasterization; mask equivalence, candidate slots, predicate calls и median wall-clock; CI artifact |
 | `tests/test_import_resolution_diagnostics.py` | Проверка разрешения импортов и общих моделей |
 | `tests/test_unified_app.py` | Интеграционные UI-регрессии |
 
