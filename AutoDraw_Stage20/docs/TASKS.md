@@ -725,3 +725,20 @@ CI evidence: workflow 41787492122, commit d337f4240e83488273152f65992032beca3957
 ### Уточнение Egret API — 2026-11-04
 
 Официальный Egret Engine 5.2.18 API описывает lineStyle thickness как ширину линии и defaults CapsStyle.ROUND / JointStyle.ROUND при опущенных аргументах. Bundle передаёт только первые четыре аргумента lineStyle. Версия runtime, реально подключённая игрой, не подтверждена, поэтому defaults считаются обоснованным ожиданием, а не установленным runtime фактом. Источник и ограничения добавлены в engine audit.
+
+
+## Дополнительная задача: точная raster footprint для круглой кисти
+
+**ID:** BRUSH-FOOTPRINT-CAPSULE-001  
+**Статус:** OPEN / OFFLINE.  
+**Основание:** Egret Graphics reference использует ROUND caps/joins; прямой многоточечный штрих моделируется capsule/swept path, а не прямоугольником. Текущий footprint_pixel_bounds возвращает bbox. interior_fill_planner._mark_footprint и outline_first_fill_planner помечают весь bbox covered, что может пропускать угловые target cells около круглых концов. Это не доказанная причина FILL-001-RS.
+
+План:
+- [ ] Подтвердить deployed Egret runtime/version и render path для целевой игры.
+- [ ] Получить popup BoardPane global transform и screen/canvas scale.
+- [ ] Реализовать отдельную exact/under-approx pixel-cell mask для capsule и swept polyline; bbox оставить только как broad-phase bounds.
+- [ ] Разделить два понятия: гарантированно покрытые клетки и потенциально затронутые клетки для safety/leakage.
+- [ ] Добавить тесты горизонтальных концов, диагоналей, round joins, анизотропного scale, границ холста и соседних цветов.
+- [ ] Сравнить старую bbox-модель и новую модель на frozen fixtures; не менять production planner до прохождения acceptance.
+- [ ] Проверить отдельным PNG capture только после offline acceptance и отдельного разрешения на live run.
+
