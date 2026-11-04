@@ -861,3 +861,11 @@
 - Выявлено, что smooth single-point path формирует moveTo+lineTo в одну координату; фактическое окрашивание нулевого сегмента и cap geometry остаются UNKNOWN.
 - Следующий gate перенесён с pixel localization (закрыто) на renderer footprint / frame sampling calibration. Capture REJECTED, 45-task matrix BLOCKED.
 - Только документация; production code, tests, configs, frozen plans, thresholds и raw captures не менялись.
+
+
+## 2026-11-04 — Game Monitor per-stroke timing telemetry
+
+- Browser Bridge добавляет strokeId в frame_probe.
+- Bridge Server сохраняет исходные intervals, добавляет frame_probe_by_stroke и per_stroke_metrics.
+- Сохранённый FILL-001-RS run показывает accepted-point cadence около 29 points/s при browser requestAnimationFrame около 60 FPS; эти показатели документированы раздельно.
+- CI для изменений кода/тестов ожидает завершения; live runtime не запускался.
