@@ -219,12 +219,17 @@ test("hot-path wrappers, status and export do not scan atom.points", () => {
   board.atom.points[0].push({ x: 10, y: 10 }, { x: 11, y: 10 });
   board.updateLess();
   assert.equal(board.less, 2998);
-  assert.equal(board.pointIndexReadsAtEngineReturn, getPointIndexReads());
+
+  // Monitor reads only the last accepted point (one indexed tail access);
+  // status/export and the exact resource snapshot must not scan point history.
+  const readsAfterUpdate = getPointIndexReads();
+  assert.equal(readsAfterUpdate, board.pointIndexReadsAtEngineReturn + 1);
 
   const snapshot = monitor.status().snapshot;
   assert.equal(snapshot.pointCount, 2);
   assert.equal(snapshot.remainingPoints, 2998);
   assert.equal(snapshot.isExact, true);
+  assert.equal(getPointIndexReads(), readsAfterUpdate);
 
   // The explicit diagnostic is the only API that intentionally scans points.
   const diagnostic = monitor.diagnosticSnapshot();
