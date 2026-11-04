@@ -2,7 +2,7 @@
 
 ## Актуальный статус FILL-001 / FILL-001-RS на 2026-11-04
 
-Последний branch HEAD на момент документирования: [4f1fb94](https://github.com/Kiddos19882/AutoDraw/commit/4f1fb945f384aba0b3454e4301b248cf74101800). Последний code/test commit [5cde7a1](https://github.com/Kiddos19882/AutoDraw/commit/5cde7a109a669bebf790ecbeb21f8bbc4feae182) прошёл CI [41754801210](https://github.com/Kiddos19882/AutoDraw/actions/runs/41754801210). В live task run из [73d14a1](https://github.com/Kiddos19882/AutoDraw/commit/73d14a1784a5a9f8ef29bc0e197b75352f2650af) exact CHALK=5999 подтверждён, но только 128/131 consuming strokes; 3 кандидата остановились на quota limit. Capture REJECTED, полная стоимость плана неизвестна, quantitative PNG audit отсутствует.
+Последний code/test commit: [7203c15](https://github.com/Kiddos19882/AutoDraw/commit/7203c15a5d8c2ffe6fb7bb68a780f8b7b77f2808); полный workflow [41765865098](https://github.com/Kiddos19882/AutoDraw/actions/runs/41765865098) выполняется. Предыдущий baseline CI [41754801210](https://github.com/Kiddos19882/AutoDraw/actions/runs/41754801210) прошёл на code/test commit 5cde7a1, но не включает FILL-001-RS changes.
 
 Exhaustive OpenCV sweep проверил 2 238 step/offset кандидатов; 62 прошли gate coverage ≥99% / leakage=0. Все 15 shape/radius cells получили frozen config. Реализованы planner version 2, отдельный 45-task RS manifest builder, single-task handoff, runtime context binding и генератор manifest. Полные результаты: [FILL-001-RS static sweep](CHALK_FILL001_RS_STATIC_SWEEP_2026-11-04.md). Это не live renderer evidence и не доказательство экономии CHALK.
 
