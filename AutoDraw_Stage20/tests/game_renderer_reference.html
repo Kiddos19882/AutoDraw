@@ -44,7 +44,7 @@
   </p>
   <section id="live-replay">
     <h2>Парный offline replay принятых точек игры</h2>
-    <p>Вставь JSON <code>game-monitor-run</code> с событиями <code>POINT_QUOTA_UPDATE</code>. Replay использует только принятые игрой board-local координаты; при <code>pointDelta &gt; 1</code> или отсутствующих acceptedPoint он откажет, чтобы не подменять пропущенные координаты догадками. Также можно вставить массив <code>[{"x":10,"y":20}]</code>.</p>
+    <p>Вставь JSON <code>game-monitor-run</code> с событиями <code>POINT_QUOTA_UPDATE</code>. Replay принимает ровно один strokeId и использует только принятые игрой board-local координаты; при <code>pointDelta &gt; 1</code> или отсутствующих acceptedPoint он откажет, чтобы не подменять пропущенные координаты догадками. Также можно вставить массив <code>[{"x":10,"y":20}]</code>.</p>
     <textarea id="live-points-json" placeholder="Вставь полный JSON Game Monitor run или массив координат"></textarea>
     <div class="live-controls">
       <label>Режим кисти<select id="live-path-mode"><option value="smooth">smooth (Painter.drawSmoothLine)</option><option value="normal">normal (Painter.drawNormalLine)</option></select></label>

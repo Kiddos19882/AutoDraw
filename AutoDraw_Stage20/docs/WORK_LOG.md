@@ -3044,7 +3044,7 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 ## 2026-11-05 — подготовлен paired replay фактических accepted points
 
 - Offline renderer harness расширен импортом полного Game Monitor run JSON или прямого массива board-local координат.
-- Для run извлекаются только положительные POINT_QUOTA_UPDATE.acceptedPoint; если pointDelta > 1 или координаты отсутствуют, replay fail-closed отклоняет вход. Промежуточные точки не интерполируются.
+- Для run извлекаются только положительные POINT_QUOTA_UPDATE.acceptedPoint одного идентифицированного strokeId; несколько штрихов, pointDelta > 1 или отсутствующие координаты fail-closed отклоняются. Промежуточные точки не интерполируются.
 - Добавлены параметры фактического режима smooth/normal и line width; выход создаётся через настоящий BoardPane.redraw(), Egret CanvasRenderer и WebGLRenderer. Manifest фиксирует source run id, mode, width и accepted coordinates.
 - Добавлены Node regression tests для корректного извлечения точек, отклонения агрегированных updates и отсутствующих координат.
 - Подготовлена пользовательская процедура live capture: включение telemetry, точные pointCount before/after, Monitor run/session, runtime snapshot и PNG одной игровой сессии.

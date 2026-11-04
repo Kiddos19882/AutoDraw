@@ -99,9 +99,9 @@ test("imports accepted points from a Game Monitor run without guessing missing p
   const run = {
     run_id: "run-1",
     events: [
-      { type: "POINT_QUOTA_UPDATE", pointDelta: 1, acceptedPoint: { x: 12, y: 15 } },
+      { type: "POINT_QUOTA_UPDATE", strokeId: "stroke-1", pointDelta: 1, acceptedPoint: { x: 12, y: 15 } },
       { type: "DRAW_SAMPLE", pointDelta: 2 },
-      { type: "POINT_QUOTA_UPDATE", pointDelta: 1, acceptedPoint: { x: 18, y: 21 } }
+      { type: "POINT_QUOTA_UPDATE", strokeId: "stroke-1", pointDelta: 1, acceptedPoint: { x: 18, y: 21 } }
     ]
   };
   assert.deepEqual(extractAcceptedPoints(run), [{ x: 12, y: 15 }, { x: 18, y: 21 }]);
@@ -109,13 +109,20 @@ test("imports accepted points from a Game Monitor run without guessing missing p
 
 test("rejects aggregated point updates because intermediate accepted coordinates are unknown", () => {
   assert.throws(() => extractAcceptedPoints({
-    events: [{ type: "POINT_QUOTA_UPDATE", pointDelta: 2, acceptedPoint: { x: 12, y: 15 } }]
+    events: [{ type: "POINT_QUOTA_UPDATE", strokeId: "stroke-1", pointDelta: 2, acceptedPoint: { x: 12, y: 15 } }]
   }), /pointDelta must equal 1/);
 });
 
 test("rejects missing accepted-point coordinates and supports direct point arrays", () => {
   assert.throws(() => extractAcceptedPoints({
-    events: [{ type: "POINT_QUOTA_UPDATE", pointDelta: 1, acceptedPoint: null }]
+    events: [{ type: "POINT_QUOTA_UPDATE", strokeId: "stroke-1", pointDelta: 1, acceptedPoint: null }]
   }), /missing coordinates/);
   assert.deepEqual(extractAcceptedPoints([{ x: 1, y: 2 }]), [{ x: 1, y: 2 }]);
+});
+
+test("rejects runs containing more than one stroke", () => {
+  assert.throws(() => extractAcceptedPoints({ events: [
+    { type: "POINT_QUOTA_UPDATE", strokeId: "stroke-1", pointDelta: 1, acceptedPoint: { x: 1, y: 2 } },
+    { type: "POINT_QUOTA_UPDATE", strokeId: "stroke-2", pointDelta: 1, acceptedPoint: { x: 3, y: 4 } }
+  ] }), /exactly one identified stroke/);
 });

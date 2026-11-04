@@ -1114,6 +1114,6 @@
 ## 2026-11-05 — paired renderer replay preparation
 
 - Offline Egret renderer reference harness теперь может воспроизвести точные принятые BoardPane-local координаты из Game Monitor run.
-- Fail-closed validation запрещает воспроизведение неполной последовательности (pointDelta > 1, missing acceptedPoint).
+- Fail-closed validation запрещает воспроизведение неполной или неоднозначной последовательности (несколько strokeId, pointDelta > 1, missing acceptedPoint).
 - Добавлена пользовательская процедура live capture для последующего сравнения PNG и runtime evidence.
 - Это подготовка парного сравнения; live game pixel equivalence и CHALK для нового запуска не измерялись.

@@ -91,12 +91,12 @@ Workflow `.github/workflows/geometry-tests.yml` дополнен независ�
 
 **Offline paired replay подготовлен (2026-11-05):**
 - tests/game_renderer_reference.html принимает полный JSON Game Monitor run или прямой массив [{x,y}], извлекает только POINT_QUOTA_UPDATE.acceptedPoint и повторно строит те же BoardPane-local координаты через настоящий BoardPane.redraw() и Egret CanvasRenderer/WebGLRenderer.
-- Replay fail-closed отклоняет pointDelta != 1 и события без координат: потерянные промежуточные точки не интерполируются и не выдумываются.
+- Replay fail-closed требует ровно один идентифицированный strokeId, отклоняет несколько штрихов в одном run, pointDelta != 1 и события без координат: потерянные промежуточные точки не интерполируются и не выдумываются.
 - Режим smooth/normal и line width вводятся явно по фактической конфигурации игрового запуска. Выход: source PNG, Canvas2D masked reference, actual WebGL board PNG и manifest с исходными точками.
 - Replay воспроизводит accepted geometry, но не DOM event timing, ENTER_FRAME phase или пропущенные до DOM события. Он не является live runtime и не измеряет CHALK.
 
 **Процедура пользовательского paired capture:**
-1. Запустить одну фиксированную тестовую траекторию на пустой доске с записанными mode/line width; не менять разрешение, zoom, окно игры или runtime между сбором.
+1. Запустить один непрерывный штрих фиксированной тестовой траектории на пустой доске с записанными mode/line width; не менять разрешение, zoom, окно игры или runtime между сбором.
 2. В Console именно игрового iframe включить telemetry: AutoDrawGameMonitor.setInputTelemetryEnabled(true). Проверить status().inputTelemetryEnabled === true и status().boardDetected === true.
 3. Подключить Game Monitor Bridge после включения telemetry; сохранить соответствующий session.json.
 4. До штриха сохранить AutoDrawGameMonitor.status().snapshot.pointCount как pointCount_before. Выполнить траекторию один раз, дождаться окончания штриха, затем сохранить post snapshot как pointCount_after. Счётчик должен иметь validationStatus=valid.

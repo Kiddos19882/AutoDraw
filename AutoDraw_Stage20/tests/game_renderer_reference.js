@@ -20,6 +20,10 @@
       event && event.type === "POINT_QUOTA_UPDATE" && Number(event.pointDelta) > 0
     );
     if (!updates.length) throw new Error("The run contains no accepted POINT_QUOTA_UPDATE events.");
+    const strokeIds = new Set(updates.map(event => event.strokeId).filter(value => typeof value === "string" && value));
+    if (strokeIds.size !== 1 || updates.some(event => typeof event.strokeId !== "string" || !event.strokeId)) {
+      throw new Error("Replay requires exactly one identified stroke; split multi-stroke runs before import.");
+    }
     const points = [];
     for (const event of updates) {
       if (Number(event.pointDelta) !== 1) {
