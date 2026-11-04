@@ -72,12 +72,19 @@ def test_png_audit_checks_real_files_hash_coverage_and_leakage(tmp_path):
 
 def _png_pair_for_roi(tmp_path, shape_id, width, height):
     logical = build_fill_target_mask(shape_id)
-    screen_mask = np.asarray(
-        Image.fromarray(logical.astype(np.uint8) * 255, mode="L").resize(
-            (width, height), resample=Image.Resampling.NEAREST
-        ),
-        dtype=np.uint8,
-    ) > 0
+    scale_x = (width - 1) / 460
+    scale_y = (height - 1) / 240
+    source_x = np.clip(
+        np.rint(np.arange(width, dtype=np.float64) / scale_x).astype(np.intp),
+        0,
+        459,
+    )
+    source_y = np.clip(
+        np.rint(np.arange(height, dtype=np.float64) / scale_y).astype(np.intp),
+        0,
+        239,
+    )
+    screen_mask = logical[np.ix_(source_y, source_x)]
     before = np.zeros((height, width, 3), dtype=np.uint8)
     after = before.copy()
     after[screen_mask] = 255
@@ -102,7 +109,9 @@ def test_png_audit_accepts_actual_client_roi_581x304(tmp_path):
     transform = result["logical_to_screen_transform"]
     assert transform["logical_board"] == {"width": 460, "height": 240}
     assert transform["screen_roi"] == roi
-    assert transform["mask_resampling"] == "nearest_neighbor"
+    assert transform["mask_resampling"] == "inverse_affine_nearest_neighbor"
+    assert transform["mask_raster_scale_x"] == pytest.approx(transform["scale_x"])
+    assert transform["mask_raster_scale_y"] == pytest.approx(transform["scale_y"])
 
 
 def test_runtime_capture_preserves_client_roi_transform(tmp_path):
