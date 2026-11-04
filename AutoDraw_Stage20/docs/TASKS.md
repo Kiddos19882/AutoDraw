@@ -1,3 +1,81 @@
+# Актуальный сводный backlog — 2026-11-04
+
+Этот раздел является каноническим списком незавершённых задач. Исторические чек-листы ниже сохранены как хронология; их старые статусы не считать текущими, если они расходятся с этой сводкой и более поздним TEST_RESULTS.md.
+
+## Сводка
+
+| ID | Приоритет | Статус | Содержание |
+|---|---|---|---|
+| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | BLOCKED | Renderer footprint/transform, offline PNG gate, затем live preflight |
+| FILL-001-RS-MATRIX | P0 | BLOCKED | 45 captures только после принятого single-task preflight |
+| BRUSH-FOOTPRINT-CAPSULE-001 | P1 | OPEN | Offline capsule model готова; renderer acceptance/planner integration не выполнены |
+| INT-006 | P1 | IN_PROGRESS | D1-D5 45/45 и analyzer завершены; domain validation/safety margin не завершены |
+| INT-003 | P1 | IN_PROGRESS | A/B/C FPS/duration overhead Monitor измерен не полностью |
+| CHALK-SAMPLING-DOMAIN | P1 | OPEN | Sampling проверен на длинных горизонталях; другие геометрии не подтверждены |
+| INT-007 | P2 | BLOCKED | Интеграция модели после INT-006 |
+| INT-008 | P2 | TODO/BLOCKED | Оптимизация кистей/траекторий/покрытия после INT-007 |
+| INT-009 | P2 | TODO/BLOCKED | Holdout-проверка прогноза, exact CHALK и качества полного рисунка |
+| MONITOR-AUTOCAPTURE-STATUS | P2 | RECONCILE | Старый bridge design расходится с DONE-статусом INT-004 и поздними captures |
+
+## P0 — FILL-001-RS: renderer footprint и live preflight
+
+**Текущее evidence:** versioned RS run: 27/27 strokes, radius=10, exact CHALK=1260 (pointCount 1→1261), но PNG capture REJECTED: coverage=98.430600%, leakage=11 при thresholds coverage≥99% и leakage=0. Actual PNG diagnostic: 1116 uncovered pixels, все в perimeter zones; leakage — 11 пикселей. Физическая причина пока не установлена. Более ранний FILL-001 attempt исчерпал квоту на 5999 CHALK при 128/131 consuming strokes; это censored attempt, не полная стоимость рисунка.
+
+Открытые задачи:
+1. Подтвердить реально загруженную версию Egret/runtime и render path целевой игры; установить caps/joins defaults и zero-length rasterization именно этой версии.
+2. Измерить полный global/display transform PainterPopup→BoardPane с родительскими контейнерами, CSS/canvas scaling, browser zoom, devicePixelRatio и screen ROI.
+3. Снять before/after PNG и hashes для frozen geometry при нескольких радиусах; отдельно измерить середину штриха, endpoints, диагонали, повороты и zero-length.
+4. Построить отдельные versioned perimeter/endpoint candidates. Сравнить dense scanline, sparse scanline + horizontal corrections и sparse scanline + связный contour + локальные коррекции.
+5. Проверить swept footprint и color safety на frozen masks; пройти независимый offline PNG gate coverage≥99%, leakage=0. Frozen plans/masks/thresholds не переписывать.
+6. Только после offline PASS и отдельного разрешения пользователя выполнить один Windows live preflight rectangle/radius10/step5/offset0/repeat1 на чистой доске с полной квотой. Проверить task/plan/executor/Bridge binding, P1, 27/27 strokes, exact pointCount delta, integrity counters и PNG gate.
+7. Новый live run должен сохранять per-stroke frame_probe raw intervals и связывать их со strokeId, pointCount delta, duration и Executor step/delay. Старый run raw per-stroke frame_probe не содержит.
+8. После принятого preflight отдельно решить вопрос 45-cell RS matrix; не запускать автоматически.
+
+**Закрытие:** подтверждён renderer footprint, offline candidate проходит PNG gates, live preflight принят runtime/telemetry/PNG критериями. Exact CHALK — только post.pointCount - pre.pointCount. Не ослаблять thresholds и не менять production defaults.
+
+## P1 — BRUSH-FOOTPRINT-CAPSULE-001
+
+**Выполнено:** swept_capsule_pixel_masks, potential/guaranteed masks, per-segment broad-phase, independent full-canvas oracle, edge/seeded tests, benchmark и CI 41859709320 PASS.
+
+**Открыто:** подтвердить deployed renderer/version и popup transform; получить frozen PNG fixtures для горизонтальных концов, диагоналей, joins, nonuniform scale, clipping и соседних цветов; сравнить potential/guaranteed masks с фактическим footprint; проверить bbox coverage overclaim в generic interior_fill_planner; только после acceptance решить planner integration. Live capture — после offline acceptance и отдельного разрешения. Это не доказанная причина FILL-001-RS residual.
+
+## P1 — INT-006: расширение validation CHALK и safety margin
+
+Официальный analyzer: 45/45 D1-D5 accepted; MAE=1.408, RMSE=1.967, bias=-0.875, MAPE=2.134%, max underprediction=1.82 CHALK. Результат относится к frozen model, D1-D5 и P1. safety_margin_status=not_established, production_eligibility=not_validated.
+
+Открыто: расширить domain на полные рисунки, кривые, заливки, отверстия, узкие детали, многосегментные маршруты, повторное покрытие и другие радиусы; заранее заморозить predictions/criteria; собрать exact pre/post pointCount и PNG quality; рассчитать error distribution/worst-case по доменам; обосновать safety margin и оформить решение о границах применимости. Не считать 1 CHALK универсальным запасом. До закрытия не менять estimator/defaults и не начинать INT-007.
+
+## P1 — INT-003: overhead Game Monitor
+
+Открыто: зафиксировать A/B/C (Monitor off / 0.1.2 / актуальный 0.2.1); одинаковые plan/radius/executor/browser/resolution/scale/baseline; минимум три независимых повтора на режим; исключить невалидный B-1 старой серии; собирать per-mode FPS/frame intervals, P50/P95/max frame time, duration, accepted point cadence, exact CHALK и integrity counters; повторить runtime max/less и boundary probe. Старый общий FPS probe не был размечен по режимам и не закрывает overhead.
+
+## P1 — CHALK-SAMPLING-DOMAIN
+
+G3 27/27 относится к длинным горизонтальным линиям. Открыто: frozen plans для диагоналей, коротких штрихов, кривых/поворотов, пересечений, параллельных линий, контуров и повторного покрытия; сравнить sampling profiles на одинаковых геометриях/радиусе; собирать exact CHALK, per-stroke delta, cadence, duration и PNG coverage/gaps/merges/leakage; оценить step×delay×geometry. Не переносить G3 коэффициенты на другие формы.
+
+## P2 — INT-007 / INT-008 / INT-009
+
+- **INT-007 BLOCKED:** после INT-006 определить контракт estimate (exact/unavailable, estimate, domain/confidence, safety margin), fail-closed для неизвестной геометрии, budget guard для полного DrawingPlan, regression tests и независимое сравнение с фактом.
+- **INT-008 TODO:** после INT-007 сравнить стратегии кистей, обводки, заливки, порядка цветов и повторного покрытия. Оценивать качество, coverage/leakage, exact CHALK, strokes, path length, coordinate count и duration раздельно. Короткий путь сам по себе не доказывает экономию CHALK.
+- **INT-009 TODO:** на независимом holdout-наборе полных рисунков сравнить predicted CHALK с exact pointCount delta и визуальным качеством; показать error distribution, underprediction и случаи превышения бюджета.
+
+## Документационные расхождения и завершённые задачи
+
+- **MONITOR-AUTOCAPTURE-STATUS:** TASKS отмечает INT-004 DONE и поздние captures связаны с Monitor reports; BRUSH_MONITOR_AUTOCAPTURE_DESIGN всё ещё сообщает о not_tested Firefox transport/manifest binding. Сверить текущий код и accepted bundles; если закрыто — пометить старый design как superseded, если нет — выделить residual gate.
+- G1 принят 12/12 в отдельном корректно маркированном блоке; старая серия с ошибочным repeat metadata остаётся исторической.
+- G2 принят 18/18; G3 принят 27/27.
+- INT006R завершён: 45/45 captures, raw-data audit, официальный analyzer и ручной visual audit 45 пар PNG.
+- Capsule offline implementation/oracle/benchmark и FILL-001-RS static sweep/software gates завершены; это не означает renderer/live acceptance.
+
+## Неактивные и исторические планы
+
+Не переносить автоматически старые TODO из PROJECT_GUIDE.md, PROJECT_DOCUMENTATION.md, MASTER_ROADMAP.md и архивных отчётов в текущий backlog. Аналитические этапы 7–10 отменены пользователем. TEMP_PLAN_OUTLINE_FIRST_FILL.md сохраняется до закрытия; connected-route гипотеза теперь связана с FILL-001-RS и не считается выполненной. DATA_CLEANUP_INVENTORY.md фиксирует не выполненную физическую очистку; это отдельная отложенная операция, не разрешение удалять данные.
+
+Все результаты и evidence: TEST_RESULTS.md. Первичные данные не перемещать и не переписывать.
+
+---
+
+
 ## КЛЮЧЕВОЙ ТЕХНИЧЕСКИЙ ВЫВОД ДЛЯ FILL-001-RS — связный контур вместо глобального уплотнения scanline (2026-11-04)
 
 **Статус:** OPEN / OFFLINE CANDIDATE / HYPOTHESIS — приоритет для следующего сравнения, не принятое production-решение.
