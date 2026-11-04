@@ -15,7 +15,9 @@ from chalk_fill_matrix import (
     FillMatrixError,
     build_fill001_matrix,
     build_fill001_rs_matrix,
+    load_fill001_matrix,
     validate_fill001_matrix,
+    write_fill001_matrix,
 )
 
 
@@ -176,3 +178,15 @@ def test_legacy_single_task_handoff_keeps_legacy_generation_metadata():
     assert plan["generation"]["planner_version"] == 1
     assert "plan_variant" not in plan["generation"]
     assert "scanline_spacing" not in plan["generation"]
+
+
+def test_rs_manifest_round_trips_through_existing_loader(tmp_path):
+    matrix = build_fill001_rs_matrix("fill001-rs-roundtrip")
+    manifest_path = tmp_path / "fill001-rs-roundtrip.json"
+
+    write_fill001_matrix(matrix, manifest_path)
+    loaded = load_fill001_matrix(manifest_path)
+
+    assert loaded["matrix_signature"] == matrix["matrix_signature"]
+    assert loaded["plan_variant"] == FILL001_RS_PLAN_VARIANT
+    assert loaded["execution_allowed"] is False
