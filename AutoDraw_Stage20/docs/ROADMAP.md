@@ -443,3 +443,17 @@ Current evidence does not justify changing scanline row spacing: diagnostic repo
 
 
 **Дополнение 2026-11-04:** сохранённый run показал accepted-point cadence около 29 updates/s при browser requestAnimationFrame около 60 FPS. Browser probe и игровые point updates теперь разделяются в Bridge schema. Egret bundle задаёт nominal stage.frameRate=48; фактическая частота принятия координат в run ниже и должна измеряться per-stroke.
+
+
+## Отдельный offline workstream — BRUSH-FOOTPRINT-CAPSULE-001
+
+Egret reference показывает ROUND caps/joins и capsule/swept geometry для многоточечного штриха. Текущий planner footprint API возвращает bbox, а interior_fill_planner и outline_first_fill_planner могут помечать весь bbox как покрытый. Углы bbox около круглых концов могут оставаться фактически незакрашенными, но считаться covered.
+
+После подтверждения target runtime и popup transform:
+1. Реализовать точную/under-approx pixel-cell capsule mask отдельно от broad-phase bbox.
+2. Разделить гарантированное покрытие и потенциальное касание для safety.
+3. Добавить regression tests на endpoints, joins, diagonals и соседние цвета.
+4. Сравнить с frozen fixtures; не менять planner production behavior без evidence.
+5. Live PNG calibration проводить только после offline gate и отдельного разрешения.
+
+Это отдельный риск planner-моделей; не считать причиной FILL-001-RS scanline capture без прямого подтверждения.
