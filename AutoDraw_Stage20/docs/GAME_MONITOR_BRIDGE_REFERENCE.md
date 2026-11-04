@@ -1,7 +1,7 @@
 # Game Monitor и Bridge — техническая справка
 
 **Статус:** актуальная справка по реализации в рабочей ветке  
-**Дата проверки:** 2026-11-03  
+**Дата проверки:** 2026-11-04  
 **Ветка:** `feature/image-geometry-optimization`  
 **Область:** браузерный Game Monitor, browser-side Bridge и локальный WebSocket collector.
 
@@ -47,7 +47,7 @@ Game iframe
 5. RunRecorder начинает run при первом событии начала штриха, накапливает события и финализирует run после периода бездействия либо при закрытии соединения.
 6. Session diagnostics обновляются при каждом сообщении; run JSON создаётся отдельно при финализации.
 
-## 3. Game Monitor API (версия 0.2.1)
+## 3. Game Monitor API (версия 0.2.2)
 
 Публичный объект: `window.AutoDrawGameMonitor`. Скрипт автоматически вызывает `start()` после установки API.
 
@@ -97,9 +97,10 @@ Snapshot считается точным только если оба значе
 | `MONITOR_STARTED`, `MONITOR_STOPPED` | Жизненный цикл Monitor |
 | `BOARD_ATTACHED`, `BOARD_DETACHED` | Подключение/отключение BoardPane |
 | `DRAW_START`, `DRAW_START_APPLIED`, `DRAW_END` | Жизненный цикл штриха на уровне игровых методов |
-| `DRAW_SAMPLE` | Изменение точного pointCount во время штриха |
+| `DRAW_SAMPLE` | Polling-событие об изменении точного pointCount во время штриха; может объединить несколько точек |
+| `MOUSE_MOVE_SAMPLE` | DOM mousemove, доставленный canvas игры, и преобразованные stage/BoardPane-local координаты |
 | `BRUSH_CHANGE`, `BRUSH_CHANGE_APPLIED` | Радиус до/после setRadius |
-| `POINT_QUOTA_UPDATE` | Изменение max/less после updateLess |
+| `POINT_QUOTA_UPDATE` | Изменение max/less после updateLess; при положительной pointDelta содержит acceptedPoint и stage/local coordinates |
 | `GAME_METHOD_ERROR` | Ошибка обёрнутого метода |
 | `POINTER_DOWN_CANDIDATE`, `POINTER_UP_CANDIDATE` | Pointer fallback для lifecycle, если игровые callback недоступны |
 | `NETWORK_RESOURCE` | Resource Timing entry |
@@ -107,6 +108,26 @@ Snapshot считается точным только если оба значе
 `DRAW_SAMPLE` содержит source, strokeId, before/after snapshot, pointDelta и acceptedPoint. Выборка выполняется при изменении счётчика, а не на каждом кадре. Если `pointDelta > 1`, между выборками могли появиться промежуточные точки; acceptedPoint — только последняя принятая координата, а не полная траектория.
 
 Локальный буфер Monitor ограничен `MAX_EVENTS=50000`. После заполнения увеличивается droppedEvents, однако emit продолжает уведомлять подписчиков. Это означает, что Bridge subscriber может получить события, даже когда локальный export buffer уже достиг лимита. Не путать локальный cumulative droppedEvents с per-run `dropped_events` на стороне collector.
+
+### 3.4. Input movement telemetry
+
+`MOUSE_MOVE_SAMPLE` создаётся только во время активного штриха и только для DOM `mousemove`, target которого является игровым canvas. Listener установлен на `window` в bubble phase. В согласованном Egret 5.4.1 bundle `WebTouchHandler.addMouseListener()` добавляет `mousemove` handler непосредственно на canvas и не останавливает propagation; поэтому Monitor получает событие после canvas handler.
+
+Поля события:
+- `domEventTimeStamp` и Monitor `t`;
+- `clientX/Y`, `pageX/Y`, `screenX/Y`, `movementX/Y`, `buttons`;
+- `stageX/Y` из текущего `stage.mouseX/Y`;
+- `boardX/Y` после `BoardPane.globalToLocal(stageX, stageY)`;
+- `source=window-bubble-after-egret-canvas`.
+
+Это события mousemove, доставленные DOM listener во время штриха, но не гарантированно полный набор вызовов AutoDraw/PyAutoGUI: OS/browser могут объединить события до DOM dispatch.
+
+`POINT_QUOTA_UPDATE` дополнительно содержит:
+- `pointDelta = after.pointCount - before.pointCount`, если оба snapshots точны;
+- `acceptedPoint` — последняя точка atom.points при положительной delta;
+- stage и BoardPane-local coordinates, считанные после `updateLess()`.
+
+Так accepted point связывается с координатами указателя и моментом изменения квоты. Если `pointDelta > 1`, acceptedPoint остаётся только последней точкой и промежуточные accepted points этим событием не восстанавливаются.
 
 ## 4. Browser Bridge API и протокол
 
@@ -138,7 +159,7 @@ Snapshot считается точным только если оба значе
 
 Bridge передаёт только allowlist:
 
-`BOARD_ATTACHED`, `BOARD_DETACHED`, `DRAW_START`, `DRAW_START_APPLIED`, `DRAW_SAMPLE`, `DRAW_END`, `BRUSH_CHANGE`, `BRUSH_CHANGE_APPLIED`, `POINT_QUOTA_UPDATE`, `GAME_METHOD_ERROR`, `POINTER_DOWN_CANDIDATE`, `POINTER_UP_CANDIDATE`.
+`BOARD_ATTACHED`, `BOARD_DETACHED`, `DRAW_START`, `DRAW_START_APPLIED`, `DRAW_SAMPLE`, `MOUSE_MOVE_SAMPLE`, `DRAW_END`, `BRUSH_CHANGE`, `BRUSH_CHANGE_APPLIED`, `POINT_QUOTA_UPDATE`, `GAME_METHOD_ERROR`, `POINTER_DOWN_CANDIDATE`, `POINTER_UP_CANDIDATE`.
 
 Например, `MONITOR_STARTED`, `MONITOR_STOPPED` и `NETWORK_RESOURCE` остаются в Monitor export, но не входят в текущий Bridge allowlist.
 
