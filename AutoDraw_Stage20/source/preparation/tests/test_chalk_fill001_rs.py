@@ -158,3 +158,21 @@ def test_frozen_rs_spacing_map_matches_exhaustive_static_sweep():
     assert candidate_count == 2238
     assert accepted_count == 62
     assert observed == FILL001_RS_SCANLINE_CONFIGS
+
+
+def test_legacy_single_task_handoff_keeps_legacy_generation_metadata():
+    matrix = build_fill001_matrix("FILL001-LEGACY-HANDOFF")
+    task = next(
+        item for item in matrix["tasks"]
+        if item["shape_id"] == "rectangle"
+        and item["requested_radius"] == 10
+        and item["repeat_index"] == 1
+    )
+    plan, _ = prepare_fill001_single_task_plan(
+        matrix,
+        task["task_id"],
+        operator_approved_single_task_preflight=True,
+    )
+    assert plan["generation"]["planner_version"] == 1
+    assert "plan_variant" not in plan["generation"]
+    assert "scanline_spacing" not in plan["generation"]
