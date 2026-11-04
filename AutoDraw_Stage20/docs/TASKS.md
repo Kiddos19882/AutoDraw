@@ -15,6 +15,7 @@
 | INT-007 | P2 | BLOCKED | Интеграция модели после INT-006 |
 | INT-008 | P2 | TODO/BLOCKED | Оптимизация кистей/траекторий/покрытия после INT-007 |
 | INT-009 | P2 | TODO/BLOCKED | Holdout-проверка прогноза, exact CHALK и качества полного рисунка |
+| MONITOR-BOARD-SELECTION-001 | P0 | BLOCKED | Проверить, что auto-discovery Game Monitor выбирает активный PainterPopup BoardPane, а не preview BoardPane |
 | MONITOR-AUTOCAPTURE-STATUS | P2 | RECONCILE | Старый bridge design расходится с DONE-статусом INT-004 и поздними captures |
 | DOC-STATUS-SYNC | P2 | OPEN | Синхронизировать устаревшие статусы планов и справочников с TEST_RESULTS.md и текущим backlog |
 | INT-003 | — | CLOSED_NOT_REQUIRED | По решению пользователя: отдельное исследование overhead Monitor не требуется |
