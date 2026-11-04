@@ -2943,3 +2943,13 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - Follow-up overhead safeguard: raw mousemove listener выключен по умолчанию и управляется через `setInputTelemetryEnabled(true/false)`; статус экспортируется. Commit `8bc19ab80a2632a014a87886f96396691e7d6336`.
 - Regression tests проверяют default-off, включение/выключение и accepted-point coordinates при включённом режиме. Commit `e3ca5fdde23199a8ff11ab66eb38068fb48a0e91`.
 - Static JavaScript syntax parse PASS для Monitor, Bridge, Monitor tests и renderer harness; actual Game Monitor source executed in an isolated mock browser context: MOUSE_MOVE_SAMPLE/POINT_QUOTA_UPDATE coordinate correlation PASS, disable stops subsequent move events, errors=0. Это не Node test suite, CI или live game run.
+
+## 2026-11-04 — CI regression correction: accepted-point tail lookup
+
+- GitHub Actions run `41912100010`, commit `665c1f393a264368038c49bbfe3bb526f8e6c759`, failed only in `Game Monitor and bridge tests` → `Test Game Monitor resource snapshot`.
+- Exact failure: `hot-path wrappers, status and export do not scan atom.points`, assertion expected indexed-read count 2 but observed 3 after `updateLess()`.
+- Source inspection showed one additional indexed access came from `latestAcceptedPoint(board)`, which reads only the final stroke and final point to populate the event's `acceptedPoint`. It is O(1) tail access, not a history scan. The engine test double snapshots its own indexed-read count before the monitor wrapper completes, so the previous equality assertion incorrectly rejected this required constant-time access.
+- Corrected test to require exactly one extra indexed tail access after the engine method returns, and no further indexed reads from `status()` / resource snapshot. The explicit diagnostic remains the only full-history scan.
+- Test-only commit: `3d50da2ff4edbc6cc9511c23e82c3796eea124f2`.
+- New validation run: `41913850169`; Game Monitor and bridge job PASS, Executor job PASS, Application integration test steps PASS at time of entry; Preparation job still running. Windows portable build / Edge renderer job awaits dependencies.
+- No production Monitor logic changed for this correction.
