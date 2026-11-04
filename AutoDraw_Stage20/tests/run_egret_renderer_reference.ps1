@@ -39,6 +39,12 @@ try {
     }
     Write-Host "Egret bundle HTTP check: status=$($bundleResponse.StatusCode), chars=$($bundleResponse.Content.Length)."
 
+    $gameBundleResponse = Invoke-WebRequest -Uri "http://127.0.0.1:8765/AutoDraw_Stage20/gameEngine/main.min_653f95bc.js" -TimeoutSec 20
+    if ($gameBundleResponse.StatusCode -ne 200 -or $gameBundleResponse.Content.Length -lt 1000000) {
+        throw "Game bundle HTTP check failed: status=$($gameBundleResponse.StatusCode), chars=$($gameBundleResponse.Content.Length)."
+    }
+    Write-Host "Game bundle HTTP check: status=$($gameBundleResponse.StatusCode), chars=$($gameBundleResponse.Content.Length)."
+
     $programFilesX86 = [Environment]::GetEnvironmentVariable("ProgramFiles(x86)")
     $edgeCandidates = @(
         (Join-Path $programFilesX86 "Microsoft\Edge\Application\msedge.exe"),
