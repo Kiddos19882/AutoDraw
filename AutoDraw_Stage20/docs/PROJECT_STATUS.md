@@ -1166,3 +1166,9 @@ Planner integration и live renderer validation не выполнялись. Gen
 **Ограничения:** статический разбор не является runtime validation zero-length rasterization, popup global transform, фактического screen footprint или cadence. Новые игровые/live эксперименты в рамках этой документальной синхронизации не запускались; исходники, тесты, конфигурации и workflow не изменялись. GitHub API не предоставляет локальный `git status`.
 
 **Следующий технический шаг:** продолжать с FILL-001-RS renderer footprint/transform и offline frozen-fixture gates, а не с выбора экземпляра BoardPane. Live-проверка — только после offline gates и отдельного разрешения.
+
+## Дополнение — GAME-BRUSH-REPLICATION source trace (2026-11-04)
+
+По пользовательски подтверждённому набору gameEngine/main.min_653f95bc.js / mergeEngine_df2e5bc5.js выполнена полная статическая трассировка цепочки ввода, кадровой выборки, point storage, normal/smooth path construction, Graphics line width, ROUND defaults и Canvas/WebGL backend selection. Детали и blob SHA — в [engine report, раздел 14](CHALK_GAME_ENGINE_POINT_COST_AND_BRUSH_WIDTH_2026-11-03.md#14-полная-трассировка-цепочки-игровой-кисти-и-границы-воспроизведения--2026-11-04).
+
+**Статус:** source trace E1 complete; offline replica не реализована; pixel equivalence не проверена. Основные неизвестные: backend конкретной сессии, полный display/CSS/device-pixel transform, zero-length rasterization и фактический pixel footprint. Следующий шаг остаётся offline: renderer mode/transform evidence → frozen fixtures → reference harness/PNG comparison. Исходники, тесты, конфигурации, workflow и live game не затрагивались.
