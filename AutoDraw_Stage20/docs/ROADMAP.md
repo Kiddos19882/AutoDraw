@@ -375,3 +375,12 @@ Harness V1–V5: matrix metadata/validator, block planner/journal, Brush Test UI
 4. До принятия preflight 45 live captures и CHALK/quality analysis остаются BLOCKED.
 
 Не менять production estimator/defaults и не считать CI/synthetic tests доказательством поведения в игре.
+
+
+## 2026-11-04 — CI run 41780241017: software gates PASS, evidence gates частично открыты
+
+1. Run [41780241017](https://github.com/Kiddos19882/AutoDraw/actions/runs/41780241017) — SUCCESS для всех обязательных jobs, включая Preparation/G3, INT-006 PNG audit и Windows portable build/startup smoke-test; optional benchmarks SKIPPED.
+2. FILL-001-RS static sweep: 15/15 selected shape×radius cells прошли offline raster gate (coverage≥99%, leakage=0). Это не exact CHALK и не live renderer evidence.
+3. INT-006 PNG audit: 90/90 valid captures, 549 stroke rows, coverage=1.0, zero gaps. Frozen CHALK analyzer: 45/45 accepted, но safety margin не установлен и production eligibility не validated.
+4. INT006R: 45/45 radius×geometry captures accepted; exact CHALK differences для radius 1/10/30 малы и немонотонны. PNG artifact полный, но ручной visual quality gate остаётся pending для 45/45 captures.
+5. Следующие действия: (а) вручную проверить 45 пар INT006R PNG; (б) определить safety margin и границы frozen CHALK model; (в) отдельно пройти FILL-001-RS capture/replay gate. Не менять production estimator/defaults по результатам только этого CI.
