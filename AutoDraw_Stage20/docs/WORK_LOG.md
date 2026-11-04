@@ -2937,5 +2937,5 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 
 - Чтобы не добавлять постоянный обработчик на каждый DOM mousemove в обычных сессиях, raw input telemetry выключена по умолчанию.
 - Управление: `AutoDrawGameMonitor.setInputTelemetryEnabled(true/false)`; состояние отображается в `status().inputTelemetryEnabled` и export.
-- При включении listener добавляется на window bubble phase; при выключении снимается. Координаты в POINT_QUOTA_UPDATE вычисляются только при включённой telemetry; acceptedPoint и exact pointDelta сохраняются при положительном delta.
+- При включении listener добавляется на window bubble phase; при выключении снимается. В POINT_QUOTA_UPDATE acceptedPoint и exact pointDelta сохраняются при положительном delta, а stage/local coordinates вычисляются только при включённой telemetry.
 - Добавлены regression checks: по умолчанию события не пишутся, включение/выключение работает, accepted-point coordinates требуют включённого режима.
