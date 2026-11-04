@@ -180,10 +180,10 @@ Bridge передаёт только allowlist:
 - `_begin_stroke(event, now, source)` — начинает stroke/run и записывает источник lifecycle (engine или pointer_observer).
 - `_end_stroke(event, now, source)` — закрывает stroke, суммирует активную длительность и завершает run при отсутствии активных штрихов.
 - `event(event, now)` — проверяет allowlist и обрабатывает lifecycle/event.
-- `frame_probe(message)` — сохраняет frame intervals текущего run.
+- `frame_probe(message)` — сохраняет raw frame intervals и stroke_id текущего run.
 - `note_collector_sequence_gap(missing_count)` — учитывает пропущенные sequence текущего run.
 - `heartbeat(status, now, bridge_diagnostics)` — обновляет baseline/end counters Monitor и browser send failures; при idle timeout финализирует run.
-- `finalize(status="partial")` — рассчитывает CHALK, stroke counts, sampled point delta, радиусы, оценку нижней границы длины наблюдаемой траектории и FPS; сохраняет run JSON.
+- `finalize(status="partial")` — рассчитывает CHALK, per-stroke point timing, frame_probe_by_stroke, stroke counts, sampled point delta, радиусы и нижнюю границу длины наблюдаемой траектории; сохраняет raw frame_probes в run JSON.
 
 ### 5.4. Правила lifecycle и расхода CHALK
 
@@ -237,7 +237,8 @@ Sequence начинается с 1 для session_start. Collector отверг�
 - sampled_point_delta_total, point_delta_matches_chalk;
 - observed_brush_radii, brush_radius_status;
 - trajectory.observed_segment_length_lower_bound и статус полноты;
-- frame_probe summary;
+- frame_probe aggregate summary, frame_probe_by_stroke summaries и raw frame_probes intervals;
+- per_stroke_metrics: pointCount delta, stroke duration, число POINT_QUOTA_UPDATE, accepted points/sec и интервалы между принятыми обновлениями;
 - dropped_events, monitor buffer/error deltas, bridge_send_failures_delta, collector_sequence_gap_count.
 
 Run файл записывается в session directory под именем `game-monitor-run-*.json`. `session.json` — отдельный живой журнал транспортной сессии и diagnostics.
@@ -272,3 +273,18 @@ UI лаборатории кистей вызывает запуск companion �
 - `tests/test_websocket_smoke_server.py`
 
 Изменение API следует сопровождать обновлением этой справки и профильного [README Game Monitor](../source/game_monitor/README.md). Проверка справки на дату создания выполнена чтением текущих файлов исходников рабочей ветки; новые live-прогоны и тесты в рамках создания документа не запускались.
+
+
+## 10. Per-stroke timing telemetry — 2026-11-04
+
+Browser Bridge передаёт strokeId вместе с frame_probe. Collector сохраняет raw intervals для каждой пробы и дополнительно формирует frame_probe_by_stroke. Raw frame_probes больше не очищаются при finalize; общий frame_probe summary сохраняется для совместимости.
+
+RunRecorder также формирует per_stroke_metrics по событиям POINTER_DOWN_CANDIDATE / DRAW_START, POINT_QUOTA_UPDATE и POINTER_UP_CANDIDATE / DRAW_END. В метриках отдельно записываются:
+- exact point_count_before / point_count_after / point_count_delta, если lifecycle snapshots доступны;
+- сумма дельт POINT_QUOTA_UPDATE и проверка её совпадения со stroke delta;
+- stroke duration и accepted_points_per_second;
+- median/p95/max интервалов между точечными обновлениями.
+
+**Важное различие частот:** frame_probe измеряет browser requestAnimationFrame, а не Egret ENTER_FRAME. accepted_points_per_second и интервалы POINT_QUOTA_UPDATE показывают частоту принятых игровых точек, но не являются прямым счётчиком всех кадров движка. Не подменять одну метрику другой.
+
+Для старых run JSON без strokeId у frame_probe сохраняется общий summary; per-stroke frame probe может быть unavailable. Старые finalized runs не содержат raw frame intervals, если прежний finalize уже очистил frame_probes.
