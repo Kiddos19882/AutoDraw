@@ -246,38 +246,60 @@ def swept_capsule_pixel_masks(
     radius_squared = radius * radius
     tolerance = 1e-12 * max(1.0, radius_squared)
 
-    for py in range(top, bottom + 1):
-        cell_top = (py - 0.5) / sy
-        cell_bottom = (py + 0.5) / sy
-        for px in range(left, right + 1):
-            cell_left = (px - 0.5) / sx
-            cell_right = (px + 0.5) / sx
-            corners = (
-                (cell_left, cell_top),
-                (cell_right, cell_top),
-                (cell_left, cell_bottom),
-                (cell_right, cell_bottom),
-            )
-            may_be_painted = False
-            fully_inside_one_capsule = False
-            for start, end in segments:
-                minimum_distance = _segment_rectangle_distance_squared(
-                    start, end, cell_left, cell_top, cell_right, cell_bottom
+    # Rasterize each segment only inside its own expanded bounds. A long,
+    # winding polyline can have a canvas-sized global AABB while each segment
+    # affects only a narrow local region. Union semantics are unchanged:
+    # potential/guaranteed cells are added when any segment capsule qualifies.
+    for start, end in segments:
+        segment_left = max(
+            0,
+            math.floor((min(start[0], end[0]) - radius) * sx - 0.5 + epsilon) + 1,
+        )
+        segment_right = min(
+            width - 1,
+            math.ceil((max(start[0], end[0]) + radius) * sx + 0.5 - epsilon) - 1,
+        )
+        segment_top = max(
+            0,
+            math.floor((min(start[1], end[1]) - radius) * sy - 0.5 + epsilon) + 1,
+        )
+        segment_bottom = min(
+            height - 1,
+            math.ceil((max(start[1], end[1]) + radius) * sy + 0.5 - epsilon) - 1,
+        )
+        if segment_left > segment_right or segment_top > segment_bottom:
+            continue
+
+        for py in range(segment_top, segment_bottom + 1):
+            cell_top = (py - 0.5) / sy
+            cell_bottom = (py + 0.5) / sy
+            for px in range(segment_left, segment_right + 1):
+                cell = (px, py)
+                if cell in potential and cell in guaranteed:
+                    continue
+
+                cell_left = (px - 0.5) / sx
+                cell_right = (px + 0.5) / sx
+                corners = (
+                    (cell_left, cell_top),
+                    (cell_right, cell_top),
+                    (cell_left, cell_bottom),
+                    (cell_right, cell_bottom),
                 )
-                if minimum_distance < radius_squared:
-                    may_be_painted = True
-                if all(
+
+                if cell not in potential:
+                    minimum_distance = _segment_rectangle_distance_squared(
+                        start, end, cell_left, cell_top, cell_right, cell_bottom
+                    )
+                    if minimum_distance < radius_squared:
+                        potential.add(cell)
+
+                if cell not in guaranteed and all(
                     _point_segment_distance_squared(corner, start, end)
                     <= radius_squared - tolerance
                     for corner in corners
                 ):
-                    fully_inside_one_capsule = True
-                if may_be_painted and fully_inside_one_capsule:
-                    break
-            if may_be_painted:
-                potential.add((px, py))
-            if fully_inside_one_capsule:
-                guaranteed.add((px, py))
+                    guaranteed.add(cell)
 
     return {
         "bounds": (left, right, top, bottom),
