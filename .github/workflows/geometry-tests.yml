@@ -52,6 +52,10 @@ jobs:
           cache-dependency-path: AutoDraw_Stage20/source/game_monitor/requirements-smoke.txt
       - name: Check Game Monitor JavaScript syntax
         run: node --check AutoDraw_Stage20/source/game_monitor/game_monitor.js
+      - name: Check offline Egret renderer reference harness syntax
+        run: node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+      - name: Test offline Egret renderer path semantics
+        run: node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
       - name: Test Game Monitor resource snapshot
         run: node --test AutoDraw_Stage20/source/game_monitor/tests/game_monitor.test.js
       - name: Install bridge smoke-test dependencies
