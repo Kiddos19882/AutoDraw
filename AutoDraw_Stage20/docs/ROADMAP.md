@@ -1,3 +1,11 @@
+## Дополнительная offline ветка — BRUSH-FOOTPRINT-CAPSULE-001 (2026-11-04)
+
+Статический аудит обнаружил coverage overclaim в generic `interior_fill_planner`: прямоугольный bbox horizontal brush stroke помечается полностью covered, хотя для round caps реальный footprint имеет capsule shape. Независимые tests сейчас также используют rectangular oracle. Это отдельная задача геометрической модели и не доказанная причина FILL-001-RS: fixed-radius FILL-001 planner использует отдельный OpenCV round-capped rasterizer.
+
+План: разработать separate potential/guaranteed pixel-cell masks; сохранить bbox только как broad-phase; покрыть horizontal endpoints, diagonals, joins, anisotropic scales и canvas boundaries; сравнить old/new results на frozen fixtures. Не менять planner/defaults до acceptance. Основной FILL-001-RS renderer gate остаётся приоритетным blocker; live experiments не открывать.
+
+---
+
 ## Актуализация ближайшего FILL-001-RS gate — 2026-11-04
 
 Telemetry implementation для будущих запусков завершена и прошла полный CI: run [41840582147](https://github.com/Kiddos19882/AutoDraw/actions/runs/41840582147) SUCCESS. Browser Bridge связывает frame_probe с strokeId и сохраняет rAF intervals; Bridge Server сохраняет raw frame probes, per-stroke frame summaries и per-stroke point-count metrics. Старый run `6a17a297` не содержит raw per-stroke rAF series, но его point cadence восстановлена по 1260 POINT_QUOTA_UPDATE: median 33 ms, 28.26–29.50 accepted points/s. Не смешивать browser rAF (~60 FPS), nominal Egret stage.frameRate=48 и фактическую cadence принятия точек.
