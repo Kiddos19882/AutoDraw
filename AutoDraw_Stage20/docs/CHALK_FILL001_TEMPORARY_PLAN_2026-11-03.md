@@ -146,7 +146,7 @@
 
 ## FILL-001-RS — исследование расстояния между проходами заливки
 
-**Статус:** exhaustive static sweep выполнен; versioned planner/matrix/handoff реализованы; CI validation выполняется; live preflight NOT RUN.  
+**Статус:** exhaustive static sweep выполнен; versioned planner/matrix/handoff реализованы; полный CI PASS; local live preflight NOT RUN.
 **Назначение:** проверить, как расстояние между соседними scanline-проходами влияет на геометрическое покрытие и затем — отдельным разрешённым live-экспериментом — на фактический расход CHALK.  
 **Связь с FILL-001:** это отдельная versioned ветка исследования геометрии. Исходные frozen masks, FILL-001 plans, signatures, manifest, P1 и captures не переписываются.
 
@@ -197,7 +197,7 @@
 1. **DONE — сохранить baseline.** Frozen masks, исходные FILL-001 plans/signatures, manifest, P1 и первичные runtime evidence сохранены без изменений.
 2. **DONE — exhaustive static sweep.** Проверены все 2 238 step/offset кандидатов; все 15 shape×radius ячеек имеют выбранную конфигурацию, а все candidate records формируются отдельным CI artifact.
 3. **DONE — versioned planner/matrix/handoff.** Legacy planner version 1 сохраняет прежнюю геометрию/signature. FILL-001-RS использует versioned planner v2 там, где геометрия меняется; `scanline_row_step` независим от `point_step_px`. Создаётся отдельный 45-task manifest с `execution_allowed=false`; CLI: `source/preparation/create_fill001_rs_manifest.py`.
-4. **IN_PROGRESS — software/CI validation.** Пройти preparation regressions, exhaustive sweep script, остальные обязательные CI jobs и Windows portable build/startup smoke-test. До подтверждённого CI не считать реализацию принятой.
+4. **DONE — software/CI validation.** Preparation/G3 800 passed, 24 warnings, 82 subtests; exhaustive 2 238-candidate sweep и artifact upload SUCCESS; executor, Game Monitor/Bridge, application integration, INT-006 pixel audit и Windows portable build/startup smoke-test SUCCESS. Optional algorithm benchmarks skipped.
 5. **READY FOR LOCAL PREFLIGHT — один candidate.** После успешного CI создать новый `fill001-rs-*` manifest, открыть его существующей вкладкой FILL-001 и запустить только `rectangle/r10/step=5/offset=0/repeat=1`. Требуются восстановленная доска с полной квотой и фактический Windows/browser game session.
 6. **BLOCKED — capture acceptance.** Принять только при exact task↔executor↔Bridge↔Monitor binding, completed 27/27 strokes, exact pointCount delta, неизменном P1 и quantitative PNG gate coverage≥99%/leakage=0. При quota exhaustion сохранить censored attempt, не оценивать полную стоимость.
 7. **BLOCKED — расширение матрицы.** Решать вопрос о 45 live captures FILL-001-RS только после принятого одиночного preflight. Исходную FILL-001 matrix не переписывать.
