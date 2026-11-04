@@ -482,7 +482,18 @@ BoardPane stage corners из runtime: TL=(519.791666,72), TR=(979.791666,72), BR
 
 Это сильное объяснение потенциального расхождения между CHALK points и визуальным покрытием концов штрихов, но пока не доказанная причина FILL-001-RS residual: требуется сравнение конкретных game PNG и offline reference на идентичном path.
 
-### 15.7 Границы доказательства и следующий шаг
+### 15.7 Offline endpoint analysis реального FILL-001 run
+
+Для raw Game Monitor evidence [`game-monitor-run-...-6a17a297.json`](../data/results/brush_behavior_tests/game_monitor_bridge/bb261898-8296-41f5-a333-eb0b81016410/game-monitor-run-20261104T040548835772Z-6a17a297.json) выполнен воспроизводимый анализ через `source/preparation/game_brush_endpoint_analysis.py`. Derived report: [`endpoint-analysis-6a17a297.json`](../data/results/brush_behavior_tests/fill001/endpoint-analysis-6a17a297.json).
+
+- Run: `6a17a297-ea14-4527-9527-bfd8de3bd335`, radius/lineWidth=10, exact CHALK=1260, 27 штрихов.
+- Raw event integrity: 1287 DRAW_SAMPLE; 1260 positive samples; сумма pointDelta=1260; максимальный positive pointDelta=1; 1260 POINT_QUOTA_UPDATE; accepted_points=1260. Для этого run каждая принятая координата имеет отдельную positive sample запись; coalesced pointDelta отсутствуют.
+- 1233 соседних accepted-point intervals: min=3, median=6, p90=9, p95=10, max=13; только 3 интервала > lineWidth 10.
+- Последний интервал каждого из 27 штрихов: min=3, median=6, p90=7, p95=9, max=9. При smooth terminal midpoint и ideal round cap radius=5 все 27 последних принятых точек достигаются cap; расчётный идеальный зазор к центру последней принятой точки равен 0.
+
+**Вывод ограничен:** smooth path заканчивается в midpoint, но в данном capture round cap геометрически достигает центра последней принятой точки. Поэтому отсутствие заключительного `lineTo(lastPoint)` само по себе не доказывает причину coverage residual=11. Game `onDrawingEnd()` не семплирует mouseup; расстояние до фактической release coordinate не рассчитано из-за отсутствия same-session verified client→board transform для этого старого capture. Также не измерены browser antialiasing, texture filtering и clipping pixels.
+
+### 15.8 Границы доказательства и следующий шаг
 
 - Snapshot — один runtime capture, не live drawing и не brush experiment.
 - `pointCount=1` / remaining=5999 — текущее состояние; без pre/post pair это не расход CHALK отдельного запуска.
@@ -490,4 +501,4 @@ BoardPane stage corners из runtime: TL=(519.791666,72), TR=(979.791666,72), BR
 - `systemRenderer` constructor name `n` не идентифицирует класс без статической связи с `renderMode`.
 - Не установлены: фактический pixel footprint single point/zero-length path, Canvas2D antialiasing, texture interpolation, точное clipping/mask поведение на границе и PNG pixel equivalence.
 
-**Следующий этап:** offline renderer reference harness с точными 1/2/3+ point smooth path semantics, normal lines (horizontal/vertical/diagonal), caps/joins, turns и board clipping. Сравнивать с PNG из той же browser/runtime сессии и отдельно измерять остаток последнего сегмента. Не менять planner/defaults до acceptance. FILL-001-RS live preflight и 45-cell matrix остаются закрытыми до прохождения offline gate и отдельного разрешения.
+**Следующий этап:** offline renderer reference harness с точными 1/2/3+ point smooth path semantics, normal lines (horizontal/vertical/diagonal), caps/joins, turns и board clipping. Сравнивать с PNG из той же browser/runtime сессии, проверить mouseup-to-last-sample и измерить реальную пиксельную маску/texture filtering. Не менять planner/defaults до acceptance. FILL-001-RS live preflight и 45-cell matrix остаются закрытыми до прохождения offline gate и отдельного разрешения.
