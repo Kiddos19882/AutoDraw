@@ -60,6 +60,7 @@
 - [INT006R — live results](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md) — 45 captures D1–D5 × radius 1/10/30, exact CHALK и raw-data integrity audit; ручной visual audit завершён; ограничения D2/radius=1 и D4/radius=30 зафиксированы в отдельном отчёте.
 - [Игровой движок — стоимость точки, ширина кисти и source trace](CHALK_GAME_ENGINE_POINT_COST_AND_BRUSH_WIDTH_2026-11-03.md) — точный CHALK counter, статическая трассировка и runtime renderer evidence (разделы 14–15); pixel equivalence ещё не подтверждена.
 - [Runtime renderer snapshot 2026-11-04](../data/runtime/renderer_snapshot_2026-11-04.json) — пользовательский JSON, подтверждающий WebGL backend, stage/canvas scale и BoardPane transform для одной игровой сессии.
+- [FILL-001 smooth endpoint analysis](../data/results/brush_behavior_tests/fill001/endpoint-analysis-6a17a297.json) — анализ accepted point spacing и идеального round-cap покрытия последней принятой точки в run 6a17a297.
 - [Исторический снимок PROJECT_STATUS](PROJECT_STATUS_HISTORY_2026-11-02.md) — полный статус до консолидации 2 ноября; только для аудита, не текущий backlog.
 
 ## Данные и очистка
