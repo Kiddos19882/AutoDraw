@@ -1110,3 +1110,10 @@
 - Выполнена полная статическая трассировка цепочки игровой кисти в пользовательски подтверждённом наборе Egret 5.4.1: ввод, ENTER_FRAME sampling, dedup, normal/smooth path, line width, ROUND caps/joints, clipping и Canvas/WebGL selection.
 - Зафиксировано отличие AutoDraw: Executor отправляет mouse move events, но список точек формируется игровым кадровым циклом; OpenCV и capsule модели не подтверждены как pixel-identical renderer replica.
 - Добавлены результаты и следующий offline gate в существующий engine report, TASKS, ROADMAP и PROJECT_STATUS. Исходники, тесты, конфигурации, workflow, live data и master не менялись.
+
+## 2026-11-05 — paired renderer replay preparation
+
+- Offline Egret renderer reference harness теперь может воспроизвести точные принятые BoardPane-local координаты из Game Monitor run.
+- Fail-closed validation запрещает воспроизведение неполной последовательности (pointDelta > 1, missing acceptedPoint).
+- Добавлена пользовательская процедура live capture для последующего сравнения PNG и runtime evidence.
+- Это подготовка парного сравнения; live game pixel equivalence и CHALK для нового запуска не измерялись.

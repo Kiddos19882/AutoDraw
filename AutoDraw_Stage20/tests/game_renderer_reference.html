@@ -18,6 +18,10 @@
     .fixture pre { white-space: pre-wrap; font-size: 11px; overflow-wrap: anywhere; }
     .downloads { display: flex; flex-wrap: wrap; gap: 12px; font-size: .9rem; }
     #renderer-manifest { display: inline-block; margin: 12px 0; }
+    #live-replay { border: 1px solid #8888; border-radius: 8px; padding: 14px; margin: 16px 0; }
+    #live-points-json { width: 100%; min-height: 120px; font: 12px ui-monospace, monospace; }
+    .live-controls { display: flex; gap: 12px; flex-wrap: wrap; align-items: end; margin: 10px 0; }
+    .live-controls label { display: grid; gap: 4px; }
   </style>
 </head>
 <body>
@@ -38,6 +42,17 @@
     и параметры texture сохраняются отдельно. Canvas2D composite сравнивается с WebGL output по пикселям.
     Это offscreen engine test, не доказательство pixel equivalence с live game capture.
   </p>
+  <section id="live-replay">
+    <h2>Парный offline replay принятых точек игры</h2>
+    <p>Вставь JSON <code>game-monitor-run</code> с событиями <code>POINT_QUOTA_UPDATE</code>. Replay использует только принятые игрой board-local координаты; при <code>pointDelta &gt; 1</code> или отсутствующих acceptedPoint он откажет, чтобы не подменять пропущенные координаты догадками. Также можно вставить массив <code>[{"x":10,"y":20}]</code>.</p>
+    <textarea id="live-points-json" placeholder="Вставь полный JSON Game Monitor run или массив координат"></textarea>
+    <div class="live-controls">
+      <label>Режим кисти<select id="live-path-mode"><option value="smooth">smooth (Painter.drawSmoothLine)</option><option value="normal">normal (Painter.drawNormalLine)</option></select></label>
+      <label>Толщина линии<input id="live-line-width" type="number" min="1" max="100" step="1" value="10"></label>
+      <button id="render-live-points" type="button">Построить парный offline replay</button>
+    </div>
+    <p>Для точного сопоставления выбери фактический режим и line width из того же run. Полученные PNG и manifest относятся к тем же принятым точкам, но не воспроизводят DOM timing или фазу ENTER_FRAME.</p>
+  </section>
   <p id="renderer-status">Loading local Egret bundle…</p>
   <a id="renderer-manifest"></a>
   <pre id="renderer-manifest-json" hidden></pre>
@@ -45,5 +60,6 @@
   <script src="../gameEngine/mergeEngine_df2e5bc5.js"></script>
   <script src="../gameEngine/main.min_653f95bc.js"></script>
   <script src="./game_renderer_reference.js"></script>
+  <script>document.getElementById("render-live-points").addEventListener("click", function () { window.AutoDrawGameRendererReference.renderAll(); });</script>
 </body>
 </html>

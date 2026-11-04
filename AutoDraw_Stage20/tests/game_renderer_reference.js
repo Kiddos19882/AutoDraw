@@ -1,6 +1,39 @@
 (function (root) {
   "use strict";
 
+
+  function extractAcceptedPoints(runOrPoints) {
+    if (Array.isArray(runOrPoints)) {
+      const direct = runOrPoints;
+      if (!direct.length) throw new Error("No accepted points were supplied.");
+      return direct.map((point, index) => {
+        if (!point || !Number.isFinite(Number(point.x)) || !Number.isFinite(Number(point.y))) {
+          throw new Error("Invalid point at index " + index + ".");
+        }
+        return { x: Number(point.x), y: Number(point.y) };
+      });
+    }
+    if (!runOrPoints || typeof runOrPoints !== "object" || !Array.isArray(runOrPoints.events)) {
+      throw new Error("Paste a Game Monitor run JSON with an events array, or a direct [{x,y}] array.");
+    }
+    const updates = runOrPoints.events.filter(event =>
+      event && event.type === "POINT_QUOTA_UPDATE" && Number(event.pointDelta) > 0
+    );
+    if (!updates.length) throw new Error("The run contains no accepted POINT_QUOTA_UPDATE events.");
+    const points = [];
+    for (const event of updates) {
+      if (Number(event.pointDelta) !== 1) {
+        throw new Error("Run is incomplete for exact replay: pointDelta must equal 1 for every accepted-point event.");
+      }
+      const point = event.acceptedPoint;
+      if (!point || !Number.isFinite(Number(point.x)) || !Number.isFinite(Number(point.y))) {
+        throw new Error("An accepted point is missing coordinates; enable input telemetry before capture.");
+      }
+      points.push({ x: Number(point.x), y: Number(point.y) });
+    }
+    return points;
+  }
+
   function midpoint(a, b) {
     return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
   }
@@ -623,9 +656,10 @@
       manifestNode.href = URL.createObjectURL(blob);
       manifestNode.download = "egret-5.4.1-renderer-reference-manifest.json";
       manifestNode.textContent = "Download fixture manifest JSON";
-      statusNode.textContent =
-        "Generated " + manifest.fixtures.length + " fixtures using Egret " +
-        manifest.engineVersion + " CanvasRenderer + WebGLRenderer. No live game session, pointer input or CHALK was used.";
+      statusNode.textContent = manifest.fixtures[0] && manifest.fixtures[0].id === "live-accepted-points"
+        ? "Rendered " + manifest.fixtures[0].points.length + " accepted game points through the actual BoardPane and Egret renderers. This is an offline replay; no game input or CHALK was used."
+        : "Generated " + manifest.fixtures.length + " fixtures using Egret " +
+          manifest.engineVersion + " CanvasRenderer + WebGLRenderer. No live game session, pointer input or CHALK was used.";
     } catch (error) {
       document.body.dataset.referenceStatus = "error";
       statusNode.textContent = "Reference harness error: " + (error && error.stack ? error.stack : String(error));
@@ -633,6 +667,7 @@
     }
   }
 
+  api.renderAll = renderAll;
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", renderAll, { once: true });
   } else {

@@ -3040,3 +3040,12 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - Optional algorithm benchmarks: SKIPPED by workflow policy.
 - Workflow artifacts include `autodraw-egret-renderer-reference` ID `13365670726`, `autodraw-int006-png-analysis` ID `13365930476`, and `autodraw-g3-preflight-build` ID `13365063601`.
 - Branch HEAD after subsequent documentation updates is ahead of the CI-tested commit by 9 commits; compare shows only documentation paths changed. Source, tests and workflow remain identical to the CI-tested commit. No claim is made that the documentation-only HEAD itself was re-run through CI.
+
+## 2026-11-05 — подготовлен paired replay фактических accepted points
+
+- Offline renderer harness расширен импортом полного Game Monitor run JSON или прямого массива board-local координат.
+- Для run извлекаются только положительные POINT_QUOTA_UPDATE.acceptedPoint; если pointDelta > 1 или координаты отсутствуют, replay fail-closed отклоняет вход. Промежуточные точки не интерполируются.
+- Добавлены параметры фактического режима smooth/normal и line width; выход создаётся через настоящий BoardPane.redraw(), Egret CanvasRenderer и WebGLRenderer. Manifest фиксирует source run id, mode, width и accepted coordinates.
+- Добавлены Node regression tests для корректного извлечения точек, отклонения агрегированных updates и отсутствующих координат.
+- Подготовлена пользовательская процедура live capture: включение telemetry, точные pointCount before/after, Monitor run/session, runtime snapshot и PNG одной игровой сессии.
+- Live game не запускалась. Парная pixel equivalence с реальным игровым PNG не подтверждена; ожидается комплект evidence от пользователя. FILL-001-RS 45-cell matrix остаётся BLOCKED.

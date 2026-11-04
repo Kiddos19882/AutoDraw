@@ -10,6 +10,7 @@
 |---|---|---|---|
 | FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | IN_PROGRESS | Runtime WebGL/transform подтверждены; reference harness исправлен для empty GraphicsNode, browser PNG fixtures и pixel gate остаются |
 | FILL-001-RS-MATRIX | P0 | BLOCKED | 45 captures только после принятого single-task preflight |
+| GAME-INPUT-SAMPLING-TRACE-001 | P1 | READY_FOR_USER_CAPTURE | Monitor telemetry, offline accepted-point replay и процедура парного PNG сравнения готовы; требуется live capture пользователя |
 | BRUSH-FOOTPRINT-CAPSULE-001 | P1 | OPEN | Offline capsule model готова; renderer acceptance/planner integration не выполнены |
 | INT-006 | P1 | IN_PROGRESS | D1-D5 45/45 и analyzer завершены; domain validation/safety margin не завершены |
 | INT-007 | P2 | BLOCKED | Интеграция модели после INT-006 |
@@ -68,7 +69,7 @@ Workflow `.github/workflows/geometry-tests.yml` дополнен независ�
 
 ### GAME-INPUT-SAMPLING-TRACE-001 — повторяемость одинаковой траектории
 
-**Статус:** INSTRUMENTED / LIVE EVIDENCE PENDING.
+**Статус:** INSTRUMENTED / OFFLINE REPLAY READY / USER LIVE CAPTURE PENDING.
 
 Статический source trace подтверждает несколько последовательных преобразований между координатами AutoDraw и принятыми точками игры:
 
@@ -88,7 +89,22 @@ Workflow `.github/workflows/geometry-tests.yml` дополнен независ�
 
 Изменённые файлы: `source/game_monitor/game_monitor.js`, `game_monitor_bridge.js`, `game_monitor_bridge_server.py`, `source/game_monitor/tests/game_monitor.test.js`, `tests/test_websocket_smoke_server.py`.
 
-**Следующая проверка после browser harness gate:** выполнить контролируемые повторы одной траектории с фиксированными и различными delay/phase, затем сопоставить `MOUSE_MOVE_SAMPLE`, `POINT_QUOTA_UPDATE.acceptedPoint`, `DRAW_SAMPLE`, `frame_probe` и итоговый PNG. `frame_probe` — browser rAF, не прямой Egret ENTER_FRAME counter. Live captures ещё не получены.
+**Offline paired replay подготовлен (2026-11-05):**
+- tests/game_renderer_reference.html принимает полный JSON Game Monitor run или прямой массив [{x,y}], извлекает только POINT_QUOTA_UPDATE.acceptedPoint и повторно строит те же BoardPane-local координаты через настоящий BoardPane.redraw() и Egret CanvasRenderer/WebGLRenderer.
+- Replay fail-closed отклоняет pointDelta != 1 и события без координат: потерянные промежуточные точки не интерполируются и не выдумываются.
+- Режим smooth/normal и line width вводятся явно по фактической конфигурации игрового запуска. Выход: source PNG, Canvas2D masked reference, actual WebGL board PNG и manifest с исходными точками.
+- Replay воспроизводит accepted geometry, но не DOM event timing, ENTER_FRAME phase или пропущенные до DOM события. Он не является live runtime и не измеряет CHALK.
+
+**Процедура пользовательского paired capture:**
+1. Запустить одну фиксированную тестовую траекторию на пустой доске с записанными mode/line width; не менять разрешение, zoom, окно игры или runtime между сбором.
+2. В Console именно игрового iframe включить telemetry: AutoDrawGameMonitor.setInputTelemetryEnabled(true). Проверить status().inputTelemetryEnabled === true и status().boardDetected === true.
+3. Подключить Game Monitor Bridge после включения telemetry; сохранить соответствующий session.json.
+4. До штриха сохранить AutoDrawGameMonitor.status().snapshot.pointCount как pointCount_before. Выполнить траекторию один раз, дождаться окончания штриха, затем сохранить post snapshot как pointCount_after. Счётчик должен иметь validationStatus=valid.
+5. Экспортировать соответствующий game-monitor-run*.json, session.json, runtime snapshot через AutoDrawGameMonitor.inspect()/rendererSnapshot() и PNG доски после штриха. Не очищать/перезапускать доску между снимком счётчика и PNG.
+6. Проверить, что все положительные POINT_QUOTA_UPDATE имеют pointDelta=1 и acceptedPoint; иначе capture не позволяет восстановить полную последовательность координат и должен быть повторён. Сумма положительных pointDelta сверяется с pointCount_after - pointCount_before.
+7. Передать файлы. Открыть offline harness через HTTP server, вставить JSON run в блок «Парный offline replay», выбрать тот же mode и line width, построить reference и сохранить PNG + manifest. Сопоставлять только PNG из той же сессии и с теми же accepted points; чужой run/PNG не объединять.
+
+**Следующая проверка:** получить один пользовательский live capture по протоколу выше, затем выполнить pixel/geometry comparison итогового game PNG с offline replay PNG. Отдельно проанализировать MOUSE_MOVE_SAMPLE → POINT_QUOTA_UPDATE.acceptedPoint → DRAW_SAMPLE → frame_probe; frame_probe — browser rAF, не прямой Egret ENTER_FRAME counter. Live capture пока не получен.
 
 ### Историческое наблюдение о двух экземплярах BoardPane — NOT_APPLICABLE_TO_CURRENT_USER_SCENARIO
 
