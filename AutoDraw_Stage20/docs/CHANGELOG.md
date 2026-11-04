@@ -1,5 +1,11 @@
 ## 2026-11-04 — уточнение активного объёма CHALK
 
+## 2026-11-04 — прямой анализ игровой кисти
+
+- Прослежен фактический путь BoardPane/Painter в клиентском bundle из master: толщина кисти передаётся в Egret Graphics; normal path строится через moveTo/lineTo, smooth path — через midpoint/curveTo.
+- Зафиксировано визуальное наблюдение пользователя: кисть в игре выглядит круглой. Оно согласуется с ROUND caps/joins Egret reference API; deployed runtime и точная rasterization остаются не подтверждены.
+- Документированы ограничения single-point path и следующий offline renderer/PNG gate. Код, тесты, конфигурации, workflow и master не менялись.
+
 - INT-003 и CHALK-SAMPLING-DOMAIN закрыты как CLOSED_NOT_REQUIRED по решению пользователя; исторические данные сохранены.
 - В TASKS добавлено обоснование четырёх оставшихся направлений и их зависимостей. FILL-001-RS renderer footprint остаётся P0 blocker; 45-cell matrix условна и заблокирована до принятого preflight; Capsule остаётся отдельной offline geometry validation; INT-006 остаётся незавершённой из-за ограниченного domain и неустановленного safety margin.
 - Код, тесты, конфигурации, workflow и live evidence не менялись.
