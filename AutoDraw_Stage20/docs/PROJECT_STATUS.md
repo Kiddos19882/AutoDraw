@@ -1,3 +1,19 @@
+## Дополнение — размещение копии игровых engine assets (2026-11-04)
+
+В commit [d3322fe35c808bde079c79545cc839636b7cda2a](https://github.com/Kiddos19882/AutoDraw/commit/d3322fe35c808bde079c79545cc839636b7cda2a) в ветку `feature/image-geometry-optimization` добавлен каталог `AutoDraw_Stage20/gameEngine/` (п):
+
+- `main.min_653f95bc.js` (ф), Git blob SHA `46cc74de00b6cb5d207b1e1a2ffcd81613b6d388`;
+- `mergeEngine_df2e5bc5.js` (ф), Git blob SHA `d613d2b97e2436521aa3870478c69e99eac1f19f`;
+- `manifest.json` (ф), Git blob SHA `0aea9b5c89eef7e4cd9552f9d1302eed29bcc28e`.
+
+Манифест перечисляет runtime paths `js/mergeEngine_df2e5bc5.js` и `js/main.min_653f95bc.js`; в дереве репозитория сами файлы находятся непосредственно в `gameEngine/`, без вложенного каталога `js/`.
+
+Это подтверждает наличие копии assets в рабочей ветке, но пока не доказывает, что браузерная игра загружает именно эти байты. Имя `main.min_653f95bc.js` отличается от исторического URL `main.min_6ecc02a4.js` и от ранее анализировавшегося `master:fileGameEngine/main.min_570122a1.js`. Совпадение `mergeEngine_df2e5bc5.js` по имени с историческим URL также не является доказательством совпадения содержимого.
+
+**Следующий offline шаг:** статически исследовать добавленные bundles и сравнить их с доступными историческими evidence/предыдущим master bundle по содержимому и hash; уточнить, какую версию runtime представляет новая копия. Deployed runtime identity остаётся UNKNOWN до подтверждения. Live drawing, кодовые изменения и игровые эксперименты этим документированием не выполнялись.
+
+---
+
 # Дополнение к статусу — 2026-11-04 (решение по объёму работ)
 
 **Канонический список задач и критерии закрытия:** [TASKS.md](TASKS.md). Этот блок уточняет приоритеты и заменяет устаревшие активные статусы ниже; исторические записи не переписываются.
