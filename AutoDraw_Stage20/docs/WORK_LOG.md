@@ -2919,3 +2919,16 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - Commits: `167661b09417c107aa39ab58891302e1ea8b4c76` (CI diagnostics), `e1caaba6e92dffabc50794c5687cb7c81cc5db08` (harness), `e2cdafaf3249ba4168082e7a6fcac67d850d9119` (tests).
 - CI нового HEAD пока не подтверждён; previous run `41903225993` остаётся FAILURE. Browser fixtures/PNG и pixel equivalence не заявляются.
 - Live game, CHALK experiments, production planner/defaults и master не изменялись.
+
+## 2026-11-04 — Game Monitor 0.2.2: delivered mousemove и accepted-point correlation
+
+- По Egret 5.4.1 bundle подтверждены mouse input chain и quantization: canvas mousemove → WebTouchHandler.getLocation() → divide by scaleX/Y → Math.round() → TouchHandler.onTouchMove() suppresses unchanged stage coordinates.
+- SystemTicker вызывается из browser requestAnimationFrame, но broadcastEnterFrame throttled через frameDeltaTime/countdown. Для runtime snapshot stage.frameRate=30; browser rAF ~60 FPS не равен Egret ENTER_FRAME frequency.
+- Game Monitor теперь фиксирует DOM `MOUSE_MOVE_SAMPLE` в window bubble phase после Egret canvas handler: DOM timestamp, client/page/screen/movement, buttons, stage mouse coordinates и BoardPane-local coordinates.
+- `POINT_QUOTA_UPDATE` при положительной exact pointDelta теперь содержит acceptedPoint и stage/local coordinates после updateLess().
+- Bridge/collector allowlists расширены; добавлены Node tests на mousemove и accepted point correlation и Python allowlist test.
+- Monitor version: 0.2.2.
+- Code/test commits: `981b2c672a0980237ae9c1b4c3ab01c75eedc2c5`, `216361d155945e9037c530e695873192fa6c9595`, `b9899b217a21ecfc3c4f24b470eff5d5dfa352b7`, `6e0867b47b325b6affb6030a6f4f93fbabe94bca`, `7a1780216ac7daa06280d6ba6ffd0a5311ff3270`.
+- Документация обновлена в Monitor README, Bridge reference, MODULE_REFERENCE, TASKS, ROADMAP и engine report.
+- Live game captures не выполнялись; instrumentation не доказана на реальном iframe. CI для нового HEAD пока не подтверждён. Эти события фиксируют DOM-delivered moves, не OS/PyAutoGUI calls до browser dispatch.
+- Production planner/defaults, FILL-001 matrix и master не изменялись.
