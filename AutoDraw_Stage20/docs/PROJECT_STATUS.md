@@ -1130,3 +1130,26 @@ Planner integration и live renderer validation не выполнялись. Gen
 ## Единый реестр тестирования
 
 Сводные результаты тестов, CI и экспериментов ведутся в [TEST_RESULTS.md](TEST_RESULTS.md). В этом файле сохраняется актуальный статус, блокировки и незавершённые инициативы.
+
+
+## Дополнение — подтверждённый источник игровых bundles и статический разбор — 2026-11-04
+
+**Происхождение файлов:** пользователь подтвердил, что все три файла из `AutoDraw_Stage20/gameEngine/` (п) — `main.min_653f95bc.js` (ф), `mergeEngine_df2e5bc5.js` (ф) и `manifest.json` (ф) — скачаны непосредственно с сайта запущенной игры в один момент; достоверность источника по подтверждению пользователя — 100%. Рассматривать их как единый набор. Сверка с `master/fileGameEngine/main.min_570122a1.js` не требуется и не выполнялась.
+
+**Идентификаторы файлов:** main blob `46cc74de00b6cb5d207b1e1a2ffcd81613b6d388` (4 857 523 UTF-8 characters); merge blob `d613d2b97e2436521aa3870478c69e99eac1f19f`; manifest blob `0aea9b5c89eef7e4cd9552f9d1302eed29bcc28e`. Manifest указывает runtime paths `js/mergeEngine_df2e5bc5.js` и `js/main.min_653f95bc.js`; физически в репозитории файлы находятся непосредственно в `gameEngine/`.
+
+**Подтверждено статическим чтением актуального main bundle:**
+- `BoardPane` считает `pointCount` как количество сохранённых объектов-точек во вложенных массивах `atom.points`; `less = max - pointCount`.
+- `BlackBoardAtom.pushPoint()` добавляет точку, если текущий штрих пуст или координата отличается от последней сохранённой. Совпадающие соседние координаты не расходуют дополнительную точку.
+- `onDrawStart()` сразу добавляет стартовую координату; `onDrawing()` вызывается через `ENTER_FRAME`, преобразует stage coordinates через `globalToLocal`, проверяет попадание в прямоугольник доски и добавляет координату; `onDrawingEnd()` снимает frame listener и завершает штрих.
+- `updateLess()` выполняет полный обход `atom.points` при каждом вызове, пересчитывает `less` и отправляет `CHALK` event с `percent`. Это O(N) операция в игровом пути; количественное влияние на cadence/FPS здесь не измерялось.
+- `setRadius()` меняет только `atom.radius` текущего штриха и не изменяет `pointCount`. `redraw()` передаёт это значение как thickness в `Graphics.lineStyle`. Presets: 20/14/7; slider range 1–30; `BLACK_BOARD_LINE_RADIUS=7`.
+- По умолчанию PainterPopup включает smooth path; `drawSmoothLine()` строит midpoint/curveTo, `drawNormalLine()` — moveTo/lineTo. Эти варианты меняют геометрию рендера, но не формулу CHALK.
+- Main bundle задаёт nominal `stage.frameRate=48`, `StageScaleMode.NO_SCALE`; логический BoardPane — 460×240. PainterPopup получает лимит из `blackBoard.maxPoint`.
+- `mergeEngine_df2e5bc5.js` объявляет `egret.Capabilities.engineVersion="5.4.1"`. Его `GraphicsNode.lineStyle()` подставляет ROUND caps/joints, когда параметры не заданы; CanvasRenderer передаёт их в `context.lineCap`/`lineJoin` и вызывает `stroke()`.
+
+**Новый риск интеграции Game Monitor:** игровой bundle содержит два структурно подходящих `BoardPane`: preview instance внутри `BoardItemBase` (`interactive=false`) и активный `PainterPopup.painterBoard` (`interactive=true`). Текущий `game_monitor.js` ищет первый структурно подходящий объект обходом display list и не различает эти экземпляры. Unit tests покрывают прямой attach/replacement, но не выбор при нескольких BoardPane. Это подтверждённая неоднозначность алгоритма обнаружения; какой именно объект выбирается в живом iframe, пока UNKNOWN. Добавлена задача `MONITOR-BOARD-SELECTION-001` в `TASKS.md`.
+
+**Ограничения:** статический разбор не является runtime validation raster footprint, zero-length path, popup global transform или фактической cadence. Не запускались игра, live capture и эксперименты; исходники, тесты, конфигурации и workflow не изменялись. GitHub API не предоставляет локальный `git status`.
+
+**Следующий шаг:** статически уточнить display-list ownership/order и контракт выбора active PainterPopup BoardPane; затем проверить transform/clipping и frozen renderer fixtures для Egret 5.4.1. Live-проверка — только после offline gates и отдельного разрешения.
