@@ -2,7 +2,7 @@
 
 - Созданы `tests/game_renderer_reference.html`, `tests/game_renderer_reference.js`, `tests/game_renderer_reference.test.js`.
 - Harness загружает локальный `mergeEngine_df2e5bc5.js`, напрямую вызывает `egret.CanvasRenderer.renderGraphics()` для GraphicsNode и генерирует 18 fixtures: 9 геометрических случаев × lineWidth 10/30.
-- Path builder повторяет source sequence `Painter.drawSmoothLine(..., true, false)` и normal path. Manifest сохраняет Egret version, browser userAgent/platform, DPR и viewport.
+- Path builder повторяет source call `Painter.drawSmoothLine(graphics, points, true, false)`: четвёртый формальный аргумент не используется, пятый `drawLast` не передаётся и остаётся undefined; normal path также воспроизведён. Manifest сохраняет Egret version, browser userAgent/platform, DPR и viewport.
 - Отдельно создаётся masked-board composite через Canvas2D; он помечен как approximation, поскольку финальный WebGL texture sampling и mask stencil не воспроизводятся.
 - Добавлены workflow steps `node --check` и `node --test`; CI run [41901639258](https://github.com/Kiddos19882/AutoDraw/actions/runs/41901639258) выполняется.
 - Browser execution и PNG comparison не выполнялись; production planner/defaults не изменялись.
