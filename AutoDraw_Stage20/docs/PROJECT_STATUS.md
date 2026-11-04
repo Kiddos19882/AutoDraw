@@ -4,9 +4,11 @@
 
 **Статус:** IN PROGRESS / BLOCKER. До завершения replay не начинать новый live запуск FILL-001-RS и не открывать 45-task matrix. Сам replay — offline-проверка сохранённых evidence; игровые эксперименты не выполняются.
 
-Исходный run: 27/27 strokes, pointCount 1→1261, exact CHALK=1260; Bridge diagnostics без ошибок. Исходный PNG gate: coverage=97.673218%, leakage=28 (требуется ≥99% и 0). Исправление affine mapping и успешный CI run 41780241017 не являются доказательством прохождения replay исходных PNG.
+Исходный run: 27/27 strokes, pointCount 1→1261, exact CHALK=1260; Bridge diagnostics без ошибок. Первоначальный audit до affine correction дал coverage=97.673218%, leakage=28.
 
-**Следующий результат, необходимый для снятия блокировки:** доступность и hash исходных PNG/evidence → replay актуальным adapter → отчёт по binding, coverage/leakage и hashes → решение PASS/REJECT с сохранением исходных данных. Thresholds не менять. Если бинарные исходники недоступны через GitHub, зафиксировать точную недостающую пару/архив и запросить только эти файлы.
+**Replay исходных PNG выполнен:** тест `test_chalk_fill_committed_capture_replay.py` через `Fill001Tab.finalize_capture()` использовал исходные файлы evidence commit [5308214](https://github.com/Kiddos19882/AutoDraw/commit/530821497ce3a6bd5152318a78e1f06cb836f288). CI [41780241017](https://github.com/Kiddos19882/AutoDraw/actions/runs/41780241017), checkout HEAD `0f23731848f0c148fe5e1309d1e305576dd4b6b7`, вывел corrected audit: coverage=98.430600%, leakage=11, status=failed. Runtime binding PASS, exact CHALK=1260. Подробный отчёт и hashes: [CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md](CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md).
+
+**Статус:** capture REJECTED; residual PNG discrepancy ещё не локализовано. Следующий шаг — offline pixel breakdown той же пары PNG. Thresholds не менять; новый live запуск и 45-task matrix запрещены до закрытия gate.
 
 # Текущее состояние проекта
 
@@ -16,7 +18,7 @@
 
 Run [41778045384](https://github.com/Kiddos19882/AutoDraw/actions/runs/41778045384) завершился FAILURE в Preparation/G3: 799 passed, 5 failed, 24 warnings, 82 subtests. Game Monitor/Bridge, Application integration и Executor regression — SUCCESS; PNG audit и Windows portable build skipped. Пять падений связаны с synthetic PNG fixtures, не соблюдавшими executor transform, и non-uniform ROI test, который падал до вызова audit.
 
-Test-only fixes committed: [1f28436](https://github.com/Kiddos19882/AutoDraw/commit/1f28436ab20fe949e4d53cfeea4a5560ed3cbcae), [0f23731](https://github.com/Kiddos19882/AutoDraw/commit/0f23731848f0c148fe5e1309d1e305576dd4b6b7). Production source, frozen masks и acceptance thresholds не менялись. Повторный CI ещё не подтверждён; committed PNG replay не выполнен. Capture remains BLOCKED; 45-task matrix BLOCKED.
+Test-only fixes committed: [1f28436](https://github.com/Kiddos19882/AutoDraw/commit/1f28436ab20fe949e4d53cfeea4a5560ed3cbcae), [0f23731](https://github.com/Kiddos19882/AutoDraw/commit/0f23731848f0c148fe5e1309d1e305576dd4b6b7). Production source, frozen masks и acceptance thresholds не менялись. Последующий CI [41780241017](https://github.com/Kiddos19882/AutoDraw/actions/runs/41780241017) завершился SUCCESS и выполнил replay исходных PNG: coverage=98.430600%, leakage=11, audit failed. Capture remains BLOCKED; 45-task matrix BLOCKED.
 
 ## Дополнение — независимая проверка executor transform — 2026-11-04
 
@@ -25,7 +27,7 @@ Test-only fixes committed: [1f28436](https://github.com/Kiddos19882/AutoDraw/com
 
 Этот CI предшествует affine correction commits `4797aa5`, `a950084` и независимому test commit `c399433`; он **не валидирует** эти изменения. Текущий workflow запускается на push по `source/**`, поэтому source/test commit должен инициировать CI, но доступный GitHub connector не предоставляет push-triggered run listing. `fetch_commit_workflow_runs` ограничен PR-triggered runs; отсутствие результата от него не означает, что push run отсутствует.
 
-Статический review текущего regression test подтверждает, что `_executor_transform()` вызывает реальный `transform_logical_brush_plan_to_screen()` и получает `scale_x/scale_y` из его metadata. Однако тест пока не выполнен на подтверждённом CI после изменений. Runtime PNG replay остаётся отдельным незакрытым gate.
+CI [41780241017](https://github.com/Kiddos19882/AutoDraw/actions/runs/41780241017) на HEAD `0f23731` выполнил regression suite и replay исходных PNG. В логе зафиксировано coverage=98.430600%, leakage=11; binding PASS, PNG gate FAIL. Исправленный affine transform используется, но остаточное расхождение ещё требует координатной локализации.
 
 
 ## FILL-001-RS — согласование координат PNG audit — 2026-11-04
@@ -36,7 +38,7 @@ Test-only fixes committed: [1f28436](https://github.com/Kiddos19882/AutoDraw/com
 
 Исправление: [4797aa5](https://github.com/Kiddos19882/AutoDraw/commit/4797aa5e2e3d9f78656c91dcddf285304eae55c1) согласует PNG mask rasterization с executor transform; [a950084](https://github.com/Kiddos19882/AutoDraw/commit/a950084db14fd1560aa15f099da4a0108c9631e7) обновляет regression fixture/assertions.
 
-**Проверка после исправления не завершена:** локальные pytest недоступны через GitHub API; для новых commits нет подтверждённых CI statuses. Реальные PNG ещё не пересчитаны исправленным audit. Capture не принят, пороги coverage≥99% / leakage=0 не менялись, 45-task matrix остаётся BLOCKED. Следующий gate — полный CI/replay на текущем HEAD; при повторном fail исследовать footprint игрового renderer, brush radius semantics и raster sampling.
+**Проверка после исправления выполнена:** CI [41780241017](https://github.com/Kiddos19882/AutoDraw/actions/runs/41780241017) на HEAD `0f23731` повторно обработал исходную PNG пару: coverage=98.430600%, leakage=11. Affine correction улучшила результат относительно старого audit (97.673218% / 28), но gate не пройден. Остаточная причина не установлена; требуется offline breakdown по координатам. Capture и 45-task matrix остаются BLOCKED.
 
 
 ## FILL-001-RS — runtime binding и PNG audit по live evidence — 2026-11-04
@@ -47,7 +49,7 @@ Test-only fixes committed: [1f28436](https://github.com/Kiddos19882/AutoDraw/com
 
 Добавлен replay test [974f949](https://github.com/Kiddos19882/AutoDraw/commit/974f949e9639acc90e7f4d6f4588c3fb96f9abb2), который передаёт реальные manifest, attempt, executor report, две Bridge run records, session и before/after PNG через обработчик `Fill001Tab.finalize_capture()`. Тест включает старую legacy session и подтверждает успешную runtime binding: run ID совпадает, exact CHALK=1260.
 
-**Capture не принят:** независимый PNG audit получил coverage **97.673218%** при требовании ≥99% и leakage **28 pixels** при требовании 0. Кнопка корректно оставляет capture pending и не создаёт capture JSON. Успешное исполнение 27/27 и измеренный CHALK не заменяют PNG quality gate.
+**Capture не принят:** первоначальный audit до affine correction получил coverage **97.673218%** и leakage **28 pixels**. Повторный audit на исходных PNG с исправленным transform в CI [41780241017](https://github.com/Kiddos19882/AutoDraw/actions/runs/41780241017) получил coverage **98.430600%** и leakage **11 pixels**. Оба результата не проходят неизменённые условия ≥99% / 0; capture pending, CHALK=1260 не заменяет PNG quality gate. См. [отчёт replay](CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md).
 
 Полный CI [41772866679](https://github.com/Kiddos19882/AutoDraw/actions/runs/41772866679) на code/test HEAD `974f949`: Preparation/G3 — 804 passed, 24 warnings, 82 subtests; Executor, Game Monitor/Bridge, Application integration, INT-006 pixel audit и Windows portable build/startup smoke-test — SUCCESS; optional benchmarks — SKIPPED.
 
