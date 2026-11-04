@@ -33,6 +33,7 @@ def main() -> int:
     args = parser.parse_args()
 
     cells = []
+    candidate_records = []
     candidate_count = 0
     accepted_count = 0
     for shape in FILL001_SHAPES:
@@ -49,6 +50,8 @@ def main() -> int:
                     )
                     summary = plan["summary"]
                     item = {
+                        "shape_id": shape,
+                        "radius": radius,
                         "scanline_row_step": step,
                         "scanline_offset": offset,
                         "planner_version": plan["planner_version"],
@@ -61,6 +64,7 @@ def main() -> int:
                         "leakage_pixels": summary["leakage_pixels"],
                         "quality_gate_passed": summary["quality_gate_passed"],
                     }
+                    candidate_records.append(item)
                     if summary["coverage_fraction"] >= 0.99 and summary["leakage_pixels"] == 0:
                         accepted_count += 1
                         candidates.append(item)
@@ -111,6 +115,7 @@ def main() -> int:
         "acceptance_gate": {"coverage_fraction_min": 0.99, "leakage_pixels_max": 0},
         "selection_policy": FILL001_RS_SELECTION_POLICY,
         "cells": cells,
+        "candidates": candidate_records,
         "evidence_limitations": [
             "OpenCV raster simulation only; game renderer has not been validated.",
             "estimated_sampling_points is a proxy, not exact CHALK.",
