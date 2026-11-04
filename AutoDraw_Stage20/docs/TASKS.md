@@ -61,6 +61,8 @@ G3 27/27 относится к длинным горизонтальным ли�
 
 ## Документационные расхождения и завершённые задачи
 
+Перед закрытием backlog отдельно синхронизировать устаревшие статусы: CHALK_GEOMETRY_MATRIX_PLAN.md (старый G3 pending), CHALK_INT006R_LIVE_PREFLIGHT_AND_VISUAL_AUDIT_2026-11-03.md и CHALK_RADIUS_GEOMETRY_CROSS_VALIDATION_PLAN_2026-11-03.md (старый manual visual pending), CHALK_NEXT_STEPS_PLAN_2026-11-02.md, BRUSH_MODULE_QUICK_INDEX.md и source/game_monitor/README.md. Не переписывать исторические результаты; добавить отметку HISTORICAL/SUPERSEDED и ссылку на актуальные статусы. Проверить PROJECT_STATUS.md и старые bridge design документы на те же расхождения.
+
 - **MONITOR-AUTOCAPTURE-STATUS:** TASKS отмечает INT-004 DONE и поздние captures связаны с Monitor reports; BRUSH_MONITOR_AUTOCAPTURE_DESIGN всё ещё сообщает о not_tested Firefox transport/manifest binding. Сверить текущий код и accepted bundles; если закрыто — пометить старый design как superseded, если нет — выделить residual gate.
 - G1 принят 12/12 в отдельном корректно маркированном блоке; старая серия с ошибочным repeat metadata остаётся исторической.
 - G2 принят 18/18; G3 принят 27/27.
