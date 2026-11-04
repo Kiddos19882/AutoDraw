@@ -1058,3 +1058,13 @@ Code commit: `5a090948ecbe927807fde4ffc5337132d131b765`; test commit: `7ffdd150b
 
 ---
 
+## BRUSH-FOOTPRINT-CAPSULE-001 — CI evidence update
+
+Первоначальный capsule-mask candidate прошёл полный CI [41842587672](https://github.com/Kiddos19882/AutoDraw/actions/runs/41842587672): 820 passed, 24 warnings, 82 subtests; обязательные regression jobs, INT-006 PNG audit и Windows portable build/startup smoke-test — SUCCESS; optional benchmarks SKIPPED. FILL-001-RS static sweep: 2 238 candidates, 62 accepted, 15/15 selected cells passed. Windows artifact: `13329303700`.
+
+После этого добавлены independent analytic oracle и небольшое уточнение conservative tolerance semantics: potential cells используют strict positive-area test без вычитания epsilon; guaranteed cells требуют margin внутрь capsule; boolean axis scales отклоняются. Эти последние commits `336d66f`, `8aeb66a`, `7357f3e` ещё требуют повторного CI. Run [41843716918](https://github.com/Kiddos19882/AutoDraw/actions/runs/41843716918) на HEAD `7357f3e` ожидает выполнения.
+
+Planner integration и live renderer validation не выполнялись. Generic capsule model остаётся offline candidate; FILL-001-RS capture остаётся REJECTED и 45-task matrix BLOCKED.
+
+---
+
