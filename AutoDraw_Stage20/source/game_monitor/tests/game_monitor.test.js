@@ -8,13 +8,22 @@ const { test } = require("node:test");
 
 const monitorSource = fs.readFileSync(path.join(__dirname, "..", "game_monitor.js"), "utf8");
 
-function createMonitor() {
+function createMonitor(options = {}) {
   let timerId = 0;
   const timers = new Map();
+  const eventListeners = new Map();
+  const HTMLCanvasElement = class HTMLCanvasElement {};
   const window = {
     top: null,
-    addEventListener() {},
-    removeEventListener() {},
+    addEventListener(type, callback, capture = false) {
+      const handlers = eventListeners.get(type) || [];
+      handlers.push({ callback, capture });
+      eventListeners.set(type, handlers);
+    },
+    removeEventListener(type, callback, capture = false) {
+      const handlers = eventListeners.get(type) || [];
+      eventListeners.set(type, handlers.filter(item => item.callback !== callback || item.capture !== capture));
+    },
     setInterval(callback, interval) {
       const id = ++timerId;
       timers.set(id, { callback, interval });
@@ -39,12 +48,24 @@ function createMonitor() {
     },
     document,
     URL,
-    HTMLCanvasElement: class HTMLCanvasElement {},
+    HTMLCanvasElement,
     console
   };
+  if (options.stage) {
+    window.egret = { MainContext: { instance: { stage: options.stage } } };
+  }
 
   vm.runInNewContext(monitorSource, sandbox, { filename: "game_monitor.js" });
-  return { monitor: window.AutoDrawGameMonitor, timers, window, document };
+  return {
+    monitor: window.AutoDrawGameMonitor,
+    timers,
+    window,
+    document,
+    HTMLCanvasElement,
+    dispatchWindowEvent(type, event) {
+      for (const item of (eventListeners.get(type) || []).slice()) item.callback(event);
+    }
+  };
 }
 
 function createBoard() {
@@ -67,6 +88,7 @@ function createBoard() {
     height: 240,
     scaleX: 1,
     scaleY: 1,
+    globalToLocal(x, y) { return { x: x - 100, y: y - 50 }; },
     onDrawStart() {},
     onDrawing() {},
     onDrawingEnd() {},
@@ -86,6 +108,68 @@ function createBoard() {
     getPointIndexReads: () => pointIndexReads
   };
 }
+
+test("MOUSE_MOVE_SAMPLE records delivered DOM and Egret/BoardPane coordinates during a stroke", () => {
+  const stage = { mouseX: 142, mouseY: 83 };
+  const { monitor, HTMLCanvasElement, dispatchWindowEvent } = createMonitor({ stage });
+  const { board } = createBoard();
+  monitor.start();
+  monitor.attach(board);
+
+  const canvas = new HTMLCanvasElement();
+  dispatchWindowEvent("mousemove", {
+    type: "mousemove", target: canvas, clientX: 20, clientY: 30,
+    pageX: 21, pageY: 31, screenX: 1021, screenY: 731,
+    movementX: 2, movementY: -1, buttons: 1, timeStamp: 100.25
+  });
+  assert.equal(monitor.export().events.some(event => event.type === "MOUSE_MOVE_SAMPLE"), false);
+
+  dispatchWindowEvent("pointerdown", {
+    type: "pointerdown", target: canvas, clientX: 20, clientY: 30, pointerType: "mouse"
+  });
+  dispatchWindowEvent("mousemove", {
+    type: "mousemove", target: canvas, clientX: 24, clientY: 34,
+    pageX: 25, pageY: 35, screenX: 1025, screenY: 735,
+    movementX: 4, movementY: 4, buttons: 1, timeStamp: 116.75
+  });
+
+  const event = monitor.export().events.find(item => item.type === "MOUSE_MOVE_SAMPLE");
+  assert.ok(event);
+  assert.equal(event.strokeId, "pointer-stroke-1");
+  assert.equal(event.source, "window-bubble-after-egret-canvas");
+  assert.equal(event.domEventTimeStamp, 116.75);
+  assert.equal(event.clientX, 24);
+  assert.equal(event.clientY, 34);
+  assert.equal(event.stageX, 142);
+  assert.equal(event.stageY, 83);
+  assert.equal(event.boardX, 42);
+  assert.equal(event.boardY, 33);
+
+  dispatchWindowEvent("pointerup", {
+    type: "pointerup", target: canvas, clientX: 24, clientY: 34, pointerType: "mouse"
+  });
+  monitor.stop();
+});
+
+test("POINT_QUOTA_UPDATE carries the exact accepted point and current transformed pointer position", () => {
+  const stage = { mouseX: 135, mouseY: 77 };
+  const { monitor } = createMonitor({ stage });
+  const { board } = createBoard();
+  monitor.attach(board);
+  board.onDrawStart();
+  board.atom.points[0].push({ x: 35, y: 27 });
+  board.updateLess();
+
+  const event = monitor.export().events.find(item => item.type === "POINT_QUOTA_UPDATE");
+  assert.ok(event);
+  assert.equal(event.pointDelta, 1);
+  assert.deepEqual({ ...event.acceptedPoint }, { x: 35, y: 27 });
+  assert.equal(event.stageX, 135);
+  assert.equal(event.stageY, 77);
+  assert.equal(event.boardX, 35);
+  assert.equal(event.boardY, 27);
+  monitor.stop();
+});
 
 test("resource snapshot reads exact max/less fields and derives point count", () => {
   const { monitor } = createMonitor();
