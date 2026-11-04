@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-11-04 — подтверждён PainterPopup BoardPane runtime transform
+
+- Runtime snapshot показывает BoardPane local `(30,75)` под PainterPopup `(489.791666,-3)`, concatenated translation `(519.791666,72)`, scale 1.
+- boardMask имеет ту же concatenated matrix; stage-space transform подтверждён для snapshot.
+- `boardClientCorners` недоступен (`getBoxQuads()` отсутствует), поэтому client/screen corners остаются derived. Paired live PNG и фактический renderer footprint остаются pending.
+
+
 ## 2026-11-04 — Egret WebGL mask reference corrected: 18/18 comparisons
 
 - Исправлена тестовая сцена: mask теперь attached к Egret Stage, board и mask имеют общий parent/stage; assert требует `boardRenderMode=3`.

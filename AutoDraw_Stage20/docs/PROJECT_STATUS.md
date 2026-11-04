@@ -14,7 +14,7 @@
 - Полный CI на commit `5308fade`: Game Monitor/Bridge, Preparation/G3, Application integration, Executor, Egret browser harness, INT-006 pixel audit и Windows portable build/startup smoke-test — SUCCESS; optional algorithm benchmarks — SKIPPED.
 - Production code, CHALK estimator, executor/sampling defaults и frozen FILL-001 plans не менялись. Live game experiment не выполнялся.
 
-**Следующий gate:** получить парный live capture одной фиксированной траектории — final board PNG, принятые координаты/точки и pre/post `pointCount` из одного run. Затем проверить transform именно PainterPopup BoardPane и сопоставить screenshot с offline Egret reference. До этого фактический live footprint и CHALK для новых вариантов не установлены; 45-task FILL-001-RS matrix остаётся BLOCKED.
+**Следующий gate:** получить парный live capture одной фиксированной траектории — final board PNG, принятые координаты/точки и pre/post `pointCount` из одного run — и сопоставить screenshot с offline Egret reference. Stage-space transform уже подтверждён runtime snapshot: BoardPane local `(30,75)`, parent PainterPopup `(489.791666,-3)`, concatenated matrix translation `(519.791666,72)` при scale 1; boardMask имеет ту же матрицу. `boardClientCorners` в snapshot отсутствует (`getBoxQuads()` недоступен), поэтому client-space corners остаются derived, не измеренными. Фактический live footprint и CHALK для новых вариантов не установлены; 45-task FILL-001-RS matrix остаётся BLOCKED.
 
 
 ## Дополнение — actual BoardPane CanvasRenderer harness PASS (2026-11-04)

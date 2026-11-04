@@ -310,6 +310,16 @@
 
 # Журнал работ AutoDraw
 
+## 2026-11-04 — подтверждён PainterPopup BoardPane stage-space transform
+
+Источник — пользовательский read-only runtime snapshot `data/runtime/renderer_snapshot_2026-11-04.json` (blob `99aaee478d0355d01be9d36770964293753d1486`).
+
+- BoardPane local `(30,75)`, size `460×240`; parent PainterPopup `(489.791666,-3)`, size `676×379`.
+- BoardPane concatenated matrix translation `(519.7916660308838,72)`, scale 1; boardMask имеет ту же матрицу.
+- Stage→client affine scale выводится из Stage `1672×600` и canvas CSS rect `1920×690`, origin `(0,-0.5)`. Прямые `boardClientCorners` отсутствуют (`getBoxQuads()` недоступен), screen coordinates остаются derived.
+- TASKS/ROADMAP обновлены: stage-space transform закрыт; следующий blocker — paired live PNG + accepted coordinates + pre/post pointCount из одной сессии. FILL-001-RS 45-task matrix остаётся BLOCKED.
+
+
 ## 2026-11-04 — исправлена постановка Egret WebGL mask reference
 
 **Commit:** `5308fade07fbb11409a9afc5c3d40ed4cf82ca3a`  

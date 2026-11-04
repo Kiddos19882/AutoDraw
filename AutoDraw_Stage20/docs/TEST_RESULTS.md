@@ -67,6 +67,19 @@ GitHub tree на HEAD `0a5fa41c` содержит 5 413 файлов; 5 011 фа
 
 **Ограничения:** residual delta=1 не классифицирован как дефект; exact popup transform и paired live board PNG + accepted points + pointCount из одной сессии не получены. CHALK и production footprint модель этим тестом не измерялись. FILL-001-RS 45-task matrix остаётся BLOCKED.
 
+## 1.6. PainterPopup BoardPane runtime transform (2026-11-04)
+
+**Источник:** `data/runtime/renderer_snapshot_2026-11-04.json`, provenance — полный read-only `inspect()` snapshot, предоставленный пользователем; blob SHA `99aaee478d0355d01be9d36770964293753d1486`.
+
+- BoardPane local position `(30,75)`, size `460×240`, scale `(1,1)`.
+- Parent PainterPopup position `(489.791666,-3)`, size `676×379`.
+- BoardPane concatenated matrix: `a=1, b=0, c=0, d=1, tx=519.7916660308838, ty=72`.
+- boardMask concatenated matrix совпадает с BoardPane matrix.
+- Canvas CSS rect: `(left=0, top=-0.5, width=1920, height=690)`; Stage `1672×600`; client-space affine scale выводится из этих размеров.
+- `boardClientCorners=null`, `getBoxQuads()` недоступен. Следовательно, screen/client corners — derived values, не direct runtime measurements.
+
+**Вывод:** stage-space parent chain и transform установлены для этого snapshot. Это не paired PNG capture и не измерение фактического swept footprint кисти; live renderer comparison остаётся открытым.
+
 ## 2. Сводный статус ключевых исследовательских серий
 
 | Серия | Область | Подтверждённый итог | Текущий статус / ограничения |
