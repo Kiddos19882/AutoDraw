@@ -884,3 +884,11 @@
 - Сохранённые per-stroke frame probes для будущих запусков связаны через strokeId; старый run не содержит raw per-stroke rAF intervals. Измеренная ранее cadence POINT_QUOTA_UPDATE остаётся 28.26–29.50 points/s, median 33 ms; browser rAF около 60 FPS не является частотой Egret ENTER_FRAME.
 - Renderer gate уточнён: nominal stage.frameRate=48, NO_SCALE, PainterPopup 676×379, BoardPane 460×240 без локального scale; deployed Egret runtime, global transform, zero-length rasterization и реальный brush footprint ещё не подтверждены.
 - Capture FILL-001-RS остаётся REJECTED (coverage=98.430600%, leakage=11; exact CHALK=1260); 45-task matrix BLOCKED. Production defaults, frozen plans/masks/thresholds и raw evidence не изменялись.
+
+
+## 2026-11-04 — Egret stroke geometry and planner footprint risk
+
+- Egret GraphicsNode defaults omitted caps/joints to ROUND; CanvasRenderer applies them. The reviewed WebGL renderer also delegates GraphicsNode rasterization to CanvasRenderer.
+- For compatible Canvas rendering, a zero-length single-point path is removed and does not paint, while the game point counter can still increase.
+- Planner bbox footprint can overestimate coverage around rounded endpoints in interior_fill_planner and outline_first_fill_planner. Added separate offline task BRUSH-FOOTPRINT-CAPSULE-001; no planner code changed.
+- CI workflow 41840582147 SUCCESS; all required jobs passed, optional benchmarks skipped.
