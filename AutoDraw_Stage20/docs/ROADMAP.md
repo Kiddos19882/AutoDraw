@@ -4,23 +4,24 @@
 
 Последний branch HEAD на момент документирования: [4f1fb94](https://github.com/Kiddos19882/AutoDraw/commit/4f1fb945f384aba0b3454e4301b248cf74101800). Последний code/test commit [5cde7a1](https://github.com/Kiddos19882/AutoDraw/commit/5cde7a109a669bebf790ecbeb21f8bbc4feae182) прошёл CI [41754801210](https://github.com/Kiddos19882/AutoDraw/actions/runs/41754801210). В live task run из [73d14a1](https://github.com/Kiddos19882/AutoDraw/commit/73d14a1784a5a9f8ef29bc0e197b75352f2650af) exact CHALK=5999 подтверждён, но только 128/131 consuming strokes; 3 кандидата остановились на quota limit. Capture REJECTED, полная стоимость плана неизвестна, quantitative PNG audit отсутствует.
 
-Предварительная OpenCV-симуляция выявила избыточно плотные проходы текущего planner. Для r10 / step=5 / offset=0 три frozen masks прошли текущий офлайн-gate coverage ≥99% / leakage=0. Это не live renderer evidence и не доказательство экономии CHALK. FILL-001-RS введён как отдельный этап versioned geometry research; его план описан в [временном плане FILL-001](CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md).
+Exhaustive OpenCV sweep проверил 2 238 step/offset кандидатов; 62 прошли gate coverage ≥99% / leakage=0. Все 15 shape/radius cells получили frozen config. Реализованы planner version 2, отдельный 45-task RS manifest builder, single-task handoff, runtime context binding и генератор manifest. Полные результаты: [FILL-001-RS static sweep](CHALK_FILL001_RS_STATIC_SWEEP_2026-11-04.md). Это не live renderer evidence и не доказательство экономии CHALK.
 
-**Текущий порядок:** (1) завершить воспроизводимую статическую матрицу FILL-001-RS; (2) после отдельного разрешения создать versioned candidate и провести один live preflight с полной квотой; (3) только после принятого preflight решать вопрос о новой matrix. FILL-001 45-cell matrix остаётся BLOCKED; INT-006 safety margin не установлен; INT-007 остаётся BLOCKED.
+**Текущий порядок:** (1) подтвердить новый code/test HEAD полным CI, включая exhaustive sweep artifact; (2) создать `fill001-rs-*` manifest и выполнить один локальный Windows/browser live preflight `rectangle/r10/step=5/offset=0/repeat=1` на доске с полной квотой; (3) принять capture только после exact runtime binding и quantitative PNG audit; (4) затем отдельно решать вопрос новой 45-task matrix. Удалённый GitHub runner не имеет доступа к локальной игровой сессии/экрану, поэтому live preflight здесь не запускался. FILL-001 45-cell matrix остаётся BLOCKED; INT-006 safety margin не установлен; INT-007 остаётся BLOCKED.
 
 ## FILL-001-RS — исследование расстояния между проходами
 
-1. **DONE — документальный контракт:** `scanline_row_step` отделён от `point_step_px`; сохранены предварительные кандидаты для 15 shape×radius combinations.
-2. **IN_PROGRESS — статическая validation:** воспроизвести sweep в зафиксированном окружении, сохранить все step/offset варианты, coverage, uncovered pixels, leakage, stroke count, path length и estimated sampling points.
-3. **BLOCKED — versioned plan:** только после завершения статической проверки оформить новый plan version/signature, не переписывая FILL-001 frozen plans.
-4. **BLOCKED — live preflight:** отдельное разрешение пользователя, восстановленная доска с полной квотой, exact Game Monitor pointCount, Bridge/executor binding и quantitative PNG audit.
-5. **BLOCKED — расширение матрицы:** решение только после принятого preflight; отдельный manifest/experiment ID для новой геометрии.
+1. **DONE — exhaustive static sweep:** 2 238 candidates, 62 accepted by frozen geometric gate; 15 shape/radius configs saved in report and source constants.
+2. **DONE — versioned planner and matrix:** legacy planner v1 unchanged; RS planner v2, separate 45-task manifest, new plan signatures and frozen spacing metadata.
+3. **DONE — single-task handoff:** RS plan passes through existing FILL-001 handoff; runtime context binds plan variant/version and spacing; P1 remains unchanged.
+4. **IN_PROGRESS — CI validation:** preparation regressions, exhaustive sweep artifact, other required jobs and Windows portable build/startup smoke-test must pass on new HEAD.
+5. **READY FOR LOCAL PREFLIGHT — one task:** after CI success, generate manifest and run rectangle/r10/step=5/offset=0/repeat=1 in the local game with full quota; remote runner cannot access the user's local game session.
+6. **BLOCKED — matrix expansion:** only after an accepted live capture; separate manifest/experiment ID, no mutation of the original FILL-001 series.
 
-Candidate r10/step=5: rectangle 27 strokes / 99,319% coverage / 0 leakage; wide_irregular 29 / 99,395% / 0; narrow_irregular 43 / 99,173% / 0. Эти значения — OpenCV simulation. Estimated sampling points не являются CHALK. У rectangle запас покрытия над 99% составляет 0,319 п.п.; 304 target pixels остаются uncovered в модели.
+Preflight candidate r10/rectangle/step=5/offset=0: 27 strokes, 99,319% coverage, 304 uncovered target pixels, leakage=0 in OpenCV. Uniform step5 for the three shapes: rectangle 27/99,319%; wide_irregular 29/99,396%; narrow_irregular 43/99,173%. Estimated sampling points are not CHALK.
 
 Evidence commit [73d14a1](https://github.com/Kiddos19882/AutoDraw/commit/73d14a1784a5a9f8ef29bc0e197b75352f2650af) добавил полный task Bridge run и session diagnostics. Exact CHALK=5999 подтверждён на run level и суммой point deltas, но 3 из 131 pointer candidates не потребили CHALK после исчерпания квоты; stroke_count=128, capture REJECTED. Первый Bridge run — калибровочный (CHALK=0) и исключается по event activity window. UI pending был временным: executor report появился примерно за 3.44 секунды до финализации Bridge run; после persistence строгая проверка должна завершиться отказом по 128/131 и 3 non-consuming candidates.
 
-Шаги 1–2 временного плана DONE (software/CI). Шаг 3 IN_PROGRESS: live preflight исполнен, но не принят из-за исчерпания квоты; количественный PNG audit не выполнен. Шаги 4–5 BLOCKED. Следующее действие — статический анализ frozen plan и бюджета CHALK, затем решение по обработке over-budget/censored результатов. Повторять тот же запуск без изменений не следует. Подробности: [FILL-001 postmortem](CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md).
+Шаги 1–2 временного плана DONE на предыдущем code baseline. Шаг 3 IN_PROGRESS: прежний live preflight rejected; FILL-001-RS software implementation теперь добавлена, CI для нового HEAD pending. Шаги 4–5 BLOCKED до принятого versioned live preflight. Предыдущий run exact CHALK=5999 — censored/over-budget attempt, не полная стоимость. Подробности: [FILL-001 postmortem](CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md).
 
 ## Постоянная система управления знаниями ИИ
 
