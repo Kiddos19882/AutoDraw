@@ -55,7 +55,11 @@ try {
 
     $browserArgs = @(
         "--headless",
-        "--disable-gpu",
+        "--enable-webgl",
+        "--use-gl=angle",
+        "--use-angle=swiftshader",
+        "--enable-unsafe-swiftshader",
+        "--ignore-gpu-blocklist",
         "--no-sandbox",
         "--disable-dev-shm-usage",
         "--dump-dom",
@@ -69,7 +73,7 @@ try {
     }
 
     $dom = Get-Content -Raw $domPath
-    if ($dom -notmatch 'data-reference-status="complete"' -or $dom -notmatch 'data-fixture-count="18"') {
+    if ($dom -notmatch 'data-reference-status="complete"' -or $dom -notmatch 'data-fixture-count="18"' -or $dom -notmatch 'data-webgl-status="complete"') {
         Save-FailureDiagnostics
         $statusMatch = [regex]::Match($dom, '<p id="renderer-status"[^>]*>(.*?)</p>', [System.Text.RegularExpressions.RegexOptions]::Singleline)
         if ($statusMatch.Success) {
@@ -79,7 +83,7 @@ try {
         }
         Write-Host "Headless Edge DOM diagnostic (first 16000 characters):"
         Write-Host $dom.Substring(0, [Math]::Min(16000, $dom.Length))
-        throw "Egret reference page did not report 18 completed fixtures; diagnostics saved to artifact."
+        throw "Egret reference page did not report 18 fixtures and a completed WebGL probe; diagnostics saved to artifact."
     }
 
     $manifestMatch = [regex]::Match($dom, '<pre id="renderer-manifest-json"[^>]*>(.*?)</pre>', [System.Text.RegularExpressions.RegexOptions]::Singleline)
@@ -98,9 +102,9 @@ try {
 
     $pngPattern = '<a(?=[^>]*href="data:image/png;base64,([^"]+)")(?=[^>]*download="([^"]+)")[^>]*>'
     $pngMatches = [regex]::Matches($dom, $pngPattern)
-    if ($pngMatches.Count -ne 36) {
+    if ($pngMatches.Count -ne 37) {
         Save-FailureDiagnostics
-        throw "Expected 36 PNG download links, found $($pngMatches.Count)."
+        throw "Expected 37 PNG download links (36 fixture PNGs + 1 WebGL probe), found $($pngMatches.Count)."
     }
 
     foreach ($match in $pngMatches) {
@@ -109,7 +113,12 @@ try {
         [System.IO.File]::WriteAllBytes((Join-Path $outputDir $pngName), $pngBytes)
     }
 
-    Write-Host "Egret CanvasRenderer generated $($manifest.fixtures.Count) fixtures and $($pngMatches.Count) PNG files."
+    if ($manifest.webglProbe.status -ne "complete") {
+        Save-FailureDiagnostics
+        throw "WebGL probe did not complete."
+    }
+
+    Write-Host "Egret actual BoardPane CanvasRenderer + WebGLRenderer generated $($manifest.fixtures.Count) fixtures and $($pngMatches.Count) PNG files."
 } finally {
     if ($server -and -not $server.HasExited) {
         Stop-Process -Id $server.Id -Force
