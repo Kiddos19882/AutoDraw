@@ -1,6 +1,22 @@
 # Roadmap AutoDraw
 
-## Актуальный статус FILL-001 на 2026-11-04
+## Актуальный статус FILL-001 / FILL-001-RS на 2026-11-04
+
+Последний branch HEAD на момент документирования: [4f1fb94](https://github.com/Kiddos19882/AutoDraw/commit/4f1fb945f384aba0b3454e4301b248cf74101800). Последний code/test commit [5cde7a1](https://github.com/Kiddos19882/AutoDraw/commit/5cde7a109a669bebf790ecbeb21f8bbc4feae182) прошёл CI [41754801210](https://github.com/Kiddos19882/AutoDraw/actions/runs/41754801210). В live task run из [73d14a1](https://github.com/Kiddos19882/AutoDraw/commit/73d14a1784a5a9f8ef29bc0e197b75352f2650af) exact CHALK=5999 подтверждён, но только 128/131 consuming strokes; 3 кандидата остановились на quota limit. Capture REJECTED, полная стоимость плана неизвестна, quantitative PNG audit отсутствует.
+
+Предварительная OpenCV-симуляция выявила избыточно плотные проходы текущего planner. Для r10 / step=5 / offset=0 три frozen masks прошли текущий офлайн-gate coverage ≥99% / leakage=0. Это не live renderer evidence и не доказательство экономии CHALK. FILL-001-RS введён как отдельный этап versioned geometry research; его план описан в [временном плане FILL-001](CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md).
+
+**Текущий порядок:** (1) завершить воспроизводимую статическую матрицу FILL-001-RS; (2) после отдельного разрешения создать versioned candidate и провести один live preflight с полной квотой; (3) только после принятого preflight решать вопрос о новой matrix. FILL-001 45-cell matrix остаётся BLOCKED; INT-006 safety margin не установлен; INT-007 остаётся BLOCKED.
+
+## FILL-001-RS — исследование расстояния между проходами
+
+1. **DONE — документальный контракт:** `scanline_row_step` отделён от `point_step_px`; сохранены предварительные кандидаты для 15 shape×radius combinations.
+2. **IN_PROGRESS — статическая validation:** воспроизвести sweep в зафиксированном окружении, сохранить все step/offset варианты, coverage, uncovered pixels, leakage, stroke count, path length и estimated sampling points.
+3. **BLOCKED — versioned plan:** только после завершения статической проверки оформить новый plan version/signature, не переписывая FILL-001 frozen plans.
+4. **BLOCKED — live preflight:** отдельное разрешение пользователя, восстановленная доска с полной квотой, exact Game Monitor pointCount, Bridge/executor binding и quantitative PNG audit.
+5. **BLOCKED — расширение матрицы:** решение только после принятого preflight; отдельный manifest/experiment ID для новой геометрии.
+
+Candidate r10/step=5: rectangle 27 strokes / 99,319% coverage / 0 leakage; wide_irregular 29 / 99,395% / 0; narrow_irregular 43 / 99,173% / 0. Эти значения — OpenCV simulation. Estimated sampling points не являются CHALK. У rectangle запас покрытия над 99% составляет 0,319 п.п.; 304 target pixels остаются uncovered в модели.
 
 Evidence commit [73d14a1](https://github.com/Kiddos19882/AutoDraw/commit/73d14a1784a5a9f8ef29bc0e197b75352f2650af) добавил полный task Bridge run и session diagnostics. Exact CHALK=5999 подтверждён на run level и суммой point deltas, но 3 из 131 pointer candidates не потребили CHALK после исчерпания квоты; stroke_count=128, capture REJECTED. Первый Bridge run — калибровочный (CHALK=0) и исключается по event activity window. UI pending был временным: executor report появился примерно за 3.44 секунды до финализации Bridge run; после persistence строгая проверка должна завершиться отказом по 128/131 и 3 non-consuming candidates.
 
@@ -22,7 +38,7 @@ Evidence commit [73d14a1](https://github.com/Kiddos19882/AutoDraw/commit/73d14a1
 4. Выполнить 45 live captures (3 формы × 5 радиусов × 3 повтора); до успешного шага 3 запуск заблокирован.
 5. Проанализировать exact CHALK и качество, определить влияние радиуса и лучшую стратегию заливки.
 
-**Текущий статус:** шаги 1–2 DONE; шаг 3 IN_PROGRESS — live attempt выполнен, но capture rejected: exact CHALK=5999, 128/131 consuming strokes, 3 non-consuming candidates. Шаги 4–5 BLOCKED; сначала требуется статический resource/plan analysis и решение по over-budget outcomes.
+**Текущий статус:** шаги 1–2 DONE; шаг 3 IN_PROGRESS — live attempt выполнен, но capture rejected. Статический анализ baseline выполнен; FILL-001-RS теперь содержит отдельный шаг воспроизводимой статической validation. Шаги 4–5 BLOCKED до принятого versioned preflight.
 
 ### FILL-001 — fill efficiency matrix
 
@@ -38,7 +54,7 @@ Evidence commit [73d14a1](https://github.com/Kiddos19882/AutoDraw/commit/73d14a1
 - [x] Обработать incomplete Bridge sessions как pending только после фильтрации по времени executor и connection close; не принимать другой session, пока потенциально пересекающаяся session остаётся неполной.
 - [x] Добавить retry runtime binding в FILL-001 кнопке «Проверить runtime + PNG и принять capture»; acceptance по-прежнему требует полного runtime binding и PNG audit.
 - [x] Полный CI [41754801210](https://github.com/Kiddos19882/AutoDraw/actions/runs/41754801210) — SUCCESS; portable artifact ID 13288855067.
-- [ ] Провести новый Windows live runtime preflight на восстановленной доске и подтвердить P1 из фактического executor report.
+- [ ] После завершения FILL-001-RS static gate создать новый versioned candidate и провести Windows live runtime preflight на восстановленной доске; подтвердить P1 из фактического executor report.
 - [x] Исправить физическое требование crop 460×240: UI снимает фактический calibrated client ROI, adapter преобразует frozen logical mask в размер PNG и сохраняет transform.
 - [ ] Проверить реальные board PNG в client ROI: RGB threshold=8, cursor/UI exclusion и coverage/leakage против frozen masks.
 - [ ] Только после preflight — 45 live captures и анализ расхода CHALK по shape/radius.
