@@ -1,5 +1,11 @@
 ## 2026-11-04 — уточнение активного объёма CHALK
 
+## 2026-11-04 — уточнение deployed renderer evidence
+
+- Из сохранённых Monitor captures извлечены URL исторических runtime assets: manifest, `mergeEngine_df2e5bc5.js` и `main.min_6ecc02a4.js`.
+- Установлено, что эти assets не совпадают по имени с bundle `main.min_570122a1.js` из master; содержимое и hash исторических загрузок отсутствуют. Deployed Egret version не установлена.
+- Следующий gate уточнён: получить response bodies и SHA-256, затем сравнить фактический renderer. Код и live experiments не менялись.
+
 ## 2026-11-04 — прямой анализ игровой кисти
 
 - Прослежен фактический путь BoardPane/Painter в клиентском bundle из master: толщина кисти передаётся в Egret Graphics; normal path строится через moveTo/lineTo, smooth path — через midpoint/curveTo.
