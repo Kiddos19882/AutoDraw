@@ -92,3 +92,28 @@ FILL-001 должен проверять не «сколько CHALK стоит 
 **Точные области bundle:** BoardPane около offsets 4 092 419–4 095 700; Painter около offset 1 419 504. Blob SHA указан выше. BoardPane constants: 460×240, BLACK_BOARD_LINE_RADIUS=7.
 
 **Статус:** E1 статический разбор завершён для перечисленных вызовов. Cap geometry, zero-length stroke rasterization, popup display transform и фактическая screen-space raster footprint — UNKNOWN. Live captures не запускались.
+
+
+## 8. Фактическая cadence принятых игровых точек — run 6a17a297
+
+Исходный Bridge JSON:
+- session: bb261898-8296-41f5-a333-eb0b81016410;
+- run: 6a17a297-ea14-4527-9527-bfd8de3bd335;
+- файл: game-monitor-run-20261104T040548835772Z-6a17a297.json;
+- brush radius=10; pointCount 1→1261; exact CHALK=1260;
+- 27 pointer strokes, 1260 POINT_QUOTA_UPDATE events.
+
+Per-stroke timing пересчитан по timestamps событий POINT_QUOTA_UPDATE и POINTER_DOWN/UP:
+- каждый штрих принял 41–48 точек;
+- длительность штриха 1450–1645 ms;
+- median интервал между соседними quota updates — 33 ms во всех 27 штрихах;
+- accepted point rate — 28.26–29.50 points/s;
+- средняя скорость первых 9 штрихов — 28.734 points/s; последних 9 — 29.049 points/s.
+
+В том же run aggregate frame_probe сообщает 2579 browser requestAnimationFrame intervals, average 59.997 FPS, median 60.024 FPS, 27 probes. Это browser rAF, не прямой счётчик Egret ENTER_FRAME. Нельзя заключать, что игровая обработка точек происходила с частотой 60 Hz: cadence POINT_QUOTA_UPDATE около 30 updates/s.
+
+На этом run не видно снижения скорости принятых точек от накопления pointCount 1 до 1261 (сравнение первых/последних 9 штрихов), но это не доказывает отсутствие O(N) overhead на более длинных runs или других устройствах. Bundle показывает, что updateLess() пересчитывает массив atom.points; количественный эффект на FPS остаётся гипотезой.
+
+Старый Bridge finalizer объединил rAF intervals в один run-level summary и очистил frame_probes, поэтому исходные per-stroke rAF intervals этого исторического run восстановить нельзя. POINT_QUOTA_UPDATE events сохранили timestamps и strokeId, поэтому accepted-point cadence восстановлена. Новые commits добавляют strokeId в frame_probe, сохраняют raw intervals и создают per_stroke_metrics/frame_probe_by_stroke.
+
+**Уровень evidence:** E2 для cadence принятых точек данного run (точные игровые pointCount events); E2 для browser rAF aggregate; не E2 для фактического Egret frame rate и не доказательство renderer footprint.
