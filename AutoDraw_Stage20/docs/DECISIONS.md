@@ -193,3 +193,11 @@
 **Решение:** rasterize frozen mask в screen ROI обратным nearest-neighbor mapping, используя ровно те же scale_x/scale_y, что и executor coordinate transform. Audit не должен использовать самостоятельную альтернативную формулу масштаба.
 **Инварианты:** coverage ≥99%, leakage=0, RGB threshold=8, frozen mask/hash, executor transform и исходные PNG остаются неизменными. Исправление audit не может автоматически принимать capture; committed PNG должны пройти повторный audit на исправленном коде.
 **Последствия:** code/test commits 4797aa5 и a950084 реализуют и закрепляют contract. До подтверждённого CI/replay и прохождения PNG gate FILL-001 capture и 45-task matrix остаются BLOCKED.
+
+
+## DEC-016. Выбор доски Game Monitor не входит в текущий пользовательский сценарий
+
+**Статус:** принято пользователем, 2026-11-04  
+**Контекст:** статический анализ подтверждённого game bundle обнаружил preview `BoardPane` внутри `BoardItemBase` и рабочий `PainterPopup.painterBoard`; общий auto-discovery структурно не различает эти экземпляры.  
+**Решение:** для текущей задачи считать рабочим сценарием комнату без других досок, с одной пустой тестовой доской на экране. Не исследовать и не исправлять выбор между preview BoardPane и PainterPopup BoardPane; считать этот вопрос `NOT_APPLICABLE_TO_CURRENT_USER_SCENARIO`.  
+**Последствия:** удалить `MONITOR-BOARD-SELECTION-001` из актуального backlog и roadmap. Историческое статическое наблюдение сохранять с отметкой о неприменимости к текущему сценарию. Это решение не утверждает, что auto-discovery исправлен для комнат с несколькими досками; код и тесты не меняются.

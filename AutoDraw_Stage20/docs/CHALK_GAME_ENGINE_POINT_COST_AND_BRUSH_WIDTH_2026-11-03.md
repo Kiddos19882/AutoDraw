@@ -1,7 +1,7 @@
 # Игровой движок: связь размера кисти и расхода CHALK
 
 **Дата аудита:** 2026-11-03  
-**Источник:** `AutoDraw_Stage20/fileGameEngine/main.min_570122a1.js` в `master`, добавлен commit `bd8815cfb5e8cdc3276d872c833adeb23bbf22ac`.  
+**Исходный исторический источник:** `AutoDraw_Stage20/fileGameEngine/main.min_570122a1.js` в `master`, добавлен commit `bd8815cfb5e8cdc3276d872c833adeb23bbf22ac`. Последующий анализ актуального пользовательски подтверждённого набора `AutoDraw_Stage20/gameEngine/` (п) приведён в разделах 11–13 ниже.  
 **Ограничение:** это статический анализ клиентского bundle; фактическая форма следа всё равно требует проверки по PNG и live captures.
 
 ## 1. Как движок считает CHALK
@@ -216,7 +216,7 @@ brush_footprint_geometry.footprint_pixel_bounds() возвращает прям�
 6. До renderer identity и frozen PNG comparison не менять production planner/defaults и не разблокировать FILL-001-RS matrix.
 
 **Уровень evidence:** E1 — статически прочитаны конкретные методы bundle и их связи; E0/E1 для вывода о deployed round caps/joins; пользовательское визуальное наблюдение отдельно зафиксировано. Runtime equivalence — NOT VALIDATED.
-## 12. Проверка фактически загружавшихся runtime assets — 2026-11-04
+## 12. Проверка исторических Resource Timing runtime assets — 2026-11-04
 
 Проверены сохранённые Resource Timing events в Game Monitor captures:
 - `source/game_monitor/autodraw-game-monitor-2026-10-30T01-57-14-095Z.json`;
@@ -289,7 +289,7 @@ Commit [d3322fe35c808bde079c79545cc839636b7cda2a](https://github.com/Kiddos19882
 
 Основной bundle задаёт `stage.frameRate=48` и `StageScaleMode.NO_SCALE`; это nominal target, а не измеренный FPS. Логические размеры BoardPane — 460×240. Popup/global transform и фактический screen ROI этим разбором не установлены.
 
-### 11.4. Важный риск выбора BoardPane в Game Monitor
+### 11.4. Историческое структурное наблюдение о BoardPane — NOT_APPLICABLE_TO_CURRENT_USER_SCENARIO
 
 В `main.min_653f95bc.js` существуют два экземпляра одного класса:
 
@@ -298,11 +298,19 @@ Commit [d3322fe35c808bde079c79545cc839636b7cda2a](https://github.com/Kiddos19882
 
 Текущий `source/game_monitor/game_monitor.js` ищет первый структурно подходящий объект через обход display list (`findBoard()` → `isBoard()`). Проверка требует `atom.points` и методов `onDrawStart/onDrawing/onDrawingEnd`, но не проверяет `interactive`, popup ownership или активность рисования. Следовательно, auto-discovery имеет неоднозначность и может выбрать preview BoardPane. Это не доказывает, что именно он выбирается в конкретном live session: порядок display list и фактическая привязка требуют отдельного подтверждения. Unit tests сейчас проверяют прямой `attach(board)` и replacement, но не несколько BoardPane в одном display list.
 
-До закрытия этого вопроса `boardDetected=true` само по себе не доказывает, что Game Monitor измеряет активный painterBoard. Следующая задача — установить безопасный критерий выбора и regression coverage; код/тесты не менялись.
+**Уточнение пользователя от 2026-11-04:** текущая игровая комната не содержит других досок; на экране используется одна пустая тестовая доска. В этом сценарии выяснение, выбрал ли Game Monitor preview BoardPane или PainterPopup BoardPane, не требуется и не является блокером. Структурная неоднозначность остаётся историческим фактом для других конфигураций, но получает статус `NOT_APPLICABLE_TO_CURRENT_USER_SCENARIO`. Это не доказывает универсальную корректность auto-discovery и не означает изменения кода/тестов.
 
 ### 11.5. Следующий шаг
 
-1. Статически проследить создание и порядок добавления preview BoardPane и PainterPopup в display list, а также найти безопасный признак активного painterBoard.
-2. Проверить popup → BoardPane → screen transform, clipping и соответствие logical 460×240 фактическому ROI.
-3. Подготовить frozen fixtures для smooth/normal path, прямых концов, поворотов, разных thickness и zero-length path; сравнить rasterization с capsule candidate.
-4. Только после offline gates и отдельного разрешения рассматривать live capture. Текущий анализ не запускал игру и не измерял CHALK.
+1. Проверить popup → BoardPane → screen transform, clipping и соответствие logical 460×240 фактическому ROI.
+2. Подготовить frozen fixtures для smooth/normal path, прямых концов, поворотов, разных thickness и zero-length path; сопоставить rasterization с offline capsule candidate.
+3. Только после offline gates и отдельного разрешения рассматривать live capture. Текущий документальный increment не запускал игру и не измерял CHALK.
+
+
+## 13. Уточнение области применимости — текущий сценарий Game Monitor (2026-11-04)
+
+Пользователь подтвердил, что рабочая игровая комната не содержит других досок, а на экране используется одна пустая тестовая доска. Поэтому ранее описанное различие preview `BoardPane` и `PainterPopup.painterBoard`, а также неоднозначность общего `findBoard()`, не являются требованием к текущему сценарию и не блокируют измерения в нём. В актуальном backlog задача выбора экземпляра исключена как `NOT_APPLICABLE_TO_CURRENT_USER_SCENARIO`; историческое техническое наблюдение в разделе 11.4 сохранено.
+
+Отдельно уточняется доказательность версии движка: в пользовательски подтверждённом согласованном наборе `gameEngine/main.min_653f95bc.js`, `mergeEngine_df2e5bc5.js` и `manifest.json` статически указана версия Egret 5.4.1. ROUND caps/joints defaults и реализация CanvasRenderer присутствуют в этом merge bundle. Более ранние Resource Timing captures с иным именем main bundle остаются историческими свидетельствами загрузок; их содержимое не подменяется текущим набором.
+
+**Остаются неизвестными:** какой render backend фактически использовался в конкретной старой capture-сессии; полный popup/global→screen transform и clipping; pixel footprint и rasterization zero-length path. Эти вопросы не закрываются одним номером версии движка и требуют соответствующих frozen fixtures/измерений.

@@ -1,3 +1,15 @@
+# Актуальная точка продолжения — 2026-11-04
+
+- **Рабочая ветка:** `feature/image-geometry-optimization`.
+- **HEAD на начало этой документальной синхронизации:** `59a730ea219671c236c642322e5365823d7c82e1`; последний commit добавил в backlog блокер выбора BoardPane, который не применим к подтверждённому текущему сценарию.
+- **Последний подтверждённый code/test HEAD по существующей статусной документации:** `af30b5fdf1c926d3493bff90706806f5d3a28c43`; полный CI [41859709320](https://github.com/Kiddos19882/AutoDraw/actions/runs/41859709320) — SUCCESS. Эта синхронизация не меняет code/test lineage.
+- **Сценарий Game Monitor:** комната без других досок; на экране одна пустая тестовая доска. Различение preview BoardPane и PainterPopup BoardPane не входит в текущий объём и не является блокером. Статическое наблюдение о двух экземплярах сохранено в профильном отчёте как историческое, не применимое к текущему сценарию.
+- **Игровые assets:** пользователь подтвердил, что `main.min_653f95bc.js`, `mergeEngine_df2e5bc5.js` и `manifest.json` скачаны с сайта запущенной игры одновременно. В согласованном наборе статически указана версия Egret **5.4.1**; ROUND caps/joints defaults и CanvasRenderer implementation найдены в merge bundle. Фактический backend активной сессии, zero-length rasterization, полный popup/global transform и pixel footprint всё ещё требуют отдельного evidence.
+- **Текущие технические gates:** FILL-001-RS capture остаётся REJECTED (exact CHALK=1260 для этого запуска; coverage=98.430600%, leakage=11); 45-cell matrix BLOCKED. INT-006 остаётся IN_PROGRESS до обоснования domain и safety margin; INT-007 BLOCKED. Capsule renderer acceptance/planner integration остаются открытыми.
+- **Ограничения:** эта работа — только документация. Исходники, тесты, конфигурации, workflow, экспериментальные данные и `master` не изменяются; игровые/live эксперименты не запускаются. GitHub API не даёт локальный `git status`.
+
+---
+
 ## Дополнение — размещение копии игровых engine assets (2026-11-04)
 
 В commit [d3322fe35c808bde079c79545cc839636b7cda2a](https://github.com/Kiddos19882/AutoDraw/commit/d3322fe35c808bde079c79545cc839636b7cda2a) в ветку `feature/image-geometry-optimization` добавлен каталог `AutoDraw_Stage20/gameEngine/` (п):
@@ -8,7 +20,7 @@
 
 Манифест перечисляет runtime paths `js/mergeEngine_df2e5bc5.js` и `js/main.min_653f95bc.js`; в дереве репозитория сами файлы находятся непосредственно в `gameEngine/`, без вложенного каталога `js/`.
 
-Это подтверждает наличие копии assets в рабочей ветке, но пока не доказывает, что браузерная игра загружает именно эти байты. Имя `main.min_653f95bc.js` отличается от исторического URL `main.min_6ecc02a4.js` и от ранее анализировавшегося `master:fileGameEngine/main.min_570122a1.js`. Совпадение `mergeEngine_df2e5bc5.js` по имени с историческим URL также не является доказательством совпадения содержимого.
+Это была историческая оценка на момент добавления файлов, до прямого подтверждения пользователя. Позднее пользователь подтвердил, что все три файла скачаны непосредственно с сайта запущенной игры в один момент; актуальный статус происхождения и анализа зафиксирован в разделе «подтверждённый источник игровых bundles» ниже. Старые Resource Timing captures с `main.min_6ecc02a4.js` остаются отдельными историческими свидетельствами и не подменяются текущим набором.
 
 **Следующий offline шаг:** статически исследовать добавленные bundles и сравнить их с доступными историческими evidence/предыдущим master bundle по содержимому и hash; уточнить, какую версию runtime представляет новая копия. Deployed runtime identity остаётся UNKNOWN до подтверждения. Live drawing, кодовые изменения и игровые эксперименты этим документированием не выполнялись.
 
@@ -70,7 +82,7 @@ Offline benchmark сравнил global-AABB reference и per-segment реали
 - Run `41840281018` на HEAD `730590d` был отменён (CANCELLED), а не провален. Его успешные отдельные jobs не заменяют полный CI. Run `41840582147` — подтверждённый полный SUCCESS для telemetry code lineage.
 - Per-stroke telemetry проверена по исходникам: Browser Bridge передаёт `strokeId` и raw requestAnimationFrame intervals; Bridge Server сохраняет `frame_probes`, формирует `frame_probe_by_stroke` и `per_stroke_metrics`. Важно: browser rAF — не Egret `ENTER_FRAME`; события `POINT_QUOTA_UPDATE` отражают изменения resource snapshot/принятые point updates, а не каждый кадр.
 - Сохранённый старый run `6a17a297` даёт 1260 point updates, median интервал 33 ms, cadence 28.26–29.50 points/s; первые/последние 9 штрихов — 28.734/29.049 points/s. Старые per-stroke rAF intervals не сохранены старым finalizer, поэтому новую frame_probe корреляцию нужно получить в будущем run после прохождения offline gate.
-- Уточнён статический renderer context: nominal stage.frameRate=48, StageScaleMode.NO_SCALE; PainterPopup 676×379, BoardPane 460×240 без собственного scaleX/scaleY. Это не определяет parent/global transform и device-pixel ratio. Egret 5.2.18 API указывает ROUND defaults для omitted caps/joints, но deployed runtime version не установлена; zero-length rasterization и фактический footprint остаются UNKNOWN.
+- Исторический статус до подтверждения текущего набора assets: nominal stage.frameRate=48, StageScaleMode.NO_SCALE; PainterPopup 676×379, BoardPane 460×240 без собственного scaleX/scaleY. Это не определяет parent/global transform и device-pixel ratio. Тогда использовалась ссылка на Egret 5.2.18 API, а deployed runtime version ещё не была установлена. Позднее в подтверждённом пользовательском наборе установлена Egret 5.4.1; zero-length rasterization и фактический footprint остаются UNKNOWN.
 - FILL-001-RS остаётся **BLOCKED**: capture REJECTED, coverage=98.430600%, leakage=11; exact CHALK=1260 (pointCount 1→1261) относится только к этому запуску. Критерии coverage≥99% и leakage=0 не выполнены. 45-task matrix не открывать.
 - Следующий gate: установить deployed Egret runtime identity, измерить popup global transform, отдельно проверить zero-length path rasterization и откалибровать фактический screen-space footprint на frozen geometry. Live preflight и 45-task matrix не запускать до прохождения offline gate; frozen plans/masks/thresholds/defaults не менять.
 
@@ -1148,8 +1160,8 @@ Planner integration и live renderer validation не выполнялись. Gen
 - Main bundle задаёт nominal `stage.frameRate=48`, `StageScaleMode.NO_SCALE`; логический BoardPane — 460×240. PainterPopup получает лимит из `blackBoard.maxPoint`.
 - `mergeEngine_df2e5bc5.js` объявляет `egret.Capabilities.engineVersion="5.4.1"`. Его `GraphicsNode.lineStyle()` подставляет ROUND caps/joints, когда параметры не заданы; CanvasRenderer передаёт их в `context.lineCap`/`lineJoin` и вызывает `stroke()`.
 
-**Новый риск интеграции Game Monitor:** игровой bundle содержит два структурно подходящих `BoardPane`: preview instance внутри `BoardItemBase` (`interactive=false`) и активный `PainterPopup.painterBoard` (`interactive=true`). Текущий `game_monitor.js` ищет первый структурно подходящий объект обходом display list и не различает эти экземпляры. Unit tests покрывают прямой attach/replacement, но не выбор при нескольких BoardPane. Это подтверждённая неоднозначность алгоритма обнаружения; какой именно объект выбирается в живом iframe, пока UNKNOWN. Добавлена задача `MONITOR-BOARD-SELECTION-001` в `TASKS.md`.
+**Историческое структурное наблюдение (не блокер текущего сценария):** в bundle существуют preview `BoardPane` внутри `BoardItemBase` (`interactive=false`) и `PainterPopup.painterBoard` (`interactive=true`); статически отмечено, что auto-discovery не различает эти экземпляры. Пользователь уточнил, что текущая комната не содержит других досок и используется одна пустая тестовая доска. Поэтому проверка выбора между двумя экземплярами имеет статус `NOT_APPLICABLE_TO_CURRENT_USER_SCENARIO`; задача `MONITOR-BOARD-SELECTION-001` исключена из актуального backlog. Это не означает, что алгоритм auto-discovery изменён или универсально исправлен.
 
-**Ограничения:** статический разбор не является runtime validation raster footprint, zero-length path, popup global transform или фактической cadence. Не запускались игра, live capture и эксперименты; исходники, тесты, конфигурации и workflow не изменялись. GitHub API не предоставляет локальный `git status`.
+**Ограничения:** статический разбор не является runtime validation zero-length rasterization, popup global transform, фактического screen footprint или cadence. Новые игровые/live эксперименты в рамках этой документальной синхронизации не запускались; исходники, тесты, конфигурации и workflow не изменялись. GitHub API не предоставляет локальный `git status`.
 
-**Следующий шаг:** статически уточнить display-list ownership/order и контракт выбора active PainterPopup BoardPane; затем проверить transform/clipping и frozen renderer fixtures для Egret 5.4.1. Live-проверка — только после offline gates и отдельного разрешения.
+**Следующий технический шаг:** продолжать с FILL-001-RS renderer footprint/transform и offline frozen-fixture gates, а не с выбора экземпляра BoardPane. Live-проверка — только после offline gates и отдельного разрешения.

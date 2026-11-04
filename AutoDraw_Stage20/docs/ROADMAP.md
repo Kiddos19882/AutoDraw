@@ -2,22 +2,17 @@
 
 INT-003 и CHALK-SAMPLING-DOMAIN закрыты как NOT_REQUIRED по решению пользователя; не планировать отдельные работы по A/B/C overhead Monitor и расширению sampling-domain. Исторические evidence остаются.
 
-Текущая последовательность обязательных работ:
-1. **P0 — FILL-001-RS renderer footprint:** установить deployed renderer и полный popup→board transform; откалибровать footprint; пройти offline PNG gate coverage≥99%, leakage=0.
-2. **P0 — single-task live preflight:** только после offline PASS и отдельного разрешения пользователя. Последний capture (coverage 98.430600%, leakage 11) отклонён.
+## Актуальная последовательность работ
+
+1. **P0 — FILL-001-RS renderer footprint/transform:** Egret 5.4.1, ROUND caps/joints defaults и CanvasRenderer implementation подтверждены в согласованном наборе assets, происхождение которого пользователь подтвердил как скачивание с сайта запущенной игры. Остаётся установить фактический render backend активной сессии, полный popup→board→screen transform, clipping/device-pixel mapping и footprint на frozen fixtures; пройти offline PNG gate coverage≥99%, leakage=0.
+2. **P0 — single-task live preflight:** только после offline PASS и отдельного разрешения пользователя. Последний capture (coverage 98.430600%, leakage 11) отклонён; exact CHALK=1260 относится только к этому capture.
 3. **P0 — FILL-001-RS 45-cell matrix:** только после принятого single-task preflight и отдельного разрешения; 15 shape×radius cells × 3 повтора.
 4. **P1 — BRUSH-FOOTPRINT-CAPSULE-001:** завершить offline fixture comparison/renderer agreement и решить, нужна ли интеграция generic planner. Это отдельная геометрическая корректность; не установленная причина RS rejection.
 5. **P1 — INT-006:** расширить domain модели CHALK и установить error bounds/safety margin; до этого estimator/defaults не менять и INT-007 не начинать.
 
+**Объём Game Monitor:** текущая комната пользователя не содержит других досок; на экране одна пустая тестовая доска. Исторически найденное различие preview/PainterPopup BoardPane помечено `NOT_APPLICABLE_TO_CURRENT_USER_SCENARIO` и не является пунктом roadmap. Это не означает исправление общего auto-discovery для сценариев с несколькими досками.
+
 INT-006 можно вести как отдельную offline/validation работу без запуска live экспериментов; для любых новых live captures требуется отдельное разрешение.
-
-## Приоритетная гипотеза для FILL-001-RS — sparse fill + connected contour (2026-11-04)
-
-При остаточных пропусках, локализованных преимущественно по внешнему периметру, первым отдельным offline-кандидатом после прохождения renderer/footprint gates проверять **редкий внутренний scanline-fill + один связный обход контура + локальные внутренние коррекции**. Не считать глобальное уплотнение горизонтальных проходов вариантом по умолчанию.
-
-Это гипотеза о возможном снижении exact CHALK, а не доказанный результат. Исторический `outline-first` benchmark использовал множество независимых горизонтальных boundary runs, а не один связный contour route; его отрицательный результат не опровергает эту стратегию. Сравнивать A) плотный scanline, B) редкий scanline с дополнительными горизонтальными штрихами и C) редкий scanline со связным контуром по exact `pointCount_after - pointCount_before`, PNG coverage/leakage и отдельным диагностическим метрикам.
-
-Связный контур должен пройти swept-footprint/color-safety проверку. Не менять frozen plans/masks/thresholds/defaults, не открывать 45-task matrix и не запускать live experiment до закрытия текущих gates и отдельного разрешения. Полная формулировка, критерии и ограничения — в [приоритетном выводе TASKS.md](TASKS.md#ключевой-технический-вывод-для-fill-001-rs--связный-контур-вместо-глобального-уплотнения-scanline).
 
 ---
 
@@ -33,10 +28,10 @@ INT-006 можно вести как отдельную offline/validation ра�
 
 Telemetry implementation для будущих запусков завершена и прошла полный CI: run [41840582147](https://github.com/Kiddos19882/AutoDraw/actions/runs/41840582147) SUCCESS. Browser Bridge связывает frame_probe с strokeId и сохраняет rAF intervals; Bridge Server сохраняет raw frame probes, per-stroke frame summaries и per-stroke point-count metrics. Старый run `6a17a297` не содержит raw per-stroke rAF series, но его point cadence восстановлена по 1260 POINT_QUOTA_UPDATE: median 33 ms, 28.26–29.50 accepted points/s. Не смешивать browser rAF (~60 FPS), nominal Egret stage.frameRate=48 и фактическую cadence принятия точек.
 
-Статический renderer audit уточнён: PainterPopup 676×379, BoardPane 460×240 без локального scale; stage NO_SCALE, nominal frameRate 48. Egret 5.2.18 API указывает ROUND caps/joints defaults, однако deployed runtime identity не установлена. Parent/global transform, device-pixel ratio, zero-length rasterization и фактический screen footprint остаются открытыми.
+Статический renderer audit уточнён: PainterPopup 676×379, BoardPane 460×240 без локального scale; stage NO_SCALE, nominal frameRate 48. В подтверждённом пользовательском наборе assets установлена версия Egret 5.4.1; merge bundle содержит ROUND defaults caps/joints и CanvasRenderer path. Это не доказывает, какой backend был активен в конкретной старой сессии. Parent/global transform, device-pixel ratio, zero-length rasterization и фактический screen footprint остаются открытыми.
 
 **Следующие шаги:**
-1. **Исследовать новую копию assets в feature branch:** `AutoDraw_Stage20/gameEngine/main.min_653f95bc.js`, `mergeEngine_df2e5bc5.js` и `manifest.json` (commit [d3322fe](https://github.com/Kiddos19882/AutoDraw/commit/d3322fe35c808bde079c79545cc839636b7cda2a)). Сравнить содержимое/hash с историческими URL из captures (`/old/manifest.json`, `/old/js/mergeEngine_df2e5bc5.js`, `/old/js/main.min_6ecc02a4.js`) и ранее изученным `master:fileGameEngine/main.min_570122a1.js`. Если новая копия не совпадает с историческими assets, получить их response bodies из browser cache/DevTools Network. Resource Timing metadata подтверждает URL, но не содержимое; deployed runtime identity не считать установленной до сравнения.
+1. **Завершено — подтверждение актуального набора assets:** пользователь подтвердил, что `AutoDraw_Stage20/gameEngine/main.min_653f95bc.js`, `mergeEngine_df2e5bc5.js` и `manifest.json` скачаны с сайта запущенной игры одновременно. Сверка с `master:fileGameEngine/main.min_570122a1.js` не требуется. Для этого набора статически установлена версия Egret 5.4.1. Исторические Resource Timing captures с `main.min_6ecc02a4.js` остаются отдельным свидетельством старых загрузок и не используются как основание текущей runtime-идентификации.
 2. Измерить полный global/display transform painter popup BoardPane, включая родительские контейнеры и browser pixel mapping.
 3. Проверить zero-length stroke rasterization на соответствующем runtime или независимом controlled PNG capture.
 4. Откалибровать screen-space footprint и endpoints для нескольких brush widths на одной frozen geometry; сохранить raw PNG и hashes.
@@ -56,7 +51,7 @@ Offline pixel localization завершена: исходный capture fill001-
 **Порядок следующего increment:**
 1. Извлечь per-stroke Bridge frame_probe intervals и связать с pointCount deltas / Executor step-delay.
 2. Измерить global/display transform интерактивного painter popup BoardPane; локальный scale не задаётся, но родительский/CSS/devicePixelRatio transform не установлен.
-3. Установить фактически подключённую версию Egret runtime. Egret 5.2.18 API указывает ROUND caps/joins по умолчанию, однако это ещё не подтверждено для deployed runtime. Проверить zero-length path rasterization отдельным controlled PNG capture.
+3. Версия Egret 5.4.1 и ROUND defaults caps/joins установлены для подтверждённого набора assets. Проверить фактически используемый backend активной сессии и zero-length path rasterization на frozen fixture/controlled PNG capture.
 4. Построить независимую versioned модель footprint и perimeter/endpoint candidates; проверить coverage≥99%, leakage=0.
 5. Только после offline gate выполнить отдельный live preflight; 45-task matrix открывать лишь после его принятия.
 

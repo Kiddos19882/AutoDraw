@@ -15,9 +15,8 @@
 | INT-007 | P2 | BLOCKED | Интеграция модели после INT-006 |
 | INT-008 | P2 | TODO/BLOCKED | Оптимизация кистей/траекторий/покрытия после INT-007 |
 | INT-009 | P2 | TODO/BLOCKED | Holdout-проверка прогноза, exact CHALK и качества полного рисунка |
-| MONITOR-BOARD-SELECTION-001 | P0 | BLOCKED | Проверить, что auto-discovery Game Monitor выбирает активный PainterPopup BoardPane, а не preview BoardPane |
 | MONITOR-AUTOCAPTURE-STATUS | P2 | RECONCILE | Старый bridge design расходится с DONE-статусом INT-004 и поздними captures |
-| DOC-STATUS-SYNC | P2 | OPEN | Синхронизировать устаревшие статусы планов и справочников с TEST_RESULTS.md и текущим backlog |
+| DOC-STATUS-SYNC | P2 | IN_PROGRESS | Управляющие документы синхронизированы; остаются исторические профильные планы/design/README со статусами, перечисленными ниже |
 | INT-003 | — | CLOSED_NOT_REQUIRED | По решению пользователя: отдельное исследование overhead Monitor не требуется |
 | CHALK-SAMPLING-DOMAIN | — | CLOSED_NOT_REQUIRED | По решению пользователя: расширение sampling-domain не требуется |
 
@@ -37,15 +36,13 @@
 
 **Дополнение 2026-11-04 — происхождение engine assets подтверждено пользователем:** все три файла в `AutoDraw_Stage20/gameEngine/` — `main.min_653f95bc.js`, `mergeEngine_df2e5bc5.js` и `manifest.json` — скачаны непосредственно с сайта запущенной игры в один момент; пользователь подтвердил достоверность источника 100%. Считать их единым согласованным набором. Сверка с `master/fileGameEngine/main.min_570122a1.js` не требуется и не входит в план. Git blob IDs и пути приведены в [PROJECT_STATUS.md](PROJECT_STATUS.md).
 
-**Следующий технический шаг:** (1) разрешить неоднозначность auto-discovery Game Monitor: `BoardItemBase.createNativeContent()` создаёт preview `BoardPane` с `interactive=false`, а `PainterPopup.createBlackBoard()` создаёт второй активный `painterBoard`; `findBoard()` Game Monitor возвращает первый структурно подходящий объект и не фильтрует по interactive/активности. (2) Проверить popup → BoardPane → screen transform и clipping. (3) На frozen fixtures проверить smooth/normal path, round caps/joins и zero-length stroke для Egret 5.4.1. Live capture остаётся запрещён до прохождения offline gates и отдельного разрешения.
+**Текущий сценарий пользователя (2026-11-04):** в комнате нет других досок; на экране используется одна пустая тестовая доска. Поэтому выяснение, выбрал ли Game Monitor preview `BoardPane` или `PainterPopup.painterBoard`, не является требованием или блокером текущего сценария. Историческое структурное наблюдение о двух экземплярах сохранено ниже как `NOT_APPLICABLE_TO_CURRENT_USER_SCENARIO`; это не утверждение, что неоднозначность алгоритма auto-discovery исправлена.
 
-### MONITOR-BOARD-SELECTION-001 — однозначный выбор активной доски
+### Историческое наблюдение о двух экземплярах BoardPane — NOT_APPLICABLE_TO_CURRENT_USER_SCENARIO
 
-**Основание:** актуальный main bundle создаёт отдельный preview `BoardPane` внутри `BoardItemBase` с `interactive=false`, а при открытии PainterPopup создаёт второй `BoardPane` (`painterBoard`) с `interactive=true`. В текущем `game_monitor.js` `findBoard()` выполняет обход display list и возвращает первый объект, удовлетворяющий структурной проверке `isBoard()`; проверок `interactive`, видимости, popup ownership или активного рисования нет. Поэтому статически подтверждена неоднозначность выбора, но конкретный выбранный экземпляр в живом iframe без runtime evidence не установлен.
+Статический анализ подтверждает, что bundle содержит preview `BoardPane` внутри `BoardItemBase` с `interactive=false` и рабочий `PainterPopup.painterBoard` с `interactive=true`; текущий алгоритм `findBoard()` структурно не различает их. Для абстрактного сценария с несколькими досками это остаётся известным ограничением auto-discovery. Однако пользователь подтвердил, что текущая игровая комната не содержит других досок и на экране используется одна пустая тестовая доска. В рамках этого сценария неоднозначность выбора экземпляра не требуется исследовать и не блокирует работу Game Monitor.
 
-**Пробел проверки:** существующие unit tests проверяют прямой `attach(board)` и замену экземпляра, но не сценарий нескольких BoardPane в display list.
-
-**Критерий закрытия:** доказать, что Monitor привязывается именно к активному `PainterPopup.painterBoard`, либо определить и проверить безопасный критерий выбора; добавить regression coverage после отдельного разрешения на изменение кода/тестов. До закрытия не считать один `boardDetected=true` доказательством привязки к активной доске.
+**Статус:** исключено из текущего объёма по прямому уточнению пользователя; код и тесты не менялись. Историческое наблюдение сохранено, техническое исправление не заявляется.
 
 ### 2. FILL-001-RS-MATRIX — полная матрица из 45 экспериментов
 
@@ -78,7 +75,7 @@
 **Текущее evidence:** versioned RS run: 27/27 strokes, radius=10, exact CHALK=1260 (pointCount 1→1261), но PNG capture REJECTED: coverage=98.430600%, leakage=11 при thresholds coverage≥99% и leakage=0. Actual PNG diagnostic: 1116 uncovered pixels, все в perimeter zones; leakage — 11 пикселей. Физическая причина пока не установлена. Более ранний FILL-001 attempt исчерпал квоту на 5999 CHALK при 128/131 consuming strokes; это censored attempt, не полная стоимость рисунка.
 
 Открытые задачи:
-1. Подтвердить реально загруженную версию Egret/runtime и render path целевой игры; установить caps/joins defaults и zero-length rasterization именно этой версии.
+1. Версия Egret 5.4.1 и ROUND defaults caps/joints подтверждены статически в пользовательски подтверждённом согласованном наборе игровых assets. Остаётся установить фактически используемый backend/path активной сессии и проверить zero-length rasterization; исторические Resource Timing captures не доказывают идентичность более ранних JS assets.
 2. Измерить полный global/display transform PainterPopup→BoardPane с родительскими контейнерами, CSS/canvas scaling, browser zoom, devicePixelRatio и screen ROI.
 3. Снять before/after PNG и hashes для frozen geometry при нескольких радиусах; отдельно измерить середину штриха, endpoints, диагонали, повороты и zero-length.
 4. Построить отдельные versioned perimeter/endpoint candidates. Сравнить dense scanline, sparse scanline + horizontal corrections и sparse scanline + связный contour + локальные коррекции.
@@ -93,7 +90,7 @@
 
 **Выполнено:** swept_capsule_pixel_masks, potential/guaranteed masks, per-segment broad-phase, independent full-canvas oracle, edge/seeded tests, benchmark и CI 41859709320 PASS.
 
-**Открыто:** подтвердить deployed renderer/version и popup transform; получить frozen PNG fixtures для горизонтальных концов, диагоналей, joins, nonuniform scale, clipping и соседних цветов; сравнить potential/guaranteed masks с фактическим footprint; проверить bbox coverage overclaim в generic interior_fill_planner; только после acceptance решить planner integration. Live capture — после offline acceptance и отдельного разрешения. Это не доказанная причина FILL-001-RS residual.
+**Открыто:** версия Egret 5.4.1 подтверждена в согласованном наборе assets; остаётся установить фактически используемый render backend и popup/global transform, получить frozen PNG fixtures для горизонтальных концов, диагоналей, joins, nonuniform scale, clipping и соседних цветов; сравнить potential/guaranteed masks с фактическим footprint; проверить bbox coverage overclaim в generic interior_fill_planner; только после acceptance решить planner integration. Live capture — после offline acceptance и отдельного разрешения. Это не доказанная причина FILL-001-RS residual.
 
 ## P1 — INT-006: расширение validation CHALK и safety margin
 
