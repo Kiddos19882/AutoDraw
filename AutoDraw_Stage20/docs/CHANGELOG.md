@@ -6,6 +6,12 @@
 - Последние интервалы всех штрихов 3–9 при lineWidth=10: идеальный round cap достигает последней принятой точки. Smooth endpoint omission сама по себе не объясняет PNG residual; mouseup-to-last-sample и пиксельная маска остаются неизвестными.
 - Добавлены offline analyzer, unit tests и derived report JSON.
 
+## 2026-11-04 — установлена реальная форма clipping mask доски
+
+- `PainterPopup` применяет `boardMask` через `drawRoundRect(...,10)`; Egret 5.4.1 делит ellipseWidth/Height пополам, фактический corner radius=5 logical px.
+- `painterBoard.mask=boardMask`; `BoardPane.scrollRect` дополнительно задаёт прямоугольный clip 460×240.
+- Offline fixtures должны моделировать оба механизма, не заменять маску прямоугольником.
+
 ## 2026-11-04 — уточнена семантика конечной точки smooth brush path
 
 - Подтверждено, что игровой `Painter.drawSmoothLine(..., true, false)` не добавляет `lineTo(lastPoint)`; `onDrawingEnd()` не завершает этот сегмент.
