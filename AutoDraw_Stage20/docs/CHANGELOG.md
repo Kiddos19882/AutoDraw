@@ -3,7 +3,7 @@
 - Выполнен replay исходных before/after PNG и связанных evidence через `Fill001Tab.finalize_capture()` в CI [41780241017](https://github.com/Kiddos19882/AutoDraw/actions/runs/41780241017), checkout HEAD `0f23731`.
 - Runtime binding PASS: 27/27 strokes, radius=10, exact CHALK=1260, Bridge diagnostics без потерь/ошибок.
 - Corrected PNG audit: coverage=98.430600%, leakage=11 — capture REJECTED при неизменных требованиях ≥99% / 0. Предыдущие 97.673218% / 28 относятся к audit до affine correction.
-- SHA-256 исходных PNG и входных JSON сохранены в [replay report](CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md). Остаточная причина mismatch требует offline pixel breakdown; live и 45-task matrix остаются BLOCKED.
+- SHA-256 исходных PNG и входных JSON сохранены в [replay report](CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md). Raw runtime plan hash mismatch разрешён: CRLF-представление committed текста точно совпадает с hash в executor report; содержательного mismatch нет. Остаточная причина PNG mismatch требует offline pixel breakdown; live и 45-task matrix остаются BLOCKED.
 
 ## 2026-11-04 — FILL-001-RS PNG audit transform correction
 
