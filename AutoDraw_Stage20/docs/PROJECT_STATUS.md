@@ -15,7 +15,7 @@
 - Измеренные GraphicsNode bounds: обычные fixture — `(-2,-2,464,244)`; mask-corner width10/30 — `(-5,-5,467,247)` / `(-15,-15,477,257)`; scrollrect-edges width10/30 — `(-25,-2,510,244)` / `(-35,-2,530,244)`.
 - Single-point path содержит только moveTo и не даёт видимого alpha, но BoardPane.resetBg() создаёт full-board GraphicsNode. Поэтому этот реальный BoardPane не является empty-node case и не должен пропускаться generic WebGLRenderer empty-bounds guard.
 - Это подтверждает точное совпадение manual path transcription с actual BoardPane в Egret CanvasRenderer. WebGL context не создавался; texture LINEAR sampling, premultiplied-alpha upload, mask stencil, scrollRect в WebGL и pixel equivalence с live game capture ещё не подтверждены.
-- Run `41916449025` на момент записи: browser, Game Monitor/Bridge, Executor и Application integration jobs SUCCESS; Preparation/G3 ещё выполнялся. Full workflow conclusion пока не заявляется.
+- Full GitHub Actions run `41916449025` завершился `SUCCESS` на commit `63d9dab586d6a6801b2afbbe964686877419131f`: Game Monitor/Bridge, Executor, Application integration, Preparation/G3, Egret actual BoardPane browser harness, INT-006 pixel PNG audit и Windows portable build/startup smoke-test — SUCCESS. Optional algorithm benchmarks — SKIPPED по workflow policy. После этого run в ветке были только docs commits (`ahead_by=9`, changed paths — docs only), поэтому CI PASS применим к неизменённым source/test/workflow files.
 
 ## Дополнение — renderer browser gate изолирован от preparation suite (2026-11-04)
 
