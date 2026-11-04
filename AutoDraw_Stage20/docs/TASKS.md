@@ -38,6 +38,18 @@
 
 **Текущий сценарий пользователя (2026-11-04):** в комнате нет других досок; на экране используется одна пустая тестовая доска. Поэтому выяснение, выбрал ли Game Monitor preview `BoardPane` или `PainterPopup.painterBoard`, не является требованием или блокером текущего сценария. Историческое структурное наблюдение о двух экземплярах сохранено ниже как `NOT_APPLICABLE_TO_CURRENT_USER_SCENARIO`; это не утверждение, что неоднозначность алгоритма auto-discovery исправлена.
 
+### GAME-BRUSH-REPLICATION — воспроизведение цепочки игровой кисти
+
+**Статус:** SOURCE TRACE COMPLETE (E1); OFFLINE REPLICA NOT IMPLEMENTED; PIXEL EQUIVALENCE NOT VALIDATED. Это исследовательский подэтап FILL-001-RS renderer footprint, а не замена измерениям CHALK или отдельное разрешение на live run.
+
+**Что установлено по согласованному набору assets:** ввод проходит через BoardPane.onMouseDown → onDrawStart → ENTER_FRAME/onDrawing → onDrawingEnd; принятые координаты переводятся через globalToLocal, проверяются по локальным границам и deduplicate через BlackBoardAtom.pushPoint. Геометрия строится Painter.drawNormalLine или midpoint/curveTo smooth path. Значение UI передаётся в Egret как line width; caps/joints по умолчанию round. Подробная трассировка и ссылки на Git blob SHA — в [отчёте игрового движка, раздел 14](CHALK_GAME_ENGINE_POINT_COST_AND_BRUSH_WIDTH_2026-11-03.md#14-полная-трассировка-цепочки-игровой-кисти-и-границы-воспроизведения--2026-11-04).
+
+**Ключевое ограничение:** игра сохраняет координаты, наблюдаемые на ENTER_FRAME, а не все move events AutoDraw. Поэтому планировщик/Executor не может получить идентичный список точек только из геометрической траектории. В bundle доступны Canvas и WebGL renderer; фактически выбранный режим, полный transform и device-pixel mapping не установлены.
+
+**Текущие реализации AutoDraw не являются копией renderer:** FILL-001 использует OpenCV round-capped lines, Capsule — идеальную round-capped polyline, а generic interior fill — rectangular footprint checks. Ни один из этих путей не воспроизводит полностью игровой sampling + smooth path + backend rasterization.
+
+**Следующий offline шаг:** установить renderer mode/полный transform из runtime boot configuration или контролируемого capture; затем построить frozen reference fixtures и offline harness для input sampling, normal/smooth path, clipping и PNG comparison. Не менять production planner/defaults и не запускать live experiments до прохождения offline gate и отдельного разрешения пользователя.
+
 ### Историческое наблюдение о двух экземплярах BoardPane — NOT_APPLICABLE_TO_CURRENT_USER_SCENARIO
 
 Статический анализ подтверждает, что bundle содержит preview `BoardPane` внутри `BoardItemBase` с `interactive=false` и рабочий `PainterPopup.painterBoard` с `interactive=true`; текущий алгоритм `findBoard()` структурно не различает их. Для абстрактного сценария с несколькими досками это остаётся известным ограничением auto-discovery. Однако пользователь подтвердил, что текущая игровая комната не содержит других досок и на экране используется одна пустая тестовая доска. В рамках этого сценария неоднозначность выбора экземпляра не требуется исследовать и не блокирует работу Game Monitor.
