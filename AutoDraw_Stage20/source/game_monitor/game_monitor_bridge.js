@@ -25,6 +25,7 @@
   let fpsActive = false;
   let fpsStartedAt = null;
   let frameTimes = [];
+  let fpsStrokeId = null;
   let sentEventCount = 0;
   let lastEventType = null;
   let lastEventAtPerformanceMs = null;
@@ -52,6 +53,7 @@
     const intervals = [];
     for (let i = 1; i < frameTimes.length; i++) intervals.push(Number((frameTimes[i] - frameTimes[i - 1]).toFixed(3)));
     send("frame_probe", {
+      strokeId: fpsStrokeId,
       startedAtPerformanceMs: fpsStartedAt,
       endedAtPerformanceMs: performance.now(),
       visible: document.visibilityState === "visible",
@@ -59,10 +61,12 @@
     });
     frameTimes = [];
     fpsStartedAt = null;
+    fpsStrokeId = null;
   };
 
-  const startFpsProbe = () => {
+  const startFpsProbe = strokeId => {
     if (fpsActive) return;
+    fpsStrokeId = typeof strokeId === "string" ? strokeId : null;
     fpsActive = true;
     fpsStartedAt = performance.now();
     frameTimes = [];
@@ -98,7 +102,7 @@
         // BoardPane callbacks are not exposed in every game frame. Pointer
         // candidates are the explicit fallback lifecycle; startFpsProbe/stopFpsProbe
         // are idempotent so engine and pointer events cannot double-count probes.
-        if (item.type === "DRAW_START" || item.type === "POINTER_DOWN_CANDIDATE") startFpsProbe();
+        if (item.type === "DRAW_START" || item.type === "POINTER_DOWN_CANDIDATE") startFpsProbe(item.strokeId);
         if ((item.type === "DRAW_END" || item.type === "POINTER_UP_CANDIDATE") && fpsActive) stopFpsProbe();
         sentEventCount++;
         lastEventType = item.type;
