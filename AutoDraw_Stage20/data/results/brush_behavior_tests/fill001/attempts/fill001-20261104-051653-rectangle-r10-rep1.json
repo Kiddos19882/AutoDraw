@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "phase_id": "FILL001",
+  "task": {
+    "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
+    "matrix_order_index": 7,
+    "phase_id": "FILL001",
+    "series_id": "fill001-20261104-051653",
+    "shape_id": "rectangle",
+    "requested_radius": 10,
+    "repeat_index": 1,
+    "planned_repeats": 3,
+    "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e",
+    "target_mask_sha256": "ac1c6660e5986cdf534328c6dbcd5020f631168b1473c24b29e7609eb827998b",
+    "expected_strokes": 131,
+    "target_area_pixels": 44653,
+    "planned_path_length": 40218.0,
+    "planned_coverage_fraction": 1.0,
+    "planned_leakage_pixels": 0,
+    "quality_gate_passed": true,
+    "unsupported": false,
+    "sampling_profile": {
+      "profile_id": "P1",
+      "sampling_step": 4,
+      "delay_ms": 5
+    },
+    "safe_to_execute": false,
+    "capture_status": "pending"
+  },
+  "manifest_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw-feature-image-geometry-optimization\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\fill001\\fill001-20261104-051653.json",
+  "plan_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw-feature-image-geometry-optimization\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\fill001\\plans\\fill001-20261104-051653-rectangle-r10-rep1.json",
+  "status": "execution_completed_pending_runtime_and_png_audit",
+  "created_at_utc": "2026-11-04T02:18:32.686325+00:00",
+  "execution_report_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw-feature-image-geometry-optimization\\AutoDraw_Stage20\\data\\results\\execution_20261104_052219_185570_5065f9.json",
+  "before_png": "C:\\Users\\Kiddos\\Desktop\\AutoDraw-feature-image-geometry-optimization\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\fill001\\captures\\fill001-20261104-051653-rectangle-r10-rep1-before.png",
+  "screen_roi": {
+    "x": 566,
+    "y": 253,
+    "width": 581,
+    "height": 304
+  },
+  "after_png": "C:\\Users\\Kiddos\\Desktop\\AutoDraw-feature-image-geometry-optimization\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\fill001\\captures\\fill001-20261104-051653-rectangle-r10-rep1-after.png",
+  "capture_path": null,
+  "finished_at_utc": "2026-11-04T02:22:19.193571+00:00",
+  "executor_status": "completed",
+  "after_png_captured_at_utc": "2026-11-04T02:22:20.526177+00:00"
+}
