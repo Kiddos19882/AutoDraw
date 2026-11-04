@@ -509,7 +509,22 @@ BoardPane stage corners из runtime: TL=(519.791666,72), TR=(979.791666,72), BR
 
 Не использовать radius=10 для roundRect mask и не заменять mask одним прямоугольным clip в reference fixtures. Pixel-level edge coverage ещё требует сравнения.
 
-### 15.9 Границы доказательства и следующий шаг
+### 15.9 Offline Egret CanvasRenderer reference harness
+
+Добавлены:
+
+- `tests/game_renderer_reference.html` — локальная browser page;
+- `tests/game_renderer_reference.js` — path transcription, Egret GraphicsNode creation и CanvasRenderer source raster;
+- `tests/game_renderer_reference.test.js` — Node tests для 1/2/3+ smooth points и normal path;
+- CI steps `node --check` + `node --test` в `.github/workflows/geometry-tests.yml`.
+
+Harness использует локальный `gameEngine/mergeEngine_df2e5bc5.js`, `egret.Shape`, `egret.CanvasRenderer` и raster scale 3. Создаёт 9 cases × lineWidth 10/30 = 18 fixtures: single point, smooth 2/3/4-point, normal horizontal/diagonal/L-turn, mask corner и scrollRect edges. Source texture raster stage выполняется настоящим Egret CanvasRenderer. Дополнительный board output композитит source texture и roundRect mask через Canvas2D; это намеренно помечено в manifest как approximation, поскольку WebGL texture upload/filtering и mask stencil pipeline не исполняются.
+
+Manifest содержит Egret engine version, source bundle, browser userAgent/platform, devicePixelRatio и viewport. Запуск из корня checkout: `python -m http.server 8765`, затем `http://localhost:8765/AutoDraw_Stage20/tests/game_renderer_reference.html`.
+
+**Текущий статус:** файлы созданы, path builder покрыт Node tests; CI run [41901639258](https://github.com/Kiddos19882/AutoDraw/actions/runs/41901639258) выполняется. Сам browser page не запускался в этой среде; PNG outputs и comparison с game capture ещё не получены.
+
+### 15.10 Границы доказательства и следующий шаг
 
 - Snapshot — один runtime capture, не live drawing и не brush experiment.
 - `pointCount=1` / remaining=5999 — текущее состояние; без pre/post pair это не расход CHALK отдельного запуска.
@@ -517,4 +532,4 @@ BoardPane stage corners из runtime: TL=(519.791666,72), TR=(979.791666,72), BR
 - `systemRenderer` constructor name `n` не идентифицирует класс без статической связи с `renderMode`.
 - Не установлены: фактический pixel footprint single point/zero-length path, Canvas2D antialiasing, texture interpolation, точное clipping/mask поведение на границе и PNG pixel equivalence.
 
-**Следующий этап:** offline renderer reference harness с точными 1/2/3+ point smooth path semantics, normal lines (horizontal/vertical/diagonal), caps/joins, turns и board clipping. Сравнивать с PNG из той же browser/runtime сессии, проверить mouseup-to-last-sample и измерить реальную пиксельную маску/texture filtering. Не менять planner/defaults до acceptance. FILL-001-RS live preflight и 45-cell matrix остаются закрытыми до прохождения offline gate и отдельного разрешения.
+**Следующий этап:** выполнить browser harness, сохранить 18 source texture PNG, 18 masked-board PNG и manifest. Сопоставить source texture с PNG из той же игровой сессии; затем отдельно получить reference финального WebGL texture/mask output (текущий harness его не выполняет). Проверить mouseup-to-last-sample и реальную пиксельную маску/texture filtering. Не менять planner/defaults до acceptance. FILL-001-RS live preflight и 45-cell matrix остаются закрытыми до прохождения offline gate и отдельного разрешения.
