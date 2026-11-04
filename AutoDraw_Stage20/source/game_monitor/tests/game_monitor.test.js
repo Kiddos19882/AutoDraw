@@ -128,6 +128,16 @@ test("MOUSE_MOVE_SAMPLE records delivered DOM and Egret/BoardPane coordinates du
     type: "pointerdown", target: canvas, clientX: 20, clientY: 30, pointerType: "mouse"
   });
   dispatchWindowEvent("mousemove", {
+    type: "mousemove", target: canvas, clientX: 22, clientY: 32,
+    pageX: 23, pageY: 33, screenX: 1023, screenY: 733,
+    movementX: 2, movementY: 2, buttons: 1, timeStamp: 108.5
+  });
+  assert.equal(monitor.export().events.some(event => event.type === "MOUSE_MOVE_SAMPLE"), false);
+  assert.equal(monitor.status().inputTelemetryEnabled, false);
+
+  monitor.setInputTelemetryEnabled(true);
+  assert.equal(monitor.status().inputTelemetryEnabled, true);
+  dispatchWindowEvent("mousemove", {
     type: "mousemove", target: canvas, clientX: 24, clientY: 34,
     pageX: 25, pageY: 35, screenX: 1025, screenY: 735,
     movementX: 4, movementY: 4, buttons: 1, timeStamp: 116.75
@@ -145,6 +155,14 @@ test("MOUSE_MOVE_SAMPLE records delivered DOM and Egret/BoardPane coordinates du
   assert.equal(event.boardX, 42);
   assert.equal(event.boardY, 33);
 
+  monitor.setInputTelemetryEnabled(false);
+  dispatchWindowEvent("mousemove", {
+    type: "mousemove", target: canvas, clientX: 25, clientY: 35,
+    pageX: 26, pageY: 36, screenX: 1026, screenY: 736,
+    movementX: 1, movementY: 1, buttons: 1, timeStamp: 120.5
+  });
+  assert.equal(monitor.export().events.filter(item => item.type === "MOUSE_MOVE_SAMPLE").length, 1);
+
   dispatchWindowEvent("pointerup", {
     type: "pointerup", target: canvas, clientX: 24, clientY: 34, pointerType: "mouse"
   });
@@ -156,6 +174,7 @@ test("POINT_QUOTA_UPDATE carries the exact accepted point and current transforme
   const { monitor } = createMonitor({ stage });
   const { board } = createBoard();
   monitor.attach(board);
+  monitor.setInputTelemetryEnabled(true);
   board.onDrawStart();
   board.atom.points[0].push({ x: 35, y: 27 });
   board.updateLess();
