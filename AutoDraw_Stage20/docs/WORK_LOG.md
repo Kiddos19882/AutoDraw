@@ -2551,3 +2551,18 @@ Brush Test acceptance и матричные валидаторы больше н
 - Проверен regression test: helper вызывает реальный `transform_logical_brush_plan_to_screen()` и использует возвращённые `scale_x/scale_y`; фактический pytest после изменения не запускался в доступной среде.
 - GitHub connector `fetch_commit_workflow_runs` возвращает только PR-triggered runs; открытых PR для рабочей ветки не найдено. Поэтому отсутствие результата не используется как доказательство отсутствия push CI. Push workflow ожидается по path filter `source/**`, но актуальный run не удалось независимо получить.
 - Committed PNG replay исправленным audit и live runtime эксперименты не выполнялись. 45-task matrix остаётся BLOCKED.
+## FILL-001-RS — CI failure analysis and synthetic fixture alignment — 2026-11-04
+
+GitHub Actions run [41778045384](https://github.com/Kiddos19882/AutoDraw/actions/runs/41778045384) завершился с failure в Preparation/G3: **799 passed, 5 failed, 24 warnings, 82 subtests passed**. Game Monitor/Bridge, Application integration и Executor regression — SUCCESS; Preparation/G3 — FAILURE; optional benchmarks, INT-006 PNG audit и Windows portable build/startup smoke-test — SKIPPED. Артефакты этого run не опубликованы.
+
+Пять отказов локализованы в FILL-001 synthetic PNG tests:
+- native 460×240 fixtures записывали frozen logical mask напрямую, не применяя executor logical→screen mapping; audit корректно применял pixel-center transform, поэтому fixtures создавали ложное расхождение;
+- non-uniform ROI test вызывал executor transform внутри fixture builder и получал ValueError до вызова проверяемого PNG audit;
+- runtime-binding test использовал тот же несогласованный native PNG fixture.
+
+Обновлены только тесты:
+- [1f28436](https://github.com/Kiddos19882/AutoDraw/commit/1f28436ab20fe949e4d53cfeea4a5560ed3cbcae) — native fixtures теперь используют тот же helper, что и scaled ROI tests; non-uniform audit получает реальные PNG paths; leakage assertion выбирает пиксель вне screen-rasterized mask.
+- [0f23731](https://github.com/Kiddos19882/AutoDraw/commit/0f23731848f0c148fe5e1309d1e305576dd4b6b7) — runtime-binding fixture строится с масштабом из фактического transform helper.
+
+Production source, frozen masks, PNG thresholds, исходные live captures и production defaults не менялись. Новые commits пока не имеют подтверждённого CI результата; локальный pytest недоступен через GitHub API. Повторный CI обязателен до committed PNG replay. Capture остаётся REJECTED/BLOCKED, coverage≥99% и leakage=0 не менялись; 45-task matrix не запускалась.
+
