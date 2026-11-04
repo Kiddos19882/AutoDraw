@@ -462,7 +462,27 @@ BoardPane stage corners из runtime: TL=(519.791666,72), TR=(979.791666,72), BR
 
 В согласованном game bundle `BoardPane.redraw()` вызывает `graphics.lineStyle(value, color, 1, false)`, передавая UI radius как первый аргумент `lineStyle`, то есть `lineWidth`. `GraphicsNode.lineStyle()` задаёт round defaults для caps и joints, если они не указаны. Поэтому `currentRadius=30` в snapshot не означает геометрический диск радиуса 30 и не должен преобразовываться в диаметр 60 без отдельной калибровки. Для прямого штриха номинальная толщина линии равна значению lineWidth в логических координатах; фактическая пиксельная маска с antialiasing ещё не измерена.
 
-### 15.6 Границы доказательства и следующий шаг
+### 15.6 Семантика конечного сегмента smooth path
+
+В согласованном `main.min_653f95bc.js` `BoardPane.redraw()` вызывает `Painter.drawSmoothLine(graphics, points, true, false)`. Реализация функции:
+
+1. Начинает путь через `moveTo(points[0])`.
+2. Строит массив midpoint для каждой пары соседних точек.
+3. Переходит к первому midpoint через `lineTo()`.
+4. Для внутренних midpoint вызывает `curveTo(points[i+1], midpoint[i+1])`.
+5. Добавляет `lineTo(points[last])` только при truthy последнем аргументе; игра передаёт `false`.
+
+Следствия для `n` принятых точек:
+
+- `n=1`: только `moveTo`; отдельный видимый след не гарантирован и обычно отсутствует для Canvas2D stroke.
+- `n=2`: прямой путь заканчивается в midpoint между первой и второй точкой.
+- `n≥3`: smooth path заканчивается в midpoint последнего сегмента; последняя половина последнего сегмента в path не входит.
+
+`BoardPane.onDrawingEnd()` вызывает `redraw(false)` и затем `atom.add()`, не выполняя дополнительного `lineTo(lastPoint)`. Поэтому последняя координата может увеличивать `pointCount`, но не совпадать с конечной координатой растеризованного centerline. Round cap расширяет конец пути на половину lineWidth, поэтому фактический uncovered остаток зависит от расстояния между последними точками и ширины кисти; без PNG это не количественная оценка.
+
+Это сильное объяснение потенциального расхождения между CHALK points и визуальным покрытием концов штрихов, но пока не доказанная причина FILL-001-RS residual: требуется сравнение конкретных game PNG и offline reference на идентичном path.
+
+### 15.7 Границы доказательства и следующий шаг
 
 - Snapshot — один runtime capture, не live drawing и не brush experiment.
 - `pointCount=1` / remaining=5999 — текущее состояние; без pre/post pair это не расход CHALK отдельного запуска.
@@ -470,4 +490,4 @@ BoardPane stage corners из runtime: TL=(519.791666,72), TR=(979.791666,72), BR
 - `systemRenderer` constructor name `n` не идентифицирует класс без статической связи с `renderMode`.
 - Не установлены: фактический pixel footprint single point/zero-length path, Canvas2D antialiasing, texture interpolation, точное clipping/mask поведение на границе и PNG pixel equivalence.
 
-**Следующий этап:** offline renderer reference harness с fixtures для single point/zero-length, normal lines (horizontal/vertical/diagonal), smooth midpoint curves, caps/joins, turns и board clipping. Сравнивать с PNG из той же browser/runtime сессии; не менять planner/defaults до acceptance. FILL-001-RS live preflight и 45-cell matrix остаются закрытыми до прохождения offline gate и отдельного разрешения.
+**Следующий этап:** offline renderer reference harness с точными 1/2/3+ point smooth path semantics, normal lines (horizontal/vertical/diagonal), caps/joins, turns и board clipping. Сравнивать с PNG из той же browser/runtime сессии и отдельно измерять остаток последнего сегмента. Не менять planner/defaults до acceptance. FILL-001-RS live preflight и 45-cell matrix остаются закрытыми до прохождения offline gate и отдельного разрешения.
