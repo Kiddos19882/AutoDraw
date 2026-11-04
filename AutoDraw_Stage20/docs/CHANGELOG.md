@@ -869,3 +869,9 @@
 - Bridge Server сохраняет исходные intervals, добавляет frame_probe_by_stroke и per_stroke_metrics.
 - Сохранённый FILL-001-RS run показывает accepted-point cadence около 29 points/s при browser requestAnimationFrame около 60 FPS; эти показатели документированы раздельно.
 - CI для изменений кода/тестов ожидает завершения; live runtime не запускался.
+
+
+## 2026-11-04 — Egret renderer audit refinement
+
+- Зафиксирован nominal stage.frameRate=48 и локальная геометрия PainterPopup/BoardPane 676×379 / 460×240.
+- Egret Engine 5.2.18 API документирует lineStyle thickness как толщину линии и ROUND defaults для caps/joints. Deployed runtime version не подтверждена; фактический footprint и zero-length rasterization остаются открытыми.
