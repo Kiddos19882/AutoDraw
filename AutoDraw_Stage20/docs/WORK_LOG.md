@@ -2747,3 +2747,11 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - Уточнено, что исторический outline-first prototype использовал независимые горизонтальные boundary runs, а не единый связный contour route; его результаты не опровергают новую гипотезу.
 - Вывод классифицирован как OPEN / OFFLINE CANDIDATE / HYPOTHESIS. Экономия CHALK не доказана; exact расход определяется только pointCount delta. Сохранены PNG acceptance thresholds и текущие renderer/live gates.
 - Изменены только документационные файлы: AI_WORK_GUIDE, docs index, TASKS, ROADMAP, WORK_LOG и CHANGELOG. Исходники, тесты, конфигурации, frozen plans/masks и экспериментальные данные не менялись; live run не выполнялся.
+
+
+## 2026-11-04 — capsule model: per-segment raster broad-phase
+
+- Переработан перебор pixel cells в `swept_capsule_pixel_masks()`: вместо полного global polyline AABB каждая capsule обрабатывает собственный расширенный AABB, результаты объединяются как union.
+- Сохранены API, global bounds, определение potential/guaranteed и fail-closed ограничения; production planners не подключались.
+- Добавлены тесты эквивалентности с прежним global-AABB reference на winding polyline и инвариантности разбиения прямого сегмента на коллинеарные части.
+- Ожидаем CI run [41848358502](https://github.com/Kiddos19882/AutoDraw/actions/runs/41848358502) на HEAD `6afdefc7ff2f18db544e55572ed918841d448164`. Фактический performance gain пока не измерен; live/runtime проверок не было.
