@@ -1,0 +1,2725 @@
+{
+  "schema_version": 1,
+  "name": "FILL-001 fill001-20261104-040510-rectangle-r10-rep1",
+  "created_at": "2026-11-04T01:05:28.983350+00:00",
+  "coordinate_system": "logical_board_pixels",
+  "canvas": {
+    "width": 460,
+    "height": 240
+  },
+  "width": 460,
+  "height": 240,
+  "strokes": [
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0001",
+      "closed": false,
+      "points": [
+        {
+          "x": 94.0,
+          "y": 55.0
+        },
+        {
+          "x": 366.0,
+          "y": 55.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0002",
+      "closed": false,
+      "points": [
+        {
+          "x": 88.0,
+          "y": 56.0
+        },
+        {
+          "x": 372.0,
+          "y": 56.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0003",
+      "closed": false,
+      "points": [
+        {
+          "x": 86.0,
+          "y": 57.0
+        },
+        {
+          "x": 374.0,
+          "y": 57.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0004",
+      "closed": false,
+      "points": [
+        {
+          "x": 84.0,
+          "y": 58.0
+        },
+        {
+          "x": 376.0,
+          "y": 58.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0005",
+      "closed": false,
+      "points": [
+        {
+          "x": 83.0,
+          "y": 59.0
+        },
+        {
+          "x": 377.0,
+          "y": 59.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0006",
+      "closed": false,
+      "points": [
+        {
+          "x": 82.0,
+          "y": 60.0
+        },
+        {
+          "x": 378.0,
+          "y": 60.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0007",
+      "closed": false,
+      "points": [
+        {
+          "x": 81.0,
+          "y": 61.0
+        },
+        {
+          "x": 379.0,
+          "y": 61.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0008",
+      "closed": false,
+      "points": [
+        {
+          "x": 80.0,
+          "y": 62.0
+        },
+        {
+          "x": 380.0,
+          "y": 62.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0009",
+      "closed": false,
+      "points": [
+        {
+          "x": 79.0,
+          "y": 63.0
+        },
+        {
+          "x": 381.0,
+          "y": 63.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0010",
+      "closed": false,
+      "points": [
+        {
+          "x": 78.0,
+          "y": 64.0
+        },
+        {
+          "x": 382.0,
+          "y": 64.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0011",
+      "closed": false,
+      "points": [
+        {
+          "x": 78.0,
+          "y": 65.0
+        },
+        {
+          "x": 382.0,
+          "y": 65.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0012",
+      "closed": false,
+      "points": [
+        {
+          "x": 77.0,
+          "y": 66.0
+        },
+        {
+          "x": 383.0,
+          "y": 66.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0013",
+      "closed": false,
+      "points": [
+        {
+          "x": 77.0,
+          "y": 67.0
+        },
+        {
+          "x": 383.0,
+          "y": 67.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0014",
+      "closed": false,
+      "points": [
+        {
+          "x": 76.0,
+          "y": 68.0
+        },
+        {
+          "x": 384.0,
+          "y": 68.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0015",
+      "closed": false,
+      "points": [
+        {
+          "x": 76.0,
+          "y": 69.0
+        },
+        {
+          "x": 384.0,
+          "y": 69.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0016",
+      "closed": false,
+      "points": [
+        {
+          "x": 76.0,
+          "y": 70.0
+        },
+        {
+          "x": 384.0,
+          "y": 70.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0017",
+      "closed": false,
+      "points": [
+        {
+          "x": 76.0,
+          "y": 71.0
+        },
+        {
+          "x": 384.0,
+          "y": 71.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0018",
+      "closed": false,
+      "points": [
+        {
+          "x": 76.0,
+          "y": 72.0
+        },
+        {
+          "x": 384.0,
+          "y": 72.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0019",
+      "closed": false,
+      "points": [
+        {
+          "x": 76.0,
+          "y": 73.0
+        },
+        {
+          "x": 384.0,
+          "y": 73.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0020",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 74.0
+        },
+        {
+          "x": 385.0,
+          "y": 74.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0021",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 75.0
+        },
+        {
+          "x": 385.0,
+          "y": 75.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0022",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 76.0
+        },
+        {
+          "x": 385.0,
+          "y": 76.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0023",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 77.0
+        },
+        {
+          "x": 385.0,
+          "y": 77.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0024",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 78.0
+        },
+        {
+          "x": 385.0,
+          "y": 78.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0025",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 79.0
+        },
+        {
+          "x": 385.0,
+          "y": 79.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0026",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 80.0
+        },
+        {
+          "x": 385.0,
+          "y": 80.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0027",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 81.0
+        },
+        {
+          "x": 385.0,
+          "y": 81.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0028",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 82.0
+        },
+        {
+          "x": 385.0,
+          "y": 82.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0029",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 83.0
+        },
+        {
+          "x": 385.0,
+          "y": 83.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0030",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 84.0
+        },
+        {
+          "x": 385.0,
+          "y": 84.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0031",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 85.0
+        },
+        {
+          "x": 385.0,
+          "y": 85.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0032",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 86.0
+        },
+        {
+          "x": 385.0,
+          "y": 86.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0033",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 87.0
+        },
+        {
+          "x": 385.0,
+          "y": 87.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0034",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 88.0
+        },
+        {
+          "x": 385.0,
+          "y": 88.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0035",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 89.0
+        },
+        {
+          "x": 385.0,
+          "y": 89.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0036",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 90.0
+        },
+        {
+          "x": 385.0,
+          "y": 90.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0037",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 91.0
+        },
+        {
+          "x": 385.0,
+          "y": 91.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0038",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 92.0
+        },
+        {
+          "x": 385.0,
+          "y": 92.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0039",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 93.0
+        },
+        {
+          "x": 385.0,
+          "y": 93.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0040",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 94.0
+        },
+        {
+          "x": 385.0,
+          "y": 94.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0041",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 95.0
+        },
+        {
+          "x": 385.0,
+          "y": 95.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0042",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 96.0
+        },
+        {
+          "x": 385.0,
+          "y": 96.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0043",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 97.0
+        },
+        {
+          "x": 385.0,
+          "y": 97.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0044",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 98.0
+        },
+        {
+          "x": 385.0,
+          "y": 98.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0045",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 99.0
+        },
+        {
+          "x": 385.0,
+          "y": 99.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0046",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 100.0
+        },
+        {
+          "x": 385.0,
+          "y": 100.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0047",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 101.0
+        },
+        {
+          "x": 385.0,
+          "y": 101.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0048",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 102.0
+        },
+        {
+          "x": 385.0,
+          "y": 102.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0049",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 103.0
+        },
+        {
+          "x": 385.0,
+          "y": 103.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0050",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 104.0
+        },
+        {
+          "x": 385.0,
+          "y": 104.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0051",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 105.0
+        },
+        {
+          "x": 385.0,
+          "y": 105.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0052",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 106.0
+        },
+        {
+          "x": 385.0,
+          "y": 106.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0053",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 107.0
+        },
+        {
+          "x": 385.0,
+          "y": 107.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0054",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 108.0
+        },
+        {
+          "x": 385.0,
+          "y": 108.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0055",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 109.0
+        },
+        {
+          "x": 385.0,
+          "y": 109.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0056",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 110.0
+        },
+        {
+          "x": 385.0,
+          "y": 110.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0057",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 111.0
+        },
+        {
+          "x": 385.0,
+          "y": 111.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0058",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 112.0
+        },
+        {
+          "x": 385.0,
+          "y": 112.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0059",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 113.0
+        },
+        {
+          "x": 385.0,
+          "y": 113.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0060",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 114.0
+        },
+        {
+          "x": 385.0,
+          "y": 114.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0061",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 115.0
+        },
+        {
+          "x": 385.0,
+          "y": 115.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0062",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 116.0
+        },
+        {
+          "x": 385.0,
+          "y": 116.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0063",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 117.0
+        },
+        {
+          "x": 385.0,
+          "y": 117.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0064",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 118.0
+        },
+        {
+          "x": 385.0,
+          "y": 118.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0065",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 119.0
+        },
+        {
+          "x": 385.0,
+          "y": 119.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0066",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 120.0
+        },
+        {
+          "x": 385.0,
+          "y": 120.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0067",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 121.0
+        },
+        {
+          "x": 385.0,
+          "y": 121.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0068",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 122.0
+        },
+        {
+          "x": 385.0,
+          "y": 122.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0069",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 123.0
+        },
+        {
+          "x": 385.0,
+          "y": 123.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0070",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 124.0
+        },
+        {
+          "x": 385.0,
+          "y": 124.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0071",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 125.0
+        },
+        {
+          "x": 385.0,
+          "y": 125.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0072",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 126.0
+        },
+        {
+          "x": 385.0,
+          "y": 126.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0073",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 127.0
+        },
+        {
+          "x": 385.0,
+          "y": 127.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0074",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 128.0
+        },
+        {
+          "x": 385.0,
+          "y": 128.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0075",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 129.0
+        },
+        {
+          "x": 385.0,
+          "y": 129.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0076",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 130.0
+        },
+        {
+          "x": 385.0,
+          "y": 130.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0077",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 131.0
+        },
+        {
+          "x": 385.0,
+          "y": 131.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0078",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 132.0
+        },
+        {
+          "x": 385.0,
+          "y": 132.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0079",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 133.0
+        },
+        {
+          "x": 385.0,
+          "y": 133.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0080",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 134.0
+        },
+        {
+          "x": 385.0,
+          "y": 134.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0081",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 135.0
+        },
+        {
+          "x": 385.0,
+          "y": 135.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0082",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 136.0
+        },
+        {
+          "x": 385.0,
+          "y": 136.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0083",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 137.0
+        },
+        {
+          "x": 385.0,
+          "y": 137.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0084",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 138.0
+        },
+        {
+          "x": 385.0,
+          "y": 138.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0085",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 139.0
+        },
+        {
+          "x": 385.0,
+          "y": 139.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0086",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 140.0
+        },
+        {
+          "x": 385.0,
+          "y": 140.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0087",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 141.0
+        },
+        {
+          "x": 385.0,
+          "y": 141.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0088",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 142.0
+        },
+        {
+          "x": 385.0,
+          "y": 142.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0089",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 143.0
+        },
+        {
+          "x": 385.0,
+          "y": 143.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0090",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 144.0
+        },
+        {
+          "x": 385.0,
+          "y": 144.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0091",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 145.0
+        },
+        {
+          "x": 385.0,
+          "y": 145.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0092",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 146.0
+        },
+        {
+          "x": 385.0,
+          "y": 146.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0093",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 147.0
+        },
+        {
+          "x": 385.0,
+          "y": 147.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0094",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 148.0
+        },
+        {
+          "x": 385.0,
+          "y": 148.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0095",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 149.0
+        },
+        {
+          "x": 385.0,
+          "y": 149.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0096",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 150.0
+        },
+        {
+          "x": 385.0,
+          "y": 150.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0097",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 151.0
+        },
+        {
+          "x": 385.0,
+          "y": 151.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0098",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 152.0
+        },
+        {
+          "x": 385.0,
+          "y": 152.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0099",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 153.0
+        },
+        {
+          "x": 385.0,
+          "y": 153.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0100",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 154.0
+        },
+        {
+          "x": 385.0,
+          "y": 154.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0101",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 155.0
+        },
+        {
+          "x": 385.0,
+          "y": 155.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0102",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 156.0
+        },
+        {
+          "x": 385.0,
+          "y": 156.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0103",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 157.0
+        },
+        {
+          "x": 385.0,
+          "y": 157.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0104",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 158.0
+        },
+        {
+          "x": 385.0,
+          "y": 158.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0105",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 159.0
+        },
+        {
+          "x": 385.0,
+          "y": 159.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0106",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 160.0
+        },
+        {
+          "x": 385.0,
+          "y": 160.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0107",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 161.0
+        },
+        {
+          "x": 385.0,
+          "y": 161.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0108",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 162.0
+        },
+        {
+          "x": 385.0,
+          "y": 162.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0109",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 163.0
+        },
+        {
+          "x": 385.0,
+          "y": 163.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0110",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 164.0
+        },
+        {
+          "x": 385.0,
+          "y": 164.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0111",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 165.0
+        },
+        {
+          "x": 385.0,
+          "y": 165.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0112",
+      "closed": false,
+      "points": [
+        {
+          "x": 75.0,
+          "y": 166.0
+        },
+        {
+          "x": 385.0,
+          "y": 166.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0113",
+      "closed": false,
+      "points": [
+        {
+          "x": 76.0,
+          "y": 167.0
+        },
+        {
+          "x": 384.0,
+          "y": 167.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0114",
+      "closed": false,
+      "points": [
+        {
+          "x": 76.0,
+          "y": 168.0
+        },
+        {
+          "x": 384.0,
+          "y": 168.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0115",
+      "closed": false,
+      "points": [
+        {
+          "x": 76.0,
+          "y": 169.0
+        },
+        {
+          "x": 384.0,
+          "y": 169.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0116",
+      "closed": false,
+      "points": [
+        {
+          "x": 76.0,
+          "y": 170.0
+        },
+        {
+          "x": 384.0,
+          "y": 170.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0117",
+      "closed": false,
+      "points": [
+        {
+          "x": 76.0,
+          "y": 171.0
+        },
+        {
+          "x": 384.0,
+          "y": 171.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0118",
+      "closed": false,
+      "points": [
+        {
+          "x": 76.0,
+          "y": 172.0
+        },
+        {
+          "x": 384.0,
+          "y": 172.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0119",
+      "closed": false,
+      "points": [
+        {
+          "x": 77.0,
+          "y": 173.0
+        },
+        {
+          "x": 383.0,
+          "y": 173.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0120",
+      "closed": false,
+      "points": [
+        {
+          "x": 77.0,
+          "y": 174.0
+        },
+        {
+          "x": 383.0,
+          "y": 174.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0121",
+      "closed": false,
+      "points": [
+        {
+          "x": 78.0,
+          "y": 175.0
+        },
+        {
+          "x": 382.0,
+          "y": 175.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0122",
+      "closed": false,
+      "points": [
+        {
+          "x": 78.0,
+          "y": 176.0
+        },
+        {
+          "x": 382.0,
+          "y": 176.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0123",
+      "closed": false,
+      "points": [
+        {
+          "x": 79.0,
+          "y": 177.0
+        },
+        {
+          "x": 381.0,
+          "y": 177.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0124",
+      "closed": false,
+      "points": [
+        {
+          "x": 80.0,
+          "y": 178.0
+        },
+        {
+          "x": 380.0,
+          "y": 178.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0125",
+      "closed": false,
+      "points": [
+        {
+          "x": 81.0,
+          "y": 179.0
+        },
+        {
+          "x": 379.0,
+          "y": 179.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0126",
+      "closed": false,
+      "points": [
+        {
+          "x": 82.0,
+          "y": 180.0
+        },
+        {
+          "x": 378.0,
+          "y": 180.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0127",
+      "closed": false,
+      "points": [
+        {
+          "x": 83.0,
+          "y": 181.0
+        },
+        {
+          "x": 377.0,
+          "y": 181.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0128",
+      "closed": false,
+      "points": [
+        {
+          "x": 84.0,
+          "y": 182.0
+        },
+        {
+          "x": 376.0,
+          "y": 182.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0129",
+      "closed": false,
+      "points": [
+        {
+          "x": 86.0,
+          "y": 183.0
+        },
+        {
+          "x": 374.0,
+          "y": 183.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0130",
+      "closed": false,
+      "points": [
+        {
+          "x": 88.0,
+          "y": 184.0
+        },
+        {
+          "x": 372.0,
+          "y": 184.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261104-040510-rectangle-r10-rep1_0131",
+      "closed": false,
+      "points": [
+        {
+          "x": 94.0,
+          "y": 185.0
+        },
+        {
+          "x": 366.0,
+          "y": 185.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+        "brush_value": "10",
+        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+      }
+    }
+  ],
+  "generation": {
+    "method": "fill001_fixed_radius_single_task_preflight",
+    "planner_version": 1,
+    "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e",
+    "target_mask_sha256": "ac1c6660e5986cdf534328c6dbcd5020f631168b1473c24b29e7609eb827998b",
+    "chalk_fill001_task": {
+      "task_id": "fill001-20261104-040510-rectangle-r10-rep1",
+      "matrix_order_index": 7,
+      "phase_id": "FILL001",
+      "series_id": "fill001-20261104-040510",
+      "shape_id": "rectangle",
+      "requested_radius": 10,
+      "repeat_index": 1,
+      "planned_repeats": 3,
+      "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e",
+      "target_mask_sha256": "ac1c6660e5986cdf534328c6dbcd5020f631168b1473c24b29e7609eb827998b",
+      "expected_strokes": 131,
+      "target_area_pixels": 44653,
+      "planned_path_length": 40218.0,
+      "planned_coverage_fraction": 1.0,
+      "planned_leakage_pixels": 0,
+      "quality_gate_passed": true,
+      "unsupported": false,
+      "sampling_profile": {
+        "profile_id": "P1",
+        "sampling_step": 4,
+        "delay_ms": 5
+      },
+      "safe_to_execute": false,
+      "capture_status": "pending"
+    },
+    "sampling_profile": {
+      "profile_id": "P1",
+      "sampling_step": 4,
+      "delay_ms": 5
+    },
+    "execution_scope": "single_task_preflight",
+    "operator_approved": true,
+    "matrix_batch_execution_allowed": false,
+    "screen_transform": {
+      "method": "inclusive_logical_bounds_to_screen_pixel_centers",
+      "source_coordinate_system": "logical_board_pixels",
+      "target_coordinate_system": "local_canvas_pixels",
+      "logical_board": {
+        "width": 460,
+        "height": 240
+      },
+      "screen_roi": {
+        "x": 566,
+        "y": 253,
+        "width": 581,
+        "height": 304
+      },
+      "scale_x": 1.2608695652173914,
+      "scale_y": 1.2625,
+      "expected_uniform_scale": true,
+      "uniform_scale_relative_error": 0.0012914334911751312,
+      "uniform_scale_tolerance": 0.01,
+      "logical_bounds": {
+        "x": [
+          0,
+          460
+        ],
+        "y": [
+          0,
+          240
+        ]
+      },
+      "screen_local_bounds": {
+        "x": [
+          0,
+          580
+        ],
+        "y": [
+          0,
+          303
+        ]
+      },
+      "boundary_mapping": "logical_max_to_last_screen_pixel",
+      "executor_coordinate_units": "screen_pixels",
+      "point_step_px_units": "screen_pixels"
+    }
+  },
+  "summary": {
+    "stroke_count": 131,
+    "coverage_fraction": 1.0,
+    "leakage_pixels": 0,
+    "path_length_logical_pixels": 40218.0,
+    "estimated_sampling_points": 10237,
+    "estimated_sampling_points_are_exact_chalk": false
+  }
+}
