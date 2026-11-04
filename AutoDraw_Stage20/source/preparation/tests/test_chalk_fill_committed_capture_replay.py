@@ -145,7 +145,7 @@ def test_real_committed_fill001_evidence_runs_through_capture_button(tmp_path, m
     assert saved_attempt["capture_path"] == str(capture_path)
     assert capture["run_id"] == "6a17a297-ea14-4527-9527-bfd8de3bd335"
     assert capture["exact_chalk"] == 1260
-    assert capture["stroke_count"] == 27
+    assert capture["completed_strokes"] == 27
     assert capture["observed_radius"] == 10
     assert capture["coverage_fraction"] >= 0.99
     assert capture["leakage_pixels"] == 0
