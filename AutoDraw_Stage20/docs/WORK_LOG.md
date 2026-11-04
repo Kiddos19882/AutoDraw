@@ -1,3 +1,17 @@
+## 2026-11-04 — FILL-001-RS — exhaustive sweep and versioned implementation
+
+- Проверены branch, HEAD, последние 20 коммитов, README, docs index, управляющие документы и постоянные engineering/experiment регламенты. GitHub API не даёт локальный git status.
+- Полный статический sweep: 2 238 комбинаций step/offset для 3 frozen masks × 5 radii; 62 кандидата прошли coverage≥99%/leakage=0. Frozen mask SHA-256 совпали с константами исходника. Baseline rectangle/r10/step1 воспроизведён: 131 strokes, path=40 218, estimated points=10 237, coverage=100%, leakage=0.
+- Зафиксирован выбор кандидатов: максимальный прошедший row step, затем максимальное coverage и минимальные estimated points/path/strokes. Полный отчёт — CHALK_FILL001_RS_STATIC_SWEEP_2026-11-04.md; CI script сохраняет все candidate records.
+- Реализован versioned scanline spacing planner v2. Legacy planner v1/default geometry/signatures сохраняются. scanline_row_step и scanline_offset включены в v2 plan identity; point_step_px/P1 не менялись.
+- Реализованы отдельный FILL001_RS_V1 45-task matrix builder, fail-closed validation, single-task plan handoff и runtime experiment context с spacing metadata. Добавлены CLI manifest generator и capture metadata.
+- Добавлены regression tests: versioned geometry, invalid parameters, matrix tampering, legacy compatibility, single-task handoff, runtime context, exhaustive 2 238-candidate sweep.
+- CI workflow дополнен полным static sweep и upload artifact step. Новый полный CI на текущем code HEAD ещё не подтверждён.
+- Изменены исходники preparation, tests, CI workflow и Markdown docs только в feature/image-geometry-optimization. master и исходные FILL-001 manifests/captures не менялись.
+- UI-кнопка для прямого создания RS manifest не добавлена; manifest генерируется CLI и открывается существующей кнопкой «Открыть manifest…». Это сохраняет существующий UI workflow без незавершённого action.
+- Live preflight не запускался: удалённый runner не имеет доступа к локальной Windows/browser game session и calibrated board. Пользователь разрешил live work; фактическая блокировка — отсутствие доступного локального runtime control.
+- Следующий шаг: дождаться полного CI, затем локально создать manifest и выполнить только rectangle/r10/step5/offset0/repeat1; принять только при exact runtime binding и quantitative PNG audit. До этого обе 45-task matrices остаются BLOCKED, INT-007 остаётся BLOCKED.
+
 ## 2026-11-04 — FILL-001-RS — scanline spacing documentation
 
 - Повторно сверены branch `feature/image-geometry-optimization`, HEAD `4f1fb945f384aba0b3454e4301b248cf74101800`, последние 20 коммитов и актуальные управляющие документы. GitHub API не предоставляет локальный `git status`.
