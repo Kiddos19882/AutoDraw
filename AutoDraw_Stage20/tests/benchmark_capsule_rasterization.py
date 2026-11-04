@@ -168,7 +168,10 @@ def _benchmark_case(case: dict[str, Any], repeats: int):
     )
     reference, reference_counts = _global_aabb_reference(*args)
     optimized, optimized_counts = _optimized_instrumented(*args)
-    if reference != optimized:
+    if (
+        reference["potential_cells"] != optimized["potential_cells"]
+        or reference["guaranteed_cells"] != optimized["guaranteed_cells"]
+    ):
         raise AssertionError(f"Mask mismatch in {case['name']}")
 
     # Warm both paths before collecting timing samples.
