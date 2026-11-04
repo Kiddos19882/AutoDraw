@@ -2566,3 +2566,14 @@ GitHub Actions run [41778045384](https://github.com/Kiddos19882/AutoDraw/actions
 
 Production source, frozen masks, PNG thresholds, исходные live captures и production defaults не менялись. Новые commits пока не имеют подтверждённого CI результата; локальный pytest недоступен через GitHub API. Повторный CI обязателен до committed PNG replay. Capture остаётся REJECTED/BLOCKED, coverage≥99% и leakage=0 не менялись; 45-task matrix не запускалась.
 
+
+
+## 2026-11-04 — CI run 41780241017 и разбор artifacts
+
+- Проверен run [41780241017](https://github.com/Kiddos19882/AutoDraw/actions/runs/41780241017), checkout code/test HEAD `0f23731848f0c148fe5e1309d1e305576dd4b6b7`. Все обязательные jobs SUCCESS: Application integration, Executor regression, Preparation/G3, Game Monitor/Bridge, INT-006 PNG audit, Windows portable build/startup smoke-test. Optional benchmarks SKIPPED.
+- Получены и распакованы artifacts: FILL-001-RS static sweep (ID 13299430831), INT-006 PNG analysis (13299470914), INT-006 frozen CHALK validation (13299121807), INT006R live validation (13299101877), INT006R visual review source (13299381257), portable build (13299481008).
+- Static sweep: 2,238 candidates / 62 accepted; 15 selected shape×radius cells прошли offline raster quality gate. Estimated sampling points остаются proxy, не exact CHALK.
+- INT-006 PNG analysis: 90/90 captures valid; 549 stroke rows, all coverage=1.0, gaps=0. Frozen CHALK validation: 45/45 accepted, 0 missing/rejected; safety margin not established, production eligibility not validated.
+- INT006R: 45/45 accepted; pre/post pointCount CHALK и per-stroke deltas доступны. Радиус 1/10/30 при P1 дал небольшие немонотонные различия по D1–D5; см. TASKS/PROJECT_STATUS для средних значений. Visual source содержит 180 files (45 before/after pairs); автоматический analyzer оставил 45/45 visual gates pending manual review.
+- Быстрый обзор контактного листа показал ожидаемое изменение толщины следа между радиусами, без очевидной потери целевых фигур на миниатюрах; это только предварительный triage, не замена индивидуальному review всех пар.
+- Не запускались live игровые эксперименты в этой сессии. Production model/estimator/defaults, executor и sampling defaults не изменялись. Static sweep не подтверждает game runtime и расход CHALK.
