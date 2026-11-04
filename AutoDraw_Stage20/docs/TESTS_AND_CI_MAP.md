@@ -91,29 +91,29 @@
 
 Единый workflow: `.github/workflows/geometry-tests.yml`.
 
-### 4.1. Job: geometry-tests
+### 4.1. Job: game-monitor-tests
+
+Платформа: Windows. Проверяет JavaScript syntax, Game Monitor resource snapshot, зависимости локального Bridge smoke server и WebSocket smoke test.
+
+### 4.2. Job: preparation-tests
 
 Рабочая директория: `AutoDraw_Stage20/source/preparation`.
 
-Порядок основных шагов:
 1. Checkout и установка Python 3.11.
-2. `node --check` для `source/game_monitor/game_monitor.js`.
-3. Установка зависимостей Game Monitor smoke server и pytest.
-4. `tests/test_websocket_smoke_server.py` — отдельный локальный WebSocket smoke test.
-5. Установка зависимостей preparation и executor.
-6. Диагностика эталонного изображения.
-7. Benchmark Stage 5 и загрузка отчётов/preview.
-8. Benchmark Stage 7, синтетические геометрические сценарии и sweep fallback merge.
-9. Benchmark Stage 8 и проверка его отчёта.
-10. Проверки fallback sweep, outline-first fill и сравнение стратегий.
-11. Полный pytest-набор `source/preparation/tests/`.
-12. Benchmark capsule global-AABB vs per-segment broad phase; JSON report загружается как artifact `autodraw-capsule-broad-phase-benchmark`.
-13. Exhaustive FILL-001-RS static spacing sweep и загрузка evidence artifact.
-14. Проверка правил валидатора Stage 7.
-13. Диагностика разрешения импортов.
-14. UI-регрессии `tests/test_unified_app.py`, включая передачу G3 task-specific executor parameters из matrix metadata в Stage6.
+2. Установка preparation и executor requirements, pytest.
+3. Полный `python -m pytest -q -ra tests` для Preparation, brush, Game Monitor capture и G3 block regressions.
+4. `tests/benchmark_capsule_rasterization.py` — сравнение global-AABB reference и per-segment capsule broad phase; проверка mask equivalence, candidate slots, predicate calls и median wall-clock. JSON публикуется как artifact `autodraw-capsule-broad-phase-benchmark`.
+5. `tests/analyze_chalk_fill001_rs_sweep.py` — воспроизводимый exhaustive FILL-001-RS static spacing sweep; отчёт публикуется как artifact `autodraw-fill001-rs-static-sweep`.
 
-### 4.2. Job: executor-tests
+### 4.3. Job: integration-tests
+
+Рабочая директория: `AutoDraw_Stage20`.
+
+- `tests/test_unified_app.py` — unified application и G3 UI handoff.
+- Root build/import/test-runner regressions.
+- Geometry validator и metric tests для fallback sweep / Stage 7.
+
+### 4.4. Job: executor-tests
 
 Рабочая директория: `AutoDraw_Stage20/source/executor`.
 
@@ -121,13 +121,21 @@
 - Устанавливает PYTHONPATH на корень Stage20, preparation, executor и executor/tests.
 - Запускает `python -m unittest discover -s tests -v`.
 
-Точный состав автоматически найденных тестов определяется unittest discovery и файлами в `source/executor/tests/`; два конкретно проверенных теста перечислены в разделе 2.2.
+Точный состав автоматически найденных тестов определяется unittest discovery и файлами в `source/executor/tests/`.
 
-### 4.3. Job: windows-build-smoke
+### 4.5. Job: chalk-png-analysis
+
+Зависит от успешного Preparation/G3 job. Выполняет pixel-level PNG analysis INT-006 V1–V5, independent CHALK prediction validation и INT006R radius×geometry validation; публикует отчёты и диагностические изображения. Отдельно упаковывает before/after PNG и runtime metadata для ручного visual review. Это анализ существующих captures, не новый live game run.
+
+### 4.6. Job: windows-build-smoke
 
 Рабочая директория: `AutoDraw_Stage20`.
 
-Запускает `build_windows.bat` с `AUTODRAW_NO_PAUSE=1`. После успешной сборки и smoke test публикует `release/AutoDrawPortable/` как artifact `autodraw-g3-preflight-build` (срок хранения 7 дней), предназначенный для локального Windows preflight G3. Это отдельная проверка portable-сборки и startup smoke test; она не заменяет pytest/unittest и не является тестом качества рисунка в игре.
+Запускает `build_windows.bat` с `AUTODRAW_NO_PAUSE=1` и `AUTODRAW_SKIP_TESTS=1` после успешных обязательных regression jobs. После успешной сборки и startup smoke test публикует `release/AutoDrawPortable/` как artifact `autodraw-g3-preflight-build` (7 дней). Это не тест качества рисования в игре.
+
+### 4.7. Job: algorithm-benchmarks
+
+Длительный Stage 5/7/8 benchmark suite запускается только через `workflow_dispatch` с `run_algorithm_benchmarks=true`; по умолчанию job SKIPPED. В него входят image diagnostics, Stage 5/7/8 comparisons, synthetic Stage 7 cases, fallback merge sweep и outline-first comparison. Он не заменяет обязательные regression jobs и capsule broad-phase benchmark из preparation-tests.
 
 ## 5. Диагностики и benchmark-скрипты
 
