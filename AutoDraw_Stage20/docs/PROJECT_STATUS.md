@@ -2,6 +2,16 @@
 
 ## Актуальное состояние на 2026-11-04
 
+## Дополнение — независимая проверка executor transform — 2026-11-04
+
+
+Дополнительно проверен полный GitHub Actions run [41772866679](https://github.com/Kiddos19882/AutoDraw/actions/runs/41772866679), который в исторической записи связан с code/test HEAD `974f949`. Все 6 обязательных jobs завершились SUCCESS: Game Monitor/Bridge, Application integration, Preparation/G3, Executor regression, Windows portable build/startup smoke-test и INT-006 PNG audit; optional benchmarks SKIPPED. Preparation/G3 включал запуск `pytest -q -ra tests` и exhaustive static sweep; artifact `autodraw-fill001-rs-static-sweep` сохранён.
+
+Этот CI предшествует affine correction commits `4797aa5`, `a950084` и независимому test commit `c399433`; он **не валидирует** эти изменения. Текущий workflow запускается на push по `source/**`, поэтому source/test commit должен инициировать CI, но доступный GitHub connector не предоставляет push-triggered run listing. `fetch_commit_workflow_runs` ограничен PR-triggered runs; отсутствие результата от него не означает, что push run отсутствует.
+
+Статический review текущего regression test подтверждает, что `_executor_transform()` вызывает реальный `transform_logical_brush_plan_to_screen()` и получает `scale_x/scale_y` из его metadata. Однако тест пока не выполнен на подтверждённом CI после изменений. Runtime PNG replay остаётся отдельным незакрытым gate.
+
+
 ## FILL-001-RS — согласование координат PNG audit — 2026-11-04
 
 В live preflight серии `fill001-rs-preflight-20261104-7.04` runtime binding подтверждён: rectangle/r10/step=5/offset=0, 27/27 штрихов, observed radius=10, exact CHALK=1260 (pointCount 1→1261). Bridge diagnostics: 0 sequence gaps, 0 dropped events, 0 Monitor errors, 0 send failures. Capture отклонён исходным PNG audit: coverage=97.673218%, leakage=28.
