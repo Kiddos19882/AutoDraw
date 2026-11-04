@@ -92,6 +92,7 @@
   const BOARD_WIDTH = 460;
   const BOARD_HEIGHT = 240;
   const RASTER_SCALE = 3;
+  const RUNTIME_CANVAS_SCALE_FACTOR = 2;
   const MASK_ELLIPSE_SIZE = 10; // Egret Path2D halves this: corner radius = 5.
   const LINE_WIDTHS = [10, 30];
   const statusNode = document.getElementById("renderer-status");
@@ -342,7 +343,7 @@
     const displayList = egret.sys.DisplayList;
     displayList.$canvasScaleX = RASTER_SCALE;
     displayList.$canvasScaleY = RASTER_SCALE;
-    displayList.$canvasScaleFactor = RASTER_SCALE;
+    displayList.$canvasScaleFactor = RUNTIME_CANVAS_SCALE_FACTOR;
 
     const outputWidth = BOARD_WIDTH * RASTER_SCALE;
     const outputHeight = BOARD_HEIGHT * RASTER_SCALE;
@@ -433,8 +434,14 @@
         referenceType: "Actual game BoardPane CanvasRenderer and WebGL renderer reference",
         engineVersion: egret.Capabilities.engineVersion,
         sourceBundles: [
-          "gameEngine/mergeEngine_df2e5bc5.js",
-          "gameEngine/main.min_653f95bc.js"
+          {
+            path: "gameEngine/mergeEngine_df2e5bc5.js",
+            blobSha: "d613d2b97e2436521aa3870478c69e99eac1f19f"
+          },
+          {
+            path: "gameEngine/main.min_653f95bc.js",
+            blobSha: "46cc74de00b6cb5d207b1e1a2ffcd81613b6d388"
+          }
         ],
         gameBoardClass: "com.magnetjoy.pet.ui.board.BoardPane",
         browser: {
@@ -443,15 +450,31 @@
           devicePixelRatio: window.devicePixelRatio || 1,
           viewport: { width: window.innerWidth, height: window.innerHeight }
         },
-        renderMode: "Actual BoardPane GraphicsNode rendered by Egret CanvasRenderer and WebGLRenderer (SwiftShader in CI)",
+        renderMode: "Actual BoardPane GraphicsNode rendered by Egret CanvasRenderer and WebGLRenderer; GL backend recorded below",
         board: { width: BOARD_WIDTH, height: BOARD_HEIGHT },
         rasterScale: RASTER_SCALE,
+        runtimeProfile: {
+          source: "data/runtime/renderer_snapshot_2026-11-04.json",
+          canvasScaleFactor: RUNTIME_CANVAS_SCALE_FACTOR,
+          canvasScaleX: RASTER_SCALE,
+          canvasScaleY: RASTER_SCALE,
+          stageWidth: 1672,
+          stageHeight: 600,
+          canvasBackingWidth: 5016,
+          canvasBackingHeight: 1800,
+          devicePixelRatio: 1,
+          stageFrameRate: 30,
+          scaleMode: "fixedHeight",
+          boardWidth: BOARD_WIDTH,
+          boardHeight: BOARD_HEIGHT,
+          note: "Local BoardPane offscreen raster uses canvasScaleX/Y=3; stage/client CSS transform is not applied."
+        },
         mask: {
           type: "Egret Shape drawRoundRect",
           ellipseWidthArgument: MASK_ELLIPSE_SIZE,
           ellipseHeightArgument: MASK_ELLIPSE_SIZE,
           effectiveCornerRadiusLogicalPx: MASK_ELLIPSE_SIZE / 2,
-          clipping: "Canvas2D destination-in composite for comparison; not validated as identical to WebGL mask stencil"
+          clipping: "Actual BoardPane.mask and scrollRect are rendered by Egret WebGLRenderer; Canvas2D destination-in remains a comparison reference"
         },
         webglComposite: "actual Egret WebGLRenderer mask+scrollRect output is captured separately; Canvas2D composite retained as comparison reference",
         actualBoardPaneComparison: "actual BoardPane GraphicsNode pixel-compared with manual path transcription including transparent resetBg rectangle",
