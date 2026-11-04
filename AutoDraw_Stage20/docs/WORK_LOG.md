@@ -2963,3 +2963,16 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - Commits: script `f83edfdf80172709b596f4bbc470a6a273417610`, workflow `10c5e50d3ba5744adeb0f96bd49febf327c9cc5c`, PowerShell ProgramFiles(x86) correction `a5b4b2978006960845ef04d021e4174a5c6425ea`.
 - Runs `41914411268` (pre-correction workflow/script) and `41914478746` (corrected script) were created; corrected run outcome and browser artifact are pending. Do not infer browser harness success from job creation.
 - Production planner, renderer implementation, CHALK model and live game state are unchanged.
+
+## 2026-11-04 — Egret CanvasRenderer browser harness: 18/18 PASS
+
+- GitHub Actions run: `41914478746`; job `126871096410` — SUCCESS; commit `a5b4b2978006960845ef04d021e4174a5c6425ea`.
+- Edge 156.0.0.0 / Win32, DPR=1, viewport 756×441; Egret engine 5.4.1; rasterScale=3.
+- Browser reported 18 fixtures (9 path cases × lineWidth 10/30), manifest count 18 and 36 PNG download links. Log: `Egret CanvasRenderer generated 18 fixtures and 36 PNG files.`
+- Artifact `autodraw-egret-renderer-reference`, ID `13365080566`, size 362,990 bytes; ZIP contains 37 files: manifest + 36 PNG.
+- Local artifact validation PASS: all 36 PNG decode; 18 fixture matrix correct; all masked-board images 1380×720; source texture dimensions match ceil(GraphicsNode bounds × 3); smooth-single-point two source and two masked outputs are fully transparent no-op references.
+- Manifest SHA-256: `eafdf4612aa86c16f1ae70db74d40f13600a064abc2fc7115c131eef7dbf2642`.
+- Visual contact sheet reviewed. Smooth two/three/four point, normal horizontal/diagonal/L-turn, corner and scrollRect edge cases render as expected from the recorded path commands.
+- Important boundary: page invokes Egret CanvasRenderer directly and does not start WebGL. Masked-board output is a Canvas2D comparison composite. Browser PASS confirms source raster harness generation, not final WebGL output or pixel equivalence with game.
+- No same-session PNG capture for run `6a17a297-ea14-4527-9527-bfd8de3bd335` has yet been matched to its accepted point stream. The 27-stroke/1260-point Monitor run remains without a verified paired WebGL PNG comparison.
+- In run `41914478746`, Game Monitor/Bridge, Executor, Application integration, Preparation/G3, renderer browser job and INT-006 PNG job passed; Windows portable build/startup job was still in progress at last poll. Optional algorithm benchmarks SKIPPED. Full workflow result not yet final.
