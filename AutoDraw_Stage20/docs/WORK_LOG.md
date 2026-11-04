@@ -2523,3 +2523,15 @@ Brush Test acceptance и матричные валидаторы больше н
 - Executor report был записан примерно за 3.44 s до Bridge run finalization, что объясняет временный UI pending. После persistence строгая проверка должна дать окончательный отказ.
 - Before/after PNG просмотрены визуально; количественный frozen-mask audit не запускался. 5999 — точный фактический расход до лимита, но полная стоимость task неизвестна, так как последние три штриха не потребили ресурс.
 - Исходники, тесты, настройки и workflow не менялись; live experiment не запускался повторно. 45-cell matrix остаётся BLOCKED. Следующий шаг — статический анализ frozen plan/resource budget и документированное решение по over-budget/censored outcomes.
+
+## 2026-11-04 — FILL-001-RS PNG audit affine alignment correction
+
+- Перечитаны актуальные README/docs index, управляющие документы, регламенты, FILL-001 plan, postmortem, source adapter, coordinate transform, planner и regression tests.
+- По committed live evidence серии `fill001-rs-preflight-20261104-7.04` подтверждены executor 27/27 strokes, radius=10, exact pointCount 1→1261 (CHALK=1260), без Bridge sequence gaps/drops/errors/send failures. PNG gate ранее отклонил capture: coverage=97.673218%, leakage=28.
+- Найдено статическое несоответствие: executor использует scale=(ROI dimension−1)/logical dimension; PNG audit использовал PIL resize с ROI dimension/logical dimension. Это разные affine transforms. Для rectangle mask и ROI 581×304 различие двух raster masks составляет 606 pixels.
+- Исправлен `chalk_fill_capture_adapter.py`: screen mask строится inverse nearest-neighbor sampling с теми же scale_x/scale_y, что и `transform_logical_brush_plan_to_screen()`. Метаданные audit отражают единый transform.
+- Обновлён `test_chalk_fill_capture_adapter.py`: synthetic ROI fixture формирует mask по согласованному pixel-center mapping; проверяются равенство raster/executor scales и метод resampling.
+- Commits: [4797aa5](https://github.com/Kiddos19882/AutoDraw/commit/4797aa5e2e3d9f78656c91dcddf285304eae55c1), [a950084](https://github.com/Kiddos19882/AutoDraw/commit/a950084db14fd1560aa15f099da4a0108c9631e7). Затем синхронизирована документация.
+- Локальный git status и локальный pytest через GitHub API недоступны. Для новых commits нет подтверждённых CI statuses; committed PNG replay после исправления ещё не выполнен.
+- Исправление alignment не является доказательством устранения всего недопокрытия: 606 mask pixels — вклад различия raster conventions, а не измерение новых coverage/leakage. Acceptance thresholds не менялись.
+- Не запускались live game experiments; 45-task matrix остаётся BLOCKED. Production estimator/defaults, P1, frozen masks, исходные captures и master не менялись.
