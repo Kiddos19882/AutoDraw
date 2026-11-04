@@ -267,4 +267,13 @@ Planner model reproduction для frozen rectangle/r10/step5/offset0 plan даё
 Exploratory test одной замкнутой обводки после scanlines: erosion frozen mask эллиптическим ядром и один contour pass. Offset 6/7/8 px в OpenCV model дал coverage 99.516270% / 99.372942% / 99.328153%, leakage=0; offset 5 дал coverage 99.964168%, leakage=32. Это показывает возможное решение краевого дефицита при правильном смещении внутрь, но не подтверждает renderer equivalence и не определяет exact CHALK. Для offset 6 получен один контур из 64 вершин, длина приближения 846.225 logical px; не переводить эту длину в ресурс.
 
 Далее: завершить coordinate breakdown actual before/after PNG, проверить все 11 leakage pixels и сравнить с концами scanlines; только затем продолжить contour candidate offline с screen transform/brush footprint. Не менять исходный frozen plan и acceptance criteria. Новый live preflight и 45-task matrix — только после закрытия offline gate и отдельных разрешений.
+## Actual PNG residual map — confirmed 2026-11-04
 
+CI replay of immutable committed PNG pair reports:
+- uncovered target pixels: 1116;
+- top=244, bottom=239, left-middle=134, right-middle=499, interior/other=0;
+- largest connected component: 870 px, bbox [460,63,33,178], right perimeter;
+- 11 leakage pixels, sparse components at left perimeter / upper and lower rounded corners;
+- nearest scanline centerline distances: <=2px=10, 2–5px=320, 5–10px=786, >10px=0.
+
+Interpretation: residuals in this capture are perimeter-localized, not interior row-spacing gaps. Right-side deficit and sparse opposite-side leakage require establishing actual engine brush footprint and endpoint cap behavior. Previous offline contour-offset sweep remains exploratory only; it is not renderer-validated and cannot yet select a production offset. Capture REJECTED; 45-task matrix BLOCKED. No live experiment.
