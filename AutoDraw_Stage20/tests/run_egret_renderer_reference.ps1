@@ -73,7 +73,7 @@ try {
     }
 
     $dom = Get-Content -Raw $domPath
-    if ($dom -notmatch 'data-reference-status="complete"' -or $dom -notmatch 'data-fixture-count="18"' -or $dom -notmatch 'data-webgl-status="complete"' -or $dom -notmatch 'data-webgl-comparison-count="18"') {
+    if ($dom -notmatch 'data-reference-status="complete"' -or $dom -notmatch 'data-fixture-count="20"' -or $dom -notmatch 'data-webgl-status="complete"' -or $dom -notmatch 'data-webgl-comparison-count="20"') {
         Save-FailureDiagnostics
         $statusMatch = [regex]::Match($dom, '<p id="renderer-status"[^>]*>(.*?)</p>', [System.Text.RegularExpressions.RegexOptions]::Singleline)
         if ($statusMatch.Success) {
@@ -83,7 +83,7 @@ try {
         }
         Write-Host "Headless Edge DOM diagnostic (first 16000 characters):"
         Write-Host $dom.Substring(0, [Math]::Min(16000, $dom.Length))
-        throw "Egret reference page did not report 18 fixtures and a completed WebGL probe; diagnostics saved to artifact."
+        throw "Egret reference page did not report 20 fixtures and a completed WebGL probe; diagnostics saved to artifact."
     }
 
     $manifestMatch = [regex]::Match($dom, '<pre id="renderer-manifest-json"[^>]*>(.*?)</pre>', [System.Text.RegularExpressions.RegexOptions]::Singleline)
@@ -94,17 +94,17 @@ try {
 
     $manifestJson = [System.Net.WebUtility]::HtmlDecode($manifestMatch.Groups[1].Value)
     $manifest = $manifestJson | ConvertFrom-Json
-    if ($manifest.fixtures.Count -ne 18) {
+    if ($manifest.fixtures.Count -ne 20) {
         Save-FailureDiagnostics
-        throw "Expected 18 fixture entries in the manifest, found $($manifest.fixtures.Count)."
+        throw "Expected 20 fixture entries in the manifest, found $($manifest.fixtures.Count)."
     }
     Set-Content -Path (Join-Path $outputDir "manifest.json") -Value $manifestJson -Encoding utf8
 
     $pngPattern = '<a(?=[^>]*href="data:image/png;base64,([^"]+)")(?=[^>]*download="([^"]+)")[^>]*>'
     $pngMatches = [regex]::Matches($dom, $pngPattern)
-    if ($pngMatches.Count -ne 54) {
+    if ($pngMatches.Count -ne 60) {
         Save-FailureDiagnostics
-        throw "Expected 54 PNG download links (36 CanvasRenderer PNGs + 18 WebGL PNGs), found $($pngMatches.Count)."
+        throw "Expected 60 PNG download links (40 CanvasRenderer PNGs + 20 WebGL PNGs), found $($pngMatches.Count)."
     }
 
     foreach ($match in $pngMatches) {
@@ -113,15 +113,15 @@ try {
         [System.IO.File]::WriteAllBytes((Join-Path $outputDir $pngName), $pngBytes)
     }
 
-    if ($manifest.webglProbe.status -ne "complete" -or $manifest.webglProbe.comparisonCount -ne 18 -or
+    if ($manifest.webglProbe.status -ne "complete" -or $manifest.webglProbe.comparisonCount -ne 20 -or
         $manifest.runtimeProfile.canvasScaleFactor -ne 2 -or
         $manifest.runtimeProfile.canvasScaleX -ne 3 -or
         $manifest.runtimeProfile.canvasScaleY -ne 3) {
         Save-FailureDiagnostics
-        throw "WebGL renderer did not complete all 18 comparisons or runtime scale profile differs from snapshot."
+        throw "WebGL renderer did not complete all 20 comparisons or runtime scale profile differs from snapshot."
     }
 
-    Write-Host "Egret actual BoardPane CanvasRenderer + WebGLRenderer generated $($manifest.fixtures.Count) fixtures, 18 WebGL comparisons and $($pngMatches.Count) PNG files."
+    Write-Host "Egret actual BoardPane CanvasRenderer + WebGLRenderer generated $($manifest.fixtures.Count) fixtures, 20 WebGL comparisons and $($pngMatches.Count) PNG files."
 } finally {
     if ($server -and -not $server.HasExited) {
         Stop-Process -Id $server.Id -Force

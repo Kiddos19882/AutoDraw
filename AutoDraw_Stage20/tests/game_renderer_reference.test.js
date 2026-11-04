@@ -42,6 +42,15 @@ test("smooth three-point path ends at the last pair midpoint, not the last point
   assert.deepEqual(terminalPoint(points, true, false), { x: 20, y: 20 });
 });
 
+test("normal zero-length segment retains an explicit lineTo to the same coordinate", () => {
+  const points = [{ x: 100, y: 100 }, { x: 100, y: 100 }];
+  assert.deepEqual(buildNormalPathCommands(points), [
+    { type: "moveTo", x: 100, y: 100 },
+    { type: "lineTo", x: 100, y: 100 }
+  ]);
+  assert.deepEqual(terminalPoint(points, false, false), { x: 100, y: 100 });
+});
+
 test("normal path includes the final accepted point", () => {
   const points = [{ x: 0, y: 0 }, { x: 10, y: 5 }, { x: 30, y: 15 }];
   const commands = buildNormalPathCommands(points);
