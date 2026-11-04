@@ -2984,4 +2984,14 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - `buildSmoothPathCommands` теперь имеет сигнатуру `(points, drawFirstHalf, drawLast)` и defaults true/true; tests проверяют default `drawLast=true` и явный BoardPane `drawLast=false`.
 - Добавлены проверки HTTP availability для game bundle. CI для этих новых изменений ещё не завершён; ранее подтверждённый run `41914478746` относится к прежнему manual-only harness и не подтверждает actual BoardPane integration.
 - Ранее созданные PNG artifact `13365080566` и manifest относятся к manual-only harness и не являются финальным actual BoardPane reference; сохраняются как исторический output, не использовать для pixel equivalence.
+## 2026-11-04 — actual BoardPane CanvasRenderer reference: 18/18 pixel match
 
+- Run `41916449025`, job `126877971003`, commit `63d9dab586d6a6801b2afbbe964686877419131f` — browser harness SUCCESS.
+- Browser loads Egret engine bundle blob `d613d2b97e2436521aa3870478c69e99eac1f19f` and game bundle blob `46cc74de00b6cb5d207b1e1a2ffcd81613b6d388`; `com.magnetjoy.pet.ui.board.BoardPane` constructor and real `redraw()` are used.
+- For each of 9 path cases × widths 10/30, actual BoardPane output is compared with a second BoardPane instance whose Painter path method is replaced by the manual transcription. All 18 comparisons: `equal=true`, `differingPixels=0`.
+- Browser Edge 156.0.0.0 / Win32, DPR=1, viewport 756×441; Egret 5.4.1; rasterScale 3.
+- Artifact `autodraw-egret-renderer-reference`, ID `13365670726`, 520,477 bytes, manifest + 36 PNG. Local validation PASS: all PNGs decode, source dimensions match ceil(nodeBounds×3), masked boards 1380×720, single-point alpha bboxes empty.
+- Manifest SHA-256: `45e666ca2fe8b852105e08e72bf44665fc2ae0d8724bf14b4b9875dad3438fbc`.
+- Actual BoardPane GraphicsNode bounds include resetBg/stroke: standard fixtures `(-2,-2,464,244)`; mask-corner widths 10/30 `(-5,-5,467,247)` / `(-15,-15,477,257)`; scrollrect-edge widths 10/30 `(-25,-2,510,244)` / `(-35,-2,530,244)`. `smooth-single-point` is a non-empty node but fully transparent; empty-node WebGL guard does not apply.
+- This is exact CanvasRenderer agreement between actual BoardPane and manual transcription, not WebGL/game pixel equivalence. WebGL context was not created; texture sampling, premultiplied-alpha upload, mask stencil and live game PNG remain pending.
+- Full workflow `41916449025` still had Preparation/G3 in progress at log time; do not label overall CI PASS until final conclusion.
