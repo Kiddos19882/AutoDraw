@@ -23,6 +23,17 @@
 
 **Ограничения:** E1 only для кода bundle; cap geometry, zero-length rasterization, popup transform и live footprint не подтверждены. Exact CHALK только по pointCount delta. Текущий capture REJECTED; 45-task matrix BLOCKED.
 
+### Дополнение — per-stroke sampling telemetry (2026-11-04)
+
+- [x] Разобрать timestamps всех 1260 POINT_QUOTA_UPDATE events сохранённого run 6a17a297 по 27 штрихам.
+- [x] Зафиксировать median интервал 33 ms, accepted-point cadence 28.26–29.50 points/s и сравнение первых/последних 9 штрихов (28.734 vs 29.049 points/s).
+- [x] Установить, что старый frame_probe summary измерял browser requestAnimationFrame (59.997 FPS), а не Egret ENTER_FRAME; старый finalizer удалял raw per-probe intervals.
+- [x] Добавить strokeId к browser frame_probe; сохранять raw frame intervals и производить per-stroke point/frame summaries в Bridge Server.
+- [ ] Подтвердить CI run 41840281018 на HEAD 730590d2a6d7a3587a728934158bf64e9d7a958c; при ошибках исправить и повторить проверки.
+- [ ] Следующий live run (после прохождения offline renderer gate и отдельного разрешения) должен использовать новые per-stroke summaries; не считать browser rAF частотой игрового sampling.
+
+См. [engine audit](CHALK_GAME_ENGINE_POINT_COST_AND_BRUSH_WIDTH_2026-11-03.md) и [Bridge reference](GAME_MONITOR_BRIDGE_REFERENCE.md).
+
 ### Фактический результат replay — 2026-11-04
 
 - Исходные PNG и связанные evidence подтверждены в commit [5308214](https://github.com/Kiddos19882/AutoDraw/commit/530821497ce3a6bd5152318a78e1f06cb836f288).
