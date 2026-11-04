@@ -229,3 +229,11 @@ Replay test [974f949](https://github.com/Kiddos19882/AutoDraw/commit/974f949e963
 - Production estimator, production planner, executor defaults, P1 sampling defaults, исходные FILL-001 plans/captures и `master` не изменяются этим этапом.
 
 **Текущее решение:** статический sweep и versioned implementation выполнены; r10 / rectangle / step=5 / offset=0 — первый live preflight candidate, но не утверждённая настройка AutoDraw. Code/tests/config/workflow изменены только в рамках данного прямого разрешения пользователя. Live preflight ещё не выполнен: удалённый GitHub workflow не имеет доступа к локальной браузерной игровой сессии и calibrated board.
+
+## 2026-11-04 — коррекция affine mapping PNG audit
+
+Статический разбор live preflight выявил, что `transform_logical_brush_plan_to_screen()` использует (ROI width−1)/460 и (ROI height−1)/240, а `audit_fill001_png_pair()` ранее применял PIL.resize по ROI width/460 и height/240. На ROI 581×304 старый и согласованный screen masks различаются на 606 пикселей.
+
+Исправление внесено в [4797aa5](https://github.com/Kiddos19882/AutoDraw/commit/4797aa5e2e3d9f78656c91dcddf285304eae55c1); regression assertions — [a950084](https://github.com/Kiddos19882/AutoDraw/commit/a950084db14fd1560aa15f099da4a0108c9631e7). Это исправление alignment, а не подтверждение, что оно объясняет всю прежнюю разницу PNG. Старые coverage/leakage не переносить на новый audit без повторного replay.
+
+**Следующий обязательный gate:** полный CI и replay committed PNG на новом HEAD. Сохранить thresholds coverage≥99% / leakage=0. При повторном fail исследовать renderer footprint/sampling. 45-cell matrix не запускать до принятого capture.
