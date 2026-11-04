@@ -78,7 +78,7 @@ FILL-001 committed PNG audit: coverage=98.430600%, leakage=11, status=failed
 | `fill001/plans/...-rep1.json` | `430b79ad350b3ffd70183ca3da29c99b36f54d70079e482d6e553313c9355108` |
 | `runtime/current_brush_behavior_test.json` (repository bytes) | `31ca4c81d3dc8524ee98dcd584473f62060c131c65c23dad8bfd684115aac321` |
 
-В executor report записан runtime `source_plan_file_sha256=644cbf85a44481a5ecbe0fb2d88383dd1b13835c443dc240c0aa5700b4a8565f`, который не совпадает с SHA-256 committed runtime plan bytes выше. Replay test переносит plan в `tmp_path`, меняет абсолютный путь в копии report, но сохраняет записанный runtime file hash. Текущий `_validate_executor_report()` проверяет формат этого hash, но не пересчитывает его по relocated plan file. Canonical `source_plan_sha256`/executor plan hash и task signature совпадают, однако byte-for-byte identity runtime plan file отдельно не доказана. Разница может быть связана с line-ending normalization или изменением файла после исполнения; причина не установлена.
+В executor report записан runtime `source_plan_file_sha256=644cbf85a44481a5ecbe0fb2d88383dd1b13835c443dc240c0aa5700b4a8565f`. Он отличается от SHA-256 committed runtime plan bytes в таблице, но при пересчёте того же текста с Windows CRLF line endings получается **точное совпадение** с runtime hash. Следовательно, расхождение объясняется нормализацией LF/CRLF при помещении файла в Git, а не отличием содержимого плана. Canonical `source_plan_sha256`/executor plan hash и task signature также совпадают. Replay validator действительно проверяет формат source file hash, но не пересчитывает его по relocated copy; независимое сравнение LF и CRLF представлений закрывает это ограничение для данного evidence.
 | `game_monitor_bridge/.../session.json` | `2e521c711c2d6c768a77ef84a9f01228c6cdf9af9ff52de0e54b03aa12962fe9` |
 | `game-monitor-run-...-9ea6d0bb.json` (подготовительный run) | `8bcf8943cc37a50f0f3b0064878089fab8380ca182d392e4fa8333be61f39a56` |
 | `game-monitor-run-...-6a17a297.json` (run исполнения) | `0453db0e230d07702aef61e0e7945c64e845b68b47b3ee0dd33cf252f04e10f6` |
@@ -95,11 +95,11 @@ FILL-001 committed PNG audit: coverage=98.430600%, leakage=11, status=failed
 
 **Не установлено:** конкретная причина оставшихся 1.569400% недопокрытия и 11 leakage pixels. Текущая replay-метрика не позволяет однозначно выбрать между различием footprint/cap игрового renderer и офлайн-модели, дискретизацией/округлением координат, особенностями границы ROI или взаимодействием этих факторов. Это гипотезы, а не подтверждённые причины.
 
-Также остаётся ограничение byte-level binding runtime plan: committed file SHA-256 отличается от `source_plan_file_sha256`, записанного Executor во время live run. Canonical plan hash и task signature совпадают, но исходные bytes runtime plan требуют отдельного объяснения/проверки.
+Byte-level различие runtime plan hash объяснено и подтверждено: SHA-256 committed LF bytes — `31ca4c81d3dc8524ee98dcd584473f62060c131c65c23dad8bfd684115aac321`; SHA-256 того же содержимого с CRLF — `644cbf85a44481a5ecbe0fb2d88383dd1b13835c443dc240c0aa5700b4a8565f`, что точно совпадает с executor report. Это line-ending normalization, не содержательное расхождение.
 
 ## 6. Следующий шаг
 
-Продолжить только offline-анализ: (1) получить координатную карту uncovered target pixels и leakage pixels, разложить их по границам/штрихам и сопоставить с frozen mask, executor plan и screen transform; (2) выяснить причину расхождения runtime `source_plan_file_sha256` и committed plan bytes, не подменяя canonical plan identity. Сохранить диагностические overlays и численные breakdown. Не менять пороги, frozen mask, исходный plan или production defaults.
+Продолжить только offline-анализ той же пары PNG: получить координатную карту uncovered target pixels и leakage pixels, разложить их по границам/штрихам и сопоставить с frozen mask, executor plan и screen transform. Сохранить диагностические overlays и численные breakdown. Не менять пороги, frozen mask, исходный plan или production defaults.
 
 До локализации остаточного несоответствия:
 - не запускать новый live preflight;
