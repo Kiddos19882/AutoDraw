@@ -757,3 +757,13 @@ CI evidence: workflow 41787492122, commit d337f4240e83488273152f65992032beca3957
 **Вывод:** проблема bbox overclaim подтверждена для experimental `interior_fill_planner`; влияние на качество AutoDraw и соответствие реальному Egret renderer не доказано. Изменения исходников и тестов не выполнялись.
 
 **Следующий offline increment:** добавить отдельные masks для потенциально затронутых pixel cells (safety/leakage) и гарантированно покрытых cells (coverage), используя bbox только как broad-phase. Для горизонтального штриха базовая модель — capsule в logical space; при non-uniform scale учитывать обратное преобразование pixel-cell rectangle. Для polyline — отдельная swept-union модель и тесты концов/поворотов/анизотропии. Сравнить старый и новый planner на frozen fixtures; не менять текущий planner/defaults до независимого acceptance и не проводить live capture без прохождения offline gate.
+
+### BRUSH-FOOTPRINT-CAPSULE-001 — implementation candidate
+
+- [x] Добавлена отдельная pure-geometry функция `swept_capsule_pixel_masks()` в `brush_footprint_geometry.py`: ideal round-capped polyline, potential/guaranteed cell sets, inverse mapping pixel cells under non-uniform scale, bbox broad-phase.
+- [x] Добавлены tests для horizontal capsule endpoint corners, point/disk, anisotropic scale, polyline reversal/round join, canvas clipping и invalid inputs.
+- [ ] Получить полный CI result для test commit `7ffdd150ba42840737cba5f2143370e56d67bed3`; run [41842587672](https://github.com/Kiddos19882/AutoDraw/actions/runs/41842587672) на момент записи IN_PROGRESS.
+- [ ] Добавить независимый analytic oracle / frozen fixture comparison и оценить coverage overclaim старого planner.
+- [ ] Только после отдельного acceptance решать вопрос интеграции в `interior_fill_planner`; не менять текущие planner outputs/defaults до этого.
+
+**Ограничение:** это ideal geometric model, не deployed Egret validation. ROUND caps/joins остаются API-level assumption до подтверждения runtime identity. FILL-001-RS остаётся отдельным blocker; generic capsule task не доказывает причину его PNG residual.
