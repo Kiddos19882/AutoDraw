@@ -2995,3 +2995,11 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - Actual BoardPane GraphicsNode bounds include resetBg/stroke: standard fixtures `(-2,-2,464,244)`; mask-corner widths 10/30 `(-5,-5,467,247)` / `(-15,-15,477,257)`; scrollrect-edge widths 10/30 `(-25,-2,510,244)` / `(-35,-2,530,244)`. `smooth-single-point` is a non-empty node but fully transparent; empty-node WebGL guard does not apply.
 - This is exact CanvasRenderer agreement between actual BoardPane and manual transcription, not WebGL/game pixel equivalence. WebGL context was not created; texture sampling, premultiplied-alpha upload, mask stencil and live game PNG remain pending.
 - Full workflow `41916449025` still had Preparation/G3 in progress at log time; do not label overall CI PASS until final conclusion.
+
+### Follow-up 2026-11-04 — full CI run 41916449025 completed SUCCESS
+
+- Final workflow conclusion: `success`, head commit `63d9dab586d6a6801b2afbbe964686877419131f`.
+- Successful jobs: Application integration tests; Preparation and G3 matrix tests; Executor regression tests; Egret CanvasRenderer browser reference; Game Monitor and bridge tests; Windows portable build and startup smoke-test; INT-006 pixel-level PNG geometry audit.
+- Optional algorithm benchmarks: SKIPPED by workflow policy.
+- Workflow artifacts include `autodraw-egret-renderer-reference` ID `13365670726`, `autodraw-int006-png-analysis` ID `13365930476`, and `autodraw-g3-preflight-build` ID `13365063601`.
+- Branch HEAD after subsequent documentation updates is ahead of the CI-tested commit by 9 commits; compare shows only documentation paths changed. Source, tests and workflow remain identical to the CI-tested commit. No claim is made that the documentation-only HEAD itself was re-run through CI.
