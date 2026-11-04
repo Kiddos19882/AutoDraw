@@ -171,3 +171,48 @@ brush_footprint_geometry.footprint_pixel_bounds() возвращает прям�
 - угловые пиксели bbox у круглых окончаний могут быть помечены как покрытые, хотя capsule их не касается.
 
 Это способно привести к underfill в этих planner-ах. Это отдельная гипотеза/дефект модели, не установленная причина FILL-001-RS: текущий FILL capture строился scanline plan и требует отдельного аудита. До изменения кода сначала установить deployed renderer/transform и добавить точный pixel-cell capsule/swept footprint с regression tests.
+
+
+## 11. Прямое чтение brush path из игрового bundle — 2026-11-04
+
+**Источник:** `master:AutoDraw_Stage20/fileGameEngine/main.min_570122a1.js`; Git blob SHA `28838e803dcc6f85efb13febd93cc9e0f5046ffc`. Bundle прочитан через Git blob API; JavaScript не исполнялся. Ни `master`, ни исходный bundle не изменялись.
+
+### 11.1 Что непосредственно делает BoardPane
+
+В `BoardPane.redraw()` найден следующий фактический порядок:
+1. Для текущего сохранённого штриха берутся `atom.points`, `atom.radius`, `atom.colors` и `atom.options`.
+2. Для каждого штриха вызывается `graphics.lineStyle(s, color, 1, false)`.
+3. При включённом smooth option вызывается `Painter.drawSmoothLine(...)`; иначе — `Painter.drawNormalLine(...)`.
+4. Значение `s` напрямую передаётся как thickness линии Egret Graphics. Это ширина штриха, не диаметр `2 × s` и не геометрический радиус `s`.
+
+### 11.2 Фактическая геометрия центральной линии
+
+- `drawNormalLine()` начинает путь через `moveTo(first)` и продолжает его последовательными `lineTo(point)`.
+- `drawSmoothLine()` вычисляет середины соседних пар точек, использует их как промежуточные окончания сегментов и строит сглаживание через `curveTo(control, midpoint)`; затем при соответствующем флаге доводит путь до последней точки.
+- Поэтому smooth stroke нельзя точно заменить набором независимых прямых отрезков: нужно сохранять ту же последовательность midpoint/quadratic-curve path operations либо доказанно эквивалентную геометрию.
+- `onDrawStart()` добавляет начальную точку после `globalToLocal(stage.mouseX, stage.mouseY)`; `onDrawing()` получает следующие точки на `ENTER_FRAME`, проверяет попадание в локальный прямоугольник доски и только затем сохраняет точку.
+- `BlackBoardAtom.pushPoint()` не добавляет точку, если она равна последней сохранённой. `onDrawingEnd()` завершает штрих вызовом `atom.add()`.
+- `setRadius()` записывает выбранное значение в `atom.radius` текущего штриха.
+
+### 11.3 Круглая форма — наблюдение и доказательность
+
+**Пользовательское визуальное наблюдение (2026-11-04):** кисть в самой игре выглядит круглой. Это наблюдение пользователя, а не измерение PNG.
+
+**Сопоставление с исходником:** игровой код задаёт толщину линии через `Graphics.lineStyle`, но не передаёт caps/joints явно — вызов содержит только четыре аргумента. Egret 5.2.18 API/reference implementation задаёт ROUND для отсутствующих caps и joints. Это согласуется с визуальным наблюдением и с моделью круглого swept footprint: у прямого сегмента — полоса шириной thickness с полукруглыми концами; у ломаной — круглые соединения. Для сглаженной траектории та же круглая кисть проходит вдоль кривого центрального пути.
+
+**Ограничение:** deployed Egret runtime игры всё ещё не идентифицирован. Поэтому ROUND caps/joins — подтверждённое поведение reference API и сильная гипотеза для игры, но не окончательное доказательство её конкретной растеризации. Нельзя пока объявлять offline capsule mask пиксельно эквивалентной игровому PNG.
+
+### 11.4 Особый случай одного клика
+
+Для массива из одной точки `drawSmoothLine()` формирует `moveTo(p)` и затем `lineTo(p)`; `drawNormalLine()` формирует только `moveTo(p)`. По Canvas path semantics zero-length segment не обязан создавать видимый след. При этом `onDrawStart()` уже сохраняет первую точку и вызывает `updateLess()`. Следовательно, возможен случай расхода одной игровой точки без видимого отпечатка. Это вывод из исходной последовательности операций и Canvas semantics; поведение deployed renderer для такого случая требует отдельного PNG/runtime подтверждения.
+
+### 11.5 Вывод для AutoDraw
+
+1. Эталонная геометрическая модель — круглая кисть, проходящая вдоль фактического центрального пути; для прямого сегмента это capsule/swept disk, а не прямоугольный AABB.
+2. Толщина модели должна быть равна передаваемому `brush_value`; полуразмер равен `brush_value / 2` до применения transform.
+3. Для smooth option нужно воспроизводить midpoint + `curveTo` путь; обычный polyline режим остаётся отдельным вариантом.
+4. Координаты BoardPane локальны; игровой ввод переводит stage coordinates через `globalToLocal()`. Для полного совпадения требуется также восстановить transform popup/board → screen/canvas ROI.
+5. Существующий `swept_capsule_pixel_masks()` является полезной offline геометрической основой, но пока не доказан как pixel-identical renderer replica.
+6. До renderer identity и frozen PNG comparison не менять production planner/defaults и не разблокировать FILL-001-RS matrix.
+
+**Уровень evidence:** E1 — статически прочитаны конкретные методы bundle и их связи; E0/E1 для вывода о deployed round caps/joins; пользовательское визуальное наблюдение отдельно зафиксировано. Runtime equivalence — NOT VALIDATED.
