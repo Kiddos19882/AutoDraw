@@ -255,3 +255,54 @@ Commit [d3322fe35c808bde079c79545cc839636b7cda2a](https://github.com/Kiddos19882
 Манифест указывает runtime paths `js/mergeEngine_df2e5bc5.js` и `js/main.min_653f95bc.js`. В репозитории файлы лежат непосредственно в `gameEngine/`, а не в `gameEngine/js/`.
 
 Наличие этих файлов позволяет анализировать новую копию игровых bundles в feature branch. Пока не установлено, что она байт-в-байт совпадает с историческими assets из Game Monitor captures или с ранее прочитанным `master:fileGameEngine/main.min_570122a1.js`. Имя merge bundle совпадает с историческим URL, но это не заменяет hash comparison; имя основного bundle отличается. Поэтому deployed Egret/runtime identity остаётся UNKNOWN до статического сравнения содержимого и подтверждения источника.
+
+
+## 11. Повторный разбор подтверждённого набора с сайта игры — 2026-11-04
+
+Пользователь подтвердил, что `main.min_653f95bc.js`, `mergeEngine_df2e5bc5.js` и `manifest.json` скачаны с сайта запущенной игры в один момент; достоверность происхождения — 100% по подтверждению пользователя. Эти три файла рассматриваются как единый согласованный набор. Сверка с `master/fileGameEngine/main.min_570122a1.js` не требуется.
+
+### 11.1. Точный счётчик и приём координат
+
+В `main.min_653f95bc.js` (Git blob SHA `46cc74de00b6cb5d207b1e1a2ffcd81613b6d388`) подтверждено:
+
+- `BoardPane.updateLess()` проходит по всем штрихам и всем точкам `atom.points`, считает `pointCount`, затем задаёт `less = max - pointCount` и отправляет событие `BlackBoardEvent.CHALK` с `percent = less / max`.
+- `BoardPane.onDrawStart()` добавляет стартовую координату из `globalToLocal(stage.mouseX, stage.mouseY)`, обновляет квоту и подписывается на `ENTER_FRAME`.
+- `BoardPane.onDrawing()` на кадре читает текущую позицию, переводит её в локальные координаты, проверяет прямоугольник `0..width × 0..height` и при попадании вызывает `atom.pushPoint()`, `updateLess()` и `redraw(false)`.
+- `BoardPane.onDrawingEnd()` снимает `ENTER_FRAME` listener, перерисовывает и завершает текущий массив точек через `atom.add()`.
+- `BlackBoardAtom.pushPoint()` добавляет координату только если текущий штрих пуст или координата не совпадает с последней точкой. Повтор одной и той же соседней координаты не увеличивает расход.
+- `updateLess()` повторно сканирует весь накопленный `atom.points` на каждом вызове. Это статически подтверждённая O(N) работа игрового пути, но влияние на FPS/количество принятых точек не измерялось в рамках этого анализа.
+
+### 11.2. Размер кисти и геометрия
+
+- `BoardPane.setRadius(t)` выполняет только `atom.radius[atom.length - 1] = t`; прямого изменения `pointCount`, `max` или `less` в этом методе нет.
+- `BoardPane.redraw()` передаёт сохранённое значение как первый аргумент `graphics.lineStyle(s, color, 1, false)`, то есть как толщину линии Graphics. Название `radius` в модели игры не следует автоматически трактовать как математический радиус диска с диаметром `2×radius`.
+- Presets `RadiusOption`: 20, 14 и 7; `MAX_RADIUS=30`; `BoardPane.BLACK_BOARD_LINE_RADIUS=7`.
+- В `PainterPopup` smooth button по умолчанию selected и `painterBoard.setSmooth(true)` вызывается при инициализации. `Painter.drawSmoothLine()` строит midpoint/`curveTo`; `drawNormalLine()` строит polyline через `moveTo`/`lineTo`. Выбор пути влияет на геометрию растеризации, но не меняет формулу счётчика CHALK.
+- `PainterPopup.createBlackBoard()` создаёт активный `painterBoard` с логическим размером 460×240 и лимитом `blackBoard.maxPoint`. `BoardPane` constructor имеет fallback `maxPoint=2000`, но в этом пути передаётся значение объекта доски.
+- В режиме `_isPainterExtend` метод `clear()` добавляет специальную стартовую точку `(0,0)` и отдельный массив штриха. Поэтому абсолютный `pointCount` может содержать начальную служебную точку; изолированный расход следует считать по pre/post delta после завершённого Clear/baseline.
+
+### 11.3. Runtime renderer из merge bundle
+
+`mergeEngine_df2e5bc5.js` (Git blob SHA `d613d2b97e2436521aa3870478c69e99eac1f19f`) содержит `egret.Capabilities.engineVersion="5.4.1"`. Это supersedes прежнее предположение, основанное на upstream reference Egret 5.2.18: для текущего набора статически установлен номер движка 5.4.1.
+
+В реализации `GraphicsNode.lineStyle()` отсутствующие/неподдерживаемые caps/joints нормализуются к `"round"`; `CanvasRenderer.renderGraphics()` назначает `context.lineCap` и `context.lineJoin`, затем вызывает `stroke()`. Это подтверждает renderer defaults в предоставленном merge bundle. Но поведение нулевого пути `moveTo(p)+lineTo(p)`, итоговый pixel footprint и фактический Canvas/WebGL execution mode требуют отдельной frozen-fixture/runtime проверки.
+
+Основной bundle задаёт `stage.frameRate=48` и `StageScaleMode.NO_SCALE`; это nominal target, а не измеренный FPS. Логические размеры BoardPane — 460×240. Popup/global transform и фактический screen ROI этим разбором не установлены.
+
+### 11.4. Важный риск выбора BoardPane в Game Monitor
+
+В `main.min_653f95bc.js` существуют два экземпляра одного класса:
+
+1. Preview `BoardPane` внутри `BoardItemBase.createNativeContent()`, где устанавливается `interactive=false`.
+2. Рабочий `PainterPopup.painterBoard`, создаваемый `createBlackBoard()` с `interactive=true`.
+
+Текущий `source/game_monitor/game_monitor.js` ищет первый структурно подходящий объект через обход display list (`findBoard()` → `isBoard()`). Проверка требует `atom.points` и методов `onDrawStart/onDrawing/onDrawingEnd`, но не проверяет `interactive`, popup ownership или активность рисования. Следовательно, auto-discovery имеет неоднозначность и может выбрать preview BoardPane. Это не доказывает, что именно он выбирается в конкретном live session: порядок display list и фактическая привязка требуют отдельного подтверждения. Unit tests сейчас проверяют прямой `attach(board)` и replacement, но не несколько BoardPane в одном display list.
+
+До закрытия этого вопроса `boardDetected=true` само по себе не доказывает, что Game Monitor измеряет активный painterBoard. Следующая задача — установить безопасный критерий выбора и regression coverage; код/тесты не менялись.
+
+### 11.5. Следующий шаг
+
+1. Статически проследить создание и порядок добавления preview BoardPane и PainterPopup в display list, а также найти безопасный признак активного painterBoard.
+2. Проверить popup → BoardPane → screen transform, clipping и соответствие logical 460×240 фактическому ROI.
+3. Подготовить frozen fixtures для smooth/normal path, прямых концов, поворотов, разных thickness и zero-length path; сравнить rasterization с capsule candidate.
+4. Только после offline gates и отдельного разрешения рассматривать live capture. Текущий анализ не запускал игру и не измерял CHALK.
