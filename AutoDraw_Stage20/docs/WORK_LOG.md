@@ -2577,3 +2577,11 @@ Production source, frozen masks, PNG thresholds, исходные live captures 
 - INT006R: 45/45 accepted; pre/post pointCount CHALK и per-stroke deltas доступны. Радиус 1/10/30 при P1 дал небольшие немонотонные различия по D1–D5; см. TASKS/PROJECT_STATUS для средних значений. Visual source содержит 180 files (45 before/after pairs); автоматический analyzer оставил 45/45 visual gates pending manual review.
 - Быстрый обзор контактного листа показал ожидаемое изменение толщины следа между радиусами, без очевидной потери целевых фигур на миниатюрах; это только предварительный triage, не замена индивидуальному review всех пар.
 - Не запускались live игровые эксперименты в этой сессии. Production model/estimator/defaults, executor и sampling defaults не изменялись. Static sweep не подтверждает game runtime и расход CHALK.
+
+## 2026-11-04 — фиксация обязательного FILL-001-RS evidence replay
+
+Создана/актуализирована блокирующая задача **FILL-001-RS-PRE-REPLAY-001**: до любого следующего live запуска требуется повторно проверить неизменённые before/after PNG и связанное evidence исходного запуска `fill001-rs-preflight-20261104-7.04` актуальным PNG audit. Проверка должна сохранить hashes входов, версию analyzer, runtime binding, coverage и leakage.
+
+Исходные данные задачи: 27/27 strokes, pointCount 1→1261 (exact CHALK=1260), Bridge diagnostics без ошибок; прежний PNG gate отклонил capture с coverage=97.673218% и leakage=28 при неизменных критериях ≥99% / 0. Успешный CI 41780241017 проверяет software gates, но не подтверждает replay исходных live PNG.
+
+До закрытия задачи запрещены новый live запуск FILL-001-RS и запуск 45-task matrix; игровые эксперименты не входят в offline replay и требуют отдельного разрешения. Изменение production-кода/defaults, frozen masks, исходных plans/manifest и acceptance thresholds не разрешено. Доступность бинарных PNG из предполагаемого commit `530821497ce3a6bd5152318a78e1f06cb836f288` ещё не подтверждена.
