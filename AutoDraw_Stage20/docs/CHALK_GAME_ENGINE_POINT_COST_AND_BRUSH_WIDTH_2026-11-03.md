@@ -57,3 +57,38 @@ FILL-001 должен проверять не «сколько CHALK стоит 
 - `main.min_570122a1.js` присутствует в `master`, но отсутствует в `feature/image-geometry-optimization`.
 - `AutoDraw_Stage20/testImages/images.png` присутствует в обеих ветках с одинаковым blob SHA `fc9c984d15e9dda7d6511b01b5a88ca52ba2380f`; повторный перенос не требуется.
 - Ветки diverged; merge/rebase не выполнялся. Engine bundle не копировался в feature branch.
+
+
+## 7. Повторный разбор исходного bundle — 2026-11-04
+
+**Источник:** master commit 9a3453aeb847b66041bc83d6f4a56ecaf33a993a; blob 28838e803dcc6f85efb13febd93cc9e0f5046ffc, размер 4 785 687 bytes. Bundle прочитан через GitHub Contents API; файл не переносился в feature branch. Это статический анализ конкретной версии, не runtime validation.
+
+### 7.1 Приём координат и расход
+
+- BoardPane.onDrawStart() сразу добавляет первую координату через atom.pushPoint(globalToLocal(stage.mouseX, stage.mouseY)), вызывает updateLess() и подписывается на ENTER_FRAME.
+- BoardPane.onDrawing() на каждом ENTER_FRAME считывает текущие stage.mouseX/mouseY, переводит через globalToLocal, проверяет попадание в прямоугольник 0..width × 0..height и при попадании вызывает atom.pushPoint(), updateLess() и redraw(false).
+- Игра делает максимум одну попытку добавления текущей позиции за кадр, а не одну точку на каждый pyautogui.moveTo.
+- BlackBoardAtom.pushPoint() добавляет координату, только если текущий stroke пуст или координата не равна последней сохранённой. Повтор одинаковых соседних координат не расходует дополнительную точку.
+- BoardPane.onDrawingEnd() снимает ENTER_FRAME listener, вызывает redraw(false) и atom.add().
+- BoardPane.updateLess() заново обходит все массивы atom.points, считает их длины и задаёт less = max - count. Пересчёт — O(N) по накопленному числу точек на каждом принятом sample. Это потенциальный источник снижения frame rate на длинных запусках, но фактический эффект нужно проверить по per-stroke FPS probe.
+
+### 7.2 Геометрия и сглаживание
+
+- BoardPane.redraw() вызывает graphics.lineStyle(s, color, 1, false), где s — сохранённое значение atom.radius. Вызов содержит только четыре аргумента; caps/joints явно не задаются.
+- Painter.drawSmoothLine() строит midpoints между соседними точками, использует curveTo() для сглаживания и в конце делает lineTo() к последней сохранённой точке.
+- Для массива из одной точки smooth path выполняет moveTo(point) и lineTo(point) в ту же координату. Для drawNormalLine() с одной точкой выполняется только moveTo(point).
+- Первая точка может быть учтена в CHALK до заметного перемещения указателя. Будет ли нулевой путь визуально окрашен, зависит от Egret renderer и настроек окончания линии; это не установлено по одному вызову Painter.
+- Caps/joints не передаются из BoardPane.redraw(). В bundle не найдено явного задания lineCap; фактическая форма окончания и поведение нулевого сегмента остаются UNKNOWN до проверки Egret Graphics/runtime или отдельного capture.
+- BlackBoardItem.createNativeContent() задаёт logical board 460×240 и вычисляет равномерный board.scaleX = board.scaleY = boardMask.width / 460. Это подтверждает display scale доски внутри item. Нельзя автоматически переносить этот transform на painter popup: нужно проверить именно тот BoardPane, на котором выполняется live drawing.
+
+### 7.3 Следствия для AutoDraw
+
+1. Сравнивать move_calls, частоту ENTER_FRAME, число принятых координат и CHALK как разные метрики.
+2. Для P1 (step=4, delay=5 ms) нельзя считать, что каждый 5-ms шаг становится отдельной игровой точкой: sampling ограничен кадрами, одинаковые соседние координаты удаляются.
+3. Bridge frame_probe уже собирает интервалы requestAnimationFrame между началом и концом штриха. Следующий анализ должен связать их с per-stroke pointCount delta, длительностью и фактическими настройками Executor.
+4. Полный обход atom.points внутри updateLess() может создавать обратную связь: накопление точек увеличивает работу на каждом кадре и потенциально снижает sampling rate. Это проверяемая гипотеза, не установленная причина PNG дефекта.
+5. Не менять footprint model на основании только lineStyle thickness: нужны экранный transform popup board, renderer caps/joints и PNG calibration на нескольких значениях кисти.
+
+**Точные области bundle:** BoardPane около offsets 4 092 419–4 095 700; Painter около offset 1 419 504. Blob SHA указан выше. BoardPane constants: 460×240, BLACK_BOARD_LINE_RADIUS=7.
+
+**Статус:** E1 статический разбор завершён для перечисленных вызовов. Cap geometry, zero-length stroke rasterization, popup display transform и фактическая screen-space raster footprint — UNKNOWN. Live captures не запускались.
