@@ -1,3 +1,11 @@
+## Дополнение — аудит BRUSH-FOOTPRINT-CAPSULE-001 (2026-11-04)
+
+Статически подтверждено, что generic `interior_fill_planner` использует AABB bounds не только для color-safety, но и как уже покрытую область (`_mark_footprint`). Для круглой capsule кисти AABB содержит угловые клетки, которые не принадлежат фактическому footprint; они могут ошибочно исключаться из fallback, завышая модельное coverage. Тестовый oracle также моделирует прямоугольник, а не независимую capsule.
+
+Область влияния ограничена generic experimental modules: `swept_footprint_geometry` использует bbox как conservative safety envelope, `outline_first_fill_planner` — для safety check. FILL-001/FILL-001-RS используют отдельный OpenCV round-capped rasterizer и не вызывают `footprint_pixel_bounds`; прямую причинную связь с rejected FILL-001-RS capture не установлено. Deployed Egret runtime и реальный footprint остаются UNKNOWN. Код/тесты не менялись; следующий шаг — offline possible/guaranteed pixel-cell masks и frozen-fixture comparison.
+
+---
+
 ## Актуальная сводка — 2026-11-04, CI и telemetry
 
 - Рабочая ветка: `feature/image-geometry-optimization`; проверенный HEAD перед синхронизацией документации: `1315dc013f972ef77fc0ff6d6c9b8607ae6a09f1`. GitHub compare: ahead 2907 / behind 5 относительно `master`; merge/rebase не выполнялся, `master` не изменялся. Локальный `git status` недоступен через GitHub API.
