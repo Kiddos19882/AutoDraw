@@ -983,3 +983,10 @@
 - В merge bundle найден Egret Engine 5.4.1 и ROUND fallback для caps/joints.
 - Обнаружена неоднозначность выбора BoardPane при автоматическом поиске Game Monitor: preview и активный PainterPopup создают два структурно подходящих экземпляра. Добавлена блокирующая задача на подтверждение выбора активной доски.
 - Изменены только Markdown-документы. Исходники, тесты, конфигурации, workflow, master и экспериментальные данные не затрагивались; live runtime не запускался.
+
+
+## 2026-11-04 — GAME-BRUSH-REPLICATION source trace
+
+- Выполнена полная статическая трассировка цепочки игровой кисти в пользовательски подтверждённом наборе Egret 5.4.1: ввод, ENTER_FRAME sampling, dedup, normal/smooth path, line width, ROUND caps/joints, clipping и Canvas/WebGL selection.
+- Зафиксировано отличие AutoDraw: Executor отправляет mouse move events, но список точек формируется игровым кадровым циклом; OpenCV и capsule модели не подтверждены как pixel-identical renderer replica.
+- Добавлены результаты и следующий offline gate в существующий engine report, TASKS, ROADMAP и PROJECT_STATUS. Исходники, тесты, конфигурации, workflow, live data и master не менялись.
