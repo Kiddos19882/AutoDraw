@@ -1,20 +1,20 @@
 {
   "schema_version": 1,
-  "name": "FILL-001 fill001-20261104-051653-rectangle-r10-rep1",
-  "created_at": "2026-11-04T02:17:10.747868+00:00",
+  "name": "FILL-001-RS fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
+  "created_at": "2026-11-04T03:39:06.659250+00:00",
   "coordinate_system": "local_canvas_pixels",
   "canvas": {
     "width": 581,
     "height": 304
   },
   "summary": {
-    "stroke_count": 131,
-    "drawing_length_px": 50709.69,
-    "pen_up_distance_px": 50367.0
+    "stroke_count": 27,
+    "drawing_length_px": 10402.18,
+    "pen_up_distance_px": 10060.57
   },
   "strokes": [
     {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0001",
+      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0001",
       "closed": false,
       "points": [
         {
@@ -28,93 +28,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
+        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0002",
-      "closed": false,
-      "points": [
-        {
-          "x": 110.957,
-          "y": 70.7
-        },
-        {
-          "x": 469.043,
-          "y": 70.7
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0003",
-      "closed": false,
-      "points": [
-        {
-          "x": 108.435,
-          "y": 71.962
-        },
-        {
-          "x": 471.565,
-          "y": 71.962
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0004",
-      "closed": false,
-      "points": [
-        {
-          "x": 105.913,
-          "y": 73.225
-        },
-        {
-          "x": 474.087,
-          "y": 73.225
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0005",
-      "closed": false,
-      "points": [
-        {
-          "x": 104.652,
-          "y": 74.487
-        },
-        {
-          "x": 475.348,
-          "y": 74.487
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0006",
+      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0002",
       "closed": false,
       "points": [
         {
@@ -128,93 +48,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
+        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0007",
-      "closed": false,
-      "points": [
-        {
-          "x": 102.13,
-          "y": 77.013
-        },
-        {
-          "x": 477.87,
-          "y": 77.013
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0008",
-      "closed": false,
-      "points": [
-        {
-          "x": 100.87,
-          "y": 78.275
-        },
-        {
-          "x": 479.13,
-          "y": 78.275
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0009",
-      "closed": false,
-      "points": [
-        {
-          "x": 99.609,
-          "y": 79.537
-        },
-        {
-          "x": 480.391,
-          "y": 79.537
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0010",
-      "closed": false,
-      "points": [
-        {
-          "x": 98.348,
-          "y": 80.8
-        },
-        {
-          "x": 481.652,
-          "y": 80.8
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0011",
+      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0003",
       "closed": false,
       "points": [
         {
@@ -228,93 +68,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
+        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0012",
-      "closed": false,
-      "points": [
-        {
-          "x": 97.087,
-          "y": 83.325
-        },
-        {
-          "x": 482.913,
-          "y": 83.325
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0013",
-      "closed": false,
-      "points": [
-        {
-          "x": 97.087,
-          "y": 84.587
-        },
-        {
-          "x": 482.913,
-          "y": 84.587
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0014",
-      "closed": false,
-      "points": [
-        {
-          "x": 95.826,
-          "y": 85.85
-        },
-        {
-          "x": 484.174,
-          "y": 85.85
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0015",
-      "closed": false,
-      "points": [
-        {
-          "x": 95.826,
-          "y": 87.112
-        },
-        {
-          "x": 484.174,
-          "y": 87.112
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0016",
+      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0004",
       "closed": false,
       "points": [
         {
@@ -328,93 +88,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
+        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0017",
-      "closed": false,
-      "points": [
-        {
-          "x": 95.826,
-          "y": 89.638
-        },
-        {
-          "x": 484.174,
-          "y": 89.638
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0018",
-      "closed": false,
-      "points": [
-        {
-          "x": 95.826,
-          "y": 90.9
-        },
-        {
-          "x": 484.174,
-          "y": 90.9
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0019",
-      "closed": false,
-      "points": [
-        {
-          "x": 95.826,
-          "y": 92.162
-        },
-        {
-          "x": 484.174,
-          "y": 92.162
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0020",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 93.425
-        },
-        {
-          "x": 485.435,
-          "y": 93.425
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0021",
+      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0005",
       "closed": false,
       "points": [
         {
@@ -428,93 +108,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
+        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0022",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 95.95
-        },
-        {
-          "x": 485.435,
-          "y": 95.95
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0023",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 97.212
-        },
-        {
-          "x": 485.435,
-          "y": 97.212
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0024",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 98.475
-        },
-        {
-          "x": 485.435,
-          "y": 98.475
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0025",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 99.737
-        },
-        {
-          "x": 485.435,
-          "y": 99.737
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0026",
+      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0006",
       "closed": false,
       "points": [
         {
@@ -528,93 +128,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
+        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0027",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 102.263
-        },
-        {
-          "x": 485.435,
-          "y": 102.263
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0028",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 103.525
-        },
-        {
-          "x": 485.435,
-          "y": 103.525
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0029",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 104.787
-        },
-        {
-          "x": 485.435,
-          "y": 104.787
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0030",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 106.05
-        },
-        {
-          "x": 485.435,
-          "y": 106.05
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0031",
+      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0007",
       "closed": false,
       "points": [
         {
@@ -628,93 +148,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
+        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0032",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 108.575
-        },
-        {
-          "x": 485.435,
-          "y": 108.575
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0033",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 109.837
-        },
-        {
-          "x": 485.435,
-          "y": 109.837
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0034",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 111.1
-        },
-        {
-          "x": 485.435,
-          "y": 111.1
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0035",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 112.362
-        },
-        {
-          "x": 485.435,
-          "y": 112.362
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0036",
+      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0008",
       "closed": false,
       "points": [
         {
@@ -728,93 +168,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
+        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0037",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 114.888
-        },
-        {
-          "x": 485.435,
-          "y": 114.888
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0038",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 116.15
-        },
-        {
-          "x": 485.435,
-          "y": 116.15
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0039",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 117.412
-        },
-        {
-          "x": 485.435,
-          "y": 117.412
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0040",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 118.675
-        },
-        {
-          "x": 485.435,
-          "y": 118.675
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0041",
+      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0009",
       "closed": false,
       "points": [
         {
@@ -828,93 +188,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
+        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0042",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 121.2
-        },
-        {
-          "x": 485.435,
-          "y": 121.2
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0043",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 122.462
-        },
-        {
-          "x": 485.435,
-          "y": 122.462
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0044",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 123.725
-        },
-        {
-          "x": 485.435,
-          "y": 123.725
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0045",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 124.987
-        },
-        {
-          "x": 485.435,
-          "y": 124.987
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0046",
+      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0010",
       "closed": false,
       "points": [
         {
@@ -928,93 +208,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
+        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0047",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 127.512
-        },
-        {
-          "x": 485.435,
-          "y": 127.512
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0048",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 128.775
-        },
-        {
-          "x": 485.435,
-          "y": 128.775
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0049",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 130.037
-        },
-        {
-          "x": 485.435,
-          "y": 130.037
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0050",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 131.3
-        },
-        {
-          "x": 485.435,
-          "y": 131.3
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0051",
+      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0011",
       "closed": false,
       "points": [
         {
@@ -1028,93 +228,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
+        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0052",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 133.825
-        },
-        {
-          "x": 485.435,
-          "y": 133.825
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0053",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 135.088
-        },
-        {
-          "x": 485.435,
-          "y": 135.088
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0054",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 136.35
-        },
-        {
-          "x": 485.435,
-          "y": 136.35
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0055",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 137.612
-        },
-        {
-          "x": 485.435,
-          "y": 137.612
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0056",
+      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0012",
       "closed": false,
       "points": [
         {
@@ -1128,93 +248,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
+        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0057",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 140.137
-        },
-        {
-          "x": 485.435,
-          "y": 140.137
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0058",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 141.4
-        },
-        {
-          "x": 485.435,
-          "y": 141.4
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0059",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 142.662
-        },
-        {
-          "x": 485.435,
-          "y": 142.662
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0060",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 143.925
-        },
-        {
-          "x": 485.435,
-          "y": 143.925
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0061",
+      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0013",
       "closed": false,
       "points": [
         {
@@ -1228,93 +268,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
+        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0062",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 146.45
-        },
-        {
-          "x": 485.435,
-          "y": 146.45
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0063",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 147.713
-        },
-        {
-          "x": 485.435,
-          "y": 147.713
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0064",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 148.975
-        },
-        {
-          "x": 485.435,
-          "y": 148.975
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0065",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 150.237
-        },
-        {
-          "x": 485.435,
-          "y": 150.237
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0066",
+      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0014",
       "closed": false,
       "points": [
         {
@@ -1328,93 +288,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
+        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0067",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 152.762
-        },
-        {
-          "x": 485.435,
-          "y": 152.762
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0068",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 154.025
-        },
-        {
-          "x": 485.435,
-          "y": 154.025
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0069",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 155.287
-        },
-        {
-          "x": 485.435,
-          "y": 155.287
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0070",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 156.55
-        },
-        {
-          "x": 485.435,
-          "y": 156.55
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0071",
+      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0015",
       "closed": false,
       "points": [
         {
@@ -1428,93 +308,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
+        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0072",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 159.075
-        },
-        {
-          "x": 485.435,
-          "y": 159.075
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0073",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 160.338
-        },
-        {
-          "x": 485.435,
-          "y": 160.338
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0074",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 161.6
-        },
-        {
-          "x": 485.435,
-          "y": 161.6
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0075",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 162.862
-        },
-        {
-          "x": 485.435,
-          "y": 162.862
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0076",
+      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0016",
       "closed": false,
       "points": [
         {
@@ -1528,93 +328,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
+        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0077",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 165.387
-        },
-        {
-          "x": 485.435,
-          "y": 165.387
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0078",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 166.65
-        },
-        {
-          "x": 485.435,
-          "y": 166.65
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0079",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 167.912
-        },
-        {
-          "x": 485.435,
-          "y": 167.912
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0080",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 169.175
-        },
-        {
-          "x": 485.435,
-          "y": 169.175
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0081",
+      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0017",
       "closed": false,
       "points": [
         {
@@ -1628,93 +348,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
+        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0082",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 171.7
-        },
-        {
-          "x": 485.435,
-          "y": 171.7
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0083",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 172.963
-        },
-        {
-          "x": 485.435,
-          "y": 172.963
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0084",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 174.225
-        },
-        {
-          "x": 485.435,
-          "y": 174.225
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0085",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 175.487
-        },
-        {
-          "x": 485.435,
-          "y": 175.487
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0086",
+      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0018",
       "closed": false,
       "points": [
         {
@@ -1728,93 +368,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
+        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0087",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 178.012
-        },
-        {
-          "x": 485.435,
-          "y": 178.012
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0088",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 179.275
-        },
-        {
-          "x": 485.435,
-          "y": 179.275
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0089",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 180.537
-        },
-        {
-          "x": 485.435,
-          "y": 180.537
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0090",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 181.8
-        },
-        {
-          "x": 485.435,
-          "y": 181.8
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0091",
+      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0019",
       "closed": false,
       "points": [
         {
@@ -1828,93 +388,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
+        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0092",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 184.325
-        },
-        {
-          "x": 485.435,
-          "y": 184.325
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0093",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 185.588
-        },
-        {
-          "x": 485.435,
-          "y": 185.588
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0094",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 186.85
-        },
-        {
-          "x": 485.435,
-          "y": 186.85
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0095",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 188.112
-        },
-        {
-          "x": 485.435,
-          "y": 188.112
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0096",
+      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0020",
       "closed": false,
       "points": [
         {
@@ -1928,93 +408,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
+        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0097",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 190.637
-        },
-        {
-          "x": 485.435,
-          "y": 190.637
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0098",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 191.9
-        },
-        {
-          "x": 485.435,
-          "y": 191.9
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0099",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 193.162
-        },
-        {
-          "x": 485.435,
-          "y": 193.162
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0100",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 194.425
-        },
-        {
-          "x": 485.435,
-          "y": 194.425
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0101",
+      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0021",
       "closed": false,
       "points": [
         {
@@ -2028,93 +428,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
+        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0102",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 196.95
-        },
-        {
-          "x": 485.435,
-          "y": 196.95
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0103",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 198.213
-        },
-        {
-          "x": 485.435,
-          "y": 198.213
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0104",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 199.475
-        },
-        {
-          "x": 485.435,
-          "y": 199.475
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0105",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 200.737
-        },
-        {
-          "x": 485.435,
-          "y": 200.737
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0106",
+      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0022",
       "closed": false,
       "points": [
         {
@@ -2128,93 +448,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
+        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0107",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 203.262
-        },
-        {
-          "x": 485.435,
-          "y": 203.262
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0108",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 204.525
-        },
-        {
-          "x": 485.435,
-          "y": 204.525
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0109",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 205.787
-        },
-        {
-          "x": 485.435,
-          "y": 205.787
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0110",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 207.05
-        },
-        {
-          "x": 485.435,
-          "y": 207.05
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0111",
+      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0023",
       "closed": false,
       "points": [
         {
@@ -2228,93 +468,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
+        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0112",
-      "closed": false,
-      "points": [
-        {
-          "x": 94.565,
-          "y": 209.575
-        },
-        {
-          "x": 485.435,
-          "y": 209.575
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0113",
-      "closed": false,
-      "points": [
-        {
-          "x": 95.826,
-          "y": 210.838
-        },
-        {
-          "x": 484.174,
-          "y": 210.838
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0114",
-      "closed": false,
-      "points": [
-        {
-          "x": 95.826,
-          "y": 212.1
-        },
-        {
-          "x": 484.174,
-          "y": 212.1
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0115",
-      "closed": false,
-      "points": [
-        {
-          "x": 95.826,
-          "y": 213.362
-        },
-        {
-          "x": 484.174,
-          "y": 213.362
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0116",
+      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0024",
       "closed": false,
       "points": [
         {
@@ -2328,93 +488,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
+        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0117",
-      "closed": false,
-      "points": [
-        {
-          "x": 95.826,
-          "y": 215.887
-        },
-        {
-          "x": 484.174,
-          "y": 215.887
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0118",
-      "closed": false,
-      "points": [
-        {
-          "x": 95.826,
-          "y": 217.15
-        },
-        {
-          "x": 484.174,
-          "y": 217.15
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0119",
-      "closed": false,
-      "points": [
-        {
-          "x": 97.087,
-          "y": 218.412
-        },
-        {
-          "x": 482.913,
-          "y": 218.412
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0120",
-      "closed": false,
-      "points": [
-        {
-          "x": 97.087,
-          "y": 219.675
-        },
-        {
-          "x": 482.913,
-          "y": 219.675
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0121",
+      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0025",
       "closed": false,
       "points": [
         {
@@ -2428,93 +508,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
+        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0122",
-      "closed": false,
-      "points": [
-        {
-          "x": 98.348,
-          "y": 222.2
-        },
-        {
-          "x": 481.652,
-          "y": 222.2
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0123",
-      "closed": false,
-      "points": [
-        {
-          "x": 99.609,
-          "y": 223.463
-        },
-        {
-          "x": 480.391,
-          "y": 223.463
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0124",
-      "closed": false,
-      "points": [
-        {
-          "x": 100.87,
-          "y": 224.725
-        },
-        {
-          "x": 479.13,
-          "y": 224.725
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0125",
-      "closed": false,
-      "points": [
-        {
-          "x": 102.13,
-          "y": 225.987
-        },
-        {
-          "x": 477.87,
-          "y": 225.987
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0126",
+      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0026",
       "closed": false,
       "points": [
         {
@@ -2528,93 +528,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
+        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0127",
-      "closed": false,
-      "points": [
-        {
-          "x": 104.652,
-          "y": 228.512
-        },
-        {
-          "x": 475.348,
-          "y": 228.512
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0128",
-      "closed": false,
-      "points": [
-        {
-          "x": 105.913,
-          "y": 229.775
-        },
-        {
-          "x": 474.087,
-          "y": 229.775
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0129",
-      "closed": false,
-      "points": [
-        {
-          "x": 108.435,
-          "y": 231.037
-        },
-        {
-          "x": 471.565,
-          "y": 231.037
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0130",
-      "closed": false,
-      "points": [
-        {
-          "x": 110.957,
-          "y": 232.3
-        },
-        {
-          "x": 469.043,
-          "y": 232.3
-        }
-      ],
-      "metadata": {
-        "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
-        "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
-      }
-    },
-    {
-      "name": "fill001_fill001-20261104-051653-rectangle-r10-rep1_0131",
+      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0027",
       "closed": false,
       "points": [
         {
@@ -2628,27 +548,31 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
+        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
-        "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e"
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     }
   ],
   "autodraw_experiment": {
     "phase_id": "FILL001",
-    "series_id": "fill001-20261104-051653",
-    "task_id": "fill001-20261104-051653-rectangle-r10-rep1",
+    "series_id": "fill001-rs-preflight-20261104",
+    "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
     "shape_id": "rectangle",
     "requested_radius": 10,
     "repeat_index": 1,
-    "expected_strokes": 131,
-    "plan_signature": "3def44cfdccaed30c2219fc0ae5a2a4a6a962f8437b8fe5e669675eaee60a50e",
+    "expected_strokes": 27,
+    "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417",
     "target_mask_sha256": "ac1c6660e5986cdf534328c6dbcd5020f631168b1473c24b29e7609eb827998b",
     "sampling_profile": {
       "profile_id": "P1",
       "sampling_step": 4,
       "delay_ms": 5
     },
-    "executor_plan_sha256": "02641ce74126f4e99eb23907f66858e1f54e022164e131759483bdd83d0e9faf"
+    "plan_variant": "FILL001_RS_V1",
+    "planner_version": 2,
+    "scanline_row_step": 5,
+    "scanline_offset": 0,
+    "executor_plan_sha256": "b50bb021bb932be1b9ef100f22c30d77756ec89e9bff11c5317066b94fce1446"
   }
 }
