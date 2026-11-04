@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "0.2.1";
+  const VERSION = "0.2.2";
   const METHOD_NAMES = ["onDrawStart", "onDrawing", "onDrawingEnd", "setRadius", "updateLess"];
   const MAX_EVENTS = 50000;
   const SCAN_INTERVAL_MS = 500;
@@ -286,6 +286,22 @@
     return !!(target.closest && target.closest("canvas"));
   }
 
+  function currentBoardCoordinates(board) {
+    const stage = findStage();
+    const stageX = stage ? finiteNumber(stage.mouseX) : null;
+    const stageY = stage ? finiteNumber(stage.mouseY) : null;
+    let boardX = null;
+    let boardY = null;
+    if (stageX !== null && stageY !== null && board && typeof board.globalToLocal === "function") {
+      try {
+        const local = board.globalToLocal(stageX, stageY);
+        boardX = finiteNumber(local && local.x);
+        boardY = finiteNumber(local && local.y);
+      } catch (_) {}
+    }
+    return { stageX, stageY, boardX, boardY };
+  }
+
   function onPointerDown(event) {
     if (!state.active || !state.board || !isGameCanvasTarget(event.target)) return;
     if (!state.activeStrokeId) {
@@ -303,12 +319,35 @@
     state.activeStrokeId = null;
   }
 
+  function onMouseMove(event) {
+    if (!state.active || !state.activeStrokeId || !state.board || !isGameCanvasTarget(event.target)) return;
+    // Egret WebTouchHandler attaches mousemove to the canvas. This window
+    // bubble listener runs after that target listener, so stage.mouseX/Y
+    // reflect the coordinates the game has just received.
+    emit("MOUSE_MOVE_SAMPLE", {
+      source: "window-bubble-after-egret-canvas",
+      domEventTimeStamp: finiteNumber(event.timeStamp),
+      clientX: finiteNumber(event.clientX),
+      clientY: finiteNumber(event.clientY),
+      pageX: finiteNumber(event.pageX),
+      pageY: finiteNumber(event.pageY),
+      screenX: finiteNumber(event.screenX),
+      screenY: finiteNumber(event.screenY),
+      movementX: finiteNumber(event.movementX),
+      movementY: finiteNumber(event.movementY),
+      buttons: finiteNumber(event.buttons),
+      ...currentBoardCoordinates(state.board)
+    });
+  }
+
   function installInputObservers() {
     if (state.inputHandlers) return;
-    state.inputHandlers = { down: onPointerDown, up: onPointerUp, cancel: onPointerUp };
+    state.inputHandlers = { down: onPointerDown, up: onPointerUp, cancel: onPointerUp, move: onMouseMove };
     window.addEventListener("pointerdown", state.inputHandlers.down, true);
     window.addEventListener("pointerup", state.inputHandlers.up, true);
     window.addEventListener("pointercancel", state.inputHandlers.cancel, true);
+    // Bubble phase is intentional: capture after Egret's canvas mousemove handler.
+    window.addEventListener("mousemove", state.inputHandlers.move, false);
   }
 
   function removeInputObservers() {
@@ -316,6 +355,7 @@
     window.removeEventListener("pointerdown", state.inputHandlers.down, true);
     window.removeEventListener("pointerup", state.inputHandlers.up, true);
     window.removeEventListener("pointercancel", state.inputHandlers.cancel, true);
+    window.removeEventListener("mousemove", state.inputHandlers.move, false);
     state.inputHandlers = null;
   }
 
@@ -364,7 +404,17 @@
         // updateLess() can run on every ENTER_FRAME even when pushPoint()
         // rejects a duplicate coordinate. Do not log a quota event if max/less
         // did not change.
-        emit("POINT_QUOTA_UPDATE", { before, after, args: args.slice(0, 3).map(safeValue) });
+        const pointDelta = before.isExact && after.isExact
+          ? after.pointCount - before.pointCount
+          : null;
+        emit("POINT_QUOTA_UPDATE", {
+          before,
+          after,
+          args: args.slice(0, 3).map(safeValue),
+          pointDelta,
+          acceptedPoint: pointDelta > 0 ? latestAcceptedPoint(board) : null,
+          ...(pointDelta > 0 ? currentBoardCoordinates(board) : {})
+        });
       }
       if (previousStroke && !state.activeStrokeId && name !== "onDrawingEnd") state.activeStrokeId = previousStroke;
       return result;
