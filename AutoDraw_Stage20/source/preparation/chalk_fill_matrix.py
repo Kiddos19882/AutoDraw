@@ -240,9 +240,12 @@ def validate_fill001_matrix(matrix: Any) -> None:
         if plan_variant == FILL001_RS_PLAN_VARIANT:
             if task.get("plan_variant") != FILL001_RS_PLAN_VARIANT:
                 raise FillMatrixError("FILL-001-RS task не закрепляет plan variant.")
+            radius = task.get("requested_radius")
             step, offset = task.get("scanline_row_step"), task.get("scanline_offset")
+            if type(radius) is not int or radius not in FILL001_RADII:
+                raise FillMatrixError("Некорректный radius в FILL-001-RS task.")
             if (
-                type(step) is not int or not 1 <= step <= task.get("requested_radius", 0)
+                type(step) is not int or not 1 <= step <= radius
                 or type(offset) is not int or not 0 <= offset < step
             ):
                 raise FillMatrixError("Некорректные scanline spacing parameters в FILL-001-RS task.")
