@@ -2772,3 +2772,8 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 ## 2026-11-04 — единый реестр результатов
 
 Создан [TEST_RESULTS.md](TEST_RESULTS.md); первичные отчёты и raw evidence сохранены.
+
+
+## 2026-11-04 — консолидация незавершённых задач
+
+Проведена инвентаризация Markdown-документации Stage20 и сверка текущих задач с TEST_RESULTS.md. В начало TASKS.md добавлен канонический backlog: FILL-001-RS renderer blocker, capsule renderer acceptance, INT-006 domain validation/safety margin, INT-003 Monitor overhead, sampling domain, INT-007/008/009 и документационное расхождение по auto-capture. Старые чек-листы сохранены как история; отменённые и архивные планы отделены от активного backlog. Код, тесты, конфигурации и live experiments не изменялись.
