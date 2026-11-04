@@ -5,7 +5,8 @@ const assert = require("node:assert/strict");
 const {
   buildSmoothPathCommands,
   buildNormalPathCommands,
-  terminalPoint
+  terminalPoint,
+  shouldWebGLRendererRasterize
 } = require("./game_renderer_reference.js");
 
 test("smooth one-point path contains moveTo only and has no segment endpoint", () => {
@@ -51,6 +52,13 @@ test("normal path includes the final accepted point", () => {
     { type: "lineTo", x: 30, y: 15 }
   ]);
   assert.deepEqual(terminalPoint(points, false, false), { x: 30, y: 15 });
+});
+
+test("WebGLRenderer skips GraphicsNode with empty bounds or empty drawData", () => {
+  assert.equal(shouldWebGLRendererRasterize({ width: 0, height: 0, drawData: [{}] }), false);
+  assert.equal(shouldWebGLRendererRasterize({ width: 10, height: 0, drawData: [{}] }), false);
+  assert.equal(shouldWebGLRendererRasterize({ width: 10, height: 10, drawData: [] }), false);
+  assert.equal(shouldWebGLRendererRasterize({ width: 10, height: 10, drawData: [{}] }), true);
 });
 
 test("empty paths produce no drawing commands", () => {
