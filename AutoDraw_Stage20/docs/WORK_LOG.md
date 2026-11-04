@@ -2696,3 +2696,18 @@ Bundle дополнительно подтверждает: Main UI задаёт
 - Renderer static findings уточнены: nominal stage.frameRate=48, NO_SCALE, PainterPopup 676×379, BoardPane 460×240 без local scale. Egret 5.2.18 API defaults ROUND caps/joints — только API reference; deployed runtime identity не подтверждена. Global transform, zero-length rasterization и фактический footprint остаются открытыми.
 - FILL-001-RS capture остаётся REJECTED: coverage=98.430600%, leakage=11, exact CHALK=1260 (pointCount 1→1261). 45-task matrix остаётся BLOCKED. Live experiments не запускались; frozen plans/masks/thresholds/defaults не менялись.
 - Изменены только управляющие Markdown-документы; исходники, тесты, конфигурации, workflow и raw experiment evidence не менялись.
+
+
+## 2026-11-04 — Egret GraphicsNode / CanvasRenderer path semantics
+
+Проверен upstream Egret core reference:
+- GraphicsNode.lineStyle() подставляет ROUND для отсутствующих caps и joints;
+- CanvasRenderer задаёт context.lineCap/lineJoin и выполняет context.stroke();
+- WebGLRenderer в рассмотренной реализации использует CanvasRenderer для растрирования GraphicsNode перед upload в texture.
+- Egret 5.2.18 API docs согласуются с этим: lineStyle thickness — ширина линии; omitted caps/joints — ROUND.
+
+Для совместимого CanvasRenderer single-point smooth path moveTo(p)+lineTo(p) является zero-length segment. Canvas Standard удаляет такие сегменты и subpaths без линий, поэтому такой штрих не оставляет видимого следа, хотя onDrawStart уже расходует одну игровую точку. В run FILL-001-RS все 27 штрихов имели 41–48 point updates, поэтому это не объясняет его perimeter gaps.
+
+Обнаружен отдельный риск planner-ов: footprint_pixel_bounds даёт bbox capsule, а interior_fill_planner._mark_footprint и outline_first_fill_planner помечают весь bbox covered. У круглых концов bbox углы могут не касаться фактического capsule. Это потенциальный underfill в этих planner-ах, не доказанная причина FILL-001-RS. Добавлена задача BRUSH-FOOTPRINT-CAPSULE-001; production planners не менялись.
+
+CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3c08ea05cb9ef83ff599eb52a6f9527e. Все обязательные jobs PASS, optional algorithm benchmarks SKIPPED. Более поздние commits — documentation-only.
