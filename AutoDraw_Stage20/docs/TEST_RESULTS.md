@@ -3,7 +3,7 @@
 **Статус:** действующий сводный реестр результатов и доказательств  
 **Дата формирования:** 2026-11-04  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
-**HEAD на момент инвентаризации:** `0a5fa41cdba488be1eb140a528eb6ae2a1def791`  
+**HEAD перед дополнением D1–D5:** `63fdaf3f2a1b12bd90e1a588ca4e968facbe0103`  
 **Область:** AutoDraw_Stage20, тесты приложения, лабораторные эксперименты, Game Monitor/Bridge, CHALK, FILL-001, геометрические модели, GitHub Actions и offline benchmarks.
 
 > Этот файл — единая точка входа для понимания результатов тестирования. Здесь собраны проверяемые сводные результаты, статусы, ограничения и ссылки на первичные отчёты/артефакты. Первичные JSON, PNG, логи, frozen plans, manifests и подробные отчёты не удаляются и не переписываются: они остаются источниками доказательств. Если краткая сводка расходится с первичным отчётом, приоритет имеет первичный материал и фактический runtime/CI evidence.
@@ -57,7 +57,7 @@ GitHub tree на HEAD `0a5fa41c` содержит 5 413 файлов; 5 011 фа
 | CHALK G3 sampling matrix | Длинные горизонтальные линии, sampling step/delay | 27/27 completed, 0 failed, 0 pending; точный CHALK подтверждён для всех captures | Radius=10 и одна геометрия; перенос коэффициентов на произвольный рисунок не доказан |
 | INT-006 V1–V5 | Независимая validation геометрии и CHALK | 45/45 accepted captures в основной серии; follow-up V1–V5 — ещё 45/45 captures | Принимать выводы только в границах frozen scenarios, профилей и критериев |
 | INT-006 official validation | Проверка прогнозной модели на независимых captures | Официальный отчёт указывает 45/45 accepted | MAE/RMSE/bias, safety margin и production eligibility смотреть в отчёте; 45/45 accepted не означает автоматически production-ready |
-| INT006R | Радиус × геометрия, D1–D5 × radius 1/10/30 | 45 captures; exact CHALK и raw-data integrity audit задокументированы | Отдельные ограничения D2/radius=1 и D4/radius=30; visual audit — самостоятельный gate |
+| INT006R | Радиус × геометрия, D1–D5 × radius 1/10/30 | 45/45 completed; raw-data audit PASS; официальный analyzer PASS (45 accepted); ручной аудит 90 PNG завершён | CHALK-эффект радиуса мал в этой матрице; визуальные ограничения D2/radius=1 и D4/radius=30; см. подробную матрицу ниже |
 | FILL-001 initial live preflight | Реальная заливка с радиусом 10 | Один run завершил 27 strokes; pointCount 1→6000, exact CHALK=5999, квота исчерпана до трёх последних consuming strokes | Неполный/censored run; полная стоимость завершённого рисунка неизвестна; 45-cell matrix заблокирована |
 | FILL-001-RS live preflight | Versioned scanline spacing candidate | Run 27/27 strokes, pointCount 1→1261, exact CHALK=1260; Bridge diagnostics без потерь/ошибок | Capture REJECTED PNG gate: после исправленного audit coverage=98.430600%, leakage=11; требования coverage≥99% и leakage=0 не выполнены; 45-task matrix BLOCKED |
 | FILL-001-RS static sweep | Offline OpenCV scanline spacing | Exhaustive sweep 2 238 candidates; 62 прошли существующий статический gate; выбраны 15/15 shape/radius cells | Только offline geometry proxy; не подтверждает фактический CHALK или renderer |
@@ -119,6 +119,46 @@ GitHub tree на HEAD `0a5fa41c` содержит 5 413 файлов; 5 011 фа
 - Exact CHALK и raw-data integrity проверялись отдельно от визуального качества.
 - Отдельно задокументированы ограничения D2/radius=1 и D4/radius=30.
 - Полнота captures не заменяет visual-quality gate.
+
+### 3.6. INT006R — подробная матрица D1–D5 × радиус кисти
+
+**Серия:** `chalk-20261103-030837-a20df5`  
+**Block ID:** `a8e0b9ec87984f60aa294910d366e987`  
+**Последний commit с live-данными:** [138c9fbeaf612a86819f7ff9ea0db7bb1fe4296a](https://github.com/Kiddos19882/AutoDraw/commit/138c9fbeaf612a86819f7ff9ea0db7bb1fe4296a)  
+**Профиль:** P1 — `point_step_px=4`, `point_delay_ms=5`  
+**Матрица:** 5 геометрий × 3 радиуса (1/10/30) × 3 повтора = 45 captures.
+
+| ID | Геометрия | Radius 1: CHALK mean | Radius 10: CHALK mean | Radius 30: CHALK mean | Визуальный результат |
+|---|---|---:|---:|---:|---|
+| D1 | Mixed lines | 62.67 | 62.33 | 63.33 | Все четыре штриха видимы на всех радиусах; непредусмотренного слияния/потерь не найдено |
+| D2 | Polygon | 71.67 | 71.00 | 71.00 | Radius 1: небольшой разрыв верхнего левого соединения первой и пятой сторон во всех 3 повторах; radius 10/30: контур замкнут |
+| D3 | Intersections | 100.00 | 100.67 | 99.67 | Все 6 штрихов и ожидаемые пересечения видимы; пересечения соответствуют DrawingPlan |
+| D4 | Short details | 14.33 | 14.67 | 15.33 | Radius 1: детали различимы, но очень тонкие; radius 10: все 6 разделены; radius 30: первые 3 детали (1/2/3 logical px) сливаются, остаётся 4 компонента |
+| D5 | Repeated coverage | 88.33 | 89.67 | 89.67 | Повторные проходы совпадают с траекториями; ожидаемое наложение, посторонних следов нет |
+
+Средние значения рассчитаны по трём повторам в каждой ячейке. Суммарный exact CHALK по 15 опытам каждого радиуса: radius 1 — 1011; radius 10 — 1015; radius 30 — 1017. Среднее на опыт: 67.40 / 67.67 / 67.80 соответственно. Разница между суммарными значениями крайних радиусов — 6 CHALK (около 0.6% от radius 1).
+
+**Integrity / acceptance:**
+- 45/45 задач имеют `status=completed`, по одной completed attempt на задачу.
+- Во всех 45 Monitor reports `chalk.status=exact`; CHALK вычислен как `post.pointCount - pre.pointCount`.
+- Сумма sampled `DRAW_SAMPLE.pointDelta` совпадает с exact CHALK; `point_delta_matches_chalk=true`.
+- Observed radius совпал с requested radius (1/10/30).
+- Dropped events, Monitor error delta, Bridge send-failure delta и collector sequence gaps — 0.
+- Официальный CLI analyzer на реальном journal/capture bundle: [CI 41563236073](https://github.com/Kiddos19882/AutoDraw/actions/runs/41563236073), 45 accepted, 0 missing/rejected, PNG evidence complete.
+- Ручной аудит всех 45 пар (90 PNG) завершён; все 45 пар присутствуют и читаемы, before ROI визуально пустые, after ROI содержат ожидаемую геометрию.
+
+**Вывод по CHALK:** в рамках D1–D5, sampling P1 и радиусов 1–30 заметного преимущества большого радиуса по exact CHALK не обнаружено. Не вводить radius multiplier и не выбирать radius 30 ради предполагаемой экономии на основании этой серии.
+
+**Вывод по качеству:** радиус влияет на визуальный результат в конкретных геометриях: radius 1 недостаточен для надёжного замыкания D2 при текущем P1; radius 30 сливает первые короткие элементы D4; radius 10 сохранил замыкание D2 и разделение деталей D4 в этой матрице. Это локальные наблюдения, не универсальное правило.
+
+**Граница применимости:** D2 — геометрия полигона, а не полноценная заливка площади; D5 — повторное покрытие линий, а не заливка одноцветной области. INT006R не определяет лучший радиус для FILL. Для этого предназначен отдельный FILL-001.
+
+Первичные документы:
+- [INT006R live results](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md)
+- [INT006R software gate](CHALK_INT006R_SOFTWARE_GATE_RESULTS_2026-11-03.md)
+- [INT006R visual audit](CHALK_INT006R_VISUAL_AUDIT_2026-11-03.md)
+- [INT006R live preflight and visual audit](CHALK_INT006R_LIVE_PREFLIGHT_AND_VISUAL_AUDIT_2026-11-03.md)
+- [Radius × geometry cross-validation plan](CHALK_RADIUS_GEOMETRY_CROSS_VALIDATION_PLAN_2026-11-03.md)
 
 ## 4. FILL-001 и FILL-001-RS
 
