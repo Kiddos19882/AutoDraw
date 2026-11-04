@@ -5,7 +5,11 @@ import json
 import statistics
 import time
 from pathlib import Path
+import sys
 from typing import Any
+
+PREPARATION_SOURCE = Path(__file__).resolve().parents[1] / "source" / "preparation"
+sys.path.insert(0, str(PREPARATION_SOURCE))
 
 import brush_footprint_geometry as geometry
 
