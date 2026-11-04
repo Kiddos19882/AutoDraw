@@ -2939,3 +2939,7 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - Управление: `AutoDrawGameMonitor.setInputTelemetryEnabled(true/false)`; состояние отображается в `status().inputTelemetryEnabled` и export.
 - При включении listener добавляется на window bubble phase; при выключении снимается. В POINT_QUOTA_UPDATE acceptedPoint и exact pointDelta сохраняются при положительном delta, а stage/local coordinates вычисляются только при включённой telemetry.
 - Добавлены regression checks: по умолчанию события не пишутся, включение/выключение работает, accepted-point coordinates требуют включённого режима.
+
+- Follow-up overhead safeguard: raw mousemove listener выключен по умолчанию и управляется через `setInputTelemetryEnabled(true/false)`; статус экспортируется. Commit `8bc19ab80a2632a014a87886f96396691e7d6336`.
+- Regression tests проверяют default-off, включение/выключение и accepted-point coordinates при включённом режиме. Commit `e3ca5fdde23199a8ff11ab66eb38068fb48a0e91`.
+- Static JavaScript syntax parse PASS для Monitor, Bridge, Monitor tests и renderer harness; actual Game Monitor source executed in an isolated mock browser context: MOUSE_MOVE_SAMPLE/POINT_QUOTA_UPDATE coordinate correlation PASS, disable stops subsequent move events, errors=0. Это не Node test suite, CI или live game run.
