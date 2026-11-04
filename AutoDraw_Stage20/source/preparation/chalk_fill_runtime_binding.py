@@ -707,6 +707,12 @@ def find_fill001_runtime_binding(
         session_id = session.get("session_id")
         if not isinstance(session_id, str) or session_file.parent.name != session_id:
             raise FillMatrixError(f"Каталог Bridge session не совпадает с session_id: {session_file}.")
+        # Only schema-v2 sessions can ever satisfy the current FILL-001
+        # runtime contract. Legacy sessions without diagnostics are not
+        # "pending" candidates: they are permanently ineligible and must not
+        # block a later, fully persisted schema-v2 session.
+        if session.get("schema_version") != 2:
+            continue
         session_started = _parse_aware_datetime(
             session.get("started_at_utc"), "session.started_at_utc"
         )
@@ -734,8 +740,6 @@ def find_fill001_runtime_binding(
         )
         if last_message < executor_started:
             continue
-        if session.get("schema_version") != 2:
-            raise FillMatrixError("Активная Bridge session создана по устаревшей schema; требуется schema_version=2.")
         _session_finalize_grace_seconds(session)
         active_sessions.append(session_file)
 
