@@ -370,11 +370,31 @@
   }
 
   function renderWebGLProbe(mode, points, lineWidth, expectedCanvas, state) {
-    const board = makeActualBoardPane(mode, points, lineWidth).shape;
-    const mask = makeBoardMaskShape();
-    board.mask = mask;
+    // Egret 5.4.1 only switches the masked object to the mask render path when
+    // mask.$stage is present. Recreate the live display-list relationship:
+    // board and mask are siblings under a container attached to a Stage.
+    const stage = new egret.Stage();
     const container = new egret.DisplayObjectContainer();
+    stage.addChild(container);
+
+    const mask = makeBoardMaskShape();
+    container.addChild(mask);
+    const board = makeActualBoardPane(mode, points, lineWidth).shape;
     container.addChild(board);
+    board.mask = mask;
+
+    const sceneDiagnostics = {
+      stageAttached: !!board.$stage && !!mask.$stage,
+      sameStage: board.$stage === mask.$stage,
+      sameParent: board.$parent === mask.$parent,
+      boardRenderMode: board.$renderMode,
+      maskRenderMode: mask.$renderMode
+    };
+    if (!sceneDiagnostics.stageAttached || !sceneDiagnostics.sameStage ||
+        !sceneDiagnostics.sameParent || sceneDiagnostics.boardRenderMode !== 3) {
+      throw new Error("WebGL mask scene is not configured like an attached Egret display list: " +
+        JSON.stringify(sceneDiagnostics));
+    }
 
     state.buffer.clear();
     const matrix = new egret.Matrix(RASTER_SCALE, 0, 0, RASTER_SCALE, 0, 0);
@@ -413,6 +433,7 @@
       glInfo: state.glInfo,
       contextAttributes: state.contextAttributes,
       textureParameters,
+      sceneDiagnostics,
       comparison: compareCanvases(expectedCanvas, canvas)
     };
   }
@@ -516,6 +537,7 @@
           manifest.webglProbe.comparisons.push({
             fixture: fixture.id,
             lineWidth,
+            ...webgl.sceneDiagnostics,
             ...webgl.comparison
           });
           const terminal = terminalPoint(fixture.points, fixture.mode === "smooth", false);
@@ -528,6 +550,7 @@
             actualBoardPane: true,
             manualTranscriptionMatch,
             webglPixelComparison: webgl.comparison,
+            webglSceneDiagnostics: webgl.sceneDiagnostics,
             webglTextureParameters: webgl.textureParameters,
             nodeBounds: source.nodeBounds,
             sourceTextureSize: source.skippedByWebGLRenderer
