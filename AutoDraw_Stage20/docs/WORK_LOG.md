@@ -310,6 +310,20 @@
 
 # Журнал работ AutoDraw
 
+## 2026-11-04 — исправлена постановка Egret WebGL mask reference
+
+**Commit:** `5308fade07fbb11409a9afc5c3d40ed4cf82ca3a`  
+**CI:** [41924481247](https://github.com/Kiddos19882/AutoDraw/actions/runs/41924481247) SUCCESS.
+
+- По Egret 5.4.1 source trace установлено, что object mask path требует `mask.$stage`; предыдущий harness назначал `board.mask`, но оставлял mask вне display list, поэтому renderMode=3 не активировался.
+- В browser harness добавлен реальный `egret.Stage`; board и mask размещаются в одной сцене как siblings. Добавлены runtime assertions stageAttached/sameStage/sameParent/boardRenderMode=3.
+- Повторены все 18 CanvasRenderer↔WebGLRenderer comparisons. Итог: 4 exact, 14 max channel delta=1, ни одного delta выше 1. Mask-corner width10: 145 pixels/max1; width30: 36/max1; scrollRect edges exact.
+- Artifact `13368272823`: manifest + 54 PNG. Environment: Edge 156, WebGL1, ANGLE SwiftShader.
+- Full CI: Game Monitor/Bridge, Preparation/G3, integration, Executor, browser harness, INT-006 PNG audit, Windows portable build/startup smoke-test — SUCCESS; optional algorithm benchmarks SKIPPED.
+- Исправлялся только тестовый harness; production code, CHALK model, executor defaults и live experiment data не менялись.
+- Следующий gate — paired live game PNG + accepted coordinates + pre/post pointCount из одной сессии и точный PainterPopup transform; 45-task FILL-001-RS matrix остаётся BLOCKED.
+
+
 ## 2026-11-03 — INT006R live data audit и план FILL-001
 
 **Live data commit:** [138c9fbe](https://github.com/Kiddos19882/AutoDraw/commit/138c9fbeaf612a86819f7ff9ea0db7bb1fe4296a)  

@@ -46,6 +46,27 @@ GitHub tree на HEAD `0a5fa41c` содержит 5 413 файлов; 5 011 фа
 
 Локальный `git status` через GitHub API недоступен. Данный документ отражает GitHub branch snapshot, а не локальную рабочую копию.
 
+## 1.5. Egret WebGL renderer reference — mask/scrollRect correction (2026-11-04)
+
+**Commit:** `5308fade07fbb11409a9afc5c3d40ed4cf82ca3a`  
+**CI:** [41924481247](https://github.com/Kiddos19882/AutoDraw/actions/runs/41924481247) — SUCCESS.  
+**Browser job:** `126905145909` — SUCCESS.  
+**Artifact:** [13368272823](https://github.com/Kiddos19882/AutoDraw/actions/runs/41924481247/artifacts/13368272823), manifest + 54 PNG.
+
+Причина прежних крупных `mask-corner` расхождений найдена в harness: mask object не был прикреплён к Egret Stage. В Egret 5.4.1 объектная маска переводит masked display object в renderMode=3 только если `mask.$stage` установлен. Harness теперь создаёт Stage и помещает board + mask в общую display-list сцену; assertions проверяют stage attachment, одинаковые stage/parent и boardRenderMode=3.
+
+| Fixture | Width | Differing pixels | Max channel delta |
+|---|---:|---:|---:|
+| smooth-single-point | 10 / 30 | 0 / 0 | 0 / 0 |
+| scrollrect-edges | 10 / 30 | 0 / 0 | 0 / 0 |
+| mask-corner | 10 | 145 | 1 |
+| mask-corner | 30 | 36 | 1 |
+| Остальные 12 comparisons | 10 / 30 | 14 comparisons суммарно имеют отличия | 1 |
+
+Итого: 18/18 WebGL comparisons созданы; 4 exact, 14 имеют max channel delta=1, ни одного delta выше 1. Для сравнения, до stage-binding correction mask-corner имел 193/84 differing pixels и max delta=255. Среда: Egret 5.4.1, Edge 156, WebGL 1 / ANGLE SwiftShader, rasterScale=3, board output 1380×720. Это E3 browser/CI evidence для offline renderer harness, не E4 live game capture.
+
+**Ограничения:** residual delta=1 не классифицирован как дефект; exact popup transform и paired live board PNG + accepted points + pointCount из одной сессии не получены. CHALK и production footprint модель этим тестом не измерялись. FILL-001-RS 45-task matrix остаётся BLOCKED.
+
 ## 2. Сводный статус ключевых исследовательских серий
 
 | Серия | Область | Подтверждённый итог | Текущий статус / ограничения |

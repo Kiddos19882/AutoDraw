@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-11-04 — Egret WebGL mask reference corrected: 18/18 comparisons
+
+- Исправлена тестовая сцена: mask теперь attached к Egret Stage, board и mask имеют общий parent/stage; assert требует `boardRenderMode=3`.
+- Найденная причина прежних крупных corner differences — неактивированный mask path из-за `mask.$stage=null` в harness.
+- После correction: 18/18 WebGL comparisons; 4 exact, 14 max channel delta=1; mask-corner width10/30 — 145/36 differing pixels, max delta 1; scrollRect edges exact.
+- CI run [41924481247](https://github.com/Kiddos19882/AutoDraw/actions/runs/41924481247) SUCCESS; artifact [13368272823](https://github.com/Kiddos19882/AutoDraw/actions/runs/41924481247/artifacts/13368272823) содержит manifest + 54 PNG.
+- Live game PNG equivalence и точный popup transform остаются pending; production code и CHALK model не менялись.
+
+
 ## 2026-11-04 — actual BoardPane CanvasRenderer reference: 18/18 pixel match
 
 - Harness теперь загружает настоящий `BoardPane` из game bundle, вызывает `redraw()` и сравнивает source raster с manual path transcription на втором BoardPane instance.

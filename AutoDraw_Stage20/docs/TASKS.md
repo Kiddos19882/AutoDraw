@@ -40,7 +40,7 @@
 
 ### GAME-BRUSH-REPLICATION — воспроизведение цепочки игровой кисти
 
-**Статус:** SOURCE TRACE COMPLETE (E1); ACTUAL BOARDPANE CANVASRENDERER HARNESS PASS (18/18); MANUAL TRANSCRIPTION PIXEL EQUALITY PASS (18/18); WEBGL/GAME PIXEL EQUIVALENCE NOT VALIDATED. Это исследовательский подэтап FILL-001-RS renderer footprint, а не замена измерениям CHALK или отдельное разрешение на live run.
+**Статус:** SOURCE TRACE COMPLETE (E1); ACTUAL BOARDPANE CANVASRENDERER HARNESS PASS (18/18); MANUAL TRANSCRIPTION PIXEL EQUALITY PASS (18/18); EGRET WEBGL MASK/SCROLLRECT REFERENCE PASS (18/18; max channel delta 1); LIVE GAME PNG EQUIVALENCE NOT VALIDATED. Это исследовательский подэтап FILL-001-RS renderer footprint, а не замена измерениям CHALK или отдельное разрешение на live run.
 
 **Что установлено по согласованному набору assets:** ввод проходит через BoardPane.onMouseDown → onDrawStart → ENTER_FRAME/onDrawing → onDrawingEnd; принятые координаты переводятся через globalToLocal, проверяются по локальным границам и deduplicate через BlackBoardAtom.pushPoint. Геометрия строится Painter.drawNormalLine или midpoint/curveTo smooth path. Значение UI передаётся в Egret как line width; caps/joints по умолчанию round. Подробная трассировка и ссылки на Git blob SHA — в [отчёте игрового движка, раздел 14](CHALK_GAME_ENGINE_POINT_COST_AND_BRUSH_WIDTH_2026-11-03.md#14-полная-трассировка-цепочки-игровой-кисти-и-границы-воспроизведения--2026-11-04).
 
@@ -51,6 +51,8 @@
 **Проверка этой особенности на реальном принятом path:** offline analysis run `6a17a297-ea14-4527-9527-bfd8de3bd335` (radius/lineWidth=10, exact CHALK=1260, 27 strokes) показал 1260 accepted coordinates, 1260 positive `DRAW_SAMPLE` events, все `pointDelta=1`, 1260 `POINT_QUOTA_UPDATE`; coordinate list для этого run полна по наблюдаемым delta. Из 1233 соседних пространственных интервалов median=6, p95=10, max=13; только 3 интервала больше lineWidth. Интервалы времени между соседними принятыми точками: median=33ms, p90=35ms, p95=36ms, max=81ms. Последний пространственный интервал каждого из 27 штрихов находится в диапазоне 3–9. Идеальный round cap радиуса 5 достигает центра последней принятой точки во всех 27 случаях. Значит, smooth endpoint omission сама по себе не доказывает причину PNG residual этого запуска. Координата mouseup всё ещё не семплируется и её расстояние до последней принятой точки не измерено. Derived report: [`../data/results/brush_behavior_tests/fill001/endpoint-analysis-6a17a297.json`](../data/results/brush_behavior_tests/fill001/endpoint-analysis-6a17a297.json); analyzer: [`../source/preparation/game_brush_endpoint_analysis.py`](../source/preparation/game_brush_endpoint_analysis.py).
 
 Маска доски теперь статически установлена: `PainterPopup` создаёт roundRect с параметром ellipseWidth=10, а Egret `Path2D.drawRoundRect()` преобразует его в внутренний радиус 5 логических пикселей; `painterBoard.mask=boardMask`. Дополнительно BoardPane ограничен `scrollRect` 460×240. Реальная пиксельная маска, browser antialiasing и влияние texture sampling ещё не подтверждены.
+
+**WebGL reference evidence 2026-11-04:** CI run `41924481247`, job `126905145909`, commit `5308fade07fbb11409a9afc5c3d40ed4cf82ca3a`. После добавления board и mask в общий Egret Stage объектный mask path подтверждён (`boardRenderMode=3`, sameStage/sameParent=true). Все 18 WebGL comparisons завершились: 4 exact, 14 с max channel delta=1; `mask-corner` width 10 — 145 differing pixels, width 30 — 36, оба max delta=1; `scrollrect-edges` exact для обеих ширин. Artifact `13368272823` содержит manifest + 54 PNG. Результат относится к Egret 5.4.1 / Edge 156 / ANGLE SwiftShader, не к live game capture. Сильные прежние расхождения были артефактом отсутствующего `mask.$stage` в тестовой сцене. Парный live PNG + accepted coordinates + pointCount из одной сессии всё ещё отсутствуют.
 
 **Текущие реализации AutoDraw не являются копией renderer:** FILL-001 использует OpenCV round-capped lines, Capsule — идеальную round-capped polyline, а generic interior fill — rectangular footprint checks. Ни один из этих путей не воспроизводит полностью игровой sampling + smooth path + backend rasterization.
 
@@ -254,7 +256,7 @@ Workflow `.github/workflows/geometry-tests.yml` дополнен независ�
 ## BLOCKER: FILL-001-RS — калибровка renderer footprint и sampling
 
 **ID:** FILL-001-RS-ENGINE-FOOTPRINT-001  
-**Статус:** IN PROGRESS / BLOCKER — actual PNG residual localization завершена; capture REJECTED; фактический cap/footprint ещё не установлен.  
+**Статус:** IN PROGRESS / BLOCKER — offline Egret CanvasRenderer↔WebGL mask/scrollRect reference PASS 18/18 (max channel delta 1) после исправления stage binding; live game footprint и popup transform ещё не установлены; предыдущий live capture REJECTED.  
 **Приоритет:** блокирует новый live preflight и 45-task matrix.
 
 ### Закрытые пункты
@@ -263,10 +265,12 @@ Workflow `.github/workflows/geometry-tests.yml` дополнен независ�
 - [x] Повторить corrected PNG audit: coverage=98.430600%, leakage=11.
 - [x] Получить actual PNG pixel diagnostic: 1116 uncovered pixels, top=244, bottom=239, left-middle=134, right-middle=499, interior/other=0; 11 leakage coordinates.
 - [x] Прочитать bundle из master через GitHub Contents API и подтвердить статические вызовы BoardPane sampling, pushPoint dedup, updateLess и Painter path construction.
+- [x] Исправить WebGL reference scene: board и mask прикреплены к общему Egret Stage; проверить mask renderMode=3 и повторить 18 WebGL comparisons — max channel delta 1.
 
 ### Открытые пункты
 - [x] Установить, что старый run не сохранил raw per-stroke frame_probe intervals; реализовать их сбор/сохранение для будущих runs (см. сводку выше).
 - [ ] Измерить global/display transform именно painter popup BoardPane (локальный scale не задаётся; не подменять его transform доски внутри BlackBoardItem).
+- [ ] Получить парный live capture из одной сессии: final board PNG, accepted coordinates/points и pre/post pointCount; offline artifact не заменяет этот capture.
 - [ ] Установить фактически подключённую версию Egret runtime; проверить round caps/joins defaults и raster behavior нулевого сегмента по точной runtime версии либо независимому controlled PNG capture.
 - [ ] Откалибровать screen-space footprint для нескольких значений кисти на одинаковой frozen geometry; сохранить raw before/after PNG и hashes.
 - [ ] Построить отдельные perimeter/endpoint candidates и проверить coverage≥99%, leakage=0 на независимом audit, не меняя frozen preflight.

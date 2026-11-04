@@ -1,5 +1,21 @@
 # Актуальная точка продолжения — 2026-11-04
 
+## Дополнение — Egret WebGL mask reference исправлен и проверен (2026-11-04)
+
+**Кодовый commit:** [5308fade07fbb11409a9afc5c3d40ed4cf82ca3a](https://github.com/Kiddos19882/AutoDraw/commit/5308fade07fbb11409a9afc5c3d40ed4cf82ca3a)  
+**Полный CI:** [run 41924481247](https://github.com/Kiddos19882/AutoDraw/actions/runs/41924481247) — SUCCESS.  
+**Artifact:** [autodraw-egret-renderer-reference, ID 13368272823](https://github.com/Kiddos19882/AutoDraw/actions/runs/41924481247/artifacts/13368272823), 700,581 bytes, manifest + 54 PNG.
+
+- Найдена ошибка постановки прежнего WebGL probe: маска назначалась через `board.mask`, но сама не была добавлена в display list и имела `mask.$stage=null`. В Egret 5.4.1 `DisplayObject.$updateRenderMode()` выбирает объектный mask path (renderMode=3) только при наличии `$mask.$stage`; прежняя сцена не запускала этот путь.
+- Harness исправлен: создаётся `egret.Stage`, board и mask добавляются в одну сцену как siblings, затем назначается `board.mask`. Добавлены fail-closed assertions: stage attached, same stage, same parent и `boardRenderMode=3`.
+- Edge 156 / Windows runner / WebGL 1 / ANGLE SwiftShader; 18/18 WebGL comparisons созданы.
+- Итог: 4/18 сравнений pixel-identical; 14/18 имеют только max channel delta=1; ни одного расхождения выше 1. `mask-corner`: width 10 — 145 pixels, max delta 1 (до correction: 193, max 255); width 30 — 36 pixels, max delta 1 (до correction: 84, max 255). `scrollrect-edges` — точное совпадение для обеих ширин.
+- Сильные расхождения были вызваны отсутствием stage binding в тестовой сцене; доказательств ошибки WebGL mask renderer в этих fixtures не осталось. Остаточные delta=1 не классифицированы как ошибка: возможны raster/texture rounding, но это пока не отдельный установленный диагноз.
+- Полный CI на commit `5308fade`: Game Monitor/Bridge, Preparation/G3, Application integration, Executor, Egret browser harness, INT-006 pixel audit и Windows portable build/startup smoke-test — SUCCESS; optional algorithm benchmarks — SKIPPED.
+- Production code, CHALK estimator, executor/sampling defaults и frozen FILL-001 plans не менялись. Live game experiment не выполнялся.
+
+**Следующий gate:** получить парный live capture одной фиксированной траектории — final board PNG, принятые координаты/точки и pre/post `pointCount` из одного run. Затем проверить transform именно PainterPopup BoardPane и сопоставить screenshot с offline Egret reference. До этого фактический live footprint и CHALK для новых вариантов не установлены; 45-task FILL-001-RS matrix остаётся BLOCKED.
+
 
 ## Дополнение — actual BoardPane CanvasRenderer harness PASS (2026-11-04)
 
