@@ -316,6 +316,82 @@ jobs:
           path: AutoDraw_Stage20/release/AutoDrawPortable/
           if-no-files-found: error
           retention-days: 7
+      - name: Run Egret CanvasRenderer reference harness in headless Edge
+        shell: pwsh
+        run: |
+          $outputDir = Join-Path $env:RUNNER_TEMP "egret-renderer-reference"
+          New-Item -ItemType Directory -Force -Path $outputDir | Out-Null
+          $server = Start-Process -FilePath "python" -ArgumentList @("-m", "http.server", "8765", "--bind", "127.0.0.1") -WorkingDirectory $env:GITHUB_WORKSPACE -PassThru -WindowStyle Hidden
+          try {
+            $ready = $false
+            for ($attempt = 0; $attempt -lt 30; $attempt++) {
+              try {
+                Invoke-WebRequest -Uri "http://127.0.0.1:8765/AutoDraw_Stage20/tests/game_renderer_reference.html" -TimeoutSec 2 | Out-Null
+                $ready = $true
+                break
+              } catch {
+                Start-Sleep -Milliseconds 500
+              }
+            }
+            if (-not $ready) { throw "Local HTTP server did not become ready." }
+
+            $edgeCandidates = @(
+              (Join-Path ${env:ProgramFiles(x86)} "Microsoft\Edge\Application\msedge.exe"),
+              (Join-Path $env:ProgramFiles "Microsoft\Edge\Application\msedge.exe")
+            )
+            $edgePath = $edgeCandidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+            if (-not $edgePath) { throw "Microsoft Edge executable was not found on the Windows runner." }
+
+            $domPath = Join-Path $env:RUNNER_TEMP "egret-renderer-reference-dom.html"
+            $stderrPath = Join-Path $env:RUNNER_TEMP "egret-renderer-reference-edge-stderr.log"
+            $browserArgs = @(
+              "--headless",
+              "--disable-gpu",
+              "--no-sandbox",
+              "--disable-dev-shm-usage",
+              "--dump-dom",
+              "--user-data-dir=$(Join-Path $env:RUNNER_TEMP 'egret-edge-profile')",
+              "http://127.0.0.1:8765/AutoDraw_Stage20/tests/game_renderer_reference.html"
+            )
+            $browser = Start-Process -FilePath $edgePath -ArgumentList $browserArgs -RedirectStandardOutput $domPath -RedirectStandardError $stderrPath -PassThru -Wait
+            if ($browser.ExitCode -ne 0) {
+              if (Test-Path $stderrPath) { Get-Content $stderrPath }
+              throw "Headless Edge exited with code $($browser.ExitCode)."
+            }
+
+            $dom = Get-Content -Raw $domPath
+            if ($dom -notmatch 'data-reference-status="complete"' -or $dom -notmatch 'data-fixture-count="18"') {
+              if (Test-Path $stderrPath) { Get-Content $stderrPath }
+              throw "Egret reference page did not report 18 completed fixtures."
+            }
+
+            $manifestMatch = [regex]::Match($dom, '<pre id="renderer-manifest-json"[^>]*>(.*?)</pre>', [System.Text.RegularExpressions.RegexOptions]::Singleline)
+            if (-not $manifestMatch.Success) { throw "Renderer fixture manifest was not serialized into the page DOM." }
+            $manifestJson = [System.Net.WebUtility]::HtmlDecode($manifestMatch.Groups[1].Value)
+            $manifest = $manifestJson | ConvertFrom-Json
+            if ($manifest.fixtures.Count -ne 18) { throw "Expected 18 fixture entries in the manifest." }
+            Set-Content -Path (Join-Path $outputDir "manifest.json") -Value $manifestJson -Encoding utf8
+
+            $pngPattern = '<a(?=[^>]*href="data:image/png;base64,([^"]+)")(?=[^>]*download="([^"]+)")[^>]*>'
+            $pngMatches = [regex]::Matches($dom, $pngPattern)
+            if ($pngMatches.Count -ne 36) { throw "Expected 36 PNG download links, found $($pngMatches.Count)." }
+            foreach ($match in $pngMatches) {
+              $pngBytes = [Convert]::FromBase64String($match.Groups[1].Value)
+              $pngName = [System.IO.Path]::GetFileName($match.Groups[2].Value)
+              [System.IO.File]::WriteAllBytes((Join-Path $outputDir $pngName), $pngBytes)
+            }
+            Write-Host "Egret CanvasRenderer generated $($manifest.fixtures.Count) fixtures and $($pngMatches.Count) PNG files."
+          } finally {
+            if ($server -and -not $server.HasExited) { Stop-Process -Id $server.Id -Force }
+          }
+      - name: Upload Egret renderer reference PNG fixtures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autodraw-egret-renderer-reference
+          path: ${{ runner.temp }}/egret-renderer-reference/
+          if-no-files-found: warn
+          retention-days: 14
 
   algorithm-benchmarks:
     name: Optional algorithm benchmarks
