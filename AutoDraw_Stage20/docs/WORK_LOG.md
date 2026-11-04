@@ -2677,3 +2677,10 @@ Run-level frame_probe: 2579 browser requestAnimationFrame intervals, average 59.
 - ead8808 и 730590d — regression test для per-stroke timing и точного 60-Hz fixture.
 
 CI 41840281018 для HEAD 730590d на момент записи выполняется; результаты не объявляются PASS. Новых live runs не было. Frozen plans, masks, thresholds, production defaults и raw capture evidence не менялись.
+
+
+## 2026-11-04 — Egret API defaults и painter popup transform
+
+Bundle дополнительно подтверждает: Main UI задаёт nominal stage.frameRate=48 и StageScaleMode.NO_SCALE; PainterPopup имеет размер 676×379, интерактивный BoardPane — logical 460×240 без собственного scaleX/scaleY. Это уточняет local geometry, но не раскрывает parent/global transform и browser device-pixel ratio.
+
+В официальном Egret Engine 5.2.18 egret.d.ts lineStyle thickness описан как ширина линии, omitted caps/joints имеют defaults ROUND. Поскольку версия Egret runtime, загруженная самой игрой, не установлена, round caps/joins считаются обоснованной гипотезой совместимого API, но не подтверждённым фактом deployed runtime. Zero-length path rasterization остаётся неизвестной. Источник: https://app.unpkg.com/egret-engine@5.2.18/files/build/egret-wasm/egret.d.ts, Graphics.lineStyle, строки 6063–6090.
