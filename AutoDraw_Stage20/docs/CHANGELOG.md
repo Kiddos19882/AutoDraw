@@ -809,3 +809,7 @@
 - INT-006 pixel audit: 90/90 captures valid, 549 stroke rows, coverage=1.0, gaps=0. Frozen CHALK analyzer: 45/45 accepted; safety margin не установлен, production eligibility не подтверждена.
 - INT006R radius×geometry: 45/45 accepted, radius 1/10/30 tested at P1; расходы различаются слабо и немонотонно. 45 PNG pairs сохранены, visual review остаётся pending.
 - Production estimator/defaults и live data не изменялись.
+
+## 2026-11-04
+
+- Зафиксирована блокирующая задача FILL-001-RS-PRE-REPLAY-001: replay неизменённых исходных live PNG/evidence через исправленный PNG audit обязателен до следующего live запуска FILL-001-RS. Установлены критерии закрытия, сохранение hashes/raw evidence и запрет на ослабление PNG thresholds. 45-task matrix остаётся заблокированной.
