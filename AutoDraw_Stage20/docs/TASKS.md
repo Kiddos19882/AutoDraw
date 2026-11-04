@@ -16,6 +16,7 @@
 | INT-008 | P2 | TODO/BLOCKED | Оптимизация кистей/траекторий/покрытия после INT-007 |
 | INT-009 | P2 | TODO/BLOCKED | Holdout-проверка прогноза, exact CHALK и качества полного рисунка |
 | MONITOR-AUTOCAPTURE-STATUS | P2 | RECONCILE | Старый bridge design расходится с DONE-статусом INT-004 и поздними captures |
+| DOC-STATUS-SYNC | P2 | OPEN | Синхронизировать устаревшие статусы планов и справочников с TEST_RESULTS.md и текущим backlog |
 
 ## P0 — FILL-001-RS: renderer footprint и live preflight
 
