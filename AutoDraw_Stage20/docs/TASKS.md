@@ -7,12 +7,15 @@
 - [x] Исправить mask rasterization по тому же inverse affine transform — [4797aa5](https://github.com/Kiddos19882/AutoDraw/commit/4797aa5e2e3d9f78656c91dcddf285304eae55c1).
 - [x] Добавить regression coverage масштаба и raster contract — [a950084](https://github.com/Kiddos19882/AutoDraw/commit/a950084db14fd1560aa15f099da4a0108c9631e7).
 - [x] Усилить fixture: эталонный масштаб теперь извлекается непосредственно из `transform_logical_brush_plan_to_screen()`, а не только повторяет формулу — [c399433](https://github.com/Kiddos19882/AutoDraw/commit/c399433af7f2e7bc547a9f35274aaf24d3c3a52e).
-- [ ] Получить полный CI на code/test commits `4797aa5` / `a950084` / `c399433` (CI 41772866679 SUCCESS относится к более раннему HEAD `974f949` и не валидирует affine correction).
+- [x] Получить CI run [41778045384](https://github.com/Kiddos19882/AutoDraw/actions/runs/41778045384) на последующих изменениях — run завершился FAILURE: Preparation/G3 799 passed / 5 failed / 24 warnings / 82 subtests; остальные 3 test jobs success, downstream PNG audit и Windows build skipped.
+- [x] Разобрать все 5 отказов: synthetic PNG fixtures не учитывали executor pixel-center mapping; non-uniform ROI fixture завершался ValueError до audit.
+- [x] Исправить только тестовые fixtures — commits [1f28436](https://github.com/Kiddos19882/AutoDraw/commit/1f28436ab20fe949e4d53cfeea4a5560ed3cbcae) и [0f23731](https://github.com/Kiddos19882/AutoDraw/commit/0f23731848f0c148fe5e1309d1e305576dd4b6b7).
+- [ ] Получить полный CI PASS на новых test commits; локальный pytest недоступен.
 - [ ] Выполнить committed evidence replay и повторный PNG audit неизменённых before/after PNG исправленным кодом; сохранить coverage/leakage и hashes.
 - [ ] Если gate всё ещё fail — исследовать фактический footprint игрового renderer, не ослабляя критерии.
 - [ ] Только после принятого PNG/runtime preflight отдельно разрешать 45-cell matrix.
 
-**Текущий статус:** CODE CHANGES COMMITTED / VALIDATION PENDING. Live capture и matrix остаются BLOCKED.
+**Текущий статус:** AFFINE SOURCE FIX COMMITTED; CI обнаружил устаревшие synthetic fixtures; test-only corrections COMMITTED, повторный CI PENDING. Live capture и matrix остаются BLOCKED.
 
 ## Актуальное состояние FILL-001 / FILL-001-RS на 2026-11-04
 
