@@ -11,6 +11,14 @@
 
 Последовательность: renderer/transform и offline PNG gate → принятый single-task preflight (при отдельном разрешении на live) → отдельное решение о 45 captures; INT-006 расширяется как независимая валидация модели. Capsule проверяется offline и не подменяет renderer gate.
 
+## Дополнение — проверка исторических runtime asset URLs (2026-11-04)
+
+В трёх сохранённых Game Monitor captures от 2026-10-30/31 найдены Resource Timing entries для `/old/manifest.json`, `/old/js/mergeEngine_df2e5bc5.js` и `/old/js/main.min_6ecc02a4.js`. Это подтверждает только исторические URL/transferSize metadata. Response bodies и hashes не сохранены, прямое получение ресурсов через web fetch недоступно.
+
+Файл из master, прочитанный в предыдущем increment, — `main.min_570122a1.js` (blob SHA `28838e803dcc6f85efb13febd93cc9e0f5046ffc`), то есть имя отличается от `main.min_6ecc02a4.js` в capture. Идентичность этих bundles не доказана. Egret 5.2.18 остаётся upstream reference; deployed runtime identity — UNKNOWN.
+
+Следующий offline шаг: получить response bodies трёх assets из браузерного cache/DevTools Network и зафиксировать hashes. Код, тесты, конфигурации, workflow, frozen evidence и master не менялись; live drawing не выполнялся.
+
 ## Дополнение — прямой source trace игровой кисти (2026-11-04)
 
 Клиентский bundle из `master` прочитан по Git blob SHA `28838e803dcc6f85efb13febd93cc9e0f5046ffc` без исполнения и без изменения master. Прослежены `BoardPane.redraw()`, `setRadius()`, `onDrawStart()`, `onDrawing()`, `onDrawingEnd()`, `BlackBoardAtom.pushPoint()`, `Painter.drawNormalLine()` и `Painter.drawSmoothLine()`.
