@@ -142,7 +142,29 @@ def build_fill001_experiment_context(task: dict[str, Any]) -> dict[str, Any]:
             raise FillMatrixError(f"{field} должен быть SHA-256.")
     if task["sampling_profile"] != FILL001_RUNTIME_PROFILE:
         raise FillMatrixError("FILL-001 task не закрепляет sampling profile P1.")
-    return {field: task[field] for field in _CONTEXT_FIELDS}
+    context = {field: task[field] for field in _CONTEXT_FIELDS}
+    if task.get("plan_variant") == "FILL001_RS_V1":
+        step, offset = task.get("scanline_row_step"), task.get("scanline_offset")
+        if (
+            task.get("planner_version") != 2
+            or type(step) is not int
+            or not 1 <= step <= task["requested_radius"]
+            or type(offset) is not int
+            or not 0 <= offset < step
+        ):
+            raise FillMatrixError("FILL-001-RS context содержит некорректную versioned scanline spacing.")
+        context.update({
+            "plan_variant": "FILL001_RS_V1",
+            "planner_version": 2,
+            "scanline_row_step": step,
+            "scanline_offset": offset,
+        })
+    elif any(
+        field in task
+        for field in ("planner_version", "scanline_row_step", "scanline_offset")
+    ):
+        raise FillMatrixError("Legacy FILL-001 context не может содержать FILL-001-RS fields.")
+    return context
 
 
 def _canonical_drawing_plan_document(plan_document: dict[str, Any]) -> dict[str, Any]:
