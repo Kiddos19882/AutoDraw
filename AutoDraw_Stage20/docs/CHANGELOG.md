@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-11-04 — actual BoardPane CanvasRenderer reference: 18/18 pixel match
+
+- Harness теперь загружает настоящий `BoardPane` из game bundle, вызывает `redraw()` и сравнивает source raster с manual path transcription на втором BoardPane instance.
+- Run `41916449025`, job `126877971003`: 18/18 fixture comparisons pixel-identical (`differingPixels=0`); artifact `13365670726` содержит manifest и 36 PNG.
+- Single-point BoardPane GraphicsNode не пустой из-за transparent `resetBg()` rectangle, но его raster полностью прозрачный. Предыдущий manual-only empty-node вывод superseded.
+- WebGL texture sampling/mask stencil и live game pixel equivalence остаются pending.
 ## 2026-11-04 — correction: actual BoardPane reference and explicit drawLast=false
 
 - Corrected `Painter.drawSmoothLine` signature to four parameters `(graphics, points, drawFirstHalf, drawLast)`, with default `drawLast=true`; `BoardPane.redraw()` explicitly passes `false`.
