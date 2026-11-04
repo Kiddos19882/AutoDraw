@@ -921,3 +921,12 @@
 - Сохранены API, global bounds, определение potential/guaranteed и fail-closed ограничения; production planners не подключались.
 - Добавлены тесты эквивалентности с прежним global-AABB reference на winding polyline и инвариантности разбиения прямого сегмента на коллинеарные части.
 - Ожидаем CI run [41848358502](https://github.com/Kiddos19882/AutoDraw/actions/runs/41848358502) на HEAD `6afdefc7ff2f18db544e55572ed918841d448164`. Фактический performance gain пока не измерен; live/runtime проверок не было.
+
+
+## 2026-11-04 — capsule broad-phase benchmark and independent oracle
+
+- Добавлен независимый full-canvas oracle для swept capsule polyline и 16 seeded cases; все potential/guaranteed masks совпали с production model.
+- Добавлен offline benchmark global-AABB vs per-segment AABB и CI artifact. Пять synthetic cases дали совпадение masks; candidate slots сокращены на 59.53–96.23% для многосегментных случаев и не сократились для single segment.
+- Median wall-clock speedup в Windows CI runner: 10.91× winding, 20.57× large zigzag, 2.76× diagonal turns, 14.10× compact polyline, 1.16× single segment. Не универсальная гарантия и не CHALK/runtime measurement.
+- Full CI [41859709320](https://github.com/Kiddos19882/AutoDraw/actions/runs/41859709320) — SUCCESS: Preparation/G3 832 passed, 24 warnings, 82 subtests; all required jobs, INT-006 PNG audit and Windows portable build/startup smoke-test SUCCESS; optional algorithm benchmarks SKIPPED. Artifact `13338434277`.
+- Planner integration, deployed Egret renderer validation and live experiments не выполнялись; production defaults и frozen FILL-001 evidence не менялись.
