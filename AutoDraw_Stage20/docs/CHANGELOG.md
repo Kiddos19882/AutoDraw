@@ -794,3 +794,9 @@
 - Runtime binding больше не принимает поздний `finished_at_utc` за время последнего события. Activity window восстанавливается по `started_at_utc`, `started_at_performance_ms` и максимальному `events[].t`; idle finalization grace проверяется отдельно.
 - Добавлены regression tests для pre-execution calibration run и Bridge JSON >27 MiB, включая проверку полного чтения и SHA-256.
 - Commits: `95a8d1799cd2cbbba09929cc5086a3655ba90c78` (fix), `870bebce6b39e782f70ef9f476a324ee840c05ae` (tests). CI ожидается.
+
+## 2026-11-04 — FILL-001 CI fixture alignment
+
+- Анализирован run [41778045384](https://github.com/Kiddos19882/AutoDraw/actions/runs/41778045384): Preparation/G3 — 799 passed, 5 failed, 24 warnings, 82 subtests; три других обязательных test jobs success, downstream PNG audit и Windows build skipped.
+- Исправлены synthetic PNG fixtures: согласование с реальным executor transform, non-uniform ROI test теперь доходит до audit, runtime-binding fixture использует screen rasterization.
+- Commits: `1f28436ab20fe949e4d53cfeea4a5560ed3cbcae`, `0f23731848f0c148fe5e1309d1e305576dd4b6b7`. Только тесты; production code и acceptance thresholds не менялись. Повторный CI ожидается.
