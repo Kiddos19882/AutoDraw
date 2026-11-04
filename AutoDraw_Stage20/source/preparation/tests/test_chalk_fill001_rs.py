@@ -7,7 +7,10 @@ import pytest
 from chalk_fill_execution import prepare_fill001_single_task_plan
 from chalk_fill_runtime_binding import build_fill001_experiment_context
 from chalk_fill_experiment import FILL001_RADII, FILL001_SHAPES
-from chalk_fill_fixed_radius_planner import (\n    build_fixed_radius_fill_plan,\n    build_fixed_radius_fill_plan_for_task,\n)
+from chalk_fill_fixed_radius_planner import (
+    build_fixed_radius_fill_plan,
+    build_fixed_radius_fill_plan_for_task,
+)
 from chalk_fill_matrix import (
     FILL001_RS_PLAN_VARIANT,
     FILL001_RS_SCANLINE_CONFIGS,
