@@ -852,3 +852,12 @@
 - Right perimeter is dominant residual region (largest component 870 px); 11 leakage pixels are sparse near left perimeter / rounded corners.
 - Result supports investigating brush footprint and stroke endpoints before changing row spacing. No production behavior, frozen plan or acceptance thresholds changed.
 - Workflow 41787492122 SUCCESS; Preparation/G3 804 passed, 82 subtests passed.
+
+
+## 2026-11-04 — FILL-001-RS game renderer source inspection
+
+- Получен полный game bundle из master через GitHub Contents API; зафиксированы commit/blob identity и статические участки BoardPane/Painter.
+- Подтверждены ENTER_FRAME sampling, dedup соседних одинаковых координат, O(N) пересчёт point count на каждый принятый sample и передача brush value в lineStyle thickness.
+- Выявлено, что smooth single-point path формирует moveTo+lineTo в одну координату; фактическое окрашивание нулевого сегмента и cap geometry остаются UNKNOWN.
+- Следующий gate перенесён с pixel localization (закрыто) на renderer footprint / frame sampling calibration. Capture REJECTED, 45-task matrix BLOCKED.
+- Только документация; production code, tests, configs, frozen plans, thresholds и raw captures не менялись.
