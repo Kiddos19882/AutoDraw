@@ -260,3 +260,11 @@ Runtime binding PASS: выбран правильный run, 27/27 strokes, radi
 
 **Будущий кандидат:** после основной заливки выполнить одну непрерывную обводку контура, правильно сместив центральную линию внутрь области с учётом фактического renderer footprint, чтобы край кисти закрывал границу без выхода наружу. Это не реализовано и не подтверждено. До рассмотрения нужны offline geometry/raster validation, затем отдельное разрешение на live проверку; критерии — coverage≥99%, leakage=0 и exact CHALK по `pointCount_after - pointCount_before`. Длина контура и proxy points не заменяют измерение расхода.
 
+## Дополнение — offline edge breakdown planner model и contour-pass sweep (2026-11-04)
+
+Planner model reproduction для frozen rectangle/r10/step5/offset0 plan даёт 304 uncovered pixels из 44 653 target pixels. Разбиение: верхняя полоса 80, нижняя 80, левая средняя граница 72, правая средняя 72, внутренняя область 0; leakage=0. Это доказывает краевую концентрацию пропусков в **OpenCV модели планировщика**, но не локализует actual PNG residuals (corrected audit: coverage=98.430600%, leakage=11).
+
+Exploratory test одной замкнутой обводки после scanlines: erosion frozen mask эллиптическим ядром и один contour pass. Offset 6/7/8 px в OpenCV model дал coverage 99.516270% / 99.372942% / 99.328153%, leakage=0; offset 5 дал coverage 99.964168%, leakage=32. Это показывает возможное решение краевого дефицита при правильном смещении внутрь, но не подтверждает renderer equivalence и не определяет exact CHALK. Для offset 6 получен один контур из 64 вершин, длина приближения 846.225 logical px; не переводить эту длину в ресурс.
+
+Далее: завершить coordinate breakdown actual before/after PNG, проверить все 11 leakage pixels и сравнить с концами scanlines; только затем продолжить contour candidate offline с screen transform/brush footprint. Не менять исходный frozen plan и acceptance criteria. Новый live preflight и 45-task matrix — только после закрытия offline gate и отдельных разрешений.
+
