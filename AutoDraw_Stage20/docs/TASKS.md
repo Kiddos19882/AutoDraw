@@ -80,7 +80,7 @@ Workflow `.github/workflows/geometry-tests.yml` дополнен проверк�
 
 **Добавлено в Game Monitor 0.2.2:**
 - `MOUSE_MOVE_SAMPLE` — opt-in DOM mousemove (выключен по умолчанию, включается через `setInputTelemetryEnabled(true)`), доставленный canvas; timestamp и client/page/screen coordinates, stage mouse coordinates и BoardPane-local coordinates; listener выполняется на window bubble после Egret canvas listener.
-- `POINT_QUOTA_UPDATE` — при положительной exact pointDelta теперь включает acceptedPoint и stage/local coordinates после updateLess().
+- `POINT_QUOTA_UPDATE` — при положительной exact pointDelta включает acceptedPoint; stage/local coordinates добавляются только при включённой input telemetry.
 - Bridge allowlist и collector allowlist пропускают новый event.
 - Node tests проверяют raw mousemove telemetry и accepted-point correlation; Python smoke test проверяет allowlist.
 
