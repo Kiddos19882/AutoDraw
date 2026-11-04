@@ -1,5 +1,11 @@
 # Roadmap AutoDraw
 
+## FILL-001-RS — следующий gate после коррекции PNG transform
+
+Кодовая коррекция alignment внесена в [4797aa5](https://github.com/Kiddos19882/AutoDraw/commit/4797aa5e2e3d9f78656c91dcddf285304eae55c1), regression assertions — [a950084](https://github.com/Kiddos19882/AutoDraw/commit/a950084db14fd1560aa15f099da4a0108c9631e7). До коррекции audit использовал W/460 и H/240, тогда как executor использует (W−1)/460 и (H−1)/240. На ROI 581×304 две версии mask rasterization различаются на 606 пикселей.
+
+**Очередность:** полный CI/replay на новом HEAD → пересчитать committed PNG без изменения исходников и thresholds → при pass пересмотреть preflight acceptance → при fail локализовать оставшуюся разницу игрового renderer. До выполнения gate 45-task matrix BLOCKED; CHALK=1260 остаётся измерением только этой задачи и не означает принятия качества.
+
 ## Актуальный статус FILL-001 / FILL-001-RS на 2026-11-04
 
 ## FILL-001-RS — актуальный live preflight gate — 2026-11-04
