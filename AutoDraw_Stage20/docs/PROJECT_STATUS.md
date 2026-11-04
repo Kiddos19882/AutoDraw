@@ -1005,3 +1005,11 @@ Per-run transport gates чистые: `dropped_events=0`, `monitor_error_count_d
 - Pixel-coordinate breakdown исходной after.png и 11 leakage pixels всё ещё не завершён; сравнение с предыдущим capture не выполнено. Нельзя считать фактическую edge-gap причину доказанной.
 - Capture остаётся REJECTED, 45-task matrix BLOCKED. Не менялись code/tests/configuration/frozen plan/thresholds/production defaults; live experiments не запускались. Следующий gate — pixel-level breakdown исходных PNG и сопоставление с renderer footprint, затем отдельное разрешение на новый live preflight.
 
+## 2026-11-04 — actual PNG residual diagnostics: CI instrumentation added
+
+- Исходные `before.png` и `after.png` подтверждены в рабочей ветке; визуально просмотрена фактическая пара. Corrected audit остаётся coverage=98.430600%, leakage=11, capture REJECTED.
+- В replay test добавлен test-only pixel diagnostic: повторяет screen-mask mapping audit, вычисляет uncovered/leakage координаты, распределение по зонам и строкам, connected components, а также расстояния пропусков до scanline centerlines по точным affine screen endpoints.
+- Изменения тестовые, не меняют production audit, frozen mask/plan, thresholds, runtime defaults и исходные PNG.
+- Commits: `e62b69295f9df1c67a485a5c900fbcf1ceba87eb`, `d337f4240e83488273152f65992032beca395781`.
+- Результат вычисления пока PENDING: локальная рабочая копия недоступна, GitHub combined status не вернул CI statuses; запуск и лог Preparation/G3 требуют подтверждения. Не считать actual pixel breakdown завершённым.
+- Capture остаётся REJECTED, 45-task matrix BLOCKED. Live эксперименты не запускались.
