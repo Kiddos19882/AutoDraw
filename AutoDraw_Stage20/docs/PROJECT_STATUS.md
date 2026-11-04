@@ -2,6 +2,12 @@
 
 ## Актуальное состояние на 2026-11-04
 
+## FILL-001-RS — CI failure и исправление тестовых fixtures — 2026-11-04
+
+Run [41778045384](https://github.com/Kiddos19882/AutoDraw/actions/runs/41778045384) завершился FAILURE в Preparation/G3: 799 passed, 5 failed, 24 warnings, 82 subtests. Game Monitor/Bridge, Application integration и Executor regression — SUCCESS; PNG audit и Windows portable build skipped. Пять падений связаны с synthetic PNG fixtures, не соблюдавшими executor transform, и non-uniform ROI test, который падал до вызова audit.
+
+Test-only fixes committed: [1f28436](https://github.com/Kiddos19882/AutoDraw/commit/1f28436ab20fe949e4d53cfeea4a5560ed3cbcae), [0f23731](https://github.com/Kiddos19882/AutoDraw/commit/0f23731848f0c148fe5e1309d1e305576dd4b6b7). Production source, frozen masks и acceptance thresholds не менялись. Повторный CI ещё не подтверждён; committed PNG replay не выполнен. Capture remains BLOCKED; 45-task matrix BLOCKED.
+
 ## Дополнение — независимая проверка executor transform — 2026-11-04
 
 
