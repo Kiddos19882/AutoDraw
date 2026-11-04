@@ -79,7 +79,7 @@ Workflow `.github/workflows/geometry-tests.yml` дополнен проверк�
 Следствие: одна геометрическая траектория AutoDraw не гарантирует одинаковую последовательность точек, доставленных DOM, округлённых Egret и принятых BoardPane. Относительная фаза mousemove events к игровому ENTER_FRAME, пропуск/объединение DOM events и округление stage coordinates — конкретные механизмы для проверки. Это не доказывает, что каждый старый случай вариативности вызван только ими.
 
 **Добавлено в Game Monitor 0.2.2:**
-- `MOUSE_MOVE_SAMPLE` — DOM mousemove, доставленный canvas, timestamp и client/page/screen coordinates, stage mouse coordinates и BoardPane-local coordinates; listener выполняется на window bubble после Egret canvas listener.
+- `MOUSE_MOVE_SAMPLE` — opt-in DOM mousemove (выключен по умолчанию, включается через `setInputTelemetryEnabled(true)`), доставленный canvas; timestamp и client/page/screen coordinates, stage mouse coordinates и BoardPane-local coordinates; listener выполняется на window bubble после Egret canvas listener.
 - `POINT_QUOTA_UPDATE` — при положительной exact pointDelta теперь включает acceptedPoint и stage/local coordinates после updateLess().
 - Bridge allowlist и collector allowlist пропускают новый event.
 - Node tests проверяют raw mousemove telemetry и accepted-point correlation; Python smoke test проверяет allowlist.
