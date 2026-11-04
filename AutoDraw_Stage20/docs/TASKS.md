@@ -603,3 +603,18 @@ INT-006 остаётся IN_PROGRESS до официального analyzer repo
 - [ ] Только после успешного preflight и отдельного согласования переходить к 45 live captures.
 
 CI SUCCESS не является live evidence; 45-cell matrix остаётся BLOCKED.
+
+
+## 2026-11-04 — FILL-001-RS CI PASS и анализ опубликованных evidence
+
+- [x] Подтвердить полный CI run [41780241017](https://github.com/Kiddos19882/AutoDraw/actions/runs/41780241017): Application integration, Executor regression, Preparation/G3, Game Monitor/Bridge, INT-006 PNG audit, Windows portable build/startup smoke-test — SUCCESS; optional benchmarks — SKIPPED.
+- [x] Подтвердить FILL-001-RS static sweep artifact ID `13299430831`: 2,238 candidates, 62 accepted, 15/15 selected shape×radius cells прошли offline coverage≥99% / leakage=0.
+- [x] Проверить INT-006 PNG artifact ID `13299470914`: 90 valid captures, 549 stroke rows, coverage=1.0, zero gaps.
+- [x] Проверить INT-006 frozen CHALK artifact ID `13299121807`: 45/45 accepted, 0 missing/rejected; safety margin не установлен, production eligibility не подтверждена.
+- [x] Проверить INT006R radius × geometry artifact ID `13299101877`: 45/45 accepted; exact CHALK сравнен по radius 1/10/30 при P1.
+- [x] Получить 45 пар INT006R before/after PNG и manifests (artifact ID `13299381257`, 180 файлов).
+- [ ] Завершить ручной visual review всех 45 пар INT006R PNG; текущий analyzer gate — `pending_manual_review`.
+- [ ] Установить safety margin и границы применимости frozen INT-006 model отдельным решением; до этого `production_eligibility=not_validated`.
+- [ ] Отдельно повторно оценить FILL-001-RS live preflight capture по фактическим неизменённым PNG и executor mapping; CI static sweep не заменяет live CHALK/capture evidence.
+
+Радиус не показал монотонного влияния на расход в пяти geometry scenarios. Средние CHALK radius 1/10/30: D1 62.667/62.333/63.333; D2 71.667/71.000/71.000; D3 100.000/100.667/99.667; D4 14.333/14.667/15.333; D5 88.333/89.667/89.667. Не делать вывод о незначимости радиуса за пределами протестированных геометрий, P1 и радиусов.
