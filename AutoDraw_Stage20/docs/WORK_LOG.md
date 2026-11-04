@@ -2953,3 +2953,13 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - Test-only commit: `3d50da2ff4edbc6cc9511c23e82c3796eea124f2`.
 - New validation run: `41913850169`; Game Monitor and bridge job PASS, Executor job PASS, Application integration test steps PASS at time of entry; Preparation job still running. Windows portable build / Edge renderer job awaits dependencies.
 - No production Monitor logic changed for this correction.
+
+## 2026-11-04 — Egret renderer browser harness выделен в независимый CI job
+
+- Run `41913850169` после исправления O(1) теста подтвердил PASS для Game Monitor/Bridge, Executor и Application integration, но Preparation/G3 job оставался IN_PROGRESS без обновления GitHub API; Windows build/harness зависел от его завершения.
+- Чтобы критический browser evidence gate не блокировался длительной несвязанной preparation suite, workflow разделён: новый независимый `egret-renderer-reference` job запускает только Windows Edge harness; portable build/startup остаётся отдельным job с прежними regression dependencies.
+- Inline PowerShell перенесён в `AutoDraw_Stage20/tests/run_egret_renderer_reference.ps1`. Скрипт проверяет HTTP bundle, Edge exit code, DOM completion, 18 manifest fixtures и 36 PNG links; при ошибке сохраняет DOM и Edge stderr в artifact.
+- Новый browser job имеет timeout 12 минут и загружает `autodraw-egret-renderer-reference` независимо от остальных jobs.
+- Commits: script `f83edfdf80172709b596f4bbc470a6a273417610`, workflow `10c5e50d3ba5744adeb0f96bd49febf327c9cc5c`, PowerShell ProgramFiles(x86) correction `a5b4b2978006960845ef04d021e4174a5c6425ea`.
+- Runs `41914411268` (pre-correction workflow/script) and `41914478746` (corrected script) were created; corrected run outcome and browser artifact are pending. Do not infer browser harness success from job creation.
+- Production planner, renderer implementation, CHALK model and live game state are unchanged.
