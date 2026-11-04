@@ -1,3 +1,12 @@
+## 2026-11-04 — FILL-001-RS — versioned scanline spacing
+
+- Добавлен planner v2 с независимыми scanline_row_step/scanline_offset; legacy planner v1 и default plan identity сохранены.
+- Добавлен отдельный FILL001_RS_V1 manifest builder (45 задач), fail-closed validation и single-task execution handoff.
+- Runtime experiment context и capture metadata связывают plan variant/version и spacing; P1 point sampling не менялся.
+- Добавлены CLI manifest generator, exhaustive 2 238-candidate static sweep script, regression tests и CI artifact upload.
+- Static sweep: 62 candidates passed coverage≥99%/leakage=0; результаты OpenCV не являются измерением CHALK.
+- Live preflight не выполнялся; FILL-001-RS matrix остаётся BLOCKED до принятого single-task live capture.
+
 ## 2026-11-04 — FILL-001-RS — документирован этап исследования scanline spacing
 
 - В существующий временный FILL-001 plan добавлен отдельный этап исследования `scanline_row_step`, не смешиваемый с `point_step_px`.
