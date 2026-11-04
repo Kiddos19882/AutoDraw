@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-11-04 — Game Monitor 0.2.2: input sampling telemetry
+
+- Добавлено событие `MOUSE_MOVE_SAMPLE`: DOM mousemove после Egret canvas handler с DOM timestamp, client/page/screen coordinates, stage.mouseX/Y и BoardPane-local coordinates.
+- `POINT_QUOTA_UPDATE` при положительной exact pointDelta теперь содержит acceptedPoint и stage/local coordinates, связывая точку с моментом обновления quota.
+- Browser Bridge и Python collector allowlists расширены; добавлены Node и Python regression tests.
+- Source trace зафиксировал цепочку WebTouchHandler page→stage mapping с Math.round(), TouchHandler duplicate suppression и SystemTicker frameRate throttle. Это обоснованный механизм вариативности повторных линий, но парные live captures ещё нужны для подтверждения.
+- Monitor version 0.2.2. Code/test commits: `981b2c6`, `216361d`, `b9899b2`, `6e0867b`, `7a17802`. Live experiments не выполнялись; CI нового HEAD не подтверждён.
+
 ## 2026-11-04 — исправлен empty GraphicsNode handling в Egret reference harness
 
 - По source trace Egret 5.4.1 подтверждено: `Graphics.moveTo()` не обновляет bounds; WebGLRenderer пропускает GraphicsNode без положительных width/height или drawData.
