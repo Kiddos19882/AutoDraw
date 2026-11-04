@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AutoDraw — Egret brush renderer reference</title>
+  <style>
+    :root { color-scheme: light dark; font-family: system-ui, sans-serif; }
+    body { margin: 24px; max-width: 1200px; }
+    h1 { font-size: 1.5rem; }
+    .notice { padding: 12px 14px; border: 1px solid #9998; border-radius: 8px; margin: 12px 0 20px; }
+    #renderer-status { padding: 10px; border-radius: 6px; background: #8882; }
+    #renderer-status.error { background: #d22a; }
+    #renderer-cases { display: grid; grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); gap: 16px; }
+    .fixture { border: 1px solid #8886; border-radius: 8px; padding: 12px; min-width: 0; }
+    .fixture h3 { font-size: 1rem; margin: 0 0 10px; }
+    .fixture img { width: 100%; height: auto; image-rendering: auto; background: repeating-conic-gradient(#8882 0 25%, transparent 0 50%) 0 / 16px 16px; border: 1px solid #8885; }
+    .fixture pre { white-space: pre-wrap; font-size: 11px; overflow-wrap: anywhere; }
+    .downloads { display: flex; flex-wrap: wrap; gap: 12px; font-size: .9rem; }
+    #renderer-manifest { display: inline-block; margin: 12px 0; }
+  </style>
+</head>
+<body>
+  <h1>Egret 5.4.1 — offline GraphicsNode reference</h1>
+  <p class="notice">
+    Страница загружает только локальный <code>mergeEngine_df2e5bc5.js</code> и напрямую вызывает Egret CanvasRenderer.
+    Она не открывает игру, не создаёт WebGL context, не отправляет события мыши и не расходует CHALK.
+  </p>
+  <p class="notice">
+    PNG <strong>source texture</strong> воспроизводит CanvasRenderer raster stage для GraphicsNode при масштабе 3×.
+    PNG <strong>masked board</strong> дополнительно композитит результат через Canvas2D. Последний шаг не является
+    доказанной пиксельной копией WebGL texture sampling / mask stencil и должен сравниваться с game capture.
+  </p>
+  <p id="renderer-status">Loading local Egret bundle…</p>
+  <a id="renderer-manifest"></a>
+  <div id="renderer-cases"></div>
+  <script src="../gameEngine/mergeEngine_df2e5bc5.js"></script>
+  <script src="./game_renderer_reference.js"></script>
+</body>
+</html>
