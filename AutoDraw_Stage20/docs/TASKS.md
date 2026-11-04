@@ -682,3 +682,10 @@ CI SUCCESS не является live evidence; 45-cell matrix остаётся 
 
 Ограничение: contour-pass числа получены в OpenCV raster model и не предсказывают exact CHALK. Расход измеряется только `pointCount_after - pointCount_before`.
 
+## FILL-001-RS — actual PNG residual diagnostic instrumentation (2026-11-04)
+
+- [x] Добавить в committed-evidence replay test воспроизводимый pixel-coordinate diagnostic на исходной before/after PNG pair: uncovered/leakage pixels, зоны, строки, компоненты и расстояния до screen-transformed scanlines.
+- [ ] Получить и проверить фактический вывод diagnostic из CI Preparation/G3 logs; сверить totals с corrected audit coverage/leakage.
+- [ ] На основании координат определить, связаны ли пропуски с краевыми участками, окончаниями штрихов, footprint/cap renderer или другими факторами; не подменять этот вывод planner model.
+
+Commits: `e62b69295f9df1c67a485a5c900fbcf1ceba87eb`, `d337f4240e83488273152f65992032beca395781`. Diagnostic code добавлен, его execution result ещё не подтверждён. Capture REJECTED; 45-cell matrix BLOCKED.
