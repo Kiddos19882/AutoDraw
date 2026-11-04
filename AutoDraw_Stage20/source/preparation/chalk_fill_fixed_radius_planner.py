@@ -28,6 +28,7 @@ from chalk_fill_experiment import (
 
 
 FILL001_PLANNER_VERSION = 1
+FILL001_RS_PLANNER_VERSION = 2
 FILL001_MIN_COVERAGE = 0.99
 FILL001_MAX_LEAKAGE_PIXELS = 0
 FILL001_SAMPLING_STEP = 4
@@ -143,6 +144,8 @@ def build_fixed_radius_fill_plan(
     radius: int,
     *,
     sampling_step: int = FILL001_SAMPLING_STEP,
+    scanline_row_step: int = 1,
+    scanline_offset: int = 0,
 ) -> dict[str, Any]:
     """Build a deterministic plan using exactly one brush width.
 
@@ -158,7 +161,24 @@ def build_fixed_radius_fill_plan(
         raise FillPlannerError("Радиус должен быть одним из значений 1/5/10/20/30.")
     if isinstance(sampling_step, bool) or not isinstance(sampling_step, int) or sampling_step < 1:
         raise FillPlannerError("Шаг оценки sampling должен быть положительным целым числом.")
+    if (
+        isinstance(scanline_row_step, bool)
+        or not isinstance(scanline_row_step, int)
+        or scanline_row_step < 1
+    ):
+        raise FillPlannerError("scanline_row_step должен быть положительным целым числом.")
+    if (
+        isinstance(scanline_offset, bool)
+        or not isinstance(scanline_offset, int)
+        or not 0 <= scanline_offset < scanline_row_step
+    ):
+        raise FillPlannerError("scanline_offset должен находиться в диапазоне 0..scanline_row_step-1.")
 
+    planner_version = (
+        FILL001_PLANNER_VERSION
+        if scanline_row_step == 1 and scanline_offset == 0
+        else FILL001_RS_PLANNER_VERSION
+    )
     mask = build_fill_target_mask(shape_id)
     mask_hash = fill_target_mask_sha256(shape_id, mask)
     if mask_hash != FILL001_EXPECTED_MASK_SHA256[shape_id]:
@@ -170,7 +190,7 @@ def build_fixed_radius_fill_plan(
 
     strokes: list[dict[str, Any]] = []
     path_length = 0.0
-    for y in range(FILL001_CANVAS_HEIGHT):
+    for y in range(scanline_offset, FILL001_CANVAS_HEIGHT, scanline_row_step):
         for x_start, x_end in _iter_true_runs(centerline_mask[y]):
             path_length += float(x_end - x_start)
             strokes.append({
@@ -196,7 +216,7 @@ def build_fixed_radius_fill_plan(
         for stroke in strokes
     )
     identity = {
-        "planner_version": FILL001_PLANNER_VERSION,
+        "planner_version": planner_version,
         "shape_id": shape_id,
         "radius": radius,
         "target_mask_sha256": mask_hash,
@@ -206,14 +226,21 @@ def build_fixed_radius_fill_plan(
             for stroke in strokes
         ],
     }
+    if planner_version == FILL001_RS_PLANNER_VERSION:
+        identity["scanline_row_step"] = scanline_row_step
+        identity["scanline_offset"] = scanline_offset
     signature = hashlib.sha256(
         json.dumps(identity, sort_keys=True, separators=(",", ":")).encode("utf-8")
     ).hexdigest()
 
     return {
         "schema_version": 1,
-        "plan_type": "autodraw_fill001_fixed_radius_experimental",
-        "planner_version": FILL001_PLANNER_VERSION,
+        "plan_type": (
+            "autodraw_fill001_fixed_radius_experimental"
+            if planner_version == FILL001_PLANNER_VERSION
+            else "autodraw_fill001_rs_fixed_radius_experimental"
+        ),
+        "planner_version": planner_version,
         "shape_id": shape_id,
         "radius": radius,
         "canvas": {"width": FILL001_CANVAS_WIDTH, "height": FILL001_CANVAS_HEIGHT},
@@ -223,7 +250,8 @@ def build_fixed_radius_fill_plan(
             "brush_value": radius,
             "footprint_model": "opencv_round_capped_line",
             "centerline_inset_pixels": inset,
-            "scanline_row_step": 1,
+            "scanline_row_step": scanline_row_step,
+            "scanline_offset": scanline_offset,
             "sampling_step_for_estimate": sampling_step,
             "automatic_execution_allowed": False,
         },
