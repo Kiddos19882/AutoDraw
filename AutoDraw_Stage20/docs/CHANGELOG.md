@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-11-04 — Egret zero-length lineTo fixture: no visible raster output
+
+- Добавлен controlled actual BoardPane fixture с `moveTo(100,100) → lineTo(100,100)`, widths 10/30.
+- В обоих случаях CanvasRenderer source, masked Canvas2D и WebGL alpha полностью пусты; Canvas↔WebGL pixel-identical.
+- Матрица: 20 WebGL comparisons, 6 exact, 14 max channel delta=1; artifact `13368772614` содержит manifest + 60 PNG.
+- Duplicate points назначаются напрямую и обходят live `pushPoint` dedup; результат ограничен нулевым lineTo в Egret 5.4.1 и не является CHALK/live measurement.
+- Full CI run [41926175588](https://github.com/Kiddos19882/AutoDraw/actions/runs/41926175588) SUCCESS.
+
+
 ## 2026-11-04 — подтверждён PainterPopup BoardPane runtime transform
 
 - Runtime snapshot показывает BoardPane local `(30,75)` под PainterPopup `(489.791666,-3)`, concatenated translation `(519.791666,72)`, scale 1.

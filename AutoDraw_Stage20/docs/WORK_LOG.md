@@ -310,6 +310,19 @@
 
 # Журнал работ AutoDraw
 
+## 2026-11-04 — controlled Egret zero-length lineTo raster check
+
+**Commit:** `63c14b8d5428bf61c439fb2c0bf1c630538b6118`  
+**CI:** [41926175588](https://github.com/Kiddos19882/AutoDraw/actions/runs/41926175588) SUCCESS.  
+**Artifact:** `13368772614` — manifest + 60 PNG.
+
+- Добавлен fixture `normal-zero-length-segment`: два одинаковых normal points `(100,100)`, widths 10/30.
+- Actual BoardPane CanvasRenderer source raster, masked Canvas2D и WebGL output полностью прозрачны (0 alpha pixels) для обеих ширин; Canvas/WebGL exact.
+- Matrix расширена до 20 fixtures/width entries, 20 WebGL comparisons, 60 PNG; 6 exact, 14 max channel delta=1, max delta=1.
+- Fixture synthetic: points задаются прямо в atom и обходят `pushPoint` dedup. Это подтверждает Egret raster behavior нулевого lineTo, но не наличие такого segment в live input; CHALK не измерялся.
+- Полный CI: Preparation/G3, Game Monitor/Bridge, Executor, Application integration, Egret browser harness, INT-006 audit и Windows portable build/startup smoke-test — SUCCESS; optional algorithm benchmarks SKIPPED.
+
+
 ## 2026-11-04 — подтверждён PainterPopup BoardPane stage-space transform
 
 Источник — пользовательский read-only runtime snapshot `data/runtime/renderer_snapshot_2026-11-04.json` (blob `99aaee478d0355d01be9d36770964293753d1486`).

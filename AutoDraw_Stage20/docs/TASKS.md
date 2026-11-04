@@ -40,7 +40,7 @@
 
 ### GAME-BRUSH-REPLICATION — воспроизведение цепочки игровой кисти
 
-**Статус:** SOURCE TRACE COMPLETE (E1); ACTUAL BOARDPANE CANVASRENDERER HARNESS PASS (18/18); MANUAL TRANSCRIPTION PIXEL EQUALITY PASS (18/18); EGRET WEBGL MASK/SCROLLRECT REFERENCE PASS (18/18; max channel delta 1); LIVE GAME PNG EQUIVALENCE NOT VALIDATED. Это исследовательский подэтап FILL-001-RS renderer footprint, а не замена измерениям CHALK или отдельное разрешение на live run.
+**Статус:** SOURCE TRACE COMPLETE (E1); ACTUAL BOARDPANE CANVASRENDERER HARNESS PASS (18/18); MANUAL TRANSCRIPTION PIXEL EQUALITY PASS (18/18); EGRET WEBGL MASK/SCROLLRECT/ZERO-LENGTH REFERENCE PASS (20/20; 6 exact, 14 max channel delta 1); LIVE GAME PNG EQUIVALENCE NOT VALIDATED. Это исследовательский подэтап FILL-001-RS renderer footprint, а не замена измерениям CHALK или отдельное разрешение на live run.
 
 **Что установлено по согласованному набору assets:** ввод проходит через BoardPane.onMouseDown → onDrawStart → ENTER_FRAME/onDrawing → onDrawingEnd; принятые координаты переводятся через globalToLocal, проверяются по локальным границам и deduplicate через BlackBoardAtom.pushPoint. Геометрия строится Painter.drawNormalLine или midpoint/curveTo smooth path. Значение UI передаётся в Egret как line width; caps/joints по умолчанию round. Подробная трассировка и ссылки на Git blob SHA — в [отчёте игрового движка, раздел 14](CHALK_GAME_ENGINE_POINT_COST_AND_BRUSH_WIDTH_2026-11-03.md#14-полная-трассировка-цепочки-игровой-кисти-и-границы-воспроизведения--2026-11-04).
 
@@ -52,7 +52,7 @@
 
 Маска доски теперь статически установлена: `PainterPopup` создаёт roundRect с параметром ellipseWidth=10, а Egret `Path2D.drawRoundRect()` преобразует его в внутренний радиус 5 логических пикселей; `painterBoard.mask=boardMask`. Дополнительно BoardPane ограничен `scrollRect` 460×240. Offline Egret WebGL mask/scrollRect reference проверен ниже; live game PNG equivalence, exact popup transform и вклад texture sampling в residual delta=1 ещё не подтверждены.
 
-**WebGL reference evidence 2026-11-04:** CI run `41924481247`, job `126905145909`, commit `5308fade07fbb11409a9afc5c3d40ed4cf82ca3a`. После добавления board и mask в общий Egret Stage объектный mask path подтверждён (`boardRenderMode=3`, sameStage/sameParent=true). Все 18 WebGL comparisons завершились: 4 exact, 14 с max channel delta=1; `mask-corner` width 10 — 145 differing pixels, width 30 — 36, оба max delta=1; `scrollrect-edges` exact для обеих ширин. Artifact `13368272823` содержит manifest + 54 PNG. Результат относится к Egret 5.4.1 / Edge 156 / ANGLE SwiftShader, не к live game capture. Сильные прежние расхождения были артефактом отсутствующего `mask.$stage` в тестовой сцене. Парный live PNG + accepted coordinates + pointCount из одной сессии всё ещё отсутствуют.
+**WebGL reference evidence 2026-11-04:** CI run `41926175588`, browser job `126911052714`, commit `63c14b8d5428bf61c439fb2c0bf1c630538b6118`. После добавления board и mask в общий Egret Stage объектный mask path подтверждён (`boardRenderMode=3`, sameStage/sameParent=true). Расширенная матрица: 20 WebGL comparisons; 6 exact, 14 с max channel delta=1, max delta=1. `mask-corner` width 10 — 145 differing pixels, width 30 — 36; `scrollrect-edges` exact. Новый `normal-zero-length-segment` (`moveTo(100,100) → lineTo(100,100)`) при widths 10/30 даёт 0 visible-alpha pixels в CanvasRenderer и WebGL; обе пары pixel-identical. Artifact `13368772614` содержит manifest + 60 PNG. Среда: Egret 5.4.1 / Edge 156 / ANGLE SwiftShader. Zero-length fixture synthetic и напрямую задаёт duplicate points, обходя input dedup; live behavior и CHALK им не измеряются. Парный live PNG + accepted coordinates + pointCount из одной сессии всё ещё отсутствуют.
 
 **Текущие реализации AutoDraw не являются копией renderer:** FILL-001 использует OpenCV round-capped lines, Capsule — идеальную round-capped polyline, а generic interior fill — rectangular footprint checks. Ни один из этих путей не воспроизводит полностью игровой sampling + smooth path + backend rasterization.
 
@@ -256,7 +256,7 @@ Workflow `.github/workflows/geometry-tests.yml` дополнен независ�
 ## BLOCKER: FILL-001-RS — калибровка renderer footprint и sampling
 
 **ID:** FILL-001-RS-ENGINE-FOOTPRINT-001  
-**Статус:** IN PROGRESS / BLOCKER — offline Egret CanvasRenderer↔WebGL mask/scrollRect reference PASS 18/18 (max channel delta 1) после исправления stage binding; live game footprint ещё не установлен; stage-space popup transform подтверждён runtime snapshot, client-space corners derived; предыдущий live capture REJECTED.  
+**Статус:** IN PROGRESS / BLOCKER — offline Egret CanvasRenderer↔WebGL mask/scrollRect/zero-length reference PASS 20/20 (6 exact, 14 max channel delta 1) после исправления stage binding; live game footprint ещё не установлен; stage-space popup transform подтверждён runtime snapshot, client-space corners derived; предыдущий live capture REJECTED.  
 **Приоритет:** блокирует новый live preflight и 45-task matrix.
 
 ### Закрытые пункты
@@ -272,7 +272,7 @@ Workflow `.github/workflows/geometry-tests.yml` дополнен независ�
 - [x] Измерить global/display transform именно PainterPopup BoardPane по runtime snapshot: BoardPane local=(30,75), parent PainterPopup=(489.791666,-3), concatenated translation=(519.791666,72), scale=1; boardMask имеет ту же матрицу. Client corners отсутствуют в snapshot и остаются derived.
 - [ ] Получить парный live capture из одной сессии: final board PNG, accepted coordinates/points и pre/post pointCount; offline artifact не заменяет этот capture.
 - [x] Подтвердить фактически подключённую версию Egret runtime 5.4.1 по read-only runtime snapshot; статический source trace подтверждает default round caps/joins.
-- [ ] Проверить raster behavior именно нулевого `lineTo` segment (одинаковые start/end coordinates) по точной runtime версии либо controlled PNG capture. Уже проверенный single-point smooth path содержит только `moveTo` и не эквивалентен нулевому сегменту.
+- [x] Проверить raster behavior нулевого `lineTo` segment controlled PNG capture на actual BoardPane/Egret 5.4.1: `moveTo(100,100) → lineTo(100,100)` при widths 10/30 даёт 0 visible-alpha pixels; CanvasRenderer и WebGLRenderer совпадают. Fixture напрямую задаёт duplicate points и обходит `pushPoint` dedup, поэтому не доказывает создание такого segment в live input.
 - [ ] Откалибровать screen-space footprint для нескольких значений кисти на одинаковой frozen geometry; сохранить raw before/after PNG и hashes.
 - [ ] Построить отдельные perimeter/endpoint candidates и проверить coverage≥99%, leakage=0 на независимом audit, не меняя frozen preflight.
 - [ ] Только после принятия offline candidate выполнить отдельный live preflight; 45-task matrix не открывать автоматически.

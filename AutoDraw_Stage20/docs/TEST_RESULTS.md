@@ -81,6 +81,26 @@ GitHub tree на HEAD `0a5fa41c` содержит 5 413 файлов; 5 011 фа
 
 **Вывод:** stage-space parent chain и transform установлены для этого snapshot. Это не paired PNG capture и не измерение фактического swept footprint кисти; live renderer comparison остаётся открытым.
 
+## 1.7. Egret zero-length normal segment — controlled PNG result (2026-11-04)
+
+**Commit:** `63c14b8d5428bf61c439fb2c0bf1c630538b6118`  
+**CI:** [41926175588](https://github.com/Kiddos19882/AutoDraw/actions/runs/41926175588) — SUCCESS.  
+**Browser job:** `126911052714` — SUCCESS.  
+**Artifact:** [13368772614](https://github.com/Kiddos19882/AutoDraw/actions/runs/41926175588/artifacts/13368772614), manifest + 60 PNG.
+
+Fixture `normal-zero-length-segment` создаёт actual BoardPane и задаёт normal path с двумя одинаковыми точками: `moveTo(100,100) → lineTo(100,100)`. Проверены widths 10 и 30.
+
+| Width | CanvasRenderer source alpha pixels | Masked Canvas2D alpha pixels | WebGL alpha pixels | Canvas↔WebGL |
+|---:|---:|---:|---:|---|
+| 10 | 0 | 0 | 0 | exact |
+| 30 | 0 | 0 | 0 | exact |
+
+В обеих комбинациях alpha bbox пустой. В manifest: `actualBoardPane=true`, `manualTranscriptionMatch.equal=true`, `webglPixelComparison.equal=true`, `boardRenderMode=3`.
+
+**Ограничение:** points назначены напрямую в `atom.points`, обходя `BlackBoardAtom.pushPoint()` duplicate suppression. Это controlled renderer test, а не доказательство, что live input передаёт повторные точки. В обычном live flow повторяющиеся принятые координаты deduplicate. CHALK/pointCount в этом offline test не измерялись.
+
+Расширенная матрица содержит 20 fixture-width entries, 20 WebGL comparisons и 60 PNG: 6 exact comparisons, 14 с max channel delta=1; max delta=1.
+
 ## 2. Сводный статус ключевых исследовательских серий
 
 | Серия | Область | Подтверждённый итог | Текущий статус / ограничения |

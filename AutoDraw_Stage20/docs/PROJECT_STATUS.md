@@ -1,5 +1,21 @@
 # Актуальная точка продолжения — 2026-11-04
 
+## Дополнение — проверен zero-length lineTo segment в Egret 5.4.1 (2026-11-04)
+
+**Code/test commit:** [63c14b8d5428bf61c439fb2c0bf1c630538b6118](https://github.com/Kiddos19882/AutoDraw/commit/63c14b8d5428bf61c439fb2c0bf1c630538b6118)  
+**Full CI:** [run 41926175588](https://github.com/Kiddos19882/AutoDraw/actions/runs/41926175588) — SUCCESS.  
+**Browser job:** `126911052714` — SUCCESS.  
+**Artifact:** [autodraw-egret-renderer-reference, ID 13368772614](https://github.com/Kiddos19882/AutoDraw/actions/runs/41926175588/artifacts/13368772614), 763,017 bytes, manifest + 60 PNG.
+
+- Добавлен fixture `normal-zero-length-segment`: normal path `moveTo(100,100) → lineTo(100,100)`; widths 10 и 30.
+- Для обеих ширин actual BoardPane CanvasRenderer source PNG имеет 0 pixels с alpha>0; masked-board PNG и WebGL board PNG также полностью прозрачны. CanvasRenderer↔WebGLRenderer совпали pixel-identically в обеих комбинациях.
+- Расширенная матрица: 20 fixture-width entries, 20 WebGL comparisons, 60 PNG; 6 exact comparisons, 14 с max channel delta=1, max delta по всей матрице — 1.
+- Это controlled synthetic path: duplicate points присвоены непосредственно `atom.points`, обходя `BlackBoardAtom.pushPoint()` dedup. В обычном live input одинаковые последовательные координаты подавляются; тест устанавливает поведение Egret для явно заданного нулевого `lineTo`, но не доказывает, что игра генерирует такой segment.
+- Runtime snapshot и source trace подтверждают Egret 5.4.1 и round caps/joints defaults. Тест не измеряет CHALK и не заменяет paired live PNG/accepted coordinates/pointCount.
+- Full CI: Preparation/G3, Game Monitor/Bridge, Executor, Application integration, Egret browser harness, INT-006 pixel audit и Windows portable build/startup smoke-test — SUCCESS; optional algorithm benchmarks — SKIPPED.
+
+**Следующий gate:** paired live capture одной фиксированной траектории — final board PNG, accepted coordinates/points и pre/post `pointCount` из одной сессии. Stage-space PainterPopup transform уже подтверждён; client-space corners derived. FILL-001-RS 45-task matrix остаётся BLOCKED до live footprint/quality acceptance.
+
 ## Дополнение — Egret WebGL mask reference исправлен и проверен (2026-11-04)
 
 **Кодовый commit:** [5308fade07fbb11409a9afc5c3d40ed4cf82ca3a](https://github.com/Kiddos19882/AutoDraw/commit/5308fade07fbb11409a9afc5c3d40ed4cf82ca3a)  
