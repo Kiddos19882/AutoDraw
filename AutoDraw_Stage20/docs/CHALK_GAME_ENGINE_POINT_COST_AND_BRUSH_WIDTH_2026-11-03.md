@@ -290,7 +290,7 @@ Commit [d3322fe35c808bde079c79545cc839636b7cda2a](https://github.com/Kiddos19882
 
 В реализации `GraphicsNode.lineStyle()` отсутствующие/неподдерживаемые caps/joints нормализуются к `"round"`; `CanvasRenderer.renderGraphics()` назначает `context.lineCap` и `context.lineJoin`, затем вызывает `stroke()`. Это подтверждает renderer defaults в предоставленном merge bundle. Но поведение нулевого пути `moveTo(p)+lineTo(p)`, итоговый pixel footprint и фактический Canvas/WebGL execution mode требуют отдельной frozen-fixture/runtime проверки.
 
-Основной bundle задаёт `stage.frameRate=48` и `StageScaleMode.NO_SCALE`; это nominal target, а не измеренный FPS. Логические размеры BoardPane — 460×240. Popup/global transform и фактический screen ROI этим разбором не установлены.
+Статический bundle содержит nominal `stage.frameRate=48` и `StageScaleMode.NO_SCALE`, но runtime snapshot текущей сессии подтверждает effective `stage.frameRate=30`, `scaleMode=fixedHeight`, `playerOptions.frameRate=30`. В raw FILL-001 run 6a17a297 интервалы времени между соседними принятыми точками имеют median=33ms, p90=35ms, p95=36ms, max=81ms; это согласуется с примерно 30Hz, но не является прямым измерением frameRate, поскольку повторные координаты подавляются и не каждый кадр обязан создавать новую точку. Логические размеры BoardPane — 460×240. Popup/global transform и фактический screen ROI для старого run не установлены.
 
 ### 11.4. Историческое структурное наблюдение о BoardPane — NOT_APPLICABLE_TO_CURRENT_USER_SCENARIO
 
@@ -488,7 +488,8 @@ BoardPane stage corners из runtime: TL=(519.791666,72), TR=(979.791666,72), BR
 
 - Run: `6a17a297-ea14-4527-9527-bfd8de3bd335`, radius/lineWidth=10, exact CHALK=1260, 27 штрихов.
 - Raw event integrity: 1287 DRAW_SAMPLE; 1260 positive samples; сумма pointDelta=1260; максимальный positive pointDelta=1; 1260 POINT_QUOTA_UPDATE; accepted_points=1260. Для этого run каждая принятая координата имеет отдельную positive sample запись; coalesced pointDelta отсутствуют.
-- 1233 соседних accepted-point intervals: min=3, median=6, p90=9, p95=10, max=13; только 3 интервала > lineWidth 10.
+- 1233 соседних accepted-point spatial intervals: min=3, median=6, p90=9, p95=10, max=13; только 3 интервала > lineWidth 10.
+- 1233 time intervals between accepted points: min=26ms, median=33ms, p90=35ms, p95=36ms, max=81ms; 27 intervals >40ms.
 - Последний интервал каждого из 27 штрихов: min=3, median=6, p90=7, p95=9, max=9. При smooth terminal midpoint и ideal round cap radius=5 все 27 последних принятых точек достигаются cap; расчётный идеальный зазор к центру последней принятой точки равен 0.
 
 **Вывод ограничен:** smooth path заканчивается в midpoint, но в данном capture round cap геометрически достигает центра последней принятой точки. Поэтому отсутствие заключительного `lineTo(lastPoint)` само по себе не доказывает причину coverage residual=11. Game `onDrawingEnd()` не семплирует mouseup; расстояние до фактической release coordinate не рассчитано из-за отсутствия same-session verified client→board transform для этого старого capture. Также не измерены browser antialiasing, texture filtering и clipping pixels.
