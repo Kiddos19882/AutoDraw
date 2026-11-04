@@ -9,7 +9,7 @@
 - В отдельной офлайн-симуляции r10 / scanline step=5 / offset=0 прошли текущий критерий coverage ≥99% и leakage=0 все три формы: rectangle 99,319% (27 strokes), wide_irregular 99,395% (29), narrow_irregular 99,173% (43). Для rectangle estimated sampling points=2 099 против 10 237 у baseline; это proxy, не прогноз/измерение CHALK. Игровой renderer не проверен.
 - Добавлен этап FILL-001-RS в [временный план](https://github.com/Kiddos19882/AutoDraw/blob/feature/image-geometry-optimization/AutoDraw_Stage20/docs/CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md): исследование `scanline_row_step` отдельно от `point_step_px`, versioned plan signatures и отдельный live preflight gate. r10/step=5 — только кандидат, не настройка AutoDraw.
 - FILL-001 остаётся IN_PROGRESS; FILL-001 45-cell matrix BLOCKED до отдельного принятого live preflight нового versioned candidate. INT-006 safety margin не установлен; INT-007 остаётся BLOCKED.
-- Изменения этой сессии ограничены Markdown-документацией в рабочей ветке. Исходники, тесты, конфигурации, workflow, экспериментальные данные и `master` не изменялись. CI для документационного HEAD 4f1fb94 отдельно не запускался.
+- FILL-001-RS implementation затронула planner, matrix, execution handoff, runtime binding, capture metadata, regression tests, manifest generator и CI workflow; добавлены static sweep script/report. Полный CI для новых commits ещё не подтверждён. `master` не изменялся. Live preflight не запускался: доступный runner не имеет локальной Windows/browser game session и calibrated board. Через GitHub API локальный `git status` недоступен.
 
 Историческая запись статуса на 2026-11-03 (сохранена для истории; её CI/HEAD сведения superseded текущим блоком выше):
 
