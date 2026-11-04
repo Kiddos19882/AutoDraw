@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-11-04 — уточнена семантика конечной точки smooth brush path
+
+- Подтверждено, что игровой `Painter.drawSmoothLine(..., true, false)` не добавляет `lineTo(lastPoint)`; `onDrawingEnd()` не завершает этот сегмент.
+- При одной точке остаётся `moveTo`, при двух — линия до midpoint, при 3+ — midpoint/quadratic path до midpoint последнего сегмента. Принятые CHALK точки и визуальное покрытие поэтому должны анализироваться раздельно.
+- Добавлены обязательные offline fixtures для 1/2/3+ точек; pixel-level последствия требуют browser PNG comparison.
+
 ## 2026-11-04 — runtime renderer snapshot и уточнение WebGL raster path
 
 - Сохранён пользовательский runtime snapshot в `data/runtime/renderer_snapshot_2026-11-04.json`.
