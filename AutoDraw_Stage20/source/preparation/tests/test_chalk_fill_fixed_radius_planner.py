@@ -90,3 +90,57 @@ def test_rasterizer_rejects_out_of_canvas_and_non_integer_coordinates():
             [{"brush_value": 10, "points": [{"x": 10.5, "y": 100}, {"x": 200, "y": 100}]}],
             10,
         )
+
+
+def test_default_scanline_spacing_keeps_legacy_planner_version_and_baseline_geometry():
+    plan = build_fixed_radius_fill_plan("rectangle", 10)
+
+    assert plan["planner_version"] == 1
+    assert plan["brush_configuration"]["scanline_row_step"] == 1
+    assert plan["brush_configuration"]["scanline_offset"] == 0
+    assert plan["summary"]["stroke_count"] == 131
+    assert plan["summary"]["path_length_logical_pixels"] == 40218.0
+    assert plan["summary"]["estimated_sampling_points"] == 10237
+    assert plan["summary"]["coverage_fraction"] == 1.0
+    assert plan["summary"]["leakage_pixels"] == 0
+
+
+def test_rs_scanline_spacing_is_versioned_and_reduces_rectangle_r10_passes():
+    plan = build_fixed_radius_fill_plan(
+        "rectangle", 10, scanline_row_step=5, scanline_offset=0
+    )
+
+    assert plan["planner_version"] == 2
+    assert plan["plan_type"] == "autodraw_fill001_rs_fixed_radius_experimental"
+    assert plan["brush_configuration"]["scanline_row_step"] == 5
+    assert plan["brush_configuration"]["scanline_offset"] == 0
+    assert plan["summary"]["stroke_count"] == 27
+    assert plan["summary"]["coverage_fraction"] == pytest.approx(0.993192, abs=1e-6)
+    assert plan["summary"]["uncovered_target_pixels"] == 304
+    assert plan["summary"]["leakage_pixels"] == 0
+    assert plan["summary"]["estimated_sampling_points_are_exact_chalk"] is False
+
+
+def test_rs_scanline_offset_changes_plan_signature_and_geometry():
+    first = build_fixed_radius_fill_plan(
+        "narrow_irregular", 5, scanline_row_step=3, scanline_offset=0
+    )
+    second = build_fixed_radius_fill_plan(
+        "narrow_irregular", 5, scanline_row_step=3, scanline_offset=1
+    )
+
+    assert first["plan_signature"] != second["plan_signature"]
+    assert first["summary"]["coverage_fraction"] < 0.99
+    assert second["summary"]["coverage_fraction"] >= 0.99
+    assert second["summary"]["leakage_pixels"] == 0
+
+
+def test_rs_scanline_parameters_reject_invalid_values():
+    with pytest.raises(FillPlannerError):
+        build_fixed_radius_fill_plan("rectangle", 10, scanline_row_step=0)
+    with pytest.raises(FillPlannerError):
+        build_fixed_radius_fill_plan("rectangle", 10, scanline_row_step=True)
+    with pytest.raises(FillPlannerError):
+        build_fixed_radius_fill_plan("rectangle", 10, scanline_row_step=5, scanline_offset=5)
+    with pytest.raises(FillPlannerError):
+        build_fixed_radius_fill_plan("rectangle", 10, scanline_row_step=5, scanline_offset=-1)
