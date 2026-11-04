@@ -2535,3 +2535,11 @@ Brush Test acceptance и матричные валидаторы больше н
 - Локальный git status и локальный pytest через GitHub API недоступны. Для новых commits нет подтверждённых CI statuses; committed PNG replay после исправления ещё не выполнен.
 - Исправление alignment не является доказательством устранения всего недопокрытия: 606 mask pixels — вклад различия raster conventions, а не измерение новых coverage/leakage. Acceptance thresholds не менялись.
 - Не запускались live game experiments; 45-task matrix остаётся BLOCKED. Production estimator/defaults, P1, frozen masks, исходные captures и master не менялись.
+
+
+## 2026-11-04 — независимая regression-проверка executor transform
+
+- Усилен `test_chalk_fill_capture_adapter.py`: synthetic ROI fixture получает scale из фактической `transform_logical_brush_plan_to_screen()`, проверяет преобразование крайних координат (0,0) → (W−1,H−1) и сравнивает scale PNG audit с метаданными executor transform.
+- Это устраняет слабость прежнего теста, где fixture повторял формулу вручную и мог совпасть с audit при расхождении с executor helper.
+- Commit: [c399433](https://github.com/Kiddos19882/AutoDraw/commit/c399433af7f2e7bc547a9f35274aaf24d3c3a52e).
+- Проверка pytest и CI для нового commit пока не подтверждена: combined status пуст, PR-triggered workflow runs отсутствуют; локальная среда репозитория недоступна.
