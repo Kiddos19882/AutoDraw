@@ -410,3 +410,18 @@ Harness V1–V5: matrix metadata/validator, block planner/journal, Brush Test UI
 3. INT-006 PNG audit: 90/90 valid captures, 549 stroke rows, coverage=1.0, zero gaps. Frozen CHALK analyzer: 45/45 accepted, но safety margin не установлен и production eligibility не validated.
 4. INT006R: 45/45 radius×geometry captures accepted; exact CHALK differences для radius 1/10/30 малы и немонотонны. PNG artifact полный, но ручной visual quality gate остаётся pending для 45/45 captures.
 5. Следующие действия: (а) вручную проверить 45 пар INT006R PNG; (б) определить safety margin и границы frozen CHALK model; (в) отдельно пройти FILL-001-RS capture/replay gate. Не менять production estimator/defaults по результатам только этого CI.
+
+## Следующий диагностический increment FILL-001-RS — edge pixels и contour candidate (2026-11-04)
+
+Offline повторение planner model локализовало её 304 uncovered pixels исключительно в краевых зонах (top=80, bottom=80, left-middle=72, right-middle=72; interior=0). Это согласуется с приоритетом проверки краёв, но не объясняет actual PNG audit: corrected capture по-прежнему имеет coverage=98.430600% и leakage=11, а координатный breakdown этих actual pixels ещё не выполнен.
+
+Выполнен отдельный exploratory sweep одного замкнутого contour pass после текущих 27 scanlines. В OpenCV raster model inward offsets 6, 7 и 8 px дали coverage 99.516270%, 99.372942%, 99.328153% при leakage=0; offset 5 px дал 32 leakage pixels. Это кандидат для дальнейшей проверки, а не утверждённый алгоритм: модель не является игровым renderer, executor contour lifecycle не проверен, CHALK не измерялся.
+
+**Порядок действий:**
+1. Завершить actual PNG coordinate breakdown: uncovered target pixels по четырём границам/углам/центру и все 11 leakage pixels.
+2. Сопоставить actual coordinates с plan endpoints, affine transform и возможным renderer cap/footprint.
+3. Если край подтверждается, исследовать contour pass как отдельную versioned offline geometry candidate; не изменять frozen plan и thresholds.
+4. После offline gate — только отдельный разрешённый live preflight; затем отдельное решение о 45-cell matrix.
+
+До этого capture остаётся REJECTED/BLOCKED; production code/defaults и live execution не менять.
+
