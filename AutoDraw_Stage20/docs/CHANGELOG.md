@@ -892,3 +892,10 @@
 - For compatible Canvas rendering, a zero-length single-point path is removed and does not paint, while the game point counter can still increase.
 - Planner bbox footprint can overestimate coverage around rounded endpoints in interior_fill_planner and outline_first_fill_planner. Added separate offline task BRUSH-FOOTPRINT-CAPSULE-001; no planner code changed.
 - CI workflow 41840582147 SUCCESS; all required jobs passed, optional benchmarks skipped.
+
+
+## 2026-11-04 — BRUSH-FOOTPRINT-CAPSULE-001 audit
+
+- Статический аудит выявил AABB coverage overclaim в experimental `interior_fill_planner`: bbox маркируется как полностью покрытая область, хотя round-cap stroke имеет capsule footprint; текущий independent test oracle использует rectangular model.
+- Уточнена область: `swept_footprint_geometry` и `outline_first_fill_planner` используют bbox как conservative safety check; FILL-001-RS имеет отдельный OpenCV round-capped rasterizer, поэтому причинная связь не доказана.
+- Код и тесты не менялись. Следующий шаг — offline masks для потенциально затронутых и гарантированно покрытых pixel cells с frozen-fixture comparison.
