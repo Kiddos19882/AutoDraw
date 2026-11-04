@@ -23,19 +23,24 @@
 <body>
   <h1>Egret 5.4.1 — offline GraphicsNode reference</h1>
   <p class="notice">
-    Страница загружает только локальный <code>mergeEngine_df2e5bc5.js</code> и напрямую вызывает Egret CanvasRenderer.
-    Она не открывает игру, не создаёт WebGL context, не отправляет события мыши и не расходует CHALK.
+    Страница загружает локальные Egret engine и game bundles, создаёт настоящий
+    <code>com.magnetjoy.pet.ui.board.BoardPane</code>, вызывает его <code>redraw()</code> и напрямую
+    растеризует его GraphicsNode через Egret CanvasRenderer. Она не запускает игровой клиент,
+    не создаёт WebGL context, не отправляет события мыши и не расходует CHALK.
   </p>
   <p class="notice">
-    PNG <strong>source texture</strong> воспроизводит CanvasRenderer raster stage для GraphicsNode при масштабе 3×.
-    PNG <strong>masked board</strong> дополнительно композитит результат через Canvas2D. Последний шаг не является
-    доказанной пиксельной копией WebGL texture sampling / mask stencil и должен сравниваться с game capture.
+    PNG <strong>source texture</strong> строится из GraphicsNode реального BoardPane, включая прозрачный
+    прямоугольник <code>resetBg()</code> и board scrollRect; manual path transcription проверяется
+    попиксельным сравнением с настоящим BoardPane. PNG <strong>masked board</strong> дополнительно композитит
+    результат через Canvas2D. Это не доказанная копия WebGL texture sampling / mask stencil и требует
+    сравнения с game capture.
   </p>
   <p id="renderer-status">Loading local Egret bundle…</p>
   <a id="renderer-manifest"></a>
   <pre id="renderer-manifest-json" hidden></pre>
   <div id="renderer-cases"></div>
   <script src="../gameEngine/mergeEngine_df2e5bc5.js"></script>
+  <script src="../gameEngine/main.min_653f95bc.js"></script>
   <script src="./game_renderer_reference.js"></script>
 </body>
 </html>
