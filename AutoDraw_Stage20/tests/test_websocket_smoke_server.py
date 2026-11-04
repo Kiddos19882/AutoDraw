@@ -5,7 +5,7 @@ import unittest
 try:
     import websockets
     from websocket_smoke_server import OneShotAuthenticator, make_handler, parse_message
-    from game_monitor_bridge_server import RunRecorder, exact_snapshot, summarize_intervals, valid_origin, make_handler as bridge_make_handler
+    from game_monitor_bridge_server import ALLOWED_TYPES, RunRecorder, exact_snapshot, summarize_intervals, valid_origin, make_handler as bridge_make_handler
 except ModuleNotFoundError:
     websockets = None
 
@@ -72,6 +72,9 @@ class SmokeServerIntegrationTests(unittest.IsolatedAsyncioTestCase):
 
 @unittest.skipIf(websockets is None, "install game_monitor/requirements-smoke.txt to run transport tests")
 class BridgeRecorderTests(unittest.TestCase):
+    def test_mouse_move_sample_is_allowed_by_bridge_collector(self):
+        self.assertIn("MOUSE_MOVE_SAMPLE", ALLOWED_TYPES)
+
     def setUp(self):
         import tempfile
         from pathlib import Path
