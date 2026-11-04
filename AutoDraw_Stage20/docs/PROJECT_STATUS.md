@@ -1,3 +1,16 @@
+# Дополнение к статусу — 2026-11-04 (решение по объёму работ)
+
+**Канонический список задач и критерии закрытия:** [TASKS.md](TASKS.md). Этот блок уточняет приоритеты и заменяет устаревшие активные статусы ниже; исторические записи не переписываются.
+
+- **INT-003 — CLOSED_NOT_REQUIRED** по решению пользователя. Дополнительная A/B/C матрица overhead Monitor не нужна для текущей цели. Существующий Game Monitor/Bridge и telemetry остаются рабочими инструментами; не требуется только отдельная performance-оценка Monitor.
+- **CHALK-SAMPLING-DOMAIN — CLOSED_NOT_REQUIRED** по решению пользователя. Не расширять отдельную sampling step×delay матрицу. G3 остаётся подтверждённым только для длинных горизонтальных линий; его коэффициенты не экстраполировать на иные геометрии.
+- **P0 FILL-001-RS renderer footprint — BLOCKED:** последний run 27/27 strokes, exact CHALK=1260, PNG REJECTED (coverage 98.430600%, leakage 11). Неизвестный renderer footprint/transform остаётся причиной, требующей проверки, а не установленным объяснением residual.
+- **P0 FILL-001-RS 45-cell matrix — BLOCKED:** запускать только после принятого single-task preflight и отдельного разрешения.
+- **P1 BRUSH-FOOTPRINT-CAPSULE-001 — OPEN:** offline реализация и CI завершены; renderer fixture acceptance и решение о planner integration открыты. Не считать причиной RS rejection.
+- **P1 INT-006 — IN_PROGRESS:** 45/45 D1–D5 accepted, но safety margin и production eligibility не установлены; расширение domain необходимо до применения модели к полным рисункам.
+
+Последовательность: renderer/transform и offline PNG gate → принятый single-task preflight (при отдельном разрешении на live) → отдельное решение о 45 captures; INT-006 расширяется как независимая валидация модели. Capsule проверяется offline и не подменяет renderer gate.
+
 ## Дополнение — capsule model per-segment broad-phase и benchmark (2026-11-04)
 
 В `swept_capsule_pixel_masks()` сохранена union-семантика potential/guaranteed masks, но candidate enumeration выполняется в расширенном AABB каждого сегмента, а не во всём global polyline AABB. Добавлены независимый full-canvas geometry oracle (ориентационный тест пересечения сегментов с прямоугольником и собственная point-segment distance реализация), seven parametrized edge cases и 16 воспроизводимых seeded polylines.
