@@ -41,6 +41,8 @@ def test_real_committed_fill001_evidence_runs_through_capture_button(tmp_path, m
     before_source = results_root / "fill001" / "captures" / f"{TASK_ID}-before.png"
     after_source = results_root / "fill001" / "captures" / f"{TASK_ID}-after.png"
     session_source = results_root / "game_monitor_bridge" / SESSION_ID
+    legacy_session_id = "3323cf8e-01ca-4009-8f16-27d657d857f8"
+    legacy_session_source = results_root / "game_monitor_bridge" / legacy_session_id / "session.json"
 
     required = (
         manifest_source,
@@ -50,6 +52,7 @@ def test_real_committed_fill001_evidence_runs_through_capture_button(tmp_path, m
         before_source,
         after_source,
         session_source / "session.json",
+        legacy_session_source,
         session_source / "game-monitor-run-20261104T040456791496Z-9ea6d0bb.json",
         session_source / "game-monitor-run-20261104T040548835772Z-6a17a297.json",
     )
@@ -64,6 +67,11 @@ def test_real_committed_fill001_evidence_runs_through_capture_button(tmp_path, m
     bridge_root.mkdir(parents=True)
     session_destination = bridge_root / SESSION_ID
     shutil.copytree(session_source, session_destination)
+    # This real pre-schema-2 session has no Bridge diagnostics and must not
+    # block a later FILL-001 binding merely because its directory still exists.
+    legacy_session_destination = bridge_root / legacy_session_id
+    legacy_session_destination.mkdir()
+    shutil.copy2(legacy_session_source, legacy_session_destination / "session.json")
 
     manifest_path = sandbox_results / "fill001_rs" / manifest_source.name
     manifest_path.parent.mkdir(parents=True)
