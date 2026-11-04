@@ -1,9 +1,16 @@
+## 2026-11-04 — FILL-001-RS corrected replay of original PNG evidence
+
+- Выполнен replay исходных before/after PNG и связанных evidence через `Fill001Tab.finalize_capture()` в CI [41780241017](https://github.com/Kiddos19882/AutoDraw/actions/runs/41780241017), checkout HEAD `0f23731`.
+- Runtime binding PASS: 27/27 strokes, radius=10, exact CHALK=1260, Bridge diagnostics без потерь/ошибок.
+- Corrected PNG audit: coverage=98.430600%, leakage=11 — capture REJECTED при неизменных требованиях ≥99% / 0. Предыдущие 97.673218% / 28 относятся к audit до affine correction.
+- SHA-256 исходных PNG и входных JSON сохранены в [replay report](CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md). Остаточная причина mismatch требует offline pixel breakdown; live и 45-task matrix остаются BLOCKED.
+
 ## 2026-11-04 — FILL-001-RS PNG audit transform correction
 
 - Исправлено несовпадение affine mapping frozen mask и executor screen coordinates: audit использует те же (W−1)/460 и (H−1)/240 scales.
 - Добавлены regression assertions для client ROI 581×304 и inverse nearest-neighbor mapping.
 - Commits: [4797aa5](https://github.com/Kiddos19882/AutoDraw/commit/4797aa5e2e3d9f78656c91dcddf285304eae55c1), [a950084](https://github.com/Kiddos19882/AutoDraw/commit/a950084db14fd1560aa15f099da4a0108c9631e7).
-- CI/replay после изменений ещё не подтверждены; предыдущие 97.673218% coverage / 28 leakage относятся к старой версии audit. Capture не принят до повторной проверки. 45-task matrix остаётся BLOCKED.
+- На момент этой записи CI/replay после affine correction ещё не были подтверждены; последующий corrected replay и результат 98.430600% / 11 зафиксированы выше в changelog и в отдельном replay report. Capture остаётся REJECTED; 45-task matrix BLOCKED.
 ## 2026-11-04 — FILL-001-RS runtime discovery replay и live PNG rejection
 
 - Изучен evidence commit [5308214](https://github.com/Kiddos19882/AutoDraw/commit/530821497ce3a6bd5152318a78e1f06cb836f288): основной Bridge run `6a17a297-ea14-4527-9527-bfd8de3bd335`, 27/27 strokes, radius=10, exact pointCount 1→1261, CHALK=1260; dropped events, Monitor errors, Bridge send failures и sequence gaps — 0.
