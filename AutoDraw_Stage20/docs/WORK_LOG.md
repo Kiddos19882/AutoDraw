@@ -2932,3 +2932,10 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - Документация обновлена в Monitor README, Bridge reference, MODULE_REFERENCE, TASKS, ROADMAP и engine report.
 - Live game captures не выполнялись; instrumentation не доказана на реальном iframe. CI для нового HEAD пока не подтверждён. Эти события фиксируют DOM-delivered moves, не OS/PyAutoGUI calls до browser dispatch.
 - Production planner/defaults, FILL-001 matrix и master не изменялись.
+
+### Уточнение 2026-11-04 — raw mousemove telemetry сделана opt-in
+
+- Чтобы не добавлять постоянный обработчик на каждый DOM mousemove в обычных сессиях, raw input telemetry выключена по умолчанию.
+- Управление: `AutoDrawGameMonitor.setInputTelemetryEnabled(true/false)`; состояние отображается в `status().inputTelemetryEnabled` и export.
+- При включении listener добавляется на window bubble phase; при выключении снимается. Координаты в POINT_QUOTA_UPDATE вычисляются только при включённой telemetry; acceptedPoint и exact pointDelta сохраняются при положительном delta.
+- Добавлены regression checks: по умолчанию события не пишутся, включение/выключение работает, accepted-point coordinates требуют включённого режима.
