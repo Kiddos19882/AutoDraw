@@ -216,3 +216,44 @@ brush_footprint_geometry.footprint_pixel_bounds() возвращает прям�
 6. До renderer identity и frozen PNG comparison не менять production planner/defaults и не разблокировать FILL-001-RS matrix.
 
 **Уровень evidence:** E1 — статически прочитаны конкретные методы bundle и их связи; E0/E1 для вывода о deployed round caps/joins; пользовательское визуальное наблюдение отдельно зафиксировано. Runtime equivalence — NOT VALIDATED.
+
+
+## 11. Прямое чтение brush path из игрового bundle — 2026-11-04
+
+**Источник:** `master:AutoDraw_Stage20/fileGameEngine/main.min_570122a1.js`; Git blob SHA `28838e803dcc6f85efb13febd93cc9e0f5046ffc`. Bundle прочитан через Git Blob API; JavaScript не исполнялся. Ни `master`, ни исходный bundle не изменялись.
+
+### 11.1. Что делает BoardPane
+
+В `BoardPane.redraw()` для каждого штриха берутся `atom.points`, `atom.radius`, `atom.colors` и `atom.options`, затем вызывается `graphics.lineStyle(s, color, 1, false)`. После этого при smooth option вызывается `Painter.drawSmoothLine()`, иначе `Painter.drawNormalLine()`. Значение `s` передаётся как thickness линии Egret Graphics — это ширина штриха, не математический радиус и не удвоенный диаметр.
+
+### 11.2. Центральная линия и ввод
+
+- `drawNormalLine()` строит путь через `moveTo(first)` и последовательные `lineTo(point)`.
+- `drawSmoothLine()` вычисляет середины соседних пар точек, использует `curveTo()` для сглаживания и при соответствующем флаге доводит путь до последней точки. Smooth path нельзя точно заменить набором независимых прямых отрезков.
+- `onDrawStart()` добавляет начальную точку после `globalToLocal(stage.mouseX, stage.mouseY)`.
+- `onDrawing()` на `ENTER_FRAME` получает локальные координаты, проверяет их попадание в прямоугольник доски и только затем добавляет точку.
+- `BlackBoardAtom.pushPoint()` не добавляет точку, равную последней сохранённой. `onDrawingEnd()` завершает штрих через `atom.add()`.
+- `setRadius()` записывает выбранное значение в `atom.radius` текущего штриха.
+
+### 11.3. Круглая форма: наблюдение и доказательность
+
+**Пользовательское визуальное наблюдение (2026-11-04):** кисть в самой игре выглядит круглой.
+
+Игровой код вызывает `Graphics.lineStyle` с четырьмя аргументами и явно не задаёт caps/joints. Egret 5.2.18 API/reference implementation задаёт ROUND для отсутствующих caps и joints. Это согласуется с наблюдением пользователя и с круглым swept footprint: у прямого сегмента — полоса шириной thickness с полукруглыми концами; у ломаной — круглые соединения. Для smooth path круглый профиль проходит вдоль кривой центральной линии.
+
+**Ограничение:** deployed Egret runtime игры не идентифицирован. ROUND caps/joins подтверждены для reference API, но не доказаны для конкретной сборки игры. Нельзя объявлять offline capsule mask пиксельно эквивалентной игровому PNG.
+
+### 11.4. Особый случай одного клика
+
+Для одной точки `drawSmoothLine()` формирует `moveTo(p)` и `lineTo(p)`, а `drawNormalLine()` — только `moveTo(p)`. По Canvas path semantics zero-length path не обязан создавать видимый след. При этом `onDrawStart()` уже сохраняет первую точку и вызывает `updateLess()`. Возможен расход одной игровой точки без видимого отпечатка; deployed renderer для этого случая требует отдельного подтверждения.
+
+### 11.5. Вывод для AutoDraw
+
+1. Геометрическая отправная точка — круглая кисть вдоль центрального пути; прямой сегмент моделируется capsule/swept disk, не прямоугольным AABB.
+2. Толщина модели равна `brush_value`, полуразмер — `brush_value / 2` до transform.
+3. Для smooth option нужно воспроизводить midpoint + `curveTo`; normal polyline — отдельный режим.
+4. Полное совпадение требует восстановить transform popup/BoardPane → screen/canvas ROI.
+5. Существующий `swept_capsule_pixel_masks()` — offline геометрическая основа, но pixel-identical renderer replica пока не подтверждена.
+6. До renderer identity и frozen PNG comparison не менять production planner/defaults и не разблокировать FILL-001-RS matrix.
+
+**Evidence:** E1 — статически прочитаны методы bundle и их связи; E0/E1 для deployed round caps/joins; пользовательское визуальное наблюдение зафиксировано отдельно. Runtime equivalence — NOT VALIDATED.
