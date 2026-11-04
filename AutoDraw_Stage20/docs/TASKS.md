@@ -4,7 +4,7 @@
 
 После live run из [73d14a1](https://github.com/Kiddos19882/AutoDraw/commit/73d14a1784a5a9f8ef29bc0e197b75352f2650af) подтверждены exact CHALK=5999 и per-stroke accounting, но исполнено только 128/131 consuming strokes; три кандидата не потребили ресурс после исчерпания квоты. Capture REJECTED, полная стоимость незавершённого плана неизвестна. Строгие runtime/PNG gates не ослаблять.
 
-Статическая OpenCV-проверка выявила избыточно плотную сетку проходов. Добавлен отдельный этап FILL-001-RS для исследования `scanline_row_step`; r10/step=5 прошёл текущий офлайн-критерий для трёх frozen shapes, но остаётся гипотезой до проверки игровым renderer и exact pointCount. Подробности и последовательность — во [временном плане](CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md).
+Exhaustive OpenCV sweep завершён: 2 238 step/offset кандидатов, 62 прошли coverage≥99%/leakage=0, все 15 shape/radius cells имеют frozen spacing candidate. Добавлены planner version 2, отдельный 45-task FILL-001-RS manifest builder, single-task handoff и runtime context binding. r10/rectangle/step=5 — кандидат, не подтверждённый игровым renderer или exact CHALK. Отчёт: [static sweep](CHALK_FILL001_RS_STATIC_SWEEP_2026-11-04.md); порядок — во [временном плане](CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md).
 
 Новый пользовательский evidence commit [73d14a1](https://github.com/Kiddos19882/AutoDraw/commit/73d14a1784a5a9f8ef29bc0e197b75352f2650af) содержит полный второй Bridge run (27.9 MB), session diagnostics, executor report и PNG pair. Task run подтверждён: radius=10, exact CHALK=5999, sampled/per-stroke delta=5999, 131 pointer candidates, 128 consuming strokes и 3 non-consuming candidates. Strict runtime binder корректно отклоняет его, поскольку stroke_count=128 вместо ожидаемых 131 и non_consuming_stroke_candidate_count=3. Capture не принят; доска исчерпала квоту. Первый Bridge run — отдельная калибровка с CHALK=0 и исключается по event activity window.
 
@@ -16,27 +16,30 @@
 
 ## FILL-001-RS — расстояние между проходами
 
-**Статус:** DOCUMENTED / STATIC CANDIDATE AVAILABLE; live validation BLOCKED pending separate authorization.
+**Статус:** IN_PROGRESS — static sweep и versioned implementation выполнены; CI validation pending; live preflight ещё не выполнен.
 
-- [x] Разделить `point_step_px` и `scanline_row_step` в документационном контракте.
-- [x] Зафиксировать предварительные варианты step/offset для 15 shape×radius combinations и r10/step=5 raster metrics.
-- [ ] Повторно воспроизвести полный статический sweep и сохранить все варианты/метрики как отдельный versioned result.
-- [ ] После отдельного разрешения подготовить versioned plan/signature и провести один live preflight на доске с полной квотой.
-- [ ] Принять/отклонить candidate по runtime binding, exact CHALK и quantitative PNG audit; при quota exhaustion фиксировать censored attempt, не полную стоимость.
-- [ ] Только после принятого preflight отдельно решить вопрос запуска новой матрицы.
+- [x] Выполнить exhaustive sweep всех 2 238 step/offset кандидатов и сохранить полный JSON report как CI artifact.
+- [x] Зафиксировать 15 выбранных конфигураций и неизменённые frozen mask SHA-256.
+- [x] Реализовать versioned planner v2; legacy planner version 1 и его signatures сохранить.
+- [x] Реализовать отдельный 45-task FILL-001-RS manifest builder, fail-closed validation, single-task plan handoff и runtime context с spacing parameters.
+- [x] Добавить regression tests для planner, matrix, handoff, runtime context и exhaustive sweep.
+- [ ] Подтвердить полный GitHub Actions workflow на новом code HEAD, включая sweep artifact и Windows portable build/startup smoke-test.
+- [ ] После успешного CI создать manifest командой `source/preparation/create_fill001_rs_manifest.py`, открыть его существующей вкладкой FILL-001 и выполнить только rectangle/r10/step=5/offset=0/repeat=1 на восстановленной доске с полной квотой.
+- [ ] Принять/отклонить capture по runtime binding, exact CHALK и quantitative PNG audit; при quota exhaustion фиксировать censored attempt, не полную стоимость.
+- [ ] Только после принятого preflight отдельно решить вопрос запуска новой 45-task RS matrix.
 
-**Ограничения:** code, tests, config, workflow и live experiment не входят в текущее документальное разрешение. Исходные FILL-001 frozen plans и 45-cell manifest не изменять.
+**Ограничения:** существующие FILL-001 frozen plans, signatures, manifest и captures не изменять. P1 sampling и production defaults сохраняются.
 
 ## Временный план FILL-001 на пять шагов
 
 **Документ:** [CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md](CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md)  
-**Статус:** IN_PROGRESS — activity-window fix (`95a8d17`) и transient-session/UI retry correction (`5cde7a1`) прошли полный CI [41754801210](https://github.com/Kiddos19882/AutoDraw/actions/runs/41754801210), включая Windows portable build/startup smoke-test и INT-006 pixel audit. Предыдущий live execution завершился 131/131 strokes, session CHALK=5999, но capture не принят. Текущая доска исчерпана; следующий gate — один новый Windows live preflight на восстановленной доске. Шаги 4–5 BLOCKED.
+**Статус:** IN_PROGRESS — предыдущий code baseline прошёл CI [41754801210](https://github.com/Kiddos19882/AutoDraw/actions/runs/41754801210), но новые FILL-001-RS commits ожидают собственного CI. Предыдущий live execution завершился с exact CHALK=5999 и 128/131 consuming strokes; capture REJECTED, доска исчерпана. Новый versioned preflight ещё не выполнялся; шаги 4–5 BLOCKED.
 
 | Шаг | Статус | Критерий |
 |---|---|---|
 | 1. Regression gate: tests, полный CI, Windows build | DONE | CI [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881), code HEAD `fe6d446`; Preparation/G3 782 passed, 24 warnings, 82 subtests; все обязательные jobs, INT-006 pixel audit и Windows portable build/startup smoke-test SUCCESS; optional benchmarks skipped |
 | 2. Runtime binding: Bridge, executor journal, P1 | DONE | Binder, Stage 6 completion hook и связь с FILL-001 experiment context покрыты regression CI; live binding будет подтверждён на шаге 3 |
-| 3. UI/runner handoff и Windows preflight | IN_PROGRESS | Binder fix `95a8d17` и regression tests `870bebc` подтверждены полным CI [41737923777] SUCCESS; требуется один live preflight на восстановленной доске |
+| 3. UI/runner handoff и Windows preflight | IN_PROGRESS | RS planner/matrix/handoff и regression tests добавлены; CI для нового HEAD pending; затем нужен один live preflight на восстановленной доске |
 | 4. 45 live captures | BLOCKED | 45 уникальных принятых ячеек либо документированные отклонения |
 | 5. CHALK/quality analysis и рекомендация | BLOCKED | Подготовлен отчёт о влиянии радиуса и лучшей стратегии заливки |
 
