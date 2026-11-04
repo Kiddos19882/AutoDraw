@@ -6,11 +6,11 @@
 - Реализован versioned scanline spacing planner v2. Legacy planner v1/default geometry/signatures сохраняются. scanline_row_step и scanline_offset включены в v2 plan identity; point_step_px/P1 не менялись.
 - Реализованы отдельный FILL001_RS_V1 45-task matrix builder, fail-closed validation, single-task plan handoff и runtime experiment context с spacing metadata. Добавлены CLI manifest generator и capture metadata.
 - Добавлены regression tests: versioned geometry, invalid parameters, matrix tampering, legacy compatibility, single-task handoff, runtime context, exhaustive 2 238-candidate sweep.
-- CI workflow дополнен полным static sweep и upload artifact step. Последний code/test commit `dac985e147319d2275318531ab9063cdf410e5a4`; workflow [41766148192](https://github.com/Kiddos19882/AutoDraw/actions/runs/41766148192) ожидает запуска. Предыдущие runs были отменены concurrency при последовательных code/test commits.
+- Полный CI на code/test commit `dac985e147319d2275318531ab9063cdf410e5a4` — [41766148192](https://github.com/Kiddos19882/AutoDraw/actions/runs/41766148192) SUCCESS: Preparation/G3 800 passed, 24 warnings, 82 subtests; exhaustive sweep 2 238 candidates / 62 passed; executor, Game Monitor/Bridge, application integration, INT-006 pixel audit и Windows portable build/startup smoke-test SUCCESS. Optional benchmarks skipped.
 - Изменены исходники preparation, tests, CI workflow и Markdown docs только в feature/image-geometry-optimization. master и исходные FILL-001 manifests/captures не менялись.
 - UI-кнопка для прямого создания RS manifest не добавлена; manifest генерируется CLI и открывается существующей кнопкой «Открыть manifest…». Это сохраняет существующий UI workflow без незавершённого action.
 - Live preflight не запускался: удалённый runner не имеет доступа к локальной Windows/browser game session и calibrated board. Пользователь разрешил live work; фактическая блокировка — отсутствие доступного локального runtime control.
-- Следующий шаг: дождаться полного CI, затем локально создать manifest и выполнить только rectangle/r10/step5/offset0/repeat1; принять только при exact runtime binding и quantitative PNG audit. До этого обе 45-task matrices остаются BLOCKED, INT-007 остаётся BLOCKED.
+- Следующий шаг: локально создать manifest и выполнить только rectangle/r10/step5/offset0/repeat1 на доступной Windows/game session с полной квотой; принять capture только при exact runtime binding и quantitative PNG audit. До этого обе 45-task matrices остаются BLOCKED, INT-007 остаётся BLOCKED.
 
 ## 2026-11-04 — FILL-001-RS — scanline spacing documentation
 
