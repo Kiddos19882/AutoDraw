@@ -93,7 +93,7 @@
 
 ### 4.1. Job: game-monitor-tests
 
-Платформа: Windows. Проверяет JavaScript syntax, 18 Node.js Game Monitor tests (включая renderer/transform diagnostics), зависимости локального Bridge smoke server и WebSocket smoke test. Run [41895277128](https://github.com/Kiddos19882/AutoDraw/actions/runs/41895277128): job SUCCESS.
+Платформа: Windows. Проверяет JavaScript syntax, 18 Node.js Game Monitor tests (включая renderer/transform diagnostics), зависимости локального Bridge smoke server и WebSocket smoke test. Run [41896024383](https://github.com/Kiddos19882/AutoDraw/actions/runs/41896024383): job SUCCESS.
 
 ### 4.2. Job: preparation-tests
 

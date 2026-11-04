@@ -365,5 +365,5 @@ Workflow включает:
 - `node --check AutoDraw_Stage20/source/game_monitor/game_monitor.js` — PASS.
 - `node --test AutoDraw_Stage20/source/game_monitor/tests/game_monitor.test.js` — PASS, 18/18 tests, включая runtime renderer snapshot, stage/client corner mapping и graceful no-runtime case.
 - Локальный WebSocket smoke server test — PASS.
-- GitHub Actions run [41895277128](https://github.com/Kiddos19882/AutoDraw/actions/runs/41895277128): Game Monitor and bridge tests — SUCCESS; Executor regression tests — SUCCESS; Application integration tests — SUCCESS; Preparation/G3 matrix tests — IN_PROGRESS на момент записи; optional algorithm benchmarks — SKIPPED.
+- GitHub Actions run [41896024383](https://github.com/Kiddos19882/AutoDraw/actions/runs/41896024383): Game Monitor and bridge tests — SUCCESS; Executor regression tests — SUCCESS; Application integration tests — SUCCESS; Preparation/G3 matrix tests — IN_PROGRESS на момент записи; optional algorithm benchmarks — SKIPPED.
 - Это программные проверки mock/runtime diagnostics, не live browser evidence. Реальный renderMode, screen transform, brush footprint и pixel equivalence ещё не получены.
