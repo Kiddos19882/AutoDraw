@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
@@ -74,3 +75,43 @@ def test_invalid_coordinates_are_rejected(bad):
 
     with pytest.raises(ValueError):
         analyze_run(run)
+
+def test_committed_fill001_capture_reproduces_endpoint_and_frame_cadence_metrics():
+    project_root = Path(__file__).resolve().parents[3]
+    raw_path = (
+        project_root
+        / "data"
+        / "results"
+        / "brush_behavior_tests"
+        / "game_monitor_bridge"
+        / "bb261898-8296-41f5-a333-eb0b81016410"
+        / "game-monitor-run-20261104T040548835772Z-6a17a297.json"
+    )
+    run = json.loads(raw_path.read_text(encoding="utf-8"))
+    report = analyze_run(run)
+
+    assert report["run_id"] == "6a17a297-ea14-4527-9527-bfd8de3bd335"
+    assert report["chalk_consumed_points"] == 1260
+    assert report["stroke_count_in_run"] == 27
+    assert report["accepted_point_coordinates_complete_for_observed_deltas"] is True
+
+    segments = report["within_stroke_segment_lengths"]
+    assert segments["count"] == 1233
+    assert segments["median"] == 6
+    assert segments["p95"] == 10
+    assert segments["max"] == 13
+    assert segments["over_line_width"] == 3
+
+    final_segments = report["last_segment_per_stroke"]
+    assert final_segments["count"] == 27
+    assert final_segments["min"] == 3
+    assert final_segments["max"] == 9
+    assert report["ideal_round_cap_covers_last_accepted_sample_centers"] == 27
+
+    timing = report["accepted_point_time_intervals_ms"]
+    assert timing["count"] == 1233
+    assert timing["median"] == 33
+    assert timing["p90"] == 35
+    assert timing["p95"] == 36
+    assert timing["max"] == 81
+    assert timing["over_40ms"] == 27
