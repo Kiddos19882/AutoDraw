@@ -6,7 +6,7 @@
 **Последние Monitor code/test commits:** `981b2c672a0980237ae9c1b4c3ab01c75eedc2c5`, `216361d155945e9037c530e695873192fa6c9595`, `b9899b217a21ecfc3c4f24b470eff5d5dfa352b7`, `6e0867b47b325b6affb6030a6f4f93fbabe94bca`, `7a1780216ac7daa06280d6ba6ffd0a5311ff3270`.
 
 - Game Monitor version поднят до 0.2.2.
-- Добавлен `MOUSE_MOVE_SAMPLE`: DOM mousemove, доставленный canvas во время активного штриха; сохраняются DOM/Monitor timestamps, client/page/screen/movement coordinates, buttons, stage mouse coordinates и BoardPane-local coordinates.
+- Добавлен opt-in `MOUSE_MOVE_SAMPLE` (выключен по умолчанию, включается через `setInputTelemetryEnabled(true)`): DOM mousemove, доставленный canvas во время активного штриха; сохраняются DOM/Monitor timestamps, client/page/screen/movement coordinates, buttons, stage mouse coordinates и BoardPane-local coordinates.
 - `POINT_QUOTA_UPDATE` при положительной точной pointDelta включает acceptedPoint и stage/local coordinates после `updateLess()`.
 - Browser Bridge и Python collector allowlists обновлены; добавлены regression tests.
 - Статическая трассировка Egret 5.4.1 подтверждает округление координат `Math.round()`, suppression повторных stage coordinates и throttle `ENTER_FRAME` через stage.frameRate. Это конкретный механизм, способный объяснить вариативность одинаковых геометрических траекторий, но для подтверждения нужны повторные live captures.
