@@ -210,6 +210,13 @@
         schemaVersion: 1,
         referenceType: "Egret CanvasRenderer GraphicsNode source-raster reference",
         engineVersion: egret.Capabilities.engineVersion,
+        sourceBundle: "gameEngine/mergeEngine_df2e5bc5.js",
+        browser: {
+          userAgent: navigator.userAgent || null,
+          platform: navigator.platform || null,
+          devicePixelRatio: window.devicePixelRatio || 1,
+          viewport: { width: window.innerWidth, height: window.innerHeight }
+        },
         renderMode: "CanvasRenderer direct invocation; no WebGL context started",
         board: { width: BOARD_WIDTH, height: BOARD_HEIGHT },
         rasterScale: RASTER_SCALE,
