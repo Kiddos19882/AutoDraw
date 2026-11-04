@@ -1050,3 +1050,11 @@ Capture remains REJECTED; 45-task matrix remains BLOCKED. Exact CHALK remains 12
 **Новый planner risk:** brush_footprint_geometry возвращает прямоугольный bbox capsule; interior_fill_planner._mark_footprint и outline_first_fill_planner помечают весь bbox covered. У круглых концов углы bbox могут не входить в реальный capsule, что потенциально создаёт underfill. Не доказано как причина FILL-001-RS (там использовался scanline plan). Требуется отдельная exact cell-footprint модель после подтверждения runtime transform.
 
 **CI телеметрии:** workflow 41840582147 SUCCESS на code/test commit 6fd3c91c3c08ea05cb9ef83ff599eb52a6f9527e: Application integration, Game Monitor/Bridge, Preparation/G3, Executor regression, Windows portable build/startup smoke-test и INT-006 PNG audit — SUCCESS; optional algorithm benchmarks — SKIPPED. Более поздние commits содержат только документацию.
+## BRUSH-FOOTPRINT-CAPSULE-001 — candidate implementation status
+
+Добавлен отдельный offline candidate `swept_capsule_pixel_masks()` с двумя масками: potential cells для safety/leakage envelope и guaranteed cells для conservative coverage under-approximation. Учитывается non-uniform scale через обратное преобразование pixel-cell bounds в logical space; bounding box используется как broad-phase. Добавлены regression tests на endpoints, point/disk, anisotropic scale, polyline reversal/round join, clipping и malformed inputs.
+
+Code commit: `5a090948ecbe927807fde4ffc5337132d131b765`; test commit: `7ffdd150ba42840737cba5f2143370e56d67bed3`. CI run [41842587672](https://github.com/Kiddos19882/AutoDraw/actions/runs/41842587672) ещё выполняется на момент записи. Planner integration не выполнялась; текущие outputs/defaults не изменены. Модель предполагает ideal round-capped capsules и не является доказательством фактического Egret renderer.
+
+---
+
