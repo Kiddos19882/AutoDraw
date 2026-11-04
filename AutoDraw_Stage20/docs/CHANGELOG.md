@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-11-04 — подтверждены WebGL texture sampling defaults
+
+- `sys.createTexture()` устанавливает LINEAR min/mag filters, CLAMP_TO_EDGE и premultiplied-alpha upload.
+- GraphicsNode `drawTexture()` не переопределяет smoothing для этого пути; Canvas2D `imageSmoothingEnabled=true` является только приближением.
+
 ## 2026-11-04 — offline Egret CanvasRenderer reference harness
 
 - Добавлены browser page, JS renderer harness и Node tests path semantics; создаются 18 source/masked fixtures при lineWidth 10/30.
