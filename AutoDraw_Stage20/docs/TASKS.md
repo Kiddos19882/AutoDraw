@@ -1,3 +1,15 @@
+## Обновление статуса — 2026-11-04: per-stroke telemetry и CI
+
+- [x] Сопоставить существующий saved run `6a17a297` по 27 штрихам: 1260 POINT_QUOTA_UPDATE, cadence 28.26–29.50 points/s, median update interval 33 ms; browser rAF около 60 FPS не считать частотой Egret ENTER_FRAME.
+- [x] Установить ограничение исторического evidence: старый finalizer не сохранил исходные per-stroke rAF intervals; восстановить их из старого run нельзя.
+- [x] Реализовать для будущих runs strokeId-bound frame_probe, сохранение raw intervals, `frame_probe_by_stroke` и `per_stroke_metrics` (commits 02907aca, ec2ed77, ead8808, 730590d).
+- [x] Подтвердить полный CI [41840582147](https://github.com/Kiddos19882/AutoDraw/actions/runs/41840582147): обязательные jobs SUCCESS, optional benchmarks SKIPPED; Windows portable build/startup smoke-test и INT-006 PNG audit SUCCESS. Run checkout SHA `6fd3c91`; текущий HEAD `7ff5813` отличается последующими docs-only commits.
+- [ ] Получить фактическую per-stroke frame_probe серию в новом live run после прохождения renderer offline gate; связать её с pointCount delta, stroke duration и Executor point_step/delay. До этого live run не запускать.
+
+**Renderer gate не закрыт:** capture REJECTED (coverage=98.430600%, leakage=11), exact CHALK=1260 для прежнего single-task run; coverage≥99% / leakage=0 не достигнуты. 45-task matrix остаётся BLOCKED.
+
+---
+
 ## BLOCKER: FILL-001-RS — калибровка renderer footprint и sampling
 
 **ID:** FILL-001-RS-ENGINE-FOOTPRINT-001  
@@ -12,7 +24,7 @@
 - [x] Прочитать bundle из master через GitHub Contents API и подтвердить статические вызовы BoardPane sampling, pushPoint dedup, updateLess и Painter path construction.
 
 ### Открытые пункты
-- [ ] Получить per-stroke frame_probe intervals из сохранённого Bridge evidence и сопоставить с pointCount deltas, stroke duration и Executor point_step/delay.
+- [x] Установить, что старый run не сохранил raw per-stroke frame_probe intervals; реализовать их сбор/сохранение для будущих runs (см. сводку выше).
 - [ ] Измерить global/display transform именно painter popup BoardPane (локальный scale не задаётся; не подменять его transform доски внутри BlackBoardItem).
 - [ ] Установить фактически подключённую версию Egret runtime; проверить round caps/joins defaults и raster behavior нулевого сегмента по точной runtime версии либо независимому controlled PNG capture.
 - [ ] Откалибровать screen-space footprint для нескольких значений кисти на одинаковой frozen geometry; сохранить raw before/after PNG и hashes.
@@ -29,7 +41,7 @@
 - [x] Зафиксировать median интервал 33 ms, accepted-point cadence 28.26–29.50 points/s и сравнение первых/последних 9 штрихов (28.734 vs 29.049 points/s).
 - [x] Установить, что старый frame_probe summary измерял browser requestAnimationFrame (59.997 FPS), а не Egret ENTER_FRAME; старый finalizer удалял raw per-probe intervals.
 - [x] Добавить strokeId к browser frame_probe; сохранять raw frame intervals и производить per-stroke point/frame summaries в Bridge Server.
-- [ ] Подтвердить CI run 41840281018 на HEAD 730590d2a6d7a3587a728934158bf64e9d7a958c; при ошибках исправить и повторить проверки.
+- [x] Проверить run 41840281018: CANCELLED. Подтвердить полный CI run 41840582147: SUCCESS; optional benchmarks SKIPPED.
 - [ ] Следующий live run (после прохождения offline renderer gate и отдельного разрешения) должен использовать новые per-stroke summaries; не считать browser rAF частотой игрового sampling.
 
 См. [engine audit](CHALK_GAME_ENGINE_POINT_COST_AND_BRUSH_WIDTH_2026-11-03.md) и [Bridge reference](GAME_MONITOR_BRIDGE_REFERENCE.md).
