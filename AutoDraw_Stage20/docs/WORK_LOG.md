@@ -1,3 +1,12 @@
+## 2026-11-04 — аудит исторических runtime asset references
+
+- Проверены три сохранённых Game Monitor captures от 2026-10-30/31.
+- Resource Timing фиксирует `/old/manifest.json`, `/old/js/mergeEngine_df2e5bc5.js`, `/old/js/main.min_6ecc02a4.js`; записанные transferSize — metadata Resource Timing, не проверенные размеры файлов.
+- Сверено с доступным bundle в master: `main.min_570122a1.js`, blob SHA `28838e803dcc6f85efb13febd93cc9e0f5046ffc`. Имя отличается от исторического `main.min_6ecc02a4.js`; identity/content equality не доказаны.
+- Прямое чтение игровых URL через web fetch недоступно. Response bodies и hashes в captures отсутствуют. Deployed Egret runtime version остаётся UNKNOWN; Egret 5.2.18 — только upstream reference.
+- Обновлены engine audit, TASKS, PROJECT_STATUS и ROADMAP. Исходники, тесты, конфигурации, workflow, raw evidence и master не менялись; live drawing и CI не запускались.
+- Следующий шаг: получить статические response bodies через browser cache/DevTools Network и выполнить hash/source comparison.
+
 ## Дополнение — краевые промежутки и будущая контурная обводка (2026-11-04)
 
 При просмотре исходного `after.png` отмечен округлый профиль боковых краёв заливки. Пользовательская гипотеза: между круглыми окончаниями соседних scanline-проходов остаются незаполненные промежутки. В предпоследнем тесте, по наблюдению пользователя, следующая линия начиналась ниже и такого эффекта не было. Это направление offline-проверки, а не установленная причина.
