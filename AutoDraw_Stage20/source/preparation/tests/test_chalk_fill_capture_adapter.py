@@ -4,6 +4,7 @@ import numpy as np
 from PIL import Image
 import pytest
 
+from brush_coordinate_transform import transform_logical_brush_plan_to_screen
 from chalk_fill_capture_adapter import (
     FILL001_SAMPLING_PROFILE,
     audit_fill001_png_pair,
@@ -70,10 +71,27 @@ def test_png_audit_checks_real_files_hash_coverage_and_leakage(tmp_path):
     assert len(result["after_png_sha256"]) == 64
 
 
+def _executor_transform(width, height):
+    plan = {
+        "coordinate_system": "logical_board_pixels",
+        "canvas": {"width": 460, "height": 240},
+        "strokes": [{"points": [{"x": 0, "y": 0}, {"x": 460, "y": 240}]}],
+    }
+    transformed, metadata = transform_logical_brush_plan_to_screen(
+        plan, {"x": 0, "y": 0, "width": width, "height": height}
+    )
+    assert transformed["strokes"][0]["points"] == [
+        {"x": 0.0, "y": 0.0},
+        {"x": float(width - 1), "y": float(height - 1)},
+    ]
+    return metadata
+
+
 def _png_pair_for_roi(tmp_path, shape_id, width, height):
     logical = build_fill_target_mask(shape_id)
-    scale_x = (width - 1) / 460
-    scale_y = (height - 1) / 240
+    executor_transform = _executor_transform(width, height)
+    scale_x = executor_transform["scale_x"]
+    scale_y = executor_transform["scale_y"]
     source_x = np.clip(
         np.rint(np.arange(width, dtype=np.float64) / scale_x).astype(np.intp),
         0,
@@ -110,8 +128,11 @@ def test_png_audit_accepts_actual_client_roi_581x304(tmp_path):
     assert transform["logical_board"] == {"width": 460, "height": 240}
     assert transform["screen_roi"] == roi
     assert transform["mask_resampling"] == "inverse_affine_nearest_neighbor"
-    assert transform["mask_raster_scale_x"] == pytest.approx(transform["scale_x"])
-    assert transform["mask_raster_scale_y"] == pytest.approx(transform["scale_y"])
+    executor_transform = _executor_transform(581, 304)
+    assert transform["scale_x"] == pytest.approx(executor_transform["scale_x"])
+    assert transform["scale_y"] == pytest.approx(executor_transform["scale_y"])
+    assert transform["mask_raster_scale_x"] == pytest.approx(executor_transform["scale_x"])
+    assert transform["mask_raster_scale_y"] == pytest.approx(executor_transform["scale_y"])
 
 
 def test_runtime_capture_preserves_client_roi_transform(tmp_path):
