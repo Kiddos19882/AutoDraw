@@ -800,3 +800,12 @@
 - Анализирован run [41778045384](https://github.com/Kiddos19882/AutoDraw/actions/runs/41778045384): Preparation/G3 — 799 passed, 5 failed, 24 warnings, 82 subtests; три других обязательных test jobs success, downstream PNG audit и Windows build skipped.
 - Исправлены synthetic PNG fixtures: согласование с реальным executor transform, non-uniform ROI test теперь доходит до audit, runtime-binding fixture использует screen rasterization.
 - Commits: `1f28436ab20fe949e4d53cfeea4a5560ed3cbcae`, `0f23731848f0c148fe5e1309d1e305576dd4b6b7`. Только тесты; production code и acceptance thresholds не менялись. Повторный CI ожидается.
+
+
+## 2026-11-04 — FILL-001-RS CI PASS и INT006R evidence
+
+- Run [41780241017](https://github.com/Kiddos19882/AutoDraw/actions/runs/41780241017): все обязательные CI jobs SUCCESS; optional benchmarks SKIPPED.
+- FILL-001-RS static sweep: 2,238 candidates, 62 accepted, 15/15 selected offline cells прошли coverage≥99% / leakage=0; estimated points не являются exact CHALK.
+- INT-006 pixel audit: 90/90 captures valid, 549 stroke rows, coverage=1.0, gaps=0. Frozen CHALK analyzer: 45/45 accepted; safety margin не установлен, production eligibility не подтверждена.
+- INT006R radius×geometry: 45/45 accepted, radius 1/10/30 tested at P1; расходы различаются слабо и немонотонно. 45 PNG pairs сохранены, visual review остаётся pending.
+- Production estimator/defaults и live data не изменялись.
