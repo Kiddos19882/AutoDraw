@@ -21,7 +21,7 @@ Preflight candidate r10/rectangle/step=5/offset=0: 27 strokes, 99,319% coverage,
 
 Evidence commit [73d14a1](https://github.com/Kiddos19882/AutoDraw/commit/73d14a1784a5a9f8ef29bc0e197b75352f2650af) добавил полный task Bridge run и session diagnostics. Exact CHALK=5999 подтверждён на run level и суммой point deltas, но 3 из 131 pointer candidates не потребили CHALK после исчерпания квоты; stroke_count=128, capture REJECTED. Первый Bridge run — калибровочный (CHALK=0) и исключается по event activity window. UI pending был временным: executor report появился примерно за 3.44 секунды до финализации Bridge run; после persistence строгая проверка должна завершиться отказом по 128/131 и 3 non-consuming candidates.
 
-Шаги 1–2 временного плана DONE на предыдущем code baseline. Шаг 3 IN_PROGRESS: прежний live preflight rejected; FILL-001-RS software implementation теперь добавлена, CI для нового HEAD pending. Шаги 4–5 BLOCKED до принятого versioned live preflight. Предыдущий run exact CHALK=5999 — censored/over-budget attempt, не полная стоимость. Подробности: [FILL-001 postmortem](CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md).
+Шаги 1–2 временного плана DONE на предыдущем code baseline. Шаг 3 IN_PROGRESS: прежний live preflight rejected; FILL-001-RS software implementation и полный CI теперь PASS. Следующий gate — один локальный versioned live preflight; шаги 4–5 BLOCKED до его принятия. Предыдущий run exact CHALK=5999 — censored/over-budget attempt, не полная стоимость. Подробности: [FILL-001 postmortem](CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md).
 
 ## Постоянная система управления знаниями ИИ
 
