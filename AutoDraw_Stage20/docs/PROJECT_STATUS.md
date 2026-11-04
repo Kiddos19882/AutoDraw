@@ -1,6 +1,15 @@
 # Актуальная точка продолжения — 2026-11-04
 
 
+## Дополнение — renderer browser gate изолирован от preparation suite (2026-11-04)
+
+Новый job `egret-renderer-reference` запускает Edge harness независимо от Preparation/G3 и portable build. Это устраняет зависимость browser evidence от длительного unrelated test job. Inline PowerShell вынесен в `AutoDraw_Stage20/tests/run_egret_renderer_reference.ps1`; artifact `autodraw-egret-renderer-reference` должен содержать manifest и 36 PNG при PASS либо DOM/Edge stderr diagnostics при failure.
+
+- Workflow commit: `10c5e50d3ba5744adeb0f96bd49febf327c9cc5c`.
+- Script commit: `f83edfdf80172709b596f4bbc470a6a273417610`.
+- Исправление поиска Edge x86: `a5b4b2978006960845ef04d021e4174a5c6425ea`.
+- Run `41914411268` создан до correction script; run `41914478746` использует corrected script. Browser outcome и artifact ещё не подтверждены.
+
 ## Дополнение — исправлена regression assertion O(1) accepted-point lookup (2026-11-04)
 
 CI run `41912100010` выявил один тестовый сбой: `hot-path wrappers, status and export do not scan atom.points` ожидал неизменный indexed-read count после `updateLess()`, но Monitor выполнял ровно одно дополнительное индексное чтение последней принятой точки для поля `acceptedPoint`. Это O(1) tail access, не обход истории точек.
