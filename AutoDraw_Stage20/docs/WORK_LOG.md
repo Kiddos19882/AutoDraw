@@ -214,6 +214,17 @@
 - Зафиксированы quality limits: radius 1 — видимый разрыв верхнего левого соединения D2 polygon; radius 30 — слияние первых трёх коротких деталей D4 (длины 1/2/3 logical px); radius 10 сохраняет их разделение в этой матрице. См. `CHALK_INT006R_VISUAL_AUDIT_2026-11-03.md`.
 - INT006R закрыт как завершённая измерительная фаза с ограничениями; FILL-001 остаётся следующим активным направлением. Production estimator/defaults, frozen model и master не менялись.
 
+
+## 2026-11-04 — прямой анализ геометрии игровой кисти
+
+- Получен полный текст клиентского bundle `master:AutoDraw_Stage20/fileGameEngine/main.min_570122a1.js` через Git blob API (blob SHA `28838e803dcc6f85efb13febd93cc9e0f5046ffc`); JavaScript не исполнялся.
+- Прослежены `BoardPane.redraw()`, `setRadius()`, `onDrawStart()`, `onDrawing()`, `onDrawingEnd()`, `BlackBoardAtom.pushPoint()`, `Painter.drawNormalLine()`, `Painter.drawSmoothLine()`.
+- Подтверждено по bundle: brush value передаётся в `Graphics.lineStyle` как thickness; normal path строится через moveTo/lineTo; smooth path использует midpoints и curveTo; координаты ввода переводятся через globalToLocal; одинаковые соседние точки не дублируются.
+- Зафиксировано пользовательское визуальное наблюдение: кисть в игре выглядит круглой. Оно согласуется с ROUND caps/joins defaults Egret reference API, но deployed runtime игры пока не идентифицирован.
+- Вывод: offline swept capsule — геометрическая основа для прямых сегментов; smooth mode требует повторения кривого path. Пиксельное совпадение с игрой не доказано.
+- Обновлены CHALK_GAME_ENGINE_POINT_COST_AND_BRUSH_WIDTH_2026-11-03.md, TASKS.md и PROJECT_STATUS.md. Исходники, тесты, конфигурации, workflow, frozen evidence и master не менялись.
+- Runtime/live tests и CI не запускались. Следующий шаг: установить deployed Egret runtime и popup/board → screen transform; выполнить offline frozen-PNG comparison для round caps/joins, smooth path, single-point stroke и clipping.
+
 # Журнал работ AutoDraw
 
 ## 2026-11-03 — INT006R live data audit и план FILL-001
