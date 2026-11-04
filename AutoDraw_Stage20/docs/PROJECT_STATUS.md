@@ -1,27 +1,13 @@
-## Текущий блокирующий шаг: FILL-001-RS остаточная PNG диагностика
+## Текущий блокирующий шаг: FILL-001-RS калибровка renderer footprint и sampling
 
-**Задача:** FILL-001-RS-PRE-REPLAY-001 — завершить offline диагностику остаточного PNG несоответствия после replay исходного live preflight `fill001-rs-preflight-20261104-7.04`.
+**Задача:** FILL-001-RS-ENGINE-FOOTPRINT-001.  
+**Статус:** IN PROGRESS / BLOCKER. Pixel-level локализация завершена; исходный capture остаётся REJECTED (coverage=98.430600%, leakage=11). До принятия нового preflight 45-task matrix заблокирована. Live experiments в текущем исследовательском шаге не выполнялись.
 
-**Статус:** IN PROGRESS / BLOCKER. Replay завершён, capture REJECTED. До локализации остаточных uncovered/leakage pixels не начинать новый live запуск FILL-001-RS и не открывать 45-task matrix. Дальнейшая диагностика остаётся offline; игровые эксперименты не выполняются.
+Исходный run fill001-rs-preflight-20261104-7.04: 27/27 strokes, pointCount 1→1261, exact CHALK=1260. Corrected PNG diagnostic: 1116 uncovered target pixels; top=244, bottom=239, left-middle=134, right-middle=499, interior/other=0; leakage=11. Основной остаток расположен на правом периметре. Это локализует дефект как perimeter-dominant, но не доказывает конкретную форму кисти или окончаний.
 
-Исходный run: 27/27 strokes, pointCount 1→1261, exact CHALK=1260; Bridge diagnostics без ошибок. Первоначальный audit до affine correction дал coverage=97.673218%, leakage=28.
+**Новый статический анализ движка:** полный bundle прочитан через GitHub Contents API. Источник master commit 9a3453aeb847b66041bc83d6f4a56ecaf33a993a, blob 28838e803dcc6f85efb13febd93cc9e0f5046ffc. Подтверждены ENTER_FRAME sampling, dedup одинаковых соседних точек, O(N) пересчёт updateLess() на каждый принятый sample, передача brush value как line thickness и smooth-path behavior. Cap geometry, zero-length stroke rasterization и popup display transform остаются UNKNOWN. Подробности: [engine audit](CHALK_GAME_ENGINE_POINT_COST_AND_BRUSH_WIDTH_2026-11-03.md).
 
-**Replay исходных PNG выполнен:** тест `test_chalk_fill_committed_capture_replay.py` через `Fill001Tab.finalize_capture()` использовал исходные файлы evidence commit [5308214](https://github.com/Kiddos19882/AutoDraw/commit/530821497ce3a6bd5152318a78e1f06cb836f288). CI [41780241017](https://github.com/Kiddos19882/AutoDraw/actions/runs/41780241017), checkout HEAD `0f23731848f0c148fe5e1309d1e305576dd4b6b7`, вывел corrected audit: coverage=98.430600%, leakage=11, status=failed. Runtime binding PASS, exact CHALK=1260; canonical plan hash и task signature совпадают. Raw runtime plan hash mismatch объяснён line endings: SHA-256 CRLF-представления committed текста точно совпадает с `source_plan_file_sha256` в executor report; canonical plan hash и task signature совпадают. Подробный отчёт и hashes: [CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md](CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md).
-
-**Статус:** capture REJECTED; residual PNG discrepancy ещё не локализовано. Проверка runtime plan file hash закрыта: различие объясняется CRLF/LF нормализацией, содержимое и canonical plan identity совпадают. Следующий шаг — offline pixel breakdown. Thresholds не менять; новый live запуск и 45-task matrix запрещены до закрытия gate.
-
-## Дополнение — краевые промежутки и будущая контурная обводка (2026-11-04)
-
-При просмотре исходного `after.png` отмечен округлый профиль боковых краёв заливки. Пользовательская гипотеза: между круглыми окончаниями соседних scanline-проходов остаются незаполненные промежутки. В предпоследнем тесте, по наблюдению пользователя, следующая линия начиналась ниже и такого эффекта не было. Это направление offline-проверки, а не установленная причина.
-
-Проверить на неизменённых исходных данных:
-1. Разложить uncovered target pixels по боковым краям, верхней/нижней границам, углам и внутренней области.
-2. Сопоставить пропуски с координатами начала/конца линий, вертикальным шагом и фактической rasterized footprint/cap кисти.
-3. Отдельно локализовать 11 leakage pixels.
-4. Сопоставить с предпоследним тестом по первичным PNG/plan evidence, если они доступны.
-5. Не менять frozen masks, thresholds, исходный plan или production defaults.
-
-**Будущий кандидат:** после основной заливки выполнить одну непрерывную обводку контура, правильно сместив центральную линию внутрь области с учётом фактического renderer footprint, чтобы край кисти закрывал границу без выхода наружу. Это не реализовано и не подтверждено. До рассмотрения нужны offline geometry/raster validation, затем отдельное разрешение на live проверку; критерии — coverage≥99%, leakage=0 и exact CHALK по `pointCount_after - pointCount_before`. Длина контура и proxy points не заменяют измерение расхода.
+**Следующий offline gate:** связать Bridge per-stroke frame_probe intervals с фактическими pointCount deltas; установить transform именно popup BoardPane; получить независимое подтверждение caps/joins и raster footprint. После этого построить versioned perimeter candidate и проверить frozen PNG acceptance mask. Не менять frozen plan, masks, thresholds, production defaults и не запускать live capture до прохождения offline gate.
 
 # Текущее состояние проекта
 
