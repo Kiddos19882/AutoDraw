@@ -3,9 +3,9 @@
 
 ## Дополнение — Game Monitor 0.2.2 input sampling telemetry (2026-11-04)
 
-**Последние Monitor code/test commits:** `981b2c672a0980237ae9c1b4c3ab01c75eedc2c5`, `216361d155945e9037c530e695873192fa6c9595`, `b9899b217a21ecfc3c4f24b470eff5d5dfa352b7`, `6e0867b47b325b6affb6030a6f4f93fbabe94bca`, `7a1780216ac7daa06280d6ba6ffd0a5311ff3270`.
+**Последние Monitor code/test commits:** `981b2c672a0980237ae9c1b4c3ab01c75eedc2c5`, `216361d155945e9037c530e695873192fa6c9595`, `b9899b217a21ecfc3c4f24b470eff5d5dfa352b7`, `6e0867b47b325b6affb6030a6f4f93fbabe94bca`, `7a1780216ac7daa06280d6ba6ffd0a5311ff3270`, `8bc19ab80a2632a014a87886f96396691e7d6336`, `e3ca5fdde23199a8ff11ab66eb38068fb48a0e91`.
 
-- Game Monitor version поднят до 0.2.2.
+- Game Monitor version поднят до 0.2.2; raw mousemove telemetry выключена по умолчанию и включается через `setInputTelemetryEnabled(true)`.
 - Добавлен opt-in `MOUSE_MOVE_SAMPLE` (выключен по умолчанию, включается через `setInputTelemetryEnabled(true)`): DOM mousemove, доставленный canvas во время активного штриха; сохраняются DOM/Monitor timestamps, client/page/screen/movement coordinates, buttons, stage mouse coordinates и BoardPane-local coordinates.
 - `POINT_QUOTA_UPDATE` при положительной точной pointDelta включает acceptedPoint; stage/local coordinates добавляются только при включённой input telemetry.
 - Browser Bridge и Python collector allowlists обновлены; добавлены regression tests.
@@ -32,7 +32,7 @@
 
 ## Дополнение — runtime renderer diagnostics (2026-11-04)
 
-**Последний code/test commit:** `e2cdafaf3249ba4168082e7a6fcac67d850d9119`; последующий HEAD содержит документальные фиксации и runtime evidence в `feature/image-geometry-optimization`.
+**Последний code/test commit:** `e3ca5fdde23199a8ff11ab66eb38068fb48a0e91`; последующий HEAD содержит документальные фиксации и runtime evidence в `feature/image-geometry-optimization`.
 
 - В Game Monitor реализован read-only `rendererSnapshot()`; `inspect()` теперь возвращает объект `renderer` вместе с прежним CHALK snapshot.
 - Снимок фиксирует фактический Egret renderMode/systemRenderer, canvas scale factors, DPR, viewport scale, экранную геометрию canvas и CSS transform, цепочку преобразований BoardPane, mask и stage/client corner coordinates (client corners доступны при поддержке `getBoxQuads()`).
