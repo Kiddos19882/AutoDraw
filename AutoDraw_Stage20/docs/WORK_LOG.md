@@ -1,3 +1,16 @@
+## Дополнение — краевые промежутки и будущая контурная обводка (2026-11-04)
+
+При просмотре исходного `after.png` отмечен округлый профиль боковых краёв заливки. Пользовательская гипотеза: между круглыми окончаниями соседних scanline-проходов остаются незаполненные промежутки. В предпоследнем тесте, по наблюдению пользователя, следующая линия начиналась ниже и такого эффекта не было. Это направление offline-проверки, а не установленная причина.
+
+Проверить на неизменённых исходных данных:
+1. Разложить uncovered target pixels по боковым краям, верхней/нижней границам, углам и внутренней области.
+2. Сопоставить пропуски с координатами начала/конца линий, вертикальным шагом и фактической rasterized footprint/cap кисти.
+3. Отдельно локализовать 11 leakage pixels.
+4. Сопоставить с предпоследним тестом по первичным PNG/plan evidence, если они доступны.
+5. Не менять frozen masks, thresholds, исходный plan или production defaults.
+
+**Будущий кандидат:** после основной заливки выполнить одну непрерывную обводку контура, правильно сместив центральную линию внутрь области с учётом фактического renderer footprint, чтобы край кисти закрывал границу без выхода наружу. Это не реализовано и не подтверждено. До рассмотрения нужны offline geometry/raster validation, затем отдельное разрешение на live проверку; критерии — coverage≥99%, leakage=0 и exact CHALK по `pointCount_after - pointCount_before`. Длина контура и proxy points не заменяют измерение расхода.
+
 ## 2026-11-04 — FILL-001-RS corrected replay of original PNG evidence
 
 - Выполнен committed replay test `test_chalk_fill_committed_capture_replay.py` через реальный `Fill001Tab.finalize_capture()`; использованы исходные manifest, attempt, executor report, runtime plan, Bridge session/run records, legacy session и before/after PNG из evidence commit [5308214](https://github.com/Kiddos19882/AutoDraw/commit/530821497ce3a6bd5152318a78e1f06cb836f288).
