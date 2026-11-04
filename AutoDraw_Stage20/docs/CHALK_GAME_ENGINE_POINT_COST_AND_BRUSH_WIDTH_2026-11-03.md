@@ -590,3 +590,15 @@ Manifest содержит Egret engine version, source bundle, browser userAgent
 **Ограничения:** MOUSE_MOVE_SAMPLE фиксирует события, доставленные DOM listener, но не OS/PyAutoGUI calls, которые могли быть объединены до DOM dispatch. POINT_QUOTA_UPDATE даёт точную последнюю acceptedPoint на конкретном quota update; при pointDelta>1 промежуточные координаты не восстанавливаются этим полем. Runtime snapshot и stage.frameRate относятся к одной сессии.
 
 **Следующий evidence gate:** после подтверждения browser renderer harness выполнить повторные одинаковые траектории с разными delay/phase, сохраняя MOUSE_MOVE_SAMPLE, POINT_QUOTA_UPDATE.acceptedPoint, DRAW_SAMPLE, frame_probe и PNG. Не делать вывод о причине старых различий без этих парных данных.
+
+### 15.14 Actual BoardPane CanvasRenderer reference — 2026-11-04
+
+Browser harness загружает `mergeEngine_df2e5bc5.js` и `main.min_653f95bc.js`, создаёт настоящий `com.magnetjoy.pet.ui.board.BoardPane`, устанавливает `atom.points/radius/colors/options` и вызывает реальный `BoardPane.redraw()`. Второй BoardPane instance использует manual transcription `Painter.drawSmoothLine` / `drawNormalLine`; CanvasRenderer source rasters сравниваются попиксельно.
+
+- CI run `41916449025`, job `126877971003`: 18/18 fixtures (9 path cases × widths 10/30), все `manualTranscriptionMatch.equal=true`, `differingPixels=0`.
+- Artifact `autodraw-egret-renderer-reference`, ID `13365670726`: manifest + 36 PNG; manifest SHA-256 `45e666ca2fe8b852105e08e72bf44665fc2ae0d8724bf14b4b9875dad3438fbc`.
+- Browser Edge 156.0.0.0 / Win32, DPR=1, viewport 756×441; Egret 5.4.1; rasterScale=3. Source texture dimensions match `ceil(GraphicsNode bounds × 3)`; masked-board Canvas2D outputs 1380×720.
+- Standard fixture GraphicsNode bounds: `(-2,-2,464,244)`. `mask-corner`: width10 `(-5,-5,467,247)`, width30 `(-15,-15,477,257)`. `scrollrect-edges`: width10 `(-25,-2,510,244)`, width30 `(-35,-2,530,244)`.
+- Single-point smooth path содержит только moveTo и не создаёт видимый alpha, но actual BoardPane GraphicsNode остаётся non-empty из-за transparent `resetBg()` rectangle; его bounds `(-2,-2,464,244)`. Поэтому generic WebGLRenderer empty-node skip к этому случаю не относится.
+
+**Граница доказательства:** run подтверждает попиксельное совпадение actual BoardPane и manual path transcription внутри Egret CanvasRenderer. WebGL context не создавался; WebGL texture upload/LINEAR sampling/premultiplied alpha, scrollRect+mask stencil и сравнение с PNG из того же live game run не выполнялись. Canvas2D masked-board composite остаётся approximation.
