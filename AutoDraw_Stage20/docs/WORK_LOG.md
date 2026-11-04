@@ -2626,3 +2626,12 @@ Production source, frozen masks, PNG thresholds, исходные live captures 
 
 Статус: edge concentration подтверждена для offline planner model (E1), но остаётся E0 для actual PNG residuals. Contour pass — exploratory candidate, не внедрён, не выбран и не live-validated. Не менялись код, тесты, конфигурации, frozen plan, thresholds, production defaults; live experiment не запускался. Следующий шаг — actual PNG coordinate breakdown и сравнение с renderer footprint.
 
+## 2026-11-04 — подготовка actual PNG pixel-coordinate breakdown
+
+Проверено текущее состояние рабочей ветки `feature/image-geometry-optimization`: до начала изменений HEAD был `0f066bb11095420e38770f149fdcd276b3ccbd0b`; последние 20 commits просмотрены, они включали последовательные документационные записи FILL-001-RS. Ветка diverged относительно `master` (ahead 2859 / behind 5 на исходном HEAD); `master` не изменялся. Локальный `git status` недоступен через GitHub API.
+
+Получены и просмотрены неизменённые committed `before.png`/`after.png` FILL-001-RS capture. В исходном replay test добавлена test-only диагностика фактической screen pixel map: exact same inverse affine nearest-neighbor mask mapping as PNG audit, координаты uncovered target/leakage pixels, spatial zones, per-row counts, connected components и расстояния residuals до scanline segments после affine transform. Для endpoints используется непрерывное точное affine mapping без дополнительного округления. Исходные PNG, capture evidence, production adapter, frozen plan/mask и acceptance criteria не менялись.
+
+Commits: `e62b69295f9df1c67a485a5c900fbcf1ceba87eb` (diagnostic) и `d337f4240e83488273152f65992032beca395781` (точные affine endpoints). Workflow path filter включает `AutoDraw_Stage20/source/**`, поэтому изменения подходят под push trigger `.github/workflows/geometry-tests.yml`; однако отдельный run ID/logs не удалось получить доступными GitHub Actions tools, а combined status для commit пока возвращает пустой список. Следовательно, diagnostic пока не подтверждён запуском.
+
+Текущий audit result остаётся coverage=98.430600%, leakage=11, status=failed; exact CHALK=1260 и runtime binding PASS не отменяют PNG gate. 45-task matrix остаётся BLOCKED; live запусков не выполнялось.
