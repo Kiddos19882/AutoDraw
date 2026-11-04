@@ -9,6 +9,10 @@
 
 **Следующий offline gate:** связать Bridge per-stroke frame_probe intervals с фактическими pointCount deltas; установить transform именно popup BoardPane; получить независимое подтверждение caps/joins и raster footprint. После этого построить versioned perimeter candidate и проверить frozen PNG acceptance mask. Не менять frozen plan, masks, thresholds, production defaults и не запускать live capture до прохождения offline gate.
 
+**Дополнительные данные сохранённого run 6a17a297:** 1260 POINT_QUOTA_UPDATE events распределены по 27 штрихам. Каждый штрих принял 41–48 точек за 1450–1645 ms; median интервал между изменениями pointCount — 33 ms; accepted-point rate 28.26–29.50 points/s. Первые 9 штрихов: 28.734 points/s в среднем; последние 9: 29.049. В run-level frame_probe browser requestAnimationFrame измерен как 59.997 FPS; это не частота Egret ENTER_FRAME. На данном запуске не видно падения cadence от роста pointCount 1→1261, но это не исключает overhead на более длинных runs.
+
+**Улучшение телеметрии внесено:** Browser Bridge теперь передаёт strokeId для frame_probe; Bridge Server сохраняет raw per-probe intervals и формирует per_stroke_metrics / frame_probe_by_stroke. Изменения: 02907aca (browser bridge), ec2ed77 (collector), ead8808/730590d (tests). CI run 41840281018 для HEAD 730590d на момент записи выполняется; PASS пока не заявлен.
+
 # Текущее состояние проекта
 
 ## Актуальное состояние на 2026-11-04
