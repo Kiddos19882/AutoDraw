@@ -18,7 +18,6 @@ from chalk_fill_execution import prepare_fill001_single_task_plan
 from chalk_fill_matrix import (
     FillMatrixError,
     build_fill001_matrix,
-    build_fill001_rs_matrix,
     load_fill001_matrix,
     write_fill001_matrix,
 )
