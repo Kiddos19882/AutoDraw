@@ -88,6 +88,7 @@ def guaranteed_is_subset(result):
         {"brush_value": 0},
         {"brush_value": True},
         {"scale_x": 0.0},
+        {"scale_x": True},
         {"scale_y": float("inf")},
         {"width": 0},
         {"height": -1},
