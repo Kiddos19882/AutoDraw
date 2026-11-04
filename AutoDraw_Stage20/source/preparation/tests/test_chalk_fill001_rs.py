@@ -7,7 +7,7 @@ import pytest
 from chalk_fill_execution import prepare_fill001_single_task_plan
 from chalk_fill_runtime_binding import build_fill001_experiment_context
 from chalk_fill_experiment import FILL001_RADII, FILL001_SHAPES
-from chalk_fill_fixed_radius_planner import build_fixed_radius_fill_plan
+from chalk_fill_fixed_radius_planner import (\n    build_fixed_radius_fill_plan,\n    build_fixed_radius_fill_plan_for_task,\n)
 from chalk_fill_matrix import (
     FILL001_RS_PLAN_VARIANT,
     FILL001_RS_SCANLINE_CONFIGS,
@@ -190,3 +190,52 @@ def test_rs_manifest_round_trips_through_existing_loader(tmp_path):
     assert loaded["matrix_signature"] == matrix["matrix_signature"]
     assert loaded["plan_variant"] == FILL001_RS_PLAN_VARIANT
     assert loaded["execution_allowed"] is False
+
+
+def test_frozen_task_geometry_rebuild_preserves_rs_spacing_and_signature():
+    matrix = build_fill001_rs_matrix("fill001-rs-rebuild")
+    task = next(
+        item for item in matrix["tasks"]
+        if item["shape_id"] == "rectangle"
+        and item["requested_radius"] == 10
+        and item["repeat_index"] == 1
+    )
+
+    rebuilt = build_fixed_radius_fill_plan_for_task(task)
+
+    assert rebuilt["planner_version"] == task["planner_version"] == 2
+    assert rebuilt["plan_signature"] == task["plan_signature"]
+    assert rebuilt["target_mask_sha256"] == task["target_mask_sha256"]
+    assert rebuilt["summary"]["stroke_count"] == task["expected_strokes"] == 27
+    assert rebuilt["brush_configuration"]["scanline_row_step"] == 5
+    assert rebuilt["brush_configuration"]["scanline_offset"] == 0
+
+
+def test_frozen_task_geometry_rebuild_keeps_legacy_planner_defaults():
+    matrix = build_fill001_matrix("FILL001-LEGACY-REBUILD")
+    task = next(
+        item for item in matrix["tasks"]
+        if item["shape_id"] == "rectangle"
+        and item["requested_radius"] == 10
+        and item["repeat_index"] == 1
+    )
+
+    rebuilt = build_fixed_radius_fill_plan_for_task(task)
+
+    assert rebuilt["planner_version"] == 1
+    assert rebuilt["plan_signature"] == task["plan_signature"]
+    assert rebuilt["summary"]["stroke_count"] == task["expected_strokes"] == 131
+
+
+def test_frozen_task_geometry_rebuild_rejects_planner_version_mismatch():
+    matrix = build_fill001_rs_matrix("fill001-rs-version-mismatch")
+    task = next(
+        item for item in matrix["tasks"]
+        if item["shape_id"] == "rectangle"
+        and item["requested_radius"] == 10
+        and item["repeat_index"] == 1
+    )
+    task["planner_version"] = 1
+
+    with pytest.raises(ValueError, match="Planner version"):
+        build_fixed_radius_fill_plan_for_task(task)

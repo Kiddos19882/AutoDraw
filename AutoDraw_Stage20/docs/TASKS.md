@@ -2,6 +2,14 @@
 
 ## Актуальное состояние FILL-001 / FILL-001-RS на 2026-11-04
 
+## Исправление FILL-001-RS frozen geometry rebuild — 2026-11-04
+
+Пользовательский runtime evidence commit [63158fb](https://github.com/Kiddos19882/AutoDraw/commit/63158fb55743c566bf231196b80016273970bbf1) зафиксировал отказ single-task preflight до запуска исполнителя. Для задачи rectangle/r10 manifest и исходный DrawingPlan согласованы: planner_version=2, scanline_row_step=5, scanline_offset=0, plan signature совпадает с task, expected_strokes=27. Game Monitor подтвердил radius 30→10; pointCount остался 1 (CHALK=0), Bridge session завершилась без dropped events/errors/send failures.
+
+Причина установлена в runtime guard integrated_app.py: повторное построение выполнялось вызовом build_fixed_radius_fill_plan(shape_id, radius) без spacing-параметров. Значения по умолчанию — step=1/offset=0, то есть legacy planner v1. Поэтому сравнивался FILL-001-RS v2 signature с другой геометрией v1 и срабатывал корректный fail-closed guard. Это ошибка handoff/validation, не ошибка регулировки кисти и не расход CHALK.
+
+Исправление: единый helper повторного построения получает scanline_row_step/scanline_offset из frozen task; для legacy tasks без этих полей сохраняются прежние defaults. Объявленный planner_version проверяется против фактически восстановленного. Добавлены регрессионные проверки RS signature/27 strokes, legacy signature/131 strokes и отказа при несовпадении версии. До успешного CI и повторного локального preflight live matrix остаётся BLOCKED; повторный запуск здесь не выполнялся.
+
 После live run из [73d14a1](https://github.com/Kiddos19882/AutoDraw/commit/73d14a1784a5a9f8ef29bc0e197b75352f2650af) подтверждены exact CHALK=5999 и per-stroke accounting, но исполнено только 128/131 consuming strokes; три кандидата не потребили ресурс после исчерпания квоты. Capture REJECTED, полная стоимость незавершённого плана неизвестна. Строгие runtime/PNG gates не ослаблять.
 
 Exhaustive OpenCV sweep завершён: 2 238 step/offset кандидатов, 62 прошли coverage≥99%/leakage=0, все 15 shape/radius cells имеют frozen spacing candidate. Добавлены planner version 2, отдельный 45-task FILL-001-RS manifest builder, single-task handoff и runtime context binding. r10/rectangle/step=5 — кандидат, не подтверждённый игровым renderer или exact CHALK. Отчёт: [static sweep](CHALK_FILL001_RS_STATIC_SWEEP_2026-11-04.md); порядок — во [временном плане](CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md).

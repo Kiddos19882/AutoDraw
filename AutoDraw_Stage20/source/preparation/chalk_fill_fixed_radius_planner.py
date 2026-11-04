@@ -269,3 +269,21 @@ def build_fixed_radius_fill_plan(
         },
         "strokes": strokes,
     }
+
+def build_fixed_radius_fill_plan_for_task(task: dict[str, Any]) -> dict[str, Any]:
+    """Rebuild frozen FILL-001 geometry using the exact planner parameters in its task."""
+    if not isinstance(task, dict):
+        raise FillPlannerError("FILL-001 task должен быть объектом.")
+
+    plan = build_fixed_radius_fill_plan(
+        task.get("shape_id"),
+        task.get("requested_radius"),
+        scanline_row_step=task.get("scanline_row_step", 1),
+        scanline_offset=task.get("scanline_offset", 0),
+    )
+    declared_version = task.get("planner_version")
+    if declared_version is not None and declared_version != plan["planner_version"]:
+        raise FillPlannerError(
+            "Planner version задачи FILL-001 не совпадает с восстановленными параметрами geometry."
+        )
+    return plan

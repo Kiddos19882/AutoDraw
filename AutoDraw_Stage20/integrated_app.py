@@ -840,7 +840,7 @@ class AutoDrawUnifiedApp:
             source_task = source_generation.get("chalk_fill001_task") if isinstance(source_generation, dict) else None
             from chalk_fill_runtime_binding import build_fill001_experiment_context
             from chalk_fill_execution import FILL001_EXECUTOR_OVERRIDE
-            from chalk_fill_fixed_radius_planner import build_fixed_radius_fill_plan
+            from chalk_fill_fixed_radius_planner import build_fixed_radius_fill_plan_for_task
 
             expected = build_fill001_experiment_context(task)
             if not isinstance(context, dict) or any(context.get(key) != value for key, value in expected.items()):
@@ -857,7 +857,7 @@ class AutoDrawUnifiedApp:
                 or source_generation.get("matrix_batch_execution_allowed") is not False
             ):
                 raise ValueError("Source plan не содержит разрешённый single-task preflight contract.")
-            rebuilt = build_fixed_radius_fill_plan(task["shape_id"], task["requested_radius"])
+            rebuilt = build_fixed_radius_fill_plan_for_task(task)
             if (
                 source_generation.get("plan_signature") != rebuilt.get("plan_signature")
                 or source_generation.get("target_mask_sha256") != rebuilt.get("target_mask_sha256")
