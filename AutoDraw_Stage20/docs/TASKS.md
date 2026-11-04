@@ -9,7 +9,7 @@
 
 - Исходные PNG и связанные evidence подтверждены в commit [5308214](https://github.com/Kiddos19882/AutoDraw/commit/530821497ce3a6bd5152318a78e1f06cb836f288).
 - Replay выполнен тестом `test_chalk_fill_committed_capture_replay.py` через реальный `Fill001Tab.finalize_capture()`; подтверждающий CI — [41780241017](https://github.com/Kiddos19882/AutoDraw/actions/runs/41780241017), checkout HEAD `0f23731848f0c148fe5e1309d1e305576dd4b6b7`.
-- Runtime binding PASS: task/session/run связаны с run `6a17a297-ea14-4527-9527-bfd8de3bd335`; 27/27 strokes, radius=10, exact pointCount 1→1261, CHALK=1260; sample delta совпадает с CHALK; dropped events, Monitor errors, Bridge send failures и sequence gaps — 0.
+- Runtime binding PASS: task/session/run связаны с run `6a17a297-ea14-4527-9527-bfd8de3bd335`; 27/27 strokes, radius=10, exact pointCount 1→1261, CHALK=1260; sample delta совпадает с CHALK; dropped events, Monitor errors, Bridge send failures и sequence gaps — 0. Canonical plan hash и task signature совпадают. Однако committed runtime plan SHA-256 не совпадает с `source_plan_file_sha256` в исходном executor report; validator проверяет формат поля, но не пересчитывает relocated file.
 - Исправленный PNG audit: **coverage=98.430600%, leakage=11**. Критерии остаются coverage≥99% и leakage=0; audit status=failed. Предыдущие 97.673218%/28 относятся к audit до affine correction.
 - Полный replay report и SHA-256 всех входов: [CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md](CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md).
 
@@ -20,7 +20,8 @@
 3. [x] Выполнить replay исправленным `chalk_fill_capture_adapter.py` на исходных PNG.
 4. [x] Зафиксировать SHA-256 входов, code/test revision и audit result.
 5. [ ] Локализовать 11 leakage pixels и недостающую область покрытия по координатам/границам/штрихам; сохранить диагностические overlays и breakdown.
-6. [ ] После диагностики принять решение о capture. Не ослаблять thresholds и не переписывать raw evidence.
+6. [ ] Разобрать byte-level mismatch runtime `source_plan_file_sha256` vs committed runtime plan SHA-256; определить, объясняется ли он нормализацией line endings или изменением файла.
+7. [ ] После диагностики принять решение о capture. Не ослаблять thresholds и не переписывать raw evidence.
 
 **Ограничения:** не менять production-код/defaults, frozen masks, исходные plans/manifest или thresholds; не запускать игру и 45-task matrix. Новый live preflight возможен только после закрытия offline gate и отдельного разрешения пользователя.
 
