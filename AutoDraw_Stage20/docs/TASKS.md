@@ -767,3 +767,12 @@ CI evidence: workflow 41787492122, commit d337f4240e83488273152f65992032beca3957
 - [ ] Только после отдельного acceptance решать вопрос интеграции в `interior_fill_planner`; не менять текущие planner outputs/defaults до этого.
 
 **Ограничение:** это ideal geometric model, не deployed Egret validation. ROUND caps/joins остаются API-level assumption до подтверждения runtime identity. FILL-001-RS остаётся отдельным blocker; generic capsule task не доказывает причину его PNG residual.
+
+### BRUSH-FOOTPRINT-CAPSULE-001 — CI и уточнение консервативности
+
+- [x] Первоначальная реализация и базовые tests прошли полный CI [41842587672](https://github.com/Kiddos19882/AutoDraw/actions/runs/41842587672): 820 passed, 24 warnings, 82 subtests; Preparation/G3, Game Monitor/Bridge, Executor, Application integration, INT-006 PNG audit и Windows portable build/startup smoke-test — SUCCESS; optional benchmarks SKIPPED.
+- [x] Подтверждён static sweep в том же run: 2 238 candidates, 62 accepted, 15/15 selected cells passed offline gate.
+- [x] Добавлен independent analytic oracle для horizontal capsule и уточнены tolerance boundaries: potential mask не отбрасывает малые положительные пересечения; guaranteed mask использует строгую внутреннюю границу; boolean scales отклоняются.
+- [ ] Проверить последующие исправления в полном CI: run [41843716918](https://github.com/Kiddos19882/AutoDraw/actions/runs/41843716918) на HEAD `7357f3e198c729b194b87eec7c591242314c2782` ожидает выполнения.
+
+Initial full CI PASS не распространяется автоматически на последующие threshold/oracle commits. Planner integration по-прежнему не выполнена; модель не подтверждена deployed Egret runtime.
