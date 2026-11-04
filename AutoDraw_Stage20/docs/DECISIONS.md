@@ -195,7 +195,7 @@
 **Последствия:** code/test commits 4797aa5 и a950084 реализуют и закрепляют contract. До подтверждённого CI/replay и прохождения PNG gate FILL-001 capture и 45-task matrix остаются BLOCKED.
 
 
-## DEC-016. Выбор доски Game Monitor не входит в текущий пользовательский сценарий
+## DEC-022. Выбор доски Game Monitor не входит в текущий пользовательский сценарий
 
 **Статус:** принято пользователем, 2026-11-04  
 **Контекст:** статический анализ подтверждённого game bundle обнаружил preview `BoardPane` внутри `BoardItemBase` и рабочий `PainterPopup.painterBoard`; общий auto-discovery структурно не различает эти экземпляры.  
