@@ -17,7 +17,7 @@
 
 - Исходный Game Monitor JSON: `data/results/brush_behavior_tests/game_monitor_bridge/bb261898-8296-41f5-a333-eb0b81016410/game-monitor-run-20261104T040548835772Z-6a17a297.json`; exact CHALK=1260, 27 strokes, radius/lineWidth=10.
 - В raw events: 1287 DRAW_SAMPLE, 1260 positive samples, sum pointDelta=1260, max pointDelta=1, 1260 POINT_QUOTA_UPDATE; accepted_points=1260. В этом run все принятые координаты представлены по одному на каждую positive delta; generic trajectory note о coalescing фактически не срабатывает.
-- По 1233 соседним интервалам: min=3, median=6, p90=9, p95=10, max=13; 3 интервала превышают lineWidth=10. Последний интервал каждого штриха: 3–9; все 27 из 27 укладываются в lineWidth=10.
+- По 1233 соседним пространственным интервалам: min=3, median=6, p90=9, p95=10, max=13; 3 интервала превышают lineWidth=10. Временные интервалы между соседними принятыми точками: min=26ms, median=33ms, p90=35ms, p95=36ms, max=81ms; 27 интервалов >40ms. Это согласуется с примерно 30Hz, но не является прямым frame-rate measurement. Последний интервал каждого штриха: 3–9; все 27 из 27 укладываются в lineWidth=10.
 - Для smooth path terminal midpoint и идеального round cap radius=5 это означает, что последняя принятая точка геометрически достигается cap во всех 27 случаях. Это не PNG доказательство и не учитывает mouseup, который не семплируется игрой.
 - Добавлены `source/preparation/game_brush_endpoint_analysis.py`, его unit tests и derived JSON report `data/results/brush_behavior_tests/fill001/endpoint-analysis-6a17a297.json`. CI run [41900011413](https://github.com/Kiddos19882/AutoDraw/actions/runs/41900011413) запущен; результат тестов ожидается.
 
