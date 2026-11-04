@@ -128,7 +128,7 @@ Snapshot считается точным только если оба значе
 `POINT_QUOTA_UPDATE` содержит:
 - `pointDelta = after.pointCount - before.pointCount`, если оба snapshots точны;
 - `acceptedPoint` — последняя точка atom.points при положительной delta;
-- stage и BoardPane-local coordinates, считанные после `updateLess()`.
+- stage и BoardPane-local coordinates, считанные после `updateLess()`, только при включённой input telemetry.
 
 Так accepted point связывается с координатами указателя и моментом изменения квоты. Если `pointDelta > 1`, acceptedPoint остаётся только последней точкой и промежуточные accepted points этим событием не восстанавливаются.
 
