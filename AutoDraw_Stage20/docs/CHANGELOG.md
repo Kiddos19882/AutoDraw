@@ -1,4 +1,12 @@
-## 2026-11-04 — синхронизация документации и текущего сценария Game Monitor
+# Changelog
+
+## 2026-11-04 — документационная синхронизация
+
+- Согласованы актуальные статусы PROJECT_STATUS, TASKS и ROADMAP; DOC-STATUS-SYNC закрыта.
+- Исправлены архитектурная карта девяти вкладок и актуальные PNG metrics в TESTS_AND_CI_MAP.
+- Обновлены индекс, engine source-trace reference и исторические оговорки профильных планов/Game Monitor design.
+- Изменения ограничены Markdown; тесты/CI/сборка/live runtime не запускались.
+
 
 - Удалён неактуальный для текущего сценария backlog blocker `MONITOR-BOARD-SELECTION-001`; исторический факт о preview/PainterPopup BoardPane сохранён с пометкой `NOT_APPLICABLE_TO_CURRENT_USER_SCENARIO`.
 - Зафиксирован пользовательский сценарий: комната без других досок, на экране одна пустая тестовая доска. Не утверждается, что общий механизм auto-discovery исправлен для иных сценариев.

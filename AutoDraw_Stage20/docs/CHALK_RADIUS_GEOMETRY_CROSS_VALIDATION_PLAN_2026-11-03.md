@@ -1,7 +1,10 @@
 # План перекрёстной validation радиуса кисти и геометрии CHALK
 
+> **Исторический план/протокол INT006R.** Предложенная матрица 5×3×3 была выполнена; этот документ сохраняется как методика, а не как активный план. Текущий статус и оставшиеся gates находятся в `docs/TASKS.md`, `docs/ROADMAP.md` и официальных INT006R results/visual audit.
+
+
 **Дата:** 2026-11-03  
-**Статус:** LIVE CAPTURES 45/45 COMPLETED; raw-data audit PASS; real-data analyzer PASS; ручной visual audit pending  
+**Статус на дату создания:** HISTORICAL / SUPERSEDED. 45/45 live captures, raw-data audit, real-data analyzer и ручной visual audit завершены; INT-006 domain/safety margin и INT-007 остаются отдельными открытыми задачами.  
 **Связь:** продолжение INT-006; не открывает INT-007 автоматически  
 **Рабочая ветка:** `feature/image-geometry-optimization`
 

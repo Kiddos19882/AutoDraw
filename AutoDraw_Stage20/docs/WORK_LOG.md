@@ -1,3 +1,13 @@
+## 2026-11-04 — синхронизация документации AutoDraw
+
+- Повторно проверены рабочая ветка `feature/image-geometry-optimization`, HEAD до работы `a442ee3790d360a9fc947995cd01daf0d96d6301`, последние 20 commits и compare с последним подтверждённым code/test HEAD `af30b5fdf1c926d3493bff90706806f5d3a28c43`.
+- Compare показывает 84 commits между code/test baseline и HEAD перед синхронизацией; изменения ограничены документацией, `TEST_RESULTS.txt` и тремя engine assets. Code/test lineage не изменялся.
+- Согласованы управляющие документы; `DOC-STATUS-SYNC` закрыта. `MONITOR-AUTOCAPTURE-STATUS` оставлена RECONCILE, поскольку требует отдельной сверки реализации и accepted captures.
+- Синхронизированы индекс документации, список девяти UI-вкладок, CI/test map и PNG metrics. Устаревшие профильные планы и bridge design снабжены явными историческими оговорками и ссылками на актуальные источники.
+- В engine report закреплена иерархия источников: старые master/Resource Timing материалы остаются историческими; актуальная трассировка относится к пользовательски подтверждённому набору assets, раздел 14.
+- Изменены только Markdown-файлы. Исходники, тесты, workflow, конфигурации, engine assets, первичные экспериментальные данные и `master` не менялись. Тесты, CI, сборка, live runtime и игровые эксперименты не запускались. Локальный `git status` через GitHub API недоступен.
+
+---
 ## 2026-11-04 — зафиксировано расположение копии игровых engine assets
 
 - Проверен commit [d3322fe35c808bde079c79545cc839636b7cda2a](https://github.com/Kiddos19882/AutoDraw/commit/d3322fe35c808bde079c79545cc839636b7cda2a) в `feature/image-geometry-optimization`.

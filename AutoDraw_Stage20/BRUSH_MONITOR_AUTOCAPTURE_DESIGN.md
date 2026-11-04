@@ -1,6 +1,9 @@
 # Game Monitor: автоматическое сохранение отчётов теста кисти
 
-Статус: первая реализация read-only WebSocket telemetry bridge добавлена; автоматическая привязка к UI experiment.json и live-проверка нового bridge в Firefox ещё не завершены.
+> **Исторический дизайн.** Описывает исходные требования и раннюю архитектуру. Для фактических API и текущего потока данных использовать `docs/GAME_MONITOR_BRIDGE_REFERENCE.md` и `source/game_monitor/README.md`.
+
+
+**Статус документа:** HISTORICAL DESIGN / SUPERSEDED как описание текущей реализации. Ветка содержит Game Monitor 0.2.1, Browser Bridge и локальный collector; актуальные интерфейсы, event schema и ограничения описаны в [GAME_MONITOR_BRIDGE_REFERENCE.md](docs/GAME_MONITOR_BRIDGE_REFERENCE.md). Состояние автопривязки к experiment bundles и остаточные transport/manifest gates отдельно отслеживаются задачей `MONITOR-AUTOCAPTURE-STATUS` в `docs/TASKS.md`. Этот документ сохраняется как исходный дизайн, а не как доказательство текущего runtime.
 
 ## Цель
 

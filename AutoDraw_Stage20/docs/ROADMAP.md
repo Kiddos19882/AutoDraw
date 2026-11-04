@@ -1,10 +1,12 @@
 # Дополнение к дорожной карте — 2026-11-04
 
+**DOC-STATUS-SYNC:** DONE — управляющие документы, индекс, архитектурная/CI-карта и перечисленные исторические планы/инструкции синхронизированы; см. верхний блок `PROJECT_STATUS.md` и запись в `WORK_LOG.md`.
+
 INT-003 и CHALK-SAMPLING-DOMAIN закрыты как NOT_REQUIRED по решению пользователя; не планировать отдельные работы по A/B/C overhead Monitor и расширению sampling-domain. Исторические evidence остаются.
 
 ## Актуальная последовательность работ
 
-1. **P0 — FILL-001-RS renderer footprint/transform:** Egret 5.4.1, ROUND caps/joints defaults и CanvasRenderer implementation подтверждены в согласованном наборе assets, происхождение которого пользователь подтвердил как скачивание с сайта запущенной игры. Остаётся установить фактический render backend активной сессии, полный popup→board→screen transform, clipping/device-pixel mapping и footprint на frozen fixtures; пройти offline PNG gate coverage≥99%, leakage=0.
+1. **P0 — FILL-001-RS renderer footprint/transform:** Egret 5.4.1, ROUND defaults caps/joints и наличие CanvasRenderer/WebGLRenderer подтверждены статически в согласованном наборе assets, происхождение которого пользователь подтвердил. Фактически выбранный backend активной сессии неизвестен. Остаётся установить render backend, полный popup→board→screen transform, clipping/device-pixel mapping и footprint на frozen fixtures; пройти offline PNG gate coverage≥99%, leakage=0.
 **Подэтап GAME-BRUSH-REPLICATION (внутри пункта 1):** статическая трассировка текущего игрового набора завершена (E1). Следующий offline gate — установить фактический Canvas/WebGL mode и полный transform, затем подготовить frozen fixtures/reference harness для кадровой выборки точек, normal/smooth path, clipping и PNG comparison. OpenCV и Capsule остаются моделями, а не подтверждённой копией renderer. Реализация в AutoDraw и live captures пока не выполнялись.
 
 2. **P0 — single-task live preflight:** только после offline PASS и отдельного разрешения пользователя. Последний capture (coverage 98.430600%, leakage 11) отклонён; exact CHALK=1260 относится только к этому capture.

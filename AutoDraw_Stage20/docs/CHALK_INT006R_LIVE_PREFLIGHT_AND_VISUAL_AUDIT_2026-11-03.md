@@ -1,6 +1,9 @@
 # INT006R — live preflight и визуальный аудит
 
-**Статус:** LIVE BLOCK COMPLETED 45/45; raw-data audit PASS; official CLI analyzer on real bundle and manual visual audit pending  
+> **Исторический протокол выполнения.** Описанные ниже preflight/launch инструкции относятся к завершённой серии 2026-11-03. Они сохранены для воспроизводимости, но не являются разрешением на новый live run и не описывают текущий backlog. Результаты: `CHALK_INT006R_LIVE_RESULTS_2026-11-03.md` и `CHALK_INT006R_VISUAL_AUDIT_2026-11-03.md`.
+
+
+**Статус на дату создания:** HISTORICAL / SUPERSEDED. 45/45 captures завершены; raw-data audit PASS; официальный CLI analyzer PASS; ручной visual audit 45 пар PNG завершён. Текущие ограничения и применимость см. `TASKS.md` / `ROADMAP.md` и итоговые отчёты INT006R.  
 **Фаза:** INT006R  
 **Матрица:** D1–D5 × radius 1/10/30 × 3 повтора = 45 captures  
 **Sampling:** P1 — point_step_px=4, point_delay_ms=5 ms  

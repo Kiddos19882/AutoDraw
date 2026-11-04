@@ -1,6 +1,9 @@
 # План измерения расхода CHALK по геометрии и режиму ввода
 
-**Статус:** G1 и G2 LIVE ACCEPTED; G3 SOFTWARE IMPLEMENTED, CI/Windows smoke-test PENDING. Live-запуск G3 закрыт до прохождения software gate.  
+> **Исторический протокол.** Сохранён для воспроизводимости исходной матрицы G1–G3. Его первоначальные статусы и ожидающие пункты ниже superseded итоговыми результатами. Не использовать этот документ как текущий backlog; см. `docs/TASKS.md` и `docs/ROADMAP.md`.
+
+
+**Статус на дату создания:** HISTORICAL / SUPERSEDED. G1/G2/G3 впоследствии приняты; G3 software/CI и live series завершены. Текущие задачи и gates — `docs/TASKS.md`, `docs/ROADMAP.md`, результаты — `docs/CHALK_G3_RESULTS_2026-11-02.md`.  
 **Дата:** 1 ноября 2026 г.  
 **Предыдущая серия:** `chalk-20261101-023127-b85dbb`, 21/21 валидных прогонов.  
 **Ветка:** `feature/image-geometry-optimization`.

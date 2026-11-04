@@ -1,5 +1,8 @@
 # Быстрый поиск по документации: модуль автоматических тестов кистей и CHALK
 
+> **Статус индекса:** навигационный документ; старые планы и статусы ниже не являются источником текущего backlog. Текущие gates: `docs/TASKS.md` и `docs/ROADMAP.md`. Текущий Monitor — 0.2.1; актуальная реализация/ограничения описаны в `source/game_monitor/README.md` и `docs/GAME_MONITOR_BRIDGE_REFERENCE.md`.
+
+
 **Назначение:** точка входа для разработчика или ИИ-агента перед изучением и реализацией модуля автоматизированных экспериментов.  
 **Рабочая ветка:** `feature/image-geometry-optimization`.  
 **Корень приложения:** `AutoDraw_Stage20/`.  
@@ -15,7 +18,7 @@
 | 2 | [TASKS.md](TASKS.md) | Текущие статусы INT-003—INT-009 и зависимости |
 | 3 | [PROJECT_STATUS.md](PROJECT_STATUS.md) | Что подтверждено, что не завершено и какие действуют ограничения |
 | 4 | [GAME_MONITOR_BRUSH_LAB_PLAN.md](../GAME_MONITOR_BRUSH_LAB_PLAN.md) | Подробный технический контекст Game Monitor, CHALK и лаборатории кистей |
-| 5 | [source/game_monitor/README.md](../source/game_monitor/README.md) | Подключение, команды, snapshot и ограничения Game Monitor 0.2.0 |
+| 5 | [source/game_monitor/README.md](../source/game_monitor/README.md) | Подключение, команды, snapshot и ограничения Game Monitor 0.2.1; source provenance и границы runtime evidence |
 | 6 | [MODULE_REFERENCE.md](MODULE_REFERENCE.md) | Быстрый поиск назначения основных программных модулей |
 | 7 | [EXECUTOR_API_REFERENCE.md](EXECUTOR_API_REFERENCE.md) | Интерфейсы Stage6 и executor |
 | 8 | [PREPARATION_API_REFERENCE.md](PREPARATION_API_REFERENCE.md) | Интерфейсы модулей подготовки и лаборатории |
@@ -24,9 +27,11 @@
 | 11 | [DATA_FORMATS_AND_PROFILES.md](DATA_FORMATS_AND_PROFILES.md) | Форматы профилей, калибровки, планов и отчётов |
 | 12 | [WORK_LOG.md](WORK_LOG.md) и [DECISIONS.md](DECISIONS.md) | История технических выводов и принятых решений |
 | 13 | [CHALK_RADIUS_MATRIX_RESULTS.md](CHALK_RADIUS_MATRIX_RESULTS.md) | Завершённые 21 измерение расхода по радиусам и границы вывода |
-| 14 | [../CHALK_GEOMETRY_MATRIX_PLAN.md](../CHALK_GEOMETRY_MATRIX_PLAN.md) | Активный план G1–G3: геометрия, перекрытие, скорость и sampling |
+| 14 | [../CHALK_GEOMETRY_MATRIX_PLAN.md](../CHALK_GEOMETRY_MATRIX_PLAN.md) | Исторический протокол G1–G3; результаты завершённых серий в CHALK G3 results, текущий backlog — в TASKS/ROADMAP |
 
 ## 2. Карта компонентов: где искать код
+
+**Приоритет для продолжения работы:** FILL-001-RS renderer/footprint gate и GAME-BRUSH-REPLICATION offline reference; INT-006 domain/safety margin остаётся отдельной задачей. Не запускать live captures без отдельного разрешения.
 
 | Компонент | Основной файл / каталог | Что искать |
 |---|---|---|

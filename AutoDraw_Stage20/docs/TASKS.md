@@ -15,8 +15,8 @@
 | INT-007 | P2 | BLOCKED | Интеграция модели после INT-006 |
 | INT-008 | P2 | TODO/BLOCKED | Оптимизация кистей/траекторий/покрытия после INT-007 |
 | INT-009 | P2 | TODO/BLOCKED | Holdout-проверка прогноза, exact CHALK и качества полного рисунка |
-| MONITOR-AUTOCAPTURE-STATUS | P2 | RECONCILE | Старый bridge design расходится с DONE-статусом INT-004 и поздними captures |
-| DOC-STATUS-SYNC | P2 | IN_PROGRESS | Управляющие документы синхронизированы; остаются исторические профильные планы/design/README со статусами, перечисленными ниже |
+| MONITOR-AUTOCAPTURE-STATUS | P2 | RECONCILE | Сверить legacy bridge design с текущей реализацией и accepted captures; старый design не является источником текущего статуса |
+| DOC-STATUS-SYNC | P2 | DONE | 2026-11-04: синхронизированы управляющие документы, индекс, архитектура/CI map и исторические профильные планы/README; исторические результаты сохранены |
 | INT-003 | — | CLOSED_NOT_REQUIRED | По решению пользователя: отдельное исследование overhead Monitor не требуется |
 | CHALK-SAMPLING-DOMAIN | — | CLOSED_NOT_REQUIRED | По решению пользователя: расширение sampling-domain не требуется |
 
@@ -130,7 +130,7 @@
 
 ## Документационные расхождения и завершённые задачи
 
-Перед закрытием backlog отдельно синхронизировать устаревшие статусы: CHALK_GEOMETRY_MATRIX_PLAN.md (старый G3 pending), CHALK_INT006R_LIVE_PREFLIGHT_AND_VISUAL_AUDIT_2026-11-03.md и CHALK_RADIUS_GEOMETRY_CROSS_VALIDATION_PLAN_2026-11-03.md (старый manual visual pending), CHALK_NEXT_STEPS_PLAN_2026-11-02.md, BRUSH_MODULE_QUICK_INDEX.md и source/game_monitor/README.md. Не переписывать исторические результаты; добавить отметку HISTORICAL/SUPERSEDED и ссылку на актуальные статусы. Проверить PROJECT_STATUS.md и старые bridge design документы на те же расхождения.
+**DOC-STATUS-SYNC закрыта 2026-11-04.** Устаревшие статусы в `CHALK_GEOMETRY_MATRIX_PLAN.md`, INT006R live preflight/cross-validation plans, `CHALK_NEXT_STEPS_PLAN_2026-11-02.md`, `BRUSH_MODULE_QUICK_INDEX.md`, `source/game_monitor/README.md` и `BRUSH_MONITOR_AUTOCAPTURE_DESIGN.md` помечены как исторические либо снабжены актуальной ссылкой. Архивные результаты и исходные evidence не переписывались. Канонические статусы находятся в `PROJECT_STATUS.md`, `TASKS.md` и `ROADMAP.md`.
 
 - **MONITOR-AUTOCAPTURE-STATUS:** TASKS отмечает INT-004 DONE и поздние captures связаны с Monitor reports; BRUSH_MONITOR_AUTOCAPTURE_DESIGN всё ещё сообщает о not_tested Firefox transport/manifest binding. Сверить текущий код и accepted bundles; если закрыто — пометить старый design как superseded, если нет — выделить residual gate.
 - G1 принят 12/12 в отдельном корректно маркированном блоке; старая серия с ошибочным repeat metadata остаётся исторической.

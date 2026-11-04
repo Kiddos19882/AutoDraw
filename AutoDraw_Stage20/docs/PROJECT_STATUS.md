@@ -1,13 +1,21 @@
 # Актуальная точка продолжения — 2026-11-04
 
-- **Рабочая ветка:** `feature/image-geometry-optimization`.
-- **HEAD на начало этой документальной синхронизации:** `59a730ea219671c236c642322e5365823d7c82e1`; последний commit добавил в backlog блокер выбора BoardPane, который не применим к подтверждённому текущему сценарию.
-- **Последний подтверждённый code/test HEAD по существующей статусной документации:** `af30b5fdf1c926d3493bff90706806f5d3a28c43`; полный CI [41859709320](https://github.com/Kiddos19882/AutoDraw/actions/runs/41859709320) — SUCCESS. Эта синхронизация не меняет code/test lineage.
-- **Сценарий Game Monitor:** комната без других досок; на экране одна пустая тестовая доска. Различение preview BoardPane и PainterPopup BoardPane не входит в текущий объём и не является блокером. Статическое наблюдение о двух экземплярах сохранено в профильном отчёте как историческое, не применимое к текущему сценарию.
-- **Игровые assets:** пользователь подтвердил, что `main.min_653f95bc.js`, `mergeEngine_df2e5bc5.js` и `manifest.json` скачаны с сайта запущенной игры одновременно. В согласованном наборе статически указана версия Egret **5.4.1**; ROUND caps/joints defaults и CanvasRenderer implementation найдены в merge bundle. Фактический backend активной сессии, zero-length rasterization, полный popup/global transform и pixel footprint всё ещё требуют отдельного evidence.
-- **Синхронизация документации:** `DOC-STATUS-SYNC — IN_PROGRESS`; управляющие документы обновлены, оставшиеся исторические профильные планы/design/README перечислены в TASKS.md.
-- **Текущие технические gates:** FILL-001-RS capture остаётся REJECTED (exact CHALK=1260 для этого запуска; coverage=98.430600%, leakage=11); 45-cell matrix BLOCKED. INT-006 остаётся IN_PROGRESS до обоснования domain и safety margin; INT-007 BLOCKED. Capsule renderer acceptance/planner integration остаются открытыми.
-- **Ограничения:** эта работа — только документация. Исходники, тесты, конфигурации, workflow, экспериментальные данные и `master` не изменяются; игровые/live эксперименты не запускаются. GitHub API не даёт локальный `git status`.
+**Срез проверен:** 4 ноября 2026 г.  
+**Рабочая ветка:** `feature/image-geometry-optimization`.  
+**HEAD до документальной синхронизации:** `a442ee3790d360a9fc947995cd01daf0d96d6301` (`docs: changelog game brush source trace`).
+
+- **Последний подтверждённый code/test HEAD:** `af30b5fdf1c926d3493bff90706806f5d3a28c43`. Полный CI [41859709320](https://github.com/Kiddos19882/AutoDraw/actions/runs/41859709320) — SUCCESS: Preparation/G3 832 passed, 24 warnings, 82 subtests; Game Monitor/Bridge, Executor, Application integration, INT-006 PNG audit и Windows portable build/startup smoke-test — SUCCESS. Optional algorithm benchmarks — SKIPPED. Это evidence code/test lineage, а не CI для последующих документационных commits.
+- **Диапазон между code/test HEAD и HEAD перед синхронизацией:** 84 commits; compare показывает изменения только в Markdown-документации, `TEST_RESULTS.txt` и трёх engine assets. Исходники приложения, тесты и workflow в этом диапазоне не менялись.
+- **Игровые assets:** пользователь подтвердил единое происхождение `main.min_653f95bc.js`, `mergeEngine_df2e5bc5.js` и `manifest.json` — они скачаны с сайта запущенной игры одновременно. Статический анализ merge bundle показывает Egret 5.4.1; CanvasRenderer/WebGLRenderer присутствуют, ROUND defaults заданы в GraphicsNode. Фактически выбранный backend сессии, полный popup/global→screen transform, clipping/device-pixel mapping, zero-length rasterization и pixel footprint не установлены.
+- **GAME-BRUSH-REPLICATION:** source trace завершён (E1); offline replica не реализована, PNG pixel equivalence не проверена. Следующий шаг — определить backend/transform и подготовить frozen fixtures/reference harness. Детали: [engine report, раздел 14](CHALK_GAME_ENGINE_POINT_COST_AND_BRUSH_WIDTH_2026-11-03.md#14-полная-трассировка-цепочки-игровой-кисти-и-границы-воспроизведения--2026-11-04).
+- **FILL-001-RS:** единственный исправно связанный live capture содержит 27/27 strokes и exact CHALK=1260 (pointCount 1→1261), но PNG gate REJECTED: coverage=98.430600%, leakage=11 при критериях coverage≥99% и leakage=0. 45-cell matrix остаётся BLOCKED. Значение 1260 относится только к этому запуску.
+- **INT-006:** D1–D5 45/45 и официальный analyzer завершены; domain validation и обоснование safety margin остаются открытыми. **INT-007 BLOCKED** до закрытия INT-006.
+- **BRUSH-FOOTPRINT-CAPSULE-001:** offline implementation/tests/benchmark готовы; renderer fixture acceptance и решение о planner integration открыты. Модель не считается копией игрового rasterizer и не установлена как причина FILL-001-RS rejection.
+- **Game Monitor:** текущий пользовательский сценарий — одна пустая тестовая доска без других досок. Историческая неоднозначность preview/PainterPopup BoardPane не блокирует этот сценарий; универсальная корректность auto-discovery не заявляется.
+- **Синхронизация документации:** `DOC-STATUS-SYNC` закрывается этим документальным increment после обновления управляющих документов, индекса, карт тестов/архитектуры и устаревших профильных инструкций. `MONITOR-AUTOCAPTURE-STATUS` остаётся отдельной задачей RECONCILE.
+- **Границы выполненной работы:** только Markdown-документация. Исходники, тесты, конфигурации, workflow, engine assets, экспериментальные данные и `master` не изменяются; live/game experiments и тестовые запуски не выполняются. GitHub API не предоставляет локальный `git status`.
+
+**Источники текущего статуса:** [TASKS.md](TASKS.md), [ROADMAP.md](ROADMAP.md), [TEST_RESULTS.md](TEST_RESULTS.md), [инвентаризация документации](DOCUMENTATION_INVENTORY_2026-11-03.md).
 
 ---
 
