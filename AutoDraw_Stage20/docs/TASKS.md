@@ -34,7 +34,9 @@
 
 **Дополнение 2026-11-04 — source trace:** напрямую прочитан bundle из `master` (blob SHA `28838e803dcc6f85efb13febd93cc9e0f5046ffc`). Найдены `BoardPane.redraw()`, `setRadius()`, `onDrawStart()`, `onDrawing()`, `onDrawingEnd()`, `BlackBoardAtom.pushPoint()`, `Painter.drawNormalLine()` и `Painter.drawSmoothLine()`. Игровой код передаёт brush value как thickness в `Graphics.lineStyle`; normal path — polyline, smooth path — midpoint/`curveTo`. Вызов не задаёт caps/joints явно. Пользователь визуально наблюдает круглую кисть; это согласуется с Egret ROUND defaults, но deployed runtime/version и точная rasterization ещё не подтверждены.
 
-**Следующий технический шаг:** установить Egret runtime, реально загруженный игрой, и popup BoardPane → screen transform; затем сравнить offline capsule + smooth-path rasterization с frozen PNG fixtures. Не копировать Egret целиком и не заменять его приближённой OpenCV-моделью до такого сравнения.
+**Дополнение 2026-11-04 — копия engine assets в feature branch:** commit [d3322fe](https://github.com/Kiddos19882/AutoDraw/commit/d3322fe35c808bde079c79545cc839636b7cda2a) добавил `AutoDraw_Stage20/gameEngine/` с файлами `main.min_653f95bc.js`, `mergeEngine_df2e5bc5.js` и `manifest.json`. Это новый доступный источник для статического исследования. Он не должен автоматически считаться тем же bundle, который загружался в старых captures: исторический main URL имел имя `main.min_6ecc02a4.js`, а ранее изученный master bundle — `main.min_570122a1.js`. Git blob IDs и точные пути приведены в [PROJECT_STATUS.md](PROJECT_STATUS.md).
+
+**Следующий технический шаг:** статически исследовать bundles из `gameEngine/`, сравнить их содержимое/hash с историческими runtime assets и ранее изученным master bundle, установить происхождение/версию; затем продолжить проверку Egret runtime и popup BoardPane → screen transform, zero-length rasterization и offline capsule/smooth-path comparison. Не считать deployed runtime установленным только по именам файлов; не запускать live capture до закрытия offline gates и отдельного разрешения.
 
 ### 2. FILL-001-RS-MATRIX — полная матрица из 45 экспериментов
 
