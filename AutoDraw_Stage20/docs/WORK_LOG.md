@@ -2835,3 +2835,14 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - Согласованный комплект `gameEngine/main.min_653f95bc.js`, `mergeEngine_df2e5bc5.js`, `manifest.json` подтверждён пользователем как скачанный с сайта запущенной игры одновременно; версия Egret 5.4.1 отражена как установленная для этого набора. Старые Resource Timing records сохранены как исторические, не тождественные доказательства содержимого старых assets.
 - Актуализированы TASKS, PROJECT_STATUS, ROADMAP, DECISIONS и профильный CHALK engine report; добавлены записи WORK_LOG и CHANGELOG. Остальные исторические планы/design-документы не переписывались; `DOC-STATUS-SYNC` остаётся IN_PROGRESS до отдельной сверки перечисленных в TASKS профильных материалов.
 - Только Markdown. Код, тесты, конфигурации, workflow, первичные данные, live captures и `master` не изменялись; игровые эксперименты не запускались. GitHub API не предоставляет локальный `git status`.
+
+
+## 2026-11-04 — GAME-BRUSH-REPLICATION: полная статическая трассировка
+
+- Прочитан полный основной bundle main.min_653f95bc.js (Git blob 46cc74de00b6cb5d207b1e1a2ffcd81613b6d388) и связанный mergeEngine_df2e5bc5.js (blob d613d2b97e2436521aa3870478c69e99eac1f19f).
+- Прослежены BoardPane input events → ENTER_FRAME sampling → globalToLocal → bounds check → BlackBoardAtom dedup → pointCount update → redraw → atom.add.
+- Подтверждены normal polyline и smooth midpoint/curveTo path, передача UI value как Graphics line width, default ROUND caps/joints, наличие Canvas/WebGL renderer и выбор backend через setRenderMode.
+- Сопоставлены текущие AutoDraw executor, OpenCV FILL-001 rasterizer и ideal capsule model; ни один не является доказанной pixel-identical копией игровой цепочки.
+- Обновлены TASKS/ROADMAP/PROJECT_STATUS и существующий engine report; отдельный дублирующий документ не создавался.
+- Только статический анализ и Markdown. Код, тесты, конфигурации, workflow, primary evidence и master не изменялись. Скрипты/тесты/CI не запускались. Live drawing и игровые эксперименты не выполнялись.
+- Неизвестными остаются backend конкретной сессии, полный display/CSS/device-pixel transform, zero-length rasterization и точный pixel footprint. Следующий gate — offline renderer mode/transform evidence и frozen PNG fixtures.
