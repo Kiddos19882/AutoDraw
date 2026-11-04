@@ -1,3 +1,9 @@
+## 2026-11-04 — FILL-001-RS PNG audit transform correction
+
+- Исправлено несовпадение affine mapping frozen mask и executor screen coordinates: audit использует те же (W−1)/460 и (H−1)/240 scales.
+- Добавлены regression assertions для client ROI 581×304 и inverse nearest-neighbor mapping.
+- Commits: [4797aa5](https://github.com/Kiddos19882/AutoDraw/commit/4797aa5e2e3d9f78656c91dcddf285304eae55c1), [a950084](https://github.com/Kiddos19882/AutoDraw/commit/a950084db14fd1560aa15f099da4a0108c9631e7).
+- CI/replay после изменений ещё не подтверждены; предыдущие 97.673218% coverage / 28 leakage относятся к старой версии audit. Capture не принят до повторной проверки. 45-task matrix остаётся BLOCKED.
 ## 2026-11-04 — FILL-001-RS runtime discovery replay и live PNG rejection
 
 - Изучен evidence commit [5308214](https://github.com/Kiddos19882/AutoDraw/commit/530821497ce3a6bd5152318a78e1f06cb836f288): основной Bridge run `6a17a297-ea14-4527-9527-bfd8de3bd335`, 27/27 strokes, radius=10, exact pointCount 1→1261, CHALK=1260; dropped events, Monitor errors, Bridge send failures и sequence gaps — 0.
