@@ -4,12 +4,20 @@
 
 - **INT-003 — CLOSED_NOT_REQUIRED** по решению пользователя. Дополнительная A/B/C матрица overhead Monitor не нужна для текущей цели. Существующий Game Monitor/Bridge и telemetry остаются рабочими инструментами; не требуется только отдельная performance-оценка Monitor.
 - **CHALK-SAMPLING-DOMAIN — CLOSED_NOT_REQUIRED** по решению пользователя. Не расширять отдельную sampling step×delay матрицу. G3 остаётся подтверждённым только для длинных горизонтальных линий; его коэффициенты не экстраполировать на иные геометрии.
-- **P0 FILL-001-RS renderer footprint — BLOCKED:** последний run 27/27 strokes, exact CHALK=1260, PNG REJECTED (coverage 98.430600%, leakage 11). Неизвестный renderer footprint/transform остаётся причиной, требующей проверки, а не установленным объяснением residual.
+- **P0 FILL-001-RS renderer footprint — BLOCKED:** последний run 27/27 strokes, exact CHALK=1260, PNG REJECTED (coverage 98.430600%, leakage 11). Source-level brush path теперь непосредственно прослежен в master bundle: thickness передаётся в Egret Graphics, smooth/normal path различаются; пользователь визуально наблюдает круглую кисть. Deployed Egret runtime, round caps/joins в конкретной сборке, pixel rasterization и полный screen transform всё ещё не подтверждены. Причина residual не установлена.
 - **P0 FILL-001-RS 45-cell matrix — BLOCKED:** запускать только после принятого single-task preflight и отдельного разрешения.
 - **P1 BRUSH-FOOTPRINT-CAPSULE-001 — OPEN:** offline реализация и CI завершены; renderer fixture acceptance и решение о planner integration открыты. Не считать причиной RS rejection.
 - **P1 INT-006 — IN_PROGRESS:** 45/45 D1–D5 accepted, но safety margin и production eligibility не установлены; расширение domain необходимо до применения модели к полным рисункам.
 
 Последовательность: renderer/transform и offline PNG gate → принятый single-task preflight (при отдельном разрешении на live) → отдельное решение о 45 captures; INT-006 расширяется как независимая валидация модели. Capsule проверяется offline и не подменяет renderer gate.
+
+## Дополнение — прямой source trace игровой кисти (2026-11-04)
+
+Клиентский bundle из `master` прочитан по Git blob SHA `28838e803dcc6f85efb13febd93cc9e0f5046ffc` без исполнения и без изменения master. Прослежены `BoardPane.redraw()`, `setRadius()`, `onDrawStart()`, `onDrawing()`, `onDrawingEnd()`, `BlackBoardAtom.pushPoint()`, `Painter.drawNormalLine()` и `Painter.drawSmoothLine()`.
+
+Игровое значение кисти передаётся в `Graphics.lineStyle` как thickness; normal path использует moveTo/lineTo, smooth path — midpoint и curveTo. Пользователь сообщил, что визуально видит кисть круглой. Это согласуется с ROUND caps/joins defaults Egret reference API, но не заменяет подтверждение deployed runtime игры.
+
+Следующий gate остаётся offline: определить фактическую версию Egret/render path и popup/BoardPane transform, затем проверить capsule и smooth-path rasterization на frozen PNG. FILL-001-RS и 45-cell live matrix остаются BLOCKED; live запусков и изменений кода не было.
 
 ## Дополнение — capsule model per-segment broad-phase и benchmark (2026-11-04)
 
