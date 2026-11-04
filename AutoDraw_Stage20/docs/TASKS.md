@@ -3,7 +3,7 @@
 - [x] Сопоставить существующий saved run `6a17a297` по 27 штрихам: 1260 POINT_QUOTA_UPDATE, cadence 28.26–29.50 points/s, median update interval 33 ms; browser rAF около 60 FPS не считать частотой Egret ENTER_FRAME.
 - [x] Установить ограничение исторического evidence: старый finalizer не сохранил исходные per-stroke rAF intervals; восстановить их из старого run нельзя.
 - [x] Реализовать для будущих runs strokeId-bound frame_probe, сохранение raw intervals, `frame_probe_by_stroke` и `per_stroke_metrics` (commits 02907aca, ec2ed77, ead8808, 730590d).
-- [x] Подтвердить полный CI [41840582147](https://github.com/Kiddos19882/AutoDraw/actions/runs/41840582147): обязательные jobs SUCCESS, optional benchmarks SKIPPED; Windows portable build/startup smoke-test и INT-006 PNG audit SUCCESS. Run checkout SHA `6fd3c91`; текущий HEAD `1315dc0` отличается последующими docs-only commits.
+- [x] Подтвердить полный CI [41840582147](https://github.com/Kiddos19882/AutoDraw/actions/runs/41840582147): обязательные jobs SUCCESS, optional benchmarks SKIPPED; Windows portable build/startup smoke-test и INT-006 PNG audit SUCCESS. Run checkout SHA `6fd3c91`; HEAD перед финальной синхронизацией документации `1315dc0`; последующие commits — docs-only.
 - [ ] Получить фактическую per-stroke frame_probe серию в новом live run после прохождения renderer offline gate; связать её с pointCount delta, stroke duration и Executor point_step/delay. До этого live run не запускать.
 
 **Renderer gate не закрыт:** capture REJECTED (coverage=98.430600%, leakage=11), exact CHALK=1260 для прежнего single-task run; coverage≥99% / leakage=0 не достигнуты. 45-task matrix остаётся BLOCKED.
