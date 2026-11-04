@@ -165,4 +165,18 @@ Replay выполнен; блокировка следующего запуск�
 - Не изменялись исходники, тесты, конфигурации, frozen mask/plan, acceptance thresholds и production defaults; live experiments не запускались.
 
 **Следующий обязательный шаг:** получить координаты actual uncovered target pixels и 11 leakage pixels из неизменённых PNG, сопоставить с screen-transformed centerlines/renderer footprint, и только после этого продолжить contour candidate offline. Новый live preflight и 45-task matrix остаются заблокированными.
+## Actual PNG residual diagnostic result — CI 41787492122
 
+Committed-evidence replay diagnostic executed successfully in Preparation/G3 (804 passed, 82 subtests passed). Corrected audit still rejects capture: coverage=98.430600%, leakage=11.
+
+Actual PNG pixel map:
+- 1116 uncovered target pixels;
+- top=244, bottom=239, left-middle=134, right-middle=499, interior/other=0;
+- largest component area=870, bbox screen xywh=[460,63,33,178], right perimeter;
+- additional components: area 142 bbox [88,90,2,122]; area 54 bbox [101,233,13,7]; area 41 bbox [101,64,13,6]; remaining components 6,1,1,1 pixels;
+- nearest scanline centerline distances: <=2px=10, 2–5px=320, 5–10px=786, >10px=0;
+- leakage coordinates xy: [116,63], [117,63], [92,78], [91,81], [90,83], [90,84], [89,85], [90,85], [90,218], [116,240], [117,240].
+
+Pixel evidence confirms uncovered pixels confined to configured perimeter zones. Right perimeter is the largest failure region; leakage is sparse near opposite perimeter and rounded corners. This is consistent with endpoint/perimeter footprint mismatch, but does not establish game brush effective radius, cap geometry, or units. Actual engine rendering path and executor sampling must be inspected before selecting endpoint extension or contour offset.
+
+Do not compare 1116 screen pixels directly with 304 logical pixels from planner OpenCV simulation. Capture remains rejected and 45-task matrix blocked. No live experiment or production change.
