@@ -124,3 +124,45 @@ Replay выполнен; блокировка следующего запуск�
 
 **Будущий кандидат:** после основной заливки выполнить одну непрерывную обводку контура, правильно сместив центральную линию внутрь области с учётом фактического renderer footprint, чтобы край кисти закрывал границу без выхода наружу. Это не реализовано и не подтверждено. До рассмотрения нужны offline geometry/raster validation, затем отдельное разрешение на live проверку; критерии — coverage≥99%, leakage=0 и exact CHALK по `pointCount_after - pointCount_before`. Длина контура и proxy points не заменяют измерение расхода.
 
+## 8. Offline edge breakdown planner model и exploratory contour pass (2026-11-04)
+
+### 8.1 Воспроизведение текущей planner raster model
+
+По frozen mask `rectangle` (SHA-256 `ac1c6660e5986cdf534328c6dbcd5020f631168b1473c24b29e7609eb827998b`) и committed plan `fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1` воспроизведены 27 scanline centerlines с `y=55..185`, шагом 5. Target area — 44 653 logical pixels. Использована та же концепция OpenCV round-capped line model, что описана в `chalk_fill_fixed_radius_planner.py`.
+
+В этой **planner model** осталось 304 uncovered target pixels (0.680805%):
+
+| Область logical mask | Uncovered pixels |
+|---|---:|
+| Верхняя полоса, y=50..74 | 80 |
+| Нижняя полоса, y=166..190 | 80 |
+| Левая боковая полоса, y=75..165 и x≤94 | 72 |
+| Правая боковая полоса, y=75..165 и x≥366 | 72 |
+| Внутренняя область, y=75..165 и 95≤x≤365 | 0 |
+| **Всего** | **304** |
+
+Модельный leakage — 0. Это согласуется с гипотезой о краевой концентрации недопокрытия и подтверждает, что центральная часть в planner raster model закрыта. Однако это **не actual PNG pixel breakdown**: исходный corrected audit по фактическому `after.png` остаётся coverage=98.430600%, leakage=11. Координаты actual uncovered target pixels и 11 leakage pixels ещё не получены, поэтому фактическую причину нельзя считать установленной.
+
+### 8.2 Exploratory contour-pass sweep
+
+После неизменённого набора 27 scanlines смоделирован один замкнутый contour pass. Контур получался из той же frozen mask после erosion эллиптическим ядром с inward offset; затем он rasterized одной замкнутой линией шириной 10 px в OpenCV model.
+
+| Inward offset | Coverage | Leakage | Uncovered | Offline gate |
+|---:|---:|---:|---:|---|
+| 5 px | 99.964168% | 32 | 16 | FAIL |
+| 6 px | 99.516270% | 0 | 216 | PASS |
+| 7 px | 99.372942% | 0 | 280 | PASS |
+| 8 px | 99.328153% | 0 | 300 | PASS |
+
+Для offset 6 один замкнутый contour содержит 64 вершины и имеет длину приблизительно 846.225 logical px в этой OpenCV approximation. Эта длина не является CHALK estimate. Результат показывает потенциальную геометрическую возможность закрыть краевой дефицит одной обводкой с корректным inward offset, но offset 5/6 резко меняет leakage; следовательно, подбор смещения должен быть привязан к фактическому footprint игрового renderer.
+
+### 8.3 Статус и ограничения
+
+- Edge concentration: подтверждена для воспроизведённой planner raster model; для actual PNG residuals — не подтверждена (E0).
+- Contour pass: exploratory offline candidate, не реализован, не включён в frozen plan и не live-validated.
+- Corrected actual PNG gate остаётся failed: coverage=98.430600%, leakage=11; capture REJECTED.
+- Runtime binding и exact CHALK=1260 остаются подтверждёнными независимо от PNG quality gate.
+- Не изменялись исходники, тесты, конфигурации, frozen mask/plan, acceptance thresholds и production defaults; live experiments не запускались.
+
+**Следующий обязательный шаг:** получить координаты actual uncovered target pixels и 11 leakage pixels из неизменённых PNG, сопоставить с screen-transformed centerlines/renderer footprint, и только после этого продолжить contour candidate offline. Новый live preflight и 45-task matrix остаются заблокированными.
+
