@@ -2543,3 +2543,11 @@ Brush Test acceptance и матричные валидаторы больше н
 - Это устраняет слабость прежнего теста, где fixture повторял формулу вручную и мог совпасть с audit при расхождении с executor helper.
 - Commit: [c399433](https://github.com/Kiddos19882/AutoDraw/commit/c399433af7f2e7bc547a9f35274aaf24d3c3a52e).
 - Проверка pytest и CI для нового commit пока не подтверждена: combined status пуст, PR-triggered workflow runs отсутствуют; локальная среда репозитория недоступна.
+
+## 2026-11-04 — проверка CI evidence boundary после affine correction
+
+- Проверен GitHub Actions run [41772866679](https://github.com/Kiddos19882/AutoDraw/actions/runs/41772866679): все обязательные jobs SUCCESS, optional benchmarks SKIPPED; Preparation/G3 job включает `pytest -q -ra tests` и exhaustive static sweep artifact.
+- Этот run относится к более раннему code/test HEAD `974f949`; он не покрывает последующие commits `4797aa5`, `a950084`, `c399433`.
+- Проверен regression test: helper вызывает реальный `transform_logical_brush_plan_to_screen()` и использует возвращённые `scale_x/scale_y`; фактический pytest после изменения не запускался в доступной среде.
+- GitHub connector `fetch_commit_workflow_runs` возвращает только PR-triggered runs; открытых PR для рабочей ветки не найдено. Поэтому отсутствие результата не используется как доказательство отсутствия push CI. Push workflow ожидается по path filter `source/**`, но актуальный run не удалось независимо получить.
+- Committed PNG replay исправленным audit и live runtime эксперименты не выполнялись. 45-task matrix остаётся BLOCKED.
