@@ -2755,3 +2755,15 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - Сохранены API, global bounds, определение potential/guaranteed и fail-closed ограничения; production planners не подключались.
 - Добавлены тесты эквивалентности с прежним global-AABB reference на winding polyline и инвариантности разбиения прямого сегмента на коллинеарные части.
 - Ожидаем CI run [41848358502](https://github.com/Kiddos19882/AutoDraw/actions/runs/41848358502) на HEAD `6afdefc7ff2f18db544e55572ed918841d448164`. Фактический performance gain пока не измерен; live/runtime проверок не было.
+
+
+## 2026-11-04 — capsule model: independent polyline oracle and per-segment benchmark
+
+- Добавлен независимый full-canvas oracle в `source/preparation/tests/test_capsule_footprint_masks.py`: локальные point-segment distance и orientation-based segment intersection не вызывают production helpers. Проверены 7 параметризованных edge cases и 16 seeded polylines; potential/guaranteed masks совпали.
+- Добавлен `tests/benchmark_capsule_rasterization.py`: сравнивает former global-AABB enumeration с production per-segment broad phase на пяти синтетических полилиниях; 7 timing repeats; маски должны совпадать. Считает candidate slots, уникальные клетки, segment-rectangle и point-segment helper calls, median wall-clock.
+- Добавлен workflow step в `.github/workflows/geometry-tests.yml`, публикующий `autodraw-capsule-broad-phase-benchmark` artifact.
+- Первый CI запуск [41857043512](https://github.com/Kiddos19882/AutoDraw/actions/runs/41857043512) выявил ModuleNotFoundError: benchmark script не находил preparation module при запуске из tests directory. Исправлен sys.path bootstrap.
+- Повторный CI [41858081222](https://github.com/Kiddos19882/AutoDraw/actions/runs/41858081222) прошёл полностью, но review artifact выявил неполный reference counter: вложенные вызовы point-segment helper внутри segment-rectangle predicate не учитывались. Этот artifact не использован для geometry predicate comparison; счётчики исправлены симметричной instrumentation обоих вариантов.
+- Финальный CI [41859709320](https://github.com/Kiddos19882/AutoDraw/actions/runs/41859709320) на HEAD `af30b5fdf1c926d3493bff90706806f5d3a28c43` — SUCCESS: Preparation/G3 832 passed, 24 warnings, 82 subtests; Game Monitor/Bridge, Executor, Application integration, INT-006 PNG audit и Windows portable build/startup smoke-test — SUCCESS; optional algorithm benchmarks SKIPPED.
+- Benchmark artifact `13338434277`: masks совпали во всех 5 cases. Candidate slots / geometry predicate calls reductions и median speedups: winding 91.09% / 89.30% / 10.91×; large zigzag 96.23% / 94.08% / 20.57×; diagonal turns 59.53% / 58.95% / 2.76×; compact polyline 92.24% / 92.09% / 14.10×; single long segment 0% / 0% / 1.16×.
+- Benchmark wall-clock относится только к Windows GitHub runner и synthetic inputs. CHALK, renderer equivalence, deployed Egret transform и planner integration не проверялись; live experiments не проводились. Frozen masks/plans/thresholds/defaults не менялись.
