@@ -424,4 +424,12 @@ Offline повторение planner model локализовало её 304 unc
 4. После offline gate — только отдельный разрешённый live preflight; затем отдельное решение о 45-cell matrix.
 
 До этого capture остаётся REJECTED/BLOCKED; production code/defaults и live execution не менять.
+## FILL-001-RS diagnostic continuation — 2026-11-04
 
+1. Use the confirmed actual PNG residual map as baseline: 1116 uncovered pixels, all in configured perimeter zones; 0 in interior/other. Right perimeter dominates (499 in right-middle; largest component area 870 at screen bbox [460,63,33,178]).
+2. Inspect engine-side brush rendering and executor point sampling to establish actual screen-space footprint, endpoint cap behavior, and radius units. Keep the current interpretation as a hypothesis until verified.
+3. Evaluate perimeter/contour additions and endpoint adjustments as separate offline candidates. Preserve frozen plan and acceptance thresholds.
+4. Only after a candidate passes independent PNG geometry audit, perform a separately authorized live preflight and measure exact CHALK by pointCount delta.
+5. Unlock the 45-experiment matrix only after successful preflight acceptance.
+
+Current evidence does not justify changing scanline row spacing: diagnostic reports 0 residual pixels in interior/other, while edge zones contain all 1116.
