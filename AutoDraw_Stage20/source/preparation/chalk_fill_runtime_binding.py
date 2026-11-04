@@ -145,8 +145,9 @@ def build_fill001_experiment_context(task: dict[str, Any]) -> dict[str, Any]:
     context = {field: task[field] for field in _CONTEXT_FIELDS}
     if task.get("plan_variant") == "FILL001_RS_V1":
         step, offset = task.get("scanline_row_step"), task.get("scanline_offset")
+        expected_planner_version = 1 if step == 1 and offset == 0 else 2
         if (
-            task.get("planner_version") != 2
+            task.get("planner_version") != expected_planner_version
             or type(step) is not int
             or not 1 <= step <= task["requested_radius"]
             or type(offset) is not int
