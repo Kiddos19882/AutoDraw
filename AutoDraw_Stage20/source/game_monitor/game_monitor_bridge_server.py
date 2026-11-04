@@ -87,6 +87,116 @@ def summarize_intervals(intervals: object) -> dict:
     }
 
 
+def summarize_per_stroke_metrics(events: object) -> list[dict]:
+    """Summarize exact point-counter changes and timing for each identified stroke.
+
+    POINT_QUOTA_UPDATE timestamps come from Monitor's wrapped updateLess calls.
+    They measure accepted point updates, not every ENTER_FRAME callback.
+    """
+    if not isinstance(events, list):
+        return []
+    starts: dict[str, dict] = {}
+    ends: dict[str, dict] = {}
+    updates: dict[str, list[dict]] = {}
+    start_types = {"DRAW_START", "POINTER_DOWN_CANDIDATE"}
+    end_types = {"DRAW_END", "POINTER_UP_CANDIDATE"}
+    for event in events:
+        if not isinstance(event, dict):
+            continue
+        stroke_id = event.get("strokeId")
+        if not isinstance(stroke_id, str) or not stroke_id:
+            continue
+        event_type = event.get("type")
+        if event_type in start_types:
+            previous = starts.get(stroke_id)
+            if previous is None or event.get("t", float("inf")) < previous.get("t", float("inf")):
+                starts[stroke_id] = event
+        elif event_type in end_types:
+            previous = ends.get(stroke_id)
+            if previous is None or event.get("t", float("-inf")) > previous.get("t", float("-inf")):
+                ends[stroke_id] = event
+        elif event_type == "POINT_QUOTA_UPDATE":
+            updates.setdefault(stroke_id, []).append(event)
+
+    stroke_ids = set(starts) | set(ends) | set(updates)
+    ordered_ids = sorted(stroke_ids, key=lambda key: (
+        starts.get(key, {}).get("t", float("inf")), key
+    ))
+    results: list[dict] = []
+    for stroke_id in ordered_ids:
+        start = starts.get(stroke_id, {})
+        end = ends.get(stroke_id, {})
+        start_snapshot = start.get("board") or start.get("before")
+        end_snapshot = end.get("board") or end.get("after")
+        before_count = start_snapshot.get("pointCount") if isinstance(start_snapshot, dict) else None
+        after_count = end_snapshot.get("pointCount") if isinstance(end_snapshot, dict) else None
+        exact_counts = (
+            type(before_count) is int and type(after_count) is int
+            and after_count >= before_count
+        )
+        point_delta = after_count - before_count if exact_counts else None
+        stroke_updates = sorted(
+            updates.get(stroke_id, []),
+            key=lambda item: item.get("t", float("inf"))
+        )
+        update_deltas: list[int] = []
+        update_times: list[float] = []
+        all_update_snapshots_exact = True
+        for item in stroke_updates:
+            before = item.get("before")
+            after = item.get("after")
+            if (isinstance(before, dict) and isinstance(after, dict)
+                    and type(before.get("pointCount")) is int
+                    and type(after.get("pointCount")) is int
+                    and after["pointCount"] >= before["pointCount"]):
+                update_deltas.append(after["pointCount"] - before["pointCount"])
+            else:
+                all_update_snapshots_exact = False
+            timestamp = item.get("t")
+            if isinstance(timestamp, (int, float)) and not isinstance(timestamp, bool):
+                update_times.append(float(timestamp))
+        intervals = sorted(
+            right - left for left, right in zip(update_times, update_times[1:])
+            if right >= left
+        )
+        def percentile(values: list[float], fraction: float) -> float | None:
+            if not values:
+                return None
+            index = min(len(values) - 1, max(0, math.ceil(len(values) * fraction) - 1))
+            return round(values[index], 3)
+        start_t, end_t = start.get("t"), end.get("t")
+        duration = (
+            round(float(end_t) - float(start_t), 3)
+            if isinstance(start_t, (int, float)) and isinstance(end_t, (int, float))
+            and end_t >= start_t else None
+        )
+        update_delta_sum = sum(update_deltas)
+        results.append({
+            "stroke_id": stroke_id,
+            "lifecycle_status": "complete" if start and end else "incomplete",
+            "started_at_performance_ms": start_t,
+            "ended_at_performance_ms": end_t,
+            "duration_ms": duration,
+            "point_count_before": before_count if type(before_count) is int else None,
+            "point_count_after": after_count if type(after_count) is int else None,
+            "point_count_delta": point_delta,
+            "point_update_event_count": len(stroke_updates),
+            "point_update_delta_sum": update_delta_sum,
+            "point_count_delta_matches_updates": (
+                update_delta_sum == point_delta
+                if exact_counts and all_update_snapshots_exact and stroke_updates else None
+            ),
+            "accepted_points_per_second": (
+                round(point_delta * 1000.0 / duration, 3)
+                if point_delta is not None and duration and duration > 0 else None
+            ),
+            "median_point_update_interval_ms": percentile(intervals, 0.5),
+            "p95_point_update_interval_ms": percentile(intervals, 0.95),
+            "max_point_update_interval_ms": round(max(intervals), 3) if intervals else None,
+        })
+    return results
+
+
 class RunRecorder:
     def __init__(self, output_dir: Path, session_id: str, idle_seconds: float):
         self.output_dir = output_dir
@@ -264,7 +374,9 @@ class RunRecorder:
     def frame_probe(self, message: dict) -> None:
         if self.current is None:
             return
+        stroke_id = message.get("strokeId")
         self.current["frame_probes"].append({
+            "stroke_id": stroke_id if isinstance(stroke_id, str) and stroke_id else None,
             "started_at_performance_ms": message.get("startedAtPerformanceMs"),
             "ended_at_performance_ms": message.get("endedAtPerformanceMs"),
             "visible": message.get("visible") is True,
@@ -378,6 +490,18 @@ class RunRecorder:
             "status": run["interpretation"]["path_length_status"],
             "note": "Coalesced pointDelta values mean intermediate accepted coordinates may be missing."
         }
+        run["per_stroke_metrics"] = summarize_per_stroke_metrics(run["events"])
+        probe_summaries = []
+        for probe in run["frame_probes"]:
+            summary = summarize_intervals(probe.get("intervals", []))
+            summary.update({
+                "stroke_id": probe.get("stroke_id"),
+                "started_at_performance_ms": probe.get("started_at_performance_ms"),
+                "ended_at_performance_ms": probe.get("ended_at_performance_ms"),
+                "visible": probe.get("visible") is True,
+            })
+            probe_summaries.append(summary)
+        run["frame_probe_by_stroke"] = probe_summaries
         all_intervals = [interval for probe in run["frame_probes"]
                          for interval in probe.get("intervals", [])]
         fps = summarize_intervals(all_intervals)
@@ -385,7 +509,7 @@ class RunRecorder:
         fps["visibility_interruption"] = (any(probe.get("visible") is not True for probe in run["frame_probes"])
                                           if run["frame_probes"] else None)
         run["frame_probe"] = fps
-        run["frame_probes"].clear()
+        # Keep raw per-probe intervals in frame_probes for reproducible timing analysis.
         run["interpretation"]["chalk_status"] = run["chalk"]["status"]
         if isinstance(run.get("started_at_performance_ms"), (int, float)) and isinstance(run.get("ended_at_performance_ms"), (int, float)):
             run["elapsed_from_first_to_last_stroke_ms"] = max(0.0, run["ended_at_performance_ms"] - run["started_at_performance_ms"])
