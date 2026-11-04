@@ -34,7 +34,7 @@
 - [FILL-001 — план эффективности заливки](CHALK_FILL_AREA_RADIUS_EFFICIENCY_PLAN_2026-11-03.md) — три формы областей, пять радиусов, 45 captures.
 - [FILL-001 — технический дизайн harness](CHALK_FILL001_HARNESS_DESIGN_2026-11-03.md) — fixed-radius planner, frozen masks, 45-cell matrix, capture validation, отдельный UI/runner и analyzer.
 - [FILL-001 — разбор пользовательского Windows live preflight](CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md) — история двух live attempts; полный run-level/per-stroke CHALK=5999, quota exhaustion на трёх последних strokes, rejected capture и открытый quantitative PNG audit.
-- [FILL-001 — временный план дальнейших работ на пять шагов](CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md) — актуальные software gates, отдельная UI/runner интеграция, Windows live preflight, 45 captures и анализ эффективности.
+- [FILL-001 — временный план дальнейших работ и этап FILL-001-RS](CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md) — software/runtime gates, quota-exhausted preflight, отдельное исследование расстояния между scanline-проходами, versioned candidate и live preflight gate; исходные frozen plans и 45-cell matrix сохраняются.
 - [FILL-001 — аудит интеграции AutoDraw](CHALK_FILL001_AUTODRAW_INTEGRATION_AUDIT_2026-11-03.md) — исторический снимок до появления отдельной вкладки и UI/runner handoff.
 - [FILL-001 matrix/analyzer](../source/preparation/chalk_fill_matrix.py) — экспериментальный manifest schema v2, frozen P1 metadata и fail-closed validation 45 captures.
 - [FILL-001 Game Monitor capture adapter](../source/preparation/chalk_fill_capture_adapter.py) — сборка capture из Monitor events, exact per-stroke CHALK и PNG evidence audit; software regression gate подтверждён CI, live evidence pending.
