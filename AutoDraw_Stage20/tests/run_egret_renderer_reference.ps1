@@ -73,7 +73,7 @@ try {
     }
 
     $dom = Get-Content -Raw $domPath
-    if ($dom -notmatch 'data-reference-status="complete"' -or $dom -notmatch 'data-fixture-count="18"' -or $dom -notmatch 'data-webgl-status="complete"') {
+    if ($dom -notmatch 'data-reference-status="complete"' -or $dom -notmatch 'data-fixture-count="18"' -or $dom -notmatch 'data-webgl-status="complete"' -or $dom -notmatch 'data-webgl-comparison-count="18"') {
         Save-FailureDiagnostics
         $statusMatch = [regex]::Match($dom, '<p id="renderer-status"[^>]*>(.*?)</p>', [System.Text.RegularExpressions.RegexOptions]::Singleline)
         if ($statusMatch.Success) {
@@ -113,9 +113,12 @@ try {
         [System.IO.File]::WriteAllBytes((Join-Path $outputDir $pngName), $pngBytes)
     }
 
-    if ($manifest.webglProbe.status -ne "complete" -or $manifest.webglProbe.comparisonCount -ne 18) {
+    if ($manifest.webglProbe.status -ne "complete" -or $manifest.webglProbe.comparisonCount -ne 18 -or
+        $manifest.runtimeProfile.canvasScaleFactor -ne 2 -or
+        $manifest.runtimeProfile.canvasScaleX -ne 3 -or
+        $manifest.runtimeProfile.canvasScaleY -ne 3) {
         Save-FailureDiagnostics
-        throw "WebGL renderer did not complete all 18 fixture comparisons."
+        throw "WebGL renderer did not complete all 18 comparisons or runtime scale profile differs from snapshot."
     }
 
     Write-Host "Egret actual BoardPane CanvasRenderer + WebGLRenderer generated $($manifest.fixtures.Count) fixtures, 18 WebGL comparisons and $($pngMatches.Count) PNG files."
