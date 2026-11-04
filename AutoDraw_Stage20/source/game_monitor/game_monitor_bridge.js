@@ -6,7 +6,7 @@
     "BOARD_ATTACHED", "BOARD_DETACHED", "DRAW_START", "DRAW_START_APPLIED",
     "DRAW_SAMPLE", "DRAW_END", "BRUSH_CHANGE", "BRUSH_CHANGE_APPLIED",
     "POINT_QUOTA_UPDATE", "GAME_METHOD_ERROR", "POINTER_DOWN_CANDIDATE",
-    "POINTER_UP_CANDIDATE"
+    "POINTER_UP_CANDIDATE", "MOUSE_MOVE_SAMPLE"
   ]);
   const monitor = window.AutoDrawGameMonitor;
   if (!monitor || typeof monitor.subscribe !== "function" || typeof monitor.status !== "function") {
