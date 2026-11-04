@@ -122,26 +122,14 @@
     }
   }
 
-  function makeManualShape(mode, points, lineWidth, color) {
-    const shape = new egret.Shape();
-    const graphics = shape.graphics;
-    graphics.beginFill(16711680, 0);
-    graphics.drawRect(0, 0, BOARD_WIDTH, BOARD_HEIGHT);
-    const clip = egret.Rectangle.create().setTo(0, 0, BOARD_WIDTH, BOARD_HEIGHT);
-    shape.scrollRect = clip;
-    egret.Rectangle.release(clip);
-    graphics.lineStyle(lineWidth, color === undefined ? 0x000000 : color, 1, false);
-    const commands = mode === "smooth"
-      ? buildSmoothPathCommands(points, true, false)
-      : buildNormalPathCommands(points);
-    applyPathCommands(graphics, commands);
-    return { shape, commands };
-  }
-
-  function makeActualBoardPane(mode, points, lineWidth, color) {
-    const BoardPane = root.com && root.com.magnetjoy && root.com.magnetjoy.pet &&
+  function getBoardPaneClass() {
+    return root.com && root.com.magnetjoy && root.com.magnetjoy.pet &&
       root.com.magnetjoy.pet.ui && root.com.magnetjoy.pet.ui.board &&
       root.com.magnetjoy.pet.ui.board.BoardPane;
+  }
+
+  function prepareBoardPane(mode, points, lineWidth, color) {
+    const BoardPane = getBoardPaneClass();
     if (typeof BoardPane !== "function") {
       throw new Error("Game bundle did not expose com.magnetjoy.pet.ui.board.BoardPane.");
     }
@@ -154,7 +142,38 @@
     board.atom.colors = [color === undefined ? 0x000000 : color];
     board.atom.options = [mode === "smooth"];
     board.updateLess();
+    return board;
+  }
+
+  function makeActualBoardPane(mode, points, lineWidth, color) {
+    const board = prepareBoardPane(mode, points, lineWidth, color);
     board.redraw();
+    return {
+      shape: board,
+      commands: mode === "smooth"
+        ? buildSmoothPathCommands(points, true, false)
+        : buildNormalPathCommands(points)
+    };
+  }
+
+  function makeManualBoardPane(mode, points, lineWidth, color) {
+    const board = prepareBoardPane(mode, points, lineWidth, color);
+    const painter = root.com.magnetjoy.painter.Painter;
+    const originalSmooth = painter.drawSmoothLine;
+    const originalNormal = painter.drawNormalLine;
+    painter.drawSmoothLine = function (graphics, acceptedPoints, drawFirstHalf, drawLast) {
+      applyPathCommands(graphics,
+        buildSmoothPathCommands(acceptedPoints, drawFirstHalf, drawLast));
+    };
+    painter.drawNormalLine = function (graphics, acceptedPoints) {
+      applyPathCommands(graphics, buildNormalPathCommands(acceptedPoints));
+    };
+    try {
+      board.redraw();
+    } finally {
+      painter.drawSmoothLine = originalSmooth;
+      painter.drawNormalLine = originalNormal;
+    }
     return {
       shape: board,
       commands: mode === "smooth"
@@ -165,7 +184,13 @@
 
   function compareCanvases(left, right) {
     if (left.width !== right.width || left.height !== right.height) {
-      return { equal: false, differingPixels: null, reason: "dimension-mismatch" };
+      return {
+        equal: false,
+        differingPixels: null,
+        reason: "dimension-mismatch",
+        left: { width: left.width, height: left.height },
+        right: { width: right.width, height: right.height }
+      };
     }
     const leftData = left.getContext("2d").getImageData(0, 0, left.width, left.height).data;
     const rightData = right.getContext("2d").getImageData(0, 0, right.width, right.height).data;
@@ -327,14 +352,13 @@
       for (const fixture of fixtureList()) {
         for (const lineWidth of LINE_WIDTHS) {
           const actual = makeActualBoardPane(fixture.mode, fixture.points, lineWidth);
-          const manual = makeManualShape(fixture.mode, fixture.points, lineWidth);
+          const manual = makeManualBoardPane(fixture.mode, fixture.points, lineWidth);
           const source = renderGraphicsNode(actual.shape.$renderNode, false);
           const manualSource = renderGraphicsNode(manual.shape.$renderNode, false);
           const manualTranscriptionMatch = compareCanvases(source.canvas, manualSource.canvas);
           if (!manualTranscriptionMatch.equal) {
             throw new Error("Manual path transcription differs from actual BoardPane for " +
-              fixture.id + " width " + lineWidth + ": " + manualTranscriptionMatch.differingPixels +
-              " pixels differ.");
+              fixture.id + " width " + lineWidth + ": " + JSON.stringify(manualTranscriptionMatch));
           }
           const board = composeBoard(source, source.nodeBounds, mask);
           const terminal = terminalPoint(fixture.points, fixture.mode === "smooth", false);
