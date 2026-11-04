@@ -2817,3 +2817,12 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - CHALK-SAMPLING-DOMAIN закрыта как отдельная расширенная матрица step×delay: текущий фокус — renderer footprint, геометрия заливки и модель расхода. G3 не экстраполируется за пределы длинных горизонтальных линий.
 - В TASKS добавлено обоснование оставшихся направлений: реальный renderer footprint, условная 45-cell matrix, capsule geometry и расширение domain INT-006.
 - Live эксперименты, код, тесты, конфигурации и workflow не менялись. master не изменялся. GitHub API не предоставляет локальный git status.
+
+
+## 2026-11-04 — статический анализ подтверждённого gameEngine bundle
+
+- Пользователь подтвердил происхождение всех трёх файлов `AutoDraw_Stage20/gameEngine/` с сайта запущенной игры и единый момент скачивания; достоверность источника по его подтверждению — 100%. Сверка с master bundle исключена из плана.
+- Прочитан `main.min_653f95bc.js` (blob `46cc74de00b6cb5d207b1e1a2ffcd81613b6d388`) и `mergeEngine_df2e5bc5.js` (blob `d613d2b97e2436521aa3870478c69e99eac1f19f`). Для merge bundle статически установлено `egret.Capabilities.engineVersion=5.4.1`.
+- Подтверждено: расход считается числом точек `atom.points`; `pushPoint` удаляет совпадающие соседние координаты; `setRadius` меняет только значение толщины линии; игровой sampling идёт через `ENTER_FRAME`; `updateLess` выполняет O(N) подсчёт.
+- Найдена неоднозначность auto-discovery Game Monitor: в display list могут одновременно присутствовать preview BoardPane (`interactive=false`) и активный PainterPopup BoardPane (`interactive=true`), а `findBoard()` не различает эти экземпляры. Добавлена задача MONITOR-BOARD-SELECTION-001; конкретный выбранный объект в live iframe не подтверждён.
+- Документированы факты и ограничения в TASKS, PROJECT_STATUS, CHALK engine analysis и docs index. Исходники, тесты, конфигурации, workflow и master не менялись. Игровые запуски/эксперименты не выполнялись; локальный git status через GitHub API недоступен.
