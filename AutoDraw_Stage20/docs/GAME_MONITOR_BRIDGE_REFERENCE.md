@@ -55,6 +55,7 @@ Game iframe
 |---|---|---|
 | `start()` | нет | Включает мониторинг, Resource Timing observer, pointer observers, поиск BoardPane и периодическое сканирование; возвращает `status()` |
 | `stop()` | нет | Останавливает таймеры/observer, снимает pointer listeners, восстанавливает обёрнутые методы BoardPane; возвращает `status()` |
+| `setInputTelemetryEnabled(enabled)` | boolean | Включает/выключает raw `MOUSE_MOVE_SAMPLE` listener; по умолчанию выключен; возвращает `status()` |
 | `status()` | нет | Возвращает версию, active, boardDetected, boardLabel, O(1) snapshot, eventCount, droppedEvents и число ошибок |
 | `inspect()` | нет | Read-only поиск/снимок BoardPane без attach, wrappers и timers |
 | `subscribe(listener)` | функция | Добавляет listener событий; возвращает функцию unsubscribe |
@@ -111,7 +112,7 @@ Snapshot считается точным только если оба значе
 
 ### 3.4. Input movement telemetry
 
-`MOUSE_MOVE_SAMPLE` создаётся только во время активного штриха и только для DOM `mousemove`, target которого является игровым canvas. Listener установлен на `window` в bubble phase. В согласованном Egret 5.4.1 bundle `WebTouchHandler.addMouseListener()` добавляет `mousemove` handler непосредственно на canvas и не останавливает propagation; поэтому Monitor получает событие после canvas handler.
+`MOUSE_MOVE_SAMPLE` создаётся только после явного `setInputTelemetryEnabled(true)`, во время активного штриха и только для DOM `mousemove`, target которого является игровым canvas. Телеметрия выключена по умолчанию; состояние отражается в `status().inputTelemetryEnabled` и export. Listener установлен на `window` в bubble phase. В согласованном Egret 5.4.1 bundle `WebTouchHandler.addMouseListener()` добавляет `mousemove` handler непосредственно на canvas и не останавливает propagation; поэтому Monitor получает событие после canvas handler.
 
 Поля события:
 - `domEventTimeStamp` и Monitor `t`;
@@ -122,7 +123,9 @@ Snapshot считается точным только если оба значе
 
 Это события mousemove, доставленные DOM listener во время штриха, но не гарантированно полный набор вызовов AutoDraw/PyAutoGUI: OS/browser могут объединить события до DOM dispatch.
 
-`POINT_QUOTA_UPDATE` дополнительно содержит:
+При включённой input telemetry `POINT_QUOTA_UPDATE` дополнительно содержит stage/local coordinates. Вне этого режима событие всё равно содержит точный `pointDelta` и `acceptedPoint` при положительной delta.
+
+`POINT_QUOTA_UPDATE` содержит:
 - `pointDelta = after.pointCount - before.pointCount`, если оба snapshots точны;
 - `acceptedPoint` — последняя точка atom.points при положительной delta;
 - stage и BoardPane-local coordinates, считанные после `updateLess()`.
