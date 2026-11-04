@@ -592,17 +592,29 @@
         "ideal_round_cap_covers_last_sample_center": true,
         "ideal_geometric_gap_to_last_sample_center": 0
       }
-    ]
+    ],
+    "accepted_point_time_intervals_ms": {
+      "count": 1233,
+      "min": 26,
+      "median": 33,
+      "p90": 35,
+      "p95": 36,
+      "max": 81,
+      "median_interval_equivalent_hz": 30.303030303030305,
+      "over_40ms": 27
+    }
   },
   "interpretation": [
     "The smooth path ends at the midpoint of the final accepted point pair because BoardPane.redraw calls Painter.drawSmoothLine(..., true, false).",
     "For this run, all 27 final accepted segment lengths are <= 9 logical units, while the line width is 10; an ideal round cap of radius 5 therefore reaches each last accepted sample center.",
     "This ideal-cap result does not establish browser pixel coverage or coverage at the mouseup coordinate; BoardPane.onDrawingEnd does not sample mouseup.",
-    "No positive DRAW_SAMPLE pointDelta exceeded 1 in this run; accepted point coordinates match the exact 1260-point CHALK delta."
+    "No positive DRAW_SAMPLE pointDelta exceeded 1 in this run; accepted point coordinates match the exact 1260-point CHALK delta.",
+    "Across 1233 within-stroke intervals between distinct accepted points, the median time interval is 33 ms (p90=35 ms, p95=36 ms, max=81 ms). This is consistent with a roughly 30 Hz accepted-point cadence, but is not a direct frame-rate measurement because duplicate coordinates are suppressed and some frames may produce no new point."
   ],
   "limitations": [
     "No Canvas2D/WebGL PNG comparison is performed.",
     "No mouseup-to-last-accepted-point distance is calculated because this run does not contain a same-session verified client-to-board transform.",
-    "Ideal round-cap geometry is not a substitute for measured antialiasing, texture filtering, mask clipping or screenshot coverage."
+    "Ideal round-cap geometry is not a substitute for measured antialiasing, texture filtering, mask clipping or screenshot coverage.",
+    "Accepted-point timestamp intervals are not identical to frame intervals; duplicate-coordinate suppression and frames without a new accepted point can lengthen them."
   ]
 }
