@@ -81,7 +81,6 @@ class Fill001Tab:
         ttk.Label(series, text="ID серии").pack(side="left")
         ttk.Entry(series, textvariable=self.series_var, width=32).pack(side="left", padx=6)
         ttk.Button(series, text="Создать FILL-001 (45 задач)", command=self.create_series).pack(side="left", padx=4)
-        ttk.Button(series, text="Создать FILL-001-RS (45 задач)", command=self.create_rs_series).pack(side="left", padx=4)
         ttk.Button(series, text="Открыть manifest…", command=self.load_series_dialog).pack(side="left", padx=4)
         self.manifest_label = ttk.Label(series, text="Manifest не загружен")
         self.manifest_label.pack(side="left", padx=10)
