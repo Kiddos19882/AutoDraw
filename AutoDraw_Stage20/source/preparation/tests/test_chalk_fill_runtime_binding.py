@@ -10,6 +10,7 @@ from PIL import Image
 import pytest
 
 from chalk_fill_capture_adapter import build_fill001_capture_from_runtime
+from brush_coordinate_transform import transform_logical_brush_plan_to_screen
 from chalk_fill_experiment import build_fill_target_mask, fill_target_mask_sha256
 from chalk_fill_matrix import FillMatrixError
 from chalk_fill_runtime_binding import (
@@ -174,10 +175,27 @@ def _runtime_documents(tmp_path):
 
 
 def _png_pair(tmp_path):
-    mask = build_fill_target_mask("rectangle")
+    plan = {
+        "coordinate_system": "logical_board_pixels",
+        "canvas": {"width": 460, "height": 240},
+        "strokes": [{"points": [{"x": 0, "y": 0}, {"x": 460, "y": 240}]}],
+    }
+    _, transform = transform_logical_brush_plan_to_screen(
+        plan, {"x": 0, "y": 0, "width": 460, "height": 240}
+    )
+    scale_x, scale_y = transform["scale_x"], transform["scale_y"]
+    source_x = np.clip(
+        np.rint(np.arange(460, dtype=np.float64) / scale_x).astype(np.intp),
+        0, 459,
+    )
+    source_y = np.clip(
+        np.rint(np.arange(240, dtype=np.float64) / scale_y).astype(np.intp),
+        0, 239,
+    )
+    screen_mask = build_fill_target_mask("rectangle")[np.ix_(source_y, source_x)]
     before = np.zeros((240, 460, 3), dtype=np.uint8)
     after = before.copy()
-    after[mask] = 255
+    after[screen_mask] = 255
     before_path = tmp_path / "before.png"
     after_path = tmp_path / "after.png"
     Image.fromarray(before).save(before_path)
