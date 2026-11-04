@@ -344,3 +344,12 @@ Regression coverage:
 
 Live Firefox/game test этим не заменяется. До успешного CI и локального preflight новый G3 не запускать.
 
+
+
+## Per-stroke timing telemetry — 4 ноября 2026 г.
+
+Browser Bridge связывает frame_probe с strokeId. Collector сохраняет исходные интервалы requestAnimationFrame и добавляет per-stroke summaries в Run JSON. Общий frame_probe summary остаётся для совместимости.
+
+Дополнительно RunRecorder рассчитывает per_stroke_metrics из точных POINT_QUOTA_UPDATE before/after snapshots и событий начала/окончания штриха: pointCount delta, duration, accepted points/sec и медианный/p95 интервал между принятыми точками.
+
+Важно: frame_probe — частота browser requestAnimationFrame, а не прямое измерение Egret ENTER_FRAME. Частота POINT_QUOTA_UPDATE — cadence принятых игровых точек. Эти величины нужно анализировать отдельно.
