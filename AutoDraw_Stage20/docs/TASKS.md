@@ -64,6 +64,30 @@ Workflow `.github/workflows/geometry-tests.yml` дополнен проверк�
 
 **Следующий шаг:** подтвердить browser run 18/18 fixtures, 36 PNG reference outputs и manifest. Если запуск всё ещё упадёт, прочитать DOM diagnostic и Edge stderr artifact. Затем сравнить source raster с game capture той же browser/runtime; после этого отдельно проверять WebGL LINEAR sampling, subpixel destination coordinates и mask stencil. Не менять production planner/defaults до pixel acceptance; FILL-001-RS 45-cell matrix остаётся BLOCKED.
 
+### GAME-INPUT-SAMPLING-TRACE-001 — повторяемость одинаковой траектории
+
+**Статус:** INSTRUMENTED / LIVE EVIDENCE PENDING.
+
+Статический source trace подтверждает несколько последовательных преобразований между координатами AutoDraw и принятыми точками игры:
+
+1. Egret `WebTouchHandler.addMouseListener()` получает DOM `mousedown/mousemove/mouseup` на canvas.
+2. `WebTouchHandler.getLocation()` переводит page coordinates относительно canvas rect в stage coordinates через `scaleX/scaleY` и округляет результат через `Math.round()`.
+3. `TouchHandler.onTouchMove()` не dispatch-ит повторное событие, если stage X/Y совпадают с предыдущими.
+4. Egret `SystemTicker` вызывается из browser requestAnimationFrame, но ограничивает `ENTER_FRAME` значением `stage.frameRate`; runtime snapshot этой сессии показывал 30 FPS.
+5. `BoardPane.onDrawing()` считывает текущие stage mouse coordinates на ENTER_FRAME, переводит их в локальные координаты и добавляет точку; повторные точки дополнительно дедуплицируются игровым atom.
+
+Следствие: одна геометрическая траектория AutoDraw не гарантирует одинаковую последовательность точек, доставленных DOM, округлённых Egret и принятых BoardPane. Относительная фаза mousemove events к игровому ENTER_FRAME, пропуск/объединение DOM events и округление stage coordinates — конкретные механизмы для проверки. Это не доказывает, что каждый старый случай вариативности вызван только ими.
+
+**Добавлено в Game Monitor 0.2.2:**
+- `MOUSE_MOVE_SAMPLE` — DOM mousemove, доставленный canvas, timestamp и client/page/screen coordinates, stage mouse coordinates и BoardPane-local coordinates; listener выполняется на window bubble после Egret canvas listener.
+- `POINT_QUOTA_UPDATE` — при положительной exact pointDelta теперь включает acceptedPoint и stage/local coordinates после updateLess().
+- Bridge allowlist и collector allowlist пропускают новый event.
+- Node tests проверяют raw mousemove telemetry и accepted-point correlation; Python smoke test проверяет allowlist.
+
+Изменённые файлы: `source/game_monitor/game_monitor.js`, `game_monitor_bridge.js`, `game_monitor_bridge_server.py`, `source/game_monitor/tests/game_monitor.test.js`, `tests/test_websocket_smoke_server.py`.
+
+**Следующая проверка после browser harness gate:** выполнить контролируемые повторы одной траектории с фиксированными и различными delay/phase, затем сопоставить `MOUSE_MOVE_SAMPLE`, `POINT_QUOTA_UPDATE.acceptedPoint`, `DRAW_SAMPLE`, `frame_probe` и итоговый PNG. `frame_probe` — browser rAF, не прямой Egret ENTER_FRAME counter. Live captures ещё не получены.
+
 ### Историческое наблюдение о двух экземплярах BoardPane — NOT_APPLICABLE_TO_CURRENT_USER_SCENARIO
 
 Статический анализ подтверждает, что bundle содержит preview `BoardPane` внутри `BoardItemBase` с `interactive=false` и рабочий `PainterPopup.painterBoard` с `interactive=true`; текущий алгоритм `findBoard()` структурно не различает их. Для абстрактного сценария с несколькими досками это остаётся известным ограничением auto-discovery. Однако пользователь подтвердил, что текущая игровая комната не содержит других досок и на экране используется одна пустая тестовая доска. В рамках этого сценария неоднозначность выбора экземпляра не требуется исследовать и не блокирует работу Game Monitor.
