@@ -8,6 +8,13 @@
 - Source trace зафиксировал цепочку WebTouchHandler page→stage mapping с Math.round(), TouchHandler duplicate suppression и SystemTicker frameRate throttle. Это обоснованный механизм вариативности повторных линий, но парные live captures ещё нужны для подтверждения.
 - Monitor version 0.2.2; raw mousemove listener выключен по умолчанию и управляется через `setInputTelemetryEnabled(true/false)`. Code/test commits: `981b2c6`, `216361d`, `b9899b2`, `6e0867b`, `7a17802`, `8bc19ab`, `e3ca5fd`. Static JS syntax parse и isolated mock-browser execution Monitor PASS; Node suite, CI нового HEAD и live experiments не подтверждены.
 
+## 2026-11-04 — renderer browser gate изолирован от Preparation/G3
+
+- Добавлен отдельный Windows job `egret-renderer-reference`, запускающий Edge harness независимо от длинной Preparation/G3 suite и portable build.
+- Inline PowerShell вынесен в `tests/run_egret_renderer_reference.ps1`; на failure сохраняются DOM и Edge stderr, на success ожидаются manifest 18 fixtures и 36 PNG.
+- Исправление O(1) accepted-point теста подтверждено Game Monitor CI job PASS.
+- Browser runs `41914411268` / `41914478746` ещё не имеют подтверждённого результата в момент записи.
+
 ## 2026-11-04 — исправлен empty GraphicsNode handling в Egret reference harness
 
 - По source trace Egret 5.4.1 подтверждено: `Graphics.moveTo()` не обновляет bounds; WebGLRenderer пропускает GraphicsNode без положительных width/height или drawData.
