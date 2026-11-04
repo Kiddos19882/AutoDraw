@@ -996,3 +996,12 @@ Per-run transport gates чистые: `dropped_events=0`, `monitor_error_count_d
 - INT006R PNG evidence artifact `autodraw-int006r-visual-review-source` (ID `13299381257`) содержит 180 файлов для 45 пар captures. Analyzer сообщает `png_evidence_status=complete`, но `visual_quality_gate=pending_manual_review` для всех 45 runs. До полного визуального review нельзя закрыть visual gate.
 - Production estimator/model, executor defaults, sampling defaults, frozen predictions и live captures не менялись в рамках этого CI review. Реальные игровые эксперименты в этой сессии не запускались.
 - Следующий gate: завершить ручной visual review 45 пар INT006R before/after PNG; отдельно принять решение по safety margin и production eligibility для INT-006; FILL-001-RS preflight capture не переоткрывать автоматически только на основании software CI/static sweep.
+
+## 2026-11-04 — FILL-001-RS: локализация дефектов в offline-модели
+
+- Повторно воспроизведена frozen rectangle mask и planner raster model для `rectangle / radius=10 / scanline_row_step=5 / offset=0`. Получены исходные 27 centerlines, совпадающие с committed plan; frozen target area — 44 653 px.
+- В planner OpenCV-модели остаются 304 uncovered target pixels (0,6808%); все они находятся в заданных краевых полосах: верхняя — 80, нижняя — 80, левая средняя — 72, правая средняя — 72; внутренний центральный участок — 0. Модель leakage=0. Это подтверждает краевую локализацию **только для offline raster model**, а не для фактических 11 leakage и 1,5694% недопокрытия PNG capture.
+- Дополнительно смоделирован один замкнутый contour pass после 27 scanlines: contour centerline построен по маске, эродированной эллиптическим ядром с inward offset 6/7/8 px; в OpenCV-модели все три варианта дали coverage 99,516270% / 99,372942% / 99,328153% соответственно и leakage=0. Offset 5 дал leakage=32 и отклоняется. Это только exploratory raster candidate, не проверка игрового renderer.
+- Pixel-coordinate breakdown исходной after.png и 11 leakage pixels всё ещё не завершён; сравнение с предыдущим capture не выполнено. Нельзя считать фактическую edge-gap причину доказанной.
+- Capture остаётся REJECTED, 45-task matrix BLOCKED. Не менялись code/tests/configuration/frozen plan/thresholds/production defaults; live experiments не запускались. Следующий gate — pixel-level breakdown исходных PNG и сопоставление с renderer footprint, затем отдельное разрешение на новый live preflight.
+
