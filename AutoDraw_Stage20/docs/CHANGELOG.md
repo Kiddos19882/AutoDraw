@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-11-04 — offline endpoint analysis на реальном FILL-001 capture
+
+- Для run `6a17a297-ea14-4527-9527-bfd8de3bd335` разобраны 1260 accepted points / 27 штрихов. Все 1260 positive DRAW_SAMPLE имеют pointDelta=1; coalesced deltas отсутствуют.
+- Последние интервалы всех штрихов 3–9 при lineWidth=10: идеальный round cap достигает последней принятой точки. Smooth endpoint omission сама по себе не объясняет PNG residual; mouseup-to-last-sample и пиксельная маска остаются неизвестными.
+- Добавлены offline analyzer, unit tests и derived report JSON.
+
 ## 2026-11-04 — уточнена семантика конечной точки smooth brush path
 
 - Подтверждено, что игровой `Painter.drawSmoothLine(..., true, false)` не добавляет `lineTo(lastPoint)`; `onDrawingEnd()` не завершает этот сегмент.
