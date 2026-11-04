@@ -34,6 +34,10 @@
 
 **Дополнение 2026-11-04 — source trace:** напрямую прочитан bundle из `master` (blob SHA `28838e803dcc6f85efb13febd93cc9e0f5046ffc`). Найдены `BoardPane.redraw()`, `setRadius()`, `onDrawStart()`, `onDrawing()`, `onDrawingEnd()`, `BlackBoardAtom.pushPoint()`, `Painter.drawNormalLine()` и `Painter.drawSmoothLine()`. Игровой код передаёт brush value как thickness в `Graphics.lineStyle`; normal path — polyline, smooth path — midpoint/`curveTo`. Вызов не задаёт caps/joints явно. Пользователь визуально наблюдает круглую кисть; это согласуется с Egret ROUND defaults, но deployed runtime/version и точная rasterization ещё не подтверждены.
 
+**Следующий технический шаг:** установить Egret runtime, реально загруженный игрой, и popup BoardPane → screen transform; затем сравнить offline capsule + smooth-path rasterization с frozen PNG fixtures. Не копировать Egret целиком и не заменять его приближённой OpenCV-моделью до такого сравнения.
+
+**Дополнение 2026-11-04 — source trace:** напрямую прочитан bundle из `master` (blob SHA `28838e803dcc6f85efb13febd93cc9e0f5046ffc`). Найдены `BoardPane.redraw()`, `setRadius()`, `onDrawStart()`, `onDrawing()`, `onDrawingEnd()`, `BlackBoardAtom.pushPoint()`, `Painter.drawNormalLine()` и `Painter.drawSmoothLine()`. Игровой код передаёт brush value как thickness в `Graphics.lineStyle`; normal path — polyline, smooth path — midpoint/`curveTo`. Вызов не задаёт caps/joints явно. Пользователь визуально наблюдает круглую кисть; это согласуется с Egret ROUND defaults, но deployed runtime/version и точная rasterization ещё не подтверждены.
+
 **Следующий технический шаг:** установить Egret runtime, реально загруженный игрой, и popup/BoardPane → screen transform; затем сравнить offline capsule + smooth-path rasterization с frozen PNG fixtures. Не копировать Egret целиком и не заменять его приближённой OpenCV-моделью до такого сравнения.
 
 ### 2. FILL-001-RS-MATRIX — полная матрица из 45 экспериментов
