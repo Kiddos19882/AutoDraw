@@ -1,6 +1,16 @@
 # Актуальная точка продолжения — 2026-11-04
 
 
+## Дополнение — исправлена regression assertion O(1) accepted-point lookup (2026-11-04)
+
+CI run `41912100010` выявил один тестовый сбой: `hot-path wrappers, status and export do not scan atom.points` ожидал неизменный indexed-read count после `updateLess()`, но Monitor выполнял ровно одно дополнительное индексное чтение последней принятой точки для поля `acceptedPoint`. Это O(1) tail access, не обход истории точек.
+
+Тест исправлен: допускается ровно одно чтение tail point после возврата engine method; последующие `status()` и resource snapshot не должны выполнять дополнительные indexed reads. Полный обход разрешён только явному `diagnosticSnapshot()`.
+
+- Test-only commit: `3d50da2ff4edbc6cc9511c23e82c3796eea124f2`.
+- CI run `41913850169`: Game Monitor and bridge tests PASS; Executor tests PASS; Application integration test steps PASS; Preparation job выполняется. Windows/Edge harness gate ещё ожидает зависимые jobs.
+- Production code не менялся в этом исправлении.
+
 ## Дополнение — Game Monitor 0.2.2 input sampling telemetry (2026-11-04)
 
 **Последние Monitor code/test commits:** `981b2c672a0980237ae9c1b4c3ab01c75eedc2c5`, `216361d155945e9037c530e695873192fa6c9595`, `b9899b217a21ecfc3c4f24b470eff5d5dfa352b7`, `6e0867b47b325b6affb6030a6f4f93fbabe94bca`, `7a1780216ac7daa06280d6ba6ffd0a5311ff3270`, `8bc19ab80a2632a014a87886f96396691e7d6336`, `e3ca5fdde23199a8ff11ab66eb38068fb48a0e91`.
