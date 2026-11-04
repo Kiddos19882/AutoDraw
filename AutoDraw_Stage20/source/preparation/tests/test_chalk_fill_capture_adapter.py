@@ -48,14 +48,9 @@ def _monitor_export(task):
 
 
 def _png_pair(tmp_path, shape_id):
-    mask = build_fill_target_mask(shape_id)
-    before = np.zeros((240, 460, 3), dtype=np.uint8)
-    after = before.copy()
-    after[mask] = 255
-    before_path = tmp_path / "before.png"
-    after_path = tmp_path / "after.png"
-    Image.fromarray(before).save(before_path)
-    Image.fromarray(after).save(after_path)
+    before_path, after_path, _ = _png_pair_for_roi(
+        tmp_path, shape_id, 460, 240
+    )
     return before_path, after_path
 
 
@@ -167,11 +162,16 @@ def test_runtime_capture_preserves_client_roi_transform(tmp_path):
 def test_png_audit_rejects_nonuniform_client_roi(tmp_path):
     matrix = build_fill001_matrix("CLIENT-ROI-NONUNIFORM")
     task = matrix["tasks"][0]
-    before, after, _ = _png_pair_for_roi(tmp_path, task["shape_id"], 581, 320)
+    before = np.zeros((320, 581, 3), dtype=np.uint8)
+    after = before.copy()
+    before_path = tmp_path / "nonuniform-before.png"
+    after_path = tmp_path / "nonuniform-after.png"
+    Image.fromarray(before).save(before_path)
+    Image.fromarray(after).save(after_path)
 
     with pytest.raises(FillMatrixError, match="равномерному масштабу"):
         audit_fill001_png_pair(
-            task["shape_id"], before, after,
+            task["shape_id"], before_path, after_path,
             screen_roi={"x": 0, "y": 0, "width": 581, "height": 320},
         )
 
@@ -273,11 +273,12 @@ def test_monitor_adapter_rejects_bad_sample_totals_and_wrong_bridge_run(tmp_path
 def test_png_audit_detects_pixels_outside_frozen_target(tmp_path):
     matrix = build_fill001_matrix("ADAPTER-TEST")
     task = matrix["tasks"][0]
-    before, after = _png_pair(tmp_path, task["shape_id"])
+    before, after, screen_mask = _png_pair_for_roi(
+        tmp_path, task["shape_id"], 460, 240
+    )
     with Image.open(after) as image:
         pixels = np.asarray(image.convert("RGB")).copy()
-    mask = build_fill_target_mask(task["shape_id"])
-    outside_y, outside_x = np.argwhere(~mask)[0]
+    outside_y, outside_x = np.argwhere(~screen_mask)[0]
     pixels[outside_y, outside_x] = 255
     Image.fromarray(pixels).save(after)
     result = audit_fill001_png_pair(task["shape_id"], before, after)
