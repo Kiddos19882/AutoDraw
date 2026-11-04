@@ -307,6 +307,80 @@
     parent.appendChild(link);
   }
 
+  function renderWebGLProbe(mode, points, lineWidth, expectedCanvas) {
+    if (!egret.sys || typeof egret.sys.setRenderMode !== "function") {
+      throw new Error("Egret sys.setRenderMode is unavailable.");
+    }
+    egret.sys.setRenderMode("webgl");
+    if (!egret.sys.systemRenderer || typeof egret.sys.systemRenderer.render !== "function" ||
+        !egret.sys.RenderBuffer) {
+      throw new Error("Egret did not initialize WebGLRenderer/WebGLRenderBuffer.");
+    }
+
+    const displayList = egret.sys.DisplayList;
+    displayList.$canvasScaleX = RASTER_SCALE;
+    displayList.$canvasScaleY = RASTER_SCALE;
+    displayList.$canvasScaleFactor = RASTER_SCALE;
+
+    const board = makeActualBoardPane(mode, points, lineWidth).shape;
+    const mask = createBoardMask();
+    board.mask = mask;
+    const container = new egret.DisplayObjectContainer();
+    container.addChild(board);
+
+    const outputWidth = BOARD_WIDTH * RASTER_SCALE;
+    const outputHeight = BOARD_HEIGHT * RASTER_SCALE;
+    const buffer = new egret.sys.RenderBuffer(outputWidth, outputHeight);
+    buffer.clear();
+
+    const renderer = egret.sys.systemRenderer;
+    const matrix = new egret.Matrix(RASTER_SCALE, 0, 0, RASTER_SCALE, 0, 0);
+    const drawCalls = renderer.render(container, buffer, matrix);
+    const pixels = buffer.getPixels(0, 0, outputWidth, outputHeight);
+    if (!pixels || pixels.length !== outputWidth * outputHeight * 4) {
+      throw new Error("WebGLRenderBuffer returned an invalid pixel buffer.");
+    }
+
+    const canvas = document.createElement("canvas");
+    canvas.width = outputWidth;
+    canvas.height = outputHeight;
+    const context = canvas.getContext("2d");
+    context.putImageData(new ImageData(new Uint8ClampedArray(pixels), outputWidth, outputHeight), 0, 0);
+
+    const gl = buffer.context.context;
+    const texture = board.$renderNode && board.$renderNode.$texture;
+    if (!gl || !texture) {
+      throw new Error("WebGL context or BoardPane GraphicsNode texture was not created.");
+    }
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    const textureParameters = {
+      minFilter: gl.getTexParameter(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER),
+      magFilter: gl.getTexParameter(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER),
+      wrapS: gl.getTexParameter(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S),
+      wrapT: gl.getTexParameter(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T),
+      unpackPremultiplyAlpha: gl.getParameter(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL)
+    };
+    const contextAttributes = gl.getContextAttributes();
+    const glInfo = {
+      version: gl.getParameter(gl.VERSION),
+      shadingLanguageVersion: gl.getParameter(gl.SHADING_LANGUAGE_VERSION),
+      vendor: gl.getParameter(gl.VENDOR),
+      renderer: gl.getParameter(gl.RENDERER)
+    };
+    gl.bindTexture(gl.TEXTURE_2D, null);
+
+    const comparison = compareCanvases(expectedCanvas, canvas);
+    return {
+      canvas,
+      drawCalls,
+      outputSize: { width: outputWidth, height: outputHeight },
+      glInfo,
+      contextAttributes,
+      textureParameters,
+      comparison
+    };
+  }
+
   function renderAll() {
     try {
       if (!window.egret || !egret.Shape || !egret.CanvasRenderer) {
@@ -320,8 +394,8 @@
       casesNode.textContent = "";
       const mask = createBoardMask();
       const manifest = {
-        schemaVersion: 1,
-        referenceType: "Egret CanvasRenderer GraphicsNode source-raster reference",
+        schemaVersion: 2,
+        referenceType: "Actual game BoardPane CanvasRenderer and WebGL renderer reference",
         engineVersion: egret.Capabilities.engineVersion,
         sourceBundles: [
           "gameEngine/mergeEngine_df2e5bc5.js",
@@ -334,7 +408,7 @@
           devicePixelRatio: window.devicePixelRatio || 1,
           viewport: { width: window.innerWidth, height: window.innerHeight }
         },
-        renderMode: "Actual BoardPane GraphicsNode rasterized directly by CanvasRenderer; no WebGL context started",
+        renderMode: "Actual BoardPane GraphicsNode rendered by Egret CanvasRenderer and WebGLRenderer (SwiftShader in CI)",
         board: { width: BOARD_WIDTH, height: BOARD_HEIGHT },
         rasterScale: RASTER_SCALE,
         mask: {
@@ -344,11 +418,13 @@
           effectiveCornerRadiusLogicalPx: MASK_ELLIPSE_SIZE / 2,
           clipping: "Canvas2D destination-in composite for comparison; not validated as identical to WebGL mask stencil"
         },
-        webglComposite: "not executed; final Canvas2D drawImage composite is explicitly approximate",
+        webglComposite: "actual Egret WebGLRenderer mask+scrollRect output is captured separately; Canvas2D composite retained as comparison reference",
         actualBoardPaneComparison: "actual BoardPane GraphicsNode pixel-compared with manual path transcription including transparent resetBg rectangle",
+        webglProbe: null,
         fixtures: []
       };
 
+      let webglProbeInput = null;
       for (const fixture of fixtureList()) {
         for (const lineWidth of LINE_WIDTHS) {
           const actual = makeActualBoardPane(fixture.mode, fixture.points, lineWidth);
@@ -361,6 +437,9 @@
               fixture.id + " width " + lineWidth + ": " + JSON.stringify(manualTranscriptionMatch));
           }
           const board = composeBoard(source, source.nodeBounds, mask);
+          if (fixture.id === "normal-horizontal" && lineWidth === 10) {
+            webglProbeInput = { fixture, lineWidth, expectedCanvas: board };
+          }
           const terminal = terminalPoint(fixture.points, fixture.mode === "smooth", false);
           const entry = {
             id: fixture.id,
@@ -424,17 +503,40 @@
         }
       }
 
+      if (!webglProbeInput) throw new Error("WebGL probe fixture was not generated.");
+      const webglProbe = renderWebGLProbe(
+        webglProbeInput.fixture.mode,
+        webglProbeInput.fixture.points,
+        webglProbeInput.lineWidth,
+        webglProbeInput.expectedCanvas
+      );
+      manifest.webglProbe = {
+        status: "complete",
+        fixture: webglProbeInput.fixture.id,
+        lineWidth: webglProbeInput.lineWidth,
+        outputSize: webglProbe.outputSize,
+        drawCalls: webglProbe.drawCalls,
+        glInfo: webglProbe.glInfo,
+        contextAttributes: webglProbe.contextAttributes,
+        textureParameters: webglProbe.textureParameters,
+        comparisonToCanvas2DMaskedReference: webglProbe.comparison
+      };
+      addDownloadLink(casesNode, webglProbe.canvas, "webgl-board-probe.png",
+        "Download actual Egret WebGLRenderer BoardPane probe");
+      document.body.dataset.webglStatus = "complete";
+
       const json = JSON.stringify(manifest, null, 2);
       document.getElementById("renderer-manifest-json").textContent = json;
       document.body.dataset.referenceStatus = "complete";
       document.body.dataset.fixtureCount = String(manifest.fixtures.length);
+      document.body.dataset.pngCount = String(casesNode.querySelectorAll("a[download$='.png']").length);
       const blob = new Blob([json], { type: "application/json" });
       manifestNode.href = URL.createObjectURL(blob);
       manifestNode.download = "egret-5.4.1-renderer-reference-manifest.json";
       manifestNode.textContent = "Download fixture manifest JSON";
       statusNode.textContent =
         "Generated " + manifest.fixtures.length + " fixtures using Egret " +
-        manifest.engineVersion + " CanvasRenderer. No game session, WebGL context, pointer input or CHALK was used.";
+        manifest.engineVersion + " CanvasRenderer + WebGLRenderer. No live game session, pointer input or CHALK was used.";
     } catch (error) {
       document.body.dataset.referenceStatus = "error";
       statusNode.textContent = "Reference harness error: " + (error && error.stack ? error.stack : String(error));
