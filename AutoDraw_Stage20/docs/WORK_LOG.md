@@ -2469,3 +2469,13 @@ Brush Test acceptance и матричные валидаторы больше н
 - Строгий guard `non_consuming_stroke_candidate_count == 0` для выбранного task run сохранён.
 - Добавлены regression tests на calibration run, чьи события закончились до executor start, несмотря на позднюю финализацию, и на полную загрузку/разбор/hash Bridge JSON размером более 27 MiB.
 - Code commit `95a8d1799cd2cbbba09929cc5086a3655ba90c78`; test commit `870bebce6b39e782f70ef9f476a324ee840c05ae`. Тесты/CI на новом HEAD пока не подтверждены; live preflight не запускался.
+
+
+## 2026-11-04 — FILL-001 follow-up: полный task Bridge run и исчерпание квоты
+
+- Проверен пользовательский evidence commit [73d14a1](https://github.com/Kiddos19882/AutoDraw/commit/73d14a1784a5a9f8ef29bc0e197b75352f2650af) на ветке feature/image-geometry-optimization; branch HEAD — 73d14a1, master не изменялся. Compare: ahead 2713 / behind 5; локальный git status через GitHub API недоступен.
+- Полностью прочитан Bridge run размером 27 932 334 bytes. Первый run — calibration CHALK=0; второй run связан с executor по event activity window. Exact task CHALK=5999 согласуется с pre/post pointCount, sampled deltas и per-stroke quota updates.
+- Обнаружено 131 pointer candidates, 128 consuming strokes и 3 non-consuming candidates после исчерпания квоты 6000. Runtime binder должен отклонить task из-за stroke_count mismatch и non-consuming candidates; strict checks сохранены.
+- Executor report был записан примерно за 3.44 s до Bridge run finalization, что объясняет временный UI pending. После persistence строгая проверка должна дать окончательный отказ.
+- Before/after PNG просмотрены визуально; количественный frozen-mask audit не запускался. 5999 — точный фактический расход до лимита, но полная стоимость task неизвестна, так как последние три штриха не потребили ресурс.
+- Исходники, тесты, настройки и workflow не менялись; live experiment не запускался повторно. 45-cell matrix остаётся BLOCKED. Следующий шаг — статический анализ frozen plan/resource budget и документированное решение по over-budget/censored outcomes.

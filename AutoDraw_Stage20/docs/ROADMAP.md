@@ -2,7 +2,9 @@
 
 ## Актуальный статус FILL-001 на 2026-11-04
 
-Binder activity-window fix `95a8d17` дополнен transient-session/UI retry correction в [5cde7a1](https://github.com/Kiddos19882/AutoDraw/commit/5cde7a109a669bebf790ecbeb21f8bbc4feae182): incomplete potentially relevant Bridge session теперь pending, а кнопка FILL-001 повторно выполняет binder перед PNG audit. Полный CI [41754801210](https://github.com/Kiddos19882/AutoDraw/actions/runs/41754801210) — SUCCESS: Preparation/G3 787 passed, 24 warnings, 82 subtests; Executor, Game Monitor/Bridge, Application integration, INT-006 pixel audit и Windows portable build/startup smoke-test — SUCCESS; optional benchmarks skipped. Предыдущий live preflight остаётся rejected (session CHALK=5999; доска исчерпана); следующий gate — один новый preflight на восстановленной доске. The 45-cell matrix remains BLOCKED. Подробности: [FILL-001 postmortem](CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md).
+Evidence commit [73d14a1](https://github.com/Kiddos19882/AutoDraw/commit/73d14a1784a5a9f8ef29bc0e197b75352f2650af) добавил полный task Bridge run и session diagnostics. Exact CHALK=5999 подтверждён на run level и суммой point deltas, но 3 из 131 pointer candidates не потребили CHALK после исчерпания квоты; stroke_count=128, capture REJECTED. Первый Bridge run — калибровочный (CHALK=0) и исключается по event activity window. UI pending был временным: executor report появился примерно за 3.44 секунды до финализации Bridge run; после persistence строгая проверка должна завершиться отказом по 128/131 и 3 non-consuming candidates.
+
+Шаги 1–2 временного плана DONE (software/CI). Шаг 3 IN_PROGRESS: live preflight исполнен, но не принят из-за исчерпания квоты; количественный PNG audit не выполнен. Шаги 4–5 BLOCKED. Следующее действие — статический анализ frozen plan и бюджета CHALK, затем решение по обработке over-budget/censored результатов. Повторять тот же запуск без изменений не следует. Подробности: [FILL-001 postmortem](CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md).
 
 ## Постоянная система управления знаниями ИИ
 
@@ -20,7 +22,7 @@ Binder activity-window fix `95a8d17` дополнен transient-session/UI retry
 4. Выполнить 45 live captures (3 формы × 5 радиусов × 3 повтора); до успешного шага 3 запуск заблокирован.
 5. Проанализировать exact CHALK и качество, определить влияние радиуса и лучшую стратегию заливки.
 
-**Текущий статус:** шаги 1–2 DONE; binder activity-window fix и regression tests прошли полный CI [41737923777](https://github.com/Kiddos19882/AutoDraw/actions/runs/41737923777), включая Windows portable build/startup smoke-test. Предыдущий live run завершил 131/131 strokes, session CHALK=5999, но capture не принят. Шаг 3 остаётся IN_PROGRESS до одного нового live preflight на восстановленной доске. Шаги 4–5 BLOCKED.
+**Текущий статус:** шаги 1–2 DONE; шаг 3 IN_PROGRESS — live attempt выполнен, но capture rejected: exact CHALK=5999, 128/131 consuming strokes, 3 non-consuming candidates. Шаги 4–5 BLOCKED; сначала требуется статический resource/plan analysis и решение по over-budget outcomes.
 
 ### FILL-001 — fill efficiency matrix
 

@@ -1,3 +1,10 @@
+## 2026-11-04 — FILL-001: полный runtime evidence и quota exhaustion
+
+- Добавлен пользовательский evidence commit [73d14a1](https://github.com/Kiddos19882/AutoDraw/commit/73d14a1784a5a9f8ef29bc0e197b75352f2650af): attempt, manifest, DrawingPlan, executor report, Bridge session, два run JSON и before/after PNG.
+- Второй Bridge run полностью разобран: exact CHALK=5999 подтверждён snapshots и per-stroke/sample deltas; radius=10; 0 drops/errors/send failures/sequence gaps.
+- Run не принят: 128 consuming strokes из 131 кандидата; три последних штриха не потребили CHALK после достижения квоты 6000. Capture остаётся pending/rejected, 45-cell matrix BLOCKED.
+- Документация обновлена; production code/tests/workflows не изменялись. Количественный PNG audit не выполнялся.
+
 ## 2026-11-04 — FILL-001 transient Bridge session retry: CI SUCCESS
 
 - Исправлена race/fail-fast обработка неполной Bridge session: после фильтрации по executor window отсутствие bridge_diagnostics/last_message_at_utc у потенциально подходящей session означает pending, а не окончательную ошибку.

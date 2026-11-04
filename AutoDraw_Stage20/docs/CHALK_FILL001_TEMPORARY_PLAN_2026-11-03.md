@@ -39,7 +39,7 @@
 
 ### Шаг 3. Интегрировать запуск в AutoDraw и провести Windows live preflight
 
-**Статус:** IN_PROGRESS — activity-window fix (`95a8d17`) и transient Bridge session/UI retry correction (`5cde7a1`) прошли полный CI [41754801210](https://github.com/Kiddos19882/AutoDraw/actions/runs/41754801210), включая Windows portable build/startup smoke-test и INT-006 pixel audit. Предыдущий live run завершил 131/131 strokes; session CHALK=5999, capture rejected, доска исчерпана. Следующий gate — один preflight на восстановленной доске.
+**Статус:** IN_PROGRESS — software/CI gates пройдены. Новый live preflight из commit [73d14a1](https://github.com/Kiddos19882/AutoDraw/commit/73d14a1784a5a9f8ef29bc0e197b75352f2650af) дал exact task-level CHALK=5999, но только 128/131 consuming strokes; последние три кандидата не потребили ресурс после исчерпания квоты. Capture REJECTED, доска исчерпана. Следующий gate — статический разбор ресурсоёмкости frozen plan и решение по over-budget outcomes; тот же run без изменений не повторять.
 
 **Подтверждённая реализация UI/runner:**
 - Добавлен `source/preparation/chalk_fill_ui.py` и самостоятельная вкладка FILL-001 в `integrated_app.py`, отдельная от седьмой вкладки «Тест кистей».
@@ -59,14 +59,14 @@
 - Capture adapter растеризует frozen logical mask в размер PNG ROI методом nearest-neighbor и сохраняет logical→screen transform; пропорции ROI проверяются по uniform-scale tolerance 1%.
 - Before/after должны иметь одинаковые фактические ROI; курсор и UI/paint meter исключаются из crop по существующей процедуре.
 
-**Следующий Windows live preflight (software gate подтверждён CI 41737923777):**
-- Binder activity-window fix и regression coverage находятся в `95a8d17`/`870bebc`; полный CI и Windows portable build/startup smoke-test завершились SUCCESS.
-- Использовать актуальную portable-сборку из [CI artifact 13280731107](https://github.com/Kiddos19882/AutoDraw/actions/runs/41737923777/artifacts/13280731107).
-- Использовать восстановленную/новую доску с полной доступной квотой CHALK; текущая доска исчерпана.
-- Запустить ровно одну задачу `rectangle / radius 10 / repeat 1` из вкладки FILL-001.
-- Подтвердить task ↔ DrawingPlan ↔ executor report ↔ Bridge session/run identity, фактический P1, exact run/per-stroke CHALK и отсутствие non-consuming candidates в выбранном task run.
-- Проверить реальные before/after PNG в calibrated client ROI, RGB threshold 8, cursor/UI exclusion, frozen mask alignment, coverage ≥99% и leakage=0.
-- Не запускать 45-cell matrix до принятия preflight.
+**Следующий шаг после live attempt 2026-11-04:**
+- Не повторять без изменений задачу rectangle / radius 10 / repeat 1: текущий run исчерпал 5999 доступных CHALK до завершения всех 131 consuming strokes.
+- Статически проверить frozen DrawingPlan, порядок и геометрию последних штрихов, а также существующий raster simulator/coverage model. Не выдавать расчётную оценку за exact CHALK.
+- Определить и документировать, должен ли экспериментальный analyzer отдельно хранить over-budget/censored attempts (точный расход до лимита, но неизвестная полная потребность) наряду с accepted captures. Не менять acceptance criteria задним числом.
+- Сохранить P1 и frozen masks неизменными до отдельного решения; любые изменения geometry/strategy оформлять новой версией плана и mask signature.
+- Количественный before/after PNG audit выполнить по frozen mask и calibrated ROI; визуальный просмотр PNG не является заменой.
+- После статического анализа выбрать обоснованный следующий preflight и только затем использовать восстановленную/новую доску с полной квотой.
+- Не запускать 45-cell matrix до принятия preflight и определения обработки over-budget cases.
 
 
 **Актуальное уточнение 2026-11-04:**

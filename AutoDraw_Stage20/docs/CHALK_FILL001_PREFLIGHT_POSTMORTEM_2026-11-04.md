@@ -204,3 +204,34 @@ Windows artifact: [autodraw-g3-preflight-build](https://github.com/Kiddos19882/A
 Полный GitHub Actions [41754801210](https://github.com/Kiddos19882/AutoDraw/actions/runs/41754801210) завершился **SUCCESS** на commit 5cde7a1: Preparation/G3 — 787 passed, 24 warnings, 82 subtests; Executor regression, Game Monitor/Bridge, Application integration, INT-006 pixel audit и Windows portable build/startup smoke-test — SUCCESS; optional benchmarks — SKIPPED. Portable artifact ID 13288855067.
 
 **Граница результата:** это подтверждает software regression/build gate, но не принимает пользовательский capture. Session-level CHALK=5999 подтверждён, однако второй Bridge run не был полностью проверен в рамках этого исправления; task-level/per-stroke attribution и quantitative FILL-001 PNG audit остаются неподтверждёнными. Новый live preflight не запускался; доска из предыдущей попытки исчерпана. 45-cell matrix остаётся BLOCKED.
+
+
+## 12. Follow-up 2026-11-04 — полный Bridge run из commit 73d14a1
+
+Пользователь добавил полный набор runtime evidence в [commit 73d14a1](https://github.com/Kiddos19882/AutoDraw/commit/73d14a1784a5a9f8ef29bc0e197b75352f2650af), task fill001-20261104-051653-rectangle-r10-rep1, series fill001-20261104-051653.
+
+### 12.1. Связь executor и Bridge
+
+- Executor report: execution ID 320d4b20-3e7b-48ae-a468-c22f5027d107; 131/131 strokes, status completed, duration 226.438 s; P1: point_step=4, delay=5 ms, line_extension=0; report ended at 2026-11-04 02:22:19 UTC.
+- Attempt: status execution_completed_pending_runtime_and_png_audit; capture_status=pending; capture_path отсутствует.
+- Bridge session: ec375b46-a17c-4129-9552-d4b4d774a195, schema v2, diagnostics present; received_event_count=12541, droppedEvents=0, errors=0, sequence gaps=0, Bridge send failures=0.
+- В session находятся два run. Первый b26c0529-11f7-43b8-b34e-5227bb549aa3 — калибровка: 0 CHALK, 2 non-consuming candidates. Его event activity завершилась около 02:18:31.114 UTC, до executor start 02:18:32 UTC; поздняя persistence не делает его частью task run.
+- Второй bdca032b-57df-402c-a6c8-bb4be0f9a6ee — task run: started 02:18:37.856 UTC, last event около 02:22:19.168 UTC, finalized/persisted 02:22:22.633 UTC. Activity window пересекается с executor; persistence произошла примерно через 3.465 s после последнего события, в пределах session idle-finalization grace (4.0 s).
+
+### 12.2. Exact CHALK и stroke accounting
+
+- Task run pre/post snapshots: pointCount 1 → 6000, max_points=6000. chalk.consumed_points=5999, sampled_point_delta_total=5999, сумма 5999 POINT_QUOTA_UPDATE и per-stroke deltas также 5999.
+- Фактически observed radius=[10], brush_radius_status=single.
+- В task run: stroke_candidate_count=131, stroke_count=128, non_consuming_stroke_candidate_count=3. Нулевые кандидаты — pointer-stroke-131, pointer-stroke-132, pointer-stroke-133; каждый имеет pointer down/up и DRAW_SAMPLE с нулевым delta после достижения pointCount=6000.
+- Все 5999 потреблённых points согласованы между exact snapshots, sampled deltas и per-stroke aggregation. Dropped events, Monitor errors, Bridge send failures и sequence gaps равны нулю.
+- Это подтверждает exact CHALK, потраченный в пределах доступной квоты, но не полную стоимость завершения плана: три последних штриха не были приняты игрой. Для полного исполнения потребность превышает 5999; точное превышение из этого запуска неизвестно (right-censored by quota).
+
+### 12.3. Причина pending UI и причина отказа capture
+
+Executor report записан в 02:22:19.193 UTC, тогда как Bridge run был финализирован в 02:22:22.633 UTC. Поэтому post-execution binding, выполненный до persistence run-файла, закономерно мог вернуть RuntimeBindingNotReady; сообщение UI «повторите проверку после завершения записи Bridge» соответствует этому временному окну. После появления run-файла binder должен перейти от pending к строгой проверке и отклонить capture: stroke_count=128 вместо expected_strokes=131 и non-consuming candidates=3. Это не основание ослаблять validator.
+
+### 12.4. PNG и итог
+
+Before PNG визуально пустой; after PNG визуально показывает заполненную прямоугольную область. Это только визуальное наблюдение: количественный audit frozen mask, coverage ≥99% и leakage=0 не запускался. Последние три запланированных DrawingPlan strokes расположены на y=183,184,185; без pixel audit нельзя утверждать, были ли их области полностью покрыты перекрытием предыдущих strokes.
+
+**Итог:** EXECUTION COMPLETED / EXACT CHALK TO QUOTA CONFIRMED / TASK INCOMPLETE / CAPTURE REJECTED / PNG AUDIT NOT RUN. 45-cell matrix остаётся BLOCKED. Не повторять тот же запуск без изменений; следующий шаг — статический анализ frozen plan/resource budget и отдельное решение о представлении over-budget/censored attempts. Исходники, тесты и workflow этим evidence commit не менялись; CI statuses для data-only commit отсутствуют.
