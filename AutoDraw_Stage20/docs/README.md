@@ -67,6 +67,18 @@
 
 - [Инвентаризация документации](DOCUMENTATION_INVENTORY_2026-11-03.md) — 72 Markdown-файла, классификация действующих и архивных материалов, выявленные несогласованности и правила сохранения/удаления.
 
+## Файлы игрового движка
+
+Копия игровых assets находится в `AutoDraw_Stage20/gameEngine/` (п):
+
+- [main.min_653f95bc.js](../gameEngine/main.min_653f95bc.js) (ф) — основной игровой bundle;
+- [mergeEngine_df2e5bc5.js](../gameEngine/mergeEngine_df2e5bc5.js) (ф) — bundle движка;
+- [manifest.json](../gameEngine/manifest.json) (ф) — манифест, перечисляющий runtime paths `js/mergeEngine_df2e5bc5.js` и `js/main.min_653f95bc.js`.
+
+Файлы добавлены в commit [d3322fe](https://github.com/Kiddos19882/AutoDraw/commit/d3322fe35c808bde079c79545cc839636b7cda2a) ветки `feature/image-geometry-optimization`. В репозитории они физически лежат непосредственно в `gameEngine/`, а не во вложенном `gameEngine/js/`.
+
+Эта копия доступна для статического анализа. Совпадение с историческими runtime downloads из captures или с bundle из `master/fileGameEngine/` требует отдельного сравнения содержимого/hash; одинаковое имя файла не доказывает идентичность. Текущий deployed runtime пока не объявляется установленным только на основании наличия этих файлов.
+
 ## Справочники подсистем
 
 - [Game Monitor и Bridge — техническая справка](GAME_MONITOR_BRIDGE_REFERENCE.md) — фактический API Game Monitor 0.2.1, Browser Bridge, WebSocket collector, методы RunRecorder, протокол сообщений, JSON-схемы и ограничения интерпретации.
