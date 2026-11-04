@@ -155,3 +155,74 @@ def test_horizontal_capsule_masks_match_independent_analytic_cell_oracle():
     )
     assert result["potential_cells"] == expected_potential
     assert result["guaranteed_cells"] == expected_guaranteed
+
+
+
+def _global_bounds_reference(points, brush, sx, sy, width, height):
+    """Slow global-AABB reference for the per-segment broad-phase implementation."""
+    import math
+
+    from brush_footprint_geometry import (
+        _point_segment_distance_squared,
+        _segment_rectangle_distance_squared,
+    )
+
+    radius = brush / 2.0
+    segments = list(zip(points, points[1:])) or [(points[0], points[0])]
+    epsilon = 1e-9
+    left = max(0, math.floor((min(p[0] for p in points) - radius) * sx - 0.5 + epsilon) + 1)
+    right = min(width - 1, math.ceil((max(p[0] for p in points) + radius) * sx + 0.5 - epsilon) - 1)
+    top = max(0, math.floor((min(p[1] for p in points) - radius) * sy - 0.5 + epsilon) + 1)
+    bottom = min(height - 1, math.ceil((max(p[1] for p in points) + radius) * sy + 0.5 - epsilon) - 1)
+    potential, guaranteed = set(), set()
+    radius_squared = radius * radius
+    tolerance = 1e-12 * max(1.0, radius_squared)
+
+    for py in range(top, bottom + 1):
+        cell_top, cell_bottom = (py - 0.5) / sy, (py + 0.5) / sy
+        for px in range(left, right + 1):
+            cell_left, cell_right = (px - 0.5) / sx, (px + 0.5) / sx
+            corners = (
+                (cell_left, cell_top), (cell_right, cell_top),
+                (cell_left, cell_bottom), (cell_right, cell_bottom),
+            )
+            for start, end in segments:
+                if _segment_rectangle_distance_squared(
+                    start, end, cell_left, cell_top, cell_right, cell_bottom
+                ) < radius_squared:
+                    potential.add((px, py))
+                if all(
+                    _point_segment_distance_squared(corner, start, end)
+                    <= radius_squared - tolerance
+                    for corner in corners
+                ):
+                    guaranteed.add((px, py))
+                if (px, py) in potential and (px, py) in guaranteed:
+                    break
+    return potential, guaranteed
+
+
+def test_per_segment_broad_phase_matches_global_reference_for_winding_polyline():
+    points = [
+        (4.0, 5.0), (18.0, 5.0), (18.0, 34.0),
+        (7.0, 34.0), (7.0, 13.0), (31.0, 13.0),
+        (31.0, 42.0), (44.0, 42.0),
+    ]
+    expected_potential, expected_guaranteed = _global_bounds_reference(
+        points, 6, 1.25, 0.8, 64, 52
+    )
+    result = swept_capsule_pixel_masks(points, 6, 1.25, 0.8, 64, 52)
+
+    assert result["potential_cells"] == expected_potential
+    assert result["guaranteed_cells"] == expected_guaranteed
+
+
+def test_collinear_vertex_subdivision_preserves_capsule_masks():
+    straight = [(3.0, 7.0), (27.0, 19.0)]
+    subdivided = [(3.0, 7.0), (9.0, 10.0), (18.0, 14.5), (27.0, 19.0)]
+    direct = swept_capsule_pixel_masks(straight, 5, 1.4, 0.75, 48, 32)
+    split = swept_capsule_pixel_masks(subdivided, 5, 1.4, 0.75, 48, 32)
+
+    assert direct["bounds"] == split["bounds"]
+    assert direct["potential_cells"] == split["potential_cells"]
+    assert direct["guaranteed_cells"] == split["guaranteed_cells"]
