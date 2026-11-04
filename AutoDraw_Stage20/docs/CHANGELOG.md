@@ -4,7 +4,7 @@
 
 - Добавлены `rendererSnapshot()` и расширенный read-only `inspect()` для фактического Egret backend, canvas scale/DPR, viewport, canvas CSS geometry, BoardPane parent transforms, mask и stage/client corners.
 - Добавлены два Node regression tests: runtime renderer snapshot/coordinate mapping и безопасная деградация при отсутствии runtime.
-- Game Monitor/Bridge CI job run [41896024383](https://github.com/Kiddos19882/AutoDraw/actions/runs/41896024383) — PASS: JS syntax, 18 Node tests и WebSocket smoke test. Общий CI на момент записи ещё выполнялся.
+- Game Monitor/Bridge CI job run [41896024383](https://github.com/Kiddos19882/AutoDraw/actions/runs/41896024383) — PASS: JS syntax, 18 Node tests и WebSocket smoke test. Полный GitHub Actions workflow [41896024383](https://github.com/Kiddos19882/AutoDraw/actions/runs/41896024383) — SUCCESS: regression suites, static benchmarks, Windows portable build/startup smoke-test и INT-006 pixel-level audit. Optional algorithm benchmarks SKIPPED.
 - Runtime capture, offline replica и PNG pixel equivalence не заявляются; live drawing и CHALK experiments не запускались.
 
 
