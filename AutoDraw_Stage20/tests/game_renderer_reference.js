@@ -5,13 +5,12 @@
     return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
   }
 
-  // Faithful path-command transcription of Painter.drawSmoothLine from
-  // main.min_653f95bc.js. Signature after graphics/points is
-  // (drawFirstHalf, unusedOption, drawLast). BoardPane passes (true, false),
-  // so drawLast (the fifth formal parameter) is omitted and remains undefined.
-  function buildSmoothPathCommands(points, drawFirstHalf, unusedOption, drawLast) {
+  // Mirrors Painter.drawSmoothLine(graphics, points, drawFirstHalf, drawLast)
+  // from main.min_653f95bc.js. Both boolean arguments default to true.
+  // BoardPane.redraw() explicitly calls it with (true, false).
+  function buildSmoothPathCommands(points, drawFirstHalf, drawLast) {
     if (drawFirstHalf === undefined) drawFirstHalf = true;
-    if (drawLast === undefined) drawLast = false;
+    if (drawLast === undefined) drawLast = true;
     if (!points || points.length === 0) return [];
 
     const commands = [{ type: "moveTo", x: points[0].x, y: points[0].y }];
@@ -66,6 +65,7 @@
   }
 
   function terminalPoint(points, smooth, drawLast) {
+    if (drawLast === undefined) drawLast = true;
     if (!points || points.length === 0) return null;
     if (!smooth || drawLast) {
       const p = points[points.length - 1];
@@ -112,13 +112,7 @@
     ];
   }
 
-  function makeShape(mode, points, lineWidth, color) {
-    const shape = new egret.Shape();
-    const graphics = shape.graphics;
-    graphics.lineStyle(lineWidth, color === undefined ? 0x000000 : color, 1, false);
-    const commands = mode === "smooth"
-      ? buildSmoothPathCommands(points, true, false)
-      : buildNormalPathCommands(points);
+  function applyPathCommands(graphics, commands) {
     for (const command of commands) {
       if (command.type === "moveTo") graphics.moveTo(command.x, command.y);
       else if (command.type === "lineTo") graphics.lineTo(command.x, command.y);
@@ -126,7 +120,63 @@
         graphics.curveTo(command.controlX, command.controlY, command.x, command.y);
       }
     }
+  }
+
+  function makeManualShape(mode, points, lineWidth, color) {
+    const shape = new egret.Shape();
+    const graphics = shape.graphics;
+    graphics.beginFill(16711680, 0);
+    graphics.drawRect(0, 0, BOARD_WIDTH, BOARD_HEIGHT);
+    const clip = egret.Rectangle.create().setTo(0, 0, BOARD_WIDTH, BOARD_HEIGHT);
+    shape.scrollRect = clip;
+    egret.Rectangle.release(clip);
+    graphics.lineStyle(lineWidth, color === undefined ? 0x000000 : color, 1, false);
+    const commands = mode === "smooth"
+      ? buildSmoothPathCommands(points, true, false)
+      : buildNormalPathCommands(points);
+    applyPathCommands(graphics, commands);
     return { shape, commands };
+  }
+
+  function makeActualBoardPane(mode, points, lineWidth, color) {
+    const BoardPane = root.com && root.com.magnetjoy && root.com.magnetjoy.pet &&
+      root.com.magnetjoy.pet.ui && root.com.magnetjoy.pet.ui.board &&
+      root.com.magnetjoy.pet.ui.board.BoardPane;
+    if (typeof BoardPane !== "function") {
+      throw new Error("Game bundle did not expose com.magnetjoy.pet.ui.board.BoardPane.");
+    }
+    const board = new BoardPane(false, 6000);
+    board.width = BOARD_WIDTH;
+    board.height = BOARD_HEIGHT;
+    board.atom.clear();
+    board.atom.points = [points.map(point => new egret.Point(point.x, point.y))];
+    board.atom.radius = [lineWidth];
+    board.atom.colors = [color === undefined ? 0x000000 : color];
+    board.atom.options = [mode === "smooth"];
+    board.updateLess();
+    board.redraw();
+    return {
+      shape: board,
+      commands: mode === "smooth"
+        ? buildSmoothPathCommands(points, true, false)
+        : buildNormalPathCommands(points)
+    };
+  }
+
+  function compareCanvases(left, right) {
+    if (left.width !== right.width || left.height !== right.height) {
+      return { equal: false, differingPixels: null, reason: "dimension-mismatch" };
+    }
+    const leftData = left.getContext("2d").getImageData(0, 0, left.width, left.height).data;
+    const rightData = right.getContext("2d").getImageData(0, 0, right.width, right.height).data;
+    let differingPixels = 0;
+    for (let i = 0; i < leftData.length; i += 4) {
+      if (leftData[i] !== rightData[i] || leftData[i + 1] !== rightData[i + 1] ||
+          leftData[i + 2] !== rightData[i + 2] || leftData[i + 3] !== rightData[i + 3]) {
+        differingPixels += 1;
+      }
+    }
+    return { equal: differingPixels === 0, differingPixels, reason: null };
   }
 
   function renderGraphicsNode(node, isMask) {
@@ -237,20 +287,29 @@
       if (!window.egret || !egret.Shape || !egret.CanvasRenderer) {
         throw new Error("Egret 5.4.1 bundle did not expose Shape/CanvasRenderer.");
       }
+      if (!root.com || !root.com.magnetjoy || !root.com.magnetjoy.pet ||
+          !root.com.magnetjoy.pet.ui || !root.com.magnetjoy.pet.ui.board ||
+          typeof root.com.magnetjoy.pet.ui.board.BoardPane !== "function") {
+        throw new Error("Game bundle did not expose the actual BoardPane class.");
+      }
       casesNode.textContent = "";
       const mask = createBoardMask();
       const manifest = {
         schemaVersion: 1,
         referenceType: "Egret CanvasRenderer GraphicsNode source-raster reference",
         engineVersion: egret.Capabilities.engineVersion,
-        sourceBundle: "gameEngine/mergeEngine_df2e5bc5.js",
+        sourceBundles: [
+          "gameEngine/mergeEngine_df2e5bc5.js",
+          "gameEngine/main.min_653f95bc.js"
+        ],
+        gameBoardClass: "com.magnetjoy.pet.ui.board.BoardPane",
         browser: {
           userAgent: navigator.userAgent || null,
           platform: navigator.platform || null,
           devicePixelRatio: window.devicePixelRatio || 1,
           viewport: { width: window.innerWidth, height: window.innerHeight }
         },
-        renderMode: "CanvasRenderer direct invocation; no WebGL context started",
+        renderMode: "Actual BoardPane GraphicsNode rasterized directly by CanvasRenderer; no WebGL context started",
         board: { width: BOARD_WIDTH, height: BOARD_HEIGHT },
         rasterScale: RASTER_SCALE,
         mask: {
@@ -261,14 +320,22 @@
           clipping: "Canvas2D destination-in composite for comparison; not validated as identical to WebGL mask stencil"
         },
         webglComposite: "not executed; final Canvas2D drawImage composite is explicitly approximate",
+        actualBoardPaneComparison: "actual BoardPane GraphicsNode pixel-compared with manual path transcription including transparent resetBg rectangle",
         fixtures: []
       };
 
       for (const fixture of fixtureList()) {
         for (const lineWidth of LINE_WIDTHS) {
-          const built = makeShape(fixture.mode, fixture.points, lineWidth);
-          const node = built.shape.$renderNode;
-          const source = renderGraphicsNode(node, false);
+          const actual = makeActualBoardPane(fixture.mode, fixture.points, lineWidth);
+          const manual = makeManualShape(fixture.mode, fixture.points, lineWidth);
+          const source = renderGraphicsNode(actual.shape.$renderNode, false);
+          const manualSource = renderGraphicsNode(manual.shape.$renderNode, false);
+          const manualTranscriptionMatch = compareCanvases(source.canvas, manualSource.canvas);
+          if (!manualTranscriptionMatch.equal) {
+            throw new Error("Manual path transcription differs from actual BoardPane for " +
+              fixture.id + " width " + lineWidth + ": " + manualTranscriptionMatch.differingPixels +
+              " pixels differ.");
+          }
           const board = composeBoard(source, source.nodeBounds, mask);
           const terminal = terminalPoint(fixture.points, fixture.mode === "smooth", false);
           const entry = {
@@ -276,7 +343,9 @@
             mode: fixture.mode,
             lineWidth,
             points: fixture.points,
-            commands: built.commands,
+            commands: actual.commands,
+            actualBoardPane: true,
+            manualTranscriptionMatch,
             nodeBounds: source.nodeBounds,
             sourceTextureSize: source.skippedByWebGLRenderer
               ? null
@@ -284,14 +353,14 @@
             sourceScale: { x: source.scaleX, y: source.scaleY },
             rasterDisposition: source.skippedByWebGLRenderer
               ? "skipped-by-WebGLRenderer-empty-graphics-node"
-              : "CanvasRenderer-source-raster",
+              : "actual-BoardPane-CanvasRenderer-source-raster",
             smoothPathTerminalPoint: terminal,
             lastAcceptedPoint: fixture.points[fixture.points.length - 1],
             note: source.skippedByWebGLRenderer
-              ? "Egret WebGLRenderer skips GraphicsNode rasterization when bounds are empty; this path produces no texture and no visible pixels."
+              ? "Unexpected empty BoardPane GraphicsNode; inspect resetBg and drawData."
               : fixture.mode === "smooth"
-                ? "Painter.drawSmoothLine(..., true, false) with its trailing drawLast parameter omitted: final lineTo(lastPoint) is not emitted."
-                : "Painter.drawNormalLine: final accepted point is included in the path."
+                ? "Actual BoardPane calls Painter.drawSmoothLine(graphics, points, true, false); drawLast=false is explicit, so final lineTo(lastPoint) is not emitted."
+                : "Actual BoardPane calls Painter.drawNormalLine; final accepted point is included in the path."
           };
           manifest.fixtures.push(entry);
 
@@ -313,7 +382,9 @@
             sourceScale: [source.scaleX, source.scaleY],
             smoothPathTerminalPoint: terminal,
             lastAcceptedPoint: entry.lastAcceptedPoint,
-            rasterDisposition: entry.rasterDisposition
+            rasterDisposition: entry.rasterDisposition,
+            actualBoardPane: entry.actualBoardPane,
+            manualTranscriptionMatch: entry.manualTranscriptionMatch
           }, null, 2);
           card.appendChild(details);
 
