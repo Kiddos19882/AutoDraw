@@ -24,6 +24,7 @@
     lastSamplePointCount: null,
     strokePollTimer: null,
     inputHandlers: null,
+    inputTelemetryEnabled: false,
     startedAt: null,
     errors: [],
     eventListeners: new Set()
@@ -320,7 +321,7 @@
   }
 
   function onMouseMove(event) {
-    if (!state.active || !state.activeStrokeId || !state.board || !isGameCanvasTarget(event.target)) return;
+    if (!state.active || !state.inputTelemetryEnabled || !state.activeStrokeId || !state.board || !isGameCanvasTarget(event.target)) return;
     // Egret WebTouchHandler attaches mousemove to the canvas. This window
     // bubble listener runs after that target listener, so stage.mouseX/Y
     // reflect the coordinates the game has just received.
@@ -346,8 +347,10 @@
     window.addEventListener("pointerdown", state.inputHandlers.down, true);
     window.addEventListener("pointerup", state.inputHandlers.up, true);
     window.addEventListener("pointercancel", state.inputHandlers.cancel, true);
-    // Bubble phase is intentional: capture after Egret's canvas mousemove handler.
-    window.addEventListener("mousemove", state.inputHandlers.move, false);
+    // Optional: bubble phase captures after Egret's canvas mousemove handler.
+    if (state.inputTelemetryEnabled) {
+      window.addEventListener("mousemove", state.inputHandlers.move, false);
+    }
   }
 
   function removeInputObservers() {
@@ -413,7 +416,7 @@
           args: args.slice(0, 3).map(safeValue),
           pointDelta,
           acceptedPoint: pointDelta > 0 ? latestAcceptedPoint(board) : null,
-          ...(pointDelta > 0 ? currentBoardCoordinates(board) : {})
+          ...(pointDelta > 0 && state.inputTelemetryEnabled ? currentBoardCoordinates(board) : {})
         });
       }
       if (previousStroke && !state.activeStrokeId && name !== "onDrawingEnd") state.activeStrokeId = previousStroke;
@@ -520,6 +523,7 @@
       eventCount: state.events.length,
       droppedEvents: state.droppedEvents,
       errors: state.errors.slice(),
+      inputTelemetryEnabled: state.inputTelemetryEnabled,
       events: state.events.slice()
     };
   }
@@ -740,7 +744,8 @@
       snapshot: state.board ? resourceSnapshot(state.board) : null,
       eventCount: state.events.length,
       droppedEvents: state.droppedEvents,
-      errors: state.errors.length
+      errors: state.errors.length,
+      inputTelemetryEnabled: state.inputTelemetryEnabled
     };
   }
 
@@ -750,9 +755,21 @@
     return () => state.eventListeners.delete(listener);
   }
 
+  function setInputTelemetryEnabled(enabled) {
+    const next = enabled === true;
+    if (state.inputTelemetryEnabled === next) return status();
+    state.inputTelemetryEnabled = next;
+    if (state.active && state.inputHandlers) {
+      if (next) window.addEventListener("mousemove", state.inputHandlers.move, false);
+      else window.removeEventListener("mousemove", state.inputHandlers.move, false);
+    }
+    return status();
+  }
+
   const api = {
     start,
     subscribe,
+    setInputTelemetryEnabled,
     stop,
     status,
     export: exportData,
