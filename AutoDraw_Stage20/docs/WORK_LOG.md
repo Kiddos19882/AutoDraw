@@ -1,3 +1,10 @@
+## 2026-11-04 — подтверждена семантика конечного сегмента smooth brush path
+
+- В `main.min_653f95bc.js` проверены `Painter.drawSmoothLine()` и `BoardPane.redraw()`: игра вызывает `drawSmoothLine(graphics, points, true, false)`, то есть запрещает заключительный `lineTo(lastPoint)`.
+- Для одной точки smooth path содержит только `moveTo`; для двух — `moveTo(first)` + `lineTo(midpoint)`; для 3+ точек — midpoint/quadratic segments, заканчивающиеся в midpoint последнего сегмента. `onDrawingEnd()` вызывает `redraw(false)` и не завершает путь до последней принятой точки.
+- Это означает, что последняя точка может быть учтена в `atom.points`/`pointCount`, хотя визуальный path не доходит до неё. Round cap может частично перекрыть остаток, но величина покрытия зависит от lineWidth и расстояния между последними точками; pixel mask ещё не измерена.
+- Это статически подтверждённая семантика source bundle; PNG/runtime equivalence не заявляется. В offline fixtures добавлены обязательные cases 1/2/3+ points и comparison принятой последней точки с концом растеризованного path.
+
 ## 2026-11-04 — получен runtime renderer snapshot и уточнён путь растеризации кисти
 
 - Пользователь предоставил полный `AutoDrawGameMonitor.inspect()` JSON; сохранён как `data/runtime/renderer_snapshot_2026-11-04.json` без изменения значений.
