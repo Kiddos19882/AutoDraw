@@ -486,7 +486,7 @@ Current evidence does not justify changing scanline row spacing: diagnostic repo
 **Оставшиеся gates:**
 1. Runtime Egret 5.4.1/WebGL и stage→client transform уже подтверждены для одной сессии; не переносить коэффициенты на другую viewport без нового snapshot.
 2. Запустить `tests/game_renderer_reference.html`, сохранить source texture PNG, masked-board PNG и browser manifest; проверить smooth endpoint, normal paths, round caps/joins, scrollRect и roundRect mask radius 5.
-3. Сопоставить CanvasRenderer source raster с game captures из той же browser/runtime; отдельно воспроизвести WebGL texture upload/filtering и mask stencil, которых текущий harness не исполняет.
+3. Сопоставить CanvasRenderer source raster с game captures из той же browser/runtime; отдельно проверить WebGL LINEAR sampling при subpixel destination coordinates и mask stencil, которых текущий harness не исполняет (статические texture defaults уже установлены).
 4. Установить расстояние mouseup→last accepted sample для реальной сессии; mouseup не семплируется в `onDrawingEnd()`.
 5. Только после offline PNG acceptance отдельно рассмотреть planner integration; live PNG calibration — после offline gate и отдельного разрешения.
 
