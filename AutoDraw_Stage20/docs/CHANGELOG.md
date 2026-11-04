@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-11-04 — исправлен empty GraphicsNode handling в Egret reference harness
+
+- По source trace Egret 5.4.1 подтверждено: `Graphics.moveTo()` не обновляет bounds; WebGLRenderer пропускает GraphicsNode без положительных width/height или drawData.
+- Предыдущий browser harness останавливался на первом `smooth-single-point` fixture, потому что считал empty bounds ошибкой. Теперь этот случай моделируется как прозрачный no-op с явным manifest disposition; batch может продолжить остальные fixtures.
+- Добавлен Node regression test; CI workflow теперь сохраняет DOM/Edge diagnostics при failure и проверяет доступность локального bundle.
+- Изменения: `167661b`, `e1caaba`, `e2cdafa`. CI нового HEAD пока не подтверждён; pixel equivalence не заявляется.
+
+
 ## 2026-11-04 — подтверждены WebGL texture sampling defaults
 
 - `sys.createTexture()` устанавливает LINEAR min/mag filters, CLAMP_TO_EDGE и premultiplied-alpha upload.
