@@ -493,7 +493,23 @@ BoardPane stage corners из runtime: TL=(519.791666,72), TR=(979.791666,72), BR
 
 **Вывод ограничен:** smooth path заканчивается в midpoint, но в данном capture round cap геометрически достигает центра последней принятой точки. Поэтому отсутствие заключительного `lineTo(lastPoint)` само по себе не доказывает причину coverage residual=11. Game `onDrawingEnd()` не семплирует mouseup; расстояние до фактической release coordinate не рассчитано из-за отсутствия same-session verified client→board transform для этого старого capture. Также не измерены browser antialiasing, texture filtering и clipping pixels.
 
-### 15.8 Границы доказательства и следующий шаг
+### 15.8 Геометрия board mask и clipping
+
+В согласованном `main.min_653f95bc.js` `PainterPopup.createBlackBackground()` создаёт `boardMask` как `egret.Shape` и вызывает:
+
+`boardMask.graphics.drawRoundRect(0, 0, BLACK_BOARD_WIDTH, BLACK_BOARD_HEIGHT, 10)`
+
+Затем `createBlackBoard()` присваивает `painterBoard.mask = boardMask`. В Egret 5.4.1 реализация `egret.sys.Path2D.drawRoundRect()` вычисляет `s = 0.5 * ellipseWidth` и `a = 0.5 * ellipseHeight`; при одном аргументе 10 внутренние радиусы составляют 5 logical px по обеим осям. Snapshot подтверждает mask size 460×240 и ту же concatenated matrix, что и BoardPane. Сам BoardPane дополнительно имеет `scrollRect=(0,0,460,240)`.
+
+Следовательно, фактический clipping включает:
+
+1. прямоугольный BoardPane scrollRect 460×240;
+2. отдельную roundRect mask 460×240 с corner radius 5 logical px;
+3. общий stage/display transform.
+
+Не использовать radius=10 для roundRect mask и не заменять mask одним прямоугольным clip в reference fixtures. Pixel-level edge coverage ещё требует сравнения.
+
+### 15.9 Границы доказательства и следующий шаг
 
 - Snapshot — один runtime capture, не live drawing и не brush experiment.
 - `pointCount=1` / remaining=5999 — текущее состояние; без pre/post pair это не расход CHALK отдельного запуска.
