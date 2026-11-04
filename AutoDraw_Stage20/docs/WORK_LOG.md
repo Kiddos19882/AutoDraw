@@ -2644,3 +2644,22 @@ Retrieved Preparation/G3 job logs and extracted actual committed FILL-001 PNG di
 Evidence supports a perimeter/endpoint coverage problem and does not support an interior scanline-gap explanation for this capture. Asymmetry (right-side uncovered region vs sparse left-side leakage) means actual game brush footprint, screen-space radius semantics and endpoint caps must be inspected before choosing a contour offset or changing plan. The 304-pixel OpenCV planner residual and 1116-pixel screen PNG residual are different measurements.
 
 No production code, frozen plan, mask, thresholds or live game state changed. No new live experiment. Exact CHALK=1260 remains bound to previously committed runtime run; capture REJECTED and 45-task matrix BLOCKED.
+
+
+## 2026-11-04 — FILL-001-RS: статический разбор полного game renderer bundle
+
+Полный main.min_570122a1.js из master получен через GitHub Contents API (blob SHA 28838e803dcc6f85efb13febd93cc9e0f5046ffc, размер 4 785 687 bytes; master commit 9a3453aeb847b66041bc83d6f4a56ecaf33a993a). Файл не копировался в feature branch.
+
+Подтверждено по коду:
+- BoardPane.onDrawStart() добавляет начальную точку, пересчитывает ресурс и включает ENTER_FRAME listener.
+- BoardPane.onDrawing() считывает одну текущую позицию за кадр, проверяет локальные границы и пытается добавить точку.
+- BlackBoardAtom.pushPoint() подавляет только точное совпадение с последней точкой текущего stroke.
+- BoardPane.updateLess() проходит все накопленные atom.points и вычисляет less=max-pointCount; вызов происходит после принятия каждого sample. Это O(N) работа в пути рисования и потенциальная гипотеза для снижения FPS на длинных штрихах.
+- BoardPane.redraw() передаёт atom.radius в graphics.lineStyle как thickness; caps/joints явно не задаёт.
+- Painter.drawSmoothLine() использует midpoint/curveTo и завершает путь lineTo последней точки. Single-point smooth path создаёт moveTo+lineTo в одну координату; normal single-point path только moveTo.
+
+Найден display scaling BoardPane внутри BlackBoardItem: logical 460×240, scaleX=scaleY=boardMask.width/460. Это не доказывает transform интерактивного BoardPane в painter popup, который используется в preflight.
+
+Bridge JS уже формирует frame_probe intervals между началом и концом штриха. Следующая задача — проверить, что intervals сохраняются/доступны в Bridge run evidence, затем сопоставить с per-stroke CHALK. Номинальные 48 FPS не считать фактической частотой кадров конкретного запуска.
+
+Не установлены: renderer caps/joints defaults, реальная rasterization нулевого сегмента, popup board transform и screen-space brush footprint. Статический уровень E1; runtime/live capture не выполнялись. Production code, tests, configs, frozen plan, thresholds и raw evidence не менялись.
