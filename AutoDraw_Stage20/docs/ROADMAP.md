@@ -484,11 +484,11 @@ Current evidence does not justify changing scanline row spacing: diagnostic repo
 Независимый full-canvas oracle использует собственные геометрические функции и сравнивает оба набора клеток. Дополнительно benchmark сравнил global-AABB reference с per-segment вариантом на пяти synthetic polylines (7 timing repeats); masks совпали во всех случаях. Candidate slots сокращены на 59.53–96.23% в четырёх многосегментных сценариях, без сокращения для одного длинного сегмента. Median wall-clock speedup в Windows CI runner составил 2.76–20.57× для многосегментных сценариев и 1.16× для одного сегмента. Детали и limitations записаны в [TASKS.md](TASKS.md#brush-footprint-capsule-001--per-segment-broad-phase-independent-oracle-и-benchmark-2026-11-04).
 
 **Оставшиеся gates:**
-1. Подтвердить deployed Egret runtime/version, фактический render path и caps/joins.
-2. Получить popup BoardPane global transform и screen/canvas mapping.
-3. Сравнить masks с frozen renderer PNG fixtures; проверить endpoints, joins, соседние цвета и canvas boundaries.
-4. Только после offline renderer acceptance отдельно рассмотреть planner integration; не менять production outputs/defaults заранее.
-5. Live PNG calibration — только после offline gate и отдельного разрешения.
+1. Runtime Egret 5.4.1/WebGL и stage→client transform уже подтверждены для одной сессии; не переносить коэффициенты на другую viewport без нового snapshot.
+2. Запустить `tests/game_renderer_reference.html`, сохранить source texture PNG, masked-board PNG и browser manifest; проверить smooth endpoint, normal paths, round caps/joins, scrollRect и roundRect mask radius 5.
+3. Сопоставить CanvasRenderer source raster с game captures из той же browser/runtime; отдельно воспроизвести WebGL texture upload/filtering и mask stencil, которых текущий harness не исполняет.
+4. Установить расстояние mouseup→last accepted sample для реальной сессии; mouseup не семплируется в `onDrawingEnd()`.
+5. Только после offline PNG acceptance отдельно рассмотреть planner integration; live PNG calibration — после offline gate и отдельного разрешения.
 
 Это отдельный риск generic planner-моделей; не считать причиной FILL-001-RS scanline capture без прямого подтверждения. Модель не измеряет CHALK и не доказывает renderer equivalence.
 
