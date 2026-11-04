@@ -905,3 +905,11 @@
 - Offline capsule pixel-cell candidate прошёл первоначальный полный CI [41842587672](https://github.com/Kiddos19882/AutoDraw/actions/runs/41842587672): 820 passed, 24 warnings, 82 subtests; обязательные jobs и Windows portable build/startup smoke-test SUCCESS; optional benchmarks SKIPPED.
 - Добавлены independent analytic oracle и уточнение conservative potential/guaranteed predicates; повторный CI [41843716918](https://github.com/Kiddos19882/AutoDraw/actions/runs/41843716918) ожидает завершения.
 - Existing planner behavior/defaults не менялись; live renderer validation не проводилась.
+
+
+## 2026-11-04 — приоритет connected-contour кандидата для FILL-001-RS
+
+- По запросу пользователя зафиксирован ключевой концептуальный вывод: для периметр-доминантных пропусков сравнивать редкий внутренний scanline-fill + один связный обход контура + локальные внутренние коррекции с глобальным уплотнением scanline и с горизонтальными коррекциями.
+- Уточнено, что исторический outline-first prototype использовал независимые горизонтальные boundary runs, а не единый связный contour route; его результаты не опровергают новую гипотезу.
+- Вывод классифицирован как OPEN / OFFLINE CANDIDATE / HYPOTHESIS. Экономия CHALK не доказана; exact расход определяется только pointCount delta. Сохранены PNG acceptance thresholds и текущие renderer/live gates.
+- Изменены только документационные файлы: AI_WORK_GUIDE, docs index, TASKS, ROADMAP, WORK_LOG и CHANGELOG. Исходники, тесты, конфигурации, frozen plans/masks и экспериментальные данные не менялись; live run не выполнялся.
