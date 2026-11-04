@@ -2,6 +2,21 @@
 
 ## Актуальное состояние на 2026-11-04
 
+## FILL-001-RS — runtime binding и PNG audit по live evidence — 2026-11-04
+
+Пользовательский evidence commit [5308214](https://github.com/Kiddos19882/AutoDraw/commit/530821497ce3a6bd5152318a78e1f06cb836f288) содержит завершённый single-task run rectangle/r10/step=5/offset=0: 27/27 штрихов, radius=10, exact CHALK = 1261 − 1 = 1260. Bridge run `6a17a297-ea14-4527-9527-bfd8de3bd335` завершён без dropped events, Monitor errors, Bridge send failures и sequence gaps.
+
+Причина сообщения «Runtime binding пока не готов» найдена в discovery: в хранилище присутствовала legacy Bridge session `3323cf8e-01ca-4009-8f16-27d657d857f8` от 2026-10-31 без `schema_version=2` и `bridge_diagnostics`. Она не могла удовлетворить FILL-001 contract, но классифицировалась как незавершённая потенциальная session и блокировала найденную актуальную запись. Исправление [a7e37d6](https://github.com/Kiddos19882/AutoDraw/commit/a7e37d6eb0031094ffd962bc11ef01860a3af74a): discovery пропускает несовместимые legacy schemas до pending-классификации; неполные schema-v2 sessions по-прежнему остаются pending, неоднозначность не ослаблена.
+
+Добавлен replay test [974f949](https://github.com/Kiddos19882/AutoDraw/commit/974f949e9639acc90e7f4d6f4588c3fb96f9abb2), который передаёт реальные manifest, attempt, executor report, две Bridge run records, session и before/after PNG через обработчик `Fill001Tab.finalize_capture()`. Тест включает старую legacy session и подтверждает успешную runtime binding: run ID совпадает, exact CHALK=1260.
+
+**Capture не принят:** независимый PNG audit получил coverage **97.673218%** при требовании ≥99% и leakage **28 pixels** при требовании 0. Кнопка корректно оставляет capture pending и не создаёт capture JSON. Успешное исполнение 27/27 и измеренный CHALK не заменяют PNG quality gate.
+
+Полный CI [41772866679](https://github.com/Kiddos19882/AutoDraw/actions/runs/41772866679) на code/test HEAD `974f949`: Preparation/G3 — 804 passed, 24 warnings, 82 subtests; Executor, Game Monitor/Bridge, Application integration, INT-006 pixel audit и Windows portable build/startup smoke-test — SUCCESS; optional benchmarks — SKIPPED.
+
+Следующий приоритет — анализ фактического PNG относительно frozen mask, screen ROI и transform, устранение причин недопокрытия/выхода за границу. Capture и 45-task matrix остаются BLOCKED до повторного прохождения coverage≥99%/leakage=0.
+
+
 ## Исправление FILL-001-RS frozen geometry rebuild — 2026-11-04
 
 Пользовательский runtime evidence commit [63158fb](https://github.com/Kiddos19882/AutoDraw/commit/63158fb55743c566bf231196b80016273970bbf1) зафиксировал отказ single-task preflight до запуска исполнителя. Для задачи rectangle/r10 manifest и исходный DrawingPlan согласованы: planner_version=2, scanline_row_step=5, scanline_offset=0, plan signature совпадает с task, expected_strokes=27. Game Monitor подтвердил radius 30→10; pointCount остался 1 (CHALK=0), Bridge session завершилась без dropped events/errors/send failures.

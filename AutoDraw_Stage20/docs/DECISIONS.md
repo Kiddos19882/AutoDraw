@@ -172,3 +172,16 @@
 **Параметры:** scanline_row_step — расстояние между проходами; point_step_px — расстояние между точками внутри прохода. P1 (step=4, delay=5 ms) не меняется.
 **Выбор кандидатов:** максимальный row step, проходящий coverage ≥99% / leakage=0; при равенстве — максимальное coverage, затем минимальные estimated sampling points/path/strokes. Критерий не объявляется CHALK-optimal; estimated points/path/strokes не являются exact CHALK.
 **Последствия:** первый live preflight candidate — rectangle/r10/step=5/offset=0. До принятого live capture не запускать 45-task RS matrix и не менять production estimator/defaults, executor defaults, исходный FILL-001 manifest или frozen captures. Exact CHALK — только pointCount_after - pointCount_before. INT-006 safety margin и INT-007 не меняются.
+
+
+## DEC-020. Legacy Bridge sessions не блокируют FILL-001 runtime discovery
+
+**Статус:** принято, 2026-11-04  
+**Контекст:** `find_fill001_runtime_binding()` обнаруживал сохранённые session directories. Legacy session `3323cf8e-01ca-4009-8f16-27d657d857f8` от 2026-10-31 не содержала `schema_version=2` и `bridge_diagnostics`, но классифицировалась как потенциально pending и блокировала единственную актуальную schema-v2 session с завершённым run.
+
+**Решение:** до определения pending/active состояния проверять schema version. Session, не соответствующая schema v2, пропускается как заведомо непригодная для текущего FILL-001 contract. Schema-v2 session без diagnostics/finalization timestamp по-прежнему считается pending, пока не разрешится; несколько подходящих schema-v2 sessions остаются неоднозначностью и не принимаются автоматически.
+
+**Инварианты:** не ослаблять session/run identity, временные границы, source-plan SHA-256, P1, lifecycle, exact pointCount/CHALK, observed radius, Bridge/Monitor diagnostics и PNG quality gates.
+
+**Последствия:** старые несовместимые session files больше не блокируют runtime binding новых экспериментов. Replay test на реальных данных подтверждает binding PASS. Capture при этом остаётся REJECTED по PNG gate (coverage=97.673218%, leakage=28); это решение не меняет критерии качества и не разрешает 45-task matrix.
+

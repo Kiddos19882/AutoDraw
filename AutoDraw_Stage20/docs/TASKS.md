@@ -2,6 +2,16 @@
 
 ## Актуальное состояние FILL-001 / FILL-001-RS на 2026-11-04
 
+## FILL-001-RS — runtime binding и live PNG gate — 2026-11-04
+
+- [x] Использовать evidence commit [5308214](https://github.com/Kiddos19882/AutoDraw/commit/530821497ce3a6bd5152318a78e1f06cb836f288): 27/27 strokes, radius=10, exact CHALK=1260, Bridge diagnostics без потерь и ошибок.
+- [x] Исправить блокировку runtime discovery устаревшей legacy Bridge session без schema v2/diagnostics — commit [a7e37d6](https://github.com/Kiddos19882/AutoDraw/commit/a7e37d6eb0031094ffd962bc11ef01860a3af74a).
+- [x] Добавить replay реальных данных через `Fill001Tab.finalize_capture()`, включая legacy session, manifest, executor report, Bridge run records и PNG — commit [974f949](https://github.com/Kiddos19882/AutoDraw/commit/974f949e9639acc90e7f4d6f4588c3fb96f9abb2).
+- [x] Подтвердить, что runtime binding проходит и связывает run `6a17a297-ea14-4527-9527-bfd8de3bd335` с executor; exact CHALK=1260.
+- [ ] Исправить фактическое несоответствие PNG: coverage=97.673218% (требуется ≥99%), leakage=28 (требуется 0). Capture остаётся pending; не принимать и не запускать 45-task matrix до прохождения gate.
+- [x] Полный CI [41772866679](https://github.com/Kiddos19882/AutoDraw/actions/runs/41772866679) — SUCCESS: Preparation/G3 804 passed, 24 warnings, 82 subtests; остальные обязательные jobs, INT-006 audit и Windows portable build/startup smoke-test — SUCCESS; optional benchmarks skipped.
+
+
 ## Исправление FILL-001-RS frozen geometry rebuild — 2026-11-04
 
 Пользовательский runtime evidence commit [63158fb](https://github.com/Kiddos19882/AutoDraw/commit/63158fb55743c566bf231196b80016273970bbf1) зафиксировал отказ single-task preflight до запуска исполнителя. Для задачи rectangle/r10 manifest и исходный DrawingPlan согласованы: planner_version=2, scanline_row_step=5, scanline_offset=0, plan signature совпадает с task, expected_strokes=27. Game Monitor подтвердил radius 30→10; pointCount остался 1 (CHALK=0), Bridge session завершилась без dropped events/errors/send failures.

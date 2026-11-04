@@ -1,3 +1,13 @@
+## 2026-11-04 — FILL-001-RS runtime discovery replay и live PNG rejection
+
+- Изучен evidence commit [5308214](https://github.com/Kiddos19882/AutoDraw/commit/530821497ce3a6bd5152318a78e1f06cb836f288): основной Bridge run `6a17a297-ea14-4527-9527-bfd8de3bd335`, 27/27 strokes, radius=10, exact pointCount 1→1261, CHALK=1260; dropped events, Monitor errors, Bridge send failures и sequence gaps — 0.
+- Установлена причина прежнего сообщения Runtime binding pending: legacy session `3323cf8e-01ca-4009-8f16-27d657d857f8` без schema v2/diagnostics классифицировалась как pending и блокировала актуальную session.
+- В [a7e37d6](https://github.com/Kiddos19882/AutoDraw/commit/a7e37d6eb0031094ffd962bc11ef01860a3af74a) discovery пропускает несовместимые legacy schemas до pending-классификации. Неполные schema-v2 sessions остаются pending.
+- В [974f949](https://github.com/Kiddos19882/AutoDraw/commit/974f949e9639acc90e7f4d6f4588c3fb96f9abb2) добавлен replay тест, который вызывает реальный `Fill001Tab.finalize_capture()` с сохранёнными manifest/attempt/executor report/Bridge session и runs/before-after PNG, включая старую legacy session.
+- Результат replay: runtime binding PASS, точный run ID и CHALK=1260 подтверждены. PNG audit REJECTED: coverage=97.673218% при требовании ≥99%, leakage=28 при требовании 0. Capture JSON не создаётся, attempt и matrix остаются pending.
+- Полный CI [41772866679](https://github.com/Kiddos19882/AutoDraw/actions/runs/41772866679) — SUCCESS: Preparation/G3 804 passed, 24 warnings, 82 subtests; Executor, Game Monitor/Bridge, Application integration, INT-006 pixel audit и Windows portable build/startup smoke-test SUCCESS; optional benchmarks SKIPPED.
+- Следующий шаг — анализировать реальный PNG/ROI/transform и устранить недопокрытие/выход за границы. Live matrix не запускать до прохождения PNG gate.
+
 ## Исправление FILL-001-RS frozen geometry rebuild — 2026-11-04
 
 Пользовательский runtime evidence commit [63158fb](https://github.com/Kiddos19882/AutoDraw/commit/63158fb55743c566bf231196b80016273970bbf1) зафиксировал отказ single-task preflight до запуска исполнителя. Для задачи rectangle/r10 manifest и исходный DrawingPlan согласованы: planner_version=2, scanline_row_step=5, scanline_offset=0, plan signature совпадает с task, expected_strokes=27. Game Monitor подтвердил radius 30→10; pointCount остался 1 (CHALK=0), Bridge session завершилась без dropped events/errors/send failures.

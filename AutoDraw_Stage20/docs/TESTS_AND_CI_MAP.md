@@ -29,6 +29,7 @@
 | `source/preparation/tests/test_chalk_test_blocks.py` | `chalk_test_blocks` | Полные планы G1/G2/G3/INT006R, три повтора, детерминированный порядок, журнал, последовательный claim, fail-closed и interrupted recovery |
 | `source/preparation/tests/test_chalk_int006r_validation.py` | `chalk_experiment_matrix`, `chalk_test_blocks`, `chalk_int006r_validation` | 45-cell radius × geometry matrix, радиусы 1/10/30, P1-only, journal tampering, duplicate cells и incomplete analyzer gate |
 | `source/preparation/tests/test_chalk_fill_experiment.py` | `chalk_fill_experiment` | Frozen FILL-001 masks, SHA-256, area matching ±5%, shape aspect ratios, row connectivity и fail-closed input validation |
+| `source/preparation/tests/test_chalk_fill_committed_capture_replay.py` | `Fill001Tab.finalize_capture`, `chalk_fill_runtime_binding`, `chalk_fill_capture_adapter`, PNG audit | Replay реальных committed manifest/attempt/executor report/Bridge session и run JSON/before-after PNG; legacy session не блокирует binding; runtime binding PASS, exact CHALK=1260, PNG gate fail-closed при coverage=97.673218% и leakage=28. |
 
 Дополнительные импорты в `test_geometry_color_plan.py` подтверждают, что тест напрямую обращается к внутренним функциям и модулям-реализациям, а не только к публичному API. При изменении внутренних контрактов этот тестовый файл следует рассматривать как интеграционный тест нескольких алгоритмических компонентов.
 

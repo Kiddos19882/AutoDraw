@@ -2,9 +2,19 @@
 
 **Статус:** актуальный временный план, обязателен к сохранению до выполнения всех пяти шагов или отдельного решения пользователя.  
 **Дата создания:** 2026-11-03  
-**Последнее обновление:** 2026-11-04 (FILL-001-RS runtime geometry rebuild defect identified and corrected; CI/live preflight pending)
+**Последнее обновление:** 2026-11-04 (runtime discovery replay fixed legacy-session blocker; live PNG audit rejected the candidate)
 **Рабочая ветка:** `feature/image-geometry-optimization`  
 **Область:** подготовка и проведение контролируемого эксперимента по расходу CHALK при заполнении областей кистями разных радиусов; после quota-exhausted preflight добавлен отдельный versioned этап FILL-001-RS для исследования расстояния между проходами.
+
+## Runtime binding replay и PNG audit — 2026-11-04
+
+Пользовательский evidence commit [5308214](https://github.com/Kiddos19882/AutoDraw/commit/530821497ce3a6bd5152318a78e1f06cb836f288) содержит завершённый run rectangle/r10/step=5/offset=0: 27/27 strokes, radius=10, exact CHALK=1260. Основной Bridge run ID: `6a17a297-ea14-4527-9527-bfd8de3bd335`.
+
+Причина Runtime binding pending — старая legacy Bridge session без schema v2 и diagnostics блокировала discovery. Исправление [a7e37d6](https://github.com/Kiddos19882/AutoDraw/commit/a7e37d6eb0031094ffd962bc11ef01860a3af74a) исключает несовместимые schema до классификации pending; incomplete schema-v2 sessions по-прежнему не принимаются автоматически.
+
+Replay test [974f949](https://github.com/Kiddos19882/AutoDraw/commit/974f949e9639acc90e7f4d6f4588c3fb96f9abb2) прогоняет реальные committed artifacts через `Fill001Tab.finalize_capture()`, включая legacy session. Runtime binding PASS, exact CHALK=1260. Независимый PNG audit не прошёл: coverage=97.673218% (требуется ≥99%), leakage=28 (требуется 0). Capture остаётся pending; качество не считается подтверждённым.
+
+Полный CI [41772866679](https://github.com/Kiddos19882/AutoDraw/actions/runs/41772866679) — SUCCESS: Preparation/G3 804 passed, 24 warnings, 82 subtests; обязательные jobs, INT-006 pixel audit и Windows portable build/startup smoke-test SUCCESS; optional benchmarks SKIPPED.
 
 ## Исправление FILL-001-RS frozen geometry rebuild — 2026-11-04
 
@@ -47,7 +57,7 @@
 
 ### Шаг 3. Интегрировать запуск в AutoDraw и провести Windows live preflight
 
-**Статус:** IN_PROGRESS — software/CI gates пройдены. Live preflight из commit [73d14a1](https://github.com/Kiddos19882/AutoDraw/commit/73d14a1784a5a9f8ef29bc0e197b75352f2650af) подтвердил exact CHALK=5999, но только 128/131 consuming strokes; три последних кандидата не потребили ресурс после исчерпания квоты. Capture REJECTED, полная стоимость плана неизвестна. Последующий статический анализ выявил избыточно плотные проходы и сформировал кандидатов FILL-001-RS; ни один кандидат ещё не подтверждён live.
+**Статус:** IN_PROGRESS — software/CI gates пройдены; runtime binding реального RS candidate подтверждён, но независимый PNG audit отклонил capture (coverage=97.673218%, leakage=28). Live preflight из commit [73d14a1](https://github.com/Kiddos19882/AutoDraw/commit/73d14a1784a5a9f8ef29bc0e197b75352f2650af) подтвердил exact CHALK=5999, но только 128/131 consuming strokes; три последних кандидата не потребили ресурс после исчерпания квоты. Capture REJECTED, полная стоимость плана неизвестна. Последующий статический анализ выявил избыточно плотные проходы и сформировал кандидатов FILL-001-RS; ни один кандидат ещё не подтверждён live.
 
 **Подтверждённая реализация UI/runner:**
 - Добавлен `source/preparation/chalk_fill_ui.py` и самостоятельная вкладка FILL-001 в `integrated_app.py`, отдельная от седьмой вкладки «Тест кистей».

@@ -2,6 +2,15 @@
 
 ## Актуальный статус FILL-001 / FILL-001-RS на 2026-11-04
 
+## FILL-001-RS — актуальный live preflight gate — 2026-11-04
+
+Runtime binding для последнего rectangle/r10/step=5/offset=0 запуска восстановлен: legacy Bridge session без schema v2 больше не блокирует поиск. Replay через обработчик capture-кнопки подтвердил task↔executor↔Bridge binding, 27/27 strokes и exact CHALK=1260.
+
+Однако live capture **не принят**: фактический PNG audit — coverage=97.673218% при пороге ≥99%, leakage=28 при требовании 0. Следующий этап — диагностировать raster/ROI/transform discrepancy и добиться прохождения PNG gate без ослабления frozen criteria. До этого FILL-001 capture и 45-task matrix остаются BLOCKED.
+
+Software gate: [CI 41772866679](https://github.com/Kiddos19882/AutoDraw/actions/runs/41772866679) SUCCESS на code/test HEAD `974f949`; Preparation/G3 804 passed, 24 warnings, 82 subtests; Executor, Game Monitor/Bridge, Application integration, INT-006 pixel audit и Windows portable build/startup smoke-test SUCCESS.
+
+
 ## Исправление FILL-001-RS frozen geometry rebuild — 2026-11-04
 
 Пользовательский runtime evidence commit [63158fb](https://github.com/Kiddos19882/AutoDraw/commit/63158fb55743c566bf231196b80016273970bbf1) зафиксировал отказ single-task preflight до запуска исполнителя. Для задачи rectangle/r10 manifest и исходный DrawingPlan согласованы: planner_version=2, scanline_row_step=5, scanline_offset=0, plan signature совпадает с task, expected_strokes=27. Game Monitor подтвердил radius 30→10; pointCount остался 1 (CHALK=0), Bridge session завершилась без dropped events/errors/send failures.
