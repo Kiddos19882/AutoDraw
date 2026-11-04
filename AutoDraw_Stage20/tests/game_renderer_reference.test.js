@@ -58,3 +58,12 @@ test("empty paths produce no drawing commands", () => {
   assert.deepEqual(buildNormalPathCommands([]), []);
   assert.equal(terminalPoint([], true, false), null);
 });
+
+test("the source call's fourth formal argument is not the final-line flag", () => {
+  const points = [{ x: 0, y: 0 }, { x: 10, y: 10 }];
+  const sourceCall = buildSmoothPathCommands(points, true, false);
+  const explicitFinalLine = buildSmoothPathCommands(points, true, false, true);
+
+  assert.deepEqual(sourceCall.at(-1), { type: "lineTo", x: 5, y: 5 });
+  assert.deepEqual(explicitFinalLine.at(-1), { type: "lineTo", x: 10, y: 10 });
+});
