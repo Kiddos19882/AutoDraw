@@ -2,7 +2,7 @@
 
 **Статус:** актуальный временный план, обязателен к сохранению до выполнения всех пяти шагов или отдельного решения пользователя.  
 **Дата создания:** 2026-11-03  
-**Последнее обновление:** 2026-11-04 (runtime discovery replay fixed legacy-session blocker; live PNG audit rejected the candidate)
+**Последнее обновление:** 2026-11-04 (corrected replay of original PNGs: runtime binding PASS; coverage=98.430600%, leakage=11; capture REJECTED)
 **Рабочая ветка:** `feature/image-geometry-optimization`  
 **Область:** подготовка и проведение контролируемого эксперимента по расходу CHALK при заполнении областей кистями разных радиусов; после quota-exhausted preflight добавлен отдельный versioned этап FILL-001-RS для исследования расстояния между проходами.
 
@@ -15,6 +15,15 @@
 Replay test [974f949](https://github.com/Kiddos19882/AutoDraw/commit/974f949e9639acc90e7f4d6f4588c3fb96f9abb2) прогоняет реальные committed artifacts через `Fill001Tab.finalize_capture()`, включая legacy session. Runtime binding PASS, exact CHALK=1260. Независимый PNG audit не прошёл: coverage=97.673218% (требуется ≥99%), leakage=28 (требуется 0). Capture остаётся pending; качество не считается подтверждённым.
 
 Полный CI [41772866679](https://github.com/Kiddos19882/AutoDraw/actions/runs/41772866679) — SUCCESS: Preparation/G3 804 passed, 24 warnings, 82 subtests; обязательные jobs, INT-006 pixel audit и Windows portable build/startup smoke-test SUCCESS; optional benchmarks SKIPPED.
+
+
+## Corrected replay исходных PNG — 2026-11-04
+
+Replay test [`test_chalk_fill_committed_capture_replay.py`](../source/preparation/tests/test_chalk_fill_committed_capture_replay.py) выполнен в CI [41780241017](https://github.com/Kiddos19882/AutoDraw/actions/runs/41780241017) на checkout HEAD `0f23731`. Использованы исходные before/after PNG и связанное evidence commit [5308214](https://github.com/Kiddos19882/AutoDraw/commit/530821497ce3a6bd5152318a78e1f06cb836f288); test вызывает реальный `Fill001Tab.finalize_capture()`.
+
+Runtime binding PASS: выбран правильный run, 27/27 strokes, radius=10, exact CHALK=1260, Bridge diagnostics без потерь и ошибок. Исправленный PNG audit дал coverage=98.430600%, leakage=11; прежний результат до affine correction был 97.673218% / 28. Улучшение есть, но thresholds ≥99% / 0 не пройдены. Capture остаётся REJECTED/PENDING.
+
+Полный replay report, SHA-256 evidence и ограничения: [CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md](CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md). Следующий шаг — offline pixel breakdown и overlays; live запуск и 45-task matrix остаются BLOCKED.
 
 ## Исправление FILL-001-RS frozen geometry rebuild — 2026-11-04
 
@@ -57,7 +66,7 @@ Replay test [974f949](https://github.com/Kiddos19882/AutoDraw/commit/974f949e963
 
 ### Шаг 3. Интегрировать запуск в AutoDraw и провести Windows live preflight
 
-**Статус:** IN_PROGRESS — software/CI gates пройдены; runtime binding реального RS candidate подтверждён, но независимый PNG audit отклонил capture (coverage=97.673218%, leakage=28). Live preflight из commit [73d14a1](https://github.com/Kiddos19882/AutoDraw/commit/73d14a1784a5a9f8ef29bc0e197b75352f2650af) подтвердил exact CHALK=5999, но только 128/131 consuming strokes; три последних кандидата не потребили ресурс после исчерпания квоты. Capture REJECTED, полная стоимость плана неизвестна. Последующий статический анализ выявил избыточно плотные проходы и сформировал кандидатов FILL-001-RS; кандидат rectangle/r10/step=5/offset=0 уже исполнен: runtime binding PASS, но capture REJECTED независимым PNG audit; ни один кандидат пока не принят как valid live capture.
+**Статус:** IN_PROGRESS — software/CI gates пройдены; corrected replay исходных PNG подтвердил runtime binding, но audit отклонил capture (coverage=98.430600%, leakage=11; предыдущий audit до affine correction: 97.673218% / 28). Остаточная pixel discrepancy ещё не локализована. Live preflight из commit [73d14a1](https://github.com/Kiddos19882/AutoDraw/commit/73d14a1784a5a9f8ef29bc0e197b75352f2650af) подтвердил exact CHALK=5999, но только 128/131 consuming strokes; три последних кандидата не потребили ресурс после исчерпания квоты. Capture REJECTED, полная стоимость плана неизвестна. Последующий статический анализ выявил избыточно плотные проходы и сформировал кандидатов FILL-001-RS; кандидат rectangle/r10/step=5/offset=0 уже исполнен: runtime binding PASS, но capture REJECTED независимым PNG audit; ни один кандидат пока не принят как valid live capture.
 
 **Подтверждённая реализация UI/runner:**
 - Добавлен `source/preparation/chalk_fill_ui.py` и самостоятельная вкладка FILL-001 в `integrated_app.py`, отдельная от седьмой вкладки «Тест кистей».
