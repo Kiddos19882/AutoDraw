@@ -156,11 +156,13 @@ Per-stroke timing пересчитан по timestamps событий POINT_QUOT
 - прямой многоточечный штрих имеет swept/capsule footprint с полукруглыми окончаниями; в углах используются round joins;
 - на прямом сегменте геометрическая полуширина равна thickness/2, до преобразования board/global/canvas scale.
 
-### 10.2 Одноточечный штрих
+### 10.2 Одноточечный штрих — историческая гипотеза, superseded by current bundle trace
 
-Painter.drawSmoothLine() для одного point формирует moveTo(p)+lineTo(p), то есть нулевой сегмент. drawNormalLine() формирует только moveTo(p).
+В раннем анализе предполагалось, что smooth path для одной точки может формировать `moveTo(p)+lineTo(p)`. Это утверждение не следует применять к подтверждённому текущему bundle: точная сигнатура и фактический вызов `Painter.drawSmoothLine` разобраны в §15.6.
 
-HTML Canvas Standard требует удалить zero-length line segments перед построением stroke и удалить subpaths без линий. Следовательно, в CanvasRenderer такой путь не даёт видимого следа, хотя BoardPane.onDrawStart() уже добавил координату и updateLess() увеличил pointCount. WebGLRenderer в рассмотренной версии Egret тоже делегирует GraphicsNode растрирование в CanvasRenderer.
+Для текущего `main.min_653f95bc.js` `BoardPane.redraw()` передаёт только четыре аргумента функции, у которой пятый параметр `drawLast` остаётся undefined. Поэтому smooth path одной точки содержит два последовательных `moveTo(p)`, без `lineTo(p)`; normal path содержит один `moveTo(p)`. Ни один вариант не создаёт drawable segment. Game Monitor при этом может учитывать первую принятую точку в `pointCount`.
+
+CanvasRenderer использует GraphicsNode raster path; фактический пиксельный результат для такого path требует браузерного PNG reference. См. §15.6 и §15.9.
 
 Источник Canvas path algorithm: https://html.spec.whatwg.org/multipage/canvas.html (раздел 4.12.5.1.4, lineCap; 4.12.5.1.6, path construction). Это вывод для совместимого CanvasRenderer; deployed Egret runtime/version игры пока не идентифицирован. В FILL-001-RS run все 27 штрихов имели 41–48 point updates, поэтому одноточечный случай к этому capture не относится.
 
