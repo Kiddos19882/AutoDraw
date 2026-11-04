@@ -899,3 +899,9 @@
 - Статический аудит выявил AABB coverage overclaim в experimental `interior_fill_planner`: bbox маркируется как полностью покрытая область, хотя round-cap stroke имеет capsule footprint; текущий independent test oracle использует rectangular model.
 - Уточнена область: `swept_footprint_geometry` и `outline_first_fill_planner` используют bbox как conservative safety check; FILL-001-RS имеет отдельный OpenCV round-capped rasterizer, поэтому причинная связь не доказана.
 - Код и тесты не менялись. Следующий шаг — offline masks для потенциально затронутых и гарантированно покрытых pixel cells с frozen-fixture comparison.
+
+## 2026-11-04 — capsule footprint candidate and CI
+
+- Offline capsule pixel-cell candidate прошёл первоначальный полный CI [41842587672](https://github.com/Kiddos19882/AutoDraw/actions/runs/41842587672): 820 passed, 24 warnings, 82 subtests; обязательные jobs и Windows portable build/startup smoke-test SUCCESS; optional benchmarks SKIPPED.
+- Добавлены independent analytic oracle и уточнение conservative potential/guaranteed predicates; повторный CI [41843716918](https://github.com/Kiddos19882/AutoDraw/actions/runs/41843716918) ожидает завершения.
+- Existing planner behavior/defaults не менялись; live renderer validation не проводилась.
