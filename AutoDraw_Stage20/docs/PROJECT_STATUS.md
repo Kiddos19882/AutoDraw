@@ -7,7 +7,7 @@
 
 **Новый статический анализ движка:** полный bundle прочитан через GitHub Contents API. Источник master commit 9a3453aeb847b66041bc83d6f4a56ecaf33a993a, blob 28838e803dcc6f85efb13febd93cc9e0f5046ffc. Подтверждены ENTER_FRAME sampling, dedup одинаковых соседних точек, O(N) пересчёт updateLess() на каждый принятый sample, передача brush value как line thickness и smooth-path behavior. Cap geometry, zero-length stroke rasterization и popup display transform остаются UNKNOWN. Подробности: [engine audit](CHALK_GAME_ENGINE_POINT_COST_AND_BRUSH_WIDTH_2026-11-03.md).
 
-**Следующий offline gate:** связать Bridge per-stroke frame_probe intervals с фактическими pointCount deltas; установить transform именно popup BoardPane; получить независимое подтверждение caps/joins и raster footprint. После этого построить versioned perimeter candidate и проверить frozen PNG acceptance mask. Не менять frozen plan, masks, thresholds, production defaults и не запускать live capture до прохождения offline gate.
+**Следующий offline gate:** frame_probe теперь сохраняется per-stroke для будущих запусков; для старого run принятая point cadence уже восстановлена из POINT_QUOTA_UPDATE. Установить deployed Egret runtime identity, проверить zero-length rasterization, измерить global transform painter popup BoardPane и откалибровать фактический screen-space footprint. После этого построить versioned perimeter candidate и проверить frozen PNG acceptance mask. Не менять frozen plan, masks, thresholds, production defaults и не запускать live capture до прохождения offline gate.
 
 **Дополнительные данные сохранённого run 6a17a297:** 1260 POINT_QUOTA_UPDATE events распределены по 27 штрихам. Каждый штрих принял 41–48 точек за 1450–1645 ms; median интервал между изменениями pointCount — 33 ms; accepted-point rate 28.26–29.50 points/s. Первые 9 штрихов: 28.734 points/s в среднем; последние 9: 29.049. В run-level frame_probe browser requestAnimationFrame измерен как 59.997 FPS; это не частота Egret ENTER_FRAME. На данном запуске не видно падения cadence от роста pointCount 1→1261, но это не исключает overhead на более длинных runs.
 
@@ -1021,3 +1021,6 @@ Direct pixel evidence shows residuals concentrated at target perimeter / scanlin
 Planner OpenCV model had 304 uncovered logical pixels, actual PNG diagnostic found 1116 screen pixels. These are different raster spaces and renderer models; do not treat counts as interchangeable.
 
 Capture remains REJECTED; 45-task matrix remains BLOCKED. Exact CHALK remains 1260 from the existing live run. No new live experiment. Frozen plan, mask, thresholds and production code unchanged.
+
+
+**Уточнение renderer API:** в bundle Main UI задаёт nominal stage.frameRate=48 и StageScaleMode.NO_SCALE. PainterPopup создаёт BoardPane 460×240 без собственного scaleX/scaleY. Egret Engine 5.2.18 API документирует omitted caps/joints как ROUND; версия реально подключённого runtime игры пока не подтверждена. Поэтому round caps/joins — ожидаемое поведение совместимого Egret, не установленный факт для текущей игровой сборки.
