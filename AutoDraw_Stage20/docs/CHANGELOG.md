@@ -846,3 +846,9 @@
 - В committed capture replay test добавлен вывод координат фактических uncovered/leakage pixels исходной PNG pair, пространственного распределения, connected components и расстояний до affine-transformed scanline centerlines.
 - Изменение ограничено тестовой диагностикой; production audit, исходные evidence, frozen plan/mask, thresholds и defaults не менялись.
 - Commits: `e62b692`, `d337f42`. Выполнение диагностического теста и его численный результат ожидают подтверждения CI.
+## 2026-11-04 — FILL-001-RS actual PNG residual localization
+
+- CI confirms committed-evidence pixel diagnostic: 1116 uncovered target pixels, distributed entirely in configured perimeter zones; 0 interior/other.
+- Right perimeter is dominant residual region (largest component 870 px); 11 leakage pixels are sparse near left perimeter / rounded corners.
+- Result supports investigating brush footprint and stroke endpoints before changing row spacing. No production behavior, frozen plan or acceptance thresholds changed.
+- Workflow 41787492122 SUCCESS; Preparation/G3 804 passed, 82 subtests passed.
