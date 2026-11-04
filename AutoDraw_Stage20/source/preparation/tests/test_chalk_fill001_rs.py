@@ -6,6 +6,8 @@ import pytest
 
 from chalk_fill_execution import prepare_fill001_single_task_plan
 from chalk_fill_runtime_binding import build_fill001_experiment_context
+from chalk_fill_experiment import FILL001_RADII, FILL001_SHAPES
+from chalk_fill_fixed_radius_planner import build_fixed_radius_fill_plan
 from chalk_fill_matrix import (
     FILL001_RS_PLAN_VARIANT,
     FILL001_RS_SCANLINE_CONFIGS,
@@ -109,3 +111,50 @@ def test_rs_runtime_context_rejects_invalid_spacing():
     task["scanline_offset"] = task["scanline_row_step"]
     with pytest.raises(FillMatrixError):
         build_fill001_experiment_context(task)
+
+
+def test_frozen_rs_spacing_map_matches_exhaustive_static_sweep():
+    observed = {}
+    candidate_count = 0
+    accepted_count = 0
+
+    for shape in FILL001_SHAPES:
+        for radius in FILL001_RADII:
+            candidates = []
+            for step in range(1, radius + 1):
+                for offset in range(step):
+                    candidate_count += 1
+                    plan = build_fixed_radius_fill_plan(
+                        shape,
+                        radius,
+                        scanline_row_step=step,
+                        scanline_offset=offset,
+                    )
+                    summary = plan["summary"]
+                    if summary["coverage_fraction"] >= 0.99 and summary["leakage_pixels"] == 0:
+                        accepted_count += 1
+                        candidates.append({
+                            "step": step,
+                            "offset": offset,
+                            "coverage": summary["coverage_fraction"],
+                            "estimated_points": summary["estimated_sampling_points"],
+                            "path": summary["path_length_logical_pixels"],
+                            "strokes": summary["stroke_count"],
+                        })
+            assert candidates, f"No accepted static candidate for {shape}/r{radius}"
+            max_step = max(item["step"] for item in candidates)
+            finalists = [item for item in candidates if item["step"] == max_step]
+            best = max(
+                finalists,
+                key=lambda item: (
+                    item["coverage"],
+                    -item["estimated_points"],
+                    -item["path"],
+                    -item["strokes"],
+                ),
+            )
+            observed[(shape, radius)] = (best["step"], best["offset"])
+
+    assert candidate_count == 2238
+    assert accepted_count == 62
+    assert observed == FILL001_RS_SCANLINE_CONFIGS
