@@ -78,8 +78,8 @@ FILL-001 должен проверять не «сколько CHALK стоит 
 - Painter.drawSmoothLine() строит midpoints между соседними точками, использует curveTo() для сглаживания и в конце делает lineTo() к последней сохранённой точке.
 - Для массива из одной точки smooth path выполняет moveTo(point) и lineTo(point) в ту же координату. Для drawNormalLine() с одной точкой выполняется только moveTo(point).
 - Первая точка может быть учтена в CHALK до заметного перемещения указателя. Будет ли нулевой путь визуально окрашен, зависит от Egret renderer и настроек окончания линии; это не установлено по одному вызову Painter.
-- Caps/joints не передаются из BoardPane.redraw(). В bundle не найдено явного задания lineCap; фактическая форма окончания и поведение нулевого сегмента остаются UNKNOWN до проверки Egret Graphics/runtime или отдельного capture.
-- BlackBoardItem.createNativeContent() задаёт logical board 460×240 и вычисляет равномерный board.scaleX = board.scaleY = boardMask.width / 460. Это подтверждает display scale доски внутри item. Нельзя автоматически переносить этот transform на painter popup: нужно проверить именно тот BoardPane, на котором выполняется live drawing.
+- Caps/joints не передаются из BoardPane.redraw(). В официальном Egret Engine 5.2.18 API (egret.d.ts) для Graphics.lineStyle задокументированы defaults CapsStyle.ROUND и JointStyle.ROUND; thickness описана как толщина линии в points. Поэтому round caps/joins — обоснованный ожидаемый default для совместимого Egret runtime. Но версия Egret, фактически загруженная игрой, не установлена, поэтому это пока не подтверждённый runtime факт. Поведение нулевого сегмента остаётся UNKNOWN.
+- BlackBoardItem.createNativeContent() задаёт logical board 460×240 и вычисляет равномерный board.scaleX = board.scaleY = boardMask.width / 460. Это display scale доски внутри item, не painter popup. PainterPopup.setPopupUI(676,379) создаёт popup 676×379; createBlackBoard() создаёт интерактивный BoardPane 460×240 и не задаёт ему собственный scaleX/scaleY. Родительский/global transform, CSS/devicePixelRatio и соответствие stage coordinates физическим screen pixels всё ещё нужно измерить именно на painter popup.
 
 ### 7.3 Следствия для AutoDraw
 
@@ -117,3 +117,21 @@ Per-stroke timing пересчитан по timestamps событий POINT_QUOT
 Старый Bridge finalizer объединил rAF intervals в один run-level summary и очистил frame_probes, поэтому исходные per-stroke rAF intervals этого исторического run восстановить нельзя. POINT_QUOTA_UPDATE events сохранили timestamps и strokeId, поэтому accepted-point cadence восстановлена. Новые commits добавляют strokeId в frame_probe, сохраняют raw intervals и создают per_stroke_metrics/frame_probe_by_stroke.
 
 **Уровень evidence:** E2 для cadence принятых точек данного run (точные игровые pointCount events); E2 для browser rAF aggregate; не E2 для фактического Egret frame rate и не доказательство renderer footprint.
+
+
+## 9. Egret API defaults и stage target frame rate
+
+В bundle найдено:
+- Main UI container устанавливает _defaultFps=48.
+- setAsMain() назначает stage.frameRate = _defaultFps и stage.scaleMode = egret.StageScaleMode.NO_SCALE.
+- PainterPopup создаётся размером 676×379; его painterBoard имеет logical width=460, height=240, x=boardX, y=75. В createBlackBoard() явного scaleX/scaleY для painterBoard нет.
+- BoardPane.redraw() вызывает lineStyle только с четырьмя аргументами.
+
+Сопоставление с официальной документацией Egret Engine 5.2.18:
+- thickness — толщина линии в points;
+- omitted caps default to CapsStyle.ROUND;
+- omitted joints default to JointStyle.ROUND.
+
+Источник: https://app.unpkg.com/egret-engine@5.2.18/files/build/egret-wasm/egret.d.ts (Graphics.lineStyle, строки 6063–6090 в просмотренной версии).
+
+**Ограничение:** фактически подключённая игрой версия Egret runtime не установлена по доступным репозиторным материалам. Поэтому round caps/joins — сильная API-совместимая гипотеза, но не доказательство конкретной сборки. Также не установлено, как renderer растеризует moveTo(p)+lineTo(p) при round cap. Нужны deployed runtime identity или независимый PNG capture. Не считать круглую форму footprint полностью подтверждённой.
