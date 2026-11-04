@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "name": "FILL-001-RS fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
-  "created_at": "2026-11-04T03:39:06.659250+00:00",
+  "name": "FILL-001-RS fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
+  "created_at": "2026-11-04T04:04:22.557429+00:00",
   "coordinate_system": "local_canvas_pixels",
   "canvas": {
     "width": 581,
@@ -14,7 +14,7 @@
   },
   "strokes": [
     {
-      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0001",
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0001",
       "closed": false,
       "points": [
         {
@@ -28,13 +28,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
         "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0002",
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0002",
       "closed": false,
       "points": [
         {
@@ -48,13 +48,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
         "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0003",
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0003",
       "closed": false,
       "points": [
         {
@@ -68,13 +68,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
         "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0004",
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0004",
       "closed": false,
       "points": [
         {
@@ -88,13 +88,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
         "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0005",
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0005",
       "closed": false,
       "points": [
         {
@@ -108,13 +108,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
         "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0006",
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0006",
       "closed": false,
       "points": [
         {
@@ -128,13 +128,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
         "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0007",
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0007",
       "closed": false,
       "points": [
         {
@@ -148,13 +148,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
         "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0008",
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0008",
       "closed": false,
       "points": [
         {
@@ -168,13 +168,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
         "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0009",
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0009",
       "closed": false,
       "points": [
         {
@@ -188,13 +188,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
         "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0010",
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0010",
       "closed": false,
       "points": [
         {
@@ -208,13 +208,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
         "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0011",
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0011",
       "closed": false,
       "points": [
         {
@@ -228,13 +228,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
         "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0012",
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0012",
       "closed": false,
       "points": [
         {
@@ -248,13 +248,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
         "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0013",
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0013",
       "closed": false,
       "points": [
         {
@@ -268,13 +268,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
         "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0014",
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0014",
       "closed": false,
       "points": [
         {
@@ -288,13 +288,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
         "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0015",
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0015",
       "closed": false,
       "points": [
         {
@@ -308,13 +308,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
         "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0016",
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0016",
       "closed": false,
       "points": [
         {
@@ -328,13 +328,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
         "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0017",
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0017",
       "closed": false,
       "points": [
         {
@@ -348,13 +348,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
         "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0018",
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0018",
       "closed": false,
       "points": [
         {
@@ -368,13 +368,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
         "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0019",
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0019",
       "closed": false,
       "points": [
         {
@@ -388,13 +388,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
         "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0020",
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0020",
       "closed": false,
       "points": [
         {
@@ -408,13 +408,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
         "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0021",
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0021",
       "closed": false,
       "points": [
         {
@@ -428,13 +428,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
         "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0022",
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0022",
       "closed": false,
       "points": [
         {
@@ -448,13 +448,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
         "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0023",
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0023",
       "closed": false,
       "points": [
         {
@@ -468,13 +468,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
         "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0024",
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0024",
       "closed": false,
       "points": [
         {
@@ -488,13 +488,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
         "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0025",
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0025",
       "closed": false,
       "points": [
         {
@@ -508,13 +508,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
         "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0026",
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0026",
       "closed": false,
       "points": [
         {
@@ -528,13 +528,13 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
         "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     },
     {
-      "name": "fill001_fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1_0027",
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0027",
       "closed": false,
       "points": [
         {
@@ -548,7 +548,7 @@
       ],
       "metadata": {
         "role": "fill001_fixed_radius_scanline",
-        "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
         "brush_value": "10",
         "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
@@ -556,8 +556,8 @@
   ],
   "autodraw_experiment": {
     "phase_id": "FILL001",
-    "series_id": "fill001-rs-preflight-20261104",
-    "task_id": "fill001-rs-preflight-20261104-rectangle-r10-s5-o0-rep1",
+    "series_id": "fill001-rs-preflight-20261104-7.04",
+    "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
     "shape_id": "rectangle",
     "requested_radius": 10,
     "repeat_index": 1,
@@ -573,6 +573,6 @@
     "planner_version": 2,
     "scanline_row_step": 5,
     "scanline_offset": 0,
-    "executor_plan_sha256": "b50bb021bb932be1b9ef100f22c30d77756ec89e9bff11c5317066b94fce1446"
+    "executor_plan_sha256": "848b6875e34bad388a48706346a9939cdf508200edf2536d8da99121a5d8b6b9"
   }
 }
