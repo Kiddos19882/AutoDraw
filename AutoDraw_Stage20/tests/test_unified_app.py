@@ -384,7 +384,10 @@ class UnifiedAppCoreTests(unittest.TestCase):
         root = None
         app = None
         try:
-            root = tk.Tk()
+            try:
+                root = tk.Tk()
+            except tk.TclError as exc:
+                self.skipTest(f"Tk desktop session unavailable: {exc}")
             root.withdraw()
             app = integrated_app.AutoDrawUnifiedApp(root)
             labels = [app.notebook.tab(tab, "text") for tab in app.notebook.tabs()]
