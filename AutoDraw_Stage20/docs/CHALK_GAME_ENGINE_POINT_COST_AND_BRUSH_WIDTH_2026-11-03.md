@@ -191,7 +191,7 @@ brush_footprint_geometry.footprint_pixel_bounds() возвращает прям�
 ### 11.2 Фактическая геометрия центральной линии
 
 - `drawNormalLine()` начинает путь через `moveTo(first)` и продолжает его последовательными `lineTo(point)`.
-- `drawSmoothLine()` вычисляет середины соседних пар точек, использует их как промежуточные окончания сегментов и строит сглаживание через `curveTo(control, midpoint)`; затем при соответствующем флаге доводит путь до последней точки.
+- `drawSmoothLine()` вычисляет середины соседних пар точек, использует их как промежуточные окончания сегментов и строит сглаживание через `curveTo(control, midpoint)`; затем при truthy пятом параметре `drawLast` доводит путь до последней точки. Однако `BoardPane.redraw()` не передаёт этот пятый параметр (см. §15.6), поэтому активный игровой вызов не выполняет заключительный `lineTo(lastPoint)`.
 - Поэтому smooth stroke нельзя точно заменить набором независимых прямых отрезков: нужно сохранять ту же последовательность midpoint/quadratic-curve path operations либо доказанно эквивалентную геометрию.
 - `onDrawStart()` добавляет начальную точку после `globalToLocal(stage.mouseX, stage.mouseY)`; `onDrawing()` получает следующие точки на `ENTER_FRAME`, проверяет попадание в локальный прямоугольник доски и только затем сохраняет точку.
 - `BlackBoardAtom.pushPoint()` не добавляет точку, если она равна последней сохранённой. `onDrawingEnd()` завершает штрих вызовом `atom.add()`.
@@ -207,7 +207,7 @@ brush_footprint_geometry.footprint_pixel_bounds() возвращает прям�
 
 ### 11.4 Особый случай одного клика
 
-Для массива из одной точки `drawSmoothLine()` формирует `moveTo(p)` и затем `lineTo(p)`; `drawNormalLine()` формирует только `moveTo(p)`. По Canvas path semantics zero-length segment не обязан создавать видимый след. При этом `onDrawStart()` уже сохраняет первую точку и вызывает `updateLess()`. Следовательно, возможен случай расхода одной игровой точки без видимого отпечатка. Это вывод из исходной последовательности операций и Canvas semantics; поведение deployed renderer для такого случая требует отдельного PNG/runtime подтверждения.
+Для массива из одной точки активный вызов `BoardPane.redraw()` формирует в smooth path два `moveTo(p)` (второй повторяет первый), но не `lineTo(p)`, поскольку пятый параметр `drawLast` не передан. `drawNormalLine()` формирует только `moveTo(p)`. Ни один вариант не создаёт drawable segment. При этом `onDrawStart()` уже сохраняет первую точку и вызывает `updateLess()`. Следовательно, возможен случай расхода одной игровой точки без видимого отпечатка. Это вывод из исходной последовательности операций и Canvas semantics; поведение deployed renderer для такого случая требует отдельного PNG/runtime подтверждения.
 
 ### 11.5 Вывод для AutoDraw
 
@@ -339,9 +339,9 @@ Commit [d3322fe35c808bde079c79545cc839636b7cda2a](https://github.com/Kiddos19882
 BoardPane.redraw() перебирает сохранённые штрихи, вызывает graphics.lineStyle(value, color, 1, false) и выбирает функцию по atom.options:
 
 - Painter.drawNormalLine(): moveTo(P0), затем lineTo(P1...Pn).
-- Painter.drawSmoothLine(): рассчитывает midpoint каждой пары соседних точек; начинает с moveTo(P0), ведёт линию к первому midpoint, далее использует curveTo(Pi, midpoint(i,i+1)), затем ведёт линию к последней исходной точке.
+- Painter.drawSmoothLine(): рассчитывает midpoint каждой пары соседних точек; начинает с moveTo(P0), повторяет moveTo(P0), ведёт линию к первому midpoint, далее использует curveTo(Pi, midpoint(i,i+1)). Заключительный lineTo(lastPoint) выполняется только при truthy пятом параметре; `BoardPane.redraw()` его не передаёт.
 - В PainterPopup smooth включается при инициализации через painterBoard.setSmooth(true). При отсутствии явной опции redraw() также выбирает smooth path.
-- Для одного сохранённого пункта normal path содержит только moveTo; smooth path дополнительно вызывает lineTo к той же координате. Это создаёт разные команды пути, но не доказывает, какие пиксели будут закрашены нулевым сегментом.
+- Для одного сохранённого пункта normal path содержит только moveTo; smooth path содержит два последовательных moveTo одной координаты, но не lineTo. В обоих случаях drawable segment отсутствует; видимый след требует отдельного runtime/PNG подтверждения.
 
 ### 14.3. Значение кисти → Graphics/Egret
 
@@ -464,13 +464,13 @@ BoardPane stage corners из runtime: TL=(519.791666,72), TR=(979.791666,72), BR
 
 ### 15.6 Семантика конечного сегмента smooth path
 
-В согласованном `main.min_653f95bc.js` `BoardPane.redraw()` вызывает `Painter.drawSmoothLine(graphics, points, true, false)`. Реализация функции:
+В согласованном `main.min_653f95bc.js` `Painter.drawSmoothLine` имеет формальные параметры `(graphics, points, drawFirstHalf, unusedOption, drawLast)`. `BoardPane.redraw()` вызывает её с четырьмя аргументами `(graphics, points, true, false)`: четвёртый формальный параметр не используется, а пятый `drawLast` остаётся undefined. Поэтому условный заключительный `lineTo(lastPoint)` не выполняется. Реализация функции:
 
 1. Начинает путь через `moveTo(points[0])`.
 2. Строит массив midpoint для каждой пары соседних точек.
 3. Переходит к первому midpoint через `lineTo()`.
 4. Для внутренних midpoint вызывает `curveTo(points[i+1], midpoint[i+1])`.
-5. Добавляет `lineTo(points[last])` только при truthy последнем аргументе; игра передаёт `false`.
+5. Добавляет `lineTo(points[last])` только при truthy пятом аргументе `drawLast`; игровой вызов его не передаёт, поэтому он undefined/falsy.
 
 Следствия для `n` принятых точек:
 
