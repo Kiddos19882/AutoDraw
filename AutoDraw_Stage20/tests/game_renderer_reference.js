@@ -6,10 +6,12 @@
   }
 
   // Faithful path-command transcription of Painter.drawSmoothLine from
-  // main.min_653f95bc.js. BoardPane.redraw passes (true, false).
-  function buildSmoothPathCommands(points, drawFirstHalf, drawLast) {
+  // main.min_653f95bc.js. Signature after graphics/points is
+  // (drawFirstHalf, unusedOption, drawLast). BoardPane passes (true, false),
+  // so drawLast (the fifth formal parameter) is omitted and remains undefined.
+  function buildSmoothPathCommands(points, drawFirstHalf, unusedOption, drawLast) {
     if (drawFirstHalf === undefined) drawFirstHalf = true;
-    if (drawLast === undefined) drawLast = true;
+    if (drawLast === undefined) drawLast = false;
     if (!points || points.length === 0) return [];
 
     const commands = [{ type: "moveTo", x: points[0].x, y: points[0].y }];
@@ -250,7 +252,7 @@
             smoothPathTerminalPoint: terminal,
             lastAcceptedPoint: fixture.points[fixture.points.length - 1],
             note: fixture.mode === "smooth"
-              ? "Painter.drawSmoothLine(..., true, false): final lineTo(lastPoint) omitted."
+              ? "Painter.drawSmoothLine(..., true, false) with its trailing drawLast parameter omitted: final lineTo(lastPoint) is not emitted."
               : "Painter.drawNormalLine: final accepted point is included in the path."
           };
           manifest.fixtures.push(entry);
