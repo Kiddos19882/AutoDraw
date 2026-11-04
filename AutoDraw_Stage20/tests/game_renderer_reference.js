@@ -55,6 +55,16 @@
     return commands;
   }
 
+  // Mirrors the WebGLRenderer.renderGraphics guard in Egret 5.4.1:
+  // GraphicsNode is not rasterized/uploaded when bounds or drawData are empty.
+  function shouldWebGLRendererRasterize(node) {
+    return !!node &&
+      node.width > 0 &&
+      node.height > 0 &&
+      !!node.drawData &&
+      node.drawData.length > 0;
+  }
+
   function terminalPoint(points, smooth, drawLast) {
     if (!points || points.length === 0) return null;
     if (!smooth || drawLast) {
@@ -68,7 +78,8 @@
   const api = {
     buildSmoothPathCommands,
     buildNormalPathCommands,
-    terminalPoint
+    terminalPoint,
+    shouldWebGLRendererRasterize
   };
 
   if (typeof module !== "undefined" && module.exports) {
@@ -119,8 +130,25 @@
   }
 
   function renderGraphicsNode(node, isMask) {
-    if (!node || !(node.width > 0) || !(node.height > 0)) {
-      throw new Error("GraphicsNode has empty bounds.");
+    if (!node) throw new Error("GraphicsNode is unavailable.");
+
+    // The active game runtime uses WebGLRenderer. Egret 5.4.1 skips GraphicsNode
+    // rasterization entirely when its bounds are empty or drawData is empty.
+    // Preserve that no-op as a transparent reference rather than aborting the
+    // entire fixture batch (notably for a smooth single-point moveTo-only path).
+    if (!shouldWebGLRendererRasterize(node)) {
+      const canvas = document.createElement("canvas");
+      canvas.width = 1;
+      canvas.height = 1;
+      return {
+        canvas,
+        pixelWidth: 1,
+        pixelHeight: 1,
+        scaleX: 1,
+        scaleY: 1,
+        nodeBounds: { x: null, y: null, width: node.width || 0, height: node.height || 0 },
+        skippedByWebGLRenderer: true
+      };
     }
 
     let scaleX = RASTER_SCALE;
@@ -153,7 +181,8 @@
       pixelHeight,
       scaleX,
       scaleY,
-      nodeBounds: { x: node.x, y: node.y, width: node.width, height: node.height }
+      nodeBounds: { x: node.x, y: node.y, width: node.width, height: node.height },
+      skippedByWebGLRenderer: false
     };
   }
 
@@ -173,6 +202,8 @@
     if (!context) throw new Error("Board Canvas2D context unavailable.");
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.imageSmoothingEnabled = true;
+
+    if (source.skippedByWebGLRenderer) return canvas;
 
     // Mirrors the WebGLRenderer destination size (node bounds mapped back to
     // logical size) using Canvas2D. This is a comparison composite, not proof
@@ -247,13 +278,20 @@
             points: fixture.points,
             commands: built.commands,
             nodeBounds: source.nodeBounds,
-            sourceTextureSize: { width: source.pixelWidth, height: source.pixelHeight },
+            sourceTextureSize: source.skippedByWebGLRenderer
+              ? null
+              : { width: source.pixelWidth, height: source.pixelHeight },
             sourceScale: { x: source.scaleX, y: source.scaleY },
+            rasterDisposition: source.skippedByWebGLRenderer
+              ? "skipped-by-WebGLRenderer-empty-graphics-node"
+              : "CanvasRenderer-source-raster",
             smoothPathTerminalPoint: terminal,
             lastAcceptedPoint: fixture.points[fixture.points.length - 1],
-            note: fixture.mode === "smooth"
-              ? "Painter.drawSmoothLine(..., true, false) with its trailing drawLast parameter omitted: final lineTo(lastPoint) is not emitted."
-              : "Painter.drawNormalLine: final accepted point is included in the path."
+            note: source.skippedByWebGLRenderer
+              ? "Egret WebGLRenderer skips GraphicsNode rasterization when bounds are empty; this path produces no texture and no visible pixels."
+              : fixture.mode === "smooth"
+                ? "Painter.drawSmoothLine(..., true, false) with its trailing drawLast parameter omitted: final lineTo(lastPoint) is not emitted."
+                : "Painter.drawNormalLine: final accepted point is included in the path."
           };
           manifest.fixtures.push(entry);
 
@@ -274,16 +312,18 @@
             sourceTextureSize: [source.pixelWidth, source.pixelHeight],
             sourceScale: [source.scaleX, source.scaleY],
             smoothPathTerminalPoint: terminal,
-            lastAcceptedPoint: entry.lastAcceptedPoint
+            lastAcceptedPoint: entry.lastAcceptedPoint,
+            rasterDisposition: entry.rasterDisposition
           }, null, 2);
           card.appendChild(details);
 
           const links = document.createElement("div");
           links.className = "downloads";
           addDownloadLink(links, source.canvas,
-            fixture.id + "-width-" + lineWidth + "-source-texture.png", "Download source texture");
+            fixture.id + "-width-" + lineWidth + "-source-reference.png",
+            source.skippedByWebGLRenderer ? "Download transparent no-op reference" : "Download source raster reference");
           addDownloadLink(links, board,
-            fixture.id + "-width-" + lineWidth + "-masked-board.png", "Download masked board");
+            fixture.id + "-width-" + lineWidth + "-masked-board-reference.png", "Download masked-board reference");
           card.appendChild(links);
           casesNode.appendChild(card);
         }
