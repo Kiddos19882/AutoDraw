@@ -121,3 +121,36 @@ def test_invalid_brush_scale_and_canvas_are_rejected(kwargs):
 def test_malformed_polyline_points_are_rejected(points):
     with pytest.raises(ValueError):
         swept_capsule_pixel_masks(points, 2, 1.0, 1.0, 5, 5)
+
+
+def _horizontal_reference_masks(x_start, x_end, y, brush, sx, sy, width, height):
+    radius_squared = (brush / 2.0) ** 2
+    tolerance = 1e-12 * max(1.0, radius_squared)
+    potential = set()
+    guaranteed = set()
+    for py in range(height):
+        top = (py - 0.5) / sy
+        bottom = (py + 0.5) / sy
+        for px in range(width):
+            left = (px - 0.5) / sx
+            right = (px + 0.5) / sx
+            dx = max(x_start - right, 0.0, left - x_end)
+            dy = max(y - bottom, 0.0, top - y)
+            if dx * dx + dy * dy < radius_squared:
+                potential.add((px, py))
+            corner_distances = []
+            for cx, cy in ((left, top), (right, top), (left, bottom), (right, bottom)):
+                corner_dx = max(x_start - cx, 0.0, cx - x_end)
+                corner_distances.append(corner_dx * corner_dx + (cy - y) ** 2)
+            if max(corner_distances) <= radius_squared - tolerance:
+                guaranteed.add((px, py))
+    return potential, guaranteed
+
+
+def test_horizontal_capsule_masks_match_independent_analytic_cell_oracle():
+    result = swept_capsule_pixel_masks([(3, 4), (9, 4)], 4, 1.5, 0.75, 20, 10)
+    expected_potential, expected_guaranteed = _horizontal_reference_masks(
+        3, 9, 4, 4, 1.5, 0.75, 20, 10
+    )
+    assert result["potential_cells"] == expected_potential
+    assert result["guaranteed_cells"] == expected_guaranteed
