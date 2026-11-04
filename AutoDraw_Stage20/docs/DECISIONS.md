@@ -162,3 +162,13 @@
 **Решение:** выделить исследование расстояния между scanline-проходами в отдельный этап FILL-001-RS. Параметры `scanline_row_step` и `point_step_px` считать независимыми. Любое изменение геометрии оформлять новой версией плана, новым plan signature и отдельным experiment ID; существующие frozen masks, FILL-001 plans, manifest и captures не переписывать.
 **Границы доказательности:** OpenCV coverage/leakage и estimated sampling points являются статическими proxy. Они не доказывают фактическую экономию CHALK. Точный расход определяется только exact `pointCount_after - pointCount_before`; неполный run при исчерпании квоты фиксируется как censored attempt, полная стоимость неизвестна.
 **Последствия:** FILL-001 45-cell matrix остаётся BLOCKED до отдельного принятого live preflight. INT-006 safety margin и INT-007 не меняются. Код, тесты, конфигурации, workflow, production estimator/defaults и `master` не меняются без отдельного разрешения.
+
+
+## DEC-019. Изолировать versioned planner и manifest FILL-001-RS
+
+**Статус:** принято, 2026-11-04  
+**Контекст:** exhaustive OpenCV sweep FILL-001-RS проверил 2 238 сочетаний scanline step/offset; 62 прошли существующий gate coverage ≥99% / leakage=0. Для всех 15 shape/radius cells выбраны frozen spacing configs. Геометрия отличается от исходного FILL-001 plan и не должна менять его signatures или результаты.
+**Решение:** сохранить исходный planner v1 без изменения его default geometry/signatures. Ввести planner v2 для spacing variants; включать scanline_row_step и scanline_offset в plan identity/signature. Создавать отдельный FILL001_RS_V1 45-task manifest с отдельным selection policy и fail-closed validation. В runtime context/capture сохранять plan variant/version и spacing. Исполнение остаётся single-task only; matrix execution_allowed=false.
+**Параметры:** scanline_row_step — расстояние между проходами; point_step_px — расстояние между точками внутри прохода. P1 (step=4, delay=5 ms) не меняется.
+**Выбор кандидатов:** максимальный row step, проходящий coverage ≥99% / leakage=0; при равенстве — максимальное coverage, затем минимальные estimated sampling points/path/strokes. Критерий не объявляется CHALK-optimal; estimated points/path/strokes не являются exact CHALK.
+**Последствия:** первый live preflight candidate — rectangle/r10/step=5/offset=0. До принятого live capture не запускать 45-task RS matrix и не менять production estimator/defaults, executor defaults, исходный FILL-001 manifest или frozen captures. Exact CHALK — только pointCount_after - pointCount_before. INT-006 safety margin и INT-007 не меняются.
