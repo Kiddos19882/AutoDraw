@@ -6,9 +6,9 @@
 
 Исходный run: 27/27 strokes, pointCount 1→1261, exact CHALK=1260; Bridge diagnostics без ошибок. Первоначальный audit до affine correction дал coverage=97.673218%, leakage=28.
 
-**Replay исходных PNG выполнен:** тест `test_chalk_fill_committed_capture_replay.py` через `Fill001Tab.finalize_capture()` использовал исходные файлы evidence commit [5308214](https://github.com/Kiddos19882/AutoDraw/commit/530821497ce3a6bd5152318a78e1f06cb836f288). CI [41780241017](https://github.com/Kiddos19882/AutoDraw/actions/runs/41780241017), checkout HEAD `0f23731848f0c148fe5e1309d1e305576dd4b6b7`, вывел corrected audit: coverage=98.430600%, leakage=11, status=failed. Runtime binding PASS, exact CHALK=1260. Подробный отчёт и hashes: [CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md](CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md).
+**Replay исходных PNG выполнен:** тест `test_chalk_fill_committed_capture_replay.py` через `Fill001Tab.finalize_capture()` использовал исходные файлы evidence commit [5308214](https://github.com/Kiddos19882/AutoDraw/commit/530821497ce3a6bd5152318a78e1f06cb836f288). CI [41780241017](https://github.com/Kiddos19882/AutoDraw/actions/runs/41780241017), checkout HEAD `0f23731848f0c148fe5e1309d1e305576dd4b6b7`, вывел corrected audit: coverage=98.430600%, leakage=11, status=failed. Runtime binding PASS, exact CHALK=1260; canonical plan hash и task signature совпадают. Byte-level identity runtime plan остаётся отдельным ограничением: committed plan SHA-256 отличается от исходного `source_plan_file_sha256`, а validator не пересчитывает relocated file. Подробный отчёт и hashes: [CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md](CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md).
 
-**Статус:** capture REJECTED; residual PNG discrepancy ещё не локализовано. Следующий шаг — offline pixel breakdown той же пары PNG. Thresholds не менять; новый live запуск и 45-task matrix запрещены до закрытия gate.
+**Статус:** capture REJECTED; residual PNG discrepancy ещё не локализовано. Дополнительно не закрыта byte-level проверка runtime plan file hash. Следующий шаг — offline pixel breakdown и разбор plan hash mismatch на существующих evidence. Thresholds не менять; новый live запуск и 45-task matrix запрещены до закрытия gate.
 
 # Текущее состояние проекта
 
