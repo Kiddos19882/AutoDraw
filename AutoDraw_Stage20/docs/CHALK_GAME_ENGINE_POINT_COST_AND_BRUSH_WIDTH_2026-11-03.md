@@ -527,7 +527,18 @@ Manifest содержит Egret engine version, source bundle, browser userAgent
 
 **Текущий статус:** файлы созданы, path builder покрыт Node tests; CI run [41901639258](https://github.com/Kiddos19882/AutoDraw/actions/runs/41901639258) выполняется. Сам browser page не запускался в этой среде; PNG outputs и comparison с game capture ещё не получены.
 
-### 15.10 Границы доказательства и следующий шаг
+### 15.10 WebGL texture sampling defaults
+
+В `mergeEngine_df2e5bc5.js` подтверждена следующая цепочка для GraphicsNode:
+
+1. `WebGLRenderer.renderGraphics()` получает CanvasRenderBuffer, отрисованный через `CanvasRenderer.renderGraphics()`.
+2. Canvas source texture передаётся в `WebGLRenderContext.createTexture()`.
+3. `createTexture()` делегирует `egret.sys.createTexture()`, где задаются `TEXTURE_MIN_FILTER=LINEAR`, `TEXTURE_MAG_FILTER=LINEAR`, `TEXTURE_WRAP_S=CLAMP_TO_EDGE`, `TEXTURE_WRAP_T=CLAMP_TO_EDGE` и `UNPACK_PREMULTIPLY_ALPHA_WEBGL=1`.
+4. Последующий `drawTexture()` для GraphicsNode не передаёт отдельный smoothing override; действуют указанные LINEAR defaults.
+
+Текущий harness использует `CanvasRenderingContext2D.imageSmoothingEnabled=true` при композиции source texture на board canvas. Это согласуется с LINEAR filter на концептуальном уровне, но не доказывает pixel equivalence: WebGL rasterization, subpixel destination coordinates, premultiplied-alpha edges и mask stencil pipeline отдельно не исполняются. Runtime snapshot подтверждает `renderMode=webgl` для одной сессии.
+
+### 15.11 Границы доказательства и следующий шаг
 
 - Snapshot — один runtime capture, не live drawing и не brush experiment.
 - `pointCount=1` / remaining=5999 — текущее состояние; без pre/post pair это не расход CHALK отдельного запуска.
