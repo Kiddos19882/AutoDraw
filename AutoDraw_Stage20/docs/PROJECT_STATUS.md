@@ -3,14 +3,14 @@
 ## Текущая точка — paired live renderer capture подготовлен
 
 **Branch:** feature/image-geometry-optimization  
-**Предыдущий code HEAD:** 1c88af15750e9bd2e6b79b57411cb16284ebde1e  
+**Source/test HEAD:** f6df3f9f6d513efd44c093aae17c2c70c05e03ac  
 **Input sampling analyzer:** реализован; offline trace report доступен через source/preparation/game_input_sampling_analysis.py.  
-**Paired renderer replay:** tests/game_renderer_reference.html принимает Game Monitor run JSON, извлекает acceptedPoint и рендерит ту же геометрию через actual BoardPane/Egret CanvasRenderer/WebGLRenderer.  
+**Paired renderer replay:** tests/game_renderer_reference.html принимает Game Monitor run JSON, извлекает acceptedPoint одного strokeId и рендерит ту же геометрию через actual BoardPane/Egret CanvasRenderer/WebGLRenderer. Fail-closed guards проверяют полную последовательность точек.  
 **CI на предыдущем HEAD:** run 41929641436 — SUCCESS; все обязательные jobs прошли, optional algorithm benchmarks SKIPPED.
 
 **Оставшийся блокер:** пользовательский live capture. Нужны Game Monitor run JSON, Bridge session JSON, runtime renderer snapshot, точные pointCount before/after и final board PNG одной сессии. Только пользователь может выполнить этот шаг в реальной игре. До получения capture pixel equivalence с live game не подтверждена.
 
-**Следующий шаг:** пользователь передаёт комплект evidence; затем AutoDraw сравнивает фактическую доску с offline replay того же accepted-point sequence. FILL-001-RS 45-cell matrix остаётся BLOCKED до прохождения footprint/quality preflight.
+**Следующий шаг:** пользователь передаёт комплект evidence; затем AutoDraw сравнивает фактическую доску с offline replay того же accepted-point sequence. Run 41933396072 подтвердил offline harness и обязательные regression suites, но не является live game validation. FILL-001-RS 45-cell matrix остаётся BLOCKED до прохождения footprint/quality preflight.
 
 ---
 

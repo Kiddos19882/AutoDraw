@@ -1117,3 +1117,9 @@
 - Fail-closed validation запрещает воспроизведение неполной или неоднозначной последовательности (несколько strokeId, pointDelta > 1, missing acceptedPoint).
 - Добавлена пользовательская процедура live capture для последующего сравнения PNG и runtime evidence.
 - Это подготовка парного сравнения; live game pixel equivalence и CHALK для нового запуска не измерялись.
+## 2026-11-05 — paired accepted-point replay: CI PASS
+
+- Full CI run 41933396072 на source/test HEAD f6df3f9 — SUCCESS; обязательные jobs, включая browser renderer, preparation/G3, INT-006 validation и Windows portable build/startup smoke-test, прошли.
+- Offline renderer harness: 20 fixtures, 20 WebGL comparisons, 60 PNG; artifact 13371659297.
+- Renderer replay Node tests: 13/13 passed, включая fail-closed проверку multi-stroke, pointDelta>1 и missing acceptedPoint.
+- Live game pixel equivalence не проверена; пользовательский paired capture остаётся следующим gate.

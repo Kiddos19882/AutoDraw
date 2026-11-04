@@ -3049,3 +3049,11 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - Добавлены Node regression tests для корректного извлечения точек, отклонения агрегированных updates и отсутствующих координат.
 - Подготовлена пользовательская процедура live capture: включение telemetry, точные pointCount before/after, Monitor run/session, runtime snapshot и PNG одной игровой сессии.
 - Live game не запускалась. Парная pixel equivalence с реальным игровым PNG не подтверждена; ожидается комплект evidence от пользователя. FILL-001-RS 45-cell matrix остаётся BLOCKED.
+## 2026-11-05 — paired accepted-point replay: CI PASS
+
+- Implementation commits: 94b62bd352f4114471b1e5f29b97a4ee27785eb4; f9fcdbf09a5c4fd653586948788b3c74bea23159; f6df3f9f6d513efd44c093aae17c2c70c05e03ac.
+- Full workflow 41933396072 на source/test HEAD f6df3f9 завершился SUCCESS.
+- Game Monitor and bridge tests SUCCESS; renderer reference Node suite — 13/13 passed; Game Monitor Node suite — 20/20 passed.
+- Egret CanvasRenderer browser reference SUCCESS: 20 fixtures, 20 WebGL comparisons, 60 PNG; artifact 13371659297 (763,022 bytes).
+- Preparation/G3, capsule broad-phase benchmark, exhaustive FILL-001-RS static sweep, Application integration, Executor, INT-006 pixel/CHALK/INT006R validation и Windows portable build/startup smoke-test — SUCCESS. Optional algorithm benchmarks SKIPPED.
+- Реальный игровой тест не выполнялся. Парное live PNG/renderer comparison остаётся ожидающим пользовательский комплект capture; FILL-001-RS matrix остаётся BLOCKED.
