@@ -1,8 +1,8 @@
-## Текущий блокирующий шаг: FILL-001-RS исходный PNG replay
+## Текущий блокирующий шаг: FILL-001-RS остаточная PNG диагностика
 
-**Задача:** FILL-001-RS-PRE-REPLAY-001 — повторно проверить неизменённые before/after PNG исходного live preflight `fill001-rs-preflight-20261104-7.04` актуальным PNG audit и подтвердить полный evidence binding.
+**Задача:** FILL-001-RS-PRE-REPLAY-001 — завершить offline диагностику остаточного PNG несоответствия после replay исходного live preflight `fill001-rs-preflight-20261104-7.04`.
 
-**Статус:** IN PROGRESS / BLOCKER. До завершения replay не начинать новый live запуск FILL-001-RS и не открывать 45-task matrix. Сам replay — offline-проверка сохранённых evidence; игровые эксперименты не выполняются.
+**Статус:** IN PROGRESS / BLOCKER. Replay завершён, capture REJECTED. До локализации остаточных uncovered/leakage pixels не начинать новый live запуск FILL-001-RS и не открывать 45-task matrix. Дальнейшая диагностика остаётся offline; игровые эксперименты не выполняются.
 
 Исходный run: 27/27 strokes, pointCount 1→1261, exact CHALK=1260; Bridge diagnostics без ошибок. Первоначальный audit до affine correction дал coverage=97.673218%, leakage=28.
 
