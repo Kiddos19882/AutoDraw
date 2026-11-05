@@ -1,3 +1,11 @@
+## 2026-11-06 — синхронизация документации с кодом renderer и CI
+
+- Уточнены remote branch HEAD на начало сверки и последний code/test HEAD; `master` оставлена без изменений.
+- Управляющий backlog датирован 2026-11-06; `DOC-STATUS-SYNC` отмечен завершённым после повторной сверки.
+- Индекс документации теперь различает isolated offscreen WebGL probe, вспомогательную Canvas2D композицию и отсутствующую пока Stage-level texture composition.
+- Зафиксированы formal multi-axis результаты CI 42113632374: horizontal PASS_PER_RUN, vertical/diagonal REJECTED_PER_RUN; общий workflow FAILURE.
+- Сохранены ограничения: без изменения production-кода, порогов, live captures и без запуска live game tests.
+
 ## 2026-11-05 — offline replay profile now comes from exact Game Monitor run
 
 - Удалён stale 2026-11-04 renderer snapshot из runtime metadata live paired replay.
