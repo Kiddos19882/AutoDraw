@@ -201,3 +201,12 @@
 **Контекст:** статический анализ подтверждённого game bundle обнаружил preview `BoardPane` внутри `BoardItemBase` и рабочий `PainterPopup.painterBoard`; общий auto-discovery структурно не различает эти экземпляры.  
 **Решение:** для текущей задачи считать рабочим сценарием комнату без других досок, с одной пустой тестовой доской на экране. Не исследовать и не исправлять выбор между preview BoardPane и PainterPopup BoardPane; считать этот вопрос `NOT_APPLICABLE_TO_CURRENT_USER_SCENARIO`.  
 **Последствия:** удалить `MONITOR-BOARD-SELECTION-001` из актуального backlog и roadmap. Историческое статическое наблюдение сохранять с отметкой о неприменимости к текущему сценарию. Это решение не утверждает, что auto-discovery исправлен для комнат с несколькими досками; код и тесты не меняются.
+
+
+## DEC-023. Fail-closed client geometry fallback и сохранение renderer snapshot
+
+**Статус:** принято как implementation contract, 2026-11-05  
+**Контекст:** Firefox snapshot может не предоставлять `canvas.getBoxQuads()`. Bounding rect без проверки CSS transform не даёт безопасной affine mapping при rotate/skew. Bridge ранее не сохранял renderer geometry, поэтому session/run нельзя было связать с геометрией доски.  
+**Решение:** предпочитать `getBoxQuads({box:"content"})`. Если API отсутствует, разрешать client-corner fallback только для положительного axis-aligned CSS matrix и при совпадении canvas rect с Stage×Egret backing scale в пределах 1 CSS px. Иначе возвращать `boardClientCorners=null`, method=`unavailable`. Сохранять raw windowGeometry отдельно, не трактуя его как точный client→desktop transform. Browser Bridge передаёт snapshot в session_start и renderer_geometry updates; collector добавляет optional geometry fields к session schema v2 и run schema v1 без смены schema versions.  
+**Инварианты:** client coordinates не приравнивать к desktop/screenshot pixels; не умножать на DPR без подтверждения; не применять approximate/stale geometry к executor; не менять CHALK telemetry и event hot path.  
+**Последствия:** Monitor 0.2.3, Bridge session geometry persistence и tests добавлены. AutoDraw profile consumer и desktop/screenshot transform остаются следующими этапами.
