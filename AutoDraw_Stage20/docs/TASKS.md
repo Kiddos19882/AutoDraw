@@ -10,7 +10,7 @@
 |---|---|---|---|
 | FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | IN_PROGRESS | Runtime WebGL/transform подтверждены; reference harness исправлен для empty GraphicsNode, browser PNG fixtures и pixel gate остаются |
 | FILL-001-RS-MATRIX | P0 | BLOCKED | 45 captures только после принятого single-task preflight |
-| GAME-INPUT-SAMPLING-TRACE-001 | P1 | READY_FOR_USER_CAPTURE | Monitor telemetry, offline accepted-point replay и процедура парного PNG сравнения готовы; требуется live capture пользователя |
+| GAME-INPUT-SAMPLING-TRACE-001 | P1 | READY_FOR_USER_CAPTURE | Во вкладку «Тест кистей» добавлен одиночный 400 px штрих с фиксированным профилем radius=10 / step=2 / delay=10 / extension=0; требуется live capture пользователя и paired PNG replay |
 | BRUSH-FOOTPRINT-CAPSULE-001 | P1 | OPEN | Offline capsule model готова; renderer acceptance/planner integration не выполнены |
 | INT-006 | P1 | IN_PROGRESS | D1-D5 45/45 и analyzer завершены; domain validation/safety margin не завершены |
 | INT-007 | P2 | BLOCKED | Интеграция модели после INT-006 |
@@ -20,6 +20,22 @@
 | DOC-STATUS-SYNC | P2 | DONE | 2026-11-04: синхронизированы управляющие документы, индекс, архитектура/CI map и исторические профильные планы/README; исторические результаты сохранены |
 | INT-003 | — | CLOSED_NOT_REQUIRED | По решению пользователя: отдельное исследование overhead Monitor не требуется |
 | CHALK-SAMPLING-DOMAIN | — | CLOSED_NOT_REQUIRED | По решению пользователя: расширение sampling-domain не требуется |
+
+## Дополнение 2026-11-05 — paired renderer single-stroke capture
+
+Сценарий добавлен во вкладку «Тест кистей» как отдельный тест, не входящий в CHALK matrix blocks:
+
+- UI label: «Парный renderer — один длинный штрих»; scenario ID: paired_renderer_single_stroke.
+- Logical geometry: ровно один штрих (20,120) → (420,120) на доске 460×240.
+- Фиксированный радиус: 10. План блокируется при другом значении.
+- Executor profile: point_step_px=2, line_extension_px=0, point_delay_ms=10, after_mouse_up_ms=20, before_mouse_down_ms=20, after_mouse_down_ms=40, end_hold_ms=50, countdown_seconds=5.
+- Offline renderer mode: smooth, line width 10.
+- Интеграция Stage 6 проверяет metadata, radius, executor profile и ровно один stroke перед запуском; override временный, пользовательские execution settings не меняются.
+- Перед штрихом включить AutoDrawGameMonitor.setInputTelemetryEnabled(true). Сохранить status() до/после, inspect(), raw run JSON, Bridge session.json и итоговый PNG доски.
+- Capture принимается для replay только при одном strokeId, наличии каждого acceptedPoint и pointDelta=1. Любая неполнота остаётся fail-closed; задержка 10 ms не гарантирует отсутствие coalescing.
+- CHALK фиксировать только как pointCount_after - pointCount_before.
+
+**Статус:** READY_FOR_USER_CAPTURE. Live запуск не выполнялся; paired PNG equivalence не подтверждена. FILL-001-RS matrix остаётся BLOCKED до закрытия renderer/footprint gate.
 
 ## Зачем остаются четыре направления
 
