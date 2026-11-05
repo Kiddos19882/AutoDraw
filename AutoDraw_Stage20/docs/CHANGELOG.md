@@ -1,3 +1,11 @@
+## 2026-11-05 — offline replay profile now comes from exact Game Monitor run
+
+- Удалён stale 2026-11-04 renderer snapshot из runtime metadata live paired replay.
+- Offline harness принимает полный Monitor report и переносит run-bound Stage/canvas/screen/CSS profile из неизменных start/end geometry snapshots.
+- Отсутствие exact run geometry теперь приводит к явной ошибке вместо использования старого профиля.
+- Offscreen BoardPane raster остаётся 460×240 при 3× (1380×720); экранная CSS transform сохраняется только как runtime metadata.
+- Обновлена инструкция страницы offline renderer. Live/production drawing code и CHALK logic не менялись.
+
 ## 2026-11-05 — same-run geometry для multi-axis paired renderer
 
 - Добавлен run/session-bound geometry-audit из Game Monitor snapshot; проверяются screen metrics, фазы эксперимента, полноэкранные PNG, неизменность geometry start/end и отсутствие telemetry updates/overflow.
