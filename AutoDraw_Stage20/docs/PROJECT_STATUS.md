@@ -8,7 +8,7 @@
 **Последний evidence-only commit:** `e6b771ed67201625884c6ce778fa355f1ab9b873` — 22 result artifacts; CI для этого data-only commit не подтверждён.
 **Последний успешный CI:** [run 41994624425](https://github.com/Kiddos19882/AutoDraw/actions/runs/41994624425), conclusion SUCCESS.
 **Workflow packaging commit:** `fb853547d74a70582ab1e4731d55763367b8ceb8`, проверен успешным run `41970907209`.  
-**Документационная синхронизация:** 2026-11-05, после проверки CI 41994624425.
+**Документационная синхронизация:** 2026-11-05, после evidence commit `e6b771e`; управляющие документы синхронизированы коммитами `1d4ad6e`–`102b834`, последний docs HEAD `102b834739a0313a41dbe79f1060d86bd3e7ac26`.
 **Последний code/test HEAD:** `58ebdda7cf3f07ceef1075020f2808a2782562b7` — CI 41994624425 SUCCESS.
 **Master:** remote HEAD `9a3453aeb847b66041bc83d6f4a56ecaf33a993a`; master не изменялась.
 **Рабочая копия:** локальный `git status` через GitHub API недоступен.
