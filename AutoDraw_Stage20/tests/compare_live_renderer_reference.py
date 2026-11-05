@@ -8,7 +8,12 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import html
 import json
+import os
+import shutil
+import subprocess
+import tempfile
 from pathlib import Path
 from typing import Any
 import sys
@@ -92,6 +97,159 @@ def mask_metrics(observed: np.ndarray, expected: np.ndarray) -> dict[str, Any]:
         "observed_centroid_xy": centroid(observed),
         "expected_centroid_xy": centroid(expected),
     }
+
+
+
+
+def _find_edge_executable() -> Path:
+    candidates = [
+        shutil.which("msedge"),
+        Path(os.environ.get("ProgramFiles(x86)", "")) / "Microsoft/Edge/Application/msedge.exe",
+        Path(os.environ.get("ProgramFiles", "")) / "Microsoft/Edge/Application/msedge.exe",
+    ]
+    for candidate in candidates:
+        if candidate and Path(candidate).is_file():
+            return Path(candidate)
+    raise FileNotFoundError("Microsoft Edge is required for same-run CSS compositor replay.")
+
+
+def _browser_composite_html(
+    baseline_png: Path,
+    offline_png: Path | None,
+    screen_size: tuple[int, int],
+    board_origin: dict[str, float],
+    css_matrix: dict[str, float],
+) -> str:
+    width, height = screen_size
+    baseline_uri = html.escape(baseline_png.resolve().as_uri(), quote=True)
+    overlay = ""
+    if offline_png is not None:
+        overlay_uri = html.escape(offline_png.resolve().as_uri(), quote=True)
+        left = float(board_origin["x"])
+        top = float(board_origin["y"])
+        a, b, c, d, tx, ty = (float(css_matrix[key]) for key in ("a", "b", "c", "d", "tx", "ty"))
+        overlay = (
+            f'<img id="board-overlay" alt="" src="{overlay_uri}" '
+            f'style="left:{left:.12f}px;top:{top:.12f}px;'
+            f'transform:matrix({a:.15g},{b:.15g},{c:.15g},{d:.15g},{tx:.15g},{ty:.15g});">'
+        )
+    return f"""<!doctype html>
+<html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<style>
+html,body {{ margin:0;padding:0;width:{width}px;height:{height}px;overflow:hidden;background:#000; }}
+img {{ position:absolute;display:block;margin:0;padding:0;border:0;max-width:none;max-height:none;object-fit:fill; }}
+#baseline {{ left:0;top:0;width:{width}px;height:{height}px; }}
+#board-overlay {{ width:1380px;height:720px;transform-origin:0 0;image-rendering:auto; }}
+</style></head><body>
+<img id="baseline" alt="" src="{baseline_uri}">
+{overlay}
+<script>
+Promise.all(Array.from(document.images).map(image => image.decode()))
+  .then(() => {{ document.documentElement.dataset.ready = "true"; }})
+  .catch(error => {{ document.documentElement.dataset.error = String(error); }});
+</script>
+</body></html>"""
+
+
+def render_browser_css_composite(
+    baseline_png: Path,
+    offline_png: Path,
+    screen_size: tuple[int, int],
+    board_origin: dict[str, float],
+    css_matrix: dict[str, float],
+    output_dir: Path,
+) -> dict[str, Any]:
+    """Composite the exact offline BoardPane raster using Edge's CSS compositor.
+
+    The baseline capture is displayed 1:1. The offline PNG is then positioned at
+    the same-run BoardPane screen origin and transformed by the inspected canvas
+    CSS matrix. No image registration, translation search, or pixel-fit is used.
+    """
+    width, height = screen_size
+    edge = _find_edge_executable()
+    output_dir.mkdir(parents=True, exist_ok=True)
+    browser_dir = output_dir / "browser-css-composite"
+    browser_dir.mkdir(parents=True, exist_ok=True)
+    results: dict[str, Any] = {
+        "method": "edge_headless_css_compositor",
+        "screen_size": {"width": width, "height": height},
+        "board_origin_screen_px": board_origin,
+        "css_matrix": css_matrix,
+        "offline_png_natural_size": {"width": 1380, "height": 720},
+        "device_scale_factor": 1,
+        "post_hoc_registration": False,
+    }
+
+    def capture(name: str, overlay_png: Path | None) -> Path:
+        html_path = browser_dir / f"{name}.html"
+        screenshot_path = browser_dir / f"{name}.png"
+        html_path.write_text(
+            _browser_composite_html(baseline_png, overlay_png, screen_size, board_origin, css_matrix),
+            encoding="utf-8",
+        )
+        profile = browser_dir / f"profile-{name}"
+        command = [
+            str(edge), "--headless", "--enable-webgl", "--use-gl=angle", "--use-angle=swiftshader",
+            "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist", "--hide-scrollbars",
+            "--force-device-scale-factor=1", f"--window-size={width},{height}",
+            "--virtual-time-budget=2500", "--run-all-compositor-stages-before-draw",
+            f"--user-data-dir={profile}", f"--screenshot={screenshot_path}", html_path.resolve().as_uri(),
+        ]
+        completed = subprocess.run(command, capture_output=True, text=True, timeout=90, check=False)
+        results.setdefault("browser_runs", {})[name] = {
+            "returncode": completed.returncode,
+            "stdout_tail": completed.stdout[-2000:],
+            "stderr_tail": completed.stderr[-4000:],
+        }
+        if completed.returncode != 0 or not screenshot_path.is_file():
+            raise RuntimeError(
+                f"Edge CSS compositor capture {name!r} failed; "
+                f"returncode={completed.returncode}, stderr={completed.stderr[-2000:]}"
+            )
+        with Image.open(screenshot_path) as image:
+            if image.size != (width, height):
+                raise RuntimeError(
+                    f"Edge CSS compositor returned {image.size}, expected {(width, height)}."
+                )
+        return screenshot_path
+
+    base_capture = capture("baseline-only", None)
+    composite_capture = capture("baseline-with-board", offline_png)
+    with Image.open(base_capture) as image:
+        base_rgb = np.asarray(image.convert("RGB"), dtype=np.int16)
+    with Image.open(composite_capture) as image:
+        composite_rgb = np.asarray(image.convert("RGB"), dtype=np.int16)
+    with Image.open(baseline_png) as image:
+        source_rgb = np.asarray(image.convert("RGB"), dtype=np.int16)
+    roundtrip = np.max(np.abs(base_rgb - source_rgb), axis=2)
+    results["baseline_round_trip"] = {
+        "max_channel_error": int(roundtrip.max()),
+        "pixels_over_1_channel_error": int(np.count_nonzero(roundtrip > 1)),
+        "mean_absolute_channel_error": float(np.abs(base_rgb - source_rgb).mean()),
+        "interpretation": "browser baseline capture compared with its exact source full-screen PNG",
+    }
+    composite_delta = np.max(np.abs(composite_rgb - base_rgb), axis=2)
+    expected = composite_delta > 24
+    Image.fromarray((expected.astype(np.uint8) * 255), mode="L").save(
+        browser_dir / "expected-mask-browser-css.png"
+    )
+    Image.fromarray(composite_rgb.astype(np.uint8), mode="RGB").save(
+        browser_dir / "baseline-with-board.png"
+    )
+    Image.fromarray(base_rgb.astype(np.uint8), mode="RGB").save(
+        browser_dir / "baseline-browser-roundtrip.png"
+    )
+    results["expected_changed_pixels"] = int(np.count_nonzero(expected))
+    results["expected_bbox_xywh"] = bbox(expected)
+    results["outputs"] = {
+        "html": str(browser_dir),
+        "baseline": str(base_capture),
+        "composite": str(composite_capture),
+        "expected_mask": str(browser_dir / "expected-mask-browser-css.png"),
+    }
+    return {"expected_mask": expected, "diagnostics": results}
+
 
 
 def main() -> int:
@@ -331,30 +489,62 @@ def main() -> int:
         monitor_fit_axes = [axis.upper() for axis, source in geometry["axis_sources"].items() if source == "same_run_monitor_fit"]
         screenshot_bounds_axes = [axis.upper() for axis, source in geometry["axis_sources"].items() if source == "same_run_full_screen_board_bounds"]
         inspect_fallback_axes = [axis.upper() for axis, source in geometry["axis_sources"].items() if source == "inspect_css_transform_unfitted_axis"]
+        # Formal screen comparison uses the same-run CSS transform and Edge's
+        # compositor. OpenCV affine resampling remains a separate diagnostic.
         matrix_independent = np.asarray(geometry["matrix_source_raster_to_roi"], dtype=np.float32)
-        alpha_independent = cv2.warpAffine(
+        alpha_opencv = cv2.warpAffine(
             offline[:, :, 3], matrix_independent, (live.shape[1], live.shape[0]),
             flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT, borderValue=0,
         )
-        independent_results = {
-            str(threshold): mask_metrics(observed, alpha_independent > threshold)
+        opencv_independent_results = {
+            str(threshold): mask_metrics(observed, alpha_opencv > threshold)
             for threshold in args.alpha_thresholds
         }
-        expected_independent = alpha_independent > 24
+        css_matrix = geometry_evidence["renderer"]["canvas"]["css_matrix"]
+        browser_composite = render_browser_css_composite(
+            screen_before_path,
+            args.offline_png,
+            (int(screen["width"]), int(screen["height"])),
+            geometry["inspect_origin"],
+            css_matrix,
+            args.output_dir,
+        )
+        roi_x, roi_y = int(roi["x"]), int(roi["y"])
+        roi_width, roi_height = int(roi["width"]), int(roi["height"])
+        observed = (
+            np.max(
+                np.abs(
+                    after_screen[roi_y:roi_y + roi_height, roi_x:roi_x + roi_width].astype(np.int16)
+                    - before_screen[roi_y:roi_y + roi_height, roi_x:roi_x + roi_width].astype(np.int16)
+                ),
+                axis=2,
+            ) > args.rgb_threshold
+        )
+        expected_independent = browser_composite["expected_mask"][
+            roi_y:roi_y + roi_height, roi_x:roi_x + roi_width
+        ]
+        if expected_independent.shape != observed.shape:
+            raise ValueError("Browser CSS compositor ROI dimensions differ from the live ROI.")
+        independent_results = {
+            str(args.rgb_threshold): mask_metrics(observed, expected_independent),
+        }
+        Image.fromarray((expected_independent.astype(np.uint8) * 255), mode="L").save(
+            args.output_dir / "expected-mask-browser-css.png"
+        )
+        Image.fromarray((alpha_opencv > 24).astype(np.uint8) * 255, mode="L").save(
+            args.output_dir / "expected-alpha-opencv-diagnostic.png"
+        )
         overlay_independent = np.zeros((live.shape[0], live.shape[1], 3), dtype=np.uint8)
         overlay_independent[observed & ~expected_independent] = (255, 0, 0)
         overlay_independent[~observed & expected_independent] = (0, 255, 0)
         overlay_independent[observed & expected_independent] = (255, 255, 0)
-        Image.fromarray(alpha_independent, mode="L").save(
-            args.output_dir / "expected-alpha-independent-transform.png"
-        )
         Image.fromarray(overlay_independent, mode="RGB").save(
             args.output_dir / "live-offline-mask-overlay-independent-transform.png"
         )
 
         # Formal per-run gate applies only to the independent, unshifted transform.
-        if "24" not in independent_results:
-            raise ValueError("Alpha threshold 24 is mandatory for renderer acceptance.")
+        if str(args.rgb_threshold) not in independent_results or args.rgb_threshold != 24:
+            raise ValueError("The fixed RGB screen-delta threshold must remain 24 for renderer acceptance.")
         capture_validation = validate_paired_capture(
             experiment, monitor_report, plan, fixture,
         )
@@ -378,6 +568,11 @@ def main() -> int:
                              args.plan, monitor_path, geometry_audit_path, screen_before_path, screen_after_path)
             },
             "transform": geometry,
+            "screen_compositing": {
+                **browser_composite["diagnostics"],
+                "formal_pixel_threshold_rgb": args.rgb_threshold,
+                "opencv_inter_linear_diagnostic_metrics": opencv_independent_results,
+            },
             "offline_renderer": {
                 "logical_board_size": manifest.get("board"),
                 "raster_scale": manifest.get("rasterScale"),
@@ -418,7 +613,8 @@ def main() -> int:
         report["offline_renderer"] = independent_report["offline_renderer"]
         report["limitations"] = [
             "Frozen plan transform metrics are retained only in diagnostic_frozen_plan_comparison.",
-            "Formal acceptance uses geometry derived from this experiment's run-bound Game Monitor snapshot and full-screen captures.",
+            "Formal acceptance uses same-run inspected CSS matrix through Edge's CSS compositor over the exact before-draw full-screen capture; no post-hoc registration is applied.",
+            "OpenCV INTER_LINEAR affine resampling is retained only as a diagnostic and is not the formal screen rasterization reference.",
             "The offline BoardPane uses the manifest logical board dimensions and raster scale; manifest runtimeProfile metadata is not used for live screen alignment.",
             "No post-hoc translation or image registration is applied to the formal comparison.",
             "A per-run PASS is not series acceptance; three unique valid vertical and diagonal runs are still required.",
@@ -435,10 +631,11 @@ def main() -> int:
                 "transform": transform_validation["failed_checks"],
                 "renderer": renderer_validation["failed_checks"],
             },
-            "iou_alpha_24": independent_results.get("24", {}).get("iou"),
-            "precision_alpha_24": independent_results.get("24", {}).get("precision"),
-            "recall_alpha_24": independent_results.get("24", {}).get("recall"),
-            "symmetric_difference_alpha_24": independent_results.get("24", {}).get("symmetric_difference_pixels"),
+            "iou_alpha_24": independent_results.get(str(args.rgb_threshold), {}).get("iou"),
+            "precision_alpha_24": independent_results.get(str(args.rgb_threshold), {}).get("precision"),
+            "recall_alpha_24": independent_results.get(str(args.rgb_threshold), {}).get("recall"),
+            "symmetric_difference_alpha_24": independent_results.get(str(args.rgb_threshold), {}).get("symmetric_difference_pixels"),
+            "screen_compositing_method": "edge_headless_css_compositor",
             "report": str(args.output_dir / "comparison-report-independent-transform.json"),
         }
     print(json.dumps({
