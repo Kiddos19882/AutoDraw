@@ -247,6 +247,18 @@ class RunRecorder:
         self.lifecycle_sources: set[str] = set()
         self.renderer_geometry: dict | None = None
         self.renderer_geometry_updated_at_utc: str | None = None
+        self.bridge_configuration: dict | None = None
+
+    def set_bridge_configuration(self, configuration: dict) -> None:
+        if not isinstance(configuration, dict):
+            raise ValueError("bridge configuration must be an object")
+        try:
+            encoded = json.dumps(configuration, ensure_ascii=False, separators=(",", ":"))
+        except (TypeError, ValueError):
+            raise ValueError("bridge configuration must be JSON serializable") from None
+        if len(encoded.encode("utf-8")) > 4096:
+            raise ValueError("bridge configuration is too large")
+        self.bridge_configuration = json.loads(encoded)
 
     def set_renderer_geometry(self, geometry: dict, reason: str | None = None) -> None:
         if not isinstance(geometry, dict):
@@ -288,6 +300,7 @@ class RunRecorder:
             "post_test_snapshot": None,
             "renderer_geometry_at_start": self.renderer_geometry,
             "renderer_geometry_updated_at_start_utc": self.renderer_geometry_updated_at_utc,
+            "bridge_configuration_at_start": self.bridge_configuration,
             "renderer_geometry_updates": [],
             "renderer_geometry_update_overflow_count": 0,
             "brush_radius": (before or {}).get("currentRadius") if isinstance(before, dict) else None,
@@ -700,6 +713,16 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
                         except ValueError:
                             await websocket.close(code=4002, reason="invalid renderer geometry")
                             return
+                    initial_bridge_configuration = message.get("bridgeConfiguration")
+                    if initial_bridge_configuration is not None:
+                        if not isinstance(initial_bridge_configuration, dict):
+                            await websocket.close(code=4002, reason="invalid bridge configuration")
+                            return
+                        try:
+                            recorder.set_bridge_configuration(initial_bridge_configuration)
+                        except ValueError:
+                            await websocket.close(code=4002, reason="invalid bridge configuration")
+                            return
                     initial_status = message.get("monitorStatus")
                     if isinstance(initial_status, dict):
                         recorder.last_status = initial_status
@@ -717,6 +740,7 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
                         "browser": message.get("browser"),
                         "page": message.get("page"),
                         "monitor_status_at_connect": message.get("monitorStatus"),
+                        "bridge_configuration": recorder.bridge_configuration,
                         "renderer_geometry": recorder.renderer_geometry,
                         "renderer_geometry_updated_at_utc": recorder.renderer_geometry_updated_at_utc,
                         "bridge_diagnostics": {
