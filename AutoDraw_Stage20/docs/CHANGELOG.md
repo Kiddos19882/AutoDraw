@@ -1,3 +1,9 @@
+## 2026-11-05 — принят live capture для paired renderer replay
+
+- Сохранён одиночный run 16aec62c-9e54-44e7-8691-9df79b19161d: один strokeId, 138 принятых точек, все pointDelta=1 и acceptedPoint присутствует.
+- Точный CHALK=138 по pointCount 1→139; Bridge telemetry без drops/errors/send failures/sequence gaps.
+- Raw capture прошёл условия импорта в offline accepted-point replay. PNG equivalence с live board пока не проверена; отдельный runtime inspect snapshot не приложен.
+
 ## 2026-11-05 — добавлен одиночный paired renderer test во вкладку «Тест кистей»
 
 - Добавлен сценарий одного горизонтального штриха 400 logical px для live PNG ↔ offline Egret replay.
