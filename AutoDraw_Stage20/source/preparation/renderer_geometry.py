@@ -164,7 +164,13 @@ def derive_live_board_screen_transform(
     *,
     screenshot_board_bounds: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Fit X from same-run telemetry; optionally derive Y from same-run screenshot bounds."""
+    """Derive each board axis from same-run telemetry when it spans that axis.
+
+    Screenshot-derived board bounds provide an independent fallback for an axis
+    that the trajectory does not span (horizontal runs do not span Y; vertical
+    runs do not span X). Inspect geometry is retained as a cross-check, not as a
+    substitute for missing same-run axis evidence when screenshot bounds exist.
+    """
     if monitor_report.get("record_type") != "autodraw_game_monitor_run":
         raise RendererGeometryError("A complete Game Monitor run report is required.")
     if inspect_evidence.get("provenance", {}).get("same_screen_as_live_capture") is not True:
@@ -220,100 +226,143 @@ def derive_live_board_screen_transform(
         raise RendererGeometryError("Client-to-screen offset changed during the run.")
     offset_x, offset_y = median(dx), median(dy)
 
-    fit_x = _fit([float(e["boardX"]) for e in samples], [float(e["screenX"]) for e in samples])
+    board_x = [float(e["boardX"]) for e in samples]
+    board_y = [float(e["boardY"]) for e in samples]
+    screen_x = [float(e["screenX"]) for e in samples]
+    screen_y = [float(e["screenY"]) for e in samples]
+    # A trajectory must span at least 20 logical pixels to independently fit an axis.
+    fit_x = _fit(board_x, screen_x) if max(board_x) - min(board_x) >= 20 else None
+    fit_y = _fit(board_y, screen_y) if max(board_y) - min(board_y) >= 20 else None
+
     inspect_x_origin = rect_left + stage_left * sx_inspect + offset_x
-    if abs(fit_x["origin"] - inspect_x_origin) > 0.5:
-        raise RendererGeometryError("Monitor horizontal origin disagrees with inspect.")
-    if abs(fit_x["scale"] - sx_inspect) / sx_inspect > 0.002:
-        raise RendererGeometryError("Monitor horizontal scale disagrees with inspect.")
-
     inspect_y_origin = rect_top + stage_top * sy_inspect + offset_y
-    if len({round(float(e["boardY"]), 6) for e in samples}) != 1:
-        raise RendererGeometryError("This audit expects a horizontal run; add a separately validated Y fit.")
-    sample = samples[len(samples) // 2]
 
-    screenshot_cross_check = None
-    if screenshot_board_bounds is None:
-        y_origin = inspect_y_origin
-        sy = sy_inspect
-        vertical_scale_source = "inspect_css_transform_single_horizontal_trajectory"
-        method = "same_run_monitor_x_fit_plus_inspect_css_y_transform"
-        validation_status = "X_and_client_screen_offset_cross_checked; Y_scale_inspect_only"
-    else:
+    bounds = None
+    screenshot_sx = screenshot_sy = None
+    if screenshot_board_bounds is not None:
         if not isinstance(screenshot_board_bounds, dict):
             raise RendererGeometryError("Screenshot board bounds must be an object.")
-        bounds_x = _finite(screenshot_board_bounds.get("x"), "screenshot_board_bounds.x")
-        bounds_y = _finite(screenshot_board_bounds.get("y"), "screenshot_board_bounds.y")
-        bounds_width = _finite(screenshot_board_bounds.get("width"), "screenshot_board_bounds.width")
-        bounds_height = _finite(screenshot_board_bounds.get("height"), "screenshot_board_bounds.height")
-        if bounds_width < 2 or bounds_height < 2:
+        bounds = {
+            key: _finite(screenshot_board_bounds.get(key), f"screenshot_board_bounds.{key}")
+            for key in ("x", "y", "width", "height")
+        }
+        if bounds["width"] < 2 or bounds["height"] < 2:
             raise RendererGeometryError("Screenshot board bounds must be at least 2×2 pixels.")
-        screenshot_sx = bounds_width / 460
-        screenshot_sy = bounds_height / 240
-        if abs(fit_x["origin"] - bounds_x) > 1.0:
-            raise RendererGeometryError("Monitor X origin disagrees with screenshot board bounds.")
-        if abs(fit_x["scale"] - screenshot_sx) / screenshot_sx > 0.002:
-            raise RendererGeometryError("Monitor X scale disagrees with screenshot board bounds.")
-        if abs(inspect_y_origin - bounds_y) > 1.0:
+        screenshot_sx = bounds["width"] / 460
+        screenshot_sy = bounds["height"] / 240
+        if abs(inspect_x_origin - bounds["x"]) > 1.0:
+            raise RendererGeometryError("Inspect X origin disagrees with screenshot board bounds.")
+        if abs(inspect_y_origin - bounds["y"]) > 1.0:
             raise RendererGeometryError("Inspect Y origin disagrees with screenshot board bounds.")
+        if abs(sx_inspect - screenshot_sx) / screenshot_sx > 0.002:
+            raise RendererGeometryError("Inspect X scale disagrees with screenshot board bounds.")
         if abs(sy_inspect - screenshot_sy) / screenshot_sy > 0.002:
             raise RendererGeometryError("Inspect Y scale disagrees with screenshot board bounds.")
-        y_origin = bounds_y
-        sy = screenshot_sy
-        vertical_scale_source = "same_run_full_screen_blank_after_board_bounds"
-        method = "same_run_monitor_x_fit_plus_screenshot_board_bounds_y"
-        validation_status = "X_monitor_fit_cross_checked_with_screenshot_bounds; Y_screenshot_bounds_cross_checked_with_inspect"
-        screenshot_cross_check = {
-            "bounds": {
-                "x": bounds_x, "y": bounds_y,
-                "width": bounds_width, "height": bounds_height,
-            },
-            "scale": {"x": screenshot_sx, "y": screenshot_sy},
-            "monitor_x_origin_difference_px": fit_x["origin"] - bounds_x,
-            "monitor_x_scale_relative_difference": fit_x["scale"] / screenshot_sx - 1,
-            "inspect_y_origin_difference_px": inspect_y_origin - bounds_y,
-            "inspect_y_scale_relative_difference": sy_inspect / screenshot_sy - 1,
-        }
 
-    y_residual = y_origin + float(sample["boardY"]) * sy - float(sample["screenY"])
-    if abs(y_residual) > 0.75:
-        source = "Screenshot-derived" if screenshot_board_bounds is not None else "Inspect-derived"
-        raise RendererGeometryError(f"{source} Y transform does not reproduce the live sample.")
+    def resolve_axis(
+        axis: str,
+        fit: dict[str, float] | None,
+        inspect_origin: float,
+        inspect_scale: float,
+        screenshot_origin: float | None,
+        screenshot_scale: float | None,
+    ) -> tuple[float, float, str, dict[str, float] | None]:
+        if fit is not None:
+            if abs(fit["origin"] - inspect_origin) > 0.5:
+                raise RendererGeometryError(f"Monitor {axis} origin disagrees with inspect.")
+            if abs(fit["scale"] - inspect_scale) / inspect_scale > 0.002:
+                raise RendererGeometryError(f"Monitor {axis} scale disagrees with inspect.")
+            if screenshot_origin is not None and abs(fit["origin"] - screenshot_origin) > 1.0:
+                raise RendererGeometryError(f"Monitor {axis} origin disagrees with screenshot board bounds.")
+            if screenshot_scale is not None and abs(fit["scale"] - screenshot_scale) / screenshot_scale > 0.002:
+                raise RendererGeometryError(f"Monitor {axis} scale disagrees with screenshot board bounds.")
+            if fit["max_abs_residual_px"] > 0.75:
+                raise RendererGeometryError(f"Monitor {axis} fit residual exceeds 0.75 screen pixels.")
+            return fit["origin"], fit["scale"], "same_run_monitor_fit", fit
+        if screenshot_origin is not None and screenshot_scale is not None:
+            return screenshot_origin, screenshot_scale, "same_run_full_screen_board_bounds", None
+        if axis == "Y":
+            return inspect_origin, inspect_scale, "inspect_css_transform_unfitted_axis", None
+        raise RendererGeometryError(
+            f"Monitor {axis} trajectory does not span the axis and screenshot board bounds are unavailable."
+        )
+
+    origin_x, scale_x, source_x, fit_x = resolve_axis(
+        "X", fit_x, inspect_x_origin, sx_inspect,
+        bounds["x"] if bounds else None, screenshot_sx,
+    )
+    origin_y, scale_y, source_y, fit_y = resolve_axis(
+        "Y", fit_y, inspect_y_origin, sy_inspect,
+        bounds["y"] if bounds else None, screenshot_sy,
+    )
+
+    residuals_x = [origin_x + value * scale_x - observed for value, observed in zip(board_x, screen_x)]
+    residuals_y = [origin_y + value * scale_y - observed for value, observed in zip(board_y, screen_y)]
+    max_residual_x = max(abs(value) for value in residuals_x)
+    max_residual_y = max(abs(value) for value in residuals_y)
+    if fit_x is None and max_residual_x > 0.75:
+        raise RendererGeometryError("Screenshot-derived X transform does not reproduce the live samples.")
+    if fit_y is None and max_residual_y > 0.75:
+        raise RendererGeometryError("Screenshot-derived Y transform does not reproduce the live samples.")
 
     x, y, width, height = (int(screen_roi[k]) for k in ("x", "y", "width", "height"))
     if width < 2 or height < 2:
         raise RendererGeometryError("ROI must be at least 2×2 pixels.")
-    right = fit_x["origin"] + fit_x["scale"] * 460
-    bottom = y_origin + sy * 240
-    matrix = [[fit_x["scale"] / 3, 0.0, fit_x["origin"] - x],
-              [0.0, sy / 3, y_origin - y]]
+    right = origin_x + scale_x * 460
+    bottom = origin_y + scale_y * 240
+    matrix = [[scale_x / 3, 0.0, origin_x - x],
+              [0.0, scale_y / 3, origin_y - y]]
+
+    if source_x == "same_run_monitor_fit" and source_y == "same_run_monitor_fit":
+        method = "same_run_monitor_xy_fit"
+    elif source_x == "same_run_monitor_fit":
+        method = "same_run_monitor_x_fit_plus_screenshot_y_bounds"
+    elif source_y == "same_run_monitor_fit":
+        method = "same_run_monitor_y_fit_plus_screenshot_x_bounds"
+    else:
+        method = "same_run_screenshot_board_bounds"
+
     return {
         "coordinate_system": "primary_screen_screenshot_pixels",
         "method": method,
-        "validation_status": validation_status,
+        "validation_status": "both_axes_cross_checked_with_inspect_and_same_run_screenshot_bounds"
+        if bounds else "monitor_fit_axes_cross_checked_with_inspect; unfitted_Y_uses_inspect",
         "board_to_screen": {
-            "origin_x": fit_x["origin"], "origin_y": y_origin,
-            "scale_x": fit_x["scale"], "scale_y": sy,
+            "origin_x": origin_x, "origin_y": origin_y,
+            "scale_x": scale_x, "scale_y": scale_y,
             "corners": {
-                "top_left": [fit_x["origin"], y_origin],
+                "top_left": [origin_x, origin_y],
                 "bottom_right": [right, bottom],
             },
         },
         "screen_offset_from_client": {"x": offset_x, "y": offset_y, "sample_count": len(samples)},
         "horizontal_fit": fit_x,
-        "vertical_scale_source": vertical_scale_source,
-        "vertical_sample_residual_px": y_residual,
-        "screenshot_bounds_cross_check": screenshot_cross_check,
+        "vertical_fit": fit_y,
+        "axis_sources": {"x": source_x, "y": source_y},
+        "axis_max_abs_residual_px": {"x": max_residual_x, "y": max_residual_y},
+        "screenshot_bounds_cross_check": {
+            "bounds": bounds,
+            "scale": {"x": screenshot_sx, "y": screenshot_sy} if bounds else None,
+            "monitor_x_origin_difference_px": fit_x["origin"] - bounds["x"] if fit_x and bounds else None,
+            "monitor_x_scale_relative_difference": fit_x["scale"] / screenshot_sx - 1 if fit_x and screenshot_sx else None,
+            "monitor_y_origin_difference_px": fit_y["origin"] - bounds["y"] if fit_y and bounds else None,
+            "monitor_y_scale_relative_difference": fit_y["scale"] / screenshot_sy - 1 if fit_y and screenshot_sy else None,
+            "inspect_x_origin_difference_px": inspect_x_origin - bounds["x"] if bounds else None,
+            "inspect_y_origin_difference_px": inspect_y_origin - bounds["y"] if bounds else None,
+            "inspect_x_scale_relative_difference": sx_inspect / screenshot_sx - 1 if screenshot_sx else None,
+            "inspect_y_scale_relative_difference": sy_inspect / screenshot_sy - 1 if screenshot_sy else None,
+        },
         "roi": {"x": x, "y": y, "width": width, "height": height},
         "roi_alignment": {
-            "board_origin_in_roi": {"x": fit_x["origin"] - x, "y": y_origin - y},
-            "board_size_px": {"width": right - fit_x["origin"], "height": bottom - y_origin},
+            "board_origin_in_roi": {"x": origin_x - x, "y": origin_y - y},
+            "board_size_px": {"width": right - origin_x, "height": bottom - origin_y},
             "roi_scale": {"x": (width - 1) / 460, "y": (height - 1) / 240},
             "board_edge_overrun_px": {"right": right - (x + width), "bottom": bottom - (y + height)},
         },
         "inspect_scale": {"x": sx_inspect, "y": sy_inspect},
+        "inspect_origin": {"x": inspect_x_origin, "y": inspect_y_origin},
         "inspect_x_origin": inspect_x_origin,
-        "inspect_x_origin_difference_px": fit_x["origin"] - inspect_x_origin,
+        "inspect_x_origin_difference_px": origin_x - inspect_x_origin,
         "matrix_source_raster_to_roi": matrix,
         "source_raster_scale": 3,
     }
