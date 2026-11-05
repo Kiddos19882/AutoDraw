@@ -795,6 +795,37 @@ class AutoDrawUnifiedApp:
                 ):
                     raise ValueError(f"{matrix_phase}: параметры плана не соответствуют фиксированному протоколу матрицы.")
                 executor_config_override = dict(parameters)
+
+            scenario_id = generation.get("test_case") if isinstance(generation, dict) else None
+            if scenario_id == "paired_renderer_single_stroke":
+                from brush_behavior_test_ui import (
+                    PAIRED_RENDERER_EXECUTOR_CONFIG,
+                    PAIRED_RENDERER_PATH_MODE,
+                    PAIRED_RENDERER_REQUESTED_RADIUS,
+                    PAIRED_RENDERER_TEST_CASE_ID,
+                )
+
+                capture = generation.get("paired_renderer_capture")
+                expected_parameters = dict(PAIRED_RENDERER_EXECUTOR_CONFIG)
+                strokes = plan_document.get("strokes")
+                if (
+                    not isinstance(capture, dict)
+                    or capture.get("schema_version") != 1
+                    or capture.get("scenario_id") != PAIRED_RENDERER_TEST_CASE_ID
+                    or capture.get("requested_radius") != PAIRED_RENDERER_REQUESTED_RADIUS
+                    or capture.get("expected_strokes") != 1
+                    or capture.get("renderer_path_mode") != PAIRED_RENDERER_PATH_MODE
+                    or capture.get("executor_parameters") != expected_parameters
+                    or requested_brush != PAIRED_RENDERER_REQUESTED_RADIUS
+                    or not isinstance(strokes, list)
+                    or len(strokes) != 1
+                ):
+                    raise ValueError(
+                        "Paired renderer capture: план должен содержать один штрих, "
+                        "радиус 10, smooth renderer и фиксированный executor profile step=2/delay=10/extension=0."
+                    )
+                executor_config_override = expected_parameters
+
             started = self.executor.start_execution_from_workflow(
                 executor_config_override=executor_config_override
             )
