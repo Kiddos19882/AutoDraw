@@ -317,7 +317,7 @@ def test_board_renderer_comparison_rejects_bounds_outside_roi_or_screen():
     with pytest.raises(RendererGeometryError, match="contained"):
         crop_mask_to_board_bounds(
             mask,
-            {"x": 497, "y": 268, "width": 672, "height": 351},
+            {"x": 495, "y": 268, "width": 672, "height": 351},
             {"x": 496, "y": 265, "width": 674, "height": 355},
         )
     with pytest.raises(RendererGeometryError, match="exceeds"):
