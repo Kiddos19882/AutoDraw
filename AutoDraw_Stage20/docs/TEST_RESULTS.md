@@ -27,6 +27,9 @@
 **Статус:** действующий сводный реестр результатов и доказательств  
 **Дата формирования:** 2026-11-06  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
+**Удалённый branch HEAD на начало документационной сверки:** `81f6bb77c8a338ae52e0de084dce45e0cacabf1f` (docs-only commit); последний code/test HEAD остаётся `b07c636fa4b4ce28329cfb74f468634a46751ac1`.  
+**Master:** `9a3453aeb847b66041bc83d6f4a56ecaf33a993a`, не изменялась.  
+
 **HEAD перед дополнением D1–D5:** `63fdaf3f2a1b12bd90e1a588ca4e968facbe0103`  
 **Область:** AutoDraw_Stage20, тесты приложения, лабораторные эксперименты, Game Monitor/Bridge, CHALK, FILL-001, геометрические модели, GitHub Actions и offline benchmarks.  
 **Последний evidence commit:** `e6b771ed67201625884c6ce778fa355f1ab9b873` (первые vertical/diagonal live captures и exploratory offline reports).  
