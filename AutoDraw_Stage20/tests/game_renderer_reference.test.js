@@ -7,7 +7,8 @@ const {
   buildNormalPathCommands,
   terminalPoint,
   shouldWebGLRendererRasterize,
-  extractAcceptedPoints
+  extractAcceptedPoints,
+  buildStagePlacement
 } = require("./game_renderer_reference.js");
 
 test("smooth one-point path contains moveTo only and has no segment endpoint", () => {
@@ -125,4 +126,60 @@ test("rejects runs containing more than one stroke", () => {
     { type: "POINT_QUOTA_UPDATE", strokeId: "stroke-1", pointDelta: 1, acceptedPoint: { x: 1, y: 2 } },
     { type: "POINT_QUOTA_UPDATE", strokeId: "stroke-2", pointDelta: 1, acceptedPoint: { x: 3, y: 4 } }
   ] }), /exactly one identified stroke/);
+});
+
+test("Stage placement preserves the exact fractional backing origin and computes A-D rounding", () => {
+  const profile = {
+    stageWidth: 1314, stageHeight: 600,
+    canvasBackingWidth: 3942, canvasBackingHeight: 1800,
+    canvasScaleX: 3, canvasScaleY: 3,
+    boardWidth: 460, boardHeight: 240,
+    boardStageCorners: {
+      topLeft: { x: 340.7916660308838, y: 72 },
+      topRight: { x: 800.7916660308838, y: 72 },
+      bottomRight: { x: 800.7916660308838, y: 312 },
+      bottomLeft: { x: 340.7916660308838, y: 312 }
+    }
+  };
+  const exact = buildStagePlacement(profile, false);
+  const rounded = buildStagePlacement(profile, true);
+  assert.ok(Math.abs(exact.x - 1022.375) < 1e-6);
+  assert.equal(exact.y, 216);
+  assert.equal(exact.width, 1380);
+  assert.equal(exact.height, 720);
+  assert.equal(rounded.x, 1022);
+  assert.equal(rounded.y, 216);
+  assert.equal(exact.rounding, "exact_fractional_backing_origin");
+  assert.equal(rounded.rounding, "nearest_backing_pixel");
+});
+
+test("Stage placement rejects mismatched backing scale and non-rectangular BoardPane corners", () => {
+  const profile = {
+    stageWidth: 1314, stageHeight: 600,
+    canvasBackingWidth: 3942, canvasBackingHeight: 1800,
+    canvasScaleX: 2, canvasScaleY: 3,
+    boardWidth: 460, boardHeight: 240,
+    boardStageCorners: {
+      topLeft: { x: 340, y: 72 }, topRight: { x: 800, y: 72 },
+      bottomRight: { x: 800, y: 312 }, bottomLeft: { x: 340, y: 312 }
+    }
+  };
+  assert.throws(() => buildStagePlacement(profile, false), /Backing dimensions do not match/);
+  profile.canvasScaleX = 3;
+  profile.boardStageCorners.bottomRight.x = 801;
+  assert.throws(() => buildStagePlacement(profile, false), /axis-aligned rectangle/);
+});
+
+test("Stage placement rejects BoardPane geometry outside the backing canvas", () => {
+  const profile = {
+    stageWidth: 1314, stageHeight: 600,
+    canvasBackingWidth: 3942, canvasBackingHeight: 1800,
+    canvasScaleX: 3, canvasScaleY: 3,
+    boardWidth: 460, boardHeight: 240,
+    boardStageCorners: {
+      topLeft: { x: 1000, y: 72 }, topRight: { x: 1460, y: 72 },
+      bottomRight: { x: 1460, y: 312 }, bottomLeft: { x: 1000, y: 312 }
+    }
+  };
+  assert.throws(() => buildStagePlacement(profile, false), /falls outside/);
 });
