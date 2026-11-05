@@ -515,3 +515,11 @@ Artifact: `autodraw-paired-renderer-png-comparison`, ID `13386122895`.
 **FILL-001-RS static sweep artifact:** `autodraw-fill001-rs-static-sweep` ID `13386973590`; 15 cells (3 shapes×5 radii), 2238 candidate plans, 62 accepted candidates; each cell has a selected offline candidate meeting coverage≥0.99 and leakage=0. This is OpenCV raster simulation and estimated sampling points, not exact CHALK or game renderer validation.
 
 **Separate committed PNG quality gate:** coverage `98.430600%`, leakage `11`, status `failed`; therefore FILL-001 remains blocked despite the static sweep step succeeding.
+
+
+## 2026-11-05 — AutoDraw geometry reader/UI diagnostics (CI pending)
+
+- `test_brush_radius_feedback.py`: active Bridge geometry reader returns client-space corners and explicitly denies desktop/executor readiness; stale and closed sessions are rejected.
+- `test_brush_behavior_test_ui.py`: Game Monitor report summary preserves BoardPane client corners, mapping method, window geometry and update count without copying raw snapshots or claiming screen mapping.
+- Brush Behavior tab displays current BoardPane geometry diagnostics and retains manual calibration for executor placement.
+- Awaiting CI for reader/UI changes.
