@@ -481,3 +481,13 @@ Workflow и тесты обновлены в feature-ветке; результ�
 - `tests/test_unified_app.py`: paired horizontal/vertical/diagonal executor handoff with the fixed capture profile.
 - `tests/compare_live_renderer_reference.py`: scenario-aware axis coverage validation; known paired scenario IDs require the corresponding Monitor-fit/screenshot-bound axes.
 - CI [41976515362](https://github.com/Kiddos19882/AutoDraw/actions/runs/41976515362): all required jobs SUCCESS; optional algorithm benchmarks SKIPPED.
+
+
+## Formal paired-renderer acceptance gates — 2026-11-05
+
+- `source/preparation/renderer_acceptance.py`: fail-closed capture validation (experiment/run/session binding, exact pre/post `pointCount`, complete `POINT_QUOTA_UPDATE` / `DRAW_SAMPLE` accepted-point equality, single stroke, brush/executor profile, clean board and Monitor/Bridge integrity); transform thresholds; alpha-24 PNG metrics; per-run decision.
+- `source/preparation/tests/test_renderer_acceptance.py`: regression checks for all three axis-source policies, capture validity and rejected evidence, transform/pixel thresholds, unique run IDs and series aggregation.
+- `tests/compare_live_renderer_reference.py`: creates `comparison-report-independent-transform.json` with `PASS_PER_RUN` or `REJECTED_PER_RUN`. Only the independent, unshifted transform is scored; the post-hoc translation remains diagnostic and is excluded from acceptance.
+- `tests/summarize_renderer_acceptance.py`: aggregates per-run reports. Overall multi-axis series requires three unique `PASS_PER_RUN` captures for vertical and three for diagonal; rejected attempts and duplicate run IDs are not counted.
+- Workflow: `.github/workflows/geometry-tests.yml`, preparation/G3 job and paired PNG audit. Run [41992373137](https://github.com/Kiddos19882/AutoDraw/actions/runs/41992373137) is currently in progress; do not treat it as PASS until the required jobs finish.
+- A per-run PASS is not environment-wide renderer acceptance and does not authorize calibration/profile or executor handoff. Real vertical/diagonal live captures remain required.
