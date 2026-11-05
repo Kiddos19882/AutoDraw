@@ -87,7 +87,7 @@
 
 #### Этап 6. Tests и CI — IN PROGRESS
 - Unit tests для valid transform, unstable client→screen offset и unsupported CSS skew добавлены в `source/preparation/tests/test_renderer_geometry.py`.
-- Workflow `geometry-tests.yml` запускает независимое сравнение после подготовки артефактов; CI run `41963498086` для commit `1b16b51e42ba0c61a0fbc547179ca5a9b3864b54` был `in_progress` при последней проверке.
+- Workflow `geometry-tests.yml` запускает независимое сравнение после подготовки артефактов; CI run `41963498086` для commit `1b16b51e42ba0c61a0fbc547179ca5a9b3864b54` завершился SUCCESS: обязательные jobs включая Windows portable build/startup smoke-test и INT-006 PNG audit — SUCCESS; optional algorithm benchmarks — SKIPPED.
 - После завершения CI проверить новые метрики, report JSON и диагностические PNG; отдельно зафиксировать обязательные jobs и skipped optional jobs.
 
 #### Этап 7. Confirmatory live capture — BLOCKED BY USER-SCREEN ACCESS
@@ -117,7 +117,7 @@
 | 3. Monitor geometry specification | DESIGN IN PROGRESS |
 | 4. Monitor → Bridge → AutoDraw | DESIGN PENDING |
 | 5. Independent offline renderer compare | DONE EXPLORATORY / ACCEPTANCE OPEN |
-| 6. Tests/CI | PARTIAL SUCCESS; WINDOWS BUILD RUNNING |
+| 6. Tests/CI | SUCCESS; OPTIONAL BENCHMARKS SKIPPED |
 | 7. Confirmatory live capture | BLOCKED BY USER-SCREEN ACCESS |
 | 8. FILL-001-RS preflight/matrix | BLOCKED BY RENDERER GATE |
 
