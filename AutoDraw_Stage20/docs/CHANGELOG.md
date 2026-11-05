@@ -1,3 +1,10 @@
+## 2026-11-05 — independent screen geometry audit tooling
+
+- Добавлен fail-closed helper для независимого BoardPane→screenshot transform: same-run Monitor X fit плюс inspect-derived Y transform с явным vertical caveat.
+- Добавлены unit tests и derived geometry audit input для paired renderer run.
+- CI comparison теперь считает дополнительную метрику по независимому transform без post-hoc registration; исходный frozen transform comparison сохраняется.
+- Документировано смещение ручного ROI примерно на 1.95 px слева и 2.86 px сверху. Renderer acceptance остаётся открытой до результата CI.
+
 ## 2026-11-05 — уточнён временный план board geometry/calibration handoff
 
 - Уточнена последовательность: независимое восстановление ROI из same-session evidence → coordinate-space contract → спецификация BoardPane geometry → отдельное разрешение на Monitor/Bridge/AutoDraw implementation → offline renderer validation → отдельное разрешение на live capture.
