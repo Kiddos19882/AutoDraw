@@ -175,13 +175,28 @@ try {
         if (-not $caseManifestMatch.Success) { throw "Stage-level $($case.Name) manifest is missing." }
         $caseManifestJson = [System.Net.WebUtility]::HtmlDecode($caseManifestMatch.Groups[1].Value)
         $caseManifest = $caseManifestJson | ConvertFrom-Json
+        $variants = @($caseManifest.fixtures[0].stageLevelCompositor)
+        $variantA = $variants | Where-Object { $_.id -eq "A" } | Select-Object -First 1
+        $variantB = $variants | Where-Object { $_.id -eq "B" } | Select-Object -First 1
+        $variantC = $variants | Where-Object { $_.id -eq "C" } | Select-Object -First 1
+        $variantD = $variants | Where-Object { $_.id -eq "D" } | Select-Object -First 1
         if ($caseManifest.runtimeProfile.sourceRunId -ne $case.RunId -or
             $caseManifest.stageLevelCompositor.status -ne "generated_four_offline_variants" -or
             $caseManifest.stageLevelCompositor.variantCount -ne 4 -or
-            $caseManifest.fixtures.Count -ne 1 -or
-            $caseManifest.fixtures[0].stageLevelCompositor.Count -ne 4) {
+            $caseManifest.fixtures.Count -ne 1 -or $variants.Count -ne 4 -or
+            $null -eq $variantA -or $null -eq $variantB -or $null -eq $variantC -or $null -eq $variantD -or
+            $variantA.backend -ne "WebGL" -or $variantB.backend -ne "WebGL" -or
+            $variantC.backend -ne "Canvas2D" -or $variantD.backend -ne "Canvas2D" -or
+            $variantA.rendererBackend -notmatch "Egret WebGLRenderer" -or
+            [Math]::Abs([double]$variantA.placement.x - 1022.375) -gt 0.0001 -or
+            [double]$variantA.placement.y -ne 216 -or
+            [double]$variantB.placement.x -ne 1022 -or
+            [double]$variantB.placement.y -ne 216 -or
+            [double]$variantA.placement.width -ne 1380 -or
+            [double]$variantA.placement.height -ne 720 -or
+            [int]$variantA.comparisonToA.differingPixels -ne 0) {
             Set-Content -Path (Join-Path $caseOutput "manifest-invalid.json") -Value $caseManifestJson -Encoding utf8
-            throw "Stage-level $($case.Name) output is not bound to the expected run or does not contain all A-D variants."
+            throw "Stage-level $($case.Name) output failed run binding, A-D backend, placement or baseline self-comparison validation."
         }
         Set-Content -Path (Join-Path $caseOutput "manifest.json") -Value $caseManifestJson -Encoding utf8
 
