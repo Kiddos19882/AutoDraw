@@ -1,8 +1,8 @@
 # Дополнение — Stage-level compositor A–D (2026-11-06)
 
 **Статус:** implementation committed; automated browser/CI validation pending.  
-**Branch:** `feature/image-geometry-optimization`. **Code/test HEAD:** `501b3fac5e4cb7039161da6d70a1c79803ebb01f`.  
-**Master:** `9a3453aeb847b66041bc83d6f4a56ecaf33a993a`, не изменялась. Remote compare: diverged, feature ahead 3424 / behind 5; merge/rebase не выполнялись. GitHub API не показывает локальный `git status`.
+**Branch:** `feature/image-geometry-optimization`; remote HEAD перед этой записью `adac8018c22c66fa91d8d9203cd82c1b79110f29`. **Code/test HEAD:** `501b3fac5e4cb7039161da6d70a1c79803ebb01f`.  
+**Master:** `9a3453aeb847b66041bc83d6f4a56ecaf33a993a`, не изменялась. Remote compare на HEAD `adac801`: diverged, feature ahead 3434 / behind 5; merge/rebase не выполнялись. GitHub API не показывает локальный `git status`.
 
 ## Что реализовано
 
@@ -18,7 +18,7 @@ Stage 1314×600; backing 3942×1800; BoardPane 460×240; scale 3×; logical orig
 
 ## Что ещё не подтверждено
 
-- GitHub combined status для code/test HEAD пока не вернул checks; browser runner и Node tests на этом HEAD не подтверждены. CI PASS не заявляется.
+- GitHub combined status для code/test HEAD вернул пустой список checks; PR-only workflow lookup также не вернул runs. Browser runner, Node tests и CI на этом HEAD не подтверждены. CI PASS не заявляется.
 - A–D PNG и per-variant pixel metrics ещё не получены/проверены.
 - Stage A ещё не сопоставлен с live before/after screenshots через отдельный Stage CSS-to-screen transform. Formal acceptance thresholds не менялись; post-hoc alignment запрещён.
 - Причинность fractional X phase 0.375 px остаётся гипотезой.
