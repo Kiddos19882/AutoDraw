@@ -128,19 +128,28 @@ def _browser_composite_html(
     board_origin: dict[str, float],
     css_matrix: dict[str, float],
 ) -> str:
-    """Build a same-browser, load-blocking image overlay for the live WebGL canvas."""
+    """Build a same-browser canvas overlay drawn synchronously from the loaded source image."""
     width, height = screen_size
     baseline_uri = html.escape(baseline_png.resolve().as_uri(), quote=True)
     overlay = ""
+    overlay_image = ""
     if offline_png is not None:
         overlay_uri = html.escape(offline_png.resolve().as_uri(), quote=True)
         left = float(board_origin["x"])
         top = float(board_origin["y"])
         a, b, c, d, tx, ty = (float(css_matrix[key]) for key in ("a", "b", "c", "d", "tx", "ty"))
         overlay = (
-            f'<img id="board-overlay" alt="" src="{overlay_uri}" loading="eager" decoding="sync" '
-            f'style="left:{left:.12f}px;top:{top:.12f}px;width:1380px;height:720px;'
-            f'transform-origin:0 0;transform:matrix({a:.15g},{b:.15g},{c:.15g},{d:.15g},{tx:.15g},{ty:.15g});">'
+            f'<canvas id="board-overlay" width="1380" height="720" '
+            f'style="left:{left:.12f}px;top:{top:.12f}px;'
+            f'transform-origin:0 0;transform:matrix({a:.15g},{b:.15g},{c:.15g},{d:.15g},{tx:.15g},{ty:.15g});"></canvas>'
+        )
+        overlay_image = (
+            f'<img id="offline-source" alt="" src="{overlay_uri}" loading="eager" decoding="sync" '
+            f'style="display:none" onload="const canvas=document.getElementById(\'board-overlay\');'
+            f'const context=canvas.getContext(\'2d\',{{alpha:true}});'
+            f'if(!context)throw new Error(\'Canvas2D overlay context unavailable.\');'
+            f'context.imageSmoothingEnabled=true;context.imageSmoothingQuality=\'high\';'
+            f'context.drawImage(this,0,0,1380,720);document.documentElement.dataset.overlayReady=\'true\';">'
         )
     return f"""<!doctype html>
 <html><head><meta charset="utf-8">
@@ -149,10 +158,11 @@ def _browser_composite_html(
 html,body {{ margin:0;padding:0;width:{width}px;height:{height}px;overflow:hidden;background:#000; }}
 img {{ position:absolute;display:block;margin:0;padding:0;border:0;max-width:none;max-height:none; }}
 #baseline {{ left:0;top:0;width:{width}px;height:{height}px; }}
-#board-overlay {{ position:absolute;display:block;max-width:none;max-height:none;image-rendering:auto; }}
+#board-overlay {{ position:absolute;display:block;width:1380px;height:720px;transform-origin:0 0;image-rendering:auto; }}
 </style></head><body>
 <img id="baseline" alt="" src="{baseline_uri}">
 {overlay}
+{overlay_image}
 </body></html>"""
 
 

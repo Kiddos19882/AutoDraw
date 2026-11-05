@@ -399,12 +399,12 @@ def test_browser_compositor_html_uses_eager_static_overlay_image(tmp_path):
         {"a": 0.487, "b": 0.0, "c": 0.0, "d": 0.4875, "tx": 0.0, "ty": 0.0},
     )
 
-    assert '<img id="board-overlay"' in html
+    assert '<canvas id="board-overlay"' in html
+    assert '<img id="offline-source"' in html
     assert 'loading="eager"' in html
     assert 'decoding="sync"' in html
-    assert 'width:1380px;height:720px' in html
+    assert 'onload="const canvas=' in html
+    assert 'context.drawImage(this,0,0,1380,720)' in html
     assert "transform:matrix(0.487,0,0,0.4875,0,0)" in html
-    assert "offline-source" not in html
-    assert "<canvas" not in html
     assert ".decode()" not in html
     assert "requestAnimationFrame" not in html
