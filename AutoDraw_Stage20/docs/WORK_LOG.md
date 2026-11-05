@@ -168,3 +168,19 @@ Scope: code, tests and CI only in feature/image-geometry-optimization; no real g
 - Локальный `git status`, локальный запуск приложения и live game tests недоступны; новые тесты и CI в рамках этой документационной сверки не запускались.
 
 **Остаточный P0:** реализовать и проверить offline Stage-level WebGL compositor A–D на существующих captures; не менять production renderer/planner/sampling/brush/executor и acceptance thresholds. Дробная backing X phase=0.375 px остаётся гипотезой, не установленной причиной vertical/diagonal mismatch.
+
+## 2026-11-06 — Stage-level compositor A–D implementation
+
+**Scope:** offline renderer harness, regression tests, HTML page and headless browser runner; no production drawing code and no live game run.
+
+- Start audit: remote feature branch and latest 20 commits checked; required README/docs index, PROJECT_STATUS, TASKS, ROADMAP, DECISIONS, CHANGELOG, WORK_LOG and permanent engineering/evidence/experiment guides reviewed. GitHub API does not expose local `git status`.
+- Branch remained `feature/image-geometry-optimization`; `master` remained at `9a3453aeb847b66041bc83d6f4a56ecaf33a993a`. Branch compare reports diverged, ahead 3418 / behind 5; no merge/rebase performed.
+- Confirmed run-bound geometry for saved captures: Stage 1314×600, backing 3942×1800, BoardPane 460×240, scale 3×, logical top-left (340.7916660308838,72), backing origin (1022.375,216).
+- Added `buildStagePlacement()` with fail-closed validation, exact and rounded origins, and Node tests.
+- Added A/B WebGL and C/D Canvas2D Stage backing render variants; manifest records placement, texture parameters and RGBA pixel delta vs A.
+- Connected the HTML harness to the exact existing vertical/diagonal Game Monitor reports and extended the headless Edge runner to save A–D PNGs/manifests. This is offline replay of existing captures, not a new live experiment.
+- Commits: `9dc84c4` (Stage compositor), `c1bf7be` (placement tests), `bd13ad9` (HTML docs), `8035457` (variant deltas), `c0fd8d7` (WebGL canvas readback), `670d84f` (source orientation), `6bdce34` (saved Monitor input), `a6782cd` (headless runner).
+- Validation: remote source changes committed. No local node/PowerShell execution available; GitHub combined status for the current code HEAD has not returned checks, so CI/browser result is NOT_CONFIRMED. Do not infer runtime correctness from source presence.
+- Not changed: production renderer/planner/sampling/brush/executor, acceptance thresholds, raw captures, live game state, master.
+- Next: inspect CI browser artifacts for both orientations; compare A–D and then feed Stage A through the existing formal screenshot comparator with the independent Stage→screen transform, no post-hoc alignment.
+
