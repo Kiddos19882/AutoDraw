@@ -284,7 +284,7 @@ def main() -> int:
             geometry_audit_path = args.output_dir / "screen_geometry_audit.json"
             args.output_dir.mkdir(parents=True, exist_ok=True)
             geometry_audit_path.write_text(
-                json.dumps(geometry_evidence, ensure_ascii=False, indent=2) + "\\n",
+                json.dumps(geometry_evidence, ensure_ascii=False, indent=2) + "\n",
                 encoding="utf-8",
             )
         else:
