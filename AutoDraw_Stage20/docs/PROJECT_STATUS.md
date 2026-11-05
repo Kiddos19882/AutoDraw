@@ -1,12 +1,20 @@
 # Актуальная точка продолжения — 2026-11-05
 
-## Текущая точка — exploratory live/offline comparison выполнен; transform root cause открыт
+## Текущая точка — exploratory renderer comparison завершён; независимая геометрия и handoff остаются открытыми
 
 **Branch:** feature/image-geometry-optimization  
-**HEAD при проверке:** 2c31cb350ba7390ee7da35a9a0f515432b0d5b19 (test: report diagnostic renderer alignment offset).  
-**Последние 20 commits:** проверены; последние изменения — paired renderer comparison/test fixtures и диагностический translation report.  
+**HEAD при проверке:** 454b63dc2c9fb41b553cef0a86cad63e0fa2241e (`docs(test-results): record live offline pixel comparison`).  
+**Сверка ветки:** compare `feature/image-geometry-optimization` с HEAD вернул `identical` (ahead=0, behind=0). Последние 20 commits проверены; последний commit документальный.  
 **Локальный git status:** недоступен через GitHub API; чистота локальной рабочей копии не подтверждена.  
-**Последний полный известный CI:** run 41954783317 — все обязательные jobs SUCCESS, optional algorithm benchmarks SKIPPED. Combined status непосредственно на HEAD 2c31cb3 пуст; этот CI нельзя автоматически приписывать HEAD.
+**CI:** последний известный полный workflow 41954783317 завершился SUCCESS по обязательным jobs, optional algorithm benchmarks SKIPPED; он не подтверждает текущий HEAD 454b63d. Combined status для 454b63d не содержит статусов.  
+
+### Текущая задача
+
+FILL-001-RS-ENGINE-FOOTPRINT-001 остаётся IN_PROGRESS. Live/offline сравнение имеет статус exploratory; независимая причина residual offset не установлена, renderer acceptance не пройдена. Подробный временный план уточнён в [ROADMAP.md](ROADMAP.md#уточнённый-временный-план--автоматическое-определение-геометрии-доски-и-handoff-калибровки).
+
+**Разрешённый объём текущего продолжения:** анализ реализации и документирование плана. Изменение исходников, тестов, конфигураций/workflow, запуск live-игры и CHALK-эксперименты не разрешены этим запросом.
+
+**Следующий шаг:** выполнить offline-аудит исходных скриншотов и независимо восстановить board ROI/crop origin из той же сессии; если same-session full-screen/blank evidence недостаточно, остановиться и запросить недостающий материал. Не начинать интеграцию Monitor → Bridge → AutoDraw до отдельного утверждения реализации.
 
 ### Принятый live capture и offline replay
 
