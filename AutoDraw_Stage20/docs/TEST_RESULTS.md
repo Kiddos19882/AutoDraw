@@ -9,6 +9,60 @@
 > Этот файл — единая точка входа для понимания результатов тестирования. Здесь собраны проверяемые сводные результаты, статусы, ограничения и ссылки на первичные отчёты/артефакты. Первичные JSON, PNG, логи, frozen plans, manifests и подробные отчёты не удаляются и не переписываются: они остаются источниками доказательств. Если краткая сводка расходится с первичным отчётом, приоритет имеет первичный материал и фактический runtime/CI evidence.
 
 
+## 2026-11-05 — full CI 41994624425 SUCCESS (code/test commit 58ebdda7)
+
+**Workflow:** [41994624425](https://github.com/Kiddos19882/AutoDraw/actions/runs/41994624425) — conclusion SUCCESS.  
+**Code/test commit:** `58ebdda7cf3f07ceef1075020f2808a2782562b7`.  
+**Artifacts:** paired renderer `13399663414`; V1–V5 PNG analyzer `13400530501`; FILL-001-RS static sweep `13399922622`; capsule benchmark `13399777779`; INT-006 CHALK `13399473920`; INT006R `13399563542`; INT006R visual review source `13399289073`; Windows portable build `13399627749`.
+
+### Required job summary
+
+- Game Monitor/Bridge: SUCCESS; Browser Bridge telemetry lifecycle 4/4; Python WebSocket/snippet/run-provenance suite 31 passed.
+- Application integration: SUCCESS.
+- Executor regression: SUCCESS.
+- Egret CanvasRenderer browser reference: SUCCESS.
+- Preparation/G3: 880 passed, 24 warnings, 82 subtests. Capsule benchmark and FILL-001-RS static sweep ran and artifacts were uploaded.
+- INT-006 pixel-level PNG geometry audit: SUCCESS.
+- Windows portable build/startup smoke-test: SUCCESS; portable artifact 646,950,501 bytes.
+- Optional algorithm benchmarks: SKIPPED by default configuration.
+
+### Paired renderer formal per-run result
+
+- Status: `PASS_PER_RUN` for the existing horizontal capture only.
+- Alpha24: IoU=0.9988824318; precision=0.9991057456; recall=0.9997762864; symmetric difference=10 px; fraction=0.1117818%; bbox edge differences=[0,0,0,0].
+- Exact CHALK=138 (`pointCount` 1→139); 138 accepted quota updates and 138 drawing samples, each pointDelta=1; one stroke ID; zero Monitor/Bridge integrity errors.
+- Does not constitute multi-axis series acceptance: three unique vertical and three unique diagonal live captures are still required.
+
+### V1–V5 pixel analyzer
+
+- 90/90 captures valid; 10 independent series × 9 runs; no missing or duplicate matrix cells.
+- Artifact `13400530501`. This validates capture identity/completeness and provides pixel diagnostics; the analyzer does not declare a universal quality PASS for all series.
+
+### INT-006 and INT006R
+
+- INT-006 frozen prediction: 45/45 accepted. Actual total 3910, predicted total 3949.38; MAE=1.408, RMSE=1.967, bias=-0.875, MAPE=2.134%, maximum absolute error=4.94, maximum underprediction=1.82.
+- P0: MAE/RMSE/MAPE=2.882/3.189/3.484%, max underprediction=0.99.
+- P1: 0.657/0.838/1.178%, max underprediction=0.92.
+- P2: 0.685/0.854/1.741%, max underprediction=1.82.
+- Safety margin status remains `not_established`; production eligibility `not_validated`.
+- INT006R: 45/45 accepted; average exact CHALK radius 1/10/30 = 67.40/67.67/67.80. The latest artifact marks visual-quality review `pending_manual_review`; visual-review source is separately preserved.
+
+### FILL-001-RS and capsule offline evidence
+
+- Static sweep reproduced 2,238 candidates; 62 accepted; 15/15 selected shape×radius cells pass the offline gate (coverage≥99%, leakage=0).
+- Rectangle/radius10 selected candidate: step=5, offset=0, 27 strokes, coverage=99.3191947%, leakage=0, estimated sampling points=2,099. This last value is an estimate, not exact CHALK.
+- Capsule benchmark: masks equivalent in all five cases. Candidate-slot reductions: winding 91.09%, large zigzag 96.23%, diagonal turns 59.53%, compact many-segment 92.24%, single long diagonal 0%. Median runner speedups: 10.92×, 20.20×, 2.74×, 13.87× and 1.14× respectively. These are environment-specific offline geometry timings, not CHALK measurements or guaranteed application-wide speedups.
+- FILL-001 committed live PNG quality gate remains FAIL: coverage=98.430600%, leakage=11. This is separate from the offline sweep and paired renderer PASS. The 45-cell live matrix remains BLOCKED.
+
+### Bridge input telemetry automation
+
+- Paired scenarios opt in through `--enable-input-telemetry`; ordinary Bridge sessions leave Monitor telemetry unchanged.
+- Browser Bridge preserves an already-enabled user setting, enables only when required, restores changed state at disconnect and reports configuration in `session_start`.
+- Server stores `bridge_configuration` in session.json and `bridge_configuration_at_start` in run JSON.
+- CI verified Node lifecycle 4/4 and Python suite 31 passed. Earlier runs `41994014564` and `41994258815` failed on test-only expectation/import issues; those attempts remain preserved and corrected code passed run `41994624425`.
+
+**Not performed:** no new live game experiment, no local AutoDraw launch, no local `git status`, no production renderer/planner/estimator/calibration/executor default changes.
+
 ## 2026-11-05 — exploratory live/offline renderer comparison and transform audit
 
 **Experiment:** d47cc0a5520044c7abfd0352a4f93ca8; **run:** 16aec62c-9e54-44e7-8691-9df79b19161d; **session:** d357b6ee-5617-4e07-9011-7eba7ccb6c0f. Raw capture and offline renderer inputs remain immutable.
@@ -34,7 +88,7 @@
 - Added capture validation that checks run/session/experiment binding, exact pre/post pointCount, accepted-point completeness, per-event pointDelta, stroke identity, bridge integrity counters, brush radius, executor profile, clean-board state and fixture binding.
 - Added same-run transform checks and the predeclared alpha-24 renderer gates. The post-hoc best-translation diagnostic remains non-acceptance evidence and is excluded from formal scoring.
 - Added a distinct series aggregator: three unique per-run PASS captures per orientation are required for vertical and diagonal. Rejected and duplicate attempts are recorded but do not count.
-- Unit tests were added; CI execution is pending. No new live experiment or raw evidence mutation was performed.
+- Unit/regression tests прошли full CI [41994624425](https://github.com/Kiddos19882/AutoDraw/actions/runs/41994624425) SUCCESS. No new live experiment or raw evidence mutation was performed.
 
 ## 1. Правила чтения и доказательности
 

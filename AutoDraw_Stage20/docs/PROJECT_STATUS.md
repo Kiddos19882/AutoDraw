@@ -1,26 +1,26 @@
 # Актуальная точка продолжения — 2026-11-05
 
-## Текущая точка — horizontal renderer baseline PASS_PER_RUN; multi-axis live series pending; Bridge telemetry automation CI pending
+## Текущая точка — Bridge telemetry automation CI PASS; horizontal renderer PASS_PER_RUN; multi-axis live series pending
 
 **Репозиторий:** `Kiddos19882/AutoDraw`  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
-**Последний CI-проверенный code/test commit:** `156a5195e2c0fb29bc0cd8d494a5e9b6547ca4ed`
-**Последний успешный CI:** [run 41992373137](https://github.com/Kiddos19882/AutoDraw/actions/runs/41992373137), conclusion SUCCESS.
+**Последний CI-проверенный code/test commit:** `58ebdda7cf3f07ceef1075020f2808a2782562b7`
+**Последний успешный CI:** [run 41994624425](https://github.com/Kiddos19882/AutoDraw/actions/runs/41994624425), conclusion SUCCESS.
 **Workflow packaging commit:** `fb853547d74a70582ab1e4731d55763367b8ceb8`, проверен успешным run `41970907209`.  
-**Документационная синхронизация:** `3cd5a3dd0b09818c1f1a198def8babd4d5a01622`.
-**Последний code/test HEAD:** `58ebdda7cf3f07ceef1075020f2808a2782562b7`; CI [41994624425](https://github.com/Kiddos19882/AutoDraw/actions/runs/41994624425) pending.
+**Документационная синхронизация:** 2026-11-05, после проверки CI 41994624425.
+**Последний code/test HEAD:** `58ebdda7cf3f07ceef1075020f2808a2782562b7` — CI 41994624425 SUCCESS.
 **Master:** remote HEAD `9a3453aeb847b66041bc83d6f4a56ecaf33a993a`; master не изменялась.
 **Рабочая копия:** локальный `git status` через GitHub API недоступен.
 
 ### Подтверждённое состояние CI
 
-- Preparation/G3: **SUCCESS**; multi-axis transform unit tests and vertical/diagonal paired-plan tests included.
-- Application integration: **SUCCESS**; horizontal, vertical and diagonal paired-renderer executor handoff tests passed.
-- Game Monitor/Bridge: job SUCCESS; WebSocket smoke 22 passed.
+- Game Monitor/Bridge: SUCCESS; Python WebSocket/snippet/provenance suite 31 passed; Browser Bridge telemetry lifecycle 4/4 passed.
+- Application integration: SUCCESS.
 - Executor regression: SUCCESS.
 - Egret CanvasRenderer browser reference: SUCCESS.
-- INT-006 pixel-level analysis, CHALK model validation, INT006R radius validation и packaging визуальных capture artifacts: SUCCESS.
-- Windows portable build и startup smoke-test: **SUCCESS**; artifact `autodraw-g3-preflight-build`, ID `13391394936`, 646,947,839 bytes.
+- Preparation/G3: 880 passed, 24 warnings, 82 subtests; capsule benchmark and FILL-001-RS static sweep completed.
+- INT-006 pixel-level analysis, CHALK model validation, INT006R radius validation и paired renderer formal gate: SUCCESS.
+- Windows portable build/startup smoke-test: SUCCESS; artifact `autodraw-g3-preflight-build`, ID `13399627749`, 646,950,501 bytes.
 - Optional algorithm benchmarks: SKIPPED.
 - Отдельный FILL-001 committed PNG quality gate остаётся FAIL: coverage `98.430600%`, leakage `11`. Успешный CI job не означает прохождение этого quality gate.
 
@@ -57,7 +57,7 @@ Same-run full-screen before/after screenshots обнаружили одну и �
 
 ### CHALK / brush evidence
 
-- INT006R visual and measurement phase: 45/45 captures audited. D2 radius1 seam gap; D4 radius30 short-detail merging; radius10 best compromise among tested radii for D1–D5.
+- INT006R earlier manual visual and measurement audit: 45/45 captures reviewed. D2 radius1 seam gap; D4 radius30 short-detail merging; radius10 best compromise among tested radii for D1–D5. The latest CI package from run 41994624425 separately marks its visual-quality gate as pending manual review.
 - Exact CHALK averages: radius1 `67.40`, radius10 `67.67`, radius30 `67.80`. Radius effect on resource use is negligible in this matrix; visual footprint differs materially.
 - Frozen INT-006 validation: 45/45 accepted. P0 MAE/RMSE/MAPE `2.882/3.189/3.484%`, max underprediction `0.99`; P1 `0.657/0.838/1.178%`, max `0.92`; P2 `0.685/0.854/1.741%`, max `1.82`. P1 is best by MAE/MAPE in this sample; safety margin and production eligibility remain unvalidated.
 - FILL-001-RS static sweep is offline evidence only: 15 cells / 2,238 candidates / 62 accepted. It is not exact CHALK and does not unblock the live matrix.

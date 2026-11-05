@@ -22,7 +22,7 @@
 | CHALK-SAMPLING-DOMAIN | — | CLOSED_NOT_REQUIRED | По решению пользователя: расширение sampling-domain не требуется |
 
 
-**Уточнение по INT006R (2026-11-05):** измерительная фаза закрыта с geometry-specific limitations. Radius 1 не замыкает D2 polygon; radius 30 сливает короткие детали D4; radius 10 — лучший из трёх проверенных компромиссов для D1–D5. Exact CHALK averages: 67.40 / 67.67 / 67.80 для радиусов 1 / 10 / 30. Это не универсальный выбор радиуса и не тест заливки. INT-006 остаётся IN_PROGRESS только по safety margin и расширенной независимой validation frozen estimator.
+**Уточнение по INT006R (2026-11-05):** предыдущий ручной visual audit и измерительная фаза закрыты с geometry-specific limitations. Radius 1 не замыкает D2 polygon; radius 30 сливает короткие детали D4; radius 10 — лучший из трёх проверенных компромиссов для D1–D5. Exact CHALK averages: 67.40 / 67.67 / 67.80 для радиусов 1 / 10 / 30. Это не универсальный выбор радиуса и не тест заливки. Новая CI-упаковка визуальных evidence из run 41994624425 помечена `pending_manual_review`; это отдельная проверка свежего набора, не отменяющая ранее выполненный ручной аудит. INT-006 остаётся IN_PROGRESS только по safety margin и расширенной независимой validation frozen estimator.
 
 
 
@@ -32,7 +32,7 @@
 - [x] Один горизонтальный live capture принят как `PASS_PER_RUN`: IoU=0.998882, precision=0.999106, recall=0.999776, symmetric-difference fraction=0.1118%, bbox edge delta=0 px; artifact `13397839621`.
 - [x] Добавлен агрегатор, требующий три уникальных `PASS_PER_RUN` vertical и три diagonal отчёта; multi-axis series остаётся PENDING.
 - [x] Bridge input telemetry opt-in, restore старого состояния и session/run provenance реализованы; добавлены Node, Python и UI regression tests.
-- [ ] CI telemetry automation: run `41994014564` выявил неправильный JS string assertion; run `41994258815` выявил missing imports (30 passed / 1 failed). Оба исправления входят в `58ebdda7`; rerun [41994624425](https://github.com/Kiddos19882/AutoDraw/actions/runs/41994624425) pending.
+- [x] CI telemetry automation: run [41994624425](https://github.com/Kiddos19882/AutoDraw/actions/runs/41994624425) завершился SUCCESS. Browser lifecycle 4/4; Python Bridge/WebSocket/snippet/provenance suite 31 passed. Ранее выявленные ошибки тестов в runs 41994014564 и 41994258815 исправлены; история сохранена.
 - [ ] Три live captures на чистой доске для каждой новой ориентации vertical и diagonal с input telemetry и full-screen before/after screenshots.
 - [ ] Environment fingerprint/stale invalidation, calibration profile consumer и executor gate остаются заблокированы до multi-axis live/environment acceptance.
 
@@ -1186,6 +1186,15 @@ CI evidence: workflow 41787492122, commit d337f4240e83488273152f65992032beca3957
 | Single long segment | 0% | 0% | 1.16× |
 
 **Вывод:** per-segment broad phase полезен для winding/zigzag полилиний с большим global AABB. Выигрыш зависит от геометрии; при одном сегменте candidate count и predicate count не уменьшаются. Wall-clock значения специфичны для CI runner и не переносятся напрямую на пользовательскую среду.
+
+
+### BRUSH-FOOTPRINT-CAPSULE-001 — повторное подтверждение benchmark в CI 41994624425
+
+- [x] Полный CI повторно прошёл на code/test commit `58ebdda7cf3f07ceef1075020f2808a2782562b7`; Preparation/G3 — 880 passed, 24 warnings, 82 subtests.
+- [x] Capsule broad-phase artifact: `13399777779`; masks equivalent in all five scenarios.
+- Candidate-slot reductions: winding 91.09%, large zigzag 96.23%, diagonal turns 59.53%, compact many-segment 92.24%, single long segment 0%.
+- Median wall-clock speedups on this Windows runner: 10.92×, 20.20×, 2.74×, 13.87×, 1.14× respectively.
+- Эти результаты относятся к offline rasterization benchmark; они не измеряют CHALK и не доказывают renderer equivalence или гарантированное ускорение полного AutoDraw.
 
 **Ограничения и следующий gate:** модель остаётся ideal round-capsule offline candidate. Не подтверждены deployed Egret runtime, фактические caps/joins, popup global transform и screen/canvas mapping. Не выполнены frozen renderer PNG comparison, planner integration и live capture. Не менять production planner/defaults и FILL-001-RS frozen gates до отдельного acceptance. Это не измерение CHALK и не доказательство renderer equivalence.
 

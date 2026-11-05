@@ -1,11 +1,17 @@
 # Дополнение к дорожной карте — 2026-11-05
 
-## 2026-11-05 — formal per-run renderer acceptance tooling (CI PASS)
+## 2026-11-05 — full CI 41994624425 PASS and paired Bridge automation verified
 
 - Added a fail-closed acceptance contract for capture binding, exact pointCount/CHALK, full accepted-point stream, one-stroke integrity, same-run screenshot metadata, per-axis transform tolerances and alpha-24 pixel metrics.
 - Added separate aggregation for three unique accepted vertical runs and three unique accepted diagonal runs. A single horizontal baseline or a per-run PASS cannot complete this series.
 - Added regression tests for complete/incomplete captures, thresholds, transform sources, duplicates and rejected attempts.
 - Formal horizontal per-run acceptance passed in CI [41992373137](https://github.com/Kiddos19882/AutoDraw/actions/runs/41992373137). No live vertical/diagonal captures exist yet; no production handoff is enabled.
+- Full CI run 41994624425 on code/test commit 58ebdda7 SUCCESS: all required jobs passed; optional algorithm benchmarks skipped.
+- Bridge input telemetry automation passed: Node lifecycle 4/4 and Python Bridge/WebSocket/snippet/provenance suite 31 passed. The selected paired-renderer scenario enables telemetry opt-in; ordinary sessions do not toggle it; previous state restores at disconnect and provenance persists.
+- Preparation/G3: 880 passed, 24 warnings, 82 subtests. Capsule broad-phase benchmark and exhaustive FILL-001-RS static sweep reproduced successfully.
+- Horizontal renderer remains PASS_PER_RUN only; three vertical and three diagonal unique live captures are still pending.
+- V1–V5 PNG analyzer validated 90/90 captures across 10 series × 9 runs. INT-006 and INT006R analyzers each accepted 45/45; safety margin/production eligibility remain unvalidated; latest INT006R visual review package remains pending manual review.
+- Windows portable build/startup smoke-test SUCCESS; artifact 13399627749. FILL-001 committed PNG gate remains FAIL (coverage 98.430600%, leakage 11).
 
 ## 2026-11-05 — multi-axis transform helper and paired scenarios ready (CI 41976515362)
 

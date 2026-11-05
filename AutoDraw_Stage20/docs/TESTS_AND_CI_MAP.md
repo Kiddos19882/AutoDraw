@@ -137,6 +137,18 @@
 
 Длительный Stage 5/7/8 benchmark suite запускается только через `workflow_dispatch` с `run_algorithm_benchmarks=true`; по умолчанию job SKIPPED. В него входят image diagnostics, Stage 5/7/8 comparisons, synthetic Stage 7 cases, fallback merge sweep и outline-first comparison. Он не заменяет обязательные regression jobs и capsule broad-phase benchmark из preparation-tests.
 
+
+## 2026-11-05 — verified Bridge automation and full CI result
+
+- Full CI [41994624425](https://github.com/Kiddos19882/AutoDraw/actions/runs/41994624425) on code/test commit `58ebdda7cf3f07ceef1075020f2808a2782562b7`: all required jobs SUCCESS; optional benchmarks SKIPPED.
+- Game Monitor/Bridge: Node lifecycle tests 4/4; Python WebSocket/snippet/provenance suite 31 passed. Opt-in telemetry is selected only for paired-renderer scenarios, pre-enabled user state is preserved, changed state is restored on disconnect, and configuration is written to session/run records.
+- Preparation/G3: 880 passed, 24 warnings, 82 subtests. Capsule broad-phase benchmark artifact `13399777779`; FILL-001-RS static sweep artifact `13399922622`.
+- Formal paired horizontal renderer gate: `PASS_PER_RUN`, artifact `13399663414`; this is not multi-axis series acceptance.
+- V1–V5: 90/90 captures valid across 10 series × 9 runs; artifact `13400530501`.
+- INT-006/INT006R: 45/45 accepted each; estimator safety margin/production eligibility remain not established; latest INT006R visual package awaits manual review.
+- Windows portable build/startup smoke-test SUCCESS; artifact `13399627749`.
+- FILL-001 committed PNG quality gate remains FAIL (coverage 98.430600%, leakage 11).
+
 ## 5. Диагностики и benchmark-скрипты
 
 В workflow явно используются следующие скрипты:
@@ -435,7 +447,7 @@ Benchmark job работает из корня `AutoDraw_Stage20/`; пути с�
 
 ### 10.5. Текущий статус проверки
 
-Workflow и тесты обновлены в feature-ветке; результат нового CI на конечном HEAD ещё не подтверждён. До статуса success по всем обязательным jobs, успешной portable build и локального Windows preflight запускать новую live G3 серию нельзя.
+Последняя полная проверка: CI [41994624425](https://github.com/Kiddos19882/AutoDraw/actions/runs/41994624425), code/test commit `58ebdda7cf3f07ceef1075020f2808a2782562b7`, conclusion SUCCESS. Все обязательные jobs, включая Windows portable build/startup smoke-test, завершились успешно; optional algorithm benchmarks — SKIPPED. Это закрывает CI/build gate, но не заменяет локальный preflight и live capture на ПК пользователя. Новую live G3 серию можно планировать только после локального подтверждения окружения и отдельного согласования самой серии.
 
 ### 10.6. Изоляция UI tests и Tk callback lifecycle
 
@@ -467,7 +479,7 @@ Workflow и тесты обновлены в feature-ветке; результ�
 - UI and executor handoff: `source/preparation/brush_behavior_test_ui.py` и `integrated_app.py` — радиус устанавливается из task journal и повторно сверяется с requested brush до запуска штатного executor.
 - Analyzer: `source/preparation/chalk_int006r_validation.py` — exact CHALK, completed journal attempt, experiment/run binding, per-stroke breakdown, before/after board ROI PNG readability/dimension checks, per-geometry/per-radius mean/median/range/population SD и сравнение с radius=10. Data completeness не закрывает отдельный manual visual-quality gate.
 - Regression: `source/preparation/tests/test_chalk_int006r_validation.py` и `tests/test_unified_app.py`.
-- Live execution запрещён до полного CI и Windows portable build/startup smoke-test PASS. INT006R не использует frozen INT-006 predictions и не меняет production estimator.
+- CI/build prerequisite now passed in run `41994624425`. INT006R has 45/45 accepted captures and remains separate from frozen INT-006 predictions; it does not change the production estimator. Before using the latest visual-review package as a new manual audit, review artifact `13399289073`.
 
 
 ## Результаты запусков

@@ -23,4 +23,14 @@
 - Implemented paired-scenario input telemetry opt-in in Bridge; ordinary Bridge sessions leave Monitor telemetry unchanged. The Bridge restores the user's pre-existing state on disconnect.
 - Added `bridge_configuration` to session.json and `bridge_configuration_at_start` to run JSON.
 - Browser lifecycle tests passed 4/4. First Python CI attempt failed with a wrong JS-string assertion; second attempt failed because the provenance test omitted `json` and `RunRecorder` imports. Both failed runs are preserved in TEST_RESULTS.
-- Corrected imports in commit `58ebdda7`; CI rerun 41994624425 pending. No live game experiment was run.
+- Corrected imports in commit `58ebdda7`; CI rerun 41994624425 completed SUCCESS. No live game experiment was run.
+
+## 2026-11-05 — complete CI verification and artifact review
+
+- Full CI run 41994624425 on code/test commit 58ebdda7 completed SUCCESS across all required jobs; optional algorithm benchmarks skipped.
+- Bridge input telemetry tests: browser lifecycle 4/4, Python WebSocket/snippet/provenance suite 31 passed.
+- Preparation/G3: 880 passed, 24 warnings, 82 subtests; capsule broad-phase benchmark and FILL-001-RS static sweep reproduced and uploaded.
+- Formal horizontal renderer per-run acceptance passed again; artifact 13399663414. Vertical/diagonal live series remains uncollected.
+- V1–V5 pixel analyzer validated 90/90 captures (10×9). INT-006 and INT006R each accepted 45/45; safety margin and production eligibility remain unvalidated; INT006R package awaits manual visual review.
+- Windows portable build/startup smoke-test passed; artifact 13399627749, 646,950,501 bytes.
+- CI artifacts were downloaded and inspected. No new live run, local app launch, raw evidence mutation, or production drawing default change was performed.

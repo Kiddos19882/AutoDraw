@@ -1255,3 +1255,12 @@
 - Persisted Bridge opt-in telemetry configuration in session/run evidence.
 - Added regression tests for generated snippets, Bridge lifecycle, run provenance and paired UI scenario selection.
 - Fixed test expectation/import issues found by two CI attempts; commit 58ebdda7 is undergoing CI run 41994624425.
+
+## 2026-11-05 — CI verification of renderer and Bridge automation
+
+- Full CI run 41994624425 completed SUCCESS on code/test commit 58ebdda7; all required jobs passed, optional algorithm benchmarks skipped.
+- Bridge input telemetry opt-in/restore and run provenance passed Node/Python regression tests.
+- Horizontal paired renderer retained PASS_PER_RUN; multi-axis live series remains pending.
+- Latest V1–V5 analyzer validated 90/90 captures; INT-006 and INT006R analyses accepted 45/45 each. CHALK safety margin and production eligibility remain unvalidated.
+- FILL-001-RS static sweep reproduced 2,238 candidates / 62 accepted; this remains offline estimate evidence, not exact CHALK.
+- Windows portable build/startup smoke-test passed and artifact was uploaded.
