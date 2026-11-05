@@ -1,3 +1,14 @@
+## 2026-11-05 — review of first vertical/diagonal captures (evidence commit e6b771e)
+
+**Scope:** remote repository review and documentation synchronization only; no code/test/config/workflow changes and no new live experiment by the reviewer.
+
+- Confirmed remote branch `feature/image-geometry-optimization` HEAD `e6b771ed67201625884c6ce778fa355f1ab9b873`; it is one commit after `6fb868f`. The commit adds 22 result artifacts only. `master` remains at the previously known HEAD; GitHub API does not expose local `git status`.
+- Reviewed both experiment manifests, raw Game Monitor reports, brush plans, comparison reports, offline manifests and PNG outputs. Vertical exact CHALK=71; diagonal exact CHALK=161; both radius 10, one stroke, zero Monitor/Bridge dropped/error/sequence counters.
+- Recomputed same-run Monitor fits: vertical Y max residual 0.723222 px; diagonal X/Y max residuals 0.730129/0.739053 px. Client-to-screen offsets are stable (0,163) px; geometry snapshots are unchanged start/end.
+- Existing alpha24 comparisons use the frozen 674×355 ROI transform and remain exploratory (vertical IoU 0.870044; diagonal 0.873071); neither report contains an independent-transform comparison. Best-translation overlays are diagnostic only.
+- Calibration profile records 1920×1080, Windows scale 100%, browser zoom 100%, Firefox 159; Monitor reports DPR=1 and visualViewportScale=1. Windows scale is sourced from the profile calibrated earlier on the same date, not a per-run Windows display API.
+- Updated current status, backlog, roadmap, work log and TEST_RESULTS. Kept raw experiment evidence and frozen acceptance thresholds unchanged.
+- Next offline step: derive same-run screenshot BoardPane bounds and rerun comparison using the independent per-axis transform. No additional live run should be needed before this replay.
 ## 2026-11-05 — закреплены границы локального доступа и автоматизация live-тестов
 
 **Объём:** только документация, ветка `feature/image-geometry-optimization`.
