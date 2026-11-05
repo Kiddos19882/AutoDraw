@@ -8,7 +8,7 @@
 
 | ID | Приоритет | Статус | Содержание |
 |---|---|---|---|
-| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | ROI_AUDIT_DONE_INDEPENDENT_TRANSFORM_CI_PENDING | Same-run Monitor X fit и inspect-derived axis-aligned transform выявили смещение ручного ROI; независимый offline PNG compare добавлен в CI, renderer acceptance открыта |
+| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | INDEPENDENT_COMPARE_DONE_EXPLORATORY | Независимый transform дал IoU=0.998994 / 9 различающихся px при alpha 24; renderer acceptance остаётся exploratory из-за inspect provenance и отсутствия vertical live fit |
 | FILL-001-RS-MATRIX | P0 | BLOCKED | 45 captures только после принятого single-task preflight |
 | GAME-INPUT-SAMPLING-TRACE-001 | P1 | EXPLORATORY_COMPARE_DONE_TRANSFORM_ROOT_CAUSE_OPEN | Run 16aec62c принят; 138 accepted points, CHALK=138; unshifted IoU=0.76315, post-hoc (+1,+2) IoU=0.99888; acceptance не пройдена |
 | BRUSH-FOOTPRINT-CAPSULE-001 | P1 | OPEN | Offline capsule model готова; renderer acceptance/planner integration не выполнены |
@@ -29,9 +29,18 @@
 - [x] Inspect-derived stage→client scales: 1.461186 / 1.463334; BoardPane screen corners≈(497.960,267.860)—(1170.106,619.060). X fit согласуется с inspect origin менее чем на 0.01 px.
 - [x] Ручной ROI (496,265,674,355) смещён примерно на 1.95 px слева и 2.86 px сверху. Допуск 1% в текущем helper пропускает несовпадение и не проверяет origin.
 - [x] Добавлены renderer_geometry.py, unit tests, screen_geometry_audit.json и independent-transform ветка compare_live_renderer_reference.py; workflow обновлён для выполнения сравнения.
-- [ ] Дождаться CI и оценить независимые IoU/precision/recall без post-hoc translation.
+- [x] CI run 41963498086 / INT-006 PNG job завершился SUCCESS; независимый transform compare выполнен без post-hoc translation.
 - Ограничение: вертикальный scale inspect-derived, потому что live stroke горизонтальный; inspect snapshot user-attested same-screen, но без run/session timestamp.
 
+### Результат independent offline comparison (CI 41963498086)
+
+- Старый frozen transform при alpha 24: IoU=0.7631527094, precision=0.8658618377, recall=0.8654748603, symmetric difference=2404 px.
+- Независимый transform при alpha 24: IoU=0.9989941886, precision=0.9992175274, recall=0.9997763114, symmetric difference=9 px; bbox live/expected совпадает `(21,170,599,15)`.
+- Для alpha 1: IoU=0.9988830559, symmetric difference=10 px; alpha64: IoU=0.9985468366, 13 px; alpha128: IoU=0.9976525822, 21 px. На высоких alpha порогах качество падает из-за antialiasing/coverage threshold sensitivity.
+- Независимый mapping: origin `(497.954055,267.860048)`, scale `(1.461204822,1.463334)`, raster→ROI matrix `[[0.487068274,0,1.954055],[0,0.487778,2.860048]]`.
+- Это не post-hoc registration. Горизонтальный transform получен из same-run Monitor; вертикальный scale взят из user inspect snapshot same-screen, но не same-run.
+- Report artifact: `autodraw-paired-renderer-png-comparison`, artifact ID `13386122895`, workflow run `41963498086`.
+- Interpretation: ROI origin/scale mismatch является сильным объяснением основной части прежнего residual; оставшиеся 9 px при alpha24 требуют отдельного анализа antialiasing/resampling. Результат не является renderer acceptance.
 ## 2026-11-05 — Monitor → Bridge → AutoDraw handoff audit
 
 - Monitor inspect() собирает stage corners, canvas rect/CSS transform, canvas scale, DPR и viewport; boardClientCorners доступен только при getBoxQuads().
