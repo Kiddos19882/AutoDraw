@@ -165,6 +165,26 @@
   }
 
 
+  // Egret's Stage DisplayList matrix is expressed in logical Stage coordinates.
+  // The renderer applies canvasScaleX/Y while drawing into the backing RenderBuffer,
+  // so the translation must be converted from backing pixels back to Stage units.
+  function buildStageRendererTransform(placement) {
+    if (!placement ||
+        !Number.isFinite(placement.x) || !Number.isFinite(placement.y) ||
+        !Number.isFinite(placement.scaleX) || !Number.isFinite(placement.scaleY) ||
+        placement.scaleX <= 0 || placement.scaleY <= 0) {
+      throw new Error("Stage renderer transform requires a valid backing placement and positive scale.");
+    }
+    return {
+      a: placement.scaleX,
+      b: 0,
+      c: 0,
+      d: placement.scaleY,
+      tx: placement.x / placement.scaleX,
+      ty: placement.y / placement.scaleY
+    };
+  }
+
   function renderStageWebGL(mode, points, lineWidth, profile, roundOrigin, state) {
     const placement = buildStagePlacement(profile, roundOrigin);
     if (state.bufferSize.width !== placement.backingWidth ||
@@ -195,8 +215,10 @@
     }
 
     state.buffer.clear();
+    const stageTransform = buildStageRendererTransform(placement);
     const matrix = new egret.Matrix(
-      placement.scaleX, 0, 0, placement.scaleY, placement.x, placement.y
+      stageTransform.a, stageTransform.b, stageTransform.c,
+      stageTransform.d, stageTransform.tx, stageTransform.ty
     );
     const drawCalls = state.renderer.render(container, state.buffer, matrix);
     const pixels = state.buffer.getPixels(
@@ -259,7 +281,8 @@
     terminalPoint,
     shouldWebGLRendererRasterize,
     extractAcceptedPoints,
-    buildStagePlacement
+    buildStagePlacement,
+    buildStageRendererTransform
   };
 
   if (typeof module !== "undefined" && module.exports) {
