@@ -607,6 +607,35 @@ def summarize_game_monitor_report(
             if int(value) == value and int(value) > 0:
                 radii.add(int(value))
 
+    renderer_geometry = document.get("renderer_geometry_at_start")
+    if not isinstance(renderer_geometry, dict):
+        renderer_geometry = document.get("renderer_geometry")
+    geometry_summary = None
+    if isinstance(renderer_geometry, dict):
+        players = renderer_geometry.get("players")
+        players = players if isinstance(players, list) else []
+        board_players = [
+            item for item in players
+            if isinstance(item, dict) and isinstance(item.get("boardStageCorners"), dict)
+        ]
+        selected_player = board_players[0] if len(board_players) == 1 else None
+        geometry_summary = {
+            "board_detected": bool(board_players),
+            "board_ambiguous": len(board_players) > 1,
+            "board_client_mapping_method": (
+                selected_player.get("boardClientMappingMethod", "unavailable")
+                if selected_player else "ambiguous_or_unavailable"
+            ),
+            "board_stage_corners": selected_player.get("boardStageCorners") if selected_player else None,
+            "board_client_corners": selected_player.get("boardClientCorners") if selected_player else None,
+            "window_geometry": renderer_geometry.get("windowGeometry"),
+            "coordinate_space": "css_client_pixels",
+            "desktop_screen_mapping_available": False,
+            "executor_usable": False,
+        }
+    geometry_updates = document.get("renderer_geometry_updates")
+    geometry_update_count = len(geometry_updates) if isinstance(geometry_updates, list) else 0
+
     observed = sorted(radii)
     if requested_brush_value is None:
         brush_status = "not_compared"
@@ -639,6 +668,9 @@ def summarize_game_monitor_report(
         "observed_draw_radii": observed,
         "brush_value_status": brush_status,
         "brush_value_matches_requested": brush_matches,
+        "renderer_geometry": geometry_summary,
+        "renderer_geometry_update_count": geometry_update_count,
+        "renderer_geometry_at_end": document.get("renderer_geometry_at_end"),
         "interpretation": "passive_browser_telemetry_not_direct_paint_resource_measurement",
     }
 
