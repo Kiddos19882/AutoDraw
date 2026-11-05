@@ -3,8 +3,8 @@
 ## Текущая точка — independent renderer comparison завершён; Monitor/Bridge geometry snapshot реализован
 
 **Branch:** feature/image-geometry-optimization  
-**Baseline перед geometry snapshot implementation:** HEAD после offline audit/doc sync. GitHub API не предоставляет локальный git status.  
-**Последний полный CI:** run 41963498086 SUCCESS для code/test/workflow commit `1b16b51e42ba0c61a0fbc547179ca5a9b3864b54`; subsequent audit-result commits были документационными.
+**HEAD на момент последней синхронизации:** `c0b7a0feaaa14f13d33ebc350b7399ff5b6b5241`; текущую точку ветки после этого обновления следует сверить отдельно. GitHub API не предоставляет локальный git status.  
+**Последний полный CI:** run `41964932479` SUCCESS для Monitor/Bridge geometry code/test commit `baf7e3f73bebe4cd780e93723bf6b4ea231a7b4b`; все обязательные jobs, включая Windows portable build/startup smoke-test и INT-006 PNG audit, SUCCESS; optional algorithm benchmarks SKIPPED. Последующие commits были документационными.
 
 ### Подтверждённые результаты
 
