@@ -535,6 +535,7 @@ def main() -> int:
         alpha_opencv_board, _ = crop_mask_to_board_bounds(
             alpha_opencv, board_bounds, roi,
         )
+        # Keep diagnostic and formal masks on the identical BoardPane pixel domain.
         opencv_independent_results = {
             str(threshold): mask_metrics(observed, alpha_opencv_board > threshold)
             for threshold in args.alpha_thresholds
