@@ -3,8 +3,9 @@
 ## Текущая точка — live capture принят, offline renderer replay ожидает выполнения
 
 **Branch:** feature/image-geometry-optimization  
-**Current HEAD:** 02ebab89733559421edbb151e7931ed3fecf30c0 (пользовательский commit с результатами одиночного теста).  
-**Code/test HEAD:** bacf8ed35cd09b3d0b1e9cf7deda122a91c9f521; commit 02ebab8 добавил экспериментальные данные и синхронизировал управляющие документы.  
+**Пользовательский data commit:** 02ebab89733559421edbb151e7931ed3fecf30c0.  
+**Последний source/test commit:** 9a2de6e350c263c755cf62283fda14882f31157c; последующие commits до 02ebab8 содержат документацию и экспериментальные данные.  
+**Документационная синхронизация после data commit:** commits 898e0b8, 0bc4246, 6b240a6, 7d9e652, a002df0; эта запись уточняет статус capture.  
 **Последний пользовательский data commit:** [02ebab8](https://github.com/Kiddos19882/AutoDraw/commit/02ebab89733559421edbb151e7931ed3fecf30c0).  
 **Сценарий:** paired_renderer_single_stroke; logical board 460×240; один штрих (20,120) → (420,120); requested/observed radius=10; executor step=2 screen px, delay=10 ms, line extension=0; renderer replay profile smooth / line width 10.
 
@@ -33,7 +34,7 @@
 
 **CI:** для commit 02ebab8 combined status пустой (statuses=[]), а доступный endpoint workflow-runs не вернул runs; CI PASS не подтверждён. Тесты исходников в этом data commit не менялись. Локальный запуск и git status недоступны через GitHub API.
 
-**Git:** latest commit 02ebab8 находится в feature/image-geometry-optimization; master не изменялась. Сравнение с последним ранее проверенным master commit 9a3453a показывает diverged (feature ahead 3236 / behind 5); это compare snapshot, не локальный git status.
+**Git:** пользовательский data commit 02ebab8 и документационные обновления находятся в feature/image-geometry-optimization; master не изменялась. Сравнение с последним ранее проверенным master commit 9a3453a показывает diverged; это compare snapshot, не локальный git status.
 
 
 ---
