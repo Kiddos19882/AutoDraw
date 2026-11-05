@@ -1423,6 +1423,111 @@ class UnifiedAppCoreTests(unittest.TestCase):
         self.assertEqual(app.executor.started_with["point_delay_ms"], 20)
 
 
+    def test_brush_test_executor_applies_paired_renderer_capture_profile(self):
+        class Status:
+            def set(self, value):
+                self.value = value
+
+        class Executor:
+            running = False
+
+            def __init__(self, plan_path):
+                self.plan_path = plan_path
+                self.started_with = None
+
+            def start_execution_from_workflow(self, *, executor_config_override=None):
+                self.started_with = executor_config_override
+                return True
+
+        from brush_behavior_test_ui import (
+            PAIRED_RENDERER_EXECUTOR_CONFIG,
+            PAIRED_RENDERER_PATH_MODE,
+            PAIRED_RENDERER_REQUESTED_RADIUS,
+            PAIRED_RENDERER_TEST_CASE_ID,
+        )
+
+        parameters = dict(PAIRED_RENDERER_EXECUTOR_CONFIG)
+        plan = {
+            "generation": {
+                "test_case": PAIRED_RENDERER_TEST_CASE_ID,
+                "paired_renderer_capture": {
+                    "schema_version": 1,
+                    "scenario_id": PAIRED_RENDERER_TEST_CASE_ID,
+                    "requested_radius": PAIRED_RENDERER_REQUESTED_RADIUS,
+                    "expected_strokes": 1,
+                    "renderer_path_mode": PAIRED_RENDERER_PATH_MODE,
+                    "executor_parameters": parameters,
+                },
+            },
+            "strokes": [{"points": [{"x": 20.0, "y": 120.0}, {"x": 420.0, "y": 120.0}]}],
+        }
+        app = object.__new__(integrated_app.AutoDrawUnifiedApp)
+        app.status_var = Status()
+        with tempfile.TemporaryDirectory(prefix="AutoDraw paired renderer handoff ") as temp:
+            plan_path = Path(temp) / "current_brush_behavior_test.json"
+            plan_path.write_text(json.dumps(plan), encoding="utf-8")
+            app.executor = Executor(plan_path)
+            with (
+                patch("integrated_app.messagebox.showerror") as showerror,
+                patch("integrated_app.messagebox.showwarning") as showwarning,
+            ):
+                app._start_brush_test_executor(10)
+
+        showerror.assert_not_called()
+        showwarning.assert_not_called()
+        self.assertEqual(app.executor.started_with, parameters)
+        self.assertEqual(app.executor.started_with["point_step_px"], 2)
+        self.assertEqual(app.executor.started_with["point_delay_ms"], 10)
+        self.assertEqual(app.executor.started_with["line_extension_px"], 0)
+
+    def test_brush_test_executor_rejects_paired_renderer_capture_with_wrong_radius(self):
+        class Status:
+            def set(self, value):
+                self.value = value
+
+        class Executor:
+            running = False
+
+            def __init__(self, plan_path):
+                self.plan_path = plan_path
+                self.started_with = None
+
+            def start_execution_from_workflow(self, *, executor_config_override=None):
+                self.started_with = executor_config_override
+                return True
+
+        from brush_behavior_test_ui import (
+            PAIRED_RENDERER_EXECUTOR_CONFIG,
+            PAIRED_RENDERER_PATH_MODE,
+            PAIRED_RENDERER_TEST_CASE_ID,
+        )
+
+        plan = {
+            "generation": {
+                "test_case": PAIRED_RENDERER_TEST_CASE_ID,
+                "paired_renderer_capture": {
+                    "schema_version": 1,
+                    "scenario_id": PAIRED_RENDERER_TEST_CASE_ID,
+                    "requested_radius": 10,
+                    "expected_strokes": 1,
+                    "renderer_path_mode": PAIRED_RENDERER_PATH_MODE,
+                    "executor_parameters": dict(PAIRED_RENDERER_EXECUTOR_CONFIG),
+                },
+            },
+            "strokes": [{"points": [{"x": 20.0, "y": 120.0}, {"x": 420.0, "y": 120.0}]}],
+        }
+        app = object.__new__(integrated_app.AutoDrawUnifiedApp)
+        app.status_var = Status()
+        with tempfile.TemporaryDirectory(prefix="AutoDraw paired renderer invalid radius ") as temp:
+            plan_path = Path(temp) / "current_brush_behavior_test.json"
+            plan_path.write_text(json.dumps(plan), encoding="utf-8")
+            app.executor = Executor(plan_path)
+            with patch("integrated_app.messagebox.showerror") as showerror:
+                app._start_brush_test_executor(14)
+
+        showerror.assert_called_once()
+        self.assertIsNone(app.executor.started_with)
+
     def test_brush_test_executor_applies_int006_v5_task_specific_parameters(self):
         class Status:
             def set(self, value):
