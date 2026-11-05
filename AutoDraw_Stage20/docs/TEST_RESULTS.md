@@ -508,3 +508,10 @@ Artifact: `autodraw-paired-renderer-png-comparison`, ID `13386122895`.
 **Preparation/G3 suite result for geometry snapshot commit:** workflow `41964932479`, job `Preparation and G3 matrix tests` SUCCESS; `pytest -q -ra tests` — 852 passed, 24 warnings, 82 subtests passed in 59.71s. Includes `test_renderer_geometry.py`.
 
 **FILL-001 evidence in same job:** committed PNG audit output reports coverage `98.430600%`, leakage `11`, status `failed`; static spacing sweep workflow step reports `passed`, 15 cells, 2238 candidates, 62 accepted candidates. The latter is not a substitute for the committed PNG quality gate; FILL-001 remains blocked.
+
+
+**Full CI result for Monitor/Bridge geometry snapshot implementation:** workflow [41964932479](https://github.com/Kiddos19882/AutoDraw/actions/runs/41964932479), code/test commit `baf7e3f73bebe4cd780e93723bf6b4ea231a7b4b` — SUCCESS. Preparation/G3: 852 passed, 24 warnings, 82 subtests. Game Monitor: 21 passed. Bridge/WebSocket: 22 passed. Executor regression, Application integration, Egret browser reference, Windows portable build/startup smoke-test, INT-006 PNG audit: SUCCESS. Optional algorithm benchmarks: SKIPPED.
+
+**FILL-001-RS static sweep artifact:** `autodraw-fill001-rs-static-sweep` ID `13386973590`; 15 cells (3 shapes×5 radii), 2238 candidate plans, 62 accepted candidates; each cell has a selected offline candidate meeting coverage≥0.99 and leakage=0. This is OpenCV raster simulation and estimated sampling points, not exact CHALK or game renderer validation.
+
+**Separate committed PNG quality gate:** coverage `98.430600%`, leakage `11`, status `failed`; therefore FILL-001 remains blocked despite the static sweep step succeeding.
