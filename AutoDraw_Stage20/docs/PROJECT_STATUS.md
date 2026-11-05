@@ -1,36 +1,64 @@
 # Актуальная точка продолжения — 2026-11-05
 
-## Текущая точка — геометрия Game Monitor подключена к AutoDraw; renderer acceptance и CHALK safety margin открыты
+## Текущая точка — single-run screen transform подтверждён независимыми снимками; production handoff ещё закрыт
 
 **Репозиторий:** `Kiddos19882/AutoDraw`  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
-**HEAD перед этой синхронизацией:** `fb853547d74a70582ab1e4731d55763367b8ceb8`  
-**Последний успешный code/test CI:** [run 41966023670](https://github.com/Kiddos19882/AutoDraw/actions/runs/41966023670), commit `7969134a1e1d545a99f985e8d637a7776823411f`.  
-**Последний workflow/config commit:** `fb853547d74a70582ab1e4731d55763367b8ceb8`; на момент синхронизации отдельный CI run для него не обнаружен. Успешный run 41966023670 не валидирует эту последнюю правку workflow.  
-**Master:** текущий remote HEAD `9a3453aeb847b66041bc83d6f4a56ecaf33a993a`; в рамках этой работы master не изменялась.  
+**Проверенный code/test commit:** `b9c2e2a194f840c844c1e8b0877a6c4c54ddc1df`  
+**Последний успешный CI:** [run 41971869707](https://github.com/Kiddos19882/AutoDraw/actions/runs/41971869707), conclusion SUCCESS.  
+**Workflow packaging commit:** `fb853547d74a70582ab1e4731d55763367b8ceb8`, проверен успешным run `41970907209`.  
+**Последний документационный commit до этой синхронизации:** `ab25a34e5a0e2aa0fac778ac076eaae03be1c071`.  
+**Master:** remote HEAD `9a3453aeb847b66041bc83d6f4a56ecaf33a993a`; master не изменялась.  
 **Рабочая копия:** локальный `git status` через GitHub API недоступен.
 
-### Подтверждённое состояние
+### Подтверждённое состояние CI
 
-- Run `41966023670`: Preparation/G3 — **855 passed**, 24 warnings, 82 subtests passed; Game Monitor — 21 JS tests; Bridge/WebSocket — 22 tests; Executor, Application integration, Egret CanvasRenderer browser reference, Windows portable build/startup smoke-test и INT-006 PNG/CHALK/INT006R analysis jobs завершились SUCCESS. Optional algorithm benchmarks — SKIPPED.
-- В том же CI отдельный committed PNG gate FILL-001 остаётся **FAIL**: coverage `98.430600%`, leakage `11`; FILL-001-RS matrix заблокирована. Offline spacing sweep отдельно обработал 15 cells / 2 238 candidates / 62 accepted; это не live renderer и не exact CHALK.
-- Game Monitor 0.2.3 → Bridge → AutoDraw geometry reader/UI прошли CI. AutoDraw читает активную свежую Bridge geometry и отображает BoardPane CSS client corners; summary сохраняет компактную геометрию. Это ещё не desktop/screenshot transform. Calibration profile и executor не используют этот snapshot; ручной fallback обязателен.
-- Парный renderer run `16aec62c-9e54-44e7-8691-9df79b19161d`, experiment `d47cc0a5520044c7abfd0352a4f93ca8`: один штрих, 138 accepted points, `pointCount` 1→139, exact CHALK=138; drops/errors/send failures/sequence gaps — 0.
-- Независимое exploratory сравнение live/offline при alpha 24: IoU=0.998994, precision=0.999218, recall=0.999776, symmetric difference=9 px. X transform получен из 272 same-run Monitor samples; Y scale пока inspect-derived из same-screen snapshot без run/session timestamp. Это **не renderer acceptance** и не основание менять production transform.
-- Same-run `before_clear-screen.png` и `after_draw-screen.png` присутствуют в paired experiment. В workflow commit `fb853547` добавлено их включение в следующий paired-renderer artifact для pixel-level board-edge audit; эта упаковка пока не прошла CI.
-- INT006R завершён как измерительная фаза: 45/45 captures, raw-data audit и ручной visual audit завершены. Ограничения: radius 1 дал разрыв соединения D2 polygon во всех трёх повторах; radius 30 объединил первые три короткие детали D4 в четыре компонента вместо шести; radius 10 сохранил замыкание D2 и разделение деталей D4 в этой матрице.
-- Exact CHALK INT006R: radius 1 — 1011 / 15 = 67,40; radius 10 — 1015 / 15 = 67,67; radius 30 — 1017 / 15 = 67,80. Выраженного преимущества радиуса по расходу не выявлено в D1–D5/P1.
-- Frozen INT-006 CHALK model validation artifact в run 41966023670: 45/45 accepted, 0 missing/rejected. Агрегированные результаты по 15 run на профиль: P0 MAE=2,882 / RMSE=3,189 / MAPE=3,484% / max underprediction=0,99; P1 MAE=0,657 / RMSE=0,838 / MAPE=1,178% / max underprediction=0,92; P2 MAE=0,685 / RMSE=0,854 / MAPE=1,741% / max underprediction=1,82. P1 точнее по MAE/MAPE на этой выборке, но safety margin не установлен и production eligibility не validated.
+- Preparation/G3: **859 passed**, 24 warnings, 82 subtests passed. Четыре новых screenshot/transform tests включены в этот набор.
+- Application integration: 41 passed / 1 skipped, 3 subtests; дополнительные UI/integration groups: 24 passed / 2 subtests и 12 passed.
+- Game Monitor/Bridge: job SUCCESS; WebSocket smoke 22 passed.
+- Executor regression: SUCCESS.
+- Egret CanvasRenderer browser reference: SUCCESS.
+- INT-006 pixel-level analysis, CHALK model validation, INT006R radius validation и packaging визуальных capture artifacts: SUCCESS.
+- Windows portable build и startup smoke-test: SUCCESS; artifact `autodraw-g3-preflight-build`, ID `13390167082`, 646,947,279 bytes.
+- Optional algorithm benchmarks: SKIPPED.
+- Отдельный FILL-001 committed PNG quality gate остаётся FAIL: coverage `98.430600%`, leakage `11`. Успешный CI job не означает прохождение этого quality gate.
+
+### Независимая проверка BoardPane screen bounds
+
+Same-run full-screen before/after screenshots обнаружили одну и ту же board-color область:
+
+- Bounds: `x=498, y=268, width=672, height=351 px`.
+- Board color: RGB `(238,238,238)`; detector tolerance 4.
+- Before component fill fraction: `0.999788`; after: `0.961861`.
+- Calibrated ROI был `(496,265,674,355)`: он включал 2 px слева и 3 px сверху; его размеры нельзя принимать за размеры BoardPane.
+- Новый audit transform: origin `(497.954055,268.0)`, scale `(1.461204822,1.4625)` px/logical px.
+- X fit: 272 same-run Monitor samples, RMSE `0.424 px`, max residual `0.729 px`; client→screen offset `(0,163)`.
+- Y sample residual: `0.0375 px`. Screenshot Y bounds cross-check against inspect: origin difference `-0.139952 px`, scale relative difference `0.0005703` (`0.0570%`).
+- Screenshot X bounds cross-check against Monitor fit: origin difference `-0.045945 px`, scale relative difference `0.0002295` (`0.0230%`).
+
+### Paired renderer comparison (exploratory)
+
+- Frozen ROI transform at alpha 24: IoU `0.763153`, symmetric difference `2404 px`; live/expected bbox differed by about 2 px in X and Y.
+- Same-run Monitor X fit + screenshot-derived Y bounds, without post-hoc registration: IoU `0.998882`, precision `0.999106`, recall `0.999776`, symmetric difference `10 px`; live/expected bbox совпадает `(21,170,599,15)`.
+- At alpha thresholds 1/64/128 IoU is `0.998771 / 0.998435 / 0.997764`; at 192/254 it falls to `0.931366 / 0.929689`, demonstrating threshold sensitivity to antialiasing/coverage.
+- CI artifact: `autodraw-paired-renderer-png-comparison`, ID `13389883231`; report status remains `ANALYZED_EXPLORATORY_NO_ACCEPTANCE_THRESHOLD`.
+
+### CHALK / brush evidence
+
+- INT006R visual and measurement phase: 45/45 captures audited. D2 radius1 seam gap; D4 radius30 short-detail merging; radius10 best compromise among tested radii for D1–D5.
+- Exact CHALK averages: radius1 `67.40`, radius10 `67.67`, radius30 `67.80`. Radius effect on resource use is negligible in this matrix; visual footprint differs materially.
+- Frozen INT-006 validation: 45/45 accepted. P0 MAE/RMSE/MAPE `2.882/3.189/3.484%`, max underprediction `0.99`; P1 `0.657/0.838/1.178%`, max `0.92`; P2 `0.685/0.854/1.741%`, max `1.82`. P1 is best by MAE/MAPE in this sample; safety margin and production eligibility remain unvalidated.
+- FILL-001-RS static sweep is offline evidence only: 15 cells / 2,238 candidates / 62 accepted. It is not exact CHALK and does not unblock the live matrix.
 
 ### Следующие действия
 
-1. Получить CI artifact с full-screen before/after captures и независимо измерить BoardPane pixel bounds на обоих screenshots. Сопоставить X/Y scales и origin с same-run Monitor fit, inspect snapshot и calibration ROI; не использовать post-hoc translation (+1,+2) как correction.
-2. По результатам определить, можно ли закрыть coordinate-space/renderer gate. До этого CSS client coordinates не передавать executor и не подключать их к calibration profile.
-3. Завершить environment fingerprint и stale invalidation для viewport/window/zoom/DPR/canvas/BoardPane; сохранить ручной fallback.
-4. После renderer acceptance отдельно пройти FILL-001-RS single-task preflight на реальной доске; matrix не запускать до принятия PNG gate. CHALK измерять только delta `pointCount`.
-5. Для INT-006 определить safety margin и domain limits по независимому holdout; INT-007 остаётся BLOCKED до этого решения.
+1. Add a vertical/diagonal paired capture (and later additional viewport/window configurations) to validate both axes beyond the current single horizontal trajectory. Define acceptance thresholds before reviewing the next run.
+2. Complete environment fingerprint and stale invalidation for window/viewport/zoom/DPR/canvas/BoardPane. Keep CSS client coordinates separate from desktop/screenshot coordinates.
+3. Only after multi-axis/environment acceptance, connect geometry to calibration profile with explicit stale status and manual fallback; do not enable executor handoff yet.
+4. After renderer/footprint gate and committed PNG quality issue are resolved, run a single-task FILL-001-RS preflight; do not launch the 45-cell matrix yet.
+5. Keep INT-007 BLOCKED until INT-006 safety margin and domain/holdout validation are established.
 
-**Неизменяемые ограничения:** production estimator/defaults, executor defaults, frozen plans и raw captures не менялись; реальные игровые эксперименты в этой сессии не запускались. Сборка/CI не доказывают качество live-рисования.
+**Неизменяемые ограничения:** production renderer, planner, estimator/defaults, calibration profile and executor behavior were not changed; no real game experiment was launched in this continuation. The new code is an offline diagnostic/audit path only.
 
 ---
 

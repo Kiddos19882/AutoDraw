@@ -535,3 +535,18 @@ Artifact: `autodraw-paired-renderer-png-comparison`, ID `13386122895`.
 - Frozen INT-006 model validation: 45/45 accepted. Aggregated profile metrics (15 runs/profile): P0 MAE=2.882, RMSE=3.189, MAPE=3.484%, max underprediction=0.99; P1 MAE=0.657, RMSE=0.838, MAPE=1.178%, max underprediction=0.92; P2 MAE=0.685, RMSE=0.854, MAPE=1.741%, max underprediction=1.82. Safety margin remains NOT_ESTABLISHED; production eligibility NOT_VALIDATED.
 - Artifact IDs: INT-006 CHALK validation `13387976546`; INT006R live validation `13387682524`; INT006R visual review source `13387951744`; paired renderer comparison `13386869712`; FILL-001-RS static sweep `13387727239`.
 - Subsequent workflow/config commit `fb853547d74a70582ab1e4731d55763367b8ceb8` adds paired full-screen screenshots to the next diagnostic artifact. No CI run for that commit was available at this update; run 41966023670 does not validate it.
+
+
+## 2026-11-05 — screenshot-derived BoardPane bounds and renderer audit
+
+**CI:** [41971869707](https://github.com/Kiddos19882/AutoDraw/actions/runs/41971869707), commit `b9c2e2a194f840c844c1e8b0877a6c4c54ddc1df`, SUCCESS.
+
+- Preparation/G3: 859 passed, 24 warnings, 82 subtests passed (includes four new screenshot-bound/transform tests).
+- Application integration: 41 passed / 1 skipped / 3 subtests; additional groups 24 passed / 2 subtests and 12 passed. Game Monitor/Bridge job SUCCESS (WebSocket smoke: 22 passed). Executor regression, Egret CanvasRenderer browser reference, INT-006 analysis and Windows portable build/startup smoke-test: SUCCESS. Optional algorithm benchmarks: SKIPPED.
+- New full-screen board-bound detector: same before/after bbox `(498,268,672,351)`, board color RGB `(238,238,238)`, tolerance 4; component fill fractions `0.999788 / 0.961861`.
+- New independent transform: origin `(497.954055,268.0)`, scale `(1.461204822,1.4625)`; X fit from 272 same-run samples, RMSE 0.424 px; Y same-run sample residual 0.0375 px; inspect cross-check differences under 0.14 px / 0.057% scale.
+- At alpha24 old ROI transform: IoU 0.763153, symmetric difference 2,404 px. Screenshot-derived Y + Monitor X: IoU 0.998882, precision 0.999106, recall 0.999776, symmetric difference 10 px; bbox exact match `(21,170,599,15)`. No post-hoc registration.
+- Threshold sensitivity: alpha1 IoU 0.998771 / 11 px; alpha64 0.998435 / 14 px; alpha128 0.997764 / 20 px; alpha192/254 lower due antialiasing/coverage. No acceptance threshold was defined; report remains exploratory.
+- FILL-001 committed PNG quality gate remains FAIL: coverage 98.430600%, leakage 11. FILL-001-RS sweep remains offline-only.
+- Artifact IDs: paired renderer `13389883231`; INT-006 PNG analysis `13389958144`; INT-006 CHALK validation `13389908245`; INT006R live validation `13390795994`; INT006R visual source `13390526598`; FILL-001-RS sweep `13390271857`; portable build `13390167082`.
+- The audit helper/tests and full-screen artifact packaging do not change production renderer/planner/calibration/executor. No live game experiment was launched.

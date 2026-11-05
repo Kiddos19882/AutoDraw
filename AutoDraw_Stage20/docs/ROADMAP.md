@@ -1,5 +1,15 @@
 # Дополнение к дорожной карте — 2026-11-05
 
+## 2026-11-05 — independent screen-bound verification completed (CI 41971869707)
+
+- Same-run full-screen screenshots identify BoardPane bounds `(498,268,672,351)`; the calibrated ROI `(496,265,674,355)` is a larger crop, not the board itself.
+- The old ROI transform gave IoU 0.763153 / 2,404 differing pixels. Monitor-X + screenshot-Y transform gives IoU 0.998882 / 10 differing pixels at alpha24, without post-hoc translation.
+- CI tests: 859 passed, 24 warnings, 82 subtests; paired renderer comparison, INT-006 analysis and Windows portable build/startup smoke-test succeeded. Full run [41971869707](https://github.com/Kiddos19882/AutoDraw/actions/runs/41971869707) SUCCESS.
+- This is single-run exploratory confirmation only; no formal renderer acceptance threshold and no executor handoff.
+
+**Active next step:** collect vertical/diagonal paired trajectories and repeat under controlled viewport/window/DPR conditions; then complete environment fingerprint and stale invalidation. FILL-001-RS matrix remains BLOCKED.
+
+
 ## Синхронизация после CI 41966023670 и закрытия визуального gate INT006R
 
 - INT006R: 45/45 live captures, exact CHALK audit и ручной visual audit завершены; radius-specific limitations записаны в `CHALK_INT006R_VISUAL_AUDIT_2026-11-03.md`.

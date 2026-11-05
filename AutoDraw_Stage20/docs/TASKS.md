@@ -8,9 +8,9 @@
 
 | ID | Приоритет | Статус | Содержание |
 |---|---|---|---|
-| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | RENDERER_EXPLORATORY_DONE_AUTODRAW_GEOMETRY_DIAGNOSTICS_DONE_PROFILE_CONSUMER_PENDING | Independent compare IoU=0.998994 / 9 px; Monitor 0.2.3 + Bridge geometry persistence passed CI; AutoDraw active-session reader/UI diagnostics and manifest summary added; profile consumer, desktop transform validation and end-to-end calibration pending |
+| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | SINGLE_RUN_SCREEN_TRANSFORM_VERIFIED_MULTI_AXIS_AND_PROFILE_PENDING | Same-run screen bounds + Monitor X fit: IoU=0.998882 / 10 px, no post-hoc shift; one horizontal stroke only; multi-axis/environment validation, profile consumer and executor gate pending |
 | FILL-001-RS-MATRIX | P0 | BLOCKED | 45 captures только после принятого single-task preflight |
-| GAME-INPUT-SAMPLING-TRACE-001 | P1 | EXPLORATORY_COMPARE_DONE_TRANSFORM_ROOT_CAUSE_OPEN | Run 16aec62c принят; 138 accepted points, CHALK=138; unshifted IoU=0.76315, post-hoc (+1,+2) IoU=0.99888; acceptance не пройдена |
+| GAME-INPUT-SAMPLING-TRACE-001 | P1 | ROI_BOUNDS_ROOT_CAUSE_IDENTIFIED_SINGLE_RUN_VERIFIED | Run 16aec62c; 138 accepted points, CHALK=138; ROI included margins; screenshot-derived bounds + Monitor fit IoU=0.998882 / 10 px without post-hoc shift; multi-axis/environment validation pending |
 | BRUSH-FOOTPRINT-CAPSULE-001 | P1 | OPEN | Offline capsule model готова; renderer acceptance/planner integration не выполнены |
 | INT-006 | P1 | IN_PROGRESS | INT006R 45/45 + manual visual audit завершены; frozen model validation 45/45 accepted; safety margin и расширенная domain/holdout validation не завершены |
 | INT-007 | P2 | BLOCKED | Интеграция модели после INT-006 |
@@ -23,6 +23,15 @@
 
 
 **Уточнение по INT006R (2026-11-05):** измерительная фаза закрыта с geometry-specific limitations. Radius 1 не замыкает D2 polygon; radius 30 сливает короткие детали D4; radius 10 — лучший из трёх проверенных компромиссов для D1–D5. Exact CHALK averages: 67.40 / 67.67 / 67.80 для радиусов 1 / 10 / 30. Это не универсальный выбор радиуса и не тест заливки. INT-006 остаётся IN_PROGRESS только по safety margin и расширенной независимой validation frozen estimator.
+
+
+## 2026-11-05 — screenshot-derived BoardPane bounds verification
+
+- [x] Full-screen before/after captures processed in CI; same bounds on both: `(498,268,672,351)`.
+- [x] Actual board bounds differ from calibrated ROI `(496,265,674,355)`; ROI includes margins and must not be used as the board transform.
+- [x] X from same-run Monitor fit; Y origin/scale from screenshot bounds; inspect is cross-check only. Same-run Y sample residual 0.0375 px.
+- [x] Alpha24 comparison: old ROI transform IoU 0.763153 / 2404 px symmetric difference; independent screenshot transform IoU 0.998882 / 10 px, no post-hoc shift.
+- [ ] Multi-axis captures, additional viewport/window configurations, formal acceptance thresholds and executor/calibration handoff remain open.
 
 ## 2026-11-05 — Monitor/Bridge geometry snapshot pipeline
 

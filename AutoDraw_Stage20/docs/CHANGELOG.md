@@ -1,3 +1,10 @@
+## 2026-11-05 — screenshot-derived BoardPane transform diagnostics
+
+- Added same-run full-screen board-bound detection to the renderer audit path. The calibrated ROI is no longer assumed to be the BoardPane extent.
+- Independent X/Y transform now uses same-run Monitor X fit plus screenshot-derived Y bounds, with inspect cross-checks and fail-closed validation.
+- Added four unit tests and report evidence. CI run `41971869707` SUCCESS (859 tests passed, 24 warnings, 82 subtests; paired renderer comparison and Windows portable build succeeded).
+- Diagnostic/audit only: production renderer, planner, calibration profile and executor behavior are unchanged. The single horizontal capture remains exploratory; multi-axis/environment validation and formal acceptance are pending.
+
 ## 2026-11-05 — подготовка paired renderer full-screen evidence
 
 - Workflow `.github/workflows/geometry-tests.yml` дополнен копированием same-run `before_clear-screen.png` и `after_draw-screen.png` в artifact `autodraw-paired-renderer-png-comparison` для последующего pixel-level восстановления границ BoardPane.

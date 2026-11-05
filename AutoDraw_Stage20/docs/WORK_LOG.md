@@ -3203,3 +3203,14 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - Рассчитаны агрегированные profile metrics по frozen INT-006 validation artifact; P1 имеет лучшие MAE/MAPE на текущей выборке, но P2 показывает большее максимальное недопрогнозирование. Safety margin и production eligibility не установлены.
 - В workflow `.github/workflows/geometry-tests.yml` добавлена упаковка same-run `before_clear-screen.png` и `after_draw-screen.png` в paired-renderer artifact для независимого pixel-level board-edge audit. Commit: `fb853547d74a70582ab1e4731d55763367b8ceb8`. CI для этого commit пока не подтверждён.
 - Исходники приложения, production estimator/defaults, executor, frozen plans и первичные capture данные не изменялись; реальные игровые эксперименты не запускались.
+
+
+## 2026-11-05 — independent screen-bound transform audit and CI verification
+
+- Added `detect_board_bounds_from_screenshots` in `source/preparation/renderer_geometry.py`: it derives board bounds from same-run blank/after full-screen captures, checks stable bounds and aspect ratio, and does not treat the calibrated crop as the board itself.
+- Extended `derive_live_board_screen_transform` to keep X from same-run Monitor fit and derive Y from screenshot bounds, cross-checking both against screenshot/inspect evidence. No post-hoc translation is applied.
+- Updated `tests/compare_live_renderer_reference.py` to require and hash the same-run full-screen captures, include board-bound diagnostics in the report, and use the screenshot-derived transform.
+- Added four unit tests for detection, movement rejection, screenshot-Y cross-check and disagreement fail-closed behavior.
+- CI run `41971869707` on `b9c2e2a194f840c844c1e8b0877a6c4c54ddc1df`: 859 preparation tests passed, 24 warnings, 82 subtests; paired renderer comparison SUCCESS; INT-006/INT006R analyses SUCCESS; Windows portable build/startup smoke-test SUCCESS.
+- Independent result: BoardPane bounds `(498,268,672,351)`; alpha24 IoU improved from 0.763153 (frozen ROI transform) to 0.998882 (Monitor X + screenshot Y), symmetric difference from 2,404 to 10 px. This remains single-run exploratory evidence, not a general renderer acceptance.
+- FILL-001 PNG gate remains FAIL (coverage 98.430600%, leakage 11); FILL-001-RS matrix remains blocked. No production code, calibration profile, executor defaults or live game state changed.
