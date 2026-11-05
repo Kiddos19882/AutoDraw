@@ -378,6 +378,13 @@ def main() -> int:
                              args.plan, monitor_path, geometry_audit_path, screen_before_path, screen_after_path)
             },
             "transform": geometry,
+            "offline_renderer": {
+                "logical_board_size": manifest.get("board"),
+                "raster_scale": manifest.get("rasterScale"),
+                "raster_png_size": {"width": int(offline.shape[1]), "height": int(offline.shape[0])},
+                "manifest_runtime_profile_source": manifest.get("runtimeProfile", {}).get("source"),
+                "runtime_profile_used_for_live_screen_transform": False,
+            },
             "board_bounds_audit": board_bounds_audit,
             "thresholds": {"observed_rgb_euclidean": args.rgb_threshold, "expected_alpha": args.alpha_thresholds},
             "observed_live_delta": report["observed_live_delta"],
@@ -398,7 +405,24 @@ def main() -> int:
         (args.output_dir / "comparison-report-independent-transform.json").write_text(
             json.dumps(independent_report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
-        report["analysis_status"] = report["status"]
+        report["diagnostic_frozen_plan_comparison"] = {
+            "status": report["status"],
+            "transform": report["transform"],
+            "comparisons": report["comparisons"],
+            "purpose": "Diagnostic only; excluded from formal per-run acceptance.",
+        }
+        report["analysis_status"] = "FROZEN_PLAN_DIAGNOSTIC_ONLY"
+        report["transform"] = geometry
+        report["transform_source"] = "same_run_monitor_geometry_and_full_screen_board_bounds"
+        report["comparisons"] = independent_results
+        report["offline_renderer"] = independent_report["offline_renderer"]
+        report["limitations"] = [
+            "Frozen plan transform metrics are retained only in diagnostic_frozen_plan_comparison.",
+            "Formal acceptance uses geometry derived from this experiment's run-bound Game Monitor snapshot and full-screen captures.",
+            "The offline BoardPane uses the manifest logical board dimensions and raster scale; manifest runtimeProfile metadata is not used for live screen alignment.",
+            "No post-hoc translation or image registration is applied to the formal comparison.",
+            "A per-run PASS is not series acceptance; three unique valid vertical and diagonal runs are still required.",
+        ]
         report["status"] = formal_acceptance["status"]
         report["formal_acceptance"] = formal_acceptance
         (args.output_dir / "comparison-report.json").write_text(
