@@ -1,23 +1,22 @@
 # Актуальная точка продолжения — 2026-11-05
 
-## Текущая точка — independent offline comparison выполнен; renderer acceptance exploratory
+## Текущая точка — independent renderer comparison завершён; Monitor/Bridge geometry snapshot реализован
 
 **Branch:** feature/image-geometry-optimization  
-**Текущий HEAD:** 01e6c8d60512f6b8e1c5e4b4a48eafd0f1db65d1. Code/test/workflow commit `1b16b51e42ba0c61a0fbc547179ca5a9b3864b54` проверен CI; последующие commits в этой серии — только документация.  
-**Последние 20 commits:** проверены перед началом этой итерации. GitHub API не подтверждает локальный git status.  
-**CI:** workflow run `41963498086` завершился SUCCESS для code/test/workflow commit `1b16b51e42ba0c61a0fbc547179ca5a9b3864b54`; все обязательные jobs SUCCESS, optional algorithm benchmarks SKIPPED. Последующие commits до HEAD `01e6c8d` меняли только документацию. GitHub compare branch↔HEAD вернул `identical`; локальный `git status` недоступен.  
+**Baseline перед geometry snapshot implementation:** HEAD после offline audit/doc sync. GitHub API не предоставляет локальный git status.  
+**Последний полный CI:** run 41963498086 SUCCESS для code/test/workflow commit `1b16b51e42ba0c61a0fbc547179ca5a9b3864b54`; subsequent audit-result commits были документационными.
 
-### Результат offline ROI audit
+### Подтверждённые результаты
 
-Same-run Game Monitor report содержит 272 mouse samples: во всех screenX-clientX=0, screenY-clientY=163, boardY=119, stageY=191. Горизонтальный fit: origin X=497.954055, scale X=1.461204822; RMSE≈0.424 screen px. Пользовательский inspect snapshot того же экрана даёт scale X=1.461186 и Y=1.463334; после client→screen offset BoardPane corners ≈(497.960,267.860)—(1170.106,619.060). Вертикальный scale не fit-ится по live run, поскольку траектория горизонтальная; он получен из inspect CSS transform и проверен одной точкой.
+- Independent offline comparison без post-hoc registration: alpha24 IoU=0.998994, precision=0.999218, recall=0.999776, symmetric difference=9 px; old transform IoU=0.763153 / 2404 px. Renderer acceptance остаётся exploratory: vertical scale inspect-derived, inspect без run/session timestamp.
+- Game Monitor поднят до 0.2.3: `inspect().renderer` добавляет raw windowGeometry; client corners могут вычисляться без getBoxQuads только при валидированном positive axis-aligned CSS transform и совпадении canvas rect со Stage/backing scale. Иначе mapping unavailable.
+- Browser Bridge отправляет rendererGeometry в session_start и updates при изменении window/viewport. Server сохраняет snapshot в session schema v2 optional fields и привязывает start/update/end snapshots к run JSON schema v1.
+- AutoDraw пока не читает geometry из session/run и не обновляет calibration profile; production screen transform/planner/executor не изменялись.
 
-Ручной ROI (496,265,674,355) содержит около 1.95 px лишней области слева и 2.86 px сверху; его pixel-center scales (1.463043,1.475) отличаются от runtime scales (1.461186,1.463334). Текущий helper допускает до 1% разницы и не проверяет origin, поэтому этот ROI проходит validation, хотя геометрически не совпадает с BoardPane.
+### Следующий шаг
 
-**Новый offline comparison:** CI run 41963498086, job INT-006 pixel-level PNG geometry audit SUCCESS. Независимый transform (без post-hoc registration) при alpha threshold 24 дал IoU=0.998994, precision=0.999218, recall=0.999776, symmetric difference=9 px против старого IoU=0.763153 / 2404 px. Report artifact `autodraw-paired-renderer-png-comparison` (artifact ID 13386122895). Renderer acceptance остаётся exploratory из-за inspect provenance и отсутствия вертикального live fit.
+Добавить AutoDraw-side reader/validator для renderer geometry, проверить session freshness/fingerprint и связать валидный transform с calibration profile. До подтверждения screen/client mapping использовать manual fallback; approximate/stale geometry не передавать executor.
 
-**Следующий шаг:** завершить coordinate-space contract и Monitor→Bridge→AutoDraw design, затем интеграцию и tests. Не переносить этот transform в production до подтверждения геометрии и полноценного handoff.
-
-**Границы этой итерации:** добавлены offline audit helper/test/derived evidence и CI comparison path; live game actions не выполнялись. Новый offline compare успешно завершён, но production mapping не менялся. Production planner, executor defaults, brush calibration profile и frozen plans не изменялись.
 ### Принятый live capture и offline replay
 
 Run 16aec62c-9e54-44e7-8691-9df79b19161d, session d357b6ee-5617-4e07-9011-7eba7ccb6c0f, experiment d47cc0a5520044c7abfd0352a4f93ca8: один stroke, 138 accepted points, каждый положительный update имеет pointDelta=1 и acceptedPoint; pointCount 1→139, точный CHALK=138. Bridge telemetry без drops/errors/send failures/sequence gaps. Raw capture пригоден для replay; агрегированное trajectory.status=incomplete_until_verified остаётся summary metadata inconsistency.
