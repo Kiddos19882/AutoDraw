@@ -79,11 +79,11 @@
 - Расширять существующий calibration profile только с миграцией и сохранением v1/manual fallback; атомарное сохранение и stale-profile block обязательны.
 - Пользователь разрешил любые действия; реализацию можно начинать после завершения design и unit-test contract. Live runtime остаётся ограничен отсутствием удалённого доступа к пользовательскому экрану.
 
-#### Этап 5. Independent offline renderer comparison — NEXT / CI RUNNING
+#### Этап 5. Independent offline renderer comparison — DONE EXPLORATORY / ACCEPTANCE OPEN
 - В `source/preparation/renderer_geometry.py` добавлен fail-closed transform: X из same-run Monitor fit, Y из inspect CSS transform с явным caveat.
 - `tests/compare_live_renderer_reference.py` запускает дополнительный replay по независимой affine matrix, сохраняет `comparison-report-independent-transform.json`, expected alpha и overlay. Старый frozen comparison остаётся неизменным.
 - `screen_geometry_audit.json` связывает inspect subset с исходным run/session; inspect provenance помечена как same-screen user attestation, не same-run inspect.
-- Новый comparison не применяет post-hoc translation. Метрики остаются exploratory, acceptance threshold не задан.
+- Новый comparison не применяет post-hoc translation. При alpha24: IoU=0.9989941886, precision=0.9992175274, recall=0.9997763114, symmetric difference=9 px; bbox live/expected совпадает `(21,170,599,15)`. Старый frozen transform: IoU=0.7631527094, symmetric difference=2404 px. Alpha threshold sensitivity: alpha1 IoU=0.998883, alpha64 IoU=0.998547, alpha128 IoU=0.997653. Report artifact `autodraw-paired-renderer-png-comparison` ID 13386122895, workflow run 41963498086. Это exploratory; acceptance threshold не задан, Y scale inspect-derived, inspect не same-run.
 
 #### Этап 6. Tests и CI — IN PROGRESS
 - Unit tests для valid transform, unstable client→screen offset и unsupported CSS skew добавлены в `source/preparation/tests/test_renderer_geometry.py`.
@@ -116,8 +116,8 @@
 | 2. Coordinate-space contract | IN PROGRESS |
 | 3. Monitor geometry specification | DESIGN IN PROGRESS |
 | 4. Monitor → Bridge → AutoDraw | DESIGN PENDING |
-| 5. Independent offline renderer compare | NEXT / CI RUNNING |
-| 6. Tests/CI | IN PROGRESS |
+| 5. Independent offline renderer compare | DONE EXPLORATORY / ACCEPTANCE OPEN |
+| 6. Tests/CI | PARTIAL SUCCESS; WINDOWS BUILD RUNNING |
 | 7. Confirmatory live capture | BLOCKED BY USER-SCREEN ACCESS |
 | 8. FILL-001-RS preflight/matrix | BLOCKED BY RENDERER GATE |
 
