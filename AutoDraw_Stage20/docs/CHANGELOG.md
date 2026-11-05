@@ -1,3 +1,11 @@
+## 2026-11-05 — добавлен одиночный paired renderer test во вкладку «Тест кистей»
+
+- Добавлен сценарий одного горизонтального штриха 400 logical px для live PNG ↔ offline Egret replay.
+- Фиксированы radius=10, executor step=2 px, delay=10 ms, line extension=0 и timing profile; renderer replay — smooth / line width 10.
+- Добавлены fail-closed проверки одного stroke и точного executor metadata, а также regression tests.
+- UI показывает инструкцию по включению Game Monitor input telemetry и сохранению полного capture evidence.
+- Live game запуск и paired PNG comparison не выполнялись; ожидается пользовательский capture.
+
 # Changelog
 
 ## 2026-11-04 — Egret zero-length lineTo fixture: no visible raster output
