@@ -72,11 +72,13 @@
 - Unit tests покрывают fallback mapping и window geometry; полноценная validation на runtime/CI для этой версии ожидается.
 - Не менять O(1) resource telemetry и не добавлять полный обход `atom.points` в hot path; geometry collection остаётся read-only.
 
-#### Этап 4. Monitor → Bridge geometry persistence — IMPLEMENTED / CI SUCCESS; AutoDraw consumer PENDING
+#### Этап 4. Monitor → Bridge → AutoDraw geometry diagnostics — IMPLEMENTED; profile consumer PENDING
 - `game_monitor_bridge.js` передаёт `rendererGeometry` в `session_start` и отправляет `renderer_geometry` updates при resize/scroll/orientation/fullscreen/visualViewport changes.
 - Bridge server сохраняет latest `renderer_geometry` в `session.json` schema v2 optional fields и snapshots at run start/update/end в run JSON schema v1; update history ограничена 32 snapshots/run. AutoDraw пока не читает geometry и не обновляет profile.
 - `brush_calibration.py` schema v1 хранит screen points/regions/environment; `_ensure_screen_compatibility()` сравнивает только screen resolution, а `get_experiment_capture_config()` отдаёт screen size без полного environment fingerprint.
-- Следующий substage: AutoDraw reader/validator, session freshness, environment fingerprint и invalidation при изменении screen/window/viewport/zoom/DPR/canvas/BoardPane/session.
+- `brush_radius_feedback.read_active_bridge_geometry()` читает свежую активную session geometry; Brush Behavior UI показывает BoardPane client corners/mapping method и прямо сообщает, что это не desktop/screenshot transform.
+- `summarize_game_monitor_report()` включает compact start/end geometry summary в experiment manifest, не дублируя raw snapshots.
+- Следующий substage: environment fingerprint, stale invalidation и profile integration. Пока profile/executor не используют эти CSS client corners.
 - Расширять существующий calibration profile только с миграцией и сохранением v1/manual fallback; атомарное сохранение и stale-profile block обязательны.
 - Пользователь разрешил любые действия; реализацию можно начинать после завершения design и unit-test contract. Live runtime остаётся ограничен отсутствием удалённого доступа к пользовательскому экрану.
 
@@ -116,7 +118,7 @@
 | 1. Independent ROI audit | DONE WITH VERTICAL-SCALE CAVEAT |
 | 2. Coordinate-space contract | IN PROGRESS |
 | 3. Monitor geometry snapshot | IMPLEMENTED / CI SUCCESS |
-| 4. Monitor → Bridge persistence | IMPLEMENTED / CI SUCCESS; AutoDraw consumer PENDING |
+| 4. Monitor → Bridge → AutoDraw diagnostics | IMPLEMENTED; profile consumer PENDING |
 | 5. Independent offline renderer compare | DONE EXPLORATORY / ACCEPTANCE OPEN |
 | 6. Tests/CI | SUCCESS; OPTIONAL BENCHMARKS SKIPPED |
 | 7. Confirmatory live capture | BLOCKED BY USER-SCREEN ACCESS |
