@@ -14,7 +14,7 @@ from typing import Any
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "source" / "preparation"))
-from renderer_geometry import derive_live_board_screen_transform
+from renderer_geometry import detect_board_bounds_from_screenshots, derive_live_board_screen_transform
 
 import cv2
 import numpy as np
@@ -268,6 +268,19 @@ def main() -> int:
         if monitor_report.get("run_id") != run_id or monitor_report.get("session_id") != summary.get("session_id"):
             raise ValueError("Monitor report run/session does not match the experiment manifest.")
         screen = geometry_evidence["screen"]
+        screen_before_path = args.experiment_dir / "before_clear-screen.png"
+        screen_after_path = args.experiment_dir / "after_draw-screen.png"
+        for screen_path in (screen_before_path, screen_after_path):
+            if not screen_path.is_file():
+                raise FileNotFoundError(screen_path)
+        before_screen = np.asarray(Image.open(screen_before_path).convert("RGB"), dtype=np.uint8)
+        after_screen = np.asarray(Image.open(screen_after_path).convert("RGB"), dtype=np.uint8)
+        expected_screen_size = (int(screen["height"]), int(screen["width"]))
+        if before_screen.shape[:2] != expected_screen_size or after_screen.shape[:2] != expected_screen_size:
+            raise ValueError("Same-run full-screen captures do not match the inspect screen dimensions.")
+        board_bounds_audit = detect_board_bounds_from_screenshots(
+            before_screen, after_screen, roi,
+        )
         inspect_input = {
             "provenance": geometry_evidence.get("provenance", {}),
             "screen": screen,
@@ -275,7 +288,8 @@ def main() -> int:
             "renderer": geometry_evidence["renderer"],
         }
         geometry = derive_live_board_screen_transform(
-            monitor_report, inspect_input, roi, (int(screen["width"]), int(screen["height"]))
+            monitor_report, inspect_input, roi, (int(screen["width"]), int(screen["height"])),
+            screenshot_board_bounds=board_bounds_audit["bounds"],
         )
         matrix_independent = np.asarray(geometry["matrix_source_raster_to_roi"], dtype=np.float32)
         alpha_independent = cv2.warpAffine(
@@ -305,17 +319,19 @@ def main() -> int:
             "inputs": {
                 str(item): {"sha256": sha256(item), "size_bytes": item.stat().st_size}
                 for item in (experiment_path, live_path, args.blank, args.offline_png, args.manifest,
-                             args.plan, monitor_path, args.geometry_audit)
+                             args.plan, monitor_path, args.geometry_audit, screen_before_path, screen_after_path)
             },
             "transform": geometry,
+            "board_bounds_audit": board_bounds_audit,
             "thresholds": {"observed_rgb_euclidean": args.rgb_threshold, "expected_alpha": args.alpha_thresholds},
             "observed_live_delta": report["observed_live_delta"],
             "comparisons": independent_results,
             "limitations": [
                 "No post-hoc translation or image registration is applied.",
                 "Horizontal scale/origin are fitted from same-run Monitor screenX/boardX telemetry.",
-                "Vertical scale comes from the user-provided inspect snapshot; this live run has no vertical pointer variation.",
-                "The inspect snapshot has no run/session timestamp; same-screen provenance is user-attested.",
+                "Vertical origin/scale come from same-run full-screen blank/after board-color bounds; the horizontal run contributes one same-run Y sample for a residual check.",
+                "The inspect snapshot is an independent cross-check for screenshot-derived Y origin/scale, not their source.",
+                "The current capture is one horizontal trajectory on one screen configuration; it does not validate every viewport/window state or executor handoff.",
                 "This is exploratory evidence and has no renderer acceptance threshold.",
             ],
         }
