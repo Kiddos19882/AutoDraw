@@ -131,6 +131,7 @@ jobs:
     name: INT-006 pixel-level PNG geometry audit
     needs:
       - preparation-tests
+      - egret-renderer-reference
     runs-on: windows-latest
     timeout-minutes: 20
     defaults:
@@ -147,6 +148,13 @@ jobs:
           cache-dependency-path: AutoDraw_Stage20/source/preparation/requirements.txt
       - name: Install image-analysis dependencies
         run: python -m pip install -r source/preparation/requirements.txt
+      - name: Download Stage A-D browser artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: autodraw-egret-renderer-reference
+          path: ${{ runner.temp }}/egret-renderer-reference
+      - name: Test Stage screenshot transform and mask metrics
+        run: python tests\\test_stage_renderer_comparison.py
       - name: Apply paired live/offline renderer per-run acceptance gates
         shell: pwsh
         run: |
@@ -181,6 +189,33 @@ jobs:
           if ($replayFailed) {
             throw "At least one vertical/diagonal paired-renderer replay did not pass formal acceptance. Inspect both per-orientation reports."
           }
+      - name: Compare Stage A/B against same-run live screenshots (diagnostic only)
+        if: always()
+        shell: pwsh
+        run: |
+          $cases = @(
+            @{
+              Name = "vertical"
+              Experiment = "experiment-20261105-192426-b10-paired_renderer_vertical_single_stroke-6f2227c7"
+            },
+            @{
+              Name = "diagonal"
+              Experiment = "experiment-20261105-192602-b10-paired_renderer_diagonal_single_stroke-0e61bc40"
+            }
+          )
+          $failed = $false
+          foreach ($case in $cases) {
+            $stageDir = Join-Path "$env:RUNNER_TEMP\\egret-renderer-reference" ("stage-level-" + $case.Name)
+            $experimentDir = "data\\results\\brush_behavior_tests\\$($case.Experiment)"
+            $comparisonReport = Join-Path (Join-Path "$env:RUNNER_TEMP\\paired-renderer-png-comparison" $case.Name) "comparison-report-independent-transform.json"
+            $outputDir = Join-Path "$env:RUNNER_TEMP\\stage-renderer-live-comparison" $case.Name
+            python tests\\compare_stage_renderer_reference.py --orientation $case.Name --stage-manifest (Join-Path $stageDir "manifest.json") --stage-png-dir $stageDir --experiment-dir $experimentDir --comparison-report $comparisonReport --output-dir $outputDir --variants A B
+            if ($LASTEXITCODE -ne 0) {
+              Write-Host "$($case.Name) Stage A/B diagnostic comparison failed with exit code $LASTEXITCODE."
+              $failed = $true
+            }
+          }
+          if ($failed) { throw "At least one same-run Stage A/B diagnostic comparison could not complete." }
       - name: Include paired full-screen source captures for independent board-edge audit
         if: always()
         shell: pwsh
@@ -215,6 +250,14 @@ jobs:
         with:
           name: autodraw-paired-renderer-png-comparison
           path: ${{ runner.temp }}/paired-renderer-png-comparison/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Upload Stage compositor live comparison diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autodraw-stage-renderer-live-comparison
+          path: ${{ runner.temp }}/stage-renderer-live-comparison/
           if-no-files-found: warn
           retention-days: 14
       - name: Analyse all INT-006 V1-V5 board captures
