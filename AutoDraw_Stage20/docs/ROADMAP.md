@@ -1,3 +1,15 @@
+# Дополнение к дорожной карте — 2026-11-05
+
+## GAME-INPUT-SAMPLING-TRACE-001 — готовность пользовательского capture
+
+Вкладка «Тест кистей» получила отдельный сценарий одного длинного горизонтального штриха для paired live/offline renderer comparison. Фиксированный профиль: logical line (20,120) → (420,120), radius 10, step=2 px, delay=10 ms, line extension=0; остальные executor timings сохранены из ранее принятого G3 profile. Renderer replay выполняется в режиме smooth, line width 10.
+
+**Следующий шаг:** пользователь запускает только этот одиночный сценарий при активных Game Monitor/Bridge и input telemetry. Сохранить raw run JSON, Bridge session, runtime inspect snapshot, точные pointCount before/after и PNG доски из одной сессии. Проверить ровно один strokeId, полную последовательность acceptedPoint и pointDelta=1; затем выполнить offline replay и PNG comparison. Не считать delay=10 гарантией полной sampling последовательности.
+
+Live game pixel equivalence остаётся PENDING. FILL-001-RS 45-cell matrix не запускать до закрытия paired renderer/footprint gate.
+
+---
+
 # Дополнение к дорожной карте — 2026-11-04
 
 **DOC-STATUS-SYNC:** DONE — управляющие документы, индекс, архитектурная/CI-карта и перечисленные исторические планы/инструкции синхронизированы; см. верхний блок `PROJECT_STATUS.md` и запись в `WORK_LOG.md`.
