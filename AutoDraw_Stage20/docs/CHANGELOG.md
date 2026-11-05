@@ -1,3 +1,10 @@
+## 2026-11-06 — Stage-level compositor A–D и повтор существующих captures
+
+- В offline renderer harness добавлен расчёт BoardPane placement в Stage backing canvas из точной run-bound geometry.
+- Добавлены WebGL/Canvas2D варианты с exact fractional origin и округлением до backing pixel; manifest сохраняет параметры и попиксельные различия относительно WebGL exact (A).
+- Headless Edge runner подключён к существующим vertical/diagonal Game Monitor reports; live game runs не запускаются.
+- Добавлены unit tests для placement/rounding и fail-closed геометрии. CI/browser execution и pixel acceptance пока не подтверждены.
+
 ## 2026-11-06 — синхронизация документации с кодом renderer и CI
 
 - Уточнены remote branch HEAD на начало сверки и последний code/test HEAD; `master` оставлена без изменений.
