@@ -24,7 +24,7 @@ from brush_test_workflow import (
     should_run_postdraw_workflow,
 )
 from brush_radius_feedback import (
-    calculate_radius_correction_target, read_active_bridge_radius,
+    calculate_radius_correction_target, read_active_bridge_radius, read_active_bridge_geometry,
 )
 from chalk_radius_matrix import (
     MATRIX_SCENARIO_ID, build_chalk_radius_matrix_metadata, is_monitor_run_claimed,
@@ -837,6 +837,7 @@ class BrushBehaviorTestTab:
         self.game_monitor_report_path: Path | None = None
         self.game_monitor_summary: dict[str, Any] | None = None
         self._bridge_capture_poll_id: str | None = None
+        self._geometry_poll_after_id: str | None = None
         self.bridge_snippet_path: Path | None = None
         self.bridge_process: subprocess.Popen | None = None
         self.last_record_path: Path | None = None
@@ -869,12 +870,14 @@ class BrushBehaviorTestTab:
         self.paint_after_var = tk.StringVar()
         self.zoom_var = tk.StringVar(value="100")
         self.area_var = tk.StringVar(value="Область доски берётся из профиля исполнения.")
+        self.geometry_status_var = tk.StringVar(value="Геометрия доски: ожидание Game Monitor Bridge.")
         self.slider_start_var = tk.StringVar()
         self.slider_end_var = tk.StringVar()
         self.status_var = tk.StringVar(value="Выбери радиус и тест. Автоустановка 1–30 работает только с расширенным ползунком игры.")
         self._build(parent)
         self._load_brush_control_into_fields()
         self._chalk_block_recovery_scan_after_id = self.root.after(0, self._scan_chalk_block_recovery)
+        self._geometry_poll_after_id = self.root.after(500, self._poll_game_monitor_geometry)
 
     def _cancel_pending_chalk_block_recovery_scan(self) -> None:
         callback_id = getattr(self, "_chalk_block_recovery_scan_after_id", None)
@@ -889,6 +892,54 @@ class BrushBehaviorTestTab:
     def _on_recovery_scan_owner_destroyed(self, event) -> None:
         if event.widget is getattr(self, "_recovery_scan_frame", None):
             self._cancel_pending_chalk_block_recovery_scan()
+            self._cancel_pending_geometry_poll()
+
+    def _cancel_pending_geometry_poll(self) -> None:
+        callback_id = getattr(self, "_geometry_poll_after_id", None)
+        if callback_id is None:
+            return
+        try:
+            self.root.after_cancel(callback_id)
+        except (tk.TclError, ValueError):
+            pass
+        self._geometry_poll_after_id = None
+
+    def _poll_game_monitor_geometry(self) -> None:
+        self._geometry_poll_after_id = None
+        try:
+            snapshot = read_active_bridge_geometry(self.output_dir / "game_monitor_bridge")
+        except Exception as exc:
+            snapshot = None
+            message = f"Геометрия Game Monitor: ошибка чтения ({type(exc).__name__})."
+        else:
+            if snapshot is None:
+                message = "Геометрия доски: нет активной сессии Bridge или renderer snapshot."
+            elif snapshot.get("board_ambiguous"):
+                message = "BoardPane: обнаружено несколько кандидатов; автоматическая геометрия заблокирована."
+            elif not snapshot.get("board_detected"):
+                message = "Game Monitor подключён, но BoardPane не обнаружен."
+            elif not snapshot.get("board_client_corners"):
+                message = "BoardPane обнаружен; client mapping недоступен. Используется ручной профиль калибровки."
+            else:
+                corners = snapshot["board_client_corners"]
+                top_left = corners.get("topLeft") or corners.get("top_left") or {}
+                bottom_right = corners.get("bottomRight") or corners.get("bottom_right") or {}
+                window = snapshot.get("window_geometry") or {}
+                screen_size = ""
+                if window.get("screenWidth") and window.get("screenHeight"):
+                    screen_size = f"; screen {window['screenWidth']}×{window['screenHeight']}"
+                message = (
+                    f"BoardPane: {snapshot.get('board_client_mapping_method')}; "
+                    f"CSS client TL=({top_left.get('x', 0):.1f},{top_left.get('y', 0):.1f}), "
+                    f"BR=({bottom_right.get('x', 0):.1f},{bottom_right.get('y', 0):.1f})"
+                    f"{screen_size}. Это не desktop/screenshot mapping; executor продолжает использовать профиль калибровки."
+                )
+        try:
+            self.geometry_status_var.set(message)
+            if self._recovery_scan_frame.winfo_exists():
+                self._geometry_poll_after_id = self.root.after(1000, self._poll_game_monitor_geometry)
+        except tk.TclError:
+            self._geometry_poll_after_id = None
 
     def _build(self, parent: tk.Widget) -> None:
         outer = ttk.Frame(parent, padding=10)
@@ -949,6 +1000,9 @@ class BrushBehaviorTestTab:
             text="Сначала запусти сокет, затем скопируй и выполни game_monitor.js, после него — snippet подключения в Console игрового iframe.",
             wraplength=760,
         ).pack(side="left", padx=8)
+        ttk.Label(
+            bridge, textvariable=self.geometry_status_var, wraplength=1100, justify="left"
+        ).pack(fill="x", anchor="w", pady=(6, 0))
         actions = ttk.Frame(outer)
         actions.pack(fill="x", pady=(0, 8))
         ttk.Button(actions, text="Создать и передать тест в исполнитель →", command=self.create_and_transfer_plan).pack(side="left")
