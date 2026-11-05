@@ -147,17 +147,55 @@ jobs:
         run: |
           python tests\\compare_live_renderer_reference.py --experiment-dir data\\results\\brush_behavior_tests\\experiment-20261105-041705-b10-paired_renderer_single_stroke-d47cc0a5 --blank data\\results\\brush_behavior_tests\\blank-board-reference.png --offline-png data\\renderer_result\\live-accepted-points-width-10-webgl-board-reference.png --manifest data\\renderer_result\\egret-5.4.1-renderer-reference-manifest.json --plan data\\results\\brush_behavior_tests\\brush-plan-paired_renderer_single_stroke-b10-20261105-041703-d47cc0a5.json --output-dir "$env:RUNNER_TEMP\\paired-renderer-png-comparison" --geometry-audit data\\results\\brush_behavior_tests\\experiment-20261105-041705-b10-paired_renderer_single_stroke-d47cc0a5\\screen_geometry_audit.json
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Replay vertical and diagonal captures using same-run renderer geometry
+        shell: pwsh
+        run: |
+          $cases = @(
+            @{
+              Name = "vertical"
+              Experiment = "experiment-20261105-192426-b10-paired_renderer_vertical_single_stroke-6f2227c7"
+              Plan = "brush-plan-paired_renderer_vertical_single_stroke-b10-20261105-192425-6f2227c7.json"
+            },
+            @{
+              Name = "diagonal"
+              Experiment = "experiment-20261105-192602-b10-paired_renderer_diagonal_single_stroke-0e61bc40"
+              Plan = "brush-plan-paired_renderer_diagonal_single_stroke-b10-20261105-192600-0e61bc40.json"
+            }
+          )
+          foreach ($case in $cases) {
+            $experimentDir = "data\results\brush_behavior_tests\$($case.Experiment)"
+            $caseOutput = "$env:RUNNER_TEMP\paired-renderer-png-comparison\$($case.Name)"
+            New-Item -ItemType Directory -Path $caseOutput -Force | Out-Null
+            python tests\compare_live_renderer_reference.py --experiment-dir $experimentDir --blank data\results\brush_behavior_tests\blank-board-reference.png --offline-png "data\results\renderer_compare\$($case.Name)\live-accepted-points-width-10-webgl-board-reference.png" --manifest "data\results\renderer_compare\$($case.Name)\egret-5.4.1-renderer-reference-manifest.json" --plan "data\results\brush_behavior_tests\$($case.Plan)" --output-dir $caseOutput --same-run-geometry
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          }
       - name: Include paired full-screen source captures for independent board-edge audit
         if: always()
         shell: pwsh
         run: |
-          $source = "data\\results\\brush_behavior_tests\\experiment-20261105-041705-b10-paired_renderer_single_stroke-d47cc0a5"
-          $target = "$env:RUNNER_TEMP\\paired-renderer-png-comparison"
-          New-Item -ItemType Directory -Path $target -Force | Out-Null
-          foreach ($fileName in @("before_clear-screen.png", "after_draw-screen.png")) {
-            $sourceFile = Join-Path $source $fileName
-            if (-not (Test-Path $sourceFile -PathType Leaf)) { throw "Missing paired screen capture: $sourceFile" }
-            Copy-Item $sourceFile (Join-Path $target $fileName) -Force
+          $target = "$env:RUNNER_TEMP\paired-renderer-png-comparison"
+          $sources = @(
+            @{
+              Name = "horizontal"
+              Directory = "data\results\brush_behavior_tests\experiment-20261105-041705-b10-paired_renderer_single_stroke-d47cc0a5"
+            },
+            @{
+              Name = "vertical"
+              Directory = "data\results\brush_behavior_tests\experiment-20261105-192426-b10-paired_renderer_vertical_single_stroke-6f2227c7"
+            },
+            @{
+              Name = "diagonal"
+              Directory = "data\results\brush_behavior_tests\experiment-20261105-192602-b10-paired_renderer_diagonal_single_stroke-0e61bc40"
+            }
+          )
+          foreach ($source in $sources) {
+            $caseTarget = Join-Path $target $source.Name
+            New-Item -ItemType Directory -Path $caseTarget -Force | Out-Null
+            foreach ($fileName in @("before_clear-screen.png", "after_draw-screen.png")) {
+              $sourceFile = Join-Path $source.Directory $fileName
+              if (-not (Test-Path $sourceFile -PathType Leaf)) { throw "Missing paired screen capture: $sourceFile" }
+              Copy-Item $sourceFile (Join-Path $caseTarget $fileName) -Force
+            }
           }
       - name: Upload paired renderer PNG comparison diagnostics
         if: always()

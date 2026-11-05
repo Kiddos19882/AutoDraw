@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from math import isfinite
 from statistics import median
+import re
 from typing import Any
 
 
@@ -156,6 +157,160 @@ def detect_board_bounds_from_screenshots(
     }
 
 
+
+def _parse_css_matrix(value: Any) -> dict[str, float]:
+    if not isinstance(value, str):
+        raise RendererGeometryError("Same-run computed CSS transform must be a matrix() string.")
+    number = r"[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?"
+    pattern = r"\s*matrix\(\s*" + r"\s*,\s*".join([f"({number})"] * 6) + r"\s*\)\s*"
+    match = re.fullmatch(pattern, value)
+    if not match:
+        raise RendererGeometryError("Only a six-value CSS matrix() transform is supported.")
+    a, b, c, d, tx, ty = (float(item) for item in match.groups())
+    if not all(isfinite(item) for item in (a, b, c, d, tx, ty)):
+        raise RendererGeometryError("CSS matrix() values must be finite.")
+    return {"a": a, "b": b, "c": c, "d": d, "tx": tx, "ty": ty}
+
+
+def _parse_css_transform_origin(value: Any) -> dict[str, float]:
+    if not isinstance(value, str):
+        raise RendererGeometryError("Same-run computed transform-origin must be a CSS string.")
+    matches = re.findall(r"[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?", value)
+    if len(matches) < 2:
+        raise RendererGeometryError("Computed transform-origin must expose two coordinates.")
+    return {"x": float(matches[0]), "y": float(matches[1])}
+
+
+def build_same_run_geometry_audit_input(
+    experiment: dict[str, Any],
+    monitor_report: dict[str, Any],
+    screenshot_size: tuple[int, int],
+) -> dict[str, Any]:
+    """Normalize the exact run-bound Game Monitor renderer snapshot for audit."""
+    summary = experiment.get("game_monitor_summary", {})
+    run_id, session_id = summary.get("run_id"), summary.get("session_id")
+    experiment_id = experiment.get("experiment_id")
+    if not all(isinstance(value, str) and value for value in (run_id, session_id, experiment_id)):
+        raise RendererGeometryError("Experiment run/session/experiment provenance is incomplete.")
+    if monitor_report.get("record_type") != "autodraw_game_monitor_run":
+        raise RendererGeometryError("A complete Game Monitor run report is required.")
+    if monitor_report.get("run_id") != run_id or monitor_report.get("session_id") != session_id:
+        raise RendererGeometryError("Game Monitor report is not bound to this experiment run/session.")
+    if monitor_report.get("autodraw_experiment_id") != experiment_id:
+        raise RendererGeometryError("Game Monitor report is not bound to this experiment ID.")
+
+    geometry_start = monitor_report.get("renderer_geometry_at_start")
+    geometry_end = monitor_report.get("renderer_geometry_at_end")
+    if not isinstance(geometry_start, dict) or not isinstance(geometry_end, dict):
+        raise RendererGeometryError("Same-run renderer geometry snapshots are missing.")
+    if geometry_start != geometry_end:
+        raise RendererGeometryError("Renderer geometry changed between run start and end.")
+    if monitor_report.get("renderer_geometry_updates") != []:
+        raise RendererGeometryError("Renderer geometry updates occurred during the run.")
+    if monitor_report.get("renderer_geometry_update_overflow_count") != 0:
+        raise RendererGeometryError("Renderer geometry update telemetry overflowed.")
+    updated_start = monitor_report.get("renderer_geometry_updated_at_start_utc")
+    updated_end = monitor_report.get("renderer_geometry_updated_at_end_utc")
+    if not isinstance(updated_start, str) or not updated_start or updated_start != updated_end:
+        raise RendererGeometryError("Renderer geometry snapshot timestamps are missing or inconsistent.")
+    if geometry_start.get("inspectionMode") != "read_only":
+        raise RendererGeometryError("Renderer geometry must come from a read-only inspect snapshot.")
+    if geometry_start.get("engineVersion") != "5.4.1" or geometry_start.get("renderMode") != "webgl":
+        raise RendererGeometryError("Unexpected live renderer engine/version/mode.")
+    if geometry_start.get("boardDetected") is not True:
+        raise RendererGeometryError("Game Monitor did not detect the BoardPane.")
+
+    players = geometry_start.get("players")
+    if geometry_start.get("playerCount") != 1 or not isinstance(players, list) or len(players) != 1:
+        raise RendererGeometryError("Exactly one game renderer player is required.")
+    player = players[0]
+    if player.get("playerFound") is not True or player.get("playerMatchesStage") is not True:
+        raise RendererGeometryError("Game renderer player does not match the inspected Stage.")
+
+    window = geometry_start.get("windowGeometry", {})
+    screen_width, screen_height = window.get("screenWidth"), window.get("screenHeight")
+    if any(isinstance(value, bool) or not isinstance(value, int) or value <= 0
+           for value in (screen_width, screen_height)):
+        raise RendererGeometryError("Same-run window.screen dimensions are unavailable.")
+    if screenshot_size != (screen_width, screen_height):
+        raise RendererGeometryError("Full-screen PNG dimensions differ from same-run window.screen metrics.")
+    phases = experiment.get("phases", {})
+    expected_size = {"width": screen_width, "height": screen_height}
+    if phases.get("before_draw", {}).get("screen_size") != expected_size:
+        raise RendererGeometryError("Experiment before-draw screen metadata differs from same-run window.screen.")
+    if phases.get("after_draw", {}).get("screen_size") != expected_size:
+        raise RendererGeometryError("Experiment after-draw screen metadata differs from same-run window.screen.")
+
+    dpr = _finite(geometry_start.get("devicePixelRatio"), "devicePixelRatio")
+    viewport_scale = _finite(geometry_start.get("visualViewportScale"), "visualViewportScale")
+    if abs(dpr - 1.0) > 1e-9 or abs(viewport_scale - 1.0) > 1e-9:
+        raise RendererGeometryError("Screen pixel mapping requires devicePixelRatio and visualViewportScale equal to 1.")
+    scale_x = _finite(geometry_start.get("canvasScaleX"), "canvasScaleX")
+    scale_y = _finite(geometry_start.get("canvasScaleY"), "canvasScaleY")
+    if abs(scale_x - 3.0) > 1e-9 or abs(scale_y - 3.0) > 1e-9:
+        raise RendererGeometryError("Expected the paired renderer's 3× logical raster scale.")
+    if geometry_start.get("canvasScaleFactor") != 2:
+        raise RendererGeometryError("Unexpected Egret canvas scale factor.")
+
+    logical = geometry_start.get("boardLogicalSize", {})
+    if logical != {"width": 460, "height": 240}:
+        raise RendererGeometryError("Same-run BoardPane logical bounds must be 460×240.")
+    corners = player.get("boardStageCorners", geometry_start.get("boardStageCorners", {}))
+    top_left, bottom_right = corners.get("topLeft"), corners.get("bottomRight")
+    if not isinstance(top_left, dict) or not isinstance(bottom_right, dict):
+        raise RendererGeometryError("Same-run BoardPane stage corners are missing.")
+    stage = player.get("stage", {})
+    canvas = player.get("canvas", {})
+    rect = canvas.get("rect", {})
+    style = canvas.get("style", {})
+    matrix = _parse_css_matrix(style.get("computedTransform"))
+    transform_origin = _parse_css_transform_origin(
+        style.get("computedTransformOrigin", style.get("transformOrigin"))
+    )
+
+    return {
+        "schema_version": 1,
+        "record_type": "autodraw_board_screen_geometry_audit_input",
+        "provenance": {
+            "inspect_source": "renderer_geometry_at_start from the exact Game Monitor run",
+            "same_screen_as_live_capture": True,
+            "same_run": True,
+            "session_binding": "exact experiment_id/run_id/session_id match; start/end geometry snapshots identical; zero geometry updates and overflow",
+            "geometry_snapshot_updated_at_utc": updated_start,
+        },
+        "source_run": {"experiment_id": experiment_id, "run_id": run_id, "session_id": session_id},
+        "screen": {
+            "width": screen_width,
+            "height": screen_height,
+            "device_pixel_ratio": dpr,
+            "visual_viewport_scale": viewport_scale,
+            "screenshot_pixel_mapping": {
+                "verified": True,
+                "method": "same_run_window_screen_metrics_equal_full_screen_png_dimensions",
+                "scale_x": 1.0,
+                "scale_y": 1.0,
+                "screenshot_width_px": screenshot_size[0],
+                "screenshot_height_px": screenshot_size[1],
+            },
+        },
+        "board": {"logical_width": logical["width"], "logical_height": logical["height"]},
+        "renderer": {
+            "canvas_scale_x": scale_x,
+            "canvas_scale_y": scale_y,
+            "stage": {"width": stage.get("width"), "height": stage.get("height")},
+            "canvas": {
+                "rect": {key: rect.get(key) for key in ("left", "top", "width", "height")},
+                "css_matrix": matrix,
+                "transform_origin": transform_origin,
+            },
+            "board_stage_corners": {
+                "top_left": {"x": top_left.get("x"), "y": top_left.get("y")},
+                "bottom_right": {"x": bottom_right.get("x"), "y": bottom_right.get("y")},
+            },
+        },
+    }
+
+
 def derive_live_board_screen_transform(
     monitor_report: dict[str, Any],
     inspect_evidence: dict[str, Any],
@@ -184,8 +339,23 @@ def derive_live_board_screen_transform(
     screen_size = (int(screen.get("width", 0)), int(screen.get("height", 0)))
     if tuple(screenshot_size) != screen_size:
         raise RendererGeometryError("Screenshot and desktop screen dimensions differ.")
-    if screen.get("windows_scale_percent") != 100 or screen.get("device_pixel_ratio") != 1:
-        raise RendererGeometryError("Screen-to-screenshot identity requires Windows scale 100% and DPR 1.")
+    if screen.get("device_pixel_ratio") != 1:
+        raise RendererGeometryError("Screen-to-screenshot identity requires DPR 1.")
+    if screen.get("windows_scale_percent") != 100:
+        mapping = screen.get("screenshot_pixel_mapping", {})
+        mapping_ok = (
+            isinstance(mapping, dict)
+            and mapping.get("verified") is True
+            and mapping.get("method") == "same_run_window_screen_metrics_equal_full_screen_png_dimensions"
+            and mapping.get("scale_x") == 1.0
+            and mapping.get("scale_y") == 1.0
+            and mapping.get("screenshot_width_px") == screen_size[0]
+            and mapping.get("screenshot_height_px") == screen_size[1]
+        )
+        if not mapping_ok:
+            raise RendererGeometryError(
+                "Screen-to-screenshot identity requires Windows scale 100% or verified same-run 1:1 screen/PNG dimensions."
+            )
 
     stage, canvas = renderer.get("stage", {}), renderer.get("canvas", {})
     rect, css, origin = canvas.get("rect", {}), canvas.get("css_matrix", {}), canvas.get("transform_origin", {})

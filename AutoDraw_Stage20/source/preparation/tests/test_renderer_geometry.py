@@ -178,3 +178,115 @@ def test_rejects_unstable_screen_offset_and_unsupported_skew():
     with pytest.raises(RendererGeometryError, match="axis-aligned"):
         derive_live_board_screen_transform(report(), bad_inspect,
             {"x": 496, "y": 265, "width": 674, "height": 355}, (1920, 1080))
+
+
+
+def _same_run_geometry_fixture():
+    geometry = {
+        "inspectionMode": "read_only", "engineVersion": "5.4.1", "renderMode": "webgl",
+        "windowGeometry": {"screenWidth": 1920, "screenHeight": 1080, "innerWidth": 1920, "innerHeight": 877},
+        "canvasScaleFactor": 2, "canvasScaleX": 3, "canvasScaleY": 3,
+        "devicePixelRatio": 1, "visualViewportScale": 1,
+        "playerCount": 1,
+        "players": [{
+            "playerFound": True, "playerMatchesStage": True,
+            "stage": {"width": 1314, "height": 600},
+            "canvas": {
+                "rect": {"left": 0, "top": -0.5, "width": 1920, "height": 878},
+                "style": {
+                    "computedTransform": "matrix(0.487062, 0, 0, 0.487778, 0, 0)",
+                    "computedTransformOrigin": "0px 0px",
+                },
+            },
+            "boardStageCorners": {
+                "topLeft": {"x": 340.7916660308838, "y": 72},
+                "bottomRight": {"x": 800.7916660308838, "y": 312},
+            },
+        }],
+        "boardDetected": True, "boardLogicalSize": {"width": 460, "height": 240},
+    }
+    experiment = {
+        "experiment_id": "exp-vertical", "test_case": "paired_renderer_vertical_single_stroke",
+        "game_monitor_summary": {
+            "run_id": "run-vertical", "session_id": "session-vertical",
+            "autodraw_experiment_id": "exp-vertical",
+        },
+        "phases": {
+            "before_draw": {"screen_size": {"width": 1920, "height": 1080}},
+            "after_draw": {"screen_size": {"width": 1920, "height": 1080}},
+        },
+    }
+    monitor = {
+        "record_type": "autodraw_game_monitor_run",
+        "run_id": "run-vertical", "session_id": "session-vertical",
+        "autodraw_experiment_id": "exp-vertical",
+        "renderer_geometry_at_start": geometry, "renderer_geometry_at_end": geometry,
+        "renderer_geometry_updated_at_start_utc": "2026-11-05T16:24:11.865+00:00",
+        "renderer_geometry_updated_at_end_utc": "2026-11-05T16:24:11.865+00:00",
+        "renderer_geometry_updates": [], "renderer_geometry_update_overflow_count": 0,
+        "events": [],
+    }
+    return experiment, monitor
+
+
+def test_same_run_geometry_audit_input_builds_from_exact_monitor_snapshot():
+    from renderer_geometry import build_same_run_geometry_audit_input
+
+    experiment, monitor = _same_run_geometry_fixture()
+    audit = build_same_run_geometry_audit_input(experiment, monitor, (1920, 1080))
+    assert audit["source_run"] == {
+        "experiment_id": "exp-vertical", "run_id": "run-vertical", "session_id": "session-vertical",
+    }
+    assert audit["provenance"]["same_run"] is True
+    assert audit["screen"]["screenshot_pixel_mapping"]["verified"] is True
+    assert audit["renderer"]["stage"] == {"width": 1314, "height": 600}
+    assert audit["renderer"]["canvas"]["css_matrix"]["a"] == pytest.approx(0.487062)
+    assert audit["renderer"]["board_stage_corners"]["bottom_right"] == {"x": 800.7916660308838, "y": 312}
+
+
+def test_same_run_geometry_audit_rejects_wrong_run_or_session():
+    from renderer_geometry import build_same_run_geometry_audit_input
+
+    experiment, monitor = _same_run_geometry_fixture()
+    monitor["run_id"] = "other-run"
+    with pytest.raises(RendererGeometryError, match="run/session"):
+        build_same_run_geometry_audit_input(experiment, monitor, (1920, 1080))
+
+
+def test_same_run_geometry_audit_rejects_changed_geometry_and_updates():
+    from renderer_geometry import build_same_run_geometry_audit_input
+
+    experiment, monitor = _same_run_geometry_fixture()
+    monitor["renderer_geometry_at_end"] = dict(monitor["renderer_geometry_at_start"])
+    monitor["renderer_geometry_at_end"]["windowGeometry"] = {"screenWidth": 1280, "screenHeight": 720}
+    with pytest.raises(RendererGeometryError, match="changed"):
+        build_same_run_geometry_audit_input(experiment, monitor, (1920, 1080))
+
+    experiment, monitor = _same_run_geometry_fixture()
+    monitor["renderer_geometry_updates"] = [{"updated_at_utc": "later"}]
+    with pytest.raises(RendererGeometryError, match="updates occurred"):
+        build_same_run_geometry_audit_input(experiment, monitor, (1920, 1080))
+
+
+def test_same_run_geometry_audit_rejects_screen_size_mismatch():
+    from renderer_geometry import build_same_run_geometry_audit_input
+
+    experiment, monitor = _same_run_geometry_fixture()
+    with pytest.raises(RendererGeometryError, match="PNG dimensions"):
+        build_same_run_geometry_audit_input(experiment, monitor, (1600, 900))
+
+
+def test_same_run_screen_metrics_can_attest_pixel_mapping_without_os_scale_profile():
+    evidence_without_os_scale = evidence()
+    evidence_without_os_scale["screen"].pop("windows_scale_percent")
+    evidence_without_os_scale["screen"]["screenshot_pixel_mapping"] = {
+        "verified": True,
+        "method": "same_run_window_screen_metrics_equal_full_screen_png_dimensions",
+        "scale_x": 1.0, "scale_y": 1.0,
+        "screenshot_width_px": 1920, "screenshot_height_px": 1080,
+    }
+    result = derive_live_board_screen_transform(
+        report(), evidence_without_os_scale,
+        {"x": 496, "y": 265, "width": 674, "height": 355}, (1920, 1080),
+    )
+    assert result["board_to_screen"]["scale_x"] == pytest.approx(1.461214, abs=1e-5)

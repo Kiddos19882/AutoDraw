@@ -14,7 +14,7 @@ from typing import Any
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "source" / "preparation"))
-from renderer_geometry import (RendererGeometryError, detect_board_bounds_from_screenshots, derive_live_board_screen_transform)
+from renderer_geometry import (RendererGeometryError, build_same_run_geometry_audit_input, detect_board_bounds_from_screenshots, derive_live_board_screen_transform)
 from renderer_acceptance import (
     EXPECTED_PAIRED_AXIS_SOURCES,
     evaluate_per_run_acceptance,
@@ -103,9 +103,13 @@ def main() -> int:
     parser.add_argument("--plan", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--geometry-audit", type=Path, default=None)
+    parser.add_argument("--same-run-geometry", action="store_true",
+                        help="Build the geometry audit from this experiment and its exact Game Monitor run snapshot.")
     parser.add_argument("--rgb-threshold", type=float, default=24.0)
     parser.add_argument("--alpha-thresholds", type=int, nargs="+", default=[1, 24, 64, 128, 192, 254])
     args = parser.parse_args()
+    if args.geometry_audit is not None and args.same_run_geometry:
+        parser.error("--geometry-audit and --same-run-geometry are mutually exclusive.")
 
     experiment_path = args.experiment_dir / "experiment.json"
     live_path = args.experiment_dir / "after_draw-board.png"
@@ -265,12 +269,29 @@ def main() -> int:
 
     independent_summary = None
     formal_acceptance = None
-    if args.geometry_audit is not None:
-        if not args.geometry_audit.is_file():
-            raise FileNotFoundError(args.geometry_audit)
-        geometry_evidence = json.loads(args.geometry_audit.read_text(encoding="utf-8"))
+    if args.geometry_audit is not None or args.same_run_geometry:
         monitor_path = args.experiment_dir / "monitor_report.json"
         monitor_report = json.loads(monitor_path.read_text(encoding="utf-8"))
+        if args.same_run_geometry:
+            screen_before_source = args.experiment_dir / "before_clear-screen.png"
+            if not screen_before_source.is_file():
+                raise FileNotFoundError(screen_before_source)
+            with Image.open(screen_before_source) as screen_image:
+                same_run_screen_size = screen_image.size
+            geometry_evidence = build_same_run_geometry_audit_input(
+                experiment, monitor_report, same_run_screen_size,
+            )
+            geometry_audit_path = args.output_dir / "screen_geometry_audit.json"
+            args.output_dir.mkdir(parents=True, exist_ok=True)
+            geometry_audit_path.write_text(
+                json.dumps(geometry_evidence, ensure_ascii=False, indent=2) + "\\n",
+                encoding="utf-8",
+            )
+        else:
+            if not args.geometry_audit.is_file():
+                raise FileNotFoundError(args.geometry_audit)
+            geometry_audit_path = args.geometry_audit
+            geometry_evidence = json.loads(geometry_audit_path.read_text(encoding="utf-8"))
         source_run = geometry_evidence.get("source_run", {})
         if source_run.get("run_id") != run_id or source_run.get("session_id") != summary.get("session_id"):
             raise ValueError("Independent geometry evidence is not bound to this exact run/session.")
@@ -354,7 +375,7 @@ def main() -> int:
             "inputs": {
                 str(item): {"sha256": sha256(item), "size_bytes": item.stat().st_size}
                 for item in (experiment_path, live_path, args.blank, args.offline_png, args.manifest,
-                             args.plan, monitor_path, args.geometry_audit, screen_before_path, screen_after_path)
+                             args.plan, monitor_path, geometry_audit_path, screen_before_path, screen_after_path)
             },
             "transform": geometry,
             "board_bounds_audit": board_bounds_audit,
