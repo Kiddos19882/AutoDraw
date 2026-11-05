@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "record_type": "autodraw_board_screen_geometry_audit_input",
+  "provenance": {
+    "inspect_source": "User-provided AutoDrawGameMonitor.inspect() JSON in project conversation.",
+    "same_screen_as_live_capture": true,
+    "session_binding": "same screen/window attested by user; no inspect timestamp or run/session ID; not claimed same-run",
+    "original_inspect_json_archived": false,
+    "note": "Normalized subset only; not a replacement for the original inspect export."
+  },
+  "source_run": {
+    "experiment_id": "d47cc0a5520044c7abfd0352a4f93ca8",
+    "run_id": "16aec62c-9e54-44e7-8691-9df79b19161d",
+    "session_id": "d357b6ee-5617-4e07-9011-7eba7ccb6c0f"
+  },
+  "screen": {
+    "width": 1920,
+    "height": 1080,
+    "windows_scale_percent": 100,
+    "browser_zoom_percent": 100,
+    "browser": "Firefox",
+    "browser_version": "159",
+    "device_pixel_ratio": 1,
+    "visual_viewport_scale": 1
+  },
+  "board": {
+    "logical_width": 460,
+    "logical_height": 240
+  },
+  "renderer": {
+    "canvas_scale_x": 3,
+    "canvas_scale_y": 3,
+    "stage": {
+      "width": 1314,
+      "height": 600
+    },
+    "canvas": {
+      "backing_width": 3942,
+      "backing_height": 1800,
+      "rect": {
+        "left": 0,
+        "top": -0.5,
+        "right": 1920,
+        "bottom": 877.5,
+        "width": 1920,
+        "height": 878
+      },
+      "css_matrix": {
+        "a": 0.487062,
+        "b": 0,
+        "c": 0,
+        "d": 0.487778,
+        "tx": 0,
+        "ty": 0
+      },
+      "transform_origin": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    "board_stage_corners": {
+      "top_left": {
+        "x": 340.7916660308838,
+        "y": 72
+      },
+      "bottom_right": {
+        "x": 800.7916660308838,
+        "y": 312
+      }
+    }
+  }
+}
