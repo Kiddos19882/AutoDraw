@@ -1,3 +1,9 @@
+## 2026-11-05 — Monitor/Bridge geometry targeted tests pass
+
+- Game Monitor JavaScript suite: 21/21 passed, including safe client-corner fallback and window geometry.
+- Bridge/WebSocket Python suite: 22/22 passed, including geometry snapshots persisted to session/run records while preserving schema v2.
+- Full workflow `41964932479` remained in progress for preparation/G3 tests at this point.
+
 ## 2026-11-05 — Game Monitor 0.2.3 geometry telemetry
 
 - Added raw window geometry and a fail-closed axis-aligned client-corner fallback when `getBoxQuads()` is unavailable.
