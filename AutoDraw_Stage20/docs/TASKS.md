@@ -8,7 +8,7 @@
 
 | ID | Приоритет | Статус | Содержание |
 |---|---|---|---|
-| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | HORIZONTAL_PER_RUN_ACCEPTED_MULTI_AXIS_LIVE_PENDING_PROFILE_PENDING | Один horizontal capture прошёл formal per-run capture/transform/renderer gates; Bridge telemetry automation CI-verified; три vertical + три diagonal live captures, environment fingerprint, profile consumer and executor gate pending |
+| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | HORIZONTAL_PER_RUN_ACCEPTED_VERTICAL_DIAGONAL_EXPLORATORY_REPLAY_PENDING_PROFILE_PENDING | Один horizontal capture прошёл formal per-run gates; по одному vertical/diagonal live capture собраны и raw-validated, но independent-transform per-run acceptance pending; для multi-axis серии нужны три unique PASS_PER_RUN каждого направления; environment fingerprint, profile consumer and executor gate pending |
 | FILL-001-RS-MATRIX | P0 | BLOCKED | 45 captures только после принятого single-task preflight |
 | GAME-INPUT-SAMPLING-TRACE-001 | P1 | ROI_BOUNDS_ROOT_CAUSE_IDENTIFIED_MULTI_AXIS_CODE_READY_LIVE_CAPTURE_PENDING | Run 16aec62c; 138 accepted points, CHALK=138; ROI included margins; screenshot-derived bounds + Monitor fit IoU=0.998882 / 10 px without post-hoc shift; multi-axis/environment validation pending |
 | BRUSH-FOOTPRINT-CAPSULE-001 | P1 | OPEN | Offline capsule model готова; renderer acceptance/planner integration не выполнены |
@@ -26,6 +26,14 @@
 
 
 
+## 2026-11-05 — first vertical/diagonal live captures (e6b771e; exploratory)
+
+- [x] Один user live capture для vertical и один для diagonal добавлены в commit e6b771e; оба radius 10, один stroke.
+- [x] Exact CHALK: vertical 71 (pointCount 1→72), diagonal 161 (1→162); положительные DRAW_SAMPLE/POINT_QUOTA_UPDATE совпадают с CHALK, каждый pointDelta=1, acceptedPoint присутствует.
+- [x] Monitor/Bridge integrity: dropped events=0, Monitor error delta=0, Bridge failures=0, sequence gaps=0; geometry start/end совпадает, geometry updates=0.
+- [x] Same-run offset стабилен: screen-client X=0, Y=163 px. Vertical Y fit max residual 0.7232 px; diagonal X/Y 0.7301/0.7391 px.
+- [ ] Пересчитать обе offline пары через independent transform из same-run Monitor + screenshot-derived BoardPane bounds; текущие reports используют frozen ROI 674×355 и остаются exploratory.
+- [ ] Получить три уникальных PASS_PER_RUN по каждой ориентации. Текущие captures не засчитывать как PASS до formal replay; best-translation не использовать.
 ## 2026-11-05 — formal horizontal acceptance and automated paired Bridge telemetry
 
 - [x] Formal per-run gates прошли в CI [41992373137](https://github.com/Kiddos19882/AutoDraw/actions/runs/41992373137); все обязательные jobs SUCCESS, optional benchmarks SKIPPED.
@@ -33,7 +41,8 @@
 - [x] Добавлен агрегатор, требующий три уникальных `PASS_PER_RUN` vertical и три diagonal отчёта; multi-axis series остаётся PENDING.
 - [x] Bridge input telemetry opt-in, restore старого состояния и session/run provenance реализованы; добавлены Node, Python и UI regression tests.
 - [x] CI telemetry automation: run [41994624425](https://github.com/Kiddos19882/AutoDraw/actions/runs/41994624425) завершился SUCCESS. Browser lifecycle 4/4; Python Bridge/WebSocket/snippet/provenance suite 31 passed. Ранее выявленные ошибки тестов в runs 41994014564 и 41994258815 исправлены; история сохранена.
-- [ ] Три live captures на чистой доске для каждой новой ориентации vertical и diagonal с input telemetry и full-screen before/after screenshots.
+- [x] По одному user live capture для vertical и diagonal собраны; exact CHALK=71/161 и raw telemetry integrity подтверждены. Independent-transform replay ещё не выполнен.
+- [ ] Довести каждую ориентацию до трёх unique `PASS_PER_RUN` после независимого replay.
 - [ ] Environment fingerprint/stale invalidation, calibration profile consumer и executor gate остаются заблокированы до multi-axis live/environment acceptance.
 
 ## 2026-11-05 — screenshot-derived BoardPane bounds verification
@@ -1220,7 +1229,8 @@ CI evidence: workflow 41787492122, commit d337f4240e83488273152f65992032beca3957
 - [x] Brush Test UI exposes one-stroke vertical and diagonal paired-renderer scenarios; executor validates the shared radius/sampling/renderer contract.
 - [x] Full CI run [41976515362](https://github.com/Kiddos19882/AutoDraw/actions/runs/41976515362) SUCCESS, including Preparation/G3, Application integration, Game Monitor/Bridge, Egret renderer, INT-006 analysis and Windows portable build.
 - [x] Scenario-aware comparison audit validates expected axis sources for horizontal/vertical/diagonal cases; current horizontal baseline passed the updated audit.
-- [ ] Three valid live captures per orientation (vertical and diagonal) with input telemetry, full-screen before/after screenshots and same-screen inspect evidence.
+- [x] First user live capture for each orientation exists with exact pointCount/CHALK and intact raw event stream; neither is a formal per-run PASS yet.
+- [ ] Run independent-transform comparison using same-run screenshots and Monitor geometry, then collect enough clean-board repeats to obtain three unique `PASS_PER_RUN` reports per orientation.
 - [ ] Formal multi-axis series acceptance remains blocked until three unique per-run PASS captures exist for each vertical and diagonal orientation.
 - [ ] Environment fingerprint, stale invalidation, calibration profile consumer and executor gate remain blocked.
 - [x] Formal per-run acceptance code and series aggregator added; per-run reports distinguish PASS_PER_RUN / REJECTED_PER_RUN, while series status remains PENDING until the six required multi-axis live runs are accepted.
