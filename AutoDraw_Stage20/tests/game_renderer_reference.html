@@ -44,7 +44,7 @@
   </p>
   <section id="live-replay">
     <h2>Парный offline replay принятых точек игры</h2>
-    <p>Вставь JSON <code>game-monitor-run</code> с событиями <code>POINT_QUOTA_UPDATE</code>. Replay принимает ровно один strokeId и использует только принятые игрой board-local координаты; при <code>pointDelta &gt; 1</code> или отсутствующих acceptedPoint он откажет, чтобы не подменять пропущенные координаты догадками. Также можно вставить массив <code>[{"x":10,"y":20}]</code>.</p>
+    <p>Вставь полный <code>monitor_report.json</code> последнего Game Monitor run. Replay принимает ровно один strokeId и только принятые игрой board-local координаты; при <code>pointDelta &gt; 1</code>, отсутствующих acceptedPoint или отсутствии неизменного <code>renderer_geometry_at_start/end</code> он откажет. Параметры Stage, canvas backing, CSS transform, screen/viewport, DPR и scale автоматически берутся из этого же run — старый snapshot 2026-11-04 не используется. Массив координат и события без renderer geometry не подходят для paired replay.</p>
     <textarea id="live-points-json" placeholder="Вставь полный JSON Game Monitor run или массив координат"></textarea>
     <div class="live-controls">
       <label>Режим кисти<select id="live-path-mode"><option value="smooth">smooth (Painter.drawSmoothLine)</option><option value="normal">normal (Painter.drawNormalLine)</option></select></label>
