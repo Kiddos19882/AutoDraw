@@ -140,3 +140,16 @@ Scope: code, tests and CI only in feature/image-geometry-optimization; no real g
 - Exact CHALK remains from existing user captures only: vertical=71, diagonal=161. No new live run, no brush/trajectory/sampling/executor changes, no master changes.
 - Next step: stage-level WebGL compositor using same-run stage/backing evidence while keeping the screen transform independently derived; rerun existing captures and add tests.
 
+
+
+## 2026-11-06 — статический аудит Stage-level WebGL composition
+
+- Проверены branch refs, HEAD, последние 20 коммитов, обязательные управляющие документы и постоянные регламенты. Удалённая рабочая ветка: `feature/image-geometry-optimization`; HEAD перед записью: `f0cfa6268fd39cf91f3d4a9e7e2bf9509763ff48`; master не изменялась. Локальный git status недоступен через GitHub API.
+- Повторно изучены `tests/game_renderer_reference.js`, `tests/compare_live_renderer_reference.py` и `gameEngine/mergeEngine_df2e5bc5.js`.
+- Подтверждено: reference harness рендерит local 1380×720 WebGL buffer, а comparison script размещает raster в screen CSS space; Stage backing composition не моделируется.
+- Подтверждён source pipeline Egret WebGL: GraphicsNode → CanvasRenderBuffer/CanvasRenderer → WebGL texture → drawTexture; texture uses LINEAR min/mag, CLAMP_TO_EDGE и premultiplied alpha.
+- Зафиксированы run-bound параметры сохранённых captures: Stage 1314×600, backing 3942×1800, BoardPane local raster 1380×720, backing origin ≈(1022.375,216), canvasScaleX/Y=3.
+- Дробная X-фаза 0.375 px и sampling являются правдоподобными факторами, но причинность не доказана. Текущий harness gap подтверждён статическим аудитом.
+- Зафиксирован план A–D (WebGL/Canvas2D × exact/rounded origin), метрики и требования к unit/browser tests. Код, тесты и workflow в этой работе не менялись; live game runs не запускались; CHALK не измерялся повторно.
+- Предыдущий CI 42113632374 остаётся FAILURE из-за INT-006 vertical/diagonal renderer gates; его результаты не переинтерпретируются как результат нового probe.
+- Следующий шаг: реализовать offline Stage-level probe, получить PNG/manifests и сравнить exact WebGL variant с сохранёнными live captures без post-hoc alignment.

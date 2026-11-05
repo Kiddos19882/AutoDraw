@@ -1289,3 +1289,11 @@
 - Windows portable build/startup smoke-test стал manual opt-in: workflow_dispatch.run_windows_portable_build, default=false. Обычный push CI больше не запускает этот job.
 - CI 42113632374: horizontal PASS_PER_RUN; vertical/diagonal REJECTED_PER_RUN. Остальные обязательные code/test jobs SUCCESS; INT-006 общий workflow gate FAILURE. Stage-level WebGL composition остаётся следующим диагностическим этапом.
 - Production renderer, brush settings, trajectories, sampling и executor не изменялись.
+
+
+## 2026-11-06 — документирование Stage-level WebGL compositor audit
+
+- Зафиксирован пробел renderer comparison harness: local BoardPane WebGL raster и screen-space Canvas2D overlay не воспроизводят Stage backing composition.
+- Документирована source-level цепочка Egret WebGL texture rendering и подтверждённые параметры sampling/alpha.
+- Зафиксированы run-bound Stage/backing geometry и контролируемый A–D offline diagnostic plan.
+- Production code, tests, workflow, acceptance thresholds и live game state не менялись. Гипотеза о влиянии fractional backing origin остаётся открытой.

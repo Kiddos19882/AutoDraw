@@ -710,3 +710,8 @@ Current evidence does not justify changing scanline row spacing: diagnostic repo
 ## Единый реестр тестирования
 
 Результаты проверок и экспериментов: [TEST_RESULTS.md](TEST_RESULTS.md). Roadmap содержит последовательность работ и gates.
+
+
+## Следующий offline этап — Stage-level WebGL composition (2026-11-06)
+
+**P0 / ANALYSIS REQUIRED / NO LIVE RUN.** Статический аудит завершён. Следующая работа — Stage-size compositor probe на сохранённых Monitor reports/captures. Сначала реализовать и проверить A–D (WebGL/Canvas2D × fractional/rounded backing origin), затем сопоставить WebGL exact output с live vertical/diagonal PNG. Отдельно измерить вклад позиции и backend sampling; не смешивать screen transform с backing placement. Добавить unit и browser integration regression coverage. Не менять acceptance thresholds, production renderer/planner/sampling/brush/executor и не запускать live game runs. Переход к следующему решению возможен только после получения воспроизводимых PNG, manifests и численных сравнений. Текущая гипотеза о fractional phase=0.375 px остаётся неподтверждённой.

@@ -1,5 +1,39 @@
 # Актуальная точка продолжения — 2026-11-06
 
+## Дополнение — аудит Stage-level WebGL composition (2026-11-06)
+
+**Статус:** статический аудит завершён; controlled Stage-level probe ещё не реализован и не запускался.  
+**Проверенная точка:** branch `feature/image-geometry-optimization`, HEAD до этой документационной записи `f0cfa6268fd39cf91f3d4a9e7e2bf9509763ff48`; code/test HEAD `b07c636fa4b4ce28329cfb74f468634a46751ac1`. Master `9a3453aeb847b66041bc83d6f4a56ecaf33a993a` не изменялась.
+
+### Выполненная работа и подтверждённые факты
+
+- Повторно проверены текущие управляющие документы, постоянные регламенты, последние 20 коммитов, renderer harness и Egret engine bundle. GitHub API подтверждает удалённые refs и commits; локальный `git status` недоступен.
+- Подтверждён пробел текущего сравнения: `tests/game_renderer_reference.js` создаёт локальный WebGL RenderBuffer 1380×720 с масштабом 3× и рендерит BoardPane в начале буфера; `tests/compare_live_renderer_reference.py` размещает локальный raster непосредственно в screen CSS space. Ни один путь не воспроизводит полную композицию Stage backing canvas.
+- Статическая трассировка `gameEngine/mergeEngine_df2e5bc5.js` подтверждает цепочку WebGLRenderer → CanvasRenderBuffer/CanvasRenderer raster → WebGL texture → `drawTexture()`.
+- Для texture sampling подтверждены MIN_FILTER/MAG_FILTER=LINEAR, WRAP_S/WRAP_T=CLAMP_TO_EDGE и premultiplied alpha.
+- Run-bound geometry сохранённых captures: Stage 1314×600, backing canvas 3942×1800, локальный BoardPane raster 1380×720, backing origin около (1022.375, 216), fractional X phase 0.375 px; canvasScaleX/Y=3. Эти параметры относятся к сохранённым запускам и не являются универсальными настройками.
+- Предыдущий formal CI replay 42113632374 завершился FAILURE по INT-006 vertical/diagonal renderer gates; horizontal прошёл. Это отдельный результат replay, а не результат нового Stage-level эксперимента.
+
+### Вывод и границы доказательств
+
+Текущий harness не моделирует Stage-level texture composition. Влияние fractional backing origin, WebGL LINEAR sampling и последующего screen transform на vertical/diagonal mismatch остаётся **гипотезой**. Само наличие дробной координаты и LINEAR filtering не доказывает причинность.
+
+### Зафиксированный следующий offline эксперимент
+
+Сравнить четыре контролируемых варианта на одних и тех же run-bound данных:
+
+| Вариант | Backend | Позиция BoardPane в backing canvas |
+|---|---|---|
+| A | WebGL | точная дробная позиция из Monitor |
+| B | WebGL | округление до целого backing pixel |
+| C | Canvas2D | точная дробная позиция из Monitor |
+| D | Canvas2D | округление до целого backing pixel |
+
+Stage buffer должен соответствовать run-bound backing dimensions; размещение вычислять из фактических Stage/canvas scale и BoardPane geometry. Screen transform применять отдельно и независимо. Сохранять PNG и manifest с исходными координатами, размерами, scale, фильтрацией и alpha режимом. Сравнивать changed pixels, IoU, precision, recall, alpha differences и пространственное распределение; затем сопоставить вариант A с сохранёнными live vertical/diagonal PNG. Добавить unit test вычисления placement/rounding и browser integration test фактической Stage/WebGL composition.
+
+**Ограничения:** не менять production renderer/planner/sampling/brush/executor и acceptance thresholds; не применять post-hoc alignment; не запускать live game runs; Windows portable build остаётся opt-in/default=false. Синтетический или offline результат сам по себе не доказывает live equivalence.
+
+
 ## P0 — independent same-run multi-axis renderer comparison
 
 **Репозиторий:** Kiddos19882/AutoDraw  

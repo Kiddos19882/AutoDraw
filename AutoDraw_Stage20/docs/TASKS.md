@@ -1295,3 +1295,20 @@ CI evidence: workflow 41787492122, commit d337f4240e83488273152f65992032beca3957
 - Alpha thresholds 1/64/128 are sensitivity diagnostics, not primary gates.
 - Any failed criterion leaves the result exploratory; thresholds must not be changed after viewing the captures.
 
+
+
+## Stage-level WebGL compositor diagnostic — 2026-11-06
+
+**Статус:** AUDIT COMPLETE / IMPLEMENTATION PENDING / NO LIVE RUN.
+
+- [x] Проверить архитектуру текущего local BoardPane WebGL reference и screen-space comparison harness.
+- [x] Проследить Egret 5.4.1 WebGL texture pipeline в engine bundle; зафиксировать LINEAR min/mag, CLAMP_TO_EDGE и premultiplied alpha.
+- [x] Зафиксировать run-bound Stage/backing geometry и fractional origin для сохранённых vertical/diagonal captures.
+- [x] Установить, что текущий harness не воспроизводит Stage-level composition; отделить подтверждённые факты от гипотезы.
+- [ ] Реализовать варианты A–D: WebGL/Canvas2D × exact fractional/rounded backing position.
+- [ ] Добавить unit regression test для Stage placement и округления backing-pixel coordinates.
+- [ ] Добавить browser integration test реального Stage-size WebGL buffer и texture sampling.
+- [ ] Сохранить PNG/manifests и численные метрики для всех вариантов; сравнить WebGL exact вариант с сохранёнными live vertical/diagonal captures.
+- [ ] Только по результатам определить, объясняет ли Stage composition прежние renderer mismatches; thresholds не менять.
+
+**Критерии:** same-run geometry; отсутствие post-hoc alignment; неизменные rendering/brush/sampling parameters; отчёт по changed pixels, IoU, precision, recall, alpha и spatial distribution. Offline/synthetic match не приравнивать к live equivalence.
