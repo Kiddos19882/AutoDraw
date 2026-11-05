@@ -586,6 +586,62 @@ test("read-only renderer inspection captures Egret mode, canvas geometry and boa
   assert.equal(board.updateLess.name, "updateLess");
 });
 
+test("renderer inspection maps axis-aligned canvas rect and exposes window geometry when getBoxQuads is unavailable", () => {
+  const { monitor, window, document } = createMonitor();
+  const { board } = createBoard();
+  const stage = {
+    stageWidth: 1314, stageHeight: 600, frameRate: 60, $children: [board]
+  };
+  Object.assign(board, { width: 460, height: 240, x: 340.791666, y: 72 });
+  board.localToGlobal = (x, y) => ({ x: x + 340.791666, y: y + 72 });
+  board.$getConcatenatedMatrix = () => ({ a: 1, b: 0, c: 0, d: 1, tx: 340.791666, ty: 72 });
+  const canvas = {
+    width: 3942, height: 1800, clientWidth: 3942, clientHeight: 1800,
+    offsetLeft: 0, offsetTop: 0,
+    style: { left: "0px", top: "-0.5px", transform: "matrix(0.487062,0,0,0.487778,0,0)", transformOrigin: "0px 0px" },
+    getBoundingClientRect: () => ({ left: 0, top: -0.5, right: 1920, bottom: 877.5, width: 1920, height: 878 })
+  };
+  const playerElement = {
+    getBoundingClientRect: () => ({ left: 0, top: 0, right: 1920, bottom: 877, width: 1920, height: 877 }),
+    "egret-player": {
+      canvas, stage, container: null,
+      playerOption: { scaleMode: "fixedHeight", frameRate: 60, contentWidth: 740, contentHeight: 600, renderMode: "webgl" }
+    }
+  };
+  playerElement["egret-player"].container = playerElement;
+  document.querySelectorAll = selector => selector === ".egret-player" ? [playerElement] : [];
+  window.getComputedStyle = () => ({
+    transform: "matrix(0.487062,0,0,0.487778,0,0)",
+    transformOrigin: "0px 0px"
+  });
+  Object.assign(window, {
+    screenX: 0, screenY: 0, outerWidth: 1920, outerHeight: 1040,
+    innerWidth: 1920, innerHeight: 877, devicePixelRatio: 1,
+    screen: { width: 1920, height: 1080, availWidth: 1920, availHeight: 1040 },
+    visualViewport: { scale: 1 }
+  });
+  window.egret = {
+    MainContext: { instance: { stage } },
+    Capabilities: { engineVersion: "5.4.1", renderMode: "webgl", runtimeType: "web" },
+    sys: { DisplayList: { $canvasScaleFactor: 3, $canvasScaleX: 3, $canvasScaleY: 3 } }
+  };
+
+  monitor.stop();
+  const result = monitor.inspect();
+  const player = result.renderer.players[0];
+  assert.equal(player.canvas.screenQuad, null);
+  assert.equal(player.boardClientMappingMethod, "validated_axis_aligned_rect");
+  assert.ok(Math.abs(player.boardClientCorners.topLeft.x - 497.960011) < 0.01);
+  assert.ok(Math.abs(player.boardClientCorners.topLeft.y - 104.860048) < 0.01);
+  assert.ok(Math.abs(player.boardClientCorners.bottomRight.x - 1170.105571) < 0.01);
+  assert.ok(Math.abs(player.boardClientCorners.bottomRight.y - 456.060208) < 0.01);
+  assert.equal(result.renderer.windowGeometry.screenX, 0);
+  assert.equal(result.renderer.windowGeometry.screenY, 0);
+  assert.equal(result.renderer.windowGeometry.outerHeight, 1040);
+  assert.equal(result.renderer.windowGeometry.innerHeight, 877);
+  assert.equal(result.renderer.windowGeometry.screenHeight, 1080);
+});
+
 test("read-only renderer inspection degrades safely when Egret and canvas are unavailable", () => {
   const { monitor } = createMonitor();
   const result = monitor.rendererSnapshot();
