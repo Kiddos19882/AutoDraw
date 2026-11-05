@@ -1,3 +1,14 @@
+## 2026-11-05 — принят live capture paired renderer single-stroke
+
+- Пользовательский data commit: 02ebab89733559421edbb151e7931ed3fecf30c0; experiment d47cc0a5520044c7abfd0352a4f93ca8; run 16aec62c-9e54-44e7-8691-9df79b19161d; session d357b6ee-5617-4e07-9011-7eba7ccb6c0f.
+- Executor completed 1/1 stroke, 294 move calls, 9.766 s; фактические executor parameters совпали с frozen scenario.
+- Raw Monitor run содержит один положительный strokeId pointer-stroke-5, 138 POINT_QUOTA_UPDATE, все pointDelta=1, missing acceptedPoint=0. Координаты: X 18.2083→419.2083, Y=119; X монотонен.
+- Точный CHALK: pointCount 1→139 = 138. acceptedPoint count и сумма pointDelta совпадают с CHALK. 294 move calls не используются как расход.
+- Bridge session: input telemetry enabled; 0 dropped events, 0 errors, 0 send failures, 0 sequence gaps. Frame probe average 59.978 FPS.
+- Raw event checks удовлетворяют fail-closed extractor extractAcceptedPoints(); capture пригоден для offline replay. Aggregate trajectory.status=incomplete_until_verified и generic coalescing note расходятся с raw event histogram (138×delta1); зафиксирована summary metadata inconsistency, raw evidence не изменялась.
+- Board PNG 674×355 визуально показывает один горизонтальный штрих. Отдельный AutoDrawGameMonitor.inspect() snapshot отсутствует в commit; runtime renderer mode отдельно не подтверждён.
+- Offline BoardPane replay и количественное PNG comparison не выполнены. Повторный live run не требуется; FILL-001-RS остаётся BLOCKED.
+
 ## 2026-11-05 — UI сценарий paired renderer single-stroke
 
 - Во вкладку «Тест кистей» добавлен отдельный сценарий paired_renderer_single_stroke: один горизонтальный штрих logical (20,120) → (420,120) на 460×240.
