@@ -8,7 +8,7 @@
 
 | ID | Приоритет | Статус | Содержание |
 |---|---|---|---|
-| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | IN_PROGRESS | Exploratory live/offline comparison выполнен; остаточный offset (+1,+2) диагностирован post-hoc, независимая причина и acceptance не установлены |
+| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | ANALYSIS_PLAN_REFINED_PENDING_IMPLEMENTATION_APPROVAL | Уточнён временный план независимого screen ROI audit → coordinate contract → Monitor/Bridge handoff design → offline validation; renderer acceptance и причина offset открыты |
 | FILL-001-RS-MATRIX | P0 | BLOCKED | 45 captures только после принятого single-task preflight |
 | GAME-INPUT-SAMPLING-TRACE-001 | P1 | EXPLORATORY_COMPARE_DONE_TRANSFORM_ROOT_CAUSE_OPEN | Run 16aec62c принят; 138 accepted points, CHALK=138; unshifted IoU=0.76315, post-hoc (+1,+2) IoU=0.99888; acceptance не пройдена |
 | BRUSH-FOOTPRINT-CAPSULE-001 | P1 | OPEN | Offline capsule model готова; renderer acceptance/planner integration не выполнены |
@@ -20,6 +20,17 @@
 | DOC-STATUS-SYNC | P2 | DONE | 2026-11-04: синхронизированы управляющие документы, индекс, архитектура/CI map и исторические профильные планы/README; исторические результаты сохранены |
 | INT-003 | — | CLOSED_NOT_REQUIRED | По решению пользователя: отдельное исследование overhead Monitor не требуется |
 | CHALK-SAMPLING-DOMAIN | — | CLOSED_NOT_REQUIRED | По решению пользователя: расширение sampling-domain не требуется |
+
+## 2026-11-05 — уточнённый план FILL-001-RS-ENGINE-FOOTPRINT-001
+
+План и gates находятся в [ROADMAP.md](ROADMAP.md#уточнённый-временный-план--автоматическое-определение-геометрии-доски-и-handoff-калибровки).
+
+- Текущий статус: `PLAN_REFINED / ANALYSIS_ONLY`; реализация не утверждена.
+- Первый шаг — offline-проверка same-session full-screen/blank/after screenshots и независимое восстановление границ доски; при отсутствии достаточных исходников — BLOCKED, без геометрических догадок.
+- Текущий `inspect()` уже выдаёт stage corners и `boardClientCorners` только при доступном canvas screen quad; `boardClientCorners=null` не разрешает объявлять screen transform точным.
+- Текущий Bridge пересылает allowlisted events, status и heartbeat; отдельная передача renderer geometry/calibration profile в AutoDraw не подтверждена. Это предмет отдельного анализа и последующей реализации.
+- Код, тесты, настройки и workflow не менялись; live captures и игровые эксперименты не запускались.
+- FILL-001-RS single-task preflight и 45-cell matrix остаются заблокированы до renderer/footprint acceptance и отдельных разрешений.
 
 ## Дополнение 2026-11-05 — paired renderer single-stroke capture
 
