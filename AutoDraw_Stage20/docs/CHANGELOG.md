@@ -1,3 +1,8 @@
+## 2026-11-06 — уточнение Stage A/B: используется Egret WebGLRenderer
+
+- Варианты A/B переведены с независимого raw-WebGL textured quad на фактический Egret WebGLRenderer: тот же BoardPane, mask/scrollRect и run-sized Stage RenderBuffer с точной/округлённой backing translation.
+- В manifest добавлены draw-call, scene и backend diagnostics. Это делает A/B ближе к реальной Egret texture composition; pixel equivalence с live capture ещё не подтверждена.
+
 ## 2026-11-06 — Stage-level compositor A–D и повтор существующих captures
 
 - В offline renderer harness добавлен расчёт BoardPane placement в Stage backing canvas из точной run-bound geometry.
