@@ -1,0 +1,50 @@
+{
+  "status": "ANALYZED_EXPLORATORY_NO_ACCEPTANCE_THRESHOLD",
+  "changed_live_pixels": 10870,
+  "comparisons": {
+    "1": {
+      "iou": 0.8758579272477693,
+      "precision": 0.9391904323827047,
+      "recall": 0.9285129604365621,
+      "symmetric_difference_pixels": 1447
+    },
+    "24": {
+      "iou": 0.8730709207560257,
+      "precision": 0.9264029438822448,
+      "recall": 0.9381404881684368,
+      "symmetric_difference_pixels": 1464
+    },
+    "64": {
+      "iou": 0.8712134477324461,
+      "precision": 0.9154553817847286,
+      "recall": 0.9474435875464153,
+      "symmetric_difference_pixels": 1471
+    },
+    "128": {
+      "iou": 0.8661368653421634,
+      "precision": 0.9023919043238271,
+      "recall": 0.9556703039750585,
+      "symmetric_difference_pixels": 1516
+    },
+    "192": {
+      "iou": 0.8606060606060606,
+      "precision": 0.8883164673413063,
+      "recall": 0.9650209874075555,
+      "symmetric_difference_pixels": 1564
+    },
+    "254": {
+      "iou": 0.839103317364187,
+      "precision": 0.854001839926403,
+      "recall": 0.9796327564373153,
+      "symmetric_difference_pixels": 1780
+    }
+  },
+  "best_translation_diagnostic": {
+    "dx": 2,
+    "dy": 2,
+    "iou": 0.9370572940016139,
+    "symmetric_difference_pixels": 702
+  },
+  "report": "data\\results\\renderer_compare\\diagonal\\comparison-report.json",
+  "independent_transform_comparison": null
+}

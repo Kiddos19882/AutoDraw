@@ -1,0 +1,346 @@
+{
+  "status": "ANALYZED_EXPLORATORY_NO_ACCEPTANCE_THRESHOLD",
+  "experiment_id": "0e61bc40e5a8432fb87fa80b95889f4e",
+  "scenario_id": "paired_renderer_diagonal_single_stroke",
+  "run_id": "f69cb0f4-f5d0-4ff9-a3b7-1148c38fa07f",
+  "session_id": "fa8c4845-3158-4763-8d53-c1b9f5fae144",
+  "accepted_point_count": 161,
+  "exact_chalk": 161,
+  "renderer_fixture": {
+    "id": "live-accepted-points",
+    "mode": "smooth",
+    "line_width": 10,
+    "manifest_schema_version": 2
+  },
+  "inputs": {
+    "data\\results\\brush_behavior_tests\\experiment-20261105-192602-b10-paired_renderer_diagonal_single_stroke-0e61bc40\\experiment.json": {
+      "sha256": "0e5479437c8fbaf9fd446dfaca20feb07a8aefe6ec77e1c0f26920b62252e800",
+      "size_bytes": 14637
+    },
+    "data\\results\\brush_behavior_tests\\experiment-20261105-192602-b10-paired_renderer_diagonal_single_stroke-0e61bc40\\after_draw-board.png": {
+      "sha256": "da0f271e59d13afc403b290c59ef7934854caf9edb4956a8d31970b8f43202fa",
+      "size_bytes": 9987
+    },
+    "data\\results\\brush_behavior_tests\\experiment-20261105-192602-b10-paired_renderer_diagonal_single_stroke-0e61bc40\\before_clear-board.png": {
+      "sha256": "283fdd897a084c07eaf5438008a9924cf82231b4cd2624b21cc37015f3b15d2f",
+      "size_bytes": 1863
+    },
+    "data\\results\\renderer_compare\\diagonal\\live-accepted-points-width-10-webgl-board-reference.png": {
+      "sha256": "c1b5bb77305b4d0f070944c416fb205f5f9392f9009b88bce4eedd75381e10d6",
+      "size_bytes": 16802
+    },
+    "data\\results\\renderer_compare\\diagonal\\egret-5.4.1-renderer-reference-manifest.json": {
+      "sha256": "7629db2158fa0686baf36db396128a0a5b60e7385522b6d2834c5f57f91804ba",
+      "size_bytes": 44595
+    },
+    "data\\results\\brush_behavior_tests\\brush-plan-paired_renderer_diagonal_single_stroke-b10-20261105-192600-0e61bc40.json": {
+      "sha256": "fda028953d23feb1d35e01264f34a30f6dbe5f8613661a49cb665d93c4f1f36a",
+      "size_bytes": 2719
+    }
+  },
+  "dimensions": {
+    "live_roi": [
+      674,
+      355
+    ],
+    "offline_webgl": [
+      1380,
+      720
+    ],
+    "logical_board": [
+      460,
+      240
+    ]
+  },
+  "transform": {
+    "scale_x": 1.4630434782608697,
+    "scale_y": 1.475,
+    "source_raster_scale": 3,
+    "matrix_source_to_live": [
+      [
+        0.48768115043640137,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.49166667461395264,
+        0.0
+      ]
+    ],
+    "interpolation": "OpenCV INTER_LINEAR",
+    "origin_mapping": "logical board origin to live ROI origin; frozen plan scale_x/scale_y"
+  },
+  "thresholds": {
+    "observed_rgb_euclidean": 24.0,
+    "expected_alpha": [
+      1,
+      24,
+      64,
+      128,
+      192,
+      254
+    ]
+  },
+  "observed_live_delta": {
+    "changed_pixels": 10870,
+    "bbox_xywh": [
+      21,
+      22,
+      628,
+      333
+    ],
+    "centroid_xy": [
+      334.0017479300828,
+      176.4245630174793
+    ]
+  },
+  "comparisons": {
+    "1": {
+      "observed_pixels": 10870,
+      "expected_pixels": 10995,
+      "true_positive": 10209,
+      "false_positive": 661,
+      "false_negative": 786,
+      "true_negative": 227614,
+      "symmetric_difference_pixels": 1447,
+      "iou": 0.8758579272477693,
+      "precision": 0.9391904323827047,
+      "recall": 0.9285129604365621,
+      "f1": 0.9338211753944661,
+      "observed_bbox_xywh": [
+        21,
+        22,
+        628,
+        333
+      ],
+      "expected_bbox_xywh": [
+        19,
+        19,
+        630,
+        313
+      ],
+      "observed_centroid_xy": [
+        334.0017479300828,
+        176.4245630174793
+      ],
+      "expected_centroid_xy": [
+        333.2084583901773,
+        174.481127785357
+      ]
+    },
+    "24": {
+      "observed_pixels": 10870,
+      "expected_pixels": 10734,
+      "true_positive": 10070,
+      "false_positive": 800,
+      "false_negative": 664,
+      "true_negative": 227736,
+      "symmetric_difference_pixels": 1464,
+      "iou": 0.8730709207560257,
+      "precision": 0.9264029438822448,
+      "recall": 0.9381404881684368,
+      "f1": 0.9322347713386411,
+      "observed_bbox_xywh": [
+        21,
+        22,
+        628,
+        333
+      ],
+      "expected_bbox_xywh": [
+        19,
+        19,
+        629,
+        313
+      ],
+      "observed_centroid_xy": [
+        334.0017479300828,
+        176.4245630174793
+      ],
+      "expected_centroid_xy": [
+        333.5999627352338,
+        174.65893422768772
+      ]
+    },
+    "64": {
+      "observed_pixels": 10870,
+      "expected_pixels": 10503,
+      "true_positive": 9951,
+      "false_positive": 919,
+      "false_negative": 552,
+      "true_negative": 227848,
+      "symmetric_difference_pixels": 1471,
+      "iou": 0.8712134477324461,
+      "precision": 0.9154553817847286,
+      "recall": 0.9474435875464153,
+      "f1": 0.9311748467692884,
+      "observed_bbox_xywh": [
+        21,
+        22,
+        628,
+        333
+      ],
+      "expected_bbox_xywh": [
+        19,
+        19,
+        629,
+        313
+      ],
+      "observed_centroid_xy": [
+        334.0017479300828,
+        176.4245630174793
+      ],
+      "expected_centroid_xy": [
+        333.24259735313717,
+        174.49243073407598
+      ]
+    },
+    "128": {
+      "observed_pixels": 10870,
+      "expected_pixels": 10264,
+      "true_positive": 9809,
+      "false_positive": 1061,
+      "false_negative": 455,
+      "true_negative": 227945,
+      "symmetric_difference_pixels": 1516,
+      "iou": 0.8661368653421634,
+      "precision": 0.9023919043238271,
+      "recall": 0.9556703039750585,
+      "f1": 0.9282672470899972,
+      "observed_bbox_xywh": [
+        21,
+        22,
+        628,
+        333
+      ],
+      "expected_bbox_xywh": [
+        20,
+        19,
+        628,
+        312
+      ],
+      "observed_centroid_xy": [
+        334.0017479300828,
+        176.4245630174793
+      ],
+      "expected_centroid_xy": [
+        333.55017537022604,
+        174.62402572096647
+      ]
+    },
+    "192": {
+      "observed_pixels": 10870,
+      "expected_pixels": 10006,
+      "true_positive": 9656,
+      "false_positive": 1214,
+      "false_negative": 350,
+      "true_negative": 228050,
+      "symmetric_difference_pixels": 1564,
+      "iou": 0.8606060606060606,
+      "precision": 0.8883164673413063,
+      "recall": 0.9650209874075555,
+      "f1": 0.9250814332247556,
+      "observed_bbox_xywh": [
+        21,
+        22,
+        628,
+        333
+      ],
+      "expected_bbox_xywh": [
+        20,
+        20,
+        628,
+        311
+      ],
+      "observed_centroid_xy": [
+        334.0017479300828,
+        176.4245630174793
+      ],
+      "expected_centroid_xy": [
+        333.63831700979415,
+        174.6818908654807
+      ]
+    },
+    "254": {
+      "observed_pixels": 10870,
+      "expected_pixels": 9476,
+      "true_positive": 9283,
+      "false_positive": 1587,
+      "false_negative": 193,
+      "true_negative": 228207,
+      "symmetric_difference_pixels": 1780,
+      "iou": 0.839103317364187,
+      "precision": 0.854001839926403,
+      "recall": 0.9796327564373153,
+      "f1": 0.9125135161702546,
+      "observed_bbox_xywh": [
+        21,
+        22,
+        628,
+        333
+      ],
+      "expected_bbox_xywh": [
+        20,
+        20,
+        628,
+        311
+      ],
+      "observed_centroid_xy": [
+        334.0017479300828,
+        176.4245630174793
+      ],
+      "expected_centroid_xy": [
+        333.60574081891093,
+        174.65555086534403
+      ]
+    }
+  },
+  "best_translation_diagnostic": {
+    "search_radius_px": 5,
+    "expected_mask_translation_to_align_live": {
+      "x": 2,
+      "y": 2
+    },
+    "metrics_at_alpha_threshold_24": {
+      "observed_pixels": 10870,
+      "expected_pixels": 10734,
+      "true_positive": 10451,
+      "false_positive": 419,
+      "false_negative": 283,
+      "true_negative": 228117,
+      "symmetric_difference_pixels": 702,
+      "iou": 0.9370572940016139,
+      "precision": 0.9614535418583257,
+      "recall": 0.9736351779392585,
+      "f1": 0.9675060174041844,
+      "observed_bbox_xywh": [
+        21,
+        22,
+        628,
+        333
+      ],
+      "expected_bbox_xywh": [
+        21,
+        21,
+        629,
+        313
+      ],
+      "observed_centroid_xy": [
+        334.0017479300828,
+        176.4245630174793
+      ],
+      "expected_centroid_xy": [
+        335.5999627352338,
+        176.65893422768772
+      ]
+    },
+    "interpretation": "post-hoc alignment diagnostic only; does not replace the frozen transform or constitute acceptance"
+  },
+  "limitations": [
+    "This is an exploratory raster comparison; no acceptance threshold is applied.",
+    "Live image is differenced against the user-confirmed blank-board baseline.",
+    "The offline WebGL alpha is resampled into the live ROI using the frozen plan transform.",
+    "Any mismatch may include screen resampling, antialiasing, baseline drift, color management, or renderer differences.",
+    "The manifest runtimeProfile references the 2026-11-04 renderer snapshot, not a same-run inspect() snapshot."
+  ]
+}
