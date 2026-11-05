@@ -145,8 +145,7 @@ html,body {{ margin:0;padding:0;width:{width}px;height:{height}px;overflow:hidde
 img {{ position:absolute;display:block;margin:0;padding:0;border:0;max-width:none;max-height:none; }}
 #baseline {{ left:0;top:0;width:{width}px;height:{height}px; }}
 #offline-source {{ display:none; }}
-#board-overlay {{ position:absolute;display:block;width:1380px;height:720px;'
-  'transform-origin:0 0;image-rendering:auto; }}
+#board-overlay {{ position:absolute;display:block;width:1380px;height:720px;transform-origin:0 0;image-rendering:auto; }}
 </style></head><body>
 <img id="baseline" alt="" src="{baseline_uri}">
 {overlay_image}
@@ -191,13 +190,13 @@ def render_browser_css_composite(
     """
     width, height = screen_size
     firefox = _find_firefox_executable()
-    expected_match = re.search(r"Firefox/([0-9]+(?:\\.[0-9]+)*)", expected_user_agent or "")
+    expected_match = re.search(r"Firefox/([0-9.]+)", expected_user_agent or "")
     if not expected_match:
         raise RuntimeError("Same-run renderer manifest does not identify Firefox; refusing cross-browser compositing.")
     expected_version = expected_match.group(1)
     version_result = subprocess.run([str(firefox), "--version"], capture_output=True, text=True, timeout=20, check=False)
     version_text = (version_result.stdout + " " + version_result.stderr).strip()
-    actual_match = re.search(r"Firefox\\s+([0-9]+(?:\\.[0-9]+)*)", version_text)
+    actual_match = re.search(r"Firefox[ /]([0-9.]+)", version_text)
     if version_result.returncode != 0 or not actual_match:
         raise RuntimeError(f"Unable to determine Firefox version: {version_text}")
     actual_version = actual_match.group(1)
