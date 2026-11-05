@@ -65,14 +65,14 @@
 - Хранить composed affine matrix, четыре угла, units, provenance, sample count/residuals, clipping и environment fingerprint.
 - Статусы: `valid`, `approximate`, `stale`, `unavailable`. Только `valid` допускает автоматический handoff; остальные блокируют его и оставляют manual fallback.
 
-#### Этап 3. Monitor geometry snapshot — IMPLEMENTED / TESTING
+#### Этап 3. Monitor geometry snapshot — IMPLEMENTED / CI SUCCESS
 - `game_monitor.js` уже предоставляет `rendererSnapshot()`/`inspect()` с stage corners, canvas rect/CSS transform, backing scale, DPR, viewport и display chain. `boardClientCorners` сейчас заполняется только при наличии `getBoxQuads()`.
 - `MOUSE_MOVE_SAMPLE` содержит screen/client/stage/board coordinates, но collector записывает его только при активном stroke и включённой input telemetry. Для initial calibration нужен no-draw sampling mode или подтверждённая window geometry.
 - `inspect().renderer` расширен raw `windowGeometry` и `boardClientMappingMethod`; `boardClientCorners` использует `getBoxQuads` или fail-closed axis-aligned rect fallback. Raw browser window metrics не выдаются за screen transform.
 - Unit tests покрывают fallback mapping и window geometry; полноценная validation на runtime/CI для этой версии ожидается.
 - Не менять O(1) resource telemetry и не добавлять полный обход `atom.points` в hot path; geometry collection остаётся read-only.
 
-#### Этап 4. Monitor → Bridge geometry persistence — IMPLEMENTED; AutoDraw consumer PENDING
+#### Этап 4. Monitor → Bridge geometry persistence — IMPLEMENTED / CI SUCCESS; AutoDraw consumer PENDING
 - `game_monitor_bridge.js` передаёт `rendererGeometry` в `session_start` и отправляет `renderer_geometry` updates при resize/scroll/orientation/fullscreen/visualViewport changes.
 - Bridge server сохраняет latest `renderer_geometry` в `session.json` schema v2 optional fields и snapshots at run start/update/end в run JSON schema v1; update history ограничена 32 snapshots/run. AutoDraw пока не читает geometry и не обновляет profile.
 - `brush_calibration.py` schema v1 хранит screen points/regions/environment; `_ensure_screen_compatibility()` сравнивает только screen resolution, а `get_experiment_capture_config()` отдаёт screen size без полного environment fingerprint.
@@ -86,7 +86,7 @@
 - `screen_geometry_audit.json` связывает inspect subset с исходным run/session; inspect provenance помечена как same-screen user attestation, не same-run inspect.
 - Новый comparison не применяет post-hoc translation. При alpha24: IoU=0.9989941886, precision=0.9992175274, recall=0.9997763114, symmetric difference=9 px; bbox live/expected совпадает `(21,170,599,15)`. Старый frozen transform: IoU=0.7631527094, symmetric difference=2404 px. Alpha threshold sensitivity: alpha1 IoU=0.998883, alpha64 IoU=0.998547, alpha128 IoU=0.997653. Report artifact `autodraw-paired-renderer-png-comparison` ID 13386122895, workflow run 41963498086. Это exploratory; acceptance threshold не задан, Y scale inspect-derived, inspect не same-run.
 
-#### Этап 6. Tests и CI — IN PROGRESS
+#### Этап 6. Tests и CI — SUCCESS
 - Unit tests для valid transform, unstable client→screen offset и unsupported CSS skew добавлены в `source/preparation/tests/test_renderer_geometry.py`.
 - Workflow `geometry-tests.yml` запускает независимое сравнение после подготовки артефактов; CI run `41963498086` для commit `1b16b51e42ba0c61a0fbc547179ca5a9b3864b54` завершился SUCCESS: обязательные jobs включая Windows portable build/startup smoke-test и INT-006 PNG audit — SUCCESS; optional algorithm benchmarks — SKIPPED.
 - После завершения CI проверить новые метрики, report JSON и диагностические PNG; отдельно зафиксировать обязательные jobs и skipped optional jobs.
@@ -115,8 +115,8 @@
 | 0. Baseline | DONE |
 | 1. Independent ROI audit | DONE WITH VERTICAL-SCALE CAVEAT |
 | 2. Coordinate-space contract | IN PROGRESS |
-| 3. Monitor geometry snapshot | IMPLEMENTED / CI PENDING |
-| 4. Monitor → Bridge persistence | IMPLEMENTED; AutoDraw consumer PENDING |
+| 3. Monitor geometry snapshot | IMPLEMENTED / CI SUCCESS |
+| 4. Monitor → Bridge persistence | IMPLEMENTED / CI SUCCESS; AutoDraw consumer PENDING |
 | 5. Independent offline renderer compare | DONE EXPLORATORY / ACCEPTANCE OPEN |
 | 6. Tests/CI | SUCCESS; OPTIONAL BENCHMARKS SKIPPED |
 | 7. Confirmatory live capture | BLOCKED BY USER-SCREEN ACCESS |
