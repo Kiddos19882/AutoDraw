@@ -8,7 +8,7 @@
 
 | ID | Приоритет | Статус | Содержание |
 |---|---|---|---|
-| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | INDEPENDENT_COMPARE_DONE_EXPLORATORY | Независимый transform дал IoU=0.998994 / 9 различающихся px при alpha 24; renderer acceptance остаётся exploratory из-за inspect provenance и отсутствия vertical live fit |
+| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | INDEPENDENT_COMPARE_DONE_EXPLORATORY | Независимый transform дал IoU=0.998994 / 9 различающихся px при alpha 24; CI run 41963498086 SUCCESS (обязательные jobs), renderer acceptance остаётся exploratory из-за inspect provenance и отсутствия vertical live fit |
 | FILL-001-RS-MATRIX | P0 | BLOCKED | 45 captures только после принятого single-task preflight |
 | GAME-INPUT-SAMPLING-TRACE-001 | P1 | EXPLORATORY_COMPARE_DONE_TRANSFORM_ROOT_CAUSE_OPEN | Run 16aec62c принят; 138 accepted points, CHALK=138; unshifted IoU=0.76315, post-hoc (+1,+2) IoU=0.99888; acceptance не пройдена |
 | BRUSH-FOOTPRINT-CAPSULE-001 | P1 | OPEN | Offline capsule model готова; renderer acceptance/planner integration не выполнены |
