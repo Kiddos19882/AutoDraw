@@ -629,7 +629,7 @@
 
   function parseCssMatrix(value) {
     if (!value || value === "none") return { a: 1, b: 0, c: 0, d: 1 };
-    const match = /^matrix\\(([^)]+)\\)$/.exec(String(value).trim());
+    const match = /^matrix\(([^)]+)\)$/.exec(String(value).trim());
     if (!match) return null;
     const values = match[1].split(",").map(item => Number(item.trim()));
     if (values.length !== 6 || values.some(item => !Number.isFinite(item))) return null;
