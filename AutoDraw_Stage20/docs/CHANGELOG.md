@@ -1,3 +1,9 @@
+## 2026-11-05 — Game Monitor 0.2.3 geometry telemetry
+
+- Added raw window geometry and a fail-closed axis-aligned client-corner fallback when `getBoxQuads()` is unavailable.
+- Browser Bridge now transmits renderer geometry at session start and on viewport/window changes; server persists session and run-bound snapshots using existing schema versions for compatibility.
+- Added unit and websocket integration tests; CI pending.
+
 ## 2026-11-05 — full CI validation passed
 
 - CI workflow `41963498086` completed SUCCESS for code/test/workflow commit `1b16b51e42ba0c61a0fbc547179ca5a9b3864b54`.
