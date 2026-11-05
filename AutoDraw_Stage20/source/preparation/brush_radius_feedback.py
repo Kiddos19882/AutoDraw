@@ -89,6 +89,81 @@ def read_active_bridge_radius(
             continue
     return max(candidates, key=lambda item: item[0])[1] if candidates else None
 
+
+def read_active_bridge_geometry(
+    bridge_root: Any,
+    *,
+    max_age_seconds: float = 4.0,
+) -> dict[str, Any] | None:
+    """Read the latest geometry snapshot from a fresh, connected Bridge session.
+
+    Returned board corners remain CSS client coordinates. This helper deliberately
+    never marks them as usable primary-screen/executor coordinates.
+    """
+    import json
+    from datetime import datetime, timezone
+    from pathlib import Path
+
+    def parse_stamp(value: object) -> datetime | None:
+        if not isinstance(value, str) or not value.strip():
+            return None
+        try:
+            stamp = datetime.fromisoformat(value.strip().replace("Z", "+00:00"))
+        except ValueError:
+            return None
+        if stamp.tzinfo is None:
+            stamp = stamp.replace(tzinfo=timezone.utc)
+        return stamp.astimezone(timezone.utc)
+
+    root = Path(bridge_root)
+    if not root.is_dir():
+        return None
+    now = datetime.now(timezone.utc)
+    candidates: list[tuple[datetime, dict[str, Any]]] = []
+    for session_path in root.glob("*/session.json"):
+        try:
+            record = json.loads(session_path.read_text(encoding="utf-8"))
+            diagnostics = record.get("bridge_diagnostics", {})
+            if not isinstance(diagnostics, dict) or diagnostics.get("connection_closed") is not False:
+                continue
+            stamp_text = diagnostics.get("last_message_at_utc")
+            stamp = parse_stamp(stamp_text)
+            if stamp is None or (now - stamp).total_seconds() > max_age_seconds:
+                continue
+            geometry = record.get("renderer_geometry")
+            if not isinstance(geometry, dict):
+                continue
+            players = geometry.get("players")
+            players = players if isinstance(players, list) else []
+            board_players = [
+                item for item in players
+                if isinstance(item, dict) and isinstance(item.get("boardStageCorners"), dict)
+            ]
+            board_detected = len(board_players) == 1
+            player = board_players[0] if board_detected else None
+            client_corners = player.get("boardClientCorners") if player else None
+            mapping_method = player.get("boardClientMappingMethod", "unavailable") if player else "ambiguous_or_unavailable"
+            candidates.append((stamp, {
+                "session_id": record.get("session_id"),
+                "observed_at_utc": stamp_text,
+                "geometry_updated_at_utc": record.get("renderer_geometry_updated_at_utc"),
+                "board_detected": bool(board_players),
+                "board_ambiguous": len(board_players) > 1,
+                "board_client_mapping_method": mapping_method,
+                "board_stage_corners": player.get("boardStageCorners") if player else None,
+                "board_client_corners": client_corners,
+                "window_geometry": geometry.get("windowGeometry"),
+                "coordinate_space": "css_client_pixels",
+                "desktop_screen_mapping_available": False,
+                "executor_usable": False,
+                "renderer_geometry": geometry,
+            }))
+        except (OSError, ValueError, TypeError, AttributeError):
+            continue
+    return max(candidates, key=lambda item: item[0])[1] if candidates else None
+
+
+
 def calculate_radius_correction_target(
     high_point: tuple[int, int] | list[int],
     high_radius: int,
