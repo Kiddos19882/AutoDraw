@@ -473,7 +473,7 @@ Workflow включает:
 
 ## 2026-11-05 — independent live/offline renderer transform comparison
 
-**Workflow:** [41963498086](https://github.com/Kiddos19882/AutoDraw/actions/runs/41963498086), commit `1b16b51e42ba0c61a0fbc547179ca5a9b3864b54`. Job `INT-006 pixel-level PNG geometry audit` completed SUCCESS; preparation/G3, Game Monitor/Bridge, Executor regression, Application integration and Egret browser reference jobs completed SUCCESS. Windows portable build/startup smoke-test was still running at last check. Optional algorithm benchmarks SKIPPED.
+**Workflow:** [41963498086](https://github.com/Kiddos19882/AutoDraw/actions/runs/41963498086), commit `1b16b51e42ba0c61a0fbc547179ca5a9b3864b54`. Job `INT-006 pixel-level PNG geometry audit` completed SUCCESS; preparation/G3, Game Monitor/Bridge, Executor regression, Application integration and Egret browser reference jobs completed SUCCESS. Windows portable build/startup smoke-test also completed SUCCESS. Optional algorithm benchmarks SKIPPED.
 
 **Independent transform:** same-run Monitor X fit + user inspect CSS Y transform; no post-hoc registration. Origin `(497.954055,267.860048)`, scale `(1.461204822,1.463334)`, source-raster→ROI matrix `[[0.487068274,0,1.954055],[0,0.487778,2.860048]]`.
 
@@ -489,3 +489,6 @@ At alpha 24, live and expected bbox both `(21,170,599,15)`. Old frozen transform
 **Limitations:** vertical scale is inspect-derived because the live stroke is horizontal-only; inspect snapshot is user-attested same-screen but has no run/session timestamp; alpha thresholds 192/254 are more sensitive to antialiasing and lower IoU. No acceptance threshold has been declared. Status remains `ANALYZED_EXPLORATORY_NO_ACCEPTANCE_THRESHOLD`.
 
 Artifact: `autodraw-paired-renderer-png-comparison`, ID `13386122895`.
+
+
+**Final CI status:** workflow `41963498086` — `SUCCESS`. Required jobs: Egret browser reference, Preparation/G3, Game Monitor/Bridge, Executor regression, Application integration, Windows portable build/startup smoke-test, INT-006 PNG geometry audit — all SUCCESS. Optional algorithm benchmarks — SKIPPED. The workflow validates code/test/workflow commit `1b16b51e42ba0c61a0fbc547179ca5a9b3864b54`; subsequent branch commits in this audit sequence are documentation-only.
