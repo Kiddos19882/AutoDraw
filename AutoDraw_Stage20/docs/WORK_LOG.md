@@ -77,3 +77,10 @@ Scope: code, tests and CI only in feature/image-geometry-optimization; no real g
 - Follow-up review found that OpenCV diagnostic alpha masks and the overlay image also needed to use the exact BoardPane crop after the formal observed/expected masks were narrowed. Without this, diagnostic arrays would have mismatched dimensions.
 - Cropped OpenCV alpha diagnostics to the same BoardPane bounds and sized the overlay from the board-only observed mask.
 - Commit: `e73506db2a2cfd55bbb0ea4c4a1616648b7f0065`; CI run `42091800785` pending.
+
+
+## 2026-11-05 — correction to negative BoardPane bounds test fixture
+
+- CI 42091800785 ran 887 tests successfully and found one failing assertion in the newly added negative-bounds test. The test fixture used x=497 while ROI started at x=496, so the board bounds were correctly considered contained; the test expectation was wrong.
+- Corrected the fixture to x=495, genuinely outside the ROI. Production crop implementation was not changed.
+- Commit: `cfdc49e86809a7b62c0271f0574473a48403e20b`; CI run `42092259450` queued.
