@@ -46,7 +46,36 @@
 - Изучены README, docs index, управляющие документы, постоянные регламенты, Game Monitor/Bridge reference, Game Monitor source/tests и профильные UI/profile docs.
 - Старый run, PNG comparison и raw evidence остаются неизменными; новая серия не создаётся до появления нового экспериментального вопроса и протокола.
 
-#### Этап 1. Независимо восстановить screen ROI из существующих артефактов — NEXT, OFFLINE ONLY
+#### Этап 1. Независимо восстановить screen ROI из существующих артефактов — DONE WITH VERTICAL-SCALE CAVEAT
+
+- Same-run artifacts: experiment manifest, Monitor report, before_clear-screen.png и after_draw-screen.png (1920×1080), board crops 674×355.
+- 272 MOUSE_MOVE_SAMPLE: во всех screenX-clientX=0, screenY-clientY=163, boardY=119, stageY=191.
+- Горизонтальная регрессия screenX = origin + scaleX × boardX: originX=497.9520408757, scaleX=1.4612139903, RMSE≈0.424 screen px, max residual≈0.729 px.
+- User inspect snapshot (тот же экран по подтверждению пользователя, но без run/session timestamp): Stage 1314×600; BoardPane stage TL (340.791666,72), BR (800.791666,312); backing scale 3×; CSS matrix (0.487062,0,0,0.487778,0,0); canvas rect (0,-0.5,1920,878); DPR=1. Stage→client scales X=1.461186, Y=1.463334.
+- После same-run client→screen offset BoardPane screen corners TL≈(497.960011,267.860048), BR≈(1170.105571,619.060208). X fit and inspect origin differ by <0.01 px.
+- Vertical scale не fitted: live trajectory горизонтальная, Y constant. Y=1.463334 взят из inspect и reproduces sample (screenY=442, boardY=119) с residual около 0.004 px.
+- ROI (496,265,674,355) больше footprint примерно 672.146×351.200 px; origin доски смещён относительно ROI на (1.960,2.860) px. ROI содержит padding слева/сверху.
+- Existing ROI transform scales=(1.4630434783,1.475), relative discrepancy 0.8106%; текущий tolerance 1% принимает ROI и не проверяет origin. Это подтверждённая слабость ROI-only validation.
+- Monitor accepted 138 points; first (18.2083,119), last (419.2083,119), при запрошенных (20,120)→(420,120). Это согласуется с coordinate mismatch, но причинность residual требует нового offline comparison.
+- Derived audit input сохранён как screen_geometry_audit.json; исходный inspect JSON не архивирован и не заменяется этим subset.
+
+#### Этап 2. Зафиксировать coordinate-space contract — IN PROGRESS
+
+- Разделить board_local, egret_stage, canvas_backing_pixels, css_client_pixels, desktop_screen_pixels, screenshot_pixels.
+- Board-local→Stage: BoardPane concatenated matrix/four corners. Stage→client: getBoxQuads() либо безопасный positive axis-aligned fallback при согласованных CSS matrix/origin/canvas rect/backing scale; rotate/skew/perspective и неизвестный origin → unavailable.
+- Client→desktop-screen: стабильные screenX-clientX / screenY-clientY offsets по нескольким same-run samples. Window geometry (screenX/Y, outerWidth/Height, innerWidth/Height) сохранять как estimated, пока не cross-checked.
+- Desktop-screen→screenshot identity разрешать только при совпадении capture resolution, DPR и Windows scale; не умножать на DPR автоматически.
+- Хранить composed affine matrix, corners, provenance, sample residuals и environment fingerprint. approximate, stale, unavailable блокируют автоматический handoff.
+- Для общего acceptance нужна вертикальная/non-collinear evidence или проверенный axis-aligned canvas contract.
+
+#### Этап 3. Специфицировать Monitor → Bridge → AutoDraw geometry handoff — DESIGN
+
+- inspect() уже выдаёт stage corners/canvas CSS metadata; boardClientCorners только при getBoxQuads().
+- MOUSE_MOVE_SAMPLE уже содержит screen/client/stage/board coordinates, но текущий collector пишет его только при активном stroke; для initial calibration нужен no-draw sampling mode либо подтверждённый window geometry.
+- Bridge session_start сейчас не передаёт renderer geometry; server пишет session/run JSON; AutoDraw получает radius heartbeat и вручную прикрепляет Monitor report.
+- Profile v1 хранит точки/regions/environment, но compatibility проверяет только resolution; capture config отдаёт только screen size.
+- Требуется versioned payload, session binding, affine matrix, validity/confidence, fingerprint/invalidation и manual fallback.
+
 - Проверить наличие и целостность `after_draw-screen.png`, before/blank full-screen reference, `after_draw-board.png`, inspect JSON, run JSON и Bridge session JSON; подтвердить, что относящиеся к сравнению материалы сняты в одной сессии и при неизменном разрешении/масштабе.
 - Независимо определить четыре видимые границы доски по full-screen изображению и отдельно определить crop origin. Сохранить метод, координаты, размеры, исходные изображения и hashes.
 - Сопоставить полученные границы с ROI `(496,265,674,355)` и ранее вычисленной оценкой по runtime snapshot. Не переносить координаты из другой сессии и не считать оценку `(≈498,≈105,≈672,≈351)` подтверждённой геометрией.
@@ -120,13 +149,13 @@
 | Этап | Статус |
 |---|---|
 | 0. Baseline и аудит реализации | DONE |
-| 1. Независимое восстановление ROI | NEXT / OFFLINE ONLY |
-| 2. Coordinate-space contract | PENDING |
-| 3. Спецификация Monitor geometry | PENDING |
-| 4. Monitor → Bridge → AutoDraw | DESIGN PENDING / CODE NOT APPROVED |
-| 5. Offline mapping/renderer validation | PENDING |
-| 6. Tests/CI | BLOCKED BY IMPLEMENTATION APPROVAL |
-| 7. Confirmatory live capture | BLOCKED BY SEPARATE LIVE APPROVAL |
+| 1. Независимое восстановление ROI | DONE WITH VERTICAL-SCALE CAVEAT |
+| 2. Coordinate-space contract | IN PROGRESS |
+| 3. Спецификация Monitor geometry | DESIGN IN PROGRESS |
+| 4. Monitor → Bridge → AutoDraw | DESIGN PENDING |
+| 5. Offline mapping/renderer validation | NEXT / CI RUNNING |
+| 6. Tests/CI | OFFLINE AUDIT TOOLING ADDED |
+| 7. Confirmatory live capture | BLOCKED BY USER-SCREEN ACCESS |
 | 8. FILL-001-RS preflight/matrix | BLOCKED |
 
 **Последовательность:** (1) независимо определить board crop edges из same-session full-screen PNG; (2) зафиксировать coordinate-space contract; (3) специфицировать Monitor geometry и handoff; (4) после отдельного разрешения реализовать интеграцию и тесты; (5) выполнить offline validation без post-hoc registration; (6) получить отдельное разрешение на confirmatory live capture; (7) только после принятия renderer gate рассматривать single-task FILL-001-RS preflight. Production defaults и frozen plans не менять.
