@@ -137,10 +137,89 @@
   const casesNode = document.getElementById("renderer-cases");
   const manifestNode = document.getElementById("renderer-manifest");
 
-  function fixtureList() {
+  function getLiveRunInput() {
     const liveInput = document.getElementById("live-points-json");
-    if (liveInput && liveInput.value.trim()) {
-      const parsed = JSON.parse(liveInput.value);
+    return liveInput && liveInput.value.trim() ? JSON.parse(liveInput.value) : null;
+  }
+
+  function buildRuntimeProfileFromRun(run) {
+    if (!run || Array.isArray(run) || typeof run !== "object") {
+      throw new Error("Для парного offline replay нужен полный monitor_report.json, а не массив координат.");
+    }
+    const start = run.renderer_geometry_at_start;
+    const end = run.renderer_geometry_at_end;
+    if (!start || !end || JSON.stringify(start) !== JSON.stringify(end)) {
+      throw new Error("В Game Monitor run отсутствует неизменный renderer_geometry_at_start/end. Используй полный monitor_report.json последнего теста.");
+    }
+    if (run.record_type !== "autodraw_game_monitor_run" ||
+        !run.run_id || !run.session_id || !run.autodraw_experiment_id) {
+      throw new Error("Renderer profile не связан с полным Game Monitor run/session/experiment.");
+    }
+    if (start.inspectionMode !== "read_only" || start.engineVersion !== "5.4.1" ||
+        start.renderMode !== "webgl" || start.boardDetected !== true) {
+      throw new Error("Live renderer profile не соответствует Egret 5.4.1 WebGL с обнаруженной доской.");
+    }
+    if (start.playerCount !== 1 || !Array.isArray(start.players) || start.players.length !== 1 ||
+        start.players[0].playerFound !== true || start.players[0].playerMatchesStage !== true) {
+      throw new Error("Для offline replay требуется ровно один проверенный Egret player.");
+    }
+    if (start.canvasScaleFactor !== RUNTIME_CANVAS_SCALE_FACTOR ||
+        start.canvasScaleX !== RASTER_SCALE || start.canvasScaleY !== RASTER_SCALE ||
+        start.devicePixelRatio !== 1 || start.visualViewportScale !== 1 ||
+        start.boardLogicalSize?.width !== BOARD_WIDTH ||
+        start.boardLogicalSize?.height !== BOARD_HEIGHT) {
+      throw new Error("Live renderer scale/board profile отличается от поддерживаемой геометрии 460×240, raster 3×, DPR 1.");
+    }
+
+    const player = start.players[0];
+    const stage = player.stage || {};
+    const canvas = player.canvas || {};
+    const windowGeometry = start.windowGeometry || {};
+    const screenWidth = Number(windowGeometry.screenWidth);
+    const screenHeight = Number(windowGeometry.screenHeight);
+    if (!Number.isInteger(screenWidth) || !Number.isInteger(screenHeight) ||
+        screenWidth <= 0 || screenHeight <= 0 ||
+        !Number.isInteger(Number(stage.width)) || !Number.isInteger(Number(stage.height)) ||
+        !Number.isInteger(Number(canvas.width)) || !Number.isInteger(Number(canvas.height))) {
+      throw new Error("В renderer geometry отсутствуют достоверные screen/stage/canvas dimensions.");
+    }
+    const css = canvas.style || {};
+    const corners = player.boardStageCorners || start.boardStageCorners || {};
+    return {
+      source: "exact Game Monitor renderer_geometry_at_start",
+      sourceRunId: run.run_id,
+      sourceSessionId: run.session_id,
+      sourceExperimentId: run.autodraw_experiment_id,
+      geometrySnapshotUpdatedAtUtc: run.renderer_geometry_updated_at_start_utc || null,
+      canvasScaleFactor: start.canvasScaleFactor,
+      canvasScaleX: start.canvasScaleX,
+      canvasScaleY: start.canvasScaleY,
+      stageWidth: Number(stage.width),
+      stageHeight: Number(stage.height),
+      canvasBackingWidth: Number(canvas.width),
+      canvasBackingHeight: Number(canvas.height),
+      devicePixelRatio: start.devicePixelRatio,
+      visualViewportScale: start.visualViewportScale,
+      stageFrameRate: Number(stage.frameRate || 0) || null,
+      scaleMode: stage.scaleMode || null,
+      boardWidth: start.boardLogicalSize.width,
+      boardHeight: start.boardLogicalSize.height,
+      screen: { width: screenWidth, height: screenHeight },
+      viewport: {
+        width: Number(windowGeometry.innerWidth || 0) || null,
+        height: Number(windowGeometry.innerHeight || 0) || null
+      },
+      canvasClientRect: canvas.rect || null,
+      canvasCssTransform: css.computedTransform || null,
+      canvasCssTransformOrigin: css.computedTransformOrigin || null,
+      boardStageCorners: corners,
+      note: "Live profile is copied from the exact run-bound Game Monitor snapshot. BoardPane offscreen raster remains 460×240 at 3×; screen CSS transform is metadata for paired comparison and is not baked into the local BoardPane raster."
+    };
+  }
+
+  function fixtureList(liveRunInput) {
+    const parsed = liveRunInput;
+    if (parsed) {
       const points = extractAcceptedPoints(parsed);
       const mode = document.getElementById("live-path-mode").value;
       const lineWidth = Number(document.getElementById("live-line-width").value);
@@ -501,6 +580,8 @@
       }
       casesNode.textContent = "";
       const mask = createBoardMask();
+      const liveRunInput = getLiveRunInput();
+      const liveRuntimeProfile = liveRunInput ? buildRuntimeProfileFromRun(liveRunInput) : null;
       const manifest = {
         schemaVersion: 2,
         referenceType: "Actual game BoardPane CanvasRenderer and WebGL renderer reference",
@@ -525,21 +606,15 @@
         renderMode: "Actual BoardPane GraphicsNode rendered by Egret CanvasRenderer and WebGLRenderer; GL backend recorded below",
         board: { width: BOARD_WIDTH, height: BOARD_HEIGHT },
         rasterScale: RASTER_SCALE,
-        runtimeProfile: {
-          source: "data/runtime/renderer_snapshot_2026-11-04.json",
+        runtimeProfile: liveRuntimeProfile || {
+          source: "offline_fixture_defaults",
           canvasScaleFactor: RUNTIME_CANVAS_SCALE_FACTOR,
           canvasScaleX: RASTER_SCALE,
           canvasScaleY: RASTER_SCALE,
-          stageWidth: 1672,
-          stageHeight: 600,
-          canvasBackingWidth: 5016,
-          canvasBackingHeight: 1800,
-          devicePixelRatio: 1,
-          stageFrameRate: 30,
-          scaleMode: "fixedHeight",
           boardWidth: BOARD_WIDTH,
           boardHeight: BOARD_HEIGHT,
-          note: "Local BoardPane offscreen raster uses canvasScaleX/Y=3; stage/client CSS transform is not applied."
+          profileStatus: "not_bound_to_live_run",
+          note: "Synthetic fixture mode only. No stale stage, canvas backing, viewport or screen values are asserted."
         },
         mask: {
           type: "Egret Shape drawRoundRect",
@@ -567,7 +642,7 @@
       manifest.webglProbe.glInfo = webglState.glInfo;
       manifest.webglProbe.contextAttributes = webglState.contextAttributes;
 
-      for (const fixture of fixtureList()) {
+      for (const fixture of fixtureList(liveRunInput)) {
         for (const lineWidth of fixture.lineWidths || LINE_WIDTHS) {
           const actual = makeActualBoardPane(fixture.mode, fixture.points, lineWidth);
           const manual = makeManualBoardPane(fixture.mode, fixture.points, lineWidth);
