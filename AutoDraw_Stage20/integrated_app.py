@@ -797,12 +797,12 @@ class AutoDrawUnifiedApp:
                 executor_config_override = dict(parameters)
 
             scenario_id = generation.get("test_case") if isinstance(generation, dict) else None
-            if scenario_id == "paired_renderer_single_stroke":
+            if scenario_id in PAIRED_RENDERER_TEST_CASE_IDS:
                 from brush_behavior_test_ui import (
                     PAIRED_RENDERER_EXECUTOR_CONFIG,
                     PAIRED_RENDERER_PATH_MODE,
                     PAIRED_RENDERER_REQUESTED_RADIUS,
-                    PAIRED_RENDERER_TEST_CASE_ID,
+                    PAIRED_RENDERER_TEST_CASE_IDS,
                 )
 
                 capture = generation.get("paired_renderer_capture")
@@ -811,7 +811,7 @@ class AutoDrawUnifiedApp:
                 if (
                     not isinstance(capture, dict)
                     or capture.get("schema_version") != 1
-                    or capture.get("scenario_id") != PAIRED_RENDERER_TEST_CASE_ID
+                    or capture.get("scenario_id") != scenario_id
                     or capture.get("requested_radius") != PAIRED_RENDERER_REQUESTED_RADIUS
                     or capture.get("expected_strokes") != 1
                     or capture.get("renderer_path_mode") != PAIRED_RENDERER_PATH_MODE

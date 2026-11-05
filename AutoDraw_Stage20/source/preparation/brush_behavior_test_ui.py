@@ -55,6 +55,13 @@ MAX_BRUSH_LINE_WIDTH_LOGICAL_PX = 30
 
 # Frozen settings for one isolated live stroke consumed by the paired renderer replay.
 PAIRED_RENDERER_TEST_CASE_ID = "paired_renderer_single_stroke"
+PAIRED_RENDERER_VERTICAL_TEST_CASE_ID = "paired_renderer_vertical_single_stroke"
+PAIRED_RENDERER_DIAGONAL_TEST_CASE_ID = "paired_renderer_diagonal_single_stroke"
+PAIRED_RENDERER_TEST_CASE_IDS = frozenset({
+    PAIRED_RENDERER_TEST_CASE_ID,
+    PAIRED_RENDERER_VERTICAL_TEST_CASE_ID,
+    PAIRED_RENDERER_DIAGONAL_TEST_CASE_ID,
+})
 PAIRED_RENDERER_REQUESTED_RADIUS = 10
 PAIRED_RENDERER_PATH_MODE = "smooth"
 PAIRED_RENDERER_EXECUTOR_CONFIG = {
@@ -310,6 +317,28 @@ TEST_CASES: dict[str, dict[str, Any]] = {
         ),
         "strokes": [
             {"name": "paired_renderer_long_horizontal", "points": [[20, 120], [420, 120]]},
+        ],
+    },
+    "Парный renderer — один вертикальный штрих": {
+        "id": PAIRED_RENDERER_VERTICAL_TEST_CASE_ID,
+        "description": (
+            "Изолированный вертикальный штрих длиной 200 логических px для проверки Y-fit "
+            "по same-run Game Monitor telemetry и X fallback по screenshot BoardPane bounds. "
+            "Требуется один strokeId, радиус 10, smooth renderer и активные Game Monitor + Bridge."
+        ),
+        "strokes": [
+            {"name": "paired_renderer_long_vertical", "points": [[230, 20], [230, 220]]},
+        ],
+    },
+    "Парный renderer — один диагональный штрих": {
+        "id": PAIRED_RENDERER_DIAGONAL_TEST_CASE_ID,
+        "description": (
+            "Изолированный диагональный штрих от (20,20) до (440,220) для независимого X/Y fit "
+            "по same-run Game Monitor telemetry. Требуется один strokeId, радиус 10, smooth renderer "
+            "и активные Game Monitor + Bridge с input telemetry."
+        ),
+        "strokes": [
+            {"name": "paired_renderer_long_diagonal", "points": [[20, 20], [440, 220]]},
         ],
     },
     "Горизонтальные линии": {
@@ -814,10 +843,10 @@ def build_brush_test_drawing_plan(
         "brush_value_must_be_set_manually": True,
         "note": "Set the requested brush size in the browser before executing this plan.",
     }
-    if scenario["id"] == PAIRED_RENDERER_TEST_CASE_ID:
+    if scenario["id"] in PAIRED_RENDERER_TEST_CASE_IDS:
         generation["paired_renderer_capture"] = {
             "schema_version": 1,
-            "scenario_id": PAIRED_RENDERER_TEST_CASE_ID,
+            "scenario_id": scenario["id"],
             "requested_radius": PAIRED_RENDERER_REQUESTED_RADIUS,
             "expected_strokes": 1,
             "renderer_path_mode": PAIRED_RENDERER_PATH_MODE,
@@ -1309,7 +1338,7 @@ class BrushBehaviorTestTab:
                       "2. Не меняй масштаб браузера и размер кисти в середине серии.",
                       "3. Запиши размер кисти, видимые/пропущенные штрихи и остаток краски в заметках или заполни measurement_fields в JSON.",
                       "4. Снимок должен включать всю тестовую область и не закрывать её окнами приложения."])
-        if scenario["id"] == PAIRED_RENDERER_TEST_CASE_ID:
+        if scenario["id"] in PAIRED_RENDERER_TEST_CASE_IDS:
             lines.extend([
                 "",
                 "Профиль парного renderer capture (фиксированный):",
@@ -2026,7 +2055,7 @@ class BrushBehaviorTestTab:
             if not 1 <= brush <= 30:
                 raise ValueError("Размер кисти должен быть целым числом от 1 до 30.")
             scenario_id = plan["generation"].get("test_case")
-            if scenario_id == PAIRED_RENDERER_TEST_CASE_ID and brush != PAIRED_RENDERER_REQUESTED_RADIUS:
+            if scenario_id in PAIRED_RENDERER_TEST_CASE_IDS and brush != PAIRED_RENDERER_REQUESTED_RADIUS:
                 raise ValueError(
                     "Для парного renderer capture требуется радиус кисти 10. "
                     "Установи 10 в поле «Радиус кисти» и создай план повторно."

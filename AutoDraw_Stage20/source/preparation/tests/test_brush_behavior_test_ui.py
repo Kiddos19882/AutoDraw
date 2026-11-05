@@ -1527,3 +1527,49 @@ def test_paired_renderer_case_builds_one_fixed_long_horizontal_stroke() -> None:
     assert capture["executor_parameters"]["point_step_px"] == 2
     assert capture["executor_parameters"]["point_delay_ms"] == 10
     assert capture["executor_parameters"]["line_extension_px"] == 0
+
+
+@pytest.mark.parametrize(
+    ("label", "scenario_id", "stroke_name", "points"),
+    [
+        (
+            "Парный renderer — один вертикальный штрих",
+            "paired_renderer_vertical_single_stroke",
+            "paired_renderer_long_vertical",
+            [[230, 20], [230, 220]],
+        ),
+        (
+            "Парный renderer — один диагональный штрих",
+            "paired_renderer_diagonal_single_stroke",
+            "paired_renderer_long_diagonal",
+            [[20, 20], [440, 220]],
+        ),
+    ],
+)
+def test_paired_renderer_axis_cases_build_one_fixed_stroke(
+    label, scenario_id, stroke_name, points
+) -> None:
+    from brush_behavior_test_ui import (
+        PAIRED_RENDERER_EXECUTOR_CONFIG,
+        PAIRED_RENDERER_PATH_MODE,
+        PAIRED_RENDERER_REQUESTED_RADIUS,
+        PAIRED_RENDERER_TEST_CASE_IDS,
+    )
+
+    plan = build_brush_test_drawing_plan(
+        label, (460, 240), coordinate_system="logical_board_pixels"
+    )
+    assert scenario_id in PAIRED_RENDERER_TEST_CASE_IDS
+    assert plan["generation"]["test_case"] == scenario_id
+    assert len(plan["strokes"]) == 1
+    stroke = plan["strokes"][0]
+    assert stroke["name"] == stroke_name
+    assert [[point["x"], point["y"]] for point in stroke["points"]] == [
+        [float(x), float(y)] for x, y in points
+    ]
+    capture = plan["generation"]["paired_renderer_capture"]
+    assert capture["scenario_id"] == scenario_id
+    assert capture["requested_radius"] == PAIRED_RENDERER_REQUESTED_RADIUS == 10
+    assert capture["expected_strokes"] == 1
+    assert capture["renderer_path_mode"] == PAIRED_RENDERER_PATH_MODE == "smooth"
+    assert capture["executor_parameters"] == PAIRED_RENDERER_EXECUTOR_CONFIG
