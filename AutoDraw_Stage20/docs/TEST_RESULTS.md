@@ -12,7 +12,7 @@
 
 **CI:** [42093239480](https://github.com/Kiddos19882/AutoDraw/actions/runs/42093239480).
 
-- Horizontal: `PASS_PER_RUN`; IoU 0.999218, precision 0.999553, recall 0.999665, symmetric difference 7 pixels, observed/expected bbox both `[19,167,599,15]`.
+- Horizontal: no formal PASS_PER_RUN in CI 42093239480. The values IoU 0.999218, precision 0.999553, recall 0.999665, symmetric difference 7 pixels and matching bbox `[19,167,599,15]` were calculated offline from an existing horizontal artifact after exact BoardPane crop; this is diagnostic evidence only.
 - Vertical: `REJECTED_PER_RUN`; IoU 0.938863, precision 0.940204, recall 0.998483, 300 symmetric-difference pixels. Observed/expected bbox `[325,19,16,310]` / `[326,18,15,311]`.
 - Diagonal: `REJECTED_PER_RUN`; IoU 0.953976, precision 0.975951, recall 0.976942, 511 symmetric-difference pixels. Observed/expected bbox `[19,19,628,310]` / `[19,18,628,311]`.
 - Same-run capture provenance, BoardPane bounds and transform gates passed for all orientations. ROI-margin pixels were separately recorded (17 pixels) and excluded from formal BoardPane comparison.

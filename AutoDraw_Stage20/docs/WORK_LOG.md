@@ -101,3 +101,11 @@ Scope: code, tests and CI only in feature/image-geometry-optimization; no real g
 - Replaced Edge image overlay with a transparent Canvas2D overlay captured by Firefox headless. The compositor now requires the same browser family and matching major version from the same-session manifest.
 - Commits: `cd12cac3bad2af9aa7df9030f69d2880ec160a74`, `bc787b8f06c3609c7f294beb0cb3ea4b6e1ae5ef`. CI run `42096244252` pending.
 - No live game experiment or production executor handoff.
+
+
+## 2026-11-05 — correction to horizontal acceptance wording and Firefox CI result
+
+- Corrected the previous status wording: the horizontal metrics IoU 0.999218, precision 0.999553, recall 0.999665, 7 differing pixels were calculated offline from a stored artifact after BoardPane crop. They were not emitted as a CI `PASS_PER_RUN` in run 42093239480. That workflow formally replayed vertical and diagonal only; both were rejected.
+- Latest [CI 42096244252](https://github.com/Kiddos19882/AutoDraw/actions/runs/42096244252) completed FAILURE. Executor, Game Monitor/Bridge, Egret renderer harness, preparation/G3 matrix tests, application integration, portable build and startup smoke-test jobs succeeded. INT-006 failed on the first horizontal Firefox compositor comparison: IoU=0, precision=0, recall=0, 8946 symmetric-difference pixels. Capture and transform checks were empty (passed); renderer checks failed. Vertical/diagonal replay was skipped after the horizontal gate failed.
+- Firefox major-version detection ran successfully, but current evidence does not explain why the headless Firefox expected mask did not overlap the observed live delta. Treat as a compositor harness defect/unknown until the generated PNG diagnostics are reviewed; do not infer a game renderer defect.
+- No formal horizontal, vertical or diagonal PASS_PER_RUN is currently established by the latest CI evidence. No live game test or executor handoff was performed.
