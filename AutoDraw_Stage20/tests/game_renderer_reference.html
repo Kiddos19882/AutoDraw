@@ -38,9 +38,11 @@
     прямоугольник <code>resetBg()</code> и board scrollRect; manual path transcription проверяется
     попиксельным сравнением с настоящим BoardPane. PNG <strong>masked board</strong> дополнительно композитит
     результат через Canvas2D как контрольный composite. Отдельный <strong>WebGL probe</strong> использует
-    настоящий Egret WebGLRenderer с BoardPane mask и scrollRect для каждого fixture; все 18 WebGL PNG
-    и параметры texture сохраняются отдельно. Canvas2D composite сравнивается с WebGL output по пикселям.
-    Это offscreen engine test, не доказательство pixel equivalence с live game capture.
+    настоящий Egret WebGLRenderer с BoardPane mask и scrollRect для каждого fixture.
+    Для полного Game Monitor run дополнительно строятся четыре Stage backing variants A–D:
+    WebGL/Canvas2D × точный дробный/округлённый backing origin. Они используют backing dimensions и
+    BoardPane stage corners из того же run; каждый PNG и placement metadata входят в manifest.
+    Stage probe — offline model of texture placement, а не доказательство pixel equivalence с live game capture.
   </p>
   <section id="live-replay">
     <h2>Парный offline replay принятых точек игры</h2>
@@ -51,7 +53,7 @@
       <label>Толщина линии<input id="live-line-width" type="number" min="1" max="100" step="1" value="10"></label>
       <button id="render-live-points" type="button">Построить парный offline replay</button>
     </div>
-    <p>Для точного сопоставления выбери фактический режим и line width из того же run. Полученные PNG и manifest относятся к тем же принятым точкам, но не воспроизводят DOM timing или фазу ENTER_FRAME.</p>
+    <p>Для точного сопоставления выбери фактический режим и line width из того же run. В manifest появятся варианты A–D и ссылки на четыре Stage backing PNG. Они не воспроизводят DOM timing или фазу ENTER_FRAME и не заменяют formal comparison с live before/after capture.</p>
   </section>
   <p id="renderer-status">Loading local Egret bundle…</p>
   <a id="renderer-manifest"></a>
