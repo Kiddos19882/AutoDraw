@@ -3128,3 +3128,13 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - ROI (496,265,674,355) смещён относительно BoardPane origin примерно на (1.952,2.860) px; текущий 1% tolerance не выявляет origin mismatch.
 - Добавлены `source/preparation/renderer_geometry.py`, unit tests, derived `screen_geometry_audit.json`; `tests/compare_live_renderer_reference.py` получил independent-transform comparison; workflow вызывает оба варианта.
 - Документы PROJECT_STATUS, TASKS, ROADMAP обновлены. Raw screenshots/manifest/Monitor report/plan/calibration profile не изменялись. Production planner/executor defaults не менялись. Live run не выполнялся.
+
+
+## 2026-11-05 — independent transform replay completed
+
+- CI run `41963498086`, job `INT-006 pixel-level PNG geometry audit`, completed SUCCESS for the paired renderer comparison step. Artifact `autodraw-paired-renderer-png-comparison` ID `13386122895` uploaded.
+- Independent transform from same-run Monitor X fit + user inspect CSS Y mapping: origin `(497.954055,267.860048)`, scale `(1.461204822,1.463334)`, source-raster→ROI matrix `[[0.487068274,0,1.954055],[0,0.487778,2.860048]]`.
+- At alpha threshold 24: IoU `0.9989941886`, precision `0.9992175274`, recall `0.9997763114`, symmetric difference `9 px`; live and expected bbox both `(21,170,599,15)`. Old frozen transform at same threshold: IoU `0.7631527094`, symmetric difference `2404 px`.
+- No post-hoc registration used for the independent transform. The old (+1,+2) diagnostic remains untouched. Vertical scale remains inspect-derived and inspect has no run/session timestamp; therefore this is strong exploratory evidence, not renderer acceptance.
+- Preparation/G3 tests, Game Monitor/Bridge tests, Executor regression, Application integration and Egret browser reference jobs passed. Windows portable build/startup smoke-test was still in progress at the last check; optional algorithm benchmarks skipped.
+- No live game action, production coordinate transform, planner/executor default, calibration profile or frozen plan changed.
