@@ -3147,3 +3147,12 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - Optional algorithm benchmarks — `SKIPPED`.
 - Независимый renderer comparison artifact `autodraw-paired-renderer-png-comparison` ID `13386122895` содержит новый report и overlay. Метрики зафиксированы в TEST_RESULTS.md.
 - После CI были созданы только documentation commits; текущая ветка сверена с HEAD и compare вернул `identical`. Локальный git status через GitHub API недоступен.
+
+
+## 2026-11-05 — Game Monitor 0.2.3 / Bridge geometry snapshot
+
+- `game_monitor.js` bumped to 0.2.3. `rendererSnapshot()` now exposes raw windowGeometry (screenX/Y, outer/inner dimensions, screen size) and boardClientMappingMethod. If getBoxQuads is absent, client corners are derived only for positive axis-aligned CSS matrices with canvas rect dimensions matching Stage×backing scale; otherwise mapping remains unavailable.
+- Browser Bridge sends `rendererGeometry` in session_start and sends renderer_geometry updates on window resize/scroll/orientation, fullscreen and visualViewport changes. Geometry listeners are debounced and removed on disconnect.
+- Bridge server stores optional geometry fields in existing session schema v2 (no schema bump, preserving FILL-001 compatibility) and run schema v1 (`renderer_geometry_at_start`, up to 32 updates, `renderer_geometry_at_end`). Snapshots are JSON/size validated.
+- Tests added for Monitor axis-aligned fallback/window metrics, RunRecorder geometry binding, and websocket session geometry persistence. CI validation pending.
+- No AutoDraw profile consumer, production planner transform or executor changes in this increment. No live game actions.
