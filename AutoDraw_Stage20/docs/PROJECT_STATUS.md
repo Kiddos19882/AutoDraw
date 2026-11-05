@@ -3,10 +3,10 @@
 ## Текущая точка — exploratory renderer comparison завершён; независимая геометрия и handoff остаются открытыми
 
 **Branch:** feature/image-geometry-optimization  
-**HEAD при проверке:** 454b63dc2c9fb41b553cef0a86cad63e0fa2241e (`docs(test-results): record live offline pixel comparison`).  
-**Сверка ветки:** compare `feature/image-geometry-optimization` с HEAD вернул `identical` (ahead=0, behind=0). Последние 20 commits проверены; последний commit документальный.  
+**HEAD до документальной синхронизации:** 454b63dc2c9fb41b553cef0a86cad63e0fa2241e (`docs(test-results): record live offline pixel comparison`).  
+**Сверка ветки:** до записи плана compare ветки с HEAD 454b63d вернул `identical` (ahead=0, behind=0); последние 20 commits проверены. Документальная синхронизация после этой проверки создала последовательные commits `eb2d8bd`, `eaaee3d`, `7a88839`, `3b09faf`, `83e25a0` и `e1eb7a0`; последняя подтверждённая точка ветки перед текущим обновлением status — `e1eb7a01f26e769610cf8f8db521a1c32050b3de`.  
 **Локальный git status:** недоступен через GitHub API; чистота локальной рабочей копии не подтверждена.  
-**CI:** последний известный полный workflow 41954783317 завершился SUCCESS по обязательным jobs, optional algorithm benchmarks SKIPPED; он не подтверждает текущий HEAD 454b63d. Combined status для 454b63d не содержит статусов.  
+**CI:** последний известный полный workflow 41954783317 завершился SUCCESS по обязательным jobs, optional algorithm benchmarks SKIPPED; он не подтверждает документальные commits. Combined status для исходного HEAD 454b63d не содержал статусов.  
 
 ### Текущая задача
 
