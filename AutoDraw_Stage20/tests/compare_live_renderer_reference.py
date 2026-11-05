@@ -11,6 +11,10 @@ import hashlib
 import json
 from pathlib import Path
 from typing import Any
+import sys
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "source" / "preparation"))
+from renderer_geometry import derive_live_board_screen_transform
 
 import cv2
 import numpy as np
@@ -91,6 +95,7 @@ def main() -> int:
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--plan", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--geometry-audit", type=Path, default=None)
     parser.add_argument("--rgb-threshold", type=float, default=24.0)
     parser.add_argument("--alpha-thresholds", type=int, nargs="+", default=[1, 24, 64, 128, 192, 254])
     args = parser.parse_args()
@@ -249,6 +254,81 @@ def main() -> int:
     (args.output_dir / "comparison-report.json").write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
+
+    independent_summary = None
+    if args.geometry_audit is not None:
+        if not args.geometry_audit.is_file():
+            raise FileNotFoundError(args.geometry_audit)
+        geometry_evidence = json.loads(args.geometry_audit.read_text(encoding="utf-8"))
+        monitor_path = args.experiment_dir / "monitor_report.json"
+        monitor_report = json.loads(monitor_path.read_text(encoding="utf-8"))
+        source_run = geometry_evidence.get("source_run", {})
+        if source_run.get("run_id") != run_id or source_run.get("session_id") != summary.get("session_id"):
+            raise ValueError("Independent geometry evidence is not bound to this exact run/session.")
+        if monitor_report.get("run_id") != run_id or monitor_report.get("session_id") != summary.get("session_id"):
+            raise ValueError("Monitor report run/session does not match the experiment manifest.")
+        screen = geometry_evidence["screen"]
+        inspect_input = {
+            "provenance": geometry_evidence.get("provenance", {}),
+            "screen": screen,
+            "board": geometry_evidence["board"],
+            "renderer": geometry_evidence["renderer"],
+        }
+        geometry = derive_live_board_screen_transform(
+            monitor_report, inspect_input, roi, (int(screen["width"]), int(screen["height"]))
+        )
+        matrix_independent = np.asarray(geometry["matrix_source_raster_to_roi"], dtype=np.float32)
+        alpha_independent = cv2.warpAffine(
+            offline[:, :, 3], matrix_independent, (live.shape[1], live.shape[0]),
+            flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT, borderValue=0,
+        )
+        independent_results = {
+            str(threshold): mask_metrics(observed, alpha_independent > threshold)
+            for threshold in args.alpha_thresholds
+        }
+        expected_independent = alpha_independent > 24
+        overlay_independent = np.zeros((live.shape[0], live.shape[1], 3), dtype=np.uint8)
+        overlay_independent[observed & ~expected_independent] = (255, 0, 0)
+        overlay_independent[~observed & expected_independent] = (0, 255, 0)
+        overlay_independent[observed & expected_independent] = (255, 255, 0)
+        Image.fromarray(alpha_independent, mode="L").save(
+            args.output_dir / "expected-alpha-independent-transform.png"
+        )
+        Image.fromarray(overlay_independent, mode="RGB").save(
+            args.output_dir / "live-offline-mask-overlay-independent-transform.png"
+        )
+        independent_report = {
+            "status": "ANALYZED_EXPLORATORY_NO_ACCEPTANCE_THRESHOLD",
+            "experiment_id": experiment.get("experiment_id"),
+            "run_id": run_id,
+            "session_id": summary.get("session_id"),
+            "inputs": {
+                str(item): {"sha256": sha256(item), "size_bytes": item.stat().st_size}
+                for item in (experiment_path, live_path, args.blank, args.offline_png, args.manifest,
+                             args.plan, monitor_path, args.geometry_audit)
+            },
+            "transform": geometry,
+            "thresholds": {"observed_rgb_euclidean": args.rgb_threshold, "expected_alpha": args.alpha_thresholds},
+            "observed_live_delta": report["observed_live_delta"],
+            "comparisons": independent_results,
+            "limitations": [
+                "No post-hoc translation or image registration is applied.",
+                "Horizontal scale/origin are fitted from same-run Monitor screenX/boardX telemetry.",
+                "Vertical scale comes from the user-provided inspect snapshot; this live run has no vertical pointer variation.",
+                "The inspect snapshot has no run/session timestamp; same-screen provenance is user-attested.",
+                "This is exploratory evidence and has no renderer acceptance threshold.",
+            ],
+        }
+        (args.output_dir / "comparison-report-independent-transform.json").write_text(
+            json.dumps(independent_report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
+        independent_summary = {
+            "iou_alpha_24": independent_results.get("24", {}).get("iou"),
+            "precision_alpha_24": independent_results.get("24", {}).get("precision"),
+            "recall_alpha_24": independent_results.get("24", {}).get("recall"),
+            "symmetric_difference_alpha_24": independent_results.get("24", {}).get("symmetric_difference_pixels"),
+            "report": str(args.output_dir / "comparison-report-independent-transform.json"),
+        }
     print(json.dumps({
         "status": report["status"],
         "changed_live_pixels": report["observed_live_delta"]["changed_pixels"],
@@ -268,6 +348,7 @@ def main() -> int:
             "symmetric_difference_pixels": best_shift_metrics["symmetric_difference_pixels"],
         },
         "report": str(args.output_dir / "comparison-report.json"),
+        "independent_transform_comparison": independent_summary,
     }, ensure_ascii=False, indent=2))
     return 0
 
