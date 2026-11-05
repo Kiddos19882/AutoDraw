@@ -184,3 +184,12 @@ Scope: code, tests and CI only in feature/image-geometry-optimization; no real g
 - Not changed: production renderer/planner/sampling/brush/executor, acceptance thresholds, raw captures, live game state, master.
 - Next: inspect CI browser artifacts for both orientations; compare A–D and then feed Stage A through the existing formal screenshot comparator with the independent Stage→screen transform, no post-hoc alignment.
 
+
+## 2026-11-06 — Stage A/B уточнены: рендеринг через Egret WebGLRenderer
+
+- После первичной реализации raw WebGL quad заменён на вызов существующего Egret WebGLRenderer с тем же BoardPane/mask/scrollRect и run-sized RenderBuffer; это избегает отдельного самописного GL shader пути для вариантов A/B.
+- Stage buffer создаётся с точными backing dimensions конкретного Monitor run; renderer получает matrix с canvasScaleX/Y и exact либо rounded backing origin.
+- C/D остаются Canvas2D control variants, использующими тот же board-level WebGL output.
+- Code commit: `953d0d0d971230384d03ce45727849679dd556bf`; manifest diagnostics commit: `8713012673de7734fb0bb91fe58fcce483ed68b3`.
+- CI status не surfaced через combined-status API; Node/browser run и Stage PNG outputs пока NOT_CONFIRMED. Требуется inspect CI artifact before interpreting metrics.
+
