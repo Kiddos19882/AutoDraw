@@ -1,3 +1,34 @@
+# Дополнение — Stage-level compositor A–D (2026-11-06)
+
+**Статус:** implementation committed; automated browser/CI validation pending.  
+**Branch:** `feature/image-geometry-optimization`. **Code/test HEAD:** `8713012673de7734fb0bb91fe58fcce483ed68b3`.  
+**Master:** `9a3453aeb847b66041bc83d6f4a56ecaf33a993a`, не изменялась. Remote compare: diverged, feature ahead 3424 / behind 5; merge/rebase не выполнялись. GitHub API не показывает локальный `git status`.
+
+## Что реализовано
+
+- Run-bound placement вычисляется из Stage/backing dimensions, canvasScaleX/Y и четырёх BoardPane stage corners; проверяются масштаб, прямоугольность, размеры и выход за границы.
+- A/B используют **фактический Egret WebGLRenderer** с тем же BoardPane, mask/scrollRect и Stage-sized RenderBuffer; отличаются точным дробным или округлённым backing origin.
+- C/D используют Canvas2D image composition тех же board-level WebGL pixels с точным или округлённым backing origin.
+- Manifest сохраняет placement, WebGL texture параметры, renderer diagnostics и RGBA pixel deltas относительно A.
+- Headless Edge runner подключён к двум уже сохранённым Monitor reports: vertical run `c860234f-995a-4789-9ac2-e05b322fe742` и diagonal run `f69cb0f4-f5d0-4ff9-a3b7-1148c38fa07f`. Новые live game runs не требуются.
+
+## Подтверждённая геометрия сохранённых captures
+
+Stage 1314×600; backing 3942×1800; BoardPane 460×240; scale 3×; logical origin X=340.7916660308838, Y=72; backing origin X=1022.375, Y=216. Эти значения относятся только к данным runs.
+
+## Что ещё не подтверждено
+
+- GitHub combined status для code/test HEAD пока не вернул checks; browser runner и Node tests на этом HEAD не подтверждены. CI PASS не заявляется.
+- A–D PNG и per-variant pixel metrics ещё не получены/проверены.
+- Stage A ещё не сопоставлен с live before/after screenshots через отдельный Stage CSS-to-screen transform. Formal acceptance thresholds не менялись; post-hoc alignment запрещён.
+- Причинность fractional X phase 0.375 px остаётся гипотезой.
+
+**Ограничения соблюдены:** production renderer/planner/sampling/brush/executor не менялись; live game experiments не запускались; raw evidence не переписывались; master не менялась.
+
+**Следующий шаг:** получить CI artifacts для vertical/diagonal A–D, проверить их содержимое и сравнить Stage A с существующими live captures без post-hoc translation.
+
+---
+
 # Актуальная точка продолжения — 2026-11-06
 
 ## Дополнение — аудит Stage-level WebGL composition (2026-11-06)
