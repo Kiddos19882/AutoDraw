@@ -1,3 +1,18 @@
+## 2026-11-06 — Stage-level compositor A–D implemented; browser validation pending
+
+**Статус:** IN_PROGRESS — harness and saved-run browser automation added; no acceptance result yet.
+
+- [x] Добавлен fail-closed расчёт Stage backing placement из run-bound Stage dimensions, canvas scale и четырёх BoardPane stage corners.
+- [x] Добавлены варианты A/B (WebGL, exact/rounded backing origin) и C/D (Canvas2D, exact/rounded backing origin).
+- [x] Добавлено сравнение каждого варианта с A по RGBA pixels и сохранение placement/texture metadata в manifest.
+- [x] Добавлены Node regression tests для exact origin (1022.375, 216), rounding, scale mismatch, non-rectangular corners и out-of-bounds.
+- [x] Headless Edge runner подключён к сохранённым vertical/diagonal Game Monitor reports; новые игровые запуски не требуются.
+- [ ] Подтвердить node syntax/unit tests и headless browser Stage A–D outputs в CI.
+- [ ] Сопоставить Stage A с live before/after captures после отдельного применения Stage CSS transform; сохранить formal metrics без post-hoc alignment.
+- [ ] Только после анализа A–D решить, какая модель соответствует live capture; не менять acceptance thresholds.
+
+**Текущая доказательность:** реализация и тесты присутствуют в исходниках; выполнение Node/browser/CI на новом HEAD пока не подтверждено. Fractional X phase остаётся гипотезой о причине mismatch.
+
 ## 2026-11-06 — formal same-run multi-axis replay: horizontal PASS, vertical/diagonal REJECTED
 
 - [x] Independent same-run replay сохранённых horizontal, vertical и diagonal captures выполнен в CI [42113632374](https://github.com/Kiddos19882/AutoDraw/actions/runs/42113632374).
@@ -43,7 +58,7 @@
 
 | ID | Приоритет | Статус | Содержание |
 |---|---|---|---|
-| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | HORIZONTAL_PASS_VERTICAL_DIAGONAL_REJECTED_STAGE_WEBGL_COMPOSITOR_REQUIRED | Horizontal: один formal PASS_PER_RUN; vertical/diagonal: по одному REJECTED_PER_RUN при прошедших capture/transform gates; исследовать stage-level WebGL texture composition и fractional backing origin, затем повторить существующие captures; для multi-axis серии нужны три unique PASS_PER_RUN каждого направления; environment fingerprint, profile consumer и executor gate остаются pending |
+| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | STAGE_LEVEL_COMPOSITOR_IMPLEMENTED_CI_PENDING | Добавлены A–D Stage backing variants и headless replay для сохранённых vertical/diagonal runs; требуется подтвердить CI, проверить A–D pixel deltas и сравнить Stage A с live capture; затем получить три unique PASS_PER_RUN на ориентацию; environment fingerprint/profile consumer/executor gate pending |
 | FILL-001-RS-MATRIX | P0 | BLOCKED | 45 captures только после принятого single-task preflight |
 | GAME-INPUT-SAMPLING-TRACE-001 | P1 | ROI_BOUNDS_ROOT_CAUSE_IDENTIFIED_MULTI_AXIS_CODE_READY_LIVE_CAPTURE_PENDING | Run 16aec62c; 138 accepted points, CHALK=138; ROI included margins; screenshot-derived bounds + Monitor fit IoU=0.998882 / 10 px without post-hoc shift; multi-axis/environment validation pending |
 | BRUSH-FOOTPRINT-CAPSULE-001 | P1 | OPEN | Offline capsule model готова; renderer acceptance/planner integration не выполнены |
