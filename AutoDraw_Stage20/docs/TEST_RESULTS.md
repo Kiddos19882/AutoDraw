@@ -6,8 +6,19 @@
 **HEAD перед дополнением D1–D5:** `63fdaf3f2a1b12bd90e1a588ca4e968facbe0103`  
 **Область:** AutoDraw_Stage20, тесты приложения, лабораторные эксперименты, Game Monitor/Bridge, CHALK, FILL-001, геометрические модели, GitHub Actions и offline benchmarks.  
 **Последний evidence commit:** `e6b771ed67201625884c6ce778fa355f1ab9b873` (первые vertical/diagonal live captures и exploratory offline reports).  
-**Последний code/test HEAD:** `221e5240152c9888b564076e649b3f71366c1664`; CI run 42093239480 pending.
+**Последний code/test HEAD:** `bc787b8f06c3609c7f294beb0cb3ea4b6e1ae5ef`; CI run 42096244252 pending.
 
+## 2026-11-05 — BoardPane crop accepted horizontally; browser compositor mismatch found
+
+**CI:** [42093239480](https://github.com/Kiddos19882/AutoDraw/actions/runs/42093239480).
+
+- Horizontal: `PASS_PER_RUN`; IoU 0.999218, precision 0.999553, recall 0.999665, symmetric difference 7 pixels, observed/expected bbox both `[19,167,599,15]`.
+- Vertical: `REJECTED_PER_RUN`; IoU 0.938863, precision 0.940204, recall 0.998483, 300 symmetric-difference pixels. Observed/expected bbox `[325,19,16,310]` / `[326,18,15,311]`.
+- Diagonal: `REJECTED_PER_RUN`; IoU 0.953976, precision 0.975951, recall 0.976942, 511 symmetric-difference pixels. Observed/expected bbox `[19,19,628,310]` / `[19,18,628,311]`.
+- Same-run capture provenance, BoardPane bounds and transform gates passed for all orientations. ROI-margin pixels were separately recorded (17 pixels) and excluded from formal BoardPane comparison.
+- The offline browser compositor used Edge/Chromium, but the same-session renderer manifest records Firefox 159. This is an uncontrolled rasterization/compositing difference and invalidates vertical/diagonal pixel acceptance as evidence of an offline renderer defect.
+- Commits `cd12cac3bad2af9aa7df9030f69d2880ec160a74` and `bc787b8f06c3609c7f294beb0cb3ea4b6e1ae5ef` replace the Edge `<img>` overlay with a Firefox headless Canvas2D overlay, verify the live manifest's Firefox major version, and retain the no-registration rule.
+- CI [42096244252](https://github.com/Kiddos19882/AutoDraw/actions/runs/42096244252) is pending. No vertical/diagonal PASS_PER_RUN is claimed until the same-browser comparison passes.
 ## 2026-11-05 — exact BoardPane bounds вместо calibrated ROI в formal renderer metrics
 
 **Implementation:** [1ac3d9390c56072730017e073cf80dd69c448f8b](https://github.com/Kiddos19882/AutoDraw/commit/1ac3d9390c56072730017e073cf80dd69c448f8b), follow-up [e73506db2a2cfd55bbb0ea4c4a1616648b7f0065](https://github.com/Kiddos19882/AutoDraw/commit/e73506db2a2cfd55bbb0ea4c4a1616648b7f0065).

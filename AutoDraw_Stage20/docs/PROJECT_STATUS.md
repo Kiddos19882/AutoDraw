@@ -10,7 +10,7 @@
 **Workflow packaging commit:** `fb853547d74a70582ab1e4731d55763367b8ceb8`, проверен успешным run `41970907209`.  
 **Документационная синхронизация:** 2026-11-05, после evidence commit `e6b771e`; основные документы обновлены коммитами `1d4ad6e`–`102b834`, итоговая корректировка метаданных — `f3141dd1d3923fa3c16766b5cccddd6b4065f64a`.
 **Последний CI-проверенный code/test HEAD:** `58ebdda7cf3f07ceef1075020f2808a2782562b7` — CI 41994624425 SUCCESS.  
-**Последний code/test HEAD:** `221e5240152c9888b564076e649b3f71366c1664`.  
+**Последний code/test HEAD:** `bc787b8f06c3609c7f294beb0cb3ea4b6e1ae5ef`.  
 **Последний неуспешный CI:** [run 42087496092](https://github.com/Kiddos19882/AutoDraw/actions/runs/42087496092) — горизонтальный контроль отклонён: 17 изменившихся пикселей за пределами BoardPane попали в больший calibrated ROI.  
 **Текущий CI исправления:** [run 42091800785](https://github.com/Kiddos19882/AutoDraw/actions/runs/42091800785) завершился из-за неверного test fixture (887 passed, 1 failed); его исправление прошло в run 42092259450 (888 passed). Затем renderer gate выявил координатную ошибку только в OpenCV diagnostic crop: alpha mask ROI-local, а helper получил screen-absolute bounds. Исправление в commit `f1b5b608` переводит BoardPane bounds в ROI-local координаты; тест и CI run [42093239480](https://github.com/Kiddos19882/AutoDraw/actions/runs/42093239480) pending.
 **Master:** remote HEAD `9a3453aeb847b66041bc83d6f4a56ecaf33a993a`; master не изменялась.

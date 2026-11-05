@@ -92,3 +92,12 @@ Scope: code, tests and CI only in feature/image-geometry-optimization; no real g
 - Converted absolute BoardPane bounds to ROI-local coordinates for the OpenCV diagnostic crop; full-screen observed and browser-composited masks continue using absolute screen coordinates.
 - Added a regression test for ROI-local mask cropping. Commits: `f1b5b608de5b61c171b8e90640f83898bbd0d5b4`, `221e5240152c9888b564076e649b3f71366c1664`.
 - CI run `42093239480` pending. No live game run or production executor change.
+
+
+## 2026-11-05 — Firefox compositor parity
+
+- CI 42093239480 confirmed horizontal PASS_PER_RUN after exact BoardPane cropping. Vertical and diagonal remained REJECTED_PER_RUN with IoU 0.938863 and 0.953976; provenance and geometry gates passed.
+- Root cause candidate was identified in the comparison harness: live renderer manifest reports Firefox 159, while the offline CSS compositor used Edge/Chromium. The different browser raster/compositing engines make vertical/diagonal pixel differences non-diagnostic for the game renderer.
+- Replaced Edge image overlay with a transparent Canvas2D overlay captured by Firefox headless. The compositor now requires the same browser family and matching major version from the same-session manifest.
+- Commits: `cd12cac3bad2af9aa7df9030f69d2880ec160a74`, `bc787b8f06c3609c7f294beb0cb3ea4b6e1ae5ef`. CI run `42096244252` pending.
+- No live game experiment or production executor handoff.
