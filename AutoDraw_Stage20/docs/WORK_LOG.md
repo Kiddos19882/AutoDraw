@@ -193,3 +193,13 @@ Scope: code, tests and CI only in feature/image-geometry-optimization; no real g
 - Code commit: `953d0d0d971230384d03ce45727849679dd556bf`; manifest diagnostics commit: `8713012673de7734fb0bb91fe58fcce483ed68b3`.
 - CI status не surfaced через combined-status API; Node/browser run и Stage PNG outputs пока NOT_CONFIRMED. Требуется inspect CI artifact before interpreting metrics.
 
+
+## 2026-11-06 — fail-closed validation saved Stage A–D browser artifacts
+
+- Headless Edge runner дополнен проверкой точного source run ID, набора A/B WebGL + C/D Canvas2D, Egret backend для A/B, exact origin (1022.375,216), rounded origin (1022,216), BoardPane backing size 1380×720 и нулевой self-difference A.
+- Existing vertical/diagonal Game Monitor reports используются напрямую из committed evidence; browser runner не запускает AutoDraw и не отправляет игровые input events.
+- Commit: `501b3fac5e4cb7039161da6d70a1c79803ebb01f`.
+- GitHub combined status для code/test HEAD вернул пустой список checks; PR-only workflow lookup также не вернул runs. CI/browser execution therefore NOT_CONFIRMED, не PASS.
+- Remote feature branch HEAD перед этой записью: `adac8018c22c66fa91d8d9203cd82c1b79110f29`; compare с master: diverged, ahead 3434 / behind 5. Master SHA `9a3453aeb847b66041bc83d6f4a56ecaf33a993a`.
+- Следующий шаг — получить подтверждённые CI artifacts, проверить PNG и manifest, затем выполнить formal Stage A → live screenshot comparison.
+
