@@ -8,7 +8,7 @@
 
 | ID | Приоритет | Статус | Содержание |
 |---|---|---|---|
-| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | HORIZONTAL_PER_RUN_ACCEPTED_MULTI_AXIS_LIVE_PENDING_PROFILE_PENDING | Один horizontal capture прошёл formal per-run capture/transform/renderer gates; три vertical + три diagonal live captures, environment fingerprint, profile consumer and executor gate pending |
+| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | HORIZONTAL_PER_RUN_ACCEPTED_MULTI_AXIS_LIVE_PENDING_PROFILE_PENDING | Один horizontal capture прошёл formal per-run capture/transform/renderer gates; Bridge telemetry automation CI-verified; три vertical + три diagonal live captures, environment fingerprint, profile consumer and executor gate pending |
 | FILL-001-RS-MATRIX | P0 | BLOCKED | 45 captures только после принятого single-task preflight |
 | GAME-INPUT-SAMPLING-TRACE-001 | P1 | ROI_BOUNDS_ROOT_CAUSE_IDENTIFIED_MULTI_AXIS_CODE_READY_LIVE_CAPTURE_PENDING | Run 16aec62c; 138 accepted points, CHALK=138; ROI included margins; screenshot-derived bounds + Monitor fit IoU=0.998882 / 10 px without post-hoc shift; multi-axis/environment validation pending |
 | BRUSH-FOOTPRINT-CAPSULE-001 | P1 | OPEN | Offline capsule model готова; renderer acceptance/planner integration не выполнены |
