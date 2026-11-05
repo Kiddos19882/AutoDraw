@@ -1,24 +1,39 @@
 # Актуальная точка продолжения — 2026-11-05
 
-## Текущая точка — добавлен изолированный paired renderer test
+## Текущая точка — live capture принят, offline renderer replay ожидает выполнения
 
 **Branch:** feature/image-geometry-optimization  
-**Code/test HEAD:** 9a2de6e350c263c755cf62283fda14882f31157c  
-**Последний пользовательский data commit:** 1f7a9738476d7a9fc86b7294c45a4a9722064c4d  
-**Новый UI-сценарий:** «Парный renderer — один длинный штрих» (paired_renderer_single_stroke) во вкладке «Тест кистей».  
-**Геометрия:** один горизонтальный штрих logical board 460×240, (20,120) → (420,120), длина 400 logical px.  
-**Параметры:** radius=10; point_step_px=2; point_delay_ms=10; line_extension_px=0; after_mouse_up_ms=20; before_mouse_down_ms=20; after_mouse_down_ms=40; end_hold_ms=50; countdown_seconds=5. Renderer path mode для replay — smooth.  
-**Защита:** UI не создаёт этот план при радиусе, отличном от 10; интеграционный слой повторно проверяет metadata, конфигурацию исполнителя и ровно один stroke в runtime plan. Настройки передаются как временный executor override и не должны менять пользовательский профиль.
+**Current HEAD:** 02ebab89733559421edbb151e7931ed3fecf30c0 (пользовательский commit с результатами одиночного теста).  
+**Code/test HEAD:** bacf8ed35cd09b3d0b1e9cf7deda122a91c9f521; commit 02ebab8 добавил экспериментальные данные и синхронизировал управляющие документы.  
+**Последний пользовательский data commit:** [02ebab8](https://github.com/Kiddos19882/AutoDraw/commit/02ebab89733559421edbb151e7931ed3fecf30c0).  
+**Сценарий:** paired_renderer_single_stroke; logical board 460×240; один штрих (20,120) → (420,120); requested/observed radius=10; executor step=2 screen px, delay=10 ms, line extension=0; renderer replay profile smooth / line width 10.
 
-**Изменённые компоненты:** source/preparation/brush_behavior_test_ui.py, его unit tests, integrated_app.py и tests/test_unified_app.py. Добавлены инструкции по включению input telemetry и сохранению evidence.
+### Результат live capture
 
-**Проверки:** добавлены regression tests для геометрии/metadata плана, executor override и отказа при неверном радиусе. Локальный запуск тестов недоступен через GitHub API; CI для новых commits на момент этой записи ещё не подтверждён. Последний ранее успешный полный CI — run [41933396072](https://github.com/Kiddos19882/AutoDraw/actions/runs/41933396072) на более раннем source/test HEAD f6df3f9; он не распространяется на новые изменения.
+**Принятый run:** 16aec62c-9e54-44e7-8691-9df79b19161d; session d357b6ee-5617-4e07-9011-7eba7ccb6c0f; experiment d47cc0a5520044c7abfd0352a4f93ca8.
 
-**Оставшийся блокер:** live capture выполняет пользователь. Нужны raw Game Monitor run JSON с одним strokeId, полным acceptedPoint stream и pointDelta=1, Bridge session.json, runtime AutoDrawGameMonitor.inspect(), pointCount до/после и итоговый PNG доски из той же сессии. При pointDelta>1, пропущенных acceptedPoint или нескольких strokeId offline replay должен отклонить run.
+- Executor: completed, 1/1 stroke, 294 move calls, 9.766 s, без execution error; фактический executor profile совпадает с планом.
+- Game Monitor: один положительный strokeId pointer-stroke-5; 138 POINT_QUOTA_UPDATE; все 138 имеют pointDelta=1 и acceptedPoint с конечными координатами; missing acceptedPoint=0; delta histogram={1:138}.
+- Координаты принятых точек идут монотонно по X от 18.2083 до 419.2083, Y=119; 138 accepted points. Сумма pointDelta и число acceptedPoint совпадают с точным CHALK.
+- Точный ресурс: pointCount 1 → 139; CHALK=138; maxPoints=6000. Не использовать 294 move calls как расход.
+- Bridge/session: input telemetry enabled; 0 dropped events, 0 monitor errors, 0 send failures, 0 collector sequence gaps. Frame probe: 279 frames, average 59.978 FPS, visibility interruption=false.
+- Итоговый board PNG after_draw-board.png (674×355) визуально содержит один горизонтальный штрих.
+- Другие raw runs той же session — неуспешные pointer candidates без point consumption (radius 30) либо восстановление кисти; они не входят в принятый run.
 
-**Следующий шаг:** выбрать новый сценарий во вкладке «Тест кистей», указать радиус 10, выполнить один запуск при активных Monitor/Bridge и включённой input telemetry, затем передать полный комплект evidence. Offline renderer page уже имеет режим smooth и line width 10 по умолчанию. Live pixel equivalence пока не подтверждена. FILL-001-RS 45-cell matrix остаётся BLOCKED.
+**Replay gate:** raw event-level checks удовлетворяют валидатору tests/game_renderer_reference.js: ровно один идентифицированный strokeId, каждое положительное POINT_QUOTA_UPDATE имеет pointDelta=1 и acceptedPoint. Run пригоден для импорта в offline renderer. Поле агрегированной сводки trajectory.status=incomplete_until_verified противоречит фактической проверке raw events и сопровождается общим примечанием про coalescing; для данного run это поле не подтверждается histogram событий и не должно блокировать replay. Зафиксировать как несогласованность summary metadata, не исправлять raw evidence.
 
-**Ограничения Git:** изменения внесены через GitHub API в feature/image-geometry-optimization; локальный git status недоступен. master не изменялась.
+### Оставшиеся ограничения
+
+- Offline replay PNG ещё не создан и pixel comparison с live PNG не выполнен.
+- В commit нет отдельного runtime snapshot AutoDrawGameMonitor.inspect(). session.json подтверждает board 460×240, radius и telemetry, но не содержит полного rendererSnapshot/path-mode state. smooth — заданный профиль paired test, а не независимо записанное runtime-поле.
+- Для pixel comparison нужно получить offline output из tests/game_renderer_reference.html с raw run 16aec62c…, mode=smooth, line width=10, затем привести live board ROI 674×355 и offline board reference к общей системе размеров/координат и сравнить. Не делать вывод о pixel equivalence по визуальному осмотру одного PNG.
+- FILL-001-RS 45-cell matrix остаётся BLOCKED до закрытия renderer/footprint gate.
+
+**Следующий шаг:** выполнить offline replay именно raw run 16aec62c-9e54-44e7-8691-9df79b19161d; не требуется повторять live stroke. После replay выполнить нормализацию размеров/трансформации и количественное PNG comparison. При необходимости запросить недостающий runtime inspect snapshot.
+
+**CI:** для commit 02ebab8 combined status пустой (statuses=[]), а доступный endpoint workflow-runs не вернул runs; CI PASS не подтверждён. Тесты исходников в этом data commit не менялись. Локальный запуск и git status недоступны через GitHub API.
+
+**Git:** latest commit 02ebab8 находится в feature/image-geometry-optimization; master не изменялась. Сравнение с последним ранее проверенным master commit 9a3453a показывает diverged (feature ahead 3236 / behind 5); это compare snapshot, не локальный git status.
 
 
 ---
