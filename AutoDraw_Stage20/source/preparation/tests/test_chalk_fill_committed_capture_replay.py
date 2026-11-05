@@ -83,7 +83,11 @@ def test_real_committed_fill001_evidence_runs_through_capture_button(tmp_path, m
 
     plan_destination = tmp_path / "runtime" / source_plan.name
     plan_destination.parent.mkdir(parents=True)
-    shutil.copy2(source_plan, plan_destination)
+    # The committed DrawingPlan is stored with Git-normalized LF bytes, while
+    # the original Windows executor report hashes the runtime CRLF bytes.
+    # Recreate those exact runtime bytes before validating the immutable report.
+    plan_bytes = source_plan.read_bytes().replace(b"\\r\\n", b"\\n").replace(b"\\n", b"\\r\\n")
+    plan_destination.write_bytes(plan_bytes)
 
     report_path = tmp_path / "execution.json"
     report = json.loads(report_source.read_text(encoding="utf-8"))
