@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "record_type": "autodraw_brush_paint_experiment",
+  "experiment_id": "652cd9809d244d1394164f41f5038935",
+  "chalk_radius_matrix": {
+    "schema_version": 1,
+    "series_id": "chalk-20261105-031513-ab1bff",
+    "block": 1,
+    "repeat_index": 1,
+    "requested_radius": 10,
+    "planned_radii": [
+      1,
+      5,
+      10,
+      15,
+      20,
+      25,
+      30
+    ],
+    "block_order": [
+      1,
+      5,
+      10,
+      15,
+      20,
+      25,
+      30
+    ],
+    "matrix_order_index": 3,
+    "scenario_id": "paint_consumption_long_lines",
+    "expected_strokes": 6
+  },
+  "chalk_experiment_matrix": null,
+  "chalk_test_block": null,
+  "updated_at_utc": "2026-11-05T00:19:36+00:00",
+  "test_case": "paint_consumption_long_lines",
+  "brush_value_requested": 10,
+  "drawing_plan_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw-feature-image-geometry-optimization\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\brush-plan-paint_consumption_long_lines-b10-20261105-031931-652cd980.json",
+  "execution_report_path": null,
+  "execution_report": null,
+  "game_monitor_report_path": null,
+  "game_monitor_summary": null,
+  "monitor_capture": null,
+  "calibration_profile_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw-feature-image-geometry-optimization\\AutoDraw_Stage20\\data\\brush_paint_calibration.json",
+  "phases": {
+    "before_clear": {
+      "status": "preclear_failed",
+      "reason": "Эталон пустой доски не соответствует текущему разрешению/ROI.",
+      "captured_at_utc": "2026-11-05T00:19:36+00:00"
+    }
+  },
+  "interpretation_limits": [
+    "Meter fill is a provisional image estimate, not a direct read of the game's internal resource counter.",
+    "A successful executor report does not prove every stroke was registered by the game.",
+    "Execution status and visual evidence are recorded separately."
+  ]
+}

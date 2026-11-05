@@ -1,0 +1,2290 @@
+{
+  "schema_version": 1,
+  "record_type": "autodraw_game_monitor_run",
+  "session_id": "5f4b3e4e-3acb-4071-8613-3f89a1a4324d",
+  "run_id": "8dd39883-c203-463d-888c-28b839c28795",
+  "started_at_utc": "2026-11-05T00:18:31.944+00:00",
+  "started_at_performance_ms": 261852,
+  "execution_status": "completed",
+  "pre_test_snapshot": {
+    "logicalWidth": 460,
+    "logicalHeight": 240,
+    "scaleX": 1,
+    "scaleY": 1,
+    "maxPoints": 6000,
+    "remainingPoints": 5998,
+    "pointCount": 2,
+    "sourceMethod": "BoardPane.max+BoardPane.less",
+    "isExact": true,
+    "validationStatus": "valid",
+    "radius": [
+      0,
+      30,
+      30
+    ],
+    "currentRadius": 30
+  },
+  "post_test_snapshot": {
+    "logicalWidth": 460,
+    "logicalHeight": 240,
+    "scaleX": 1,
+    "scaleY": 1,
+    "maxPoints": 6000,
+    "remainingPoints": 5998,
+    "pointCount": 2,
+    "sourceMethod": "BoardPane.max+BoardPane.less",
+    "isExact": true,
+    "validationStatus": "valid",
+    "radius": [
+      0,
+      30,
+      1
+    ],
+    "currentRadius": 1
+  },
+  "brush_radius": 30,
+  "events": [
+    {
+      "monitorVersion": "0.2.2",
+      "t": 261852,
+      "type": "POINTER_DOWN_CANDIDATE",
+      "strokeId": "pointer-stroke-3",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "clientX": 1764,
+      "clientY": 306,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 261852,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-3",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "source": "onDrawStart",
+      "previousSignature": null,
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "pointDelta": 0,
+      "acceptedPoint": null
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 261881,
+      "type": "POINTER_UP_CANDIDATE",
+      "strokeId": "pointer-stroke-3",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "clientX": 1764,
+      "clientY": 306,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262606,
+      "type": "POINTER_DOWN_CANDIDATE",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "clientX": 1215,
+      "clientY": 166,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262606,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "source": "onDrawStart",
+      "previousSignature": null,
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "pointDelta": 0,
+      "acceptedPoint": null
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262637,
+      "type": "BRUSH_CHANGE",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "args": [
+        29
+      ],
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          30
+        ],
+        "currentRadius": 30
+      }
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262637,
+      "type": "BRUSH_CHANGE_APPLIED",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          29
+        ],
+        "currentRadius": 29
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          29
+        ],
+        "currentRadius": 29
+      }
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262637,
+      "type": "MOUSE_MOVE_SAMPLE",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          29
+        ],
+        "currentRadius": 29
+      },
+      "source": "window-bubble-after-egret-canvas",
+      "domEventTimeStamp": 262615,
+      "clientX": 1217,
+      "clientY": 167,
+      "pageX": 1217,
+      "pageY": 167,
+      "screenX": 1217,
+      "screenY": 330,
+      "movementX": 2,
+      "movementY": 1,
+      "buttons": 1,
+      "stageX": 833,
+      "stageY": 114,
+      "boardX": 492.2083339691162,
+      "boardY": 42
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262653,
+      "type": "BRUSH_CHANGE",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          29
+        ],
+        "currentRadius": 29
+      },
+      "args": [
+        28
+      ],
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          29
+        ],
+        "currentRadius": 29
+      }
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262653,
+      "type": "BRUSH_CHANGE_APPLIED",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          28
+        ],
+        "currentRadius": 28
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          29
+        ],
+        "currentRadius": 29
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          28
+        ],
+        "currentRadius": 28
+      }
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262653,
+      "type": "MOUSE_MOVE_SAMPLE",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          28
+        ],
+        "currentRadius": 28
+      },
+      "source": "window-bubble-after-egret-canvas",
+      "domEventTimeStamp": 262630,
+      "clientX": 1225,
+      "clientY": 167,
+      "pageX": 1225,
+      "pageY": 167,
+      "screenX": 1225,
+      "screenY": 330,
+      "movementX": 8,
+      "movementY": 0,
+      "buttons": 1,
+      "stageX": 838,
+      "stageY": 114,
+      "boardX": 497.2083339691162,
+      "boardY": 42
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262670,
+      "type": "BRUSH_CHANGE",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          28
+        ],
+        "currentRadius": 28
+      },
+      "args": [
+        22
+      ],
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          28
+        ],
+        "currentRadius": 28
+      }
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262670,
+      "type": "BRUSH_CHANGE_APPLIED",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          22
+        ],
+        "currentRadius": 22
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          28
+        ],
+        "currentRadius": 28
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          22
+        ],
+        "currentRadius": 22
+      }
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262670,
+      "type": "MOUSE_MOVE_SAMPLE",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          22
+        ],
+        "currentRadius": 22
+      },
+      "source": "window-bubble-after-egret-canvas",
+      "domEventTimeStamp": 262647,
+      "clientX": 1251,
+      "clientY": 170,
+      "pageX": 1251,
+      "pageY": 170,
+      "screenX": 1251,
+      "screenY": 333,
+      "movementX": 26,
+      "movementY": 3,
+      "buttons": 1,
+      "stageX": 856,
+      "stageY": 117,
+      "boardX": 515.2083339691162,
+      "boardY": 45
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262687,
+      "type": "BRUSH_CHANGE",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          22
+        ],
+        "currentRadius": 22
+      },
+      "args": [
+        17
+      ],
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          22
+        ],
+        "currentRadius": 22
+      }
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262687,
+      "type": "BRUSH_CHANGE_APPLIED",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          17
+        ],
+        "currentRadius": 17
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          22
+        ],
+        "currentRadius": 22
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          17
+        ],
+        "currentRadius": 17
+      }
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262687,
+      "type": "MOUSE_MOVE_SAMPLE",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          17
+        ],
+        "currentRadius": 17
+      },
+      "source": "window-bubble-after-egret-canvas",
+      "domEventTimeStamp": 262662,
+      "clientX": 1277,
+      "clientY": 174,
+      "pageX": 1277,
+      "pageY": 174,
+      "screenX": 1277,
+      "screenY": 337,
+      "movementX": 26,
+      "movementY": 4,
+      "buttons": 1,
+      "stageX": 874,
+      "stageY": 119,
+      "boardX": 533.2083339691162,
+      "boardY": 47
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262704,
+      "type": "BRUSH_CHANGE",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          17
+        ],
+        "currentRadius": 17
+      },
+      "args": [
+        5
+      ],
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          17
+        ],
+        "currentRadius": 17
+      }
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262704,
+      "type": "BRUSH_CHANGE_APPLIED",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          5
+        ],
+        "currentRadius": 5
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          17
+        ],
+        "currentRadius": 17
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          5
+        ],
+        "currentRadius": 5
+      }
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262705,
+      "type": "MOUSE_MOVE_SAMPLE",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          5
+        ],
+        "currentRadius": 5
+      },
+      "source": "window-bubble-after-egret-canvas",
+      "domEventTimeStamp": 262694,
+      "clientX": 1334,
+      "clientY": 181,
+      "pageX": 1334,
+      "pageY": 181,
+      "screenX": 1334,
+      "screenY": 344,
+      "movementX": 57,
+      "movementY": 7,
+      "buttons": 1,
+      "stageX": 913,
+      "stageY": 124,
+      "boardX": 572.2083339691162,
+      "boardY": 52
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262720,
+      "type": "BRUSH_CHANGE",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          5
+        ],
+        "currentRadius": 5
+      },
+      "args": [
+        1
+      ],
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          5
+        ],
+        "currentRadius": 5
+      }
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262720,
+      "type": "BRUSH_CHANGE_APPLIED",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          5
+        ],
+        "currentRadius": 5
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262724,
+      "type": "MOUSE_MOVE_SAMPLE",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "window-bubble-after-egret-canvas",
+      "domEventTimeStamp": 262709,
+      "clientX": 1381,
+      "clientY": 183,
+      "pageX": 1381,
+      "pageY": 183,
+      "screenX": 1381,
+      "screenY": 346,
+      "movementX": 47,
+      "movementY": 2,
+      "buttons": 1,
+      "stageX": 945,
+      "stageY": 125,
+      "boardX": 604.2083339691162,
+      "boardY": 53
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262737,
+      "type": "BRUSH_CHANGE",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "args": [
+        1
+      ],
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262737,
+      "type": "BRUSH_CHANGE_APPLIED",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262741,
+      "type": "MOUSE_MOVE_SAMPLE",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "window-bubble-after-egret-canvas",
+      "domEventTimeStamp": 262725,
+      "clientX": 1421,
+      "clientY": 187,
+      "pageX": 1421,
+      "pageY": 187,
+      "screenX": 1421,
+      "screenY": 350,
+      "movementX": 40,
+      "movementY": 4,
+      "buttons": 1,
+      "stageX": 972,
+      "stageY": 128,
+      "boardX": 631.2083339691162,
+      "boardY": 56
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262754,
+      "type": "BRUSH_CHANGE",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "args": [
+        1
+      ],
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262754,
+      "type": "BRUSH_CHANGE_APPLIED",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262758,
+      "type": "MOUSE_MOVE_SAMPLE",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "window-bubble-after-egret-canvas",
+      "domEventTimeStamp": 262740,
+      "clientX": 1461,
+      "clientY": 188,
+      "pageX": 1461,
+      "pageY": 188,
+      "screenX": 1461,
+      "screenY": 351,
+      "movementX": 40,
+      "movementY": 1,
+      "buttons": 1,
+      "stageX": 1000,
+      "stageY": 129,
+      "boardX": 659.2083339691162,
+      "boardY": 57
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262771,
+      "type": "BRUSH_CHANGE",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "args": [
+        1
+      ],
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262771,
+      "type": "BRUSH_CHANGE_APPLIED",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262773,
+      "type": "MOUSE_MOVE_SAMPLE",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "window-bubble-after-egret-canvas",
+      "domEventTimeStamp": 262756,
+      "clientX": 1494,
+      "clientY": 189,
+      "pageX": 1494,
+      "pageY": 189,
+      "screenX": 1494,
+      "screenY": 352,
+      "movementX": 33,
+      "movementY": 1,
+      "buttons": 1,
+      "stageX": 1022,
+      "stageY": 129,
+      "boardX": 681.2083339691162,
+      "boardY": 57
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262788,
+      "type": "BRUSH_CHANGE",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "args": [
+        1
+      ],
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262788,
+      "type": "BRUSH_CHANGE_APPLIED",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262790,
+      "type": "MOUSE_MOVE_SAMPLE",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "window-bubble-after-egret-canvas",
+      "domEventTimeStamp": 262771,
+      "clientX": 1517,
+      "clientY": 190,
+      "pageX": 1517,
+      "pageY": 190,
+      "screenX": 1517,
+      "screenY": 353,
+      "movementX": 23,
+      "movementY": 1,
+      "buttons": 1,
+      "stageX": 1038,
+      "stageY": 130,
+      "boardX": 697.2083339691162,
+      "boardY": 58
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262804,
+      "type": "BRUSH_CHANGE",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "args": [
+        1
+      ],
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262804,
+      "type": "BRUSH_CHANGE_APPLIED",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262807,
+      "type": "MOUSE_MOVE_SAMPLE",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "window-bubble-after-egret-canvas",
+      "domEventTimeStamp": 262788,
+      "clientX": 1535,
+      "clientY": 191,
+      "pageX": 1535,
+      "pageY": 191,
+      "screenX": 1535,
+      "screenY": 354,
+      "movementX": 18,
+      "movementY": 1,
+      "buttons": 1,
+      "stageX": 1051,
+      "stageY": 131,
+      "boardX": 710.2083339691162,
+      "boardY": 59
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262821,
+      "type": "BRUSH_CHANGE",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "args": [
+        1
+      ],
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262821,
+      "type": "BRUSH_CHANGE_APPLIED",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262823,
+      "type": "MOUSE_MOVE_SAMPLE",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "window-bubble-after-egret-canvas",
+      "domEventTimeStamp": 262802,
+      "clientX": 1549,
+      "clientY": 191,
+      "pageX": 1549,
+      "pageY": 191,
+      "screenX": 1549,
+      "screenY": 354,
+      "movementX": 14,
+      "movementY": 0,
+      "buttons": 1,
+      "stageX": 1060,
+      "stageY": 131,
+      "boardX": 719.2083339691162,
+      "boardY": 59
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262837,
+      "type": "BRUSH_CHANGE",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "args": [
+        1
+      ],
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262837,
+      "type": "BRUSH_CHANGE_APPLIED",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      }
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262840,
+      "type": "MOUSE_MOVE_SAMPLE",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "source": "window-bubble-after-egret-canvas",
+      "domEventTimeStamp": 262819,
+      "clientX": 1552,
+      "clientY": 191,
+      "pageX": 1552,
+      "pageY": 191,
+      "screenX": 1552,
+      "screenY": 354,
+      "movementX": 3,
+      "movementY": 0,
+      "buttons": 1,
+      "stageX": 1062,
+      "stageY": 131,
+      "boardX": 721.2083339691162,
+      "boardY": 59
+    },
+    {
+      "monitorVersion": "0.2.2",
+      "t": 262944,
+      "type": "POINTER_UP_CANDIDATE",
+      "strokeId": "pointer-stroke-4",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          1
+        ],
+        "currentRadius": 1
+      },
+      "clientX": 1552,
+      "clientY": 191,
+      "pointerType": "mouse"
+    }
+  ],
+  "frame_probes": [
+    {
+      "stroke_id": "pointer-stroke-3",
+      "started_at_performance_ms": 261852,
+      "ended_at_performance_ms": 261881,
+      "visible": true,
+      "intervals": [
+        16.66
+      ]
+    },
+    {
+      "stroke_id": "pointer-stroke-4",
+      "started_at_performance_ms": 262606,
+      "ended_at_performance_ms": 262944,
+      "visible": true,
+      "intervals": [
+        16.66,
+        16.68,
+        16.66,
+        16.66,
+        16.68,
+        16.66,
+        16.66,
+        16.68,
+        16.66,
+        16.66,
+        16.68,
+        16.66,
+        16.66,
+        16.68,
+        16.66,
+        16.66,
+        16.68,
+        16.66,
+        16.66
+      ]
+    }
+  ],
+  "active_drawing_duration_ms": 367.0,
+  "dropped_events": 0,
+  "monitor_buffer_dropped_events_start": 0,
+  "monitor_buffer_dropped_events_end": 0,
+  "monitor_buffer_dropped_events_delta": 0,
+  "monitor_error_count_start": 0,
+  "monitor_error_count_end": 0,
+  "monitor_error_count_delta": 0,
+  "bridge_send_failures_start": 0,
+  "bridge_send_failures_end": 0,
+  "bridge_send_failures_delta": 0,
+  "collector_sequence_gap_count": 0,
+  "monitor_errors": [],
+  "interpretation": {
+    "chalk_status": "exact",
+    "path_length_status": "incomplete_until_verified"
+  },
+  "ended_at_performance_ms": 262944,
+  "monitor_dropped_events": 0,
+  "monitor_error_count": 0,
+  "monitor_active": true,
+  "chalk": {
+    "status": "exact",
+    "consumed_points": 0,
+    "pre_point_count": 2,
+    "post_point_count": 2,
+    "max_points": 6000
+  },
+  "stroke_count": 0,
+  "stroke_candidate_count": 2,
+  "non_consuming_stroke_candidate_count": 2,
+  "stroke_lifecycle_sources": [
+    "pointer_observer"
+  ],
+  "sampled_point_delta_total": 0,
+  "point_delta_matches_chalk": true,
+  "observed_brush_radii": [
+    1.0,
+    5.0,
+    17.0,
+    22.0,
+    28.0,
+    29.0,
+    30.0
+  ],
+  "brush_radius_status": "mixed",
+  "trajectory": {
+    "observed_segment_length_lower_bound": 0.0,
+    "accepted_sample_count": 0,
+    "status": "incomplete_until_verified",
+    "note": "Coalesced pointDelta values mean intermediate accepted coordinates may be missing."
+  },
+  "per_stroke_metrics": [
+    {
+      "stroke_id": "pointer-stroke-3",
+      "lifecycle_status": "complete",
+      "started_at_performance_ms": 261852,
+      "ended_at_performance_ms": 261881,
+      "duration_ms": 29.0,
+      "point_count_before": 2,
+      "point_count_after": 2,
+      "point_count_delta": 0,
+      "point_update_event_count": 0,
+      "point_update_delta_sum": 0,
+      "point_count_delta_matches_updates": null,
+      "accepted_points_per_second": 0.0,
+      "median_point_update_interval_ms": null,
+      "p95_point_update_interval_ms": null,
+      "max_point_update_interval_ms": null
+    },
+    {
+      "stroke_id": "pointer-stroke-4",
+      "lifecycle_status": "complete",
+      "started_at_performance_ms": 262606,
+      "ended_at_performance_ms": 262944,
+      "duration_ms": 338.0,
+      "point_count_before": 2,
+      "point_count_after": 2,
+      "point_count_delta": 0,
+      "point_update_event_count": 0,
+      "point_update_delta_sum": 0,
+      "point_count_delta_matches_updates": null,
+      "accepted_points_per_second": 0.0,
+      "median_point_update_interval_ms": null,
+      "p95_point_update_interval_ms": null,
+      "max_point_update_interval_ms": null
+    }
+  ],
+  "frame_probe_by_stroke": [
+    {
+      "status": "measured",
+      "frame_count": 2,
+      "average_fps": 60.024,
+      "median_fps": 60.024,
+      "median_interval_ms": 16.66,
+      "p95_interval_ms": 16.66,
+      "max_interval_ms": 16.66,
+      "visibility_interruption": false,
+      "stroke_id": "pointer-stroke-3",
+      "started_at_performance_ms": 261852,
+      "ended_at_performance_ms": 261881,
+      "visible": true
+    },
+    {
+      "status": "measured",
+      "frame_count": 20,
+      "average_fps": 60.001,
+      "median_fps": 60.024,
+      "median_interval_ms": 16.66,
+      "p95_interval_ms": 16.68,
+      "max_interval_ms": 16.68,
+      "visibility_interruption": false,
+      "stroke_id": "pointer-stroke-4",
+      "started_at_performance_ms": 262606,
+      "ended_at_performance_ms": 262944,
+      "visible": true
+    }
+  ],
+  "frame_probe": {
+    "status": "measured",
+    "frame_count": 21,
+    "average_fps": 60.002,
+    "median_fps": 60.024,
+    "median_interval_ms": 16.66,
+    "p95_interval_ms": 16.68,
+    "max_interval_ms": 16.68,
+    "visibility_interruption": false,
+    "stroke_probe_count": 2
+  },
+  "elapsed_from_first_to_last_stroke_ms": 1092,
+  "finished_at_utc": "2026-11-05T00:18:35.701+00:00",
+  "event_count": 45
+}

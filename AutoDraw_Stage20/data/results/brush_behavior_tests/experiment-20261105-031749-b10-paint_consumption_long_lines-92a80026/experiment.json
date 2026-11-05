@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "record_type": "autodraw_brush_paint_experiment",
+  "experiment_id": "92a800269be44260a8e582ce8b10e799",
+  "chalk_radius_matrix": {
+    "schema_version": 1,
+    "series_id": "chalk-20261105-031513-ab1bff",
+    "block": 1,
+    "repeat_index": 1,
+    "requested_radius": 10,
+    "planned_radii": [
+      1,
+      5,
+      10,
+      15,
+      20,
+      25,
+      30
+    ],
+    "block_order": [
+      1,
+      5,
+      10,
+      15,
+      20,
+      25,
+      30
+    ],
+    "matrix_order_index": 3,
+    "scenario_id": "paint_consumption_long_lines",
+    "expected_strokes": 6
+  },
+  "chalk_experiment_matrix": null,
+  "chalk_test_block": null,
+  "updated_at_utc": "2026-11-05T00:17:54+00:00",
+  "test_case": "paint_consumption_long_lines",
+  "brush_value_requested": 10,
+  "drawing_plan_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw-feature-image-geometry-optimization\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\brush-plan-paint_consumption_long_lines-b10-20261105-031748-92a80026.json",
+  "execution_report_path": null,
+  "execution_report": null,
+  "game_monitor_report_path": null,
+  "game_monitor_summary": null,
+  "monitor_capture": null,
+  "calibration_profile_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw-feature-image-geometry-optimization\\AutoDraw_Stage20\\data\\brush_paint_calibration.json",
+  "phases": {
+    "before_clear": {
+      "status": "not_restored",
+      "board_clear_check": {
+        "status": "not_restored",
+        "tolerance_percent": 0.15,
+        "changed_percent": 8.7712,
+        "comparison": {
+          "width": 581,
+          "height": 304,
+          "total_pixels": 176624,
+          "changed_pixels": 15492,
+          "changed_percent": 8.7712,
+          "pixel_similarity_percent": 91.2288,
+          "mean_absolute_rgb_difference": 1.1419,
+          "exact_match": false,
+          "interpretation": "visual_pixel_comparison_only_not_a_reading_of_the_game_resource_counter"
+        },
+        "reference_type": "explicit_blank_board_roi",
+        "note": "Визуальное совпадение с отдельно сохранённым эталоном пустой доски; это не доказательство внутреннего состояния игры."
+      },
+      "captured_at_utc": "2026-11-05T00:17:54+00:00",
+      "screen_size": {
+        "width": 1920,
+        "height": 1080
+      },
+      "files": {
+        "full_screen": "before_clear-screen.png",
+        "board_roi": "before_clear-board.png",
+        "paint_meter_roi": "before_clear-paint-meter.png"
+      }
+    }
+  },
+  "interpretation_limits": [
+    "Meter fill is a provisional image estimate, not a direct read of the game's internal resource counter.",
+    "A successful executor report does not prove every stroke was registered by the game.",
+    "Execution status and visual evidence are recorded separately."
+  ]
+}

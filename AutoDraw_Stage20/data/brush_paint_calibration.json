@@ -6,7 +6,7 @@
   "environment": {
     "screen_width": 1920,
     "screen_height": 1080,
-    "calibrated_at_utc": "2026-11-03T00:09:04+00:00",
+    "calibrated_at_utc": "2026-11-05T00:27:09+00:00",
     "windows_scale_percent": 100,
     "browser_zoom_percent": 100,
     "browser": "Firefox",
@@ -14,44 +14,44 @@
   },
   "points": {
     "clear_board": {
-      "x": 650,
-      "y": 578
+      "x": 599,
+      "y": 647
     },
     "brush_7": {
-      "x": 1309,
-      "y": 272
+      "x": 1368,
+      "y": 289
     },
     "brush_14": {
-      "x": 1290,
-      "y": 272
+      "x": 1346,
+      "y": 289
     },
     "brush_20": {
-      "x": 1263,
-      "y": 272
+      "x": 1316,
+      "y": 289
     },
     "brush_slider_value_1": {
-      "x": 1293,
-      "y": 305
+      "x": 1354,
+      "y": 328
     },
     "brush_slider_value_30": {
-      "x": 1162,
-      "y": 303
+      "x": 1199,
+      "y": 328
     },
     "editor_open": null,
     "save_drawing": null
   },
   "regions": {
     "board_area": {
-      "x": 566,
-      "y": 253,
-      "width": 581,
-      "height": 304
+      "x": 496,
+      "y": 265,
+      "width": 674,
+      "height": 355
     },
     "paint_meter_area": {
-      "x": 742,
-      "y": 566,
-      "width": 160,
-      "height": 26
+      "x": 708,
+      "y": 629,
+      "width": 188,
+      "height": 42
     },
     "brush_value_area": null
   },
