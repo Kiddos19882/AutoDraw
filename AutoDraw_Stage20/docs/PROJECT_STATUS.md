@@ -1,3 +1,15 @@
+## 2026-11-05 — offline renderer now consumes exact latest-run profile
+
+**Code commits:** `23ed8cf2` (run-bound runtime profile) and `d6343ada` (UI instructions).
+
+- Previous offline manifest metadata was stale: it pointed to the 2026-11-04 snapshot (Stage 1672×600, backing canvas 5016×1800) and recorded an unrelated 1920×927 viewport.
+- The latest paired tests expose run-bound geometry through `monitor_report.json`: screen 1920×1080, viewport 1920×877, Stage 1314×600, backing canvas 3942×1800, canvasScaleFactor=2, canvasScaleX/Y=3, DPR=1, visualViewportScale=1, CSS matrix `matrix(0.487062,0,0,0.487778,0,0)`.
+- `game_renderer_reference.js` now requires the full Monitor report for live paired replay and derives its runtime profile from the unchanged `renderer_geometry_at_start/end` snapshot belonging to that run. Missing/mismatched geometry fails closed; stale snapshot values are no longer silently used.
+- The local BoardPane raster remains 460×240 at 3× (1380×720). Stage dimensions and CSS transform are recorded as live-session metadata; they are not applied to the isolated BoardPane raster.
+- UI instructions now request the complete latest `monitor_report.json`, not an events-only export or coordinate array.
+- No offline render was launched, no live test was run, and no CHALK/game state was changed. User will rerun the offline render and provide its new manifest/PNG for analysis.
+- Current branch: `feature/image-geometry-optimization`; latest documentation commit will follow this entry. Local `git status` remains unavailable through GitHub API.
+
 # Актуальная точка продолжения — 2026-11-05
 
 ## Текущая точка — сравнение ограничено фактическими BoardPane bounds; CI проверки исправления выполняется
