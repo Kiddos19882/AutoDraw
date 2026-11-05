@@ -8,9 +8,9 @@
 
 | ID | Приоритет | Статус | Содержание |
 |---|---|---|---|
-| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | IN_PROGRESS | Runtime Egret 5.4.1/WebGL и offline replay manifest/PNG подтверждены; количественное сравнение live after_draw-board.png с offline WebGL reference остаётся открытым |
+| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | IN_PROGRESS | Exploratory live/offline comparison выполнен; остаточный offset (+1,+2) диагностирован post-hoc, независимая причина и acceptance не установлены |
 | FILL-001-RS-MATRIX | P0 | BLOCKED | 45 captures только после принятого single-task preflight |
-| GAME-INPUT-SAMPLING-TRACE-001 | P1 | OFFLINE_REPLAY_DONE_LIVE_PNG_COMPARISON_PENDING | Run 16aec62c принят; 138 accepted points, CHALK=138; offline BoardPane/WebGL replay создан, требуется независимый live/offline pixel diff |
+| GAME-INPUT-SAMPLING-TRACE-001 | P1 | EXPLORATORY_COMPARE_DONE_TRANSFORM_ROOT_CAUSE_OPEN | Run 16aec62c принят; 138 accepted points, CHALK=138; unshifted IoU=0.76315, post-hoc (+1,+2) IoU=0.99888; acceptance не пройдена |
 | BRUSH-FOOTPRINT-CAPSULE-001 | P1 | OPEN | Offline capsule model готова; renderer acceptance/planner integration не выполнены |
 | INT-006 | P1 | IN_PROGRESS | D1-D5 45/45 и analyzer завершены; domain validation/safety margin не завершены |
 | INT-007 | P2 | BLOCKED | Интеграция модели после INT-006 |
@@ -50,6 +50,27 @@
 - Offline BoardPane replay создан: manifest fixture `live-accepted-points`, sourceRunId совпадает с live run, 138 points, mode=smooth, width=10. Actual BoardPane/manual transcription и Canvas2D/WebGL internal comparisons дали exact pixel match (0 differing pixels); это не live/offline comparison.
 - Paired plan transform: ROI 674×355, scale_x=1.4630434782608697, scale_y=1.475. Experiment ROI heuristic: x=18,y=166,w=609,h=23, changed_pixels=8947. Эти метрики не являются pixel diff с offline output.
 - Следующий шаг: независимый pixel-level compare live PNG и offline WebGL PNG с baseline/alpha normalization и фиксацией residual coordinates. Live повтор не требуется; FILL-001-RS matrix остаётся BLOCKED.
+
+## 2026-11-05 — exploratory live/offline renderer comparison and transform audit
+
+**Experiment:** d47cc0a5520044c7abfd0352a4f93ca8; **run:** 16aec62c-9e54-44e7-8691-9df79b19161d; **session:** d357b6ee-5617-4e07-9011-7eba7ccb6c0f. Raw capture and offline renderer inputs remain immutable.
+
+### Quantitative comparison (exploratory; no acceptance threshold)
+
+- Frozen, unshifted mapping at alpha threshold 24: live changed mask 8,946 px; offline expected mask 8,950 px; TP=7,746, FP=1,200, FN=1,204; symmetric difference=2,404 px; IoU=0.763153; precision=0.865862; recall=0.865475; F1=0.865668.
+- Post-hoc diagnostic search over translations ±5 px found best translation of the expected mask (+1,+2): TP=8,943, FP=3, FN=7; symmetric difference=10 px; IoU=0.998883; precision=0.999665; recall=0.999218; F1=0.999441.
+- The second result is a fit against this same image pair. It is evidence that the footprints are highly similar after translation, but it is not an independently derived coordinate correction, does not establish the cause of the offset and is not acceptance. Do not apply (+1,+2) to production or frozen plans.
+
+### Independent geometric audit of the frozen plan
+
+- The paired plan uses ROI (496,265,674,355), logical board 460×240 and pixel-center scales scale_x=(674-1)/460=1.4630434783, scale_y=(355-1)/240=1.475.
+- Relative X/Y scale discrepancy is 0.8106%, just inside the transform helper's 1% tolerance. However, the logical aspect ratio is 1.916667 while ROI aspect ratio is 1.898592. If the ROI were a uniform-scale rectangle, a 355 px height would correspond to about 680.21 px width, approximately 6.21 px wider than the selected 674 px ROI.
+- The ROI coordinates come from the configured screen calibration/blank-board crop. The 2026-11-04 runtime snapshot has boardClientCorners=null and belongs to a different session; it cannot independently validate the live 2026-11-05 crop origin or client-space corners.
+- This establishes a measurable geometric inconsistency in the selected ROI dimensions, not the root cause of the (+1,+2) residual. Candidate causes (ROI edge/crop convention, pixel-center versus board-boundary mapping, resampling, antialiasing, baseline drift and color handling) remain unseparated.
+
+**Status:** comparison analyzed as exploratory; live/offline renderer equivalence and transform root cause remain NOT ACCEPTED / OPEN. FILL-001-RS 45-cell matrix remains BLOCKED. No live experiment was run during this continuation; no production planner, renderer, executor, CHALK estimator, frozen plan or raw evidence was changed.
+
+**Next offline action:** derive board bounds and crop origin independently from the same-session after_draw-screen.png (and before/blank reference), compare them with the calibrated ROI, then evaluate the existing frozen pixel-center/boundary mapping and a uniform-scale transform from independently measured edges. Keep the current frozen transform and post-hoc diagnostic separate; define acceptance criteria before any confirmatory comparison.
 
 ## Зачем остаются четыре направления
 
