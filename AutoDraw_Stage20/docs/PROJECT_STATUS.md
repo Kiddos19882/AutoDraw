@@ -1,21 +1,21 @@
 # Актуальная точка продолжения — 2026-11-05
 
-## Текущая точка — exploratory renderer comparison завершён; независимая геометрия и handoff остаются открытыми
+## Текущая точка — независимый ROI audit выполнен; offline comparison ожидает CI
 
 **Branch:** feature/image-geometry-optimization  
-**HEAD до документальной синхронизации:** 454b63dc2c9fb41b553cef0a86cad63e0fa2241e (`docs(test-results): record live offline pixel comparison`).  
-**Сверка ветки:** до записи плана compare ветки с HEAD 454b63d вернул `identical` (ahead=0, behind=0); последние 20 commits проверены. Документальная синхронизация после этой проверки создала последовательные commits `eb2d8bd`, `eaaee3d`, `7a88839`, `3b09faf`, `83e25a0` и `e1eb7a0`; последняя подтверждённая точка ветки перед текущим обновлением status — `e1eb7a01f26e769610cf8f8db521a1c32050b3de`.  
-**Локальный git status:** недоступен через GitHub API; чистота локальной рабочей копии не подтверждена.  
-**CI:** последний известный полный workflow 41954783317 завершился SUCCESS по обязательным jobs, optional algorithm benchmarks SKIPPED; он не подтверждает документальные commits. Combined status для исходного HEAD 454b63d не содержал статусов.  
+**HEAD до текущей серии audit/tooling commits:** c27e16aebfebb0d8f829cad36a0b2fc6a46ec8fb.  
+**Последние 20 commits:** проверены перед началом этой итерации. GitHub API не подтверждает локальный git status.  
+**CI до текущих изменений:** последний известный полный workflow 41954783317 — обязательные jobs SUCCESS, optional algorithm benchmarks SKIPPED; он не подтверждает HEAD c27e16a.  
 
-### Текущая задача
+### Результат offline ROI audit
 
-FILL-001-RS-ENGINE-FOOTPRINT-001 остаётся IN_PROGRESS. Live/offline сравнение имеет статус exploratory; независимая причина residual offset не установлена, renderer acceptance не пройдена. Подробный временный план уточнён в [ROADMAP.md](ROADMAP.md#уточнённый-временный-план--автоматическое-определение-геометрии-доски-и-handoff-калибровки).
+Same-run Game Monitor report содержит 272 mouse samples: во всех screenX-clientX=0, screenY-clientY=163, boardY=119, stageY=191. Горизонтальный fit: origin X=497.952041, scale X=1.461213990; RMSE≈0.424 screen px. Пользовательский inspect snapshot того же экрана даёт scale X=1.461186 и Y=1.463334; после client→screen offset BoardPane corners ≈(497.960,267.860)—(1170.106,619.060). Вертикальный scale не fit-ится по live run, поскольку траектория горизонтальная; он получен из inspect CSS transform и проверен одной точкой.
 
-**Разрешённый объём текущего продолжения:** анализ реализации и документирование плана. Изменение исходников, тестов, конфигураций/workflow, запуск live-игры и CHALK-эксперименты не разрешены этим запросом.
+Ручной ROI (496,265,674,355) содержит около 1.95 px лишней области слева и 2.86 px сверху; его pixel-center scales (1.463043,1.475) отличаются от runtime scales (1.461186,1.463334). Текущий helper допускает до 1% разницы и не проверяет origin, поэтому этот ROI проходит validation, хотя геометрически не совпадает с BoardPane.
 
-**Следующий шаг:** выполнить offline-аудит исходных скриншотов и независимо восстановить board ROI/crop origin из той же сессии; если same-session full-screen/blank evidence недостаточно, остановиться и запросить недостающий материал. Не начинать интеграцию Monitor → Bridge → AutoDraw до отдельного утверждения реализации.
+**Следующий шаг:** CI должен выполнить независимый offline PNG comparison с матрицей, построенной по same-run Monitor X fit + inspect CSS Y transform. Post-hoc (+1,+2) не применяется. Затем продолжить coordinate-space contract и Monitor→Bridge→AutoDraw design.
 
+**Границы этой итерации:** добавлены offline audit helper/test/derived evidence и CI comparison path; live game actions не выполнялись. Production planner, executor defaults, brush calibration profile и frozen plans не изменялись.
 ### Принятый live capture и offline replay
 
 Run 16aec62c-9e54-44e7-8691-9df79b19161d, session d357b6ee-5617-4e07-9011-7eba7ccb6c0f, experiment d47cc0a5520044c7abfd0352a4f93ca8: один stroke, 138 accepted points, каждый положительный update имеет pointDelta=1 и acceptedPoint; pointCount 1→139, точный CHALK=138. Bridge telemetry без drops/errors/send failures/sequence gaps. Raw capture пригоден для replay; агрегированное trajectory.status=incomplete_until_verified остаётся summary metadata inconsistency.
