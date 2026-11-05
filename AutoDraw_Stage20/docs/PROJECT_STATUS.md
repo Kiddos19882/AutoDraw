@@ -39,7 +39,7 @@
 
 **Следующий шаг:** выполнить независимое pixel-level сравнение `after_draw-board.png` с offline WebGL PNG после применения screen ROI transform и baseline/alpha normalization; сохранить hashes, crop/resize method, threshold, IoU/precision/recall, symmetric difference и координаты residuals. Повторный live stroke не нужен.
 
-**CI:** для commit 02ebab8 combined status пустой (statuses=[]), а доступный endpoint workflow-runs не вернул runs; CI PASS не подтверждён. Тесты исходников в этом data commit не менялись. Локальный запуск и git status недоступны через GitHub API.
+**CI:** combined status для data/manifest commit `ad03a0b` и документационного commit `40f1603` пуст (`statuses=[]`); CI PASS для этих commits не подтверждён. Последний полный CI run `41933396072` завершился SUCCESS на более раннем source/test HEAD `f6df3f9`; новые commits содержат data/manifest и документацию, не исходники/тесты. Локальный запуск и `git status` недоступны через GitHub API.
 
 **Git:** пользовательский data commit 02ebab8 и документационные обновления находятся в feature/image-geometry-optimization; master не изменялась. Сравнение с последним ранее проверенным master commit 9a3453a показывает diverged; это compare snapshot, не локальный git status.
 

@@ -438,5 +438,5 @@ Workflow включает:
 
 **Status:** OFFLINE_REPLAY_DONE / LIVE_PNG_PIXEL_COMPARISON_PENDING.  
 **Evidence level:** E4 for live run and exact CHALK=138; E3/E2 for offline harness internal renderer comparisons; no E5 live/offline pixel equivalence claim.  
-**CI:** latest branch HEAD `ad03a0b5b03cf76f6fa11f06047d52106317c8c7` has empty combined status; do not claim CI PASS for this data/manifest commit. Full CI run `41933396072` passed on earlier source/test HEAD `f6df3f9`.  
+**CI:** data/manifest commit `ad03a0b5b03cf76f6fa11f06047d52106317c8c7` and follow-up documentation commit `40f1603075503c9aa12c964af52e9aa2a82635e6` have empty combined status; do not claim CI PASS for these commits. Full CI run `41933396072` passed on earlier source/test HEAD `f6df3f9`.  
 **Next gate:** independent quantitative comparison of live screenshot and offline WebGL PNG after explicit ROI transform and background/alpha normalization. No repeat live stroke required; FILL-001-RS 45-cell matrix remains BLOCKED.
