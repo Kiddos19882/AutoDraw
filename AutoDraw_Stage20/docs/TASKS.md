@@ -1,6 +1,21 @@
-## Новая актуальная задача — повторный offline replay с профилем последнего live run
+## 2026-11-06 — formal same-run multi-axis replay: horizontal PASS, vertical/diagonal REJECTED
 
-**Статус:** READY_FOR_USER_RERUN  
+- [x] Independent same-run replay сохранённых horizontal, vertical и diagonal captures выполнен в CI [42113632374](https://github.com/Kiddos19882/AutoDraw/actions/runs/42113632374).
+- [x] Horizontal: PASS_PER_RUN, IoU=0.999329, precision=0.999329, recall=1.000000, symmetric difference=6 px; все формальные gates пройдены.
+- [x] Vertical: REJECTED_PER_RUN, IoU=0.938405, precision=0.938980, recall=0.999348, symmetric difference=302 px; capture/transform gates прошли, renderer gates отклонены.
+- [x] Diagonal: REJECTED_PER_RUN, IoU=0.949646, precision=0.962683, recall=0.985939, symmetric difference=554 px; capture/transform gates прошли, renderer gates отклонены.
+- [x] Проверены оба orientation reports и PNG artifacts; best-translation не использовался для acceptance.
+- [ ] Проверить stage-level WebGL texture composition и fractional backing-store origin; гипотеза о X phase=0.375 px требует подтверждения.
+- [ ] Повторить существующие vertical/diagonal captures через stage-level WebGL compositor без изменения порогов и без post-hoc alignment.
+- [ ] Получить три уникальных PASS_PER_RUN для каждой ориентации; только затем переходить к environment fingerprint/profile consumer/executor gate.
+
+**CI jobs:** Preparation/G3, Game Monitor/Bridge, Executor regression, Egret renderer reference и Application integration — SUCCESS; INT-006 — FAILURE из-за vertical/diagonal renderer gates; optional benchmarks и Windows portable build — SKIPPED. Windows build теперь запускается отдельно через workflow_dispatch input run_windows_portable_build=true.
+
+**Artifacts:** paired renderer evidence 13454628828; Egret renderer reference 13453809141. Exact CHALK существующих live runs: vertical=71, diagonal=161. Новые live runs не выполнялись.
+
+## Завершённый этап — повторный offline replay с профилем последнего live run (2026-11-06)
+
+**Статус:** COMPLETED_FOR_EXISTING_CAPTURES; VERTICAL_DIAGONAL_REJECTED_PER_RUN  
 **Изменения harness:** внесены в `tests/game_renderer_reference.js` и `tests/game_renderer_reference.html`.
 
 - [x] Убрать ссылку на устаревший `renderer_snapshot_2026-11-04.json` из runtime profile, который создаёт offline replay.
@@ -8,8 +23,8 @@
 - [x] Отклонять события без run-bound renderer geometry вместо тихого fallback к старым настройкам.
 - [x] Сохранить правильную локальную геометрию BoardPane: 460×240, rasterScale 3, выход 1380×720.
 - [x] Обновить инструкцию UI для загрузки полного Monitor report.
-- [ ] Пользователь повторно запускает offline render с последними vertical/diagonal run reports и передаёт новые manifest/PNG.
-- [ ] Проверить новые outputs и только затем анализировать pixel mismatch.
+- [x] Сохранённые vertical/diagonal captures повторно воспроизведены в CI с точными same-run Monitor reports и полноэкранными screenshots.
+- [x] Outputs и per-run reports проверены; vertical/diagonal получили REJECTED_PER_RUN, horizontal получил PASS_PER_RUN. Причина orientation-dependent residual остаётся открытой.
 
 Важно: stage 1314×600 и canvas CSS transform описывают живую экранную композицию; они не должны менять локальный размер offscreen BoardPane 460×240.
 
@@ -21,12 +36,14 @@
 
 ## Сводка
 
+**Актуальное уточнение 2026-11-06:** CI 42113632374 подтвердил horizontal PASS_PER_RUN (IoU 0.999329, 6 px difference), но vertical/diagonal остались REJECTED_PER_RUN (IoU 0.938405 / 0.949646). Capture и transform gates прошли для всех направлений; не пройдены только renderer pixel gates вертикального и диагонального captures. Следующий шаг — проверка stage-level WebGL texture composition; fractional backing X phase=0.375 px является гипотезой. Пороги и live captures не менялись.
+
 **Уточнение 2026-11-05:** same-run Monitor/screenshot transform проходит geometry gates. CI 42087496092 выявил, что формальная pixel mask включала 17 UI pixels за пределами BoardPane, но внутри большего calibrated ROI. Commits `1ac3d939` и `e73506db` ограничили formal comparison точными screenshot-derived BoardPane bounds, вынес ROI margins в отдельную диагностику и добавил regression tests. CI 42092259450: preparation/G3 passed (888 tests, 24 warnings, 82 subtests); renderer replay failed before metrics because OpenCV diagnostic alpha mask uses ROI-local coordinates but was cropped with absolute screen coordinates. Commit `f1b5b608` fixes the coordinate frame and adds a regression test; CI 42093239480 pending. Horizontal: no formal PASS_PER_RUN yet. The 0.999218 IoU / 7-pixel result is an offline re-analysis of a stored artifact only, not a CI acceptance run. Vertical/diagonal: REJECTED_PER_RUN in that run (IoU 0.938863 / 0.953976); their captures/transforms passed, but Edge compositor did not match the live Firefox 159 browser. Commit `bc787b8f` switches to Firefox headless canvas compositing with major-version guard; CI 42096244252 завершился FAILURE: horizontal Firefox compositor replay returned IoU/precision/recall=0 and 8946 symmetric-difference pixels; capture/transform passed; vertical/diagonal replay was skipped. The Firefox overlay failure remains undiagnosed. Do not start executor handoff.
 
 
 | ID | Приоритет | Статус | Содержание |
 |---|---|---|---|
-| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | HORIZONTAL_PER_RUN_ACCEPTED_VERTICAL_DIAGONAL_REPLAY_CI_PENDING_BOARD_BOUNDS_CROP_FIX_PROFILE_PENDING | Один horizontal capture прошёл formal per-run gates; по одному vertical/diagonal live capture собраны и raw-validated, но independent-transform per-run acceptance pending; для multi-axis серии нужны три unique PASS_PER_RUN каждого направления; environment fingerprint, profile consumer and executor gate pending |
+| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | HORIZONTAL_PASS_VERTICAL_DIAGONAL_REJECTED_STAGE_WEBGL_COMPOSITOR_REQUIRED | Horizontal: один formal PASS_PER_RUN; vertical/diagonal: по одному REJECTED_PER_RUN при прошедших capture/transform gates; исследовать stage-level WebGL texture composition и fractional backing origin, затем повторить существующие captures; для multi-axis серии нужны три unique PASS_PER_RUN каждого направления; environment fingerprint, profile consumer и executor gate остаются pending |
 | FILL-001-RS-MATRIX | P0 | BLOCKED | 45 captures только после принятого single-task preflight |
 | GAME-INPUT-SAMPLING-TRACE-001 | P1 | ROI_BOUNDS_ROOT_CAUSE_IDENTIFIED_MULTI_AXIS_CODE_READY_LIVE_CAPTURE_PENDING | Run 16aec62c; 138 accepted points, CHALK=138; ROI included margins; screenshot-derived bounds + Monitor fit IoU=0.998882 / 10 px without post-hoc shift; multi-axis/environment validation pending |
 | BRUSH-FOOTPRINT-CAPSULE-001 | P1 | OPEN | Offline capsule model готова; renderer acceptance/planner integration не выполнены |

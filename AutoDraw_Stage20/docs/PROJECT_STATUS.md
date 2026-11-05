@@ -1,3 +1,45 @@
+# Актуальная точка продолжения — 2026-11-06
+
+## P0 — independent same-run multi-axis renderer comparison
+
+**Репозиторий:** Kiddos19882/AutoDraw  
+**Рабочая ветка:** feature/image-geometry-optimization  
+**HEAD на момент синхронизации:** b07c636fa4b4ce28329cfb74f468634a46751ac1  
+**Master:** 9a3453aeb847b66041bc83d6f4a56ecaf33a993a — не изменялась.  
+**Последний CI:** [42113632374](https://github.com/Kiddos19882/AutoDraw/actions/runs/42113632374), итоговый conclusion FAILURE из-за INT-006 vertical/diagonal renderer gates.
+
+### Результаты formal per-run replay
+
+| Ориентация | Статус | IoU threshold 24 | Precision | Recall | Symmetric difference |
+|---|---:|---:|---:|---:|---:|
+| Horizontal | PASS_PER_RUN | 0.999329 | 0.999329 | 1.000000 | 6 px |
+| Vertical | REJECTED_PER_RUN | 0.938405 | 0.938980 | 0.999348 | 302 px |
+| Diagonal | REJECTED_PER_RUN | 0.949646 | 0.962683 | 0.985939 | 554 px |
+
+Для всех трёх captures capture/provenance и transform gates прошли; отклонения vertical/diagonal относятся к renderer pixel metrics. Пороги не менялись: IoU/precision/recall ≥0.995, symmetric-difference fraction ≤0.0025, bbox edge delta ≤1 px. Best-translation остаётся только диагностикой и не участвует в acceptance. Ни один сдвиг post-hoc не применялся.
+
+Exact CHALK сохранённых live captures: vertical 71 (pointCount 1→72), diagonal 161 (pointCount 1→162). Новых игровых запусков в этой работе не было.
+
+### Исправления comparison harness и CI
+
+- Формальный compositor использует independent board_to_screen transform, полученный из same-run Monitor и screenshot BoardPane bounds; inspect CSS transform остаётся cross-check.
+- Firefox overlay рисуется в Canvas2D после синхронного onload source image; пустая expected mask теперь вызывает явную ошибку вместо ложной классификации renderer mismatch.
+- Добавлен regression test для HTML compositor.
+- Windows portable build/startup smoke-test вынесен в отдельный opt-in workflow input run_windows_portable_build (default=false); в run 42113632374 job был SKIPPED, как и требовалось.
+- Изменённые code/workflow файлы: tests/compare_live_renderer_reference.py, source/preparation/tests/test_renderer_geometry.py, .github/workflows/geometry-tests.yml.
+
+### Текущий технический вывод
+
+Horizontal контроль подтверждает корректную работу same-run transform и Firefox canvas capture для этой ориентации. Vertical/diagonal остаются формально отклонёнными. Ведущая, пока не доказанная гипотеза: текущий compositor накладывает локальный raster 1380×720 напрямую в screen CSS space, тогда как live BoardPane проходит через WebGL texture composition в backing canvas Stage 3942×1800, затем через CSS transform. Same-run geometry показывает BoardPane backing origin около (1022.375, 216), то есть дробную X-фазу 0.375 px. Это может влиять на LINEAR sampling и coverage для штрихов с X-компонентой нормали. Гипотеза требует отдельной проверки; не считать её установленной причиной.
+
+### Следующий этап
+
+Исследовать и реализовать stage-level WebGL compositor, который воспроизводит live texture draw в backing canvas и сохраняет independent screen transform. Повторно использовать существующие captures. Не менять acceptance thresholds, brush radius, trajectory, sampling, executor parameters или production drawing logic. Не запускать live game tests без отдельного разрешения.
+
+**Доступность:** GitHub API подтверждает remote branch/CI; локальная рабочая копия и локальный git status не проверялись и недоступны через этот интерфейс.
+
+---
+
 ## 2026-11-05 — offline renderer now consumes exact latest-run profile
 
 **Code commits:** `23ed8cf2` (run-bound runtime profile) and `d6343ada` (UI instructions).
@@ -10,7 +52,7 @@
 - No offline render was launched, no live test was run, and no CHALK/game state was changed. User will rerun the offline render and provide its new manifest/PNG for analysis.
 - Current branch: `feature/image-geometry-optimization`; latest documentation commit will follow this entry. Local `git status` remains unavailable through GitHub API.
 
-# Актуальная точка продолжения — 2026-11-05
+# Историческая точка продолжения — 2026-11-05
 
 ## Текущая точка — сравнение ограничено фактическими BoardPane bounds; CI проверки исправления выполняется
 

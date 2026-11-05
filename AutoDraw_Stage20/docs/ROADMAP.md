@@ -1,4 +1,26 @@
-## Актуальный следующий шаг — пользовательский повтор offline replay
+## Актуальный следующий шаг — stage-level WebGL compositor для independent same-run replay
+
+**Статус:** P0 / ANALYSIS REQUIRED / NO LIVE RUN.
+
+- Formal replay существующих captures завершён в CI 42113632374: horizontal PASS_PER_RUN; vertical и diagonal REJECTED_PER_RUN.
+- Для всех трёх направлений capture/provenance и transform gates прошли. Vertical/diagonal fail только renderer pixel metrics.
+- Текущий Firefox Canvas2D compositor размещает локальный BoardPane raster 1380×720 напрямую в screen CSS space. Live game pipeline использует WebGL texture composition в Stage backing canvas 3942×1800, затем CSS transform.
+- Same-run Monitor snapshot показывает BoardPane backing origin около (1022.375,216), fractional X phase=0.375 px. Возможное влияние этой фазы на WebGL LINEAR sampling — гипотеза, не доказанная причина.
+- Следующий offline increment: воспроизвести texture draw в stage backing canvas с same-run stage/backing parameters, сохранив independent board_to_screen transform для screen placement; добавить regression tests и диагностические поля.
+- После реализации повторить сохранённые captures. Не применять post-hoc translation, не менять thresholds, brush radius, trajectories, sampling, executor parameters и production defaults.
+- Три уникальных PASS_PER_RUN vertical и три diagonal остаются обязательными до environment fingerprint, profile consumer и executor gate. Новых live runs для этого этапа не требуется.
+
+## 2026-11-06 — результаты independent same-run multi-axis replay
+
+- Horizontal: PASS_PER_RUN, IoU=0.999329, precision=0.999329, recall=1.000000, symmetric difference=6 px.
+- Vertical: REJECTED_PER_RUN, IoU=0.938405, precision=0.938980, recall=0.999348, symmetric difference=302 px.
+- Diagonal: REJECTED_PER_RUN, IoU=0.949646, precision=0.962683, recall=0.985939, symmetric difference=554 px.
+- Capture/transform checks passed for all; vertical/diagonal renderer checks failed. Acceptance thresholds unchanged.
+- CI [42113632374](https://github.com/Kiddos19882/AutoDraw/actions/runs/42113632374): all code/test jobs succeeded except INT-006; optional benchmarks and Windows portable build skipped.
+- Windows portable build is now manual opt-in through run_windows_portable_build (default false).
+- Artifacts: paired renderer 13454628828, Egret reference 13453809141. No live experiment was run.
+
+## Исторический этап — пользовательский повтор offline replay (закрыт 2026-11-06)
 
 - Offline replay harness больше не использует устаревшие stage/backing размеры из snapshot 2026-11-04 для paired live run.
 - Полный Monitor report является источником renderer profile; runtime snapshot должен быть run-bound, одинаковым в начале и конце run и соответствовать Egret 5.4.1 WebGL, BoardPane 460×240, canvasScaleFactor 2, canvasScaleX/Y 3, DPR 1.

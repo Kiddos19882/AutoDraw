@@ -1280,3 +1280,12 @@
 - Latest V1–V5 analyzer validated 90/90 captures; INT-006 and INT006R analyses accepted 45/45 each. CHALK safety margin and production eligibility remain unvalidated.
 - FILL-001-RS static sweep reproduced 2,238 candidates / 62 accepted; this remains offline estimate evidence, not exact CHALK.
 - Windows portable build/startup smoke-test passed and artifact was uploaded.
+
+
+## 2026-11-06 — independent same-run renderer comparison and optional Windows build
+
+- Formal browser compositor использует independent board_to_screen transform; Firefox Canvas2D overlay ждёт eager source image load и выполняет drawImage синхронно до screenshot. Пустая expected mask отклоняется явно.
+- Добавлен regression test на HTML/onload compositor contract.
+- Windows portable build/startup smoke-test стал manual opt-in: workflow_dispatch.run_windows_portable_build, default=false. Обычный push CI больше не запускает этот job.
+- CI 42113632374: horizontal PASS_PER_RUN; vertical/diagonal REJECTED_PER_RUN. Остальные обязательные code/test jobs SUCCESS; INT-006 общий workflow gate FAILURE. Stage-level WebGL composition остаётся следующим диагностическим этапом.
+- Production renderer, brush settings, trajectories, sampling и executor не изменялись.

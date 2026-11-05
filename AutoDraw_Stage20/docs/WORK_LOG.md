@@ -122,3 +122,21 @@ Scope: code, tests and CI only in feature/image-geometry-optimization; no real g
 - Latest [CI 42096244252](https://github.com/Kiddos19882/AutoDraw/actions/runs/42096244252) completed FAILURE. Executor, Game Monitor/Bridge, Egret renderer harness, preparation/G3 matrix tests, application integration, portable build and startup smoke-test jobs succeeded. INT-006 failed on the first horizontal Firefox compositor comparison: IoU=0, precision=0, recall=0, 8946 symmetric-difference pixels. Capture and transform checks were empty (passed); renderer checks failed. Vertical/diagonal replay was skipped after the horizontal gate failed.
 - Firefox major-version detection ran successfully, but current evidence does not explain why the headless Firefox expected mask did not overlap the observed live delta. Treat as a compositor harness defect/unknown until the generated PNG diagnostics are reviewed; do not infer a game renderer defect.
 - No formal horizontal, vertical or diagonal PASS_PER_RUN is currently established by the latest CI evidence. No live game test or executor handoff was performed.
+
+
+## 2026-11-06 — independent same-run multi-axis replay and compositor investigation
+
+**Scope:** comparison harness, regression test, CI workflow and project documentation on feature/image-geometry-optimization; no production drawing code and no live game experiment.
+
+- Начальная точка продолжения: code/test HEAD c0f36ac49e4b66cf0fcd27d362154b71a917c367. Проверены управляющие документы, README/docs index, engineering invariants, evidence/experiment standards, профильные исходники и сохранённые captures. GitHub API не предоставляет локальный git status.
+- CI run 42109890747 после independent transform fix завершился FAILURE: горизонтальный compositor overlay был пустым (expected pixels=0); capture/transform evidence не показывали mismatch.
+- В commit 7c1a1fb704a0393509b7ff237048006dbbe6caf7 добавлен eager static image compositor, empty-mask fail-closed guard, regression coverage и opt-in Windows portable build workflow input. CSS image compositor давал browser-resampling mismatch, поэтому этот способ не оставлен как финальный.
+- В commit b07c636fa4b4ce28329cfb74f468634a46751ac1 overlay возвращён к Canvas2D canvas; source image загружается eager/sync, drawImage выполняется синхронно в onload до Firefox screenshot. Добавлен тест HTML contract.
+- Windows portable build/startup smoke-test вынесен из обычного push CI: job выполняется только при manual workflow_dispatch с run_windows_portable_build=true; default=false.
+- CI [42113632374](https://github.com/Kiddos19882/AutoDraw/actions/runs/42113632374) завершился FAILURE только на INT-006 vertical/diagonal renderer acceptance. Preparation/G3, Game Monitor/Bridge, Executor, Egret browser reference и Application integration — SUCCESS; optional benchmarks и Windows build — SKIPPED.
+- Horizontal formal result: PASS_PER_RUN, IoU=0.999329, precision=0.999329, recall=1.0, symmetric difference=6 px. Vertical: REJECTED_PER_RUN, IoU=0.938405, precision=0.938980, recall=0.999348, difference=302 px. Diagonal: REJECTED_PER_RUN, IoU=0.949646, precision=0.962683, recall=0.985939, difference=554 px. Capture/transform gates passed for all three.
+- Downloaded/reviewed paired renderer artifact 13454628828 and Egret reference artifact 13453809141. Vertical/diagonal failures are not explained by capture provenance or the independent board transform.
+- Leading hypothesis: compositor skips live Stage-level WebGL texture composition. Same-run geometry records Stage backing 3942×1800, BoardPane local raster 1380×720, board backing origin x≈1022.375/y=216 (fractional X phase 0.375 px), and WebGL texture LINEAR sampling. Direct screen-space Canvas2D overlay may not reproduce this pipeline. Hypothesis only; no post-hoc alignment or threshold adjustment.
+- Exact CHALK remains from existing user captures only: vertical=71, diagonal=161. No new live run, no brush/trajectory/sampling/executor changes, no master changes.
+- Next step: stage-level WebGL compositor using same-run stage/backing evidence while keeping the screen transform independently derived; rerun existing captures and add tests.
+

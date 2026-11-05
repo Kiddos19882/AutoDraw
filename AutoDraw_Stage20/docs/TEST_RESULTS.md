@@ -1,3 +1,16 @@
+## 2026-11-06 — independent same-run renderer replay and optional Windows portable build
+
+**Commits:** c0f36ac49e4b66cf0fcd27d362154b71a917c367, 7c1a1fb704a0393509b7ff237048006dbbe6caf7, b07c636fa4b4ce28329cfb74f468634a46751ac1.  
+**CI:** [42113632374](https://github.com/Kiddos19882/AutoDraw/actions/runs/42113632374), completed FAILURE because the INT-006 vertical/diagonal renderer gates rejected their per-run comparisons.
+
+- Horizontal: PASS_PER_RUN; IoU=0.999329, precision=0.999329, recall=1.000000, symmetric difference=6 px; all formal gates passed.
+- Vertical: REJECTED_PER_RUN; IoU=0.938405, precision=0.938980, recall=0.999348, symmetric difference=302 px; capture and transform passed, renderer gates failed.
+- Diagonal: REJECTED_PER_RUN; IoU=0.949646, precision=0.962683, recall=0.985939, symmetric difference=554 px; capture and transform passed, renderer gates failed.
+- Thresholds unchanged: IoU/precision/recall ≥0.995, symmetric-difference fraction ≤0.0025, bbox edge delta ≤1 px. No post-hoc translation used.
+- Preparation/G3, Game Monitor/Bridge, Executor regression, Egret browser reference and Application integration: SUCCESS. Optional algorithm benchmarks and Windows portable build: SKIPPED. Windows build is now opt-in via manual workflow_dispatch input run_windows_portable_build=true.
+- Artifacts: paired renderer 13454628828; Egret reference 13453809141. Existing live CHALK: vertical=71, diagonal=161. No new live game run.
+- Current hypothesis: direct screen-space Canvas2D overlay does not reproduce Stage-level WebGL texture composition at fractional backing origin x≈1022.375 (phase 0.375 px). Requires a dedicated stage-level WebGL compositor test; not yet proven.
+
 ## 2026-11-05 — offline renderer run-bound profile correction
 
 **Commits:** `23ed8cf2cce051eeda87ad8b630604ae96889608`, `d6343adaf2db05f321b48ef0432b897277ff0193`.
@@ -12,12 +25,12 @@
 # TEST_RESULTS — единый реестр результатов тестирования AutoDraw
 
 **Статус:** действующий сводный реестр результатов и доказательств  
-**Дата формирования:** 2026-11-05  
+**Дата формирования:** 2026-11-06  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
 **HEAD перед дополнением D1–D5:** `63fdaf3f2a1b12bd90e1a588ca4e968facbe0103`  
 **Область:** AutoDraw_Stage20, тесты приложения, лабораторные эксперименты, Game Monitor/Bridge, CHALK, FILL-001, геометрические модели, GitHub Actions и offline benchmarks.  
 **Последний evidence commit:** `e6b771ed67201625884c6ce778fa355f1ab9b873` (первые vertical/diagonal live captures и exploratory offline reports).  
-**Последний code/test HEAD:** `bc787b8f06c3609c7f294beb0cb3ea4b6e1ae5ef`; CI run 42096244252 pending.
+**Последний code/test HEAD:** `b07c636fa4b4ce28329cfb74f468634a46751ac1`; CI run [42113632374](https://github.com/Kiddos19882/AutoDraw/actions/runs/42113632374) completed FAILURE on vertical/diagonal renderer acceptance.
 
 ## 2026-11-05 — BoardPane crop accepted horizontally; browser compositor mismatch found
 
