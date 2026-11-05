@@ -1,3 +1,11 @@
+## Актуальный следующий шаг — пользовательский повтор offline replay
+
+- Offline replay harness больше не использует устаревшие stage/backing размеры из snapshot 2026-11-04 для paired live run.
+- Полный Monitor report является источником renderer profile; runtime snapshot должен быть run-bound, одинаковым в начале и конце run и соответствовать Egret 5.4.1 WebGL, BoardPane 460×240, canvasScaleFactor 2, canvasScaleX/Y 3, DPR 1.
+- Latest profile values in the paired test evidence: screen 1920×1080, viewport 1920×877, Stage 1314×600, backing canvas 3942×1800, CSS scale X/Y 0.487062/0.487778.
+- Локальная offscreen raster geometry остаётся 460×240 ×3 = 1380×720; CSS transform и stage не запекаются в неё.
+- Следующий шаг — пользователь запускает offline render с полными Monitor reports последних vertical/diagonal тестов и загружает новые manifest + PNG. До получения outputs pixel comparison и причина прежнего 1×2 shift остаются UNKNOWN.
+
 # Дополнение к дорожной карте — 2026-11-05
 
 ## 2026-11-05 — same-run multi-axis replay + exact BoardPane crop fix; CI pending
