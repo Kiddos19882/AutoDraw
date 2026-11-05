@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import json
+
 import pytest
 
-from game_monitor_bridge_server import render_bridge_snippet
+from game_monitor_bridge_server import RunRecorder, render_bridge_snippet
 
 
 TEMPLATE = (
