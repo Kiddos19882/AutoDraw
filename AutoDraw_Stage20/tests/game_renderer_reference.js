@@ -465,8 +465,20 @@
         right: { width: right.width, height: right.height }
       };
     }
-    const leftData = left.getContext("2d").getImageData(0, 0, left.width, left.height).data;
-    const rightData = right.getContext("2d").getImageData(0, 0, right.width, right.height).data;
+    function readPixels(source) {
+      let context = source.getContext("2d", { willReadFrequently: true });
+      if (!context) {
+        const copy = document.createElement("canvas");
+        copy.width = source.width;
+        copy.height = source.height;
+        context = copy.getContext("2d", { willReadFrequently: true });
+        if (!context) throw new Error("Unable to read compositor canvas pixels.");
+        context.drawImage(source, 0, 0);
+      }
+      return context.getImageData(0, 0, source.width, source.height).data;
+    }
+    const leftData = readPixels(left);
+    const rightData = readPixels(right);
     let differingPixels = 0;
     let maxChannelDifference = 0;
     let totalChannelDifference = 0;
