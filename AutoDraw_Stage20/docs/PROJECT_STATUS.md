@@ -11,11 +11,11 @@
 - Independent offline comparison без post-hoc registration: alpha24 IoU=0.998994, precision=0.999218, recall=0.999776, symmetric difference=9 px; old transform IoU=0.763153 / 2404 px. Renderer acceptance остаётся exploratory: vertical scale inspect-derived, inspect без run/session timestamp.
 - Game Monitor поднят до 0.2.3: `inspect().renderer` добавляет raw windowGeometry; client corners могут вычисляться без getBoxQuads только при валидированном positive axis-aligned CSS transform и совпадении canvas rect со Stage/backing scale. Иначе mapping unavailable.
 - Browser Bridge отправляет rendererGeometry в session_start и updates при изменении window/viewport. Server сохраняет snapshot в session schema v2 optional fields и привязывает start/update/end snapshots к run JSON schema v1.
-- AutoDraw пока не читает geometry из session/run и не обновляет calibration profile; production screen transform/planner/executor не изменялись.
+- AutoDraw добавил reader активной Bridge geometry и показывает CSS client corners в Brush Behavior UI; summary geometry включается в experiment manifest. Calibration profile и executor пока не используют этот snapshot; production screen transform/planner/executor не изменялись.
 
 ### Следующий шаг
 
-Добавить AutoDraw-side reader/validator для renderer geometry, проверить session freshness/fingerprint и связать валидный transform с calibration profile. До подтверждения screen/client mapping использовать manual fallback; approximate/stale geometry не передавать executor.
+Завершить AutoDraw-side environment fingerprint/session invalidation, затем связать только validated desktop/screenshot transform с calibration profile. До этого manual fallback остаётся обязательным; CSS client geometry не передавать executor.
 
 ### Принятый live capture и offline replay
 
