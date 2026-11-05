@@ -1,3 +1,9 @@
+## 2026-11-05 — geometry snapshot tests and preparation suite pass
+
+- Preparation/G3 suite: 852 passed, 24 warnings, 82 subtests passed. Game Monitor/Bridge: 21 JS tests and 22 Python/WebSocket tests passed.
+- FILL-001 committed PNG quality audit remains failed (coverage 98.4306%, leakage 11); separate static spacing sweep completed its workflow step with 15 cells / 2238 candidates / 62 accepted candidates. Do not interpret sweep step success as committed PNG acceptance.
+- Windows build and INT-006 PNG job still running at this point.
+
 ## 2026-11-05 — Monitor/Bridge geometry targeted tests pass
 
 - Game Monitor JavaScript suite: 21/21 passed, including safe client-corner fallback and window geometry.
