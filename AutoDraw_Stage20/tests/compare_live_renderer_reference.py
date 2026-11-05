@@ -39,6 +39,21 @@ def centroid(mask: np.ndarray) -> list[float] | None:
     return [float(xs.mean()), float(ys.mean())]
 
 
+def shift_mask(mask: np.ndarray, dx: int, dy: int) -> np.ndarray:
+    """Translate a mask without wrapping; positive offsets move right/down."""
+    shifted = np.zeros_like(mask, dtype=bool)
+    source_y0 = max(0, -dy)
+    source_y1 = min(mask.shape[0], mask.shape[0] - dy)
+    source_x0 = max(0, -dx)
+    source_x1 = min(mask.shape[1], mask.shape[1] - dx)
+    target_y0 = max(0, dy)
+    target_x0 = max(0, dx)
+    target_y1 = target_y0 + (source_y1 - source_y0)
+    target_x1 = target_x0 + (source_x1 - source_x0)
+    shifted[target_y0:target_y1, target_x0:target_x1] = mask[source_y0:source_y1, source_x0:source_x1]
+    return shifted
+
+
 def mask_metrics(observed: np.ndarray, expected: np.ndarray) -> dict[str, Any]:
     observed = observed.astype(bool)
     expected = expected.astype(bool)
@@ -148,6 +163,35 @@ def main() -> int:
     overlay[observed & expected_default] = (255, 255, 0)
     Image.fromarray(overlay, mode="RGB").save(args.output_dir / "live-offline-mask-overlay.png")
 
+    # Diagnostic only: search a small translation window to distinguish a
+    # coordinate-origin offset from a shape/footprint mismatch. The frozen
+    # transform metrics above remain the primary, unshifted comparison.
+    best_shift: tuple[float, int, int, dict[str, Any], np.ndarray] | None = None
+    for dy in range(-5, 6):
+        for dx in range(-5, 6):
+            shifted = shift_mask(expected_default, dx, dy)
+            metrics = mask_metrics(observed, shifted)
+            candidate = (float(metrics["iou"]), dx, dy, metrics, shifted)
+            if best_shift is None or (
+                candidate[0], -(abs(dx) + abs(dy)), -abs(dy), -abs(dx)
+            ) > (
+                best_shift[0], -(abs(best_shift[1]) + abs(best_shift[2])),
+                -abs(best_shift[2]), -abs(best_shift[1])
+            ):
+                best_shift = candidate
+    assert best_shift is not None
+    _, best_dx, best_dy, best_shift_metrics, shifted_expected = best_shift
+    Image.fromarray((shifted_expected.astype(np.uint8) * 255), mode="L").save(
+        args.output_dir / "expected-mask-best-translation.png"
+    )
+    shifted_overlay = np.zeros((355, 674, 3), dtype=np.uint8)
+    shifted_overlay[observed & ~shifted_expected] = (255, 0, 0)
+    shifted_overlay[~observed & shifted_expected] = (0, 255, 0)
+    shifted_overlay[observed & shifted_expected] = (255, 255, 0)
+    Image.fromarray(shifted_overlay, mode="RGB").save(
+        args.output_dir / "live-offline-mask-overlay-best-translation.png"
+    )
+
     report = {
         "status": "ANALYZED_EXPLORATORY_NO_ACCEPTANCE_THRESHOLD",
         "experiment_id": experiment.get("experiment_id"),
@@ -188,6 +232,12 @@ def main() -> int:
             "centroid_xy": centroid(observed),
         },
         "comparisons": results,
+        "best_translation_diagnostic": {
+            "search_radius_px": 5,
+            "expected_mask_translation_to_align_live": {"x": best_dx, "y": best_dy},
+            "metrics_at_alpha_threshold_24": best_shift_metrics,
+            "interpretation": "post-hoc alignment diagnostic only; does not replace the frozen transform or constitute acceptance",
+        },
         "limitations": [
             "This is an exploratory raster comparison; no acceptance threshold is applied.",
             "Live image is differenced against the user-confirmed blank-board baseline.",
@@ -210,6 +260,12 @@ def main() -> int:
                 "symmetric_difference_pixels": metrics["symmetric_difference_pixels"],
             }
             for threshold, metrics in results.items()
+        },
+        "best_translation_diagnostic": {
+            "dx": best_dx,
+            "dy": best_dy,
+            "iou": best_shift_metrics["iou"],
+            "symmetric_difference_pixels": best_shift_metrics["symmetric_difference_pixels"],
         },
         "report": str(args.output_dir / "comparison-report.json"),
     }, ensure_ascii=False, indent=2))
