@@ -1469,3 +1469,35 @@ def test_postdraw_cursor_avoids_paint_meter_even_when_board_bottom_is_clear():
     )
 
     assert point[1] >= paint_meter["y"] + paint_meter["height"] + 32
+
+
+
+def test_paired_renderer_case_builds_one_fixed_long_horizontal_stroke() -> None:
+    from brush_behavior_test_ui import (
+        PAIRED_RENDERER_EXECUTOR_CONFIG,
+        PAIRED_RENDERER_PATH_MODE,
+        PAIRED_RENDERER_REQUESTED_RADIUS,
+        PAIRED_RENDERER_TEST_CASE_ID,
+    )
+
+    label = next(name for name, scenario in TEST_CASES.items()
+                 if scenario["id"] == PAIRED_RENDERER_TEST_CASE_ID)
+    plan = build_brush_test_drawing_plan(
+        label, (460, 240), coordinate_system="logical_board_pixels"
+    )
+
+    assert len(plan["strokes"]) == 1
+    stroke = plan["strokes"][0]
+    assert stroke["name"] == "paired_renderer_long_horizontal"
+    assert stroke["points"] == [{"x": 20.0, "y": 120.0}, {"x": 420.0, "y": 120.0}]
+    assert stroke["metadata"]["line_extension_px_override"] == 0.0
+
+    capture = plan["generation"]["paired_renderer_capture"]
+    assert capture["scenario_id"] == PAIRED_RENDERER_TEST_CASE_ID
+    assert capture["requested_radius"] == PAIRED_RENDERER_REQUESTED_RADIUS == 10
+    assert capture["expected_strokes"] == 1
+    assert capture["renderer_path_mode"] == PAIRED_RENDERER_PATH_MODE == "smooth"
+    assert capture["executor_parameters"] == PAIRED_RENDERER_EXECUTOR_CONFIG
+    assert capture["executor_parameters"]["point_step_px"] == 2
+    assert capture["executor_parameters"]["point_delay_ms"] == 10
+    assert capture["executor_parameters"]["line_extension_px"] == 0
