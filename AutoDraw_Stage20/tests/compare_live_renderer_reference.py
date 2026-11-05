@@ -128,22 +128,20 @@ def _browser_composite_html(
     board_origin: dict[str, float],
     css_matrix: dict[str, float],
 ) -> str:
-    """Build the same-browser canvas overlay used by the live WebGL canvas."""
+    """Build a same-browser, load-blocking image overlay for the live WebGL canvas."""
     width, height = screen_size
     baseline_uri = html.escape(baseline_png.resolve().as_uri(), quote=True)
     overlay = ""
-    overlay_image = ""
     if offline_png is not None:
         overlay_uri = html.escape(offline_png.resolve().as_uri(), quote=True)
         left = float(board_origin["x"])
         top = float(board_origin["y"])
         a, b, c, d, tx, ty = (float(css_matrix[key]) for key in ("a", "b", "c", "d", "tx", "ty"))
         overlay = (
-            f'<canvas id="board-overlay" width="1380" height="720" '
-            f'style="left:{left:.12f}px;top:{top:.12f}px;'
-            f'transform:matrix({a:.15g},{b:.15g},{c:.15g},{d:.15g},{tx:.15g},{ty:.15g});"></canvas>'
+            f'<img id="board-overlay" alt="" src="{overlay_uri}" loading="eager" decoding="sync" '
+            f'style="left:{left:.12f}px;top:{top:.12f}px;width:1380px;height:720px;'
+            f'transform-origin:0 0;transform:matrix({a:.15g},{b:.15g},{c:.15g},{d:.15g},{tx:.15g},{ty:.15g});">'
         )
-        overlay_image = f'<img id="offline-source" alt="" src="{overlay_uri}" hidden>'
     return f"""<!doctype html>
 <html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
@@ -151,31 +149,10 @@ def _browser_composite_html(
 html,body {{ margin:0;padding:0;width:{width}px;height:{height}px;overflow:hidden;background:#000; }}
 img {{ position:absolute;display:block;margin:0;padding:0;border:0;max-width:none;max-height:none; }}
 #baseline {{ left:0;top:0;width:{width}px;height:{height}px; }}
-#offline-source {{ display:none; }}
-#board-overlay {{ position:absolute;display:block;width:1380px;height:720px;transform-origin:0 0;image-rendering:auto; }}
+#board-overlay {{ position:absolute;display:block;max-width:none;max-height:none;image-rendering:auto; }}
 </style></head><body>
 <img id="baseline" alt="" src="{baseline_uri}">
-{overlay_image}
 {overlay}
-<script>
-const baseline = document.getElementById("baseline");
-const offlineSource = document.getElementById("offline-source");
-const tasks = [baseline.decode()];
-if (offlineSource) {{
-  tasks.push(offlineSource.decode().then(() => {{
-    const canvas = document.getElementById("board-overlay");
-    const context = canvas.getContext("2d", {{ alpha: true }});
-    if (!context) throw new Error("Canvas2D overlay context unavailable.");
-    context.imageSmoothingEnabled = true;
-    context.imageSmoothingQuality = "high";
-    context.drawImage(offlineSource, 0, 0, 1380, 720);
-  }}));
-}}
-Promise.all(tasks)
-  .then(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))))
-  .then(() => {{ document.documentElement.dataset.ready = "true"; }})
-  .catch(error => {{ document.documentElement.dataset.error = String(error); }});
-</script>
 </body></html>"""
 
 
@@ -278,6 +255,12 @@ def render_browser_css_composite(
     }
     composite_delta = np.max(np.abs(composite_rgb - base_rgb), axis=2)
     expected = composite_delta > 24
+    results["expected_changed_pixels"] = int(np.count_nonzero(expected))
+    if not results["expected_changed_pixels"]:
+        raise RuntimeError(
+            "Firefox CSS compositor produced an empty overlay mask; refusing to classify this as a renderer mismatch. "
+            f"Browser diagnostics: {results.get('browser_runs', {})}"
+        )
     Image.fromarray((expected.astype(np.uint8) * 255), mode="L").save(
         browser_dir / "expected-mask-browser-css.png"
     )

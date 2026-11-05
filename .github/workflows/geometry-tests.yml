@@ -28,6 +28,11 @@ on:
         required: false
         type: boolean
         default: false
+      run_windows_portable_build:
+        description: Build and smoke-test the Windows portable application
+        required: false
+        type: boolean
+        default: false
 
 concurrency:
   group: autodraw-validation-v2-${{ github.ref }}
@@ -377,6 +382,7 @@ jobs:
           retention-days: 14
 
   windows-build-smoke:
+    if: github.event_name == 'workflow_dispatch' && inputs.run_windows_portable_build == true
     name: Windows portable build and startup smoke-test
     needs:
       - game-monitor-tests

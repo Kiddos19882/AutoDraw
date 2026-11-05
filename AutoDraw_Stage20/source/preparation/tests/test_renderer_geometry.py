@@ -379,3 +379,32 @@ def test_browser_compositor_transform_rejects_incomplete_or_invalid_geometry(geo
 
     with pytest.raises(RendererGeometryError):
         build_browser_compositor_transform(geometry)
+
+
+def test_browser_compositor_html_uses_eager_static_overlay_image(tmp_path):
+    import importlib.util
+    from pathlib import Path
+
+    script_path = Path(__file__).resolve().parents[3] / "tests" / "compare_live_renderer_reference.py"
+    spec = importlib.util.spec_from_file_location("compare_live_renderer_reference_test_module", script_path)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    html = module._browser_composite_html(
+        tmp_path / "baseline capture.png",
+        tmp_path / "offline raster.png",
+        (1920, 1080),
+        {"x": 498.0, "y": 268.0},
+        {"a": 0.487, "b": 0.0, "c": 0.0, "d": 0.4875, "tx": 0.0, "ty": 0.0},
+    )
+
+    assert '<img id="board-overlay"' in html
+    assert 'loading="eager"' in html
+    assert 'decoding="sync"' in html
+    assert 'width:1380px;height:720px' in html
+    assert "transform:matrix(0.487,0,0,0.4875,0,0)" in html
+    assert "offline-source" not in html
+    assert "<canvas" not in html
+    assert ".decode()" not in html
+    assert "requestAnimationFrame" not in html
