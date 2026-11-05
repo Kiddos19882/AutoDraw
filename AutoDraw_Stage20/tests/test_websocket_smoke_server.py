@@ -85,6 +85,23 @@ class BridgeRecorderTests(unittest.TestCase):
     def tearDown(self):
         self.temp.cleanup()
 
+    def test_renderer_geometry_is_bound_to_run_start_and_updates(self):
+        geometry_start = {"boardDetected": True, "revision": 1}
+        geometry_after_resize = {"boardDetected": True, "revision": 2}
+        before = {"maxPoints": 6000, "remainingPoints": 6000, "pointCount": 0, "isExact": True}
+
+        self.recorder.set_renderer_geometry(geometry_start, "session_start")
+        self.recorder.event({"type": "DRAW_START", "t": 1, "before": before}, 1.0)
+        self.recorder.set_renderer_geometry(geometry_after_resize, "window_resize")
+        self.recorder.event({"type": "DRAW_END", "t": 2, "after": before}, 1.1)
+
+        path = self.recorder.finalize("completed")
+        data = json.loads(path.read_text(encoding="utf-8"))
+        self.assertEqual(data["renderer_geometry_at_start"], geometry_start)
+        self.assertEqual(data["renderer_geometry_updates"][0]["reason"], "window_resize")
+        self.assertEqual(data["renderer_geometry_updates"][0]["snapshot"], geometry_after_resize)
+        self.assertEqual(data["renderer_geometry_at_end"], geometry_after_resize)
+
     def test_exact_chalk_delta_and_run_export(self):
         before = {"maxPoints": 6000, "remainingPoints": 5999, "pointCount": 1, "isExact": True}
         after = {"maxPoints": 6000, "remainingPoints": 5947, "pointCount": 53, "isExact": True}
@@ -452,6 +469,49 @@ class AtomicSessionPersistenceTests(unittest.IsolatedAsyncioTestCase):
             self.assertFalse(saved)
             self.assertEqual(json.loads(target.read_text(encoding="utf-8")), {"previous": True})
             self.assertEqual(list(Path(temp_dir).glob("*.tmp")), [])
+
+@unittest.skipIf(websockets is None, "install game_monitor/requirements-bridge.txt to run transport tests")
+class BridgeGeometrySessionIntegrationTests(unittest.IsolatedAsyncioTestCase):
+    async def test_session_start_and_geometry_update_are_persisted(self):
+        import tempfile
+        import uuid
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output = Path(temp_dir)
+            token = "geometry-session-token"
+            server = await websockets.serve(
+                bridge_make_handler(token, "https://game.example", output, 2.5),
+                "127.0.0.1", 0, origins=["https://game.example"], max_size=65536,
+            )
+            port = server.sockets[0].getsockname()[1]
+            session_id = str(uuid.uuid4())
+            try:
+                async with websockets.connect(
+                    f"ws://127.0.0.1:{port}", origin="https://game.example"
+                ) as ws:
+                    await ws.send(json.dumps({"type": "auth", "token": token}))
+                    self.assertEqual(json.loads(await ws.recv()), {"type": "ready"})
+                    await ws.send(json.dumps({
+                        "type": "session_start", "sessionId": session_id, "sequence": 1,
+                        "monitorStatus": {"active": True},
+                        "rendererGeometry": {"boardDetected": True, "revision": 1},
+                    }))
+                    await ws.send(json.dumps({
+                        "type": "renderer_geometry", "sessionId": session_id, "sequence": 2,
+                        "reason": "window_resize",
+                        "rendererGeometry": {"boardDetected": True, "revision": 2},
+                    }))
+            finally:
+                server.close()
+                await server.wait_closed()
+
+            session = json.loads((output / session_id / "session.json").read_text(encoding="utf-8"))
+            self.assertEqual(session["schema_version"], 3)
+            self.assertEqual(session["renderer_geometry"]["revision"], 2)
+            self.assertEqual(session["renderer_geometry_update_reason"], "window_resize")
+            self.assertTrue(session["bridge_diagnostics"]["connection_closed"])
+
 
 if __name__ == "__main__":
     unittest.main()
