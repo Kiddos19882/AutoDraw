@@ -288,7 +288,8 @@
 Дополнительные экспортируемые функции UI/служебных модулей:
 
 - `palette_detection_ui.map_display_rect_to_image(rect, *, source_size, display_size, offset=(0.0, 0.0)) -> tuple[int, int, int, int]`
-- `brush_behavior_test_ui.summarize_game_monitor_report(document, requested_brush_value=None) -> dict[str, Any]`
+- `brush_behavior_test_ui.summarize_game_monitor_report(document, requested_brush_value=None) -> dict[str, Any]` — дополнительно возвращает compact renderer geometry summary в CSS client coordinates, если run JSON содержит geometry snapshot; это не desktop/screenshot mapping.
+- `brush_radius_feedback.read_active_bridge_geometry(bridge_root, *, max_age_seconds=4.0) -> dict[str, Any] | None` — читает свежую геометрию активной Bridge session, возвращает CSS client corners и всегда помечает executor mapping unavailable.
 - `brush_behavior_test_ui.build_brush_test_record(*, brush_value: int, test_case: str, canvas_area: dict[str, int] | None = None, screen_area: dict[str, int] | None = None, screenshot_path: str | None = None, drawing_plan_path: str | None = None, drawing_plan: dict[str, Any] | None = None, execution_report_path: str | None = None, execution_report: dict[str, Any] | None = None, measurements: dict[str, Any] | None = None, notes: str = "", outcome: str = "not_reviewed", screen_resolution: dict[str, int] | None = None, brush_control: dict[str, Any] | None = None, game_monitor_report_path: str | None = None, game_monitor_summary: dict[str, Any] | None = None) -> dict[str, Any]`
 - `brush_behavior_test_ui.build_brush_test_drawing_plan(test_case: str, canvas_size: tuple[int, int]) -> dict[str, Any]`
 - `stage13_workbench.main() -> None` — точка запуска workbench.
