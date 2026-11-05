@@ -500,3 +500,6 @@ Artifact: `autodraw-paired-renderer-png-comparison`, ID `13386122895`.
 - Bridge server: RunRecorder test for geometry at run start/update/end; websocket integration test for session_start + renderer_geometry persistence in session schema v2.
 - Bridge client: initial rendererGeometry snapshot and debounced updates on resize/scroll/orientation/fullscreen/visualViewport; listener cleanup on disconnect.
 - No production AutoDraw profile consumption or live gameplay validation yet. Awaiting CI run triggered by this source/test update.
+
+
+**Monitor/Bridge geometry implementation test result:** workflow `41964932479`, job `Game Monitor and bridge tests` SUCCESS. `game_monitor.test.js` — 21 passed / 0 failed; `test_websocket_smoke_server.py` — 22 passed / 0 failed. New axis-aligned client geometry fallback, raw window metrics, run-bound geometry snapshots and session schema v2 persistence are covered. Preparation/G3 tests and full workflow still pending.
