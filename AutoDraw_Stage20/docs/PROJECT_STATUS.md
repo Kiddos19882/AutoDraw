@@ -1,18 +1,25 @@
 # Актуальная точка продолжения — 2026-11-05
 
-## Текущая точка — paired live renderer capture подготовлен
+## Текущая точка — добавлен изолированный paired renderer test
 
 **Branch:** feature/image-geometry-optimization  
-**Source/test HEAD:** f6df3f9f6d513efd44c093aae17c2c70c05e03ac  
-**Input sampling analyzer:** реализован; offline trace report доступен через source/preparation/game_input_sampling_analysis.py.  
-**Paired renderer replay:** tests/game_renderer_reference.html принимает Game Monitor run JSON, извлекает acceptedPoint одного strokeId и рендерит ту же геометрию через actual BoardPane/Egret CanvasRenderer/WebGLRenderer. Fail-closed guards проверяют полную последовательность точек.  
-**Implementation commits:** 94b62bd (accepted-point replay), f9fcdbf (UI wiring), f6df3f9 (single-stroke fail-closed validation).  
-**Full CI:** run [41933396072](https://github.com/Kiddos19882/AutoDraw/actions/runs/41933396072) на source/test HEAD f6df3f9 — SUCCESS; все обязательные jobs прошли, optional algorithm benchmarks SKIPPED.  
-**Browser artifact:** autodraw-egret-renderer-reference, ID 13371659297, 763,022 bytes; 20 fixtures, 20 WebGL comparisons, 60 PNG.
+**Code/test HEAD:** 9a2de6e350c263c755cf62283fda14882f31157c  
+**Последний пользовательский data commit:** 1f7a9738476d7a9fc86b7294c45a4a9722064c4d  
+**Новый UI-сценарий:** «Парный renderer — один длинный штрих» (paired_renderer_single_stroke) во вкладке «Тест кистей».  
+**Геометрия:** один горизонтальный штрих logical board 460×240, (20,120) → (420,120), длина 400 logical px.  
+**Параметры:** radius=10; point_step_px=2; point_delay_ms=10; line_extension_px=0; after_mouse_up_ms=20; before_mouse_down_ms=20; after_mouse_down_ms=40; end_hold_ms=50; countdown_seconds=5. Renderer path mode для replay — smooth.  
+**Защита:** UI не создаёт этот план при радиусе, отличном от 10; интеграционный слой повторно проверяет metadata, конфигурацию исполнителя и ровно один stroke в runtime plan. Настройки передаются как временный executor override и не должны менять пользовательский профиль.
 
-**Оставшийся блокер:** пользовательский live capture. Нужны Game Monitor run JSON, Bridge session JSON, runtime renderer snapshot, точные pointCount before/after и final board PNG одной сессии. Только пользователь может выполнить этот шаг в реальной игре. До получения capture pixel equivalence с live game не подтверждена.
+**Изменённые компоненты:** source/preparation/brush_behavior_test_ui.py, его unit tests, integrated_app.py и tests/test_unified_app.py. Добавлены инструкции по включению input telemetry и сохранению evidence.
 
-**Следующий шаг:** пользователь передаёт комплект evidence; затем AutoDraw сравнивает фактическую доску с offline replay того же accepted-point sequence. Run 41933396072 подтвердил offline harness и обязательные regression suites, но не является live game validation. FILL-001-RS 45-cell matrix остаётся BLOCKED до прохождения footprint/quality preflight.
+**Проверки:** добавлены regression tests для геометрии/metadata плана, executor override и отказа при неверном радиусе. Локальный запуск тестов недоступен через GitHub API; CI для новых commits на момент этой записи ещё не подтверждён. Последний ранее успешный полный CI — run [41933396072](https://github.com/Kiddos19882/AutoDraw/actions/runs/41933396072) на более раннем source/test HEAD f6df3f9; он не распространяется на новые изменения.
+
+**Оставшийся блокер:** live capture выполняет пользователь. Нужны raw Game Monitor run JSON с одним strokeId, полным acceptedPoint stream и pointDelta=1, Bridge session.json, runtime AutoDrawGameMonitor.inspect(), pointCount до/после и итоговый PNG доски из той же сессии. При pointDelta>1, пропущенных acceptedPoint или нескольких strokeId offline replay должен отклонить run.
+
+**Следующий шаг:** выбрать новый сценарий во вкладке «Тест кистей», указать радиус 10, выполнить один запуск при активных Monitor/Bridge и включённой input telemetry, затем передать полный комплект evidence. Offline renderer page уже имеет режим smooth и line width 10 по умолчанию. Live pixel equivalence пока не подтверждена. FILL-001-RS 45-cell matrix остаётся BLOCKED.
+
+**Ограничения Git:** изменения внесены через GitHub API в feature/image-geometry-optimization; локальный git status недоступен. master не изменялась.
+
 
 ---
 
