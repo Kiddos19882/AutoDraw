@@ -221,3 +221,15 @@ FILL-001 подключён как отдельная вкладка `8. FILL-00
 **Logical canvas и client ROI:** BoardPane в движке и frozen FILL-001 masks имеют logical size 460×240. Физический screen ROI клиента определяется калибровкой и не обязан иметь такой размер. UI снимает actual calibrated ROI; adapter растеризует frozen mask в размеры PNG, сохраняет transform и проверяет uniform-scale tolerance 1%. Размер/масштаб игровой доски не подгоняется под AutoDraw.
 
 **Оставшееся ограничение:** CI и synthetic fixtures не заменяют live game session. До одного успешного Windows runtime/PNG preflight нельзя запускать все 45 matrix cells. Требуется проверить фактический P1, Bridge identity/integrity и реальные PNG в client ROI: threshold=8, cursor/UI exclusion, logical mask alignment, coverage ≥99%, leakage=0.
+
+## Дополнение 2026-11-05 — paired renderer scenarios в «Тесте кистей»
+
+В `BrushBehaviorTestTab` добавлены три одноштриховых сценария:
+
+| UI-сценарий | Scenario ID | Логические точки |
+|---|---|---|
+| Горизонтальный | `paired_renderer_single_stroke` | `(20,120) → (420,120)` |
+| Вертикальный | `paired_renderer_vertical_single_stroke` | `(230,20) → (230,220)` |
+| Диагональный | `paired_renderer_diagonal_single_stroke` | `(20,20) → (440,220)` |
+
+Все используют радиус 10, smooth renderer и фиксированный executor profile: step=2 px, delay=10 ms, line extension=0. Приложение проверяет scenario metadata, один штрих, радиус, renderer mode и параметры executor перед запуском. Ни один из этих сценариев не меняет production defaults.

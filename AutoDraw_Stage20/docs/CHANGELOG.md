@@ -1219,3 +1219,11 @@
 - Manifest связывает 138 accepted points с live run `16aec62c-9e54-44e7-8691-9df79b19161d`, mode=smooth, lineWidth=10. Internal actual BoardPane/manual transcription и Canvas2D/WebGL comparisons — exact, 0 differing pixels.
 - Уточнён статус gate: offline replay завершён; количественный live `after_draw-board.png` ↔ offline WebGL PNG comparison остаётся pending. FILL-001-RS matrix остаётся blocked.
 - Изменения ограничены документацией; исходники, тесты, workflow, конфигурации и первичные экспериментальные данные не изменялись.
+
+## 2026-11-05 — multi-axis renderer diagnostics
+
+- Added independent horizontal/vertical/diagonal axis fitting to the offline screen-transform audit.
+- Added vertical and diagonal paired-renderer test cases in Brush Test UI with fixed radius/sampling profile.
+- Added regression coverage for scenario-plan generation and executor handoff.
+- Updated comparison diagnostics to verify the axis coverage required by each paired scenario.
+- Live captures remain pending; no production renderer or executor behavior changed.

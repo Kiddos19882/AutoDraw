@@ -8,9 +8,9 @@
 
 | ID | Приоритет | Статус | Содержание |
 |---|---|---|---|
-| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | SINGLE_RUN_SCREEN_TRANSFORM_VERIFIED_MULTI_AXIS_AND_PROFILE_PENDING | Same-run screen bounds + Monitor X fit: IoU=0.998882 / 10 px, no post-hoc shift; one horizontal stroke only; multi-axis/environment validation, profile consumer and executor gate pending |
+| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | MULTI_AXIS_TRANSFORM_CODE_CI_VERIFIED_LIVE_CAPTURE_PENDING_PROFILE_PENDING | Same-run screen bounds + Monitor X fit: IoU=0.998882 / 10 px, no post-hoc shift; one horizontal stroke only; multi-axis/environment validation, profile consumer and executor gate pending |
 | FILL-001-RS-MATRIX | P0 | BLOCKED | 45 captures только после принятого single-task preflight |
-| GAME-INPUT-SAMPLING-TRACE-001 | P1 | ROI_BOUNDS_ROOT_CAUSE_IDENTIFIED_SINGLE_RUN_VERIFIED | Run 16aec62c; 138 accepted points, CHALK=138; ROI included margins; screenshot-derived bounds + Monitor fit IoU=0.998882 / 10 px without post-hoc shift; multi-axis/environment validation pending |
+| GAME-INPUT-SAMPLING-TRACE-001 | P1 | ROI_BOUNDS_ROOT_CAUSE_IDENTIFIED_MULTI_AXIS_CODE_READY_LIVE_CAPTURE_PENDING | Run 16aec62c; 138 accepted points, CHALK=138; ROI included margins; screenshot-derived bounds + Monitor fit IoU=0.998882 / 10 px without post-hoc shift; multi-axis/environment validation pending |
 | BRUSH-FOOTPRINT-CAPSULE-001 | P1 | OPEN | Offline capsule model готова; renderer acceptance/planner integration не выполнены |
 | INT-006 | P1 | IN_PROGRESS | INT006R 45/45 + manual visual audit завершены; frozen model validation 45/45 accepted; safety margin и расширенная domain/holdout validation не завершены |
 | INT-007 | P2 | BLOCKED | Интеграция модели после INT-006 |
@@ -1181,3 +1181,39 @@ CI evidence: workflow 41787492122, commit d337f4240e83488273152f65992032beca3957
 ## Правило ведения результатов тестирования
 
 Подробные фактические результаты и evidence ведутся в [TEST_RESULTS.md](TEST_RESULTS.md). В TASKS.md сохраняются задачи, критерии завершения, статусы и блокировки.
+
+
+## 2026-11-05 — multi-axis transform implementation and paired scenarios
+
+- [x] `derive_live_board_screen_transform()` independently resolves X and Y: same-run Monitor fit for any axis with ≥20 logical px span; screenshot bounds for an unspanned axis.
+- [x] Vertical and diagonal synthetic trajectories covered by unit tests.
+- [x] Brush Test UI exposes one-stroke vertical and diagonal paired-renderer scenarios; executor validates the shared radius/sampling/renderer contract.
+- [x] Full CI run [41975359740](https://github.com/Kiddos19882/AutoDraw/actions/runs/41975359740) SUCCESS, including Preparation/G3, Application integration, Game Monitor/Bridge, Egret renderer, INT-006 analysis and Windows portable build.
+- [ ] Three valid live captures per orientation (vertical and diagonal) with input telemetry, full-screen before/after screenshots and same-screen inspect evidence.
+- [ ] Formal acceptance of screen transform remains blocked until live captures pass the predeclared protocol.
+- [ ] Environment fingerprint, stale invalidation, calibration profile consumer and executor gate remain blocked.
+
+### Предварительно зафиксированный acceptance protocol для multi-axis follow-up
+
+**Capture validity**
+- Exactly one stroke, radius 10, smooth renderer, `point_step_px=2`, `point_delay_ms=10`, `line_extension_px=0`.
+- Three valid repeats per orientation on a clean board.
+- `MOUSE_MOVE_SAMPLE` telemetry must span the expected axis; the fit axis must cover at least 20 logical px.
+- `pointCount_after - pointCount_before` must equal the sum of `DRAW_SAMPLE.pointDelta`; accepted-point sequence must be complete; no dropped events or Monitor/Bridge errors.
+- Same-run full-screen before/after screenshots must have identical BoardPane bounds; screen dimensions and inspect evidence must match.
+
+**Transform validity**
+- Client-to-screen offset range ≤0.01 px.
+- Fitted-axis maximum residual ≤0.75 screen px.
+- Monitor-vs-inspect origin difference ≤0.5 px; relative scale difference ≤0.2%.
+- Monitor-vs-screenshot bounds origin difference ≤1.0 px; relative scale difference ≤0.2%.
+- No post-hoc image translation or registration.
+
+**Renderer comparison**
+- Primary alpha threshold: 24.
+- Per-run IoU ≥0.995, precision ≥0.995 and recall ≥0.995.
+- Symmetric difference ≤0.25% of live changed pixels.
+- Live/expected mask bounding-box edges differ by no more than 1 px.
+- Alpha thresholds 1/64/128 are sensitivity diagnostics, not primary gates.
+- Any failed criterion leaves the result exploratory; thresholds must not be changed after viewing the captures.
+

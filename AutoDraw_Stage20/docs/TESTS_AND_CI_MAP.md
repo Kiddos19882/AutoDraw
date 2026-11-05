@@ -473,3 +473,11 @@ Workflow и тесты обновлены в feature-ветке; результ�
 ## Результаты запусков
 
 Фактические результаты CI и тестов собраны в [TEST_RESULTS.md](TEST_RESULTS.md). Этот документ описывает состав и назначение проверок.
+
+## Дополнение 2026-11-05 — multi-axis transform tests
+
+- `source/preparation/tests/test_renderer_geometry.py`: synthetic horizontal, vertical and diagonal coordinate fits; screenshot fallback for an unspanned axis; inspect/screenshot cross-checks; offset and residual guards.
+- `source/preparation/tests/test_brush_behavior_test_ui.py`: one-stroke vertical and diagonal paired-plan generation and metadata.
+- `tests/test_unified_app.py`: paired horizontal/vertical/diagonal executor handoff with the fixed capture profile.
+- `tests/compare_live_renderer_reference.py`: scenario-aware axis coverage validation; known paired scenario IDs require the corresponding Monitor-fit/screenshot-bound axes.
+- CI [41975359740](https://github.com/Kiddos19882/AutoDraw/actions/runs/41975359740): all required jobs SUCCESS; optional algorithm benchmarks SKIPPED.

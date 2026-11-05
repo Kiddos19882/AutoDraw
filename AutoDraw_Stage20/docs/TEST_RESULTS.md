@@ -550,3 +550,19 @@ Artifact: `autodraw-paired-renderer-png-comparison`, ID `13386122895`.
 - FILL-001 committed PNG quality gate remains FAIL: coverage 98.430600%, leakage 11. FILL-001-RS sweep remains offline-only.
 - Artifact IDs: paired renderer `13389883231`; INT-006 PNG analysis `13389958144`; INT-006 CHALK validation `13389908245`; INT006R live validation `13390795994`; INT006R visual source `13390526598`; FILL-001-RS sweep `13390271857`; portable build `13390167082`.
 - The audit helper/tests and full-screen artifact packaging do not change production renderer/planner/calibration/executor. No live game experiment was launched.
+
+## 2026-11-05 — multi-axis transform and paired renderer scenarios
+
+**Code/test HEAD:** `f9387d0d1c04375c1b8284d01ebef75ff704418b`  
+**GitHub Actions:** [41975359740](https://github.com/Kiddos19882/AutoDraw/actions/runs/41975359740) — **SUCCESS**.
+
+- Preparation/G3 tests: SUCCESS; includes synthetic vertical and diagonal transform fits and paired scenario plan checks.
+- Application integration tests: SUCCESS; horizontal, vertical and diagonal paired-renderer executor handoff.
+- Game Monitor/Bridge tests: SUCCESS.
+- Executor regression tests: SUCCESS.
+- Egret CanvasRenderer browser reference: SUCCESS.
+- INT-006 pixel-level PNG audit, independent CHALK prediction validation, INT006R radius × geometry validation and visual-review packaging: SUCCESS.
+- Windows portable build and startup smoke-test: SUCCESS; artifact `autodraw-g3-preflight-build`, ID `13392211048`.
+- Optional algorithm benchmarks: SKIPPED.
+- The earlier UI-scenario run `41975187040` failed because `PAIRED_RENDERER_TEST_CASE_IDS` was imported locally after its first use. The import was moved before the guard; the corrected run above passed.
+- No live vertical/diagonal game captures were executed. CI validates code, synthetic geometry and packaging, not runtime geometry on the user's screen.

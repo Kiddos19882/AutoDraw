@@ -14,7 +14,22 @@ from typing import Any
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "source" / "preparation"))
-from renderer_geometry import detect_board_bounds_from_screenshots, derive_live_board_screen_transform
+from renderer_geometry import (RendererGeometryError, detect_board_bounds_from_screenshots, derive_live_board_screen_transform)
+
+EXPECTED_PAIRED_AXIS_SOURCES = {
+    "paired_renderer_single_stroke": {
+        "x": "same_run_monitor_fit",
+        "y": "same_run_full_screen_board_bounds",
+    },
+    "paired_renderer_vertical_single_stroke": {
+        "x": "same_run_full_screen_board_bounds",
+        "y": "same_run_monitor_fit",
+    },
+    "paired_renderer_diagonal_single_stroke": {
+        "x": "same_run_monitor_fit",
+        "y": "same_run_monitor_fit",
+    },
+}
 
 import cv2
 import numpy as np
@@ -200,6 +215,7 @@ def main() -> int:
     report = {
         "status": "ANALYZED_EXPLORATORY_NO_ACCEPTANCE_THRESHOLD",
         "experiment_id": experiment.get("experiment_id"),
+        "scenario_id": experiment.get("test_case"),
         "run_id": run_id,
         "session_id": summary.get("session_id"),
         "accepted_point_count": len(fixture.get("points", [])),
@@ -291,6 +307,16 @@ def main() -> int:
             monitor_report, inspect_input, roi, (int(screen["width"]), int(screen["height"])),
             screenshot_board_bounds=board_bounds_audit["bounds"],
         )
+        scenario_id = experiment.get("test_case")
+        expected_axis_sources = EXPECTED_PAIRED_AXIS_SOURCES.get(scenario_id)
+        if expected_axis_sources is not None and geometry.get("axis_sources") != expected_axis_sources:
+            raise RendererGeometryError(
+                f"{scenario_id}: expected axis sources {expected_axis_sources}, "
+                f"received {geometry.get('axis_sources')}."
+            )
+        monitor_fit_axes = [axis.upper() for axis, source in geometry["axis_sources"].items() if source == "same_run_monitor_fit"]
+        screenshot_bounds_axes = [axis.upper() for axis, source in geometry["axis_sources"].items() if source == "same_run_full_screen_board_bounds"]
+        inspect_fallback_axes = [axis.upper() for axis, source in geometry["axis_sources"].items() if source == "inspect_css_transform_unfitted_axis"]
         matrix_independent = np.asarray(geometry["matrix_source_raster_to_roi"], dtype=np.float32)
         alpha_independent = cv2.warpAffine(
             offline[:, :, 3], matrix_independent, (live.shape[1], live.shape[0]),
@@ -326,12 +352,16 @@ def main() -> int:
             "thresholds": {"observed_rgb_euclidean": args.rgb_threshold, "expected_alpha": args.alpha_thresholds},
             "observed_live_delta": report["observed_live_delta"],
             "comparisons": independent_results,
+            "scenario_id": scenario_id,
+            "axis_coverage": geometry["axis_sources"],
+            "expected_axis_sources": expected_axis_sources,
             "limitations": [
                 "No post-hoc translation or image registration is applied.",
-                "Horizontal scale/origin are fitted from same-run Monitor screenX/boardX telemetry.",
-                "Vertical origin/scale come from same-run full-screen blank/after board-color bounds; the horizontal run contributes one same-run Y sample for a residual check.",
-                "The inspect snapshot is an independent cross-check for screenshot-derived Y origin/scale, not their source.",
-                "The current capture is one horizontal trajectory on one screen configuration; it does not validate every viewport/window state or executor handoff.",
+                f"Same-run Monitor fit axes: {', '.join(monitor_fit_axes) if monitor_fit_axes else 'none'}.",
+                f"Same-run screenshot BoardPane bounds axes: {', '.join(screenshot_bounds_axes) if screenshot_bounds_axes else 'none'}.",
+                f"Inspect-only fallback axes: {', '.join(inspect_fallback_axes) if inspect_fallback_axes else 'none'}.",
+                "Inspect geometry is an independent cross-check, not the source of same-run Monitor fits.",
+                "This capture covers one trajectory and one screen configuration; it does not establish viewport/window/DPR generality or executor handoff.",
                 "This is exploratory evidence and has no renderer acceptance threshold.",
             ],
         }

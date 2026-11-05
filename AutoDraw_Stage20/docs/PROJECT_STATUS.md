@@ -1,27 +1,38 @@
 # Актуальная точка продолжения — 2026-11-05
 
-## Текущая точка — single-run screen transform подтверждён независимыми снимками; production handoff ещё закрыт
+## Текущая точка — multi-axis transform helper и paired UI-сценарии готовы; live validation pending
 
 **Репозиторий:** `Kiddos19882/AutoDraw`  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
-**Проверенный code/test commit:** `b9c2e2a194f840c844c1e8b0877a6c4c54ddc1df`  
-**Последний успешный CI:** [run 41971869707](https://github.com/Kiddos19882/AutoDraw/actions/runs/41971869707), conclusion SUCCESS.  
+**Проверенный code/test commit:** `f9387d0d1c04375c1b8284d01ebef75ff704418b`  
+**Последний успешный CI:** [run 41975359740](https://github.com/Kiddos19882/AutoDraw/actions/runs/41975359740), conclusion SUCCESS.  
 **Workflow packaging commit:** `fb853547d74a70582ab1e4731d55763367b8ceb8`, проверен успешным run `41970907209`.  
-**Последний документационный commit до этой синхронизации:** `ab25a34e5a0e2aa0fac778ac076eaae03be1c071`.  
+**Предыдущая документационная синхронизация:** `ab25a34e5a0e2aa0fac778ac076eaae03be1c071`.  
 **Master:** remote HEAD `9a3453aeb847b66041bc83d6f4a56ecaf33a993a`; master не изменялась.  
 **Рабочая копия:** локальный `git status` через GitHub API недоступен.
 
 ### Подтверждённое состояние CI
 
-- Preparation/G3: **859 passed**, 24 warnings, 82 subtests passed. Четыре новых screenshot/transform tests включены в этот набор.
-- Application integration: 41 passed / 1 skipped, 3 subtests; дополнительные UI/integration groups: 24 passed / 2 subtests и 12 passed.
+- Preparation/G3: **SUCCESS**; multi-axis transform unit tests and vertical/diagonal paired-plan tests included.
+- Application integration: **SUCCESS**; horizontal, vertical and diagonal paired-renderer executor handoff tests passed.
 - Game Monitor/Bridge: job SUCCESS; WebSocket smoke 22 passed.
 - Executor regression: SUCCESS.
 - Egret CanvasRenderer browser reference: SUCCESS.
 - INT-006 pixel-level analysis, CHALK model validation, INT006R radius validation и packaging визуальных capture artifacts: SUCCESS.
-- Windows portable build и startup smoke-test: SUCCESS; artifact `autodraw-g3-preflight-build`, ID `13390167082`, 646,947,279 bytes.
+- Windows portable build и startup smoke-test: **SUCCESS**; artifact `autodraw-g3-preflight-build`, ID `13392211048`, 646,945,119 bytes.
 - Optional algorithm benchmarks: SKIPPED.
 - Отдельный FILL-001 committed PNG quality gate остаётся FAIL: coverage `98.430600%`, leakage `11`. Успешный CI job не означает прохождение этого quality gate.
+
+
+### Multi-axis transform helper и paired UI-сценарии
+
+- `derive_live_board_screen_transform()` now fits each axis independently when same-run Monitor samples span at least 20 logical px.
+- Horizontal: Monitor X fit + screenshot Y bounds; vertical: screenshot X bounds + Monitor Y fit; diagonal: Monitor fits on both axes.
+- Client→screen offset must remain stable within 0.01 px; fitted-axis max residual is limited to 0.75 screen px.
+- Monitor-vs-inspect checks: origin ≤0.5 px and relative scale difference ≤0.2%; Monitor-vs-screenshot checks: origin ≤1.0 px and relative scale difference ≤0.2%.
+- The unspanned axis uses same-run screenshot BoardPane bounds; an unspanned X axis without screenshot bounds is rejected. Production executor/calibration handoff remains disabled.
+- UI scenarios: `paired_renderer_vertical_single_stroke` and `paired_renderer_diagonal_single_stroke`, both with radius 10 and the frozen step=2/delay=10/extension=0 profile.
+- Synthetic vertical/diagonal tests and all CI jobs pass. **No live vertical or diagonal capture has been executed yet.**
 
 ### Независимая проверка BoardPane screen bounds
 
@@ -52,13 +63,14 @@ Same-run full-screen before/after screenshots обнаружили одну и �
 
 ### Следующие действия
 
-1. Add a vertical/diagonal paired capture (and later additional viewport/window configurations) to validate both axes beyond the current single horizontal trajectory. Define acceptance thresholds before reviewing the next run.
-2. Complete environment fingerprint and stale invalidation for window/viewport/zoom/DPR/canvas/BoardPane. Keep CSS client coordinates separate from desktop/screenshot coordinates.
-3. Only after multi-axis/environment acceptance, connect geometry to calibration profile with explicit stale status and manual fallback; do not enable executor handoff yet.
-4. After renderer/footprint gate and committed PNG quality issue are resolved, run a single-task FILL-001-RS preflight; do not launch the 45-cell matrix yet.
-5. Keep INT-007 BLOCKED until INT-006 safety margin and domain/holdout validation are established.
+1. Run three clean-board captures for each new paired scenario: vertical (Y-fit) and diagonal (X/Y-fit), with input telemetry and same-run full-screen before/after screenshots.
+2. Apply the predeclared acceptance protocol in TASKS.md; do not alter thresholds after reviewing captures.
+3. Complete environment fingerprint and stale invalidation for window/viewport/zoom/DPR/canvas/BoardPane. Keep CSS client coordinates separate from desktop/screenshot coordinates.
+4. Only after multi-axis/environment acceptance, connect geometry to calibration profile with explicit stale status and manual fallback; do not enable executor handoff yet.
+5. After renderer/footprint gate and committed PNG quality issue are resolved, run a single-task FILL-001-RS preflight; do not launch the 45-cell matrix yet.
+6. Keep INT-007 BLOCKED until INT-006 safety margin and domain/holdout validation are established.
 
-**Неизменяемые ограничения:** production renderer, planner, estimator/defaults, calibration profile and executor behavior were not changed; no real game experiment was launched in this continuation. The new code is an offline diagnostic/audit path only.
+**Неизменяемые ограничения:** production renderer, planner, estimator/defaults, calibration profile and executor behavior were not changed; no real game experiment was launched in this continuation. The new code is an offline diagnostic/audit path plus test-only paired-plan scenarios; live geometry remains unverified.
 
 ---
 

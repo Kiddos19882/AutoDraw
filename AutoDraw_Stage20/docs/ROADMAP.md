@@ -1,13 +1,14 @@
 # Дополнение к дорожной карте — 2026-11-05
 
-## 2026-11-05 — independent screen-bound verification completed (CI 41971869707)
+## 2026-11-05 — multi-axis transform helper and paired scenarios ready (CI 41975359740)
 
-- Same-run full-screen screenshots identify BoardPane bounds `(498,268,672,351)`; the calibrated ROI `(496,265,674,355)` is a larger crop, not the board itself.
-- The old ROI transform gave IoU 0.763153 / 2,404 differing pixels. Monitor-X + screenshot-Y transform gives IoU 0.998882 / 10 differing pixels at alpha24, without post-hoc translation.
-- CI tests: 859 passed, 24 warnings, 82 subtests; paired renderer comparison, INT-006 analysis and Windows portable build/startup smoke-test succeeded. Full run [41971869707](https://github.com/Kiddos19882/AutoDraw/actions/runs/41971869707) SUCCESS.
-- This is single-run exploratory confirmation only; no formal renderer acceptance threshold and no executor handoff.
+- Same-run screenshot-derived BoardPane bounds remain `(498,268,672,351)`; the calibrated ROI `(496,265,674,355)` is a larger crop, not the board itself.
+- The horizontal exploratory comparison remains IoU 0.998882 / 10 differing pixels at alpha24, without post-hoc translation; it is not retroactively treated as a multi-axis acceptance result.
+- `derive_live_board_screen_transform()` now supports horizontal, vertical and diagonal trajectories with per-axis fit/fallback and explicit cross-check tolerances.
+- Brush Test UI exposes separate one-stroke vertical and diagonal paired-renderer scenarios. CI [41975359740](https://github.com/Kiddos19882/AutoDraw/actions/runs/41975359740) SUCCESS across all required jobs, including tests, INT-006 audit and Windows portable build.
+- No live vertical/diagonal captures have been run; no calibration profile or executor handoff is enabled.
 
-**Active next step:** collect vertical/diagonal paired trajectories and repeat under controlled viewport/window/DPR conditions; then complete environment fingerprint and stale invalidation. FILL-001-RS matrix remains BLOCKED.
+**Active next step:** collect three valid clean-board captures per orientation using input telemetry and full-screen before/after screenshots. Apply the predeclared acceptance protocol in TASKS.md without changing thresholds after review. Then complete environment fingerprint and stale invalidation. FILL-001-RS matrix remains BLOCKED.
 
 
 ## Синхронизация после CI 41966023670 и закрытия визуального gate INT006R

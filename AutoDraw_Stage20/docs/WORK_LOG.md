@@ -3214,3 +3214,13 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - CI run `41971869707` on `b9c2e2a194f840c844c1e8b0877a6c4c54ddc1df`: 859 preparation tests passed, 24 warnings, 82 subtests; paired renderer comparison SUCCESS; INT-006/INT006R analyses SUCCESS; Windows portable build/startup smoke-test SUCCESS.
 - Independent result: BoardPane bounds `(498,268,672,351)`; alpha24 IoU improved from 0.763153 (frozen ROI transform) to 0.998882 (Monitor X + screenshot Y), symmetric difference from 2,404 to 10 px. This remains single-run exploratory evidence, not a general renderer acceptance.
 - FILL-001 PNG gate remains FAIL (coverage 98.430600%, leakage 11); FILL-001-RS matrix remains blocked. No production code, calibration profile, executor defaults or live game state changed.
+
+## 2026-11-05 — multi-axis screen transform and paired capture scenarios
+
+- Extended `derive_live_board_screen_transform()` to resolve X and Y independently. An axis is fitted from same-run `MOUSE_MOVE_SAMPLE` telemetry when its logical span is at least 20 px; otherwise same-run screenshot BoardPane bounds supply that axis.
+- Added axis-specific cross-checks against inspect and screenshot bounds, stable client→screen offset validation and a 0.75 px fitted residual limit.
+- Added synthetic vertical and diagonal transform tests.
+- Added UI paired scenarios `paired_renderer_vertical_single_stroke` and `paired_renderer_diagonal_single_stroke` with the frozen radius/sampling profile.
+- First UI integration CI exposed a local-import scope error for `PAIRED_RENDERER_TEST_CASE_IDS`; corrected by importing the scenario set before the guard. The initial run 41975187040 failed in Application integration; corrected run 41975359740 completed SUCCESS.
+- No live game experiment was executed. The new scenarios are available for operator-run captures; production renderer, calibration profile and executor defaults remain unchanged.
+- Current code/test HEAD: `f9387d0d1c04375c1b8284d01ebef75ff704418b`. Full CI: [41975359740](https://github.com/Kiddos19882/AutoDraw/actions/runs/41975359740).
