@@ -1,0 +1,1690 @@
+{
+  "schemaVersion": 2,
+  "referenceType": "Actual game BoardPane CanvasRenderer and WebGL renderer reference",
+  "engineVersion": "5.4.1",
+  "sourceBundles": [
+    {
+      "path": "gameEngine/mergeEngine_df2e5bc5.js",
+      "blobSha": "d613d2b97e2436521aa3870478c69e99eac1f19f"
+    },
+    {
+      "path": "gameEngine/main.min_653f95bc.js",
+      "blobSha": "46cc74de00b6cb5d207b1e1a2ffcd81613b6d388"
+    }
+  ],
+  "gameBoardClass": "com.magnetjoy.pet.ui.board.BoardPane",
+  "browser": {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:159.0) Gecko/20100101 Firefox/159.0",
+    "platform": "Win32",
+    "devicePixelRatio": 1,
+    "viewport": {
+      "width": 1920,
+      "height": 927
+    }
+  },
+  "renderMode": "Actual BoardPane GraphicsNode rendered by Egret CanvasRenderer and WebGLRenderer; GL backend recorded below",
+  "board": {
+    "width": 460,
+    "height": 240
+  },
+  "rasterScale": 3,
+  "runtimeProfile": {
+    "source": "data/runtime/renderer_snapshot_2026-11-04.json",
+    "canvasScaleFactor": 2,
+    "canvasScaleX": 3,
+    "canvasScaleY": 3,
+    "stageWidth": 1672,
+    "stageHeight": 600,
+    "canvasBackingWidth": 5016,
+    "canvasBackingHeight": 1800,
+    "devicePixelRatio": 1,
+    "stageFrameRate": 30,
+    "scaleMode": "fixedHeight",
+    "boardWidth": 460,
+    "boardHeight": 240,
+    "note": "Local BoardPane offscreen raster uses canvasScaleX/Y=3; stage/client CSS transform is not applied."
+  },
+  "mask": {
+    "type": "Egret Shape drawRoundRect",
+    "ellipseWidthArgument": 10,
+    "ellipseHeightArgument": 10,
+    "effectiveCornerRadiusLogicalPx": 5,
+    "clipping": "Actual BoardPane.mask and scrollRect are rendered by Egret WebGLRenderer; Canvas2D destination-in remains a comparison reference"
+  },
+  "webglComposite": "actual Egret WebGLRenderer mask+scrollRect output is captured separately; Canvas2D composite retained as comparison reference",
+  "actualBoardPaneComparison": "actual BoardPane GraphicsNode pixel-compared with manual path transcription including transparent resetBg rectangle",
+  "webglProbe": {
+    "status": "complete",
+    "backend": "Egret WebGLRenderer",
+    "outputSize": {
+      "width": 1380,
+      "height": 720
+    },
+    "glInfo": {
+      "version": "WebGL 1.0",
+      "shadingLanguageVersion": "WebGL GLSL ES 1.0",
+      "vendor": "Mozilla",
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 980 Direct3D11 vs_5_0 ps_5_0), or similar",
+      "unmaskedVendor": "Google Inc. (NVIDIA)",
+      "unmaskedRenderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 980 Direct3D11 vs_5_0 ps_5_0), or similar"
+    },
+    "contextAttributes": {
+      "alpha": true,
+      "antialias": true,
+      "depth": true,
+      "failIfMajorPerformanceCaveat": false,
+      "powerPreference": "default",
+      "premultipliedAlpha": true,
+      "preserveDrawingBuffer": false,
+      "stencil": true
+    },
+    "textureParameters": {
+      "minFilter": 9729,
+      "magFilter": 9729,
+      "wrapS": 33071,
+      "wrapT": 33071,
+      "unpackPremultiplyAlpha": true
+    },
+    "comparisons": [
+      {
+        "fixture": "live-accepted-points",
+        "lineWidth": 10,
+        "stageAttached": true,
+        "sameStage": true,
+        "sameParent": true,
+        "boardRenderMode": 3,
+        "maskRenderMode": 1,
+        "equal": true,
+        "differingPixels": 0,
+        "maxChannelDifference": 0,
+        "meanDifferingChannelDifference": 0,
+        "reason": null
+      }
+    ],
+    "comparisonCount": 1
+  },
+  "fixtures": [
+    {
+      "id": "live-accepted-points",
+      "mode": "smooth",
+      "sourceRunId": "16aec62c-9e54-44e7-8691-9df79b19161d",
+      "lineWidth": 10,
+      "points": [
+        {
+          "x": 18.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 21.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 24.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 27.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 29.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 32.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 36.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 39.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 42.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 44.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 47.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 50.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 54.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 57.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 59.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 62.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 65.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 68.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 70.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 74.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 77.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 80.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 83.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 85.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 88.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 91.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 95.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 98.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 100.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 103.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 106.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 109.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 113.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 115.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 118.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 121.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 124.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 126.20833396911621,
+          "y": 119
+        },
+        {
+          "x": 129.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 132.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 137.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 139.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 141.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 144.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 147.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 150.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 152.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 157.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 159.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 162.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 165.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 167.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 170.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 173.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 177.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 180.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 183.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 185.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 188.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 191.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 193.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 198.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 200.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 203.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 206.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 209.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 211.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 214.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 218.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 221.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 224.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 226.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 229.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 232.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 236.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 239.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 241.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 244.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 247.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 251.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 254.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 256.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 259.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 262.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 265.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 267.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 272.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 274.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 277.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 280.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 282.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 285.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 288.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 291.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 293.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 298.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 300.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 303.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 306.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 308.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 311.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 315.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 318.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 321.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 324.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 326.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 329.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 332.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 336.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 339.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 341.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 344.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 347.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 350.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 352.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 356.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 359.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 362.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 365.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 367.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 370.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 373.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 377.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 380.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 382.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 385.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 388.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 391.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 393.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 396.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 400.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 403.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 407.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 408.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 410.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 413.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 416.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 419.2083339691162,
+          "y": 119
+        }
+      ],
+      "commands": [
+        {
+          "type": "moveTo",
+          "x": 18.20833396911621,
+          "y": 119
+        },
+        {
+          "type": "moveTo",
+          "x": 18.20833396911621,
+          "y": 119
+        },
+        {
+          "type": "lineTo",
+          "x": 19.70833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 21.20833396911621,
+          "controlY": 119,
+          "x": 22.70833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 24.20833396911621,
+          "controlY": 119,
+          "x": 25.70833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 27.20833396911621,
+          "controlY": 119,
+          "x": 28.20833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 29.20833396911621,
+          "controlY": 119,
+          "x": 30.70833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 32.20833396911621,
+          "controlY": 119,
+          "x": 34.20833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 36.20833396911621,
+          "controlY": 119,
+          "x": 37.70833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 39.20833396911621,
+          "controlY": 119,
+          "x": 40.70833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 42.20833396911621,
+          "controlY": 119,
+          "x": 43.20833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 44.20833396911621,
+          "controlY": 119,
+          "x": 45.70833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 47.20833396911621,
+          "controlY": 119,
+          "x": 48.70833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 50.20833396911621,
+          "controlY": 119,
+          "x": 52.20833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 54.20833396911621,
+          "controlY": 119,
+          "x": 55.70833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 57.20833396911621,
+          "controlY": 119,
+          "x": 58.20833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 59.20833396911621,
+          "controlY": 119,
+          "x": 60.70833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 62.20833396911621,
+          "controlY": 119,
+          "x": 63.70833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 65.20833396911621,
+          "controlY": 119,
+          "x": 66.70833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 68.20833396911621,
+          "controlY": 119,
+          "x": 69.20833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 70.20833396911621,
+          "controlY": 119,
+          "x": 72.20833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 74.20833396911621,
+          "controlY": 119,
+          "x": 75.70833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 77.20833396911621,
+          "controlY": 119,
+          "x": 78.70833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 80.20833396911621,
+          "controlY": 119,
+          "x": 81.70833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 83.20833396911621,
+          "controlY": 119,
+          "x": 84.20833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 85.20833396911621,
+          "controlY": 119,
+          "x": 86.70833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 88.20833396911621,
+          "controlY": 119,
+          "x": 89.70833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 91.20833396911621,
+          "controlY": 119,
+          "x": 93.20833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 95.20833396911621,
+          "controlY": 119,
+          "x": 96.70833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 98.20833396911621,
+          "controlY": 119,
+          "x": 99.20833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 100.20833396911621,
+          "controlY": 119,
+          "x": 101.70833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 103.20833396911621,
+          "controlY": 119,
+          "x": 104.70833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 106.20833396911621,
+          "controlY": 119,
+          "x": 107.70833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 109.20833396911621,
+          "controlY": 119,
+          "x": 111.20833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 113.20833396911621,
+          "controlY": 119,
+          "x": 114.20833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 115.20833396911621,
+          "controlY": 119,
+          "x": 116.70833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 118.20833396911621,
+          "controlY": 119,
+          "x": 119.70833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 121.20833396911621,
+          "controlY": 119,
+          "x": 122.70833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 124.20833396911621,
+          "controlY": 119,
+          "x": 125.20833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 126.20833396911621,
+          "controlY": 119,
+          "x": 127.70833396911621,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 129.2083339691162,
+          "controlY": 119,
+          "x": 130.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 132.2083339691162,
+          "controlY": 119,
+          "x": 134.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 137.2083339691162,
+          "controlY": 119,
+          "x": 138.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 139.2083339691162,
+          "controlY": 119,
+          "x": 140.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 141.2083339691162,
+          "controlY": 119,
+          "x": 142.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 144.2083339691162,
+          "controlY": 119,
+          "x": 145.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 147.2083339691162,
+          "controlY": 119,
+          "x": 148.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 150.2083339691162,
+          "controlY": 119,
+          "x": 151.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 152.2083339691162,
+          "controlY": 119,
+          "x": 154.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 157.2083339691162,
+          "controlY": 119,
+          "x": 158.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 159.2083339691162,
+          "controlY": 119,
+          "x": 160.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 162.2083339691162,
+          "controlY": 119,
+          "x": 163.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 165.2083339691162,
+          "controlY": 119,
+          "x": 166.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 167.2083339691162,
+          "controlY": 119,
+          "x": 168.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 170.2083339691162,
+          "controlY": 119,
+          "x": 171.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 173.2083339691162,
+          "controlY": 119,
+          "x": 175.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 177.2083339691162,
+          "controlY": 119,
+          "x": 178.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 180.2083339691162,
+          "controlY": 119,
+          "x": 181.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 183.2083339691162,
+          "controlY": 119,
+          "x": 184.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 185.2083339691162,
+          "controlY": 119,
+          "x": 186.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 188.2083339691162,
+          "controlY": 119,
+          "x": 189.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 191.2083339691162,
+          "controlY": 119,
+          "x": 192.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 193.2083339691162,
+          "controlY": 119,
+          "x": 195.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 198.2083339691162,
+          "controlY": 119,
+          "x": 199.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 200.2083339691162,
+          "controlY": 119,
+          "x": 201.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 203.2083339691162,
+          "controlY": 119,
+          "x": 204.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 206.2083339691162,
+          "controlY": 119,
+          "x": 207.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 209.2083339691162,
+          "controlY": 119,
+          "x": 210.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 211.2083339691162,
+          "controlY": 119,
+          "x": 212.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 214.2083339691162,
+          "controlY": 119,
+          "x": 216.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 218.2083339691162,
+          "controlY": 119,
+          "x": 219.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 221.2083339691162,
+          "controlY": 119,
+          "x": 222.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 224.2083339691162,
+          "controlY": 119,
+          "x": 225.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 226.2083339691162,
+          "controlY": 119,
+          "x": 227.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 229.2083339691162,
+          "controlY": 119,
+          "x": 230.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 232.2083339691162,
+          "controlY": 119,
+          "x": 234.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 236.2083339691162,
+          "controlY": 119,
+          "x": 237.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 239.2083339691162,
+          "controlY": 119,
+          "x": 240.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 241.2083339691162,
+          "controlY": 119,
+          "x": 242.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 244.2083339691162,
+          "controlY": 119,
+          "x": 245.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 247.2083339691162,
+          "controlY": 119,
+          "x": 249.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 251.2083339691162,
+          "controlY": 119,
+          "x": 252.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 254.2083339691162,
+          "controlY": 119,
+          "x": 255.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 256.2083339691162,
+          "controlY": 119,
+          "x": 257.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 259.2083339691162,
+          "controlY": 119,
+          "x": 260.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 262.2083339691162,
+          "controlY": 119,
+          "x": 263.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 265.2083339691162,
+          "controlY": 119,
+          "x": 266.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 267.2083339691162,
+          "controlY": 119,
+          "x": 269.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 272.2083339691162,
+          "controlY": 119,
+          "x": 273.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 274.2083339691162,
+          "controlY": 119,
+          "x": 275.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 277.2083339691162,
+          "controlY": 119,
+          "x": 278.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 280.2083339691162,
+          "controlY": 119,
+          "x": 281.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 282.2083339691162,
+          "controlY": 119,
+          "x": 283.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 285.2083339691162,
+          "controlY": 119,
+          "x": 286.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 288.2083339691162,
+          "controlY": 119,
+          "x": 289.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 291.2083339691162,
+          "controlY": 119,
+          "x": 292.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 293.2083339691162,
+          "controlY": 119,
+          "x": 295.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 298.2083339691162,
+          "controlY": 119,
+          "x": 299.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 300.2083339691162,
+          "controlY": 119,
+          "x": 301.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 303.2083339691162,
+          "controlY": 119,
+          "x": 304.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 306.2083339691162,
+          "controlY": 119,
+          "x": 307.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 308.2083339691162,
+          "controlY": 119,
+          "x": 309.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 311.2083339691162,
+          "controlY": 119,
+          "x": 313.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 315.2083339691162,
+          "controlY": 119,
+          "x": 316.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 318.2083339691162,
+          "controlY": 119,
+          "x": 319.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 321.2083339691162,
+          "controlY": 119,
+          "x": 322.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 324.2083339691162,
+          "controlY": 119,
+          "x": 325.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 326.2083339691162,
+          "controlY": 119,
+          "x": 327.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 329.2083339691162,
+          "controlY": 119,
+          "x": 330.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 332.2083339691162,
+          "controlY": 119,
+          "x": 334.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 336.2083339691162,
+          "controlY": 119,
+          "x": 337.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 339.2083339691162,
+          "controlY": 119,
+          "x": 340.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 341.2083339691162,
+          "controlY": 119,
+          "x": 342.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 344.2083339691162,
+          "controlY": 119,
+          "x": 345.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 347.2083339691162,
+          "controlY": 119,
+          "x": 348.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 350.2083339691162,
+          "controlY": 119,
+          "x": 351.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 352.2083339691162,
+          "controlY": 119,
+          "x": 354.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 356.2083339691162,
+          "controlY": 119,
+          "x": 357.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 359.2083339691162,
+          "controlY": 119,
+          "x": 360.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 362.2083339691162,
+          "controlY": 119,
+          "x": 363.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 365.2083339691162,
+          "controlY": 119,
+          "x": 366.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 367.2083339691162,
+          "controlY": 119,
+          "x": 368.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 370.2083339691162,
+          "controlY": 119,
+          "x": 371.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 373.2083339691162,
+          "controlY": 119,
+          "x": 375.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 377.2083339691162,
+          "controlY": 119,
+          "x": 378.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 380.2083339691162,
+          "controlY": 119,
+          "x": 381.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 382.2083339691162,
+          "controlY": 119,
+          "x": 383.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 385.2083339691162,
+          "controlY": 119,
+          "x": 386.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 388.2083339691162,
+          "controlY": 119,
+          "x": 389.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 391.2083339691162,
+          "controlY": 119,
+          "x": 392.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 393.2083339691162,
+          "controlY": 119,
+          "x": 394.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 396.2083339691162,
+          "controlY": 119,
+          "x": 398.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 400.2083339691162,
+          "controlY": 119,
+          "x": 401.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 403.2083339691162,
+          "controlY": 119,
+          "x": 405.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 407.2083339691162,
+          "controlY": 119,
+          "x": 407.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 408.2083339691162,
+          "controlY": 119,
+          "x": 409.2083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 410.2083339691162,
+          "controlY": 119,
+          "x": 411.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 413.2083339691162,
+          "controlY": 119,
+          "x": 414.7083339691162,
+          "y": 119
+        },
+        {
+          "type": "curveTo",
+          "controlX": 416.2083339691162,
+          "controlY": 119,
+          "x": 417.7083339691162,
+          "y": 119
+        }
+      ],
+      "actualBoardPane": true,
+      "manualTranscriptionMatch": {
+        "equal": true,
+        "differingPixels": 0,
+        "maxChannelDifference": 0,
+        "meanDifferingChannelDifference": 0,
+        "reason": null
+      },
+      "webglPixelComparison": {
+        "equal": true,
+        "differingPixels": 0,
+        "maxChannelDifference": 0,
+        "meanDifferingChannelDifference": 0,
+        "reason": null
+      },
+      "webglSceneDiagnostics": {
+        "stageAttached": true,
+        "sameStage": true,
+        "sameParent": true,
+        "boardRenderMode": 3,
+        "maskRenderMode": 1
+      },
+      "webglTextureParameters": {
+        "minFilter": 9729,
+        "magFilter": 9729,
+        "wrapS": 33071,
+        "wrapT": 33071,
+        "unpackPremultiplyAlpha": true
+      },
+      "nodeBounds": {
+        "x": -2,
+        "y": -2,
+        "width": 464,
+        "height": 244
+      },
+      "sourceTextureSize": {
+        "width": 1392,
+        "height": 732
+      },
+      "sourceScale": {
+        "x": 3,
+        "y": 3
+      },
+      "rasterDisposition": "actual-BoardPane-CanvasRenderer-source-raster",
+      "smoothPathTerminalPoint": {
+        "x": 417.7083339691162,
+        "y": 119
+      },
+      "lastAcceptedPoint": {
+        "x": 419.2083339691162,
+        "y": 119
+      },
+      "note": "Actual BoardPane calls Painter.drawSmoothLine(graphics, points, true, false); drawLast=false is explicit, so final lineTo(lastPoint) is not emitted."
+    }
+  ]
+}
