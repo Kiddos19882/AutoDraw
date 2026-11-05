@@ -3108,3 +3108,13 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - Обнаружена устаревшая формулировка в PROJECT_STATUS/TASKS/ROADMAP: replay указан как невыполненный, хотя PNG и manifest уже добавлены commits `dd0451cd` и `ad03a0b`. Статусы синхронизированы: offline replay done, live pixel comparison pending.
 - Не менялись production code, tests, configs, workflows, frozen plans, raw captures, CHALK model/defaults. Новые live эксперименты не запускались. FILL-001-RS 45-cell matrix остаётся BLOCKED.
 - CI combined status на `ad03a0b` пуст; CI PASS для этого commit не заявляется. Последний полный CI run `41933396072` относится к source/test HEAD `f6df3f9` и завершился SUCCESS; он предшествует добавлению data/manifest PNG artifacts.
+
+
+## 2026-11-05 — уточнение плана автоматического определения геометрии доски
+
+- Повторно проверены ветка `feature/image-geometry-optimization`, HEAD `454b63dc2c9fb41b553cef0a86cad63e0fa2241e`, последние 20 commits, README, индекс docs, управляющие документы и постоянные регламенты. GitHub compare подтвердил, что указанный SHA являлся HEAD ветки; локальный `git status` недоступен через GitHub API.
+- Изучены `source/game_monitor/game_monitor.js`, `game_monitor_bridge.js`, тесты Game Monitor, профильная справка и UI/profile docs. Подтверждено: `inspect()` отдаёт stage/client corners при доступном canvas screen quad; Bridge сейчас отправляет allowlisted events, status и heartbeat, но отдельный geometry/calibration handoff в AutoDraw не подтверждён.
+- Уточнён временный план: независимый same-session ROI audit; явное разделение board/stage/canvas/client/screenshot/desktop coordinate spaces; fail-closed geometry contract; отдельная спецификация и approval gate для Monitor→Bridge→AutoDraw; offline renderer validation; затем отдельные approvals для live capture и FILL-001-RS preflight/matrix.
+- Обновлены `PROJECT_STATUS.md`, `TASKS.md`, `ROADMAP.md`; план помечен `PLAN_REFINED / ANALYSIS_ONLY`. После этого обновлены WORK_LOG и CHANGELOG.
+- Изменения ограничены Markdown-документацией. Исходники, тесты, конфигурации, workflow, калибровочные профили, frozen plans и raw evidence не менялись. Тесты, CI, сборка и live/game experiments не запускались.
+- Предложенные numeric acceptance thresholds (углы ≤1 px; IoU/precision/recall ≥0.99; bbox edge ≤1 px) отмечены в ROADMAP как проект для утверждения, а не принятый критерий.
