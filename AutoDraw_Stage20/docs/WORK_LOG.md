@@ -3118,3 +3118,13 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - Обновлены `PROJECT_STATUS.md`, `TASKS.md`, `ROADMAP.md`; план помечен `PLAN_REFINED / ANALYSIS_ONLY`. После этого обновлены WORK_LOG и CHANGELOG.
 - Изменения ограничены Markdown-документацией. Исходники, тесты, конфигурации, workflow, калибровочные профили, frozen plans и raw evidence не менялись. Тесты, CI, сборка и live/game experiments не запускались.
 - Предложенные numeric acceptance thresholds (углы ≤1 px; IoU/precision/recall ≥0.99; bbox edge ≤1 px) отмечены в ROADMAP как проект для утверждения, а не принятый критерий.
+
+
+## 2026-11-05 — independent ROI audit and offline transform tooling
+
+- Повторно проверены branch `feature/image-geometry-optimization`, HEAD `c27e16aebfebb0d8f829cad36a0b2fc6a46ec8fb`, последние 20 commits и управляющие документы. Локальный `git status` недоступен через GitHub API.
+- Визуально проверены same-run full-screen PNG до/после и board crops. Из Monitor report извлечены 272 MOUSE_MOVE_SAMPLE; все имеют client→screen offset `(0,163)`.
+- Горизонтальный fit: originX=497.952041, scaleX=1.461213990, RMSE≈0.424 screen px. User inspect snapshot того же экрана cross-checks X и даёт Y scale 1.463334; vertical scale не fitted из-за горизонтального штриха.
+- ROI (496,265,674,355) смещён относительно BoardPane origin примерно на (1.952,2.860) px; текущий 1% tolerance не выявляет origin mismatch.
+- Добавлены `source/preparation/renderer_geometry.py`, unit tests, derived `screen_geometry_audit.json`; `tests/compare_live_renderer_reference.py` получил independent-transform comparison; workflow вызывает оба варианта.
+- Документы PROJECT_STATUS, TASKS, ROADMAP обновлены. Raw screenshots/manifest/Monitor report/plan/calibration profile не изменялись. Production planner/executor defaults не менялись. Live run не выполнялся.
