@@ -104,8 +104,8 @@ def mask_metrics(observed: np.ndarray, expected: np.ndarray) -> dict[str, Any]:
     if observed.shape != expected.shape:
         raise ValueError(f"Mask dimensions differ: observed={observed.shape}, expected={expected.shape}.")
     tp = int(np.count_nonzero(observed & expected))
-    fp = int(np.count_nonzero(expected & ~observed))
-    fn = int(np.count_nonzero(observed & ~expected))
+    fp = int(np.count_nonzero(observed & ~expected))
+    fn = int(np.count_nonzero(~observed & expected))
     union = tp + fp + fn
     precision = tp / (tp + fp) if tp + fp else 0.0
     recall = tp / (tp + fn) if tp + fn else 0.0

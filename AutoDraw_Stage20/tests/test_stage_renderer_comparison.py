@@ -30,14 +30,14 @@ class StageRendererComparisonTests(unittest.TestCase):
         self.assertAlmostEqual(predicted["y"], 267.860048, places=8)
 
     def test_mask_metrics_count_overlap_and_symmetric_difference(self):
-        observed = np.array([[1, 1, 0], [0, 1, 0]], dtype=bool)
-        expected = np.array([[1, 0, 0], [0, 1, 1]], dtype=bool)
+        observed = np.array([[1, 1, 1, 0]], dtype=bool)
+        expected = np.array([[1, 0, 0, 1]], dtype=bool)
         metrics = mask_metrics(observed, expected)
-        self.assertEqual(metrics["true_positive"], 2)
-        self.assertEqual(metrics["false_positive"], 1)
+        self.assertEqual(metrics["true_positive"], 1)
+        self.assertEqual(metrics["false_positive"], 2)
         self.assertEqual(metrics["false_negative"], 1)
-        self.assertEqual(metrics["symmetric_difference_pixels"], 2)
-        self.assertAlmostEqual(metrics["iou"], 0.5)
+        self.assertEqual(metrics["symmetric_difference_pixels"], 3)
+        self.assertAlmostEqual(metrics["iou"], 0.25)
 
     def test_rejects_non_axis_aligned_css_transform(self):
         with self.assertRaises(ValueError):
