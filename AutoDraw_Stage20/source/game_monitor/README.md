@@ -1,8 +1,12 @@
-# Game Monitor 0.2.2
+# Game Monitor 0.2.3
 
 Диагностический DevTools-наблюдатель для браузерной игры AutoDraw. Он не отправляет игровые команды и не управляет мышью, но временно оборачивает методы экземпляра BoardPane; поэтому называть его полностью пассивным или неинвазивным до проверки overhead и восстановления методов нельзя.
 
 ## Телеметрия входа и принятых координат (0.2.2)
+
+## Renderer geometry snapshot (0.2.3)
+
+`inspect().renderer` теперь включает raw `windowGeometry` и `boardClientMappingMethod`. Если `getBoxQuads()` отсутствует, Monitor строит client corners только при проверенном положительном axis-aligned CSS transform и согласованности canvas rect/Stage/backing scale. В остальных случаях corners остаются `null` и method=`unavailable`. Browser Bridge отправляет snapshot при `session_start` и обновления при изменениях viewport/window; collector сохраняет его в session/run JSON. Эти client coordinates не являются desktop screen coordinates.
 
 Во время активного штриха Monitor дополнительно записывает `MOUSE_MOVE_SAMPLE` для DOM `mousemove`, полученного canvas игры. Listener установлен на window в bubble phase: в согласованном Egret 5.4.1 bundle WebTouchHandler регистрирует `mousemove` непосредственно на canvas, поэтому window listener выполняется после canvas handler. Событие содержит DOM `timeStamp`, client/page/screen coordinates, movement/buttons, текущие `stage.mouseX/Y` и координаты после `BoardPane.globalToLocal()`. Это события, реально доставленные браузером, а не все вызовы `pyautogui.moveTo()`: события, объединённые или отброшенные до доставки в DOM, из них восстановить нельзя.
 
@@ -292,7 +296,7 @@ py -3.11 -m pip install -r .\AutoDraw_Stage20\source\game_monitor\requirements-b
 py -3.11 .\AutoDraw_Stage20\source\game_monitor\game_monitor_bridge_server.py --origin https://ФАКТИЧЕСКИЙ-ORIGIN
 ```
 Сервер слушает только `127.0.0.1:8765`. Можно задать `--port`, `--output-dir` и `--idle-seconds`.
-4. В том же iframe сначала загрузить актуальный `game_monitor.js` (0.2.2), затем вставить полный snippet, напечатанный bridge-сервером. Snippet содержит секретный токен; не публиковать его и не сохранять в репозитории.
+4. В том же iframe сначала загрузить актуальный `game_monitor.js` (0.2.3), затем вставить полный snippet, напечатанный bridge-сервером. Snippet содержит секретный токен; не публиковать его и не сохранять в репозитории.
 
 После подключения пользователь больше не должен вручную вызывать `status()`, `export()` или `download()` для каждого прогона. Сбор начинается автоматически при `DRAW_START`; непрерывная серия штрихов объединяется в один run, а завершение фиксируется после `DRAW_END` и интервала бездействия. Время бездействия настраивается параметром `--idle-seconds` (по умолчанию 2.5 секунды).
 
