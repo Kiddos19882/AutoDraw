@@ -102,7 +102,7 @@ def main() -> int:
     if fixture.get("mode") != "smooth" or float(fixture.get("lineWidth", 0)) != 10:
         raise ValueError("Unexpected renderer fixture mode/width; expected smooth / lineWidth 10.")
 
-    transform = plan.get("generation", {}).get("paired_renderer_capture", {}).get("screen_transform", {})
+    transform = plan.get("generation", {}).get("screen_transform", {})
     roi = transform.get("screen_roi", {})
     sx = float(transform.get("scale_x", 0))
     sy = float(transform.get("scale_y", 0))
