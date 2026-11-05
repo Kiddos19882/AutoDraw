@@ -1,3 +1,10 @@
+## 2026-11-05 — уточнён временный план board geometry/calibration handoff
+
+- Уточнена последовательность: независимое восстановление ROI из same-session evidence → coordinate-space contract → спецификация BoardPane geometry → отдельное разрешение на Monitor/Bridge/AutoDraw implementation → offline renderer validation → отдельное разрешение на live capture.
+- Зафиксировано, что текущий Monitor умеет выдавать stage corners и client corners только при доступном canvas screen quad; текущий Bridge передаёт события/status/heartbeat, но полноценный calibration handoff в AutoDraw не подтверждён.
+- Введены fail-closed требования для недоступной/неоднозначной геометрии и правила invalidation устаревшего профиля. FILL-001-RS single-task preflight и 45-cell matrix остаются заблокированы.
+- Изменения только в документации; код, тесты, конфигурации, workflow, live runtime и игровые эксперименты не затрагивались.
+
 ## 2026-11-05 — exploratory paired renderer comparison and transform audit
 
 - Выполнен количественный live/offline PNG comparison для experiment d47cc0a5: unshifted IoU=0.763153; post-hoc best translation (+1,+2) даёт IoU=0.998883 и symmetric difference=10 px.
