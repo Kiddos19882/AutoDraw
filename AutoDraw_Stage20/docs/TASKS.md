@@ -8,7 +8,7 @@
 
 | ID | Приоритет | Статус | Содержание |
 |---|---|---|---|
-| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | RENDERER_EXPLORATORY_DONE_MONITOR_GEOMETRY_PIPELINE_IN_PROGRESS | Independent compare IoU=0.998994 / 9 px; Monitor 0.2.3 + Bridge geometry persistence добавлены; AutoDraw profile consumer и end-to-end validation pending |
+| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | RENDERER_EXPLORATORY_DONE_MONITOR_BRIDGE_GEOMETRY_DONE_AUTODRAW_CONSUMER_PENDING | Independent compare IoU=0.998994 / 9 px; Monitor 0.2.3 + Bridge geometry persistence passed CI; AutoDraw reader/UI/profile consumer and end-to-end validation pending |
 | FILL-001-RS-MATRIX | P0 | BLOCKED | 45 captures только после принятого single-task preflight |
 | GAME-INPUT-SAMPLING-TRACE-001 | P1 | EXPLORATORY_COMPARE_DONE_TRANSFORM_ROOT_CAUSE_OPEN | Run 16aec62c принят; 138 accepted points, CHALK=138; unshifted IoU=0.76315, post-hoc (+1,+2) IoU=0.99888; acceptance не пройдена |
 | BRUSH-FOOTPRINT-CAPSULE-001 | P1 | OPEN | Offline capsule model готова; renderer acceptance/planner integration не выполнены |
