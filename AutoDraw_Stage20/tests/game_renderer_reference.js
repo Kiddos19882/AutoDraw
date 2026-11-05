@@ -174,68 +174,75 @@
     return shader;
   }
 
-  function renderStageWebGL(sourceCanvas,profile,roundOrigin) {
-    const p=buildStagePlacement(profile,roundOrigin);
-    if (!sourceCanvas || sourceCanvas.width!==p.width || sourceCanvas.height!==p.height) {
-      throw new Error("Stage WebGL source dimensions do not match BoardPane backing dimensions.");
+  function renderStageWebGL(mode, points, lineWidth, profile, roundOrigin, state) {
+    const placement = buildStagePlacement(profile, roundOrigin);
+    if (state.bufferSize.width !== placement.backingWidth ||
+        state.bufferSize.height !== placement.backingHeight) {
+      throw new Error("Egret Stage render buffer does not match run-bound backing dimensions.");
     }
-    const canvas=document.createElement("canvas");
-    canvas.width=p.backingWidth; canvas.height=p.backingHeight;
-    const gl=canvas.getContext("webgl",{alpha:true,antialias:true,premultipliedAlpha:true,
-      preserveDrawingBuffer:true,depth:false,stencil:false});
-    if (!gl) throw new Error("Stage-level WebGL context unavailable.");
-    const maxTexture=gl.getParameter(gl.MAX_TEXTURE_SIZE), maxRenderbuffer=gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
-    if (canvas.width>maxTexture || canvas.height>maxTexture ||
-        canvas.width>maxRenderbuffer || canvas.height>maxRenderbuffer) {
-      throw new Error("Stage backing dimensions exceed WebGL texture/renderbuffer limits.");
+
+    const stage = new egret.Stage();
+    const container = new egret.DisplayObjectContainer();
+    stage.addChild(container);
+    const mask = makeBoardMaskShape();
+    container.addChild(mask);
+    const board = makeActualBoardPane(mode, points, lineWidth).shape;
+    container.addChild(board);
+    board.mask = mask;
+
+    const sceneDiagnostics = {
+      stageAttached: !!board.$stage && !!mask.$stage,
+      sameStage: board.$stage === mask.$stage,
+      sameParent: board.$parent === mask.$parent,
+      boardRenderMode: board.$renderMode,
+      maskRenderMode: mask.$renderMode
+    };
+    if (!sceneDiagnostics.stageAttached || !sceneDiagnostics.sameStage ||
+        !sceneDiagnostics.sameParent || sceneDiagnostics.boardRenderMode !== 3) {
+      throw new Error("Stage-level Egret scene is not configured like an attached display list: " +
+        JSON.stringify(sceneDiagnostics));
     }
-    const vs=compileStageShader(gl,gl.VERTEX_SHADER,
-      "attribute vec2 a_position; attribute vec2 a_texCoord; varying vec2 v_texCoord; "+
-      "void main(){gl_Position=vec4(a_position,0.0,1.0);v_texCoord=a_texCoord;}");
-    const fs=compileStageShader(gl,gl.FRAGMENT_SHADER,
-      "precision mediump float; varying vec2 v_texCoord; uniform sampler2D u_texture; "+
-      "void main(){gl_FragColor=texture2D(u_texture,v_texCoord);}");
-    const program=gl.createProgram();
-    gl.attachShader(program,vs); gl.attachShader(program,fs); gl.linkProgram(program);
-    if (!gl.getProgramParameter(program,gl.LINK_STATUS)) {
-      throw new Error("Stage WebGL program link failed: "+(gl.getProgramInfoLog(program)||"unknown error"));
+
+    state.buffer.clear();
+    const matrix = new egret.Matrix(
+      placement.scaleX, 0, 0, placement.scaleY, placement.x, placement.y
+    );
+    const drawCalls = state.renderer.render(container, state.buffer, matrix);
+    const pixels = state.buffer.getPixels(
+      0, 0, placement.backingWidth, placement.backingHeight
+    );
+    const expectedLength = placement.backingWidth * placement.backingHeight * 4;
+    if (!pixels || pixels.length !== expectedLength) {
+      throw new Error("Egret Stage RenderBuffer returned an invalid full-backing pixel buffer.");
     }
-    gl.useProgram(program);
-    const cx=x=>x/p.backingWidth*2-1, cy=y=>1-y/p.backingHeight*2;
-    const x1=p.x+p.width, y1=p.y+p.height;
-    const vertices=new Float32Array([
-      cx(p.x),cy(p.y),0,0, cx(p.x),cy(y1),0,1,
-      cx(x1),cy(p.y),1,0, cx(x1),cy(y1),1,1
-    ]);
-    const buffer=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,buffer);
-    gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STATIC_DRAW);
-    const stride=4*Float32Array.BYTES_PER_ELEMENT;
-    const pos=gl.getAttribLocation(program,"a_position"), uv=gl.getAttribLocation(program,"a_texCoord");
-    gl.enableVertexAttribArray(pos); gl.vertexAttribPointer(pos,2,gl.FLOAT,false,stride,0);
-    gl.enableVertexAttribArray(uv); gl.vertexAttribPointer(uv,2,gl.FLOAT,false,stride,2*Float32Array.BYTES_PER_ELEMENT);
-    const texture=gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D,texture);
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,true);
-    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
-    gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,sourceCanvas);
-    gl.viewport(0,0,canvas.width,canvas.height); gl.clearColor(0,0,0,0); gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.enable(gl.BLEND); gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA); gl.drawArrays(gl.TRIANGLE_STRIP,0,4); gl.finish();
-    const error=gl.getError();
-    if (error!==gl.NO_ERROR) throw new Error("Stage WebGL compositor returned GL error "+error+".");
-    const params={minFilter:gl.getTexParameter(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER),
-      magFilter:gl.getTexParameter(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER),
-      wrapS:gl.getTexParameter(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S),
-      wrapT:gl.getTexParameter(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T),
-      unpackPremultiplyAlpha:gl.getParameter(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL),
-      unpackFlipY:gl.getParameter(gl.UNPACK_FLIP_Y_WEBGL)};
-    const attributes=gl.getContextAttributes();
-    gl.deleteTexture(texture); gl.deleteBuffer(buffer); gl.deleteProgram(program); gl.deleteShader(vs); gl.deleteShader(fs);
-    return {canvas,placement:p,textureParameters:params,contextAttributes:attributes};
+    const canvas = document.createElement("canvas");
+    canvas.width = placement.backingWidth;
+    canvas.height = placement.backingHeight;
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("Stage readback Canvas2D context unavailable.");
+    context.putImageData(new ImageData(
+      new Uint8ClampedArray(pixels), placement.backingWidth, placement.backingHeight
+    ), 0, 0);
+
+    const texture = board.$renderNode && board.$renderNode.$texture;
+    if (!texture) throw new Error("Stage-level BoardPane WebGL texture was not created.");
+    state.gl.bindTexture(state.gl.TEXTURE_2D, texture);
+    const textureParameters = {
+      minFilter: state.gl.getTexParameter(state.gl.TEXTURE_2D, state.gl.TEXTURE_MIN_FILTER),
+      magFilter: state.gl.getTexParameter(state.gl.TEXTURE_2D, state.gl.TEXTURE_MAG_FILTER),
+      wrapS: state.gl.getTexParameter(state.gl.TEXTURE_2D, state.gl.TEXTURE_WRAP_S),
+      wrapT: state.gl.getTexParameter(state.gl.TEXTURE_2D, state.gl.TEXTURE_WRAP_T),
+      unpackPremultiplyAlpha: state.gl.getParameter(state.gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL)
+    };
+    state.gl.bindTexture(state.gl.TEXTURE_2D, null);
+    return {
+      canvas, placement, drawCalls, sceneDiagnostics, textureParameters,
+      contextAttributes: state.contextAttributes,
+      backend: "Egret WebGLRenderer on the run-sized Stage RenderBuffer"
+    };
   }
 
-  function renderStageLevelVariants(sourceCanvas,profile) {
+  function renderStageLevelVariants(mode,points,lineWidth,sourceCanvas,profile,state) {
     const plan=[
       {id:"A",backend:"WebGL",roundOrigin:false},
       {id:"B",backend:"WebGL",roundOrigin:true},
@@ -244,10 +251,12 @@
     ];
     const rendered=plan.map(v=>{
       const r=v.backend==="WebGL"
-        ?renderStageWebGL(sourceCanvas,profile,v.roundOrigin)
+        ?renderStageWebGL(mode,points,lineWidth,profile,v.roundOrigin,state)
         :renderStageCanvas2D(sourceCanvas,profile,v.roundOrigin);
       return {id:v.id,backend:v.backend,canvas:r.canvas,placement:r.placement,
-        textureParameters:r.textureParameters||null,contextAttributes:r.contextAttributes||null};
+        textureParameters:r.textureParameters||null,contextAttributes:r.contextAttributes||null,
+        sceneDiagnostics:r.sceneDiagnostics||null,drawCalls:r.drawCalls||null,
+        rendererBackend:r.backend||"Canvas2D image composite"};
     });
     const baseline=rendered[0].canvas;
     return rendered.map(v=>({...v,comparisonToA:compareCanvases(baseline,v.canvas)}));
@@ -615,7 +624,7 @@
     parent.appendChild(link);
   }
 
-  function initializeWebGL() {
+  function initializeWebGL(stageProfile) {
     if (!egret.sys || typeof egret.sys.setRenderMode !== "function") {
       throw new Error("Egret sys.setRenderMode is unavailable.");
     }
@@ -631,9 +640,19 @@
 
     const outputWidth = BOARD_WIDTH * RASTER_SCALE;
     const outputHeight = BOARD_HEIGHT * RASTER_SCALE;
-    const buffer = new egret.sys.RenderBuffer(outputWidth, outputHeight);
+    const bufferWidth = stageProfile ? Number(stageProfile.canvasBackingWidth) : outputWidth;
+    const bufferHeight = stageProfile ? Number(stageProfile.canvasBackingHeight) : outputHeight;
+    if (!Number.isInteger(bufferWidth) || !Number.isInteger(bufferHeight) ||
+        bufferWidth < outputWidth || bufferHeight < outputHeight) {
+      throw new Error("Egret render buffer dimensions are invalid for the run-bound Stage profile.");
+    }
+    const buffer = new egret.sys.RenderBuffer(bufferWidth, bufferHeight);
     const gl = buffer.context && buffer.context.context;
     if (!gl) throw new Error("Egret WebGL context is unavailable.");
+    const maxRenderbuffer = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
+    if (bufferWidth > maxRenderbuffer || bufferHeight > maxRenderbuffer) {
+      throw new Error("Stage backing dimensions exceed Egret WebGL renderbuffer limits.");
+    }
     const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
     const glInfo = {
       version: gl.getParameter(gl.VERSION),
@@ -649,7 +668,8 @@
       gl,
       glInfo,
       contextAttributes: gl.getContextAttributes(),
-      outputSize: { width: outputWidth, height: outputHeight }
+      outputSize: { width: outputWidth, height: outputHeight },
+      bufferSize: { width: bufferWidth, height: bufferHeight }
     };
   }
 
@@ -792,7 +812,7 @@
         fixtures: []
       };
 
-      const webglState = initializeWebGL();
+      const webglState = initializeWebGL(liveRuntimeProfile);
       manifest.webglProbe.outputSize = webglState.outputSize;
       manifest.webglProbe.glInfo = webglState.glInfo;
       manifest.webglProbe.contextAttributes = webglState.contextAttributes;
@@ -822,7 +842,7 @@
             ...webgl.comparison
           });
           const stageLevelVariants = liveRuntimeProfile && fixture.id === "live-accepted-points"
-            ? renderStageLevelVariants(webgl.canvas, liveRuntimeProfile)
+            ? renderStageLevelVariants(fixture.mode, fixture.points, lineWidth, webgl.canvas, liveRuntimeProfile, webglState)
             : [];
           const terminal = terminalPoint(fixture.points, fixture.mode === "smooth", false);
           const entry = {
