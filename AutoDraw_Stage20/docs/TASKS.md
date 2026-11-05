@@ -8,7 +8,7 @@
 
 | ID | Приоритет | Статус | Содержание |
 |---|---|---|---|
-| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | INDEPENDENT_COMPARE_DONE_EXPLORATORY | Независимый transform дал IoU=0.998994 / 9 различающихся px при alpha 24; CI run 41963498086 SUCCESS (обязательные jobs), renderer acceptance остаётся exploratory из-за inspect provenance и отсутствия vertical live fit |
+| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | RENDERER_EXPLORATORY_DONE_MONITOR_GEOMETRY_PIPELINE_IN_PROGRESS | Independent compare IoU=0.998994 / 9 px; Monitor 0.2.3 + Bridge geometry persistence добавлены; AutoDraw profile consumer и end-to-end validation pending |
 | FILL-001-RS-MATRIX | P0 | BLOCKED | 45 captures только после принятого single-task preflight |
 | GAME-INPUT-SAMPLING-TRACE-001 | P1 | EXPLORATORY_COMPARE_DONE_TRANSFORM_ROOT_CAUSE_OPEN | Run 16aec62c принят; 138 accepted points, CHALK=138; unshifted IoU=0.76315, post-hoc (+1,+2) IoU=0.99888; acceptance не пройдена |
 | BRUSH-FOOTPRINT-CAPSULE-001 | P1 | OPEN | Offline capsule model готова; renderer acceptance/planner integration не выполнены |
@@ -21,6 +21,14 @@
 | INT-003 | — | CLOSED_NOT_REQUIRED | По решению пользователя: отдельное исследование overhead Monitor не требуется |
 | CHALK-SAMPLING-DOMAIN | — | CLOSED_NOT_REQUIRED | По решению пользователя: расширение sampling-domain не требуется |
 
+## 2026-11-05 — Monitor/Bridge geometry snapshot pipeline
+
+- [x] Game Monitor 0.2.3 добавляет `windowGeometry` и safe axis-aligned `boardClientCorners` fallback; unsupported transforms остаются unavailable.
+- [x] Bridge включает `rendererGeometry` в `session_start`, отправляет `renderer_geometry` updates при resize/scroll/orientation/fullscreen/visualViewport changes.
+- [x] Bridge server сохраняет latest geometry в `session.json` schema v2 optional fields и start/update/end snapshots в run JSON schema v1; geometry update history ограничена 32 entries/run.
+- [x] Сохранена совместимость с FILL-001 session schema v2; schema version не повышалась.
+- [ ] AutoDraw reader/validator для active session geometry, environment fingerprint и stale invalidation.
+- [ ] Calibration profile migration/extension и UI diagnostics; production executor использовать только после valid status.
 ## 2026-11-05 — независимый ROI audit и новый offline comparison
 
 - [x] Проверены same-run screenshots 1920×1080, board crops 674×355, experiment manifest, Monitor report и plan.
