@@ -3138,3 +3138,12 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - No post-hoc registration used for the independent transform. The old (+1,+2) diagnostic remains untouched. Vertical scale remains inspect-derived and inspect has no run/session timestamp; therefore this is strong exploratory evidence, not renderer acceptance.
 - Preparation/G3 tests, Game Monitor/Bridge tests, Executor regression, Application integration and Egret browser reference jobs passed. Windows portable build/startup smoke-test was still in progress at the last check; optional algorithm benchmarks skipped.
 - No live game action, production coordinate transform, planner/executor default, calibration profile or frozen plan changed.
+
+
+## 2026-11-05 — CI завершён
+
+- Workflow run `41963498086` завершился `SUCCESS` для commit `1b16b51e42ba0c61a0fbc547179ca5a9b3864b54`.
+- Успешны: Egret CanvasRenderer browser reference; Preparation and G3 matrix tests; Game Monitor and Bridge tests; Executor regression tests; Application integration tests; Windows portable build and startup smoke-test; INT-006 pixel-level PNG geometry audit.
+- Optional algorithm benchmarks — `SKIPPED`.
+- Независимый renderer comparison artifact `autodraw-paired-renderer-png-comparison` ID `13386122895` содержит новый report и overlay. Метрики зафиксированы в TEST_RESULTS.md.
+- После CI были созданы только documentation commits; текущая ветка сверена с HEAD и compare вернул `identical`. Локальный git status через GitHub API недоступен.
