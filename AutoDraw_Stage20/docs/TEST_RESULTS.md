@@ -4,10 +4,54 @@
 **Дата формирования:** 2026-11-05  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
 **HEAD перед дополнением D1–D5:** `63fdaf3f2a1b12bd90e1a588ca4e968facbe0103`  
-**Область:** AutoDraw_Stage20, тесты приложения, лабораторные эксперименты, Game Monitor/Bridge, CHALK, FILL-001, геометрические модели, GitHub Actions и offline benchmarks.
+**Область:** AutoDraw_Stage20, тесты приложения, лабораторные эксперименты, Game Monitor/Bridge, CHALK, FILL-001, геометрические модели, GitHub Actions и offline benchmarks.  
+**Последний evidence commit:** `e6b771ed67201625884c6ce778fa355f1ab9b873` (первые vertical/diagonal live captures и exploratory offline reports).
 
 > Этот файл — единая точка входа для понимания результатов тестирования. Здесь собраны проверяемые сводные результаты, статусы, ограничения и ссылки на первичные отчёты/артефакты. Первичные JSON, PNG, логи, frozen plans, manifests и подробные отчёты не удаляются и не переписываются: они остаются источниками доказательств. Если краткая сводка расходится с первичным отчётом, приоритет имеет первичный материал и фактический runtime/CI evidence.
 
+
+## 2026-11-05 — first vertical and diagonal live captures (evidence commit e6b771e)
+
+**Source commit:** [e6b771ed67201625884c6ce778fa355f1ab9b873](https://github.com/Kiddos19882/AutoDraw/commit/e6b771ed67201625884c6ce778fa355f1ab9b873). Commit adds 22 result artifacts (reports, manifests, logs and PNGs); no application code, tests, configuration or workflows changed.
+
+### Exact live CHALK and event integrity
+
+| Scenario | Run ID | Stroke | Radius | pointCount | Exact CHALK | MOUSE_MOVE_SAMPLE |
+|---|---|---:|---:|---:|---:|---:|
+| Vertical | `c860234f-995a-4789-9ac2-e05b322fe742` | 1 | 10 | 1 → 72 | **71** | 139 |
+| Diagonal | `f69cb0f4-f5d0-4ff9-a3b7-1148c38fa07f` | 1 | 10 | 1 → 162 | **161** | 315 |
+
+- Positive `DRAW_SAMPLE` and `POINT_QUOTA_UPDATE` counts equal exact CHALK (71/71 and 161/161); every positive event has `pointDelta=1` and `acceptedPoint`.
+- Both runs have zero dropped events, Monitor error delta, Bridge send failures, sequence gaps and geometry updates. Start/end renderer geometry snapshots are identical.
+- Radius 10 is observed in both runs. These different-length trajectories are not a radius-effect comparison.
+- `trajectory.status=incomplete_until_verified` remains in the summaries with a coalescing note. Preserve this warning; raw positive events contain one accepted coordinate per pointCount increment.
+- The linked calibration profile records screen 1920×1080, Windows scale 100%, browser zoom 100%, Firefox 159. Monitor reports DPR=1 and visualViewportScale=1. Windows scale comes from the profile calibrated earlier the same date, not a per-run display API.
+
+### Same-run geometry from Monitor
+
+- screen-client offsets are stable for all samples: X=0 px, Y=163 px; range=0 px on both axes.
+- Both runs have BoardPane client corners top-left (497.960425,104.86), bottom-right (1170.106544,456.06). After the measured Y offset, the screen-space top-left is approximately (497.960425,267.86); inspect-derived extent is approximately 672.146×351.200 px.
+- Vertical: Y span=201 logical px; Y fit origin=267.860071, scale=1.463264, RMSE=0.422 px, max residual=0.723222 px. X is unspanned and must use same-run screenshot BoardPane bounds.
+- Diagonal: X span=419, Y span=201 logical px; X fit origin=497.945419, scale=1.461274, RMSE=0.423 px, max residual=0.730129 px; Y fit origin=267.870306, scale=1.463321, RMSE=0.427 px, max residual=0.739053 px. Both fit residuals are below the frozen 0.75 px limit; Y is close to the limit.
+- These fits were calculated from raw Monitor samples using the same least-squares formula as `renderer_geometry.py`; the project CLI has not yet consumed them. Same-run before/after full-screen PNGs exist, but screenshot-derived BoardPane bounds for these specific runs have not yet been produced.
+
+### Offline renderer comparison — exploratory only
+
+Both `comparison-report.json` files have status `ANALYZED_EXPLORATORY_NO_ACCEPTANCE_THRESHOLD`; `independent_transform_comparison=null`. They use the frozen 674×355 calibrated ROI transform (scale X=1.463043478, Y=1.475), not the independently resolved same-run BoardPane transform.
+
+| Scenario | Alpha-24 IoU | Precision | Recall | Symmetric difference | Difference / live changed pixels |
+|---|---:|---:|---:|---:|---:|
+| Vertical | 0.870044 | 0.932683 | 0.928340 | 685 px | 13.93% |
+| Diagonal | 0.873071 | 0.926403 | 0.938140 | 1,464 px | 13.47% |
+
+- Best-translation diagnostics: vertical (+1,+1) IoU=0.988100 / 59 differing pixels; diagonal (+2,+2) IoU=0.937057 / 702 differing pixels. These post-hoc fits are diagnostic only and prohibited for acceptance or production transforms.
+- The offline Egret 5.4.1 WebGL harness matches its BoardPane reference fixture exactly (zero differing pixels). This validates the internal reference comparison, not live/offline equivalence.
+
+**Interpretation:** current exploratory metrics are poor under the frozen ROI transform, but the formal independent-transform gate was not run. These captures are neither `PASS_PER_RUN` nor formal `REJECTED_PER_RUN`. Next: rerun offline with same-run Monitor geometry and screenshot-derived BoardPane bounds, without post-hoc translation.
+
+**Frozen acceptance:** alpha 24; IoU/precision/recall each ≥0.995; symmetric difference ≤0.25% of live changed pixels; each bounding-box edge differs by ≤1 px; transform and axis-source requirements remain unchanged. Three unique `PASS_PER_RUN` captures per orientation are still required.
+
+**Not performed in this review:** no game run, AutoDraw launch, raw evidence change or code/test/config/workflow change. CI 41994624425 applies to code/test commit 58ebdda7; no CI result for evidence-only commit e6b771e was confirmed.
 
 ## 2026-11-05 — full CI 41994624425 SUCCESS (code/test commit 58ebdda7)
 
