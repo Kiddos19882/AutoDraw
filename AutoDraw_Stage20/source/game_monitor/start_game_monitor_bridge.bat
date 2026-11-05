@@ -11,6 +11,9 @@ if exist "%APP_ROOT%\AutoDraw.exe" (
 set "GAME_ORIGIN=%~1"
 set "SNIPPET_FILE=%~2"
 set "OUTPUT_DIR=%~3"
+set "ENABLE_INPUT_TELEMETRY=%~4"
+set "INPUT_TELEMETRY_OPTION="
+if /I "%ENABLE_INPUT_TELEMETRY%"=="true" set "INPUT_TELEMETRY_OPTION=--enable-input-telemetry"
 
 if not defined GAME_ORIGIN (
     echo Enter the exact HTTPS Origin from the game iframe.
@@ -52,7 +55,7 @@ if errorlevel 1 (
 )
 
 echo Starting the read-only Game Monitor WebSocket collector...
-py -3.11 "%SCRIPT_DIR%game_monitor_bridge_server.py" --origin "%GAME_ORIGIN%" --output-dir "%OUTPUT_DIR%" --snippet-file "%SNIPPET_FILE%"
+py -3.11 "%SCRIPT_DIR%game_monitor_bridge_server.py" --origin "%GAME_ORIGIN%" --output-dir "%OUTPUT_DIR%" --snippet-file "%SNIPPET_FILE%" %INPUT_TELEMETRY_OPTION%
 set "RESULT=%ERRORLEVEL%"
 if not "%RESULT%"=="0" (
     echo Bridge exited with code %RESULT%.

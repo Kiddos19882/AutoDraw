@@ -1573,3 +1573,22 @@ def test_paired_renderer_axis_cases_build_one_fixed_stroke(
     assert capture["expected_strokes"] == 1
     assert capture["renderer_path_mode"] == PAIRED_RENDERER_PATH_MODE == "smooth"
     assert capture["executor_parameters"] == PAIRED_RENDERER_EXECUTOR_CONFIG
+
+
+def test_paired_renderer_scenarios_request_automatic_input_telemetry() -> None:
+    paired_labels = {
+        label for label, scenario in TEST_CASES.items()
+        if scenario.get("id") in brush_ui.PAIRED_RENDERER_TEST_CASE_IDS
+    }
+    assert paired_labels == {
+        "Парный renderer — один длинный штрих",
+        "Парный renderer — один вертикальный штрих",
+        "Парный renderer — один диагональный штрих",
+    }
+    for label in paired_labels:
+        assert brush_ui.should_enable_input_telemetry_for_test_case(label) is True
+
+
+def test_regular_brush_scenarios_do_not_request_automatic_input_telemetry() -> None:
+    assert brush_ui.should_enable_input_telemetry_for_test_case("Горизонтальные линии") is False
+    assert brush_ui.should_enable_input_telemetry_for_test_case("Расход краски — серия длинных линий") is False

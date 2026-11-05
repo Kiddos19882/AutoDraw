@@ -2,6 +2,7 @@
   "use strict";
   const TOKEN = "__AUTODRAW_BRIDGE_TOKEN__";
   const ENDPOINT = "ws://127.0.0.1:8765";
+  const INPUT_TELEMETRY_ENABLED = "__AUTODRAW_INPUT_TELEMETRY_ENABLED__" === "true";
   const ALLOWED_EVENTS = new Set([
     "BOARD_ATTACHED", "BOARD_DETACHED", "DRAW_START", "DRAW_START_APPLIED",
     "DRAW_SAMPLE", "DRAW_END", "BRUSH_CHANGE", "BRUSH_CHANGE_APPLIED",
@@ -97,6 +98,70 @@
   let lastEventType = null;
   let lastEventAtPerformanceMs = null;
   let sendFailureCount = 0;
+  let previousInputTelemetryEnabled = null;
+  let inputTelemetryChangedByBridge = false;
+  const inputTelemetryConfiguration = {
+    requested: INPUT_TELEMETRY_ENABLED,
+    enabled: null,
+    previous: null,
+    changedByBridge: false,
+    restoreStatus: "not_required"
+  };
+
+  const configureInputTelemetry = () => {
+    const before = monitor.status();
+    const previous = before && before.inputTelemetryEnabled;
+    inputTelemetryConfiguration.previous = typeof previous === "boolean" ? previous : null;
+    if (!INPUT_TELEMETRY_ENABLED) {
+      inputTelemetryConfiguration.enabled = typeof previous === "boolean" ? previous : null;
+      return { ...inputTelemetryConfiguration };
+    }
+    if (typeof previous !== "boolean") {
+      inputTelemetryConfiguration.restoreStatus = "api_unavailable";
+      return { ...inputTelemetryConfiguration };
+    }
+    previousInputTelemetryEnabled = previous;
+    if (previous === true) {
+      inputTelemetryConfiguration.enabled = true;
+      return { ...inputTelemetryConfiguration };
+    }
+    if (typeof monitor.setInputTelemetryEnabled !== "function") {
+      inputTelemetryConfiguration.restoreStatus = "api_unavailable";
+      return { ...inputTelemetryConfiguration };
+    }
+    if (!previous) {
+      inputTelemetryChangedByBridge = true;
+      inputTelemetryConfiguration.changedByBridge = true;
+      try {
+        monitor.setInputTelemetryEnabled(true);
+      } catch (error) {
+        inputTelemetryConfiguration.restoreStatus = "enable_failed";
+        console.error("AutoDraw Game Monitor input telemetry could not be enabled:", error);
+      }
+    }
+    const after = monitor.status();
+    inputTelemetryConfiguration.enabled = !!after && after.inputTelemetryEnabled === true;
+    if (!inputTelemetryConfiguration.enabled) {
+      inputTelemetryConfiguration.restoreStatus = "enable_unconfirmed";
+    }
+    return { ...inputTelemetryConfiguration };
+  };
+
+  const restoreInputTelemetry = () => {
+    if (!inputTelemetryChangedByBridge) return;
+    try {
+      monitor.setInputTelemetryEnabled(previousInputTelemetryEnabled === true);
+      const restored = monitor.status();
+      inputTelemetryConfiguration.restoreStatus =
+        restored && restored.inputTelemetryEnabled === previousInputTelemetryEnabled
+          ? "restored" : "restore_unconfirmed";
+    } catch (error) {
+      inputTelemetryConfiguration.restoreStatus = "restore_failed";
+      console.error("AutoDraw Game Monitor input telemetry could not be restored:", error);
+    }
+    inputTelemetryChangedByBridge = false;
+    inputTelemetryConfiguration.changedByBridge = false;
+  };
 
   const send = (type, payload = {}) => {
     if (!connected || socket.readyState !== WebSocket.OPEN) {
@@ -158,10 +223,12 @@
     try { message = JSON.parse(event.data); } catch (_) { return; }
     if (message.type === "ready") {
       connected = true;
+      const inputTelemetry = configureInputTelemetry();
       const initialRendererGeometry = readRendererGeometry();
       lastRendererGeometryFingerprint = initialRendererGeometry ? JSON.stringify(initialRendererGeometry) : null;
       send("session_start", {
         monitorStatus: monitor.status(),
+        bridgeConfiguration: { inputTelemetry },
         rendererGeometry: initialRendererGeometry,
         browser: navigator.userAgent,
         page: { origin: location.origin, pathname: location.pathname },
@@ -205,7 +272,11 @@
     if (heartbeatTimer !== null) clearInterval(heartbeatTimer);
     if (geometryUpdateTimer !== null) clearTimeout(geometryUpdateTimer);
     if (rafHandle !== null) cancelAnimationFrame(rafHandle);
-    window.AutoDrawGameMonitorBridge = { connected: false, sessionId, closeCode: event.code, closeReason: event.reason };
+    restoreInputTelemetry();
+    window.AutoDrawGameMonitorBridge = {
+      connected: false, sessionId, closeCode: event.code, closeReason: event.reason,
+      inputTelemetry: { ...inputTelemetryConfiguration }
+    };
     console.warn("AutoDraw Game Monitor Bridge disconnected:", event.code, event.reason);
   });
   window.AutoDrawGameMonitorBridge = {

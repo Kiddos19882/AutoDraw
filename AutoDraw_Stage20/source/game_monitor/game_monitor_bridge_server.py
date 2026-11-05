@@ -27,6 +27,38 @@ PORT = 8765
 MAX_MESSAGE_BYTES = 65536
 MAX_EVENTS_PER_RUN = 100000
 MAX_GEOMETRY_UPDATES_PER_RUN = 32
+INPUT_TELEMETRY_PLACEHOLDER = "__AUTODRAW_INPUT_TELEMETRY_ENABLED__"
+
+
+def render_bridge_snippet(
+    source: str,
+    token: str,
+    port: int,
+    *,
+    enable_input_telemetry: bool = False,
+) -> str:
+    """Render a one-time browser snippet with explicit, opt-in input telemetry."""
+    if not isinstance(source, str):
+        raise TypeError("Bridge snippet source must be text.")
+    if not isinstance(token, str) or not token:
+        raise ValueError("A non-empty one-time Bridge token is required.")
+    if isinstance(port, bool) or not isinstance(port, int) or not 1 <= port <= 65535:
+        raise ValueError("Bridge port must be an integer from 1 to 65535.")
+    if type(enable_input_telemetry) is not bool:
+        raise TypeError("enable_input_telemetry must be a boolean.")
+    if source.count("__AUTODRAW_BRIDGE_TOKEN__") != 1:
+        raise ValueError("Bridge token placeholder must occur exactly once.")
+    if source.count(INPUT_TELEMETRY_PLACEHOLDER) != 1:
+        raise ValueError("Input telemetry placeholder must occur exactly once.")
+    rendered = source.replace("__AUTODRAW_BRIDGE_TOKEN__", token)
+    rendered = rendered.replace("ws://127.0.0.1:8765", f"ws://127.0.0.1:{port}")
+    rendered = rendered.replace(
+        INPUT_TELEMETRY_PLACEHOLDER,
+        "true" if enable_input_telemetry else "false",
+    )
+    if "__AUTODRAW_BRIDGE_TOKEN__" in rendered or INPUT_TELEMETRY_PLACEHOLDER in rendered:
+        raise ValueError("Bridge snippet contains an unresolved configuration placeholder.")
+    return rendered
 ALLOWED_TYPES = {"BOARD_ATTACHED", "BOARD_DETACHED", "DRAW_START", "DRAW_START_APPLIED",
                  "DRAW_SAMPLE", "DRAW_END", "BRUSH_CHANGE", "BRUSH_CHANGE_APPLIED",
                  "POINT_QUOTA_UPDATE", "GAME_METHOD_ERROR", "POINTER_DOWN_CANDIDATE",
@@ -799,7 +831,7 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
 
 async def run_server(
     origin: str, port: int, output_dir: Path, idle_seconds: float, token: str,
-    snippet_file: Path | None = None,
+    snippet_file: Path | None = None, enable_input_telemetry: bool = False,
 ) -> None:
     print("AutoDraw Game Monitor Bridge — read-only telemetry collector")
     print(f"Listening only on ws://{HOST}:{port}")
@@ -808,8 +840,17 @@ async def run_server(
     print("Session token (keep local; do not share):")
     print(token)
     bridge_path = Path(__file__).with_name("game_monitor_bridge.js")
-    snippet = bridge_path.read_text(encoding="utf-8").replace("__AUTODRAW_BRIDGE_TOKEN__", token)
-    snippet = snippet.replace("ws://127.0.0.1:8765", f"ws://127.0.0.1:{port}")
+    snippet = render_bridge_snippet(
+        bridge_path.read_text(encoding="utf-8"),
+        token,
+        port,
+        enable_input_telemetry=enable_input_telemetry,
+    )
+    print(
+        "Input telemetry: automatically enabled for this Bridge session."
+        if enable_input_telemetry else
+        "Input telemetry: unchanged (default Bridge mode)."
+    )
     if snippet_file is not None:
         snippet_file = snippet_file.expanduser().resolve()
         snippet_file.parent.mkdir(parents=True, exist_ok=True)
@@ -841,6 +882,10 @@ def main() -> int:
     parser.add_argument("--idle-seconds", type=float, default=2.5)
     parser.add_argument("--snippet-file", type=Path, default=None,
                         help="Write the tokenized browser snippet here until the server stops")
+    parser.add_argument(
+        "--enable-input-telemetry", action="store_true",
+        help="Opt in to MOUSE_MOVE_SAMPLE telemetry for a paired-renderer capture; restored when the browser Bridge disconnects.",
+    )
     args = parser.parse_args()
     if not valid_origin(args.origin):
         parser.error("--origin must be an exact HTTPS origin without path/query/fragment")
@@ -849,8 +894,11 @@ def main() -> int:
     if not 0.5 <= args.idle_seconds <= 15:
         parser.error("--idle-seconds must be between 0.5 and 15")
     try:
-        asyncio.run(run_server(args.origin.rstrip("/"), args.port, args.output_dir,
-                               args.idle_seconds, secrets.token_urlsafe(32), args.snippet_file))
+        asyncio.run(run_server(
+            args.origin.rstrip("/"), args.port, args.output_dir,
+            args.idle_seconds, secrets.token_urlsafe(32), args.snippet_file,
+            args.enable_input_telemetry,
+        ))
     except KeyboardInterrupt:
         print("\nBridge stopped.")
     except OSError as exc:

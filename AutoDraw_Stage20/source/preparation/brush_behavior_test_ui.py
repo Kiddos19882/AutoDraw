@@ -603,6 +603,13 @@ TEST_CASES: dict[str, dict[str, Any]] = {
 }
 
 
+
+def should_enable_input_telemetry_for_test_case(test_case_label: str) -> bool:
+    """Opt in to mouse-coordinate telemetry only for paired-renderer scenarios."""
+    scenario = TEST_CASES.get(test_case_label)
+    return isinstance(scenario, dict) and scenario.get("id") in PAIRED_RENDERER_TEST_CASE_IDS
+
+
 def summarize_game_monitor_report(
     document: dict[str, Any],
     requested_brush_value: int | None = None,
@@ -921,6 +928,7 @@ class BrushBehaviorTestTab:
         self._geometry_poll_after_id: str | None = None
         self.bridge_snippet_path: Path | None = None
         self.bridge_process: subprocess.Popen | None = None
+        self.bridge_input_telemetry_requested = False
         self.last_record_path: Path | None = None
         self.brush_var = tk.StringVar(value="1")
         self.case_var = tk.StringVar(value=next(iter(TEST_CASES)))
@@ -1180,12 +1188,29 @@ class BrushBehaviorTestTab:
 
     def start_game_monitor_bridge(self) -> None:
         """Launch the authenticated local bridge in its own Windows console."""
+        selected_scenario = TEST_CASES.get(self.case_var.get(), {})
+        enable_input_telemetry = (
+            isinstance(selected_scenario, dict)
+            and selected_scenario.get("id") in PAIRED_RENDERER_TEST_CASE_IDS
+        )
         if self.bridge_process is not None and self.bridge_process.poll() is None:
-            messagebox.showinfo(
-                "Game Monitor Bridge",
-                "Окно WebSocket-сервера уже запущено. Остановить его можно сочетанием Ctrl+C в этом окне.",
-                parent=self.root,
-            )
+            if enable_input_telemetry != self.bridge_input_telemetry_requested:
+                expected_mode = (
+                    "paired-renderer с автоматической input telemetry"
+                    if enable_input_telemetry else "обычный режим без автоматического включения input telemetry"
+                )
+                messagebox.showwarning(
+                    "Game Monitor Bridge уже запущен",
+                    "Режим Bridge фиксируется при запуске. Для текущего выбранного сценария требуется: "
+                    f"{expected_mode}. Останови текущий Bridge (Ctrl+C в окне сервера) и запусти его заново.",
+                    parent=self.root,
+                )
+            else:
+                messagebox.showinfo(
+                    "Game Monitor Bridge",
+                    "Окно WebSocket-сервера уже запущено. Остановить его можно сочетанием Ctrl+C в этом окне.",
+                    parent=self.root,
+                )
             return
         origin_value = simpledialog.askstring(
             "Запуск Game Monitor WebSocket",
@@ -1233,7 +1258,11 @@ class BrushBehaviorTestTab:
             snippet_dir.mkdir(parents=True, exist_ok=True)
             snippet_path.unlink(missing_ok=True)
             self.bridge_process = subprocess.Popen(
-                ["cmd.exe", "/c", "call", str(batch_path), origin, str(snippet_path), str(snippet_dir)],
+                [
+                    "cmd.exe", "/c", "call", str(batch_path),
+                    origin, str(snippet_path), str(snippet_dir),
+                    "true" if enable_input_telemetry else "false",
+                ],
                 cwd=str(working_directory),
                 creationflags=getattr(subprocess, "CREATE_NEW_CONSOLE", 0),
             )
@@ -1245,8 +1274,15 @@ class BrushBehaviorTestTab:
             )
             return
         self.bridge_snippet_path = snippet_path
+        self.bridge_input_telemetry_requested = enable_input_telemetry
+        telemetry_mode = (
+            "Для paired-renderer input telemetry включится автоматически после подключения snippet и восстановится при отключении Bridge. "
+            if enable_input_telemetry else
+            "Input telemetry автоматически не включается. "
+        )
         self.status_var.set(
-            "WebSocket запускается в отдельном окне. После появления сообщения о готовности скопируй snippet подключения."
+            telemetry_mode
+            + "WebSocket запускается в отдельном окне. После появления сообщения о готовности скопируй snippet подключения."
         )
 
     def _copy_text_to_clipboard(self, content: str, success_message: str) -> None:
@@ -1346,8 +1382,8 @@ class BrushBehaviorTestTab:
                 "• Исполнитель: point_step_px=2, point_delay_ms=10, line_extension_px=0.",
                 "• Остальные параметры: before_mouse_down=20 ms, after_mouse_down=40 ms, "
                 "after_mouse_up=20 ms, end_hold=50 ms, countdown=5 s.",
-                "• Game Monitor и Bridge должны быть активны; в Console игрового iframe выполни "
-                "AutoDrawGameMonitor.setInputTelemetryEnabled(true) до штриха.",
+                "• Выбери этот paired-renderer сценарий до запуска кнопки «Запустить сокет»: Bridge автоматически включит input telemetry при подключении snippet и восстановит исходное состояние при отключении.",
+                "• Если Bridge запущен вручную или в обычном режиме, включи input telemetry вручную в Console игрового iframe командой AutoDrawGameMonitor.setInputTelemetryEnabled(true).",
                 "• До штриха и после него сохрани AutoDrawGameMonitor.status() с pointCount; "
                 "после запуска также сохрани AutoDrawGameMonitor.inspect().",
                 "• После одного запуска сохрани raw Game Monitor run JSON, session.json, "
@@ -2055,6 +2091,17 @@ class BrushBehaviorTestTab:
             if not 1 <= brush <= 30:
                 raise ValueError("Размер кисти должен быть целым числом от 1 до 30.")
             scenario_id = plan["generation"].get("test_case")
+            active_bridge_process = getattr(self, "bridge_process", None)
+            bridge_running = active_bridge_process is not None and active_bridge_process.poll() is None
+            if (
+                scenario_id in PAIRED_RENDERER_TEST_CASE_IDS
+                and bridge_running
+                and not getattr(self, "bridge_input_telemetry_requested", False)
+            ):
+                raise ValueError(
+                    "Для paired-renderer нужен Bridge, запущенный после выбора этого сценария: "
+                    "он должен автоматически включить input telemetry. Останови Bridge и запусти его заново."
+                )
             if scenario_id in PAIRED_RENDERER_TEST_CASE_IDS and brush != PAIRED_RENDERER_REQUESTED_RADIUS:
                 raise ValueError(
                     "Для парного renderer capture требуется радиус кисти 10. "
