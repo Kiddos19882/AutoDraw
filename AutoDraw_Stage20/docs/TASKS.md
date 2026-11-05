@@ -6,7 +6,7 @@
 
 ## Сводка
 
-**Уточнение 2026-11-05:** same-run Monitor/screenshot transform проходит geometry gates. CI 42087496092 выявил, что формальная pixel mask включала 17 UI pixels за пределами BoardPane, но внутри большего calibrated ROI. Commits `1ac3d939` и `e73506db` ограничили formal comparison точными screenshot-derived BoardPane bounds, вынес ROI margins в отдельную диагностику и добавил regression tests. CI 42091800785 завершился из-за неверной координаты в отрицательном test fixture (887 passed, 1 failed); координата исправлена в cfdc49e, CI 42092259450 выполняется. Formal acceptance vertical/diagonal остаётся pending.
+**Уточнение 2026-11-05:** same-run Monitor/screenshot transform проходит geometry gates. CI 42087496092 выявил, что формальная pixel mask включала 17 UI pixels за пределами BoardPane, но внутри большего calibrated ROI. Commits `1ac3d939` и `e73506db` ограничили formal comparison точными screenshot-derived BoardPane bounds, вынес ROI margins в отдельную диагностику и добавил regression tests. CI 42092259450: preparation/G3 passed (888 tests, 24 warnings, 82 subtests); renderer replay failed before metrics because OpenCV diagnostic alpha mask uses ROI-local coordinates but was cropped with absolute screen coordinates. Commit `f1b5b608` fixes the coordinate frame and adds a regression test; CI 42093239480 pending. Formal acceptance vertical/diagonal remains pending.
 
 
 | ID | Приоритет | Статус | Содержание |

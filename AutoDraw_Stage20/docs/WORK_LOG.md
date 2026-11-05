@@ -84,3 +84,11 @@ Scope: code, tests and CI only in feature/image-geometry-optimization; no real g
 - CI 42091800785 ran 887 tests successfully and found one failing assertion in the newly added negative-bounds test. The test fixture used x=497 while ROI started at x=496, so the board bounds were correctly considered contained; the test expectation was wrong.
 - Corrected the fixture to x=495, genuinely outside the ROI. Production crop implementation was not changed.
 - Commit: `cfdc49e86809a7b62c0271f0574473a48403e20b`; CI run `42092259450` queued.
+
+
+## 2026-11-05 — ROI-local OpenCV diagnostic mask correction
+
+- CI 42092259450 passed preparation/G3: 888 passed, 24 warnings, 82 subtests. The renderer job then failed before formal metrics because `alpha_opencv` is generated in ROI-local dimensions, while the crop helper was given absolute screenshot BoardPane coordinates.
+- Converted absolute BoardPane bounds to ROI-local coordinates for the OpenCV diagnostic crop; full-screen observed and browser-composited masks continue using absolute screen coordinates.
+- Added a regression test for ROI-local mask cropping. Commits: `f1b5b608de5b61c171b8e90640f83898bbd0d5b4`, `221e5240152c9888b564076e649b3f71366c1664`.
+- CI run `42093239480` pending. No live game run or production executor change.

@@ -6,7 +6,7 @@
 **HEAD перед дополнением D1–D5:** `63fdaf3f2a1b12bd90e1a588ca4e968facbe0103`  
 **Область:** AutoDraw_Stage20, тесты приложения, лабораторные эксперименты, Game Monitor/Bridge, CHALK, FILL-001, геометрические модели, GitHub Actions и offline benchmarks.  
 **Последний evidence commit:** `e6b771ed67201625884c6ce778fa355f1ab9b873` (первые vertical/diagonal live captures и exploratory offline reports).  
-**Последний code/test HEAD:** `cfdc49e86809a7b62c0271f0574473a48403e20b`; CI run 42092259450 in progress.
+**Последний code/test HEAD:** `221e5240152c9888b564076e649b3f71366c1664`; CI run 42093239480 pending.
 
 ## 2026-11-05 — exact BoardPane bounds вместо calibrated ROI в formal renderer metrics
 
