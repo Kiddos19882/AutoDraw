@@ -3191,3 +3191,15 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - `summarize_game_monitor_report()` now adds compact start/end geometry summaries and update count to the brush experiment manifest; raw snapshots remain in session/run JSON.
 - Tests added for active/stale/closed geometry sessions and manifest geometry summary. CI pending.
 - No calibration profile schema, automatic brush position, production planner or executor transform changed.
+
+
+## 2026-11-05 — продолжение: аудит evidence, INT006R и упаковка paired renderer captures
+
+- Проверены актуальная ветка и последние 20 commits через GitHub API: до документационной синхронизации HEAD был `fb853547d74a70582ab1e4731d55763367b8ceb8`; локальный `git status` недоступен. Master не изменялась.
+- Изучены README, docs index, PROJECT_STATUS/TASKS/ROADMAP/DECISIONS/WORK_LOG/CHANGELOG/TEST_RESULTS и постоянные регламенты; профильные исходники renderer geometry, paired comparison, tests и workflow.
+- Проверен CI run 41966023670: Preparation/G3 855 passed, 24 warnings, 82 subtests; Game Monitor 21 JS tests; Bridge 22 tests; обязательные integration/executor/browser/Windows build/PNG/CHALK jobs SUCCESS; optional benchmarks SKIPPED.
+- Получены и проверены CI artifacts INT-006 model validation, INT006R radius validation и 45-capture visual review source. Подтверждено: INT006R visual gate уже закрыт отдельным official report; поле pending_manual_review в новом analyzer artifact не отменяет ранее завершённый manual audit.
+- Просмотрены contact sheets всех 45 after-board captures; они согласуются с official visual audit: D2/r1 seam gap, D4/r30 short-detail merging, D2/D4 accepted for r10. No new live experiment was run.
+- Рассчитаны агрегированные profile metrics по frozen INT-006 validation artifact; P1 имеет лучшие MAE/MAPE на текущей выборке, но P2 показывает большее максимальное недопрогнозирование. Safety margin и production eligibility не установлены.
+- В workflow `.github/workflows/geometry-tests.yml` добавлена упаковка same-run `before_clear-screen.png` и `after_draw-screen.png` в paired-renderer artifact для независимого pixel-level board-edge audit. Commit: `fb853547d74a70582ab1e4731d55763367b8ceb8`. CI для этого commit пока не подтверждён.
+- Исходники приложения, production estimator/defaults, executor, frozen plans и первичные capture данные не изменялись; реальные игровые эксперименты не запускались.

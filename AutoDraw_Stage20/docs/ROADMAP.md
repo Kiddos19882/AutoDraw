@@ -1,5 +1,16 @@
 # Дополнение к дорожной карте — 2026-11-05
 
+## Синхронизация после CI 41966023670 и закрытия визуального gate INT006R
+
+- INT006R: 45/45 live captures, exact CHALK audit и ручной visual audit завершены; radius-specific limitations записаны в `CHALK_INT006R_VISUAL_AUDIT_2026-11-03.md`.
+- INT-006: frozen prediction validation 45/45 accepted; P1 имеет минимальные MAE/MAPE на проверенных D1–D5, но safety margin/production eligibility не установлены.
+- Paired renderer: independent alpha24 comparison IoU=0.998994 / symmetric difference=9 px остаётся exploratory из-за inspect-derived Y scale и отсутствия same-run vertical movement.
+- Workflow commit `fb853547` добавляет full-screen before/after screenshots в следующий paired-renderer artifact. CI validation этого workflow commit ещё не получена.
+- FILL-001 committed PNG gate остаётся FAIL (coverage 98.430600%, leakage 11); 45-cell RS matrix заблокирована.
+
+**Активный ближайший шаг:** pixel-level board-bound extraction из same-run full-screen before/after captures, затем cross-check screen-space transform. Не применять post-hoc shift и не открывать executor/calibration handoff до независимой проверки.
+
+
 ## GAME-INPUT-SAMPLING-TRACE-001 / FILL-001-RS renderer gate
 
 ## 2026-11-05 — exploratory live/offline renderer comparison and transform audit

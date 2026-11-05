@@ -523,3 +523,15 @@ Artifact: `autodraw-paired-renderer-png-comparison`, ID `13386122895`.
 - `test_brush_behavior_test_ui.py`: Game Monitor report summary preserves BoardPane client corners, mapping method, window geometry and update count without copying raw snapshots or claiming screen mapping.
 - Brush Behavior tab displays current BoardPane geometry diagnostics and retains manual calibration for executor placement.
 - Awaiting CI for reader/UI changes.
+
+
+## 2026-11-05 — latest geometry pipeline CI and INT006R / CHALK validation status
+
+**Workflow:** [41966023670](https://github.com/Kiddos19882/AutoDraw/actions/runs/41966023670), successful on code/test commit `7969134a1e1d545a99f985e8d637a7776823411f`.
+
+- Preparation/G3: 855 passed, 24 warnings, 82 subtests passed. Game Monitor: 21 JS tests. Bridge/WebSocket: 22 tests. Executor, Application integration, Egret CanvasRenderer browser reference, Windows portable build/startup smoke-test and INT-006 analysis jobs: SUCCESS. Optional algorithm benchmarks: SKIPPED.
+- FILL-001 committed PNG quality gate remains FAIL: coverage=98.430600%, leakage=11. FILL-001-RS static sweep is separate: 15 cells, 2,238 candidates, 62 accepted candidates; offline-only, not exact CHALK/live renderer evidence.
+- INT006R analyzer: 45/45 accepted, 0 missing/rejected; visual evidence complete. Official manual visual audit is COMPLETE WITH GEOMETRY-SPECIFIC LIMITATIONS: radius 1 D2 seam gap; radius 30 merges short details in D4; radius 10 preserves both in the tested matrix. Exact CHALK means: 67.40 / 67.67 / 67.80 for radii 1 / 10 / 30.
+- Frozen INT-006 model validation: 45/45 accepted. Aggregated profile metrics (15 runs/profile): P0 MAE=2.882, RMSE=3.189, MAPE=3.484%, max underprediction=0.99; P1 MAE=0.657, RMSE=0.838, MAPE=1.178%, max underprediction=0.92; P2 MAE=0.685, RMSE=0.854, MAPE=1.741%, max underprediction=1.82. Safety margin remains NOT_ESTABLISHED; production eligibility NOT_VALIDATED.
+- Artifact IDs: INT-006 CHALK validation `13387976546`; INT006R live validation `13387682524`; INT006R visual review source `13387951744`; paired renderer comparison `13386869712`; FILL-001-RS static sweep `13387727239`.
+- Subsequent workflow/config commit `fb853547d74a70582ab1e4731d55763367b8ceb8` adds paired full-screen screenshots to the next diagnostic artifact. No CI run for that commit was available at this update; run 41966023670 does not validate it.

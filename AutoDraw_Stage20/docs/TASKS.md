@@ -12,7 +12,7 @@
 | FILL-001-RS-MATRIX | P0 | BLOCKED | 45 captures только после принятого single-task preflight |
 | GAME-INPUT-SAMPLING-TRACE-001 | P1 | EXPLORATORY_COMPARE_DONE_TRANSFORM_ROOT_CAUSE_OPEN | Run 16aec62c принят; 138 accepted points, CHALK=138; unshifted IoU=0.76315, post-hoc (+1,+2) IoU=0.99888; acceptance не пройдена |
 | BRUSH-FOOTPRINT-CAPSULE-001 | P1 | OPEN | Offline capsule model готова; renderer acceptance/planner integration не выполнены |
-| INT-006 | P1 | IN_PROGRESS | D1-D5 45/45 и analyzer завершены; domain validation/safety margin не завершены |
+| INT-006 | P1 | IN_PROGRESS | INT006R 45/45 + manual visual audit завершены; frozen model validation 45/45 accepted; safety margin и расширенная domain/holdout validation не завершены |
 | INT-007 | P2 | BLOCKED | Интеграция модели после INT-006 |
 | INT-008 | P2 | TODO/BLOCKED | Оптимизация кистей/траекторий/покрытия после INT-007 |
 | INT-009 | P2 | TODO/BLOCKED | Holdout-проверка прогноза, exact CHALK и качества полного рисунка |
@@ -20,6 +20,9 @@
 | DOC-STATUS-SYNC | P2 | DONE | 2026-11-04: синхронизированы управляющие документы, индекс, архитектура/CI map и исторические профильные планы/README; исторические результаты сохранены |
 | INT-003 | — | CLOSED_NOT_REQUIRED | По решению пользователя: отдельное исследование overhead Monitor не требуется |
 | CHALK-SAMPLING-DOMAIN | — | CLOSED_NOT_REQUIRED | По решению пользователя: расширение sampling-domain не требуется |
+
+
+**Уточнение по INT006R (2026-11-05):** измерительная фаза закрыта с geometry-specific limitations. Radius 1 не замыкает D2 polygon; radius 30 сливает короткие детали D4; radius 10 — лучший из трёх проверенных компромиссов для D1–D5. Exact CHALK averages: 67.40 / 67.67 / 67.80 для радиусов 1 / 10 / 30. Это не универсальный выбор радиуса и не тест заливки. INT-006 остаётся IN_PROGRESS только по safety margin и расширенной независимой validation frozen estimator.
 
 ## 2026-11-05 — Monitor/Bridge geometry snapshot pipeline
 

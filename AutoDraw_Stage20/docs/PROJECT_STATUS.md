@@ -1,50 +1,37 @@
 # Актуальная точка продолжения — 2026-11-05
 
-## Текущая точка — independent renderer comparison завершён; Monitor/Bridge geometry snapshot реализован
+## Текущая точка — геометрия Game Monitor подключена к AutoDraw; renderer acceptance и CHALK safety margin открыты
 
-**Branch:** feature/image-geometry-optimization  
-**HEAD на момент последней синхронизации:** `c0b7a0feaaa14f13d33ebc350b7399ff5b6b5241`; текущую точку ветки после этого обновления следует сверить отдельно. GitHub API не предоставляет локальный git status.  
-**Последний полный CI:** run `41964932479` SUCCESS для Monitor/Bridge geometry code/test commit `baf7e3f73bebe4cd780e93723bf6b4ea231a7b4b`; все обязательные jobs, включая Windows portable build/startup smoke-test и INT-006 PNG audit, SUCCESS; optional algorithm benchmarks SKIPPED. Последующие commits были документационными.
+**Репозиторий:** `Kiddos19882/AutoDraw`  
+**Рабочая ветка:** `feature/image-geometry-optimization`  
+**HEAD перед этой синхронизацией:** `fb853547d74a70582ab1e4731d55763367b8ceb8`  
+**Последний успешный code/test CI:** [run 41966023670](https://github.com/Kiddos19882/AutoDraw/actions/runs/41966023670), commit `7969134a1e1d545a99f985e8d637a7776823411f`.  
+**Последний workflow/config commit:** `fb853547d74a70582ab1e4731d55763367b8ceb8`; на момент синхронизации отдельный CI run для него не обнаружен. Успешный run 41966023670 не валидирует эту последнюю правку workflow.  
+**Master:** текущий remote HEAD `9a3453aeb847b66041bc83d6f4a56ecaf33a993a`; в рамках этой работы master не изменялась.  
+**Рабочая копия:** локальный `git status` через GitHub API недоступен.
 
-### Подтверждённые результаты
+### Подтверждённое состояние
 
-- Independent offline comparison без post-hoc registration: alpha24 IoU=0.998994, precision=0.999218, recall=0.999776, symmetric difference=9 px; old transform IoU=0.763153 / 2404 px. Renderer acceptance остаётся exploratory: vertical scale inspect-derived, inspect без run/session timestamp.
-- Game Monitor поднят до 0.2.3: `inspect().renderer` добавляет raw windowGeometry; client corners могут вычисляться без getBoxQuads только при валидированном positive axis-aligned CSS transform и совпадении canvas rect со Stage/backing scale. Иначе mapping unavailable.
-- Browser Bridge отправляет rendererGeometry в session_start и updates при изменении window/viewport. Server сохраняет snapshot в session schema v2 optional fields и привязывает start/update/end snapshots к run JSON schema v1.
-- AutoDraw добавил reader активной Bridge geometry и показывает CSS client corners в Brush Behavior UI; summary geometry включается в experiment manifest. Calibration profile и executor пока не используют этот snapshot; production screen transform/planner/executor не изменялись.
+- Run `41966023670`: Preparation/G3 — **855 passed**, 24 warnings, 82 subtests passed; Game Monitor — 21 JS tests; Bridge/WebSocket — 22 tests; Executor, Application integration, Egret CanvasRenderer browser reference, Windows portable build/startup smoke-test и INT-006 PNG/CHALK/INT006R analysis jobs завершились SUCCESS. Optional algorithm benchmarks — SKIPPED.
+- В том же CI отдельный committed PNG gate FILL-001 остаётся **FAIL**: coverage `98.430600%`, leakage `11`; FILL-001-RS matrix заблокирована. Offline spacing sweep отдельно обработал 15 cells / 2 238 candidates / 62 accepted; это не live renderer и не exact CHALK.
+- Game Monitor 0.2.3 → Bridge → AutoDraw geometry reader/UI прошли CI. AutoDraw читает активную свежую Bridge geometry и отображает BoardPane CSS client corners; summary сохраняет компактную геометрию. Это ещё не desktop/screenshot transform. Calibration profile и executor не используют этот snapshot; ручной fallback обязателен.
+- Парный renderer run `16aec62c-9e54-44e7-8691-9df79b19161d`, experiment `d47cc0a5520044c7abfd0352a4f93ca8`: один штрих, 138 accepted points, `pointCount` 1→139, exact CHALK=138; drops/errors/send failures/sequence gaps — 0.
+- Независимое exploratory сравнение live/offline при alpha 24: IoU=0.998994, precision=0.999218, recall=0.999776, symmetric difference=9 px. X transform получен из 272 same-run Monitor samples; Y scale пока inspect-derived из same-screen snapshot без run/session timestamp. Это **не renderer acceptance** и не основание менять production transform.
+- Same-run `before_clear-screen.png` и `after_draw-screen.png` присутствуют в paired experiment. В workflow commit `fb853547` добавлено их включение в следующий paired-renderer artifact для pixel-level board-edge audit; эта упаковка пока не прошла CI.
+- INT006R завершён как измерительная фаза: 45/45 captures, raw-data audit и ручной visual audit завершены. Ограничения: radius 1 дал разрыв соединения D2 polygon во всех трёх повторах; radius 30 объединил первые три короткие детали D4 в четыре компонента вместо шести; radius 10 сохранил замыкание D2 и разделение деталей D4 в этой матрице.
+- Exact CHALK INT006R: radius 1 — 1011 / 15 = 67,40; radius 10 — 1015 / 15 = 67,67; radius 30 — 1017 / 15 = 67,80. Выраженного преимущества радиуса по расходу не выявлено в D1–D5/P1.
+- Frozen INT-006 CHALK model validation artifact в run 41966023670: 45/45 accepted, 0 missing/rejected. Агрегированные результаты по 15 run на профиль: P0 MAE=2,882 / RMSE=3,189 / MAPE=3,484% / max underprediction=0,99; P1 MAE=0,657 / RMSE=0,838 / MAPE=1,178% / max underprediction=0,92; P2 MAE=0,685 / RMSE=0,854 / MAPE=1,741% / max underprediction=1,82. P1 точнее по MAE/MAPE на этой выборке, но safety margin не установлен и production eligibility не validated.
 
-### Следующий шаг
+### Следующие действия
 
-Завершить AutoDraw-side environment fingerprint/session invalidation, затем связать только validated desktop/screenshot transform с calibration profile. До этого manual fallback остаётся обязательным; CSS client geometry не передавать executor.
+1. Получить CI artifact с full-screen before/after captures и независимо измерить BoardPane pixel bounds на обоих screenshots. Сопоставить X/Y scales и origin с same-run Monitor fit, inspect snapshot и calibration ROI; не использовать post-hoc translation (+1,+2) как correction.
+2. По результатам определить, можно ли закрыть coordinate-space/renderer gate. До этого CSS client coordinates не передавать executor и не подключать их к calibration profile.
+3. Завершить environment fingerprint и stale invalidation для viewport/window/zoom/DPR/canvas/BoardPane; сохранить ручной fallback.
+4. После renderer acceptance отдельно пройти FILL-001-RS single-task preflight на реальной доске; matrix не запускать до принятия PNG gate. CHALK измерять только delta `pointCount`.
+5. Для INT-006 определить safety margin и domain limits по независимому holdout; INT-007 остаётся BLOCKED до этого решения.
 
-### Принятый live capture и offline replay
+**Неизменяемые ограничения:** production estimator/defaults, executor defaults, frozen plans и raw captures не менялись; реальные игровые эксперименты в этой сессии не запускались. Сборка/CI не доказывают качество live-рисования.
 
-Run 16aec62c-9e54-44e7-8691-9df79b19161d, session d357b6ee-5617-4e07-9011-7eba7ccb6c0f, experiment d47cc0a5520044c7abfd0352a4f93ca8: один stroke, 138 accepted points, каждый положительный update имеет pointDelta=1 и acceptedPoint; pointCount 1→139, точный CHALK=138. Bridge telemetry без drops/errors/send failures/sequence gaps. Raw capture пригоден для replay; агрегированное trajectory.status=incomplete_until_verified остаётся summary metadata inconsistency.
-
-Offline actual BoardPane / manual path и Canvas2D/WebGL comparisons внутри harness — exact, 0 differing pixels. Это внутреннее offline соответствие, не доказательство live equivalence.
-
-### Live/offline pixel comparison
-
-## 2026-11-05 — exploratory live/offline renderer comparison and transform audit
-
-**Experiment:** d47cc0a5520044c7abfd0352a4f93ca8; **run:** 16aec62c-9e54-44e7-8691-9df79b19161d; **session:** d357b6ee-5617-4e07-9011-7eba7ccb6c0f. Raw capture and offline renderer inputs remain immutable.
-
-### Quantitative comparison (exploratory; no acceptance threshold)
-
-- Frozen, unshifted mapping at alpha threshold 24: live changed mask 8,946 px; offline expected mask 8,950 px; TP=7,746, FP=1,200, FN=1,204; symmetric difference=2,404 px; IoU=0.763153; precision=0.865862; recall=0.865475; F1=0.865668.
-- Post-hoc diagnostic search over translations ±5 px found best translation of the expected mask (+1,+2): TP=8,943, FP=3, FN=7; symmetric difference=10 px; IoU=0.998883; precision=0.999665; recall=0.999218; F1=0.999441.
-- The second result is a fit against this same image pair. It is evidence that the footprints are highly similar after translation, but it is not an independently derived coordinate correction, does not establish the cause of the offset and is not acceptance. Do not apply (+1,+2) to production or frozen plans.
-
-### Independent geometric audit of the frozen plan
-
-- The paired plan uses ROI (496,265,674,355), logical board 460×240 and pixel-center scales scale_x=(674-1)/460=1.4630434783, scale_y=(355-1)/240=1.475.
-- Relative X/Y scale discrepancy is 0.8106%, just inside the transform helper's 1% tolerance. However, the logical aspect ratio is 1.916667 while ROI aspect ratio is 1.898592. If the ROI were a uniform-scale rectangle, a 355 px height would correspond to about 680.21 px width, approximately 6.21 px wider than the selected 674 px ROI.
-- The ROI coordinates come from the configured screen calibration/blank-board crop. The 2026-11-04 runtime snapshot has boardClientCorners=null and belongs to a different session; it cannot independently validate the live 2026-11-05 crop origin or client-space corners.
-- This establishes a measurable geometric inconsistency in the selected ROI dimensions, not the root cause of the (+1,+2) residual. Candidate causes (ROI edge/crop convention, pixel-center versus board-boundary mapping, resampling, antialiasing, baseline drift and color handling) remain unseparated.
-
-**Status:** comparison analyzed as exploratory; live/offline renderer equivalence and transform root cause remain NOT ACCEPTED / OPEN. FILL-001-RS 45-cell matrix remains BLOCKED. No live experiment was run during this continuation; no production planner, renderer, executor, CHALK estimator, frozen plan or raw evidence was changed.
-
-**Next offline action:** derive board bounds and crop origin independently from the same-session after_draw-screen.png (and before/blank reference), compare them with the calibrated ROI, then evaluate the existing frozen pixel-center/boundary mapping and a uniform-scale transform from independently measured edges. Keep the current frozen transform and post-hoc diagnostic separate; define acceptance criteria before any confirmatory comparison.
 ---
 
 ## Дополнение — проверен zero-length lineTo segment в Egret 5.4.1 (2026-11-04)

@@ -1,3 +1,8 @@
+## 2026-11-05 — подготовка paired renderer full-screen evidence
+
+- Workflow `.github/workflows/geometry-tests.yml` дополнен копированием same-run `before_clear-screen.png` и `after_draw-screen.png` в artifact `autodraw-paired-renderer-png-comparison` для последующего pixel-level восстановления границ BoardPane.
+- Commit `fb853547d74a70582ab1e4731d55763367b8ceb8`; CI validation этого изменения ещё не получена.
+
 ## 2026-11-05 — AutoDraw reads and displays Game Monitor geometry
 
 - Added active Bridge geometry reader and Brush Behavior UI status for BoardPane CSS client corners/mapping method.
