@@ -5,23 +5,31 @@
 - Added a fail-closed acceptance contract for capture binding, exact pointCount/CHALK, full accepted-point stream, one-stroke integrity, same-run screenshot metadata, per-axis transform tolerances and alpha-24 pixel metrics.
 - Added separate aggregation for three unique accepted vertical runs and three unique accepted diagonal runs. A single horizontal baseline or a per-run PASS cannot complete this series.
 - Added regression tests for complete/incomplete captures, thresholds, transform sources, duplicates and rejected attempts.
-- Formal horizontal per-run acceptance passed in CI [41992373137](https://github.com/Kiddos19882/AutoDraw/actions/runs/41992373137). No live vertical/diagonal captures exist yet; no production handoff is enabled.
+- Formal horizontal per-run acceptance passed in CI [41992373137](https://github.com/Kiddos19882/AutoDraw/actions/runs/41992373137). One vertical and one diagonal user live capture were later added in evidence commit `e6b771e`; both remain exploratory pending independent-transform replay. No production handoff is enabled.
 - Full CI run 41994624425 on code/test commit 58ebdda7 SUCCESS: all required jobs passed; optional algorithm benchmarks skipped.
 - Bridge input telemetry automation passed: Node lifecycle 4/4 and Python Bridge/WebSocket/snippet/provenance suite 31 passed. The selected paired-renderer scenario enables telemetry opt-in; ordinary sessions do not toggle it; previous state restores at disconnect and provenance persists.
 - Preparation/G3: 880 passed, 24 warnings, 82 subtests. Capsule broad-phase benchmark and exhaustive FILL-001-RS static sweep reproduced successfully.
-- Horizontal renderer remains PASS_PER_RUN only; three vertical and three diagonal unique live captures are still pending.
+- Horizontal renderer remains PASS_PER_RUN only. First vertical/diagonal live captures exist but neither has formal per-run PASS yet; three unique accepted runs per orientation are still required.
 - V1–V5 PNG analyzer validated 90/90 captures across 10 series × 9 runs. INT-006 and INT006R analyzers each accepted 45/45; safety margin/production eligibility remain unvalidated; latest INT006R visual review package remains pending manual review.
 - Windows portable build/startup smoke-test SUCCESS; artifact 13399627749. FILL-001 committed PNG gate remains FAIL (coverage 98.430600%, leakage 11).
 
+## 2026-11-05 — first vertical/diagonal live captures and exploratory replay (e6b771e)
+
+- Vertical run `c860234f-995a-4789-9ac2-e05b322fe742`: one stroke, radius 10, exact CHALK 71 (pointCount 1→72), 139 mouse samples.
+- Diagonal run `f69cb0f4-f5d0-4ff9-a3b7-1148c38fa07f`: one stroke, radius 10, exact CHALK 161 (pointCount 1→162), 315 mouse samples.
+- Both raw captures have matching accepted point events, zero dropped/error/Bridge/sequence counters and stable geometry start/end. screen-client offset is constant at (0,163) px.
+- Same-run fits: vertical Y max residual 0.7232 px; diagonal X/Y max residuals 0.7301/0.7391 px. Vertical X is unspanned and must use BoardPane bounds extracted from same-run screenshots.
+- Frozen-ROI alpha24 comparisons remain exploratory: vertical IoU 0.870044; diagonal 0.873071. No independent-transform comparison exists yet; best-translation diagnostics are not acceptance.
+- Next: independent-transform offline replay from existing Monitor geometry and full-screen captures, without post-hoc translation.
 ## 2026-11-05 — multi-axis transform helper and paired scenarios ready (CI 41976515362)
 
 - Same-run screenshot-derived BoardPane bounds remain `(498,268,672,351)`; the calibrated ROI `(496,265,674,355)` is a larger crop, not the board itself.
 - The horizontal exploratory comparison remains IoU 0.998882 / 10 differing pixels at alpha24, without post-hoc translation; it is not retroactively treated as a multi-axis acceptance result.
 - `derive_live_board_screen_transform()` now supports horizontal, vertical and diagonal trajectories with per-axis fit/fallback and explicit cross-check tolerances.
 - Brush Test UI exposes separate one-stroke vertical and diagonal paired-renderer scenarios. The comparison script enforces scenario-specific axis coverage. CI [41976515362](https://github.com/Kiddos19882/AutoDraw/actions/runs/41976515362) SUCCESS across all required jobs, including tests, INT-006 audit and Windows portable build.
-- No live vertical/diagonal captures have been run; no calibration profile or executor handoff is enabled.
+- First live vertical/diagonal captures are now present as exploratory evidence; no per-run acceptance or calibration profile/executor handoff is enabled.
 
-**Active next step:** collect three valid clean-board captures per orientation using input telemetry and full-screen before/after screenshots. Apply the predeclared acceptance protocol in TASKS.md without changing thresholds after review. Then complete environment fingerprint and stale invalidation. FILL-001-RS matrix remains BLOCKED.
+**Active next step:** perform independent-transform offline replay for the existing vertical/diagonal captures using their same-run Monitor snapshots and full-screen before/after screenshots. Apply the predeclared acceptance protocol without changing thresholds. Then collect enough additional clean-board repeats to obtain three unique PASS_PER_RUN per orientation and complete environment fingerprint/stale invalidation. FILL-001-RS matrix remains BLOCKED.
 
 
 ## Синхронизация после CI 41966023670 и закрытия визуального gate INT006R
