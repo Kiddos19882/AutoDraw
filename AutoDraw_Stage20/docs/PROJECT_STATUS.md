@@ -1,10 +1,11 @@
 # Актуальная точка продолжения — 2026-11-05
 
-## Текущая точка — Bridge telemetry automation CI PASS; horizontal renderer PASS_PER_RUN; multi-axis live series pending
+## Текущая точка — Bridge telemetry CI PASS; horizontal renderer PASS_PER_RUN; first vertical/diagonal captures collected; independent-transform replay pending
 
 **Репозиторий:** `Kiddos19882/AutoDraw`  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
-**Последний CI-проверенный code/test commit:** `58ebdda7cf3f07ceef1075020f2808a2782562b7`
+**Последний CI-проверенный code/test commit:** `58ebdda7cf3f07ceef1075020f2808a2782562b7`  
+**Последний evidence-only commit:** `e6b771ed67201625884c6ce778fa355f1ab9b873` — 22 result artifacts; CI для этого data-only commit не подтверждён.
 **Последний успешный CI:** [run 41994624425](https://github.com/Kiddos19882/AutoDraw/actions/runs/41994624425), conclusion SUCCESS.
 **Workflow packaging commit:** `fb853547d74a70582ab1e4731d55763367b8ceb8`, проверен успешным run `41970907209`.  
 **Документационная синхронизация:** 2026-11-05, после проверки CI 41994624425.
@@ -33,7 +34,7 @@
 - Monitor-vs-inspect checks: origin ≤0.5 px and relative scale difference ≤0.2%; Monitor-vs-screenshot checks: origin ≤1.0 px and relative scale difference ≤0.2%.
 - The unspanned axis uses same-run screenshot BoardPane bounds; an unspanned X axis without screenshot bounds is rejected. Production executor/calibration handoff remains disabled.
 - UI scenarios: `paired_renderer_vertical_single_stroke` and `paired_renderer_diagonal_single_stroke`, both with radius 10 and the frozen step=2/delay=10/extension=0 profile.
-- Synthetic vertical/diagonal tests cover axis fitting. A fail-closed per-run acceptance module and three-repeat-per-orientation series aggregator have now been added; their CI verification is pending. **No live vertical or diagonal capture has been executed yet.**
+- Synthetic vertical/diagonal tests and fail-closed per-run/series acceptance tooling are present. The first user live capture for each orientation was added in evidence commit `e6b771e`; both have exact CHALK and intact raw telemetry but remain exploratory because committed comparisons use the frozen ROI transform and `independent_transform_comparison=null`. No multi-axis `PASS_PER_RUN` has yet been established.
 
 ### Независимая проверка BoardPane screen bounds
 
@@ -62,16 +63,24 @@ Same-run full-screen before/after screenshots обнаружили одну и �
 - Frozen INT-006 validation: 45/45 accepted. P0 MAE/RMSE/MAPE `2.882/3.189/3.484%`, max underprediction `0.99`; P1 `0.657/0.838/1.178%`, max `0.92`; P2 `0.685/0.854/1.741%`, max `1.82`. P1 is best by MAE/MAPE in this sample; safety margin and production eligibility remain unvalidated.
 - FILL-001-RS static sweep is offline evidence only: 15 cells / 2,238 candidates / 62 accepted. It is not exact CHALK and does not unblock the live matrix.
 
+### Первые vertical/diagonal live captures — exploratory (e6b771e)
+
+- Vertical: exact CHALK 71, one stroke, radius 10, 139 MOUSE_MOVE_SAMPLE; alpha24 frozen-ROI IoU 0.870044, precision 0.932683, recall 0.928340, symmetric difference 685/4917 (13.93%).
+- Diagonal: exact CHALK 161, one stroke, radius 10, 315 MOUSE_MOVE_SAMPLE; alpha24 frozen-ROI IoU 0.873071, precision 0.926403, recall 0.938140, symmetric difference 1464/10870 (13.47%).
+- Both reports are `ANALYZED_EXPLORATORY_NO_ACCEPTANCE_THRESHOLD`; `independent_transform_comparison=null`. The reports use the frozen 674×355 ROI transform, not the independent BoardPane geometry. Do not treat these metrics as a formal renderer rejection.
+- Same-run Monitor geometry: offsets stable at (0,163) px; start/end snapshots identical; no geometry updates. Vertical Y fit max residual 0.7232 px; X is unspanned and must use same-run screenshot bounds. Diagonal X/Y fit max residuals 0.7301/0.7391 px.
+- Same-run full-screen before/after PNGs exist. BoardPane pixel bounds for these two runs must still be extracted and cross-checked before independent comparison. Calibration profile records Windows scale 100% and browser zoom 100%; Monitor confirms DPR=1 / visualViewportScale=1.
+- Best-translation diagnostics (+1,+1) and (+2,+2) are post-hoc only and prohibited for acceptance. The offline Egret WebGL reference fixture matches the reference raster exactly (0 pixel difference), but that is not live/offline equivalence.
 ### Следующие действия
 
-1. Run three clean-board captures for each new paired scenario: vertical (Y-fit) and diagonal (X/Y-fit), with input telemetry and same-run full-screen before/after screenshots. Produce per-run reports with the new acceptance CLI.
-2. Apply the predeclared acceptance protocol in TASKS.md; do not alter thresholds after reviewing captures.
+1. Re-run offline comparison for the existing vertical/diagonal captures using same-run Monitor geometry and BoardPane bounds detected from each run full-screen before/after PNGs. Produce `comparison-report-independent-transform.json`; do not use best-translation diagnostics.
+2. Apply the frozen acceptance protocol in TASKS.md; after per-run results are known, collect enough additional clean-board captures to reach three unique `PASS_PER_RUN` reports for each orientation.
 3. Complete environment fingerprint and stale invalidation for window/viewport/zoom/DPR/canvas/BoardPane. Keep CSS client coordinates separate from desktop/screenshot coordinates.
 4. Only after multi-axis/environment acceptance, connect geometry to calibration profile with explicit stale status and manual fallback; do not enable executor handoff yet.
 5. After renderer/footprint gate and committed PNG quality issue are resolved, run a single-task FILL-001-RS preflight; do not launch the 45-cell matrix yet.
 6. Keep INT-007 BLOCKED until INT-006 safety margin and domain/holdout validation are established.
 
-**Неизменяемые ограничения:** production renderer, planner, estimator/defaults, calibration profile and executor behavior were not changed. The current continuation adds offline validation/series tooling only; no real game experiment was launched. Live geometry remains unverified.
+**Неизменяемые ограничения:** production renderer, planner, estimator/defaults, calibration profile and executor behavior were not changed in this review. The two live captures were executed by the user before commit `e6b771e`; no new live run was launched during this review. Same-run Monitor geometry is present and stable, but screenshot-derived BoardPane bounds and independent-transform comparisons for these captures are pending. Multi-axis series and generalization to other viewport/window/DPR configurations remain unverified.
 
 ---
 
