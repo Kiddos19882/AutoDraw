@@ -1,3 +1,18 @@
+## Новая актуальная задача — повторный offline replay с профилем последнего live run
+
+**Статус:** READY_FOR_USER_RERUN  
+**Изменения harness:** внесены в `tests/game_renderer_reference.js` и `tests/game_renderer_reference.html`.
+
+- [x] Убрать ссылку на устаревший `renderer_snapshot_2026-11-04.json` из runtime profile, который создаёт offline replay.
+- [x] При live replay брать Stage/canvas backing/CSS transform/screen/viewport/DPR/scale только из полного `monitor_report.json` с неизменными `renderer_geometry_at_start/end`.
+- [x] Отклонять события без run-bound renderer geometry вместо тихого fallback к старым настройкам.
+- [x] Сохранить правильную локальную геометрию BoardPane: 460×240, rasterScale 3, выход 1380×720.
+- [x] Обновить инструкцию UI для загрузки полного Monitor report.
+- [ ] Пользователь повторно запускает offline render с последними vertical/diagonal run reports и передаёт новые manifest/PNG.
+- [ ] Проверить новые outputs и только затем анализировать pixel mismatch.
+
+Важно: stage 1314×600 и canvas CSS transform описывают живую экранную композицию; они не должны менять локальный размер offscreen BoardPane 460×240.
+
 # Актуальный сводный backlog — 2026-11-05
 
 Этот раздел является каноническим списком незавершённых задач. Исторические чек-листы ниже сохранены как хронология; их старые статусы не считать текущими, если они расходятся с этой сводкой и более поздним TEST_RESULTS.md.
