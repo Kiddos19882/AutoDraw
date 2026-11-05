@@ -532,8 +532,11 @@ def main() -> int:
         Image.fromarray((outside_board_roi.astype(np.uint8) * 255), mode="L").save(
             args.output_dir / "outside-board-live-delta-mask.png"
         )
+        alpha_opencv_board, _ = crop_mask_to_board_bounds(
+            alpha_opencv, board_bounds, roi,
+        )
         opencv_independent_results = {
-            str(threshold): mask_metrics(observed, alpha_opencv > threshold)
+            str(threshold): mask_metrics(observed, alpha_opencv_board > threshold)
             for threshold in args.alpha_thresholds
         }
         if args.rgb_threshold != 24:
@@ -553,10 +556,10 @@ def main() -> int:
         Image.fromarray((expected_independent.astype(np.uint8) * 255), mode="L").save(
             args.output_dir / "expected-mask-browser-css.png"
         )
-        Image.fromarray((alpha_opencv > 24).astype(np.uint8) * 255, mode="L").save(
+        Image.fromarray((alpha_opencv_board > 24).astype(np.uint8) * 255, mode="L").save(
             args.output_dir / "expected-alpha-opencv-diagnostic.png"
         )
-        overlay_independent = np.zeros((live.shape[0], live.shape[1], 3), dtype=np.uint8)
+        overlay_independent = np.zeros((observed.shape[0], observed.shape[1], 3), dtype=np.uint8)
         overlay_independent[observed & ~expected_independent] = (255, 0, 0)
         overlay_independent[~observed & expected_independent] = (0, 255, 0)
         overlay_independent[observed & expected_independent] = (255, 255, 0)
