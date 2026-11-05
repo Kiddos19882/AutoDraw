@@ -1,7 +1,7 @@
 # Game Monitor и Bridge — техническая справка
 
 **Статус:** актуальная справка по реализации в рабочей ветке  
-**Дата проверки:** 2026-11-04  
+**Дата проверки:** 2026-11-05  
 **Ветка:** `feature/image-geometry-optimization`  
 **Область:** браузерный Game Monitor, browser-side Bridge и локальный WebSocket collector.
 
@@ -30,7 +30,7 @@ Game iframe
      │ AutoDrawGameMonitor.subscribe(listener)
      ▼
   game_monitor_bridge.js
-     │ WebSocket: auth → ready → session_start → event / heartbeat / frame_probe
+     │ WebSocket: auth → ready → session_start → event / heartbeat / frame_probe / renderer_geometry
      ▼
   ws://127.0.0.1:8765
      │ проверка Origin, token, sessionId и sequence
@@ -47,7 +47,7 @@ Game iframe
 5. RunRecorder начинает run при первом событии начала штриха, накапливает события и финализирует run после периода бездействия либо при закрытии соединения.
 6. Session diagnostics обновляются при каждом сообщении; run JSON создаётся отдельно при финализации.
 
-## 3. Game Monitor API (версия 0.2.2)
+## 3. Game Monitor API (версия 0.2.3)
 
 Публичный объект: `window.AutoDrawGameMonitor`. Скрипт автоматически вызывает `start()` после установки API.
 
@@ -132,6 +132,16 @@ Snapshot считается точным только если оба значе
 
 Так accepted point связывается с координатами указателя и моментом изменения квоты. Если `pointDelta > 1`, acceptedPoint остаётся только последней точкой и промежуточные accepted points этим событием не восстанавливаются.
 
+### 3.4. Renderer geometry snapshot (0.2.3)
+
+`inspect().renderer` передаётся в `session_start` как `rendererGeometry`. При изменениях viewport/window Bridge повторно снимает read-only snapshot и отправляет сообщение `renderer_geometry`. Сервер сохраняет последнее состояние в `session.json` и фиксирует snapshot на начало/изменения/конец активного run.
+
+В snapshot добавлены:
+- `windowGeometry`: screenX/Y, outer/inner window dimensions, screen/available dimensions; эти значения сохраняются как raw browser telemetry и сами по себе не объявляются точным client→desktop transform.
+- `boardClientMappingMethod`: `getBoxQuads_content`, `validated_axis_aligned_rect` или `unavailable`.
+- Если `getBoxQuads()` отсутствует, `boardClientCorners` вычисляются только для положительного axis-aligned CSS matrix при согласованных canvas rect, Stage dimensions и Egret backing scale. Для rotate/skew/unsupported matrix mapping остаётся unavailable.
+- Client corners — это CSS client coordinates, не desktop screen pixels. Для перехода к desktop/screenshot coordinates нужны отдельные проверенные offsets/scales; Bridge не применяет DPR автоматически.
+
 ## 4. Browser Bridge API и протокол
 
 Файл `game_monitor_bridge.js` — одноразовый snippet, который collector генерирует с подставленным token. Он ожидает `window.AutoDrawGameMonitor` с методами subscribe/status и завершает выполнение ошибкой, если Monitor не загружен. Повторное подключение при уже connected Bridge запрещается.
@@ -149,10 +159,11 @@ Snapshot считается точным только если оба значе
 | Тип | Содержимое |
 |---|---|
 | `auth` | token; отправляется первым после WebSocket open |
-| `session_start` | sessionId, sequence=1, sentAtUtc, monitorStatus, browser, page, visibilityState |
+| `session_start` | sessionId, sequence=1, sentAtUtc, monitorStatus, rendererGeometry, browser, page, visibilityState |
 | `event` | исходное событие Monitor |
 | `heartbeat` | monitorStatus, performanceNowMs, visibilityState, bridgeDiagnostics |
 | `frame_probe` | интервалы requestAnimationFrame, начало/конец и видимость страницы |
+| `renderer_geometry` | обновлённый read-only renderer snapshot и причина изменения; отправляется при resize/scroll/orientation/fullscreen/visualViewport changes |
 
 Каждое сообщение после auth содержит sessionId, возрастающий sequence и sentAtUtc. Heartbeat отправляется раз в секунду. Browser-side bridgeDiagnostics содержит sentEventCount, lastEventType, lastEventAtPerformanceMs и sendFailureCount.
 
@@ -240,7 +251,7 @@ game_monitor_bridge/                         (п)
 
 ### session.json — schema_version 2
 
-Содержит session_id, started_at_utc, run_idle_seconds, browser/page, monitor_status_at_connect и bridge_diagnostics. Основные поля diagnostics:
+Содержит session_id, started_at_utc, run_idle_seconds, browser/page, monitor_status_at_connect и bridge_diagnostics. Опционально сохраняются `renderer_geometry`, `renderer_geometry_updated_at_utc` и `renderer_geometry_update_reason`; это additive extension schema v2, не меняющая контракт FILL-001 session binding. Основные поля diagnostics:
 
 - received_message_count, received_event_count, received_event_types;
 - last_message_type, last_sequence, last_message_at_utc;
@@ -253,7 +264,7 @@ Sequence начинается с 1 для session_start. Collector отверг�
 
 ### Run JSON — schema_version 1
 
-Содержит record_type, session_id, run_id, started/finished timestamps, execution_status, pre/post snapshots, brush_radius, events, frame probes и агрегаты:
+Содержит record_type, session_id, run_id, started/finished timestamps, execution_status, pre/post snapshots, brush_radius, events, frame probes и агрегаты. Дополнительные optional fields: `renderer_geometry_at_start`, `renderer_geometry_updates` (до 32 изменений за run) и `renderer_geometry_at_end`.
 
 - chalk: exact consumed_points либо inconclusive reason;
 - stroke_count, stroke_candidate_count, non_consuming_stroke_candidate_count;
