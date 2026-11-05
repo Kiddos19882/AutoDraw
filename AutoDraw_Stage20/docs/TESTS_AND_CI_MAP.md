@@ -480,4 +480,4 @@ Workflow и тесты обновлены в feature-ветке; результ�
 - `source/preparation/tests/test_brush_behavior_test_ui.py`: one-stroke vertical and diagonal paired-plan generation and metadata.
 - `tests/test_unified_app.py`: paired horizontal/vertical/diagonal executor handoff with the fixed capture profile.
 - `tests/compare_live_renderer_reference.py`: scenario-aware axis coverage validation; known paired scenario IDs require the corresponding Monitor-fit/screenshot-bound axes.
-- CI [41975359740](https://github.com/Kiddos19882/AutoDraw/actions/runs/41975359740): all required jobs SUCCESS; optional algorithm benchmarks SKIPPED.
+- CI [41976515362](https://github.com/Kiddos19882/AutoDraw/actions/runs/41976515362): all required jobs SUCCESS; optional algorithm benchmarks SKIPPED.

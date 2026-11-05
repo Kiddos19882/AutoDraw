@@ -31,7 +31,8 @@
 - [x] Actual board bounds differ from calibrated ROI `(496,265,674,355)`; ROI includes margins and must not be used as the board transform.
 - [x] X from same-run Monitor fit; Y origin/scale from screenshot bounds; inspect is cross-check only. Same-run Y sample residual 0.0375 px.
 - [x] Alpha24 comparison: old ROI transform IoU 0.763153 / 2404 px symmetric difference; independent screenshot transform IoU 0.998882 / 10 px, no post-hoc shift.
-- [ ] Multi-axis captures, additional viewport/window configurations, formal acceptance thresholds and executor/calibration handoff remain open.
+- [x] Predeclared multi-axis acceptance thresholds recorded below.
+- [ ] Multi-axis live captures, additional viewport/window configurations and executor/calibration handoff remain open.
 
 ## 2026-11-05 — Monitor/Bridge geometry snapshot pipeline
 
@@ -1188,7 +1189,8 @@ CI evidence: workflow 41787492122, commit d337f4240e83488273152f65992032beca3957
 - [x] `derive_live_board_screen_transform()` independently resolves X and Y: same-run Monitor fit for any axis with ≥20 logical px span; screenshot bounds for an unspanned axis.
 - [x] Vertical and diagonal synthetic trajectories covered by unit tests.
 - [x] Brush Test UI exposes one-stroke vertical and diagonal paired-renderer scenarios; executor validates the shared radius/sampling/renderer contract.
-- [x] Full CI run [41975359740](https://github.com/Kiddos19882/AutoDraw/actions/runs/41975359740) SUCCESS, including Preparation/G3, Application integration, Game Monitor/Bridge, Egret renderer, INT-006 analysis and Windows portable build.
+- [x] Full CI run [41976515362](https://github.com/Kiddos19882/AutoDraw/actions/runs/41976515362) SUCCESS, including Preparation/G3, Application integration, Game Monitor/Bridge, Egret renderer, INT-006 analysis and Windows portable build.
+- [x] Scenario-aware comparison audit validates expected axis sources for horizontal/vertical/diagonal cases; current horizontal baseline passed the updated audit.
 - [ ] Three valid live captures per orientation (vertical and diagonal) with input telemetry, full-screen before/after screenshots and same-screen inspect evidence.
 - [ ] Formal acceptance of screen transform remains blocked until live captures pass the predeclared protocol.
 - [ ] Environment fingerprint, stale invalidation, calibration profile consumer and executor gate remain blocked.

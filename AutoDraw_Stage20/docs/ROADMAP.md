@@ -1,11 +1,11 @@
 # Дополнение к дорожной карте — 2026-11-05
 
-## 2026-11-05 — multi-axis transform helper and paired scenarios ready (CI 41975359740)
+## 2026-11-05 — multi-axis transform helper and paired scenarios ready (CI 41976515362)
 
 - Same-run screenshot-derived BoardPane bounds remain `(498,268,672,351)`; the calibrated ROI `(496,265,674,355)` is a larger crop, not the board itself.
 - The horizontal exploratory comparison remains IoU 0.998882 / 10 differing pixels at alpha24, without post-hoc translation; it is not retroactively treated as a multi-axis acceptance result.
 - `derive_live_board_screen_transform()` now supports horizontal, vertical and diagonal trajectories with per-axis fit/fallback and explicit cross-check tolerances.
-- Brush Test UI exposes separate one-stroke vertical and diagonal paired-renderer scenarios. CI [41975359740](https://github.com/Kiddos19882/AutoDraw/actions/runs/41975359740) SUCCESS across all required jobs, including tests, INT-006 audit and Windows portable build.
+- Brush Test UI exposes separate one-stroke vertical and diagonal paired-renderer scenarios. The comparison script enforces scenario-specific axis coverage. CI [41976515362](https://github.com/Kiddos19882/AutoDraw/actions/runs/41976515362) SUCCESS across all required jobs, including tests, INT-006 audit and Windows portable build.
 - No live vertical/diagonal captures have been run; no calibration profile or executor handoff is enabled.
 
 **Active next step:** collect three valid clean-board captures per orientation using input telemetry and full-screen before/after screenshots. Apply the predeclared acceptance protocol in TASKS.md without changing thresholds after review. Then complete environment fingerprint and stale invalidation. FILL-001-RS matrix remains BLOCKED.

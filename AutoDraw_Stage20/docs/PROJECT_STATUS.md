@@ -4,10 +4,10 @@
 
 **Репозиторий:** `Kiddos19882/AutoDraw`  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
-**Проверенный code/test commit:** `f9387d0d1c04375c1b8284d01ebef75ff704418b`  
-**Последний успешный CI:** [run 41975359740](https://github.com/Kiddos19882/AutoDraw/actions/runs/41975359740), conclusion SUCCESS.  
+**Проверенный code/test commit:** `32c6828c69930ee8fe5f22e11a91454425354506`  
+**Последний успешный CI:** [run 41976515362](https://github.com/Kiddos19882/AutoDraw/actions/runs/41976515362), conclusion SUCCESS.  
 **Workflow packaging commit:** `fb853547d74a70582ab1e4731d55763367b8ceb8`, проверен успешным run `41970907209`.  
-**Предыдущая документационная синхронизация:** `ab25a34e5a0e2aa0fac778ac076eaae03be1c071`.  
+**Документационная синхронизация:** `32c6828c69930ee8fe5f22e11a91454425354506`.  
 **Master:** remote HEAD `9a3453aeb847b66041bc83d6f4a56ecaf33a993a`; master не изменялась.  
 **Рабочая копия:** локальный `git status` через GitHub API недоступен.
 
@@ -19,7 +19,7 @@
 - Executor regression: SUCCESS.
 - Egret CanvasRenderer browser reference: SUCCESS.
 - INT-006 pixel-level analysis, CHALK model validation, INT006R radius validation и packaging визуальных capture artifacts: SUCCESS.
-- Windows portable build и startup smoke-test: **SUCCESS**; artifact `autodraw-g3-preflight-build`, ID `13392211048`, 646,945,119 bytes.
+- Windows portable build и startup smoke-test: **SUCCESS**; artifact `autodraw-g3-preflight-build`, ID `13391394936`, 646,947,839 bytes.
 - Optional algorithm benchmarks: SKIPPED.
 - Отдельный FILL-001 committed PNG quality gate остаётся FAIL: coverage `98.430600%`, leakage `11`. Успешный CI job не означает прохождение этого quality gate.
 

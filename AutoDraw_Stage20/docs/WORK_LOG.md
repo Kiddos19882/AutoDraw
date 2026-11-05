@@ -3224,3 +3224,10 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - First UI integration CI exposed a local-import scope error for `PAIRED_RENDERER_TEST_CASE_IDS`; corrected by importing the scenario set before the guard. The initial run 41975187040 failed in Application integration; corrected run 41975359740 completed SUCCESS.
 - No live game experiment was executed. The new scenarios are available for operator-run captures; production renderer, calibration profile and executor defaults remain unchanged.
 - Current code/test HEAD: `f9387d0d1c04375c1b8284d01ebef75ff704418b`. Full CI: [41975359740](https://github.com/Kiddos19882/AutoDraw/actions/runs/41975359740).
+
+
+## 2026-11-05 — scenario-aware axis coverage and final CI confirmation
+
+- Updated `compare_live_renderer_reference.py` to enforce expected axis sources for horizontal, vertical and diagonal paired scenarios and to report actual axis coverage without hardcoded horizontal-only limitations.
+- The current horizontal baseline passed the updated comparison audit in CI; vertical/diagonal axis requirements are covered by synthetic unit tests and scenario-specific guard definitions, but live captures remain pending.
+- Full CI on HEAD `32c6828c69930ee8fe5f22e11a91454425354506` completed SUCCESS: [41976515362](https://github.com/Kiddos19882/AutoDraw/actions/runs/41976515362). Windows portable build and INT-006 audit both succeeded; optional algorithm benchmarks were skipped.

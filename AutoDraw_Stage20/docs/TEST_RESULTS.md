@@ -566,3 +566,16 @@ Artifact: `autodraw-paired-renderer-png-comparison`, ID `13386122895`.
 - Optional algorithm benchmarks: SKIPPED.
 - The earlier UI-scenario run `41975187040` failed because `PAIRED_RENDERER_TEST_CASE_IDS` was imported locally after its first use. The import was moved before the guard; the corrected run above passed.
 - No live vertical/diagonal game captures were executed. CI validates code, synthetic geometry and packaging, not runtime geometry on the user's screen.
+
+
+## 2026-11-05 — final multi-axis audit CI
+
+**HEAD:** `32c6828c69930ee8fe5f22e11a91454425354506`  
+**GitHub Actions:** [41976515362](https://github.com/Kiddos19882/AutoDraw/actions/runs/41976515362) — **SUCCESS**.
+
+- Preparation/G3: SUCCESS, including multi-axis transform and paired scenario tests.
+- Application integration, Game Monitor/Bridge, Executor regression and Egret CanvasRenderer: SUCCESS.
+- Scenario-aware paired renderer comparison and INT-006/INT006R analyses: SUCCESS.
+- Windows portable build and startup smoke-test: SUCCESS; artifact `autodraw-g3-preflight-build`, ID `13391394936`.
+- Optional algorithm benchmarks: SKIPPED.
+- Live vertical/diagonal captures were not run; CI success does not establish their runtime pixel equivalence.

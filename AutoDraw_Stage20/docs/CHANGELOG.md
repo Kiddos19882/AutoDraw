@@ -1227,3 +1227,10 @@
 - Added regression coverage for scenario-plan generation and executor handoff.
 - Updated comparison diagnostics to verify the axis coverage required by each paired scenario.
 - Live captures remain pending; no production renderer or executor behavior changed.
+
+
+## 2026-11-05 — scenario-aware renderer audit
+
+- Renderer comparison now validates that each paired scenario uses its expected Monitor-fit and screenshot-bound axes.
+- Report limitations are generated from actual axis sources rather than assuming a horizontal trajectory.
+- Updated audit and all required CI jobs passed in run 41976515362.
