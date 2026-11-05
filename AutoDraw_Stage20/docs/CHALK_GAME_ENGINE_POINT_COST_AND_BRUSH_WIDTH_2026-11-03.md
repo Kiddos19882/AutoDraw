@@ -1,6 +1,6 @@
 # Игровой движок: связь размера кисти и расхода CHALK
 
-> **Актуальность источников на 2026-11-04.** Разделы 1–10 и 12 сохраняют исторические выводы для прежнего bundle/Resource Timing. Для текущего анализа приоритетны разделы 11, 13, 14 и 15: пользовательски подтверждённый комплект `gameEngine/main.min_653f95bc.js`, `mergeEngine_df2e5bc5.js`, `manifest.json` плюс runtime snapshot от 2026-11-04. Подтверждены Egret 5.4.1, активный WebGL backend и stage→client transform текущей сессии. Точный pixel footprint, browser antialiasing/texture sampling и pixel equivalence остаются NOT VALIDATED. Не считать offline OpenCV/Capsule модель пиксельно эквивалентной игре.
+> **Актуальность источников на 2026-11-05.** Разделы 1–10 и 12 сохраняют исторические выводы для прежнего bundle/Resource Timing. Для текущего анализа приоритетны разделы 11, 13–15: подтверждённый комплект Egret 5.4.1, runtime snapshot 04.11 и paired live capture/replay 05.11. Actual BoardPane/CanvasRenderer/WebGL internal agreement подтверждён в offline harness; quantitative live PNG ↔ offline WebGL pixel equivalence остаётся NOT VALIDATED. Не считать offline OpenCV/Capsule модель пиксельно эквивалентной игре.
 
 
 **Дата аудита:** 2026-11-03  
@@ -602,3 +602,20 @@ Browser harness загружает `mergeEngine_df2e5bc5.js` и `main.min_653f95
 - Single-point smooth path содержит только moveTo и не создаёт видимый alpha, но actual BoardPane GraphicsNode остаётся non-empty из-за transparent `resetBg()` rectangle; его bounds `(-2,-2,464,244)`. Поэтому generic WebGLRenderer empty-node skip к этому случаю не относится.
 
 **Граница доказательства:** run подтверждает попиксельное совпадение actual BoardPane и manual path transcription внутри Egret CanvasRenderer. WebGL context не создавался; WebGL texture upload/LINEAR sampling/premultiplied alpha, scrollRect+mask stencil и сравнение с PNG из того же live game run не выполнялись. Canvas2D masked-board composite остаётся approximation.
+
+
+### 15.14 Paired accepted-point replay — offline evidence и открытый live PNG gate (2026-11-05)
+
+**Источник live run:** experiment `d47cc0a5520044c7abfd0352a4f93ca8`; run `16aec62c-9e54-44e7-8691-9df79b19161d`; session `d357b6ee-5617-4e07-9011-7eba7ccb6c0f`. Точный расход CHALK=138 (`pointCount` 1→139). Приняты 138 `acceptedPoint`, каждый положительный update имеет `pointDelta=1`.
+
+**Offline replay:** `data/renderer_result/egret-5.4.1-renderer-reference-manifest.json` (schemaVersion=2) связывает fixture `live-accepted-points` с тем же `sourceRunId`, mode=`smooth`, lineWidth=10 и 138 точками. Сгенерированы source reference 1392×732, masked-board 1380×720 и WebGL board 1380×720. Manifest фиксирует actual BoardPane/manual transcription exact match и WebGL/Canvas2D composite exact match (`differingPixels=0`, `maxChannelDifference=0`). Это доказывает согласованность offline harness и renderer path внутри его test scene, но не совпадение с live screenshot.
+
+**Live image и screen mapping:** `after_draw-board.png` имеет 674×355. Paired plan `brush-plan-paired_renderer_single_stroke-b10-20261105-041703-d47cc0a5.json` фиксирует ROI 674×355, `scale_x=1.4630434782608697`, `scale_y=1.475`, logical board 460×240 и mapping logical max→last screen pixel. `experiment.json` содержит heuristic visible-change ROI `(18,166,609,23)` и 8947 changed pixels. Визуально live line непрерывен и согласуется с ожидаемой позицией/длиной replay; эти данные не являются pixel-level diff.
+
+**Ограничения:**
+- Quantitative live PNG ↔ offline WebGL PNG comparison не выполнен; IoU, precision/recall, residual map и alpha/background-normalized diff отсутствуют.
+- `rendererProfile.runtimeProfile.source` ссылается на snapshot 04.11; отдельный `AutoDrawGameMonitor.inspect()` snapshot в live session 05.11 не приложен. Не трактовать runtime profile manifest как per-run inspect.
+- Offline internal equality не доказывает exact game screenshot equality: screenshot имеет screen-space resampling, board ROI mapping и opaque background, тогда как offline PNG — transparent board render.
+- `trajectory.status=incomplete_until_verified` в experiment summary противоречит raw accepted-point histogram; raw evidence не менять, несогласованность считать metadata issue.
+
+**Следующий gate:** независимый pixel audit `after_draw-board.png` против offline WebGL PNG: подтвердить blank-board baseline, выполнить явное affine/ROI mapping и alpha/background normalization, зафиксировать input hashes, interpolation/threshold, bounding boxes, IoU/precision/recall, symmetric difference и residual coordinates. Повторный live штрих не нужен. FILL-001-RS 45-cell matrix остаётся BLOCKED до принятия renderer/footprint gate.

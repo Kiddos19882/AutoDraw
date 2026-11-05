@@ -1137,3 +1137,10 @@
 - Offline renderer harness: 20 fixtures, 20 WebGL comparisons, 60 PNG; artifact 13371659297.
 - Renderer replay Node tests: 13/13 passed, включая fail-closed проверку multi-stroke, pointDelta>1 и missing acceptedPoint.
 - Live game pixel equivalence не проверена; пользовательский paired capture остаётся следующим gate.
+
+## 2026-11-05 — paired renderer offline replay evidence
+
+- Зафиксировано, что offline replay live accepted points уже создан и сохранён в `data/renderer_result/`: source PNG, masked-board PNG, WebGL board PNG и Egret renderer manifest.
+- Manifest связывает 138 accepted points с live run `16aec62c-9e54-44e7-8691-9df79b19161d`, mode=smooth, lineWidth=10. Internal actual BoardPane/manual transcription и Canvas2D/WebGL comparisons — exact, 0 differing pixels.
+- Уточнён статус gate: offline replay завершён; количественный live `after_draw-board.png` ↔ offline WebGL PNG comparison остаётся pending. FILL-001-RS matrix остаётся blocked.
+- Изменения ограничены документацией; исходники, тесты, workflow, конфигурации и первичные экспериментальные данные не изменялись.

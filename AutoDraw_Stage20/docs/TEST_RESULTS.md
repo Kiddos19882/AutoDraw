@@ -422,3 +422,21 @@ Workflow включает:
 - Локальный WebSocket smoke server test — PASS.
 - GitHub Actions run [41896024383](https://github.com/Kiddos19882/AutoDraw/actions/runs/41896024383): Game Monitor and bridge tests — SUCCESS; Executor regression tests — SUCCESS; Application integration tests — SUCCESS; Preparation/G3 matrix tests — SUCCESS (включая capsule broad-phase benchmark и FILL-001-RS static sweep); Windows portable build/startup smoke-test — SUCCESS; INT-006 pixel-level PNG geometry audit, independent CHALK validation и INT006R validation — SUCCESS; optional algorithm benchmarks — SKIPPED. Полный workflow run завершился SUCCESS.
 - Это программные проверки mock/runtime diagnostics, не live browser evidence. Реальный renderMode, screen transform, brush footprint и pixel equivalence ещё не получены.
+
+## 2026-11-05 — paired accepted-point offline replay (live/offline comparison pending)
+
+**Live experiment:** `d47cc0a5520044c7abfd0352a4f93ca8`  
+**Run/session:** `16aec62c-9e54-44e7-8691-9df79b19161d` / `d357b6ee-5617-4e07-9011-7eba7ccb6c0f`  
+**Renderer manifest:** `data/renderer_result/egret-5.4.1-renderer-reference-manifest.json` (schema v2).  
+**Renderer PNGs:** `live-accepted-points-width-10-source-reference.png` (1392×732), `live-accepted-points-width-10-masked-board-reference.png` (1380×720), `live-accepted-points-width-10-webgl-board-reference.png` (1380×720).  
+**Live image:** experiment `after_draw-board.png` (674×355).
+
+- Manifest fixture `live-accepted-points` has the same `sourceRunId`, 138 accepted points, mode `smooth`, lineWidth=10; actual `com.magnetjoy.pet.ui.board.BoardPane` and manual path transcription agree exactly. Egret WebGLRenderer output and Canvas2D masked-board reference agree exactly: `equal=true`, `differingPixels=0`, `maxChannelDifference=0`.
+- Live plan maps logical 460×240 board to ROI 674×355 using `scale_x=1.4630434782608697`, `scale_y=1.475`, inclusive logical max→last screen pixel. Experiment visual ROI heuristic reports `x=18,y=166,width=609,height=23`, 8947 changed pixels.
+- Visual inspection shows a single continuous horizontal line whose position/extent are consistent with the replay. This is a qualitative consistency check only; no numerical live/offline pixel diff, IoU, residual map or alpha-normalized comparison has been completed.
+- The manifest's runtimeProfile references `renderer_snapshot_2026-11-04.json`; it is not an `inspect()` snapshot captured in the live session 05.11. `experiment.json` confirms session binding, board dimensions, observed brush radius and telemetry, but does not include per-run renderer inspect snapshot.
+
+**Status:** OFFLINE_REPLAY_DONE / LIVE_PNG_PIXEL_COMPARISON_PENDING.  
+**Evidence level:** E4 for live run and exact CHALK=138; E3/E2 for offline harness internal renderer comparisons; no E5 live/offline pixel equivalence claim.  
+**CI:** latest branch HEAD `ad03a0b5b03cf76f6fa11f06047d52106317c8c7` has empty combined status; do not claim CI PASS for this data/manifest commit. Full CI run `41933396072` passed on earlier source/test HEAD `f6df3f9`.  
+**Next gate:** independent quantitative comparison of live screenshot and offline WebGL PNG after explicit ROI transform and background/alpha normalization. No repeat live stroke required; FILL-001-RS 45-cell matrix remains BLOCKED.

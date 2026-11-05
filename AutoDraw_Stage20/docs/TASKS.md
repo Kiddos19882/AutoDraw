@@ -8,9 +8,9 @@
 
 | ID | Приоритет | Статус | Содержание |
 |---|---|---|---|
-| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | IN_PROGRESS | Runtime WebGL/transform подтверждены; reference harness исправлен для empty GraphicsNode, browser PNG fixtures и pixel gate остаются |
+| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | IN_PROGRESS | Runtime Egret 5.4.1/WebGL и offline replay manifest/PNG подтверждены; количественное сравнение live after_draw-board.png с offline WebGL reference остаётся открытым |
 | FILL-001-RS-MATRIX | P0 | BLOCKED | 45 captures только после принятого single-task preflight |
-| GAME-INPUT-SAMPLING-TRACE-001 | P1 | CAPTURE_ACCEPTED_OFFLINE_REPLAY_PENDING | Live run 16aec62c принят по raw events: 1 strokeId, 138/138 pointDelta=1 с acceptedPoint, CHALK=138; требуется offline BoardPane replay и PNG comparison |
+| GAME-INPUT-SAMPLING-TRACE-001 | P1 | OFFLINE_REPLAY_DONE_LIVE_PNG_COMPARISON_PENDING | Run 16aec62c принят; 138 accepted points, CHALK=138; offline BoardPane/WebGL replay создан, требуется независимый live/offline pixel diff |
 | BRUSH-FOOTPRINT-CAPSULE-001 | P1 | OPEN | Offline capsule model готова; renderer acceptance/planner integration не выполнены |
 | INT-006 | P1 | IN_PROGRESS | D1-D5 45/45 и analyzer завершены; domain validation/safety margin не завершены |
 | INT-007 | P2 | BLOCKED | Интеграция модели после INT-006 |
@@ -35,7 +35,7 @@
 - Capture принимается для replay только при одном strokeId, наличии каждого acceptedPoint и pointDelta=1. Любая неполнота остаётся fail-closed; задержка 10 ms не гарантирует отсутствие coalescing.
 - CHALK фиксировать только как pointCount_after - pointCount_before.
 
-**Статус:** CAPTURE_ACCEPTED_OFFLINE_REPLAY_PENDING. Пользовательский live run 16aec62c-9e54-44e7-8691-9df79b19161d принят по raw event checks: ровно один strokeId, 138 положительных POINT_QUOTA_UPDATE, у всех pointDelta=1 и acceptedPoint присутствует; acceptedPoint count и сумма pointDelta совпадают с точным CHALK=138 (pointCount 1→139). Bridge telemetry: zero drops/errors/send failures/sequence gaps. Агрегированное поле trajectory.status=incomplete_until_verified противоречит raw delta/acceptedPoint данным; это summary metadata inconsistency, raw events не изменять. Offline replay PNG и paired pixel comparison ещё не выполнены; inspect() snapshot отдельно не приложен. FILL-001-RS matrix остаётся BLOCKED до закрытия renderer/footprint gate.
+**Статус:** OFFLINE_REPLAY_DONE_LIVE_PNG_COMPARISON_PENDING. Пользовательский live run 16aec62c-9e54-44e7-8691-9df79b19161d принят по raw event checks: ровно один strokeId, 138 положительных POINT_QUOTA_UPDATE, у всех pointDelta=1 и acceptedPoint присутствует; acceptedPoint count и сумма pointDelta совпадают с точным CHALK=138 (pointCount 1→139). Bridge telemetry: zero drops/errors/send failures/sequence gaps. Агрегированное поле trajectory.status=incomplete_until_verified противоречит raw delta/acceptedPoint данным; это summary metadata inconsistency, raw events не изменять. Offline replay PNG и paired pixel comparison ещё не выполнены; inspect() snapshot отдельно не приложен. FILL-001-RS matrix остаётся BLOCKED до закрытия renderer/footprint gate.
 
 ## Дополнение 2026-11-05 — live capture принят
 
@@ -47,7 +47,9 @@
 - Bridge: telemetry enabled; drops/errors/send failures/sequence gaps=0; frame probe average 59.978 FPS.
 - Offline renderer reference extractor принимает raw run. Aggregate trajectory.status=incomplete_until_verified не соответствует raw event histogram; это summary metadata inconsistency, raw evidence не переписывать.
 - after_draw-board.png визуально содержит один горизонтальный штрих. Отдельный AutoDrawGameMonitor.inspect() snapshot не приложен; smooth — сценарный профиль, не отдельное runtime наблюдение.
-- Offline BoardPane replay и PNG comparison остаются следующими действиями. Live повтор не требуется; FILL-001-RS matrix остаётся BLOCKED.
+- Offline BoardPane replay создан: manifest fixture `live-accepted-points`, sourceRunId совпадает с live run, 138 points, mode=smooth, width=10. Actual BoardPane/manual transcription и Canvas2D/WebGL internal comparisons дали exact pixel match (0 differing pixels); это не live/offline comparison.
+- Paired plan transform: ROI 674×355, scale_x=1.4630434782608697, scale_y=1.475. Experiment ROI heuristic: x=18,y=166,w=609,h=23, changed_pixels=8947. Эти метрики не являются pixel diff с offline output.
+- Следующий шаг: независимый pixel-level compare live PNG и offline WebGL PNG с baseline/alpha normalization и фиксацией residual coordinates. Live повтор не требуется; FILL-001-RS matrix остаётся BLOCKED.
 
 ## Зачем остаются четыре направления
 

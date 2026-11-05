@@ -3077,3 +3077,13 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - Egret CanvasRenderer browser reference SUCCESS: 20 fixtures, 20 WebGL comparisons, 60 PNG; artifact 13371659297 (763,022 bytes).
 - Preparation/G3, capsule broad-phase benchmark, exhaustive FILL-001-RS static sweep, Application integration, Executor, INT-006 pixel/CHALK/INT006R validation и Windows portable build/startup smoke-test — SUCCESS. Optional algorithm benchmarks SKIPPED.
 - Реальный игровой тест не выполнялся. Парное live PNG/renderer comparison остаётся ожидающим пользовательский комплект capture; FILL-001-RS matrix остаётся BLOCKED.
+
+## 2026-11-05 — paired accepted-point offline replay и аудит PNG evidence
+
+- Проверены HEAD ветки `feature/image-geometry-optimization` (`ad03a0b5b03cf76f6fa11f06047d52106317c8c7`), последние 20 commits и управляющие документы; branch HEAD подтверждён через GitHub API. Локальный `git status` недоступен через GitHub API.
+- Извлечены и визуально просмотрены live `after_draw-board.png` и три renderer PNG. Live PNG 674×355 содержит один горизонтальный штрих; source reference 1392×732; masked-board/WebGL reference 1380×720.
+- Renderer manifest подтверждает fixture `live-accepted-points`, sourceRunId `16aec62c-9e54-44e7-8691-9df79b19161d`, 138 accepted points, mode=smooth, width=10. Actual BoardPane/manual path и Canvas2D/WebGL internal comparisons имеют 0 differing pixels.
+- Paired plan transform: ROI 674×355, scale_x=1.4630434782608697, scale_y=1.475. Experiment ROI heuristic: x=18,y=166,w=609,h=23, changed_pixels=8947. Визуальная геометрия согласуется с replay, но это не количественный diff live/offline.
+- Обнаружена устаревшая формулировка в PROJECT_STATUS/TASKS/ROADMAP: replay указан как невыполненный, хотя PNG и manifest уже добавлены commits `dd0451cd` и `ad03a0b`. Статусы синхронизированы: offline replay done, live pixel comparison pending.
+- Не менялись production code, tests, configs, workflows, frozen plans, raw captures, CHALK model/defaults. Новые live эксперименты не запускались. FILL-001-RS 45-cell matrix остаётся BLOCKED.
+- CI combined status на `ad03a0b` пуст; CI PASS для этого commit не заявляется. Последний полный CI run `41933396072` относится к source/test HEAD `f6df3f9` и завершился SUCCESS; он предшествует добавлению data/manifest PNG artifacts.

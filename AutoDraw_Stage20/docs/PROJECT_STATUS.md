@@ -1,6 +1,6 @@
 # Актуальная точка продолжения — 2026-11-05
 
-## Текущая точка — live capture принят, offline renderer replay ожидает выполнения
+## Текущая точка — offline replay создан; live PNG comparison остаётся открытым
 
 **Branch:** feature/image-geometry-optimization  
 **Пользовательский data commit:** 02ebab89733559421edbb151e7931ed3fecf30c0.  
@@ -18,19 +18,26 @@
 - Координаты принятых точек идут монотонно по X от 18.2083 до 419.2083, Y=119; 138 accepted points. Сумма pointDelta и число acceptedPoint совпадают с точным CHALK.
 - Точный ресурс: pointCount 1 → 139; CHALK=138; maxPoints=6000. Не использовать 294 move calls как расход.
 - Bridge/session: input telemetry enabled; 0 dropped events, 0 monitor errors, 0 send failures, 0 collector sequence gaps. Frame probe: 279 frames, average 59.978 FPS, visibility interruption=false.
-- Итоговый board PNG after_draw-board.png (674×355) визуально содержит один горизонтальный штрих.
+- Итоговый board PNG `after_draw-board.png` имеет размер 674×355 и содержит один горизонтальный штрих. Из `experiment.json`: обнаруженная область изменения `x=18, y=166, width=609, height=23`, `changed_pixels_in_roi=8947`; это результат визуального ROI-анализа, не сравнение с offline renderer.
 - Другие raw runs той же session — неуспешные pointer candidates без point consumption (radius 30) либо восстановление кисти; они не входят в принятый run.
 
 **Replay gate:** raw event-level checks удовлетворяют валидатору tests/game_renderer_reference.js: ровно один идентифицированный strokeId, каждое положительное POINT_QUOTA_UPDATE имеет pointDelta=1 и acceptedPoint. Run пригоден для импорта в offline renderer. Поле агрегированной сводки trajectory.status=incomplete_until_verified противоречит фактической проверке raw events и сопровождается общим примечанием про coalescing; для данного run это поле не подтверждается histogram событий и не должно блокировать replay. Зафиксировать как несогласованность summary metadata, не исправлять raw evidence.
 
+### Результат offline renderer replay
+
+- В `data/renderer_result/` сохранены `live-accepted-points-width-10-source-reference.png` (1392×732), `live-accepted-points-width-10-masked-board-reference.png` (1380×720), `live-accepted-points-width-10-webgl-board-reference.png` (1380×720) и `egret-5.4.1-renderer-reference-manifest.json`.
+- Manifest связывает fixture `live-accepted-points` с тем же `sourceRunId=16aec62c-9e54-44e7-8691-9df79b19161d`, mode `smooth`, lineWidth=10 и 138 accepted points. Actual BoardPane CanvasRenderer и manual transcription совпали; Egret WebGLRenderer и Canvas2D masked-board output совпали: `equal=true`, `differingPixels=0`, `maxChannelDifference=0`.
+- Эти нулевые diff относятся к внутренним сравнениям offline harness. Сравнение offline PNG с live `after_draw-board.png` ещё не выполнено.
+
 ### Оставшиеся ограничения
 
-- Offline replay PNG ещё не создан и pixel comparison с live PNG не выполнен.
-- В commit нет отдельного runtime snapshot AutoDrawGameMonitor.inspect(). session.json подтверждает board 460×240, radius и telemetry, но не содержит полного rendererSnapshot/path-mode state. smooth — заданный профиль paired test, а не независимо записанное runtime-поле.
-- Для pixel comparison нужно получить offline output из tests/game_renderer_reference.html с raw run 16aec62c…, mode=smooth, line width=10, затем привести live board ROI 674×355 и offline board reference к общей системе размеров/координат и сравнить. Не делать вывод о pixel equivalence по визуальному осмотру одного PNG.
+- Live pixel comparison остаётся PENDING. Нельзя переносить внутренний WebGL-vs-Canvas PASS на эквивалентность с реальным screenshot.
+- План фиксирует screen ROI 674×355, `scale_x=1.4630434782608697`, `scale_y=1.475`, inclusive logical bounds 460×240. Это transform данного paired plan, а не прямое измерение client corners из `inspect()`.
+- В `experiment.json` зафиксированы `changed_pixels_in_roi=8947` в ROI x=18,y=166,w=609,h=23. Положение/размер видимого следа визуально согласуются с offline path, но без количественного pixel diff это только согласованность, не renderer acceptance.
+- `inspect()` snapshot не приложен к live session 05.11. Runtime profile manifest ссылается на snapshot 04.11; не считать его per-run inspect evidence.
 - FILL-001-RS 45-cell matrix остаётся BLOCKED до закрытия renderer/footprint gate.
 
-**Следующий шаг:** выполнить offline replay именно raw run 16aec62c-9e54-44e7-8691-9df79b19161d; не требуется повторять live stroke. После replay выполнить нормализацию размеров/трансформации и количественное PNG comparison. При необходимости запросить недостающий runtime inspect snapshot.
+**Следующий шаг:** выполнить независимое pixel-level сравнение `after_draw-board.png` с offline WebGL PNG после применения screen ROI transform и baseline/alpha normalization; сохранить hashes, crop/resize method, threshold, IoU/precision/recall, symmetric difference и координаты residuals. Повторный live stroke не нужен.
 
 **CI:** для commit 02ebab8 combined status пустой (statuses=[]), а доступный endpoint workflow-runs не вернул runs; CI PASS не подтверждён. Тесты исходников в этом data commit не менялись. Локальный запуск и git status недоступны через GitHub API.
 

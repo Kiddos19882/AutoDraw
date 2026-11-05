@@ -1,10 +1,14 @@
 # Дополнение к дорожной карте — 2026-11-05
 
-## GAME-INPUT-SAMPLING-TRACE-001 — live capture принят; следующий шаг offline replay
+## GAME-INPUT-SAMPLING-TRACE-001 — offline replay создан; live PNG comparison следующий gate
 
-Live capture 16aec62c-9e54-44e7-8691-9df79b19161d принят по raw event-level validation: один положительный strokeId, 138/138 POINT_QUOTA_UPDATE с pointDelta=1 и acceptedPoint, точный CHALK=138 (pointCount 1→139), Bridge без потерь/ошибок/sequence gaps. Raw run пригоден для tests/game_renderer_reference.html.
+Live capture `16aec62c-9e54-44e7-8691-9df79b19161d` принят по raw event-level validation: один положительный strokeId, 138/138 POINT_QUOTA_UPDATE с pointDelta=1 и acceptedPoint, точный CHALK=138 (pointCount 1→139), Bridge без потерь/ошибок/sequence gaps.
 
-**Следующий шаг:** выполнить offline replay этого run в режиме smooth / line width 10, затем сравнить PNG offline BoardPane с after_draw-board.png (674×355), нормализовав scale/ROI и сохранив метрики pixel diff. Повторный live запуск не нужен. Отдельный AutoDrawGameMonitor.inspect() snapshot не приложен; runtime renderer mode остаётся недостаточно подтверждённым capture metadata. Поле aggregate trajectory.status=incomplete_until_verified не совпадает с raw event histogram и зафиксировано как summary inconsistency.
+Offline replay выполнен и сохранён: source reference 1392×732, masked-board/WebGL references 1380×720; manifest `egret-5.4.1-renderer-reference-manifest.json` связывает fixture с тем же sourceRunId, mode=smooth, lineWidth=10, 138 accepted points. Внутренние actual BoardPane/manual transcription и Canvas2D/WebGL comparisons — exact (`differingPixels=0`, max channel delta=0). Это не сравнение с live screenshot.
+
+Live `after_draw-board.png` имеет 674×355. Paired plan задаёт ROI transform `scale_x=1.4630434782608697`, `scale_y=1.475`; experiment ROI heuristic обнаружил 8947 changed pixels в x=18,y=166,w=609,h=23. Визуально геометрия согласуется, но количественный live/offline pixel diff отсутствует.
+
+**Следующий шаг:** выполнить независимый pixel-level comparison live PNG vs offline WebGL reference с явной baseline/alpha normalization, screen ROI transform, hashes, threshold, IoU/precision/recall и residual map. Повторный live запуск не нужен. Отдельный `inspect()` snapshot именно live session не приложен; runtime profile manifest ссылается на snapshot 04.11. Поле aggregate `trajectory.status=incomplete_until_verified` остаётся summary metadata inconsistency, raw evidence не менять.
 
 Live pixel equivalence остаётся PENDING. FILL-001-RS 45-cell matrix не запускать до закрытия renderer/footprint gate.
 
