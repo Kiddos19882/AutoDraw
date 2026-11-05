@@ -6,7 +6,7 @@
 - [x] Добавлены варианты A/B на фактическом Egret WebGLRenderer (exact/rounded backing origin) и C/D на Canvas2D (exact/rounded backing origin).
 - [x] Добавлено сравнение каждого варианта с A по RGBA pixels и сохранение placement/texture metadata в manifest.
 - [x] Добавлены Node regression tests для exact origin (1022.375, 216), rounding, scale mismatch, non-rectangular corners и out-of-bounds.
-- [x] Headless Edge runner подключён к сохранённым vertical/diagonal Game Monitor reports; новые игровые запуски не требуются.
+- [x] Headless Edge runner подключён к сохранённым vertical/diagonal Game Monitor reports; перед сохранением artifacts он проверяет run binding, A–D backends, exact/rounded coordinates и baseline self-comparison; новые игровые запуски не требуются.
 - [ ] Подтвердить node syntax/unit tests и headless browser Stage A–D outputs в CI.
 - [ ] Сопоставить Stage A с live before/after captures после отдельного применения Stage CSS transform; сохранить formal metrics без post-hoc alignment.
 - [ ] Только после анализа A–D решить, какая модель соответствует live capture; не менять acceptance thresholds.
