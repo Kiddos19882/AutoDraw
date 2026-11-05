@@ -121,7 +121,87 @@ try {
         throw "WebGL renderer did not complete all 20 comparisons or runtime scale profile differs from snapshot."
     }
 
+
     Write-Host "Egret actual BoardPane CanvasRenderer + WebGLRenderer generated $($manifest.fixtures.Count) fixtures, 20 WebGL comparisons and $($pngMatches.Count) PNG files."
+
+    $stageCases = @(
+        @{
+            Name = "vertical"
+            Monitor = "/AutoDraw_Stage20/data/results/brush_behavior_tests/experiment-20261105-192426-b10-paired_renderer_vertical_single_stroke-6f2227c7/monitor_report.json"
+            RunId = "c860234f-995a-4789-9ac2-e05b322fe742"
+        },
+        @{
+            Name = "diagonal"
+            Monitor = "/AutoDraw_Stage20/data/results/brush_behavior_tests/experiment-20261105-192602-b10-paired_renderer_diagonal_single_stroke-0e61bc40/monitor_report.json"
+            RunId = "f69cb0f4-f5d0-4ff9-a3b7-1148c38fa07f"
+        }
+    )
+
+    foreach ($case in $stageCases) {
+        $caseOutput = Join-Path $outputDir ("stage-level-" + $case.Name)
+        New-Item -ItemType Directory -Force -Path $caseOutput | Out-Null
+        $caseDom = Join-Path $env:RUNNER_TEMP ("stage-level-" + $case.Name + "-dom.html")
+        $caseStderr = Join-Path $env:RUNNER_TEMP ("stage-level-" + $case.Name + "-edge-stderr.log")
+        $monitorQuery = [uri]::EscapeDataString($case.Monitor)
+        $caseUrl = "http://127.0.0.1:8765/AutoDraw_Stage20/tests/game_renderer_reference.html?monitor=$monitorQuery"
+        $caseArgs = @(
+            "--headless", "--enable-webgl", "--use-gl=angle", "--use-angle=swiftshader",
+            "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist", "--no-sandbox",
+            "--disable-dev-shm-usage", "--dump-dom",
+            "--user-data-dir=$(Join-Path $env:RUNNER_TEMP ('egret-stage-' + $case.Name + '-profile'))",
+            $caseUrl
+        )
+        $caseBrowser = Start-Process -FilePath $edgePath -ArgumentList $caseArgs -RedirectStandardOutput $caseDom -RedirectStandardError $caseStderr -PassThru -Wait
+        if ($caseBrowser.ExitCode -ne 0) {
+            if (Test-Path $caseDom) { Copy-Item $caseDom (Join-Path $caseOutput "page-dom-diagnostic.html") -Force }
+            if (Test-Path $caseStderr) { Copy-Item $caseStderr (Join-Path $caseOutput "edge-stderr.log") -Force }
+            throw "Stage-level $($case.Name) browser probe exited with code $($caseBrowser.ExitCode)."
+        }
+
+        $caseHtml = Get-Content -Raw $caseDom
+        if ($caseHtml -notmatch 'data-reference-status="complete"' -or
+            $caseHtml -notmatch 'data-fixture-count="1"' -or
+            $caseHtml -notmatch 'data-webgl-status="complete"') {
+            Copy-Item $caseDom (Join-Path $caseOutput "page-dom-diagnostic.html") -Force
+            if (Test-Path $caseStderr) { Copy-Item $caseStderr (Join-Path $caseOutput "edge-stderr.log") -Force }
+            $statusMatch = [regex]::Match($caseHtml, '<p id="renderer-status"[^>]*>(.*?)</p>', [System.Text.RegularExpressions.RegexOptions]::Singleline)
+            if ($statusMatch.Success) {
+                Write-Host "Stage-level $($case.Name) status: $([System.Net.WebUtility]::HtmlDecode($statusMatch.Groups[1].Value))"
+            }
+            throw "Stage-level $($case.Name) browser probe did not complete."
+        }
+
+        $caseManifestMatch = [regex]::Match($caseHtml, '<pre id="renderer-manifest-json"[^>]*>(.*?)</pre>', [System.Text.RegularExpressions.RegexOptions]::Singleline)
+        if (-not $caseManifestMatch.Success) { throw "Stage-level $($case.Name) manifest is missing." }
+        $caseManifestJson = [System.Net.WebUtility]::HtmlDecode($caseManifestMatch.Groups[1].Value)
+        $caseManifest = $caseManifestJson | ConvertFrom-Json
+        if ($caseManifest.runtimeProfile.sourceRunId -ne $case.RunId -or
+            $caseManifest.stageLevelCompositor.status -ne "generated_four_offline_variants" -or
+            $caseManifest.stageLevelCompositor.variantCount -ne 4 -or
+            $caseManifest.fixtures.Count -ne 1 -or
+            $caseManifest.fixtures[0].stageLevelCompositor.Count -ne 4) {
+            Set-Content -Path (Join-Path $caseOutput "manifest-invalid.json") -Value $caseManifestJson -Encoding utf8
+            throw "Stage-level $($case.Name) output is not bound to the expected run or does not contain all A-D variants."
+        }
+        Set-Content -Path (Join-Path $caseOutput "manifest.json") -Value $caseManifestJson -Encoding utf8
+
+        $casePngMatches = [regex]::Matches($caseHtml, $pngPattern)
+        if ($casePngMatches.Count -ne 7) {
+            Copy-Item $caseDom (Join-Path $caseOutput "page-dom-diagnostic.html") -Force
+            throw "Stage-level $($case.Name) expected 7 PNG links (3 board references + 4 A-D variants), found $($casePngMatches.Count)."
+        }
+        $stagePngCount = 0
+        foreach ($match in $casePngMatches) {
+            $pngName = [System.IO.Path]::GetFileName($match.Groups[2].Value)
+            if ($pngName -notlike "stage-level-*.png") { continue }
+            $pngBytes = [Convert]::FromBase64String($match.Groups[1].Value)
+            [System.IO.File]::WriteAllBytes((Join-Path $caseOutput $pngName), $pngBytes)
+            $stagePngCount++
+        }
+        if ($stagePngCount -ne 4) { throw "Stage-level $($case.Name) expected four A-D PNGs, saved $stagePngCount." }
+        Write-Host "Stage-level $($case.Name): run $($case.RunId), four A-D variants, four PNGs saved."
+    }
+
 } finally {
     if ($server -and -not $server.HasExited) {
         Stop-Process -Id $server.Id -Force
