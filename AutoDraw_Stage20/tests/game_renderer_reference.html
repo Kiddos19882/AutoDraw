@@ -62,6 +62,21 @@
   <script src="../gameEngine/mergeEngine_df2e5bc5.js"></script>
   <script src="../gameEngine/main.min_653f95bc.js"></script>
   <script src="./game_renderer_reference.js"></script>
-  <script>document.getElementById("render-live-points").addEventListener("click", function () { window.AutoDrawGameRendererReference.renderAll(); });</script>
+  <script>
+    document.getElementById("render-live-points").addEventListener("click", function () {
+      window.AutoDrawGameRendererReference.renderAll();
+    });
+    (function () {
+      const monitorPath = new URLSearchParams(window.location.search).get("monitor");
+      if (!monitorPath) return;
+      const request = new XMLHttpRequest();
+      request.open("GET", monitorPath, false);
+      request.send(null);
+      if (request.status !== 200) throw new Error("Unable to load run-bound Game Monitor report: " + request.status);
+      document.getElementById("live-points-json").value = request.responseText;
+      document.getElementById("live-path-mode").value = "smooth";
+      document.getElementById("live-line-width").value = "10";
+    })();
+  </script>
 </body>
 </html>
