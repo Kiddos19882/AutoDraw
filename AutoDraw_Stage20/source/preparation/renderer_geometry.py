@@ -316,9 +316,13 @@ def derive_live_board_screen_transform(
     if source_x == "same_run_monitor_fit" and source_y == "same_run_monitor_fit":
         method = "same_run_monitor_xy_fit"
     elif source_x == "same_run_monitor_fit":
-        method = "same_run_monitor_x_fit_plus_screenshot_y_bounds"
+        method = (
+            "same_run_monitor_x_fit_plus_screenshot_board_bounds_y"
+            if source_y == "same_run_full_screen_board_bounds"
+            else "same_run_monitor_x_fit_plus_inspect_css_y_transform"
+        )
     elif source_y == "same_run_monitor_fit":
-        method = "same_run_monitor_y_fit_plus_screenshot_x_bounds"
+        method = "same_run_monitor_y_fit_plus_screenshot_board_bounds_x"
     else:
         method = "same_run_screenshot_board_bounds"
 
@@ -338,6 +342,8 @@ def derive_live_board_screen_transform(
         "screen_offset_from_client": {"x": offset_x, "y": offset_y, "sample_count": len(samples)},
         "horizontal_fit": fit_x,
         "vertical_fit": fit_y,
+        "vertical_scale_source": source_y,
+        "vertical_sample_residual_px": max_residual_y,
         "axis_sources": {"x": source_x, "y": source_y},
         "axis_max_abs_residual_px": {"x": max_residual_x, "y": max_residual_y},
         "screenshot_bounds_cross_check": {
