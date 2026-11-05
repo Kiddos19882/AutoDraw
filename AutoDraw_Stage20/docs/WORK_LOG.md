@@ -3164,3 +3164,11 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - `game_monitor.test.js`: 21 tests passed, 0 failed; includes the new axis-aligned canvas rect fallback and window geometry snapshot test.
 - `test_websocket_smoke_server.py`: 22 tests passed; includes RunRecorder geometry-at-start/update/end and websocket session geometry persistence using schema v2.
 - Bridge browser agent parse test passed. Preparation/G3 test job was still running; full workflow result pending.
+
+
+## 2026-11-05 — preparation/G3 tests passed for geometry snapshot implementation
+
+- CI run `41964932479`, job `Preparation and G3 matrix tests` completed SUCCESS. `pytest -q -ra tests`: 852 passed, 24 warnings, 82 subtests passed in 59.71s. This includes the new renderer geometry helper tests.
+- Existing committed FILL-001 PNG audit printed coverage `98.430600%`, leakage `11`, status `failed`; this is a quality-audit result, not a pytest failure. The separate static spacing sweep step completed with status `passed` (15 cells, 2238 candidates, 62 accepted candidates). These statuses are not interchangeable; the committed PNG quality gate remains failed.
+- Game Monitor and Bridge job SUCCESS: 21 JavaScript tests and 22 Python/WebSocket tests passed.
+- Windows portable build/startup smoke-test and INT-006 PNG audit were still running at last check.
