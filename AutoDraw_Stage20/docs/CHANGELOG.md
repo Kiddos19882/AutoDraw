@@ -1,3 +1,8 @@
+## 2026-11-06 — fail-closed validation Stage A–D artifacts
+
+- Headless Edge runner проверяет source run ID, четыре варианта и их backend, точные/округлённые backing coordinates, размер BoardPane и нулевую self-difference варианта A до сохранения artifact как валидного.
+- Результаты всё ещё ожидают реального browser/CI запуска; сам факт добавления проверки не означает её прохождение.
+
 ## 2026-11-06 — уточнение Stage A/B: используется Egret WebGLRenderer
 
 - Варианты A/B переведены с независимого raw-WebGL textured quad на фактический Egret WebGLRenderer: тот же BoardPane, mask/scrollRect и run-sized Stage RenderBuffer с точной/округлённой backing translation.
