@@ -1,3 +1,9 @@
+## 2026-11-05 — full CI validation passed
+
+- CI workflow `41963498086` completed SUCCESS for code/test/workflow commit `1b16b51e42ba0c61a0fbc547179ca5a9b3864b54`.
+- Required jobs, including Windows portable build/startup smoke-test and INT-006 PNG audit, passed; optional algorithm benchmarks skipped.
+- Current branch HEAD after documentation-only updates: `0cc665e9c9d9e215423c1fa5e5428abc6c3ca08c` at time of this entry; branch compare identical.
+
 ## 2026-11-05 — independent renderer transform comparison result
 
 - Independent mapping (same-run Monitor X fit + inspect CSS Y transform) improved alpha-24 IoU from `0.763153` to `0.998994`; symmetric difference fell from `2404` to `9` pixels. Precision `0.999218`, recall `0.999776`; live/expected bounding boxes coincide.
