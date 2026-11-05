@@ -210,3 +210,12 @@
 **Решение:** предпочитать `getBoxQuads({box:"content"})`. Если API отсутствует, разрешать client-corner fallback только для положительного axis-aligned CSS matrix и при совпадении canvas rect с Stage×Egret backing scale в пределах 1 CSS px. Иначе возвращать `boardClientCorners=null`, method=`unavailable`. Сохранять raw windowGeometry отдельно, не трактуя его как точный client→desktop transform. Browser Bridge передаёт snapshot в session_start и renderer_geometry updates; collector добавляет optional geometry fields к session schema v2 и run schema v1 без смены schema versions.  
 **Инварианты:** client coordinates не приравнивать к desktop/screenshot pixels; не умножать на DPR без подтверждения; не применять approximate/stale geometry к executor; не менять CHALK telemetry и event hot path.  
 **Последствия:** Monitor 0.2.3, Bridge session geometry persistence и tests добавлены. AutoDraw profile consumer и desktop/screenshot transform остаются следующими этапами.
+
+
+## DEC-024. Границы локального доступа и максимальная автоматизация live-тестов
+
+**Статус:** принято, 2026-11-05  
+**Контекст:** ИИ работает с удалённым репозиторием и доступными CI-инструментами, но не имеет прямого доступа к локальному ПК пользователя, запущенной программе AutoDraw и игровой доске. Удалённое состояние GitHub не показывает локальные изменения рабочей копии. Live-проверки требуют реальной программы и доски.  
+**Решение:** закрепить как постоянное правило, что live-тесты AutoDraw в локальной игровой среде и проверка локального `git status` доступны только пользователю. ИИ не заявляет о выполнении таких действий без предоставленных пользователем результатов. Все тесты с игровой доской должны быть максимально автоматизированы: сначала повторно использовать существующие harness/Monitor/Bridge/executor/capture/analyzer, а при необходимости создавать недостающие условия и инструменты в пределах разрешённого объёма. Автоматизировать подготовку, сценарии и повторы, телеметрию, exact CHALK, сохранение raw evidence, аудит критериев и отчётность; минимизировать и явно обозначать необходимые ручные шаги пользователя.  
+**Инварианты:** INV-010 и INV-011. Автоматизация не предоставляет ИИ локальный доступ и не отменяет разрешение на live-эксперимент.  
+**Последствия:** правила добавлены в README, индекс документации, AI_WORK_GUIDE, EVIDENCE_AND_VALIDATION и ENGINEERING_INVARIANTS. Код, тесты и workflow не изменялись.
