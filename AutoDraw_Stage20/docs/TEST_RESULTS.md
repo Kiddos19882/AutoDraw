@@ -1,13 +1,13 @@
 ## 2026-11-06 — Stage-level compositor A–D implementation (CI pending)
 
-**Code/test HEAD:** `8713012673de7734fb0bb91fe58fcce483ed68b3`.  
+**Code/test HEAD:** `501b3fac5e4cb7039161da6d70a1c79803ebb01f`.  
 **Область:** offline renderer harness, Node regression tests, HTML test page and headless Edge runner.  
 **Execution status:** implementation committed; Node/browser/CI results on this HEAD are not yet confirmed. Combined GitHub commit status currently returns no checks. No live game run was performed.
 
 - `buildStagePlacement()` validates Stage/backing dimensions, X/Y scale, axis-aligned BoardPane corners and backing bounds; exact origin derives from run-bound Monitor geometry.
 - Existing vertical/diagonal Monitor reports are configured as headless browser inputs. Their run IDs are c860234f-995a-4789-9ac2-e05b322fe742 and f69cb0f4-f5d0-4ff9-a3b7-1148c38fa07f.
 - Four outputs are defined: A/B use the actual Egret WebGLRenderer and differ by exact/rounded origin; C/D use Canvas2D and differ by exact/rounded origin. Per-variant pixel differences against A are added to the manifest.
-- Node tests cover exact origin 1022.375×216, rounded origin 1022×216, and invalid scale/corners/bounds.
+- Node tests cover exact origin 1022.375×216, rounded origin 1022×216, and invalid scale/corners/bounds. Headless runner additionally validates run binding, A–D backend identities, exact/rounded placements and A self-comparison before accepting the browser artifact.
 - No Stage PNG artifacts, pixel metrics, PASS_PER_RUN or CI PASS are claimed until the headless runner actually completes and its artifacts are inspected.
 - Existing live exact CHALK values remain historical evidence only: vertical=71, diagonal=161. This work does not change CHALK logic or acceptance thresholds.
 
