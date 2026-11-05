@@ -242,13 +242,15 @@
       {id:"C",backend:"Canvas2D",roundOrigin:false},
       {id:"D",backend:"Canvas2D",roundOrigin:true}
     ];
-    return plan.map(v=>{
+    const rendered=plan.map(v=>{
       const r=v.backend==="WebGL"
         ?renderStageWebGL(sourceCanvas,profile,v.roundOrigin)
         :renderStageCanvas2D(sourceCanvas,profile,v.roundOrigin);
       return {id:v.id,backend:v.backend,canvas:r.canvas,placement:r.placement,
         textureParameters:r.textureParameters||null,contextAttributes:r.contextAttributes||null};
     });
+    const baseline=rendered[0].canvas;
+    return rendered.map(v=>({...v,comparisonToA:compareCanvases(baseline,v.canvas)}));
   }
 
   const api = {
@@ -825,7 +827,8 @@
             webglTextureParameters: webgl.textureParameters,
             stageLevelCompositor: stageLevelVariants.map(variant => ({
               id: variant.id, backend: variant.backend, placement: variant.placement,
-              textureParameters: variant.textureParameters, contextAttributes: variant.contextAttributes
+              textureParameters: variant.textureParameters, contextAttributes: variant.contextAttributes,
+              comparisonToA: variant.comparisonToA
             })),
             nodeBounds: source.nodeBounds,
             sourceTextureSize: source.skippedByWebGLRenderer
