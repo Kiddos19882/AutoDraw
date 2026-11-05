@@ -489,5 +489,16 @@ Workflow и тесты обновлены в feature-ветке; результ�
 - `source/preparation/tests/test_renderer_acceptance.py`: regression checks for all three axis-source policies, capture validity and rejected evidence, transform/pixel thresholds, unique run IDs and series aggregation.
 - `tests/compare_live_renderer_reference.py`: creates `comparison-report-independent-transform.json` with `PASS_PER_RUN` or `REJECTED_PER_RUN`. Only the independent, unshifted transform is scored; the post-hoc translation remains diagnostic and is excluded from acceptance.
 - `tests/summarize_renderer_acceptance.py`: aggregates per-run reports. Overall multi-axis series requires three unique `PASS_PER_RUN` captures for vertical and three for diagonal; rejected attempts and duplicate run IDs are not counted.
-- Workflow: `.github/workflows/geometry-tests.yml`, preparation/G3 job and paired PNG audit. Run [41992373137](https://github.com/Kiddos19882/AutoDraw/actions/runs/41992373137) is currently in progress; do not treat it as PASS until the required jobs finish.
+- Workflow: `.github/workflows/geometry-tests.yml`, preparation/G3 job and paired PNG audit. Run [41992373137](https://github.com/Kiddos19882/AutoDraw/actions/runs/41992373137) completed SUCCESS; artifact `13397839621` records horizontal `PASS_PER_RUN`.
 - A per-run PASS is not environment-wide renderer acceptance and does not authorize calibration/profile or executor handoff. Real vertical/diagonal live captures remain required.
+
+
+
+## Paired-renderer auto input telemetry — 2026-11-05
+
+- `source/game_monitor/game_monitor_bridge_server.py`: strict opt-in `render_bridge_snippet()`, CLI `--enable-input-telemetry` defaults off.
+- `source/game_monitor/game_monitor_bridge.js`: enables input telemetry only when requested; preserves pre-enabled user state and restores state at disconnect; reports configuration in `session_start`.
+- Server persists `bridge_configuration` in `session.json` and `bridge_configuration_at_start` in run JSON.
+- `source/preparation/brush_behavior_test_ui.py`: a selected paired-renderer scenario controls the opt-in flag; UI warns if a running Bridge was started in another mode.
+- Regression tests: `source/game_monitor/tests/game_monitor_bridge.test.js` (4 lifecycle tests); `source/game_monitor/tests/test_game_monitor_bridge_server.py`; paired scenario selection in `source/preparation/tests/test_brush_behavior_test_ui.py`.
+- Workflow [41994624425](https://github.com/Kiddos19882/AutoDraw/actions/runs/41994624425) is the active CI verification for the corrected commit `58ebdda7`.

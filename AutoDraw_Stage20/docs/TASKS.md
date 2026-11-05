@@ -8,7 +8,7 @@
 
 | ID | Приоритет | Статус | Содержание |
 |---|---|---|---|
-| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | MULTI_AXIS_TRANSFORM_CODE_CI_VERIFIED_LIVE_CAPTURE_PENDING_PROFILE_PENDING | Same-run screen bounds + Monitor X fit: IoU=0.998882 / 10 px, no post-hoc shift; one horizontal stroke only; multi-axis/environment validation, profile consumer and executor gate pending |
+| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | HORIZONTAL_PER_RUN_ACCEPTED_MULTI_AXIS_LIVE_PENDING_PROFILE_PENDING | Один horizontal capture прошёл formal per-run capture/transform/renderer gates; три vertical + три diagonal live captures, environment fingerprint, profile consumer and executor gate pending |
 | FILL-001-RS-MATRIX | P0 | BLOCKED | 45 captures только после принятого single-task preflight |
 | GAME-INPUT-SAMPLING-TRACE-001 | P1 | ROI_BOUNDS_ROOT_CAUSE_IDENTIFIED_MULTI_AXIS_CODE_READY_LIVE_CAPTURE_PENDING | Run 16aec62c; 138 accepted points, CHALK=138; ROI included margins; screenshot-derived bounds + Monitor fit IoU=0.998882 / 10 px without post-hoc shift; multi-axis/environment validation pending |
 | BRUSH-FOOTPRINT-CAPSULE-001 | P1 | OPEN | Offline capsule model готова; renderer acceptance/planner integration не выполнены |
@@ -24,6 +24,17 @@
 
 **Уточнение по INT006R (2026-11-05):** измерительная фаза закрыта с geometry-specific limitations. Radius 1 не замыкает D2 polygon; radius 30 сливает короткие детали D4; radius 10 — лучший из трёх проверенных компромиссов для D1–D5. Exact CHALK averages: 67.40 / 67.67 / 67.80 для радиусов 1 / 10 / 30. Это не универсальный выбор радиуса и не тест заливки. INT-006 остаётся IN_PROGRESS только по safety margin и расширенной независимой validation frozen estimator.
 
+
+
+## 2026-11-05 — formal horizontal acceptance and automated paired Bridge telemetry
+
+- [x] Formal per-run gates прошли в CI [41992373137](https://github.com/Kiddos19882/AutoDraw/actions/runs/41992373137); все обязательные jobs SUCCESS, optional benchmarks SKIPPED.
+- [x] Один горизонтальный live capture принят как `PASS_PER_RUN`: IoU=0.998882, precision=0.999106, recall=0.999776, symmetric-difference fraction=0.1118%, bbox edge delta=0 px; artifact `13397839621`.
+- [x] Добавлен агрегатор, требующий три уникальных `PASS_PER_RUN` vertical и три diagonal отчёта; multi-axis series остаётся PENDING.
+- [x] Bridge input telemetry opt-in, restore старого состояния и session/run provenance реализованы; добавлены Node, Python и UI regression tests.
+- [ ] CI telemetry automation: run `41994014564` выявил неправильный JS string assertion; run `41994258815` выявил missing imports (30 passed / 1 failed). Оба исправления входят в `58ebdda7`; rerun [41994624425](https://github.com/Kiddos19882/AutoDraw/actions/runs/41994624425) pending.
+- [ ] Три live captures на чистой доске для каждой новой ориентации vertical и diagonal с input telemetry и full-screen before/after screenshots.
+- [ ] Environment fingerprint/stale invalidation, calibration profile consumer и executor gate остаются заблокированы до multi-axis live/environment acceptance.
 
 ## 2026-11-05 — screenshot-derived BoardPane bounds verification
 

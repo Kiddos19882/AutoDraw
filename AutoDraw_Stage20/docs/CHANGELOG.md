@@ -1248,3 +1248,10 @@
 - Added offline validators for exact capture binding, pointCount/accepted-point consistency, axis-transform tolerances and the predeclared alpha-24 pixel acceptance thresholds.
 - Added a separate series report tool requiring three unique accepted vertical captures and three unique accepted diagonal captures.
 - No production drawing behavior or live experiment was changed.
+
+
+## 2026-11-05 — Bridge telemetry run provenance and CI correction
+
+- Persisted Bridge opt-in telemetry configuration in session/run evidence.
+- Added regression tests for generated snippets, Bridge lifecycle, run provenance and paired UI scenario selection.
+- Fixed test expectation/import issues found by two CI attempts; commit 58ebdda7 is undergoing CI run 41994624425.

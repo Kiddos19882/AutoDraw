@@ -1,11 +1,11 @@
 # Дополнение к дорожной карте — 2026-11-05
 
-## 2026-11-05 — formal per-run renderer acceptance tooling added (CI pending)
+## 2026-11-05 — formal per-run renderer acceptance tooling (CI PASS)
 
 - Added a fail-closed acceptance contract for capture binding, exact pointCount/CHALK, full accepted-point stream, one-stroke integrity, same-run screenshot metadata, per-axis transform tolerances and alpha-24 pixel metrics.
 - Added separate aggregation for three unique accepted vertical runs and three unique accepted diagonal runs. A single horizontal baseline or a per-run PASS cannot complete this series.
 - Added regression tests for complete/incomplete captures, thresholds, transform sources, duplicates and rejected attempts.
-- CI verification is pending. No live vertical/diagonal captures exist yet; no production handoff is enabled.
+- Formal horizontal per-run acceptance passed in CI [41992373137](https://github.com/Kiddos19882/AutoDraw/actions/runs/41992373137). No live vertical/diagonal captures exist yet; no production handoff is enabled.
 
 ## 2026-11-05 — multi-axis transform helper and paired scenarios ready (CI 41976515362)
 

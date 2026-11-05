@@ -1,7 +1,7 @@
 # TEST_RESULTS — единый реестр результатов тестирования AutoDraw
 
 **Статус:** действующий сводный реестр результатов и доказательств  
-**Дата формирования:** 2026-11-04  
+**Дата формирования:** 2026-11-05  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
 **HEAD перед дополнением D1–D5:** `63fdaf3f2a1b12bd90e1a588ca4e968facbe0103`  
 **Область:** AutoDraw_Stage20, тесты приложения, лабораторные эксперименты, Game Monitor/Bridge, CHALK, FILL-001, геометрические модели, GitHub Actions и offline benchmarks.

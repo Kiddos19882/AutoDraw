@@ -1,14 +1,15 @@
 # Актуальная точка продолжения — 2026-11-05
 
-## Текущая точка — multi-axis transform helper и paired UI-сценарии готовы; live validation pending
+## Текущая точка — horizontal renderer baseline PASS_PER_RUN; multi-axis live series pending; Bridge telemetry automation CI pending
 
 **Репозиторий:** `Kiddos19882/AutoDraw`  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
-**Проверенный code/test commit:** `32c6828c69930ee8fe5f22e11a91454425354506`  
-**Последний успешный CI:** [run 41976515362](https://github.com/Kiddos19882/AutoDraw/actions/runs/41976515362), conclusion SUCCESS.  
+**Последний CI-проверенный code/test commit:** `156a5195e2c0fb29bc0cd8d494a5e9b6547ca4ed`
+**Последний успешный CI:** [run 41992373137](https://github.com/Kiddos19882/AutoDraw/actions/runs/41992373137), conclusion SUCCESS.
 **Workflow packaging commit:** `fb853547d74a70582ab1e4731d55763367b8ceb8`, проверен успешным run `41970907209`.  
-**Документационная синхронизация:** `32c6828c69930ee8fe5f22e11a91454425354506`.  
-**Master:** remote HEAD `9a3453aeb847b66041bc83d6f4a56ecaf33a993a`; master не изменялась.  
+**Документационная синхронизация:** `3cd5a3dd0b09818c1f1a198def8babd4d5a01622`.
+**Последний code/test HEAD:** `58ebdda7cf3f07ceef1075020f2808a2782562b7`; CI [41994624425](https://github.com/Kiddos19882/AutoDraw/actions/runs/41994624425) pending.
+**Master:** remote HEAD `9a3453aeb847b66041bc83d6f4a56ecaf33a993a`; master не изменялась.
 **Рабочая копия:** локальный `git status` через GitHub API недоступен.
 
 ### Подтверждённое состояние CI
@@ -52,7 +53,7 @@ Same-run full-screen before/after screenshots обнаружили одну и �
 - Frozen ROI transform at alpha 24: IoU `0.763153`, symmetric difference `2404 px`; live/expected bbox differed by about 2 px in X and Y.
 - Same-run Monitor X fit + screenshot-derived Y bounds, without post-hoc registration: IoU `0.998882`, precision `0.999106`, recall `0.999776`, symmetric difference `10 px`; live/expected bbox совпадает `(21,170,599,15)`.
 - At alpha thresholds 1/64/128 IoU is `0.998771 / 0.998435 / 0.997764`; at 192/254 it falls to `0.931366 / 0.929689`, demonstrating threshold sensitivity to antialiasing/coverage.
-- CI artifact: `autodraw-paired-renderer-png-comparison`, ID `13389883231`; historical report status remains exploratory. New code applies the predeclared thresholds to the independent unshifted comparison and is pending CI verification.
+- Исторический exploratory artifact: `13389883231`. Formal per-run report artifact `13397839621` прошёл capture, transform и alpha24 renderer gates для горизонтального baseline; post-hoc translation не использовался в acceptance.
 
 ### CHALK / brush evidence
 
@@ -1370,3 +1371,12 @@ Planner integration и live renderer validation не выполнялись. Gen
 По пользовательски подтверждённому набору gameEngine/main.min_653f95bc.js / mergeEngine_df2e5bc5.js выполнена полная статическая трассировка цепочки ввода, кадровой выборки, point storage, normal/smooth path construction, Graphics line width, ROUND defaults и Canvas/WebGL backend selection. Детали и blob SHA — в [engine report, раздел 14](CHALK_GAME_ENGINE_POINT_COST_AND_BRUSH_WIDTH_2026-11-03.md#14-полная-трассировка-цепочки-игровой-кисти-и-границы-воспроизведения--2026-11-04).
 
 **Статус:** source trace E1 complete; пользовательский runtime snapshot подтвердил Egret 5.4.1/WebGL и stage→client transform одной сессии. Подтверждены WebGL→CanvasRenderer GraphicsNode raster path, WebGL texture defaults LINEAR min/mag + CLAMP_TO_EDGE + premultiplied alpha, round caps/joins, smooth endpoint omission (`last=false`) и board mask roundRect с corner radius 5 logical px плюс scrollRect 460×240. Для FILL-001 run 6a17a297 offline analysis показал, что идеальный round cap покрывает последнюю принятую точку во всех 27 штрихах; mouseup-to-last-sample остаётся неизвестным. Добавлены analyzer, tests и browser-based Egret CanvasRenderer reference harness. CI run [41901639258](https://github.com/Kiddos19882/AutoDraw/actions/runs/41901639258) проверяет path tests/syntax; browser harness и PNG comparison ещё не выполнялись. Production planner/defaults, live game и CHALK не изменялись.
+
+
+
+### Bridge input telemetry automation — CI pending
+
+- Paired-renderer Bridge opt-in включён только для трёх paired scenarios, если сценарий выбран до запуска Bridge. Обычные Bridge sessions не меняют telemetry.
+- Browser Bridge сохраняет исходное состояние Monitor, включает input telemetry только при необходимости и восстанавливает его при отключении.
+- `bridgeConfiguration` хранится в `session.json`; `bridge_configuration_at_start` — в run JSON.
+- Код: `ce834bd5`; последующие test corrections/provenance: `3c87345a`, `58ebdda7`. Run `41994014564` выявил неверный JS string assertion; `41994258815` выявил missing imports (30 passed / 1 failed). Исправления входят в HEAD `58ebdda7`; run `41994624425` pending.
