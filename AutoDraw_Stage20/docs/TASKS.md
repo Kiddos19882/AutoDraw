@@ -3,7 +3,7 @@
 **Статус:** IN_PROGRESS — harness and saved-run browser automation added; no acceptance result yet.
 
 - [x] Добавлен fail-closed расчёт Stage backing placement из run-bound Stage dimensions, canvas scale и четырёх BoardPane stage corners.
-- [x] Добавлены варианты A/B (WebGL, exact/rounded backing origin) и C/D (Canvas2D, exact/rounded backing origin).
+- [x] Добавлены варианты A/B на фактическом Egret WebGLRenderer (exact/rounded backing origin) и C/D на Canvas2D (exact/rounded backing origin).
 - [x] Добавлено сравнение каждого варианта с A по RGBA pixels и сохранение placement/texture metadata в manifest.
 - [x] Добавлены Node regression tests для exact origin (1022.375, 216), rounding, scale mismatch, non-rectangular corners и out-of-bounds.
 - [x] Headless Edge runner подключён к сохранённым vertical/diagonal Game Monitor reports; новые игровые запуски не требуются.
@@ -11,7 +11,7 @@
 - [ ] Сопоставить Stage A с live before/after captures после отдельного применения Stage CSS transform; сохранить formal metrics без post-hoc alignment.
 - [ ] Только после анализа A–D решить, какая модель соответствует live capture; не менять acceptance thresholds.
 
-**Текущая доказательность:** реализация и тесты присутствуют в исходниках; выполнение Node/browser/CI на новом HEAD пока не подтверждено. Fractional X phase остаётся гипотезой о причине mismatch.
+**Текущая доказательность:** реализация и тесты присутствуют в исходниках; A/B используют Egret WebGLRenderer; выполнение Node/browser/CI на новом HEAD пока не подтверждено. Fractional X phase остаётся гипотезой о причине mismatch.
 
 ## 2026-11-06 — formal same-run multi-axis replay: horizontal PASS, vertical/diagonal REJECTED
 
