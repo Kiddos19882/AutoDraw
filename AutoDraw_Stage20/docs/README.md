@@ -67,7 +67,7 @@
 - [INT-006 — результаты live-матрицы V1–V5](CHALK_INT006_V1_V5_RESULTS_2026-11-02.md) — 45/45 captures, exact/per-stroke CHALK, сравнение sampling profiles, первичная holdout-проверка модели и открытые quality gates.
 - [INT-006 — результаты follow-up V1–V5](CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md) — 45/45 новых captures после исправления геометрии/сценариев, raw repeat CHALK, сравнение P0/P1/P2 и следующие pixel-level/validation gates.
 - [INT006R — live results](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md) — 45 captures D1–D5 × radius 1/10/30, exact CHALK и raw-data integrity audit; ручной visual audit завершён; ограничения D2/radius=1 и D4/radius=30 зафиксированы в отдельном отчёте.
-- [Игровой движок — стоимость точки, ширина кисти и source trace](CHALK_GAME_ENGINE_POINT_COST_AND_BRUSH_WIDTH_2026-11-03.md) — точный CHALK counter, статическая трассировка и runtime renderer evidence (разделы 14–15); offline Egret CanvasRenderer↔WebGL reference PASS 20/20 (6 exact, 14 max channel delta=1), zero-length lineTo не создаёт visible alpha; paired live game PNG equivalence ещё не подтверждена.
+- [Игровой движок — стоимость точки, ширина кисти и source trace](CHALK_GAME_ENGINE_POINT_COST_AND_BRUSH_WIDTH_2026-11-03.md) — точный CHALK counter, статическая трассировка и runtime renderer evidence (разделы 14–15); offline Egret CanvasRenderer↔WebGL reference PASS 20/20 (6 exact, 14 max channel delta=1), zero-length lineTo не создаёт visible alpha. По formal paired replay CI 42113632374 горизонталь получила PASS_PER_RUN, вертикаль и диагональ — REJECTED_PER_RUN; полная multi-axis эквивалентность live renderer не подтверждена. Текущая причина исследуется отдельно в Stage-level compositor audit в [PROJECT_STATUS.md](PROJECT_STATUS.md).
 - [Runtime renderer snapshot 2026-11-04](../data/runtime/renderer_snapshot_2026-11-04.json) — пользовательский JSON, подтверждающий WebGL backend, stage/canvas scale и BoardPane transform для одной игровой сессии.
 - [FILL-001 smooth endpoint analysis](../data/results/brush_behavior_tests/fill001/endpoint-analysis-6a17a297.json) — анализ accepted point spacing и идеального round-cap покрытия последней принятой точки в run 6a17a297.
 - [Исторический снимок PROJECT_STATUS](PROJECT_STATUS_HISTORY_2026-11-02.md) — полный статус до консолидации 2 ноября; только для аудита, не текущий backlog.
@@ -137,7 +137,7 @@
 - [PROJECT_DOCUMENTATION.md](../PROJECT_DOCUMENTATION.md) — накопленная документация Stage20; архив, не расширять параллельно с docs.
 - [PROJECT_ANALYSIS_PLAN_10_STAGES.md](../PROJECT_ANALYSIS_PLAN_10_STAGES.md) — архивный аналитический план; этапы 7–10 отменены.
 - [source/game_monitor/README.md](../source/game_monitor/README.md) — документация Game Monitor.
-- [tests/game_renderer_reference.html](../tests/game_renderer_reference.html) — offline Egret CanvasRenderer source-raster harness; masked composite является approximation, не WebGL equivalence.
+- [tests/game_renderer_reference.html](../tests/game_renderer_reference.html) — offline harness создаёт настоящий BoardPane GraphicsNode, проверяет CanvasRenderer source raster и отдельный offscreen Egret WebGL probe. Canvas2D masked composite — вспомогательная композиция; harness пока не воспроизводит размещение BoardPane texture внутри полного Stage backing canvas и последующий live screen transform. Это ограничение описано в [PROJECT_STATUS.md](PROJECT_STATUS.md) и [ROADMAP.md](ROADMAP.md).
 
 ## Приоритет источников
 
