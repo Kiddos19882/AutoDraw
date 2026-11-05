@@ -164,15 +164,6 @@
     return {canvas,placement:p};
   }
 
-  function compileStageShader(gl,type,source) {
-    const shader=gl.createShader(type);
-    gl.shaderSource(shader,source); gl.compileShader(shader);
-    if (!gl.getShaderParameter(shader,gl.COMPILE_STATUS)) {
-      const message=gl.getShaderInfoLog(shader)||"unknown shader compile error";
-      gl.deleteShader(shader); throw new Error("Stage WebGL shader compile failed: "+message);
-    }
-    return shader;
-  }
 
   function renderStageWebGL(mode, points, lineWidth, profile, roundOrigin, state) {
     const placement = buildStagePlacement(profile, roundOrigin);
@@ -860,7 +851,8 @@
             stageLevelCompositor: stageLevelVariants.map(variant => ({
               id: variant.id, backend: variant.backend, placement: variant.placement,
               textureParameters: variant.textureParameters, contextAttributes: variant.contextAttributes,
-              comparisonToA: variant.comparisonToA
+              sceneDiagnostics: variant.sceneDiagnostics, drawCalls: variant.drawCalls,
+              rendererBackend: variant.rendererBackend, comparisonToA: variant.comparisonToA
             })),
             nodeBounds: source.nodeBounds,
             sourceTextureSize: source.skippedByWebGLRenderer
