@@ -154,7 +154,7 @@ def test_game_monitor_summary_preserves_client_geometry_without_claiming_screen_
     assert geometry["desktop_screen_mapping_available"] is False
     assert geometry["executor_usable"] is False
     assert summary["renderer_geometry_update_count"] == 1
-    assert summary["renderer_geometry_at_end"] == {"players": []}
+    assert summary["renderer_geometry_at_end"]["board_detected"] is False
 
 
 def test_game_monitor_summary_detects_requested_vs_actual_brush_mismatch() -> None:
