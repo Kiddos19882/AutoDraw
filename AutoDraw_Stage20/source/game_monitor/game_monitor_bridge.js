@@ -21,6 +21,7 @@
   let geometryUpdateTimer = null;
   let lastRendererGeometryFingerprint = null;
   let geometryListenersInstalled = false;
+  let geometryHandlers = null;
 
   const readRendererGeometry = () => {
     if (typeof monitor.inspect !== "function") return null;
@@ -43,7 +44,7 @@
   };
 
   const scheduleRendererGeometryRefresh = reason => {
-    if (geometryUpdateTimer !== null) return;
+    if (!connected || geometryUpdateTimer !== null) return;
     geometryUpdateTimer = setTimeout(() => {
       geometryUpdateTimer = null;
       publishRendererGeometry(reason);
@@ -53,14 +54,36 @@
   const installGeometryListeners = () => {
     if (geometryListenersInstalled) return;
     geometryListenersInstalled = true;
-    window.addEventListener("resize", () => scheduleRendererGeometryRefresh("window_resize"), true);
-    window.addEventListener("scroll", () => scheduleRendererGeometryRefresh("window_scroll"), true);
-    window.addEventListener("orientationchange", () => scheduleRendererGeometryRefresh("orientation_change"), true);
-    document.addEventListener("fullscreenchange", () => scheduleRendererGeometryRefresh("fullscreen_change"), true);
+    geometryHandlers = {
+      resize: () => scheduleRendererGeometryRefresh("window_resize"),
+      scroll: () => scheduleRendererGeometryRefresh("window_scroll"),
+      orientation: () => scheduleRendererGeometryRefresh("orientation_change"),
+      fullscreen: () => scheduleRendererGeometryRefresh("fullscreen_change"),
+      viewportResize: () => scheduleRendererGeometryRefresh("visual_viewport_resize"),
+      viewportScroll: () => scheduleRendererGeometryRefresh("visual_viewport_scroll")
+    };
+    window.addEventListener("resize", geometryHandlers.resize, true);
+    window.addEventListener("scroll", geometryHandlers.scroll, true);
+    window.addEventListener("orientationchange", geometryHandlers.orientation, true);
+    document.addEventListener("fullscreenchange", geometryHandlers.fullscreen, true);
     if (window.visualViewport && typeof window.visualViewport.addEventListener === "function") {
-      window.visualViewport.addEventListener("resize", () => scheduleRendererGeometryRefresh("visual_viewport_resize"));
-      window.visualViewport.addEventListener("scroll", () => scheduleRendererGeometryRefresh("visual_viewport_scroll"));
+      window.visualViewport.addEventListener("resize", geometryHandlers.viewportResize);
+      window.visualViewport.addEventListener("scroll", geometryHandlers.viewportScroll);
     }
+  };
+
+  const removeGeometryListeners = () => {
+    if (!geometryListenersInstalled || !geometryHandlers) return;
+    window.removeEventListener("resize", geometryHandlers.resize, true);
+    window.removeEventListener("scroll", geometryHandlers.scroll, true);
+    window.removeEventListener("orientationchange", geometryHandlers.orientation, true);
+    document.removeEventListener("fullscreenchange", geometryHandlers.fullscreen, true);
+    if (window.visualViewport && typeof window.visualViewport.removeEventListener === "function") {
+      window.visualViewport.removeEventListener("resize", geometryHandlers.viewportResize);
+      window.visualViewport.removeEventListener("scroll", geometryHandlers.viewportScroll);
+    }
+    geometryHandlers = null;
+    geometryListenersInstalled = false;
   };
   let connected = false;
   let unsubscribe = null;
@@ -178,6 +201,7 @@
   socket.addEventListener("close", event => {
     connected = false;
     if (unsubscribe) unsubscribe();
+    removeGeometryListeners();
     if (heartbeatTimer !== null) clearInterval(heartbeatTimer);
     if (geometryUpdateTimer !== null) clearTimeout(geometryUpdateTimer);
     if (rafHandle !== null) cancelAnimationFrame(rafHandle);
