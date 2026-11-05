@@ -587,3 +587,33 @@ def derive_live_board_screen_transform(
         "matrix_source_raster_to_roi": matrix,
         "source_raster_scale": 3,
     }
+
+def build_browser_compositor_transform(geometry: dict[str, Any]) -> dict[str, Any]:
+    """Build compositor origin and scale only from the independent board transform.
+
+    Inspect CSS values remain cross-check evidence and are deliberately not used
+    for formal overlay placement.
+    """
+    if not isinstance(geometry, dict):
+        raise RendererGeometryError("Independent geometry must be an object.")
+    board = geometry.get("board_to_screen")
+    if not isinstance(board, dict):
+        raise RendererGeometryError("Independent board_to_screen transform is missing.")
+    raster_scale = _finite(geometry.get("source_raster_scale"), "source_raster_scale")
+    if raster_scale <= 0:
+        raise RendererGeometryError("source_raster_scale must be positive.")
+    origin_x = _finite(board.get("origin_x"), "board_to_screen.origin_x")
+    origin_y = _finite(board.get("origin_y"), "board_to_screen.origin_y")
+    scale_x = _finite(board.get("scale_x"), "board_to_screen.scale_x")
+    scale_y = _finite(board.get("scale_y"), "board_to_screen.scale_y")
+    if scale_x <= 0 or scale_y <= 0:
+        raise RendererGeometryError("Independent board-to-screen scales must be positive.")
+    return {
+        "source": "independent_board_to_screen",
+        "source_raster_scale": raster_scale,
+        "board_origin_screen_px": {"x": origin_x, "y": origin_y},
+        "css_matrix": {
+            "a": scale_x / raster_scale, "b": 0.0, "c": 0.0,
+            "d": scale_y / raster_scale, "tx": 0.0, "ty": 0.0,
+        },
+    }

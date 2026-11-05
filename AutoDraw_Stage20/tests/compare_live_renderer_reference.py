@@ -20,7 +20,14 @@ from typing import Any
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "source" / "preparation"))
-from renderer_geometry import (RendererGeometryError, build_same_run_geometry_audit_input, crop_mask_to_board_bounds, detect_board_bounds_from_screenshots, derive_live_board_screen_transform)
+from renderer_geometry import (
+    RendererGeometryError,
+    build_browser_compositor_transform,
+    build_same_run_geometry_audit_input,
+    crop_mask_to_board_bounds,
+    detect_board_bounds_from_screenshots,
+    derive_live_board_screen_transform,
+)
 from renderer_acceptance import (
     EXPECTED_PAIRED_AXIS_SOURCES,
     evaluate_per_run_acceptance,
@@ -181,12 +188,11 @@ def render_browser_css_composite(
     expected_user_agent: str,
     output_dir: Path,
 ) -> dict[str, Any]:
-    """Composite the offline BoardPane raster in the same Firefox engine as live.
+    """Composite the offline raster using the independently derived board mapping.
 
-    The offline raster is first drawn into a transparent HTML canvas. Firefox
-    then applies the inspected live canvas CSS matrix to that canvas. The browser
-    major version must match the UA recorded by the same-session renderer harness.
-    No image registration, translation search, or pixel-fit is used.
+    The origin and axis scales are supplied from ``board_to_screen``. Inspect CSS
+    geometry is only a cross-check and is not used to place the formal overlay.
+    Firefox reproduces browser rasterization without post-hoc image fitting.
     """
     width, height = screen_size
     firefox = _find_firefox_executable()
@@ -530,24 +536,27 @@ def main() -> int:
         monitor_fit_axes = [axis.upper() for axis, source in geometry["axis_sources"].items() if source == "same_run_monitor_fit"]
         screenshot_bounds_axes = [axis.upper() for axis, source in geometry["axis_sources"].items() if source == "same_run_full_screen_board_bounds"]
         inspect_fallback_axes = [axis.upper() for axis, source in geometry["axis_sources"].items() if source == "inspect_css_transform_unfitted_axis"]
-        # Formal screen comparison uses the same-run CSS transform and Edge's
-        # compositor. OpenCV affine resampling remains a separate diagnostic.
+        # Formal browser compositing receives the independent board_to_screen
+        # origin and per-axis scale. OpenCV affine resampling remains diagnostic.
+        browser_transform = build_browser_compositor_transform(geometry)
         matrix_independent = np.asarray(geometry["matrix_source_raster_to_roi"], dtype=np.float32)
         alpha_opencv = cv2.warpAffine(
             offline[:, :, 3], matrix_independent, (live.shape[1], live.shape[0]),
             flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT, borderValue=0,
         )
         opencv_independent_results = {}
-        css_matrix = geometry_evidence["renderer"]["canvas"]["css_matrix"]
         browser_composite = render_browser_css_composite(
             screen_before_path,
             args.offline_png,
             (int(screen["width"]), int(screen["height"])),
-            geometry["inspect_origin"],
-            css_matrix,
+            browser_transform["board_origin_screen_px"],
+            browser_transform["css_matrix"],
             manifest.get("browser", {}).get("userAgent", ""),
             args.output_dir,
         )
+        browser_composite["diagnostics"]["transform_source"] = browser_transform["source"]
+        browser_composite["diagnostics"]["source_raster_scale"] = browser_transform["source_raster_scale"]
+        browser_composite["diagnostics"]["independent_board_to_screen"] = geometry["board_to_screen"]
         roi_x, roi_y = int(roi["x"]), int(roi["y"])
         roi_width, roi_height = int(roi["width"]), int(roi["height"])
         observed_full_screen = (
@@ -698,7 +707,7 @@ def main() -> int:
         report["offline_renderer"] = independent_report["offline_renderer"]
         report["limitations"] = [
             "Frozen plan transform metrics are retained only in diagnostic_frozen_plan_comparison.",
-            "Formal acceptance uses same-run inspected CSS matrix through Edge's CSS compositor over the exact before-draw full-screen capture; no post-hoc registration is applied.",
+            "Formal acceptance uses the independently derived same-run board_to_screen origin and scale through Firefox's CSS compositor over the exact before-draw full-screen capture; inspect CSS values are cross-checks only.",
             "OpenCV INTER_LINEAR affine resampling is retained only as a diagnostic and is not the formal screen rasterization reference.",
             "The offline BoardPane uses the manifest logical board dimensions and raster scale; manifest runtimeProfile metadata is not used for live screen alignment.",
             "No post-hoc translation or image registration is applied to the formal comparison.",

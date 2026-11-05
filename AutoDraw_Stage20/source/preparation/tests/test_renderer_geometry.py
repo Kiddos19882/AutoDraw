@@ -342,3 +342,40 @@ def test_board_renderer_comparison_crops_roi_local_diagnostic_mask():
     assert board_mask.shape == (351, 672)
     assert int(board_mask.sum()) == 255 * 672 * 351
     assert int(outside_roi_mask.sum()) == 0
+
+def test_browser_compositor_transform_uses_independent_board_to_screen_not_inspect_css():
+    from renderer_geometry import build_browser_compositor_transform
+
+    points = [(230, 20 + index * 5) for index in range(40)]
+    geometry = derive_live_board_screen_transform(
+        _axis_report(points), evidence(),
+        {"x": 496, "y": 265, "width": 674, "height": 355}, (1920, 1080),
+        screenshot_board_bounds={"x": 498, "y": 268, "width": 672, "height": 351},
+    )
+    compositor = build_browser_compositor_transform(geometry)
+
+    assert compositor["source"] == "independent_board_to_screen"
+    assert compositor["source_raster_scale"] == 3
+    assert compositor["board_origin_screen_px"]["x"] == pytest.approx(498)
+    assert compositor["board_origin_screen_px"]["y"] == pytest.approx(268)
+    assert compositor["css_matrix"]["a"] == pytest.approx((672 / 460) / 3)
+    assert compositor["css_matrix"]["b"] == 0.0
+    assert compositor["css_matrix"]["c"] == 0.0
+    assert compositor["css_matrix"]["d"] == pytest.approx((351 / 240) / 3)
+    assert compositor["css_matrix"]["tx"] == 0.0
+    assert compositor["css_matrix"]["ty"] == 0.0
+    assert compositor["board_origin_screen_px"]["x"] != pytest.approx(geometry["inspect_origin"]["x"])
+    assert compositor["css_matrix"]["a"] != pytest.approx(evidence()["renderer"]["canvas"]["css_matrix"]["a"])
+
+
+@pytest.mark.parametrize("geometry", [
+    {},
+    {"board_to_screen": {}, "source_raster_scale": 3},
+    {"board_to_screen": {"origin_x": 1, "origin_y": 2, "scale_x": 0, "scale_y": 1}, "source_raster_scale": 3},
+    {"board_to_screen": {"origin_x": 1, "origin_y": 2, "scale_x": 1, "scale_y": 1}, "source_raster_scale": 0},
+])
+def test_browser_compositor_transform_rejects_incomplete_or_invalid_geometry(geometry):
+    from renderer_geometry import build_browser_compositor_transform
+
+    with pytest.raises(RendererGeometryError):
+        build_browser_compositor_transform(geometry)
