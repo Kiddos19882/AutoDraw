@@ -1,49 +1,41 @@
 # Актуальная точка продолжения — 2026-11-05
 
-## Текущая точка — offline replay создан; live PNG comparison остаётся открытым
+## Текущая точка — exploratory live/offline comparison выполнен; transform root cause открыт
 
 **Branch:** feature/image-geometry-optimization  
-**Пользовательский data commit:** 02ebab89733559421edbb151e7931ed3fecf30c0.  
-**Последний source/test commit:** 9a2de6e350c263c755cf62283fda14882f31157c; последующие commits до 02ebab8 содержат документацию и экспериментальные данные.  
-**Документационная синхронизация после data commit:** commits 898e0b8, 0bc4246, 6b240a6, 7d9e652, a002df0; эта запись уточняет статус capture.  
-**Последний пользовательский data commit:** [02ebab8](https://github.com/Kiddos19882/AutoDraw/commit/02ebab89733559421edbb151e7931ed3fecf30c0).  
-**Сценарий:** paired_renderer_single_stroke; logical board 460×240; один штрих (20,120) → (420,120); requested/observed radius=10; executor step=2 screen px, delay=10 ms, line extension=0; renderer replay profile smooth / line width 10.
+**HEAD при проверке:** 2c31cb350ba7390ee7da35a9a0f515432b0d5b19 (test: report diagnostic renderer alignment offset).  
+**Последние 20 commits:** проверены; последние изменения — paired renderer comparison/test fixtures и диагностический translation report.  
+**Локальный git status:** недоступен через GitHub API; чистота локальной рабочей копии не подтверждена.  
+**Последний полный известный CI:** run 41954783317 — все обязательные jobs SUCCESS, optional algorithm benchmarks SKIPPED. Combined status непосредственно на HEAD 2c31cb3 пуст; этот CI нельзя автоматически приписывать HEAD.
 
-### Результат live capture
+### Принятый live capture и offline replay
 
-**Принятый run:** 16aec62c-9e54-44e7-8691-9df79b19161d; session d357b6ee-5617-4e07-9011-7eba7ccb6c0f; experiment d47cc0a5520044c7abfd0352a4f93ca8.
+Run 16aec62c-9e54-44e7-8691-9df79b19161d, session d357b6ee-5617-4e07-9011-7eba7ccb6c0f, experiment d47cc0a5520044c7abfd0352a4f93ca8: один stroke, 138 accepted points, каждый положительный update имеет pointDelta=1 и acceptedPoint; pointCount 1→139, точный CHALK=138. Bridge telemetry без drops/errors/send failures/sequence gaps. Raw capture пригоден для replay; агрегированное trajectory.status=incomplete_until_verified остаётся summary metadata inconsistency.
 
-- Executor: completed, 1/1 stroke, 294 move calls, 9.766 s, без execution error; фактический executor profile совпадает с планом.
-- Game Monitor: один положительный strokeId pointer-stroke-5; 138 POINT_QUOTA_UPDATE; все 138 имеют pointDelta=1 и acceptedPoint с конечными координатами; missing acceptedPoint=0; delta histogram={1:138}.
-- Координаты принятых точек идут монотонно по X от 18.2083 до 419.2083, Y=119; 138 accepted points. Сумма pointDelta и число acceptedPoint совпадают с точным CHALK.
-- Точный ресурс: pointCount 1 → 139; CHALK=138; maxPoints=6000. Не использовать 294 move calls как расход.
-- Bridge/session: input telemetry enabled; 0 dropped events, 0 monitor errors, 0 send failures, 0 collector sequence gaps. Frame probe: 279 frames, average 59.978 FPS, visibility interruption=false.
-- Итоговый board PNG `after_draw-board.png` имеет размер 674×355 и содержит один горизонтальный штрих. Из `experiment.json`: обнаруженная область изменения `x=18, y=166, width=609, height=23`, `changed_pixels_in_roi=8947`; это результат визуального ROI-анализа, не сравнение с offline renderer.
-- Другие raw runs той же session — неуспешные pointer candidates без point consumption (radius 30) либо восстановление кисти; они не входят в принятый run.
+Offline actual BoardPane / manual path и Canvas2D/WebGL comparisons внутри harness — exact, 0 differing pixels. Это внутреннее offline соответствие, не доказательство live equivalence.
 
-**Replay gate:** raw event-level checks удовлетворяют валидатору tests/game_renderer_reference.js: ровно один идентифицированный strokeId, каждое положительное POINT_QUOTA_UPDATE имеет pointDelta=1 и acceptedPoint. Run пригоден для импорта в offline renderer. Поле агрегированной сводки trajectory.status=incomplete_until_verified противоречит фактической проверке raw events и сопровождается общим примечанием про coalescing; для данного run это поле не подтверждается histogram событий и не должно блокировать replay. Зафиксировать как несогласованность summary metadata, не исправлять raw evidence.
+### Live/offline pixel comparison
 
-### Результат offline renderer replay
+## 2026-11-05 — exploratory live/offline renderer comparison and transform audit
 
-- В `data/renderer_result/` сохранены `live-accepted-points-width-10-source-reference.png` (1392×732), `live-accepted-points-width-10-masked-board-reference.png` (1380×720), `live-accepted-points-width-10-webgl-board-reference.png` (1380×720) и `egret-5.4.1-renderer-reference-manifest.json`.
-- Manifest связывает fixture `live-accepted-points` с тем же `sourceRunId=16aec62c-9e54-44e7-8691-9df79b19161d`, mode `smooth`, lineWidth=10 и 138 accepted points. Actual BoardPane CanvasRenderer и manual transcription совпали; Egret WebGLRenderer и Canvas2D masked-board output совпали: `equal=true`, `differingPixels=0`, `maxChannelDifference=0`.
-- Эти нулевые diff относятся к внутренним сравнениям offline harness. Сравнение offline PNG с live `after_draw-board.png` ещё не выполнено.
+**Experiment:** d47cc0a5520044c7abfd0352a4f93ca8; **run:** 16aec62c-9e54-44e7-8691-9df79b19161d; **session:** d357b6ee-5617-4e07-9011-7eba7ccb6c0f. Raw capture and offline renderer inputs remain immutable.
 
-### Оставшиеся ограничения
+### Quantitative comparison (exploratory; no acceptance threshold)
 
-- Live pixel comparison остаётся PENDING. Нельзя переносить внутренний WebGL-vs-Canvas PASS на эквивалентность с реальным screenshot.
-- План фиксирует screen ROI 674×355, `scale_x=1.4630434782608697`, `scale_y=1.475`, inclusive logical bounds 460×240. Это transform данного paired plan, а не прямое измерение client corners из `inspect()`.
-- В `experiment.json` зафиксированы `changed_pixels_in_roi=8947` в ROI x=18,y=166,w=609,h=23. Положение/размер видимого следа визуально согласуются с offline path, но без количественного pixel diff это только согласованность, не renderer acceptance.
-- `inspect()` snapshot не приложен к live session 05.11. Runtime profile manifest ссылается на snapshot 04.11; не считать его per-run inspect evidence.
-- FILL-001-RS 45-cell matrix остаётся BLOCKED до закрытия renderer/footprint gate.
+- Frozen, unshifted mapping at alpha threshold 24: live changed mask 8,946 px; offline expected mask 8,950 px; TP=7,746, FP=1,200, FN=1,204; symmetric difference=2,404 px; IoU=0.763153; precision=0.865862; recall=0.865475; F1=0.865668.
+- Post-hoc diagnostic search over translations ±5 px found best translation of the expected mask (+1,+2): TP=8,943, FP=3, FN=7; symmetric difference=10 px; IoU=0.998883; precision=0.999665; recall=0.999218; F1=0.999441.
+- The second result is a fit against this same image pair. It is evidence that the footprints are highly similar after translation, but it is not an independently derived coordinate correction, does not establish the cause of the offset and is not acceptance. Do not apply (+1,+2) to production or frozen plans.
 
-**Следующий шаг:** выполнить независимое pixel-level сравнение `after_draw-board.png` с offline WebGL PNG после применения screen ROI transform и baseline/alpha normalization; сохранить hashes, crop/resize method, threshold, IoU/precision/recall, symmetric difference и координаты residuals. Повторный live stroke не нужен.
+### Independent geometric audit of the frozen plan
 
-**CI:** combined status для data/manifest commit `ad03a0b` и документационного commit `40f1603` пуст (`statuses=[]`); CI PASS для этих commits не подтверждён. Последний полный CI run `41933396072` завершился SUCCESS на более раннем source/test HEAD `f6df3f9`; новые commits содержат data/manifest и документацию, не исходники/тесты. Локальный запуск и `git status` недоступны через GitHub API.
+- The paired plan uses ROI (496,265,674,355), logical board 460×240 and pixel-center scales scale_x=(674-1)/460=1.4630434783, scale_y=(355-1)/240=1.475.
+- Relative X/Y scale discrepancy is 0.8106%, just inside the transform helper's 1% tolerance. However, the logical aspect ratio is 1.916667 while ROI aspect ratio is 1.898592. If the ROI were a uniform-scale rectangle, a 355 px height would correspond to about 680.21 px width, approximately 6.21 px wider than the selected 674 px ROI.
+- The ROI coordinates come from the configured screen calibration/blank-board crop. The 2026-11-04 runtime snapshot has boardClientCorners=null and belongs to a different session; it cannot independently validate the live 2026-11-05 crop origin or client-space corners.
+- This establishes a measurable geometric inconsistency in the selected ROI dimensions, not the root cause of the (+1,+2) residual. Candidate causes (ROI edge/crop convention, pixel-center versus board-boundary mapping, resampling, antialiasing, baseline drift and color handling) remain unseparated.
 
-**Git:** пользовательский data commit 02ebab8 и документационные обновления находятся в feature/image-geometry-optimization; master не изменялась. Сравнение с последним ранее проверенным master commit 9a3453a показывает diverged; это compare snapshot, не локальный git status.
+**Status:** comparison analyzed as exploratory; live/offline renderer equivalence and transform root cause remain NOT ACCEPTED / OPEN. FILL-001-RS 45-cell matrix remains BLOCKED. No live experiment was run during this continuation; no production planner, renderer, executor, CHALK estimator, frozen plan or raw evidence was changed.
 
-
+**Next offline action:** derive board bounds and crop origin independently from the same-session after_draw-screen.png (and before/blank reference), compare them with the calibrated ROI, then evaluate the existing frozen pixel-center/boundary mapping and a uniform-scale transform from independently measured edges. Keep the current frozen transform and post-hoc diagnostic separate; define acceptance criteria before any confirmatory comparison.
 ---
 
 ## Дополнение — проверен zero-length lineTo segment в Egret 5.4.1 (2026-11-04)
