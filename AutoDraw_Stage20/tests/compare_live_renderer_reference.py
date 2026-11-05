@@ -11,6 +11,7 @@ import hashlib
 import html
 import json
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -101,16 +102,16 @@ def mask_metrics(observed: np.ndarray, expected: np.ndarray) -> dict[str, Any]:
 
 
 
-def _find_edge_executable() -> Path:
+def _find_firefox_executable() -> Path:
     candidates = [
-        shutil.which("msedge"),
-        Path(os.environ.get("ProgramFiles(x86)", "")) / "Microsoft/Edge/Application/msedge.exe",
-        Path(os.environ.get("ProgramFiles", "")) / "Microsoft/Edge/Application/msedge.exe",
+        shutil.which("firefox"),
+        Path(os.environ.get("ProgramFiles", "")) / "Mozilla Firefox/firefox.exe",
+        Path(os.environ.get("ProgramFiles(x86)", "")) / "Mozilla Firefox/firefox.exe",
     ]
     for candidate in candidates:
         if candidate and Path(candidate).is_file():
             return Path(candidate)
-    raise FileNotFoundError("Microsoft Edge is required for same-run CSS compositor replay.")
+    raise FileNotFoundError("Firefox is required to reproduce the live browser's CSS compositor.")
 
 
 def _browser_composite_html(
@@ -120,32 +121,52 @@ def _browser_composite_html(
     board_origin: dict[str, float],
     css_matrix: dict[str, float],
 ) -> str:
+    """Build the same-browser canvas overlay used by the live WebGL canvas."""
     width, height = screen_size
     baseline_uri = html.escape(baseline_png.resolve().as_uri(), quote=True)
     overlay = ""
+    overlay_image = ""
     if offline_png is not None:
         overlay_uri = html.escape(offline_png.resolve().as_uri(), quote=True)
         left = float(board_origin["x"])
         top = float(board_origin["y"])
         a, b, c, d, tx, ty = (float(css_matrix[key]) for key in ("a", "b", "c", "d", "tx", "ty"))
         overlay = (
-            f'<img id="board-overlay" alt="" src="{overlay_uri}" '
+            f'<canvas id="board-overlay" width="1380" height="720" '
             f'style="left:{left:.12f}px;top:{top:.12f}px;'
-            f'transform:matrix({a:.15g},{b:.15g},{c:.15g},{d:.15g},{tx:.15g},{ty:.15g});">'
+            f'transform:matrix({a:.15g},{b:.15g},{c:.15g},{d:.15g},{tx:.15g},{ty:.15g});"></canvas>'
         )
+        overlay_image = f'<img id="offline-source" alt="" src="{overlay_uri}" hidden>'
     return f"""<!doctype html>
 <html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <style>
 html,body {{ margin:0;padding:0;width:{width}px;height:{height}px;overflow:hidden;background:#000; }}
-img {{ position:absolute;display:block;margin:0;padding:0;border:0;max-width:none;max-height:none;object-fit:fill; }}
+img {{ position:absolute;display:block;margin:0;padding:0;border:0;max-width:none;max-height:none; }}
 #baseline {{ left:0;top:0;width:{width}px;height:{height}px; }}
-#board-overlay {{ width:1380px;height:720px;transform-origin:0 0;image-rendering:auto; }}
+#offline-source {{ display:none; }}
+#board-overlay {{ position:absolute;display:block;width:1380px;height:720px;'
+  'transform-origin:0 0;image-rendering:auto; }}
 </style></head><body>
 <img id="baseline" alt="" src="{baseline_uri}">
+{overlay_image}
 {overlay}
 <script>
-Promise.all(Array.from(document.images).map(image => image.decode()))
+const baseline = document.getElementById("baseline");
+const offlineSource = document.getElementById("offline-source");
+const tasks = [baseline.decode()];
+if (offlineSource) {{
+  tasks.push(offlineSource.decode().then(() => {{
+    const canvas = document.getElementById("board-overlay");
+    const context = canvas.getContext("2d", {{ alpha: true }});
+    if (!context) throw new Error("Canvas2D overlay context unavailable.");
+    context.imageSmoothingEnabled = true;
+    context.imageSmoothingQuality = "high";
+    context.drawImage(offlineSource, 0, 0, 1380, 720);
+  }}));
+}}
+Promise.all(tasks)
+  .then(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))))
   .then(() => {{ document.documentElement.dataset.ready = "true"; }})
   .catch(error => {{ document.documentElement.dataset.error = String(error); }});
 </script>
@@ -158,21 +179,41 @@ def render_browser_css_composite(
     screen_size: tuple[int, int],
     board_origin: dict[str, float],
     css_matrix: dict[str, float],
+    expected_user_agent: str,
     output_dir: Path,
 ) -> dict[str, Any]:
-    """Composite the exact offline BoardPane raster using Edge's CSS compositor.
+    """Composite the offline BoardPane raster in the same Firefox engine as live.
 
-    The baseline capture is displayed 1:1. The offline PNG is then positioned at
-    the same-run BoardPane screen origin and transformed by the inspected canvas
-    CSS matrix. No image registration, translation search, or pixel-fit is used.
+    The offline raster is first drawn into a transparent HTML canvas. Firefox
+    then applies the inspected live canvas CSS matrix to that canvas. The browser
+    major version must match the UA recorded by the same-session renderer harness.
+    No image registration, translation search, or pixel-fit is used.
     """
     width, height = screen_size
-    edge = _find_edge_executable()
+    firefox = _find_firefox_executable()
+    expected_match = re.search(r"Firefox/([0-9]+(?:\\.[0-9]+)*)", expected_user_agent or "")
+    if not expected_match:
+        raise RuntimeError("Same-run renderer manifest does not identify Firefox; refusing cross-browser compositing.")
+    expected_version = expected_match.group(1)
+    version_result = subprocess.run([str(firefox), "--version"], capture_output=True, text=True, timeout=20, check=False)
+    version_text = (version_result.stdout + " " + version_result.stderr).strip()
+    actual_match = re.search(r"Firefox\\s+([0-9]+(?:\\.[0-9]+)*)", version_text)
+    if version_result.returncode != 0 or not actual_match:
+        raise RuntimeError(f"Unable to determine Firefox version: {version_text}")
+    actual_version = actual_match.group(1)
+    expected_major = expected_version.split(".", 1)[0]
+    actual_major = actual_version.split(".", 1)[0]
+    if actual_major != expected_major:
+        raise RuntimeError(
+            f"Firefox major version mismatch: live manifest={expected_version}, CI browser={actual_version}."
+        )
     output_dir.mkdir(parents=True, exist_ok=True)
     browser_dir = output_dir / "browser-css-composite"
     browser_dir.mkdir(parents=True, exist_ok=True)
     results: dict[str, Any] = {
-        "method": "edge_headless_css_compositor",
+        "method": "firefox_headless_canvas_compositor",
+        "browser": {"name": "Firefox", "version": actual_version, "expected_user_agent": expected_user_agent,
+                    "expected_version": expected_version, "major_version_match": True},
         "screen_size": {"width": width, "height": height},
         "board_origin_screen_px": board_origin,
         "css_matrix": css_matrix,
@@ -189,14 +230,15 @@ def render_browser_css_composite(
             encoding="utf-8",
         )
         profile = browser_dir / f"profile-{name}"
+        profile.mkdir(parents=True, exist_ok=True)
         command = [
-            str(edge), "--headless", "--enable-webgl", "--use-gl=angle", "--use-angle=swiftshader",
-            "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist", "--hide-scrollbars",
-            "--force-device-scale-factor=1", f"--window-size={width},{height}",
-            "--virtual-time-budget=2500", "--run-all-compositor-stages-before-draw",
-            f"--user-data-dir={profile}", f"--screenshot={screenshot_path}", html_path.resolve().as_uri(),
+            str(firefox), "--headless", "--no-remote", "--profile", str(profile),
+            "--window-size", f"{width},{height}", "--screenshot", str(screenshot_path),
+            html_path.resolve().as_uri(),
         ]
-        completed = subprocess.run(command, capture_output=True, text=True, timeout=90, check=False)
+        browser_env = os.environ.copy()
+        browser_env["MOZ_HEADLESS"] = "1"
+        completed = subprocess.run(command, capture_output=True, text=True, timeout=90, check=False, env=browser_env)
         results.setdefault("browser_runs", {})[name] = {
             "returncode": completed.returncode,
             "stdout_tail": completed.stdout[-2000:],
@@ -204,13 +246,13 @@ def render_browser_css_composite(
         }
         if completed.returncode != 0 or not screenshot_path.is_file():
             raise RuntimeError(
-                f"Edge CSS compositor capture {name!r} failed; "
+                f"Firefox canvas compositor capture {name!r} failed; "
                 f"returncode={completed.returncode}, stderr={completed.stderr[-2000:]}"
             )
         with Image.open(screenshot_path) as image:
             if image.size != (width, height):
                 raise RuntimeError(
-                    f"Edge CSS compositor returned {image.size}, expected {(width, height)}."
+                    f"Firefox canvas compositor returned {image.size}, expected {(width, height)}."
                 )
         return screenshot_path
 
@@ -504,6 +546,7 @@ def main() -> int:
             (int(screen["width"]), int(screen["height"])),
             geometry["inspect_origin"],
             css_matrix,
+            manifest.get("browser", {}).get("userAgent", ""),
             args.output_dir,
         )
         roi_x, roi_y = int(roi["x"]), int(roi["y"])
@@ -678,7 +721,7 @@ def main() -> int:
             "precision_screen_rgb_delta_24": independent_results["24"]["precision"],
             "recall_screen_rgb_delta_24": independent_results["24"]["recall"],
             "symmetric_difference_screen_rgb_delta_24": independent_results["24"]["symmetric_difference_pixels"],
-            "screen_compositing_method": "edge_headless_css_compositor",
+            "screen_compositing_method": "firefox_headless_canvas_compositor",
             "report": str(args.output_dir / "comparison-report-independent-transform.json"),
         }
     print(json.dumps({
