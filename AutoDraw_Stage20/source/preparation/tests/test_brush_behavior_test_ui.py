@@ -131,6 +131,32 @@ def test_game_monitor_summary_extracts_only_active_draw_radii_and_detects_match(
     assert summary["draw_sample_count"] == 3
 
 
+def test_game_monitor_summary_preserves_client_geometry_without_claiming_screen_mapping() -> None:
+    document = {
+        "events": [],
+        "renderer_geometry_at_start": {
+            "windowGeometry": {"screenWidth": 1920, "screenHeight": 1080},
+            "players": [{
+                "boardStageCorners": {"topLeft": {"x": 30, "y": 75}},
+                "boardClientCorners": {"topLeft": {"x": 498, "y": 105}},
+                "boardClientMappingMethod": "validated_axis_aligned_rect",
+            }],
+        },
+        "renderer_geometry_updates": [{"reason": "window_resize"}],
+        "renderer_geometry_at_end": {"players": []},
+    }
+    summary = brush_ui.summarize_game_monitor_report(document)
+    geometry = summary["renderer_geometry"]
+    assert geometry["board_detected"] is True
+    assert geometry["board_client_mapping_method"] == "validated_axis_aligned_rect"
+    assert geometry["board_client_corners"]["topLeft"] == {"x": 498, "y": 105}
+    assert geometry["coordinate_space"] == "css_client_pixels"
+    assert geometry["desktop_screen_mapping_available"] is False
+    assert geometry["executor_usable"] is False
+    assert summary["renderer_geometry_update_count"] == 1
+    assert summary["renderer_geometry_at_end"] == {"players": []}
+
+
 def test_game_monitor_summary_detects_requested_vs_actual_brush_mismatch() -> None:
     document = {
         "events": [
