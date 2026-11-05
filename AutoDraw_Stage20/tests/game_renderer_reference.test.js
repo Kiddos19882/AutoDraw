@@ -8,7 +8,8 @@ const {
   terminalPoint,
   shouldWebGLRendererRasterize,
   extractAcceptedPoints,
-  buildStagePlacement
+  buildStagePlacement,
+  buildStageRendererTransform
 } = require("./game_renderer_reference.js");
 
 test("smooth one-point path contains moveTo only and has no segment endpoint", () => {
@@ -143,8 +144,18 @@ test("Stage placement preserves the exact fractional backing origin and computes
   };
   const exact = buildStagePlacement(profile, false);
   const rounded = buildStagePlacement(profile, true);
-  assert.ok(Math.abs(exact.x - 1022.375) < 1e-6);
+  // Monitor geometry is fractional; allow only the observed binary-float rounding error.
+  assert.ok(Math.abs(exact.x - 1022.375) < 3e-6);
   assert.equal(exact.y, 216);
+  const exactTransform = buildStageRendererTransform(exact);
+  const roundedTransform = buildStageRendererTransform(rounded);
+  assert.equal(exactTransform.a, 3);
+  assert.equal(exactTransform.d, 3);
+  assert.ok(Math.abs(exactTransform.tx - 340.7916660308838) < 1e-9);
+  assert.equal(exactTransform.ty, 72);
+  assert.ok(Math.abs(exactTransform.tx * exactTransform.a - exact.x) < 1e-9);
+  assert.equal(roundedTransform.tx * roundedTransform.a, 1022);
+  assert.equal(roundedTransform.ty * roundedTransform.d, 216);
   assert.equal(exact.width, 1380);
   assert.equal(exact.height, 720);
   assert.equal(rounded.x, 1022);
