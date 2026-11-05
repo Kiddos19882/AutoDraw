@@ -29,6 +29,13 @@
 **Status:** comparison analyzed as exploratory; live/offline renderer equivalence and transform root cause remain NOT ACCEPTED / OPEN. FILL-001-RS 45-cell matrix remains BLOCKED. No live experiment was run during this continuation; no production planner, renderer, executor, CHALK estimator, frozen plan or raw evidence was changed.
 
 **Next offline action:** derive board bounds and crop origin independently from the same-session after_draw-screen.png (and before/blank reference), compare them with the calibrated ROI, then evaluate the existing frozen pixel-center/boundary mapping and a uniform-scale transform from independently measured edges. Keep the current frozen transform and post-hoc diagnostic separate; define acceptance criteria before any confirmatory comparison.
+## 2026-11-05 — formal per-run renderer acceptance tooling
+
+- Added capture validation that checks run/session/experiment binding, exact pre/post pointCount, accepted-point completeness, per-event pointDelta, stroke identity, bridge integrity counters, brush radius, executor profile, clean-board state and fixture binding.
+- Added same-run transform checks and the predeclared alpha-24 renderer gates. The post-hoc best-translation diagnostic remains non-acceptance evidence and is excluded from formal scoring.
+- Added a distinct series aggregator: three unique per-run PASS captures per orientation are required for vertical and diagonal. Rejected and duplicate attempts are recorded but do not count.
+- Unit tests were added; CI execution is pending. No new live experiment or raw evidence mutation was performed.
+
 ## 1. Правила чтения и доказательности
 
 ### 1.1. Статусы

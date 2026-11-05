@@ -1241,3 +1241,10 @@
 - Renderer comparison now validates that each paired scenario uses its expected Monitor-fit and screenshot-bound axes.
 - Report limitations are generated from actual axis sources rather than assuming a horizontal trajectory.
 - Updated audit and all required CI jobs passed in run 41976515362.
+
+
+## 2026-11-05 — formal paired-renderer acceptance gates
+
+- Added offline validators for exact capture binding, pointCount/accepted-point consistency, axis-transform tolerances and the predeclared alpha-24 pixel acceptance thresholds.
+- Added a separate series report tool requiring three unique accepted vertical captures and three unique accepted diagonal captures.
+- No production drawing behavior or live experiment was changed.

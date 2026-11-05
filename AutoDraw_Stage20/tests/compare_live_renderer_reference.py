@@ -15,21 +15,13 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "source" / "preparation"))
 from renderer_geometry import (RendererGeometryError, detect_board_bounds_from_screenshots, derive_live_board_screen_transform)
-
-EXPECTED_PAIRED_AXIS_SOURCES = {
-    "paired_renderer_single_stroke": {
-        "x": "same_run_monitor_fit",
-        "y": "same_run_full_screen_board_bounds",
-    },
-    "paired_renderer_vertical_single_stroke": {
-        "x": "same_run_full_screen_board_bounds",
-        "y": "same_run_monitor_fit",
-    },
-    "paired_renderer_diagonal_single_stroke": {
-        "x": "same_run_monitor_fit",
-        "y": "same_run_monitor_fit",
-    },
-}
+from renderer_acceptance import (
+    EXPECTED_PAIRED_AXIS_SOURCES,
+    evaluate_per_run_acceptance,
+    validate_paired_capture,
+    validate_renderer_comparison,
+    validate_transform_geometry,
+)
 
 import cv2
 import numpy as np
@@ -272,6 +264,7 @@ def main() -> int:
     )
 
     independent_summary = None
+    formal_acceptance = None
     if args.geometry_audit is not None:
         if not args.geometry_audit.is_file():
             raise FileNotFoundError(args.geometry_audit)
@@ -337,9 +330,25 @@ def main() -> int:
         Image.fromarray(overlay_independent, mode="RGB").save(
             args.output_dir / "live-offline-mask-overlay-independent-transform.png"
         )
+
+        # Formal per-run gate applies only to the independent, unshifted transform.
+        if "24" not in independent_results:
+            raise ValueError("Alpha threshold 24 is mandatory for renderer acceptance.")
+        capture_validation = validate_paired_capture(
+            experiment, monitor_report, plan, fixture,
+        )
+        transform_validation = validate_transform_geometry(geometry, scenario_id)
+        renderer_validation = validate_renderer_comparison(
+            independent_results["24"], report["observed_live_delta"]["changed_pixels"],
+        )
+        formal_acceptance = evaluate_per_run_acceptance(
+            capture_validation, transform_validation, renderer_validation,
+        )
+
         independent_report = {
-            "status": "ANALYZED_EXPLORATORY_NO_ACCEPTANCE_THRESHOLD",
+            "status": formal_acceptance["status"],
             "experiment_id": experiment.get("experiment_id"),
+            "scenario_id": scenario_id,
             "run_id": run_id,
             "session_id": summary.get("session_id"),
             "inputs": {
@@ -352,8 +361,8 @@ def main() -> int:
             "thresholds": {"observed_rgb_euclidean": args.rgb_threshold, "expected_alpha": args.alpha_thresholds},
             "observed_live_delta": report["observed_live_delta"],
             "comparisons": independent_results,
-            "scenario_id": scenario_id,
             "axis_coverage": geometry["axis_sources"],
+            "formal_acceptance": formal_acceptance,
             "expected_axis_sources": expected_axis_sources,
             "limitations": [
                 "No post-hoc translation or image registration is applied.",
@@ -362,13 +371,25 @@ def main() -> int:
                 f"Inspect-only fallback axes: {', '.join(inspect_fallback_axes) if inspect_fallback_axes else 'none'}.",
                 "Inspect geometry is an independent cross-check, not the source of same-run Monitor fits.",
                 "This capture covers one trajectory and one screen configuration; it does not establish viewport/window/DPR generality or executor handoff.",
-                "This is exploratory evidence and has no renderer acceptance threshold.",
+                "A per-run PASS is not series acceptance; three unique valid vertical and diagonal runs are still required.",
             ],
         }
         (args.output_dir / "comparison-report-independent-transform.json").write_text(
             json.dumps(independent_report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
+        report["analysis_status"] = report["status"]
+        report["status"] = formal_acceptance["status"]
+        report["formal_acceptance"] = formal_acceptance
+        (args.output_dir / "comparison-report.json").write_text(
+            json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
         independent_summary = {
+            "status": formal_acceptance["status"],
+            "failed_checks": {
+                "capture": capture_validation["failed_checks"],
+                "transform": transform_validation["failed_checks"],
+                "renderer": renderer_validation["failed_checks"],
+            },
             "iou_alpha_24": independent_results.get("24", {}).get("iou"),
             "precision_alpha_24": independent_results.get("24", {}).get("precision"),
             "recall_alpha_24": independent_results.get("24", {}).get("recall"),
@@ -396,7 +417,7 @@ def main() -> int:
         "report": str(args.output_dir / "comparison-report.json"),
         "independent_transform_comparison": independent_summary,
     }, ensure_ascii=False, indent=2))
-    return 0
+    return 2 if formal_acceptance is not None and not formal_acceptance["passed"] else 0
 
 
 if __name__ == "__main__":

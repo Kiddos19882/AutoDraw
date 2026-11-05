@@ -32,7 +32,7 @@
 - Monitor-vs-inspect checks: origin ≤0.5 px and relative scale difference ≤0.2%; Monitor-vs-screenshot checks: origin ≤1.0 px and relative scale difference ≤0.2%.
 - The unspanned axis uses same-run screenshot BoardPane bounds; an unspanned X axis without screenshot bounds is rejected. Production executor/calibration handoff remains disabled.
 - UI scenarios: `paired_renderer_vertical_single_stroke` and `paired_renderer_diagonal_single_stroke`, both with radius 10 and the frozen step=2/delay=10/extension=0 profile.
-- Synthetic vertical/diagonal tests and all CI jobs pass. **No live vertical or diagonal capture has been executed yet.**
+- Synthetic vertical/diagonal tests cover axis fitting. A fail-closed per-run acceptance module and three-repeat-per-orientation series aggregator have now been added; their CI verification is pending. **No live vertical or diagonal capture has been executed yet.**
 
 ### Независимая проверка BoardPane screen bounds
 
@@ -52,7 +52,7 @@ Same-run full-screen before/after screenshots обнаружили одну и �
 - Frozen ROI transform at alpha 24: IoU `0.763153`, symmetric difference `2404 px`; live/expected bbox differed by about 2 px in X and Y.
 - Same-run Monitor X fit + screenshot-derived Y bounds, without post-hoc registration: IoU `0.998882`, precision `0.999106`, recall `0.999776`, symmetric difference `10 px`; live/expected bbox совпадает `(21,170,599,15)`.
 - At alpha thresholds 1/64/128 IoU is `0.998771 / 0.998435 / 0.997764`; at 192/254 it falls to `0.931366 / 0.929689`, demonstrating threshold sensitivity to antialiasing/coverage.
-- CI artifact: `autodraw-paired-renderer-png-comparison`, ID `13389883231`; report status remains `ANALYZED_EXPLORATORY_NO_ACCEPTANCE_THRESHOLD`.
+- CI artifact: `autodraw-paired-renderer-png-comparison`, ID `13389883231`; historical report status remains exploratory. New code applies the predeclared thresholds to the independent unshifted comparison and is pending CI verification.
 
 ### CHALK / brush evidence
 
@@ -63,14 +63,14 @@ Same-run full-screen before/after screenshots обнаружили одну и �
 
 ### Следующие действия
 
-1. Run three clean-board captures for each new paired scenario: vertical (Y-fit) and diagonal (X/Y-fit), with input telemetry and same-run full-screen before/after screenshots.
+1. Run three clean-board captures for each new paired scenario: vertical (Y-fit) and diagonal (X/Y-fit), with input telemetry and same-run full-screen before/after screenshots. Produce per-run reports with the new acceptance CLI.
 2. Apply the predeclared acceptance protocol in TASKS.md; do not alter thresholds after reviewing captures.
 3. Complete environment fingerprint and stale invalidation for window/viewport/zoom/DPR/canvas/BoardPane. Keep CSS client coordinates separate from desktop/screenshot coordinates.
 4. Only after multi-axis/environment acceptance, connect geometry to calibration profile with explicit stale status and manual fallback; do not enable executor handoff yet.
 5. After renderer/footprint gate and committed PNG quality issue are resolved, run a single-task FILL-001-RS preflight; do not launch the 45-cell matrix yet.
 6. Keep INT-007 BLOCKED until INT-006 safety margin and domain/holdout validation are established.
 
-**Неизменяемые ограничения:** production renderer, planner, estimator/defaults, calibration profile and executor behavior were not changed; no real game experiment was launched in this continuation. The new code is an offline diagnostic/audit path plus test-only paired-plan scenarios; live geometry remains unverified.
+**Неизменяемые ограничения:** production renderer, planner, estimator/defaults, calibration profile and executor behavior were not changed. The current continuation adds offline validation/series tooling only; no real game experiment was launched. Live geometry remains unverified.
 
 ---
 

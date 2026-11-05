@@ -340,6 +340,7 @@ def derive_live_board_screen_transform(
             },
         },
         "screen_offset_from_client": {"x": offset_x, "y": offset_y, "sample_count": len(samples)},
+        "screen_offset_range_px": {"x": max(dx) - min(dx), "y": max(dy) - min(dy)},
         "horizontal_fit": fit_x,
         "vertical_fit": fit_y,
         "vertical_scale_source": source_y,

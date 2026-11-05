@@ -1184,6 +1184,15 @@ CI evidence: workflow 41787492122, commit d337f4240e83488273152f65992032beca3957
 Подробные фактические результаты и evidence ведутся в [TEST_RESULTS.md](TEST_RESULTS.md). В TASKS.md сохраняются задачи, критерии завершения, статусы и блокировки.
 
 
+## 2026-11-05 — formal per-run renderer acceptance implementation
+
+- Added fail-closed capture validation: experiment/run/session binding, frozen radius and executor settings, one-stroke identity, exact pre/post pointCount, event integrity, complete pointDelta=1 acceptedPoint streams, equality against the offline fixture, clean-board and same-screen capture metadata.
+- Added transform checks against the predeclared offset/residual/inspect/screenshot tolerances, plus alpha-24 renderer gates for IoU, precision, recall, symmetric-difference fraction and inclusive bounding-box edges.
+- A per-run PASS is explicitly not series acceptance. The separate aggregator requires three unique PASS runs for vertical and three for diagonal; failed and duplicate attempts remain visible.
+- Added unit tests for accepted/rejected capture contracts, threshold boundaries, axis policies, binding failures and repeat aggregation.
+- The original horizontal baseline is retained as read-only input to the formal gate. No raw evidence, production renderer, planner, estimator, calibration profile or executor defaults are modified.
+- Live vertical/diagonal captures and environment/profile handoff remain pending; CI is required before claiming the new gate implementation verified.
+
 ## 2026-11-05 — multi-axis transform implementation and paired scenarios
 
 - [x] `derive_live_board_screen_transform()` independently resolves X and Y: same-run Monitor fit for any axis with ≥20 logical px span; screenshot bounds for an unspanned axis.
@@ -1192,8 +1201,9 @@ CI evidence: workflow 41787492122, commit d337f4240e83488273152f65992032beca3957
 - [x] Full CI run [41976515362](https://github.com/Kiddos19882/AutoDraw/actions/runs/41976515362) SUCCESS, including Preparation/G3, Application integration, Game Monitor/Bridge, Egret renderer, INT-006 analysis and Windows portable build.
 - [x] Scenario-aware comparison audit validates expected axis sources for horizontal/vertical/diagonal cases; current horizontal baseline passed the updated audit.
 - [ ] Three valid live captures per orientation (vertical and diagonal) with input telemetry, full-screen before/after screenshots and same-screen inspect evidence.
-- [ ] Formal acceptance of screen transform remains blocked until live captures pass the predeclared protocol.
+- [ ] Formal multi-axis series acceptance remains blocked until three unique per-run PASS captures exist for each vertical and diagonal orientation.
 - [ ] Environment fingerprint, stale invalidation, calibration profile consumer and executor gate remain blocked.
+- [x] Formal per-run acceptance code and series aggregator added; per-run reports distinguish PASS_PER_RUN / REJECTED_PER_RUN, while series status remains PENDING until the six required multi-axis live runs are accepted.
 
 ### Предварительно зафиксированный acceptance protocol для multi-axis follow-up
 

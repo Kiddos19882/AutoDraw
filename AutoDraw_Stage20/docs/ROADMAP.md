@@ -1,5 +1,12 @@
 # Дополнение к дорожной карте — 2026-11-05
 
+## 2026-11-05 — formal per-run renderer acceptance tooling added (CI pending)
+
+- Added a fail-closed acceptance contract for capture binding, exact pointCount/CHALK, full accepted-point stream, one-stroke integrity, same-run screenshot metadata, per-axis transform tolerances and alpha-24 pixel metrics.
+- Added separate aggregation for three unique accepted vertical runs and three unique accepted diagonal runs. A single horizontal baseline or a per-run PASS cannot complete this series.
+- Added regression tests for complete/incomplete captures, thresholds, transform sources, duplicates and rejected attempts.
+- CI verification is pending. No live vertical/diagonal captures exist yet; no production handoff is enabled.
+
 ## 2026-11-05 — multi-axis transform helper and paired scenarios ready (CI 41976515362)
 
 - Same-run screenshot-derived BoardPane bounds remain `(498,268,672,351)`; the calibrated ROI `(496,265,674,355)` is a larger crop, not the board itself.
