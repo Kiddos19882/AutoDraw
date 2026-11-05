@@ -26,6 +26,7 @@ HOST = "127.0.0.1"
 PORT = 8765
 MAX_MESSAGE_BYTES = 65536
 MAX_EVENTS_PER_RUN = 100000
+MAX_GEOMETRY_UPDATES_PER_RUN = 32
 ALLOWED_TYPES = {"BOARD_ATTACHED", "BOARD_DETACHED", "DRAW_START", "DRAW_START_APPLIED",
                  "DRAW_SAMPLE", "DRAW_END", "BRUSH_CHANGE", "BRUSH_CHANGE_APPLIED",
                  "POINT_QUOTA_UPDATE", "GAME_METHOD_ERROR", "POINTER_DOWN_CANDIDATE",
@@ -212,6 +213,33 @@ class RunRecorder:
         self.observed_stroke_ids: set[str] = set()
         self.accepted_stroke_ids: set[str] = set()
         self.lifecycle_sources: set[str] = set()
+        self.renderer_geometry: dict | None = None
+        self.renderer_geometry_updated_at_utc: str | None = None
+
+    def set_renderer_geometry(self, geometry: dict, reason: str | None = None) -> None:
+        if not isinstance(geometry, dict):
+            raise ValueError("renderer geometry must be an object")
+        try:
+            encoded = json.dumps(geometry, ensure_ascii=False, separators=(",", ":"))
+        except (TypeError, ValueError):
+            raise ValueError("renderer geometry must be JSON serializable") from None
+        if len(encoded.encode("utf-8")) > MAX_MESSAGE_BYTES // 2:
+            raise ValueError("renderer geometry snapshot is too large")
+        snapshot = json.loads(encoded)
+        self.renderer_geometry = snapshot
+        self.renderer_geometry_updated_at_utc = utc_now()
+        if self.current is not None:
+            updates = self.current.setdefault("renderer_geometry_updates", [])
+            if len(updates) < MAX_GEOMETRY_UPDATES_PER_RUN:
+                updates.append({
+                    "updated_at_utc": self.renderer_geometry_updated_at_utc,
+                    "reason": reason if isinstance(reason, str) and len(reason) <= 128 else None,
+                    "snapshot": snapshot,
+                })
+            else:
+                self.current["renderer_geometry_update_overflow_count"] = (
+                    self.current.get("renderer_geometry_update_overflow_count", 0) + 1
+                )
 
     def _start(self, event: dict) -> None:
         self.run_count += 1
@@ -226,6 +254,10 @@ class RunRecorder:
             "execution_status": "in_progress",
             "pre_test_snapshot": before,
             "post_test_snapshot": None,
+            "renderer_geometry_at_start": self.renderer_geometry,
+            "renderer_geometry_updated_at_start_utc": self.renderer_geometry_updated_at_utc,
+            "renderer_geometry_updates": [],
+            "renderer_geometry_update_overflow_count": 0,
             "brush_radius": (before or {}).get("currentRadius") if isinstance(before, dict) else None,
             "events": [],
             "frame_probes": [],
@@ -513,6 +545,8 @@ class RunRecorder:
         run["interpretation"]["chalk_status"] = run["chalk"]["status"]
         if isinstance(run.get("started_at_performance_ms"), (int, float)) and isinstance(run.get("ended_at_performance_ms"), (int, float)):
             run["elapsed_from_first_to_last_stroke_ms"] = max(0.0, run["ended_at_performance_ms"] - run["started_at_performance_ms"])
+        run["renderer_geometry_at_end"] = self.renderer_geometry
+        run["renderer_geometry_updated_at_end_utc"] = self.renderer_geometry_updated_at_utc
         run["finished_at_utc"] = utc_now()
         run["event_count"] = len(run["events"])
         run["dropped_events"] += 0
@@ -623,7 +657,17 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
                     except (ValueError, TypeError, AttributeError):
                         await websocket.close(code=4002, reason="invalid session id")
                         return
+                    initial_geometry = message.get("rendererGeometry")
+                    if initial_geometry is not None and not isinstance(initial_geometry, dict):
+                        await websocket.close(code=4002, reason="invalid renderer geometry")
+                        return
                     recorder = RunRecorder(output_dir / session_id, session_id, idle_seconds)
+                    if isinstance(initial_geometry, dict):
+                        try:
+                            recorder.set_renderer_geometry(initial_geometry, "session_start")
+                        except ValueError:
+                            await websocket.close(code=4002, reason="invalid renderer geometry")
+                            return
                     initial_status = message.get("monitorStatus")
                     if isinstance(initial_status, dict):
                         recorder.last_status = initial_status
@@ -634,13 +678,15 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
                     session_dir.mkdir(parents=True, exist_ok=True)
                     session_path = session_dir / "session.json"
                     session_record = {
-                        "schema_version": 2,
+                        "schema_version": 3,
                         "session_id": session_id,
                         "started_at_utc": utc_now(),
                         "run_idle_seconds": idle_seconds,
                         "browser": message.get("browser"),
                         "page": message.get("page"),
                         "monitor_status_at_connect": message.get("monitorStatus"),
+                        "renderer_geometry": recorder.renderer_geometry,
+                        "renderer_geometry_updated_at_utc": recorder.renderer_geometry_updated_at_utc,
                         "bridge_diagnostics": {
                             "received_message_count": 1,
                             "received_event_count": 0,
@@ -698,6 +744,23 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
                     except ValueError:
                         await websocket.close(code=4002, reason="unsupported game event")
                         return
+                elif msg_type == "renderer_geometry":
+                    geometry = message.get("rendererGeometry")
+                    if not isinstance(geometry, dict):
+                        await websocket.close(code=4002, reason="invalid renderer geometry")
+                        return
+                    reason = message.get("reason")
+                    try:
+                        recorder.set_renderer_geometry(geometry, reason if isinstance(reason, str) else None)
+                    except ValueError:
+                        await websocket.close(code=4002, reason="invalid renderer geometry")
+                        return
+                    if session_record is not None:
+                        session_record["renderer_geometry"] = recorder.renderer_geometry
+                        session_record["renderer_geometry_updated_at_utc"] = recorder.renderer_geometry_updated_at_utc
+                        session_record["renderer_geometry_update_reason"] = (
+                            reason if isinstance(reason, str) and len(reason) <= 128 else None
+                        )
                 elif msg_type == "heartbeat":
                     status = message.get("monitorStatus")
                     if isinstance(status, dict):
