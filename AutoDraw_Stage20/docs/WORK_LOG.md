@@ -1,3 +1,16 @@
+## 2026-11-05 — привязка offline renderer к профилю последнего live run
+
+**Scope:** исправление offline replay harness и инструкции; без запуска renderer/live game.
+
+- Проверено состояние ветки: `feature/image-geometry-optimization`, исходный HEAD перед работой `3ab7dcaca7672a7256076dece053b7977f72d9a5`; просмотрены последние 20 коммитов и обязательные управляющие документы/регламенты.
+- Установлено: `game_renderer_reference.js` жёстко записывал в manifest snapshot от 2026-11-04 (Stage 1672×600, backing 5016×1800), хотя latest paired-run geometry использует Stage 1314×600, backing 3942×1800, screen 1920×1080 и CSS matrix 0.487062/0.487778.
+- Исправлено: runtime profile для live replay теперь строится из `renderer_geometry_at_start/end` того же полного Game Monitor report; несовпадающие/отсутствующие snapshots и неподдерживаемые renderer settings отклоняются.
+- Сохранено: offscreen BoardPane 460×240, rasterScale 3, WebGL output 1380×720. Stage/screen CSS transform записывается как профиль live session, но не применяется повторно к локальному raster.
+- HTML-инструкция требует полный `monitor_report.json`. Изменены два файла harness.
+- Commits: `23ed8cf2cce051eeda87ad8b630604ae96889608`, `d6343adaf2db05f321b48ef0432b897277ff0193`.
+- Проверки: source-level consistency reviewed; offline renderer, unit suite and CI не запускались. Новых live experiments не было.
+- Следующий шаг — пользовательский offline rerun с последними vertical/diagonal monitor reports и последующая проверка новых артефактов.
+
 ## 2026-11-05 — review of first vertical/diagonal captures (evidence commit e6b771e)
 
 **Scope:** remote repository review and documentation synchronization only; no code/test/config/workflow changes and no new live experiment by the reviewer.
