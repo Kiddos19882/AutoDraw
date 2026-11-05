@@ -469,3 +469,23 @@ Workflow включает:
 - Добавлены `source/preparation/tests/test_renderer_geometry.py`: положительный сценарий, unstable offset rejection, CSS skew rejection.
 - `tests/compare_live_renderer_reference.py` теперь дополнительно сохраняет `comparison-report-independent-transform.json`, expected alpha и overlay; не выполняет post-hoc registration для нового transform.
 - Workflow `geometry-tests.yml` передаёт `screen_geometry_audit.json`. Фактический результат этого CI ещё не проверен; до него comparison status — pending.
+
+
+## 2026-11-05 — independent live/offline renderer transform comparison
+
+**Workflow:** [41963498086](https://github.com/Kiddos19882/AutoDraw/actions/runs/41963498086), commit `1b16b51e42ba0c61a0fbc547179ca5a9b3864b54`. Job `INT-006 pixel-level PNG geometry audit` completed SUCCESS; preparation/G3, Game Monitor/Bridge, Executor regression, Application integration and Egret browser reference jobs completed SUCCESS. Windows portable build/startup smoke-test was still running at last check. Optional algorithm benchmarks SKIPPED.
+
+**Independent transform:** same-run Monitor X fit + user inspect CSS Y transform; no post-hoc registration. Origin `(497.954055,267.860048)`, scale `(1.461204822,1.463334)`, source-raster→ROI matrix `[[0.487068274,0,1.954055],[0,0.487778,2.860048]]`.
+
+| Alpha threshold | IoU | Precision | Recall | Symmetric difference |
+|---:|---:|---:|---:|---:|
+| 1 | 0.998883 | 0.999665 | 0.999218 | 10 px |
+| 24 | 0.998994 | 0.999218 | 0.999776 | 9 px |
+| 64 | 0.998547 | 0.998547 | 1.000000 | 13 px |
+| 128 | 0.997653 | 0.997653 | 1.000000 | 21 px |
+
+At alpha 24, live and expected bbox both `(21,170,599,15)`. Old frozen transform at alpha24: IoU `0.763153`, precision `0.865862`, recall `0.865475`, symmetric difference `2404 px`. The independent transform is slightly better than the previous post-hoc `(+1,+2)` diagnostic (IoU `0.998883`, 10 px), without fitting translation to the masks.
+
+**Limitations:** vertical scale is inspect-derived because the live stroke is horizontal-only; inspect snapshot is user-attested same-screen but has no run/session timestamp; alpha thresholds 192/254 are more sensitive to antialiasing and lower IoU. No acceptance threshold has been declared. Status remains `ANALYZED_EXPLORATORY_NO_ACCEPTANCE_THRESHOLD`.
+
+Artifact: `autodraw-paired-renderer-png-comparison`, ID `13386122895`.
