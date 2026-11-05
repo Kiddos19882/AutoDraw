@@ -1,3 +1,12 @@
+## 2026-11-05 — UI сценарий paired renderer single-stroke
+
+- Во вкладку «Тест кистей» добавлен отдельный сценарий paired_renderer_single_stroke: один горизонтальный штрих logical (20,120) → (420,120) на 460×240.
+- Зафиксированы radius=10, step=2 px, delay=10 ms, line extension=0 и ранее использованные timing параметры G3; offline replay mode — smooth, line width 10.
+- UI сохраняет capture metadata в DrawingPlan и требует radius=10. Интеграция Stage 6 повторно валидирует сценарий, один stroke, радиус, renderer mode и полный executor profile; override передаётся только текущему запуску.
+- Добавлены unit/integration regression tests для geometry, metadata, executor override и отказа при неверном радиусе.
+- В UI-инструкцию добавлены команды включения input telemetry и перечень evidence: raw run JSON, Bridge session, inspect snapshot, pre/post pointCount и final board PNG.
+- Новые live tests не запускались. Новые тесты не запускались локально; CI на итоговый commit ожидает проверки. Предыдущий CI PASS не переносится на новые commits.
+
 ## 2026-11-04 — подтверждены WebGL texture sampling defaults
 
 - Статическая трассировка `mergeEngine_df2e5bc5.js`: `WebGLRenderContext.createTexture()` делегирует `sys.createTexture()`, где выставляются `TEXTURE_MIN_FILTER=LINEAR`, `TEXTURE_MAG_FILTER=LINEAR`, `TEXTURE_WRAP_S/T=CLAMP_TO_EDGE` и `UNPACK_PREMULTIPLY_ALPHA_WEBGL=1`.
