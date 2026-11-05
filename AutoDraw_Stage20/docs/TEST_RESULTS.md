@@ -461,3 +461,11 @@ Workflow включает:
 **Evidence level:** E4 for live run and exact CHALK=138; E3/E2 for offline harness internal renderer comparisons; no E5 live/offline pixel equivalence claim.  
 **CI:** data/manifest commit `ad03a0b5b03cf76f6fa11f06047d52106317c8c7` and follow-up documentation commit `40f1603075503c9aa12c964af52e9aa2a82635e6` have empty combined status; do not claim CI PASS for these commits. Full CI run `41933396072` passed on earlier source/test HEAD `f6df3f9`.  
 **Next gate:** independent quantitative comparison of live screenshot and offline WebGL PNG after explicit ROI transform and background/alpha normalization. No repeat live stroke required; FILL-001-RS 45-cell matrix remains BLOCKED.
+
+
+## 2026-11-05 — independent BoardPane screen transform (CI pending)
+
+- Добавлен `source/preparation/renderer_geometry.py`: same-run Monitor `screenX/boardX` fit, стабильность `screen-client` offset, inspect CSS matrix validation, vertical-scale caveat и affine mapping source-raster→ROI.
+- Добавлены `source/preparation/tests/test_renderer_geometry.py`: положительный сценарий, unstable offset rejection, CSS skew rejection.
+- `tests/compare_live_renderer_reference.py` теперь дополнительно сохраняет `comparison-report-independent-transform.json`, expected alpha и overlay; не выполняет post-hoc registration для нового transform.
+- Workflow `geometry-tests.yml` передаёт `screen_geometry_audit.json`. Фактический результат этого CI ещё не проверен; до него comparison status — pending.
