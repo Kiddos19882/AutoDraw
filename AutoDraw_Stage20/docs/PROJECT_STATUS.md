@@ -3,9 +3,9 @@
 ## Текущая точка — independent offline comparison выполнен; renderer acceptance exploratory
 
 **Branch:** feature/image-geometry-optimization  
-**HEAD до текущей серии audit/tooling commits:** c27e16aebfebb0d8f829cad36a0b2fc6a46ec8fb.  
+**Текущий HEAD:** 01e6c8d60512f6b8e1c5e4b4a48eafd0f1db65d1. Code/test/workflow commit `1b16b51e42ba0c61a0fbc547179ca5a9b3864b54` проверен CI; последующие commits в этой серии — только документация.  
 **Последние 20 commits:** проверены перед началом этой итерации. GitHub API не подтверждает локальный git status.  
-**CI до текущих изменений:** последний известный полный workflow 41954783317 — обязательные jobs SUCCESS, optional algorithm benchmarks SKIPPED; он не подтверждает HEAD c27e16a.  
+**CI:** workflow run `41963498086` завершился SUCCESS для code/test/workflow commit `1b16b51e42ba0c61a0fbc547179ca5a9b3864b54`; все обязательные jobs SUCCESS, optional algorithm benchmarks SKIPPED. Последующие commits до HEAD `01e6c8d` меняли только документацию. GitHub compare branch↔HEAD вернул `identical`; локальный `git status` недоступен.  
 
 ### Результат offline ROI audit
 
