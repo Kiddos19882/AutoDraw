@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "0.2.2";
+  const VERSION = "0.2.3";
   const METHOD_NAMES = ["onDrawStart", "onDrawing", "onDrawingEnd", "setRadius", "updateLess"];
   const MAX_EVENTS = 50000;
   const SCAN_INTERVAL_MS = 500;
@@ -627,6 +627,24 @@
     };
   }
 
+  function parseCssMatrix(value) {
+    if (!value || value === "none") return { a: 1, b: 0, c: 0, d: 1 };
+    const match = /^matrix\\(([^)]+)\\)$/.exec(String(value).trim());
+    if (!match) return null;
+    const values = match[1].split(",").map(item => Number(item.trim()));
+    if (values.length !== 6 || values.some(item => !Number.isFinite(item))) return null;
+    return { a: values[0], b: values[1], c: values[2], d: values[3] };
+  }
+
+  function mapStagePointToClientRect(point, rect, stageWidth, stageHeight) {
+    if (!point || !rect || !(stageWidth > 0) || !(stageHeight > 0)) return null;
+    return {
+      x: rect.left + (point.x / stageWidth) * rect.width,
+      y: rect.top + (point.y / stageHeight) * rect.height
+    };
+  }
+
+
   // Read-only runtime evidence. Screen-space corners are derived only when the
   // browser exposes the canvas content quad; a bounding rectangle alone is not
   // treated as an exact affine transform (notably when the canvas is rotated).
@@ -655,10 +673,28 @@
       const stageWidth = finiteNumber(playerStage && (playerStage.stageWidth ?? playerStage.$stageWidth));
       const stageHeight = finiteNumber(playerStage && (playerStage.stageHeight ?? playerStage.$stageHeight));
       const quad = canvasQuadSnapshot(canvas);
+      const canvasRect = rectangleSnapshot(canvas);
       const stageCorners = activeBoard ? displayObjectCorners(activeBoard) : null;
-      const clientCorners = stageCorners && quad && stageWidth > 0 && stageHeight > 0
-        ? Object.fromEntries(Object.entries(stageCorners).map(([name, point]) =>
-            [name, mapStagePointToClient(point, quad, stageWidth, stageHeight)])) : null;
+      const cssMatrix = parseCssMatrix(computed && computed.transform);
+      const canvasScaleX = finiteNumber(displayList.$canvasScaleX);
+      const canvasScaleY = finiteNumber(displayList.$canvasScaleY);
+      const axisAlignedFallback = !quad && !!(stageCorners && canvasRect && cssMatrix
+        && stageWidth > 0 && stageHeight > 0
+        && Math.abs(cssMatrix.b) < 1e-9 && Math.abs(cssMatrix.c) < 1e-9
+        && cssMatrix.a > 0 && cssMatrix.d > 0
+        && Math.abs(canvasRect.width - stageWidth * canvasScaleX * cssMatrix.a) <= 1
+        && Math.abs(canvasRect.height - stageHeight * canvasScaleY * cssMatrix.d) <= 1);
+      const clientCorners = stageCorners && stageWidth > 0 && stageHeight > 0
+        ? (quad
+          ? Object.fromEntries(Object.entries(stageCorners).map(([name, point]) =>
+              [name, mapStagePointToClient(point, quad, stageWidth, stageHeight)]))
+          : axisAlignedFallback
+            ? Object.fromEntries(Object.entries(stageCorners).map(([name, point]) =>
+                [name, mapStagePointToClientRect(point, canvasRect, stageWidth, stageHeight)]))
+            : null)
+        : null;
+      const clientMappingMethod = quad ? "getBoxQuads_content"
+        : axisAlignedFallback ? "validated_axis_aligned_rect" : "unavailable";
       const mask = activeBoard && (activeBoard.mask || activeBoard.$mask);
       return {
         playerFound: !!webPlayer,
@@ -677,7 +713,7 @@
           width: finiteNumber(canvas.width), height: finiteNumber(canvas.height),
           clientWidth: finiteNumber(canvas.clientWidth), clientHeight: finiteNumber(canvas.clientHeight),
           offsetLeft: finiteNumber(canvas.offsetLeft), offsetTop: finiteNumber(canvas.offsetTop),
-          rect: rectangleSnapshot(canvas), screenQuad: quad,
+          rect: canvasRect, screenQuad: quad,
           style: {
             left: safeValue(style.left) ?? null, top: safeValue(style.top) ?? null,
             width: safeValue(style.width) ?? null, height: safeValue(style.height) ?? null,
@@ -688,6 +724,7 @@
         } : null,
         boardStageCorners: stageCorners,
         boardClientCorners: clientCorners,
+        boardClientMappingMethod: clientMappingMethod,
         boardDisplayChain: activeBoard ? displayObjectChainSnapshot(activeBoard, playerStage) : null,
         boardMask: mask ? {
           className: mask.constructor && mask.constructor.name || null,
@@ -707,6 +744,15 @@
       runtimeType: safeValue(capabilities.runtimeType) ?? null,
       systemRenderer: renderer && renderer.constructor && renderer.constructor.name || null,
       canvasRenderer: canvasRenderer && canvasRenderer.constructor && canvasRenderer.constructor.name || null,
+      windowGeometry: {
+        screenX: finiteNumber(window.screenX), screenY: finiteNumber(window.screenY),
+        outerWidth: finiteNumber(window.outerWidth), outerHeight: finiteNumber(window.outerHeight),
+        innerWidth: finiteNumber(window.innerWidth), innerHeight: finiteNumber(window.innerHeight),
+        screenWidth: finiteNumber(window.screen && window.screen.width),
+        screenHeight: finiteNumber(window.screen && window.screen.height),
+        availableScreenWidth: finiteNumber(window.screen && window.screen.availWidth),
+        availableScreenHeight: finiteNumber(window.screen && window.screen.availHeight)
+      },
       canvasScaleFactor: finiteNumber(displayList.$canvasScaleFactor),
       canvasScaleX: finiteNumber(displayList.$canvasScaleX),
       canvasScaleY: finiteNumber(displayList.$canvasScaleY),
