@@ -8,7 +8,7 @@
 
 | ID | Приоритет | Статус | Содержание |
 |---|---|---|---|
-| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | ANALYSIS_PLAN_REFINED_PENDING_IMPLEMENTATION_APPROVAL | Уточнён временный план независимого screen ROI audit → coordinate contract → Monitor/Bridge handoff design → offline validation; renderer acceptance и причина offset открыты |
+| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | ROI_AUDIT_DONE_INDEPENDENT_TRANSFORM_CI_PENDING | Same-run Monitor X fit и inspect-derived axis-aligned transform выявили смещение ручного ROI; независимый offline PNG compare добавлен в CI, renderer acceptance открыта |
 | FILL-001-RS-MATRIX | P0 | BLOCKED | 45 captures только после принятого single-task preflight |
 | GAME-INPUT-SAMPLING-TRACE-001 | P1 | EXPLORATORY_COMPARE_DONE_TRANSFORM_ROOT_CAUSE_OPEN | Run 16aec62c принят; 138 accepted points, CHALK=138; unshifted IoU=0.76315, post-hoc (+1,+2) IoU=0.99888; acceptance не пройдена |
 | BRUSH-FOOTPRINT-CAPSULE-001 | P1 | OPEN | Offline capsule model готова; renderer acceptance/planner integration не выполнены |
@@ -21,6 +21,25 @@
 | INT-003 | — | CLOSED_NOT_REQUIRED | По решению пользователя: отдельное исследование overhead Monitor не требуется |
 | CHALK-SAMPLING-DOMAIN | — | CLOSED_NOT_REQUIRED | По решению пользователя: расширение sampling-domain не требуется |
 
+## 2026-11-05 — независимый ROI audit и новый offline comparison
+
+- [x] Проверены same-run screenshots 1920×1080, board crops 674×355, experiment manifest, Monitor report и plan.
+- [x] 272 MOUSE_MOVE_SAMPLE: screenX-clientX=0, screenY-clientY=163, boardY=119, stageY=191 во всех образцах.
+- [x] Горизонтальный fit: originX=497.952041, scaleX=1.461213990, RMSE≈0.424 screen px.
+- [x] Inspect-derived stage→client scales: 1.461186 / 1.463334; BoardPane screen corners≈(497.960,267.860)—(1170.106,619.060). X fit согласуется с inspect origin менее чем на 0.01 px.
+- [x] Ручной ROI (496,265,674,355) смещён примерно на 1.95 px слева и 2.86 px сверху. Допуск 1% в текущем helper пропускает несовпадение и не проверяет origin.
+- [x] Добавлены renderer_geometry.py, unit tests, screen_geometry_audit.json и independent-transform ветка compare_live_renderer_reference.py; workflow обновлён для выполнения сравнения.
+- [ ] Дождаться CI и оценить независимые IoU/precision/recall без post-hoc translation.
+- Ограничение: вертикальный scale inspect-derived, потому что live stroke горизонтальный; inspect snapshot user-attested same-screen, но без run/session timestamp.
+
+## 2026-11-05 — Monitor → Bridge → AutoDraw handoff audit
+
+- Monitor inspect() собирает stage corners, canvas rect/CSS transform, canvas scale, DPR и viewport; boardClientCorners доступен только при getBoxQuads().
+- MOUSE_MOVE_SAMPLE содержит screen/client/stage/board coordinates, но сейчас собирается только во время активного stroke.
+- Bridge передаёт allowlisted events и heartbeat; на session_start geometry snapshot не передаётся. Server сохраняет session/run JSON в data/results/brush_behavior_tests/game_monitor_bridge/.
+- AutoDraw умеет читать heartbeat для radius feedback и вручную связывать Monitor run JSON; автоматического geometry-profile handoff пока нет.
+- Profile v1 хранит screen points/regions и environment, но _ensure_screen_compatibility() сравнивает только screen resolution. get_experiment_capture_config() отдаёт screen size, но не полный environment fingerprint.
+- Эти выводы входят в Stage 2/3 design; production code пока не менялся.
 ## 2026-11-05 — уточнённый план FILL-001-RS-ENGINE-FOOTPRINT-001
 
 План и gates находятся в [ROADMAP.md](ROADMAP.md#уточнённый-временный-план--автоматическое-определение-геометрии-доски-и-handoff-калибровки).
