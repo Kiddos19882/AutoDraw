@@ -503,3 +503,8 @@ Artifact: `autodraw-paired-renderer-png-comparison`, ID `13386122895`.
 
 
 **Monitor/Bridge geometry implementation test result:** workflow `41964932479`, job `Game Monitor and bridge tests` SUCCESS. `game_monitor.test.js` — 21 passed / 0 failed; `test_websocket_smoke_server.py` — 22 passed / 0 failed. New axis-aligned client geometry fallback, raw window metrics, run-bound geometry snapshots and session schema v2 persistence are covered. Preparation/G3 tests and full workflow still pending.
+
+
+**Preparation/G3 suite result for geometry snapshot commit:** workflow `41964932479`, job `Preparation and G3 matrix tests` SUCCESS; `pytest -q -ra tests` — 852 passed, 24 warnings, 82 subtests passed in 59.71s. Includes `test_renderer_geometry.py`.
+
+**FILL-001 evidence in same job:** committed PNG audit output reports coverage `98.430600%`, leakage `11`, status `failed`; static spacing sweep workflow step reports `passed`, 15 cells, 2238 candidates, 62 accepted candidates. The latter is not a substitute for the committed PNG quality gate; FILL-001 remains blocked.
