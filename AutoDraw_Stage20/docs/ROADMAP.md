@@ -1,12 +1,12 @@
 # Дополнение к дорожной карте — 2026-11-05
 
-## GAME-INPUT-SAMPLING-TRACE-001 — готовность пользовательского capture
+## GAME-INPUT-SAMPLING-TRACE-001 — live capture принят; следующий шаг offline replay
 
-Вкладка «Тест кистей» получила отдельный сценарий одного длинного горизонтального штриха для paired live/offline renderer comparison. Фиксированный профиль: logical line (20,120) → (420,120), radius 10, step=2 px, delay=10 ms, line extension=0; остальные executor timings сохранены из ранее принятого G3 profile. Renderer replay выполняется в режиме smooth, line width 10.
+Live capture 16aec62c-9e54-44e7-8691-9df79b19161d принят по raw event-level validation: один положительный strokeId, 138/138 POINT_QUOTA_UPDATE с pointDelta=1 и acceptedPoint, точный CHALK=138 (pointCount 1→139), Bridge без потерь/ошибок/sequence gaps. Raw run пригоден для tests/game_renderer_reference.html.
 
-**Следующий шаг:** пользователь запускает только этот одиночный сценарий при активных Game Monitor/Bridge и input telemetry. Сохранить raw run JSON, Bridge session, runtime inspect snapshot, точные pointCount before/after и PNG доски из одной сессии. Проверить ровно один strokeId, полную последовательность acceptedPoint и pointDelta=1; затем выполнить offline replay и PNG comparison. Не считать delay=10 гарантией полной sampling последовательности.
+**Следующий шаг:** выполнить offline replay этого run в режиме smooth / line width 10, затем сравнить PNG offline BoardPane с after_draw-board.png (674×355), нормализовав scale/ROI и сохранив метрики pixel diff. Повторный live запуск не нужен. Отдельный AutoDrawGameMonitor.inspect() snapshot не приложен; runtime renderer mode остаётся недостаточно подтверждённым capture metadata. Поле aggregate trajectory.status=incomplete_until_verified не совпадает с raw event histogram и зафиксировано как summary inconsistency.
 
-Live game pixel equivalence остаётся PENDING. FILL-001-RS 45-cell matrix не запускать до закрытия paired renderer/footprint gate.
+Live pixel equivalence остаётся PENDING. FILL-001-RS 45-cell matrix не запускать до закрытия renderer/footprint gate.
 
 ---
 
