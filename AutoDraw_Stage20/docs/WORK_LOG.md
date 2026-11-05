@@ -3172,3 +3172,13 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - Existing committed FILL-001 PNG audit printed coverage `98.430600%`, leakage `11`, status `failed`; this is a quality-audit result, not a pytest failure. The separate static spacing sweep step completed with status `passed` (15 cells, 2238 candidates, 62 accepted candidates). These statuses are not interchangeable; the committed PNG quality gate remains failed.
 - Game Monitor and Bridge job SUCCESS: 21 JavaScript tests and 22 Python/WebSocket tests passed.
 - Windows portable build/startup smoke-test and INT-006 PNG audit were still running at last check.
+
+
+## 2026-11-05 — Monitor/Bridge geometry implementation CI complete
+
+- Workflow `41964932479` completed SUCCESS for code/test commit `baf7e3f73bebe4cd780e93723bf6b4ea231a7b4b`.
+- Successful required jobs: Preparation/G3 (852 passed, 24 warnings, 82 subtests); Game Monitor/Bridge (21 JS tests, 22 Python/WebSocket tests); Executor regression; Application integration; Egret browser reference; Windows portable build/startup smoke-test; INT-006 PNG audit. Optional algorithm benchmarks SKIPPED.
+- INT-006 independent transform artifact `autodraw-paired-renderer-png-comparison` ID `13387246831`: alpha24 IoU=0.998994, precision=0.999218, recall=0.999776, symmetric difference=9 px; no post-hoc registration.
+- FILL-001 static sweep artifact `autodraw-fill001-rs-static-sweep` ID `13386973590`: 15 shape×radius cells, 2238 candidates, 62 accepted; selected candidate in every cell passes offline coverage≥0.99 and zero-leakage gate. This is OpenCV simulation only, not live renderer/CHALK validation.
+- Separate committed PNG quality audit in the same pytest suite still reports coverage 98.430600%, leakage 11, status failed. Do not confuse static sweep workflow success with this committed PNG acceptance gate; FILL-001 remains blocked.
+- Monitor/Bridge geometry pipeline is validated by CI; AutoDraw reader/profile consumer is not yet implemented. No live gameplay actions.
