@@ -153,3 +153,18 @@ Scope: code, tests and CI only in feature/image-geometry-optimization; no real g
 - Зафиксирован план A–D (WebGL/Canvas2D × exact/rounded origin), метрики и требования к unit/browser tests. Код, тесты и workflow в этой работе не менялись; live game runs не запускались; CHALK не измерялся повторно.
 - Предыдущий CI 42113632374 остаётся FAILURE из-за INT-006 vertical/diagonal renderer gates; его результаты не переинтерпретируются как результат нового probe.
 - Следующий шаг: реализовать offline Stage-level probe, получить PNG/manifests и сравнить exact WebGL variant с сохранёнными live captures без post-hoc alignment.
+
+
+## 2026-11-06 — синхронизация документации с remote commits, кодом renderer и CI
+
+**Объём:** удалённая проверка GitHub и документационная синхронизация в `feature/image-geometry-optimization`; исходники, тесты, конфигурации и workflow не изменялись.
+
+- Проверены refs рабочей ветки и `master`, последние 20 commits и сравнение веток. На начало сверки remote HEAD рабочей ветки — `81f6bb77c8a338ae52e0de084dce45e0cacabf1f`; последний code/test HEAD — `b07c636fa4b4ce28329cfb74f468634a46751ac1`; `master` — `9a3453aeb847b66041bc83d6f4a56ecaf33a993a` и не изменялась. GitHub compare сообщает diverged, feature branch ahead by 3404 / behind by 5; merge/rebase не выполнялись.
+- Проверено, что commits после `b07c636` до начала сверки являются документационными; code/test HEAD остаётся `b07c636`. Commit `b07c636` меняет только `tests/compare_live_renderer_reference.py` и `source/preparation/tests/test_renderer_geometry.py`.
+- Сверены `game_renderer_reference.js`, HTML harness, `compare_live_renderer_reference.py`, `renderer_geometry.py`, `renderer_acceptance.py` и workflow. Подтверждено: offscreen WebGL probe использует локальный буфер 1380×720 и BoardPane в начале сцены; paired comparator композитит raster через Firefox Canvas2D в screen CSS space. Полная Stage backing texture composition пока отсутствует.
+- CI run [42113632374](https://github.com/Kiddos19882/AutoDraw/actions/runs/42113632374) на `b07c636` завершился FAILURE из-за vertical/diagonal renderer acceptance. Preparation/G3, Game Monitor/Bridge, Executor, Egret browser reference и Application integration — SUCCESS; optional benchmarks и Windows portable build — SKIPPED.
+- Уточнены текущие refs в `PROJECT_STATUS.md` и `TEST_RESULTS.md`; синхронизированы дата канонического backlog и строка `DOC-STATUS-SYNC` в `TASKS.md`; исправлено описание renderer harness и multi-axis evidence в `docs/README.md`; запись добавлена в `CHANGELOG.md`.
+- Проверены относительные файловые ссылки в управляющих документах и README: отсутствующие цели не обнаружены. Проверка якорей отдельно не выполнялась.
+- Локальный `git status`, локальный запуск приложения и live game tests недоступны; новые тесты и CI в рамках этой документационной сверки не запускались.
+
+**Остаточный P0:** реализовать и проверить offline Stage-level WebGL compositor A–D на существующих captures; не менять production renderer/planner/sampling/brush/executor и acceptance thresholds. Дробная backing X phase=0.375 px остаётся гипотезой, не установленной причиной vertical/diagonal mismatch.
