@@ -259,3 +259,24 @@ def test_multi_axis_series_retains_rejects_and_ignores_duplicates():
 def test_multi_axis_series_rejects_invalid_repeat_count():
     with pytest.raises(ValueError):
         summarize_multi_axis_series([], required_repeats=0)
+
+
+
+def test_renderer_comparison_supports_explicit_screen_rgb_metric_names():
+    metrics = {
+        "iou": 0.998,
+        "precision": 0.998,
+        "recall": 0.999,
+        "symmetric_difference_pixels": 10,
+        "observed_bbox_xywh": [10, 20, 100, 10],
+        "expected_bbox_xywh": [10, 20, 100, 10],
+    }
+    result = validate_renderer_comparison(
+        metrics, 10000, metric_suffix="screen_rgb_delta_24",
+    )
+    assert result["status"] == "PASS"
+    assert "iou_screen_rgb_delta_24" in result["checks"]
+    assert "precision_screen_rgb_delta_24" in result["checks"]
+    assert "recall_screen_rgb_delta_24" in result["checks"]
+    assert "symmetric_difference_fraction_screen_rgb_delta_24" in result["checks"]
+    assert "bbox_edges_screen_rgb_delta_24" in result["checks"]

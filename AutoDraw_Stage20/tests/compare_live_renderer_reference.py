@@ -496,10 +496,7 @@ def main() -> int:
             offline[:, :, 3], matrix_independent, (live.shape[1], live.shape[0]),
             flags=cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT, borderValue=0,
         )
-        opencv_independent_results = {
-            str(threshold): mask_metrics(observed, alpha_opencv > threshold)
-            for threshold in args.alpha_thresholds
-        }
+        opencv_independent_results = {}
         css_matrix = geometry_evidence["renderer"]["canvas"]["css_matrix"]
         browser_composite = render_browser_css_composite(
             screen_before_path,
@@ -525,8 +522,20 @@ def main() -> int:
         ]
         if expected_independent.shape != observed.shape:
             raise ValueError("Browser CSS compositor ROI dimensions differ from the live ROI.")
+        opencv_independent_results = {
+            str(threshold): mask_metrics(observed, alpha_opencv > threshold)
+            for threshold in args.alpha_thresholds
+        }
+        if args.rgb_threshold != 24:
+            raise ValueError("The formal browser-composited screen-delta threshold is fixed at RGB 24.")
         independent_results = {
-            str(args.rgb_threshold): mask_metrics(observed, expected_independent),
+            "24": mask_metrics(observed, expected_independent),
+        }
+        report["observed_live_delta"] = {
+            "changed_pixels": int(np.count_nonzero(observed)),
+            "bbox_xywh": bbox(observed),
+            "centroid_xy": centroid(observed),
+            "source": "same-run after_draw-screen.png minus before_clear-screen.png, cropped to the paired ROI",
         }
         Image.fromarray((expected_independent.astype(np.uint8) * 255), mode="L").save(
             args.output_dir / "expected-mask-browser-css.png"
@@ -543,7 +552,7 @@ def main() -> int:
         )
 
         # Formal per-run gate applies only to the independent, unshifted transform.
-        if str(args.rgb_threshold) not in independent_results or args.rgb_threshold != 24:
+        if "24" not in independent_results:
             raise ValueError("The fixed RGB screen-delta threshold must remain 24 for renderer acceptance.")
         capture_validation = validate_paired_capture(
             experiment, monitor_report, plan, fixture,
@@ -551,6 +560,7 @@ def main() -> int:
         transform_validation = validate_transform_geometry(geometry, scenario_id)
         renderer_validation = validate_renderer_comparison(
             independent_results["24"], report["observed_live_delta"]["changed_pixels"],
+            metric_suffix="screen_rgb_delta_24",
         )
         formal_acceptance = evaluate_per_run_acceptance(
             capture_validation, transform_validation, renderer_validation,
@@ -581,7 +591,10 @@ def main() -> int:
                 "runtime_profile_used_for_live_screen_transform": False,
             },
             "board_bounds_audit": board_bounds_audit,
-            "thresholds": {"observed_rgb_euclidean": args.rgb_threshold, "expected_alpha": args.alpha_thresholds},
+            "thresholds": {
+                "formal_screen_rgb_delta": args.rgb_threshold,
+                "opencv_diagnostic_alpha": args.alpha_thresholds,
+            },
             "observed_live_delta": report["observed_live_delta"],
             "comparisons": independent_results,
             "axis_coverage": geometry["axis_sources"],
@@ -631,10 +644,10 @@ def main() -> int:
                 "transform": transform_validation["failed_checks"],
                 "renderer": renderer_validation["failed_checks"],
             },
-            "iou_alpha_24": independent_results.get(str(args.rgb_threshold), {}).get("iou"),
-            "precision_alpha_24": independent_results.get(str(args.rgb_threshold), {}).get("precision"),
-            "recall_alpha_24": independent_results.get(str(args.rgb_threshold), {}).get("recall"),
-            "symmetric_difference_alpha_24": independent_results.get(str(args.rgb_threshold), {}).get("symmetric_difference_pixels"),
+            "iou_screen_rgb_delta_24": independent_results["24"]["iou"],
+            "precision_screen_rgb_delta_24": independent_results["24"]["precision"],
+            "recall_screen_rgb_delta_24": independent_results["24"]["recall"],
+            "symmetric_difference_screen_rgb_delta_24": independent_results["24"]["symmetric_difference_pixels"],
             "screen_compositing_method": "edge_headless_css_compositor",
             "report": str(args.output_dir / "comparison-report-independent-transform.json"),
         }

@@ -468,7 +468,12 @@ def validate_transform_geometry(geometry: dict[str, Any], scenario: str) -> dict
     return _result(checks, failures)
 
 
-def validate_renderer_comparison(metrics: dict[str, Any], live_changed_pixels: int) -> dict[str, Any]:
+def validate_renderer_comparison(
+    metrics: dict[str, Any],
+    live_changed_pixels: int,
+    *,
+    metric_suffix: str = "alpha_24",
+) -> dict[str, Any]:
     checks: dict[str, dict[str, Any]] = {}
     failures: list[str] = []
 
@@ -485,14 +490,14 @@ def validate_renderer_comparison(metrics: dict[str, Any], live_changed_pixels: i
     for key in ("iou", "precision", "recall"):
         value = _number(metrics.get(key)) if isinstance(metrics, dict) else None
         threshold = float(RENDERER_ACCEPTANCE_THRESHOLDS[f"{key}_min"])
-        check(f"{key}_alpha_24", value is not None and value >= threshold,
+        check(f"{key}_{metric_suffix}", value is not None and value >= threshold,
               actual=value, expected=f">= {threshold}")
 
     diff = _number(metrics.get("symmetric_difference_pixels")) if isinstance(metrics, dict) else None
     observed = _number(live_changed_pixels)
     ratio = diff / observed if diff is not None and observed is not None and observed > 0 else None
     maximum_ratio = float(RENDERER_ACCEPTANCE_THRESHOLDS["symmetric_difference_fraction_max"])
-    check("symmetric_difference_fraction_alpha_24", ratio is not None and ratio <= maximum_ratio,
+    check(f"symmetric_difference_fraction_{metric_suffix}", ratio is not None and ratio <= maximum_ratio,
           actual=ratio, expected=f"<= {maximum_ratio} of live changed pixels")
 
     def inclusive_edges(box: Any) -> list[int] | None:
@@ -512,7 +517,7 @@ def validate_renderer_comparison(metrics: dict[str, Any], live_changed_pixels: i
         if live_edges is not None and expected_edges is not None else None
     )
     maximum_edge = int(RENDERER_ACCEPTANCE_THRESHOLDS["bbox_edge_difference_px_max"])
-    check("bbox_edges_alpha_24", edge_differences is not None and max(edge_differences) <= maximum_edge,
+    check(f"bbox_edges_{metric_suffix}", edge_differences is not None and max(edge_differences) <= maximum_edge,
           actual=edge_differences, expected=f"each edge difference <= {maximum_edge} px")
 
     return {
