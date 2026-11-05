@@ -635,6 +635,26 @@ def summarize_game_monitor_report(
         }
     geometry_updates = document.get("renderer_geometry_updates")
     geometry_update_count = len(geometry_updates) if isinstance(geometry_updates, list) else 0
+    geometry_end = document.get("renderer_geometry_at_end")
+    geometry_end_summary = None
+    if isinstance(geometry_end, dict):
+        end_players = geometry_end.get("players")
+        end_players = end_players if isinstance(end_players, list) else []
+        end_board_players = [
+            item for item in end_players
+            if isinstance(item, dict) and isinstance(item.get("boardStageCorners"), dict)
+        ]
+        end_player = end_board_players[0] if len(end_board_players) == 1 else None
+        geometry_end_summary = {
+            "board_detected": bool(end_board_players),
+            "board_ambiguous": len(end_board_players) > 1,
+            "board_client_mapping_method": (
+                end_player.get("boardClientMappingMethod", "unavailable")
+                if end_player else "ambiguous_or_unavailable"
+            ),
+            "board_client_corners": end_player.get("boardClientCorners") if end_player else None,
+            "window_geometry": geometry_end.get("windowGeometry"),
+        }
 
     observed = sorted(radii)
     if requested_brush_value is None:
@@ -670,7 +690,7 @@ def summarize_game_monitor_report(
         "brush_value_matches_requested": brush_matches,
         "renderer_geometry": geometry_summary,
         "renderer_geometry_update_count": geometry_update_count,
-        "renderer_geometry_at_end": document.get("renderer_geometry_at_end"),
+        "renderer_geometry_at_end": geometry_end_summary,
         "interpretation": "passive_browser_telemetry_not_direct_paint_resource_measurement",
     }
 
