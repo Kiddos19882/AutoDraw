@@ -112,12 +112,152 @@
     return midpoint(points[points.length - 2], points[points.length - 1]);
   }
 
+
+  function buildStagePlacement(profile, roundOrigin) {
+    if (!profile || typeof profile !== "object") throw new Error("Stage profile is required.");
+    const stageWidth = Number(profile.stageWidth), stageHeight = Number(profile.stageHeight);
+    const backingWidth = Number(profile.canvasBackingWidth), backingHeight = Number(profile.canvasBackingHeight);
+    const scaleX = Number(profile.canvasScaleX), scaleY = Number(profile.canvasScaleY);
+    const boardWidth = Number(profile.boardWidth), boardHeight = Number(profile.boardHeight);
+    const c = profile.boardStageCorners || {};
+    const tl = c.topLeft || {}, tr = c.topRight || {}, br = c.bottomRight || {}, bl = c.bottomLeft || {};
+    const values = [stageWidth,stageHeight,backingWidth,backingHeight,scaleX,scaleY,boardWidth,boardHeight,
+      Number(tl.x),Number(tl.y),Number(tr.x),Number(tr.y),Number(br.x),Number(br.y),Number(bl.x),Number(bl.y)];
+    if (!values.every(Number.isFinite) ||
+        ![stageWidth,stageHeight,backingWidth,backingHeight,boardWidth,boardHeight].every(Number.isInteger) ||
+        stageWidth<=0 || stageHeight<=0 || backingWidth<=0 || backingHeight<=0 ||
+        scaleX<=0 || scaleY<=0 || boardWidth<=0 || boardHeight<=0) {
+      throw new Error("Stage/backing/board geometry contains invalid dimensions or scale.");
+    }
+    const eps=1e-4, close=(a,b)=>Math.abs(a-b)<=eps;
+    if (!close(backingWidth/stageWidth,scaleX) || !close(backingHeight/stageHeight,scaleY)) {
+      throw new Error("Backing dimensions do not match the run-bound Stage scale.");
+    }
+    if (!close(tr.x-tl.x,boardWidth) || !close(br.x-bl.x,boardWidth) ||
+        !close(bl.y-tl.y,boardHeight) || !close(br.y-tr.y,boardHeight) ||
+        !close(tl.y,tr.y) || !close(bl.y,br.y) || !close(tl.x,bl.x) || !close(tr.x,br.x)) {
+      throw new Error("BoardPane stage corners are not an axis-aligned rectangle matching board dimensions.");
+    }
+    const exactX=tl.x*scaleX, exactY=tl.y*scaleY;
+    const x=roundOrigin?Math.round(exactX):exactX, y=roundOrigin?Math.round(exactY):exactY;
+    const width=boardWidth*scaleX, height=boardHeight*scaleY;
+    if (x<0 || y<0 || x+width>backingWidth+eps || y+height>backingHeight+eps) {
+      throw new Error("BoardPane placement falls outside the Stage backing canvas.");
+    }
+    return {x,y,width,height,exactX,exactY,roundedX:Math.round(exactX),roundedY:Math.round(exactY),
+      stageWidth,stageHeight,backingWidth,backingHeight,scaleX,scaleY,boardWidth,boardHeight,
+      rounding:roundOrigin?"nearest_backing_pixel":"exact_fractional_backing_origin"};
+  }
+
+  function renderStageCanvas2D(sourceCanvas, profile, roundOrigin) {
+    const p=buildStagePlacement(profile,roundOrigin);
+    if (!sourceCanvas || sourceCanvas.width!==p.width || sourceCanvas.height!==p.height) {
+      throw new Error("Stage compositor source dimensions do not match BoardPane backing dimensions.");
+    }
+    const canvas=document.createElement("canvas");
+    canvas.width=p.backingWidth; canvas.height=p.backingHeight;
+    const ctx=canvas.getContext("2d",{alpha:true});
+    if (!ctx) throw new Error("Stage Canvas2D context unavailable.");
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality="high";
+    ctx.drawImage(sourceCanvas,p.x,p.y,p.width,p.height);
+    return {canvas,placement:p};
+  }
+
+  function compileStageShader(gl,type,source) {
+    const shader=gl.createShader(type);
+    gl.shaderSource(shader,source); gl.compileShader(shader);
+    if (!gl.getShaderParameter(shader,gl.COMPILE_STATUS)) {
+      const message=gl.getShaderInfoLog(shader)||"unknown shader compile error";
+      gl.deleteShader(shader); throw new Error("Stage WebGL shader compile failed: "+message);
+    }
+    return shader;
+  }
+
+  function renderStageWebGL(sourceCanvas,profile,roundOrigin) {
+    const p=buildStagePlacement(profile,roundOrigin);
+    if (!sourceCanvas || sourceCanvas.width!==p.width || sourceCanvas.height!==p.height) {
+      throw new Error("Stage WebGL source dimensions do not match BoardPane backing dimensions.");
+    }
+    const canvas=document.createElement("canvas");
+    canvas.width=p.backingWidth; canvas.height=p.backingHeight;
+    const gl=canvas.getContext("webgl",{alpha:true,antialias:true,premultipliedAlpha:true,
+      preserveDrawingBuffer:true,depth:false,stencil:false});
+    if (!gl) throw new Error("Stage-level WebGL context unavailable.");
+    const maxTexture=gl.getParameter(gl.MAX_TEXTURE_SIZE), maxRenderbuffer=gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
+    if (canvas.width>maxTexture || canvas.height>maxTexture ||
+        canvas.width>maxRenderbuffer || canvas.height>maxRenderbuffer) {
+      throw new Error("Stage backing dimensions exceed WebGL texture/renderbuffer limits.");
+    }
+    const vs=compileStageShader(gl,gl.VERTEX_SHADER,
+      "attribute vec2 a_position; attribute vec2 a_texCoord; varying vec2 v_texCoord; "+
+      "void main(){gl_Position=vec4(a_position,0.0,1.0);v_texCoord=a_texCoord;}");
+    const fs=compileStageShader(gl,gl.FRAGMENT_SHADER,
+      "precision mediump float; varying vec2 v_texCoord; uniform sampler2D u_texture; "+
+      "void main(){gl_FragColor=texture2D(u_texture,v_texCoord);}");
+    const program=gl.createProgram();
+    gl.attachShader(program,vs); gl.attachShader(program,fs); gl.linkProgram(program);
+    if (!gl.getProgramParameter(program,gl.LINK_STATUS)) {
+      throw new Error("Stage WebGL program link failed: "+(gl.getProgramInfoLog(program)||"unknown error"));
+    }
+    gl.useProgram(program);
+    const cx=x=>x/p.backingWidth*2-1, cy=y=>1-y/p.backingHeight*2;
+    const x1=p.x+p.width, y1=p.y+p.height;
+    const vertices=new Float32Array([
+      cx(p.x),cy(p.y),0,0, cx(p.x),cy(y1),0,1,
+      cx(x1),cy(p.y),1,0, cx(x1),cy(y1),1,1
+    ]);
+    const buffer=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,buffer);
+    gl.bufferData(gl.ARRAY_BUFFER,vertices,gl.STATIC_DRAW);
+    const stride=4*Float32Array.BYTES_PER_ELEMENT;
+    const pos=gl.getAttribLocation(program,"a_position"), uv=gl.getAttribLocation(program,"a_texCoord");
+    gl.enableVertexAttribArray(pos); gl.vertexAttribPointer(pos,2,gl.FLOAT,false,stride,0);
+    gl.enableVertexAttribArray(uv); gl.vertexAttribPointer(uv,2,gl.FLOAT,false,stride,2*Float32Array.BYTES_PER_ELEMENT);
+    const texture=gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D,texture);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,true);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+    gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,sourceCanvas);
+    gl.viewport(0,0,canvas.width,canvas.height); gl.clearColor(0,0,0,0); gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.enable(gl.BLEND); gl.blendFunc(gl.ONE,gl.ONE_MINUS_SRC_ALPHA); gl.drawArrays(gl.TRIANGLE_STRIP,0,4); gl.finish();
+    const error=gl.getError();
+    if (error!==gl.NO_ERROR) throw new Error("Stage WebGL compositor returned GL error "+error+".");
+    const params={minFilter:gl.getTexParameter(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER),
+      magFilter:gl.getTexParameter(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER),
+      wrapS:gl.getTexParameter(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S),
+      wrapT:gl.getTexParameter(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T),
+      unpackPremultiplyAlpha:gl.getParameter(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL),
+      unpackFlipY:gl.getParameter(gl.UNPACK_FLIP_Y_WEBGL)};
+    const attributes=gl.getContextAttributes();
+    gl.deleteTexture(texture); gl.deleteBuffer(buffer); gl.deleteProgram(program); gl.deleteShader(vs); gl.deleteShader(fs);
+    return {canvas,placement:p,textureParameters:params,contextAttributes:attributes};
+  }
+
+  function renderStageLevelVariants(sourceCanvas,profile) {
+    const plan=[
+      {id:"A",backend:"WebGL",roundOrigin:false},
+      {id:"B",backend:"WebGL",roundOrigin:true},
+      {id:"C",backend:"Canvas2D",roundOrigin:false},
+      {id:"D",backend:"Canvas2D",roundOrigin:true}
+    ];
+    return plan.map(v=>{
+      const r=v.backend==="WebGL"
+        ?renderStageWebGL(sourceCanvas,profile,v.roundOrigin)
+        :renderStageCanvas2D(sourceCanvas,profile,v.roundOrigin);
+      return {id:v.id,backend:v.backend,canvas:r.canvas,placement:r.placement,
+        textureParameters:r.textureParameters||null,contextAttributes:r.contextAttributes||null};
+    });
+  }
+
   const api = {
     buildSmoothPathCommands,
     buildNormalPathCommands,
     terminalPoint,
     shouldWebGLRendererRasterize,
-    extractAcceptedPoints
+    extractAcceptedPoints,
+    buildStagePlacement
   };
 
   if (typeof module !== "undefined" && module.exports) {
@@ -634,6 +774,7 @@
           textureParameters: null,
           comparisons: []
         },
+        stageLevelCompositor: { status: liveRuntimeProfile ? "pending" : "not_run_no_run_bound_profile" },
         fixtures: []
       };
 
@@ -666,6 +807,9 @@
             ...webgl.sceneDiagnostics,
             ...webgl.comparison
           });
+          const stageLevelVariants = liveRuntimeProfile && fixture.id === "live-accepted-points"
+            ? renderStageLevelVariants(webgl.canvas, liveRuntimeProfile)
+            : [];
           const terminal = terminalPoint(fixture.points, fixture.mode === "smooth", false);
           const entry = {
             id: fixture.id,
@@ -679,6 +823,10 @@
             webglPixelComparison: webgl.comparison,
             webglSceneDiagnostics: webgl.sceneDiagnostics,
             webglTextureParameters: webgl.textureParameters,
+            stageLevelCompositor: stageLevelVariants.map(variant => ({
+              id: variant.id, backend: variant.backend, placement: variant.placement,
+              textureParameters: variant.textureParameters, contextAttributes: variant.contextAttributes
+            })),
             nodeBounds: source.nodeBounds,
             sourceTextureSize: source.skippedByWebGLRenderer
               ? null
@@ -730,11 +878,19 @@
             fixture.id + "-width-" + lineWidth + "-masked-board-reference.png", "Download Canvas2D masked-board reference");
           addDownloadLink(links, webgl.canvas,
             fixture.id + "-width-" + lineWidth + "-webgl-board-reference.png", "Download actual WebGL board reference");
+          for (const variant of stageLevelVariants) {
+            addDownloadLink(links, variant.canvas,
+              "stage-level-" + variant.id + "-" + variant.backend.toLowerCase() + "-" +
+                variant.placement.rounding + ".png",
+              "Download Stage variant " + variant.id + " (" + variant.backend + ")");
+          }
           card.appendChild(links);
           casesNode.appendChild(card);
         }
       }
 
+      manifest.stageLevelCompositor.status = liveRuntimeProfile ? "generated_four_offline_variants" : "not_run_no_run_bound_profile";
+      manifest.stageLevelCompositor.variantCount = liveRuntimeProfile ? 4 : 0;
       manifest.webglProbe.status = "complete";
       manifest.webglProbe.comparisonCount = manifest.webglProbe.comparisons.length;
       document.body.dataset.webglStatus = "complete";
