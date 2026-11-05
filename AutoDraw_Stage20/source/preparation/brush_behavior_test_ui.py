@@ -912,7 +912,7 @@ class BrushBehaviorTestTab:
         ttk.Label(row, text="Радиус кисти (1–30)").pack(side="left")
         ttk.Entry(row, textvariable=self.brush_var, width=6).pack(side="left", padx=(6, 16))
         ttk.Label(row, text="Тест").pack(side="left")
-        ttk.Combobox(row, textvariable=self.case_var, values=tuple(TEST_CASES), state="readonly", width=30).pack(side="left", padx=6)
+        ttk.Combobox(row, textvariable=self.case_var, values=tuple(TEST_CASES), state="readonly", width=42).pack(side="left", padx=6)
         matrix_row = ttk.Frame(controls)
         matrix_row.pack(fill="x", pady=(8, 0))
         ttk.Label(matrix_row, text="ID серии CHALK").pack(side="left")
@@ -1211,7 +1211,10 @@ class BrushBehaviorTestTab:
                 "• Исполнитель: point_step_px=2, point_delay_ms=10, line_extension_px=0.",
                 "• Остальные параметры: before_mouse_down=20 ms, after_mouse_down=40 ms, "
                 "after_mouse_up=20 ms, end_hold=50 ms, countdown=5 s.",
-                "• Game Monitor и Bridge должны быть активны; включи input telemetry до штриха.",
+                "• Game Monitor и Bridge должны быть активны; в Console игрового iframe выполни "
+                "AutoDrawGameMonitor.setInputTelemetryEnabled(true) до штриха.",
+                "• До штриха и после него сохрани AutoDrawGameMonitor.status() с pointCount; "
+                "после запуска также сохрани AutoDrawGameMonitor.inspect().",
                 "• После одного запуска сохрани raw Game Monitor run JSON, session.json, "
                 "AutoDrawGameMonitor.inspect(), pointCount до/после и PNG доски после штриха.",
                 "• В offline renderer reference используй режим smooth и line width 10.",
