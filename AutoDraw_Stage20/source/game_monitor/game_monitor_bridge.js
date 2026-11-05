@@ -18,6 +18,50 @@
 
   const sessionId = crypto.randomUUID();
   let sequence = 0;
+  let geometryUpdateTimer = null;
+  let lastRendererGeometryFingerprint = null;
+  let geometryListenersInstalled = false;
+
+  const readRendererGeometry = () => {
+    if (typeof monitor.inspect !== "function") return null;
+    try {
+      const inspection = monitor.inspect();
+      return inspection && inspection.renderer && typeof inspection.renderer === "object"
+        ? inspection.renderer : null;
+    } catch (_) {
+      return null;
+    }
+  };
+
+  const publishRendererGeometry = reason => {
+    const geometry = readRendererGeometry();
+    if (!geometry) return;
+    const fingerprint = JSON.stringify(geometry);
+    if (fingerprint === lastRendererGeometryFingerprint) return;
+    lastRendererGeometryFingerprint = fingerprint;
+    send("renderer_geometry", { rendererGeometry: geometry, reason });
+  };
+
+  const scheduleRendererGeometryRefresh = reason => {
+    if (geometryUpdateTimer !== null) return;
+    geometryUpdateTimer = setTimeout(() => {
+      geometryUpdateTimer = null;
+      publishRendererGeometry(reason);
+    }, 120);
+  };
+
+  const installGeometryListeners = () => {
+    if (geometryListenersInstalled) return;
+    geometryListenersInstalled = true;
+    window.addEventListener("resize", () => scheduleRendererGeometryRefresh("window_resize"), true);
+    window.addEventListener("scroll", () => scheduleRendererGeometryRefresh("window_scroll"), true);
+    window.addEventListener("orientationchange", () => scheduleRendererGeometryRefresh("orientation_change"), true);
+    document.addEventListener("fullscreenchange", () => scheduleRendererGeometryRefresh("fullscreen_change"), true);
+    if (window.visualViewport && typeof window.visualViewport.addEventListener === "function") {
+      window.visualViewport.addEventListener("resize", () => scheduleRendererGeometryRefresh("visual_viewport_resize"));
+      window.visualViewport.addEventListener("scroll", () => scheduleRendererGeometryRefresh("visual_viewport_scroll"));
+    }
+  };
   let connected = false;
   let unsubscribe = null;
   let heartbeatTimer = null;
@@ -91,12 +135,16 @@
     try { message = JSON.parse(event.data); } catch (_) { return; }
     if (message.type === "ready") {
       connected = true;
+      const initialRendererGeometry = readRendererGeometry();
+      lastRendererGeometryFingerprint = initialRendererGeometry ? JSON.stringify(initialRendererGeometry) : null;
       send("session_start", {
         monitorStatus: monitor.status(),
+        rendererGeometry: initialRendererGeometry,
         browser: navigator.userAgent,
         page: { origin: location.origin, pathname: location.pathname },
         visibilityState: document.visibilityState
       });
+      installGeometryListeners();
       unsubscribe = monitor.subscribe(item => {
         if (!ALLOWED_EVENTS.has(item.type)) return;
         // BoardPane callbacks are not exposed in every game frame. Pointer
@@ -131,6 +179,7 @@
     connected = false;
     if (unsubscribe) unsubscribe();
     if (heartbeatTimer !== null) clearInterval(heartbeatTimer);
+    if (geometryUpdateTimer !== null) clearTimeout(geometryUpdateTimer);
     if (rafHandle !== null) cancelAnimationFrame(rafHandle);
     window.AutoDrawGameMonitorBridge = { connected: false, sessionId, closeCode: event.code, closeReason: event.reason };
     console.warn("AutoDraw Game Monitor Bridge disconnected:", event.code, event.reason);
