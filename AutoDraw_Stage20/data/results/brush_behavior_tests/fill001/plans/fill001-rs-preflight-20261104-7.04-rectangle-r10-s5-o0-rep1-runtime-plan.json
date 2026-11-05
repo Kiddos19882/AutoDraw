@@ -1,0 +1,578 @@
+{
+  "schema_version": 1,
+  "name": "FILL-001-RS fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
+  "created_at": "2026-11-04T04:04:22.557429+00:00",
+  "coordinate_system": "local_canvas_pixels",
+  "canvas": {
+    "width": 581,
+    "height": 304
+  },
+  "summary": {
+    "stroke_count": 27,
+    "drawing_length_px": 10402.18,
+    "pen_up_distance_px": 10060.57
+  },
+  "strokes": [
+    {
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0001",
+      "closed": false,
+      "points": [
+        {
+          "x": 118.522,
+          "y": 69.438
+        },
+        {
+          "x": 461.478,
+          "y": 69.438
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0002",
+      "closed": false,
+      "points": [
+        {
+          "x": 103.391,
+          "y": 75.75
+        },
+        {
+          "x": 476.609,
+          "y": 75.75
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0003",
+      "closed": false,
+      "points": [
+        {
+          "x": 98.348,
+          "y": 82.062
+        },
+        {
+          "x": 481.652,
+          "y": 82.062
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0004",
+      "closed": false,
+      "points": [
+        {
+          "x": 95.826,
+          "y": 88.375
+        },
+        {
+          "x": 484.174,
+          "y": 88.375
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0005",
+      "closed": false,
+      "points": [
+        {
+          "x": 94.565,
+          "y": 94.688
+        },
+        {
+          "x": 485.435,
+          "y": 94.688
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0006",
+      "closed": false,
+      "points": [
+        {
+          "x": 94.565,
+          "y": 101.0
+        },
+        {
+          "x": 485.435,
+          "y": 101.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0007",
+      "closed": false,
+      "points": [
+        {
+          "x": 94.565,
+          "y": 107.312
+        },
+        {
+          "x": 485.435,
+          "y": 107.312
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0008",
+      "closed": false,
+      "points": [
+        {
+          "x": 94.565,
+          "y": 113.625
+        },
+        {
+          "x": 485.435,
+          "y": 113.625
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0009",
+      "closed": false,
+      "points": [
+        {
+          "x": 94.565,
+          "y": 119.938
+        },
+        {
+          "x": 485.435,
+          "y": 119.938
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0010",
+      "closed": false,
+      "points": [
+        {
+          "x": 94.565,
+          "y": 126.25
+        },
+        {
+          "x": 485.435,
+          "y": 126.25
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0011",
+      "closed": false,
+      "points": [
+        {
+          "x": 94.565,
+          "y": 132.562
+        },
+        {
+          "x": 485.435,
+          "y": 132.562
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0012",
+      "closed": false,
+      "points": [
+        {
+          "x": 94.565,
+          "y": 138.875
+        },
+        {
+          "x": 485.435,
+          "y": 138.875
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0013",
+      "closed": false,
+      "points": [
+        {
+          "x": 94.565,
+          "y": 145.188
+        },
+        {
+          "x": 485.435,
+          "y": 145.188
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0014",
+      "closed": false,
+      "points": [
+        {
+          "x": 94.565,
+          "y": 151.5
+        },
+        {
+          "x": 485.435,
+          "y": 151.5
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0015",
+      "closed": false,
+      "points": [
+        {
+          "x": 94.565,
+          "y": 157.812
+        },
+        {
+          "x": 485.435,
+          "y": 157.812
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0016",
+      "closed": false,
+      "points": [
+        {
+          "x": 94.565,
+          "y": 164.125
+        },
+        {
+          "x": 485.435,
+          "y": 164.125
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0017",
+      "closed": false,
+      "points": [
+        {
+          "x": 94.565,
+          "y": 170.438
+        },
+        {
+          "x": 485.435,
+          "y": 170.438
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0018",
+      "closed": false,
+      "points": [
+        {
+          "x": 94.565,
+          "y": 176.75
+        },
+        {
+          "x": 485.435,
+          "y": 176.75
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0019",
+      "closed": false,
+      "points": [
+        {
+          "x": 94.565,
+          "y": 183.062
+        },
+        {
+          "x": 485.435,
+          "y": 183.062
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0020",
+      "closed": false,
+      "points": [
+        {
+          "x": 94.565,
+          "y": 189.375
+        },
+        {
+          "x": 485.435,
+          "y": 189.375
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0021",
+      "closed": false,
+      "points": [
+        {
+          "x": 94.565,
+          "y": 195.688
+        },
+        {
+          "x": 485.435,
+          "y": 195.688
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0022",
+      "closed": false,
+      "points": [
+        {
+          "x": 94.565,
+          "y": 202.0
+        },
+        {
+          "x": 485.435,
+          "y": 202.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0023",
+      "closed": false,
+      "points": [
+        {
+          "x": 94.565,
+          "y": 208.312
+        },
+        {
+          "x": 485.435,
+          "y": 208.312
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0024",
+      "closed": false,
+      "points": [
+        {
+          "x": 95.826,
+          "y": 214.625
+        },
+        {
+          "x": 484.174,
+          "y": 214.625
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0025",
+      "closed": false,
+      "points": [
+        {
+          "x": 98.348,
+          "y": 220.938
+        },
+        {
+          "x": 481.652,
+          "y": 220.938
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0026",
+      "closed": false,
+      "points": [
+        {
+          "x": 103.391,
+          "y": 227.25
+        },
+        {
+          "x": 476.609,
+          "y": 227.25
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1_0027",
+      "closed": false,
+      "points": [
+        {
+          "x": 118.522,
+          "y": 233.562
+        },
+        {
+          "x": 461.478,
+          "y": 233.562
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    }
+  ],
+  "autodraw_experiment": {
+    "phase_id": "FILL001",
+    "series_id": "fill001-rs-preflight-20261104-7.04",
+    "task_id": "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1",
+    "shape_id": "rectangle",
+    "requested_radius": 10,
+    "repeat_index": 1,
+    "expected_strokes": 27,
+    "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417",
+    "target_mask_sha256": "ac1c6660e5986cdf534328c6dbcd5020f631168b1473c24b29e7609eb827998b",
+    "sampling_profile": {
+      "profile_id": "P1",
+      "sampling_step": 4,
+      "delay_ms": 5
+    },
+    "plan_variant": "FILL001_RS_V1",
+    "planner_version": 2,
+    "scanline_row_step": 5,
+    "scanline_offset": 0,
+    "executor_plan_sha256": "848b6875e34bad388a48706346a9939cdf508200edf2536d8da99121a5d8b6b9"
+  }
+}

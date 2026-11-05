@@ -41,7 +41,7 @@ def test_real_committed_fill001_evidence_runs_through_capture_button(tmp_path, m
     report_source = (
         repo_root / "data" / "results" / "execution_20261104_070545_500355_cf845f.json"
     )
-    source_plan = results_root / "fill001" / "plans" / f"{TASK_ID}.json"
+    source_plan = results_root / "fill001" / "plans" / f"{TASK_ID}-runtime-plan.json"
     before_source = results_root / "fill001" / "captures" / f"{TASK_ID}-before.png"
     after_source = results_root / "fill001" / "captures" / f"{TASK_ID}-after.png"
     session_source = results_root / "game_monitor_bridge" / SESSION_ID
