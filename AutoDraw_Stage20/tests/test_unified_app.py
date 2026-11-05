@@ -1517,6 +1517,7 @@ class UnifiedAppCoreTests(unittest.TestCase):
             "strokes": [{"points": [{"x": 20.0, "y": 120.0}, {"x": 420.0, "y": 120.0}]}],
         }
         app = object.__new__(integrated_app.AutoDrawUnifiedApp)
+        app.root = None  # The test bypasses __init__; production instances always receive the Tk root.
         app.status_var = Status()
         with tempfile.TemporaryDirectory(prefix="AutoDraw paired renderer invalid radius ") as temp:
             plan_path = Path(temp) / "current_brush_behavior_test.json"
