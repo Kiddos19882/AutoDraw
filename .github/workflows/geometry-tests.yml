@@ -141,7 +141,7 @@ jobs:
       - name: Compare paired live board PNG with accepted-point Egret WebGL replay (exploratory)
         shell: pwsh
         run: |
-          python tests\\compare_live_renderer_reference.py --experiment-dir data\\results\\brush_behavior_tests\\experiment-20261105-041705-b10-paired_renderer_single_stroke-d47cc0a5 --blank data\\results\\brush_behavior_tests\\blank-board-reference.png --offline-png data\\renderer_result\\live-accepted-points-width-10-webgl-board-reference.png --manifest data\\renderer_result\\egret-5.4.1-renderer-reference-manifest.json --plan data\\results\\brush_behavior_tests\\brush-plan-paired_renderer_single_stroke-b10-20261105-041703-d47cc0a5.json --output-dir "$env:RUNNER_TEMP\\paired-renderer-png-comparison"
+          python tests\\compare_live_renderer_reference.py --experiment-dir data\\results\\brush_behavior_tests\\experiment-20261105-041705-b10-paired_renderer_single_stroke-d47cc0a5 --blank data\\results\\brush_behavior_tests\\blank-board-reference.png --offline-png data\\renderer_result\\live-accepted-points-width-10-webgl-board-reference.png --manifest data\\renderer_result\\egret-5.4.1-renderer-reference-manifest.json --plan data\\results\\brush_behavior_tests\\brush-plan-paired_renderer_single_stroke-b10-20261105-041703-d47cc0a5.json --output-dir "$env:RUNNER_TEMP\\paired-renderer-png-comparison" --geometry-audit data\\results\\brush_behavior_tests\\experiment-20261105-041705-b10-paired_renderer_single_stroke-d47cc0a5\\screen_geometry_audit.json
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Upload paired renderer PNG comparison diagnostics
         if: always()
