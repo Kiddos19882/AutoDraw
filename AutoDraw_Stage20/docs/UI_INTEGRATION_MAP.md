@@ -192,13 +192,13 @@ Bridge server получает временный путь через --snippet-
 
 ### 4.3.1. G3 CHALK executor parameter matrix
 
-### Paired renderer single-stroke test
+Автоматический CHALK block runner поддерживает G3 только после принятого G2. Каждая задача передаёт `executor_parameters` в `chalk_experiment_matrix` metadata и сохраняет их в runtime plan. Интеграционный слой читает runtime plan при подтверждении кисти, проверяет фиксированный G3 protocol и передаёт полный набор параметров в `Stage6App.start_execution_from_workflow(executor_config_override=...)`.
+
+### 4.3.2. Paired renderer single-stroke test
 
 Вкладка «Тест кистей» содержит отдельный сценарий paired_renderer_single_stroke, не являющийся задачей G1/G2/G3 matrix runner. Он формирует один logical-board stroke и добавляет в generation.paired_renderer_capture версию протокола, requested radius, ожидаемое число strokes, renderer path mode и frozen executor parameters.
 
 AutoDrawUnifiedApp._start_brush_test_executor() читает metadata из runtime plan и fail-closed проверяет профиль, радиус 10 и один stroke; затем передаёт executor override в Stage 6. Override действует только на текущий запуск. Воспроизведение принятых координат выполняется отдельно через tests/game_renderer_reference.html в режиме smooth / line width 10.
-
-Автоматический CHALK block runner поддерживает G3 только после принятого G2. Каждая задача передаёт `executor_parameters` в `chalk_experiment_matrix` metadata и сохраняет их в runtime plan. Интеграционный слой читает runtime plan при подтверждении кисти, проверяет фиксированный G3 protocol и передаёт полный набор параметров в `Stage6App.start_execution_from_workflow(executor_config_override=...)`.
 
 Stage6 валидирует override через `ExecutorConfig`, применяет его к текущему запуску и не сохраняет временные значения в пользовательский профиль. Фактическая конфигурация попадает в execution report и сверяется analyzer с metadata.
 
