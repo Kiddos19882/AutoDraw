@@ -4,7 +4,8 @@
 
 **Репозиторий:** Kiddos19882/AutoDraw  
 **Рабочая ветка:** feature/image-geometry-optimization  
-**HEAD на момент синхронизации:** b07c636fa4b4ce28329cfb74f468634a46751ac1  
+**Последний code/test HEAD:** b07c636fa4b4ce28329cfb74f468634a46751ac1  
+**Последний документационный commit:** fb34c119f84c9569ce118d1191bc11907e2f8016  
 **Master:** 9a3453aeb847b66041bc83d6f4a56ecaf33a993a — не изменялась.  
 **Последний CI:** [42113632374](https://github.com/Kiddos19882/AutoDraw/actions/runs/42113632374), итоговый conclusion FAILURE из-за INT-006 vertical/diagonal renderer gates.
 
