@@ -3156,3 +3156,11 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - Bridge server stores optional geometry fields in existing session schema v2 (no schema bump, preserving FILL-001 compatibility) and run schema v1 (`renderer_geometry_at_start`, up to 32 updates, `renderer_geometry_at_end`). Snapshots are JSON/size validated.
 - Tests added for Monitor axis-aligned fallback/window metrics, RunRecorder geometry binding, and websocket session geometry persistence. CI validation pending.
 - No AutoDraw profile consumer, production planner transform or executor changes in this increment. No live game actions.
+
+
+## 2026-11-05 — Monitor/Bridge targeted tests passed
+
+- CI run `41964932479`, job `Game Monitor and bridge tests` completed SUCCESS.
+- `game_monitor.test.js`: 21 tests passed, 0 failed; includes the new axis-aligned canvas rect fallback and window geometry snapshot test.
+- `test_websocket_smoke_server.py`: 22 tests passed; includes RunRecorder geometry-at-start/update/end and websocket session geometry persistence using schema v2.
+- Bridge browser agent parse test passed. Preparation/G3 test job was still running; full workflow result pending.
