@@ -1,3 +1,14 @@
+## 2026-11-05 — offline renderer run-bound profile correction
+
+**Commits:** `23ed8cf2cce051eeda87ad8b630604ae96889608`, `d6343adaf2db05f321b48ef0432b897277ff0193`.
+
+- Статический аудит выявил устаревшие runtime metadata в `game_renderer_reference.js`: Stage 1672×600 и backing canvas 5016×1800 из snapshot 2026-11-04.
+- Последний paired-run профиль: screen 1920×1080; viewport 1920×877; Stage 1314×600; backing canvas 3942×1800; scale factor 2; canvas scale 3×3; DPR=1; visualViewportScale=1; CSS matrix X/Y=0.487062/0.487778.
+- Harness теперь извлекает этот профиль из полного `monitor_report.json` и требует идентичные `renderer_geometry_at_start/end` для exact run. Старый snapshot больше не является fallback.
+- Offscreen raster remains BoardPane 460×240 at 3× = 1380×720; live Stage/CSS transform is metadata and is not applied to local raster.
+- **Execution status:** offline rerun NOT_RUN; live test NOT_RUN; automated CI NOT_RUN. Это source change, а не подтверждение pixel equivalence.
+- Ожидаются новые offline manifest/PNG от пользователя.
+
 # TEST_RESULTS — единый реестр результатов тестирования AutoDraw
 
 **Статус:** действующий сводный реестр результатов и доказательств  
