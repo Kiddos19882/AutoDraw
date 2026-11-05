@@ -6,9 +6,12 @@
 
 ## Сводка
 
+**Уточнение 2026-11-05:** same-run Monitor/screenshot transform проходит geometry gates. CI 42087496092 выявил, что формальная pixel mask включала 17 UI pixels за пределами BoardPane, но внутри большего calibrated ROI. Commit `1ac3d939` ограничил formal comparison точными screenshot-derived BoardPane bounds, вынес ROI margins в отдельную диагностику и добавил regression tests. CI 42091370065 выполняется; formal acceptance vertical/diagonal остаётся pending.
+
+
 | ID | Приоритет | Статус | Содержание |
 |---|---|---|---|
-| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | HORIZONTAL_PER_RUN_ACCEPTED_VERTICAL_DIAGONAL_SAME_RUN_REPLAY_CI_PENDING_PROFILE_PENDING | Один horizontal capture прошёл formal per-run gates; по одному vertical/diagonal live capture собраны и raw-validated, но independent-transform per-run acceptance pending; для multi-axis серии нужны три unique PASS_PER_RUN каждого направления; environment fingerprint, profile consumer and executor gate pending |
+| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | HORIZONTAL_PER_RUN_ACCEPTED_VERTICAL_DIAGONAL_REPLAY_CI_PENDING_BOARD_BOUNDS_CROP_FIX_PROFILE_PENDING | Один horizontal capture прошёл formal per-run gates; по одному vertical/diagonal live capture собраны и raw-validated, но independent-transform per-run acceptance pending; для multi-axis серии нужны три unique PASS_PER_RUN каждого направления; environment fingerprint, profile consumer and executor gate pending |
 | FILL-001-RS-MATRIX | P0 | BLOCKED | 45 captures только после принятого single-task preflight |
 | GAME-INPUT-SAMPLING-TRACE-001 | P1 | ROI_BOUNDS_ROOT_CAUSE_IDENTIFIED_MULTI_AXIS_CODE_READY_LIVE_CAPTURE_PENDING | Run 16aec62c; 138 accepted points, CHALK=138; ROI included margins; screenshot-derived bounds + Monitor fit IoU=0.998882 / 10 px without post-hoc shift; multi-axis/environment validation pending |
 | BRUSH-FOOTPRINT-CAPSULE-001 | P1 | OPEN | Offline capsule model готова; renderer acceptance/planner integration не выполнены |

@@ -1,6 +1,6 @@
 # Актуальная точка продолжения — 2026-11-05
 
-## Текущая точка — same-run geometry replay реализован; CI вертикального и диагонального сравнений выполняется
+## Текущая точка — сравнение ограничено фактическими BoardPane bounds; CI проверки исправления выполняется
 
 **Репозиторий:** `Kiddos19882/AutoDraw`  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
@@ -10,13 +10,17 @@
 **Workflow packaging commit:** `fb853547d74a70582ab1e4731d55763367b8ceb8`, проверен успешным run `41970907209`.  
 **Документационная синхронизация:** 2026-11-05, после evidence commit `e6b771e`; основные документы обновлены коммитами `1d4ad6e`–`102b834`, итоговая корректировка метаданных — `f3141dd1d3923fa3c16766b5cccddd6b4065f64a`.
 **Последний CI-проверенный code/test HEAD:** `58ebdda7cf3f07ceef1075020f2808a2782562b7` — CI 41994624425 SUCCESS.  
-**Последний implementation HEAD:** `1cd0d6153bdd5e6ae6248a3a48dd1915595cccc9`.  
-**Текущий CI replay:** [run 42083576282](https://github.com/Kiddos19882/AutoDraw/actions/runs/42083576282), in progress; formal vertical/diagonal outcomes ещё не получены.
+**Последний implementation HEAD:** `1ac3d9390c56072730017e073cf80dd69c448f8b`.  
+**Последний неуспешный CI:** [run 42087496092](https://github.com/Kiddos19882/AutoDraw/actions/runs/42087496092) — горизонтальный контроль отклонён: 17 изменившихся пикселей за пределами BoardPane попали в больший calibrated ROI.  
+**Текущий CI исправления:** [run 42091370065](https://github.com/Kiddos19882/AutoDraw/actions/runs/42091370065), in progress.
 **Master:** remote HEAD `9a3453aeb847b66041bc83d6f4a56ecaf33a993a`; master не изменялась.
 **Рабочая копия:** локальный `git status` через GitHub API недоступен.
 
 
 ### Исправление screen geometry для offline/live paired renderer — 2026-11-05
+
+**Новое уточнение после CI 42087496092:** same-run transform и provenance проходят; оставшаяся ошибка была в домене pixel comparison. ROI `(496,265,674,355)` содержит BoardPane `(498,268,672,351)` и соседние UI pixels. В horizontal capture 17 changed pixels находились на нижнем ряду ROI вне BoardPane; они искажали bbox/symmetric-difference gates. В commit `1ac3d939` formal masks теперь вырезаются по фактическим screenshot-derived BoardPane bounds; ROI margins сохраняются отдельной диагностикой и не входят в метрики рендера. Добавлены regression tests для точного crop и reject bounds вне ROI. CI 42091370065 проверяет исправление; до его завершения PASS не заявляется.
+
 
 - CLI собирает geometry-audit из renderer_geometry_at_start exact Game Monitor run: проверяет experiment_id/run_id/session_id, идентичность start/end snapshots, нулевые geometry updates/overflow, window.screen, фазовые screen metadata и фактические full-screen PNG dimensions.
 - Live screen transform строится по same-run Monitor fits и/или screenshot BoardPane bounds. Frozen ROI остаётся только окном поиска доски, а не размером BoardPane. Runtime snapshot от 2026-11-04 не используется для live screen alignment.

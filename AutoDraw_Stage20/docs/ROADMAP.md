@@ -1,6 +1,6 @@
 # Дополнение к дорожной карте — 2026-11-05
 
-## 2026-11-05 — same-run multi-axis renderer replay implemented; CI pending
+## 2026-11-05 — same-run multi-axis replay + exact BoardPane crop fix; CI pending
 
 - renderer_geometry.py builds a run-bound geometry audit from Game Monitor renderer_geometry_at_start; it requires exact experiment/run/session IDs, unchanged start/end snapshots, zero geometry updates/overflow and matched screen/PNG dimensions.
 - compare_live_renderer_reference.py --same-run-geometry derives the actual screen transform from same-run Monitor and full-screen screenshot evidence; frozen ROI is only a search window. The stale 2026-11-04 runtime profile is not used for live alignment.

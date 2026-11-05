@@ -59,3 +59,15 @@ Scope: code, tests and CI only in feature/image-geometry-optimization; no real g
 - Commits: d26ed86 (adapter/tests/CI replay), 57638f2 (audit JSON newline), 1cd0d61 (authoritative report fields).
 - Current CI run: 42083576282, pending at documentation time. Game Monitor/Bridge, Egret browser reference, executor and integration jobs have reported SUCCESS; preparation/G3 is still running.
 - No live game run, AutoDraw launch, production planner/renderer/executor change or local workstation action was performed.
+
+## 2026-11-05 — formal renderer comparison uses exact BoardPane crop
+
+**Scope:** renderer comparison code and regression tests on `feature/image-geometry-optimization`; no live experiment.
+
+- Reviewed CI 42087496092 artifacts. The same-run transform was valid, but the formal comparison cropped to calibrated ROI `(496,265,674,355)` instead of detected BoardPane bounds `(498,268,672,351)`.
+- Identified 17 changed pixels on the ROI's bottom margin outside the board; these caused false bbox/symmetric-difference failures despite the actual board mask matching closely.
+- Added `crop_mask_to_board_bounds()` with fail-closed validation. Formal observed/expected masks now use exact same-run BoardPane bounds; ROI-margin deltas are retained separately as diagnostic evidence.
+- Added regression tests for exact board crop, outside-board isolation and invalid bounds.
+- Commit: `1ac3d9390c56072730017e073cf80dd69c448f8b`.
+- CI run `42091370065` is pending. The existing horizontal artifact recalculated over exact BoardPane bounds gives IoU 0.999218, precision 0.999553, recall 0.999665, 7 symmetric-difference pixels and identical bounding boxes; this is an offline re-analysis, not a new CI result.
+- No live game run, local app launch, production planner/executor change, master modification or local git status check was performed.

@@ -6,8 +6,21 @@
 **HEAD перед дополнением D1–D5:** `63fdaf3f2a1b12bd90e1a588ca4e968facbe0103`  
 **Область:** AutoDraw_Stage20, тесты приложения, лабораторные эксперименты, Game Monitor/Bridge, CHALK, FILL-001, геометрические модели, GitHub Actions и offline benchmarks.  
 **Последний evidence commit:** `e6b771ed67201625884c6ce778fa355f1ab9b873` (первые vertical/diagonal live captures и exploratory offline reports).  
-**Последний implementation HEAD:** `1cd0d6153bdd5e6ae6248a3a48dd1915595cccc9`; CI replay 42083576282 pending.
+**Последний implementation HEAD:** `1ac3d9390c56072730017e073cf80dd69c448f8b`; CI run 42091370065 in progress.
 
+## 2026-11-05 — exact BoardPane bounds вместо calibrated ROI в formal renderer metrics
+
+**Implementation:** [1ac3d9390c56072730017e073cf80dd69c448f8b](https://github.com/Kiddos19882/AutoDraw/commit/1ac3d9390c56072730017e073cf80dd69c448f8b).
+**Предыдущий CI:** [42087496092](https://github.com/Kiddos19882/AutoDraw/actions/runs/42087496092) — FAILED на horizontal formal renderer gate; transform и capture gates прошли.
+**Текущий CI:** [42091370065](https://github.com/Kiddos19882/AutoDraw/actions/runs/42091370065) — IN_PROGRESS на момент записи.
+
+- Причина: calibrated ROI `(496,265,674,355)` больше фактического BoardPane `(498,268,672,351)`. Horizontal full-screen diff содержал 17 изменившихся пикселей на одном ряду за пределами BoardPane, но внутри ROI. Эти UI pixels не относятся к offline BoardPane raster, однако попадали в formal bbox и symmetric-difference metrics.
+- Контрольный replay run 42087496092: IoU `0.997323`, precision `0.997657`, recall `0.999665`, symmetric difference `24/8963`; bbox height включал дополнительные 170 px за пределами ожидаемого штриха. Причина локализована к ROI margin; пороги не менялись.
+- Новый `crop_mask_to_board_bounds()` вырезает live и expected masks по точным screenshot-derived BoardPane bounds; изменившиеся pixels внутри ROI, но снаружи BoardPane, отдельно сохраняются в `outside-board-live-delta-mask.png` и в report, не влияя на BoardPane comparison.
+- Добавлены regression tests: crop `672×351` исключает 17 outside-board pixels; некорректные bounds вне ROI/screen отклоняются.
+- CI workflow продолжает vertical/diagonal replay даже если один из них отклонён, чтобы сохранить оба per-orientation reports.
+- Расчёт на имеющемся horizontal CI artifact после exact BoardPane crop: IoU `0.999218`, precision `0.999553`, recall `0.999665`, symmetric difference `7` pixels, bbox совпадает. Это локальный повторный расчёт по артефакту, не результат нового CI.
+- No live game run, production executor handoff or master change.
 > Этот файл — единая точка входа для понимания результатов тестирования. Здесь собраны проверяемые сводные результаты, статусы, ограничения и ссылки на первичные отчёты/артефакты. Первичные JSON, PNG, логи, frozen plans, manifests и подробные отчёты не удаляются и не переписываются: они остаются источниками доказательств. Если краткая сводка расходится с первичным отчётом, приоритет имеет первичный материал и фактический runtime/CI evidence.
 
 
