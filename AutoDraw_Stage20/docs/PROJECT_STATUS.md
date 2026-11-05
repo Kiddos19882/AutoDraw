@@ -3,7 +3,7 @@
 ## Дополнение — аудит Stage-level WebGL composition (2026-11-06)
 
 **Статус:** статический аудит завершён; controlled Stage-level probe ещё не реализован и не запускался.  
-**Проверенная точка:** branch `feature/image-geometry-optimization`, HEAD до этой документационной записи `f0cfa6268fd39cf91f3d4a9e7e2bf9509763ff48`; code/test HEAD `b07c636fa4b4ce28329cfb74f468634a46751ac1`. Master `9a3453aeb847b66041bc83d6f4a56ecaf33a993a` не изменялась.
+**Удалённая точка до текущей синхронизации:** branch `feature/image-geometry-optimization`, HEAD `81f6bb77c8a338ae52e0de084dce45e0cacabf1f` (последний документационный commit); последний code/test HEAD `b07c636fa4b4ce28329cfb74f468634a46751ac1`. Master `9a3453aeb847b66041bc83d6f4a56ecaf33a993a` не изменялась.
 
 ### Выполненная работа и подтверждённые факты
 
