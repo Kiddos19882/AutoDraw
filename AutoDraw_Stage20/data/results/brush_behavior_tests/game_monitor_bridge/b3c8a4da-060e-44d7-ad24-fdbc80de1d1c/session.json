@@ -1,0 +1,446 @@
+{
+  "schema_version": 2,
+  "session_id": "b3c8a4da-060e-44d7-ad24-fdbc80de1d1c",
+  "started_at_utc": "2026-11-05T16:22:19.908+00:00",
+  "run_idle_seconds": 2.5,
+  "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:159.0) Gecko/20100101 Firefox/159.0",
+  "page": {
+    "origin": "https://eufbpet.hust.me",
+    "pathname": "/pet.php"
+  },
+  "monitor_status_at_connect": {
+    "version": "0.2.3",
+    "active": true,
+    "boardDetected": true,
+    "boardLabel": "o",
+    "snapshot": {
+      "logicalWidth": 460,
+      "logicalHeight": 240,
+      "scaleX": 1,
+      "scaleY": 1,
+      "maxPoints": 6000,
+      "remainingPoints": 5999,
+      "pointCount": 1,
+      "sourceMethod": "BoardPane.max+BoardPane.less",
+      "isExact": true,
+      "validationStatus": "valid",
+      "radius": [
+        0,
+        30
+      ],
+      "currentRadius": 30
+    },
+    "eventCount": 252,
+    "droppedEvents": 0,
+    "errors": 0,
+    "inputTelemetryEnabled": false
+  },
+  "bridge_configuration": {
+    "inputTelemetry": {
+      "requested": false,
+      "enabled": false,
+      "previous": false,
+      "changedByBridge": false,
+      "restoreStatus": "not_required"
+    }
+  },
+  "renderer_geometry": {
+    "inspectionMode": "read_only",
+    "engineVersion": "5.4.1",
+    "renderMode": "webgl",
+    "runtimeType": "web",
+    "systemRenderer": "n",
+    "canvasRenderer": "n",
+    "windowGeometry": {
+      "screenX": -8,
+      "screenY": -8,
+      "outerWidth": 1936,
+      "outerHeight": 1056,
+      "innerWidth": 1920,
+      "innerHeight": 877,
+      "screenWidth": 1920,
+      "screenHeight": 1080,
+      "availableScreenWidth": 1920,
+      "availableScreenHeight": 1032
+    },
+    "canvasScaleFactor": 2,
+    "canvasScaleX": 3,
+    "canvasScaleY": 3,
+    "devicePixelRatio": 1,
+    "visualViewportScale": 1,
+    "playerCount": 1,
+    "players": [
+      {
+        "playerFound": true,
+        "playerMatchesStage": true,
+        "containerRect": {
+          "left": 0,
+          "top": 0,
+          "right": 1920,
+          "bottom": 877,
+          "width": 1920,
+          "height": 877
+        },
+        "playerOptions": {
+          "scaleMode": "fixedHeight",
+          "frameRate": 30,
+          "contentWidth": 740,
+          "contentHeight": 600,
+          "renderModeOption": null
+        },
+        "stage": {
+          "width": 1314,
+          "height": 600,
+          "frameRate": 30,
+          "scaleMode": "fixedHeight",
+          "orientation": "auto"
+        },
+        "canvas": {
+          "width": 3942,
+          "height": 1800,
+          "clientWidth": 3942,
+          "clientHeight": 1800,
+          "offsetLeft": 0,
+          "offsetTop": -1,
+          "rect": {
+            "left": 0,
+            "top": -0.5,
+            "right": 1920,
+            "bottom": 877.5,
+            "width": 1920,
+            "height": 878
+          },
+          "screenQuad": null,
+          "style": {
+            "left": "0px",
+            "top": "-0.5px",
+            "width": "",
+            "height": "",
+            "transform": "matrix(0.487062, 0, 0, 0.487778, 0, 0)",
+            "transformOrigin": "0% 0% 0px",
+            "computedTransform": "matrix(0.487062, 0, 0, 0.487778, 0, 0)",
+            "computedTransformOrigin": "0px 0px"
+          }
+        },
+        "boardStageCorners": {
+          "topLeft": {
+            "x": 340.7916660308838,
+            "y": 72
+          },
+          "topRight": {
+            "x": 800.7916660308838,
+            "y": 72
+          },
+          "bottomRight": {
+            "x": 800.7916660308838,
+            "y": 312
+          },
+          "bottomLeft": {
+            "x": 340.7916660308838,
+            "y": 312
+          }
+        },
+        "boardClientCorners": {
+          "topLeft": {
+            "x": 497.9604252506065,
+            "y": 104.86
+          },
+          "topRight": {
+            "x": 1170.1065439720678,
+            "y": 104.86
+          },
+          "bottomRight": {
+            "x": 1170.1065439720678,
+            "y": 456.06
+          },
+          "bottomLeft": {
+            "x": 497.9604252506065,
+            "y": 456.06
+          }
+        },
+        "boardClientMappingMethod": "validated_axis_aligned_rect",
+        "boardDisplayChain": [
+          {
+            "className": "o",
+            "x": 30,
+            "y": 75,
+            "width": 460,
+            "height": 240,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": {
+              "x": 0,
+              "y": 0,
+              "width": 460,
+              "height": 240
+            },
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 340.7916660308838,
+              "ty": 72
+            }
+          },
+          {
+            "className": "o",
+            "x": 310.7916660308838,
+            "y": -3,
+            "width": 676,
+            "height": 379,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": null,
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 310.7916660308838,
+              "ty": -3
+            }
+          },
+          {
+            "className": "i",
+            "x": 0,
+            "y": 0,
+            "width": 1314,
+            "height": 603,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": null,
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 0,
+              "ty": 0
+            }
+          },
+          {
+            "className": "Preloader",
+            "x": 0,
+            "y": 0,
+            "width": 3113,
+            "height": 737.9490000000001,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": {
+              "x": 0,
+              "y": 0,
+              "width": 1314,
+              "height": 600
+            },
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 0,
+              "ty": 0
+            }
+          },
+          {
+            "className": "i",
+            "x": 0,
+            "y": 0,
+            "width": 3113,
+            "height": 737.9490000000001,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": null,
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 0,
+              "ty": 0
+            }
+          }
+        ],
+        "boardMask": {
+          "className": "i",
+          "x": 30,
+          "y": 75,
+          "width": 460,
+          "height": 240,
+          "concatenatedMatrix": {
+            "a": 1,
+            "b": 0,
+            "c": 0,
+            "d": 1,
+            "tx": 340.7916660308838,
+            "ty": 72
+          }
+        }
+      }
+    ],
+    "boardDetected": true,
+    "boardLabel": "o",
+    "boardLogicalSize": {
+      "width": 460,
+      "height": 240
+    },
+    "boardDisplayChain": [
+      {
+        "className": "o",
+        "x": 30,
+        "y": 75,
+        "width": 460,
+        "height": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "rotation": 0,
+        "scrollRect": {
+          "x": 0,
+          "y": 0,
+          "width": 460,
+          "height": 240
+        },
+        "concatenatedMatrix": {
+          "a": 1,
+          "b": 0,
+          "c": 0,
+          "d": 1,
+          "tx": 340.7916660308838,
+          "ty": 72
+        }
+      },
+      {
+        "className": "o",
+        "x": 310.7916660308838,
+        "y": -3,
+        "width": 676,
+        "height": 379,
+        "scaleX": 1,
+        "scaleY": 1,
+        "rotation": 0,
+        "scrollRect": null,
+        "concatenatedMatrix": {
+          "a": 1,
+          "b": 0,
+          "c": 0,
+          "d": 1,
+          "tx": 310.7916660308838,
+          "ty": -3
+        }
+      },
+      {
+        "className": "i",
+        "x": 0,
+        "y": 0,
+        "width": 1314,
+        "height": 603,
+        "scaleX": 1,
+        "scaleY": 1,
+        "rotation": 0,
+        "scrollRect": null,
+        "concatenatedMatrix": {
+          "a": 1,
+          "b": 0,
+          "c": 0,
+          "d": 1,
+          "tx": 0,
+          "ty": 0
+        }
+      },
+      {
+        "className": "Preloader",
+        "x": 0,
+        "y": 0,
+        "width": 3113,
+        "height": 737.9490000000001,
+        "scaleX": 1,
+        "scaleY": 1,
+        "rotation": 0,
+        "scrollRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1314,
+          "height": 600
+        },
+        "concatenatedMatrix": {
+          "a": 1,
+          "b": 0,
+          "c": 0,
+          "d": 1,
+          "tx": 0,
+          "ty": 0
+        }
+      },
+      {
+        "className": "i",
+        "x": 0,
+        "y": 0,
+        "width": 3113,
+        "height": 737.9490000000001,
+        "scaleX": 1,
+        "scaleY": 1,
+        "rotation": 0,
+        "scrollRect": null,
+        "concatenatedMatrix": {
+          "a": 1,
+          "b": 0,
+          "c": 0,
+          "d": 1,
+          "tx": 0,
+          "ty": 0
+        }
+      }
+    ]
+  },
+  "renderer_geometry_updated_at_utc": "2026-11-05T16:22:19.907+00:00",
+  "bridge_diagnostics": {
+    "received_message_count": 92,
+    "received_event_count": 0,
+    "received_event_types": {},
+    "last_message_type": "heartbeat",
+    "last_sequence": 92,
+    "collector_sequence_gap_count": 0,
+    "last_message_at_utc": "2026-11-05T16:23:50.945+00:00",
+    "last_monitor_status": {
+      "version": "0.2.3",
+      "active": true,
+      "boardDetected": true,
+      "boardLabel": "o",
+      "snapshot": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5999,
+        "pointCount": 1,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "eventCount": 252,
+      "droppedEvents": 0,
+      "errors": 0,
+      "inputTelemetryEnabled": false
+    },
+    "browser_bridge": {
+      "sentEventCount": 0,
+      "lastEventType": null,
+      "lastEventAtPerformanceMs": null,
+      "sendFailureCount": 0
+    },
+    "frame_probe_count": 0,
+    "connection_closed": true,
+    "closed_at_utc": "2026-11-05T16:23:51.119+00:00"
+  }
+}

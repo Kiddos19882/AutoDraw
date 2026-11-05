@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "name": "Brush behavior test — paired_renderer_single_stroke",
-  "created_at": "2026-11-05T01:17:03+00:00",
+  "name": "Brush behavior test — paired_renderer_diagonal_single_stroke",
+  "created_at": "2026-11-05T16:26:00+00:00",
   "coordinate_system": "local_canvas_pixels",
   "canvas": {
     "width": 674,
@@ -11,33 +11,33 @@
   "height": 355,
   "strokes": [
     {
-      "name": "paired_renderer_long_horizontal",
+      "name": "paired_renderer_long_diagonal",
       "points": [
         {
           "x": 29.260869565217394,
-          "y": 177.0
+          "y": 29.5
         },
         {
-          "x": 614.4782608695652,
-          "y": 177.0
+          "x": 643.7391304347826,
+          "y": 324.5
         }
       ],
       "closed": false,
       "metadata": {
         "role": "brush_behavior_test",
-        "test_case": "paired_renderer_single_stroke",
+        "test_case": "paired_renderer_diagonal_single_stroke",
         "line_extension_px_override": 0.0
       }
     }
   ],
   "generation": {
     "method": "manual_brush_behavior_test",
-    "test_case": "paired_renderer_single_stroke",
+    "test_case": "paired_renderer_diagonal_single_stroke",
     "brush_value_must_be_set_manually": true,
     "note": "Set the requested brush size in the browser before executing this plan.",
     "paired_renderer_capture": {
       "schema_version": 1,
-      "scenario_id": "paired_renderer_single_stroke",
+      "scenario_id": "paired_renderer_diagonal_single_stroke",
       "requested_radius": 10,
       "expected_strokes": 1,
       "renderer_path_mode": "smooth",
@@ -52,7 +52,7 @@
         "countdown_seconds": 5
       }
     },
-    "experiment_id": "d47cc0a5520044c7abfd0352a4f93ca8",
+    "experiment_id": "0e61bc40e5a8432fb87fa80b95889f4e",
     "requested_brush_value": 10,
     "source_coordinate_system": "logical_board_pixels",
     "source_canvas": {
@@ -105,7 +105,7 @@
   },
   "summary": {
     "stroke_count": 1,
-    "drawing_length_px": 585.22,
+    "drawing_length_px": 681.62,
     "pen_up_distance_px": 0.0
   }
 }
