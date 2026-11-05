@@ -10,7 +10,7 @@
 |---|---|---|---|
 | FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | IN_PROGRESS | Runtime WebGL/transform подтверждены; reference harness исправлен для empty GraphicsNode, browser PNG fixtures и pixel gate остаются |
 | FILL-001-RS-MATRIX | P0 | BLOCKED | 45 captures только после принятого single-task preflight |
-| GAME-INPUT-SAMPLING-TRACE-001 | P1 | READY_FOR_USER_CAPTURE | Во вкладку «Тест кистей» добавлен одиночный 400 px штрих с фиксированным профилем radius=10 / step=2 / delay=10 / extension=0; требуется live capture пользователя и paired PNG replay |
+| GAME-INPUT-SAMPLING-TRACE-001 | P1 | CAPTURE_ACCEPTED_OFFLINE_REPLAY_PENDING | Live run 16aec62c принят по raw events: 1 strokeId, 138/138 pointDelta=1 с acceptedPoint, CHALK=138; требуется offline BoardPane replay и PNG comparison |
 | BRUSH-FOOTPRINT-CAPSULE-001 | P1 | OPEN | Offline capsule model готова; renderer acceptance/planner integration не выполнены |
 | INT-006 | P1 | IN_PROGRESS | D1-D5 45/45 и analyzer завершены; domain validation/safety margin не завершены |
 | INT-007 | P2 | BLOCKED | Интеграция модели после INT-006 |
@@ -35,7 +35,19 @@
 - Capture принимается для replay только при одном strokeId, наличии каждого acceptedPoint и pointDelta=1. Любая неполнота остаётся fail-closed; задержка 10 ms не гарантирует отсутствие coalescing.
 - CHALK фиксировать только как pointCount_after - pointCount_before.
 
-**Статус:** READY_FOR_USER_CAPTURE. Live запуск не выполнялся; paired PNG equivalence не подтверждена. FILL-001-RS matrix остаётся BLOCKED до закрытия renderer/footprint gate.
+**Статус:** CAPTURE_ACCEPTED_OFFLINE_REPLAY_PENDING. Пользовательский live run 16aec62c-9e54-44e7-8691-9df79b19161d принят по raw event checks: ровно один strokeId, 138 положительных POINT_QUOTA_UPDATE, у всех pointDelta=1 и acceptedPoint присутствует; acceptedPoint count и сумма pointDelta совпадают с точным CHALK=138 (pointCount 1→139). Bridge telemetry: zero drops/errors/send failures/sequence gaps. Агрегированное поле trajectory.status=incomplete_until_verified противоречит raw delta/acceptedPoint данным; это summary metadata inconsistency, raw events не изменять. Offline replay PNG и paired pixel comparison ещё не выполнены; inspect() snapshot отдельно не приложен. FILL-001-RS matrix остаётся BLOCKED до закрытия renderer/footprint gate.
+
+## Дополнение 2026-11-05 — live capture принят
+
+Принятый experiment: d47cc0a5520044c7abfd0352a4f93ca8; run 16aec62c-9e54-44e7-8691-9df79b19161d; session d357b6ee-5617-4e07-9011-7eba7ccb6c0f.
+
+- Executor завершил 1/1 stroke; 294 move calls; 9.766 s; фактический profile совпадает с frozen profile.
+- Raw run: один положительный strokeId=pointer-stroke-5; 138 POINT_QUOTA_UPDATE; delta histogram только 1:138; missing acceptedPoint=0; все 138 координат валидны и упорядочены по X.
+- CHALK exact: pointCount 1→139, consumed_points=138; acceptedPoint count=138 и сумма pointDelta=138. Move calls не являются расходом.
+- Bridge: telemetry enabled; drops/errors/send failures/sequence gaps=0; frame probe average 59.978 FPS.
+- Offline renderer reference extractor принимает raw run. Aggregate trajectory.status=incomplete_until_verified не соответствует raw event histogram; это summary metadata inconsistency, raw evidence не переписывать.
+- after_draw-board.png визуально содержит один горизонтальный штрих. Отдельный AutoDrawGameMonitor.inspect() snapshot не приложен; smooth — сценарный профиль, не отдельное runtime наблюдение.
+- Offline BoardPane replay и PNG comparison остаются следующими действиями. Live повтор не требуется; FILL-001-RS matrix остаётся BLOCKED.
 
 ## Зачем остаются четыре направления
 
