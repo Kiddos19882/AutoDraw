@@ -3182,3 +3182,12 @@ CI workflow 41840582147 завершён SUCCESS на code/test commit 6fd3c91c3
 - FILL-001 static sweep artifact `autodraw-fill001-rs-static-sweep` ID `13386973590`: 15 shape×radius cells, 2238 candidates, 62 accepted; selected candidate in every cell passes offline coverage≥0.99 and zero-leakage gate. This is OpenCV simulation only, not live renderer/CHALK validation.
 - Separate committed PNG quality audit in the same pytest suite still reports coverage 98.430600%, leakage 11, status failed. Do not confuse static sweep workflow success with this committed PNG acceptance gate; FILL-001 remains blocked.
 - Monitor/Bridge geometry pipeline is validated by CI; AutoDraw reader/profile consumer is not yet implemented. No live gameplay actions.
+
+
+## 2026-11-05 — AutoDraw geometry diagnostics consumer
+
+- Added `read_active_bridge_geometry()` in `brush_radius_feedback.py`; it selects a fresh connected Bridge session, returns BoardPane stage/client corners, mapping method and raw window geometry, and always sets `desktop_screen_mapping_available=false` / `executor_usable=false`.
+- Brush Behavior UI now polls the active session and displays CSS client corners/mapping method. It explicitly states that these are not desktop/screenshot coordinates and the executor continues using the manual calibration profile.
+- `summarize_game_monitor_report()` now adds compact start/end geometry summaries and update count to the brush experiment manifest; raw snapshots remain in session/run JSON.
+- Tests added for active/stale/closed geometry sessions and manifest geometry summary. CI pending.
+- No calibration profile schema, automatic brush position, production planner or executor transform changed.
