@@ -492,3 +492,11 @@ Artifact: `autodraw-paired-renderer-png-comparison`, ID `13386122895`.
 
 
 **Final CI status:** workflow `41963498086` — `SUCCESS`. Required jobs: Egret browser reference, Preparation/G3, Game Monitor/Bridge, Executor regression, Application integration, Windows portable build/startup smoke-test, INT-006 PNG geometry audit — all SUCCESS. Optional algorithm benchmarks — SKIPPED. The workflow validates code/test/workflow commit `1b16b51e42ba0c61a0fbc547179ca5a9b3864b54`; subsequent branch commits in this audit sequence are documentation-only.
+
+
+## 2026-11-05 — Monitor/Bridge renderer geometry snapshot (CI pending)
+
+- Game Monitor 0.2.3: test for axis-aligned rect fallback without `getBoxQuads()`, four client corners, and raw window geometry.
+- Bridge server: RunRecorder test for geometry at run start/update/end; websocket integration test for session_start + renderer_geometry persistence in session schema v2.
+- Bridge client: initial rendererGeometry snapshot and debounced updates on resize/scroll/orientation/fullscreen/visualViewport; listener cleanup on disconnect.
+- No production AutoDraw profile consumption or live gameplay validation yet. Awaiting CI run triggered by this source/test update.
