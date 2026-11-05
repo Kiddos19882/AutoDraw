@@ -661,7 +661,7 @@ def main() -> int:
                 "recall": metrics["recall"],
                 "symmetric_difference_pixels": metrics["symmetric_difference_pixels"],
             }
-            for threshold, metrics in results.items()
+            for threshold, metrics in report["comparisons"].items()
         },
         "best_translation_diagnostic": {
             "dx": best_dx,
