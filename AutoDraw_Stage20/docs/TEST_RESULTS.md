@@ -1,3 +1,16 @@
+## 2026-11-06 — Stage-level compositor A–D implementation (CI pending)
+
+**Code/test HEAD:** `a6782cde9ef0d3fa2395e649c19d2b49355626f8`.  
+**Область:** offline renderer harness, Node regression tests, HTML test page and headless Edge runner.  
+**Execution status:** implementation committed; Node/browser/CI results on this HEAD are not yet confirmed. No live game run was performed.
+
+- `buildStagePlacement()` validates Stage/backing dimensions, X/Y scale, axis-aligned BoardPane corners and backing bounds; exact origin derives from run-bound Monitor geometry.
+- Existing vertical/diagonal Monitor reports are configured as headless browser inputs. Their run IDs are c860234f-995a-4789-9ac2-e05b322fe742 and f69cb0f4-f5d0-4ff9-a3b7-1148c38fa07f.
+- Four outputs are defined: A WebGL exact origin; B WebGL rounded origin; C Canvas2D exact origin; D Canvas2D rounded origin. Per-variant pixel differences against A are added to the manifest.
+- Node tests cover exact origin 1022.375×216, rounded origin 1022×216, and invalid scale/corners/bounds.
+- No Stage PNG artifacts, pixel metrics, PASS_PER_RUN or CI PASS are claimed until the headless runner actually completes and its artifacts are inspected.
+- Existing live exact CHALK values remain historical evidence only: vertical=71, diagonal=161. This work does not change CHALK logic or acceptance thresholds.
+
 ## 2026-11-06 — independent same-run renderer replay and optional Windows portable build
 
 **Commits:** c0f36ac49e4b66cf0fcd27d362154b71a917c367, 7c1a1fb704a0393509b7ff237048006dbbe6caf7, b07c636fa4b4ce28329cfb74f468634a46751ac1.  
