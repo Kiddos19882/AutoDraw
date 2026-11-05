@@ -51,7 +51,22 @@ from brush_experiment_capture import (
 
 
 # Verified against the master game bundle: Graphics.lineStyle receives atom.radius directly.
-MAX_BRUSH_LINE_WIDTH_LOGICAL_PX = 30;
+MAX_BRUSH_LINE_WIDTH_LOGICAL_PX = 30
+
+# Frozen settings for one isolated live stroke consumed by the paired renderer replay.
+PAIRED_RENDERER_TEST_CASE_ID = "paired_renderer_single_stroke"
+PAIRED_RENDERER_REQUESTED_RADIUS = 10
+PAIRED_RENDERER_PATH_MODE = "smooth"
+PAIRED_RENDERER_EXECUTOR_CONFIG = {
+    "point_step_px": 2,
+    "line_extension_px": 0,
+    "point_delay_ms": 10,
+    "after_mouse_up_ms": 20,
+    "before_mouse_down_ms": 20,
+    "after_mouse_down_ms": 40,
+    "end_hold_ms": 50,
+    "countdown_seconds": 5,
+}
 
 
 def _is_legacy_chalk_radius_matrix_run(scenario_id: str | None, chalk_block_task: dict[str, Any] | None) -> bool:
@@ -283,6 +298,18 @@ TEST_CASES: dict[str, dict[str, Any]] = {
                 "points": [[20, 18 + index * 36], [420, 18 + index * 36]],
             }
             for index in range(6)
+        ],
+    },
+    "Парный renderer — один длинный штрих": {
+        "id": PAIRED_RENDERER_TEST_CASE_ID,
+        "description": (
+            "Изолированный горизонтальный штрих длиной 400 логических px для парного сравнения "
+            "live PNG с offline replay по принятым Game Monitor координатам. Требуется ровно один "
+            "strokeId, радиус 10, режим игрового рендеринга smooth и активные Game Monitor + Bridge "
+            "с input telemetry. Executor profile заморожен: step=2 px, delay=10 ms, line extension=0."
+        ),
+        "strokes": [
+            {"name": "paired_renderer_long_horizontal", "points": [[20, 120], [420, 120]]},
         ],
     },
     "Горизонтальные линии": {
@@ -729,6 +756,21 @@ def build_brush_test_drawing_plan(
             "metadata": {"role": "brush_behavior_test", "test_case": scenario["id"], "line_extension_px_override": 0.0},
         })
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    generation = {
+        "method": "manual_brush_behavior_test",
+        "test_case": scenario["id"],
+        "brush_value_must_be_set_manually": True,
+        "note": "Set the requested brush size in the browser before executing this plan.",
+    }
+    if scenario["id"] == PAIRED_RENDERER_TEST_CASE_ID:
+        generation["paired_renderer_capture"] = {
+            "schema_version": 1,
+            "scenario_id": PAIRED_RENDERER_TEST_CASE_ID,
+            "requested_radius": PAIRED_RENDERER_REQUESTED_RADIUS,
+            "expected_strokes": 1,
+            "renderer_path_mode": PAIRED_RENDERER_PATH_MODE,
+            "executor_parameters": dict(PAIRED_RENDERER_EXECUTOR_CONFIG),
+        }
     return {
         "schema_version": 1,
         "name": f"Brush behavior test — {scenario['id']}",
@@ -738,12 +780,7 @@ def build_brush_test_drawing_plan(
         "width": width,
         "height": height,
         "strokes": strokes,
-        "generation": {
-            "method": "manual_brush_behavior_test",
-            "test_case": scenario["id"],
-            "brush_value_must_be_set_manually": True,
-            "note": "Set the requested brush size in the browser before executing this plan.",
-        },
+        "generation": generation,
     }
 
 
@@ -1166,6 +1203,20 @@ class BrushBehaviorTestTab:
                       "2. Не меняй масштаб браузера и размер кисти в середине серии.",
                       "3. Запиши размер кисти, видимые/пропущенные штрихи и остаток краски в заметках или заполни measurement_fields в JSON.",
                       "4. Снимок должен включать всю тестовую область и не закрывать её окнами приложения."])
+        if scenario["id"] == PAIRED_RENDERER_TEST_CASE_ID:
+            lines.extend([
+                "",
+                "Профиль парного renderer capture (фиксированный):",
+                "• Радиус кисти: 10 (создание плана блокируется при другом значении).",
+                "• Исполнитель: point_step_px=2, point_delay_ms=10, line_extension_px=0.",
+                "• Остальные параметры: before_mouse_down=20 ms, after_mouse_down=40 ms, "
+                "after_mouse_up=20 ms, end_hold=50 ms, countdown=5 s.",
+                "• Game Monitor и Bridge должны быть активны; включи input telemetry до штриха.",
+                "• После одного запуска сохрани raw Game Monitor run JSON, session.json, "
+                "AutoDrawGameMonitor.inspect(), pointCount до/после и PNG доски после штриха.",
+                "• В offline renderer reference используй режим smooth и line width 10.",
+                "• Replay будет принят только при одном strokeId, полном acceptedPoint-потоке и pointDelta=1.",
+            ])
         self.template_text.configure(state="normal")
         self.template_text.delete("1.0", "end")
         self.template_text.insert("1.0", "\n".join(lines))
@@ -1865,6 +1916,12 @@ class BrushBehaviorTestTab:
             brush = int(self.brush_var.get().strip())
             if not 1 <= brush <= 30:
                 raise ValueError("Размер кисти должен быть целым числом от 1 до 30.")
+            scenario_id = plan["generation"].get("test_case")
+            if scenario_id == PAIRED_RENDERER_TEST_CASE_ID and brush != PAIRED_RENDERER_REQUESTED_RADIUS:
+                raise ValueError(
+                    "Для парного renderer capture требуется радиус кисти 10. "
+                    "Установи 10 в поле «Радиус кисти» и создай план повторно."
+                )
             self.output_dir.mkdir(parents=True, exist_ok=True)
             experiment_id = uuid.uuid4().hex
             plan["generation"]["experiment_id"] = experiment_id
