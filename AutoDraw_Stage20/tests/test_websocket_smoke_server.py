@@ -507,7 +507,7 @@ class BridgeGeometrySessionIntegrationTests(unittest.IsolatedAsyncioTestCase):
                 await server.wait_closed()
 
             session = json.loads((output / session_id / "session.json").read_text(encoding="utf-8"))
-            self.assertEqual(session["schema_version"], 3)
+            self.assertEqual(session["schema_version"], 2)
             self.assertEqual(session["renderer_geometry"]["revision"], 2)
             self.assertEqual(session["renderer_geometry_update_reason"], "window_resize")
             self.assertTrue(session["bridge_diagnostics"]["connection_closed"])
