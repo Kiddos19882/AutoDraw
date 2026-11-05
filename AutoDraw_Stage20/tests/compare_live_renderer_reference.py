@@ -532,8 +532,15 @@ def main() -> int:
         Image.fromarray((outside_board_roi.astype(np.uint8) * 255), mode="L").save(
             args.output_dir / "outside-board-live-delta-mask.png"
         )
+        board_bounds_in_roi = {
+            "x": board_bounds["x"] - roi_x,
+            "y": board_bounds["y"] - roi_y,
+            "width": board_bounds["width"],
+            "height": board_bounds["height"],
+        }
+        roi_local_bounds = {"x": 0, "y": 0, "width": roi_width, "height": roi_height}
         alpha_opencv_board, _ = crop_mask_to_board_bounds(
-            alpha_opencv, board_bounds, roi,
+            alpha_opencv, board_bounds_in_roi, roi_local_bounds,
         )
         # Keep diagnostic and formal masks on the identical BoardPane pixel domain.
         opencv_independent_results = {

@@ -326,3 +326,19 @@ def test_board_renderer_comparison_rejects_bounds_outside_roi_or_screen():
             {"x": 1800, "y": 268, "width": 672, "height": 351},
             {"x": 496, "y": 265, "width": 674, "height": 355},
         )
+
+
+
+def test_board_renderer_comparison_crops_roi_local_diagnostic_mask():
+    roi_mask = np.zeros((355, 674), dtype=np.uint8)
+    roi_mask[3:354, 2:674] = 255
+
+    board_mask, outside_roi_mask = crop_mask_to_board_bounds(
+        roi_mask,
+        {"x": 2, "y": 3, "width": 672, "height": 351},
+        {"x": 0, "y": 0, "width": 674, "height": 355},
+    )
+
+    assert board_mask.shape == (351, 672)
+    assert int(board_mask.sum()) == 255 * 672 * 351
+    assert int(outside_roi_mask.sum()) == 0
