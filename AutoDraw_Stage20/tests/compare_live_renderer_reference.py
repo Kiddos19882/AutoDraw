@@ -539,6 +539,7 @@ def main() -> int:
             "height": board_bounds["height"],
         }
         roi_local_bounds = {"x": 0, "y": 0, "width": roi_width, "height": roi_height}
+        # alpha_opencv is ROI-local; the browser compositor masks above are full-screen.
         alpha_opencv_board, _ = crop_mask_to_board_bounds(
             alpha_opencv, board_bounds_in_roi, roi_local_bounds,
         )
