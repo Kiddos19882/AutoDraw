@@ -1,3 +1,10 @@
+## 2026-11-05 — exploratory paired renderer comparison and transform audit
+
+- Выполнен количественный live/offline PNG comparison для experiment d47cc0a5: unshifted IoU=0.763153; post-hoc best translation (+1,+2) даёт IoU=0.998883 и symmetric difference=10 px.
+- Отдельно проверена геометрия frozen ROI 674×355 против logical board 460×240: scale X/Y различается на 0.8106%, ROI aspect ratio не совпадает с logical aspect ratio; расхождение указывает на необходимость независимой проверки границ crop.
+- Причина translation residual не установлена. Post-hoc shift не является correction/acceptance; production и frozen plan не менялись.
+- FILL-001-RS matrix остаётся BLOCKED; следующий шаг — independent crop-origin/board-bound derivation из same-session full-screen evidence.
+
 ## 2026-11-05 — принят live capture для paired renderer replay
 
 - Сохранён одиночный run 16aec62c-9e54-44e7-8691-9df79b19161d: один strokeId, 138 принятых точек, все pointDelta=1 и acceptedPoint присутствует.
