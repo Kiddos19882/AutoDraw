@@ -19,7 +19,7 @@ from typing import Any
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "source" / "preparation"))
-from renderer_geometry import (RendererGeometryError, build_same_run_geometry_audit_input, detect_board_bounds_from_screenshots, derive_live_board_screen_transform)
+from renderer_geometry import (RendererGeometryError, build_same_run_geometry_audit_input, crop_mask_to_board_bounds, detect_board_bounds_from_screenshots, derive_live_board_screen_transform)
 from renderer_acceptance import (
     EXPECTED_PAIRED_AXIS_SOURCES,
     evaluate_per_run_acceptance,
@@ -508,20 +508,30 @@ def main() -> int:
         )
         roi_x, roi_y = int(roi["x"]), int(roi["y"])
         roi_width, roi_height = int(roi["width"]), int(roi["height"])
-        observed = (
-            np.max(
-                np.abs(
-                    after_screen[roi_y:roi_y + roi_height, roi_x:roi_x + roi_width].astype(np.int16)
-                    - before_screen[roi_y:roi_y + roi_height, roi_x:roi_x + roi_width].astype(np.int16)
-                ),
-                axis=2,
-            ) > args.rgb_threshold
+        observed_full_screen = (
+            np.max(np.abs(after_screen.astype(np.int16) - before_screen.astype(np.int16)), axis=2)
+            > args.rgb_threshold
         )
-        expected_independent = browser_composite["expected_mask"][
-            roi_y:roi_y + roi_height, roi_x:roi_x + roi_width
-        ]
+        expected_full_screen = browser_composite["expected_mask"]
+        if expected_full_screen.shape != observed_full_screen.shape:
+            raise ValueError("Browser CSS compositor dimensions differ from the same-run full-screen captures.")
+
+        # Formal renderer metrics are scoped to the exact BoardPane component
+        # detected in the same-run screenshots. The calibrated ROI is wider/taller
+        # and may include adjacent UI pixels that are not part of the board.
+        board_bounds = board_bounds_audit["bounds"]
+        observed, outside_board_roi = crop_mask_to_board_bounds(
+            observed_full_screen, board_bounds, roi,
+        )
+        expected_independent, _ = crop_mask_to_board_bounds(
+            expected_full_screen, board_bounds, roi,
+        )
         if expected_independent.shape != observed.shape:
-            raise ValueError("Browser CSS compositor ROI dimensions differ from the live ROI.")
+            raise ValueError("BoardPane live/offline comparison dimensions differ.")
+        outside_board_changed_pixels = int(np.count_nonzero(outside_board_roi))
+        Image.fromarray((outside_board_roi.astype(np.uint8) * 255), mode="L").save(
+            args.output_dir / "outside-board-live-delta-mask.png"
+        )
         opencv_independent_results = {
             str(threshold): mask_metrics(observed, alpha_opencv > threshold)
             for threshold in args.alpha_thresholds
@@ -535,7 +545,10 @@ def main() -> int:
             "changed_pixels": int(np.count_nonzero(observed)),
             "bbox_xywh": bbox(observed),
             "centroid_xy": centroid(observed),
-            "source": "same-run after_draw-screen.png minus before_clear-screen.png, cropped to the paired ROI",
+            "comparison_bounds_screen_px": board_bounds,
+            "comparison_domain": "same_run_screenshot_detected_BoardPane_bounds",
+            "outside_board_roi_changed_pixels": outside_board_changed_pixels,
+            "source": "same-run after_draw-screen.png minus before_clear-screen.png, cropped to exact BoardPane bounds",
         }
         Image.fromarray((expected_independent.astype(np.uint8) * 255), mode="L").save(
             args.output_dir / "expected-mask-browser-css.png"
@@ -591,6 +604,11 @@ def main() -> int:
                 "runtime_profile_used_for_live_screen_transform": False,
             },
             "board_bounds_audit": board_bounds_audit,
+            "outside_board_roi_delta": {
+                "changed_pixels": outside_board_changed_pixels,
+                "included_in_formal_renderer_comparison": False,
+                "interpretation": "ROI margins outside the detected BoardPane are recorded separately and cannot affect BoardPane pixel metrics.",
+            },
             "thresholds": {
                 "formal_screen_rgb_delta": args.rgb_threshold,
                 "opencv_diagnostic_alpha": args.alpha_thresholds,

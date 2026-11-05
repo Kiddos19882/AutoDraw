@@ -36,6 +36,50 @@ def _fit(source: list[float], target: list[float]) -> dict[str, float]:
     }
 
 
+def crop_mask_to_board_bounds(
+    mask: Any,
+    board_bounds: dict[str, int],
+    screen_roi: dict[str, int],
+) -> tuple[Any, Any]:
+    """Crop a full-screen mask to the detected BoardPane and isolate ROI margins.
+
+    The calibrated ROI is a search/diagnostic window, not the BoardPane geometry.
+    Pixels inside the ROI but outside the screenshot-derived board bounds are
+    returned separately and must not contaminate the renderer pixel comparison.
+    """
+    shape = getattr(mask, "shape", None)
+    if not isinstance(shape, tuple) or len(shape) != 2:
+        raise RendererGeometryError("A two-dimensional full-screen mask is required.")
+    screen_height, screen_width = shape
+
+    def rectangle(values: Any, label: str) -> tuple[int, int, int, int]:
+        if not isinstance(values, dict):
+            raise RendererGeometryError(f"{label} must be an object.")
+        result = []
+        for key in ("x", "y", "width", "height"):
+            value = values.get(key)
+            if isinstance(value, bool) or not isinstance(value, int):
+                raise RendererGeometryError(f"{label}.{key} must be an integer.")
+            result.append(value)
+        x, y, width, height = result
+        if x < 0 or y < 0 or width < 1 or height < 1:
+            raise RendererGeometryError(f"{label} must be a positive in-screen rectangle.")
+        if x + width > screen_width or y + height > screen_height:
+            raise RendererGeometryError(f"{label} exceeds the full-screen mask dimensions.")
+        return x, y, width, height
+
+    bx, by, bw, bh = rectangle(board_bounds, "board_bounds")
+    rx, ry, rw, rh = rectangle(screen_roi, "screen_roi")
+    if bx < rx or by < ry or bx + bw > rx + rw or by + bh > ry + rh:
+        raise RendererGeometryError("Detected BoardPane bounds must be contained in the calibrated screen ROI.")
+
+    board_mask = mask[by:by + bh, bx:bx + bw].copy()
+    roi_mask = mask[ry:ry + rh, rx:rx + rw].copy()
+    outside_board_roi_mask = roi_mask.copy()
+    outside_board_roi_mask[by - ry:by - ry + bh, bx - rx:bx - rx + bw] = False
+    return board_mask, outside_board_roi_mask
+
+
 def detect_board_bounds_from_screenshots(
     before_rgb: Any,
     after_rgb: Any,

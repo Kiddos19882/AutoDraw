@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import numpy as np
 import pytest
 
 from renderer_geometry import (
+    crop_mask_to_board_bounds,
     RendererGeometryError,
     detect_board_bounds_from_screenshots,
     derive_live_board_screen_transform,
@@ -290,3 +292,37 @@ def test_same_run_screen_metrics_can_attest_pixel_mapping_without_os_scale_profi
         {"x": 496, "y": 265, "width": 674, "height": 355}, (1920, 1080),
     )
     assert result["board_to_screen"]["scale_x"] == pytest.approx(1.461214, abs=1e-5)
+
+
+
+def test_board_renderer_comparison_excludes_pixels_outside_detected_board_bounds():
+    full_screen = np.zeros((1080, 1920), dtype=bool)
+    full_screen[268:619, 498:1170] = True
+    full_screen[619, 592:609] = True  # 17 changed pixels below the BoardPane, inside the larger ROI.
+
+    board_mask, outside_roi_mask = crop_mask_to_board_bounds(
+        full_screen,
+        {"x": 498, "y": 268, "width": 672, "height": 351},
+        {"x": 496, "y": 265, "width": 674, "height": 355},
+    )
+
+    assert board_mask.shape == (351, 672)
+    assert int(board_mask.sum()) == 672 * 351
+    assert outside_roi_mask.shape == (355, 674)
+    assert int(outside_roi_mask.sum()) == 17
+
+
+def test_board_renderer_comparison_rejects_bounds_outside_roi_or_screen():
+    mask = np.zeros((1080, 1920), dtype=bool)
+    with pytest.raises(RendererGeometryError, match="contained"):
+        crop_mask_to_board_bounds(
+            mask,
+            {"x": 497, "y": 268, "width": 672, "height": 351},
+            {"x": 496, "y": 265, "width": 674, "height": 355},
+        )
+    with pytest.raises(RendererGeometryError, match="exceeds"):
+        crop_mask_to_board_bounds(
+            mask,
+            {"x": 1800, "y": 268, "width": 672, "height": 351},
+            {"x": 496, "y": 265, "width": 674, "height": 355},
+        )
