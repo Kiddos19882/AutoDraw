@@ -65,17 +65,18 @@
 - Хранить composed affine matrix, четыре угла, units, provenance, sample count/residuals, clipping и environment fingerprint.
 - Статусы: `valid`, `approximate`, `stale`, `unavailable`. Только `valid` допускает автоматический handoff; остальные блокируют его и оставляют manual fallback.
 
-#### Этап 3. Monitor geometry specification — DESIGN IN PROGRESS
+#### Этап 3. Monitor geometry snapshot — IMPLEMENTED / TESTING
 - `game_monitor.js` уже предоставляет `rendererSnapshot()`/`inspect()` с stage corners, canvas rect/CSS transform, backing scale, DPR, viewport и display chain. `boardClientCorners` сейчас заполняется только при наличии `getBoxQuads()`.
 - `MOUSE_MOVE_SAMPLE` содержит screen/client/stage/board coordinates, но collector записывает его только при активном stroke и включённой input telemetry. Для initial calibration нужен no-draw sampling mode или подтверждённая window geometry.
-- Специфицировать payload: `schemaVersion`, `boardDetected`, `coordinateSpace`, `logicalSize`, four corners, affine mapping, canvas quad/rect, viewport/DPR, clipping, timestamp, session identity, provenance, validity state.
+- `inspect().renderer` расширен raw `windowGeometry` и `boardClientMappingMethod`; `boardClientCorners` использует `getBoxQuads` или fail-closed axis-aligned rect fallback. Raw browser window metrics не выдаются за screen transform.
+- Unit tests покрывают fallback mapping и window geometry; полноценная validation на runtime/CI для этой версии ожидается.
 - Не менять O(1) resource telemetry и не добавлять полный обход `atom.points` в hot path; geometry collection остаётся read-only.
 
-#### Этап 4. Monitor → Bridge → AutoDraw handoff — DESIGN PENDING
-- `game_monitor_bridge.js` сейчас отправляет `session_start` (status/browser/page), allowlisted events и heartbeat; renderer geometry в session_start не передаётся.
-- Bridge server сохраняет `session.json` и run JSON в `data/results/brush_behavior_tests/game_monitor_bridge/`; AutoDraw использует heartbeat для brush-radius feedback и вручную связывает Monitor report. Автоматического geometry-profile handoff нет.
+#### Этап 4. Monitor → Bridge geometry persistence — IMPLEMENTED; AutoDraw consumer PENDING
+- `game_monitor_bridge.js` передаёт `rendererGeometry` в `session_start` и отправляет `renderer_geometry` updates при resize/scroll/orientation/fullscreen/visualViewport changes.
+- Bridge server сохраняет latest `renderer_geometry` в `session.json` schema v2 optional fields и snapshots at run start/update/end в run JSON schema v1; update history ограничена 32 snapshots/run. AutoDraw пока не читает geometry и не обновляет profile.
 - `brush_calibration.py` schema v1 хранит screen points/regions/environment; `_ensure_screen_compatibility()` сравнивает только screen resolution, а `get_experiment_capture_config()` отдаёт screen size без полного environment fingerprint.
-- Определить versioned geometry payload, run/session binding, transform provenance, validity/confidence, fingerprint и invalidation при изменении screen/window/viewport/zoom/DPR/canvas/BoardPane/session.
+- Следующий substage: AutoDraw reader/validator, session freshness, environment fingerprint и invalidation при изменении screen/window/viewport/zoom/DPR/canvas/BoardPane/session.
 - Расширять существующий calibration profile только с миграцией и сохранением v1/manual fallback; атомарное сохранение и stale-profile block обязательны.
 - Пользователь разрешил любые действия; реализацию можно начинать после завершения design и unit-test contract. Live runtime остаётся ограничен отсутствием удалённого доступа к пользовательскому экрану.
 
@@ -114,8 +115,8 @@
 | 0. Baseline | DONE |
 | 1. Independent ROI audit | DONE WITH VERTICAL-SCALE CAVEAT |
 | 2. Coordinate-space contract | IN PROGRESS |
-| 3. Monitor geometry specification | DESIGN IN PROGRESS |
-| 4. Monitor → Bridge → AutoDraw | DESIGN PENDING |
+| 3. Monitor geometry snapshot | IMPLEMENTED / CI PENDING |
+| 4. Monitor → Bridge persistence | IMPLEMENTED; AutoDraw consumer PENDING |
 | 5. Independent offline renderer compare | DONE EXPLORATORY / ACCEPTANCE OPEN |
 | 6. Tests/CI | SUCCESS; OPTIONAL BENCHMARKS SKIPPED |
 | 7. Confirmatory live capture | BLOCKED BY USER-SCREEN ACCESS |
