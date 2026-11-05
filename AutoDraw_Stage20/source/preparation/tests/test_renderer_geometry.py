@@ -109,6 +109,64 @@ def test_transform_rejects_screenshot_bounds_that_disagree_with_inspect():
         )
 
 
+def _axis_report(points):
+    events = []
+    scale_x = 672 / 460
+    scale_y = 351 / 240
+    for board_x, board_y in points:
+        screen_x = 498 + board_x * scale_x
+        screen_y = 268 + board_y * scale_y
+        events.append({
+            "type": "MOUSE_MOVE_SAMPLE",
+            "screenX": screen_x, "clientX": screen_x,
+            "screenY": screen_y, "clientY": screen_y - 163,
+            "boardX": board_x, "boardY": board_y,
+        })
+    return {"record_type": "autodraw_game_monitor_run", "events": events}
+
+
+def test_vertical_trajectory_fits_y_from_monitor_and_x_from_screenshot():
+    points = [(230, 20 + index * 5) for index in range(40)]
+    result = derive_live_board_screen_transform(
+        _axis_report(points), evidence(),
+        {"x": 496, "y": 265, "width": 674, "height": 355}, (1920, 1080),
+        screenshot_board_bounds={"x": 498, "y": 268, "width": 672, "height": 351},
+    )
+    assert result["method"] == "same_run_monitor_y_fit_plus_screenshot_board_bounds_x"
+    assert result["axis_sources"] == {
+        "x": "same_run_full_screen_board_bounds",
+        "y": "same_run_monitor_fit",
+    }
+    assert result["horizontal_fit"] is None
+    assert result["vertical_fit"]["sample_count"] == 40
+    assert result["board_to_screen"]["origin_x"] == pytest.approx(498)
+    assert result["board_to_screen"]["origin_y"] == pytest.approx(268)
+    assert result["board_to_screen"]["scale_x"] == pytest.approx(672 / 460)
+    assert result["board_to_screen"]["scale_y"] == pytest.approx(351 / 240)
+    assert result["axis_max_abs_residual_px"]["x"] == pytest.approx(0, abs=1e-9)
+    assert result["axis_max_abs_residual_px"]["y"] == pytest.approx(0, abs=1e-9)
+
+
+def test_diagonal_trajectory_fits_both_axes_from_monitor():
+    points = [(20 + index * 10, 20 + index * 5) for index in range(40)]
+    result = derive_live_board_screen_transform(
+        _axis_report(points), evidence(),
+        {"x": 496, "y": 265, "width": 674, "height": 355}, (1920, 1080),
+        screenshot_board_bounds={"x": 498, "y": 268, "width": 672, "height": 351},
+    )
+    assert result["method"] == "same_run_monitor_xy_fit"
+    assert result["axis_sources"] == {
+        "x": "same_run_monitor_fit",
+        "y": "same_run_monitor_fit",
+    }
+    assert result["horizontal_fit"]["sample_count"] == 40
+    assert result["vertical_fit"]["sample_count"] == 40
+    assert result["board_to_screen"]["origin_x"] == pytest.approx(498)
+    assert result["board_to_screen"]["origin_y"] == pytest.approx(268)
+    assert result["board_to_screen"]["scale_x"] == pytest.approx(672 / 460)
+    assert result["board_to_screen"]["scale_y"] == pytest.approx(351 / 240)
+
+
 def test_rejects_unstable_screen_offset_and_unsupported_skew():
     bad_report = report()
     bad_report["events"][0]["screenY"] += 1
