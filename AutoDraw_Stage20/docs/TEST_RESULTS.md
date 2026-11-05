@@ -5,10 +5,25 @@
 **Рабочая ветка:** `feature/image-geometry-optimization`  
 **HEAD перед дополнением D1–D5:** `63fdaf3f2a1b12bd90e1a588ca4e968facbe0103`  
 **Область:** AutoDraw_Stage20, тесты приложения, лабораторные эксперименты, Game Monitor/Bridge, CHALK, FILL-001, геометрические модели, GitHub Actions и offline benchmarks.  
-**Последний evidence commit:** `e6b771ed67201625884c6ce778fa355f1ab9b873` (первые vertical/diagonal live captures и exploratory offline reports).
+**Последний evidence commit:** `e6b771ed67201625884c6ce778fa355f1ab9b873` (первые vertical/diagonal live captures и exploratory offline reports).  
+**Последний implementation HEAD:** `1cd0d6153bdd5e6ae6248a3a48dd1915595cccc9`; CI replay 42083576282 pending.
 
 > Этот файл — единая точка входа для понимания результатов тестирования. Здесь собраны проверяемые сводные результаты, статусы, ограничения и ссылки на первичные отчёты/артефакты. Первичные JSON, PNG, логи, frozen plans, manifests и подробные отчёты не удаляются и не переписываются: они остаются источниками доказательств. Если краткая сводка расходится с первичным отчётом, приоритет имеет первичный материал и фактический runtime/CI evidence.
 
+
+## 2026-11-05 — same-run geometry replay для vertical/diagonal (CI pending)
+
+Implementation commit: 1cd0d6153bdd5e6ae6248a3a48dd1915595cccc9.
+Workflow: [42083576282](https://github.com/Kiddos19882/AutoDraw/actions/runs/42083576282) — in progress at time of this update.
+
+- CLI --same-run-geometry builds a geometry audit from exact Monitor run data and full-screen capture dimensions; no external/stale renderer snapshot is substituted.
+- Unit tests added for evidence binding and fail-closed behavior. Their execution is included in the preparation/G3 CI job, still in progress at update time.
+- Workflow now replays two immutable existing live captures:
+  - Vertical run c860234f-995a-4789-9ac2-e05b322fe742, experiment 6f2227c7bce94fa5acd0c633af5ed04f, exact CHALK 71.
+  - Diagonal run f69cb0f4-f5d0-4ff9-a3b7-1148c38fa07f, experiment 0e61bc40e5a8432fb87fa80b95889f4, exact CHALK 161.
+- No new live game run was performed. Existing exploratory frozen-ROI numbers remain historical; independent comparison metrics and formal acceptance have not yet been emitted by the current workflow.
+- CI jobs already successful at this update: Game Monitor/Bridge, Egret CanvasRenderer browser reference, Executor regression, Application integration. Preparation/G3 remains in progress; optional benchmarks skipped.
+- A run-level PASS, if achieved, counts as one valid capture only; the required series still needs three unique PASS_PER_RUN captures per orientation.
 
 ## 2026-11-05 — first vertical and diagonal live captures (evidence commit e6b771e)
 

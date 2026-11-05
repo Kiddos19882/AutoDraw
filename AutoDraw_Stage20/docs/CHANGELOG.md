@@ -1,3 +1,11 @@
+## 2026-11-05 — same-run geometry для multi-axis paired renderer
+
+- Добавлен run/session-bound geometry-audit из Game Monitor snapshot; проверяются screen metrics, фазы эксперимента, полноэкранные PNG, неизменность geometry start/end и отсутствие telemetry updates/overflow.
+- --same-run-geometry использует same-run Monitor fits и screenshot BoardPane bounds. Frozen plan ROI используется только для поиска доски; stale runtime snapshot 2026-11-04 не используется для экранной привязки.
+- Основной comparison report теперь содержит независимый transform и alpha metrics; frozen-plan results сохранены отдельной диагностикой.
+- CI replay vertical/diagonal captures добавлен; результат run 42083576282 ожидается. До формального отчёта PASS_PER_RUN не заявляется.
+- Изменения не затрагивают production planner/renderer/executor и не требуют нового live game run.
+
 ## 2026-11-05 — правила доступа и автоматизации тестов
 
 - Добавлено заметное предупреждение о том, что локальная программа, игровая доска и локальный `git status` доступны для непосредственной проверки только пользователю.

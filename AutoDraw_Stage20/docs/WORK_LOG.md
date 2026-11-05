@@ -45,3 +45,17 @@
 - V1–V5 pixel analyzer validated 90/90 captures (10×9). INT-006 and INT006R each accepted 45/45; safety margin and production eligibility remain unvalidated; INT006R package awaits manual visual review.
 - Windows portable build/startup smoke-test passed; artifact 13399627749, 646,950,501 bytes.
 - CI artifacts were downloaded and inspected. No new live run, local app launch, raw evidence mutation, or production drawing default change was performed.
+
+
+## 2026-11-05 — исправление same-run geometry для multi-axis offline/live renderer
+
+Scope: code, tests and CI only in feature/image-geometry-optimization; no real game experiment.
+
+- Added build_same_run_geometry_audit_input() to normalize the exact renderer_geometry_at_start stored in Game Monitor. It rejects run/session/experiment mismatch, changed start/end geometry, geometry updates/overflow, unsupported renderer mode, unexpected logical dimensions, and screen/PNG dimension mismatch.
+- Added verified 1:1 screen-pixel mapping when same-run window.screen dimensions match both experiment phase metadata and actual full-screen PNG dimensions, with DPR and visualViewportScale equal to 1. Legacy audits with a calibrated 100% Windows scale remain supported.
+- Added --same-run-geometry to the paired comparison CLI. The generated audit is written to the output directory and used with same-run full-screen before/after captures.
+- Added fail-closed unit tests for valid evidence, run mismatch, changed geometry, geometry updates, screen mismatch, and pixel mapping without a separate OS-scale profile.
+- CI now replays the stored vertical and diagonal captures. Frozen-plan metrics remain diagnostic; independent geometry becomes authoritative in the main comparison report.
+- Commits: d26ed86 (adapter/tests/CI replay), 57638f2 (audit JSON newline), 1cd0d61 (authoritative report fields).
+- Current CI run: 42083576282, pending at documentation time. Game Monitor/Bridge, Egret browser reference, executor and integration jobs have reported SUCCESS; preparation/G3 is still running.
+- No live game run, AutoDraw launch, production planner/renderer/executor change or local workstation action was performed.

@@ -8,7 +8,7 @@
 
 | ID | Приоритет | Статус | Содержание |
 |---|---|---|---|
-| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | HORIZONTAL_PER_RUN_ACCEPTED_VERTICAL_DIAGONAL_EXPLORATORY_REPLAY_PENDING_PROFILE_PENDING | Один horizontal capture прошёл formal per-run gates; по одному vertical/diagonal live capture собраны и raw-validated, но independent-transform per-run acceptance pending; для multi-axis серии нужны три unique PASS_PER_RUN каждого направления; environment fingerprint, profile consumer and executor gate pending |
+| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | HORIZONTAL_PER_RUN_ACCEPTED_VERTICAL_DIAGONAL_SAME_RUN_REPLAY_CI_PENDING_PROFILE_PENDING | Один horizontal capture прошёл formal per-run gates; по одному vertical/diagonal live capture собраны и raw-validated, но independent-transform per-run acceptance pending; для multi-axis серии нужны три unique PASS_PER_RUN каждого направления; environment fingerprint, profile consumer and executor gate pending |
 | FILL-001-RS-MATRIX | P0 | BLOCKED | 45 captures только после принятого single-task preflight |
 | GAME-INPUT-SAMPLING-TRACE-001 | P1 | ROI_BOUNDS_ROOT_CAUSE_IDENTIFIED_MULTI_AXIS_CODE_READY_LIVE_CAPTURE_PENDING | Run 16aec62c; 138 accepted points, CHALK=138; ROI included margins; screenshot-derived bounds + Monitor fit IoU=0.998882 / 10 px without post-hoc shift; multi-axis/environment validation pending |
 | BRUSH-FOOTPRINT-CAPSULE-001 | P1 | OPEN | Offline capsule model готова; renderer acceptance/planner integration не выполнены |
@@ -32,7 +32,8 @@
 - [x] Exact CHALK: vertical 71 (pointCount 1→72), diagonal 161 (1→162); положительные DRAW_SAMPLE/POINT_QUOTA_UPDATE совпадают с CHALK, каждый pointDelta=1, acceptedPoint присутствует.
 - [x] Monitor/Bridge integrity: dropped events=0, Monitor error delta=0, Bridge failures=0, sequence gaps=0; geometry start/end совпадает, geometry updates=0.
 - [x] Same-run offset стабилен: screen-client X=0, Y=163 px. Vertical Y fit max residual 0.7232 px; diagonal X/Y 0.7301/0.7391 px.
-- [ ] Пересчитать обе offline пары через independent transform из same-run Monitor + screenshot-derived BoardPane bounds; текущие reports используют frozen ROI 674×355 и остаются exploratory.
+- [x] Реализован CLI/CI replay обеих сохранённых пар через geometry-аудит из точного same-run Monitor snapshot и полноэкранных captures; frozen ROI применяется только как search window.
+- [ ] Получить и проверить independent-transform reports и formal PASS_PER_RUN/REJECTED_PER_RUN для каждого из двух существующих captures в CI.
 - [ ] Получить три уникальных PASS_PER_RUN по каждой ориентации. Текущие captures не засчитывать как PASS до formal replay; best-translation не использовать.
 ## 2026-11-05 — formal horizontal acceptance and automated paired Bridge telemetry
 

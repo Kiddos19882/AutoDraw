@@ -1,6 +1,6 @@
 # Актуальная точка продолжения — 2026-11-05
 
-## Текущая точка — Bridge telemetry CI PASS; horizontal renderer PASS_PER_RUN; first vertical/diagonal captures collected; independent-transform replay pending
+## Текущая точка — same-run geometry replay реализован; CI вертикального и диагонального сравнений выполняется
 
 **Репозиторий:** `Kiddos19882/AutoDraw`  
 **Рабочая ветка:** `feature/image-geometry-optimization`  
@@ -9,9 +9,21 @@
 **Последний успешный CI:** [run 41994624425](https://github.com/Kiddos19882/AutoDraw/actions/runs/41994624425), conclusion SUCCESS.
 **Workflow packaging commit:** `fb853547d74a70582ab1e4731d55763367b8ceb8`, проверен успешным run `41970907209`.  
 **Документационная синхронизация:** 2026-11-05, после evidence commit `e6b771e`; основные документы обновлены коммитами `1d4ad6e`–`102b834`, итоговая корректировка метаданных — `f3141dd1d3923fa3c16766b5cccddd6b4065f64a`.
-**Последний code/test HEAD:** `58ebdda7cf3f07ceef1075020f2808a2782562b7` — CI 41994624425 SUCCESS.
+**Последний CI-проверенный code/test HEAD:** `58ebdda7cf3f07ceef1075020f2808a2782562b7` — CI 41994624425 SUCCESS.  
+**Последний implementation HEAD:** `1cd0d6153bdd5e6ae6248a3a48dd1915595cccc9`.  
+**Текущий CI replay:** [run 42083576282](https://github.com/Kiddos19882/AutoDraw/actions/runs/42083576282), in progress; formal vertical/diagonal outcomes ещё не получены.
 **Master:** remote HEAD `9a3453aeb847b66041bc83d6f4a56ecaf33a993a`; master не изменялась.
 **Рабочая копия:** локальный `git status` через GitHub API недоступен.
+
+
+### Исправление screen geometry для offline/live paired renderer — 2026-11-05
+
+- CLI собирает geometry-audit из renderer_geometry_at_start exact Game Monitor run: проверяет experiment_id/run_id/session_id, идентичность start/end snapshots, нулевые geometry updates/overflow, window.screen, фазовые screen metadata и фактические full-screen PNG dimensions.
+- Live screen transform строится по same-run Monitor fits и/или screenshot BoardPane bounds. Frozen ROI остаётся только окном поиска доски, а не размером BoardPane. Runtime snapshot от 2026-11-04 не используется для live screen alignment.
+- Offline BoardPane fixture имеет logical size 460×240 и rasterScale 3 (1380×720); это локальная WebGL raster geometry, не размеры экранного Stage.
+- Main comparison-report.json использует независимые transform/comparison; frozen-plan metrics сохранены отдельно как diagnostic_frozen_plan_comparison.
+- CI replay добавлен для существующих vertical run c860234f-995a-4789-9ac2-e05b322fe742 и diagonal run f69cb0f4-f5d0-4ff9-a3b7-1148c38fa07f. Текущие захваты не считаются PASS_PER_RUN до получения формального отчёта.
+- Live game runs не проводились. Локальное выполнение приложения и локальный git status недоступны через GitHub API.
 
 ### Подтверждённое состояние CI
 
@@ -34,7 +46,7 @@
 - Monitor-vs-inspect checks: origin ≤0.5 px and relative scale difference ≤0.2%; Monitor-vs-screenshot checks: origin ≤1.0 px and relative scale difference ≤0.2%.
 - The unspanned axis uses same-run screenshot BoardPane bounds; an unspanned X axis without screenshot bounds is rejected. Production executor/calibration handoff remains disabled.
 - UI scenarios: `paired_renderer_vertical_single_stroke` and `paired_renderer_diagonal_single_stroke`, both with radius 10 and the frozen step=2/delay=10/extension=0 profile.
-- Synthetic vertical/diagonal tests and fail-closed per-run/series acceptance tooling are present. The first user live capture for each orientation was added in evidence commit `e6b771e`; both have exact CHALK and intact raw telemetry but remain exploratory because committed comparisons use the frozen ROI transform and `independent_transform_comparison=null`. No multi-axis `PASS_PER_RUN` has yet been established.
+- Synthetic vertical/diagonal tests and fail-closed per-run/series acceptance tooling are present. The first user live capture for each orientation was added in evidence commit `e6b771e`; both have exact CHALK and intact raw telemetry. Same-run replay tooling is now committed; the existing exploratory reports remain unchanged until the new CI replay emits independent-transform results. No multi-axis `PASS_PER_RUN` has yet been established.
 
 ### Независимая проверка BoardPane screen bounds
 

@@ -1,5 +1,13 @@
 # Дополнение к дорожной карте — 2026-11-05
 
+## 2026-11-05 — same-run multi-axis renderer replay implemented; CI pending
+
+- renderer_geometry.py builds a run-bound geometry audit from Game Monitor renderer_geometry_at_start; it requires exact experiment/run/session IDs, unchanged start/end snapshots, zero geometry updates/overflow and matched screen/PNG dimensions.
+- compare_live_renderer_reference.py --same-run-geometry derives the actual screen transform from same-run Monitor and full-screen screenshot evidence; frozen ROI is only a search window. The stale 2026-11-04 runtime profile is not used for live alignment.
+- Main comparison report promotes the independent transform/comparison; previous frozen-plan metrics remain under diagnostic_frozen_plan_comparison.
+- CI workflow replays the stored vertical and diagonal captures. Run 42083576282 is in progress; no new live game run was performed and no multi-axis PASS_PER_RUN is claimed yet.
+- Offline renderer logical BoardPane remains 460×240 with 3× rasterization (1380×720); this is distinct from desktop/browser screen geometry.
+
 ## 2026-11-05 — full CI 41994624425 PASS and paired Bridge automation verified
 
 - Added a fail-closed acceptance contract for capture binding, exact pointCount/CHALK, full accepted-point stream, one-stroke integrity, same-run screenshot metadata, per-axis transform tolerances and alpha-24 pixel metrics.
