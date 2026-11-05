@@ -1,3 +1,9 @@
+## 2026-11-05 — AutoDraw reads and displays Game Monitor geometry
+
+- Added active Bridge geometry reader and Brush Behavior UI status for BoardPane CSS client corners/mapping method.
+- Experiment summary now preserves compact renderer geometry metadata without claiming desktop/screenshot coordinates.
+- Reader and summary tests added; profile/executor integration remains pending until desktop transform is independently validated.
+
 ## 2026-11-05 — Monitor/Bridge geometry pipeline CI success
 
 - Full workflow `41964932479` completed SUCCESS. Preparation/G3 852 passed; Game Monitor 21 JS tests; Bridge 22 Python tests; Executor, Application integration, Egret browser reference, Windows portable build/startup smoke-test and INT-006 PNG audit all SUCCESS. Optional algorithm benchmarks SKIPPED.
