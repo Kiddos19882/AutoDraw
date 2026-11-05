@@ -1,3 +1,9 @@
+## 2026-11-05 — independent renderer transform comparison result
+
+- Independent mapping (same-run Monitor X fit + inspect CSS Y transform) improved alpha-24 IoU from `0.763153` to `0.998994`; symmetric difference fell from `2404` to `9` pixels. Precision `0.999218`, recall `0.999776`; live/expected bounding boxes coincide.
+- No post-hoc translation applied. The comparison remains exploratory because Y scale comes from a same-screen inspect snapshot without same-run timestamp and no vertical live trajectory exists.
+- CI job `INT-006 pixel-level PNG geometry audit` completed SUCCESS and uploaded artifact `autodraw-paired-renderer-png-comparison` (ID `13386122895`). Full workflow remained in progress for Windows portable build at documentation time.
+
 ## 2026-11-05 — independent screen geometry audit tooling
 
 - Добавлен fail-closed helper для независимого BoardPane→screenshot transform: same-run Monitor X fit плюс inspect-derived Y transform с явным vertical caveat.
