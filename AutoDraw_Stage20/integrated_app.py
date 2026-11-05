@@ -112,7 +112,7 @@ try:
     from color_scanline import save_color_scanline_plan
     from geometry_color_plan import save_geometry_color_plan
     from paint_limit_test_ui import PaintLimitTestTab
-    from brush_behavior_test_ui import BrushBehaviorTestTab
+    from brush_behavior_test_ui import BrushBehaviorTestTab, PAIRED_RENDERER_TEST_CASE_IDS
     from chalk_fill_ui import Fill001Tab
     from brush_coordinate_transform import LOGICAL_BOARD_SIZE, transform_logical_brush_plan_to_screen
     from brush_calibration_ui import BrushCalibrationTab
@@ -802,7 +802,6 @@ class AutoDrawUnifiedApp:
                     PAIRED_RENDERER_EXECUTOR_CONFIG,
                     PAIRED_RENDERER_PATH_MODE,
                     PAIRED_RENDERER_REQUESTED_RADIUS,
-                    PAIRED_RENDERER_TEST_CASE_IDS,
                 )
 
                 capture = generation.get("paired_renderer_capture")
