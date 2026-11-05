@@ -71,3 +71,9 @@ Scope: code, tests and CI only in feature/image-geometry-optimization; no real g
 - Commit: `1ac3d9390c56072730017e073cf80dd69c448f8b`.
 - CI run `42091370065` is pending. The existing horizontal artifact recalculated over exact BoardPane bounds gives IoU 0.999218, precision 0.999553, recall 0.999665, 7 symmetric-difference pixels and identical bounding boxes; this is an offline re-analysis, not a new CI result.
 - No live game run, local app launch, production planner/executor change, master modification or local git status check was performed.
+
+## 2026-11-05 — BoardPane crop diagnostics consistency
+
+- Follow-up review found that OpenCV diagnostic alpha masks and the overlay image also needed to use the exact BoardPane crop after the formal observed/expected masks were narrowed. Without this, diagnostic arrays would have mismatched dimensions.
+- Cropped OpenCV alpha diagnostics to the same BoardPane bounds and sized the overlay from the board-only observed mask.
+- Commit: `e73506db2a2cfd55bbb0ea4c4a1616648b7f0065`; CI run `42091800785` pending.

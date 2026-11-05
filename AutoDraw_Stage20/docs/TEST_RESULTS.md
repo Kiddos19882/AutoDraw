@@ -6,13 +6,13 @@
 **HEAD перед дополнением D1–D5:** `63fdaf3f2a1b12bd90e1a588ca4e968facbe0103`  
 **Область:** AutoDraw_Stage20, тесты приложения, лабораторные эксперименты, Game Monitor/Bridge, CHALK, FILL-001, геометрические модели, GitHub Actions и offline benchmarks.  
 **Последний evidence commit:** `e6b771ed67201625884c6ce778fa355f1ab9b873` (первые vertical/diagonal live captures и exploratory offline reports).  
-**Последний implementation HEAD:** `1ac3d9390c56072730017e073cf80dd69c448f8b`; CI run 42091370065 in progress.
+**Последний implementation HEAD:** `e73506db2a2cfd55bbb0ea4c4a1616648b7f0065`; CI run 42091800785 in progress.
 
 ## 2026-11-05 — exact BoardPane bounds вместо calibrated ROI в formal renderer metrics
 
-**Implementation:** [1ac3d9390c56072730017e073cf80dd69c448f8b](https://github.com/Kiddos19882/AutoDraw/commit/1ac3d9390c56072730017e073cf80dd69c448f8b).
+**Implementation:** [1ac3d9390c56072730017e073cf80dd69c448f8b](https://github.com/Kiddos19882/AutoDraw/commit/1ac3d9390c56072730017e073cf80dd69c448f8b), follow-up [e73506db2a2cfd55bbb0ea4c4a1616648b7f0065](https://github.com/Kiddos19882/AutoDraw/commit/e73506db2a2cfd55bbb0ea4c4a1616648b7f0065).
 **Предыдущий CI:** [42087496092](https://github.com/Kiddos19882/AutoDraw/actions/runs/42087496092) — FAILED на horizontal formal renderer gate; transform и capture gates прошли.
-**Текущий CI:** [42091370065](https://github.com/Kiddos19882/AutoDraw/actions/runs/42091370065) — IN_PROGRESS на момент записи.
+**Текущий CI:** [42091800785](https://github.com/Kiddos19882/AutoDraw/actions/runs/42091800785) — IN_PROGRESS на момент записи.
 
 - Причина: calibrated ROI `(496,265,674,355)` больше фактического BoardPane `(498,268,672,351)`. Horizontal full-screen diff содержал 17 изменившихся пикселей на одном ряду за пределами BoardPane, но внутри ROI. Эти UI pixels не относятся к offline BoardPane raster, однако попадали в formal bbox и symmetric-difference metrics.
 - Контрольный replay run 42087496092: IoU `0.997323`, precision `0.997657`, recall `0.999665`, symmetric difference `24/8963`; bbox height включал дополнительные 170 px за пределами ожидаемого штриха. Причина локализована к ROI margin; пороги не менялись.

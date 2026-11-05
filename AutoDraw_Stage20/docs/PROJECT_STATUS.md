@@ -10,9 +10,9 @@
 **Workflow packaging commit:** `fb853547d74a70582ab1e4731d55763367b8ceb8`, проверен успешным run `41970907209`.  
 **Документационная синхронизация:** 2026-11-05, после evidence commit `e6b771e`; основные документы обновлены коммитами `1d4ad6e`–`102b834`, итоговая корректировка метаданных — `f3141dd1d3923fa3c16766b5cccddd6b4065f64a`.
 **Последний CI-проверенный code/test HEAD:** `58ebdda7cf3f07ceef1075020f2808a2782562b7` — CI 41994624425 SUCCESS.  
-**Последний implementation HEAD:** `1ac3d9390c56072730017e073cf80dd69c448f8b`.  
+**Последний implementation HEAD:** `e73506db2a2cfd55bbb0ea4c4a1616648b7f0065`.  
 **Последний неуспешный CI:** [run 42087496092](https://github.com/Kiddos19882/AutoDraw/actions/runs/42087496092) — горизонтальный контроль отклонён: 17 изменившихся пикселей за пределами BoardPane попали в больший calibrated ROI.  
-**Текущий CI исправления:** [run 42091370065](https://github.com/Kiddos19882/AutoDraw/actions/runs/42091370065), in progress.
+**Текущий CI исправления:** [run 42091800785](https://github.com/Kiddos19882/AutoDraw/actions/runs/42091800785), in progress.
 **Master:** remote HEAD `9a3453aeb847b66041bc83d6f4a56ecaf33a993a`; master не изменялась.
 **Рабочая копия:** локальный `git status` через GitHub API недоступен.
 
