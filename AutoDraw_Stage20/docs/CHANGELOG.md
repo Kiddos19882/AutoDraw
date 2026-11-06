@@ -1,3 +1,11 @@
+## 2026-11-06 — Firefox Stage runner and A–D diagnostics
+
+- Исправлено чтение run-bound geometry из `players[0].boardStageCorners`.
+- Firefox 159 WebGL probe successfully запускается в CI, но Basic Render Driver reports antialias=false despite `webgl.msaa-force=true`; GPU/context parity with source NVIDIA is not achieved.
+- Исправлен фильтр PNG links; manifest download link больше не считается PNG.
+- Stage comparison accepts both WebGL and Canvas2D backends; CI requests A/B/C/D.
+- CI 42155453886 ожидает результата.
+
 ## 2026-11-06 — Firefox WebGL Stage A–D runner
 
 - Добавлен Firefox Selenium runner для run-bound Stage A–D compositor probe.

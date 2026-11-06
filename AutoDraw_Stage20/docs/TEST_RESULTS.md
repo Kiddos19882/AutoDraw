@@ -1,3 +1,12 @@
+## 2026-11-06 — Firefox Stage A–D runner debugging (CI pending)
+
+- CI 42154755178 failed in the new validator on Monitor schema lookup; Firefox WebGL itself ran.
+- CI 42155166156 failed on download-link count (8 links included the manifest link); Firefox 159 WebGL probe completed and saved manifest.
+- Firefox CI GL: Microsoft Basic Render Driver / ANGLE, antialias=false even with `webgl.msaa-force=true`; source renderer reference expects Firefox 159, NVIDIA ANGLE and antialias=true. Browser version parity is confirmed; GPU/context parity is not.
+- Fixed nested Monitor geometry lookup, PNG-only link filtering, and enabled all A–D backends in Stage comparison.
+- CI 42155453886 pending; no Firefox Stage A–D screen comparison metrics yet.
+- No live game run, CHALK measurement, production changes, formal threshold changes or post-hoc registration.
+
 ## 2026-11-06 — Firefox Stage A–D browser parity (CI pending)
 
 **Commit:** `9940bc9ddf0f3de553983edd0bfbe74142797be0`.  

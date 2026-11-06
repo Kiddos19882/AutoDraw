@@ -1,3 +1,26 @@
+# Дополнение — Firefox Stage A–D runner: повторная диагностика (2026-11-06)
+
+**Актуальный code/test HEAD:** `e91b94da3350e2385b73eec1c7008f4e0659043a`.  
+**Текущий CI:** [42155453886](https://github.com/Kiddos19882/AutoDraw/actions/runs/42155453886), pending на момент записи.  
+**Статус:** Firefox WebGL Stage probe запускается; финальная выгрузка PNG и сравнение A–D ожидают исправления фильтра ссылок и нового CI.
+
+## Факты из CI
+
+- CI 42154755178: Selenium и Firefox успешно запустились; Firefox завершил Egret WebGL probe. Валидатор остановился на неверном пути к `boardStageCorners` в Monitor report. Фактическая структура: `renderer_geometry_at_start.players[0].boardStageCorners`.
+- CI 42155166156: после исправления Monitor path Firefox WebGL probe снова завершился. Manifest сохранён; runner остановился на проверке количества download links: найдено 8 ссылок, поскольку выборка включала дополнительную ссылку manifest. В HTML было 7 PNG data URLs: 3 BoardPane reference PNG + 4 A–D PNG.
+- В Firefox CI зафиксированы Firefox 159 и WebGL 1.0, но GL renderer — Microsoft Basic Render Driver / ANGLE. `contextAttributes.antialias=false`, несмотря на `webgl.msaa-force=true`. Исторический source renderer manifest ожидает antialias=true и указывает ANGLE/NVIDIA. Это фактическое различие GPU/context; версия браузера совпадает, но аппаратная растеризация не эквивалентна.
+- Следовательно, Firefox headless CI подходит для проверки браузерного пути и геометрии, но не может автоматически считаться точной заменой локального Firefox + NVIDIA. Сравнение pixel metrics должно сохранять этот limitation.
+
+## Исправления после двух прогонов
+
+- Monitor geometry validation теперь читает `boardStageCorners` из `players[0]`.
+- Firefox runner включает `webgl.msaa-force=true` и сохраняет actual/expected WebGL context attributes и GL renderer diagnostics. Флаг не включил antialiasing на Basic Render Driver.
+- PNG link extraction теперь фильтрует только `data:image/png;base64,` URLs.
+- Stage comparison analyzer допускает WebGL и Canvas2D variants; CI запрашивает A, B, C и D.
+- CI 42155453886 запущен на HEAD `e91b94da...`; результат пока не получен.
+
+**Следующий шаг:** проверить новый artifact, сравнить все A–D на сохранённых vertical/diagonal captures, затем решить, достаточно ли Firefox headless Basic Render Driver для диагностического вывода. При сохранении контекстного расхождения exact renderer equivalence остаётся неподтверждённой и потребуется local Firefox/GPU reference. Live runs, CHALK, production code и formal thresholds не менялись.
+
 # Дополнение — Stage A–D: переход на Firefox WebGL (2026-11-06)
 
 **Статус:** Firefox-based Stage A–D runner внесён; CI run 42154755178 ожидает завершения. Результат браузерной проверки пока не подтверждён.  

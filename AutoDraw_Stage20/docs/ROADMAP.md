@@ -1,3 +1,12 @@
+## Актуальный следующий шаг — проверить Firefox A–D artifacts
+
+1. Дождаться CI 42155453886.
+2. Убедиться, что Firefox runner сохранил `stage-level-vertical/` и `stage-level-diagonal/` manifests и четыре PNG в каждом каталоге.
+3. Проверить фактические context attributes и GL renderer. В текущем GitHub runner antialias остаётся false на Microsoft Basic Render Driver даже при `webgl.msaa-force=true`.
+4. Получить metrics A/B/C/D на прежних same-run screenshots; пороги не менять.
+5. Сравнить browser-context differences и A–D metrics, не смешивая диагностическое сравнение с formal PASS_PER_RUN.
+6. Если hardware backend остаётся отличным от source NVIDIA, подготовить local Firefox/GPU offline replay; не делать вывод об exact renderer equivalence по CI Basic Render Driver.
+
 ## Актуальный следующий шаг — Firefox Stage WebGL parity
 
 **P0:** завершить offline Stage A–D replay в Firefox той же основной версии, которую ожидает paired renderer reference.

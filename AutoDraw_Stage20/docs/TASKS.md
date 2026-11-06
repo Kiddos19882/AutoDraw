@@ -1,3 +1,20 @@
+## 2026-11-06 — Firefox Stage A–D runner follow-up
+
+**Статус:** IN_PROGRESS — Firefox WebGL runs; PNG artifact extraction fix committed; CI 42155453886 pending.
+
+- [x] Исправлен путь `boardStageCorners`: используется `renderer_geometry_at_start.players[0]`.
+- [x] Подтверждено, что Selenium Firefox 159 запускает страницу и Egret WebGL probe.
+- [x] Зафиксировано фактическое ограничение CI GL: Microsoft Basic Render Driver / ANGLE; WebGL antialias=false даже при `webgl.msaa-force=true`.
+- [x] Исправлена выборка PNG download links: только data:image/png URLs.
+- [x] Stage comparison analyzer принимает WebGL и Canvas2D backends; workflow сравнивает A/B/C/D.
+- [ ] Подтвердить CI 42155453886 и сохранение четырёх PNG для обоих runs.
+- [ ] Проверить browser-session.json: version, GL renderer, antialias, texture parameters.
+- [ ] Получить A–D metrics по vertical/diagonal на прежних screenshots.
+- [ ] Отделить влияние browser compositor, MSAA и GPU backend.
+- [ ] При необходимости подготовить local Firefox/GPU replay; live game experiments не запускать.
+
+**Acceptance:** unchanged; no post-hoc registration; no production changes.
+
 ## 2026-11-06 — Stage A–D: browser parity follow-up
 
 **Статус:** IN_PROGRESS — Firefox WebDriver runner добавлен; CI и pixel results ожидаются.

@@ -1,3 +1,13 @@
+## 2026-11-06 — Firefox Stage A–D runner debugging
+
+- CI 42154755178: Firefox WebDriver and Egret WebGL probe launched; validation failed because Monitor board corners are nested under `players[0]`. No renderer failure.
+- CI 42155166156: geometry binding fixed; Firefox 159 WebGL probe completed and manifest was saved. Runner failed only because it counted 8 download links including manifest link; actual PNG data URLs = 7.
+- Firefox CI WebGL diagnostics: WebGL 1.0, Microsoft Basic Render Driver / ANGLE, antialias=false even with `webgl.msaa-force=true`. Source renderer manifest expects Firefox 159 but records NVIDIA ANGLE and antialias=true. Browser major matches; GPU/context does not.
+- Updated runner to read Monitor corners from `players[0]`, retain expected/actual context diagnostics, and filter only PNG data URLs.
+- Updated Stage comparison to accept WebGL and Canvas2D and workflow to analyze A–D.
+- CI 42155453886 pending. No Stage A–D metrics from the Firefox runner yet.
+- No live experiment, CHALK measurement, production changes, acceptance threshold changes or post-hoc alignment.
+
 ## 2026-11-06 — Firefox WebGL parity follow-up
 
 - Перепроверен CI 42151945274 и извлечены Stage/live comparison artifacts.
