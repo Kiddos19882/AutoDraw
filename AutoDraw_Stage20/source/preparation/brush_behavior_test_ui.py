@@ -1109,7 +1109,7 @@ class BrushBehaviorTestTab:
         ttk.Label(block_controls, text="Фаза").pack(side="left")
         ttk.Combobox(
             block_controls, textvariable=self.chalk_block_phase_var,
-            values=("G1", "G2", "G3", "V1", "V2", "V3", "V4", "V5", "INT006", "INT006R"), state="readonly", width=10,
+            values=("G1", "G2", "G3", "V1", "V2", "V3", "V4", "V5", "INT006", "INT006R", "PRR"), state="readonly", width=10,
         ).pack(side="left", padx=(6, 10))
         ttk.Button(block_controls, text="Запустить полный блок", command=self.start_chalk_test_block).pack(side="left")
         ttk.Button(block_controls, text="Остановить после текущего опыта", command=self.request_stop_chalk_test_block).pack(side="left", padx=6)
@@ -1698,8 +1698,8 @@ class BrushBehaviorTestTab:
             )
             return
         phase_id = self.chalk_block_phase_var.get().strip()
-        if phase_id not in {"G1", "G2", "G3", "V1", "V2", "V3", "V4", "V5", "INT006", "INT006R"}:
-            messagebox.showwarning("Неизвестная фаза", "Выбери G1/G2/G3, V1–V5, INT006 или INT006R.", parent=self.root)
+        if phase_id not in {"G1", "G2", "G3", "V1", "V2", "V3", "V4", "V5", "INT006", "INT006R", "PRR"}:
+            messagebox.showwarning("Неизвестная фаза", "Выбери G1/G2/G3, V1–V5, INT006, INT006R или PRR.", parent=self.root)
             return
         if phase_id == "G2" and not self._has_completed_g1_block():
             messagebox.showwarning(
@@ -2131,6 +2131,8 @@ class BrushBehaviorTestTab:
                 } and self._chalk_block_task is None:
                     raise ValueError("D1–D5 validation разрешено запускать только через полный автоматический блок соответствующей фазы.")
                 if scenario_id in {
+                    "paired_renderer_vertical_single_stroke",
+                    "paired_renderer_diagonal_single_stroke",
                     "paint_consumption_long_lines",
                     "int006_diagonals",
                     "int006_short_strokes",
