@@ -39,6 +39,10 @@ PHASE_SCENARIOS = {
         "int006r_validation_d4_short_details",
         "int006r_validation_d5_repeated_coverage",
     ),
+    "PRR": (
+        "paired_renderer_vertical_single_stroke",
+        "paired_renderer_diagonal_single_stroke",
+    ),
 }
 LEGACY_V_SCENARIO_PHASES = {
     "int006_short_strokes": "V2",
@@ -89,6 +93,8 @@ EXPECTED_STROKES = {
     "int006r_validation_d3_intersections": 6,
     "int006r_validation_d4_short_details": 6,
     "int006r_validation_d5_repeated_coverage": 6,
+    "paired_renderer_vertical_single_stroke": 1,
+    "paired_renderer_diagonal_single_stroke": 1,
 }
 
 G3_POINT_STEPS = (1, 2, 4)
