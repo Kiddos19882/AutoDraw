@@ -274,3 +274,25 @@ D1–D5 подключены к отдельной фазе INT006. Block journa
 Full CI [41513389663](https://github.com/Kiddos19882/AutoDraw/actions/runs/41513389663) завершился success: Preparation/G3 667 passed, 82 subtests; остальные обязательные jobs, pixel audit и Windows portable build/startup smoke-test — success. Artifact `autodraw-g3-preflight-build` ID `13173632860`.
 
 Следующий шаг — локальный Windows 10 preflight. До его проверки не запускать 45 live captures. См. [INT-006 frozen analyzer](CHALK_INT006_FROZEN_PREDICTIONS_AND_ANALYZER_2026-11-02.md) и [preflight guide](CHALK_INT006_LOCAL_PREFLIGHT_GUIDE_2026-11-02.md).
+
+
+## 7. Фаза PRR — закрытие paired-renderer repeats
+
+PRR использует тот же durable block lifecycle, но имеет специальный ограниченный состав, потому что repeat 1 для каждой ориентации уже принят ранее.
+
+| Scenario | Repeat indices | Tasks |
+|---|---:|---:|
+| paired_renderer_vertical_single_stroke | 2, 3 | 2 |
+| paired_renderer_diagonal_single_stroke | 2, 3 | 2 |
+| **Итого** | | **4** |
+
+Параметры PRR:
+- radius=10, один штрих на опыт;
+- smooth renderer path;
+- executor: point_step=2 px, delay=10 ms, line extension=0, остальные frozen параметры совпадают с paired-renderer capture contract;
+- уникальные task_id, attempt_id, experiment_id, Game Monitor run_id и session_id;
+- повтор 1 не создаётся и не перезаписывается; повторные/подменённые ячейки отклоняются journal validator.
+
+В UI Brush Test выбрать фазу PRR и запустить полный блок. Существующий preflight требует Windows, калиброванный brush slider, активный свежий Game Monitor Bridge, профиль калибровки и эталон пустой доски. Между опытами доска автоматически очищается и сверяется с эталоном. При любой ошибке блок ставится на паузу; автоматического пропуска/повторения нет.
+
+**Важно:** completed PRR означает, что четыре CHALK/runtime captures прошли общий block acceptance. Он не заменяет запуск tests/run_paired_renderer_acceptance.py: только отдельная same-run PNG проверка может присвоить PASS_PER_RUN. После PRR необходимы две уникальные принятые попытки на каждую ориентацию; повторяющиеся run_id не засчитываются.
