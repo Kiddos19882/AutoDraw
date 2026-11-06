@@ -1776,7 +1776,11 @@ class BrushBehaviorTestTab:
             )
             return
         try:
-            block_plan = build_chalk_test_block_plan(series_id=series_id, phase_id=phase_id)
+            block_plan = build_chalk_test_block_plan(
+                series_id=series_id,
+                phase_id=phase_id,
+                repeats=2 if phase_id == "PRR" else 3,
+            )
         except (TypeError, ValueError) as exc:
             messagebox.showerror("Неверные параметры блока", str(exc), parent=self.root)
             return
