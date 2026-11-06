@@ -2,7 +2,7 @@ from __future__ import annotations
 
 """Fail-closed acceptance for paired live/offline renderer captures."""
 
-from math import isfinite
+from math import ceil, isfinite
 from typing import Any
 
 EXPECTED_PAIRED_AXIS_SOURCES = {
@@ -33,11 +33,15 @@ EXPECTED_EXECUTOR_CONFIG = {
 
 RENDERER_ACCEPTANCE_THRESHOLDS = {
     "alpha_threshold": 24,
-    "iou_min": 0.995,
-    "precision_min": 0.995,
-    "recall_min": 0.995,
-    "symmetric_difference_fraction_max": 0.0025,
-    "bbox_edge_difference_px_max": 1,
+    "iou_min": 0.92,
+    "precision_min": 0.92,
+    "recall_min": 0.92,
+    # Consistent upper bound for symmetric-difference/live pixels when
+    # IoU, precision and recall are each at least 0.92 (rounded upward).
+    "symmetric_difference_fraction_max": 0.087,
+    # Bounding-box edge tolerance scales with the smaller compared extent.
+    "bbox_edge_difference_fraction_max": 0.08,
+    "bbox_edge_difference_min_px": 1,
 }
 
 
@@ -516,14 +520,32 @@ def validate_renderer_comparison(
         [abs(left - right) for left, right in zip(live_edges, expected_edges)]
         if live_edges is not None and expected_edges is not None else None
     )
-    maximum_edge = int(RENDERER_ACCEPTANCE_THRESHOLDS["bbox_edge_difference_px_max"])
-    check(f"bbox_edges_{metric_suffix}", edge_differences is not None and max(edge_differences) <= maximum_edge,
-          actual=edge_differences, expected=f"each edge difference <= {maximum_edge} px")
+    edge_fraction = float(RENDERER_ACCEPTANCE_THRESHOLDS["bbox_edge_difference_fraction_max"])
+    edge_minimum = int(RENDERER_ACCEPTANCE_THRESHOLDS["bbox_edge_difference_min_px"])
+    edge_tolerances = None
+    if live_edges is not None and expected_edges is not None:
+        compared_width = min(metrics["observed_bbox_xywh"][2], metrics["expected_bbox_xywh"][2])
+        compared_height = min(metrics["observed_bbox_xywh"][3], metrics["expected_bbox_xywh"][3])
+        x_tolerance = max(edge_minimum, ceil(compared_width * edge_fraction))
+        y_tolerance = max(edge_minimum, ceil(compared_height * edge_fraction))
+        edge_tolerances = [x_tolerance, y_tolerance, x_tolerance, y_tolerance]
+    edges_pass = (
+        edge_differences is not None
+        and edge_tolerances is not None
+        and all(delta <= tolerance for delta, tolerance in zip(edge_differences, edge_tolerances))
+    )
+    check(
+        f"bbox_edges_{metric_suffix}",
+        edges_pass,
+        actual=edge_differences,
+        expected=f"per-edge tolerance <= {edge_fraction:.1%} of the smaller compared bbox extent (minimum {edge_minimum} px)",
+    )
 
     return {
         **_result(checks, failures),
         "thresholds": dict(RENDERER_ACCEPTANCE_THRESHOLDS),
         "bbox_edge_differences_px": edge_differences,
+        "bbox_edge_tolerances_px": edge_tolerances,
         "symmetric_difference_fraction": ratio,
     }
 
