@@ -1,3 +1,13 @@
+## 2026-11-06 — обновлён критерий renderer acceptance
+
+Формальная политика renderer pixel gates обновлена: IoU/precision/recall ≥92%, symmetric difference ≤8.7% live changed pixels, bbox edge tolerance ≤8% соответствующего меньшего bbox extent (минимум 1 px). Код и unit tests обновлены; CI validation pending.
+
+Следующий шаг — выполнить CI на новом commit, проверить formal vertical/diagonal renderer gates и только после подтверждения результата пересмотреть downstream task statuses. Ранее записанные CI FAIL и указания «не менять thresholds» относятся к предыдущей версии политики и сохраняются как историческая evidence, а не как действующая инструкция.
+
+Capture/provenance, transform geometry, alpha threshold 24, точность CHALK и повторяемость серии не ослаблялись. Live game tests и CHALK consumption не выполнялись.
+
+---
+
 ## Актуальный следующий шаг — same-run сравнение локального NVIDIA Stage A–D (2026-11-06)
 
 **P0 / OFFLINE ONLY / NO LIVE RUN.** Локальный Firefox 159.0.1 replay на NVIDIA GeForce GTX 980 завершён и подтверждён browser-session manifest. Теперь необходимо прогнать локальные full-Stage PNG через существующий `tests/compare_stage_renderer_reference.py` (ф), а не повторять генерацию.
