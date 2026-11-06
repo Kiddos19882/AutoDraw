@@ -64,13 +64,42 @@ def _renderer_metrics():
     }
 
 
-def test_renderer_gate_applies_frozen_thresholds():
+def test_renderer_gate_applies_92_percent_thresholds():
     accepted = validate_renderer_comparison(_renderer_metrics(), 10000)
     assert accepted["passed"] is True
     assert accepted["symmetric_difference_fraction"] == pytest.approx(0.001)
-    rejected = validate_renderer_comparison(_renderer_metrics() | {"iou": 0.994}, 10000)
+    assert accepted["thresholds"]["iou_min"] == 0.92
+    assert accepted["thresholds"]["precision_min"] == 0.92
+    assert accepted["thresholds"]["recall_min"] == 0.92
+    assert accepted["thresholds"]["symmetric_difference_fraction_max"] == 0.087
+    assert accepted["thresholds"]["bbox_edge_difference_fraction_max"] == 0.08
+
+    boundary = _renderer_metrics() | {
+        "iou": 0.92, "precision": 0.92, "recall": 1.0,
+        "symmetric_difference_pixels": 869,
+    }
+    assert validate_renderer_comparison(boundary, 10000)["passed"] is True
+
+    rejected = validate_renderer_comparison(_renderer_metrics() | {"iou": 0.919}, 10000)
     assert rejected["passed"] is False
     assert "iou_alpha_24" in rejected["failed_checks"]
+
+
+def test_renderer_gate_uses_scaled_bbox_edge_tolerance():
+    metrics = _renderer_metrics() | {
+        "observed_bbox_xywh": [20, 30, 100, 12],
+        "expected_bbox_xywh": [28, 30, 100, 12],
+    }
+    accepted = validate_renderer_comparison(metrics, 10000)
+    assert accepted["passed"] is True
+    assert accepted["bbox_edge_differences_px"] == [8, 0, 8, 0]
+    assert accepted["bbox_edge_tolerances_px"] == [8, 1, 8, 1]
+
+    rejected = validate_renderer_comparison(
+        metrics | {"expected_bbox_xywh": [29, 30, 100, 12]}, 10000,
+    )
+    assert rejected["passed"] is False
+    assert "bbox_edges_alpha_24" in rejected["failed_checks"]
 
 
 def test_renderer_gate_rejects_missing_bbox_and_empty_live_mask():
