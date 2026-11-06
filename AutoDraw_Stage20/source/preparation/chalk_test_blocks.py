@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-"""Durable, deterministic block plans and journals for CHALK geometry experiments."""
+"""Durable, deterministic block plans and journals for CHALK geometry and paired-renderer experiments."""
 
 import json
 import os
