@@ -1,3 +1,18 @@
+## 2026-11-06 — формальные renderer acceptance thresholds снижены до 92%
+
+**Статус:** политика реализована в acceptance validator и unit tests; повторный CI ещё не запускался. Ранее опубликованные CI результаты остаются историческими результатами, рассчитанными по прежним порогам.
+
+Новая формальная политика для alpha threshold 24:
+- IoU ≥ **0.92**.
+- Precision ≥ **0.92**.
+- Recall ≥ **0.92**.
+- Symmetric difference / live changed pixels ≤ **0.087** (8.7%). Это согласованный верхний предел с тремя метриками ≥0.92; он не позволяет отдельному ratio-gate отвергать допустимые комбинации на границе новых метрик.
+- Bounding-box edges: каждый edge delta ≤ **8%** от меньшего соответствующего размера сравниваемых bounding boxes (width для X edges, height для Y edges), с минимумом **1 px** и округлением вверх.
+
+Alpha threshold=24, capture/provenance gates, transform/geometry gates, exact CHALK validation и требование трёх уникальных PASS_PER_RUN на ориентацию не менялись. Ослаблены только renderer pixel acceptance criteria. Предыдущие CI run 42165379138 и 42155453886 не пересчитывались; требуется новый CI на изменённом commit, чтобы получить результат по новой политике. Никаких live runs и расхода CHALK не выполнялось.
+
+---
+
 # Дополнение — локальный Firefox/NVIDIA Stage A–D replay (2026-11-06)
 
 **Состояние:** локальный GPU replay завершён; сравнение именно локальных Stage PNG с live captures ещё не выполнено.  
