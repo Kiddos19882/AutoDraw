@@ -121,6 +121,11 @@ def main() -> int:
     parser.add_argument("--base-url", default="http://127.0.0.1:8765")
     parser.add_argument("--output-dir", required=True, type=Path)
     parser.add_argument("--workspace", default=".", type=Path)
+    parser.add_argument(
+        "--headed",
+        action="store_true",
+        help="Run Firefox with a visible window so local hardware acceleration can be used.",
+    )
     args = parser.parse_args()
     workspace = args.workspace.resolve()
     output_root = args.output_dir.resolve()
@@ -134,7 +139,8 @@ def main() -> int:
     expected_major = match.group(1).split(".", 1)[0]
 
     options = Options()
-    options.add_argument("-headless")
+    if not args.headed:
+        options.add_argument("-headless")
     options.binary_location = str(find_firefox())
     options.set_preference("webgl.disabled", False)
     options.set_preference("webgl.force-enabled", True)
@@ -234,6 +240,7 @@ def main() -> int:
                         "version": actual_version,
                         "userAgent": actual_user_agent,
                         "expectedMajor": expected_major,
+                        "headless": not args.headed,
                         "webgl": manifest.get("webglProbe", {}).get("glInfo", {}),
                         "contextAttributes": actual_context,
                         "expectedContextAttributes": expected_context,
