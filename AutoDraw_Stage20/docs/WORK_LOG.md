@@ -1,3 +1,13 @@
+## 2026-11-06 — renderer acceptance thresholds согласованно снижены до 92%
+
+- По прямому указанию пользователя формальные renderer pixel gates изменены с 99.5% на 92%.
+- `renderer_acceptance.py`: IoU/precision/recall minima=0.92; symmetric difference fraction max=0.087; bbox edge tolerance=8% от меньшего соответствующего bbox extent, минимум 1 px.
+- Обновлены unit tests: новые пороги, boundary symmetric-difference case и масштабируемый bbox edge tolerance.
+- Capture/provenance, transform gates, alpha threshold 24, exact CHALK validation и series repeat requirement не менялись.
+- Документация PROJECT_STATUS/TASKS/ROADMAP/DECISIONS/CHANGELOG/TEST_RESULTS синхронизирована; старые CI результаты сохранены как historical evidence по прежним критериям.
+- CI после изменения ещё не запускался; локальное выполнение тестов через удалённый GitHub API не выполнялось.
+- Нет live game run, CHALK consumption или изменений master.
+
 ## 2026-11-06 — local Firefox/NVIDIA Stage A–D replay received
 
 - Проверен push commit `b4359c9178e514f773ee742fc99e20dde74c6543`; branch HEAD на момент проверки совпадал с ним. Diff commit содержит один raw ZIP в `AutoDraw_Stage20/data/`; master не менялась. GitHub API не подтверждает локальный `git status`.
