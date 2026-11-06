@@ -41,6 +41,40 @@ def test_block_plan_contains_every_scenario_repeat_cell_and_unique_order(phase, 
     assert all(task["requested_radius"] == 10 for task in plan["tasks"])
 
 
+def test_paired_renderer_block_contains_only_the_two_missing_unique_repeats():
+    plan = build_chalk_test_block_plan(
+        series_id="paired-renderer-series", phase_id="PRR", repeats=2, seed=12345
+    )
+    assert plan["repeat_count"] == 2
+    assert plan["expected_task_count"] == 4
+    assert {task["scenario_id"] for task in plan["tasks"]} == {
+        "paired_renderer_vertical_single_stroke",
+        "paired_renderer_diagonal_single_stroke",
+    }
+    for scenario in {task["scenario_id"] for task in plan["tasks"]}:
+        assert sorted(task["repeat_index"] for task in plan["tasks"] if task["scenario_id"] == scenario) == [2, 3]
+    assert all(task["requested_radius"] == 10 for task in plan["tasks"])
+    assert all(task["expected_strokes"] == 1 for task in plan["tasks"])
+
+
+def test_paired_renderer_journal_rejects_missing_or_duplicate_repeat_cells(tmp_path):
+    import copy
+
+    plan = build_chalk_test_block_plan(series_id="paired-renderer-series", phase_id="PRR", repeats=2)
+    path = tmp_path / "paired-renderer.json"
+    create_chalk_test_block_journal(path, plan)
+    journal = load_chalk_test_block_journal(path)
+    assert journal["phase_id"] == "PRR"
+    assert journal["expected_task_count"] == 4
+
+    corrupt = copy.deepcopy(journal)
+    corrupt["tasks"][0]["repeat_index"] = 1
+    corrupt_path = tmp_path / "paired-renderer-corrupt.json"
+    corrupt_path.write_text(json.dumps(corrupt), encoding="utf-8")
+    with pytest.raises(ValueError):
+        load_chalk_test_block_journal(corrupt_path)
+
+
 def test_block_order_is_deterministic_for_same_seed():
     first = build_chalk_test_block_plan(series_id="series", phase_id="G1", seed=777)
     second = build_chalk_test_block_plan(series_id="series", phase_id="G1", seed=777)
@@ -56,6 +90,7 @@ def test_block_order_is_deterministic_for_same_seed():
     [
         {"series_id": "series", "phase_id": "G9"},
         {"series_id": "series", "phase_id": "G1", "repeats": 2},
+        {"series_id": "series", "phase_id": "PRR", "repeats": 3},
         {"series_id": "series", "phase_id": "G1", "radius": 5},
         {"series_id": "bad id", "phase_id": "G1"},
     ],
