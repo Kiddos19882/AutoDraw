@@ -169,6 +169,10 @@ def run_diagnostics(
     series = summarize_multi_axis_series(reports, required_repeats=3)
     series["report_count"] = len(reports)
     series["source_reports"] = [str(path) for path in source_reports]
+    discovery_path = paired_report_root / "paired-renderer-discovery-summary.json"
+    if discovery_path.is_file():
+        discovery_summary = _read_json(discovery_path)
+        series["preflight_rejected_attempts"] = discovery_summary.get("preflight_rejected_attempts", [])
     series_output.parent.mkdir(parents=True, exist_ok=True)
     series_output.write_text(json.dumps(series, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
