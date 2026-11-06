@@ -143,15 +143,28 @@ def build_chalk_test_block_plan(
     normalized_series = _validate_series_id(series_id)
     if phase_id not in BLOCK_PHASES:
         raise ValueError(f"Неизвестный блок CHALK: {phase_id!r}.")
-    if isinstance(repeats, bool) or not isinstance(repeats, int) or repeats != 3:
-        raise ValueError("Для G1/G2/G3/V1-V5/INT006 требуется ровно три независимых повтора.")
+    expected_repeats = 2 if phase_id == "PRR" else 3
+    if isinstance(repeats, bool) or not isinstance(repeats, int) or repeats != expected_repeats:
+        raise ValueError("Для PRR требуется ровно два дополнительных повтора (№2 и №3); для остальных фаз — три повтора.")
     if isinstance(seed, bool) or not isinstance(seed, int):
         raise ValueError("Seed порядка тестов должен быть целым числом.")
     if isinstance(radius, bool) or not isinstance(radius, int) or radius != 10:
         raise ValueError("Для блоков G1/G2/G3/V1-V5/INT006 требуется фиксированный радиус 10.")
 
     scenarios = PHASE_SCENARIOS[phase_id]
-    if phase_id == "G3":
+    if phase_id == "PRR":
+        cells = [
+            {
+                "scenario_id": scenario_id,
+                "repeat_index": repeat_index,
+                "expected_strokes": EXPECTED_STROKES[scenario_id],
+                "requested_radius": radius,
+                "executor_parameters": dict(GEOMETRY_EXECUTOR_CONFIG),
+            }
+            for scenario_id in scenarios
+            for repeat_index in (2, 3)
+        ]
+    elif phase_id == "G3":
         cells = []
         for point_step_px in G3_POINT_STEPS:
             for point_delay_ms in G3_POINT_DELAYS_MS:
@@ -217,12 +230,15 @@ def build_chalk_test_block_plan(
     for order_index, cell in enumerate(cells, start=1):
         parameters = cell["executor_parameters"]
         task_id = (
-            f"{cell['scenario_id']}-b{cell['requested_radius']}-r{cell['repeat_index']}"
-            if phase_id == "INT006R" else (
-                f"{cell['scenario_id']}-s{parameters['point_step_px']}-"
-                f"d{parameters['point_delay_ms']}-r{cell['repeat_index']}"
-                if phase_id == "G3" or phase_id.startswith("V") or phase_id == "INT006"
-                else f"{cell['scenario_id']}-r{cell['repeat_index']}"
+            f"{cell['scenario_id']}-r{cell['repeat_index']}"
+            if phase_id == "PRR" else (
+                f"{cell['scenario_id']}-b{cell['requested_radius']}-r{cell['repeat_index']}"
+                if phase_id == "INT006R" else (
+                    f"{cell['scenario_id']}-s{parameters['point_step_px']}-"
+                    f"d{parameters['point_delay_ms']}-r{cell['repeat_index']}"
+                    if phase_id == "G3" or phase_id.startswith("V") or phase_id == "INT006"
+                    else f"{cell['scenario_id']}-r{cell['repeat_index']}"
+                )
             )
         )
         task_record = {
@@ -371,7 +387,45 @@ def _validate_chalk_test_block_journal(document: Any, path: Path) -> dict[str, A
             raise ValueError(f"У неактивной задачи {task_id!r} осталась running-попытка: {path}")
 
     phase_id = document["phase_id"]
-    if phase_id == "G3":
+    if phase_id == "PRR":
+        expected_cells = {
+            (scenario_id, repeat_index)
+            for scenario_id in PHASE_SCENARIOS[phase_id]
+            for repeat_index in (2, 3)
+        }
+        observed_cells = set()
+        observed_order_indices = set()
+        for task in tasks:
+            scenario_id = task.get("scenario_id")
+            repeat_index = task.get("repeat_index")
+            order_index = task.get("matrix_order_index")
+            cell = (scenario_id, repeat_index)
+            if (
+                scenario_id not in PHASE_SCENARIOS[phase_id]
+                or isinstance(repeat_index, bool) or not isinstance(repeat_index, int)
+                or repeat_index not in (2, 3)
+                or isinstance(order_index, bool) or not isinstance(order_index, int)
+                or order_index < 1 or order_index > 4 or order_index in observed_order_indices
+                or task.get("requested_radius") != 10
+                or task.get("expected_strokes") != 1
+                or task.get("executor_parameters") != GEOMETRY_EXECUTOR_CONFIG
+                or task.get("task_id") != f"{scenario_id}-r{repeat_index}"
+                or cell in observed_cells
+            ):
+                raise ValueError(f"Некорректная/повторная ячейка PRR: {path}")
+            observed_cells.add(cell)
+            observed_order_indices.add(order_index)
+        if (
+            observed_cells != expected_cells
+            or observed_order_indices != set(range(1, 5))
+            or len(tasks) != 4
+            or document.get("repeat_count") != 2
+            or document.get("executor_parameters") != GEOMETRY_EXECUTOR_CONFIG
+            or document.get("executor_parameter_matrix") != [dict(GEOMETRY_EXECUTOR_CONFIG)]
+            or "prediction_artifact" in document
+        ):
+            raise ValueError(f"Журнал PRR должен содержать два повтора каждой ориентации: {path}")
+    elif phase_id == "G3":
         expected_cells = {
             (step, delay, repeat)
             for step in G3_POINT_STEPS
