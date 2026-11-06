@@ -1,3 +1,13 @@
+## 2026-11-06 — новая renderer acceptance policy (CI pending)
+
+Формальные renderer thresholds в acceptance validator изменены:
+- IoU ≥0.92; precision ≥0.92; recall ≥0.92.
+- Symmetric difference fraction ≤0.087.
+- Bbox edge delta ≤8% меньшего соответствующего bbox extent, минимум 1 px.
+- Alpha threshold остаётся 24.
+
+Unit tests обновлены, но результат их выполнения и новый CI пока отсутствуют. Все результаты CI, записанные ниже, получены до изменения и относятся к прежним порогам 0.995 / 0.0025 / 1 px. Их исторические статусы сохраняются без пересчёта. Не считать новую политику CI-validated до успешного/подтверждённого workflow run.
+
 ## 2026-11-06 — local NVIDIA Firefox Stage A–D artifacts
 
 **Source commit:** [b4359c9](https://github.com/Kiddos19882/AutoDraw/commit/b4359c9178e514f773ee742fc99e20dde74c6543)  
