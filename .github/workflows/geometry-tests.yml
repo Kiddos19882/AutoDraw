@@ -133,7 +133,7 @@ jobs:
       - preparation-tests
       - egret-renderer-reference
     runs-on: windows-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     defaults:
       run:
         working-directory: AutoDraw_Stage20
@@ -216,6 +216,12 @@ jobs:
             }
           }
           if ($failed) { throw "At least one same-run Stage A/B diagnostic comparison could not complete." }
+      - name: Compare saved local NVIDIA Stage A-D with same-run live captures (diagnostic only)
+        if: always()
+        shell: pwsh
+        run: |
+          python tests\run_local_nvidia_stage_comparison.py --archive data\AutoDraw-Stage-Firefox-Local-20261106-075246.zip --paired-report-root "$env:RUNNER_TEMP\paired-renderer-png-comparison" --experiment-root data\results\brush_behavior_tests --output-dir "$env:RUNNER_TEMP\local-nvidia-stage-comparison" --series-output "$env:RUNNER_TEMP\paired-renderer-png-comparison\multi-axis-series-summary.json"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Include paired full-screen source captures for independent board-edge audit
         if: always()
         shell: pwsh
@@ -258,6 +264,14 @@ jobs:
         with:
           name: autodraw-stage-renderer-live-comparison
           path: ${{ runner.temp }}/stage-renderer-live-comparison/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Upload local NVIDIA Stage comparison diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autodraw-local-nvidia-stage-comparison
+          path: \${{ runner.temp }}/local-nvidia-stage-comparison/
           if-no-files-found: warn
           retention-days: 14
       - name: Analyse all INT-006 V1-V5 board captures
