@@ -7,6 +7,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "tests"))
 from run_local_nvidia_stage_comparison import (  # noqa: E402
+    CASES,
     validate_browser_session,
     validate_manifest_binding,
 )
@@ -29,9 +30,10 @@ def _valid_session():
 
 
 def _valid_binding():
-    run_id = "run-1"
-    session_id = "session-1"
-    experiment_id = "experiment-1"
+    case = CASES["vertical"]
+    run_id = case["run_id"]
+    session_id = case["session_id"]
+    experiment_id = case["experiment_id"]
     manifest = {
         "runtimeProfile": {
             "sourceRunId": run_id,
@@ -91,3 +93,9 @@ def test_stage_manifest_rejects_failed_capture_or_transform_gate():
     report["formal_acceptance"]["transform"]["passed"] = False
     with pytest.raises(ValueError):
         validate_manifest_binding(manifest, report, run_id)
+
+
+def test_stage_manifest_rejects_unknown_expected_run():
+    manifest, report, _ = _valid_binding()
+    with pytest.raises(ValueError):
+        validate_manifest_binding(manifest, report, "unknown-run")

@@ -93,14 +93,16 @@ def validate_manifest_binding(
     if manifest.get("stageLevelCompositor", {}).get("status") != "generated_four_offline_variants":
         raise ValueError("Stage manifest does not confirm generation of all four A-D variants.")
 
+    expected_case = next(
+        (item for item in CASES.values() if item["run_id"] == expected_run_id),
+        None,
+    )
+    if expected_case is None:
+        raise ValueError(f"Unknown expected live run id: {expected_run_id!r}.")
     expected_bindings = {
         "run_id": expected_run_id,
-        "session_id": CASES[next(
-            name for name, item in CASES.items() if item["run_id"] == expected_run_id
-        )]["session_id"],
-        "experiment_id": CASES[next(
-            name for name, item in CASES.items() if item["run_id"] == expected_run_id
-        )]["experiment_id"],
+        "session_id": expected_case["session_id"],
+        "experiment_id": expected_case["experiment_id"],
     }
     for key, expected in expected_bindings.items():
         if comparison_report.get(key) != expected:
