@@ -1,3 +1,9 @@
+## 2026-11-07 — PRR implementation synchronized; final CI triggered
+
+- Синхронизированы PRR code, regression tests и управляющая документация.
+- CI должен проверять конечное состояние ветки после всех PRR code commits; run ID фиксируется после появления GitHub Actions результата.
+- Live PRR не запускался: удалённая GitHub-среда не имеет доступа к локальной Windows-сессии AutoDraw и игровой доске.
+
 ## 2026-11-07 — пакетный paired-renderer блок PRR
 
 **Статус:** код добавлен в ветку; CI validation pending; live-запуски не выполнялись.
