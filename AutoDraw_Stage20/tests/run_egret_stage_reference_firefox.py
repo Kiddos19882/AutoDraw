@@ -200,7 +200,9 @@ def main() -> int:
             )
 
             links = driver.execute_script(
-                "return Array.from(document.querySelectorAll('a[download]')).map(a=>({name:a.download,href:a.href}));"
+                "return Array.from(document.querySelectorAll('a[download]'))"
+                ".filter(a=>a.href.startsWith('data:image/png;base64,'))"
+                ".map(a=>({name:a.download,href:a.href}));"
             )
             if len(links) != 7:
                 raise RuntimeError(f"Firefox Stage probe expected 7 PNG links for {case['name']}, got {len(links)}.")
