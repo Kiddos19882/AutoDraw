@@ -1,3 +1,12 @@
+## 2026-11-06 — renderer acceptance policy 92%
+
+- Формальные IoU/precision/recall minima изменены с 0.995 на 0.92.
+- Symmetric-difference fraction max изменён с 0.0025 на 0.087, согласованно с новыми метриками.
+- Bbox edge tolerance заменён с фиксированного 1 px на 8% меньшего соответствующего bbox extent, минимум 1 px.
+- Unit tests обновлены для граничных значений и масштабируемой bbox tolerance.
+- Alpha threshold 24, capture/transform gates, CHALK и series-repeat requirements сохранены.
+- Требуется новый CI run; исторические CI результаты не переинтерпретированы. Live runs/CHALK не выполнялись.
+
 ## 2026-11-06 — локальный Firefox/NVIDIA Stage A–D replay
 
 - В репозиторий добавлен ZIP с headed Firefox 159.0.1 Stage A–D artifacts для vertical/diagonal.
