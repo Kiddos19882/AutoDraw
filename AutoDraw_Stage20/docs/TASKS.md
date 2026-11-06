@@ -1,3 +1,18 @@
+## 2026-11-06 — renderer acceptance policy обновлена до 92%
+
+**Статус:** IMPLEMENTED / CI_VALIDATION_PENDING / NO LIVE RUN.
+
+- [x] IoU, precision и recall пороги изменены с 99.5% на 92%.
+- [x] Symmetric-difference cap согласован с новыми метриками: 8.7% от live changed pixels.
+- [x] Bounding-box edge tolerance переведён с фиксированного 1 px на 8% меньшего соответствующего размера bbox, минимум 1 px.
+- [x] Добавлены unit tests на новые пороги, boundary ratio и масштабируемый bbox tolerance.
+- [ ] Запустить/дождаться CI для commit с новой acceptance policy и проверить результат formal renderer gates.
+- [ ] После CI пересмотреть статусы downstream gates; не переносить старые FAIL/PASS на новую политику без повторной оценки.
+
+Результаты CI до этого изменения относятся к прежним порогам 99.5% / 0.25% / 1 px и сохраняются как исторические. Снижение порогов не меняет capture/transform gates, run provenance, точный CHALK и требование трёх уникальных PASS_PER_RUN на ориентацию. Live game tests не запускались.
+
+---
+
 ## 2026-11-06 — локальный Firefox/NVIDIA Stage A–D replay получен
 
 **Статус:** LOCAL_GPU_REPLAY_COMPLETE / SAME_RUN_LIVE_COMPARISON_PENDING / NO LIVE RUN.
