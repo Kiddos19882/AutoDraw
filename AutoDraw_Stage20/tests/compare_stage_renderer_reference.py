@@ -298,12 +298,6 @@ def compare_stage_variants(
     if "origin_x" not in independent_origin or "origin_y" not in independent_origin:
         raise ValueError("Independent board-to-screen origin is missing from the comparison report.")
     threshold = float(report.get("thresholds", {}).get("formal_screen_rgb_delta", 24.0))
-    # Compare live and expected masks against the exact same Firefox round-trip baseline.
-    # Keep the raw-before mask as a sensitivity diagnostic for the <=1 RGB round-trip delta.
-    observed_full = build_change_mask(after_rgb, baseline_rgb, threshold)
-    observed_raw_baseline_full = build_change_mask(after_rgb, before_rgb, threshold)
-    observed = observed_full[by:by + bh, bx:bx + bw]
-    observed_raw_baseline = observed_raw_baseline_full[by:by + bh, bx:bx + bw]
     firefox = find_firefox()
     actual_version = firefox_version(firefox)
     expected_ua = screen_compositing.get("browser", {}).get("expected_user_agent", "")
@@ -325,6 +319,13 @@ def compare_stage_variants(
     roundtrip = np.max(np.abs(baseline_rgb - before_rgb), axis=2)
     if int(roundtrip.max()) > 1:
         raise RuntimeError("Firefox baseline round-trip differs from the original screenshot by more than one channel value.")
+
+    # Compare live and expected masks against the exact same Firefox round-trip baseline.
+    # Keep the raw-before mask as a sensitivity diagnostic for the <=1 RGB round-trip delta.
+    observed_full = build_change_mask(after_rgb, baseline_rgb, threshold)
+    observed_raw_baseline_full = build_change_mask(after_rgb, before_rgb, threshold)
+    observed = observed_full[by:by + bh, bx:bx + bw]
+    observed_raw_baseline = observed_raw_baseline_full[by:by + bh, bx:bx + bw]
 
     result: dict[str, Any] = {
         "status": "DIAGNOSTIC_ONLY",

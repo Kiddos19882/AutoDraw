@@ -1,3 +1,9 @@
+## 2026-11-06 — post-commit ordering correction in shared-baseline comparator
+
+- Review of commit `97184afe99e852fe6ace19c37547b67327b44550` caught that observed masks referenced `baseline_rgb` before the Firefox baseline capture initialized it.
+- Moved both observed-mask calculations to immediately after baseline round-trip validation. No measurement semantics or thresholds changed.
+- The first commit's workflow result is not used as validation; the corrected follow-up commit is the validation target.
+
 ## 2026-11-06 — устранение baseline asymmetry в Stage screenshot diagnostics
 
 **Scope:** тестовый/диагностический код и документация; без production changes и live game runs.

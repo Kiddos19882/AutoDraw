@@ -1,3 +1,8 @@
+## 2026-11-06 — исправлен порядок инициализации shared-baseline comparator
+
+- Пост-коммитная проверка выявила использование `baseline_rgb` до создания Firefox baseline capture.
+- Расчёт observed masks перенесён после проверки baseline round-trip; пороги и методика общего baseline сохранены.
+
 ## 2026-11-06 — общий baseline для Stage/live screenshot diagnostics
 
 - Исправлена асимметрия: observed и expected RGB masks теперь сравниваются относительно одного Firefox round-trip baseline.
