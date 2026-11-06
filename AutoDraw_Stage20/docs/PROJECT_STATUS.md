@@ -1,3 +1,41 @@
+# Дополнение — Stage A–D: переход на Firefox WebGL (2026-11-06)
+
+**Статус:** Firefox-based Stage A–D runner внесён; CI run 42154755178 ожидает завершения. Результат браузерной проверки пока не подтверждён.  
+**Branch:** `feature/image-geometry-optimization`  
+**HEAD на момент записи:** `9940bc9ddf0f3de553983edd0bfbe74142797be0`  
+**Область:** только offline test harness, browser runner и workflow; production renderer/planner/sampling/brush/executor не менялись.
+
+## Перепроверка CI run 42151945274 на c333dd7
+
+- Основные code/test jobs завершились SUCCESS; optional benchmarks и Windows portable build были SKIPPED.
+- Stage A/B diagnostic comparison завершился, но формальная paired-renderer проверка vertical/diagonal осталась REJECTED_PER_RUN.
+- Stage A против live mask: vertical IoU=0.940000, FP=294, FN=0; diagonal IoU=0.981483, FP=199, FN=2. Baseline round-trip max channel error=0, mask sensitivity к raw-before baseline=0 для обоих runs.
+- Округлённый вариант B не улучшил результат: vertical IoU=0.939184; diagonal IoU=0.976984. Дробная позиция A дала небольшое улучшение, недостаточное для acceptance.
+- В сохранённых PNG A и C побайтно совпадают; B и D также побайтно совпадают. Для этих двух fixtures Canvas2D composition of the WebGL board raster и Egret Stage WebGL output дали одинаковые Stage pixels.
+- Формальная paired-renderer replay отдельно осталась отклонённой: vertical IoU=0.938405 / symmetric difference=302 px; diagonal IoU=0.949646 / symmetric difference=554 px. Эти метрики нельзя смешивать с диагностическими Stage A metrics.
+
+## Найденное различие браузерных сред
+
+Старый Stage A–D runner создавал Stage WebGL PNG через headless Edge/Chromium с ANGLE SwiftShader. Same-browser screen compositor запускался в Firefox 159. Исторический renderer reference manifest, используемый formal comparator, также указывает Firefox 159 и ANGLE/NVIDIA. Monitor reports для двух runs фиксируют Egret 5.4.1 и renderMode=webgl, но сами по себе не содержат browser user-agent или GL vendor; поэтому точное same-session browser/GPU binding не следует считать доказанным только по Monitor.
+
+Это различие сред делает Stage rasterization неэквивалентной по условиям и требует повторить Stage A–D в Firefox той же основной версии, которую ожидает paired renderer reference.
+
+## Изменение harness
+
+- Добавлен `tests/run_egret_stage_reference_firefox.py`: Selenium запускает Firefox, открывает run-bound Monitor input, ждёт завершения Egret WebGL probe, валидирует sourceRunId, A–D backends, exact/rounded placement, A self-comparison и browser major version, затем сохраняет manifest, четыре Stage PNG и browser/GL diagnostics.
+- `run_egret_renderer_reference.ps1` сохраняет прежний Edge run для 20 базовых fixtures, но Stage A–D теперь запускает отдельным Firefox WebDriver runner.
+- В `geometry-tests.yml` добавлена установка Selenium; Stage артефакты сохраняются в прежних путях `stage-level-vertical/` и `stage-level-diagonal/`, чтобы downstream comparator продолжал использовать тот же контракт.
+
+## Проверка и ограничения
+
+- Изменения закоммичены в feature branch; `master` не менялась.
+- CI run 42154755178 создан на HEAD `9940bc9...`; на момент этой записи workflow находится в состоянии pending, jobs ещё не опубликованы.
+- Firefox WebGL, Selenium Manager/geckodriver, фактический GL backend и повторные A–D PNG пока NOT VERIFIED до завершения CI.
+- Live game runs не выполнялись; CHALK не измерялся; acceptance thresholds не менялись; post-hoc alignment не применялся.
+- Локальный `git status` недоступен через GitHub API.
+
+**Следующий шаг:** дождаться CI 42154755178, проверить Egret Firefox runner job и Stage artifacts. Затем пересчитать A–D metrics на тех же сохранённых vertical/diagonal captures. Если Firefox headless WebGL не запускается или его GL backend существенно отличается, зафиксировать блокировку и не интерпретировать прежние Chromium/SwiftShader метрики как доказательство поведения Firefox.
+
 # Дополнение — единая baseline для Stage/live pixel masks (2026-11-06)
 
 **Статус:** исправление диагностической методики внесено; CI-проверка ожидается.  

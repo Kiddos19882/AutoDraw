@@ -1,3 +1,22 @@
+## 2026-11-06 — Stage A–D: browser parity follow-up
+
+**Статус:** IN_PROGRESS — Firefox WebDriver runner добавлен; CI и pixel results ожидаются.
+
+- [x] Проверены artifacts и logs CI 42151945274 на c333dd7.
+- [x] Подтверждено, что baseline round-trip не изменил observed masks: 0 пикселей sensitivity для vertical и diagonal.
+- [x] Подтверждено, что fractional A немного лучше rounded B, но оба варианта далеки от formal gates.
+- [x] Проверена побайтная идентичность A=C и B=D для двух сохранённых fixtures.
+- [x] Выявлено, что Stage A–D WebGL PNG генерировались Edge/Chromium SwiftShader, а paired screen compositor — Firefox 159.
+- [x] Добавлен Firefox Selenium runner с проверкой sourceRunId, browser major, WebGL diagnostics, A–D backends и геометрии.
+- [x] Исправлен output path: Firefox Stage artifacts сохраняются в прежние downstream каталоги.
+- [ ] Подтвердить установку Selenium/geckodriver и запуск Firefox WebGL в CI 42154755178.
+- [ ] Проверить browser/GL diagnostics в обоих Stage manifests.
+- [ ] Пересчитать A–D screen masks и metrics на тех же run-bound screenshots.
+- [ ] Сопоставить новые результаты с formal INT-006 gates, не меняя их.
+- [ ] Если mismatch останется — локализовать edge/alpha/coverage и browser/GPU различия отдельно.
+
+**Ограничения:** no live runs; no production changes; no threshold changes; no post-hoc alignment; raw captures остаются неизменными.
+
 ## 2026-11-06 — единый baseline в Stage/live diagnostic mask
 
 **Статус:** IN_PROGRESS — методическая асимметрия устранена в коде; влияние на pixel metrics ещё не проверено CI artifact.

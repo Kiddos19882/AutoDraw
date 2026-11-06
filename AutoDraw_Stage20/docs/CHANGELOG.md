@@ -1,3 +1,11 @@
+## 2026-11-06 — Firefox WebGL Stage A–D runner
+
+- Добавлен Firefox Selenium runner для run-bound Stage A–D compositor probe.
+- Stage PNG generation перенесён из headless Edge/Chromium SwiftShader в Firefox; базовые 20 fixtures остаются в прежнем Edge runner.
+- Workflow устанавливает Selenium; Stage artifacts сохраняются в совместимых downstream путях.
+- Проверки browser version, sourceRunId, WebGL diagnostics, A–D backend identity, exact/rounded placement и A self-comparison встроены в runner.
+- CI 42154755178 ожидает результата; Firefox WebGL execution пока не подтверждён.
+
 ## 2026-11-06 — исправлен порядок инициализации shared-baseline comparator
 
 - Пост-коммитная проверка выявила использование `baseline_rgb` до создания Firefox baseline capture.

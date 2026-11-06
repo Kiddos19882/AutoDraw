@@ -1,3 +1,13 @@
+## 2026-11-06 — Firefox WebGL parity follow-up
+
+- Перепроверен CI 42151945274 и извлечены Stage/live comparison artifacts.
+- Stage A vs B: fractional origin дал небольшое улучшение, но vertical/diagonal остались далеко от formal gates; common-baseline sensitivity равна нулю.
+- A/C PNG и B/D PNG совпадают побайтно для обоих runs.
+- Найдено различие browser execution path: Stage WebGL output создавался headless Edge/Chromium SwiftShader, screen compositor — Firefox 159; source renderer reference manifest ожидает Firefox 159. Monitor reports не содержат собственного UA/GL vendor, поэтому exact session binding остаётся ограничением.
+- Добавлен Selenium Firefox Stage runner, сохраняющий run-bound A–D manifests/PNGs и browser/GL diagnostics. Workflow устанавливает Selenium.
+- На момент записи CI 42154755178 pending; никаких PASS/FAIL выводов по Firefox runner пока нет.
+- Production code, live game state, CHALK and formal thresholds не менялись.
+
 ## 2026-11-06 — post-commit ordering correction in shared-baseline comparator
 
 - Review of commit `97184afe99e852fe6ace19c37547b67327b44550` caught that observed masks referenced `baseline_rgb` before the Firefox baseline capture initialized it.

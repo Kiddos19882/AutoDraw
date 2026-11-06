@@ -1,3 +1,16 @@
+## 2026-11-06 — Firefox Stage A–D browser parity (CI pending)
+
+**Commit:** `9940bc9ddf0f3de553983edd0bfbe74142797be0`.  
+**Workflow:** [42154755178](https://github.com/Kiddos19882/AutoDraw/actions/runs/42154755178), pending at documentation time.
+
+- Previous run 42151945274 on c333dd7: base code/test jobs SUCCESS; INT-006 pixel audit job FAILURE because formal vertical/diagonal renderer comparisons remained rejected; optional benchmarks and Windows portable build SKIPPED.
+- Stage diagnostic A: vertical IoU 0.940000 (294 FP, 0 FN); diagonal IoU 0.981483 (199 FP, 2 FN). Baseline round-trip error and mask sensitivity both zero.
+- Stage diagnostic B: vertical IoU 0.939184; diagonal IoU 0.976984. A was slightly better, but neither close to formal acceptance.
+- Stage PNG equality: A=C and B=D, 0 differing pixels for both orientations.
+- Formal paired renderer replay remained rejected: vertical IoU 0.938405 / 302 symmetric-difference px; diagonal IoU 0.949646 / 554 px.
+- Browser path mismatch found: Stage raster was generated in Edge/Chromium SwiftShader; same-browser screen compositor was Firefox 159. Added Firefox WebDriver runner and Selenium workflow dependency. No Firefox-run metrics are available until 42154755178 completes.
+- No live experiment, CHALK measurement, production change, threshold change or post-hoc alignment.
+
 ## 2026-11-06 — Stage-level compositor A–D implementation (CI pending)
 
 **Code/test HEAD:** `501b3fac5e4cb7039161da6d70a1c79803ebb01f`.  

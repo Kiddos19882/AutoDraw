@@ -1,3 +1,16 @@
+## Актуальный следующий шаг — Firefox Stage WebGL parity
+
+**P0:** завершить offline Stage A–D replay в Firefox той же основной версии, которую ожидает paired renderer reference.
+
+1. Проверить CI run 42154755178 и Firefox WebDriver job.
+2. Подтвердить фактический `navigator.userAgent`, Firefox version, WebGL version/renderer, context attributes и texture parameters.
+3. Проверить run binding и четыре PNG для vertical/diagonal.
+4. Запустить существующий Stage comparison analyzer для A–D без изменения RGB threshold=24 и formal INT-006 thresholds.
+5. Сопоставить Stage A–D с теми же live before/after captures; не использовать post-hoc registration.
+6. Только после этого выбирать следующий диагностический разрез.
+
+Если Firefox headless не предоставляет WebGL или Selenium Manager не устанавливает geckodriver, остановиться на BLOCKED и зафиксировать фактическую причину. Не возвращаться к Edge/SwiftShader как к эквиваленту Firefox.
+
 ## Актуальный следующий шаг — stage-level WebGL compositor для independent same-run replay
 
 **Статус:** P0 / ANALYSIS REQUIRED / NO LIVE RUN.
