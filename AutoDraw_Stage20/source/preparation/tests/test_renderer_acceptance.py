@@ -74,11 +74,18 @@ def test_renderer_gate_applies_92_percent_thresholds():
     assert accepted["thresholds"]["symmetric_difference_fraction_max"] == 0.087
     assert accepted["thresholds"]["bbox_edge_difference_fraction_max"] == 0.08
 
+    # Consistent confusion matrix: TP=10,000, FP=0, FN=869.
+    # Therefore precision=1, while IoU=recall=10,000/10,869.
+    boundary_iou_recall = 10000 / 10869
     boundary = _renderer_metrics() | {
-        "iou": 0.92, "precision": 0.92, "recall": 1.0,
+        "iou": boundary_iou_recall,
+        "precision": 1.0,
+        "recall": boundary_iou_recall,
         "symmetric_difference_pixels": 869,
     }
-    assert validate_renderer_comparison(boundary, 10000)["passed"] is True
+    boundary_result = validate_renderer_comparison(boundary, 10000)
+    assert boundary_result["passed"] is True
+    assert boundary_result["symmetric_difference_fraction"] == pytest.approx(0.0869)
 
     rejected = validate_renderer_comparison(_renderer_metrics() | {"iou": 0.919}, 10000)
     assert rejected["passed"] is False
