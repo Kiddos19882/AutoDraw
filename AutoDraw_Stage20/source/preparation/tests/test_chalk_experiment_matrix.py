@@ -138,6 +138,35 @@ def test_geometry_metadata_rejects_invalid_series_scenario_repeat_or_stroke_coun
         build_chalk_experiment_matrix_metadata(**kwargs)
 
 
+def test_paired_renderer_metadata_uses_prr_phase_and_frozen_executor_profile():
+    metadata = build_chalk_experiment_matrix_metadata(
+        series_id="paired-renderer-series",
+        scenario_id="paired_renderer_vertical_single_stroke",
+        repeat_index=2,
+        requested_radius=10,
+        strokes=_strokes(1),
+        matrix_order_index=1,
+        executor_parameters=dict(GEOMETRY_EXECUTOR_CONFIG),
+    )
+    assert metadata["phase_id"] == "PRR"
+    assert metadata["expected_strokes"] == 1
+    assert metadata["repeat_index"] == 2
+    assert metadata["planned_repeats"] == 3
+
+    invalid = dict(GEOMETRY_EXECUTOR_CONFIG)
+    invalid["point_step_px"] = 1
+    with pytest.raises(ValueError):
+        build_chalk_experiment_matrix_metadata(
+            series_id="paired-renderer-series",
+            scenario_id="paired_renderer_diagonal_single_stroke",
+            repeat_index=3,
+            requested_radius=10,
+            strokes=_strokes(1),
+            matrix_order_index=2,
+            executor_parameters=invalid,
+        )
+
+
 def test_geometry_matrix_accepts_three_repeats_and_validates_per_stroke_sum(tmp_path):
     docs = []
     for repeat, consumed in ((1, 50), (2, 55), (3, 60)):
