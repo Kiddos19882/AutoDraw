@@ -1,3 +1,11 @@
+## 2026-11-06 — Firefox Stage A–D browser artifacts
+
+- Firefox 159.0.1 WebGL Stage A–D artifacts generated for vertical and diagonal; browser reference job SUCCESS.
+- A/C Stage PNG differences are small (665/1906 pixels, max channel 1); B/D are identical; A/B differ at 2581/4400 pixels (max 90/93).
+- These are Stage-to-Stage image comparisons, not live acceptance metrics.
+- CI GL mismatch persists: Microsoft Basic Render Driver, antialias=false vs source NVIDIA, antialias=true.
+- Downstream INT-006 same-run mask comparison pending.
+
 ## 2026-11-06 — Firefox Stage runner and A–D diagnostics
 
 - Исправлено чтение run-bound geometry из `players[0].boardStageCorners`.

@@ -1,3 +1,12 @@
+## 2026-11-06 — Firefox Stage A–D artifacts and internal pixel audit
+
+- CI 42155453886 browser reference job SUCCESS: Firefox 159.0.1 generated Stage A–D for vertical and diagonal; manifests and eight PNGs uploaded.
+- Internal PNG comparison: vertical A/C=665 differing pixels (max channel 1), B/D=0; A/B=2581 (max 90). Diagonal A/C=1906 (max 1), B/D=0; A/B=4400 (max 93).
+- A/C differences are only internal Stage raster comparisons; thresholded live masks are not yet computed. No acceptance conclusion.
+- Browser major matches expected Firefox 159, but CI uses Microsoft Basic Render Driver and antialias=false versus source NVIDIA and antialias=true. Exact GPU/context parity remains unavailable.
+- Game Monitor/Bridge, executor and application integration jobs SUCCESS. Preparation core tests SUCCESS; benchmark and FILL-001-RS sweep still running. INT-006 dependent audit pending.
+- No live game run, CHALK measurement, production changes or threshold changes.
+
 ## 2026-11-06 — Firefox Stage A–D runner debugging
 
 - CI 42154755178: Firefox WebDriver and Egret WebGL probe launched; validation failed because Monitor board corners are nested under `players[0]`. No renderer failure.

@@ -1,3 +1,38 @@
+# Дополнение — Firefox Stage A–D artifacts получены (2026-11-06)
+
+**CI run:** [42155453886](https://github.com/Kiddos19882/AutoDraw/actions/runs/42155453886), browser reference job SUCCESS.  
+**Code/test commit:** `e91b94da3350e2385b73eec1c7008f4e0659043a`.  
+**Artifacts:** `autodraw-egret-renderer-reference`, artifact ID `13474113190`.
+
+## Полученные данные
+
+- Для vertical и diagonal созданы run-bound manifests и четыре Stage PNG: A/B WebGL, C/D Canvas2D.
+- Firefox 159.0.1, WebGL 1.0; Stage A–D probe завершился, sourceRunId и placement validation прошли.
+- Фактический CI renderer: ANGLE / Microsoft Basic Render Driver; `antialias=false`. Ожидаемый source renderer reference: ANGLE / NVIDIA; `antialias=true`. Поэтому browser major совпадает, но GPU/context parity не достигнута.
+
+### Внутреннее сравнение Stage PNG
+
+| Пара | Vertical | Diagonal |
+|---|---:|---:|
+| A vs C differing pixels | 665 | 1906 |
+| A vs C max channel difference | 1 | 1 |
+| B vs D differing pixels | 0 | 0 |
+| A vs B differing pixels | 2581 | 4400 |
+| A vs B max channel difference | 90 | 93 |
+
+Это сравнение Stage PNG друг с другом, а не live mask IoU. При RGB threshold 24 A/C differences выглядят sub-threshold, но это должно быть подтверждено итоговыми mask metrics; вывод заранее не фиксируется. B и D побайтно эквивалентны в обоих runs.
+
+## CI state
+
+- Egret CanvasRenderer browser reference — SUCCESS.
+- Game Monitor/Bridge tests — SUCCESS.
+- Executor regression tests — SUCCESS.
+- Application integration tests — SUCCESS.
+- Preparation/G3 core test step — SUCCESS; benchmark capsule и FILL-001-RS static sweep ещё выполняются.
+- INT-006 pixel-level PNG geometry audit ожидает завершения preparation job; live comparison metrics A–D пока не получены.
+
+**Ограничение:** Firefox headless Basic Render Driver не воспроизводит source NVIDIA antialiasing. Stage metrics будут диагностическими, не подтверждением exact renderer equivalence. Live experiments, CHALK, production changes и acceptance threshold changes отсутствуют.
+
 # Дополнение — Firefox Stage A–D runner: повторная диагностика (2026-11-06)
 
 **Актуальный code/test HEAD:** `e91b94da3350e2385b73eec1c7008f4e0659043a`.  

@@ -1,3 +1,14 @@
+## Актуальный следующий шаг — получить same-run live metrics для Firefox A–D
+
+1. Дождаться завершения Preparation and G3 matrix tests в CI 42155453886.
+2. Проверить job INT-006 pixel-level PNG geometry audit.
+3. Извлечь vertical/diagonal `stage-level-*-comparison.json` для A/B/C/D.
+4. Сопоставить IoU, precision, recall, FP/FN и spatial distribution с предыдущими Edge/Chromium результатами.
+5. Отдельно учитывать, что Firefox CI использует Microsoft Basic Render Driver и antialias=false, тогда как source renderer reference указывает NVIDIA и antialias=true.
+6. Если остаточное расхождение существенно зависит от GPU/AA, подготовить local Firefox/NVIDIA offline replay; не запускать live game experiment.
+
+Порог RGB=24 и formal INT-006 thresholds не менять; post-hoc registration запрещён.
+
 ## Актуальный следующий шаг — проверить Firefox A–D artifacts
 
 1. Дождаться CI 42155453886.

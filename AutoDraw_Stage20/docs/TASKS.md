@@ -1,3 +1,20 @@
+## 2026-11-06 — Firefox Stage A–D artifacts получены
+
+**Статус:** IN_PROGRESS — browser job SUCCESS; same-run pixel comparison ждёт downstream INT-006 job.
+
+- [x] Firefox 159.0.1 WebGL 1.0 Stage probe завершился для vertical и diagonal.
+- [x] Сохранены два manifest и восемь PNG (A–D для двух ориентаций).
+- [x] Run binding, exact/rounded placement и A self-comparison валидированы.
+- [x] B=D побайтно для обоих направлений.
+- [x] A/C отличаются на 665 vertical и 1906 diagonal пикселей; максимальная разница канала = 1.
+- [x] A/B отличаются на 2581 vertical и 4400 diagonal пикселей.
+- [x] Подтверждён CI GPU/context mismatch: Microsoft Basic Render Driver, antialias=false против source NVIDIA, antialias=true.
+- [ ] Получить live mask IoU/precision/recall и FP/FN для всех A–D.
+- [ ] Сравнить Stage A–D с formal paired renderer acceptance, не меняя пороги.
+- [ ] Решить, нужен ли local Firefox/NVIDIA offline replay.
+
+CI run 42155453886: browser, monitor, executor и application jobs SUCCESS; preparation benchmark/sweep и dependent INT-006 job ещё не завершены.
+
 ## 2026-11-06 — Firefox Stage A–D runner follow-up
 
 **Статус:** IN_PROGRESS — Firefox WebGL runs; PNG artifact extraction fix committed; CI 42155453886 pending.

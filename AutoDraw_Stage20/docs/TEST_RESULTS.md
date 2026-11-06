@@ -1,3 +1,14 @@
+## 2026-11-06 — Firefox Stage A–D artifacts (browser job SUCCESS)
+
+**Workflow:** [42155453886](https://github.com/Kiddos19882/AutoDraw/actions/runs/42155453886)  
+**Artifact:** `autodraw-egret-renderer-reference` (13474113190)
+
+- Firefox 159.0.1 WebGL 1.0 Stage A–D generated for vertical and diagonal.
+- Stage PNG pairwise: vertical A/C 665 px, max channel 1; B/D 0 px; A/B 2581 px, max 90. Diagonal A/C 1906 px, max 1; B/D 0 px; A/B 4400 px, max 93.
+- CI GL backend is Microsoft Basic Render Driver; antialias=false. Source renderer reference is NVIDIA ANGLE; antialias=true.
+- Browser/geometry runner passed; exact GPU/context equivalence not established.
+- Live mask metrics for A–D pending INT-006 dependent job.
+
 ## 2026-11-06 — Firefox Stage A–D runner debugging (CI pending)
 
 - CI 42154755178 failed in the new validator on Monitor schema lookup; Firefox WebGL itself ran.
