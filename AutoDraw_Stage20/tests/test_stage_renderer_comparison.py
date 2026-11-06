@@ -6,6 +6,7 @@ from compare_stage_renderer_reference import (
     predict_board_screen_origin,
     validate_board_origin_crosscheck,
     mask_metrics,
+    build_change_mask,
     parse_css_matrix,
 )
 
@@ -38,6 +39,20 @@ class StageRendererComparisonTests(unittest.TestCase):
         self.assertEqual(metrics["false_negative"], 1)
         self.assertEqual(metrics["symmetric_difference_pixels"], 3)
         self.assertAlmostEqual(metrics["iou"], 0.25)
+
+    def test_rgb_change_mask_uses_explicit_common_baseline_and_strict_threshold(self):
+        baseline = np.zeros((1, 2, 3), dtype=np.uint8)
+        candidate = np.array([[[25, 25, 25], [24, 24, 24]]], dtype=np.uint8)
+        mask = build_change_mask(candidate, baseline, threshold=24)
+        self.assertEqual(mask.tolist(), [[True, False]])
+
+    def test_rgb_change_mask_rejects_different_image_dimensions(self):
+        with self.assertRaises(ValueError):
+            build_change_mask(
+                np.zeros((2, 2, 3), dtype=np.uint8),
+                np.zeros((2, 3, 3), dtype=np.uint8),
+                threshold=24,
+            )
 
     def test_rejects_non_axis_aligned_css_transform(self):
         with self.assertRaises(ValueError):

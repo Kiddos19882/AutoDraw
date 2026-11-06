@@ -1,3 +1,19 @@
+## 2026-11-06 — устранение baseline asymmetry в Stage screenshot diagnostics
+
+**Scope:** тестовый/диагностический код и документация; без production changes и live game runs.
+
+- Перепроверены remote branch/HEAD, последние 20 commits, compare с master, управляющие документы, постоянные регламенты, Stage comparator, tests, saved Monitor reports и последний CI run.
+- Branch: `feature/image-geometry-optimization`; исходный HEAD `d924cc2a848229342d4306915b010d97200ef671`; master не изменялась. Remote compare: feature ahead 3440 / behind 5; merge/rebase не выполнялись. Локальный git status недоступен через GitHub API.
+- Последний CI до изменения: run 42131803494, conclusion FAILURE. Обязательные jobs Game Monitor/Bridge, Preparation/G3, Executor, Application integration и Egret CanvasRenderer reference — SUCCESS; INT-006 pixel-level audit — FAILURE на formal vertical/diagonal replay; Stage A/B diagnostic и full-screen source-capture jobs — SUCCESS. Optional benchmarks и Windows portable build — SKIPPED.
+- Найдена асимметрия comparator: observed mask использовала raw before screenshot, expected mask — Firefox round-trip baseline. Round-trip допускал до 1 RGB level расхождения при threshold=24.
+- Обе маски переведены на общий Firefox baseline. В отчёт добавлена mask sensitivity к выбору raw/round-trip baseline. Добавлены unit tests на threshold boundary и несовпадающие RGB dimensions.
+- Это correction to diagnostic measurement, не установленная причина исходного renderer mismatch. Численный эффект ожидает нового CI artifact.
+- Acceptance thresholds и raw captures не менялись; production renderer/planner/sampling/brush/executor не затронуты; live game runs не проводились.
+
+**Следующий шаг:** проверить CI на новом commit, затем оценить mask sensitivity и остаточные metrics vertical/diagonal. Если mismatch сохранится, продолжить анализ маски/alpha/coverage и Stage sampling, не подгоняя пороги.
+
+---
+
 ## 2026-11-05 — привязка offline renderer к профилю последнего live run
 
 **Scope:** исправление offline replay harness и инструкции; без запуска renderer/live game.

@@ -122,6 +122,24 @@ def mask_metrics(observed: np.ndarray, expected: np.ndarray) -> dict[str, Any]:
     }
 
 
+def build_change_mask(candidate: np.ndarray, baseline: np.ndarray, threshold: float) -> np.ndarray:
+    """Build an RGB-delta mask against one explicit baseline image."""
+    candidate = np.asarray(candidate)
+    baseline = np.asarray(baseline)
+    if candidate.shape != baseline.shape or candidate.ndim != 3 or candidate.shape[2] != 3:
+        raise ValueError(
+            f"RGB candidate/baseline dimensions differ or are invalid: "
+            f"candidate={candidate.shape}, baseline={baseline.shape}."
+        )
+    if not np.isfinite(float(threshold)) or threshold < 0:
+        raise ValueError("RGB delta threshold must be finite and non-negative.")
+    delta = np.max(
+        np.abs(candidate.astype(np.int16) - baseline.astype(np.int16)),
+        axis=2,
+    )
+    return delta > float(threshold)
+
+
 def find_firefox() -> Path:
     candidates = [
         shutil.which("firefox"),
@@ -280,8 +298,12 @@ def compare_stage_variants(
     if "origin_x" not in independent_origin or "origin_y" not in independent_origin:
         raise ValueError("Independent board-to-screen origin is missing from the comparison report.")
     threshold = float(report.get("thresholds", {}).get("formal_screen_rgb_delta", 24.0))
-    observed_full = np.max(np.abs(after_rgb - before_rgb), axis=2) > threshold
+    # Compare live and expected masks against the exact same Firefox round-trip baseline.
+    # Keep the raw-before mask as a sensitivity diagnostic for the <=1 RGB round-trip delta.
+    observed_full = build_change_mask(after_rgb, baseline_rgb, threshold)
+    observed_raw_baseline_full = build_change_mask(after_rgb, before_rgb, threshold)
     observed = observed_full[by:by + bh, bx:bx + bw]
+    observed_raw_baseline = observed_raw_baseline_full[by:by + bh, bx:bx + bw]
     firefox = find_firefox()
     actual_version = firefox_version(firefox)
     expected_ua = screen_compositing.get("browser", {}).get("expected_user_agent", "")
@@ -323,8 +345,14 @@ def compare_stage_variants(
         "board_origin_crosschecks": {},
         "threshold_rgb_delta": threshold,
         "post_hoc_alignment": False,
-        "baseline_round_trip": {"max_channel_error": int(roundtrip.max()),
-                                 "pixels_over_one": int(np.count_nonzero(roundtrip > 1))},
+        "baseline_round_trip": {
+            "max_channel_error": int(roundtrip.max()),
+            "pixels_over_one": int(np.count_nonzero(roundtrip > 1)),
+            "observed_mask_delta_pixels_vs_raw_before": int(
+                np.count_nonzero(observed != observed_raw_baseline)
+            ),
+            "observed_mask_comparison": mask_metrics(observed, observed_raw_baseline),
+        },
         "browser_runs": {"baseline-only": baseline_run},
         "variants": {},
         "source_hashes": {"before_screen": sha256(before_png), "after_screen": sha256(after_png),
@@ -359,7 +387,7 @@ def compare_stage_variants(
         browser_run = capture_firefox(firefox, html_path, capture_path,
                                       browser_dir / f"profile-variant-{variant}", screen_size)
         composite_rgb = load_rgb(capture_path)
-        expected_full = np.max(np.abs(composite_rgb - baseline_rgb), axis=2) > threshold
+        expected_full = build_change_mask(composite_rgb, baseline_rgb, threshold)
         expected = expected_full[by:by + bh, bx:bx + bw]
         if not np.any(expected):
             raise RuntimeError(f"Variant {variant} produced an empty Stage overlay mask.")

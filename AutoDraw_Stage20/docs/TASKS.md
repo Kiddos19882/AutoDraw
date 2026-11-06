@@ -1,3 +1,19 @@
+## 2026-11-06 — единый baseline в Stage/live diagnostic mask
+
+**Статус:** IN_PROGRESS — методическая асимметрия устранена в коде; влияние на pixel metrics ещё не проверено CI artifact.
+
+- [x] Установлено, что observed mask и expected mask использовали разные baseline images (raw before screenshot и Firefox round-trip baseline).
+- [x] Переведены обе маски на один Firefox round-trip baseline без изменения RGB threshold=24.
+- [x] Добавлена отдельная sensitivity-метрика числа пикселей, меняющих маску при использовании raw before baseline.
+- [x] Добавлены unit tests на threshold boundary и mismatch dimensions.
+- [ ] Подтвердить unit tests в GitHub Actions на новом commit.
+- [ ] Проверить новую sensitivity-метрику и Stage A/B результаты vertical/diagonal.
+- [ ] Только после этого решать, остаётся ли renderer mismatch и какой следующий диагностический разрез нужен.
+
+**Ограничения:** не менять formal INT-006 thresholds; не выполнять post-hoc alignment; не менять production drawing logic; не запускать live game runs; не переписывать raw evidence.
+
+---
+
 ## 2026-11-06 — Stage-level compositor A–D implemented; browser validation pending
 
 **Статус:** IN_PROGRESS — harness and saved-run browser automation added; no acceptance result yet.

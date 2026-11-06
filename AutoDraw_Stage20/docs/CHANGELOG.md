@@ -1,3 +1,10 @@
+## 2026-11-06 — общий baseline для Stage/live screenshot diagnostics
+
+- Исправлена асимметрия: observed и expected RGB masks теперь сравниваются относительно одного Firefox round-trip baseline.
+- В Stage comparison report добавлена оценка чувствительности observed mask к разнице между исходным before screenshot и Firefox baseline.
+- Добавлены unit tests на строгое сравнение с RGB threshold и проверку размеров входных изображений.
+- Formal INT-006 thresholds, raw captures и production drawing logic не менялись; результат ожидает CI validation.
+
 ## 2026-11-06 — fail-closed validation Stage A–D artifacts
 
 - Headless Edge runner проверяет source run ID, четыре варианта и их backend, точные/округлённые backing coordinates, размер BoardPane и нулевую self-difference варианта A до сохранения artifact как валидного.

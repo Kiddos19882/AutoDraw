@@ -1,3 +1,31 @@
+# Дополнение — единая baseline для Stage/live pixel masks (2026-11-06)
+
+**Статус:** исправление диагностической методики внесено; CI-проверка ожидается.  
+**Исходный HEAD:** `d924cc2a848229342d4306915b010d97200ef671`; изменения ограничены Stage comparison harness, его unit tests и управляющими журналами.  
+**Область:** только диагностический Stage A/B ↔ live screenshot comparator. Formal INT-006 thresholds и production renderer/planner/sampling/brush/executor не менялись.
+
+## Найденная асимметрия
+
+До исправления observed mask строилась как `after_screen - before_screen`, а expected mask — как `stage_composite - firefox_baseline_roundtrip`. При этом Firefox baseline round-trip допускал максимум 1 RGB level ошибки относительно исходного before screenshot. Две маски, следовательно, сравнивались относительно немного различающихся baseline images при строгом пороге RGB delta 24.
+
+Это не доказывает, что baseline mismatch объясняет прежние 200–300 пикселей symmetric difference. Исправление обеспечивает одинаковый baseline для обеих масок и отдельно сохраняет sensitivity diagnostic: сколько пикселей observed mask изменилось бы при использовании исходного before screenshot.
+
+## Изменение
+
+- Введён общий helper `build_change_mask(candidate, baseline, threshold)` с проверкой размеров RGB и конечного неотрицательного порога.
+- Live observed mask и Stage expected mask теперь строятся относительно одного Firefox round-trip baseline.
+- В отчёт добавлено число пикселей, изменивших принадлежность observed mask при переходе от исходного before screenshot к Firefox baseline, и метрики совпадения этих двух масок.
+- Добавлены unit tests на строгую семантику порога и несовпадающие размеры.
+- Порог RGB=24, formal acceptance gates, raw captures и исходные Monitor reports не менялись.
+
+## Проверка и ограничения
+
+До завершения CI статус — PENDING/NOT VERIFIED. Изменение не является доказательством исправления renderer mismatch; его влияние будет оценено по новому CI artifact. Live game runs не запускались. Локальный `git status` недоступен через GitHub API.
+
+**Следующий шаг:** проверить unit tests и повторный Stage diagnostic artifact на новом commit; сопоставить baseline mask sensitivity с IoU/precision/recall и symmetric difference для vertical/diagonal. Если расхождение сохранится, продолжить анализ edge/alpha/coverage и геометрии без изменения acceptance thresholds.
+
+---
+
 # Дополнение — Stage-level compositor A–D (2026-11-06)
 
 **Статус:** implementation committed; automated browser/CI validation pending.  
