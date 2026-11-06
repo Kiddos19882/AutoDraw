@@ -1,3 +1,20 @@
+## 2026-11-07 — пакетный paired-renderer блок PRR
+
+**Статус:** код добавлен в ветку; CI validation pending; live-запуски не выполнялись.
+
+В существующий CHALK block runner добавлена фаза PRR для закрытия недостающих formal renderer repeats:
+- ровно четыре задания: vertical repeat 2 и 3, diagonal repeat 2 и 3;
+- фиксированные radius=10 и штатный executor profile 2 px / 10 ms;
+- deterministic shuffle, отдельные task/attempt/experiment IDs и durable journal;
+- сценарии проходят через существующий preflight, drag-установку кисти, fresh Game Monitor heartbeat, executor, exact CHALK capture, postdraw capture и fail-closed progression;
+- repeat 1 намеренно не генерируется: он уже присутствует в исходной серии; PRR добавляет только две недостающие независимые попытки на каждую ориентацию.
+
+Это автоматизирует последовательность опытов внутри локального Windows AutoDraw, но не запускает игру из GitHub Actions и не предоставляет ИИ доступ к локальной доске. Формальная renderer acceptance по PNG остаётся отдельным итоговым gate: завершение CHALK block само по себе не означает PASS_PER_RUN.
+
+- [ ] Подтвердить CI для PRR batch runner; проверить, что план содержит ровно четыре уникальные ячейки и журнал отклоняет повторы/подмену параметров.
+- [ ] После обновления AutoDraw на локальном Windows ПК выполнить PRR на тестовой доске; получить два новых уникальных Game Monitor run_id для vertical и два для diagonal.
+- [ ] Запустить paired renderer acceptance analyzer по сохранённым артефактам; засчитывать только уникальные PASS_PER_RUN. Не открывать INT-007 до закрытия series и CHALK safety review.
+
 ## 2026-11-06 — renderer acceptance policy обновлена до 92%
 
 **Статус:** IMPLEMENTED / CI_VALIDATION_PENDING / NO LIVE RUN.
