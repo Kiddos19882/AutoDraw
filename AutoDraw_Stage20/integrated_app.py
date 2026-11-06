@@ -722,7 +722,7 @@ class AutoDrawUnifiedApp:
             generation = plan_document.get("generation", {})
             matrix = generation.get("chalk_experiment_matrix") if isinstance(generation, dict) else None
             matrix_phase = matrix.get("phase_id") if isinstance(matrix, dict) else None
-            if isinstance(matrix, dict) and matrix_phase in {"G3", "V1", "V2", "V3", "V4", "V5", "INT006", "INT006R"}:
+            if isinstance(matrix, dict) and matrix_phase in {"G3", "V1", "V2", "V3", "V4", "V5", "INT006", "INT006R", "PRR"}:
                 from chalk_experiment_matrix import (
                     GEOMETRY_EXECUTOR_CONFIG, EXPECTED_STROKES, PHASE_SCENARIOS,
                     V_SAMPLING_PROFILES, RADIUS_GEOMETRY_VALIDATION_RADII,
@@ -761,6 +761,9 @@ class AutoDrawUnifiedApp:
                 elif matrix_phase == "INT006R":
                     expected_scenario = scenario_id if scenario_id in PHASE_SCENARIOS[matrix_phase] else None
                     allowed_profiles = {RADIUS_GEOMETRY_VALIDATION_PROFILE}
+                elif matrix_phase == "PRR":
+                    expected_scenario = scenario_id if scenario_id in PHASE_SCENARIOS[matrix_phase] else None
+                    allowed_profiles = {(2, 10)}
                 else:
                     expected_scenario = PHASE_SCENARIOS[matrix_phase][0]
                     allowed_profiles = set(V_SAMPLING_PROFILES)
