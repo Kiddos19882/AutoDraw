@@ -76,7 +76,10 @@ def validate_manifest(
         raise ValueError("Variant A did not use the actual Egret WebGLRenderer.")
 
     geometry = monitor.get("renderer_geometry_at_start", {})
-    corners = geometry.get("boardStageCorners", {})
+    players = geometry.get("players", [])
+    if len(players) != 1:
+        raise ValueError(f"Expected exactly one monitored game player, found {len(players)}.")
+    corners = geometry.get("boardStageCorners") or players[0].get("boardStageCorners") or {}
     top_left = corners.get("topLeft", {})
     scale_x = float(geometry.get("canvasScaleX", 0))
     scale_y = float(geometry.get("canvasScaleY", 0))
@@ -138,6 +141,7 @@ def main() -> int:
     options.set_preference("webgl.disable-fail-if-major-performance-caveat", True)
     options.set_preference("webgl.min_capability_mode", False)
     options.set_preference("webgl.enable-webgl2", True)
+    options.set_preference("webgl.msaa-force", True)
     driver = webdriver.Firefox(options=options)
     try:
         actual_version = str(driver.capabilities.get("browserVersion", ""))
@@ -188,7 +192,7 @@ def main() -> int:
                 status = driver.find_element("id", "renderer-status").text
                 raise RuntimeError(f"Firefox Stage probe failed for {case['name']}: {status}; state={state}")
 
-            manifest_text = driver.find_element("id", "renderer-manifest-json").get_attribute("textContent")
+            manifest_text = driver.find_element("id", "renderer-manifest-json").get_property("textContent")
             manifest = json.loads(manifest_text)
             validate_manifest(manifest, monitor, case["run_id"], expected_major, actual_version, actual_user_agent)
             (case_output / "manifest.json").write_text(
@@ -214,6 +218,13 @@ def main() -> int:
             if stage_count != 4:
                 raise RuntimeError(f"Firefox Stage probe expected four A-D PNGs, saved {stage_count}.")
             driver.save_screenshot(str(case_output / "firefox-page.png"))
+            actual_context = manifest.get("webglProbe", {}).get("contextAttributes", {})
+            expected_context = expected_manifest.get("webglProbe", {}).get("contextAttributes", {})
+            context_differences = {
+                key: {"expected": expected_context.get(key), "actual": actual_context.get(key)}
+                for key in sorted(set(expected_context) | set(actual_context))
+                if expected_context.get(key) != actual_context.get(key)
+            }
             (case_output / "browser-session.json").write_text(
                 json.dumps(
                     {
@@ -222,7 +233,10 @@ def main() -> int:
                         "userAgent": actual_user_agent,
                         "expectedMajor": expected_major,
                         "webgl": manifest.get("webglProbe", {}).get("glInfo", {}),
-                        "contextAttributes": manifest.get("webglProbe", {}).get("contextAttributes", {}),
+                        "contextAttributes": actual_context,
+                        "expectedContextAttributes": expected_context,
+                        "contextAttributeDifferences": context_differences,
+                        "expectedWebGLRenderer": expected_manifest.get("webglProbe", {}).get("glInfo", {}),
                     },
                     ensure_ascii=False,
                     indent=2,

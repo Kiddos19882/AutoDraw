@@ -209,7 +209,7 @@ jobs:
             $experimentDir = "data\\results\\brush_behavior_tests\\$($case.Experiment)"
             $comparisonReport = Join-Path (Join-Path "$env:RUNNER_TEMP\\paired-renderer-png-comparison" $case.Name) "comparison-report-independent-transform.json"
             $outputDir = Join-Path "$env:RUNNER_TEMP\\stage-renderer-live-comparison" $case.Name
-            python tests\\compare_stage_renderer_reference.py --orientation $case.Name --stage-manifest (Join-Path $stageDir "manifest.json") --stage-png-dir $stageDir --experiment-dir $experimentDir --comparison-report $comparisonReport --output-dir $outputDir --variants A B
+            python tests\\compare_stage_renderer_reference.py --orientation $case.Name --stage-manifest (Join-Path $stageDir "manifest.json") --stage-png-dir $stageDir --experiment-dir $experimentDir --comparison-report $comparisonReport --output-dir $outputDir --variants A B C D
             if ($LASTEXITCODE -ne 0) {
               Write-Host "$($case.Name) Stage A/B diagnostic comparison failed with exit code $LASTEXITCODE."
               $failed = $true

@@ -367,8 +367,8 @@ def compare_stage_variants(
 
     for variant in variants:
         metadata = stage_variants[variant]
-        if metadata.get("backend") != "WebGL":
-            raise ValueError(f"Variant {variant} is not an Egret WebGL variant.")
+        if metadata.get("backend") not in ("WebGL", "Canvas2D"):
+            raise ValueError(f"Variant {variant} has an unsupported compositor backend: {metadata.get('backend')!r}.")
         placement = metadata.get("placement", {})
         predicted_origin = predict_board_screen_origin(stage_origin, placement, css_matrix)
         crosscheck = validate_board_origin_crosscheck(
@@ -400,6 +400,7 @@ def compare_stage_variants(
         result["browser_runs"][f"variant-{variant}"] = browser_run
         result["variants"][variant] = {
             "backend": metadata["backend"],
+            "renderer_backend": metadata.get("rendererBackend"),
             "placement": placement,
             "stage_png": str(stage_png),
             "stage_png_sha256": sha256(stage_png),
