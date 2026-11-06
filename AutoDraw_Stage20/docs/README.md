@@ -74,6 +74,9 @@
 
 ## Данные и очистка
 
+- [Локальный Firefox/NVIDIA Stage A–D replay (2026-11-06)](../data/AutoDraw-Stage-Firefox-Local-20261106-075246.zip) — raw Stage PNG, manifest и browser-session для vertical/diagonal; Firefox 159.0.1, NVIDIA GTX 980, antialias=true. Screen comparison с live captures ещё pending.
+
+
 - [Инвентаризация данных и кандидаты на безопасную очистку](DATA_CLEANUP_INVENTORY_2026-11-01.md) — назначение накопленных результатов, что можно удалить условно, что требует миграции/архивации и какие первичные данные сохранять.
 
 ## Инвентаризация и обслуживание документации

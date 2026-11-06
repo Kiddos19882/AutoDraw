@@ -1,3 +1,16 @@
+## Актуальный следующий шаг — same-run сравнение локального NVIDIA Stage A–D (2026-11-06)
+
+**P0 / OFFLINE ONLY / NO LIVE RUN.** Локальный Firefox 159.0.1 replay на NVIDIA GeForce GTX 980 завершён и подтверждён browser-session manifest. Теперь необходимо прогнать локальные full-Stage PNG через существующий `tests/compare_stage_renderer_reference.py` (ф), а не повторять генерацию.
+
+1. Использовать ZIP `data/AutoDraw-Stage-Firefox-Local-20261106-075246.zip` (файл) с Stage PNG 3942×1800 и run-bound manifest.
+2. Для vertical/diagonal взять exact experiment directories, Monitor reports, before/after full-screen screenshots и независимые geometry reports из CI artifact 13478658984 (или заново создать их через `compare_live_renderer_reference.py --same-run-geometry`).
+3. Запустить Stage comparator для A/B/C/D; он применяет same-run canvas CSS matrix к полному Stage PNG и проверяет предсказанный BoardPane origin относительно независимого board-to-screen transform.
+4. Сохранить A–D metrics, overlay PNG, hashes и baseline diagnostics; post-hoc translation/registration запрещены.
+5. Сравнить локальный NVIDIA результат с hosted CI Stage A–D и формальными local-board results. Hosted CI использовал Microsoft Basic Render Driver/antialias=false, поэтому не смешивать эти метрики.
+6. Не менять acceptance thresholds, production renderer/planner/sampling/brush/executor и CHALK logic. Не запускать live game tests.
+
+**Критерий следующего решения:** локальные NVIDIA Stage A–D metrics привязаны к точному run/session/experiment, baseline round-trip и board-origin crosschecks проходят, все четыре варианта сохранены. Formal PASS_PER_RUN определяется только неизменными formal gates; Stage diagnostic alone не является приёмкой.
+
 ## Актуальный следующий шаг — local Firefox/NVIDIA offline replay
 
 CI Stage A–D подтвердил существенное улучшение диагонального full-Stage compositor, но не устранил вертикальное edge mismatch. CI Firefox использует Basic Render Driver и antialias=false, тогда как source reference указывает NVIDIA и antialias=true.

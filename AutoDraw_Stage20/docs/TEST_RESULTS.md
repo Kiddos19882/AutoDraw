@@ -1,3 +1,52 @@
+## 2026-11-06 — local NVIDIA Firefox Stage A–D artifacts
+
+**Source commit:** [b4359c9](https://github.com/Kiddos19882/AutoDraw/commit/b4359c9178e514f773ee742fc99e20dde74c6543)  
+**Raw evidence:** `data/AutoDraw-Stage-Firefox-Local-20261106-075246.zip`  
+**CI:** [42165379138](https://github.com/Kiddos19882/AutoDraw/actions/runs/42165379138)
+
+### Environment and provenance
+
+- Firefox 159.0.1, headed, WebGL 1.0.
+- GL renderer: ANGLE / NVIDIA GeForce GTX 980 / Direct3D11.
+- Antialias=true; expected/actual context attributes equal.
+- Vertical run `c860234f-995a-4789-9ac2-e05b322fe742`, exact source CHALK=71.
+- Diagonal run `f69cb0f4-f5d0-4ff9-a3b7-1148c38fa07f`, exact source CHALK=161.
+- Both Stage images: 3942×1800 RGBA8; Stage=1314×600; BoardPane=460×240; raster scale=3; backing origin=(1022.374998,216); rounded origin=(1022,216).
+
+### Internal Stage PNG comparison (not live acceptance)
+
+| Orientation | A/B differing pixels | Max channel delta | Mean differing-channel delta |
+|---|---:|---:|---:|
+| Vertical | 2565 | 96 | 47.482651 |
+| Diagonal | 4119 | 96 | 29.478029 |
+
+- A/C pixel equality is recorded in the manifest and supported by matching PNG CRC32/size.
+- B/D have matching PNG CRC32/size and matching comparison-to-A metrics.
+- This establishes sensitivity of the offline Stage raster to fractional vs rounded placement for these fixtures. It does not by itself prove live renderer equivalence.
+- C/D are Canvas2D image-composite variants on the same source raster, not a full independent CanvasRenderer-vs-WebGL source-raster comparison.
+
+### Hosted CI result — distinct from local NVIDIA ZIP
+
+CI 42165379138: Preparation/G3, Game Monitor/Bridge, Executor, Application integration and Egret browser reference SUCCESS; INT-006 formal vertical/diagonal renderer gate FAILURE; optional benchmarks and Windows portable build SKIPPED.
+
+Hosted CI Stage A–D metrics at RGB threshold 24:
+
+| Orientation | Variant | IoU | Precision | Recall | FP | FN | Symmetric difference |
+|---|---|---:|---:|---:|---:|---:|---:|
+| Vertical | A | 0.940000 | 0.940000 | 1.000000 | 294 | 0 | 294 |
+| Vertical | B | 0.939388 | 0.939388 | 1.000000 | 297 | 0 | 297 |
+| Vertical | C | 0.940000 | 0.940000 | 1.000000 | 294 | 0 | 294 |
+| Vertical | D | 0.939388 | 0.939388 | 1.000000 | 297 | 0 | 297 |
+| Diagonal | A | 0.982775 | 0.983046 | 0.999719 | 184 | 3 | 187 |
+| Diagonal | B | 0.978823 | 0.979545 | 0.999248 | 222 | 8 | 230 |
+| Diagonal | C | 0.982406 | 0.982678 | 0.999719 | 188 | 3 | 191 |
+| Diagonal | D | 0.978823 | 0.979545 | 0.999248 | 222 | 8 | 230 |
+
+Hosted CI used Microsoft Basic Render Driver / antialias=false, so these screen metrics are not local NVIDIA results. Baseline round-trip max channel error=0, observed mask sensitivity=0, board-origin crosschecks passed, post-hoc alignment=false.
+
+Formal local-board replay remained REJECTED_PER_RUN: vertical IoU=0.938405 / symmetric difference=302; diagonal IoU=0.949646 / symmetric difference=554. Capture and transform gates passed; renderer pixel gates failed. Formal thresholds remain unchanged.
+
+**Pending:** same-run full-Stage screen comparison of the local NVIDIA ZIP using `compare_stage_renderer_reference.py` and the exact saved captures. No live game run or new CHALK measurement.
 ## 2026-11-06 — Stage A–D diagnostic comparison and local GPU replay
 
 **CI:** [42155453886](https://github.com/Kiddos19882/AutoDraw/actions/runs/42155453886)  

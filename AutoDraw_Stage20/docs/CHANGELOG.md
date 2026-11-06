@@ -1,3 +1,12 @@
+## 2026-11-06 — локальный Firefox/NVIDIA Stage A–D replay
+
+- В репозиторий добавлен ZIP с headed Firefox 159.0.1 Stage A–D artifacts для vertical/diagonal.
+- Подтверждён WebGL 1.0 на ANGLE/NVIDIA GeForce GTX 980 D3D11 с antialias=true и точным совпадением expected context attributes.
+- Внутренние Stage PNG: A/B differing pixels=2565 vertical и 4119 diagonal; A/C pixel-equal; B/D имеют совпадающие CRC32/размеры.
+- Stage PNG имеют полный backing размер 3942×1800; fractional BoardPane origin X=1022.375 отличается от rounded X=1022.
+- Hosted CI 42165379138: Stage A–D diagnostic success, formal vertical/diagonal renderer gates failure. Hosted CI renderer использует Basic Render Driver и antialias=false, поэтому не подменяет локальные NVIDIA evidence.
+- Следующий шаг — прогнать локальные NVIDIA PNG через существующий same-run Stage comparator. Production code и formal thresholds не менялись; live runs/CHALK не запускались.
+
 ## 2026-11-06 — Stage A–D live comparison and local GPU replay
 
 - Stage A–D diagnostic comparison succeeded on CI run 42155453886.

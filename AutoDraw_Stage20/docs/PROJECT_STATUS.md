@@ -1,3 +1,93 @@
+# Дополнение — локальный Firefox/NVIDIA Stage A–D replay (2026-11-06)
+
+**Состояние:** локальный GPU replay завершён; сравнение именно локальных Stage PNG с live captures ещё не выполнено.  
+**Ветка/HEAD до документационной фиксации:** `feature/image-geometry-optimization` / `b4359c9178e514f773ee742fc99e20dde74c6543`.  
+**Первичный артефакт:** [AutoDraw-Stage-Firefox-Local-20261106-075246.zip](../data/AutoDraw-Stage-Firefox-Local-20261106-075246.zip), добавлен коммитом [b4359c9](https://github.com/Kiddos19882/AutoDraw/commit/b4359c9178e514f773ee742fc99e20dde74c6543). Архив содержит 16 файлов, 436 759 байт: два run-bound набора, по четыре Stage PNG A–D, manifest, browser-session, page source и Firefox screenshot.
+
+## 1. Browser/GPU parity
+
+Оба browser-session manifest подтверждают:
+- Firefox **159.0.1**, headed mode (`headless=false`), WebGL 1.0.
+- GL renderer: `ANGLE (NVIDIA, NVIDIA GeForce GTX 980 Direct3D11 vs_5_0 ps_5_0), or similar`.
+- `antialias=true`; alpha/depth/stencil/premultipliedAlpha соответствуют expected attributes.
+- `contextAttributeDifferences={}`; expected и actual GL renderer совпадают.
+- Профиль совпадает с сохранённым source renderer reference по Firefox major, NVIDIA GTX 980/ANGLE и WebGL context attributes.
+
+Это устраняет ранее установленное расхождение hosted CI (Microsoft Basic Render Driver, `antialias=false`) для локального Stage replay. Это не live game run.
+
+## 2. Привязка к исходным Game Monitor runs
+
+| Параметр | Vertical | Diagonal |
+|---|---|---|
+| Run ID | `c860234f-995a-4789-9ac2-e05b322fe742` | `f69cb0f4-f5d0-4ff9-a3b7-1148c38fa07f` |
+| Session ID | `30e55d53-8eae-4d99-884f-0cf0c6d0a8bc` | `fa8c4845-3158-4763-8d53-c1b9f5fae144` |
+| Experiment ID | `6f2227c7bce94fa5acd0c633af5ed04f` | `0e61bc40e5a8432fb87fa80b95889f4e` |
+| Exact CHALK исходного run | 71 | 161 |
+
+SourceRunId/SessionId/ExperimentId в manifest совпадают с соответствующими Game Monitor и experiment JSON. CHALK 71/161 — исторические значения этих исходных live runs; локальный offline replay нового CHALK не расходовал.
+
+## 3. Stage geometry
+
+Оба набора используют Stage 1314×600, backing canvas 3942×1800, BoardPane 460×240, raster scale 3× и DPR=1. Stage PNG A–D имеют размер **3942×1800, RGBA, 8-bit**.
+
+- BoardPane Stage origin: X=340.791666..., Y=72.
+- Backing origin: X=1022.374998..., Y=216.
+- Rounded control: X=1022, Y=216.
+- Fractional X phase: 0.374998 backing px (≈0.375 px).
+- Same-run canvas CSS matrix: `matrix(0.487062, 0, 0, 0.487778, 0, 0)`.
+- Canvas client rect: left=0, top=−0.5, size=1920×878; исходный game viewport=1920×877.
+
+`browser.viewport=1280×850` в локальном manifest относится к окну offline probe; `runtimeProfile.viewport=1920×877` — к исходному live run. Это разные среды, не противоречие.
+
+## 4. Внутренние Stage PNG comparisons
+
+Сравнение самих full-Stage PNG, не с live capture:
+
+| Направление | A vs B: differing pixels | Max channel delta | Mean differing-channel delta |
+|---|---:|---:|---:|
+| Vertical | 2565 | 96 | 47.482651 |
+| Diagonal | 4119 | 96 | 29.478029 |
+
+- A/C: manifest сообщает pixel equality; PNG CRC32 и размеры совпадают для каждой ориентации.
+- B/D: PNG CRC32 и размеры совпадают для каждой ориентации; метрики относительно A также совпадают.
+- Следовательно, в этом конкретном fixture выбор exact fractional vs rounded backing origin существенно меняет результат; WebGL vs Canvas2D *image-composite* вариант не даёт измеримого различия между A/C и B/D.
+- C/D — варианты Canvas2D image composition на том же BoardPane source raster; это не доказательство полной эквивалентности всех путей игрового CanvasRenderer и WebGLRenderer.
+
+## 5. Что уже показал hosted CI — отдельно от локального NVIDIA ZIP
+
+Push commit `b4359c9` запустил [CI 42165379138](https://github.com/Kiddos19882/AutoDraw/actions/runs/42165379138). Preparation/G3, Game Monitor/Bridge, Executor, Application integration и Egret browser reference завершились SUCCESS; optional benchmarks и Windows portable build были SKIPPED. INT-006 завершился FAILURE на формальных vertical/diagonal renderer gates. Stage A–D diagnostic comparison при этом завершился и сохранил artifacts.
+
+Hosted CI Stage A–D (не локальный NVIDIA ZIP), RGB threshold=24:
+
+| Orientation | Variant | IoU | Precision | Recall | FP | FN | Symmetric difference |
+|---|---|---:|---:|---:|---:|---:|---:|
+| Vertical | A WebGL fractional | 0.940000 | 0.940000 | 1.000000 | 294 | 0 | 294 |
+| Vertical | B WebGL rounded | 0.939388 | 0.939388 | 1.000000 | 297 | 0 | 297 |
+| Vertical | C Canvas2D fractional | 0.940000 | 0.940000 | 1.000000 | 294 | 0 | 294 |
+| Vertical | D Canvas2D rounded | 0.939388 | 0.939388 | 1.000000 | 297 | 0 | 297 |
+| Diagonal | A WebGL fractional | 0.982775 | 0.983046 | 0.999719 | 184 | 3 | 187 |
+| Diagonal | B WebGL rounded | 0.978823 | 0.979545 | 0.999248 | 222 | 8 | 230 |
+| Diagonal | C Canvas2D fractional | 0.982406 | 0.982678 | 0.999719 | 188 | 3 | 191 |
+| Diagonal | D Canvas2D rounded | 0.978823 | 0.979545 | 0.999248 | 222 | 8 | 230 |
+
+Hosted CI использовал Basic Render Driver и `antialias=false`; эти screen metrics нельзя приписывать локальному NVIDIA ZIP. Baseline round-trip max channel error=0, observed-mask sensitivity=0, board-origin crosschecks прошли для A–D. Все эти результаты — DIAGNOSTIC_ONLY; formal thresholds не менялись.
+
+Formal local-board replay в том же CI остался REJECTED_PER_RUN:
+- Vertical: IoU=0.938405, precision=0.938980, recall=0.999348, symmetric difference=302 px.
+- Diagonal: IoU=0.949646, precision=0.962683, recall=0.985939, symmetric difference=554 px.
+Capture и transform gates прошли; отказ относится к renderer pixel gates.
+
+## 6. Следующий шаг
+
+Сравнить **локальные NVIDIA Stage PNG из ZIP** с теми же before/after full-screen captures без нового live run. В репозитории уже есть `tests/compare_stage_renderer_reference.py` (ф): он принимает full-Stage PNG 3942×1800, применяет same-run canvas CSS matrix из Monitor manifest, использует независимый board-to-screen origin как crosscheck и не выполняет post-hoc alignment.
+
+Для локального ZIP нужно повторить A–D Stage comparison с:
+- соответствующим run/experiment directory и Monitor captures;
+- `comparison-report-independent-transform.json` из CI artifact [13478658984](https://github.com/Kiddos19882/AutoDraw/actions/runs/42165379138/artifacts/13478658984), либо заново полученным тем же `compare_live_renderer_reference.py --same-run-geometry`;
+- Firefox 159 и local ZIP manifest/PNGs.
+
+До получения этих метрик нельзя переносить CI Stage A–D IoU на локальный NVIDIA run или объявлять renderer equivalence. Formal thresholds, production renderer/planner/sampling/brush/executor и CHALK logic не менялись; новых live experiments не было.
+
 # Дополнение — результаты Firefox Stage A–D и следующий GPU replay (2026-11-06)
 
 **Актуальный HEAD:** `5a8dd650f1c685fb2200f1bee7fdb959b9685b2c`.  

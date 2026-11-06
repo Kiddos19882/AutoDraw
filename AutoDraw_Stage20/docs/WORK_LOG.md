@@ -1,3 +1,13 @@
+## 2026-11-06 — local Firefox/NVIDIA Stage A–D replay received
+
+- Проверен push commit `b4359c9178e514f773ee742fc99e20dde74c6543`; branch HEAD на момент проверки совпадал с ним. Diff commit содержит один raw ZIP в `AutoDraw_Stage20/data/`; master не менялась. GitHub API не подтверждает локальный `git status`.
+- Из ZIP извлечены и проверены оба browser-session и manifest. Firefox 159.0.1 headed, WebGL 1.0, ANGLE/NVIDIA GeForce GTX 980 D3D11, antialias=true; context attributes совпадают с expected и source renderer reference.
+- Run binding exact: vertical run `c860234f-995a-4789-9ac2-e05b322fe742`, CHALK=71; diagonal run `f69cb0f4-f5d0-4ff9-a3b7-1148c38fa07f`, CHALK=161. Это значения исходных runs, не новый расход.
+- Stage backing: 3942×1800; Stage 1314×600; BoardPane 460×240; raster scale 3×; backing origin X=1022.374998, Y=216; rounded control X=1022; CSS matrix 0.487062/0.487778.
+- PNG internal comparisons: vertical A/B 2565 differing pixels, diagonal A/B 4119; A/C pixel-equal; B/D same CRC32 and size per orientation. Fractional-vs-rounded placement materially changes this offline Stage raster; Canvas2D image-composite vs WebGL produces no measurable difference for these specific paired variants.
+- Checked CI [42165379138](https://github.com/Kiddos19882/AutoDraw/actions/runs/42165379138): core jobs and Stage browser job SUCCESS; INT-006 formal vertical/diagonal renderer gate FAILURE. Hosted Stage A–D diagnostic reports were generated, but they use Microsoft Basic Render Driver/antialias=false and are not local NVIDIA metrics.
+- Existing `compare_stage_renderer_reference.py` supports full 3942×1800 Stage PNG and same-run CSS transform. Local NVIDIA A–D screen comparison remains pending; no code changes required to start that comparison.
+- No live game run, new CHALK consumption, production changes, threshold changes or post-hoc alignment.
 ## 2026-11-06 — Stage A–D live comparison and local GPU replay preparation
 
 - Firefox 159 CI Stage A–D comparison completed successfully for vertical and diagonal.

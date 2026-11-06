@@ -1,3 +1,21 @@
+## 2026-11-06 — локальный Firefox/NVIDIA Stage A–D replay получен
+
+**Статус:** LOCAL_GPU_REPLAY_COMPLETE / SAME_RUN_LIVE_COMPARISON_PENDING / NO LIVE RUN.
+
+- [x] Локальный ZIP добавлен в ветку: `data/AutoDraw-Stage-Firefox-Local-20261106-075246.zip` (436 759 bytes, 16 files).
+- [x] Firefox 159.0.1 headed probe завершён для vertical и diagonal.
+- [x] Подтверждены NVIDIA GeForce GTX 980 / ANGLE D3D11, WebGL 1.0, antialias=true; expected/actual context attributes совпадают.
+- [x] Manifest sourceRunId/SessionId/ExperimentId совпадает с исходными Game Monitor runs.
+- [x] Получены Stage PNG 3942×1800 RGBA для A/B/C/D обеих ориентаций.
+- [x] Внутренние Stage PNG deltas: A/B=2565 px vertical и 4119 px diagonal; A/C pixel-equal; B/D имеют одинаковые CRC32/размеры и одинаковые deltas относительно A.
+- [x] Проверен CI 42165379138: Stage A–D diagnostic comparison сохранил отчёты; formal INT-006 vertical/diagonal renderer gates остаются FAILURE.
+- [ ] Запустить `compare_stage_renderer_reference.py` на локальных NVIDIA PNG A–D с same-run captures и independent geometry reports.
+- [ ] Сопоставить локальные NVIDIA A–D metrics с hosted CI metrics и formal renderer gates.
+- [ ] Решить, какие residuals относятся к Stage placement, CSS resampling, mask/brush raster или другому фактору; не менять thresholds.
+- [ ] Получить требуемые уникальные PASS_PER_RUN для дальнейших gates; не начинать live runs без отдельного разрешения.
+
+Hosted CI A–D metrics — диагностические и относятся к Microsoft Basic Render Driver/antialias=false, не к локальному NVIDIA ZIP. Exact CHALK исходных runs остаётся 71/161; новый расход отсутствует.
+
 ## 2026-11-06 — Stage A–D same-run comparison complete; local GPU replay pending
 
 **Статус:** IN_PROGRESS — Stage diagnostic completed; formal vertical/diagonal renderer gates remain rejected; local Firefox/NVIDIA replay prepared.
@@ -148,7 +166,7 @@ CI run 42155453886: browser, monitor, executor и application jobs SUCCESS; prep
 
 | ID | Приоритет | Статус | Содержание |
 |---|---|---|---|
-| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | STAGE_LEVEL_COMPOSITOR_IMPLEMENTED_CI_PENDING | Добавлены A–D Stage backing variants и headless replay для сохранённых vertical/diagonal runs; требуется подтвердить CI, проверить A–D pixel deltas и сравнить Stage A с live capture; затем получить три unique PASS_PER_RUN на ориентацию; environment fingerprint/profile consumer/executor gate pending |
+| FILL-001-RS-ENGINE-FOOTPRINT-001 | P0 | LOCAL_GPU_REPLAY_COMPLETE_SAME_RUN_LIVE_COMPARISON_PENDING | A–D Stage backing variants и локальный Firefox/NVIDIA replay завершены; требуется прогнать локальные NVIDIA PNG через same-run Stage comparator, затем повторно оценить formal renderer gates; environment fingerprint/profile consumer/executor gate pending |
 | FILL-001-RS-MATRIX | P0 | BLOCKED | 45 captures только после принятого single-task preflight |
 | GAME-INPUT-SAMPLING-TRACE-001 | P1 | ROI_BOUNDS_ROOT_CAUSE_IDENTIFIED_MULTI_AXIS_CODE_READY_LIVE_CAPTURE_PENDING | Run 16aec62c; 138 accepted points, CHALK=138; ROI included margins; screenshot-derived bounds + Monitor fit IoU=0.998882 / 10 px without post-hoc shift; multi-axis/environment validation pending |
 | BRUSH-FOOTPRINT-CAPSULE-001 | P1 | OPEN | Offline capsule model готова; renderer acceptance/planner integration не выполнены |
@@ -1404,16 +1422,17 @@ CI evidence: workflow 41787492122, commit d337f4240e83488273152f65992032beca3957
 
 ## Stage-level WebGL compositor diagnostic — 2026-11-06
 
-**Статус:** AUDIT COMPLETE / IMPLEMENTATION PENDING / NO LIVE RUN.
+**Статус:** A–D IMPLEMENTED / LOCAL NVIDIA REPLAY COMPLETE / SAME-RUN LIVE COMPARISON PENDING / NO LIVE RUN.
 
 - [x] Проверить архитектуру текущего local BoardPane WebGL reference и screen-space comparison harness.
 - [x] Проследить Egret 5.4.1 WebGL texture pipeline в engine bundle; зафиксировать LINEAR min/mag, CLAMP_TO_EDGE и premultiplied alpha.
 - [x] Зафиксировать run-bound Stage/backing geometry и fractional origin для сохранённых vertical/diagonal captures.
 - [x] Установить, что текущий harness не воспроизводит Stage-level composition; отделить подтверждённые факты от гипотезы.
-- [ ] Реализовать варианты A–D: WebGL/Canvas2D × exact fractional/rounded backing position.
+- [x] Реализовать варианты A–D: WebGL/Canvas2D × exact fractional/rounded backing position.
 - [ ] Добавить unit regression test для Stage placement и округления backing-pixel coordinates.
 - [ ] Добавить browser integration test реального Stage-size WebGL buffer и texture sampling.
-- [ ] Сохранить PNG/manifests и численные метрики для всех вариантов; сравнить WebGL exact вариант с сохранёнными live vertical/diagonal captures.
+- [x] Сохранить PNG/manifests A–D для hosted Firefox и local NVIDIA Firefox; подтвердить run binding и GPU/context parity локального ZIP.
+- [ ] Сравнить local NVIDIA Stage PNG A–D с сохранёнными live vertical/diagonal captures через full-Stage same-run comparator.
 - [ ] Только по результатам определить, объясняет ли Stage composition прежние renderer mismatches; thresholds не менять.
 
 **Критерии:** same-run geometry; отсутствие post-hoc alignment; неизменные rendering/brush/sampling parameters; отчёт по changed pixels, IoU, precision, recall, alpha и spatial distribution. Offline/synthetic match не приравнивать к live equivalence.
