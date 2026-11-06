@@ -1,3 +1,23 @@
+## 2026-11-07 — пакетный paired-renderer блок PRR
+
+**Статус:** код добавлен в ветку; CI validation pending; live-запуски не выполнялись.
+
+В существующий CHALK block runner добавлена фаза PRR для закрытия недостающих formal renderer repeats:
+- ровно четыре задания: vertical repeat 2 и 3, diagonal repeat 2 и 3;
+- фиксированные radius=10 и штатный executor profile 2 px / 10 ms;
+- deterministic shuffle, отдельные task/attempt/experiment IDs и durable journal;
+- сценарии проходят через существующий preflight, drag-установку кисти, fresh Game Monitor heartbeat, executor, exact CHALK capture, postdraw capture и fail-closed progression;
+- repeat 1 намеренно не генерируется: он уже присутствует в исходной серии; PRR добавляет только две недостающие независимые попытки на каждую ориентацию.
+
+Это автоматизирует последовательность опытов внутри локального Windows AutoDraw, но не запускает игру из GitHub Actions и не предоставляет ИИ доступ к локальной доске. Формальная renderer acceptance по PNG остаётся отдельным итоговым gate: завершение CHALK block само по себе не означает PASS_PER_RUN.
+
+- Добавлены phase/scenario IDs для vertical и diagonal single-stroke paired renderer.
+- Расширены block planner и journal validator для точного набора repeat 2/3 (4 tasks total).
+- UI Brush Test показывает фазу PRR и передаёт два повтора в планировщик; интеграция исполнителя валидирует PRR executor metadata.
+- Добавлены regression tests для полного набора и tamper rejection.
+- Источник истины по локальному исполнению остаётся локальный AutoDraw; GitHub API не может запустить реальную игру или проверить локальную доску.
+- Commit chain: c4a9170, 07126ae, 6485448, bb9370d, c8bef70, 3d98953 (все в feature/image-geometry-optimization).
+
 ## 2026-11-06 — renderer acceptance thresholds согласованно снижены до 92%
 
 - По прямому указанию пользователя формальные renderer pixel gates изменены с 99.5% на 92%.
