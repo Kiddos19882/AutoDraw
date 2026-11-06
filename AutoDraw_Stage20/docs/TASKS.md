@@ -1,3 +1,24 @@
+## 2026-11-06 — Stage A–D same-run comparison complete; local GPU replay pending
+
+**Статус:** IN_PROGRESS — Stage diagnostic completed; formal vertical/diagonal renderer gates remain rejected; local Firefox/NVIDIA replay prepared.
+
+- [x] Firefox Stage A–D artifacts generated for both orientations.
+- [x] Same-run Stage comparison completed for A/B/C/D without post-hoc alignment.
+- [x] Baseline round-trip and mask sensitivity confirmed zero.
+- [x] Board-origin crosschecks passed for all A–D.
+- [x] A/C and B/D internal image differences measured.
+- [x] Diagonal Stage A symmetric difference improved 554 → 187 px relative to formal local-board replay.
+- [x] Vertical Stage A symmetric difference improved 302 → 294 px only.
+- [x] Spatial audit found 288 vertical FP pixels in one continuous column x=325, y=26..313; diagonal FP are distributed along path.
+- [x] Added headed local Firefox runner to capture local GPU and actual context attributes.
+- [ ] Run local Firefox 159 headed probe on the source NVIDIA GPU.
+- [ ] Verify antialias=true and actual GL renderer match source renderer reference.
+- [ ] Re-run Stage A–D live comparison using local GPU artifacts.
+- [ ] Reassess formal renderer gates without changing thresholds.
+- [ ] Only after renderer gates pass, resume downstream INT-006 V1–V5, CHALK prediction and INT006R validation.
+
+CI 42155453886: browser and core test groups SUCCESS; formal vertical/diagonal renderer gates FAILURE; downstream analyses skipped.
+
 ## 2026-11-06 — Firefox Stage A–D artifacts получены
 
 **Статус:** IN_PROGRESS — browser job SUCCESS; same-run pixel comparison ждёт downstream INT-006 job.

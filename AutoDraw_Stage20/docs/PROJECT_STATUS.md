@@ -1,3 +1,63 @@
+# Дополнение — результаты Firefox Stage A–D и следующий GPU replay (2026-11-06)
+
+**Актуальный HEAD:** `5a8dd650f1c685fb2200f1bee7fdb959b9685b2c`.  
+**Рабочая ветка:** `feature/image-geometry-optimization`.  
+**CI с результатами Stage A–D:** [42155453886](https://github.com/Kiddos19882/AutoDraw/actions/runs/42155453886), overall FAILURE из-за formal vertical/diagonal renderer gates; diagnostic Stage A–D step SUCCESS.
+
+## Same-run Stage A–D metrics (RGB threshold 24)
+
+| Orientation | Variant | IoU | Precision | Recall | FP | FN | Symmetric difference |
+|---|---|---:|---:|---:|---:|---:|---:|
+| Vertical | A WebGL fractional | 0.940000 | 0.940000 | 1.000000 | 294 | 0 | 294 |
+| Vertical | B WebGL rounded | 0.939388 | 0.939388 | 1.000000 | 297 | 0 | 297 |
+| Vertical | C Canvas2D fractional | 0.940000 | 0.940000 | 1.000000 | 294 | 0 | 294 |
+| Vertical | D Canvas2D rounded | 0.939388 | 0.939388 | 1.000000 | 297 | 0 | 297 |
+| Diagonal | A WebGL fractional | 0.982775 | 0.983046 | 0.999719 | 184 | 3 | 187 |
+| Diagonal | B WebGL rounded | 0.978823 | 0.979545 | 0.999248 | 222 | 8 | 230 |
+| Diagonal | C Canvas2D fractional | 0.982406 | 0.982678 | 0.999719 | 188 | 3 | 191 |
+| Diagonal | D Canvas2D rounded | 0.978823 | 0.979545 | 0.999248 | 222 | 8 | 230 |
+
+## Сопоставление с formal paired replay
+
+- Vertical formal local-board replay: IoU=0.938405, precision=0.938980, recall=0.999348, FP=299, FN=3, symmetric difference=302.
+- Diagonal formal local-board replay: IoU=0.949646, precision=0.962683, recall=0.985939, FP=405, FN=149, symmetric difference=554.
+- Stage A уменьшил diagonal symmetric difference с 554 до 187 (−66,2%); Stage C — до 191 (−65,5%).
+- Vertical улучшение ограниченное: 302 → 294 (−2,6%).
+- Fractional variants A/C лучше rounded B/D. A/C отличаются между собой на 665 vertical и 1906 diagonal Stage pixels, но максимальная разница канала равна 1; B/D побайтно идентичны в обоих направлениях.
+- Эти значения являются diagnostic-only. Formal thresholds остаются IoU/precision/recall ≥0.995 и symmetric-difference fraction ≤0.0025; ни один вариант formal PASS не получил.
+
+## Геометрия и baseline
+
+- Same-run board-origin crosschecks прошли для всех A–D с tolerance 1.0 px.
+- A/C origin delta: vertical X −0.040 px, diagonal X +0.015 px; B/D: vertical X −0.223 px, diagonal X −0.168 px. Y deltas не превышают 0.011 px.
+- Baseline round-trip max channel error=0; observed mask sensitivity=0 для обоих runs.
+- `post_hoc_alignment=false`; RGB threshold=24 неизменён.
+- Vertical FP пространственно сконцентрированы: 288 пикселей образуют непрерывную дополнительную колонку x=325 на y=26..313; остальные FP — единичные точки. Diagonal FP распределены вдоль траектории; FN=3.
+- Паттерн совместим с различием edge coverage/antialiasing, но причинность не доказана.
+
+## Ограничение среды и следующий эксперимент
+
+Firefox CI 159.0.1 использует Microsoft Basic Render Driver / ANGLE и reports `antialias=false`, несмотря на `webgl.msaa-force=true`. Source renderer reference указывает NVIDIA ANGLE и `antialias=true`. Поэтому CI не воспроизводит исходный GPU/context.
+
+Добавлен локальный headed offline runner:
+- `tests/run_egret_stage_reference_local.ps1` (ф) запускает локальный HTTP server и Firefox WebDriver;
+- `tests/run_egret_stage_reference_firefox.py --headed` (ф) запускает тот же Stage A–D probe в видимом Firefox, позволяя использовать локальный GPU;
+- runner сохраняет actual/expected GL renderer и context attributes в `browser-session.json` (ф) и упаковывает A–D PNG/manifest.
+
+**Следующий шаг:** локально запустить offline probe в Firefox 159 на той же NVIDIA GPU, которая указана в source renderer reference, и передать полученный ZIP для сравнения. Игра не запускается, CHALK не расходуется, live experiments не проводятся.
+
+## Итог CI 42155453886
+
+- Game Monitor/Bridge — SUCCESS.
+- Executor regression — SUCCESS.
+- Application integration — SUCCESS.
+- Egret Firefox Stage A–D browser reference — SUCCESS.
+- Preparation/G3 core tests — SUCCESS.
+- INT-006 formal vertical/diagonal renderer replay — FAILURE; transform checks passed, renderer metrics failed.
+- Stage A–D diagnostic live comparison — SUCCESS.
+- V1–V5 analysis, CHALK prediction validation and INT006R live validation were skipped after formal gate failure.
+- Windows portable build — SKIPPED.
+
 # Дополнение — Firefox Stage A–D artifacts получены (2026-11-06)
 
 **CI run:** [42155453886](https://github.com/Kiddos19882/AutoDraw/actions/runs/42155453886), browser reference job SUCCESS.  

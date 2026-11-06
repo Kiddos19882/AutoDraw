@@ -1,3 +1,24 @@
+## 2026-11-06 — Stage A–D diagnostic comparison and local GPU replay
+
+**CI:** [42155453886](https://github.com/Kiddos19882/AutoDraw/actions/runs/42155453886)  
+**Diagnostic stage comparison:** SUCCESS  
+**Formal vertical/diagonal renderer gates:** FAILURE
+
+| Orientation | Variant | IoU | Precision | Recall | FP | FN | Symmetric difference |
+|---|---|---:|---:|---:|---:|---:|---:|
+| Vertical | A | 0.940000 | 0.940000 | 1.000000 | 294 | 0 | 294 |
+| Vertical | B | 0.939388 | 0.939388 | 1.000000 | 297 | 0 | 297 |
+| Vertical | C | 0.940000 | 0.940000 | 1.000000 | 294 | 0 | 294 |
+| Vertical | D | 0.939388 | 0.939388 | 1.000000 | 297 | 0 | 297 |
+| Diagonal | A | 0.982775 | 0.983046 | 0.999719 | 184 | 3 | 187 |
+| Diagonal | B | 0.978823 | 0.979545 | 0.999248 | 222 | 8 | 230 |
+| Diagonal | C | 0.982406 | 0.982678 | 0.999719 | 188 | 3 | 191 |
+| Diagonal | D | 0.978823 | 0.979545 | 0.999248 | 222 | 8 | 230 |
+
+Formal replay reference: vertical 302 symmetric-difference px; diagonal 554 px. Stage A reduces diagonal difference by 66.2%, vertical by 2.6%. Board-origin crosschecks all passed; baseline error/sensitivity zero; no post-hoc alignment. Vertical FP includes 288 px in one extra column x=325, y=26..313.
+
+Hosted Firefox 159 context is Microsoft Basic Render Driver / antialias=false; source renderer reference is NVIDIA / antialias=true. A headed local Firefox runner was added for offline GPU parity verification. No live game or CHALK test was run.
+
 ## 2026-11-06 — Firefox Stage A–D artifacts (browser job SUCCESS)
 
 **Workflow:** [42155453886](https://github.com/Kiddos19882/AutoDraw/actions/runs/42155453886)  

@@ -1,3 +1,15 @@
+## 2026-11-06 — Stage A–D live comparison and local GPU replay preparation
+
+- Firefox 159 CI Stage A–D comparison completed successfully for vertical and diagonal.
+- Stage A/C and B/D metrics recorded in PROJECT_STATUS and TEST_RESULTS. Fractional A/C outperformed rounded B/D.
+- Diagonal symmetric difference improved from formal local-board replay 554 px to Stage A 187 px (−66.2%); vertical improved 302 → 294 px only.
+- All Stage A–D board-origin crosschecks passed; baseline round-trip error and mask sensitivity were zero; no post-hoc alignment.
+- Vertical FP: 288 pixels in one continuous column x=325, y=26..313. Diagonal FP distributed along path, FN=3.
+- CI renderer context mismatch remains: Microsoft Basic Render Driver, antialias=false vs source NVIDIA, antialias=true.
+- Added `--headed` mode and local PowerShell offline runner for same Firefox Stage A–D probe on the source machine/GPU.
+- CI 42155453886 overall FAILURE because formal vertical/diagonal renderer gates failed. Stage diagnostic comparison succeeded. Downstream V1–V5, CHALK and INT006R validation skipped.
+- No live experiment, CHALK consumption, production changes, threshold changes or post-hoc registration.
+
 ## 2026-11-06 — Firefox Stage A–D artifacts and internal pixel audit
 
 - CI 42155453886 browser reference job SUCCESS: Firefox 159.0.1 generated Stage A–D for vertical and diagonal; manifests and eight PNGs uploaded.

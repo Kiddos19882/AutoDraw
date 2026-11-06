@@ -1,3 +1,14 @@
+## 2026-11-06 — Stage A–D live comparison and local GPU replay
+
+- Stage A–D diagnostic comparison succeeded on CI run 42155453886.
+- Vertical A/C: IoU 0.940000, FP 294, FN 0, symmetric difference 294. B/D: IoU 0.939388, FP 297, FN 0, symmetric difference 297.
+- Diagonal A: IoU 0.982775, FP 184, FN 3, symmetric difference 187. C: IoU 0.982406, FP 188, FN 3, symmetric difference 191. B/D: IoU 0.978823, FP 222, FN 8, symmetric difference 230.
+- Formal local-board replay: vertical 302 symmetric-difference px; diagonal 554 px. Stage A improved diagonal by 66.2%, vertical by 2.6%.
+- Baseline round-trip error=0; mask sensitivity=0; all board-origin crosschecks passed; post-hoc alignment=false.
+- CI Firefox 159 uses Microsoft Basic Render Driver and antialias=false; source renderer reference uses NVIDIA and antialias=true. Exact GPU/context parity is not available in hosted CI.
+- Added headed local Firefox Stage runner to test the source GPU offline.
+- Formal vertical/diagonal acceptance remains FAILURE; thresholds unchanged.
+
 ## 2026-11-06 — Firefox Stage A–D browser artifacts
 
 - Firefox 159.0.1 WebGL Stage A–D artifacts generated for vertical and diagonal; browser reference job SUCCESS.

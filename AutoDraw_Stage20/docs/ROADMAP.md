@@ -1,3 +1,17 @@
+## Актуальный следующий шаг — local Firefox/NVIDIA offline replay
+
+CI Stage A–D подтвердил существенное улучшение диагонального full-Stage compositor, но не устранил вертикальное edge mismatch. CI Firefox использует Basic Render Driver и antialias=false, тогда как source reference указывает NVIDIA и antialias=true.
+
+Следующий шаг:
+1. На машине с исходной NVIDIA GPU выполнить `AutoDraw_Stage20/tests/run_egret_stage_reference_local.ps1` (ф).
+2. Убедиться в `browser-session.json` (ф), что Firefox major=159, GL renderer соответствует NVIDIA reference, а `antialias=true`.
+3. Передать созданный ZIP; сравнить новые Stage A–D с теми же saved live captures.
+4. Проверить, исчезает ли вертикальная колонка x=325 и уменьшается ли диагональный symmetric difference.
+5. Не менять RGB threshold 24, formal thresholds, production renderer и executor.
+6. Не запускать игру и не расходовать CHALK: это offline replay.
+
+Только после получения локального GPU evidence решать, является ли остаточная ошибка особенностью растеризации кисти, Stage composition или иным renderer mismatch.
+
 ## Актуальный следующий шаг — получить same-run live metrics для Firefox A–D
 
 1. Дождаться завершения Preparation and G3 matrix tests в CI 42155453886.
