@@ -1,3 +1,19 @@
+## 2026-11-07 — итог CI PRR implementation и повторная оценка renderer/CHALK
+
+**GitHub Actions:** [42309752566](https://github.com/Kiddos19882/AutoDraw/actions/runs/42309752566) — **SUCCESS**.  
+**Validated HEAD:** `bacd03f5eee725dbbfac0ce928b227bd23d73b0c`, branch `feature/image-geometry-optimization`.
+
+- Все обязательные jobs завершились SUCCESS: Game Monitor/Bridge, Application integration, Preparation/G3 matrix, Egret CanvasRenderer browser reference, Executor regression и INT-006 pixel-level PNG geometry audit.
+- В Preparation/G3 прошли PRR planner/journal/UI/integration regression tests, capsule benchmark и FILL-001-RS static sweep. Optional algorithm benchmarks и Windows portable build/startup smoke-test были SKIPPED; это не ошибки, но соответствующие проверки этим run не подтверждены.
+- INT-006 paired-renderer analyzer пересчитал сохранённые исходные captures по текущим критериям: оба имеющихся run получили `PASS_PER_RUN` (vertical run `c860234f-995a-4789-9ac2-e05b322fe742`; diagonal run `f69cb0f4-f5d0-4ff9-a3b7-1148c38fa07f`). Однако агрегат явно сообщает `series_status=PENDING`: принято только **1/3** уникальных run на каждую ориентацию. PRR live repeats не запускались и в этом CI не создавались.
+- INT-006 CHALK prediction validation: 45/45 captures приняты, missing/rejected=0; `safety_margin_status=not_established`, `production_eligibility=not_validated`. Успешная валидация модели не доказывает безопасный запас краски.
+- INT006R: 45/45 captures приняты; это программная/аналитическая проверка сохранённых live evidence, не новый игровой запуск.
+- FILL-001-RS static sweep step завершился SUCCESS, но он не отменяет отдельный committed PNG quality gate: ранее зафиксированы coverage 98.430600%, leakage 11, status=failed. FILL-001 остаётся BLOCKED.
+- Артефакты run 42309752566: paired renderer PNG comparison (13548436614), INT-006 PNG analysis (13548237630), CHALK validation (13548436686), INT006R validation (13548501600), visual review source (13548217748), FILL-001-RS static sweep (13548680868), Egret renderer reference (13547343754), плюс Stage diagnostics и capsule benchmark. Срок хранения опубликованных artifacts — до 2026-11-20.
+- Никакие новые live game runs/CHALK расход не выполнялись. GitHub Actions не имеет доступа к локальной Windows-доске пользователя.
+
+**Следующие блокирующие шаги:** обновить локальный AutoDraw из этой ветки и выполнить PRR на тестовой доске; получить по два новых уникальных run на vertical/diagonal (итого 3/3); повторно прогнать formal acceptance; отдельно закрыть CHALK safety margin и FILL-001 PNG quality gate. INT-007 не открывать до выполнения этих условий.
+
 ## 2026-11-07 — PRR implementation synchronized; final CI triggered
 
 - Синхронизированы PRR code, regression tests и управляющая документация.
