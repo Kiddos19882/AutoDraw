@@ -1,3 +1,13 @@
+## 2026-11-07 — локальный PRR batch: evidence и статус
+
+- Сохранены результаты четырёх локальных paired-renderer repeats (vertical/diagonal, repeats 2 и 3), Game Monitor session, screenshots, execution reports и block journal.
+- Успешный block `596e5c37813a43048395d0f596f9d971`: 4/4 задания completed; exact CHALK — vertical 71/70, diagonal 161/160.
+- Первоначальный block `ab9b788c8199454c957036effb99e9c6` сохранён со статусом stopped из-за Bridge input telemetry, не включён в успешную выборку.
+- Formal renderer acceptance новых captures остаётся pending; CHALK safety margin не установлена, FILL-001 PNG quality gate остаётся failed, INT-007 заблокирован.
+- Изменения этого документационного обновления не затрагивают исходники, тесты, конфигурации или workflow.
+
+---
+
 ## 2026-11-07 — итог CI PRR implementation и повторная оценка renderer/CHALK
 
 **GitHub Actions:** [42309752566](https://github.com/Kiddos19882/AutoDraw/actions/runs/42309752566) — **SUCCESS**.  
