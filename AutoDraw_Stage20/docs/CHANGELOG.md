@@ -1,3 +1,12 @@
+## 2026-11-07 — генератор кандидатного корпуса для INT-006
+
+- Добавлен CLI генератор portable .autodraw и color scanline plans из исходных изображений с повторным использованием штатного pipeline.
+- Добавлены SHA-256 deduplication, provenance manifest и раздельные stroke counts для monochrome DrawingPlan и color scanline plan.
+- Добавлены unit tests и документ с инструкцией запуска/статистическими ограничениями.
+- CI validation pending; corpus generation и live captures не выполнялись.
+
+---
+
 ## 2026-11-07 — проект CHALK safety-margin policy
 
 - Добавлен design document profile-aware и stroke-count-aware safety margin.
