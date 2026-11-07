@@ -1,3 +1,19 @@
+## 2026-11-07 — INT-006: создан генератор кандидатного корпуса
+
+Добавлен `source/preparation/generate_validation_corpus.py`, который строит .autodraw и цветные scanline планы из исходных изображений штатным pipeline.
+
+Последовательность:
+1. Подтвердить CI для нового генератора и тестов.
+2. Запустить CLI на доступных исходных изображениях и фактическом palette profile.
+3. Проверить происхождение и семейства; отделить test/synthetic corpus от production-like population.
+4. Проверить соответствие monochrome DrawingPlan / color scanline plan frozen predictor INT-006.
+5. Получить распределение N, затем определить low/medium/high bands до split.
+6. Только после review корпуса формировать независимые calibration/holdout sets.
+
+Генератор не создаёт split, не назначает safety margin и не запускает игру. INT-006 остаётся BLOCKED до прохождения последующих gates.
+
+---
+
 ## 2026-11-07 — INT-006 95% policy validation protocol зафиксирован
 
 Пользователь утвердил 95% как целевое одностороннее предиктивное покрытие. Подготовлен [protocol calibration/holdout](CHALK_95_PERCENT_CALIBRATION_HOLDOUT_PROTOCOL_2026-11-07.md).
