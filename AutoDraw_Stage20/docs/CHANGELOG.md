@@ -1,3 +1,14 @@
+## 2026-11-07 — paired-renderer series PASS и исправления analyzer pipeline
+
+- Добавлена автоматическая генерация per-run offline WebGL references для сохранённых paired-renderer captures.
+- Исправлена проверка DRAW_SAMPLE: предусмотренный `state_poll` fallback учитывается при точном совпадении упорядоченного accepted-point stream с quota updates.
+- Исправлено разрешение имени generated manifest (`manifest.json`) без ослабления sourceRunId/fixture/pixel gates.
+- CI [42321009715](https://github.com/Kiddos19882/AutoDraw/actions/runs/42321009715) SUCCESS: 6/6 PASS_PER_RUN; vertical 3/3, diagonal 3/3; aggregate series PASS.
+- INT-006 PNG audit 90/90; INT-006 CHALK 45/45; INT006R 45/45. CHALK safety margin не установлена, INT006R manual visual review pending.
+- FILL-001-RS static sweep PASS; committed FILL-001 PNG quality gate остаётся failed (coverage 98.430600%, leakage 11).
+
+---
+
 ## 2026-11-07 — локальный PRR batch: evidence и статус
 
 - Сохранены результаты четырёх локальных paired-renderer repeats (vertical/diagonal, repeats 2 и 3), Game Monitor session, screenshots, execution reports и block journal.

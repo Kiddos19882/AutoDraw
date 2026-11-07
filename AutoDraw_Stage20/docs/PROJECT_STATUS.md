@@ -1,3 +1,57 @@
+## 2026-11-07 — INT-006 paired-renderer multi-axis series принята
+
+**GitHub Actions:** [42321009715](https://github.com/Kiddos19882/AutoDraw/actions/runs/42321009715) — **SUCCESS**.  
+**Validated code HEAD:** `dd7b88815cc345660c735ebabb36f49dba67de01`, ветка `feature/image-geometry-optimization`.  
+**Документационный HEAD до этой записи:** `dd7b88815cc345660c735ebabb36f49dba67de01`.
+
+### Formal paired-renderer acceptance
+
+- Analyzer обнаружил 6 валидных независимых входов: 3 vertical и 3 diagonal.
+- Все 6 получили `PASS_PER_RUN`; rejected=0, duplicate run IDs=0, tool errors=0.
+- Aggregate `multi-axis-series-summary.status=PASS`; обе ориентации закрыли требование 3/3.
+- Все capture, transform и renderer failed-checks пусты. Использован independent transform; post-hoc translation оставался только диагностикой и не участвовал в acceptance.
+- Новые run-bound offline WebGL references созданы отдельно для каждого run; manifests привязаны к соответствующим run IDs.
+- Исправлена проверка полного DRAW_SAMPLE stream: `state_poll` разрешён как fallback source наряду с `onDrawing_wrapper`, только если положительные события с acceptedPoint в том же порядке и количестве совпадают с `POINT_QUOTA_UPDATE`. Это соответствует механизму polling в `source/game_monitor/game_monitor.js`; критерии полноты потока не ослаблены.
+
+### Метрики шести принятых запусков
+
+| Orientation | Repeat | Run ID | IoU | Precision | Recall | Symmetric difference |
+|---|---:|---|---:|---:|---:|---:|
+| Vertical | 1 | `c860234f-995a-4789-9ac2-e05b322fe742` | 93.84% | 93.90% | 99.93% | 302 px |
+| Vertical | 2 | `7159641d-84c1-4d4a-a3dd-a7c4f34614ab` | 93.90% | 93.92% | 99.98% | 299 px |
+| Vertical | 3 | `cc98eabc-4365-4387-9756-48564b31f498` | 93.87% | 93.89% | 99.98% | 299 px |
+| Diagonal | 1 | `f69cb0f4-f5d0-4ff9-a3b7-1148c38fa07f` | 94.96% | 96.27% | 98.59% | 554 px |
+| Diagonal | 2 | `ac5a5692-59b1-4cb4-83e5-6539d3472706` | 95.01% | 96.48% | 98.42% | 550 px |
+| Diagonal | 3 | `656aef75-1e69-4e90-a2c5-c713a262fb08` | 95.20% | 96.56% | 98.54% | 529 px |
+
+### Исправленные ошибки автоматизации
+
+Первый CI-проход [42320255395](https://github.com/Kiddos19882/AutoDraw/actions/runs/42320255395) успешно сгенерировал четыре per-run references, но acceptance runner искал manifest под именем `egret-5.4.1-renderer-reference-manifest.json`, тогда как генератор сохранял его как `manifest.json`. Четыре новых capture были помечены preflight-rejected из-за отсутствующего файла, а не из-за pixel mismatch. Добавлен resolver, который предпочитает ожидаемое имя и использует `manifest.json` для сгенерированного run-bound reference. Повторный CI 42321009715 подтвердил все четыре новых запуска.
+
+### Другие результаты CI
+
+- Preparation/G3: 919 passed, 24 warnings, 82 subtests passed.
+- Executor regression, Application integration, Game Monitor/Bridge, Egret CanvasRenderer browser reference — SUCCESS.
+- INT-006 V1–V5 PNG audit: 90/90 captures valid, 0 invalid.
+- INT-006 CHALK prediction validation: 45/45 accepted, missing cells=0.
+- INT006R: 45/45 accepted, PNG evidence complete; `visual_quality_gate=pending_manual_review`.
+- FILL-001-RS static sweep: 2238 candidates, 62 accepted, 15 cells, status=passed.
+- Optional algorithm benchmarks и Windows portable build/startup smoke-test — SKIPPED.
+
+### Остающиеся gates
+
+- INT-006 paired-renderer multi-axis series — **PASS**.
+- INT-006 CHALK safety margin — `not_established`; production eligibility — `not_validated`.
+- INT006R manual visual quality review — `pending_manual_review`.
+- FILL-001 committed PNG quality gate остаётся failed: coverage=98.430600%, leakage=11. Static sweep не отменяет PNG gate.
+- INT-007 остаётся BLOCKED до обоснования CHALK safety margin и закрытия остальных зависимостей.
+
+CI использовал сохранённые captures; новых live game runs и расхода CHALK в этой работе не было. Локальный `git status` через GitHub API недоступен.
+
+Артефакты CI 42321009715: paired renderer comparison `13553551374`, Egret run-bound references `13552518244`, INT-006 PNG analysis `13553466593`, INT-006 CHALK validation `13553546401`, INT006R live validation `13553651362`, INT006R visual review source `13553755987`, FILL-001-RS static sweep `13553800023`.
+
+---
+
 ## 2026-11-07 — актуализация после выполнения локального PRR batch
 
 **Текущий исходный HEAD до этой документационной синхронизации:** `52e3c51a0830e09abb09b516af098069aef26de7`, ветка `feature/image-geometry-optimization`. Commit добавляет сохранённые локальные PRR evidence (эксперименты, Game Monitor, captures и execution reports), а не изменения исходников. GitHub API не показывает локальный `git status`.

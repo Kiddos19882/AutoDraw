@@ -1,3 +1,21 @@
+## 2026-11-07 — исправлена run-bound renderer acceptance automation; multi-axis series PASS
+
+- Исходный code HEAD перед работой: `0037c3b858425b07397fb410cf36b4519394465a`; ветка `feature/image-geometry-optimization`.
+- Добавлена генерация отдельных offline WebGL reference для каждого нового paired-renderer run в Firefox Stage harness; в acceptance runner добавлен выбор run-bound каталога.
+- Установлено по Game Monitor source, что `state_poll` — предусмотренный 25 ms fallback polling активного штриха на случай, когда listener `onDrawing` был зарегистрирован до wrapper. В четырёх новых reports positive DRAW_SAMPLE stream (включая state_poll) совпадает с quota updates по count и acceptedPoint coordinates.
+- В `renderer_acceptance.py` разрешён source `state_poll` только вместе с `onDrawing_wrapper`; строгая проверка exact ordered point stream сохранена. Добавлен regression test.
+- Первый CI [42320255395](https://github.com/Kiddos19882/AutoDraw/actions/runs/42320255395) создал четыре run-bound references, но четыре новых capture получили preflight rejection из-за различия имени manifest (`manifest.json` против ожидаемого фиксированного имени). Это инфраструктурный mismatch, не pixel rejection.
+- Исправлен resolver manifest: expected committed name имеет приоритет, generated `manifest.json` допустим как fallback. Добавлены unit tests.
+- Повторный CI [42321009715](https://github.com/Kiddos19882/AutoDraw/actions/runs/42321009715) — SUCCESS на `dd7b88815cc345660c735ebabb36f49dba67de01`.
+- Formal analyzer: 6 valid inputs, 6 PASS_PER_RUN, 0 rejected, 0 duplicate IDs, 0 tool errors; vertical 3/3, diagonal 3/3; aggregate series PASS.
+- Preparation/G3: 919 passed, 24 warnings, 82 subtests passed. Game Monitor/Bridge, Executor regression, Application integration, Egret browser reference и INT-006 PNG audit jobs — SUCCESS.
+- INT-006 V1–V5 PNG audit: 90/90 valid. INT-006 CHALK validation: 45/45 accepted, safety margin not established. INT006R: 45/45 accepted, visual review pending manual review.
+- FILL-001-RS static sweep: 2238 candidates, 62 accepted, 15 cells, passed. Committed FILL-001 PNG gate всё ещё failed: coverage=98.430600%, leakage=11.
+- Новых live runs/CHALK расхода не было. Optional benchmarks и Windows portable build были SKIPPED.
+- В этой серии code commits: `c364ab40fba7be66f71495d4a1fd11d0bed67a08`, `87626ebc68add090e0cf9085fe6025760a7716ad`, `dd7b88815cc345660c735ebabb36f49dba67de01`. `master` не менялась.
+
+---
+
 ## 2026-11-07 — выполнен локальный PRR batch и сохранено evidence
 
 - Проверена ветка `feature/image-geometry-optimization`; evidence commit до документальной синхронизации: `52e3c51a0830e09abb09b516af098069aef26de7`.

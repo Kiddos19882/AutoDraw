@@ -1,10 +1,26 @@
+## 2026-11-07 — обновлённая последовательность после formal PRR acceptance
+
+**Закрыто:** PRR execution 4/4 и formal paired-renderer series. CI [42321009715](https://github.com/Kiddos19882/AutoDraw/actions/runs/42321009715) дал 6/6 `PASS_PER_RUN`; vertical 3/3, diagonal 3/3; aggregate `PASS`.
+
+**Следующие работы:**
+
+1. **INT006R manual visual review — NEXT:** просмотреть artifact `13553755987` (before/after PNG + metadata), зафиксировать решение по `visual_quality_gate`. Не считать data completeness визуальным PASS.
+2. **INT-006 CHALK safety margin — BLOCKED:** определить область применимости модели и обосновать консервативный запас на независимых capture groups. Текущие 45/45 accepted подтверждают полноту валидации, но `safety_margin_status=not_established` и `production_eligibility=not_validated`.
+3. **FILL-001 PNG quality gate — BLOCKED:** устранить coverage=98.430600% и leakage=11 при сохранении frozen criteria и исходных evidence. Static sweep (62/2238 кандидатов, 15 cells) не является PNG acceptance.
+4. **INT-007 — BLOCKED:** не включать estimator в production preflight до обоснования CHALK safety margin и закрытия обязательных gates.
+5. **INT-008:** вернуться к оптимизации кисти/траекторий/покрытия после разрешения зависимостей; оценивать визуальное качество, exact CHALK, точки, штрихи и время совместно.
+
+**Технические исправления, вошедшие в CI 42321009715:** per-run offline WebGL reference generation; manifest fallback для `manifest.json`; точное сопоставление `state_poll` DRAW_SAMPLE с POINT_QUOTA_UPDATE. Acceptance thresholds не менялись. Новых live runs не выполнялось.
+
+---
+
 ## 2026-11-07 — обновление последовательности после PRR live batch
 
 PRR runner уже выполнен на локальной игровой доске. Четыре новых run (vertical repeats 2/3 и diagonal repeats 2/3) сохранены, каждый имеет exact CHALK и валидную Monitor/Bridge привязку. Поэтому прежний пункт «выполнить локальный PRR» закрыт, но renderer series ещё не принимается автоматически.
 
 **Ближайшая последовательность:**
 
-1. **PRR formal acceptance — NEXT:** обработать четыре новых captures paired-renderer analyzer'ом; проверить run/session/experiment provenance, same-run transform, PNG metrics и уникальность. Зафиксировать PASS_PER_RUN/REJECTED_PER_RUN отдельно для каждого run и агрегат серии.
+1. **PRR formal acceptance — DONE:** CI 42321009715; все шесть уникальных captures получили PASS_PER_RUN, vertical 3/3, diagonal 3/3, aggregate series PASS.
 2. **INT-006 CHALK safety margin — BLOCKED:** расширить validation domain и получить обоснованный консервативный запас. Текущие четыре PRR повтора выполнены только при radius=10 и не заменяют validation полного диапазона геометрий.
 3. **FILL-001 PNG quality gate — BLOCKED:** устранить причину coverage=98.430600% и leakage=11, сохраняя frozen criteria и исходные evidence; static sweep не считать live acceptance.
 4. **INT-007 — BLOCKED:** не интегрировать estimator в production preflight до закрытия INT-006/safety margin и formal gates.

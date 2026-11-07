@@ -1,3 +1,53 @@
+## 2026-11-07 — PRR formal paired-renderer acceptance: 6/6 PASS
+
+**CI:** [42321009715](https://github.com/Kiddos19882/AutoDraw/actions/runs/42321009715) — SUCCESS.  
+**Code HEAD:** `dd7b88815cc345660c735ebabb36f49dba67de01`.  
+**Analyzer artifact:** `13553551374` (`autodraw-paired-renderer-png-comparison`).  
+**Reference artifact:** `13552518244` (`autodraw-egret-renderer-reference`).
+
+### Aggregate result
+
+- `discovered_valid_inputs=6`; `per_run_results=6 PASS_PER_RUN`.
+- Vertical: 3/3 unique runs accepted.
+- Diagonal: 3/3 unique runs accepted.
+- Rejected attempts=0; duplicate run IDs=0; tool errors=0.
+- `multi-axis-series-summary.status=PASS`.
+- Capture, transform and renderer failed-check arrays empty for all six runs.
+- Formal comparison uses independent unshifted transform. Best-translation values are diagnostics only and do not affect acceptance.
+
+### Per-run pixel metrics (alpha-24 comparison)
+
+| Orientation | Repeat | Run ID | IoU | Precision | Recall | Symmetric difference | Changed live pixels |
+|---|---:|---|---:|---:|---:|---:|---:|
+| Vertical | 1 | `c860234f-995a-4789-9ac2-e05b322fe742` | 0.938405 | 0.938980 | 0.999348 | 302 | 4900 |
+| Vertical | 2 | `7159641d-84c1-4d4a-a3dd-a7c4f34614ab` | 0.938980 | 0.939171 | 0.999783 | 299 | 4899 |
+| Vertical | 3 | `cc98eabc-4365-4387-9756-48564b31f498` | 0.938692 | 0.938884 | 0.999782 | 299 | 4876 |
+| Diagonal | 1 | `f69cb0f4-f5d0-4ff9-a3b7-1148c38fa07f` | 0.949646 | 0.962683 | 0.985939 | 554 | 10853 |
+| Diagonal | 2 | `ac5a5692-59b1-4cb4-83e5-6539d3472706` | 0.950113 | 0.964815 | 0.984215 | 550 | 10857 |
+| Diagonal | 3 | `656aef75-1e69-4e90-a2c5-c713a262fb08` | 0.951996 | 0.965578 | 0.985441 | 529 | 10865 |
+
+### Почему понадобились два CI-прохода
+
+CI [42320255395](https://github.com/Kiddos19882/AutoDraw/actions/runs/42320255395) успешно сгенерировал четыре per-run references, но analyzer искал фиксированное имя manifest, в то время как генератор сохранял `manifest.json`. Четыре новых captures были помечены preflight-rejected из-за отсутствующего manifest path; pixel comparison не выполнялся. Это не были visual/geometry rejections.
+
+В commit `dd7b88815cc345660c735ebabb36f49dba67de01` добавлен `renderer_manifest_path()`: сначала ищется expected filename, затем generated `manifest.json`. Regression tests проверяют оба случая. Повторный CI 42321009715 принял все четыре новых captures.
+
+### DRAW_SAMPLE fallback semantics
+
+В `source/game_monitor/game_monitor.js` polling активного штриха выполняется каждые 25 ms и вызывает `sampleActiveStroke("state_poll")`; это fallback для случая, когда listener `onDrawing` уже был зарегистрирован до wrapper. Для всех четырёх новых reports positive DRAW_SAMPLE stream, включая state_poll, имеет те же count и acceptedPoint coordinates, что и POINT_QUOTA_UPDATE. Поэтому validator учитывает оба источника, но по-прежнему требует полного упорядоченного совпадения потоков. Длина траектории остаётся lower-bound при coalesced pointDelta и не используется как exact CHALK.
+
+### Дополнительные CI results
+
+- Preparation/G3: 919 passed, 24 warnings, 82 subtests passed.
+- INT-006 V1–V5: 90/90 captures valid, 0 invalid.
+- INT-006 CHALK prediction: 45/45 accepted; `safety_margin_status=not_established`, `production_eligibility=not_validated`.
+- INT006R: 45/45 accepted; `png_evidence_status=complete`, `visual_quality_gate=pending_manual_review`, `production_model_changed=false`.
+- FILL-001-RS static sweep: 2238 candidates, 62 accepted, 15 cells, passed.
+- Committed FILL-001 PNG audit remains failed: coverage=98.430600%, leakage=11.
+- Optional algorithm benchmarks и Windows portable build/startup smoke-test — SKIPPED.
+
+---
+
 ## 2026-11-07 — локальный PRR batch и exact CHALK evidence
 
 **Источник:** commit `52e3c51a0830e09abb09b516af098069aef26de7`, ветка `feature/image-geometry-optimization`. Commit содержит 64 сохранённых файла с локальными экспериментальными данными; ниже приведена сводка четырёх новых PRR run. Исходные JSON/PNG остаются первичными данными.

@@ -125,7 +125,7 @@
 
 ### 4.5. Job: chalk-png-analysis
 
-Зависит от успешного Preparation/G3 job. Выполняет pixel-level PNG analysis INT-006 V1–V5, independent CHALK prediction validation и INT006R radius×geometry validation; публикует отчёты и диагностические изображения. Отдельно упаковывает before/after PNG и runtime metadata для ручного visual review. Это анализ существующих captures, не новый live game run.
+Зависит от успешных Preparation/G3 и Egret renderer-reference jobs. Загружает Stage A–D browser artifacts и run-bound per-run WebGL references, выполняет paired-renderer acceptance для сохранённых vertical/diagonal captures, pixel-level PNG analysis INT-006 V1–V5, independent CHALK prediction validation и INT006R radius×geometry validation; публикует отчёты и диагностические изображения. Отдельно упаковывает before/after PNG и runtime metadata для ручного visual review. Это анализ существующих captures, не новый live game run.
 
 ### 4.6. Job: windows-build-smoke
 
@@ -497,10 +497,12 @@ Benchmark job работает из корня `AutoDraw_Stage20/`; пути с�
 
 ## Formal paired-renderer acceptance gates — 2026-11-05
 
-- `source/preparation/renderer_acceptance.py`: fail-closed capture validation (experiment/run/session binding, exact pre/post `pointCount`, complete `POINT_QUOTA_UPDATE` / `DRAW_SAMPLE` accepted-point equality, single stroke, brush/executor profile, clean board and Monitor/Bridge integrity); transform thresholds; alpha-24 PNG metrics; per-run decision.
+- `source/preparation/renderer_acceptance.py`: fail-closed capture validation (experiment/run/session binding, exact pre/post `pointCount`, complete `POINT_QUOTA_UPDATE` / `DRAW_SAMPLE` accepted-point equality, single stroke, brush/executor profile, clean board and Monitor/Bridge integrity); transform thresholds; alpha-24 PNG metrics; per-run decision. Positive DRAW_SAMPLE may originate from `onDrawing_wrapper` or `state_poll`; both must match the ordered quota accepted-point stream exactly.
 - `source/preparation/tests/test_renderer_acceptance.py`: regression checks for all three axis-source policies, capture validity and rejected evidence, transform/pixel thresholds, unique run IDs and series aggregation.
 - `tests/compare_live_renderer_reference.py`: creates `comparison-report-independent-transform.json` with `PASS_PER_RUN` or `REJECTED_PER_RUN`. Only the independent, unshifted transform is scored; the post-hoc translation remains diagnostic and is excluded from acceptance.
 - `tests/summarize_renderer_acceptance.py`: aggregates per-run reports. Overall multi-axis series requires three unique `PASS_PER_RUN` captures for vertical and three for diagonal; rejected attempts and duplicate run IDs are not counted.
+- `tests/run_egret_stage_reference_firefox.py` generates per-run offline WebGL reference PNGs/manifests for saved non-baseline captures; `tests/run_paired_renderer_acceptance.py` binds each new run to its own reference and supports generated `manifest.json` alongside the committed baseline filename.
+- Regression tests cover `state_poll` accepted-point fallback, run-bound reference directories and generated manifest resolution.
 - Workflow: `.github/workflows/geometry-tests.yml`, preparation/G3 job and paired PNG audit. Run [41992373137](https://github.com/Kiddos19882/AutoDraw/actions/runs/41992373137) completed SUCCESS; artifact `13397839621` records horizontal `PASS_PER_RUN`.
 - A per-run PASS is not environment-wide renderer acceptance and does not authorize calibration/profile or executor handoff. Real vertical/diagonal live captures remain required.
 
@@ -514,3 +516,13 @@ Benchmark job работает из корня `AutoDraw_Stage20/`; пути с�
 - `source/preparation/brush_behavior_test_ui.py`: a selected paired-renderer scenario controls the opt-in flag; UI warns if a running Bridge was started in another mode.
 - Regression tests: `source/game_monitor/tests/game_monitor_bridge.test.js` (4 lifecycle tests); `source/game_monitor/tests/test_game_monitor_bridge_server.py`; paired scenario selection in `source/preparation/tests/test_brush_behavior_test_ui.py`.
 - Workflow [41994624425](https://github.com/Kiddos19882/AutoDraw/actions/runs/41994624425) is the active CI verification for the corrected commit `58ebdda7`.
+
+
+### 2026-11-07 — run-bound paired-renderer acceptance automation
+
+- `tests/run_egret_stage_reference_firefox.py` discovers valid saved paired-renderer experiments and creates a separate Firefox/Egret WebGL fixture, manifest and Stage A–D variants for each non-baseline run. Output is stored under `paired-renderer/<orientation>/<run_id>/`; the monitor report supplies the exact accepted point stream and same-run renderer geometry.
+- `tests/run_paired_renderer_acceptance.py` uses committed baseline references for original repeat-1 runs and run-bound artifacts for later repeats. `renderer_manifest_path()` prefers the committed expected manifest filename and falls back to generated `manifest.json`.
+- `source/preparation/renderer_acceptance.py` accepts positive DRAW_SAMPLE from `onDrawing_wrapper` or `state_poll`; the complete ordered stream must still match POINT_QUOTA_UPDATE accepted points exactly.
+- Regression coverage: `source/preparation/tests/test_renderer_acceptance.py` (state_poll fallback) and `source/preparation/tests/test_paired_renderer_discovery.py` (per-run reference and manifest resolution).
+- CI [42321009715](https://github.com/Kiddos19882/AutoDraw/actions/runs/42321009715): six unique captures, 6/6 PASS_PER_RUN; vertical 3/3, diagonal 3/3; aggregate series PASS. Artifact `13553551374`.
+

@@ -1,9 +1,24 @@
+## 2026-11-07 — актуальный статус после formal PRR acceptance
+
+- [x] PRR batch execution: 4/4 новых live run завершены; exact CHALK и Game Monitor provenance сохранены.
+- [x] Run-bound offline renderer references: сгенерированы четыре отдельных WebGL reference и manifests с привязкой к каждому run ID.
+- [x] Исправлена проверка DRAW_SAMPLE fallback: `state_poll` учитывается только при точном упорядоченном совпадении accepted-point stream с quota updates.
+- [x] Formal paired-renderer acceptance: CI [42321009715](https://github.com/Kiddos19882/AutoDraw/actions/runs/42321009715), 6/6 PASS_PER_RUN; vertical 3/3, diagonal 3/3; aggregate series PASS.
+- [ ] INT-006 CHALK safety margin/domain validation: 45/45 captures приняты, но `safety_margin_status=not_established`, `production_eligibility=not_validated`.
+- [ ] INT006R manual visual quality review: evidence complete, `visual_quality_gate=pending_manual_review`.
+- [ ] FILL-001 PNG quality gate: исправить coverage=98.430600% и leakage=11; FILL-001-RS static sweep PASS не заменяет PNG acceptance.
+- [ ] INT-007: остаётся BLOCKED до обоснования CHALK safety margin и выполнения остальных зависимостей.
+
+**Последний подтверждённый CI:** 42321009715 SUCCESS на code HEAD `dd7b88815cc345660c735ebabb36f49dba67de01`. Windows portable build и optional algorithm benchmarks были SKIPPED.
+
+---
+
 ## 2026-11-07 — актуальный статус PRR после локального batch
 
 - [x] PRR batch runner прошёл CI: workflow [42309752566](https://github.com/Kiddos19882/AutoDraw/actions/runs/42309752566), SUCCESS на commit `bacd03f5eee725dbbfac0ce928b227bd23d73b0c`. Это не CI для последующего evidence HEAD `52e3c51a0830e09abb09b516af098069aef26de7`.
 - [x] Локальный PRR batch выполнен: block `596e5c37813a43048395d0f596f9d971`, 4/4 задач, по два новых run для vertical и diagonal; все execution completed, CHALK exact.
 - [x] Проверена привязка четырёх run к Game Monitor session `0490d04b-8728-40f2-891d-e1d57d69402b`; telemetry включена, dropped events/errors/sequence gaps отсутствуют.
-- [ ] Выполнить formal paired-renderer analyzer для четырёх новых captures и проверить итоговый aggregate series status. Не засчитывать capture как PASS_PER_RUN до результата analyzer.
+- [x] Выполнить formal paired-renderer analyzer: CI 42321009715, 6/6 PASS_PER_RUN, vertical 3/3, diagonal 3/3, aggregate series PASS.
 - [ ] После formal acceptance отдельно закрыть CHALK safety margin/domain validation.
 - [ ] Разблокировать FILL-001 только после исправления PNG quality gate (coverage=98.430600%, leakage=11 в прежнем committed audit).
 - [ ] Не открывать INT-007 до закрытия INT-006 и обоснования safety margin.

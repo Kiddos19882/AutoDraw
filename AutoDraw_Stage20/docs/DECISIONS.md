@@ -1,3 +1,19 @@
+## 2026-11-07 — run-bound renderer evidence и fallback telemetry
+
+**Статус:** ACCEPTED.
+
+**Решение 1 — DRAW_SAMPLE fallback.** Источники `onDrawing_wrapper` и `state_poll` могут входить в positive DRAW_SAMPLE stream. Событие `state_poll` принимается только при положительном pointDelta и наличии acceptedPoint; весь упорядоченный stream должен совпадать с `POINT_QUOTA_UPDATE` по количеству и координатам. Нельзя заменять этим exact `pointCount` и нельзя принимать неполные/дублирующие последовательности.
+
+**Решение 2 — run-bound renderer references.** Каждый non-baseline paired-renderer run получает собственный offline WebGL reference и manifest, привязанные к его run ID. Baseline references используются только для исходных repeat-1 run. Нельзя повторно применять manifest, привязанный к другому run.
+
+**Решение 3 — manifest naming.** Resolver предпочитает зафиксированное имя `egret-5.4.1-renderer-reference-manifest.json`; для автоматически созданного per-run reference допускает `manifest.json`. Содержимое всё равно проходит sourceRunId, fixture, geometry и pixel acceptance.
+
+**Основание:** Game Monitor implementation `game_monitor.js`; четыре PRR monitor reports; per-run Firefox artifacts; paired renderer analyzer artifact из CI 42321009715. Все шесть run получили PASS_PER_RUN, series PASS. Acceptance thresholds не менялись.
+
+**Последствия:** multi-axis renderer series закрыта; INT-006 CHALK safety margin, INT006R visual review и FILL-001 PNG gate остаются независимыми gates.
+
+---
+
 ## 2026-11-07 — фиксация границы PRR execution и formal renderer acceptance
 
 **Статус:** ACCEPTED — уточнение применения существующих acceptance gates, не изменение критериев.
