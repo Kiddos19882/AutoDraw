@@ -3,6 +3,16 @@
 **Назначение:** только фактически выполненные изменения и проверки, а не будущие планы.  
 **Полная история до 2026-11-08:** [WORK_LOG_HISTORY_THROUGH_2026-11-08.md](WORK_LOG_HISTORY_THROUGH_2026-11-08.md) — побайтовый исторический снимок прежней редакции.
 
+## 2026-11-08 — завершена новая документационная система
+
+- Изучен набор 90 исходных Markdown на baseline `a2d1f0a52d47`, выделены текущие источники и полный historical layer.
+- Девять прежних редакций сохранены без изменения Git blobs: PROJECT_STATUS, TASKS, ROADMAP, TEST_RESULTS, WORK_LOG, CHANGELOG, DECISIONS, README, AI_WORK_GUIDE. Источник каждого SHA — `HISTORY_SNAPSHOT_PROVENANCE.json`.
+- Сокращены действующие управляющие документы; `docs/README.md` охватывает 99/99 Markdown; все старые ссылки восстановлены через aliases. Второй конфликтующий DEC-016 получил DEC-027.
+- Реализованы `tools/check_markdown_docs.py`, 5 regression tests и `.github/workflows/docs-integrity.yml`. Первый [CI 42421193210](https://github.com/Kiddos19882/AutoDraw/actions/runs/42421193210) FAILED (1 пропущенная архивная ссылка и 1 некорректный anchor), исправлено. [Повтор 42421451709](https://github.com/Kiddos19882/AutoDraw/actions/runs/42421451709) **SUCCESS**: 99 indexed, 0 broken local links, 0 duplicate DEC IDs, 9 snapshot integrity PASS и 5 unit tests PASS.
+- Основной [AutoDraw validation 42420934884](https://github.com/Kiddos19882/AutoDraw/actions/runs/42420934884) SUCCESS на `c7f2e363`. Это не игровой runtime. Raw experiments, frozen INT-006, executor, palette и `master` не менялись; локальный `git status` пользователя не проверялся.
+
+---
+
 ## 2026-11-08 — реорганизация документации, этап 1
 
 - Проверены feature HEAD `a2d1f0a52d47`, последние 20 коммитов, 90 Markdown-файлов, текущие регламенты, активные управляющие документы и CHALK/renderer/fill результаты.
