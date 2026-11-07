@@ -1,3 +1,9 @@
+## 2026-11-07 — готовность offline инструментов, ожидание целевого корпуса
+
+Успешный [CI 42388237279](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388237279) подтвердил structural audit для 8/8 тестовых планов (не predictor support). Windows `run_validation_corpus_local.ps1` создан, проверяется в основном CI [42388837703](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388837703). Следующий шаг — локальный сбор representative input пользователя и отчётов без новых live запусков, review geometry/family/N, затем утверждение N bands → независимые splits → CHALK validation → safety margin/INT-007. Существующие FILL-001 quality gates независимы.
+
+---
+
 ## 2026-11-07 — exploratory N inventory подготовлен, целевой corpus остаётся следующим этапом
 
 Успешный CI [42387485762](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387485762) выпустил [offline artifact 13580167471](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387485762/artifacts/13580167471), подтвердив весь генерационный конвейер на 8 `testImages` при canvas 64×32. Детальные N сохранены в [TEST_RESULTS.md](TEST_RESULTS.md). Дальнейшая последовательность не меняется: target corpus provenance/families → frozen predictor geometry eligibility → target N distribution and bounds → independent calibration/holdout split → user-run live capture → one-sided safety policy → INT-007. Не применять тестовый диапазон N к production.

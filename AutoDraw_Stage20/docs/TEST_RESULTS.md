@@ -1,3 +1,9 @@
+## 2026-11-07 — offline structural audit candidate corpus (E3)
+
+[GitHub Actions 42388237279](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388237279) SUCCESS на `54ab979d`; [artifact 13580376620](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388237279/artifacts/13580376620). Анализатор `audit_validation_corpus.py` повторно открыл 8 .autodraw при canvas 64×32: `schema_valid_records=8`, `schema_invalid_records=0`; `predictor_domain_eligibility=not_assessed`. Структурный результат не доказывает применимость CHALK predictor, статистическую независимость plans или production calibration. No live CHALK measurements. Отдельная Windows проверка launcher: [42388505263](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388505263) FAILED из-за выбора Python без Pillow; исправление `bb9bb2ee` ждёт повторной CI-валидации.
+
+---
+
 ## 2026-11-07 — offline candidate corpus: 8/8 exploratory fixtures, Linux Actions SUCCESS
 
 **Уровень:** E3 (offline GitHub Actions, не live). **Evidence:** [workflow 42387485762](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387485762), [artifact 13580167471](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387485762/artifacts/13580167471). **Workflow/code HEAD:** `2fe37ef8b013450ed7f30924e15a9ddeb0c7f0c3`.

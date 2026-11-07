@@ -1,3 +1,12 @@
+## 2026-11-07 — geometry audit и Windows offline runner
+
+- `source/preparation/audit_validation_corpus.py` — open_project + frozen schema normalization, counts of zero-length and unsupported-short strokes; отчёт `corpus_geometry_audit.json`, predictor domain remains NOT ASSESSED.
+- `source/preparation/tests/test_audit_validation_corpus.py` — smoke и проверка path traversal rejection.
+- `.github/workflows/validation-corpus-smoke.yml` — создает .autodraw, color plans, manifest, N inventory и geometry audit; [CI 42388237279](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388237279) SUCCESS.
+- `run_validation_corpus_local.ps1` — запуск offline на Windows с собственной исходной папкой и уникальным output. `.github/workflows/geometry-tests.yml` теперь выполняет fixture smoke. [Run 42388505263](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388505263) FAILED из-за Python environment mismatch; исправлено `bb9bb2ee`, повтор [42388837703](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388837703) ожидает итогового результата.
+
+---
+
 # Карта тестов, диагностик и CI AutoDraw
 
 **Область:** тестовые модули, диагностические скрипты, benchmark-инструменты и их запуск в GitHub Actions.  

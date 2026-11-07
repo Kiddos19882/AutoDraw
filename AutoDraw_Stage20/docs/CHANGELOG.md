@@ -1,3 +1,11 @@
+## 2026-11-07 — candidate-corpus geometry audit и offline Windows launcher
+
+- Добавлены `audit_validation_corpus.py` и regression tests; audit [CI 42388237279](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388237279) SUCCESS 8/8 structurally valid, без CHALK/domain approval.
+- Добавлен `run_validation_corpus_local.ps1` с уникальным output root и двумя JSON-отчётами; в Windows CI добавлен end-to-end fixture smoke.
+- Сохранён FAILED [run 42388505263](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388505263) из-за Python interpreter mismatch; исправлено `bb9bb2ee`. CHALK predictor, executor, production defaults не менялись.
+
+---
+
 ## 2026-11-07 — итоговые проверки fixture corpus
 
 - GitHub Actions `42387145503` SUCCESS для обновлённого image corpus regression и CI paths; Windows portable/benchmarks SKIPPED.

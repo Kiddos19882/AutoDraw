@@ -1,3 +1,16 @@
+## 2026-11-07 — локальный offline corpus, независимая подготовка к 95% validation
+
+- [x] Реализовать structural `audit_validation_corpus.py` + regression tests и подключить в CI (`54ab979d`).
+- [x] Получить CI [42388237279](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388237279) SUCCESS: 8/8 schema-valid, 0 errors, predictor eligibility not_assessed.
+- [x] Реализовать отдельный Windows offline runner `run_validation_corpus_local.ps1` и non-destructive output.
+- [x] Исправить mismatch системного `py -3` и активного `python` на Windows по CI failure `42388505263` (`bb9bb2ee`).
+- [ ] Подтвердить полностью завершившийся [CI 42388837703](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388837703), включая Windows fixture smoke.
+- [ ] Пользователь: собрать реальные исходные изображения и запустить offline runner с фактическими canvas и palette profile; предоставить manifest + geometry audit JSON.
+- [ ] Проверить family provenance, независимые планы, constraints frozen predictor и target N distribution. Не назначать N bands по fixture sample 8×64×32.
+- [ ] Только после frozen corpus/split допускать 19/59 calibration/holdout, live capture с exact CHALK и отдельное решение INT-007.
+
+---
+
 ## 2026-11-07 — CI gate закрыт для изменений corpus tests/workflow
 
 - [x] [AutoDraw validation 42387145503](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387145503) завершён SUCCESS на `e984b68`; все выполненные обязательные jobs SUCCESS, Windows portable и benchmarks SKIPPED.

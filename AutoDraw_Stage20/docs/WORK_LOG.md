@@ -1,3 +1,13 @@
+## 2026-11-07 — offline geometry audit и Windows local corpus runner
+
+- Сверены feature HEAD, последние 20 коммитов, постоянные регламенты, Stage 8 и frozen INT-006 geometry normalizer/lookup.
+- Добавлены `audit_validation_corpus.py` и `test_audit_validation_corpus.py`, обновлён `validation-corpus-smoke.yml` (`54ab979d`).
+- [Offline CI 42388237279](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388237279) SUCCESS: 8 schema-valid / 0 invalid; exact CHALK/live не измерялись; predictor eligibility остаётся not_assessed.
+- Добавлен `run_validation_corpus_local.ps1` (`0bddddfd`) и Windows fixture smoke в `geometry-tests.yml` (`d36aec25`). Первое выполнение [42388505263](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388505263) FAILED: `py -3` выбрал Python без зависимостей PIL. Исправлен выбор активного `python` (`bb9bb2ee`), повторный CI [42388837703](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388837703) выполняется.
+- Локальный пользовательский git status и live runtime не проверялись; master и production defaults не менялись.
+
+---
+
 ## 2026-11-07 — получен окончательный SUCCESS основного CI
 
 [AutoDraw validation 42387145503](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387145503) на `e984b68` завершён SUCCESS: Preparation/G3, Game Monitor/Bridge, Executor, Application integration, Egret reference, INT-006 PNG audit — SUCCESS; Windows portable и optional benchmarks — SKIPPED. Изменённые image corpus regression tests теперь подтверждены E3 на данном commit. Отдельный offline [corpus workflow 42387485762](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387485762) SUCCESS. Прошлые записи «in progress» остаются историей времени их составления.

@@ -1,3 +1,13 @@
+## 2026-11-07 — offline structural audit и локальный corpus runner
+
+Добавлены `source/preparation/audit_validation_corpus.py` и regression tests (commit `54ab979d`): проверка количества и схемы штрихов из .autodraw, длин, нулевых штрихов и длин вне frozen short lookup. [Offline CI 42388237279](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388237279) SUCCESS; 8/8 fixture plans schema-valid, 0 invalid; [artifact 13580376620](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388237279/artifacts/13580376620). Predictor-domain eligibility **not_assessed**, CHALK не измерялся.
+
+Для самостоятельной offline-инвентаризации целевых изображений создан `run_validation_corpus_local.ps1` (commits `0bddddfd`, `bb9bb2ee`); без игры, перезаписи старых результатов и передачи raw images в GitHub. Проверка Windows launcher включена в основной CI (commit `d36aec25`). Первый run [42388505263](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388505263) FAILED в smoke из-за несовпадения Python интерпретаторов; исправлено prefer-active-python в `bb9bb2ee`, повторный [42388837703](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388837703) ожидает итогового результата.
+
+Следующий блокирующий input: реальный corpus пользователя (исходные изображения локально, после offline-run достаточно manifest + geometry audit JSON) и фактические canvas/palette settings. Production-like population, N bands, 95% reserve и INT-007 по-прежнему NOT VALIDATED/BLOCKED. FILL-001 PNG gate отдельно открыт.
+
+---
+
 ## 2026-11-07 — итоговый CI на исправленной регрессии: SUCCESS
 
 Полный [AutoDraw validation run 42387145503](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387145503) **SUCCESS** на code/workflow commit `e984b68bea7eb4fd2130d0d00336c86215129fa6`. SUCCESS: Preparation/G3 (включая все восемь testImages в corpus regression), Game Monitor/Bridge, Executor, Application integration, Egret browser reference и INT-006 pixel-level PNG audit. SKIPPED: Windows portable build/startup smoke-test и optional benchmarks. Успех не переносится автоматически на последующие документационные коммиты и не подтверждает live игру.

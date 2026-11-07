@@ -18,6 +18,33 @@
 
 Валидационный статус остаётся `candidate_only_not_assessed`, а model eligibility — `not_assessed`. Это не production population, не замороженные N bands и не exact CHALK.
 
+## Локальная offline-инвентаризация целевого корпуса на Windows
+
+**Назначение:** получить реальные значения N, происхождение и предварительную диагностику формы DrawingPlan без открытия игры. Скрипт `AutoDraw_Stage20/run_validation_corpus_local.ps1` вызывает генератор, затем `audit_validation_corpus.py`, сохраняет новый каталог результатов без перезаписи.
+
+**Действия пользователя:**
+
+1. Подготовить папку с разнообразными **реально планируемыми** изображениями. Исходники не менять, одинаковые вариации одного рисунка не считать независимыми. Для предварительного инвентаризационного запуска достаточно 20–30 изображений разных типов; это не итоговая calibration/holdout выборка.
+2. В PowerShell перейти в `AutoDraw_Stage20` (после синхронизации feature branch). При необходимости установить Python 3 и зависимости **в активный интерпретатор**:
+
+```powershell
+python -m pip install -r .\source\preparation\requirements.txt
+```
+
+3. Запустить, заменив входной путь и размеры холста на фактические настройки AutoDraw:
+
+```powershell
+.\run_validation_corpus_local.ps1 -InputFolder "D:\AutoDrawSamples" -CanvasWidth 646 -CanvasHeight 323
+```
+
+Используется профиль `data/palettes/profiles/Browser_palette.autodraw-palette.json` (можно переопределить `-PaletteFile`). По умолчанию результат пишется в новый `Documents/AutoDraw-Corpus-Runs/<run-id>`; при `-OutputRoot` путь должен отсутствовать.
+
+4. Передать из созданной папки **два JSON**: `results/generated_validation_corpus_manifest.json` и `results/corpus_geometry_audit.json`. Также сообщить canvas width/height, фактический palette profile и возможные сообщения об ошибке. Raw images можно сохранить локально, их не требуется публиковать в GitHub; файлы могут содержать имена/хеши источников.
+
+**Статус проверки:** [offline CI 42388237279](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388237279) SUCCESS (8/8 schema valid); Windows runner [42388505263](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388505263) FAILED из-за Python interpreter mismatch, исправлено `bb9bb2ee` и проверяется в [42388837703](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388837703).
+
+**Ограничения:** структурная валидность `closed=false`, двух конечных точек и N не означает поддержку геометрии frozen predictor. `predictor_domain_eligibility=not_assessed` остаётся до отдельного review. Ни изображения, ни эти результаты не используются автоматически как 19/59 calibration/holdout; точный игровой CHALK определяется только по разнице `pointCount` в валидном live capture.
+
 ## 1. Назначение
 
 Генератор создаёт из набора исходных растровых изображений два независимых типа артефактов:
