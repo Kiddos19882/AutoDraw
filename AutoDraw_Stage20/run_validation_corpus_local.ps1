@@ -39,14 +39,16 @@ if (Test-Path -LiteralPath $output) {
     throw "OutputRoot already exists. Choose a new empty output path; no existing evidence will be overwritten."
 }
 
-$launcher = Get-Command py -ErrorAction SilentlyContinue
-$pyPrefix = @("-3")
+# Prefer the active Python on PATH so it matches the installed dependencies
+# (notably the actions/setup-python environment on Windows CI).
+$launcher = Get-Command python -ErrorAction SilentlyContinue
+$pyPrefix = @()
 if (-not $launcher) {
-    $launcher = Get-Command python -ErrorAction SilentlyContinue
-    $pyPrefix = @()
+    $launcher = Get-Command py -ErrorAction SilentlyContinue
+    $pyPrefix = @("-3")
 }
 if (-not $launcher) {
-    throw "Python 3 is required (py -3 or python). Install dependencies from source/preparation/requirements.txt first."
+    throw "Python 3 is required (python or py -3). Install dependencies using the same interpreter first."
 }
 
 $previousPythonPath = $env:PYTHONPATH
