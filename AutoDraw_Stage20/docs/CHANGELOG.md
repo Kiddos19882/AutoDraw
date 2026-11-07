@@ -1463,3 +1463,11 @@
 - Документирована source-level цепочка Egret WebGL texture rendering и подтверждённые параметры sampling/alpha.
 - Зафиксированы run-bound Stage/backing geometry и контролируемый A–D offline diagnostic plan.
 - Production code, tests, workflow, acceptance thresholds и live game state не менялись. Гипотеза о влиянии fractional backing origin остаётся открытой.
+
+
+## 2026-11-07 — INT-006 95% calibration/holdout protocol
+
+- Добавлен `CHALK_95_PERCENT_CALIBRATION_HOLDOUT_PROTOCOL_2026-11-07.md`: target interpretation, 19 calibration / 59 holdout independent DrawingPlan IDs per profile/domain, zero-exceedance holdout gate, N strata, capture integrity и split protection.
+- Зафиксировано пользовательское решение о 95% целевом одностороннем предиктивном покрытии (DEC-026).
+- Обновлены PROJECT_STATUS, TASKS, ROADMAP, WORK_LOG, README и policy design.
+- Только документация; код, тесты, конфигурации, workflow, production estimator/defaults и live game не изменялись.
