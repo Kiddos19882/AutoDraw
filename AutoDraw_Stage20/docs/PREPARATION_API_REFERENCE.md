@@ -1,3 +1,17 @@
+## 1.1. CLI генератор корпуса
+
+### `generate_validation_corpus.py`
+
+Командный инструмент для пакетной подготовки данных из исходных изображений:
+
+- `generate_corpus(input_dir, output_root, *, palette_path, canvas_width=646, canvas_height=323, fit_mode="contain", row_step_px=1, color_row_step_px=1, threshold_mode="otsu", threshold=128, denoise_level=0, brightness=0, contrast=1.0, family=None, overwrite=False) -> dict[str, Any]`
+- `CorpusGenerationError(ValueError)` — ошибка входных данных или генерации корпуса.
+- `main(argv: list[str] | None = None) -> int` — CLI entry point.
+
+Функция использует штатные API image processing, Stage 8, .autodraw, palette quantization и color scanline. Она не запускает executor и не измеряет CHALK. См. [VALIDATION_CORPUS_GENERATOR_2026-11-07.md](VALIDATION_CORPUS_GENERATOR_2026-11-07.md).
+
+---
+
 # Справочник API: preparation
 
 **Область:** `AutoDraw_Stage20/source/preparation/`  
