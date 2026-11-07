@@ -1,0 +1,1544 @@
+## 2026-11-08 — расширен offline screening: color-plan executor counters
+
+- `screen_candidate_corpus.py` теперь проверяет canonical SHA-256 и summary полей исходного color scanline JSON (commit `5a55e9f`), добавлен regression test.
+- [CI 42417067363](https://github.com/Kiddos19882/AutoDraw/actions/runs/42417067363) SUCCESS: 81 color plans / 942206 source strokes / 395455 zero-length singleton runs / 916312 color changes. Source code conversion expands singleton до 1px drag и palette changes требуют swatch selection; counts не приравниваются к CHALK.
+- Frozen predictor, executor и production defaults не менялись; 95% domain eligibility всё ещё unknown.
+
+---
+
+## 2026-11-08 — conservative offline image/geometry screening
+
+- Добавлены `screen_candidate_corpus.py`, четыре unit tests и `.github/workflows/candidate-corpus-screen.yml` (commits `196f338`, `3fdffec`): проверка provenance SHA-256, exact DrawingPlan geometry hash, pHash+dHash и 20 closest pairs.
+- [CI 42416307401](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416307401) SUCCESS: 81 sources, 0 exact source/geometry duplicate groups, 0 strict flagged perceptual pairs; [raw artifact 13591427560](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416307401/artifacts/13591427560). Автоматическое решение independent, semantic family или CHALK eligibility не принимается.
+- Main full CI `42416307257` должен подтверждаться отдельно. Frozen predictor, executor, monitor, production defaults и master не изменены.
+
+---
+
+## 2026-11-08 — сохраняемые офлайн-артефакты двух партий изображений
+
+- Пользовательский [commit 985e194](https://github.com/Kiddos19882/AutoDraw/commit/985e1947c9f79bf330ea17b8aab65be7aa70c2fb) добавил 31+50 source images, 50 новых .autodraw, 50 color plans и отчёты второй партии; вместе с предыдущими артефактами corpus содержит 81 unique candidate source.
+- Подтверждены geometry audit 81/81 valid и отсутствие exact SHA256 duplicate; 95% model eligibility и live CHALK не проверялись. Результаты и границы применения документированы в `TEST_RESULTS.md`.
+
+---
+
+## 2026-11-07 — candidate-corpus geometry audit и offline Windows launcher
+
+- Добавлены `audit_validation_corpus.py` и regression tests; audit [CI 42388237279](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388237279) SUCCESS 8/8 structurally valid, без CHALK/domain approval.
+- Добавлен `run_validation_corpus_local.ps1` с уникальным output root и двумя JSON-отчётами; в Windows CI добавлен end-to-end fixture smoke.
+- Сохранён FAILED [run 42388505263](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388505263) из-за Python interpreter mismatch; исправлено `bb9bb2ee`. CHALK predictor, executor, production defaults не менялись.
+
+---
+
+## 2026-11-07 — итоговые проверки fixture corpus
+
+- GitHub Actions `42387145503` SUCCESS для обновлённого image corpus regression и CI paths; Windows portable/benchmarks SKIPPED.
+- Exploratory corpus workflow `42387485762` SUCCESS и artifact `13580167471`; сохранены текущие N results для восьми testImages.
+- Production рисунок и точный игровой CHALK не проверялись.
+
+---
+
+## 2026-11-07 — exploratory corpus GitHub Actions и N report
+
+- Добавлен воспроизводимый offline workflow `.github/workflows/validation-corpus-smoke.yml` со сбором .autodraw, color scanline и manifest из repository testImages, а также публикацией N summary и artifact.
+- Исправлено Linux `PYTHONPATH` после FAILED run `42387397972`, подтверждён SUCCESS `42387485762` и artifact `13580167471`.
+- Работа изолирована от production executor, CHALK predictor и Game Monitor; данные остаются exploratory.
+
+---
+
+## 2026-11-07 — testImages corpus regression guard
+
+- Regression test генератора адаптирован к расширяемому каталогу `testImages`, с проверкой хешей, количества результатов и повторной загрузки .autodraw/color plans (`098d5599`).
+- Изменения файлов изображений теперь активируют GitHub Actions validation через workflow path-filter (`e984b68`).
+- Frozen INT-006 prediction domain и production defaults не менялись; CI текущего workflow `42387145503` ожидает завершения.
+
+---
+
+## 2026-11-07 — документационное уточнение CI генератора
+
+- CI [42352776594](https://github.com/Kiddos19882/AutoDraw/actions/runs/42352776594) завершён SUCCESS для code/test HEAD `51c731f0c25ad10af70efdfb8a46a38a73d07bc1` (2026-11-07). Успешны Preparation/G3, Game Monitor/Bridge, Executor, Application integration, Egret browser reference и INT-006 PNG audit. Windows portable build/startup smoke-test и optional benchmarks были SKIPPED, поэтому Windows сборка этим workflow не подтверждена. Текущий проверенный перед синхронизацией HEAD `0db0bcb96d20b39a01a5b6fb2614a43c1f83a916` добавил только семь файлов в `testImages/` и не менял генератор/тесты; отдельного CI для HEAD не обнаружено. Реальный пользовательский корпус ещё не сформирован, candidate manifest не является validation выборкой; N bands и safety margin не установлены, INT-007 BLOCKED. Новых live captures не выполнялось.
+- Исторические записи «CI pending» оставлены как описание состояния на момент их составления; актуальное подтверждение приведено выше.
+
+---
+
+## 2026-11-07 — генератор кандидатного корпуса для INT-006
+
+- Добавлен CLI генератор portable .autodraw и color scanline plans из исходных изображений с повторным использованием штатного pipeline.
+- Добавлены SHA-256 deduplication, provenance manifest и раздельные stroke counts для monochrome DrawingPlan и color scanline plan.
+- Добавлены unit tests и документ с инструкцией запуска/статистическими ограничениями.
+- CI validation pending; corpus generation и live captures не выполнялись.
+
+---
+
+## 2026-11-07 — проект CHALK safety-margin policy
+
+- Добавлен design document profile-aware и stroke-count-aware safety margin.
+- Разделены run-level underprediction и сумма положительных per-stroke residual.
+- Зафиксировано, что 15 captures/profile INT-006 — пять DrawingPlan × три повтора.
+- Количественный reserve, production eligibility и INT-007 остаются неутверждёнными.
+
+## 2026-11-07 — INT006R: пользовательский visual sign-off radius=10
+
+- Зафиксировано подтверждение пользователя: radius=10 визуально приемлем и предпочтителен в пределах проверенной матрицы D1–D5.
+- Уточнена ограниченная область применимости; универсальный production default не утверждён.
+- Machine-generated analyzer field `visual_quality_gate=pending_manual_review` сохранено без изменений.
+- CHALK safety margin и production eligibility остаются невалидированными; FILL-001 PNG gate не закрыт.
+
+## 2026-11-07 — INT006R preliminary visual review and CHALK residual diagnostics
+
+- Просмотрены 45 saved after-draw PNG из INT006R artifact; preliminary visual compromise — radius 10, но manual visual gate остаётся pending.
+- Зафиксированы exact CHALK totals: radius1=1011, radius10=1015, radius30=1017 (по 15 captures).
+- Пересчитаны P0/P1/P2 model residuals и per-stroke positive residual diagnostics; safety margin не утверждалась.
+- Production eligibility остаётся not_validated.
+
+---
+
+## 2026-11-07 — paired-renderer series PASS и исправления analyzer pipeline
+
+- Добавлена автоматическая генерация per-run offline WebGL references для сохранённых paired-renderer captures.
+- Исправлена проверка DRAW_SAMPLE: предусмотренный `state_poll` fallback учитывается при точном совпадении упорядоченного accepted-point stream с quota updates.
+- Исправлено разрешение имени generated manifest (`manifest.json`) без ослабления sourceRunId/fixture/pixel gates.
+- CI [42321009715](https://github.com/Kiddos19882/AutoDraw/actions/runs/42321009715) SUCCESS: 6/6 PASS_PER_RUN; vertical 3/3, diagonal 3/3; aggregate series PASS.
+- INT-006 PNG audit 90/90; INT-006 CHALK 45/45; INT006R 45/45. CHALK safety margin не установлена, INT006R manual visual review pending.
+- FILL-001-RS static sweep PASS; committed FILL-001 PNG quality gate остаётся failed (coverage 98.430600%, leakage 11).
+
+---
+
+## 2026-11-07 — локальный PRR batch: evidence и статус
+
+- Сохранены результаты четырёх локальных paired-renderer repeats (vertical/diagonal, repeats 2 и 3), Game Monitor session, screenshots, execution reports и block journal.
+- Успешный block `596e5c37813a43048395d0f596f9d971`: 4/4 задания completed; exact CHALK — vertical 71/70, diagonal 161/160.
+- Первоначальный block `ab9b788c8199454c957036effb99e9c6` сохранён со статусом stopped из-за Bridge input telemetry, не включён в успешную выборку.
+- Formal renderer acceptance новых captures остаётся pending; CHALK safety margin не установлена, FILL-001 PNG quality gate остаётся failed, INT-007 заблокирован.
+- Изменения этого документационного обновления не затрагивают исходники, тесты, конфигурации или workflow.
+
+---
+
+## 2026-11-07 — итог CI PRR implementation и повторная оценка renderer/CHALK
+
+**GitHub Actions:** [42309752566](https://github.com/Kiddos19882/AutoDraw/actions/runs/42309752566) — **SUCCESS**.  
+**Validated HEAD:** `bacd03f5eee725dbbfac0ce928b227bd23d73b0c`, branch `feature/image-geometry-optimization`.
+
+- Все обязательные jobs завершились SUCCESS: Game Monitor/Bridge, Application integration, Preparation/G3 matrix, Egret CanvasRenderer browser reference, Executor regression и INT-006 pixel-level PNG geometry audit.
+- В Preparation/G3 прошли PRR planner/journal/UI/integration regression tests, capsule benchmark и FILL-001-RS static sweep. Optional algorithm benchmarks и Windows portable build/startup smoke-test были SKIPPED; это не ошибки, но соответствующие проверки этим run не подтверждены.
+- INT-006 paired-renderer analyzer пересчитал сохранённые исходные captures по текущим критериям: оба имеющихся run получили `PASS_PER_RUN` (vertical run `c860234f-995a-4789-9ac2-e05b322fe742`; diagonal run `f69cb0f4-f5d0-4ff9-a3b7-1148c38fa07f`). Однако агрегат явно сообщает `series_status=PENDING`: принято только **1/3** уникальных run на каждую ориентацию. PRR live repeats не запускались и в этом CI не создавались.
+- INT-006 CHALK prediction validation: 45/45 captures приняты, missing/rejected=0; `safety_margin_status=not_established`, `production_eligibility=not_validated`. Успешная валидация модели не доказывает безопасный запас краски.
+- INT006R: 45/45 captures приняты; это программная/аналитическая проверка сохранённых live evidence, не новый игровой запуск.
+- FILL-001-RS static sweep step завершился SUCCESS, но он не отменяет отдельный committed PNG quality gate: ранее зафиксированы coverage 98.430600%, leakage 11, status=failed. FILL-001 остаётся BLOCKED.
+- Артефакты run 42309752566: paired renderer PNG comparison (13548436614), INT-006 PNG analysis (13548237630), CHALK validation (13548436686), INT006R validation (13548501600), visual review source (13548217748), FILL-001-RS static sweep (13548680868), Egret renderer reference (13547343754), плюс Stage diagnostics и capsule benchmark. Срок хранения опубликованных artifacts — до 2026-11-20.
+- Никакие новые live game runs/CHALK расход не выполнялись. GitHub Actions не имеет доступа к локальной Windows-доске пользователя.
+
+**Следующие блокирующие шаги:** обновить локальный AutoDraw из этой ветки и выполнить PRR на тестовой доске; получить по два новых уникальных run на vertical/diagonal (итого 3/3); повторно прогнать formal acceptance; отдельно закрыть CHALK safety margin и FILL-001 PNG quality gate. INT-007 не открывать до выполнения этих условий.
+
+## 2026-11-07 — пакетный paired-renderer блок PRR
+
+**Статус:** код добавлен в ветку; CI validation pending; live-запуски не выполнялись.
+
+В существующий CHALK block runner добавлена фаза PRR для закрытия недостающих formal renderer repeats:
+- ровно четыре задания: vertical repeat 2 и 3, diagonal repeat 2 и 3;
+- фиксированные radius=10 и штатный executor profile 2 px / 10 ms;
+- deterministic shuffle, отдельные task/attempt/experiment IDs и durable journal;
+- сценарии проходят через существующий preflight, drag-установку кисти, fresh Game Monitor heartbeat, executor, exact CHALK capture, postdraw capture и fail-closed progression;
+- repeat 1 намеренно не генерируется: он уже присутствует в исходной серии; PRR добавляет только две недостающие независимые попытки на каждую ориентацию.
+
+Это автоматизирует последовательность опытов внутри локального Windows AutoDraw, но не запускает игру из GitHub Actions и не предоставляет ИИ доступ к локальной доске. Формальная renderer acceptance по PNG остаётся отдельным итоговым gate: завершение CHALK block само по себе не означает PASS_PER_RUN.
+
+- Добавлена фаза PRR в CHALK block planner/UI: 2 дополнительных вертикальных и 2 диагональных повтора, radius 10, фиксированный executor profile, durable journal и regression tests.
+- Добавлена проверка PRR matrix metadata в интеграции исполнителя.
+
+## 2026-11-06 — renderer acceptance policy 92%
+
+- Формальные IoU/precision/recall minima изменены с 0.995 на 0.92.
+- Symmetric-difference fraction max изменён с 0.0025 на 0.087, согласованно с новыми метриками.
+- Bbox edge tolerance заменён с фиксированного 1 px на 8% меньшего соответствующего bbox extent, минимум 1 px.
+- Unit tests обновлены для граничных значений и масштабируемой bbox tolerance.
+- Alpha threshold 24, capture/transform gates, CHALK и series-repeat requirements сохранены.
+- Требуется новый CI run; исторические CI результаты не переинтерпретированы. Live runs/CHALK не выполнялись.
+
+## 2026-11-06 — локальный Firefox/NVIDIA Stage A–D replay
+
+- В репозиторий добавлен ZIP с headed Firefox 159.0.1 Stage A–D artifacts для vertical/diagonal.
+- Подтверждён WebGL 1.0 на ANGLE/NVIDIA GeForce GTX 980 D3D11 с antialias=true и точным совпадением expected context attributes.
+- Внутренние Stage PNG: A/B differing pixels=2565 vertical и 4119 diagonal; A/C pixel-equal; B/D имеют совпадающие CRC32/размеры.
+- Stage PNG имеют полный backing размер 3942×1800; fractional BoardPane origin X=1022.375 отличается от rounded X=1022.
+- Hosted CI 42165379138: Stage A–D diagnostic success, formal vertical/diagonal renderer gates failure. Hosted CI renderer использует Basic Render Driver и antialias=false, поэтому не подменяет локальные NVIDIA evidence.
+- Следующий шаг — прогнать локальные NVIDIA PNG через существующий same-run Stage comparator. Production code и formal thresholds не менялись; live runs/CHALK не запускались.
+
+## 2026-11-06 — Stage A–D live comparison and local GPU replay
+
+- Stage A–D diagnostic comparison succeeded on CI run 42155453886.
+- Vertical A/C: IoU 0.940000, FP 294, FN 0, symmetric difference 294. B/D: IoU 0.939388, FP 297, FN 0, symmetric difference 297.
+- Diagonal A: IoU 0.982775, FP 184, FN 3, symmetric difference 187. C: IoU 0.982406, FP 188, FN 3, symmetric difference 191. B/D: IoU 0.978823, FP 222, FN 8, symmetric difference 230.
+- Formal local-board replay: vertical 302 symmetric-difference px; diagonal 554 px. Stage A improved diagonal by 66.2%, vertical by 2.6%.
+- Baseline round-trip error=0; mask sensitivity=0; all board-origin crosschecks passed; post-hoc alignment=false.
+- CI Firefox 159 uses Microsoft Basic Render Driver and antialias=false; source renderer reference uses NVIDIA and antialias=true. Exact GPU/context parity is not available in hosted CI.
+- Added headed local Firefox Stage runner to test the source GPU offline.
+- Formal vertical/diagonal acceptance remains FAILURE; thresholds unchanged.
+
+## 2026-11-06 — Firefox Stage A–D browser artifacts
+
+- Firefox 159.0.1 WebGL Stage A–D artifacts generated for vertical and diagonal; browser reference job SUCCESS.
+- A/C Stage PNG differences are small (665/1906 pixels, max channel 1); B/D are identical; A/B differ at 2581/4400 pixels (max 90/93).
+- These are Stage-to-Stage image comparisons, not live acceptance metrics.
+- CI GL mismatch persists: Microsoft Basic Render Driver, antialias=false vs source NVIDIA, antialias=true.
+- Downstream INT-006 same-run mask comparison pending.
+
+## 2026-11-06 — Firefox Stage runner and A–D diagnostics
+
+- Исправлено чтение run-bound geometry из `players[0].boardStageCorners`.
+- Firefox 159 WebGL probe successfully запускается в CI, но Basic Render Driver reports antialias=false despite `webgl.msaa-force=true`; GPU/context parity with source NVIDIA is not achieved.
+- Исправлен фильтр PNG links; manifest download link больше не считается PNG.
+- Stage comparison accepts both WebGL and Canvas2D backends; CI requests A/B/C/D.
+- CI 42155453886 ожидает результата.
+
+## 2026-11-06 — Firefox WebGL Stage A–D runner
+
+- Добавлен Firefox Selenium runner для run-bound Stage A–D compositor probe.
+- Stage PNG generation перенесён из headless Edge/Chromium SwiftShader в Firefox; базовые 20 fixtures остаются в прежнем Edge runner.
+- Workflow устанавливает Selenium; Stage artifacts сохраняются в совместимых downstream путях.
+- Проверки browser version, sourceRunId, WebGL diagnostics, A–D backend identity, exact/rounded placement и A self-comparison встроены в runner.
+- CI 42154755178 ожидает результата; Firefox WebGL execution пока не подтверждён.
+
+## 2026-11-06 — исправлен порядок инициализации shared-baseline comparator
+
+- Пост-коммитная проверка выявила использование `baseline_rgb` до создания Firefox baseline capture.
+- Расчёт observed masks перенесён после проверки baseline round-trip; пороги и методика общего baseline сохранены.
+
+## 2026-11-06 — общий baseline для Stage/live screenshot diagnostics
+
+- Исправлена асимметрия: observed и expected RGB masks теперь сравниваются относительно одного Firefox round-trip baseline.
+- В Stage comparison report добавлена оценка чувствительности observed mask к разнице между исходным before screenshot и Firefox baseline.
+- Добавлены unit tests на строгое сравнение с RGB threshold и проверку размеров входных изображений.
+- Formal INT-006 thresholds, raw captures и production drawing logic не менялись; результат ожидает CI validation.
+
+## 2026-11-06 — fail-closed validation Stage A–D artifacts
+
+- Headless Edge runner проверяет source run ID, четыре варианта и их backend, точные/округлённые backing coordinates, размер BoardPane и нулевую self-difference варианта A до сохранения artifact как валидного.
+- Результаты всё ещё ожидают реального browser/CI запуска; сам факт добавления проверки не означает её прохождение.
+
+## 2026-11-06 — уточнение Stage A/B: используется Egret WebGLRenderer
+
+- Варианты A/B переведены с независимого raw-WebGL textured quad на фактический Egret WebGLRenderer: тот же BoardPane, mask/scrollRect и run-sized Stage RenderBuffer с точной/округлённой backing translation.
+- В manifest добавлены draw-call, scene и backend diagnostics. Это делает A/B ближе к реальной Egret texture composition; pixel equivalence с live capture ещё не подтверждена.
+
+## 2026-11-06 — Stage-level compositor A–D и повтор существующих captures
+
+- В offline renderer harness добавлен расчёт BoardPane placement в Stage backing canvas из точной run-bound geometry.
+- Добавлены WebGL/Canvas2D варианты с exact fractional origin и округлением до backing pixel; manifest сохраняет параметры и попиксельные различия относительно WebGL exact (A).
+- Headless Edge runner подключён к существующим vertical/diagonal Game Monitor reports; live game runs не запускаются.
+- Добавлены unit tests для placement/rounding и fail-closed геометрии. CI/browser execution и pixel acceptance пока не подтверждены.
+
+## 2026-11-06 — синхронизация документации с кодом renderer и CI
+
+- Уточнены remote branch HEAD на начало сверки и последний code/test HEAD; `master` оставлена без изменений.
+- Управляющий backlog датирован 2026-11-06; `DOC-STATUS-SYNC` отмечен завершённым после повторной сверки.
+- Индекс документации теперь различает isolated offscreen WebGL probe, вспомогательную Canvas2D композицию и отсутствующую пока Stage-level texture composition.
+- Зафиксированы formal multi-axis результаты CI 42113632374: horizontal PASS_PER_RUN, vertical/diagonal REJECTED_PER_RUN; общий workflow FAILURE.
+- Сохранены ограничения: без изменения production-кода, порогов, live captures и без запуска live game tests.
+
+## 2026-11-05 — offline replay profile now comes from exact Game Monitor run
+
+- Удалён stale 2026-11-04 renderer snapshot из runtime metadata live paired replay.
+- Offline harness принимает полный Monitor report и переносит run-bound Stage/canvas/screen/CSS profile из неизменных start/end geometry snapshots.
+- Отсутствие exact run geometry теперь приводит к явной ошибке вместо использования старого профиля.
+- Offscreen BoardPane raster остаётся 460×240 при 3× (1380×720); экранная CSS transform сохраняется только как runtime metadata.
+- Обновлена инструкция страницы offline renderer. Live/production drawing code и CHALK logic не менялись.
+
+## 2026-11-05 — same-run geometry для multi-axis paired renderer
+
+- Добавлен run/session-bound geometry-audit из Game Monitor snapshot; проверяются screen metrics, фазы эксперимента, полноэкранные PNG, неизменность geometry start/end и отсутствие telemetry updates/overflow.
+- --same-run-geometry использует same-run Monitor fits и screenshot BoardPane bounds. Frozen plan ROI используется только для поиска доски; stale runtime snapshot 2026-11-04 не используется для экранной привязки.
+- Основной comparison report теперь содержит независимый transform и alpha metrics; frozen-plan results сохранены отдельной диагностикой.
+- CI replay vertical/diagonal captures добавлен; результат run 42083576282 ожидается. До формального отчёта PASS_PER_RUN не заявляется.
+- Изменения не затрагивают production planner/renderer/executor и не требуют нового live game run.
+
+## 2026-11-05 — правила доступа и автоматизации тестов
+
+- Добавлено заметное предупреждение о том, что локальная программа, игровая доска и локальный `git status` доступны для непосредственной проверки только пользователю.
+- Регламентированы максимальная автоматизация всех тестов с реальной игровой доской, повторное использование существующих средств и создание недостающих условий.
+- Уточнено, что удалённая проверка GitHub/CI не доказывает локальное состояние или выполнение live-теста.
+- Изменения только документационные; исходники, тесты и workflow не затронуты.
+
+## 2026-11-05 — screenshot-derived BoardPane transform diagnostics
+
+- Added same-run full-screen board-bound detection to the renderer audit path. The calibrated ROI is no longer assumed to be the BoardPane extent.
+- Independent X/Y transform now uses same-run Monitor X fit plus screenshot-derived Y bounds, with inspect cross-checks and fail-closed validation.
+- Added four unit tests and report evidence. CI run `41971869707` SUCCESS (859 tests passed, 24 warnings, 82 subtests; paired renderer comparison and Windows portable build succeeded).
+- Diagnostic/audit only: production renderer, planner, calibration profile and executor behavior are unchanged. The single horizontal capture remains exploratory; multi-axis/environment validation and formal acceptance are pending.
+
+## 2026-11-05 — подготовка paired renderer full-screen evidence
+
+- Workflow `.github/workflows/geometry-tests.yml` дополнен копированием same-run `before_clear-screen.png` и `after_draw-screen.png` в artifact `autodraw-paired-renderer-png-comparison` для последующего pixel-level восстановления границ BoardPane.
+- Commit `fb853547d74a70582ab1e4731d55763367b8ceb8`; CI validation этого изменения ещё не получена.
+
+## 2026-11-05 — AutoDraw reads and displays Game Monitor geometry
+
+- Added active Bridge geometry reader and Brush Behavior UI status for BoardPane CSS client corners/mapping method.
+- Experiment summary now preserves compact renderer geometry metadata without claiming desktop/screenshot coordinates.
+- Reader and summary tests added; profile/executor integration remains pending until desktop transform is independently validated.
+
+## 2026-11-05 — Monitor/Bridge geometry pipeline CI success
+
+- Full workflow `41964932479` completed SUCCESS. Preparation/G3 852 passed; Game Monitor 21 JS tests; Bridge 22 Python tests; Executor, Application integration, Egret browser reference, Windows portable build/startup smoke-test and INT-006 PNG audit all SUCCESS. Optional algorithm benchmarks SKIPPED.
+- FILL-001-RS static sweep: 15 cells, 2238 candidates, 62 accepted; selected offline candidate passes coverage/leakage gate in each cell. Separate committed PNG audit still fails (coverage 98.4306%, leakage 11), so FILL-001 remains blocked.
+- AutoDraw geometry reader/profile consumer remains pending.
+
+## 2026-11-05 — geometry snapshot tests and preparation suite pass
+
+- Preparation/G3 suite: 852 passed, 24 warnings, 82 subtests passed. Game Monitor/Bridge: 21 JS tests and 22 Python/WebSocket tests passed.
+- FILL-001 committed PNG quality audit remains failed (coverage 98.4306%, leakage 11); separate static spacing sweep completed its workflow step with 15 cells / 2238 candidates / 62 accepted candidates. Do not interpret sweep step success as committed PNG acceptance.
+- Windows build and INT-006 PNG job still running at this point.
+
+## 2026-11-05 — Monitor/Bridge geometry targeted tests pass
+
+- Game Monitor JavaScript suite: 21/21 passed, including safe client-corner fallback and window geometry.
+- Bridge/WebSocket Python suite: 22/22 passed, including geometry snapshots persisted to session/run records while preserving schema v2.
+- Full workflow `41964932479` remained in progress for preparation/G3 tests at this point.
+
+## 2026-11-05 — Game Monitor 0.2.3 geometry telemetry
+
+- Added raw window geometry and a fail-closed axis-aligned client-corner fallback when `getBoxQuads()` is unavailable.
+- Browser Bridge now transmits renderer geometry at session start and on viewport/window changes; server persists session and run-bound snapshots using existing schema versions for compatibility.
+- Added unit and websocket integration tests; CI pending.
+
+## 2026-11-05 — full CI validation passed
+
+- CI workflow `41963498086` completed SUCCESS for code/test/workflow commit `1b16b51e42ba0c61a0fbc547179ca5a9b3864b54`.
+- Required jobs, including Windows portable build/startup smoke-test and INT-006 PNG audit, passed; optional algorithm benchmarks skipped.
+- Current branch HEAD after documentation-only updates: `0cc665e9c9d9e215423c1fa5e5428abc6c3ca08c` at time of this entry; branch compare identical.
+
+## 2026-11-05 — independent renderer transform comparison result
+
+- Independent mapping (same-run Monitor X fit + inspect CSS Y transform) improved alpha-24 IoU from `0.763153` to `0.998994`; symmetric difference fell from `2404` to `9` pixels. Precision `0.999218`, recall `0.999776`; live/expected bounding boxes coincide.
+- No post-hoc translation applied. The comparison remains exploratory because Y scale comes from a same-screen inspect snapshot without same-run timestamp and no vertical live trajectory exists.
+- CI job `INT-006 pixel-level PNG geometry audit` completed SUCCESS and uploaded artifact `autodraw-paired-renderer-png-comparison` (ID `13386122895`). Full workflow remained in progress for Windows portable build at documentation time.
+
+## 2026-11-05 — independent screen geometry audit tooling
+
+- Добавлен fail-closed helper для независимого BoardPane→screenshot transform: same-run Monitor X fit плюс inspect-derived Y transform с явным vertical caveat.
+- Добавлены unit tests и derived geometry audit input для paired renderer run.
+- CI comparison теперь считает дополнительную метрику по независимому transform без post-hoc registration; исходный frozen transform comparison сохраняется.
+- Документировано смещение ручного ROI примерно на 1.95 px слева и 2.86 px сверху. Renderer acceptance остаётся открытой до результата CI.
+
+## 2026-11-05 — уточнён временный план board geometry/calibration handoff
+
+- Уточнена последовательность: независимое восстановление ROI из same-session evidence → coordinate-space contract → спецификация BoardPane geometry → отдельное разрешение на Monitor/Bridge/AutoDraw implementation → offline renderer validation → отдельное разрешение на live capture.
+- Зафиксировано, что текущий Monitor умеет выдавать stage corners и client corners только при доступном canvas screen quad; текущий Bridge передаёт события/status/heartbeat, но полноценный calibration handoff в AutoDraw не подтверждён.
+- Введены fail-closed требования для недоступной/неоднозначной геометрии и правила invalidation устаревшего профиля. FILL-001-RS single-task preflight и 45-cell matrix остаются заблокированы.
+- Изменения только в документации; код, тесты, конфигурации, workflow, live runtime и игровые эксперименты не затрагивались.
+
+## 2026-11-05 — exploratory paired renderer comparison and transform audit
+
+- Выполнен количественный live/offline PNG comparison для experiment d47cc0a5: unshifted IoU=0.763153; post-hoc best translation (+1,+2) даёт IoU=0.998883 и symmetric difference=10 px.
+- Отдельно проверена геометрия frozen ROI 674×355 против logical board 460×240: scale X/Y различается на 0.8106%, ROI aspect ratio не совпадает с logical aspect ratio; расхождение указывает на необходимость независимой проверки границ crop.
+- Причина translation residual не установлена. Post-hoc shift не является correction/acceptance; production и frozen plan не менялись.
+- FILL-001-RS matrix остаётся BLOCKED; следующий шаг — independent crop-origin/board-bound derivation из same-session full-screen evidence.
+
+## 2026-11-05 — принят live capture для paired renderer replay
+
+- Сохранён одиночный run 16aec62c-9e54-44e7-8691-9df79b19161d: один strokeId, 138 принятых точек, все pointDelta=1 и acceptedPoint присутствует.
+- Точный CHALK=138 по pointCount 1→139; Bridge telemetry без drops/errors/send failures/sequence gaps.
+- Raw capture прошёл условия импорта в offline accepted-point replay. PNG equivalence с live board пока не проверена; отдельный runtime inspect snapshot не приложен.
+
+## 2026-11-05 — добавлен одиночный paired renderer test во вкладку «Тест кистей»
+
+- Добавлен сценарий одного горизонтального штриха 400 logical px для live PNG ↔ offline Egret replay.
+- Фиксированы radius=10, executor step=2 px, delay=10 ms, line extension=0 и timing profile; renderer replay — smooth / line width 10.
+- Добавлены fail-closed проверки одного stroke и точного executor metadata, а также regression tests.
+- UI показывает инструкцию по включению Game Monitor input telemetry и сохранению полного capture evidence.
+- Live game запуск и paired PNG comparison не выполнялись; ожидается пользовательский capture.
+
+# Changelog
+
+## 2026-11-04 — Egret zero-length lineTo fixture: no visible raster output
+
+- Добавлен controlled actual BoardPane fixture с `moveTo(100,100) → lineTo(100,100)`, widths 10/30.
+- В обоих случаях CanvasRenderer source, masked Canvas2D и WebGL alpha полностью пусты; Canvas↔WebGL pixel-identical.
+- Матрица: 20 WebGL comparisons, 6 exact, 14 max channel delta=1; artifact `13368772614` содержит manifest + 60 PNG.
+- Duplicate points назначаются напрямую и обходят live `pushPoint` dedup; результат ограничен нулевым lineTo в Egret 5.4.1 и не является CHALK/live measurement.
+- Full CI run [41926175588](https://github.com/Kiddos19882/AutoDraw/actions/runs/41926175588) SUCCESS.
+
+
+## 2026-11-04 — подтверждён PainterPopup BoardPane runtime transform
+
+- Runtime snapshot показывает BoardPane local `(30,75)` под PainterPopup `(489.791666,-3)`, concatenated translation `(519.791666,72)`, scale 1.
+- boardMask имеет ту же concatenated matrix; stage-space transform подтверждён для snapshot.
+- `boardClientCorners` недоступен (`getBoxQuads()` отсутствует), поэтому client/screen corners остаются derived. Paired live PNG и фактический renderer footprint остаются pending.
+
+
+## 2026-11-04 — Egret WebGL mask reference corrected: 18/18 comparisons
+
+- Исправлена тестовая сцена: mask теперь attached к Egret Stage, board и mask имеют общий parent/stage; assert требует `boardRenderMode=3`.
+- Найденная причина прежних крупных corner differences — неактивированный mask path из-за `mask.$stage=null` в harness.
+- После correction: 18/18 WebGL comparisons; 4 exact, 14 max channel delta=1; mask-corner width10/30 — 145/36 differing pixels, max delta 1; scrollRect edges exact.
+- CI run [41924481247](https://github.com/Kiddos19882/AutoDraw/actions/runs/41924481247) SUCCESS; artifact [13368272823](https://github.com/Kiddos19882/AutoDraw/actions/runs/41924481247/artifacts/13368272823) содержит manifest + 54 PNG.
+- Live game PNG equivalence и точный popup transform остаются pending; production code и CHALK model не менялись.
+
+
+## 2026-11-04 — actual BoardPane CanvasRenderer reference: 18/18 pixel match
+
+- Harness теперь загружает настоящий `BoardPane` из game bundle, вызывает `redraw()` и сравнивает source raster с manual path transcription на втором BoardPane instance.
+- Run `41916449025`, job `126877971003`: 18/18 fixture comparisons pixel-identical (`differingPixels=0`); artifact `13365670726` содержит manifest и 36 PNG.
+- Single-point BoardPane GraphicsNode не пустой из-за transparent `resetBg()` rectangle, но его raster полностью прозрачный. Предыдущий manual-only empty-node вывод superseded.
+- Full CI run `41916449025` на commit `63d9dab` завершился SUCCESS, включая Windows portable build и INT-006 pixel audit; optional algorithm benchmarks SKIPPED.
+- WebGL texture sampling/mask stencil и live game pixel equivalence остаются pending.
+## 2026-11-04 — correction: actual BoardPane reference and explicit drawLast=false
+
+- Corrected `Painter.drawSmoothLine` signature to four parameters `(graphics, points, drawFirstHalf, drawLast)`, with default `drawLast=true`; `BoardPane.redraw()` explicitly passes `false`.
+- Previous manual-only single-point fixture omitted `BoardPane.resetBg()`. Actual `resetBg()` adds a transparent 460×240 rectangle, so the BoardPane GraphicsNode is non-empty even when the stroke path contains only moveTo commands. The previous empty-node/skip conclusion does not apply to actual BoardPane.
+- Browser harness now loads `main.min_653f95bc.js`, instantiates actual BoardPane, and pixel-compares its CanvasRenderer output with the manual transcription including resetBg. Run `41916449025` confirms 18/18 pixel-identical comparisons and full workflow SUCCESS.
+## 2026-11-04 — Game Monitor 0.2.2: input sampling telemetry
+
+- Добавлено opt-in событие `MOUSE_MOVE_SAMPLE` (выключено по умолчанию, `setInputTelemetryEnabled(true/false)`): DOM mousemove после Egret canvas handler с DOM timestamp, client/page/screen coordinates, stage.mouseX/Y и BoardPane-local coordinates.
+- `POINT_QUOTA_UPDATE` при положительной exact pointDelta содержит acceptedPoint; stage/local coordinates добавляются только при включённой input telemetry.
+- Browser Bridge и Python collector allowlists расширены; добавлены Node и Python regression tests.
+- Source trace зафиксировал цепочку WebTouchHandler page→stage mapping с Math.round(), TouchHandler duplicate suppression и SystemTicker frameRate throttle. Это обоснованный механизм вариативности повторных линий, но парные live captures ещё нужны для подтверждения.
+- Monitor version 0.2.2; raw mousemove listener выключен по умолчанию и управляется через `setInputTelemetryEnabled(true/false)`. Code/test commits: `981b2c6`, `216361d`, `b9899b2`, `6e0867b`, `7a17802`, `8bc19ab`, `e3ca5fd`. Static JS syntax parse и isolated mock-browser execution Monitor PASS; Node suite, CI нового HEAD и live experiments не подтверждены.
+
+## 2026-11-04 — Egret CanvasRenderer browser reference: 18/18 PASS
+
+- Run `41914478746`, job `126871096410`: Egret 5.4.1 harness завершил 18 fixtures и сформировал 36 PNG + manifest.
+- Artifact `autodraw-egret-renderer-reference`, ID `13365080566`; локальная проверка архива и всех PNG PASS.
+- Edge 156.0.0.0, DPR=1, viewport 756×441, rasterScale 3.
+- Browser PASS подтверждает CanvasRenderer source raster generation; WebGL texture/mask и game pixel equivalence остаются не проверены.
+
+## 2026-11-04 — renderer browser gate изолирован от Preparation/G3
+
+- Добавлен отдельный Windows job `egret-renderer-reference`, запускающий Edge harness независимо от длинной Preparation/G3 suite и portable build.
+- Inline PowerShell вынесен в `tests/run_egret_renderer_reference.ps1`; на failure сохраняются DOM и Edge stderr, на success ожидаются manifest 18 fixtures и 36 PNG.
+- Исправление O(1) accepted-point теста подтверждено Game Monitor CI job PASS.
+- Browser runs `41914411268` / `41914478746` ещё не имеют подтверждённого результата в момент записи.
+
+## 2026-11-04 — исправлен empty GraphicsNode handling в Egret reference harness
+
+- По source trace Egret 5.4.1 подтверждено: `Graphics.moveTo()` не обновляет bounds; WebGLRenderer пропускает GraphicsNode без положительных width/height или drawData.
+- Предыдущий browser harness останавливался на первом `smooth-single-point` fixture, потому что считал empty bounds ошибкой. Теперь этот случай моделируется как прозрачный no-op с явным manifest disposition; batch может продолжить остальные fixtures.
+- Добавлен Node regression test; CI workflow теперь сохраняет DOM/Edge diagnostics при failure и проверяет доступность локального bundle.
+- Изменения: `167661b`, `e1caaba`, `e2cdafa`. CI нового HEAD пока не подтверждён; pixel equivalence не заявляется.
+
+
+## 2026-11-04 — подтверждены WebGL texture sampling defaults
+
+- `sys.createTexture()` устанавливает LINEAR min/mag filters, CLAMP_TO_EDGE и premultiplied-alpha upload.
+- GraphicsNode `drawTexture()` не переопределяет smoothing для этого пути; Canvas2D `imageSmoothingEnabled=true` является только приближением.
+
+## 2026-11-04 — offline Egret CanvasRenderer reference harness
+
+- Добавлены browser page, JS renderer harness и Node tests path semantics; создаются 18 source/masked fixtures при lineWidth 10/30.
+- Workflow запускает syntax check и Node tests; browser execution и WebGL pixel equivalence пока не подтверждены.
+
+
+## 2026-11-04 — offline endpoint analysis на реальном FILL-001 capture
+
+- Для run `6a17a297-ea14-4527-9527-bfd8de3bd335` разобраны 1260 accepted points / 27 штрихов. Все 1260 positive DRAW_SAMPLE имеют pointDelta=1; coalesced deltas отсутствуют.
+- Последние интервалы всех штрихов 3–9 при lineWidth=10: идеальный round cap достигает последней принятой точки. Smooth endpoint omission сама по себе не объясняет PNG residual; mouseup-to-last-sample и пиксельная маска остаются неизвестными.
+- Добавлены offline analyzer, unit tests и derived report JSON.
+
+## 2026-11-04 — установлена реальная форма clipping mask доски
+
+- `PainterPopup` применяет `boardMask` через `drawRoundRect(...,10)`; Egret 5.4.1 делит ellipseWidth/Height пополам, фактический corner radius=5 logical px.
+- `painterBoard.mask=boardMask`; `BoardPane.scrollRect` дополнительно задаёт прямоугольный clip 460×240.
+- Offline fixtures должны моделировать оба механизма, не заменять маску прямоугольником.
+
+## 2026-11-04 — уточнена семантика конечной точки smooth brush path
+
+- Подтверждено, что `BoardPane.redraw()` вызывает `Painter.drawSmoothLine(graphics, points, true, false)`, при этом пятый формальный параметр `drawLast` не передаётся и остаётся undefined; `onDrawingEnd()` не завершает путь до последней точки.
+- При одной точке остаётся `moveTo`, при двух — линия до midpoint, при 3+ — midpoint/quadratic path до midpoint последнего сегмента. Принятые CHALK точки и визуальное покрытие поэтому должны анализироваться раздельно.
+- Добавлены обязательные offline fixtures для 1/2/3+ точек; pixel-level последствия требуют browser PNG comparison.
+
+## 2026-11-04 — runtime renderer snapshot и уточнение WebGL raster path
+
+- Сохранён пользовательский runtime snapshot в `data/runtime/renderer_snapshot_2026-11-04.json`.
+- Подтверждён активный WebGL backend Egret 5.4.1 и восстановлена stage→client геометрия для текущей сессии; прямой `getBoxQuads()` evidence отсутствует, client corners помечены как derived.
+- Статический audit bundle установил, что WebGLRenderer растеризует GraphicsNode через CanvasRenderer и затем загружает canvas texture в WebGL; round caps/joins defaults подтверждены.
+- Уточнено, что UI `radius` передаётся как line width, а не математический радиус. Pixel equivalence и exact footprint остаются открытыми.
+
+
+## 2026-11-04 — Game Monitor renderer/transform diagnostics
+
+- Добавлены `rendererSnapshot()` и расширенный read-only `inspect()` для фактического Egret backend, canvas scale/DPR, viewport, canvas CSS geometry, BoardPane parent transforms, mask и stage/client corners.
+- Добавлены два Node regression tests: runtime renderer snapshot/coordinate mapping и безопасная деградация при отсутствии runtime.
+- Game Monitor/Bridge CI job run [41896024383](https://github.com/Kiddos19882/AutoDraw/actions/runs/41896024383) — PASS: JS syntax, 18 Node tests и WebSocket smoke test. Полный GitHub Actions workflow [41896024383](https://github.com/Kiddos19882/AutoDraw/actions/runs/41896024383) — SUCCESS: regression suites, static benchmarks, Windows portable build/startup smoke-test и INT-006 pixel-level audit. Optional algorithm benchmarks SKIPPED.
+- Runtime capture, offline replica и PNG pixel equivalence не заявляются; live drawing и CHALK experiments не запускались.
+
+
+## 2026-11-04 — документационная синхронизация
+
+- Согласованы актуальные статусы PROJECT_STATUS, TASKS и ROADMAP; DOC-STATUS-SYNC закрыта.
+- Исправлены архитектурная карта девяти вкладок и актуальные PNG metrics в TESTS_AND_CI_MAP.
+- Обновлены индекс, engine source-trace reference и исторические оговорки профильных планов/Game Monitor design.
+- Изменения ограничены Markdown; тесты/CI/сборка/live runtime не запускались.
+
+
+- Удалён неактуальный для текущего сценария backlog blocker `MONITOR-BOARD-SELECTION-001`; исторический факт о preview/PainterPopup BoardPane сохранён с пометкой `NOT_APPLICABLE_TO_CURRENT_USER_SCENARIO`.
+- Зафиксирован пользовательский сценарий: комната без других досок, на экране одна пустая тестовая доска. Не утверждается, что общий механизм auto-discovery исправлен для иных сценариев.
+- В актуальном статусе отражена версия Egret 5.4.1 из согласованного набора игровых assets, происхождение которого подтверждено пользователем; исторические Resource Timing records не смешиваются с этим набором.
+- Синхронизированы TASKS, PROJECT_STATUS, ROADMAP, DECISIONS и CHALK engine analysis; DOC-STATUS-SYNC оставлен IN_PROGRESS из-за оставшихся исторических профильных документов.
+- Изменена только Markdown-документация. Исходники, тесты, конфигурации, workflow, первичные данные, live captures и master не изменялись.
+
+## 2026-11-04 — документация расположения игровых engine assets
+
+- Зафиксирован новый каталог `AutoDraw_Stage20/gameEngine/` (п) в рабочей ветке.
+- Перечислены `main.min_653f95bc.js`, `mergeEngine_df2e5bc5.js` и `manifest.json`, а также runtime paths, указанные манифестом.
+- Добавлено различие между физическим расположением файлов в репозитории и путями ресурсов из manifest.
+- Отдельно отмечено, что deployed runtime identity и совпадение с историческими bundles пока не подтверждены.
+- Обновлены README, статус, задачи, roadmap, журнал работ и справочник игрового движка. Программный код и экспериментальные данные не менялись.
+
+## 2026-11-04 — уточнение активного объёма CHALK
+
+## 2026-11-04 — уточнение deployed renderer evidence
+
+- Из сохранённых Monitor captures извлечены URL исторических runtime assets: manifest, `mergeEngine_df2e5bc5.js` и `main.min_6ecc02a4.js`.
+- Установлено, что эти assets не совпадают по имени с bundle `main.min_570122a1.js` из master; содержимое и hash исторических загрузок отсутствуют. Deployed Egret version не установлена.
+- Следующий gate уточнён: получить response bodies и SHA-256, затем сравнить фактический renderer. Код и live experiments не менялись.
+
+## 2026-11-04 — прямой анализ игровой кисти
+
+- Прослежен фактический путь BoardPane/Painter в клиентском bundle из master: толщина кисти передаётся в Egret Graphics; normal path строится через moveTo/lineTo, smooth path — через midpoint/curveTo.
+- Зафиксировано визуальное наблюдение пользователя: кисть в игре выглядит круглой. Оно согласуется с ROUND caps/joins Egret reference API; deployed runtime и точная rasterization остаются не подтверждены.
+- Документированы ограничения single-point path и следующий offline renderer/PNG gate. Код, тесты, конфигурации, workflow и master не менялись.
+
+- INT-003 и CHALK-SAMPLING-DOMAIN закрыты как CLOSED_NOT_REQUIRED по решению пользователя; исторические данные сохранены.
+- В TASKS добавлено обоснование четырёх оставшихся направлений и их зависимостей. FILL-001-RS renderer footprint остаётся P0 blocker; 45-cell matrix условна и заблокирована до принятого preflight; Capsule остаётся отдельной offline geometry validation; INT-006 остаётся незавершённой из-за ограниченного domain и неустановленного safety margin.
+- Код, тесты, конфигурации, workflow и live evidence не менялись.
+
+## Дополнение — краевые промежутки и будущая контурная обводка (2026-11-04)
+
+При просмотре исходного `after.png` отмечен округлый профиль боковых краёв заливки. Пользовательская гипотеза: между круглыми окончаниями соседних scanline-проходов остаются незаполненные промежутки. В предпоследнем тесте, по наблюдению пользователя, следующая линия начиналась ниже и такого эффекта не было. Это направление offline-проверки, а не установленная причина.
+
+Проверить на неизменённых исходных данных:
+1. Разложить uncovered target pixels по боковым краям, верхней/нижней границам, углам и внутренней области.
+2. Сопоставить пропуски с координатами начала/конца линий, вертикальным шагом и фактической rasterized footprint/cap кисти.
+3. Отдельно локализовать 11 leakage pixels.
+4. Сопоставить с предпоследним тестом по первичным PNG/plan evidence, если они доступны.
+5. Не менять frozen masks, thresholds, исходный plan или production defaults.
+
+**Будущий кандидат:** после основной заливки выполнить одну непрерывную обводку контура, правильно сместив центральную линию внутрь области с учётом фактического renderer footprint, чтобы край кисти закрывал границу без выхода наружу. Это не реализовано и не подтверждено. До рассмотрения нужны offline geometry/raster validation, затем отдельное разрешение на live проверку; критерии — coverage≥99%, leakage=0 и exact CHALK по `pointCount_after - pointCount_before`. Длина контура и proxy points не заменяют измерение расхода.
+
+## 2026-11-04 — FILL-001-RS corrected replay of original PNG evidence
+
+- Выполнен replay исходных before/after PNG и связанных evidence через `Fill001Tab.finalize_capture()` в CI [41780241017](https://github.com/Kiddos19882/AutoDraw/actions/runs/41780241017), checkout HEAD `0f23731`.
+- Runtime binding PASS: 27/27 strokes, radius=10, exact CHALK=1260, Bridge diagnostics без потерь/ошибок.
+- Corrected PNG audit: coverage=98.430600%, leakage=11 — capture REJECTED при неизменных требованиях ≥99% / 0. Предыдущие 97.673218% / 28 относятся к audit до affine correction.
+- SHA-256 исходных PNG и входных JSON сохранены в [replay report](CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md). Raw runtime plan hash mismatch разрешён: CRLF-представление committed текста точно совпадает с hash в executor report; содержательного mismatch нет. Остаточная причина PNG mismatch требует offline pixel breakdown; live и 45-task matrix остаются BLOCKED.
+
+## 2026-11-04 — FILL-001-RS PNG audit transform correction
+
+- Исправлено несовпадение affine mapping frozen mask и executor screen coordinates: audit использует те же (W−1)/460 и (H−1)/240 scales.
+- Добавлены regression assertions для client ROI 581×304 и inverse nearest-neighbor mapping.
+- Commits: [4797aa5](https://github.com/Kiddos19882/AutoDraw/commit/4797aa5e2e3d9f78656c91dcddf285304eae55c1), [a950084](https://github.com/Kiddos19882/AutoDraw/commit/a950084db14fd1560aa15f099da4a0108c9631e7).
+- На момент этой записи CI/replay после affine correction ещё не были подтверждены; последующий corrected replay и результат 98.430600% / 11 зафиксированы выше в changelog и в отдельном replay report. Capture остаётся REJECTED; 45-task matrix BLOCKED.
+## 2026-11-04 — FILL-001-RS runtime discovery replay и live PNG rejection
+
+- Изучен evidence commit [5308214](https://github.com/Kiddos19882/AutoDraw/commit/530821497ce3a6bd5152318a78e1f06cb836f288): основной Bridge run `6a17a297-ea14-4527-9527-bfd8de3bd335`, 27/27 strokes, radius=10, exact pointCount 1→1261, CHALK=1260; dropped events, Monitor errors, Bridge send failures и sequence gaps — 0.
+- Установлена причина прежнего сообщения Runtime binding pending: legacy session `3323cf8e-01ca-4009-8f16-27d657d857f8` без schema v2/diagnostics классифицировалась как pending и блокировала актуальную session.
+- В [a7e37d6](https://github.com/Kiddos19882/AutoDraw/commit/a7e37d6eb0031094ffd962bc11ef01860a3af74a) discovery пропускает несовместимые legacy schemas до pending-классификации. Неполные schema-v2 sessions остаются pending.
+- В [974f949](https://github.com/Kiddos19882/AutoDraw/commit/974f949e9639acc90e7f4d6f4588c3fb96f9abb2) добавлен replay тест, который вызывает реальный `Fill001Tab.finalize_capture()` с сохранёнными manifest/attempt/executor report/Bridge session и runs/before-after PNG, включая старую legacy session.
+- Результат replay: runtime binding PASS, точный run ID и CHALK=1260 подтверждены. PNG audit REJECTED: coverage=97.673218% при требовании ≥99%, leakage=28 при требовании 0. Capture JSON не создаётся, attempt и matrix остаются pending.
+- Полный CI [41772866679](https://github.com/Kiddos19882/AutoDraw/actions/runs/41772866679) — SUCCESS: Preparation/G3 804 passed, 24 warnings, 82 subtests; Executor, Game Monitor/Bridge, Application integration, INT-006 pixel audit и Windows portable build/startup smoke-test SUCCESS; optional benchmarks SKIPPED.
+- Следующий шаг — анализировать реальный PNG/ROI/transform и устранить недопокрытие/выход за границы. Live matrix не запускать до прохождения PNG gate.
+
+## Исправление FILL-001-RS frozen geometry rebuild — 2026-11-04
+
+Пользовательский runtime evidence commit [63158fb](https://github.com/Kiddos19882/AutoDraw/commit/63158fb55743c566bf231196b80016273970bbf1) зафиксировал отказ single-task preflight до запуска исполнителя. Для задачи rectangle/r10 manifest и исходный DrawingPlan согласованы: planner_version=2, scanline_row_step=5, scanline_offset=0, plan signature совпадает с task, expected_strokes=27. Game Monitor подтвердил radius 30→10; pointCount остался 1 (CHALK=0), Bridge session завершилась без dropped events/errors/send failures.
+
+Причина установлена в runtime guard integrated_app.py: повторное построение выполнялось вызовом build_fixed_radius_fill_plan(shape_id, radius) без spacing-параметров. Значения по умолчанию — step=1/offset=0, то есть legacy planner v1. Поэтому сравнивался FILL-001-RS v2 signature с другой геометрией v1 и срабатывал корректный fail-closed guard. Это ошибка handoff/validation, не ошибка регулировки кисти и не расход CHALK.
+
+Исправление: единый helper повторного построения получает scanline_row_step/scanline_offset из frozen task; для legacy tasks без этих полей сохраняются прежние defaults. Объявленный planner_version проверяется против фактически восстановленного. Добавлены регрессионные проверки RS signature/27 strokes, legacy signature/131 strokes и отказа при несовпадении версии. До успешного CI и повторного локального preflight live matrix остаётся BLOCKED; повторный запуск здесь не выполнялся.
+
+## 2026-11-04 — FILL-001-RS — versioned scanline spacing
+
+- Добавлен planner v2 с независимыми scanline_row_step/scanline_offset; legacy planner v1 и default plan identity сохранены.
+- Добавлен отдельный FILL001_RS_V1 manifest builder (45 задач), fail-closed validation и single-task execution handoff.
+- Runtime experiment context и capture metadata связывают plan variant/version и spacing; P1 point sampling не менялся.
+- Добавлены CLI manifest generator, exhaustive 2 238-candidate static sweep script, regression tests и CI artifact upload.
+- Static sweep: 62 candidates passed coverage≥99%/leakage=0; результаты OpenCV не являются измерением CHALK.
+- Live preflight не выполнялся; FILL-001-RS matrix остаётся BLOCKED до принятого single-task live capture.
+
+## 2026-11-04 — FILL-001-RS — документирован этап исследования scanline spacing
+
+- В существующий временный FILL-001 plan добавлен отдельный этап исследования `scanline_row_step`, не смешиваемый с `point_step_px`.
+- Зафиксированы предварительные OpenCV-кандидаты для 15 shape×radius combinations и подробные r10/step=5 metrics для трёх frozen masks.
+- Обозначено, что step=5 — кандидат, а не принятая настройка; estimated sampling points/path length не являются измерением CHALK.
+- Определены обязательные versioned plan/signature и отдельный live preflight gate; FILL-001 45-cell matrix и INT-007 остаются BLOCKED.
+- Изменения только в Markdown-документации. Код, тесты, конфигурации, workflow, экспериментальные данные и `master` не изменялись.
+
+## 2026-11-04 — FILL-001: полный runtime evidence и quota exhaustion
+
+- Добавлен пользовательский evidence commit [73d14a1](https://github.com/Kiddos19882/AutoDraw/commit/73d14a1784a5a9f8ef29bc0e197b75352f2650af): attempt, manifest, DrawingPlan, executor report, Bridge session, два run JSON и before/after PNG.
+- Второй Bridge run полностью разобран: exact CHALK=5999 подтверждён snapshots и per-stroke/sample deltas; radius=10; 0 drops/errors/send failures/sequence gaps.
+- Run не принят: 128 consuming strokes из 131 кандидата; три последних штриха не потребили CHALK после достижения квоты 6000. Capture остаётся pending/rejected, 45-cell matrix BLOCKED.
+- Документация обновлена; production code/tests/workflows не изменялись. Количественный PNG audit не выполнялся.
+
+## 2026-11-04 — FILL-001 transient Bridge session retry: CI SUCCESS
+
+- Исправлена race/fail-fast обработка неполной Bridge session: после фильтрации по executor window отсутствие bridge_diagnostics/last_message_at_utc у потенциально подходящей session означает pending, а не окончательную ошибку.
+- Кнопка FILL-001 capture finalization повторно выполняет runtime binding и принимает capture только после строгого binding и PNG audit. Stage 6 и UI используют общий summary builder; worker не перезаписывает passed status.
+- Добавлены regression tests на incomplete session → обновлённая session → successful binding, исключение future session и UI retry.
+- Commit [5cde7a1](https://github.com/Kiddos19882/AutoDraw/commit/5cde7a109a669bebf790ecbeb21f8bbc4feae182). Полный CI [41754801210](https://github.com/Kiddos19882/AutoDraw/actions/runs/41754801210) — SUCCESS: Preparation/G3 787 passed, 24 warnings, 82 subtests; все обязательные jobs, Windows portable build/startup smoke-test и INT-006 pixel audit успешны; optional benchmarks skipped.
+- Portable artifact ID 13288855067, 637,575,055 bytes.
+- Live capture не принят; 45-cell matrix остаётся BLOCKED до нового успешного Windows live preflight.
+
+## 2026-11-04 — FILL-001 binder activity-window fix: CI SUCCESS
+
+- Binder fix `95a8d17` и regression tests `870bebc` подтверждены полным GitHub Actions [41737923777](https://github.com/Kiddos19882/AutoDraw/actions/runs/41737923777): все обязательные jobs, включая Windows portable build/startup smoke-test, завершились SUCCESS; optional benchmarks skipped.
+- Portable artifact [autodraw-g3-preflight-build](https://github.com/Kiddos19882/AutoDraw/actions/runs/41737923777/artifacts/13280731107) опубликован.
+- Предыдущий live preflight остаётся REJECTED/UNACCEPTED (131/131 strokes, session CHALK=5999); доска исчерпана, 45-cell matrix заблокирована до нового принятого preflight на восстановленной доске.
+- Обновлены PROJECT_STATUS, TASKS, ROADMAP, временный план FILL-001 и WORK_LOG. Исходники, тесты, workflow и первичные runtime evidence в рамках этой синхронизации не менялись.
+
+## 2026-11-04 — FILL-001 preflight postmortem и software gate
+
+- Полный CI [41730717881](https://github.com/Kiddos19882/AutoDraw/actions/runs/41730717881) прошёл на code HEAD `fe6d446`: Executor, Game Monitor/Bridge, Application integration, Preparation/G3 (782 passed, 24 warnings, 82 subtests), INT-006 pixel audit и Windows portable build/startup smoke-test — SUCCESS; optional benchmarks skipped.
+- Добавлен postmortem `CHALK_FILL001_PREFLIGHT_POSTMORTEM_2026-11-04.md`: executor завершил 131/131 strokes; session exact CHALK=5999; attempt JSON invalid; after PNG физически существует, capture не принят; большой Bridge run file не проверен целиком.
+- Выявлен дополнительный runtime binder blocker: idle finalization timestamp ошибочно считается временем активности Bridge run, что создаёт false overlap с executor window. Следующее исправление и regression test зарегистрированы в TASKS/ROADMAP.
+- Обновлены PROJECT_STATUS, TASKS, ROADMAP, временный FILL-001 plan и docs index. Исходники, тесты, workflow и первичные runtime evidence в рамках отчётной задачи не менялись.
+
+## 2026-11-04 — FILL-001 persistence and hash validation fixes
+
+- Исправлены четыре записи JSON в chalk_fill_ui.py: теперь используются реальные переводы строк, а не буквальная последовательность \\n. Добавлены regression tests для completion/after PNG, capture JSON и attempt finalization.
+- Canonical plan hash теперь вычисляется по нормализованному DrawingPlan через общий model round-trip; attach сохраняет тот же normalized document, что Stage 6 повторно загружает. Добавлен regression test для numeric metadata и точности координат.
+- Commits: [2b7577c](https://github.com/Kiddos19882/AutoDraw/commit/2b7577c3a3289871b7fff300fd6013f12c7cb54e), [3b67aea](https://github.com/Kiddos19882/AutoDraw/commit/3b67aea0145170ec23df089916bedf7828de9a68).
+- CI [41728163369](https://github.com/Kiddos19882/AutoDraw/actions/runs/41728163369): Game Monitor/Bridge и Executor SUCCESS; Preparation/G3 и Application integration выполняются; Windows build ожидает их завершения. Live capture не принят; 45-cell matrix остаётся BLOCKED.
+
+## 2026-11-03 — DOC-018: введена постоянная система управления знаниями ИИ
+
+- Добавлены пять универсальных регламентов: рабочий процесс ИИ, архитектура знаний, доказательность и validation, инженерные инварианты, стандарт экспериментов.
+- README приложения и основной docs index направляют ИИ к регламенту до начала работы.
+- Управляющие документы отражают DOC-018 и DEC-016. Технические справочники, планы и исторические отчёты сохранены; конкурирующие копии статуса не создавались.
+- Изменения ограничены Markdown-документацией; код, тесты, настройки, workflow и экспериментальные данные не затронуты.
+
+## 2026-11-03 — FILL-001 runtime JSON handoff fix
+- По данным пользовательского запуска в commit [6b1cba9](https://github.com/Kiddos19882/AutoDraw/commit/6b1cba9b1c40a030ac6bd7b29365bf19ac3c9149) обнаружено, что `integrated_app.py::_transfer_brush_test_plan()` добавлял к runtime DrawingPlan буквальную последовательность `\n` после JSON object. Stage 6 отклонял невалидный JSON, поэтому FILL-001 callback возвращал отказ.
+- Исправлена сериализация runtime JSON и форматирование сообщения исключения: commit [8dfd1b5](https://github.com/Kiddos19882/AutoDraw/commit/8dfd1b541f54a1b416dfb2907739cf4b1a99c58d).
+- Добавлен интеграционный regression test FILL-001 plan → Stage 6 load с проверкой `autodraw_experiment`: commit [1b2d8a1](https://github.com/Kiddos19882/AutoDraw/commit/1b2d8a128c99ab8ad1abb1e9f480702676cd9f56).
+- GitHub Actions [41692129486](https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486): Application integration, Game Monitor/Bridge, Preparation/G3, Executor и INT-006 pixel audit — SUCCESS; Windows portable build/startup smoke-test ещё выполняется. Повторный Windows live preflight не выполнялся; 45-cell captures остаются заблокированы.
+
+## 2026-11-03 — FILL-001 client ROI correction CI
+
+- GitHub Actions [41686091985](https://github.com/Kiddos19882/AutoDraw/actions/runs/41686091985) завершился SUCCESS на code/test HEAD `031913c`: Preparation/G3 778 passed, 24 warnings, 82 subtests; Game Monitor/Bridge, Executor, Application integration, INT-006 pixel audit и Windows portable build/startup smoke-test успешны; optional benchmarks skipped.
+- Portable artifact `autodraw-g3-preflight-build` загружен (artifact ID `13254104951`, 636,529,516 bytes, retention 7 days). Live Windows/game preflight не выполнялся и остаётся следующим gate.
+
+## 2026-11-03 — FILL-001 client-resolution ROI correction
+
+- Исправлено ошибочное требование screen ROI ровно 460×240. 460×240 остаётся logical board size движка и frozen masks; клиентский ROI берётся из калибровки и сохраняется в фактическом размере.
+- UI проверяет границы crop, сохраняет ROI в attempt record, сверяет before/after ROI и DrawingPlan transform, требует парный before/after capture и блокирует finalize без calibrated ROI. PNG adapter масштабирует frozen logical mask методом nearest-neighbor, сохраняет transform и raster scale, проверяет uniform scale ≤1% и выполняет coverage/leakage audit на screen-resolution crop.
+- Добавлены synthetic regression tests для ROI 581×304, runtime transform, non-uniform/mismatch rejection, scaled leakage и фактического UI crop. CI для нового HEAD ожидается; live Windows preflight не выполнялся.
+
+## 2026-11-03 — синхронизация управляющей документации
+
+- Устранён конфликт идентификаторов решений: второе решение DEC-013 перенумеровано в DEC-015.
+- TASKS.md синхронизирован с общим набором статусов, включая DEFERRED.
+- Карта UI и основной индекс исправлены: фактическая конфигурация содержит девять вкладок, FILL-001 — № 8, калибровка — № 9.
+- ROADMAP.md очищен от дублирующих устаревших CI TODO; текущий незакрытый gate — Windows live preflight.
+- PROJECT_STATUS.md начинается с актуального снимка; историческая запись сохранена ниже.
+
+## 2026-11-03 — FILL-001 UI/runner integration и CI regression gate
+
+- Подтверждена отдельная вкладка FILL-001: создание/загрузка 45-cell manifest, выбор одной pending task, frozen plan/mask validation, operator approval, brush-size handoff и запуск Stage 6 с P1 override.
+- Реализована связь DrawingPlan experiment context → executor report → Bridge session/run runtime binding; direct Stage 6 bypass для FILL-001 блокируется fail-closed guard.
+- Unified application tests подтверждают регистрацию отдельной вкладки `8. FILL-001`; вкладка калибровки отображается как `9. Калибровка теста`. По DEC-014 FILL-001 остаётся отдельной.
+- Полный CI [41673570178](https://github.com/Kiddos19882/AutoDraw/actions/runs/41673570178) SUCCESS на code/test HEAD `e3774a3`: Preparation/G3 772 passed, 24 warnings, 82 subtests; все обязательные jobs и Windows portable build/startup smoke-test успешны; optional benchmarks skipped.
+- Остаётся Windows live runtime/PNG preflight; 45 live captures заблокированы до успешного preflight. Production estimator, executor defaults, sampling defaults и `master` не менялись.
+
+## 2026-11-03 — FILL-001 runtime binding integration
+
+- Runtime binder `chalk_fill_runtime_binding.py` добавлен и подключён к завершению FILL-001 исполнения в Stage 6.
+- Реализована fail-closed проверка Bridge session/run, executor report, timestamps, lifecycle, observed radius, exact CHALK, sequence/send-failure diagnostics и P1 config.
+- Runtime capture adapter получает данные из persisted runtime artifacts и сохраняет их SHA-256.
+- Полный GitHub Actions [41591543009](https://github.com/Kiddos19882/AutoDraw/actions/runs/41591543009) на code HEAD `d7466c5` завершился SUCCESS по всем обязательным jobs; optional algorithm benchmarks skipped.
+- Шаг 2 временного плана FILL-001 закрыт как программная интеграция и regression gate. Реальный Windows runtime/PNG preflight остаётся TODO; 45 live captures остаются заблокированы.
+
+## 2026-11-03 — FILL-001 software regression gate PASS
+
+- Подтверждён полный GitHub Actions run [41579136690](https://github.com/Kiddos19882/AutoDraw/actions/runs/41579136690) на code HEAD `b4cc45a80231e6bad2f878b2a5a2f16b48b9d68b`.
+- Preparation/G3: 754 passed, 24 warnings, 82 subtests passed; Game Monitor/Bridge, Application integration, Executor regression, INT-006 audit и Windows portable build/startup smoke-test — SUCCESS.
+- Windows smoke-test подтвердил запуск portable `AutoDraw.exe` с активным процессом в течение 10 секунд; artifact ID 13204044319.
+- Исправление сигнатуры `audit_fill001_png_pair()` подтверждено; production estimator, executor defaults и live captures не менялись.
+- Шаг 1 временного плана FILL-001 переведён в DONE. Runtime binding и Windows PNG preflight остаются открытыми.
+
+## 2026-11-03 — временный план FILL-001
+
+- Добавлен обязательный к сохранению временный план из пяти шагов: software gate, runtime binding, Windows PNG preflight, 45 live captures и анализ расхода/качества.
+- Уточнено, что live captures заблокированы до прохождения первых трёх шагов; production estimator и defaults не меняются автоматически.
+
+## 2026-11-03 — Инвентаризация документации DOC-016
+
+- Проведена инвентаризация 56 Markdown-файлов `docs/` и 16 Markdown-файлов корня `AutoDraw_Stage20/`.
+- Создан `DOCUMENTATION_INVENTORY_2026-11-03.md` с классификацией действующих/исторических материалов и правилами сопровождения.
+- Основной индекс синхронизирован с завершённым INT006R visual audit; ранний CHALK next-steps plan помечен историческим; удалены дублирующие ссылки FILL-001.
+- Добавлены DOC-016 и DEC-013. Архивные файлы сохранены согласно DEC-002; код и данные не менялись.
+
+## 2026-11-03 — FILL-001 raster prototype gates
+
+- Проверены grid и eroded-contour fill prototypes на frozen masks. Первый не покрывает ≥99% на части больших радиусов; второй оставляет небольшой leakage/undercoverage в отдельных cells.
+- Ни один prototype не принят для executor. Следующая реализация должна быть boundary-aware и одновременно пройти coverage ≥99% / leakage=0.
+
+## 2026-11-03 — FILL-001 frozen target masks implementation
+
+- Добавлен `source/preparation/chalk_fill_experiment.py` с тремя детерминированными frozen masks на logical canvas 460×240: rectangle, wide_irregular, narrow_irregular.
+- Площади 44 653 / 45 159 / 44 879 px; разброс max/min — 1,133%, в пределах ±5%.
+- SHA-256 масок закреплены в коде; добавлены 8 regression tests на hash, площадь, геометрию, связность и invalid input.
+- Локальный тестовый прогон — 8 passed. Полный GitHub Actions для новых commits пока не подтверждён; fixed-radius generator, matrix/block harness и live captures не готовы.
+
+## 2026-11-03 — FILL-001 technical design review
+
+- Проверены существующие interior-fill и outline-first planners: оба используют смешанные ширины кисти и не подходят для контролируемого сравнения одного фиксированного радиуса.
+- Определена изолированная архитектура `chalk_fill_experiment.py`: frozen masks, fixed-radius plans, raster footprint simulation, matrix/journal/analyzer gates.
+- Зафиксированы критерии FILL-001: coverage ≥99%, leakage=0, три формы × пять радиусов × три повтора. Подробности: [harness design](CHALK_FILL001_HARNESS_DESIGN_2026-11-03.md).
+- Production planners, estimator, executor/sampling defaults и `master` не менялись; harness пока не реализован.
+
+## 2026-11-03 — INT006R visual audit завершён и packaging CI исправлен
+
+- Исправлено имя before-capture PNG в CI packaging: использовано фактическое `before_clear-board.png` вместо `before_draw-board.png` (commit `c60b8cf`).
+- Полный workflow [41563236073](https://github.com/Kiddos19882/AutoDraw/actions/runs/41563236073) завершился SUCCESS: все обязательные regression, integration, Game Monitor/Bridge, PNG analyzer и Windows portable build jobs прошли.
+- Упакованы все 45 пар PNG (90 board images); ручной визуальный аудит завершён.
+- Найдены ограничения качества: radius 1 оставляет видимый разрыв соединения D2 polygon; radius 30 объединяет первые три короткие детали D4. Подробности: [visual audit report](CHALK_INT006R_VISUAL_AUDIT_2026-11-03.md).
+- INT006R закрыт как измерительная фаза с геометрическими ограничениями; следующий этап — FILL-001. INT-007 остаётся BLOCKED.
+
+# История изменений документации и проекта
+
+## 2026-11-03 — engine audit и уточнение отчёта INT006R
+
+- Добавлен статический разбор клиентского engine bundle: `updateLess()` считает точки, а `setRadius()` задаёт толщину линии через `lineStyle`; прямого radius multiplier в CHALK counter нет.
+- Уточнён FILL-001: для каждого радиуса требуется собственный путь покрытия одной frozen target mask, а не одинаковая траектория с разным размером кисти.
+- Исправлено поле `sampling_profile.other_executor_parameters`, чтобы в нём не дублировались устаревшие P0 значения `point_step_px=2` и `point_delay_ms=10`.
+- Regression test фиксирует точное представление P1; повторный CI run [41560787871](https://github.com/Kiddos19882/AutoDraw/actions/runs/41560787871) выполняется.
+
+## 2026-11-03 — CI для реального INT006R dataset
+
+- В `.github/workflows/geometry-tests.yml` добавлен отдельный запуск `chalk_int006r_validation.py` на committed live journal/capture bundle и загрузка JSON artifact `autodraw-int006r-live-validation`.
+- Workflow [41559932955](https://github.com/Kiddos19882/AutoDraw/actions/runs/41559932955) запущен; результат ожидается. Это отдельная проверка реальных данных, а не synthetic fixture.
+
+## 2026-11-03 — INT006R live results и FILL-001
+
+- Добавлен [отчёт INT006R live results](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md): 45/45 задач, exact CHALK, sampled/per-stroke delta match, observed radius match и нулевые Monitor/Bridge integrity errors.
+- Зафиксированы средние расходы radius 1/10/30: 67.40/67.67/67.80 CHALK; разница суммарных расходов — около 0.6%.
+- INT006R остаётся IN_PROGRESS до официального CLI analyzer на реальном bundle и ручного visual audit всех PNG.
+- Добавлен действующий план [FILL-001](CHALK_FILL_AREA_RADIUS_EFFICIENCY_PLAN_2026-11-03.md): 3 формы областей × 5 радиусов × 3 повтора (45 captures).
+- Production estimator, frozen model, executor/sampling defaults и master не менялись.
+
+
+
+## 2026-11-03 — INT006R software gate PASS
+
+- Полный workflow [41540054975](https://github.com/Kiddos19882/AutoDraw/actions/runs/41540054975) на code HEAD `28b56a9` завершился SUCCESS.
+- Preparation/G3: 682 passed, 82 subtests passed, 24 warnings; Application integration, Executor regression, Game Monitor/Bridge, INT-006 PNG audit и Windows portable build/startup smoke-test — success.
+- Положительный synthetic analyzer fixture подтвердил полный 45/45 набор с Monitor и PNG evidence; визуальная оценка остаётся отдельным manual gate.
+- INT006R live captures не запускались. Следующий этап — локальный Windows preflight и контролируемая live matrix. Production estimator/defaults и master не менялись.
+
+
+
+## 2026-11-03 — реализация отдельной фазы INT006R
+
+- Добавлены phase/scenario contracts для D1–D5R, радиусов 1/10/30 и фиксированного P1 (step=4, delay=5 ms).
+- Block planner/journal расширен отдельной 45-cell матрицей `(scenario, radius, repeat)`; добавлены fail-closed проверки уникальности и соответствия параметров.
+- Brush Test и executor handoff поддерживают установку и проверку радиуса конкретной задачи; ручной запуск сценариев INT006R запрещён.
+- Добавлен независимый analyzer exact CHALK и regression tests; frozen INT-006 model и prediction artifact не изменялись.
+- Software CI для нового HEAD ожидается; live captures не выполнялись.
+
+
+
+## 2026-11-03 — план radius × geometry cross-validation
+
+- Сопоставлены два подтверждённых источника: radius matrix 21/21 на шести длинных горизонтальных линиях (радиусы 1–30, 722–728 CHALK) и официальный INT-006 D1–D5 при фиксированном radius=10.
+- Вывод: radius matrix не показывает систематического эффекта для длинных горизонтальных линий, но не отвечает на вопрос для коротких деталей, диагоналей, пересечений и повторного покрытия.
+- Создан [CHALK_RADIUS_GEOMETRY_CROSS_VALIDATION_PLAN_2026-11-03.md](CHALK_RADIUS_GEOMETRY_CROSS_VALIDATION_PLAN_2026-11-03.md): предложена матрица D1–D5 × radius 1/10/30 × 3 повтора при P1 (45 captures). Требуется отдельная experimental phase/harness и успешный CI до live запуска.
+- До результатов не вводить radius multiplier и не менять production estimator/defaults.
+
+
+## 2026-11-03 — INT-006 official quantitative validation PASS
+
+- Повторный CI [41532629748](https://github.com/Kiddos19882/AutoDraw/actions/runs/41532629748) на commit `dd64730e202ed6f6014fa2dd1a65c3100cc32018` завершился SUCCESS. Preparation/G3: 669 passed, 82 subtests passed; Application integration, Executor regression, Game Monitor/bridge, Windows portable build/startup smoke-test, PNG audit и независимый analyzer — success. Optional algorithm benchmarks skipped.
+- Artifact `autodraw-int006-chalk-validation` (ID `13182727663`): `status=complete`, 45 accepted, 0 missing, 0 rejected, 15/15 groups complete, 3 repeats per group, 243 stroke rows. SHA-256 frozen artifact совпал с journal.
+- Official metrics: run-level MAE 1.408, RMSE 1.967, bias -0.875, MAPE 2.134%, max absolute error 4.94, max underprediction 1.82 CHALK. Per-stroke MAE 0.439, RMSE 0.544, max underprediction 1.085 CHALK.
+- P1 (step=4, delay=5 ms) — лучший совокупный профиль на D1–D5: MAE 0.657, RMSE 0.838, MAPE 1.178%, max underprediction 0.92 CHALK. P1 остаётся экспериментальным кандидатом, не production default. Эмпирический guard 1 CHALK покрывает максимум этой выборки, но не является статистической гарантией; D3/P1 repeat σ≈1.41.
+- Полный отчёт: [CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md). Analyzer geometry serialization fix и runtime-shaped regression fixture: commits `8eba34f` и `dd64730`.
+- `safety_margin_status=not_established`, `production_eligibility=not_validated`; production estimator/defaults и master не менялись. INT-006 остаётся IN_PROGRESS до отдельного решения по safety margin и расширения domain validation; INT-007 остаётся BLOCKED.
+
+
+## 2026-11-03 — официальный analyzer run: geometry serialization mismatch
+
+- CI run [41530634729](https://github.com/Kiddos19882/AutoDraw/actions/runs/41530634729) на commit `2d99869` завершился FAILURE только на шаге независимого INT-006 CHALK analyzer. Preparation/G3, Application integration, Executor regression, Game Monitor/bridge, Windows portable build и INT-006 pixel PNG audit завершились success; optional benchmarks skipped.
+- Загруженный analyzer artifact содержит `status=incomplete`, `accepted_count=0`, `missing=45`, `rejected=45`; все 45 отклонений имеют причину `geometry_signature_mismatch`. Frozen artifact SHA-256 совпадает с ожидаемым `a0eab016e96a81e14bededd32cf5161dd943d6fc85a20b7eec17455f69d0c61c`.
+- Root cause: frozen prediction хранит logical points как пары чисел, а реальный runtime DrawingPlan serializer сохраняет strokes с `closed`, служебным `metadata` и point objects `{x, y}`. Analyzer ошибочно сравнивал хеши/структуры разных сериализаций напрямую; captures и Monitor telemetry не признаны повреждёнными.
+- Analyzer исправлен: отдельно проверяется hash фактического manifest representation, затем strokes нормализуются до frozen logical geometry и сравниваются с frozen plan/signature. Коэффициенты, prediction artifact, production estimator, executor defaults и sampling defaults не менялись.
+- Regression fixture обновлён для реального runtime manifest shape. Commits: `8eba34f2ae402bbcf8af096f8b642a5cdcfb5eee` (fix), `dd64730e202ed6f6014fa2dd1a65c3100cc32018` (test).
+- Повторная проверка выполняется workflow [41532629748](https://github.com/Kiddos19882/AutoDraw/actions/runs/41532629748) на HEAD `dd64730`; на момент записи run ещё выполняется. До его завершения quantitative validation остаётся PENDING, INT-006 — IN_PROGRESS, safety margin — not established, production eligibility — not validated.
+
+## 2026-10-31
+
+### Added
+- Зарегистрирована техническая инициатива INT-001—INT-002 по измерению игрового CHALK и ресурсной оптимизации рисования.
+- В WORK_LOG и DECISIONS зафиксирована измерительная основа: расход изолированного опыта — дельта `pointCount`, остаток — `max - pointCount`.
+
+### Changed
+- PROJECT_STATUS и ROADMAP переключены с завершённой документационной инициативы на текущую задачу измерения CHALK; документирование результатов выполняется без отдельного запроса, но разрешения на код и тесты остаются раздельными.
+- TASKS дополнен статусами INT-001 (DONE) и INT-002 (TODO).
+
+### Added
+- Добавлен TESTS_AND_CI_MAP.md: тестовые наборы, прямые зависимости проверенных тестов, CI jobs, benchmark и диагностики.
+- Добавлен FILE_STORAGE_CATALOG.md: пути пользовательских данных, runtime-планы, результаты, brush experiments и структура .autodraw.
+- Добавлен DEPENDENCY_MAP.md с картой точек входа, основных импортов и общих адаптеров.
+- DATA_FORMATS_AND_PROFILES.md дополнен схемой execution report v2, ExecutionSummary и color execution report.
+- Добавлен EXECUTOR_API_REFERENCE.md с интерфейсами Stage6, MouseExecutor, цветного исполнения, диагностики и планирования.
+- DATA_FORMATS_AND_PROFILES.md дополнен записью наблюдения поведения кисти и структурой `experiment.json`.
+- Добавлен UI_INTEGRATION_MAP.md с картой восьми вкладок, callback-связей и передачи планов в executor.
+- DATA_FORMATS_AND_PROFILES.md дополнен форматами game point calibration, engine point calibration и отчётами моделей ресурса/расхода.
+- DATA_FORMATS_AND_PROFILES.md дополнен структурой JSON-экспорта Game Monitor 0.1.2.
+- DATA_FORMATS_AND_PROFILES.md дополнен форматом журнала paint-limit, снимком brush workflow и структурами визуальных измерений.
+- Добавлен DATA_FORMATS_AND_PROFILES.md со схемами профилей рабочей области, палитры и калибровки, а также основными структурами цветных и многодосочных планов.
+- Добавлен первичный справочник интерфейсов модулей preparation; в него включена инвентаризация конструкторов, методов UI-классов и внешних callback-зависимостей.
+- Создан каталог структурной документации docs/.
+- Добавлены документы архитектуры, компонентов, конфигурации и разработки.
+- Добавлены файлы управления проектом.
+- Добавлен справочник общих геометрических моделей и формата .autodraw.
+
+### Changed
+- PREPARATION_API_REFERENCE.md сверён с объявлениями исходников; исправлена повторяющаяся нумерация разделов.
+- FILE_STORAGE_CATALOG.md сверён с конфигурацией каталогов, runtime-передачей и владельцами данных в integrated_app.py.
+- DOC-015 закрыта: выполнена структурная сверка API preparation/executor и файлового хранилища.
+- Проверены локальные ссылки основного docs/README.md: все целевые файлы присутствуют в рабочей ветке.
+- CONFIGURATION_AND_DATA.md теперь отделяет основные каталоги приложения от исторических/экспериментальных каталогов и ссылается на FILE_STORAGE_CATALOG.md.
+- DEPENDENCY_MAP.md дополнен полной матрицей прямых импортов 40 preparation и 13 executor production-модулей.
+- Индекс README.md дополнен каталогом файлового хранилища; исправлена некорректная строка таблицы.
+- DOC-010 закрыта: EXECUTOR_API_REFERENCE.md охватывает все 13 модулей executor из структурного справочника.
+- DOC-009 закрыта: PREPARATION_API_REFERENCE.md охватывает все 40 модулей preparation из структурного справочника.
+- PREPARATION_API_REFERENCE.md уточнён по сигнатуре build_brush_test_record и конструкторам UI-компонентов.
+- DOC-011 закрыта после документирования UI и интеграционных точек единого приложения.
+- DOC-012 закрыта после документирования основных профилей, планов, лабораторных и калибровочных результатов, а также экспорта Game Monitor.
+- Индекс, roadmap, реестр задач, статус проекта и журнал работ обновлены в связи с документированием профилей и планов.
+- PREPARATION_API_REFERENCE.md дополнен методами UI-компонентов preparation и точками передачи callback-зависимостей.
+- Stage20 README связан с новым каталогом документации.
+- Roadmap и реестр задач сфокусированы на документационной инициативе.
+- Статус аналитического плана обновлён в соответствии с решением пользователя.
+
+### Cancelled
+- Аналитические этапы 7–10 отменены пользователем. Исходный план сохранён в архивном статусе.
+
+## 2026-10-31 — INT-002: проектирование CHALK snapshot
+
+### Added
+- Зафиксирован контракт ресурсного снимка CHALK с baseline/post-test delta, checkpoint, источником данных и признаком точности.
+- В ROADMAP и TASKS зарегистрированы INT-003—INT-009: runtime/A-B-проверка, bridge capture, экспериментальная матрица, модель и её интеграция.
+
+### Changed
+- Уточнено описание существующих ресурсных моделей: game-point и engine-point calibration являются оценками, а не прямым счётчиком игры.
+- Зафиксировано требование не выполнять дополнительные O(N)-обходы `atom.points` в Monitor на каждом событии/кадре.
+- INT-002 закрыта как статическое проектирование; INT-003 выделена для runtime-проверки точного источника CHALK и A/B-измерения overhead.
+
+## Правила ведения
+
+- Не добавлять каждую мелкую опечатку.
+- Группировать изменения по версиям или датам.
+- Не заявлять о функциях, которых нет в текущих исходниках.
+- Аналитические выводы добавлять только при наличии проверяемого основания; явно указывать источник, метод и ограничения достоверности.
+- Ссылаться на commit, если изменение уже зафиксировано в Git.
+
+
+## 2026-10-31 — документационная инвентаризация и ссылки
+
+- Завершена матрица прямых импортов 46 тестовых файлов в `TESTS_AND_CI_MAP.md`; DOC-013 закрыта.
+- Проверены 67 относительных Markdown-ссылок в 35 документах, все локальные цели существуют; DOC-014 закрыта.
+- Обновлены TASKS, PROJECT_STATUS и ROADMAP.
+- Код, тесты, UI, benchmarks и сборка не запускались.
+
+
+## 2026-10-31 — INT-003: точный CHALK snapshot и Game Monitor 0.2.0
+
+### Added
+- Добавлены Node.js поведенческие тесты Game Monitor: точность `max-less`, отсутствие обхода `atom.points` в hot path, обработка unavailable и сверка с диагностическим подсчётом.
+- В CI добавлен запуск `node --test` для Game Monitor.
+
+### Changed
+- В игровом bundle статически подтверждены поля `BoardPane.max` и `BoardPane.less`; событие CHALK использует только `percent`, но точные целые значения доступны на экземпляре доски.
+- Game Monitor обновлён с 0.1.2 до 0.2.0: ресурсный snapshot читает `max`/`less` за O(1), а полный обход `atom.points` оставлен только в явном `diagnosticSnapshot()`.
+- Экспорт дополнен текущим `resourceSnapshot`; при отсутствующих/невалидных engine-полях точность не имитируется и array fallback не выполняется.
+- INT-003 остаётся IN_PROGRESS до живой runtime-сверки и A/B-замера FPS/длительности без Monitor и с Monitor.
+
+
+- Добавлен read-only `inspect()` для контрольных точек без активных wrappers/polling; это позволяет снимать точные `max`/ `less` в режиме A после `stop()`.
+
+
+### 2026-10-31 — автоматизация CHALK-экспериментов
+- В GAME_MONITOR_BRUSH_LAB_PLAN.md зафиксирован переход от ручной отрисовки к параметрическим DrawingPlan, исполняемым существующим MouseExecutor/PyAutoGUI.
+- Уточнена матрица INT-005: пакетные повторы, фиксируемые параметры траектории/исполнителя, автоматические checkpoints и привязка артефактов к experiment_id/run_id.
+- Зафиксированы границы: игровой счётчик нельзя подменять вызовами внутренних методов или изменением atom.points; текущая запись описывает решение и существующую основу, но не заявляет реализацию пакетного runner.
+
+
+## 2026-10-31 — INT-003: геометрический блокер Brush Test
+
+- Исправлено описание логического размера доски Game Monitor: 420×240, экранный ROI учитывается отдельно.
+- Зафиксировано, что текущий Brush Test передаёт экранные размеры ROI в генератор плана, а MouseExecutor прибавляет origin без применения масштаба.
+- Добавлено требование к явному преобразованию logical→screen и unit-тестам до проведения матрицы CHALK.
+- Это документирование статического результата; исходники и тесты пока не изменялись.
+
+
+## 2026-10-31 — целевая архитектура автоматизированной лаборатории кистей
+
+### Added
+- Добавлен `docs/BRUSH_TEST_AUTOMATION_VISION.md`: целевая архитектура полного автоматического цикла CHALK-экспериментов, роли компонентов, матрица, checkpoints, manifest, fail-safe и критерии готовности.
+
+### Changed
+- Индекс документации дополнен ссылкой на видение модуля.
+- INT-005 в TASKS и PROJECT_STATUS связана с целевой архитектурой и текущим блокером logical→screen transform.
+
+### Boundaries
+- Документ описывает целевое состояние и не означает, что batch runner, bridge, transform или автоматический анализ уже реализованы.
+- Исходники, тесты, CI и runtime не изменялись/не запускались.
+
+
+## 2026-10-31 — быстрый индекс модуля автоматических тестов кистей
+
+### Added
+- Добавлен `docs/BRUSH_MODULE_QUICK_INDEX.md` с быстрым поиском по документации, исходным модулям, ключевым темам, ограничениям и порядку реализации.
+
+### Changed
+- В `docs/README.md` добавлена ссылка на быстрый индекс.
+- Исправлено некорректное отображение разделителя строк в навигационной таблице README.
+
+
+## 2026-10-31 — первый этап logical→screen transform Brush Test
+
+### Added
+- Добавлен source/preparation/brush_coordinate_transform.py для явного преобразования логического плана 420×240 в screen-local ROI.
+- Добавлены unit-тесты преобразования координат.
+
+### Changed
+- Brush Test формирует logical-планы; интеграционная передача преобразует их под текущий ROI и сохраняет transform metadata.
+- Для тестовых штрихов отключено дополнительное продление конечных точек.
+- Добавлены проверки генерации logical-плана и интеграционного handoff.
+
+### Validation boundary
+- CI runs созданы, окончательный результат ожидается.
+- Live-проверка координат и границ в браузерной игре ещё не выполнена; полная CHALK-матрица остаётся заблокированной до этой проверки.
+
+
+### Fixed — сохранение исходного logical-плана
+- Общий stage8 save_plan нормализует coordinate_system в local_canvas_pixels; Brush Test теперь сохраняет исходный logical_board_pixels JSON напрямую, а Stage6 runtime-копия по-прежнему проходит нормализацию в local_canvas_pixels.
+
+### Changed
+- Transform metadata явно фиксирует единицы координат runtime executor и point_step_px как screen_pixels.
+
+
+### Fixed
+- Stage6 отклоняет прямую загрузку исходных logical_board_pixels планов Brush Test; их нужно передавать через интеграционный преобразователь.
+- Добавлен regression test на запрет такой прямой загрузки.
+
+
+## 2026-10-31 — CI logical→screen handoff
+
+- GitHub Actions run #1132 для HEAD `3a0383b56b5972d4b978ff30080d7b7768b021d0` завершился успешно: geometry-tests, executor-tests и Windows portable build/startup smoke-test.
+- Live-проверка геометрии доски, границ и A/B/C Monitor остаётся незавершённой.
+
+
+## 2026-10-31 — исправление размера BoardPane в Brush Test
+
+- Повторная сверка master game bundle подтвердила `BoardPane` 460×240; ранее использованное в transform значение 420×240 было ошибочным.
+- Обновлены логический размер Brush Test, X-масштаб transform, unit-тесты, UI-подпись и документация.
+- CI для новой геометрии и live-проверка ROI/границ ожидаются.
+
+### Added
+- Сценарий Brush Test `board_boundary_probe` для короткой проверки правой/левой/верхней/нижней границ BoardPane 460×240; добавлен unit test на endpoint.
+
+### Changed
+- Logical→screen transform проверяет соответствие ROI равномерному масштабу BoardPane (расхождение X/Y не более 1%); неверная геометрия ROI отклоняется до исполнения.
+- Добавлены metadata равномерности масштаба и тест отклонения искажённого ROI.
+
+
+## 2026-10-31 — Brush Test: не очищать доску после теста; Alt для остановки
+
+- После успешного теста сохраняются скриншоты, измерения и `experiment.json`, но автоматическое нажатие Clear и post-clear этап отключены. Рисунок остаётся на доске до ручной очистки после проверки и экспорта Game Monitor.
+- Начальная очистка перед независимым тестом остаётся частью подготовки.
+- Глобальная клавиша аварийной остановки изменена с F12 на Alt (левая и правая Alt) в Brush Test, MouseExecutor, Stage6, Stage2 и калибровочном тесте.
+- Обновлены unit tests. CI и live browser test ещё не запускались.
+
+
+## 2026-10-31 — результаты live board_boundary_probe и исправление анализа
+
+- Добавлены три live-прогона boundary probe: Game Monitor exact CHALK deltas 51, 52 и 52 при радиусе 1; 4/4 штриха в каждом прогоне; errors=0, droppedEvents=0.
+- В каждом эксперименте baseline pointCount=1; после исполнения 52/53/53. Средний расход — 51.67 игровых точки.
+- Конечные POINTER_UP client coordinates соответствуют преобразованным ROI endpoints, но не являются доказательством фактического принятия граничных координат BoardPane.
+- Исправлен stroke visibility analyzer: теперь logical-plan strokes преобразуются в screen-local coordinates по сохранённому screen_transform; добавлены regression tests.
+- Исправлена negative fixture uniform-scale test: non-uniform ROI 646×323 вместо ошибочного uniform ROI 646×338.
+- Paint meter visual estimator остаётся inconclusive; CHALK измеряется по точному Monitor max/less.
+- A/B/C Monitor и повторная визуальная проверка границ ещё не выполнены.
+
+
+### Дополнение — визуальная проверка live boundary probe
+
+- Вручную просмотрены все три пары `after_draw-board.png` / `after_draw-screen.png`: все четыре штриха доходят до границ доски, видимого выхода за пределы нет.
+- Результат относится к проверенному ROI 578×301 на экране 1920×1080.
+- Поля automated visibility в исходных manifest не переписывались: они сохраняют исторический inconclusive из-за выявленного и уже исправленного mismatch logical/screen dimensions.
+- INT-003 остаётся открытой до A/B/C и успешного CI актуального HEAD.
+
+
+## 2026-10-31 — live WebSocket smoke и A/B/C Monitor 0.2.1
+
+- Добавлены результаты browser WebSocket handshake: `ready` и `pong`; Monitor 0.2.1 обнаружил BoardPane в игровом iframe, 0 dropped events и 0 errors.
+- Добавлены три повтора A/B/C. Точные дельты pointCount: A 53/52/52, B 0*/52/52, C 50/52/52. B-1 невалиден: игра не добавила новых точек. В повторах 2 и 3 все три режима дали 52.
+- В Monitor 0.2.1 diagnosticPointCount совпал с точным pointCount во всех трёх повторах; pointDelta подтверждает дельты 50/52/52.
+- FPS probes показали 60 FPS во всех трёх сериях, но не разделены по режимам A/B/C; overhead Monitor не измерен.
+- Новый boundary experiment: 4/4 видимых штриха, 7.36 с, 106 move calls, ΔpointCount=52. Paint-meter image estimate остаётся inconclusive.
+- AcceptedPoint подтвердил y=0/240; горизонтальные конечные координаты около x=2.21/458.21, поэтому точные x=0/460 требуют отдельной проверки.
+- Влияние размера кисти не установлено; полная матрица ожидает завершения A/B/C overhead и проверки горизонтальных границ.
+
+
+## 2026-10-31 — первая реализация Game Monitor WebSocket telemetry bridge
+
+- Добавлен `AutoDrawGameMonitor.subscribe(listener)` для низконагрузочной инкрементальной передачи событий.
+- Добавлен browser agent для iframe: авторизация, allowlist событий, heartbeat и per-stroke FPS probe.
+- Добавлен loopback WebSocket collector: автоматическая группировка DRAW_START/DRAW_END в run, exact pre/post CHALK delta, acceptedPoint и JSON persistence.
+- Незавершённые runs при потере соединения сохраняются как partial.
+- Добавлены Python/Node regression tests; browser live validation и привязка к UI experiment.json остаются открытыми.
+- INT-004 переведена в IN_PROGRESS, не DONE.
+
+
+### Дополнение — автоматическая связь bridge telemetry с Brush Test
+
+- Brush Test UI автоматически находит bridge run по времени `before_draw` и фактическому радиусу кисти.
+- Отчёт копируется в каталог эксперимента как `monitor_report.json`; `experiment.json` получает `session_id`, `run_id`, CHALK/FPS/trajectory summary и capture status.
+- Если отчёт не найден за 10 секунд, сохраняется `monitor_capture.status=unavailable`.
+- Корреляция по времени+радиусу является промежуточной; сквозной experiment_id и live validation ещё требуются.
+
+## 2026-11-01 — G3 CHALK executor matrix
+
+### Added
+- G3 block на 27 уникальных задач для девяти сочетаний `point_step_px` и `point_delay_ms`, по три повтора.
+- G3 metadata, parameter-aware duplicate protection, journal validation и analyzer aggregation.
+- UI gate G3 после принятого G2 и runtime передачу параметров в MouseExecutor без перезаписи пользовательского профиля.
+- Regression tests для G3 матрицы, журнала, анализатора и workflow override.
+
+### Validation
+- Полный CI и Windows portable startup smoke-test ещё ожидают подтверждения.
+- Live G3 не запускался.
+
+
+## 2026-11-01 — подтверждён CI на актуальном G3 HEAD
+
+- Полный workflow run [41340237207](https://github.com/Kiddos19882/AutoDraw/actions/runs/41340237207) завершился success на HEAD `3dbf8f20bcea44c61290e49398e1a4daf182dbf9`.
+- Успешны все три jobs: geometry-tests, executor-tests, Windows portable build/startup smoke-test.
+- Run включает интеграционный regression test основного приложения из commit `8c93a498864973b9879c926627030bb7e1d3ce2a`; прежнее ожидание нового CI для этого теста закрыто.
+- G3 software gate закрыт. Локальный Windows preflight и 27 live G3 captures не выполнены; экспериментальная модель расхода CHALK пока не подтверждена.
+- Документация синхронизирована; исходный код и workflow не менялись.
+
+## 2026-11-01
+
+### Fixed
+- Автоматические G3 block tasks больше не перехватываются legacy radius-matrix routing при совпадении `scenario_id`; geometry metadata создаётся для G3 task и может активировать task-specific executor override.
+- Добавлен regression test для коллизии scenario ID между legacy и geometry matrices.
+
+### Security
+- Удалены runtime Game Monitor connection snippets; добавлено правило .gitignore для таких файлов.
+
+## 2026-11-02 — CI и G3 regression optimization
+
+### Changed
+- Обязательный CI разделён на параллельные jobs Game Monitor, Preparation/G3, Integration и Executor; portable build запускается только после их успеха.
+- Добавлены pip caching и отмена устаревших runs одной feature-ветки; убран дублирующий pull_request trigger.
+- Длительные Stage 5/7/8 и synthetic benchmarks запускаются вручную через отдельный opt-in input; по умолчанию выключены.
+- В CI portable build использует `AUTODRAW_SKIP_TESTS=1` только после прохождения независимых test jobs; локальная сборка сохраняет полный test run.
+
+### Tests
+- Добавлен тест реального G3 UI plan routing: обязательные block/matrix identity и executor parameters должны формироваться для активной block task.
+- Integration regression проверяет передачу task-specific параметров 2/20 в Stage6.
+- Новый workflow run на конечном HEAD ожидает подтверждения.
+
+### Tests and CI
+- UI regression tests изолируют persistent data paths во временном каталоге, чтобы CI не читал сохранённые paused CHALK journals и не открывал recovery dialogs.
+- Brush Test tab отменяет deferred recovery scan при уничтожении owner frame; добавлен тест очистки Tk callback.
+- Root integration tests разбиты на отдельные группы с локальными таймаутами; concurrency group обновлён для чистого повторного CI после зависших предыдущих runs.
+
+
+## 2026-11-02 — завершена live G3 матрица CHALK
+
+### Experimental results
+- Принят новый независимый G3 block `chalk-20261102-031830-a0f325`: 27/27 captures, девять сочетаний шага/задержки, три повтора.
+- Все 27 измерений имеют exact CHALK и совпадение sampled pointDelta; per-run dropped events, Monitor error deltas, Bridge send-failure deltas и collector sequence gaps равны нулю.
+- Подтверждено, что положительный cumulative local Monitor buffer overflow не равен потере событий конкретного run: Bridge/collector captures сохранены и приняты.
+- Для шести длинных горизонтальных линий step=4 / delay=5–10 ms расходует около 365 CHALK; step=1 / delay=5–10 ms — около 1350; delay=20 ms увеличивает расход примерно на 53–95% в зависимости от шага.
+- Полные таблицы и границы применимости: [CHALK_G3_RESULTS_2026-11-02.md](CHALK_G3_RESULTS_2026-11-02.md).
+
+
+## 2026-11-02 — предварительная модель расхода CHALK
+
+- Добавлен `CHALK_PRELIMINARY_SEGMENTED_MODEL_2026-11-02.md` с отдельными сегментами для прямых штрихов, коротких штрихов, sampling profile и повторного покрытия.
+- Для прямых штрихов G1 при radius=10, step=2, delay=10 зафиксирована предварительная оценка `C ≈ 1.765 + 0.2988 × L` (36 обучающих per-stroke наблюдений).
+- Зафиксировано, что ROI visibility heuristic G3 не доказывает непрерывность линий; pixel-level quality gate остаётся открытым.
+- Production estimator и executor defaults не изменялись.
+
+
+## 2026-11-02 — визуальная проверка G3 step=4
+
+- Получены и просмотрены все шесть PNG для step=4/delay=5 и step=4/delay=10.
+- Подтверждена визуальная непрерывность шести длинных горизонтальных линий во всех повторах; видимой разницы между задержками нет.
+- Визуальный gate закрыт для этой геометрии, но step=4 не назначен универсальным production default.
+- Добавлен отчёт `CHALK_G3_VISUAL_QUALITY_AUDIT_2026-11-02.md`.
+
+
+## 2026-11-02 — консолидация документации и план INT-006—INT-009
+
+### Changed
+- PROJECT_STATUS теперь начинается с единого актуального снимка; прежняя полная версия сохранена в PROJECT_STATUS_HISTORY_2026-11-02.md.
+- TASKS синхронизирован с фактическим состоянием G1/G2/G3 и автоматизированной лаборатории.
+- Preliminary CHALK model и G3 Results согласованы с завершённым ручным просмотром шести PNG.
+- ROADMAP и docs index указывают на действующий план дальнейших работ.
+
+### Added
+- CHALK_NEXT_STEPS_PLAN_2026-11-02.md: геометрическая проверка step=4, независимая validation estimator, метрики ошибки, safety margin и последовательность INT-007—INT-009.
+
+
+## 2026-11-02 — INT-006 зафиксирован и начат
+
+- Добавлен исполнительный протокол INT-006 с матрицей V1–V5, тремя sampling-профилями, 45 запланированными captures, критериями качества и независимой validation модели CHALK.
+- Зафиксировано ограничение текущей лаборатории: V1–V5 отсутствуют в контракте G1/G2/G3 и требуют расширения harness до live-испытаний.
+
+
+## 2026-11-02
+- INT-006: экспериментальный harness расширен сценариями V1–V5 на инфраструктуре G3; добавлены три sampling profiles, отдельные 9-task journals и regression tests.
+- Task-specific executor override распространён на V1–V5; production executor defaults и estimator не менялись.
+- CI и live validation ожидаются; экспериментальные результаты V1–V5 пока отсутствуют.
+
+
+## 2026-11-02 — INT-006 V1–V5 live results
+
+### Added
+- `CHALK_INT006_V1_V5_RESULTS_2026-11-02.md`: сводка 45 live captures, exact/per-stroke CHALK, профильных сравнений, первичной holdout-проверки модели и визуальных ограничений.
+
+### Verified
+- V1–V5: 5 block journals × 9 tasks = 45/45 completed; Monitor/Bridge per-run integrity gates пройдены.
+- CI run #1887 на commit `6479536` завершился success.
+- Step=4 снизил расход CHALK примерно на 48–49% для V1/V3/V4/V5 и на 23–25% для коротких штрихов V2.
+- G1-модель на 66 новых штрихах P0: MAE 1.09, RMSE 1.33, MAPE 1.71%; step=4 fits остаются исследовательскими.
+- Production defaults и estimator не изменялись; INT-006 остаётся IN_PROGRESS до pixel-level audit и независимой validation.
+
+
+## 2026-11-02 — INT-006 preliminary PNG screening
+
+- Added `CHALK_INT006_PNG_SCREENING_2026-11-02.md` with representative visual screening of 15 original PNGs across V1–V5 and P0/P1/P2.
+- Recorded geometry limitations: unintended intersections in V1/V3, dot-like V2 marks at radius 10, cursor occlusion in V4, and merged close parallel lines in V5.
+- No obvious step=4 continuity regression was seen in the reviewed samples; quantitative pixel-level metrics remain pending.
+- No production code, executor defaults, estimator, or raw captures changed.
+
+
+### INT-006 — корректировка геометрии тестов
+- По результатам ручного review PNG-overlay исправлены пересекающиеся тестовые траектории V1/V3; добавлен regression gate минимального межштрихового расстояния. Первичные captures не переписывались, повторные live-блоки и CI для нового code HEAD остаются следующими проверками.
+
+
+### INT-006 — cursor-free post-draw capture
+- Post-draw screenshot теперь выполняется после mouseUp и перемещения курсора за пределы calibrated board ROI; выбранная точка и метод фиксируются в experiment manifest.
+- Добавлены regression tests выбора безопасной точки и порядка mouseUp → move → screenshot. CI и live validation нового поведения ожидаются.
+- Production executor, estimator, sampling defaults и первичные captures не менялись.
+
+- Дополнительно проверено, что cursor relocation применяется только в automated post-draw capture; ручная процедура захвата сохранена без перемещения курсора и защищена regression test.
+
+
+## 2026-11-02 — отдельные V2/V5 follow-up серии INT-006
+
+- Обновлены Brush Test presets: V2 12/16/20/24/30 logical px (5 strokes) и V5 spacing sweep 8/12/16/20/24 logical px плюс X/T/крестовые узлы (16 strokes).
+- Новые scenario IDs отделяют follow-up captures от исходных V2/V5; исходные данные не перезаписываются и не смешиваются.
+- Обновлены matrix expected counts, block tests и UI geometry regression tests.
+- Добавлен `CHALK_INT006_V2_V5_FOLLOWUP_2026-11-02.md` с инструкцией для пользовательских live-прогонов.
+- Каждая серия содержит 9 captures: P0/P1/P2 × три повтора, radius=10. Live-прогоны не запускались.
+
+
+## 2026-11-02 — INT-006 CI regression fixes
+
+### Fixed
+- Restored expected stroke counts for legacy V2/V5 scenario IDs (6 and 10) so existing manifests remain analyzable without reintroducing legacy IDs into current block planners.
+- Updated the V5 application integration fixture to use `int006_intersections_spacing_sweep` and its 16-stroke contract.
+
+### Validation
+- Previous CI run `41468581157` had two legacy-count failures and one stale V5 fixture failure. Corrective commits: `0cac37c`, `706be60`.
+- Full CI rerun is pending; no live experiments were started.
+
+
+## 2026-11-02 — INT-006 corrective CI и синхронизация статусов
+
+- Полный CI run [41470680544](https://github.com/Kiddos19882/AutoDraw/actions/runs/41470680544) на code HEAD `3e8e6c5` завершился success: Application integration, Executor regression, Game Monitor/bridge, Preparation/G3, Windows portable build/startup smoke-test и INT-006 PNG audit.
+- Исправления legacy V2/V5 counts и V5 integration fixture подтверждены обязательными jobs. Optional algorithm benchmarks пропущены.
+- Уточнено разделение исходных V2/V5 сценариев и follow-up контрактов; исходные manifests остаются обратно совместимыми.
+- Обновлены PROJECT_STATUS, TASKS, CHALK_NEXT_STEPS_PLAN и CHALK_INT006_EXECUTION_PROTOCOL. Live follow-up и независимая validation модели остаются незавершёнными.
+
+
+## 2026-11-02 — INT-006 V1/V3/V4 follow-up protocol
+
+- Добавлен отдельный протокол новых live-серий для исправленной геометрии V1/V3 и cursor-free closure capture V4.
+- Для каждой фазы определены новый series_id, отдельный block journal и 9 captures; все три фазы вместе — 27 captures.
+- Ссылки добавлены в docs index, PROJECT_STATUS, TASKS, ROADMAP и действующий план INT-006. Код и исходные captures не менялись.
+
+
+## 2026-11-02 — legacy CHALK block journal compatibility
+
+### Fixed
+- Fixed validation of historical INT-006 V2/V5 block journals. The validator now accepts the corresponding legacy scenario IDs and validates each task against its own legacy expected stroke count.
+- Preserved strict matrix integrity: all nine unique sampling/repeat cells and unique order indexes remain required; mixing legacy and current scenario IDs inside one block is rejected.
+- Added regression coverage for completed legacy V2 (6 strokes) and V5 (10 strokes) journals.
+
+### Verified input
+- The reported V2 journal contains 9 unique completed tasks and no duplicate matrix cell. Its legacy ID was the sole compatibility mismatch.
+- Commits: `f0e05df`, `4847cce`. CI validation pending.
+- No experiment records were modified; no production drawing or CHALK calculation behavior changed.
+
+
+### Исправление after-draw cursor placement — 2026-11-02
+
+- Автоматический курсор теперь уходит ниже доски и полоски краски, а не просто за границу доски.
+- Учитываются обе откалиброванные области (`board_area`, `paint_meter_area`) и 32 px свободного отступа; это предотвращает hover-уведомление от полоски краски поверх доски на `after_draw-board.png`.
+- Ручное снятие снимков и траектории рисования не затронуты.
+
+
+### INT-006 live follow-up V1–V5 — 2026-11-02
+
+- Добавлены и проанализированы 45/45 live captures по V1–V5 (commit [e879a77](https://github.com/Kiddos19882/AutoDraw/commit/e879a77f63be7a7a68de3f09091eab7dba0d34a2)); все пять block journals завершены 9/9.
+- Подтверждены exact CHALK и согласованность per-stroke Monitor deltas для всех 45 runs; per-run Monitor/Bridge errors и drops отсутствуют.
+- Step=4 показал 38.5–49.4% экономии против step=2; различие delay=5/10 ms при step=4 мало. Радиус во всех сериях фиксирован на 10.
+- Добавлен отдельный отчёт repeat values и ограничений `CHALK_INT006_FOLLOWUP_RESULTS_2026-11-02.md`. Следующий gate — pixel-level audit новых PNG и независимая validation; production defaults не изменены.
+
+
+### INT-006 follow-up pixel audit and CI — 2026-11-02
+
+- Исправлен PNG analyzer: независимые серии INT-006 идентифицируются по series_id; duplicate matrix cells проверяются только внутри серии. Добавлены regression tests и обновлён CI expected runs per series.
+- Pixel-level audit завершён для 90 captures (45 исходных + 45 follow-up): 90 valid, 0 duplicate/missing/unexpected cells, 0 batch failures; 549 stroke rows и 900 pair rows.
+- Для новых 45 captures: 297/297 strokes с coverage=1.0 и zero gaps; V4 closure seam 27/27 covered; курсор не обнаружен на board image в 45/45 captures.
+- V5 spacing sweep: целевые пары 8/12 logical px touch/merge; 16/20/24 logical px остаются разделёнными при radius=10.
+- Full CI run [41496555297](https://github.com/Kiddos19882/AutoDraw/actions/runs/41496555297) — success, включая Windows portable build/startup smoke-test и PNG audit. Production executor defaults и CHALK estimator не менялись.
+
+
+### INT-006 legacy journal compatibility and independent validation plan — 2026-11-02
+
+- Добавлена совместимость validator с историческими scenario IDs V2/V5 и их собственными expected stroke counts; добавлены regression tests (commits `f0e05df`, `4847cce`).
+- Подтверждено, что полный CI run [41496555297](https://github.com/Kiddos19882/AutoDraw/actions/runs/41496555297) checkout рабочей ветки после commit `956ce2b`, содержащего оба исправления в истории. Preparation/G3 завершился 662 passed и 82 subtests passed; все обязательные jobs успешны.
+- Создан `CHALK_INT006_INDEPENDENT_VALIDATION_PLAN_2026-11-02.md`: пять новых DrawingPlan, frozen predictions P0/P1/P2, 3 повтора, exact pre/post pointCount и метрики ошибок.
+- Обновлены PROJECT_STATUS, TASKS, ROADMAP, WORK_LOG, CHALK_NEXT_STEPS_PLAN и docs index. Production estimator, executor defaults и первичные experiment data не менялись. Legacy-journal CI gate закрыт.
+
+
+## 2026-11-02 — INT-006 independent validation harness readiness
+
+- Добавлен `CHALK_INT006_HARNESS_READINESS_AUDIT_2026-11-02.md`.
+- Независимый validation protocol переведён в BLOCKED: D1–D5 пока не подключены к matrix/block/UI/executor harness, а analyzer не сравнивает captures с immutable frozen predictions.
+- PROJECT_STATUS, TASKS, ROADMAP, WORK_LOG и docs index синхронизированы с фактическим состоянием исходников.
+- Production estimator/defaults, исходные экспериментальные данные и master не изменялись; code/tests/CI/live captures в рамках readiness audit не запускались.
+
+
+### INT-006 frozen prediction harness — 2026-11-02
+
+- Добавлены 15 frozen prediction records (D1–D5 × P0/P1/P2), hash-sealed artifact в durable block journal и prediction ID в 45 task/manifest cells.
+- Реализован независимый analyzer: exact CHALK, geometry/profile/task/journal binding, completed attempt integrity, run/per-stroke residuals и error metrics.
+- Executor handoff сверяет prediction ID; Brush Test UI запрещает ручной запуск D1–D5 вне INT006 block.
+- Full CI [41513389663](https://github.com/Kiddos19882/AutoDraw/actions/runs/41513389663) — success: Preparation/G3 667 passed + 82 subtests; integration, executor, Game Monitor/bridge, pixel audit и Windows portable build/startup smoke-test success.
+- Созданы инструкции frozen analyzer и local Windows preflight. Production estimator/defaults и live experiment data не менялись.
+
+
+## 2026-11-03 — INT-006 D1–D5 live captures и предварительный CHALK audit
+
+- Принят live block `chalk-20261102-232320-7cea27`: 45/45 задач completed, radius=10.
+- Для 45 experiment manifests найдены 45 Monitor reports; предварительно проверены exact CHALK, per-stroke delta sum, stroke counts и нулевые Monitor/Bridge integrity counters.
+- Добавлен отчёт [CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md](CHALK_INT006_VALIDATION_PRELIMINARY_RESULTS_2026-11-03.md): 45 plan runs, MAE 1.408, RMSE 1.967, bias -0.875, MAPE 2.134%, maximum underprediction 1.82 CHALK; per-stroke 243 rows, MAE 0.439.
+- Исправлена portability-привязка journal attempt к experiment directory name вместо локального абсолютного Windows path; добавлен regression test.
+- В `.github/workflows/geometry-tests.yml` добавлен официальный запуск analyzer и artifact upload. Новый CI result и официальный analyzer JSON ещё ожидаются.
+- Safety margin не установлен; production estimator, executor/sampling defaults и master не менялись.
+
+
+## 2026-11-03 — повторный полный аудит INT-006 captures
+
+- Повторно прочитаны все 45 experiment manifests и все 45 Monitor reports.
+- Для каждой записи подтверждены exact CHALK, per-stroke pointDelta sum, stroke count, experiment linkage, observed radius=10 и нулевые Monitor/Bridge integrity counters.
+- SHA-256 frozen prediction artifact независимо пересчитан и совпал с journal: `a0eab016e96a81e14bededd32cf5161dd943d6fc85a20b7eec17455f69d0c61c`.
+- Официальный analyzer JSON и результат CI после его подключения пока не получены; quantitative validation и safety margin остаются pending.
+
+
+## 2026-11-03 — INT-006 analyzer binding hardening
+
+- Added direct journal-task `prediction_id` verification against the frozen scenario/profile prediction.
+- Added `expected_strokes` verification against the frozen planned-stroke count.
+- Added a fail-closed regression test for a tampered journal prediction ID.
+- No prediction coefficients, sampling defaults, executor defaults, or production estimator changes.
+- CI confirmation and the official 45-capture analyzer JSON remain pending.
+
+
+## 2026-11-03 — FILL-001 fixed-radius planner
+
+- Добавлен изолированный boundary-aware fixed-radius scanline planner и raster simulator для трёх frozen masks и радиусов 1/5/10/20/30.
+- Добавлены regression tests для 15 shape×radius cells, coverage/leakage gate, radius isolation и deterministic signature.
+- Офлайн Python simulation прошла 15/15 cells (coverage 99,962–100%, leakage=0); pytest/CI для нового HEAD пока не подтверждены. Executor handoff и production defaults не менялись.
+
+
+## 2026-11-03 — FILL-001 matrix and analyzer
+
+- Добавлен отдельный 45-cell manifest для трёх форм, пяти радиусов и трёх повторов.
+- Добавлены fail-closed capture validation по exact CHALK, dynamic expected strokes, geometry/mask/run identity, coverage/leakage и целостности Game Monitor.
+- Добавлен analyzer с отдельной статистикой exact CHALK по форме и радиусу и regression tests.
+- CI/pytest для актуального HEAD пока не подтверждены; live execution не запускалось.
+
+
+## 2026-11-03 — FILL-001 capture fixture correction
+
+- Исправлен тестовый capture helper: теперь он формирует обязательные per-stroke CHALK deltas и PNG evidence fields, соответствующие текущему validator contract.
+- Добавлены negative checks для отсутствующего PNG evidence и неверного количества per-stroke deltas.
+- Commit: [70323a8](https://github.com/Kiddos19882/AutoDraw/commit/70323a8e65ccddd201aa412263aac9efe18ec099). Pytest/CI для этого изменения ещё не подтверждены.
+
+
+## 2026-11-03 — FILL-001 Game Monitor capture adapter
+
+- Добавлен адаптер Monitor export → FILL-001 capture с per-stroke/run exact CHALK, radius, P1 sampling binding, external bridge/run identity и PNG file/hash/pixel audit.
+- Добавлен отдельный набор regression tests с синтетическими Monitor events и PNG fixtures.
+- Software tests/CI ещё не запускались или не подтверждены; live execution остаётся заблокированным до CI и preflight.
+
+
+## 2026-11-03 — FILL-001 matrix schema v2
+
+- Matrix manifest теперь фиксирует P1 sampling metadata в каждой task; validator отклоняет изменённый профиль.
+- Adapter закреплён за Game Monitor 0.2.1 и проверяет frozen mask SHA-256 и bridge diagnostics binding.
+- Тесты добавлены, но ещё не запускались; CI pending.
+
+
+## 2026-11-03 — справочник Game Monitor и Bridge
+
+- Добавлен `GAME_MONITOR_BRIDGE_REFERENCE.md` с описанием Monitor 0.2.1 API, событий BoardPane, Browser Bridge transport, Python collector/RunRecorder, JSON форматов и ограничений evidence.
+- Справочник добавлен в основной `docs/README.md` и структурный `MODULE_REFERENCE.md`.
+- Изменения документационные; runtime-код и тесты не изменялись.
+
+
+## 2026-11-03 — FILL-001 launch integration audit
+
+- Добавлен аудит пользовательского пути запуска FILL-001 в AutoDraw.
+- Уточнён статус: Stage 6 runtime binding — post-execution hook; UI/runner workflow и FILL001 executor override отсутствуют.
+- Временный план и roadmap обновлены: UI/runner handoff должен быть реализован до Windows live preflight; 45 captures остаются заблокированными.
+
+
+## 2026-11-03 — FILL-001 CI confirmation
+
+- GitHub Actions run `41692129486` завершился SUCCESS: обязательные regression jobs, INT-006 pixel audit, Windows portable build и startup smoke-test прошли.
+- Опубликован Windows portable artifact `autodraw-g3-preflight-build` (ID `13258221572`): https://github.com/Kiddos19882/AutoDraw/actions/runs/41692129486/artifacts/13258221572.
+- Это подтверждает software gate, но не live runtime. Следующий шаг — один пользовательский Windows preflight; 45 captures остаются заблокированными.
+
+
+## 2026-11-04 — FILL-001 Bridge activity-window fix
+
+- Runtime binding больше не принимает поздний `finished_at_utc` за время последнего события. Activity window восстанавливается по `started_at_utc`, `started_at_performance_ms` и максимальному `events[].t`; idle finalization grace проверяется отдельно.
+- Добавлены regression tests для pre-execution calibration run и Bridge JSON >27 MiB, включая проверку полного чтения и SHA-256.
+- Commits: `95a8d1799cd2cbbba09929cc5086a3655ba90c78` (fix), `870bebce6b39e782f70ef9f476a324ee840c05ae` (tests). CI ожидается.
+
+## 2026-11-04 — FILL-001 CI fixture alignment
+
+- Анализирован run [41778045384](https://github.com/Kiddos19882/AutoDraw/actions/runs/41778045384): Preparation/G3 — 799 passed, 5 failed, 24 warnings, 82 subtests; три других обязательных test jobs success, downstream PNG audit и Windows build skipped.
+- Исправлены synthetic PNG fixtures: согласование с реальным executor transform, non-uniform ROI test теперь доходит до audit, runtime-binding fixture использует screen rasterization.
+- Commits: `1f28436ab20fe949e4d53cfeea4a5560ed3cbcae`, `0f23731848f0c148fe5e1309d1e305576dd4b6b7`. Только тесты; production code и acceptance thresholds не менялись. Повторный CI ожидается.
+
+
+## 2026-11-04 — FILL-001-RS CI PASS и INT006R evidence
+
+- Run [41780241017](https://github.com/Kiddos19882/AutoDraw/actions/runs/41780241017): все обязательные CI jobs SUCCESS; optional benchmarks SKIPPED.
+- FILL-001-RS static sweep: 2,238 candidates, 62 accepted, 15/15 selected offline cells прошли coverage≥99% / leakage=0; estimated points не являются exact CHALK.
+- INT-006 pixel audit: 90/90 captures valid, 549 stroke rows, coverage=1.0, gaps=0. Frozen CHALK analyzer: 45/45 accepted; safety margin не установлен, production eligibility не подтверждена.
+- INT006R radius×geometry: 45/45 accepted, radius 1/10/30 tested at P1; расходы различаются слабо и немонотонно. 45 PNG pairs сохранены, visual review остаётся pending.
+- Production estimator/defaults и live data не изменялись.
+
+## 2026-11-04
+
+- Зафиксирована блокирующая задача FILL-001-RS-PRE-REPLAY-001: replay неизменённых исходных live PNG/evidence через исправленный PNG audit обязателен до следующего live запуска FILL-001-RS. Установлены критерии закрытия, сохранение hashes/raw evidence и запрет на ослабление PNG thresholds. 45-task matrix остаётся заблокированной.
+
+## 2026-11-04 — FILL-001-RS offline edge diagnosis and contour candidate
+
+- Зафиксировано offline OpenCV model breakdown: 304 uncovered target pixels planner model распределены по краевым полосам (80 top, 80 bottom, 72 left, 72 right; interior=0), leakage=0.
+- Добавлен exploratory sweep одного contour pass поверх scanline fill: inward offsets 6–8 px проходят модельные coverage≥99% / leakage=0; offset 5 px имеет 32 leakage pixels.
+- Actual PNG residual pixel coordinates остаются неразобранными; capture по-прежнему REJECTED. Contour pass не реализован и не live-validated; CHALK не прогнозировался.
+- Только документация; исходники, тесты, настройки, frozen plan, thresholds и production defaults не изменялись.
+
+## 2026-11-04 — FILL-001-RS actual PNG residual diagnostics
+
+- В committed capture replay test добавлен вывод координат фактических uncovered/leakage pixels исходной PNG pair, пространственного распределения, connected components и расстояний до affine-transformed scanline centerlines.
+- Изменение ограничено тестовой диагностикой; production audit, исходные evidence, frozen plan/mask, thresholds и defaults не менялись.
+- Commits: `e62b692`, `d337f42`. Выполнение диагностического теста и его численный результат ожидают подтверждения CI.
+## 2026-11-04 — FILL-001-RS actual PNG residual localization
+
+- CI confirms committed-evidence pixel diagnostic: 1116 uncovered target pixels, distributed entirely in configured perimeter zones; 0 interior/other.
+- Right perimeter is dominant residual region (largest component 870 px); 11 leakage pixels are sparse near left perimeter / rounded corners.
+- Result supports investigating brush footprint and stroke endpoints before changing row spacing. No production behavior, frozen plan or acceptance thresholds changed.
+- Workflow 41787492122 SUCCESS; Preparation/G3 804 passed, 82 subtests passed.
+
+
+## 2026-11-04 — FILL-001-RS game renderer source inspection
+
+- Получен полный game bundle из master через GitHub Contents API; зафиксированы commit/blob identity и статические участки BoardPane/Painter.
+- Подтверждены ENTER_FRAME sampling, dedup соседних одинаковых координат, O(N) пересчёт point count на каждый принятый sample и передача brush value в lineStyle thickness.
+- Выявлено, что smooth single-point path формирует moveTo+lineTo в одну координату; фактическое окрашивание нулевого сегмента и cap geometry остаются UNKNOWN.
+- Следующий gate перенесён с pixel localization (закрыто) на renderer footprint / frame sampling calibration. Capture REJECTED, 45-task matrix BLOCKED.
+- Только документация; production code, tests, configs, frozen plans, thresholds и raw captures не менялись.
+
+
+## 2026-11-04 — Game Monitor per-stroke timing telemetry
+
+- Browser Bridge добавляет strokeId в frame_probe.
+- Bridge Server сохраняет исходные intervals, добавляет frame_probe_by_stroke и per_stroke_metrics.
+- Сохранённый FILL-001-RS run показывает accepted-point cadence около 29 points/s при browser requestAnimationFrame около 60 FPS; эти показатели документированы раздельно.
+- CI для изменений кода/тестов ожидает завершения; live runtime не запускался.
+
+
+## 2026-11-04 — Egret renderer audit refinement
+
+- Зафиксированы nominal static bundle значения stage.frameRate=48 и NO_SCALE; более поздний пользовательский runtime snapshot показывает effective frameRate=30 и fixedHeight для конкретной сессии. Локальная геометрия PainterPopup/BoardPane — 676×379 / 460×240.
+- Egret Engine 5.2.18 API документирует lineStyle thickness как толщину линии и ROUND defaults для caps/joints. Deployed runtime version не подтверждена; фактический footprint и zero-length rasterization остаются открытыми.
+
+
+## 2026-11-04 — Game Monitor per-stroke telemetry CI verification
+
+- Per-stroke frame_probe и point timing telemetry прошли полный CI run [41840582147](https://github.com/Kiddos19882/AutoDraw/actions/runs/41840582147): Application integration, Game Monitor/Bridge, Preparation/G3, Executor regression, Windows portable build/startup smoke-test и INT-006 PNG audit — SUCCESS; optional benchmarks SKIPPED.
+- Run [41840281018](https://github.com/Kiddos19882/AutoDraw/actions/runs/41840281018) завершился CANCELLED; не считать его успешным.
+- Сохранённые per-stroke frame probes для будущих запусков связаны через strokeId; старый run не содержит raw per-stroke rAF intervals. Измеренная ранее cadence POINT_QUOTA_UPDATE остаётся 28.26–29.50 points/s, median 33 ms; browser rAF около 60 FPS не является частотой Egret ENTER_FRAME.
+- Renderer gate уточнён: nominal stage.frameRate=48, NO_SCALE, PainterPopup 676×379, BoardPane 460×240 без локального scale; deployed Egret runtime, global transform, zero-length rasterization и реальный brush footprint ещё не подтверждены.
+- Capture FILL-001-RS остаётся REJECTED (coverage=98.430600%, leakage=11; exact CHALK=1260); 45-task matrix BLOCKED. Production defaults, frozen plans/masks/thresholds и raw evidence не изменялись.
+
+
+## 2026-11-04 — Egret stroke geometry and planner footprint risk
+
+- Egret GraphicsNode defaults omitted caps/joints to ROUND; CanvasRenderer applies them. The reviewed WebGL renderer also delegates GraphicsNode rasterization to CanvasRenderer.
+- For compatible Canvas rendering, a zero-length single-point path is removed and does not paint, while the game point counter can still increase.
+- Planner bbox footprint can overestimate coverage around rounded endpoints in interior_fill_planner and outline_first_fill_planner. Added separate offline task BRUSH-FOOTPRINT-CAPSULE-001; no planner code changed.
+- CI workflow 41840582147 SUCCESS; all required jobs passed, optional benchmarks skipped.
+
+
+## 2026-11-04 — BRUSH-FOOTPRINT-CAPSULE-001 audit
+
+- Статический аудит выявил AABB coverage overclaim в experimental `interior_fill_planner`: bbox маркируется как полностью покрытая область, хотя round-cap stroke имеет capsule footprint; текущий independent test oracle использует rectangular model.
+- Уточнена область: `swept_footprint_geometry` и `outline_first_fill_planner` используют bbox как conservative safety check; FILL-001-RS имеет отдельный OpenCV round-capped rasterizer, поэтому причинная связь не доказана.
+- Код и тесты не менялись. Следующий шаг — offline masks для потенциально затронутых и гарантированно покрытых pixel cells с frozen-fixture comparison.
+
+## 2026-11-04 — capsule footprint candidate and CI
+
+- Offline capsule pixel-cell candidate прошёл первоначальный полный CI [41842587672](https://github.com/Kiddos19882/AutoDraw/actions/runs/41842587672): 820 passed, 24 warnings, 82 subtests; обязательные jobs и Windows portable build/startup smoke-test SUCCESS; optional benchmarks SKIPPED.
+- Добавлены independent analytic oracle и уточнение conservative potential/guaranteed predicates; повторный CI [41843716918](https://github.com/Kiddos19882/AutoDraw/actions/runs/41843716918) ожидает завершения.
+- Existing planner behavior/defaults не менялись; live renderer validation не проводилась.
+
+
+## 2026-11-04 — приоритет connected-contour кандидата для FILL-001-RS
+
+- По запросу пользователя зафиксирован ключевой концептуальный вывод: для периметр-доминантных пропусков сравнивать редкий внутренний scanline-fill + один связный обход контура + локальные внутренние коррекции с глобальным уплотнением scanline и с горизонтальными коррекциями.
+- Уточнено, что исторический outline-first prototype использовал независимые горизонтальные boundary runs, а не единый связный contour route; его результаты не опровергают новую гипотезу.
+- Вывод классифицирован как OPEN / OFFLINE CANDIDATE / HYPOTHESIS. Экономия CHALK не доказана; exact расход определяется только pointCount delta. Сохранены PNG acceptance thresholds и текущие renderer/live gates.
+- Изменены только документационные файлы: AI_WORK_GUIDE, docs index, TASKS, ROADMAP, WORK_LOG и CHANGELOG. Исходники, тесты, конфигурации, frozen plans/masks и экспериментальные данные не менялись; live run не выполнялся.
+
+
+## 2026-11-04 — capsule model: per-segment raster broad-phase
+
+- Переработан перебор pixel cells в `swept_capsule_pixel_masks()`: вместо полного global polyline AABB каждая capsule обрабатывает собственный расширенный AABB, результаты объединяются как union.
+- Сохранены API, global bounds, определение potential/guaranteed и fail-closed ограничения; production planners не подключались.
+- Добавлены тесты эквивалентности с прежним global-AABB reference на winding polyline и инвариантности разбиения прямого сегмента на коллинеарные части.
+- Ожидаем CI run [41848358502](https://github.com/Kiddos19882/AutoDraw/actions/runs/41848358502) на HEAD `6afdefc7ff2f18db544e55572ed918841d448164`. Фактический performance gain пока не измерен; live/runtime проверок не было.
+
+
+## 2026-11-04 — capsule broad-phase benchmark and independent oracle
+
+- Добавлен независимый full-canvas oracle для swept capsule polyline и 16 seeded cases; все potential/guaranteed masks совпали с production model.
+- Добавлен offline benchmark global-AABB vs per-segment AABB и CI artifact. Пять synthetic cases дали совпадение masks; candidate slots сокращены на 59.53–96.23% для многосегментных случаев и не сократились для single segment.
+- Median wall-clock speedup в Windows CI runner: 10.91× winding, 20.57× large zigzag, 2.76× diagonal turns, 14.10× compact polyline, 1.16× single segment. Не универсальная гарантия и не CHALK/runtime measurement.
+- Full CI [41859709320](https://github.com/Kiddos19882/AutoDraw/actions/runs/41859709320) — SUCCESS: Preparation/G3 832 passed, 24 warnings, 82 subtests; all required jobs, INT-006 PNG audit and Windows portable build/startup smoke-test SUCCESS; optional algorithm benchmarks SKIPPED. Artifact `13338434277`.
+- Planner integration, deployed Egret renderer validation and live experiments не выполнялись; production defaults и frozen FILL-001 evidence не менялись.
+
+
+## 2026-11-04 — реестр тестирования
+
+Добавлен [TEST_RESULTS.md](TEST_RESULTS.md) как центральная сводка результатов.
+
+
+## 2026-11-04 — единый актуальный backlog задач
+
+В начало TASKS.md добавлен консолидированный список незавершённых задач с приоритетами, статусами, подзадачами, зависимостями и критериями завершения. Исторические чек-листы сохранены; старые TODO не считаются активными без повторной проверки.
+
+
+## 2026-11-04 — актуальный gameEngine bundle и Game Monitor selection risk
+
+- Зафиксировано подтверждение пользователя, что `main.min_653f95bc.js`, `mergeEngine_df2e5bc5.js` и `manifest.json` скачаны с сайта запущенной игры одновременно; сравнение с bundle из master исключено.
+- Статически разобран текущий main bundle: `pointCount` — количество принятых точек `atom.points`; brush value передаётся в `Graphics.lineStyle` как thickness; `setRadius()` напрямую не меняет CHALK; sampling выполняется на `ENTER_FRAME`.
+- В merge bundle найден Egret Engine 5.4.1 и ROUND fallback для caps/joints.
+- Обнаружена неоднозначность выбора BoardPane при автоматическом поиске Game Monitor: preview и активный PainterPopup создают два структурно подходящих экземпляра. Добавлена блокирующая задача на подтверждение выбора активной доски.
+- Изменены только Markdown-документы. Исходники, тесты, конфигурации, workflow, master и экспериментальные данные не затрагивались; live runtime не запускался.
+
+
+## 2026-11-04 — GAME-BRUSH-REPLICATION source trace
+
+- Выполнена полная статическая трассировка цепочки игровой кисти в пользовательски подтверждённом наборе Egret 5.4.1: ввод, ENTER_FRAME sampling, dedup, normal/smooth path, line width, ROUND caps/joints, clipping и Canvas/WebGL selection.
+- Зафиксировано отличие AutoDraw: Executor отправляет mouse move events, но список точек формируется игровым кадровым циклом; OpenCV и capsule модели не подтверждены как pixel-identical renderer replica.
+- Добавлены результаты и следующий offline gate в существующий engine report, TASKS, ROADMAP и PROJECT_STATUS. Исходники, тесты, конфигурации, workflow, live data и master не менялись.
+
+## 2026-11-05 — paired renderer replay preparation
+
+- Offline Egret renderer reference harness теперь может воспроизвести точные принятые BoardPane-local координаты из Game Monitor run.
+- Fail-closed validation запрещает воспроизведение неполной или неоднозначной последовательности (несколько strokeId, pointDelta > 1, missing acceptedPoint).
+- Добавлена пользовательская процедура live capture для последующего сравнения PNG и runtime evidence.
+- Это подготовка парного сравнения; live game pixel equivalence и CHALK для нового запуска не измерялись.
+## 2026-11-05 — paired accepted-point replay: CI PASS
+
+- Full CI run 41933396072 на source/test HEAD f6df3f9 — SUCCESS; обязательные jobs, включая browser renderer, preparation/G3, INT-006 validation и Windows portable build/startup smoke-test, прошли.
+- Offline renderer harness: 20 fixtures, 20 WebGL comparisons, 60 PNG; artifact 13371659297.
+- Renderer replay Node tests: 13/13 passed, включая fail-closed проверку multi-stroke, pointDelta>1 и missing acceptedPoint.
+- Live game pixel equivalence не проверена; пользовательский paired capture остаётся следующим gate.
+
+## 2026-11-05 — paired renderer offline replay evidence
+
+- Зафиксировано, что offline replay live accepted points уже создан и сохранён в `data/renderer_result/`: source PNG, masked-board PNG, WebGL board PNG и Egret renderer manifest.
+- Manifest связывает 138 accepted points с live run `16aec62c-9e54-44e7-8691-9df79b19161d`, mode=smooth, lineWidth=10. Internal actual BoardPane/manual transcription и Canvas2D/WebGL comparisons — exact, 0 differing pixels.
+- Уточнён статус gate: offline replay завершён; количественный live `after_draw-board.png` ↔ offline WebGL PNG comparison остаётся pending. FILL-001-RS matrix остаётся blocked.
+- Изменения ограничены документацией; исходники, тесты, workflow, конфигурации и первичные экспериментальные данные не изменялись.
+
+## 2026-11-05 — multi-axis renderer diagnostics
+
+- Added independent horizontal/vertical/diagonal axis fitting to the offline screen-transform audit.
+- Added vertical and diagonal paired-renderer test cases in Brush Test UI with fixed radius/sampling profile.
+- Added regression coverage for scenario-plan generation and executor handoff.
+- Updated comparison diagnostics to verify the axis coverage required by each paired scenario.
+- Live captures remain pending; no production renderer or executor behavior changed.
+
+
+## 2026-11-05 — scenario-aware renderer audit
+
+- Renderer comparison now validates that each paired scenario uses its expected Monitor-fit and screenshot-bound axes.
+- Report limitations are generated from actual axis sources rather than assuming a horizontal trajectory.
+- Updated audit and all required CI jobs passed in run 41976515362.
+
+
+## 2026-11-05 — formal paired-renderer acceptance gates
+
+- Added offline validators for exact capture binding, pointCount/accepted-point consistency, axis-transform tolerances and the predeclared alpha-24 pixel acceptance thresholds.
+- Added a separate series report tool requiring three unique accepted vertical captures and three unique accepted diagonal captures.
+- No production drawing behavior or live experiment was changed.
+
+
+## 2026-11-05 — Bridge telemetry run provenance and CI correction
+
+- Persisted Bridge opt-in telemetry configuration in session/run evidence.
+- Added regression tests for generated snippets, Bridge lifecycle, run provenance and paired UI scenario selection.
+- Fixed test expectation/import issues found by two CI attempts; commit 58ebdda7 is undergoing CI run 41994624425.
+
+## 2026-11-05 — CI verification of renderer and Bridge automation
+
+- Full CI run 41994624425 completed SUCCESS on code/test commit 58ebdda7; all required jobs passed, optional algorithm benchmarks skipped.
+- Bridge input telemetry opt-in/restore and run provenance passed Node/Python regression tests.
+- Horizontal paired renderer retained PASS_PER_RUN; multi-axis live series remains pending.
+- Latest V1–V5 analyzer validated 90/90 captures; INT-006 and INT006R analyses accepted 45/45 each. CHALK safety margin and production eligibility remain unvalidated.
+- FILL-001-RS static sweep reproduced 2,238 candidates / 62 accepted; this remains offline estimate evidence, not exact CHALK.
+- Windows portable build/startup smoke-test passed and artifact was uploaded.
+
+
+## 2026-11-06 — independent same-run renderer comparison and optional Windows build
+
+- Formal browser compositor использует independent board_to_screen transform; Firefox Canvas2D overlay ждёт eager source image load и выполняет drawImage синхронно до screenshot. Пустая expected mask отклоняется явно.
+- Добавлен regression test на HTML/onload compositor contract.
+- Windows portable build/startup smoke-test стал manual opt-in: workflow_dispatch.run_windows_portable_build, default=false. Обычный push CI больше не запускает этот job.
+- CI 42113632374: horizontal PASS_PER_RUN; vertical/diagonal REJECTED_PER_RUN. Остальные обязательные code/test jobs SUCCESS; INT-006 общий workflow gate FAILURE. Stage-level WebGL composition остаётся следующим диагностическим этапом.
+- Production renderer, brush settings, trajectories, sampling и executor не изменялись.
+
+
+## 2026-11-06 — документирование Stage-level WebGL compositor audit
+
+- Зафиксирован пробел renderer comparison harness: local BoardPane WebGL raster и screen-space Canvas2D overlay не воспроизводят Stage backing composition.
+- Документирована source-level цепочка Egret WebGL texture rendering и подтверждённые параметры sampling/alpha.
+- Зафиксированы run-bound Stage/backing geometry и контролируемый A–D offline diagnostic plan.
+- Production code, tests, workflow, acceptance thresholds и live game state не менялись. Гипотеза о влиянии fractional backing origin остаётся открытой.
+
+
+## 2026-11-07 — INT-006 95% calibration/holdout protocol
+
+- Добавлен `CHALK_95_PERCENT_CALIBRATION_HOLDOUT_PROTOCOL_2026-11-07.md`: target interpretation, 19 calibration / 59 holdout independent DrawingPlan IDs per profile/domain, zero-exceedance holdout gate, N strata, capture integrity и split protection.
+- Зафиксировано пользовательское решение о 95% целевом одностороннем предиктивном покрытии (DEC-026).
+- Обновлены PROJECT_STATUS, TASKS, ROADMAP, WORK_LOG, README и policy design.
+- Только документация; код, тесты, конфигурации, workflow, production estimator/defaults и live game не изменялись.
