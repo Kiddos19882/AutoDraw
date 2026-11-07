@@ -10,6 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "tests"))
 from run_paired_renderer_acceptance import (  # noqa: E402
     discover_paired_renderer_runs,
     renderer_reference_directory,
+    renderer_manifest_path,
 )
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -120,3 +121,20 @@ def test_renderer_reference_directory_is_bound_to_each_nonbaseline_run(tmp_path)
 
     assert original == renderer_root / "vertical"
     assert additional == run_root / "vertical" / "new-vertical-run"
+
+
+def test_renderer_manifest_path_accepts_generated_run_bound_manifest_name(tmp_path):
+    generated = tmp_path / "manifest.json"
+    generated.write_text("{}", encoding="utf-8")
+
+    resolved = renderer_manifest_path(tmp_path, "egret-5.4.1-renderer-reference-manifest.json")
+
+    assert resolved == generated
+
+
+def test_renderer_manifest_path_prefers_expected_committed_name(tmp_path):
+    expected = tmp_path / "egret-5.4.1-renderer-reference-manifest.json"
+    expected.write_text("{}", encoding="utf-8")
+    (tmp_path / "manifest.json").write_text("{\"generated\": true}", encoding="utf-8")
+
+    assert renderer_manifest_path(tmp_path, expected.name) == expected

@@ -180,6 +180,15 @@ def renderer_reference_directory(
     return root / orientation / run_id
 
 
+def renderer_manifest_path(offline_dir: Path, expected_name: str) -> Path:
+    """Resolve the committed baseline name or the generated run-bound manifest name."""
+    expected = offline_dir / expected_name
+    if expected.is_file():
+        return expected
+    generated = offline_dir / "manifest.json"
+    return generated if generated.is_file() else expected
+
+
 def _write_preflight_rejection(output_root: Path, item: dict[str, Any]) -> Path:
     orientation = item["orientation"]
     identity = str(item.get("experiment_id") or Path(item["experiment_dir"]).name)
@@ -239,7 +248,7 @@ def run_acceptance(
             renderer_root, orientation, str(candidate["run_id"]), run_reference_root,
         )
         offline_png = offline_dir / reference["offline_png"]
-        manifest = offline_dir / reference["manifest"]
+        manifest = renderer_manifest_path(offline_dir, reference["manifest"])
         if not offline_png.is_file() or not manifest.is_file():
             rejected_item = {
                 **candidate,
