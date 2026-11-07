@@ -1,3 +1,22 @@
+## 2026-11-07 — INT-006: 95% calibration/holdout protocol
+
+- [x] Получить пользовательское подтверждение 95% как целевого одностороннего предиктивного покрытия.
+- [x] Определить статистическую единицу: уникальный DrawingPlan ID, не stroke row и не повтор capture.
+- [x] Зафиксировать split-conformal calibration minimum: 19 независимых plan IDs на profile/domain.
+- [x] Зафиксировать строгий holdout acceptance: 59 независимых plan IDs и 0 превышений на profile/domain; exact one-sided 95% upper bound для failure probability около 4.95%.
+- [x] Подготовить offline protocol, capture integrity gates, split protection и fail-closed boundaries.
+- [ ] Определить целевую совокупность production DrawingPlans и числовые границы N low/medium/high до генерации выборки.
+- [ ] Сформировать 78 новых независимых plan IDs для первой line-based domain; проверить отсутствие дубликатов/leakage между splits.
+- [ ] Заморозить prediction artifact, split assignment, protocol version и acceptance criteria.
+- [ ] Получить отдельное разрешение на live captures; до него игру и доску не запускать.
+- [ ] Провести calibration, зафиксировать квантиль, затем независимо проверить holdout без tuning.
+- [ ] Сохранить `safety_margin_status=not_established`, `production_eligibility=not_validated` и INT-007 BLOCKED до прохождения всех gates.
+- [ ] Закрыть FILL-001 PNG quality gate отдельно.
+
+**Объём:** одна line-based domain, radius=10, P0/P1/P2; 19 calibration + 59 holdout plans на профиль/domain. 78 уникальных планов, каждый исполняется по трём профилям: 234 плановых captures. Дополнительные domains требуют независимых выборок. N bands пока не заданы. Только офлайн-проектирование; live capture не разрешён.
+
+---
+
 ## 2026-11-07 — INT-006 проект политики безопасного запаса CHALK
 
 - [x] Проверить официальный INT-006 report, frozen analyzer и независимый validation plan.
