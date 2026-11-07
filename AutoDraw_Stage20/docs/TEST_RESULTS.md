@@ -1,3 +1,61 @@
+## 2026-11-07 — локальный PRR batch и exact CHALK evidence
+
+**Источник:** commit `52e3c51a0830e09abb09b516af098069aef26de7`, ветка `feature/image-geometry-optimization`. Commit содержит 64 сохранённых файла с локальными экспериментальными данными; ниже приведена сводка четырёх новых PRR run. Исходные JSON/PNG остаются первичными данными.
+
+### Условия серии
+
+- Phase: `PRR`; series: `chalk-20261107-030757-c4fd43`.
+- Успешный block: `596e5c37813a43048395d0f596f9d971`; status=`completed`; expected/completed=4/4.
+- Первый block: `ab9b788c8199454c957036effb99e9c6`; status=`stopped`; первая задача завершилась `plan_creation_failed`, так как Bridge был запущен до выбора paired-renderer scenario и input telemetry не была включена. Остальные задачи остались pending. Этот блок не засчитывается.
+- Game Monitor/Bridge session: `0490d04b-8728-40f2-891d-e1d57d69402b`; Game Monitor 0.2.3; boardDetected=true; inputTelemetryEnabled=true; board=460×240; maxPoints=6000; начальный pointCount=1.
+- Requested radius=10; во всех четырёх Monitor reports `observed_brush_radii=[10]`, `brush_radius_status=single`; один completed stroke на run.
+- Executor profile: point_step_px=2, line_extension_px=0, point_delay_ms=10, after_mouse_up_ms=20, before_mouse_down_ms=20, after_mouse_down_ms=40, end_hold_ms=50, countdown_seconds=5.
+
+### Точные результаты
+
+| Orientation | Repeat | Run ID | Experiment ID | pointCount before | pointCount after | CHALK |
+|---|---:|---|---|---:|---:|---:|
+| Diagonal | 2 | `ac5a5692-59b1-4cb4-83e5-6539d3472706` | `e57f336d5ada4ca7a71c1c7bac12903c` | 1 | 162 | 161 |
+| Vertical | 3 | `cc98eabc-4365-4387-9756-48564b31f498` | `5c8bb20fb26d4e2ba51a0a68d9d7b799` | 1 | 71 | 70 |
+| Diagonal | 3 | `656aef75-1e69-4e90-a2c5-c713a262fb08` | `74ec4e28243b45d1a9eb648257549e21` | 1 | 161 | 160 |
+| Vertical | 2 | `7159641d-84c1-4d4a-a3dd-a7c4f34614ab` | `41566975619247b1a574ed0204cca59b` | 1 | 72 | 71 |
+
+Во всех случаях `CHALK = pointCount_after - pointCount_before`; сумма `DRAW_SAMPLE.pointDelta` совпадает с CHALK. Reports фиксируют `dropped_events=0`, `monitor_error_count=0`, `collector_sequence_gap_count=0`. Жизненный цикл штриха собран через `pointer_observer`; не следует требовать отсутствующие в этих reports события DRAW_START/DRAW_END.
+
+### Сопоставление с repeat 1
+
+Ранее сохранённые исходные run: vertical `c860234f-995a-4789-9ac2-e05b322fe742` — CHALK=71; diagonal `f69cb0f4-f5d0-4ff9-a3b7-1148c38fa07f` — CHALK=161. Таким образом, имеются три уникальных live captures для каждой ориентации:
+- Vertical: 71, 71, 70.
+- Diagonal: 161, 161, 160.
+
+Это подтверждает повторяемость точного счётчика в этих фиксированных сценариях при radius=10, но не устанавливает зависимость CHALK от радиуса и не доказывает универсальную модель для других геометрий.
+
+### Ограничения интерпретации
+
+- Monitor trajectory status=`incomplete_until_verified`: coalesced `pointDelta` означает, что часть промежуточных принятых координат может отсутствовать. Report segment length — lower bound, не точная длина траектории.
+- Четыре новых run ещё не прошли отдельный paired-renderer PNG acceptance analyzer. Не присваивать им PASS_PER_RUN и не менять aggregate series status до анализа.
+- Успешное завершение block не подтверждает визуальное качество штрихов и не заменяет PNG acceptance.
+- PRR не исследует влияние радиуса: все новые прогоны выполнены при radius=10.
+- INT-006 CHALK safety margin остаётся `not_established`, `production_eligibility=not_validated`.
+- FILL-001 committed PNG audit остаётся failed (coverage=98.430600%, leakage=11); FILL-001-RS static sweep не заменяет этот gate.
+- INT-007 остаётся BLOCKED.
+
+### Raw evidence locations
+
+- `data/results/brush_behavior_tests/chalk_test_blocks/chalk-block-PRR-chalk-20261107-030757-c4fd43-596e5c37.json`
+- `data/results/brush_behavior_tests/chalk_test_blocks/chalk-block-PRR-chalk-20261107-030757-c4fd43-ab9b788c.json`
+- `data/results/brush_behavior_tests/game_monitor_bridge/0490d04b-8728-40f2-891d-e1d57d69402b/session.json`
+- `data/results/brush_behavior_tests/experiment-20261107-030956-b10-paired_renderer_diagonal_single_stroke-e57f336d/experiment.json` и `monitor_report.json`
+- `data/results/brush_behavior_tests/experiment-20261107-031044-b10-paired_renderer_vertical_single_stroke-5c8bb20f/experiment.json` и `monitor_report.json`
+- `data/results/brush_behavior_tests/experiment-20261107-031127-b10-paired_renderer_diagonal_single_stroke-74ec4e28/experiment.json` и `monitor_report.json`
+- `data/results/brush_behavior_tests/experiment-20261107-031215-b10-paired_renderer_vertical_single_stroke-41566975/experiment.json` и `monitor_report.json`
+
+### CI status
+
+Workflow [42309752566](https://github.com/Kiddos19882/AutoDraw/actions/runs/42309752566) SUCCESS validates PRR code at commit `bacd03f5eee725dbbfac0ce928b227bd23d73b0c`. It predates evidence commit `52e3c51a0830e09abb09b516af098069aef26de7`; CI PASS for the latter is not confirmed. Current evidence needs to be passed through the paired-renderer analyzer/CI.
+
+---
+
 ## 2026-11-07 — итог CI PRR implementation и повторная оценка renderer/CHALK
 
 **GitHub Actions:** [42309752566](https://github.com/Kiddos19882/AutoDraw/actions/runs/42309752566) — **SUCCESS**.  
