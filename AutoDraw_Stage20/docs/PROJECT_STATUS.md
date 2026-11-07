@@ -1,3 +1,21 @@
+## 2026-11-07 — ручное подтверждение визуального компромисса INT006R: radius=10
+
+**Решение пользователя:** визуальное качество radius=10 подтверждено как приемлемое и предпочтительное для исследованной матрицы INT006R.
+
+**Область решения:** только пять проверенных сценариев D1–D5 (mixed lines, polygon, intersections, short details, repeated coverage), три повтора на радиус и сравнение radius 1/10/30 в artifact [13553755987](https://github.com/Kiddos19882/AutoDraw/actions/runs/42321009715/artifacts/13553755987). Radius=10 сохраняет читаемость линий и разделение коротких деталей лучше, чем radius=30, и выглядит заметнее radius=1.
+
+**Статус и ограничения:**
+- Ручной sign-off пользователя получен; визуальный компромисс radius=10 принят для указанной матрицы.
+- Это не универсальное правило для всех изображений, геометрий, масштабов и режимов заполнения.
+- Это не доказательство минимального расхода CHALK: INT006R totals составили 1011/1015/1017 для радиусов 1/10/30 на 15 captures каждый; разница ограничена данной выборкой.
+- Машинное поле в сохранённом analyzer artifact `visual_quality_gate=pending_manual_review` не изменялось и не переопределяется этим документальным sign-off.
+- `safety_margin_status=not_established`; `production_eligibility=not_validated`.
+- FILL-001 PNG quality gate остаётся отдельным незакрытым блокером.
+
+**Следующий шаг:** разработать и независимо проверить CHALK safety-margin policy с учётом числа штрихов и domain coverage; параллельно сохранить FILL-001 PNG gate отдельной задачей.
+
+---
+
 ## 2026-11-07 — предварительный визуальный обзор INT006R; manual gate не закрыт
 
 Проверен CI visual-review artifact [13553755987](https://github.com/Kiddos19882/AutoDraw/actions/runs/42321009715/artifacts/13553755987): 45 after-draw board PNG, 5 geometry scenarios × 3 radii × 3 repeats. Контактные листы сформированы по радиусам 1/10/30 для сравнения всех сценариев.

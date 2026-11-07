@@ -1,3 +1,10 @@
+## 2026-11-07 — INT006R: пользовательский visual sign-off radius=10
+
+- Зафиксировано подтверждение пользователя: radius=10 визуально приемлем и предпочтителен в пределах проверенной матрицы D1–D5.
+- Уточнена ограниченная область применимости; универсальный production default не утверждён.
+- Machine-generated analyzer field `visual_quality_gate=pending_manual_review` сохранено без изменений.
+- CHALK safety margin и production eligibility остаются невалидированными; FILL-001 PNG gate не закрыт.
+
 ## 2026-11-07 — INT006R preliminary visual review and CHALK residual diagnostics
 
 - Просмотрены 45 saved after-draw PNG из INT006R artifact; preliminary visual compromise — radius 10, но manual visual gate остаётся pending.

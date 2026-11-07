@@ -1,3 +1,21 @@
+## 2026-11-07 — INT006R: ручной visual sign-off пользователя
+
+**Решение:** пользователь подтвердил визуальную приемлемость radius=10 как предпочтительного компромисса для исследованной матрицы D1–D5.
+
+**Evidence scope:** artifact `13553755987`, 45 after-draw captures; 5 геометрий × 3 радиуса (1/10/30) × 3 повтора.
+
+**Принятая область:** radius=10 предпочтителен в пределах этих пяти сценариев и условий испытания. Это ручное качественное решение пользователя, а не новая автоматическая метрика или результат повторного запуска.
+
+**Не следует заключать:**
+- что radius=10 универсально оптимален для любого рисунка;
+- что radius=10 минимизирует расход CHALK;
+- что решение распространяется на FILL-001/заливку;
+- что safety margin модели подтверждён.
+
+Machine-generated `visual_quality_gate=pending_manual_review` в исходном analyzer artifact не менялся. Пользовательский sign-off хранится как отдельное решение проекта. `safety_margin_status=not_established`; `production_eligibility=not_validated`.
+
+---
+
 ## 2026-11-07 — INT006R visual review package и CHALK residual diagnostics
 
 **Source artifact:** [13553755987 — INT006R visual review source](https://github.com/Kiddos19882/AutoDraw/actions/runs/42321009715/artifacts/13553755987).  

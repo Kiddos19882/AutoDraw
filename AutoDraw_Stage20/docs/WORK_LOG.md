@@ -1,3 +1,14 @@
+## 2026-11-07 — зафиксирован пользовательский visual sign-off INT006R
+
+- Пользователь подтвердил, что radius=10 визуально приемлем и предпочтителен для исследованной матрицы D1–D5.
+- Решение записывается как ручной sign-off с ограниченной областью применимости; универсальный production default не объявляется.
+- Сохранённый analyzer artifact не изменялся: его machine-generated поле `visual_quality_gate=pending_manual_review` остаётся исходным.
+- CHALK totals по INT006R (15 captures на радиус): r1=1011, r10=1015, r30=1017. Это не доказывает, что radius=10 минимизирует расход.
+- `safety_margin_status=not_established`, `production_eligibility=not_validated`; FILL-001 PNG gate остаётся отдельным блокером.
+- Исходники, тесты, конфигурации и live-эксперименты не затрагивались.
+
+---
+
 ## 2026-11-07 — предварительный визуальный обзор INT006R и residual analysis
 
 - Скачан и просмотрен CI artifact `13553755987`: 45 after-draw PNG, 15 на каждый radius (1/10/30), 5 geometry scenarios × 3 repeats.

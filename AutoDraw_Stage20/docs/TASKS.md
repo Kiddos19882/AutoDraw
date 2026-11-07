@@ -1,3 +1,16 @@
+## 2026-11-07 — пользовательский sign-off визуального компромисса INT006R
+
+- [x] Получить подтверждение пользователя: radius=10 визуально приемлем и предпочтителен в пределах проверенной матрицы D1–D5.
+- [x] Зафиксировать область применимости решения: пять исследованных геометрий, captures INT006R, сравнение радиусов 1/10/30; не распространять на произвольные рисунки и заливку.
+- [x] Зафиксировать ручное проектное решение отдельно от machine-generated analyzer status.
+- [ ] Разработать safety-margin policy с масштабированием по числу штрихов и профилю; проверить на независимых captures.
+- [ ] Сохранить `safety_margin_status=not_established` и `production_eligibility=not_validated` до отдельного validation gate.
+- [ ] Разобрать FILL-001 PNG quality gate (coverage=98.430600%, leakage=11); static sweep PASS не заменяет PNG acceptance.
+
+**Примечание:** сохранённое поле analyzer `visual_quality_gate=pending_manual_review` не изменено. Пользовательский sign-off зафиксирован как отдельное ручное решение, ограниченное INT006R matrix.
+
+---
+
 ## 2026-11-07 — INT006R preliminary visual review и CHALK residual analysis
 
 - [x] Просмотреть 45 сохранённых INT006R after-draw PNG (5 геометрий × 3 радиуса × 3 повтора) в artifact `13553755987`.
