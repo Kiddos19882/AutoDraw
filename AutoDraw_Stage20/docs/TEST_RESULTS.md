@@ -1,3 +1,25 @@
+## 2026-11-08 — проверенный 81-image image/geometry screening (E3)
+
+**Первичные артефакты:** [screening CI 42416307401](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416307401) SUCCESS на `3fdffec`; [artifact 13591427560](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416307401/artifacts/13591427560), `combined_corpus_screening.json`. Прочитаны 31+50 исходных изображений и 81 штатный .autodraw, проверены сохранённые source SHA256, выполнены 4 regression unit tests (PASS).
+
+| Фактический offline параметр | Значение |
+|---|---:|
+| Источники: first31 / second50 | 31 / 50 |
+| Exact source SHA256 duplicate groups | 0 |
+| Exact geometry hash duplicate groups (stroke endpoints/order, без имён) | 0 |
+| Строгие perceptual review pairs: pHash≤10 AND dHash≤10 | 0 |
+| Ближайшие пары, сохранённые в JSON для ручного просмотра | 20 |
+| Source images с alpha transparency | 10 |
+| Images с chroma_fraction≤0.10 | 27 |
+| Images с dominant coarse color fraction≥0.75 | 8 |
+| Images с edge_score≥50 | 6 |
+
+Два image hash и pixel статистики — **диагностика, а не доказательство семантической независимости**, классификация семейства изображений не выполнялась, нулевой результат near-duplicate не исключает обрезанные, повёрнутые и иные производные изображения. Не присвоен статус independent или eligible ни одному плану: `independent_plan_count=null`, `predictor_domain_eligibility=not_assessed`, `CHALK_measurement=not_performed`, `validation_95_percent=not_performed`. Проверенный domain первой CHALK policy — line-based D1–D5; пользовательские Stage8 планы — scanline raster image coverage, автоматический перенос на них 95% недопустим.
+
+**CI chronology:** [42415293374](https://github.com/Kiddos19882/AutoDraw/actions/runs/42415293374) SUCCESS на `985e194`; [42416162521](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416162521) SUCCESS для первой версии скрининга, соответствующий большой validation [42416162506](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416162506) отменён из-за concurrency; [42416307401](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416307401) SUCCESS для последнего скрининга. [Полный validation 42416307257](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416307257) для `3fdffec` отслеживается отдельно. Ни live CHALK, ни Windows portable build screening не проверял.
+
+---
+
 ## 2026-11-08 — подтверждённый offline inventory: 31 + 50 = 81 candidate source images
 
 **Источники:** первая партия: [8b4588b](https://github.com/Kiddos19882/AutoDraw/commit/8b4588be1803f90905cba223005c4702b374e520), `data/generated_autodraw_plan/20261107-224452-09ee1388/`; вторая партия и добавление исходных изображений обеих партий: [985e194](https://github.com/Kiddos19882/AutoDraw/commit/985e1947c9f79bf330ea17b8aab65be7aa70c2fb), `data/generated_autodraw_plan/20261108-001212-215cb369/`, `data/generated_autodraw_plan/images_31_first/` и `images2_50_second/`. Проверены committed первичные `generated_validation_corpus_manifest.json` и `corpus_geometry_audit.json` **обеих партий**; реальная игра не запускалась и локальные генерации повторно не проводились через GitHub API.

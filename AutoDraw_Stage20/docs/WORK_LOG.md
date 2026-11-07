@@ -1,3 +1,11 @@
+## 2026-11-08 — CI подтверждён: similarity/geometry audit 81-image corpus
+
+Проверены feature branch HEAD/20 commits, исходный код генератора, протокол CHALK, существующие источники статуса и 81 committed source image через read-only workflow. Созданы `screen_candidate_corpus.py`, unit tests и read-only workflow (`196f338`, `3fdffec`), без изменения frozen predictor/executor/игровой части. Анализатор читает все source images и проекты, проверяет source SHA256, hash геометрии без имени stroke, строит pHash/dHash, ближайшие пары и exploratory image features.
+
+[Run 42416307401](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416307401) SUCCESS: 81/81, exact source/geometry duplicate 0; строгий perceptual-pair count 0, 20 ближайших пар сохранены для ручного review, 4 unit tests PASS. Image feature counts (10 transparent/27 low chroma/8 coarse color dominant/6 high edge-score) не эквивалентны семантической классификации; независимость/CHALK eligibility не доказана. Основной CI `42416307257` ещё проверяется; master не изменён, local git status/live не проверялись.
+
+---
+
 ## 2026-11-08 — проверка GitHub commit 985e194 и corpus 81 candidates
 
 - Изучены актуальный feature HEAD, последние 20 коммитов, master ref, состав commit, проектные регламенты, CHALK protocol и два committed manifest+geometry audit.

@@ -1,3 +1,15 @@
+## 2026-11-08 — screening 81 sources завершён, ручные/domain gates открыты
+
+- [x] Добавить `screen_candidate_corpus.py`, 4 regression tests и независимый `candidate-corpus-screen.yml` (`196f338`, `3fdffec`).
+- [x] [CI 42416307401](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416307401) SUCCESS: 81 source verified, 0 exact source/geometry duplicate groups; 0 strict pHash+dHash flagged, top20 nearest pairs preserved in [artifact 13591427560](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416307401/artifacts/13591427560).
+- [x] Подтвердить предыдущий полный [CI 42415293374](https://github.com/Kiddos19882/AutoDraw/actions/runs/42415293374) SUCCESS на `985e194`.
+- [ ] Проверить полный [CI 42416307257](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416307257) на `3fdffec`.
+- [ ] Ручной просмотр 20 ближайших пар; классификация содержимого 81 image family и near-duplicate/derived групп. По pHash нельзя автоматически делать split.
+- [ ] Выбрать поддерживаемый runtime drawing domain: line-based D1–D5 или отдельный scanline-fill protocol. До domain eligibility не freeze N bands и 19/59.
+- [ ] Live captures / exact CHALK, FILL-001 и INT-007 по-прежнему отдельные gates; offline screen ни один из них не закрывает.
+
+---
+
 ## 2026-11-08 — подготовлен 81-image candidate pool, protocol eligibility ещё открыт
 
 - [x] Проверены [commit 985e194](https://github.com/Kiddos19882/AutoDraw/commit/985e1947c9f79bf330ea17b8aab65be7aa70c2fb) и обе партии: image source folders, 50 новых проектов и 50 цветных планов, manifest и geometry audit.

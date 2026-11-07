@@ -1,3 +1,11 @@
+## 2026-11-08 — офлайн-скрининг независимости 81 изображения: E3 SUCCESS, domain gate OPEN
+
+[CI 42416307401](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416307401) SUCCESS, [artifact 13591427560](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416307401/artifacts/13591427560). `screen_candidate_corpus.py` сверил все 81 original image SHA256 и exact geometry endpoints из 81 .autodraw: 0 точных source/geometry duplicate groups, 0 strict pHash+dHash similarity flags. 20 ближайших пар отобраны для **ручного** просмотра, не исключены автоматически. Статистическая независимость и semantic image family labels остаются unknown. Численные image characteristics и ограничения — [TEST_RESULTS.md](TEST_RESULTS.md).
+
+Frozen INT-006 95% protocol scoped to line-based D1–D5; все Stage8 image plans — горизонтальные scanlines и не имеют подтверждённого модельного домена. Нет оснований freeze 19/59 split/production N bands, делать 95%-й вывод или открывать INT-007. FILL-001 gate без изменений; exact game CHALK не измерялся. [Full CI 42416307257](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416307257) на последнем source commit пока отдельно проверяется; прежний full [42415293374](https://github.com/Kiddos19882/AutoDraw/actions/runs/42415293374) SUCCESS на `985e194`.
+
+---
+
 ## 2026-11-08 — две партии изображений сохранены: 81 candidate DrawingPlan
 
 В feature branch [commit 985e194](https://github.com/Kiddos19882/AutoDraw/commit/985e1947c9f79bf330ea17b8aab65be7aa70c2fb) добавил 50 .autodraw + 50 color plans с manifest/geometry audit для второй партии, а также исходные изображения первой (31) и второй (50) партий. Верификация первичных manifest и audit двух запусков: 81/81 уникальный source SHA-256, 0 точных пересечений между партиями, 81 mono/81 color SHA-256 plans, 81/81 structurally valid. Canvas 646×323, fit=contain, палитра и шаги совпадают. Mono N 315–6385 (median 1897); color N 1868–33113 (median 10727). [Подробные measurements](TEST_RESULTS.md).
