@@ -1,6 +1,6 @@
 # AutoDraw — текущее состояние
 
-**Дата сверки:** 2026-11-08. **Ветка:** `feature/image-geometry-optimization`. **Исходный HEAD проверки:** `a2d1f0a52d47`. **Последний проверенный code SHA:** `5a55e9f45b34`.
+**Дата сверки:** 2026-11-08. **Ветка:** `feature/image-geometry-optimization`. **Исходный HEAD проверки:** `a2d1f0a52d47`. **Последний проверенный code/test SHA:** `98615e7f23aa`; **workflow SHA:** `6d790cd72326`.
 
 **Основной [CI 42417067391](https://github.com/Kiddos19882/AutoDraw/actions/runs/42417067391) — SUCCESS**, [81-image screening 42417067363](https://github.com/Kiddos19882/AutoDraw/actions/runs/42417067363) — SUCCESS, оба на `5a55e9f`. Проверка GitHub не равна локальному `git status`, Windows runtime или реальному игровому запуску.
 
@@ -17,6 +17,7 @@
 | INT006R | [45 exact captures](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md) и [визуальный аудит](CHALK_INT006R_VISUAL_AUDIT_2026-11-03.md) | Radius 1: разрыв D2; radius 30: слияние деталей D4; перенос на fills не подтверждён |
 | PRR renderer | [6/6 PASS_PER_RUN, aggregate PASS](https://github.com/Kiddos19882/AutoDraw/actions/runs/42321009715) | Не универсальная pixel-equivalence каждого будущего рисунка |
 | FILL-001-RS | [Exact CHALK 1260 на 27 штрихах](CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md), runtime binding PASS | **PNG FAIL**: coverage=98.430600% при ≥99%, leakage=11px при 0 |
+| FILL-001 A–D offline | [CI 42424959123](https://github.com/Kiddos19882/AutoDraw/actions/runs/42424959123) SUCCESS, 3 frozen masks × 4 strategies; [artifact 13595421597](https://github.com/Kiddos19882/AutoDraw/actions/runs/42424959123/artifacts/13595421597) | Только OpenCV: actual PNG 98.430600%/11px остаётся FAIL; 81-image strategy comparison не выполнен |
 | Корпус 81 изображения | 31+50 unique SHA, 81 моно+цветных планов; [screening E3](TEST_RESULTS.md) | Similarity review не доказывает semantic independence; scanline ≠ frozen D1–D5 domain |
 | INT-007 | Требования к estimator документированы | **BLOCKED:** safety margin/domain/quality gates не закрыты |
 
@@ -30,6 +31,12 @@
 ## Завершённая проверка новой документации
 
 [Markdown CI 42421451709](https://github.com/Kiddos19882/AutoDraw/actions/runs/42421451709) **SUCCESS**: 99/99 Markdown в едином индексе, 0 broken links в анализируемом синтаксисе, 0 duplicate DEC IDs, 9 intact historical snapshots по SHA, 5 unit tests PASS. [Основной CI 42420934884](https://github.com/Kiddos19882/AutoDraw/actions/runs/42420934884) также **SUCCESS** на `c7f2e363`. Это проверки конкретных SHA, не новый live runtime. [Manifest сохранности](HISTORY_SNAPSHOT_PROVENANCE.json).
+
+## Новый экспериментальный offline baseline A–D (2026-11-08)
+
+Новый FILL-001 A–D offline [CI 42424959123](https://github.com/Kiddos19882/AutoDraw/actions/runs/42424959123): SUCCESS на workflow SHA `6d790cd`. 3 frozen mask × 4 strategy, 15 диагностических PNG + JSON ([artifact 13595421597](https://github.com/Kiddos19882/AutoDraw/actions/runs/42424959123/artifacts/13595421597)). Для варианта C coverage rectangle=99.516%, wide=99.593%, narrow=99.381%, leakage=0 в OpenCV. Эффект не подтверждён на реальном PNG. Вариант D использует oracle residual и создаёт слишком много дополнительных штрихов.
+
+Исходные masks, план FILL-001 и live capture не менялись. Stage6, CHALK estimator и production defaults не затронуты. 12/12 raster PNG согласованы с JSON при независимом пересчёте. FILL-001 live capture по-прежнему REJECTED: CHALK=1260 exact, coverage=98.430600%, leakage=11. Следующий шаг — сопоставление кандидатной контурной геометрии с actual screen-ROI residual map, затем перенос сравнения на фиксированную подвыборку 81 реального изображения.
 
 ## Ближайший приоритет
 

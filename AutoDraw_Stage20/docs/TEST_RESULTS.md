@@ -27,6 +27,7 @@
 |---|---|---|---|
 | Paired renderer PRR | 6/6 `PASS_PER_RUN`, aggregate PASS в [CI 42321009715](https://github.com/Kiddos19882/AutoDraw/actions/runs/42321009715) | Pixel parity всех рисунков/конфигураций | [Game engine analysis](CHALK_GAME_ENGINE_POINT_COST_AND_BRUSH_WIDTH_2026-11-03.md) |
 | FILL-001-RS static sweep | 2238 offline candidates, 62 passed simulation gate | Реальный CHALK или quality gate в игре | [Static sweep](CHALK_FILL001_RS_STATIC_SWEEP_2026-11-04.md) |
+| FILL-001 A–D frozen-mask offline screening | [CI 42424959123](https://github.com/Kiddos19882/AutoDraw/actions/runs/42424959123) SUCCESS на `6d790cd`, 3 маски × 4 стратегии, 15 PNG + JSON ([artifact 13595421597](https://github.com/Kiddos19882/AutoDraw/actions/runs/42424959123/artifacts/13595421597)); C: 99.516% / 99.593% / 99.381%, modeled leakage=0; 12/12 PNG↔JSON independently checked | Не проверяет actual game screenshot, не измеряет CHALK; D oracle-based; Windows build SKIPPED | [Analyzer](../source/preparation/chalk_fill_strategy_comparison.py), [tests](../source/preparation/tests/test_chalk_fill_strategy_comparison.py) |
 | FILL-001 committed PNG replay | 27/27, actual 98.430600% coverage, 11 leakage pixels | **Не PASS**, несмотря на успешные тесты replay | [Replay](CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md) |
 | Monitor per-run integrity | Exact telemetry, binding и per-stroke deltas в принятых сериях | Автоматическое доказательство произвольного последующего live | [Bridge API](GAME_MONITOR_BRIDGE_REFERENCE.md), [overflow diagnosis](GAME_MONITOR_BUFFER_OVERFLOW_ANALYSIS_2026-11-02.md) |
 
@@ -47,6 +48,8 @@
 Эти числа — **не измеренный CHALK**. Color scanline Stage6 и mono Stage8 — разные execution paths; INT-006 frozen predictor валидирован для D1–D5 line-based, не автоматически для fills. [95% split protocol](CHALK_95_PERCENT_CALIBRATION_HOLDOUT_PROTOCOL_2026-11-07.md) остаётся proposed, 19/59 не выполнялся.
 
 ## 4. CI и уровни подтверждения
+
+- [CI 42424959123](https://github.com/Kiddos19882/AutoDraw/actions/runs/42424959123): **SUCCESS** on `6d790cd72326`. Preparation/G3, Monitor/Bridge, executor, app integration, Egret reference, INT-006 pixel-audit jobs passed. Optional benchmarks and Windows portable build **SKIPPED**. Artifact: [artifact 13595421597](https://github.com/Kiddos19882/AutoDraw/actions/runs/42424959123/artifacts/13595421597). Это E3 offline, а не новый E4 runtime.
 
 - [Full AutoDraw validation 42417067391](https://github.com/Kiddos19882/AutoDraw/actions/runs/42417067391): **SUCCESS** на `5a55e9f`; Windows portable job мог быть SKIPPED — читать jobs конкретного run.
 - [Offline screening 42417067363](https://github.com/Kiddos19882/AutoDraw/actions/runs/42417067363): **SUCCESS**, 5 regression tests на `5a55e9f`.

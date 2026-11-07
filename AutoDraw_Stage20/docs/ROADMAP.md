@@ -10,6 +10,8 @@
 
 Определить неизменный baseline на уже доступных изображениях. В FILL-001 воспроизвести perimeter-localized failure, сравнить scanline и outline-first / contour-correction без изменения production executor. Сопоставлять coverage, leakage, boundary errors, details, path length, strokes и expected operation count раздельно.
 
+**Промежуточное доказательство 2026-11-08:** Новый FILL-001 A–D offline [CI 42424959123](https://github.com/Kiddos19882/AutoDraw/actions/runs/42424959123): SUCCESS на workflow SHA `6d790cd`. 3 frozen mask × 4 strategy, 15 диагностических PNG + JSON ([artifact 13595421597](https://github.com/Kiddos19882/AutoDraw/actions/runs/42424959123/artifacts/13595421597)). Для варианта C coverage rectangle=99.516%, wide=99.593%, narrow=99.381%, leakage=0 в OpenCV. Эффект не подтверждён на реальном PNG. Вариант D использует oracle residual и создаёт слишком много дополнительных штрихов. Следующий шаг — paired screen-ROI residual comparison и фиксированная подвыборка 81 изображений. Quality gate оригинального game capture остаётся FAIL.
+
 **Gate:** качество ≥99% coverage и leakage=0 для ранее заданных FILL-001 targets до новой live-проверки; offline simulation не утверждает runtime.
 
 ## Этап 2. Изучение фактического цветного execution pipeline
