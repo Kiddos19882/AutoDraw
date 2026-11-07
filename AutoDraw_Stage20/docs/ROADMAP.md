@@ -1,3 +1,9 @@
+## 2026-11-07 — exploratory N inventory подготовлен, целевой corpus остаётся следующим этапом
+
+Успешный CI [42387485762](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387485762) выпустил [offline artifact 13580167471](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387485762/artifacts/13580167471), подтвердив весь генерационный конвейер на 8 `testImages` при canvas 64×32. Детальные N сохранены в [TEST_RESULTS.md](TEST_RESULTS.md). Дальнейшая последовательность не меняется: target corpus provenance/families → frozen predictor geometry eligibility → target N distribution and bounds → independent calibration/holdout split → user-run live capture → one-sided safety policy → INT-007. Не применять тестовый диапазон N к production.
+
+---
+
 ## 2026-11-07 — новый набор testImages: устранён пропущенный CI trigger
 
 Исправлены test assumptions при переходе от одного к восьми изображениям и path-filter CI. После подтверждения [run 42387145503](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387145503) можно продолжить offline-инвентаризацию фактических N. Следующий этап — corpus provenance и geometry eligibility review для реальных изображений, затем frozen selection/split. До этого `testImages` нельзя интерпретировать как валидированную production-like population. INT-007 остаётся BLOCKED.

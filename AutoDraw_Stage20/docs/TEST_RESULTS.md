@@ -1,3 +1,30 @@
+## 2026-11-07 — offline candidate corpus: 8/8 exploratory fixtures, Linux Actions SUCCESS
+
+**Уровень:** E3 (offline GitHub Actions, не live). **Evidence:** [workflow 42387485762](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387485762), [artifact 13580167471](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387485762/artifacts/13580167471). **Workflow/code HEAD:** `2fe37ef8b013450ed7f30924e15a9ddeb0c7f0c3`.
+
+**Среда/параметры:** Ubuntu runner, Python 3.11, `generate_validation_corpus.py`, `AutoDraw_Stage20/testImages/`, `Browser_palette.autodraw-palette.json`, canvas 64×32, fit=contain, row_step=1 (mono/color), другие параметры генератора по умолчанию. Это уменьшенный exploratory smoke, а не production target canvas.
+
+**Результаты:** 8 исходных файлов / 8 уникальных SHA-256 / 0 дубликатов; созданы восемь portable .autodraw и восемь color scanline plan, manifest и `exploratory_N_summary.json`. Manifest records — `candidate_only_not_assessed`. Все family labels — `unclassified`.
+
+| Входной файл | Mono N | Color N |
+|---|---:|---:|
+| `free-icon-font-envelope-3916611.png` | 71 | 196 |
+| `free-icon-font-home-3917033.png` | 79 | 246 |
+| `free-icon-font-instagram-6422200.png` | 87 | 248 |
+| `free-icon-font-phone-call-5070407.png` | 88 | 295 |
+| `free-icon-font-user-3917688.png` | 50 | 172 |
+| `images.png` | 63 | 262 |
+| `vk-dog-1.jpg` | 40 | 179 |
+| `wV6VeZI9S1Y.png` | 50 | 226 |
+
+**Диапазон:** mono N 40–88; color N 172–295 — число штрихов в generated plan, **не** accepted game points, CHALK или утверждённые N bands. Восемь files не являются независимой production calibration/holdout population; нет семейств, target-domain matching и frozen predictor eligibility. CHALK exact не измерялся.
+
+**Неудачная попытка сохранена:** [42387397972](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387397972) FAILED из-за отсутствующего `shared_image_processing` в Linux `PYTHONPATH`; исправлено только окружение workflow в commit `2fe37ef`. Без изменения production pipeline.
+
+**Следующий gate:** сформировать целевую population реальных DrawingPlan, проверить family/provenance/геометрии и численные N на реальном целевом размере/режиме; только затем заморозить N bands и независимые 19/59 splits. `safety_margin_status=not_established`, `production_eligibility=not_validated`, INT-007 BLOCKED.
+
+---
+
 ## 2026-11-07 — INT006R: ручной visual sign-off пользователя
 
 **Решение:** пользователь подтвердил визуальную приемлемость radius=10 как предпочтительного компромисса для исследованной матрицы D1–D5.

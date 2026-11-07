@@ -1,3 +1,14 @@
+## 2026-11-07 — восстановление Linux offline workflow, выпуск измеримого fixture corpus
+
+- Добавлен самостоятельный `.github/workflows/validation-corpus-smoke.yml` (`e112d4c`), запускающий генератор на testImages с реальным committed palette profile и холстом 64×32.
+- Первая попытка [42387397972](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387397972) FAILED в import `shared_image_processing` (Linux PYTHONPATH); исправлен `PYTHONPATH` (`2fe37ef`), не затрагивая код приложения.
+- Повторный workflow [42387485762](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387485762) SUCCESS; artifact [13580167471](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387485762/artifacts/13580167471) содержит проекты, планы, manifest и N summary.
+- Вывод CI logs: 8 unique sources / 0 duplicates; mono N 40–88, color N 172–295; все source families unclassified. Первичные per-file значения записаны в TEST_RESULTS.
+- Нельзя переносить эти результаты на 95% holdout, утверждённый запас CHALK или production eligibility: размер холста и выборка исследовательские, game execution не было.
+- Программный CI [42387145503](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387145503) пока не завершён; Preparation/G3, executor, game monitor, app integration и Egret reference jobs SUCCESS.
+
+---
+
 ## 2026-11-07 — регрессия от новых repository images и устранение пропущенного запуска CI
 
 - Проверены HEAD, 20 commits, восемь изображений в `AutoDraw_Stage20/testImages/`, test generator, Stage 8 scanline stroke schema и frozen INT-006 normalizer.

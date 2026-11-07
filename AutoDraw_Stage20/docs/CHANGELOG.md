@@ -1,3 +1,11 @@
+## 2026-11-07 — exploratory corpus GitHub Actions и N report
+
+- Добавлен воспроизводимый offline workflow `.github/workflows/validation-corpus-smoke.yml` со сбором .autodraw, color scanline и manifest из repository testImages, а также публикацией N summary и artifact.
+- Исправлено Linux `PYTHONPATH` после FAILED run `42387397972`, подтверждён SUCCESS `42387485762` и artifact `13580167471`.
+- Работа изолирована от production executor, CHALK predictor и Game Monitor; данные остаются exploratory.
+
+---
+
 ## 2026-11-07 — testImages corpus regression guard
 
 - Regression test генератора адаптирован к расширяемому каталогу `testImages`, с проверкой хешей, количества результатов и повторной загрузки .autodraw/color plans (`098d5599`).

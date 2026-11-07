@@ -4,6 +4,12 @@
 **Источники:** текущие тестовые файлы, `.github/workflows/geometry-tests.yml`, `ARCHITECTURE.md`, `UI_INTEGRATION_MAP.md` и актуальные результаты `TEST_RESULTS.md`. Исторические root-level `PROJECT_GUIDE.md` и `PROJECT_DOCUMENTATION.md` не являются источниками текущего статуса.  
 **Ограничение:** документ описывает обнаруженные связи и конфигурацию запуска. Тесты в рамках подготовки документа не запускались.
 
+## Offline exploratory validation corpus workflow (2026-11-07)
+
+`.github/workflows/validation-corpus-smoke.yml` — отдельный Ubuntu/Python 3.11 workflow; запускается при изменении testImages и связанных файлов pipeline, а также вручную. Повторно использует `generate_validation_corpus.py`, palette profile и сохраняет проекты, цветные планы, manifest и `exploratory_N_summary.json` в artifact `autodraw-exploratory-fixture-corpus`. Параметры: canvas 64×32, fit contain; это smoke для fixtures, не production CHALK validation. Первый run [42387397972](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387397972) FAILED из-за import path; исправлен `PYTHONPATH`. Следующий [42387485762](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387485762) SUCCESS, artifact [13580167471](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387485762/artifacts/13580167471). Подробные измеренные N: [TEST_RESULTS.md](TEST_RESULTS.md).
+
+Основной `.github/workflows/geometry-tests.yml` отдельно включает `AutoDraw_Stage20/testImages/**` в push paths (`e984b68`) для регрессии при расширении fixtures.
+
 ## 1. Уровни тестирования
 
 | Уровень | Каталог | Инструмент | Назначение |
@@ -89,7 +95,7 @@
 
 ## 4. CI workflow
 
-Единый workflow: `.github/workflows/geometry-tests.yml`.
+Основной validation workflow: `.github/workflows/geometry-tests.yml`; отдельный exploratory candidate-corpus workflow описан выше.
 
 ### 4.1. Job: game-monitor-tests
 

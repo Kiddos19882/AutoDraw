@@ -1,3 +1,16 @@
+## 2026-11-07 — offline candidate-corpus evidence и следующие блокировки
+
+- [x] Исправить GitHub Actions `PYTHONPATH` для Linux candidate-corpus workflow (исходный FAILED `42387397972`, исправлен `2fe37ef`).
+- [x] Получить artifact [13580167471](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387485762/artifacts/13580167471) на CI SUCCESS `42387485762`: 8/8 исходников, 0 SHA-256 дубликатов, mono N=40–88, color N=172–295, canvas 64×32, candidate-only.
+- [x] Записать метрики отдельных файлов в `TEST_RESULTS.md` (единственный владелец результатов).
+- [ ] Зафиксировать полное завершение validation workflow [42387145503](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387145503) и отдельные jobs/skips.
+- [ ] Получить **целевую**, не тестовую population и проверить, какие планы действительно поддерживаются frozen INT-006 predictor; не смешивать mono и color N.
+- [ ] Определить репрезентативные families, ограничения по длине, источники и target N range до назначения N bands и разделения 19/59.
+
+**Статус:** тестовый offline corpus готов; 95% validation corpus и safety margin — NOT READY; live captures — NOT_RUN.
+
+---
+
 ## 2026-11-07 — устранение регрессии candidate corpus на расширенном testImages
 
 - [x] Сверить актуальный HEAD, последние 20 коммитов, каталог testImages, генератор и regression tests.

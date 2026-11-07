@@ -1,3 +1,11 @@
+## 2026-11-07 — exploratory corpus из repository testImages успешно построен в CI
+
+[Offline corpus workflow 42387485762](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387485762) SUCCESS на `2fe37ef`; [artifact 13580167471](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387485762/artifacts/13580167471) содержит 8 проектов .autodraw, 8 color plans, manifest и N summary. Восемь SHA-256 уникальны, дубликатов нет. Mono N=40–88, color N=172–295 **только для testImages/canvas 64×32**. Все family labels unclassified; `protocol_eligibility=candidate_only_not_assessed`.
+
+Первая попытка `42387397972` FAILED из-за `PYTHONPATH`; исправлен workflow `2fe37ef`. Эти N не служат числовыми N bands для утверждённой 95%-й проверки; корпус не является production-like population. CHALK live не измерялся. INT-006 safety margin и FILL-001 PNG gate не закрыты; INT-007 BLOCKED. Полный validation workflow `42387145503` на момент записи ещё выполняется: подтверждены Preparation/G3, executor, Game Monitor/Bridge, app integration и Egret reference; INT-006 PNG audit ещё в процессе, Windows portable skipped.
+
+---
+
 ## 2026-11-07 — регрессия testImages после расширения набора исправлена в тестах
 
 Статический аудит текущей ветки обнаружил: после commit `0db0bcb` каталог `testImages/` содержит восемь изображений, а `test_generate_validation_corpus.py` ожидал один уникальный исходник. Последний прежний CI SUCCESS `42352776594` относился к `51c731f`, до добавления семи изображений.

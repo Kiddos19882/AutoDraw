@@ -12,6 +12,12 @@
 
 **Граница применимости:** Stage 8 scanline strokes имеют двухточечный `closed=false` формат и схематически соответствуют frozen INT-006 normalizer. Однако сам frozen INT-006 predictor проверялся на отдельной line-based domain, а не на всех generated scanline fill plans. Нельзя считать каждую строку scanline автоматическим valid CHALK observation или выдавать политику 95% для этих файлов. Fixtures `testImages` предназначены для offline smoke/inventory и не должны автоматически включаться в независимый production-like split.
 
+### Фактический offline результат (2026-11-07)
+
+Успешно выполнен [GitHub Actions 42387485762](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387485762) после исправления Linux import paths (`2fe37ef`); [artifact 13580167471](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387485762/artifacts/13580167471) содержит .autodraw, color scanline, manifest и N summary для всех восьми testImages. Уникальных SHA-256 — 8, дубликатов — 0; mono N 40–88, color N 172–295 при canvas 64×32. Подробные per-file результаты — [TEST_RESULTS.md](TEST_RESULTS.md). Первая попытка [42387397972](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387397972) FAILED из-за `PYTHONPATH`; эта попытка сохранена как отрицательный результат.
+
+Валидационный статус остаётся `candidate_only_not_assessed`, а model eligibility — `not_assessed`. Это не production population, не замороженные N bands и не exact CHALK.
+
 ## 1. Назначение
 
 Генератор создаёт из набора исходных растровых изображений два независимых типа артефактов:
