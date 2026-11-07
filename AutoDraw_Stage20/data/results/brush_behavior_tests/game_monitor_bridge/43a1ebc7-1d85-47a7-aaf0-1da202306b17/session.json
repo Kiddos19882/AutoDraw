@@ -1,0 +1,204 @@
+{
+  "schema_version": 2,
+  "session_id": "43a1ebc7-1d85-47a7-aaf0-1da202306b17",
+  "started_at_utc": "2026-11-07T00:08:29.309+00:00",
+  "run_idle_seconds": 2.5,
+  "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:159.0) Gecko/20100101 Firefox/159.0",
+  "page": {
+    "origin": "https://eufbpet.hust.me",
+    "pathname": "/pet.php"
+  },
+  "monitor_status_at_connect": {
+    "version": "0.2.3",
+    "active": true,
+    "boardDetected": false,
+    "boardLabel": null,
+    "snapshot": null,
+    "eventCount": 251,
+    "droppedEvents": 0,
+    "errors": 0,
+    "inputTelemetryEnabled": false
+  },
+  "bridge_configuration": {
+    "inputTelemetry": {
+      "requested": false,
+      "enabled": false,
+      "previous": false,
+      "changedByBridge": false,
+      "restoreStatus": "not_required"
+    }
+  },
+  "renderer_geometry": {
+    "inspectionMode": "read_only",
+    "engineVersion": "5.4.1",
+    "renderMode": "webgl",
+    "runtimeType": "web",
+    "systemRenderer": "n",
+    "canvasRenderer": "n",
+    "windowGeometry": {
+      "screenX": -32000,
+      "screenY": -32000,
+      "outerWidth": 160,
+      "outerHeight": 28,
+      "innerWidth": 1920,
+      "innerHeight": 877,
+      "screenWidth": 1920,
+      "screenHeight": 1080,
+      "availableScreenWidth": 1920,
+      "availableScreenHeight": 1032
+    },
+    "canvasScaleFactor": 2,
+    "canvasScaleX": 3,
+    "canvasScaleY": 3,
+    "devicePixelRatio": 1,
+    "visualViewportScale": 1,
+    "playerCount": 1,
+    "players": [
+      {
+        "playerFound": true,
+        "playerMatchesStage": true,
+        "containerRect": {
+          "left": 0,
+          "top": 0,
+          "right": 1920,
+          "bottom": 877,
+          "width": 1920,
+          "height": 877
+        },
+        "playerOptions": {
+          "scaleMode": "fixedHeight",
+          "frameRate": 30,
+          "contentWidth": 740,
+          "contentHeight": 600,
+          "renderModeOption": null
+        },
+        "stage": {
+          "width": 1314,
+          "height": 600,
+          "frameRate": 30,
+          "scaleMode": "fixedHeight",
+          "orientation": "auto"
+        },
+        "canvas": {
+          "width": 3942,
+          "height": 1800,
+          "clientWidth": 3942,
+          "clientHeight": 1800,
+          "offsetLeft": 0,
+          "offsetTop": -1,
+          "rect": {
+            "left": 0,
+            "top": -0.5,
+            "right": 1920,
+            "bottom": 877.5,
+            "width": 1920,
+            "height": 878
+          },
+          "screenQuad": null,
+          "style": {
+            "left": "0px",
+            "top": "-0.5px",
+            "width": "",
+            "height": "",
+            "transform": "matrix(0.487062, 0, 0, 0.487778, 0, 0)",
+            "transformOrigin": "0% 0% 0px",
+            "computedTransform": "matrix(0.487062, 0, 0, 0.487778, 0, 0)",
+            "computedTransformOrigin": "0px 0px"
+          }
+        },
+        "boardStageCorners": null,
+        "boardClientCorners": null,
+        "boardClientMappingMethod": "unavailable",
+        "boardDisplayChain": null,
+        "boardMask": null
+      }
+    ],
+    "boardDetected": false,
+    "boardLabel": null,
+    "boardLogicalSize": null,
+    "boardDisplayChain": null
+  },
+  "renderer_geometry_updated_at_utc": "2026-11-07T00:08:29.308+00:00",
+  "bridge_diagnostics": {
+    "received_message_count": 68,
+    "received_event_count": 25,
+    "received_event_types": {
+      "BOARD_ATTACHED": 1,
+      "POINTER_DOWN_CANDIDATE": 8,
+      "DRAW_SAMPLE": 8,
+      "POINTER_UP_CANDIDATE": 8
+    },
+    "last_message_type": "heartbeat",
+    "last_sequence": 68,
+    "collector_sequence_gap_count": 0,
+    "last_message_at_utc": "2026-11-07T00:09:05.112+00:00",
+    "last_monitor_status": {
+      "version": "0.2.3",
+      "active": true,
+      "boardDetected": true,
+      "boardLabel": "o",
+      "snapshot": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 0.5770652173913043,
+        "scaleY": 0.5770652173913043,
+        "maxPoints": 6000,
+        "remainingPoints": 2000,
+        "pointCount": 4000,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          1,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          6,
+          11,
+          11,
+          11,
+          11,
+          11,
+          11,
+          2,
+          2,
+          2,
+          2,
+          2,
+          5,
+          5,
+          5
+        ],
+        "currentRadius": 19
+      },
+      "eventCount": 633,
+      "droppedEvents": 0,
+      "errors": 0,
+      "inputTelemetryEnabled": false
+    },
+    "browser_bridge": {
+      "sentEventCount": 25,
+      "lastEventType": "POINTER_UP_CANDIDATE",
+      "lastEventAtPerformanceMs": 114108,
+      "sendFailureCount": 0
+    },
+    "frame_probe_count": 8,
+    "connection_closed": true,
+    "last_event_type": "POINTER_UP_CANDIDATE",
+    "last_event_performance_ms": 114108,
+    "closed_at_utc": "2026-11-07T00:09:05.370+00:00"
+  }
+}

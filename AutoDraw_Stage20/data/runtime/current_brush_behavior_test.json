@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "name": "Brush behavior test — paired_renderer_diagonal_single_stroke",
-  "created_at": "2026-11-05T16:26:00+00:00",
+  "name": "Brush behavior test — paired_renderer_vertical_single_stroke",
+  "created_at": "2026-11-07T00:12:15+00:00",
   "coordinate_system": "local_canvas_pixels",
   "canvas": {
     "width": 674,
@@ -11,33 +11,33 @@
   "height": 355,
   "strokes": [
     {
-      "name": "paired_renderer_long_diagonal",
+      "name": "paired_renderer_long_vertical",
       "points": [
         {
-          "x": 29.260869565217394,
+          "x": 336.5,
           "y": 29.5
         },
         {
-          "x": 643.7391304347826,
+          "x": 336.5,
           "y": 324.5
         }
       ],
       "closed": false,
       "metadata": {
         "role": "brush_behavior_test",
-        "test_case": "paired_renderer_diagonal_single_stroke",
+        "test_case": "paired_renderer_vertical_single_stroke",
         "line_extension_px_override": 0.0
       }
     }
   ],
   "generation": {
     "method": "manual_brush_behavior_test",
-    "test_case": "paired_renderer_diagonal_single_stroke",
+    "test_case": "paired_renderer_vertical_single_stroke",
     "brush_value_must_be_set_manually": true,
     "note": "Set the requested brush size in the browser before executing this plan.",
     "paired_renderer_capture": {
       "schema_version": 1,
-      "scenario_id": "paired_renderer_diagonal_single_stroke",
+      "scenario_id": "paired_renderer_vertical_single_stroke",
       "requested_radius": 10,
       "expected_strokes": 1,
       "renderer_path_mode": "smooth",
@@ -52,8 +52,56 @@
         "countdown_seconds": 5
       }
     },
-    "experiment_id": "0e61bc40e5a8432fb87fa80b95889f4e",
+    "experiment_id": "41566975619247b1a574ed0204cca59b",
     "requested_brush_value": 10,
+    "chalk_test_block": {
+      "block_id": "596e5c37813a43048395d0f596f9d971",
+      "task_id": "paired_renderer_vertical_single_stroke-r2",
+      "phase_id": "PRR"
+    },
+    "chalk_experiment_matrix": {
+      "schema_version": 1,
+      "series_id": "chalk-20261107-030757-c4fd43",
+      "phase_id": "PRR",
+      "scenario_id": "paired_renderer_vertical_single_stroke",
+      "repeat_index": 2,
+      "matrix_order_index": 4,
+      "planned_repeats": 3,
+      "requested_radius": 10,
+      "expected_strokes": 1,
+      "geometry_signature": "f9833cf9f6d0d5fab360a7b866ccc42dabedf17c5342b70657134070ea32f0ae",
+      "planned_strokes": [
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "paired_renderer_vertical_single_stroke"
+          },
+          "name": "paired_renderer_long_vertical",
+          "points": [
+            {
+              "x": 230.0,
+              "y": 20.0
+            },
+            {
+              "x": 230.0,
+              "y": 220.0
+            }
+          ]
+        }
+      ],
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      }
+    },
     "source_coordinate_system": "logical_board_pixels",
     "source_canvas": {
       "width": 460,
@@ -105,7 +153,7 @@
   },
   "summary": {
     "stroke_count": 1,
-    "drawing_length_px": 681.62,
+    "drawing_length_px": 295.0,
     "pen_up_distance_px": 0.0
   }
 }

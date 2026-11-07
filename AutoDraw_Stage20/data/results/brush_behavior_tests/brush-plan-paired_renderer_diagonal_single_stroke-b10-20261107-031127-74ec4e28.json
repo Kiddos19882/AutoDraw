@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "name": "Brush behavior test — paired_renderer_diagonal_single_stroke",
+  "created_at": "2026-11-07T00:11:27+00:00",
+  "coordinate_system": "logical_board_pixels",
+  "canvas": {
+    "width": 460,
+    "height": 240
+  },
+  "width": 460,
+  "height": 240,
+  "strokes": [
+    {
+      "name": "paired_renderer_long_diagonal",
+      "points": [
+        {
+          "x": 20.0,
+          "y": 20.0
+        },
+        {
+          "x": 440.0,
+          "y": 220.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "paired_renderer_diagonal_single_stroke",
+        "line_extension_px_override": 0.0
+      }
+    }
+  ],
+  "generation": {
+    "method": "manual_brush_behavior_test",
+    "test_case": "paired_renderer_diagonal_single_stroke",
+    "brush_value_must_be_set_manually": true,
+    "note": "Set the requested brush size in the browser before executing this plan.",
+    "paired_renderer_capture": {
+      "schema_version": 1,
+      "scenario_id": "paired_renderer_diagonal_single_stroke",
+      "requested_radius": 10,
+      "expected_strokes": 1,
+      "renderer_path_mode": "smooth",
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      }
+    },
+    "experiment_id": "74ec4e28243b45d1a9eb648257549e21",
+    "requested_brush_value": 10,
+    "chalk_test_block": {
+      "block_id": "596e5c37813a43048395d0f596f9d971",
+      "task_id": "paired_renderer_diagonal_single_stroke-r3",
+      "phase_id": "PRR"
+    },
+    "chalk_experiment_matrix": {
+      "schema_version": 1,
+      "series_id": "chalk-20261107-030757-c4fd43",
+      "phase_id": "PRR",
+      "scenario_id": "paired_renderer_diagonal_single_stroke",
+      "repeat_index": 3,
+      "matrix_order_index": 3,
+      "planned_repeats": 3,
+      "requested_radius": 10,
+      "expected_strokes": 1,
+      "geometry_signature": "c23a12ef0e12f125ce5346c82c4ffd4f82bc06c4d0c64cf5f27001b787b7251b",
+      "planned_strokes": [
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "paired_renderer_diagonal_single_stroke"
+          },
+          "name": "paired_renderer_long_diagonal",
+          "points": [
+            {
+              "x": 20.0,
+              "y": 20.0
+            },
+            {
+              "x": 440.0,
+              "y": 220.0
+            }
+          ]
+        }
+      ],
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      }
+    },
+    "screen_transform": {
+      "method": "inclusive_logical_bounds_to_screen_pixel_centers",
+      "source_coordinate_system": "logical_board_pixels",
+      "target_coordinate_system": "local_canvas_pixels",
+      "logical_board": {
+        "width": 460,
+        "height": 240
+      },
+      "screen_roi": {
+        "x": 496,
+        "y": 265,
+        "width": 674,
+        "height": 355
+      },
+      "scale_x": 1.4630434782608697,
+      "scale_y": 1.475,
+      "expected_uniform_scale": true,
+      "uniform_scale_relative_error": 0.00810611643330876,
+      "uniform_scale_tolerance": 0.01,
+      "logical_bounds": {
+        "x": [
+          0,
+          460
+        ],
+        "y": [
+          0,
+          240
+        ]
+      },
+      "screen_local_bounds": {
+        "x": [
+          0,
+          673
+        ],
+        "y": [
+          0,
+          354
+        ]
+      },
+      "boundary_mapping": "logical_max_to_last_screen_pixel",
+      "executor_coordinate_units": "screen_pixels",
+      "point_step_px_units": "screen_pixels"
+    }
+  }
+}
