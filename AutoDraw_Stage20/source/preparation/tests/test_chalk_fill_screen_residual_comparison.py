@@ -111,6 +111,27 @@ def test_fail_closed_on_bad_sensitivity_parameters(insets):
         analyze_committed_screen_residual(_results_root(), insets=insets)
 
 
+def test_json_sha_is_canonical_across_checkout_line_endings_but_png_is_exact(tmp_path):
+    from chalk_fill_screen_residual_comparison import _read_pinned
+
+    source = b'{\n  "message": "immutable"\n}\n'
+    expected = hashlib.sha256(source).hexdigest()
+    path = tmp_path / "evidence.json"
+    path.write_bytes(source)
+    assert _read_pinned(path, expected, git_json=True) == source
+
+    crlf = source.replace(b"\n", b"\r\n")
+    path.write_bytes(crlf)
+    assert _read_pinned(path, expected, git_json=True) == crlf
+    with pytest.raises(ValueError, match="SHA-256 mismatch"):
+        _read_pinned(path, expected)
+
+    mixed = crlf.replace(b"immutable\"\r\n", b"immutable\"\n")
+    path.write_bytes(mixed)
+    with pytest.raises(ValueError, match="Mixed JSON"):
+        _read_pinned(path, expected, git_json=True)
+
+
 def test_reject_modified_png_and_identity(tmp_path):
     original = _results_root()
     target = tmp_path / "source"
