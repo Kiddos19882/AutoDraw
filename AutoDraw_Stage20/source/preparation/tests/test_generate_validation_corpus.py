@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import tempfile
 import unittest
@@ -124,21 +125,54 @@ class ValidationCorpusGeneratorTests(unittest.TestCase):
         self.assertTrue((source_dir / "images.png").is_file())
         self.assertTrue(palette_path.is_file())
 
+        # The repository fixture directory is intentionally expandable. The
+        # 2026-11-07 image additions made the former "exactly one file"
+        # assertion stale, even though generation itself is valid.
+        sources = sorted(
+            path for path in source_dir.iterdir()
+            if path.is_file() and path.suffix.lower() in {".png", ".jpg", ".jpeg", ".bmp", ".webp", ".tif", ".tiff"}
+        )
+        self.assertGreaterEqual(len(sources), 8)
+        expected_hashes = {
+            hashlib.sha256(path.read_bytes()).hexdigest() for path in sources
+        }
+
         with tempfile.TemporaryDirectory() as temp:
+            data_root = Path(temp) / "data"
             manifest = generate_corpus(
                 source_dir,
-                Path(temp) / "data",
+                data_root,
                 palette_path=palette_path,
                 canvas_width=64,
                 canvas_height=32,
                 fit_mode="contain",
             )
-            self.assertEqual(manifest["unique_source_count"], 1)
-            record = manifest["records"][0]
-            self.assertGreater(record["drawing_plan_stroke_count"], 0)
-            self.assertGreater(record["color_plan_stroke_count"], 0)
-            self.assertTrue((Path(temp) / "data" / record["project_path"]).is_file())
-            self.assertTrue((Path(temp) / "data" / record["color_plan_path"]).is_file())
+            self.assertEqual(manifest["unique_source_count"], len(expected_hashes))
+            self.assertEqual(
+                manifest["duplicate_source_count"], len(sources) - len(expected_hashes)
+            )
+            records = manifest["records"]
+            self.assertEqual({item["source_sha256"] for item in records}, expected_hashes)
+            self.assertTrue(any(item["drawing_plan_stroke_count"] > 0 for item in records))
+            self.assertTrue(any(item["color_plan_stroke_count"] > 0 for item in records))
+
+            for record in records:
+                self.assertEqual(record["protocol_eligibility"], "candidate_only_not_assessed")
+                project_path = data_root / record["project_path"]
+                color_plan_path = data_root / record["color_plan_path"]
+                self.assertTrue(project_path.is_file(), record["source"])
+                self.assertTrue(color_plan_path.is_file(), record["source"])
+                project = open_project(project_path)
+                self.assertEqual(project.canvas, (64, 32))
+                self.assertEqual(
+                    len(project.json_file("drawing_plan")["strokes"]),
+                    record["drawing_plan_stroke_count"],
+                )
+                color_plan = load_color_scanline_plan(color_plan_path)
+                self.assertEqual(
+                    color_plan["summary"]["stroke_count"],
+                    record["color_plan_stroke_count"],
+                )
 
 
 if __name__ == "__main__":
