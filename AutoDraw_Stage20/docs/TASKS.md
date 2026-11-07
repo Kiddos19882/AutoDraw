@@ -1,3 +1,17 @@
+## 2026-11-07 — актуальный статус PRR после локального batch
+
+- [x] PRR batch runner прошёл CI: workflow [42309752566](https://github.com/Kiddos19882/AutoDraw/actions/runs/42309752566), SUCCESS на commit `bacd03f5eee725dbbfac0ce928b227bd23d73b0c`. Это не CI для последующего evidence HEAD `52e3c51a0830e09abb09b516af098069aef26de7`.
+- [x] Локальный PRR batch выполнен: block `596e5c37813a43048395d0f596f9d971`, 4/4 задач, по два новых run для vertical и diagonal; все execution completed, CHALK exact.
+- [x] Проверена привязка четырёх run к Game Monitor session `0490d04b-8728-40f2-891d-e1d57d69402b`; telemetry включена, dropped events/errors/sequence gaps отсутствуют.
+- [ ] Выполнить formal paired-renderer analyzer для четырёх новых captures и проверить итоговый aggregate series status. Не засчитывать capture как PASS_PER_RUN до результата analyzer.
+- [ ] После formal acceptance отдельно закрыть CHALK safety margin/domain validation.
+- [ ] Разблокировать FILL-001 только после исправления PNG quality gate (coverage=98.430600%, leakage=11 в прежнем committed audit).
+- [ ] Не открывать INT-007 до закрытия INT-006 и обоснования safety margin.
+
+**Новые точные CHALK:** diagonal repeat 2=161 (run `ac5a5692-59b1-4cb4-83e5-6539d3472706`), diagonal repeat 3=160 (`656aef75-1e69-4e90-a2c5-c713a262fb08`), vertical repeat 2=71 (`7159641d-84c1-4d4a-a3dd-a7c4f34614ab`), vertical repeat 3=70 (`cc98eabc-4365-4387-9756-48564b31f498`). Для каждого pre pointCount=1; post соответствует CHALK+1. Подробная таблица и experiment IDs находятся в [TEST_RESULTS.md](TEST_RESULTS.md#2026-11-07--локальный-prr-batch-и-exact-chalk-evidence).
+
+---
+
 ## 2026-11-07 — итог CI PRR implementation и повторная оценка renderer/CHALK
 
 **GitHub Actions:** [42309752566](https://github.com/Kiddos19882/AutoDraw/actions/runs/42309752566) — **SUCCESS**.  
@@ -27,8 +41,8 @@
 
 Это автоматизирует последовательность опытов внутри локального Windows AutoDraw, но не запускает игру из GitHub Actions и не предоставляет ИИ доступ к локальной доске. Формальная renderer acceptance по PNG остаётся отдельным итоговым gate: завершение CHALK block само по себе не означает PASS_PER_RUN.
 
-- [ ] Подтвердить CI для PRR batch runner; проверить, что план содержит ровно четыре уникальные ячейки и журнал отклоняет повторы/подмену параметров.
-- [ ] После обновления AutoDraw на локальном Windows ПК выполнить PRR на тестовой доске; получить два новых уникальных Game Monitor run_id для vertical и два для diagonal.
+- [x] Подтвердить CI для PRR batch runner; проверка четырёх ячеек и journal regression завершена в workflow 42309752566 на bacd03f.
+- [x] Выполнить PRR на локальной тестовой доске; получены два новых уникальных Game Monitor run_id для vertical и два для diagonal (block 596e5c37, 4/4).
 - [ ] Запустить paired renderer acceptance analyzer по сохранённым артефактам; засчитывать только уникальные PASS_PER_RUN. Не открывать INT-007 до закрытия series и CHALK safety review.
 
 ## 2026-11-06 — renderer acceptance policy обновлена до 92%
