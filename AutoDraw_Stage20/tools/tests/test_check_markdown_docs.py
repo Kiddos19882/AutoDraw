@@ -15,6 +15,8 @@ class MarkdownIntegrityTests(unittest.TestCase):
         self.assertEqual(
             github_slug('3. Кандидатный корпус 81 реального изображения (OFFLINE ONLY)'),
             '3-кандидатный-корпус-81-реального-изображения-offline-only')
+        self.assertEqual(github_slug('A — B'), 'a--b')
+        self.assertIn('старый-якорь', heading_anchors('<a id="старый-якорь"></a>'))
         self.assertEqual(heading_anchors('# Title\n## Раздел\n## Раздел'),
                          {'title', 'раздел', 'раздел-1'})
 

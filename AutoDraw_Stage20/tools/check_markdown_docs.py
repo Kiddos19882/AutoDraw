@@ -21,6 +21,7 @@ CURRENT_DOCS = {
     'docs/KNOWLEDGE_ARCHITECTURE.md'
 }
 FENCE_RE = re.compile(r'^\s{0,3}(?:' + chr(96) + r'{3,}|~{3,})')
+EXPLICIT_ANCHOR_RE = re.compile(r'<a\s+(?:id|name)=[\"\']([^\"\']+)[\"\']', re.IGNORECASE)
 
 
 def github_slug(title: str) -> str:
@@ -29,7 +30,7 @@ def github_slug(title: str) -> str:
     title = re.sub(r'[*~]', '', title).strip().strip('#').strip().lower()
     title = ''.join(c for c in title
                     if c in ' -_' or unicodedata.category(c)[0] in ('L', 'N', 'M'))
-    return re.sub(r'\s+', '-', title)
+    return re.sub(r'\s', '-', title)
 
 
 def heading_anchors(content: str) -> set[str]:
@@ -42,6 +43,8 @@ def heading_anchors(content: str) -> set[str]:
             continue
         if fenced:
             continue
+        for anchor in EXPLICIT_ANCHOR_RE.finditer(line):
+            result.add(anchor.group(1).lower())
         found = HEADING_RE.match(line)
         if found:
             slug = github_slug(found.group(1))
@@ -93,7 +96,7 @@ def check_links(root: Path, md_paths: list[Path]):
                 indexed.add(path)
             label = {'file': str(file.relative_to(root)), 'line': line_no,
                      'destination': dest}
-            if not path.is_relative_to(root):
+            if not path.is_relative_to(root.parent):
                 problems.append({**label, 'error': 'outside_repository_root'})
             elif not path.exists():
                 problems.append({**label, 'error': 'missing_target'})

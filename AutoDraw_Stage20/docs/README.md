@@ -27,6 +27,12 @@
 - **Цель CHALK 95%:** [проект safety margin](CHALK_SAFETY_MARGIN_POLICY_DESIGN_2026-11-07.md) → [предложенный протокол 19/59](CHALK_95_PERCENT_CALIBRATION_HOLDOUT_PROTOCOL_2026-11-07.md); ещё **не** production gate PASS.
 - **Game Monitor / Bridge:** [текущие API](GAME_MONITOR_BRIDGE_REFERENCE.md) и [README Game Monitor](../source/game_monitor/README.md).
 
+## Файлы игрового движка
+
+- [Текущий комплект клиентских bundle и manifest](../gameEngine/) — сохранённые файлы Egret/BoardPane. Копия в репозитории не доказывает соответствие именно текущей живой игре.
+- [Аудит движка, принятых точек и renderer](CHALK_GAME_ENGINE_POINT_COST_AND_BRUSH_WIDTH_2026-11-03.md) — сопоставление версий, доказательства и границы выводов.
+- [Game Monitor / Bridge API](GAME_MONITOR_BRIDGE_REFERENCE.md) — фактические интерфейсы наблюдателя.
+
 ## Правила интерпретации
 
 1. `PROJECT_STATUS.md` — текущее состояние; старые файлы/планы и snapshots — хронология с локальной датой на каждом утверждении.
@@ -38,9 +44,10 @@
 
 Ниже файлы из Git tree рабочего коммита при составлении индекса; каталоги и исторические версии включены. Для быстрых ответов сначала используйте таблицу выше. **Название файла не является доказательством актуальности его содержимого.**
 
-### Основное управление, регламенты и история (22)
+### Основное управление, регламенты и история (23)
 
 - [`AI_WORK_GUIDE.md`](AI_WORK_GUIDE.md)
+- [`AI_WORK_GUIDE_HISTORY_THROUGH_2026-11-08.md`](AI_WORK_GUIDE_HISTORY_THROUGH_2026-11-08.md)
 - [`CHANGELOG_HISTORY_THROUGH_2026-11-08.md`](CHANGELOG_HISTORY_THROUGH_2026-11-08.md)
 - [`CHANGELOG.md`](CHANGELOG.md)
 - [`DECISIONS_HISTORY_THROUGH_2026-11-08.md`](DECISIONS_HISTORY_THROUGH_2026-11-08.md)

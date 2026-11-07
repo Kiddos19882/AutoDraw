@@ -35,3 +35,11 @@
 - [42415293374](https://github.com/Kiddos19882/AutoDraw/actions/runs/42415293374) **SUCCESS** на `985e194`.
 
 **Текущие зависимости:** [ROADMAP](ROADMAP.md) · [PROJECT_STATUS](PROJECT_STATUS.md) · [TEST_RESULTS](TEST_RESULTS.md).
+
+## Совместимость исторических ссылок
+
+<a id="ключевой-технический-вывод-для-fill-001-rs--связный-контур-вместо-глобального-уплотнения-scanline"></a>
+- Прежняя ссылка на FILL-001-RS ведёт к [этому действующему выводу](#ключевой-технический-вывод-для-fill-001-rs--связный-контур-вместо-глобального-уплотнения-scanline-2026-11-04); полный исторический текст — [здесь](TASKS_HISTORY_THROUGH_2026-11-08.md#ключевой-технический-вывод-для-fill-001-rs--связный-контур-вместо-глобального-уплотнения-scanline-2026-11-04).
+
+<a id="brush-footprint-capsule-001--per-segment-broad-phase-independent-oracle-и-benchmark-2026-11-04"></a>
+- Техническая запись BRUSH-FOOTPRINT-CAPSULE-001 сохранена в [историческом TASKS](TASKS_HISTORY_THROUGH_2026-11-08.md#brush-footprint-capsule-001--per-segment-broad-phase-independent-oracle-и-benchmark-2026-11-04); это не автоматически открытая новая задача.

@@ -54,3 +54,8 @@
 - [Corpus ingestion 42415293374](https://github.com/Kiddos19882/AutoDraw/actions/runs/42415293374): **SUCCESS** на `985e194`.
 
 **Граница:** E3 CI ≠ E4 live game; E4 live ≠ статистическая гарантия для неподдерживаемого domain. [Правила доказательств](EVIDENCE_AND_VALIDATION.md) · [исторические тесты](TEST_RESULTS_HISTORY_THROUGH_2026-11-08.md).
+
+## Совместимость ссылок на исторический PRR batch
+
+<a id="2026-11-07--локальный-prr-batch-и-exact-chalk-evidence"></a>
+Полный набор локальных PRR run ID, exact CHALK и ссылок на исходные captures находится в [TEST_RESULTS_HISTORY_THROUGH_2026-11-08.md](TEST_RESULTS_HISTORY_THROUGH_2026-11-08.md#2026-11-07--локальный-prr-batch-и-exact-chalk-evidence). Формальная позднейшая renderer acceptance — [CI 42321009715](https://github.com/Kiddos19882/AutoDraw/actions/runs/42321009715) (6/6 PASS_PER_RUN).
