@@ -1,3 +1,15 @@
+## 2026-11-07 — добавлен генератор кандидатного корпуса DrawingPlan
+
+- Изучены штатные Stage 12 image processing, Stage 8 scanline planner, .autodraw archive writer/reader, CIELAB/CIEDE2000 palette quantizer и color scanline planner.
+- Добавлен CLI `source/preparation/generate_validation_corpus.py`: один исходник преобразуется в portable .autodraw с monochrome Stage 8 DrawingPlan; при передаче palette JSON дополнительно создаётся color scanline plan.
+- Добавлена SHA-256 дедупликация, provenance manifest, отдельные N для monochrome и color plans, overwrite guard и повторное открытие .autodraw штатным reader.
+- Добавлены tests на создание обоих форматов, проверку содержимого, дедупликацию и защиту от перезаписи.
+- Добавлена документация использования и ограничений.
+- Изменения выполнены только в `feature/image-geometry-optimization`; `master` не затрагивалась.
+- CI и локальный запуск на реальных входных данных на момент записи ещё не подтверждены; корпус не создан, N bands не определены, live runs не выполнялись.
+
+---
+
 ## 2026-11-07 — offline проектирование CHALK safety-margin policy
 
 - Сверены управляющие документы, официальный INT-006 report, frozen predictions/analyzer, validation plan и код `chalk_int006_validation.py`.
