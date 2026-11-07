@@ -1,3 +1,12 @@
+## 2026-11-08 — проверка GitHub commit 985e194 и corpus 81 candidates
+
+- Изучены актуальный feature HEAD, последние 20 коммитов, master ref, состав commit, проектные регламенты, CHALK protocol и два committed manifest+geometry audit.
+- Коммит `985e194` меняет только `AutoDraw_Stage20/data/generated_autodraw_plan/`: 50 second-batch .autodraw + 50 color JSON + 2 reports + 81 source images `images_31_first` / `images2_50_second`. Значит новые исходники теперь доступны отдельно от архивов проектов.
+- Подтверждены: 31+50=81 unique source SHA256, 0 exact cross-overlap, 81 unique mono-plan hashes, 81 unique color-plan hashes, 81/81 schema-valid; 168237 mono strokes, 942206 color strokes; 16955 diagnostic short strokes outside discrete lookup, 0 zero-length; all monochrome scanline horizontal.
+- Документация и результаты обновлены, существующий экспериментальный evidence не перезаписывался. Не проводилось local git status, local replay и game runs; CI на `985e194` рассматривался отдельно. Интерпретация: candidate-only, не frozen 95% calibration/holdout и не CHALK measurement.
+
+---
+
 ## 2026-11-07 — аудит входного commit 8b4588b, данные с компьютера пользователя
 
 - Проверены feature head, последние 20 коммитов, проектные регламенты, новый commit и primary committed JSON `generated_validation_corpus_manifest.json` / `corpus_geometry_audit.json`.

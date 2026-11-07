@@ -1,3 +1,23 @@
+## 2026-11-08 — подтверждённый offline inventory: 31 + 50 = 81 candidate source images
+
+**Источники:** первая партия: [8b4588b](https://github.com/Kiddos19882/AutoDraw/commit/8b4588be1803f90905cba223005c4702b374e520), `data/generated_autodraw_plan/20261107-224452-09ee1388/`; вторая партия и добавление исходных изображений обеих партий: [985e194](https://github.com/Kiddos19882/AutoDraw/commit/985e1947c9f79bf330ea17b8aab65be7aa70c2fb), `data/generated_autodraw_plan/20261108-001212-215cb369/`, `data/generated_autodraw_plan/images_31_first/` и `images2_50_second/`. Проверены committed первичные `generated_validation_corpus_manifest.json` и `corpus_geometry_audit.json` **обеих партий**; реальная игра не запускалась и локальные генерации повторно не проводились через GitHub API.
+
+Конфигурация обоих запусков совпадает: canvas `646×323`, `fit_mode=contain`, `row_step_px=1`, `color_row_step_px=1`, `threshold_mode=otsu`, threshold 128, brightness 0, contrast 1, denoise 0, palette SHA-256 `e8e73bed2a1eca73de548f880b17ca11ede352b7e7b62d1b69c4950930b431c6`. Одинаковые параметры не доказывают совпадение runtime режима исполнения.
+
+| Набор | Исходники / SHA-256 unique | Mono N min / median / max | Color N min / median / max | Σ mono strokes | Σ color strokes |
+|---|---:|---:|---:|---:|---:|
+| Первые 31 | 31 / 31 | 340 / 1707 / 6385 | 1868 / 10245 / 33113 | 65743 | 376068 |
+| Вторые 50 | 50 / 50 | 315 / 1924 / 4432 | 2176 / 10880 / 25974 | 102494 | 566138 |
+| **Вместе** | **81 / 81** | **315 / 1897 / 6385** | **1868 / 10727 / 33113** | **168237** | **942206** |
+
+**Контроль пересечений:** 0 совпадающих source SHA-256 между партиями, 81 уникальный `drawing_plan_sha256`, 81 уникальный `color_plan_sha256`. `schema_valid_records=31+50=81`, `schema_invalid_records=0`. Все 168237 монохромных stroke — горизонтальные, zero-length=0. В 2 аудитах суммарно 16955 short-stroke длин за пределами discrete frozen `SHORT_LOOKUP` при длине ≤10 px; это диагностический признак применения общей регрессионной ветви, а не установленный predictor failure. Все 81 `family_label=unclassified`; metadata не подтверждают независимость по содержанию, шаблону или геометрической подписи. По словам пользователя, картинки были произвольными разными потенциальными заданиями для рисования без критериев отбора; это contextual evidence, а не визуальная проверка похожести.
+
+**Ключевое разграничение:** 81≥78 — лишь достаточный номинальный размер candidate pool перед исключением геометрически неподдержанных/связанных plans. Frozen CHALK INT-006 calibration/holdout protocol требует 78 **независимых и domain-eligible** line-based DrawingPlan IDs для одной геометрической области; horizontal raster scanlines image-fill generator ещё не валидированы как та же область. Нельзя назначать 19/59 split, N bands для 95% claim, safety margin или считать цветной N эквивалентом mono N на основании этого inventory. На сегодня `protocol_eligibility=candidate_only_not_assessed`, `predictor_domain_eligibility=not_assessed`, `production_eligibility=not_validated`; exact `CHALK = pointCount_after - pointCount_before` в новых live captures не измерен, INT-007 BLOCKED.
+
+**CI:** основной [run 42408937802](https://github.com/Kiddos19882/AutoDraw/actions/runs/42408937802) SUCCESS для первой партии `8b4588b`, [run 42415293374](https://github.com/Kiddos19882/AutoDraw/actions/runs/42415293374) по второй партии `985e194` проверяется отдельно. GitHub Actions tests не являются доказательством корректного игрового CHALK.
+
+---
+
 ## 2026-11-07 — пользовательский corpus 31 изображение, offline-аудит (источник 8b4588b)
 
 **Источник:** [GitHub commit 8b4588be1803f90905cba223005c4702b374e520](https://github.com/Kiddos19882/AutoDraw/commit/8b4588be1803f90905cba223005c4702b374e520), каталог `data/generated_autodraw_plan/20261107-224452-09ee1388/`. Первичные файлы: `results/generated_validation_corpus_manifest.json`, `results/corpus_geometry_audit.json`, 31 `.autodraw` проектов и 31 JSON color scanline план. Данные подготовлены локально пользователем и загружены в GitHub; мы проверили сохранённые артефакты, **не** повторяли локальную генерацию или игровой запуск.

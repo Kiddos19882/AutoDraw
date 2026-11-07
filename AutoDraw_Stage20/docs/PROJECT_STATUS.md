@@ -1,3 +1,11 @@
+## 2026-11-08 — две партии изображений сохранены: 81 candidate DrawingPlan
+
+В feature branch [commit 985e194](https://github.com/Kiddos19882/AutoDraw/commit/985e1947c9f79bf330ea17b8aab65be7aa70c2fb) добавил 50 .autodraw + 50 color plans с manifest/geometry audit для второй партии, а также исходные изображения первой (31) и второй (50) партий. Верификация первичных manifest и audit двух запусков: 81/81 уникальный source SHA-256, 0 точных пересечений между партиями, 81 mono/81 color SHA-256 plans, 81/81 structurally valid. Canvas 646×323, fit=contain, палитра и шаги совпадают. Mono N 315–6385 (median 1897); color N 1868–33113 (median 10727). [Подробные measurements](TEST_RESULTS.md).
+
+Размер candidate pool теперь ≥78, однако **его нельзя автоматически объявлять утверждёнными 78 calibration/holdout plans**: 81 family unclassified, независимость по содержанию/geometry не доказана, scanline fill geometry не подтверждена в frozen line-based INT-006 population. Никаких игровых CHALK measurements. INT-007 BLOCKED; FILL-001 gate не изменён. Основной CI входного [run 42415293374](https://github.com/Kiddos19882/AutoDraw/actions/runs/42415293374) требует отдельного финального статуса.
+
+---
+
 ## 2026-11-07 — получен пользовательский corpus из 31 плана (`8b4588b`)
 
 В рабочей ветке [commit 8b4588b](https://github.com/Kiddos19882/AutoDraw/commit/8b4588be1803f90905cba223005c4702b374e520) сохранены 31 candidate .autodraw, 31 цветной план, generated manifest и geometry audit (646×323, contain, row steps 1). Verified manifest: 31 unique SHA-256 / 0 exact duplicate, 31/31 mono plans schema-valid, 0 zero strokes. N mono 340–6385 (median 1707), color 1868–33113 (median 10245). Все 31 family unclassified; 6155 short strokes вне специального lookup и все mono strokes горизонтальные. Подробные фактические данные и ограничения — [TEST_RESULTS.md](TEST_RESULTS.md).

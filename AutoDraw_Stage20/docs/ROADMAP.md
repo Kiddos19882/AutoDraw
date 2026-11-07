@@ -1,3 +1,9 @@
+## 2026-11-08 — candidate population расширена до 81, следующий gate — domain и independence
+
+Поступили source images двух партий (31+50), генератор и аудит подтверждают 81/81 schema-valid, SHA-256 exact unique, одинаковый canvas 646×323. Подробные результаты — [TEST_RESULTS.md](TEST_RESULTS.md), source commits `8b4588b` и `985e194`. Количественная цель 78 **кандидатов** достигнута; статистический и domain gate для 78 независимых line-based calibration/holdout plans — **нет**. Следующая последовательность: classify source families/near duplicates → проверить реальный execution pipeline и frozen geometry domain → определить целевое N distribution/3 bands → frozen independent 19/59 selection → пользовательские live captures exact CHALK → one-sided safety coverage decision. Не переносить 95% на unsupported fills, не изменять FILL-001 gate и INT-007.
+
+---
+
 ## 2026-11-07 — готовность offline инструментов, ожидание целевого корпуса
 
 Успешный [CI 42388237279](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388237279) подтвердил structural audit для 8/8 тестовых планов (не predictor support). Windows `run_validation_corpus_local.ps1` создан, проверяется в основном CI [42388837703](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388837703). Следующий шаг — локальный сбор representative input пользователя и отчётов без новых live запусков, review geometry/family/N, затем утверждение N bands → независимые splits → CHALK validation → safety margin/INT-007. Существующие FILL-001 quality gates независимы.

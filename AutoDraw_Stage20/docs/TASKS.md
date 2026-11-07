@@ -1,3 +1,16 @@
+## 2026-11-08 — подготовлен 81-image candidate pool, protocol eligibility ещё открыт
+
+- [x] Проверены [commit 985e194](https://github.com/Kiddos19882/AutoDraw/commit/985e1947c9f79bf330ea17b8aab65be7aa70c2fb) и обе партии: image source folders, 50 новых проектов и 50 цветных планов, manifest и geometry audit.
+- [x] Сопоставить 31+50 source SHA-256 и plan hashes: 81 уникальный source и mono/color plans, без exact cross-overlap.
+- [x] Проверить N distribution и диагностику структуры: mono 315–6385, color 1868–33113, 81/81 schema-valid, zero-length=0, 16955 диагностических short lengths вне дискретного lookup.
+- [ ] Зафиксировать итог [AutoDraw validation 42415293374](https://github.com/Kiddos19882/AutoDraw/actions/runs/42415293374) на коммите `985e194`.
+- [ ] Классифицировать image families по реальным изображениям, оценить near-duplicate/derived groups и семантическую независимость; сохранять оригинальные изображения и raw plans.
+- [ ] Определить реальный execution plan для будущего INT-006 claim: mono Stage8 scanline vs color scanline vs line-based D1–D5; проверить geometry support каждого домена, не допуская scanline fill автоматически.
+- [ ] Только после domain/independence review определить frozen target N bands и назначить 19/59 split на 78 **допущенных** независимых планов. При <78 после фильтрации потребуется дополнить нужный domain; заранее не утверждать, что 81 достаточно.
+- [ ] Не проводить или не объявлять exact CHALK live validation, safety-margin PASS, FILL-001 gate PASS или INT-007 ready без отдельных первичных evidence.
+
+---
+
 ## 2026-11-07 — анализ поступившего candidate corpus (`8b4588b`)
 
 - [x] Получить и изучить committed manifest+geometry audit и состав коммита (31 .autodraw, 31 color plan, offline reports).

@@ -1,3 +1,10 @@
+## 2026-11-08 — сохраняемые офлайн-артефакты двух партий изображений
+
+- Пользовательский [commit 985e194](https://github.com/Kiddos19882/AutoDraw/commit/985e1947c9f79bf330ea17b8aab65be7aa70c2fb) добавил 31+50 source images, 50 новых .autodraw, 50 color plans и отчёты второй партии; вместе с предыдущими артефактами corpus содержит 81 unique candidate source.
+- Подтверждены geometry audit 81/81 valid и отсутствие exact SHA256 duplicate; 95% model eligibility и live CHALK не проверялись. Результаты и границы применения документированы в `TEST_RESULTS.md`.
+
+---
+
 ## 2026-11-07 — candidate-corpus geometry audit и offline Windows launcher
 
 - Добавлены `audit_validation_corpus.py` и regression tests; audit [CI 42388237279](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388237279) SUCCESS 8/8 structurally valid, без CHALK/domain approval.
