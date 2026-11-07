@@ -1,3 +1,12 @@
+## 2026-11-07 — CI gate закрыт для изменений corpus tests/workflow
+
+- [x] [AutoDraw validation 42387145503](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387145503) завершён SUCCESS на `e984b68`; все выполненные обязательные jobs SUCCESS, Windows portable и benchmarks SKIPPED.
+- [x] [Exploratory fixture corpus 42387485762](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387485762) SUCCESS на `2fe37ef`, сохраняет artifact [13580167471](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387485762/artifacts/13580167471).
+- [ ] Проверить production-like corpus по независимым исходникам/фактическому canvas и domain eligibility; зафиксировать N bands до 19/59 splits.
+- [ ] Не использовать sample fixture N как safety margin и не открывать INT-007 без independent CHALK validation.
+
+---
+
 ## 2026-11-07 — offline candidate-corpus evidence и следующие блокировки
 
 - [x] Исправить GitHub Actions `PYTHONPATH` для Linux candidate-corpus workflow (исходный FAILED `42387397972`, исправлен `2fe37ef`).

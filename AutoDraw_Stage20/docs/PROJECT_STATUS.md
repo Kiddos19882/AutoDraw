@@ -1,3 +1,11 @@
+## 2026-11-07 — итоговый CI на исправленной регрессии: SUCCESS
+
+Полный [AutoDraw validation run 42387145503](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387145503) **SUCCESS** на code/workflow commit `e984b68bea7eb4fd2130d0d00336c86215129fa6`. SUCCESS: Preparation/G3 (включая все восемь testImages в corpus regression), Game Monitor/Bridge, Executor, Application integration, Egret browser reference и INT-006 pixel-level PNG audit. SKIPPED: Windows portable build/startup smoke-test и optional benchmarks. Успех не переносится автоматически на последующие документационные коммиты и не подтверждает live игру.
+
+Отдельный [exploratory corpus workflow 42387485762](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387485762) SUCCESS на `2fe37ef`, 8 source images и artifact 13580167471. Detailed N: [TEST_RESULTS.md](TEST_RESULTS.md). Не изменять gates: candidate-only corpus; INT-006 safety margin not established; INT-007 BLOCKED; FILL-001 PNG gate remains unclosed.
+
+---
+
 ## 2026-11-07 — exploratory corpus из repository testImages успешно построен в CI
 
 [Offline corpus workflow 42387485762](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387485762) SUCCESS на `2fe37ef`; [artifact 13580167471](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387485762/artifacts/13580167471) содержит 8 проектов .autodraw, 8 color plans, manifest и N summary. Восемь SHA-256 уникальны, дубликатов нет. Mono N=40–88, color N=172–295 **только для testImages/canvas 64×32**. Все family labels unclassified; `protocol_eligibility=candidate_only_not_assessed`.

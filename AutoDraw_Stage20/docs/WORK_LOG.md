@@ -1,3 +1,9 @@
+## 2026-11-07 — получен окончательный SUCCESS основного CI
+
+[AutoDraw validation 42387145503](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387145503) на `e984b68` завершён SUCCESS: Preparation/G3, Game Monitor/Bridge, Executor, Application integration, Egret reference, INT-006 PNG audit — SUCCESS; Windows portable и optional benchmarks — SKIPPED. Изменённые image corpus regression tests теперь подтверждены E3 на данном commit. Отдельный offline [corpus workflow 42387485762](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387485762) SUCCESS. Прошлые записи «in progress» остаются историей времени их составления.
+
+---
+
 ## 2026-11-07 — восстановление Linux offline workflow, выпуск измеримого fixture corpus
 
 - Добавлен самостоятельный `.github/workflows/validation-corpus-smoke.yml` (`e112d4c`), запускающий генератор на testImages с реальным committed palette profile и холстом 64×32.

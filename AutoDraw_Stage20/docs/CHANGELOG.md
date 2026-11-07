@@ -1,3 +1,11 @@
+## 2026-11-07 — итоговые проверки fixture corpus
+
+- GitHub Actions `42387145503` SUCCESS для обновлённого image corpus regression и CI paths; Windows portable/benchmarks SKIPPED.
+- Exploratory corpus workflow `42387485762` SUCCESS и artifact `13580167471`; сохранены текущие N results для восьми testImages.
+- Production рисунок и точный игровой CHALK не проверялись.
+
+---
+
 ## 2026-11-07 — exploratory corpus GitHub Actions и N report
 
 - Добавлен воспроизводимый offline workflow `.github/workflows/validation-corpus-smoke.yml` со сбором .autodraw, color scanline и manifest из repository testImages, а также публикацией N summary и artifact.
