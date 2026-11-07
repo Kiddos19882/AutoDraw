@@ -1,3 +1,11 @@
+## 2026-11-08 — проверка исходников и exact/perceptual similarities
+
+- `source/preparation/screen_candidate_corpus.py`: CLI повторяемых `--dataset LABEL MANIFEST IMAGE_DIR` + `--output JSON`; без игры, SHA-256 provenance, `open_project` geometry signature only, pHash/dHash and top20 nearest-pairs manual review queue.
+- `source/preparation/tests/test_screen_candidate_corpus.py`: 4 unit tests, duplicate exact images, different shapes, fail-closed source hash and path safety.
+- `.github/workflows/candidate-corpus-screen.yml`: [run 42416307401](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416307401) SUCCESS on `3fdffec`, artifact [13591427560](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416307401/artifacts/13591427560). Not a live runtime/CHALK calibration and not 95% coverage.
+
+---
+
 ## 2026-11-07 — geometry audit и Windows offline runner
 
 - `source/preparation/audit_validation_corpus.py` — open_project + frozen schema normalization, counts of zero-length and unsupported-short strokes; отчёт `corpus_geometry_audit.json`, predictor domain remains NOT ASSESSED.

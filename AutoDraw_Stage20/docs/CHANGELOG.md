@@ -1,3 +1,11 @@
+## 2026-11-08 — conservative offline image/geometry screening
+
+- Добавлены `screen_candidate_corpus.py`, четыре unit tests и `.github/workflows/candidate-corpus-screen.yml` (commits `196f338`, `3fdffec`): проверка provenance SHA-256, exact DrawingPlan geometry hash, pHash+dHash и 20 closest pairs.
+- [CI 42416307401](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416307401) SUCCESS: 81 sources, 0 exact source/geometry duplicate groups, 0 strict flagged perceptual pairs; [raw artifact 13591427560](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416307401/artifacts/13591427560). Автоматическое решение independent, semantic family или CHALK eligibility не принимается.
+- Main full CI `42416307257` должен подтверждаться отдельно. Frozen predictor, executor, monitor, production defaults и master не изменены.
+
+---
+
 ## 2026-11-08 — сохраняемые офлайн-артефакты двух партий изображений
 
 - Пользовательский [commit 985e194](https://github.com/Kiddos19882/AutoDraw/commit/985e1947c9f79bf330ea17b8aab65be7aa70c2fb) добавил 31+50 source images, 50 новых .autodraw, 50 color plans и отчёты второй партии; вместе с предыдущими артефактами corpus содержит 81 unique candidate source.

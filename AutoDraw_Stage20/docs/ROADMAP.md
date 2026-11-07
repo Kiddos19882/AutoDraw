@@ -1,3 +1,9 @@
+## 2026-11-08 — 81-image similarity audit завершён; следующий gate — ручные family и domain review
+
+[CI 42416307401](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416307401) SUCCESS: 81 hash-verified source, 0 exact geometry duplicates и 0 strict perceptual flagged pairs. Raw report [13591427560](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416307401/artifacts/13591427560) сохраняет 20 ближайших пар для ручной проверки и image characteristics. Дальше: family/near-derived group review → независимость и frozen INT-006 line D1–D5 vs отдельный scanline domain → N bands только для утверждённой domain → frozen 19/59 split → actual pointCount captures → safety margin policy. Никакого изменения FILL-001 или INT-007 по результату image screening.
+
+---
+
 ## 2026-11-08 — candidate population расширена до 81, следующий gate — domain и independence
 
 Поступили source images двух партий (31+50), генератор и аудит подтверждают 81/81 schema-valid, SHA-256 exact unique, одинаковый canvas 646×323. Подробные результаты — [TEST_RESULTS.md](TEST_RESULTS.md), source commits `8b4588b` и `985e194`. Количественная цель 78 **кандидатов** достигнута; статистический и domain gate для 78 независимых line-based calibration/holdout plans — **нет**. Следующая последовательность: classify source families/near duplicates → проверить реальный execution pipeline и frozen geometry domain → определить целевое N distribution/3 bands → frozen independent 19/59 selection → пользовательские live captures exact CHALK → one-sided safety coverage decision. Не переносить 95% на unsupported fills, не изменять FILL-001 gate и INT-007.

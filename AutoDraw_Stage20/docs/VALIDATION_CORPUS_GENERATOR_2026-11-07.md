@@ -1,3 +1,9 @@
+## 2026-11-08 — 81 images: дополнительный offline screening
+
+Успешно выполнен [GitHub Actions 42416307401](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416307401) (коммит `3fdffec`, [artifact 13591427560](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416307401/artifacts/13591427560)). Анализатор `screen_candidate_corpus.py` сверяет реальные source SHA-256 с manifest и computes exact image-independent DrawingPlan geometry hashes без stroke names, pHash/dHash и image pixel features. Исходники обеих партий 31+50 присутствуют в репозитории. Exact duplicates 0, strict perceptual flagged pairs 0, 20 closest pair candidates требуют ручной проверки. Не делать выводов о semantic image family, статистической независимости, INT-006 domain eligibility либо 95% CHALK на основании этих признаков. Все raw results и ограничения — [TEST_RESULTS.md](TEST_RESULTS.md).
+
+---
+
 # Генератор кандидатного корпуса DrawingPlan и color scanline — 2026-11-07
 
 **Статус:** IMPLEMENTED IN CODE / CI VALIDATION SUCCESS (51c731f; Windows build SKIPPED)  
