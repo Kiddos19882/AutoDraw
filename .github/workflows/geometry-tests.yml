@@ -17,6 +17,7 @@ on:
       - "AutoDraw_Stage20/build_windows.py"
       - "AutoDraw_Stage20/app_features.json"
       - "AutoDraw_Stage20/run_all_tests.py"
+      - "AutoDraw_Stage20/run_validation_corpus_local.ps1"
       - "AutoDraw_Stage20/requirements-build.txt"
       - "AutoDraw_Stage20/requirements-runtime.txt"
       - "AutoDraw_Stage20/README.md"
@@ -96,6 +97,18 @@ jobs:
             AutoDraw_Stage20/source/executor/requirements.txt
       - name: Install preparation and executor test dependencies
         run: python -m pip install -r requirements.txt -r ..\executor\requirements.txt pytest
+      - name: Smoke-test local candidate corpus launcher on repository fixtures
+        shell: pwsh
+        run: |
+          $script = Join-Path $env:GITHUB_WORKSPACE "AutoDraw_Stage20/run_validation_corpus_local.ps1"
+          $inputDir = Join-Path $env:GITHUB_WORKSPACE "AutoDraw_Stage20/testImages"
+          $outputDir = Join-Path $env:RUNNER_TEMP "autodraw-local-corpus-launcher-test"
+          & $script -InputFolder $inputDir -CanvasWidth 64 -CanvasHeight 32 -OutputRoot $outputDir
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if (-not (Test-Path (Join-Path $outputDir "results/corpus_geometry_audit.json"))) {
+            throw "The local corpus launcher did not create its audit report."
+          }
+
       - name: Run preparation, brush, Game Monitor capture and G3 block tests
         shell: pwsh
         run: |
