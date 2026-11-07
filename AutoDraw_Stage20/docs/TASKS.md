@@ -1,3 +1,19 @@
+## 2026-11-07 — генератор кандидатного корпуса INT-006
+
+- [x] Изучить штатные Stage 12/8, .autodraw project writer, palette quantizer и color scanline planner.
+- [x] Добавить CLI генератор .autodraw + monochrome DrawingPlan + color_scanline_plans из каталога изображений.
+- [x] Добавить SHA-256 дедупликацию исходников и manifest с provenance, family label, N и plan hashes.
+- [x] Разделить N monochrome DrawingPlan и N color scanline plan; не смешивать статистические единицы.
+- [x] Добавить unit tests для обоих форматов, повторного чтения, дубликатов и overwrite guard.
+- [ ] Подтвердить CI на commit с генератором и тестами.
+- [ ] Запустить генератор локально на исходном наборе изображений и реальном palette profile.
+- [ ] Проверить provenance, исключить нецелевые synthetic/test fixtures из production-like population.
+- [ ] Сверить N с фактическим входом frozen INT-006 predictor; только затем строить N distribution и bands.
+
+**Ограничение:** создание инструмента не означает, что корпус уже сгенерирован или является репрезентативным. Статус всех записей manifest — candidate_only_not_assessed.
+
+---
+
 ## 2026-11-07 — INT-006: 95% calibration/holdout protocol
 
 - [x] Получить пользовательское подтверждение 95% как целевого одностороннего предиктивного покрытия.
