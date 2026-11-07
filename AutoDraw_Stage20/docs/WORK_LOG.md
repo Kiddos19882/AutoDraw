@@ -1,3 +1,19 @@
+## 2026-11-07 — выполнен локальный PRR batch и сохранено evidence
+
+- Проверена ветка `feature/image-geometry-optimization`; evidence commit до документальной синхронизации: `52e3c51a0830e09abb09b516af098069aef26de7`.
+- Проанализированы успешный block journal `596e5c37813a43048395d0f596f9d971`, остановленный block `ab9b788c8199454c957036effb99e9c6`, session `0490d04b-8728-40f2-891d-e1d57d69402b`, четыре experiment JSON, четыре Monitor reports и execution reports.
+- Успешный block выполнил 4/4 задания: diagonal r2/r3 и vertical r3/r2; radius=10, point_step=2, delay=10 ms, line_extension=0.
+- Получены exact CHALK: diagonal 161 и 160; vertical 70 и 71. Для всех run pre pointCount=1, post pointCount=CHALK+1; DRAW_SAMPLE delta совпадает с quota delta.
+- Все четыре run имеют один session ID; boardDetected/inputTelemetryEnabled=true; dropped events=0, Monitor errors=0, sequence gaps=0.
+- Первоначальный block остановлен до запуска эксперимента, потому что Bridge был запущен до выбора paired-renderer scenario и input telemetry не была включена. Ошибка и recovery сохранены, неудача не скрыта.
+- Траектории остаются lower-bound/incomplete из-за coalesced pointDelta; это не влияет на exact CHALK.
+- Formal paired-renderer acceptance новых PNG ещё не выполнялась; три captures на ориентацию имеются с учётом repeat 1, но aggregate PASS не заявляется.
+- INT-006 safety margin остаётся неустановленной; FILL-001 PNG gate остаётся failed; INT-007 заблокирован.
+- CI 42309752566 SUCCESS относится к bacd03f. Для evidence commit 52e3c51 подтверждённого CI результата нет.
+- В рамках этой синхронизации меняются только Markdown-документы; live runs и кодовые изменения не выполняются.
+
+---
+
 ## 2026-11-07 — итог CI PRR implementation и повторная оценка renderer/CHALK
 
 **GitHub Actions:** [42309752566](https://github.com/Kiddos19882/AutoDraw/actions/runs/42309752566) — **SUCCESS**.  
