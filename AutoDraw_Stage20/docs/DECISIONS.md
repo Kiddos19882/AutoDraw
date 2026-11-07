@@ -1,3 +1,20 @@
+## 2026-11-07 — фиксация границы PRR execution и formal renderer acceptance
+
+**Статус:** ACCEPTED — уточнение применения существующих acceptance gates, не изменение критериев.
+
+**Решение:** завершение PRR block (4/4 tasks) и exact CHALK captures означает, что локальная серия сбора evidence выполнена. Это не присваивает автоматический `PASS_PER_RUN` и не закрывает renderer series. Для каждого нового run обязательны независимая проверка PNG/provenance/transform/pixel criteria и отдельный aggregate analyzer result.
+
+**Основание:** block journal `596e5c37813a43048395d0f596f9d971`, четыре Monitor reports, единая Bridge session `0490d04b-8728-40f2-891d-e1d57d69402b`; существующий renderer acceptance policy и правила доказательности.
+
+**Последствия:**
+- PRR execution отмечен COMPLETED; formal renderer acceptance остаётся PENDING до повторного analyzer.
+- Не менять frozen thresholds, brush radius, executor parameters и acceptance criteria после просмотра captures.
+- Сохранить неудачный первоначальный block `ab9b788c8199454c957036effb99e9c6` как отдельную историю, не включать его в число успешных повторов.
+- CHALK exact подтверждается только pointCount delta; длина траектории и число координат не заменяют расход.
+- INT-006 safety margin, FILL-001 PNG gate и INT-007 остаются независимыми gates.
+
+---
+
 # Журнал проектных решений
 
 Журнал фиксирует организационные и документационные решения.
