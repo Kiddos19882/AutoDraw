@@ -1,3 +1,9 @@
+### Генерация кандидатного корпуса INT-006
+
+- [Генератор кандидатного корпуса DrawingPlan и color scanline](VALIDATION_CORPUS_GENERATOR_2026-11-07.md) — CLI для создания .autodraw и цветных scanline планов из исходных изображений, provenance manifest, дедупликация и ограничения применимости к 95% calibration/holdout.
+
+---
+
 # Документация AutoDraw
 
 **Статус:** основной индекс документации  
