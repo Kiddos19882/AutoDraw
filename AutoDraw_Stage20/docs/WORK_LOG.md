@@ -1,3 +1,14 @@
+## 2026-11-07 — регрессия от новых repository images и устранение пропущенного запуска CI
+
+- Проверены HEAD, 20 commits, восемь изображений в `AutoDraw_Stage20/testImages/`, test generator, Stage 8 scanline stroke schema и frozen INT-006 normalizer.
+- Найдена конкретная stale assertion `unique_source_count == 1` после `0db0bcb`; прежний successful workflow запущен до добавления изображений. Прямого локального исполнения тестов не было.
+- Изменён только тест `source/preparation/tests/test_generate_validation_corpus.py`: полный набор изображений, SHA-256, re-open outputs, manifest eligibility (commit `098d5599`).
+- В `.github/workflows/geometry-tests.yml` добавлен push path `AutoDraw_Stage20/testImages/**` (commit `e984b68`).
+- Статически подтверждено, что схема Stage 8 scanline strokes совпадает с требованиями frozen normalizer, но это не доказывает applicability frozen CHALK estimates или репрезентативность корпуса.
+- Workflow `42387145503` в процессе на момент записи; не приписывать ему PASS заранее. Production executor, model и game monitor не изменялись; live CHALK measurements не выполнялись.
+
+---
+
 ## 2026-11-07 — аудит GitHub и синхронизация CI статуса генератора
 
 - Проверены рабочая feature branch, HEAD `0db0bcb`, последние 20 коммитов, управляющие документы, генератор и regression tests.

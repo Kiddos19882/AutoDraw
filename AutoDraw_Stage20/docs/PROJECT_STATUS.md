@@ -1,3 +1,13 @@
+## 2026-11-07 — регрессия testImages после расширения набора исправлена в тестах
+
+Статический аудит текущей ветки обнаружил: после commit `0db0bcb` каталог `testImages/` содержит восемь изображений, а `test_generate_validation_corpus.py` ожидал один уникальный исходник. Последний прежний CI SUCCESS `42352776594` относился к `51c731f`, до добавления семи изображений.
+
+Исправление: test commit [098d5599](https://github.com/Kiddos19882/AutoDraw/commit/098d5599ffeda1b11124a31a6c457bd10a12885c) проверяет все поддерживаемые изображения, SHA-256, созданные проекты, цветные планы и кандидатный статус. Workflow commit [e984b68](https://github.com/Kiddos19882/AutoDraw/commit/e984b68bea7eb4fd2130d0d00336c86215129fa6) добавил `AutoDraw_Stage20/testImages/**` в push-trigger CI. На момент этой записи проверка `42387145503` выполняется; результат ещё не заявлен.
+
+Frozen INT-006 нормализует только двухточечные прямые штрихи; Stage 8 выдаёт двухточечные `closed=false` scanline strokes, что согласуется со схемой. Но это лишь E1 — structural compatibility, а **не** модельная/статистическая поддержка scanline filling, коротких длин вне frozen lookup и всех новых изображений. Corpus из `testImages` остаётся exploratory fixture, не calibration/holdout population. Числовые N bands, safety margin и production eligibility не установлены. INT-007 BLOCKED; FILL-001 PNG gate не закрыт. Live и локальные Windows проверки не выполнялись.
+
+---
+
 ## 2026-11-07 — синхронизация фактического статуса CI генератора
 
 CI [42352776594](https://github.com/Kiddos19882/AutoDraw/actions/runs/42352776594) завершён SUCCESS для code/test HEAD `51c731f0c25ad10af70efdfb8a46a38a73d07bc1` (2026-11-07). Успешны Preparation/G3, Game Monitor/Bridge, Executor, Application integration, Egret browser reference и INT-006 PNG audit. Windows portable build/startup smoke-test и optional benchmarks были SKIPPED, поэтому Windows сборка этим workflow не подтверждена. Текущий проверенный перед синхронизацией HEAD `0db0bcb96d20b39a01a5b6fb2614a43c1f83a916` добавил только семь файлов в `testImages/` и не менял генератор/тесты; отдельного CI для HEAD не обнаружено. Реальный пользовательский корпус ещё не сформирован, candidate manifest не является validation выборкой; N bands и safety margin не установлены, INT-007 BLOCKED. Новых live captures не выполнялось.

@@ -6,6 +6,12 @@
 
 **Проверка CI (2026-11-07):** [GitHub Actions 42352776594](https://github.com/Kiddos19882/AutoDraw/actions/runs/42352776594) SUCCESS для code/test commit `51c731f`; Windows portable build/startup smoke-test и optional benchmarks SKIPPED. Это не является подтверждением локального запуска генератора на пользовательских изображениях или пригодности корпуса для 95% calibration/holdout.
 
+## 0. Проверка при расширении repository testImages (2026-11-07)
+
+Каталог `testImages/` увеличился до восьми поддерживаемых файлов в commit `0db0bcb`. Прежняя regression assertion на один уникальный исходник стала неактуальной. Test commit `098d5599` проверяет динамическое количество уникальных SHA-256, созданные .autodraw и color plans по каждому записи. Workflow commit `e984b68` добавил каталог в push triggers; [CI run 42387145503](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387145503) ещё проверяется на момент записи.
+
+**Граница применимости:** Stage 8 scanline strokes имеют двухточечный `closed=false` формат и схематически соответствуют frozen INT-006 normalizer. Однако сам frozen INT-006 predictor проверялся на отдельной line-based domain, а не на всех generated scanline fill plans. Нельзя считать каждую строку scanline автоматическим valid CHALK observation или выдавать политику 95% для этих файлов. Fixtures `testImages` предназначены для offline smoke/inventory и не должны автоматически включаться в независимый production-like split.
+
 ## 1. Назначение
 
 Генератор создаёт из набора исходных растровых изображений два независимых типа артефактов:

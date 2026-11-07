@@ -1,3 +1,16 @@
+## 2026-11-07 — устранение регрессии candidate corpus на расширенном testImages
+
+- [x] Сверить актуальный HEAD, последние 20 коммитов, каталог testImages, генератор и regression tests.
+- [x] Исправить тест, ошибочно ожидавший ровно один файл: проверить все восемь текущих изображений, SHA-256 dedup, .autodraw reader и color-plan reader (`098d5599`).
+- [x] Добавить testImages/** в CI push-paths (`e984b68`).
+- [ ] Подтвердить workflow [42387145503](https://github.com/Kiddos19882/AutoDraw/actions/runs/42387145503) на code/workflow HEAD; проверить результат preparation-tests, other jobs и skipped jobs.
+- [ ] Получить реальные candidate N из итогового manifest; пока CI тест формирует временные артефакты и не сохраняет production corpus.
+- [ ] Проверить plan geometry domain и independence на пользовательской целевой совокупности до назначения N bands и формирования 19/59 split.
+
+**Не закрывать:** INT-006 safety margin, FILL-001 PNG gate и INT-007. `testImages` — exploratory fixtures, не подтверждённая population.
+
+---
+
 ## 2026-11-07 — CI генератора: подтверждённая проверка
 
 - [x] Проверить GitHub Actions `42352776594` для code/test commit `51c731f` — SUCCESS.

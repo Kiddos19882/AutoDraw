@@ -1,3 +1,11 @@
+## 2026-11-07 — testImages corpus regression guard
+
+- Regression test генератора адаптирован к расширяемому каталогу `testImages`, с проверкой хешей, количества результатов и повторной загрузки .autodraw/color plans (`098d5599`).
+- Изменения файлов изображений теперь активируют GitHub Actions validation через workflow path-filter (`e984b68`).
+- Frozen INT-006 prediction domain и production defaults не менялись; CI текущего workflow `42387145503` ожидает завершения.
+
+---
+
 ## 2026-11-07 — документационное уточнение CI генератора
 
 - CI [42352776594](https://github.com/Kiddos19882/AutoDraw/actions/runs/42352776594) завершён SUCCESS для code/test HEAD `51c731f0c25ad10af70efdfb8a46a38a73d07bc1` (2026-11-07). Успешны Preparation/G3, Game Monitor/Bridge, Executor, Application integration, Egret browser reference и INT-006 PNG audit. Windows portable build/startup smoke-test и optional benchmarks были SKIPPED, поэтому Windows сборка этим workflow не подтверждена. Текущий проверенный перед синхронизацией HEAD `0db0bcb96d20b39a01a5b6fb2614a43c1f83a916` добавил только семь файлов в `testImages/` и не менял генератор/тесты; отдельного CI для HEAD не обнаружено. Реальный пользовательский корпус ещё не сформирован, candidate manifest не является validation выборкой; N bands и safety margin не установлены, INT-007 BLOCKED. Новых live captures не выполнялось.
