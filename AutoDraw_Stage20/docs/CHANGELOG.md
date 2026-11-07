@@ -1,3 +1,11 @@
+## 2026-11-08 — расширен offline screening: color-plan executor counters
+
+- `screen_candidate_corpus.py` теперь проверяет canonical SHA-256 и summary полей исходного color scanline JSON (commit `5a55e9f`), добавлен regression test.
+- [CI 42417067363](https://github.com/Kiddos19882/AutoDraw/actions/runs/42417067363) SUCCESS: 81 color plans / 942206 source strokes / 395455 zero-length singleton runs / 916312 color changes. Source code conversion expands singleton до 1px drag и palette changes требуют swatch selection; counts не приравниваются к CHALK.
+- Frozen predictor, executor и production defaults не менялись; 95% domain eligibility всё ещё unknown.
+
+---
+
 ## 2026-11-08 — conservative offline image/geometry screening
 
 - Добавлены `screen_candidate_corpus.py`, четыре unit tests и `.github/workflows/candidate-corpus-screen.yml` (commits `196f338`, `3fdffec`): проверка provenance SHA-256, exact DrawingPlan geometry hash, pHash+dHash и 20 closest pairs.

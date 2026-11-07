@@ -1,3 +1,9 @@
+## 2026-11-08 — цветной source executor footprint: gate перед массовыми CHALK captures
+
+81 color scanline plans прошли SHA/inventory CI [42417067363](https://github.com/Kiddos19882/AutoDraw/actions/runs/42417067363): всего 942206 strokes, 395455 singleton runs, 916312 color changes; фактические per-plan данные в [artifact 13591858161](https://github.com/Kiddos19882/AutoDraw/actions/runs/42417067363/artifacts/13591858161). До 19/59 live capture сначала оценить **реальный** target execution mode (Stage6 color vs Stage8 mono), singleton expansion, палитру и будущий scanline-specific domain. Критически сохранить order/overlap и безопасность исполнителя; нельзя утверждать оптимизацию CHALK по уменьшению counts. Frozen line-based INT-006 domain не распространяется автоматически на fill. Далее: domain preflight → независимые family groups / N bands → frozen split → game pointCount → safety coverage. FILL-001 и INT-007 не изменены.
+
+---
+
 ## 2026-11-08 — 81-image similarity audit завершён; следующий gate — ручные family и domain review
 
 [CI 42416307401](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416307401) SUCCESS: 81 hash-verified source, 0 exact geometry duplicates и 0 strict perceptual flagged pairs. Raw report [13591427560](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416307401/artifacts/13591427560) сохраняет 20 ближайших пар для ручной проверки и image characteristics. Дальше: family/near-derived group review → независимость и frozen INT-006 line D1–D5 vs отдельный scanline domain → N bands только для утверждённой domain → frozen 19/59 split → actual pointCount captures → safety margin policy. Никакого изменения FILL-001 или INT-007 по результату image screening.

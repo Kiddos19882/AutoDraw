@@ -1,3 +1,11 @@
+## 2026-11-08 — color-plan source summary / runtime semantics проверка
+
+- `screen_candidate_corpus.py::color_plan_metadata`: read-only canonical color JSON SHA-256 vs manifest, schema plan_type и sanity checks `stroke_count`, `single_pixel_stroke_count`, `color_switch_count`, `used_palette_color_count`; не запускает executor. Runtime semantics отдельно подтверждаются static code `color_plan_to_drawing_plan` и `ColorPlanExecutionHooks.before_stroke`.
+- `test_screen_candidate_corpus.py`: 5 tests, включая correct color source summary и fail-closed SHA/count.
+- [Offline workflow 42417067363](https://github.com/Kiddos19882/AutoDraw/actions/runs/42417067363) SUCCESS на `5a55e9f`, [artifact 13591858161](https://github.com/Kiddos19882/AutoDraw/actions/runs/42417067363/artifacts/13591858161) содержит per-plan данные и totals. Основной CI на commit `5a55e9f` — [42417067391](https://github.com/Kiddos19882/AutoDraw/actions/runs/42417067391) (статус отдельно).
+
+---
+
 ## 2026-11-08 — проверка исходников и exact/perceptual similarities
 
 - `source/preparation/screen_candidate_corpus.py`: CLI повторяемых `--dataset LABEL MANIFEST IMAGE_DIR` + `--output JSON`; без игры, SHA-256 provenance, `open_project` geometry signature only, pHash/dHash and top20 nearest-pairs manual review queue.

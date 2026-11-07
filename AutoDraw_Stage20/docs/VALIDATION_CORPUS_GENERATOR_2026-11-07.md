@@ -1,3 +1,9 @@
+## 2026-11-08 — colour scanline runtime-boundary audit
+
+Source-image screening расширен проверкой цветных планов по canonical SHA-256, `summary.stroke_count` и executor-relevant `single_pixel_stroke_count`/ `color_switch_count` без модификации данных. [Run 42417067363](https://github.com/Kiddos19882/AutoDraw/actions/runs/42417067363) SUCCESS, [artifact 13591858161](https://github.com/Kiddos19882/AutoDraw/actions/runs/42417067363/artifacts/13591858161) — 81 color source plan, 942206 total strokes, 395455 singletons, 916312 switches. Эти параметры информируют о потенциальном количестве действий Stage6 executor, но не являются игровой телеметрией. Поддерживаемая frozen INT-006 geometry domain не расширялась; подробности в [TEST_RESULTS.md](TEST_RESULTS.md).
+
+---
+
 ## 2026-11-08 — 81 images: дополнительный offline screening
 
 Успешно выполнен [GitHub Actions 42416307401](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416307401) (коммит `3fdffec`, [artifact 13591427560](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416307401/artifacts/13591427560)). Анализатор `screen_candidate_corpus.py` сверяет реальные source SHA-256 с manifest и computes exact image-independent DrawingPlan geometry hashes без stroke names, pHash/dHash и image pixel features. Исходники обеих партий 31+50 присутствуют в репозитории. Exact duplicates 0, strict perceptual flagged pairs 0, 20 closest pair candidates требуют ручной проверки. Не делать выводов о semantic image family, статистической независимости, INT-006 domain eligibility либо 95% CHALK на основании этих признаков. Все raw results и ограничения — [TEST_RESULTS.md](TEST_RESULTS.md).
