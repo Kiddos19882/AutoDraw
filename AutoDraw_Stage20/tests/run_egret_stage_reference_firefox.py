@@ -17,6 +17,8 @@ from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 
+from run_paired_renderer_acceptance import discover_paired_renderer_runs  # noqa: E402
+
 
 CASES = (
     {
