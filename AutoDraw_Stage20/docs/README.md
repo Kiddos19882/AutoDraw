@@ -42,6 +42,7 @@
 - [Архитектура автоматических блоков CHALK](CHALK_TEST_BLOCKS_DESIGN.md) — пакетный запуск всех сценариев и повторов, критерии принятия, журналирование и восстановление.
 
 - [Проект политики безопасного запаса CHALK](CHALK_SAFETY_MARGIN_POLICY_DESIGN_2026-11-07.md) — proposed run-level residual policy с нормировкой на число штрихов, калибровкой по профилю/domain, calibration/holdout validation и fail-closed поведением; числовой production reserve не утверждён.
+- [INT-006 — протокол калибровки и независимой проверки политики CHALK 95%](CHALK_95_PERCENT_CALIBRATION_HOLDOUT_PROTOCOL_2026-11-07.md) — 19 calibration + 59 holdout независимых DrawingPlan на profile/domain, критерии покрытия и границы применимости.
 
 - [INT-006 — официальная независимая validation CHALK](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md) — 45/45 accepted, метрики ошибки модели, ограничения и статус safety margin.
 - [INT006R — live validation радиуса и геометрии](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md) — 45 captures, точный CHALK и сравнение радиусов 1/10/30.
