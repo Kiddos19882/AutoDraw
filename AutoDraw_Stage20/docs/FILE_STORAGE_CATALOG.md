@@ -1,3 +1,17 @@
+## 1.1. Генерируемый кандидатный корпус INT-006
+
+CLI `source/preparation/generate_validation_corpus.py` создаёт следующие пути относительно корня данных:
+
+| Путь | Тип | Назначение |
+|---|---|---|
+| `data/projects/generated_validation_corpus/*.autodraw` | файл | Portable-проекты с Stage 8 monochrome DrawingPlan |
+| `data/results/color_scanline_plans/generated_validation_corpus/*.json` | файл | Цветные scanline планы, построенные по palette profile |
+| `data/results/generated_validation_corpus_manifest.json` | файл | Provenance, source SHA-256, duplicate groups, family labels, stroke counts и plan hashes |
+
+Генератор сохраняет monochrome DrawingPlan N и color scanline N раздельно. Manifest помечает записи `candidate_only_not_assessed`; эти файлы не являются автоматически принятой calibration/holdout выборкой. Само наличие N не является измерением CHALK.
+
+---
+
 # Каталог файлового хранилища AutoDraw
 
 **Область:** пользовательские данные, временные файлы, экспортируемые проекты и результаты инструментов AutoDraw_Stage20.  
