@@ -1,3 +1,19 @@
+## 2026-11-07 — INT-006 проект политики безопасного запаса CHALK
+
+- [x] Проверить официальный INT-006 report, frozen analyzer и независимый validation plan.
+- [x] Разделить run-level residual и сумму положительных per-stroke residual; не смешивать 0.92 и 1.597 CHALK для P1.
+- [x] Зафиксировать структуру выборки: 5 независимых DrawingPlan × 3 повтора на профиль.
+- [x] Подготовить проект profile-aware и stroke-count-aware safety policy.
+- [ ] До новой серии выбрать целевой уровень покрытия/риска и заморозить критерии.
+- [ ] Собрать отдельные calibration и holdout наборы из новых независимых DrawingPlan с разным N и расширенным geometry domain.
+- [ ] Проверить масштабирование резерва с N и coverage на holdout.
+- [ ] Сохранить `safety_margin_status=not_established`, `production_eligibility=not_validated` и INT-007 BLOCKED до завершения gates.
+- [ ] Закрыть FILL-001 PNG quality gate отдельно.
+
+**Ограничение:** числовой reserve не выбран; production estimator/defaults не изменялись; live capture не запускался.
+
+---
+
 ## 2026-11-07 — пользовательский sign-off визуального компромисса INT006R
 
 - [x] Получить подтверждение пользователя: radius=10 визуально приемлем и предпочтителен в пределах проверенной матрицы D1–D5.

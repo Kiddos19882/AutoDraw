@@ -1,3 +1,15 @@
+## 2026-11-07 — проект CHALK safety-margin policy; числовой запас не установлен
+
+Проведён offline review frozen INT-006 analyzer, official validation report и validation plan. Создан [проект политики безопасного запаса CHALK](CHALK_SAFETY_MARGIN_POLICY_DESIGN_2026-11-07.md).
+
+45/45 accepted captures — пять независимых DrawingPlan на профиль с тремя повторами, а не 15 независимых геометрий. Max run-level underprediction P1=0.92 CHALK и diagnostic max sum of positive per-stroke residual P1=1.597 CHALK — разные показатели, не production reserve. P1 остаётся исследовательским кандидатом при radius=10 и D1–D5.
+
+Предложено калибровать односторонний run-level residual, нормированный на число штрихов, отдельно по profile и supported geometry domain; умножать подтверждённый квантиль на N и округлять запас вверх. Это design proposal до независимой holdout validation.
+
+**Статусы без изменения:** `safety_margin_status=not_established`; `production_eligibility=not_validated`; INT-007 BLOCKED; FILL-001 PNG gate BLOCKED. Код, тесты, конфигурации и production defaults не менялись. Live runs не выполнялись.
+
+---
+
 ## 2026-11-07 — ручное подтверждение визуального компромисса INT006R: radius=10
 
 **Решение пользователя:** визуальное качество radius=10 подтверждено как приемлемое и предпочтительное для исследованной матрицы INT006R.

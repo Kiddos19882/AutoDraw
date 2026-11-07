@@ -1,3 +1,14 @@
+## 2026-11-07 — offline проектирование CHALK safety-margin policy
+
+- Сверены управляющие документы, официальный INT-006 report, frozen predictions/analyzer, validation plan и код `chalk_int006_validation.py`.
+- Analyzer фиксирует exact run-level residual `actual - predicted`; положительное значение означает недооценку.
+- Разделены P1 max run-level underprediction=0.92 CHALK и max sum of positive per-stroke residual=1.597 CHALK.
+- Уточнена структура выборки: 15 captures/profile состоят из пяти DrawingPlan с тремя повторами.
+- Подготовлен design proposal: run-level residual / N, отдельная калибровка по profile/domain, округление вверх и fail-closed UNKNOWN вне области.
+- Числовой reserve не утверждался; production estimator/defaults, исходники, тесты и конфигурации не менялись. Live runs не выполнялись.
+
+---
+
 ## 2026-11-07 — зафиксирован пользовательский visual sign-off INT006R
 
 - Пользователь подтвердил, что radius=10 визуально приемлем и предпочтителен для исследованной матрицы D1–D5.

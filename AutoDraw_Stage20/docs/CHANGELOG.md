@@ -1,3 +1,10 @@
+## 2026-11-07 — проект CHALK safety-margin policy
+
+- Добавлен design document profile-aware и stroke-count-aware safety margin.
+- Разделены run-level underprediction и сумма положительных per-stroke residual.
+- Зафиксировано, что 15 captures/profile INT-006 — пять DrawingPlan × три повтора.
+- Количественный reserve, production eligibility и INT-007 остаются неутверждёнными.
+
 ## 2026-11-07 — INT006R: пользовательский visual sign-off radius=10
 
 - Зафиксировано подтверждение пользователя: radius=10 визуально приемлем и предпочтителен в пределах проверенной матрицы D1–D5.

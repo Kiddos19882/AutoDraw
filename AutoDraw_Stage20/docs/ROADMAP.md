@@ -1,3 +1,16 @@
+## 2026-11-07 — проект safety-margin policy подготовлен; требуется независимая validation
+
+Создан [CHALK_SAFETY_MARGIN_POLICY_DESIGN_2026-11-07.md](CHALK_SAFETY_MARGIN_POLICY_DESIGN_2026-11-07.md). Предложено нормировать положительный run-level residual на число штрихов и калибровать квантиль отдельно для sampling profile и supported geometry domain. Числовой reserve не назначен.
+
+1. **INT-006 policy — DESIGN COMPLETE / VALIDATION BLOCKED:** заранее выбрать целевое покрытие/риск, сформировать независимые calibration/holdout DrawingPlan и проверить масштабирование с N.
+2. **FILL-001 PNG quality gate — BLOCKED:** устранить coverage=98.430600% и leakage=11 без изменения frozen criteria.
+3. **INT-007 — BLOCKED:** не внедрять estimator в production preflight до принятия safety policy, независимой holdout validation и закрытия обязательных gates.
+4. После закрытия зависимостей вернуться к INT-008.
+
+Текущие 45 INT-006 captures остаются evidence только для D1–D5, radius=10 и трёх профилей; три повтора не превращаются в независимые DrawingPlan.
+
+---
+
 ## 2026-11-07 — INT006R visual sign-off получен; дальнейшие gates
 
 Пользователь подтвердил radius=10 как визуально приемлемый и предпочтительный компромисс для исследованной матрицы D1–D5 (artifact `13553755987`, радиусы 1/10/30, три повтора). Ручное решение принято только в границах этих сценариев; оно не устанавливает универсальный production default и не распространяется автоматически на заливку.
