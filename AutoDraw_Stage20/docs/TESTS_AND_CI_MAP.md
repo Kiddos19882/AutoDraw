@@ -1,3 +1,12 @@
+## 2026-11-08 — DOC-INTEGRITY: контроль Markdown и исходной истории
+
+- `tools/check_markdown_docs.py`: проверяет полноту индекса `docs/README.md` для всех .md, обычные локальные ссылки и Markdown/explicit anchor, уникальность `DEC-NNN` и неизменность Git blob SHA исторических файлов из `docs/HISTORY_SNAPSHOT_PROVENANCE.json`.
+- `tools/tests/test_check_markdown_docs.py`: 5 unit tests. [GitHub workflow 42421451709](https://github.com/Kiddos19882/AutoDraw/actions/runs/42421451709) **SUCCESS** на `d778000e`; 99/99 indexed, 0 broken links (current и historical), 0 duplicates, 9/9 valid snapshots.
+- Первый [CI 42421193210](https://github.com/Kiddos19882/AutoDraw/actions/runs/42421193210) FAILED по пропуску одного архива в каталоге и одной старой ссылке; оба дефекта исправлены. Результат предыдущего run не перезаписывался.
+- Автоматическая проверка **не** доказывает semantic correctness, внешние CI links, Windows startup или live game CHALK.
+
+---
+
 ## 2026-11-08 — color-plan source summary / runtime semantics проверка
 
 - `screen_candidate_corpus.py::color_plan_metadata`: read-only canonical color JSON SHA-256 vs manifest, schema plan_type и sanity checks `stroke_count`, `single_pixel_stroke_count`, `color_switch_count`, `used_palette_color_count`; не запускает executor. Runtime semantics отдельно подтверждаются static code `color_plan_to_drawing_plan` и `ColorPlanExecutionHooks.before_stroke`.

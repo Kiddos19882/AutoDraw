@@ -33,6 +33,13 @@
 - [Аудит движка, принятых точек и renderer](CHALK_GAME_ENGINE_POINT_COST_AND_BRUSH_WIDTH_2026-11-03.md) — сопоставление версий, доказательства и границы выводов.
 - [Game Monitor / Bridge API](GAME_MONITOR_BRIDGE_REFERENCE.md) — фактические интерфейсы наблюдателя.
 
+## Автоматический контроль документации
+
+- [Markdown integrity CI 42421451709](https://github.com/Kiddos19882/AutoDraw/actions/runs/42421451709): **SUCCESS**, 99/99 .md в индексе; 0 найденных broken internal links; 0 дублирующихся DEC ID; 9/9 неизменённых historical snapshots.
+- [Скрипт аудита](../tools/check_markdown_docs.py), [его пять тестов](../tools/tests/test_check_markdown_docs.py), [workflow](../../.github/workflows/docs-integrity.yml), [manifest исторических SHA](HISTORY_SNAPSHOT_PROVENANCE.json).
+- Ручная read-only проверка: `python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20 --report docs-integrity.json`.
+- Проверяется стандартный Markdown link/heading syntax и SHA истории. Внешние URL, статус GitHub run, поведение приложения и смысловое содержание старых отчётов этим инструментом не подтверждаются.
+
 ## Правила интерпретации
 
 1. `PROJECT_STATUS.md` — текущее состояние; старые файлы/планы и snapshots — хронология с локальной датой на каждом утверждении.
