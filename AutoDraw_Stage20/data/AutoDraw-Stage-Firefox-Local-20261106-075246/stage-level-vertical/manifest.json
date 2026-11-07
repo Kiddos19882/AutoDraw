@@ -1,0 +1,1182 @@
+{
+  "schemaVersion": 2,
+  "referenceType": "Actual game BoardPane CanvasRenderer and WebGL renderer reference",
+  "engineVersion": "5.4.1",
+  "sourceBundles": [
+    {
+      "path": "gameEngine/mergeEngine_df2e5bc5.js",
+      "blobSha": "d613d2b97e2436521aa3870478c69e99eac1f19f"
+    },
+    {
+      "path": "gameEngine/main.min_653f95bc.js",
+      "blobSha": "46cc74de00b6cb5d207b1e1a2ffcd81613b6d388"
+    }
+  ],
+  "gameBoardClass": "com.magnetjoy.pet.ui.board.BoardPane",
+  "browser": {
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:159.0) Gecko/20100101 Firefox/159.0",
+    "platform": "Win32",
+    "devicePixelRatio": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 850
+    }
+  },
+  "renderMode": "Actual BoardPane GraphicsNode rendered by Egret CanvasRenderer and WebGLRenderer; GL backend recorded below",
+  "board": {
+    "width": 460,
+    "height": 240
+  },
+  "rasterScale": 3,
+  "runtimeProfile": {
+    "source": "exact Game Monitor renderer_geometry_at_start",
+    "sourceRunId": "c860234f-995a-4789-9ac2-e05b322fe742",
+    "sourceSessionId": "30e55d53-8eae-4d99-884f-0cf0c6d0a8bc",
+    "sourceExperimentId": "6f2227c7bce94fa5acd0c633af5ed04f",
+    "geometrySnapshotUpdatedAtUtc": "2026-11-05T16:24:11.865+00:00",
+    "canvasScaleFactor": 2,
+    "canvasScaleX": 3,
+    "canvasScaleY": 3,
+    "stageWidth": 1314,
+    "stageHeight": 600,
+    "canvasBackingWidth": 3942,
+    "canvasBackingHeight": 1800,
+    "devicePixelRatio": 1,
+    "visualViewportScale": 1,
+    "stageFrameRate": 30,
+    "scaleMode": "fixedHeight",
+    "boardWidth": 460,
+    "boardHeight": 240,
+    "screen": {
+      "width": 1920,
+      "height": 1080
+    },
+    "viewport": {
+      "width": 1920,
+      "height": 877
+    },
+    "canvasClientRect": {
+      "left": 0,
+      "top": -0.5,
+      "right": 1920,
+      "bottom": 877.5,
+      "width": 1920,
+      "height": 878
+    },
+    "canvasCssTransform": "matrix(0.487062, 0, 0, 0.487778, 0, 0)",
+    "canvasCssTransformOrigin": "0px 0px",
+    "boardStageCorners": {
+      "topLeft": {
+        "x": 340.7916660308838,
+        "y": 72
+      },
+      "topRight": {
+        "x": 800.7916660308838,
+        "y": 72
+      },
+      "bottomRight": {
+        "x": 800.7916660308838,
+        "y": 312
+      },
+      "bottomLeft": {
+        "x": 340.7916660308838,
+        "y": 312
+      }
+    },
+    "note": "Live profile is copied from the exact run-bound Game Monitor snapshot. BoardPane offscreen raster remains 460×240 at 3×; screen CSS transform is metadata for paired comparison and is not baked into the local BoardPane raster."
+  },
+  "mask": {
+    "type": "Egret Shape drawRoundRect",
+    "ellipseWidthArgument": 10,
+    "ellipseHeightArgument": 10,
+    "effectiveCornerRadiusLogicalPx": 5,
+    "clipping": "Actual BoardPane.mask and scrollRect are rendered by Egret WebGLRenderer; Canvas2D destination-in remains a comparison reference"
+  },
+  "webglComposite": "actual Egret WebGLRenderer mask+scrollRect output is captured separately; Canvas2D composite retained as comparison reference",
+  "actualBoardPaneComparison": "actual BoardPane GraphicsNode pixel-compared with manual path transcription including transparent resetBg rectangle",
+  "webglProbe": {
+    "status": "complete",
+    "backend": "Egret WebGLRenderer",
+    "outputSize": {
+      "width": 1380,
+      "height": 720
+    },
+    "glInfo": {
+      "version": "WebGL 1.0",
+      "shadingLanguageVersion": "WebGL GLSL ES 1.0",
+      "vendor": "Mozilla",
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 980 Direct3D11 vs_5_0 ps_5_0), or similar",
+      "unmaskedVendor": "Google Inc. (NVIDIA)",
+      "unmaskedRenderer": "ANGLE (NVIDIA, NVIDIA GeForce GTX 980 Direct3D11 vs_5_0 ps_5_0), or similar"
+    },
+    "contextAttributes": {
+      "alpha": true,
+      "antialias": true,
+      "depth": true,
+      "failIfMajorPerformanceCaveat": false,
+      "powerPreference": "default",
+      "premultipliedAlpha": true,
+      "preserveDrawingBuffer": false,
+      "stencil": true
+    },
+    "textureParameters": {
+      "minFilter": 9729,
+      "magFilter": 9729,
+      "wrapS": 33071,
+      "wrapT": 33071,
+      "unpackPremultiplyAlpha": true
+    },
+    "comparisons": [
+      {
+        "fixture": "live-accepted-points",
+        "lineWidth": 10,
+        "stageAttached": true,
+        "sameStage": true,
+        "sameParent": true,
+        "boardRenderMode": 3,
+        "maskRenderMode": 1,
+        "equal": true,
+        "differingPixels": 0,
+        "maxChannelDifference": 0,
+        "meanDifferingChannelDifference": 0,
+        "reason": null
+      }
+    ],
+    "comparisonCount": 1
+  },
+  "stageLevelCompositor": {
+    "status": "generated_four_offline_variants",
+    "variantCount": 4
+  },
+  "fixtures": [
+    {
+      "id": "live-accepted-points",
+      "mode": "smooth",
+      "sourceRunId": "c860234f-995a-4789-9ac2-e05b322fe742",
+      "lineWidth": 10,
+      "points": [
+        {
+          "x": 228.2083339691162,
+          "y": 18
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 21
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 23
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 26
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 29
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 32
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 34
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 38
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 41
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 44
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 47
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 49
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 52
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 55
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 59
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 62
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 64
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 67
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 70
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 73
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 75
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 78
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 82
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 85
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 88
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 90
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 93
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 96
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 99
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 103
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 105
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 108
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 111
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 114
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 116
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 119
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 123
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 126
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 129
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 131
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 134
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 137
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 140
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 142
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 146
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 149
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 152
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 155
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 157
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 160
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 163
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 167
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 170
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 172
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 175
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 178
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 181
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 185
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 187
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 190
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 193
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 196
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 198
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 201
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 204
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 208
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 211
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 213
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 216
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 219
+        },
+        {
+          "x": 228.2083339691162,
+          "y": 220
+        }
+      ],
+      "commands": [
+        {
+          "type": "moveTo",
+          "x": 228.2083339691162,
+          "y": 18
+        },
+        {
+          "type": "moveTo",
+          "x": 228.2083339691162,
+          "y": 18
+        },
+        {
+          "type": "lineTo",
+          "x": 228.2083339691162,
+          "y": 19.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 21,
+          "x": 228.2083339691162,
+          "y": 22
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 23,
+          "x": 228.2083339691162,
+          "y": 24.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 26,
+          "x": 228.2083339691162,
+          "y": 27.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 29,
+          "x": 228.2083339691162,
+          "y": 30.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 32,
+          "x": 228.2083339691162,
+          "y": 33
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 34,
+          "x": 228.2083339691162,
+          "y": 36
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 38,
+          "x": 228.2083339691162,
+          "y": 39.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 41,
+          "x": 228.2083339691162,
+          "y": 42.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 44,
+          "x": 228.2083339691162,
+          "y": 45.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 47,
+          "x": 228.2083339691162,
+          "y": 48
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 49,
+          "x": 228.2083339691162,
+          "y": 50.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 52,
+          "x": 228.2083339691162,
+          "y": 53.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 55,
+          "x": 228.2083339691162,
+          "y": 57
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 59,
+          "x": 228.2083339691162,
+          "y": 60.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 62,
+          "x": 228.2083339691162,
+          "y": 63
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 64,
+          "x": 228.2083339691162,
+          "y": 65.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 67,
+          "x": 228.2083339691162,
+          "y": 68.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 70,
+          "x": 228.2083339691162,
+          "y": 71.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 73,
+          "x": 228.2083339691162,
+          "y": 74
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 75,
+          "x": 228.2083339691162,
+          "y": 76.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 78,
+          "x": 228.2083339691162,
+          "y": 80
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 82,
+          "x": 228.2083339691162,
+          "y": 83.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 85,
+          "x": 228.2083339691162,
+          "y": 86.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 88,
+          "x": 228.2083339691162,
+          "y": 89
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 90,
+          "x": 228.2083339691162,
+          "y": 91.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 93,
+          "x": 228.2083339691162,
+          "y": 94.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 96,
+          "x": 228.2083339691162,
+          "y": 97.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 99,
+          "x": 228.2083339691162,
+          "y": 101
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 103,
+          "x": 228.2083339691162,
+          "y": 104
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 105,
+          "x": 228.2083339691162,
+          "y": 106.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 108,
+          "x": 228.2083339691162,
+          "y": 109.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 111,
+          "x": 228.2083339691162,
+          "y": 112.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 114,
+          "x": 228.2083339691162,
+          "y": 115
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 116,
+          "x": 228.2083339691162,
+          "y": 117.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 119,
+          "x": 228.2083339691162,
+          "y": 121
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 123,
+          "x": 228.2083339691162,
+          "y": 124.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 126,
+          "x": 228.2083339691162,
+          "y": 127.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 129,
+          "x": 228.2083339691162,
+          "y": 130
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 131,
+          "x": 228.2083339691162,
+          "y": 132.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 134,
+          "x": 228.2083339691162,
+          "y": 135.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 137,
+          "x": 228.2083339691162,
+          "y": 138.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 140,
+          "x": 228.2083339691162,
+          "y": 141
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 142,
+          "x": 228.2083339691162,
+          "y": 144
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 146,
+          "x": 228.2083339691162,
+          "y": 147.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 149,
+          "x": 228.2083339691162,
+          "y": 150.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 152,
+          "x": 228.2083339691162,
+          "y": 153.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 155,
+          "x": 228.2083339691162,
+          "y": 156
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 157,
+          "x": 228.2083339691162,
+          "y": 158.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 160,
+          "x": 228.2083339691162,
+          "y": 161.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 163,
+          "x": 228.2083339691162,
+          "y": 165
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 167,
+          "x": 228.2083339691162,
+          "y": 168.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 170,
+          "x": 228.2083339691162,
+          "y": 171
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 172,
+          "x": 228.2083339691162,
+          "y": 173.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 175,
+          "x": 228.2083339691162,
+          "y": 176.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 178,
+          "x": 228.2083339691162,
+          "y": 179.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 181,
+          "x": 228.2083339691162,
+          "y": 183
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 185,
+          "x": 228.2083339691162,
+          "y": 186
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 187,
+          "x": 228.2083339691162,
+          "y": 188.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 190,
+          "x": 228.2083339691162,
+          "y": 191.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 193,
+          "x": 228.2083339691162,
+          "y": 194.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 196,
+          "x": 228.2083339691162,
+          "y": 197
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 198,
+          "x": 228.2083339691162,
+          "y": 199.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 201,
+          "x": 228.2083339691162,
+          "y": 202.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 204,
+          "x": 228.2083339691162,
+          "y": 206
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 208,
+          "x": 228.2083339691162,
+          "y": 209.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 211,
+          "x": 228.2083339691162,
+          "y": 212
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 213,
+          "x": 228.2083339691162,
+          "y": 214.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 216,
+          "x": 228.2083339691162,
+          "y": 217.5
+        },
+        {
+          "type": "curveTo",
+          "controlX": 228.2083339691162,
+          "controlY": 219,
+          "x": 228.2083339691162,
+          "y": 219.5
+        }
+      ],
+      "actualBoardPane": true,
+      "manualTranscriptionMatch": {
+        "equal": true,
+        "differingPixels": 0,
+        "maxChannelDifference": 0,
+        "meanDifferingChannelDifference": 0,
+        "reason": null
+      },
+      "webglPixelComparison": {
+        "equal": true,
+        "differingPixels": 0,
+        "maxChannelDifference": 0,
+        "meanDifferingChannelDifference": 0,
+        "reason": null
+      },
+      "webglSceneDiagnostics": {
+        "stageAttached": true,
+        "sameStage": true,
+        "sameParent": true,
+        "boardRenderMode": 3,
+        "maskRenderMode": 1
+      },
+      "webglTextureParameters": {
+        "minFilter": 9729,
+        "magFilter": 9729,
+        "wrapS": 33071,
+        "wrapT": 33071,
+        "unpackPremultiplyAlpha": true
+      },
+      "stageLevelCompositor": [
+        {
+          "id": "A",
+          "backend": "WebGL",
+          "placement": {
+            "x": 1022.3749980926514,
+            "y": 216,
+            "width": 1380,
+            "height": 720,
+            "exactX": 1022.3749980926514,
+            "exactY": 216,
+            "roundedX": 1022,
+            "roundedY": 216,
+            "stageWidth": 1314,
+            "stageHeight": 600,
+            "backingWidth": 3942,
+            "backingHeight": 1800,
+            "scaleX": 3,
+            "scaleY": 3,
+            "boardWidth": 460,
+            "boardHeight": 240,
+            "rounding": "exact_fractional_backing_origin"
+          },
+          "textureParameters": {
+            "minFilter": 9729,
+            "magFilter": 9729,
+            "wrapS": 33071,
+            "wrapT": 33071,
+            "unpackPremultiplyAlpha": true
+          },
+          "contextAttributes": {
+            "alpha": true,
+            "antialias": true,
+            "depth": true,
+            "failIfMajorPerformanceCaveat": false,
+            "powerPreference": "default",
+            "premultipliedAlpha": true,
+            "preserveDrawingBuffer": false,
+            "stencil": true
+          },
+          "sceneDiagnostics": {
+            "stageAttached": true,
+            "sameStage": true,
+            "sameParent": true,
+            "boardRenderMode": 3,
+            "maskRenderMode": 1
+          },
+          "drawCalls": null,
+          "rendererBackend": "Egret WebGLRenderer on the run-sized Stage RenderBuffer",
+          "comparisonToA": {
+            "equal": true,
+            "differingPixels": 0,
+            "maxChannelDifference": 0,
+            "meanDifferingChannelDifference": 0,
+            "reason": null
+          }
+        },
+        {
+          "id": "B",
+          "backend": "WebGL",
+          "placement": {
+            "x": 1022,
+            "y": 216,
+            "width": 1380,
+            "height": 720,
+            "exactX": 1022.3749980926514,
+            "exactY": 216,
+            "roundedX": 1022,
+            "roundedY": 216,
+            "stageWidth": 1314,
+            "stageHeight": 600,
+            "backingWidth": 3942,
+            "backingHeight": 1800,
+            "scaleX": 3,
+            "scaleY": 3,
+            "boardWidth": 460,
+            "boardHeight": 240,
+            "rounding": "nearest_backing_pixel"
+          },
+          "textureParameters": {
+            "minFilter": 9729,
+            "magFilter": 9729,
+            "wrapS": 33071,
+            "wrapT": 33071,
+            "unpackPremultiplyAlpha": true
+          },
+          "contextAttributes": {
+            "alpha": true,
+            "antialias": true,
+            "depth": true,
+            "failIfMajorPerformanceCaveat": false,
+            "powerPreference": "default",
+            "premultipliedAlpha": true,
+            "preserveDrawingBuffer": false,
+            "stencil": true
+          },
+          "sceneDiagnostics": {
+            "stageAttached": true,
+            "sameStage": true,
+            "sameParent": true,
+            "boardRenderMode": 3,
+            "maskRenderMode": 1
+          },
+          "drawCalls": null,
+          "rendererBackend": "Egret WebGLRenderer on the run-sized Stage RenderBuffer",
+          "comparisonToA": {
+            "equal": false,
+            "differingPixels": 2565,
+            "maxChannelDifference": 96,
+            "meanDifferingChannelDifference": 47.48265107212475,
+            "reason": null
+          }
+        },
+        {
+          "id": "C",
+          "backend": "Canvas2D",
+          "placement": {
+            "x": 1022.3749980926514,
+            "y": 216,
+            "width": 1380,
+            "height": 720,
+            "exactX": 1022.3749980926514,
+            "exactY": 216,
+            "roundedX": 1022,
+            "roundedY": 216,
+            "stageWidth": 1314,
+            "stageHeight": 600,
+            "backingWidth": 3942,
+            "backingHeight": 1800,
+            "scaleX": 3,
+            "scaleY": 3,
+            "boardWidth": 460,
+            "boardHeight": 240,
+            "rounding": "exact_fractional_backing_origin"
+          },
+          "textureParameters": null,
+          "contextAttributes": null,
+          "sceneDiagnostics": null,
+          "drawCalls": null,
+          "rendererBackend": "Canvas2D image composite",
+          "comparisonToA": {
+            "equal": true,
+            "differingPixels": 0,
+            "maxChannelDifference": 0,
+            "meanDifferingChannelDifference": 0,
+            "reason": null
+          }
+        },
+        {
+          "id": "D",
+          "backend": "Canvas2D",
+          "placement": {
+            "x": 1022,
+            "y": 216,
+            "width": 1380,
+            "height": 720,
+            "exactX": 1022.3749980926514,
+            "exactY": 216,
+            "roundedX": 1022,
+            "roundedY": 216,
+            "stageWidth": 1314,
+            "stageHeight": 600,
+            "backingWidth": 3942,
+            "backingHeight": 1800,
+            "scaleX": 3,
+            "scaleY": 3,
+            "boardWidth": 460,
+            "boardHeight": 240,
+            "rounding": "nearest_backing_pixel"
+          },
+          "textureParameters": null,
+          "contextAttributes": null,
+          "sceneDiagnostics": null,
+          "drawCalls": null,
+          "rendererBackend": "Canvas2D image composite",
+          "comparisonToA": {
+            "equal": false,
+            "differingPixels": 2565,
+            "maxChannelDifference": 96,
+            "meanDifferingChannelDifference": 47.48265107212475,
+            "reason": null
+          }
+        }
+      ],
+      "nodeBounds": {
+        "x": -2,
+        "y": -2,
+        "width": 464,
+        "height": 244
+      },
+      "sourceTextureSize": {
+        "width": 1392,
+        "height": 732
+      },
+      "sourceScale": {
+        "x": 3,
+        "y": 3
+      },
+      "rasterDisposition": "actual-BoardPane-CanvasRenderer-source-raster",
+      "smoothPathTerminalPoint": {
+        "x": 228.2083339691162,
+        "y": 219.5
+      },
+      "lastAcceptedPoint": {
+        "x": 228.2083339691162,
+        "y": 220
+      },
+      "note": "Actual BoardPane calls Painter.drawSmoothLine(graphics, points, true, false); drawLast=false is explicit, so final lineTo(lastPoint) is not emitted."
+    }
+  ]
+}
