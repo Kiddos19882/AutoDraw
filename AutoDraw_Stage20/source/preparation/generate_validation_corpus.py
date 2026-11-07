@@ -116,10 +116,8 @@ def generate_corpus(
         raise CorpusGenerationError("Шаг строк должен быть не меньше 1.")
     if threshold_mode not in {"otsu", "manual"}:
         raise CorpusGenerationError("threshold_mode должен быть otsu или manual.")
-    if not 0 <= threshold <= 255 or not 0 <= brightness <= 0:
-        # Brightness is intentionally checked below with its full signed range.
-        if not 0 <= threshold <= 255:
-            raise CorpusGenerationError("Порог должен быть от 0 до 255.")
+    if not 0 <= threshold <= 255:
+        raise CorpusGenerationError("Порог должен быть от 0 до 255.")
     if not -100 <= brightness <= 100:
         raise CorpusGenerationError("Яркость должна быть от -100 до 100.")
     if not 0.5 <= contrast <= 2.5:
