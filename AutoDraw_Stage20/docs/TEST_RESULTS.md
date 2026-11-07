@@ -1,3 +1,22 @@
+## 2026-11-08 — offline-аудит исполняемых цветных scanline-планов: 81 из 81, E3
+
+[GitHub Actions run 42417067363](https://github.com/Kiddos19882/AutoDraw/actions/runs/42417067363) SUCCESS на `5a55e9f45b34d05cc787e5d6fd5b234282d9f46a`, [artifact 13591858161](https://github.com/Kiddos19882/AutoDraw/actions/runs/42417067363/artifacts/13591858161) (`combined_corpus_screening.json`). Скрининг проверил canonical SHA-256 JSON против manifest для всех 81 цветных plan, `plan_type=autodraw_color_scanline_plan` и согласованность `summary.stroke_count` с manifest; 5 regression tests PASS. Основной `geometry-tests` CI на этом source commit отдельно находится в [run 42417067391](https://github.com/Kiddos19882/AutoDraw/actions/runs/42417067391) (итог не считать PASS до завершения).
+
+| Source color-plan summary across 31+50 | Фактическое значение |
+|---|---:|
+| Количество цветных планов | 81 |
+| Всего исходных цветных штрихов N | 942206 |
+| Zero-length single-pixel source runs | 395455 |
+| Изменений цвета между соседними source strokes | 916312 |
+| Доля single-pixel runs среди strokes (расчётная) | ≈42.0% |
+| Доля color transitions относительно общего N (расчётная) | ≈97.3% |
+
+**Runtime contract из исходного кода:** `source/preparation/color_scanline.py` сохраняет однопиксельные runs как zero-length strokes. `source/executor/drawing/color_plan_execution.py::color_plan_to_drawing_plan` превращает их в одно-пиксельные горизонтальные движения; `ColorPlanExecutionHooks.before_stroke` выбирает swatch при изменении palette index (сохраняя исходный порядок). `MouseExecutor` выполняет штрихи с задержками и возможным extension. Цветные планы исполняются через отдельный режим Stage6, а не автоматически как монохромный Stage8 DrawingPlan. Текущая геометрия и модель frozen INT-006 D1–D5 не удостоверяют точность расхода на этих color scanlines.
+
+**Важные границы:** source counts — не подтверждённые количества кликов в успешно завершённой игре, не runtime duration, не фактический CHALK. `CHALK=pointCount_after-pointCount_before` требует live captures. Высокие counters обосновывают отдельный preflight стоимости цветного исполнения до масштабной калибровки, но не разрешают переставлять штрихи по цветам (порядок критичен для качества/перекрытий) или изменять frozen модель без доказательств.
+
+---
+
 ## 2026-11-08 — проверенный 81-image image/geometry screening (E3)
 
 **Первичные артефакты:** [screening CI 42416307401](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416307401) SUCCESS на `3fdffec`; [artifact 13591427560](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416307401/artifacts/13591427560), `combined_corpus_screening.json`. Прочитаны 31+50 исходных изображений и 81 штатный .autodraw, проверены сохранённые source SHA256, выполнены 4 regression unit tests (PASS).

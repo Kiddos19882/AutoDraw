@@ -1,3 +1,11 @@
+## 2026-11-08 — проверена граница генератор → цветной executor на 81 планах
+
+Статически изучены `color_scanline.py`, `drawing/color_plan_execution.py`, `drawing/mouse_executor.py`, `stage6_execute_plan.py` и regression tests. В `screen_candidate_corpus.py` добавлена сверка canonical color JSON SHA256, count и метаданных генератора, не меняющая сам план или порядок исполнения (commit `5a55e9f`). [CI 42417067363](https://github.com/Kiddos19882/AutoDraw/actions/runs/42417067363) SUCCESS, 5 tests PASS, 81 color plans valid по проверенным summary fields, 942206 N, 395455 single-pixel, 916312 color changes; [artifact 13591858161](https://github.com/Kiddos19882/AutoDraw/actions/runs/42417067363/artifacts/13591858161).
+
+Подтверждён кодовый путь: singleton raw zero-length stroke → 1px drag, смена palette-index → выбор swatch before stroke; это потенциальный overhead, а не измеренный CHALK/runtime. Полный CI `42416307257` ранее SUCCESS на `3fdffec`; новый `42417067391` выполняется. Master, frozen INT-006, executor, palette и исходные изображения не менялись; пользовательская локальная среда/живая игра не использовалась.
+
+---
+
 ## 2026-11-08 — CI подтверждён: similarity/geometry audit 81-image corpus
 
 Проверены feature branch HEAD/20 commits, исходный код генератора, протокол CHALK, существующие источники статуса и 81 committed source image через read-only workflow. Созданы `screen_candidate_corpus.py`, unit tests и read-only workflow (`196f338`, `3fdffec`), без изменения frozen predictor/executor/игровой части. Анализатор читает все source images и проекты, проверяет source SHA256, hash геометрии без имени stroke, строит pHash/dHash, ближайшие пары и exploratory image features.

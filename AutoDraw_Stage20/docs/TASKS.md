@@ -1,3 +1,14 @@
+## 2026-11-08 — цветной execution-boundary inventory выполнен, новые вопросы к оптимизации
+
+- [x] Проверить по коду Stage6, как `color_scanline` преобразуется в runtime `DrawingPlan` (синглтоны = 1px drag, palette index changes = swatch selections); не путать mono и color source N.
+- [x] Добавить canonical SHA-256 verification, summary checks и counters для 81 color plans в `screen_candidate_corpus.py`, regression test (`5a55e9f`).
+- [x] [Offline CI 42417067363](https://github.com/Kiddos19882/AutoDraw/actions/runs/42417067363) SUCCESS: 81 verified color plans, 942206 source strokes, 395455 single-pixel runs, 916312 source color switches. [Raw artifact 13591858161](https://github.com/Kiddos19882/AutoDraw/actions/runs/42417067363/artifacts/13591858161).
+- [ ] Завершить [полный validation 42417067391](https://github.com/Kiddos19882/AutoDraw/actions/runs/42417067391) и синхронизировать его подтверждённый итог.
+- [ ] До expensive live: исследовать репрезентативные runtime color plans, стоимость палитры/однопиксельных штрихов и безопасность порядка/overlap, затем определить separate scanline CHALK protocol и нужные параметры preflight.
+- [ ] Пока не применять D1–D5 frozen predictor как утверждённый для fill scanlines, не выполнять 19/59 split, не заявлять CHALK savings от офлайн-счётчиков.
+
+---
+
 ## 2026-11-08 — screening 81 sources завершён, ручные/domain gates открыты
 
 - [x] Добавить `screen_candidate_corpus.py`, 4 regression tests и независимый `candidate-corpus-screen.yml` (`196f338`, `3fdffec`).

@@ -1,3 +1,11 @@
+## 2026-11-08 — выявлен крупный runtime-cost риск цветных source plans
+
+[Offline screening 42417067363](https://github.com/Kiddos19882/AutoDraw/actions/runs/42417067363) SUCCESS на `5a55e9f`; 81 color plan SHA+schema summary подтверждены, 942206 total source color strokes, 395455 single-pixel runs, 916312 цветовых переходов между последовательными штрихами. Экспериментальный риск — много реальных операций выбора palette swatch при сохранении порядка, плюс принудительное расширение singleton в 1px drag; **это ещё не runtime execution evidence**. Source path подтверждён статически `color_scanline.py` → `color_plan_to_drawing_plan` → `ColorPlanExecutionHooks` → `MouseExecutor`. Детали и границы — [TEST_RESULTS.md](TEST_RESULTS.md).
+
+Сохраняются блокировки: scanline vs D1–D5 domain eligibility, visual independence и semantic families, точные CHALK измерения, 19/59 split, FILL-001 PNG gate, INT-007. Нельзя заявлять сокращение CHALK от простого уменьшения количества смен цвета. Full [CI 42417067391](https://github.com/Kiddos19882/AutoDraw/actions/runs/42417067391) на последнем code commit проверяется отдельно.
+
+---
+
 ## 2026-11-08 — офлайн-скрининг независимости 81 изображения: E3 SUCCESS, domain gate OPEN
 
 [CI 42416307401](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416307401) SUCCESS, [artifact 13591427560](https://github.com/Kiddos19882/AutoDraw/actions/runs/42416307401/artifacts/13591427560). `screen_candidate_corpus.py` сверил все 81 original image SHA256 и exact geometry endpoints из 81 .autodraw: 0 точных source/geometry duplicate groups, 0 strict pHash+dHash similarity flags. 20 ближайших пар отобраны для **ручного** просмотра, не исключены автоматически. Статистическая независимость и semantic image family labels остаются unknown. Численные image characteristics и ограничения — [TEST_RESULTS.md](TEST_RESULTS.md).
