@@ -7,7 +7,10 @@ import sys
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "tests"))
-from run_paired_renderer_acceptance import discover_paired_renderer_runs  # noqa: E402
+from run_paired_renderer_acceptance import (  # noqa: E402
+    discover_paired_renderer_runs,
+    renderer_reference_directory,
+)
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from renderer_acceptance import EXPECTED_EXECUTOR_CONFIG  # noqa: E402
@@ -102,3 +105,18 @@ def test_discovery_ignores_other_brush_scenarios(tmp_path):
 
     assert candidates == []
     assert rejected == []
+
+
+def test_renderer_reference_directory_is_bound_to_each_nonbaseline_run(tmp_path):
+    renderer_root = tmp_path / "committed"
+    run_root = tmp_path / "run-bound"
+
+    original = renderer_reference_directory(
+        renderer_root, "vertical", "c860234f-995a-4789-9ac2-e05b322fe742", run_root,
+    )
+    additional = renderer_reference_directory(
+        renderer_root, "vertical", "new-vertical-run", run_root,
+    )
+
+    assert original == renderer_root / "vertical"
+    assert additional == run_root / "vertical" / "new-vertical-run"

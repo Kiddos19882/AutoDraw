@@ -231,6 +231,19 @@ def test_paired_capture_gate_accepts_complete_evidence(scenario):
     assert result["passed"] is True, result["failed_checks"]
 
 
+def test_paired_capture_gate_accepts_state_poll_fallback_sample_when_it_matches_quota():
+    data = _capture_fixture()
+    fallback = next(
+        event for event in data["monitor"]["events"]
+        if event["type"] == "DRAW_SAMPLE" and event.get("source") == "onDrawing_wrapper"
+    )
+    fallback["source"] = "state_poll"
+    result = validate_paired_capture(
+        data["experiment"], data["monitor"], data["plan"], data["fixture"],
+    )
+    assert result["passed"] is True, result["failed_checks"]
+
+
 def test_paired_capture_gate_rejects_missing_accepted_point():
     data = _capture_fixture()
     data["monitor"]["events"] = [

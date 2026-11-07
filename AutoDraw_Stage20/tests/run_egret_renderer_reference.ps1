@@ -124,7 +124,7 @@ try {
 
     Write-Host "Egret actual BoardPane CanvasRenderer + WebGLRenderer generated $($manifest.fixtures.Count) fixtures, 20 WebGL comparisons and $($pngMatches.Count) PNG files."
 
-    python AutoDraw_Stage20/tests/run_egret_stage_reference_firefox.py --base-url "http://127.0.0.1:8765" --output-dir $outputDir --workspace $env:GITHUB_WORKSPACE
+    python AutoDraw_Stage20/tests/run_egret_stage_reference_firefox.py --base-url "http://127.0.0.1:8765" --output-dir $outputDir --workspace $env:GITHUB_WORKSPACE --paired-renderer-experiment-root "AutoDraw_Stage20/data/results/brush_behavior_tests"
     if ($LASTEXITCODE -ne 0) { throw "Firefox Stage-level A-D browser probe failed." }
 
 } finally {

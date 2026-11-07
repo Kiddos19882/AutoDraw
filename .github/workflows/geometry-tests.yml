@@ -164,7 +164,7 @@ jobs:
         if: always()
         shell: pwsh
         run: |
-          python tests\run_paired_renderer_acceptance.py --experiment-root data\results\brush_behavior_tests --blank data\results\brush_behavior_tests\blank-board-reference.png --renderer-root data\results\renderer_compare --output-root "$env:RUNNER_TEMP\paired-renderer-png-comparison"
+          python tests\run_paired_renderer_acceptance.py --experiment-root data\results\brush_behavior_tests --blank data\results\brush_behavior_tests\blank-board-reference.png --renderer-root data\results\renderer_compare --run-reference-root "$env:RUNNER_TEMP\egret-renderer-reference\paired-renderer" --output-root "$env:RUNNER_TEMP\paired-renderer-png-comparison"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Compare Stage A/B against same-run live screenshots (diagnostic only)
         if: always()

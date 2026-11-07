@@ -34,6 +34,27 @@ EXPECTED_BROWSER_MANIFEST = Path(
     "AutoDraw_Stage20/data/results/renderer_compare/vertical/"
     "egret-5.4.1-renderer-reference-manifest.json"
 )
+ORIGINAL_RUN_IDS = {item["run_id"] for item in CASES}
+
+
+def discover_additional_cases(experiment_root: Path, workspace: Path) -> list[dict[str, str]]:
+    """Create one offline renderer replay input for each non-baseline saved live run."""
+    candidates, _rejected = discover_paired_renderer_runs(experiment_root)
+    cases: list[dict[str, str]] = []
+    for candidate in candidates:
+        run_id = str(candidate["run_id"])
+        if run_id in ORIGINAL_RUN_IDS:
+            continue
+        orientation = str(candidate["orientation"])
+        monitor_path = (Path(candidate["experiment_dir"]) / "monitor_report.json").resolve()
+        relative_monitor = monitor_path.relative_to(workspace).as_posix()
+        cases.append({
+            "name": f"{orientation}-{run_id}",
+            "monitor": relative_monitor,
+            "run_id": run_id,
+            "output_subdir": f"paired-renderer/{orientation}/{run_id}",
+        })
+    return cases
 
 
 def find_firefox() -> Path:
@@ -122,6 +143,10 @@ def main() -> int:
     parser.add_argument("--output-dir", required=True, type=Path)
     parser.add_argument("--workspace", default=".", type=Path)
     parser.add_argument(
+        "--paired-renderer-experiment-root", type=Path, default=None,
+        help="Generate additional run-bound offline WebGL references for saved paired-renderer captures.",
+    )
+    parser.add_argument(
         "--headed",
         action="store_true",
         help="Run Firefox with a visible window so local hardware acceleration can be used.",
@@ -130,6 +155,12 @@ def main() -> int:
     workspace = args.workspace.resolve()
     output_root = args.output_dir.resolve()
     output_root.mkdir(parents=True, exist_ok=True)
+    cases = list(CASES)
+    if args.paired_renderer_experiment_root is not None:
+        experiment_root = args.paired_renderer_experiment_root
+        if not experiment_root.is_absolute():
+            experiment_root = workspace / experiment_root
+        cases.extend(discover_additional_cases(experiment_root.resolve(), workspace))
 
     expected_manifest = json.loads((workspace / EXPECTED_BROWSER_MANIFEST).read_text(encoding="utf-8-sig"))
     expected_ua = str(expected_manifest.get("browser", {}).get("userAgent", ""))
@@ -158,7 +189,7 @@ def main() -> int:
                 f"runner Firefox is {actual_version!r}."
             )
         driver.set_page_load_timeout(90)
-        for case in CASES:
+        for case in cases:
             monitor_path = workspace / case["monitor"]
             monitor = json.loads(monitor_path.read_text(encoding="utf-8-sig"))
             if monitor.get("run_id") != case["run_id"]:
@@ -166,7 +197,8 @@ def main() -> int:
             query = f"/{case['monitor'].replace(os.sep, '/')}"
             from urllib.parse import quote
             url = f"{args.base_url}/AutoDraw_Stage20/tests/game_renderer_reference.html?monitor={quote(query, safe='')}"
-            case_output = output_root / f"stage-level-{case['name']}"
+            output_subdir = case.get("output_subdir", f"stage-level-{case['name']}")
+            case_output = output_root / Path(output_subdir)
             case_output.mkdir(parents=True, exist_ok=True)
             driver.get(url)
 
@@ -213,18 +245,24 @@ def main() -> int:
             if len(links) != 7:
                 raise RuntimeError(f"Firefox Stage probe expected 7 PNG links for {case['name']}, got {len(links)}.")
             stage_count = 0
+            fixture_png_count = 0
             for link in links:
                 name = Path(str(link["name"])).name
-                if not name.startswith("stage-level-") or not name.endswith(".png"):
+                if not name.endswith(".png"):
                     continue
                 data_url = str(link["href"])
                 if not data_url.startswith("data:image/png;base64,"):
                     raise ValueError(f"Unexpected PNG URL for {name}.")
                 payload = base64.b64decode(data_url.split(",", 1)[1], validate=True)
                 (case_output / name).write_bytes(payload)
-                stage_count += 1
+                if name.startswith("stage-level-"):
+                    stage_count += 1
+                if name == "live-accepted-points-width-10-webgl-board-reference.png":
+                    fixture_png_count += 1
             if stage_count != 4:
                 raise RuntimeError(f"Firefox Stage probe expected four A-D PNGs, saved {stage_count}.")
+            if fixture_png_count != 1:
+                raise RuntimeError(f"Firefox paired replay expected one WebGL board PNG, saved {fixture_png_count}.")
             driver.save_screenshot(str(case_output / "firefox-page.png"))
             actual_context = manifest.get("webglProbe", {}).get("contextAttributes", {})
             expected_context = expected_manifest.get("webglProbe", {}).get("contextAttributes", {})

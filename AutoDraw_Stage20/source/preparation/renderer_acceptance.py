@@ -284,7 +284,7 @@ def validate_paired_capture(
     positive_draw = [
         event for event in events
         if isinstance(event, dict) and event.get("type") == "DRAW_SAMPLE"
-        and event.get("source") == "onDrawing_wrapper"
+        and event.get("source") in {"onDrawing_wrapper", "state_poll"}
         and (_number(event.get("pointDelta")) or 0) > 0
     ]
     quota_points = [event.get("acceptedPoint") for event in positive_quota]

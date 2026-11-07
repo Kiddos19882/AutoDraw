@@ -167,6 +167,19 @@ def discover_paired_renderer_runs(
     return candidates, rejected
 
 
+def renderer_reference_directory(
+    renderer_root: Path,
+    orientation: str,
+    run_id: str,
+    run_reference_root: Path | None = None,
+) -> Path:
+    """Return a renderer reference bound to this exact live run."""
+    if run_id == ORIGINAL_RUN_IDS.get(orientation):
+        return renderer_root / orientation
+    root = run_reference_root if run_reference_root is not None else renderer_root / "paired-renderer"
+    return root / orientation / run_id
+
+
 def _write_preflight_rejection(output_root: Path, item: dict[str, Any]) -> Path:
     orientation = item["orientation"]
     identity = str(item.get("experiment_id") or Path(item["experiment_dir"]).name)
@@ -198,10 +211,12 @@ def run_acceptance(
     blank: Path,
     renderer_root: Path,
     output_root: Path,
+    run_reference_root: Path | None = None,
 ) -> dict[str, Any]:
     experiment_root = experiment_root.resolve()
     blank = blank.resolve()
     renderer_root = renderer_root.resolve()
+    run_reference_root = run_reference_root.resolve() if run_reference_root is not None else None
     output_root = output_root.resolve()
     if not experiment_root.is_dir():
         raise FileNotFoundError(experiment_root)
@@ -220,14 +235,21 @@ def run_acceptance(
     for candidate in candidates:
         orientation = candidate["orientation"]
         reference = SCENARIOS[candidate["scenario_id"]]
-        offline_dir = renderer_root / orientation
+        offline_dir = renderer_reference_directory(
+            renderer_root, orientation, str(candidate["run_id"]), run_reference_root,
+        )
         offline_png = offline_dir / reference["offline_png"]
         manifest = offline_dir / reference["manifest"]
         if not offline_png.is_file() or not manifest.is_file():
-            tool_errors.append({
-                "run_id": str(candidate["run_id"]),
-                "error": f"Offline renderer reference missing for {orientation}.",
-            })
+            rejected_item = {
+                **candidate,
+                "reasons": [
+                    "run-bound offline renderer reference is missing: "
+                    f"expected {offline_png.name} and {manifest.name} under {offline_dir}"
+                ],
+            }
+            rejected.append(rejected_item)
+            _write_preflight_rejection(output_root, rejected_item)
             continue
 
         if candidate["run_id"] == ORIGINAL_RUN_IDS[orientation]:
@@ -314,9 +336,16 @@ def main() -> int:
     parser.add_argument("--blank", type=Path, required=True)
     parser.add_argument("--renderer-root", type=Path, required=True)
     parser.add_argument("--output-root", type=Path, required=True)
+    parser.add_argument(
+        "--run-reference-root", type=Path, default=None,
+        help="Root containing per-run offline references at <orientation>/<run_id>/; original repeat-1 references remain under --renderer-root.",
+    )
     args = parser.parse_args()
     try:
-        result = run_acceptance(args.experiment_root, args.blank, args.renderer_root, args.output_root)
+        result = run_acceptance(
+            args.experiment_root, args.blank, args.renderer_root, args.output_root,
+            args.run_reference_root,
+        )
     except Exception as exc:
         print(json.dumps({"status": "FAIL", "error": str(exc)}, ensure_ascii=False), file=sys.stderr)
         return 1
