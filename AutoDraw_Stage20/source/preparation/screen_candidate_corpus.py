@@ -117,18 +117,29 @@ def screen(datasets):
             })
     rows.sort(key=lambda v: (v["dataset"], v["source"]))
     near_pairs = []
+    all_pairs = []
     for i, a in enumerate(rows):
         for b in rows[i + 1:]:
             p = (int(a["phash64"], 16) ^ int(b["phash64"], 16)).bit_count()
             d = (int(a["dhash64"], 16) ^ int(b["dhash64"], 16)).bit_count()
+            pair = {
+                "left": a["dataset"] + "/" + a["source"],
+                "right": b["dataset"] + "/" + b["source"],
+                "phash_distance": p, "dhash_distance": d,
+                "status": "manual_review_required",
+            }
+            all_pairs.append(pair)
             if p <= 10 and d <= 10:
-                near_pairs.append({
-                    "left": a["dataset"] + "/" + a["source"],
-                    "right": b["dataset"] + "/" + b["source"],
-                    "phash_distance": p, "dhash_distance": d,
-                    "status": "manual_review_required",
-                })
-    near_pairs.sort(key=lambda pair: (pair["phash_distance"] + pair["dhash_distance"], pair["left"], pair["right"]))
+                near_pairs.append(pair)
+    rank = lambda pair: (pair["phash_distance"] + pair["dhash_distance"], pair["left"], pair["right"])
+    near_pairs.sort(key=rank)
+    all_pairs.sort(key=rank)
+    visual_counts = {
+        "with_transparency": sum(r["transparency_present"] for r in rows),
+        "low_chroma_at_most_0_10": sum(r["chroma_fraction"] <= 0.10 for r in rows),
+        "dominant_coarse_color_at_least_0_75": sum(r["dominant_coarse_color_fraction"] >= 0.75 for r in rows),
+        "edge_score_at_least_50": sum(r["edge_score"] >= 50 for r in rows),
+    }
     return {
         "schema_version": 1, "type": "candidate_image_similarity_and_geometry_screen",
         "source_count": len(rows),
@@ -139,6 +150,8 @@ def screen(datasets):
         "geometry_exact_duplicate_groups": group_duplicates(rows, "geometry_sha256_without_names"),
         "perceptual_review_pairs": near_pairs,
         "perceptual_review_pair_count": len(near_pairs),
+        "closest_20_pairs_review_only": all_pairs[:20],
+        "visual_characteristics_counts": visual_counts,
         "records": rows,
         "perceptual_thresholds_review_only": {"phash_hamming_max": 10, "dhash_hamming_max": 10},
         "manual_family_classification": "not_performed",
@@ -162,7 +175,8 @@ def main(argv=None):
     print(json.dumps({key: result[key] for key in (
         "source_count", "dataset_counts", "configurations_match",
         "source_exact_duplicate_groups", "geometry_exact_duplicate_groups",
-        "perceptual_review_pair_count", "independent_plan_count",
+        "perceptual_review_pair_count", "visual_characteristics_counts",
+        "closest_20_pairs_review_only", "independent_plan_count",
         "predictor_domain_eligibility"
     )}, ensure_ascii=False))
     return 0
