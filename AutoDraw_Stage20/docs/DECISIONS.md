@@ -281,3 +281,12 @@
 **Обоснование согласования:** предел 8.7% для symmetric difference относительно live changed pixels согласован с одновременными требованиями IoU/precision/recall ≥0.92. Bbox tolerance масштабируется относительно размера объекта, чтобы не сохранять прежнее фиксированное ограничение 1 px для объектов любого масштаба.  
 **Инварианты:** capture/provenance, transform/geometry, exact CHALK, event integrity и три уникальных PASS_PER_RUN на каждую ориентацию остаются без изменений. Ослабляются только renderer pixel acceptance criteria. Исторические результаты не пересчитываются; для статуса по новой политике требуется новый CI. Live game runs не разрешены этим решением и не выполнялись.
 
+
+
+## DEC-026. Целевое покрытие CHALK safety policy — 95%
+
+**Статус:** принято пользователем, 2026-11-07  
+**Контекст:** INT-006 frozen validation подтвердил точность на D1–D5 при radius=10, но только пять независимых DrawingPlan на профиль; этого недостаточно для обоснования safety reserve. Был подготовлен проект profile-aware/run-level residual policy.  
+**Решение:** принять 95% как целевое одностороннее предиктивное покрытие для новых DrawingPlan внутри заранее определённой и валидированной совокупности `profile × geometry_domain`. Статистическая единица — независимый DrawingPlan ID. Для первой line-based domain протокол предусматривает 19 calibration IDs и 59 holdout IDs на каждый профиль; holdout acceptance — ноль превышений из 59.  
+**Границы:** 95% не означает универсальную гарантию, 95% confidence в универсальность формулы или защиту неподдержанных geometry/radius/profile. N bands и их границы должны быть зафиксированы до формирования выборки.  
+**Последствия:** протокол [CHALK_95_PERCENT_CALIBRATION_HOLDOUT_PROTOCOL_2026-11-07.md](CHALK_95_PERCENT_CALIBRATION_HOLDOUT_PROTOCOL_2026-11-07.md) принят как план дальнейшей проверки. Решение не разрешает live captures и не меняет production estimator/defaults. До успешного независимого holdout `safety_margin_status=not_established`, `production_eligibility=not_validated`, INT-007 остаётся BLOCKED; FILL-001 PNG gate независим.
