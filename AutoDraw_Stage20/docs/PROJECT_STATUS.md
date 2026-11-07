@@ -1,3 +1,9 @@
+## 2026-11-07 — синхронизация фактического статуса CI генератора
+
+CI [42352776594](https://github.com/Kiddos19882/AutoDraw/actions/runs/42352776594) завершён SUCCESS для code/test HEAD `51c731f0c25ad10af70efdfb8a46a38a73d07bc1` (2026-11-07). Успешны Preparation/G3, Game Monitor/Bridge, Executor, Application integration, Egret browser reference и INT-006 PNG audit. Windows portable build/startup smoke-test и optional benchmarks были SKIPPED, поэтому Windows сборка этим workflow не подтверждена. Текущий проверенный перед синхронизацией HEAD `0db0bcb96d20b39a01a5b6fb2614a43c1f83a916` добавил только семь файлов в `testImages/` и не менял генератор/тесты; отдельного CI для HEAD не обнаружено. Реальный пользовательский корпус ещё не сформирован, candidate manifest не является validation выборкой; N bands и safety margin не установлены, INT-007 BLOCKED. Новых live captures не выполнялось.
+
+---
+
 ## 2026-11-07 — добавлен генератор кандидатного корпуса INT-006
 
 Создан CLI-инструмент `source/preparation/generate_validation_corpus.py` и regression tests `source/preparation/tests/test_generate_validation_corpus.py`.

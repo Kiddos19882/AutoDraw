@@ -1,8 +1,10 @@
 # Генератор кандидатного корпуса DrawingPlan и color scanline — 2026-11-07
 
-**Статус:** IMPLEMENTED IN CODE / CI VALIDATION PENDING  
+**Статус:** IMPLEMENTED IN CODE / CI VALIDATION SUCCESS (51c731f; Windows build SKIPPED)  
 **Инструмент:** source/preparation/generate_validation_corpus.py  
 **Тесты:** source/preparation/tests/test_generate_validation_corpus.py
+
+**Проверка CI (2026-11-07):** [GitHub Actions 42352776594](https://github.com/Kiddos19882/AutoDraw/actions/runs/42352776594) SUCCESS для code/test commit `51c731f`; Windows portable build/startup smoke-test и optional benchmarks SKIPPED. Это не является подтверждением локального запуска генератора на пользовательских изображениях или пригодности корпуса для 95% calibration/holdout.
 
 ## 1. Назначение
 

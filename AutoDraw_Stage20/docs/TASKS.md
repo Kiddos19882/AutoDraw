@@ -1,3 +1,14 @@
+## 2026-11-07 — CI генератора: подтверждённая проверка
+
+- [x] Проверить GitHub Actions `42352776594` для code/test commit `51c731f` — SUCCESS.
+- [x] Разграничить успешные jobs и SKIPPED Windows portable / optional benchmarks.
+- [ ] Проверить генератор на реальных пользовательских изображениях и palette profile (локальный запуск пользователем).
+- [ ] Проверить provenance, family, совместимость N с frozen predictor и определить N bands до независимого split.
+
+Это уточнение не закрывает INT-006, не означает generation 78 DrawingPlans/234 captures и не разрешает live-тесты.
+
+---
+
 ## 2026-11-07 — генератор кандидатного корпуса INT-006
 
 - [x] Изучить штатные Stage 12/8, .autodraw project writer, palette quantizer и color scanline planner.
@@ -5,7 +16,7 @@
 - [x] Добавить SHA-256 дедупликацию исходников и manifest с provenance, family label, N и plan hashes.
 - [x] Разделить N monochrome DrawingPlan и N color scanline plan; не смешивать статистические единицы.
 - [x] Добавить unit tests для обоих форматов, повторного чтения, дубликатов и overwrite guard.
-- [ ] Подтвердить CI на commit с генератором и тестами.
+- [x] Подтвердить CI на commit с генератором и тестами: Actions 42352776594 SUCCESS на 51c731f; Windows portable / smoke-test SKIPPED.
 - [ ] Запустить генератор локально на исходном наборе изображений и реальном palette profile.
 - [ ] Проверить provenance, исключить нецелевые synthetic/test fixtures из production-like population.
 - [ ] Сверить N с фактическим входом frozen INT-006 predictor; только затем строить N distribution и bands.

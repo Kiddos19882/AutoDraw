@@ -1,3 +1,11 @@
+## 2026-11-07 — аудит GitHub и синхронизация CI статуса генератора
+
+- Проверены рабочая feature branch, HEAD `0db0bcb`, последние 20 коммитов, управляющие документы, генератор и regression tests.
+- CI [42352776594](https://github.com/Kiddos19882/AutoDraw/actions/runs/42352776594) завершён SUCCESS для code/test HEAD `51c731f0c25ad10af70efdfb8a46a38a73d07bc1` (2026-11-07). Успешны Preparation/G3, Game Monitor/Bridge, Executor, Application integration, Egret browser reference и INT-006 PNG audit. Windows portable build/startup smoke-test и optional benchmarks были SKIPPED, поэтому Windows сборка этим workflow не подтверждена. Текущий проверенный перед синхронизацией HEAD `0db0bcb96d20b39a01a5b6fb2614a43c1f83a916` добавил только семь файлов в `testImages/` и не менял генератор/тесты; отдельного CI для HEAD не обнаружено. Реальный пользовательский корпус ещё не сформирован, candidate manifest не является validation выборкой; N bands и safety margin не установлены, INT-007 BLOCKED. Новых live captures не выполнялось.
+- Изменены только документы; код, тесты, workflow, исходные эксперименты и production defaults не менялись. Локальный git status недоступен через GitHub API.
+
+---
+
 ## 2026-11-07 — добавлен генератор кандидатного корпуса DrawingPlan
 
 - Изучены штатные Stage 12 image processing, Stage 8 scanline planner, .autodraw archive writer/reader, CIELAB/CIEDE2000 palette quantizer и color scanline planner.
