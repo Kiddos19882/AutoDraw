@@ -396,3 +396,15 @@ Scope: code, tests and CI only in feature/image-geometry-optimization; no real g
 - Remote feature branch HEAD перед этой записью: `adac8018c22c66fa91d8d9203cd82c1b79110f29`; compare с master: diverged, ahead 3434 / behind 5. Master SHA `9a3453aeb847b66041bc83d6f4a56ecaf33a993a`.
 - Следующий шаг — получить подтверждённые CI artifacts, проверить PNG и manifest, затем выполнить formal Stage A → live screenshot comparison.
 
+
+
+## 2026-11-07 — утверждена цель 95%, подготовлен calibration/holdout protocol
+
+- Получено подтверждение пользователя: 95% — целевое одностороннее предиктивное покрытие CHALK.
+- Спроектирована независимая выборка: 19 calibration + 59 holdout DrawingPlan IDs на profile/domain; строгий holdout PASS требует 0 превышений из 59.
+- Для первой line-based domain, radius=10 и P0/P1/P2: 78 новых уникальных планов, по одному capture на профиль (234 плановых captures).
+- Определены split protection, N strata, capture integrity, exact pointCount CHALK, frozen quantile и fail-closed критерии.
+- Числовые N boundaries пока не выбраны, поскольку сначала требуется определить целевое распределение production DrawingPlans.
+- Live experiments не запускались; пользовательское подтверждение целевого покрытия не является разрешением на live runs.
+- Исходники, тесты, конфигурации, workflow и production defaults не изменялись.
+- Подробности: [CHALK_95_PERCENT_CALIBRATION_HOLDOUT_PROTOCOL_2026-11-07.md](CHALK_95_PERCENT_CALIBRATION_HOLDOUT_PROTOCOL_2026-11-07.md).
