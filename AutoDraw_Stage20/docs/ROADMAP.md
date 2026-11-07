@@ -1,3 +1,21 @@
+## 2026-11-07 — обновление последовательности после PRR live batch
+
+PRR runner уже выполнен на локальной игровой доске. Четыре новых run (vertical repeats 2/3 и diagonal repeats 2/3) сохранены, каждый имеет exact CHALK и валидную Monitor/Bridge привязку. Поэтому прежний пункт «выполнить локальный PRR» закрыт, но renderer series ещё не принимается автоматически.
+
+**Ближайшая последовательность:**
+
+1. **PRR formal acceptance — NEXT:** обработать четыре новых captures paired-renderer analyzer'ом; проверить run/session/experiment provenance, same-run transform, PNG metrics и уникальность. Зафиксировать PASS_PER_RUN/REJECTED_PER_RUN отдельно для каждого run и агрегат серии.
+2. **INT-006 CHALK safety margin — BLOCKED:** расширить validation domain и получить обоснованный консервативный запас. Текущие четыре PRR повтора выполнены только при radius=10 и не заменяют validation полного диапазона геометрий.
+3. **FILL-001 PNG quality gate — BLOCKED:** устранить причину coverage=98.430600% и leakage=11, сохраняя frozen criteria и исходные evidence; static sweep не считать live acceptance.
+4. **INT-007 — BLOCKED:** не интегрировать estimator в production preflight до закрытия INT-006/safety margin и formal gates.
+5. **INT-008:** планировать оптимизацию кисти/траекторий/покрытия только после разрешения зависимостей; оценивать quality, exact CHALK, штрихи, точки и время отдельно.
+
+Первый PRR block `ab9b788c8199454c957036effb99e9c6` завершился остановкой до создания experiment из-за отсутствия input telemetry при старте Bridge; он сохранён как failed attempt. Повторный block `596e5c37813a43048395d0f596f9d971` завершился 4/4. Точный расход и IDs — в [TEST_RESULTS.md](TEST_RESULTS.md#2026-11-07--локальный-prr-batch-и-exact-chalk-evidence).
+
+**CI caveat:** workflow 42309752566 SUCCESS подтверждает код PRR на bacd03f, но не HEAD 52e3c51 с добавленными evidence. CI для текущего HEAD не подтверждён.
+
+---
+
 ## 2026-11-07 — итог CI PRR implementation и повторная оценка renderer/CHALK
 
 **GitHub Actions:** [42309752566](https://github.com/Kiddos19882/AutoDraw/actions/runs/42309752566) — **SUCCESS**.  
