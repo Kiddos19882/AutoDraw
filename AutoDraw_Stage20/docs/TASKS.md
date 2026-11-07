@@ -19,7 +19,8 @@
 - [x] Получить подтверждение пользователя: radius=10 визуально приемлем и предпочтителен в пределах проверенной матрицы D1–D5.
 - [x] Зафиксировать область применимости решения: пять исследованных геометрий, captures INT006R, сравнение радиусов 1/10/30; не распространять на произвольные рисунки и заливку.
 - [x] Зафиксировать ручное проектное решение отдельно от machine-generated analyzer status.
-- [ ] Разработать safety-margin policy с масштабированием по числу штрихов и профилю; проверить на независимых captures.
+- [x] Подготовить design proposal safety-margin policy с масштабированием по числу штрихов и профилю.
+- [ ] Проверить предложенную policy на независимых captures; до этого production reserve не назначать.
 - [ ] Сохранить `safety_margin_status=not_established` и `production_eligibility=not_validated` до отдельного validation gate.
 - [ ] Разобрать FILL-001 PNG quality gate (coverage=98.430600%, leakage=11); static sweep PASS не заменяет PNG acceptance.
 
@@ -31,10 +32,12 @@
 
 - [x] Просмотреть 45 сохранённых INT006R after-draw PNG (5 геометрий × 3 радиуса × 3 повтора) в artifact `13553755987`.
 - [x] Зафиксировать предварительное наблюдение: radius=10 выглядит наиболее сбалансированным для исследованных геометрий; radius=1 тонкий на коротких деталях, radius=30 грубее на D3/D4.
-- [ ] Получить ручное подтверждение visual-quality gate; до этого `visual_quality_gate=pending_manual_review`.
+- [x] Получить ручное подтверждение пользователя: radius=10 визуально приемлем в исследованной матрице.
+- [x] Записать ручной sign-off отдельно; machine-generated `visual_quality_gate=pending_manual_review` не переопределять.
 - [x] Повторно свести exact CHALK totals по радиусам: r1=1011, r10=1015, r30=1017 на 15 captures на радиус.
 - [x] Рассчитать offline residual diagnostics P0/P1/P2; максимальная сумма положительных stroke residual в run: 1.990/1.597/2.157 соответственно.
-- [ ] Определить и проверить safety-margin policy, масштабируемую по количеству штрихов; не выводить production reserve только из max residual этой выборки.
+- [x] Подготовить design proposal safety-margin policy, масштабируемой по количеству штрихов.
+- [ ] Проверить policy на независимых DrawingPlan; не выводить production reserve только из max residual текущей выборки.
 - [ ] Сохранить `safety_margin_status=not_established` и `production_eligibility=not_validated` до отдельного validation gate.
 
 ---
@@ -46,7 +49,7 @@
 - [x] Исправлена проверка DRAW_SAMPLE fallback: `state_poll` учитывается только при точном упорядоченном совпадении accepted-point stream с quota updates.
 - [x] Formal paired-renderer acceptance: CI [42321009715](https://github.com/Kiddos19882/AutoDraw/actions/runs/42321009715), 6/6 PASS_PER_RUN; vertical 3/3, diagonal 3/3; aggregate series PASS.
 - [ ] INT-006 CHALK safety margin/domain validation: 45/45 captures приняты, но `safety_margin_status=not_established`, `production_eligibility=not_validated`.
-- [ ] INT006R manual visual quality review: evidence complete, `visual_quality_gate=pending_manual_review`.
+- [x] Получен пользовательский visual sign-off radius=10 для D1–D5; machine-generated поле `visual_quality_gate=pending_manual_review` сохранено без изменений.
 - [ ] FILL-001 PNG quality gate: исправить coverage=98.430600% и leakage=11; FILL-001-RS static sweep PASS не заменяет PNG acceptance.
 - [ ] INT-007: остаётся BLOCKED до обоснования CHALK safety margin и выполнения остальных зависимостей.
 
