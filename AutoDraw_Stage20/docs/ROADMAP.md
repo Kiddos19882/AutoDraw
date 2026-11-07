@@ -1,3 +1,17 @@
+## 2026-11-07 — INT-006 95% policy validation protocol зафиксирован
+
+Пользователь утвердил 95% как целевое одностороннее предиктивное покрытие. Подготовлен [protocol calibration/holdout](CHALK_95_PERCENT_CALIBRATION_HOLDOUT_PROTOCOL_2026-11-07.md).
+
+1. **Сначала определить N population:** извлечь ожидаемый рабочий диапазон числа stroke executions из целевых DrawingPlans и до сбора зафиксировать три N bands.
+2. **Подготовить выборку:** 19 независимых calibration + 59 независимых holdout plan IDs на каждую profile/domain группу. Для первой line-based domain и трёх профилей — 78 уникальных DrawingPlan, 234 captures.
+3. **Заморозить протокол:** canonical hashes, независимые splits, frozen predictions, capture integrity и нулевой holdout exceedance criterion.
+4. **Live captures:** только после отдельного разрешения пользователя; подтверждение 95% не является таким разрешением.
+5. **После PASS:** отдельное решение о production eligibility; INT-007 не запускается автоматически.
+
+FILL-001 PNG gate остаётся отдельным блокером. До независимой validation safety margin не установлен, production eligibility не подтверждена.
+
+---
+
 ## 2026-11-07 — проект safety-margin policy подготовлен; требуется независимая validation
 
 Создан [CHALK_SAFETY_MARGIN_POLICY_DESIGN_2026-11-07.md](CHALK_SAFETY_MARGIN_POLICY_DESIGN_2026-11-07.md). Предложено нормировать положительный run-level residual на число штрихов и калибровать квантиль отдельно для sampling profile и supported geometry domain. Числовой reserve не назначен.
