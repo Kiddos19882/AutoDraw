@@ -1,3 +1,15 @@
+## 2026-11-07 — анализ поступившего candidate corpus (`8b4588b`)
+
+- [x] Получить и изучить committed manifest+geometry audit и состав коммита (31 .autodraw, 31 color plan, offline reports).
+- [x] Проверить фактическую конфигурацию 646×323/contain, хеши, N distribution, structural valid/invalid, длины, семейства и отсутствие SHA-256 дубликатов; сохранить результаты в [TEST_RESULTS.md](TEST_RESULTS.md).
+- [ ] Зафиксировать окончательное состояние [CI 42408937802](https://github.com/Kiddos19882/AutoDraw/actions/runs/42408937802), различать skipped и success jobs.
+- [ ] Пользователь/оценка исходников: подтвердить реальные группы картинок, производные версии и происхождение; нынешний manifest содержит только unclassified, источники отдельно не классифицированы.
+- [ ] Провести independent geometry domain review (все 65 743 mono штрихов горизонтальные, 6155 коротких вне short lookup), установить соответствие реальному execution pipeline и frozen INT-006.
+- [ ] Только после population/domain approval зафиксировать N bands и independent split; число 31 меньше требуемых 78 plan IDs, ещё 47 **при условии** валидности всех 31, что пока НЕ подтверждено.
+- [ ] Не считать этот corpus live CHALK calibration, FILL-001 PNG quality pass либо основанием открыть INT-007.
+
+---
+
 ## 2026-11-07 — локальный offline corpus, независимая подготовка к 95% validation
 
 - [x] Реализовать structural `audit_validation_corpus.py` + regression tests и подключить в CI (`54ab979d`).

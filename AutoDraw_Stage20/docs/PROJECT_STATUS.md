@@ -1,3 +1,11 @@
+## 2026-11-07 — получен пользовательский corpus из 31 плана (`8b4588b`)
+
+В рабочей ветке [commit 8b4588b](https://github.com/Kiddos19882/AutoDraw/commit/8b4588be1803f90905cba223005c4702b374e520) сохранены 31 candidate .autodraw, 31 цветной план, generated manifest и geometry audit (646×323, contain, row steps 1). Verified manifest: 31 unique SHA-256 / 0 exact duplicate, 31/31 mono plans schema-valid, 0 zero strokes. N mono 340–6385 (median 1707), color 1868–33113 (median 10245). Все 31 family unclassified; 6155 short strokes вне специального lookup и все mono strokes горизонтальные. Подробные фактические данные и ограничения — [TEST_RESULTS.md](TEST_RESULTS.md).
+
+Артефакты — **не** подтверждённая независимая line-based 95% validation sample; модель для raster scanline fills не аттестована. CHALK не измерялся, N bands не frozen, INT-007 BLOCKED, FILL-001 gate не изменён. Для целевой 78-plan выборки требуется provenance/family review и ещё независимые примеры. CI [42408937802](https://github.com/Kiddos19882/AutoDraw/actions/runs/42408937802) на входном коммите на момент проверки в процессе.
+
+---
+
 ## 2026-11-07 — offline structural audit и локальный corpus runner
 
 Добавлены `source/preparation/audit_validation_corpus.py` и regression tests (commit `54ab979d`): проверка количества и схемы штрихов из .autodraw, длин, нулевых штрихов и длин вне frozen short lookup. [Offline CI 42388237279](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388237279) SUCCESS; 8/8 fixture plans schema-valid, 0 invalid; [artifact 13580376620](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388237279/artifacts/13580376620). Predictor-domain eligibility **not_assessed**, CHALK не измерялся.

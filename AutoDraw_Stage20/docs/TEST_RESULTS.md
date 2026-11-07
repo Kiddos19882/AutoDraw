@@ -1,3 +1,29 @@
+## 2026-11-07 — пользовательский corpus 31 изображение, offline-аудит (источник 8b4588b)
+
+**Источник:** [GitHub commit 8b4588be1803f90905cba223005c4702b374e520](https://github.com/Kiddos19882/AutoDraw/commit/8b4588be1803f90905cba223005c4702b374e520), каталог `data/generated_autodraw_plan/20261107-224452-09ee1388/`. Первичные файлы: `results/generated_validation_corpus_manifest.json`, `results/corpus_geometry_audit.json`, 31 `.autodraw` проектов и 31 JSON color scanline план. Данные подготовлены локально пользователем и загружены в GitHub; мы проверили сохранённые артефакты, **не** повторяли локальную генерацию или игровой запуск.
+
+**Конфигурация из manifest:** 646×323; fit=contain; mono/color row_step=1; Otsu threshold mode, threshold=128; brightness=0; contrast=1.0; denoise=0; palette SHA-256 `e8e73bed2a1eca73de548f880b17ca11ede352b7e7b62d1b69c4950930b431c6`; generator 1.0.0. Created `2026-11-07T19:47:48+00:00`. Palette hash зафиксирован; смысловая идентичность с использованной пользователем runtime палитрой отдельно не подтверждена.
+
+| Показатель | Mono Stage 8 | Color scanline |
+|---|---:|---:|
+| Число candidate plans | 31 | 31 |
+| N (min) | 340 | 1 868 |
+| N (median) | 1 707 | 10 245 |
+| N (max) | 6 385 | 33 113 |
+| Σ N по 31 плану (не CHALK) | 65 743 | 376 068 |
+
+**Structural audit:** 31/31 schema-valid; 0 invalid; 0 zero-length; 65 743/65 743 монохромных штрихов — горизонтальные. Отмечено суммарно 6 155 коротких stroke с длинами ≤10, отсутствующими в дискретном `SHORT_LOOKUP` frozen INT-006. В frozen implementation для них предусмотрена общая линейная ветвь; отчёт *не* доказывает, что она калибрована на этом классе. Структурный аудит применён к монохромным планам, не доказывает geometry eligibility для цветных. Это метрики **числа штрихов**, не игрового ресурса `pointCount`.
+
+**Источник/независимость:** 31 уникальный SHA-256 input, 0 exact duplicate; 8 имён совпадают с прежними repository testImages (и их ранее зафиксированными SHA-256), то есть приблизительно 23 дополнительных источника в инвентаризации по сравнению с прежними восьмью. Все 31 `family_label=unclassified`; похожесть, шаблонное родство и фактическая репрезентативность изображений не исследованы. Имя/хеш исходника не подтверждает независимость геометрий. Не назначать N bands или 19/59 split по этому exploratory набору без отдельного provenance/domain review.
+
+**Вне области:** `protocol_eligibility=candidate_only_not_assessed`, `predictor_domain_eligibility=not_assessed`, `production_eligibility=not_validated`. Frozen INT-006 в проверенной области D1–D5 — line-based geometry, но generator создаёт горизонтальные raster scanline штрихи для покрытия изображений. Schema compatibility — не доказательство exchangeability, модели расхода или 95%-го predictive coverage. No new live captures; `safety_margin_status=not_established`; INT-007 BLOCKED.
+
+**CI по входному commit:** [workflow 42408937802](https://github.com/Kiddos19882/AutoDraw/actions/runs/42408937802) находился в процессе при документировании; не заявлять CI PASS до окончательного результата. Прежний CI [42388837703](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388837703) SUCCESS для `bb9bb2ee`, но не является проверкой `8b4588b`.
+
+**Следующие условия:** (1) подтвердить состав реальных образцов и отдельные семейства (значки, простые линии, сложные картины, заливки и производные версии); (2) отделить 8 повторно использованных тестовых исходников от нового production-like набора; (3) определить, какой тип плана фактически будет исполняться в игре и входит ли он в frozen line-based domain; (4) проверить длины/масштабирование/повторы и независимость до назначения N bands; (5) готовить отдельную независимую выборку ≥78 планов на целевую domain, 19/59 calibration/holdout, только после eligibility approval.
+
+---
+
 ## 2026-11-07 — offline structural audit candidate corpus (E3)
 
 [GitHub Actions 42388237279](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388237279) SUCCESS на `54ab979d`; [artifact 13580376620](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388237279/artifacts/13580376620). Анализатор `audit_validation_corpus.py` повторно открыл 8 .autodraw при canvas 64×32: `schema_valid_records=8`, `schema_invalid_records=0`; `predictor_domain_eligibility=not_assessed`. Структурный результат не доказывает применимость CHALK predictor, статистическую независимость plans или production calibration. No live CHALK measurements. Отдельная Windows проверка launcher: [42388505263](https://github.com/Kiddos19882/AutoDraw/actions/runs/42388505263) FAILED из-за выбора Python без Pillow; исправление `bb9bb2ee` ждёт повторной CI-валидации.

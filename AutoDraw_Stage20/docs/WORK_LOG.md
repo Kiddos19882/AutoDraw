@@ -1,3 +1,13 @@
+## 2026-11-07 — аудит входного commit 8b4588b, данные с компьютера пользователя
+
+- Проверены feature head, последние 20 коммитов, проектные регламенты, новый commit и primary committed JSON `generated_validation_corpus_manifest.json` / `corpus_geometry_audit.json`.
+- На canvas 646×323 получены 31 уникальный source и 31 mono/31 color plans. Structural PASS 31/31, zero-length 0, 6155 коротких длин вне short lookup. Mono N min/median/max = 340/1707/6385; color = 1868/10245/33113.
+- 31 family `unclassified`; exact SHA-256 duplicates 0, но perceptual/derived duplicate и production population не проверялись. Восемь исходников ранее присутствовали в testImages; 23 дополнительные — только счёт новых имён/хешей, не новых независимых calibration cases.
+- Commit также содержит отдельные Firefox browser reference captures от 2026-11-06; они не являются результатом сегодняшней CHALK calibration.
+- Никаких изменений кода, tests, runtime или live scripts. Изменены только затронутые docs; данные первичных артефактов сохранены без модификаций. Локальный git status неизвестен.
+
+---
+
 ## 2026-11-07 — offline geometry audit и Windows local corpus runner
 
 - Сверены feature HEAD, последние 20 коммитов, постоянные регламенты, Stage 8 и frozen INT-006 geometry normalizer/lookup.
