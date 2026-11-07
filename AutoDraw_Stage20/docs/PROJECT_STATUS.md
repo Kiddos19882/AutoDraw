@@ -1,3 +1,17 @@
+## 2026-11-07 — добавлен генератор кандидатного корпуса INT-006
+
+Создан CLI-инструмент `source/preparation/generate_validation_corpus.py` и regression tests `source/preparation/tests/test_generate_validation_corpus.py`.
+
+Генератор повторно использует Stage 12 processing, Stage 8 monochrome scanline planner, штатный `.autodraw` writer/reader, palette quantizer CIELAB/CIEDE2000 и color scanline planner. Результаты предназначены для офлайн-инвентаризации N и family labels. Генератор не запускает executor и не измеряет CHALK.
+
+Выходы: `data/projects/generated_validation_corpus/`, `data/results/color_scanline_plans/generated_validation_corpus/`, manifest `data/results/generated_validation_corpus_manifest.json`. Дубликаты исходников отсеиваются по SHA-256; N monochrome DrawingPlan и N color scanline plan фиксируются раздельно. Каждый record пока имеет `protocol_eligibility=candidate_only_not_assessed`.
+
+**Статус:** код и тесты добавлены в feature branch; CI ещё требуется проверить. Локальный запуск генератора на пользовательском наборе изображений не выполнялся, реальные планы не сформированы. N bands не назначены, safety margin не установлена, production eligibility не подтверждена. Live captures не выполнялись.
+
+Следующий шаг: CI validation; затем пользовательский локальный запуск на исходных изображениях и реальном palette profile, review provenance/families и проверка того, какой из двух DrawingPlan типов соответствует frozen INT-006 predictor.
+
+---
+
 ## 2026-11-07 — целевой уровень 95% принят; независимый протокол спроектирован
 
 Пользователь подтвердил 95% как целевое **одностороннее предиктивное покрытие** для новых DrawingPlan в пределах заранее зафиксированной поддерживаемой совокупности. Это не универсальная гарантия и не 95% confidence в универсальность модели.
