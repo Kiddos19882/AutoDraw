@@ -117,5 +117,29 @@ class ValidationCorpusGeneratorTests(unittest.TestCase):
                 generate_corpus(source_dir, root / "data", palette_path=None)
 
 
+    def test_generates_from_repository_test_image_and_real_palette_profile(self):
+        repo_root = Path(__file__).resolve().parents[3]
+        source_dir = repo_root / "testImages"
+        palette_path = repo_root / "data" / "palettes" / "profiles" / "Browser_palette.autodraw-palette.json"
+        self.assertTrue((source_dir / "images.png").is_file())
+        self.assertTrue(palette_path.is_file())
+
+        with tempfile.TemporaryDirectory() as temp:
+            manifest = generate_corpus(
+                source_dir,
+                Path(temp) / "data",
+                palette_path=palette_path,
+                canvas_width=64,
+                canvas_height=32,
+                fit_mode="contain",
+            )
+            self.assertEqual(manifest["unique_source_count"], 1)
+            record = manifest["records"][0]
+            self.assertGreater(record["drawing_plan_stroke_count"], 0)
+            self.assertGreater(record["color_plan_stroke_count"], 0)
+            self.assertTrue((Path(temp) / "data" / record["project_path"]).is_file())
+            self.assertTrue((Path(temp) / "data" / record["color_plan_path"]).is_file())
+
+
 if __name__ == "__main__":
     unittest.main()
