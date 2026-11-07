@@ -1,3 +1,15 @@
+## 2026-11-07 — INT006R preliminary visual review и CHALK residual analysis
+
+- [x] Просмотреть 45 сохранённых INT006R after-draw PNG (5 геометрий × 3 радиуса × 3 повтора) в artifact `13553755987`.
+- [x] Зафиксировать предварительное наблюдение: radius=10 выглядит наиболее сбалансированным для исследованных геометрий; radius=1 тонкий на коротких деталях, radius=30 грубее на D3/D4.
+- [ ] Получить ручное подтверждение visual-quality gate; до этого `visual_quality_gate=pending_manual_review`.
+- [x] Повторно свести exact CHALK totals по радиусам: r1=1011, r10=1015, r30=1017 на 15 captures на радиус.
+- [x] Рассчитать offline residual diagnostics P0/P1/P2; максимальная сумма положительных stroke residual в run: 1.990/1.597/2.157 соответственно.
+- [ ] Определить и проверить safety-margin policy, масштабируемую по количеству штрихов; не выводить production reserve только из max residual этой выборки.
+- [ ] Сохранить `safety_margin_status=not_established` и `production_eligibility=not_validated` до отдельного validation gate.
+
+---
+
 ## 2026-11-07 — актуальный статус после formal PRR acceptance
 
 - [x] PRR batch execution: 4/4 новых live run завершены; exact CHALK и Game Monitor provenance сохранены.

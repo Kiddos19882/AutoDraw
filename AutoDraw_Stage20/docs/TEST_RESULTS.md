@@ -1,3 +1,41 @@
+## 2026-11-07 — INT006R visual review package и CHALK residual diagnostics
+
+**Source artifact:** [13553755987 — INT006R visual review source](https://github.com/Kiddos19882/AutoDraw/actions/runs/42321009715/artifacts/13553755987).  
+**Scope:** 45 accepted captures; 5 scenarios (D1 mixed lines, D2 polygon, D3 intersections, D4 short details, D5 repeated coverage), radii 1/10/30, 3 repeats per cell.
+
+### Preliminary visual observations — not a formal gate
+
+- Radius 1: thin geometry; short details are weakly visible.
+- Radius 10: balanced stroke visibility and detail retention across the inspected set.
+- Radius 30: broader strokes; D3 intersections look coarser and D4 short details become oversized dots/segments.
+- Radius 10 is the preliminary visual compromise for these five tested geometries. This does not generalize beyond the tested matrix.
+- Repeat captures preserve overall geometry but are not pixel-identical; no frozen pixel-level repeatability threshold exists for this manual gate.
+- `visual_quality_gate` remains `pending_manual_review`; no final manual sign-off was recorded.
+
+### Exact CHALK totals by radius
+
+| Radius | Captures | Actual CHALK total | Mean CHALK/capture |
+|---:|---:|---:|---:|
+| 1 | 15 | 1011 | 67.40 |
+| 10 | 15 | 1015 | 67.67 |
+| 30 | 15 | 1017 | 67.80 |
+
+Observed radius 1→30 difference is 6 CHALK over these 15 captures per radius. It is not a universal radius law.
+
+### Frozen INT-006 prediction residuals
+
+| Profile | Captures | Actual total | Predicted total | MAE | RMSE | Max underprediction |
+|---|---:|---:|---:|---:|---:|---:|
+| P0 | 15 | 1884 | 1925.25 | 2.882 | 3.189 | 0.99 |
+| P1 | 15 | 1010 | 1011.81 | 0.657 | 0.838 | 0.92 |
+| P2 | 15 | 1016 | 1012.32 | 0.685 | 0.854 | 1.82 |
+
+Derived per-run sum of positive stroke residuals: max P0=1.990, P1=1.597, P2=2.157 CHALK. This is an offline diagnostic, not an approved safety margin. A fixed per-run reserve may not scale with stroke count.
+
+**Current gates:** `safety_margin_status=not_established`; `production_eligibility=not_validated`; `visual_quality_gate=pending_manual_review`.
+
+---
+
 ## 2026-11-07 — PRR formal paired-renderer acceptance: 6/6 PASS
 
 **CI:** [42321009715](https://github.com/Kiddos19882/AutoDraw/actions/runs/42321009715) — SUCCESS.  

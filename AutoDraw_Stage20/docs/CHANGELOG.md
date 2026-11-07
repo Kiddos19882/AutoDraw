@@ -1,3 +1,12 @@
+## 2026-11-07 — INT006R preliminary visual review and CHALK residual diagnostics
+
+- Просмотрены 45 saved after-draw PNG из INT006R artifact; preliminary visual compromise — radius 10, но manual visual gate остаётся pending.
+- Зафиксированы exact CHALK totals: radius1=1011, radius10=1015, radius30=1017 (по 15 captures).
+- Пересчитаны P0/P1/P2 model residuals и per-stroke positive residual diagnostics; safety margin не утверждалась.
+- Production eligibility остаётся not_validated.
+
+---
+
 ## 2026-11-07 — paired-renderer series PASS и исправления analyzer pipeline
 
 - Добавлена автоматическая генерация per-run offline WebGL references для сохранённых paired-renderer captures.

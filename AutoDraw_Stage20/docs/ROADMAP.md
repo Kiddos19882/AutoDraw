@@ -1,3 +1,19 @@
+## 2026-11-07 — INT006R visual review: предварительный анализ завершён, sign-off ожидается
+
+Просмотрены 45 after-draw PNG из artifact `13553755987` (5 геометрий × radius 1/10/30 × 3 повтора). Предварительно radius=10 выглядит лучшим визуальным компромиссом в этой матрице: radius=1 слабее на коротких деталях, radius=30 грубее на пересечениях и коротких штрихах. **Manual visual gate не закрыт**: требуется подтверждение, а `visual_quality_gate` остаётся `pending_manual_review`.
+
+Точные CHALK totals на 15 captures для каждого радиуса: 1011 / 1015 / 1017 (radius 1/10/30). Разница 6 CHALK не доказывает универсальный закон влияния радиуса.
+
+**Ближайшая последовательность:**
+
+1. Получить manual sign-off визуального качества radius=10 либо зафиксировать замечания по конкретным геометриям.
+2. Разработать safety-margin policy с учётом per-stroke residual и числа штрихов. Сохранённая INT-006 выборка: max underprediction P1=0.92, P2=1.82; максимальная сумма положительных per-stroke residual в одном run P1=1.597, P2=2.157. Это диагностические границы текущей выборки, не production margin.
+3. Расширить validation domain и проверить safety margin на независимых captures; до этого production eligibility остаётся not_validated.
+4. Разобрать FILL-001 PNG quality gate (coverage=98.430600%, leakage=11); static sweep PASS не заменяет PNG acceptance.
+5. Только после закрытия gates возвращаться к INT-007.
+
+---
+
 ## 2026-11-07 — обновлённая последовательность после formal PRR acceptance
 
 **Закрыто:** PRR execution 4/4 и formal paired-renderer series. CI [42321009715](https://github.com/Kiddos19882/AutoDraw/actions/runs/42321009715) дал 6/6 `PASS_PER_RUN`; vertical 3/3, diagonal 3/3; aggregate `PASS`.

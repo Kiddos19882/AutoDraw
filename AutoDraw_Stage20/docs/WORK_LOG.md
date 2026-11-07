@@ -1,3 +1,15 @@
+## 2026-11-07 — предварительный визуальный обзор INT006R и residual analysis
+
+- Скачан и просмотрен CI artifact `13553755987`: 45 after-draw PNG, 15 на каждый radius (1/10/30), 5 geometry scenarios × 3 repeats.
+- Контактные листы показывают: radius=1 тонкий на коротких деталях; radius=10 сохраняет читаемость линий и деталей; radius=30 заметно огрубляет D3 intersections и D4 short details. Предварительная рекомендация — radius=10 для исследованной матрицы.
+- Не присваивал visual PASS: analyzer намеренно оставляет `visual_quality_gate=pending_manual_review`; frozen numeric visual rubric и пользовательский sign-off отсутствуют.
+- Суммарный exact CHALK на 15 captures: radius1=1011, radius10=1015, radius30=1017; разница 6. Это ограничено данной матрицей.
+- INT-006 residuals пересчитаны по 45 accepted captures: P0 actual/predicted=1884/1925.25, MAE=2.882, RMSE=3.189, max underprediction=0.99; P1=1010/1011.81, 0.657/0.838/0.92; P2=1016/1012.32, 0.685/0.854/1.82.
+- Дополнительная сумма положительных per-stroke residual в одном run: P0=1.990, P1=1.597, P2=2.157. Эти значения не объявлены safety margin.
+- `safety_margin_status=not_established`, `production_eligibility=not_validated`; новых live runs не выполнялось.
+
+---
+
 ## 2026-11-07 — исправлена run-bound renderer acceptance automation; multi-axis series PASS
 
 - Исходный code HEAD перед работой: `0037c3b858425b07397fb410cf36b4519394465a`; ветка `feature/image-geometry-optimization`.
