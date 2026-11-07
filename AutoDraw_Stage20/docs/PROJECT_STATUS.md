@@ -1,3 +1,40 @@
+## 2026-11-07 — актуализация после выполнения локального PRR batch
+
+**Текущий исходный HEAD до этой документационной синхронизации:** `52e3c51a0830e09abb09b516af098069aef26de7`, ветка `feature/image-geometry-optimization`. Commit добавляет сохранённые локальные PRR evidence (эксперименты, Game Monitor, captures и execution reports), а не изменения исходников. GitHub API не показывает локальный `git status`.
+
+### Результат PRR
+
+- Успешный блок: `596e5c37813a43048395d0f596f9d971`, серия `chalk-20261107-030757-c4fd43`, phase `PRR`, status=`completed`, 4/4 задания.
+- Планировались только недостающие повторы №2 и №3 для vertical и diagonal; каждый запуск — один штрих, requested/observed radius=10, point_step=2 px, delay=10 ms, line_extension=0.
+- Все четыре execution завершились со статусом `completed`; каждый monitor report имеет `chalk.status=exact`, совпадение суммы `DRAW_SAMPLE.pointDelta` с CHALK, ноль dropped events, ноль Monitor errors и ноль collector sequence gaps.
+- Game Monitor session: `0490d04b-8728-40f2-891d-e1d57d69402b`; boardDetected=true, inputTelemetryEnabled=true, logical board=460×240, maxPoints=6000, начальный pointCount=1. Все четыре run привязаны к этой session.
+
+| Ориентация | Repeat | Run ID | Experiment ID | pointCount before→after | Exact CHALK |
+|---|---:|---|---|---:|---:|
+| Diagonal | 2 | `ac5a5692-59b1-4cb4-83e5-6539d3472706` | `e57f336d5ada4ca7a71c1c7bac12903c` | 1→162 | 161 |
+| Vertical | 3 | `cc98eabc-4365-4387-9756-48564b31f498` | `5c8bb20fb26d4e2ba51a0a68d9d7b799` | 1→71 | 70 |
+| Diagonal | 3 | `656aef75-1e69-4e90-a2c5-c713a262fb08` | `74ec4e28243b45d1a9eb648257549e21` | 1→161 | 160 |
+| Vertical | 2 | `7159641d-84c1-4d4a-a3dd-a7c4f34614ab` | `41566975619247b1a574ed0204cca59b` | 1→72 | 71 |
+
+С учётом ранее сохранённых repeat 1 (vertical run `c860234f-995a-4789-9ac2-e05b322fe742`, CHALK=71; diagonal run `f69cb0f4-f5d0-4ff9-a3b7-1148c38fa07f`, CHALK=161) теперь имеются три уникальных live captures на каждую ориентацию. Значения PRR показывают vertical 71/70 и diagonal 161/160 для repeats 2/3.
+
+### Ограничения и незакрытые gates
+
+- Наличие трёх captures на ориентацию **не означает** formal series PASS. Новый paired-renderer analyzer ещё должен проверить новые PNG, provenance, geometry и pixel criteria; до этого aggregate acceptance остаётся pending.
+- Траектории в Monitor reports имеют статус `incomplete_until_verified`: coalesced `pointDelta` не гарантирует полноту промежуточных координат. CHALK при этом exact по pointCount.
+- Первая попытка блока `ab9b788c8199454c957036effb99e9c6` сохранена со статусом `stopped`: Bridge был запущен до выбора paired-renderer сценария, поэтому input telemetry не была включена и создание плана завершилось ошибкой. Этот блок не засчитывается.
+- INT-006 CHALK safety margin остаётся `not_established`, `production_eligibility=not_validated`; новые PRR повторы при одном радиусе 10 не закрывают domain validation модели.
+- FILL-001 остаётся BLOCKED: committed PNG quality gate ранее дал coverage=98.430600%, leakage=11. Успешный FILL-001-RS static sweep не отменяет этот результат.
+- INT-007 остаётся BLOCKED до отдельного закрытия INT-006/safety-margin gates.
+
+### CI и границы проверки
+
+GitHub Actions [42309752566](https://github.com/Kiddos19882/AutoDraw/actions/runs/42309752566) — SUCCESS для commit `bacd03f5eee725dbbfac0ce928b227bd23d73b0c`, не для текущего evidence commit `52e3c51a0830e09abb09b516af098069aef26de7). Для последнего commit lookup связанных workflow runs не вернул записей; поэтому CI PASS для HEAD `52e3c51` не заявляется. GitHub Actions не выполняет локальные игровые сценарии.
+
+**Следующий шаг:** запустить paired-renderer acceptance analyzer/CI на сохранённых четырёх новых PRR captures; затем обновить статусы серии только по фактическому analyzer output. CHALK safety margin и FILL-001 PNG quality gate остаются отдельными задачами.
+
+---
+
 ## 2026-11-07 — итог CI PRR implementation и повторная оценка renderer/CHALK
 
 **GitHub Actions:** [42309752566](https://github.com/Kiddos19882/AutoDraw/actions/runs/42309752566) — **SUCCESS**.  
