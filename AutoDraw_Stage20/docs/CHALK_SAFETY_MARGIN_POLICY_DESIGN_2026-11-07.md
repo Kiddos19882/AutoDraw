@@ -114,3 +114,12 @@ Holdout не используется для переобучения или п�
 - [INT-006 frozen predictions and analyzer](CHALK_INT006_FROZEN_PREDICTIONS_AND_ANALYZER_2026-11-02.md).
 - [INT-006 independent validation plan](CHALK_INT006_INDEPENDENT_VALIDATION_PLAN_2026-11-02.md).
 - [INT006R live radius results](CHALK_INT006R_LIVE_RESULTS_2026-11-03.md).
+
+
+## 11. Принятый целевой уровень и отдельный протокол выборки — 2026-11-07
+
+Пользователь подтвердил **95% как целевое одностороннее предиктивное покрытие** для новых DrawingPlan внутри заранее определённой поддерживаемой совокупности. Это не 95% confidence в универсальность формулы и не гарантия для произвольных изображений.
+
+Размеры и split protocol зафиксированы отдельно: [INT-006 — протокол калибровки и независимой проверки политики CHALK 95%](CHALK_95_PERCENT_CALIBRATION_HOLDOUT_PROTOCOL_2026-11-07.md). Для каждой группы profile/domain предусмотрено 19 независимых calibration plan IDs и 59 независимых holdout plan IDs с нулём превышений по строгому acceptance rule. Для первой line-based domain и трёх профилей это 78 уникальных планов / 234 profile captures. Числовые N bands пока не установлены: их нужно определить по целевой совокупности рабочих DrawingPlans до формирования выборки.
+
+Подтверждение целевого уровня не меняет статусы `safety_margin_status=not_established`, `production_eligibility=not_validated`; INT-007 остаётся BLOCKED. Live captures не разрешены и не выполнялись.
