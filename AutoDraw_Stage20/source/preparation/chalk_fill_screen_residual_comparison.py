@@ -45,11 +45,24 @@ EXPECTED_ORIGINAL_LEAKAGE = 11
 CONTOUR_INSETS = (5, 6, 7, 8)
 
 
-def _read_pinned(path: Path, digest: str) -> bytes:
+def _read_pinned(
+    path: Path, digest: str, *, git_json: bool = False
+) -> bytes:
+    """Check Git-tracked JSON on LF canonical bytes, but PNG on exact bytes.
+
+    GitHub stores the evidence JSON with LF endings; a Windows checkout may
+    materialize the same tracked file as CRLF. Mixed endings and any content
+    change are rejected. PNG never receives any normalization.
+    """
     if not path.is_file():
         raise FileNotFoundError("Required committed evidence missing: " + str(path))
     raw = path.read_bytes()
-    actual = hashlib.sha256(raw).hexdigest()
+    checked = raw
+    if git_json:
+        checked = raw.replace(b"\r\n", b"\n")
+        if raw != checked and raw != checked.replace(b"\n", b"\r\n"):
+            raise ValueError("Mixed JSON line endings are not accepted: " + path.name)
+    actual = hashlib.sha256(checked).hexdigest()
     if actual != digest:
         raise ValueError(f"Committed evidence SHA-256 mismatch: {path.name}: {actual}")
     return raw
@@ -134,6 +147,12 @@ def analyze_committed_screen_residual(
     *,
     insets: tuple[int, ...] = CONTOUR_INSETS,
 ) -> tuple[dict[str, Any], dict[str, np.ndarray]]:
+    if not insets or any(
+        isinstance(inset, bool) or not isinstance(inset, int) or inset < 1
+        for inset in insets
+    ) or len(insets) != len(set(insets)):
+        raise ValueError("Insets must be distinct positive integers")
+
     root = Path(results_root)
     before_path = root / (CAPTURE_BASE + "-before.png")
     after_path = root / (CAPTURE_BASE + "-after.png")
@@ -142,8 +161,10 @@ def analyze_committed_screen_residual(
 
     before_raw = _read_pinned(before_path, EXPECTED_BEFORE_SHA256)
     after_raw = _read_pinned(after_path, EXPECTED_AFTER_SHA256)
-    attempt = json.loads(_read_pinned(attempt_path, EXPECTED_ATTEMPT_SHA256))
-    plan = json.loads(_read_pinned(plan_path, EXPECTED_PLAN_SHA256))
+    attempt_raw = _read_pinned(attempt_path, EXPECTED_ATTEMPT_SHA256, git_json=True)
+    plan_raw = _read_pinned(plan_path, EXPECTED_PLAN_SHA256, git_json=True)
+    attempt = json.loads(attempt_raw)
+    plan = json.loads(plan_raw)
     task = attempt["task"]
     if (
         task.get("task_id") != TASK_ID
@@ -240,11 +261,6 @@ def analyze_committed_screen_residual(
         "actual_leakage_screen_pixels": leakage_count,
     }
 
-    if not insets or any(
-        isinstance(inset, bool) or not isinstance(inset, int) or inset < 1
-        for inset in insets
-    ) or len(insets) != len(set(insets)):
-        raise ValueError("Insets must be distinct positive integers")
     overlays: dict[str, np.ndarray] = {
         "actual_residual": _overlay(target, actual),
         "baseline_model_disagreement": np.where(
@@ -290,9 +306,14 @@ def analyze_committed_screen_residual(
         "input_evidence_sha256": {
             "before_png": before_sha,
             "after_png": after_sha,
-            "attempt": EXPECTED_ATTEMPT_SHA256,
-            "plan": EXPECTED_PLAN_SHA256,
+            "attempt_git_lf_canonical": EXPECTED_ATTEMPT_SHA256,
+            "plan_git_lf_canonical": EXPECTED_PLAN_SHA256,
         },
+        "checkout_json_sha256": {
+            "attempt_raw": hashlib.sha256(attempt_raw).hexdigest(),
+            "plan_raw": hashlib.sha256(plan_raw).hexdigest(),
+        },
+        "json_line_ending_policy": "Git LF canonical SHA-256; allow only all-LF or all-CRLF checkout bytes",
         "screen_roi": dict(EXPECTED_ROI),
         "logical_to_screen_mapping": "same_inverse_affine_nearest_neighbor_as_committed_png_audit",
         "scale_x": scale_x,
