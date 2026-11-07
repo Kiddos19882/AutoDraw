@@ -1,3 +1,15 @@
+## 2026-11-07 — целевой уровень 95% принят; независимый протокол спроектирован
+
+Пользователь подтвердил 95% как целевое **одностороннее предиктивное покрытие** для новых DrawingPlan в пределах заранее зафиксированной поддерживаемой совокупности. Это не универсальная гарантия и не 95% confidence в универсальность модели.
+
+Создан [протокол calibration/holdout 95%](CHALK_95_PERCENT_CALIBRATION_HOLDOUT_PROTOCOL_2026-11-07.md). Для первой line-based domain при radius=10 предусмотрено 19 независимых calibration и 59 независимых holdout plan IDs на каждый профиль P0/P1/P2: всего 78 уникальных DrawingPlan, исполняемых по трём профилям (234 captures). Holdout acceptance — 0 превышений из 59 в каждой profile/domain группе; статистическая интерпретация зависит от независимости и репрезентативности plan IDs.
+
+Три N bands и их числовые границы пока не зафиксированы: требуется определить целевой диапазон N по реальным рабочим DrawingPlans до формирования выборки. Геометрические families и N bands — strata для репрезентативности; отдельные 95% гарантии для каждой подгруппы не заявляются.
+
+**Статусы без изменения:** `safety_margin_status=not_established`; `production_eligibility=not_validated`; INT-007 BLOCKED; FILL-001 PNG gate BLOCKED. Выполнено только офлайн-проектирование: новые планы не сформированы, captures не запускались, CHALK не измерялся. Код, тесты, конфигурации, workflow и production defaults не менялись.
+
+---
+
 ## 2026-11-07 — проект CHALK safety-margin policy; числовой запас не установлен
 
 Проведён offline review frozen INT-006 analyzer, official validation report и validation plan. Создан [проект политики безопасного запаса CHALK](CHALK_SAFETY_MARGIN_POLICY_DESIGN_2026-11-07.md).
