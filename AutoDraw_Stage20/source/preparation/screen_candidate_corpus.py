@@ -79,6 +79,34 @@ def geometry_sha256(project_path, expected_n):
     return h.hexdigest()
 
 
+
+def color_plan_metadata(path, expected_sha, expected_n):
+    """Verify provenance and read producer counters; never treat them as CHALK."""
+    payload = json.loads(Path(path).read_text(encoding="utf-8"))
+    canonical = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    digest = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+    if digest != expected_sha:
+        raise ValueError("Color plan SHA-256 mismatch")
+    if payload.get("plan_type") != "autodraw_color_scanline_plan":
+        raise ValueError("Expected source color scanline plan")
+    summary = payload.get("summary")
+    if not isinstance(summary, dict) or summary.get("stroke_count") != expected_n:
+        raise ValueError("Color scanline stroke count mismatch")
+    fields = ("single_pixel_stroke_count", "color_switch_count", "used_palette_color_count")
+    for key in fields:
+        v = summary.get(key)
+        if isinstance(v, bool) or not isinstance(v, int) or v < 0:
+            raise ValueError("Missing or invalid color plan summary: " + key)
+    if summary["single_pixel_stroke_count"] > expected_n:
+        raise ValueError("Singleton count exceeds stroke count")
+    return {
+        "single_pixel_source_runs": summary["single_pixel_stroke_count"],
+        "color_switches_in_plan": summary["color_switch_count"],
+        "used_palette_colors": summary["used_palette_color_count"],
+        "color_executor_singleton_expansion": "one_pixel_drag_per_zero_length_run",
+    }
+
+
 def group_duplicates(rows, key):
     by_value = defaultdict(list)
     for row in rows:
@@ -105,8 +133,13 @@ def screen(datasets):
             if source_hash != rec["source_sha256"]:
                 raise ValueError("Source SHA-256 mismatch: " + rec["source"])
             plan = safe_child(mpath.parent.parent, rec["project_path"])
+            color_stats = None
+            if rec.get("color_plan_path") is not None:
+                path = safe_child(mpath.parent.parent, rec["color_plan_path"])
+                color_stats = color_plan_metadata(path, rec["color_plan_sha256"], rec["color_plan_stroke_count"])
             rows.append({
                 "dataset": label, "source": rec["source"],
+                "color_execution_source_summary": color_stats,
                 "source_sha256": source_hash,
                 "drawing_plan_sha256": rec["drawing_plan_sha256"],
                 "geometry_sha256_without_names": geometry_sha256(plan, rec["drawing_plan_stroke_count"]),
@@ -140,8 +173,19 @@ def screen(datasets):
         "dominant_coarse_color_at_least_0_75": sum(r["dominant_coarse_color_fraction"] >= 0.75 for r in rows),
         "edge_score_at_least_50": sum(r["edge_score"] >= 50 for r in rows),
     }
+    colored = [r["color_execution_source_summary"] for r in rows
+               if r["color_execution_source_summary"] is not None]
+    color_totals = {
+        "color_plan_count": len(colored),
+        "color_stroke_N": sum(r["color_N"] for r in rows if r["color_N"] is not None),
+        "source_single_pixel_runs": sum(x["single_pixel_source_runs"] for x in colored),
+        "source_color_switches": sum(x["color_switches_in_plan"] for x in colored),
+        "singleton_expansion_semantics": "stage6_color_plan_to_drawing_plan_expands_zero_length_to_1px",
+        "not_a_CHALK_measurement": True,
+    }
     return {
         "schema_version": 1, "type": "candidate_image_similarity_and_geometry_screen",
+        "color_plan_totals": color_totals,
         "source_count": len(rows),
         "dataset_counts": {label: sum(r["dataset"] == label for r in rows) for label, _, _ in datasets},
         "configurations": configs,
@@ -175,7 +219,7 @@ def main(argv=None):
     print(json.dumps({key: result[key] for key in (
         "source_count", "dataset_counts", "configurations_match",
         "source_exact_duplicate_groups", "geometry_exact_duplicate_groups",
-        "perceptual_review_pair_count", "visual_characteristics_counts",
+        "perceptual_review_pair_count", "color_plan_totals", "visual_characteristics_counts",
         "closest_20_pairs_review_only", "independent_plan_count",
         "predictor_domain_eligibility"
     )}, ensure_ascii=False))

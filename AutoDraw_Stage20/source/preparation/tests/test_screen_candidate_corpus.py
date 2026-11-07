@@ -51,6 +51,31 @@ class CandidateCorpusScreenTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "SHA-256 mismatch"):
                 screen([a])
 
+    def test_color_plan_summary_preserves_singleton_and_switch_counters(self):
+        import hashlib
+        import json
+        from screen_candidate_corpus import color_plan_metadata
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "color.json"
+            plan = {
+                "plan_type": "autodraw_color_scanline_plan",
+                "summary": {
+                    "stroke_count": 4, "single_pixel_stroke_count": 2,
+                    "color_switch_count": 3, "used_palette_color_count": 2,
+                },
+            }
+            path.write_text(json.dumps(plan), encoding="utf-8")
+            sha = hashlib.sha256(json.dumps(
+                plan, ensure_ascii=False, sort_keys=True,
+                separators=(",", ":")).encode("utf-8")).hexdigest()
+            result = color_plan_metadata(path, sha, 4)
+            self.assertEqual(result["single_pixel_source_runs"], 2)
+            self.assertEqual(result["color_switches_in_plan"], 3)
+            with self.assertRaisesRegex(ValueError, "SHA-256 mismatch"):
+                color_plan_metadata(path, "0" * 64, 4)
+            with self.assertRaisesRegex(ValueError, "stroke count mismatch"):
+                color_plan_metadata(path, sha, 5)
+
     def test_path_traversal_and_duplicate_labels_rejected(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
