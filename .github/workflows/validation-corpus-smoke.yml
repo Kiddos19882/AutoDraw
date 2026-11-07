@@ -1,0 +1,109 @@
+name: AutoDraw exploratory validation corpus
+
+on:
+  push:
+    branches:
+      - feature/image-geometry-optimization
+    paths:
+      - ".github/workflows/validation-corpus-smoke.yml"
+      - "AutoDraw_Stage20/testImages/**"
+      - "AutoDraw_Stage20/source/preparation/generate_validation_corpus.py"
+      - "AutoDraw_Stage20/source/preparation/image_processing.py"
+      - "AutoDraw_Stage20/source/preparation/stage8_optimizer.py"
+      - "AutoDraw_Stage20/source/preparation/color_scanline.py"
+      - "AutoDraw_Stage20/source/preparation/palette_quantization.py"
+      - "AutoDraw_Stage20/source/preparation/autodraw_project.py"
+  workflow_dispatch:
+
+concurrency:
+  group: autodraw-exploratory-corpus-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  corpus-smoke:
+    name: Generate repository fixture corpus (exploratory)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: AutoDraw_Stage20/source/preparation/requirements.txt
+
+      - name: Install preparation dependencies
+        run: python -m pip install -r AutoDraw_Stage20/source/preparation/requirements.txt
+
+      - name: Generate exploratory corpus from repository test images
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/source/preparation/generate_validation_corpus.py \
+            --input AutoDraw_Stage20/testImages \
+            --palette AutoDraw_Stage20/data/palettes/profiles/Browser_palette.autodraw-palette.json \
+            --output-root "$RUNNER_TEMP/autodraw-corpus-smoke" \
+            --canvas-width 64 \
+            --canvas-height 32 \
+            --fit-mode contain
+
+      - name: Audit manifest and write diagnostic N summary
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ["RUNNER_TEMP"]) / "autodraw-corpus-smoke"
+          source = root / "results" / "generated_validation_corpus_manifest.json"
+          manifest = json.loads(source.read_text(encoding="utf-8"))
+          records = manifest["records"]
+          assert manifest["dataset_kind"] == "generated_candidate_corpus_from_source_images"
+          assert manifest["protocol_eligibility"] == "candidate_only_not_assessed"
+          assert len(records) == manifest["unique_source_count"]
+          assert len(records) >= 8, "Expected at least the eight repository fixtures"
+          for record in records:
+              assert record["protocol_eligibility"] == "candidate_only_not_assessed"
+              assert (root / record["project_path"]).is_file()
+              assert (root / record["color_plan_path"]).is_file()
+          summary = {
+              "validation_status": "offline_fixture_generation_only",
+              "model_eligibility": "not_assessed",
+              "production_population": False,
+              "canvas": manifest["configuration"]["canvas"],
+              "source_count": manifest["unique_source_count"] + manifest["duplicate_source_count"],
+              "unique_source_count": manifest["unique_source_count"],
+              "duplicate_source_count": manifest["duplicate_source_count"],
+              "monochrome_N": sorted(record["drawing_plan_stroke_count"] for record in records),
+              "color_N": sorted(record["color_plan_stroke_count"] for record in records),
+              "records": [
+                  {
+                      "source": record["source"],
+                      "source_sha256": record["source_sha256"],
+                      "family_label": record["family_label"],
+                      "monochrome_N": record["drawing_plan_stroke_count"],
+                      "color_N": record["color_plan_stroke_count"],
+                      "eligibility": record["protocol_eligibility"],
+                  }
+                  for record in records
+              ],
+          }
+          output = root / "results" / "exploratory_N_summary.json"
+          output.write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
+          print(json.dumps(summary, indent=2, ensure_ascii=False))
+          PY
+
+      - name: Upload exploratory corpus and N report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autodraw-exploratory-fixture-corpus
+          path: ${{ runner.temp }}/autodraw-corpus-smoke/
+          if-no-files-found: warn
+          retention-days: 14
