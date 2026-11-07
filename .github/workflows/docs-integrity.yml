@@ -1,0 +1,44 @@
+name: AutoDraw Markdown integrity
+
+on:
+  push:
+    branches:
+      - feature/image-geometry-optimization
+    paths:
+      - "AutoDraw_Stage20/**/*.md"
+      - "AutoDraw_Stage20/docs/HISTORY_SNAPSHOT_PROVENANCE.json"
+      - "AutoDraw_Stage20/tools/check_markdown_docs.py"
+      - "AutoDraw_Stage20/tools/tests/test_check_markdown_docs.py"
+      - ".github/workflows/docs-integrity.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: autodraw-docs-integrity-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  markdown-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Test Markdown auditing logic
+        run: python -m unittest discover -s AutoDraw_Stage20/tools/tests -p "test_check_markdown_docs.py" -v
+      - name: Audit navigation, decisions and source history hashes
+        run: python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20 --report "$RUNNER_TEMP/docs-integrity.json"
+      - name: Upload audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autodraw-markdown-integrity
+          path: ${{ runner.temp }}/docs-integrity.json
+          if-no-files-found: warn
+          retention-days: 30

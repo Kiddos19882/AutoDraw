@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "source_commit": "a2d1f0a52d47dbf6130c27431460fee12f443073",
+  "snapshot_date": "2026-11-08",
+  "snapshots": [
+    {
+      "source": "docs/PROJECT_STATUS.md",
+      "archive": "docs/PROJECT_STATUS_HISTORY_THROUGH_2026-11-08.md",
+      "git_blob_sha": "149cf1680ac8fa5453d6f8c86d98bc3973a7af82"
+    },
+    {
+      "source": "docs/TASKS.md",
+      "archive": "docs/TASKS_HISTORY_THROUGH_2026-11-08.md",
+      "git_blob_sha": "9c8456303a6dc74c3d8b3f4de1d5423a7b684034"
+    },
+    {
+      "source": "docs/ROADMAP.md",
+      "archive": "docs/ROADMAP_HISTORY_THROUGH_2026-11-08.md",
+      "git_blob_sha": "c3ab1842693b02718a81a519a71c39ff64c31375"
+    },
+    {
+      "source": "docs/TEST_RESULTS.md",
+      "archive": "docs/TEST_RESULTS_HISTORY_THROUGH_2026-11-08.md",
+      "git_blob_sha": "5677fb15462a7ebb61ece61750b784081323c6b2"
+    },
+    {
+      "source": "docs/WORK_LOG.md",
+      "archive": "docs/WORK_LOG_HISTORY_THROUGH_2026-11-08.md",
+      "git_blob_sha": "e33a5ed179b83110f0434d51170f9b3069a30cca"
+    },
+    {
+      "source": "docs/CHANGELOG.md",
+      "archive": "docs/CHANGELOG_HISTORY_THROUGH_2026-11-08.md",
+      "git_blob_sha": "bd8903dcd8937c1988c6446f299b9893e7d18199"
+    },
+    {
+      "source": "docs/DECISIONS.md",
+      "archive": "docs/DECISIONS_HISTORY_THROUGH_2026-11-08.md",
+      "git_blob_sha": "97f013e5cab6f33bbe3f625ed320b98d99e6f59a"
+    },
+    {
+      "source": "docs/README.md",
+      "archive": "docs/README_HISTORY_THROUGH_2026-11-08.md",
+      "git_blob_sha": "61cc73587c815d0bca3a57a5d915bc90601af921"
+    },
+    {
+      "source": "docs/AI_WORK_GUIDE.md",
+      "archive": "docs/AI_WORK_GUIDE_HISTORY_THROUGH_2026-11-08.md",
+      "git_blob_sha": "554d3554b72eae62a2608741dc579f3c45398ac4"
+    }
+  ]
+}
