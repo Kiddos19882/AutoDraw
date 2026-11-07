@@ -1,0 +1,59 @@
+name: AutoDraw 81-image candidate corpus screening
+
+on:
+  push:
+    branches:
+      - feature/image-geometry-optimization
+    paths:
+      - ".github/workflows/candidate-corpus-screen.yml"
+      - "AutoDraw_Stage20/source/preparation/screen_candidate_corpus.py"
+      - "AutoDraw_Stage20/source/preparation/tests/test_screen_candidate_corpus.py"
+      - "AutoDraw_Stage20/data/generated_autodraw_plan/**"
+  workflow_dispatch:
+
+concurrency:
+  group: autodraw-corpus-screen-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  image-screen:
+    name: Screen exact geometry and visual similarity (offline)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: AutoDraw_Stage20/source/preparation/requirements.txt
+      - name: Install preparation dependencies
+        run: python -m pip install -r AutoDraw_Stage20/source/preparation/requirements.txt
+      - name: Screen regression tests
+        run: |
+          export PYTHONPATH="$GITHUB_WORKSPACE/AutoDraw_Stage20:$GITHUB_WORKSPACE/AutoDraw_Stage20/source/preparation:$GITHUB_WORKSPACE/AutoDraw_Stage20/source/executor"
+          python -m unittest discover -s AutoDraw_Stage20/source/preparation/tests -p "test_screen_candidate_corpus.py" -v
+      - name: Screen committed sources and projects
+        run: |
+          export PYTHONPATH="$GITHUB_WORKSPACE/AutoDraw_Stage20:$GITHUB_WORKSPACE/AutoDraw_Stage20/source/preparation:$GITHUB_WORKSPACE/AutoDraw_Stage20/source/executor"
+          python AutoDraw_Stage20/source/preparation/screen_candidate_corpus.py \
+            --dataset first31 \
+              AutoDraw_Stage20/data/generated_autodraw_plan/20261107-224452-09ee1388/results/generated_validation_corpus_manifest.json \
+              AutoDraw_Stage20/data/generated_autodraw_plan/images_31_first \
+            --dataset second50 \
+              AutoDraw_Stage20/data/generated_autodraw_plan/20261108-001212-215cb369/results/generated_validation_corpus_manifest.json \
+              AutoDraw_Stage20/data/generated_autodraw_plan/images2_50_second \
+            --output "$RUNNER_TEMP/autodraw-corpus-screen/combined_corpus_screening.json"
+      - name: Upload offline evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autodraw-corpus-81-offline-screen
+          path: ${{ runner.temp }}/autodraw-corpus-screen/
+          if-no-files-found: warn
+          retention-days: 21
