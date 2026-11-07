@@ -27,6 +27,10 @@
 - 81 цветной scanline-план: 942206 исходных штрихов, 395455 одиночных пикселей и 916312 переключений между цветами. Это offline counters, **не** CHALK/runtime time.
 - Имеющиеся измерения CHALK повторно собирать с нуля не требуется. Необходимы отдельные доменные и quality gates, если планируется новый универсализированный вывод.
 
+## Завершённая проверка новой документации
+
+[Markdown CI 42421451709](https://github.com/Kiddos19882/AutoDraw/actions/runs/42421451709) **SUCCESS**: 99/99 Markdown в едином индексе, 0 broken links в анализируемом синтаксисе, 0 duplicate DEC IDs, 9 intact historical snapshots по SHA, 5 unit tests PASS. [Основной CI 42420934884](https://github.com/Kiddos19882/AutoDraw/actions/runs/42420934884) также **SUCCESS** на `c7f2e363`. Это проверки конкретных SHA, не новый live runtime. [Manifest сохранности](HISTORY_SNAPSHOT_PROVENANCE.json).
+
 ## Ближайший приоритет
 
 Поддерживать [действующие задачи](TASKS.md) и [очерёдность](ROADMAP.md); сначала сохранить целостность документации, затем оценивать алгоритмы на одинаковых рисунках и разбирать FILL-001 perimeter mismatch. 95% protocol — отдельная цель, не препятствие для начала офлайн-сравнения.
