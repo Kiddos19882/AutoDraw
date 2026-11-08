@@ -635,6 +635,36 @@ class AutoDrawUnifiedApp:
             )
             return False
         coordinate_system = plan.get("coordinate_system", "local_canvas_pixels")
+        generation = plan.get("generation")
+        fill_task = generation.get("chalk_fill001_task") if isinstance(generation, dict) else None
+        if (isinstance(fill_task, dict)
+                and fill_task.get("experiment_protocol") == "FILL001_SMOOTH_AB_V3"):
+            # Stage 6 must never receive legacy ROI-projected coordinates for V3.
+            # The plan remains LOGICAL until after brush confirmation, when
+            # fresh authenticated passive DOM samples become available.
+            from fill001_smooth_ab_v3 import COORDINATE_PREFLIGHT
+            if (coordinate_system != "logical_board_pixels"
+                    or fill_task.get("coordinate_preflight_protocol") != COORDINATE_PREFLIGHT
+                    or not isinstance(generation, dict)):
+                messagebox.showerror("V3 preflight", "V3 plan missing strict coordinate protocol.", parent=self.root)
+                return False
+            generation["screen_mapping_policy"] = COORDINATE_PREFLIGHT
+            generation["screen_mapping_expected_roi"] = {
+                "x": int(area.x), "y": int(area.y),
+                "width": int(area.width), "height": int(area.height),
+            }
+            try:
+                source_path.write_text(
+                    json.dumps(plan, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+                )
+            except OSError as exc:
+                messagebox.showerror("V3 preflight", str(exc), parent=self.root)
+                return False
+            self.status_var.set(
+                "V3 logical plan staged only: Stage 6 has NOT received uncalibrated coordinates. "
+                "Native BoardPane preflight will run immediately before game input."
+            )
+            return True
         execution_plan = plan
         if coordinate_system == "logical_board_pixels":
             try:
