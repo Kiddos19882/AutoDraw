@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "experiment_id": "ENGINE001_ONE_CLICK_LAB_V1",
+  "status": "PASS_E4_RAW_CAPTURE",
+  "reasons": [],
+  "source_experiment_id": "49ecb24bf6ba4db09a9344a28ef1b3d3",
+  "session_id": "a5e43181-37be-4941-a170-5ec63c09e006",
+  "run_id": "86d863ca-d337-4c84-bc93-a5efc797b855",
+  "scenario_id": "engine001_vertical_axis",
+  "repeat_index": 2,
+  "exact_chalk": 60,
+  "accepted_points": 60,
+  "first_accepted": {
+    "t": 2775717,
+    "stroke_id": "pointer-stroke-19",
+    "x": 228.2083339691162,
+    "y": 34,
+    "point_delta": 1
+  },
+  "penultimate_accepted": {
+    "t": 2777698,
+    "stroke_id": "pointer-stroke-19",
+    "x": 228.2083339691162,
+    "y": 203,
+    "point_delta": 1
+  },
+  "last_accepted": {
+    "t": 2777726,
+    "stroke_id": "pointer-stroke-19",
+    "x": 228.2083339691162,
+    "y": 204,
+    "point_delta": 1
+  },
+  "observed_modes": [
+    {
+      "stroke_id": "pointer-stroke-19",
+      "stroke_option_raw": true,
+      "source": "BoardPane.atom.options[from_ENGINE_FRAME_SAMPLE]"
+    }
+  ],
+  "engine_frame_samples": {
+    "source": "BoardPane.EgretEvent.ENTER_FRAME_observer",
+    "event_count": 62,
+    "by_stroke": [
+      {
+        "stroke_id": "pointer-stroke-19",
+        "frame_count": 62,
+        "observed_positive_point_delta_frames": 60,
+        "observed_stationary_frames": 2,
+        "first_t_ms": 2775725,
+        "last_t_ms": 2777758
+      }
+    ],
+    "is_full_engine_render_timeline": false,
+    "caveat": "Observer may miss callbacks and does not establish game render ordering."
+  },
+  "raf_frame_probe": {
+    "status": "measured",
+    "frame_count": 124,
+    "average_fps": 60.0,
+    "median_fps": 60.024,
+    "median_interval_ms": 16.66,
+    "p95_interval_ms": 16.68,
+    "max_interval_ms": 16.68,
+    "visibility_interruption": false,
+    "stroke_probe_count": 1
+  },
+  "renderer_geometry_binding": {
+    "same_run_start_and_end_equal": true,
+    "raw_client_corners": [
+      {
+        "topLeft": {
+          "x": 497.9604252506065,
+          "y": 104.86
+        },
+        "topRight": {
+          "x": 1170.1065439720678,
+          "y": 104.86
+        },
+        "bottomRight": {
+          "x": 1170.1065439720678,
+          "y": 456.06
+        },
+        "bottomLeft": {
+          "x": 497.9604252506065,
+          "y": 456.06
+        }
+      }
+    ],
+    "screen_projection": "UNCALIBRATED_UNTIL_INDEPENDENT_SAME_RUN_GEOMETRY_AUDIT"
+  },
+  "board_roi_pixel_diff": {
+    "method": "screen_board_roi_rgb_max_channel_difference_ge_20",
+    "roi_width": 674,
+    "roi_height": 355,
+    "changed_pixel_count": 4171,
+    "changed_bounds_roi": {
+      "left": 96,
+      "top": 46,
+      "right": 342,
+      "bottom": 354
+    },
+    "not_a_native_stroke_mask": true
+  },
+  "raw_sha256": {
+    "before_clear-screen.png": "4ed9c0c97aaed0ecf303261405c280d6ac6b549b4bae3facd3ec73cc6c4674e1",
+    "before_clear-board.png": "283fdd897a084c07eaf5438008a9924cf82231b4cd2624b21cc37015f3b15d2f",
+    "after_draw-screen.png": "0aa1f0b297c314e0d3b2a6448562f104eb9e09b9d98c5816620faec0e3a226e7",
+    "after_draw-board.png": "f4ca34dd5097fca764af9a3e143efab7c9c0b979ce083927fa74e7c40884a5d3",
+    "monitor_report.json": "4a2daa3393d8e3f7674781951bbed233142b4593d9cf2166dd024895d16648d3",
+    "experiment.json": "2d9d9cabe5979382b4d04d1498575569059559db47d3c9d5a63ebf0b58a5b075"
+  },
+  "limitations": [
+    "One game run per stroke; no shared screen transform from another session",
+    "ENTER_FRAME observer does not establish exact rendering order",
+    "Changed screen ROI pixels are not a native stroke mask or quality score",
+    "No automatic model acceptance without separate same-run transform and PNG audit"
+  ]
+}

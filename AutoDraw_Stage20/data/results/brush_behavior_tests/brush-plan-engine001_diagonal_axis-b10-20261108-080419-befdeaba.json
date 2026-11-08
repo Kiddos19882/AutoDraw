@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "name": "Brush behavior test — engine001_diagonal_axis",
+  "created_at": "2026-11-08T05:04:19+00:00",
+  "coordinate_system": "logical_board_pixels",
+  "canvas": {
+    "width": 460,
+    "height": 240
+  },
+  "width": 460,
+  "height": 240,
+  "strokes": [
+    {
+      "name": "engine001_diagonal_axis",
+      "points": [
+        {
+          "x": 75.0,
+          "y": 70.0
+        },
+        {
+          "x": 385.0,
+          "y": 175.0
+        }
+      ],
+      "closed": false,
+      "metadata": {
+        "role": "brush_behavior_test",
+        "test_case": "engine001_diagonal_axis",
+        "line_extension_px_override": 0.0
+      }
+    }
+  ],
+  "generation": {
+    "method": "manual_brush_behavior_test",
+    "test_case": "engine001_diagonal_axis",
+    "brush_value_must_be_set_manually": true,
+    "note": "Set the requested brush size in the browser before executing this plan.",
+    "paired_renderer_capture": {
+      "schema_version": 1,
+      "scenario_id": "engine001_diagonal_axis",
+      "requested_radius": 10,
+      "expected_strokes": 1,
+      "renderer_path_mode": "smooth",
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      }
+    },
+    "experiment_id": "befdeababc784ea98ed0bced4e15fdaa",
+    "requested_brush_value": 10,
+    "chalk_test_block": {
+      "block_id": "9fdb9bd9b6a9498b91ef8a5db137a95e",
+      "task_id": "engine001_diagonal_axis-r2",
+      "phase_id": "ENGINE001"
+    },
+    "chalk_experiment_matrix": {
+      "schema_version": 1,
+      "series_id": "chalk-20261108-080330-af2835",
+      "phase_id": "ENGINE001",
+      "scenario_id": "engine001_diagonal_axis",
+      "repeat_index": 2,
+      "matrix_order_index": 1,
+      "planned_repeats": 3,
+      "requested_radius": 10,
+      "expected_strokes": 1,
+      "geometry_signature": "69d5435d7c04596e3437be48b7c7617fb6c56d6d490e7b746ea1071501c51b9a",
+      "planned_strokes": [
+        {
+          "closed": false,
+          "metadata": {
+            "line_extension_px_override": 0.0,
+            "role": "brush_behavior_test",
+            "test_case": "engine001_diagonal_axis"
+          },
+          "name": "engine001_diagonal_axis",
+          "points": [
+            {
+              "x": 75.0,
+              "y": 70.0
+            },
+            {
+              "x": 385.0,
+              "y": 175.0
+            }
+          ]
+        }
+      ],
+      "executor_parameters": {
+        "point_step_px": 2,
+        "line_extension_px": 0,
+        "point_delay_ms": 10,
+        "after_mouse_up_ms": 20,
+        "before_mouse_down_ms": 20,
+        "after_mouse_down_ms": 40,
+        "end_hold_ms": 50,
+        "countdown_seconds": 5
+      }
+    },
+    "screen_transform": {
+      "method": "inclusive_logical_bounds_to_screen_pixel_centers",
+      "source_coordinate_system": "logical_board_pixels",
+      "target_coordinate_system": "local_canvas_pixels",
+      "logical_board": {
+        "width": 460,
+        "height": 240
+      },
+      "screen_roi": {
+        "x": 496,
+        "y": 265,
+        "width": 674,
+        "height": 355
+      },
+      "scale_x": 1.4630434782608697,
+      "scale_y": 1.475,
+      "expected_uniform_scale": true,
+      "uniform_scale_relative_error": 0.00810611643330876,
+      "uniform_scale_tolerance": 0.01,
+      "logical_bounds": {
+        "x": [
+          0,
+          460
+        ],
+        "y": [
+          0,
+          240
+        ]
+      },
+      "screen_local_bounds": {
+        "x": [
+          0,
+          673
+        ],
+        "y": [
+          0,
+          354
+        ]
+      },
+      "boundary_mapping": "logical_max_to_last_screen_pixel",
+      "executor_coordinate_units": "screen_pixels",
+      "point_step_px_units": "screen_pixels"
+    }
+  }
+}

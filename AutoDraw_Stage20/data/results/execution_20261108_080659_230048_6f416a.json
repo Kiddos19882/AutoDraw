@@ -1,0 +1,83 @@
+{
+  "schema_version": 3,
+  "execution_id": "20710c98-7163-458b-9886-5638990a2f58",
+  "created_at": "2026-11-08T08:06:59+03:00",
+  "stage": 14,
+  "status": "completed",
+  "source_plan_file": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\runtime\\current_brush_behavior_test.json",
+  "source_plan_name": "Brush behavior test — engine001_vertical_axis",
+  "source_plan_sha256": "80c41b3f1bbec55dd1cba7b103d3c91d26c889fbcea5e7ef9880e63d99fbcb2a",
+  "source_plan_file_sha256": "5d1c30a9b57e53ec0cf7e5733fa4fc81c024cfeee47fd6972bf81d4237a265b8",
+  "experiment_context": null,
+  "executed_plan": {
+    "name": "Brush behavior test — engine001_vertical_axis",
+    "width": 674,
+    "height": 355,
+    "stroke_count": 1,
+    "sha256": "80c41b3f1bbec55dd1cba7b103d3c91d26c889fbcea5e7ef9880e63d99fbcb2a"
+  },
+  "target_area": {
+    "x": 496,
+    "y": 265,
+    "width": 674,
+    "height": 355
+  },
+  "plan_fit": {
+    "source_size": {
+      "width": 674,
+      "height": 355
+    },
+    "target_size": {
+      "width": 674,
+      "height": 355
+    },
+    "scale_x": 1.0,
+    "scale_y": 1.0,
+    "offset_x": 0.0,
+    "offset_y": 0.0,
+    "preserve_aspect_ratio": true,
+    "identity_transform": true
+  },
+  "executor_config": {
+    "point_step_px": 2,
+    "line_extension_px": 0.0,
+    "point_delay_ms": 10,
+    "after_mouse_up_ms": 20,
+    "before_mouse_down_ms": 20,
+    "after_mouse_down_ms": 40,
+    "end_hold_ms": 50,
+    "countdown_seconds": 5
+  },
+  "summary": {
+    "status": "completed",
+    "completed_strokes": 1,
+    "total_strokes": 1,
+    "started_at": "2026-11-08T08:06:52+03:00",
+    "ended_at": "2026-11-08T08:06:59+03:00",
+    "duration_seconds": 7.218,
+    "move_calls": 127,
+    "error": null,
+    "stop_reason": null,
+    "mouse_release": {
+      "attempted": true,
+      "succeeded": true,
+      "errors": []
+    },
+    "executor_config": {
+      "point_step_px": 2,
+      "line_extension_px": 0.0,
+      "point_delay_ms": 10,
+      "after_mouse_up_ms": 20,
+      "before_mouse_down_ms": 20,
+      "after_mouse_down_ms": 40,
+      "end_hold_ms": 50,
+      "countdown_seconds": 5
+    }
+  },
+  "error": null,
+  "environment": {
+    "python_version": "3.11.4",
+    "platform": "Windows-10-10.0.19045-SP0",
+    "python_implementation": "CPython"
+  }
+}
