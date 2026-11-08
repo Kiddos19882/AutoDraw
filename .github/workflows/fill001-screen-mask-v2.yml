@@ -7,6 +7,8 @@ on:
     paths:
       - ".github/workflows/fill001-screen-mask-v2.yml"
       - "AutoDraw_Stage20/source/preparation/fill001_screen_mask_v2*.py"
+      - "AutoDraw_Stage20/source/preparation/fill001_v2_footprint_spatial.py"
+      - "AutoDraw_Stage20/source/preparation/tests/test_fill001_v2_footprint_spatial.py"
       - "AutoDraw_Stage20/source/preparation/tests/test_fill001_screen_mask_v2*.py"
       - "AutoDraw_Stage20/data/results/brush_behavior_tests/fill001/**"
   workflow_dispatch:
@@ -30,7 +32,7 @@ jobs:
       - name: Install minimal diagnostic dependencies
         run: python -m pip install numpy pillow opencv-python-headless pytest
       - name: Test Screen Mask V2 and raw Monitor binding
-        run: python -m pytest -q -ra tests/test_fill001_screen_mask_v2.py tests/test_fill001_screen_mask_v2_binding.py
+        run: python -m pytest -q -ra tests/test_fill001_screen_mask_v2.py tests/test_fill001_screen_mask_v2_binding.py tests/test_fill001_v2_footprint_spatial.py
       - name: Recalculate both committed Smooth A/B ROI with verified DOM screen mapping
         run: |
           python fill001_screen_mask_v2_batch.py --results-root ../../data/results/brush_behavior_tests --output-dir "${RUNNER_TEMP}/fill001-screen-mask-v2"
@@ -40,5 +42,17 @@ jobs:
         with:
           name: autodraw-fill001-screen-mask-v2-numeric
           path: ${{ runner.temp }}/fill001-screen-mask-v2/report.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Analyze frozen fresh V2 Smooth ON/OFF spatial footprint (no gameplay)
+        run: |
+          python fill001_v2_footprint_spatial.py --results-root ../../data/results/brush_behavior_tests --output-dir "${RUNNER_TEMP}/fill001-v2-footprint-spatial"
+      - name: Upload fresh V2 spatial diagnostic PNG and numeric report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autodraw-fill001-v2-footprint-spatial
+          path: ${{ runner.temp }}/fill001-v2-footprint-spatial/
           if-no-files-found: warn
           retention-days: 30
