@@ -184,7 +184,7 @@
   let passivePreflightHandler = null;
   let lastPassivePreflightAt = -Infinity;
   const installPassivePreflight = () => {
-    if (!INPUT_TELEMETRY_ENABLED || passivePreflightHandler) return;
+    if (!INPUT_TELEMETRY_ENABLED || inputTelemetryConfiguration.enabled !== true || passivePreflightHandler) return;
     passivePreflightHandler = event => {
       if (!connected || !event.isTrusted || event.buttons !== 0
           || document.visibilityState !== "visible"
