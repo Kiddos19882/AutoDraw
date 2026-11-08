@@ -72,7 +72,7 @@
 ## FILL-001 — Screen Mask V2 (диагностическая проекция)
 
 - [x] Добавлен отдельный `fill001_screen_mask_v2.py` (E1): frozen logical mask 460×240 и исходный RGB threshold=8 не меняются; V2 требует явные проверенные desktop-screen corners BoardPane, run ID и evidence SHA, иначе fail-closed. Сравнение V1 возвращается в том же отчёте и никогда не переопределяет исторический acceptance.
-- [x] Добавлены regression tests `test_fill001_screen_mask_v2.py` для identity, сдвига, отказа на неверной геометрии/ROI и сохранения V1.
+- [x] Добавлены regression tests `test_fill001_screen_mask_v2.py` для identity, сдвига, отказа на неверной геометрии/ROI и сохранения V1. Отдельный CLI принимает `--before`, `--after`, `--run-id`, `--binding`, `--output`, не перезаписывает evidence; JSON `binding` требует `screen_roi:{x,y,width,height}` и `geometry:{run_id,same_run:true,coordinate_system:"desktop_screen_css_pixels",validation_status:"valid",independent_screen_mapping:true,board_screen_corners:{left,top,right,bottom},evidence_sha256}`. Флаги подтверждения — только контракт входа, их подлинность и desktop mapping необходимо независимо подтвердить до E5. 
 - [ ] E2/E3: получить результат тестов/CI именно для SHA с новым кодом; до этого статус проверки NOT_RUN/UNKNOWN.
 - [ ] E5: привязать к двум FILL001_SMOOTH_AB_V1 run независимо верифицированные экранные BoardPane corners и fingerprint, затем перепроецировать оба сохранённых PNG; raw логические и client coordinates без подтверждённого desktop mapping не принимаются. Внести сравнение V1/V2 и native Egret footprint в отдельный evidence отчёт без изменения quality thresholds.
 
