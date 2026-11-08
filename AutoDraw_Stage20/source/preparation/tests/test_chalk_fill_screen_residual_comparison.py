@@ -101,6 +101,16 @@ def test_report_artifacts_and_no_overwrite(tmp_path):
     report = json.loads(file.read_text(encoding="utf-8"))
     assert report["experiment_id"] == "FILL-001-RS-SCREEN-RESIDUAL-CF-V1"
     assert len(list(out.glob("*.png"))) == 6
+    edge = json.loads((out / "FILL001_RIGHT_EDGE_SPATIAL_V1.json").read_text(encoding="utf-8"))
+    assert edge["status"] == "DIAGNOSTIC_NOT_CAUSAL_NO_NEW_LIVE"
+    assert edge["middle"]["screen_rows"] == 114
+    assert edge["middle"]["rows_with_right_gap"] == 114
+    assert [edge["middle"][k] for k in (
+        "right_gap_min_px", "right_gap_median_px", "right_gap_max_px",
+        "left_gap_median_px",
+    )] == [3, 4.0, 7, 1.0]
+    assert edge["uncovered_by_zone"]["right_middle_x_ge_366"] == 499
+    assert len(edge["raw_monitor_endpoint_summary"]) == 27
     with pytest.raises(FileExistsError, match="overwrite"):
         save_screen_residual_report(_results_root(), out)
 
@@ -149,3 +159,27 @@ def test_reject_modified_png_and_identity(tmp_path):
     after.write_bytes(after.read_bytes() + b"unauthorized-change")
     with pytest.raises(ValueError, match="SHA-256 mismatch"):
         analyze_committed_screen_residual(target)
+
+
+def test_edge_diagnostic_rejects_modified_endpoint_source(tmp_path):
+    from chalk_fill_screen_residual_comparison import _edge_profile_from_pinned_overlay
+
+    root = _results_root()
+    _, overlays = analyze_committed_screen_residual(root)
+    original = root / "fill001" / "endpoint-analysis-6a17a297.json"
+    new = tmp_path / "fill001" / original.name
+    new.parent.mkdir(parents=True)
+    new.write_bytes(original.read_bytes() + b"\n ")
+    with pytest.raises(ValueError, match="Endpoint Git blob SHA mismatch"):
+        _edge_profile_from_pinned_overlay(tmp_path, overlays["actual_residual"])
+
+
+def test_edge_diagnostic_rejects_changed_pixel_label():
+    from chalk_fill_screen_residual_comparison import _edge_profile_from_pinned_overlay
+
+    root = _results_root()
+    _, overlays = analyze_committed_screen_residual(root)
+    modified = overlays["actual_residual"].copy()
+    modified[0, 0] = (220, 40, 45)
+    with pytest.raises(ValueError, match="residual masks disagree"):
+        _edge_profile_from_pinned_overlay(root, modified)

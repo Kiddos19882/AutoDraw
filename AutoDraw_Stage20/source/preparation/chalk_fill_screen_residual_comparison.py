@@ -43,6 +43,10 @@ EXPECTED_ROI = {"x": 566, "y": 253, "width": 581, "height": 304}
 EXPECTED_ORIGINAL_UNCOVERED = 1116
 EXPECTED_ORIGINAL_LEAKAGE = 11
 CONTOUR_INSETS = (5, 6, 7, 8)
+EDGE_PROFILE_ID = "FILL001_RIGHT_EDGE_SPATIAL_V1"
+ENDPOINT_REPORT_GIT_SHA = "6d2fe33c98ada4899311613f173b00e4afdad424"
+ENDPOINT_MONITOR_SHA = "8eb04ad7331d1e56f4aeb7d0f625c59c1dc57c24"
+ENDPOINT_RUN_ID = "6a17a297-ea14-4527-9527-bfd8de3bd335"
 
 
 def _read_pinned(
@@ -348,6 +352,146 @@ def analyze_committed_screen_residual(
     return report, overlays
 
 
+def _edge_profile_from_pinned_overlay(
+    root: Path, rgb: np.ndarray,
+) -> dict[str, Any]:
+    """Distinct E2 spatial profile; no new calibration or new gameplay."""
+    path = root / "fill001" / "endpoint-analysis-6a17a297.json"
+    raw = path.read_bytes()
+    canonical = raw.replace(b"\r\n", b"\n")
+    if raw != canonical and raw != canonical.replace(b"\n", b"\r\n"):
+        raise ValueError("Mixed endpoint JSON line endings")
+    git_sha = hashlib.sha1(
+        b"blob " + str(len(canonical)).encode("ascii") + b"\0" + canonical
+    ).hexdigest()
+    if git_sha != ENDPOINT_REPORT_GIT_SHA:
+        raise ValueError("Endpoint Git blob SHA mismatch")
+    endpoint = json.loads(canonical)
+    if (
+        endpoint.get("source", {}).get("run_id") != ENDPOINT_RUN_ID
+        or endpoint.get("source", {}).get("blob_sha") != ENDPOINT_MONITOR_SHA
+        or endpoint.get("exact_chalk", {}).get("consumed_points") != 1260
+        or endpoint.get("exact_chalk", {}).get("pre_point_count") != 1
+        or endpoint.get("exact_chalk", {}).get("post_point_count") != 1261
+        or endpoint.get("capture_completeness", {}).get("accepted_point_coordinates") != 1260
+        or endpoint.get("geometry", {}).get("stroke_count") != 27
+        or len(endpoint.get("geometry", {}).get("per_stroke", [])) != 27
+    ):
+        raise ValueError("Endpoint run binding or exact CHALK mismatch")
+    if rgb.shape != (304, 581, 3):
+        raise ValueError("Screen residual overlay size mismatch")
+    painted = np.all(rgb == (180, 180, 180), axis=2)
+    missing = np.all(rgb == (220, 40, 45), axis=2)
+    leaked = np.all(rgb == (155, 70, 205), axis=2)
+    target = painted | missing
+    if (
+        int(target.sum()) != 71110
+        or int(missing.sum()) != 1116
+        or int(leaked.sum()) != 11
+        or int(painted.sum()) != 69994
+    ):
+        raise ValueError("Pinned screen residual masks disagree with E4 PNG audit")
+    source_x = np.clip(
+        np.rint(np.arange(581) / ((581 - 1) / LOGICAL_BOARD_WIDTH)).astype(int),
+        0, LOGICAL_BOARD_WIDTH - 1,
+    )
+    source_y = np.clip(
+        np.rint(np.arange(304) / ((304 - 1) / LOGICAL_BOARD_HEIGHT)).astype(int),
+        0, LOGICAL_BOARD_HEIGHT - 1,
+    )
+    zone_counts = _zones(missing, source_x, source_y)
+    if zone_counts != {
+        "top_y_lt_75": 244,
+        "bottom_y_gt_165": 239,
+        "left_middle_x_le_94": 134,
+        "right_middle_x_ge_366": 499,
+        "interior_or_other": 0,
+    }:
+        raise ValueError("Pinned regional miss counts disagree")
+    rows = []
+    for y, ly in enumerate(source_y):
+        if not 75 <= ly <= 165:
+            continue
+        target_x = np.flatnonzero(target[y])
+        paint_x = np.flatnonzero(painted[y])
+        if not len(target_x) or not len(paint_x):
+            raise ValueError("Unexpected empty middle screen row")
+        rows.append({
+            "screen_y": int(y), "logical_y_nearest": int(ly),
+            "right_gap_px": int(target_x[-1] - paint_x[-1]),
+            "left_gap_px": int(paint_x[0] - target_x[0]),
+            "right_missing_px": int((missing[y] & (source_x >= 366)).sum()),
+            "left_missing_px": int((missing[y] & (source_x <= 94)).sum()),
+            "target_right_x": int(target_x[-1]),
+            "painted_right_x": int(paint_x[-1]),
+        })
+    r = [x["right_gap_px"] for x in rows]
+    l = [x["left_gap_px"] for x in rows]
+    if (
+        len(rows) != 114
+        or sum(x["right_missing_px"] for x in rows) != 499
+        or sum(x["left_missing_px"] for x in rows) != 134
+        or any(x <= 0 for x in r)
+    ):
+        raise ValueError("Pinned right-edge streak count disagrees")
+    strokes = []
+    for i, s in enumerate(endpoint["geometry"]["per_stroke"]):
+        first, last, terminal = (
+            s["first_accepted_point"], s["last_accepted_point"],
+            s["smooth_path_terminal_point"],
+        )
+        if (
+            first["y"] != last["y"] or last["y"] != terminal["y"]
+            or s["accepted_point_count"] < 2
+            or not np.isclose(
+                last["x"] - terminal["x"],
+                s["last_accepted_segment_length"] / 2.0,
+                atol=1e-6, rtol=0,
+            )
+        ):
+            raise ValueError("Smooth endpoint does not match accepted points")
+        strokes.append({
+            "index": i + 1, "accepted_y": last["y"],
+            "first_x": first["x"], "last_x": last["x"],
+            "smooth_terminal_x": terminal["x"],
+            "smooth_retreat_logical_px": last["x"] - terminal["x"],
+        })
+    return {
+        "schema_version": 1,
+        "experiment_id": EDGE_PROFILE_ID,
+        "status": "DIAGNOSTIC_NOT_CAUSAL_NO_NEW_LIVE",
+        "source_monitor_run": ENDPOINT_RUN_ID,
+        "source_monitor_blob_sha": ENDPOINT_MONITOR_SHA,
+        "source_endpoint_blob_sha": ENDPOINT_REPORT_GIT_SHA,
+        "source_endpoint_sha256": hashlib.sha256(canonical).hexdigest(),
+        "before_png_sha256": EXPECTED_BEFORE_SHA256,
+        "after_png_sha256": EXPECTED_AFTER_SHA256,
+        "plan_signature": EXPECTED_PLAN_SIGNATURE,
+        "old_capture_exact_chalk": 1260,
+        "uncovered_by_zone": zone_counts,
+        "leakage_pixels": 11,
+        "right_over_left_middle_misses": 499 / 134,
+        "middle": {
+            "screen_rows": len(rows),
+            "rows_with_right_gap": sum(x > 0 for x in r),
+            "right_gap_min_px": int(min(r)),
+            "right_gap_median_px": float(np.median(r)),
+            "right_gap_p90_px": float(np.percentile(r, 90)),
+            "right_gap_max_px": int(max(r)),
+            "left_gap_median_px": float(np.median(l)),
+            "left_gap_max_px": int(max(l)),
+        },
+        "rows": rows,
+        "raw_monitor_endpoint_summary": strokes,
+        "limitations": [
+            "No same-run native CSS/Stage screen transform in old FILL-001 evidence",
+            "Saved before/after RGB delta threshold=8; not a live alpha or temporal replay",
+            "Right-edge streak does not establish which engine/planner/executor stage caused it",
+            "Existing FILL-001 acceptance FAIL and old CHALK 1260 remain unchanged",
+        ],
+    }
+
+
 def save_screen_residual_report(
     results_root: str | Path,
     output_dir: str | Path,
@@ -358,6 +502,7 @@ def save_screen_residual_report(
     if destination.exists():
         raise FileExistsError("Refusing to overwrite prior screen-residual diagnostics")
     report, overlays = analyze_committed_screen_residual(results_root, insets=insets)
+    edge = _edge_profile_from_pinned_overlay(Path(results_root), overlays["actual_residual"])
     destination.mkdir(parents=True)
     for name, rgb in overlays.items():
         output = destination / (name + ".png")
@@ -365,6 +510,9 @@ def save_screen_residual_report(
             raise OSError("Failed to write " + str(output))
     path = destination / "screen_residual_comparison.json"
     path.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    (destination / (EDGE_PROFILE_ID + ".json")).write_text(
+        json.dumps(edge, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
     return path
 
 
