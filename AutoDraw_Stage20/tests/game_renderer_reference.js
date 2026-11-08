@@ -819,7 +819,12 @@
   }
 
 
-  function makeTemporalBoard(strokes, lineWidth, mode, incremental) {
+  function makeTemporalBoard(strokes, lineWidth, mode, incremental, duplicateFinalFrames) {
+    if (duplicateFinalFrames === undefined) duplicateFinalFrames = 0;
+    if (!Number.isInteger(duplicateFinalFrames) || duplicateFinalFrames < 0 ||
+        duplicateFinalFrames > 3 || (duplicateFinalFrames > 0 && !incremental)) {
+      throw new Error("Duplicate-frame replay requires incremental mode and 0..3 extra frames.");
+    }
     const BoardPane = getBoardPaneClass();
     if (typeof BoardPane !== "function") throw new Error("Game BoardPane unavailable.");
     const board = new BoardPane(false, 6000);
@@ -827,6 +832,7 @@
     board.height = BOARD_HEIGHT;
     board.atom.clear();
     let fullRedrawCalls = 0, incrementalRedrawCalls = 0, accepted = 0;
+    let duplicatePointRejections = 0, extraFrameRedrawCalls = 0;
     for (const stroke of strokes) {
       board.setRadius(lineWidth);
       board.setColor(0x000000);
@@ -851,6 +857,28 @@
         }
       }
       if (incremental) {
+        // A stationary, inside-board ENTER_FRAME still calls onDrawing,
+        // pushPoint (deduplicated) and redraw(false). The original monitor
+        // does NOT record these rejected samples or extra frame callbacks.
+        const last = stroke.points[stroke.points.length - 1];
+        if (!last) throw new Error("Duplicate-frame study rejects empty strokes.");
+        for (let k = 0; k < duplicateFinalFrames; k += 1) {
+          const current = board.atom.points[board.atom.points.length - 1];
+          const countBefore = current.length;
+          const quotaBefore = board.less;
+          board.atom.pushPoint(new egret.Point(last.x, last.y));
+          if (board.atom.points[board.atom.points.length - 1].length !== countBefore) {
+            throw new Error("Stationary duplicate was unexpectedly accepted.");
+          }
+          duplicatePointRejections += 1;
+          board.updateLess();
+          if (board.less !== quotaBefore) {
+            throw new Error("Stationary duplicate changed quota or accepted-point count.");
+          }
+          board.redraw(false);
+          incrementalRedrawCalls += 1;
+          extraFrameRedrawCalls += 1;
+        }
         board.redraw(false); // onDrawingEnd, before atom.add
         incrementalRedrawCalls += 1;
       }
@@ -867,6 +895,7 @@
     }
     return {
       shape: board, accepted, fullRedrawCalls, incrementalRedrawCalls,
+      duplicatePointRejections, extraFrameRedrawCalls,
       graphicsPathCount: board.$renderNode && board.$renderNode.drawData
         ? board.$renderNode.drawData.length : null
     };
@@ -963,6 +992,115 @@
     }
   }
 
+
+
+  // ENGINE001_DUPLICATE_FRAMES_V1: controlled stationery-pointer ENTER_FRAME
+  // callbacks after the final accepted point of every frozen stroke.
+  // 0, 1, 3 are synthetic frame counts (NOT reconstructed historical timing).
+  function renderDuplicateFrameStudy() {
+    try {
+      if (!window.egret || !egret.Shape || !egret.CanvasRenderer) {
+        throw new Error("Native game Egret renderer unavailable.");
+      }
+      const path = "../data/results/brush_behavior_tests/game_monitor_bridge/" +
+        "bb261898-8296-41f5-a333-eb0b81016410/" +
+        "game-monitor-run-20261104T040548835772Z-6a17a297.json";
+      const req = new XMLHttpRequest();
+      req.open("GET",path,false); req.send(null);
+      if (req.status !== 200) throw new Error("Pinned monitor input unavailable: " + req.status);
+      const input = extractTemporalStrokes(JSON.parse(req.responseText));
+      if (input.runId !== "6a17a297-ea14-4527-9527-bfd8de3bd335" ||
+          input.sessionId !== "bb261898-8296-41f5-a333-eb0b81016410" ||
+          input.strokes.length !== 27 || input.exactChalk !== 1260) {
+        throw new Error("Duplicate-frame input violates historical run identity.");
+      }
+      const mode = "smooth"; // Experimental assumption: no per-stroke mode in run.
+      const width = 10, extraFrameCounts = [0,1,3];
+      const mask = createBoardMask();
+      const webglState = initializeWebGL(null);
+      const samples = [], pictures = [];
+      const boards = [];
+      for (const frames of extraFrameCounts) {
+        const result = makeTemporalBoard(input.strokes,width,mode,true,frames);
+        const source = renderGraphicsNode(result.shape.$renderNode,false);
+        const canvas = composeBoard(source,source.nodeBounds,mask);
+        const webgl = renderWebGLProbe(mode,[],width,canvas,webglState,result.shape);
+        const expectedPaths = 70 + 27 * frames;
+        if (result.accepted !== input.exactChalk ||
+            result.duplicatePointRejections !== frames * 27 ||
+            result.extraFrameRedrawCalls !== frames * 27 ||
+            result.graphicsPathCount !== expectedPaths ||
+            result.shape.max-result.shape.less !== input.exactChalk) {
+          throw new Error("Native Frame replay violated path/CHALK invariant.");
+        }
+        samples.push({
+          extraStationaryFramesPerStroke:frames,
+          totalSyntheticFrameCallbacks:frames*27,
+          acceptedPoints:result.accepted,
+          duplicatePointRejections:result.duplicatePointRejections,
+          extraFrameRedrawCalls:result.extraFrameRedrawCalls,
+          fullRedrawCalls:result.fullRedrawCalls,
+          incrementalRedrawCalls:result.incrementalRedrawCalls,
+          graphicsPathCount:result.graphicsPathCount,
+          egretCanvas2dVsWebgl:webgl.comparison,
+          webglDrawCalls:webgl.drawCalls
+        });
+        pictures.push(["frames"+frames+"-canvas2d",canvas],
+                      ["frames"+frames+"-webgl",webgl.canvas]);
+        boards.push({frames,canvas,webgl:webgl.canvas});
+      }
+      const baseline = boards[0];
+      const comparisons = boards.map(e=>({
+        extraStationaryFramesPerStroke:e.frames,
+        canvas2dVsBaseline:compareCanvases(baseline.canvas,e.canvas),
+        webglVsBaseline:compareCanvases(baseline.webgl,e.webgl)
+      }));
+      if (comparisons[0].canvas2dVsBaseline.differingPixels !== 0 ||
+          comparisons[0].webglVsBaseline.differingPixels !== 0 ||
+          pictures.length !== 6) {
+        throw new Error("Duplicate-frame baseline or output count mismatch.");
+      }
+      const manifest={
+        schemaVersion:1, experimentId:"ENGINE001_DUPLICATE_FRAMES_V1",
+        status:"COMPLETE_OFFLINE_NATIVE_FRAME_EXPERIMENT",
+        gameBundleBlobSha:"46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+        egretBundleBlobSha:"d613d2b97e2436521aa3870478c69e99eac1f19f",
+        monitorInputBlobSha:"8eb04ad7331d1e56f4aeb7d0f625c59c1dc57c24",
+        runId:input.runId, sessionId:input.sessionId,
+        historicalExactChalk:input.exactChalk, acceptedPoints:1260, strokeCount:27,
+        lineWidth:width, modeAssumption:"smooth (per-stroke options unavailable)",
+        extraFrameCounts, frameInjection:"Immediately after the last accepted sample of each stroke and before onDrawingEnd; pushPoint with identical last coordinate rejected, updateLess and native redraw(false).",
+        screenProjection:"UNCALIBRATED",
+        renderSize:{width:baseline.canvas.width,height:baseline.canvas.height},
+        samples, comparisons, pngCount:pictures.length,
+        exclusions:[
+          "No actual ENTER_FRAME timing, DOM input, or stage rendering schedule recovered",
+          "No live screenshot or same-run Stage/CSS/client/desktop mapping",
+          "No new game interaction and no newly measured CHALK",
+          "Only duplicate frames at the final point, not arbitrary pauses throughout the stroke",
+          "No restoration of original service baseline point"
+        ]
+      };
+      casesNode.textContent="";
+      const card=document.createElement("section");
+      card.className="fixture";
+      card.textContent="ENGINE-001 native stationary pointer redraw diagnostics; offline only.";
+      for(const [label,canvas] of pictures) {
+        addDownloadLink(card,canvas,"engine001-frames-"+label+".png",label+" PNG");
+      }
+      casesNode.appendChild(card);
+      document.getElementById("renderer-manifest-json").textContent=JSON.stringify(manifest,null,2);
+      document.body.dataset.framesStatus="complete";
+      document.body.dataset.framesPngCount=String(pictures.length);
+      document.body.dataset.referenceStatus="frames_complete";
+      statusNode.textContent="ENGINE-001 stationary final-point redraw study complete; screen uncalibrated.";
+    } catch(error) {
+      document.body.dataset.framesStatus="error";
+      document.body.dataset.referenceStatus="error";
+      statusNode.className="error";
+      statusNode.textContent="Duplicate frame experiment failed: "+(error&&error.stack?error.stack:String(error));
+    }
+  }
 
   // ENGINE-001 endpoint comparison: keep 1260 accepted points frozen.
   // ENGINE001_NATIVE_ENDPOINT_OUTLINE5_V1: the same 5-logical-px normal
@@ -1392,8 +1530,10 @@
   api.renderAll = renderAll;
   api.renderTemporalStudy = renderTemporalStudy;
   api.renderEndpointStudy = renderEndpointStudy;
+  api.renderDuplicateFrameStudy = renderDuplicateFrameStudy;
   const params = new URLSearchParams(window.location.search);
-  const startup = params.get("outline") === "fill001" ? () => renderEndpointStudy(true)
+  const startup = params.get("frames") === "fill001" ? renderDuplicateFrameStudy
+    : params.get("outline") === "fill001" ? () => renderEndpointStudy(true)
     : params.get("endpoint") === "fill001" ? () => renderEndpointStudy(false)
     : params.get("temporal") === "fill001" ? renderTemporalStudy : renderAll;
   if (document.readyState === "loading") {
