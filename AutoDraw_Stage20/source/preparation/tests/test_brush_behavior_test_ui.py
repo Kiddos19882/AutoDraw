@@ -1595,3 +1595,65 @@ def test_paired_renderer_scenarios_request_automatic_input_telemetry() -> None:
 def test_regular_brush_scenarios_do_not_request_automatic_input_telemetry() -> None:
     assert brush_ui.should_enable_input_telemetry_for_test_case("Горизонтальные линии") is False
     assert brush_ui.should_enable_input_telemetry_for_test_case("Расход краски — серия длинных линий") is False
+
+
+def test_fill001_bridge_launcher_forces_input_telemetry_without_changing_brush_scenario(
+    tmp_path, monkeypatch,
+) -> None:
+    from types import SimpleNamespace
+
+    tab = brush_ui.BrushBehaviorTestTab.__new__(brush_ui.BrushBehaviorTestTab)
+    tab.root = object()
+    tab.bridge_process = None
+    tab.bridge_snippet_path = None
+    tab.bridge_input_telemetry_requested = False
+    tab.output_dir = tmp_path
+    tab.case_var = SimpleNamespace(get=lambda: "Горизонтальные линии")
+    messages = []
+    tab.status_var = SimpleNamespace(set=messages.append)
+    monkeypatch.setattr(
+        brush_ui.simpledialog, "askstring",
+        lambda *args, **kwargs: "https://game.example",
+    )
+    monkeypatch.setattr(brush_ui.platform, "system", lambda: "Windows")
+    commands = []
+
+    def fake_popen(args, **kwargs):
+        commands.append(args)
+        return SimpleNamespace(poll=lambda: None)
+
+    monkeypatch.setattr(brush_ui.subprocess, "Popen", fake_popen)
+    assert tab.start_game_monitor_bridge(require_input_telemetry=True) is True
+    assert len(commands) == 1
+    assert commands[0][-1] == "true"
+    assert tab.bridge_input_telemetry_requested is True
+    assert tab.bridge_snippet_path.parent == tmp_path / "game_monitor_bridge"
+
+    warnings = []
+    monkeypatch.setattr(
+        brush_ui.messagebox, "showwarning",
+        lambda *args, **kwargs: warnings.append(args),
+    )
+    # Old non-paired brush scenario must not reconfigure the running V3 Bridge.
+    assert tab.start_game_monitor_bridge() is False
+    assert len(commands) == 1
+    assert warnings
+
+
+def test_fill001_bridge_launcher_rejects_reusing_old_telemetry_off_process(
+    tmp_path, monkeypatch,
+) -> None:
+    from types import SimpleNamespace
+
+    tab = brush_ui.BrushBehaviorTestTab.__new__(brush_ui.BrushBehaviorTestTab)
+    tab.root = object()
+    tab.bridge_process = SimpleNamespace(poll=lambda: None)
+    tab.bridge_input_telemetry_requested = False
+    tab.case_var = SimpleNamespace(get=lambda: "Горизонтальные линии")
+    warnings = []
+    monkeypatch.setattr(
+        brush_ui.messagebox, "showwarning",
+        lambda *args, **kwargs: warnings.append(args),
+    )
+    assert tab.start_game_monitor_bridge(require_input_telemetry=True) is False
+    assert warnings
