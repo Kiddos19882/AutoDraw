@@ -71,6 +71,7 @@ def _evidence(task, run_id, sha="a" * 64):
     v1 = {"coverage_fraction": .987, "leakage_pixels": 3,
           "png_audit_status": "failed"}
     v2 = {"schema": SCREEN_MASK, "run_id": run_id,
+          "geometry_evidence_sha256": "e" * 64,
           "acceptance_override": False, "before_png_sha256": sha,
           "after_png_sha256": "b" * 64,
           "frozen_target_mask_sha256": task["target_mask_sha256"],
@@ -83,6 +84,13 @@ def _evidence(task, run_id, sha="a" * 64):
         "raw_e4_status": "PASS_E4_RAW_CAPTURE",
         "run_id": run_id, "plan_signature": task["plan_signature"],
         "target_mask_sha256": task["target_mask_sha256"],
+        "raw_run_sha256": "e" * 64,
+        "v2_binding_provenance": {
+            "run_id": run_id, "raw_run_sha256": "e" * 64,
+            "native_geometry_sha256": "c" * 64,
+        },
+        "before_png": "/new/" + task["task_id"] + "-before.png",
+        "after_png": "/new/" + task["task_id"] + "-after.png",
         "before_png_sha256": sha, "after_png_sha256": "b" * 64,
         "renderer_geometry_sha256": "c" * 64,
         "screen_roi": {"x": 50, "y": 100, "width": 674, "height": 355},
@@ -103,6 +111,8 @@ def test_v2_pair_does_not_mix_run_ids_versions_or_baselines():
         lambda e: e[1].update(screen_mask_version="V1"),
         lambda e: e[0]["v2_audit"].update(acceptance_override=True),
         lambda e: e[0].update(before_png_sha256="f" * 64),
+        lambda e: e[0].update(raw_run_sha256="f" * 64),
+        lambda e: e[0].update(before_png="/old/smooth-on-before.png"),
     ]
     for mutation in cases:
         broken = copy.deepcopy(rows)
