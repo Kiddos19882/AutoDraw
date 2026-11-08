@@ -56,13 +56,17 @@ def bind_from_monitor_run(
     run, run_sha = _load(run_path)
     evidence, evidence_sha = _load(evidence_path)
     run_id = run.get("run_id")
-    if (not isinstance(run_id, str) or not run_id
-            or run_id != evidence.get("run_id")
-            or run_sha != evidence.get("raw_run_sha256")
-            or evidence.get("status") != "PASS_E4_RAW_CAPTURE"
-            or evidence.get("monitor_version") != "0.2.4"
-            or run.get("session_id") != evidence.get("session_id")):
-        raise FillMatrixError("V2 run/evidence provenance or E4 status mismatch.")
+    checks = {
+        "run_id_missing": not isinstance(run_id, str) or not run_id,
+        "run_id_mismatch": run_id != evidence.get("run_id"),
+        "raw_run_sha256_mismatch": run_sha != evidence.get("raw_run_sha256"),
+        "e4_status_not_pass": evidence.get("status") != "PASS_E4_RAW_CAPTURE",
+        "monitor_version_mismatch": evidence.get("monitor_version") != "0.2.4",
+        "session_id_mismatch": run.get("session_id") != evidence.get("session_id"),
+    }
+    failed = [name for name, invalid in checks.items() if invalid]
+    if failed:
+        raise FillMatrixError("V2 run/evidence provenance failure: " + ", ".join(failed))
     g0, g1 = run.get("renderer_geometry_at_start"), run.get("renderer_geometry_at_end")
     if (not isinstance(g0, dict) or g0 != g1
             or run.get("renderer_geometry_updates") != []
