@@ -77,6 +77,50 @@ def classify_leakage(mask: np.ndarray, changed: np.ndarray) -> dict:
     }
 
 
+
+def accepted_centerline_offsets(run: dict, plan: dict) -> dict:
+    """Compare actual accepted points to the frozen centerlines; not a raster model."""
+    points = run.get("accepted_points")
+    strokes = plan.get("strokes")
+    if not isinstance(points, list) or not isinstance(strokes, list):
+        raise ValueError("Missing monitor points or frozen plan")
+    groups = {}
+    for point in points:
+        if not isinstance(point, dict) or not isinstance(point.get("stroke_id"), str):
+            raise ValueError("Invalid accepted point stream")
+        groups.setdefault(point["stroke_id"], []).append(point)
+    if len(groups) != len(strokes) or len(strokes) != 27:
+        raise ValueError("Expected exactly 27 independently observed scanlines")
+    measurements = []
+    for index, (group, stroke) in enumerate(zip(groups.values(), strokes)):
+        ys = np.asarray([float(point["y"]) for point in group], dtype=np.float64)
+        xs = np.asarray([float(point["x"]) for point in group], dtype=np.float64)
+        planned_start, planned_end = stroke["points"]
+        planned_y = float(planned_start["y"])
+        if (float(planned_end["y"]) != planned_y or
+                not np.isfinite(xs).all() or not np.isfinite(ys).all()):
+            raise ValueError("Invalid horizontal accepted trajectory")
+        measurements.append({
+            "index": index + 1,
+            "planned_y": planned_y,
+            "observed_y_min": float(ys.min()),
+            "observed_y_max": float(ys.max()),
+            "observed_y_median": float(np.median(ys)),
+            "median_y_offset": float(np.median(ys) - planned_y),
+            "planned_start_x": float(planned_start["x"]),
+            "observed_first_x": float(xs[0]),
+            "planned_end_x": float(planned_end["x"]),
+            "observed_last_x": float(xs[-1]),
+            "accepted_point_count": int(len(group)),
+        })
+    return {
+        "rows": measurements,
+        "first": measurements[0],
+        "last": measurements[-1],
+        "max_abs_y_offset": max(abs(r["median_y_offset"]) for r in measurements),
+        "limitations": "Accepted trajectory comparison, not brush footprint pixel parity",
+    }
+
 def _png(path: Path) -> np.ndarray:
     with Image.open(path) as image:
         if image.format != "PNG":
@@ -145,7 +189,13 @@ def analyze_pair(root: Path, output: Path) -> dict:
                 or spatial["leakage_pixels"] != expected["leakage_pixels"]
                 or int(np.count_nonzero(changed)) != expected["changed_pixels"]):
             raise ValueError(f"{mode}: V2 audit metrics mismatch; refusing diagnostic")
+        raw_run = _read_json(matches[0])
+        if raw_run.get("run_id") != result["run_id"]:
+            raise ValueError("Monitor run mismatch")
+        plan = _read_json(root / "fill001" / "plans" / (task + ".json"))
+        centers = accepted_centerline_offsets(raw_run, plan)
         results[mode] = {
+            "accepted_centerlines": centers,
             "run_id": result["run_id"], "raw_run_sha256": result["raw_run_sha256"],
             "evidence_sha256": _sha(evidence), "before_sha256": _sha(before_path),
             "after_sha256": _sha(after_path), "roi": roi,
@@ -200,6 +250,8 @@ def main() -> int:
               f"leak={item['spatial']['leakage_pixels']}, "
               f"regions={item['spatial']['categories']}, "
               f"depth={item['spatial']['max_depth_screen_px']}")
+        print(f"{mode} first accepted row: {item['accepted_centerlines']['first']}; "
+              f"max abs y-offset: {item['accepted_centerlines']['max_abs_y_offset']:.3f}")
     return 0
 
 
