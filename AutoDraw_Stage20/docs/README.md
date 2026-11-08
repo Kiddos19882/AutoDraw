@@ -1,6 +1,6 @@
 # Документация AutoDraw — быстрый вход
 
-**Рабочая ветка:** `feature/image-geometry-optimization`. **Состояние знаний:** проверено 2026-11-08 на evidence baseline `a2d1f0a52d47`. Это вход в существующую систему документации, а не отдельный источник статуса. Полная предыдущая редакция индекса сохранена [здесь](README_HISTORY_THROUGH_2026-11-08.md).
+**Рабочая ветка:** `feature/image-geometry-optimization`. **Актуальный evidence baseline ENGINE-001:** `177165361b0340515fe3bb74f4847ab3ec579ebc` (9/9 live E4, E5 PARTIAL; см. §21). Исторический baseline прежней системы документации — `a2d1f0a52d47`. Текущий remote HEAD проверять заново в каждом чате. Это вход в существующую систему документации, а не отдельный источник статуса. Полная предыдущая редакция индекса сохранена [здесь](README_HISTORY_THROUGH_2026-11-08.md).
 
 ## Начните с этих документов
 
@@ -22,7 +22,8 @@
 
 - **Ресурс CHALK:** [G1/G2/G3, INT-006 и INT006R — общий реестр](TEST_RESULTS.md) → [официальный INT-006](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md) → [frozen model/analyzer](CHALK_INT006_FROZEN_PREDICTIONS_AND_ANALYZER_2026-11-02.md). Только exact `CHALK = post.pointCount - pre.pointCount` — реальное измерение.
 - **Заливка и качество:** [FILL-001-RS capture/replay](CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md) → [временный план эксперимента](CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md); baseline: CHALK 1260 измерен, **PNG quality FAILED** (98.430600%, leakage 11).
-- **Геометрия/рендерер:** [архитектура игровой доски и движка](GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md) → [game engine cost и renderer](CHALK_GAME_ENGINE_POINT_COST_AND_BRUSH_WIDTH_2026-11-03.md) → [PRR CI 6/6 PASS](https://github.com/Kiddos19882/AutoDraw/actions/runs/42321009715).
+- **ENGINE-001, актуальная лаборатория:** [§21 — 9/9 live E4 и независимая E5 диагностика](GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md) → [исходный commit 1771653](https://github.com/Kiddos19882/AutoDraw/commit/177165361b0340515fe3bb74f4847ab3ec579ebc) → [полный CI 42449898657](https://github.com/Kiddos19882/AutoDraw/actions/runs/42449898657). Exact CHALK 846 по 9 отдельным runs; E5 geometry и screen RGB PARTIAL, независимая native WebGL PNG parity **NOT_RUN**.
+- **Геометрия/рендерер, исторический анализ:** [архитектура игровой доски и движка](GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md) → [game engine cost и renderer](CHALK_GAME_ENGINE_POINT_COST_AND_BRUSH_WIDTH_2026-11-03.md) → [PRR CI 6/6 PASS](https://github.com/Kiddos19882/AutoDraw/actions/runs/42321009715).
 - **Корпус 81 изображения:** [offline screening и N](TEST_RESULTS.md#3-кандидатный-корпус-81-реального-изображения-offline-only) → [генератор и ограничения](VALIDATION_CORPUS_GENERATOR_2026-11-07.md). Это кандидатные Stage8 mono / Stage6 color scanlines, а **не** валидированная D1–D5 CHALK-популяция.
 - **Цель CHALK 95%:** [проект safety margin](CHALK_SAFETY_MARGIN_POLICY_DESIGN_2026-11-07.md) → [предложенный протокол 19/59](CHALK_95_PERCENT_CALIBRATION_HOLDOUT_PROTOCOL_2026-11-07.md); ещё **не** production gate PASS.
 - **Game Monitor / Bridge:** [текущие API](GAME_MONITOR_BRIDGE_REFERENCE.md) и [README Game Monitor](../source/game_monitor/README.md).
