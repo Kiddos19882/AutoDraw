@@ -73,3 +73,38 @@ def test_bridge_configuration_is_bound_to_the_run_record(tmp_path) -> None:
     path = recorder.finalize("partial")
     report = json.loads(path.read_text(encoding="utf-8"))
     assert report["bridge_configuration_at_start"] == configuration
+
+
+def test_native_engine_frame_samples_and_stroke_mode_are_saved_in_bridge_run(tmp_path):
+    recorder = RunRecorder(tmp_path, "frame-session", 2.5)
+    pre = {"maxPoints":6000, "remainingPoints":6000, "pointCount":0, "isExact":True}
+    post = {"maxPoints":6000, "remainingPoints":5999, "pointCount":1, "isExact":True}
+    recorder.event({"type":"DRAW_START","strokeId":"stroke-1","t":1.0,"before":pre},1.0)
+    recorder.event({
+        "type":"ENGINE_FRAME_SAMPLE","strokeId":"stroke-1","t":2.0,
+        "board":post, "strokeOptionRaw":True, "observedPointDeltaSincePreviousFrame":1,
+        "renderPathCount":2,
+    },2.0)
+    recorder.event({
+        "type":"ENGINE_FRAME_SAMPLE","strokeId":"stroke-1","t":3.0,
+        "board":post, "strokeOptionRaw":True, "observedPointDeltaSincePreviousFrame":0,
+        "renderPathCount":3,
+    },3.0)
+    recorder.event({
+        "type":"DRAW_SAMPLE","strokeId":"stroke-1","t":3.1,"board":post,
+        "pointDelta":1,"acceptedPoint":{"x":20.0,"y":120.0},
+    },3.1)
+    recorder.event({"type":"DRAW_END","strokeId":"stroke-1","t":4.0,"after":post},4.0)
+    file = recorder.finalize()
+    report = json.loads(file.read_text(encoding="utf-8"))
+    frames = report["engine_frame_samples"]
+    assert frames["event_count"] == 2
+    assert frames["by_stroke"][0]["frame_count"] == 2
+    assert frames["by_stroke"][0]["observed_stationary_frames"] == 1
+    assert report["observed_stroke_modes"] == [{
+        "stroke_id":"stroke-1", "stroke_option_raw":True,
+        "source":"BoardPane.atom.options[from_ENGINE_FRAME_SAMPLE]",
+    }]
+    assert frames["is_full_engine_render_timeline"] is False
+    assert [event["renderPathCount"] for event in report["events"]
+            if event["type"] == "ENGINE_FRAME_SAMPLE"] == [2,3]
