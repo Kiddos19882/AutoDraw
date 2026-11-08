@@ -2,6 +2,11 @@
 
 Записывать только изменения интерфейсов, форматов, возможностей и значимые изменения сопровождения. Ход проверки каждой задачи — [WORK_LOG](WORK_LOG.md). Полная прежняя редакция без изменений: [CHANGELOG_HISTORY_THROUGH_2026-11-08.md](CHANGELOG_HISTORY_THROUGH_2026-11-08.md).
 
+## 2026-11-08 — ENGINE-001: native 5px contour across endpoint variants
+
+- Исследовательский opt-in `?outline=fill001` в существующем Egret browser harness добавляет одинаковый замкнутый 5 logical px contour из pinned rectangle mask ко всем трём endpoint режимам; 15 дополнительных native PNG, независимый OpenCV audit с four-alpha metrics и CI artifacts. [Full CI 42439343897](https://github.com/Kiddos19882/AutoDraw/actions/runs/42439343897) SUCCESS (`f381ffe`).
+- После добавления обводки board-local coverage улучшилась, но новый modeled leakage >0 и zero right-middle recovery в smooth. Исторический live capture остаётся FAIL; production code/game bundle, executor и estimator не менялись.
+
 ## 2026-11-08 — ENGINE-001: native Painter endpoint reference
 
 - Добавлен opt-in `?endpoint=fill001` в существующий browser harness, 15 PNG (27-stroke aggregate и три изолированных штриха, game-smooth / native forced-last / normal), independent board-local OpenCV raster analysis в [validation CI 42438036187](https://github.com/Kiddos19882/AutoDraw/actions/runs/42438036187) **SUCCESS** на `1805ebf`.
