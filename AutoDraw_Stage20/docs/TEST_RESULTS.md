@@ -101,3 +101,26 @@
 ## FILL-001 Smooth A/B V2 — новый эксперимент, код подготовлен; игровой E4 NOT_RUN
 
 Протокол `FILL001_SMOOTH_AB_V2`; Screen Mask `FILL001_SCREEN_MASK_V2`; frozen логический план rectangle/r10/step5/offset0, 27 штрихов и P1. Новые ON/OFF task IDs и новая matrix signature изолированы от `FILL001_SMOOTH_AB_V1`. Для каждого свежего run pipeline сохраняет raw E4, SHA исходного Monitor, before/after PNG, исходный V1 контроль и V2 audit с same-run client→desktop mapping. Stage6/executor defaults и frozen acceptance не менялись. Проверка code/unit: [AutoDraw validation 42505872844](https://github.com/Kiddos19882/AutoDraw/actions/runs/42505872844) на code SHA `d557db23ac5911911acc722c58aa140658040cd7`, **SUCCESS** по всем обязательным jobs для code SHA `d557db23ac5911911acc722c58aa140658040cd7` (Preparation/G3, monitor/bridge, executor, integration, Egret browser, INT-006). Optional benchmarks/Windows portable build SKIPPED. Новые реальные CHALK/coverage/leakage — **NOT_RUN**. Preexisting V2 offline replay для старых capture не является новым E4.
+
+
+## FILL-001 Smooth A/B V2 — фактический E4 и отдельная пространственная диагностика
+
+**Исходная серия:** `fill001-20261108-204825`, исходный [evidence commit 07f4f3e](https://github.com/Kiddos19882/AutoDraw/commit/07f4f3ea14eb14598fa7ce08c3985e56acb0f73b), два новых Monitor 0.2.4 run с одинаковым `plan_signature=a0e42216...`, frozen rectangle 460×240, 27 штрихов и `screen_roi=(496,265,674,355)`. E4 accepted Egret points, observed smooth и exact `CHALK=post.pointCount-pre.pointCount` привязаны к отдельным run и PNG. Оба executor completed; `raw_e4_status=PASS_E4_RAW_CAPTURE`, но quality `FAIL`.
+
+| Новый run | Smooth | Exact CHALK | Screen Mask V2 coverage | V2 leakage |
+|---|---|---:|---:|---:|
+| `0d0a0edf-f42e-4da1-b880-f09a4fce0a27` | ON | 1458 | 98.666023% | 1488 |
+| `0f3f9299-afce-4e02-b7be-7d4fb5714348` | OFF | 1459 | 99.359230% | 1474 |
+
+**Новый исследовательский протокол:** `FILL001_V2_FOOTPRINT_SPATIAL_V1`, код `source/preparation/fill001_v2_footprint_spatial.py`, test `tests/test_fill001_v2_footprint_spatial.py`. На том же immutable V2 mask, RGB `abs(after-before)>8` и SHA-verified PNG, без подгонки mask/threshold, пиксели leakage распределены по непересекающимся регионам. [Focused CI 42511062639](https://github.com/Kiddos19882/AutoDraw/actions/runs/42511062639) **SUCCESS** на code/test SHA `bcfa7dce711f2c5ace955b7ff1b241d15efc6189` (18 passed, 6 subtests); [JSON с 27 accepted rows и цветные карты](https://github.com/Kiddos19882/AutoDraw/actions/runs/42511062639/artifacts/13630025090).
+
+| Новая Screen Mask V2 leak region | ON | OFF |
+|---|---:|---:|
+| Above | 1206 (max depth 3 screen px) | 1216 (max depth 3) |
+| Left | 281 (max depth 7) | 253 (max depth 7) |
+| Right | 1 (max depth 1) | 5 (max depth 4) |
+| Below | 0 | 0 |
+
+**Новая ключевая E4/E2 находка:** первый плановый centerline `(94,55)→(366,55)` был реально принят Egret как `(93.2083339691,53)→(365.2083339691,53)` **в обоих run**, 48 accepted points на каждом первом штрихе; вертикальное отклонение `-2 logical px`; максимальное абсолютное median Y deviation по 27 рядами также 2 logical px. Следовательно, запланированный margin сверху 5 logical px фактически стал 3, что само по себе достаточно для верхнего выхода номинального кистевого радиуса 5. Это **не** доказывает, что реальный WebGL диаметр неверен: вероятна причина в legacy ROI-based `transform_logical_brush_plan_to_screen()`, который предполагает совпадение ROI borders и run-bound BoardPane corners; отдельная причинная проверка нового transform/runtime round-trip ещё **NOT_RUN**.
+
+**Ограничения:** spatial split — screen RGB, не native Egret pixel-exact brush raster и не один изолированный stroke. ENGINE-001 E5 ранее подтверждал ~15 screen px transverse width при game UI lineWidth 10. Ни V1/V2 historical gate, ни production CHALK estimator, ни executor defaults не изменены. Полный CI для SHA `bcfa7dce` проверять по завершению [42511062648](https://github.com/Kiddos19882/AutoDraw/actions/runs/42511062648).
