@@ -47,6 +47,8 @@ def _number(value: Any) -> float:
 def bind_from_monitor_run(
     run_path: str | Path,
     evidence_path: str | Path,
+    *,
+    allow_v3_boardpane_only: bool = False,
 ) -> dict[str, Any]:
     """Produce a verified V2 binding from one raw run and its E4 audit report.
 
@@ -81,12 +83,38 @@ def bind_from_monitor_run(
     if failed:
         raise FillMatrixError("V2 run/evidence provenance failure: " + ", ".join(failed))
     g0, g1 = run.get("renderer_geometry_at_start"), run.get("renderer_geometry_at_end")
-    if (not isinstance(g0, dict) or g0 != g1
-            or run.get("renderer_geometry_updates") != []
+    if allow_v3_boardpane_only:
+        # V3 is a separately versioned input calibration experiment. A
+        # dynamically resized Preloader is irrelevant to BoardPane mapping.
+        # The full g0 SHA remains checked and reported as raw evidence.
+        from fill001_monitor_diagnostic import _boardpane_mapping_fingerprint
+        updates = run.get("renderer_geometry_updates")
+        target = evidence.get("boardpane_mapping_at_start_sha256")
+        try:
+            valid_board = (
+                evidence.get("protocol") == "FILL001_SMOOTH_AB_V3"
+                and isinstance(g0, dict) and isinstance(g1, dict)
+                and isinstance(target, str) and len(target) == 64
+                and _boardpane_mapping_fingerprint(g0) == target
+                and _boardpane_mapping_fingerprint(g1) == target
+                and isinstance(updates, list)
+                and all(isinstance(entry, dict)
+                        and isinstance(entry.get("snapshot"), dict)
+                        and _boardpane_mapping_fingerprint(entry["snapshot"]) == target
+                        for entry in updates)
+            )
+        except (TypeError, ValueError):
+            valid_board = False
+        if not valid_board:
+            raise FillMatrixError("V3 same-run BoardPane projection changed or lost provenance.")
+    elif (not isinstance(g0, dict) or g0 != g1
+            or run.get("renderer_geometry_updates") != []):
+        raise FillMatrixError("V2 same-run BoardPane geometry missing, changed, or unbound.")
+    if (not isinstance(g0, dict)
             or _geometry_sha(g0) != evidence.get("geometry_at_start_sha256")
             or g0.get("boardLogicalSize") != {"width": 460, "height": 240}
             or g0.get("renderMode") != "webgl"):
-        raise FillMatrixError("V2 same-run BoardPane geometry missing, changed, or unbound.")
+        raise FillMatrixError("Same-run raw geometry SHA, canvas or render mode invalid.")
     players = g0.get("players")
     if not isinstance(players, list) or len(players) != 1:
         raise FillMatrixError("V2 requires exactly one BoardPane player.")
@@ -165,6 +193,7 @@ def bind_from_monitor_run(
             "byte_reconstruction": sha_reconstruction,
             "e4_evidence_sha256": evidence_sha,
             "native_geometry_sha256": _geometry_sha(g0),
+            "v3_boardpane_only_identity": allow_v3_boardpane_only,
             "mouse_sample_count": len(samples),
             "client_screen_offset_x": float(center[0]),
             "client_screen_offset_y": float(center[1]),
