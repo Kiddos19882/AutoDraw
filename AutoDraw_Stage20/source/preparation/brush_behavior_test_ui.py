@@ -1224,17 +1224,27 @@ class BrushBehaviorTestTab:
             return None
         return raw.rstrip("/")
 
-    def start_game_monitor_bridge(self) -> None:
-        """Launch the authenticated local bridge in its own Windows console."""
+    def start_game_monitor_bridge(
+        self, *, require_input_telemetry: bool | None = None,
+    ) -> bool:
+        """Launch the one shared Bridge, with an explicit FILL-001 opt-in mode.
+
+        None preserves the existing brush-lab scenario-dependent behavior.
+        True is required for FILL-001 V3; never silently reuse a Bridge that
+        was started without input telemetry.
+        """
         selected_scenario = TEST_CASES.get(self.case_var.get(), {})
         enable_input_telemetry = (
-            isinstance(selected_scenario, dict)
-            and selected_scenario.get("id") in PAIRED_RENDERER_TEST_CASE_IDS
+            bool(require_input_telemetry)
+            if require_input_telemetry is not None else (
+                isinstance(selected_scenario, dict)
+                and selected_scenario.get("id") in PAIRED_RENDERER_TEST_CASE_IDS
+            )
         )
         if self.bridge_process is not None and self.bridge_process.poll() is None:
             if enable_input_telemetry != self.bridge_input_telemetry_requested:
                 expected_mode = (
-                    "paired-renderer с автоматической input telemetry"
+                    "режим с обязательной input telemetry (FILL-001 V3 / paired-renderer)"
                     if enable_input_telemetry else "обычный режим без автоматического включения input telemetry"
                 )
                 messagebox.showwarning(
@@ -1246,17 +1256,19 @@ class BrushBehaviorTestTab:
             else:
                 messagebox.showinfo(
                     "Game Monitor Bridge",
-                    "Окно WebSocket-сервера уже запущено. Остановить его можно сочетанием Ctrl+C в этом окне.",
+                    "Совместимый мост уже запущен. Используйте действующий одноразовый snippet.",
                     parent=self.root,
                 )
-            return
+            return (
+                enable_input_telemetry == self.bridge_input_telemetry_requested
+            )
         origin_value = simpledialog.askstring(
             "Запуск Game Monitor WebSocket",
             "Вставь точный Origin игрового iframe. Получить его можно в Console iframe командой location.origin:",
             parent=self.root,
         )
         if not origin_value:
-            return
+            return False
         origin = self.normalize_game_monitor_origin(origin_value)
         if origin is None:
             messagebox.showerror(
@@ -1264,14 +1276,14 @@ class BrushBehaviorTestTab:
                 "Нужен точный HTTPS Origin без пути, query и fragment. Скопируй location.origin именно из игрового iframe.",
                 parent=self.root,
             )
-            return
+            return False
         if platform.system() != "Windows":
             messagebox.showerror(
                 "Недоступный запуск",
                 "Кнопка запуска использует Windows .bat. На этой системе запусти game_monitor_bridge_server.py вручную.",
                 parent=self.root,
             )
-            return
+            return False
 
         if getattr(sys, "frozen", False):
             app_root = Path(sys.executable).resolve().parent
@@ -1288,7 +1300,7 @@ class BrushBehaviorTestTab:
                 f"Не найден файл:\n{batch_path}",
                 parent=self.root,
             )
-            return
+            return False
 
         snippet_dir = self.output_dir / "game_monitor_bridge"
         snippet_path = snippet_dir / f"connection_snippet_{uuid.uuid4().hex}.js"
@@ -1310,7 +1322,7 @@ class BrushBehaviorTestTab:
                 str(exc),
                 parent=self.root,
             )
-            return
+            return False
         self.bridge_snippet_path = snippet_path
         self.bridge_input_telemetry_requested = enable_input_telemetry
         telemetry_mode = (
@@ -1322,6 +1334,7 @@ class BrushBehaviorTestTab:
             telemetry_mode
             + "WebSocket запускается в отдельном окне. После появления сообщения о готовности скопируй snippet подключения."
         )
+        return True
 
     def _copy_text_to_clipboard(self, content: str, success_message: str) -> None:
         self.root.clipboard_clear()
