@@ -19,7 +19,7 @@ from engine001_lab import (
 def _session(tmp_path, *, age_seconds=1, frames=True, telemetry=True, suffix="a"):
     now = datetime.now(timezone.utc)
     directory = tmp_path / f"session-{suffix}"
-    directory.mkdir()
+    directory.mkdir(parents=True)
     payload = {
         "session_id": f"session-{suffix}",
         "bridge_diagnostics": {
@@ -164,3 +164,36 @@ def test_single_capture_bad_run_identity_fails_closed(tmp_path):
     (tmp_path/"mismatch"/"experiment.json").write_text(json.dumps(exp),encoding="utf-8")
     with pytest.raises(ValueError,match="run/session identity"):
         audit_single_capture(tmp_path/"mismatch")
+
+
+def test_one_button_rejects_when_bridge_not_prepared(tmp_path, monkeypatch):
+    import brush_behavior_test_ui as ui
+    tab = ui.BrushBehaviorTestTab.__new__(ui.BrushBehaviorTestTab)
+    tab.output_dir = tmp_path
+    tab.root = object()
+    tab._chalk_block_task = None
+    tab._chalk_block_journal_path = None
+    calls = []
+    notices = []
+    tab.start_chalk_test_block = lambda **kwargs: calls.append(kwargs)
+    monkeypatch.setattr(ui.messagebox,"showwarning",
+                        lambda *args, **kwargs: notices.append(args))
+    tab.start_engine001_lab()
+    assert not calls
+    assert notices
+
+
+def test_one_button_uses_existing_automation_only_after_bridge_gate(tmp_path, monkeypatch):
+    import brush_behavior_test_ui as ui
+    _session(tmp_path / "game_monitor_bridge")
+    tab = ui.BrushBehaviorTestTab.__new__(ui.BrushBehaviorTestTab)
+    tab.output_dir = tmp_path
+    tab.root = object()
+    tab._chalk_block_task = None
+    tab._chalk_block_journal_path = None
+    tab.chalk_block_progress_var = type("Var",(),{"set":lambda self,v:None})()
+    calls = []
+    tab.start_chalk_test_block = lambda **kwargs: calls.append(kwargs)
+    tab.start_engine001_lab()
+    assert calls == [{"lab_one_click":True}]
+    assert tab._engine001_lab_session_id == "session-a"
