@@ -2,6 +2,13 @@
 
 Записывать только изменения интерфейсов, форматов, возможностей и значимые изменения сопровождения. Ход проверки каждой задачи — [WORK_LOG](WORK_LOG.md). Полная прежняя редакция без изменений: [CHANGELOG_HISTORY_THROUGH_2026-11-08.md](CHANGELOG_HISTORY_THROUGH_2026-11-08.md).
 
+## 2026-11-08 — отдельный FILL-001 Smooth A/B V3 BoardPane pilot
+
+- Новый `FILL001_SMOOTH_AB_V3` с отдельными задачами ON/OFF и `FILL001_BOARDPANE_PREFLIGHT_V1`: логическая маска, 27-штриховой план, CHALK measurement, executor defaults и старые V1/V2 evidence не изменены.
+- Вкладка FILL-001: новая кнопка **«Новый Smooth A/B V3 (BoardPane)»**. До загрузки Stage6 выполняется обязательная свежая проверка BoardPane geometry; некорректный/stale mapping блокирует игровой ввод, без fallback к старому ROI transform.
+- Game Monitor Bridge (opt-in) дополняет read-only session metadata пассивными `isTrusted` событиями движения курсора при `buttons=0`; сохраняет до 16 samples с session/geometry SHA. Путь draw telemetry и штатные режимы не менялись.
+- Добавлены regression tests для V3 manifest, provenance, preflight и Bridge, расширен существующий focused CI. Новый игровой E4, нативная Egret E5 и подтверждение исправленной утечки — **NOT_RUN**; подробности в [TASKS](TASKS.md), [TEST_RESULTS](TEST_RESULTS.md) и [Game Monitor §14](GAME_MONITOR_BRIDGE_REFERENCE.md#14-fill-001--отдельный-boardpane-anchored-smooth-ab-v3-исследовательский-пилот).
+
 ## 2026-11-08 — отдельный FILL-001 Smooth A/B V1
 
 Добавлен экспериментальный двухзадачный режим ON/OFF с отдельными task IDs и frozen 27-stroke plan, predeclared smooth mode и raw подтверждением по реальным Egret ENGINE_FRAME_SAMPLE. UI сохраняет по каждому запуску raw audit и независимый FILL PNG quality outcome даже при quality FAIL; есть парное сравнение exact CHALK, coverage, leakage и пограничных пропусков с контролем одинаковых before ROI. Старые V1/RS данные, 45-cell matrix и production execution defaults не меняются. Новый E4 и регрессионный CI на момент подготовки NOT_RUN.
