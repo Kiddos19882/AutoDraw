@@ -178,19 +178,31 @@ def audit_single_capture(experiment_dir: Path) -> dict[str, Any]:
         failures.append("accepted_points_incomplete")
         points = []
     modes = report.get("observed_stroke_modes")
-    if not isinstance(modes, list) or len(modes) != 1 or (
-        type(modes[0].get("stroke_option_raw")) is not bool
-        or modes[0].get("stroke_id") != points[0].get("stroke_id") if points else True
-    ):
+    expected_stroke_id = points[0].get("stroke_id") if points else None
+    valid_mode = (
+        isinstance(modes, list)
+        and len(modes) == 1
+        and isinstance(modes[0], dict)
+        and type(modes[0].get("stroke_option_raw")) is bool
+        and isinstance(expected_stroke_id, str)
+        and modes[0].get("stroke_id") == expected_stroke_id
+    )
+    if not valid_mode:
         failures.append("native_stroke_mode_not_observed")
     frames = report.get("engine_frame_samples")
     by_stroke = frames.get("by_stroke") if isinstance(frames, dict) else None
-    if (
-        not isinstance(frames, dict)
-        or frames.get("event_count", 0) <= 0
-        or not isinstance(by_stroke, list) or len(by_stroke) != 1
-        or by_stroke[0].get("stroke_id") != points[0].get("stroke_id") if points else True
-    ):
+    valid_frames = (
+        isinstance(frames, dict)
+        and type(frames.get("event_count")) is int
+        and frames["event_count"] > 0
+        and isinstance(by_stroke, list)
+        and len(by_stroke) == 1
+        and isinstance(by_stroke[0], dict)
+        and by_stroke[0].get("stroke_id") == expected_stroke_id
+        and type(by_stroke[0].get("frame_count")) is int
+        and by_stroke[0]["frame_count"] > 0
+    )
+    if not valid_frames:
         failures.append("egret_enter_frame_telemetry_incomplete")
     if any(report.get(key) != 0 for key in (
         "dropped_events", "monitor_buffer_dropped_events_delta",
