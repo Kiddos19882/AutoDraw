@@ -2,6 +2,11 @@
 
 Записывать только изменения интерфейсов, форматов, возможностей и значимые изменения сопровождения. Ход проверки каждой задачи — [WORK_LOG](WORK_LOG.md). Полная прежняя редакция без изменений: [CHANGELOG_HISTORY_THROUGH_2026-11-08.md](CHANGELOG_HISTORY_THROUGH_2026-11-08.md).
 
+## 2026-11-08 — ENGINE-001: offline E5 native screen-RGB reference validation
+
+- Исследовательский Egret harness расширен для raw Monitor 0.2.4 `accepted_points` с fail-closed проверкой `DRAW_SAMPLE` и observed mode; добавлены immutable 9-run Firefox Stage A–D и independent screen-RGB validator. Старые paired-renderer пути, пороги DEC-025, production и FILL-001 thresholds не менялись.
+- [E5 CI 42454224181](https://github.com/Kiddos19882/AutoDraw/actions/runs/42454224181) SUCCESS: 9/9 `PASS_PER_RUN`, реальные финальные screen RGB IoU по направлениям H/V/D в §22. Первый [CI 42453831682](https://github.com/Kiddos19882/AutoDraw/actions/runs/42453831682) дал 9/9 инструментальных REJECTED из-за отсутствовавших bbox; corrected в `6810f75`, отрицательные отчёты сохранены. Direct live native alpha и temporal order остаются открытыми.
+
 ## 2026-11-08 — ENGINE-001: live 9/9 evidence и актуализация E5-границы
 
 - После `7b129c2` исправлена ложная остановка `lab_bridge_gate`: readiness опирается на отдельный timestamp валидного heartbeat, а не на тип последнего игрового event. [CI 42448779447](https://github.com/Kiddos19882/AutoDraw/actions/runs/42448779447) SUCCESS.
