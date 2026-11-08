@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VERSION = "0.2.3";
+  const VERSION = "0.2.4"; // adds opt-in native Egret ENTER_FRAME evidence
   const METHOD_NAMES = ["onDrawStart", "onDrawing", "onDrawingEnd", "setRadius", "updateLess"];
   const MAX_EVENTS = 50000;
   const SCAN_INTERVAL_MS = 500;
