@@ -3,6 +3,17 @@
 **Назначение:** только фактически выполненные изменения и проверки, а не будущие планы.  
 **Полная история до 2026-11-08:** [WORK_LOG_HISTORY_THROUGH_2026-11-08.md](WORK_LOG_HISTORY_THROUGH_2026-11-08.md) — побайтовый исторический снимок прежней редакции.
 
+## 2026-11-08 — FILL-001 actual screen-ROI contour counterfactual
+
+- Повторно проверены remote HEAD `57815f6f5a26`, 20 последних коммитов и доступные Actions, текущие README/STATUS/TASKS/ROADMAP/AI guide, FILL-001 primary live report, PNG capture adapter, pinned plan, frozen masks и A–D модель. Работа продолжила FILL-001, не меняла Stage6/production.
+- Новый (ф) `source/preparation/chalk_fill_screen_residual_comparison.py`: [`ae86544`](https://github.com/Kiddos19882/AutoDraw/commit/ae865444014008adfdd8ecb42e2286ebcfd90598). Tests [`a7cc557`](https://github.com/Kiddos19882/AutoDraw/commit/a7cc557e3a112ce5c8ebec3972fed7d3e204bb51), CI workflow [`c2ae5a0`](https://github.com/Kiddos19882/AutoDraw/commit/c2ae5a0ffdabb506843e4d25f2cff28e5c444e20). No original capture edits.
+- Первичный [CI 42427122693](https://github.com/Kiddos19882/AutoDraw/actions/runs/42427122693) FAILED: 8 новых тестов отклоняли Windows CRLF checkout (attempt SHA-256 `2e144c2f…` вместо Git LF canonical `79a42cf…`; файл/исторический blob неизменён). Исправление [`1b39e8d`](https://github.com/Kiddos19882/AutoDraw/commit/1b39e8d8d97362ece19040fa3170ec0119cd663d) и newline regression [`16f0e1b`](https://github.com/Kiddos19882/AutoDraw/commit/16f0e1b6cce0959571adec1f03cc38aeb48277f6). PNG exact-byte hashes не ослаблены.
+- [CI 42427514794](https://github.com/Kiddos19882/AutoDraw/actions/runs/42427514794): SUCCESS; 952 preparation tests PASS; все mandatory jobs PASS, optional algorithm benchmarks и Windows portable build SKIPPED. [artifact 13596093007](https://github.com/Kiddos19882/AutoDraw/actions/runs/42427514794/artifacts/13596093007), ZIP SHA-256 `19313debbcc350f0eeda3edf2cba9e65350690a850d5bb2d9d733bb03794d620`, 6 PNG и JSON. Внешняя независимая сверка цветовых diagnostic overlays с JSON: all nominal recovered/leakage counts match.
+- [CI 42427514794](https://github.com/Kiddos19882/AutoDraw/actions/runs/42427514794) SUCCESS (`16f0e1b`), [artifact 13596093007](https://github.com/Kiddos19882/AutoDraw/actions/runs/42427514794/artifacts/13596093007). Actual ROI target 71110 screen px: 1116 uncovered, 11 leaked. Hypothetical contour inset6 recovers 734, leaves 382, would yield 99.462804% coverage with 0 NEW model leakage, but existing 11 leakage remain, so this is not a game PASS. Inset5 recovers1092 but +60 new leakage; inset7/8 recover335/157; ±1 screen-pixel dilation at inset6 adds89 new modeled leaks. Baseline B prediction of 416 misses diverges from actual1116 (model-only738), причина физического renderer mismatch UNKNOWN.
+- Старый capture по-прежнему REJECTED: exact CHALK=1260 только предыдущего run; new exact CHALK=NOT_RUN; новой live игры и 81-image comparison не было. Executor defaults, frozen models, raw PNG, history и master не тронуты; локальный ПК статус неизвестен.
+
+---
+
 ## 2026-11-08 — FILL-001 / GEOM-001 offline screening A–D
 
 - Проверены remote HEAD `1e0774596c3d`, последние 20 коммитов, docs/README, STATUS, TASKS, ROADMAP, регламенты, FILL/CHALK evidence и исходники существующих FILL-001, interior/outline planners.

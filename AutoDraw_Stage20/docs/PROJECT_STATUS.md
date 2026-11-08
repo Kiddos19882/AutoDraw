@@ -1,8 +1,8 @@
 # AutoDraw — текущее состояние
 
-**Дата сверки:** 2026-11-08. **Ветка:** `feature/image-geometry-optimization`. **Исходный HEAD проверки:** `a2d1f0a52d47`. **Последний проверенный code/test SHA:** `98615e7f23aa`; **workflow SHA:** `6d790cd72326`.
+**Дата сверки:** 2026-11-08. **Ветка:** `feature/image-geometry-optimization`. **Исходный HEAD проверки:** `a2d1f0a52d47`. **Последний проверенный code/test + workflow SHA:** `16f0e1b6cce0` (FILL-001 screen ROI diagnostics).
 
-**Основной [CI 42417067391](https://github.com/Kiddos19882/AutoDraw/actions/runs/42417067391) — SUCCESS**, [81-image screening 42417067363](https://github.com/Kiddos19882/AutoDraw/actions/runs/42417067363) — SUCCESS, оба на `5a55e9f`. Проверка GitHub не равна локальному `git status`, Windows runtime или реальному игровому запуску.
+**Актуальный основной [CI 42427514794](https://github.com/Kiddos19882/AutoDraw/actions/runs/42427514794) — SUCCESS** на `16f0e1b`; 952 preparation tests PASS, INT-006 PNG audit и остальные обязательные jobs PASS, optional benchmarks/Windows portable build SKIPPED. Более ранние [full CI 42417067391](https://github.com/Kiddos19882/AutoDraw/actions/runs/42417067391) и [81-image screening 42417067363](https://github.com/Kiddos19882/AutoDraw/actions/runs/42417067363) были SUCCESS на `5a55e9f`. Проверка GitHub не равна локальному `git status`, Windows runtime или реальному игровому запуску.
 
 > Полная прежняя редакция, включая все исторические факты, промежуточные статусы и ссылки: [PROJECT_STATUS_HISTORY_THROUGH_2026-11-08.md](PROJECT_STATUS_HISTORY_THROUGH_2026-11-08.md). Снимок сохранён без изменения исходных байтов.
 
@@ -18,6 +18,7 @@
 | PRR renderer | [6/6 PASS_PER_RUN, aggregate PASS](https://github.com/Kiddos19882/AutoDraw/actions/runs/42321009715) | Не универсальная pixel-equivalence каждого будущего рисунка |
 | FILL-001-RS | [Exact CHALK 1260 на 27 штрихах](CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md), runtime binding PASS | **PNG FAIL**: coverage=98.430600% при ≥99%, leakage=11px при 0 |
 | FILL-001 A–D offline | [CI 42424959123](https://github.com/Kiddos19882/AutoDraw/actions/runs/42424959123) SUCCESS, 3 frozen masks × 4 strategies; [artifact 13595421597](https://github.com/Kiddos19882/AutoDraw/actions/runs/42424959123/artifacts/13595421597) | Только OpenCV: actual PNG 98.430600%/11px остаётся FAIL; 81-image strategy comparison не выполнен |
+| FILL-001 actual ROI counterfactual | [CI 42427514794](https://github.com/Kiddos19882/AutoDraw/actions/runs/42427514794) SUCCESS: 1116 actual screen misses / 11 actual leaks, 6 PNG, JSON; [artifact 13596093007](https://github.com/Kiddos19882/AutoDraw/actions/runs/42427514794/artifacts/13596093007) | Inset6 recovers 734 in modeled union, 382 remain, inherited 11 leaks. Baseline model underpredicts missing by 700px; game contour NOT validated |
 | Корпус 81 изображения | 31+50 unique SHA, 81 моно+цветных планов; [screening E3](TEST_RESULTS.md) | Similarity review не доказывает semantic independence; scanline ≠ frozen D1–D5 domain |
 | INT-007 | Требования к estimator документированы | **BLOCKED:** safety margin/domain/quality gates не закрыты |
 
@@ -36,7 +37,15 @@
 
 Новый FILL-001 A–D offline [CI 42424959123](https://github.com/Kiddos19882/AutoDraw/actions/runs/42424959123): SUCCESS на workflow SHA `6d790cd`. 3 frozen mask × 4 strategy, 15 диагностических PNG + JSON ([artifact 13595421597](https://github.com/Kiddos19882/AutoDraw/actions/runs/42424959123/artifacts/13595421597)). Для варианта C coverage rectangle=99.516%, wide=99.593%, narrow=99.381%, leakage=0 в OpenCV. Эффект не подтверждён на реальном PNG. Вариант D использует oracle residual и создаёт слишком много дополнительных штрихов.
 
-Исходные masks, план FILL-001 и live capture не менялись. Stage6, CHALK estimator и production defaults не затронуты. 12/12 raster PNG согласованы с JSON при независимом пересчёте. FILL-001 live capture по-прежнему REJECTED: CHALK=1260 exact, coverage=98.430600%, leakage=11. Следующий шаг — сопоставление кандидатной контурной геометрии с actual screen-ROI residual map, затем перенос сравнения на фиксированную подвыборку 81 реального изображения.
+Исходные masks, план FILL-001 и live capture не менялись. Stage6, CHALK estimator и production defaults не затронуты. 12/12 raster PNG согласованы с JSON при независимом пересчёте. FILL-001 live capture по-прежнему REJECTED: CHALK=1260 exact, coverage=98.430600%, leakage=11. Сравнение actual ROI с контуром уже выполнено (см. ниже); следующая задача — калибровка реальной геометрии границ и исправление источника утечки, затем фиксированная подвыборка 81 изображения.
+
+## FILL-001 screen-ROI counterfactual — проверено 2026-11-08
+
+[CI 42427514794](https://github.com/Kiddos19882/AutoDraw/actions/runs/42427514794) SUCCESS (`16f0e1b`), [artifact 13596093007](https://github.com/Kiddos19882/AutoDraw/actions/runs/42427514794/artifacts/13596093007). Actual ROI target 71110 screen px: 1116 uncovered, 11 leaked. Hypothetical contour inset6 recovers 734, leaves 382, would yield 99.462804% coverage with 0 NEW model leakage, but existing 11 leakage remain, so this is not a game PASS. Отступ 5 (1092 recovered) создаёт 60 новых modeled leaks; offset 7/8 восстанавливают 335/157 pixels и дают coverage <99%. При сдвиге modeled mask на 1 screen px offset6 может породить 89 новых leaks (dilation). В исходном baseline модель считает незакрашенными 416 screen pixels против 1116 actual; 738 pixels модель считала окрашенными, а actual change-mask — нет. Причина renderer/rounding/coordinate discrepancy не установлена.
+
+Проверены SHA frozen PNG и LF-canonical JSON; архив ZIP SHA-256 `19313debbcc350f0eeda3edf2cba9e65350690a850d5bb2d9d733bb03794d620`, 6 diagnostic PNG+JSON cross-checked. [CI 42427122693](https://github.com/Kiddos19882/AutoDraw/actions/runs/42427122693) сначала FAILED (Windows CRLF JSON vs LF hash); нормализация только JSON исправлена и покрыта тестом, [CI 42427514794](https://github.com/Kiddos19882/AutoDraw/actions/runs/42427514794) SUCCESS. Исходный live PNG не перестал быть FAIL; exact CHALK для дополнительного контура отсутствует.
+
+**Следующий gate:** E1/E2 уточнить фактическое смещение/footprint экранных концов 27 scanlines и 11 leakage pixels, особенно left/right border; разработать и проверить отдельную boundary-aware candidate geometry до любого нового live preflight или расширения на 81 изображение.
 
 ## Ближайший приоритет
 
