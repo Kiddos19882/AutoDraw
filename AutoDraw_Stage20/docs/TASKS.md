@@ -73,7 +73,7 @@
 
 - [x] Добавлен отдельный `fill001_screen_mask_v2.py` (E1): frozen logical mask 460×240 и исходный RGB threshold=8 не меняются; V2 требует явные проверенные desktop-screen corners BoardPane, run ID и evidence SHA, иначе fail-closed. Сравнение V1 возвращается в том же отчёте и никогда не переопределяет исторический acceptance.
 - [x] Добавлены regression tests `test_fill001_screen_mask_v2.py` для identity, сдвига, отказа на неверной геометрии/ROI и сохранения V1. Отдельный CLI принимает `--before`, `--after`, `--run-id`, `--binding`, `--output`, не перезаписывает evidence; JSON `binding` требует `screen_roi:{x,y,width,height}` и `geometry:{run_id,same_run:true,coordinate_system:"desktop_screen_css_pixels",validation_status:"valid",independent_screen_mapping:true,board_screen_corners:{left,top,right,bottom},evidence_sha256}`. Флаги подтверждения — только контракт входа, их подлинность и desktop mapping необходимо независимо подтвердить до E5. 
-- [ ] E2/E3: получить результат тестов/CI именно для SHA с новым кодом; до этого статус проверки NOT_RUN/UNKNOWN.
+- [x] E2/E3 исходной Screen Mask V2: focused CI 42504588736 SUCCESS на 480cb3e, 14 tests + 6 subtests; исторические V2 replay V1/old PNG FAIL не заменяют новый live.
 - [ ] E5: привязать к двум FILL001_SMOOTH_AB_V1 run независимо верифицированные экранные BoardPane corners и fingerprint, затем перепроецировать оба сохранённых PNG; raw логические и client coordinates без подтверждённого desktop mapping не принимаются. Внести сравнение V1/V2 и native Egret footprint в отдельный evidence отчёт без изменения quality thresholds.
 
 **Область:** только исследовательская диагностика; production executor/planner, frozen mask, предыдущие PNG и оригинальные результаты остаются неизменными. Новые live-рисования не нужны для первого V2 replay.
@@ -89,7 +89,7 @@
 
 - [x] **E1 implementation:** `FILL001_SMOOTH_AB_V2` с двумя независимыми ON/OFF task IDs, frozen logical rectangle mask и 27-stroke RS plan, отдельным `FILL001_SCREEN_MASK_V2` для post-run анализа. В UI — кнопка «Новый Smooth A/B V2 (2 задачи)»; standard Stage6 и Bridge не изменены.
 - [x] Новый manifest валидируется через существующий fail-closed matrix loader. Из каждого нового run сохраняются V1 PNG контроль и V2 PNG diagnostic, полученный из *его собственного* raw Monitor 0.2.4 с SHA-bound client→screen mapping; ошибочный binding не принимается. В V2 pair comparison запрещены старые протоколы, устаревшие task/PNG, несовпадающие raw run SHA и geometry.
-- [ ] E2/E3: подтвердить полные Windows preparation/UI/regression tests и mandatory CI на **одном** SHA после последней модификации; ранее подтверждённые CI на другом SHA не заменяют этот gate.
+- [x] **E2/E3 PASS:** [Full validation 42505872844](https://github.com/Kiddos19882/AutoDraw/actions/runs/42505872844) SUCCESS на code SHA `d557db23ac5911911acc722c58aa140658040cd7`; все обязательные jobs, включая Preparation/G3 и INT-006, SUCCESS. Optional benchmarks/Windows portable build SKIPPED. Новый live E4 по-прежнему NOT_RUN.
 - [ ] **E4 operator live:** выполнить на Windows два **совершенно новых** single-task прогона, новый manifest/session, чистую доску перед каждым, вручную ON затем OFF. До получения actual raw run + PNG результаты новой серии **NOT_RUN**; никаких ожидаемых чисел coverage/leakage/CHALK не объявлять.
 - [ ] E5: независимая сверка native Egret footprint против каждого из новых PNG после сохранения первичных evidence; запрет post-hoc подгонки маски и изменения quality gates.
 
