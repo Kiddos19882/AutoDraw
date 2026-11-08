@@ -92,3 +92,9 @@ Software tests/CI для нового кода: NOT_RUN на момент под
 Первым делом завершить E5 на уже сохранённых ENGINE-001 run-bound PNG + native Egret replay при независимой same-run калибровке; далее поддерживать [действующие задачи](TASKS.md) и [очерёдность](ROADMAP.md). FILL-001 perimeter mismatch и оптимизацию не возобновлять без отдельного gate. 95% protocol — отдельная цель, не препятствие для начала офлайн-сравнения.
 
 **Источники:** [TEST_RESULTS](TEST_RESULTS.md) · [DECISIONS](DECISIONS.md) · [первичная история](PROJECT_STATUS_HISTORY_THROUGH_2026-11-08.md).
+
+## FILL-001 Screen Mask V2 — диагностический replay (2026-11-08)
+
+**Текущий code/CI SHA:** `647aeb7a74ec979f46a0828aa3418e57635533c1` (CI [42503756622](https://github.com/Kiddos19882/AutoDraw/actions/runs/42503756622); статус сверять по окончании). Исходные FILL001_SMOOTH_AB_V1 E4 ON/OFF из `16640ea` остаются неизменными: V1 leakage 840/849, PNG quality FAIL/FAIL, same ROI 674×355. На том же session `15e3de92` в `session.json` есть BoardPane client corners (497.9604,104.86)–(1170.1065,456.06), но window screenX=-32000 и session timestamp не доказывают desktop mapping текущих run.
+
+Добавлен отдельный read-only Screen Mask V2: `fill001_screen_mask_v2.py`, `fill001_screen_mask_v2_binding.py`, `fill001_screen_mask_v2_batch.py` и regression tests. Binding создаётся из **самого raw Monitor run** и его SHA-linked E4 audit: неизменная same-run native geometry, DOM `MOUSE_MOVE_SAMPLE` client/screen, постоянный offset (иначе fail-closed). Прежняя NumPy frozen target mask, RGB threshold 8, V1 capture adapter, production executor и quality thresholds не менялись. В CI добавлен isolated replay ON/OFF с upload **только численных JSON**, без full-screen приватных PNG. До появления отчёта V2 leakage/coverage — NOT_RUN/UNKNOWN, E5 native Egret↔live для этих runs — NOT_RUN. Результат V2 не переопределяет V1 acceptance.
