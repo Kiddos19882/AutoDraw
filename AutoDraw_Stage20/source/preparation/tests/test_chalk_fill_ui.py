@@ -309,3 +309,41 @@ def test_diagnostic_screen_capture_persists_full_and_roi_from_same_frame(tmp_pat
     assert tab.diagnostic_capture_timestamps["after"]
     with pytest.raises(FileExistsError, match="перезапись"):
         tab._capture_board_png(task, phase="after")
+
+
+def test_diagnostic_create_series_uses_frozen_rs_27_stroke_manifest(tmp_path):
+    from types import SimpleNamespace
+    from chalk_fill_matrix import load_fill001_matrix
+
+    class _String:
+        def __init__(self, value):
+            self.value = value
+        def get(self):
+            return self.value
+        def set(self, value):
+            self.value = value
+
+    tab = chalk_fill_ui.Fill001Tab.__new__(chalk_fill_ui.Fill001Tab)
+    tab.root = None
+    tab.output_dir = tmp_path
+    tab.series_var = _String("fill001-diagnostic-single-run")
+    tab.diagnostic_var = _String(True)
+    tab.status_var = _Var()
+    tab.manifest_label = SimpleNamespace(configure=lambda **_kwargs: None)
+    tab._refresh_tasks = lambda: None
+    tab.create_series()
+    assert tab.manifest_path.is_file()
+    matrix = load_fill001_matrix(tab.manifest_path)
+    assert matrix["plan_variant"] == "FILL001_RS_V1"
+    assert matrix["execution_allowed"] is False
+    assert len(matrix["tasks"]) == 45
+    selected = [t for t in matrix["tasks"] if
+                t["shape_id"] == "rectangle" and
+                t["requested_radius"] == 10 and
+                t["repeat_index"] == 1]
+    assert len(selected) == 1
+    task = selected[0]
+    assert task["expected_strokes"] == 27
+    assert task["scanline_row_step"] == 5
+    assert task["scanline_offset"] == 0
+    assert task["plan_signature"] == "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"

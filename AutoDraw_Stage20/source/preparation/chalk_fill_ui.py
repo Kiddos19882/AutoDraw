@@ -309,6 +309,13 @@ class Fill001Tab:
                 parent=self.root,
             )
             return
+        diagnostic_warning = (
+            "\n\nВКЛЮЧЕНА ДИАГНОСТИКА: программа сохранит PNG ВСЕГО ЭКРАНА до и после "
+            "рисования, включая другие окна и возможные личные данные. "
+            "Не публикуйте эти PNG в открытом репозитории без проверки. "
+            "Выполнится только выбранная задача, расход CHALK реален."
+            if getattr(self, "diagnostic_active", False) else ""
+        )
         if not messagebox.askyesno(
             "Разрешить один экспериментальный запуск?",
             (
@@ -316,6 +323,7 @@ class Fill001Tab:
                 "Проверьте, что это отдельная тестовая доска, она очищена, запас краски достаточен, "
                 "Game Monitor Bridge подключён, а calibrated ROI точно охватывает игровую доску. "
                 "Пакетное выполнение остальных 44 задач останется запрещено. Продолжить?"
+                + diagnostic_warning
             ),
             icon="warning",
             parent=self.root,
@@ -663,10 +671,15 @@ class Fill001Tab:
                     f"{self.active_task['task_id']}-{FILL001_DIAGNOSTIC_PROTOCOL}.json"
                 )
                 if audit_file.exists():
-                    raise FileExistsError("Диагностический raw audit уже сохранён; перезапись запрещена.")
-                audit_file.write_text(
-                    json.dumps(audit, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
-                )
+                    previous = json.loads(audit_file.read_text(encoding="utf-8"))
+                    if previous != audit:
+                        raise FileExistsError(
+                            "Диагностический raw audit уже существует с другим содержимым; перезапись запрещена."
+                        )
+                else:
+                    audit_file.write_text(
+                        json.dumps(audit, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+                    )
                 diagnostic["audit_report"] = str(audit_file)
                 diagnostic["raw_e4_status"] = audit["status"]
                 record["diagnostic"] = diagnostic
