@@ -165,6 +165,49 @@ try {
     }
     Write-Host "ENGINE-001 accepted-only replay: 27 strokes, 1260 historical points, Canvas2D diff=$($temporalManifest.canvas2dPixelComparison.differingPixels), WebGL diff=$($temporalManifest.webglPixelComparison.differingPixels)."
 
+
+    # ENGINE-001 native Painter endpoint variants: frozen run and plan, no
+    # substitution of Stage/CSS transform or synthetic accepted points.
+    $endpointPlan = "AutoDraw_Stage20/data/results/brush_behavior_tests/fill001/plans/fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1.json"
+    $endpointPlanBlob = (git rev-parse "HEAD:$endpointPlan").Trim()
+    if ($LASTEXITCODE -ne 0 -or $endpointPlanBlob -ne "ab54d5a322a642ba6a89a6c77111e4cfadf93232") {
+        throw "ENGINE-001 pinned plan blob mismatch: $endpointPlanBlob"
+    }
+    $endpointDom = Join-Path $env:RUNNER_TEMP "egret-endpoint-dom.html"
+    $endpointStderr = Join-Path $env:RUNNER_TEMP "egret-endpoint-edge-stderr.log"
+    $endpointArgs = @($browserArgs)
+    $endpointArgs[-1] = "http://127.0.0.1:8765/AutoDraw_Stage20/tests/game_renderer_reference.html?endpoint=fill001"
+    $endpointProcess = Start-Process -FilePath $edgePath -ArgumentList $endpointArgs -RedirectStandardOutput $endpointDom -RedirectStandardError $endpointStderr -PassThru -Wait
+    if ($endpointProcess.ExitCode -ne 0) { throw "ENGINE-001 endpoint browser exited with $($endpointProcess.ExitCode)." }
+    $endpointPage = Get-Content -Raw $endpointDom
+    if ($endpointPage -notmatch 'data-endpoint-status="complete"' -or $endpointPage -notmatch 'data-endpoint-png-count="15"') {
+        Copy-Item $endpointDom (Join-Path $outputDir "endpoint-page-failure.html") -Force
+        Copy-Item $endpointStderr (Join-Path $outputDir "endpoint-edge-stderr.log") -Force
+        throw "ENGINE-001 native Painter endpoint browser did not complete."
+    }
+    $endpointJsonMatch = [regex]::Match($endpointPage, '<pre id="renderer-manifest-json"[^>]*>(.*?)</pre>', [System.Text.RegularExpressions.RegexOptions]::Singleline)
+    if (-not $endpointJsonMatch.Success) { throw "ENGINE-001 endpoint manifest was not exported." }
+    $endpointJson = [System.Net.WebUtility]::HtmlDecode($endpointJsonMatch.Groups[1].Value)
+    $endpointManifest = $endpointJson | ConvertFrom-Json
+    if ($endpointManifest.status -ne "COMPLETE_OFFLINE_NATIVE_ENGINE_MEASUREMENT" -or
+        $endpointManifest.runId -ne "6a17a297-ea14-4527-9527-bfd8de3bd335" -or
+        $endpointManifest.screenProjection -ne "UNCALIBRATED" -or
+        $endpointManifest.acceptedCount -ne 1260 -or
+        $endpointManifest.strokeCount -ne 27 -or
+        $endpointManifest.aggregate.'smooth-drawlast'.nativePainterPatchedCalls -ne 27 -or
+        $endpointManifest.individual.Count -ne 3) {
+        throw "ENGINE-001 endpoint manifest fails native renderer provenance."
+    }
+    Set-Content -Path (Join-Path $outputDir "engine001-native-endpoint-v1.json") -Value $endpointJson -Encoding utf8
+    $endpointLinks = [regex]::Matches($endpointPage, $pngPattern)
+    if ($endpointLinks.Count -ne 15) { throw "ENGINE-001 requires 15 renderer endpoint PNGs, found $($endpointLinks.Count)." }
+    foreach ($link in $endpointLinks) {
+        $pngName = [System.IO.Path]::GetFileName($link.Groups[2].Value)
+        if (-not $pngName.StartsWith("engine001-endpoint-")) { throw "Unexpected endpoint PNG: $pngName" }
+        [System.IO.File]::WriteAllBytes((Join-Path $outputDir $pngName), [Convert]::FromBase64String($link.Groups[1].Value))
+    }
+    Write-Host "ENGINE-001 native endpoint raster: 27 strokes, 3 variants, 3 isolated rows, 15 PNGs; screen UNCALIBRATED."
+
     python AutoDraw_Stage20/tests/run_egret_stage_reference_firefox.py --base-url "http://127.0.0.1:8765" --output-dir $outputDir --workspace $env:GITHUB_WORKSPACE --paired-renderer-experiment-root "AutoDraw_Stage20/data/results/brush_behavior_tests"
     if ($LASTEXITCODE -ne 0) { throw "Firefox Stage-level A-D browser probe failed." }
 
