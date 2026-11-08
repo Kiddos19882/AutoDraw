@@ -85,3 +85,23 @@ def test_legacy_roi_board_roundtrip_reproduces_egret_stage_rounding():
     assert report["first"]["predicted_first"]["y"] == 53
     assert report["first"]["predicted_first"]["x"] == pytest.approx(93.20833396911621)
     assert report["maximum_error_on_observed_first_last_and_y"] == pytest.approx(0)
+
+
+def test_board_anchored_counterfactual_recovers_planned_y_without_touching_mask():
+    from fill001_v2_footprint_spatial import corrected_board_counterfactual
+    plan = {"strokes": [{"points": [{"x": 94, "y": 55}, {"x": 366, "y": 55}]}]}
+    run = {"renderer_geometry_at_start": {"players": [
+        {"boardStageCorners": {"topLeft": {"x": 340.7916660308838, "y": 72}}}
+    ]}}
+    binding = {
+        "screen_roi": {"x": 496, "y": 265, "width": 674, "height": 355},
+        "geometry": {"board_screen_corners": {
+            "left": 497.9604252506065, "right": 1170.1065439720678,
+            "top": 267.86, "bottom": 619.06,
+        }},
+    }
+    corrected = corrected_board_counterfactual(plan, run, binding)
+    assert corrected["status"] == "UNEXECUTED_COUNTERFACTUAL"
+    assert corrected["first"]["start"]["y"] == 55
+    assert corrected["first"]["end"]["y"] == 55
+    assert corrected["max_y_deviation_from_planned"] == 0
