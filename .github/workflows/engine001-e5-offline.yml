@@ -1,0 +1,79 @@
+name: AutoDraw ENGINE-001 offline E5 native screen comparison
+
+on:
+  push:
+    branches:
+      - feature/image-geometry-optimization
+    paths:
+      - "AutoDraw_Stage20/tests/game_renderer_reference.js"
+      - "AutoDraw_Stage20/tests/game_renderer_reference.test.js"
+      - "AutoDraw_Stage20/tests/run_egret_stage_reference_firefox.py"
+      - "AutoDraw_Stage20/tests/validate_engine001_e5_native.py"
+      - "AutoDraw_Stage20/tests/compare_stage_renderer_reference.py"
+      - "AutoDraw_Stage20/source/preparation/renderer_acceptance.py"
+      - "AutoDraw_Stage20/source/preparation/renderer_geometry.py"
+      - ".github/workflows/engine001-e5-offline.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: autodraw-engine001-e5-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-screen-e5:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - name: Check out working branch
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install E5 analysis dependencies
+        run: python -m pip install "selenium>=4.27" numpy pillow opencv-python pytest
+      - name: Check accepted-point replay syntax and regression tests
+        run: |
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+      - name: Test renderer capture validation contracts
+        shell: pwsh
+        run: |
+          $env:PYTHONPATH = "$env:GITHUB_WORKSPACE\AutoDraw_Stage20\source\preparation"
+          python -m pytest -q AutoDraw_Stage20/source/preparation/tests/test_renderer_acceptance.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Generate nine immutable native Stage A-D references and compare live PNG
+        shell: pwsh
+        run: |
+          $journal = "AutoDraw_Stage20/data/results/brush_behavior_tests/chalk_test_blocks/chalk-block-ENGINE001-chalk-20261108-080330-af2835-9fdb9bd9.json"
+          $native = Join-Path $env:RUNNER_TEMP "engine001-e5-native"
+          $reports = Join-Path $env:RUNNER_TEMP "engine001-e5-results"
+          $server = Start-Process -FilePath python -ArgumentList @("-m", "http.server", "8765", "--bind", "127.0.0.1") -PassThru -WindowStyle Hidden
+          try {
+            Start-Sleep -Seconds 3
+            python AutoDraw_Stage20/tests/run_egret_stage_reference_firefox.py --base-url "http://127.0.0.1:8765" --workspace "$env:GITHUB_WORKSPACE" --engine001-journal $journal --engine001-only --output-dir $native
+            if ($LASTEXITCODE -ne 0) { throw "ENGINE-001 native Stage rendering failed." }
+            python AutoDraw_Stage20/tests/validate_engine001_e5_native.py --workspace "$env:GITHUB_WORKSPACE" --journal $journal --reference-root $native --output-root $reports
+            if ($LASTEXITCODE -ne 0) { throw "ENGINE-001 E5 comparison incomplete; inspect reports." }
+          } finally {
+            if ($server -and -not $server.HasExited) { Stop-Process -Id $server.Id -Force }
+          }
+      - name: Upload native Stage renders
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autodraw-engine001-e5-native-stage
+          path: ${{ runner.temp }}/engine001-e5-native/
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Upload independent E5 comparison evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autodraw-engine001-e5-screen-results
+          path: ${{ runner.temp }}/engine001-e5-results/
+          if-no-files-found: warn
+          retention-days: 30
