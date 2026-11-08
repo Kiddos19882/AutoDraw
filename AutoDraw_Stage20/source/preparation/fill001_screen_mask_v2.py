@@ -167,3 +167,36 @@ def audit_screen_mask_v2(
         "v2_diagnostic_gate": "PASS" if covered / target >= .99 and leak == 0 else "FAIL",
         "acceptance_override": False,
     }
+
+
+def main() -> int:
+    """Optional standalone diagnostic on existing PNG, never a gameplay runner."""
+    import argparse
+    import json
+
+    parser = argparse.ArgumentParser(description="FILL-001 Screen Mask V2 diagnostic")
+    parser.add_argument("--shape", default="rectangle")
+    parser.add_argument("--before", required=True, type=Path)
+    parser.add_argument("--after", required=True, type=Path)
+    parser.add_argument("--run-id", required=True)
+    parser.add_argument("--binding", required=True, type=Path,
+                        help="JSON with screen_roi and independently validated geometry")
+    parser.add_argument("--output", required=True, type=Path)
+    args = parser.parse_args()
+    binding = json.loads(args.binding.read_text(encoding="utf-8"))
+    if not isinstance(binding, dict):
+        raise FillMatrixError("Screen Mask V2 binding must be a JSON object.")
+    result = audit_screen_mask_v2(
+        args.shape, args.before, args.after, run_id=args.run_id,
+        screen_roi=binding.get("screen_roi"), geometry=binding.get("geometry"),
+    )
+    if args.output.exists():
+        raise FillMatrixError("Screen Mask V2 refuses to overwrite existing evidence.")
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\\n",
+                           encoding="utf-8")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
