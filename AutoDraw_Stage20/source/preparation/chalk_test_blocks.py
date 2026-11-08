@@ -589,6 +589,43 @@ def _validate_chalk_test_block_journal(document: Any, path: Path) -> dict[str, A
             or "prediction_artifact" in document
         ):
             raise ValueError(f"Журнал INT006R должен содержать 45 уникальных ячеек и три радиуса: {path}")
+    elif phase_id == "ENGINE001":
+        # Frozen one-button laboratory matrix. Do not let a damaged journal
+        # silently remove a direction, repeat or change executor parameters.
+        expected_cells = {
+            (scenario, repeat_index)
+            for scenario in PHASE_SCENARIOS["ENGINE001"]
+            for repeat_index in (1, 2, 3)
+        }
+        seen, indices = set(), set()
+        for task in tasks:
+            scenario = task.get("scenario_id")
+            repeat_index = task.get("repeat_index")
+            order_index = task.get("matrix_order_index")
+            cell = (scenario, repeat_index)
+            if (
+                cell not in expected_cells or cell in seen
+                or type(order_index) is not int or not 1 <= order_index <= 9
+                or order_index in indices
+                or task.get("task_id") != f"{scenario}-r{repeat_index}"
+                or task.get("expected_strokes") != 1
+                or task.get("requested_radius") != 10
+                or task.get("executor_parameters") != GEOMETRY_EXECUTOR_CONFIG
+                or "prediction_id" in task
+            ):
+                raise ValueError(f"Invalid ENGINE-001 laboratory task/cell: {path}")
+            seen.add(cell)
+            indices.add(order_index)
+        if (
+            len(tasks) != 9 or seen != expected_cells
+            or indices != set(range(1, 10))
+            or document.get("repeat_count") != 3
+            or document.get("requested_radius") != 10
+            or document.get("executor_parameters") != GEOMETRY_EXECUTOR_CONFIG
+            or document.get("executor_parameter_matrix") != [dict(GEOMETRY_EXECUTOR_CONFIG)]
+            or "prediction_artifact" in document
+        ):
+            raise ValueError(f"ENGINE-001 lab requires exactly 9 immutable cells: {path}")
     elif phase_id in {"V1", "V2", "V3", "V4", "V5"}:
         scenario_id = PHASE_SCENARIOS[phase_id][0]
         compatible_scenarios = {scenario_id, *(
