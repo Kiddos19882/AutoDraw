@@ -19,6 +19,8 @@ from engine001_lab import inspect_ready_bridge
 PROTOCOL = "FILL001_MONITOR_SAME_RUN_V1"
 BASELINE_PLAN_SIGNATURE = "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
 BASELINE_MASK_SHA256 = "ac1c6660e5986cdf534328c6dbcd5020f631168b1473c24b29e7609eb827998b"
+# Preflight budget only, not a model of exact CHALK for a future run.
+MIN_REMAINING_POINTS_FOR_SAFE_PILOT = 1600
 
 
 def _hash(path: Path) -> str:
@@ -88,11 +90,20 @@ def inspect_diagnostic_preflight(bridge_root: Path, task: dict[str, Any]) -> dic
             or not _valid_board_geometry(geometry)
             or session.get("monitor_status_at_connect", {}).get("version") != "0.2.4"):
         raise ValueError("FILL-001 diagnostic needs exactly one native WebGL BoardPane with verified client corners and Monitor 0.2.4.")
+    diagnostics = session.get("bridge_diagnostics") or {}
+    status = diagnostics.get("last_monitor_status") or {}
+    snapshot = status.get("snapshot") or {}
+    if (snapshot.get("isExact") is not True
+            or type(snapshot.get("remainingPoints")) is not int
+            or snapshot["remainingPoints"] < MIN_REMAINING_POINTS_FOR_SAFE_PILOT):
+        raise ValueError("FILL-001 diagnostic needs an exact fresh CHALK snapshot with at least 1600 points remaining.")
     return {
         "protocol": PROTOCOL, "session_id": ready["session_id"],
         "session_file": str(session_file), "monitor_version": "0.2.4",
         "renderer_geometry_sha256": _geometry_fingerprint(geometry),
         "bridge_heartbeat_at_utc": ready["heartbeat_at_utc"],
+        "minimum_remaining_points_required": MIN_REMAINING_POINTS_FOR_SAFE_PILOT,
+        "observed_remaining_points": snapshot["remainingPoints"],
         "board_client_mapping_method": geometry["players"][0]["boardClientMappingMethod"],
         "screen_projection_status": "REQUIRES_INDEPENDENT_POST_RUN_FIT",
     }
@@ -221,6 +232,9 @@ def audit_diagnostic_capture(
     after = _valid_rgb_pair(Path(after_full), Path(after_roi), screen_roi)
     if before["full_screen_size"] != after["full_screen_size"]:
         reasons.append("screen_dimensions_changed")
+    with Image.open(before_roi) as ib, Image.open(after_roi) as ia:
+        if ImageChops.difference(ib.convert("RGB"), ia.convert("RGB")).getbbox() is None:
+            reasons.append("no_visible_screen_change")
     return {
         "schema_version": 1, "protocol": PROTOCOL,
         "status": "PASS_E4_RAW_CAPTURE" if not reasons else "PARTIAL",
