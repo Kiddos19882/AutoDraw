@@ -47,6 +47,44 @@ def _geometry_fingerprint(geometry: Any) -> str:
     ).hexdigest()
 
 
+def _boardpane_mapping_fingerprint(geometry: Any) -> str:
+    """V3 only: hash input-relevant BoardPane projection, not animated Preloader.
+
+    Preserve the full renderer SHA separately for raw evidence. Any change in
+    screen/window placement, canvas CSS scale, Egret BoardPane client/stage
+    corners, renderer mode or logical dimensions changes this fingerprint.
+    """
+    if not isinstance(geometry, dict):
+        raise ValueError("BoardPane geometry is absent.")
+    players = geometry.get("players")
+    if not isinstance(players, list) or len(players) != 1 or not isinstance(players[0], dict):
+        raise ValueError("Expected exactly one BoardPane for projection fingerprint.")
+    player = players[0]
+    if not isinstance(player.get("boardClientCorners"), dict) or not isinstance(
+        player.get("boardStageCorners"), dict
+    ):
+        raise ValueError("BoardPane client/stage corners are absent.")
+    def pick(obj: Any, names: tuple[str, ...]) -> dict[str, Any]:
+        return {k: obj.get(k) for k in names} if isinstance(obj, dict) else {}
+    projection = {
+        **pick(geometry, ("engineVersion", "renderMode", "boardLogicalSize",
+                          "canvasScaleFactor", "canvasScaleX", "canvasScaleY",
+                          "devicePixelRatio", "visualViewportScale")),
+        "windowGeometry": pick(geometry.get("windowGeometry"),
+                               ("screenX", "screenY", "outerWidth", "outerHeight",
+                                "innerWidth", "innerHeight", "screenWidth", "screenHeight")),
+        "boardClientMappingMethod": player.get("boardClientMappingMethod"),
+        "boardClientCorners": player["boardClientCorners"],
+        "boardStageCorners": player["boardStageCorners"],
+        "stage": pick(player.get("stage"),
+                      ("width", "height", "scaleMode", "orientation")),
+        "canvas": pick(player.get("canvas"),
+                       ("width", "height", "clientWidth", "clientHeight",
+                        "offsetLeft", "offsetTop", "rect", "style")),
+    }
+    return _geometry_fingerprint(projection)
+
+
 def _valid_board_geometry(geometry: Any) -> bool:
     if not isinstance(geometry, dict) or geometry.get("boardLogicalSize") != {
         "width": 460, "height": 240
@@ -117,6 +155,7 @@ def inspect_diagnostic_preflight(bridge_root: Path, task: dict[str, Any]) -> dic
         **({"expected_smooth": expected_smooth} if protocol in (AB_PROTOCOL, AB_V2_PROTOCOL, AB_V3_PROTOCOL) else {}),
         "session_file": str(session_file), "monitor_version": "0.2.4",
         "renderer_geometry_sha256": _geometry_fingerprint(geometry),
+        "boardpane_mapping_sha256": _boardpane_mapping_fingerprint(geometry),
         "bridge_heartbeat_at_utc": ready["heartbeat_at_utc"],
         "minimum_remaining_points_required": MIN_REMAINING_POINTS_FOR_SAFE_PILOT,
         "observed_remaining_points": snapshot["remainingPoints"],
@@ -257,7 +296,25 @@ def audit_diagnostic_capture(
             reasons.append("nonzero_" + name)
     g0 = run.get("renderer_geometry_at_start")
     g1 = run.get("renderer_geometry_at_end")
-    if (not _valid_board_geometry(g0) or g0 != g1
+    if protocol == AB_V3_PROTOCOL:
+        # Animation-only Preloader widths may change while the BoardPane,
+        # viewport and client→screen projection remain EXACTLY fixed.
+        try:
+            expected_board = readiness.get("boardpane_mapping_sha256")
+            updates = run.get("renderer_geometry_updates")
+            if (not _valid_board_geometry(g0) or not _valid_board_geometry(g1)
+                    or not isinstance(expected_board, str)
+                    or _boardpane_mapping_fingerprint(g0) != expected_board
+                    or _boardpane_mapping_fingerprint(g1) != expected_board
+                    or not isinstance(updates, list)
+                    or any(not isinstance(item, dict)
+                           or not isinstance(item.get("renderer_geometry"), dict)
+                           or _boardpane_mapping_fingerprint(item["renderer_geometry"])
+                              != expected_board for item in updates)):
+                reasons.append("same_run_boardpane_mapping_unstable_or_missing")
+        except (ValueError, TypeError):
+            reasons.append("same_run_boardpane_mapping_unstable_or_missing")
+    elif (not _valid_board_geometry(g0) or g0 != g1
             or run.get("renderer_geometry_updates") != []
             or _geometry_fingerprint(g0) != readiness.get("renderer_geometry_sha256")):
         reasons.append("same_run_native_geometry_unstable_or_missing")
@@ -283,6 +340,9 @@ def audit_diagnostic_capture(
         "engine_frame_count": len(observed_frame_events),
         "mouse_move_count": input_count,
         "geometry_at_start_sha256": _geometry_fingerprint(g0),
+        "boardpane_mapping_at_start_sha256": (
+            _boardpane_mapping_fingerprint(g0) if _valid_board_geometry(g0) else None
+        ),
         "raw_run_sha256": _hash(run_path),
         "before": before, "after": after,
         "screen_roi": screen_roi,
