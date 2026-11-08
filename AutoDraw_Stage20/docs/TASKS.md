@@ -99,6 +99,12 @@
 
 Инструкция по шагам: [Game Monitor / Bridge §13](GAME_MONITOR_BRIDGE_REFERENCE.md#13-fill-001--новая-чистая-smooth-ab-v2-под-screen-mask-v2). Старые результаты V1 и V2 replay 2026-11-08 — архивная база, **не вход** новой серии.
 
+## FILL-001 — UI подключения Monitor/Bridge для V3
+
+- [x] **E1 implementation:** в существующей вкладке FILL-001 добавлены четыре кнопки для запуска shared Bridge с обязательной input telemetry, копирования актуальных Monitor/Bridge JS и проверки текущей сессии по фактической телеметрии. Режим ввода остаётся fail-closed, нельзя повторно использовать Bridge с `Telemetry OFF` и старый snippet.
+- [x] **Regression tests:** `tests/test_fill001_bridge_controls.py` и новые проверки в `test_brush_behavior_test_ui.py`, включая работу до создания manifest, mismatch/rejection, session diagnostics и stale snippet.
+- [ ] **E4 в Windows UI:** подтвердить, что эти кнопки запускают локальный Bridge, подхватывают Monitor 0.2.4 из *текущего* исходника в правильном iframe, показывают свежую сессию с Input Telemetry ON, а V3 затем получает 3 passive samples. Без run-bound live артефактов статус **NOT_RUN**.
+
 ## FILL-001 — отдельный V3 BoardPane preflight pilot (после V2 spatial E2/E3)
 
 - [x] **Исследовательский код:** `FILL001_SMOOTH_AB_V3` и `FILL001_BOARDPANE_PREFLIGHT_V1` — отдельные новые ON/OFF IDs и signature, frozen rectangle/27 strokes/lineWidth10/P1, без изменения V1/V2 manifests или production quality thresholds. В UI создана отдельная кнопка V3, Stage6 получает mapped plan лишь после свежего preflight; прежний ROI-transform V3 не применяется.
