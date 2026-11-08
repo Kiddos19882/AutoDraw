@@ -106,7 +106,7 @@ def test_preflight_maps_to_actual_boardpane_not_roi_and_preserves_source():
     ("outside", "outside BoardPane"),
     ("nonuniform_offset", "mapping changed"),
     ("unverified_mapping", "unvalidated"), ("renderer_changed", "Egret version"),
-    ("nonuniform_board", "uniformly scaled"), ("outside_roi", "outside executor ROI"),
+    ("nonuniform_board", "type/source/run/geometry"), ("outside_roi", "outside executor ROI"),
 ])
 def test_fail_closed_when_evidence_is_missing_stale_or_geometry_changed(fault, needle):
     plan, roi, session, samples = fixture()
@@ -159,4 +159,17 @@ def test_invalid_logical_coordinates_and_nonfinite_values_fail():
         call_with(plan, roi, session, samples)
     plan["strokes"][0]["points"][0]["y"] = 241
     with pytest.raises(PreflightGeometryError, match="outside board"):
+        call_with(plan, roi, session, samples)
+
+
+def test_coherently_rehashed_nonuniform_board_still_fails_scale_gate():
+    plan, roi, session, samples = fixture()
+    corners = session["renderer_geometry"]["players"][0]["boardClientCorners"]
+    corners["bottomRight"]["y"] = 500
+    corners["bottomLeft"]["y"] = 500
+    sha = hashlib.sha256(json.dumps(session["renderer_geometry"], sort_keys=True,
+                                  separators=(",", ":"), ensure_ascii=False).encode()).hexdigest()
+    for sample in samples:
+        sample["renderer_geometry_sha256"] = sha
+    with pytest.raises(PreflightGeometryError, match="uniformly scaled"):
         call_with(plan, roi, session, samples)
