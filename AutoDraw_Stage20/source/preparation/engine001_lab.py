@@ -204,6 +204,24 @@ def audit_single_capture(experiment_dir: Path) -> dict[str, Any]:
     )
     if not valid_frames:
         failures.append("egret_enter_frame_telemetry_incomplete")
+    # Cross-check Bridge rollups against the raw, run-bound engine callbacks.
+    raw_events = report.get("events")
+    frame_events = [
+        ev for ev in raw_events
+        if isinstance(ev, dict) and ev.get("type") == "ENGINE_FRAME_SAMPLE"
+    ] if isinstance(raw_events, list) else []
+    if (
+        not valid_frames
+        or len(frame_events) != frames["event_count"]
+        or any(ev.get("strokeId") != expected_stroke_id for ev in frame_events)
+    ):
+        failures.append("raw_engine_frame_event_binding_missing")
+    if valid_mode and frame_events and any(
+        type(ev.get("strokeOptionRaw")) is not bool
+        or ev["strokeOptionRaw"] != modes[0]["stroke_option_raw"]
+        for ev in frame_events
+    ):
+        failures.append("native_mode_changed_or_unknown_inside_stroke")
     if any(report.get(key) != 0 for key in (
         "dropped_events", "monitor_buffer_dropped_events_delta",
         "monitor_error_count_delta", "bridge_send_failures_delta",
