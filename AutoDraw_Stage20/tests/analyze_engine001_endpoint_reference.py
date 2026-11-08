@@ -143,6 +143,8 @@ def analyze(workspace: Path, reference_dir: Path, output_dir: Path) -> dict:
     image_hashes = {}
     scans = {}
     for p in reference_dir.glob("engine001-endpoint-*.png"):
+        if p.name.startswith("engine001-endpoint-outline5-"):
+            continue  # Versioned separate contour study, not original 15 PNG.
         if p.name in image_hashes:
             raise ValueError("Duplicate PNG filename")
         rgba, digest = png_rgba(p)
