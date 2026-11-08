@@ -19,6 +19,7 @@ from engine001_lab import inspect_ready_bridge
 PROTOCOL = "FILL001_MONITOR_SAME_RUN_V1"
 AB_PROTOCOL = "FILL001_SMOOTH_AB_V1"
 AB_V2_PROTOCOL = "FILL001_SMOOTH_AB_V2"
+AB_V3_PROTOCOL = "FILL001_SMOOTH_AB_V3"
 BASELINE_PLAN_SIGNATURE = "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
 BASELINE_MASK_SHA256 = "ac1c6660e5986cdf534328c6dbcd5020f631168b1473c24b29e7609eb827998b"
 # Preflight budget only, not a model of exact CHALK for a future run.
@@ -27,7 +28,7 @@ MIN_REMAINING_POINTS_FOR_SAFE_PILOT = 1600
 
 def _expected_mode(task: dict[str, Any]) -> tuple[str, bool]:
     """V1 is historically fixed to smooth=True; A/B has an explicit contract."""
-    if task.get("experiment_protocol") in (AB_PROTOCOL, AB_V2_PROTOCOL):
+    if task.get("experiment_protocol") in (AB_PROTOCOL, AB_V2_PROTOCOL, AB_V3_PROTOCOL):
         if type(task.get("expected_smooth")) is not bool:
             raise ValueError("Smooth A/B expected_smooth must be an explicit boolean.")
         return task["experiment_protocol"], task["expected_smooth"]
@@ -113,7 +114,7 @@ def inspect_diagnostic_preflight(bridge_root: Path, task: dict[str, Any]) -> dic
         raise ValueError("FILL-001 diagnostic needs an exact fresh CHALK snapshot with at least 1600 points remaining.")
     return {
         "protocol": protocol, "session_id": ready["session_id"],
-        **({"expected_smooth": expected_smooth} if protocol in (AB_PROTOCOL, AB_V2_PROTOCOL) else {}),
+        **({"expected_smooth": expected_smooth} if protocol in (AB_PROTOCOL, AB_V2_PROTOCOL, AB_V3_PROTOCOL) else {}),
         "session_file": str(session_file), "monitor_version": "0.2.4",
         "renderer_geometry_sha256": _geometry_fingerprint(geometry),
         "bridge_heartbeat_at_utc": ready["heartbeat_at_utc"],
@@ -171,7 +172,7 @@ def audit_diagnostic_capture(
     run = json.loads(run_path.read_text(encoding="utf-8"))
     reasons: list[str] = []
     if (readiness.get("protocol") != protocol
-            or (protocol in (AB_PROTOCOL, AB_V2_PROTOCOL) and readiness.get("expected_smooth") is not expected_smooth)
+            or (protocol in (AB_PROTOCOL, AB_V2_PROTOCOL, AB_V3_PROTOCOL) and readiness.get("expected_smooth") is not expected_smooth)
             or run.get("session_id") != readiness.get("session_id")
             or run.get("execution_status") != "completed"
             or run.get("stroke_count") != 27
@@ -227,7 +228,7 @@ def audit_diagnostic_capture(
             or any(not isinstance(x, dict) or type(x.get("stroke_option_raw")) is not bool
                    or x["stroke_option_raw"] is not expected_smooth for x in modes)):
         reasons.append("smooth_mode_unverified_or_changed")
-    if protocol in (AB_PROTOCOL, AB_V2_PROTOCOL):
+    if protocol in (AB_PROTOCOL, AB_V2_PROTOCOL, AB_V3_PROTOCOL):
         # Verify the declared condition against each original Egret frame, not
         # merely a reconstructed per-stroke summary from the Bridge collector.
         observed_ids = {
@@ -269,7 +270,7 @@ def audit_diagnostic_capture(
             reasons.append("no_visible_screen_change")
     return {
         "schema_version": 1, "protocol": protocol,
-        **({"expected_smooth": expected_smooth} if protocol in (AB_PROTOCOL, AB_V2_PROTOCOL) else {}),
+        **({"expected_smooth": expected_smooth} if protocol in (AB_PROTOCOL, AB_V2_PROTOCOL, AB_V3_PROTOCOL) else {}),
         "status": "PASS_E4_RAW_CAPTURE" if not reasons else "PARTIAL",
         "reasons": reasons, "run_id": run.get("run_id"),
         "session_id": run.get("session_id"), "task_id": task.get("task_id"),
@@ -290,7 +291,7 @@ def audit_diagnostic_capture(
             "Same-run client geometry requires independent desktop/PNG alignment validation.",
             "Screenshots contain RGB; native alpha cannot be inferred.",
             ("No per-stroke live PNG; game smooth toggle remains operator-controlled."
-             if protocol in (AB_PROTOCOL, AB_V2_PROTOCOL) else
+             if protocol in (AB_PROTOCOL, AB_V2_PROTOCOL, AB_V3_PROTOCOL) else
              "No per-stroke live PNG and no direct normal-mode control in this protocol."),
             "A diagnostic PASS is not FILL coverage/leakage acceptance or CHALK prediction.",
         ],
