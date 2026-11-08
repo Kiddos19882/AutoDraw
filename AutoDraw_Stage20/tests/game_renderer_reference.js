@@ -964,33 +964,66 @@
   }
 
 
-  // ENGINE-001 endpoint comparison: keep accepted points identical in every
-  // variant, change only the native Painter path's final segment.
-  function makeEndpointBoard(strokes, variant) {
-    if (variant === "game-smooth") return {board:makeTemporalBoard(strokes,10,"smooth",false),patchedCalls:0};
-    if (variant === "normal") return {board:makeTemporalBoard(strokes,10,"normal",false),patchedCalls:0};
+  // ENGINE-001 endpoint comparison: keep 1260 accepted points frozen.
+  // ENGINE001_NATIVE_ENDPOINT_OUTLINE5_V1: the same 5-logical-px normal
+  // contour appended after the same frozen 27 strokes in all three variants.
+  // Points are the 64 frozen-mask cv2.findContours(CHAIN_APPROX_SIMPLE)
+  // vertices following a 3-logical-px elliptical erosion. The independent
+  // OpenCV analyzer reconstructs and checks this array against frozen mask SHA.
+  const ENDPOINT_OUTLINE5_INSET = 3;
+  const ENDPOINT_OUTLINE5_WIDTH = 5;
+  const ENDPOINT_OUTLINE5_POINTS = [[94,53],[93,54],[88,54],[87,55],[85,55],[84,56],[83,56],[77,62],[77,63],[76,64],[76,65],[75,66],[75,68],[74,69],[74,74],[73,75],[73,165],[74,166],[74,171],[75,172],[75,174],[76,175],[76,176],[77,177],[77,178],[83,184],[84,184],[85,185],[87,185],[88,186],[93,186],[94,187],[366,187],[367,186],[372,186],[373,185],[375,185],[376,184],[377,184],[383,178],[383,177],[384,176],[384,175],[385,174],[385,172],[386,171],[386,166],[387,165],[387,75],[386,74],[386,69],[385,68],[385,66],[384,65],[384,64],[383,63],[383,62],[377,56],[376,56],[375,55],[373,55],[372,54],[367,54],[366,53]];
+
+  function addNativeOutline5(boardInfo) {
+    const board = boardInfo.shape;
+    board.setRadius(ENDPOINT_OUTLINE5_WIDTH);
+    board.setColor(0x000000);
+    board.setSmooth(false); // Same native closed normal outline for every variant.
+    for (const xy of ENDPOINT_OUTLINE5_POINTS.concat([ENDPOINT_OUTLINE5_POINTS[0]])) {
+      const active = board.atom.points[board.atom.points.length - 1];
+      const oldLength = active.length;
+      board.atom.pushPoint(new egret.Point(xy[0], xy[1]));
+      if (board.atom.points[board.atom.points.length - 1].length !== oldLength + 1) {
+        throw new Error("Native BoardPane rejected a 5px outline vertex.");
+      }
+    }
+    board.atom.add();
+    board.redraw(); // Actual game's full BoardPane/Painter rendering path.
+    board.updateLess();
+    if (board.max - board.less !== boardInfo.accepted + ENDPOINT_OUTLINE5_POINTS.length + 1) {
+      throw new Error("Native outline mutated point count unexpectedly.");
+    }
+    return boardInfo;
+  }
+
+  function makeEndpointBoard(strokes, variant, outline5) {
+    if (variant === "game-smooth" || variant === "normal") {
+      const board = makeTemporalBoard(strokes, 10, variant === "normal" ? "normal" : "smooth", false);
+      if (outline5) addNativeOutline5(board);
+      return {board, patchedCalls:0};
+    }
     if (variant !== "smooth-drawlast") throw new Error("Unknown endpoint variant.");
     const painter = root.com.magnetjoy.painter.Painter;
     const original = painter.drawSmoothLine;
     let patchedCalls = 0;
-    painter.drawSmoothLine = function(graphics, points, drawFirstHalf, drawLast) {
-      // BoardPane.redraw() may also visit the current empty atom slot after
-      // the last atom.add(); that is not an accepted stroke to extend.
-      if (!points || points.length === 0) {
-        return original.call(this, graphics, points, drawFirstHalf, drawLast);
+    painter.drawSmoothLine = function(graphics, pts, drawFirstHalf, drawLast) {
+      // BoardPane.redraw() also visits the current empty atom slot.
+      if (!pts || pts.length === 0) {
+        return original.call(this, graphics, pts, drawFirstHalf, drawLast);
       }
       if (drawFirstHalf !== true || drawLast !== false) {
-        throw new Error("Game BoardPane changed native smooth Painter call signature.");
+        throw new Error("Game BoardPane changed native smooth Painter signature.");
       }
       patchedCalls += 1;
-      return original.call(this, graphics, points, drawFirstHalf, true);
+      return original.call(this, graphics, pts, drawFirstHalf, true);
     };
     try {
-      const board = makeTemporalBoard(strokes,10,"smooth",false);
-      if (patchedCalls !== strokes.length) {
-        throw new Error("Forced endpoint did not intercept each native Painter stroke.");
+      const board = makeTemporalBoard(strokes, 10, "smooth", false);
+      if (outline5) addNativeOutline5(board);
+      if (patchedCalls !== strokes.length * (outline5 ? 2 : 1)) {
+        throw new Error("Native forced endpoint did not process each smooth stroke.");
       }
-      return {board,patchedCalls};
+      return {board, patchedCalls};
     } finally {
       painter.drawSmoothLine = original;
     }
@@ -1013,7 +1046,7 @@
     return {threshold,screenScale:RASTER_SCALE,leftBackingX:left,rightBackingX:right,nonzeroBandPixels:opaqueCount};
   }
 
-  function renderEndpointStudy() {
+  function renderEndpointStudy(outline5) {
     try {
       if (!window.egret || !egret.Shape || !egret.CanvasRenderer) {
         throw new Error("Real Egret browser renderer is unavailable.");
@@ -1048,6 +1081,7 @@
         }
       }
       const variants=["game-smooth","smooth-drawlast","normal"];
+      const filenameRoot = outline5 ? "engine001-endpoint-outline5-" : "engine001-endpoint-";
       const mask=createBoardMask();
       const state=initializeWebGL(null);
       const card=document.createElement("section");
@@ -1057,12 +1091,12 @@
       const aggregate={};
       let pngCount=0;
       for(const variant of variants) {
-        const item=makeEndpointBoard(run.strokes,variant);
+        const item=makeEndpointBoard(run.strokes,variant,outline5);
         const source=renderGraphicsNode(item.board.shape.$renderNode,false);
         const canvas=composeBoard(source,source.nodeBounds,mask);
         const webgl=renderWebGLProbe("smooth",[],10,canvas,state,item.board.shape);
         for(const [name,output] of [["canvas2d",canvas],["webgl",webgl.canvas]]) {
-          addDownloadLink(card,output,"engine001-endpoint-"+variant+"-all-"+name+".png",variant+" "+name);
+          addDownloadLink(card,output,filenameRoot+variant+"-all-"+name+".png",variant+" "+name);
           pngCount+=1;
         }
         aggregate[variant]={
@@ -1085,11 +1119,11 @@
           smoothTerminalPoint:midpoint(previous,last),variants:{}
         };
         for(const variant of variants) {
-          const item=makeEndpointBoard([stroke],variant);
+          const item=makeEndpointBoard([stroke],variant,outline5);
           const source=renderGraphicsNode(item.board.shape.$renderNode,false);
           const canvas=composeBoard(source,source.nodeBounds,mask);
           const webgl=renderWebGLProbe("smooth",[],10,canvas,state,item.board.shape);
-          const pngName="engine001-endpoint-"+variant+"-row"+row+"-webgl.png";
+          const pngName=filenameRoot+variant+"-row"+row+"-webgl.png";
           addDownloadLink(card,webgl.canvas,pngName,pngName);
           pngCount+=1;
           report.variants[variant]={
@@ -1101,14 +1135,14 @@
         }
         individual.push(report);
       }
-      if(pngCount!==15 || aggregate["smooth-drawlast"].nativePainterPatchedCalls!==27 ||
-        individual.some(r=>r.variants["smooth-drawlast"].nativePainterPatchedCalls!==1)) {
+      if(pngCount!==15 || aggregate["smooth-drawlast"].nativePainterPatchedCalls!==(outline5?54:27) ||
+        individual.some(r=>r.variants["smooth-drawlast"].nativePainterPatchedCalls!==(outline5?2:1))) {
         throw new Error("Expected all actual Painter path changes and 15 reference PNGs.");
       }
       casesNode.textContent="";
       casesNode.appendChild(card);
       const manifest={
-        schemaVersion:1,experimentId:"ENGINE001_NATIVE_ENDPOINT_V1",
+        schemaVersion:1,experimentId:outline5?"ENGINE001_NATIVE_ENDPOINT_OUTLINE5_V1":"ENGINE001_NATIVE_ENDPOINT_V1",
         status:"COMPLETE_OFFLINE_NATIVE_ENGINE_MEASUREMENT",
         runId:run.runId,sessionId:run.sessionId,exactHistoricalChalk:run.exactChalk,
         gameBundleBlobSha:"46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
@@ -1119,6 +1153,10 @@
         syntheticControl:"smooth-drawlast forces only native Painter final lineTo through temporary isolated method wrapper; normal uses native BoardPane.setSmooth(false)",
         browserRaster:"Egret 5.4.1 CanvasRenderer and WebGLRenderer masked actual game BoardPane, 3x backing scale",
         pixelCanvas:{width:1380,height:720},screenProjection:"UNCALIBRATED",
+        outline5: outline5 ? {mode:"native_normal_closed_contour",widthLogical:ENDPOINT_OUTLINE5_WIDTH,
+          insetLogical:ENDPOINT_OUTLINE5_INSET, vertexCount:ENDPOINT_OUTLINE5_POINTS.length,
+          points:ENDPOINT_OUTLINE5_POINTS, appendedPointCount:ENDPOINT_OUTLINE5_POINTS.length+1,
+          originalHistoricalChalkUnchanged:true, additionalChalk:"NOT_MEASURED"} : null,
         isolatedRows:endpointRows,aggregate,individual,pngCount,
         exclusions:[
           "No new gameplay or CHALK measurement",
@@ -1129,12 +1167,12 @@
         ]
       };
       document.getElementById("renderer-manifest-json").textContent=JSON.stringify(manifest,null,2);
-      document.body.dataset.endpointStatus="complete";
-      document.body.dataset.endpointPngCount=String(pngCount);
-      document.body.dataset.referenceStatus="endpoint_complete";
+      document.body.dataset[outline5?"outlineStatus":"endpointStatus"]="complete";
+      document.body.dataset[outline5?"outlinePngCount":"endpointPngCount"]=String(pngCount);
+      document.body.dataset.referenceStatus=outline5?"outline_complete":"endpoint_complete";
       statusNode.textContent="ENGINE-001 native endpoint experiment complete; 27 strokes and 3 isolated rows; uncalibrated screen.";
     } catch(error) {
-      document.body.dataset.endpointStatus="error";
+      document.body.dataset[outline5?"outlineStatus":"endpointStatus"]="error";
       document.body.dataset.referenceStatus="error";
       statusNode.className="error";
       statusNode.textContent="Endpoint study failed: "+(error&&error.stack?error.stack:String(error));
@@ -1355,7 +1393,8 @@
   api.renderTemporalStudy = renderTemporalStudy;
   api.renderEndpointStudy = renderEndpointStudy;
   const params = new URLSearchParams(window.location.search);
-  const startup = params.get("endpoint") === "fill001" ? renderEndpointStudy
+  const startup = params.get("outline") === "fill001" ? () => renderEndpointStudy(true)
+    : params.get("endpoint") === "fill001" ? () => renderEndpointStudy(false)
     : params.get("temporal") === "fill001" ? renderTemporalStudy : renderAll;
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", startup, { once: true });
