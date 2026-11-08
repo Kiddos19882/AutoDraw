@@ -1031,7 +1031,7 @@
             result.extraFrameRedrawCalls !== frames * 27 ||
             result.graphicsPathCount !== expectedPaths ||
             result.shape.max-result.shape.less !== input.exactChalk) {
-          throw new Error("Native Frame replay violated path/CHALK invariant.");
+          throw new Error("Native Frame replay violated path/CHALK invariant: "+JSON.stringify({frames,expectedPaths,actualPaths:result.graphicsPathCount,accepted:result.accepted,duplicatePointRejections:result.duplicatePointRejections,extraFrameRedrawCalls:result.extraFrameRedrawCalls,quotaUsed:result.shape.max-result.shape.less}));
         }
         samples.push({
           extraStationaryFramesPerStroke:frames,
