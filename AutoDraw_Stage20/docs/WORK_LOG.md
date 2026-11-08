@@ -3,6 +3,15 @@
 **Назначение:** только фактически выполненные изменения и проверки, а не будущие планы.  
 **Полная история до 2026-11-08:** [WORK_LOG_HISTORY_THROUGH_2026-11-08.md](WORK_LOG_HISTORY_THROUGH_2026-11-08.md) — побайтовый исторический снимок прежней редакции.
 
+## 2026-11-08 — ENGINE-001: сверка API Monitor/Bridge, PRR, snapshot и исправление доказательности
+
+- Повторно проверены remote HEAD `22649900ffdc`, последние 20 коммитов, доступные Actions и действующие README/STATUS/TASKS/ROADMAP/AI guide; использованы профильные архитектура, Monitor API, DEC-025, analyzer и первичные PRR/runtime records.
+- Сопоставлены статическая input→frame→renderer цепочка E1 с Monitor event semantics и точным CHALK шести PRR runs. Подтверждён формальный PRR E3 PASS 6/6 на CI 42321009715 при действующем IoU/precision/recall ≥0.92; это не pixel identity и не FILL-001 acceptance.
+- Найдено противоречие §13.6 первичному JSON 04.11: `boardClientCorners=null`, хотя текст ранее приписывал snapshot рассчитанные fallback corners. Исправлена граница доказательства; stage/client/desktop не смешаны. Новая матрица E1/E3/older E4 и UNKNOWN внесена в [§14](GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md#14-финальная-сверка-источников-game-monitorbridge-prr-и-runtime-2026-11-08).
+- Код, тесты, production, frozen captures и `master` не изменены. Новых live/offline pixel tests, CHALK замеров или ручного CI запуска не проводилось; `ENGINE-001 PARTIAL` сохранён для будущей независимой validation.
+
+---
+
 ## 2026-11-08 — ENGINE-001: прямая сквозная трассировка ввода и WebGL-доски
 
 - На удалённом HEAD `570f9a6` повторно проверены последние 20 коммитов и GitHub Actions; открытая задача — `ENGINE-001`, предыдущие геометрические тесты остаются DEFERRED.

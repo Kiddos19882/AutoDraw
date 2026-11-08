@@ -382,7 +382,7 @@ browser canvas event: mousedown / mousemove / mouseup
 - CSS `transform` canvas настраивается для display scale, компенсируя backing scale, и передаётся в `webTouchHandler.updateScaleMode(displayScaleX,displayScaleY,rotation)`;
 - `DisplayList.$setCanvasScale(canvasScaleX,canvasScaleY)` определяет масштаб растеризации, а `Player.updateStageSize` меняет размеры stage render buffer.
 
-Для пользовательского [runtime snapshot 04.11](../data/runtime/renderer_snapshot_2026-11-04.json) были `stage=1672×600`, `backing=5016×1800`, `canvasScaleX/Y=3` и `Capabilities.renderMode=webgl`. Это **E4 конкретного прежнего snapshot**, не константы движка; `canvasScaleFactor=2` не равен фактическому canvasScale=3. Клиентские углы были вычислены по fall-back affine transform, а не получены от `getBoxQuads()`. Для старого 27-stroke FILL-001 run нет полного **same-run** renderer geometry, и чужой snapshot нельзя выдавать за его screen transform.
+Для пользовательского [runtime snapshot 04.11](../data/runtime/renderer_snapshot_2026-11-04.json) были `stage=1672×600`, `backing=5016×1800`, `canvasScaleX/Y=3` и `Capabilities.renderMode=webgl`. Это **E4 конкретного прежнего snapshot**, не константы движка; `canvasScaleFactor=2` не равен фактическому canvasScale=3. В самом сохранённом JSON `boardClientCorners=null`, а `canvas.screenQuad=null`: **клиентские углы BoardPane в этом snapshot не записаны**. Наличие axis-aligned CSS transform и stage corners позволяет исследовать возможный пересчёт, но не доказывает, что `boardClientCorners` были рассчитаны и валидированы в той сессии. В более новом Monitor предусмотрен отдельный проверяемый affine fallback; он не должен ретроспективно приписываться snapshot 04.11. Для старого 27-stroke FILL-001 run нет полного **same-run** renderer geometry, и чужой snapshot нельзя выдавать за его screen transform.
 
 Координатные пространства не взаимозаменяемы: board logical 460×240, stage, backing pixels, CSS client, desktop PNG/ROI; внутри AutoDraw дополнительно существуют screen-local план и исполнительные screen pixels. Конкретный affine mapping принимается только вместе с версией и calibration evidence.
 
@@ -399,4 +399,46 @@ browser canvas event: mousedown / mousemove / mouseup
 
 **Итог ENGINE-001 на данном шаге:** input → sampling → drawing → raster/mask/Stage *статически прослежены* (E1 PASS) для сохранённой версии Egret 5.4.1. Нельзя на основании кода объявить доказанными фактическое количество кадросэмплов, конкретную альфа-маску каждого пикселя, воспроизведение temporal renderer или причинность FILL-001 PNG ошибок. Эти вопросы оставлены для **отдельно разрешённых** экспериментальных этапов.
 
-**Один следующий шаг текущего документального этапа:** сделать финальную проверку непротиворечивости архитектурного справочника относительно подтверждённого runtime/PRR и существующего Monitor/Bridge API; при обнаружении различий зафиксировать точную границу версий/данных, без новых тестов.
+**Сверка с Monitor/Bridge, PRR и runtime snapshot проведена:** подробная матрица доказательств и исправленное ограничение координат приведены в §14. Для завершения вопросов pixel/temporal equivalence понадобятся отдельно разрешённые E2/E4 проверки, не входящие в этот документационный шаг.
+
+## 14. Финальная сверка источников: Game Monitor/Bridge, PRR и runtime (2026-11-08)
+
+**Проверенная база:** remote HEAD `22649900ffdc0e7bde317ced277ca01d2e710029`; сохранённый Egret bundle [§13](#13-сквозная-трассировка-браузерного-ввода-egret-кадров-и-webgl-вывода-2026-11-08), [Game Monitor/Bridge API](GAME_MONITOR_BRIDGE_REFERENCE.md), [runtime JSON 04.11](../data/runtime/renderer_snapshot_2026-11-04.json), [исторический индекс первичных PRR captures](TEST_RESULTS_HISTORY_THROUGH_2026-11-08.md#2026-11-07--prr-formal-paired-renderer-acceptance-66-pass), формальная [DEC-025](DECISIONS.md) и [renderer_acceptance.py](../source/preparation/renderer_acceptance.py). Это **read-only cross-source audit**; новых игровых данных, pixel comparisons и тестов не получено.
+
+### 14.1. Матрица уровней доказательств
+
+| Звено | Доказательство и область | Итог |
+|---|---|---|
+| DOM pointer → desktop `mouse.enable` → `stage.mouseX/Y` → `BoardPane.globalToLocal` | Согласованный `main.min_653f95bc.js` + `mergeEngine_df2e5bc5.js`; методы описаны в §13 | **E1 PASS** для сохранённой версии, не подсчёт всех OS/DOM событий |
+| `SystemTicker.render()` **перед** `broadcastEnterFrame()` | Прямой static call order в Egret §13.3 | **E1 PASS**; E4 задержка в ms **NOT_RUN** |
+| `pushPoint/updateLess/redraw(false)` и `CHALK=post.pointCount-pre.pointCount` | Код `BoardPane/BlackBoardAtom`; [PRR Monitor captures](TEST_RESULTS_HISTORY_THROUGH_2026-11-08.md#2026-11-07--локальный-prr-batch-и-exact-chalk-evidence) | **E1 PASS + прежнее E4** в валидных runs; не равно длине пути |
+| Monitor `MOUSE_MOVE_SAMPLE`, `DRAW_SAMPLE`, `POINT_QUOTA_UPDATE` | [API §3](GAME_MONITOR_BRIDGE_REFERENCE.md); `state_poll` раз в 25 ms в PRR | **E1 + подтверждение reports**; при `pointDelta>1` наблюдаемая `acceptedPoint` не раскрывает промежуточные точки |
+| Round caps, Canvas2D `GraphicsNode` raster → WebGL texture, два вида clipping | Сохранённые renderer methods §5–§6, §13 | **E1 PASS**; полная пиксельная эквивалентность **UNKNOWN** |
+| Offline Egret internal equality | [Сохранённый reference manifest](../data/renderer_result/egret-5.4.1-renderer-reference-manifest.json): один single-stroke fixture, WebGL comparison `differingPixels=0` | **E2/E3 PASS только внутри reference harness**, не live screen |
+| PRR paired renderer | [CI 42321009715](https://github.com/Kiddos19882/AutoDraw/actions/runs/42321009715), [artifact 13553551374](https://github.com/Kiddos19882/AutoDraw/actions/runs/42321009715/artifacts/13553551374): 6/6 `PASS_PER_RUN`, 3 vertical + 3 diagonal | **E3 PASS по формальной политике** на сохранённых E4 captures, не pixel identity |
+| Same-run desktop/PNG mapping для старого FILL-001 27-stroke run | ROI есть; полного run-bound renderer snapshot нет | **PARTIAL/UNKNOWN**; snapshot другой сессии не подставлять |
+| Full 27-stroke incremental Egret replay и новые live/fill сравнения | Harness пока one-pass/single-stroke; отдельного протокола здесь не запускали | **NOT_RUN** |
+
+### 14.2. Монитор не равен браузерному или кадровому трассировщику
+
+`MOUSE_MOVE_SAMPLE` (при явном включении input telemetry) фиксирует доставленный DOM `mousemove` после обработчика Egret на canvas, но не гарантирует регистрации всех движений OS/executor. `DRAW_SAMPLE` формируется по изменению quota; `state_poll` раз в 25 ms нужен как fallback на случай захвата listener до установки wrapper. `POINT_QUOTA_UPDATE` после `updateLess` имеет точный `pointDelta` и последнюю `acceptedPoint` при положительном изменении. Нельзя считать ни один из этих потоков прямым счётчиком `ENTER_FRAME` или всех физических движений мыши.
+
+В четырёх дополнительных PRR runs суммарный `DRAW_SAMPLE.pointDelta` совпал с exact pre/post CHALK, `dropped_events=0`, `monitor_error_count=0`, `collector_sequence_gap_count=0`; границы штриха восстановлены через `pointer_observer`, а не через отсутствующие в этих reports `DRAW_START/DRAW_END`. Для трех vertical captures CHALK **71, 71, 70**; для трех diagonal **161, 161, 160**. Это воспроизводимость для `radius=10` и frozen executor profile, не универсальная зависимость от ширины кисти или частоты Egret.
+
+### 14.3. Правильная трактовка PRR PASS
+
+В историческом [PRR CI](https://github.com/Kiddos19882/AutoDraw/actions/runs/42321009715) шесть independent-transform comparisons прошли формальный gate: vertical IoU **0.938405–0.938980**, diagonal IoU **0.949646–0.951996**. [DEC-025](DECISIONS.md) **до этих повторных captures** зафиксировал отдельную renderer policy: `iou_min=precision_min=recall_min=0.92`, `symmetric_difference_fraction_max=0.087`, bbox edge tolerance 8% (минимум 1 px), alpha threshold 24; эти константы присутствуют в коде и на pre-acceptance commit `52e3c51a`. Предыдущий исторический порог 0.995 относится к прежней политике и не должен интерпретироваться как действующий для CI 42321009715. Формальный PASS **не означает**, что PNG попиксельно совпадают или что политика FILL-001 (coverage ≥99%, leakage=0) была ослаблена.
+
+Эти PRR опираются на реальные ранее сохранённые game PNG и соответствующие run-bound geometry, но CI — повторное offline сравнение **существующих** captures, не новый live gameplay. Одна финальная массивная Graphics path и цепочка `redraw(false)` на каждом принятии остаются разными способами воспроизведения; temporal equivalence **NOT_RUN**.
+
+### 14.4. Обнаруженное расхождение документации с первичным JSON
+
+Ранее в §13.6 говорилось, что клиентские углы доски рассчитаны fallback-transform в [snapshot 04.11](../data/runtime/renderer_snapshot_2026-11-04.json). **Исходный JSON утверждает иное:** `renderer.players[0].boardStageCorners.topLeft=(519.7916660308838,72)`, `renderer.players[0].boardClientCorners=null` и `renderer.players[0].canvas.screenQuad=null`. При этом действительно зафиксированы `stage=1672×600`, `backing=5016×1800`, `canvasScaleX/Y=3`, `stage.frameRate=30`, `renderMode=webgl` и CSS matrix canvas. Утверждение §13.6 исправлено на границу имеющихся полей. `stage corners` не являются автоматически ни CSS client, ни desktop pixels; новой калибровки для того run не получено.
+
+Snapshot датирован **2026-11-04**, а формальная PRR серия — **2026-11-07**: перенос CSS/Stage/desktop transform между ними недопустим. Доказательства `boardClientMappingMethod` для прежнего snapshot отсутствуют; возможность fallback в текущем Monitor не доказывает, что он исполнился тогда.
+
+### 14.5. Остаточный риск и граница завершения документационного шага
+
+**Документационная сверка завершена; `ENGINE-001 PARTIAL` сохраняется по инженерной валидации.** Не получены: непосредственная пара DOM-event ↔ `ENTER_FRAME` с measured frame-lag; полный incremental-vs-one-pass PNG на 27 stroke; независимая screen-space calibration старого FILL-001 run; pixel-identical renderer на разных кистях/окружениях. Историческая FILL-001 проверка остаётся **REJECTED** (coverage=98.430600%, leakage=11), точный CHALK=1260 не пересчитан.
+
+**Следующий отдельный gate при новом разрешении:** воспроизведение incremental `redraw(false)` и one-pass на сохранённых accepted points в **существующем** Egret harness, с новым ID/provenance и fail-closed для отсутствующей same-run geometry. Никаких production, frozen evidence, acceptance thresholds или live запусков этой документационной сверкой не изменено.
