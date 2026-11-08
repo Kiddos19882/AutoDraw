@@ -6,7 +6,7 @@
 
 - Версия `FILL001_MONITOR_SAME_RUN_V1`: существующая вкладка FILL-001 получила диагностический флаг/создание неизменного RS 27-stroke rectangle плана, однокадровые пары full-screen/board-ROI PNG и дополнительный строгий raw Monitor/Bridge audit без ослабления основного PNG gate.
 - Legacy 0.2.1 и modern 0.2.4 bind/capture работают по отдельным exact versioned contracts; смешанные и неизвестные версии fail-closed. Перед input требуется свежий Bridge + Egret observation + native WebGL BoardPane geometry и ≥1600 exact remaining CHALK. Private desktop screenshots требуют явного предупреждения и не должны автоматически публиковаться.
-- [CI 42458832846](https://github.com/Kiddos19882/AutoDraw/actions/runs/42458832846) для `b98d9e0`; игровой runtime новой версии ещё **NOT_RUN**. Не изменены production draw/executor paths, frozen FILL001 quality gates и исходные E4 captures.
+- [CI 42458832846](https://github.com/Kiddos19882/AutoDraw/actions/runs/42458832846) **SUCCESS** для `b98d9e0` (995 Preparation/G3 PASS, 82 subtests); игровой runtime новой версии ещё **NOT_RUN**. Не изменены production draw/executor paths, frozen FILL001 quality gates и исходные E4 captures.
 
 ## 2026-11-08 — FILL-001: versioned right-edge spatial diagnostics
 
