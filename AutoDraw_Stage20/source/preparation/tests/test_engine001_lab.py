@@ -212,7 +212,7 @@ def test_lab_rejects_modified_nine_cell_journal(tmp_path):
     journal = tmp_path/"lab-tamper.json"
     create_chalk_test_block_journal(journal, plan)
     damaged=json.loads(journal.read_text("utf-8"))
-    damaged["tasks"][0]["scenario_id"]="engine001_vertical_axis"
+    damaged["tasks"][0]["scenario_id"]="engine001_invalid_tampered_scenario"
     journal.write_text(json.dumps(damaged),encoding="utf-8")
     with pytest.raises(ValueError, match="ENGINE-001"):
         load_chalk_test_block_journal(journal)

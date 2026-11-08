@@ -1584,6 +1584,9 @@ def test_paired_renderer_scenarios_request_automatic_input_telemetry() -> None:
         "Парный renderer — один длинный штрих",
         "Парный renderer — один вертикальный штрих",
         "Парный renderer — один диагональный штрих",
+        "ENGINE-001 — горизонталь, окончание",
+        "ENGINE-001 — вертикаль, калибровка",
+        "ENGINE-001 — диагональ, обе оси",
     }
     for label in paired_labels:
         assert brush_ui.should_enable_input_telemetry_for_test_case(label) is True
