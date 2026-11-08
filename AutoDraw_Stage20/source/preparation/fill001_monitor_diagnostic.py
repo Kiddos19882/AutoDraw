@@ -308,8 +308,8 @@ def audit_diagnostic_capture(
                     or _boardpane_mapping_fingerprint(g1) != expected_board
                     or not isinstance(updates, list)
                     or any(not isinstance(item, dict)
-                           or not isinstance(item.get("renderer_geometry"), dict)
-                           or _boardpane_mapping_fingerprint(item["renderer_geometry"])
+                           or not isinstance(item.get("snapshot"), dict)
+                           or _boardpane_mapping_fingerprint(item["snapshot"])
                               != expected_board for item in updates)):
                 reasons.append("same_run_boardpane_mapping_unstable_or_missing")
         except (ValueError, TypeError):
