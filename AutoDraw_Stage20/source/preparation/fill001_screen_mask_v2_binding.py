@@ -63,8 +63,8 @@ def bind_from_monitor_run(
     expected_sha = evidence.get("raw_run_sha256")
     if run_sha != expected_sha:
         raw = Path(run_path).read_bytes()
-        if b"\\r" not in raw and b"\\n" in raw:
-            restored = raw.replace(b"\\n", b"\\r\\n")
+        if b"\r" not in raw and b"\n" in raw:
+            restored = raw.replace(b"\n", b"\r\n")
             if _sha(restored) == expected_sha:
                 run_sha = expected_sha
                 sha_reconstruction = "git_normalized_LF_to_original_CRLF"
