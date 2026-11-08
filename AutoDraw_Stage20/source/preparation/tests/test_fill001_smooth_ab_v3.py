@@ -57,6 +57,7 @@ def _v3_result(task, run_id):
         "raw_e4_status": "PASS_E4_RAW_CAPTURE",
         "run_id": run_id, "session_id": "same-session", "exact_chalk": 1458,
         "renderer_geometry_sha256": "g"*64,
+        "boardpane_mapping_sha256": "b"*64,
         "screen_roi": {"x":496,"y":265,"width":674,"height":355},
         "before_png": task["task_id"]+"-before.png",
         "after_png": task["task_id"]+"-after.png",
@@ -88,6 +89,14 @@ def test_v3_pair_accepts_only_matching_protocol_and_coordinate_provenance():
     report = analyze_smooth_ab_v3_pair(matrix, rows)
     assert report["status"] == "ANALYZED_COMPARABLE"
     assert report["acceptance_override"] is False
+    cosmetic = deepcopy(rows)
+    cosmetic[1]["renderer_geometry_sha256"] = "a"*64
+    cosmetic[1]["boardpane_preflight"]["renderer_geometry_sha256"] = "f"*64
+    assert analyze_smooth_ab_v3_pair(matrix, cosmetic)["status"] == "ANALYZED_COMPARABLE"
+    shifted = deepcopy(rows)
+    shifted[1]["boardpane_mapping_sha256"] = "0"*64
+    shifted[1]["boardpane_preflight"]["boardpane_mapping_sha256"] = "0"*64
+    assert analyze_smooth_ab_v3_pair(matrix, shifted)["status"].startswith("PARTIAL")
     damaged = deepcopy(rows)
     damaged[1]["boardpane_preflight"]["session_id"] = "another-session"
     with pytest.raises(FillMatrixError):
