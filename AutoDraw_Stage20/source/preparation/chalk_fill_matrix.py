@@ -205,6 +205,10 @@ def validate_fill001_matrix(matrix: Any) -> None:
         from fill001_smooth_ab_v2 import validate_smooth_ab_v2_matrix
         validate_smooth_ab_v2_matrix(matrix)
         return
+    if matrix.get("experiment_protocol") == "FILL001_SMOOTH_AB_V3":
+        from fill001_smooth_ab_v3 import validate_smooth_ab_v3_matrix
+        validate_smooth_ab_v3_matrix(matrix)
+        return
     if "experiment_protocol" in matrix:
         raise FillMatrixError("Unsupported FILL-001 experimental protocol.")
     plan_variant = matrix.get("plan_variant")
