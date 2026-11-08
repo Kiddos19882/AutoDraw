@@ -1,0 +1,44 @@
+name: AutoDraw FILL-001 Screen Mask V2 offline evidence
+
+on:
+  push:
+    branches:
+      - feature/image-geometry-optimization
+    paths:
+      - ".github/workflows/fill001-screen-mask-v2.yml"
+      - "AutoDraw_Stage20/source/preparation/fill001_screen_mask_v2*.py"
+      - "AutoDraw_Stage20/source/preparation/tests/test_fill001_screen_mask_v2*.py"
+      - "AutoDraw_Stage20/data/results/brush_behavior_tests/fill001/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fill001-v2:
+    name: Run-bound V2 replay (no gameplay)
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: AutoDraw_Stage20/source/preparation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install minimal diagnostic dependencies
+        run: python -m pip install numpy pillow pytest
+      - name: Test Screen Mask V2 and raw Monitor binding
+        run: python -m pytest -q -ra tests/test_fill001_screen_mask_v2.py tests/test_fill001_screen_mask_v2_binding.py
+      - name: Recalculate both committed Smooth A/B ROI with verified DOM screen mapping
+        run: |
+          python fill001_screen_mask_v2_batch.py --results-root ../../data/results/brush_behavior_tests --output-dir "${RUNNER_TEMP}/fill001-screen-mask-v2"
+      - name: Upload numeric-only diagnostic evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autodraw-fill001-screen-mask-v2-numeric
+          path: ${{ runner.temp }}/fill001-screen-mask-v2/report.json
+          if-no-files-found: warn
+          retention-days: 30
