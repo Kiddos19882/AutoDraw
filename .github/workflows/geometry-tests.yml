@@ -154,6 +154,19 @@ jobs:
           path: ${{ runner.temp }}/fill001-screen-residual-v1/
           if-no-files-found: warn
           retention-days: 30
+      - name: Replay immutable FILL-001 Smooth A/B using verified Screen Mask V2
+        shell: pwsh
+        run: |
+          python fill001_screen_mask_v2_batch.py --results-root "..\\..\\data\\results\\brush_behavior_tests" --output-dir "$env:RUNNER_TEMP\\fill001-screen-mask-v2"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Upload FILL-001 Screen Mask V2 numeric evidence only
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autodraw-fill001-screen-mask-v2
+          path: ${{ runner.temp }}/fill001-screen-mask-v2/report.json
+          if-no-files-found: warn
+          retention-days: 30
       - name: Reproduce exhaustive FILL-001-RS static spacing sweep
         shell: pwsh
         run: |
