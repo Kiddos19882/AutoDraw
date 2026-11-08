@@ -1044,6 +1044,26 @@ class AutoDrawUnifiedApp:
                 raise ValueError("Число штрихов runtime plan не совпадает с frozen task.")
             if document.get("autodraw_experiment", {}).get("phase_id") != "FILL001":
                 raise ValueError("Отсутствует FILL-001 experiment context.")
+            if task.get("experiment_protocol") == "FILL001_SMOOTH_AB_V3":
+                # Last-moment session and geometry check immediately before
+                # sending any game input. The plan may not outlive its witness.
+                from datetime import datetime, timezone
+                from fill001_monitor_diagnostic import inspect_diagnostic_preflight
+                preflight = source_generation.get("screen_transform")
+                if not isinstance(preflight, dict):
+                    raise ValueError("V3 preflight mapping has disappeared.")
+                fresh = inspect_diagnostic_preflight(
+                    self.data_paths["brush_tests"] / "game_monitor_bridge", task,
+                )
+                bound_at = datetime.fromisoformat(
+                    preflight["preflight_valid_at_utc"].replace("Z", "+00:00")
+                )
+                age = (datetime.now(timezone.utc) - bound_at).total_seconds()
+                if (not 0 <= age <= 5
+                        or fresh["session_id"] != preflight["session_id"]
+                        or fresh["renderer_geometry_sha256"]
+                           != preflight["renderer_geometry_sha256"]):
+                    raise ValueError("V3 BoardPane mapping stale or session/geometry changed before input.")
             started = self.executor.start_execution_from_workflow(
                 executor_config_override=dict(FILL001_EXECUTOR_OVERRIDE)
             )
