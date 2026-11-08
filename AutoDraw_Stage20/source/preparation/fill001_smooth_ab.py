@@ -204,6 +204,8 @@ def analyze_smooth_ab_pair(matrix: dict, evidence: list[dict]) -> dict[str, Any]
                 or item.get("target_mask_sha256") != task["target_mask_sha256"]
                 or not isinstance(item.get("run_id"), str) or not item["run_id"]
                 or type(item.get("exact_chalk")) is not int or item["exact_chalk"] <= 0
+                or not isinstance(item.get("renderer_geometry_sha256"), str)
+                or len(item["renderer_geometry_sha256"]) != 64
                 or item.get("screen_roi") is None):
             raise FillMatrixError("A/B evidence not valid or not bound to declared mode.")
         png = audit_fill001_png_pair(
@@ -220,6 +222,7 @@ def analyze_smooth_ab_pair(matrix: dict, evidence: list[dict]) -> dict[str, Any]
             "smooth": task["expected_smooth"],
             "exact_chalk": item["exact_chalk"],
             "screen_roi": item["screen_roi"],
+            "renderer_geometry_sha256": item["renderer_geometry_sha256"],
             "before_sha256": png["before_png_sha256"],
             "after_sha256": png["after_png_sha256"],
             "coverage_fraction": png["coverage_fraction"],
@@ -231,11 +234,12 @@ def analyze_smooth_ab_pair(matrix: dict, evidence: list[dict]) -> dict[str, Any]
     if on["run_id"] == off["run_id"]:
         raise FillMatrixError("A/B requires two distinct Game Monitor runs.")
     compatible = (on["screen_roi"] == off["screen_roi"]
+                  and on["renderer_geometry_sha256"] == off["renderer_geometry_sha256"]
                   and on["before_sha256"] == off["before_sha256"])
     return {
         "schema_version": 1, "protocol": PROTOCOL,
         "series_id": matrix["series_id"], "matrix_signature": matrix["matrix_signature"],
-        "status": "ANALYZED_COMPARABLE" if compatible else "PARTIAL_BASELINE_OR_ROI_MISMATCH",
+        "status": "ANALYZED_COMPARABLE" if compatible else "PARTIAL_BASELINE_ROI_OR_GEOMETRY_MISMATCH",
         "conditions": rows,
         "off_minus_on": {
             "exact_chalk": off["exact_chalk"] - on["exact_chalk"],
