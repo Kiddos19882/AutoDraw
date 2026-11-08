@@ -4,8 +4,8 @@
 
 ## 2026-11-08 — ENGINE-001 accepted-only Egret temporal reference
 
-- Добавлен opt-in исследовательский режим \`?temporal=fill001\` **в существующий** \`tests/game_renderer_reference.js\`: actual \`BoardPane\` one-pass / incremental redraw, 27 run-bound strokes/1260 accepted points, строгая входная валидация, 4 Canvas2D/WebGL PNG, manifest. Production и прежние 20 renderer fixtures не изменены.
-- [CI 42434968046](https://github.com/Kiddos19882/AutoDraw/actions/runs/42434968046) browser job SUCCESS на \`8d5d088\`: 0 difference между двумя итоговыми растрами и 70 vs 29 накопленных Graphics paths. Данные исторические; exact live CHALK новых алгоритмов не измерялся, full temporal/screen equivalence не доказаны.
+- Добавлен opt-in исследовательский режим `?temporal=fill001` **в существующий** `tests/game_renderer_reference.js`: actual `BoardPane` one-pass / incremental redraw, 27 run-bound strokes/1260 accepted points, строгая входная валидация, 4 Canvas2D/WebGL PNG, manifest. Production и прежние 20 renderer fixtures не изменены.
+- [CI 42434968046](https://github.com/Kiddos19882/AutoDraw/actions/runs/42434968046) browser job SUCCESS на `8d5d088`: 0 difference между двумя итоговыми растрами и 70 vs 29 накопленных Graphics paths. Данные исторические; exact live CHALK новых алгоритмов не измерялся, full temporal/screen equivalence не доказаны.
 
 ---
 
