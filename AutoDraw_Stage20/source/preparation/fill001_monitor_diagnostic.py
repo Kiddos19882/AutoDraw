@@ -171,7 +171,7 @@ def audit_diagnostic_capture(
     run = json.loads(run_path.read_text(encoding="utf-8"))
     reasons: list[str] = []
     if (readiness.get("protocol") != protocol
-            or (protocol == AB_PROTOCOL and readiness.get("expected_smooth") is not expected_smooth)
+            or (protocol in (AB_PROTOCOL, AB_V2_PROTOCOL) and readiness.get("expected_smooth") is not expected_smooth)
             or run.get("session_id") != readiness.get("session_id")
             or run.get("execution_status") != "completed"
             or run.get("stroke_count") != 27
@@ -227,7 +227,7 @@ def audit_diagnostic_capture(
             or any(not isinstance(x, dict) or type(x.get("stroke_option_raw")) is not bool
                    or x["stroke_option_raw"] is not expected_smooth for x in modes)):
         reasons.append("smooth_mode_unverified_or_changed")
-    if protocol == AB_PROTOCOL:
+    if protocol in (AB_PROTOCOL, AB_V2_PROTOCOL):
         # Verify the declared condition against each original Egret frame, not
         # merely a reconstructed per-stroke summary from the Bridge collector.
         observed_ids = {
