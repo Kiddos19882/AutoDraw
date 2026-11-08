@@ -974,6 +974,11 @@
     const original = painter.drawSmoothLine;
     let patchedCalls = 0;
     painter.drawSmoothLine = function(graphics, points, drawFirstHalf, drawLast) {
+      // BoardPane.redraw() may also visit the current empty atom slot after
+      // the last atom.add(); that is not an accepted stroke to extend.
+      if (!points || points.length === 0) {
+        return original.call(this, graphics, points, drawFirstHalf, drawLast);
+      }
       if (drawFirstHalf !== true || drawLast !== false) {
         throw new Error("Game BoardPane changed native smooth Painter call signature.");
       }
