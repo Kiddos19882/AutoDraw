@@ -255,6 +255,40 @@ def test_complete_27_stroke_raw_monitor_and_screen_evidence_can_pass(tmp_path):
     assert ab["status"] == "PASS_E4_RAW_CAPTURE"
     assert ab["expected_smooth"] is False
     assert ab["protocol"] == AB_PROTOCOL
+    # New V3: same BoardPane is valid even if Preloader reports a different
+    # animated content width at run end. Older V1/V2 remain full-hash strict.
+    from fill001_monitor_diagnostic import AB_V3_PROTOCOL, _boardpane_mapping_fingerprint
+    v3 = copy.deepcopy(off)
+    v3["renderer_geometry_at_end"]["players"][0]["boardDisplayChain"] = [
+        {"className": "Preloader", "width": 2830.0809053156145}
+    ]
+    v3["renderer_geometry_updates"] = [{
+        "updated_at_utc": "2026-11-08T20:24:00+00:00",
+        "reason": "passive_input_preflight",
+        "snapshot": copy.deepcopy(v3["renderer_geometry_at_end"]),
+    }]
+    path.write_text(json.dumps(v3), encoding="utf-8")
+    v3_ready = {
+        "protocol": AB_V3_PROTOCOL, "session_id": "valid-session",
+        "expected_smooth": False, "renderer_geometry_sha256": "old-full-hash",
+        "boardpane_mapping_sha256": _boardpane_mapping_fingerprint(geometry),
+    }
+    v3_task = dict(_task(), experiment_protocol=AB_V3_PROTOCOL, expected_smooth=False)
+    def audit_v3():
+        return audit_diagnostic_capture(
+            task=v3_task, readiness=v3_ready, monitor_run_path=path,
+            before_full=full, before_roi=roi_image,
+            after_full=after_full, after_roi=after_crop, screen_roi=roi,
+        )
+    clean_v3 = audit_v3()
+    assert clean_v3["status"] == "PASS_E4_RAW_CAPTURE"
+    assert clean_v3["boardpane_mapping_at_start_sha256"] == v3_ready["boardpane_mapping_sha256"]
+    v3["renderer_geometry_at_end"]["players"][0]["boardClientCorners"]["topLeft"]["x"] += 1
+    path.write_text(json.dumps(v3), encoding="utf-8")
+    bad_v3 = audit_v3()
+    assert bad_v3["status"] == "PARTIAL"
+    assert "same_run_boardpane_mapping_unstable_or_missing" in bad_v3["reasons"]
+    path.write_text(json.dumps(off), encoding="utf-8")
     # A single mixed frame is not a valid OFF run.
     for row in off["events"]:
         if row["type"] == "ENGINE_FRAME_SAMPLE":
