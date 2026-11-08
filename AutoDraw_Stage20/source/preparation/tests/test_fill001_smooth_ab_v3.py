@@ -66,6 +66,7 @@ def _v3_result(task, run_id):
         "boardpane_preflight": {
             "schema": COORDINATE_PREFLIGHT, "session_id": "same-session",
             "renderer_geometry_sha256": "g"*64,
+            "boardpane_mapping_sha256": "b"*64,
             "screen_roi": {"x":496,"y":265,"width":674,"height":355},
         },
         "v2_audit": {
