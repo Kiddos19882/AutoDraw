@@ -106,8 +106,13 @@ def test_connection_check_uses_live_bridge_session_and_reports_only_actual_readi
 def test_connection_check_reports_no_manifest_or_stale_session(tmp_path, monkeypatch):
     tab, _ = make_tab(tmp_path)
     tab._selected_task = lambda: None
+    from brush_radius_feedback import read_active_bridge_geometry
+    monkeypatch.setattr(
+        "brush_radius_feedback.read_active_bridge_geometry",
+        lambda _: None,
+    )
     tab.check_fill001_bridge()
-    assert "Сначала создайте" in tab.bridge_status_var.get()
+    assert "НЕ ГОТОВО" in tab.bridge_status_var.get()
     tab._selected_task = lambda: {"task_id": "test-v3",
                                   "experiment_protocol": "FILL001_SMOOTH_AB_V3"}
     def stale(*args):
@@ -116,3 +121,31 @@ def test_connection_check_reports_no_manifest_or_stale_session(tmp_path, monkeyp
     tab.check_fill001_bridge()
     assert "НЕ ГОТОВО" in tab.bridge_status_var.get()
     assert "Heartbeat устарел" in tab.bridge_status_var.get()
+
+
+def test_can_check_monitor_and_bridge_before_creating_fresh_manifest(tmp_path, monkeypatch):
+    tab, _ = make_tab(tmp_path)
+    tab._selected_task = lambda: None
+    monkeypatch.setattr(
+        "brush_radius_feedback.read_active_bridge_geometry",
+        lambda _: {"board_detected": True, "session_id": "fresh-session"},
+    )
+    folder = tmp_path / "game_monitor_bridge" / "fresh-session"
+    folder.mkdir(parents=True)
+    (folder / "session.json").write_text(json.dumps({
+        "bridge_configuration": {"inputTelemetry": {"requested": True, "enabled": True}},
+        "bridge_diagnostics": {"last_monitor_status": {
+            "version": "0.2.4", "inputTelemetryEnabled": True,
+        }},
+    }), encoding="utf-8")
+    tab.check_fill001_bridge()
+    assert "СОЕДИНЕНИЕ ЕСТЬ" in tab.bridge_status_var.get()
+    assert "fresh-session" in tab.bridge_status_var.get()
+    (folder / "session.json").write_text(json.dumps({
+        "bridge_configuration": {"inputTelemetry": {"requested": False, "enabled": False}},
+        "bridge_diagnostics": {"last_monitor_status": {
+            "version": "0.2.4", "inputTelemetryEnabled": False,
+        }},
+    }), encoding="utf-8")
+    tab.check_fill001_bridge()
+    assert "НЕ ГОТОВО" in tab.bridge_status_var.get()
