@@ -18,6 +18,7 @@ from chalk_fill_execution import prepare_fill001_single_task_plan
 from chalk_fill_matrix import (
     FillMatrixError,
     build_fill001_matrix,
+    build_fill001_rs_matrix,
     load_fill001_matrix,
     write_fill001_matrix,
 )
@@ -121,7 +122,10 @@ class Fill001Tab:
             )
             return
         try:
-            matrix = build_fill001_matrix(raw_id)
+            # Opt-in diagnostic reproduces the historical 27-stroke RS
+            # geometry, never the legacy 131-stroke default.
+            matrix = (build_fill001_rs_matrix(raw_id)
+                      if self.diagnostic_var.get() else build_fill001_matrix(raw_id))
             path = self.output_dir / f"{raw_id}.json"
             if path.exists():
                 raise FileExistsError(f"Серия уже существует: {path}. Откройте её вместо перезаписи.")
@@ -129,7 +133,10 @@ class Fill001Tab:
             self.matrix, self.manifest_path = matrix, path
             self.manifest_label.configure(text=path.name)
             self._refresh_tasks()
-            self.status_var.set(f"Создан manifest из 45 задач: {path}")
+            label = "Диагностический FILL-001-RS" if self.diagnostic_var.get() else "FILL-001"
+            self.status_var.set(
+                f"Создан {label} manifest из 45 записей (batch запрещён): {path}"
+            )
         except (OSError, ValueError, TypeError, FillMatrixError) as exc:
             messagebox.showerror("Не удалось создать FILL-001 manifest", str(exc), parent=self.root)
 
