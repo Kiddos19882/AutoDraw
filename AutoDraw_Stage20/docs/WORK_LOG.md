@@ -3,6 +3,17 @@
 **Назначение:** только фактически выполненные изменения и проверки, а не будущие планы.  
 **Полная история до 2026-11-08:** [WORK_LOG_HISTORY_THROUGH_2026-11-08.md](WORK_LOG_HISTORY_THROUGH_2026-11-08.md) — побайтовый исторический снимок прежней редакции.
 
+## 2026-11-08 — ENGINE-001: офлайн-сравнение накопленных StrokePath на сохранённом FILL-001 run
+
+- HEAD до изменений \`ca0c768b\`: remote и последние 20 commits проверены, разрешение получено на исследовательскую разработку и offline-проверки; live gameplay, production и frozen evidence не изменялись.
+- Новый opt-in \`?temporal=fill001\` в существующем \`tests/game_renderer_reference.js\`, code commit \`79b33e2\`; прицельные fail-closed Node tests и CI PNG/JSON export в commit \`8d5d088\`.
+- Source Game Monitor run Git blob \`8eb04ad7331d1e56f4aeb7d0f625c59c1dc57c24\`, run \`6a17a297\`, 27 strokes / 1260 accepted points / historical CHALK=1260. Из-за отсутствия per-frame duplicate redraw trace воспроизведён только accepted-only minimum; \`smooth\` — исследовательское предположение, screen mapping UNCALIBRATED.
+- [Browser CI 42434968046](https://github.com/Kiddos19882/AutoDraw/actions/runs/42434968046) на \`8d5d088\` успешно сгенерировал [artifact 13599086458](https://github.com/Kiddos19882/AutoDraw/actions/runs/42434968046/artifacts/13599086458): 4 PNG и manifest. 29 one-pass vs 70 incremental Graphics paths, 1 vs 27 full redraw, 0 vs 1260 incremental redraw; Canvas2D и WebGL финальные пиксели совпали (0 RGBA difference). Canvas2D↔WebGL внутри каждого варианта имеет 243 различающихся пикселя с max channel delta=1.
+- Независимый PNG audit на скачанном ZIP (SHA-256 \`0aede096b0e28e6a7d18e83e71dfc576310b36b2bcedb30a8136d1f971a76fde\`) повторил нулевую разницу; все четыре изображения непустые (406282 alpha-positive pixels).
+- Отрицательный результат гипотезы о final pixel effect **сохранён**, а не интерпретирован как универсальный pixel-perfect game. Не покрыты extra \`ENTER_FRAME\` без новой точки, промежуточный renderer update, другой GPU, desktop transform, реальный FILL-001 PNG. Исторические 98.430600%/11 leakage остаются FAIL, INT-007 BLOCKED.
+
+---
+
 ## 2026-11-08 — ENGINE-001: сверка API Monitor/Bridge, PRR, snapshot и исправление доказательности
 
 - Повторно проверены remote HEAD `22649900ffdc`, последние 20 коммитов, доступные Actions и действующие README/STATUS/TASKS/ROADMAP/AI guide; использованы профильные архитектура, Monitor API, DEC-025, analyzer и первичные PRR/runtime records.

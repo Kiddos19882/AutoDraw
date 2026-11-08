@@ -417,7 +417,7 @@ browser canvas event: mousedown / mousemove / mouseup
 | Offline Egret internal equality | [Сохранённый reference manifest](../data/renderer_result/egret-5.4.1-renderer-reference-manifest.json): один single-stroke fixture, WebGL comparison `differingPixels=0` | **E2/E3 PASS только внутри reference harness**, не live screen |
 | PRR paired renderer | [CI 42321009715](https://github.com/Kiddos19882/AutoDraw/actions/runs/42321009715), [artifact 13553551374](https://github.com/Kiddos19882/AutoDraw/actions/runs/42321009715/artifacts/13553551374): 6/6 `PASS_PER_RUN`, 3 vertical + 3 diagonal | **E3 PASS по формальной политике** на сохранённых E4 captures, не pixel identity |
 | Same-run desktop/PNG mapping для старого FILL-001 27-stroke run | ROI есть; полного run-bound renderer snapshot нет | **PARTIAL/UNKNOWN**; snapshot другой сессии не подставлять |
-| Full 27-stroke incremental Egret replay и новые live/fill сравнения | Harness пока one-pass/single-stroke; отдельного протокола здесь не запускали | **NOT_RUN** |
+| Accepted-only multi-stroke Egret replay | [ENGINE-001 §15](#15-engine-001--offline-temporal-replay-принятых-точек-2026-11-08): 27 strokes/1260 points, Canvas/WebGL 0 RGBA differences, historical source fixed | **E2/E3 PASS для offline supported variant**; unknown extra ENTER_FRAME callbacks и desktop mapping |
 
 ### 14.2. Монитор не равен браузерному или кадровому трассировщику
 
@@ -439,6 +439,32 @@ Snapshot датирован **2026-11-04**, а формальная PRR сери
 
 ### 14.5. Остаточный риск и граница завершения документационного шага
 
-**Документационная сверка завершена; `ENGINE-001 PARTIAL` сохраняется по инженерной валидации.** Не получены: непосредственная пара DOM-event ↔ `ENTER_FRAME` с measured frame-lag; полный incremental-vs-one-pass PNG на 27 stroke; независимая screen-space calibration старого FILL-001 run; pixel-identical renderer на разных кистях/окружениях. Историческая FILL-001 проверка остаётся **REJECTED** (coverage=98.430600%, leakage=11), точный CHALK=1260 не пересчитан.
+**Документационная сверка завершена; `ENGINE-001 PARTIAL` сохраняется по инженерной валидации.** Не получены: непосредственная пара DOM-event ↔ `ENTER_FRAME` с measured frame-lag; воспроизведение **всех** дублирующихся ENTER_FRAME/render passes и условий живого compositing; независимая screen-space calibration старого FILL-001 run; pixel-identical renderer на разных кистях/окружениях. Историческая FILL-001 проверка остаётся **REJECTED** (coverage=98.430600%, leakage=11), точный CHALK=1260 не пересчитан.
 
-**Следующий отдельный gate при новом разрешении:** воспроизведение incremental `redraw(false)` и one-pass на сохранённых accepted points в **существующем** Egret harness, с новым ID/provenance и fail-closed для отсутствующей same-run geometry. Никаких production, frozen evidence, acceptance thresholds или live запусков этой документационной сверкой не изменено.
+**Следующий технический gate:** после accepted-only §15 исследовать влияние неподтверждённых extra redraw без принятой точки / intermediate render passes, не подменяя отсутствующий frame trace. Same-run geometry для старого run по-прежнему не дана. Никаких production, frozen evidence, acceptance thresholds или live запусков этой документационной сверкой не изменено.
+
+
+## 15. ENGINE-001 — offline temporal replay принятых точек (2026-11-08)
+
+**Протокол / experiment ID:** \`ENGINE001_TEMPORAL_ACCEPTED_ONLY_V1\`. Цель: на одинаковых сохранённых точках проверить **итоговые** Canvas2D и WebGL RGBA для \`one-pass redraw()\` и приближённой последовательности \`onDrawStart redraw()\` → по каждой новой принятой точке \`redraw(false)\` → \`onDrawingEnd redraw(false)\` → \`atom.add()\`. **Результат сравнения не требовалось заранее объявлять различным или идентичным**: критерий корректного выполнения — полный pinning входа, точный порядок 27 stroke/1260 points, оба непустых финальных изображения и диагностические counts. Исходный live PNG не заменяется.
+
+**Зафиксированный вход:** [Game Monitor run](../data/results/brush_behavior_tests/game_monitor_bridge/bb261898-8296-41f5-a333-eb0b81016410/game-monitor-run-20261104T040548835772Z-6a17a297.json), Git blob \`8eb04ad7331d1e56f4aeb7d0f625c59c1dc57c24\`, run \`6a17a297-ea14-4527-9527-bfd8de3bd335\`, session \`bb261898-8296-41f5-a333-eb0b81016410\`; \`pre.pointCount=1\`, \`post.pointCount=1261\`, exact historical CHALK=1260; \`stroke_count=27\`, \`accepted_points=1260\`, каждая \`point_delta=1\`, нет зафиксированных dropped/sequence/monitor/bridge ошибок. Исходник содержит **все принятые точки**, но не все вызовы \`onDrawing\` при отсутствии новой точки. Режим \`smooth\` задан **исследовательским предположением**: per-stroke \`options\` в run отсутствует. Рабочая ширина \`lineWidth=10\`.
+
+**Исполнение:** реальный \`BoardPane\`, \`BlackBoardAtom.pushPoint/add\`, \`BoardPane.redraw\`, \`GraphicsNode\`, \`CanvasRenderer\` и \`WebGLRenderer\` из зафиксированного Egret 5.4.1; [исследовательский режим](../tests/game_renderer_reference.js) \`?temporal=fill001\` встроен в существующий harness и запускается в [CI script](../tests/run_egret_renderer_reference.ps1). Для новой последовательности разрешены только accepted-point redraw events и финальный redraw конца штриха; при переходе к следующему штриху выполняется полный redraw. В обоих вариантах **не рисуется исходная служебная точка** \`pre.pointCount=1\` — сравнивается равная геометрическая выборка, а не точная реконструкция всего live canvas. Инварианты неизменности Git blob, run/session, 460×240, radius10, 1260/27 и integrity проверяются fail-closed; [Node regression](../tests/game_renderer_reference.test.js) включает неполные и испорченные входы.
+
+**E2/E3:** браузерный Egret job **SUCCESS** в [CI 42434968046](https://github.com/Kiddos19882/AutoDraw/actions/runs/42434968046) на кодовом commit \`8d5d0880c2027bf5c699608578d338025d64c595\`; [artifact 13599086458](https://github.com/Kiddos19882/AutoDraw/actions/runs/42434968046/artifacts/13599086458) содержит JSON и 4 PNG, размер каждого 1380×720. Графический контекст: headless Edge WebGL1 ANGLE SwiftShader, не обязательно равен GPU live игры.
+
+| Метрика | One-pass | Accepted-only incremental |
+|---|---:|---:|
+| Принятые точки / завершённые штрихи | 1260 / 27 | 1260 / 27 |
+| Полных \`redraw()\` | 1 | 27 |
+| \`redraw(false)\` | 0 | 1260 |
+| \`GraphicsNode.drawData.length\` | 29 | 70 |
+| Canvas2D difference vs one-pass, RGBA pixels | — | **0** |
+| WebGL difference vs one-pass, RGBA pixels | — | **0** |
+
+**Независимая проверка скачанного CI artifact (PNG-only E5 в offline domain):** Python/Pillow+NumPy повторно прочитали четыре PNG, сравнили каждый RGBA канал; для \`onepass\` и \`incremental\` совпадение точное в Canvas2D и WebGL. Каждый имеет **406282 пикселя с ненулевой alpha** и границы nonzero-alpha \`(213,153)..(1177,581)\` в 1380×720 — это не совпадение пустых изображений. Сравнение Canvas2D против WebGL в **каждом** варианте даёт 243 отличающихся пикселя, максимальная разница канала=1. SHA-256 полученного ZIP \`0aede096b0e28e6a7d18e83e71dfc576310b36b2bcedb30a8136d1f971a76fde\`.
+
+**Область вывода:** дополнительные \`StrokePath\` действительно накапливаются (70 против 29), но в *данном* accepted-only эксперименте итоговая растеризация не изменилась. Влияние накопления как достаточная причина FILL-001 underfill/leakage **не подтверждено**. Это не доказательство отсутствия влияния на runtime latency/memory, неожиданные duplicate \`ENTER_FRAME\`, очередность промежуточных renderer passes, другую кисть/режим, GPU, game screenshot, сохранённый service point или физический transform. Старые FILL-001 gates остаются FAIL (98.430600% и 11 leakage); ни CHALK новых кандидатов, ни новые live measurements не получены.
+
+**Следующий вопрос:** исследовательский E2 контроль с дополнительными \`redraw(false)\` без новой точки и с промежуточным render/upload в отдельном versioned protocol; для claims о реальной частоте/фазе кадров потребуется отдельное E4 evidence. Устаревшую screen geometry другого run использовать запрещено.

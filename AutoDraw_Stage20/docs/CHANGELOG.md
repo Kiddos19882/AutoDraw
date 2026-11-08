@@ -2,6 +2,13 @@
 
 Записывать только изменения интерфейсов, форматов, возможностей и значимые изменения сопровождения. Ход проверки каждой задачи — [WORK_LOG](WORK_LOG.md). Полная прежняя редакция без изменений: [CHANGELOG_HISTORY_THROUGH_2026-11-08.md](CHANGELOG_HISTORY_THROUGH_2026-11-08.md).
 
+## 2026-11-08 — ENGINE-001 accepted-only Egret temporal reference
+
+- Добавлен opt-in исследовательский режим \`?temporal=fill001\` **в существующий** \`tests/game_renderer_reference.js\`: actual \`BoardPane\` one-pass / incremental redraw, 27 run-bound strokes/1260 accepted points, строгая входная валидация, 4 Canvas2D/WebGL PNG, manifest. Production и прежние 20 renderer fixtures не изменены.
+- [CI 42434968046](https://github.com/Kiddos19882/AutoDraw/actions/runs/42434968046) browser job SUCCESS на \`8d5d088\`: 0 difference между двумя итоговыми растрами и 70 vs 29 накопленных Graphics paths. Данные исторические; exact live CHALK новых алгоритмов не измерялся, full temporal/screen equivalence не доказаны.
+
+---
+
 ## 2026-11-08 — подтверждённая граница источников ENGINE-001
 
 - [Архитектура доски](GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md#14-финальная-сверка-источников-game-monitorbridge-prr-и-runtime-2026-11-08) дополнена сравнением Egret E1, Monitor/Bridge, PRR 6/6 E3 и snapshot E4; устранено ошибочное утверждение, будто старый JSON содержал вычисленные `boardClientCorners`.
