@@ -3,6 +3,16 @@
 **Назначение:** только фактически выполненные изменения и проверки, а не будущие планы.  
 **Полная история до 2026-11-08:** [WORK_LOG_HISTORY_THROUGH_2026-11-08.md](WORK_LOG_HISTORY_THROUGH_2026-11-08.md) — побайтовый исторический снимок прежней редакции.
 
+## 2026-11-08 — ENGINE-001: чтение движка и консервация следующей программы тестов
+
+- Повторно проверены remote HEAD `768ece83f129`, 20 коммитов и Actions, README/STATUS/TASKS/ROADMAP/AI guide, DECISIONS/invariants/evidence, инженерный разбор Egret, Monitor и точные FILL/PRR результаты.
+- Проверены `gameEngine/manifest.json` и непосредственные ключевые методы `mergeEngine_df2e5bc5.js` (roundRect radius calculation, GraphicsNode line caps, CanvasRenderer path/stroke, WebTouchHandler.getLocation, SystemTicker); повторный полный `main.min` в текущем text connector невозможен, его BoardPane/Painter путь проверен по ранее зафиксированному анализу того же Git blob и существующему actual-BoardPane harness.
+- Создан [единый технический обзор движка и доски](GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md) с уровнем подтверждения для каждого звена, таблицей координат, CHALK, лимитами, методами smooth/normal, render/clip и списком неизвестного. Это документационная систематизация, **не новый runtime эксперимент**.
+- Зафиксированы ранее выполненные A–D/PRR/RS тесты, предполагаемые E1–E4 и будущий multi-stroke replay на **существующем** Egret harness в [ROADMAP](ROADMAP.md#отложенная-программа-тестов-fill-001-geom-001-и-связанных-gates); задача FILL-001 остаётся открытой, но отложенной. Новый ENGINE-001 отмечен как P0.
+- Не менялись gameplay source, gameEngine bundles, unit tests, workflow, frozen masks, capture PNG, CHALK estimator, Stage6 executor и master. Документационный CI проверять отдельно на итоговом commit.
+
+---
+
 ## 2026-11-08 — FILL-001 actual screen-ROI contour counterfactual
 
 - Повторно проверены remote HEAD `57815f6f5a26`, 20 последних коммитов и доступные Actions, текущие README/STATUS/TASKS/ROADMAP/AI guide, FILL-001 primary live report, PNG capture adapter, pinned plan, frozen masks и A–D модель. Работа продолжила FILL-001, не меняла Stage6/production.

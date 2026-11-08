@@ -4,7 +4,13 @@
 
 **DOC-001…DOC-004 закрыты:** [CI 42421451709](https://github.com/Kiddos19882/AutoDraw/actions/runs/42421451709) SUCCESS, 99/99 индексировано, 0 broken links, 9 immutable archives, 0 duplicate decisions. Фактические действия отражены в [WORK_LOG](WORK_LOG.md); старые чек-листы остаются в [истории TASKS](TASKS_HISTORY_THROUGH_2026-11-08.md). Ниже перечислены только открытые технические задачи.
 
-## P1 — качество рисунка и практическая оптимизация
+## P0 — текущая работа: игровой движок и документация
+
+- [ ] **ENGINE-001** — Выполнить проверяемый разбор сохранённого Egret 5.4.1 и рабочего `PainterPopup.painterBoard`. Начальная систематизация в [архитектуре игровой доски](GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md) (**E1 PARTIAL**). Проверено по комплекту gameEngine/manifest, merge bundle, существующим engine/PRR/Monitor отчетам и browser harness; основной `main.min` повторно целиком через текущий GitHub connector не извлечён. **Открыто:** методы/состояния BlackBoardAtom и смежных классов по точному blob, все критические transform/render paths, несовпадения и непроверенные runtime assumptions, таблица трассируемых ссылок и ограничения репликации. **Критерий завершения:** профильная документация отражает источник для каждого существенного вывода и явно отделяет E1, E2/E3, E4, UNKNOWN; противоречия не замалчиваются. Не запускать новые live/оптимизационные тесты в рамках документационного этапа.
+
+## P1 — отложенные тесты качества и оптимизации (не закрыты)
+
+**Статус:** `DEFERRED_BY_PRIORITY` до выполнения текущего ENGINE-001; прежние PASS/FAIL/BLOCKED не меняются. Полная матрица новых кандидатов и ранее запланированных тестов — [ROADMAP](ROADMAP.md#отложенная-программа-тестов-fill-001-geom-001-и-связанных-gates).
 
 - [ ] **FILL-001** — Live baseline 27/27, exact CHALK=1260, actual coverage=98.430600%, leakage=11: **REJECTED**. Frozen A–D и paired screen-ROI contour counterfactual выполнены ([CI 42427514794](https://github.com/Kiddos19882/AutoDraw/actions/runs/42427514794); [artifact 13596093007](https://github.com/Kiddos19882/AutoDraw/actions/runs/42427514794/artifacts/13596093007)): 1116 screen misses; offset6 model recovers 734, leaves 382, adds 0 model leakage, но старые 11 остаются; ±1px dilation adds 89 leakage. **Следующий gate:** выяснить 738px model-only mismatch, локализовать leakage и подобрать boundary-aware geometry без новых утечек; затем независимый новый live preflight. Пороги ≥99% и 0 не менять. [Original live evidence](CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md).
 - [ ] **GEOM-001** — A–D offline analyzer для трёх FILL-001 frozen masks реализован ([CI 42424959123](https://github.com/Kiddos19882/AutoDraw/actions/runs/42424959123)). **Следующий незавершённый шаг:** закрепить representative source/image-family подвыборку из 81 изображений, расширить контроль на mono/color (разные Stage8/Stage6 пути) и сопоставить качество/контуры/длину/strokes отдельно от estimated sampling и measured CHALK.

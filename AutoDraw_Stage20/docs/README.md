@@ -22,12 +22,14 @@
 
 - **Ресурс CHALK:** [G1/G2/G3, INT-006 и INT006R — общий реестр](TEST_RESULTS.md) → [официальный INT-006](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md) → [frozen model/analyzer](CHALK_INT006_FROZEN_PREDICTIONS_AND_ANALYZER_2026-11-02.md). Только exact `CHALK = post.pointCount - pre.pointCount` — реальное измерение.
 - **Заливка и качество:** [FILL-001-RS capture/replay](CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md) → [временный план эксперимента](CHALK_FILL001_TEMPORARY_PLAN_2026-11-03.md); baseline: CHALK 1260 измерен, **PNG quality FAILED** (98.430600%, leakage 11).
-- **Геометрия/рендерер:** [game engine cost и renderer](CHALK_GAME_ENGINE_POINT_COST_AND_BRUSH_WIDTH_2026-11-03.md) → [PRR CI 6/6 PASS](https://github.com/Kiddos19882/AutoDraw/actions/runs/42321009715).
+- **Геометрия/рендерер:** [архитектура игровой доски и движка](GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md) → [game engine cost и renderer](CHALK_GAME_ENGINE_POINT_COST_AND_BRUSH_WIDTH_2026-11-03.md) → [PRR CI 6/6 PASS](https://github.com/Kiddos19882/AutoDraw/actions/runs/42321009715).
 - **Корпус 81 изображения:** [offline screening и N](TEST_RESULTS.md#3-кандидатный-корпус-81-реального-изображения-offline-only) → [генератор и ограничения](VALIDATION_CORPUS_GENERATOR_2026-11-07.md). Это кандидатные Stage8 mono / Stage6 color scanlines, а **не** валидированная D1–D5 CHALK-популяция.
 - **Цель CHALK 95%:** [проект safety margin](CHALK_SAFETY_MARGIN_POLICY_DESIGN_2026-11-07.md) → [предложенный протокол 19/59](CHALK_95_PERCENT_CALIBRATION_HOLDOUT_PROTOCOL_2026-11-07.md); ещё **не** production gate PASS.
 - **Game Monitor / Bridge:** [текущие API](GAME_MONITOR_BRIDGE_REFERENCE.md) и [README Game Monitor](../source/game_monitor/README.md).
 
 ## Файлы игрового движка
+
+- [Архитектура и цикл рисования BoardPane](GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md) — актуальная систематизация источников и открытых вопросов ENGINE-001.
 
 - [Текущий комплект клиентских bundle и manifest](../gameEngine/) — сохранённые файлы Egret/BoardPane. Копия в репозитории не доказывает соответствие именно текущей живой игре.
 - [Аудит движка, принятых точек и renderer](CHALK_GAME_ENGINE_POINT_COST_AND_BRUSH_WIDTH_2026-11-03.md) — сопоставление версий, доказательства и границы выводов.
@@ -117,7 +119,7 @@
 - [`CHALK_SAFETY_MARGIN_POLICY_DESIGN_2026-11-07.md`](CHALK_SAFETY_MARGIN_POLICY_DESIGN_2026-11-07.md)
 - [`CHALK_TEST_BLOCKS_DESIGN.md`](CHALK_TEST_BLOCKS_DESIGN.md)
 
-### Справочники архитектуры, UI, API и процессов (20)
+### Справочники архитектуры, UI, API и процессов (21)
 
 - [`ARCHITECTURE.md`](ARCHITECTURE.md)
 - [`BRUSH_MODULE_QUICK_INDEX.md`](BRUSH_MODULE_QUICK_INDEX.md)
@@ -132,6 +134,7 @@
 - [`DOCUMENTATION_INVENTORY_2026-11-03.md`](DOCUMENTATION_INVENTORY_2026-11-03.md)
 - [`EXECUTOR_API_REFERENCE.md`](EXECUTOR_API_REFERENCE.md)
 - [`FILE_STORAGE_CATALOG.md`](FILE_STORAGE_CATALOG.md)
+- [`GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md`](GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md)
 - [`GAME_MONITOR_BRIDGE_REFERENCE.md`](GAME_MONITOR_BRIDGE_REFERENCE.md)
 - [`GAME_MONITOR_BUFFER_OVERFLOW_ANALYSIS_2026-11-02.md`](GAME_MONITOR_BUFFER_OVERFLOW_ANALYSIS_2026-11-02.md)
 - [`MODULE_REFERENCE.md`](MODULE_REFERENCE.md)
