@@ -178,6 +178,49 @@
     }
   };
 
+  // Read-only, opt-in pre-draw desktop mapping witness. This never sends input
+  // to the game. Only genuine mouse moves with NO buttons over BoardPane are
+  // accepted; the server binds these samples to this authenticated session.
+  let passivePreflightHandler = null;
+  let lastPassivePreflightAt = -Infinity;
+  const installPassivePreflight = () => {
+    if (!INPUT_TELEMETRY_ENABLED || passivePreflightHandler) return;
+    passivePreflightHandler = event => {
+      if (!connected || !event.isTrusted || event.buttons !== 0
+          || document.visibilityState !== "visible"
+          || !(event.target instanceof HTMLCanvasElement)
+          || performance.now() - lastPassivePreflightAt < 250) return;
+      const current = monitor.status();
+      if (!current.active || !current.boardDetected) return;
+      // Geometry is refreshed and published BEFORE each sample if the page
+      // moved; the collector always fingerprints its current renderer state.
+      const geo = readRendererGeometry();
+      const players = geo && geo.players;
+      const rect = Array.isArray(players) && players.length === 1
+        ? players[0].boardClientCorners : null;
+      const tl = rect && rect.topLeft;
+      const br = rect && rect.bottomRight;
+      if (!tl || !br || !Number.isFinite(event.clientX) || !Number.isFinite(event.clientY)
+          || event.clientX < tl.x || event.clientX > br.x
+          || event.clientY < tl.y || event.clientY > br.y) return;
+      publishRendererGeometry("passive_input_preflight");
+      lastPassivePreflightAt = performance.now();
+      send("preflight_sample", { sample: {
+        source: "window-bubble-after-egret-canvas",
+        isTrusted: true,
+        buttons: 0,
+        clientX: event.clientX, clientY: event.clientY,
+        screenX: event.screenX, screenY: event.screenY
+      }});
+    };
+    window.addEventListener("mousemove", passivePreflightHandler, false);
+  };
+  const removePassivePreflight = () => {
+    if (!passivePreflightHandler) return;
+    window.removeEventListener("mousemove", passivePreflightHandler, false);
+    passivePreflightHandler = null;
+  };
+
   const stopFpsProbe = () => {
     if (rafHandle !== null) cancelAnimationFrame(rafHandle);
     rafHandle = null;
@@ -235,6 +278,7 @@
         visibilityState: document.visibilityState
       });
       installGeometryListeners();
+      installPassivePreflight();
       unsubscribe = monitor.subscribe(item => {
         if (!ALLOWED_EVENTS.has(item.type)) return;
         // BoardPane callbacks are not exposed in every game frame. Pointer
@@ -269,6 +313,7 @@
     connected = false;
     if (unsubscribe) unsubscribe();
     removeGeometryListeners();
+    removePassivePreflight();
     if (heartbeatTimer !== null) clearInterval(heartbeatTimer);
     if (geometryUpdateTimer !== null) clearTimeout(geometryUpdateTimer);
     if (rafHandle !== null) cancelAnimationFrame(rafHandle);
