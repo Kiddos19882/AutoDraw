@@ -90,6 +90,44 @@ def parse_json(raw: str) -> dict | None:
     return value if isinstance(value, dict) else None
 
 
+def boardpane_mapping_fingerprint(geometry: object) -> str:
+    """Hash V3 input-relevant projection; exclude animated Preloader chain.
+
+    The complete renderer fingerprint remains separately retained for evidence.
+    Keep this projection in sync with the V3 preparation diagnostic helper.
+    """
+    if not isinstance(geometry, dict):
+        raise ValueError("BoardPane geometry missing.")
+    players = geometry.get("players")
+    if not isinstance(players, list) or len(players) != 1 or not isinstance(players[0], dict):
+        raise ValueError("Expected one BoardPane.")
+    player = players[0]
+    if (not isinstance(player.get("boardClientCorners"), dict)
+            or not isinstance(player.get("boardStageCorners"), dict)):
+        raise ValueError("BoardPane corners missing.")
+    def pick(obj: object, names: tuple[str, ...]) -> dict:
+        return {key: obj.get(key) for key in names} if isinstance(obj, dict) else {}
+    projection = {
+        **pick(geometry, ("engineVersion", "renderMode", "boardLogicalSize",
+                          "canvasScaleFactor", "canvasScaleX", "canvasScaleY",
+                          "devicePixelRatio", "visualViewportScale")),
+        "windowGeometry": pick(geometry.get("windowGeometry"),
+                               ("screenX", "screenY", "outerWidth", "outerHeight",
+                                "innerWidth", "innerHeight", "screenWidth", "screenHeight")),
+        "boardClientMappingMethod": player.get("boardClientMappingMethod"),
+        "boardClientCorners": player["boardClientCorners"],
+        "boardStageCorners": player["boardStageCorners"],
+        "stage": pick(player.get("stage"),
+                      ("width", "height", "scaleMode", "orientation")),
+        "canvas": pick(player.get("canvas"),
+                       ("width", "height", "clientWidth", "clientHeight",
+                        "offsetLeft", "offsetTop", "rect", "style")),
+    }
+    return hashlib.sha256(json.dumps(
+        projection, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+    ).encode("utf-8")).hexdigest()
+
+
 def normalize_passive_preflight_sample(
     raw: object, session_record: dict,
 ) -> dict:
@@ -147,6 +185,7 @@ def normalize_passive_preflight_sample(
         "source": raw["source"],
         "session_id": session_record["session_id"],
         "renderer_geometry_sha256": fingerprint,
+        "boardpane_mapping_sha256": boardpane_mapping_fingerprint(geometry),
         "buttons": 0,
         "pre_drawing": True,
         "captured_at_utc": utc_now(),
