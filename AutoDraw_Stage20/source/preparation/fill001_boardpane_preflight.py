@@ -144,6 +144,10 @@ def boardpane_preflight_transform(
     geometry_sha = _geometry_hash(geometry)
     if not isinstance(samples, list) or len(samples) < 3:
         raise PreflightGeometryError("At least three passive pre-run input samples required.")
+    recorded = session.get("passive_preflight_samples")
+    if (not isinstance(recorded, list) or len(recorded) < 3
+            or len(samples) > len(recorded) or samples != recorded[-len(samples):]):
+        raise PreflightGeometryError("Passive samples must be the latest suffix of the authenticated Bridge session.")
     offset_x, offset_y, seen = [], [], set()
     for i, sample in enumerate(samples):
         if not isinstance(sample, dict):
