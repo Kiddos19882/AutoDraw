@@ -116,6 +116,11 @@ def test_authenticated_passive_preflight_witness_is_bounded_to_boardpane():
         "players": [{"boardClientCorners": {
             "topLeft": {"x": 498.0, "y": 104.0},
             "bottomRight": {"x": 1170.0, "y": 456.0},
+        }, "boardStageCorners": {
+            "topLeft": {"x": 340.0, "y": 72.0},
+            "topRight": {"x": 800.0, "y": 72.0},
+            "bottomRight": {"x": 800.0, "y": 312.0},
+            "bottomLeft": {"x": 340.0, "y": 312.0},
         }}],
         "boardLogicalSize": {"width": 460, "height": 240},
     }
