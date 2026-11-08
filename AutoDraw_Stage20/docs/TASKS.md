@@ -84,3 +84,13 @@
 - [x] Same-run source binding: подтверждены исходный SHA (при строго восстановленных CRLF после Git checkout), пара E4/run ID, неизменные BoardPane client corners и согласованный client→screen offset по `MOUSE_MOVE_SAMPLE`.
 - [x] Числовой V2: Smooth ON `coverage=98.796065%`, `leakage=1493`; Smooth OFF `coverage=99.359230%`, `leakage=1474`. В обоих `V2 diagnostic FAIL`. Исходный V1 остаётся 840/849 и `FAIL/FAIL`.
 - [ ] **Следующее E5:** сравнить верхние/нижние и боковые пиксели с native Egret WebGL footprint для обоих конкретных run. V2 увеличение утечки не доказывает ухудшения рисунка или правоту V1; запрещено подбирать offset/пороги по результату.
+
+## FILL-001 — новая чистая Smooth A/B V2 (запуск пользователя)
+
+- [x] **E1 implementation:** `FILL001_SMOOTH_AB_V2` с двумя независимыми ON/OFF task IDs, frozen logical rectangle mask и 27-stroke RS plan, отдельным `FILL001_SCREEN_MASK_V2` для post-run анализа. В UI — кнопка «Новый Smooth A/B V2 (2 задачи)»; standard Stage6 и Bridge не изменены.
+- [x] Новый manifest валидируется через существующий fail-closed matrix loader. Из каждого нового run сохраняются V1 PNG контроль и V2 PNG diagnostic, полученный из *его собственного* raw Monitor 0.2.4 с SHA-bound client→screen mapping; ошибочный binding не принимается. В V2 pair comparison запрещены старые протоколы, устаревшие task/PNG, несовпадающие raw run SHA и geometry.
+- [ ] E2/E3: подтвердить полные Windows preparation/UI/regression tests и mandatory CI на **одном** SHA после последней модификации; ранее подтверждённые CI на другом SHA не заменяют этот gate.
+- [ ] **E4 operator live:** выполнить на Windows два **совершенно новых** single-task прогона, новый manifest/session, чистую доску перед каждым, вручную ON затем OFF. До получения actual raw run + PNG результаты новой серии **NOT_RUN**; никаких ожидаемых чисел coverage/leakage/CHALK не объявлять.
+- [ ] E5: независимая сверка native Egret footprint против каждого из новых PNG после сохранения первичных evidence; запрет post-hoc подгонки маски и изменения quality gates.
+
+Инструкция по шагам: [Game Monitor / Bridge §13](GAME_MONITOR_BRIDGE_REFERENCE.md#13-fill-001--новая-чистая-smooth-ab-v2-под-screen-mask-v2). Старые результаты V1 и V2 replay 2026-11-08 — архивная база, **не вход** новой серии.
