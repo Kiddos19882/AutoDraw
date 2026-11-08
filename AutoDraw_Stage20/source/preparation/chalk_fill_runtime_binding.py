@@ -290,8 +290,8 @@ def _validate_session(session: dict[str, Any], run: dict[str, Any]) -> str:
         raise FillMatrixError("Bridge run не содержит корректный run_id.") from exc
 
     monitor_status = session.get("monitor_status_at_connect")
-    if not isinstance(monitor_status, dict) or monitor_status.get("version") != "0.2.1":
-        raise FillMatrixError("Bridge session не подтверждает Game Monitor 0.2.1.")
+    if not isinstance(monitor_status, dict) or monitor_status.get("version") not in {"0.2.1", "0.2.4"}:
+        raise FillMatrixError("Bridge session не подтверждает поддерживаемый Game Monitor 0.2.1/0.2.4.")
     diagnostics = session.get("bridge_diagnostics")
     if not isinstance(diagnostics, dict):
         raise FillMatrixError("Bridge session не содержит bridge_diagnostics.")
@@ -397,8 +397,10 @@ def _validate_bridge_run(
     if any(not isinstance(event, dict) for event in events):
         raise FillMatrixError("Bridge run содержит некорректный event.")
     monitor_versions = {event.get("monitorVersion") for event in events}
-    if monitor_versions != {"0.2.1"}:
-        raise FillMatrixError("Bridge run events не подтверждают единый Game Monitor version.")
+    monitor_status = session.get("monitor_status_at_connect")
+    expected_monitor_version = monitor_status.get("version") if isinstance(monitor_status, dict) else None
+    if monitor_versions != {expected_monitor_version}:
+        raise FillMatrixError("Bridge run events не подтверждают единую версию Game Monitor из session.")
 
     for field in (
         "dropped_events",
@@ -456,15 +458,15 @@ def _validate_bridge_run(
         lifecycle_source = "pointer_observer"
     else:
         raise FillMatrixError("Bridge run не содержит полного engine или pointer stroke lifecycle.")
-    if any(event.get("monitorVersion") != "0.2.1" for event in events):
-        raise FillMatrixError("Bridge run содержит событие с неизвестной версией Monitor.")
+    if any(event.get("monitorVersion") != expected_monitor_version for event in events):
+        raise FillMatrixError("Bridge run содержит событие другой версии Monitor.")
 
     return {
         "session_id": session_id,
         "stroke_lifecycle_source": lifecycle_source,
         "observed_radius": radii[0],
         "run_id": run_id,
-        "monitor_version": "0.2.1",
+        "monitor_version": expected_monitor_version,
         "event_count": event_count,
         "events": events,
         "pre_point_count": pre_count,

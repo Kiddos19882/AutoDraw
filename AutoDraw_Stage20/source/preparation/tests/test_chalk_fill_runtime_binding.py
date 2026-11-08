@@ -494,3 +494,42 @@ def test_runtime_binding_rejects_non_consuming_stroke_candidates(tmp_path):
 
     with pytest.raises(FillMatrixError, match="non-consuming stroke candidates"):
         bind_fill001_runtime_evidence(task, session, [run], report)
+
+
+def test_fill001_runtime_binding_accepts_monitor_024_without_relabeling_legacy(tmp_path):
+    task, _, _, _, run, session, report = _runtime_documents(tmp_path)
+    session["monitor_status_at_connect"]["version"] = "0.2.4"
+    for event in run["events"]:
+        event["monitorVersion"] = "0.2.4"
+    binding = bind_fill001_runtime_evidence(task, session, [run], report)
+    assert binding["run_id"] == run["run_id"]
+    assert binding["exact_chalk"] == 5
+    assert binding["monitor_export"]["monitorVersion"] == "0.2.4"
+    assert {ev["monitorVersion"] for ev in binding["monitor_export"]["events"]} == {"0.2.4"}
+
+
+@pytest.mark.parametrize("bad_version", ["0.2.0", "0.2.2", "0.2.3", "0.2.5"])
+def test_fill001_runtime_binding_rejects_unvalidated_monitor_versions(tmp_path, bad_version):
+    task, _, _, _, run, session, report = _runtime_documents(tmp_path)
+    session["monitor_status_at_connect"]["version"] = bad_version
+    for event in run["events"]:
+        event["monitorVersion"] = bad_version
+    with pytest.raises(FillMatrixError, match="поддерживаемый Game Monitor"):
+        bind_fill001_runtime_evidence(task, session, [run], report)
+
+
+def test_fill001_runtime_binding_rejects_mixed_monitor_versions_across_run_events(tmp_path):
+    task, _, _, _, run, session, report = _runtime_documents(tmp_path)
+    session["monitor_status_at_connect"]["version"] = "0.2.4"
+    for event in run["events"]:
+        event["monitorVersion"] = "0.2.4"
+    run["events"][1]["monitorVersion"] = "0.2.1"
+    with pytest.raises(FillMatrixError, match="единую версию Game Monitor"):
+        bind_fill001_runtime_evidence(task, session, [run], report)
+
+
+def test_fill001_runtime_binding_rejects_session_run_monitor_mismatch(tmp_path):
+    task, _, _, _, run, session, report = _runtime_documents(tmp_path)
+    session["monitor_status_at_connect"]["version"] = "0.2.4"
+    with pytest.raises(FillMatrixError, match="единую версию Game Monitor"):
+        bind_fill001_runtime_evidence(task, session, [run], report)
