@@ -68,3 +68,12 @@
 
 <a id="brush-footprint-capsule-001--per-segment-broad-phase-independent-oracle-и-benchmark-2026-11-04"></a>
 - Техническая запись BRUSH-FOOTPRINT-CAPSULE-001 сохранена в [историческом TASKS](TASKS_HISTORY_THROUGH_2026-11-08.md#brush-footprint-capsule-001--per-segment-broad-phase-independent-oracle-и-benchmark-2026-11-04); это не автоматически открытая новая задача.
+
+## FILL-001 — Screen Mask V2 (диагностическая проекция)
+
+- [x] Добавлен отдельный `fill001_screen_mask_v2.py` (E1): frozen logical mask 460×240 и исходный RGB threshold=8 не меняются; V2 требует явные проверенные desktop-screen corners BoardPane, run ID и evidence SHA, иначе fail-closed. Сравнение V1 возвращается в том же отчёте и никогда не переопределяет исторический acceptance.
+- [x] Добавлены regression tests `test_fill001_screen_mask_v2.py` для identity, сдвига, отказа на неверной геометрии/ROI и сохранения V1.
+- [ ] E2/E3: получить результат тестов/CI именно для SHA с новым кодом; до этого статус проверки NOT_RUN/UNKNOWN.
+- [ ] E5: привязать к двум FILL001_SMOOTH_AB_V1 run независимо верифицированные экранные BoardPane corners и fingerprint, затем перепроецировать оба сохранённых PNG; raw логические и client coordinates без подтверждённого desktop mapping не принимаются. Внести сравнение V1/V2 и native Egret footprint в отдельный evidence отчёт без изменения quality thresholds.
+
+**Область:** только исследовательская диагностика; production executor/planner, frozen mask, предыдущие PNG и оригинальные результаты остаются неизменными. Новые live-рисования не нужны для первого V2 replay.
