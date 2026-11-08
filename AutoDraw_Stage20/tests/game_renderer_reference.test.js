@@ -8,6 +8,7 @@ const {
   terminalPoint,
   shouldWebGLRendererRasterize,
   extractAcceptedPoints,
+  extractTemporalStrokes,
   buildStagePlacement,
   buildStageRendererTransform
 } = require("./game_renderer_reference.js");
@@ -193,4 +194,38 @@ test("Stage placement rejects BoardPane geometry outside the backing canvas", ()
     }
   };
   assert.throws(() => buildStagePlacement(profile, false), /falls outside/);
+});
+
+
+test("ENGINE-001 temporal sample extraction validates identity, CHALK and order", () => {
+  const run = {
+    record_type: "autodraw_game_monitor_run", execution_status: "completed",
+    point_delta_matches_chalk: true, stroke_count: 2, observed_brush_radii: [10],
+    dropped_events: 0, monitor_buffer_dropped_events_delta: 0,
+    monitor_error_count_delta: 0, bridge_send_failures_delta: 0,
+    collector_sequence_gap_count: 0, run_id: "test-run", session_id: "test-session",
+    pre_test_snapshot: { isExact: true, logicalWidth: 460, logicalHeight: 240, pointCount: 1 },
+    post_test_snapshot: { isExact: true, logicalWidth: 460, logicalHeight: 240, pointCount: 4 },
+    accepted_points: [
+      { t: 1, stroke_id: "a", point_delta: 1, x: 1.5, y: 2 },
+      { t: 2, stroke_id: "a", point_delta: 1, x: 3.5, y: 2 },
+      { t: 3, stroke_id: "b", point_delta: 1, x: 4.5, y: 6 }
+    ]
+  };
+  const result = extractTemporalStrokes(run);
+  assert.equal(result.exactChalk, 3);
+  assert.deepEqual(result.strokes.map(s => s.points.length), [2, 1]);
+  assert.equal(result.strokes[0].points[0].x, 1.5);
+  for (const [description, mutate, error] of [
+    ["coalesced", r => { r.accepted_points[0].point_delta = 2; }, /Invalid ordered/],
+    ["missing coordinate", r => { r.accepted_points[0].x = null; }, /Invalid ordered/],
+    ["invalid CHALK", r => { r.post_test_snapshot.pointCount += 1; }, /exact run-bound CHALK/],
+    ["interleaving", r => { r.accepted_points[2].stroke_id = "a"; r.accepted_points[1].stroke_id = "b"; }, /Interleaved/],
+    ["dropped events", r => { r.dropped_events = 1; }, /telemetry loss/],
+    ["brush mismatch", r => { r.observed_brush_radii = [30]; }, /brush width/]
+  ]) {
+    const copy = structuredClone(run);
+    mutate(copy);
+    assert.throws(() => extractTemporalStrokes(copy), error, description);
+  }
 });

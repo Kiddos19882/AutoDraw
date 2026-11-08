@@ -124,6 +124,47 @@ try {
 
     Write-Host "Egret actual BoardPane CanvasRenderer + WebGLRenderer generated $($manifest.fixtures.Count) fixtures, 20 WebGL comparisons and $($pngMatches.Count) PNG files."
 
+
+    # ENGINE-001 offline temporal replay: do not substitute inputs from another run.
+    $temporalInput = "AutoDraw_Stage20/data/results/brush_behavior_tests/game_monitor_bridge/bb261898-8296-41f5-a333-eb0b81016410/game-monitor-run-20261104T040548835772Z-6a17a297.json"
+    $sourceBlob = (git rev-parse "HEAD:$temporalInput").Trim()
+    if ($LASTEXITCODE -ne 0 -or $sourceBlob -ne "8eb04ad7331d1e56f4aeb7d0f625c59c1dc57c24") {
+        throw "ENGINE-001 source Game Monitor blob changed unexpectedly: $sourceBlob"
+    }
+    $temporalDom = Join-Path $env:RUNNER_TEMP "egret-temporal-dom.html"
+    $temporalStderr = Join-Path $env:RUNNER_TEMP "egret-temporal-edge-stderr.log"
+    $temporalArgs = @($browserArgs)
+    $temporalArgs[-1] = "http://127.0.0.1:8765/AutoDraw_Stage20/tests/game_renderer_reference.html?temporal=fill001"
+    $temporalProcess = Start-Process -FilePath $edgePath -ArgumentList $temporalArgs -RedirectStandardOutput $temporalDom -RedirectStandardError $temporalStderr -PassThru -Wait
+    if ($temporalProcess.ExitCode -ne 0) { throw "ENGINE-001 Edge temporal browser exited with $($temporalProcess.ExitCode)." }
+    $temporalPage = Get-Content -Raw $temporalDom
+    if ($temporalPage -notmatch 'data-temporal-status="complete"' -or $temporalPage -notmatch 'data-temporal-png-count="4"') {
+        Copy-Item $temporalDom (Join-Path $outputDir "temporal-page-failure.html") -Force
+        Copy-Item $temporalStderr (Join-Path $outputDir "temporal-edge-stderr.log") -Force
+        throw "ENGINE-001 temporal HTML did not complete. See temporal-page-failure.html."
+    }
+    $temporalJsonMatch = [regex]::Match($temporalPage, '<pre id="renderer-manifest-json"[^>]*>(.*?)</pre>', [System.Text.RegularExpressions.RegexOptions]::Singleline)
+    if (-not $temporalJsonMatch.Success) { throw "ENGINE-001 temporal manifest was not exported." }
+    $temporalJson = [System.Net.WebUtility]::HtmlDecode($temporalJsonMatch.Groups[1].Value)
+    $temporalManifest = $temporalJson | ConvertFrom-Json
+    if ($temporalManifest.status -ne "COMPLETE_OFFLINE_MEASUREMENT" -or
+        $temporalManifest.strokeCount -ne 27 -or
+        $temporalManifest.exactHistoricalChalk -ne 1260 -or
+        $temporalManifest.screenProjection -ne "UNCALIBRATED" -or
+        $temporalManifest.incremental.graphicsPathCount -le $temporalManifest.onePass.graphicsPathCount -or
+        $null -eq $temporalManifest.webglPixelComparison.differingPixels) {
+        throw "ENGINE-001 temporal manifest fails provenance or rendering guards."
+    }
+    Set-Content -Path (Join-Path $outputDir "engine001-temporal-accepted-only-v1.json") -Value $temporalJson -Encoding utf8
+    $temporalLinks = [regex]::Matches($temporalPage, $pngPattern)
+    if ($temporalLinks.Count -ne 4) { throw "ENGINE-001 requires 4 renderer PNGs, found $($temporalLinks.Count)." }
+    foreach ($link in $temporalLinks) {
+        $pngName = [System.IO.Path]::GetFileName($link.Groups[2].Value)
+        if (-not $pngName.StartsWith("engine001-temporal-")) { throw "Unexpected temporal PNG name: $pngName" }
+        [System.IO.File]::WriteAllBytes((Join-Path $outputDir $pngName), [Convert]::FromBase64String($link.Groups[1].Value))
+    }
+    Write-Host "ENGINE-001 accepted-only replay: 27 strokes, 1260 historical points, Canvas2D diff=$($temporalManifest.canvas2dPixelComparison.differingPixels), WebGL diff=$($temporalManifest.webglPixelComparison.differingPixels)."
+
     python AutoDraw_Stage20/tests/run_egret_stage_reference_firefox.py --base-url "http://127.0.0.1:8765" --output-dir $outputDir --workspace $env:GITHUB_WORKSPACE --paired-renderer-experiment-root "AutoDraw_Stage20/data/results/brush_behavior_tests"
     if ($LASTEXITCODE -ne 0) { throw "Firefox Stage-level A-D browser probe failed." }
 
