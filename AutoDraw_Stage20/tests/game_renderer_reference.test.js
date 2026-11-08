@@ -229,3 +229,42 @@ test("ENGINE-001 temporal sample extraction validates identity, CHALK and order"
     assert.throws(() => extractTemporalStrokes(copy), error, description);
   }
 });
+
+test("ENGINE-001 imports complete run-bound fractional accepted points without quota events", () => {
+  const run = {
+    record_type: "autodraw_game_monitor_run", execution_status: "completed",
+    run_id: "run", session_id: "session", chalk_experiment_matrix: { phase_id: "ENGINE001" },
+    point_delta_matches_chalk: true, stroke_count: 1, observed_brush_radii: [10],
+    dropped_events: 0, monitor_buffer_dropped_events_delta: 0,
+    monitor_error_count_delta: 0, bridge_send_failures_delta: 0, collector_sequence_gap_count: 0,
+    pre_test_snapshot: { isExact: true, logicalWidth: 460, logicalHeight: 240, pointCount: 1 },
+    post_test_snapshot: { isExact: true, logicalWidth: 460, logicalHeight: 240, pointCount: 3 },
+    renderer_geometry_at_start: { engineVersion: "5.4.1" },
+    renderer_geometry_at_end: { engineVersion: "5.4.1" },
+    observed_stroke_modes: [{ stroke_id: "s", stroke_option_raw: true }],
+    accepted_points: [
+      { t: 10, stroke_id: "s", point_delta: 1, x: 74.20833396911621, y: 119 },
+      { t: 20, stroke_id: "s", point_delta: 1, x: 76.20833396911621, y: 119 }
+    ],
+    events: [
+      { type: "DRAW_SAMPLE", source: "state_poll", pointDelta: 1, strokeId: "s", t: 10,
+        acceptedPoint: { x: 74.20833396911621, y: 119 } },
+      { type: "DRAW_SAMPLE", source: "state_poll", pointDelta: 1, strokeId: "s", t: 20,
+        acceptedPoint: { x: 76.20833396911621, y: 119 } }
+    ]
+  };
+  assert.deepEqual(extractAcceptedPoints(run), [
+    { x: 74.20833396911621, y: 119 }, { x: 76.20833396911621, y: 119 }
+  ]);
+  for (const [label, mutate, error] of [
+    ["missing draw", r => { r.events.pop(); }, /DRAW_SAMPLE/],
+    ["tampered draw", r => { r.events[0].acceptedPoint.x += 1; }, /DRAW_SAMPLE/],
+    ["coalesced delta", r => { r.events[0].pointDelta = 2; }, /DRAW_SAMPLE/],
+    ["wrong native mode", r => { r.observed_stroke_modes[0].stroke_option_raw = false; }, /smooth=true/],
+    ["changed geometry", r => { r.renderer_geometry_at_end.engineVersion = "5.5"; }, /geometry/],
+    ["invalid CHALK", r => { r.post_test_snapshot.pointCount++; }, /exact run-bound CHALK/]
+  ]) {
+    const changed = structuredClone(run); mutate(changed);
+    assert.throws(() => extractAcceptedPoints(changed), error, label);
+  }
+});

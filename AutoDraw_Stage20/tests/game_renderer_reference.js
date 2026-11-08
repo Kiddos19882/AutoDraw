@@ -13,6 +13,38 @@
         return { x: Number(point.x), y: Number(point.y) };
       });
     }
+    // ENGINE-001/Monitor 0.2.4 stores complete accepted_points; older PRR used
+    // POINT_QUOTA_UPDATE. Verify the exact raw stream before offline replay.
+    if (runOrPoints && runOrPoints.chalk_experiment_matrix?.phase_id === "ENGINE001") {
+      const run = runOrPoints;
+      const temporal = extractTemporalStrokes(run);
+      if (temporal.strokes.length !== 1) {
+        throw new Error("ENGINE-001 replay requires exactly one stroke.");
+      }
+      if (!run.renderer_geometry_at_start || !run.renderer_geometry_at_end ||
+          JSON.stringify(run.renderer_geometry_at_start) !== JSON.stringify(run.renderer_geometry_at_end)) {
+        throw new Error("ENGINE-001 run-bound renderer geometry is missing or changed.");
+      }
+      const modes = run.observed_stroke_modes;
+      if (!Array.isArray(modes) || modes.length !== 1 ||
+          modes[0].stroke_id !== temporal.strokes[0].strokeId ||
+          modes[0].stroke_option_raw !== true) {
+        throw new Error("ENGINE-001 replay requires observed smooth=true native mode.");
+      }
+      if (!Array.isArray(run.events)) throw new Error("ENGINE-001 raw events missing.");
+      const accepted = run.accepted_points;
+      const draws = run.events.filter(e => e && e.type === "DRAW_SAMPLE" && Number(e.pointDelta) > 0);
+      if (draws.length !== accepted.length || draws.some((e, i) => {
+        const p = accepted[i], q = e.acceptedPoint;
+        return Number(e.pointDelta) !== 1 ||
+          !["state_poll", "onDrawing_wrapper"].includes(e.source) ||
+          e.strokeId !== p.stroke_id || e.t !== p.t ||
+          !q || q.x !== p.x || q.y !== p.y;
+      })) {
+        throw new Error("ENGINE-001 accepted_points disagree with positive DRAW_SAMPLE telemetry.");
+      }
+      return temporal.strokes[0].points;
+    }
     if (!runOrPoints || typeof runOrPoints !== "object" || !Array.isArray(runOrPoints.events)) {
       throw new Error("Paste a Game Monitor run JSON with an events array, or a direct [{x,y}] array.");
     }
@@ -449,6 +481,9 @@
     if (parsed) {
       const points = extractAcceptedPoints(parsed);
       const mode = document.getElementById("live-path-mode").value;
+      if (parsed.chalk_experiment_matrix?.phase_id === "ENGINE001" && mode !== "smooth") {
+        throw new Error("ENGINE-001 selected mode differs from observed smooth=true.");
+      }
       const lineWidth = Number(document.getElementById("live-line-width").value);
       if (!Number.isFinite(lineWidth) || lineWidth <= 0 || lineWidth > 100) {
         throw new Error("Line width must be greater than 0 and no more than 100.");
