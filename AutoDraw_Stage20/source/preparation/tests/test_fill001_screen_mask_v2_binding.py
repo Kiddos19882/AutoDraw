@@ -113,7 +113,7 @@ class TestV2Binding(unittest.TestCase):
     def test_exact_original_crlf_reconstruction_is_accepted(self):
         self.write()
         # Ensure the fixture has actual LF line endings (compact JSON is one line).
-        self.run_path.write_text(json.dumps(self.run, indent=2) + "\n", encoding="utf-8")
+        self.run_path.write_bytes((json.dumps(self.run, indent=2) + "\n").encode("utf-8"))
         checked_out = self.run_path.read_bytes()
         reconstructed = checked_out.replace(b"\n", b"\r\n")
         self.evidence["raw_run_sha256"] = hashlib.sha256(reconstructed).hexdigest()
