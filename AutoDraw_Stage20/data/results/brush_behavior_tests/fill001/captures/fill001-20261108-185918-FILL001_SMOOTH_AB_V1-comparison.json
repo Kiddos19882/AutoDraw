@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "protocol": "FILL001_SMOOTH_AB_V1",
+  "series_id": "fill001-20261108-185918",
+  "matrix_signature": "106bbe302fc1325d420895f8d19263dafbdd83f10aab44aa61e6081a6079f12a",
+  "status": "ANALYZED_COMPARABLE",
+  "conditions": [
+    {
+      "task_id": "fill001-20261108-185918-rectangle-r10-s5-o0-smooth-on",
+      "run_id": "358f1e65-f786-4ba3-a866-71d6a48c5016",
+      "session_id": "15e3de92-f847-420f-b0d5-faea8dd38b4c",
+      "smooth": true,
+      "exact_chalk": 1465,
+      "screen_roi": {
+        "x": 496,
+        "y": 265,
+        "width": 674,
+        "height": 355
+      },
+      "renderer_geometry_sha256": "c62f8c948427e1b94986c5a6f5a62dcc331efcbe467f88afec596491b7af16bd",
+      "before_sha256": "5f0278f8c92b05e5755179bc5ae7bb8bf145d5e3e87e322f9845d1402db20ded",
+      "after_sha256": "35b5be4e4a87047d6002c65aa7aacf5fdf0ffc7310ec7006e98a1e8a97eda383",
+      "coverage_fraction": 0.9878470414262804,
+      "leakage_pixels": 840,
+      "png_quality_gate": "FAIL",
+      "spatial": {
+        "uncovered_pixels": 1167,
+        "leakage_pixels": 840,
+        "middle_row_count": 118,
+        "right_middle_miss_pixels": 440,
+        "left_middle_miss_pixels": 100,
+        "right_middle_gap_median_px": 3.0,
+        "left_middle_gap_median_px": 1.0,
+        "right_rows_with_gap": 118,
+        "leakage_top_rows": [
+          [
+            73,
+            400
+          ],
+          [
+            281,
+            400
+          ],
+          [
+            74,
+            4
+          ],
+          [
+            280,
+            3
+          ],
+          [
+            99,
+            2
+          ],
+          [
+            102,
+            2
+          ],
+          [
+            251,
+            2
+          ],
+          [
+            252,
+            2
+          ],
+          [
+            255,
+            2
+          ],
+          [
+            92,
+            1
+          ]
+        ]
+      }
+    },
+    {
+      "task_id": "fill001-20261108-185918-rectangle-r10-s5-o0-smooth-off",
+      "run_id": "b76d43c3-9b29-4622-8ca8-48ece75eaf3d",
+      "session_id": "15e3de92-f847-420f-b0d5-faea8dd38b4c",
+      "smooth": false,
+      "exact_chalk": 1454,
+      "screen_roi": {
+        "x": 496,
+        "y": 265,
+        "width": 674,
+        "height": 355
+      },
+      "renderer_geometry_sha256": "c62f8c948427e1b94986c5a6f5a62dcc331efcbe467f88afec596491b7af16bd",
+      "before_sha256": "5f0278f8c92b05e5755179bc5ae7bb8bf145d5e3e87e322f9845d1402db20ded",
+      "after_sha256": "a86c2b036681c6619833280b2f33ffdaa2f0c26ab13063651389f7521b85cab9",
+      "coverage_fraction": 0.9931476891675172,
+      "leakage_pixels": 849,
+      "png_quality_gate": "FAIL",
+      "spatial": {
+        "uncovered_pixels": 658,
+        "leakage_pixels": 849,
+        "middle_row_count": 118,
+        "right_middle_miss_pixels": 129,
+        "left_middle_miss_pixels": 122,
+        "right_middle_gap_median_px": 1.0,
+        "left_middle_gap_median_px": 1.0,
+        "right_rows_with_gap": 118,
+        "leakage_top_rows": [
+          [
+            281,
+            403
+          ],
+          [
+            73,
+            402
+          ],
+          [
+            74,
+            6
+          ],
+          [
+            280,
+            6
+          ],
+          [
+            99,
+            2
+          ],
+          [
+            108,
+            2
+          ],
+          [
+            246,
+            2
+          ],
+          [
+            255,
+            2
+          ],
+          [
+            92,
+            1
+          ],
+          [
+            93,
+            1
+          ]
+        ]
+      }
+    }
+  ],
+  "off_minus_on": {
+    "exact_chalk": -11,
+    "coverage_percentage_points": 0.530064774123673,
+    "leakage_pixels": 9,
+    "uncovered_pixels": -509,
+    "right_middle_miss_pixels": -311
+  },
+  "limitations": [
+    "The game smoothing toggle is operator-controlled; actual modes are verified from raw ENTER_FRAME telemetry.",
+    "Stage/client-to-desktop projection is not independently proven by equal screen ROI alone.",
+    "Two consecutive runs are exploratory, not independent proof of causality or a general model.",
+    "RGB screenshot comparison cannot recover native alpha or full temporal render order.",
+    "PNG quality remains >=99% coverage AND zero leakage for each run."
+  ]
+}
