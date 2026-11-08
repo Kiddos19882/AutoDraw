@@ -302,3 +302,32 @@ def test_complete_27_stroke_raw_monitor_and_screen_evidence_can_pass(tmp_path):
     ab_readiness["expected_smooth"] = True
     assert audit_ab()["status"] == "PARTIAL"
 
+
+
+def test_committed_76a58ab_v3_failure_has_stable_boardpane_despite_preloader_animation():
+    """Reproduce exact captured failure without altering or copying raw artifacts."""
+    from fill001_monitor_diagnostic import (
+        _boardpane_mapping_fingerprint, _geometry_fingerprint,
+    )
+    root = Path(__file__).resolve().parents[3]
+    session_folder = (
+        root / "data" / "results" / "brush_behavior_tests" /
+        "game_monitor_bridge" / "6941c88e-5875-436e-91f1-adea67f44160"
+    )
+    first = json.loads((session_folder /
+        "game-monitor-run-20261108T202311793393Z-717c7f61.json"
+    ).read_text(encoding="utf-8"))
+    second = json.loads((session_folder /
+        "game-monitor-run-20261108T202417826011Z-d21dc550.json"
+    ).read_text(encoding="utf-8"))
+    before = first["renderer_geometry_at_start"]
+    after = second["renderer_geometry_at_start"]
+    assert first["stroke_count"] == second["stroke_count"] == 0
+    assert first["session_id"] == second["session_id"]
+    assert _geometry_fingerprint(before) != _geometry_fingerprint(after)
+    assert _boardpane_mapping_fingerprint(before) == _boardpane_mapping_fingerprint(after)
+    assert before["players"][0]["boardDisplayChain"][3]["width"] == 3060
+    assert after["players"][0]["boardDisplayChain"][3]["width"] == pytest.approx(
+        2830.0809053156145
+    )
+    assert before["players"][0]["boardClientCorners"] == after["players"][0]["boardClientCorners"]
