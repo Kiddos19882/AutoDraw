@@ -135,6 +135,7 @@ def test_authenticated_passive_preflight_witness_is_bounded_to_boardpane():
     assert bound["session_id"] == "live-session"
     assert bound["screenY"] - bound["clientY"] == 163
     assert len(bound["renderer_geometry_sha256"]) == 64
+    assert len(bound["boardpane_mapping_sha256"]) == 64
     assert bound["captured_at_utc"]
     for changed in (
         {**raw, "buttons": 1},
@@ -145,3 +146,29 @@ def test_authenticated_passive_preflight_witness_is_bounded_to_boardpane():
     ):
         with pytest.raises(ValueError):
             normalize_passive_preflight_sample(changed, session)
+
+
+def test_boardpane_projection_fingerprint_excludes_preloader_but_tracks_board_screen():
+    from game_monitor_bridge_server import boardpane_mapping_fingerprint
+    from copy import deepcopy
+    geometry = {
+        "engineVersion": "5.4.1", "renderMode": "webgl",
+        "boardLogicalSize": {"width": 460, "height": 240},
+        "windowGeometry": {"screenX": -8, "screenY": -8, "innerWidth": 1920,
+                           "innerHeight": 877},
+        "players": [{
+            "boardClientMappingMethod": "validated_axis_aligned_rect",
+            "boardClientCorners": {"topLeft": {"x": 497.96, "y": 104.86}},
+            "boardStageCorners": {"topLeft": {"x": 340.79, "y": 72}},
+        }],
+        "boardDisplayChain": [{"className": "Preloader", "width": 3060}],
+    }
+    baseline = boardpane_mapping_fingerprint(geometry)
+    animated = deepcopy(geometry)
+    animated["boardDisplayChain"][0]["width"] = 2830.0809053156145
+    assert boardpane_mapping_fingerprint(animated) == baseline
+    animated["players"][0]["boardClientCorners"]["topLeft"]["x"] += 1
+    assert boardpane_mapping_fingerprint(animated) != baseline
+    moved = deepcopy(geometry)
+    moved["windowGeometry"]["screenX"] += 1
+    assert boardpane_mapping_fingerprint(moved) != baseline
