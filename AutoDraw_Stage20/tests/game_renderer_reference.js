@@ -963,6 +963,179 @@
     }
   }
 
+
+  // ENGINE-001 endpoint comparison: keep accepted points identical in every
+  // variant, change only the native Painter path's final segment.
+  function makeEndpointBoard(strokes, variant) {
+    if (variant === "game-smooth") return {board:makeTemporalBoard(strokes,10,"smooth",false),patchedCalls:0};
+    if (variant === "normal") return {board:makeTemporalBoard(strokes,10,"normal",false),patchedCalls:0};
+    if (variant !== "smooth-drawlast") throw new Error("Unknown endpoint variant.");
+    const painter = root.com.magnetjoy.painter.Painter;
+    const original = painter.drawSmoothLine;
+    let patchedCalls = 0;
+    painter.drawSmoothLine = function(graphics, points, drawFirstHalf, drawLast) {
+      if (drawFirstHalf !== true || drawLast !== false) {
+        throw new Error("Game BoardPane changed native smooth Painter call signature.");
+      }
+      patchedCalls += 1;
+      return original.call(this, graphics, points, drawFirstHalf, true);
+    };
+    try {
+      const board = makeTemporalBoard(strokes,10,"smooth",false);
+      if (patchedCalls !== strokes.length) {
+        throw new Error("Forced endpoint did not intercept each native Painter stroke.");
+      }
+      return {board,patchedCalls};
+    } finally {
+      painter.drawSmoothLine = original;
+    }
+  }
+
+  function endpointBoundsAtRow(canvas, logicalY, threshold) {
+    if (![1,64,128,254].includes(threshold)) throw new Error("Unsupported alpha threshold");
+    const data=canvas.getContext("2d",{willReadFrequently:true}).getImageData(
+      0,0,canvas.width,canvas.height).data;
+    const cy=Math.round(logicalY * RASTER_SCALE);
+    const lo=Math.max(0,cy-2),hi=Math.min(canvas.height-1,cy+2);
+    let left=null,right=null,opaqueCount=0;
+    for(let y=lo;y<=hi;y+=1) for(let x=0;x<canvas.width;x+=1) {
+      if(data[(y*canvas.width+x)*4+3]>=threshold) {
+        left=left===null?x:Math.min(left,x);
+        right=right===null?x:Math.max(right,x);
+        opaqueCount+=1;
+      }
+    }
+    return {threshold,screenScale:RASTER_SCALE,leftBackingX:left,rightBackingX:right,nonzeroBandPixels:opaqueCount};
+  }
+
+  function renderEndpointStudy() {
+    try {
+      if (!window.egret || !egret.Shape || !egret.CanvasRenderer) {
+        throw new Error("Real Egret browser renderer is unavailable.");
+      }
+      const runPath="../data/results/brush_behavior_tests/game_monitor_bridge/" +
+        "bb261898-8296-41f5-a333-eb0b81016410/" +
+        "game-monitor-run-20261104T040548835772Z-6a17a297.json";
+      const planPath="../data/results/brush_behavior_tests/fill001/plans/" +
+        "fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1.json";
+      function readJson(path) {
+        const request=new XMLHttpRequest();
+        request.open("GET",path,false);request.send(null);
+        if(request.status!==200)throw new Error("Pinned endpoint evidence HTTP "+request.status+": "+path);
+        return JSON.parse(request.responseText);
+      }
+      const run=extractTemporalStrokes(readJson(runPath));
+      const plan=readJson(planPath);
+      if(run.runId!=="6a17a297-ea14-4527-9527-bfd8de3bd335" ||
+        run.sessionId!=="bb261898-8296-41f5-a333-eb0b81016410" ||
+        run.strokes.length!==27 || run.exactChalk!==1260 ||
+        !Array.isArray(plan.strokes) || plan.strokes.length!==run.strokes.length) {
+        throw new Error("Pinned run/plan identity or count mismatch.");
+      }
+      const endpointRows=[5,15,16];
+      for(let k=4;k<=22;k+=1) {
+        const expected=plan.strokes[k].points;
+        const actual=run.strokes[k].points;
+        if(expected.length!==2 || expected[0].x!==75 || expected[1].x!==385 ||
+          actual.length<2 || Math.abs(actual[0].x-76.20833396911621)>1e-7 ||
+          Math.abs(actual[actual.length-1].x-389.2083339691162)>1e-7) {
+          throw new Error("Identical-plan endpoint cohort has changed: row "+(k+1));
+        }
+      }
+      const variants=["game-smooth","smooth-drawlast","normal"];
+      const mask=createBoardMask();
+      const state=initializeWebGL(null);
+      const card=document.createElement("section");
+      card.className="fixture";
+      card.appendChild(document.createTextNode(
+        "ENGINE-001 actual game Painter endpoint comparison; offline only; no screen calibration."));
+      const aggregate={};
+      let pngCount=0;
+      for(const variant of variants) {
+        const item=makeEndpointBoard(run.strokes,variant);
+        const source=renderGraphicsNode(item.board.shape.$renderNode,false);
+        const canvas=composeBoard(source,source.nodeBounds,mask);
+        const webgl=renderWebGLProbe("smooth",[],10,canvas,state,item.board.shape);
+        for(const [name,output] of [["canvas2d",canvas],["webgl",webgl.canvas]]) {
+          addDownloadLink(card,output,"engine001-endpoint-"+variant+"-all-"+name+".png",variant+" "+name);
+          pngCount+=1;
+        }
+        aggregate[variant]={
+          accepted:item.board.accepted,strokeCount:run.strokes.length,
+          nativePainterPatchedCalls:item.patchedCalls,
+          graphicsPathCount:item.board.graphicsPathCount,
+          canvas2dVsWebgl: webgl.comparison, webglDrawCalls:webgl.drawCalls
+        };
+      }
+      const individual=[];
+      for(const row of endpointRows) {
+        const stroke=run.strokes[row-1];
+        const p=stroke.points;
+        const last=p[p.length-1],previous=p[p.length-2];
+        const report={
+          row,strokeId:stroke.strokeId,
+          planStart:plan.strokes[row-1].points[0],
+          planEnd:plan.strokes[row-1].points[1],
+          firstAccepted:p[0],penultimateAccepted:previous,lastAccepted:last,
+          smoothTerminalPoint:midpoint(previous,last),variants:{}
+        };
+        for(const variant of variants) {
+          const item=makeEndpointBoard([stroke],variant);
+          const source=renderGraphicsNode(item.board.shape.$renderNode,false);
+          const canvas=composeBoard(source,source.nodeBounds,mask);
+          const webgl=renderWebGLProbe("smooth",[],10,canvas,state,item.board.shape);
+          const pngName="engine001-endpoint-"+variant+"-row"+row+"-webgl.png";
+          addDownloadLink(card,webgl.canvas,pngName,pngName);
+          pngCount+=1;
+          report.variants[variant]={
+            nativePainterPatchedCalls:item.patchedCalls,
+            graphicsPathCount:item.board.graphicsPathCount,
+            canvas2dVsWebgl:webgl.comparison,
+            boundsByAlpha:[1,64,128,254].map(a=>endpointBoundsAtRow(webgl.canvas,last.y,a))
+          };
+        }
+        individual.push(report);
+      }
+      if(pngCount!==15 || aggregate["smooth-drawlast"].nativePainterPatchedCalls!==27 ||
+        individual.some(r=>r.variants["smooth-drawlast"].nativePainterPatchedCalls!==1)) {
+        throw new Error("Expected all actual Painter path changes and 15 reference PNGs.");
+      }
+      casesNode.textContent="";
+      casesNode.appendChild(card);
+      const manifest={
+        schemaVersion:1,experimentId:"ENGINE001_NATIVE_ENDPOINT_V1",
+        status:"COMPLETE_OFFLINE_NATIVE_ENGINE_MEASUREMENT",
+        runId:run.runId,sessionId:run.sessionId,exactHistoricalChalk:run.exactChalk,
+        gameBundleBlobSha:"46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+        egretBundleBlobSha:"d613d2b97e2436521aa3870478c69e99eac1f19f",
+        monitorInputBlobSha:"8eb04ad7331d1e56f4aeb7d0f625c59c1dc57c24",
+        planInputPath:planPath,strokeCount:run.strokes.length,acceptedCount:1260,
+        modeAssumption:"smooth for game baseline; historical per-stroke options unavailable",
+        syntheticControl:"smooth-drawlast forces only native Painter final lineTo through temporary isolated method wrapper; normal uses native BoardPane.setSmooth(false)",
+        browserRaster:"Egret 5.4.1 CanvasRenderer and WebGLRenderer masked actual game BoardPane, 3x backing scale",
+        pixelCanvas:{width:1380,height:720},screenProjection:"UNCALIBRATED",
+        isolatedRows:endpointRows,aggregate,individual,pngCount,
+        exclusions:[
+          "No new gameplay or CHALK measurement",
+          "No actual per-stroke live screenshot, no frame/DOM scheduling reproduction",
+          "No same-run Stage/CSS/desktop mapping; browser pixels cannot be compared directly to original captured screen ROI",
+          "Original per-stroke mode/colors, current live game GPU and service point not recovered",
+          "Original FILL-001 coverage and leakage thresholds are unchanged"
+        ]
+      };
+      document.getElementById("renderer-manifest-json").textContent=JSON.stringify(manifest,null,2);
+      document.body.dataset.endpointStatus="complete";
+      document.body.dataset.endpointPngCount=String(pngCount);
+      document.body.dataset.referenceStatus="endpoint_complete";
+      statusNode.textContent="ENGINE-001 native endpoint experiment complete; 27 strokes and 3 isolated rows; uncalibrated screen.";
+    } catch(error) {
+      document.body.dataset.endpointStatus="error";
+      document.body.dataset.referenceStatus="error";
+      statusNode.className="error";
+      statusNode.textContent="Endpoint study failed: "+(error&&error.stack?error.stack:String(error));
+    }
+  }
+
   function renderAll() {
     try {
       if (!window.egret || !egret.Shape || !egret.CanvasRenderer) {
@@ -1175,8 +1348,10 @@
 
   api.renderAll = renderAll;
   api.renderTemporalStudy = renderTemporalStudy;
-  const startup = new URLSearchParams(window.location.search).get("temporal") === "fill001"
-    ? renderTemporalStudy : renderAll;
+  api.renderEndpointStudy = renderEndpointStudy;
+  const params = new URLSearchParams(window.location.search);
+  const startup = params.get("endpoint") === "fill001" ? renderEndpointStudy
+    : params.get("temporal") === "fill001" ? renderTemporalStudy : renderAll;
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", startup, { once: true });
   } else {
