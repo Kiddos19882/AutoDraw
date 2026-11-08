@@ -33,6 +33,11 @@ from fill001_smooth_ab_v2 import (
     V2_IDENTITY_FIELDS, build_fill001_smooth_ab_v2_matrix,
     analyze_smooth_ab_v2_pair,
 )
+from fill001_smooth_ab_v3 import (
+    PROTOCOL as FILL001_AB_V3_PROTOCOL, COORDINATE_PREFLIGHT,
+    V3_IDENTITY_FIELDS, build_fill001_smooth_ab_v3_matrix,
+    analyze_smooth_ab_v3_pair,
+)
 from fill001_screen_mask_v2 import audit_screen_mask_v2
 from fill001_screen_mask_v2_binding import bind_from_monitor_run
 from fill001_monitor_diagnostic import (
@@ -104,6 +109,7 @@ class Fill001Tab:
         ttk.Button(series, text="Создать manifest (45 задач)", command=self.create_series).pack(side="left", padx=4)
         ttk.Button(series, text="Новый Smooth A/B (2 задачи)", command=self.create_smooth_ab_series).pack(side="left", padx=4)
         ttk.Button(series, text="Новый Smooth A/B V2 (2 задачи)", command=self.create_smooth_ab_v2_series).pack(side="left", padx=4)
+        ttk.Button(series, text="Новый Smooth A/B V3 (BoardPane)", command=self.create_smooth_ab_v3_series).pack(side="left", padx=4)
         ttk.Button(series, text="Открыть manifest…", command=self.load_series_dialog).pack(side="left", padx=4)
         self.manifest_label = ttk.Label(series, text="Manifest не загружен")
         self.manifest_label.pack(side="left", padx=10)
@@ -139,7 +145,10 @@ class Fill001Tab:
     def create_smooth_ab_v2_series(self) -> None:
         self._create_series(smooth_ab=False, smooth_ab_v2=True)
 
-    def _create_series(self, *, smooth_ab: bool, smooth_ab_v2: bool = False) -> None:
+    def create_smooth_ab_v3_series(self) -> None:
+        self._create_series(smooth_ab=False, smooth_ab_v3=True)
+
+    def _create_series(self, *, smooth_ab: bool, smooth_ab_v2: bool = False, smooth_ab_v3: bool = False) -> None:
         raw_id = self.series_var.get().strip()
         if not raw_id or re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,63}", raw_id) is None:
             messagebox.showwarning(
@@ -152,6 +161,7 @@ class Fill001Tab:
             # Opt-in diagnostic reproduces the historical 27-stroke RS
             # geometry, never the legacy 131-stroke default.
             matrix = (
+                build_fill001_smooth_ab_v3_matrix(raw_id) if smooth_ab_v3 else
                 build_fill001_smooth_ab_v2_matrix(raw_id) if smooth_ab_v2 else
                 build_fill001_smooth_ab_matrix(raw_id) if smooth_ab else
                 build_fill001_rs_matrix(raw_id) if self.diagnostic_var.get()
@@ -165,6 +175,7 @@ class Fill001Tab:
             self.manifest_label.configure(text=path.name)
             self._refresh_tasks()
             label = (
+                "FILL-001 Smooth A/B V3 BoardPane" if smooth_ab_v3 else
                 "FILL-001 Smooth A/B V2" if smooth_ab_v2 else
                 "FILL-001 Smooth A/B" if smooth_ab else
                 "Диагностический FILL-001-RS" if self.diagnostic_var.get() else "FILL-001"
@@ -231,7 +242,7 @@ class Fill001Tab:
                 f"Radius: {task['requested_radius']}\n"
                 f"Repeat: {task['repeat_index']}/{task.get('planned_repeats', 3)}\n"
                 + (f"Declared smooth: {task['expected_smooth']}\n"
-                   if task.get("experiment_protocol") in (FILL001_AB_PROTOCOL, FILL001_AB_V2_PROTOCOL) else "") +
+                   if task.get("experiment_protocol") in (FILL001_AB_PROTOCOL, FILL001_AB_V2_PROTOCOL, FILL001_AB_V3_PROTOCOL) else "") +
                 f"Expected strokes: {task['expected_strokes']}\n"
                 f"Coverage estimate: {task['planned_coverage_fraction']:.6%}\n"
                 f"Leakage pixels: {task['planned_leakage_pixels']}\n"
@@ -296,7 +307,7 @@ class Fill001Tab:
             messagebox.showerror("FILL-001 не подключён", "Callback передачи в Stage 6 отсутствует.", parent=self.root)
             return
         self.diagnostic_active = (
-            self.matrix.get("experiment_protocol") in (FILL001_AB_PROTOCOL, FILL001_AB_V2_PROTOCOL)
+            self.matrix.get("experiment_protocol") in (FILL001_AB_PROTOCOL, FILL001_AB_V2_PROTOCOL, FILL001_AB_V3_PROTOCOL)
             or bool(self.diagnostic_var.get())
         )
         self.diagnostic_readiness = None
@@ -369,7 +380,7 @@ class Fill001Tab:
                     + ("ON" if task["expected_smooth"] else "OFF")
                     + ". AutoDraw не переключает этот параметр. Фактический режим "
                       "всех 27 штрихов будет проверен по ENGINE_FRAME_SAMPLE."
-                    if task.get("experiment_protocol") in (FILL001_AB_PROTOCOL, FILL001_AB_V2_PROTOCOL) else ""
+                    if task.get("experiment_protocol") in (FILL001_AB_PROTOCOL, FILL001_AB_V2_PROTOCOL, FILL001_AB_V3_PROTOCOL) else ""
                 )
             ),
             icon="warning",
@@ -393,6 +404,9 @@ class Fill001Tab:
                 task["task_id"],
                 operator_approved_single_task_preflight=True,
             )
+            if task.get("experiment_protocol") == FILL001_AB_V3_PROTOCOL:
+                plan["generation"]["screen_mapping_policy"] = COORDINATE_PREFLIGHT
+                plan["generation"]["screen_mapping_expected_roi"] = dict(self.capture_region)
             plan_path = self.output_dir / "plans" / f"{task['task_id']}.json"
             plan_path.parent.mkdir(parents=True, exist_ok=True)
             plan_path.write_text(json.dumps(plan, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -400,7 +414,11 @@ class Fill001Tab:
                 raise RuntimeError("AutoDraw отклонил передачу FILL-001 плана в Stage 6.")
             generation = plan.get("generation")
             screen_transform = generation.get("screen_transform") if isinstance(generation, dict) else None
-            if (
+            if task.get("experiment_protocol") == FILL001_AB_V3_PROTOCOL:
+                if (screen_transform is not None
+                        or plan["generation"].get("screen_mapping_expected_roi") != self.capture_region):
+                    raise RuntimeError("V3 must remain LOGICAL until fresh BoardPane preflight.")
+            elif (
                 not isinstance(screen_transform, dict)
                 or screen_transform.get("screen_roi") != self.capture_region
             ):
@@ -649,7 +667,7 @@ class Fill001Tab:
         """Analyze only a complete new A/B pair, never archival captures."""
         try:
             if (not isinstance(self.matrix, dict)
-                    or self.matrix.get("experiment_protocol") not in (FILL001_AB_PROTOCOL, FILL001_AB_V2_PROTOCOL)):
+                    or self.matrix.get("experiment_protocol") not in (FILL001_AB_PROTOCOL, FILL001_AB_V2_PROTOCOL, FILL001_AB_V3_PROTOCOL)):
                 raise FillMatrixError("Откройте двухзадачный FILL-001 Smooth A/B manifest.")
             if self.manifest_path is None:
                 raise FillMatrixError("A/B manifest не загружен.")
@@ -782,7 +800,7 @@ class Fill001Tab:
                         "FILL-001 raw E4 diagnostic PARTIAL: " + ", ".join(audit["reasons"])
                         + ". Report сохранён, capture не принят."
                     )
-            if self.matrix.get("experiment_protocol") in (FILL001_AB_PROTOCOL, FILL001_AB_V2_PROTOCOL):
+            if self.matrix.get("experiment_protocol") in (FILL001_AB_PROTOCOL, FILL001_AB_V2_PROTOCOL, FILL001_AB_V3_PROTOCOL):
                 # Preserve a failed PNG as evidence. This is NOT the legacy
                 # accepted FILL-001 capture path and never weakens its gates.
                 ab_protocol = self.matrix["experiment_protocol"]
