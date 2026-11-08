@@ -682,6 +682,8 @@ class Fill001Tab:
                 reports.append(json.loads(Path(path).read_text(encoding="utf-8")))
             protocol = current["experiment_protocol"]
             analysis = (
+                analyze_smooth_ab_v3_pair(current, reports)
+                if protocol == FILL001_AB_V3_PROTOCOL else
                 analyze_smooth_ab_v2_pair(current, reports)
                 if protocol == FILL001_AB_V2_PROTOCOL
                 else analyze_smooth_ab_pair(current, reports)
@@ -810,7 +812,8 @@ class Fill001Tab:
                     "rectangle", before_png, after_png, screen_roi=record["screen_roi"]
                 )
                 evidence = {
-                    "schema_version": 2 if ab_protocol == FILL001_AB_V2_PROTOCOL else 1,
+                    "schema_version": (3 if ab_protocol == FILL001_AB_V3_PROTOCOL else
+                                       2 if ab_protocol in (FILL001_AB_V2_PROTOCOL, FILL001_AB_V3_PROTOCOL) else 1),
                     "protocol": ab_protocol,
                     "task_id": self.active_task["task_id"],
                     "expected_smooth": self.active_task["expected_smooth"],
@@ -827,7 +830,7 @@ class Fill001Tab:
                     "after_png_sha256": png["after_png_sha256"],
                     "png_audit": png,
                 }
-                if ab_protocol == FILL001_AB_V2_PROTOCOL:
+                if ab_protocol in (FILL001_AB_V2_PROTOCOL, FILL001_AB_V3_PROTOCOL):
                     # This is run-bound and derived from the CURRENT raw run;
                     # no old series, fitted offsets, or screenshot-derived calibration.
                     v2_binding = bind_from_monitor_run(Path(run_file), audit_file)
@@ -844,6 +847,18 @@ class Fill001Tab:
                     evidence["screen_mask_version"] = FILL001_V2_MASK
                     evidence["v2_audit"] = v2
                     evidence["v2_binding_provenance"] = v2_binding["provenance"]
+                    if ab_protocol == FILL001_AB_V3_PROTOCOL:
+                        frozen_source = json.loads(Path(self.active_plan_path).read_text(encoding="utf-8"))
+                        generation = frozen_source.get("generation")
+                        preflight = generation.get("screen_transform") if isinstance(generation, dict) else None
+                        if (not isinstance(preflight, dict)
+                                or preflight.get("schema") != COORDINATE_PREFLIGHT
+                                or preflight.get("session_id") != audit["session_id"]
+                                or preflight.get("renderer_geometry_sha256") != audit["geometry_at_start_sha256"]
+                                or preflight.get("screen_roi") != record["screen_roi"]
+                                or preflight.get("no_fallback") is not True):
+                            raise FillMatrixError("V3 fresh BoardPane preflight evidence is absent or mismatched.")
+                        evidence["boardpane_preflight"] = preflight
                 evidence_file = self.output_dir / "captures" / (
                     f"{self.active_task['task_id']}-{ab_protocol}-result.json"
                 )
@@ -866,7 +881,8 @@ class Fill001Tab:
                 matching[0]["capture_path"] = str(evidence_file)
                 self.matrix["status"] = "in_progress"
                 identity_fields = (
-                    V2_IDENTITY_FIELDS if ab_protocol == FILL001_AB_V2_PROTOCOL
+                    V3_IDENTITY_FIELDS if ab_protocol == FILL001_AB_V3_PROTOCOL
+                    else V2_IDENTITY_FIELDS if ab_protocol == FILL001_AB_V2_PROTOCOL
                     else (
                         "schema_version", "phase_id", "series_id", "shapes",
                         "radii", "repeats", "tasks", "plan_variant",
@@ -880,11 +896,11 @@ class Fill001Tab:
                 ).hexdigest()
                 write_fill001_matrix(self.matrix, self.manifest_path)
                 measured = (
-                    evidence["v2_audit"] if ab_protocol == FILL001_AB_V2_PROTOCOL
+                    evidence["v2_audit"] if ab_protocol in (FILL001_AB_V2_PROTOCOL, FILL001_AB_V3_PROTOCOL)
                     else png
                 )
                 quality = (
-                    measured["v2_diagnostic_gate"] if ab_protocol == FILL001_AB_V2_PROTOCOL
+                    measured["v2_diagnostic_gate"] if ab_protocol in (FILL001_AB_V2_PROTOCOL, FILL001_AB_V3_PROTOCOL)
                     else png["png_audit_status"]
                 )
                 record["status"] = (
@@ -901,7 +917,7 @@ class Fill001Tab:
                     **({"v2_coverage_fraction": evidence["v2_audit"]["coverage_fraction"],
                         "v2_leakage_pixels": evidence["v2_audit"]["leakage_pixels"],
                         "v2_diagnostic_gate": evidence["v2_audit"]["v2_diagnostic_gate"]}
-                       if ab_protocol == FILL001_AB_V2_PROTOCOL else {}),
+                       if ab_protocol in (FILL001_AB_V2_PROTOCOL, FILL001_AB_V3_PROTOCOL) else {}),
                 }
                 self.active_run_record.write_text(
                     json.dumps(record, ensure_ascii=False, indent=2) + "\n",
@@ -915,7 +931,7 @@ class Fill001Tab:
                     + (f" V2 coverage={evidence['v2_audit']['coverage_fraction']:.6%}, "
                        f"V2 leakage={evidence['v2_audit']['leakage_pixels']}, "
                        f"V2={evidence['v2_audit']['v2_diagnostic_gate']}."
-                       if ab_protocol == FILL001_AB_V2_PROTOCOL else "")
+                       if ab_protocol in (FILL001_AB_V2_PROTOCOL, FILL001_AB_V3_PROTOCOL) else "")
                     + " Результат сохранён; перед следующим запуском очистите доску."
                 )
                 self.active_task = None
