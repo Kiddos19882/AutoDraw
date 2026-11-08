@@ -13,13 +13,17 @@ function createBridge({ enabled, initiallyEnabled = false, includeApi = true }) 
   const setterCalls = [];
   const sentMessages = [];
   const socketHandlers = {};
+  const windowHandlers = new Map();
+  class HTMLCanvasElement {}
 
   const monitor = {
     status() {
-      return { active: true, inputTelemetryEnabled };
+      return { active: true, boardDetected: true, inputTelemetryEnabled };
     },
     inspect() {
-      return { renderer: { players: [] } };
+      return { renderer: { players: [{ boardClientCorners: {
+        topLeft: { x: 498, y: 105 }, bottomRight: { x: 1170, y: 456 }
+      }}] } };
     },
     subscribe() {
       return () => {};
@@ -59,8 +63,8 @@ function createBridge({ enabled, initiallyEnabled = false, includeApi = true }) 
 
   const window = {
     AutoDrawGameMonitor: monitor,
-    addEventListener() {},
-    removeEventListener() {},
+    addEventListener(name, handler) { windowHandlers.set(name, handler); },
+    removeEventListener(name) { windowHandlers.delete(name); },
     visualViewport: null
   };
   const document = {
@@ -75,6 +79,7 @@ function createBridge({ enabled, initiallyEnabled = false, includeApi = true }) 
     location: { origin: "https://game.example", pathname: "/game" },
     crypto: { randomUUID: () => "session-test-id" },
     WebSocket: MockWebSocket,
+    HTMLCanvasElement,
     setTimeout: () => 1,
     clearTimeout() {},
     setInterval: () => 1,
@@ -97,6 +102,11 @@ function createBridge({ enabled, initiallyEnabled = false, includeApi = true }) 
   const sessionStart = sentMessages.find(item => item.type === "session_start");
   return {
     window, monitor, socket, setterCalls, sentMessages, sessionStart,
+    emitMouse(event) {
+      const handler = windowHandlers.get("mousemove");
+      if (handler) handler({ target: new HTMLCanvasElement(), isTrusted: true,
+        buttons: 0, ...event });
+    },
     get inputTelemetryEnabled() { return inputTelemetryEnabled; }
   };
 }
@@ -143,4 +153,32 @@ test("paired-renderer mode reports unavailable when Monitor cannot control input
   assert.equal(bridge.sessionStart.bridgeConfiguration.inputTelemetry.restoreStatus, "api_unavailable");
   bridge.socket.close();
   assert.equal(bridge.inputTelemetryEnabled, false);
+});
+
+
+test("opt-in Bridge captures trusted passive DOM screen coordinates without a draw event", () => {
+  const bridge = createBridge({ enabled: true });
+  bridge.emitMouse({ clientX: 600, clientY: 220, screenX: 600, screenY: 383 });
+  const witnesses = bridge.sentMessages.filter(item => item.type === "preflight_sample");
+  assert.equal(witnesses.length, 1);
+  assert.equal(witnesses[0].sample.source, "window-bubble-after-egret-canvas");
+  assert.equal(witnesses[0].sample.buttons, 0);
+  assert.equal(witnesses[0].sample.screenY - witnesses[0].sample.clientY, 163);
+  bridge.socket.close();
+});
+
+test("Bridge never probes with buttons held or outside observed BoardPane", () => {
+  const bridge = createBridge({ enabled: true });
+  bridge.emitMouse({ clientX: 600, clientY: 220, screenX: 600, screenY: 383,
+                     buttons: 1 });
+  bridge.emitMouse({ clientX: 100, clientY: 220, screenX: 100, screenY: 383 });
+  assert.equal(bridge.sentMessages.filter(item => item.type === "preflight_sample").length, 0);
+  bridge.socket.close();
+});
+
+test("ordinary Bridge does not collect passive preflight samples", () => {
+  const bridge = createBridge({ enabled: false });
+  bridge.emitMouse({ clientX: 600, clientY: 220, screenX: 600, screenY: 383 });
+  assert.equal(bridge.sentMessages.filter(item => item.type === "preflight_sample").length, 0);
+  bridge.socket.close();
 });
