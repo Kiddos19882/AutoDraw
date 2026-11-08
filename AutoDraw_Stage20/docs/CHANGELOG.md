@@ -2,6 +2,11 @@
 
 Записывать только изменения интерфейсов, форматов, возможностей и значимые изменения сопровождения. Ход проверки каждой задачи — [WORK_LOG](WORK_LOG.md). Полная прежняя редакция без изменений: [CHANGELOG_HISTORY_THROUGH_2026-11-08.md](CHANGELOG_HISTORY_THROUGH_2026-11-08.md).
 
+## 2026-11-08 — FILL-001: versioned right-edge spatial diagnostics
+
+- Existing committed screen-residual analyzer now outputs opt-in-compatible supplementary `FILL001_RIGHT_EDGE_SPATIAL_V1.json`, pinning the actual saved screenshot + 27-stroke endpoint derivation with strict SHA/run/CHALK checks. **No change** to frozen comparison report, original screenshots, thresholds or production paths. [Evidence artifact](https://github.com/Kiddos19882/AutoDraw/actions/runs/42456241289/artifacts/13607454421), [CI 42456241289](https://github.com/Kiddos19882/AutoDraw/actions/runs/42456241289) Preparation/G3 977 PASS.
+- 499 right middle misses form a 3–7px-wide strip across 114/114 screen rows; 134 left middle misses median1, 11 original leaked pixels remain. Causality undecided (legacy FILL001 same-run Stage mapping missing), quality FAIL unchanged. Initial Windows newline-test failure [CI 42456007010](https://github.com/Kiddos19882/AutoDraw/actions/runs/42456007010) retained, negative test corrected in `c4fefe6`.
+
 ## 2026-11-08 — ENGINE-001: offline E5 native screen-RGB reference validation
 
 - Исследовательский Egret harness расширен для raw Monitor 0.2.4 `accepted_points` с fail-closed проверкой `DRAW_SAMPLE` и observed mode; добавлены immutable 9-run Firefox Stage A–D и independent screen-RGB validator. Старые paired-renderer пути, пороги DEC-025, production и FILL-001 thresholds не менялись.
