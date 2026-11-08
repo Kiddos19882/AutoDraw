@@ -83,6 +83,7 @@ class Fill001Tab:
         )
         self.task_var = tk.StringVar()
         self.status_var = tk.StringVar(value="Создайте новую серию или откройте существующий manifest.")
+        self.bridge_status_var = tk.StringVar(value="Monitor/Bridge: подключение ещё не проверено.")
         self._build(parent)
 
     def _build(self, parent: tk.Widget) -> None:
@@ -114,6 +115,40 @@ class Fill001Tab:
         self.manifest_label = ttk.Label(series, text="Manifest не загружен")
         self.manifest_label.pack(side="left", padx=10)
 
+        bridge_controls = ttk.LabelFrame(
+            outer, text="Game Monitor 0.2.4 + Bridge — для FILL-001 V3", padding=8
+        )
+        bridge_controls.pack(fill="x", pady=(0, 8))
+        controls = ttk.Frame(bridge_controls)
+        controls.pack(fill="x")
+        ttk.Button(
+            controls, text="1. Запустить Bridge (Telemetry ON)",
+            command=self.start_fill001_bridge,
+        ).pack(side="left", padx=(0, 6))
+        ttk.Button(
+            controls, text="2. Копировать Monitor JS",
+            command=self.copy_fill001_monitor,
+        ).pack(side="left", padx=(0, 6))
+        ttk.Button(
+            controls, text="3. Копировать Bridge JS",
+            command=self.copy_fill001_bridge_snippet,
+        ).pack(side="left", padx=(0, 6))
+        ttk.Button(
+            controls, text="4. Проверить подключение",
+            command=self.check_fill001_bridge,
+        ).pack(side="left", padx=(0, 6))
+        ttk.Label(
+            bridge_controls,
+            text=("Порядок: запустите Bridge; в F12 → Console именно игрового iframe "
+                  "вставьте Monitor JS, затем Bridge JS. После подключения проверьте "
+                  "статус. Сами кнопки НЕ внедряют код в браузер."),
+            wraplength=1080, justify="left",
+        ).pack(anchor="w", pady=(6, 2))
+        ttk.Label(
+            bridge_controls, textvariable=self.bridge_status_var,
+            wraplength=1080, justify="left",
+        ).pack(anchor="w", pady=(2, 0))
+
         task = ttk.LabelFrame(outer, text="Одиночная задача", padding=8)
         task.pack(fill="x", pady=(0, 8))
         ttk.Label(task, text="Pending task").pack(side="left")
@@ -135,6 +170,79 @@ class Fill001Tab:
         self.task_details = tk.Text(outer, height=10, wrap="word", state="disabled")
         self.task_details.pack(fill="both", expand=True, pady=(0, 8))
         ttk.Label(outer, textvariable=self.status_var, wraplength=1120).pack(anchor="w")
+
+    def start_fill001_bridge(self) -> None:
+        """Use the existing shared Bridge launcher with mandatory V3 telemetry."""
+        try:
+            accepted = self.brush_tab.start_game_monitor_bridge(
+                require_input_telemetry=True,
+            )
+        except (OSError, RuntimeError, ValueError, TypeError, AttributeError) as exc:
+            self.bridge_status_var.set(f"Bridge BLOCKED: {exc}")
+            messagebox.showerror("FILL-001 Bridge", str(exc), parent=self.root)
+            return
+        if accepted:
+            self.bridge_status_var.set(
+                "Bridge запускается с Input Telemetry ON. Вставьте Monitor JS и "
+                "одноразовый Bridge JS в Console игрового iframe; затем проверьте связь."
+            )
+        else:
+            self.bridge_status_var.set(
+                "Bridge не запущен в требуемом режиме V3. Проверьте диалог и "
+                "окно сервера; старый Bridge с Telemetry OFF использовать нельзя."
+            )
+
+    def copy_fill001_monitor(self) -> None:
+        """Copy the shipped Monitor; user selects the game iframe in DevTools."""
+        self.brush_tab.copy_game_monitor_source()
+
+    def copy_fill001_bridge_snippet(self) -> None:
+        """Copy the current Bridge token, never a stale or sample token."""
+        self.brush_tab.copy_game_monitor_bridge_snippet()
+
+    def check_fill001_bridge(self) -> None:
+        """Read actual same-session Bridge diagnostics, never assume connected."""
+        bridge_root = self.output_dir.parent / "game_monitor_bridge"
+        task = self._selected_task()
+        if task is None:
+            self.bridge_status_var.set(
+                "Сначала создайте/выберите FILL-001 задачу для полной "
+                "проверки текущего Monitor и Bridge."
+            )
+            return
+        if (task.get("experiment_protocol") == FILL001_AB_V3_PROTOCOL
+                and getattr(self.brush_tab, "bridge_input_telemetry_requested", None)
+                    is False):
+            self.bridge_status_var.set(
+                "BLOCKED: Bridge запущен без обязательной Input Telemetry. "
+                "Остановите старый Bridge и запустите кнопку 1 повторно."
+            )
+            return
+        try:
+            ready = inspect_diagnostic_preflight(bridge_root, task)
+        except (OSError, ValueError, TypeError, KeyError) as exc:
+            self.bridge_status_var.set(
+                f"НЕ ГОТОВО: {exc}. Проверьте игровую Console, "
+                "кнопки 1–3 и текущее окно Bridge."
+            )
+            return
+        if task.get("experiment_protocol") == FILL001_AB_V3_PROTOCOL:
+            try:
+                session = json.loads(Path(ready["session_file"]).read_text(encoding="utf-8"))
+                config = session.get("bridge_configuration", {}).get("inputTelemetry", {})
+                status = session.get("bridge_diagnostics", {}).get("last_monitor_status", {})
+                if (config.get("requested") is not True
+                        or config.get("enabled") is not True
+                        or status.get("inputTelemetryEnabled") is not True):
+                    raise ValueError("Input Telemetry ON не подтверждена текущей сессией.")
+            except (OSError, ValueError, TypeError, KeyError, AttributeError) as exc:
+                self.bridge_status_var.set(f"BLOCKED: {exc}")
+                return
+        self.bridge_status_var.set(
+            f"ГОТОВО: Monitor/Bridge, session={ready['session_id']}, "
+            "живая геометрия доски подтверждена. "
+            "Для V3 свежий пассивный preflight будет выполнен отдельно перед рисованием."
+        )
 
     def create_series(self) -> None:
         self._create_series(smooth_ab=False)
