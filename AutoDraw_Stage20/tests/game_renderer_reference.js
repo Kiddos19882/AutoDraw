@@ -38,6 +38,67 @@
     return points;
   }
 
+
+  // ENGINE-001: accepted-only temporal replay. Does not reconstruct missing
+  // ENTER_FRAME callbacks, DOM events, or original screen transforms.
+  function extractTemporalStrokes(run) {
+    if (!run || run.record_type !== "autodraw_game_monitor_run" ||
+        run.execution_status !== "completed" || !Array.isArray(run.accepted_points)) {
+      throw new Error("Temporal replay requires a completed Game Monitor run with accepted_points.");
+    }
+    const before = run.pre_test_snapshot, after = run.post_test_snapshot;
+    if (!before || !after || before.isExact !== true || after.isExact !== true ||
+        before.logicalWidth !== 460 || before.logicalHeight !== 240 ||
+        after.logicalWidth !== 460 || after.logicalHeight !== 240) {
+      throw new Error("Temporal replay requires exact 460x240 before/after snapshots.");
+    }
+    const chalk = Number(after.pointCount) - Number(before.pointCount);
+    if (!Number.isSafeInteger(chalk) || chalk <= 0 ||
+        chalk !== run.accepted_points.length || run.point_delta_matches_chalk !== true) {
+      throw new Error("Temporal accepted-point count differs from exact run-bound CHALK.");
+    }
+    for (const key of ["dropped_events", "monitor_buffer_dropped_events_delta",
+      "monitor_error_count_delta", "bridge_send_failures_delta", "collector_sequence_gap_count"]) {
+      if (Number(run[key]) !== 0) throw new Error("Temporal replay rejects telemetry loss: " + key);
+    }
+    const byId = new Map(), strokes = [];
+    let lastId = null, lastTime = -Infinity;
+    for (let i = 0; i < run.accepted_points.length; i += 1) {
+      const p = run.accepted_points[i];
+      if (!p || typeof p.stroke_id !== "string" || !p.stroke_id ||
+          p.point_delta !== 1 || !Number.isFinite(p.x) || !Number.isFinite(p.y) ||
+          p.x < 0 || p.x >= 460 || p.y < 0 || p.y >= 240 ||
+          !Number.isFinite(p.t) || p.t < lastTime) {
+        throw new Error("Invalid ordered accepted-point sample at index " + i);
+      }
+      if (p.stroke_id !== lastId) {
+        if (byId.has(p.stroke_id)) throw new Error("Interleaved temporal stroke IDs.");
+        const stroke = { strokeId: p.stroke_id, points: [] };
+        strokes.push(stroke);
+        byId.set(p.stroke_id, stroke);
+        lastId = p.stroke_id;
+      }
+      const points = byId.get(p.stroke_id).points;
+      if (points.length && points[points.length - 1].x === p.x &&
+          points[points.length - 1].y === p.y) {
+        throw new Error("Duplicate consecutive accepted point in " + p.stroke_id);
+      }
+      points.push({ x: p.x, y: p.y });
+      lastTime = p.t;
+    }
+    if (!strokes.length || strokes.length !== run.stroke_count ||
+        !Array.isArray(run.observed_brush_radii) ||
+        run.observed_brush_radii.length !== 1 ||
+        run.observed_brush_radii[0] !== 10) {
+      throw new Error("Unexpected temporal stroke count or brush width.");
+    }
+    return {
+      runId: run.run_id, sessionId: run.session_id,
+      pointCountBefore: before.pointCount, pointCountAfter: after.pointCount,
+      exactChalk: chalk, strokes
+    };
+  }
+
   function midpoint(a, b) {
     return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
   }
@@ -281,6 +342,7 @@
     terminalPoint,
     shouldWebGLRendererRasterize,
     extractAcceptedPoints,
+    extractTemporalStrokes,
     buildStagePlacement,
     buildStageRendererTransform
   };
@@ -687,7 +749,7 @@
     };
   }
 
-  function renderWebGLProbe(mode, points, lineWidth, expectedCanvas, state) {
+  function renderWebGLProbe(mode, points, lineWidth, expectedCanvas, state, boardOverride) {
     // Egret 5.4.1 only switches the masked object to the mask render path when
     // mask.$stage is present. Recreate the live display-list relationship:
     // board and mask are siblings under a container attached to a Stage.
@@ -697,7 +759,7 @@
 
     const mask = makeBoardMaskShape();
     container.addChild(mask);
-    const board = makeActualBoardPane(mode, points, lineWidth).shape;
+    const board = boardOverride || makeActualBoardPane(mode, points, lineWidth).shape;
     container.addChild(board);
     board.mask = mask;
 
@@ -754,6 +816,151 @@
       sceneDiagnostics,
       comparison: compareCanvases(expectedCanvas, canvas)
     };
+  }
+
+
+  function makeTemporalBoard(strokes, lineWidth, mode, incremental) {
+    const BoardPane = getBoardPaneClass();
+    if (typeof BoardPane !== "function") throw new Error("Game BoardPane unavailable.");
+    const board = new BoardPane(false, 6000);
+    board.width = BOARD_WIDTH;
+    board.height = BOARD_HEIGHT;
+    board.atom.clear();
+    let fullRedrawCalls = 0, incrementalRedrawCalls = 0, accepted = 0;
+    for (const stroke of strokes) {
+      board.setRadius(lineWidth);
+      board.setColor(0x000000);
+      board.setSmooth(mode === "smooth");
+      for (let i = 0; i < stroke.points.length; i += 1) {
+        const point = stroke.points[i];
+        const oldLength = board.atom.points[board.atom.points.length - 1].length;
+        board.atom.pushPoint(new egret.Point(point.x, point.y));
+        if (board.atom.points[board.atom.points.length - 1].length !== oldLength + 1) {
+          throw new Error("BoardPane rejected a validated accepted sample.");
+        }
+        accepted += 1;
+        if (incremental) {
+          board.updateLess();
+          if (i === 0) {
+            board.redraw();
+            fullRedrawCalls += 1;
+          } else {
+            board.redraw(false);
+            incrementalRedrawCalls += 1;
+          }
+        }
+      }
+      if (incremental) {
+        board.redraw(false); // onDrawingEnd, before atom.add
+        incrementalRedrawCalls += 1;
+      }
+      board.atom.add();
+    }
+    if (!incremental) {
+      board.redraw();
+      fullRedrawCalls += 1;
+    }
+    board.updateLess();
+    if (board.max - board.less !== accepted ||
+        board.atom.points.length !== strokes.length + 1) {
+      throw new Error("Reconstructed BoardPane quota/stroke slots differ.");
+    }
+    return {
+      shape: board, accepted, fullRedrawCalls, incrementalRedrawCalls,
+      graphicsPathCount: board.$renderNode && board.$renderNode.drawData
+        ? board.$renderNode.drawData.length : null
+    };
+  }
+
+  function renderTemporalStudy() {
+    try {
+      if (!window.egret || !egret.Shape || !egret.CanvasRenderer) {
+        throw new Error("Egret bundle is not loaded.");
+      }
+      const path = "../data/results/brush_behavior_tests/game_monitor_bridge/" +
+        "bb261898-8296-41f5-a333-eb0b81016410/" +
+        "game-monitor-run-20261104T040548835772Z-6a17a297.json";
+      const request = new XMLHttpRequest();
+      request.open("GET", path, false);
+      request.send(null);
+      if (request.status !== 200) throw new Error("Pinned temporal source HTTP " + request.status);
+      const input = extractTemporalStrokes(JSON.parse(request.responseText));
+      if (input.runId !== "6a17a297-ea14-4527-9527-bfd8de3bd335" ||
+          input.sessionId !== "bb261898-8296-41f5-a333-eb0b81016410" ||
+          input.strokes.length !== 27 || input.exactChalk !== 1260) {
+        throw new Error("Temporal input differs from frozen FILL-001 run.");
+      }
+      const mode = "smooth", lineWidth = 10; // Research assumption; per-stroke options not in run.
+      const onePass = makeTemporalBoard(input.strokes, lineWidth, mode, false);
+      const incremental = makeTemporalBoard(input.strokes, lineWidth, mode, true);
+      const mask = createBoardMask();
+      const rasterA = renderGraphicsNode(onePass.shape.$renderNode, false);
+      const rasterB = renderGraphicsNode(incremental.shape.$renderNode, false);
+      const canvasA = composeBoard(rasterA, rasterA.nodeBounds, mask);
+      const canvasB = composeBoard(rasterB, rasterB.nodeBounds, mask);
+      const state = initializeWebGL(null);
+      const webglA = renderWebGLProbe(mode, [], lineWidth, canvasA, state, onePass.shape);
+      const webglB = renderWebGLProbe(mode, [], lineWidth, canvasB, state, incremental.shape);
+      const canvasDiff = compareCanvases(canvasA, canvasB);
+      const webglDiff = compareCanvases(webglA.canvas, webglB.canvas);
+      const manifest = {
+        schemaVersion: 1, experimentId: "ENGINE001_TEMPORAL_ACCEPTED_ONLY_V1",
+        status: "COMPLETE_OFFLINE_MEASUREMENT",
+        gameBundleBlobSha: "46cc74de00b6cb5d207b1e1a2ffcd81613b6d388",
+        egretBundleBlobSha: "d613d2b97e2436521aa3870478c69e99eac1f19f",
+        inputGitBlobSha: "8eb04ad7331d1e56f4aeb7d0f625c59c1dc57c24",
+        inputPath: path, runId: input.runId, sessionId: input.sessionId,
+        strokeCount: input.strokes.length, exactHistoricalChalk: input.exactChalk,
+        pointCountBefore: input.pointCountBefore, pointCountAfter: input.pointCountAfter,
+        lineWidth, modeAssumption: "smooth; per-stroke options unavailable in run",
+        method: "one-pass redraw() vs full redraw on stroke start + one redraw(false) per accepted point after first + final redraw(false) + atom.add()",
+        exclusions: [
+          "Unrecorded extra ENTER_FRAME redraw(false) calls not replayed",
+          "No intermediate renderer passes or exact DOM scheduling replayed",
+          "Original service baseline point not rendered in either variant",
+          "No same-run Stage/client/desktop transform or live PNG comparison",
+          "No new CHALK measurement"
+        ],
+        screenProjection: "UNCALIBRATED",
+        inputCompleteForAcceptedPointsOnly: true,
+        onePass: {accepted:onePass.accepted,fullRedrawCalls:onePass.fullRedrawCalls,
+          incrementalRedrawCalls:onePass.incrementalRedrawCalls,graphicsPathCount:onePass.graphicsPathCount},
+        incremental: {accepted:incremental.accepted,fullRedrawCalls:incremental.fullRedrawCalls,
+          incrementalRedrawCalls:incremental.incrementalRedrawCalls,graphicsPathCount:incremental.graphicsPathCount},
+        renderSize: {width:canvasA.width,height:canvasA.height},
+        canvas2dPixelComparison: canvasDiff, webglPixelComparison: webglDiff,
+        onePassWebGLVsCanvas2D: webglA.comparison,
+        incrementalWebGLVsCanvas2D: webglB.comparison,
+        backend: state.glInfo, renderedWebGL: true
+      };
+      if (onePass.accepted !== 1260 || incremental.accepted !== 1260 ||
+          !Number.isInteger(onePass.graphicsPathCount) ||
+          !Number.isInteger(incremental.graphicsPathCount) ||
+          incremental.graphicsPathCount <= onePass.graphicsPathCount ||
+          !Number.isInteger(canvasDiff.differingPixels) ||
+          !Number.isInteger(webglDiff.differingPixels)) {
+        throw new Error("Temporal renderer comparison incomplete or no accumulated paths.");
+      }
+      casesNode.textContent = "";
+      const card = document.createElement("section");
+      card.className = "fixture";
+      card.textContent = "ENGINE-001 accepted-only temporal study; offline only.";
+      for (const [label,canvas] of [
+        ["onepass-canvas2d",canvasA],["incremental-canvas2d",canvasB],
+        ["onepass-webgl",webglA.canvas],["incremental-webgl",webglB.canvas]
+      ]) addDownloadLink(card,canvas,"engine001-temporal-"+label+".png",label+" PNG");
+      casesNode.appendChild(card);
+      document.getElementById("renderer-manifest-json").textContent = JSON.stringify(manifest,null,2);
+      document.body.dataset.temporalStatus = "complete";
+      document.body.dataset.temporalPngCount = "4";
+      document.body.dataset.referenceStatus = "temporal_complete";
+      statusNode.textContent = "ENGINE-001 accepted-only offline study complete; no gameplay or screen calibration.";
+    } catch (error) {
+      document.body.dataset.temporalStatus = "error";
+      document.body.dataset.referenceStatus = "error";
+      statusNode.className = "error";
+      statusNode.textContent = "Temporal study failed: " + (error && error.stack ? error.stack : String(error));
+    }
   }
 
   function renderAll() {
@@ -967,9 +1174,12 @@
   }
 
   api.renderAll = renderAll;
+  api.renderTemporalStudy = renderTemporalStudy;
+  const startup = new URLSearchParams(window.location.search).get("temporal") === "fill001"
+    ? renderTemporalStudy : renderAll;
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", renderAll, { once: true });
+    document.addEventListener("DOMContentLoaded", startup, { once: true });
   } else {
-    renderAll();
+    startup();
   }
 })(typeof window !== "undefined" ? window : globalThis);
