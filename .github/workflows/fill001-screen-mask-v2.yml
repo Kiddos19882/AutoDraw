@@ -8,7 +8,9 @@ on:
       - ".github/workflows/fill001-screen-mask-v2.yml"
       - "AutoDraw_Stage20/source/preparation/fill001_screen_mask_v2*.py"
       - "AutoDraw_Stage20/source/preparation/fill001_v2_footprint_spatial.py"
-      - "AutoDraw_Stage20/source/preparation/tests/test_fill001_v2_footprint_spatial.py"
+      - "AutoDraw_Stage20/source/preparation/fill001_boardpane_preflight.py"
+      - "AutoDraw_Stage20/source/preparation/tests/test_fill001_boardpane_preflight.py"
+      - "AutoDraw_Stage20/source/preparation/tests/test_fill001_v2_footprint_spatial.py tests/test_fill001_boardpane_preflight.py"
       - "AutoDraw_Stage20/source/preparation/tests/test_fill001_screen_mask_v2*.py"
       - "AutoDraw_Stage20/data/results/brush_behavior_tests/fill001/**"
   workflow_dispatch:
