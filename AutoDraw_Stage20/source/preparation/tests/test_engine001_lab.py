@@ -130,6 +130,12 @@ def _capture(folder):
         "monitor_error_count_delta":0, "bridge_send_failures_delta":0,
         "collector_sequence_gap_count":0,
         "frame_probe":{"status":"measured"},
+        "events":[
+            {"type":"ENGINE_FRAME_SAMPLE","strokeId":"stroke-1",
+             "strokeOptionRaw":True,"t":1.25},
+            {"type":"ENGINE_FRAME_SAMPLE","strokeId":"stroke-1",
+             "strokeOptionRaw":True,"t":1.75},
+        ],
     }
     (folder/"experiment.json").write_text(json.dumps(exp),encoding="utf-8")
     (folder/"monitor_report.json").write_text(json.dumps(report),encoding="utf-8")
@@ -197,3 +203,25 @@ def test_one_button_uses_existing_automation_only_after_bridge_gate(tmp_path, mo
     tab.start_engine001_lab()
     assert calls == [{"lab_one_click":True}]
     assert tab._engine001_lab_session_id == "session-a"
+
+
+def test_lab_rejects_modified_nine_cell_journal(tmp_path):
+    plan = build_chalk_test_block_plan(
+        series_id="tamper-check", phase_id="ENGINE001", repeats=3, seed=8,
+    )
+    journal = tmp_path/"lab-tamper.json"
+    create_chalk_test_block_journal(journal, plan)
+    damaged=json.loads(journal.read_text("utf-8"))
+    damaged["tasks"][0]["scenario_id"]="engine001_vertical_axis"
+    journal.write_text(json.dumps(damaged),encoding="utf-8")
+    with pytest.raises(ValueError, match="ENGINE-001"):
+        load_chalk_test_block_journal(journal)
+
+
+def test_lab_detects_mode_switch_in_raw_engine_frames(tmp_path):
+    _, report = _capture(tmp_path/"mode-change")
+    report["events"][-1]["strokeOptionRaw"] = False
+    (tmp_path/"mode-change"/"monitor_report.json").write_text(json.dumps(report), encoding="utf-8")
+    result = audit_single_capture(tmp_path/"mode-change")
+    assert result["status"] == "PARTIAL"
+    assert "native_mode_changed_or_unknown_inside_stroke" in result["reasons"]
