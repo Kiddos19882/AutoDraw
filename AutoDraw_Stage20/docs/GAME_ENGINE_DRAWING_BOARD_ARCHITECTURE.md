@@ -2,7 +2,7 @@
 
 **Область:** технический разбор сохранённой версии игрового движка; центральный объект — `com.magnetjoy.pet.ui.board.BoardPane`. **Задача:** `ENGINE-001`. **Проверенная ветка:** `feature/image-geometry-optimization`, исходный remote HEAD `768ece83f129d28278dc771ab4ff0726e0748cb4`, дата 2026-11-08.
 
-**Статус:** `E1 PARTIAL` — статический разбор ключевых путей и сверка ранее зафиксированного анализа; `E2/E3` — ранее выполненные unit/browser/paired-renderer проверки в указанной области. **Не является:** аудитом всего игрового приложения, утверждением о текущей версии сайта, новой игровой сессией, доказательством pixel-equivalence FILL-001 или измерением CHALK новых алгоритмов.
+**Статус:** `ENGINE-001 PARTIAL`; `E1 PASS` для непосредственно проверенных методов `BlackBoardAtom/BoardPane/Painter/PainterPopup/Atom` и Egret Graphics, но не всего игрового клиента. `E2/E3` — ранее выполненные unit/browser/paired-renderer проверки в их заявленной области. **Не является:** аудитом всего игрового приложения, утверждением о текущей версии сайта, новой игровой сессией, доказательством pixel-equivalence FILL-001 или измерением CHALK новых алгоритмов.
 
 Этот документ систематизирует прежде разрозненные факты **без замены** первичного [подробного исследования движка](CHALK_GAME_ENGINE_POINT_COST_AND_BRUSH_WIDTH_2026-11-03.md) и [технической справки Game Monitor](GAME_MONITOR_BRIDGE_REFERENCE.md). Перед новым экспериментом сверять код, SHA и его run-bound данные.
 
@@ -11,13 +11,13 @@
 | Узел | Исходник / доказательство | Подтверждение |
 |---|---|---|
 | Комплект приложения | [`gameEngine/manifest.json`](../gameEngine/manifest.json) | В `game` перечислены `js/mergeEngine_df2e5bc5.js` и `js/main.min_653f95bc.js`; `initial=[]` |
-| Игровая логика | [`main.min_653f95bc.js`](../gameEngine/main.min_653f95bc.js), blob `46cc74de00b6cb5d207b1e1a2ffcd81613b6d388`, 4 859 418 байт в Git tree | `BoardPane`, `BlackBoardAtom`, `Painter`, `PainterPopup` — ранее извлечены и проанализированы в разделах 11–15 основного отчёта |
+| Игровая логика | [`main.min_653f95bc.js`](../gameEngine/main.min_653f95bc.js), blob `46cc74de00b6cb5d207b1e1a2ffcd81613b6d388`, 4 859 418 байт в Git tree | `BoardPane`, `BlackBoardAtom`, `Painter`, `PainterPopup`, `Atom` и настройки popup непосредственно сверены по полному Git blob; таблица методов — §12 |
 | Движок рендера | [`mergeEngine_df2e5bc5.js`](../gameEngine/mergeEngine_df2e5bc5.js), blob `d613d2b97e2436521aa3870478c69e99eac1f19f`, 877 537 байт в Git tree | В текущем просмотре кода подтверждены `GraphicsNode.lineStyle`, `CanvasRenderer.renderGraphics`, `Path2D.drawRoundRect`, `WebTouchHandler.getLocation`, `SystemTicker.broadcastEnterFrame`; Egret 5.4.1 |
 | Runtime-снимок | [`renderer_snapshot_2026-11-04.json`](../data/runtime/renderer_snapshot_2026-11-04.json) | Конкретная пользовательская сессия: `renderMode=webgl`, stage 1672×600, `frameRate=30`, board 460×240, backing 5016×1800 |
 | Реальные игровые точки | [`endpoint-analysis-6a17a297.json`](../data/results/brush_behavior_tests/fill001/endpoint-analysis-6a17a297.json) и сохранённый Monitor run, указанный в нём | 27 штрихов, 1260 сохранённых точек, точный CHALK 1260; координаты восстановлены из raw events |
 | Браузерный воспроизводитель | [`tests/game_renderer_reference.html`](../tests/game_renderer_reference.html), [`game_renderer_reference.js`](../tests/game_renderer_reference.js), [tests](../tests/game_renderer_reference.test.js) | Рисует через реальный `BoardPane.redraw`, `CanvasRenderer` и `WebGLRenderer`, но не выполняет реальный игровой input |
 
-Ограничение настоящей сверки: `mergeEngine` прочитан непосредственно, а `main.min` слишком велик для текущего текстового извлечения через GitHub connector. Факты о его минифицированных методах получены из ранее задокументированного анализа **того же Git blob**, плюс проверяемого браузерного harness, а не из нового полного посимвольного аудита `main.min`. Неподтверждённые детали прямо помечены ниже.
+**Прямая проверка 2026-11-08:** первоначальный `fetch_file` не прочитал большой `main.min`, но `fetch_blob` по точному SHA вернул **4 857 523 символа / 4 859 418 UTF-8 байт**; вычисленный SHA-1 Git blob совпал с `46cc74de00b6cb5d207b1e1a2ffcd81613b6d388`. Тела профильных методов изучены непосредственно. Это устраняет прежнее ограничение чтения **для данных методов**, но не равнозначно анализу всех прочих классов клиента и не доказывает сегодняшнюю runtime-версию сайта.
 
 ## 2. Где начинается рисование: объекты приложения
 
@@ -181,8 +181,8 @@ y_screen = roi.y + y_roi
 
 | Вопрос | Текущее состояние | Чем закрывать |
 |---|---|---|
-| Полный обзор всех подсистем `main.min` вне доски | `PARTIAL`: прямой полный re-read bundle в этом проходе недоступен; профильная декомпозиция BoardPane/Painter подтверждена прежним static audit | Инвентаризация остальных классов по точному blob, без догадок об их обязанностях |
-| Более точная структура `BlackBoardAtom`: `add/clear` и индексы параллельных массивов | E1 по прежнему разбору, специальных новых тестов не было | Таблица состояний на класс/методы, исходный bundle и соответствующие unit fixtures |
+| Полный обзор всех подсистем `main.min` вне доски | `PARTIAL`: blob целиком получен и проверен, но классы **вне доски** не инвентаризированы | При необходимости дополнить профильный перечень классов с доказуемыми связями |
+| `BlackBoardAtom`: `add/clear/undo`, serializer, слоты штрихов | `E1 PASS` по полному blob; таблица состояний и бинарный формат в §12 | Отдельные edge-case E2/E4 tests не запускались |
 | Точный порядок `TouchHandler`/Egret `ENTER_FRAME` при разных mouse timings | Static model E1; 30Hz наблюдался только в отдельных runs | Парная DOM/accepted-point telemetry при той же сессии, если будет отдельное разрешение |
 | Screen transform старого 27-stroke FILL-001 run | `PARTIAL`: calibrated ROI есть, same-run geometry snapshot отсутствует | Не переносить чужую матрицу; потребуются сопоставимые геометрические evidence и независимая проверка |
 | Результат actual Egret для 27-stroke FILL-001 | `NOT_RUN` | Перенести multi-stroke case в существующий reference harness, с корректными отказами |
@@ -201,3 +201,95 @@ y_screen = roi.y + y_roi
 - [CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md](CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md) — исходный REJECTED PNG evidence.
 - [TEST_RESULTS.md](TEST_RESULTS.md) — актуальный индекс measured/CI evidence.
 - [TASKS.md](TASKS.md) и [ROADMAP.md](ROADMAP.md) — текущая `ENGINE-001` и **отложенный** backlog экспериментов с заливкой.
+
+## 12. Прямой аудит полного main bundle: методы, состояния, сериализация (2026-11-08)
+
+**E1 direct source:** [`gameEngine/main.min_653f95bc.js`](../gameEngine/main.min_653f95bc.js), Git blob `46cc74de00b6cb5d207b1e1a2ffcd81613b6d388`, **4 859 418 байт**. Через GitHub blob получено 4 857 523 символа; независимо рассчитанный Git blob SHA-1 совпал с исходным. Также прочитан [`mergeEngine_df2e5bc5.js`](../gameEngine/mergeEngine_df2e5bc5.js), blob `d613d2b97e2436521aa3870478c69e99eac1f19f`. Сведения ниже относятся к этим точным файлам: **E1 подтверждает реализацию, но не сегодняшнюю версию игры и не E4 runtime**.
+
+### 12.1. Карта классов и методов доски
+
+| Объект | Прямо проверенные члены | Роль |
+|---|---|---|
+| `BlackBoardAtom` | `data` get/set, `clear`, `add`, `pushPoint`, `undo`, `length`, `points/radius/colors/options/total` | Слоты штрихов, настройки, бинарные данные |
+| `BoardPane` | constructor, `initAction`, `interactive`, `onMouseDown/Up`, `onDrawStart/onDrawing/onDrawingEnd`, `onAddedToStage/onRemovedFromStage`, `resetBg`, `updateLess`, `redraw`, `setColor/Radius/Smooth`, `undo/clear/changeAlpha`, `fromByteArray/toByteArray` | Интерактивный `egret.Shape`, события, точки и квота |
+| `Painter` | `drawNormalLine`, `drawSmoothLine` | Команды пути из принятых координат |
+| `PainterPopup` | `createBlackBackground`, `createBlackBoard`, `init`, `resetSetting`, `selectColor`, `onRadiusChanged`, `onSmoothButtonClick`, `undoHandler/clearHandler/saveHandler` | Окно редактора, маска, настройки и сохранение |
+| `com.magnetjoy.net.Atom` | `_propertyInfos`, `readValue/writeValue`, `toByteArray/fromByteArray` | Общая бинарная сериализация `data:Array` |
+| Egret `Graphics/GraphicsNode` | `clear`, `lineStyle`, `moveTo/lineTo/curveTo`, `drawData` | Хранит и рисует отдельные StrokePath |
+
+`BlackBoardAtom.total` / `length` — число **слотов штрихов**, включая обычно пустой резервный. Точный `pointCount` — сумма `points[i].length`, а не `total`.
+
+### 12.2. Состояния BlackBoardAtom и BoardPane
+
+| Вызов | Что непосредственно делает код | Ограничение |
+|---|---|---|
+| `new BlackBoardAtom()` | `points=[[]]`, `radius=[4]`, `colors=[0xFFFFFF]`, `options=[true]`, `total=1` | Есть слот, но **нет принятых точек** |
+| `new BoardPane(extended,maxPoint=2000)` | Создаёт Atom, временно размеры 200×200, подключает events, устанавливает `max` и выполняет `clear` | 2000 — fallback конструктора, popup передаёт `blackBoard.maxPoint` |
+| `pushPoint(P)` | Помещает P в **последний** массив, только если он пуст или `!P.equals(last)` | Последовательный дубль не расходует CHALK |
+| `add()` | Если последний массив непустой: создаёт следующий `[]` и наследует `radius/color/options`, увеличивает `total` | Штатно после законченного штриха остаётся пустой слот |
+| `BlackBoardAtom.clear()` | Стирает точки, делает `points=[[]]`, `total=1`, наследует **последние настройки** | Defaults 4/white/smooth устанавливаются только при исходном `total=0` |
+| `BoardPane.clear()`, обычный | `atom.clear` → полный `redraw` → `updateLess` | Возвращает `less=max`, но выбор кисти может сохраняться |
+| `BoardPane.clear()`, `_isPainterExtend` | Вставляет служебную точку `(0,0)`, вызывает `atom.add`, задаёт для слота 0 `radius=0` или `1` при alpha, white | Служебная точка учитывается в CHALK baseline |
+| `setColor/Radius/Smooth(v)` | Записывает параметр в **последний** слот `atom.*[length-1]` | Не изменяет предыдущие штрихи и точный CHALK |
+| `BoardPane.undo()` | Только при `points.length>1`: `atom.undo`, полный `redraw`, `updateLess` | Штатно удаляет последний завершённый штрих перед пустым слотом |
+| `updateLess()` | Полный обход всех точек, `less=max-count`, `BlackBoardEvent.CHALK` с `percent=less/max` | O(N) в игровом коде; эффект на FPS не измерен |
+| `fromByteArray(buffer)` | `atom.fromByteArray`, `updateLess`, полный `redraw` | Возвращает конечные точки, **не** историю их прорисовки |
+
+Внутренний `BlackBoardAtom.undo()` удаляет слот `total-2` при длине массивов более одного, а `total--` выполняется за пределами этой проверки. Вызов через `BoardPane.undo()` предварительно проверяет число слотов. Поведение прямого вызова Atom или повреждённого импорта в E2/E4 не проверено; это **не доказанный баг живой игры**.
+
+### 12.3. События и конечный автомат штриха
+
+| Состояние | Событие | Действие | Затем |
+|---|---|---|---|
+| `IDLE`, `less>0` | `TOUCH_BEGIN` → `DRAG_START` | `onDrawStart`: `globalToLocal(stage.mouseX/Y)`, первая точка, quota, **полный** `redraw()` и подписка на `ENTER_FRAME` | `DRAWING` |
+| `IDLE`, `less<=0` | `DRAG_START` | Устанавливает `less=0`, не добавляет точку и listener | `IDLE` |
+| `DRAWING`, внутри rect, CHALK есть | `ENTER_FRAME` | `onDrawing`: `globalToLocal`, `Rectangle.contains`, `pushPoint`, `updateLess`, `redraw(false)` | `DRAWING` |
+| `DRAWING`, снаружи rect | `ENTER_FRAME` | Не добавляет точку и не перерисовывает | `DRAWING` |
+| `DRAWING`, CHALK исчерпан | `ENTER_FRAME` | Не добавляет новые точки, `less=0` | `DRAWING` до mouseup |
+| `DRAWING` | `TOUCH_END` → `DRAG_END` | `onDrawingEnd`: снять `ENTER_FRAME`, `redraw(false)`, `atom.add()` | `IDLE` |
+
+`onDrawStart` не выполняет **отдельной** `Rectangle.contains`-проверки первой точки, а `onDrawing` выполняет. Это не доказывает возможность внеэкранного начала: обычно `TOUCH_BEGIN` поступает через hit-test интерактивной доски. `onDrawingEnd` не добавляет mouseup-точку отдельно.
+
+### 12.4. Существенное отличие живого redraw от one-pass replay
+
+В игровом `BoardPane.redraw(full=true)` полный режим вызывает `resetBg()` и `graphics.clear()`, затем строит пути всех сохранённых штрихов. `redraw(false)` **не очищает** graphics; он выбирает **только последний** массив точек, но заново вызывает `graphics.lineStyle` и `Painter.drawSmoothLine/drawNormalLine` для всего этого массива.
+
+В сохранённом Egret `GraphicsNode.lineStyle()` создаёт `new StrokePath`, затем `drawData.push(path)`. `CanvasRenderer.renderGraphics()` проходит по этому массиву и вызывает `stroke()` для каждого. Следовательно, во время активного штриха `onDrawing` на каждом принятом кадре и `onDrawingEnd` **накапливают команды полного текущего пути**. Даже когда `pushPoint` отклонил соседний дубль, `onDrawing` всё равно вызывает `redraw(false)` при попадании внутрь доски. Начало следующего штриха через полный `redraw()` очищает эту накопленную историю.
+
+**E1 вывод:** конечный список принятых точек не определяет всю графическую историю последнего/активного штриха. **E0 гипотеза:** повторная композиция может влиять на alpha/edge pixels. Её эффект на 11 FILL-001 leaks или 738 model-only pixels **не измерен**.
+
+Существующий [`game_renderer_reference.js`](../tests/game_renderer_reference.js) обычно присваивает `atom.points` и вызывает один **полный** `BoardPane.redraw()`. Поэтому его E3/PRR результаты показывают соответствие one-pass пути в проверенной области, но не доказывают репликацию всей временной последовательности `redraw(false)`. Для будущего эксперимента на том же harness (не новой реализации) нужны отдельно `one-pass` и `incremental redraw` с run-bound input/ENTER_FRAME доказательствами.
+
+### 12.5. Бинарный формат сохранённой доски
+
+Базовый `Atom` регистрирует единственное сериализуемое поле `data:Array`. Геттер `BlackBoardAtom.data` выдаёт последовательно:
+
+~~~text
+points.length
+  для каждого stroke: count; x0; y0; ...; xN; yN
+radius.length; radius[0] ...
+colors.length; colors[0] ...
+options.length; options[0] ...
+~~~
+
+Сеттер читает массив через `shift`, создаёт `egret.Point(x,y)`, восстанавливает четыре параллельных массива и присваивает `total=points.length`. Отдельно `total` не сохраняется. `Atom.writeValue(Array)` сериализует JS `Number` через `ByteArray.writeFloat`; в сохранённом Egret он вызывает `DataView.setFloat32`. При сохранении координат возможно **float32 округление**. Числовая round-trip ошибка здесь не измерялась.
+
+**Условное наблюдение:** геттер записывает `colors.length`, но цикл записи фактических цветов итерирует `radius.length`. При стандартно выровненных массивах эти длины совпадают; при несогласованном ручном состоянии возможен конфликт. Это риск E1 для будущих unit fixtures, **не установленная порча живых сохранений**.
+
+`PainterPopup.saveHandler` вызывает `toByteArray()` → `Zlib.Deflate` → Base64 → `Server.call(CallName.PAINT,{id,data})` и обновляет локальный объект. `BoardPane.importFor` декодирует/распаковывает и вызывает `fromByteArray`; `PainterPopup.init` загружает переданный `this.ba`. Успех ответа удалённого сервера нельзя доказать по одному исходнику.
+
+### 12.6. Popup, preview и значения кисти
+
+`PainterPopup.createBlackBoard` создаёт **interactive** `BoardPane(this._isPainterExtend,this.blackBoard.maxPoint)` размером 460×240, в позиции `(boardX,75)` и с `mask=boardMask`. Значение `boardX` зависит от типа popup, не является универсальной screen-координатой. Preview `BoardItemBase.createNativeContent` создаёт иной экземпляр `BoardPane` с `interactive=false` и отдельным scale.
+
+`PainterPopup.init()`: `fromByteArray(this.ba)` → `updateLess` → `setSmooth(true)` активному слоту → `resetSetting()`. Последний выбирает белый и толщину 7; обычные пресеты `RadiusOption` — **20, 14, 7**, начальное значение нового `BlackBoardAtom.radius` — **4**, а специальный UI может иметь `MAX_RADIUS=30`. Все эти значения называются в модели `radius`, но передаются в Egret как **lineWidth**.
+
+`selectColor`, `onRadiusChanged` и `onSmoothButtonClick` меняют только текущий слот, `undoHandler/clearHandler` делегируют операции доске. Отдельный сценарий изменения параметров посреди штриха ещё не тестировался.
+
+### 12.7. Что подтверждено, что осталось
+
+**E1 PASS:** полный `main.min` прочитан и его blob SHA совпал; профильные методы `BlackBoardAtom/BoardPane/Painter/PainterPopup/Atom` и Egret `GraphicsNode/CanvasRenderer` проверены непосредственно. Предыдущая проблема чтения файла снята. **ENGINE-001 остаётся PARTIAL:** вся цепочка `WebTouchHandler → TouchHandler → SystemTicker/ENTER_FRAME → BoardPane → GraphicsNode → CanvasRenderBuffer/WebGL/mask → screen` ещё не сведена в полностью проверенный граф, а часть игрового кода вне доски не инвентаризирована.
+
+Новые E2/E4 эксперименты и unit tests не выполнялись; старые PRR `6/6 PASS_PER_RUN` и FILL-001 PNG `FAIL` не меняются.
+
+**Один следующий шаг:** проверить полную цепочку input/frame/render из сохранённых бандлов и явно отделить детерминированную логику от неподтверждённых browser timings и пиксельной эквивалентности.

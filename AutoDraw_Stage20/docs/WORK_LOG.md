@@ -3,6 +3,15 @@
 **Назначение:** только фактически выполненные изменения и проверки, а не будущие планы.  
 **Полная история до 2026-11-08:** [WORK_LOG_HISTORY_THROUGH_2026-11-08.md](WORK_LOG_HISTORY_THROUGH_2026-11-08.md) — побайтовый исторический снимок прежней редакции.
 
+## 2026-11-08 — ENGINE-001: прямой аудит полного main bundle и состояния BoardPane
+
+- Сверены remote HEAD `90d1944`, 20 коммитов и Markdown Actions. С помощью GitHub blob API успешно прочитан `main.min_653f95bc.js` полностью (4 857 523 символа / 4 859 418 байт), вычисленный Git SHA-1 совпал с `46cc74de00b6cb5d207b1e1a2ffcd81613b6d388`. Ограничение обычного `fetch_file` на большой текст преодолено.
+- Непосредственно изучены `BlackBoardAtom` и структура его слотов/сериализации, `BoardPane` события/quota/undo/clear/redraw, `Painter`, `PainterPopup` UI/save, `net.Atom`, Egret `GraphicsNode/CanvasRenderer/WebGLRenderer`. Накопление путей через `redraw(false)`, float32 serialization и условный случай несогласованной длины массивов задокументированы как E1 / проверяемые риски, без объявления живого бага.
+- Дополнен **существующий** [системный справочник](GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md); новый E1 результат сопоставлен с текущей задачей и отложенным Egret replay в ROADMAP. Новых E2/E4 тестов не выполнялось; старые PRR PASS и FILL-001 PNG FAIL не менялись.
+- Документальный инкремент: код, tests, gameEngine blobs, Stage6, CHALK estimator, frozen captures, master не менялись. Markdown CI проверяется после коммита.
+
+---
+
 ## 2026-11-08 — ENGINE-001: чтение движка и консервация следующей программы тестов
 
 - Повторно проверены remote HEAD `768ece83f129`, 20 коммитов и Actions, README/STATUS/TASKS/ROADMAP/AI guide, DECISIONS/invariants/evidence, инженерный разбор Egret, Monitor и точные FILL/PRR результаты.

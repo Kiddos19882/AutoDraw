@@ -2,6 +2,13 @@
 
 Записывать только изменения интерфейсов, форматов, возможностей и значимые изменения сопровождения. Ход проверки каждой задачи — [WORK_LOG](WORK_LOG.md). Полная прежняя редакция без изменений: [CHANGELOG_HISTORY_THROUGH_2026-11-08.md](CHANGELOG_HISTORY_THROUGH_2026-11-08.md).
 
+## 2026-11-08 — прямой разбор BoardPane из byte-verified main bundle
+
+- [Справочник игровой доски](GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md) расширен исходными методами `BlackBoardAtom/BoardPane/Painter/PainterPopup`, таблицей состояний и бинарного `Atom`, различием `redraw()`/`redraw(false)`, границами one-pass Egret replay.
+- Это E1 документирование, не изменение кода и не доказательство нового live-рисунка; план future tests обновлён без запуска.
+
+---
+
 ## 2026-11-08 — документация игровой доски и перенос тестов в будущий план
 
 - Добавлен [GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md](GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md): сопоставленная архитектура Egret/BoardPane, детали input sampling/CHALK/normal-smooth path/Canvas-WebGL/маски/координатные пространства и пределы доказательств.
