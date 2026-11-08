@@ -2,6 +2,12 @@
 
 Записывать только изменения интерфейсов, форматов, возможностей и значимые изменения сопровождения. Ход проверки каждой задачи — [WORK_LOG](WORK_LOG.md). Полная прежняя редакция без изменений: [CHANGELOG_HISTORY_THROUGH_2026-11-08.md](CHANGELOG_HISTORY_THROUGH_2026-11-08.md).
 
+## 2026-11-08 — кнопки подключения Game Monitor/Bridge во вкладке FILL-001
+
+- Добавлен отдельный блок из четырёх кнопок FILL-001: **запуск Bridge с Input Telemetry ON**, **копирование Game Monitor JS**, **копирование одноразового Bridge JS**, **проверка свежей live-сессии** (в том числе до создания manifest). Подключение JS в игровой iframe остаётся ручным действием в DevTools.
+- Запуск переиспользует штатный Bridge контроллер лаборатории кистей, но явно включает телеметрию независимо от выбранного brush test scenario. Сессия с telemetry OFF не признаётся совместимой; недействующий Bridge не может предоставить старый snippet через кнопку FILL.
+- Добавлены regression-тесты делегирования, forced telemetry, отрицательной проверки session и защиты от устаревшего snippet. Production executor, CHALK, игровая кисть и FILL V2/V3 измерения не менялись. Результаты тестов и CI — в [TEST_RESULTS](TEST_RESULTS.md).
+
 ## 2026-11-08 — отдельный FILL-001 Smooth A/B V3 BoardPane pilot
 
 - Новый `FILL001_SMOOTH_AB_V3` с отдельными задачами ON/OFF и `FILL001_BOARDPANE_PREFLIGHT_V1`: логическая маска, 27-штриховой план, CHALK measurement, executor defaults и старые V1/V2 evidence не изменены.
