@@ -991,7 +991,10 @@ class Fill001Tab:
                 if ab_protocol in (FILL001_AB_V2_PROTOCOL, FILL001_AB_V3_PROTOCOL):
                     # This is run-bound and derived from the CURRENT raw run;
                     # no old series, fitted offsets, or screenshot-derived calibration.
-                    v2_binding = bind_from_monitor_run(Path(run_file), audit_file)
+                    v2_binding = bind_from_monitor_run(
+                        Path(run_file), audit_file,
+                        allow_v3_boardpane_only=(ab_protocol == FILL001_AB_V3_PROTOCOL),
+                    )
                     if v2_binding["screen_roi"] != record["screen_roi"]:
                         raise FillMatrixError("V2 run-bound ROI differs from the captured PNG ROI.")
                     v2 = audit_screen_mask_v2(
