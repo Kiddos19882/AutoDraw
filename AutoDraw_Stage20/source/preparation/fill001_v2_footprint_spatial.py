@@ -68,7 +68,7 @@ def classify_leakage(mask: np.ndarray, changed: np.ndarray) -> dict:
         else:
             key, depth = "other", 0
         regions[key] += 1
-        distances[key].append(depth)
+        distances[key].append(int(depth))
     return {
         "leakage_pixels": int(np.count_nonzero(leaking)),
         "categories": regions,
