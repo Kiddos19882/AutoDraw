@@ -98,3 +98,9 @@
 - Код приложения, frozen CHALK model, palette, executor, experimental data и `master` не менялись. Local `git status` и новая игровая сессия не проверялись.
 
 **Актуальные задачи:** [TASKS](TASKS.md). **Значимые изменения:** [CHANGELOG](CHANGELOG.md). **Подробная история:** [WORK_LOG_HISTORY_THROUGH_2026-11-08.md](WORK_LOG_HISTORY_THROUGH_2026-11-08.md).
+
+## 2026-11-08 — ENGINE-001, анализ различных окончаний горизонтальных штрихов
+
+- На remote HEAD `8ce14223d46a` сопоставлены frozen FILL-001 plan (27 строк), raw Game Monitor accepted points и executor/Egret; 19 внутренних строк имеют одинаковую plan X-геометрию и first/last accepted X.
+- Различная предпоследняя X даёт три разных конца `smooth` Graphics path, разброс 3 logical px. E1 + арифметическая сверка старых E4 данных; причина 499 правых missed screen pixels пока UNKNOWN/NOT_PROVEN. Новый live game test или E2 не запускался.
+- Обновлены только архитектура, статус, открытая задача и журнал; frozen files, приложение, production и master не менялись.

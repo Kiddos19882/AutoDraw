@@ -470,3 +470,31 @@ Snapshot датирован **2026-11-04**, а формальная PRR сери
 **Область вывода:** дополнительные `StrokePath` действительно накапливаются (70 против 29), но в *данном* accepted-only эксперименте итоговая растеризация не изменилась. Влияние накопления как достаточная причина FILL-001 underfill/leakage **не подтверждено**. Это не доказательство отсутствия влияния на runtime latency/memory, неожиданные duplicate `ENTER_FRAME`, очередность промежуточных renderer passes, другую кисть/режим, GPU, game screenshot, сохранённый service point или физический transform. Старые FILL-001 gates остаются FAIL (98.430600% и 11 leakage); ни CHALK новых кандидатов, ни новые live measurements не получены.
 
 **Следующий вопрос:** исследовательский E2 контроль с дополнительными `redraw(false)` без новой точки и с промежуточным render/upload в отдельном versioned protocol; для claims о реальной частоте/фазе кадров потребуется отдельное E4 evidence. Устаревшую screen geometry другого run использовать запрещено.
+
+## 16. Почему одинаковые горизонтальные перемещения могут давать разные окончания (2026-11-08)
+
+**ENGINE-001 / FILL-001, анализ без нового игрового запуска.** Проверены [frozen 27-stroke plan](../data/results/brush_behavior_tests/fill001/plans/fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1.json) и [Game Monitor run](../data/results/brush_behavior_tests/game_monitor_bridge/bb261898-8296-41f5-a333-eb0b81016410/game-monitor-run-20261104T040548835772Z-6a17a297.json) (Git blob `8eb04ad7331d1e56f4aeb7d0f625c59c1dc57c24`, run `6a17a297-ea14-4527-9527-bfd8de3bd335`) на baseline HEAD `8ce14223d46a`; логика проверена по [сохранённому Egret game bundle](../gameEngine/main.min_653f95bc.js) (Git blob `46cc74de00b6cb5d207b1e1a2ffcd81613b6d388`) и [executor](../source/executor/drawing/mouse_executor.py).
+
+### 16.1. Сверка 19 одинаковых по X запланированных линий
+
+В frozen plan **строки 5–23** имеют идентичные `start.x=75`, `end.x=385`, но разные Y. Все 19 соответствующих штрихов в Game Monitor имеют **одинаковые** первую принятую X=`76.20833396911621` и последнюю принятую X=`389.2083339691162`. Различаются их предпоследние принятые координаты:
+
+| Группа | Строк | Предпоследняя X | Последняя X | Midpoint последней пары |
+|---|---:|---:|---:|---:|
+| A | 11 | 386.208333969 | 389.208333969 | 387.708333969 |
+| B | 7 | 383.208333969 | 389.208333969 | 386.208333969 |
+| C | 1 | 380.208333969 | 389.208333969 | 384.708333969 |
+
+Строки 5, 15 и 16 — примеры A, B и C. **Итоговая математическая X-координата конца smooth Graphics path меняется на 3 логических px**, хотя первая и последняя принятые X и плановые X одинаковы. В этих 19 штрихах задержка между последним accepted sample и `POINTER_UP_CANDIDATE` равна 26–54 ms; это Monitor timestamps, а не точный тайминг Egret render.
+
+Механизм подтверждён кодом: executor отправляет много `pyautogui.moveTo` (использованный P1: step=4px, delay=5ms), `BoardPane.onDrawing` принимает текущее положение на `ENTER_FRAME` (записанный typical sample cadence около 33ms), поэтому момент кадра может менять предпоследнюю точку. Игровой `Painter.drawSmoothLine(...,true,false)` затем заканчивает путь на midpoint двух последних **принятых** точек без `lineTo(lastPoint)`. Непосредственные фазовые соответствия OS/DOM/ENTER_FRAME в старом run не записаны: изменчивая фаза sampling — согласующаяся с данными гипотеза, а вычисленные разные midpoint — проверяемый факт.
+
+### 16.2. Почему это ещё не доказывает причину правого underfill
+
+При номинальном `lineWidth=10` геометрический радиус круглого cap около 5. Идеализированные **непроверенные bitmap-оценки** правой границы Egret для A/B/C: midpoint+5 = **392.708 / 391.208 / 389.708**; идеализированный OpenCV cap на плановом `end.x=385` дал бы **390**. **18 из 19** таких оценок Egret не короче, а длиннее исходного OpenCV пути. Реальное bitmap покрытие может отличаться из-за alpha, Canvas/WebGL raster, endpoint extension, ROI/affine mapping и других факторов.
+
+Предыдущая независимая [screen-ROI диагностика](CHALK_FILL001_RS_PRE_REPLAY_REPORT_2026-11-04.md) насчитала **499 missed pixels в правой средней зоне**, **1116 actual misses всего**, **11 leaked pixels**. Нельзя вывести их причину, вычитая 3 logical px из одной строки, и нельзя переносить Stage/desktop geometry из другого run. В [accepted-only Egret эксперименте §15](GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md) pixel equality одно-проходного и инкрементального replay относится к **одному набору принятых точек**, а не к вариациям penultimate между строками.
+
+**Evidence:** E1 механизма + арифметическая сверка архивной E4 accepted-point телеметрии — PASS; **причинность конкретного PNG underfill — E0/NOT_PROVEN**. Оригинальный FILL-001 остаётся FAIL (coverage 98.430600%, leakage 11). Ни код, ни экспериментальные данные в этой работе не менялись.
+
+**Следующий gate:** same-run сравнение видимой крайней X каждого изолированного штриха с реальными последними двумя принятыми точками, с отдельным контрольным `normal` vs `smooth` и теми же executor settings; валидный screen transform/PNG и timeline frame events обязательны для E4. Воспроизводить разные accepted sequences можно и offline в существующем Egret harness; результат offline нельзя объявлять доказательством live PNG. Новые production line extension, режимы сглаживания и пороги сейчас не менять.
