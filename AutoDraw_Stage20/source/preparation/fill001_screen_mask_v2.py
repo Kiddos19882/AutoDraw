@@ -193,7 +193,7 @@ def main() -> int:
     if args.output.exists():
         raise FillMatrixError("Screen Mask V2 refuses to overwrite existing evidence.")
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    args.output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\\n",
+    args.output.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n",
                            encoding="utf-8")
     return 0
 
