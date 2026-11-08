@@ -84,3 +84,7 @@
 
 <a id="2026-11-07--локальный-prr-batch-и-exact-chalk-evidence"></a>
 Полный набор локальных PRR run ID, exact CHALK и ссылок на исходные captures находится в [TEST_RESULTS_HISTORY_THROUGH_2026-11-08.md](TEST_RESULTS_HISTORY_THROUGH_2026-11-08.md#2026-11-07--локальный-prr-batch-и-exact-chalk-evidence). Формальная позднейшая renderer acceptance — [CI 42321009715](https://github.com/Kiddos19882/AutoDraw/actions/runs/42321009715) (6/6 PASS_PER_RUN).
+
+## FILL-001 Screen Mask V2 — проверка свидетельств
+
+**Источник:** frozen ON/OFF PNG, E4 diagnostic и raw Monitor run из commit [16640ea](https://github.com/Kiddos19882/AutoDraw/commit/16640eaf7f1ad2282d63b05b06394a32f13f14ed). **Новый code SHA:** `647aeb7a74ec979f46a0828aa3418e57635533c1`; [validation workflow 42503756622](https://github.com/Kiddos19882/AutoDraw/actions/runs/42503756622), результат фиксировать после окончания. Добавлен source-run-bound validation и CLI для пересчёта двух сохранённых ROI; результат сохраняется в `autodraw-fill001-screen-mask-v2/report.json` (artifact только JSON), если все provenance checks выполнены. Прежние утечки 840/849, coverage 98.7847%/99.3148%, PNG FAIL/FAIL — исходный V1 baseline, не новая V2 метрика. Native Egret trace и независимое pixel-equivalence V2 — NOT_RUN.
