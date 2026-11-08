@@ -7,6 +7,7 @@ measurement projection, not the shape/planner. No old V1 evidence is imported.
 """
 
 from copy import deepcopy
+from pathlib import Path
 from typing import Any
 
 from chalk_fill_matrix import FillMatrixError, _hash
@@ -85,6 +86,15 @@ def analyze_smooth_ab_v2_pair(matrix: dict, evidence: list[dict]) -> dict[str, A
                 or row.get("task_id") != task["task_id"]
                 or row.get("expected_smooth") is not task["expected_smooth"]
                 or row.get("raw_e4_status") != "PASS_E4_RAW_CAPTURE"
+                or Path(row.get("before_png") or "").name != task["task_id"] + "-before.png"
+                or Path(row.get("after_png") or "").name != task["task_id"] + "-after.png"
+                or row.get("v2_binding_provenance", {}).get("run_id") != row.get("run_id")
+                or row.get("v2_binding_provenance", {}).get("raw_run_sha256") !=
+                    row.get("raw_run_sha256")
+                or row.get("v2_binding_provenance", {}).get("native_geometry_sha256") !=
+                    row.get("renderer_geometry_sha256")
+                or row.get("v2_audit", {}).get("geometry_evidence_sha256") !=
+                    row.get("raw_run_sha256")
                 or row.get("plan_signature") != task["plan_signature"]
                 or row.get("target_mask_sha256") != task["target_mask_sha256"]
                 or row.get("v2_audit", {}).get("schema") != SCREEN_MASK
