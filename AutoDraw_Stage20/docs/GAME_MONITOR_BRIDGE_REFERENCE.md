@@ -373,6 +373,17 @@ Original acceptance остаётся: coverage≥99% И leakage=0 в КАЖДО�
 **Схема свидетельств:** `fill001/<new-series>.json` (ф) — manifest; `fill001/attempts/` (п) — попытки; `fill001/captures/` (п) — новые before/after ROI и full-screen PNG, raw E4 report, самостоятельный `*-FILL001_SMOOTH_AB_V2-result.json` и `*-FILL001_SMOOTH_AB_V2-comparison.json` (ф). Исходные run JSON остаются в `game_monitor_bridge/` (п). E4, PNG и V2 не дают обещания успеха до фактического E4. Утечки V2=0, покрытие≥99% — те же диагностические границы; V2 не подменяет frozen V1 acceptance. Ни один старый run не подаётся на новый V2 parser автоматически.
 
 
+### Подключение Monitor и Bridge непосредственно на вкладке FILL-001
+
+В обновлённой вкладке **FILL-001** доступны четыре действия, использующие существующий Bridge без второго коллектора:
+
+1. **«1. Запустить Bridge (Telemetry ON)»** — запускает штатный Windows `start_game_monitor_bridge.bat` в обязательном для V3 режиме `--enable-input-telemetry`. Требуется точный `location.origin` *игрового iframe*, без path/query. Если уже запущен Bridge с telemetry OFF, запуск **блокируется**: остановите старый сервер через его консоль и создайте новую сессию. Открытие консоли не доказывает браузерное подключение.
+2. **«2. Копировать Monitor JS»** — копирует `game_monitor.js` из текущей версии AutoDraw. Вручную вставьте его целиком в **DevTools → Console игрового iframe**; автоматическая JS-инъекция в браузер не предусмотрена.
+3. **«3. Копировать Bridge JS»** — копирует *сгенерированный текущим сервером* одноразовый `connection_snippet_*.js`; вставьте его в тот же iframe **после Monitor JS**. Не используйте старые snippet и не публикуйте токен.
+4. **«4. Проверить подключение»** — читает свежую реальную Bridge-сессию и проверяет `inputTelemetryEnabled=true`, параметры V3 и readiness. Без выбранной задачи можно проверить связь/версию/телеметрию; с выбранной задачей запускается полный `inspect_diagnostic_preflight`. Статус «ГОТОВО» означает только готовность инструментария, **не** качество рисования или pixel-exact Egret footprint.
+
+Кнопки не нажимают мышь в игре и не запускают рисование. Запуск одного V3 задания остаётся отдельным операторским действием после подтверждённого preflight. Для portable AutoDraw необходим актуальный соседний каталог `game_monitor/`, для запуска из исходников — `source/game_monitor/`. Не обновляйте страницу после подключения без повторной установки Monitor и Bridge JS.
+
 ## 14. FILL-001 — отдельный BoardPane-anchored Smooth A/B V3 (исследовательский пилот)
 
 **Новый протокол:** `FILL001_SMOOTH_AB_V3`, mapping `FILL001_BOARDPANE_PREFLIGHT_V1`. Это **отдельный эксперимент**, не замена V2 и не изменение frozen target mask: rectangle 460×240, brush lineWidth=10 (полудиаметр 5), 27 scanlines, row-step5/offset0, P1 step4/delay5/extension0. Старая серия V2 `fill001-20261108-204825` остаётся E4 baseline (ON CHALK1458, coverage98.666023%, leak1488; OFF CHALK1459, coverage99.359230%, leak1474, оба quality FAIL). Новый V3 live **NOT_RUN** до операторского запуска.
