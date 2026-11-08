@@ -4,6 +4,12 @@
 
 > **Обязательная формула:** exact `CHALK = pointCount_after - pointCount_before`, только при валидной привязке к конкретному запуску. Длина, количество strokes, площадь, pixel coverage, move calls и estimates — отдельные величины.
 
+## FILL-001: история и будущий чистый A/B
+
+Исторические данные не меняются: FILL001-RS 27 strokes, CHALK1260, coverage98.430600%, leakage11, PNG FAIL; отдельные runs 2026-11-08 ON: CHALK1455, coverage98.6764%, leakage840; OFF: CHALK1459, coverage99.3137%, leakage849 (ROI 674×355 для обоих), оба PNG FAIL. Monitor наблюдал 27/27 заданных режимов; отдельный сохранённый V1 audit есть для ON, отсутствует для OFF. [Первичные файлы](https://github.com/Kiddos19882/AutoDraw/commit/d7da3a1ba5680a8659864b564ad342b25c0baa8b).
+
+Новый FILL001_SMOOTH_AB_V1: software/regression CI NOT_RUN, live E4 ON/OFF NOT_RUN, парная validation NOT_RUN. Старые данные не засчитываются в новый протокол. [Схема проверки](GAME_MONITOR_BRIDGE_REFERENCE.md#12-fill-001--чистый-парный-smooth-ab-v1).
+
 ## 1. Реальные измерения CHALK
 
 | Исследование | Принятые live captures / метрика | Результат и ограничения | Первоисточник |

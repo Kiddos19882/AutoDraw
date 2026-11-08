@@ -6,6 +6,10 @@
 
 **Этап 0 завершён:** 99/99 Markdown в навигации, девять сохранённых исторических редакций, автоматический audit [CI 42421451709](https://github.com/Kiddos19882/AutoDraw/actions/runs/42421451709) SUCCESS. Далее только будущие приоритеты.
 
+## Следующий исследовательский запуск — чистый FILL-001 Smooth A/B
+
+По заданию пользователя текущий приоритет переключён на FILL001_SMOOTH_AB_V1. Последовательность: software/regression CI → два индивидуальных Windows preflight с явно заданными ON/OFF и новой чистой доской → сохранение raw+PNG даже для quality FAIL → независимый same-mask анализ покрытия, утечек, правого края и точного CHALK. До двух новых E4 capture статусы нового теста NOT_RUN; архивные A/B данные не выдаются за новые. При несовпадении before ROI или экранного преобразования итог пары PARTIAL, без подгонки изображения. Production и 45-cell batch остаются заблокированы. [TASKS](TASKS.md#p1--активный-следующий-эксперимент-fill-001-smooth-ab).
+
 ## Текущий этап — ENGINE-001: независимая E5 сверка после live лаборатории
 
 **Достигнут следующий gate:** [CI E5 42454224181](https://github.com/Kiddos19882/AutoDraw/actions/runs/42454224181) зафиксировал 9/9 `PASS_PER_RUN` для native Egret WebGL Stage A ↔ live screen RGB на run-bound accepted coordinates, без post-hoc alignment. Результат **E5 screen-RGB PASS**, но direct native-to-live alpha и temporal order не закрыты; ENGINE-001 остаётся PARTIAL. **Далее:** оценить необходимость отдельно наблюдаемого native render timeline и `normal` live control, не переносить этот результат на FILL-001. Числа и границы в [§22](GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md).

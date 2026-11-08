@@ -228,3 +228,43 @@ def test_complete_27_stroke_raw_monitor_and_screen_evidence_can_pass(tmp_path):
     )
     assert altered["status"] == "PARTIAL"
     assert "same_run_native_geometry_unstable_or_missing" in altered["reasons"]
+
+    # A/B v2 must explicitly accept a clean OFF run while preserving v1 TRUE.
+    from fill001_monitor_diagnostic import AB_PROTOCOL
+    off = copy.deepcopy(run)
+    off["renderer_geometry_at_end"] = copy.deepcopy(geometry)
+    for row in off["observed_stroke_modes"]:
+        row["stroke_option_raw"] = False
+    for row in off["events"]:
+        if row["type"] == "ENGINE_FRAME_SAMPLE":
+            row["strokeOptionRaw"] = False
+    path.write_text(json.dumps(off), encoding="utf-8")
+    ab_task = dict(_task(), experiment_protocol=AB_PROTOCOL, expected_smooth=False)
+    ab_readiness = {
+        "protocol": AB_PROTOCOL, "session_id": "valid-session",
+        "expected_smooth": False,
+        "renderer_geometry_sha256": diag._geometry_fingerprint(geometry),
+    }
+    def audit_ab():
+        return audit_diagnostic_capture(
+            task=ab_task, readiness=ab_readiness, monitor_run_path=path,
+            before_full=full, before_roi=roi_image, after_full=after_full,
+            after_roi=after_crop, screen_roi=roi,
+        )
+    ab = audit_ab()
+    assert ab["status"] == "PASS_E4_RAW_CAPTURE"
+    assert ab["expected_smooth"] is False
+    assert ab["protocol"] == AB_PROTOCOL
+    # A single mixed frame is not a valid OFF run.
+    for row in off["events"]:
+        if row["type"] == "ENGINE_FRAME_SAMPLE":
+            row["strokeOptionRaw"] = True
+            break
+    path.write_text(json.dumps(off), encoding="utf-8")
+    mixed = audit_ab()
+    assert mixed["status"] == "PARTIAL"
+    assert "raw_engine_smooth_mode_missing_or_mixed" in mixed["reasons"]
+    # Declared mode cannot change after raw collection.
+    ab_readiness["expected_smooth"] = True
+    assert audit_ab()["status"] == "PARTIAL"
+

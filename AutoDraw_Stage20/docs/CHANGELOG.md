@@ -2,6 +2,10 @@
 
 Записывать только изменения интерфейсов, форматов, возможностей и значимые изменения сопровождения. Ход проверки каждой задачи — [WORK_LOG](WORK_LOG.md). Полная прежняя редакция без изменений: [CHANGELOG_HISTORY_THROUGH_2026-11-08.md](CHANGELOG_HISTORY_THROUGH_2026-11-08.md).
 
+## 2026-11-08 — отдельный FILL-001 Smooth A/B V1
+
+Добавлен экспериментальный двухзадачный режим ON/OFF с отдельными task IDs и frozen 27-stroke plan, predeclared smooth mode и raw подтверждением по реальным Egret ENGINE_FRAME_SAMPLE. UI сохраняет по каждому запуску raw audit и независимый FILL PNG quality outcome даже при quality FAIL; есть парное сравнение exact CHALK, coverage, leakage и пограничных пропусков с контролем одинаковых before ROI. Старые V1/RS данные, 45-cell matrix и production execution defaults не меняются. Новый E4 и регрессионный CI на момент подготовки NOT_RUN.
+
 ## 2026-11-08 — FILL-001: opt-in native Monitor 0.2.4 single-task diagnostic
 
 - Версия `FILL001_MONITOR_SAME_RUN_V1`: существующая вкладка FILL-001 получила диагностический флаг/создание неизменного RS 27-stroke rectangle плана, однокадровые пары full-screen/board-ROI PNG и дополнительный строгий raw Monitor/Bridge audit без ослабления основного PNG gate.

@@ -3,6 +3,12 @@
 **Назначение:** только фактически выполненные изменения и проверки, а не будущие планы.  
 **Полная история до 2026-11-08:** [WORK_LOG_HISTORY_THROUGH_2026-11-08.md](WORK_LOG_HISTORY_THROUGH_2026-11-08.md) — побайтовый исторический снимок прежней редакции.
 
+## 2026-11-08 — подготовка отдельного Smooth A/B
+
+Сверены рабочий remote HEAD d7da3a1, последние 20 коммитов и документация. Прочитаны существующие матрица, одиночный Stage6 handoff, frozen mask, UI, PNG adapter и Monitor raw auditor. Подтверждён E1 дефект V1: требование smooth=true для всех штрихов исключает намеренный OFF; отсутствие второго audit_report одной этой проверкой не объясняется.
+
+Подготовлен FILL001_SMOOTH_AB_V1: 2-task manifest ON/OFF с заранее объявленным режимом, исходный 27-stroke RS plan без изменения, raw ENGINE_FRAME_SAMPLE cross-check, раздельное сохранение E4 и PNG gate даже при FAIL, сравнение по frozen PNG-маске. Добавлены synthetic/regression tests. Новых live runs и production изменений нет. Software CI нового кода к моменту подготовки НЕ выполнялся; его результат фиксируется после запуска. Исторические файлы и отрицательные captures сохранены.
+
 ## 2026-11-08 — FILL-001: preparation of one full-telemetry comparison run (no Windows live)
 
 - Повторно проверены remote HEAD `8566242` и последние 20 commits, Actions, FILL-001 original evidence и актуальные FILL/ENGINE docs. Цель: новый **одиночный**, полностью run-bound E4 baseline на том же frozen рисунке 27 stroke / r10 / step5 / offset0 без перезаписи old FILL001 run.

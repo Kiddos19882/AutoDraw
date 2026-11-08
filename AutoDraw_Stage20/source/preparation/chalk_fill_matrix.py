@@ -196,6 +196,13 @@ def validate_fill001_matrix(matrix: Any) -> None:
     """Fail closed on duplicate/missing cells, altered signatures or unsafe plans."""
     if not isinstance(matrix, dict) or matrix.get("phase_id") != FILL001_PHASE_ID:
         raise FillMatrixError("Некорректный FILL-001 manifest.")
+    # Versioned, two-run A/B pilot. Legacy 45-cell manifests are unchanged.
+    if matrix.get("experiment_protocol") == "FILL001_SMOOTH_AB_V1":
+        from fill001_smooth_ab import validate_smooth_ab_matrix
+        validate_smooth_ab_matrix(matrix)
+        return
+    if "experiment_protocol" in matrix:
+        raise FillMatrixError("Unsupported FILL-001 experimental protocol.")
     plan_variant = matrix.get("plan_variant")
     if plan_variant not in (None, FILL001_RS_PLAN_VARIANT):
         raise FillMatrixError("Неизвестная версия FILL-001 plan_variant.")

@@ -347,3 +347,34 @@ def test_diagnostic_create_series_uses_frozen_rs_27_stroke_manifest(tmp_path):
     assert task["scanline_row_step"] == 5
     assert task["scanline_offset"] == 0
     assert task["plan_signature"] == "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+
+
+def test_new_smooth_ab_ui_creates_two_frozen_tasks(tmp_path):
+    from types import SimpleNamespace
+    from chalk_fill_matrix import load_fill001_matrix
+
+    class _String:
+        def __init__(self, value):
+            self.value = value
+        def get(self):
+            return self.value
+        def set(self, value):
+            self.value = value
+
+    tab = chalk_fill_ui.Fill001Tab.__new__(chalk_fill_ui.Fill001Tab)
+    tab.root = None
+    tab.output_dir = tmp_path
+    tab.series_var = _String("new-smooth-ab")
+    tab.diagnostic_var = _String(False)
+    tab.status_var = _Var()
+    tab.manifest_label = SimpleNamespace(configure=lambda **_kwargs: None)
+    tab._refresh_tasks = lambda: None
+    tab.create_smooth_ab_series()
+    manifest = load_fill001_matrix(tab.manifest_path)
+    assert manifest["experiment_protocol"] == "FILL001_SMOOTH_AB_V1"
+    assert manifest["execution_allowed"] is False
+    assert manifest["expected_task_count"] == 2
+    assert [x["expected_smooth"] for x in manifest["tasks"]] == [True, False]
+    assert {x["plan_signature"] for x in manifest["tasks"]} == {
+        "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+    }

@@ -23,6 +23,11 @@ from chalk_fill_matrix import (
     write_fill001_matrix,
 )
 from brush_behavior_test_ui import _cursor_safe_point_outside_region
+from chalk_fill_capture_adapter import audit_fill001_png_pair
+from fill001_smooth_ab import (
+    PROTOCOL as FILL001_AB_PROTOCOL, build_fill001_smooth_ab_matrix,
+    analyze_smooth_ab_pair,
+)
 from fill001_monitor_diagnostic import (
     PROTOCOL as FILL001_DIAGNOSTIC_PROTOCOL,
     audit_diagnostic_capture, inspect_diagnostic_preflight,
@@ -90,6 +95,7 @@ class Fill001Tab:
         ttk.Label(series, text="ID серии").pack(side="left")
         ttk.Entry(series, textvariable=self.series_var, width=32).pack(side="left", padx=6)
         ttk.Button(series, text="Создать manifest (45 задач)", command=self.create_series).pack(side="left", padx=4)
+        ttk.Button(series, text="Новый Smooth A/B (2 задачи)", command=self.create_smooth_ab_series).pack(side="left", padx=4)
         ttk.Button(series, text="Открыть manifest…", command=self.load_series_dialog).pack(side="left", padx=4)
         self.manifest_label = ttk.Label(series, text="Manifest не загружен")
         self.manifest_label.pack(side="left", padx=10)
@@ -107,12 +113,22 @@ class Fill001Tab:
             outer, variable=self.diagnostic_var,
             text="Диагностический одиночный FILL-001: Monitor 0.2.4 + run-bound WebGL + полные PNG (27 штрихов)",
         ).pack(anchor="w", pady=(1, 7))
+        ttk.Button(
+            outer, text="Сравнить Smooth ON/OFF по двум сохранённым прогонам",
+            command=self.analyze_smooth_ab,
+        ).pack(anchor="w", pady=(0, 7))
 
         self.task_details = tk.Text(outer, height=10, wrap="word", state="disabled")
         self.task_details.pack(fill="both", expand=True, pady=(0, 8))
         ttk.Label(outer, textvariable=self.status_var, wraplength=1120).pack(anchor="w")
 
     def create_series(self) -> None:
+        self._create_series(smooth_ab=False)
+
+    def create_smooth_ab_series(self) -> None:
+        self._create_series(smooth_ab=True)
+
+    def _create_series(self, *, smooth_ab: bool) -> None:
         raw_id = self.series_var.get().strip()
         if not raw_id or re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,63}", raw_id) is None:
             messagebox.showwarning(
@@ -124,8 +140,11 @@ class Fill001Tab:
         try:
             # Opt-in diagnostic reproduces the historical 27-stroke RS
             # geometry, never the legacy 131-stroke default.
-            matrix = (build_fill001_rs_matrix(raw_id)
-                      if self.diagnostic_var.get() else build_fill001_matrix(raw_id))
+            matrix = (
+                build_fill001_smooth_ab_matrix(raw_id) if smooth_ab else
+                build_fill001_rs_matrix(raw_id) if self.diagnostic_var.get()
+                else build_fill001_matrix(raw_id)
+            )
             path = self.output_dir / f"{raw_id}.json"
             if path.exists():
                 raise FileExistsError(f"Серия уже существует: {path}. Откройте её вместо перезаписи.")
@@ -133,9 +152,12 @@ class Fill001Tab:
             self.matrix, self.manifest_path = matrix, path
             self.manifest_label.configure(text=path.name)
             self._refresh_tasks()
-            label = "Диагностический FILL-001-RS" if self.diagnostic_var.get() else "FILL-001"
+            label = (
+                "FILL-001 Smooth A/B" if smooth_ab else
+                "Диагностический FILL-001-RS" if self.diagnostic_var.get() else "FILL-001"
+            )
             self.status_var.set(
-                f"Создан {label} manifest из 45 записей (batch запрещён): {path}"
+                f"Создан {label}: {len(matrix['tasks'])} задач (batch запрещён): {path}"
             )
         except (OSError, ValueError, TypeError, FillMatrixError) as exc:
             messagebox.showerror("Не удалось создать FILL-001 manifest", str(exc), parent=self.root)
@@ -194,7 +216,9 @@ class Fill001Tab:
                 f"Task: {task['task_id']}\n"
                 f"Shape: {task['shape_id']}\n"
                 f"Radius: {task['requested_radius']}\n"
-                f"Repeat: {task['repeat_index']}/3\n"
+                f"Repeat: {task['repeat_index']}/{task.get('planned_repeats', 3)}\n"
+                + (f"Declared smooth: {task['expected_smooth']}\n"
+                   if task.get("experiment_protocol") == FILL001_AB_PROTOCOL else "") +
                 f"Expected strokes: {task['expected_strokes']}\n"
                 f"Coverage estimate: {task['planned_coverage_fraction']:.6%}\n"
                 f"Leakage pixels: {task['planned_leakage_pixels']}\n"
@@ -258,7 +282,10 @@ class Fill001Tab:
         if not callable(self.on_transfer_plan) or not callable(self.on_start):
             messagebox.showerror("FILL-001 не подключён", "Callback передачи в Stage 6 отсутствует.", parent=self.root)
             return
-        self.diagnostic_active = bool(self.diagnostic_var.get())
+        self.diagnostic_active = (
+            self.matrix.get("experiment_protocol") == FILL001_AB_PROTOCOL
+            or bool(self.diagnostic_var.get())
+        )
         self.diagnostic_readiness = None
         self.diagnostic_screens = {}
         self.diagnostic_capture_timestamps = {}
@@ -324,6 +351,13 @@ class Fill001Tab:
                 "Game Monitor Bridge подключён, а calibrated ROI точно охватывает игровую доску. "
                 "Пакетное выполнение остальных 44 задач останется запрещено. Продолжить?"
                 + diagnostic_warning
+                + (
+                    "\n\nРЕЖИМ ИГРЫ: установите в интерфейсе игры smooth="
+                    + ("ON" if task["expected_smooth"] else "OFF")
+                    + ". AutoDraw не переключает этот параметр. Фактический режим "
+                      "всех 27 штрихов будет проверен по ENGINE_FRAME_SAMPLE."
+                    if task.get("experiment_protocol") == FILL001_AB_PROTOCOL else ""
+                )
             ),
             icon="warning",
             parent=self.root,
@@ -434,7 +468,7 @@ class Fill001Tab:
             "after_png": None,
             "capture_path": None,
             "diagnostic": ({
-                "protocol": FILL001_DIAGNOSTIC_PROTOCOL,
+                "protocol": self.diagnostic_readiness["protocol"],
                 "readiness": dict(self.diagnostic_readiness),
                 "before_full_screen": self.diagnostic_screens.get("before"),
                 "before_captured_at_utc": self.diagnostic_capture_timestamps.get("before"),
@@ -597,6 +631,45 @@ class Fill001Tab:
             except tk.TclError:
                 pass
 
+
+    def analyze_smooth_ab(self) -> None:
+        """Analyze only a complete new A/B pair, never archival captures."""
+        try:
+            if (not isinstance(self.matrix, dict)
+                    or self.matrix.get("experiment_protocol") != FILL001_AB_PROTOCOL):
+                raise FillMatrixError("Откройте двухзадачный FILL-001 Smooth A/B manifest.")
+            if self.manifest_path is None:
+                raise FillMatrixError("A/B manifest не загружен.")
+            current = load_fill001_matrix(self.manifest_path)
+            if current["matrix_signature"] != self.matrix["matrix_signature"]:
+                raise FillMatrixError("Manifest изменился; перезагрузите его.")
+            reports = []
+            for task in current["tasks"]:
+                path = task.get("capture_path")
+                if task.get("capture_status") != "completed" or not path:
+                    raise FillMatrixError("Оба режима должны иметь завершённый raw audit и PNG.")
+                reports.append(json.loads(Path(path).read_text(encoding="utf-8")))
+            analysis = analyze_smooth_ab_pair(current, reports)
+            path = self.output_dir / "captures" / (
+                f"{current['series_id']}-{FILL001_AB_PROTOCOL}-comparison.json"
+            )
+            if path.exists():
+                previous = json.loads(path.read_text(encoding="utf-8"))
+                if previous != analysis:
+                    raise FileExistsError("A/B comparison exists with other contents.")
+            else:
+                path.write_text(
+                    json.dumps(analysis, ensure_ascii=False, indent=2) + "\n",
+                    encoding="utf-8",
+                )
+            self.status_var.set(
+                f"A/B comparison: {analysis['status']}. "
+                f"Результат: {path}. PNG quality каждого прогона показано отдельно."
+            )
+        except Exception as exc:
+            self.status_var.set(f"A/B comparison заблокирован: {exc}")
+            messagebox.showerror("FILL-001 Smooth A/B", str(exc), parent=self.root)
+
     def finalize_capture(self) -> None:
         if self.active_task is None or self.active_run_record is None:
             messagebox.showwarning("Нет активной FILL-001 задачи", "Сначала выполните одну задачу FILL-001.", parent=self.root)
@@ -668,7 +741,7 @@ class Fill001Tab:
                     screen_roi=record["screen_roi"],
                 )
                 audit_file = self.output_dir / "captures" / (
-                    f"{self.active_task['task_id']}-{FILL001_DIAGNOSTIC_PROTOCOL}.json"
+                    f"{self.active_task['task_id']}-{audit['protocol']}.json"
                 )
                 if audit_file.exists():
                     previous = json.loads(audit_file.read_text(encoding="utf-8"))
@@ -691,6 +764,98 @@ class Fill001Tab:
                         "FILL-001 raw E4 diagnostic PARTIAL: " + ", ".join(audit["reasons"])
                         + ". Report сохранён, capture не принят."
                     )
+            if self.matrix.get("experiment_protocol") == FILL001_AB_PROTOCOL:
+                # Preserve a failed PNG as evidence. This is NOT the legacy
+                # accepted FILL-001 capture path and never weakens its gates.
+                if audit.get("protocol") != FILL001_AB_PROTOCOL:
+                    raise FillMatrixError("Expected a versioned smooth A/B raw audit.")
+                png = audit_fill001_png_pair(
+                    "rectangle", before_png, after_png, screen_roi=record["screen_roi"]
+                )
+                evidence = {
+                    "schema_version": 1, "protocol": FILL001_AB_PROTOCOL,
+                    "task_id": self.active_task["task_id"],
+                    "expected_smooth": self.active_task["expected_smooth"],
+                    "raw_e4_status": audit["status"],
+                    "run_id": audit["run_id"], "session_id": audit["session_id"],
+                    "exact_chalk": audit["exact_chalk"],
+                    "plan_signature": self.active_task["plan_signature"],
+                    "target_mask_sha256": self.active_task["target_mask_sha256"],
+                    "raw_run_sha256": audit["raw_run_sha256"],
+                    "screen_roi": record["screen_roi"],
+                    "before_png": str(before_png), "after_png": str(after_png),
+                    "before_png_sha256": png["before_png_sha256"],
+                    "after_png_sha256": png["after_png_sha256"],
+                    "png_audit": png,
+                }
+                evidence_file = self.output_dir / "captures" / (
+                    f"{self.active_task['task_id']}-{FILL001_AB_PROTOCOL}-result.json"
+                )
+                if evidence_file.exists():
+                    previous = json.loads(evidence_file.read_text(encoding="utf-8"))
+                    if previous != evidence:
+                        raise FileExistsError("A/B evidence already exists with different content.")
+                else:
+                    evidence_file.write_text(
+                        json.dumps(evidence, ensure_ascii=False, indent=2) + "\n",
+                        encoding="utf-8",
+                    )
+                matching = [
+                    item for item in self.matrix["tasks"]
+                    if item["task_id"] == self.active_task["task_id"]
+                ]
+                if len(matching) != 1:
+                    raise FillMatrixError("A/B task identity changed.")
+                matching[0]["capture_status"] = "completed"
+                matching[0]["capture_path"] = str(evidence_file)
+                self.matrix["status"] = "in_progress"
+                identity = {
+                    key: self.matrix[key] for key in (
+                        "schema_version", "phase_id", "series_id", "shapes",
+                        "radii", "repeats", "tasks", "plan_variant",
+                        "candidate_selection_policy", "experiment_protocol",
+                    )
+                }
+                self.matrix["matrix_signature"] = hashlib.sha256(
+                    json.dumps(identity, ensure_ascii=False, sort_keys=True,
+                               separators=(",", ":")).encode("utf-8")
+                ).hexdigest()
+                write_fill001_matrix(self.matrix, self.manifest_path)
+                record["status"] = (
+                    "ab_raw_complete_png_pass" if png["png_audit_status"] == "passed"
+                    else "ab_raw_complete_png_failed"
+                )
+                record["capture_path"] = str(evidence_file)
+                record["capture_summary"] = {
+                    "run_id": audit["run_id"], "exact_chalk": audit["exact_chalk"],
+                    "coverage_fraction": png["coverage_fraction"],
+                    "leakage_pixels": png["leakage_pixels"],
+                    "png_audit_status": png["png_audit_status"],
+                    "raw_e4_status": audit["status"],
+                }
+                self.active_run_record.write_text(
+                    json.dumps(record, ensure_ascii=False, indent=2) + "\n",
+                    encoding="utf-8",
+                )
+                self.status_var.set(
+                    f"Smooth A/B: raw E4={audit['status']}, "
+                    f"PNG quality={png['png_audit_status']} "
+                    f"(coverage={png['coverage_fraction']:.6%}, "
+                    f"leakage={png['leakage_pixels']}). "
+                    "Результат сохранён; перед следующим запуском очистите доску."
+                )
+                self.active_task = None
+                self.active_plan_path = None
+                self.active_run_record = None
+                self.before_png_path = None
+                self.after_png_path = None
+                self.capture_region = None
+                self.diagnostic_active = False
+                self.diagnostic_readiness = None
+                self.diagnostic_screens = {}
+                self.diagnostic_capture_timestamps = {}
+                self._refresh_tasks()
+                return
             from chalk_fill_capture_adapter import build_fill001_capture_from_runtime
 
             capture = build_fill001_capture_from_runtime(
