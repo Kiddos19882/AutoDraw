@@ -61,7 +61,7 @@ def render_bridge_snippet(
     return rendered
 ALLOWED_TYPES = {"BOARD_ATTACHED", "BOARD_DETACHED", "DRAW_START", "DRAW_START_APPLIED",
                  "DRAW_SAMPLE", "DRAW_END", "BRUSH_CHANGE", "BRUSH_CHANGE_APPLIED",
-                 "POINT_QUOTA_UPDATE", "GAME_METHOD_ERROR", "POINTER_DOWN_CANDIDATE",
+                 "POINT_QUOTA_UPDATE", "GAME_METHOD_ERROR", "ENGINE_FRAME_SAMPLE", "POINTER_DOWN_CANDIDATE",
                  "POINTER_UP_CANDIDATE", "MOUSE_MOVE_SAMPLE"}
 
 
@@ -568,6 +568,46 @@ class RunRecorder:
             "note": "Coalesced pointDelta values mean intermediate accepted coordinates may be missing."
         }
         run["per_stroke_metrics"] = summarize_per_stroke_metrics(run["events"])
+        # True Egret BoardPane ENTER_FRAME observer callbacks, not browser RAF.
+        frame_events = [event for event in run["events"]
+                        if event.get("type") == "ENGINE_FRAME_SAMPLE"]
+        grouped_frames: dict[str, list[dict]] = {}
+        for event in frame_events:
+            sid = event.get("strokeId")
+            if isinstance(sid, str) and sid:
+                grouped_frames.setdefault(sid, []).append(event)
+        run["engine_frame_samples"] = {
+            "source": "BoardPane.EgretEvent.ENTER_FRAME_observer",
+            "event_count": len(frame_events),
+            "by_stroke": [
+                {
+                    "stroke_id": sid,
+                    "frame_count": len(events),
+                    "observed_positive_point_delta_frames": sum(
+                        type(event.get("observedPointDeltaSincePreviousFrame")) is int
+                        and event["observedPointDeltaSincePreviousFrame"] > 0
+                        for event in events),
+                    "observed_stationary_frames": sum(
+                        event.get("observedPointDeltaSincePreviousFrame") == 0
+                        for event in events),
+                    "first_t_ms": events[0].get("t"),
+                    "last_t_ms": events[-1].get("t"),
+                }
+                for sid, events in sorted(grouped_frames.items())
+            ],
+            "is_full_engine_render_timeline": False,
+            "caveat": "Observer may miss callbacks and does not establish game render ordering.",
+        }
+        mode_events = [event for event in run["events"]
+                       if event.get("type") == "DRAW_START_APPLIED"]
+        run["observed_stroke_modes"] = [
+            {
+                "stroke_id": event.get("strokeId"),
+                "stroke_option_raw": event.get("strokeOptionRaw"),
+                "source": event.get("modeEvidenceSource"),
+            }
+            for event in mode_events
+        ]
         probe_summaries = []
         for probe in run["frame_probes"]:
             summary = summarize_intervals(probe.get("intervals", []))
