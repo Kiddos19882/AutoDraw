@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from PIL import Image
+import pytest
 
 import chalk_fill_ui
 
@@ -275,3 +276,36 @@ def test_executor_completion_and_after_png_keep_attempt_record_valid(tmp_path):
     saved = json.loads(attempt_path.read_text(encoding="utf-8"))
     assert saved["after_png"] == str(after_png)
     assert saved["after_png_captured_at_utc"]
+
+
+def test_diagnostic_screen_capture_persists_full_and_roi_from_same_frame(tmp_path, monkeypatch):
+    from fill001_monitor_diagnostic import _valid_rgb_pair
+
+    region = {"x": 120, "y": 80, "width": 581, "height": 304}
+    screen = Image.new("RGB", (1000, 800), (240, 240, 240))
+    screen.paste((17, 120, 80), (150, 100, 200, 130))
+    tab = chalk_fill_ui.Fill001Tab.__new__(chalk_fill_ui.Fill001Tab)
+    tab.output_dir = tmp_path
+    tab.brush_tab = _BrushTab(region)
+    tab.capture_region = dict(region)
+    tab.diagnostic_active = True
+    tab.diagnostic_screens = {}
+    tab.diagnostic_capture_timestamps = {}
+    monkeypatch.setattr(chalk_fill_ui.ImageGrab, "grab", lambda: screen.copy())
+    monkeypatch.setattr(chalk_fill_ui.pyautogui, "mouseUp", lambda: None)
+    monkeypatch.setattr(chalk_fill_ui.pyautogui, "moveTo", lambda *_args: None)
+    monkeypatch.setattr(chalk_fill_ui.time, "sleep", lambda *_args: None)
+    monkeypatch.setattr(
+        chalk_fill_ui, "_cursor_safe_point_outside_region",
+        lambda *_args, **_kwargs: (10, 10),
+    )
+    task = {"task_id": "diag-v1-rectangle"}
+    result = tab._capture_board_png(task, phase="after")
+    full = tmp_path / "captures" / "diag-v1-rectangle-after-full-screen.png"
+    assert tab.diagnostic_screens["after"] == str(full)
+    check = _valid_rgb_pair(full, result, region)
+    assert check["full_screen_size"] == [1000, 800]
+    assert check["roi_size"] == [581, 304]
+    assert tab.diagnostic_capture_timestamps["after"]
+    with pytest.raises(FileExistsError, match="перезапись"):
+        tab._capture_board_png(task, phase="after")

@@ -22,6 +22,10 @@ from chalk_fill_matrix import (
     write_fill001_matrix,
 )
 from brush_behavior_test_ui import _cursor_safe_point_outside_region
+from fill001_monitor_diagnostic import (
+    PROTOCOL as FILL001_DIAGNOSTIC_PROTOCOL,
+    audit_diagnostic_capture, inspect_diagnostic_preflight,
+)
 
 
 class Fill001Tab:
@@ -51,6 +55,11 @@ class Fill001Tab:
         self.before_png_path: Path | None = None
         self.after_png_path: Path | None = None
         self.capture_region: dict[str, int] | None = None
+        self.diagnostic_active = False
+        self.diagnostic_readiness: dict[str, Any] | None = None
+        self.diagnostic_screens: dict[str, str] = {}
+        self.diagnostic_capture_timestamps: dict[str, str] = {}
+        self.diagnostic_var = tk.BooleanVar(value=False)
         self.series_var = tk.StringVar(
             value=f"fill001-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
         )
@@ -93,6 +102,10 @@ class Fill001Tab:
         ttk.Button(task, text="Обновить список", command=self._refresh_tasks).pack(side="left", padx=4)
         ttk.Button(task, text="Подготовить и запустить одну задачу", command=self.prepare_and_run).pack(side="left", padx=4)
         ttk.Button(task, text="Проверить runtime + PNG и принять capture", command=self.finalize_capture).pack(side="left", padx=4)
+        ttk.Checkbutton(
+            outer, variable=self.diagnostic_var,
+            text="Диагностический одиночный FILL-001: Monitor 0.2.4 + run-bound WebGL + полные PNG (27 штрихов)",
+        ).pack(anchor="w", pady=(1, 7))
 
         self.task_details = tk.Text(outer, height=10, wrap="word", state="disabled")
         self.task_details.pack(fill="both", expand=True, pady=(0, 8))
@@ -238,6 +251,20 @@ class Fill001Tab:
         if not callable(self.on_transfer_plan) or not callable(self.on_start):
             messagebox.showerror("FILL-001 не подключён", "Callback передачи в Stage 6 отсутствует.", parent=self.root)
             return
+        self.diagnostic_active = bool(self.diagnostic_var.get())
+        self.diagnostic_readiness = None
+        self.diagnostic_screens = {}
+        self.diagnostic_capture_timestamps = {}
+        if self.diagnostic_active:
+            try:
+                self.diagnostic_readiness = inspect_diagnostic_preflight(
+                    self.output_dir.parent / "game_monitor_bridge", task
+                )
+            except (ValueError, OSError, TypeError, KeyError) as exc:
+                self.diagnostic_active = False
+                self.status_var.set(f"Диагностический preflight заблокирован: {exc}")
+                messagebox.showwarning("FILL-001 Monitor 0.2.4 не готов", str(exc), parent=self.root)
+                return
         if not self.brush_tab._validate_automation_preflight():
             return
         canvas_size = self.brush_tab.get_canvas_size()
@@ -353,6 +380,22 @@ class Fill001Tab:
             except tk.TclError:
                 pass
             return
+        if getattr(self, "diagnostic_active", False):
+            try:
+                fresh = inspect_diagnostic_preflight(
+                    self.output_dir.parent / "game_monitor_bridge", self.active_task
+                )
+                if (not isinstance(self.diagnostic_readiness, dict)
+                        or fresh["session_id"] != self.diagnostic_readiness["session_id"]
+                        or fresh["renderer_geometry_sha256"] !=
+                           self.diagnostic_readiness["renderer_geometry_sha256"]):
+                    raise ValueError("Bridge session или native renderer geometry изменились после before PNG.")
+            except (ValueError, OSError, TypeError, KeyError) as exc:
+                self.status_var.set(f"Диагностический FILL-001 остановлен до game input: {exc}")
+                messagebox.showerror("Monitor/Bridge сменился", str(exc), parent=self.root)
+                self.active_task = None
+                self.active_plan_path = None
+                return
         attempt_path = self.output_dir / "attempts" / f"{self.active_task['task_id']}.json"
         attempt_path.parent.mkdir(parents=True, exist_ok=True)
         if attempt_path.exists():
@@ -375,6 +418,15 @@ class Fill001Tab:
             "screen_roi": dict(self.capture_region) if self.capture_region else None,
             "after_png": None,
             "capture_path": None,
+            "diagnostic": ({
+                "protocol": FILL001_DIAGNOSTIC_PROTOCOL,
+                "readiness": dict(self.diagnostic_readiness),
+                "before_full_screen": self.diagnostic_screens.get("before"),
+                "before_captured_at_utc": self.diagnostic_capture_timestamps.get("before"),
+                "after_full_screen": None,
+                "after_captured_at_utc": None,
+                "audit_report": None,
+            } if getattr(self, "diagnostic_active", False) else None),
         }
         attempt_path.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         self.active_run_record = attempt_path
@@ -489,6 +541,15 @@ class Fill001Tab:
                 raise ValueError(
                     f"Пустая доска не подтверждена эталоном: {clear_result.get('status')}."
                 )
+        if getattr(self, "diagnostic_active", False):
+            full_screen = directory / f"{task['task_id']}-{phase}-full-screen.png"
+            if destination.exists() or full_screen.exists():
+                raise FileExistsError("Диагностические PNG этого task уже существуют; перезапись запрещена.")
+            # A single ImageGrab frame supplies both PNGs, so cropping cannot
+            # silently mix a newer screenshot with the earlier calibrated ROI.
+            screen.save(full_screen)
+            self.diagnostic_screens[phase] = str(full_screen)
+            self.diagnostic_capture_timestamps[phase] = datetime.now(timezone.utc).isoformat()
         crop.save(destination)
         return destination
 
@@ -500,6 +561,9 @@ class Fill001Tab:
             record = json.loads(self.active_run_record.read_text(encoding="utf-8"))
             record["after_png"] = str(self.after_png_path)
             record["after_png_captured_at_utc"] = datetime.now(timezone.utc).isoformat()
+            if isinstance(record.get("diagnostic"), dict):
+                record["diagnostic"]["after_full_screen"] = self.diagnostic_screens.get("after")
+                record["diagnostic"]["after_captured_at_utc"] = self.diagnostic_capture_timestamps.get("after")
             self.active_run_record.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
             self.status_var.set(
                 f"After PNG сохранён: {self.after_png_path}. Нажмите «Проверить runtime + PNG и принять capture» "
@@ -573,6 +637,40 @@ class Fill001Tab:
                 raise FillMatrixError("Не хватает session.json, before PNG или after PNG.")
             if not isinstance(record.get("screen_roi"), dict):
                 raise FillMatrixError("В attempt record отсутствует calibrated screen ROI.")
+            if isinstance(record.get("diagnostic"), dict):
+                diagnostic = record["diagnostic"]
+                run_file = binding.get("bridge_run_file") if isinstance(binding, dict) else None
+                if not run_file:
+                    raise FillMatrixError("Диагностический FILL-001: runtime binding не содержит raw run file.")
+                audit = audit_diagnostic_capture(
+                    task=self.active_task,
+                    readiness=diagnostic["readiness"],
+                    monitor_run_path=Path(run_file),
+                    before_full=Path(diagnostic["before_full_screen"]),
+                    before_roi=Path(before_png),
+                    after_full=Path(diagnostic["after_full_screen"]),
+                    after_roi=Path(after_png),
+                    screen_roi=record["screen_roi"],
+                )
+                audit_file = self.output_dir / "captures" / (
+                    f"{self.active_task['task_id']}-{FILL001_DIAGNOSTIC_PROTOCOL}.json"
+                )
+                if audit_file.exists():
+                    raise FileExistsError("Диагностический raw audit уже сохранён; перезапись запрещена.")
+                audit_file.write_text(
+                    json.dumps(audit, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+                )
+                diagnostic["audit_report"] = str(audit_file)
+                diagnostic["raw_e4_status"] = audit["status"]
+                record["diagnostic"] = diagnostic
+                self.active_run_record.write_text(
+                    json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+                )
+                if audit["status"] != "PASS_E4_RAW_CAPTURE":
+                    raise FillMatrixError(
+                        "FILL-001 raw E4 diagnostic PARTIAL: " + ", ".join(audit["reasons"])
+                        + ". Report сохранён, capture не принят."
+                    )
             from chalk_fill_capture_adapter import build_fill001_capture_from_runtime
 
             capture = build_fill001_capture_from_runtime(
@@ -622,6 +720,10 @@ class Fill001Tab:
             self.before_png_path = None
             self.after_png_path = None
             self.capture_region = None
+            self.diagnostic_active = False
+            self.diagnostic_readiness = None
+            self.diagnostic_screens = {}
+            self.diagnostic_capture_timestamps = {}
             self._refresh_tasks()
         except Exception as exc:
             messagebox.showerror("FILL-001 capture не принят", str(exc), parent=self.root)
