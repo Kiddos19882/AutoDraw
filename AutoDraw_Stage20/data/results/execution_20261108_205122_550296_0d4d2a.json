@@ -1,0 +1,140 @@
+{
+  "schema_version": 3,
+  "execution_id": "0968f040-a1ee-4bd3-b11f-30567e3537a9",
+  "created_at": "2026-11-08T20:51:22+03:00",
+  "stage": 14,
+  "status": "completed",
+  "source_plan_file": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\runtime\\current_brush_behavior_test.json",
+  "source_plan_name": "FILL-001-RS fill001-20261108-204825-rectangle-r10-s5-o0-v2-smooth-on",
+  "source_plan_sha256": "7a1ea2bc4ae5a851b46c4c48e77389a9d55e953cbdadf991a87f945152f2cfb0",
+  "source_plan_file_sha256": "40f2dda573696f2ac437ccf8e5b24aecf0b343b2c380312c04c7677a5a0d36cf",
+  "experiment_context": {
+    "phase_id": "FILL001",
+    "series_id": "fill001-20261108-204825",
+    "task_id": "fill001-20261108-204825-rectangle-r10-s5-o0-v2-smooth-on",
+    "shape_id": "rectangle",
+    "requested_radius": 10,
+    "repeat_index": 1,
+    "expected_strokes": 27,
+    "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417",
+    "target_mask_sha256": "ac1c6660e5986cdf534328c6dbcd5020f631168b1473c24b29e7609eb827998b",
+    "sampling_profile": {
+      "profile_id": "P1",
+      "sampling_step": 4,
+      "delay_ms": 5
+    },
+    "plan_variant": "FILL001_RS_V1",
+    "planner_version": 2,
+    "scanline_row_step": 5,
+    "scanline_offset": 0,
+    "executor_plan_sha256": "7a1ea2bc4ae5a851b46c4c48e77389a9d55e953cbdadf991a87f945152f2cfb0"
+  },
+  "executed_plan": {
+    "name": "FILL-001-RS fill001-20261108-204825-rectangle-r10-s5-o0-v2-smooth-on",
+    "width": 674,
+    "height": 355,
+    "stroke_count": 27,
+    "sha256": "7a1ea2bc4ae5a851b46c4c48e77389a9d55e953cbdadf991a87f945152f2cfb0"
+  },
+  "target_area": {
+    "x": 496,
+    "y": 265,
+    "width": 674,
+    "height": 355
+  },
+  "plan_fit": {
+    "source_size": {
+      "width": 674,
+      "height": 355
+    },
+    "target_size": {
+      "width": 674,
+      "height": 355
+    },
+    "scale_x": 1.0,
+    "scale_y": 1.0,
+    "offset_x": 0.0,
+    "offset_y": 0.0,
+    "preserve_aspect_ratio": true,
+    "identity_transform": true
+  },
+  "executor_config": {
+    "point_step_px": 4.0,
+    "line_extension_px": 0.0,
+    "point_delay_ms": 5,
+    "after_mouse_up_ms": 20,
+    "before_mouse_down_ms": 20,
+    "after_mouse_down_ms": 40,
+    "end_hold_ms": 50,
+    "countdown_seconds": 5
+  },
+  "summary": {
+    "status": "completed",
+    "completed_strokes": 27,
+    "total_strokes": 27,
+    "started_at": "2026-11-08T20:50:25+03:00",
+    "ended_at": "2026-11-08T20:51:22+03:00",
+    "duration_seconds": 57.328,
+    "move_calls": 3061,
+    "error": null,
+    "stop_reason": null,
+    "mouse_release": {
+      "attempted": true,
+      "succeeded": true,
+      "errors": []
+    },
+    "executor_config": {
+      "point_step_px": 4.0,
+      "line_extension_px": 0.0,
+      "point_delay_ms": 5,
+      "after_mouse_up_ms": 20,
+      "before_mouse_down_ms": 20,
+      "after_mouse_down_ms": 40,
+      "end_hold_ms": 50,
+      "countdown_seconds": 5
+    }
+  },
+  "error": null,
+  "environment": {
+    "python_version": "3.11.4",
+    "platform": "Windows-10-10.0.19045-SP0",
+    "python_implementation": "CPython"
+  },
+  "runtime_binding_status": "passed",
+  "runtime_binding": {
+    "binding_method": "unique_run_in_executor_window",
+    "task_id": "fill001-20261108-204825-rectangle-r10-s5-o0-v2-smooth-on",
+    "session_id": "c820c0bb-7955-4c7e-a14c-7e4f6f44cd4d",
+    "run_id": "0d0a0edf-f42e-4da1-b880-f09a4fce0a27",
+    "execution_id": "0968f040-a1ee-4bd3-b11f-30567e3537a9",
+    "stroke_lifecycle_source": "pointer_observer",
+    "observed_radius": 10.0,
+    "sampling_profile": {
+      "profile_id": "P1",
+      "sampling_step": 4,
+      "delay_ms": 5
+    },
+    "executor_config": {
+      "point_step_px": 4.0,
+      "line_extension_px": 0.0,
+      "point_delay_ms": 5,
+      "after_mouse_up_ms": 20,
+      "before_mouse_down_ms": 20,
+      "after_mouse_down_ms": 40,
+      "end_hold_ms": 50,
+      "countdown_seconds": 5
+    },
+    "source_plan_file_sha256": "40f2dda573696f2ac437ccf8e5b24aecf0b343b2c380312c04c7677a5a0d36cf",
+    "pre_point_count": 2,
+    "post_point_count": 1460,
+    "exact_chalk": 1458,
+    "event_count": 5849,
+    "bridge_failures": 0,
+    "sequence_gaps": 0,
+    "session_file": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\game_monitor_bridge\\c820c0bb-7955-4c7e-a14c-7e4f6f44cd4d\\session.json",
+    "session_file_sha256": "47915baa4abfff34f13564d81b038d40c6febb651d71bb766c3e108067c32a77",
+    "bridge_run_file": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\game_monitor_bridge\\c820c0bb-7955-4c7e-a14c-7e4f6f44cd4d\\game-monitor-run-20261108T175125236656Z-0d0a0edf.json",
+    "bridge_run_file_sha256": "6a865033edd6d66a5e0e556d39481b4a3759160bbc76def5f7cd4a1fb2005120"
+  },
+  "runtime_binding_error": null
+}

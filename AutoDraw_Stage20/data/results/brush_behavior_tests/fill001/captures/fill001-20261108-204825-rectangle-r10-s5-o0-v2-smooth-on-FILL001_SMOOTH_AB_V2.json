@@ -1,0 +1,194 @@
+{
+  "schema_version": 1,
+  "protocol": "FILL001_SMOOTH_AB_V2",
+  "expected_smooth": true,
+  "status": "PASS_E4_RAW_CAPTURE",
+  "reasons": [],
+  "run_id": "0d0a0edf-f42e-4da1-b880-f09a4fce0a27",
+  "session_id": "c820c0bb-7955-4c7e-a14c-7e4f6f44cd4d",
+  "task_id": "fill001-20261108-204825-rectangle-r10-s5-o0-v2-smooth-on",
+  "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417",
+  "monitor_version": "0.2.4",
+  "exact_chalk": 1458,
+  "accepted_points_count": 1458,
+  "positive_draw_samples": 1458,
+  "stroke_count": 27,
+  "observed_stroke_modes": [
+    {
+      "stroke_id": "pointer-stroke-10",
+      "stroke_option_raw": true,
+      "source": "BoardPane.atom.options[from_ENGINE_FRAME_SAMPLE]"
+    },
+    {
+      "stroke_id": "pointer-stroke-11",
+      "stroke_option_raw": true,
+      "source": "BoardPane.atom.options[from_ENGINE_FRAME_SAMPLE]"
+    },
+    {
+      "stroke_id": "pointer-stroke-12",
+      "stroke_option_raw": true,
+      "source": "BoardPane.atom.options[from_ENGINE_FRAME_SAMPLE]"
+    },
+    {
+      "stroke_id": "pointer-stroke-13",
+      "stroke_option_raw": true,
+      "source": "BoardPane.atom.options[from_ENGINE_FRAME_SAMPLE]"
+    },
+    {
+      "stroke_id": "pointer-stroke-14",
+      "stroke_option_raw": true,
+      "source": "BoardPane.atom.options[from_ENGINE_FRAME_SAMPLE]"
+    },
+    {
+      "stroke_id": "pointer-stroke-15",
+      "stroke_option_raw": true,
+      "source": "BoardPane.atom.options[from_ENGINE_FRAME_SAMPLE]"
+    },
+    {
+      "stroke_id": "pointer-stroke-16",
+      "stroke_option_raw": true,
+      "source": "BoardPane.atom.options[from_ENGINE_FRAME_SAMPLE]"
+    },
+    {
+      "stroke_id": "pointer-stroke-17",
+      "stroke_option_raw": true,
+      "source": "BoardPane.atom.options[from_ENGINE_FRAME_SAMPLE]"
+    },
+    {
+      "stroke_id": "pointer-stroke-18",
+      "stroke_option_raw": true,
+      "source": "BoardPane.atom.options[from_ENGINE_FRAME_SAMPLE]"
+    },
+    {
+      "stroke_id": "pointer-stroke-19",
+      "stroke_option_raw": true,
+      "source": "BoardPane.atom.options[from_ENGINE_FRAME_SAMPLE]"
+    },
+    {
+      "stroke_id": "pointer-stroke-20",
+      "stroke_option_raw": true,
+      "source": "BoardPane.atom.options[from_ENGINE_FRAME_SAMPLE]"
+    },
+    {
+      "stroke_id": "pointer-stroke-21",
+      "stroke_option_raw": true,
+      "source": "BoardPane.atom.options[from_ENGINE_FRAME_SAMPLE]"
+    },
+    {
+      "stroke_id": "pointer-stroke-22",
+      "stroke_option_raw": true,
+      "source": "BoardPane.atom.options[from_ENGINE_FRAME_SAMPLE]"
+    },
+    {
+      "stroke_id": "pointer-stroke-23",
+      "stroke_option_raw": true,
+      "source": "BoardPane.atom.options[from_ENGINE_FRAME_SAMPLE]"
+    },
+    {
+      "stroke_id": "pointer-stroke-24",
+      "stroke_option_raw": true,
+      "source": "BoardPane.atom.options[from_ENGINE_FRAME_SAMPLE]"
+    },
+    {
+      "stroke_id": "pointer-stroke-25",
+      "stroke_option_raw": true,
+      "source": "BoardPane.atom.options[from_ENGINE_FRAME_SAMPLE]"
+    },
+    {
+      "stroke_id": "pointer-stroke-26",
+      "stroke_option_raw": true,
+      "source": "BoardPane.atom.options[from_ENGINE_FRAME_SAMPLE]"
+    },
+    {
+      "stroke_id": "pointer-stroke-27",
+      "stroke_option_raw": true,
+      "source": "BoardPane.atom.options[from_ENGINE_FRAME_SAMPLE]"
+    },
+    {
+      "stroke_id": "pointer-stroke-28",
+      "stroke_option_raw": true,
+      "source": "BoardPane.atom.options[from_ENGINE_FRAME_SAMPLE]"
+    },
+    {
+      "stroke_id": "pointer-stroke-29",
+      "stroke_option_raw": true,
+      "source": "BoardPane.atom.options[from_ENGINE_FRAME_SAMPLE]"
+    },
+    {
+      "stroke_id": "pointer-stroke-30",
+      "stroke_option_raw": true,
+      "source": "BoardPane.atom.options[from_ENGINE_FRAME_SAMPLE]"
+    },
+    {
+      "stroke_id": "pointer-stroke-31",
+      "stroke_option_raw": true,
+      "source": "BoardPane.atom.options[from_ENGINE_FRAME_SAMPLE]"
+    },
+    {
+      "stroke_id": "pointer-stroke-5",
+      "stroke_option_raw": true,
+      "source": "BoardPane.atom.options[from_ENGINE_FRAME_SAMPLE]"
+    },
+    {
+      "stroke_id": "pointer-stroke-6",
+      "stroke_option_raw": true,
+      "source": "BoardPane.atom.options[from_ENGINE_FRAME_SAMPLE]"
+    },
+    {
+      "stroke_id": "pointer-stroke-7",
+      "stroke_option_raw": true,
+      "source": "BoardPane.atom.options[from_ENGINE_FRAME_SAMPLE]"
+    },
+    {
+      "stroke_id": "pointer-stroke-8",
+      "stroke_option_raw": true,
+      "source": "BoardPane.atom.options[from_ENGINE_FRAME_SAMPLE]"
+    },
+    {
+      "stroke_id": "pointer-stroke-9",
+      "stroke_option_raw": true,
+      "source": "BoardPane.atom.options[from_ENGINE_FRAME_SAMPLE]"
+    }
+  ],
+  "engine_frame_count": 1505,
+  "mouse_move_count": 2805,
+  "geometry_at_start_sha256": "c62f8c948427e1b94986c5a6f5a62dcc331efcbe467f88afec596491b7af16bd",
+  "raw_run_sha256": "6a865033edd6d66a5e0e556d39481b4a3759160bbc76def5f7cd4a1fb2005120",
+  "before": {
+    "full_screen_size": [
+      1920,
+      1080
+    ],
+    "roi_size": [
+      674,
+      355
+    ],
+    "full_screen_sha256": "821591981ea727b7c47a0fb07a964188ebb816d2188ae2982cab366f68058ccd",
+    "board_roi_sha256": "5f0278f8c92b05e5755179bc5ae7bb8bf145d5e3e87e322f9845d1402db20ded"
+  },
+  "after": {
+    "full_screen_size": [
+      1920,
+      1080
+    ],
+    "roi_size": [
+      674,
+      355
+    ],
+    "full_screen_sha256": "290b9a8a699a2672c95909c1c8d248ad78d97e74f594d0923fe25cf496bebe9a",
+    "board_roi_sha256": "aa72a1866fe3f938c2414b3953b38dd800f645a63e797850d2456447a6495298"
+  },
+  "screen_roi": {
+    "x": 496,
+    "y": 265,
+    "width": 674,
+    "height": 355
+  },
+  "limitations": [
+    "Observing ENTER_FRAME does not prove actual Stage rendering order.",
+    "Same-run client geometry requires independent desktop/PNG alignment validation.",
+    "Screenshots contain RGB; native alpha cannot be inferred.",
+    "No per-stroke live PNG; game smooth toggle remains operator-controlled.",
+    "A diagnostic PASS is not FILL coverage/leakage acceptance or CHALK prediction."
+  ]
+}
