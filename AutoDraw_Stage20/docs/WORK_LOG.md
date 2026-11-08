@@ -3,6 +3,15 @@
 **Назначение:** только фактически выполненные изменения и проверки, а не будущие планы.  
 **Полная история до 2026-11-08:** [WORK_LOG_HISTORY_THROUGH_2026-11-08.md](WORK_LOG_HISTORY_THROUGH_2026-11-08.md) — побайтовый исторический снимок прежней редакции.
 
+## 2026-11-08 — ENGINE-001: прямая сквозная трассировка ввода и WebGL-доски
+
+- На удалённом HEAD `570f9a6` повторно проверены последние 20 коммитов и GitHub Actions; открытая задача — `ENGINE-001`, предыдущие геометрические тесты остаются DEFERRED.
+- По byte-identified `main.min_653f95bc.js` и `mergeEngine_df2e5bc5.js` прослежены `WebTouchHandler.getLocation` → `TouchHandler` с desktop `mouse.enable` wrappers → `Preloader.initStage` → `BoardPane.globalToLocal/onDrawing`; `SystemTicker.update` выполняет render **перед** `broadcastEnterFrame`.
+- Установлен конкретный WebGL путь `GraphicsNode → CanvasRenderBuffer/CanvasRenderer → WebGL texture → drawWithClip` (offscreen `destination-in` для rounded board mask, отдельный `scrollRect`), а также формулы stage/display/backing/CSS масштаба. Это E1 по frozen engine, не E4 pixel parity.
+- Дополнен [единый справочник](GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md), §13, и уточнены статус и задача. Новых live, unit, screenshot экспериментов не запускалось; CHALK, PRR и FILL-001 результаты неизменны. `master`, исходники, frozen captures и workflows не изменены. Markdown CI проверить после docs commit.
+
+---
+
 ## 2026-11-08 — ENGINE-001: прямой аудит полного main bundle и состояния BoardPane
 
 - Сверены remote HEAD `90d1944`, 20 коммитов и Markdown Actions. С помощью GitHub blob API успешно прочитан `main.min_653f95bc.js` полностью (4 857 523 символа / 4 859 418 байт), вычисленный Git SHA-1 совпал с `46cc74de00b6cb5d207b1e1a2ffcd81613b6d388`. Ограничение обычного `fetch_file` на большой текст преодолено.

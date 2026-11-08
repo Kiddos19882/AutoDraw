@@ -2,6 +2,13 @@
 
 Записывать только изменения интерфейсов, форматов, возможностей и значимые изменения сопровождения. Ход проверки каждой задачи — [WORK_LOG](WORK_LOG.md). Полная прежняя редакция без изменений: [CHANGELOG_HISTORY_THROUGH_2026-11-08.md](CHANGELOG_HISTORY_THROUGH_2026-11-08.md).
 
+## 2026-11-08 — полная статическая цепочка input/frame/Canvas/WebGL для доски
+
+- [GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md](GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md), §13: документирована desktop/mobile доставка pointer событий, фактический `mouse.enable` hook, порядок `SystemTicker.render → ENTER_FRAME`, матрицы `globalToLocal`, Canvas2D raster внутри WebGL, offscreen `destination-in` mask, scrollRect clipping и stage/backing/CSS преобразования.
+- `ENGINE-001` остаётся PARTIAL до финальной сверки с Monitor/PRR; новые тесты, изменения приложения и runtime запуск не выполнялись.
+
+---
+
 ## 2026-11-08 — прямой разбор BoardPane из byte-verified main bundle
 
 - [Справочник игровой доски](GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md) расширен исходными методами `BlackBoardAtom/BoardPane/Painter/PainterPopup`, таблицей состояний и бинарного `Atom`, различием `redraw()`/`redraw(false)`, границами one-pass Egret replay.

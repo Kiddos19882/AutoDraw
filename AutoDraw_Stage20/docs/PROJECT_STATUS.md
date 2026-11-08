@@ -8,7 +8,7 @@
 
 ## Текущий активный приоритет — ENGINE-001
 
-На основании пользовательского задания 2026-11-08 прежние и новые FILL/GEOM/PRR оптимизационные эксперименты **отложены** (их подтверждённые PASS/FAIL/BLOCKED не изменены). Текущая задача — статический разбор сохранённого игрового движка с приоритетом интерактивной доски, `PainterPopup/BoardPane/BlackBoardAtom/Painter` и Egret рендеринга. [Техническая документация](GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md) — `ENGINE-001 PARTIAL`, `E1 PASS` для прямо проверенных методов BoardPane/BlackBoardAtom/Painter/PainterPopup/Atom (§12). Полный `main.min` получен (4 859 418 байт, SHA совпадает); дальнейшая end-to-end трассировка, свежие temporal/raster E2/E4 остаются PARTIAL/NOT_RUN.
+На основании пользовательского задания 2026-11-08 прежние и новые FILL/GEOM/PRR оптимизационные эксперименты **отложены** (их подтверждённые PASS/FAIL/BLOCKED не изменены). Текущая задача — статический разбор сохранённого игрового движка с приоритетом интерактивной доски, `PainterPopup/BoardPane/BlackBoardAtom/Painter` и Egret рендеринга. [Техническая документация](GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md) — `ENGINE-001 PARTIAL`, `E1 PASS` для проверенных методов BoardPane/BlackBoardAtom/Painter/PainterPopup/Atom (§12) и сквозной цепочки input → Egret frame → Canvas/WebGL/mask/screen (§13). Полный `main.min` получен (4 859 418 байт, SHA совпадает); независимое согласование с Monitor/PRR, fresh temporal/raster E2/E4 и фактическая pixel-equivalence остаются PARTIAL/NOT_RUN.
 
 [Отложенные варианты A–D, E1–E4 и инструмент Egret](ROADMAP.md#отложенная-программа-тестов-fill-001-geom-001-и-связанных-gates). Работа текущего этапа не запускает gameplay, не меняет production и не меняет отвергнутый FILL-001 capture.
 

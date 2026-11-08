@@ -292,4 +292,111 @@ options.length; options[0] ...
 
 Новые E2/E4 эксперименты и unit tests не выполнялись; старые PRR `6/6 PASS_PER_RUN` и FILL-001 PNG `FAIL` не меняются.
 
-**Один следующий шаг:** проверить полную цепочку input/frame/render из сохранённых бандлов и явно отделить детерминированную логику от неподтверждённых browser timings и пиксельной эквивалентности.
+**Следующий шаг, зафиксированный после §12 (выполнен статически в §13):** проверить полную цепочку input/frame/render. Динамический тайминг и пиксельная эквивалентность остаются отдельными E2/E4 вопросами.
+
+## 13. Сквозная трассировка браузерного ввода, Egret-кадров и WebGL-вывода (2026-11-08)
+
+**Область подтверждения:** прямое чтение сохранённого [`main.min_653f95bc.js`](../gameEngine/main.min_653f95bc.js), Git blob `46cc74de00b6cb5d207b1e1a2ffcd81613b6d388`, и [`mergeEngine_df2e5bc5.js`](../gameEngine/mergeEngine_df2e5bc5.js), blob `d613d2b97e2436521aa3870478c69e99eac1f19f`. Статус перечисленных связей: **E1 PASS** для этого набора файлов. Это не E4 для текущего сайта или конкретного будущего браузера. Код минифицирован: приведены **имена методов**, проверяемые поиском в исходнике, а не ненадёжные номера строк.
+
+### 13.1. Источник stage.mouseX/Y — уточнение desktop/mobile
+
+Сохранённый `Preloader.initStage()` в главном bundle регистрирует обновление позиции на Egret stage:
+- **Desktop:** `mouse.enable(stage)` → `mouse.setMouseMoveEnabled(true)` → `stage.addEventListener(mouse.MouseEvent.MOUSE_MOVE, listener)`; listener сохраняет `stage.mouseX=event.stageX` и `stage.mouseY=event.stageY`.
+- **Mobile:** `stage.addEventListener(egret.TouchEvent.TOUCH_MOVE, listener)` с тем же обновлением координат, одновременно выбираются мобильные настройки `FIXED_NARROW` и LANDSCAPE.
+- **При нажатии на саму доску** `BoardPane.onMouseDown(event)` дополнительно устанавливает stage coordinates из `event.stageX/Y` и отправляет `DRAG_START`.
+
+Desktop-расширение `mouse.enable` находится **в согласованном merge bundle**, а не является догадкой о стандартном Egret:
+1. Сохраняет исходный `egret.sys.TouchHandler.prototype.onTouchMove` и оборачивает его. Обёртка вызывает оригинал, затем при включённом `setMouseMoveEnabled(true)` через `stage.$hitTest(x,y)` отправляет `mouse.MouseEvent.MOUSE_MOVE`, и выполняет hover/roll-over логику.
+2. Аналогично оборачивает `onTouchBegin` и `onTouchEnd`. Обёртка `WebTouchHandler.getLocation` выставляет внутренний флаг при `event.buttons==0`; для ветви end plugin может дополнительно синтезировать mouse move, чтобы получать hover-координаты.
+3. **Оригинальный** `TouchHandler.onTouchMove` отправляет `egret.TouchEvent.TOUCH_MOVE` только для активного touch identifier и при отличии координаты от предыдущей. Дополнительный `mouse.MouseEvent.MOUSE_MOVE` расширения имеет **отдельные условия** и не равен количеству принятых точек `BoardPane`.
+
+Означает: desktop `BoardPane.onDrawing()` в `ENTER_FRAME` читает **последнее сохранённое значение stage.mouseX/Y**. Это не обработчик каждого OS mousemove и не очередь всех DOM events. Точный browser-event coalescing и порядок относительно кадра по E1 восстановить нельзя.
+
+### 13.2. Браузерный pointer → Egret stage → BoardPane-local
+
+Проверенный путь:
+
+~~~text
+browser canvas event: mousedown / mousemove / mouseup
+  -> egret.web.WebTouchHandler.addMouseListener()
+  -> WebTouchHandler.getLocation(event)
+     pageX/pageY - canvas.getBoundingClientRect() origin; rotation ±90; /scaleX/Y; Math.round()
+  -> egret.sys.TouchHandler.onTouchBegin/Move/End
+     (с desktop mouse.enable() wrappers, если включены)
+  -> TouchHandler.findTarget() = stage.$hitTest(stageX,stageY)
+  -> Egret TouchEvent + дополнительное custom mouse.MouseEvent.MOUSE_MOVE
+  -> Preloader stage mouseX/Y; BoardPane.onMouseDown initial stage coordinates
+  -> BoardPane.globalToLocal(stage.mouseX,stage.mouseY)
+     -> transformPoint через inverted concatenated display-object matrix
+  -> BlackBoardAtom.pushPoint(), если соблюдены условия quota и bounds
+~~~
+
+В исходном `egret.DisplayObject.globalToLocal()` используется `$getInvertedConcatenatedMatrix().transformPoint()`. Собранная матрица учитывает цепочку родителей, scale/rotation/translation, anchor offsets и сдвиг `scrollRect`. Следовательно, **одних размеров доски 460×240 недостаточно** для преобразования browser client/desktop→board.
+
+В desktop `WebTouchHandler.onMouseMove(event)` при `event.buttons==0` вызывает `onTouchEnd`, а при зажатой кнопке — `onTouchMove`. Дополнительное desktop `mouse.enable` поддерживает hover обновления. Это **реальный код**; предположение, будто каждая DOM mousemove всегда проходит одинаковый `TouchEvent.TOUCH_MOVE` route, неверно.
+
+### 13.3. Порядок Egret SystemTicker: рендер до ENTER_FRAME
+
+В `egret.sys.SystemTicker.update(force)`:
+1. Вызываются зарегистрированные tick callbacks; на основании `frameDeltaTime` и `lastCount` определяется, нужен ли рендер в этом обновлении.
+2. При полном обновлении выполняется **`this.render(true, ...)`**.
+3. **После этого** вызывается `this.broadcastEnterFrame()`, который dispatch `egret.Event.ENTER_FRAME` подписанным display objects.
+
+Внутри `SystemTicker.render` вызывается `Player.$render`; тот вызывает `stage.$displayList.drawToSurface()`, далее `systemRenderer.render(...)`. Подписанный `BoardPane.onDrawing` срабатывает уже **после этого прохода рендера**. Так что Graphics-изменение, выполненное внутри текущего `ENTER_FRAME`, может появиться в **следующем** подходящем render pass, а не в только что завершённом.
+
+Примечания по доказательности:
+- Это порядок **в данном сохранённом SystemTicker**, не гарантированная задержка в миллисекундах или всегда ровно один новый frame.
+- Runtime snapshot 04.11 показывает `stage.frameRate=30`; статистика accepted-point интервалов около 33 мс относится к **отдельному наблюдённому FILL-001 run**, а не к текущей игре.
+- `mouse.enable()` дополнительно регистрирует hover/roll-over callback на каждом пятом `ENTER_FRAME`; он **не** заменяет основной `BoardPane.onDrawing` и сам по себе не расходует CHALK.
+
+### 13.4. От принятой точки до Canvas2D raster
+
+В `BoardPane.onDrawing()` на `ENTER_FRAME`: `globalToLocal` → `Rectangle.contains` → `pushPoint` → `updateLess` → `redraw(false)`. При условии `less<=0` метод не добавляет точек. Текущая частота появления `P_i` зависит от обработанных mouse coordinates, времени Egret кадра и дедупликации `Point.equals()`.
+
+В `BoardPane.redraw()` путь `Painter.drawSmoothLine(...,true,false)` либо `drawNormalLine` передаётся в `egret.Graphics`. При `lineStyle(width,color,1,false)` отсутствующие caps/joints нормализуются `GraphicsNode.lineStyle()` в `round`. `CanvasRenderer.renderGraphics` читает `drawData`; задаёт `lineWidth/lineCap/lineJoin`, создаёт path из `moveTo/lineTo/quadraticCurveTo` и вызывает Canvas2D `stroke()`. Для линии толщиной 1 или 3 в Canvas-рендерере существует специальный контекстный сдвиг 0.5/0.5 px.
+
+Особенность [§12.4](#124-существенное-отличие-живого-redraw-от-one-pass-replay): `onDrawing` и `onDrawingEnd` повторно вызывают `redraw(false)`, накопляя отдельные `StrokePath`. Обычный окончательный replay через один `redraw()` строит другую **командную историю**. Разница в конкретных пикселях остаётся E0 до проверки.
+
+### 13.5. WebGL path: GraphicsNode → texture → mask → stage
+
+Реализация `egret.web.WebGLRenderer.renderGraphics(node,buffer,...)` в сохранённом merge bundle:
+1. Вычисляет размер объекта и множители `DisplayList.$canvasScaleX/Y`, формирует pixel dimensions (через `Math.ceil` и пересчёт эффективного scale).
+2. Создаёт или переиспользует `CanvasRenderBuffer`. Для грязного `GraphicsNode` вызывает **`CanvasRenderer.renderGraphics(node,canvasBuffer.context)`**, то есть геометрия линии первоначально **растеризуется Canvas2D даже при `renderMode=webgl`**.
+3. Создаёт или обновляет WebGL texture методом `createTexture` или `updateTexture` и выполняет `context.drawTexture(...)`. Кэширование связано с `node.dirtyRender`.
+4. `WebGLRenderer.drawDisplayObject()` проверяет `displayObject.$renderMode`: для маски используем `drawWithClip`, для отдельного scrollRect — `drawWithScrollRect`. Отрисовка `Player.$render` в конечном счёте проходит через `DisplayList.drawToSurface` на stage backing.
+
+**Оба ограничения доски применяются, но по разным путям:**
+- `BoardPane.resetBg` задаёт локальный **прямоугольный** `scrollRect=(0,0,width,height)`.
+- `PainterPopup.createBlackBackground` создаёт отдельный `boardMask` с `drawRoundRect(0,0,460,240,10)` и задаёт `painterBoard.mask=boardMask`.
+- Для `WebGLRenderer.drawWithClip` при наличии display-object `$mask` создаются offscreen буферы содержания и маски, затем выполняется **`destination-in`** композиция. Когда дополнительно есть `$scrollRect`, применяется прямоугольная маска вокруг финальной композиции через `pushMask/popMask`.
+- Если объект ограничен **только** `$scrollRect`, `drawWithScrollRect` может использовать `enableScissor/disableScissor` при подходящей осевой матрице, либо `pushMask/popMask` при иных transforms или уже включённом scissor.
+
+Важно: закруглённая маска **игровой доски** не тождественна целевой **маске фигуры** внутри FILL-001. Комбинация offscreen alpha-mask, WebGL texture filtering, округления backing dimensions и browser antialiasing — возможные причины отличия от идеальной OpenCV-капсулы, но вклад каждой в старые 11 leakage / 738 model-only pixels остаётся **UNKNOWN**.
+
+### 13.6. Stage → backing canvas → CSS client → desktop PNG
+
+В `egret.web.WebPlayer.updateScreenSize()`:
+- `screenAdapter.calculateStageSize(...)` определяет `stageWidth/stageHeight` и `displayWidth/displayHeight` согласно scale mode;
+- `displayScaleX=displayWidth/stageWidth`, `displayScaleY=displayHeight/stageHeight`;
+- `canvasScaleX=Math.ceil(displayScaleX × DisplayList.$canvasScaleFactor)`, аналогично Y;
+- CSS `transform` canvas настраивается для display scale, компенсируя backing scale, и передаётся в `webTouchHandler.updateScaleMode(displayScaleX,displayScaleY,rotation)`;
+- `DisplayList.$setCanvasScale(canvasScaleX,canvasScaleY)` определяет масштаб растеризации, а `Player.updateStageSize` меняет размеры stage render buffer.
+
+Для пользовательского [runtime snapshot 04.11](../data/runtime/renderer_snapshot_2026-11-04.json) были `stage=1672×600`, `backing=5016×1800`, `canvasScaleX/Y=3` и `Capabilities.renderMode=webgl`. Это **E4 конкретного прежнего snapshot**, не константы движка; `canvasScaleFactor=2` не равен фактическому canvasScale=3. Клиентские углы были вычислены по fall-back affine transform, а не получены от `getBoxQuads()`. Для старого 27-stroke FILL-001 run нет полного **same-run** renderer geometry, и чужой snapshot нельзя выдавать за его screen transform.
+
+Координатные пространства не взаимозаменяемы: board logical 460×240, stage, backing pixels, CSS client, desktop PNG/ROI; внутри AutoDraw дополнительно существуют screen-local план и исполнительные screen pixels. Конкретный affine mapping принимается только вместе с версией и calibration evidence.
+
+### 13.7. Что должен учитывать будущий Egret replay, не выполняя его сейчас
+
+| Уровень будущего сравнения | Нужно сохранить / воспроизвести | Нынешний статус |
+|---|---|---|
+| Финальная геометрия пути | Те же accepted points, stroke order, width/color/options, `Painter` smooth/normal | Existing one-pass harness; E2/E3 в проверенных fixtures |
+| Temporal Graphics | Последовательность вызовов `onDrawing/redraw(false)`, включая дубли и final redraw | **NOT_RUN**; final accepted-point array этого не определяет |
+| Browser input | DOM event coalescing, desktop `mouse.enable`, `stage.mouseX/Y`, Event/ENTER_FRAME ordering | E1 paths проверены; E4 timings не проверены |
+| Маски и backing | ScrollRect, roundRect display mask, WebGL offscreen composite, texture sampling, stage scale/translation | Source E1; частичное E3 PRR для single strokes |
+| Screenshot identity | Same-run transform, before/after pixels, threshold, target ROI | Старый FILL-001: 98.430600% / 11 leaks **FAIL**, полная same-run geometry отсутствует |
+| CHALK | `post.pointCount-pre.pointCount` с run-bound Monitor/Bridge | Старый 27-stroke run: 1260 measured; для будущих вариантов **NOT_RUN** |
+
+**Итог ENGINE-001 на данном шаге:** input → sampling → drawing → raster/mask/Stage *статически прослежены* (E1 PASS) для сохранённой версии Egret 5.4.1. Нельзя на основании кода объявить доказанными фактическое количество кадросэмплов, конкретную альфа-маску каждого пикселя, воспроизведение temporal renderer или причинность FILL-001 PNG ошибок. Эти вопросы оставлены для **отдельно разрешённых** экспериментальных этапов.
+
+**Один следующий шаг текущего документального этапа:** сделать финальную проверку непротиворечивости архитектурного справочника относительно подтверждённого runtime/PRR и существующего Monitor/Bridge API; при обнаружении различий зафиксировать точную границу версий/данных, без новых тестов.
