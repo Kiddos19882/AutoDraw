@@ -1025,7 +1025,9 @@
         const source = renderGraphicsNode(result.shape.$renderNode,false);
         const canvas = composeBoard(source,source.nodeBounds,mask);
         const webgl = renderWebGLProbe(mode,[],width,canvas,webglState,result.shape);
-        const expectedPaths = 70 + 27 * frames;
+        // Next stroke's full redraw clears all previous transient paths; only
+        // duplicates on the FINAL stroke remain in the finished GraphicsNode.
+        const expectedPaths = 70 + frames;
         if (result.accepted !== input.exactChalk ||
             result.duplicatePointRejections !== frames * 27 ||
             result.extraFrameRedrawCalls !== frames * 27 ||

@@ -25,7 +25,7 @@ from analyze_engine001_endpoint_reference import (
 )
 
 COUNTS = (0, 1, 3)
-PATHS = (70, 97, 151)
+PATHS = (70, 71, 73)
 RUN = "6a17a297-ea14-4527-9527-bfd8de3bd335"
 SESSION = "bb261898-8296-41f5-a333-eb0b81016410"
 

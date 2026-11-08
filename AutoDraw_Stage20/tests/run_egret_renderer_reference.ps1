@@ -185,7 +185,7 @@ try {
     $framesJson = [System.Net.WebUtility]::HtmlDecode($framesMatch.Groups[1].Value)
     $framesManifest = $framesJson | ConvertFrom-Json
     $expectedCounts = @(0, 1, 3)
-    $expectedPaths = @(70, 97, 151)
+    $expectedPaths = @(70, 71, 73)
     if ($framesManifest.experimentId -ne "ENGINE001_DUPLICATE_FRAMES_V1" -or
         $framesManifest.status -ne "COMPLETE_OFFLINE_NATIVE_FRAME_EXPERIMENT" -or
         $framesManifest.runId -ne $temporalManifest.runId -or
