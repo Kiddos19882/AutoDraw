@@ -26,6 +26,7 @@ def make_tab(tmp_path, *, protocol="FILL001_SMOOTH_AB_V3"):
 
     class Brush:
         bridge_input_telemetry_requested = True
+        bridge_process = SimpleNamespace(poll=lambda: None)
 
         def start_game_monitor_bridge(self, **kwargs):
             calls.append(("start", kwargs))
@@ -149,3 +150,16 @@ def test_can_check_monitor_and_bridge_before_creating_fresh_manifest(tmp_path, m
     }), encoding="utf-8")
     tab.check_fill001_bridge()
     assert "НЕ ГОТОВО" in tab.bridge_status_var.get()
+
+
+def test_fill001_refuses_to_copy_stale_bridge_token(tmp_path):
+    tab, calls = make_tab(tmp_path)
+    tab.brush_tab.bridge_process = SimpleNamespace(poll=lambda: 1)
+    tab.copy_fill001_bridge_snippet()
+    assert not calls
+    assert "BLOCKED" in tab.bridge_status_var.get()
+    tab.brush_tab.bridge_process = SimpleNamespace(poll=lambda: None)
+    tab.brush_tab.bridge_input_telemetry_requested = False
+    tab.copy_fill001_bridge_snippet()
+    assert not calls
+    assert "Telemetry ON" in tab.bridge_status_var.get()
