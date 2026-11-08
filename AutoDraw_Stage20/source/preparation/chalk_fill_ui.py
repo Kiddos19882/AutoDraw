@@ -981,6 +981,7 @@ class Fill001Tab:
                     "target_mask_sha256": self.active_task["target_mask_sha256"],
                     "raw_run_sha256": audit["raw_run_sha256"],
                     "renderer_geometry_sha256": audit["geometry_at_start_sha256"],
+                    "boardpane_mapping_sha256": audit.get("boardpane_mapping_at_start_sha256"),
                     "screen_roi": record["screen_roi"],
                     "before_png": str(before_png), "after_png": str(after_png),
                     "before_png_sha256": png["before_png_sha256"],
