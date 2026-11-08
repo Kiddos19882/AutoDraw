@@ -176,6 +176,7 @@ def test_coherently_rehashed_nonuniform_board_still_fails_scale_gate():
                                   separators=(",", ":"), ensure_ascii=False).encode()).hexdigest()
     for sample in samples:
         sample["renderer_geometry_sha256"] = sha
+        sample["boardpane_mapping_sha256"] = _boardpane_mapping_fingerprint(session["renderer_geometry"])
     with pytest.raises(PreflightGeometryError, match="uniformly scaled"):
         call_with(plan, roi, session, samples)
 
@@ -209,5 +210,5 @@ def test_live_preflight_allows_animated_preloader_without_loosening_board_mappin
     assert mapping["boardpane_mapping_sha256"] == samples[0]["boardpane_mapping_sha256"]
 
     session["renderer_geometry"]["players"][0]["boardClientCorners"]["topLeft"]["x"] += 1
-    with pytest.raises(PreflightGeometryError, match="type/source/run/geometry"):
+    with pytest.raises(PreflightGeometryError, match="non-axis-aligned rectangle"):
         call_with(plan, roi, session, samples)
