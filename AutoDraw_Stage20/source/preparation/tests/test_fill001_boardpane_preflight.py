@@ -93,6 +93,8 @@ def test_preflight_maps_to_actual_boardpane_not_roi_and_preserves_source():
     assert last["x"] > first["x"]
     assert binding["no_fallback"] is True
     assert binding["client_to_desktop_offset"] == {"x":0, "y":163}
+    assert binding["passive_samples"] == samples
+    assert len(binding["passive_samples_sha256"]) == 64
     assert binding["status"] == "validated_preflight_input_transform_not_live_draw"
     assert mapped["generation"]["screen_transform"] == binding
 
