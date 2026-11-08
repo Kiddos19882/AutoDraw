@@ -113,7 +113,7 @@ def project_screen_mask_v2(
     ix = np.clip(np.rint(lx).astype(np.intp), 0, FILL001_CANVAS_WIDTH - 1)
     iy = np.clip(np.rint(ly).astype(np.intp), 0, FILL001_CANVAS_HEIGHT - 1)
     mask = build_fill_target_mask(shape_id)[np.ix_(iy, ix)]
-    mask &= within_y[:, None] & within_x[None, :]
+    mask = mask & within_y[:, None] & within_x[None, :]
     if not np.any(mask):
         raise FillMatrixError("Screen Mask V2: empty projected target.")
     mask.setflags(write=False)
@@ -134,6 +134,8 @@ def audit_screen_mask_v2(
     after, after_sha = _screen_pixels(after_png)
     if before.shape != after.shape or before.ndim != 3 or before.shape[2] != 3:
         raise FillMatrixError("Screen Mask V2: PNG pair dimensions differ.")
+    if not isinstance(screen_roi, dict):
+        raise FillMatrixError("Screen Mask V2 requires explicit screen ROI.")
     if (before.shape[1], before.shape[0]) != (screen_roi.get("width"), screen_roi.get("height")):
         raise FillMatrixError("Screen Mask V2: ROI size does not match PNG dimensions.")
     mask = project_screen_mask_v2(shape_id, run_id=run_id, screen_roi=screen_roi, geometry=geometry)
