@@ -98,4 +98,5 @@ def test_v3_pair_accepts_only_matching_protocol_and_coordinate_provenance():
         analyze_smooth_ab_v3_pair(matrix, damaged)
     damaged = deepcopy(rows)
     damaged[1]["screen_roi"]["x"] += 1
+    damaged[1]["boardpane_preflight"]["screen_roi"]["x"] += 1
     assert analyze_smooth_ab_v3_pair(matrix, damaged)["status"].startswith("PARTIAL")
