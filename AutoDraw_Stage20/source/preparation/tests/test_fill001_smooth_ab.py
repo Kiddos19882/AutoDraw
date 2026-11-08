@@ -172,9 +172,11 @@ def test_ab_refuses_to_compare_different_blank_board_images(tmp_path):
     assert comparison["status"] == "PARTIAL_BASELINE_ROI_OR_GEOMETRY_MISMATCH"
     assert comparison["off_minus_on"] is None
     # Same-looking blank screenshots are insufficient with changed BoardPane mapping.
-    compatible_before = copy.deepcopy(evidence)
-    compatible_before[1]["before_png"] = compatible_before[0]["before_png"]
-    compatible_before[1]["before_png_sha256"] = compatible_before[0]["before_png_sha256"]
+    _capture(before_off, False)
+    compatible_before = [
+        _evidence(m["tasks"][0], "run-on", before_on, after_on, 1455),
+        _evidence(m["tasks"][1], "run-off", before_off, after_off, 1459),
+    ]
     compatible_before[1]["renderer_geometry_sha256"] = "b" * 64
     changed_geometry = analyze_smooth_ab_pair(m, compatible_before)
     assert changed_geometry["status"] == "PARTIAL_BASELINE_ROI_OR_GEOMETRY_MISMATCH"
