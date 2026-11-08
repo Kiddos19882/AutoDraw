@@ -18,6 +18,19 @@ EXPECTED_PAIRED_AXIS_SOURCES = {
         "x": "same_run_monitor_fit",
         "y": "same_run_monitor_fit",
     },
+    # Same evidence requirements, different Monitor 0.2.4 accepted-point schema.
+    "engine001_horizontal_endpoint": {
+        "x": "same_run_monitor_fit",
+        "y": "same_run_full_screen_board_bounds",
+    },
+    "engine001_vertical_axis": {
+        "x": "same_run_full_screen_board_bounds",
+        "y": "same_run_monitor_fit",
+    },
+    "engine001_diagonal_axis": {
+        "x": "same_run_monitor_fit",
+        "y": "same_run_monitor_fit",
+    },
 }
 
 EXPECTED_EXECUTOR_CONFIG = {
@@ -107,7 +120,17 @@ def validate_paired_capture(
 
     scenario = experiment.get("test_case")
     expected_axes = EXPECTED_PAIRED_AXIS_SOURCES.get(scenario)
+    is_engine001 = isinstance(scenario, str) and scenario.startswith("engine001_")
     check("known_paired_scenario", expected_axes is not None, actual=scenario)
+    if is_engine001:
+        exp_matrix = experiment.get("chalk_experiment_matrix") or {}
+        run_matrix = monitor_report.get("chalk_experiment_matrix") or {}
+        modes = monitor_report.get("observed_stroke_modes") or []
+        check("engine001_phase_native_mode",
+              exp_matrix.get("phase_id") == run_matrix.get("phase_id") == "ENGINE001"
+              and exp_matrix.get("scenario_id") == run_matrix.get("scenario_id") == scenario
+              and len(modes) == 1 and modes[0].get("stroke_option_raw") is True)
+
 
     experiment_id = experiment.get("experiment_id")
     summary = experiment.get("game_monitor_summary")
@@ -293,17 +316,35 @@ def validate_paired_capture(
     fixture_points = fixture_points if isinstance(fixture_points, list) else []
     quota_deltas = [_number(event.get("pointDelta")) for event in positive_quota]
     draw_deltas = [_number(event.get("pointDelta")) for event in positive_draw]
-    point_stream_ok = (
-        chalk_delta is not None
-        and len(positive_quota) == chalk_delta
-        and len(positive_draw) == chalk_delta
-        and all(delta == 1.0 for delta in quota_deltas)
-        and all(delta == 1.0 for delta in draw_deltas)
-        and all(_point(point) is not None for point in quota_points)
-        and all(_point(point) is not None for point in draw_points)
-        and _points_equal(quota_points, draw_points)
-        and _points_equal(quota_points, fixture_points)
-    )
+    if is_engine001:
+        accepted = monitor_report.get("accepted_points")
+        accepted = accepted if isinstance(accepted, list) else []
+        ids = {p.get("stroke_id") for p in accepted if isinstance(p, dict)}
+        point_stream_ok = (
+            chalk_delta is not None and len(accepted) == chalk_delta
+            and len(positive_quota) == 0 and len(positive_draw) == chalk_delta
+            and all(isinstance(p, dict) and p.get("point_delta") == 1
+                    and _point(p) is not None for p in accepted)
+            and len(ids) == 1 and None not in ids
+            and all(delta == 1.0 for delta in draw_deltas)
+            and all(_point(point) is not None for point in draw_points)
+            and _points_equal(accepted, draw_points)
+            and _points_equal(accepted, fixture_points)
+            and all(e.get("strokeId") == a.get("stroke_id") and e.get("t") == a.get("t")
+                    for e, a in zip(positive_draw, accepted))
+        )
+    else:
+        point_stream_ok = (
+            chalk_delta is not None
+            and len(positive_quota) == chalk_delta
+            and len(positive_draw) == chalk_delta
+            and all(delta == 1.0 for delta in quota_deltas)
+            and all(delta == 1.0 for delta in draw_deltas)
+            and all(_point(point) is not None for point in quota_points)
+            and all(_point(point) is not None for point in draw_points)
+            and _points_equal(quota_points, draw_points)
+            and _points_equal(quota_points, fixture_points)
+        )
     check(
         "complete_accepted_point_stream",
         point_stream_ok,
@@ -311,6 +352,7 @@ def validate_paired_capture(
             "exact_chalk": chalk_delta,
             "positive_quota_updates": len(positive_quota),
             "positive_draw_samples": len(positive_draw),
+            "engine001_accepted_points": len(monitor_report.get("accepted_points") or []) if is_engine001 else None,
             "fixture_points": len(fixture_points),
         },
     )

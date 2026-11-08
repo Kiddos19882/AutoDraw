@@ -222,7 +222,7 @@ def _capture_fixture(scenario="paired_renderer_vertical_single_stroke"):
     }
 
 
-@pytest.mark.parametrize("scenario", list(EXPECTED_PAIRED_AXIS_SOURCES))
+@pytest.mark.parametrize("scenario", [s for s in EXPECTED_PAIRED_AXIS_SOURCES if s.startswith("paired_renderer_")])
 def test_paired_capture_gate_accepts_complete_evidence(scenario):
     data = _capture_fixture(scenario)
     result = validate_paired_capture(
@@ -329,3 +329,30 @@ def test_renderer_comparison_supports_explicit_screen_rgb_metric_names():
     assert "recall_screen_rgb_delta_24" in result["checks"]
     assert "symmetric_difference_fraction_screen_rgb_delta_24" in result["checks"]
     assert "bbox_edges_screen_rgb_delta_24" in result["checks"]
+
+@pytest.mark.parametrize("scenario", [
+    "engine001_horizontal_endpoint", "engine001_vertical_axis", "engine001_diagonal_axis",
+])
+def test_engine001_accepted_stream_and_observed_mode(scenario):
+    data = _capture_fixture(scenario)
+    monitor = data["monitor"]
+    monitor["events"] = [e for e in monitor["events"] if e["type"] != "POINT_QUOTA_UPDATE"]
+    positives = [e for e in monitor["events"] if e["type"] == "DRAW_SAMPLE" and e["pointDelta"] == 1]
+    for index, event in enumerate(positives):
+        event["t"] = index + 1
+    monitor["accepted_points"] = [
+        {"x": p["x"], "y": p["y"], "point_delta": 1, "t": index + 1, "stroke_id": "stroke-1"}
+        for index, p in enumerate(data["fixture"]["points"])
+    ]
+    monitor["observed_stroke_modes"] = [{"stroke_id": "stroke-1", "stroke_option_raw": True}]
+    matrix = {"phase_id": "ENGINE001", "scenario_id": scenario}
+    monitor["chalk_experiment_matrix"] = matrix
+    data["experiment"]["chalk_experiment_matrix"] = matrix
+    def validate():
+        return validate_paired_capture(data["experiment"], monitor, data["plan"], data["fixture"])
+    assert validate()["passed"] is True, validate()["failed_checks"]
+    monitor["accepted_points"][0]["x"] += 1
+    assert "complete_accepted_point_stream" in validate()["failed_checks"]
+    monitor["accepted_points"][0]["x"] -= 1
+    monitor["observed_stroke_modes"][0]["stroke_option_raw"] = False
+    assert "engine001_phase_native_mode" in validate()["failed_checks"]
