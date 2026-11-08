@@ -43,6 +43,10 @@ from chalk_test_blocks import (
     resolve_interrupted_chalk_block_task,
     acquire_chalk_block_owner_lock, release_chalk_block_owner_lock,
 )
+from engine001_lab import (
+    ENGINE001_PHASE, ENGINE001_EXPECTED_TASKS, ENGINE001_EXPERIMENT_ID,
+    inspect_ready_bridge, audit_single_capture,
+)
 from brush_experiment_capture import (
     compare_images, crop_calibrated_regions,
     measure_meter_fill_against_baseline, evaluate_meter_restoration, evaluate_board_clear,
@@ -967,6 +971,7 @@ class BrushBehaviorTestTab:
         self._chalk_block_stop_requested = False
         self._chalk_block_capture_poll_id: str | None = None
         self._chalk_block_clear_confirmed = False
+        self._engine001_lab_session_id: str | None = None
         self.outcome_var = tk.StringVar(value="not_reviewed")
         self.notes_var = tk.StringVar()
         self.visible_strokes_var = tk.StringVar()
@@ -1134,6 +1139,21 @@ class BrushBehaviorTestTab:
         ttk.Button(block_controls, text="Восстановить прерванный блок", command=self.resume_interrupted_chalk_test_block).pack(side="left", padx=6)
         ttk.Button(block_controls, text="Закрыть приостановленный блок", command=self.close_paused_chalk_test_block).pack(side="left", padx=6)
         ttk.Label(block_controls, textvariable=self.chalk_block_progress_var, wraplength=650).pack(side="left", padx=10)
+
+        # One operator action after the existing calibration and browser Bridge
+        # bootstrap. The 9 attempts run in the existing locked CHALK state machine.
+        lab = ttk.LabelFrame(outer, text="ENGINE-001 — чистая лаборатория", padding=8)
+        lab.pack(fill="x", pady=(0, 8))
+        ttk.Button(
+            lab, text="Запустить лабораторию: 9 опытов (Clear)",
+            command=self.start_engine001_lab,
+        ).pack(side="left")
+        ttk.Label(lab, text=(
+            "3 направления × 3 повтора, один штрих на пустой доске. "
+            "Требуются уже подключённые Monitor + Bridge с input telemetry, "
+            "сохранённая калибровка и эталон пустой доски. "
+            "Все опыты выполняются автоматически; Alt — остановка."
+        ), wraplength=880).pack(side="left", padx=10)
 
         details = ttk.LabelFrame(outer, text="Шаблон и фиксация результата", padding=8)
         details.pack(fill="both", expand=True)
@@ -1702,7 +1722,26 @@ class BrushBehaviorTestTab:
                 return False
         return True
 
-    def start_chalk_test_block(self) -> None:
+    def start_engine001_lab(self) -> None:
+        """One-button lab once the existing Monitor/Bridge bootstrap is ready."""
+        if self._chalk_block_journal_path is not None or self._chalk_block_task is not None:
+            messagebox.showwarning(
+                "Другой блок активен", "Закрой или заверши предыдущий блок CHALK.",
+                parent=self.root,
+            )
+            return
+        try:
+            ready = inspect_ready_bridge(self.output_dir / "game_monitor_bridge")
+        except (ValueError, OSError) as exc:
+            messagebox.showwarning("Лаборатория не готова", str(exc), parent=self.root)
+            return
+        self._engine001_lab_session_id = ready["session_id"]
+        self.chalk_block_progress_var.set(
+            "ENGINE-001: подключение подтверждено; проверка калибровки и запуск."
+        )
+        self.start_chalk_test_block(lab_one_click=True)
+
+    def start_chalk_test_block(self, *, lab_one_click: bool = False) -> None:
         if self._chalk_block_task is not None or self._chalk_block_journal_path is not None:
             messagebox.showwarning("Блок уже активен", "Сначала заверши или останови текущий блок.", parent=self.root)
             return
@@ -1715,8 +1754,8 @@ class BrushBehaviorTestTab:
                 parent=self.root,
             )
             return
-        phase_id = self.chalk_block_phase_var.get().strip()
-        if phase_id not in {"G1", "G2", "G3", "V1", "V2", "V3", "V4", "V5", "INT006", "INT006R", "PRR"}:
+        phase_id = ENGINE001_PHASE if lab_one_click else self.chalk_block_phase_var.get().strip()
+        if phase_id not in {"G1", "G2", "G3", "V1", "V2", "V3", "V4", "V5", "INT006", "INT006R", "PRR", ENGINE001_PHASE}:
             messagebox.showwarning("Неизвестная фаза", "Выбери G1/G2/G3, V1–V5, INT006, INT006R или PRR.", parent=self.root)
             return
         if phase_id == "G2" and not self._has_completed_g1_block():
@@ -1802,7 +1841,9 @@ class BrushBehaviorTestTab:
         except (TypeError, ValueError) as exc:
             messagebox.showerror("Неверные параметры блока", str(exc), parent=self.root)
             return
-        if not messagebox.askyesno(
+        # The explicit ENGINE-001 button is the single consent action.
+        # No second confirmation, but all calibration/Bridge checks remain.
+        if not lab_one_click and not messagebox.askyesno(
             "Подтвердить автоматический блок",
             f"Будет выполнено {block_plan['expected_task_count']} экспериментов фазы {phase_id}, "
             "каждый на тестовой доске. AutoDraw будет автоматически нажимать Clear между опытами. "
@@ -1920,6 +1961,18 @@ class BrushBehaviorTestTab:
             else:
                 self._fail_chalk_test_block(f"block_not_complete:{journal.get('status')}")
             return
+        if task.get("scenario_id") in {
+            "engine001_horizontal_endpoint", "engine001_vertical_axis",
+            "engine001_diagonal_axis",
+        }:
+            try:
+                fresh = inspect_ready_bridge(self.output_dir / "game_monitor_bridge")
+                if fresh["session_id"] != self._engine001_lab_session_id:
+                    raise ValueError("В лаборатории изменилась browser Bridge session.")
+            except (ValueError, OSError) as exc:
+                self._chalk_block_task = task
+                self._fail_chalk_test_block(f"lab_bridge_gate:{exc}")
+                return
         self._chalk_block_task = task
         self.experiment_dir = None
         self.experiment_phases = {}
@@ -2023,6 +2076,20 @@ class BrushBehaviorTestTab:
             if not accepted:
                 self._fail_chalk_test_block(reason)
                 return
+            if journal.get("phase_id") == ENGINE001_PHASE:
+                try:
+                    audit = audit_single_capture(self.experiment_dir)
+                    if audit.get("status") != "PASS_E4_RAW_CAPTURE":
+                        self._fail_chalk_test_block(
+                            "lab_raw_capture_rejected:" + ",".join(audit.get("reasons", []))
+                        )
+                        return
+                    if audit.get("session_id") != self._engine001_lab_session_id:
+                        self._fail_chalk_test_block("lab_bridge_session_changed")
+                        return
+                except (OSError, ValueError, TypeError, KeyError) as exc:
+                    self._fail_chalk_test_block(f"lab_audit_error:{exc}")
+                    return
             try:
                 finish_chalk_block_task(
                     self._chalk_block_journal_path,
