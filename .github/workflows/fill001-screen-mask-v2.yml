@@ -28,7 +28,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install minimal diagnostic dependencies
-        run: python -m pip install numpy pillow pytest
+        run: python -m pip install numpy pillow opencv-python-headless pytest
       - name: Test Screen Mask V2 and raw Monitor binding
         run: python -m pytest -q -ra tests/test_fill001_screen_mask_v2.py tests/test_fill001_screen_mask_v2_binding.py
       - name: Recalculate both committed Smooth A/B ROI with verified DOM screen mapping
