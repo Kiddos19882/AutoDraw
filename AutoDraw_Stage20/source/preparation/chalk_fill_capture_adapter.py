@@ -17,7 +17,8 @@ from brush_coordinate_transform import (
 from chalk_fill_experiment import build_fill_target_mask, fill_target_mask_sha256
 from chalk_fill_matrix import FillMatrixError
 
-FILL001_MONITOR_VERSION = "0.2.1"
+FILL001_MONITOR_VERSION = "0.2.1"  # Frozen legacy capture version.
+FILL001_SUPPORTED_MONITOR_VERSIONS = frozenset({"0.2.1", "0.2.4"})
 FILL001_SAMPLING_PROFILE = {
     "profile_id": "P1",
     "sampling_step": 4,
@@ -289,13 +290,23 @@ def build_fill001_capture(
             raise FillMatrixError(f"Некорректный bridge diagnostic: {key}.")
     if monitor_export.get("schemaVersion") != 1:
         raise FillMatrixError("Неподдерживаемая schemaVersion Game Monitor.")
-    if monitor_export.get("monitorVersion") != FILL001_MONITOR_VERSION:
-        raise FillMatrixError("Game Monitor version не совпадает с проверенной schema adapter.")
+    monitor_version = monitor_export.get("monitorVersion")
+    if monitor_version not in FILL001_SUPPORTED_MONITOR_VERSIONS:
+        raise FillMatrixError("Game Monitor version не совпадает с проверенными schema adapter 0.2.1/0.2.4.")
     events = monitor_export.get("events")
     if not isinstance(events, list) or not events:
         raise FillMatrixError("Monitor export не содержит event list.")
     if monitor_export.get("eventCount") != len(events):
         raise FillMatrixError("eventCount не совпадает с длиной events: возможна потеря событий.")
+    # Some historical direct adapter fixtures omit per-event monitorVersion.
+    # Any version that is actually present must match the one declared by the
+    # export. The Bridge runtime binder requires every raw event to match.
+    if any(
+        isinstance(event, dict) and "monitorVersion" in event
+        and event["monitorVersion"] != monitor_version
+        for event in events
+    ):
+        raise FillMatrixError("Game Monitor export содержит событие с другой версией.")
     dropped = monitor_export.get("droppedEvents")
     errors = monitor_export.get("errors")
     if dropped != 0 or not isinstance(errors, list) or errors:

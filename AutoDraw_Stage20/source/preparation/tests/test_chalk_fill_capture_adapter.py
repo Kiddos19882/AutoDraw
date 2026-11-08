@@ -284,3 +284,61 @@ def test_png_audit_detects_pixels_outside_frozen_target(tmp_path):
     result = audit_fill001_png_pair(task["shape_id"], before, after)
     assert result["png_audit_status"] == "failed"
     assert result["leakage_pixels"] == 1
+
+
+@pytest.mark.parametrize("version", ["0.2.1", "0.2.4"])
+def test_fill001_capture_adapter_preserves_valid_monitor_version(tmp_path, version):
+    task = build_fill001_matrix("MONITOR-ADAPTER-VERSIONS")["tasks"][0]
+    before, after = _png_pair(tmp_path, task["shape_id"])
+    export = _monitor_export(task)
+    export["monitorVersion"] = version
+    for event in export["events"]:
+        event["monitorVersion"] = version
+    capture = build_fill001_capture(
+        task, export,
+        sampling_profile=FILL001_SAMPLING_PROFILE,
+        before_png=before, after_png=after,
+        run_id="versioned-test-run",
+        bridge_diagnostics={
+            "run_id": "versioned-test-run",
+            "event_count": len(export["events"]),
+            "bridge_failures": 0, "sequence_gaps": 0,
+        },
+    )
+    assert capture["monitor_version"] == version
+    assert capture["png_audit_status"] == "passed"
+
+
+def test_fill001_capture_adapter_rejects_mixed_version_events(tmp_path):
+    task = build_fill001_matrix("MIXED-MONITOR-CAPTURE")["tasks"][0]
+    before, after = _png_pair(tmp_path, task["shape_id"])
+    export = _monitor_export(task)
+    export["monitorVersion"] = "0.2.4"
+    for event in export["events"]:
+        event["monitorVersion"] = "0.2.4"
+    export["events"][-1]["monitorVersion"] = "0.2.1"
+    with pytest.raises(FillMatrixError, match="другой версией"):
+        build_fill001_capture(
+            task, export, sampling_profile=FILL001_SAMPLING_PROFILE,
+            before_png=before, after_png=after, run_id="mixed-monitor-run",
+            bridge_diagnostics={
+                "run_id": "mixed-monitor-run", "event_count": len(export["events"]),
+                "bridge_failures": 0, "sequence_gaps": 0,
+            },
+        )
+
+
+def test_fill001_capture_adapter_rejects_unknown_monitor_version(tmp_path):
+    task = build_fill001_matrix("UNKNOWN-MONITOR-CAPTURE")["tasks"][0]
+    before, after = _png_pair(tmp_path, task["shape_id"])
+    export = _monitor_export(task)
+    export["monitorVersion"] = "0.2.5"
+    with pytest.raises(FillMatrixError, match="0.2.1/0.2.4"):
+        build_fill001_capture(
+            task, export, sampling_profile=FILL001_SAMPLING_PROFILE,
+            before_png=before, after_png=after, run_id="unknown-monitor-run",
+            bridge_diagnostics={
+                "run_id": "unknown-monitor-run", "event_count": len(export["events"]),
+                "bridge_failures": 0, "sequence_gaps": 0,
+            },
+        )
