@@ -104,3 +104,11 @@
 - На remote HEAD `8ce14223d46a` сопоставлены frozen FILL-001 plan (27 строк), raw Game Monitor accepted points и executor/Egret; 19 внутренних строк имеют одинаковую plan X-геометрию и first/last accepted X.
 - Различная предпоследняя X даёт три разных конца `smooth` Graphics path, разброс 3 logical px. E1 + арифметическая сверка старых E4 данных; причина 499 правых missed screen pixels пока UNKNOWN/NOT_PROVEN. Новый live game test или E2 не запускался.
 - Обновлены только архитектура, статус, открытая задача и журнал; frozen files, приложение, production и master не менялись.
+
+## 2026-11-08 — native Egret endpoint comparison, ENGINE-001 / FILL-001
+
+- Code/test baseline `94459935`; новые исследовательские изменения: `66c8038` (game renderer endpoint), `0dc09da` (PS1 CI), `8d5f61b` (independent analyzer), `169a6d5` (workflow), `1805ebf` (исключение пустого atom slot). Изменены только tests и CI, не production / frozen data / master.
+- Негативный browser attempt: [CI 42437858048](https://github.com/Kiddos19882/AutoDraw/actions/runs/42437858048), Egret job FAIL из-за пустого atom slot при подсчёте native Painter calls. История сохранена, ошибка исправлена.
+- Полный [CI 42438036187](https://github.com/Kiddos19882/AutoDraw/actions/runs/42438036187) на `1805ebf` **SUCCESS**. Native masked Canvas2D/WebGL 15 PNG/manifest [artifact 13599599617](https://github.com/Kiddos19882/AutoDraw/actions/runs/42438036187/artifacts/13599599617), независимый board-local OpenCV JSON +3 overlays [artifact 13600208683](https://github.com/Kiddos19882/AutoDraw/actions/runs/42438036187/artifacts/13600208683); отдельная независимая PIL/NumPy проверка 15 PNG подтверждает +2936/0 backing pixels и native forced-vs-normal equality по alpha≥128.
+- Same-run screen transform отсутствует: оригинальный FILL-001 остаётся FAIL 98.430600% / 11 leakage. Новый E4/live NOT_RUN. Следующий шаг в TASKS не закрыт.
+

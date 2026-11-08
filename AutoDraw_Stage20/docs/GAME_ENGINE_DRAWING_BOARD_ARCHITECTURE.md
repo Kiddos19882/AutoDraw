@@ -498,3 +498,26 @@ Snapshot датирован **2026-11-04**, а формальная PRR сери
 **Evidence:** E1 механизма + арифметическая сверка архивной E4 accepted-point телеметрии — PASS; **причинность конкретного PNG underfill — E0/NOT_PROVEN**. Оригинальный FILL-001 остаётся FAIL (coverage 98.430600%, leakage 11). Ни код, ни экспериментальные данные в этой работе не менялись.
 
 **Следующий gate:** same-run сравнение видимой крайней X каждого изолированного штриха с реальными последними двумя принятыми точками, с отдельным контрольным `normal` vs `smooth` и теми же executor settings; валидный screen transform/PNG и timeline frame events обязательны для E4. Воспроизводить разные accepted sequences можно и offline в существующем Egret harness; результат offline нельзя объявлять доказательством live PNG. Новые production line extension, режимы сглаживания и пороги сейчас не менять.
+
+
+## 17. ENGINE-001: игровой Egret против OpenCV по окончаниям FILL-001 (2026-11-08)
+
+**Задача:** ENGINE-001, смежная диагностика FILL-001. **Code/test baseline:** `1805ebfb439ef8215bfd1dbd228417f37d6705c0`; [full CI 42438036187](https://github.com/Kiddos19882/AutoDraw/actions/runs/42438036187) **SUCCESS**, browser Egret и независимый Python audit PASS. [15 native Egret PNG + manifest](https://github.com/Kiddos19882/AutoDraw/actions/runs/42438036187/artifacts/13599599617); [board-local OpenCV comparison JSON + 3 overlays](https://github.com/Kiddos19882/AutoDraw/actions/runs/42438036187/artifacts/13600208683). Оба эксперимента versioned: `ENGINE001_NATIVE_ENDPOINT_V1`, `ENGINE001_NATIVE_ENDPOINT_BOARD_LOCAL_ANALYSIS_V1`.
+
+**Воспроизводимость:** frozen Game Monitor run `6a17a297-ea14-4527-9527-bfd8de3bd335`, session `bb261898-8296-41f5-a333-eb0b81016410`, source blob `8eb04ad7331d1e56f4aeb7d0f625c59c1dc57c24`; frozen 27-scanline plan blob `ab54d5a322a642ba6a89a6c77111e4cfadf93232`; native game engine bundle blob `46cc74de00b6cb5d207b1e1a2ffcd81613b6d388`; Egret 5.4.1 bundle blob `d613d2b97e2436521aa3870478c69e99eac1f19f`. Все сравнения используют **одни и те же 1260 архивных принятых точек**, толщину 10 и настоящий `BoardPane/Painter`. Экспериментальные варианты: game `smooth(drawLast=false)`, временный wrapper native `Painter.drawSmoothLine(drawLast=true)`, native `normal`. В исходном run **нет per-stroke smooth options**, поэтому исходный режим smooth — явно заданное предположение.
+
+**Backend и метрики:** Egret Canvas2D и WebGL, masked BoardPane 460×240, backing 1380×720 (3×). 6 full-board PNG и 9 изолированных WebGL PNG строк 5,15,16. Независимый [анализатор](../tests/analyze_engine001_endpoint_reference.py) проверяет Git blob hashes и 15 PNG, сравнивает alpha=1/64/128/254, board-local OpenCV LINE_8 capsule, IoU, XOR и реальные правые границы.
+
+| Штрих | Native game smooth rightmost backing X при alpha≥128 | Forced native last X | Сдвиг | Новых / удалённых backing pixels |
+|---|---:|---:|---:|---:|
+| 5 | 1177 | 1181 | +4 | 131 / 0 |
+| 15 | 1172 | 1181 | +9 | 270 / 0 |
+| 16 | 1168 | 1181 | +13 | 401 / 0 |
+
+Для **всех 27 линий** при alpha≥128: `game-smooth → smooth-drawlast` добавило **2936 backing pixels, не удалило ни одного**; IoU двух native raster mask = **0.99281883**. По alpha masks на всех четырёх порогах forced smooth и native normal **попиксельно равны** на этих горизонтальных данных. Canvas2D и WebGL alpha mask full game smooth при 128 также равны. OpenCV capsule, даже после согласования координат и толщины в board backing, для изолированных штрихов имеет лишь **0.96638–0.96689 IoU** с native Egret (alpha≥128), значит OpenCV не pixel-exact повтор игрового движка.
+
+**Ограничения:** `screenProjection=UNCALIBRATED` — исторический FILL-001 не содержит валидных **same-run Stage/CSS/desktop transforms** для такого сопоставления. **Нельзя** считать 2936 backing pixels частью 1116 missing screen ROI pixels, говорить, что все 499 правых пропусков исправлены, либо считать прошлые модельные 487 pixels подтверждённым Egret результатом. Архивный FILL-001 по-прежнему **FAIL** (coverage=98.430600%, leakage=11), исторический exact CHALK=1260 неизменен. Новый CHALK и live gameplay **NOT_RUN**. Несовпадение OpenCV и native Egret необходимо учитывать на alpha/cap/clipping.
+
+**Отрицательный результат:** на более раннем [CI 42437858048](https://github.com/Kiddos19882/AutoDraw/actions/runs/42437858048) browser Egret job **FAIL**: исследовательский wrapper считал пустой служебный current atom slot вызовом accepted stroke. Исправлено пропуском пустого слота; успешный E3 результат относится только к `1805ebf`; frozen evidence не менялось.
+
+**Следующий gate не снят:** получить same-run координатные преобразования, per-stroke live screenshot и связь ENTER_FRAME / last-two accepted / visible endpoint, проверить duplicate redraw без новой принятой точки и actual FILL-001 residuals; до E4/E5 не изменять production painter/executor/estimator/quality gates.

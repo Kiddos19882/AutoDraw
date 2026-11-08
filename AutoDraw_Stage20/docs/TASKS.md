@@ -10,6 +10,8 @@
 
 **Новое уточнение ENGINE-001 ↔ FILL-001:** архивный источник уже доказывает разные `smooth` path endpoints (разброс 3 logical px) у 19 одинаковых плановых X-маршрутов; причина фактических **499 right-side misses** остаётся `NOT_PROVEN`, геометрический cap может компенсировать разницу. Следующий gate — подлинные per-stroke PNG bounds + last-two accepted samples + same-run calibration + контроль `normal`/`smooth`, а не немедленное изменение line extension. [Протокол и границы](GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md).
 
+**ENGINE-001 дополнение (2026-11-08):** native Egret endpoint study `ENGINE001_NATIVE_ENDPOINT_V1` **PASS E2/E3** ([CI 42438036187](https://github.com/Kiddos19882/AutoDraw/actions/runs/42438036187) SUCCESS, [PNG](https://github.com/Kiddos19882/AutoDraw/actions/runs/42438036187/artifacts/13599599617), [OpenCV comparison](https://github.com/Kiddos19882/AutoDraw/actions/runs/42438036187/artifacts/13600208683)); +2936 backing px, 0 removed и 4/9/13 backing px right-end gain для строк 5/15/16. **Следующий шаг остаётся:** новый E4 same-run stage/client/desktop mapping + per-stroke live PNG/ENTER_FRAME, независимая проверка реальных 499 right misses и 11 leaked pixels, дополнительные `redraw(false)` без новой точки; FILL-001 остается DEFERRED/FAIL. [§17](GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md).
+
 ## P1 — отложенные тесты качества и оптимизации (не закрыты)
 
 **Статус:** `DEFERRED_BY_PRIORITY` до выполнения текущего ENGINE-001; прежние PASS/FAIL/BLOCKED не меняются. Полная матрица новых кандидатов и ранее запланированных тестов — [ROADMAP](ROADMAP.md#отложенная-программа-тестов-fill-001-geom-001-и-связанных-gates).
