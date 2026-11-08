@@ -108,3 +108,40 @@ def test_native_engine_frame_samples_and_stroke_mode_are_saved_in_bridge_run(tmp
     assert frames["is_full_engine_render_timeline"] is False
     assert [event["renderPathCount"] for event in report["events"]
             if event["type"] == "ENGINE_FRAME_SAMPLE"] == [2,3]
+
+
+def test_authenticated_passive_preflight_witness_is_bounded_to_boardpane():
+    from game_monitor_bridge_server import normalize_passive_preflight_sample
+    geometry = {
+        "players": [{"boardClientCorners": {
+            "topLeft": {"x": 498.0, "y": 104.0},
+            "bottomRight": {"x": 1170.0, "y": 456.0},
+        }}],
+        "boardLogicalSize": {"width": 460, "height": 240},
+    }
+    session = {
+        "session_id": "live-session", "renderer_geometry": geometry,
+        "bridge_configuration": {"inputTelemetry": {"enabled": True}},
+        "bridge_diagnostics": {"last_monitor_status": {
+            "version": "0.2.4", "active": True, "boardDetected": True,
+        }},
+    }
+    raw = {"source": "window-bubble-after-egret-canvas", "isTrusted": True,
+           "buttons": 0, "clientX": 600, "clientY": 220,
+           "screenX": 600, "screenY": 383}
+    bound = normalize_passive_preflight_sample(raw, session)
+    assert bound["type"] == "BOARD_SCREEN_PREFLIGHT_SAMPLE"
+    assert bound["pre_drawing"] is True
+    assert bound["session_id"] == "live-session"
+    assert bound["screenY"] - bound["clientY"] == 163
+    assert len(bound["renderer_geometry_sha256"]) == 64
+    assert bound["captured_at_utc"]
+    for changed in (
+        {**raw, "buttons": 1},
+        {**raw, "isTrusted": False},
+        {**raw, "clientX": 0},
+        {**raw, "screenX": float("nan")},
+        {**raw, "source": "inferred"},
+    ):
+        with pytest.raises(ValueError):
+            normalize_passive_preflight_sample(changed, session)
