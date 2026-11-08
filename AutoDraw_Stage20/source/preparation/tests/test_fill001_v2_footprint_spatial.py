@@ -47,3 +47,23 @@ def test_invalid_mask_rejected_and_overlay_uses_four_unambiguous_classes():
     assert output[0, 1].tolist() == [35, 180, 94]
     assert output[1, 0].tolist() == [246, 174, 44]
     assert output.shape == (2, 2, 3)
+
+
+def test_accepted_centerline_offsets_uses_real_points_not_cursor_intent():
+    from fill001_v2_footprint_spatial import accepted_centerline_offsets
+    strokes = [
+        {"points": [{"x": 10, "y": 20 + 5 * i}, {"x": 80, "y": 20 + 5 * i}]}
+        for i in range(27)
+    ]
+    points = []
+    for i in range(27):
+        points.extend([
+            {"stroke_id": f"stroke-{i}", "x": 11.2, "y": 21 + 5 * i},
+            {"stroke_id": f"stroke-{i}", "x": 79.2, "y": 21 + 5 * i},
+        ])
+    result = accepted_centerline_offsets({"accepted_points": points}, {"strokes": strokes})
+    assert result["max_abs_y_offset"] == 1
+    assert result["first"]["observed_first_x"] == 11.2
+    assert result["last"]["index"] == 27
+    with pytest.raises(ValueError):
+        accepted_centerline_offsets({"accepted_points": points[:-1]}, {"strokes": strokes[:-1]})
