@@ -208,6 +208,49 @@ try {
     }
     Write-Host "ENGINE-001 native endpoint raster: 27 strokes, 3 variants, 3 isolated rows, 15 PNGs; screen UNCALIBRATED."
 
+
+    # Second versioned experiment: same browser Egret Native Painter test, with
+    # an identical 5-logical-pixel CLOSED target outline added to each variant.
+    $outlineDom = Join-Path $env:RUNNER_TEMP "egret-outline5-dom.html"
+    $outlineStderr = Join-Path $env:RUNNER_TEMP "egret-outline5-edge-stderr.log"
+    $outlineArgs = @($browserArgs)
+    $outlineArgs[-1] = "http://127.0.0.1:8765/AutoDraw_Stage20/tests/game_renderer_reference.html?outline=fill001"
+    $outlineProcess = Start-Process -FilePath $edgePath -ArgumentList $outlineArgs -RedirectStandardOutput $outlineDom -RedirectStandardError $outlineStderr -PassThru -Wait
+    if ($outlineProcess.ExitCode -ne 0) { throw "ENGINE-001 outline5 browser exited with $($outlineProcess.ExitCode)." }
+    $outlinePage = Get-Content -Raw $outlineDom
+    if ($outlinePage -notmatch 'data-outline-status="complete"' -or $outlinePage -notmatch 'data-outline-png-count="15"') {
+        Copy-Item $outlineDom (Join-Path $outputDir "outline5-page-failure.html") -Force
+        Copy-Item $outlineStderr (Join-Path $outputDir "outline5-edge-stderr.log") -Force
+        throw "ENGINE-001 native 5px contour browser test did not complete."
+    }
+    $outlineMatch = [regex]::Match($outlinePage, '<pre id="renderer-manifest-json"[^>]*>(.*?)</pre>', [System.Text.RegularExpressions.RegexOptions]::Singleline)
+    if (-not $outlineMatch.Success) { throw "ENGINE-001 outline5 JSON manifest absent." }
+    $outlineJson = [System.Net.WebUtility]::HtmlDecode($outlineMatch.Groups[1].Value)
+    $outlineManifest = $outlineJson | ConvertFrom-Json
+    if ($outlineManifest.experimentId -ne "ENGINE001_NATIVE_ENDPOINT_OUTLINE5_V1" -or
+        $outlineManifest.status -ne "COMPLETE_OFFLINE_NATIVE_ENGINE_MEASUREMENT" -or
+        $outlineManifest.runId -ne $endpointManifest.runId -or
+        $outlineManifest.sessionId -ne $endpointManifest.sessionId -or
+        $outlineManifest.exactHistoricalChalk -ne 1260 -or
+        $outlineManifest.outline5.widthLogical -ne 5 -or
+        $outlineManifest.outline5.insetLogical -ne 3 -or
+        $outlineManifest.outline5.vertexCount -ne 64 -or
+        $outlineManifest.outline5.appendedPointCount -ne 65 -or
+        $outlineManifest.aggregate.'smooth-drawlast'.nativePainterPatchedCalls -ne 54 -or
+        $outlineManifest.individual.Count -ne 3 -or
+        $outlineManifest.screenProjection -ne "UNCALIBRATED") {
+        throw "ENGINE-001 outline5 source or native contour conditions changed."
+    }
+    Set-Content -Path (Join-Path $outputDir "engine001-native-endpoint-outline5-v1.json") -Value $outlineJson -Encoding utf8
+    $outlineLinks = [regex]::Matches($outlinePage, $pngPattern)
+    if ($outlineLinks.Count -ne 15) { throw "Expected 15 native outline PNG, got $($outlineLinks.Count)." }
+    foreach ($link in $outlineLinks) {
+        $pngName = [System.IO.Path]::GetFileName($link.Groups[2].Value)
+        if (-not $pngName.StartsWith("engine001-endpoint-outline5-")) { throw "Unexpected outline PNG: $pngName" }
+        [System.IO.File]::WriteAllBytes((Join-Path $outputDir $pngName), [Convert]::FromBase64String($link.Groups[1].Value))
+    }
+    Write-Host "ENGINE-001 native outline5: 3 variants, same frozen 1260 accepted points, additional 5px closed contour, 15 PNG."
+
     python AutoDraw_Stage20/tests/run_egret_stage_reference_firefox.py --base-url "http://127.0.0.1:8765" --output-dir $outputDir --workspace $env:GITHUB_WORKSPACE --paired-renderer-experiment-root "AutoDraw_Stage20/data/results/brush_behavior_tests"
     if ($LASTEXITCODE -ne 0) { throw "Firefox Stage-level A-D browser probe failed." }
 
