@@ -33,7 +33,7 @@ class TestV2Binding(unittest.TestCase):
             "renderMode": "webgl",
             "players": [{
                 "boardClientMappingMethod": "validated_axis_aligned_rect",
-                "boardClientCorners": corners,
+                "boardClientCorners": corners, "boardStageCorners": corners,
             }],
         }
         self.run = {
@@ -75,6 +75,36 @@ class TestV2Binding(unittest.TestCase):
         self.assertEqual(p["max_offset_residual_px"], 0.0)
         self.assertAlmostEqual(binding["geometry"]["board_screen_corners"]["top"], 267.86)
         self.assertTrue(binding["geometry"]["independent_screen_mapping"])
+
+    def test_v3_accepts_animated_preloader_only_with_explicit_opt_in(self):
+        from fill001_monitor_diagnostic import _boardpane_mapping_fingerprint
+        self.evidence["protocol"] = "FILL001_SMOOTH_AB_V3"
+        self.evidence["boardpane_mapping_at_start_sha256"] = (
+            _boardpane_mapping_fingerprint(self.geom)
+        )
+        self.run["renderer_geometry_at_end"] = json.loads(json.dumps(self.geom))
+        self.run["renderer_geometry_at_end"]["boardDisplayChain"] = [
+            {"className": "Preloader", "width": 2830.0809053156145}
+        ]
+        self.run["renderer_geometry_updates"] = [{
+            "updated_at_utc": "2026-11-08T20:24:00+00:00",
+            "reason": "passive_input_preflight",
+            "snapshot": self.run["renderer_geometry_at_end"],
+        }]
+        self.write()
+        with self.assertRaises(FillMatrixError):
+            bind_from_monitor_run(self.run_path, self.evidence_path)
+        accepted = bind_from_monitor_run(
+            self.run_path, self.evidence_path, allow_v3_boardpane_only=True,
+        )
+        self.assertTrue(accepted["provenance"]["v3_boardpane_only_identity"])
+        self.run["renderer_geometry_at_end"]["players"][0]["boardClientCorners"][
+            "topLeft"]["x"] += 2
+        self.write()
+        with self.assertRaises(FillMatrixError):
+            bind_from_monitor_run(
+                self.run_path, self.evidence_path, allow_v3_boardpane_only=True,
+            )
 
     def test_reject_changed_geometry_even_if_e4_audit_is_rehashed(self):
         self.run["renderer_geometry_at_end"] = dict(self.geom, renderMode="canvas")
