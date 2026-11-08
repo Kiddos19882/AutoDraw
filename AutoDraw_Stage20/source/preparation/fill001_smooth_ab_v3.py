@@ -91,7 +91,7 @@ def analyze_smooth_ab_v3_pair(matrix: dict, rows: list[dict]) -> dict[str, Any]:
                 or not isinstance(preflight, dict)
                 or preflight.get("schema") != COORDINATE_PREFLIGHT
                 or preflight.get("session_id") != row.get("session_id")
-                or preflight.get("renderer_geometry_sha256") != row.get("renderer_geometry_sha256")
+                or preflight.get("boardpane_mapping_sha256") != row.get("boardpane_mapping_sha256")
                 or preflight.get("screen_roi") != row.get("screen_roi")
                 or not isinstance(audit, dict) or audit.get("schema") != SCREEN_MASK
                 or audit.get("run_id") != row.get("run_id")
@@ -109,7 +109,7 @@ def analyze_smooth_ab_v3_pair(matrix: dict, rows: list[dict]) -> dict[str, Any]:
         run_ids.add(run_id)
     on, off = rows
     comparable = (on["screen_roi"] == off["screen_roi"]
-                  and on["renderer_geometry_sha256"] == off["renderer_geometry_sha256"]
+                  and on["boardpane_mapping_sha256"] == off["boardpane_mapping_sha256"]
                   and on["before_png_sha256"] == off["before_png_sha256"])
     return {
         "protocol": PROTOCOL, "series_id": matrix["series_id"],
