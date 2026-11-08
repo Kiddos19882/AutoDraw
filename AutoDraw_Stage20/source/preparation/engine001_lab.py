@@ -47,9 +47,17 @@ def inspect_ready_bridge(root: Path, *, now: datetime | None = None) -> dict[str
         diagnostics = session.get("bridge_diagnostics")
         if not isinstance(diagnostics, dict) or diagnostics.get("connection_closed") is not False:
             continue
-        if diagnostics.get("last_message_type") != "heartbeat":
-            continue
-        stamp = _utc(diagnostics.get("last_message_at_utc"))
+        # The collector updates last_message_type for every event and frame probe.
+        # Freshness must be tied to an actual status-bearing heartbeat, not the
+        # most recent arbitrary WebSocket message.
+        if "last_heartbeat_at_utc" in diagnostics:
+            heartbeat_at = diagnostics["last_heartbeat_at_utc"]
+        else:
+            # Preserve the old fail-closed check for pre-upgrade session files.
+            if diagnostics.get("last_message_type") != "heartbeat":
+                continue
+            heartbeat_at = diagnostics.get("last_message_at_utc")
+        stamp = _utc(heartbeat_at)
         if stamp is None or not 0 <= (now - stamp).total_seconds() <= 4.0:
             continue
         status = diagnostics.get("last_monitor_status")

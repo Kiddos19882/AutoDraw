@@ -811,6 +811,7 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
                             "last_sequence": 1,
                             "collector_sequence_gap_count": 0,
                             "last_message_at_utc": utc_now(),
+                            "last_heartbeat_at_utc": None,
                             "last_monitor_status": message.get("monitorStatus"),
                             "browser_bridge": None,
                             "frame_probe_count": 0,
@@ -887,7 +888,9 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
                             bridge_diagnostics if isinstance(bridge_diagnostics, dict) else None,
                         )
                         if session_record is not None:
-                            session_record["bridge_diagnostics"]["last_monitor_status"] = status
+                            diagnostics = session_record["bridge_diagnostics"]
+                            diagnostics["last_monitor_status"] = status
+                            diagnostics["last_heartbeat_at_utc"] = utc_now()
                     if session_record is not None:
                         session_record["bridge_diagnostics"]["browser_bridge"] = message.get("bridgeDiagnostics")
                 elif msg_type == "frame_probe":

@@ -80,6 +80,60 @@ def test_bridge_rejects_no_frames_no_telemetry_or_stale(tmp_path, frames, teleme
         inspect_ready_bridge(tmp_path)
 
 
+def test_bridge_fresh_heartbeat_survives_later_event_or_frame_probe(tmp_path):
+    session = _session(tmp_path)
+    diagnostics = session["bridge_diagnostics"]
+    diagnostics["last_heartbeat_at_utc"] = diagnostics["last_message_at_utc"]
+    diagnostics["last_message_type"] = "event"
+    diagnostics["last_message_at_utc"] = datetime.now(timezone.utc).isoformat()
+    path = tmp_path / "session-a" / "session.json"
+    path.write_text(json.dumps(session), encoding="utf-8")
+    assert inspect_ready_bridge(tmp_path)["session_id"] == session["session_id"]
+
+    diagnostics["last_message_type"] = "frame_probe"
+    path.write_text(json.dumps(session), encoding="utf-8")
+    assert inspect_ready_bridge(tmp_path)["session_id"] == session["session_id"]
+
+
+def test_bridge_stale_heartbeat_rejected_despite_fresh_events(tmp_path):
+    session = _session(tmp_path, age_seconds=20)
+    diagnostics = session["bridge_diagnostics"]
+    diagnostics["last_heartbeat_at_utc"] = diagnostics["last_message_at_utc"]
+    diagnostics["last_message_type"] = "event"
+    diagnostics["last_message_at_utc"] = datetime.now(timezone.utc).isoformat()
+    (tmp_path / "session-a" / "session.json").write_text(json.dumps(session), encoding="utf-8")
+    with pytest.raises(ValueError, match="подходящих сессий: 0"):
+        inspect_ready_bridge(tmp_path)
+
+
+def test_bridge_explicitly_missing_heartbeat_never_uses_latest_message(tmp_path):
+    session = _session(tmp_path)
+    diagnostics = session["bridge_diagnostics"]
+    diagnostics["last_heartbeat_at_utc"] = None
+    (tmp_path / "session-a" / "session.json").write_text(json.dumps(session), encoding="utf-8")
+    with pytest.raises(ValueError, match="подходящих сессий: 0"):
+        inspect_ready_bridge(tmp_path)
+
+
+def test_bridge_legacy_event_without_heartbeat_timestamp_remains_rejected(tmp_path):
+    session = _session(tmp_path)
+    diagnostics = session["bridge_diagnostics"]
+    diagnostics["last_message_type"] = "event"
+    (tmp_path / "session-a" / "session.json").write_text(json.dumps(session), encoding="utf-8")
+    with pytest.raises(ValueError, match="подходящих сессий: 0"):
+        inspect_ready_bridge(tmp_path)
+
+
+def test_bridge_disconnected_even_with_fresh_heartbeat_is_rejected(tmp_path):
+    session = _session(tmp_path)
+    diagnostics = session["bridge_diagnostics"]
+    diagnostics["last_heartbeat_at_utc"] = diagnostics["last_message_at_utc"]
+    diagnostics["connection_closed"] = True
+    (tmp_path / "session-a" / "session.json").write_text(json.dumps(session), encoding="utf-8")
+    with pytest.raises(ValueError, match="подходящих сессий: 0"):
+        inspect_ready_bridge(tmp_path)
+
+
 def _capture(folder):
     folder.mkdir()
     before = Image.new("RGB", (24,12), "white")
