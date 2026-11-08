@@ -197,7 +197,16 @@ class Fill001Tab:
         self.brush_tab.copy_game_monitor_source()
 
     def copy_fill001_bridge_snippet(self) -> None:
-        """Copy the current Bridge token, never a stale or sample token."""
+        """Copy only the one-time token from a live, V3-capable Bridge."""
+        process = getattr(self.brush_tab, "bridge_process", None)
+        if (process is None or process.poll() is not None
+                or getattr(self.brush_tab, "bridge_input_telemetry_requested", None)
+                   is not True):
+            self.bridge_status_var.set(
+                "BLOCKED: сначала запустите текущий Bridge с Input Telemetry ON "
+                "через кнопку 1. Старый или остановленный snippet копировать нельзя."
+            )
+            return
         self.brush_tab.copy_game_monitor_bridge_snippet()
 
     def check_fill001_bridge(self) -> None:
