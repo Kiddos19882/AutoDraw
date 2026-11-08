@@ -3,6 +3,13 @@
 **Назначение:** только фактически выполненные изменения и проверки, а не будущие планы.  
 **Полная история до 2026-11-08:** [WORK_LOG_HISTORY_THROUGH_2026-11-08.md](WORK_LOG_HISTORY_THROUGH_2026-11-08.md) — побайтовый исторический снимок прежней редакции.
 
+## 2026-11-08 — ENGINE-001: актуализация E4 и начальная независимая E5-сверка по 9 raw runs
+
+- Проверены feature HEAD `177165361b0340515fe3bb74f4847ab3ec579ebc`, последние 20 коммитов и Actions. Исправление heartbeat `7b129c2` — [CI 42448779447](https://github.com/Kiddos19882/AutoDraw/actions/runs/42448779447) SUCCESS; новый run baseline `1771653` — [full CI 42449898657](https://github.com/Kiddos19882/AutoDraw/actions/runs/42449898657) SUCCESS, required jobs PASS, optional benchmarks/portable Windows build SKIPPED.
+- Из commit `1771653` прочитаны 9 per-run monitor reports, experiment manifests, engine001 audit JSON, journal, session renderer geometry; проверены 9/9 completed, 9/9 `PASS_E4_RAW_CAPTURE`, exact CHALK=846 (324/181/341), 861 Egret frame samples, нулевые telemetry errors/loss, один session, девять различных runs. Два старых `lab_bridge_gate` interrupted/stopped блока сохранены отдельно.
+- Независимо пересчитана геометрия по **1641** raw `MOUSE_MOVE_SAMPLE`: client→screen offset (0,163) px для всех 9; 6 X+6 Y отдельных least-squares fits, max absolute residual **0.749 px** (round to 0.001), fitted-origin ↔ inspect-corner difference ≤0.077 px X / ≤0.063 px Y. Для constant axis нет независимой оценки из траектории. Native raster-vs-live-mask E5 **NOT_RUN**: полный пиксельный comparator не запускался, и `changed_bounds_roi` захватывает постороннюю дельту у нижней кромки скриншота. **E5 PARTIAL / ENGINE-001 PARTIAL**, не объявлять качества FILL-001 доказанными.
+- Синхронизированы только текущие документы `PROJECT_STATUS`, `TASKS`, `ROADMAP`, `TEST_RESULTS`, `GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE`, `WORK_LOG`, `CHANGELOG`. Ранее сохранённые raw captures, `HISTORY` snapshots, production estimator/Stage6 executor не изменялись. Локальные Windows/gameplay тесты не запускались; документный CI проверяется по SHA нового коммита.
+
 ## 2026-11-08 — ENGINE-001: офлайн-сравнение накопленных StrokePath на сохранённом FILL-001 run
 
 - HEAD до изменений `ca0c768b`: remote и последние 20 commits проверены, разрешение получено на исследовательскую разработку и offline-проверки; live gameplay, production и frozen evidence не изменялись.

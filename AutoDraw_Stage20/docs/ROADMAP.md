@@ -1,16 +1,16 @@
 # AutoDraw — дорожная карта будущих работ
 
-**Дата:** 2026-11-08 · **База сверки:** `a2d1f0a52d47` · **Ветка:** `feature/image-geometry-optimization`. Подробная прежняя редакция полностью сохранена: [ROADMAP_HISTORY_THROUGH_2026-11-08.md](ROADMAP_HISTORY_THROUGH_2026-11-08.md).
+**Дата:** 2026-11-08 · **Текущая evidence-база:** `177165361b0340515fe3bb74f4847ab3ec579ebc` (историческая база `a2d1f0a52d47` сохранена в прежних записях) · **Ветка:** `feature/image-geometry-optimization`. Подробная прежняя редакция полностью сохранена: [ROADMAP_HISTORY_THROUGH_2026-11-08.md](ROADMAP_HISTORY_THROUGH_2026-11-08.md).
 
 Этот файл задаёт **последовательность**, а не историю. Пункты выполнения и владельцы конкретных gate — [TASKS](TASKS.md); подтверждённые факты — [PROJECT_STATUS](PROJECT_STATUS.md) и [TEST_RESULTS](TEST_RESULTS.md).
 
 **Этап 0 завершён:** 99/99 Markdown в навигации, девять сохранённых исторических редакций, автоматический audit [CI 42421451709](https://github.com/Kiddos19882/AutoDraw/actions/runs/42421451709) SUCCESS. Далее только будущие приоритеты.
 
-## Текущий этап — ENGINE-001: документирование игрового движка
+## Текущий этап — ENGINE-001: независимая E5 сверка после live лаборатории
 
-**Приоритет на 2026-11-08:** понять и описать сохранённый Egret 5.4.1, особенно интерактивный `PainterPopup.painterBoard`: создание `BoardPane`, `BlackBoardAtom`, принимаемые события и точки, `Painter` normal/smooth, `GraphicsNode` и Canvas/WebGL raster, `scrollRect`/roundRect mask, экранные преобразования, quota/CHALK, ограничения browser reference. Существующие профильные результаты сохранять, не выдавать E1 за новую E4.
+**Приоритет на 2026-11-08:** статический разбор Egret 5.4.1 выполнен в проверенной части, а `ENGINE001_ONE_CLICK_LAB_V1` теперь прошёл **9/9 E4** на `1771653` (точный CHALK=846). Следующий приоритет — по уже сохранённым run-bound артефактам независимо верифицировать Stage/client/desktop projection, исключить нерисовальные изменения у нижней кромки before PNG и сравнить реальную маску PNG с native Egret WebGL replay на фактически принятых точках. Предварительный independent 1641-sample fit **E5 PARTIAL** по геометрии; pixel-native E5 **NOT_RUN**, и ни E4, ни static analysis не должны считаться E5 PASS.
 
-**Выход:** [систематический технический документ](GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md), связанные первичные ссылки/хеши, перечень известных и неопределённых частей. **Gate:** пройти проверку документации, а для будущих утверждений о pixel accuracy — независимую validation; никаких изменений production и новых FILL-001 runs сейчас. Тесты следующего этапа перечислены ниже и **не запущены**.
+**Выход:** [архитектура §21 и E5 boundary](GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md), связь 9 run/PNG/accepted-points, самостоятельный native WebGL renderer reference и независимая PNG-маска с зафиксированными критериями до итоговой оценки. **Gate:** accepted/rejected/missing 9/9, sha256/provenance, pixel overlap/missing/leakage и endpoint bounds без подбора thresholds, отдельный результат по каждому run; при нехватке данных PARTIAL/UNKNOWN. Затем аудит Markdown и CI соответствующего SHA. Ни production, ни FILL-001 quality thresholds не менять; FILL-001 live experiments по-прежнему отложены.
 
 ## Этап 1. Офлайн-сравнение качества геометрии
 

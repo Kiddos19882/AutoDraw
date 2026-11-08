@@ -2,6 +2,12 @@
 
 Записывать только изменения интерфейсов, форматов, возможностей и значимые изменения сопровождения. Ход проверки каждой задачи — [WORK_LOG](WORK_LOG.md). Полная прежняя редакция без изменений: [CHANGELOG_HISTORY_THROUGH_2026-11-08.md](CHANGELOG_HISTORY_THROUGH_2026-11-08.md).
 
+## 2026-11-08 — ENGINE-001: live 9/9 evidence и актуализация E5-границы
+
+- После `7b129c2` исправлена ложная остановка `lab_bridge_gate`: readiness опирается на отдельный timestamp валидного heartbeat, а не на тип последнего игрового event. [CI 42448779447](https://github.com/Kiddos19882/AutoDraw/actions/runs/42448779447) SUCCESS.
+- Приняты и индексированы raw runtime results `1771653`: E4 9/9 clean-board single-stroke runs, exact CHALK 846, 861 Egret `ENTER_FRAME` samples, [full CI 42449898657](https://github.com/Kiddos19882/AutoDraw/actions/runs/42449898657) SUCCESS. Начат независимый E5 geometry fit из 1641 samples; full native PNG/Egret pixel parity **NOT_RUN**, статус ENGINE-001 остаётся PARTIAL.
+- Обновлён текущий слой документации без изменений production-кода и исходных/historical raw данных; FILL-001 98.430600% coverage, 11 leakage сохраняется FAIL.
+
 ## 2026-11-08 — ENGINE-001: one-click isolated Windows laboratory preparation
 
 - В существующей вкладке Brush Tests создана кнопка полного автономного блока 9 одиночных штрихов (3 axis scenarios ×3 repeats) с fail-closed Bridge/Monitor preflight, Clear-before-run, existing Stage6, independent raw PNG/CHALK/geometry audit, durable journal.
