@@ -224,6 +224,7 @@ def boardpane_preflight_transform(
         "session_id": expected_session_id,
         "renderer_geometry_sha256": geometry_sha,
         "passive_samples_sha256": evidence_sha,
+        "passive_samples": deepcopy(samples),
         "passive_sample_count": len(samples),
         "client_to_desktop_offset": {"x": ox, "y": oy},
         "board_screen_corners": {"left": bx0, "top": by0, "right": bx1, "bottom": by1},
