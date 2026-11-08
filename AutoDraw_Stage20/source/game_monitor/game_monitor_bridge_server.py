@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import hmac
+import hashlib
 import json
 import math
 import os
@@ -87,6 +88,70 @@ def parse_json(raw: str) -> dict | None:
     except (json.JSONDecodeError, UnicodeError):
         return None
     return value if isinstance(value, dict) else None
+
+
+def normalize_passive_preflight_sample(
+    raw: object, session_record: dict,
+) -> dict:
+    """Validate and bind a no-click DOM witness to the current Bridge geometry.
+
+    This is read-only session metadata, not a DRAW_* event and not proof that
+    the next future game session uses the same geometry.
+    """
+    geometry = session_record.get("renderer_geometry")
+    if not isinstance(geometry, dict):
+        raise ValueError("No current renderer geometry.")
+    players = geometry.get("players")
+    if not isinstance(players, list) or len(players) != 1:
+        raise ValueError("Expected one BoardPane.")
+    player = players[0]
+    client = player.get("boardClientCorners")
+    if not isinstance(client, dict):
+        raise ValueError("No client BoardPane bounds.")
+    try:
+        tl = client["topLeft"]
+        br = client["bottomRight"]
+        x0, y0, x1, y1 = (float(tl["x"]), float(tl["y"]),
+                          float(br["x"]), float(br["y"]))
+    except (KeyError, ValueError, TypeError) as exc:
+        raise ValueError("Invalid BoardPane client bounds.") from exc
+    if not isinstance(raw, dict):
+        raise ValueError("Missing passive sample.")
+    if (raw.get("source") != "window-bubble-after-egret-canvas"
+            or raw.get("isTrusted") is not True or raw.get("buttons") != 0):
+        raise ValueError("Passive sample must come from trusted button-up DOM input.")
+    coordinates = {}
+    for name in ("clientX", "clientY", "screenX", "screenY"):
+        value = raw.get(name)
+        if type(value) not in (int, float) or not math.isfinite(value):
+            raise ValueError("Invalid passive screen/client coordinate.")
+        coordinates[name] = float(value)
+    if (not all(math.isfinite(v) for v in (x0, y0, x1, y1))
+            or x1 <= x0 or y1 <= y0
+            or not x0 <= coordinates["clientX"] <= x1
+            or not y0 <= coordinates["clientY"] <= y1):
+        raise ValueError("Passive pointer is outside the currently observed BoardPane.")
+    status = session_record.get("bridge_diagnostics", {}).get("last_monitor_status")
+    config = session_record.get("bridge_configuration", {}).get("inputTelemetry")
+    if (not isinstance(status, dict) or status.get("version") != "0.2.4"
+            or status.get("active") is not True
+            or status.get("boardDetected") is not True
+            or not isinstance(config, dict) or config.get("enabled") is not True):
+        raise ValueError("Passive witness requires live opt-in Monitor telemetry.")
+    fingerprint = hashlib.sha256(
+        json.dumps(geometry, sort_keys=True, separators=(",", ":"),
+                   ensure_ascii=False).encode("utf-8")
+    ).hexdigest()
+    return {
+        "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+        "source": raw["source"],
+        "session_id": session_record["session_id"],
+        "renderer_geometry_sha256": fingerprint,
+        "buttons": 0,
+        "pre_drawing": True,
+        "captured_at_utc": utc_now(),
+        **coordinates,
+    }
 
 
 def exact_snapshot(value: object) -> bool:
@@ -803,6 +868,7 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
                         "bridge_configuration": recorder.bridge_configuration,
                         "renderer_geometry": recorder.renderer_geometry,
                         "renderer_geometry_updated_at_utc": recorder.renderer_geometry_updated_at_utc,
+                        "passive_preflight_samples": [],
                         "bridge_diagnostics": {
                             "received_message_count": 1,
                             "received_event_count": 0,
@@ -878,6 +944,21 @@ def make_handler(token: str, origin: str, output_dir: Path, idle_seconds: float)
                         session_record["renderer_geometry_update_reason"] = (
                             reason if isinstance(reason, str) and len(reason) <= 128 else None
                         )
+                elif msg_type == "preflight_sample":
+                    if session_record is None:
+                        await websocket.close(code=4002, reason="missing preflight session")
+                        return
+                    try:
+                        sample = normalize_passive_preflight_sample(
+                            message.get("sample"), session_record,
+                        )
+                    except ValueError:
+                        await websocket.close(code=4002, reason="invalid passive preflight sample")
+                        return
+                    existing = session_record.get("passive_preflight_samples")
+                    if not isinstance(existing, list):
+                        existing = []
+                    session_record["passive_preflight_samples"] = (existing + [sample])[-16:]
                 elif msg_type == "heartbeat":
                     status = message.get("monitorStatus")
                     if isinstance(status, dict):
