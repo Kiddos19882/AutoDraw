@@ -165,6 +165,48 @@ def roundtrip_acceptance(plan: dict, run: dict, binding: dict, centerlines: dict
         "limitation": "Not a native raster footprint or temporal replay",
     }
 
+
+def corrected_board_counterfactual(plan: dict, run: dict, binding: dict) -> dict:
+    """Hypothetical same-run BoardPane-anchored input, never executed in game."""
+    import math
+    board = binding["geometry"]["board_screen_corners"]
+    roi = binding["screen_roi"]
+    players = run["renderer_geometry_at_start"]["players"]
+    if not isinstance(players, list) or len(players) != 1:
+        raise ValueError("Same-run BoardPane player missing")
+    top_left = players[0]["boardStageCorners"]["topLeft"]
+    sx = (board["right"] - board["left"]) / 460
+    sy = (board["bottom"] - board["top"]) / 240
+    if sx <= 0 or sy <= 0:
+        raise ValueError("Invalid board geometry")
+    predicted = []
+    for idx, stroke in enumerate(plan["strokes"]):
+        pair = []
+        for point in stroke["points"]:
+            # The executor uses screen-local ROI coordinates. This computes them
+            # from the actual BoardPane screen corners, NOT the ROI's bounds.
+            local_x = board["left"] - roi["x"] + float(point["x"]) * sx
+            local_y = board["top"] - roi["y"] + float(point["y"]) * sy
+            screen_x = roi["x"] + local_x
+            screen_y = roi["y"] + local_y
+            stage_x = float(top_left["x"]) + (screen_x - board["left"]) / sx
+            stage_y = float(top_left["y"]) + (screen_y - board["top"]) / sy
+            pair.append({
+                "x": math.floor(stage_x + 0.5) - float(top_left["x"]),
+                "y": math.floor(stage_y + 0.5) - float(top_left["y"]),
+            })
+        predicted.append({"index": idx + 1, "start": pair[0], "end": pair[1]})
+    return {
+        "status": "UNEXECUTED_COUNTERFACTUAL",
+        "method": "BoardPane_screen_corners_to_ROI_local_then_Egret_round",
+        "rows": predicted, "first": predicted[0],
+        "max_y_deviation_from_planned": max(
+            abs(predicted[i]["start"]["y"] - float(stroke["points"][0]["y"]))
+            for i, stroke in enumerate(plan["strokes"])
+        ),
+        "warning": "Post-run same-run geometry cannot be assumed valid for a future session",
+    }
+
 def _png(path: Path) -> np.ndarray:
     with Image.open(path) as image:
         if image.format != "PNG":
@@ -239,9 +281,11 @@ def analyze_pair(root: Path, output: Path) -> dict:
         plan = _read_json(root / "fill001" / "plans" / (task + ".json"))
         centers = accepted_centerline_offsets(raw_run, plan)
         roundtrip = roundtrip_acceptance(plan, raw_run, binding, centers)
+        corrected = corrected_board_counterfactual(plan, raw_run, binding)
         results[mode] = {
             "accepted_centerlines": centers,
             "egret_input_roundtrip": roundtrip,
+            "board_anchored_counterfactual": corrected,
             "run_id": result["run_id"], "raw_run_sha256": result["raw_run_sha256"],
             "evidence_sha256": _sha(evidence), "before_sha256": _sha(before_path),
             "after_sha256": _sha(after_path), "roi": roi,
@@ -300,6 +344,10 @@ def main() -> int:
               f"max abs y-offset: {item['accepted_centerlines']['max_abs_y_offset']:.3f}")
         print(f"{mode} ROI to Egret: {item['egret_input_roundtrip']['first']}; "
               f"max error: {item['egret_input_roundtrip']['maximum_error_on_observed_first_last_and_y']:.3f}")
+        print(f"{mode} post-run BoardPane counterfactual: "
+              f"{item['board_anchored_counterfactual']['first']}; "
+              f"max predicted Y deviation: "
+              f"{item['board_anchored_counterfactual']['max_y_deviation_from_planned']:.3f}")
     return 0
 
 
