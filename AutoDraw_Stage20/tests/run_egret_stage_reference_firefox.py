@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import argparse
 import base64
+import hashlib
+from pathlib import PureWindowsPath
 import json
 import os
 import re
@@ -139,6 +141,73 @@ def validate_manifest(
         raise ValueError("Firefox WebGL renderer diagnostics are incomplete.")
 
 
+
+def discover_engine001_cases(journal_path: Path, workspace: Path) -> list[dict[str, str]]:
+    """Use the immutable nine-task journal, not a guessed directory glob."""
+    journal = json.loads(journal_path.read_text(encoding="utf-8-sig"))
+    expected = {(s, n) for s in (
+        "engine001_horizontal_endpoint", "engine001_vertical_axis", "engine001_diagonal_axis"
+    ) for n in (1, 2, 3)}
+    if journal.get("phase_id") != "ENGINE001" or journal.get("status") != "completed" or len(journal.get("tasks", [])) != 9:
+        raise ValueError("ENGINE-001 E4 journal is not an immutable completed nine-cell matrix.")
+    root = workspace / "AutoDraw_Stage20/data/results/brush_behavior_tests"
+    seen_cells, seen_runs, seen_experiments, sessions = set(), set(), set(), set()
+    cases = []
+    for task in journal["tasks"]:
+        cell = (task.get("scenario_id"), task.get("repeat_index"))
+        if cell not in expected or cell in seen_cells or task.get("status") != "completed":
+            raise ValueError("ENGINE-001 journal contains a duplicate, unknown or unfinished cell.")
+        seen_cells.add(cell)
+        attempts = task.get("attempts") or []
+        if len(attempts) != 1 or attempts[0].get("status") != "completed":
+            raise ValueError("ENGINE-001 journal contains a retry or incomplete attempt.")
+        attempt = attempts[0]
+        dirname = PureWindowsPath(str(attempt.get("experiment_dir", ""))).name
+        if not dirname.startswith("experiment-20261108-") or "/" in dirname or "\\\\" in dirname:
+            raise ValueError("ENGINE-001 journal contains an invalid experiment directory.")
+        directory = root / dirname
+        exp_path, monitor_path = directory / "experiment.json", directory / "monitor_report.json"
+        audit_path = directory / "engine001-lab-audit.json"
+        experiment = json.loads(exp_path.read_text(encoding="utf-8-sig"))
+        monitor = json.loads(monitor_path.read_text(encoding="utf-8-sig"))
+        audit = json.loads(audit_path.read_text(encoding="utf-8-sig"))
+        exp_id, run_id, session_id = experiment.get("experiment_id"), monitor.get("run_id"), monitor.get("session_id")
+        if (exp_id != attempt.get("experiment_id") or exp_id in seen_experiments
+                or not run_id or run_id in seen_runs or not session_id):
+            raise ValueError("ENGINE-001 experiment/run IDs are invalid or repeated.")
+        seen_experiments.add(exp_id); seen_runs.add(run_id); sessions.add(session_id)
+        if (audit.get("status") != "PASS_E4_RAW_CAPTURE"
+                or audit.get("source_experiment_id") != exp_id
+                or audit.get("run_id") != run_id or audit.get("session_id") != session_id
+                or audit.get("scenario_id") != cell[0] or audit.get("repeat_index") != cell[1]
+                or monitor.get("autodraw_experiment_id") != exp_id
+                or monitor.get("execution_status") != "completed"
+                or monitor.get("renderer_geometry_at_start") != monitor.get("renderer_geometry_at_end")
+                or monitor.get("point_delta_matches_chalk") is not True):
+            raise ValueError("ENGINE-001 audit or monitor binding disagrees with the completed journal.")
+        if experiment.get("chalk_experiment_matrix", {}).get("series_id") != journal.get("series_id"):
+            raise ValueError("ENGINE-001 series ID differs from the immutable journal.")
+        points = monitor.get("accepted_points") or []
+        pre, post = monitor.get("pre_test_snapshot") or {}, monitor.get("post_test_snapshot") or {}
+        if (len(points) != audit.get("exact_chalk")
+                or len(points) != post.get("pointCount", -1) - pre.get("pointCount", -1)
+                or len(monitor.get("observed_stroke_modes") or []) != 1
+                or monitor["observed_stroke_modes"][0].get("stroke_option_raw") is not True):
+            raise ValueError("ENGINE-001 accepted points, CHALK or observed stroke mode disagree.")
+        for filename in ("monitor_report.json", "experiment.json", "before_clear-screen.png", "after_draw-screen.png",
+                         "before_clear-board.png", "after_draw-board.png"):
+            path = directory / filename
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            if digest != audit.get("raw_sha256", {}).get(filename):
+                raise ValueError(f"ENGINE-001 immutable raw hash mismatch: {path}")
+        rel = monitor_path.relative_to(workspace).as_posix()
+        cases.append({"name": f"engine001-{cell[0]}-r{cell[1]}", "monitor": rel,
+                      "run_id": run_id, "output_subdir": f"engine001/{cell[0]}-r{cell[1]}-{run_id[:8]}"})
+    if seen_cells != expected or len(seen_runs) != 9 or len(sessions) != 1:
+        raise ValueError("ENGINE-001 E4 journal is missing cells or contains multiple Bridge sessions.")
+    return cases
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--base-url", default="http://127.0.0.1:8765")
@@ -153,11 +222,20 @@ def main() -> int:
         action="store_true",
         help="Run Firefox with a visible window so local hardware acceleration can be used.",
     )
+    parser.add_argument("--engine001-journal", type=Path, default=None,
+                        help="Replay exactly the nine immutable ENGINE-001 E4 runs.")
+    parser.add_argument("--engine001-only", action="store_true",
+                        help="Do not repeat historical paired-renderer fixtures.")
     args = parser.parse_args()
+    if args.engine001_only and args.engine001_journal is None:
+        parser.error("--engine001-only requires --engine001-journal.")
     workspace = args.workspace.resolve()
     output_root = args.output_dir.resolve()
     output_root.mkdir(parents=True, exist_ok=True)
-    cases = list(CASES)
+    cases = [] if args.engine001_only else list(CASES)
+    if args.engine001_journal is not None:
+        path = args.engine001_journal if args.engine001_journal.is_absolute() else workspace / args.engine001_journal
+        cases.extend(discover_engine001_cases(path.resolve(), workspace))
     if args.paired_renderer_experiment_root is not None:
         experiment_root = args.paired_renderer_experiment_root
         if not experiment_root.is_absolute():

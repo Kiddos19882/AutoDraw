@@ -121,10 +121,10 @@ def test_renderer_gate_rejects_missing_bbox_and_empty_live_mask():
 def _capture_fixture(scenario="paired_renderer_vertical_single_stroke"):
     experiment_id, run_id, session_id = "exp-1", "run-1", "session-1"
     stroke_id = "stroke-1"
-    if scenario == "paired_renderer_vertical_single_stroke":
+    if scenario in ("paired_renderer_vertical_single_stroke", "engine001_vertical_axis"):
         points = [{"x": 230.0, "y": value} for value in (30, 40, 60, 80)]
         samples = [(230.0, value) for value in (30, 40, 60, 80)]
-    elif scenario == "paired_renderer_diagonal_single_stroke":
+    elif scenario in ("paired_renderer_diagonal_single_stroke", "engine001_diagonal_axis"):
         points = [{"x": value, "y": value / 2} for value in (30, 40, 60, 80)]
         samples = [(value, value / 2) for value in (30, 40, 60, 80)]
     else:
