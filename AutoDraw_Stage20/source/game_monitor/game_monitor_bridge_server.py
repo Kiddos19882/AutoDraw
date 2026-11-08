@@ -598,15 +598,35 @@ class RunRecorder:
             "is_full_engine_render_timeline": False,
             "caveat": "Observer may miss callbacks and does not establish game render ordering.",
         }
-        mode_events = [event for event in run["events"]
-                       if event.get("type") == "DRAW_START_APPLIED"]
+        # Bound Egret event handlers can bypass the instance onDrawStart
+        # wrapper. Prefer its directly observed option when present, otherwise
+        # use the first native ENTER_FRAME observer raw option for that stroke.
+        # Never infer a mode from executor intent or an older capture.
+        observed_modes: dict[str, dict] = {}
+        for event in run["events"]:
+            if event.get("type") != "ENGINE_FRAME_SAMPLE":
+                continue
+            sid = event.get("strokeId")
+            option = event.get("strokeOptionRaw")
+            if isinstance(sid, str) and sid and type(option) is bool:
+                observed_modes.setdefault(sid, {
+                    "stroke_id": sid,
+                    "stroke_option_raw": option,
+                    "source": "BoardPane.atom.options[from_ENGINE_FRAME_SAMPLE]",
+                })
+        for event in run["events"]:
+            if event.get("type") != "DRAW_START_APPLIED":
+                continue
+            sid = event.get("strokeId")
+            option = event.get("strokeOptionRaw")
+            if isinstance(sid, str) and sid and type(option) is bool:
+                observed_modes[sid] = {
+                    "stroke_id": sid,
+                    "stroke_option_raw": option,
+                    "source": "BoardPane.atom.options[from_DRAW_START_APPLIED]",
+                }
         run["observed_stroke_modes"] = [
-            {
-                "stroke_id": event.get("strokeId"),
-                "stroke_option_raw": event.get("strokeOptionRaw"),
-                "source": event.get("modeEvidenceSource"),
-            }
-            for event in mode_events
+            observed_modes[sid] for sid in sorted(observed_modes)
         ]
         probe_summaries = []
         for probe in run["frame_probes"]:
