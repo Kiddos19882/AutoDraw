@@ -25,6 +25,10 @@
     strokePollTimer: null,
     inputHandlers: null,
     inputTelemetryEnabled: false,
+    engineFrameListener: null,
+    engineFrameBoard: null,
+    engineFrameCount: 0,
+    engineFrameLastPointCount: null,
     startedAt: null,
     errors: [],
     eventListeners: new Set()
@@ -303,6 +307,67 @@
     return { stageX, stageY, boardX, boardY };
   }
 
+
+  // ENGINE-001 opt-in: actual Egret BoardPane ENTER_FRAME notifications, not
+  // RAF frames. The observer is registered after the game handlers, but it is
+  // not proof of render ordering, and must never act on game input.
+  function engineFrameSample() {
+    if (!state.active || !state.inputTelemetryEnabled ||
+        !state.activeStrokeId || !state.board) return;
+    const snapshot = resourceSnapshot(state.board); // O(1), no atom scan.
+    const pointCount = snapshot.isExact ? snapshot.pointCount : null;
+    const prev = state.engineFrameLastPointCount;
+    const change = Number.isSafeInteger(prev) && Number.isSafeInteger(pointCount)
+      ? pointCount - prev : null;
+    state.engineFrameLastPointCount = pointCount;
+    state.engineFrameCount += 1;
+    const atom = state.board.atom;
+    const slot = Array.isArray(atom && atom.points) ? atom.points.length - 1 : -1;
+    const options = Array.isArray(atom && atom.options) && slot >= 0
+      ? atom.options[slot] : null;
+    const drawData = state.board.$renderNode && state.board.$renderNode.drawData;
+    emit("ENGINE_FRAME_SAMPLE", {
+      source: "BoardPane.EgretEvent.ENTER_FRAME_observer",
+      frameIndexInSession: state.engineFrameCount,
+      observedPointDeltaSincePreviousFrame: change,
+      pointCount,
+      renderPathCount: Array.isArray(drawData) ? drawData.length : null,
+      strokeOptionRaw: typeof options === "boolean" ? options : safeValue(options),
+      ...currentBoardCoordinates(state.board)
+    });
+  }
+
+  function removeEngineFrameObserver() {
+    const board = state.engineFrameBoard;
+    if (board && state.engineFrameListener &&
+        typeof board.removeEventListener === "function") {
+      try {
+        board.removeEventListener("enterFrame", state.engineFrameListener, board);
+      } catch (error) {
+        state.errors.push({ t: now(), message: "frame_remove: " + String(error) });
+      }
+    }
+    state.engineFrameListener = null;
+    state.engineFrameBoard = null;
+    state.engineFrameLastPointCount = null;
+  }
+
+  function installEngineFrameObserver() {
+    if (!state.active || !state.inputTelemetryEnabled || !state.board ||
+        state.engineFrameBoard === state.board) return;
+    removeEngineFrameObserver();
+    if (typeof state.board.addEventListener !== "function") return;
+    const board = state.board;
+    const listener = () => engineFrameSample();
+    try {
+      board.addEventListener("enterFrame", listener, board);
+      state.engineFrameBoard = board;
+      state.engineFrameListener = listener;
+    } catch (error) {
+      state.errors.push({ t: now(), message: "frame_install: " + String(error) });
+    }
+  }
+
   function onPointerDown(event) {
     if (!state.active || !state.board || !isGameCanvasTarget(event.target)) return;
     if (!state.activeStrokeId) {
@@ -395,7 +460,16 @@
       if (name === "onDrawing") {
         sampleActiveStroke("onDrawing_wrapper");
       } else if (name === "onDrawStart") {
-        emit("DRAW_START_APPLIED", { before, after });
+        state.engineFrameLastPointCount = after.isExact ? after.pointCount : null;
+        const atom = board.atom;
+        const slot = Array.isArray(atom && atom.points) ? atom.points.length - 1 : -1;
+        const raw = Array.isArray(atom && atom.options) && slot >= 0
+          ? atom.options[slot] : null;
+        emit("DRAW_START_APPLIED", {
+          before, after,
+          strokeOptionRaw: typeof raw === "boolean" ? raw : safeValue(raw),
+          modeEvidenceSource: "BoardPane.atom.options[currentStrokeSlot]"
+        });
         startStrokePolling();
       } else if (name === "onDrawingEnd") {
         stopStrokePolling();
@@ -438,11 +512,13 @@
     state.board = board;
     state.boardLabel = board.constructor && board.constructor.name ? board.constructor.name : "BoardPane";
     for (const name of METHOD_NAMES) wrapMethod(board, name);
+    installEngineFrameObserver();
     state.lastPointCount = resourceSnapshot(board).pointCount;
     emit("BOARD_ATTACHED", { label: state.boardLabel, snapshot: resourceSnapshot(board) });
   }
 
   function detach() {
+    removeEngineFrameObserver();
     for (const item of state.wrappers.splice(0).reverse()) {
       try {
         if (item.ownDescriptor) Object.defineProperty(item.board, item.name, item.ownDescriptor);
@@ -791,7 +867,9 @@
       eventCount: state.events.length,
       droppedEvents: state.droppedEvents,
       errors: state.errors.length,
-      inputTelemetryEnabled: state.inputTelemetryEnabled
+      inputTelemetryEnabled: state.inputTelemetryEnabled,
+      engineFrameObserverConnected: state.engineFrameBoard === state.board && !!state.engineFrameListener,
+      engineFrameCount: state.engineFrameCount
     };
   }
 
@@ -805,6 +883,8 @@
     const next = enabled === true;
     if (state.inputTelemetryEnabled === next) return status();
     state.inputTelemetryEnabled = next;
+    if (next) installEngineFrameObserver();
+    else removeEngineFrameObserver();
     if (state.active && state.inputHandlers) {
       if (next) window.addEventListener("mousemove", state.inputHandlers.move, false);
       else window.removeEventListener("mousemove", state.inputHandlers.move, false);
