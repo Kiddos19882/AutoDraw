@@ -205,9 +205,40 @@ class Fill001Tab:
         bridge_root = self.output_dir.parent / "game_monitor_bridge"
         task = self._selected_task()
         if task is None:
+            # Allow checking the connection before creating any experiment.
+            # This is not permission to execute: task-specific E4 preflight
+            # remains mandatory when "Подготовить и запустить" is pressed.
+            from brush_radius_feedback import read_active_bridge_geometry
+            geometry = read_active_bridge_geometry(bridge_root)
+            if not isinstance(geometry, dict) or not geometry.get("board_detected"):
+                self.bridge_status_var.set(
+                    "НЕ ГОТОВО: нет свежей подключённой Monitor/Bridge сессии "
+                    "и одной обнаруженной игровой доской."
+                )
+                return
+            sid = geometry.get("session_id")
+            if not isinstance(sid, str) or not sid:
+                self.bridge_status_var.set("НЕ ГОТОВО: отсутствует ID Bridge-сессии.")
+                return
+            try:
+                session = json.loads(
+                    (bridge_root / sid / "session.json").read_text(encoding="utf-8")
+                )
+                telemetry = session.get("bridge_configuration", {}).get("inputTelemetry", {})
+                status = session.get("bridge_diagnostics", {}).get("last_monitor_status", {})
+                if (not isinstance(telemetry, dict)
+                        or telemetry.get("requested") is not True
+                        or telemetry.get("enabled") is not True
+                        or status.get("version") != "0.2.4"
+                        or status.get("inputTelemetryEnabled") is not True):
+                    raise ValueError("Monitor 0.2.4 + Input Telemetry ON не подтверждены.")
+            except (OSError, ValueError, TypeError, AttributeError) as exc:
+                self.bridge_status_var.set(f"НЕ ГОТОВО: {exc}")
+                return
             self.bridge_status_var.set(
-                "Сначала создайте/выберите FILL-001 задачу для полной "
-                "проверки текущего Monitor и Bridge."
+                f"СОЕДИНЕНИЕ ЕСТЬ: session={sid}. "
+                "Теперь создайте/выберите FILL-001 V3 задачу для полной "
+                "проверки preflight перед рисованием."
             )
             return
         if (task.get("experiment_protocol") == FILL001_AB_V3_PROTOCOL
