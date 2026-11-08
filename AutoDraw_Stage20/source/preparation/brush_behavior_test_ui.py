@@ -61,6 +61,9 @@ PAIRED_RENDERER_TEST_CASE_IDS = frozenset({
     PAIRED_RENDERER_TEST_CASE_ID,
     PAIRED_RENDERER_VERTICAL_TEST_CASE_ID,
     PAIRED_RENDERER_DIAGONAL_TEST_CASE_ID,
+    "engine001_horizontal_endpoint",
+    "engine001_vertical_axis",
+    "engine001_diagonal_axis",
 })
 PAIRED_RENDERER_REQUESTED_RADIUS = 10
 PAIRED_RENDERER_PATH_MODE = "smooth"
@@ -291,6 +294,21 @@ def _screen_local_strokes_for_capture(
     return screen_strokes, None
 
 TEST_CASES: dict[str, dict[str, Any]] = {
+    "ENGINE-001 — горизонталь, окончание": {
+        "id": "engine001_horizontal_endpoint",
+        "description": "Отдельный штрих x=75..385 y=120: проверка принятых точек, midpoint и видимого правого края; запуск только в лабораторном блоке.",
+        "strokes": [{"name": "engine001_horizontal_endpoint", "points": [[75,120],[385,120]]}],
+    },
+    "ENGINE-001 — вертикаль, калибровка": {
+        "id": "engine001_vertical_axis",
+        "description": "Отдельный вертикальный штрих для калибровки Y; никакой подмены исторических координат.",
+        "strokes": [{"name": "engine001_vertical_axis", "points": [[230,35],[230,205]]}],
+    },
+    "ENGINE-001 — диагональ, обе оси": {
+        "id": "engine001_diagonal_axis",
+        "description": "Отдельный диагональный штрих для независимого X/Y fit на same-run PNG.",
+        "strokes": [{"name": "engine001_diagonal_axis", "points": [[75,70],[385,175]]}],
+    },
     "Расход краски — серия длинных линий": {
         "id": "paint_consumption_long_lines",
         "description": (

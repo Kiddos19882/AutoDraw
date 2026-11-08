@@ -43,6 +43,12 @@ PHASE_SCENARIOS = {
         "paired_renderer_vertical_single_stroke",
         "paired_renderer_diagonal_single_stroke",
     ),
+    # Independent, isolated one-stroke captures; do not change PRR historical cells.
+    "ENGINE001": (
+        "engine001_horizontal_endpoint",
+        "engine001_vertical_axis",
+        "engine001_diagonal_axis",
+    ),
 }
 LEGACY_V_SCENARIO_PHASES = {
     "int006_short_strokes": "V2",
@@ -95,6 +101,9 @@ EXPECTED_STROKES = {
     "int006r_validation_d5_repeated_coverage": 6,
     "paired_renderer_vertical_single_stroke": 1,
     "paired_renderer_diagonal_single_stroke": 1,
+    "engine001_horizontal_endpoint": 1,
+    "engine001_vertical_axis": 1,
+    "engine001_diagonal_axis": 1,
 }
 
 G3_POINT_STEPS = (1, 2, 4)
