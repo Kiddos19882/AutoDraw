@@ -2,6 +2,12 @@
 
 Записывать только изменения интерфейсов, форматов, возможностей и значимые изменения сопровождения. Ход проверки каждой задачи — [WORK_LOG](WORK_LOG.md). Полная прежняя редакция без изменений: [CHANGELOG_HISTORY_THROUGH_2026-11-08.md](CHANGELOG_HISTORY_THROUGH_2026-11-08.md).
 
+## 2026-11-08 — FILL-001: opt-in native Monitor 0.2.4 single-task diagnostic
+
+- Версия `FILL001_MONITOR_SAME_RUN_V1`: существующая вкладка FILL-001 получила диагностический флаг/создание неизменного RS 27-stroke rectangle плана, однокадровые пары full-screen/board-ROI PNG и дополнительный строгий raw Monitor/Bridge audit без ослабления основного PNG gate.
+- Legacy 0.2.1 и modern 0.2.4 bind/capture работают по отдельным exact versioned contracts; смешанные и неизвестные версии fail-closed. Перед input требуется свежий Bridge + Egret observation + native WebGL BoardPane geometry и ≥1600 exact remaining CHALK. Private desktop screenshots требуют явного предупреждения и не должны автоматически публиковаться.
+- [CI 42458832846](https://github.com/Kiddos19882/AutoDraw/actions/runs/42458832846) для `b98d9e0`; игровой runtime новой версии ещё **NOT_RUN**. Не изменены production draw/executor paths, frozen FILL001 quality gates и исходные E4 captures.
+
 ## 2026-11-08 — FILL-001: versioned right-edge spatial diagnostics
 
 - Existing committed screen-residual analyzer now outputs opt-in-compatible supplementary `FILL001_RIGHT_EDGE_SPATIAL_V1.json`, pinning the actual saved screenshot + 27-stroke endpoint derivation with strict SHA/run/CHALK checks. **No change** to frozen comparison report, original screenshots, thresholds or production paths. [Evidence artifact](https://github.com/Kiddos19882/AutoDraw/actions/runs/42456241289/artifacts/13607454421), [CI 42456241289](https://github.com/Kiddos19882/AutoDraw/actions/runs/42456241289) Preparation/G3 977 PASS.

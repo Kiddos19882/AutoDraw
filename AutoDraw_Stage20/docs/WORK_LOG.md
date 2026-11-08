@@ -3,6 +3,14 @@
 **Назначение:** только фактически выполненные изменения и проверки, а не будущие планы.  
 **Полная история до 2026-11-08:** [WORK_LOG_HISTORY_THROUGH_2026-11-08.md](WORK_LOG_HISTORY_THROUGH_2026-11-08.md) — побайтовый исторический снимок прежней редакции.
 
+## 2026-11-08 — FILL-001: preparation of one full-telemetry comparison run (no Windows live)
+
+- Повторно проверены remote HEAD `8566242` и последние 20 commits, Actions, FILL-001 original evidence и актуальные FILL/ENGINE docs. Цель: новый **одиночный**, полностью run-bound E4 baseline на том же frozen рисунке 27 stroke / r10 / step5 / offset0 без перезаписи old FILL001 run.
+- Реально разработано на feature branch: `8960186` исправил binder для строгой совместимости Monitor 0.2.1/0.2.4; `345507f` — capture adapter + негативные/позитивные contract tests; `4437716` — независимый E4 same-run diagnostic `FILL001_MONITOR_SAME_RUN_V1`; `66f94d0` — opt-in UI и full-screen PNG/ROI той же ImageGrab frame; `ea7b138` — exact budget floor 1600, позитивный 27-stroke synthetic audit; `77dc481` — автоматическая генерация FILL001_RS_V1 manifest из диагностического флага; `b98d9e0` — предупреждение о персональных данных full-screen PNG, idempotent raw diagnostic и regression RS series selection.
+- Базовые условия: одно явно выбранное исполнение, 45-cell batch запрещён; Monitor raw 0.2.4, Egret actual ENTER_FRAME (не графический render), `smooth=true`, exact CHALK только по run-bound pointCount, full-screen/ROI before/after, SHA and failures. Браузерные/десктоп координаты не отождествлять без независимой E5 проверки; цвета, clipping, alpha и временной render order не объявляются валидированными.
+- [Предыдущий полный CI 42458319429](https://github.com/Kiddos19882/AutoDraw/actions/runs/42458319429) SUCCESS на `77dc4813`, [финальный CI 42458832846](https://github.com/Kiddos19882/AutoDraw/actions/runs/42458832846) запущен на `b98d9e0`. Реальный Windows запуск NOT_RUN, независимая old↔new E5 validation NOT_RUN; Windows portable build на push SKIPPED. Никакого нового фактического CHALK и live coverage нет, старый capture остаётся FAIL.
+- Не изменены frozen план, маски, originals, Stage6 executor, CHALK estimator/defaults, `master`, исторические snapshots. Для публикации full-screen PNG потребуется предварительный просмотр на личные данные.
+
 ## 2026-11-08 — FILL-001: run-bound perimeter strip audit, immutable RGB evidence
 
 - Проверены feature remote HEAD `8719686d`, последние 20 commits и текущие Actions, контролирующая документация и original FILL001 pinned evidence. Цель — E2/E3 локализация дефекта, а не изменение game production или запуск новых live tasks.
