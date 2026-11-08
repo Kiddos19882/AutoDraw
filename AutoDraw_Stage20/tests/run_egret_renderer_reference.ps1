@@ -166,6 +166,59 @@ try {
     Write-Host "ENGINE-001 accepted-only replay: 27 strokes, 1260 historical points, Canvas2D diff=$($temporalManifest.canvas2dPixelComparison.differingPixels), WebGL diff=$($temporalManifest.webglPixelComparison.differingPixels)."
 
 
+    # ENGINE001_DUPLICATE_FRAMES_V1: duplicate stationary ENTER_FRAME callbacks
+    # are synthetic; no historic frame cadence and no screen transform.
+    $framesDom = Join-Path $env:RUNNER_TEMP "egret-duplicate-frames-dom.html"
+    $framesStderr = Join-Path $env:RUNNER_TEMP "egret-duplicate-frames-edge-stderr.log"
+    $framesArgs = @($browserArgs)
+    $framesArgs[-1] = "http://127.0.0.1:8765/AutoDraw_Stage20/tests/game_renderer_reference.html?frames=fill001"
+    $framesProcess = Start-Process -FilePath $edgePath -ArgumentList $framesArgs -RedirectStandardOutput $framesDom -RedirectStandardError $framesStderr -PassThru -Wait
+    if ($framesProcess.ExitCode -ne 0) { throw "ENGINE-001 duplicate-frame browser exited with $($framesProcess.ExitCode)." }
+    $framesPage = Get-Content -Raw $framesDom
+    if ($framesPage -notmatch 'data-frames-status="complete"' -or $framesPage -notmatch 'data-frames-png-count="6"') {
+        Copy-Item $framesDom (Join-Path $outputDir "duplicate-frames-page-failure.html") -Force
+        Copy-Item $framesStderr (Join-Path $outputDir "duplicate-frames-edge-stderr.log") -Force
+        throw "ENGINE-001 duplicate-frame native BoardPane test failed."
+    }
+    $framesMatch = [regex]::Match($framesPage, '<pre id="renderer-manifest-json"[^>]*>(.*?)</pre>', [System.Text.RegularExpressions.RegexOptions]::Singleline)
+    if (-not $framesMatch.Success) { throw "ENGINE-001 duplicate-frame manifest missing." }
+    $framesJson = [System.Net.WebUtility]::HtmlDecode($framesMatch.Groups[1].Value)
+    $framesManifest = $framesJson | ConvertFrom-Json
+    $expectedCounts = @(0, 1, 3)
+    $expectedPaths = @(70, 97, 151)
+    if ($framesManifest.experimentId -ne "ENGINE001_DUPLICATE_FRAMES_V1" -or
+        $framesManifest.status -ne "COMPLETE_OFFLINE_NATIVE_FRAME_EXPERIMENT" -or
+        $framesManifest.runId -ne $temporalManifest.runId -or
+        $framesManifest.sessionId -ne $temporalManifest.sessionId -or
+        $framesManifest.historicalExactChalk -ne 1260 -or
+        $framesManifest.acceptedPoints -ne 1260 -or
+        $framesManifest.strokeCount -ne 27 -or
+        $framesManifest.screenProjection -ne "UNCALIBRATED" -or
+        $framesManifest.samples.Count -ne 3 -or
+        $framesManifest.comparisons.Count -ne 3 -or
+        $framesManifest.pngCount -ne 6) {
+        throw "ENGINE-001 duplicate-frame replay provenance guard failed."
+    }
+    for ($i=0; $i -lt 3; $i++) {
+        $sample = $framesManifest.samples[$i]
+        if ($sample.extraStationaryFramesPerStroke -ne $expectedCounts[$i] -or
+            $sample.graphicsPathCount -ne $expectedPaths[$i] -or
+            $sample.acceptedPoints -ne 1260 -or
+            $sample.duplicatePointRejections -ne (27 * $expectedCounts[$i]) -or
+            $sample.extraFrameRedrawCalls -ne (27 * $expectedCounts[$i])) {
+            throw "ENGINE-001 duplicate-frame path count/accepted point mismatch at $i."
+        }
+    }
+    Set-Content -Path (Join-Path $outputDir "engine001-duplicate-frames-v1.json") -Value $framesJson -Encoding utf8
+    $framesLinks = [regex]::Matches($framesPage, $pngPattern)
+    if ($framesLinks.Count -ne 6) { throw "ENGINE-001 expected six duplicate-frame PNGs." }
+    foreach ($link in $framesLinks) {
+        $name = [System.IO.Path]::GetFileName($link.Groups[2].Value)
+        if (-not $name.StartsWith("engine001-frames-")) { throw "Unexpected duplicate-frame PNG $name" }
+        [System.IO.File]::WriteAllBytes((Join-Path $outputDir $name), [Convert]::FromBase64String($link.Groups[1].Value))
+    }
+    Write-Host "ENGINE-001 duplicate frames: accepted 1260, synthetic extra callbacks 0 / 27 / 81, Graphics paths 70 / 97 / 151, six native PNGs."
+
     # ENGINE-001 native Painter endpoint variants: frozen run and plan, no
     # substitution of Stage/CSS transform or synthetic accepted points.
     $endpointPlan = "AutoDraw_Stage20/data/results/brush_behavior_tests/fill001/plans/fill001-rs-preflight-20261104-7.04-rectangle-r10-s5-o0-rep1.json"

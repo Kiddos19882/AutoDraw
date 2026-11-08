@@ -220,6 +220,19 @@ jobs:
           path: ${{ runner.temp }}/engine001-endpoint-outline5/
           if-no-files-found: warn
           retention-days: 30
+      - name: Audit accepted-only duplicate-frame Egret PNG pixel differences
+        shell: pwsh
+        run: |
+          python tests\\analyze_engine001_duplicate_frames.py --workspace "$env:GITHUB_WORKSPACE" --reference-dir "$env:RUNNER_TEMP\\egret-renderer-reference" --output-dir "$env:RUNNER_TEMP\\engine001-duplicate-frames"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Upload ENGINE-001 duplicate-frame native Egret PNG comparison
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autodraw-engine001-duplicate-frames-v1
+          path: ${{ runner.temp }}/engine001-duplicate-frames/
+          if-no-files-found: warn
+          retention-days: 30
       - name: Test Stage screenshot transform and mask metrics
         run: python tests\\test_stage_renderer_comparison.py
       - name: Apply paired live/offline renderer per-run acceptance gates
