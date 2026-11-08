@@ -323,3 +323,12 @@ RunRecorder также формирует per_stroke_metrics по события
 **Важное различие частот:** frame_probe измеряет browser requestAnimationFrame, а не Egret ENTER_FRAME. accepted_points_per_second и интервалы POINT_QUOTA_UPDATE показывают частоту принятых игровых точек, но не являются прямым счётчиком всех кадров движка. Не подменять одну метрику другой.
 
 Для старых run JSON без strokeId у frame_probe сохраняется общий summary; per-stroke frame probe может быть unavailable. Старые finalized runs не содержат raw frame intervals, если прежний finalize уже очистил frame_probes.
+
+## ENGINE-001 — native Egret frame telemetry (Monitor 0.2.4, 2026-11-08)
+
+В существующую input telemetry (opt-in) добавлен read-only observer `BoardPane.EgretEvent.ENTER_FRAME` (тип `ENGINE_FRAME_SAMPLE`). Он записывает real Egret callback `t`/strokeId, raw `atom.options`, Stage/Board координаты, `pointCount`/delta, `GraphicsNode.drawData.length`; **не** управляет курсором, renderer и расходом CHALK. Неподвижная точка может дать `delta=0` при следующем вызове `redraw(false)`. Существующий RAF `frame_probe` имеет иной источник и не переименован в Egret frame. Версия Monitor повышена до `0.2.4`. При отключении input telemetry/Monitor снимает listener.
+
+Bridge allowlist принял только новый тип `ENGINE_FRAME_SAMPLE`, он сохраняется внутри raw `events`; collector создаёт `engine_frame_samples` с `event_count`, `by_stroke` count/нулевые/положительные frame delta и `observed_stroke_modes` из настоящего `atom.options`. Для режима используется `DRAW_START_APPLIED` при его наличии либо первый реальный Egret frame event, так как Egret может привязать обработчик до установки Monitor. Лабораторный audit требует, чтобы сырые события и агрегаты совпадали и режим не менялся. Отсутствие callback, переподключение, изменение screen geometry или потери доставки дают FAIL/PARTIAL, не подменяются RAF.
+
+Установка в живой игровой iframe остаётся отдельной доверенной подготовкой. Для one-click лаборатории подключение Monitor/Bridge и input telemetry должно быть *готово до нажатия*: GUI автоматически не внедряет JS в веб-страницу. Реальные stage/client/desktop перемещения и PNG отличаются; frame event не является полной трассой render cadence. Полный протокол — [ENGINE-001 §20](GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md), [readiness](../source/preparation/engine001_lab.py), [monitor](../source/game_monitor/game_monitor.js).
+

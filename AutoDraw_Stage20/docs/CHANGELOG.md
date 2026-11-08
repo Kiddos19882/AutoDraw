@@ -2,6 +2,12 @@
 
 Записывать только изменения интерфейсов, форматов, возможностей и значимые изменения сопровождения. Ход проверки каждой задачи — [WORK_LOG](WORK_LOG.md). Полная прежняя редакция без изменений: [CHANGELOG_HISTORY_THROUGH_2026-11-08.md](CHANGELOG_HISTORY_THROUGH_2026-11-08.md).
 
+## 2026-11-08 — ENGINE-001: one-click isolated Windows laboratory preparation
+
+- В существующей вкладке Brush Tests создана кнопка полного автономного блока 9 одиночных штрихов (3 axis scenarios ×3 repeats) с fail-closed Bridge/Monitor preflight, Clear-before-run, existing Stage6, independent raw PNG/CHALK/geometry audit, durable journal.
+- Monitor 0.2.4 поддерживает opt-in native Egret `ENTER_FRAME` observer и raw stroke smooth option; Bridge хранит эти events и rollups отдельно от старого RAF probe. Изменены только исследовательские файлы; новый gameplay run не выполнен, производственные параметры прежние.
+- Исходный FILL-001 live остаётся FAIL (98.430600% coverage / 11 leaked pixels / CHALK=1260 historical). Live E4 и independent E5 требуют отдельного запуска.
+
 ## 2026-11-08 — ENGINE-001: controlled stationary duplicate frames in native BoardPane
 
 - Исследовательский opt-in `?frames=fill001`: 0/1/3 rejected-point `ENTER_FRAME` simulations per stroke, same frozen 27/1260, six Canvas2D/WebGL PNG, Python independent threshold audit. [Full CI 42440876068](https://github.com/Kiddos19882/AutoDraw/actions/runs/42440876068) SUCCESS at `a35d782`, 0 final RGBA differences in each backend.
