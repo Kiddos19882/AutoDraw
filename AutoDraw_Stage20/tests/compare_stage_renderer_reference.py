@@ -109,7 +109,15 @@ def mask_metrics(observed: np.ndarray, expected: np.ndarray) -> dict[str, Any]:
     union = tp + fp + fn
     precision = tp / (tp + fp) if tp + fp else 0.0
     recall = tp / (tp + fn) if tp + fn else 0.0
+    def bounds(mask: np.ndarray) -> list[int] | None:
+        ys, xs = np.nonzero(mask)
+        return ([int(xs.min()), int(ys.min()),
+                 int(xs.max() - xs.min() + 1), int(ys.max() - ys.min() + 1)]
+                if len(xs) else None)
+
     return {
+        "observed_bbox_xywh": bounds(observed),
+        "expected_bbox_xywh": bounds(expected),
         "observed_pixels": int(np.count_nonzero(observed)),
         "expected_pixels": int(np.count_nonzero(expected)),
         "true_positive": tp,

@@ -39,6 +39,8 @@ class StageRendererComparisonTests(unittest.TestCase):
         self.assertEqual(metrics["false_negative"], 1)
         self.assertEqual(metrics["symmetric_difference_pixels"], 3)
         self.assertAlmostEqual(metrics["iou"], 0.25)
+        self.assertEqual(metrics["observed_bbox_xywh"], [0, 0, 3, 1])
+        self.assertEqual(metrics["expected_bbox_xywh"], [0, 0, 4, 1])
 
     def test_rgb_change_mask_uses_explicit_common_baseline_and_strict_threshold(self):
         baseline = np.zeros((1, 2, 3), dtype=np.uint8)
