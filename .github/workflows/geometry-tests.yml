@@ -194,6 +194,19 @@ jobs:
         with:
           name: autodraw-egret-renderer-reference
           path: ${{ runner.temp }}/egret-renderer-reference
+      - name: Independently compare native Egret endpoint PNGs with OpenCV board-local capsules
+        shell: pwsh
+        run: |
+          python tests\\analyze_engine001_endpoint_reference.py --workspace "$env:GITHUB_WORKSPACE" --reference-dir "$env:RUNNER_TEMP\\egret-renderer-reference" --output-dir "$env:RUNNER_TEMP\\engine001-endpoint-boardlocal"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Upload ENGINE-001 native endpoint board-local evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autodraw-engine001-endpoint-boardlocal-v1
+          path: ${{ runner.temp }}/engine001-endpoint-boardlocal/
+          if-no-files-found: warn
+          retention-days: 30
       - name: Test Stage screenshot transform and mask metrics
         run: python tests\\test_stage_renderer_comparison.py
       - name: Apply paired live/offline renderer per-run acceptance gates
