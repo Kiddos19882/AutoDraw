@@ -57,6 +57,7 @@ def fixture():
             "captured_at_utc": (NOW-timedelta(seconds=1)).isoformat(),
             "clientX": x, "clientY": y, "screenX": x, "screenY": y+163,
         })
+    session["passive_preflight_samples"] = samples
     plan = {
         "coordinate_system": "logical_board_pixels",
         "canvas": {"width": 460, "height": 240},
@@ -173,3 +174,11 @@ def test_coherently_rehashed_nonuniform_board_still_fails_scale_gate():
         sample["renderer_geometry_sha256"] = sha
     with pytest.raises(PreflightGeometryError, match="uniformly scaled"):
         call_with(plan, roi, session, samples)
+
+
+def test_preflight_does_not_accept_independent_fabricated_json_samples():
+    plan, roi, session, samples = fixture()
+    unrelated = deepcopy(samples)
+    unrelated[0]["screenY"] += 1
+    with pytest.raises(PreflightGeometryError, match="authenticated Bridge session"):
+        call_with(plan, roi, session, unrelated)
