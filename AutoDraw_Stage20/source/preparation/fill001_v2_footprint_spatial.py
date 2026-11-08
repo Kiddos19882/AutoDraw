@@ -121,6 +121,50 @@ def accepted_centerline_offsets(run: dict, plan: dict) -> dict:
         "limitations": "Accepted trajectory comparison, not brush footprint pixel parity",
     }
 
+
+def roundtrip_acceptance(plan: dict, run: dict, binding: dict, centerlines: dict) -> dict:
+    """Predict accepted Egret-local input using legacy ROI and same-run geometry."""
+    import math
+    roi = binding["screen_roi"]
+    board = binding["geometry"]["board_screen_corners"]
+    players = run["renderer_geometry_at_start"]["players"]
+    if not isinstance(players, list) or len(players) != 1:
+        raise ValueError("Same-run BoardPane player missing")
+    stage = players[0]["boardStageCorners"]["topLeft"]
+    ox, oy = float(stage["x"]), float(stage["y"])
+    sx = (board["right"] - board["left"]) / 460.0
+    sy = (board["bottom"] - board["top"]) / 240.0
+    if sx <= 0 or sy <= 0:
+        raise ValueError("Invalid BoardPane scaling")
+    predicted = []
+    for observed, stroke in zip(centerlines["rows"], plan["strokes"]):
+        pair = []
+        for point in stroke["points"]:
+            screen_x = roi["x"] + float(point["x"]) * (roi["width"] - 1) / 460
+            screen_y = roi["y"] + float(point["y"]) * (roi["height"] - 1) / 240
+            stage_x = ox + (screen_x - board["left"]) / sx
+            stage_y = oy + (screen_y - board["top"]) / sy
+            pair.append({
+                "x": math.floor(stage_x + 0.5) - ox,
+                "y": math.floor(stage_y + 0.5) - oy,
+            })
+        predicted.append({
+            "row": observed["index"], "predicted_first": pair[0],
+            "predicted_last": pair[1],
+            "first_x_error": pair[0]["x"] - observed["observed_first_x"],
+            "last_x_error": pair[1]["x"] - observed["observed_last_x"],
+            "y_error": pair[0]["y"] - observed["observed_y_median"],
+        })
+    return {
+        "method": "legacy_ROI_to_same_run_BoardPane_with_Egret_stage_rounding",
+        "rows": predicted, "first": predicted[0],
+        "maximum_error_on_observed_first_last_and_y": max(
+            abs(row[key]) for row in predicted
+            for key in ("first_x_error", "last_x_error", "y_error")
+        ),
+        "limitation": "Not a native raster footprint or temporal replay",
+    }
+
 def _png(path: Path) -> np.ndarray:
     with Image.open(path) as image:
         if image.format != "PNG":
@@ -194,8 +238,10 @@ def analyze_pair(root: Path, output: Path) -> dict:
             raise ValueError("Monitor run mismatch")
         plan = _read_json(root / "fill001" / "plans" / (task + ".json"))
         centers = accepted_centerline_offsets(raw_run, plan)
+        roundtrip = roundtrip_acceptance(plan, raw_run, binding, centers)
         results[mode] = {
             "accepted_centerlines": centers,
+            "egret_input_roundtrip": roundtrip,
             "run_id": result["run_id"], "raw_run_sha256": result["raw_run_sha256"],
             "evidence_sha256": _sha(evidence), "before_sha256": _sha(before_path),
             "after_sha256": _sha(after_path), "roi": roi,
@@ -252,6 +298,8 @@ def main() -> int:
               f"depth={item['spatial']['max_depth_screen_px']}")
         print(f"{mode} first accepted row: {item['accepted_centerlines']['first']}; "
               f"max abs y-offset: {item['accepted_centerlines']['max_abs_y_offset']:.3f}")
+        print(f"{mode} ROI to Egret: {item['egret_input_roundtrip']['first']}; "
+              f"max error: {item['egret_input_roundtrip']['maximum_error_on_observed_first_last_and_y']:.3f}")
     return 0
 
 
