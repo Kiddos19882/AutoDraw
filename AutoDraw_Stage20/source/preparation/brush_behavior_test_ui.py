@@ -953,7 +953,7 @@ class BrushBehaviorTestTab:
         self.bridge_input_telemetry_requested = False
         self.last_record_path: Path | None = None
         self.brush_var = tk.StringVar(value="1")
-        self.case_var = tk.StringVar(value=next(iter(TEST_CASES)))
+        self.case_var = tk.StringVar(value="Расход краски — серия длинных линий")
         self.matrix_series_var = tk.StringVar(
             value=f"chalk-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:6]}"
         )
