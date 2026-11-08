@@ -28,6 +28,13 @@ from fill001_smooth_ab import (
     PROTOCOL as FILL001_AB_PROTOCOL, build_fill001_smooth_ab_matrix,
     analyze_smooth_ab_pair,
 )
+from fill001_smooth_ab_v2 import (
+    PROTOCOL as FILL001_AB_V2_PROTOCOL, SCREEN_MASK as FILL001_V2_MASK,
+    V2_IDENTITY_FIELDS, build_fill001_smooth_ab_v2_matrix,
+    analyze_smooth_ab_v2_pair,
+)
+from fill001_screen_mask_v2 import audit_screen_mask_v2
+from fill001_screen_mask_v2_binding import bind_from_monitor_run
 from fill001_monitor_diagnostic import (
     PROTOCOL as FILL001_DIAGNOSTIC_PROTOCOL,
     audit_diagnostic_capture, inspect_diagnostic_preflight,
@@ -96,6 +103,7 @@ class Fill001Tab:
         ttk.Entry(series, textvariable=self.series_var, width=32).pack(side="left", padx=6)
         ttk.Button(series, text="Создать manifest (45 задач)", command=self.create_series).pack(side="left", padx=4)
         ttk.Button(series, text="Новый Smooth A/B (2 задачи)", command=self.create_smooth_ab_series).pack(side="left", padx=4)
+        ttk.Button(series, text="Новый Smooth A/B V2 (2 задачи)", command=self.create_smooth_ab_v2_series).pack(side="left", padx=4)
         ttk.Button(series, text="Открыть manifest…", command=self.load_series_dialog).pack(side="left", padx=4)
         self.manifest_label = ttk.Label(series, text="Manifest не загружен")
         self.manifest_label.pack(side="left", padx=10)
@@ -128,7 +136,10 @@ class Fill001Tab:
     def create_smooth_ab_series(self) -> None:
         self._create_series(smooth_ab=True)
 
-    def _create_series(self, *, smooth_ab: bool) -> None:
+    def create_smooth_ab_v2_series(self) -> None:
+        self._create_series(smooth_ab=False, smooth_ab_v2=True)
+
+    def _create_series(self, *, smooth_ab: bool, smooth_ab_v2: bool = False) -> None:
         raw_id = self.series_var.get().strip()
         if not raw_id or re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,63}", raw_id) is None:
             messagebox.showwarning(
@@ -141,6 +152,7 @@ class Fill001Tab:
             # Opt-in diagnostic reproduces the historical 27-stroke RS
             # geometry, never the legacy 131-stroke default.
             matrix = (
+                build_fill001_smooth_ab_v2_matrix(raw_id) if smooth_ab_v2 else
                 build_fill001_smooth_ab_matrix(raw_id) if smooth_ab else
                 build_fill001_rs_matrix(raw_id) if self.diagnostic_var.get()
                 else build_fill001_matrix(raw_id)
@@ -153,6 +165,7 @@ class Fill001Tab:
             self.manifest_label.configure(text=path.name)
             self._refresh_tasks()
             label = (
+                "FILL-001 Smooth A/B V2" if smooth_ab_v2 else
                 "FILL-001 Smooth A/B" if smooth_ab else
                 "Диагностический FILL-001-RS" if self.diagnostic_var.get() else "FILL-001"
             )
@@ -218,7 +231,7 @@ class Fill001Tab:
                 f"Radius: {task['requested_radius']}\n"
                 f"Repeat: {task['repeat_index']}/{task.get('planned_repeats', 3)}\n"
                 + (f"Declared smooth: {task['expected_smooth']}\n"
-                   if task.get("experiment_protocol") == FILL001_AB_PROTOCOL else "") +
+                   if task.get("experiment_protocol") in (FILL001_AB_PROTOCOL, FILL001_AB_V2_PROTOCOL) else "") +
                 f"Expected strokes: {task['expected_strokes']}\n"
                 f"Coverage estimate: {task['planned_coverage_fraction']:.6%}\n"
                 f"Leakage pixels: {task['planned_leakage_pixels']}\n"
@@ -283,7 +296,7 @@ class Fill001Tab:
             messagebox.showerror("FILL-001 не подключён", "Callback передачи в Stage 6 отсутствует.", parent=self.root)
             return
         self.diagnostic_active = (
-            self.matrix.get("experiment_protocol") == FILL001_AB_PROTOCOL
+            self.matrix.get("experiment_protocol") in (FILL001_AB_PROTOCOL, FILL001_AB_V2_PROTOCOL)
             or bool(self.diagnostic_var.get())
         )
         self.diagnostic_readiness = None
@@ -356,7 +369,7 @@ class Fill001Tab:
                     + ("ON" if task["expected_smooth"] else "OFF")
                     + ". AutoDraw не переключает этот параметр. Фактический режим "
                       "всех 27 штрихов будет проверен по ENGINE_FRAME_SAMPLE."
-                    if task.get("experiment_protocol") == FILL001_AB_PROTOCOL else ""
+                    if task.get("experiment_protocol") in (FILL001_AB_PROTOCOL, FILL001_AB_V2_PROTOCOL) else ""
                 )
             ),
             icon="warning",
@@ -636,7 +649,7 @@ class Fill001Tab:
         """Analyze only a complete new A/B pair, never archival captures."""
         try:
             if (not isinstance(self.matrix, dict)
-                    or self.matrix.get("experiment_protocol") != FILL001_AB_PROTOCOL):
+                    or self.matrix.get("experiment_protocol") not in (FILL001_AB_PROTOCOL, FILL001_AB_V2_PROTOCOL)):
                 raise FillMatrixError("Откройте двухзадачный FILL-001 Smooth A/B manifest.")
             if self.manifest_path is None:
                 raise FillMatrixError("A/B manifest не загружен.")
@@ -649,9 +662,14 @@ class Fill001Tab:
                 if task.get("capture_status") != "completed" or not path:
                     raise FillMatrixError("Оба режима должны иметь завершённый raw audit и PNG.")
                 reports.append(json.loads(Path(path).read_text(encoding="utf-8")))
-            analysis = analyze_smooth_ab_pair(current, reports)
+            protocol = current["experiment_protocol"]
+            analysis = (
+                analyze_smooth_ab_v2_pair(current, reports)
+                if protocol == FILL001_AB_V2_PROTOCOL
+                else analyze_smooth_ab_pair(current, reports)
+            )
             path = self.output_dir / "captures" / (
-                f"{current['series_id']}-{FILL001_AB_PROTOCOL}-comparison.json"
+                f"{current['series_id']}-{protocol}-comparison.json"
             )
             if path.exists():
                 previous = json.loads(path.read_text(encoding="utf-8"))
@@ -764,16 +782,18 @@ class Fill001Tab:
                         "FILL-001 raw E4 diagnostic PARTIAL: " + ", ".join(audit["reasons"])
                         + ". Report сохранён, capture не принят."
                     )
-            if self.matrix.get("experiment_protocol") == FILL001_AB_PROTOCOL:
+            if self.matrix.get("experiment_protocol") in (FILL001_AB_PROTOCOL, FILL001_AB_V2_PROTOCOL):
                 # Preserve a failed PNG as evidence. This is NOT the legacy
                 # accepted FILL-001 capture path and never weakens its gates.
-                if audit.get("protocol") != FILL001_AB_PROTOCOL:
-                    raise FillMatrixError("Expected a versioned smooth A/B raw audit.")
+                ab_protocol = self.matrix["experiment_protocol"]
+                if audit.get("protocol") != ab_protocol:
+                    raise FillMatrixError("Expected the same versioned Smooth A/B raw audit.")
                 png = audit_fill001_png_pair(
                     "rectangle", before_png, after_png, screen_roi=record["screen_roi"]
                 )
                 evidence = {
-                    "schema_version": 1, "protocol": FILL001_AB_PROTOCOL,
+                    "schema_version": 2 if ab_protocol == FILL001_AB_V2_PROTOCOL else 1,
+                    "protocol": ab_protocol,
                     "task_id": self.active_task["task_id"],
                     "expected_smooth": self.active_task["expected_smooth"],
                     "raw_e4_status": audit["status"],
@@ -789,8 +809,25 @@ class Fill001Tab:
                     "after_png_sha256": png["after_png_sha256"],
                     "png_audit": png,
                 }
+                if ab_protocol == FILL001_AB_V2_PROTOCOL:
+                    # This is run-bound and derived from the CURRENT raw run;
+                    # no old series, fitted offsets, or screenshot-derived calibration.
+                    v2_binding = bind_from_monitor_run(Path(run_file), audit_file)
+                    if v2_binding["screen_roi"] != record["screen_roi"]:
+                        raise FillMatrixError("V2 run-bound ROI differs from the captured PNG ROI.")
+                    v2 = audit_screen_mask_v2(
+                        "rectangle", before_png, after_png,
+                        run_id=audit["run_id"], screen_roi=record["screen_roi"],
+                        geometry=v2_binding["geometry"],
+                    )
+                    if (v2["frozen_target_mask_sha256"] !=
+                            self.active_task["target_mask_sha256"]):
+                        raise FillMatrixError("V2 frozen logical target mismatch.")
+                    evidence["screen_mask_version"] = FILL001_V2_MASK
+                    evidence["v2_audit"] = v2
+                    evidence["v2_binding_provenance"] = v2_binding["provenance"]
                 evidence_file = self.output_dir / "captures" / (
-                    f"{self.active_task['task_id']}-{FILL001_AB_PROTOCOL}-result.json"
+                    f"{self.active_task['task_id']}-{ab_protocol}-result.json"
                 )
                 if evidence_file.exists():
                     previous = json.loads(evidence_file.read_text(encoding="utf-8"))
@@ -810,20 +847,30 @@ class Fill001Tab:
                 matching[0]["capture_status"] = "completed"
                 matching[0]["capture_path"] = str(evidence_file)
                 self.matrix["status"] = "in_progress"
-                identity = {
-                    key: self.matrix[key] for key in (
+                identity_fields = (
+                    V2_IDENTITY_FIELDS if ab_protocol == FILL001_AB_V2_PROTOCOL
+                    else (
                         "schema_version", "phase_id", "series_id", "shapes",
                         "radii", "repeats", "tasks", "plan_variant",
                         "candidate_selection_policy", "experiment_protocol",
                     )
-                }
+                )
+                identity = {key: self.matrix[key] for key in identity_fields}
                 self.matrix["matrix_signature"] = hashlib.sha256(
                     json.dumps(identity, ensure_ascii=False, sort_keys=True,
                                separators=(",", ":")).encode("utf-8")
                 ).hexdigest()
                 write_fill001_matrix(self.matrix, self.manifest_path)
+                measured = (
+                    evidence["v2_audit"] if ab_protocol == FILL001_AB_V2_PROTOCOL
+                    else png
+                )
+                quality = (
+                    measured["v2_diagnostic_gate"] if ab_protocol == FILL001_AB_V2_PROTOCOL
+                    else png["png_audit_status"]
+                )
                 record["status"] = (
-                    "ab_raw_complete_png_pass" if png["png_audit_status"] == "passed"
+                    "ab_raw_complete_png_pass" if quality in ("passed", "PASS")
                     else "ab_raw_complete_png_failed"
                 )
                 record["capture_path"] = str(evidence_file)
@@ -833,6 +880,10 @@ class Fill001Tab:
                     "leakage_pixels": png["leakage_pixels"],
                     "png_audit_status": png["png_audit_status"],
                     "raw_e4_status": audit["status"],
+                    **({"v2_coverage_fraction": evidence["v2_audit"]["coverage_fraction"],
+                        "v2_leakage_pixels": evidence["v2_audit"]["leakage_pixels"],
+                        "v2_diagnostic_gate": evidence["v2_audit"]["v2_diagnostic_gate"]}
+                       if ab_protocol == FILL001_AB_V2_PROTOCOL else {}),
                 }
                 self.active_run_record.write_text(
                     json.dumps(record, ensure_ascii=False, indent=2) + "\n",
@@ -843,7 +894,11 @@ class Fill001Tab:
                     f"PNG quality={png['png_audit_status']} "
                     f"(coverage={png['coverage_fraction']:.6%}, "
                     f"leakage={png['leakage_pixels']}). "
-                    "Результат сохранён; перед следующим запуском очистите доску."
+                    + (f" V2 coverage={evidence['v2_audit']['coverage_fraction']:.6%}, "
+                       f"V2 leakage={evidence['v2_audit']['leakage_pixels']}, "
+                       f"V2={evidence['v2_audit']['v2_diagnostic_gate']}."
+                       if ab_protocol == FILL001_AB_V2_PROTOCOL else "")
+                    + " Результат сохранён; перед следующим запуском очистите доску."
                 )
                 self.active_task = None
                 self.active_plan_path = None
