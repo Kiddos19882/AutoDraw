@@ -182,3 +182,11 @@ test("ordinary Bridge does not collect passive preflight samples", () => {
   assert.equal(bridge.sentMessages.filter(item => item.type === "preflight_sample").length, 0);
   bridge.socket.close();
 });
+
+
+test("no passive events are emitted when requested input telemetry is unavailable", () => {
+  const bridge = createBridge({ enabled: true, includeApi: false });
+  bridge.emitMouse({ clientX: 600, clientY: 220, screenX: 600, screenY: 383 });
+  assert.equal(bridge.sentMessages.filter(item => item.type === "preflight_sample").length, 0);
+  bridge.socket.close();
+});
