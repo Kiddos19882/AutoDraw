@@ -207,6 +207,19 @@ jobs:
           path: ${{ runner.temp }}/engine001-endpoint-boardlocal/
           if-no-files-found: warn
           retention-days: 30
+      - name: Compare native 5px closed outline on all Egret endpoint variants (offline only)
+        shell: pwsh
+        run: |
+          python tests\\analyze_engine001_outline5_reference.py --workspace "$env:GITHUB_WORKSPACE" --reference-dir "$env:RUNNER_TEMP\\egret-renderer-reference" --output-dir "$env:RUNNER_TEMP\\engine001-endpoint-outline5"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Upload ENGINE-001 native 5px contour vs OpenCV evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autodraw-engine001-native-outline5-v1
+          path: ${{ runner.temp }}/engine001-endpoint-outline5/
+          if-no-files-found: warn
+          retention-days: 30
       - name: Test Stage screenshot transform and mask metrics
         run: python tests\\test_stage_renderer_comparison.py
       - name: Apply paired live/offline renderer per-run acceptance gates
