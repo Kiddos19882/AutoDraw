@@ -12,6 +12,8 @@
 
 [Отложенные варианты A–D, E1–E4 и инструмент Egret](ROADMAP.md#отложенная-программа-тестов-fill-001-geom-001-и-связанных-gates). Работа текущего этапа не запускает gameplay, не меняет production и не меняет отвергнутый FILL-001 capture.
 
+**Full validation CI [42434968046](https://github.com/Kiddos19882/AutoDraw/actions/runs/42434968046) — SUCCESS** на code/test SHA `8d5d0880c2027bf5c699608578d338025d64c595`: preparation 952 passed / 24 warnings / 82 subtests; Egret browser reference, Game Monitor/Bridge, executor, app integration и INT-006 PNG audit — SUCCESS; optional algorithm benchmarks и Windows portable build — SKIPPED. Это E3, не E4 gameplay.
+
 ## Работоспособность подсистем и доказательства
 
 | Направление | Подтверждено | Не закрыто |

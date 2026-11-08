@@ -51,6 +51,8 @@
 
 ## 4. CI и уровни подтверждения
 
+- **Full validation CI [42434968046](https://github.com/Kiddos19882/AutoDraw/actions/runs/42434968046) — SUCCESS** на code/test SHA `8d5d0880c2027bf5c699608578d338025d64c595`: preparation 952 passed / 24 warnings / 82 subtests; Egret browser reference, Game Monitor/Bridge, executor, app integration и INT-006 PNG audit — SUCCESS; optional algorithm benchmarks и Windows portable build — SKIPPED. Это E3, не E4 gameplay.
+
 - [CI 42427514794](https://github.com/Kiddos19882/AutoDraw/actions/runs/42427514794): **SUCCESS** на `16f0e1b6cce0`. Preparation: **952 passed**, 82 subtests; Monitor/Bridge, executor, app integration, Egret and INT-006 PNG audit jobs SUCCESS; optional benchmarks/Windows portable build SKIPPED. [artifact 13596093007](https://github.com/Kiddos19882/AutoDraw/actions/runs/42427514794/artifacts/13596093007) (ZIP SHA-256 `19313debbcc350f0eeda3edf2cba9e65350690a850d5bb2d9d733bb03794d620`); actual/counterfactual colored PNGs independently counted against JSON.
 - [CI 42427122693](https://github.com/Kiddos19882/AutoDraw/actions/runs/42427122693) на `c2ae5a0`: **FAIL** (943 passed / 8 failed) — строгая проверка Git-LF SHA ошибочно отклоняла неизменённый JSON в Windows-CRLF checkout; исправлено нормализацией **только JSON**, добавлен regression test. Отрицательный результат сохранён.
 
