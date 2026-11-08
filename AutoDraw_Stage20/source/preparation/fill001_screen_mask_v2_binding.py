@@ -53,8 +53,21 @@ def bind_from_monitor_run(
     The offset is established from actual paired DOM mouse client/screen
     samples, not inferred from painted pixels or the frozen target shape.
     """
-    run, run_sha = _load(run_path)
+    run, checked_out_sha = _load(run_path)
     evidence, evidence_sha = _load(evidence_path)
+    run_sha = checked_out_sha
+    sha_reconstruction = "identity"
+    # Git can normalize Windows CRLF text to LF on Linux checkouts.
+    # Accept ONLY an exact SHA match after reversible LF->CRLF conversion;
+    # never ignore or replace an E4 hash mismatch.
+    expected_sha = evidence.get("raw_run_sha256")
+    if run_sha != expected_sha:
+        raw = Path(run_path).read_bytes()
+        if b"\\r" not in raw and b"\\n" in raw:
+            restored = raw.replace(b"\\n", b"\\r\\n")
+            if _sha(restored) == expected_sha:
+                run_sha = expected_sha
+                sha_reconstruction = "git_normalized_LF_to_original_CRLF"
     run_id = run.get("run_id")
     checks = {
         "run_id_missing": not isinstance(run_id, str) or not run_id,
@@ -148,6 +161,8 @@ def bind_from_monitor_run(
             "schema": "FILL001_SCREEN_MASK_V2_MONITOR_BINDING",
             "run_id": run_id,
             "raw_run_sha256": run_sha,
+            "checked_out_run_sha256": checked_out_sha,
+            "byte_reconstruction": sha_reconstruction,
             "e4_evidence_sha256": evidence_sha,
             "native_geometry_sha256": _geometry_sha(g0),
             "mouse_sample_count": len(samples),
