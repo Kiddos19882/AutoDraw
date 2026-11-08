@@ -613,11 +613,20 @@ class Fill001Tab:
                 fresh = inspect_diagnostic_preflight(
                     self.output_dir.parent / "game_monitor_bridge", self.active_task
                 )
-                if (not isinstance(self.diagnostic_readiness, dict)
-                        or fresh["session_id"] != self.diagnostic_readiness["session_id"]
-                        or fresh["renderer_geometry_sha256"] !=
-                           self.diagnostic_readiness["renderer_geometry_sha256"]):
-                    raise ValueError("Bridge session или native renderer geometry изменились после before PNG.")
+                if not isinstance(self.diagnostic_readiness, dict):
+                    raise ValueError("Отсутствует исходная проверка Monitor перед before PNG.")
+                expected_key = (
+                    "boardpane_mapping_sha256"
+                    if self.active_task.get("experiment_protocol") == FILL001_AB_V3_PROTOCOL
+                    else "renderer_geometry_sha256"
+                )
+                if (fresh["session_id"] != self.diagnostic_readiness["session_id"]
+                        or not isinstance(fresh.get(expected_key), str)
+                        or fresh[expected_key] != self.diagnostic_readiness.get(expected_key)):
+                    raise ValueError(
+                        "Bridge session или координатная геометрия BoardPane "
+                        "изменились после before PNG; ввод заблокирован."
+                    )
             except (ValueError, OSError, TypeError, KeyError) as exc:
                 self.status_var.set(f"Диагностический FILL-001 остановлен до game input: {exc}")
                 messagebox.showerror("Monitor/Bridge сменился", str(exc), parent=self.root)
@@ -1002,7 +1011,7 @@ class Fill001Tab:
                         if (not isinstance(preflight, dict)
                                 or preflight.get("schema") != COORDINATE_PREFLIGHT
                                 or preflight.get("session_id") != audit["session_id"]
-                                or preflight.get("renderer_geometry_sha256") != audit["geometry_at_start_sha256"]
+                                or preflight.get("boardpane_mapping_sha256") != audit["boardpane_mapping_at_start_sha256"]
                                 or preflight.get("screen_roi") != record["screen_roi"]
                                 or preflight.get("no_fallback") is not True):
                             raise FillMatrixError("V3 fresh BoardPane preflight evidence is absent or mismatched.")
