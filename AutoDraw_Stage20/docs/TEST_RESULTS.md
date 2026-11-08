@@ -88,3 +88,12 @@
 ## FILL-001 Screen Mask V2 — проверка свидетельств
 
 **Источник:** frozen ON/OFF PNG, E4 diagnostic и raw Monitor run из commit [16640ea](https://github.com/Kiddos19882/AutoDraw/commit/16640eaf7f1ad2282d63b05b06394a32f13f14ed). **Новый code SHA:** `647aeb7a74ec979f46a0828aa3418e57635533c1`; [validation workflow 42503756622](https://github.com/Kiddos19882/AutoDraw/actions/runs/42503756622), результат фиксировать после окончания. Добавлен source-run-bound validation и CLI для пересчёта двух сохранённых ROI; результат сохраняется в `autodraw-fill001-screen-mask-v2/report.json` (artifact только JSON), если все provenance checks выполнены. Прежние утечки 840/849, coverage 98.7847%/99.3148%, PNG FAIL/FAIL — исходный V1 baseline, не новая V2 метрика. Native Egret trace и независимое pixel-equivalence V2 — NOT_RUN.
+
+## FILL-001 Screen Mask V2 — saved Smooth A/B replay PASS как диагностика, качество FAIL
+
+| Run mode | Legacy V1 leakage | V2 leakage | Legacy V1 coverage | V2 coverage | V2 diagnostic |
+|---|---:|---:|---:|---:|---|
+| Smooth ON | 840 | 1493 | 98.784704% | 98.796065% | FAIL |
+| Smooth OFF | 849 | 1474 | 99.314769% | 99.359230% | FAIL |
+
+**Provenance:** исходный commit `16640ea`, новые code/tests SHA `480cb3e87616846d9fa76276d853cda89ef640e6`, [CI 42504588736](https://github.com/Kiddos19882/AutoDraw/actions/runs/42504588736) **SUCCESS**, `14 passed + 6 subtests`, [artifact 13627275540](https://github.com/Kiddos19882/AutoDraw/actions/runs/42504588736/artifacts/13627275540). Исходные PNG/Monitor SHA сверены; проверен восстановленный CRLF оригинальных Windows JSON в Linux checkout, raw run/E4 ID, стабильный DOM screen-minus-client offset. Диагностический V2 не меняет V1 quality gate и не заменяет independent native Egret WebGL ↔ live E5. Отрицательные focused CI: 42504084158, 42504159743, 42504396198, 42504487090; причины и исправления в [WORK_LOG](WORK_LOG.md).
