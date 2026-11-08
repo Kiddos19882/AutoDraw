@@ -916,9 +916,13 @@ class AutoDrawUnifiedApp:
         # Use the existing FILL diagnostic freshness/snapshot/single-session gate.
         fresh = inspect_diagnostic_preflight(bridge_root, task)
         if (fresh["session_id"] != readiness.get("session_id")
-                or fresh["renderer_geometry_sha256"] !=
-                   readiness.get("renderer_geometry_sha256")):
-            raise ValueError("V3 Monitor session/renderer geometry changed after before PNG.")
+                or not isinstance(fresh.get("boardpane_mapping_sha256"), str)
+                or fresh["boardpane_mapping_sha256"] !=
+                   readiness.get("boardpane_mapping_sha256")):
+            raise ValueError(
+                "V3 BoardPane screen projection or Monitor session changed "
+                "after before PNG. No game input."
+            )
         # A no-button hover probes REAL desktop/browser coordinates while no
         # executor stroke is active. No click, paint or mouse-down is generated.
         self.root.iconify()
@@ -933,9 +937,9 @@ class AutoDrawUnifiedApp:
         time.sleep(0.25)
         checked = inspect_diagnostic_preflight(bridge_root, task)
         if (checked["session_id"] != fresh["session_id"]
-                or checked["renderer_geometry_sha256"] !=
-                   fresh["renderer_geometry_sha256"]):
-            raise ValueError("V3 Monitor geometry changed during passive desktop probe.")
+                or checked["boardpane_mapping_sha256"] !=
+                   fresh["boardpane_mapping_sha256"]):
+            raise ValueError("V3 BoardPane screen projection changed during passive probe.")
         session = json.loads(Path(checked["session_file"]).read_text(encoding="utf-8"))
         recorded = session.get("passive_preflight_samples")
         if not isinstance(recorded, list) or len(recorded) < 3:
@@ -1061,8 +1065,8 @@ class AutoDrawUnifiedApp:
                 age = (datetime.now(timezone.utc) - bound_at).total_seconds()
                 if (not 0 <= age <= 5
                         or fresh["session_id"] != preflight["session_id"]
-                        or fresh["renderer_geometry_sha256"]
-                           != preflight["renderer_geometry_sha256"]):
+                        or fresh["boardpane_mapping_sha256"]
+                           != preflight.get("boardpane_mapping_sha256")):
                     raise ValueError("V3 BoardPane mapping stale or session/geometry changed before input.")
             started = self.executor.start_execution_from_workflow(
                 executor_config_override=dict(FILL001_EXECUTOR_OVERRIDE)
