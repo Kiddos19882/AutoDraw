@@ -145,8 +145,8 @@ def analyze(workspace: Path, reference_dir: Path, output_dir: Path) -> dict:
         rgba, digest = png_rgba(reference_dir / path_name)
         png_hashes[path_name] = digest
         png_alpha[path_name] = rgba[:, :, 3]
-    if len(png_hashes) != 30 or len(set(png_hashes)) != 30:
-        raise ValueError("Expected exactly 30 distinct named baseline/outline renderer PNG")
+    if len(png_hashes) != 30:
+        raise ValueError("Expected exactly 30 named baseline/outline renderer PNG")
 
     by_threshold = {}
     output_dir.mkdir(parents=True, exist_ok=True)
