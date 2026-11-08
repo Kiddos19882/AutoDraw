@@ -169,7 +169,9 @@ def test_edge_diagnostic_rejects_modified_endpoint_source(tmp_path):
     original = root / "fill001" / "endpoint-analysis-6a17a297.json"
     new = tmp_path / "fill001" / original.name
     new.parent.mkdir(parents=True)
-    new.write_bytes(original.read_bytes() + b"\n ")
+    raw = original.read_bytes()
+    newline = b"\r\n" if b"\r\n" in raw else b"\n"
+    new.write_bytes(raw + newline + b" ")
     with pytest.raises(ValueError, match="Endpoint Git blob SHA mismatch"):
         _edge_profile_from_pinned_overlay(tmp_path, overlays["actual_residual"])
 
