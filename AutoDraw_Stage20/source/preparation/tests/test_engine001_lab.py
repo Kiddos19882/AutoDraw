@@ -29,7 +29,7 @@ def _session(tmp_path, *, age_seconds=1, frames=True, telemetry=True, suffix="a"
             "last_monitor_status": {
                 "active": True, "boardDetected": True,
                 "inputTelemetryEnabled": telemetry,
-                "engineFrameObserverConnected": frames, "version": "0.2.3",
+                "engineFrameObserverConnected": frames, "version": "0.2.4",
             },
         },
         "bridge_configuration": {

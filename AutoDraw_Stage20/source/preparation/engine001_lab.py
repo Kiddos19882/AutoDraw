@@ -68,7 +68,8 @@ def inspect_ready_bridge(root: Path, *, now: datetime | None = None) -> dict[str
             for player in players
         ) if isinstance(players, list) else 0
         if (
-            status.get("active") is not True
+            status.get("version") != "0.2.4"
+            or status.get("active") is not True
             or status.get("boardDetected") is not True
             or status.get("inputTelemetryEnabled") is not True
             or status.get("engineFrameObserverConnected") is not True
