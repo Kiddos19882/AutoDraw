@@ -1,0 +1,49 @@
+from __future__ import annotations
+
+import numpy as np
+import pytest
+
+from fill001_v2_footprint_spatial import classify_leakage, _overlay
+
+
+def test_spatial_regions_are_disjoint_and_count_all_leaks():
+    mask = np.zeros((9, 12), dtype=bool)
+    mask[2:7, 3:9] = True
+    changed = np.zeros_like(mask)
+    changed[1, 5] = True   # above
+    changed[7, 5] = True   # below
+    changed[4, 1] = True   # left, depth 2
+    changed[4, 10] = True  # right, depth 2
+    changed[4, 5] = True   # covered
+    out = classify_leakage(mask, changed)
+    assert out["categories"] == {
+        "above": 1, "below": 1, "left": 1, "right": 1, "other": 0,
+    }
+    assert out["leakage_pixels"] == 4
+    assert out["max_depth_screen_px"]["left"] == 2
+    assert out["max_depth_screen_px"]["right"] == 2
+    assert out["mask_screen_bbox_xyxy"] == [3, 2, 8, 6]
+
+
+def test_rounded_sides_count_as_lateral_leakage():
+    mask = np.zeros((8, 8), dtype=bool)
+    mask[2, 3:5] = True
+    mask[3:6, 2:6] = True
+    changed = np.zeros_like(mask)
+    changed[2, 2] = True
+    changed[2, 5] = True
+    result = classify_leakage(mask, changed)
+    assert result["categories"]["left"] == 1
+    assert result["categories"]["right"] == 1
+
+
+def test_invalid_mask_rejected_and_overlay_uses_four_unambiguous_classes():
+    with pytest.raises(ValueError):
+        classify_leakage(np.zeros((2, 2), bool), np.zeros((3, 3), bool))
+    mask = np.array([[False, True], [True, True]])
+    changed = np.array([[True, True], [False, False]])
+    output = np.asarray(_overlay(mask, changed))
+    assert output[0, 0].tolist() == [236, 61, 162]
+    assert output[0, 1].tolist() == [35, 180, 94]
+    assert output[1, 0].tolist() == [246, 174, 44]
+    assert output.shape == (2, 2, 3)
