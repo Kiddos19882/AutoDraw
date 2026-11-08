@@ -110,6 +110,25 @@ class TestV2Binding(unittest.TestCase):
         with self.assertRaises(FillMatrixError):
             self.bind()
 
+    def test_exact_original_crlf_reconstruction_is_accepted(self):
+        self.write()
+        checked_out = self.run_path.read_bytes()
+        reconstructed = checked_out.replace(b"\\n", b"\\r\\n")
+        self.evidence["raw_run_sha256"] = hashlib.sha256(reconstructed).hexdigest()
+        self.evidence_path.write_text(json.dumps(self.evidence), encoding="utf-8")
+        binding = bind_from_monitor_run(self.run_path, self.evidence_path)
+        self.assertEqual(binding["provenance"]["raw_run_sha256"],
+                         self.evidence["raw_run_sha256"])
+        self.assertEqual(binding["provenance"]["byte_reconstruction"],
+                         "git_normalized_LF_to_original_CRLF")
+
+    def test_wrong_original_hash_still_fails(self):
+        self.write()
+        self.evidence["raw_run_sha256"] = "f" * 64
+        self.evidence_path.write_text(json.dumps(self.evidence), encoding="utf-8")
+        with self.assertRaises(FillMatrixError):
+            bind_from_monitor_run(self.run_path, self.evidence_path)
+
     def test_reject_tampered_raw_file(self):
         self.write()
         self.run_path.write_bytes(self.run_path.read_bytes() + b" ")
