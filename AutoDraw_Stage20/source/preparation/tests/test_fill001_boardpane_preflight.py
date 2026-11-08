@@ -7,6 +7,7 @@ import json
 
 import pytest
 
+from fill001_monitor_diagnostic import _boardpane_mapping_fingerprint
 from fill001_boardpane_preflight import (
     PreflightGeometryError, boardpane_preflight_transform,
 )
@@ -53,6 +54,7 @@ def fixture():
             "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
             "source": "window-bubble-after-egret-canvas",
             "session_id": SESSION_ID, "renderer_geometry_sha256": sha,
+            "boardpane_mapping_sha256": _boardpane_mapping_fingerprint(board),
             "buttons": 0, "pre_drawing": True,
             "captured_at_utc": (NOW-timedelta(seconds=1)).isoformat(),
             "clientX": x, "clientY": y, "screenX": x, "screenY": y+163,
@@ -126,7 +128,7 @@ def test_fail_closed_when_evidence_is_missing_stale_or_geometry_changed(fault, n
     elif fault == "bad_source":
         samples[0]["source"] = "plan_derived"
     elif fault == "wrong_sha":
-        samples[0]["renderer_geometry_sha256"] = "0"*64
+        samples[0]["renderer_geometry_sha256"] = "INVALID-hash"
     elif fault == "buttons":
         samples[0]["buttons"] = 1
     elif fault == "outside":
@@ -184,3 +186,28 @@ def test_preflight_does_not_accept_independent_fabricated_json_samples():
     unrelated[0]["screenY"] += 1
     with pytest.raises(PreflightGeometryError, match="authenticated Bridge session"):
         call_with(plan, roi, session, unrelated)
+
+
+def test_live_preflight_allows_animated_preloader_without_loosening_board_mapping():
+    plan, roi, session, samples = fixture()
+    old_full_sha = samples[0]["renderer_geometry_sha256"]
+    session["renderer_geometry"]["boardDisplayChain"] = [
+        {"className": "Preloader", "width": 2830.0809053156145}
+    ]
+    assert hashlib.sha256(json.dumps(
+        session["renderer_geometry"], sort_keys=True,
+        separators=(",", ":"), ensure_ascii=False,
+    ).encode()).hexdigest() != old_full_sha
+    assert all(sample["boardpane_mapping_sha256"] ==
+               _boardpane_mapping_fingerprint(session["renderer_geometry"])
+               for sample in samples)
+    mapped, mapping = call_with(plan, roi, session, samples)
+    assert mapped["strokes"][0]["points"][0]["y"] == pytest.approx(
+        267.86 + 55*(351.2/240)-265
+    )
+    assert mapping["renderer_geometry_sha256"] != old_full_sha
+    assert mapping["boardpane_mapping_sha256"] == samples[0]["boardpane_mapping_sha256"]
+
+    session["renderer_geometry"]["players"][0]["boardClientCorners"]["topLeft"]["x"] += 1
+    with pytest.raises(PreflightGeometryError, match="type/source/run/geometry"):
+        call_with(plan, roi, session, samples)
