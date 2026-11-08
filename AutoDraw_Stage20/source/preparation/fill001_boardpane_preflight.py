@@ -13,6 +13,7 @@ import hashlib
 import json
 from math import isfinite
 from typing import Any
+from fill001_monitor_diagnostic import _boardpane_mapping_fingerprint
 
 SCHEMA = "FILL001_BOARDPANE_PREFLIGHT_V1"
 SAMPLE_TYPE = "BOARD_SCREEN_PREFLIGHT_SAMPLE"
@@ -142,6 +143,7 @@ def boardpane_preflight_transform(
     if rx < 0 or ry < 0 or width <= 1 or height <= 1:
         raise PreflightGeometryError("Invalid ROI.")
     geometry_sha = _geometry_hash(geometry)
+    boardpane_sha = _boardpane_mapping_fingerprint(geometry)
     if not isinstance(samples, list) or len(samples) < 3:
         raise PreflightGeometryError("At least three passive pre-run input samples required.")
     recorded = session.get("passive_preflight_samples")
@@ -155,7 +157,10 @@ def boardpane_preflight_transform(
         if (sample.get("type") != SAMPLE_TYPE
                 or sample.get("source") != "window-bubble-after-egret-canvas"
                 or sample.get("session_id") != expected_session_id
-                or sample.get("renderer_geometry_sha256") != geometry_sha
+                or sample.get("boardpane_mapping_sha256") != boardpane_sha
+                or not isinstance(sample.get("renderer_geometry_sha256"), str)
+                or len(sample["renderer_geometry_sha256"]) != 64
+                or any(ch not in "0123456789abcdef" for ch in sample["renderer_geometry_sha256"])
                 or sample.get("buttons") != 0
                 or sample.get("pre_drawing") is not True):
             raise PreflightGeometryError(f"Sample {i}: invalid type/source/run/geometry.")
@@ -223,6 +228,7 @@ def boardpane_preflight_transform(
         "status": "validated_preflight_input_transform_not_live_draw",
         "session_id": expected_session_id,
         "renderer_geometry_sha256": geometry_sha,
+        "boardpane_mapping_sha256": boardpane_sha,
         "passive_samples_sha256": evidence_sha,
         "passive_samples": deepcopy(samples),
         "passive_sample_count": len(samples),
