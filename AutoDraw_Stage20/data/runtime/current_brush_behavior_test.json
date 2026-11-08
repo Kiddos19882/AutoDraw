@@ -1,159 +1,578 @@
 {
   "schema_version": 1,
-  "name": "Brush behavior test — engine001_horizontal_endpoint",
-  "created_at": "2026-11-08T05:10:24+00:00",
+  "name": "FILL-001-RS fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1",
+  "created_at": "2026-11-08T08:05:13.859833+00:00",
   "coordinate_system": "local_canvas_pixels",
   "canvas": {
     "width": 674,
     "height": 355
   },
-  "width": 674,
-  "height": 355,
+  "summary": {
+    "stroke_count": 27,
+    "drawing_length_px": 12070.12,
+    "pen_up_distance_px": 11673.75
+  },
   "strokes": [
     {
-      "name": "engine001_horizontal_endpoint",
+      "name": "fill001_fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1_0001",
+      "closed": false,
       "points": [
         {
-          "x": 109.72826086956522,
+          "x": 137.526,
+          "y": 81.125
+        },
+        {
+          "x": 535.474,
+          "y": 81.125
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1_0002",
+      "closed": false,
+      "points": [
+        {
+          "x": 119.97,
+          "y": 88.5
+        },
+        {
+          "x": 553.03,
+          "y": 88.5
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1_0003",
+      "closed": false,
+      "points": [
+        {
+          "x": 114.117,
+          "y": 95.875
+        },
+        {
+          "x": 558.883,
+          "y": 95.875
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1_0004",
+      "closed": false,
+      "points": [
+        {
+          "x": 111.191,
+          "y": 103.25
+        },
+        {
+          "x": 561.809,
+          "y": 103.25
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1_0005",
+      "closed": false,
+      "points": [
+        {
+          "x": 109.728,
+          "y": 110.625
+        },
+        {
+          "x": 563.272,
+          "y": 110.625
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1_0006",
+      "closed": false,
+      "points": [
+        {
+          "x": 109.728,
+          "y": 118.0
+        },
+        {
+          "x": 563.272,
+          "y": 118.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1_0007",
+      "closed": false,
+      "points": [
+        {
+          "x": 109.728,
+          "y": 125.375
+        },
+        {
+          "x": 563.272,
+          "y": 125.375
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1_0008",
+      "closed": false,
+      "points": [
+        {
+          "x": 109.728,
+          "y": 132.75
+        },
+        {
+          "x": 563.272,
+          "y": 132.75
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1_0009",
+      "closed": false,
+      "points": [
+        {
+          "x": 109.728,
+          "y": 140.125
+        },
+        {
+          "x": 563.272,
+          "y": 140.125
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1_0010",
+      "closed": false,
+      "points": [
+        {
+          "x": 109.728,
+          "y": 147.5
+        },
+        {
+          "x": 563.272,
+          "y": 147.5
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1_0011",
+      "closed": false,
+      "points": [
+        {
+          "x": 109.728,
+          "y": 154.875
+        },
+        {
+          "x": 563.272,
+          "y": 154.875
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1_0012",
+      "closed": false,
+      "points": [
+        {
+          "x": 109.728,
+          "y": 162.25
+        },
+        {
+          "x": 563.272,
+          "y": 162.25
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1_0013",
+      "closed": false,
+      "points": [
+        {
+          "x": 109.728,
+          "y": 169.625
+        },
+        {
+          "x": 563.272,
+          "y": 169.625
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1_0014",
+      "closed": false,
+      "points": [
+        {
+          "x": 109.728,
           "y": 177.0
         },
         {
-          "x": 563.2717391304349,
+          "x": 563.272,
           "y": 177.0
         }
       ],
-      "closed": false,
       "metadata": {
-        "role": "brush_behavior_test",
-        "test_case": "engine001_horizontal_endpoint",
-        "line_extension_px_override": 0.0
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1_0015",
+      "closed": false,
+      "points": [
+        {
+          "x": 109.728,
+          "y": 184.375
+        },
+        {
+          "x": 563.272,
+          "y": 184.375
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1_0016",
+      "closed": false,
+      "points": [
+        {
+          "x": 109.728,
+          "y": 191.75
+        },
+        {
+          "x": 563.272,
+          "y": 191.75
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1_0017",
+      "closed": false,
+      "points": [
+        {
+          "x": 109.728,
+          "y": 199.125
+        },
+        {
+          "x": 563.272,
+          "y": 199.125
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1_0018",
+      "closed": false,
+      "points": [
+        {
+          "x": 109.728,
+          "y": 206.5
+        },
+        {
+          "x": 563.272,
+          "y": 206.5
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1_0019",
+      "closed": false,
+      "points": [
+        {
+          "x": 109.728,
+          "y": 213.875
+        },
+        {
+          "x": 563.272,
+          "y": 213.875
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1_0020",
+      "closed": false,
+      "points": [
+        {
+          "x": 109.728,
+          "y": 221.25
+        },
+        {
+          "x": 563.272,
+          "y": 221.25
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1_0021",
+      "closed": false,
+      "points": [
+        {
+          "x": 109.728,
+          "y": 228.625
+        },
+        {
+          "x": 563.272,
+          "y": 228.625
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1_0022",
+      "closed": false,
+      "points": [
+        {
+          "x": 109.728,
+          "y": 236.0
+        },
+        {
+          "x": 563.272,
+          "y": 236.0
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1_0023",
+      "closed": false,
+      "points": [
+        {
+          "x": 109.728,
+          "y": 243.375
+        },
+        {
+          "x": 563.272,
+          "y": 243.375
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1_0024",
+      "closed": false,
+      "points": [
+        {
+          "x": 111.191,
+          "y": 250.75
+        },
+        {
+          "x": 561.809,
+          "y": 250.75
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1_0025",
+      "closed": false,
+      "points": [
+        {
+          "x": 114.117,
+          "y": 258.125
+        },
+        {
+          "x": 558.883,
+          "y": 258.125
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1_0026",
+      "closed": false,
+      "points": [
+        {
+          "x": 119.97,
+          "y": 265.5
+        },
+        {
+          "x": 553.03,
+          "y": 265.5
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
+      }
+    },
+    {
+      "name": "fill001_fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1_0027",
+      "closed": false,
+      "points": [
+        {
+          "x": 137.526,
+          "y": 272.875
+        },
+        {
+          "x": 535.474,
+          "y": 272.875
+        }
+      ],
+      "metadata": {
+        "role": "fill001_fixed_radius_scanline",
+        "task_id": "fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1",
+        "brush_value": "10",
+        "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417"
       }
     }
   ],
-  "generation": {
-    "method": "manual_brush_behavior_test",
-    "test_case": "engine001_horizontal_endpoint",
-    "brush_value_must_be_set_manually": true,
-    "note": "Set the requested brush size in the browser before executing this plan.",
-    "paired_renderer_capture": {
-      "schema_version": 1,
-      "scenario_id": "engine001_horizontal_endpoint",
-      "requested_radius": 10,
-      "expected_strokes": 1,
-      "renderer_path_mode": "smooth",
-      "executor_parameters": {
-        "point_step_px": 2,
-        "line_extension_px": 0,
-        "point_delay_ms": 10,
-        "after_mouse_up_ms": 20,
-        "before_mouse_down_ms": 20,
-        "after_mouse_down_ms": 40,
-        "end_hold_ms": 50,
-        "countdown_seconds": 5
-      }
+  "autodraw_experiment": {
+    "phase_id": "FILL001",
+    "series_id": "fill001-20261108-110408-03",
+    "task_id": "fill001-20261108-110408-03-rectangle-r10-s5-o0-rep1",
+    "shape_id": "rectangle",
+    "requested_radius": 10,
+    "repeat_index": 1,
+    "expected_strokes": 27,
+    "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417",
+    "target_mask_sha256": "ac1c6660e5986cdf534328c6dbcd5020f631168b1473c24b29e7609eb827998b",
+    "sampling_profile": {
+      "profile_id": "P1",
+      "sampling_step": 4,
+      "delay_ms": 5
     },
-    "experiment_id": "86f6cc6a816d4f428e525a637db9c3b8",
-    "requested_brush_value": 10,
-    "chalk_test_block": {
-      "block_id": "9fdb9bd9b6a9498b91ef8a5db137a95e",
-      "task_id": "engine001_horizontal_endpoint-r2",
-      "phase_id": "ENGINE001"
-    },
-    "chalk_experiment_matrix": {
-      "schema_version": 1,
-      "series_id": "chalk-20261108-080330-af2835",
-      "phase_id": "ENGINE001",
-      "scenario_id": "engine001_horizontal_endpoint",
-      "repeat_index": 2,
-      "matrix_order_index": 9,
-      "planned_repeats": 3,
-      "requested_radius": 10,
-      "expected_strokes": 1,
-      "geometry_signature": "75768f01b14c34ccbe44030b2fe0ab576ba23b0189e1d867b881caf639a123a7",
-      "planned_strokes": [
-        {
-          "closed": false,
-          "metadata": {
-            "line_extension_px_override": 0.0,
-            "role": "brush_behavior_test",
-            "test_case": "engine001_horizontal_endpoint"
-          },
-          "name": "engine001_horizontal_endpoint",
-          "points": [
-            {
-              "x": 75.0,
-              "y": 120.0
-            },
-            {
-              "x": 385.0,
-              "y": 120.0
-            }
-          ]
-        }
-      ],
-      "executor_parameters": {
-        "point_step_px": 2,
-        "line_extension_px": 0,
-        "point_delay_ms": 10,
-        "after_mouse_up_ms": 20,
-        "before_mouse_down_ms": 20,
-        "after_mouse_down_ms": 40,
-        "end_hold_ms": 50,
-        "countdown_seconds": 5
-      }
-    },
-    "source_coordinate_system": "logical_board_pixels",
-    "source_canvas": {
-      "width": 460,
-      "height": 240
-    },
-    "screen_transform": {
-      "method": "inclusive_logical_bounds_to_screen_pixel_centers",
-      "source_coordinate_system": "logical_board_pixels",
-      "target_coordinate_system": "local_canvas_pixels",
-      "logical_board": {
-        "width": 460,
-        "height": 240
-      },
-      "screen_roi": {
-        "x": 496,
-        "y": 265,
-        "width": 674,
-        "height": 355
-      },
-      "scale_x": 1.4630434782608697,
-      "scale_y": 1.475,
-      "expected_uniform_scale": true,
-      "uniform_scale_relative_error": 0.00810611643330876,
-      "uniform_scale_tolerance": 0.01,
-      "logical_bounds": {
-        "x": [
-          0,
-          460
-        ],
-        "y": [
-          0,
-          240
-        ]
-      },
-      "screen_local_bounds": {
-        "x": [
-          0,
-          673
-        ],
-        "y": [
-          0,
-          354
-        ]
-      },
-      "boundary_mapping": "logical_max_to_last_screen_pixel",
-      "executor_coordinate_units": "screen_pixels",
-      "point_step_px_units": "screen_pixels"
-    }
-  },
-  "summary": {
-    "stroke_count": 1,
-    "drawing_length_px": 453.54,
-    "pen_up_distance_px": 0.0
+    "plan_variant": "FILL001_RS_V1",
+    "planner_version": 2,
+    "scanline_row_step": 5,
+    "scanline_offset": 0,
+    "executor_plan_sha256": "69ff50c09a62a198c5ca057d0063be10891c47cc0000f482360b20b2afa972f3"
   }
 }

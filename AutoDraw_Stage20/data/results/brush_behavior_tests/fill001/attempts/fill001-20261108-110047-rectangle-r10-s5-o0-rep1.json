@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "phase_id": "FILL001",
+  "task": {
+    "task_id": "fill001-20261108-110047-rectangle-r10-s5-o0-rep1",
+    "matrix_order_index": 7,
+    "phase_id": "FILL001",
+    "series_id": "fill001-20261108-110047",
+    "shape_id": "rectangle",
+    "requested_radius": 10,
+    "repeat_index": 1,
+    "planned_repeats": 3,
+    "plan_variant": "FILL001_RS_V1",
+    "planner_version": 2,
+    "scanline_row_step": 5,
+    "scanline_offset": 0,
+    "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417",
+    "target_mask_sha256": "ac1c6660e5986cdf534328c6dbcd5020f631168b1473c24b29e7609eb827998b",
+    "expected_strokes": 27,
+    "target_area_pixels": 44653,
+    "planned_path_length": 8250.0,
+    "planned_coverage_fraction": 0.9931919467896894,
+    "planned_leakage_pixels": 0,
+    "quality_gate_passed": true,
+    "unsupported": false,
+    "sampling_profile": {
+      "profile_id": "P1",
+      "sampling_step": 4,
+      "delay_ms": 5
+    },
+    "safe_to_execute": false,
+    "capture_status": "pending"
+  },
+  "manifest_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\fill001\\fill001-20261108-110047.json",
+  "plan_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\fill001\\plans\\fill001-20261108-110047-rectangle-r10-s5-o0-rep1.json",
+  "status": "execution_completed_pending_runtime_and_png_audit",
+  "created_at_utc": "2026-11-08T08:02:14.152417+00:00",
+  "execution_report_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\execution_20261108_110311_406470_45f4a3.json",
+  "before_png": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\fill001\\captures\\fill001-20261108-110047-rectangle-r10-s5-o0-rep1-before.png",
+  "screen_roi": {
+    "x": 496,
+    "y": 265,
+    "width": 674,
+    "height": 355
+  },
+  "after_png": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\fill001\\captures\\fill001-20261108-110047-rectangle-r10-s5-o0-rep1-after.png",
+  "capture_path": null,
+  "diagnostic": {
+    "protocol": "FILL001_MONITOR_SAME_RUN_V1",
+    "readiness": {
+      "protocol": "FILL001_MONITOR_SAME_RUN_V1",
+      "session_id": "d0f903a8-4c0a-4b2e-93d5-505185824129",
+      "session_file": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\game_monitor_bridge\\d0f903a8-4c0a-4b2e-93d5-505185824129\\session.json",
+      "monitor_version": "0.2.4",
+      "renderer_geometry_sha256": "a805493a7eaa26132eb8ef8bd052f100eeb2d8db4c6f6dc91196d9b0661c0b2b",
+      "bridge_heartbeat_at_utc": "2026-11-08T08:02:00.945000+00:00",
+      "minimum_remaining_points_required": 1600,
+      "observed_remaining_points": 5999,
+      "board_client_mapping_method": "validated_axis_aligned_rect",
+      "screen_projection_status": "REQUIRES_INDEPENDENT_POST_RUN_FIT"
+    },
+    "before_full_screen": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\fill001\\captures\\fill001-20261108-110047-rectangle-r10-s5-o0-rep1-before-full-screen.png",
+    "before_captured_at_utc": "2026-11-08T08:02:02.266914+00:00",
+    "after_full_screen": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\fill001\\captures\\fill001-20261108-110047-rectangle-r10-s5-o0-rep1-after-full-screen.png",
+    "after_captured_at_utc": "2026-11-08T08:03:12.821492+00:00",
+    "audit_report": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\fill001\\captures\\fill001-20261108-110047-rectangle-r10-s5-o0-rep1-FILL001_MONITOR_SAME_RUN_V1.json",
+    "raw_e4_status": "PASS_E4_RAW_CAPTURE"
+  },
+  "finished_at_utc": "2026-11-08T08:03:11.412468+00:00",
+  "executor_status": "completed",
+  "after_png_captured_at_utc": "2026-11-08T08:03:12.827522+00:00"
+}
