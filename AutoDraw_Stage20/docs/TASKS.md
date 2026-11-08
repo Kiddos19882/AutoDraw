@@ -77,3 +77,10 @@
 - [ ] E5: привязать к двум FILL001_SMOOTH_AB_V1 run независимо верифицированные экранные BoardPane corners и fingerprint, затем перепроецировать оба сохранённых PNG; raw логические и client coordinates без подтверждённого desktop mapping не принимаются. Внести сравнение V1/V2 и native Egret footprint в отдельный evidence отчёт без изменения quality thresholds.
 
 **Область:** только исследовательская диагностика; production executor/planner, frozen mask, предыдущие PNG и оригинальные результаты остаются неизменными. Новые live-рисования не нужны для первого V2 replay.
+
+### FILL-001 Screen Mask V2 — результаты проверки 2026-11-08
+
+- [x] **E2/E3 focused replay:** [CI 42504588736](https://github.com/Kiddos19882/AutoDraw/actions/runs/42504588736) **SUCCESS** для SHA `480cb3e87616846d9fa76276d853cda89ef640e6`, 14 tests + 6 subtests. [Численный JSON-артефакт 13627275540](https://github.com/Kiddos19882/AutoDraw/actions/runs/42504588736/artifacts/13627275540). Исходные E4 PNG/Monitor не менялись.
+- [x] Same-run source binding: подтверждены исходный SHA (при строго восстановленных CRLF после Git checkout), пара E4/run ID, неизменные BoardPane client corners и согласованный client→screen offset по `MOUSE_MOVE_SAMPLE`.
+- [x] Числовой V2: Smooth ON `coverage=98.796065%`, `leakage=1493`; Smooth OFF `coverage=99.359230%`, `leakage=1474`. В обоих `V2 diagnostic FAIL`. Исходный V1 остаётся 840/849 и `FAIL/FAIL`.
+- [ ] **Следующее E5:** сравнить верхние/нижние и боковые пиксели с native Egret WebGL footprint для обоих конкретных run. V2 увеличение утечки не доказывает ухудшения рисунка или правоту V1; запрещено подбирать offset/пороги по результату.
