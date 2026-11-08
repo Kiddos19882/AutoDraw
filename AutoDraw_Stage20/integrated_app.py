@@ -880,6 +880,93 @@ class AutoDrawUnifiedApp:
             "После завершения требуется проверка результата и очистки."
         )
 
+    def _load_v3_boardpane_preflight_plan(
+        self, task: dict[str, Any], plan_path: Path,
+    ) -> None:
+        """Opt-in V3: load executor ONLY after fresh passive BoardPane mapping."""
+        import time
+        import pyautogui
+        from datetime import datetime, timezone
+        from fill001_boardpane_preflight import boardpane_preflight_transform
+        from fill001_smooth_ab_v3 import COORDINATE_PREFLIGHT
+        from fill001_monitor_diagnostic import inspect_diagnostic_preflight
+        from chalk_fill_runtime_binding import attach_fill001_experiment_context
+
+        source = json.loads(Path(plan_path).read_text(encoding="utf-8"))
+        generation = source.get("generation")
+        if (not isinstance(generation, dict)
+                or source.get("coordinate_system") != "logical_board_pixels"
+                or generation.get("chalk_fill001_task") != task
+                or generation.get("screen_mapping_policy") != COORDINATE_PREFLIGHT
+                or task.get("coordinate_preflight_protocol") != COORDINATE_PREFLIGHT):
+            raise ValueError("V3 source plan is not bound to this exact task and preflight method.")
+        expected_roi = generation.get("screen_mapping_expected_roi")
+        area = getattr(self.executor, "area", None)
+        if area is None:
+            raise ValueError("V3 executor has no calibrated ROI.")
+        current_roi = {"x": int(area.x), "y": int(area.y),
+                       "width": int(area.width), "height": int(area.height)}
+        if current_roi != expected_roi:
+            raise ValueError("V3 ROI has changed since before PNG. Recalibration required.")
+        fill_tab = getattr(self, "fill001_tab", None)
+        readiness = getattr(fill_tab, "diagnostic_readiness", None)
+        if not isinstance(readiness, dict):
+            raise ValueError("Missing V3 before-PNG Monitor readiness.")
+        bridge_root = self.data_paths["results"] / "brush_behavior_tests" / "game_monitor_bridge"
+        # Use the existing FILL diagnostic freshness/snapshot/single-session gate.
+        fresh = inspect_diagnostic_preflight(bridge_root, task)
+        if (fresh["session_id"] != readiness.get("session_id")
+                or fresh["renderer_geometry_sha256"] !=
+                   readiness.get("renderer_geometry_sha256")):
+            raise ValueError("V3 Monitor session/renderer geometry changed after before PNG.")
+        # A no-button hover probes REAL desktop/browser coordinates while no
+        # executor stroke is active. No click, paint or mouse-down is generated.
+        self.root.iconify()
+        self.root.update_idletasks()
+        self.root.update()
+        for fx, fy in ((0.34, 0.40), (0.50, 0.52), (0.66, 0.64)):
+            px = current_roi["x"] + int(current_roi["width"] * fx)
+            py = current_roi["y"] + int(current_roi["height"] * fy)
+            pyautogui.moveTo(px, py, duration=0.34)
+            time.sleep(0.27)
+        # The authenticated Bridge writes each passive witness atomically.
+        time.sleep(0.25)
+        checked = inspect_diagnostic_preflight(bridge_root, task)
+        if (checked["session_id"] != fresh["session_id"]
+                or checked["renderer_geometry_sha256"] !=
+                   fresh["renderer_geometry_sha256"]):
+            raise ValueError("V3 Monitor geometry changed during passive desktop probe.")
+        session = json.loads(Path(checked["session_file"]).read_text(encoding="utf-8"))
+        recorded = session.get("passive_preflight_samples")
+        if not isinstance(recorded, list) or len(recorded) < 3:
+            raise ValueError("V3: no three valid passive BoardPane mouse samples.")
+        mapped, mapping = boardpane_preflight_transform(
+            source, current_roi, session, recorded[-3:],
+            expected_session_id=checked["session_id"],
+            now_utc=datetime.now(timezone.utc),
+        )
+        # Save the run-specific mapping in the source plan evidence before
+        # writing a new Stage6 document. Never change frozen logical strokes.
+        source["generation"]["screen_transform"] = mapping
+        Path(plan_path).write_text(
+            json.dumps(source, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
+        runtime_path = self.data_paths["runtime"] / "current_brush_behavior_test.json"
+        path = write_validated_execution_plan(mapped, runtime_path, save_plan, DrawingPlan)
+        persisted = DrawingPlan.load(path).to_dict()
+        bound = attach_fill001_experiment_context(persisted, task)
+        temp = path.with_name(f".{path.name}.{uuid.uuid4().hex}.tmp")
+        temp.write_text(
+            json.dumps(bound, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
+        temp.replace(path)
+        self.executor.load_plan_from_path(path)
+        # This is not a promise of game quality, only the input geometry gate.
+        self.status_var.set(
+            "V3 current BoardPane geometry verified from fresh passive Bridge samples; "
+            "Stage6 plan loaded. No brush diameter/target change."
+        )
+
     def _start_fill001_executor(
         self, requested_brush: int, task: dict[str, Any], plan_path: Path
     ) -> bool:
@@ -891,6 +978,21 @@ class AutoDrawUnifiedApp:
                 parent=self.root,
             )
             return False
+        if task.get("experiment_protocol") == "FILL001_SMOOTH_AB_V3":
+            try:
+                self._load_v3_boardpane_preflight_plan(task, plan_path)
+            except Exception as exc:
+                try:
+                    self.root.deiconify()
+                    self.root.lift()
+                except tk.TclError:
+                    pass
+                messagebox.showerror(
+                    "V3 BoardPane preflight BLOCKED",
+                    f"Game input was NOT started: {exc}",
+                    parent=self.root,
+                )
+                return False
         active_path = getattr(self.executor, "plan_path", None)
         if active_path is None or Path(active_path).resolve() != Path(self.data_paths["runtime"] / "current_brush_behavior_test.json").resolve():
             messagebox.showerror("Нет FILL-001 плана", "В Stage 6 не загружен ожидаемый runtime plan.", parent=self.root)
