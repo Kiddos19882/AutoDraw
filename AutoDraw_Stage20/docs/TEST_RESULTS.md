@@ -2,6 +2,9 @@
 
 ## FILL-001 V3 Smooth OFF — live E4 2026-11-09
 
+**Пространственный офлайн-аудит V3 OFF:** `FILL001_V3_OFF_SPATIAL_RESIDUAL_V1`, code `3eb92e79dbc843c2ff6570965e7524c47fd54548`, [CI 42545897296](https://github.com/Kiddos19882/AutoDraw/actions/runs/42545897296) SUCCESS (47 tests + 6 subtests); [artifact 13643392258](https://github.com/Kiddos19882/AutoDraw/actions/runs/42545897296/artifacts/13643392258) — report.json + V3 overlay. Исходные immutable captures/quality не менялись. Replay подтвердил `coverage=99.552195%`, `leakage=18`, `missing=427`, regions `above=0, below=0, left=10, right=8, other=0`; максимальная ошибка ROI→Egret accepted-point roundtrip **2.000 logical px**. Статус E2/E3 diagnostic PASS, FILL quality FAIL, native renderer E5 NOT_RUN. Не считать 2px ошибкой screen mapping без независимой причинной проверки; отчёт содержит пространственные распределения пропусков и координаты leak.
+
+
 Baseline [4efa33c655c1e35a36114df316da77cf54f31300](https://github.com/Kiddos19882/AutoDraw/commit/4efa33c655c1e35a36114df316da77cf54f31300), task `fill001-20261109-040615-rectangle-r10-s5-o0-v3-smooth-off`, run `3b4243e9-509d-4d5b-9698-04bd657a8888`, session `a3cf20c9-9e1b-4a76-a120-2dcfa2bccad9`. E4 raw status `PASS_E4_RAW_CAPTURE`; executor completed 27/27; observed Smooth OFF 27/27, radius 10, P1 sampling step 4/delay 5, row step 5; before pointCount=1, after=1462, exact CHALK=1461; 1461 accepted/positive samples, 2809 mouse samples, 1492 frames, bridge failures=0, sequence gaps=0. Пустая доска обычно начинает с pointCount=1 по подтверждению оператора; точный CHALK — только delta.
 
 | Метрика | V1 original audit | V2 run-bound diagnostic |
