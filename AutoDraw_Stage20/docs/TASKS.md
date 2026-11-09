@@ -1,5 +1,13 @@
 # AutoDraw — действующие задачи
 
+## P1 — FILL-001 native spatial residual: следующий узкий эксперимент
+
+- [x] `FILL001_NATIVE_CONTOUR_SPATIAL_AUDIT_V1`: frozen rectangle, native V2+V3, alpha1/128/254; verified manifest/PDF provenance? Нет, проверяются **PNG SHA, manifest SHA, frozen mask SHA и прежний alpha audit**. Read-only и fail-closed при изменённых файлах, новой форме или попытке overwrite. [CI 42573526457](https://github.com/Kiddos19882/AutoDraw/actions/runs/42573526457), [source JSON/PNG](https://github.com/Kiddos19882/AutoDraw/actions/runs/42573526457/artifacts/13653904396).
+- [x] При alpha≥128 baseline E: missing4717 (bottom2457/right1738/left517/interior5), leak54 (left44,right10). G_trim_3: missing6655, leak0; нижний невосстановленный участок всё ещё bottom2457. V3 H0: missing4394, leak74, bottom2457. Это **offline/native**, не игровой PNG gate.
+- [ ] **Следующий невыполненный шаг:** ограниченно испытать закрытие нижних 3 backing-строк отдельно от уже исправленных боковых концов, используя подтверждённый native brush footprint; предварительно измерить необходимые мелкие размеры кисти. Запретить исполнение до независимого native raster PASS; не восстанавливать дефект ценой leakage.
+- [ ] Затем отдельно повторить freeze-geometry screening на wide/narrow masks, проверить Stage/screen E5 и только после решения одиночный E4; production/45-cell batch BLOCKED, exact CHALK новой стратегии NOT_RUN.
+
+
 ## P1 — FILL-001 этап A: native Egret footprint и локальная калибровка
 
 - [x] Проверен remote baseline `389f2a23`, последние 20 коммитов, native/full/Markdown CI, текущие ограничения FILL-001.

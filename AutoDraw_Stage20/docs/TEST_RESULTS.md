@@ -1,5 +1,19 @@
 # AutoDraw — реестр проверенных результатов
 
+## FILL-001 spatial native residual V1 — независимые зоны дефекта (2026-11-09)
+
+[Native CI SUCCESS 42573526457](https://github.com/Kiddos19882/AutoDraw/actions/runs/42573526457), [artifact 13653904396](https://github.com/Kiddos19882/AutoDraw/actions/runs/42573526457/artifacts/13653904396); code SHA `b31fbe2f239d84b0bda84c77fc3e350d0cab7ba0`. Frozen rectangle SHA `ac1c6660e5986cdf534328c6dbcd5020f631168b1473c24b29e7609eb827998b`. Repeated real `BoardPane`/Egret WebGL native capture, no new game runtime. Independent `FILL001_NATIVE_CONTOUR_SPATIAL_AUDIT_V1`: native alpha≥128, 1380×720 nearest-3× target (401877 target pixels), top/bottom=first/last 3 target backing rows, left/right=18 px band per intermediate target row, interior=remaining. Missing and leakage partitions are disjoint and sum to previous alpha audits exactly.
+
+| Native variant | Missing total | Top | Bottom | Left | Right | Interior | Leakage total | Leak left/right |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| V2 E contour-first baseline | 4717 | 0 | 2457 | 517 | 1738 | 5 | 54 | 44 / 10 |
+| V2 G trim3 | 6655 | 25 | 2457 | 1441 | 2674 | 58 | 0 | 0 / 0 |
+| V3 H mixed trim0 | 4394 | 0 | 2457 | 362 | 1572 | 3 | 74 | 61 / 13 |
+| V3 H mixed trim2 | 4924 | 9 | 2457 | 604 | 1832 | 22 | 30 | 26 / 4 |
+
+Three fully missing bottom backing rows y570–572 each contain 819 frozen-target pixels. At alpha≥1 the V2 baseline E has 4311 missing: 2457 bottom, 325 left, 1526 right, 3 interior; leak88 left72/right16. Source PNG and prior alpha-report SHA confirmed; connected-component bounding boxes and full nonzero per-row residuals are in versioned JSON. These are **not** screen RGB quality results or real exact CHALK; no brush correction has been performed. Quality remains FAIL, candidate live E4 NOT_RUN.
+
+
 ## FILL-001 native brush footprint A — empirical Egret evidence (2026-11-09)
 
 Source commit `8dae4b910db690dbc3a6231865e4d24ffa07238c`, [CI run 42571729011](https://github.com/Kiddos19882/AutoDraw/actions/runs/42571729011), [source 10 native PNG + manifest, SHA/provenance, independent analysis report](https://github.com/Kiddos19882/AutoDraw/actions/runs/42571729011/artifacts/13653019564). Actual Egret 5.4.1 BoardPane/WebGLRenderer, Firefox ANGLE (Microsoft Basic Render Driver), local canvas backing 1380×720 (3× 460×240); offline synthetic normal horizontal/vertical/diagonal/corner and smooth horizontal, width5/10. Four frozen diagnostic alpha thresholds: 1/64/128/254, **not game screen RGB threshold8**.

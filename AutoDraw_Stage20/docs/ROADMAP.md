@@ -1,5 +1,10 @@
 # AutoDraw — дорожная карта будущих работ
 
+## После FILL001 spatial V1 — локальная нижняя граница и боковые концы
+
+Построчная разметка native-пропусков выявила отдельный нижний блок 2457 backing pixels (3×819) и боковые потери; при alpha128 исправление X endpoint trim3 устраняет утечку, но нижний блок не меняет и ухудшает coverage. Поэтому следующий **ограниченный offline** gate — проверить узкую граничную коррекцию снизу на реальном native brush footprint и сохранить боковой leak=0, не добавляя глобальных проходов. Затем повторить на frozen wide/narrow, изучить run-bound projection и лишь после E5 решать E4. [Evidence](https://github.com/Kiddos19882/AutoDraw/actions/runs/42573526457/artifacts/13653904396). Производство и пороги не менять.
+
+
 ## FILL-001: после native brush footprint A
 
 Для width5/10 normal + smooth измерены реальными Egret WebGL PNG (10 probes) поперечная толщина, торцы, углы и диагонали; обнаружено отсутствие последних 300 backing px в smooth относительно normal на фиксированном двухточечном отрезке (действует `drawLast=false`). [Native evidence](https://github.com/Kiddos19882/AutoDraw/actions/runs/42571729011/artifacts/13653019564). Дальше — **не** расширять бесконтрольно глобальный trim/brush sweep, а применить эмпирический footprint к per-row/per-side residual, затем bounded adaptive candidate на rectangle и frozen holdouts wide/narrow, Stage/screen E5 и только после принятого решения одиночный game E4. Не менять существующий executor или acceptance thresholds.

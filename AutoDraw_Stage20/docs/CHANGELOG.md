@@ -1,5 +1,10 @@
 # AutoDraw — значимые изменения
 
+## 2026-11-09 — FILL001 native spatial residual map V1
+
+В existing FILL001 offline geometry analyzer, regression tests и CI добавлена версия `FILL001_NATIVE_CONTOUR_SPATIAL_AUDIT_V1`: SHA-verified read-only per-row/per-side decomposition исходных V2/V3 native PNG на top/bottom/left/right/interior, leakage zones и connected components при alpha 1/128/254, с независимой сверкой ранее сохранённых метрик. Не меняет production planner/executor/CHALK defaults/target thresholds и не генерирует исполняемые штрихи. [Native evidence](https://github.com/Kiddos19882/AutoDraw/actions/runs/42573526457/artifacts/13653904396).
+
+
 ## 2026-11-09 — FILL-001 isolated native Egret footprint A
 
 В существующие browser renderer/Firefox/native analysis/test/CI средства добавлена версия `FILL001_NATIVE_FOOTPRINT_A_V1` с 10 real Egret brush probes (normal/smooth, width5/10, straight/diagonal/corner). Сохраняются native PNG, manifest/provenance SHA и независимые измерения thickness/endpoint extents/alpha thresholds. Результат offline diagnostic only; не менялись production planner, executor, CHALK estimator, frozen masks и quality gates. [Versioned artifact](https://github.com/Kiddos19882/AutoDraw/actions/runs/42571729011/artifacts/13653019564).
