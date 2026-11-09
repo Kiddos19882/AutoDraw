@@ -1,5 +1,10 @@
 # AutoDraw — значимые изменения
 
+## 2026-11-09 — исследовательские варианты FILL-001 contour-first
+
+В существующем `chalk_fill_strategy_comparison.py` добавлены **два изолированных** режима сравнения: `--contour-first` (V1: порядок/глубокий inset) и `--contour-edge-trims` (V2: сначала замкнутый контур, горизонтальные линии прежних рядов с X-trim 1..4). Каждый режим создаёт отдельные versioned JSON и diagnostic PNG, отказывается перезаписывать результаты и запрещает трактовать sampling proxy как exact CHALK. Добавлены тесты и артефакты существующего GitHub Actions workflow [42547807009](https://github.com/Kiddos19882/AutoDraw/actions/runs/42547807009). Legacy A–D, frozen mask, production Stage6/executor/CHALK estimator и quality thresholds не изменены. V1 глубокие отступы FAIL на всех трёх масках, V2 проходит только rectangle/wide; перенос в production запрещён до independent validation.
+
+
 Записывать только изменения интерфейсов, форматов, возможностей и значимые изменения сопровождения. Ход проверки каждой задачи — [WORK_LOG](WORK_LOG.md). Полная прежняя редакция без изменений: [CHANGELOG_HISTORY_THROUGH_2026-11-08.md](CHANGELOG_HISTORY_THROUGH_2026-11-08.md).
 
 ## 2026-11-08 — FILL-001 V3: устранение ложного отказа после настройки кисти
