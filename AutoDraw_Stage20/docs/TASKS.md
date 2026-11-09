@@ -1,5 +1,16 @@
 # AutoDraw — действующие задачи
 
+## P1 — FILL-001 V3: разбор нового E4 Smooth OFF (активно)
+
+- [x] Новый одиночный V3 запуск OFF на commit `4efa33c`: 27/27 strokes, Smooth OFF 27/27, exact CHALK=1461, run-bound E4 PASS; неизменные board mapping и runtime binding PASS. Исходное `pointCount=1` — нормальный baseline пустой доски со слов оператора; не трактовать как загрязнение.
+- [x] Сохранены исходные raw/PNG/plan и отрицательные PNG quality результаты: V1 coverage 98.3317%, leakage 521; V2 diagnostic coverage 99.5522%, leakage 18 (FAIL).
+- [x] [AutoDraw CI 42544453230](https://github.com/Kiddos19882/AutoDraw/actions/runs/42544453230) SUCCESS на `4efa33c`; это E3, не PNG acceptance.
+- [ ] **Следующий шаг — E5 offline residual audit на существующих V3 captures**, без игры: классифицировать 18 V2 leaking pixels и 427 missing target pixels (верх/низ/лево/право/внутри), проверить пространственную привязку маски, фактически принятые endpoints и native Egret Stage raster по run-bound данным; сохранить отдельную версию отчёта/overlay без перезаписи данных.
+- [ ] Только после определения причины решить, нужен ли новый корректирующий эксперимент или чистая парная Smooth ON серия на сопоставимой геометрии. Не менять thresholds, production planner/executor и не запускать batch.
+
+См. [commit 4efa33c](https://github.com/Kiddos19882/AutoDraw/commit/4efa33c655c1e35a36114df316da77cf54f31300) и [PROJECT_STATUS](PROJECT_STATUS.md#fill-001--новый-v3-smooth-off-e4-2026-11-09-commit-4efa33c).
+
+
 **Дата:** 2026-11-08 · **Ветка:** `feature/image-geometry-optimization`. Это список **открытых** работ. Полный старый журнал задач с закрытыми пунктами, историческими `PENDING` и ссылками: [TASKS_HISTORY_THROUGH_2026-11-08.md](TASKS_HISTORY_THROUGH_2026-11-08.md).
 
 **DOC-001…DOC-004 закрыты:** [CI 42421451709](https://github.com/Kiddos19882/AutoDraw/actions/runs/42421451709) SUCCESS, 99/99 индексировано, 0 broken links, 9 immutable archives, 0 duplicate decisions. Фактические действия отражены в [WORK_LOG](WORK_LOG.md); старые чек-листы остаются в [истории TASKS](TASKS_HISTORY_THROUGH_2026-11-08.md). Ниже перечислены только открытые технические задачи.
