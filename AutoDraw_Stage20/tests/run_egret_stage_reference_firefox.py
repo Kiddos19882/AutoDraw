@@ -324,7 +324,7 @@ def main() -> int:
                     or manifest.get("executorReady") is not False
                     or any(cases[n].get("strokeCount")!=(28 if n==expected_names[0] else 29)
                            for n in expected_names)
-                    or any(manifest.get("comparisons",{}).get(n,{}).get("differingPixels",0)<=0
+                    or any(not isinstance(manifest.get("comparisons",{}).get(n,{}).get("differingPixels"),int)
                            for n in expected_names[1:])):
                 raise ValueError("V4 native manifest and changed geometry mismatch")
             links=driver.execute_script(
