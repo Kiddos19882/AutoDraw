@@ -11,6 +11,7 @@ from chalk_fill_experiment import build_fill_target_mask
 from chalk_fill_matrix import FillMatrixError
 from fill001_screen_mask_v2 import (
     SCHEMA, audit_screen_mask_v2, project_screen_mask_v2,
+    evaluate_fill001_chalk_first_quality, FILL001_CHALK_FIRST_POLICY_V2,
 )
 
 
@@ -96,6 +97,88 @@ class ScreenMaskV2Tests(unittest.TestCase):
             self.assertEqual(report["changed_pixels"], 120 * 300)
             self.assertIn("png_audit_status", report["v1_original"])
             self.assertEqual(report["geometry_evidence_sha256"], "a" * 64)
+
+
+    def test_chalk_first_perimeter_quality_accepts_halo_rejects_remote_spill(self):
+        target = np.zeros((60,90), dtype=np.bool_)
+        target[10:50,20:70] = True
+        painted = target.copy()
+        painted[30,70:73] = True  # 1, 2, 3 logical px outside right edge
+        result = evaluate_fill001_chalk_first_quality(
+            target, painted, scale_x=1, scale_y=1,
+        )
+        self.assertEqual(result["policy_id"], FILL001_CHALK_FIRST_POLICY_V2)
+        self.assertEqual(result["quality_gate"], "PASS")
+        self.assertEqual(result["leakage_pixels"], 3)
+        self.assertEqual(result["leakage_pixels_beyond_allowed_halo"], 0)
+        self.assertEqual(result["max_perimeter_overshoot_logical_px"], 3.0)
+        self.assertIsNone(result["exact_chalk"])
+        self.assertEqual(result["chalk_evidence_status"], "NOT_EVALUATED")
+        self.assertIn("min_run_bound_exact_chalk", result["chalk_selection_priority"])
+        painted[30,73] = True
+        result = evaluate_fill001_chalk_first_quality(
+            target, painted, scale_x=1, scale_y=1,
+        )
+        self.assertEqual(result["quality_gate"], "FAIL")
+        self.assertEqual(result["leakage_pixels_beyond_allowed_halo"], 1)
+
+    def test_chalk_first_perimeter_checks_true_logical_scale_and_coverage(self):
+        target = np.zeros((60,90), dtype=np.bool_)
+        target[10:50,20:70] = True
+        screen = np.repeat(np.repeat(target,3,axis=0),3,axis=1)
+        painted = screen.copy()
+        painted[90,210:220] = True  # final pixel is >3 logical px outside
+        result = evaluate_fill001_chalk_first_quality(
+            screen, painted, scale_x=3, scale_y=3,
+        )
+        self.assertEqual(result["quality_gate"], "FAIL")
+        painted[90,219] = False
+        result = evaluate_fill001_chalk_first_quality(
+            screen, painted, scale_x=3, scale_y=3,
+        )
+        self.assertEqual(result["quality_gate"], "PASS")
+        painted[40:48,60:100] = False
+        result = evaluate_fill001_chalk_first_quality(
+            screen, painted, scale_x=3, scale_y=3,
+        )
+        self.assertEqual(result["quality_gate"], "FAIL")
+        self.assertLess(result["coverage_fraction"], 0.99)
+        for sx,sy in ((0,1),(1,1.1),(float("nan"),1)):
+            with self.subTest(sx=sx,sy=sy),self.assertRaises(FillMatrixError):
+                evaluate_fill001_chalk_first_quality(
+                    screen,screen,scale_x=sx,scale_y=sy,
+                )
+        with self.assertRaises(FillMatrixError):
+            evaluate_fill001_chalk_first_quality(
+                screen,screen.astype(np.uint8),scale_x=3,scale_y=3,
+            )
+
+    def test_chalk_first_policy_explicit_and_legacy_gate_unchanged(self):
+        mask = self.project()
+        before = np.full((241,461,3), 255, dtype=np.uint8)
+        after = before.copy()
+        after[mask] = (0,0,0)
+        after[120,391:394] = (0,0,0)
+        with tempfile.TemporaryDirectory() as directory:
+            p=Path(directory)
+            b,a=p/"before.png",p/"after.png"
+            Image.fromarray(before).save(b)
+            Image.fromarray(after).save(a)
+            kwargs=dict(run_id="run-test",screen_roi=self.roi,geometry=self.geometry)
+            legacy=audit_screen_mask_v2("rectangle",b,a,**kwargs)
+            active=audit_screen_mask_v2(
+                "rectangle",b,a,quality_policy=FILL001_CHALK_FIRST_POLICY_V2,**kwargs,
+            )
+            self.assertEqual(legacy["v2_diagnostic_gate"], "FAIL")
+            self.assertEqual(active["v2_diagnostic_gate"], "FAIL")
+            self.assertEqual(legacy["v1_original"],active["v1_original"])
+            self.assertNotIn("active_quality_gate",legacy)
+            self.assertEqual(active["active_quality_gate"],"PASS")
+            self.assertGreater(active["active_quality_metrics"]["leakage_pixels"],0)
+            self.assertEqual(active["active_quality_policy_id"],FILL001_CHALK_FIRST_POLICY_V2)
+            self.assertFalse(active["acceptance_override"])
+            with self.assertRaises(FillMatrixError):
+                audit_screen_mask_v2("rectangle",b,a,quality_policy="made_up",**kwargs)
 
 
 if __name__ == "__main__":
