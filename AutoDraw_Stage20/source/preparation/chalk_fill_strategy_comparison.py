@@ -711,12 +711,17 @@ def analyze_contour_native_pngs(render_dir: Path, report_path: Path) -> dict[str
     frozen_sha = fill_target_mask_sha256("rectangle", target)
     cases = native_manifest.get("cases")
     is_v2 = native_manifest.get("schema") == "FILL001_NATIVE_CONTOUR_EDGE_TRIMS_V2"
-    names = ("B_sparse_only", "C_contour_last", "E_contour_first")
+    is_v3 = native_manifest.get("schema") == "FILL001_NATIVE_MIXED_CONTOUR_V3"
+    names = (("E_contour_10",) + tuple(f"H_mixed_trim_{i}" for i in range(5))
+             if is_v3 else ("B_sparse_only", "C_contour_last", "E_contour_first"))
+    if is_v3:
+        if native_manifest.get("testedTrimPx") != [0,1,2,3,4] or native_manifest.get("mixedBrushWidths") != [5,10]:
+            raise ValueError("V3 mixed brush geometry parameter identity mismatch")
     if is_v2:
         names += tuple(f"G_trim_{i}" for i in range(1,5))
         if native_manifest.get("testedTrimPx") != [1, 2, 3, 4]:
             raise ValueError("V2 trim parameter identity mismatch")
-    if (native_manifest.get("schema") not in ("FILL001_NATIVE_CONTOUR_FIRST_V1", "FILL001_NATIVE_CONTOUR_EDGE_TRIMS_V2")
+    if (native_manifest.get("schema") not in ("FILL001_NATIVE_CONTOUR_FIRST_V1", "FILL001_NATIVE_CONTOUR_EDGE_TRIMS_V2", "FILL001_NATIVE_MIXED_CONTOUR_V3")
             or native_manifest.get("status") != "OFFLINE_NATIVE_EGRET_RENDERED"
             or native_manifest.get("sourceMaskSha256") != frozen_sha
             or set(cases or {}) != set(names)
@@ -737,14 +742,23 @@ def analyze_contour_native_pngs(render_dir: Path, report_path: Path) -> dict[str
             raise ValueError("Native PNG must be RGBA 1380x720")
         alpha_by_case[name] = raster[:, :, 3]
         sha_by_case[name] = hashlib.sha256(raw).hexdigest()
-    b = alpha_by_case["B_sparse_only"]
-    c = alpha_by_case["C_contour_last"]
-    e = alpha_by_case["E_contour_first"]
-    if not np.array_equal(c, e) or np.array_equal(b, e):
-        raise ValueError("Native first-vs-last parity or added contour benefit failed")
-    if (native_manifest.get("comparisons", {}).get("contourFirstVsLast", {})
-            .get("differingPixels") != 0):
-        raise ValueError("Native manifest and PNG pair disagree")
+    if not is_v3:
+        b = alpha_by_case["B_sparse_only"]
+        c = alpha_by_case["C_contour_last"]
+        e = alpha_by_case["E_contour_first"]
+        if not np.array_equal(c, e) or np.array_equal(b, e):
+            raise ValueError("Native first-vs-last parity or added contour benefit failed")
+        if (native_manifest.get("comparisons", {}).get("contourFirstVsLast", {})
+                .get("differingPixels") != 0):
+            raise ValueError("Native manifest and PNG pair disagree")
+    else:
+        e = alpha_by_case["E_contour_10"]
+        for trim in range(5):
+            if np.array_equal(e, alpha_by_case[f"H_mixed_trim_{trim}"]):
+                raise ValueError("Native V3 mixed contour variant made no change")
+            delta = native_manifest.get("comparisons", {}).get(f"contourFirstVsTrim{trim}", {})
+            if not isinstance(delta.get("differingPixels"), int) or delta["differingPixels"] <= 0:
+                raise ValueError("V3 native mix manifest PNG mismatch")
     metrics = {}
     for name in names:
         alpha = alpha_by_case[name]
@@ -775,8 +789,9 @@ def analyze_contour_native_pngs(render_dir: Path, report_path: Path) -> dict[str
             if not isinstance(delta.get("differingPixels"), int) or delta["differingPixels"] <= 0:
                 raise ValueError("V2 native trim manifest mismatch")
     report = {
-        "schema": ("FILL001_NATIVE_CONTOUR_ALPHA_AUDIT_V2"
-                   if is_v2 else "FILL001_NATIVE_CONTOUR_ALPHA_AUDIT_V1"),
+        "schema": ("FILL001_NATIVE_CONTOUR_ALPHA_AUDIT_V3" if is_v3
+                   else "FILL001_NATIVE_CONTOUR_ALPHA_AUDIT_V2" if is_v2
+                   else "FILL001_NATIVE_CONTOUR_ALPHA_AUDIT_V1"),
         "status": "OFFLINE_NATIVE_DIAGNOSTIC_ONLY",
         "source_native_manifest_sha256": hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
         "frozen_mask_sha256": frozen_sha,
@@ -785,9 +800,9 @@ def analyze_contour_native_pngs(render_dir: Path, report_path: Path) -> dict[str
         "projection": "nearest_3x_frozen_logical_mask_no_alignment",
         "alpha_cutoffs": [1, 64, 128, 254],
         "cases": metrics,
-        "tested_trim_px": [1,2,3,4] if is_v2 else None,
+        "tested_trim_px": [0,1,2,3,4] if is_v3 else [1,2,3,4] if is_v2 else None,
         "native_comparisons": native_manifest.get("comparisons", {}),
-        "order_parity_exact_rgba": True,
+        "order_parity_exact_rgba": None if is_v3 else True,
         "measured_chalk": None,
         "game_png_quality_gate": "NOT_EVALUATED",
         "native_to_live_stage_mapping": "NOT_EVALUATED",
