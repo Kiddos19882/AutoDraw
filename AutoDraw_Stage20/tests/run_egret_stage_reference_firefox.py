@@ -224,6 +224,8 @@ def main() -> int:
     )
     parser.add_argument("--engine001-journal", type=Path, default=None,
                         help="Replay exactly the nine immutable ENGINE-001 E4 runs.")
+    parser.add_argument("--fill001-contour-trim-only", action="store_true",
+                        help="Replay isolated V2 contour-first endpoint trims on native BoardPane.")
     parser.add_argument("--fill001-contour-only", action="store_true",
                         help="Run frozen synthetic contour-first multi-stroke native BoardPane probe.")
     parser.add_argument("--engine001-only", action="store_true",
@@ -271,26 +273,36 @@ def main() -> int:
                 f"runner Firefox is {actual_version!r}."
             )
         driver.set_page_load_timeout(90)
-        if args.fill001_contour_only:
+        if args.fill001_contour_only or args.fill001_contour_trim_only:
+            if args.fill001_contour_only and args.fill001_contour_trim_only:
+                parser.error("Choose only one native contour version.")
+            trim_v2 = args.fill001_contour_trim_only
             if args.engine001_journal or args.paired_renderer_experiment_root or args.engine001_only:
                 parser.error("--fill001-contour-only is incompatible with other live-reference options.")
-            fixture_path = workspace / "AutoDraw_Stage20/tests/fill001-contour-first-native-input.json"
+            fixture_path = workspace / ("AutoDraw_Stage20/tests/fill001-contour-trims-native-input.json"
+                                       if trim_v2 else "AutoDraw_Stage20/tests/fill001-contour-first-native-input.json")
             if not fixture_path.is_file():
                 raise FileNotFoundError("Native contour fixture must be generated in this checkout.")
             fixture = json.loads(fixture_path.read_text(encoding="utf-8"))
-            if (fixture.get("schema") != "FILL001_NATIVE_CONTOUR_FIRST_V1"
+            if (fixture.get("schema") != ("FILL001_NATIVE_CONTOUR_EDGE_TRIMS_V2" if trim_v2 else "FILL001_NATIVE_CONTOUR_FIRST_V1")
                     or fixture.get("status") != "OFFLINE_SYNTHETIC_INPUT_ONLY"):
                 raise ValueError("Unexpected native contour fixture.")
-            driver.get(f"{args.base_url}/AutoDraw_Stage20/tests/game_renderer_reference.html?contour=fill001")
+            driver.get(f"{args.base_url}/AutoDraw_Stage20/tests/game_renderer_reference.html?contour="
+                       f"{'fill001v2' if trim_v2 else 'fill001'}")
             def contour_completed(browser: webdriver.Firefox) -> bool:
-                status = browser.execute_script("return document.body.dataset.contourNativeStatus")
+                status = browser.execute_script("return document.body.dataset.contourTrimStatus" if trim_v2
+                                                else "return document.body.dataset.contourNativeStatus")
                 return status in ("complete", "error")
             WebDriverWait(driver, 120, poll_frequency=0.25).until(contour_completed)
-            if driver.execute_script("return document.body.dataset.contourNativeStatus") != "complete":
+            state_script = "return document.body.dataset.contourTrimStatus" if trim_v2 else "return document.body.dataset.contourNativeStatus"
+            if driver.execute_script(state_script) != "complete":
                 raise RuntimeError(driver.find_element("id", "renderer-status").text)
             manifest = json.loads(driver.find_element("id", "renderer-manifest-json").get_property("textContent"))
             expected_names = {"B_sparse_only", "C_contour_last", "E_contour_first"}
+            if trim_v2:
+                expected_names |= {f"G_trim_{i}" for i in range(1,5)}
             if (manifest.get("status") != "OFFLINE_NATIVE_EGRET_RENDERED"
+                    or manifest.get("schema") != fixture.get("schema")
                     or manifest.get("sourceMaskSha256") != fixture.get("frozen_mask_sha256")
                     or set(manifest.get("cases", {})) != expected_names
                     or any(manifest["cases"][name]["strokeCount"] != (27 if name == "B_sparse_only" else 28)
@@ -305,6 +317,11 @@ def main() -> int:
                     or not isinstance(added.get("differingPixels"), int)
                     or added["differingPixels"] <= 0):
                 raise ValueError("Native contour order parity or added geometry failed.")
+            if trim_v2:
+                for trim in (1, 2, 3, 4):
+                    delta = comparisons.get(f"contourFirstVsTrim{trim}", {})
+                    if not isinstance(delta.get("differingPixels"), int) or delta["differingPixels"] <= 0:
+                        raise ValueError(f"Native trim{trim} did not change the baseline render.")
             links = driver.execute_script(
                 "return Array.from(document.querySelectorAll('a[download]'))"
                 ".filter(a=>a.href.startsWith('data:image/png;base64,'))"
@@ -312,8 +329,8 @@ def main() -> int:
             )
             pngs = {f"fill001-native-{name}.png" for name in expected_names}
             if {Path(item["name"]).name for item in links} != pngs:
-                raise ValueError("Expected exactly three frozen native FILL001 PNGs.")
-            case_output = output_root / "fill001-contour-native-v1"
+                raise ValueError(f"Expected {len(pngs)} native FILL001 PNGs.")
+            case_output = output_root / ("fill001-contour-native-v2" if trim_v2 else "fill001-contour-native-v1")
             case_output.mkdir(parents=True, exist_ok=False)
             for item in links:
                 payload = base64.b64decode(item["href"].split(",", 1)[1], validate=True)
@@ -331,7 +348,7 @@ def main() -> int:
                     "source": "frozen synthetic contour-first, not a live Game Monitor run"
                 }, indent=2) + "\n", encoding="utf-8"
             )
-            print("FILL001 native BoardPane multi-stroke PASS; "
+            print("FILL001 native BoardPane contour " + ("V2" if trim_v2 else "V1") + " PASS; "
                   f"first-vs-last differingPixels={manifest['comparisons']['contourFirstVsLast']['differingPixels']}; "
                   "no live/game quality inference.")
             return 0
