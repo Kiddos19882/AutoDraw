@@ -317,3 +317,92 @@ def test_mixed_contour_native_v3_fixture_uses_exact_two_brush_widths(tmp_path):
     assert json.loads(output.read_text(encoding="utf-8")) == fixture
     with pytest.raises(FileExistsError):
         export_mixed_contour_native_fixture(output)
+
+
+def test_native_footprint_phase_a_contract_and_tampering(tmp_path):
+    import hashlib
+    import cv2
+    from chalk_fill_strategy_comparison import analyze_native_brush_footprints
+    source = tmp_path / "native"
+    source.mkdir()
+    coordinates = {
+        "horizontal": [(130,120),(330,120)],
+        "vertical": [(230,40),(230,200)],
+        "diagonal": [(130,60),(330,180)],
+        "corner": [(150,70),(300,70),(300,180)],
+    }
+    cases, png_hashes = [], {}
+    for width in (5,10):
+        for shape in ("horizontal","vertical","diagonal","corner","smooth_horizontal"):
+            mode = "smooth" if shape.startswith("smooth") else "normal"
+            orientation = "horizontal" if mode == "smooth" else shape
+            points = coordinates[orientation]
+            name = f"{mode}_{orientation}_w{width}"
+            png = f"fill001-footprint-{name}.png"
+            image = np.zeros((720,1380,4), dtype=np.uint8)
+            pixels = np.array(points, dtype=np.int32)*3
+            for a,b in zip(pixels[:-1],pixels[1:]):
+                cv2.line(image, tuple(a), tuple(b), (0,0,0,255),
+                         thickness=width*3)
+            assert cv2.imwrite(str(source/png), image)
+            png_hashes[png] = hashlib.sha256((source/png).read_bytes()).hexdigest()
+            cases.append({
+                "id":name, "mode":mode, "width":width,
+                "points":[{"x":x,"y":y} for x,y in points],
+                "pngName":png,
+                "acceptedSyntheticVerticesNotChalk":len(points),
+                "sceneDiagnostics":{"boardRenderMode":3},
+            })
+    manifest = {
+        "schema":"FILL001_NATIVE_FOOTPRINT_A_V1",
+        "status":"OFFLINE_NATIVE_EGRET_RENDERED",
+        "engineVersion":"5.4.1",
+        "canvasSize":{"width":1380,"height":720},
+        "logicalBoard":{"width":460,"height":240},
+        "scale":3,
+        "alphaThresholds":[1,64,128,254],
+        "measuredChalk":None,"originalGameCapture":None,
+        "executorReady":False,
+        "gameQualityGate":"NOT_EVALUATED",
+        "liveStageMapping":"NOT_EVALUATED",
+        "cases":cases,
+    }
+    (source/"manifest.json").write_text(json.dumps(manifest),encoding="utf-8")
+    provenance = {
+        "schema":"FILL001_NATIVE_FOOTPRINT_CAPTURE_A_V1",
+        "liveRunId":None,"exactChalk":None,"pngSha256":png_hashes,
+    }
+    (source/"capture-provenance.json").write_text(
+        json.dumps(provenance),encoding="utf-8")
+    out = tmp_path/"footprint-analysis.json"
+    report = analyze_native_brush_footprints(source,out)
+    assert report["status"] == "OFFLINE_NATIVE_DIAGNOSTIC_ONLY"
+    assert report["case_count"] == 10
+    assert report["measured_chalk"] is None
+    assert report["game_quality_gate"] == "NOT_EVALUATED"
+    assert report["native_to_game_screen_equivalence"] == "NOT_EVALUATED"
+    assert report["executor_ready"] is False
+    assert set(report["cases"]) == {case["id"] for case in cases}
+    for case in report["cases"].values():
+        assert set(case["thresholds"]) == {"1","64","128","254"}
+        assert case["thresholds"]["128"]["painted_backing_pixels"] > 0
+        assert len(case["png_sha256"]) == 64
+    assert (report["cases"]["normal_horizontal_w10"]["thresholds"]["128"]
+            ["midpoint_cross_section_backing_px"] > 0)
+    assert (report["cases"]["normal_vertical_w5"]["thresholds"]["128"]
+            ["midpoint_cross_section_backing_px"] > 0)
+    assert (report["cases"]["normal_corner_w10"]["thresholds"]["128"]
+            ["corner_joint_13x13_painted_pixels"] > 0)
+    assert json.loads(out.read_text(encoding="utf-8")) == report
+    with pytest.raises(FileExistsError):
+        analyze_native_brush_footprints(source,out)
+    out.unlink()
+    path=source/"fill001-footprint-normal_horizontal_w5.png"
+    path.write_bytes(path.read_bytes()+b"tamper")
+    with pytest.raises(ValueError,match="SHA-256"):
+        analyze_native_brush_footprints(source,out)
+    path.write_bytes(path.read_bytes()[:-6])
+    manifest["cases"][0]["points"][0]["x"]+=1
+    (source/"manifest.json").write_text(json.dumps(manifest),encoding="utf-8")
+    with pytest.raises(ValueError,match="coordinates"):
+        analyze_native_brush_footprints(source,out)
