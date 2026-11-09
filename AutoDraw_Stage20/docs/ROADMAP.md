@@ -1,5 +1,10 @@
 # AutoDraw — дорожная карта будущих работ
 
+## Текущий следующий шаг: FILL-001 контур первым
+
+После V3 OFF user предложил **сначала один замкнутый контур, затем редкие внутренние штрихи с перекрытием**. Existing A–D C рисовал контур последним; новая офлайн-проверка E держит ту же геометрию и подтверждает равенство OpenCV растров при смене порядка. Исследовательский V1 inset 7–9 FAIL на 3/3 frozen shapes; V2 endpoint trim 1–4 PASS только rectangle/wide, FAIL narrow. **Общего прошедшего для всех форм варианта обрезки нет**; нельзя автоматически переносить trim в production или утверждать live quality. Дальше: independent native Egret Stage replay новой геометрии, затем — только по evidence — versioned single-run live quality/CHALK, без batch и смены thresholds. [Source and output CI](https://github.com/Kiddos19882/AutoDraw/actions/runs/42547807009); действующая задача — [TASKS](TASKS.md#p1--fill-001-outline-first--interior-overlap-контролируемый-вариант).
+
+
 **Дата:** 2026-11-08 · **Текущая evidence-база:** `177165361b0340515fe3bb74f4847ab3ec579ebc` (историческая база `a2d1f0a52d47` сохранена в прежних записях) · **Ветка:** `feature/image-geometry-optimization`. Подробная прежняя редакция полностью сохранена: [ROADMAP_HISTORY_THROUGH_2026-11-08.md](ROADMAP_HISTORY_THROUGH_2026-11-08.md).
 
 Этот файл задаёт **последовательность**, а не историю. Пункты выполнения и владельцы конкретных gate — [TASKS](TASKS.md); подтверждённые факты — [PROJECT_STATUS](PROJECT_STATUS.md) и [TEST_RESULTS](TEST_RESULTS.md).
