@@ -1,5 +1,17 @@
 # AutoDraw — действующие задачи
 
+## P1 — FILL-001: outline-first / interior-overlap (контролируемый вариант)
+
+- [x] Прочитан существующий A–D `C_sparse_plus_contour`: контур в конце, radius10/rowstep5. Отдельно сохранён frozen baseline V3 OFF с CHALK1461 и quality FAIL.
+- [x] В existing `chalk_fill_strategy_comparison.py` добавлены версии `FILL001_CONTOUR_FIRST_OVERLAP_V1` и `FILL001_CONTOUR_EDGE_TRIMS_V2`; выполнены три frozen shapes с независимыми отчётами и PNG. Старый A–D остаётся неизменным, executor-ready=false, measured CHALK=null.
+- [x] V1 контроль E (контур первым без изменения штрихов) = C по растеру; покрытие 99.5163% rectangle / 99.5926% wide / 99.3806% narrow, leakage=0 в OpenCV. Глубокие inner insets 7–9 дают ~98.0% на всех формах — FAIL.
+- [x] V2 X-trim 1..4: rectangle/wide остаются ≥99%, leakage=0; narrow падает ниже 99% при любом trim — FAIL. Отрицательные данные сохранены в evidence, не подгонять порог.
+- [ ] Проверить независимый **native Egret/WebGL renderer** для contour-first (особенно боковые окончания и закругления) с заранее закреплённым screen-space gate и без live до завершения offline проверки; отдельно учесть стоимость дополнительного контура и ограничения темпорального рендера.
+- [ ] Только после E5/принятого плана решить, необходим ли один новый E4 run с новым series/task/version. Исходную пару V3 и frozen masks не перезаписывать. Production planner/defaults и 45-cell matrix блокированы.
+
+[Code/CI c0248162](https://github.com/Kiddos19882/AutoDraw/actions/runs/42547807009); [V1](https://github.com/Kiddos19882/AutoDraw/actions/runs/42547807009/artifacts/13644670082), [V2](https://github.com/Kiddos19882/AutoDraw/actions/runs/42547807009/artifacts/13643764696). Эксперименты только E1–E3 offline; CHALK по этим кандидатам NOT_RUN.
+
+
 ## P1 — FILL-001 V3: разбор нового E4 Smooth OFF (активно)
 
 **Новая E2/E3 проверка V3 OFF (2026-11-09):** [CI 42545897296](https://github.com/Kiddos19882/AutoDraw/actions/runs/42545897296) SUCCESS на `3eb92e79`, 47 тестов + 6 subtests; `FILL001_V3_OFF_SPATIAL_RESIDUAL_V1` вывел 18 leaks (10 left/8 right/0 above/0 below), 427 missing, max input roundtrip error 2 logical px. [Отчёт + overlay](https://github.com/Kiddos19882/AutoDraw/actions/runs/42545897296/artifacts/13643392258). Прежний пункт о выполнении spatial audit теперь частично закрыт: **локализация leaks PASS, анализ причинности / native replay OPEN**. Следующий шаг — интерпретировать `missing_by_roi_row` / `missing_by_roi_column` и overlay, сопоставить со stroke endpoints и native renderer, не меняя live план по одному E3 результату.
