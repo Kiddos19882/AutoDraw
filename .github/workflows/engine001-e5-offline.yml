@@ -145,6 +145,31 @@ jobs:
         run: |
           python AutoDraw_Stage20/source/preparation/chalk_fill_strategy_comparison.py --native-render-dir "$env:RUNNER_TEMP\fill001-native\fill001-contour-native-v2" --output-dir "$env:RUNNER_TEMP\fill001-native\fill001-contour-native-v2\native-alpha-audit-v2.json"
           if ($LASTEXITCODE -ne 0) { throw "Native V2 alpha diagnostic failed." }
+      - name: Export mixed-width V3 contour/native frozen fixture
+        shell: pwsh
+        run: |
+          Push-Location AutoDraw_Stage20/source/preparation
+          try {
+            python chalk_fill_strategy_comparison.py --native-mixed-fixture --output-dir "../../tests/fill001-contour-mixed-native-input.json"
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          } finally { Pop-Location }
+      - name: Render mixed-width V3 native BoardPane candidates
+        shell: pwsh
+        run: |
+          $native = Join-Path $env:RUNNER_TEMP "fill001-native"
+          $server = Start-Process -FilePath python -ArgumentList @("-m", "http.server", "8765", "--bind", "127.0.0.1") -PassThru -WindowStyle Hidden
+          try {
+            Start-Sleep -Seconds 3
+            python AutoDraw_Stage20/tests/run_egret_stage_reference_firefox.py --base-url "http://127.0.0.1:8765" --workspace "$env:GITHUB_WORKSPACE" --fill001-contour-mixed-only --output-dir $native
+            if ($LASTEXITCODE -ne 0) { throw "Mixed-width V3 native replay failed." }
+          } finally {
+            if ($server -and -not $server.HasExited) { Stop-Process -Id $server.Id -Force }
+          }
+      - name: Audit V3 mixed-width native local alpha footprint
+        shell: pwsh
+        run: |
+          python AutoDraw_Stage20/source/preparation/chalk_fill_strategy_comparison.py --native-render-dir "$env:RUNNER_TEMP\fill001-native\fill001-contour-native-v3" --output-dir "$env:RUNNER_TEMP\fill001-native\fill001-contour-native-v3\native-alpha-audit-v3.json"
+          if ($LASTEXITCODE -ne 0) { throw "Native V3 mixed alpha audit failed." }
       - name: Upload native FILL-001 comparison (no gameplay)
         if: always()
         uses: actions/upload-artifact@v4
