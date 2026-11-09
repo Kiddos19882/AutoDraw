@@ -1275,6 +1275,10 @@ def analyze_native_bottom_repair(
     manifest=json.loads(manifest_raw)
     provenance_path=render_dir/"fixture-provenance.json"
     provenance=json.loads(provenance_path.read_text(encoding="utf-8"))
+    fixture_path=render_dir/"fixture-input.json"
+    fixture_raw=fixture_path.read_bytes()
+    fixture=json.loads(fixture_raw)
+    fixture_sha=hashlib.sha256(fixture_raw).hexdigest()
     mask=build_fill_target_mask("rectangle")
     frozen=fill_target_mask_sha256("rectangle",mask)
     names=["G_trim_3_control"]+[
@@ -1291,6 +1295,18 @@ def analyze_native_bottom_repair(
             or list(manifest.get("cases") or {})!=names
             or manifest.get("measuredChalk") is not None
             or manifest.get("executorReady") is not False
+            or provenance.get("fixtureSha256")!=fixture_sha
+            or fixture.get("schema")!="FILL001_NATIVE_BOTTOM_REPAIR_V4"
+            or fixture.get("status")!="OFFLINE_SYNTHETIC_INPUT_ONLY"
+            or fixture.get("frozen_mask_sha256")!=frozen
+            or fixture.get("baseline_variant")!=manifest.get("baselineVariant")
+            or fixture.get("baseline_plan_signature")!=manifest.get("sourcePlanSignature")
+            or fixture.get("candidate_widths")!=[1,2,3]
+            or fixture.get("candidate_y")!=[189,190]
+            or fixture.get("bottom_line_endpoints")!=[97,363]
+            or fixture.get("measured_chalk") is not None
+            or fixture.get("executor_ready") is not False
+            or list(fixture.get("cases") or {})!=names
             or provenance.get("schema")!="FILL001_NATIVE_BOTTOM_CAPTURE_V4"
             or provenance.get("maskSha256")!=frozen
             or provenance.get("liveRunId") is not None
@@ -1298,6 +1314,21 @@ def analyze_native_bottom_repair(
             or set(provenance.get("pngSha256") or {})!=
                 {f"fill001-native-{name}.png" for name in names}):
         raise ValueError("V4 native provenance identity invalid")
+    original_strokes=fixture["cases"]["G_trim_3_control"]
+    if (len(original_strokes)!=28
+            or any(stroke.get("width")!=10 or stroke.get("mode")!="normal"
+                   for stroke in original_strokes)):
+        raise ValueError("V4 control strokes differ from pinned width10 geometry")
+    for width in (1,2,3):
+        for y in (189,190):
+            candidate=fixture["cases"][f"J_bottom_y{y}_w{width}"]
+            if (not isinstance(candidate,list) or len(candidate)!=29
+                    or candidate[:28]!=original_strokes
+                    or candidate[-1]!={
+                        "points":[{"x":97,"y":y},{"x":363,"y":y}],
+                        "width":width,"mode":"normal",
+                    }):
+                raise ValueError("V4 input must preserve baseline and exact bottom stroke")
     target=np.repeat(np.repeat(mask,3,axis=0),3,axis=1)
     v2_manifest=json.loads((baseline_dir/"manifest.json").read_text(encoding="utf-8"))
     v2_report=json.loads((baseline_dir/"native-alpha-audit-v2.json").read_text(encoding="utf-8"))
@@ -1359,6 +1390,7 @@ def analyze_native_bottom_repair(
         "schema":"FILL001_NATIVE_BOTTOM_REPAIR_AUDIT_V4",
         "status":"OFFLINE_NATIVE_DIAGNOSTIC_ONLY",
         "source_manifest_sha256":hashlib.sha256(manifest_raw).hexdigest(),
+        "source_fixture_sha256":fixture_sha,
         "source_capture_provenance_sha256":hashlib.sha256(provenance_path.read_bytes()).hexdigest(),
         "source_v2_manifest_sha256":hashlib.sha256((baseline_dir/"manifest.json").read_bytes()).hexdigest(),
         "source_v2_control_png_sha256":hashlib.sha256(original).hexdigest(),
