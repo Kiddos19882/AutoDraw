@@ -1,5 +1,15 @@
 # AutoDraw — текущее состояние
 
+## FILL-001 — native V2/V3 adaptive-edge diagnostics (2026-11-09)
+
+После live V3 OFF (exact CHALK=1461, run-bound screen V2 coverage 99.5522% / leakage 18, PNG quality FAIL) выполнены изолированные **native Egret WebGL** эксперименты: V2 — контур width10/inset6 и X-trim внутренних 27 рядов 1–4 px; V3 — один контур width5/inset3 и ширина внутренних рядов10, X-trim 0–4 px. Frozen rectangle SHA без изменений, местный backing 1380×720, nearest-3× маска 401877 пикселей, alpha≥1, без Stage/client/desktop/screen привязки и без нового game CHALK.
+
+V2: контроль coverage 98.927284%/4311 missing/88 leakage; G1 98.417180%/6361/22; G2 98.397770%/6439/8; G3 98.390300%/6469/2; G4 98.381590%/6504/1.
+V3: H0 98.989492%/4061/128; H1 98.832230%/4693/77; H2 98.828000%/4710/66; H3 98.825014%/4722/66; H4 98.822028%/4734/66. При диагностическом alpha≥128 V2 G3/G4 получают leakage=0, но coverage 98.34402%/98.33506%; V3 остаётся ниже 99% и с leakage. **Ни один вариант не проходит coverage≥99% плюс leakage=0.** Изолированная OpenCV-гипотеза о width5 контуре (~99.955%/0) не подтвердилась native renderer. Нельзя заменять официальный PNG/RGB gate native alpha.
+
+[E3 native CI 42552197466](https://github.com/Kiddos19882/AutoDraw/actions/runs/42552197466) SUCCESS, [артефакт V1/V2/V3 с native PNG, manifests и alpha audits](https://github.com/Kiddos19882/AutoDraw/actions/runs/42552197466/artifacts/13645982484), code SHA `be8c07ac`. Предыдущий [CI 42551948930](https://github.com/Kiddos19882/AutoDraw/actions/runs/42551948930) содержал FAIL финальной печати V3 из-за legacy comparison key, не рендеринга; исходные PNG сохранены, отчётная ошибка исправлена без смягчения порогов. Production planner, executor и mask не изменены. **Следующий gate:** native footprint и adaptive repair по конкретным сторонам/рядам, затем frozen holdout wide/narrow и отдельная native-to-live run-bound E5. Новый live run NOT_RUN.
+
+
 ## FILL-001 — native Egret контроль contour-first (2026-11-09)
 
 Новый исследовательский native contour-first вариант для исходной rectangle mask (radius=10, row-step=5, contour inset=6) воспроизведён **на настоящих BoardPane + Egret WebGLRenderer** офлайн. Проверены 27 обычных scanline strokes (B) и 28 штрихов с одним замкнутым контуром (C последний / E первый) на frozen mask SHA `ac1c6660e5986cdf534328c6dbcd5020f631168b1473c24b29e7609eb827998b`. На native 1380×720 RGBA C и E идентичны (**0 различающихся пикселей**); B и E различаются на **754 пикселя**. Следовательно, при той же геометрии и цвете **сам порядок contour-first не меняет конечную native картинку**.

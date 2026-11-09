@@ -1,5 +1,10 @@
 # AutoDraw — журнал выполненных действий
 
+## 2026-11-09 — FILL-001 native contour V2/V3 geometry screen
+
+Verified remote baseline bca6161b, last 20 commits, CI and current docs; reviewed frozen FILL-001 planners and existing BoardPane/Egret Firefox harness. Extended existing experimental strategy exporter, isolated native JS runner and tests for 10px contour X-trim1–4 (V2), mixed width5 contour/inset3 plus 10px interior X-trim0–4 (V3), and independent alpha audits. The synthetic 27-row baseline, frozen target SHA and non-executor flags remain unchanged. Code sequence `b57627bc` through `be8c07ac`; V3 first run 42551948930 failed solely in CLI report-print field, saved PNGs; fixed and native CI 42552197466 SUCCESS. V2/V3 negative quality measurements are indexed in TEST_RESULTS. No game, no new CHALK and no production changes.
+
+
 ## 2026-11-09 — FILL-001 native BoardPane contour-first replay
 
 Verified branch HEAD 97064730, last 20 commits and CI before development; reviewed docs/navigation, FILL-001 A–D and frozen planner, renderer JS/Firefox harness, native ENGINE-001 E5 workflow, game BoardPane temporal replay and explicit one-stroke guard in paired reference. Did not relax old live single-stroke or renderer-geometry fail-closed code. Implemented frozen synthetic 27-row + connected contour fixture exporter in existing `chalk_fill_strategy_comparison.py`; added isolated multi-stroke `?contour=fill001` mode through actual `BoardPane`/WebGLRenderer; extended existing Selenium Firefox runner and E5 workflow with a separate **offline** job; added native alpha-on-frozen-target diagnostic and regression assertions. Primary code commits: `40027908`, `e642f7cc`, `7eacdd46`, `38bd17b0`, `2fd3cbc4`, `03d0abd1`, `9aab5623`, `2a194bba`, `c42e0145`.

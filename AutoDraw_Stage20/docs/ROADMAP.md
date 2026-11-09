@@ -1,5 +1,10 @@
 # AutoDraw — дорожная карта будущих работ
 
+## Следующий этап — локальная footprint-диагностика FILL-001
+
+Native V2 fixed X-trim существенно уменьшил leakage, но ухудшил coverage. V3 с тонким contour5/inset3 тоже FAIL в native WebGL, хотя OpenCV предполагал PASS. Вместо дальнейшего общего отступа требуется измерение per-row/per-side native отпечатка кисти и локальные безопасные коррекции, затем frozen wide/narrow holdout и независимый run-bound Stage/screen gate. Production-код/пороги менять нельзя до E5 и отдельного решения. [Evidence](https://github.com/Kiddos19882/AutoDraw/actions/runs/42552197466/artifacts/13645982484).
+
+
 ## Следующая геометрическая проверка после native contour-first
 
 Проверка настоящим offline BoardPane/Egret WebGL показала **нулевую разницу при перестановке одного и того же контура** (C последний vs E первый) и дополнительные 754 native-пикселя по сравнению со sparse-only B. Однако native local nearest-3× alpha diagnostic всё ещё даёт пропуски и утечки; это не run-bound live screen PNG. Значит, отдельная оптимизация **положения, толщины и перекрытия контура/заливки** перспективнее перестановки порядка. Следом — ограниченный geometry candidate с заранее зафиксированными native metrics + независимым V3 Stage/client/desktop mapping gate; после успешной проверки только одно новое versioned live измерение exact CHALK. Frozen masks, thresholds и production code не менять. [Native artifact](https://github.com/Kiddos19882/AutoDraw/actions/runs/42549813024/artifacts/13644514101).

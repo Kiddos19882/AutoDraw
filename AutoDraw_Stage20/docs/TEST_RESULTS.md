@@ -1,5 +1,25 @@
 # AutoDraw — реестр проверенных результатов
 
+## FILL-001 native V2/V3 — negative geometry evidence, 2026-11-09
+
+[CI 42552197466](https://github.com/Kiddos19882/AutoDraw/actions/runs/42552197466) SUCCESS on `be8c07ac`; [native V1/V2/V3 artifact 13645982484](https://github.com/Kiddos19882/AutoDraw/actions/runs/42552197466/artifacts/13645982484). Real BoardPane/Egret WebGL, synthetic normal strokes, frozen rectangle mask, 1380×720 backing, nearest 3× target (401877 pixels); values are **alpha≥1 diagnostic only, not official live RGB screenshot quality**.
+
+| Candidate | Coverage | Missing backing px | Leakage backing px |
+|---|---:|---:|---:|
+| E width10 contour baseline | 98.927284% | 4311 | 88 |
+| V2 G trim1 | 98.417180% | 6361 | 22 |
+| V2 G trim2 | 98.397770% | 6439 | 8 |
+| V2 G trim3 | 98.390300% | 6469 | 2 |
+| V2 G trim4 | 98.381590% | 6504 | 1 |
+| V3 H width5 contour/trim0 | 98.989492% | 4061 | 128 |
+| V3 H trim1 | 98.832230% | 4693 | 77 |
+| V3 H trim2 | 98.828000% | 4710 | 66 |
+| V3 H trim3 | 98.825014% | 4722 | 66 |
+| V3 H trim4 | 98.822028% | 4734 | 66 |
+
+Alpha≥128 V2 trim3/trim4 leakage=0 but coverage 98.34402% / 98.33506%; V3 H0 coverage 98.906631% with 74 leakage, H4 98.768031% with 29 leakage. All variants FAIL unchanged 99%/zero rule even as native-local diagnostic. OpenCV static thin-contour proxy ~99.955%/0 contradicted by actual native renderer. V3 alpha does not prove live screenshot E5 or exact CHALK. Prior [CI 42551948930](https://github.com/Kiddos19882/AutoDraw/actions/runs/42551948930) recorded negative CLI reporting failure due to absent V1-only manifest key; `be8c07ac` changed the printer only and rerun passed.
+
+
 ## FILL-001 contour-first — native BoardPane/WebGL 2026-11-09
 
 Evidence: [native CI 42549813024](https://github.com/Kiddos19882/AutoDraw/actions/runs/42549813024), [native PNG + fixture-provenance + manifest + alpha diagnostic](https://github.com/Kiddos19882/AutoDraw/actions/runs/42549813024/artifacts/13644514101), source code sequence `40027908`–`c42e0145`. Frozen rectangle/radius10/rowstep5/contour inset6; `B_sparse_only` 27 strokes / 54 **synthetic vertices**, C/E 28 strokes / 119 synthetic vertices; **synthetic vertex counts are NOT CHALK**. Native WebGL 1380×720, same color+geometry: C/E differingPixels=0; sparse B↔E differingPixels=754.

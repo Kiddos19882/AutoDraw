@@ -1,5 +1,13 @@
 # AutoDraw — действующие задачи
 
+## P1 — FILL-001: native V2/V3 отрицательные результаты и следующий шаг
+
+- [x] Проверены неизменяемые V2 (width10 contour/inset6 + X-trim1–4) и V3 (width5 contour/inset3, interior width10, trim0–4) в настоящем offline BoardPane/Egret WebGL на frozen rectangle. V2 alpha≥1 leakage 88→1, но coverage 98.9273→98.3816%; V3 лучший coverage 98.9895% при 128 leak. **Оба FAIL**.
+- [x] [Native CI 42552197466](https://github.com/Kiddos19882/AutoDraw/actions/runs/42552197466) SUCCESS; сохранены native PNG/manifest/raw alpha reports и отдельно ранний CLI-key FAIL. Исторический game run pointCount baseline=1, exact CHALK1461 не изменён; новый exact CHALK NOT_RUN.
+- [ ] **Следующий шаг:** локализовать native leakage/missing по строкам/сторонам и проверить адаптивное boundary repair, не единый trim. Проверить на frozen rectangle, затем wide и narrow, сохраняя отрицательные результаты.
+- [ ] Run-bound native Stage→screen RGB E5 для живой геометрии V3, только после него — решение о новом одиночном live E4. Production planner, thresholds и batch BLOCKED.
+
+
 ## P1 — native Egret contour-first: результат и следующий gate
 
 - [x] Повторно использован настоящий `BoardPane`/Egret WebGL renderer (не новый имитатор) для сравнения B, C, E по frozen rectangle/r10. Native E и C имеют 0 RGBA различий; E добавляет 754 отличающихся пикселя к B; [артефакт 13644514101](https://github.com/Kiddos19882/AutoDraw/actions/runs/42549813024/artifacts/13644514101).

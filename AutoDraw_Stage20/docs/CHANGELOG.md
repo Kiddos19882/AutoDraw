@@ -1,5 +1,10 @@
 # AutoDraw — значимые изменения
 
+## 2026-11-09 — native geometry studies FILL-001 V2/V3
+
+Existing offline FILL-001 tools now support frozen versioned native-width10 contour endpoint trims (V2) and mixed native width5 outline + width10 interior (V3), preserved manifests/PNG/alpha sensitivity reports, with actual Egret WebGL and tests. All tested variants fail native-local coverage/leakage tradeoff; not integrated into production or executor. No thresholds, frozen masks, default brush or game runtime modifications. [Native evidence](https://github.com/Kiddos19882/AutoDraw/actions/runs/42552197466/artifacts/13645982484).
+
+
 ## 2026-11-09 — FILL-001 native contour-first offline harness
 
 В существующие FILL-001 geometry tools и renderer Firefox/BoardPane harness добавлен отдельный versioned режим генерации frozen native fixture, многолинейного WebGL replay и alpha-only сравнения с логической маской на backing ×3. Доказано в native reference: одинаковая геометрия C/E при разном порядке даёт 0 пикселей различия; контур добавляет 754 native пикселя относительно sparse-only. Результаты и негативные residual (coverage/leakage) сохранены в отдельном CI artifact [13644514101](https://github.com/Kiddos19882/AutoDraw/actions/runs/42549813024/artifacts/13644514101), с запретом выдавать alpha-model за live screen quality. Существующий ENGINE-001 E5 и V3 live recorder не ослаблены, production planner/executor/CHALK defaults/quality thresholds не менялись.
