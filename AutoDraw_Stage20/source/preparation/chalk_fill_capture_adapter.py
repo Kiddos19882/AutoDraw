@@ -3,6 +3,7 @@ from __future__ import annotations
 """Fail-closed adapter from Game Monitor exports to FILL-001 captures."""
 
 import hashlib
+import json
 from pathlib import Path
 from typing import Any
 
@@ -520,7 +521,7 @@ def build_fill001_chalk_first_capture_from_runtime(
     e4_raw = e4_path.read_bytes()
     e4_sha = hashlib.sha256(e4_raw).hexdigest()
     try:
-        e4 = __import__("json").loads(e4_raw)
+        e4 = json.loads(e4_raw)
     except (UnicodeError, ValueError) as exc:
         raise FillMatrixError("DEC-030 E4 capture report is invalid JSON.") from exc
     if not isinstance(e4, dict):
