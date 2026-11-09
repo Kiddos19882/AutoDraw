@@ -224,6 +224,8 @@ def main() -> int:
     )
     parser.add_argument("--engine001-journal", type=Path, default=None,
                         help="Replay exactly the nine immutable ENGINE-001 E4 runs.")
+    parser.add_argument("--fill001-footprint-only", action="store_true",
+                        help="Measure 10 isolated actual Egret WebGL brush footprints, no live run.")
     parser.add_argument("--fill001-contour-mixed-only", action="store_true",
                         help="Replay native V3 thin contour and wide interior candidates.")
     parser.add_argument("--fill001-contour-trim-only", action="store_true",
@@ -275,6 +277,89 @@ def main() -> int:
                 f"runner Firefox is {actual_version!r}."
             )
         driver.set_page_load_timeout(90)
+        if args.fill001_footprint_only:
+            if (args.engine001_journal or args.paired_renderer_experiment_root or args.engine001_only
+                    or args.fill001_contour_only or args.fill001_contour_trim_only
+                    or args.fill001_contour_mixed_only):
+                parser.error("--fill001-footprint-only requires an isolated native-probe invocation.")
+            driver.get(f"{args.base_url}/AutoDraw_Stage20/tests/game_renderer_reference.html?footprint=fill001a")
+            def footprint_completed(browser: webdriver.Firefox) -> bool:
+                state = browser.execute_script("return document.body.dataset.fill001FootprintStatus")
+                return state in ("complete", "error")
+            WebDriverWait(driver, 120, poll_frequency=0.25).until(footprint_completed)
+            if driver.execute_script("return document.body.dataset.fill001FootprintStatus") != "complete":
+                raise RuntimeError(driver.find_element("id", "renderer-status").text)
+            manifest = json.loads(
+                driver.find_element("id", "renderer-manifest-json").get_property("textContent")
+            )
+            points = {
+                "horizontal": [{"x":130,"y":120},{"x":330,"y":120}],
+                "vertical": [{"x":230,"y":40},{"x":230,"y":200}],
+                "diagonal": [{"x":130,"y":60},{"x":330,"y":180}],
+                "corner": [{"x":150,"y":70},{"x":300,"y":70},{"x":300,"y":180}],
+            }
+            expected = {}
+            for width in (5, 10):
+                for orientation in ("horizontal", "vertical", "diagonal", "corner"):
+                    expected[f"normal_{orientation}_w{width}"] = ("normal", width, points[orientation])
+                expected[f"smooth_horizontal_w{width}"] = ("smooth", width, points["horizontal"])
+            cases = manifest.get("cases")
+            if (manifest.get("schema") != "FILL001_NATIVE_FOOTPRINT_A_V1"
+                    or manifest.get("status") != "OFFLINE_NATIVE_EGRET_RENDERED"
+                    or manifest.get("engineVersion") != "5.4.1"
+                    or manifest.get("canvasSize") != {"width":1380, "height":720}
+                    or manifest.get("scale") != 3
+                    or manifest.get("alphaThresholds") != [1,64,128,254]
+                    or manifest.get("measuredChalk") is not None
+                    or manifest.get("originalGameCapture") is not None
+                    or manifest.get("executorReady") is not False
+                    or manifest.get("gameQualityGate") != "NOT_EVALUATED"
+                    or not isinstance(cases, list) or len(cases) != 10
+                    or {case.get("id") for case in cases} != set(expected)):
+                raise ValueError("Footprint native manifest schema, isolation or count changed.")
+            for case in cases:
+                mode, width, path_points = expected[case["id"]]
+                if (case.get("mode") != mode or case.get("width") != width
+                        or case.get("points") != path_points
+                        or case.get("acceptedSyntheticVerticesNotChalk") != len(path_points)
+                        or case.get("pngName") != "fill001-footprint-" + case["id"] + ".png"
+                        or case.get("sceneDiagnostics", {}).get("boardRenderMode") != 3):
+                    raise ValueError("Native brush footprint probe coordinates were changed.")
+            links = driver.execute_script(
+                "return Array.from(document.querySelectorAll('a[download]'))"
+                ".filter(a=>a.href.startsWith('data:image/png;base64,'))"
+                ".map(a=>({name:a.download,href:a.href}));"
+            )
+            if {item["name"] for item in links} != {
+                "fill001-footprint-" + key + ".png" for key in expected
+            } or len(links) != len(expected):
+                raise ValueError("Footprint native PNG inventory incomplete.")
+            destination = output_root / "fill001-footprint-a-v1"
+            destination.mkdir(parents=True, exist_ok=False)
+            for item in links:
+                data = base64.b64decode(item["href"].split(",", 1)[1], validate=True)
+                (destination / item["name"]).write_bytes(data)
+            (destination / "manifest.json").write_text(
+                json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+            )
+            (destination / "capture-provenance.json").write_text(
+                json.dumps({
+                    "schema": "FILL001_NATIVE_FOOTPRINT_CAPTURE_A_V1",
+                    "browser": actual_version,
+                    "userAgent": actual_user_agent,
+                    "nativeRenderer": manifest["nativeRenderer"],
+                    "source": "native Egret WebGL BoardPane synthetic probes",
+                    "liveRunId": None, "exactChalk": None,
+                    "pngSha256": {
+                        item["name"]: hashlib.sha256(
+                            (destination / item["name"]).read_bytes()
+                        ).hexdigest() for item in links
+                    },
+                }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+            )
+            print("FILL001 phase A: 10 pinned native brush cases and PNGs verified; "
+                  "no live screen/CHALK claims.")
+            return 0
         if args.fill001_contour_only or args.fill001_contour_trim_only or args.fill001_contour_mixed_only:
             if sum((args.fill001_contour_only, args.fill001_contour_trim_only,
                     args.fill001_contour_mixed_only)) != 1:
