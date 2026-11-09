@@ -517,7 +517,36 @@ def build_fill001_chalk_first_capture_from_runtime(
     geo = verified_screen["geometry"]
     provenance = verified_screen["provenance"]
     e4_path = Path(screen_e4_evidence_path)
-    e4_sha = hashlib.sha256(e4_path.read_bytes()).hexdigest()
+    e4_raw = e4_path.read_bytes()
+    e4_sha = hashlib.sha256(e4_raw).hexdigest()
+    try:
+        e4 = __import__("json").loads(e4_raw)
+    except (UnicodeError, ValueError) as exc:
+        raise FillMatrixError("DEC-030 E4 capture report is invalid JSON.") from exc
+    if not isinstance(e4, dict):
+        raise FillMatrixError("DEC-030 E4 report must be a JSON object.")
+    # Unlike a bare geometry check, full capture acceptance also requires
+    # ORIGINAL before/after ROI hashes from the same verified E4 event.
+    # A valid run geometry alone cannot make unrelated screenshots accepted.
+    before_hash = hashlib.sha256(Path(before_png).read_bytes()).hexdigest()
+    after_hash = hashlib.sha256(Path(after_png).read_bytes()).hexdigest()
+    size = [roi["width"], roi["height"]]
+    if (e4.get("status") != "PASS_E4_RAW_CAPTURE"
+            or e4.get("run_id") != bound["run_id"]
+            or e4.get("session_id") != bound["session_id"]
+            or e4.get("task_id") != task.get("task_id")
+            or e4.get("plan_signature") != task.get("plan_signature")
+            or e4.get("exact_chalk") != bound.get("exact_chalk")
+            or e4.get("monitor_version") != bound["monitor_export"].get("monitorVersion")
+            or e4.get("raw_run_sha256") != provenance.get("raw_run_sha256")
+            or e4.get("screen_roi") != roi
+            or not isinstance(e4.get("before"), dict)
+            or not isinstance(e4.get("after"), dict)
+            or e4["before"].get("board_roi_sha256") != before_hash
+            or e4["after"].get("board_roi_sha256") != after_hash
+            or e4["before"].get("roi_size") != size
+            or e4["after"].get("roi_size") != size):
+        raise FillMatrixError("DEC-030 E4 same-run screenshot SHA/ROI/task/CHALK binding failed.")
     if (geo.get("run_id") != bound["run_id"]
             or provenance.get("run_id") != bound["run_id"]
             or provenance.get("checked_out_run_sha256") != bound["bridge_run_file_sha256"]
