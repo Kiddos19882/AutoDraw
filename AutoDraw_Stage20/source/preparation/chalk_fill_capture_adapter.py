@@ -493,6 +493,7 @@ def build_fill001_chalk_first_capture_from_runtime(
     screen_e4_evidence_path: str | Path,
     before_png: str | Path,
     after_png: str | Path,
+    allow_v3_boardpane_only: bool = False,
 ) -> dict[str, Any]:
     """DEC-030: accepted *new* capture only from real run-bound inputs.
 
@@ -511,8 +512,11 @@ def build_fill001_chalk_first_capture_from_runtime(
     bound = load_fill001_runtime_binding(
         task, session_path, executor_report_path,
     )
+    if type(allow_v3_boardpane_only) is not bool:
+        raise FillMatrixError("DEC-030 BoardPane-only mapping flag must be boolean.")
     verified_screen = bind_from_monitor_run(
         bound["bridge_run_file"], screen_e4_evidence_path,
+        allow_v3_boardpane_only=allow_v3_boardpane_only,
     )
     roi = verified_screen["screen_roi"]
     geo = verified_screen["geometry"]
