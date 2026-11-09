@@ -1574,6 +1574,103 @@
     }
   }
 
+
+  // FILL-001 phase A: finite, predeclared native brush footprint probes.
+  // No source game run, browser pointer events, or executable game plan.
+  function renderFill001FootprintStudy() {
+    try {
+      if (!window.egret || !egret.Shape || !egret.CanvasRenderer ||
+          typeof getBoardPaneClass() !== "function") {
+        throw new Error("FILL001 native footprint requires actual Egret BoardPane.");
+      }
+      const lines = {
+        horizontal: [{x:130,y:120},{x:330,y:120}],
+        vertical: [{x:230,y:40},{x:230,y:200}],
+        diagonal: [{x:130,y:60},{x:330,y:180}],
+        corner: [{x:150,y:70},{x:300,y:70},{x:300,y:180}]
+      };
+      const definitions = [];
+      for (const width of [5,10]) {
+        for (const orientation of ["horizontal","vertical","diagonal","corner"]) {
+          definitions.push({
+            id:"normal_"+orientation+"_w"+width, mode:"normal", width,
+            points:lines[orientation].map(p=>({x:p.x,y:p.y}))
+          });
+        }
+        definitions.push({
+          id:"smooth_horizontal_w"+width, mode:"smooth", width,
+          points:lines.horizontal.map(p=>({x:p.x,y:p.y}))
+        });
+      }
+      const native = initializeWebGL(null);
+      const mask = createBoardMask();
+      const manifest = {
+        schema:"FILL001_NATIVE_FOOTPRINT_A_V1",
+        status:"OFFLINE_NATIVE_EGRET_RENDERED",
+        engineVersion:egret.Capabilities.engineVersion,
+        nativeRenderer:native.glInfo,
+        canvasSize:{width:1380,height:720},
+        logicalBoard:{width:460,height:240},
+        scale:3,
+        alphaThresholds:[1,64,128,254],
+        originalGameCapture:null,
+        measuredChalk:null,
+        gameQualityGate:"NOT_EVALUATED",
+        liveStageMapping:"NOT_EVALUATED",
+        executorReady:false,
+        cases:[]
+      };
+      casesNode.textContent="";
+      const card=document.createElement("section");
+      card.className="fixture";
+      card.textContent="FILL-001 phase A: isolated real Egret brush footprints; not live playback.";
+      for (const definition of definitions) {
+        const strokes=[{
+          strokeId:"footprint-"+definition.id,
+          points:definition.points
+        }];
+        const board=makeTemporalBoard(strokes,definition.width,definition.mode,false);
+        if (board.accepted!==definition.points.length) {
+          throw new Error("Unexpected accepted point count in "+definition.id);
+        }
+        const source=renderGraphicsNode(board.shape.$renderNode,false);
+        const composed=composeBoard(source,source.nodeBounds,mask);
+        const result=renderWebGLProbe(
+          definition.mode,definition.points,definition.width,composed,native,board.shape
+        );
+        if (!result.sceneDiagnostics.stageAttached ||
+            result.sceneDiagnostics.boardRenderMode !== 3 ||
+            result.canvas.width!==1380 || result.canvas.height!==720) {
+          throw new Error("Native stage/BoardPane configuration rejected for "+definition.id);
+        }
+        const pngName="fill001-footprint-"+definition.id+".png";
+        addDownloadLink(card,result.canvas,pngName,definition.id);
+        manifest.cases.push({
+          id:definition.id,mode:definition.mode,width:definition.width,
+          points:definition.points,pngName,
+          acceptedSyntheticVerticesNotChalk:board.accepted,
+          graphicsPathCount:board.graphicsPathCount,
+          webglDrawCalls:result.drawCalls,
+          sceneDiagnostics:result.sceneDiagnostics,
+          canvas2DVsWebGL:result.comparison
+        });
+      }
+      if (manifest.cases.length!==10) throw new Error("Invalid footprint probe count");
+      casesNode.appendChild(card);
+      document.getElementById("renderer-manifest-json").textContent=
+        JSON.stringify(manifest,null,2);
+      document.body.dataset.fill001FootprintStatus="complete";
+      document.body.dataset.referenceStatus="fill001_footprint_complete";
+      statusNode.textContent="10 native Egret FILL-001 footprint probes complete (offline only).";
+    } catch(error) {
+      document.body.dataset.fill001FootprintStatus="error";
+      document.body.dataset.referenceStatus="error";
+      statusNode.className="error";
+      statusNode.textContent="Native footprint probe failed: "+
+        (error&&error.stack?error.stack:String(error));
+    }
+  }
+
   function renderAll() {
     try {
       if (!window.egret || !egret.Shape || !egret.CanvasRenderer) {
@@ -1786,12 +1883,14 @@
 
   api.renderContourFirstNativeStudy = renderContourFirstNativeStudy;
   api.renderContourTrimNativeStudy = renderContourTrimNativeStudy;
+  api.renderFill001FootprintStudy = renderFill001FootprintStudy;
   api.renderAll = renderAll;
   api.renderTemporalStudy = renderTemporalStudy;
   api.renderEndpointStudy = renderEndpointStudy;
   api.renderDuplicateFrameStudy = renderDuplicateFrameStudy;
   const params = new URLSearchParams(window.location.search);
-  const startup = params.get("contour") === "fill001v3" ? () => renderContourTrimNativeStudy(true)
+  const startup = params.get("footprint") === "fill001a" ? renderFill001FootprintStudy
+    : params.get("contour") === "fill001v3" ? () => renderContourTrimNativeStudy(true)
     : params.get("contour") === "fill001v2" ? () => renderContourTrimNativeStudy(false)
     : params.get("contour") === "fill001" ? renderContourFirstNativeStudy
     : params.get("frames") === "fill001" ? renderDuplicateFrameStudy
