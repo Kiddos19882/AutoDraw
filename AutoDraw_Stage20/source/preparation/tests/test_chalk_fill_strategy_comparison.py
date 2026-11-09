@@ -287,3 +287,33 @@ def test_native_v2_contour_trim_fixture_preserves_contour_rows_and_sha(tmp_path)
     assert json.loads(path.read_text(encoding="utf-8")) == fixture
     with pytest.raises(FileExistsError):
         export_contour_trim_native_fixture(path)
+
+
+def test_mixed_contour_native_v3_fixture_uses_exact_two_brush_widths(tmp_path):
+    from chalk_fill_strategy_comparison import export_mixed_contour_native_fixture
+    output = tmp_path / "mixed-v3.json"
+    fixture = export_mixed_contour_native_fixture(output)
+    assert fixture["schema"] == "FILL001_NATIVE_MIXED_CONTOUR_V3"
+    assert fixture["frozen_mask_sha256"] == FILL001_EXPECTED_MASK_SHA256["rectangle"]
+    assert fixture["tested_trim_px"] == [0,1,2,3,4]
+    assert fixture["contour_width"] == 5 and fixture["contour_inset"] == 3
+    assert fixture["interior_width"] == 10 and fixture["row_step"] == 5
+    assert fixture["measured_chalk"] is None
+    assert fixture["executor_ready"] is False
+    cases = fixture["cases"]
+    assert len(cases) == 6
+    assert len(cases["E_contour_10"]) == 28
+    for trim in range(5):
+        strokes = cases[f"H_mixed_trim_{trim}"]
+        assert len(strokes) == 28
+        assert strokes[0]["width"] == 5
+        assert strokes[0]["points"][0] == strokes[0]["points"][-1]
+        assert all(st["width"] == 10 and st["mode"] == "normal" for st in strokes[1:])
+        for old, amended in zip(cases["E_contour_10"][1:], strokes[1:]):
+            p,q=old["points"]
+            a,b=amended["points"]
+            assert a == {"x": p["x"] + trim, "y": p["y"]}
+            assert b == {"x": q["x"] - trim, "y": q["y"]}
+    assert json.loads(output.read_text(encoding="utf-8")) == fixture
+    with pytest.raises(FileExistsError):
+        export_mixed_contour_native_fixture(output)
