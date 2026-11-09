@@ -224,6 +224,8 @@ def main() -> int:
     )
     parser.add_argument("--engine001-journal", type=Path, default=None,
                         help="Replay exactly the nine immutable ENGINE-001 E4 runs.")
+    parser.add_argument("--fill001-contour-only", action="store_true",
+                        help="Run frozen synthetic contour-first multi-stroke native BoardPane probe.")
     parser.add_argument("--engine001-only", action="store_true",
                         help="Do not repeat historical paired-renderer fixtures.")
     args = parser.parse_args()
@@ -269,6 +271,63 @@ def main() -> int:
                 f"runner Firefox is {actual_version!r}."
             )
         driver.set_page_load_timeout(90)
+        if args.fill001_contour_only:
+            if args.engine001_journal or args.paired_renderer_experiment_root or args.engine001_only:
+                parser.error("--fill001-contour-only is incompatible with other live-reference options.")
+            fixture_path = workspace / "AutoDraw_Stage20/tests/fill001-contour-first-native-input.json"
+            if not fixture_path.is_file():
+                raise FileNotFoundError("Native contour fixture must be generated in this checkout.")
+            fixture = json.loads(fixture_path.read_text(encoding="utf-8"))
+            if (fixture.get("schema") != "FILL001_NATIVE_CONTOUR_FIRST_V1"
+                    or fixture.get("status") != "OFFLINE_SYNTHETIC_INPUT_ONLY"):
+                raise ValueError("Unexpected native contour fixture.")
+            driver.get(f"{args.base_url}/AutoDraw_Stage20/tests/game_renderer_reference.html?contour=fill001")
+            def contour_completed(browser: webdriver.Firefox) -> bool:
+                status = browser.execute_script("return document.body.dataset.contourNativeStatus")
+                return status in ("complete", "error")
+            WebDriverWait(driver, 120, poll_frequency=0.25).until(contour_completed)
+            if driver.execute_script("return document.body.dataset.contourNativeStatus") != "complete":
+                raise RuntimeError(driver.find_element("id", "renderer-status").text)
+            manifest = json.loads(driver.find_element("id", "renderer-manifest-json").get_property("textContent"))
+            expected_names = {"B_sparse_only", "C_contour_last", "E_contour_first"}
+            if (manifest.get("status") != "OFFLINE_NATIVE_EGRET_RENDERED"
+                    or manifest.get("sourceMaskSha256") != fixture.get("frozen_mask_sha256")
+                    or set(manifest.get("cases", {})) != expected_names
+                    or any(manifest["cases"][name]["strokeCount"] != (27 if name == "B_sparse_only" else 28)
+                           for name in expected_names)
+                    or manifest.get("measuredChalk") is not None
+                    or manifest.get("executorReady") is not False):
+                raise ValueError("Native contour manifest did not verify frozen identity and output.")
+            links = driver.execute_script(
+                "return Array.from(document.querySelectorAll('a[download]'))"
+                ".filter(a=>a.href.startsWith('data:image/png;base64,'))"
+                ".map(a=>({name:a.download,href:a.href}));"
+            )
+            pngs = {f"fill001-native-{name}.png" for name in expected_names}
+            if {Path(item["name"]).name for item in links} != pngs:
+                raise ValueError("Expected exactly three frozen native FILL001 PNGs.")
+            case_output = output_root / "fill001-contour-native-v1"
+            case_output.mkdir(parents=True, exist_ok=False)
+            for item in links:
+                payload = base64.b64decode(item["href"].split(",", 1)[1], validate=True)
+                (case_output / Path(item["name"]).name).write_bytes(payload)
+            (case_output / "manifest.json").write_text(
+                json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+            )
+            (case_output / "fixture-provenance.json").write_text(
+                json.dumps({
+                    "fixtureSha256": hashlib.sha256(fixture_path.read_bytes()).hexdigest(),
+                    "maskSha256": fixture["frozen_mask_sha256"],
+                    "baselinePlanSignature": fixture["baseline_plan_signature"],
+                    "browser": actual_version,
+                    "userAgent": actual_user_agent,
+                    "source": "frozen synthetic contour-first, not a live Game Monitor run"
+                }, indent=2) + "\n", encoding="utf-8"
+            )
+            print("FILL001 native BoardPane multi-stroke PASS; "
+                  f"first-vs-last differingPixels={manifest['comparisons']['contourFirstVsLast']['differingPixels']}; "
+                  "no live/game quality inference.")
+            return 0
         for case in cases:
             monitor_path = workspace / case["monitor"]
             monitor = json.loads(monitor_path.read_text(encoding="utf-8-sig"))
