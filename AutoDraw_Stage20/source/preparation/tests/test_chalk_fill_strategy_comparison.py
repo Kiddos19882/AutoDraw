@@ -189,3 +189,26 @@ def test_contour_edge_trim_invalid_inputs_and_immutable_reports(tmp_path):
     with pytest.raises(FileExistsError):
         save_contour_edge_trim_report(out, ["rectangle"])
 
+
+
+def test_contour_native_fixture_pins_frozen_rectangle_and_non_executable(tmp_path):
+    from chalk_fill_strategy_comparison import export_contour_first_native_fixture
+    path = tmp_path / "fixture.json"
+    data = export_contour_first_native_fixture(path)
+    assert data["schema"] == "FILL001_NATIVE_CONTOUR_FIRST_V1"
+    assert data["frozen_mask_sha256"] == FILL001_EXPECTED_MASK_SHA256["rectangle"]
+    assert data["measured_chalk"] is None
+    assert data["executor_ready"] is False
+    cases = data["cases"]
+    assert list(cases) == ["B_sparse_only", "C_contour_last", "E_contour_first"]
+    assert [len(cases[name]) for name in cases] == [27, 28, 28]
+    assert cases["C_contour_last"][-1] == cases["E_contour_first"][0]
+    assert cases["C_contour_last"][:-1] == cases["E_contour_first"][1:]
+    assert len(cases["E_contour_first"][0]["points"]) > 3
+    contour = cases["E_contour_first"][0]["points"]
+    assert contour[0] == contour[-1]
+    assert all(stroke["mode"] == "normal" and stroke["width"] == 10
+               for strokes in cases.values() for stroke in strokes)
+    assert json.loads(path.read_text(encoding="utf-8")) == data
+    with pytest.raises(FileExistsError):
+        export_contour_first_native_fixture(path)
