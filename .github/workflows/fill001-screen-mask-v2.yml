@@ -60,3 +60,15 @@ jobs:
           path: ${{ runner.temp }}/fill001-v2-footprint-spatial/
           if-no-files-found: warn
           retention-days: 30
+
+      - name: Analyze committed V3 Smooth OFF residuals (no gameplay)
+        run: |
+          python fill001_v2_footprint_spatial.py --results-root ../../data/results/brush_behavior_tests --v3-task fill001-20261109-040615-rectangle-r10-s5-o0-v3-smooth-off --output-dir "${RUNNER_TEMP}/fill001-v3-off-spatial"
+      - name: Upload V3 OFF spatial residual overlay and numeric report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autodraw-fill001-v3-off-spatial
+          path: ${{ runner.temp }}/fill001-v3-off-spatial/
+          if-no-files-found: warn
+          retention-days: 30
