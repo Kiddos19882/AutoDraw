@@ -120,6 +120,31 @@ jobs:
         run: |
           python AutoDraw_Stage20/source/preparation/chalk_fill_strategy_comparison.py --native-render-dir "$env:RUNNER_TEMP\fill001-native\fill001-contour-native-v1" --output-dir "$env:RUNNER_TEMP\fill001-native\fill001-contour-native-v1\native-alpha-audit.json"
           if ($LASTEXITCODE -ne 0) { throw "Native FILL001 alpha audit failed." }
+      - name: Export V2 frozen trim sweep into native browser fixture
+        shell: pwsh
+        run: |
+          Push-Location AutoDraw_Stage20/source/preparation
+          try {
+            python chalk_fill_strategy_comparison.py --native-trim-fixture --output-dir "../../tests/fill001-contour-trims-native-input.json"
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          } finally { Pop-Location }
+      - name: Render native V2 BoardPane endpoint-trim controls
+        shell: pwsh
+        run: |
+          $native = Join-Path $env:RUNNER_TEMP "fill001-native"
+          $server = Start-Process -FilePath python -ArgumentList @("-m", "http.server", "8765", "--bind", "127.0.0.1") -PassThru -WindowStyle Hidden
+          try {
+            Start-Sleep -Seconds 3
+            python AutoDraw_Stage20/tests/run_egret_stage_reference_firefox.py --base-url "http://127.0.0.1:8765" --workspace "$env:GITHUB_WORKSPACE" --fill001-contour-trim-only --output-dir $native
+            if ($LASTEXITCODE -ne 0) { throw "Native V2 BoardPane trim replay failed." }
+          } finally {
+            if ($server -and -not $server.HasExited) { Stop-Process -Id $server.Id -Force }
+          }
+      - name: Audit V2 native alpha vs frozen 3x logical target (no live quality)
+        shell: pwsh
+        run: |
+          python AutoDraw_Stage20/source/preparation/chalk_fill_strategy_comparison.py --native-render-dir "$env:RUNNER_TEMP\fill001-native\fill001-contour-native-v2" --output-dir "$env:RUNNER_TEMP\fill001-native\fill001-contour-native-v2\native-alpha-audit-v2.json"
+          if ($LASTEXITCODE -ne 0) { throw "Native V2 alpha diagnostic failed." }
       - name: Upload native FILL-001 comparison (no gameplay)
         if: always()
         uses: actions/upload-artifact@v4
