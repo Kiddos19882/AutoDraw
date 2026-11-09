@@ -170,6 +170,16 @@ jobs:
         run: |
           python AutoDraw_Stage20/source/preparation/chalk_fill_strategy_comparison.py --native-render-dir "$env:RUNNER_TEMP\fill001-native\fill001-contour-native-v3" --output-dir "$env:RUNNER_TEMP\fill001-native\fill001-contour-native-v3\native-alpha-audit-v3.json"
           if ($LASTEXITCODE -ne 0) { throw "Native V3 mixed alpha audit failed." }
+      - name: Audit V2 and V3 native boundary residual by rows and sides
+        shell: pwsh
+        run: |
+          $root = Join-Path $env:RUNNER_TEMP "fill001-native"
+          foreach ($version in @("v2", "v3")) {
+            $directory = Join-Path $root "fill001-contour-native-$version"
+            $result = Join-Path $directory "native-spatial-audit-v1.json"
+            python AutoDraw_Stage20/source/preparation/chalk_fill_strategy_comparison.py --native-spatial-dir $directory --output-dir $result
+            if ($LASTEXITCODE -ne 0) { throw "FILL001 native spatial residual $version failed provenance or metric validation." }
+          }
       - name: Upload native FILL-001 comparison (no gameplay)
         if: always()
         uses: actions/upload-artifact@v4
