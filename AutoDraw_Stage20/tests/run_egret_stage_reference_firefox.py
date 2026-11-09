@@ -338,6 +338,7 @@ def main() -> int:
                 raise ValueError("Expected seven pinned native V4 PNGs")
             dest=output_root/"fill001-bottom-native-v4"
             dest.mkdir(parents=True,exist_ok=False)
+            (dest/"fixture-input.json").write_bytes(fixture_raw)
             for item in links:
                 (dest/item["name"]).write_bytes(
                     base64.b64decode(item["href"].split(",",1)[1],validate=True)
