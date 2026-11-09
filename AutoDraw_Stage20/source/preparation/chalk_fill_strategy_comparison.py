@@ -257,12 +257,169 @@ def save_exploratory_report(output_dir: Path, shapes: list[str]) -> Path:
     return path
 
 
+
+def compare_contour_first_overlap(
+    shape_id: str,
+    *,
+    brush_value: int = 10,
+    scanline_row_step: int = 5,
+    contour_inset: int = 6,
+    interior_insets: tuple[int, ...] = (7, 8, 9),
+    sampling_step: int = 4,
+) -> tuple[dict[str, Any], dict[str, np.ndarray]]:
+    """Controlled contour-first study on the original frozen FILL-001 masks.
+
+    The contour-last and contour-first controls have exactly the same strokes
+    and simulated footprint. Separate inset variants change ONLY the centerline
+    endpoints of interior scanlines, not the target or contour. No game cost,
+    native Egret raster equivalence, or executor readiness is implied.
+    """
+    if shape_id not in FILL001_SHAPES:
+        raise ValueError("unknown frozen FILL-001 shape")
+    if brush_value != 10:
+        raise ValueError("contour-first exploratory study is radius-10 only")
+    for label, value in (("scanline_row_step", scanline_row_step),
+                         ("contour_inset", contour_inset),
+                         ("sampling_step", sampling_step)):
+        if type(value) is not int or value < 1:
+            raise ValueError(f"{label} must be a positive integer")
+    if (not isinstance(interior_insets, tuple) or not interior_insets
+            or len(set(interior_insets)) != len(interior_insets)
+            or any(type(inset) is not int or inset <= contour_inset
+                   for inset in interior_insets)):
+        raise ValueError("interior_insets must be unique integers beyond contour_inset")
+
+    target = build_fill_target_mask(shape_id)
+    mask_sha = fill_target_mask_sha256(shape_id, target)
+    if mask_sha != FILL001_EXPECTED_MASK_SHA256[shape_id]:
+        raise ValueError("frozen mask SHA-256 mismatch")
+    baseline = build_fixed_radius_fill_plan(
+        shape_id, brush_value, scanline_row_step=scanline_row_step,
+    )
+    baseline_strokes = [{
+        "points": [(int(pt["x"]), int(pt["y"])) for pt in stroke["points"]],
+        "brush_value": brush_value, "closed": False, "role": "baseline_scanline",
+    } for stroke in baseline["strokes"]]
+    contour = _contour_stroke(target, contour_inset, brush_value)
+    strategies: dict[str, list[dict[str, Any]]] = {
+        "B_sparse_scanline_control": baseline_strokes,
+        "C_contour_last_control": [*baseline_strokes, contour],
+        "E_contour_first_same_geometry": [contour, *baseline_strokes],
+    }
+    distance = cv2.distanceTransform(
+        target.astype(np.uint8), cv2.DIST_L2, 5,
+    )
+    for inset in interior_insets:
+        # Centerlines retain the SAME scanline rows and brush; only their
+        # horizontal endpoints move inward. The contour is always first.
+        safe_centers = distance >= (inset + 0.01)
+        narrowed = []
+        for baseline_stroke in baseline_strokes:
+            row_y = baseline_stroke["points"][0][1]
+            selected = np.flatnonzero(safe_centers[row_y])
+            if selected.size == 0:
+                continue
+            chunks = np.split(selected, np.flatnonzero(np.diff(selected) > 1) + 1)
+            for chunk in chunks:
+                if chunk.size:
+                    narrowed.append({
+                        "points": [(int(chunk[0]), row_y),
+                                   (int(chunk[-1]), row_y)],
+                        "brush_value": brush_value, "closed": False,
+                        "role": "inset_interior_scanline",
+                    })
+        strategies[f"F_contour_first_interior_inset_{inset}"] = [contour, *narrowed]
+
+    rasters = {
+        name: _render_segments(target.shape, strokes)
+        for name, strokes in strategies.items()
+    }
+    contour_raster = _render_segments(target.shape, [contour])
+    rows = {}
+    for name, strokes in strategies.items():
+        metrics = _model_metrics(
+            target, rasters[name], strokes, sampling_step=sampling_step,
+        )
+        interior_raster = _render_segments(target.shape, [
+            s for s in strokes if s["role"] != "modeled_connected_contour"
+        ])
+        metrics["contour_interior_overlap_logical_pixels"] = int(
+            np.count_nonzero(contour_raster & interior_raster)
+        ) if name != "B_sparse_scanline_control" else None
+        metrics["contour_first"] = (name.startswith("E_") or name.startswith("F_"))
+        metrics["interior_scanline_count"] = sum(
+            s["role"] != "modeled_connected_contour" for s in strokes
+        )
+        rows[name] = metrics
+    if not np.array_equal(
+        rasters["C_contour_last_control"],
+        rasters["E_contour_first_same_geometry"],
+    ):
+        raise AssertionError("Contour order must not change set-union OpenCV raster.")
+    result = {
+        "schema_version": 1,
+        "protocol": "FILL001_CONTOUR_FIRST_OVERLAP_V1",
+        "status": "OFFLINE_EXPLORATORY_ONLY",
+        "shape_id": shape_id,
+        "frozen_mask_sha256": mask_sha,
+        "baseline_plan_signature": baseline["plan_signature"],
+        "brush_value": brush_value,
+        "contour_inset": contour_inset,
+        "scanline_row_step": scanline_row_step,
+        "sampling_step_proxy": sampling_step,
+        "tested_interior_insets": list(interior_insets),
+        "contour_vertex_count": len(contour["points"]),
+        "strategies": rows,
+        "measurement_scope": {
+            "quality": "OpenCV logical footprint proxy, not game PNG",
+            "measured_chalk": None,
+            "native_egret_equivalence": False,
+            "runtime_validated": False,
+            "executor_ready": False,
+            "order_only_control": "C and E contain identical geometry and raster; only sequence changes.",
+            "inset_variants": "F changes interior endpoints only, retaining same contour and rows.",
+        },
+    }
+    return result, {"target": target, **rasters}
+
+
+def save_contour_first_report(
+    output_dir: Path, shapes: list[str],
+) -> Path:
+    """Create a new independent evidence folder without overwriting A-D data."""
+    if output_dir.exists():
+        raise FileExistsError("Refusing to replace prior experimental artifacts")
+    output_dir.mkdir(parents=True)
+    reports = []
+    for shape_id in shapes:
+        report, masks = compare_contour_first_overlap(shape_id)
+        reports.append(report)
+        for name, mask in masks.items():
+            dest = output_dir / f"{shape_id}_{name}.png"
+            if not cv2.imwrite(str(dest), np.uint8(mask) * 255):
+                raise OSError("Cannot save diagnostic PNG")
+    path = output_dir / "contour_first_comparison.json"
+    path.write_text(
+        json.dumps({
+            "analysis_type": "fill001_contour_first_overlap_v1",
+            "reports": reports,
+        }, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+    return path
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--shape", choices=FILL001_SHAPES, action="append")
+    parser.add_argument("--contour-first", action="store_true",
+                        help="Separate controlled contour-first/inset study.")
     args = parser.parse_args(argv)
-    save_exploratory_report(args.output_dir, args.shape or list(FILL001_SHAPES))
+    if args.contour_first:
+        save_contour_first_report(args.output_dir, args.shape or list(FILL001_SHAPES))
+    else:
+        save_exploratory_report(args.output_dir, args.shape or list(FILL001_SHAPES))
     return 0
 
 
