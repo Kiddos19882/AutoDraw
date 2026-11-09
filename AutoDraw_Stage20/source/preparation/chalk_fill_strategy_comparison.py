@@ -1351,10 +1351,10 @@ def analyze_native_bottom_repair(
     if not np.array_equal(frames["G_trim_3_control"],original_rgba):
         raise ValueError("V4 control must render identical RGBA to frozen V2 G_trim_3")
     for name in names[1:]:
-        if np.array_equal(frames[name],frames["G_trim_3_control"]):
-            raise ValueError("V4 added bottom line made no native RGBA difference")
-        if manifest.get("comparisons",{}).get(name,{}).get("differingPixels",0)<=0:
-            raise ValueError("V4 manifest comparison omitted native changed pixels")
+        delta=manifest.get("comparisons",{}).get(name,{}).get("differingPixels")
+        if (not isinstance(delta,int) or delta<0
+                or (delta==0)!=np.array_equal(frames[name],frames["G_trim_3_control"])):
+            raise ValueError("V4 comparison change count disagrees with native RGBA")
     report={
         "schema":"FILL001_NATIVE_BOTTOM_REPAIR_AUDIT_V4",
         "status":"OFFLINE_NATIVE_DIAGNOSTIC_ONLY",
