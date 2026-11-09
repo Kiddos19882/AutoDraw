@@ -224,6 +224,8 @@ def main() -> int:
     )
     parser.add_argument("--engine001-journal", type=Path, default=None,
                         help="Replay exactly the nine immutable ENGINE-001 E4 runs.")
+    parser.add_argument("--fill001-chalk-first-v5-only", action="store_true",
+                        help="Isolated native V5 DEC-030 perimeter candidate sweep.")
     parser.add_argument("--fill001-bottom-only", action="store_true",
                         help="Replay the isolated native V4 thin bottom repair candidates.")
     parser.add_argument("--fill001-footprint-only", action="store_true",
@@ -279,6 +281,91 @@ def main() -> int:
                 f"runner Firefox is {actual_version!r}."
             )
         driver.set_page_load_timeout(90)
+        if args.fill001_chalk_first_v5_only:
+            if (args.engine001_journal or args.paired_renderer_experiment_root
+                    or args.engine001_only or args.fill001_bottom_only
+                    or args.fill001_footprint_only or args.fill001_contour_only
+                    or args.fill001_contour_trim_only or args.fill001_contour_mixed_only):
+                parser.error("--fill001-chalk-first-v5-only must be isolated.")
+            fixture_path=workspace/"AutoDraw_Stage20/tests/fill001-chalk-first-v5-native-input.json"
+            fixture_raw=fixture_path.read_bytes()
+            fixture=json.loads(fixture_raw)
+            names=["V4_y190_w2_control"]+[
+                f"K_trim_{t}_y{y}_w{w}"
+                for t in (0,1,2,3) for y,w in ((190,2),(189,3))
+            ]
+            frozen="ac1c6660e5986cdf534328c6dbcd5020f631168b1473c24b29e7609eb827998b"
+            if (fixture.get("schema")!="FILL001_CHALK_FIRST_NATIVE_V5"
+                    or fixture.get("status")!="OFFLINE_SYNTHETIC_INPUT_ONLY"
+                    or fixture.get("quality_policy_id")!="FILL001_CHALK_FIRST_PERIMETER_V2"
+                    or fixture.get("frozen_mask_sha256")!=frozen
+                    or fixture.get("baseline_variant")!="FILL001_NATIVE_BOTTOM_REPAIR_V4/J_bottom_y190_w2"
+                    or fixture.get("lateral_trim_values")!=[0,1,2,3]
+                    or fixture.get("bottom_variants")!=[{"y":190,"width":2},{"y":189,"width":3}]
+                    or fixture.get("bottom_line_endpoints")!=[97,363]
+                    or list(fixture.get("cases") or {})!=names
+                    or fixture.get("measured_chalk") is not None
+                    or fixture.get("executor_ready") is not False):
+                raise ValueError("Native V5 protocol input identity mismatch")
+            driver.get(f"{args.base_url}/AutoDraw_Stage20/tests/game_renderer_reference.html?contour=fill001v5")
+            def complete_v5(browser: webdriver.Firefox) -> bool:
+                return browser.execute_script(
+                    "return document.body.dataset.chalkFirstV5Status"
+                ) in ("complete","error")
+            WebDriverWait(driver,120,poll_frequency=0.25).until(complete_v5)
+            if driver.execute_script("return document.body.dataset.chalkFirstV5Status")!="complete":
+                raise RuntimeError(driver.find_element("id","renderer-status").text)
+            manifest=json.loads(
+                driver.find_element("id","renderer-manifest-json").get_property("textContent")
+            )
+            items=manifest.get("cases") or {}
+            if (manifest.get("schema")!=fixture["schema"]
+                    or manifest.get("status")!="OFFLINE_NATIVE_EGRET_RENDERED"
+                    or manifest.get("qualityPolicyId")!=fixture["quality_policy_id"]
+                    or manifest.get("sourceMaskSha256")!=frozen
+                    or manifest.get("lateralTrimValues")!=[0,1,2,3]
+                    or manifest.get("bottomVariants")!=[{"y":190,"width":2},{"y":189,"width":3}]
+                    or list(items)!=names
+                    or manifest.get("measuredChalk") is not None
+                    or manifest.get("executorReady") is not False
+                    or manifest.get("gamePngQualityGate")!="NOT_EVALUATED"
+                    or any(items[n].get("strokeCount")!=29 for n in names)):
+                raise ValueError("Native V5 renderer manifest drift")
+            links=driver.execute_script(
+                "return Array.from(document.querySelectorAll('a[download]'))"
+                ".filter(a=>a.href.startsWith('data:image/png;base64,'))"
+                ".map(a=>({name:a.download,href:a.href}));"
+            )
+            if ({z["name"] for z in links}!=
+                    {f"fill001-native-{n}.png" for n in names}
+                    or len(links)!=len(names)):
+                raise ValueError("V5 must preserve all nine pinned PNGs")
+            dest=output_root/"fill001-chalk-first-native-v5"
+            dest.mkdir(parents=True,exist_ok=False)
+            (dest/"fixture-input.json").write_bytes(fixture_raw)
+            for item in links:
+                (dest/item["name"]).write_bytes(
+                    base64.b64decode(item["href"].split(",",1)[1],validate=True)
+                )
+            (dest/"manifest.json").write_text(
+                json.dumps(manifest,ensure_ascii=False,indent=2)+"\\n",encoding="utf-8"
+            )
+            (dest/"fixture-provenance.json").write_text(
+                json.dumps({
+                    "schema":"FILL001_CHALK_FIRST_NATIVE_CAPTURE_V5",
+                    "fixtureSha256":hashlib.sha256(fixture_raw).hexdigest(),
+                    "frozenMaskSha256":frozen,
+                    "browser":actual_version,"userAgent":actual_user_agent,
+                    "pngSha256":{
+                        z["name"]:hashlib.sha256((dest/z["name"]).read_bytes()).hexdigest()
+                        for z in links
+                    },
+                    "gameRunId":None,"measuredChalk":None,
+                    "source":"offline native BoardPane synthetic points, not game input",
+                },ensure_ascii=False,indent=2)+"\\n",encoding="utf-8"
+            )
+            print("DEC-030 V5 native: 9 RGBA PNG + exact source fixture SHA. Game CHALK NOT_RUN.")
+            return 0
         if args.fill001_bottom_only:
             if (args.engine001_journal or args.paired_renderer_experiment_root or args.engine001_only
                     or args.fill001_footprint_only or args.fill001_contour_only
