@@ -9,7 +9,9 @@ import numpy as np
 from PIL import Image
 import pytest
 
-from chalk_fill_capture_adapter import build_fill001_capture_from_runtime
+from chalk_fill_capture_adapter import (
+    build_fill001_capture_from_runtime, build_fill001_chalk_first_capture_from_runtime,
+)
 from brush_coordinate_transform import transform_logical_brush_plan_to_screen
 from chalk_fill_experiment import build_fill_target_mask, fill_target_mask_sha256
 from chalk_fill_matrix import FillMatrixError
@@ -533,3 +535,88 @@ def test_fill001_runtime_binding_rejects_session_run_monitor_mismatch(tmp_path):
     session["monitor_status_at_connect"]["version"] = "0.2.4"
     with pytest.raises(FillMatrixError, match="единую версию Game Monitor"):
         bind_fill001_runtime_evidence(task, session, [run], report)
+
+
+def test_chalk_first_capture_reuses_runtime_binding_and_new_screen_quality(
+    tmp_path, monkeypatch,
+):
+    """Synthetic test of integration only: E4 geometry-binder itself is mocked.
+
+    E4 raw-run mouse/DOM proof is covered by its own unmocked binder tests.
+    """
+    import fill001_screen_mask_v2_binding
+    from fill001_screen_mask_v2 import FILL001_CHALK_FIRST_POLICY_V2
+    task, session, report, run_path, run, _, _ = _runtime_documents(tmp_path)
+    roi={"x":0,"y":0,"width":460,"height":240}
+    geometry={
+        "run_id":run["run_id"],
+        "same_run":True,
+        "coordinate_system":"desktop_screen_css_pixels",
+        "validation_status":"valid",
+        "independent_screen_mapping":True,
+        "board_screen_corners":{"left":0.0,"top":0.0,"right":460.0,"bottom":240.0},
+        "evidence_sha256":hashlib.sha256(run_path.read_bytes()).hexdigest(),
+    }
+    before=np.zeros((240,460,3),dtype=np.uint8)
+    painted=build_fill_target_mask("rectangle").copy()
+    painted[120,391:394]=True
+    after=np.zeros_like(before)
+    after[painted]=255
+    bp,ap=tmp_path/"before-chalk-first.png",tmp_path/"after-chalk-first.png"
+    Image.fromarray(before).save(bp)
+    Image.fromarray(after).save(ap)
+    e4=tmp_path/"screen-e4.json"
+    e4.write_text(json.dumps({"status":"PASS_E4_RAW_CAPTURE","run_id":run["run_id"]}),encoding="utf-8")
+    def binder(run_file,evidence_path,*,allow_v3_boardpane_only=False):
+        assert str(run_file)==str(run_path)
+        assert str(evidence_path)==str(e4)
+        assert allow_v3_boardpane_only is False
+        run_sha=hashlib.sha256(run_path.read_bytes()).hexdigest()
+        return {
+            "screen_roi":roi,
+            "geometry":dict(geometry),
+            "provenance":{
+                "schema":"FILL001_SCREEN_MASK_V2_MONITOR_BINDING",
+                "run_id":run["run_id"],
+                "raw_run_sha256":run_sha,
+                "checked_out_run_sha256":run_sha,
+                "e4_evidence_sha256":hashlib.sha256(e4.read_bytes()).hexdigest(),
+            },
+        }
+    monkeypatch.setattr(fill001_screen_mask_v2_binding,"bind_from_monitor_run",binder)
+    capture=build_fill001_chalk_first_capture_from_runtime(
+        task,session_path=session,executor_report_path=report,
+        screen_e4_evidence_path=e4,before_png=bp,after_png=ap,
+    )
+    assert capture["runtime_binding_status"]=="passed"
+    assert capture["quality_policy_id"]==FILL001_CHALK_FIRST_POLICY_V2
+    assert capture["screen_quality_audit"]["active_quality_gate"]=="PASS"
+    assert capture["screen_quality_audit"]["v2_diagnostic_gate"]=="FAIL"
+    assert capture["chalk_first_acceptance"]["legacy_png_audit_status"]=="failed"
+    assert capture["chalk_first_acceptance"]["status"]=="accepted"
+    assert capture["chalk_first_acceptance"]["exact_chalk"]==5
+    assert capture["screen_quality_audit"]["leakage_pixels"]==3
+    assert capture["chalk_first_acceptance"]["leakage_pixels"]==3
+    assert capture["exact_chalk"]==5
+    assert capture["pre_point_count"]==100
+    assert capture["post_point_count"]==105
+    with pytest.raises(FillMatrixError):
+        build_fill001_capture_from_runtime(
+            task,session_path=session,executor_report_path=report,
+            before_png=bp,after_png=ap,screen_roi=roi,
+        )
+    # Any remote splatter is a FAIL even when coverage remains 100%.
+    after[120,395]=255
+    Image.fromarray(after).save(ap)
+    with pytest.raises(FillMatrixError,match="quality audit"):
+        build_fill001_chalk_first_capture_from_runtime(
+            task,session_path=session,executor_report_path=report,
+            screen_e4_evidence_path=e4,before_png=bp,after_png=ap,
+        )
+    # Recomputed trustworthy metrics cannot conceal a mismatched run.
+    geometry["run_id"]="other-run"
+    with pytest.raises(FillMatrixError,match="does not bind"):
+        build_fill001_chalk_first_capture_from_runtime(
+            task,session_path=session,executor_report_path=report,
+            screen_e4_evidence_path=e4,before_png=bp,after_png=ap,
+        )
