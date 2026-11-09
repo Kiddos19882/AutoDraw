@@ -1,5 +1,10 @@
 # AutoDraw — дорожная карта будущих работ
 
+## После V5 DEC-030 — native geometry proxy пройден, реальный CHALK впереди
+
+В нативном Egret BoardPane/WebGL frozen rectangle V5 два заранее зафиксированных trim0 варианта с одним нижним штрихом превысили 99% покрытия; утечка 54 backing-пикселя и не дальше 1 логического px по distanceTransform/3, на alpha128. Это **native alpha proxy**, не экранная качество/CHALK-валидация. [Raw evidence](https://github.com/Kiddos19882/AutoDraw/actions/runs/42694626385/artifacts/13707703988). Следующий этап: проверить новый mixed-width brush switch (W10 + W2 или W3), same-run Stage↔desktop screen geometry, реальный `FILL001_CHALK_FIRST_PERIMETER_V2` PNG audit и exact `post.pointCount-pre.pointCount` на отдельных изолированных E4 запусках; без такого измерения W2/W3 не ранжировать. Затем frozen wide/narrow, multi-color leakage visual holdout и отдельный production decision. Executor defaults, estimator, frozen masks и historical runs не изменять.
+
+
 ## FILL-001 после DEC-030 full capture acceptance
 
 Новый программный runtime entrypoint и отдельная версия capture validator используют общий строгий Monitor/Bridge/executor/CHALK contract, проверенный E4 screen binding и DEC-030 perimeter quality. Old 45-cell matrix/legacy capture validator и executor defaults не менялись. Следующее: закончить CI на code SHA `8e2920b9d7410f596a89684ed3f85d44eaafb479`, получить независимый новый run-bound E4 с актуальной screen geometry и frozen mask, затем сравнить **только прошедшие quality** кандидатные планы по точному `pointCount delta` (не оценочным штрихам). Отдельно проверить multi-color визуальный halo и wide/narrow holdout; не делать production PASS без E4/E5 validation и без новой отдельной execution permission. [Validation](https://github.com/Kiddos19882/AutoDraw/actions/runs/42643765113).

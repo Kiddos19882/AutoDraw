@@ -1,5 +1,13 @@
 # AutoDraw — действующие задачи
 
+## P1 — FILL-001 V5 DEC-030: native trim0 99%+ periphery, CHALK gate open
+
+- [x] Versioned `FILL001_CHALK_FIRST_NATIVE_V5`: frozen rectangle SHA, неизменный V4 RGBA control и 8 заранее закреплённых trim0..3×bottom(W2/Y190 либо W3/Y189) вариантов. Изолированная native BoardPane/Egret WebGL проба, отдельный alpha анализ по 1/64/128/254, actual PNG/fixture SHA и fail-closed overwrite/tamper checks. [Native CI SUCCESS 42694626385](https://github.com/Kiddos19882/AutoDraw/actions/runs/42694626385); [source artifact 13707703988](https://github.com/Kiddos19882/AutoDraw/actions/runs/42694626385/artifacts/13707703988).
+- [x] Два trim0 кандидата на native alpha128 имеют coverage **99.425944%** / **99.426939%**, leakage 54 backing px (max1 logical px, none outside 3px). Alpha254 coverage >99.25%, far leakage 0. Контроль V4 — 98.943707%, leak0; все trim1/2/3 alpha128 ниже 99%. Все результаты, в том числе отрицательные, сохранены. **Native-screening qualified ≠ game PASS.**
+- [ ] **Следующий невыполненный шаг:** отдельная предварительная проверка и E4 live run-bound capture для trim0 (включая mixed-width brush change validation, source-plan signature, calibration, exact CHALK) и независимый E5 screen/renderer comparison. Нельзя выбирать W2 или W3 как CHALK winner без 2 exact run-bound deltas.
+- [ ] Повторить new policy на frozen wide/narrow и многоцветных holdouts; лишь потом рассматривать production/defaults и 45-cell. Live E4/E5/CHALK новой геометрии NOT_RUN, production BLOCKED.
+
+
 - [x] Новый capture validator также требует **SHA оригинальных before/after PNG из PASS_E4_RAW_CAPTURE** и совпадение E4 run/session/task/plan/ROI/exact CHALK; непроверенная screen-геометрия или подмена PNG не принимаются. Поддержка V3 BoardPane-only E4 явно включается флагом, без автоматического fallback. [CI code SHA `33fa812e4a81f9c03b2f5b43660eeb4f21018e9d`](https://github.com/Kiddos19882/AutoDraw/actions/runs/42645465734) после завершения необходимых jobs.
 
 ## P1 — FILL-001 DEC-030: внедрение нового CHALK-first PASS

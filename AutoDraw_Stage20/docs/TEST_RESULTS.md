@@ -1,5 +1,24 @@
 # AutoDraw — реестр проверенных результатов
 
+## FILL-001 DEC-030 native V5 — реальный Egret geometry screening, 2026-11-09
+
+[Native CI 42694626385 SUCCESS](https://github.com/Kiddos19882/AutoDraw/actions/runs/42694626385) on code SHA `182b2915e7afeda90ae51ad50ccf719f15a001c9`; [artifact 13707703988](https://github.com/Kiddos19882/AutoDraw/actions/runs/42694626385/artifacts/13707703988) includes 9 original RGBA PNG, input fixture JSON, manifest, SHA provenance and `FILL001_CHALK_FIRST_NATIVE_AUDIT_V5`. Frozen rectangle SHA `ac1c6660e5986cdf534328c6dbcd5020f631168b1473c24b29e7609eb827998b`, 3× backing target 401877px. Native control V5 `V4_y190_w2_control` **bytewise decoded RGBA identical** to prior V4 `J_bottom_y190_w2`, source PNG SHA checked against V4 prior audit; 29 synthetic strokes every case. New V5 independent audit verifies case list, geometry, SHA for PNG/fixture/manifest, original V4 control and per-threshold Euclidean exterior distance from projected frozen mask.
+
+| Native case | Coverage @alpha128 | Missing | Leakage backing px | Max exterior logical proxy px | Outside 3px? |
+|---|---:|---:|---:|---:|---:|
+| V4_y190_w2_control | 98.943707% | 4245 | 0 | 0 | 0 |
+| K_trim_0_y190_w2 | **99.425944%** | 2307 | 54 | 1.000000 | 0 |
+| K_trim_0_y189_w3 | **99.426939%** | 2303 | 54 | 1.000000 | 0 |
+| K_trim_1_y190_w2 | 98.973318% | 4126 | 13 | 0.666667 | 0 |
+| K_trim_1_y189_w3 | 98.974314% | 4122 | 13 | 0.666667 | 0 |
+| K_trim_2_y190_w2 | 98.952445% | 4210 | 3 | 0.333333 | 0 |
+| K_trim_2_y189_w3 | 98.953440% | 4206 | 3 | 0.333333 | 0 |
+| K_trim_3_y190_w2 | 98.943707% | 4245 | 0 | 0 | 0 |
+| K_trim_3_y189_w3 | 98.945449% | 4238 | 0 | 0 | 0 |
+
+Native trim0 sensitivity: alpha1 coverage99.527467/99.529209%, leak88, max1px; alpha64 coverage99.471978/99.473222%, leak70, max1px; alpha254 coverage99.259724/99.260968%, leak32, max0.666667px (W2/W3). Far leakage beyond 3 logical px always 0. More alpha-level detail, missing bottom/left/right and rejected cases preserved in JSON. `native_screening_gate=QUALIFIED_FOR_LIVE_EVALUATION` **не является DEC-030 game quality PASS**. Full regression [42694767248](https://github.com/Kiddos19882/AutoDraw/actions/runs/42694767248) executes on later test SHA `617866cf` — no claims before completed jobs. Exact game CHALK for V5 NOT_RUN; real E4/E5 screen/multi-color NOT_RUN. No production change.
+
+
 **Дополнительный fail-closed контракт на code SHA `33fa812e4a81f9c03b2f5b43660eeb4f21018e9d`:** E4 source report обязан иметь `status=PASS_E4_RAW_CAPTURE` и поля `before/after.board_roi_sha256`/`roi_size`, `screen_roi`, `run_id`, `session_id`, `task_id`, `plan_signature`, `monitor_version`, `raw_run_sha256`, `exact_chalk`; все сверяются с реальными source files и binding. Synthetic regression проверяет отказ при изменении after PNG без изменения E4 SHA, затем отдельно качество изображения при согласованных SHA, а также несовпадающий E4 exact CHALK. Старый capture и frozen legacy status неизменны. Explicit V3-only mapping проходит только через действующий независимый BoardPane provenance validator. [CI 42645465734](https://github.com/Kiddos19882/AutoDraw/actions/runs/42645465734) — E3 status по завершении обязательных jobs, E4 game run для DEC-030 NOT_RUN.
 
 

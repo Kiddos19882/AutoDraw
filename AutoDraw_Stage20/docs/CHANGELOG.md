@@ -1,5 +1,10 @@
 # AutoDraw — значимые изменения
 
+## 2026-11-09 — FILL-001 V5 native CHALK-first perimeter screening
+
+Extended existing FILL001 fixture generator, Egret BoardPane WebGL harness, Firefox runner, alpha analyst, regression tests and isolated native CI with `FILL001_CHALK_FIRST_NATIVE_V5` / `FILL001_CHALK_FIRST_NATIVE_AUDIT_V5`. New frozen 4×2 lateral trim vs bottom brush combinations plus unchanged V4 source control; all native RGBA/SHA and rejected candidates preserved. Native trim0 alpha128 coverage >99.42% and max leakage depth 1 logical px, but **no game quality PASS or exact CHALK**. [Native CI](https://github.com/Kiddos19882/AutoDraw/actions/runs/42694626385), [raw evidence](https://github.com/Kiddos19882/AutoDraw/actions/runs/42694626385/artifacts/13707703988). No production, runtime, historical mask, executor or default updates.
+
+
 Дополнен DEC-030 capture E4 provenance gate: before/after PNG SHA-256 и размеры ROI, exact CHALK, task/plan/run/session теперь сверяются непосредственно с independently verified source E4 report. Stale/mismatched PNG fail-closed; explicit V3 BoardPane-only geometry применяется только через ранее проверенный binder. [CI](https://github.com/Kiddos19882/AutoDraw/actions/runs/42645465734); existing legacy FILL001 capture and matrix remain unchanged.
 
 

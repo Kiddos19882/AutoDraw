@@ -1,5 +1,10 @@
 # AutoDraw — журнал выполненных действий
 
+## 2026-11-09 — FILL-001 DEC-030 V5 bounded native perimeter sweep
+
+Начальный remote HEAD `ce59f87b`, 20 recent commits, prior full and Markdown CI SUCCESS; прочитаны README/STATUS/TASKS/ROADMAP/AI_WORK_GUIDE, DEC-030, invariants, experiment rules, existing V2/V3/V4 native comparison code and Egret browser/Firefox/CI. Пользователь разрешил продолжение этапа. Вместо игры выполнен минимальный offline V5: существующий FILL001 analyzer exports 9 pinned geometric cases (4 trims×2 safe bottom plus V4 control); existing Firefox/Egret harness captures real native WebGL PNG with input/provenance SHA; existing native CI stage verifies independent alpha/3px perimeter probe, V4 RGBA equality and no game CHALK. Изменены existing `chalk_fill_strategy_comparison.py`, `game_renderer_reference.js`, `run_egret_stage_reference_firefox.py`, `test_chalk_fill_strategy_comparison.py`, `engine001-e5-offline.yml`; production untouched. Native CI `42694626385` SUCCESS [raw artifact](https://github.com/Kiddos19882/AutoDraw/actions/runs/42694626385/artifacts/13707703988). Trim0 on alpha128 coverage 99.426% with 54 backing leak (max1 logical px), other trims fail 99%; 2 trim0 qualified for **live evaluation only**, E4/E5 and exact CHALK NOT_RUN. Later full test SHA `617866cf` [CI 42694767248](https://github.com/Kiddos19882/AutoDraw/actions/runs/42694767248). Next — independent mixed-width Stage/screen validation and consented game run (not yet executed).
+
+
 **Дополнительная проверка для безопасности:** обнаружено, что одного совпадения E4 run и screen mapping недостаточно, если before/after ROI PNG могут быть подменены. Дополнены input provenance проверки E4 source PNG SHA, crop sizes, task/plan/run/session и exact CHALK. Commits `36c6e26b`, `a51b3692`, `587167a2`, `33fa812e`; режим V3 BoardPane-only E4 только с явным разрешением и проверкой в существующем binder. [Regression CI](https://github.com/Kiddos19882/AutoDraw/actions/runs/42645465734). Никаких live запусков или изменений production не было.
 
 
