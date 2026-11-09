@@ -12,6 +12,7 @@ from chalk_fill_matrix import (
     build_fill001_matrix,
     load_fill001_matrix,
     validate_fill001_capture,
+    validate_fill001_chalk_first_capture,
     validate_fill001_matrix,
     write_fill001_matrix,
 )
@@ -186,3 +187,95 @@ def test_capture_requires_per_stroke_chalk_sum_and_png_audit(matrix):
     invalid["stroke_chalk_deltas"] = [100]
     with pytest.raises(FillMatrixError):
         validate_fill001_capture(task, invalid)
+
+
+def test_chalk_first_new_capture_accepts_perimeter_leakage_without_legacy_relabel(matrix):
+    from fill001_screen_mask_v2 import FILL001_CHALK_FIRST_POLICY_V2
+    task = matrix["tasks"][0]
+    original = _capture(task)
+    original["png_audit_status"] = "failed"
+    original["leakage_pixels"] = 18
+    original["session_id"] = "session-a"
+    original["execution_id"] = "execution-a"
+    original["runtime_binding_status"] = "passed"
+    original["quality_policy_id"] = FILL001_CHALK_FIRST_POLICY_V2
+    original["bridge_run_file_sha256"] = "a" * 64
+    original["screen_binding_e4_sha256"] = "b" * 64
+    original["screen_roi"] = {"x": 0, "y": 0, "width": 461, "height": 241}
+    original["screen_quality_screen_roi"] = dict(original["screen_roi"])
+    original["screen_binding_provenance"] = {
+        "schema": "FILL001_SCREEN_MASK_V2_MONITOR_BINDING",
+        "run_id": original["run_id"],
+        "checked_out_run_sha256": "a" * 64,
+        "raw_run_sha256": "c" * 64,
+        "e4_evidence_sha256": "b" * 64,
+    }
+    original["screen_quality_audit"] = {
+        "schema": "FILL001_SCREEN_MASK_V2",
+        "run_id": original["run_id"],
+        "geometry_evidence_sha256": "c" * 64,
+        "frozen_target_mask_sha256": task["target_mask_sha256"],
+        "before_png_sha256": original["before_png_sha256"],
+        "after_png_sha256": original["after_png_sha256"],
+        "rgb_change_threshold": 8,
+        "target_pixels": 10000,
+        "coverage_fraction": 0.995,
+        "leakage_pixels": 18,
+        "active_quality_policy_id": FILL001_CHALK_FIRST_POLICY_V2,
+        "active_quality_gate": "PASS",
+        "acceptance_override": False,
+        "active_quality_metrics": {
+            "policy_id": FILL001_CHALK_FIRST_POLICY_V2,
+            "quality_gate": "PASS",
+            "minimum_coverage_fraction": 0.99,
+            "maximum_allowed_overshoot_logical_px": 3.0,
+            "coverage_fraction": 0.995,
+            "leakage_pixels": 18,
+            "target_pixels": 10000,
+            "max_perimeter_overshoot_logical_px": 2.75,
+            "leakage_pixels_beyond_allowed_halo": 0,
+            "exact_chalk": None,
+            "chalk_evidence_status": "NOT_EVALUATED",
+        },
+    }
+    accepted = validate_fill001_chalk_first_capture(task, original)
+    assert accepted["status"] == "accepted"
+    assert accepted["exact_chalk"] == 100
+    assert accepted["leakage_pixels"] == 18
+    assert accepted["legacy_png_audit_status"] == "failed"
+    assert accepted["quality_policy_id"] == FILL001_CHALK_FIRST_POLICY_V2
+    with pytest.raises(FillMatrixError):
+        validate_fill001_capture(task, original)
+    for field, value in (
+        ("exact_chalk", 99),
+        ("post_point_count", 1101),
+        ("bridge_failures", 1),
+        ("dropped_events", 1),
+        ("plan_signature", "f" * 64),
+        ("screen_binding_e4_sha256", "0" * 64),
+        ("bridge_run_file_sha256", "0" * 64),
+        ("quality_policy_id", "WRONG"),
+    ):
+        changed = copy.deepcopy(original)
+        changed[field] = value
+        with pytest.raises(FillMatrixError):
+            validate_fill001_chalk_first_capture(task, changed)
+    for key, value in (
+        ("active_quality_gate", "FAIL"),
+        ("run_id", "other-run"),
+        ("geometry_evidence_sha256", "0" * 64),
+        ("after_png_sha256", "0" * 64),
+    ):
+        changed = copy.deepcopy(original)
+        changed["screen_quality_audit"][key] = value
+        with pytest.raises(FillMatrixError):
+            validate_fill001_chalk_first_capture(task, changed)
+    for field, value in (
+        ("leakage_pixels_beyond_allowed_halo", 1),
+        ("max_perimeter_overshoot_logical_px", 3.01),
+        ("coverage_fraction", 0.985),
+    ):
+        changed = copy.deepcopy(original)
+        changed["screen_quality_audit"]["active_quality_metrics"][field] = value
+        with pytest.raises(FillMatrixError):
+            validate_fill001_chalk_first_capture(task, changed)
