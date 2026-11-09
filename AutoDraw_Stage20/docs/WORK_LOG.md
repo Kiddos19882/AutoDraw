@@ -1,5 +1,12 @@
 # AutoDraw — журнал выполненных действий
 
+## 2026-11-09 — FILL-001 contour-first experimental research
+
+Read-only audit confirmed latest pre-existing HEAD c28ac470 and baseline V3 OFF 4efa33c, current documentation, FILL-001 frozen target masks/planner and earlier A–D strategy model. User's hypothesis: paint one closed contour before the interior, overlap inside without extending fill outside. Existing `C_sparse_plus_contour` already has same contour but last; new `E_contour_first_same_geometry` held all geometry constant. Added experimental variants to **existing** `source/preparation/chalk_fill_strategy_comparison.py`, tests in `tests/test_chalk_fill_strategy_comparison.py`, and CI diagnostic artifacts in existing `.github/workflows/geometry-tests.yml`. Code sequence: `d9802757` (V1), `bd21aaf4` (tests), `5ff822bc` (CI); `01b14dce` (V2 side-only trim after V1 negative), `cbcd9fc5` (tests), `c0248162` (CI V2). No production planner/executor changes.
+
+V1 `FILL001_CONTOUR_FIRST_OVERLAP_V1`: E same geometry exactly equals C OpenCV raster on 3 masks, quality PASS, but V1 full distance-transform inset 7–9 PASS on none (coverage ~98%). V2 `FILL001_CONTOUR_EDGE_TRIMS_V2`: unchanged row count/Y, with X endpoints 1–4 px inward. Rectangle and wide pass existing OpenCV gate, narrow fails below 99%; leakage=0 for all, including failed cases. Saved versioned reports and PNG artifacts from [CI 42547807009](https://github.com/Kiddos19882/AutoDraw/actions/runs/42547807009). Exact CHALK and Egret pixel parity not tested, no gameplay. Prior V3 OFF 18 screen leaks and 427 misses remain FAIL. Further recommendation: native Egret Stage replay, rather than promoting one shape-dependent trim to production.
+
+
 **Назначение:** только фактически выполненные изменения и проверки, а не будущие планы.  
 **Полная история до 2026-11-08:** [WORK_LOG_HISTORY_THROUGH_2026-11-08.md](WORK_LOG_HISTORY_THROUGH_2026-11-08.md) — побайтовый исторический снимок прежней редакции.
 
