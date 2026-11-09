@@ -579,10 +579,105 @@ def export_contour_first_native_fixture(path: Path) -> dict[str, Any]:
     return fixture
 
 
+
+def analyze_contour_native_pngs(render_dir: Path, report_path: Path) -> dict[str, Any]:
+    """Read-only native BoardPane alpha screen; never a live PNG quality gate.
+
+    Frozen logical pixels are expanded exactly 3x into local BoardPane backing
+    pixels. No fitted translation, dilation, erosion or inferred screen ROI is
+    permitted. Alpha cutoffs 1, 64, 128 and 254 are sensitivity diagnostics.
+    """
+    if report_path.exists():
+        raise FileExistsError("Refusing to replace native contour audit")
+    manifest_path = render_dir / "manifest.json"
+    native_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    target = build_fill_target_mask("rectangle")
+    frozen_sha = fill_target_mask_sha256("rectangle", target)
+    cases = native_manifest.get("cases")
+    names = ("B_sparse_only", "C_contour_last", "E_contour_first")
+    if (native_manifest.get("schema") != "FILL001_NATIVE_CONTOUR_FIRST_V1"
+            or native_manifest.get("status") != "OFFLINE_NATIVE_EGRET_RENDERED"
+            or native_manifest.get("sourceMaskSha256") != frozen_sha
+            or set(cases or {}) != set(names)
+            or native_manifest.get("measuredChalk") is not None
+            or native_manifest.get("executorReady") is not False):
+        raise ValueError("Untrusted native contour manifest identity")
+    projected = np.repeat(np.repeat(target, 3, axis=0), 3, axis=1)
+    alpha_by_case = {}
+    sha_by_case = {}
+    for name in names:
+        png_name = f"fill001-native-{name}.png"
+        if cases[name].get("pngName") != png_name:
+            raise ValueError("Native PNG manifest name mismatch")
+        source = render_dir / png_name
+        raw = source.read_bytes()
+        raster = cv2.imdecode(np.frombuffer(raw, dtype=np.uint8), cv2.IMREAD_UNCHANGED)
+        if raster is None or raster.dtype != np.uint8 or raster.shape != (720, 1380, 4):
+            raise ValueError("Native PNG must be RGBA 1380x720")
+        alpha_by_case[name] = raster[:, :, 3]
+        sha_by_case[name] = hashlib.sha256(raw).hexdigest()
+    b = alpha_by_case["B_sparse_only"]
+    c = alpha_by_case["C_contour_last"]
+    e = alpha_by_case["E_contour_first"]
+    if not np.array_equal(c, e) or np.array_equal(b, e):
+        raise ValueError("Native first-vs-last parity or added contour benefit failed")
+    if (native_manifest.get("comparisons", {}).get("contourFirstVsLast", {})
+            .get("differingPixels") != 0):
+        raise ValueError("Native manifest and PNG pair disagree")
+    metrics = {}
+    for name in names:
+        alpha = alpha_by_case[name]
+        rows = {}
+        for cutoff in (1, 64, 128, 254):
+            painted = alpha >= cutoff
+            covered = int(np.count_nonzero(painted & projected))
+            missing = int(np.count_nonzero(~painted & projected))
+            leak = int(np.count_nonzero(painted & ~projected))
+            rows[str(cutoff)] = {
+                "covered_target_backing_pixels": covered,
+                "uncovered_target_backing_pixels": missing,
+                "leakage_backing_pixels": leak,
+                "coverage_fraction": covered / int(projected.sum()),
+            }
+        metrics[name] = {
+            "native_png_sha256": sha_by_case[name],
+            "stroke_count": cases[name]["strokeCount"],
+            "accepted_synthetic_points_not_chalk": cases[name]["acceptedSyntheticPoints"],
+            "alpha_threshold_diagnostics": rows,
+        }
+    report = {
+        "schema": "FILL001_NATIVE_CONTOUR_ALPHA_AUDIT_V1",
+        "status": "OFFLINE_NATIVE_DIAGNOSTIC_ONLY",
+        "source_native_manifest_sha256": hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
+        "frozen_mask_sha256": frozen_sha,
+        "local_backing_canvas": {"width": 1380, "height": 720, "scale": 3},
+        "projected_target_backing_pixels": int(projected.sum()),
+        "projection": "nearest_3x_frozen_logical_mask_no_alignment",
+        "alpha_cutoffs": [1, 64, 128, 254],
+        "cases": metrics,
+        "order_parity_exact_rgba": True,
+        "measured_chalk": None,
+        "game_png_quality_gate": "NOT_EVALUATED",
+        "native_to_live_stage_mapping": "NOT_EVALUATED",
+        "limitations": [
+            "Exact native local BoardPane alpha only, NOT same-run screen RGB.",
+            "Nearest logical-to-native mask raster differs from V3 run-bound Screen Mask V2.",
+            "Synthetic straight two-point scans, not the live 1461 accepted-point trajectories.",
+            "Alpha cutoffs are diagnostic sensitivity, not a substitute for RGB threshold 8.",
+            "No executed CHALK or live leak/coverage acceptance claimed.",
+        ],
+    }
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    return report
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--shape", choices=FILL001_SHAPES, action="append")
+    parser.add_argument("--native-render-dir", type=Path,
+                        help="Recheck native contour RGBA against frozen 3x logical target, diagnostic only.")
     parser.add_argument("--native-fixture", action="store_true",
                         help="Write a single multi-stroke native-browser input JSON.")
     parser.add_argument("--contour-first", action="store_true",
@@ -590,6 +685,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--contour-edge-trims", action="store_true",
                         help="Versioned V2 endpoint-only trimming study.")
     args = parser.parse_args(argv)
+    if args.native_render_dir is not None:
+        if args.native_fixture or args.contour_first or args.contour_edge_trims or args.shape:
+            parser.error("--native-render-dir must be used alone.")
+        analyze_contour_native_pngs(args.native_render_dir, args.output_dir)
+        return 0
     if args.native_fixture:
         if args.contour_first or args.contour_edge_trims or args.shape:
             parser.error("--native-fixture cannot be combined with other options.")
