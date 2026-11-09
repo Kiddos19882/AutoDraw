@@ -298,6 +298,13 @@ def main() -> int:
                     or manifest.get("measuredChalk") is not None
                     or manifest.get("executorReady") is not False):
                 raise ValueError("Native contour manifest did not verify frozen identity and output.")
+            comparisons = manifest.get("comparisons", {})
+            order = comparisons.get("contourFirstVsLast", {})
+            added = comparisons.get("sparseVsContourFirst", {})
+            if (order.get("differingPixels") != 0 or order.get("equal") is not True
+                    or not isinstance(added.get("differingPixels"), int)
+                    or added["differingPixels"] <= 0):
+                raise ValueError("Native contour order parity or added geometry failed.")
             links = driver.execute_script(
                 "return Array.from(document.querySelectorAll('a[download]'))"
                 ".filter(a=>a.href.startsWith('data:image/png;base64,'))"
