@@ -640,8 +640,13 @@ def analyze_contour_native_pngs(render_dir: Path, report_path: Path) -> dict[str
     target = build_fill_target_mask("rectangle")
     frozen_sha = fill_target_mask_sha256("rectangle", target)
     cases = native_manifest.get("cases")
+    is_v2 = native_manifest.get("schema") == "FILL001_NATIVE_CONTOUR_EDGE_TRIMS_V2"
     names = ("B_sparse_only", "C_contour_last", "E_contour_first")
-    if (native_manifest.get("schema") != "FILL001_NATIVE_CONTOUR_FIRST_V1"
+    if is_v2:
+        names += tuple(f"G_trim_{i}" for i in range(1,5))
+        if native_manifest.get("testedTrimPx") != [1, 2, 3, 4]:
+            raise ValueError("V2 trim parameter identity mismatch")
+    if (native_manifest.get("schema") not in ("FILL001_NATIVE_CONTOUR_FIRST_V1", "FILL001_NATIVE_CONTOUR_EDGE_TRIMS_V2")
             or native_manifest.get("status") != "OFFLINE_NATIVE_EGRET_RENDERED"
             or native_manifest.get("sourceMaskSha256") != frozen_sha
             or set(cases or {}) != set(names)
@@ -691,8 +696,17 @@ def analyze_contour_native_pngs(render_dir: Path, report_path: Path) -> dict[str
             "accepted_synthetic_points_not_chalk": cases[name]["acceptedSyntheticPoints"],
             "alpha_threshold_diagnostics": rows,
         }
+    if is_v2:
+        for trim in range(1,5):
+            case = alpha_by_case[f"G_trim_{trim}"]
+            if np.array_equal(e, case):
+                raise ValueError("V2 native endpoint trim rendered identical output")
+            delta = native_manifest.get("comparisons", {}).get(f"contourFirstVsTrim{trim}", {})
+            if not isinstance(delta.get("differingPixels"), int) or delta["differingPixels"] <= 0:
+                raise ValueError("V2 native trim manifest mismatch")
     report = {
-        "schema": "FILL001_NATIVE_CONTOUR_ALPHA_AUDIT_V1",
+        "schema": ("FILL001_NATIVE_CONTOUR_ALPHA_AUDIT_V2"
+                   if is_v2 else "FILL001_NATIVE_CONTOUR_ALPHA_AUDIT_V1"),
         "status": "OFFLINE_NATIVE_DIAGNOSTIC_ONLY",
         "source_native_manifest_sha256": hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
         "frozen_mask_sha256": frozen_sha,
@@ -701,6 +715,8 @@ def analyze_contour_native_pngs(render_dir: Path, report_path: Path) -> dict[str
         "projection": "nearest_3x_frozen_logical_mask_no_alignment",
         "alpha_cutoffs": [1, 64, 128, 254],
         "cases": metrics,
+        "tested_trim_px": [1,2,3,4] if is_v2 else None,
+        "native_comparisons": native_manifest.get("comparisons", {}),
         "order_parity_exact_rgba": True,
         "measured_chalk": None,
         "game_png_quality_gate": "NOT_EVALUATED",
