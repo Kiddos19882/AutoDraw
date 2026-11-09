@@ -1,5 +1,7 @@
 # AutoDraw — действующие задачи
 
+- [x] Новый capture validator также требует **SHA оригинальных before/after PNG из PASS_E4_RAW_CAPTURE** и совпадение E4 run/session/task/plan/ROI/exact CHALK; непроверенная screen-геометрия или подмена PNG не принимаются. Поддержка V3 BoardPane-only E4 явно включается флагом, без автоматического fallback. [CI code SHA `33fa812e4a81f9c03b2f5b43660eeb4f21018e9d`](https://github.com/Kiddos19882/AutoDraw/actions/runs/42645465734) после завершения необходимых jobs.
+
 ## P1 — FILL-001 DEC-030: внедрение нового CHALK-first PASS
 
 - [x] Пользователь изменил формальный критерий PASS для **новых** FILL-001: coverage≥99%, leakage допускается только на расстоянии ≤3 **логических** px по всему контуру, без удалённых пятен. Измеренный CHALK важнее дальнейшего уменьшения допустимой утечки. [Решение DEC-030](DECISIONS.md#dec-030-fill-001-новый-pass-с-ограниченной-утечкой-и-приоритетом-фактического-chalk).

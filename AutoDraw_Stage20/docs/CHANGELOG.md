@@ -1,5 +1,8 @@
 # AutoDraw — значимые изменения
 
+Дополнен DEC-030 capture E4 provenance gate: before/after PNG SHA-256 и размеры ROI, exact CHALK, task/plan/run/session теперь сверяются непосредственно с independently verified source E4 report. Stale/mismatched PNG fail-closed; explicit V3 BoardPane-only geometry применяется только через ранее проверенный binder. [CI](https://github.com/Kiddos19882/AutoDraw/actions/runs/42645465734); existing legacy FILL001 capture and matrix remain unchanged.
+
+
 ## 2026-11-09 — FILL001 DEC-030 full capture acceptance API
 
 Версионированный `build_fill001_chalk_first_capture_from_runtime()` и `validate_fill001_chalk_first_capture()`: сохраняются строгие прежние инварианты Monitor/Bridge/executor и CHALK telemetry, добавлена новая приёмка independent screen ROI по DEC-030 (99% coverage, ≤3 logical px periphery). Shared core исключает дублирование и сохраняет legacy `build_fill001_capture_from_runtime`/`validate_fill001_capture` leakage=0 без изменений исторического результата. Regression tests positive/negative, full CI [42643765113](https://github.com/Kiddos19882/AutoDraw/actions/runs/42643765113). Без production/UI/45-cell batch изменений и без live запусков.

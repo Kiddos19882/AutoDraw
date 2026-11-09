@@ -1,5 +1,8 @@
 # AutoDraw — реестр проверенных результатов
 
+**Дополнительный fail-closed контракт на code SHA `33fa812e4a81f9c03b2f5b43660eeb4f21018e9d`:** E4 source report обязан иметь `status=PASS_E4_RAW_CAPTURE` и поля `before/after.board_roi_sha256`/`roi_size`, `screen_roi`, `run_id`, `session_id`, `task_id`, `plan_signature`, `monitor_version`, `raw_run_sha256`, `exact_chalk`; все сверяются с реальными source files и binding. Synthetic regression проверяет отказ при изменении after PNG без изменения E4 SHA, затем отдельно качество изображения при согласованных SHA, а также несовпадающий E4 exact CHALK. Старый capture и frozen legacy status неизменны. Explicit V3-only mapping проходит только через действующий независимый BoardPane provenance validator. [CI 42645465734](https://github.com/Kiddos19882/AutoDraw/actions/runs/42645465734) — E3 status по завершении обязательных jobs, E4 game run для DEC-030 NOT_RUN.
+
+
 ## FILL-001 DEC-030 — separate full run-bound acceptance code and regressions (2026-11-09)
 
 Code SHA `8e2920b9d7410f596a89684ed3f85d44eaafb479` [AutoDraw validation 42643765113](https://github.com/Kiddos19882/AutoDraw/actions/runs/42643765113): `chalk_fill_matrix.py` выделяет shared capture invariants (task/run/plan/mask/P1, exact pointCount delta, per-stroke chalk sum, no dropped events/Bridge failures, PNG SHA fields) и отдельный `validate_fill001_chalk_first_capture()` с явным policy ID, source raw-run/E4 SHA, same-run ROI, `active_quality_gate=PASS`, coverage≥99%, halo≤3 logical px и нулём far-away leakage. Legacy `validate_fill001_capture()` по-прежнему требует zero leakage и historical `png_audit_status=passed`.
