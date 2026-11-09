@@ -1,5 +1,10 @@
 # AutoDraw — журнал выполненных действий
 
+## 2026-11-09 — пользователь изменил FILL-001 PASS на CHALK-first с 3px периметром
+
+Проверено remote HEAD `cc0bfa9f`, 20 recent commits, latest Actions (native/full/Markdown SUCCESS); прочитаны README/PROJECT_STATUS/TASKS/ROADMAP/AI_WORK_GUIDE и профильные DECISIONS/EVIDENCE/EXPERIMENT, код screen V2 и legacy adapter/matrix. Пользователь распорядился **формально изменить новый PASS**, поскольку нулевая утечка заставляет тратить лишний CHALK и в многоцветном рисунке допускается периметральный overshoot. Добавлена новая версия `FILL001_CHALK_FIRST_PERIMETER_V2` к существующему run-bound `fill001_screen_mask_v2.py`: ≥99% coverage, ≤3 logical px at every leaked pixel, conservative scale and explicit opt-in for new captures; historical screen gates and data unchanged. Добавлены регрессионные E2 test cases. DEC-030 фиксирует новую принятую политику. Новый code SHA проверяется Actions, E4 не запускался, production не менялся. Следующий шаг: versioned full capture acceptance и независимый CHALK-first comparison только после получения run-bound evidence.
+
+
 ## 2026-11-09 — FILL001 native V4 isolated lower stripe
 
 **Follow-up for raw reproducibility:** code `a42ed224` stores exact V4 fixture bytes with output; `7814eec3` checks source-fixture SHA, case order, control geometry and bottom line in independent report. Test commits `38c62d7d`, `5d3c5904` preserve negative tamper proof (valid JSON trailing newline). [Native CI 42577013425](https://github.com/Kiddos19882/AutoDraw/actions/runs/42577013425) SUCCESS, [retained input + raw PNG + metrics](https://github.com/Kiddos19882/AutoDraw/actions/runs/42577013425/artifacts/13655990846). Previous numeric evidence `42576168617` remains historical and unchanged. No production change.

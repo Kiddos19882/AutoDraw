@@ -1,5 +1,10 @@
 # AutoDraw — значимые изменения
 
+## 2026-11-09 — FILL-001 new forward PASS, CHALK first
+
+Accepted policy `FILL001_CHALK_FIRST_PERIMETER_V2` for new run-bound FILL-001 quality: ≥99% coverage and Euclidean perimeter overshoot ≤3 **logical board pixels** everywhere, instead of legacy leakage=0. Further minimization of permitted leakage is subordinate to validated exact CHALK. Implemented separate versioned quality result in existing Screen Mask V2 audit/CLI with tests for far-away spill, threshold, scale and unchanged historical FAIL. No executor/legacy matrix changes; previous runs and artifacts not reclassified. [DEC-030](DECISIONS.md#dec-030-fill-001-новый-pass-с-ограниченной-утечкой-и-приоритетом-фактического-chalk).
+
+
 ## 2026-11-09 — FILL001 native lower stripe V4
 
 Source fixture raw SHA added to V4 reproducibility contract without modifying candidate geometry. Saved exact input bytes in artifact and independently verified they match the fixture provenance and the per-case renderer manifest; test for input tampering fails closed. [Native CI 42577013425](https://github.com/Kiddos19882/AutoDraw/actions/runs/42577013425) SUCCESS, [artifact](https://github.com/Kiddos19882/AutoDraw/actions/runs/42577013425/artifacts/13655990846). Original V4 metrics remain unchanged.

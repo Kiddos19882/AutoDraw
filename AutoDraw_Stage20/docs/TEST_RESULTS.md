@@ -1,5 +1,12 @@
 # AutoDraw — реестр проверенных результатов
 
+## FILL-001 — новая политика PASS после прямого решения пользователя, 2026-11-09
+
+**Протокол** `FILL001_CHALK_FIRST_PERIMETER_V2`, [DEC-030](DECISIONS.md#dec-030-fill-001-новый-pass-с-ограниченной-утечкой-и-приоритетом-фактического-chalk). Новая формула: changed = max RGB difference >8 в run-bound screen ROI; target = неизменный frozen screen projection; coverage≥0.99; для каждого leaked pixel `distance_to_target_screen_px/min(validated_pixels_per_logical_x,validated_pixels_per_logical_y)≤3` (евклидова метрика; min scale консервативен). Сохранять total leakage, far-away leakage count, maximum overshoot logical px, coverage и все source hashes. Screen mapping valid/same-run обязательно; без независимого геометрического binding не заявлять game-quality PASS. Величина CHALK не выводится из PNG: ранжирование только после exact post/pre pointCount, валидированного monitor/session/run. Это новая acceptance-policy version, не re-label V4 native alpha FAIL и не V1 исторических screen results.
+
+**Кодовая реализация:** `source/preparation/fill001_screen_mask_v2.py` и `source/preparation/tests/test_fill001_screen_mask_v2.py`. Тесты: inside/3logical halo accepted, 4logical detached fail, screen scaling 3×, missing>1% fail, invalid geometry scaling fail, optional-policy screen audit returns legacy FAIL alongside new PASS. Проверка E3 должна отдельно подтвердить CI на SHA реализации; не трактовать PASS unit-tests как real E4. Старый capture adapter и 45-task matrix по-прежнему используют frozen leakage=0 до отдельной versioned integration.
+
+
 ## FILL-001 native bottom repair V4 — controlled negative/positive evidence, 2026-11-09
 
 **Provenance enhancement (same frozen V4 protocol):** [native E3 run 42577013425](https://github.com/Kiddos19882/AutoDraw/actions/runs/42577013425) SUCCESS on `7814eec3`; [artifact 13655990846](https://github.com/Kiddos19882/AutoDraw/actions/runs/42577013425/artifacts/13655990846) contains exact input `fixture-input.json` in addition to PNG/manifest/provenance/alpha report. Verified raw input SHA equals both `fixture-provenance.json.fixtureSha256` and `native-bottom-audit-v4.json.source_fixture_sha256`. All control/candidate alpha≥128 measurements remain exactly as in table below. Test-only `5d3c5904` adds a fail-closed SHA tamper regression; full validation run on its SHA is evaluated separately. This does NOT add any E4/game-screenshot evidence.

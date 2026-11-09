@@ -1,5 +1,13 @@
 # AutoDraw — действующие задачи
 
+## P1 — FILL-001 DEC-030: внедрение нового CHALK-first PASS
+
+- [x] Пользователь изменил формальный критерий PASS для **новых** FILL-001: coverage≥99%, leakage допускается только на расстоянии ≤3 **логических** px по всему контуру, без удалённых пятен. Измеренный CHALK важнее дальнейшего уменьшения допустимой утечки. [Решение DEC-030](DECISIONS.md#dec-030-fill-001-новый-pass-с-ограниченной-утечкой-и-приоритетом-фактического-chalk).
+- [x] В существующий run-bound screen-mask audit добавлена версия `FILL001_CHALK_FIRST_PERIMETER_V2`, геометрическое расстояние от frozen mask в логических координатах, отказ при невалидном масштабе, явная версия policy в отчёте; старый `v2_diagnostic_gate`/legacy V1 не перезаписываются. E2 тесты проверяют 3px PASS, >3px FAIL, coverage<99% FAIL и исторический FAIL.
+- [ ] **Первый следующий шаг:** versioned новый полный capture acceptance с policy ID / run-bound screenshot binding / точной CHALK delta, без изменения legacy матрицы и задним числом; E3 CI статусы по конкретному SHA и native/live E5 отдельно.
+- [ ] Проверить новую политику на frozen rectangle/wide/narrow с фактическим screen RGB, учесть multi-color visual holds и лишь после independent validation разрешать продвижение planner/executor. CHALK-предсказатели, frozen captures и старый 45-task batch всё ещё BLOCKED.
+
+
 ## P1 — FILL-001 V4: локальный нижний ремонт проверен (2026-11-09)
 
 - [x] V4 raw provenance усилена: исходный `fixture-input.json` находится рядом с PNG в [артефакте 13655990846](https://github.com/Kiddos19882/AutoDraw/actions/runs/42577013425/artifacts/13655990846); собственный SHA SHA-256 проверяется одновременно против `fixture-provenance.json` и read-only отчёта. Native CI [42577013425](https://github.com/Kiddos19882/AutoDraw/actions/runs/42577013425) SUCCESS на `7814eec3`, test-only SHA `5d3c5904` добавляет негативный test изменения байтов. PNG/пороговые метрики неизменны.

@@ -1,5 +1,10 @@
 # AutoDraw — дорожная карта будущих работ
 
+## Новый приоритет FILL-001 — CHALK-first PASS (DEC-030)
+
+Пользователь **изменил acceptance** будущих FILL-001: coverage≥99%, допускается до 3 логических пикселей выхода реальной кисти за frozen mask по всему контуру, но не дальше, даже единичным пикселем. После достаточного качества оптимизировать **exact CHALK**, а не нулевую утечку. Новый screen-mask quality evaluator версионирован как `FILL001_CHALK_FIRST_PERIMETER_V2`, legacy отчёты/матрицы не переписываются. Сначала versioned run-bound capture acceptance и контроль screen mapping, затем bounded native/screen кандидаты с боковым и нижним заполнением и multi-color holdouts, сравнение подтверждённых точных CHALK, потом решение о production/45-cell. Приоритет zero leakage в старых V1–V4 документах — исторический, не обязательный для следующего протокола. [Решение](DECISIONS.md#dec-030-fill-001-новый-pass-с-ограниченной-утечкой-и-приоритетом-фактического-chalk).
+
+
 ## Следующая геометрическая проверка после FILL-001 V4
 
 Один lower-boundary native stripe с width2/Y190 или width3/Y189 почти целиком закрыл 2457 backing-пикселей нижнего пропуска при alpha≥128 и **не увеличил leakage** (control G_trim_3 zero). Width3/Y190 пересёк нижнюю границу на 2414 backing-пикселей — сохраняется как отрицательный результат. Все кандидаты всё ещё ниже 99% coverage из-за боковых gaps. Следующий ограниченный шаг: adaptive left/right endpoint repair с реальным native footprint и фиксацией ширины/вертикального положения, затем frozen holdout wide/narrow, independent run-bound Stage/screen, и только при доказательности live E4. [Raw V4 evidence](https://github.com/Kiddos19882/AutoDraw/actions/runs/42576168617/artifacts/13655800959). Не менять production и acceptance gates.
