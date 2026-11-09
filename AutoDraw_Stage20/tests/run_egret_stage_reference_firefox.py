@@ -348,7 +348,7 @@ def main() -> int:
                     base64.b64decode(item["href"].split(",",1)[1],validate=True)
                 )
             (dest/"manifest.json").write_text(
-                json.dumps(manifest,ensure_ascii=False,indent=2)+"\\n",encoding="utf-8"
+                json.dumps(manifest,ensure_ascii=False,indent=2)+"\n",encoding="utf-8"
             )
             (dest/"fixture-provenance.json").write_text(
                 json.dumps({
@@ -362,7 +362,7 @@ def main() -> int:
                     },
                     "gameRunId":None,"measuredChalk":None,
                     "source":"offline native BoardPane synthetic points, not game input",
-                },ensure_ascii=False,indent=2)+"\\n",encoding="utf-8"
+                },ensure_ascii=False,indent=2)+"\n",encoding="utf-8"
             )
             print("DEC-030 V5 native: 9 RGBA PNG + exact source fixture SHA. Game CHALK NOT_RUN.")
             return 0
