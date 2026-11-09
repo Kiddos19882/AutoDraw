@@ -1354,6 +1354,109 @@
     }
   }
 
+
+  // FILL-001 native three-way multi-stroke comparison, generated from the
+  // frozen rectangle by Python; never reads a live run as a synthetic plan.
+  // The old single-stroke ENGINE-001 replay and its fail-closed gates stay intact.
+  function renderContourFirstNativeStudy() {
+    try {
+      if (!window.egret || !egret.Shape || !egret.CanvasRenderer ||
+          typeof getBoardPaneClass() !== "function") {
+        throw new Error("Native Egret and game BoardPane not loaded.");
+      }
+      const url = "./fill001-contour-first-native-input.json";
+      const req = new XMLHttpRequest();
+      req.open("GET", url, false);
+      req.send(null);
+      if (req.status !== 200) throw new Error("Missing generated pinned contour input: HTTP " + req.status);
+      const fixture = JSON.parse(req.responseText);
+      if (!fixture || fixture.schema !== "FILL001_NATIVE_CONTOUR_FIRST_V1" ||
+          fixture.status !== "OFFLINE_SYNTHETIC_INPUT_ONLY" ||
+          fixture.shape_id !== "rectangle" ||
+          fixture.frozen_mask_sha256 !== "ac1c6660e5986cdf534328c6dbcd5020f631168b1473c24b29e7609eb827998b" ||
+          fixture.brush !== 10 || fixture.contour_inset !== 6 ||
+          !fixture.cases || Object.keys(fixture.cases).sort().join(",") !==
+          "B_sparse_only,C_contour_last,E_contour_first") {
+        throw new Error("Frozen contour-first native fixture identity mismatch.");
+      }
+      const state = initializeWebGL(null);
+      const mask = createBoardMask();
+      const captures = {};
+      const manifest = {
+        schema: "FILL001_NATIVE_CONTOUR_FIRST_V1",
+        status: "OFFLINE_NATIVE_EGRET_RENDERED",
+        sourceMaskSha256: fixture.frozen_mask_sha256,
+        sourcePlanSignature: fixture.baseline_plan_signature,
+        engineVersion: egret.Capabilities.engineVersion,
+        nativeRenderer: state.glInfo,
+        stageGeometry: "LOCAL_BOARD_ONLY_NOT_V3_SCREEN",
+        cases: {},
+        comparisons: {},
+        measuredChalk: null, executorReady: false,
+        limitations: [
+          "Native BoardPane/Egret WebGL only; not a V3 same-run Stage/screen match.",
+          "Synthetic sparse strokes do not reconstruct per-frame accepted points.",
+          "No game runtime or exact CHALK for these candidate strategies."
+        ]
+      };
+      const expected = { B_sparse_only: 27, C_contour_last: 28, E_contour_first: 28 };
+      for (const name of ["B_sparse_only", "C_contour_last", "E_contour_first"]) {
+        const strokes = fixture.cases[name];
+        if (!Array.isArray(strokes) || strokes.length !== expected[name] ||
+            strokes.some(stroke => stroke.width !== 10 || stroke.mode !== "normal" ||
+              !Array.isArray(stroke.points) || stroke.points.length < 2 ||
+              stroke.points.some(p => !Number.isInteger(p.x) || !Number.isInteger(p.y) ||
+                p.x < 0 || p.x >= 460 || p.y < 0 || p.y >= 240))) {
+          throw new Error("Malformed native contour stroke inputs for " + name);
+        }
+        const replay = strokes.map((stroke,i) => ({
+          strokeId: name + "-stroke-" + i,
+          points: stroke.points
+        }));
+        const board = makeTemporalBoard(replay, 10, "normal", false);
+        const expectedPoints = strokes.reduce((sum,s) => sum + s.points.length,0);
+        if (board.accepted !== expectedPoints) {
+          throw new Error("Native BoardPane rejected generated points in " + name);
+        }
+        const source = renderGraphicsNode(board.shape.$renderNode,false);
+        const composed = composeBoard(source, source.nodeBounds, mask);
+        const native = renderWebGLProbe("normal",[],10,composed,state,board.shape);
+        captures[name] = native.canvas;
+        manifest.cases[name] = {
+          strokeCount: strokes.length, acceptedSyntheticPoints: board.accepted,
+          drawCalls: native.drawCalls, graphicsPathCount: board.graphicsPathCount,
+          sceneDiagnostics: native.sceneDiagnostics,
+          browserNativeBackend: state.glInfo.renderer,
+          canvas2DVsWebGL: native.comparison,
+          pngName: "fill001-native-" + name + ".png"
+        };
+      }
+      manifest.comparisons = {
+        contourFirstVsLast: compareCanvases(captures.C_contour_last,captures.E_contour_first),
+        sparseVsContourFirst: compareCanvases(captures.B_sparse_only,captures.E_contour_first)
+      };
+      casesNode.textContent = "";
+      const card = document.createElement("section");
+      card.className = "fixture";
+      card.textContent = "FILL-001 isolated native BoardPane multi-stroke test; NOT live E5.";
+      for (const [name,canvas] of Object.entries(captures)) {
+        addDownloadLink(card,canvas,"fill001-native-" + name + ".png",name);
+      }
+      casesNode.appendChild(card);
+      document.getElementById("renderer-manifest-json").textContent = JSON.stringify(manifest,null,2);
+      document.body.dataset.contourNativeStatus = "complete";
+      document.body.dataset.referenceStatus = "contour_native_complete";
+      document.body.dataset.pngCount = "3";
+      statusNode.textContent = "Native FILL-001 contour-first comparison complete (not game screen calibration).";
+    } catch(error) {
+      document.body.dataset.contourNativeStatus = "error";
+      document.body.dataset.referenceStatus = "error";
+      statusNode.className = "error";
+      statusNode.textContent = "Native contour-first study failed: " +
+        (error && error.stack ? error.stack : String(error));
+    }
+  }
+
   function renderAll() {
     try {
       if (!window.egret || !egret.Shape || !egret.CanvasRenderer) {
@@ -1564,12 +1667,14 @@
     }
   }
 
+  api.renderContourFirstNativeStudy = renderContourFirstNativeStudy;
   api.renderAll = renderAll;
   api.renderTemporalStudy = renderTemporalStudy;
   api.renderEndpointStudy = renderEndpointStudy;
   api.renderDuplicateFrameStudy = renderDuplicateFrameStudy;
   const params = new URLSearchParams(window.location.search);
-  const startup = params.get("frames") === "fill001" ? renderDuplicateFrameStudy
+  const startup = params.get("contour") === "fill001" ? renderContourFirstNativeStudy
+    : params.get("frames") === "fill001" ? renderDuplicateFrameStudy
     : params.get("outline") === "fill001" ? () => renderEndpointStudy(true)
     : params.get("endpoint") === "fill001" ? () => renderEndpointStudy(false)
     : params.get("temporal") === "fill001" ? renderTemporalStudy : renderAll;
