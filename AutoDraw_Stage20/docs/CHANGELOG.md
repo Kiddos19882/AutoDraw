@@ -1,5 +1,10 @@
 # AutoDraw — значимые изменения
 
+## 2026-11-09 — FILL001 DEC-030 full capture acceptance API
+
+Версионированный `build_fill001_chalk_first_capture_from_runtime()` и `validate_fill001_chalk_first_capture()`: сохраняются строгие прежние инварианты Monitor/Bridge/executor и CHALK telemetry, добавлена новая приёмка independent screen ROI по DEC-030 (99% coverage, ≤3 logical px periphery). Shared core исключает дублирование и сохраняет legacy `build_fill001_capture_from_runtime`/`validate_fill001_capture` leakage=0 без изменений исторического результата. Regression tests positive/negative, full CI [42643765113](https://github.com/Kiddos19882/AutoDraw/actions/runs/42643765113). Без production/UI/45-cell batch изменений и без live запусков.
+
+
 ## 2026-11-09 — FILL-001 new forward PASS, CHALK first
 
 Accepted policy `FILL001_CHALK_FIRST_PERIMETER_V2` for new run-bound FILL-001 quality: ≥99% coverage and Euclidean perimeter overshoot ≤3 **logical board pixels** everywhere, instead of legacy leakage=0. Further minimization of permitted leakage is subordinate to validated exact CHALK. Implemented separate versioned quality result in existing Screen Mask V2 audit/CLI with tests for far-away spill, threshold, scale and unchanged historical FAIL. No executor/legacy matrix changes; previous runs and artifacts not reclassified. [DEC-030](DECISIONS.md#dec-030-fill-001-новый-pass-с-ограниченной-утечкой-и-приоритетом-фактического-chalk).

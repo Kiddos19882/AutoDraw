@@ -1,5 +1,10 @@
 # AutoDraw — дорожная карта будущих работ
 
+## FILL-001 после DEC-030 full capture acceptance
+
+Новый программный runtime entrypoint и отдельная версия capture validator используют общий строгий Monitor/Bridge/executor/CHALK contract, проверенный E4 screen binding и DEC-030 perimeter quality. Old 45-cell matrix/legacy capture validator и executor defaults не менялись. Следующее: закончить CI на code SHA `8e2920b9d7410f596a89684ed3f85d44eaafb479`, получить независимый новый run-bound E4 с актуальной screen geometry и frozen mask, затем сравнить **только прошедшие quality** кандидатные планы по точному `pointCount delta` (не оценочным штрихам). Отдельно проверить multi-color визуальный halo и wide/narrow holdout; не делать production PASS без E4/E5 validation и без новой отдельной execution permission. [Validation](https://github.com/Kiddos19882/AutoDraw/actions/runs/42643765113).
+
+
 ## Новый приоритет FILL-001 — CHALK-first PASS (DEC-030)
 
 Пользователь **изменил acceptance** будущих FILL-001: coverage≥99%, допускается до 3 логических пикселей выхода реальной кисти за frozen mask по всему контуру, но не дальше, даже единичным пикселем. После достаточного качества оптимизировать **exact CHALK**, а не нулевую утечку. Новый screen-mask quality evaluator версионирован как `FILL001_CHALK_FIRST_PERIMETER_V2`, legacy отчёты/матрицы не переписываются. Сначала versioned run-bound capture acceptance и контроль screen mapping, затем bounded native/screen кандидаты с боковым и нижним заполнением и multi-color holdouts, сравнение подтверждённых точных CHALK, потом решение о production/45-cell. Приоритет zero leakage в старых V1–V4 документах — исторический, не обязательный для следующего протокола. [Решение](DECISIONS.md#dec-030-fill-001-новый-pass-с-ограниченной-утечкой-и-приоритетом-фактического-chalk).
