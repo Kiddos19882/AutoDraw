@@ -626,13 +626,13 @@ def export_contour_trim_native_fixture(path: Path) -> dict[str, Any]:
     return fixture
 
 
-def export_native_bottom_repair_fixture(path: Path) -> dict[str, Any]:
+def export_native_bottom_repair_fixture(path: Path | None) -> dict[str, Any]:
     """V4 bounded native probe: preserved V2 G_trim_3 plus one bottom line.
 
     The 3 logical-pixel lateral margin is pinned before any native result:
     no screenshot-driven endpoint tuning, planner modification or execution.
     """
-    if path.exists():
+    if path is not None and path.exists():
         raise FileExistsError("Refusing to overwrite frozen native V4 fixture")
     mask = build_fill_target_mask("rectangle")
     sha = fill_target_mask_sha256("rectangle", mask)
@@ -694,8 +694,9 @@ def export_native_bottom_repair_fixture(path: Path) -> dict[str, Any]:
         "runtime_validated":False,
         "executor_ready":False,
     }
-    path.parent.mkdir(parents=True,exist_ok=True)
-    path.write_text(json.dumps(fixture,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    if path is not None:
+        path.parent.mkdir(parents=True,exist_ok=True)
+        path.write_text(json.dumps(fixture,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     return fixture
 
 
@@ -707,7 +708,7 @@ def export_chalk_first_v5_fixture(path: Path) -> dict[str, Any]:
     """
     if path.exists():
         raise FileExistsError("V5 frozen geometry fixture already exists")
-    v4_control = export_native_bottom_repair_fixture_to_memory()
+    v4_control = export_native_bottom_repair_fixture(None)
     baseline = v4_control["cases"]["G_trim_3_control"]
     if len(baseline) != 28 or v4_control["bottom_line_endpoints"] != [97, 363]:
         raise ValueError("V5 V4 baseline drift")
@@ -757,15 +758,10 @@ def export_chalk_first_v5_fixture(path: Path) -> dict[str, Any]:
         "executor_ready":False,
     }
     path.parent.mkdir(parents=True,exist_ok=True)
-    path.write_text(json.dumps(fixture,ensure_ascii=False,indent=2)+"\\n",encoding="utf-8")
+    path.write_text(json.dumps(fixture,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     return fixture
 
 
-def export_native_bottom_repair_fixture_to_memory() -> dict[str, Any]:
-    """Construct the V4 geometry in-memory, without writing a second fixture."""
-    from tempfile import TemporaryDirectory
-    with TemporaryDirectory(prefix="fill001-v5-v4-") as directory:
-        return export_native_bottom_repair_fixture(Path(directory)/"v4.json")
 
 
 def export_mixed_contour_native_fixture(path: Path) -> dict[str, Any]:
