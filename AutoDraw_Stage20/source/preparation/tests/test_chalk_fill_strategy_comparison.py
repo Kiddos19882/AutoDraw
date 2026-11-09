@@ -261,3 +261,29 @@ def test_native_contour_alpha_read_only_audit(tmp_path):
     (render / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
     with pytest.raises(ValueError, match="identity"):
         analyze_contour_native_pngs(render, out)
+
+
+def test_native_v2_contour_trim_fixture_preserves_contour_rows_and_sha(tmp_path):
+    from chalk_fill_strategy_comparison import export_contour_trim_native_fixture
+    path = tmp_path / "native-v2.json"
+    fixture = export_contour_trim_native_fixture(path)
+    assert fixture["schema"] == "FILL001_NATIVE_CONTOUR_EDGE_TRIMS_V2"
+    assert fixture["tested_trim_px"] == [1,2,3,4]
+    assert fixture["frozen_mask_sha256"] == FILL001_EXPECTED_MASK_SHA256["rectangle"]
+    assert fixture["measured_chalk"] is None and fixture["executor_ready"] is False
+    cases = fixture["cases"]
+    assert len(cases) == 7
+    assert len(cases["B_sparse_only"]) == 27
+    assert len(cases["E_contour_first"]) == 28
+    for trim in fixture["tested_trim_px"]:
+        case = cases[f"G_trim_{trim}"]
+        assert len(case) == 28
+        assert case[0] == cases["E_contour_first"][0]
+        for original, updated in zip(cases["E_contour_first"][1:], case[1:]):
+            first, last = original["points"]
+            left, right = updated["points"]
+            assert left == {"x": first["x"] + trim, "y": first["y"]}
+            assert right == {"x": last["x"] - trim, "y": last["y"]}
+    assert json.loads(path.read_text(encoding="utf-8")) == fixture
+    with pytest.raises(FileExistsError):
+        export_contour_trim_native_fixture(path)
