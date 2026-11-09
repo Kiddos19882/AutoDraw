@@ -626,6 +626,76 @@ def export_contour_trim_native_fixture(path: Path) -> dict[str, Any]:
     return fixture
 
 
+def export_mixed_contour_native_fixture(path: Path) -> dict[str, Any]:
+    """V3 frozen mixed-width geometry: 5px inset outline, 10px inner scanlines.
+
+    No executor, runtime brush switch, or actual game CHALK is implied.
+    """
+    if path.exists():
+        raise FileExistsError("Refusing to overwrite V3 mixed-width native fixture")
+    shape_id = "rectangle"
+    mask = build_fill_target_mask(shape_id)
+    signature = fill_target_mask_sha256(shape_id, mask)
+    if signature != FILL001_EXPECTED_MASK_SHA256[shape_id]:
+        raise ValueError("V3 frozen mask SHA mismatch")
+    base = build_fixed_radius_fill_plan(
+        shape_id, 10, scanline_row_step=5, scanline_offset=0,
+    )
+    if len(base["strokes"]) != 27:
+        raise ValueError("V3 expected 27 stable inner scanline rows")
+    scanlines = [
+        {"points": [dict(p) for p in stroke["points"]],
+         "width": 10, "mode": "normal"}
+        for stroke in base["strokes"]
+    ]
+    legacy = _contour_stroke(mask, 6, 10)
+    thin = _contour_stroke(mask, 3, 5)
+    outline10 = {
+        "points": [{"x": int(x), "y": int(y)}
+                   for x, y in [*legacy["points"], legacy["points"][0]]],
+        "width": 10, "mode": "normal",
+    }
+    outline5 = {
+        "points": [{"x": int(x), "y": int(y)}
+                   for x, y in [*thin["points"], thin["points"][0]]],
+        "width": 5, "mode": "normal",
+    }
+    cases = {"E_contour_10": [outline10, *scanlines]}
+    for trim in range(5):
+        amended = []
+        for stroke in scanlines:
+            p, q = stroke["points"]
+            if q["x"] - p["x"] <= 2*trim:
+                raise ValueError("V3 requested trim exceeds row length")
+            amended.append({
+                "points": [
+                    {"x": p["x"]+trim, "y": p["y"]},
+                    {"x": q["x"]-trim, "y": q["y"]},
+                ],
+                "width": 10, "mode": "normal",
+            })
+        cases[f"H_mixed_trim_{trim}"] = [outline5, *amended]
+    fixture = {
+        "schema": "FILL001_NATIVE_MIXED_CONTOUR_V3",
+        "status": "OFFLINE_SYNTHETIC_INPUT_ONLY",
+        "shape_id": shape_id,
+        "frozen_mask_sha256": signature,
+        "baseline_plan_signature": base["plan_signature"],
+        "contour_width": 5, "contour_inset": 3,
+        "interior_width": 10, "row_step": 5,
+        "tested_trim_px": [0, 1, 2, 3, 4],
+        "cases": cases,
+        "measured_chalk": None,
+        "runtime_validated": False,
+        "executor_ready": False,
+        "limitations": "Two brush widths require additional game/runtime evidence.",
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(fixture, indent=2, ensure_ascii=False)+"\n",
+                    encoding="utf-8")
+    return fixture
+
+
 def analyze_contour_native_pngs(render_dir: Path, report_path: Path) -> dict[str, Any]:
     """Read-only native BoardPane alpha screen; never a live PNG quality gate.
 
@@ -740,6 +810,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--shape", choices=FILL001_SHAPES, action="append")
     parser.add_argument("--native-render-dir", type=Path,
                         help="Recheck native contour RGBA against frozen 3x logical target, diagnostic only.")
+    parser.add_argument("--native-mixed-fixture", action="store_true",
+                        help="Export V3 5px contour / 10px interior native study.")
     parser.add_argument("--native-trim-fixture", action="store_true",
                         help="Export isolated V2 contour-first X-endpoint native sweep.")
     parser.add_argument("--native-fixture", action="store_true",
@@ -750,9 +822,14 @@ def main(argv: list[str] | None = None) -> int:
                         help="Versioned V2 endpoint-only trimming study.")
     args = parser.parse_args(argv)
     if args.native_render_dir is not None:
-        if args.native_fixture or args.native_trim_fixture or args.contour_first or args.contour_edge_trims or args.shape:
+        if args.native_fixture or args.native_trim_fixture or args.native_mixed_fixture or args.contour_first or args.contour_edge_trims or args.shape:
             parser.error("--native-render-dir must be used alone.")
         analyze_contour_native_pngs(args.native_render_dir, args.output_dir)
+        return 0
+    if args.native_mixed_fixture:
+        if args.native_fixture or args.native_trim_fixture or args.contour_first or args.contour_edge_trims or args.shape:
+            parser.error("--native-mixed-fixture must be used alone.")
+        export_mixed_contour_native_fixture(args.output_dir)
         return 0
     if args.native_trim_fixture:
         if args.native_fixture or args.contour_first or args.contour_edge_trims or args.shape:
