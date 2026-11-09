@@ -317,8 +317,10 @@ def load_fill001_matrix(path: str | Path) -> dict[str, Any]:
     return matrix
 
 
-def validate_fill001_capture(task: dict[str, Any], capture: Any) -> dict[str, Any]:
-    """Validate one Game Monitor capture against the immutable matrix task."""
+def _validate_fill001_capture_invariants(
+    task: dict[str, Any], capture: Any,
+) -> None:
+    """Shared strict task/Monitor/Bridge/CHALK/PNG-field contract; no quality gate."""
     if not isinstance(capture, dict):
         raise FillMatrixError("Capture должен быть JSON object.")
     missing = [key for key in CAPTURE_FIELDS if key not in capture]
@@ -364,6 +366,14 @@ def validate_fill001_capture(task: dict[str, Any], capture: Any) -> dict[str, An
         raise FillMatrixError("monitor_version обязателен.")
     if isinstance(capture["event_count"], bool) or not isinstance(capture["event_count"], int) or capture["event_count"] < 1:
         raise FillMatrixError("event_count должен быть положительным целым.")
+    for field in ("dropped_events", "monitor_errors", "bridge_failures", "sequence_gaps"):
+        if capture[field] != 0:
+            raise FillMatrixError(f"Недопустимое значение {field}.")
+
+
+def validate_fill001_capture(task: dict[str, Any], capture: Any) -> dict[str, Any]:
+    """Original FILL001 zero-leakage validator, with unchanged results."""
+    _validate_fill001_capture_invariants(task, capture)
     if capture["png_audit_status"] != "passed":
         raise FillMatrixError("PNG evidence не прошёл независимый audit.")
     if capture["leakage_pixels"] != 0:
@@ -371,9 +381,6 @@ def validate_fill001_capture(task: dict[str, Any], capture: Any) -> dict[str, An
     coverage = capture["coverage_fraction"]
     if isinstance(coverage, bool) or not isinstance(coverage, (int, float)) or not math.isfinite(coverage) or not 0.99 <= coverage <= 1.0:
         raise FillMatrixError("Live capture не прошёл coverage ≥99%.")
-    for field in ("dropped_events", "monitor_errors", "bridge_failures", "sequence_gaps"):
-        if capture[field] != 0:
-            raise FillMatrixError(f"Недопустимое значение {field}.")
     return {
         "task_id": task["task_id"], "run_id": capture["run_id"],
         "shape_id": task["shape_id"], "radius": task["requested_radius"],
@@ -381,6 +388,86 @@ def validate_fill001_capture(task: dict[str, Any], capture: Any) -> dict[str, An
         "coverage_fraction": float(coverage), "leakage_pixels": 0,
         "completed_strokes": capture["completed_strokes"],
         "plan_signature": capture["plan_signature"], "status": "accepted",
+    }
+
+
+
+def validate_fill001_chalk_first_capture(
+    task: dict[str, Any], capture: Any,
+) -> dict[str, Any]:
+    """DEC-030 new FILL001 acceptance, gated on verified same-run screen/CHALK.
+
+    No legacy PNG PASS is invented and no old capture is relabeled.
+    """
+    from fill001_screen_mask_v2 import FILL001_CHALK_FIRST_POLICY_V2
+
+    _validate_fill001_capture_invariants(task, capture)
+    audit = capture.get("screen_quality_audit")
+    binding = capture.get("screen_binding_provenance")
+    if (capture.get("quality_policy_id") != FILL001_CHALK_FIRST_POLICY_V2
+            or capture.get("runtime_binding_status") != "passed"
+            or not isinstance(audit, dict)
+            or not isinstance(binding, dict)
+            or binding.get("schema") != "FILL001_SCREEN_MASK_V2_MONITOR_BINDING"
+            or binding.get("run_id") != capture["run_id"]
+            or binding.get("checked_out_run_sha256") != capture.get("bridge_run_file_sha256")
+            or binding.get("raw_run_sha256") != audit.get("geometry_evidence_sha256")
+            or binding.get("e4_evidence_sha256") != capture.get("screen_binding_e4_sha256")
+            or not isinstance(capture.get("session_id"), str)
+            or not capture.get("session_id")
+            or not isinstance(capture.get("execution_id"), str)
+            or not capture.get("execution_id")):
+        raise FillMatrixError("DEC-030 screen/Bridge/executor policy provenance invalid.")
+    if (audit.get("schema") != "FILL001_SCREEN_MASK_V2"
+            or audit.get("run_id") != capture["run_id"]
+            or audit.get("frozen_target_mask_sha256") != task["target_mask_sha256"]
+            or audit.get("before_png_sha256") != capture["before_png_sha256"]
+            or audit.get("after_png_sha256") != capture["after_png_sha256"]
+            or audit.get("active_quality_policy_id") != FILL001_CHALK_FIRST_POLICY_V2
+            or audit.get("active_quality_gate") != "PASS"
+            or audit.get("acceptance_override") is not False
+            or audit.get("rgb_change_threshold") != 8):
+        raise FillMatrixError("DEC-030 independent run-bound quality audit is missing or FAIL.")
+    metrics = audit.get("active_quality_metrics")
+    if (not isinstance(metrics, dict)
+            or metrics.get("policy_id") != FILL001_CHALK_FIRST_POLICY_V2
+            or metrics.get("quality_gate") != "PASS"
+            or metrics.get("minimum_coverage_fraction") != 0.99
+            or metrics.get("maximum_allowed_overshoot_logical_px") != 3.0
+            or metrics.get("leakage_pixels_beyond_allowed_halo") != 0
+            or metrics.get("leakage_pixels") != audit.get("leakage_pixels")
+            or metrics.get("target_pixels") != audit.get("target_pixels")
+            or metrics.get("exact_chalk") is not None
+            or metrics.get("chalk_evidence_status") != "NOT_EVALUATED"):
+        raise FillMatrixError("DEC-030 alpha/halo quality policy metrics invalid.")
+    cov = metrics.get("coverage_fraction")
+    distance = metrics.get("max_perimeter_overshoot_logical_px")
+    if (type(cov) not in (float,int) or not math.isfinite(cov)
+            or not 0.99 <= cov <= 1.0 or cov != audit.get("coverage_fraction")
+            or type(distance) not in (float,int) or not math.isfinite(distance)
+            or distance < 0.0 or distance > 3.0):
+        raise FillMatrixError("DEC-030 perimeter quality coverage or overshoot failed.")
+    if (capture.get("screen_roi") != capture.get("screen_quality_screen_roi")
+            or not isinstance(capture.get("screen_binding_e4_sha256"), str)
+            or len(capture["screen_binding_e4_sha256"]) != 64):
+        raise FillMatrixError("DEC-030 run-bound ROI/E4 provenance mismatch.")
+    return {
+        "status": "accepted",
+        "quality_policy_id": FILL001_CHALK_FIRST_POLICY_V2,
+        "task_id": task["task_id"],
+        "run_id": capture["run_id"],
+        "session_id": capture["session_id"],
+        "execution_id": capture["execution_id"],
+        "plan_signature": capture["plan_signature"],
+        "shape_id": task["shape_id"],
+        "requested_radius": task["requested_radius"],
+        "exact_chalk": capture["exact_chalk"],
+        "coverage_fraction": float(cov),
+        "leakage_pixels": metrics["leakage_pixels"],
+        "max_perimeter_overshoot_logical_px": distance,
+        "leakage_pixels_beyond_allowed_halo": 0,
+        "selection_priority": "min_run_bound_exact_chalk_among_quality_PASS",
+        "legacy_png_audit_status": capture["png_audit_status"],
     }
 
 
