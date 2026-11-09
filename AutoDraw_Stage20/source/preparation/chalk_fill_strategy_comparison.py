@@ -1259,6 +1259,131 @@ def analyze_native_contour_spatial_residual(render_dir: Path, report_path: Path)
     return report
 
 
+def analyze_native_bottom_repair(
+    render_dir: Path, baseline_dir: Path, report_path: Path,
+) -> dict[str, Any]:
+    """Independent V4 frozen native alpha + bottom/lateral audit.
+
+    The 28-stroke control must be pixel-identical to source V2 G_trim_3.
+    Distinguishes additive bottom repairs from lateral leakage and missing
+    pixels; diagnostics only, never an accepted game-quality result.
+    """
+    if report_path.exists():
+        raise FileExistsError("Refusing to replace V4 native residual")
+    manifest_path=render_dir/"manifest.json"
+    manifest_raw=manifest_path.read_bytes()
+    manifest=json.loads(manifest_raw)
+    provenance_path=render_dir/"fixture-provenance.json"
+    provenance=json.loads(provenance_path.read_text(encoding="utf-8"))
+    mask=build_fill_target_mask("rectangle")
+    frozen=fill_target_mask_sha256("rectangle",mask)
+    names=["G_trim_3_control"]+[
+        f"J_bottom_y{y}_w{w}" for w in (1,2,3) for y in (189,190)
+    ]
+    if (frozen!=FILL001_EXPECTED_MASK_SHA256["rectangle"]
+            or manifest.get("schema")!="FILL001_NATIVE_BOTTOM_REPAIR_V4"
+            or manifest.get("status")!="OFFLINE_NATIVE_EGRET_RENDERED"
+            or manifest.get("sourceMaskSha256")!=frozen
+            or manifest.get("baselineVariant")!="FILL001_NATIVE_CONTOUR_EDGE_TRIMS_V2/G_trim_3"
+            or manifest.get("testedWidths")!=[1,2,3]
+            or manifest.get("testedYs")!=[189,190]
+            or manifest.get("bottomLineEndpoints")!=[97,363]
+            or list(manifest.get("cases") or {})!=names
+            or manifest.get("measuredChalk") is not None
+            or manifest.get("executorReady") is not False
+            or provenance.get("schema")!="FILL001_NATIVE_BOTTOM_CAPTURE_V4"
+            or provenance.get("maskSha256")!=frozen
+            or provenance.get("liveRunId") is not None
+            or provenance.get("measuredChalk") is not None
+            or set(provenance.get("pngSha256") or {})!=
+                {f"fill001-native-{name}.png" for name in names}):
+        raise ValueError("V4 native provenance identity invalid")
+    target=np.repeat(np.repeat(mask,3,axis=0),3,axis=1)
+    v2_manifest=json.loads((baseline_dir/"manifest.json").read_text(encoding="utf-8"))
+    v2_report=json.loads((baseline_dir/"native-alpha-audit-v2.json").read_text(encoding="utf-8"))
+    if (v2_manifest.get("schema")!="FILL001_NATIVE_CONTOUR_EDGE_TRIMS_V2"
+            or v2_manifest.get("sourceMaskSha256")!=frozen
+            or v2_report.get("frozen_mask_sha256")!=frozen
+            or v2_report.get("source_native_manifest_sha256")!=
+               hashlib.sha256((baseline_dir/"manifest.json").read_bytes()).hexdigest()
+            or v2_manifest.get("cases",{}).get("G_trim_3",{}).get("pngName")!=
+               "fill001-native-G_trim_3.png"):
+        raise ValueError("V4 comparison baseline not pinned V2 G_trim_3")
+    original=(baseline_dir/"fill001-native-G_trim_3.png").read_bytes()
+    if hashlib.sha256(original).hexdigest()!=v2_report["cases"]["G_trim_3"]["native_png_sha256"]:
+        raise ValueError("V2 baseline PNG SHA mismatch")
+    original_rgba=cv2.imdecode(np.frombuffer(original,dtype=np.uint8),cv2.IMREAD_UNCHANGED)
+    if original_rgba is None or original_rgba.shape!=(720,1380,4):
+        raise ValueError("Invalid frozen V2 PNG")
+    metrics={}
+    frames={}
+    for name in names:
+        png=f"fill001-native-{name}.png"
+        case=manifest["cases"][name]
+        expected_strokes=28 if name=="G_trim_3_control" else 29
+        if case.get("pngName")!=png or case.get("strokeCount")!=expected_strokes:
+            raise ValueError("V4 native output stroke/PNG identity changed")
+        raw=(render_dir/png).read_bytes()
+        sha=hashlib.sha256(raw).hexdigest()
+        if sha!=provenance["pngSha256"][png]:
+            raise ValueError("V4 native output PNG SHA mismatch")
+        image=cv2.imdecode(np.frombuffer(raw,dtype=np.uint8),cv2.IMREAD_UNCHANGED)
+        if image is None or image.dtype!=np.uint8 or image.shape!=(720,1380,4):
+            raise ValueError("V4 output must be RGBA backing 1380x720")
+        frames[name]=image
+        per_threshold={}
+        for cutoff in (1,64,128,254):
+            painted=image[:,:,3]>=cutoff
+            spatial=_spatial_partition_contour_residual(target,painted)
+            per_threshold[str(cutoff)]={
+                "coverage_fraction":round(1-spatial["uncovered_backing_pixels"]/int(target.sum()),9),
+                "uncovered_backing_pixels":spatial["uncovered_backing_pixels"],
+                "leakage_backing_pixels":spatial["leakage_backing_pixels"],
+                "uncovered_regions":spatial["uncovered_regions"],
+                "leakage_regions":spatial["leakage_regions"],
+                "worst_uncovered_rows":spatial["worst_uncovered_rows"],
+            }
+        metrics[name]={
+            "native_png_sha256":sha,
+            "stroke_count":expected_strokes,
+            "alpha_threshold_diagnostics":per_threshold,
+        }
+    if not np.array_equal(frames["G_trim_3_control"],original_rgba):
+        raise ValueError("V4 control must render identical RGBA to frozen V2 G_trim_3")
+    for name in names[1:]:
+        if np.array_equal(frames[name],frames["G_trim_3_control"]):
+            raise ValueError("V4 added bottom line made no native RGBA difference")
+        if manifest.get("comparisons",{}).get(name,{}).get("differingPixels",0)<=0:
+            raise ValueError("V4 manifest comparison omitted native changed pixels")
+    report={
+        "schema":"FILL001_NATIVE_BOTTOM_REPAIR_AUDIT_V4",
+        "status":"OFFLINE_NATIVE_DIAGNOSTIC_ONLY",
+        "source_manifest_sha256":hashlib.sha256(manifest_raw).hexdigest(),
+        "source_capture_provenance_sha256":hashlib.sha256(provenance_path.read_bytes()).hexdigest(),
+        "source_v2_manifest_sha256":hashlib.sha256((baseline_dir/"manifest.json").read_bytes()).hexdigest(),
+        "source_v2_control_png_sha256":hashlib.sha256(original).hexdigest(),
+        "control_vs_v2_rgba_identical":True,
+        "frozen_mask_sha256":frozen,
+        "projected_target_backing_pixels":int(target.sum()),
+        "tested_bottom_y":[189,190],"tested_widths":[1,2,3],
+        "lateral_safety_margin_logical_px":3,
+        "alpha_cutoffs":[1,64,128,254],
+        "cases":metrics,
+        "measured_chalk":None,
+        "game_png_quality_gate":"NOT_EVALUATED",
+        "live_stage_mapping":"NOT_EVALUATED",
+        "executor_ready":False,
+        "limitations":[
+            "Only frozen rectangle native local WebGL alpha, not live screen RGB",
+            "A positive alpha proxy is not game acceptance or a CHALK estimate",
+            "A 29-stroke candidate requires independent holdout and calibration before runtime"
+        ],
+    }
+    report_path.parent.mkdir(parents=True,exist_ok=True)
+    report_path.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    return report
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", type=Path, required=True)
@@ -1269,6 +1394,10 @@ def main(argv: list[str] | None = None) -> int:
                         help="Independently audit isolated native Egret footprint PNGs.")
     parser.add_argument("--native-render-dir", type=Path,
                         help="Recheck native contour RGBA against frozen 3x logical target, diagnostic only.")
+    parser.add_argument("--native-bottom-dir", type=Path,
+                        help="Independently audit native V4 bottom correction against original V2.")
+    parser.add_argument("--native-bottom-control-dir", type=Path,
+                        help="Required immutable V2 native directory for V4 pixel-exact control.")
     parser.add_argument("--native-bottom-fixture", action="store_true",
                         help="Export V4 thin bottom boundary repair on frozen V2 trim3.")
     parser.add_argument("--native-mixed-fixture", action="store_true",
@@ -1282,6 +1411,16 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--contour-edge-trims", action="store_true",
                         help="Versioned V2 endpoint-only trimming study.")
     args = parser.parse_args(argv)
+    if args.native_bottom_dir is not None:
+        if (args.native_bottom_control_dir is None or args.native_spatial_dir is not None
+                or args.native_footprint_dir is not None or args.native_render_dir is not None
+                or args.native_bottom_fixture or args.native_mixed_fixture or args.native_trim_fixture
+                or args.native_fixture or args.contour_first or args.contour_edge_trims or args.shape):
+            parser.error("--native-bottom-dir requires only --native-bottom-control-dir")
+        analyze_native_bottom_repair(args.native_bottom_dir,args.native_bottom_control_dir,args.output_dir)
+        return 0
+    if args.native_bottom_control_dir is not None:
+        parser.error("--native-bottom-control-dir requires --native-bottom-dir")
     if args.native_spatial_dir is not None:
         if (args.native_footprint_dir is not None or args.native_render_dir is not None
                 or args.native_bottom_fixture or args.native_mixed_fixture or args.native_trim_fixture or args.native_fixture
