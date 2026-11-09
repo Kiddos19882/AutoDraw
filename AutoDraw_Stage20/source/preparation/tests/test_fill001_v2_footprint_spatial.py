@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import numpy as np
+import json
+import tempfile
+from pathlib import Path
 import pytest
 
 from fill001_v2_footprint_spatial import classify_leakage, _overlay
@@ -105,3 +108,36 @@ def test_board_anchored_counterfactual_recovers_planned_y_without_touching_mask(
     assert corrected["first"]["start"]["y"] == 55
     assert corrected["first"]["end"]["y"] == 55
     assert corrected["max_y_deviation_from_planned"] == 0
+
+
+def test_committed_v3_off_spatial_residual_is_diagnostic_only():
+    from fill001_v2_footprint_spatial import analyze_v3_capture
+    root = Path(__file__).resolve().parents[3] / "data/results/brush_behavior_tests"
+    task = "fill001-20261109-040615-rectangle-r10-s5-o0-v3-smooth-off"
+    with tempfile.TemporaryDirectory() as tmp:
+        target = Path(tmp) / "v3-off-diagnostic"
+        result = analyze_v3_capture(root, target, task)
+        assert result["status"] == "DIAGNOSTIC_ONLY"
+        assert result["acceptance_override"] is False
+        assert result["run_id"] == "3b4243e9-509d-4d5b-9698-04bd657a8888"
+        assert result["leakage_pixels"] == 18
+        assert result["uncovered_pixels"] == 427
+        assert result["coverage_fraction"] == pytest.approx(0.9955219497871091)
+        assert sum(result["leakage_regions"]["categories"].values()) == 18
+        assert sum(row["count"] for row in result["missing_by_roi_row"]) == 427
+        assert sum(col["count"] for col in result["missing_by_roi_column"]) == 427
+        assert len(result["leakage_positions_roi_xy"]) == 18
+        assert (target / "v3-off-spatial-overlay.png").is_file()
+        assert json.loads((target / "report.json").read_text(encoding="utf-8"))["task_id"] == task
+        with pytest.raises(FileExistsError):
+            analyze_v3_capture(root, target, task)
+
+
+def test_v3_off_spatial_rejects_non_off_task_and_traversal():
+    from fill001_v2_footprint_spatial import analyze_v3_capture
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        with pytest.raises(ValueError):
+            analyze_v3_capture(root, root / "output", "../v3-smooth-off")
+        with pytest.raises(ValueError):
+            analyze_v3_capture(root, root / "output", "fill001-any-v3-smooth-on")
