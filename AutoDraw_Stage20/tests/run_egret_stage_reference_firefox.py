@@ -224,6 +224,8 @@ def main() -> int:
     )
     parser.add_argument("--engine001-journal", type=Path, default=None,
                         help="Replay exactly the nine immutable ENGINE-001 E4 runs.")
+    parser.add_argument("--fill001-contour-mixed-only", action="store_true",
+                        help="Replay native V3 thin contour and wide interior candidates.")
     parser.add_argument("--fill001-contour-trim-only", action="store_true",
                         help="Replay isolated V2 contour-first endpoint trims on native BoardPane.")
     parser.add_argument("--fill001-contour-only", action="store_true",
@@ -273,33 +275,41 @@ def main() -> int:
                 f"runner Firefox is {actual_version!r}."
             )
         driver.set_page_load_timeout(90)
-        if args.fill001_contour_only or args.fill001_contour_trim_only:
-            if args.fill001_contour_only and args.fill001_contour_trim_only:
+        if args.fill001_contour_only or args.fill001_contour_trim_only or args.fill001_contour_mixed_only:
+            if sum((args.fill001_contour_only, args.fill001_contour_trim_only,
+                    args.fill001_contour_mixed_only)) != 1:
                 parser.error("Choose only one native contour version.")
             trim_v2 = args.fill001_contour_trim_only
+            mixed_v3 = args.fill001_contour_mixed_only
             if args.engine001_journal or args.paired_renderer_experiment_root or args.engine001_only:
                 parser.error("--fill001-contour-only is incompatible with other live-reference options.")
-            fixture_path = workspace / ("AutoDraw_Stage20/tests/fill001-contour-trims-native-input.json"
+            fixture_path = workspace / ("AutoDraw_Stage20/tests/fill001-contour-mixed-native-input.json"
+                                       if mixed_v3 else "AutoDraw_Stage20/tests/fill001-contour-trims-native-input.json"
                                        if trim_v2 else "AutoDraw_Stage20/tests/fill001-contour-first-native-input.json")
             if not fixture_path.is_file():
                 raise FileNotFoundError("Native contour fixture must be generated in this checkout.")
             fixture = json.loads(fixture_path.read_text(encoding="utf-8"))
-            if (fixture.get("schema") != ("FILL001_NATIVE_CONTOUR_EDGE_TRIMS_V2" if trim_v2 else "FILL001_NATIVE_CONTOUR_FIRST_V1")
+            if (fixture.get("schema") != ("FILL001_NATIVE_MIXED_CONTOUR_V3" if mixed_v3
+                                                 else "FILL001_NATIVE_CONTOUR_EDGE_TRIMS_V2" if trim_v2
+                                                 else "FILL001_NATIVE_CONTOUR_FIRST_V1")
                     or fixture.get("status") != "OFFLINE_SYNTHETIC_INPUT_ONLY"):
                 raise ValueError("Unexpected native contour fixture.")
             driver.get(f"{args.base_url}/AutoDraw_Stage20/tests/game_renderer_reference.html?contour="
-                       f"{'fill001v2' if trim_v2 else 'fill001'}")
+                       f"{'fill001v3' if mixed_v3 else 'fill001v2' if trim_v2 else 'fill001'}")
+            state_script = ("return document.body.dataset.contourMixedStatus" if mixed_v3
+                            else "return document.body.dataset.contourTrimStatus" if trim_v2
+                            else "return document.body.dataset.contourNativeStatus")
             def contour_completed(browser: webdriver.Firefox) -> bool:
-                status = browser.execute_script("return document.body.dataset.contourTrimStatus" if trim_v2
-                                                else "return document.body.dataset.contourNativeStatus")
+                status = browser.execute_script(state_script)
                 return status in ("complete", "error")
             WebDriverWait(driver, 120, poll_frequency=0.25).until(contour_completed)
-            state_script = "return document.body.dataset.contourTrimStatus" if trim_v2 else "return document.body.dataset.contourNativeStatus"
             if driver.execute_script(state_script) != "complete":
                 raise RuntimeError(driver.find_element("id", "renderer-status").text)
             manifest = json.loads(driver.find_element("id", "renderer-manifest-json").get_property("textContent"))
             expected_names = {"B_sparse_only", "C_contour_last", "E_contour_first"}
-            if trim_v2:
+            if mixed_v3:
+                expected_names = {"E_contour_10"} | {f"H_mixed_trim_{i}" for i in range(5)}
+            elif trim_v2:
                 expected_names |= {f"G_trim_{i}" for i in range(1,5)}
             if (manifest.get("status") != "OFFLINE_NATIVE_EGRET_RENDERED"
                     or manifest.get("schema") != fixture.get("schema")
@@ -311,14 +321,15 @@ def main() -> int:
                     or manifest.get("executorReady") is not False):
                 raise ValueError("Native contour manifest did not verify frozen identity and output.")
             comparisons = manifest.get("comparisons", {})
-            order = comparisons.get("contourFirstVsLast", {})
-            added = comparisons.get("sparseVsContourFirst", {})
-            if (order.get("differingPixels") != 0 or order.get("equal") is not True
-                    or not isinstance(added.get("differingPixels"), int)
-                    or added["differingPixels"] <= 0):
-                raise ValueError("Native contour order parity or added geometry failed.")
-            if trim_v2:
-                for trim in (1, 2, 3, 4):
+            if not mixed_v3:
+                order = comparisons.get("contourFirstVsLast", {})
+                added = comparisons.get("sparseVsContourFirst", {})
+                if (order.get("differingPixels") != 0 or order.get("equal") is not True
+                        or not isinstance(added.get("differingPixels"), int)
+                        or added["differingPixels"] <= 0):
+                    raise ValueError("Native contour order parity or added geometry failed.")
+            if trim_v2 or mixed_v3:
+                for trim in (0,1,2,3,4) if mixed_v3 else (1,2,3,4):
                     delta = comparisons.get(f"contourFirstVsTrim{trim}", {})
                     if not isinstance(delta.get("differingPixels"), int) or delta["differingPixels"] <= 0:
                         raise ValueError(f"Native trim{trim} did not change the baseline render.")
@@ -330,7 +341,9 @@ def main() -> int:
             pngs = {f"fill001-native-{name}.png" for name in expected_names}
             if {Path(item["name"]).name for item in links} != pngs:
                 raise ValueError(f"Expected {len(pngs)} native FILL001 PNGs.")
-            case_output = output_root / ("fill001-contour-native-v2" if trim_v2 else "fill001-contour-native-v1")
+            case_output = output_root / ("fill001-contour-native-v3" if mixed_v3
+                                         else "fill001-contour-native-v2" if trim_v2
+                                         else "fill001-contour-native-v1")
             case_output.mkdir(parents=True, exist_ok=False)
             for item in links:
                 payload = base64.b64decode(item["href"].split(",", 1)[1], validate=True)
@@ -348,7 +361,7 @@ def main() -> int:
                     "source": "frozen synthetic contour-first, not a live Game Monitor run"
                 }, indent=2) + "\n", encoding="utf-8"
             )
-            print("FILL001 native BoardPane contour " + ("V2" if trim_v2 else "V1") + " PASS; "
+            print("FILL001 native BoardPane contour " + ("V3" if mixed_v3 else "V2" if trim_v2 else "V1") + " PASS; "
                   f"first-vs-last differingPixels={manifest['comparisons']['contourFirstVsLast']['differingPixels']}; "
                   "no live/game quality inference.")
             return 0
