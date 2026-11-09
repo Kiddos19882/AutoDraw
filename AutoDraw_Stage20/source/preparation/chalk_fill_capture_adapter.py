@@ -256,7 +256,7 @@ def _extract_stroke_chalk_deltas(
     return stroke_deltas, pre_count, post_count
 
 
-def build_fill001_capture(
+def _build_fill001_capture_core(
     task: dict[str, Any],
     monitor_export: Any,
     *,
@@ -269,7 +269,7 @@ def build_fill001_capture(
     observed_radius: int | float | None = None,
     screen_roi: dict[str, int] | None = None,
 ) -> dict[str, Any]:
-    """Convert one unmodified Game Monitor export into a validated capture.
+    """Assemble full Monitor and PNG evidence without selecting a quality policy.
 
     The export must contain the full event list; truncated, reordered, mixed-radius,
     incomplete or diagnostically degraded runs are rejected.
@@ -410,6 +410,30 @@ def build_fill001_capture(
         "screen_roi": png_audit["logical_to_screen_transform"]["screen_roi"],
         "logical_to_screen_transform": png_audit["logical_to_screen_transform"],
     }
+    return capture
+
+
+def build_fill001_capture(
+    task: dict[str, Any],
+    monitor_export: Any,
+    *,
+    sampling_profile: dict[str, Any],
+    before_png: str | Path,
+    after_png: str | Path,
+    run_id: str,
+    bridge_diagnostics: dict[str, Any],
+    stroke_lifecycle_source: str | None = None,
+    observed_radius: int | float | None = None,
+    screen_roi: dict[str, int] | None = None,
+) -> dict[str, Any]:
+    """Original FILL001 capture acceptance; retains zero-leakage policy."""
+    capture = _build_fill001_capture_core(
+        task, monitor_export, sampling_profile=sampling_profile,
+        before_png=before_png, after_png=after_png, run_id=run_id,
+        bridge_diagnostics=bridge_diagnostics,
+        stroke_lifecycle_source=stroke_lifecycle_source,
+        observed_radius=observed_radius, screen_roi=screen_roi,
+    )
     from chalk_fill_matrix import validate_fill001_capture
     validate_fill001_capture(task, capture)
     return capture
@@ -457,4 +481,80 @@ def build_fill001_capture_from_runtime(
         "executor_report_file_sha256": binding["executor_report_file_sha256"],
         "runtime_binding_status": "passed",
     })
+    return capture
+
+
+def build_fill001_chalk_first_capture_from_runtime(
+    task: dict[str, Any],
+    *,
+    session_path: str | Path,
+    executor_report_path: str | Path,
+    screen_e4_evidence_path: str | Path,
+    before_png: str | Path,
+    after_png: str | Path,
+) -> dict[str, Any]:
+    """DEC-030: accepted *new* capture only from real run-bound inputs.
+
+    Reuses exact old Monitor/Bridge/executor proof and independently validates
+    screen geometry using the saved raw run + E4 audit; never substitutes native
+    WebGL alpha, guessed coordinates, or unbound screen crops for screenshot.
+    Legacy capture entrypoints and 45-cell FILL001 protocol are untouched.
+    """
+    from chalk_fill_runtime_binding import load_fill001_runtime_binding
+    from fill001_screen_mask_v2_binding import bind_from_monitor_run
+    from fill001_screen_mask_v2 import (
+        FILL001_CHALK_FIRST_POLICY_V2, audit_screen_mask_v2,
+    )
+    from chalk_fill_matrix import validate_fill001_chalk_first_capture
+
+    bound = load_fill001_runtime_binding(
+        task, session_path, executor_report_path,
+    )
+    verified_screen = bind_from_monitor_run(
+        bound["bridge_run_file"], screen_e4_evidence_path,
+    )
+    roi = verified_screen["screen_roi"]
+    geo = verified_screen["geometry"]
+    provenance = verified_screen["provenance"]
+    e4_path = Path(screen_e4_evidence_path)
+    e4_sha = hashlib.sha256(e4_path.read_bytes()).hexdigest()
+    if (geo.get("run_id") != bound["run_id"]
+            or provenance.get("run_id") != bound["run_id"]
+            or provenance.get("checked_out_run_sha256") != bound["bridge_run_file_sha256"]
+            or provenance.get("raw_run_sha256") != geo.get("evidence_sha256")
+            or provenance.get("e4_evidence_sha256") != e4_sha):
+        raise FillMatrixError("DEC-030 E4 geometry does not bind to the selected Bridge run.")
+    capture = _build_fill001_capture_core(
+        task, bound["monitor_export"], sampling_profile=bound["sampling_profile"],
+        before_png=before_png, after_png=after_png, run_id=bound["run_id"],
+        bridge_diagnostics=bound["bridge_diagnostics"],
+        stroke_lifecycle_source=bound["stroke_lifecycle_source"],
+        observed_radius=bound["observed_radius"], screen_roi=roi,
+    )
+    quality_audit = audit_screen_mask_v2(
+        task["shape_id"], before_png, after_png,
+        run_id=bound["run_id"], screen_roi=roi, geometry=geo,
+        quality_policy=FILL001_CHALK_FIRST_POLICY_V2,
+    )
+    capture.update({
+        "session_id": bound["session_id"],
+        "execution_id": bound["execution_id"],
+        "executor_config": bound["executor_config"],
+        "source_plan_file_sha256": bound["source_plan_file_sha256"],
+        "session_file": bound["session_file"],
+        "session_file_sha256": bound["session_file_sha256"],
+        "bridge_run_file": bound["bridge_run_file"],
+        "bridge_run_file_sha256": bound["bridge_run_file_sha256"],
+        "executor_report_file": bound["executor_report_file"],
+        "executor_report_file_sha256": bound["executor_report_file_sha256"],
+        "runtime_binding_status": "passed",
+        "quality_policy_id": FILL001_CHALK_FIRST_POLICY_V2,
+        "screen_quality_audit": quality_audit,
+        "screen_quality_screen_roi": roi,
+        "screen_binding_provenance": provenance,
+        "screen_binding_e4_file": str(e4_path),
+        "screen_binding_e4_sha256": e4_sha,
+    })
+    accepted = validate_fill001_chalk_first_capture(task, capture)
+    capture["chalk_first_acceptance"] = accepted
     return capture
