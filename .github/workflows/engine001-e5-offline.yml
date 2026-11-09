@@ -209,6 +209,35 @@ jobs:
           $report = Join-Path $output "native-bottom-audit-v4.json"
           python AutoDraw_Stage20/source/preparation/chalk_fill_strategy_comparison.py --native-bottom-dir $output --native-bottom-control-dir $v2 --output-dir $report
           if ($LASTEXITCODE -ne 0) { throw "Native V4 independent alpha/provenance audit failed." }
+      - name: Export DEC-030 V5 native sweep fixture
+        shell: pwsh
+        run: |
+          Push-Location AutoDraw_Stage20/source/preparation
+          try {
+            python chalk_fill_strategy_comparison.py --native-chalk-first-v5-fixture --output-dir "../../tests/fill001-chalk-first-v5-native-input.json"
+            if ($LASTEXITCODE -ne 0) { throw "V5 pinned fixture export failed." }
+          } finally { Pop-Location }
+      - name: Render DEC-030 native V5 nine fixed candidates without gameplay
+        shell: pwsh
+        run: |
+          $native = Join-Path $env:RUNNER_TEMP "fill001-native"
+          $server = Start-Process -FilePath python -ArgumentList @("-m", "http.server", "8765", "--bind", "127.0.0.1") -PassThru -WindowStyle Hidden
+          try {
+            Start-Sleep -Seconds 3
+            python AutoDraw_Stage20/tests/run_egret_stage_reference_firefox.py --base-url "http://127.0.0.1:8765" --workspace "$env:GITHUB_WORKSPACE" --fill001-chalk-first-v5-only --output-dir $native
+            if ($LASTEXITCODE -ne 0) { throw "Native V5 Egret renderer failed." }
+          } finally {
+            if ($server -and -not $server.HasExited) { Stop-Process -Id $server.Id -Force }
+          }
+      - name: Independently audit native V5 3px perimeter proxy and immutable V4 control
+        shell: pwsh
+        run: |
+          $root = Join-Path $env:RUNNER_TEMP "fill001-native"
+          $output = Join-Path $root "fill001-chalk-first-native-v5"
+          $v4 = Join-Path $root "fill001-bottom-native-v4"
+          $report = Join-Path $output "native-chalk-first-v5-analysis.json"
+          python AutoDraw_Stage20/source/preparation/chalk_fill_strategy_comparison.py --native-chalk-first-v5-dir $output --native-chalk-first-v5-control-dir $v4 --output-dir $report
+          if ($LASTEXITCODE -ne 0) { throw "V5 frozen native alpha/perimeter SHA validation failed." }
       - name: Upload native FILL-001 comparison (no gameplay)
         if: always()
         uses: actions/upload-artifact@v4
