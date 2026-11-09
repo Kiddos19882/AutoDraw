@@ -406,3 +406,94 @@ def test_native_footprint_phase_a_contract_and_tampering(tmp_path):
     (source/"manifest.json").write_text(json.dumps(manifest),encoding="utf-8")
     with pytest.raises(ValueError,match="coordinates"):
         analyze_native_brush_footprints(source,out)
+
+
+def test_contour_spatial_partition_disjoint_and_native_wrapper(tmp_path):
+    import cv2
+    import hashlib
+    from chalk_fill_strategy_comparison import (
+        _spatial_partition_contour_residual,
+        analyze_native_contour_spatial_residual,
+    )
+    from chalk_fill_experiment import build_fill_target_mask
+    mask = build_fill_target_mask("rectangle")
+    target = np.repeat(np.repeat(mask, 3, axis=0), 3, axis=1)
+    painted = target.copy()
+    # Last three backing rows: 819 pixels each; width1 leakage at left,
+    # top and far below are disjoint from missing zones.
+    painted[570:573, :] = False
+    painted[0, 0] = True
+    painted[200, 0] = True
+    painted[710, 0] = True
+    result = _spatial_partition_contour_residual(target, painted)
+    assert result["uncovered_backing_pixels"] == 2457
+    assert result["uncovered_regions"]["bottom"] == 2457
+    assert result["leakage_backing_pixels"] == 3
+    assert result["leakage_regions"]["above"] == 1
+    assert result["leakage_regions"]["below"] == 1
+    assert result["leakage_regions"]["left"] == 1
+    assert sum(result["uncovered_regions"].values()) == 2457
+    assert sum(result["leakage_regions"].values()) == 3
+    assert result["worst_uncovered_rows"][0]["backing_y"] == 570
+    assert result["worst_uncovered_rows"][0]["uncovered"] == 819
+    assert len(result["row_residuals"]) >= 3
+    with pytest.raises(ValueError):
+        _spatial_partition_contour_residual(target, target.astype(np.uint8))
+    with pytest.raises(ValueError):
+        _spatial_partition_contour_residual(target, painted, edge_band=0)
+
+    root = tmp_path / "native-v3"
+    root.mkdir()
+    names = ["E_contour_10"] + [f"H_mixed_trim_{i}" for i in range(5)]
+    cases, summaries = {}, {}
+    for name in names:
+        png = f"fill001-native-{name}.png"
+        rgba = np.zeros((720, 1380, 4), dtype=np.uint8)
+        rgba[:, :, 3] = painted.astype(np.uint8) * 255
+        assert cv2.imwrite(str(root / png), rgba)
+        cases[name] = {"pngName": png}
+        summaries[name] = {
+            "native_png_sha256": hashlib.sha256((root/png).read_bytes()).hexdigest(),
+            "alpha_threshold_diagnostics": {
+                str(cutoff): {
+                    "uncovered_target_backing_pixels": 2457,
+                    "leakage_backing_pixels": 3,
+                } for cutoff in (1, 64, 128, 254)
+            },
+        }
+    manifest = {
+        "schema": "FILL001_NATIVE_MIXED_CONTOUR_V3",
+        "status": "OFFLINE_NATIVE_EGRET_RENDERED",
+        "sourceMaskSha256": FILL001_EXPECTED_MASK_SHA256["rectangle"],
+        "measuredChalk": None, "executorReady": False,
+        "cases": cases,
+    }
+    manifest_path = root / "manifest.json"
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    previous = {
+        "source_native_manifest_sha256": hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
+        "frozen_mask_sha256": FILL001_EXPECTED_MASK_SHA256["rectangle"],
+        "status": "OFFLINE_NATIVE_DIAGNOSTIC_ONLY",
+        "game_png_quality_gate": "NOT_EVALUATED",
+        "measured_chalk": None,
+        "cases": summaries,
+    }
+    audit = root / "native-alpha-audit-v3.json"
+    audit.write_text(json.dumps(previous), encoding="utf-8")
+    output = root / "native-spatial-audit-v1.json"
+    report = analyze_native_contour_spatial_residual(root, output)
+    assert report["schema"] == "FILL001_NATIVE_CONTOUR_SPATIAL_AUDIT_V1"
+    assert report["source_native_variant"] == "v3"
+    assert report["repair_plan"] == "NOT_GENERATED"
+    assert report["game_png_quality_gate"] == "NOT_EVALUATED"
+    assert report["executor_ready"] is False
+    assert set(report["cases"]) == set(names)
+    assert report["cases"][names[0]]["128"]["uncovered_regions"]["bottom"] == 2457
+    assert json.loads(output.read_text(encoding="utf-8")) == report
+    with pytest.raises(FileExistsError):
+        analyze_native_contour_spatial_residual(root, output)
+    output.unlink()
+    previous["cases"][names[0]]["native_png_sha256"] = "0"*64
+    audit.write_text(json.dumps(previous), encoding="utf-8")
+    with pytest.raises(ValueError, match="SHA"):
+        analyze_native_contour_spatial_residual(root, output)
