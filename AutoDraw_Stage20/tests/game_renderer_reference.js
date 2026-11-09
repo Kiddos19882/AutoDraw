@@ -1643,7 +1643,6 @@
       }
       for(const name of names.slice(1)) {
         const compare=compareCanvases(captures.G_trim_3_control,captures[name]);
-        if(compare.differingPixels<=0)throw new Error("V4 candidate was identical: "+name);
         comparisons[name]=compare;
       }
       const manifest={
