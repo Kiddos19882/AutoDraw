@@ -819,10 +819,184 @@ def analyze_contour_native_pngs(render_dir: Path, report_path: Path) -> dict[str
     return report
 
 
+
+def analyze_native_brush_footprints(render_dir: Path, report_path: Path) -> dict[str, Any]:
+    """Independent read-only native brush footprint analysis (FILL-001 A).
+
+    No mask alignment, game-quality gate, CHALK inference or production defaults.
+    Each alpha span is measured directly from real Egret WebGL RGBA PNGs,
+    with the complete pinned case coordinates and source checksums verified.
+    """
+    if report_path.exists():
+        raise FileExistsError("Footprint audit refuses to overwrite previous evidence")
+    manifest_path = render_dir / "manifest.json"
+    provenance_path = render_dir / "capture-provenance.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    provenance = json.loads(provenance_path.read_text(encoding="utf-8"))
+    expected_points = {
+        "horizontal": [(130,120), (330,120)],
+        "vertical": [(230,40), (230,200)],
+        "diagonal": [(130,60), (330,180)],
+        "corner": [(150,70), (300,70), (300,180)],
+    }
+    expected = {
+        f"normal_{orientation}_w{width}": ("normal", width, locations)
+        for width in (5,10)
+        for orientation, locations in expected_points.items()
+    }
+    expected.update({
+        f"smooth_horizontal_w{width}": ("smooth", width, expected_points["horizontal"])
+        for width in (5,10)
+    })
+    entries = manifest.get("cases")
+    if (manifest.get("schema") != "FILL001_NATIVE_FOOTPRINT_A_V1"
+            or manifest.get("status") != "OFFLINE_NATIVE_EGRET_RENDERED"
+            or manifest.get("engineVersion") != "5.4.1"
+            or manifest.get("canvasSize") != {"width":1380, "height":720}
+            or manifest.get("logicalBoard") != {"width":460, "height":240}
+            or manifest.get("scale") != 3
+            or manifest.get("alphaThresholds") != [1,64,128,254]
+            or manifest.get("measuredChalk") is not None
+            or manifest.get("originalGameCapture") is not None
+            or manifest.get("executorReady") is not False
+            or manifest.get("gameQualityGate") != "NOT_EVALUATED"
+            or manifest.get("liveStageMapping") != "NOT_EVALUATED"
+            or not isinstance(entries, list) or len(entries) != 10
+            or {item.get("id") for item in entries if isinstance(item, dict)} != set(expected)
+            or provenance.get("schema") != "FILL001_NATIVE_FOOTPRINT_CAPTURE_A_V1"
+            or provenance.get("liveRunId") is not None
+            or provenance.get("exactChalk") is not None
+            or set(provenance.get("pngSha256") or {}) !=
+               {f"fill001-footprint-{name}.png" for name in expected}):
+        raise ValueError("Native footprint audit rejects unverified case inventory or provenance")
+    cases = {}
+    for item in entries:
+        name = item["id"]
+        mode, width, points = expected[name]
+        filename = f"fill001-footprint-{name}.png"
+        if (item.get("pngName") != filename
+                or item.get("mode") != mode or item.get("width") != width
+                or item.get("points") != [{"x":x,"y":y} for x,y in points]
+                or item.get("acceptedSyntheticVerticesNotChalk") != len(points)
+                or item.get("sceneDiagnostics", {}).get("boardRenderMode") != 3):
+            raise ValueError("Native footprint audit rejects changed stroke coordinates or mode")
+        raw = (render_dir / filename).read_bytes()
+        sha = hashlib.sha256(raw).hexdigest()
+        if sha != provenance["pngSha256"][filename]:
+            raise ValueError("Native footprint PNG SHA-256 does not match capture provenance")
+        rgba = cv2.imdecode(np.frombuffer(raw, dtype=np.uint8), cv2.IMREAD_UNCHANGED)
+        if rgba is None or rgba.dtype != np.uint8 or rgba.shape != (720,1380,4):
+            raise ValueError("Native footprint PNG must be RGBA 1380x720")
+        alpha = rgba[:,:,3]
+        per_cutoff = {}
+        for cutoff in (1,64,128,254):
+            painted = alpha >= cutoff
+            yy, xx = np.nonzero(painted)
+            if len(xx) == 0:
+                per_cutoff[str(cutoff)] = {
+                    "painted_backing_pixels":0, "bounding_xyxy":None,
+                    "midpoint_cross_section_backing_px":None,
+                    "start_axial_extension_backing_px":None,
+                    "end_axial_extension_backing_px":None,
+                    "sample_cross_sections_backing_px":[],
+                    "corner_joint_13x13_painted_pixels":None,
+                }
+                continue
+            bbox = [int(xx.min()), int(yy.min()), int(xx.max()), int(yy.max())]
+            orientation = name.split("_w",1)[0].split("_",1)[1]
+            cross = None
+            start_extension = None
+            end_extension = None
+            samples = []
+            if orientation == "horizontal":
+                cy = points[0][1] * 3
+                for logical_x in (150,230,310):
+                    col = np.flatnonzero(painted[:,logical_x * 3])
+                    samples.append({
+                        "logical_x": logical_x,
+                        "vertical_span_backing_px": (int(col.max()-col.min()+1)
+                                                     if len(col) else 0),
+                        "y_minmax": [int(col.min()),int(col.max())] if len(col) else None,
+                    })
+                cross = samples[1]["vertical_span_backing_px"]
+                start_extension = points[0][0]*3-bbox[0]
+                end_extension = bbox[2]-points[-1][0]*3
+            elif orientation == "vertical":
+                for logical_y in (60,120,180):
+                    row = np.flatnonzero(painted[logical_y * 3,:])
+                    samples.append({
+                        "logical_y": logical_y,
+                        "horizontal_span_backing_px": (int(row.max()-row.min()+1)
+                                                       if len(row) else 0),
+                        "x_minmax": [int(row.min()),int(row.max())] if len(row) else None,
+                    })
+                cross = samples[1]["horizontal_span_backing_px"]
+                start_extension = points[0][1]*3-bbox[1]
+                end_extension = bbox[3]-points[-1][1]*3
+            joint = None
+            if orientation == "corner":
+                jx,jy = points[1][0]*3, points[1][1]*3
+                joint = int(np.count_nonzero(painted[jy-6:jy+7,jx-6:jx+7]))
+            per_cutoff[str(cutoff)] = {
+                "painted_backing_pixels":int(len(xx)),
+                "bounding_xyxy":bbox,
+                "midpoint_cross_section_backing_px":cross,
+                "start_axial_extension_backing_px":start_extension,
+                "end_axial_extension_backing_px":end_extension,
+                "sample_cross_sections_backing_px":samples,
+                "corner_joint_13x13_painted_pixels":joint,
+            }
+        cases[name] = {
+            "mode":mode, "width":width,
+            "input_points_logical": [{"x":x,"y":y} for x,y in points],
+            "png_sha256":sha,
+            "thresholds":per_cutoff,
+        }
+    # Long smooth paths normally omit the last half-segment when drawLast=false;
+    # record the actual extent rather than assuming the raster's theoretical tip.
+    deltas = {}
+    for width in (5,10):
+        normal = cases[f"normal_horizontal_w{width}"]["thresholds"]["128"]
+        smooth = cases[f"smooth_horizontal_w{width}"]["thresholds"]["128"]
+        deltas[str(width)] = {
+            "normal_bbox_xmax":normal["bounding_xyxy"][2] if normal["bounding_xyxy"] else None,
+            "smooth_bbox_xmax":smooth["bounding_xyxy"][2] if smooth["bounding_xyxy"] else None,
+            "normal_minus_smooth_right_extent_backing_px":(
+                normal["bounding_xyxy"][2]-smooth["bounding_xyxy"][2]
+                if normal["bounding_xyxy"] and smooth["bounding_xyxy"] else None
+            ),
+        }
+    report = {
+        "schema":"FILL001_NATIVE_FOOTPRINT_ANALYSIS_A_V1",
+        "status":"OFFLINE_NATIVE_DIAGNOSTIC_ONLY",
+        "manifest_sha256":hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
+        "capture_provenance_sha256":hashlib.sha256(provenance_path.read_bytes()).hexdigest(),
+        "case_count":10,
+        "native_backing":{"width":1380,"height":720,"scale":3},
+        "alpha_thresholds":[1,64,128,254],
+        "cases":cases,
+        "smooth_vs_normal_right_extent":deltas,
+        "measured_chalk":None,
+        "game_quality_gate":"NOT_EVALUATED",
+        "native_to_game_screen_equivalence":"NOT_EVALUATED",
+        "executor_ready":False,
+        "scope_note":(
+            "Empirical WebGL local-BoardPane alpha footprints; no frozen target "
+            "coverage/leakage acceptance, Stage screen projection, live timing or CHALK."
+        ),
+    }
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(json.dumps(report, indent=2, ensure_ascii=False)+"\n",
+                           encoding="utf-8")
+    return report
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--shape", choices=FILL001_SHAPES, action="append")
+    parser.add_argument("--native-footprint-dir", type=Path,
+                        help="Independently audit isolated native Egret footprint PNGs.")
     parser.add_argument("--native-render-dir", type=Path,
                         help="Recheck native contour RGBA against frozen 3x logical target, diagnostic only.")
     parser.add_argument("--native-mixed-fixture", action="store_true",
@@ -836,6 +1010,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--contour-edge-trims", action="store_true",
                         help="Versioned V2 endpoint-only trimming study.")
     args = parser.parse_args(argv)
+    if args.native_footprint_dir is not None:
+        if (args.native_render_dir is not None or args.native_mixed_fixture
+                or args.native_trim_fixture or args.native_fixture or args.contour_first
+                or args.contour_edge_trims or args.shape):
+            parser.error("--native-footprint-dir is an isolated read-only diagnostic.")
+        analyze_native_brush_footprints(args.native_footprint_dir, args.output_dir)
+        return 0
     if args.native_render_dir is not None:
         if args.native_fixture or args.native_trim_fixture or args.native_mixed_fixture or args.contour_first or args.contour_edge_trims or args.shape:
             parser.error("--native-render-dir must be used alone.")
