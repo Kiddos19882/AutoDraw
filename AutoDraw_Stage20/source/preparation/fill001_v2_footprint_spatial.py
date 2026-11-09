@@ -329,11 +329,155 @@ def analyze_pair(root: Path, output: Path) -> dict:
     return report
 
 
+
+def analyze_v3_capture(results_root: Path, output: Path, task_id: str) -> dict:
+    """Offline-only V3 residual audit on immutable run-bound PNG and telemetry.
+
+    Never shifts/fits the frozen mask, replaces V1/V2 quality gates, or launches
+    an executor. The report and overlay must be written to a fresh output path.
+    """
+    if (not isinstance(task_id, str)
+            or not task_id.startswith("fill001-")
+            or not task_id.endswith("-v3-smooth-off")
+            or "/" in task_id or "\\\\" in task_id):
+        raise ValueError("V3 requires an explicit, safe Smooth OFF task ID.")
+    captures = results_root / "fill001" / "captures"
+    result_path = captures / f"{task_id}-FILL001_SMOOTH_AB_V3-result.json"
+    evidence_path = captures / f"{task_id}-FILL001_SMOOTH_AB_V3.json"
+    plan_path = results_root / "fill001" / "plans" / f"{task_id}.json"
+    result, evidence, plan = (_read_json(p) for p in
+                              (result_path, evidence_path, plan_path))
+    run_id, session_id = result.get("run_id"), result.get("session_id")
+    if (not isinstance(run_id, str) or len(run_id) < 8
+            or not isinstance(session_id, str) or not session_id
+            or result.get("protocol") != "FILL001_SMOOTH_AB_V3"
+            or evidence.get("protocol") != "FILL001_SMOOTH_AB_V3"
+            or result.get("task_id") != task_id
+            or evidence.get("task_id") != task_id
+            or result.get("expected_smooth") is not False
+            or evidence.get("expected_smooth") is not False
+            or evidence.get("status") != "PASS_E4_RAW_CAPTURE"
+            or result.get("raw_e4_status") != "PASS_E4_RAW_CAPTURE"
+            or evidence.get("run_id") != run_id
+            or evidence.get("session_id") != session_id
+            or result.get("plan_signature") != evidence.get("plan_signature")):
+        raise ValueError("V3 capture identity/E4 verification failed.")
+    monitor_dir = results_root / "game_monitor_bridge" / session_id
+    matches = list(monitor_dir.glob(f"game-monitor-run-*-{run_id[:8]}.json"))
+    if len(matches) != 1:
+        raise ValueError("V3 Monitor run missing or ambiguous.")
+    run_path = matches[0]
+    binding = bind_from_monitor_run(
+        run_path, evidence_path, allow_v3_boardpane_only=True,
+    )
+    if (binding["geometry"]["run_id"] != run_id
+            or binding["provenance"]["raw_run_sha256"] != result.get("raw_run_sha256")
+            or binding["provenance"]["native_geometry_sha256"]
+            != result.get("renderer_geometry_sha256")):
+        raise ValueError("V3 raw run/geometry provenance mismatch.")
+    before_path = captures / f"{task_id}-before.png"
+    after_path = captures / f"{task_id}-after.png"
+    if (_sha(before_path) != result.get("before_png_sha256")
+            or _sha(after_path) != result.get("after_png_sha256")):
+        raise ValueError("V3 PNG SHA mismatch.")
+    roi = binding["screen_roi"]
+    mask = project_screen_mask_v2(
+        "rectangle", run_id=run_id, screen_roi=roi,
+        geometry=binding["geometry"],
+    )
+    before, after = _png(before_path), _png(after_path)
+    if before.shape != after.shape or before.shape[:2] != mask.shape:
+        raise ValueError("V3 ROI dimensions mismatch.")
+    changed = np.any(np.abs(after - before) > PNG_THRESHOLD, axis=2)
+    covered = int(np.count_nonzero(changed & mask))
+    target = int(np.count_nonzero(mask))
+    spatial = classify_leakage(mask, changed)
+    missing = mask & ~changed
+    old = result.get("v2_audit")
+    if (not isinstance(old, dict)
+            or target != old.get("target_pixels")
+            or covered != old.get("covered_pixels")
+            or int(np.count_nonzero(missing)) != old.get("uncovered_pixels")
+            or spatial["leakage_pixels"] != old.get("leakage_pixels")
+            or int(np.count_nonzero(changed)) != old.get("changed_pixels")
+            or old.get("v2_diagnostic_gate") != "FAIL"):
+        raise ValueError("V3 spatial recomputation disagrees with frozen V2 audit.")
+    raw_run = _read_json(run_path)
+    if raw_run.get("run_id") != run_id:
+        raise ValueError("V3 raw run ID mismatch.")
+    centers = accepted_centerline_offsets(raw_run, plan)
+    roundtrip = roundtrip_acceptance(plan, raw_run, binding, centers)
+    counterfactual = corrected_board_counterfactual(plan, raw_run, binding)
+    my, mx = np.nonzero(missing)
+    ly, lx = np.nonzero(changed & ~mask)
+    report = {
+        "protocol": "FILL001_V3_OFF_SPATIAL_RESIDUAL_V1",
+        "status": "DIAGNOSTIC_ONLY",
+        "source_commit": "4efa33c655c1e35a36114df316da77cf54f31300",
+        "task_id": task_id, "run_id": run_id, "session_id": session_id,
+        "raw_run_sha256": binding["provenance"]["raw_run_sha256"],
+        "before_png_sha256": _sha(before_path),
+        "after_png_sha256": _sha(after_path),
+        "target_mask_sha256": result["target_mask_sha256"],
+        "screen_roi": roi, "input_binding": binding["provenance"],
+        "mask_pixels": target, "covered_pixels": covered,
+        "uncovered_pixels": int(len(my)),
+        "leakage_pixels": spatial["leakage_pixels"],
+        "coverage_fraction": covered / target,
+        "leakage_regions": spatial,
+        "leakage_positions_roi_xy": [[int(x), int(y)] for y, x in zip(ly, lx)],
+        "missing_bbox_roi_xyxy": ([int(mx.min()), int(my.min()),
+                                    int(mx.max()), int(my.max())]
+                                   if len(my) else None),
+        "missing_by_roi_row": [
+            {"y": int(y), "count": int(count)}
+            for y, count in enumerate(np.count_nonzero(missing, axis=1))
+            if count
+        ],
+        "missing_by_roi_column": [
+            {"x": int(x), "count": int(count)}
+            for x, count in enumerate(np.count_nonzero(missing, axis=0))
+            if count
+        ],
+        "accepted_centerlines": centers,
+        "egret_input_roundtrip": roundtrip,
+        "board_anchored_counterfactual": counterfactual,
+        "original_v1_quality": result["png_audit"],
+        "original_v2_quality": old,
+        "acceptance_override": False,
+        "limitations": [
+            "No native Egret raster equivalence or chronological renderer replay.",
+            "Rows and columns locate RGB residuals, not their causal source.",
+            "No fitted offset, erosion, dilation, RGB threshold or quality-gate change.",
+            "One Smooth OFF run is not a paired ON/OFF result.",
+        ],
+    }
+    if output.exists():
+        raise FileExistsError(f"Refusing to overwrite existing V3 diagnostic: {output}")
+    output.mkdir(parents=True, exist_ok=False)
+    _overlay(mask, changed).save(output / "v3-off-spatial-overlay.png")
+    (output / "report.json").write_text(
+        json.dumps(report, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
+    return report
+
+
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--results-root", type=Path, required=True)
     p.add_argument("--output-dir", type=Path, required=True)
+    p.add_argument("--v3-task", help="Analyze one committed V3 Smooth OFF task instead of frozen V2 pair.")
     args = p.parse_args()
+    if args.v3_task:
+        report = analyze_v3_capture(args.results_root, args.output_dir, args.v3_task)
+        print(f"V3 OFF: coverage={report['coverage_fraction']:.6%}, "
+              f"leak={report['leakage_pixels']}, "
+              f"regions={report['leakage_regions']['categories']}, "
+              f"missing={report['uncovered_pixels']}, "
+              f"maximum input roundtrip error="
+              f"{report['egret_input_roundtrip']['maximum_error_on_observed_first_last_and_y']:.3f}")
+        return 0
     report = analyze_pair(args.results_root, args.output_dir)
     for mode, item in report["conditions"].items():
         print(f"{mode}: coverage={item['coverage_fraction']:.6%}, "
