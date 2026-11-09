@@ -6,6 +6,8 @@ on:
       - feature/image-geometry-optimization
     paths:
       - "AutoDraw_Stage20/tests/game_renderer_reference.js"
+      - "AutoDraw_Stage20/source/preparation/chalk_fill_strategy_comparison.py"
+      - "AutoDraw_Stage20/source/preparation/chalk_fill_fixed_radius_planner.py"
       - "AutoDraw_Stage20/tests/game_renderer_reference.test.js"
       - "AutoDraw_Stage20/tests/run_egret_stage_reference_firefox.py"
       - "AutoDraw_Stage20/tests/validate_engine001_e5_native.py"
@@ -75,5 +77,49 @@ jobs:
         with:
           name: autodraw-engine001-e5-screen-results
           path: ${{ runner.temp }}/engine001-e5-results/
+          if-no-files-found: warn
+          retention-days: 30
+
+  fill001-contour-native:
+    name: FILL-001 native contour-first BoardPane (offline, not live E5)
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out working branch
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install native renderer and frozen planner dependencies
+        run: python -m pip install "selenium>=4.27" numpy pillow opencv-python-headless pytest
+      - name: Check browser syntax
+        run: node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+      - name: Export immutable-shape native contour fixture
+        shell: pwsh
+        run: |
+          Push-Location AutoDraw_Stage20/source/preparation
+          try {
+            python chalk_fill_strategy_comparison.py --native-fixture --output-dir "../../tests/fill001-contour-first-native-input.json"
+            if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          } finally { Pop-Location }
+      - name: Render native BoardPane WebGL baseline and ordered contour variants
+        shell: pwsh
+        run: |
+          $native = Join-Path $env:RUNNER_TEMP "fill001-native"
+          $server = Start-Process -FilePath python -ArgumentList @("-m", "http.server", "8765", "--bind", "127.0.0.1") -PassThru -WindowStyle Hidden
+          try {
+            Start-Sleep -Seconds 3
+            python AutoDraw_Stage20/tests/run_egret_stage_reference_firefox.py --base-url "http://127.0.0.1:8765" --workspace "$env:GITHUB_WORKSPACE" --fill001-contour-only --output-dir $native
+            if ($LASTEXITCODE -ne 0) { throw "FILL001 native compositor probe failed." }
+          } finally {
+            if ($server -and -not $server.HasExited) { Stop-Process -Id $server.Id -Force }
+          }
+      - name: Upload native FILL-001 comparison (no gameplay)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autodraw-fill001-native-contour-first-v1
+          path: ${{ runner.temp }}/fill001-native/
           if-no-files-found: warn
           retention-days: 30
