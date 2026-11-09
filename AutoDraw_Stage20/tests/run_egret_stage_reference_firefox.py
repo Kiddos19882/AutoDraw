@@ -361,9 +361,14 @@ def main() -> int:
                     "source": "frozen synthetic contour-first, not a live Game Monitor run"
                 }, indent=2) + "\n", encoding="utf-8"
             )
-            print("FILL001 native BoardPane contour " + ("V3" if mixed_v3 else "V2" if trim_v2 else "V1") + " PASS; "
-                  f"first-vs-last differingPixels={manifest['comparisons']['contourFirstVsLast']['differingPixels']}; "
-                  "no live/game quality inference.")
+            comparison_label = ("mixed contour-vs-baseline differingPixels="
+                                f"{manifest['comparisons']['contourFirstVsTrim0']['differingPixels']}"
+                                if mixed_v3 else
+                                "first-vs-last differingPixels="
+                                f"{manifest['comparisons']['contourFirstVsLast']['differingPixels']}")
+            print("FILL001 native BoardPane contour " +
+                  ("V3" if mixed_v3 else "V2" if trim_v2 else "V1") +
+                  " PASS; " + comparison_label + "; no live/game quality inference.")
             return 0
         for case in cases:
             monitor_path = workspace / case["monitor"]
