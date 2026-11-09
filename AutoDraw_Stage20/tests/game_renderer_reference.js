@@ -1457,6 +1457,109 @@
     }
   }
 
+
+  // FILL-001 contour trim V2: same native renderer, no gameplay/CHALK.
+  function renderContourTrimNativeStudy() {
+    try {
+      const req = new XMLHttpRequest();
+      req.open("GET", "./fill001-contour-trims-native-input.json", false);
+      req.send(null);
+      if (req.status !== 200) throw new Error("Missing V2 native input fixture.");
+      const fixture = JSON.parse(req.responseText);
+      const names = ["B_sparse_only","C_contour_last","E_contour_first",
+        "G_trim_1","G_trim_2","G_trim_3","G_trim_4"];
+      if (!fixture || fixture.schema !== "FILL001_NATIVE_CONTOUR_EDGE_TRIMS_V2" ||
+          fixture.status !== "OFFLINE_SYNTHETIC_INPUT_ONLY" ||
+          fixture.shape_id !== "rectangle" ||
+          fixture.frozen_mask_sha256 !== "ac1c6660e5986cdf534328c6dbcd5020f631168b1473c24b29e7609eb827998b" ||
+          JSON.stringify(fixture.tested_trim_px) !== "[1,2,3,4]" ||
+          Object.keys(fixture.cases||{}).sort().join(",") !== names.slice().sort().join(",")) {
+        throw new Error("Native contour trim V2 fixture provenance mismatch.");
+      }
+      const state = initializeWebGL(null);
+      const mask = createBoardMask();
+      const captures = {};
+      const cases = {};
+      for (const name of names) {
+        const strokes = fixture.cases[name];
+        const expectedStrokes = name === "B_sparse_only" ? 27 : 28;
+        if (!Array.isArray(strokes) || strokes.length !== expectedStrokes ||
+            strokes.some(st => st.width !== 10 || st.mode !== "normal" ||
+              !Array.isArray(st.points) || st.points.length < 2 ||
+              st.points.some(p=> !Number.isInteger(p.x) || !Number.isInteger(p.y) ||
+                p.x < 0 || p.y < 0 || p.x >= 460 || p.y >= 240))) {
+          throw new Error("Unexpected V2 native stroke geometry: "+name);
+        }
+        const replay = strokes.map((stroke,i)=>({
+          strokeId: name + "-stroke-" + i, points: stroke.points
+        }));
+        const board = makeTemporalBoard(replay,10,"normal",false);
+        if (board.accepted !== strokes.reduce((acc,stroke)=>acc+stroke.points.length,0))
+          throw new Error("Unexpected V2 native accepted sample count");
+        const source=renderGraphicsNode(board.shape.$renderNode,false);
+        const composed=composeBoard(source,source.nodeBounds,mask);
+        const native=renderWebGLProbe("normal",[],10,composed,state,board.shape);
+        captures[name]=native.canvas;
+        cases[name]={
+          strokeCount: strokes.length, acceptedSyntheticPoints: board.accepted,
+          pngName: "fill001-native-"+name+".png",
+          webglDrawCalls: native.drawCalls,
+          sceneDiagnostics: native.sceneDiagnostics,
+          canvas2DVsWebGL: native.comparison
+        };
+      }
+      const reference = captures.E_contour_first;
+      const comparisons = {
+        contourFirstVsLast: compareCanvases(reference,captures.C_contour_last),
+        sparseVsContourFirst: compareCanvases(captures.B_sparse_only,reference)
+      };
+      for (let trim=1;trim<=4;trim+=1) {
+        comparisons["contourFirstVsTrim"+trim] =
+          compareCanvases(reference,captures["G_trim_"+trim]);
+      }
+      if (comparisons.contourFirstVsLast.differingPixels !== 0 ||
+          comparisons.sparseVsContourFirst.differingPixels <= 0 ||
+          [1,2,3,4].some(trim=>comparisons["contourFirstVsTrim"+trim].differingPixels <= 0)) {
+        throw new Error("Native V2 controls lack expected ordering/geometry differences.");
+      }
+      const manifest = {
+        schema:"FILL001_NATIVE_CONTOUR_EDGE_TRIMS_V2",
+        status:"OFFLINE_NATIVE_EGRET_RENDERED",
+        sourceMaskSha256:fixture.frozen_mask_sha256,
+        sourcePlanSignature:fixture.baseline_plan_signature,
+        testedTrimPx: fixture.tested_trim_px,
+        engineVersion: egret.Capabilities.engineVersion,
+        nativeRenderer:state.glInfo,
+        localBackingOnly: true,
+        measuredChalk:null, executorReady:false,
+        cases,comparisons,
+        limitations:[
+          "Synthetic two-point normal line samples, not V3 accepted-point replay",
+          "Local BoardPane framebuffer only, not game Stage/screen RGB",
+          "No live CHALK, no direct PNG quality acceptance"
+        ]
+      };
+      casesNode.textContent="";
+      const card=document.createElement("section");
+      card.className="fixture";
+      card.textContent="FILL-001 V2 native endpoint-trim research; no live gameplay.";
+      for(const [name,canvas] of Object.entries(captures)) {
+        addDownloadLink(card,canvas,"fill001-native-"+name+".png",name);
+      }
+      casesNode.appendChild(card);
+      document.getElementById("renderer-manifest-json").textContent=JSON.stringify(manifest,null,2);
+      document.body.dataset.contourTrimStatus="complete";
+      document.body.dataset.referenceStatus="contour_trim_complete";
+      statusNode.textContent="FILL-001 V2 native endpoint-trim comparison complete.";
+    } catch(error) {
+      document.body.dataset.contourTrimStatus="error";
+      document.body.dataset.referenceStatus="error";
+      statusNode.className="error";
+      statusNode.textContent="V2 native trim replay failed: "+
+        (error&&error.stack?error.stack:String(error));
+    }
+  }
+
   function renderAll() {
     try {
       if (!window.egret || !egret.Shape || !egret.CanvasRenderer) {
@@ -1668,12 +1771,14 @@
   }
 
   api.renderContourFirstNativeStudy = renderContourFirstNativeStudy;
+  api.renderContourTrimNativeStudy = renderContourTrimNativeStudy;
   api.renderAll = renderAll;
   api.renderTemporalStudy = renderTemporalStudy;
   api.renderEndpointStudy = renderEndpointStudy;
   api.renderDuplicateFrameStudy = renderDuplicateFrameStudy;
   const params = new URLSearchParams(window.location.search);
-  const startup = params.get("contour") === "fill001" ? renderContourFirstNativeStudy
+  const startup = params.get("contour") === "fill001v2" ? renderContourTrimNativeStudy
+    : params.get("contour") === "fill001" ? renderContourFirstNativeStudy
     : params.get("frames") === "fill001" ? renderDuplicateFrameStudy
     : params.get("outline") === "fill001" ? () => renderEndpointStudy(true)
     : params.get("endpoint") === "fill001" ? () => renderEndpointStudy(false)
