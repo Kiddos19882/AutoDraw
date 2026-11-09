@@ -178,3 +178,53 @@ jobs:
           path: ${{ runner.temp }}/fill001-native/
           if-no-files-found: warn
           retention-days: 30
+
+  fill001-footprint-a:
+    name: FILL-001 native brush footprint phase A (offline only)
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out branch commit
+        uses: actions/checkout@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install native browser and alpha analysis dependencies
+        run: python -m pip install "selenium>=4.27" numpy pillow opencv-python-headless pytest
+      - name: Check JS syntax and footprint provenance regression
+        shell: pwsh
+        run: |
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $env:PYTHONPATH = "$env:GITHUB_WORKSPACE\AutoDraw_Stage20\source\preparation"
+          python -m pytest -q AutoDraw_Stage20/source/preparation/tests/test_chalk_fill_strategy_comparison.py -k native_footprint_phase_a_contract
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Capture 10 real Egret WebGL native brush footprint PNGs
+        shell: pwsh
+        run: |
+          $output = Join-Path $env:RUNNER_TEMP "fill001-footprint-a"
+          $server = Start-Process -FilePath python -ArgumentList @("-m", "http.server", "8765", "--bind", "127.0.0.1") -PassThru -WindowStyle Hidden
+          try {
+            Start-Sleep -Seconds 3
+            python AutoDraw_Stage20/tests/run_egret_stage_reference_firefox.py --base-url "http://127.0.0.1:8765" --workspace "$env:GITHUB_WORKSPACE" --fill001-footprint-only --output-dir $output
+            if ($LASTEXITCODE -ne 0) { throw "Native FILL-001 footprint capture did not verify." }
+          } finally {
+            if ($server -and -not $server.HasExited) { Stop-Process -Id $server.Id -Force }
+          }
+      - name: Verify capture SHA and independently measure alpha footprint
+        shell: pwsh
+        run: |
+          $dir = Join-Path $env:RUNNER_TEMP "fill001-footprint-a"
+          $data = Join-Path $dir "fill001-footprint-a-v1"
+          $report = Join-Path $data "native-footprint-analysis.json"
+          python AutoDraw_Stage20/source/preparation/chalk_fill_strategy_comparison.py --native-footprint-dir $data --output-dir $report
+          if ($LASTEXITCODE -ne 0) { throw "Native FILL-001 footprint audit failed." }
+      - name: Upload versioned raw footprints and diagnostic evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autodraw-fill001-native-footprint-a-v1
+          path: ${{ runner.temp }}/fill001-footprint-a/
+          if-no-files-found: warn
+          retention-days: 30
