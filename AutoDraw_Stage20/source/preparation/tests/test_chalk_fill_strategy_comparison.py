@@ -497,3 +497,115 @@ def test_contour_spatial_partition_disjoint_and_native_wrapper(tmp_path):
     audit.write_text(json.dumps(previous), encoding="utf-8")
     with pytest.raises(ValueError, match="SHA"):
         analyze_native_contour_spatial_residual(root, output)
+
+
+def test_native_v4_bottom_fixture_pins_v2_control_and_safe_margin(tmp_path):
+    from chalk_fill_strategy_comparison import (
+        export_contour_trim_native_fixture,export_native_bottom_repair_fixture,
+    )
+    v2=export_contour_trim_native_fixture(tmp_path/"v2-input.json")
+    v4path=tmp_path/"v4-input.json"
+    v4=export_native_bottom_repair_fixture(v4path)
+    assert v4["schema"]=="FILL001_NATIVE_BOTTOM_REPAIR_V4"
+    assert v4["status"]=="OFFLINE_SYNTHETIC_INPUT_ONLY"
+    assert v4["frozen_mask_sha256"]==FILL001_EXPECTED_MASK_SHA256["rectangle"]
+    assert v4["baseline_plan_signature"]==v2["baseline_plan_signature"]
+    assert v4["baseline_variant"]=="FILL001_NATIVE_CONTOUR_EDGE_TRIMS_V2/G_trim_3"
+    assert v4["candidate_y"]==[189,190]
+    assert v4["candidate_widths"]==[1,2,3]
+    assert v4["bottom_line_endpoints"]==[97,363]
+    assert v4["measured_chalk"] is None and v4["executor_ready"] is False
+    cases=v4["cases"]
+    assert cases["G_trim_3_control"]==v2["cases"]["G_trim_3"]
+    assert len(cases)==7
+    assert len(cases["G_trim_3_control"])==28
+    for width in (1,2,3):
+        for y in (189,190):
+            new=cases[f"J_bottom_y{y}_w{width}"]
+            assert len(new)==29
+            assert new[:28]==cases["G_trim_3_control"]
+            assert new[-1]=={
+                "points":[{"x":97,"y":y},{"x":363,"y":y}],
+                "width":width,"mode":"normal",
+            }
+    assert json.loads(v4path.read_text(encoding="utf-8"))==v4
+    with pytest.raises(FileExistsError):
+        export_native_bottom_repair_fixture(v4path)
+
+
+def test_v4_native_bottom_alpha_audit_provenance_and_no_overwrite(tmp_path):
+    import cv2
+    import hashlib
+    from chalk_fill_strategy_comparison import analyze_native_bottom_repair
+    from chalk_fill_experiment import build_fill_target_mask
+    v2=tmp_path/"v2"
+    v4=tmp_path/"v4"
+    v2.mkdir()
+    v4.mkdir()
+    target=np.repeat(np.repeat(build_fill_target_mask("rectangle"),3,axis=0),3,axis=1)
+    baseline=np.zeros((720,1380,4),dtype=np.uint8)
+    baseline[:,:,3]=target.astype(np.uint8)*255
+    baseline[570:573,:,3]=0
+    baseline[100,100,3]=255
+    assert cv2.imwrite(str(v2/"fill001-native-G_trim_3.png"),baseline)
+    original=(v2/"fill001-native-G_trim_3.png").read_bytes()
+    v2_manifest={
+        "schema":"FILL001_NATIVE_CONTOUR_EDGE_TRIMS_V2",
+        "sourceMaskSha256":FILL001_EXPECTED_MASK_SHA256["rectangle"],
+        "cases":{"G_trim_3":{"pngName":"fill001-native-G_trim_3.png"}},
+    }
+    (v2/"manifest.json").write_text(json.dumps(v2_manifest),encoding="utf-8")
+    v2_audit={
+        "frozen_mask_sha256":FILL001_EXPECTED_MASK_SHA256["rectangle"],
+        "source_native_manifest_sha256":hashlib.sha256((v2/"manifest.json").read_bytes()).hexdigest(),
+        "cases":{"G_trim_3":{"native_png_sha256":hashlib.sha256(original).hexdigest()}},
+    }
+    (v2/"native-alpha-audit-v2.json").write_text(json.dumps(v2_audit),encoding="utf-8")
+    names=["G_trim_3_control"]+[f"J_bottom_y{y}_w{w}" for w in (1,2,3) for y in (189,190)]
+    cases={}
+    hashes={}
+    for name in names:
+        image=baseline.copy()
+        if name!="G_trim_3_control":
+            image[569:572,300:1100,3]=255
+        png=f"fill001-native-{name}.png"
+        assert cv2.imwrite(str(v4/png),image)
+        hashes[png]=hashlib.sha256((v4/png).read_bytes()).hexdigest()
+        cases[name]={"pngName":png,"strokeCount":28 if name==names[0] else 29}
+    manifest={
+        "schema":"FILL001_NATIVE_BOTTOM_REPAIR_V4",
+        "status":"OFFLINE_NATIVE_EGRET_RENDERED",
+        "sourceMaskSha256":FILL001_EXPECTED_MASK_SHA256["rectangle"],
+        "baselineVariant":"FILL001_NATIVE_CONTOUR_EDGE_TRIMS_V2/G_trim_3",
+        "testedWidths":[1,2,3],"testedYs":[189,190],
+        "bottomLineEndpoints":[97,363],
+        "measuredChalk":None,"executorReady":False,
+        "cases":cases,
+        "comparisons":{n:{"differingPixels":1} for n in names[1:]},
+    }
+    (v4/"manifest.json").write_text(json.dumps(manifest),encoding="utf-8")
+    provenance={
+        "schema":"FILL001_NATIVE_BOTTOM_CAPTURE_V4",
+        "maskSha256":FILL001_EXPECTED_MASK_SHA256["rectangle"],
+        "liveRunId":None,"measuredChalk":None,
+        "pngSha256":hashes,
+    }
+    (v4/"fixture-provenance.json").write_text(json.dumps(provenance),encoding="utf-8")
+    output=tmp_path/"report.json"
+    report=analyze_native_bottom_repair(v4,v2,output)
+    assert report["status"]=="OFFLINE_NATIVE_DIAGNOSTIC_ONLY"
+    assert report["control_vs_v2_rgba_identical"] is True
+    assert report["projected_target_backing_pixels"]==401877
+    assert report["game_png_quality_gate"]=="NOT_EVALUATED"
+    assert report["measured_chalk"] is None
+    assert report["executor_ready"] is False
+    assert set(report["cases"])==set(names)
+    assert report["cases"]["G_trim_3_control"]["alpha_threshold_diagnostics"]["128"]["uncovered_regions"]["bottom"]==2457
+    assert json.loads(output.read_text(encoding="utf-8"))==report
+    with pytest.raises(FileExistsError):
+        analyze_native_bottom_repair(v4,v2,output)
+    output.unlink()
+    provenance["pngSha256"]["fill001-native-J_bottom_y189_w1.png"]="0"*64
+    (v4/"fixture-provenance.json").write_text(json.dumps(provenance),encoding="utf-8")
+    with pytest.raises(ValueError,match="SHA"):
+        analyze_native_bottom_repair(v4,v2,output)
