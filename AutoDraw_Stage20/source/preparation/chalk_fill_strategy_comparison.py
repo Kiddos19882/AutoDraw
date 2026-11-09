@@ -527,15 +527,74 @@ def save_contour_edge_trim_report(output_dir: Path, shapes: list[str]) -> Path:
     return output
 
 
+
+def export_contour_first_native_fixture(path: Path) -> dict[str, Any]:
+    """Prepare immutable-shape multi-stroke inputs for native BoardPane replay.
+
+    Not an executor plan. The pinned original 27-row FILL-001 rectangle is
+    retained, and only the stroke ordering is changed in the test control.
+    """
+    if path.exists():
+        raise FileExistsError("Refusing to overwrite native fixture")
+    mask = build_fill_target_mask("rectangle")
+    digest = fill_target_mask_sha256("rectangle", mask)
+    if digest != FILL001_EXPECTED_MASK_SHA256["rectangle"]:
+        raise ValueError("Frozen rectangle hash changed")
+    original = build_fixed_radius_fill_plan(
+        "rectangle", 10, scanline_row_step=5, scanline_offset=0,
+    )
+    if len(original["strokes"]) != 27:
+        raise ValueError("Expected 27 original FILL-001 scanlines")
+    contour = _contour_stroke(mask, 6, 10)
+    normal = [
+        {"points": [{"x": p["x"], "y": p["y"]} for p in stroke["points"]],
+         "width": 10, "mode": "normal"}
+        for stroke in original["strokes"]
+    ]
+    boundary = {
+        "points": [{"x": int(x), "y": int(y)}
+                   for x, y in [*contour["points"], contour["points"][0]]],
+        "width": 10, "mode": "normal",
+    }
+    fixture = {
+        "schema": "FILL001_NATIVE_CONTOUR_FIRST_V1",
+        "status": "OFFLINE_SYNTHETIC_INPUT_ONLY",
+        "shape_id": "rectangle",
+        "frozen_mask_sha256": digest,
+        "baseline_plan_signature": original["plan_signature"],
+        "brush": 10,
+        "contour_inset": 6,
+        "cases": {
+            "B_sparse_only": normal,
+            "C_contour_last": [*normal, boundary],
+            "E_contour_first": [boundary, *normal],
+        },
+        "measured_chalk": None,
+        "runtime_validated": False,
+        "executor_ready": False,
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(fixture, indent=2, ensure_ascii=False) + "\n",
+                    encoding="utf-8")
+    return fixture
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--shape", choices=FILL001_SHAPES, action="append")
+    parser.add_argument("--native-fixture", action="store_true",
+                        help="Write a single multi-stroke native-browser input JSON.")
     parser.add_argument("--contour-first", action="store_true",
                         help="Separate controlled contour-first/inset study.")
     parser.add_argument("--contour-edge-trims", action="store_true",
                         help="Versioned V2 endpoint-only trimming study.")
     args = parser.parse_args(argv)
+    if args.native_fixture:
+        if args.contour_first or args.contour_edge_trims or args.shape:
+            parser.error("--native-fixture cannot be combined with other options.")
+        export_contour_first_native_fixture(args.output_dir)
+        return 0
     if args.contour_first and args.contour_edge_trims:
         parser.error("Choose only one contour experiment version.")
     if args.contour_edge_trims:
