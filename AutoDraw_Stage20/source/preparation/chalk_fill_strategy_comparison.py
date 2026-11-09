@@ -580,6 +580,52 @@ def export_contour_first_native_fixture(path: Path) -> dict[str, Any]:
 
 
 
+def export_contour_trim_native_fixture(path: Path) -> dict[str, Any]:
+    """Versioned native input: contour first and 1..4px X endpoint trims.
+
+    Uses one immutable frozen target, identical rows and contour across cases.
+    This is synthetic geometry, not an executor plan or exact game CHALK.
+    """
+    if path.exists():
+        raise FileExistsError("Refusing to replace V2 native fixture")
+    baseline = export_contour_first_native_fixture(path)
+    # Recreate as the independent V2 artifact, removing the intermediate V1
+    # file only because it was created by this invocation at a new path.
+    path.unlink()
+    original = baseline["cases"]["E_contour_first"]
+    cases = dict(baseline["cases"])
+    contour = original[0]
+    scanlines = original[1:]
+    for trim in (1, 2, 3, 4):
+        lines = []
+        for stroke in scanlines:
+            left, right = stroke["points"]
+            if right["x"] - left["x"] <= 2 * trim:
+                raise ValueError("V2 trim exceeds a frozen scanline")
+            lines.append({
+                "points": [
+                    {"x": left["x"] + trim, "y": left["y"]},
+                    {"x": right["x"] - trim, "y": right["y"]},
+                ],
+                "width": 10, "mode": "normal",
+            })
+        cases[f"G_trim_{trim}"] = [contour, *lines]
+    fixture = {
+        **baseline,
+        "schema": "FILL001_NATIVE_CONTOUR_EDGE_TRIMS_V2",
+        "status": "OFFLINE_SYNTHETIC_INPUT_ONLY",
+        "tested_trim_px": [1, 2, 3, 4],
+        "cases": cases,
+        "analysis_scope": "same frozen 27-row rectangle, contour first, X endpoints only",
+        "measured_chalk": None,
+        "runtime_validated": False,
+        "executor_ready": False,
+    }
+    path.write_text(json.dumps(fixture, indent=2, ensure_ascii=False) + "\n",
+                    encoding="utf-8")
+    return fixture
+
+
 def analyze_contour_native_pngs(render_dir: Path, report_path: Path) -> dict[str, Any]:
     """Read-only native BoardPane alpha screen; never a live PNG quality gate.
 
@@ -678,6 +724,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--shape", choices=FILL001_SHAPES, action="append")
     parser.add_argument("--native-render-dir", type=Path,
                         help="Recheck native contour RGBA against frozen 3x logical target, diagnostic only.")
+    parser.add_argument("--native-trim-fixture", action="store_true",
+                        help="Export isolated V2 contour-first X-endpoint native sweep.")
     parser.add_argument("--native-fixture", action="store_true",
                         help="Write a single multi-stroke native-browser input JSON.")
     parser.add_argument("--contour-first", action="store_true",
@@ -686,9 +734,14 @@ def main(argv: list[str] | None = None) -> int:
                         help="Versioned V2 endpoint-only trimming study.")
     args = parser.parse_args(argv)
     if args.native_render_dir is not None:
-        if args.native_fixture or args.contour_first or args.contour_edge_trims or args.shape:
+        if args.native_fixture or args.native_trim_fixture or args.contour_first or args.contour_edge_trims or args.shape:
             parser.error("--native-render-dir must be used alone.")
         analyze_contour_native_pngs(args.native_render_dir, args.output_dir)
+        return 0
+    if args.native_trim_fixture:
+        if args.native_fixture or args.contour_first or args.contour_edge_trims or args.shape:
+            parser.error("--native-trim-fixture must be used alone.")
+        export_contour_trim_native_fixture(args.output_dir)
         return 0
     if args.native_fixture:
         if args.contour_first or args.contour_edge_trims or args.shape:
