@@ -621,3 +621,118 @@ def test_v4_native_bottom_alpha_audit_provenance_and_no_overwrite(tmp_path):
     (v4/"fixture-input.json").write_bytes((v4/"fixture-input.json").read_bytes()+b"\n")
     with pytest.raises(ValueError,match="provenance"):
         analyze_native_bottom_repair(v4,v2,output)
+
+
+def test_chalk_first_v5_fixture_and_native_proxy_fail_closed(tmp_path):
+    import cv2
+    import hashlib
+    from chalk_fill_strategy_comparison import (
+        export_chalk_first_v5_fixture, export_native_bottom_repair_fixture,
+        analyze_chalk_first_v5_native,
+    )
+    from chalk_fill_experiment import build_fill_target_mask
+    v5_fixture_path=tmp_path/"v5-input.json"
+    fixture=export_chalk_first_v5_fixture(v5_fixture_path)
+    v4=export_native_bottom_repair_fixture(None)
+    assert fixture["schema"]=="FILL001_CHALK_FIRST_NATIVE_V5"
+    assert fixture["quality_policy_id"]=="FILL001_CHALK_FIRST_PERIMETER_V2"
+    assert fixture["baseline_plan_signature"]==v4["baseline_plan_signature"]
+    assert fixture["frozen_mask_sha256"]==FILL001_EXPECTED_MASK_SHA256["rectangle"]
+    assert fixture["game_png_quality_gate"]=="NOT_EVALUATED"
+    assert fixture["measured_chalk"] is None and fixture["executor_ready"] is False
+    control=fixture["cases"]["V4_y190_w2_control"]
+    assert control==v4["cases"]["J_bottom_y190_w2"]
+    assert len(control)==29 and len(fixture["cases"])==9
+    for trim in (0,1,2,3):
+        for y,width in ((190,2),(189,3)):
+            strokes=fixture["cases"][f"K_trim_{trim}_y{y}_w{width}"]
+            assert len(strokes)==29 and strokes[0]==control[0]
+            assert strokes[-1]["width"]==width
+            assert strokes[-1]["points"]==[{"x":97,"y":y},{"x":363,"y":y}]
+            for a,b in zip(control[1:28],strokes[1:28]):
+                assert b["points"][0]["x"]==a["points"][0]["x"]-(3-trim)
+                assert b["points"][1]["x"]==a["points"][1]["x"]+(3-trim)
+                assert b["points"][0]["y"]==a["points"][0]["y"]
+                assert b["points"][1]["y"]==a["points"][1]["y"]
+    with pytest.raises(FileExistsError):
+        export_chalk_first_v5_fixture(v5_fixture_path)
+
+    # Synthetic native V4/V5 PNGs test independent provenance and
+    # negative controls only: no assertion about actual Egret rasterization.
+    root=tmp_path/"v5-native"
+    old=tmp_path/"v4-native"
+    root.mkdir()
+    old.mkdir()
+    original_target=np.repeat(np.repeat(build_fill_target_mask("rectangle"),3,axis=0),3,axis=1)
+    control_png=np.zeros((720,1380,4),dtype=np.uint8)
+    control_png[:,:,3]=original_target.astype(np.uint8)*255
+    old_name="J_bottom_y190_w2"
+    original_png=old/f"fill001-native-{old_name}.png"
+    assert cv2.imwrite(str(original_png),control_png)
+    old_sha=hashlib.sha256(original_png.read_bytes()).hexdigest()
+    old_manifest={"schema":"FILL001_NATIVE_BOTTOM_REPAIR_V4"}
+    (old/"manifest.json").write_text(json.dumps(old_manifest),encoding="utf-8")
+    old_report={
+        "schema":"FILL001_NATIVE_BOTTOM_REPAIR_AUDIT_V4",
+        "frozen_mask_sha256":fixture["frozen_mask_sha256"],
+        "source_manifest_sha256":hashlib.sha256((old/"manifest.json").read_bytes()).hexdigest(),
+        "cases":{old_name:{"native_png_sha256":old_sha}},
+    }
+    (old/"native-bottom-audit-v4.json").write_text(json.dumps(old_report),encoding="utf-8")
+    names=list(fixture["cases"])
+    hashes={}
+    cases={}
+    comparisons={}
+    for name in names:
+        current=control_png.copy()
+        if name!=names[0]:
+            current[100,100,3]=255
+            current[70,70,3]=255 # outside, tests remote-halo negative proof
+        png=f"fill001-native-{name}.png"
+        assert cv2.imwrite(str(root/png),current)
+        hashes[png]=hashlib.sha256((root/png).read_bytes()).hexdigest()
+        cases[name]={"pngName":png,"strokeCount":29}
+        if name!=names[0]:
+            comparisons[name]={"differingPixels":2}
+    fixture_raw=v5_fixture_path.read_bytes()
+    (root/"fixture-input.json").write_bytes(fixture_raw)
+    manifest={
+        "schema":fixture["schema"],
+        "status":"OFFLINE_NATIVE_EGRET_RENDERED",
+        "qualityPolicyId":fixture["quality_policy_id"],
+        "sourceMaskSha256":fixture["frozen_mask_sha256"],
+        "sourcePlanSignature":fixture["baseline_plan_signature"],
+        "baselineVariant":fixture["baseline_variant"],
+        "lateralTrimValues":[0,1,2,3],
+        "bottomVariants":fixture["bottom_variants"],
+        "bottomLineEndpoints":[97,363],
+        "gamePngQualityGate":"NOT_EVALUATED",
+        "measuredChalk":None,"executorReady":False,
+        "cases":cases,"comparisons":comparisons,
+    }
+    (root/"manifest.json").write_text(json.dumps(manifest),encoding="utf-8")
+    provenance={
+        "schema":"FILL001_CHALK_FIRST_NATIVE_CAPTURE_V5",
+        "fixtureSha256":hashlib.sha256(fixture_raw).hexdigest(),
+        "frozenMaskSha256":fixture["frozen_mask_sha256"],
+        "gameRunId":None,"measuredChalk":None,
+        "pngSha256":hashes,
+    }
+    (root/"fixture-provenance.json").write_text(json.dumps(provenance),encoding="utf-8")
+    report_path=root/"v5-audit.json"
+    report=analyze_chalk_first_v5_native(root,old,report_path)
+    assert report["schema"]=="FILL001_CHALK_FIRST_NATIVE_AUDIT_V5"
+    assert report["v4_control_rgba_identical"] is True
+    assert report["target_native_backing_pixels"]==401877
+    assert report["measured_chalk"] is None
+    assert report["game_quality_gate"]=="NOT_EVALUATED"
+    assert report["executor_ready"] is False
+    assert report["cases"][names[0]]["alpha_threshold_diagnostics"]["128"]["coverage_fraction"]==1.0
+    assert json.loads(report_path.read_text(encoding="utf-8"))==report
+    with pytest.raises(FileExistsError):
+        analyze_chalk_first_v5_native(root,old,report_path)
+    report_path.unlink()
+    provenance["pngSha256"][f"fill001-native-{names[1]}.png"]="0"*64
+    (root/"fixture-provenance.json").write_text(json.dumps(provenance),encoding="utf-8")
+    with pytest.raises(ValueError,match="SHA-256"):
+        analyze_chalk_first_v5_native(root,old,report_path)
