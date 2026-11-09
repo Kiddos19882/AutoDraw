@@ -1687,6 +1687,128 @@
     }
   }
 
+
+  // DEC-030 V5: local Egret-only frozen rectangle lateral trim versus
+  // bottom two-footprint combinations, never an executable game plan.
+  function renderFill001ChalkFirstV5Study() {
+    try {
+      const req=new XMLHttpRequest();
+      req.open("GET","./fill001-chalk-first-v5-native-input.json",false);
+      req.send(null);
+      if(req.status!==200) throw new Error("Pinned V5 JSON input missing");
+      const fixture=JSON.parse(req.responseText);
+      const names=["V4_y190_w2_control"];
+      for (const trim of [0,1,2,3]) {
+        for(const [y,w] of [[190,2],[189,3]]) {
+          names.push("K_trim_"+trim+"_y"+y+"_w"+w);
+        }
+      }
+      if(fixture.schema!=="FILL001_CHALK_FIRST_NATIVE_V5" ||
+        fixture.status!=="OFFLINE_SYNTHETIC_INPUT_ONLY" ||
+        fixture.quality_policy_id!=="FILL001_CHALK_FIRST_PERIMETER_V2" ||
+        fixture.frozen_mask_sha256!==
+          "ac1c6660e5986cdf534328c6dbcd5020f631168b1473c24b29e7609eb827998b" ||
+        fixture.baseline_variant!=="FILL001_NATIVE_BOTTOM_REPAIR_V4/J_bottom_y190_w2" ||
+        JSON.stringify(fixture.lateral_trim_values)!=="[0,1,2,3]" ||
+        JSON.stringify(fixture.bottom_variants)!==
+          JSON.stringify([{y:190,width:2},{y:189,width:3}]) ||
+        JSON.stringify(fixture.bottom_line_endpoints)!=="[97,363]" ||
+        fixture.game_png_quality_gate!=="NOT_EVALUATED" ||
+        fixture.measured_chalk!==null || fixture.executor_ready!==false ||
+        JSON.stringify(Object.keys(fixture.cases||{}))!==JSON.stringify(names)) {
+        throw new Error("V5 protocol/frozen identity mismatch");
+      }
+      const state=initializeWebGL(null), mask=createBoardMask();
+      const captures={}, cases={}, comparisons={};
+      for(const name of names) {
+        const strokes=fixture.cases[name];
+        let expectedY=190,expectedW=2;
+        if(name!=="V4_y190_w2_control"){
+          const suffix=name.match(/^K_trim_([0-3])_y(189|190)_w([23])$/);
+          if(!suffix || !((suffix[2]==="190" && suffix[3]==="2") ||
+                          (suffix[2]==="189" && suffix[3]==="3"))) {
+            throw new Error("V5 unplanned case name: "+name);
+          }
+          expectedY=Number(suffix[2]); expectedW=Number(suffix[3]);
+        }
+        if(!Array.isArray(strokes)||strokes.length!==29||
+          strokes.some((stroke,i)=>stroke.width!==(i===28?expectedW:10) ||
+            stroke.mode!=="normal"||!Array.isArray(stroke.points)||
+            stroke.points.length<2||stroke.points.some(p=>
+              !Number.isInteger(p.x)||!Number.isInteger(p.y)||
+              p.x<0||p.y<0||p.x>=460||p.y>=240))||
+          JSON.stringify(strokes[28].points)!==
+            JSON.stringify([{x:97,y:expectedY},{x:363,y:expectedY}])) {
+          throw new Error("V5 invalid widths/endpoints: "+name);
+        }
+        const replay=strokes.map((st,i)=>({
+          strokeId:name+"-"+i,points:st.points,width:st.width
+        }));
+        const board=makeTemporalBoard(replay,10,"normal",false);
+        const expected=strokes.reduce((n,st)=>n+st.points.length,0);
+        if(board.accepted!==expected)throw new Error("V5 Egret point replay mismatch");
+        const source=renderGraphicsNode(board.shape.$renderNode,false);
+        const composed=composeBoard(source,source.nodeBounds,mask);
+        const native=renderWebGLProbe("normal",[],10,composed,state,board.shape);
+        if(native.canvas.width!==1380||native.canvas.height!==720) {
+          throw new Error("V5 native backing size invalid");
+        }
+        captures[name]=native.canvas;
+        cases[name]={
+          strokeCount:29,acceptedSyntheticPoints:board.accepted,
+          pngName:"fill001-native-"+name+".png",
+          sceneDiagnostics:native.sceneDiagnostics,
+          webglDrawCalls:native.drawCalls,
+          canvas2DVsWebGL:native.comparison
+        };
+      }
+      for(const name of names.slice(1)) {
+        comparisons[name]=compareCanvases(captures[names[0]],captures[name]);
+      }
+      const manifest={
+        schema:fixture.schema,
+        status:"OFFLINE_NATIVE_EGRET_RENDERED",
+        qualityPolicyId:fixture.quality_policy_id,
+        sourceMaskSha256:fixture.frozen_mask_sha256,
+        sourcePlanSignature:fixture.baseline_plan_signature,
+        baselineVariant:fixture.baseline_variant,
+        lateralTrimValues:fixture.lateral_trim_values,
+        bottomVariants:fixture.bottom_variants,
+        bottomLineEndpoints:fixture.bottom_line_endpoints,
+        engineVersion:egret.Capabilities.engineVersion,
+        nativeRenderer:state.glInfo,
+        localBackingOnly:true,
+        measuredChalk:null,executorReady:false,
+        gamePngQualityGate:"NOT_EVALUATED",
+        cases,comparisons,
+        limitations:[
+          "This is native alpha/coverage only; not run-bound screen RGB",
+          "Three brush widths in one replay are research-only, not validated runtime brush changes",
+          "No exact CHALK or E4; cannot rank by real cost or authorize game execution"
+        ]
+      };
+      casesNode.textContent="";
+      const card=document.createElement("section");
+      card.className="fixture";
+      card.textContent="DEC-030 FILL001 V5 native 9 predeclared candidates; no gameplay.";
+      for(const name of names) {
+        addDownloadLink(card,captures[name],"fill001-native-"+name+".png",name);
+      }
+      casesNode.appendChild(card);
+      document.getElementById("renderer-manifest-json").textContent=
+        JSON.stringify(manifest,null,2);
+      document.body.dataset.chalkFirstV5Status="complete";
+      document.body.dataset.referenceStatus="chalk_first_v5_complete";
+      statusNode.textContent="V5 native BoardPane WebGL candidates complete, no CHALK.";
+    } catch(error) {
+      document.body.dataset.chalkFirstV5Status="error";
+      document.body.dataset.referenceStatus="error";
+      statusNode.className="error";
+      statusNode.textContent="V5 native failed: "+
+        (error&&error.stack?error.stack:String(error));
+    }
+  }
+
   // FILL-001 phase A: finite, predeclared native brush footprint probes.
   // No source game run, browser pointer events, or executable game plan.
   function renderFill001FootprintStudy() {
@@ -1995,6 +2117,7 @@
 
   api.renderContourFirstNativeStudy = renderContourFirstNativeStudy;
   api.renderContourTrimNativeStudy = renderContourTrimNativeStudy;
+  api.renderFill001ChalkFirstV5Study = renderFill001ChalkFirstV5Study;
   api.renderFill001BottomRepairStudy = renderFill001BottomRepairStudy;
   api.renderFill001FootprintStudy = renderFill001FootprintStudy;
   api.renderAll = renderAll;
@@ -2002,7 +2125,8 @@
   api.renderEndpointStudy = renderEndpointStudy;
   api.renderDuplicateFrameStudy = renderDuplicateFrameStudy;
   const params = new URLSearchParams(window.location.search);
-  const startup = params.get("contour") === "fill001v4" ? renderFill001BottomRepairStudy
+  const startup = params.get("contour") === "fill001v5" ? renderFill001ChalkFirstV5Study
+    : params.get("contour") === "fill001v4" ? renderFill001BottomRepairStudy
     : params.get("footprint") === "fill001a" ? renderFill001FootprintStudy
     : params.get("contour") === "fill001v3" ? () => renderContourTrimNativeStudy(true)
     : params.get("contour") === "fill001v2" ? () => renderContourTrimNativeStudy(false)
