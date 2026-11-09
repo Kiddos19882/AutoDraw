@@ -536,7 +536,9 @@ def test_native_v4_bottom_fixture_pins_v2_control_and_safe_margin(tmp_path):
 def test_v4_native_bottom_alpha_audit_provenance_and_no_overwrite(tmp_path):
     import cv2
     import hashlib
-    from chalk_fill_strategy_comparison import analyze_native_bottom_repair
+    from chalk_fill_strategy_comparison import (
+        analyze_native_bottom_repair, export_native_bottom_repair_fixture,
+    )
     from chalk_fill_experiment import build_fill_target_mask
     v2=tmp_path/"v2"
     v4=tmp_path/"v4"
@@ -561,6 +563,7 @@ def test_v4_native_bottom_alpha_audit_provenance_and_no_overwrite(tmp_path):
         "cases":{"G_trim_3":{"native_png_sha256":hashlib.sha256(original).hexdigest()}},
     }
     (v2/"native-alpha-audit-v2.json").write_text(json.dumps(v2_audit),encoding="utf-8")
+    fixture=export_native_bottom_repair_fixture(v4/"fixture-input.json")
     names=["G_trim_3_control"]+[f"J_bottom_y{y}_w{w}" for w in (1,2,3) for y in (189,190)]
     cases={}
     hashes={}
@@ -579,6 +582,7 @@ def test_v4_native_bottom_alpha_audit_provenance_and_no_overwrite(tmp_path):
         "baselineVariant":"FILL001_NATIVE_CONTOUR_EDGE_TRIMS_V2/G_trim_3",
         "testedWidths":[1,2,3],"testedYs":[189,190],
         "bottomLineEndpoints":[97,363],
+        "sourcePlanSignature":fixture["baseline_plan_signature"],
         "measuredChalk":None,"executorReady":False,
         "cases":cases,
         "comparisons":{n:{"differingPixels":1} for n in names[1:]},
@@ -586,6 +590,7 @@ def test_v4_native_bottom_alpha_audit_provenance_and_no_overwrite(tmp_path):
     (v4/"manifest.json").write_text(json.dumps(manifest),encoding="utf-8")
     provenance={
         "schema":"FILL001_NATIVE_BOTTOM_CAPTURE_V4",
+        "fixtureSha256":hashlib.sha256((v4/"fixture-input.json").read_bytes()).hexdigest(),
         "maskSha256":FILL001_EXPECTED_MASK_SHA256["rectangle"],
         "liveRunId":None,"measuredChalk":None,
         "pngSha256":hashes,
@@ -608,4 +613,11 @@ def test_v4_native_bottom_alpha_audit_provenance_and_no_overwrite(tmp_path):
     provenance["pngSha256"]["fill001-native-J_bottom_y189_w1.png"]="0"*64
     (v4/"fixture-provenance.json").write_text(json.dumps(provenance),encoding="utf-8")
     with pytest.raises(ValueError,match="SHA"):
+        analyze_native_bottom_repair(v4,v2,output)
+
+    # Reset valid provenance, tamper the retained fixture bytes and fail closed.
+    provenance["pngSha256"]["fill001-native-J_bottom_y189_w1.png"]=hashes["fill001-native-J_bottom_y189_w1.png"]
+    (v4/"fixture-provenance.json").write_text(json.dumps(provenance),encoding="utf-8")
+    (v4/"fixture-input.json").write_bytes((v4/"fixture-input.json").read_bytes()+b"\\n")
+    with pytest.raises(ValueError,match="provenance"):
         analyze_native_bottom_repair(v4,v2,output)
