@@ -1481,6 +1481,190 @@ def analyze_native_bottom_repair(
     return report
 
 
+def analyze_chalk_first_v5_native(
+    render_dir: Path, v4_dir: Path, report_path: Path,
+) -> dict[str, Any]:
+    """Independent native-only DEC-030 V5 alpha/3-logical-px perimeter sweep.
+
+    Original frozen V4 J-bottom-y190-w2 must be RGBA-identical to V5
+    control. Actual game quality and exact CHALK remain NOT_EVALUATED.
+    """
+    if report_path.exists():
+        raise FileExistsError("V5 native quality report already exists")
+    frozen=FILL001_EXPECTED_MASK_SHA256["rectangle"]
+    mask=build_fill_target_mask("rectangle")
+    if fill_target_mask_sha256("rectangle",mask)!=frozen:
+        raise ValueError("V5 frozen mask SHA invalid")
+    names=["V4_y190_w2_control"]+[
+        f"K_trim_{t}_y{y}_w{w}"
+        for t in (0,1,2,3) for y,w in ((190,2),(189,3))
+    ]
+    fixture_raw=(render_dir/"fixture-input.json").read_bytes()
+    fixture=json.loads(fixture_raw)
+    manifest_raw=(render_dir/"manifest.json").read_bytes()
+    manifest=json.loads(manifest_raw)
+    provenance_raw=(render_dir/"fixture-provenance.json").read_bytes()
+    provenance=json.loads(provenance_raw)
+    if (fixture.get("schema")!="FILL001_CHALK_FIRST_NATIVE_V5"
+            or manifest.get("schema")!=fixture["schema"]
+            or fixture.get("status")!="OFFLINE_SYNTHETIC_INPUT_ONLY"
+            or manifest.get("status")!="OFFLINE_NATIVE_EGRET_RENDERED"
+            or fixture.get("quality_policy_id")!="FILL001_CHALK_FIRST_PERIMETER_V2"
+            or manifest.get("qualityPolicyId")!=fixture["quality_policy_id"]
+            or fixture.get("frozen_mask_sha256")!=frozen
+            or manifest.get("sourceMaskSha256")!=frozen
+            or fixture.get("baseline_plan_signature")!=manifest.get("sourcePlanSignature")
+            or fixture.get("baseline_variant")!=manifest.get("baselineVariant")
+            or fixture.get("lateral_trim_values")!=[0,1,2,3]
+            or manifest.get("lateralTrimValues")!=[0,1,2,3]
+            or fixture.get("bottom_variants")!=[{"y":190,"width":2},{"y":189,"width":3}]
+            or manifest.get("bottomVariants")!=fixture["bottom_variants"]
+            or fixture.get("bottom_line_endpoints")!=[97,363]
+            or manifest.get("bottomLineEndpoints")!=[97,363]
+            or fixture.get("control")!="V4_y190_w2_control"
+            or fixture.get("game_png_quality_gate")!="NOT_EVALUATED"
+            or manifest.get("gamePngQualityGate")!="NOT_EVALUATED"
+            or fixture.get("measured_chalk") is not None
+            or manifest.get("measuredChalk") is not None
+            or fixture.get("executor_ready") is not False
+            or manifest.get("executorReady") is not False
+            or list(fixture.get("cases") or {})!=names
+            or list(manifest.get("cases") or {})!=names
+            or provenance.get("schema")!="FILL001_CHALK_FIRST_NATIVE_CAPTURE_V5"
+            or provenance.get("fixtureSha256")!=hashlib.sha256(fixture_raw).hexdigest()
+            or provenance.get("frozenMaskSha256")!=frozen
+            or provenance.get("gameRunId") is not None
+            or provenance.get("measuredChalk") is not None
+            or set(provenance.get("pngSha256") or {}) !=
+                {f"fill001-native-{name}.png" for name in names}):
+        raise ValueError("V5 independent native provenance failed")
+    v4_manifest=json.loads((v4_dir/"manifest.json").read_text(encoding="utf-8"))
+    v4_report=json.loads((v4_dir/"native-bottom-audit-v4.json").read_text(encoding="utf-8"))
+    old_name="J_bottom_y190_w2"
+    old_path=v4_dir/f"fill001-native-{old_name}.png"
+    old_raw=old_path.read_bytes()
+    if (v4_manifest.get("schema")!="FILL001_NATIVE_BOTTOM_REPAIR_V4"
+            or v4_report.get("schema")!="FILL001_NATIVE_BOTTOM_REPAIR_AUDIT_V4"
+            or v4_report.get("frozen_mask_sha256")!=frozen
+            or v4_report.get("source_manifest_sha256")!=
+                hashlib.sha256((v4_dir/"manifest.json").read_bytes()).hexdigest()
+            or v4_report.get("cases",{}).get(old_name,{}).get("native_png_sha256")!=
+                hashlib.sha256(old_raw).hexdigest()):
+        raise ValueError("V5 original V4 control source provenance invalid")
+    original=cv2.imdecode(np.frombuffer(old_raw,dtype=np.uint8),cv2.IMREAD_UNCHANGED)
+    if original is None or original.shape!=(720,1380,4) or original.dtype!=np.uint8:
+        raise ValueError("V5 control V4 native RGBA dimensions invalid")
+    baseline=fixture["cases"][names[0]]
+    if len(baseline)!=29 or baseline[-1]!={
+        "points":[{"x":97,"y":190},{"x":363,"y":190}],
+        "width":2,"mode":"normal",
+    }:
+        raise ValueError("V5 baseline scanline geometry changed")
+    for trim in (0,1,2,3):
+        for y,width in ((190,2),(189,3)):
+            strokes=fixture["cases"][f"K_trim_{trim}_y{y}_w{width}"]
+            if (not isinstance(strokes,list) or len(strokes)!=29
+                    or strokes[0]!=baseline[0]
+                    or strokes[-1]!={
+                        "points":[{"x":97,"y":y},{"x":363,"y":y}],
+                        "width":width,"mode":"normal",
+                    }):
+                raise ValueError("V5 candidate strokes changed after input pinning")
+            for i in range(1,28):
+                bp,bq=baseline[i]["points"]
+                p,q=strokes[i]["points"]
+                dx=3-trim
+                if (p!={"x":bp["x"]-dx,"y":bp["y"]}
+                        or q!={"x":bq["x"]+dx,"y":bq["y"]}
+                        or strokes[i]["width"]!=10 or strokes[i]["mode"]!="normal"):
+                    raise ValueError("V5 lateral trim changed original frozen row geometry")
+    target=np.repeat(np.repeat(mask,3,axis=0),3,axis=1)
+    distance=cv2.distanceTransform(
+        (~target).astype(np.uint8),cv2.DIST_L2,cv2.DIST_MASK_PRECISE,
+    )
+    results={}
+    frames={}
+    for name in names:
+        filename=f"fill001-native-{name}.png"
+        item=manifest["cases"][name]
+        if item.get("pngName")!=filename or item.get("strokeCount")!=29:
+            raise ValueError("V5 image case name or expected count invalid")
+        raw=(render_dir/filename).read_bytes()
+        sha=hashlib.sha256(raw).hexdigest()
+        if sha!=provenance["pngSha256"][filename]:
+            raise ValueError("V5 source PNG SHA-256 mismatch")
+        img=cv2.imdecode(np.frombuffer(raw,dtype=np.uint8),cv2.IMREAD_UNCHANGED)
+        if img is None or img.shape!=(720,1380,4) or img.dtype!=np.uint8:
+            raise ValueError("V5 native RGBA expected 1380x720")
+        frames[name]=img
+        cutoffs={}
+        for threshold in (1,64,128,254):
+            painted=img[:,:,3]>=threshold
+            spatial=_spatial_partition_contour_residual(target,painted)
+            outside=painted & ~target
+            extra_distances=distance[outside].astype(np.float64)/3.0
+            max_px=float(np.max(extra_distances)) if len(extra_distances) else 0.0
+            remote=int(np.count_nonzero(extra_distances>3.0+1e-6))
+            coverage=1-spatial["uncovered_backing_pixels"]/int(target.sum())
+            cutoffs[str(threshold)]={
+                "coverage_fraction":round(coverage,9),
+                "uncovered_target_backing_pixels":spatial["uncovered_backing_pixels"],
+                "missing_bottom_backing_pixels":spatial["uncovered_regions"]["bottom"],
+                "missing_left_backing_pixels":spatial["uncovered_regions"]["left"],
+                "missing_right_backing_pixels":spatial["uncovered_regions"]["right"],
+                "leakage_backing_pixels":spatial["leakage_backing_pixels"],
+                "leakage_regions":spatial["leakage_regions"],
+                "max_overshoot_native_logical_proxy_px":round(max_px,6),
+                "leakage_beyond_3_logical_proxy_px":remote,
+                "native_screening_gate":(
+                    "QUALIFIED_FOR_LIVE_EVALUATION" if coverage>=0.99 and remote==0
+                    else "REJECTED_NATIVE_SCREENING"
+                ),
+            }
+        results[name]={
+            "native_png_sha256":sha,
+            "stroke_count":29,
+            "alpha_threshold_diagnostics":cutoffs,
+        }
+    if not np.array_equal(frames[names[0]],original):
+        raise ValueError("V5 control must be pixel-identical to V4 native bottom w2")
+    for name in names[1:]:
+        diff=manifest.get("comparisons",{}).get(name,{}).get("differingPixels")
+        if (type(diff) is not int or diff<0 or
+                (diff==0)!=np.array_equal(frames[name],original)):
+            raise ValueError("V5 recorded delta is inconsistent with native control")
+    report={
+        "schema":"FILL001_CHALK_FIRST_NATIVE_AUDIT_V5",
+        "status":"OFFLINE_NATIVE_DIAGNOSTIC_ONLY",
+        "quality_policy_reference":"FILL001_CHALK_FIRST_PERIMETER_V2",
+        "native_proxy_not_run_bound_screen_quality":True,
+        "frozen_mask_sha256":frozen,
+        "source_fixture_sha256":hashlib.sha256(fixture_raw).hexdigest(),
+        "source_manifest_sha256":hashlib.sha256(manifest_raw).hexdigest(),
+        "source_provenance_sha256":hashlib.sha256(provenance_raw).hexdigest(),
+        "v4_control_png_sha256":hashlib.sha256(old_raw).hexdigest(),
+        "v4_control_rgba_identical":True,
+        "target_native_backing_pixels":int(target.sum()),
+        "native_to_logical_scale":3,
+        "distance_method":"Euclidean native backing pixel-center distance /3 (proxy)",
+        "thresholds":[1,64,128,254],
+        "cases":results,
+        "game_quality_gate":"NOT_EVALUATED",
+        "measured_chalk":None,
+        "chalk_ranking":"NOT_EVALUATED",
+        "executor_ready":False,
+        "limitations":[
+            "Only frozen rectangle 1380x720 Egret WebGL alpha, not live screen RGB",
+            "No game accepted points or exact CHALK; cannot choose minimum cost",
+            "3 logical px native backing proxy is not a run-bound screen quality acceptance",
+            "Small brush switch must be validated independently before execution",
+        ],
+    }
+    report_path.parent.mkdir(parents=True,exist_ok=True)
+    report_path.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\\n",encoding="utf-8")
+    return report
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", type=Path, required=True)
@@ -1495,6 +1679,10 @@ def main(argv: list[str] | None = None) -> int:
                         help="Independently audit native V4 bottom correction against original V2.")
     parser.add_argument("--native-bottom-control-dir", type=Path,
                         help="Required immutable V2 native directory for V4 pixel-exact control.")
+    parser.add_argument("--native-chalk-first-v5-dir", type=Path,
+                        help="Audit only fixed native V5 DEC-030 candidate alpha PNGs.")
+    parser.add_argument("--native-chalk-first-v5-control-dir", type=Path,
+                        help="Required frozen native V4 directory for pixel-identical control.")
     parser.add_argument("--native-chalk-first-v5-fixture", action="store_true",
                         help="Export only frozen rectangle DEC-030 native V5 candidates.")
     parser.add_argument("--native-bottom-fixture", action="store_true",
@@ -1510,6 +1698,21 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--contour-edge-trims", action="store_true",
                         help="Versioned V2 endpoint-only trimming study.")
     args = parser.parse_args(argv)
+    if args.native_chalk_first_v5_dir is not None:
+        if (args.native_chalk_first_v5_control_dir is None
+                or args.native_chalk_first_v5_fixture or args.native_bottom_fixture
+                or args.native_bottom_dir is not None or args.native_bottom_control_dir is not None
+                or args.native_spatial_dir is not None or args.native_footprint_dir is not None
+                or args.native_render_dir is not None or args.native_mixed_fixture
+                or args.native_trim_fixture or args.native_fixture or args.contour_first
+                or args.contour_edge_trims or args.shape):
+            parser.error("--native-chalk-first-v5-dir requires only --native-chalk-first-v5-control-dir")
+        analyze_chalk_first_v5_native(
+            args.native_chalk_first_v5_dir,args.native_chalk_first_v5_control_dir,args.output_dir
+        )
+        return 0
+    if args.native_chalk_first_v5_control_dir is not None:
+        parser.error("--native-chalk-first-v5-control-dir requires --native-chalk-first-v5-dir")
     if args.native_chalk_first_v5_fixture:
         if (args.native_bottom_fixture or args.native_bottom_dir is not None
                 or args.native_bottom_control_dir is not None
