@@ -699,6 +699,75 @@ def export_native_bottom_repair_fixture(path: Path) -> dict[str, Any]:
     return fixture
 
 
+def export_chalk_first_v5_fixture(path: Path) -> dict[str, Any]:
+    """DEC-030 V5: 8 predeclared lateral trim × safe V4 bottom corrections.
+
+    One native Egret experiment on the *same frozen rectangle*. No runtime
+    source plans, no new CHALK measurement, no screenshot-driven tuning.
+    """
+    if path.exists():
+        raise FileExistsError("V5 frozen geometry fixture already exists")
+    v4_control = export_native_bottom_repair_fixture_to_memory()
+    baseline = v4_control["cases"]["G_trim_3_control"]
+    if len(baseline) != 28 or v4_control["bottom_line_endpoints"] != [97, 363]:
+        raise ValueError("V5 V4 baseline drift")
+    fixed = [dict(st) for st in baseline]
+    cases = {"V4_y190_w2_control": [
+        *fixed, {
+            "points": [{"x":97,"y":190},{"x":363,"y":190}],
+            "width":2,"mode":"normal",
+        },
+    ]}
+    for trim in (0,1,2,3):
+        rows=[]
+        for index, st in enumerate(baseline):
+            if index == 0:
+                rows.append(dict(st))
+                continue
+            p,q=st["points"]
+            dx=3-trim
+            if p["x"]-dx >= q["x"]+dx:
+                raise ValueError("V5 trim would reverse frozen scanline")
+            rows.append({
+                "points":[{"x":p["x"]-dx,"y":p["y"]},
+                          {"x":q["x"]+dx,"y":q["y"]}],
+                "width":10,"mode":"normal",
+            })
+        for y,width in ((190,2),(189,3)):
+            name=f"K_trim_{trim}_y{y}_w{width}"
+            cases[name]=[*rows,{
+                "points":[{"x":97,"y":y},{"x":363,"y":y}],
+                "width":width,"mode":"normal",
+            }]
+    fixture={
+        "schema":"FILL001_CHALK_FIRST_NATIVE_V5",
+        "status":"OFFLINE_SYNTHETIC_INPUT_ONLY",
+        "quality_policy_id":"FILL001_CHALK_FIRST_PERIMETER_V2",
+        "shape_id":"rectangle",
+        "frozen_mask_sha256":v4_control["frozen_mask_sha256"],
+        "baseline_plan_signature":v4_control["baseline_plan_signature"],
+        "baseline_variant":"FILL001_NATIVE_BOTTOM_REPAIR_V4/J_bottom_y190_w2",
+        "lateral_trim_values":[0,1,2,3],
+        "bottom_variants":[{"y":190,"width":2},{"y":189,"width":3}],
+        "bottom_line_endpoints":[97,363],
+        "control":"V4_y190_w2_control",
+        "cases":cases,
+        "game_png_quality_gate":"NOT_EVALUATED",
+        "measured_chalk":None,
+        "executor_ready":False,
+    }
+    path.parent.mkdir(parents=True,exist_ok=True)
+    path.write_text(json.dumps(fixture,ensure_ascii=False,indent=2)+"\\n",encoding="utf-8")
+    return fixture
+
+
+def export_native_bottom_repair_fixture_to_memory() -> dict[str, Any]:
+    """Construct the V4 geometry in-memory, without writing a second fixture."""
+    from tempfile import TemporaryDirectory
+    with TemporaryDirectory(prefix="fill001-v5-v4-") as directory:
+        return export_native_bottom_repair_fixture(Path(directory)/"v4.json")
+
+
 def export_mixed_contour_native_fixture(path: Path) -> dict[str, Any]:
     """V3 frozen mixed-width geometry: 5px inset outline, 10px inner scanlines.
 
@@ -1430,6 +1499,8 @@ def main(argv: list[str] | None = None) -> int:
                         help="Independently audit native V4 bottom correction against original V2.")
     parser.add_argument("--native-bottom-control-dir", type=Path,
                         help="Required immutable V2 native directory for V4 pixel-exact control.")
+    parser.add_argument("--native-chalk-first-v5-fixture", action="store_true",
+                        help="Export only frozen rectangle DEC-030 native V5 candidates.")
     parser.add_argument("--native-bottom-fixture", action="store_true",
                         help="Export V4 thin bottom boundary repair on frozen V2 trim3.")
     parser.add_argument("--native-mixed-fixture", action="store_true",
@@ -1443,6 +1514,16 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--contour-edge-trims", action="store_true",
                         help="Versioned V2 endpoint-only trimming study.")
     args = parser.parse_args(argv)
+    if args.native_chalk_first_v5_fixture:
+        if (args.native_bottom_fixture or args.native_bottom_dir is not None
+                or args.native_bottom_control_dir is not None
+                or args.native_spatial_dir is not None or args.native_footprint_dir is not None
+                or args.native_render_dir is not None or args.native_mixed_fixture
+                or args.native_trim_fixture or args.native_fixture
+                or args.contour_first or args.contour_edge_trims or args.shape):
+            parser.error("--native-chalk-first-v5-fixture must be used alone")
+        export_chalk_first_v5_fixture(args.output_dir)
+        return 0
     if args.native_bottom_dir is not None:
         if (args.native_bottom_control_dir is None or args.native_spatial_dir is not None
                 or args.native_footprint_dir is not None or args.native_render_dir is not None
