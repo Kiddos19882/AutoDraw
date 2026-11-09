@@ -1575,6 +1575,119 @@
   }
 
 
+
+  // FILL-001 V4: six lower edge thin-brush candidates on the V2 trim3 control.
+  function renderFill001BottomRepairStudy() {
+    try {
+      const req=new XMLHttpRequest();
+      req.open("GET","./fill001-bottom-repair-native-input.json",false);
+      req.send(null);
+      if(req.status!==200) throw new Error("Native V4 pinned input missing");
+      const fixture=JSON.parse(req.responseText);
+      const names=["G_trim_3_control"];
+      for (const width of [1,2,3]) {
+        for (const y of [189,190]) names.push("J_bottom_y"+y+"_w"+width);
+      }
+      if(fixture.schema!=="FILL001_NATIVE_BOTTOM_REPAIR_V4" ||
+        fixture.status!=="OFFLINE_SYNTHETIC_INPUT_ONLY" ||
+        fixture.shape_id!=="rectangle" ||
+        fixture.frozen_mask_sha256!==
+          "ac1c6660e5986cdf534328c6dbcd5020f631168b1473c24b29e7609eb827998b" ||
+        fixture.baseline_variant!=="FILL001_NATIVE_CONTOUR_EDGE_TRIMS_V2/G_trim_3" ||
+        fixture.baseline_endpoint_trim!==3 ||
+        JSON.stringify(fixture.candidate_widths)!=="[1,2,3]" ||
+        JSON.stringify(fixture.candidate_y)!=="[189,190]" ||
+        JSON.stringify(fixture.bottom_line_endpoints)!=="[97,363]" ||
+        Object.keys(fixture.cases||{}).sort().join(",")!==names.slice().sort().join(",")) {
+        throw new Error("Native V4 frozen provenance mismatch");
+      }
+      const state=initializeWebGL(null), mask=createBoardMask();
+      const captures={}, cases={}, comparisons={};
+      for(const name of names) {
+        const strokes=fixture.cases[name];
+        const control=name==="G_trim_3_control";
+        const expectedCount=control?28:29;
+        if (!Array.isArray(strokes) || strokes.length!==expectedCount ||
+          strokes.some((st,i)=>{
+            const expectedWidth=i<28?10:Number(name.split("_w")[1]);
+            return st.width!==expectedWidth || st.mode!=="normal" ||
+              !Array.isArray(st.points) || st.points.length<2 ||
+              st.points.some(p=>!Number.isInteger(p.x)||!Number.isInteger(p.y)||
+                p.x<0||p.y<0||p.x>=460||p.y>=240);
+          }) ||
+          (control?false:JSON.stringify(strokes[28].points)!==
+            JSON.stringify([{x:97,y:Number(name.split("_y")[1].split("_w")[0])},
+                            {x:363,y:Number(name.split("_y")[1].split("_w")[0])}]))) {
+          throw new Error("V4 native input geometry or width invalid: "+name);
+        }
+        const replay=strokes.map((st,i)=>({
+          strokeId:name+"-stroke-"+i, points:st.points,width:st.width
+        }));
+        const board=makeTemporalBoard(replay,10,"normal",false);
+        const expectedPoints=strokes.reduce((n,st)=>n+st.points.length,0);
+        if(board.accepted!==expectedPoints) throw new Error("V4 accepted point mismatch");
+        const source=renderGraphicsNode(board.shape.$renderNode,false);
+        const composed=composeBoard(source,source.nodeBounds,mask);
+        const native=renderWebGLProbe("normal",[],10,composed,state,board.shape);
+        if(native.canvas.width!==1380||native.canvas.height!==720) {
+          throw new Error("V4 native backing dimension mismatch");
+        }
+        captures[name]=native.canvas;
+        cases[name]={
+          strokeCount:strokes.length,acceptedSyntheticPoints:board.accepted,
+          pngName:"fill001-native-"+name+".png",
+          sceneDiagnostics:native.sceneDiagnostics,
+          webglDrawCalls:native.drawCalls,
+          canvas2DVsWebGL:native.comparison
+        };
+      }
+      for(const name of names.slice(1)) {
+        const compare=compareCanvases(captures.G_trim_3_control,captures[name]);
+        if(compare.differingPixels<=0)throw new Error("V4 candidate was identical: "+name);
+        comparisons[name]=compare;
+      }
+      const manifest={
+        schema:"FILL001_NATIVE_BOTTOM_REPAIR_V4",
+        status:"OFFLINE_NATIVE_EGRET_RENDERED",
+        sourceMaskSha256:fixture.frozen_mask_sha256,
+        sourcePlanSignature:fixture.baseline_plan_signature,
+        baselineVariant:fixture.baseline_variant,
+        bottomLineEndpoints:fixture.bottom_line_endpoints,
+        testedWidths:fixture.candidate_widths,
+        testedYs:fixture.candidate_y,
+        engineVersion:egret.Capabilities.engineVersion,
+        nativeRenderer:state.glInfo,
+        localBackingOnly:true,
+        measuredChalk:null,executorReady:false,
+        cases,comparisons,
+        limitations:[
+          "27 synthetic 2-point lines plus contour; not real accepted game samples",
+          "Local Egret BoardPane WebGL; native alpha only, no run-bound screen RGB",
+          "No actual game CHALK or quality acceptance"
+        ]
+      };
+      casesNode.textContent="";
+      const card=document.createElement("section");
+      card.className="fixture";
+      card.textContent="FILL001 V4 thin bottom stripe isolated native candidates; no gameplay.";
+      for(const name of names) {
+        addDownloadLink(card,captures[name],"fill001-native-"+name+".png",name);
+      }
+      casesNode.appendChild(card);
+      document.getElementById("renderer-manifest-json").textContent=
+        JSON.stringify(manifest,null,2);
+      document.body.dataset.bottomRepairStatus="complete";
+      document.body.dataset.referenceStatus="bottom_repair_complete";
+      statusNode.textContent="Native FILL001 V4 bottom repair experiment complete.";
+    } catch(error) {
+      document.body.dataset.bottomRepairStatus="error";
+      document.body.dataset.referenceStatus="error";
+      statusNode.className="error";
+      statusNode.textContent="Native V4 bottom repair failed: "+
+        (error&&error.stack?error.stack:String(error));
+    }
+  }
+
   // FILL-001 phase A: finite, predeclared native brush footprint probes.
   // No source game run, browser pointer events, or executable game plan.
   function renderFill001FootprintStudy() {
@@ -1883,13 +1996,15 @@
 
   api.renderContourFirstNativeStudy = renderContourFirstNativeStudy;
   api.renderContourTrimNativeStudy = renderContourTrimNativeStudy;
+  api.renderFill001BottomRepairStudy = renderFill001BottomRepairStudy;
   api.renderFill001FootprintStudy = renderFill001FootprintStudy;
   api.renderAll = renderAll;
   api.renderTemporalStudy = renderTemporalStudy;
   api.renderEndpointStudy = renderEndpointStudy;
   api.renderDuplicateFrameStudy = renderDuplicateFrameStudy;
   const params = new URLSearchParams(window.location.search);
-  const startup = params.get("footprint") === "fill001a" ? renderFill001FootprintStudy
+  const startup = params.get("contour") === "fill001v4" ? renderFill001BottomRepairStudy
+    : params.get("footprint") === "fill001a" ? renderFill001FootprintStudy
     : params.get("contour") === "fill001v3" ? () => renderContourTrimNativeStudy(true)
     : params.get("contour") === "fill001v2" ? () => renderContourTrimNativeStudy(false)
     : params.get("contour") === "fill001" ? renderContourFirstNativeStudy
