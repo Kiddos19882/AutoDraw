@@ -991,10 +991,207 @@ def analyze_native_brush_footprints(render_dir: Path, report_path: Path) -> dict
     return report
 
 
+
+def _spatial_partition_contour_residual(
+    target: np.ndarray, painted: np.ndarray, *, edge_band: int = 18,
+) -> dict[str, Any]:
+    """Exhaustive, disjoint spatial zones for a 3x native frozen mask.
+
+    Uses the pinned nearest-3x target, not image-dependent alignment or
+    morphology. Top/bottom mean the first/last three target backing rows.
+    Middle-row missing pixels are left/right edge-band or interior. Leakage
+    is classified by the row's original target extents, not brush geometry.
+    """
+    if (target.shape != (720,1380) or painted.shape != target.shape or
+            target.dtype != np.bool_ or painted.dtype != np.bool_ or
+            type(edge_band) is not int or edge_band < 1):
+        raise ValueError("Invalid fixed native spatial partition inputs")
+    missing = target & ~painted
+    leakage = ~target & painted
+    yy = np.flatnonzero(target.any(axis=1))
+    if not len(yy):
+        raise ValueError("Empty native target")
+    top, bottom = int(yy[0]), int(yy[-1])
+    zones_missing = {k:0 for k in ("top", "bottom", "left", "right", "interior")}
+    zones_leakage = {k:0 for k in ("above", "below", "left", "right", "other")}
+    rows = []
+    for y in range(target.shape[0]):
+        xs = np.flatnonzero(target[y])
+        miss_xs = np.flatnonzero(missing[y])
+        leak_xs = np.flatnonzero(leakage[y])
+        if not len(xs):
+            if len(miss_xs):
+                raise ValueError("Uncovered pixels cannot occur outside target rows")
+            if len(leak_xs):
+                zones_leakage["above" if y < top else "below"] += int(len(leak_xs))
+            if len(leak_xs):
+                rows.append({
+                    "backing_y":y, "target_x_minmax":None,
+                    "uncovered":0, "leakage":int(len(leak_xs)),
+                    "uncovered_left":0, "uncovered_right":0,
+                    "uncovered_interior":0,
+                })
+            continue
+        left, right = int(xs[0]), int(xs[-1])
+        if len(xs) != right-left+1:
+            raise ValueError("Expected contiguous frozen rectangle target per row")
+        is_top = y <= top+2
+        is_bottom = y >= bottom-2
+        if is_top:
+            zones_missing["top"] += int(len(miss_xs))
+            left_count = right_count = interior_count = 0
+        elif is_bottom:
+            zones_missing["bottom"] += int(len(miss_xs))
+            left_count = right_count = interior_count = 0
+        else:
+            left_count = int(np.count_nonzero(miss_xs < left + edge_band))
+            right_count = int(np.count_nonzero(miss_xs > right - edge_band))
+            interior_count = int(len(miss_xs)) - left_count - right_count
+            if interior_count < 0:
+                raise ValueError("Native edge zones overlap")
+            zones_missing["left"] += left_count
+            zones_missing["right"] += right_count
+            zones_missing["interior"] += interior_count
+        if len(leak_xs):
+            l = int(np.count_nonzero(leak_xs < left))
+            r = int(np.count_nonzero(leak_xs > right))
+            zones_leakage["left"] += l
+            zones_leakage["right"] += r
+            zones_leakage["other"] += int(len(leak_xs))-l-r
+        if len(miss_xs) or len(leak_xs):
+            rows.append({
+                "backing_y":y, "target_x_minmax":[left,right],
+                "uncovered":int(len(miss_xs)),
+                "leakage":int(len(leak_xs)),
+                "uncovered_left":left_count,
+                "uncovered_right":right_count,
+                "uncovered_interior":interior_count,
+            })
+    miss_n, leak_n = int(missing.sum()),int(leakage.sum())
+    if sum(zones_missing.values()) != miss_n or sum(zones_leakage.values()) != leak_n:
+        raise ValueError("Native spatial zones are not a full partition")
+    labels_missing, components_missing = cv2.connectedComponents(
+        missing.astype(np.uint8), connectivity=8,
+    )
+    labels_leak, components_leak = cv2.connectedComponents(
+        leakage.astype(np.uint8), connectivity=8,
+    )
+    def groups(label_map: np.ndarray, count: int) -> list[dict[str, Any]]:
+        result=[]
+        for label in range(1,count):
+            ys,xs=np.nonzero(label_map==label)
+            if not len(xs): continue
+            result.append({
+                "pixels":int(len(xs)),
+                "bounding_xyxy":[int(xs.min()),int(ys.min()),int(xs.max()),int(ys.max())],
+            })
+        return sorted(result,key=lambda r:(-r["pixels"],r["bounding_xyxy"]))[:8]
+    return {
+        "target_backing_pixels":int(target.sum()),
+        "uncovered_backing_pixels":miss_n,
+        "leakage_backing_pixels":leak_n,
+        "target_vertical_bounds_backing":[top,bottom],
+        "edge_band_backing_pixels":edge_band,
+        "uncovered_regions":zones_missing,
+        "leakage_regions":zones_leakage,
+        "uncovered_connected_component_count":int(labels_missing-1),
+        "leakage_connected_component_count":int(labels_leak-1),
+        "largest_uncovered_components":groups(components_missing,labels_missing),
+        "largest_leakage_components":groups(components_leak,labels_leak),
+        "worst_uncovered_rows":sorted(rows,key=lambda r:(-r["uncovered"],r["backing_y"]))[:10],
+        "worst_leakage_rows":sorted(rows,key=lambda r:(-r["leakage"],r["backing_y"]))[:10],
+        "row_residuals":rows,
+    }
+
+
+def analyze_native_contour_spatial_residual(render_dir: Path, report_path: Path) -> dict[str, Any]:
+    """Independent fixed-geometry locality audit for a prior native V2/V3 run.
+
+    Only verified, frozen mask + raw PNG + existing alpha report. Never invent
+    repaired strokes or use source-unknown capture screenshots.
+    """
+    if report_path.exists():
+        raise FileExistsError("Native spatial residual report already exists")
+    manifest_path = render_dir/"manifest.json"
+    manifest_raw = manifest_path.read_bytes()
+    manifest = json.loads(manifest_raw)
+    schema=manifest.get("schema")
+    if schema not in ("FILL001_NATIVE_CONTOUR_EDGE_TRIMS_V2",
+                      "FILL001_NATIVE_MIXED_CONTOUR_V3"):
+        raise ValueError("Spatial audit requires pinned native V2 or V3 manifest")
+    version="v2" if schema.endswith("_V2") else "v3"
+    alpha_path=render_dir/f"native-alpha-audit-{version}.json"
+    previous=json.loads(alpha_path.read_text(encoding="utf-8"))
+    mask=build_fill_target_mask("rectangle")
+    sha=fill_target_mask_sha256("rectangle",mask)
+    if (sha != FILL001_EXPECTED_MASK_SHA256["rectangle"]
+            or manifest.get("sourceMaskSha256") != sha
+            or previous.get("frozen_mask_sha256") != sha
+            or previous.get("source_native_manifest_sha256") != hashlib.sha256(manifest_raw).hexdigest()
+            or previous.get("status") != "OFFLINE_NATIVE_DIAGNOSTIC_ONLY"
+            or previous.get("game_png_quality_gate") != "NOT_EVALUATED"
+            or previous.get("measured_chalk") is not None
+            or manifest.get("measuredChalk") is not None
+            or manifest.get("executorReady") is not False):
+        raise ValueError("Native spatial residual provenance or quality scope invalid")
+    expected=(
+        ("B_sparse_only", "C_contour_last","E_contour_first")+
+        tuple(f"G_trim_{i}" for i in range(1,5))
+        if version=="v2" else
+        ("E_contour_10",)+tuple(f"H_mixed_trim_{i}" for i in range(5))
+    )
+    if set(manifest.get("cases") or {}) != set(expected) or set(previous.get("cases") or {}) != set(expected):
+        raise ValueError("Native spatial audit refuses changed case inventory")
+    projected=np.repeat(np.repeat(mask,3,axis=0),3,axis=1)
+    output={}
+    for name in expected:
+        png=f"fill001-native-{name}.png"
+        if manifest["cases"][name].get("pngName") != png:
+            raise ValueError("Native PNG name mismatch")
+        raw=(render_dir/png).read_bytes()
+        if hashlib.sha256(raw).hexdigest() != previous["cases"][name].get("native_png_sha256"):
+            raise ValueError("Native PNG SHA differs from earlier independent alpha audit")
+        rgba=cv2.imdecode(np.frombuffer(raw,dtype=np.uint8),cv2.IMREAD_UNCHANGED)
+        if rgba is None or rgba.shape != (720,1380,4) or rgba.dtype != np.uint8:
+            raise ValueError("Native source image is not 1380x720 RGBA")
+        groups={}
+        for cutoff in (1,128,254):
+            painted=rgba[:,:,3]>=cutoff
+            detail=_spatial_partition_contour_residual(projected,painted)
+            previous_row=previous["cases"][name]["alpha_threshold_diagnostics"][str(cutoff)]
+            if (detail["uncovered_backing_pixels"] != previous_row["uncovered_target_backing_pixels"]
+                    or detail["leakage_backing_pixels"] != previous_row["leakage_backing_pixels"]):
+                raise ValueError("Spatial residual disagrees with frozen earlier alpha audit")
+            groups[str(cutoff)]=detail
+        output[name]=groups
+    report={
+        "schema":"FILL001_NATIVE_CONTOUR_SPATIAL_AUDIT_V1",
+        "status":"OFFLINE_NATIVE_DIAGNOSTIC_ONLY",
+        "source_native_variant":version,
+        "source_manifest_sha256":hashlib.sha256(manifest_raw).hexdigest(),
+        "source_alpha_audit_sha256":hashlib.sha256(alpha_path.read_bytes()).hexdigest(),
+        "frozen_mask_sha256":sha,
+        "projection":"frozen_logical_to_native_backing_nearest3_no_alignment",
+        "region_rule":"first/last 3 target backing rows, then 18px lateral bands, then interior",
+        "thresholds":[1,128,254],
+        "cases":output,
+        "measured_chalk":None,
+        "native_to_live_screen":"NOT_EVALUATED",
+        "game_png_quality_gate":"NOT_EVALUATED",
+        "repair_plan":"NOT_GENERATED",
+        "executor_ready":False,
+    }
+    report_path.parent.mkdir(parents=True,exist_ok=True)
+    report_path.write_text(json.dumps(report,indent=2,ensure_ascii=False)+"\n",encoding="utf-8")
+    return report
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--shape", choices=FILL001_SHAPES, action="append")
+    parser.add_argument("--native-spatial-dir", type=Path,
+                        help="Partition pinned native V2/V3 alpha residual by frozen boundary row/side.")
     parser.add_argument("--native-footprint-dir", type=Path,
                         help="Independently audit isolated native Egret footprint PNGs.")
     parser.add_argument("--native-render-dir", type=Path,
@@ -1010,15 +1207,22 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--contour-edge-trims", action="store_true",
                         help="Versioned V2 endpoint-only trimming study.")
     args = parser.parse_args(argv)
+    if args.native_spatial_dir is not None:
+        if (args.native_footprint_dir is not None or args.native_render_dir is not None
+                or args.native_mixed_fixture or args.native_trim_fixture or args.native_fixture
+                or args.contour_first or args.contour_edge_trims or args.shape):
+            parser.error("--native-spatial-dir is an isolated read-only diagnostic.")
+        analyze_native_contour_spatial_residual(args.native_spatial_dir,args.output_dir)
+        return 0
     if args.native_footprint_dir is not None:
-        if (args.native_render_dir is not None or args.native_mixed_fixture
+        if (args.native_render_dir is not None or args.native_spatial_dir is not None or args.native_mixed_fixture
                 or args.native_trim_fixture or args.native_fixture or args.contour_first
                 or args.contour_edge_trims or args.shape):
             parser.error("--native-footprint-dir is an isolated read-only diagnostic.")
         analyze_native_brush_footprints(args.native_footprint_dir, args.output_dir)
         return 0
     if args.native_render_dir is not None:
-        if args.native_fixture or args.native_trim_fixture or args.native_mixed_fixture or args.contour_first or args.contour_edge_trims or args.shape:
+        if args.native_fixture or args.native_trim_fixture or args.native_mixed_fixture or args.native_spatial_dir is not None or args.contour_first or args.contour_edge_trims or args.shape:
             parser.error("--native-render-dir must be used alone.")
         analyze_contour_native_pngs(args.native_render_dir, args.output_dir)
         return 0
