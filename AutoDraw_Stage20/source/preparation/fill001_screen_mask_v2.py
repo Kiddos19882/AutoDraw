@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+import cv2
 from PIL import Image
 
 from chalk_fill_experiment import (
@@ -24,6 +25,10 @@ from chalk_fill_capture_adapter import PNG_CHANGE_THRESHOLD, audit_fill001_png_p
 from chalk_fill_matrix import FillMatrixError
 
 SCHEMA = "FILL001_SCREEN_MASK_V2"
+FILL001_CHALK_FIRST_POLICY_V2 = "FILL001_CHALK_FIRST_PERIMETER_V2"
+FILL001_CHALK_FIRST_MIN_COVERAGE = 0.99
+FILL001_CHALK_FIRST_MAX_OVERSHOOT_LOGICAL_PX = 3.0
+
 
 
 def _screen_pixels(path: str | Path) -> tuple[np.ndarray, str]:
@@ -120,6 +125,69 @@ def project_screen_mask_v2(
     return mask
 
 
+def evaluate_fill001_chalk_first_quality(
+    target_mask: np.ndarray,
+    painted_mask: np.ndarray,
+    *,
+    scale_x: float,
+    scale_y: float,
+) -> dict[str, Any]:
+    """Versioned FILL-001 forward quality PASS, allowing a 3-logical-px halo.
+
+    All changed pixels outside target must lie within 3 logical pixels of the
+    target; one distant pixel fails. No fitted pixels or artificial dilation.
+    This geometric gate cannot establish or estimate game CHALK.
+    """
+    if (not isinstance(target_mask, np.ndarray) or
+            not isinstance(painted_mask, np.ndarray) or
+            target_mask.ndim != 2 or target_mask.shape != painted_mask.shape or
+            target_mask.dtype != np.bool_ or painted_mask.dtype != np.bool_ or
+            min(target_mask.shape) < 2 or not bool(np.any(target_mask))):
+        raise FillMatrixError("FILL001 chalk-first policy requires matching nonempty bool masks.")
+    sx = _finite_number(scale_x, "scale_x")
+    sy = _finite_number(scale_y, "scale_y")
+    if sx <= 0 or sy <= 0 or abs(sx - sy) / max(sx, sy) > 0.01:
+        raise FillMatrixError("FILL001 chalk-first policy requires validated uniform screen scale.")
+    outside = painted_mask & ~target_mask
+    target_size = int(np.count_nonzero(target_mask))
+    covered = int(np.count_nonzero(painted_mask & target_mask))
+    leaked = int(np.count_nonzero(outside))
+    # Pixel-center Euclidean distance, normalized conservatively by the
+    # SMALLER pixels/logical-pixel axis scale (never understates overshoot).
+    max_distance, far_pixels = 0.0, 0
+    if leaked:
+        distances = cv2.distanceTransform(
+            (~target_mask).astype(np.uint8), cv2.DIST_L2, cv2.DIST_MASK_PRECISE,
+        )
+        outside_distances = distances[outside].astype(np.float64) / min(sx, sy)
+        max_distance = float(np.max(outside_distances))
+        far_pixels = int(np.count_nonzero(
+            outside_distances > FILL001_CHALK_FIRST_MAX_OVERSHOOT_LOGICAL_PX + 1e-6
+        ))
+    coverage = covered / target_size
+    return {
+        "policy_id": FILL001_CHALK_FIRST_POLICY_V2,
+        "quality_gate": "PASS" if (
+            coverage >= FILL001_CHALK_FIRST_MIN_COVERAGE and far_pixels == 0
+        ) else "FAIL",
+        "coverage_fraction": coverage,
+        "minimum_coverage_fraction": FILL001_CHALK_FIRST_MIN_COVERAGE,
+        "target_pixels": target_size,
+        "uncovered_pixels": target_size - covered,
+        "leakage_pixels": leaked,
+        "max_perimeter_overshoot_logical_px": round(max_distance, 6),
+        "maximum_allowed_overshoot_logical_px": FILL001_CHALK_FIRST_MAX_OVERSHOOT_LOGICAL_PX,
+        "leakage_pixels_beyond_allowed_halo": far_pixels,
+        "screen_pixels_per_logical_x": sx,
+        "screen_pixels_per_logical_y": sy,
+        "distance_method": "screen_euclidean_min_uniform_scale_conservative",
+        "chalk_selection_priority": "min_run_bound_exact_chalk_among_quality_PASS",
+        "exact_chalk": None,
+        "chalk_evidence_status": "NOT_EVALUATED",
+        "scope": "run_bound_screen_RGB_quality_only_not_game_execution_or_CHALK",
+    }
+
+
 def audit_screen_mask_v2(
     shape_id: str,
     before_png: str | Path,
@@ -128,8 +196,9 @@ def audit_screen_mask_v2(
     run_id: str,
     screen_roi: dict[str, int],
     geometry: dict[str, Any],
+    quality_policy: str | None = None,
 ) -> dict[str, Any]:
-    """Read-only diagnostic; retain independent V1 metrics and FAIL status."""
+    """Read-only RGB audit. Explicit new quality policy preserves old V1/V2."""
     before, before_sha = _screen_pixels(before_png)
     after, after_sha = _screen_pixels(after_png)
     if before.shape != after.shape or before.ndim != 3 or before.shape[2] != 3:
@@ -144,7 +213,17 @@ def audit_screen_mask_v2(
     target = int(np.count_nonzero(mask))
     leak = int(np.count_nonzero(changed & ~mask))
     v1 = audit_fill001_png_pair(shape_id, before_png, after_png, screen_roi=screen_roi)
-    return {
+    if quality_policy not in (None, FILL001_CHALK_FIRST_POLICY_V2):
+        raise FillMatrixError("Unknown FILL001 quality policy ID.")
+    policy_v2 = None
+    if quality_policy == FILL001_CHALK_FIRST_POLICY_V2:
+        x0, y0, x1, y1 = _check_geometry(geometry, run_id)
+        policy_v2 = evaluate_fill001_chalk_first_quality(
+            mask, changed,
+            scale_x=(x1-x0)/FILL001_CANVAS_WIDTH,
+            scale_y=(y1-y0)/FILL001_CANVAS_HEIGHT,
+        )
+    report = {
         "schema": SCHEMA,
         "diagnostic_only": True,
         "run_id": run_id,
@@ -167,6 +246,13 @@ def audit_screen_mask_v2(
         "v2_diagnostic_gate": "PASS" if covered / target >= .99 and leak == 0 else "FAIL",
         "acceptance_override": False,
     }
+    if policy_v2 is not None:
+        # Explicitly selected for NEW run-bound audits. Historical v1/v2
+        # results remain visible and are never retrospectively rewritten.
+        report["active_quality_policy_id"] = FILL001_CHALK_FIRST_POLICY_V2
+        report["active_quality_gate"] = policy_v2["quality_gate"]
+        report["active_quality_metrics"] = policy_v2
+    return report
 
 
 def main() -> int:
@@ -182,6 +268,10 @@ def main() -> int:
     parser.add_argument("--binding", required=True, type=Path,
                         help="JSON with screen_roi and independently validated geometry")
     parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument(
+        "--quality-policy", choices=[FILL001_CHALK_FIRST_POLICY_V2], default=None,
+        help="Select the NEW versioned 3-logical-px perimeter quality PASS.",
+    )
     args = parser.parse_args()
     binding = json.loads(args.binding.read_text(encoding="utf-8"))
     if not isinstance(binding, dict):
@@ -189,6 +279,7 @@ def main() -> int:
     result = audit_screen_mask_v2(
         args.shape, args.before, args.after, run_id=args.run_id,
         screen_roi=binding.get("screen_roi"), geometry=binding.get("geometry"),
+        quality_policy=args.quality_policy,
     )
     if args.output.exists():
         raise FillMatrixError("Screen Mask V2 refuses to overwrite existing evidence.")
