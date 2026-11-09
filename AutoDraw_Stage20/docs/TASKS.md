@@ -2,6 +2,10 @@
 
 ## P1 — FILL-001 V4: локальный нижний ремонт проверен (2026-11-09)
 
+- [x] V4 raw provenance усилена: исходный `fixture-input.json` находится рядом с PNG в [артефакте 13655990846](https://github.com/Kiddos19882/AutoDraw/actions/runs/42577013425/artifacts/13655990846); собственный SHA SHA-256 проверяется одновременно против `fixture-provenance.json` и read-only отчёта. Native CI [42577013425](https://github.com/Kiddos19882/AutoDraw/actions/runs/42577013425) SUCCESS на `7814eec3`, test-only SHA `5d3c5904` добавляет негативный test изменения байтов. PNG/пороговые метрики неизменны.
+
+
+
 - [x] Изолированная V4 fixture = идентичный V2 `G_trim_3` (RGBA equality PASS в native Egret) плюс один тонкий нижний normal stroke с frozen X=97..363, Y=189/190, width1/2/3, без executor и game CHALK. [CI 42576168617](https://github.com/Kiddos19882/AutoDraw/actions/runs/42576168617); [7 native PNG, manifest, SHA и независимый audit](https://github.com/Kiddos19882/AutoDraw/actions/runs/42576168617/artifacts/13655800959).
 - [x] Alpha≥128 контроль missing6655/bottom2457/leak0; y190 width2 missing4245/bottom47/leak0, y189 width3 missing4238/bottom43/leak0. y190 width3 FAIL leakage2414 below mask, несмотря на улучшение покрытия. y189 width1/2 оставляют bottom2457; отрицательные данные сохранены.
 - [x] E2 проверяет неизменность исходных 28 штрихов, замороженного SHA, допустимых параметров и запрет overwrite; E3 native run SUCCESS. Ни один V4-кандидат не проходит coverage≥99%/leak0, качество game SCREEN NOT_EVALUATED.

@@ -2,6 +2,10 @@
 
 ## FILL-001 V4 — нижний узкий штрих, native WebGL (2026-11-09)
 
+**Дополнительная независимая проверка сохранности V4 input:** на code SHA `7814eec3a6bce2f38491ac4a190f242245a18c33` расширен архив raw evidence точным `fixture-input.json` и регрессионным fail-closed SHA/geometry guard. Отдельный [native CI 42577013425](https://github.com/Kiddos19882/AutoDraw/actions/runs/42577013425) **SUCCESS**, [artifact 13655990846](https://github.com/Kiddos19882/AutoDraw/actions/runs/42577013425/artifacts/13655990846) содержит JSON входа, SHA provenance, 7 PNG и unchanged alpha metrics. SHA input совпал и с provenance, и с независимым report; RGBA control vs V2 по-прежнему идентичен. Test-only commit `5d3c5904` проверяет tampering с сохранением синтаксически валидного JSON. Production не затронут.
+
+
+
 На frozen rectangle продолжен прежний этап **локального, а не глобального**, native footprint repair. В отдельной неизменяемой версии `FILL001_NATIVE_BOTTOM_REPAIR_V4` базовый набор **идентичен V2 `G_trim_3`** (28 synthetic strokes: контур width10/inset6, 27 строк с X-trim3), затем к нему добавляется ровно 1 горизонтальный normal stroke X=97→363 на Y=189 или Y=190 с шириной 1/2/3 (29 штрихов, семь cases с контролем). Независимый аудит `FILL001_NATIVE_BOTTOM_REPAIR_AUDIT_V4` проверяет source manifest, SHA всех PNG, frozen mask SHA, provenance, RGBA 1380×720, alpha sensitivity и **полное пиксельное RGBA равенство контрольного V4 и оригинального V2 G_trim_3**. Все PNG/manifest/отчёты сохраняются в versioned artifact, ни production, ни input mask не изменены. [Native CI 42576168617](https://github.com/Kiddos19882/AutoDraw/actions/runs/42576168617) SUCCESS на code SHA `c7ddbb1342e2deb9b3550bef88d59e3c116d43a8`, [raw evidence 13655800959](https://github.com/Kiddos19882/AutoDraw/actions/runs/42576168617/artifacts/13655800959).
 
 **Native диагностический alpha≥128; projected area=401877 backing px:**

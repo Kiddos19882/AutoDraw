@@ -2,6 +2,10 @@
 
 ## FILL-001 native bottom repair V4 — controlled negative/positive evidence, 2026-11-09
 
+**Provenance enhancement (same frozen V4 protocol):** [native E3 run 42577013425](https://github.com/Kiddos19882/AutoDraw/actions/runs/42577013425) SUCCESS on `7814eec3`; [artifact 13655990846](https://github.com/Kiddos19882/AutoDraw/actions/runs/42577013425/artifacts/13655990846) contains exact input `fixture-input.json` in addition to PNG/manifest/provenance/alpha report. Verified raw input SHA equals both `fixture-provenance.json.fixtureSha256` and `native-bottom-audit-v4.json.source_fixture_sha256`. All control/candidate alpha≥128 measurements remain exactly as in table below. Test-only `5d3c5904` adds a fail-closed SHA tamper regression; full validation run on its SHA is evaluated separately. This does NOT add any E4/game-screenshot evidence.
+
+
+
 [Native CI run 42576168617](https://github.com/Kiddos19882/AutoDraw/actions/runs/42576168617) SUCCESS on code SHA `c7ddbb1342e2deb9b3550bef88d59e3c116d43a8`; [V1/V2/V3/V4 source PNG, manifests, provenance and independent V4 report artifact 13655800959](https://github.com/Kiddos19882/AutoDraw/actions/runs/42576168617/artifacts/13655800959). Frozen rectangle SHA `ac1c6660e5986cdf534328c6dbcd5020f631168b1473c24b29e7609eb827998b`; real BoardPane/Egret 5.4.1 WebGL, browser-local 1380×720 nearest-3× projected 401877 target pixels. Native V4 control `G_trim_3_control` **RGBA identical** to original V2 `G_trim_3`; 28 original strokes unchanged. Six 29-stroke variants append X=97..363, row Y189/190, width1/2/3; no game runtime.
 
 | Candidate | Coverage alpha≥128 | Missing total | Missing bottom | Leakage total |

@@ -2,6 +2,10 @@
 
 ## 2026-11-09 — FILL001 native V4 isolated lower stripe
 
+**Follow-up for raw reproducibility:** code `a42ed224` stores exact V4 fixture bytes with output; `7814eec3` checks source-fixture SHA, case order, control geometry and bottom line in independent report. Test commits `38c62d7d`, `5d3c5904` preserve negative tamper proof (valid JSON trailing newline). [Native CI 42577013425](https://github.com/Kiddos19882/AutoDraw/actions/runs/42577013425) SUCCESS, [retained input + raw PNG + metrics](https://github.com/Kiddos19882/AutoDraw/actions/runs/42577013425/artifacts/13655990846). Previous numeric evidence `42576168617` remains historical and unchanged. No production change.
+
+
+
 Starting remote HEAD `d0721965`, checked 20 commits and complete previous CI 42573526457 native, 42573495775 full, 42574100646 Markdown SUCCESS. Read 5 navigation/active documents, FILL001 task/invariants/experiment standard, geometry/planner and native browser runner. Added `export_native_bottom_repair_fixture` and independent `analyze_native_bottom_repair` to existing comparison script, isolated browser query `?contour=fill001v4`, Firefox capture mode `--fill001-bottom-only`, regression and existing native workflow steps. V2 G_trim3 control 28 synthetic strokes, extra one line 1/2/3px at 189/190, margin3 each side, frozen SHA and versioned raw evidence. Code commits `18ad3716`→`c7ddbb13`; subsequent fix preserves **zero-delta candidates as valid negative evidence**, rather than failing entire experiment. [Native CI 42576168617](https://github.com/Kiddos19882/AutoDraw/actions/runs/42576168617) SUCCESS / [PNG+JSON](https://github.com/Kiddos19882/AutoDraw/actions/runs/42576168617/artifacts/13655800959). Independent V4 alpha report verifies pixel-identical control to V2, zero-new-leak for y190_w2 and y189_w3 at alpha128; both below overall coverage gate; y190_w3 creates severe lower leakage (2414). No game inputs, production changes, CHALK execution or screen-space validation. Next side gap repair with frozen holdouts, without relaxing thresholds.
 
 

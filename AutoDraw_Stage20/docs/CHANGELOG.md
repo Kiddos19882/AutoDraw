@@ -2,6 +2,10 @@
 
 ## 2026-11-09 — FILL001 native lower stripe V4
 
+Source fixture raw SHA added to V4 reproducibility contract without modifying candidate geometry. Saved exact input bytes in artifact and independently verified they match the fixture provenance and the per-case renderer manifest; test for input tampering fails closed. [Native CI 42577013425](https://github.com/Kiddos19882/AutoDraw/actions/runs/42577013425) SUCCESS, [artifact](https://github.com/Kiddos19882/AutoDraw/actions/runs/42577013425/artifacts/13655990846). Original V4 metrics remain unchanged.
+
+
+
 Existing `chalk_fill_strategy_comparison.py`, `game_renderer_reference.js`, `run_egret_stage_reference_firefox.py`, targeted pytest and `engine001-e5-offline.yml` extended with independent versioned V4 bottom-row 1/2/3 px brush candidates on unchanged V2 trim3 and pixel-exact source control. Stores all positive, zero-delta, and leaking PNG cases, SHA/provenance and independent alpha / lateral / bottom audits. Native E3 SUCCESS; no game CHALK, no production executor/planner/default/threshold changes. [V4 raw evidence](https://github.com/Kiddos19882/AutoDraw/actions/runs/42576168617/artifacts/13655800959).
 
 
