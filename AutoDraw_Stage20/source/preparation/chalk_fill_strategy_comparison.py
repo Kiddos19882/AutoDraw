@@ -626,6 +626,79 @@ def export_contour_trim_native_fixture(path: Path) -> dict[str, Any]:
     return fixture
 
 
+def export_native_bottom_repair_fixture(path: Path) -> dict[str, Any]:
+    """V4 bounded native probe: preserved V2 G_trim_3 plus one bottom line.
+
+    The 3 logical-pixel lateral margin is pinned before any native result:
+    no screenshot-driven endpoint tuning, planner modification or execution.
+    """
+    if path.exists():
+        raise FileExistsError("Refusing to overwrite frozen native V4 fixture")
+    mask = build_fill_target_mask("rectangle")
+    sha = fill_target_mask_sha256("rectangle", mask)
+    if sha != FILL001_EXPECTED_MASK_SHA256["rectangle"]:
+        raise ValueError("Frozen target changed")
+    original = build_fixed_radius_fill_plan(
+        "rectangle", 10, scanline_row_step=5, scanline_offset=0,
+    )
+    if len(original["strokes"]) != 27:
+        raise ValueError("Native V4 requires the 27-row frozen baseline")
+    contour = _contour_stroke(mask, 6, 10)
+    outline = {
+        "points": [{"x":int(x),"y":int(y)}
+                   for x,y in [*contour["points"],contour["points"][0]]],
+        "width":10,"mode":"normal",
+    }
+    rows = []
+    for stroke in original["strokes"]:
+        p,q = stroke["points"]
+        if q["x"]-p["x"] <= 6:
+            raise ValueError("Unexpected narrow frozen row")
+        rows.append({
+            "points":[{"x":p["x"]+3,"y":p["y"]},{"x":q["x"]-3,"y":q["y"]}],
+            "width":10,"mode":"normal",
+        })
+    baseline = [outline,*rows]
+    # Pin a row-specific interior line with both endpoints strictly inside
+    # the narrowest bottom mask row, leaving 3 logical pixels per side.
+    xs = np.flatnonzero(mask[190])
+    if (len(xs) != 273 or int(xs[0]) != 94 or int(xs[-1]) != 366
+            or not bool(mask[189, int(xs[0]+3):int(xs[-1]-3)+1].all())
+            or not bool(mask[190, int(xs[0]+3):int(xs[-1]-3)+1].all())):
+        raise ValueError("V4 bottom-row frozen geometry drift")
+    start,end = int(xs[0]+3),int(xs[-1]-3)
+    cases = {"G_trim_3_control":baseline}
+    for width in (1,2,3):
+        for y in (189,190):
+            line={
+                "points":[{"x":start,"y":y},{"x":end,"y":y}],
+                "width":width,"mode":"normal",
+            }
+            cases[f"J_bottom_y{y}_w{width}"]=[*baseline,line]
+    fixture={
+        "schema":"FILL001_NATIVE_BOTTOM_REPAIR_V4",
+        "status":"OFFLINE_SYNTHETIC_INPUT_ONLY",
+        "shape_id":"rectangle",
+        "frozen_mask_sha256":sha,
+        "baseline_plan_signature":original["plan_signature"],
+        "baseline_variant":"FILL001_NATIVE_CONTOUR_EDGE_TRIMS_V2/G_trim_3",
+        "baseline_contour_width":10,
+        "baseline_contour_inset":6,
+        "baseline_endpoint_trim":3,
+        "bottom_target_row":190,
+        "bottom_line_endpoints":[start,end],
+        "candidate_widths":[1,2,3],
+        "candidate_y":[189,190],
+        "cases":cases,
+        "measured_chalk":None,
+        "runtime_validated":False,
+        "executor_ready":False,
+    }
+    path.parent.mkdir(parents=True,exist_ok=True)
+    path.write_text(json.dumps(fixture,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    return fixture
+
+
 def export_mixed_contour_native_fixture(path: Path) -> dict[str, Any]:
     """V3 frozen mixed-width geometry: 5px inset outline, 10px inner scanlines.
 
@@ -1196,6 +1269,8 @@ def main(argv: list[str] | None = None) -> int:
                         help="Independently audit isolated native Egret footprint PNGs.")
     parser.add_argument("--native-render-dir", type=Path,
                         help="Recheck native contour RGBA against frozen 3x logical target, diagnostic only.")
+    parser.add_argument("--native-bottom-fixture", action="store_true",
+                        help="Export V4 thin bottom boundary repair on frozen V2 trim3.")
     parser.add_argument("--native-mixed-fixture", action="store_true",
                         help="Export V3 5px contour / 10px interior native study.")
     parser.add_argument("--native-trim-fixture", action="store_true",
@@ -1209,7 +1284,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if args.native_spatial_dir is not None:
         if (args.native_footprint_dir is not None or args.native_render_dir is not None
-                or args.native_mixed_fixture or args.native_trim_fixture or args.native_fixture
+                or args.native_bottom_fixture or args.native_mixed_fixture or args.native_trim_fixture or args.native_fixture
                 or args.contour_first or args.contour_edge_trims or args.shape):
             parser.error("--native-spatial-dir is an isolated read-only diagnostic.")
         analyze_native_contour_spatial_residual(args.native_spatial_dir,args.output_dir)
@@ -1226,8 +1301,16 @@ def main(argv: list[str] | None = None) -> int:
             parser.error("--native-render-dir must be used alone.")
         analyze_contour_native_pngs(args.native_render_dir, args.output_dir)
         return 0
+    if args.native_bottom_fixture:
+        if (args.native_mixed_fixture or args.native_trim_fixture or args.native_fixture
+                or args.native_render_dir is not None or args.native_spatial_dir is not None
+                or args.native_footprint_dir is not None or args.contour_first
+                or args.contour_edge_trims or args.shape):
+            parser.error("--native-bottom-fixture must be used alone")
+        export_native_bottom_repair_fixture(args.output_dir)
+        return 0
     if args.native_mixed_fixture:
-        if args.native_fixture or args.native_trim_fixture or args.contour_first or args.contour_edge_trims or args.shape:
+        if args.native_fixture or args.native_bottom_fixture or args.native_trim_fixture or args.contour_first or args.contour_edge_trims or args.shape:
             parser.error("--native-mixed-fixture must be used alone.")
         export_mixed_contour_native_fixture(args.output_dir)
         return 0
