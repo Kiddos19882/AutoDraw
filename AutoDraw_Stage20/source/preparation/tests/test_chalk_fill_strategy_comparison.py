@@ -212,3 +212,52 @@ def test_contour_native_fixture_pins_frozen_rectangle_and_non_executable(tmp_pat
     assert json.loads(path.read_text(encoding="utf-8")) == data
     with pytest.raises(FileExistsError):
         export_contour_first_native_fixture(path)
+
+
+def test_native_contour_alpha_read_only_audit(tmp_path):
+    import cv2
+    import hashlib
+    from chalk_fill_strategy_comparison import analyze_contour_native_pngs
+    render = tmp_path / "native"
+    render.mkdir()
+    cases = {}
+    for name in ("B_sparse_only", "C_contour_last", "E_contour_first"):
+        rgba = np.zeros((720, 1380, 4), dtype=np.uint8)
+        rgba[200:210, 200:210, 3] = 255
+        if name != "B_sparse_only":
+            rgba[200:210, 210:215, 3] = 255
+        pngname = f"fill001-native-{name}.png"
+        assert cv2.imwrite(str(render / pngname), rgba)
+        cases[name] = {
+            "pngName": pngname,
+            "strokeCount": 27 if name == "B_sparse_only" else 28,
+            "acceptedSyntheticPoints": 54 if name == "B_sparse_only" else 119,
+        }
+    manifest = {
+        "schema": "FILL001_NATIVE_CONTOUR_FIRST_V1",
+        "status": "OFFLINE_NATIVE_EGRET_RENDERED",
+        "sourceMaskSha256": FILL001_EXPECTED_MASK_SHA256["rectangle"],
+        "cases": cases,
+        "comparisons": {"contourFirstVsLast": {"differingPixels": 0}},
+        "measuredChalk": None, "executorReady": False,
+    }
+    (render / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+    out = tmp_path / "audit.json"
+    report = analyze_contour_native_pngs(render, out)
+    assert report["status"] == "OFFLINE_NATIVE_DIAGNOSTIC_ONLY"
+    assert report["native_to_live_stage_mapping"] == "NOT_EVALUATED"
+    assert report["game_png_quality_gate"] == "NOT_EVALUATED"
+    assert report["projected_target_backing_pixels"] > 0
+    assert report["measured_chalk"] is None
+    assert set(report["cases"]) == set(cases)
+    assert report["order_parity_exact_rgba"] is True
+    for row in report["cases"].values():
+        assert set(row["alpha_threshold_diagnostics"]) == {"1", "64", "128", "254"}
+        assert len(row["native_png_sha256"]) == 64
+    with pytest.raises(FileExistsError):
+        analyze_contour_native_pngs(render, out)
+    out.unlink()
+    manifest["sourceMaskSha256"] = "0" * 64
+    (render / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+    with pytest.raises(ValueError, match="identity"):
+        analyze_contour_native_pngs(render, out)
