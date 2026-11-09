@@ -566,7 +566,26 @@ def test_chalk_first_capture_reuses_runtime_binding_and_new_screen_quality(
     Image.fromarray(before).save(bp)
     Image.fromarray(after).save(ap)
     e4=tmp_path/"screen-e4.json"
-    e4.write_text(json.dumps({"status":"PASS_E4_RAW_CAPTURE","run_id":run["run_id"]}),encoding="utf-8")
+    e4_record={
+        "status":"PASS_E4_RAW_CAPTURE",
+        "run_id":run["run_id"],
+        "session_id":run["session_id"],
+        "task_id":task["task_id"],
+        "plan_signature":task["plan_signature"],
+        "monitor_version":"0.2.1",
+        "exact_chalk":5,
+        "raw_run_sha256":hashlib.sha256(run_path.read_bytes()).hexdigest(),
+        "screen_roi":roi,
+        "before":{
+            "roi_size":[460,240],
+            "board_roi_sha256":hashlib.sha256(bp.read_bytes()).hexdigest(),
+        },
+        "after":{
+            "roi_size":[460,240],
+            "board_roi_sha256":hashlib.sha256(ap.read_bytes()).hexdigest(),
+        },
+    }
+    e4.write_text(json.dumps(e4_record),encoding="utf-8")
     def binder(run_file,evidence_path,*,allow_v3_boardpane_only=False):
         assert str(run_file)==str(run_path)
         assert str(evidence_path)==str(e4)
@@ -608,11 +627,28 @@ def test_chalk_first_capture_reuses_runtime_binding_and_new_screen_quality(
     # Any remote splatter is a FAIL even when coverage remains 100%.
     after[120,395]=255
     Image.fromarray(after).save(ap)
+    with pytest.raises(FillMatrixError,match="screenshot SHA"):
+        build_fill001_chalk_first_capture_from_runtime(
+            task,session_path=session,executor_report_path=report,
+            screen_e4_evidence_path=e4,before_png=bp,after_png=ap,
+        )
+    e4_record["after"]["board_roi_sha256"]=hashlib.sha256(ap.read_bytes()).hexdigest()
+    e4.write_text(json.dumps(e4_record),encoding="utf-8")
     with pytest.raises(FillMatrixError,match="quality audit"):
         build_fill001_chalk_first_capture_from_runtime(
             task,session_path=session,executor_report_path=report,
             screen_e4_evidence_path=e4,before_png=bp,after_png=ap,
         )
+    # Even with both screenshots matching, E4 must identify exact CHALK.
+    e4_record["exact_chalk"]=6
+    e4.write_text(json.dumps(e4_record),encoding="utf-8")
+    with pytest.raises(FillMatrixError,match="CHALK binding"):
+        build_fill001_chalk_first_capture_from_runtime(
+            task,session_path=session,executor_report_path=report,
+            screen_e4_evidence_path=e4,before_png=bp,after_png=ap,
+        )
+    e4_record["exact_chalk"]=5
+    e4.write_text(json.dumps(e4_record),encoding="utf-8")
     # Recomputed trustworthy metrics cannot conceal a mismatched run.
     geometry["run_id"]="other-run"
     with pytest.raises(FillMatrixError,match="does not bind"):
