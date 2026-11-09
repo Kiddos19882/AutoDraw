@@ -1661,7 +1661,7 @@ def analyze_chalk_first_v5_native(
         ],
     }
     report_path.parent.mkdir(parents=True,exist_ok=True)
-    report_path.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\\n",encoding="utf-8")
+    report_path.write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     return report
 
 
