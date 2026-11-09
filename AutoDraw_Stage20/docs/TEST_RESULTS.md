@@ -1,5 +1,18 @@
 # AutoDraw — реестр проверенных результатов
 
+## FILL-001 contour-first V1/V2 — frozen OpenCV screening 2026-11-09
+
+**Scope:** E1/E2/E3 offline only, radius10, row step5, contour inset6, 3 original frozen target masks; quality ≥99% coverage / leakage=0 **в логическом OpenCV** (не live). Code/test `c024816222b691c974d47769c7a0d0dbb1c02771`, [workflow 42547807009](https://github.com/Kiddos19882/AutoDraw/actions/runs/42547807009); [V1 JSON + rasters](https://github.com/Kiddos19882/AutoDraw/actions/runs/42547807009/artifacts/13644670082), [V2 JSON + rasters](https://github.com/Kiddos19882/AutoDraw/actions/runs/42547807009/artifacts/13643764696). E and historical C have identical mask despite reverse stroke order.
+
+| Form | B sparse | E contour-first same geometry | V1 deep inset 7–9 | V2 X trim 1 | V2 X trim 4 |
+|---|---:|---:|---:|---:|---:|
+| rectangle | 99.319195% | 99.516270% | 98.091954% FAIL | 99.332632% PASS | 99.278884% PASS |
+| wide_irregular | 99.395469% | 99.592551% | 98.009256% FAIL | 99.200602% PASS | 99.096526% PASS |
+| narrow_irregular | 99.173333% | 99.380557% | 98.025803% FAIL | 98.792308% FAIL | 98.698723% FAIL |
+
+All comparison rows have **0 logical leakage pixels** in pinned OpenCV model, not demonstrated screen-image zero-leakage. All V2 trims 1,2,3,4 follow same PASS for rectangle/wide and FAIL for narrow; all V1 insets 7,8,9 FAIL. V2 rows preserve original scanline Y and stroke count; V1 deeper inset removed some full rows. At rectangle, B estimated sampling proxy 2099 vs contour-first E 2352 (plus 253, ~12.05%) — **proxy NOT CHALK**; E has 28 strokes vs 27 B. V2 trims modestly reduce proxy but are shape dependent. No real pointCount captured; new E4 and native Egret E5 remain NOT_RUN. Preserve both negative and positive results; frozen thresholds unchanged.
+
+
 ## FILL-001 V3 Smooth OFF — live E4 2026-11-09
 
 **Пространственный офлайн-аудит V3 OFF:** `FILL001_V3_OFF_SPATIAL_RESIDUAL_V1`, code `3eb92e79dbc843c2ff6570965e7524c47fd54548`, [CI 42545897296](https://github.com/Kiddos19882/AutoDraw/actions/runs/42545897296) SUCCESS (47 tests + 6 subtests); [artifact 13643392258](https://github.com/Kiddos19882/AutoDraw/actions/runs/42545897296/artifacts/13643392258) — report.json + V3 overlay. Исходные immutable captures/quality не менялись. Replay подтвердил `coverage=99.552195%`, `leakage=18`, `missing=427`, regions `above=0, below=0, left=10, right=8, other=0`; максимальная ошибка ROI→Egret accepted-point roundtrip **2.000 logical px**. Статус E2/E3 diagnostic PASS, FILL quality FAIL, native renderer E5 NOT_RUN. Не считать 2px ошибкой screen mapping без независимой причинной проверки; отчёт содержит пространственные распределения пропусков и координаты leak.
