@@ -1,0 +1,95 @@
+{
+  "schema_version": 2,
+  "phase_id": "FILL001",
+  "series_id": "fill001-20261109-040615",
+  "shapes": [
+    "rectangle"
+  ],
+  "radii": [
+    10
+  ],
+  "repeats": [
+    1
+  ],
+  "tasks": [
+    {
+      "task_id": "fill001-20261109-040615-rectangle-r10-s5-o0-v3-smooth-on",
+      "matrix_order_index": 1,
+      "phase_id": "FILL001",
+      "series_id": "fill001-20261109-040615",
+      "shape_id": "rectangle",
+      "requested_radius": 10,
+      "repeat_index": 1,
+      "planned_repeats": 1,
+      "plan_variant": "FILL001_RS_V1",
+      "planner_version": 2,
+      "scanline_row_step": 5,
+      "scanline_offset": 0,
+      "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417",
+      "target_mask_sha256": "ac1c6660e5986cdf534328c6dbcd5020f631168b1473c24b29e7609eb827998b",
+      "expected_strokes": 27,
+      "target_area_pixels": 44653,
+      "planned_path_length": 8250.0,
+      "planned_coverage_fraction": 0.9931919467896894,
+      "planned_leakage_pixels": 0,
+      "quality_gate_passed": true,
+      "unsupported": false,
+      "sampling_profile": {
+        "profile_id": "P1",
+        "sampling_step": 4,
+        "delay_ms": 5
+      },
+      "safe_to_execute": false,
+      "capture_status": "pending",
+      "experiment_protocol": "FILL001_SMOOTH_AB_V3",
+      "expected_smooth": true,
+      "screen_mask_version": "FILL001_SCREEN_MASK_V2",
+      "coordinate_preflight_protocol": "FILL001_BOARDPANE_PREFLIGHT_V1"
+    },
+    {
+      "task_id": "fill001-20261109-040615-rectangle-r10-s5-o0-v3-smooth-off",
+      "matrix_order_index": 2,
+      "phase_id": "FILL001",
+      "series_id": "fill001-20261109-040615",
+      "shape_id": "rectangle",
+      "requested_radius": 10,
+      "repeat_index": 1,
+      "planned_repeats": 1,
+      "plan_variant": "FILL001_RS_V1",
+      "planner_version": 2,
+      "scanline_row_step": 5,
+      "scanline_offset": 0,
+      "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417",
+      "target_mask_sha256": "ac1c6660e5986cdf534328c6dbcd5020f631168b1473c24b29e7609eb827998b",
+      "expected_strokes": 27,
+      "target_area_pixels": 44653,
+      "planned_path_length": 8250.0,
+      "planned_coverage_fraction": 0.9931919467896894,
+      "planned_leakage_pixels": 0,
+      "quality_gate_passed": true,
+      "unsupported": false,
+      "sampling_profile": {
+        "profile_id": "P1",
+        "sampling_step": 4,
+        "delay_ms": 5
+      },
+      "safe_to_execute": false,
+      "capture_status": "completed",
+      "experiment_protocol": "FILL001_SMOOTH_AB_V3",
+      "expected_smooth": false,
+      "screen_mask_version": "FILL001_SCREEN_MASK_V2",
+      "coordinate_preflight_protocol": "FILL001_BOARDPANE_PREFLIGHT_V1",
+      "capture_path": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\fill001\\captures\\fill001-20261109-040615-rectangle-r10-s5-o0-v3-smooth-off-FILL001_SMOOTH_AB_V3-result.json"
+    }
+  ],
+  "plan_variant": "FILL001_RS_V1",
+  "candidate_selection_policy": "max_scanline_row_step_with_coverage_ge_0.99_and_leakage_eq_0;tie_break_max_coverage_then_min_estimated_points_path_strokes",
+  "experiment_protocol": "FILL001_SMOOTH_AB_V3",
+  "matrix_signature": "bad933dd41daae6ac73e373e9ef612915a5fa966f99694e5fb847ad6571f4686",
+  "expected_task_count": 2,
+  "created_at_utc": "2026-11-09T01:08:27.699811+00:00",
+  "execution_allowed": false,
+  "status": "in_progress",
+  "screen_mask_version": "FILL001_SCREEN_MASK_V2",
+  "coordinate_preflight_protocol": "FILL001_BOARDPANE_PREFLIGHT_V1"
+}

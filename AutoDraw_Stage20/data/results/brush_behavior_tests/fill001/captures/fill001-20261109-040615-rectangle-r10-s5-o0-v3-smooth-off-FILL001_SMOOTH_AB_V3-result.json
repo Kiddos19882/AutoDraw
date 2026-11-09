@@ -1,0 +1,171 @@
+{
+  "schema_version": 3,
+  "protocol": "FILL001_SMOOTH_AB_V3",
+  "task_id": "fill001-20261109-040615-rectangle-r10-s5-o0-v3-smooth-off",
+  "expected_smooth": false,
+  "raw_e4_status": "PASS_E4_RAW_CAPTURE",
+  "run_id": "3b4243e9-509d-4d5b-9698-04bd657a8888",
+  "session_id": "a3cf20c9-9e1b-4a76-a120-2dcfa2bccad9",
+  "exact_chalk": 1461,
+  "plan_signature": "a0e422160f222276baafea73aa884e3407255d7b3da5ab47778a4d70f434e417",
+  "target_mask_sha256": "ac1c6660e5986cdf534328c6dbcd5020f631168b1473c24b29e7609eb827998b",
+  "raw_run_sha256": "76fd6855fcec56b0e03d1481175ee232e85f90000fce3ae27ece57ffd1f80bbb",
+  "renderer_geometry_sha256": "0130b56a704121f4171a35392e098f2854f486e96ecb48825fb30b85dc2c7c44",
+  "boardpane_mapping_sha256": "89388fd6640169d41cff6df7f91a8c2d1443b6a6e87abaa05a18a28c3a44d582",
+  "screen_roi": {
+    "x": 496,
+    "y": 265,
+    "width": 674,
+    "height": 355
+  },
+  "before_png": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\fill001\\captures\\fill001-20261109-040615-rectangle-r10-s5-o0-v3-smooth-off-before.png",
+  "after_png": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\fill001\\captures\\fill001-20261109-040615-rectangle-r10-s5-o0-v3-smooth-off-after.png",
+  "before_png_sha256": "5f0278f8c92b05e5755179bc5ae7bb8bf145d5e3e87e322f9845d1402db20ded",
+  "after_png_sha256": "5b521a53b7151efd42ba21dceabd38d34809f6acdd683117a85551c620080d73",
+  "png_audit": {
+    "before_png": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\fill001\\captures\\fill001-20261109-040615-rectangle-r10-s5-o0-v3-smooth-off-before.png",
+    "after_png": "C:\\Users\\Kiddos\\Desktop\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\fill001\\captures\\fill001-20261109-040615-rectangle-r10-s5-o0-v3-smooth-off-after.png",
+    "before_png_sha256": "5f0278f8c92b05e5755179bc5ae7bb8bf145d5e3e87e322f9845d1402db20ded",
+    "after_png_sha256": "5b521a53b7151efd42ba21dceabd38d34809f6acdd683117a85551c620080d73",
+    "coverage_fraction": 0.9833170183075417,
+    "leakage_pixels": 521,
+    "changed_pixels": 94945,
+    "target_pixels": 96026,
+    "png_audit_status": "failed",
+    "change_threshold": 8,
+    "audit_method": "rgb_absolute_difference_on_calibrated_screen_roi",
+    "logical_to_screen_transform": {
+      "method": "logical_mask_nearest_neighbor_to_calibrated_screen_roi",
+      "source_coordinate_system": "logical_board_pixels",
+      "target_coordinate_system": "screen_roi_pixels",
+      "logical_board": {
+        "width": 460,
+        "height": 240
+      },
+      "screen_roi": {
+        "x": 496,
+        "y": 265,
+        "width": 674,
+        "height": 355
+      },
+      "scale_x": 1.4630434782608697,
+      "scale_y": 1.475,
+      "uniform_scale_relative_error": 0.00810611643330876,
+      "uniform_scale_tolerance": 0.01,
+      "mask_raster_scale_x": 1.4630434782608697,
+      "mask_raster_scale_y": 1.475,
+      "mask_resampling": "inverse_affine_nearest_neighbor"
+    }
+  },
+  "screen_mask_version": "FILL001_SCREEN_MASK_V2",
+  "v2_audit": {
+    "schema": "FILL001_SCREEN_MASK_V2",
+    "diagnostic_only": true,
+    "run_id": "3b4243e9-509d-4d5b-9698-04bd657a8888",
+    "geometry_evidence_sha256": "76fd6855fcec56b0e03d1481175ee232e85f90000fce3ae27ece57ffd1f80bbb",
+    "frozen_target_mask_sha256": "ac1c6660e5986cdf534328c6dbcd5020f631168b1473c24b29e7609eb827998b",
+    "before_png_sha256": "5f0278f8c92b05e5755179bc5ae7bb8bf145d5e3e87e322f9845d1402db20ded",
+    "after_png_sha256": "5b521a53b7151efd42ba21dceabd38d34809f6acdd683117a85551c620080d73",
+    "rgb_change_threshold": 8,
+    "target_pixels": 95354,
+    "covered_pixels": 94927,
+    "uncovered_pixels": 427,
+    "coverage_fraction": 0.9955219497871091,
+    "leakage_pixels": 18,
+    "changed_pixels": 94945,
+    "v1_original": {
+      "coverage_fraction": 0.9833170183075417,
+      "leakage_pixels": 521,
+      "png_audit_status": "failed"
+    },
+    "v2_diagnostic_gate": "FAIL",
+    "acceptance_override": false
+  },
+  "v2_binding_provenance": {
+    "schema": "FILL001_SCREEN_MASK_V2_MONITOR_BINDING",
+    "run_id": "3b4243e9-509d-4d5b-9698-04bd657a8888",
+    "raw_run_sha256": "76fd6855fcec56b0e03d1481175ee232e85f90000fce3ae27ece57ffd1f80bbb",
+    "checked_out_run_sha256": "76fd6855fcec56b0e03d1481175ee232e85f90000fce3ae27ece57ffd1f80bbb",
+    "byte_reconstruction": "identity",
+    "e4_evidence_sha256": "2821bcf586f6c83bc2effa866a436463d7a9056996c9ac76d3e10d4fea3bb24a",
+    "native_geometry_sha256": "0130b56a704121f4171a35392e098f2854f486e96ecb48825fb30b85dc2c7c44",
+    "v3_boardpane_only_identity": true,
+    "mouse_sample_count": 2809,
+    "client_screen_offset_x": 0.0,
+    "client_screen_offset_y": 163.0,
+    "max_offset_residual_px": 0.0,
+    "method": "same_run_board_client_corners_plus_DOM_screen_minus_client"
+  },
+  "boardpane_preflight": {
+    "schema": "FILL001_BOARDPANE_PREFLIGHT_V1",
+    "status": "validated_preflight_input_transform_not_live_draw",
+    "session_id": "a3cf20c9-9e1b-4a76-a120-2dcfa2bccad9",
+    "renderer_geometry_sha256": "35798b953c810ad014cf0f92fb2df83531ae0c3a4c32b6a52dd96b237dd8b47e",
+    "boardpane_mapping_sha256": "89388fd6640169d41cff6df7f91a8c2d1443b6a6e87abaa05a18a28c3a44d582",
+    "passive_samples_sha256": "446cd21671c37108f753a40bc35c1197f4a984bbd054716a9f4459238d1225b0",
+    "passive_samples": [
+      {
+        "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+        "source": "window-bubble-after-egret-canvas",
+        "session_id": "a3cf20c9-9e1b-4a76-a120-2dcfa2bccad9",
+        "renderer_geometry_sha256": "12d0997bebac1408dda8e6d8cb5c2d780b9af04b6cf5ff293777b419cce6505d",
+        "boardpane_mapping_sha256": "89388fd6640169d41cff6df7f91a8c2d1443b6a6e87abaa05a18a28c3a44d582",
+        "buttons": 0,
+        "pre_drawing": true,
+        "captured_at_utc": "2026-11-09T01:08:52.162+00:00",
+        "clientX": 833.0,
+        "clientY": 286.0,
+        "screenX": 833.0,
+        "screenY": 449.0
+      },
+      {
+        "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+        "source": "window-bubble-after-egret-canvas",
+        "session_id": "a3cf20c9-9e1b-4a76-a120-2dcfa2bccad9",
+        "renderer_geometry_sha256": "3c6d7c633a9de7c7d929d11e5d8e7da3fab94af38b7f3ee86dfb3d93af6cb166",
+        "boardpane_mapping_sha256": "89388fd6640169d41cff6df7f91a8c2d1443b6a6e87abaa05a18a28c3a44d582",
+        "buttons": 0,
+        "pre_drawing": true,
+        "captured_at_utc": "2026-11-09T01:08:52.646+00:00",
+        "clientX": 851.0,
+        "clientY": 293.0,
+        "screenX": 851.0,
+        "screenY": 456.0
+      },
+      {
+        "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+        "source": "window-bubble-after-egret-canvas",
+        "session_id": "a3cf20c9-9e1b-4a76-a120-2dcfa2bccad9",
+        "renderer_geometry_sha256": "35798b953c810ad014cf0f92fb2df83531ae0c3a4c32b6a52dd96b237dd8b47e",
+        "boardpane_mapping_sha256": "89388fd6640169d41cff6df7f91a8c2d1443b6a6e87abaa05a18a28c3a44d582",
+        "buttons": 0,
+        "pre_drawing": true,
+        "captured_at_utc": "2026-11-09T01:08:52.929+00:00",
+        "clientX": 940.0,
+        "clientY": 329.0,
+        "screenX": 940.0,
+        "screenY": 492.0
+      }
+    ],
+    "passive_sample_count": 3,
+    "client_to_desktop_offset": {
+      "x": 0.0,
+      "y": 163.0
+    },
+    "board_screen_corners": {
+      "left": 497.9604252506065,
+      "top": 267.86,
+      "right": 1170.1065439720678,
+      "bottom": 619.06
+    },
+    "screen_roi": {
+      "x": 496,
+      "y": 265,
+      "width": 674,
+      "height": 355
+    },
+    "method": "same_session_passive_DOM_mouse_plus_validated_BoardPane_corners",
+    "no_fallback": true,
+    "preflight_valid_at_utc": "2026-11-09T01:08:53.511289+00:00"
+  }
+}
