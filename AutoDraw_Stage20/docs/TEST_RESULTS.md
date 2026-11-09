@@ -1,5 +1,19 @@
 # AutoDraw — реестр проверенных результатов
 
+## FILL-001 V3 Smooth OFF — live E4 2026-11-09
+
+Baseline [4efa33c655c1e35a36114df316da77cf54f31300](https://github.com/Kiddos19882/AutoDraw/commit/4efa33c655c1e35a36114df316da77cf54f31300), task `fill001-20261109-040615-rectangle-r10-s5-o0-v3-smooth-off`, run `3b4243e9-509d-4d5b-9698-04bd657a8888`, session `a3cf20c9-9e1b-4a76-a120-2dcfa2bccad9`. E4 raw status `PASS_E4_RAW_CAPTURE`; executor completed 27/27; observed Smooth OFF 27/27, radius 10, P1 sampling step 4/delay 5, row step 5; before pointCount=1, after=1462, exact CHALK=1461; 1461 accepted/positive samples, 2809 mouse samples, 1492 frames, bridge failures=0, sequence gaps=0. Пустая доска обычно начинает с pointCount=1 по подтверждению оператора; точный CHALK — только delta.
+
+| Метрика | V1 original audit | V2 run-bound diagnostic |
+|---|---:|---:|
+| Coverage | 98.3317018% | 99.55219498% |
+| Leakage pixels | 521 | 18 |
+| Uncovered target pixels | 1602 | 427 |
+| Gate | FAIL | FAIL |
+
+V1/V2 используют разные screen-mask projections; это не два улучшения игры. V2 binding SHA raw run `76fd6855fcec56b0e03d1481175ee232e85f90000fce3ae27ece57ffd1f80bbb` (identity), same-run BoardPane mapping SHA `89388fd6640169d41cff6df7f91a8c2d1443b6a6e87abaa05a18a28c3a44d582`, DOM client→screen offset (0,163) px; `acceptance_override=false`. PNG quality FAIL, точная причина 18 leaks/427 misses пока UNKNOWN (требуется offline spatial audit). Native Egret E5 для этого FILL-001 run NOT_RUN. [CI 42544453230](https://github.com/Kiddos19882/AutoDraw/actions/runs/42544453230) SUCCESS на capture commit; не означает PNG PASS.
+
+
 **Актуальная evidence сверка:** 2026-11-08 · **ENGINE-001 live baseline HEAD:** `177165361b0340515fe3bb74f4847ab3ec579ebc` (предыдущие исторические результаты по исходному `a2d1f0a52d47` сохранены ниже). Это **навигационный реестр**, а не замена первичных experiment manifests, Game Monitor reports, PNG или CI artifacts. Все прежние детальные записи реестра сохранены в [TEST_RESULTS_HISTORY_THROUGH_2026-11-08.md](TEST_RESULTS_HISTORY_THROUGH_2026-11-08.md).
 
 > **Обязательная формула:** exact `CHALK = pointCount_after - pointCount_before`, только при валидной привязке к конкретному запуску. Длина, количество strokes, площадь, pixel coverage, move calls и estimates — отдельные величины.
