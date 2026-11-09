@@ -1,5 +1,17 @@
 # AutoDraw — реестр проверенных результатов
 
+## FILL-001 contour-first — native BoardPane/WebGL 2026-11-09
+
+Evidence: [native CI 42549813024](https://github.com/Kiddos19882/AutoDraw/actions/runs/42549813024), [native PNG + fixture-provenance + manifest + alpha diagnostic](https://github.com/Kiddos19882/AutoDraw/actions/runs/42549813024/artifacts/13644514101), source code sequence `40027908`–`c42e0145`. Frozen rectangle/radius10/rowstep5/contour inset6; `B_sparse_only` 27 strokes / 54 **synthetic vertices**, C/E 28 strokes / 119 synthetic vertices; **synthetic vertex counts are NOT CHALK**. Native WebGL 1380×720, same color+geometry: C/E differingPixels=0; sparse B↔E differingPixels=754.
+
+| Case | Native alpha≥1 coverage | Missing backing px | Leakage backing px | Native alpha≥128 coverage | Leakage backing px |
+|---|---:|---:|---:|---:|---:|
+| B sparse | 98.768529% | 4949 | 88 | 98.674968% | 54 |
+| C contour last | 98.927284% | 4311 | 88 | 98.826258% | 54 |
+| E contour first | 98.927284% | 4311 | 88 | 98.826258% | 54 |
+
+Native target: 401877 backing pixels, frozen logical mask ×3 nearest (no offset, dilation, fitting). Alpha thresholds 1,64,128,254 are **diagnostic sensitivity only**, not game RGB threshold 8. Unlike the earlier OpenCV-only C 99.516%/leak0, this measured native local-BoardPane footprint has different coverage/leakage; neither is interchangeable with the user V3 live screen V2 coverage 99.5522%/18 leaks. Status: native rendered **E3 PASS for isolated simulation**; independent run-bound native↔live E5 **NOT_RUN**; live FILL-001 quality **FAIL**, candidate CHALK **NOT_RUN**. No automatic execution or acceptance override.
+
 ## FILL-001 contour-first V1/V2 — frozen OpenCV screening 2026-11-09
 
 **Scope:** E1/E2/E3 offline only, radius10, row step5, contour inset6, 3 original frozen target masks; quality ≥99% coverage / leakage=0 **в логическом OpenCV** (не live). Code/test `c024816222b691c974d47769c7a0d0dbb1c02771`, [workflow 42547807009](https://github.com/Kiddos19882/AutoDraw/actions/runs/42547807009); [V1 JSON + rasters](https://github.com/Kiddos19882/AutoDraw/actions/runs/42547807009/artifacts/13644670082), [V2 JSON + rasters](https://github.com/Kiddos19882/AutoDraw/actions/runs/42547807009/artifacts/13643764696). E and historical C have identical mask despite reverse stroke order.

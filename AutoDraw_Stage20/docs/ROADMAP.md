@@ -1,5 +1,9 @@
 # AutoDraw — дорожная карта будущих работ
 
+## Следующая геометрическая проверка после native contour-first
+
+Проверка настоящим offline BoardPane/Egret WebGL показала **нулевую разницу при перестановке одного и того же контура** (C последний vs E первый) и дополнительные 754 native-пикселя по сравнению со sparse-only B. Однако native local nearest-3× alpha diagnostic всё ещё даёт пропуски и утечки; это не run-bound live screen PNG. Значит, отдельная оптимизация **положения, толщины и перекрытия контура/заливки** перспективнее перестановки порядка. Следом — ограниченный geometry candidate с заранее зафиксированными native metrics + независимым V3 Stage/client/desktop mapping gate; после успешной проверки только одно новое versioned live измерение exact CHALK. Frozen masks, thresholds и production code не менять. [Native artifact](https://github.com/Kiddos19882/AutoDraw/actions/runs/42549813024/artifacts/13644514101).
+
 ## Текущий следующий шаг: FILL-001 контур первым
 
 После V3 OFF user предложил **сначала один замкнутый контур, затем редкие внутренние штрихи с перекрытием**. Existing A–D C рисовал контур последним; новая офлайн-проверка E держит ту же геометрию и подтверждает равенство OpenCV растров при смене порядка. Исследовательский V1 inset 7–9 FAIL на 3/3 frozen shapes; V2 endpoint trim 1–4 PASS только rectangle/wide, FAIL narrow. **Общего прошедшего для всех форм варианта обрезки нет**; нельзя автоматически переносить trim в production или утверждать live quality. Дальше: independent native Egret Stage replay новой геометрии, затем — только по evidence — versioned single-run live quality/CHALK, без batch и смены thresholds. [Source and output CI](https://github.com/Kiddos19882/AutoDraw/actions/runs/42547807009); действующая задача — [TASKS](TASKS.md#p1--fill-001-outline-first--interior-overlap-контролируемый-вариант).

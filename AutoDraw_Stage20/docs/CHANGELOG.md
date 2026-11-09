@@ -1,5 +1,9 @@
 # AutoDraw — значимые изменения
 
+## 2026-11-09 — FILL-001 native contour-first offline harness
+
+В существующие FILL-001 geometry tools и renderer Firefox/BoardPane harness добавлен отдельный versioned режим генерации frozen native fixture, многолинейного WebGL replay и alpha-only сравнения с логической маской на backing ×3. Доказано в native reference: одинаковая геометрия C/E при разном порядке даёт 0 пикселей различия; контур добавляет 754 native пикселя относительно sparse-only. Результаты и негативные residual (coverage/leakage) сохранены в отдельном CI artifact [13644514101](https://github.com/Kiddos19882/AutoDraw/actions/runs/42549813024/artifacts/13644514101), с запретом выдавать alpha-model за live screen quality. Существующий ENGINE-001 E5 и V3 live recorder не ослаблены, production planner/executor/CHALK defaults/quality thresholds не менялись.
+
 ## 2026-11-09 — исследовательские варианты FILL-001 contour-first
 
 В существующем `chalk_fill_strategy_comparison.py` добавлены **два изолированных** режима сравнения: `--contour-first` (V1: порядок/глубокий inset) и `--contour-edge-trims` (V2: сначала замкнутый контур, горизонтальные линии прежних рядов с X-trim 1..4). Каждый режим создаёт отдельные versioned JSON и diagnostic PNG, отказывается перезаписывать результаты и запрещает трактовать sampling proxy как exact CHALK. Добавлены тесты и артефакты существующего GitHub Actions workflow [42547807009](https://github.com/Kiddos19882/AutoDraw/actions/runs/42547807009). Legacy A–D, frozen mask, production Stage6/executor/CHALK estimator и quality thresholds не изменены. V1 глубокие отступы FAIL на всех трёх масках, V2 проходит только rectangle/wide; перенос в production запрещён до independent validation.

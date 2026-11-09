@@ -1,5 +1,15 @@
 # AutoDraw — действующие задачи
 
+## P1 — native Egret contour-first: результат и следующий gate
+
+- [x] Повторно использован настоящий `BoardPane`/Egret WebGL renderer (не новый имитатор) для сравнения B, C, E по frozen rectangle/r10. Native E и C имеют 0 RGBA различий; E добавляет 754 отличающихся пикселя к B; [артефакт 13644514101](https://github.com/Kiddos19882/AutoDraw/actions/runs/42549813024/artifacts/13644514101).
+- [x] Read-only native alpha↔nearest-3× frozen mask diagnostic: alpha≥1 B 98.768529% / leakage88 / missing4949, contour C/E 98.927284% / leakage88 / missing4311. При alpha≥128 B 98.674968% / leak54; C/E 98.826258% / leak54. Исходные PNG и frozen masks не изменялись.
+- [x] Регрессионная проверка fixture identity, запрет overwrite, isolated native Firefox path, отсутствие execution/CHALK и C/E порядок отдельно от ENGINE-001.
+- [ ] **Первый следующий шаг:** контролируемый геометрический кандидат — консервативный contour/overlap footprint и оценка необходимости локального interior boundary repair, с независимым native/webgl и сохранением несработавших вариантов. Не выдавать local backing alpha за live screen E5; следующий полноценный gate — V3 run-bound native-to-screen projection, затем только при достаточных доказательствах новый одиночный E4.
+- [ ] Сохранить production executor, planner defaults, threshold coverage≥99%/leakage=0, 45-cell batch BLOCKED до отдельного решения.
+
+Проверки: [native CI 42549813024](https://github.com/Kiddos19882/AutoDraw/actions/runs/42549813024), [AutoDraw CI 42549846609](https://github.com/Kiddos19882/AutoDraw/actions/runs/42549846609). Отчёты E3 относятся к конкретному SHA и не являются live-измерением.
+
 ## P1 — FILL-001: outline-first / interior-overlap (контролируемый вариант)
 
 - [x] Прочитан существующий A–D `C_sparse_plus_contour`: контур в конце, radius10/rowstep5. Отдельно сохранён frozen baseline V3 OFF с CHALK1461 и quality FAIL.
