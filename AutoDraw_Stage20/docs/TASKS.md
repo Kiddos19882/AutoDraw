@@ -2,6 +2,9 @@
 
 ## P1 — FILL-001 V3: разбор нового E4 Smooth OFF (активно)
 
+**Новая E2/E3 проверка V3 OFF (2026-11-09):** [CI 42545897296](https://github.com/Kiddos19882/AutoDraw/actions/runs/42545897296) SUCCESS на `3eb92e79`, 47 тестов + 6 subtests; `FILL001_V3_OFF_SPATIAL_RESIDUAL_V1` вывел 18 leaks (10 left/8 right/0 above/0 below), 427 missing, max input roundtrip error 2 logical px. [Отчёт + overlay](https://github.com/Kiddos19882/AutoDraw/actions/runs/42545897296/artifacts/13643392258). Прежний пункт о выполнении spatial audit теперь частично закрыт: **локализация leaks PASS, анализ причинности / native replay OPEN**. Следующий шаг — интерпретировать `missing_by_roi_row` / `missing_by_roi_column` и overlay, сопоставить со stroke endpoints и native renderer, не меняя live план по одному E3 результату.
+
+
 - [x] Новый одиночный V3 запуск OFF на commit `4efa33c`: 27/27 strokes, Smooth OFF 27/27, exact CHALK=1461, run-bound E4 PASS; неизменные board mapping и runtime binding PASS. Исходное `pointCount=1` — нормальный baseline пустой доски со слов оператора; не трактовать как загрязнение.
 - [x] Сохранены исходные raw/PNG/plan и отрицательные PNG quality результаты: V1 coverage 98.3317%, leakage 521; V2 diagnostic coverage 99.5522%, leakage 18 (FAIL).
 - [x] [AutoDraw CI 42544453230](https://github.com/Kiddos19882/AutoDraw/actions/runs/42544453230) SUCCESS на `4efa33c`; это E3, не PNG acceptance.
