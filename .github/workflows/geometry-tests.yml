@@ -125,6 +125,17 @@ jobs:
           path: ${{ runner.temp }}/fill001-contour-first-v1/
           if-no-files-found: error
           retention-days: 30
+      - name: FILL-001 contour-first endpoint-only V2 study (offline)
+        shell: pwsh
+        run: |
+          python chalk_fill_strategy_comparison.py --contour-edge-trims --output-dir "$env:RUNNER_TEMP\fill001-contour-edge-trims-v2"
+      - name: Upload FILL-001 contour-first endpoint study
+        uses: actions/upload-artifact@v4
+        with:
+          name: fill001-contour-edge-trims-v2
+          path: ${{ runner.temp }}/fill001-contour-edge-trims-v2/
+          if-no-files-found: error
+          retention-days: 30
       - name: Benchmark capsule global versus per-segment broad phase
         shell: pwsh
         run: |
