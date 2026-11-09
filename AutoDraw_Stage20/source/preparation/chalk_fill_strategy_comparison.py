@@ -409,14 +409,138 @@ def save_contour_first_report(
     return path
 
 
+
+def compare_contour_edge_trims(
+    shape_id: str,
+    *,
+    brush_value: int = 10,
+    scanline_row_step: int = 5,
+    contour_inset: int = 6,
+    endpoint_trims: tuple[int, ...] = (1, 2, 3, 4),
+    sampling_step: int = 4,
+) -> tuple[dict[str, Any], dict[str, np.ndarray]]:
+    """V2 controlled candidate: trim X endpoints only, preserve every scanline Y.
+
+    Unlike V1 inward distance-transform cropping, no row is removed. The
+    contour is a single closed first stroke and the same brush/target is used.
+    This only describes an OpenCV logical footprint, not real Egret behavior.
+    """
+    previous, _ = compare_contour_first_overlap(
+        shape_id, brush_value=brush_value,
+        scanline_row_step=scanline_row_step,
+        contour_inset=contour_inset,
+        sampling_step=sampling_step,
+    )
+    if (not isinstance(endpoint_trims, tuple) or not endpoint_trims
+            or len(set(endpoint_trims)) != len(endpoint_trims)
+            or any(type(t) is not int or not 1 <= t <= 4
+                   for t in endpoint_trims)):
+        raise ValueError("endpoint_trims must be unique positive integers from 1 to 4")
+    target = build_fill_target_mask(shape_id)
+    baseline = build_fixed_radius_fill_plan(
+        shape_id, brush_value, scanline_row_step=scanline_row_step,
+    )
+    contour = _contour_stroke(target, contour_inset, brush_value)
+    scanlines = [{
+        "points": [(int(point["x"]), int(point["y"])) for point in stroke["points"]],
+        "brush_value": brush_value, "closed": False,
+        "role": "baseline_scanline",
+    } for stroke in baseline["strokes"]]
+    strategies: dict[str, list[dict[str, Any]]] = {
+        "E_contour_first_same_geometry": [contour, *scanlines],
+    }
+    for trim in endpoint_trims:
+        revised = []
+        for stroke in scanlines:
+            (x0, y0), (x1, y1) = stroke["points"]
+            if x1 - x0 < trim * 2:
+                raise ValueError("endpoint trim cannot fit within all frozen scanlines")
+            revised.append({
+                "points": [(x0 + trim, y0), (x1 - trim, y1)],
+                "brush_value": brush_value, "closed": False,
+                "role": "side_endpoint_trim_only",
+            })
+        strategies[f"G_contour_first_endpoints_trim_{trim}"] = [contour, *revised]
+    masks = {
+        name: _render_segments(target.shape, strokes)
+        for name, strokes in strategies.items()
+    }
+    contour_pixels = _render_segments(target.shape, [contour])
+    rows = {}
+    for name, strokes in strategies.items():
+        info = _model_metrics(target, masks[name], strokes, sampling_step=sampling_step)
+        interior = _render_segments(target.shape, strokes[1:])
+        info["contour_interior_overlap_logical_pixels"] = int(
+            np.count_nonzero(contour_pixels & interior)
+        )
+        info["interior_scanline_count"] = len(strokes) - 1
+        info["contour_first"] = True
+        info["rows_preserved"] = (
+            tuple(stroke["points"][0][1] for stroke in strokes[1:])
+            == tuple(stroke["points"][0][1] for stroke in scanlines)
+        )
+        rows[name] = info
+    result = {
+        "schema_version": 1,
+        "protocol": "FILL001_CONTOUR_EDGE_TRIMS_V2",
+        "status": "OFFLINE_EXPLORATORY_ONLY",
+        "predecessor_protocol": previous["protocol"],
+        "shape_id": shape_id,
+        "frozen_mask_sha256": previous["frozen_mask_sha256"],
+        "baseline_plan_signature": baseline["plan_signature"],
+        "brush_value": brush_value,
+        "contour_inset": contour_inset,
+        "scanline_row_step": scanline_row_step,
+        "sampling_step_proxy": sampling_step,
+        "tested_endpoint_trims": list(endpoint_trims),
+        "strategies": rows,
+        "measurement_scope": {
+            "quality": "OpenCV logical mask model only",
+            "measured_chalk": None,
+            "native_egret_equivalence": False,
+            "runtime_validated": False,
+            "executor_ready": False,
+            "changed_variable": "X endpoints only; frozen row locations and closed first contour unchanged.",
+            "preceding_v1_negative": "7..9 distance-transform inward cropping failed coverage gate on three shapes",
+        },
+    }
+    return result, {"target": target, **masks}
+
+
+def save_contour_edge_trim_report(output_dir: Path, shapes: list[str]) -> Path:
+    if output_dir.exists():
+        raise FileExistsError("Refusing to replace prior experimental artifacts")
+    output_dir.mkdir(parents=True)
+    reports = []
+    for shape_id in shapes:
+        report, masks = compare_contour_edge_trims(shape_id)
+        reports.append(report)
+        for name, raster in masks.items():
+            output = output_dir / f"{shape_id}_{name}.png"
+            if not cv2.imwrite(str(output), np.uint8(raster) * 255):
+                raise OSError("Cannot save diagnostic PNG")
+    output = output_dir / "contour_edge_trims_comparison.json"
+    output.write_text(json.dumps({
+        "analysis_type": "fill001_contour_edge_trims_v2",
+        "reports": reports,
+    }, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    return output
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--shape", choices=FILL001_SHAPES, action="append")
     parser.add_argument("--contour-first", action="store_true",
                         help="Separate controlled contour-first/inset study.")
+    parser.add_argument("--contour-edge-trims", action="store_true",
+                        help="Versioned V2 endpoint-only trimming study.")
     args = parser.parse_args(argv)
-    if args.contour_first:
+    if args.contour_first and args.contour_edge_trims:
+        parser.error("Choose only one contour experiment version.")
+    if args.contour_edge_trims:
+        save_contour_edge_trim_report(args.output_dir, args.shape or list(FILL001_SHAPES))
+    elif args.contour_first:
         save_contour_first_report(args.output_dir, args.shape or list(FILL001_SHAPES))
     else:
         save_exploratory_report(args.output_dir, args.shape or list(FILL001_SHAPES))
