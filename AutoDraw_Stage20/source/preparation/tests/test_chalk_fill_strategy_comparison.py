@@ -618,6 +618,6 @@ def test_v4_native_bottom_alpha_audit_provenance_and_no_overwrite(tmp_path):
     # Reset valid provenance, tamper the retained fixture bytes and fail closed.
     provenance["pngSha256"]["fill001-native-J_bottom_y189_w1.png"]=hashes["fill001-native-J_bottom_y189_w1.png"]
     (v4/"fixture-provenance.json").write_text(json.dumps(provenance),encoding="utf-8")
-    (v4/"fixture-input.json").write_bytes((v4/"fixture-input.json").read_bytes()+b"\\n")
+    (v4/"fixture-input.json").write_bytes((v4/"fixture-input.json").read_bytes()+b"\n")
     with pytest.raises(ValueError,match="provenance"):
         analyze_native_bottom_repair(v4,v2,output)
