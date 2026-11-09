@@ -1,5 +1,17 @@
 # AutoDraw — действующие задачи
 
+## P1 — FILL-001 этап A: native Egret footprint и локальная калибровка
+
+- [x] Проверен remote baseline `389f2a23`, последние 20 коммитов, native/full/Markdown CI, текущие ограничения FILL-001.
+- [x] В existing `game_renderer_reference.js` и Firefox runner выделен самостоятельный `FILL001_NATIVE_FOOTPRINT_A_V1`: 10 контрольных stroke cases × native Egret WebGL, width5/10, normal horizontal/vertical/diagonal/corner + smooth horizontal, без игры и CHALK.
+- [x] Версионированный read-only alpha-анализатор проверяет точные coordinates, SHA-256, RGBA 1380×720, 4 alpha порога и сохраняет bboxes/cross-sections/endpoint extents/junction counters, отказывает при перезаписи или tampering. Есть E2 regression и [native CI](https://github.com/Kiddos19882/AutoDraw/actions/runs/42571729011) / [PNG/JSON](https://github.com/Kiddos19882/AutoDraw/actions/runs/42571729011/artifacts/13653019564).
+- [x] Измерено: normal thickness (alpha≥128) width5→16 backing px, width10→30; торцы 7/6 и 15/14; smooth two-point terminal −300 backing px относительно normal; не считать этот synthetic CHALK.
+- [ ] **Следующий невыполненный шаг:** native footprint residual локализовать по сторонах/строкам/контурам, получить безопасное adaptive boundary repair без глобальной обрезки; frozen rectangle development, wide+narrow holdout. Не подгонять alpha или маску под PASS.
+- [ ] Отдельный run-bound native Stage/screen E5 и только при подтверждении новый E4 single-run exact CHALK. Production estimator/Stage6/defaults/frozen thresholds, 45-cell batch остаются BLOCKED.
+
+Native CI SHA `8dae4b91`: [run](https://github.com/Kiddos19882/AutoDraw/actions/runs/42571729011); full validation code SHA `c31f6415`: [run](https://github.com/Kiddos19882/AutoDraw/actions/runs/42571645484). Статус whole runs проверять по конечному заключению, не делать вывод о live E5.
+
+
 ## P1 — FILL-001: native V2/V3 отрицательные результаты и следующий шаг
 
 - [x] Проверены неизменяемые V2 (width10 contour/inset6 + X-trim1–4) и V3 (width5 contour/inset3, interior width10, trim0–4) в настоящем offline BoardPane/Egret WebGL на frozen rectangle. V2 alpha≥1 leakage 88→1, но coverage 98.9273→98.3816%; V3 лучший coverage 98.9895% при 128 leak. **Оба FAIL**.

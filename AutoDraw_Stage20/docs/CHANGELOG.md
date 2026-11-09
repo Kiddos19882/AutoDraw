@@ -1,5 +1,10 @@
 # AutoDraw — значимые изменения
 
+## 2026-11-09 — FILL-001 isolated native Egret footprint A
+
+В существующие browser renderer/Firefox/native analysis/test/CI средства добавлена версия `FILL001_NATIVE_FOOTPRINT_A_V1` с 10 real Egret brush probes (normal/smooth, width5/10, straight/diagonal/corner). Сохраняются native PNG, manifest/provenance SHA и независимые измерения thickness/endpoint extents/alpha thresholds. Результат offline diagnostic only; не менялись production planner, executor, CHALK estimator, frozen masks и quality gates. [Versioned artifact](https://github.com/Kiddos19882/AutoDraw/actions/runs/42571729011/artifacts/13653019564).
+
+
 ## 2026-11-09 — native geometry studies FILL-001 V2/V3
 
 Existing offline FILL-001 tools now support frozen versioned native-width10 contour endpoint trims (V2) and mixed native width5 outline + width10 interior (V3), preserved manifests/PNG/alpha sensitivity reports, with actual Egret WebGL and tests. All tested variants fail native-local coverage/leakage tradeoff; not integrated into production or executor. No thresholds, frozen masks, default brush or game runtime modifications. [Native evidence](https://github.com/Kiddos19882/AutoDraw/actions/runs/42552197466/artifacts/13645982484).

@@ -1,5 +1,10 @@
 # AutoDraw — дорожная карта будущих работ
 
+## FILL-001: после native brush footprint A
+
+Для width5/10 normal + smooth измерены реальными Egret WebGL PNG (10 probes) поперечная толщина, торцы, углы и диагонали; обнаружено отсутствие последних 300 backing px в smooth относительно normal на фиксированном двухточечном отрезке (действует `drawLast=false`). [Native evidence](https://github.com/Kiddos19882/AutoDraw/actions/runs/42571729011/artifacts/13653019564). Дальше — **не** расширять бесконтрольно глобальный trim/brush sweep, а применить эмпирический footprint к per-row/per-side residual, затем bounded adaptive candidate на rectangle и frozen holdouts wide/narrow, Stage/screen E5 и только после принятого решения одиночный game E4. Не менять существующий executor или acceptance thresholds.
+
+
 ## Следующий этап — локальная footprint-диагностика FILL-001
 
 Native V2 fixed X-trim существенно уменьшил leakage, но ухудшил coverage. V3 с тонким contour5/inset3 тоже FAIL в native WebGL, хотя OpenCV предполагал PASS. Вместо дальнейшего общего отступа требуется измерение per-row/per-side native отпечатка кисти и локальные безопасные коррекции, затем frozen wide/narrow holdout и независимый run-bound Stage/screen gate. Production-код/пороги менять нельзя до E5 и отдельного решения. [Evidence](https://github.com/Kiddos19882/AutoDraw/actions/runs/42552197466/artifacts/13645982484).

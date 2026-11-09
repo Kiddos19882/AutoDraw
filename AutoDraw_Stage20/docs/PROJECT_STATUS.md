@@ -1,5 +1,14 @@
 # AutoDraw — текущее состояние
 
+## FILL-001 — этап A: измерение native footprint Egret, 2026-11-09
+
+**Текущий факт:** десять строго заданных *offline* native-проб на настоящем `BoardPane` + Egret 5.4.1 WebGLRenderer: normal horizontal / vertical / diagonal / corner и smooth horizontal, каждое при width 5 и 10. Захват Firefox/ANGLE Microsoft Basic Render Driver, local board backing 1380×720 (логическая 460×240, scale=3), source PNG + SHA-256 и independent read-only анализ `FILL001_NATIVE_FOOTPRINT_ANALYSIS_A_V1`. Существующий native harness и `chalk_fill_strategy_comparison.py` дополнены отдельным режимом и regressions, production не менялся. [CI 42571729011](https://github.com/Kiddos19882/AutoDraw/actions/runs/42571729011), [raw 10 PNG/manifest/provenance/analysis](https://github.com/Kiddos19882/AutoDraw/actions/runs/42571729011/artifacts/13653019564), code SHA `8dae4b910db690dbc3a6231865e4d24ffa07238c`.
+
+**Прямые замеры alpha≥128:** normal horizontal и vertical width5 — thickness16 backing px; width10 — thickness30. Торцевой выступ для horizontal/vertical width5: 7 px до начальной координаты, 6 px после конечной; width10: 15/14 px. При alpha≥254 для width5 прямой поперечный профиль уменьшается до 14 px. Native normal horizontal (логическая X 130→330) имеет bbox X [383,996] (width5), [375,1004] (width10), тогда как smooth drawLast=false заканчивается на X 696/704: **на 300 backing px ранее** при идентичном входном отрезке; это половина 200-логического пути. Углы и диагонали измерены отдельными PNG, метрики также сохранены в JSON. Все цифры относятся к подтверждённым native RGBA alpha, а не к фактическому игровому screen-RGB.
+
+**Ограничения:** это экспериментальные двух-/трёхточечные изолированные штрихи, без игры/временной последовательности, без screen mapping, без frozen target coverage gate и без CHALK. Реальный FILL-001 V3 OFF остаётся quality FAIL (run-bound screen coverage 99.5522%, leakage 18, exact CHALK 1461); native FILL001 V2/V3 contour кандидаты FAIL. Native footprint profile не разрешён к передаче Stage6/executor. Следующий шаг — построить read-only per-row/per-side native footprint residual на frozen rectangle и проверить adaptive boundary repair на rectangle/wide/narrow до нового live-запуска.
+
+
 ## FILL-001 — native V2/V3 adaptive-edge diagnostics (2026-11-09)
 
 После live V3 OFF (exact CHALK=1461, run-bound screen V2 coverage 99.5522% / leakage 18, PNG quality FAIL) выполнены изолированные **native Egret WebGL** эксперименты: V2 — контур width10/inset6 и X-trim внутренних 27 рядов 1–4 px; V3 — один контур width5/inset3 и ширина внутренних рядов10, X-trim 0–4 px. Frozen rectangle SHA без изменений, местный backing 1380×720, nearest-3× маска 401877 пикселей, alpha≥1, без Stage/client/desktop/screen привязки и без нового game CHALK.

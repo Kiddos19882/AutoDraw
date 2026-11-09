@@ -1,5 +1,25 @@
 # AutoDraw — реестр проверенных результатов
 
+## FILL-001 native brush footprint A — empirical Egret evidence (2026-11-09)
+
+Source commit `8dae4b910db690dbc3a6231865e4d24ffa07238c`, [CI run 42571729011](https://github.com/Kiddos19882/AutoDraw/actions/runs/42571729011), [source 10 native PNG + manifest, SHA/provenance, independent analysis report](https://github.com/Kiddos19882/AutoDraw/actions/runs/42571729011/artifacts/13653019564). Actual Egret 5.4.1 BoardPane/WebGLRenderer, Firefox ANGLE (Microsoft Basic Render Driver), local canvas backing 1380×720 (3× 460×240); offline synthetic normal horizontal/vertical/diagonal/corner and smooth horizontal, width5/10. Four frozen diagnostic alpha thresholds: 1/64/128/254, **not game screen RGB threshold8**.
+
+| Case | bbox alpha≥128 (Xmin,Ymin,Xmax,Ymax backing px) | Midpoint thickness alpha≥128 | Start/end axial extension backing px |
+|---|---|---:|---|
+| normal horizontal w5 | (383,352,996,367) | 16 | 7 / 6 |
+| normal vertical w5 | (682,113,697,606) | 16 | 7 / 6 |
+| normal horizontal w10 | (375,345,1004,374) | 30 | 15 / 14 |
+| normal vertical w10 | (675,105,704,614) | 30 | 15 / 14 |
+| smooth horizontal w5 | (383,352,696,367) | 14 at sample X=230 | 7 / −294 |
+| smooth horizontal w10 | (375,345,704,374) | 30 at sample X=230 | 15 / −286 |
+| normal diagonal w5 | (383,173,996,547) | per-pixel PNG/JSON | see report |
+| normal diagonal w10 | (375,165,1004,554) | per-pixel PNG/JSON | see report |
+| normal corner w5 | (443,202,907,546) | junction 165 painted of 169 (13×13) | see report |
+| normal corner w10 | (435,195,914,554) | junction 169 of 169 (13×13) | see report |
+
+`smooth` last X is **300 backing px before** `normal` at both widths on same horizontal input X130→330. The negative end extension is not a physical brush radius; it reports intentional missing second half-segment (`drawLast=false`), so do not interpret it as symmetric end cap. Alpha≥254 for normal width5 cross-section becomes 14 backing px (vs 16 at ≥128). These are empirically measured PNG values, not quality gate results and not cost estimates. SHA integrity verified for every PNG; source data preserved. Actual game live FILL-001 quality gate remains FAIL and candidate exact CHALK NOT_RUN.
+
+
 ## FILL-001 native V2/V3 — negative geometry evidence, 2026-11-09
 
 [CI 42552197466](https://github.com/Kiddos19882/AutoDraw/actions/runs/42552197466) SUCCESS on `be8c07ac`; [native V1/V2/V3 artifact 13645982484](https://github.com/Kiddos19882/AutoDraw/actions/runs/42552197466/artifacts/13645982484). Real BoardPane/Egret WebGL, synthetic normal strokes, frozen rectangle mask, 1380×720 backing, nearest 3× target (401877 pixels); values are **alpha≥1 diagnostic only, not official live RGB screenshot quality**.
