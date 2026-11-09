@@ -1,5 +1,26 @@
 # AutoDraw — текущее состояние
 
+## FILL-001 V4 — нижний узкий штрих, native WebGL (2026-11-09)
+
+На frozen rectangle продолжен прежний этап **локального, а не глобального**, native footprint repair. В отдельной неизменяемой версии `FILL001_NATIVE_BOTTOM_REPAIR_V4` базовый набор **идентичен V2 `G_trim_3`** (28 synthetic strokes: контур width10/inset6, 27 строк с X-trim3), затем к нему добавляется ровно 1 горизонтальный normal stroke X=97→363 на Y=189 или Y=190 с шириной 1/2/3 (29 штрихов, семь cases с контролем). Независимый аудит `FILL001_NATIVE_BOTTOM_REPAIR_AUDIT_V4` проверяет source manifest, SHA всех PNG, frozen mask SHA, provenance, RGBA 1380×720, alpha sensitivity и **полное пиксельное RGBA равенство контрольного V4 и оригинального V2 G_trim_3**. Все PNG/manifest/отчёты сохраняются в versioned artifact, ни production, ни input mask не изменены. [Native CI 42576168617](https://github.com/Kiddos19882/AutoDraw/actions/runs/42576168617) SUCCESS на code SHA `c7ddbb1342e2deb9b3550bef88d59e3c116d43a8`, [raw evidence 13655800959](https://github.com/Kiddos19882/AutoDraw/actions/runs/42576168617/artifacts/13655800959).
+
+**Native диагностический alpha≥128; projected area=401877 backing px:**
+
+| Вариант | Missing total | Bottom missing | Leakage | Coverage |
+|---|---:|---:|---:|---:|
+| G_trim_3 control | 6655 | 2457 | 0 | 98.344021% |
+| J y189 width1 | 6655 | 2457 | 0 | 98.344021% |
+| J y190 width1 | 4254 | 56 | 0 | 98.941467% |
+| J y189 width2 | 6655 | 2457 | 0 | 98.344021% |
+| J y190 width2 | 4245 | 47 | 0 | 98.943707% |
+| J y189 width3 | 4238 | 43 | 0 | 98.945449% |
+| J y190 width3 | 4232 | 36 | **2414 BELOW** | 98.946941% |
+
+При alpha≥1: контроль missing6469/leak2 (боковой); J y190 width2 missing4057/leak2, J y189 width3 missing4049/leak2; J y190 width3 missing4045/leak2421. При alpha≥254: J y189 width3 missing4496/leak0; J y190 width2 missing4504/leak0; J y190 width3 missing4488/leak2407. **Локальный нижний ремонт подтверждён, но все семь вариантов остаются ниже frozen gate 99% coverage, а y190 width3 добавляет неприемлемую утечку**. На baseline trim3 даже идеальное устранение всего bottom=2457 оставляет missing=4198 и максимум 98.955402%; боковой residual нельзя игнорировать. Эти числа — **local native alpha**, не run-bound screen-RGB quality, no executed CHALK and no Stage↔live V3 E5.
+
+**Следующий open step:** frozen rectangle: отдельно искать безопасное уменьшение левых/правых пропусков с удержанием нулевой native leakage на проверенной нижней коррекции (кандидат y189/w3 или y190/w2); не подгонять по скриншоту. После этого проверить wide/narrow holdouts и независимый run-bound screen equivalence до любого live E4. [Full AutoDraw CI code SHA](https://github.com/Kiddos19882/AutoDraw/actions/runs/42576168620) не приравнивать к live.
+
+
 ## FILL-001 — native spatial residual V1: подтверждённые зоны дефектов (2026-11-09)
 
 Завершён следующий после native footprint A шаг: без изменения production реализован **read-only** независимый per-row/per-side residual audit для сохранённых V2/V3 native Egret PNG. `FILL001_NATIVE_CONTOUR_SPATIAL_AUDIT_V1` фиксирует те же frozen rectangle SHA/nearest-3× mask, RGBA 1380×720, alpha cutoffs 1/128/254. Проверяет source manifest SHA-256, собственный frozen-mask SHA, список вариантов и SHA каждого PNG против предыдущего alpha audit, и точное совпадение общих missing/leakage с предыдущими результатами. Разбивка пропусков взаимоисключающая: первые/последние три backing-строки цели, затем 18 px слева/справа и interior; утечка — вне вертикального диапазона или слева/справа от целевой строки. Connected components и worst rows также сохранены. Это не реконструкция живого screen-RGB.

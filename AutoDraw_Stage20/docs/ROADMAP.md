@@ -1,5 +1,10 @@
 # AutoDraw — дорожная карта будущих работ
 
+## Следующая геометрическая проверка после FILL-001 V4
+
+Один lower-boundary native stripe с width2/Y190 или width3/Y189 почти целиком закрыл 2457 backing-пикселей нижнего пропуска при alpha≥128 и **не увеличил leakage** (control G_trim_3 zero). Width3/Y190 пересёк нижнюю границу на 2414 backing-пикселей — сохраняется как отрицательный результат. Все кандидаты всё ещё ниже 99% coverage из-за боковых gaps. Следующий ограниченный шаг: adaptive left/right endpoint repair с реальным native footprint и фиксацией ширины/вертикального положения, затем frozen holdout wide/narrow, independent run-bound Stage/screen, и только при доказательности live E4. [Raw V4 evidence](https://github.com/Kiddos19882/AutoDraw/actions/runs/42576168617/artifacts/13655800959). Не менять production и acceptance gates.
+
+
 ## После FILL001 spatial V1 — локальная нижняя граница и боковые концы
 
 Построчная разметка native-пропусков выявила отдельный нижний блок 2457 backing pixels (3×819) и боковые потери; при alpha128 исправление X endpoint trim3 устраняет утечку, но нижний блок не меняет и ухудшает coverage. Поэтому следующий **ограниченный offline** gate — проверить узкую граничную коррекцию снизу на реальном native brush footprint и сохранить боковой leak=0, не добавляя глобальных проходов. Затем повторить на frozen wide/narrow, изучить run-bound projection и лишь после E5 решать E4. [Evidence](https://github.com/Kiddos19882/AutoDraw/actions/runs/42573526457/artifacts/13653904396). Производство и пороги не менять.

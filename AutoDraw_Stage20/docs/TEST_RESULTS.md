@@ -1,5 +1,22 @@
 # AutoDraw — реестр проверенных результатов
 
+## FILL-001 native bottom repair V4 — controlled negative/positive evidence, 2026-11-09
+
+[Native CI run 42576168617](https://github.com/Kiddos19882/AutoDraw/actions/runs/42576168617) SUCCESS on code SHA `c7ddbb1342e2deb9b3550bef88d59e3c116d43a8`; [V1/V2/V3/V4 source PNG, manifests, provenance and independent V4 report artifact 13655800959](https://github.com/Kiddos19882/AutoDraw/actions/runs/42576168617/artifacts/13655800959). Frozen rectangle SHA `ac1c6660e5986cdf534328c6dbcd5020f631168b1473c24b29e7609eb827998b`; real BoardPane/Egret 5.4.1 WebGL, browser-local 1380×720 nearest-3× projected 401877 target pixels. Native V4 control `G_trim_3_control` **RGBA identical** to original V2 `G_trim_3`; 28 original strokes unchanged. Six 29-stroke variants append X=97..363, row Y189/190, width1/2/3; no game runtime.
+
+| Candidate | Coverage alpha≥128 | Missing total | Missing bottom | Leakage total |
+|---|---:|---:|---:|---:|
+| G_trim_3_control | 98.344021% | 6655 | 2457 | 0 |
+| J_bottom_y189_w1 | 98.344021% | 6655 | 2457 | 0 |
+| J_bottom_y190_w1 | 98.941467% | 4254 | 56 | 0 |
+| J_bottom_y189_w2 | 98.344021% | 6655 | 2457 | 0 |
+| J_bottom_y190_w2 | 98.943707% | 4245 | 47 | 0 |
+| J_bottom_y189_w3 | 98.945449% | 4238 | 43 | 0 |
+| J_bottom_y190_w3 | 98.946941% | 4232 | 36 | **2414 below target** |
+
+Independent alpha sensitivity: at alpha≥1 control missing6469/leak2, y190_w2 missing4057/leak2, y189_w3 missing4049/leak2; y190_w3 leak2421. Alpha≥254 y190_w2 missing4504/leak0, y189_w3 missing4496/leak0, y190_w3 leak2407. No case passes 99% coverage and 0 leakage together on local-native alpha proxy. One width3 stroke **must not be placed at y190**, unlike y189, where no new leakage was measured. Even perfect bottom-only repair leaves 4198 missing, 98.955402% coverage. Game PNG quality is NOT_EVALUATED for V4 and historical FILL001 live gate remains FAIL; exact new candidate CHALK NOT_RUN, independent native-to-live Stage/screen E5 NOT_RUN. [Full validation CI 42576168620](https://github.com/Kiddos19882/AutoDraw/actions/runs/42576168620) status separate.
+
+
 ## FILL-001 spatial native residual V1 — независимые зоны дефекта (2026-11-09)
 
 [Native CI SUCCESS 42573526457](https://github.com/Kiddos19882/AutoDraw/actions/runs/42573526457), [artifact 13653904396](https://github.com/Kiddos19882/AutoDraw/actions/runs/42573526457/artifacts/13653904396); code SHA `b31fbe2f239d84b0bda84c77fc3e350d0cab7ba0`. Frozen rectangle SHA `ac1c6660e5986cdf534328c6dbcd5020f631168b1473c24b29e7609eb827998b`. Repeated real `BoardPane`/Egret WebGL native capture, no new game runtime. Independent `FILL001_NATIVE_CONTOUR_SPATIAL_AUDIT_V1`: native alpha≥128, 1380×720 nearest-3× target (401877 target pixels), top/bottom=first/last 3 target backing rows, left/right=18 px band per intermediate target row, interior=remaining. Missing and leakage partitions are disjoint and sum to previous alpha audits exactly.

@@ -1,5 +1,14 @@
 # AutoDraw — действующие задачи
 
+## P1 — FILL-001 V4: локальный нижний ремонт проверен (2026-11-09)
+
+- [x] Изолированная V4 fixture = идентичный V2 `G_trim_3` (RGBA equality PASS в native Egret) плюс один тонкий нижний normal stroke с frozen X=97..363, Y=189/190, width1/2/3, без executor и game CHALK. [CI 42576168617](https://github.com/Kiddos19882/AutoDraw/actions/runs/42576168617); [7 native PNG, manifest, SHA и независимый audit](https://github.com/Kiddos19882/AutoDraw/actions/runs/42576168617/artifacts/13655800959).
+- [x] Alpha≥128 контроль missing6655/bottom2457/leak0; y190 width2 missing4245/bottom47/leak0, y189 width3 missing4238/bottom43/leak0. y190 width3 FAIL leakage2414 below mask, несмотря на улучшение покрытия. y189 width1/2 оставляют bottom2457; отрицательные данные сохранены.
+- [x] E2 проверяет неизменность исходных 28 штрихов, замороженного SHA, допустимых параметров и запрет overwrite; E3 native run SUCCESS. Ни один V4-кандидат не проходит coverage≥99%/leak0, качество game SCREEN NOT_EVALUATED.
+- [ ] **Следующий невыполненный шаг:** локальная боковая коррекция на базе V4 безопасного нижнего штриха, сначала native rectangle, затем независимые wide/narrow frozen holdouts. В дополнение обязательно Stage/client/desktop↔screen run-bound E5.
+- [ ] Только после достаточной validation принять решение об отдельном новом E4 и exact CHALK. Production planner/Stage6 defaults и 45-cell matrix остаются BLOCKED; no threshold relaxation.
+
+
 ## P1 — FILL-001 native spatial residual: следующий узкий эксперимент
 
 - [x] `FILL001_NATIVE_CONTOUR_SPATIAL_AUDIT_V1`: frozen rectangle, native V2+V3, alpha1/128/254; verified проверяются **PNG SHA, manifest SHA, frozen mask SHA и прежний alpha audit**. Read-only и fail-closed при изменённых файлах, новой форме или попытке overwrite. [CI 42573526457](https://github.com/Kiddos19882/AutoDraw/actions/runs/42573526457), [source JSON/PNG](https://github.com/Kiddos19882/AutoDraw/actions/runs/42573526457/artifacts/13653904396).
