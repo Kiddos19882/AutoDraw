@@ -269,20 +269,34 @@ class Fill001Tab:
             while not snippet_path.is_file() and time.monotonic() < deadline:
                 if self._firefox_stop.wait(0.5):
                     raise FirefoxMonitorError("Оператор остановил сессию.")
+            from brush_radius_feedback import read_active_bridge_geometry
+            bridge_root = self.brush_tab.output_dir / "game_monitor_bridge"
+            previous = read_active_bridge_geometry(bridge_root)
+            previous_sid = previous.get("session_id") if isinstance(previous, dict) else None
             attached = attach_monitor_after_confirmation(
                 driver, monitor_dir / "game_monitor.js", snippet_path,
                 operator_confirmed=True,
             )
-            from brush_radius_feedback import read_active_bridge_geometry
-            bridge_root = self.brush_tab.output_dir / "game_monitor_bridge"
             ready = None
             deadline = time.monotonic() + 30
             while time.monotonic() < deadline and not self._firefox_stop.is_set():
                 ready = read_active_bridge_geometry(bridge_root)
                 if isinstance(ready, dict) and ready.get("board_detected") \
                         and not ready.get("board_ambiguous") \
-                        and ready.get("session_id"):
-                    break
+                        and ready.get("session_id") \
+                        and ready.get("session_id") != previous_sid:
+                    session_file = bridge_root / ready["session_id"] / "session.json"
+                    try:
+                        session = json.loads(session_file.read_text(encoding="utf-8"))
+                        telemetry = session["bridge_configuration"]["inputTelemetry"]
+                        status = session["bridge_diagnostics"]["last_monitor_status"]
+                        if (telemetry.get("requested") is True
+                                and telemetry.get("enabled") is True
+                                and status.get("version") == "0.2.4"
+                                and status.get("inputTelemetryEnabled") is True):
+                            break
+                    except (OSError, ValueError, KeyError, TypeError):
+                        pass
                 self._firefox_stop.wait(0.5)
             else:
                 raise FirefoxMonitorError(
