@@ -34,6 +34,8 @@ def validate_v5_bridge_runs(
     session_id: str, candidate_id: str,
     expected_pre: int = 1,
     expected_pointer_down_client: list[tuple[float,float]] | None = None,
+    expected_board_client_rect: dict[str, float] | None = None,
+    slider_client_corridor: dict[str, float] | None = None,
 ) -> dict:
     """An exact run chain needs 29 stroke candidates, all radii and no drops."""
     if not isinstance(runs, list) or not 1 <= len(runs) <= 2:
@@ -46,6 +48,25 @@ def validate_v5_bridge_runs(
         raise Fill001V5Error("Unknown frozen V5 candidate.")
     counts, radii, run_ids, totals = [], [], [], []
     all_pointer_downs: list[dict] = []
+    all_metric_rows: list[dict] = []
+    strict_slider_witness = expected_board_client_rect is not None or slider_client_corridor is not None
+    if strict_slider_witness and (expected_board_client_rect is None or slider_client_corridor is None
+            or expected_pointer_down_client is None):
+        raise Fill001V5Error("Slider exclusion requires both verified board and slider bounds and planned inputs.")
+    if strict_slider_witness:
+        import math
+        def check_rect(rect: dict, label: str) -> None:
+            if (not isinstance(rect, dict) or set(rect) != {"left", "top", "right", "bottom"}
+                    or any(type(rect[k]) not in (int, float) or not math.isfinite(rect[k]) for k in rect)
+                    or rect["right"] <= rect["left"] or rect["bottom"] <= rect["top"]):
+                raise Fill001V5Error(f"Invalid verified V5 {label} rectangle.")
+        check_rect(expected_board_client_rect, "board")
+        check_rect(slider_client_corridor, "slider")
+        if not (slider_client_corridor["left"] >= expected_board_client_rect["right"]
+                or slider_client_corridor["right"] <= expected_board_client_rect["left"]
+                or slider_client_corridor["bottom"] <= expected_board_client_rect["top"]
+                or slider_client_corridor["top"] >= expected_board_client_rect["bottom"]):
+            raise Fill001V5Error("V5 slider corridor overlaps game board.")
     last_post = expected_pre
     for run in ordered:
         if not isinstance(run, dict) or run.get("session_id") != session_id:
@@ -60,14 +81,17 @@ def validate_v5_bridge_runs(
             or run.get("monitor_error_count") != 0
             or run.get("collector_sequence_gap_count") != 0
             or run.get("bridge_send_failures_delta") != 0
-            or run.get("non_consuming_stroke_candidate_count") != 0
+            or (not strict_slider_witness and run.get("non_consuming_stroke_candidate_count") != 0)
             or run.get("point_delta_matches_chalk") is not True
             or run.get("monitor_errors") != []
         ):
             raise Fill001V5Error("V5 Bridge run was incomplete or has dropped/invalid events.")
         count = run.get("stroke_count")
+        extras = run.get("non_consuming_stroke_candidate_count")
+        if (type(extras) is not int or extras < 0 or extras > 10):
+            raise Fill001V5Error("Invalid V5 non-consuming slider input count.")
         if (type(count) is not int or count <= 0 or count > 29
-                or run.get("stroke_candidate_count") != count):
+                or run.get("stroke_candidate_count") != count + (extras if strict_slider_witness else 0)):
             raise Fill001V5Error("Unexpected V5 Bridge stroke count.")
         pre, maximum = _exact(run.get("pre_test_snapshot"))
         post, post_max = _exact(run.get("post_test_snapshot"))
@@ -84,7 +108,9 @@ def validate_v5_bridge_runs(
             raise Fill001V5Error("Missing Game Monitor run ID.")
         seen_radii = run.get("observed_brush_radii")
         if (not isinstance(seen_radii, list)
-                or any(type(v) is not int or v not in (10,expected_last) for v in seen_radii)
+                or (not strict_slider_witness
+                    and any(type(v) is not int or v not in (10,expected_last) for v in seen_radii))
+                or any(type(v) is not int or not 1 <= v <= 30 for v in seen_radii)
                 or not seen_radii):
             raise Fill001V5Error("V5 Bridge observed unexpected brush radii.")
         events = run.get("events")
@@ -93,41 +119,87 @@ def validate_v5_bridge_runs(
                 or any(not isinstance(e, dict) or e.get("monitorVersion") != "0.2.4"
                        for e in events)):
             raise Fill001V5Error("V5 raw Bridge events have wrong Monitor version.")
-        all_pointer_downs.extend(
-            event for event in events if event.get("type") == "POINTER_DOWN_CANDIDATE"
-        )
+        run_downs = [event for event in events if event.get("type") == "POINTER_DOWN_CANDIDATE"]
+        if strict_slider_witness:
+            metrics = run.get("per_stroke_metrics")
+            if (not isinstance(metrics, list) or len(metrics) != len(run_downs)
+                    or len(metrics) != count + extras):
+                raise Fill001V5Error("Missing complete per-stroke slider and drawing metrics.")
+            for down, metric in zip(run_downs, metrics):
+                if (not isinstance(metric, dict) or down.get("strokeId") != metric.get("stroke_id")
+                        or metric.get("lifecycle_status") != "complete"):
+                    raise Fill001V5Error("V5 stroke lifecycle cannot be tied to pointer event.")
+            all_metric_rows.extend(metrics)
+        all_pointer_downs.extend(run_downs)
         counts.append(count)
         radii.extend(seen_radii)
         totals.append((pre,post))
         run_ids.append(run["run_id"])
         last_post = post
-    if sum(counts) != 29 or set(radii) != {10,expected_last}:
+    if sum(counts) != 29 or (not strict_slider_witness and set(radii) != {10,expected_last}):
         raise Fill001V5Error("V5 29 strokes and both brush sizes are not confirmed.")
     if len(ordered) == 2 and (
-        counts != [28,1] or sorted(set(ordered[0]["observed_brush_radii"])) != [10]
-        or sorted(set(ordered[1]["observed_brush_radii"])) != [expected_last]
+        counts != [28,1] or (
+            not strict_slider_witness and (
+                sorted(set(ordered[0]["observed_brush_radii"])) != [10]
+                or sorted(set(ordered[1]["observed_brush_radii"])) != [expected_last]
+            )
+        )
     ):
         raise Fill001V5Error("V5 two-run brush switch split is inconsistent.")
     if expected_pointer_down_client is not None:
         if (not isinstance(expected_pointer_down_client, list)
                 or len(expected_pointer_down_client) != 29
-                or len(all_pointer_downs) != 29):
+                or (not strict_slider_witness and len(all_pointer_downs) != 29)):
             raise Fill001V5Error("V5 29 planned pointer-down events are not proven.")
-        for index, (event, (x,y)) in enumerate(zip(all_pointer_downs,expected_pointer_down_client)):
-            ex, ey = event.get("clientX"), event.get("clientY")
-            if (type(ex) not in (int,float) or type(ey) not in (int,float)
-                    or abs(ex-x) > 3 or abs(ey-y) > 3):
-                raise Fill001V5Error(
-                    f"V5 pointer-down {index+1} differs from frozen planned start; "
-                    "unexpected user/game input or geometry drift."
-                )
+        if strict_slider_witness:
+            cursor = 0
+            excluded = 0
+            for down, metric in zip(all_pointer_downs, all_metric_rows):
+                ex, ey = down.get("clientX"), down.get("clientY")
+                if type(ex) not in (int, float) or type(ey) not in (int, float):
+                    raise Fill001V5Error("V5 pointer coordinates are missing.")
+                planned = expected_pointer_down_client[cursor] if cursor < 29 else None
+                if planned is not None and abs(ex-planned[0]) <= 3 and abs(ey-planned[1]) <= 3:
+                    actual_radius = down.get("board", {}).get("currentRadius")
+                    expected_radius = 10 if cursor < 28 else expected_last
+                    if actual_radius != expected_radius:
+                        raise Fill001V5Error("V5 drawing radius differs from frozen width sequence.")
+                    if (type(metric.get("point_count_delta")) is not int
+                            or metric["point_count_delta"] <= 0
+                            or metric.get("point_count_delta_matches_updates") is not True):
+                        raise Fill001V5Error("V5 drawing stroke has no matched exact point delta.")
+                    cursor += 1
+                    continue
+                # Only a zero-point control action in the CONFIRMED slider
+                # corridor may be excluded; an accidental touch on the board
+                # or an unknown UI button must invalidate CHALK binding.
+                r = slider_client_corridor
+                if (not (r["left"] <= ex <= r["right"] and r["top"] <= ey <= r["bottom"])
+                        or metric.get("point_count_delta") != 0
+                        or metric.get("point_update_event_count") != 0):
+                    raise Fill001V5Error("Unexpected off-plan pointer event; exact V5 CHALK BLOCKED.")
+                excluded += 1
+            if cursor != 29 or excluded != sum(run["non_consuming_stroke_candidate_count"] for run in ordered):
+                raise Fill001V5Error("V5 planned strokes or slider-only inputs are not uniquely bound.")
+        else:
+            for index, (event, (x,y)) in enumerate(zip(all_pointer_downs,expected_pointer_down_client)):
+                ex, ey = event.get("clientX"), event.get("clientY")
+                if (type(ex) not in (int,float) or type(ey) not in (int,float)
+                        or abs(ex-x) > 3 or abs(ey-y) > 3):
+                    raise Fill001V5Error(
+                        f"V5 pointer-down {index+1} differs from frozen planned start; "
+                        "unexpected user/game input or geometry drift."
+                    )
     return {
         "status": "EXACT_RUN_BOUND",
         "session_id": session_id,
         "run_ids": run_ids,
         "stroke_count": 29,
         "bridge_run_stroke_counts": counts,
-        "observed_brush_radii": sorted(set(radii)),
+        "observed_brush_radii": [10, expected_last] if strict_slider_witness else sorted(set(radii)),
+        "excluded_zero_point_slider_drags": (sum(run["non_consuming_stroke_candidate_count"] for run in ordered)
+                                             if strict_slider_witness else 0),
         "pre_pointCount": expected_pre,
         "post_pointCount": last_post,
         "exact_chalk": last_post-expected_pre,
@@ -165,6 +237,8 @@ def finalize_v5_stage6_attempt(
             binding=validate_v5_bridge_runs(
                 runs,session_id=sid,candidate_id=request["candidate_id"],
                 expected_pointer_down_client=expected,
+                expected_board_client_rect=request.get("board_client_rect"),
+                slider_client_corridor=request.get("slider_client_corridor"),
             )
             binding["bridge_run_paths"]=[str(p) for p in files]
             break
