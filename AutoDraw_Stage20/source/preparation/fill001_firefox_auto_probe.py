@@ -179,17 +179,10 @@ def collect_verified_v5_firefox_roi(
             )
 
     if firefox_foreground_checker is None:
-        from firefox_foreground_witness import (
-            establish_firefox_foreground,
-            firefox_foreground_witness,
-        )
-        # Never bypass the original PID check. This requests native focus
-        # through the owned WebDriver window, then rechecks the Win32 PID.
-        # It does not send keyboard/mouse input into the game.
-        try:
-            establish_firefox_foreground(driver)
-        except Exception as exc:
-            raise PreflightGeometryError(str(exc)) from exc
+        from firefox_foreground_witness import firefox_foreground_witness
+        # Operator activation has already been checked by the UI worker.
+        # Never call WebDriver focus or Win32 SetForegroundWindow here.
+        # Every passive movement rechecks the real Windows foreground PID.
         firefox_foreground_checker = lambda: firefox_foreground_witness(driver)
 
     # W3C element-relative offset uses center of element. No click ever occurs.
