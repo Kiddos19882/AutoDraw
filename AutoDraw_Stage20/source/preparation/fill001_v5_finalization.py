@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 import json
 from pathlib import Path
 import time
-from typing import Any
+from typing import Any, Callable
 
 from fill001_v5_handoff import Fill001V5Error
 
@@ -212,6 +212,7 @@ def finalize_v5_stage6_attempt(
     *, bridge_root: Path, request: dict, baseline_files: set[str],
     summary: dict, pre_png: Path, post_png: Path,
     timeout_seconds: float = 12.0,
+    post_capture_callback: Callable[[], Path] | None = None,
 ) -> dict:
     """Conservatively bind new Bridge runs; preserve failures as evidence."""
     if summary.get("status") != "completed" or summary.get("completed_strokes") != 29:
@@ -251,6 +252,13 @@ def finalize_v5_stage6_attempt(
             + str(last_error)
         )
     from fill001_screen_mask_v2 import audit_screen_mask_v2
+    if post_capture_callback is not None:
+        # Obtain a new immutable screen image after the completed Bridge-run,
+        # rather than auditing an image captured before Egret's final updates.
+        settled_png = Path(post_capture_callback())
+        if not settled_png.is_file() or settled_png == post_png:
+            raise Fill001V5Error("Post-run settled PNG capture is missing or reused.")
+        post_png = settled_png
     mapping=request.get("mapping")
     if not isinstance(mapping, dict) or not isinstance(mapping.get("board_screen_corners"),dict):
         raise Fill001V5Error("No run-bound independent screen geometry for V5 quality.")
