@@ -472,6 +472,15 @@ class Fill001Tab:
 
     def _on_v5_stage6_finished(self, result: dict) -> None:
         self._v5_stage6_completed.set()
+        if result.get("failure_stage") == "BRUSH_SLIDER_NO_RESPONSE":
+            # Never auto-retry an unverified game control on the next Firefox
+            # session. The operator must recalibrate and opt in again.
+            self.v5_run_after_probe_var.set(False)
+            self._firefox_messages.put((
+                "V5_SLIDER_BLOCKED",
+                "Кисть не изменилась при первом перетаскивании. "
+                "Автозапуск V5 выключен; требуется новая проверка ползунка.",
+            ))
         status = result.get("status", "FAILED")
         attempt = result.get("request", {}).get("attempt_id")
         self._firefox_messages.put((
