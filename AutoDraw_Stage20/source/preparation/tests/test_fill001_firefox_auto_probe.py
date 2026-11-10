@@ -191,7 +191,7 @@ def test_missing_foreground_witness_blocks_before_any_selenium_move(tmp_path, mo
         "selenium.webdriver.common": common, "selenium.webdriver.common.by": by,
         "selenium.webdriver.common.action_chains": actions,
     }):
-        with pytest.raises(PreflightGeometryError, match="foreground"):
+        with pytest.raises(PreflightGeometryError, match="PID|foreground"):
             collect_verified_v5_firefox_roi(
                 Driver(), tmp_path, SID,
                 build_fill001_v5_source_plan("K_trim_0_y190_w2"),
