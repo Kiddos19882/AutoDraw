@@ -1,0 +1,718 @@
+{
+  "schema_version": 2,
+  "session_id": "6f68db86-c831-42ec-a632-f62c8fba85b1",
+  "started_at_utc": "2026-11-10T23:24:29.562+00:00",
+  "run_idle_seconds": 2.5,
+  "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:159.0) Gecko/20100101 Firefox/159.0",
+  "page": {
+    "origin": "https://eufbpet.hust.me",
+    "pathname": "/pet.php"
+  },
+  "monitor_status_at_connect": {
+    "version": "0.2.4",
+    "active": true,
+    "boardDetected": true,
+    "boardLabel": "o",
+    "snapshot": {
+      "logicalWidth": 460,
+      "logicalHeight": 240,
+      "scaleX": 1,
+      "scaleY": 1,
+      "maxPoints": 6000,
+      "remainingPoints": 5999,
+      "pointCount": 1,
+      "sourceMethod": "BoardPane.max+BoardPane.less",
+      "isExact": true,
+      "validationStatus": "valid",
+      "radius": [
+        0,
+        30
+      ],
+      "currentRadius": 30
+    },
+    "eventCount": 252,
+    "droppedEvents": 0,
+    "errors": 0,
+    "inputTelemetryEnabled": true,
+    "engineFrameObserverConnected": true,
+    "engineFrameCount": 0
+  },
+  "bridge_configuration": {
+    "inputTelemetry": {
+      "requested": true,
+      "enabled": true,
+      "previous": false,
+      "changedByBridge": true,
+      "restoreStatus": "not_required"
+    }
+  },
+  "renderer_geometry": {
+    "inspectionMode": "read_only",
+    "engineVersion": "5.4.1",
+    "renderMode": "webgl",
+    "runtimeType": "web",
+    "systemRenderer": "n",
+    "canvasRenderer": "n",
+    "windowGeometry": {
+      "screenX": -8,
+      "screenY": -8,
+      "outerWidth": 1936,
+      "outerHeight": 1056,
+      "innerWidth": 1920,
+      "innerHeight": 905,
+      "screenWidth": 1920,
+      "screenHeight": 1080,
+      "availableScreenWidth": 1920,
+      "availableScreenHeight": 1032
+    },
+    "canvasScaleFactor": 2,
+    "canvasScaleX": 4,
+    "canvasScaleY": 4,
+    "devicePixelRatio": 1,
+    "visualViewportScale": 1,
+    "playerCount": 1,
+    "players": [
+      {
+        "playerFound": true,
+        "playerMatchesStage": true,
+        "containerRect": {
+          "left": 0,
+          "top": 0,
+          "right": 1920,
+          "bottom": 905,
+          "width": 1920,
+          "height": 905
+        },
+        "playerOptions": {
+          "scaleMode": "fixedHeight",
+          "frameRate": 30,
+          "contentWidth": 740,
+          "contentHeight": 600,
+          "renderModeOption": null
+        },
+        "stage": {
+          "width": 1274,
+          "height": 600,
+          "frameRate": 30,
+          "scaleMode": "fixedHeight",
+          "orientation": "auto"
+        },
+        "canvas": {
+          "width": 5096,
+          "height": 2400,
+          "clientWidth": 5096,
+          "clientHeight": 2400,
+          "offsetLeft": 0,
+          "offsetTop": -1,
+          "rect": {
+            "left": 0,
+            "top": -0.5,
+            "right": 1920,
+            "bottom": 905.5,
+            "width": 1920,
+            "height": 906
+          },
+          "screenQuad": null,
+          "style": {
+            "left": "0px",
+            "top": "-0.5px",
+            "width": "",
+            "height": "",
+            "transform": "matrix(0.376766, 0, 0, 0.3775, 0, 0)",
+            "transformOrigin": "0% 0% 0px",
+            "computedTransform": "matrix(0.376766, 0, 0, 0.3775, 0, 0)",
+            "computedTransformOrigin": "0px 0px"
+          }
+        },
+        "boardStageCorners": {
+          "topLeft": {
+            "x": 320.7916660308838,
+            "y": 72
+          },
+          "topRight": {
+            "x": 780.7916660308838,
+            "y": 72
+          },
+          "bottomRight": {
+            "x": 780.7916660308838,
+            "y": 312
+          },
+          "bottomLeft": {
+            "x": 320.7916660308838,
+            "y": 312
+          }
+        },
+        "boardClientCorners": {
+          "topLeft": {
+            "x": 483.4536882098092,
+            "y": 108.22
+          },
+          "topRight": {
+            "x": 1176.703295745131,
+            "y": 108.22
+          },
+          "bottomRight": {
+            "x": 1176.703295745131,
+            "y": 470.62
+          },
+          "bottomLeft": {
+            "x": 483.4536882098092,
+            "y": 470.62
+          }
+        },
+        "boardClientMappingMethod": "validated_axis_aligned_rect",
+        "boardDisplayChain": [
+          {
+            "className": "o",
+            "x": 30,
+            "y": 75,
+            "width": 460,
+            "height": 240,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": {
+              "x": 0,
+              "y": 0,
+              "width": 460,
+              "height": 240
+            },
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 320.7916660308838,
+              "ty": 72
+            }
+          },
+          {
+            "className": "o",
+            "x": 290.7916660308838,
+            "y": -3,
+            "width": 676,
+            "height": 379,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": null,
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 290.7916660308838,
+              "ty": -3
+            }
+          },
+          {
+            "className": "i",
+            "x": 0,
+            "y": 0,
+            "width": 1274,
+            "height": 603,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": null,
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 0,
+              "ty": 0
+            }
+          },
+          {
+            "className": "Preloader",
+            "x": 0,
+            "y": 0,
+            "width": 2830.0809053156145,
+            "height": 737.9490000000001,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": {
+              "x": 0,
+              "y": 0,
+              "width": 1274,
+              "height": 600
+            },
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 0,
+              "ty": 0
+            }
+          },
+          {
+            "className": "i",
+            "x": 0,
+            "y": 0,
+            "width": 2830.0809053156145,
+            "height": 737.9490000000001,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": null,
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 0,
+              "ty": 0
+            }
+          }
+        ],
+        "boardMask": {
+          "className": "i",
+          "x": 30,
+          "y": 75,
+          "width": 460,
+          "height": 240,
+          "concatenatedMatrix": {
+            "a": 1,
+            "b": 0,
+            "c": 0,
+            "d": 1,
+            "tx": 320.7916660308838,
+            "ty": 72
+          }
+        }
+      }
+    ],
+    "boardDetected": true,
+    "boardLabel": "o",
+    "boardLogicalSize": {
+      "width": 460,
+      "height": 240
+    },
+    "boardDisplayChain": [
+      {
+        "className": "o",
+        "x": 30,
+        "y": 75,
+        "width": 460,
+        "height": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "rotation": 0,
+        "scrollRect": {
+          "x": 0,
+          "y": 0,
+          "width": 460,
+          "height": 240
+        },
+        "concatenatedMatrix": {
+          "a": 1,
+          "b": 0,
+          "c": 0,
+          "d": 1,
+          "tx": 320.7916660308838,
+          "ty": 72
+        }
+      },
+      {
+        "className": "o",
+        "x": 290.7916660308838,
+        "y": -3,
+        "width": 676,
+        "height": 379,
+        "scaleX": 1,
+        "scaleY": 1,
+        "rotation": 0,
+        "scrollRect": null,
+        "concatenatedMatrix": {
+          "a": 1,
+          "b": 0,
+          "c": 0,
+          "d": 1,
+          "tx": 290.7916660308838,
+          "ty": -3
+        }
+      },
+      {
+        "className": "i",
+        "x": 0,
+        "y": 0,
+        "width": 1274,
+        "height": 603,
+        "scaleX": 1,
+        "scaleY": 1,
+        "rotation": 0,
+        "scrollRect": null,
+        "concatenatedMatrix": {
+          "a": 1,
+          "b": 0,
+          "c": 0,
+          "d": 1,
+          "tx": 0,
+          "ty": 0
+        }
+      },
+      {
+        "className": "Preloader",
+        "x": 0,
+        "y": 0,
+        "width": 2830.0809053156145,
+        "height": 737.9490000000001,
+        "scaleX": 1,
+        "scaleY": 1,
+        "rotation": 0,
+        "scrollRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1274,
+          "height": 600
+        },
+        "concatenatedMatrix": {
+          "a": 1,
+          "b": 0,
+          "c": 0,
+          "d": 1,
+          "tx": 0,
+          "ty": 0
+        }
+      },
+      {
+        "className": "i",
+        "x": 0,
+        "y": 0,
+        "width": 2830.0809053156145,
+        "height": 737.9490000000001,
+        "scaleX": 1,
+        "scaleY": 1,
+        "rotation": 0,
+        "scrollRect": null,
+        "concatenatedMatrix": {
+          "a": 1,
+          "b": 0,
+          "c": 0,
+          "d": 1,
+          "tx": 0,
+          "ty": 0
+        }
+      }
+    ]
+  },
+  "renderer_geometry_updated_at_utc": "2026-11-10T23:25:52.064+00:00",
+  "passive_preflight_samples": [
+    {
+      "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+      "source": "window-bubble-after-egret-canvas",
+      "session_id": "6f68db86-c831-42ec-a632-f62c8fba85b1",
+      "renderer_geometry_sha256": "572c5f447022b6df540a8f0f18b836625849ad48fdd80109e50241e4ec871818",
+      "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+      "buttons": 0,
+      "pre_drawing": true,
+      "captured_at_utc": "2026-11-10T23:25:18.973+00:00",
+      "clientX": 596.0,
+      "clientY": 282.0,
+      "screenX": 596.0,
+      "screenY": 417.0
+    },
+    {
+      "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+      "source": "window-bubble-after-egret-canvas",
+      "session_id": "6f68db86-c831-42ec-a632-f62c8fba85b1",
+      "renderer_geometry_sha256": "572c5f447022b6df540a8f0f18b836625849ad48fdd80109e50241e4ec871818",
+      "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+      "buttons": 0,
+      "pre_drawing": true,
+      "captured_at_utc": "2026-11-10T23:25:20.962+00:00",
+      "clientX": 596.0,
+      "clientY": 289.0,
+      "screenX": 596.0,
+      "screenY": 424.0
+    },
+    {
+      "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+      "source": "window-bubble-after-egret-canvas",
+      "session_id": "6f68db86-c831-42ec-a632-f62c8fba85b1",
+      "renderer_geometry_sha256": "572c5f447022b6df540a8f0f18b836625849ad48fdd80109e50241e4ec871818",
+      "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+      "buttons": 0,
+      "pre_drawing": true,
+      "captured_at_utc": "2026-11-10T23:25:22.963+00:00",
+      "clientX": 596.0,
+      "clientY": 297.0,
+      "screenX": 596.0,
+      "screenY": 432.0
+    },
+    {
+      "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+      "source": "window-bubble-after-egret-canvas",
+      "session_id": "6f68db86-c831-42ec-a632-f62c8fba85b1",
+      "renderer_geometry_sha256": "572c5f447022b6df540a8f0f18b836625849ad48fdd80109e50241e4ec871818",
+      "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+      "buttons": 0,
+      "pre_drawing": true,
+      "captured_at_utc": "2026-11-10T23:25:24.963+00:00",
+      "clientX": 596.0,
+      "clientY": 305.0,
+      "screenX": 596.0,
+      "screenY": 440.0
+    },
+    {
+      "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+      "source": "window-bubble-after-egret-canvas",
+      "session_id": "6f68db86-c831-42ec-a632-f62c8fba85b1",
+      "renderer_geometry_sha256": "572c5f447022b6df540a8f0f18b836625849ad48fdd80109e50241e4ec871818",
+      "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+      "buttons": 0,
+      "pre_drawing": true,
+      "captured_at_utc": "2026-11-10T23:25:26.980+00:00",
+      "clientX": 596.0,
+      "clientY": 312.0,
+      "screenX": 596.0,
+      "screenY": 447.0
+    },
+    {
+      "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+      "source": "window-bubble-after-egret-canvas",
+      "session_id": "6f68db86-c831-42ec-a632-f62c8fba85b1",
+      "renderer_geometry_sha256": "572c5f447022b6df540a8f0f18b836625849ad48fdd80109e50241e4ec871818",
+      "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+      "buttons": 0,
+      "pre_drawing": true,
+      "captured_at_utc": "2026-11-10T23:25:28.963+00:00",
+      "clientX": 596.0,
+      "clientY": 320.0,
+      "screenX": 596.0,
+      "screenY": 455.0
+    },
+    {
+      "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+      "source": "window-bubble-after-egret-canvas",
+      "session_id": "6f68db86-c831-42ec-a632-f62c8fba85b1",
+      "renderer_geometry_sha256": "572c5f447022b6df540a8f0f18b836625849ad48fdd80109e50241e4ec871818",
+      "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+      "buttons": 0,
+      "pre_drawing": true,
+      "captured_at_utc": "2026-11-10T23:25:30.963+00:00",
+      "clientX": 596.0,
+      "clientY": 327.0,
+      "screenX": 596.0,
+      "screenY": 462.0
+    },
+    {
+      "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+      "source": "window-bubble-after-egret-canvas",
+      "session_id": "6f68db86-c831-42ec-a632-f62c8fba85b1",
+      "renderer_geometry_sha256": "1636e1ff2b9e15cfc58c87c2c0972e2aaa4422630e2dcf7d5b7b167485629675",
+      "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+      "buttons": 0,
+      "pre_drawing": true,
+      "captured_at_utc": "2026-11-10T23:25:32.989+00:00",
+      "clientX": 596.0,
+      "clientY": 335.0,
+      "screenX": 596.0,
+      "screenY": 470.0
+    },
+    {
+      "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+      "source": "window-bubble-after-egret-canvas",
+      "session_id": "6f68db86-c831-42ec-a632-f62c8fba85b1",
+      "renderer_geometry_sha256": "2c77a73ce77de5cde5b26776a21f860d7b7309292e84280bbfc5e32083f6ee35",
+      "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+      "buttons": 0,
+      "pre_drawing": true,
+      "captured_at_utc": "2026-11-10T23:25:34.984+00:00",
+      "clientX": 596.0,
+      "clientY": 342.0,
+      "screenX": 596.0,
+      "screenY": 477.0
+    },
+    {
+      "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+      "source": "window-bubble-after-egret-canvas",
+      "session_id": "6f68db86-c831-42ec-a632-f62c8fba85b1",
+      "renderer_geometry_sha256": "b0f3cdb4f678c7c66856f019d17e1154baa0057f5a23e460831868fc1fd32d54",
+      "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+      "buttons": 0,
+      "pre_drawing": true,
+      "captured_at_utc": "2026-11-10T23:25:36.984+00:00",
+      "clientX": 596.0,
+      "clientY": 350.0,
+      "screenX": 596.0,
+      "screenY": 485.0
+    },
+    {
+      "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+      "source": "window-bubble-after-egret-canvas",
+      "session_id": "6f68db86-c831-42ec-a632-f62c8fba85b1",
+      "renderer_geometry_sha256": "b4891110867c5a29fae0366039d31fdfacf49aa555f5a8db4bb249e3647f74cd",
+      "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+      "buttons": 0,
+      "pre_drawing": true,
+      "captured_at_utc": "2026-11-10T23:25:38.984+00:00",
+      "clientX": 596.0,
+      "clientY": 357.0,
+      "screenX": 596.0,
+      "screenY": 492.0
+    },
+    {
+      "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+      "source": "window-bubble-after-egret-canvas",
+      "session_id": "6f68db86-c831-42ec-a632-f62c8fba85b1",
+      "renderer_geometry_sha256": "f839507900cad42ebfd04ab57c5f9e091be806220d7748d1f34d0eff70420e8d",
+      "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+      "buttons": 0,
+      "pre_drawing": true,
+      "captured_at_utc": "2026-11-10T23:25:40.984+00:00",
+      "clientX": 598.0,
+      "clientY": 365.0,
+      "screenX": 598.0,
+      "screenY": 500.0
+    },
+    {
+      "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+      "source": "window-bubble-after-egret-canvas",
+      "session_id": "6f68db86-c831-42ec-a632-f62c8fba85b1",
+      "renderer_geometry_sha256": "994e17add7bee1de663d7e55d1f4cddae3aad46272c7d5061a11cf53db88a1ff",
+      "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+      "buttons": 0,
+      "pre_drawing": true,
+      "captured_at_utc": "2026-11-10T23:25:42.976+00:00",
+      "clientX": 601.0,
+      "clientY": 372.0,
+      "screenX": 601.0,
+      "screenY": 507.0
+    },
+    {
+      "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+      "source": "window-bubble-after-egret-canvas",
+      "session_id": "6f68db86-c831-42ec-a632-f62c8fba85b1",
+      "renderer_geometry_sha256": "35a5fd5fc877e2d6764146063a937d4c88d6e9cbd1c88d487cbcd44e1ada06e7",
+      "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+      "buttons": 0,
+      "pre_drawing": true,
+      "captured_at_utc": "2026-11-10T23:25:44.935+00:00",
+      "clientX": 607.0,
+      "clientY": 380.0,
+      "screenX": 607.0,
+      "screenY": 515.0
+    },
+    {
+      "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+      "source": "window-bubble-after-egret-canvas",
+      "session_id": "6f68db86-c831-42ec-a632-f62c8fba85b1",
+      "renderer_geometry_sha256": "ca20c372aaddfaf626c312616fe1e48d9f48d3d43a550b952a2d3c744b309ec6",
+      "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+      "buttons": 0,
+      "pre_drawing": true,
+      "captured_at_utc": "2026-11-10T23:25:46.877+00:00",
+      "clientX": 625.0,
+      "clientY": 388.0,
+      "screenX": 625.0,
+      "screenY": 523.0
+    },
+    {
+      "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+      "source": "window-bubble-after-egret-canvas",
+      "session_id": "6f68db86-c831-42ec-a632-f62c8fba85b1",
+      "renderer_geometry_sha256": "572c5f447022b6df540a8f0f18b836625849ad48fdd80109e50241e4ec871818",
+      "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+      "buttons": 0,
+      "pre_drawing": true,
+      "captured_at_utc": "2026-11-10T23:25:52.067+00:00",
+      "clientX": 630.0,
+      "clientY": 394.0,
+      "screenX": 630.0,
+      "screenY": 529.0
+    }
+  ],
+  "bridge_diagnostics": {
+    "received_message_count": 8361,
+    "received_event_count": 8157,
+    "received_event_types": {
+      "POINTER_DOWN_CANDIDATE": 33,
+      "DRAW_SAMPLE": 1739,
+      "ENGINE_FRAME_SAMPLE": 1753,
+      "BRUSH_CHANGE": 4,
+      "BRUSH_CHANGE_APPLIED": 4,
+      "MOUSE_MOVE_SAMPLE": 2885,
+      "POINTER_UP_CANDIDATE": 33,
+      "POINT_QUOTA_UPDATE": 1706
+    },
+    "last_message_type": "heartbeat",
+    "last_sequence": 8361,
+    "collector_sequence_gap_count": 0,
+    "last_message_at_utc": "2026-11-10T23:26:19.785+00:00",
+    "last_heartbeat_at_utc": "2026-11-10T23:26:19.785+00:00",
+    "last_monitor_status": {
+      "version": "0.2.4",
+      "active": true,
+      "boardDetected": true,
+      "boardLabel": "o",
+      "snapshot": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 4293,
+        "pointCount": 1707,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          3,
+          3
+        ],
+        "currentRadius": 3
+      },
+      "eventCount": 8409,
+      "droppedEvents": 0,
+      "errors": 0,
+      "inputTelemetryEnabled": true,
+      "engineFrameObserverConnected": true,
+      "engineFrameCount": 1753
+    },
+    "browser_bridge": {
+      "sentEventCount": 8157,
+      "lastEventType": "POINTER_UP_CANDIDATE",
+      "lastEventAtPerformanceMs": 120195,
+      "sendFailureCount": 0
+    },
+    "frame_probe_count": 33,
+    "connection_closed": true,
+    "last_event_type": "POINTER_UP_CANDIDATE",
+    "last_event_performance_ms": 120195,
+    "closed_at_utc": "2026-11-10T23:26:20.316+00:00"
+  },
+  "renderer_geometry_update_reason": "passive_input_preflight"
+}
