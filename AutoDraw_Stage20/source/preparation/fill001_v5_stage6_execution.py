@@ -363,9 +363,10 @@ def execute_v5_with_stage6(
                         and verified["binding"]["post_pointCount"] < report["post_pointCount"]):
                     raise Fill001V5Error("Final Bridge count regressed below the earlier Stage6 snapshot.")
                 report["post_settled_pointCount"] = verified["binding"]["post_pointCount"]
-                report["after_settled_png"] = {
-                    "file": str(settled_path), "sha256": sha(settled_path),
-                }
+                if settled_path.exists():
+                    report["after_settled_png"] = {
+                        "file": str(settled_path), "sha256": sha(settled_path),
+                    }
                 report["finalization"] = verified
                 report["actual_chalk"] = verified["binding"]["exact_chalk"]
                 report["monitor_binding"] = "EXACT_RUN_BOUND"
