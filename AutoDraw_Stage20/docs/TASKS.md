@@ -1,5 +1,12 @@
 # AutoDraw — действующие задачи
 
+## FILL-001 V5 — автоматический ROI, без разрешения live input (2026-11-10)
+
+- [x] Подготовлен research-only Selenium hover + native OS mouse пассивный сборщик `fill001_firefox_auto_probe.py`; функция `fill001_v5_auto_roi.py` проверяет ROI через существующий `boardpane_preflight_transform()`, no guessed offsets, strict same-session, native targets и экранные границы. Добавлены positive/negative fake E2 tests.
+- [ ] Проверить этот сборщик в реальном Firefox + Game Monitor 0.2.4 на Windows, создать run-bound evidence и подтвердить соответствие физических координат, DPI и PNG. **Пока результат нельзя применять к executor.**
+- [ ] Подключить проверенный ROI и V5BrushSequenceGuard к отдельному single-run Stage6, реализовать безопасный Clear с подтверждением пустой доски (не `pointCount==0`), затем собрать 2 E4 точных CHALK и E5 PNG comparison. Без этого automatic V5 execution BLOCKED.
+
+
 ## FILL-001 V5 — frozen source-plan в штатном AutoDraw (2026-11-10)
 
 - [x] Разрешены только два DEC-030 trim0 кандидата. `fill001_v5_handoff.py` строит 29 исходных штрихов `10×28 → 2/3` из native fixture, сохраняет SHA геометрии, frozen mask ID и versioned policy; не создаёт второго executor.
