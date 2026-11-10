@@ -1,5 +1,11 @@
 # AutoDraw — значимые изменения
 
+## 2026-11-10 — FILL-001 V5 float-radius Bridge compatibility (research-only)
+
+- Fixed strict V5 finalizer rejecting mathematically integral radii serialized as JSON floats (`10.0`, `2.0`) with `type(v) is int`. Accepted values remain finite integer-valued numerics within 1..30; fractional, nonfinite, boolean and other unplanned drawing radii remain blocked. Code `252228c`, regression `6506774`.
+- Added pre-draw loaded-finalizer contract guard for experimental V5 only (`aa56bb0`, `f1455b4`) and real E4 Bridge replay regression on immutable `3825d57` data (`88a12aa`). No generic executor/defaults, production estimator or quality thresholds changed.
+- Historical Stage6 auto report stays BLOCKED; separately confirmed E4 closed Bridge source CHALK1694 and missing settled PNG/E5. Latest CI must be read at its exact SHA.
+
 ## 2026-11-10 — experimental FILL-001 V5 full single-run gate in existing Stage6
 
 Добавлен opt-in запуск одной frozen V5 задачи после Firefox passive ROI, чистой доски exact `pointCount=1` и подтверждённой калибровки ползунка. Использованы существующие Stage6 MouseExecutor и closed-loop BrushSliderController: 29 strokes с 28×10 и финальным 2/3, stop, сохранение screen before/after PNG. Exact CHALK/quality отчет формируется только при проверенных run-bound Bridge events и Screen Mask V2; E5 независимый не выполняется автоматически. Ordinary Stage6 V5 loader и production defaults неизменны.
