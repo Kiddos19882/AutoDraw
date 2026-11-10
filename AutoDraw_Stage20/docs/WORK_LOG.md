@@ -1,5 +1,10 @@
 # AutoDraw — журнал выполненных действий
 
+## 2026-11-10 — разбор пользовательского Windows E4 `848aae2` (FILL-001 V5)
+
+Проверен GitHub commit `848aae2fcc12d38691346b1a45592c0f1fb2cb7c` с тремя первичными runtime-артефактами. Подтверждены Firefox 159/egret iframe, Monitor 0.2.4, BoardPane и действующая Bridge телеметрия; первое пассивное ROI-свидетельство **BLOCKED** при непроверенном foreground PID. Отчёт не содержит expected/actual Win32 PID, поэтому причина остаётся UNKNOWN. В экспериментальном `firefox_foreground_witness.py` добавлена одна WebDriver window activation и новая обязательная проверка native PID, в `fill001_firefox_auto_probe.py` подключён guard; расширены regression tests, включая отказ при mismatch. Ни Stage6, ни click/clear, ни CHALK/production не менялись. Исторические отчёты сохраняются без изменения. Статус E4 PARTIAL для подключения, V5 ROI BLOCKED, exact CHALK/PNG E5 NOT_RUN.
+
+
 ## 2026-11-10 — V5 пассивный ROI: проверка времени после сбора событий
 
 По статическому аудиту обнаружено, что пользовательская метка `now_utc`, установленная до Selenium/OS hover, могла ошибочно классифицировать фактически свежий DOM screen sample как future evidence. Диагностический collector теперь запрашивает UTC после трёх native moves; отдельный E2 regression требует вызова clock именно в этот момент. Штатные ROI/Stage6 validators, параметры кисти и game input не менялись. Live Windows/GeckoDriver и E4/E5 по-прежнему NOT_RUN, итоговый CI только для code SHA `de00f194bcb1feff3dd454ee3987b144d136626b` и завершённых обязательных jobs.
