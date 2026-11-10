@@ -273,10 +273,27 @@ class Fill001Tab:
                 driver, monitor_dir / "game_monitor.js", snippet_path,
                 operator_confirmed=True,
             )
+            from brush_radius_feedback import read_active_bridge_geometry
+            bridge_root = self.brush_tab.output_dir / "game_monitor_bridge"
+            ready = None
+            deadline = time.monotonic() + 30
+            while time.monotonic() < deadline and not self._firefox_stop.is_set():
+                ready = read_active_bridge_geometry(bridge_root)
+                if isinstance(ready, dict) and ready.get("board_detected") \
+                        and not ready.get("board_ambiguous") \
+                        and ready.get("session_id"):
+                    break
+                self._firefox_stop.wait(0.5)
+            else:
+                raise FirefoxMonitorError(
+                    "BLOCKED: Monitor внедрён, но Bridge не подтвердил свежую "
+                    "однозначную сессию игровой доски."
+                )
             self._firefox_messages.put((
                 "CONNECTED",
-                f"Monitor {attached['monitor_version']} подключён. "
-                "Теперь проверьте Bridge и штатный FILL-001 preflight.",
+                f"Monitor {attached['monitor_version']}; "
+                f"Bridge session={ready['session_id']}. "
+                "Дальше используется штатный FILL-001 preflight и Stage6.",
             ))
             # Keep the WebDriver session alive and the game open for Stage6.
             self._firefox_stop.wait()
