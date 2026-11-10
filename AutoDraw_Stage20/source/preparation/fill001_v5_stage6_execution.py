@@ -34,6 +34,47 @@ CONFIG = {
 }
 
 
+def park_v5_cursor_for_png(*, native_mouse: Any, roi: dict,
+                           exact_gate: Callable[[], dict],
+                           expected_point_count: int) -> dict:
+    """V5 only: safely move the *released* pointer outside the ROI for RGB evidence.
+
+    The game draws a cursor/brush sprite over BoardPane. Differently placed
+    sprites in before/after photos are not paint and falsely inflate leakage.
+    Never edit pixels or masks: move the pointer without clicking, re-check
+    the same-session exact point counter, and fail closed on any uncertainty.
+    """
+    import time
+
+    if (type(expected_point_count) is not int or expected_point_count < 1
+            or not isinstance(roi, dict)
+            or any(type(roi.get(k)) is not int for k in ("x", "y", "width", "height"))):
+        raise Fill001V5Error("V5 PNG pointer parking requires exact ROI and point count.")
+    sw, sh = native_mouse.size()
+    # Keep 96 pixels between mouse position and game ROI so the game brush
+    # sprite cannot overlap the cropped screenshot by ordinary cursor extent.
+    x = roi["x"] - 96
+    y = roi["y"] + roi["height"] // 2
+    if (x < 4 or x >= sw - 4 or y < 4 or y >= sh - 4
+            or roi["width"] <= 0 or roi["height"] <= 0):
+        raise Fill001V5Error("No validated safe V5 cursor parking point outside ROI.")
+    before = exact_gate()  # includes current Firefox foreground and same-session identity
+    if before.get("pointCount") != expected_point_count:
+        raise Fill001V5Error("V5 PNG counter changed before cursor parking.")
+    native_mouse.moveTo(x, y, duration=0)  # never press/click
+    observed = native_mouse.position()
+    if (round(observed[0]), round(observed[1])) != (x, y):
+        raise Fill001V5Error("V5 cursor did not reach safe off-board parking position.")
+    time.sleep(0.1)  # allow Egret's next render frame to remove the moving brush sprite
+    after = exact_gate()
+    if after.get("pointCount") != expected_point_count:
+        raise Fill001V5Error("V5 PNG counter changed after cursor parking.")
+    return {"method": "released_pointer_off_roi_no_click_v1",
+            "screen_x": x, "screen_y": y,
+            "exact_pointCount_before": before["pointCount"],
+            "exact_pointCount_after": after["pointCount"]}
+
+
 class V5BrushSliderController(BrushSliderController):
     """V5-only fail-closed rule: stop after one drag with NO game-radius response.
 
@@ -305,6 +346,13 @@ def execute_v5_with_stage6(
         if snap["currentRadius"] != calib.initial_value:
             raise Fill001V5Error("Unexpected radius before first V5 slider action.")
         controller.validate()
+        # Park the released pointer outside the ROI before baseline RGB capture.
+        report.setdefault("capture_pointer_parking", {})["before"] = (
+            park_v5_cursor_for_png(
+                native_mouse=native_mouse, roi=roi, exact_gate=lambda: current_gate(blank=True),
+                expected_point_count=snap["pointCount"],
+            )
+        )
         # Bind the before screenshot to the same exact one-point board state.
         native_mouse.screenshot(region=(
             roi["x"], roi["y"], roi["width"], roi["height"],
@@ -365,6 +413,15 @@ def execute_v5_with_stage6(
                             "V5 settled screen changed after closed Bridge run; "
                             "PNG quality BLOCKED, exact run CHALK preserved."
                         )
+                    if not summary.mouse_release.succeeded:
+                        raise Fill001V5Error("V5 PNG pointer parking requires confirmed released mouse.")
+                    report.setdefault("capture_pointer_parking", {})["settled"] = (
+                        park_v5_cursor_for_png(
+                            native_mouse=native_mouse, roi=roi,
+                            exact_gate=current_gate,
+                            expected_point_count=expected_post,
+                        )
+                    )
                     native_mouse.screenshot(region=(
                         roi["x"],roi["y"],roi["width"],roi["height"],
                     )).save(settled_path)
