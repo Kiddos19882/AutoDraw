@@ -1155,6 +1155,17 @@ class Stage6App:
                 "Это исходный логический план Brush Test. Его нужно передавать через вкладку «Тест кистей», "
                 "где он преобразуется в координаты экранной области."
             )
+        generation = document.get("generation") if isinstance(document, dict) else None
+        if isinstance(generation, dict) and (
+            generation.get("method") == "fill001_v5_dec030_frozen_mixed_width"
+            or generation.get("protocol") == "FILL001_CHALK_FIRST_NATIVE_V5"
+            or generation.get("requires_verified_mixed_width_stage6") is True
+        ):
+            raise ValueError(
+                "FILL-001 V5 mixed-width source plan не является исполняемым. "
+                "Требуется отдельный проверенный Stage6 mixed-brush handoff; "
+                "обычная загрузка DrawingPlan запрещена."
+            )
         plan = DrawingPlan.from_dict(document)
         plan.validate_bounds()
         experiment_context = document.get("autodraw_experiment") if isinstance(document, dict) else None
