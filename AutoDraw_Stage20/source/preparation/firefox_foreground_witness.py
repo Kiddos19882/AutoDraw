@@ -62,12 +62,57 @@ def firefox_foreground_witness(
     return type(active_pid) is int and active_pid == browser_pid
 
 
+
+def request_owned_firefox_window_focus(expected_pid: int) -> bool:
+    """Activate only one verified Firefox top-level window; never click."""
+    if sys.platform != "win32" or type(expected_pid) is not int or expected_pid <= 0:
+        return False
+    import ctypes
+    from ctypes import wintypes
+
+    user32 = ctypes.WinDLL("user32", use_last_error=True)
+    CALLBACK = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
+    user32.EnumWindows.argtypes = [CALLBACK, wintypes.LPARAM]
+    user32.EnumWindows.restype = wintypes.BOOL
+    user32.GetWindowThreadProcessId.argtypes = [
+        wintypes.HWND, ctypes.POINTER(wintypes.DWORD)
+    ]
+    user32.GetWindowThreadProcessId.restype = wintypes.DWORD
+    user32.IsWindowVisible.argtypes = [wintypes.HWND]
+    user32.IsWindowVisible.restype = wintypes.BOOL
+    user32.GetWindow.argtypes = [wintypes.HWND, wintypes.UINT]
+    user32.GetWindow.restype = wintypes.HWND
+    user32.ShowWindow.argtypes = [wintypes.HWND, ctypes.c_int]
+    user32.ShowWindow.restype = wintypes.BOOL
+    user32.SetForegroundWindow.argtypes = [wintypes.HWND]
+    user32.SetForegroundWindow.restype = wintypes.BOOL
+    windows: list[int] = []
+
+    @CALLBACK
+    def visit(hwnd: int, _param: int) -> bool:
+        pid = wintypes.DWORD(0)
+        if (user32.IsWindowVisible(hwnd)
+                and not user32.GetWindow(hwnd, 4)  # GW_OWNER
+                and user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
+                and pid.value == expected_pid):
+            windows.append(hwnd)
+        return True
+
+    if not user32.EnumWindows(visit, 0) or len(windows) != 1:
+        return False
+    # SW_RESTORE and SetForegroundWindow do not produce game input.
+    hwnd = windows[0]
+    user32.ShowWindow(hwnd, 9)
+    return bool(user32.SetForegroundWindow(hwnd))
+
+
 def establish_firefox_foreground(
     driver: Any,
     *,
     active_pid_provider: Callable[[], int] = active_window_process_id,
     sleep_seconds: float = 0.4,
     sleep_fn: Callable[[float], None] | None = None,
+    native_focus_request: Callable[[int], bool] | None = None,
 ) -> None:
     """Verify or focus the *owned* Firefox window without desktop input.
 
@@ -110,8 +155,20 @@ def establish_firefox_foreground(
     sleep_fn(sleep_seconds)
     after = foreground_pid()
     if after != expected:
-        raise FirefoxForegroundError(
-            f"BLOCKED: Firefox is not proven to be the foreground window; "
-            f"expected PID={expected}; before PID={before}; after PID={after}. "
-            "No mouse movement permitted."
-        )
+        if native_focus_request is None:
+            native_focus_request = request_owned_firefox_window_focus
+        try:
+            requested = native_focus_request(expected) is True
+        except (OSError, RuntimeError, ValueError, TypeError):
+            requested = False
+        if requested:
+            sleep_fn(sleep_seconds)
+        after_native = foreground_pid()
+        if after_native != expected:
+            raise FirefoxForegroundError(
+                f"BLOCKED: Firefox is not proven to be the foreground window; "
+                f"expected PID={expected}; before PID={before}; "
+                f"after WebDriver PID={after}; after native PID={after_native}; "
+                f"native focus request accepted={requested}. "
+                "No mouse movement permitted."
+            )
