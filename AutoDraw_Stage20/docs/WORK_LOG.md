@@ -1,5 +1,12 @@
 # AutoDraw — журнал выполненных действий
 
+## 2026-11-10 — E4 V5 full Stage6 run 29/29 and strict exact CHALK reconciliation
+
+Read primary commit `ed74ffd` (source report, calibration, game session and full 8176-event bridge run). Confirmed new operator slider x1=1363/y306, x30=1207/y307; V5 brush first28 radius10/last radius2, 29 complete strokes, safe release and saved screen PNG. Source game monitor full run `b0afe0bf` reports exact pointCount 1→1707 (CHALK1706), 29 on-board frozen pointer starts + five zero-point slider events x1207..1358 y171. Old finalizer's `actual_chalk=null` resulted from rejecting all non-consuming UI events, including valid slider controls, as well as intermediate Stage6 post1681 before 26 late accepted points. Did NOT edit historic result.
+
+Implemented V5-specific restricted proof for slider input (screen-to-client corridor + board exclusion + per-stroke zero delta and lifecycle), all 29 drawing starts and radius 10×28→2/3, closed run counter, fresh post-run `after_settled.png`; split exact CHALK from PNG audit status. Added synthetic E4-shaped 29+5 fixture and negative phone touch / consumed slider / wrong radius / missing metric / bad bounds tests and capture-failure test. No modified frozen plans, production defaults, acceptance policy thresholds, or master. Latest code CI still must be checked; E5 independent quality NOT_RUN.
+
+
 ## 2026-11-10 — V5 no-response slider: invalidation of stale calibration
 
 После анализа `fbb97ced` изолированный V5 brush controller (`40758c98`) был усилен: при неизменном observed radius после первого подтверждённого drag Stage6 записывает `failure_stage=BRUSH_SLIDER_NO_RESPONSE` и screen x_min/x_max/y в неизменяемый run-report. Завершение Stage6 теперь снимает `brush_slider_confirmed` и пытается сохранить это в `executor_settings`; FILL-001 отключает checkbox автозапуска V5 до повторного подтверждения пользователем. Code SHA `21976b4a7c3948438431765b81951c5ea0c83ec8`, CI [AutoDraw validation 42799292488](https://github.com/Kiddos19882/AutoDraw/actions/runs/42799292488) — ожидание финального статуса на момент записи. Настоящих новых Windows E4 артефактов на этом SHA нет. Причина невосприимчивости ползунка в браузере пока UNKNOWN, координаты не угадывались, никакие thresholds/production defaults не менялись.
