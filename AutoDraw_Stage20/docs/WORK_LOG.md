@@ -1,5 +1,9 @@
 # AutoDraw — журнал выполненных действий
 
+## 2026-11-10 — V5 пассивный ROI: проверка времени после сбора событий
+
+По статическому аудиту обнаружено, что пользовательская метка `now_utc`, установленная до Selenium/OS hover, могла ошибочно классифицировать фактически свежий DOM screen sample как future evidence. Диагностический collector теперь запрашивает UTC после трёх native moves; отдельный E2 regression требует вызова clock именно в этот момент. Штатные ROI/Stage6 validators, параметры кисти и game input не менялись. Live Windows/GeckoDriver и E4/E5 по-прежнему NOT_RUN, итоговый CI только для code SHA `de00f194bcb1feff3dd454ee3987b144d136626b` и завершённых обязательных jobs.
+
 ## 2026-11-10 — исправление CI Selenium и автоматизированный passive Firefox ROI
 
 В E3 `42734007807` было `1 failed / 1125 passed`, ошибка импортирования необязательного Selenium в негативном V5-source тесте. Порядок проверки изменён, добавлен isolated regression test. Добавлен fail-closed Win32 foreground PID witness для Firefox и тесты на отсутствие PID/другое окно/неверные capabilities. В существующий FILL-001 worker добавлен автоматический passive ROI probe после подтверждения доски: нет кликов, Clear, рисунка и Stage6 handoff, создаётся диагностический JSON с `stage6_execution_allowed=false`. До E4 этот интерфейс исследовательский, не production. `master`, MouseExecutor defaults, frozen source/PNG и CHALK estimator не менялись.
