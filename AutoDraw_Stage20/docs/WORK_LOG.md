@@ -1,5 +1,10 @@
 # AutoDraw — журнал выполненных действий
 
+## 2026-11-10 — исследовательский auto ROI probe для V5
+
+После pinned V5 source и brush guard подготовлена связка для автоматической same-run BoardPane ROI без ввода кнопок: `fill001_firefox_auto_probe.py` (Selenium hover + OS mouse passive events), `fill001_v5_auto_roi.py` (ROI вычисляется из свежего screenX-clientX и проверяется действующим BoardPane E4 validator). Добавлены test fixtures для совпадающих/неверных mouse targets, session IDs, stale heartbeat и выхода за экран; подмена frozen V5 source блокируется до движения мыши. Источник evidence — fake/unit E2 до завершения CI, никакого реального Firefox, игрового E4, CHALK и production-подключения этой геометрии пока нет.
+
+
 ## 2026-11-10 — FILL-001 V5 native fixture → fail-closed DrawingPlan
 
 Продолжена разрешённая работа: исследована фактическая frozen V5 геометрия в `chalk_fill_strategy_comparison.py`, создан `fill001_v5_handoff.py`, добавлены UI export и regression tests на 29 штрихов, pinned 10→2/3, SHA provenance, explicit execution blocked, overwrite refusal и tampering. В обычный Stage6 loader добавлен отказ для V5 экспериментального плана (включая обманную подмену coordinate space). Дополнительно подготовлен `V5BrushSequenceGuard` с проверкой упорядоченного применения кистей и unit/negative tests без реального ввода мыши. Ни `MouseExecutor`, ни production CHALK predictor/defaults не менялись. Выполнены GitHub commits в `feature/image-geometry-optimization`; актуальные E2/E3 только по завершённому CI на соответствующем SHA. Новых игровых замеров и E4/E5 нет.
