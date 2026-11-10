@@ -172,3 +172,63 @@ def establish_firefox_foreground(
                 f"native focus request accepted={requested}. "
                 "No mouse movement permitted."
             )
+
+
+def wait_for_operator_firefox_foreground(
+    driver: Any, *,
+    cancel_event: Any,
+    timeout_seconds: float = 90.0,
+    poll_seconds: float = 0.2,
+    required_consecutive_matches: int = 3,
+    active_pid_provider: Callable[[], int] = active_window_process_id,
+    monotonic_fn: Callable[[], float] | None = None,
+    sleep_fn: Callable[[float], None] | None = None,
+) -> None:
+    """Wait for USER-initiated foreground activation; never focus or click.
+
+    GeckoDriver's exact Firefox PID and Win32 GetForegroundWindow owner must
+    match repeatedly.  The operator clicks Firefox chrome outside the canvas.
+    The caller must subsequently recheck the foreground before EVERY move.
+    """
+    import time
+
+    caps = getattr(driver, "capabilities", None)
+    expected = caps.get("moz:processID") if isinstance(caps, dict) else None
+    if (not isinstance(caps, dict) or caps.get("browserName") != "firefox"
+            or type(expected) is not int or expected <= 0):
+        raise FirefoxForegroundError(
+            "BLOCKED: GeckoDriver did not provide a valid Firefox browser PID."
+        )
+    if (not 0 < timeout_seconds <= 600 or not 0 < poll_seconds <= 5
+            or type(required_consecutive_matches) is not int
+            or required_consecutive_matches < 2):
+        raise FirefoxForegroundError("BLOCKED: Invalid foreground wait policy.")
+    if monotonic_fn is None:
+        monotonic_fn = time.monotonic
+    if sleep_fn is None:
+        sleep_fn = time.sleep
+    deadline = monotonic_fn() + timeout_seconds
+    matches = 0
+    last_pid: int | None = None
+    while monotonic_fn() < deadline:
+        if cancel_event.is_set():
+            raise FirefoxForegroundError(
+                "BLOCKED: Operator cancelled Firefox foreground confirmation."
+            )
+        try:
+            current = active_pid_provider()
+        except (OSError, RuntimeError, ValueError, TypeError):
+            current = None
+        last_pid = current if type(current) is int and current > 0 else None
+        if last_pid == expected:
+            matches += 1
+            if matches >= required_consecutive_matches:
+                return
+        else:
+            matches = 0
+        sleep_fn(poll_seconds)
+    raise FirefoxForegroundError(
+        f"BLOCKED: Firefox was not manually activated within {timeout_seconds:g}s; "
+        f"expected PID={expected}; last foreground PID={last_pid}. "
+        "No mouse movement permitted."
+    )
