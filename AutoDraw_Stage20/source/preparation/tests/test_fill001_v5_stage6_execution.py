@@ -126,3 +126,66 @@ def test_v5_refuses_stale_loaded_finalizer_before_any_mouse_input(tmp_path, monk
             request=request, source=source, mapped=mapped, mapping=mapping,
             bridge_root=tmp_path, driver=driver, slider_calibration=slider,
             stop_event=SimpleNamespace(), native_mouse=Mouse(), output_dir=tmp_path)
+
+
+def test_v5_png_cursor_park_is_off_roi_and_preserves_exact_count(monkeypatch):
+    """Non-click movement only; same-run exact counter verified twice."""
+    monkeypatch.setattr(runtime.time if hasattr(runtime, "time") else __import__("time"),
+                        "sleep", lambda _: None)
+    calls = []
+    class Mouse:
+        def size(self):
+            return (1920, 1080)
+        def moveTo(self, x, y, duration=0):
+            calls.append(("move", x, y, duration))
+            self.pos = (x, y)
+        def position(self):
+            return self.pos
+        def mouseDown(self):
+            pytest.fail("Cursor parking may not draw")
+    roi = {"x":483,"y":243,"width":694,"height":363}
+    result = runtime.park_v5_cursor_for_png(
+        native_mouse=Mouse(), roi=roi,
+        exact_gate=lambda: {"pointCount":1702},
+        expected_point_count=1702,
+    )
+    assert calls == [("move", 387, 424, 0)]
+    assert result["exact_pointCount_before"] == 1702
+    assert result["exact_pointCount_after"] == 1702
+
+
+def test_v5_png_cursor_park_fails_closed_on_counter_drift(monkeypatch):
+    monkeypatch.setattr(__import__("time"), "sleep", lambda _: None)
+    calls = []
+    class Mouse:
+        def size(self):
+            return (1920, 1080)
+        def moveTo(self, x, y, duration=0):
+            calls.append("move")
+            self.pos = (x, y)
+        def position(self):
+            return self.pos
+    values = iter([1702, 1703])
+    with pytest.raises(Fill001V5Error, match="changed after cursor parking"):
+        runtime.park_v5_cursor_for_png(
+            native_mouse=Mouse(),
+            roi={"x":483,"y":243,"width":694,"height":363},
+            exact_gate=lambda: {"pointCount":next(values)},
+            expected_point_count=1702,
+        )
+    assert calls == ["move"]
+
+
+def test_v5_png_cursor_park_blocks_unsafe_roi_before_input():
+    class Mouse:
+        def size(self):
+            return (1920, 1080)
+        def moveTo(self, *args, **kwargs):
+            pytest.fail("Unsafe pointer motion")
+    with pytest.raises(Fill001V5Error, match="No validated safe"):
+        runtime.park_v5_cursor_for_png(
+            native_mouse=Mouse(),
+            roi={"x":50,"y":243,"width":694,"height":363},
+            exact_gate=lambda: {"pointCount":1},
+            expected_point_count=1,
+        )
