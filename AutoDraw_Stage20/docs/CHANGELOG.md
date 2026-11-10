@@ -1,5 +1,10 @@
 # AutoDraw — значимые изменения
 
+## 2026-11-10 — experimental FILL-001 V5 full single-run gate in existing Stage6
+
+Добавлен opt-in запуск одной frozen V5 задачи после Firefox passive ROI, чистой доски exact `pointCount=1` и подтверждённой калибровки ползунка. Использованы существующие Stage6 MouseExecutor и closed-loop BrushSliderController: 29 strokes с 28×10 и финальным 2/3, stop, сохранение screen before/after PNG. Exact CHALK/quality отчет формируется только при проверенных run-bound Bridge events и Screen Mask V2; E5 независимый не выполняется автоматически. Ordinary Stage6 V5 loader и production defaults неизменны.
+
+
 ## 2026-11-10 — экспериментальная автоматическая Firefox ROI-диагностика
 
 FILL-001 Firefox после подтверждения доски выполняет попытку безопасной пассивной BoardPane/OS ROI проверки с native Win32 foreground PID свидетельством и сохраняет версионированный неисполняемый JSON. Добавлена обработка отсутствующего Selenium в CI. Полное V5 исполнение и real CHALK не включены.
