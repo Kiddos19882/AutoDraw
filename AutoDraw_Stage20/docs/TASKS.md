@@ -1,5 +1,15 @@
 # AutoDraw — действующие задачи
 
+## FILL-001 V5 — third live W2 automated CHALK 1701, quality FAIL (2026-11-10)
+
+- [x] Analyze immutable `36e95e4`: Stage6 29/29, 28×10→2, 75.578s, run-bound automated exact `pointCount 1→1702`, CHALK1701; 5 no-point slider drags correctly excluded. Settled PNG saved. This fixes prior V5 binding issue in real E4.
+- [x] Apply original perimeter quality policy: coverage 99.368653% PASS, but 2963 leakage pixels (2230 farther than allowed 3 logical px), maximum 48.146794 logical px -> **quality FAIL**, E5 NOT_RUN. No candidate acceptance or production promotion.
+- [x] Inspect both original PNGs: browser/game brush cursor sprite visibly changes location between before and settled screenshots; whole-ROI RGB subtraction includes that sprite. Do not erase pixels, alter mask or retroactively mark existing FAIL as PASS.
+- [x] Add V5-only pointer parking before future baseline and settled capture (96 px outside ROI; no click; exact counter + Firefox foreground gates) and synthetic fail-closed tests `c1fe1f8`/`1b48fb1`/`0ca2a42`. Original raw PNG and reports preserved.
+- [ ] Confirm CI at new code SHA and Markdown audit at docs HEAD; fix any FAIL before live.
+- [ ] Next E4 on Windows: new clean-board W2 isolated run with cursor parked before both screenshots; require same-session exact CHALK and fresh settled PNG. Verify whether remaining real perimeter pixels exceed 3 px; do not assume quality PASS. Independent E5 required before W3 comparison.
+
+
 
 ## FILL-001 V5 — second E4, 3825d57: numeric-type root cause and regression
 
