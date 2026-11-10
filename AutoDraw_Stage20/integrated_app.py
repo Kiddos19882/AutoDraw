@@ -334,6 +334,7 @@ class AutoDrawUnifiedApp:
             brush_tab=self.brush_behavior_tab,
             on_transfer_plan=self._transfer_brush_test_plan,
             on_start=self._start_fill001_executor,
+            on_v5_run=self._start_fill001_v5_stage6,
         )
         # Only experiment plans are routed through their own completion handler;
         # ordinary drawing keeps the executor's standard completion dialog.
@@ -970,6 +971,10 @@ class AutoDrawUnifiedApp:
             "V3 current BoardPane geometry verified from fresh passive Bridge samples; "
             "Stage6 plan loaded. No brush diameter/target change."
         )
+
+    def _start_fill001_v5_stage6(self, **kwargs: Any) -> bool:
+        """One opt-in V5 attempt via the existing Stage6 owner, never another executor."""
+        return bool(self.executor.start_fill001_v5_single_run(**kwargs))
 
     def _start_fill001_executor(
         self, requested_brush: int, task: dict[str, Any], plan_path: Path
