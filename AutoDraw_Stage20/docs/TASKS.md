@@ -1,5 +1,12 @@
 # AutoDraw — действующие задачи
 
+## FILL-001 V5 — после успешного Windows passive ROI (2026-11-10)
+
+- [x] Получен новый независимый Windows runtime E4: [`5b7e6b8`](https://github.com/Kiddos19882/AutoDraw/commit/5b7e6b877d5793720ad856997ada97417bfaeaab), `probe-0cca08ef367643beaf6397a30ab410c6.json`, `session.json`, `game-monitor-run-20261110T063915979800Z-3c8e7de5.json`. Пассивные три probe, one BoardPane, origin, offset (0,135), ROI (483,243,694,363) **PASS только в рамках этой сессии**; старый foreground PID BLOCKED преодолён.
+- [ ] Перед любым V5 вводом установить **новую** валидную сессию и доказать blank-board + exact baseline: проверенный визуальный эталон пустой доски и стабильная ресурсная телеметрия. `pointCount=1` — обычный минимум на пустой доске, но сам по себе не доказательство пустоты. В данном E4 session `pointCount=2→3`, radius30; recorded exact CHALK1 относится лишь к отдельному непроектному pointer run, не к V5.
+- [ ] Далее versioned single-run mixed-width Stage6 `10×28→2/3` с проверенными brush switches, task/session/run source SHA, отдельным Clear и immutable pre/post/PNG; E5 acceptance и V5 actual CHALK всё ещё NOT_RUN. Не переносить старое screen ROI в новую сессию и не менять production defaults.
+
+
 ## FILL-001 V5 — один механизм пользовательского foreground (2026-11-10)
 
 - [x] Вместо программной активации через WebDriver/Win32 введено ожидание **обычного действия пользователя**: подтвердить доску в AutoDraw, нажать по верхней панели Firefox. Проверка Win32 foreground PID повторяется три раза подряд; таймаут 90 секунд, отмена немедленно BLOCKED, исключено вмешательство в игру.
