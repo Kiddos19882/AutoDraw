@@ -44,6 +44,7 @@ def _recent_samples(path: Path, sid: str, baseline_count: int, *,
 def collect_verified_v5_firefox_roi(
     driver: Any, bridge_root: Path, session_id: str,
     source_plan: dict, *, native_mouse: Any, now_utc: Any,
+    firefox_foreground_checker: Any = None,
 ) -> tuple[dict, dict, dict]:
     """Selenium hover + actual OS pointer hover, then existing Stage/Bridge validator.
 
@@ -104,8 +105,27 @@ def collect_verified_v5_firefox_roi(
     before = session.get("passive_preflight_samples") or []
     if not isinstance(before,list):
         raise PreflightGeometryError("Invalid Bridge passive sample history.")
+    # A GUI caller must supply a real native foreground-window witness.
+    # The collector is research-only until a verified Windows implementation
+    # is wired in; never move a cursor based merely on Selenium window focus.
+    def require_foreground() -> None:
+        try:
+            active = (
+                callable(firefox_foreground_checker)
+                and firefox_foreground_checker() is True
+            )
+        except Exception as exc:
+            raise PreflightGeometryError(
+                "Cannot authenticate foreground Firefox window."
+            ) from exc
+        if not active:
+            raise PreflightGeometryError(
+                "BLOCKED: Firefox is not proven to be the foreground window."
+            )
+
     # W3C element-relative offset uses center of element. No click ever occurs.
     for cx,cy in css_targets:
+        require_foreground()
         dx = int(round(cx-(rect["x"]+rect["width"]/2)))
         dy = int(round(cy-(rect["y"]+rect["height"]/2)))
         ActionChains(driver).move_to_element_with_offset(canvas,dx,dy).perform()
@@ -131,6 +151,7 @@ def collect_verified_v5_firefox_roi(
             raise PreflightGeometryError("Native mouse target outside primary desktop.")
     baseline = preliminary.get("passive_preflight_samples") or []
     for x,y in native_targets:
+        require_foreground()
         native_mouse.moveTo(x,y,duration=0)
         time.sleep(0.35)
     actual, samples = _recent_samples(
