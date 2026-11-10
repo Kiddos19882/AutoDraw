@@ -1,5 +1,10 @@
 # AutoDraw — журнал выполненных действий
 
+## 2026-11-10 — V5 no-response slider: invalidation of stale calibration
+
+После анализа `fbb97ced` изолированный V5 brush controller (`40758c98`) был усилен: при неизменном observed radius после первого подтверждённого drag Stage6 записывает `failure_stage=BRUSH_SLIDER_NO_RESPONSE` и screen x_min/x_max/y в неизменяемый run-report. Завершение Stage6 теперь снимает `brush_slider_confirmed` и пытается сохранить это в `executor_settings`; FILL-001 отключает checkbox автозапуска V5 до повторного подтверждения пользователем. Code SHA `21976b4a7c3948438431765b81951c5ea0c83ec8`, CI [AutoDraw validation 42799292488](https://github.com/Kiddos19882/AutoDraw/actions/runs/42799292488) — ожидание финального статуса на момент записи. Настоящих новых Windows E4 артефактов на этом SHA нет. Причина невосприимчивости ползунка в браузере пока UNKNOWN, координаты не угадывались, никакие thresholds/production defaults не менялись.
+
+
 ## 2026-11-10 — investigation of FILL-001 V5 first Stage6 runtime failure
 
 Inspected exact source commit `fbb97ced` (preserved all original before/after PNGs, run/session JSON). Same-session Firefox foreground/ROI and exact blank board passed. Stage6 made five unsuccessful slider adjustment drags at client y193, x1199→1353 (within browser but outside ROI); Monitor remained radius30, no recorded paint strokes; 0/29 V5, resource pointCount 1→1, release succeeded. Error string about insufficient precision arose from `calculate_radius_correction_target` after unresponsive attempts, not from measured display resolution. Added isolated `V5BrushSliderController` no-response guard: first confirmed unchanged radius immediately blocks instead of further speculative drags, writes calibration endpoints/observed radius to report, with regression tests. No changes to production brush controller, original evidence, acceptance thresholds, Stage6 defaults, frozen V5 plan, or master. Next E4 is identifying proven actual slider interaction in game and verifying a single radius change, not re-running 29-stroke V5 blindly.
