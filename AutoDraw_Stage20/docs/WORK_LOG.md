@@ -1,5 +1,10 @@
 # AutoDraw — журнал выполненных действий
 
+## 2026-11-10 — разбор успешного пользовательского Windows passive ROI (E4 limited)
+
+Прочитаны три первичных JSON из коммита `5b7e6b8`. Зафиксированы E4 подтверждение native foreground+пассивного ROI `483,243,694×363` / offset `0,+135` и 3 read-only свидетеля. Дополнительно обнаружен отдельный завершённый Bridge run с точным `pointCount 2→3`, `CHALK=1`, radius30, `stroke_count=1`; он **не связан с V5 planned 29 strokes** и не доказывает пустую доску. В этом этапе первичные данные и код не изменялись, исправления не подбирались, Stage6 и production untouched. Следующий gate — версионированный blank-board/brush run identity перед V5 execution, без reuse screen ROI другого запуска.
+
+
 ## 2026-11-10 — замена Firefox foreground activation на operator handoff
 
 По явному запросу пользователя и предыдущему PID mismatch `5372 != 932` изменён только V5 Firefox passive preflight. В `firefox_foreground_witness.py` добавлен bounded/abortable `wait_for_operator_firefox_foreground` (3 native PID подтверждения подряд); удалены альтернативные активаторы `establish_firefox_foreground` и `request_owned_firefox_window_focus`. Из `fill001_firefox_auto_probe.py` устранена любая попытка устанавливать фокус. `chalk_fill_ui.py` после подтверждения доски предлагает щёлкнуть по верхней панели Firefox вне canvas; AutoDraw сворачивается и ждёт, затем только read-only ROI. Тесты заменены с focus-forcing на stable PID/cancel/timeout failure. Изменений Stage6, frozen V5 geometry, production defaults, CHALK estimator и `master` нет. Новый E4 после коммита NOT_RUN; E2/E3 проверять по точному SHA CI.
