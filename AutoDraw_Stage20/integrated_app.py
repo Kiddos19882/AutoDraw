@@ -335,6 +335,7 @@ class AutoDrawUnifiedApp:
             on_transfer_plan=self._transfer_brush_test_plan,
             on_start=self._start_fill001_executor,
             on_v5_run=self._start_fill001_v5_stage6,
+            on_v5_cancel=self.executor._stop_execution,
         )
         # Only experiment plans are routed through their own completion handler;
         # ordinary drawing keeps the executor's standard completion dialog.
