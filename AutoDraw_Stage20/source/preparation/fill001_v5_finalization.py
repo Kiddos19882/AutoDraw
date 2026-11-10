@@ -1,0 +1,179 @@
+"""Run-bound FILL-001 V5 finalization: exact CHALK and original screen PNG.
+
+Do not infer CHALK from an arbitrary post-drawing heartbeat or predicted length.
+Use only complete Game Monitor runs from the one fresh Bridge session and
+unmodified before/after PNG files captured by the same Stage6 attempt.
+"""
+from __future__ import annotations
+
+from datetime import datetime, timezone
+import json
+from pathlib import Path
+import time
+from typing import Any
+
+from fill001_v5_handoff import Fill001V5Error
+
+POLICY = "FILL001_CHALK_FIRST_PERIMETER_V2"
+
+
+def _exact(snapshot: Any) -> tuple[int,int]:
+    if not isinstance(snapshot, dict) or snapshot.get("isExact") is not True:
+        raise Fill001V5Error("V5 run has no exact BoardPane resource snapshot.")
+    points, total, left = [snapshot.get(k) for k in (
+        "pointCount", "maxPoints", "remainingPoints"
+    )]
+    if (type(points) is not int or type(total) is not int or type(left) is not int
+            or total <= 0 or points < 0 or left < 0 or points + left != total):
+        raise Fill001V5Error("V5 run exact point counters are inconsistent.")
+    return points,total
+
+
+def validate_v5_bridge_runs(
+    runs: list[dict], *,
+    session_id: str, candidate_id: str,
+    expected_pre: int = 1,
+) -> dict:
+    """An exact run chain needs 29 stroke candidates, all radii and no drops."""
+    if not isinstance(runs, list) or not 1 <= len(runs) <= 2:
+        raise Fill001V5Error("Expected one or two completed V5 Bridge runs.")
+    ordered = sorted(runs, key=lambda x: x.get("started_at_utc", ""))
+    expected_last = 2 if candidate_id == "K_trim_0_y190_w2" else (
+        3 if candidate_id == "K_trim_0_y189_w3" else None
+    )
+    if expected_last is None:
+        raise Fill001V5Error("Unknown frozen V5 candidate.")
+    counts, radii, run_ids, totals = [], [], [], []
+    last_post = expected_pre
+    for run in ordered:
+        if (
+            not isinstance(run, dict)
+            or run.get("schema_version") != 1
+            or run.get("record_type") != "autodraw_game_monitor_run"
+            or run.get("session_id") != session_id
+            or run.get("execution_status") != "completed"
+            or run.get("monitor_dropped_events") != 0
+            or run.get("monitor_error_count") != 0
+            or run.get("collector_sequence_gap_count") != 0
+            or run.get("bridge_send_failures_delta") != 0
+            or run.get("non_consuming_stroke_candidate_count") != 0
+            or run.get("point_delta_matches_chalk") is not True
+            or run.get("monitor_errors") != []
+        ):
+            raise Fill001V5Error("V5 Bridge run was incomplete or has dropped/invalid events.")
+        count = run.get("stroke_count")
+        if (type(count) is not int or count <= 0 or count > 29
+                or run.get("stroke_candidate_count") != count):
+            raise Fill001V5Error("Unexpected V5 Bridge stroke count.")
+        pre, maximum = _exact(run.get("pre_test_snapshot"))
+        post, post_max = _exact(run.get("post_test_snapshot"))
+        chalk = run.get("chalk")
+        if (post_max != maximum or pre != last_post or post < pre
+                or not isinstance(chalk, dict)
+                or chalk.get("status") != "exact"
+                or chalk.get("pre_point_count") != pre
+                or chalk.get("post_point_count") != post
+                or chalk.get("consumed_points") != post-pre
+                or chalk.get("max_points") != maximum):
+            raise Fill001V5Error("V5 exact CHALK is not continuous and run-bound.")
+        if not isinstance(run.get("run_id"), str) or not run["run_id"]:
+            raise Fill001V5Error("Missing Game Monitor run ID.")
+        seen_radii = run.get("observed_brush_radii")
+        if (not isinstance(seen_radii, list)
+                or any(type(v) is not int or v not in (10,expected_last) for v in seen_radii)
+                or not seen_radii):
+            raise Fill001V5Error("V5 Bridge observed unexpected brush radii.")
+        events = run.get("events")
+        if (not isinstance(events, list)
+                or run.get("event_count") != len(events)
+                or any(not isinstance(e, dict) or e.get("monitorVersion") != "0.2.4"
+                       for e in events)):
+            raise Fill001V5Error("V5 raw Bridge events have wrong Monitor version.")
+        counts.append(count)
+        radii.extend(seen_radii)
+        totals.append((pre,post))
+        run_ids.append(run["run_id"])
+        last_post = post
+    if sum(counts) != 29 or set(radii) != {10,expected_last}:
+        raise Fill001V5Error("V5 29 strokes and both brush sizes are not confirmed.")
+    if len(ordered) == 2 and (
+        counts != [28,1] or sorted(set(ordered[0]["observed_brush_radii"])) != [10]
+        or sorted(set(ordered[1]["observed_brush_radii"])) != [expected_last]
+    ):
+        raise Fill001V5Error("V5 two-run brush switch split is inconsistent.")
+    return {
+        "status": "EXACT_RUN_BOUND",
+        "session_id": session_id,
+        "run_ids": run_ids,
+        "stroke_count": 29,
+        "bridge_run_stroke_counts": counts,
+        "observed_brush_radii": sorted(set(radii)),
+        "pre_pointCount": expected_pre,
+        "post_pointCount": last_post,
+        "exact_chalk": last_post-expected_pre,
+        "maxPoints": maximum,
+        "method": "post.pointCount - pre.pointCount across continuous exact runs",
+    }
+
+
+def finalize_v5_stage6_attempt(
+    *, bridge_root: Path, request: dict, baseline_files: set[str],
+    summary: dict, pre_png: Path, post_png: Path,
+    timeout_seconds: float = 12.0,
+) -> dict:
+    """Conservatively bind new Bridge runs; preserve failures as evidence."""
+    if summary.get("status") != "completed" or summary.get("completed_strokes") != 29:
+        raise Fill001V5Error("Stage6 did not complete all 29 V5 strokes.")
+    if not pre_png.is_file() or not post_png.is_file():
+        raise Fill001V5Error("Missing original before/after V5 PNG.")
+    sid=request["session_id"]
+    folder=Path(bridge_root)/sid
+    if not folder.is_dir():
+        raise Fill001V5Error("Missing authenticated V5 Bridge session folder.")
+    deadline=time.monotonic()+timeout_seconds
+    last_error=None
+    while time.monotonic()<deadline:
+        files=sorted(p for p in folder.glob("game-monitor-run-*.json")
+                     if p.name not in baseline_files)
+        try:
+            runs=[json.loads(p.read_text(encoding="utf-8")) for p in files]
+            binding=validate_v5_bridge_runs(
+                runs,session_id=sid,candidate_id=request["candidate_id"],
+            )
+            binding["bridge_run_paths"]=[str(p) for p in files]
+            break
+        except (Fill001V5Error,OSError,ValueError) as exc:
+            last_error=str(exc)
+            time.sleep(.3)
+    else:
+        raise Fill001V5Error(
+            "V5 exact CHALK cannot be bound to a complete 29-stroke Bridge run: "
+            + str(last_error)
+        )
+    from fill001_screen_mask_v2 import audit_screen_mask_v2
+    mapping=request.get("mapping")
+    if not isinstance(mapping, dict) or not isinstance(mapping.get("board_screen_corners"),dict):
+        raise Fill001V5Error("No run-bound independent screen geometry for V5 quality.")
+    # The passive screen transform is checked live before/during/after executor,
+    # and may be paired with the new run IDs only after exact Bridge binding.
+    geometry={
+        "run_id":request["attempt_id"],
+        "coordinate_system":"desktop_screen_css_pixels",
+        "validation_status":"valid",
+        "independent_screen_mapping":True,
+        "same_run":True,
+        "board_screen_corners":mapping["board_screen_corners"],
+        "evidence_sha256":mapping["passive_samples_sha256"],
+    }
+    quality=audit_screen_mask_v2(
+        "rectangle",pre_png,post_png,
+        run_id=request["attempt_id"],screen_roi=request["screen_roi"],
+        geometry=geometry,quality_policy=POLICY,
+    )
+    return {
+        "binding":binding,
+        "screen_mask_v2":quality,
+        "quality_gate":quality["active_quality_gate"],
+        "quality_policy_id":POLICY,
+        "status":"RUN_BOUND_SCREEN_AUDITED_NOT_INDEPENDENT_E5",
+    }
