@@ -1,5 +1,15 @@
 # AutoDraw — действующие задачи
 
+## FILL-001 V5 — next gate after first 29/29 live, 2026-11-10
+
+- [x] Reviewed immutable `ed74ffd`: first fully completed V5 candidate `K_trim_0_y190_w2` E4 29/29, 10×28→2, 76.125s, screenshots saved. New slider `x1=1363,y306; x30=1207,y307` confirmed in operator calibration file; previous 0/29 attempt remains FAIL in record.
+- [x] Read full 8176-event closed Game Monitor run `b0afe0bf`: 29 exact planned pointer starts, five separately identifiable zero-consuming slider drags, no monitor/bridge drops; exact run-bound source `1→1707`, E4 CHALK1706; old Stage6 report `actual_chalk=null` because its strict validator rejected non-consuming slider drags and sampled early `post=1681`. Do not overwrite old report or call original automated validator PASS.
+- [x] Added narrow V5 binding update: exclude only zero-delta, complete-lifecycle input on the verified slider corridor; exact 29 geometry/brush checks, safeguard against phone touches, delayed settled PNG capture and independent audit; regression tests. Original acceptance limits unchanged.
+- [ ] Confirm full E3 CI at latest code SHA. If FAIL, fix with same baseline; never infer CI from previous commit.
+- [ ] **Next E4:** re-run same single frozen V5 candidate on freshly clean board with new validator. Require automated run-bound exact CHALK, `after_settled.png` and independently inspect screen/perimeter quality; earlier 1706 is E4 source result but not accepted as automated screenshot-quality PASS.
+- [ ] Once quality gates and source evidence validated, run candidate `K_trim_0_y189_w3` independently on cleared board and compare exact CHALK only between quality-accepted trials. No production promotion until E5.
+
+
 ## FILL-001 V5 — after first full workflow failure, 2026-11-10
 
 - [x] Analyzed actual user commit `fbb97ced` raw source: complete passive ROI and exact `pointCount=1` PASS; failure in 30→10 brush switch, **0/29 strokes**; five unsuccessful drags, radius30 always, board unchanged, mouse safely released. It is **NOT** a failed image-quality trial.
