@@ -129,3 +129,59 @@ def validate_fill001_v5_source_plan(document: Any) -> str:
             "V5 source plan differs from pinned DEC-030 geometry/metadata."
         )
     return candidate
+
+
+class V5BrushSequenceGuard:
+    """Guard the existing BrushSliderController; never generate its own input."""
+
+    def __init__(self, source_plan: dict[str, Any]):
+        self.candidate_id = validate_fill001_v5_source_plan(source_plan)
+        self.expected = tuple(
+            int(stroke["metadata"]["brush_value"])
+            for stroke in source_plan["strokes"]
+        )
+        self.next_index = 1
+        self.preflight_done = False
+        self.verified_widths: list[int] = []
+
+    def preflight(self, controller: Any) -> None:
+        """Require the native slider controller and an exact initial radius 10."""
+        if self.next_index != 1 or self.preflight_done:
+            raise Fill001V5Error("V5 brush preflight cannot be repeated.")
+        calibration = getattr(controller, "calibration", None)
+        if getattr(calibration, "initial_value", None) != 10:
+            raise Fill001V5Error("V5 requires a verified initial brush width 10.")
+        if not callable(getattr(controller, "validate", None)):
+            raise Fill001V5Error("Missing live BrushSliderController validation.")
+        controller.validate()
+        if getattr(controller, "current_value", None) != 10:
+            raise Fill001V5Error("Initial Game Monitor brush width is not 10.")
+        self.preflight_done = True
+
+    def before_stroke(
+        self, controller: Any, executor: Any, index: int, stroke: Any,
+    ) -> str:
+        if not self.preflight_done:
+            raise Fill001V5Error("V5 mixed brush preflight has not passed.")
+        if type(index) is not int or index != self.next_index or index > len(self.expected):
+            raise Fill001V5Error("V5 stroke order or count mismatch.")
+        metadata = getattr(stroke, "metadata", None)
+        expected = self.expected[index - 1]
+        if (not isinstance(metadata, dict)
+                or metadata.get("brush_value") != str(expected)
+                or metadata.get("fill001_v5_candidate") != self.candidate_id
+                or metadata.get("source_stroke_index") != str(index - 1)):
+            raise Fill001V5Error("V5 brush/source stroke identity changed.")
+        if not callable(getattr(controller, "before_stroke", None)):
+            raise Fill001V5Error("No verified slider controller hook.")
+        # Delegate all physical input and live heartbeats to existing controller.
+        result = controller.before_stroke(executor, index, stroke)
+        if getattr(controller, "current_value", None) != expected:
+            raise Fill001V5Error("V5 brush controller did not verify requested width.")
+        self.verified_widths.append(expected)
+        self.next_index += 1
+        return result
+
+    def assert_complete(self) -> None:
+        if not self.preflight_done or self.next_index != 30 or len(self.verified_widths) != 29:
+            raise Fill001V5Error("V5 brush sequence is incomplete.")
