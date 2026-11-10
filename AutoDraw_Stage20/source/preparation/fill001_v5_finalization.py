@@ -15,6 +15,8 @@ from typing import Any, Callable
 from fill001_v5_handoff import Fill001V5Error
 
 POLICY = "FILL001_CHALK_FIRST_PERIMETER_V2"
+# Runtime contract: guard against mixing a current V5 executor with stale finalizer code.
+V5_BINDING_CONTRACT = "FILL001_V5_SLIDER_AWARE_BINDING_V2"
 
 
 def _exact(snapshot: Any) -> tuple[int,int]:
