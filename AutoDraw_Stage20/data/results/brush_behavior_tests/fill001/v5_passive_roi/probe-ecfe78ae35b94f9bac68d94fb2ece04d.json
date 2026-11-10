@@ -1,0 +1,14 @@
+{
+  "schema": "FILL001_V5_FIREFOX_PASSIVE_ROI_DIAGNOSTIC_V1",
+  "captured_at_utc": "2026-11-10T15:40:15.838960+00:00",
+  "status": "BLOCKED",
+  "candidate_id": "K_trim_0_y190_w2",
+  "session_id": "b77d1967-41dd-424b-92c3-6d426fedb181",
+  "source_strokes_sha256": null,
+  "screen_roi": null,
+  "mapping": null,
+  "blocked_reason": "BLOCKED: Stage6 refused V5: ValueError: BLOCKED: Stage6 has no confirmed brush-slider calibration. A passive ROI does not calibrate the brush slider.",
+  "actual_chalk": null,
+  "game_png_quality": "NOT_EVALUATED",
+  "stage6_execution_allowed": false
+}

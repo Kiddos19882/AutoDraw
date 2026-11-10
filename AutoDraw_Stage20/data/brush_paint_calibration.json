@@ -6,7 +6,7 @@
   "environment": {
     "screen_width": 1920,
     "screen_height": 1080,
-    "calibrated_at_utc": "2026-11-05T00:27:09+00:00",
+    "calibrated_at_utc": "2026-11-10T15:38:09+00:00",
     "windows_scale_percent": 100,
     "browser_zoom_percent": 100,
     "browser": "Firefox",
@@ -30,12 +30,12 @@
       "y": 289
     },
     "brush_slider_value_1": {
-      "x": 1354,
-      "y": 328
+      "x": 1363,
+      "y": 306
     },
     "brush_slider_value_30": {
-      "x": 1199,
-      "y": 328
+      "x": 1207,
+      "y": 307
     },
     "editor_open": null,
     "save_drawing": null
@@ -61,8 +61,8 @@
       "brush_7": "set",
       "brush_14": "set",
       "brush_20": "set",
-      "brush_slider_value_1": "set",
-      "brush_slider_value_30": "set",
+      "brush_slider_value_1": "verified",
+      "brush_slider_value_30": "verified",
       "editor_open": "not_set",
       "save_drawing": "not_set"
     },

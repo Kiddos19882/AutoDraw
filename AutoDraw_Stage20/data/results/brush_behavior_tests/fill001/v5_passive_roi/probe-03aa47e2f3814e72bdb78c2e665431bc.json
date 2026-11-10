@@ -1,0 +1,90 @@
+{
+  "schema": "FILL001_V5_FIREFOX_PASSIVE_ROI_DIAGNOSTIC_V1",
+  "captured_at_utc": "2026-11-10T15:43:33.290194+00:00",
+  "status": "PASSIVE_MAPPING_ONLY_NOT_EXECUTOR_READY",
+  "candidate_id": "K_trim_0_y190_w2",
+  "session_id": "6bd34aee-0c60-41ad-9902-f4dfca8d8ed8",
+  "source_strokes_sha256": "71cf46c0111cf141c99296981fb2a282c5468956b2c3dc3e442294c42aeef8db",
+  "screen_roi": {
+    "x": 483,
+    "y": 243,
+    "width": 694,
+    "height": 363
+  },
+  "mapping": {
+    "schema": "FILL001_BOARDPANE_PREFLIGHT_V1",
+    "status": "validated_preflight_input_transform_not_live_draw",
+    "session_id": "6bd34aee-0c60-41ad-9902-f4dfca8d8ed8",
+    "renderer_geometry_sha256": "178931c66fbba64f5c0492ac8574a7e39f0fc224b79d1f28aa26d3cceb8ccd9a",
+    "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+    "passive_samples_sha256": "2677a02f995f8406f2a7a9964b7c5d000ab2f55676bcbe54f9112b9b52e85a72",
+    "passive_samples": [
+      {
+        "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+        "source": "window-bubble-after-egret-canvas",
+        "session_id": "6bd34aee-0c60-41ad-9902-f4dfca8d8ed8",
+        "renderer_geometry_sha256": "f87b31250b52525ba9709e22f08137dd0625345d72c8cb17f26a9ef6ccb47fde",
+        "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+        "buttons": 0,
+        "pre_drawing": true,
+        "captured_at_utc": "2026-11-10T15:43:31.990+00:00",
+        "clientX": 719.0,
+        "clientY": 253.0,
+        "screenX": 719.0,
+        "screenY": 388.0
+      },
+      {
+        "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+        "source": "window-bubble-after-egret-canvas",
+        "session_id": "6bd34aee-0c60-41ad-9902-f4dfca8d8ed8",
+        "renderer_geometry_sha256": "f99ac9d1f89e4cdf9561d8d486dd4521ffb507dc18001175a398a3948c171a24",
+        "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+        "buttons": 0,
+        "pre_drawing": true,
+        "captured_at_utc": "2026-11-10T15:43:32.441+00:00",
+        "clientX": 830.0,
+        "clientY": 297.0,
+        "screenX": 830.0,
+        "screenY": 432.0
+      },
+      {
+        "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+        "source": "window-bubble-after-egret-canvas",
+        "session_id": "6bd34aee-0c60-41ad-9902-f4dfca8d8ed8",
+        "renderer_geometry_sha256": "178931c66fbba64f5c0492ac8574a7e39f0fc224b79d1f28aa26d3cceb8ccd9a",
+        "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+        "buttons": 0,
+        "pre_drawing": true,
+        "captured_at_utc": "2026-11-10T15:43:32.890+00:00",
+        "clientX": 941.0,
+        "clientY": 340.0,
+        "screenX": 941.0,
+        "screenY": 475.0
+      }
+    ],
+    "passive_sample_count": 3,
+    "client_to_desktop_offset": {
+      "x": 0.0,
+      "y": 135.0
+    },
+    "board_screen_corners": {
+      "left": 483.4536882098092,
+      "top": 243.22,
+      "right": 1176.703295745131,
+      "bottom": 605.62
+    },
+    "screen_roi": {
+      "x": 483,
+      "y": 243,
+      "width": 694,
+      "height": 363
+    },
+    "method": "same_session_passive_DOM_mouse_plus_validated_BoardPane_corners",
+    "no_fallback": true,
+    "preflight_valid_at_utc": "2026-11-10T15:43:33.289678+00:00"
+  },
+  "blocked_reason": null,
+  "actual_chalk": null,
+  "game_png_quality": "NOT_EVALUATED",
+  "stage6_execution_allowed": false
+}
