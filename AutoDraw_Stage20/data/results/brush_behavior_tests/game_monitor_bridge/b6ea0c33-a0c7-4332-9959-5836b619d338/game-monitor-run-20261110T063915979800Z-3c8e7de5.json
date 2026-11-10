@@ -1,0 +1,3249 @@
+{
+  "schema_version": 1,
+  "record_type": "autodraw_game_monitor_run",
+  "session_id": "b6ea0c33-a0c7-4332-9959-5836b619d338",
+  "run_id": "3c8e7de5-87a5-4ee0-a864-d0c1df90b1c1",
+  "started_at_utc": "2026-11-10T06:39:12.714+00:00",
+  "started_at_performance_ms": 46011,
+  "execution_status": "completed",
+  "pre_test_snapshot": {
+    "logicalWidth": 460,
+    "logicalHeight": 240,
+    "scaleX": 1,
+    "scaleY": 1,
+    "maxPoints": 6000,
+    "remainingPoints": 5998,
+    "pointCount": 2,
+    "sourceMethod": "BoardPane.max+BoardPane.less",
+    "isExact": true,
+    "validationStatus": "valid",
+    "radius": [
+      0,
+      30,
+      30
+    ],
+    "currentRadius": 30
+  },
+  "post_test_snapshot": {
+    "logicalWidth": 460,
+    "logicalHeight": 240,
+    "scaleX": 1,
+    "scaleY": 1,
+    "maxPoints": 6000,
+    "remainingPoints": 5997,
+    "pointCount": 3,
+    "sourceMethod": "BoardPane.max+BoardPane.less",
+    "isExact": true,
+    "validationStatus": "valid",
+    "radius": [
+      0,
+      30,
+      30
+    ],
+    "currentRadius": 30
+  },
+  "renderer_geometry_at_start": {
+    "inspectionMode": "read_only",
+    "engineVersion": "5.4.1",
+    "renderMode": "webgl",
+    "runtimeType": "web",
+    "systemRenderer": "n",
+    "canvasRenderer": "n",
+    "windowGeometry": {
+      "screenX": -8,
+      "screenY": -8,
+      "outerWidth": 1936,
+      "outerHeight": 1056,
+      "innerWidth": 1920,
+      "innerHeight": 905,
+      "screenWidth": 1920,
+      "screenHeight": 1080,
+      "availableScreenWidth": 1920,
+      "availableScreenHeight": 1032
+    },
+    "canvasScaleFactor": 2,
+    "canvasScaleX": 4,
+    "canvasScaleY": 4,
+    "devicePixelRatio": 1,
+    "visualViewportScale": 1,
+    "playerCount": 1,
+    "players": [
+      {
+        "playerFound": true,
+        "playerMatchesStage": true,
+        "containerRect": {
+          "left": 0,
+          "top": 0,
+          "right": 1920,
+          "bottom": 905,
+          "width": 1920,
+          "height": 905
+        },
+        "playerOptions": {
+          "scaleMode": "fixedHeight",
+          "frameRate": 30,
+          "contentWidth": 740,
+          "contentHeight": 600,
+          "renderModeOption": null
+        },
+        "stage": {
+          "width": 1274,
+          "height": 600,
+          "frameRate": 30,
+          "scaleMode": "fixedHeight",
+          "orientation": "auto"
+        },
+        "canvas": {
+          "width": 5096,
+          "height": 2400,
+          "clientWidth": 5096,
+          "clientHeight": 2400,
+          "offsetLeft": 0,
+          "offsetTop": -1,
+          "rect": {
+            "left": 0,
+            "top": -0.5,
+            "right": 1920,
+            "bottom": 905.5,
+            "width": 1920,
+            "height": 906
+          },
+          "screenQuad": null,
+          "style": {
+            "left": "0px",
+            "top": "-0.5px",
+            "width": "",
+            "height": "",
+            "transform": "matrix(0.376766, 0, 0, 0.3775, 0, 0)",
+            "transformOrigin": "0% 0% 0px",
+            "computedTransform": "matrix(0.376766, 0, 0, 0.3775, 0, 0)",
+            "computedTransformOrigin": "0px 0px"
+          }
+        },
+        "boardStageCorners": {
+          "topLeft": {
+            "x": 320.7916660308838,
+            "y": 72
+          },
+          "topRight": {
+            "x": 780.7916660308838,
+            "y": 72
+          },
+          "bottomRight": {
+            "x": 780.7916660308838,
+            "y": 312
+          },
+          "bottomLeft": {
+            "x": 320.7916660308838,
+            "y": 312
+          }
+        },
+        "boardClientCorners": {
+          "topLeft": {
+            "x": 483.4536882098092,
+            "y": 108.22
+          },
+          "topRight": {
+            "x": 1176.703295745131,
+            "y": 108.22
+          },
+          "bottomRight": {
+            "x": 1176.703295745131,
+            "y": 470.62
+          },
+          "bottomLeft": {
+            "x": 483.4536882098092,
+            "y": 470.62
+          }
+        },
+        "boardClientMappingMethod": "validated_axis_aligned_rect",
+        "boardDisplayChain": [
+          {
+            "className": "o",
+            "x": 30,
+            "y": 75,
+            "width": 460,
+            "height": 240,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": {
+              "x": 0,
+              "y": 0,
+              "width": 460,
+              "height": 240
+            },
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 320.7916660308838,
+              "ty": 72
+            }
+          },
+          {
+            "className": "o",
+            "x": 290.7916660308838,
+            "y": -3,
+            "width": 676,
+            "height": 379,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": null,
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 290.7916660308838,
+              "ty": -3
+            }
+          },
+          {
+            "className": "i",
+            "x": 0,
+            "y": 0,
+            "width": 1274,
+            "height": 603,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": null,
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 0,
+              "ty": 0
+            }
+          },
+          {
+            "className": "Preloader",
+            "x": 0,
+            "y": 0,
+            "width": 3134,
+            "height": 737.9490000000001,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": {
+              "x": 0,
+              "y": 0,
+              "width": 1274,
+              "height": 600
+            },
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 0,
+              "ty": 0
+            }
+          },
+          {
+            "className": "i",
+            "x": 0,
+            "y": 0,
+            "width": 3134,
+            "height": 737.9490000000001,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": null,
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 0,
+              "ty": 0
+            }
+          }
+        ],
+        "boardMask": {
+          "className": "i",
+          "x": 30,
+          "y": 75,
+          "width": 460,
+          "height": 240,
+          "concatenatedMatrix": {
+            "a": 1,
+            "b": 0,
+            "c": 0,
+            "d": 1,
+            "tx": 320.7916660308838,
+            "ty": 72
+          }
+        }
+      }
+    ],
+    "boardDetected": true,
+    "boardLabel": "o",
+    "boardLogicalSize": {
+      "width": 460,
+      "height": 240
+    },
+    "boardDisplayChain": [
+      {
+        "className": "o",
+        "x": 30,
+        "y": 75,
+        "width": 460,
+        "height": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "rotation": 0,
+        "scrollRect": {
+          "x": 0,
+          "y": 0,
+          "width": 460,
+          "height": 240
+        },
+        "concatenatedMatrix": {
+          "a": 1,
+          "b": 0,
+          "c": 0,
+          "d": 1,
+          "tx": 320.7916660308838,
+          "ty": 72
+        }
+      },
+      {
+        "className": "o",
+        "x": 290.7916660308838,
+        "y": -3,
+        "width": 676,
+        "height": 379,
+        "scaleX": 1,
+        "scaleY": 1,
+        "rotation": 0,
+        "scrollRect": null,
+        "concatenatedMatrix": {
+          "a": 1,
+          "b": 0,
+          "c": 0,
+          "d": 1,
+          "tx": 290.7916660308838,
+          "ty": -3
+        }
+      },
+      {
+        "className": "i",
+        "x": 0,
+        "y": 0,
+        "width": 1274,
+        "height": 603,
+        "scaleX": 1,
+        "scaleY": 1,
+        "rotation": 0,
+        "scrollRect": null,
+        "concatenatedMatrix": {
+          "a": 1,
+          "b": 0,
+          "c": 0,
+          "d": 1,
+          "tx": 0,
+          "ty": 0
+        }
+      },
+      {
+        "className": "Preloader",
+        "x": 0,
+        "y": 0,
+        "width": 3134,
+        "height": 737.9490000000001,
+        "scaleX": 1,
+        "scaleY": 1,
+        "rotation": 0,
+        "scrollRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1274,
+          "height": 600
+        },
+        "concatenatedMatrix": {
+          "a": 1,
+          "b": 0,
+          "c": 0,
+          "d": 1,
+          "tx": 0,
+          "ty": 0
+        }
+      },
+      {
+        "className": "i",
+        "x": 0,
+        "y": 0,
+        "width": 3134,
+        "height": 737.9490000000001,
+        "scaleX": 1,
+        "scaleY": 1,
+        "rotation": 0,
+        "scrollRect": null,
+        "concatenatedMatrix": {
+          "a": 1,
+          "b": 0,
+          "c": 0,
+          "d": 1,
+          "tx": 0,
+          "ty": 0
+        }
+      }
+    ]
+  },
+  "renderer_geometry_updated_at_start_utc": "2026-11-10T06:39:11.632+00:00",
+  "bridge_configuration_at_start": {
+    "inputTelemetry": {
+      "requested": true,
+      "enabled": true,
+      "previous": false,
+      "changedByBridge": true,
+      "restoreStatus": "not_required"
+    }
+  },
+  "renderer_geometry_updates": [
+    {
+      "updated_at_utc": "2026-11-10T06:39:13.477+00:00",
+      "reason": "passive_input_preflight",
+      "snapshot": {
+        "inspectionMode": "read_only",
+        "engineVersion": "5.4.1",
+        "renderMode": "webgl",
+        "runtimeType": "web",
+        "systemRenderer": "n",
+        "canvasRenderer": "n",
+        "windowGeometry": {
+          "screenX": -8,
+          "screenY": -8,
+          "outerWidth": 1936,
+          "outerHeight": 1056,
+          "innerWidth": 1920,
+          "innerHeight": 905,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "availableScreenWidth": 1920,
+          "availableScreenHeight": 1032
+        },
+        "canvasScaleFactor": 2,
+        "canvasScaleX": 4,
+        "canvasScaleY": 4,
+        "devicePixelRatio": 1,
+        "visualViewportScale": 1,
+        "playerCount": 1,
+        "players": [
+          {
+            "playerFound": true,
+            "playerMatchesStage": true,
+            "containerRect": {
+              "left": 0,
+              "top": 0,
+              "right": 1920,
+              "bottom": 905,
+              "width": 1920,
+              "height": 905
+            },
+            "playerOptions": {
+              "scaleMode": "fixedHeight",
+              "frameRate": 30,
+              "contentWidth": 740,
+              "contentHeight": 600,
+              "renderModeOption": null
+            },
+            "stage": {
+              "width": 1274,
+              "height": 600,
+              "frameRate": 30,
+              "scaleMode": "fixedHeight",
+              "orientation": "auto"
+            },
+            "canvas": {
+              "width": 5096,
+              "height": 2400,
+              "clientWidth": 5096,
+              "clientHeight": 2400,
+              "offsetLeft": 0,
+              "offsetTop": -1,
+              "rect": {
+                "left": 0,
+                "top": -0.5,
+                "right": 1920,
+                "bottom": 905.5,
+                "width": 1920,
+                "height": 906
+              },
+              "screenQuad": null,
+              "style": {
+                "left": "0px",
+                "top": "-0.5px",
+                "width": "",
+                "height": "",
+                "transform": "matrix(0.376766, 0, 0, 0.3775, 0, 0)",
+                "transformOrigin": "0% 0% 0px",
+                "computedTransform": "matrix(0.376766, 0, 0, 0.3775, 0, 0)",
+                "computedTransformOrigin": "0px 0px"
+              }
+            },
+            "boardStageCorners": {
+              "topLeft": {
+                "x": 320.7916660308838,
+                "y": 72
+              },
+              "topRight": {
+                "x": 780.7916660308838,
+                "y": 72
+              },
+              "bottomRight": {
+                "x": 780.7916660308838,
+                "y": 312
+              },
+              "bottomLeft": {
+                "x": 320.7916660308838,
+                "y": 312
+              }
+            },
+            "boardClientCorners": {
+              "topLeft": {
+                "x": 483.4536882098092,
+                "y": 108.22
+              },
+              "topRight": {
+                "x": 1176.703295745131,
+                "y": 108.22
+              },
+              "bottomRight": {
+                "x": 1176.703295745131,
+                "y": 470.62
+              },
+              "bottomLeft": {
+                "x": 483.4536882098092,
+                "y": 470.62
+              }
+            },
+            "boardClientMappingMethod": "validated_axis_aligned_rect",
+            "boardDisplayChain": [
+              {
+                "className": "o",
+                "x": 30,
+                "y": 75,
+                "width": 460,
+                "height": 240,
+                "scaleX": 1,
+                "scaleY": 1,
+                "rotation": 0,
+                "scrollRect": {
+                  "x": 0,
+                  "y": 0,
+                  "width": 460,
+                  "height": 240
+                },
+                "concatenatedMatrix": {
+                  "a": 1,
+                  "b": 0,
+                  "c": 0,
+                  "d": 1,
+                  "tx": 320.7916660308838,
+                  "ty": 72
+                }
+              },
+              {
+                "className": "o",
+                "x": 290.7916660308838,
+                "y": -3,
+                "width": 676,
+                "height": 379,
+                "scaleX": 1,
+                "scaleY": 1,
+                "rotation": 0,
+                "scrollRect": null,
+                "concatenatedMatrix": {
+                  "a": 1,
+                  "b": 0,
+                  "c": 0,
+                  "d": 1,
+                  "tx": 290.7916660308838,
+                  "ty": -3
+                }
+              },
+              {
+                "className": "i",
+                "x": 0,
+                "y": 0,
+                "width": 1274,
+                "height": 603,
+                "scaleX": 1,
+                "scaleY": 1,
+                "rotation": 0,
+                "scrollRect": null,
+                "concatenatedMatrix": {
+                  "a": 1,
+                  "b": 0,
+                  "c": 0,
+                  "d": 1,
+                  "tx": 0,
+                  "ty": 0
+                }
+              },
+              {
+                "className": "Preloader",
+                "x": 0,
+                "y": 0,
+                "width": 3026,
+                "height": 737.9490000000001,
+                "scaleX": 1,
+                "scaleY": 1,
+                "rotation": 0,
+                "scrollRect": {
+                  "x": 0,
+                  "y": 0,
+                  "width": 1274,
+                  "height": 600
+                },
+                "concatenatedMatrix": {
+                  "a": 1,
+                  "b": 0,
+                  "c": 0,
+                  "d": 1,
+                  "tx": 0,
+                  "ty": 0
+                }
+              },
+              {
+                "className": "i",
+                "x": 0,
+                "y": 0,
+                "width": 3026,
+                "height": 737.9490000000001,
+                "scaleX": 1,
+                "scaleY": 1,
+                "rotation": 0,
+                "scrollRect": null,
+                "concatenatedMatrix": {
+                  "a": 1,
+                  "b": 0,
+                  "c": 0,
+                  "d": 1,
+                  "tx": 0,
+                  "ty": 0
+                }
+              }
+            ],
+            "boardMask": {
+              "className": "i",
+              "x": 30,
+              "y": 75,
+              "width": 460,
+              "height": 240,
+              "concatenatedMatrix": {
+                "a": 1,
+                "b": 0,
+                "c": 0,
+                "d": 1,
+                "tx": 320.7916660308838,
+                "ty": 72
+              }
+            }
+          }
+        ],
+        "boardDetected": true,
+        "boardLabel": "o",
+        "boardLogicalSize": {
+          "width": 460,
+          "height": 240
+        },
+        "boardDisplayChain": [
+          {
+            "className": "o",
+            "x": 30,
+            "y": 75,
+            "width": 460,
+            "height": 240,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": {
+              "x": 0,
+              "y": 0,
+              "width": 460,
+              "height": 240
+            },
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 320.7916660308838,
+              "ty": 72
+            }
+          },
+          {
+            "className": "o",
+            "x": 290.7916660308838,
+            "y": -3,
+            "width": 676,
+            "height": 379,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": null,
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 290.7916660308838,
+              "ty": -3
+            }
+          },
+          {
+            "className": "i",
+            "x": 0,
+            "y": 0,
+            "width": 1274,
+            "height": 603,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": null,
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 0,
+              "ty": 0
+            }
+          },
+          {
+            "className": "Preloader",
+            "x": 0,
+            "y": 0,
+            "width": 3026,
+            "height": 737.9490000000001,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": {
+              "x": 0,
+              "y": 0,
+              "width": 1274,
+              "height": 600
+            },
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 0,
+              "ty": 0
+            }
+          },
+          {
+            "className": "i",
+            "x": 0,
+            "y": 0,
+            "width": 3026,
+            "height": 737.9490000000001,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": null,
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 0,
+              "ty": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "updated_at_utc": "2026-11-10T06:39:13.883+00:00",
+      "reason": "passive_input_preflight",
+      "snapshot": {
+        "inspectionMode": "read_only",
+        "engineVersion": "5.4.1",
+        "renderMode": "webgl",
+        "runtimeType": "web",
+        "systemRenderer": "n",
+        "canvasRenderer": "n",
+        "windowGeometry": {
+          "screenX": -8,
+          "screenY": -8,
+          "outerWidth": 1936,
+          "outerHeight": 1056,
+          "innerWidth": 1920,
+          "innerHeight": 905,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "availableScreenWidth": 1920,
+          "availableScreenHeight": 1032
+        },
+        "canvasScaleFactor": 2,
+        "canvasScaleX": 4,
+        "canvasScaleY": 4,
+        "devicePixelRatio": 1,
+        "visualViewportScale": 1,
+        "playerCount": 1,
+        "players": [
+          {
+            "playerFound": true,
+            "playerMatchesStage": true,
+            "containerRect": {
+              "left": 0,
+              "top": 0,
+              "right": 1920,
+              "bottom": 905,
+              "width": 1920,
+              "height": 905
+            },
+            "playerOptions": {
+              "scaleMode": "fixedHeight",
+              "frameRate": 30,
+              "contentWidth": 740,
+              "contentHeight": 600,
+              "renderModeOption": null
+            },
+            "stage": {
+              "width": 1274,
+              "height": 600,
+              "frameRate": 30,
+              "scaleMode": "fixedHeight",
+              "orientation": "auto"
+            },
+            "canvas": {
+              "width": 5096,
+              "height": 2400,
+              "clientWidth": 5096,
+              "clientHeight": 2400,
+              "offsetLeft": 0,
+              "offsetTop": -1,
+              "rect": {
+                "left": 0,
+                "top": -0.5,
+                "right": 1920,
+                "bottom": 905.5,
+                "width": 1920,
+                "height": 906
+              },
+              "screenQuad": null,
+              "style": {
+                "left": "0px",
+                "top": "-0.5px",
+                "width": "",
+                "height": "",
+                "transform": "matrix(0.376766, 0, 0, 0.3775, 0, 0)",
+                "transformOrigin": "0% 0% 0px",
+                "computedTransform": "matrix(0.376766, 0, 0, 0.3775, 0, 0)",
+                "computedTransformOrigin": "0px 0px"
+              }
+            },
+            "boardStageCorners": {
+              "topLeft": {
+                "x": 320.7916660308838,
+                "y": 72
+              },
+              "topRight": {
+                "x": 780.7916660308838,
+                "y": 72
+              },
+              "bottomRight": {
+                "x": 780.7916660308838,
+                "y": 312
+              },
+              "bottomLeft": {
+                "x": 320.7916660308838,
+                "y": 312
+              }
+            },
+            "boardClientCorners": {
+              "topLeft": {
+                "x": 483.4536882098092,
+                "y": 108.22
+              },
+              "topRight": {
+                "x": 1176.703295745131,
+                "y": 108.22
+              },
+              "bottomRight": {
+                "x": 1176.703295745131,
+                "y": 470.62
+              },
+              "bottomLeft": {
+                "x": 483.4536882098092,
+                "y": 470.62
+              }
+            },
+            "boardClientMappingMethod": "validated_axis_aligned_rect",
+            "boardDisplayChain": [
+              {
+                "className": "o",
+                "x": 30,
+                "y": 75,
+                "width": 460,
+                "height": 240,
+                "scaleX": 1,
+                "scaleY": 1,
+                "rotation": 0,
+                "scrollRect": {
+                  "x": 0,
+                  "y": 0,
+                  "width": 460,
+                  "height": 240
+                },
+                "concatenatedMatrix": {
+                  "a": 1,
+                  "b": 0,
+                  "c": 0,
+                  "d": 1,
+                  "tx": 320.7916660308838,
+                  "ty": 72
+                }
+              },
+              {
+                "className": "o",
+                "x": 290.7916660308838,
+                "y": -3,
+                "width": 676,
+                "height": 379,
+                "scaleX": 1,
+                "scaleY": 1,
+                "rotation": 0,
+                "scrollRect": null,
+                "concatenatedMatrix": {
+                  "a": 1,
+                  "b": 0,
+                  "c": 0,
+                  "d": 1,
+                  "tx": 290.7916660308838,
+                  "ty": -3
+                }
+              },
+              {
+                "className": "i",
+                "x": 0,
+                "y": 0,
+                "width": 1274,
+                "height": 603,
+                "scaleX": 1,
+                "scaleY": 1,
+                "rotation": 0,
+                "scrollRect": null,
+                "concatenatedMatrix": {
+                  "a": 1,
+                  "b": 0,
+                  "c": 0,
+                  "d": 1,
+                  "tx": 0,
+                  "ty": 0
+                }
+              },
+              {
+                "className": "Preloader",
+                "x": 0,
+                "y": 0,
+                "width": 3002,
+                "height": 737.9490000000001,
+                "scaleX": 1,
+                "scaleY": 1,
+                "rotation": 0,
+                "scrollRect": {
+                  "x": 0,
+                  "y": 0,
+                  "width": 1274,
+                  "height": 600
+                },
+                "concatenatedMatrix": {
+                  "a": 1,
+                  "b": 0,
+                  "c": 0,
+                  "d": 1,
+                  "tx": 0,
+                  "ty": 0
+                }
+              },
+              {
+                "className": "i",
+                "x": 0,
+                "y": 0,
+                "width": 3002,
+                "height": 737.9490000000001,
+                "scaleX": 1,
+                "scaleY": 1,
+                "rotation": 0,
+                "scrollRect": null,
+                "concatenatedMatrix": {
+                  "a": 1,
+                  "b": 0,
+                  "c": 0,
+                  "d": 1,
+                  "tx": 0,
+                  "ty": 0
+                }
+              }
+            ],
+            "boardMask": {
+              "className": "i",
+              "x": 30,
+              "y": 75,
+              "width": 460,
+              "height": 240,
+              "concatenatedMatrix": {
+                "a": 1,
+                "b": 0,
+                "c": 0,
+                "d": 1,
+                "tx": 320.7916660308838,
+                "ty": 72
+              }
+            }
+          }
+        ],
+        "boardDetected": true,
+        "boardLabel": "o",
+        "boardLogicalSize": {
+          "width": 460,
+          "height": 240
+        },
+        "boardDisplayChain": [
+          {
+            "className": "o",
+            "x": 30,
+            "y": 75,
+            "width": 460,
+            "height": 240,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": {
+              "x": 0,
+              "y": 0,
+              "width": 460,
+              "height": 240
+            },
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 320.7916660308838,
+              "ty": 72
+            }
+          },
+          {
+            "className": "o",
+            "x": 290.7916660308838,
+            "y": -3,
+            "width": 676,
+            "height": 379,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": null,
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 290.7916660308838,
+              "ty": -3
+            }
+          },
+          {
+            "className": "i",
+            "x": 0,
+            "y": 0,
+            "width": 1274,
+            "height": 603,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": null,
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 0,
+              "ty": 0
+            }
+          },
+          {
+            "className": "Preloader",
+            "x": 0,
+            "y": 0,
+            "width": 3002,
+            "height": 737.9490000000001,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": {
+              "x": 0,
+              "y": 0,
+              "width": 1274,
+              "height": 600
+            },
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 0,
+              "ty": 0
+            }
+          },
+          {
+            "className": "i",
+            "x": 0,
+            "y": 0,
+            "width": 3002,
+            "height": 737.9490000000001,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": null,
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 0,
+              "ty": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "updated_at_utc": "2026-11-10T06:39:14.449+00:00",
+      "reason": "passive_input_preflight",
+      "snapshot": {
+        "inspectionMode": "read_only",
+        "engineVersion": "5.4.1",
+        "renderMode": "webgl",
+        "runtimeType": "web",
+        "systemRenderer": "n",
+        "canvasRenderer": "n",
+        "windowGeometry": {
+          "screenX": -8,
+          "screenY": -8,
+          "outerWidth": 1936,
+          "outerHeight": 1056,
+          "innerWidth": 1920,
+          "innerHeight": 905,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "availableScreenWidth": 1920,
+          "availableScreenHeight": 1032
+        },
+        "canvasScaleFactor": 2,
+        "canvasScaleX": 4,
+        "canvasScaleY": 4,
+        "devicePixelRatio": 1,
+        "visualViewportScale": 1,
+        "playerCount": 1,
+        "players": [
+          {
+            "playerFound": true,
+            "playerMatchesStage": true,
+            "containerRect": {
+              "left": 0,
+              "top": 0,
+              "right": 1920,
+              "bottom": 905,
+              "width": 1920,
+              "height": 905
+            },
+            "playerOptions": {
+              "scaleMode": "fixedHeight",
+              "frameRate": 30,
+              "contentWidth": 740,
+              "contentHeight": 600,
+              "renderModeOption": null
+            },
+            "stage": {
+              "width": 1274,
+              "height": 600,
+              "frameRate": 30,
+              "scaleMode": "fixedHeight",
+              "orientation": "auto"
+            },
+            "canvas": {
+              "width": 5096,
+              "height": 2400,
+              "clientWidth": 5096,
+              "clientHeight": 2400,
+              "offsetLeft": 0,
+              "offsetTop": -1,
+              "rect": {
+                "left": 0,
+                "top": -0.5,
+                "right": 1920,
+                "bottom": 905.5,
+                "width": 1920,
+                "height": 906
+              },
+              "screenQuad": null,
+              "style": {
+                "left": "0px",
+                "top": "-0.5px",
+                "width": "",
+                "height": "",
+                "transform": "matrix(0.376766, 0, 0, 0.3775, 0, 0)",
+                "transformOrigin": "0% 0% 0px",
+                "computedTransform": "matrix(0.376766, 0, 0, 0.3775, 0, 0)",
+                "computedTransformOrigin": "0px 0px"
+              }
+            },
+            "boardStageCorners": {
+              "topLeft": {
+                "x": 320.7916660308838,
+                "y": 72
+              },
+              "topRight": {
+                "x": 780.7916660308838,
+                "y": 72
+              },
+              "bottomRight": {
+                "x": 780.7916660308838,
+                "y": 312
+              },
+              "bottomLeft": {
+                "x": 320.7916660308838,
+                "y": 312
+              }
+            },
+            "boardClientCorners": {
+              "topLeft": {
+                "x": 483.4536882098092,
+                "y": 108.22
+              },
+              "topRight": {
+                "x": 1176.703295745131,
+                "y": 108.22
+              },
+              "bottomRight": {
+                "x": 1176.703295745131,
+                "y": 470.62
+              },
+              "bottomLeft": {
+                "x": 483.4536882098092,
+                "y": 470.62
+              }
+            },
+            "boardClientMappingMethod": "validated_axis_aligned_rect",
+            "boardDisplayChain": [
+              {
+                "className": "o",
+                "x": 30,
+                "y": 75,
+                "width": 460,
+                "height": 240,
+                "scaleX": 1,
+                "scaleY": 1,
+                "rotation": 0,
+                "scrollRect": {
+                  "x": 0,
+                  "y": 0,
+                  "width": 460,
+                  "height": 240
+                },
+                "concatenatedMatrix": {
+                  "a": 1,
+                  "b": 0,
+                  "c": 0,
+                  "d": 1,
+                  "tx": 320.7916660308838,
+                  "ty": 72
+                }
+              },
+              {
+                "className": "o",
+                "x": 290.7916660308838,
+                "y": -3,
+                "width": 676,
+                "height": 379,
+                "scaleX": 1,
+                "scaleY": 1,
+                "rotation": 0,
+                "scrollRect": null,
+                "concatenatedMatrix": {
+                  "a": 1,
+                  "b": 0,
+                  "c": 0,
+                  "d": 1,
+                  "tx": 290.7916660308838,
+                  "ty": -3
+                }
+              },
+              {
+                "className": "i",
+                "x": 0,
+                "y": 0,
+                "width": 1274,
+                "height": 603,
+                "scaleX": 1,
+                "scaleY": 1,
+                "rotation": 0,
+                "scrollRect": null,
+                "concatenatedMatrix": {
+                  "a": 1,
+                  "b": 0,
+                  "c": 0,
+                  "d": 1,
+                  "tx": 0,
+                  "ty": 0
+                }
+              },
+              {
+                "className": "Preloader",
+                "x": 0,
+                "y": 0,
+                "width": 2968,
+                "height": 737.9490000000001,
+                "scaleX": 1,
+                "scaleY": 1,
+                "rotation": 0,
+                "scrollRect": {
+                  "x": 0,
+                  "y": 0,
+                  "width": 1274,
+                  "height": 600
+                },
+                "concatenatedMatrix": {
+                  "a": 1,
+                  "b": 0,
+                  "c": 0,
+                  "d": 1,
+                  "tx": 0,
+                  "ty": 0
+                }
+              },
+              {
+                "className": "i",
+                "x": 0,
+                "y": 0,
+                "width": 2968,
+                "height": 737.9490000000001,
+                "scaleX": 1,
+                "scaleY": 1,
+                "rotation": 0,
+                "scrollRect": null,
+                "concatenatedMatrix": {
+                  "a": 1,
+                  "b": 0,
+                  "c": 0,
+                  "d": 1,
+                  "tx": 0,
+                  "ty": 0
+                }
+              }
+            ],
+            "boardMask": {
+              "className": "i",
+              "x": 30,
+              "y": 75,
+              "width": 460,
+              "height": 240,
+              "concatenatedMatrix": {
+                "a": 1,
+                "b": 0,
+                "c": 0,
+                "d": 1,
+                "tx": 320.7916660308838,
+                "ty": 72
+              }
+            }
+          }
+        ],
+        "boardDetected": true,
+        "boardLabel": "o",
+        "boardLogicalSize": {
+          "width": 460,
+          "height": 240
+        },
+        "boardDisplayChain": [
+          {
+            "className": "o",
+            "x": 30,
+            "y": 75,
+            "width": 460,
+            "height": 240,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": {
+              "x": 0,
+              "y": 0,
+              "width": 460,
+              "height": 240
+            },
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 320.7916660308838,
+              "ty": 72
+            }
+          },
+          {
+            "className": "o",
+            "x": 290.7916660308838,
+            "y": -3,
+            "width": 676,
+            "height": 379,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": null,
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 290.7916660308838,
+              "ty": -3
+            }
+          },
+          {
+            "className": "i",
+            "x": 0,
+            "y": 0,
+            "width": 1274,
+            "height": 603,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": null,
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 0,
+              "ty": 0
+            }
+          },
+          {
+            "className": "Preloader",
+            "x": 0,
+            "y": 0,
+            "width": 2968,
+            "height": 737.9490000000001,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": {
+              "x": 0,
+              "y": 0,
+              "width": 1274,
+              "height": 600
+            },
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 0,
+              "ty": 0
+            }
+          },
+          {
+            "className": "i",
+            "x": 0,
+            "y": 0,
+            "width": 2968,
+            "height": 737.9490000000001,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": null,
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 0,
+              "ty": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "updated_at_utc": "2026-11-10T06:39:15.028+00:00",
+      "reason": "passive_input_preflight",
+      "snapshot": {
+        "inspectionMode": "read_only",
+        "engineVersion": "5.4.1",
+        "renderMode": "webgl",
+        "runtimeType": "web",
+        "systemRenderer": "n",
+        "canvasRenderer": "n",
+        "windowGeometry": {
+          "screenX": -8,
+          "screenY": -8,
+          "outerWidth": 1936,
+          "outerHeight": 1056,
+          "innerWidth": 1920,
+          "innerHeight": 905,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "availableScreenWidth": 1920,
+          "availableScreenHeight": 1032
+        },
+        "canvasScaleFactor": 2,
+        "canvasScaleX": 4,
+        "canvasScaleY": 4,
+        "devicePixelRatio": 1,
+        "visualViewportScale": 1,
+        "playerCount": 1,
+        "players": [
+          {
+            "playerFound": true,
+            "playerMatchesStage": true,
+            "containerRect": {
+              "left": 0,
+              "top": 0,
+              "right": 1920,
+              "bottom": 905,
+              "width": 1920,
+              "height": 905
+            },
+            "playerOptions": {
+              "scaleMode": "fixedHeight",
+              "frameRate": 30,
+              "contentWidth": 740,
+              "contentHeight": 600,
+              "renderModeOption": null
+            },
+            "stage": {
+              "width": 1274,
+              "height": 600,
+              "frameRate": 30,
+              "scaleMode": "fixedHeight",
+              "orientation": "auto"
+            },
+            "canvas": {
+              "width": 5096,
+              "height": 2400,
+              "clientWidth": 5096,
+              "clientHeight": 2400,
+              "offsetLeft": 0,
+              "offsetTop": -1,
+              "rect": {
+                "left": 0,
+                "top": -0.5,
+                "right": 1920,
+                "bottom": 905.5,
+                "width": 1920,
+                "height": 906
+              },
+              "screenQuad": null,
+              "style": {
+                "left": "0px",
+                "top": "-0.5px",
+                "width": "",
+                "height": "",
+                "transform": "matrix(0.376766, 0, 0, 0.3775, 0, 0)",
+                "transformOrigin": "0% 0% 0px",
+                "computedTransform": "matrix(0.376766, 0, 0, 0.3775, 0, 0)",
+                "computedTransformOrigin": "0px 0px"
+              }
+            },
+            "boardStageCorners": {
+              "topLeft": {
+                "x": 320.7916660308838,
+                "y": 72
+              },
+              "topRight": {
+                "x": 780.7916660308838,
+                "y": 72
+              },
+              "bottomRight": {
+                "x": 780.7916660308838,
+                "y": 312
+              },
+              "bottomLeft": {
+                "x": 320.7916660308838,
+                "y": 312
+              }
+            },
+            "boardClientCorners": {
+              "topLeft": {
+                "x": 483.4536882098092,
+                "y": 108.22
+              },
+              "topRight": {
+                "x": 1176.703295745131,
+                "y": 108.22
+              },
+              "bottomRight": {
+                "x": 1176.703295745131,
+                "y": 470.62
+              },
+              "bottomLeft": {
+                "x": 483.4536882098092,
+                "y": 470.62
+              }
+            },
+            "boardClientMappingMethod": "validated_axis_aligned_rect",
+            "boardDisplayChain": [
+              {
+                "className": "o",
+                "x": 30,
+                "y": 75,
+                "width": 460,
+                "height": 240,
+                "scaleX": 1,
+                "scaleY": 1,
+                "rotation": 0,
+                "scrollRect": {
+                  "x": 0,
+                  "y": 0,
+                  "width": 460,
+                  "height": 240
+                },
+                "concatenatedMatrix": {
+                  "a": 1,
+                  "b": 0,
+                  "c": 0,
+                  "d": 1,
+                  "tx": 320.7916660308838,
+                  "ty": 72
+                }
+              },
+              {
+                "className": "o",
+                "x": 290.7916660308838,
+                "y": -3,
+                "width": 676,
+                "height": 379,
+                "scaleX": 1,
+                "scaleY": 1,
+                "rotation": 0,
+                "scrollRect": null,
+                "concatenatedMatrix": {
+                  "a": 1,
+                  "b": 0,
+                  "c": 0,
+                  "d": 1,
+                  "tx": 290.7916660308838,
+                  "ty": -3
+                }
+              },
+              {
+                "className": "i",
+                "x": 0,
+                "y": 0,
+                "width": 1274,
+                "height": 603,
+                "scaleX": 1,
+                "scaleY": 1,
+                "rotation": 0,
+                "scrollRect": null,
+                "concatenatedMatrix": {
+                  "a": 1,
+                  "b": 0,
+                  "c": 0,
+                  "d": 1,
+                  "tx": 0,
+                  "ty": 0
+                }
+              },
+              {
+                "className": "Preloader",
+                "x": 0,
+                "y": 0,
+                "width": 2934,
+                "height": 737.9490000000001,
+                "scaleX": 1,
+                "scaleY": 1,
+                "rotation": 0,
+                "scrollRect": {
+                  "x": 0,
+                  "y": 0,
+                  "width": 1274,
+                  "height": 600
+                },
+                "concatenatedMatrix": {
+                  "a": 1,
+                  "b": 0,
+                  "c": 0,
+                  "d": 1,
+                  "tx": 0,
+                  "ty": 0
+                }
+              },
+              {
+                "className": "i",
+                "x": 0,
+                "y": 0,
+                "width": 2934,
+                "height": 737.9490000000001,
+                "scaleX": 1,
+                "scaleY": 1,
+                "rotation": 0,
+                "scrollRect": null,
+                "concatenatedMatrix": {
+                  "a": 1,
+                  "b": 0,
+                  "c": 0,
+                  "d": 1,
+                  "tx": 0,
+                  "ty": 0
+                }
+              }
+            ],
+            "boardMask": {
+              "className": "i",
+              "x": 30,
+              "y": 75,
+              "width": 460,
+              "height": 240,
+              "concatenatedMatrix": {
+                "a": 1,
+                "b": 0,
+                "c": 0,
+                "d": 1,
+                "tx": 320.7916660308838,
+                "ty": 72
+              }
+            }
+          }
+        ],
+        "boardDetected": true,
+        "boardLabel": "o",
+        "boardLogicalSize": {
+          "width": 460,
+          "height": 240
+        },
+        "boardDisplayChain": [
+          {
+            "className": "o",
+            "x": 30,
+            "y": 75,
+            "width": 460,
+            "height": 240,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": {
+              "x": 0,
+              "y": 0,
+              "width": 460,
+              "height": 240
+            },
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 320.7916660308838,
+              "ty": 72
+            }
+          },
+          {
+            "className": "o",
+            "x": 290.7916660308838,
+            "y": -3,
+            "width": 676,
+            "height": 379,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": null,
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 290.7916660308838,
+              "ty": -3
+            }
+          },
+          {
+            "className": "i",
+            "x": 0,
+            "y": 0,
+            "width": 1274,
+            "height": 603,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": null,
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 0,
+              "ty": 0
+            }
+          },
+          {
+            "className": "Preloader",
+            "x": 0,
+            "y": 0,
+            "width": 2934,
+            "height": 737.9490000000001,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": {
+              "x": 0,
+              "y": 0,
+              "width": 1274,
+              "height": 600
+            },
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 0,
+              "ty": 0
+            }
+          },
+          {
+            "className": "i",
+            "x": 0,
+            "y": 0,
+            "width": 2934,
+            "height": 737.9490000000001,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": null,
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 0,
+              "ty": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "updated_at_utc": "2026-11-10T06:39:15.479+00:00",
+      "reason": "passive_input_preflight",
+      "snapshot": {
+        "inspectionMode": "read_only",
+        "engineVersion": "5.4.1",
+        "renderMode": "webgl",
+        "runtimeType": "web",
+        "systemRenderer": "n",
+        "canvasRenderer": "n",
+        "windowGeometry": {
+          "screenX": -8,
+          "screenY": -8,
+          "outerWidth": 1936,
+          "outerHeight": 1056,
+          "innerWidth": 1920,
+          "innerHeight": 905,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "availableScreenWidth": 1920,
+          "availableScreenHeight": 1032
+        },
+        "canvasScaleFactor": 2,
+        "canvasScaleX": 4,
+        "canvasScaleY": 4,
+        "devicePixelRatio": 1,
+        "visualViewportScale": 1,
+        "playerCount": 1,
+        "players": [
+          {
+            "playerFound": true,
+            "playerMatchesStage": true,
+            "containerRect": {
+              "left": 0,
+              "top": 0,
+              "right": 1920,
+              "bottom": 905,
+              "width": 1920,
+              "height": 905
+            },
+            "playerOptions": {
+              "scaleMode": "fixedHeight",
+              "frameRate": 30,
+              "contentWidth": 740,
+              "contentHeight": 600,
+              "renderModeOption": null
+            },
+            "stage": {
+              "width": 1274,
+              "height": 600,
+              "frameRate": 30,
+              "scaleMode": "fixedHeight",
+              "orientation": "auto"
+            },
+            "canvas": {
+              "width": 5096,
+              "height": 2400,
+              "clientWidth": 5096,
+              "clientHeight": 2400,
+              "offsetLeft": 0,
+              "offsetTop": -1,
+              "rect": {
+                "left": 0,
+                "top": -0.5,
+                "right": 1920,
+                "bottom": 905.5,
+                "width": 1920,
+                "height": 906
+              },
+              "screenQuad": null,
+              "style": {
+                "left": "0px",
+                "top": "-0.5px",
+                "width": "",
+                "height": "",
+                "transform": "matrix(0.376766, 0, 0, 0.3775, 0, 0)",
+                "transformOrigin": "0% 0% 0px",
+                "computedTransform": "matrix(0.376766, 0, 0, 0.3775, 0, 0)",
+                "computedTransformOrigin": "0px 0px"
+              }
+            },
+            "boardStageCorners": {
+              "topLeft": {
+                "x": 320.7916660308838,
+                "y": 72
+              },
+              "topRight": {
+                "x": 780.7916660308838,
+                "y": 72
+              },
+              "bottomRight": {
+                "x": 780.7916660308838,
+                "y": 312
+              },
+              "bottomLeft": {
+                "x": 320.7916660308838,
+                "y": 312
+              }
+            },
+            "boardClientCorners": {
+              "topLeft": {
+                "x": 483.4536882098092,
+                "y": 108.22
+              },
+              "topRight": {
+                "x": 1176.703295745131,
+                "y": 108.22
+              },
+              "bottomRight": {
+                "x": 1176.703295745131,
+                "y": 470.62
+              },
+              "bottomLeft": {
+                "x": 483.4536882098092,
+                "y": 470.62
+              }
+            },
+            "boardClientMappingMethod": "validated_axis_aligned_rect",
+            "boardDisplayChain": [
+              {
+                "className": "o",
+                "x": 30,
+                "y": 75,
+                "width": 460,
+                "height": 240,
+                "scaleX": 1,
+                "scaleY": 1,
+                "rotation": 0,
+                "scrollRect": {
+                  "x": 0,
+                  "y": 0,
+                  "width": 460,
+                  "height": 240
+                },
+                "concatenatedMatrix": {
+                  "a": 1,
+                  "b": 0,
+                  "c": 0,
+                  "d": 1,
+                  "tx": 320.7916660308838,
+                  "ty": 72
+                }
+              },
+              {
+                "className": "o",
+                "x": 290.7916660308838,
+                "y": -3,
+                "width": 676,
+                "height": 379,
+                "scaleX": 1,
+                "scaleY": 1,
+                "rotation": 0,
+                "scrollRect": null,
+                "concatenatedMatrix": {
+                  "a": 1,
+                  "b": 0,
+                  "c": 0,
+                  "d": 1,
+                  "tx": 290.7916660308838,
+                  "ty": -3
+                }
+              },
+              {
+                "className": "i",
+                "x": 0,
+                "y": 0,
+                "width": 1274,
+                "height": 603,
+                "scaleX": 1,
+                "scaleY": 1,
+                "rotation": 0,
+                "scrollRect": null,
+                "concatenatedMatrix": {
+                  "a": 1,
+                  "b": 0,
+                  "c": 0,
+                  "d": 1,
+                  "tx": 0,
+                  "ty": 0
+                }
+              },
+              {
+                "className": "Preloader",
+                "x": 0,
+                "y": 0,
+                "width": 2908,
+                "height": 737.9490000000001,
+                "scaleX": 1,
+                "scaleY": 1,
+                "rotation": 0,
+                "scrollRect": {
+                  "x": 0,
+                  "y": 0,
+                  "width": 1274,
+                  "height": 600
+                },
+                "concatenatedMatrix": {
+                  "a": 1,
+                  "b": 0,
+                  "c": 0,
+                  "d": 1,
+                  "tx": 0,
+                  "ty": 0
+                }
+              },
+              {
+                "className": "i",
+                "x": 0,
+                "y": 0,
+                "width": 2908,
+                "height": 737.9490000000001,
+                "scaleX": 1,
+                "scaleY": 1,
+                "rotation": 0,
+                "scrollRect": null,
+                "concatenatedMatrix": {
+                  "a": 1,
+                  "b": 0,
+                  "c": 0,
+                  "d": 1,
+                  "tx": 0,
+                  "ty": 0
+                }
+              }
+            ],
+            "boardMask": {
+              "className": "i",
+              "x": 30,
+              "y": 75,
+              "width": 460,
+              "height": 240,
+              "concatenatedMatrix": {
+                "a": 1,
+                "b": 0,
+                "c": 0,
+                "d": 1,
+                "tx": 320.7916660308838,
+                "ty": 72
+              }
+            }
+          }
+        ],
+        "boardDetected": true,
+        "boardLabel": "o",
+        "boardLogicalSize": {
+          "width": 460,
+          "height": 240
+        },
+        "boardDisplayChain": [
+          {
+            "className": "o",
+            "x": 30,
+            "y": 75,
+            "width": 460,
+            "height": 240,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": {
+              "x": 0,
+              "y": 0,
+              "width": 460,
+              "height": 240
+            },
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 320.7916660308838,
+              "ty": 72
+            }
+          },
+          {
+            "className": "o",
+            "x": 290.7916660308838,
+            "y": -3,
+            "width": 676,
+            "height": 379,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": null,
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 290.7916660308838,
+              "ty": -3
+            }
+          },
+          {
+            "className": "i",
+            "x": 0,
+            "y": 0,
+            "width": 1274,
+            "height": 603,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": null,
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 0,
+              "ty": 0
+            }
+          },
+          {
+            "className": "Preloader",
+            "x": 0,
+            "y": 0,
+            "width": 2908,
+            "height": 737.9490000000001,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": {
+              "x": 0,
+              "y": 0,
+              "width": 1274,
+              "height": 600
+            },
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 0,
+              "ty": 0
+            }
+          },
+          {
+            "className": "i",
+            "x": 0,
+            "y": 0,
+            "width": 2908,
+            "height": 737.9490000000001,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": null,
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 0,
+              "ty": 0
+            }
+          }
+        ]
+      }
+    },
+    {
+      "updated_at_utc": "2026-11-10T06:39:15.930+00:00",
+      "reason": "passive_input_preflight",
+      "snapshot": {
+        "inspectionMode": "read_only",
+        "engineVersion": "5.4.1",
+        "renderMode": "webgl",
+        "runtimeType": "web",
+        "systemRenderer": "n",
+        "canvasRenderer": "n",
+        "windowGeometry": {
+          "screenX": -8,
+          "screenY": -8,
+          "outerWidth": 1936,
+          "outerHeight": 1056,
+          "innerWidth": 1920,
+          "innerHeight": 905,
+          "screenWidth": 1920,
+          "screenHeight": 1080,
+          "availableScreenWidth": 1920,
+          "availableScreenHeight": 1032
+        },
+        "canvasScaleFactor": 2,
+        "canvasScaleX": 4,
+        "canvasScaleY": 4,
+        "devicePixelRatio": 1,
+        "visualViewportScale": 1,
+        "playerCount": 1,
+        "players": [
+          {
+            "playerFound": true,
+            "playerMatchesStage": true,
+            "containerRect": {
+              "left": 0,
+              "top": 0,
+              "right": 1920,
+              "bottom": 905,
+              "width": 1920,
+              "height": 905
+            },
+            "playerOptions": {
+              "scaleMode": "fixedHeight",
+              "frameRate": 30,
+              "contentWidth": 740,
+              "contentHeight": 600,
+              "renderModeOption": null
+            },
+            "stage": {
+              "width": 1274,
+              "height": 600,
+              "frameRate": 30,
+              "scaleMode": "fixedHeight",
+              "orientation": "auto"
+            },
+            "canvas": {
+              "width": 5096,
+              "height": 2400,
+              "clientWidth": 5096,
+              "clientHeight": 2400,
+              "offsetLeft": 0,
+              "offsetTop": -1,
+              "rect": {
+                "left": 0,
+                "top": -0.5,
+                "right": 1920,
+                "bottom": 905.5,
+                "width": 1920,
+                "height": 906
+              },
+              "screenQuad": null,
+              "style": {
+                "left": "0px",
+                "top": "-0.5px",
+                "width": "",
+                "height": "",
+                "transform": "matrix(0.376766, 0, 0, 0.3775, 0, 0)",
+                "transformOrigin": "0% 0% 0px",
+                "computedTransform": "matrix(0.376766, 0, 0, 0.3775, 0, 0)",
+                "computedTransformOrigin": "0px 0px"
+              }
+            },
+            "boardStageCorners": {
+              "topLeft": {
+                "x": 320.7916660308838,
+                "y": 72
+              },
+              "topRight": {
+                "x": 780.7916660308838,
+                "y": 72
+              },
+              "bottomRight": {
+                "x": 780.7916660308838,
+                "y": 312
+              },
+              "bottomLeft": {
+                "x": 320.7916660308838,
+                "y": 312
+              }
+            },
+            "boardClientCorners": {
+              "topLeft": {
+                "x": 483.4536882098092,
+                "y": 108.22
+              },
+              "topRight": {
+                "x": 1176.703295745131,
+                "y": 108.22
+              },
+              "bottomRight": {
+                "x": 1176.703295745131,
+                "y": 470.62
+              },
+              "bottomLeft": {
+                "x": 483.4536882098092,
+                "y": 470.62
+              }
+            },
+            "boardClientMappingMethod": "validated_axis_aligned_rect",
+            "boardDisplayChain": [
+              {
+                "className": "o",
+                "x": 30,
+                "y": 75,
+                "width": 460,
+                "height": 240,
+                "scaleX": 1,
+                "scaleY": 1,
+                "rotation": 0,
+                "scrollRect": {
+                  "x": 0,
+                  "y": 0,
+                  "width": 460,
+                  "height": 240
+                },
+                "concatenatedMatrix": {
+                  "a": 1,
+                  "b": 0,
+                  "c": 0,
+                  "d": 1,
+                  "tx": 320.7916660308838,
+                  "ty": 72
+                }
+              },
+              {
+                "className": "o",
+                "x": 290.7916660308838,
+                "y": -3,
+                "width": 676,
+                "height": 379,
+                "scaleX": 1,
+                "scaleY": 1,
+                "rotation": 0,
+                "scrollRect": null,
+                "concatenatedMatrix": {
+                  "a": 1,
+                  "b": 0,
+                  "c": 0,
+                  "d": 1,
+                  "tx": 290.7916660308838,
+                  "ty": -3
+                }
+              },
+              {
+                "className": "i",
+                "x": 0,
+                "y": 0,
+                "width": 1274,
+                "height": 603,
+                "scaleX": 1,
+                "scaleY": 1,
+                "rotation": 0,
+                "scrollRect": null,
+                "concatenatedMatrix": {
+                  "a": 1,
+                  "b": 0,
+                  "c": 0,
+                  "d": 1,
+                  "tx": 0,
+                  "ty": 0
+                }
+              },
+              {
+                "className": "Preloader",
+                "x": 0,
+                "y": 0,
+                "width": 2882,
+                "height": 737.9490000000001,
+                "scaleX": 1,
+                "scaleY": 1,
+                "rotation": 0,
+                "scrollRect": {
+                  "x": 0,
+                  "y": 0,
+                  "width": 1274,
+                  "height": 600
+                },
+                "concatenatedMatrix": {
+                  "a": 1,
+                  "b": 0,
+                  "c": 0,
+                  "d": 1,
+                  "tx": 0,
+                  "ty": 0
+                }
+              },
+              {
+                "className": "i",
+                "x": 0,
+                "y": 0,
+                "width": 2882,
+                "height": 737.9490000000001,
+                "scaleX": 1,
+                "scaleY": 1,
+                "rotation": 0,
+                "scrollRect": null,
+                "concatenatedMatrix": {
+                  "a": 1,
+                  "b": 0,
+                  "c": 0,
+                  "d": 1,
+                  "tx": 0,
+                  "ty": 0
+                }
+              }
+            ],
+            "boardMask": {
+              "className": "i",
+              "x": 30,
+              "y": 75,
+              "width": 460,
+              "height": 240,
+              "concatenatedMatrix": {
+                "a": 1,
+                "b": 0,
+                "c": 0,
+                "d": 1,
+                "tx": 320.7916660308838,
+                "ty": 72
+              }
+            }
+          }
+        ],
+        "boardDetected": true,
+        "boardLabel": "o",
+        "boardLogicalSize": {
+          "width": 460,
+          "height": 240
+        },
+        "boardDisplayChain": [
+          {
+            "className": "o",
+            "x": 30,
+            "y": 75,
+            "width": 460,
+            "height": 240,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": {
+              "x": 0,
+              "y": 0,
+              "width": 460,
+              "height": 240
+            },
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 320.7916660308838,
+              "ty": 72
+            }
+          },
+          {
+            "className": "o",
+            "x": 290.7916660308838,
+            "y": -3,
+            "width": 676,
+            "height": 379,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": null,
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 290.7916660308838,
+              "ty": -3
+            }
+          },
+          {
+            "className": "i",
+            "x": 0,
+            "y": 0,
+            "width": 1274,
+            "height": 603,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": null,
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 0,
+              "ty": 0
+            }
+          },
+          {
+            "className": "Preloader",
+            "x": 0,
+            "y": 0,
+            "width": 2882,
+            "height": 737.9490000000001,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": {
+              "x": 0,
+              "y": 0,
+              "width": 1274,
+              "height": 600
+            },
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 0,
+              "ty": 0
+            }
+          },
+          {
+            "className": "i",
+            "x": 0,
+            "y": 0,
+            "width": 2882,
+            "height": 737.9490000000001,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": null,
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 0,
+              "ty": 0
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "renderer_geometry_update_overflow_count": 0,
+  "brush_radius": 30,
+  "events": [
+    {
+      "monitorVersion": "0.2.4",
+      "t": 46011,
+      "type": "POINTER_DOWN_CANDIDATE",
+      "strokeId": "pointer-stroke-1",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "clientX": 632,
+      "clientY": 282,
+      "pointerType": "mouse"
+    },
+    {
+      "monitorVersion": "0.2.4",
+      "t": 46011,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-1",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "source": "onDrawStart",
+      "previousSignature": null,
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "pointDelta": 0,
+      "acceptedPoint": null
+    },
+    {
+      "monitorVersion": "0.2.4",
+      "t": 46012,
+      "type": "POINT_QUOTA_UPDATE",
+      "strokeId": "pointer-stroke-1",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5997,
+        "pointCount": 3,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "before": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5998,
+        "pointCount": 2,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5997,
+        "pointCount": 3,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "args": [],
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 98.20833396911621,
+        "y": 115
+      },
+      "stageX": 419,
+      "stageY": 187,
+      "boardX": 98.20833396911621,
+      "boardY": 115
+    },
+    {
+      "monitorVersion": "0.2.4",
+      "t": 46017,
+      "type": "DRAW_SAMPLE",
+      "strokeId": "pointer-stroke-1",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5997,
+        "pointCount": 3,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "source": "stroke_end",
+      "previousSignature": "[6000,5998,2,\"valid\"]",
+      "after": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5997,
+        "pointCount": 3,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "pointDelta": 1,
+      "acceptedPoint": {
+        "x": 98.20833396911621,
+        "y": 115
+      }
+    },
+    {
+      "monitorVersion": "0.2.4",
+      "t": 46017,
+      "type": "POINTER_UP_CANDIDATE",
+      "strokeId": "pointer-stroke-1",
+      "board": {
+        "logicalWidth": 460,
+        "logicalHeight": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "maxPoints": 6000,
+        "remainingPoints": 5997,
+        "pointCount": 3,
+        "sourceMethod": "BoardPane.max+BoardPane.less",
+        "isExact": true,
+        "validationStatus": "valid",
+        "radius": [
+          0,
+          30,
+          30
+        ],
+        "currentRadius": 30
+      },
+      "clientX": 632,
+      "clientY": 282,
+      "pointerType": "mouse"
+    }
+  ],
+  "frame_probes": [
+    {
+      "stroke_id": "pointer-stroke-1",
+      "started_at_performance_ms": 46011,
+      "ended_at_performance_ms": 46017,
+      "visible": true,
+      "intervals": []
+    }
+  ],
+  "active_drawing_duration_ms": 6.0,
+  "dropped_events": 0,
+  "monitor_buffer_dropped_events_start": 0,
+  "monitor_buffer_dropped_events_end": 0,
+  "monitor_buffer_dropped_events_delta": 0,
+  "monitor_error_count_start": 0,
+  "monitor_error_count_end": 0,
+  "monitor_error_count_delta": 0,
+  "bridge_send_failures_start": 0,
+  "bridge_send_failures_end": 0,
+  "bridge_send_failures_delta": 0,
+  "collector_sequence_gap_count": 0,
+  "monitor_errors": [],
+  "interpretation": {
+    "chalk_status": "exact",
+    "path_length_status": "incomplete_until_verified"
+  },
+  "accepted_points": [
+    {
+      "t": 46017,
+      "stroke_id": "pointer-stroke-1",
+      "x": 98.20833396911621,
+      "y": 115,
+      "point_delta": 1
+    }
+  ],
+  "ended_at_performance_ms": 46017,
+  "monitor_dropped_events": 0,
+  "monitor_error_count": 0,
+  "monitor_active": true,
+  "chalk": {
+    "status": "exact",
+    "consumed_points": 1,
+    "pre_point_count": 2,
+    "post_point_count": 3,
+    "max_points": 6000
+  },
+  "stroke_count": 1,
+  "stroke_candidate_count": 1,
+  "non_consuming_stroke_candidate_count": 0,
+  "stroke_lifecycle_sources": [
+    "pointer_observer"
+  ],
+  "sampled_point_delta_total": 1,
+  "point_delta_matches_chalk": true,
+  "observed_brush_radii": [
+    30.0
+  ],
+  "brush_radius_status": "single",
+  "trajectory": {
+    "observed_segment_length_lower_bound": 0.0,
+    "accepted_sample_count": 1,
+    "status": "incomplete_until_verified",
+    "note": "Coalesced pointDelta values mean intermediate accepted coordinates may be missing."
+  },
+  "per_stroke_metrics": [
+    {
+      "stroke_id": "pointer-stroke-1",
+      "lifecycle_status": "complete",
+      "started_at_performance_ms": 46011,
+      "ended_at_performance_ms": 46017,
+      "duration_ms": 6.0,
+      "point_count_before": 2,
+      "point_count_after": 3,
+      "point_count_delta": 1,
+      "point_update_event_count": 1,
+      "point_update_delta_sum": 1,
+      "point_count_delta_matches_updates": true,
+      "accepted_points_per_second": 166.667,
+      "median_point_update_interval_ms": null,
+      "p95_point_update_interval_ms": null,
+      "max_point_update_interval_ms": null
+    }
+  ],
+  "engine_frame_samples": {
+    "source": "BoardPane.EgretEvent.ENTER_FRAME_observer",
+    "event_count": 0,
+    "by_stroke": [],
+    "is_full_engine_render_timeline": false,
+    "caveat": "Observer may miss callbacks and does not establish game render ordering."
+  },
+  "observed_stroke_modes": [],
+  "frame_probe_by_stroke": [
+    {
+      "status": "unavailable",
+      "frame_count": 0,
+      "average_fps": null,
+      "median_fps": null,
+      "median_interval_ms": null,
+      "p95_interval_ms": null,
+      "max_interval_ms": null,
+      "stroke_id": "pointer-stroke-1",
+      "started_at_performance_ms": 46011,
+      "ended_at_performance_ms": 46017,
+      "visible": true
+    }
+  ],
+  "frame_probe": {
+    "status": "unavailable",
+    "frame_count": 0,
+    "average_fps": null,
+    "median_fps": null,
+    "median_interval_ms": null,
+    "p95_interval_ms": null,
+    "max_interval_ms": null,
+    "stroke_probe_count": 1,
+    "visibility_interruption": false
+  },
+  "elapsed_from_first_to_last_stroke_ms": 6,
+  "renderer_geometry_at_end": {
+    "inspectionMode": "read_only",
+    "engineVersion": "5.4.1",
+    "renderMode": "webgl",
+    "runtimeType": "web",
+    "systemRenderer": "n",
+    "canvasRenderer": "n",
+    "windowGeometry": {
+      "screenX": -8,
+      "screenY": -8,
+      "outerWidth": 1936,
+      "outerHeight": 1056,
+      "innerWidth": 1920,
+      "innerHeight": 905,
+      "screenWidth": 1920,
+      "screenHeight": 1080,
+      "availableScreenWidth": 1920,
+      "availableScreenHeight": 1032
+    },
+    "canvasScaleFactor": 2,
+    "canvasScaleX": 4,
+    "canvasScaleY": 4,
+    "devicePixelRatio": 1,
+    "visualViewportScale": 1,
+    "playerCount": 1,
+    "players": [
+      {
+        "playerFound": true,
+        "playerMatchesStage": true,
+        "containerRect": {
+          "left": 0,
+          "top": 0,
+          "right": 1920,
+          "bottom": 905,
+          "width": 1920,
+          "height": 905
+        },
+        "playerOptions": {
+          "scaleMode": "fixedHeight",
+          "frameRate": 30,
+          "contentWidth": 740,
+          "contentHeight": 600,
+          "renderModeOption": null
+        },
+        "stage": {
+          "width": 1274,
+          "height": 600,
+          "frameRate": 30,
+          "scaleMode": "fixedHeight",
+          "orientation": "auto"
+        },
+        "canvas": {
+          "width": 5096,
+          "height": 2400,
+          "clientWidth": 5096,
+          "clientHeight": 2400,
+          "offsetLeft": 0,
+          "offsetTop": -1,
+          "rect": {
+            "left": 0,
+            "top": -0.5,
+            "right": 1920,
+            "bottom": 905.5,
+            "width": 1920,
+            "height": 906
+          },
+          "screenQuad": null,
+          "style": {
+            "left": "0px",
+            "top": "-0.5px",
+            "width": "",
+            "height": "",
+            "transform": "matrix(0.376766, 0, 0, 0.3775, 0, 0)",
+            "transformOrigin": "0% 0% 0px",
+            "computedTransform": "matrix(0.376766, 0, 0, 0.3775, 0, 0)",
+            "computedTransformOrigin": "0px 0px"
+          }
+        },
+        "boardStageCorners": {
+          "topLeft": {
+            "x": 320.7916660308838,
+            "y": 72
+          },
+          "topRight": {
+            "x": 780.7916660308838,
+            "y": 72
+          },
+          "bottomRight": {
+            "x": 780.7916660308838,
+            "y": 312
+          },
+          "bottomLeft": {
+            "x": 320.7916660308838,
+            "y": 312
+          }
+        },
+        "boardClientCorners": {
+          "topLeft": {
+            "x": 483.4536882098092,
+            "y": 108.22
+          },
+          "topRight": {
+            "x": 1176.703295745131,
+            "y": 108.22
+          },
+          "bottomRight": {
+            "x": 1176.703295745131,
+            "y": 470.62
+          },
+          "bottomLeft": {
+            "x": 483.4536882098092,
+            "y": 470.62
+          }
+        },
+        "boardClientMappingMethod": "validated_axis_aligned_rect",
+        "boardDisplayChain": [
+          {
+            "className": "o",
+            "x": 30,
+            "y": 75,
+            "width": 460,
+            "height": 240,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": {
+              "x": 0,
+              "y": 0,
+              "width": 460,
+              "height": 240
+            },
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 320.7916660308838,
+              "ty": 72
+            }
+          },
+          {
+            "className": "o",
+            "x": 290.7916660308838,
+            "y": -3,
+            "width": 676,
+            "height": 379,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": null,
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 290.7916660308838,
+              "ty": -3
+            }
+          },
+          {
+            "className": "i",
+            "x": 0,
+            "y": 0,
+            "width": 1274,
+            "height": 603,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": null,
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 0,
+              "ty": 0
+            }
+          },
+          {
+            "className": "Preloader",
+            "x": 0,
+            "y": 0,
+            "width": 2882,
+            "height": 737.9490000000001,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": {
+              "x": 0,
+              "y": 0,
+              "width": 1274,
+              "height": 600
+            },
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 0,
+              "ty": 0
+            }
+          },
+          {
+            "className": "i",
+            "x": 0,
+            "y": 0,
+            "width": 2882,
+            "height": 737.9490000000001,
+            "scaleX": 1,
+            "scaleY": 1,
+            "rotation": 0,
+            "scrollRect": null,
+            "concatenatedMatrix": {
+              "a": 1,
+              "b": 0,
+              "c": 0,
+              "d": 1,
+              "tx": 0,
+              "ty": 0
+            }
+          }
+        ],
+        "boardMask": {
+          "className": "i",
+          "x": 30,
+          "y": 75,
+          "width": 460,
+          "height": 240,
+          "concatenatedMatrix": {
+            "a": 1,
+            "b": 0,
+            "c": 0,
+            "d": 1,
+            "tx": 320.7916660308838,
+            "ty": 72
+          }
+        }
+      }
+    ],
+    "boardDetected": true,
+    "boardLabel": "o",
+    "boardLogicalSize": {
+      "width": 460,
+      "height": 240
+    },
+    "boardDisplayChain": [
+      {
+        "className": "o",
+        "x": 30,
+        "y": 75,
+        "width": 460,
+        "height": 240,
+        "scaleX": 1,
+        "scaleY": 1,
+        "rotation": 0,
+        "scrollRect": {
+          "x": 0,
+          "y": 0,
+          "width": 460,
+          "height": 240
+        },
+        "concatenatedMatrix": {
+          "a": 1,
+          "b": 0,
+          "c": 0,
+          "d": 1,
+          "tx": 320.7916660308838,
+          "ty": 72
+        }
+      },
+      {
+        "className": "o",
+        "x": 290.7916660308838,
+        "y": -3,
+        "width": 676,
+        "height": 379,
+        "scaleX": 1,
+        "scaleY": 1,
+        "rotation": 0,
+        "scrollRect": null,
+        "concatenatedMatrix": {
+          "a": 1,
+          "b": 0,
+          "c": 0,
+          "d": 1,
+          "tx": 290.7916660308838,
+          "ty": -3
+        }
+      },
+      {
+        "className": "i",
+        "x": 0,
+        "y": 0,
+        "width": 1274,
+        "height": 603,
+        "scaleX": 1,
+        "scaleY": 1,
+        "rotation": 0,
+        "scrollRect": null,
+        "concatenatedMatrix": {
+          "a": 1,
+          "b": 0,
+          "c": 0,
+          "d": 1,
+          "tx": 0,
+          "ty": 0
+        }
+      },
+      {
+        "className": "Preloader",
+        "x": 0,
+        "y": 0,
+        "width": 2882,
+        "height": 737.9490000000001,
+        "scaleX": 1,
+        "scaleY": 1,
+        "rotation": 0,
+        "scrollRect": {
+          "x": 0,
+          "y": 0,
+          "width": 1274,
+          "height": 600
+        },
+        "concatenatedMatrix": {
+          "a": 1,
+          "b": 0,
+          "c": 0,
+          "d": 1,
+          "tx": 0,
+          "ty": 0
+        }
+      },
+      {
+        "className": "i",
+        "x": 0,
+        "y": 0,
+        "width": 2882,
+        "height": 737.9490000000001,
+        "scaleX": 1,
+        "scaleY": 1,
+        "rotation": 0,
+        "scrollRect": null,
+        "concatenatedMatrix": {
+          "a": 1,
+          "b": 0,
+          "c": 0,
+          "d": 1,
+          "tx": 0,
+          "ty": 0
+        }
+      }
+    ]
+  },
+  "renderer_geometry_updated_at_end_utc": "2026-11-10T06:39:15.930+00:00",
+  "finished_at_utc": "2026-11-10T06:39:15.979+00:00",
+  "event_count": 5
+}
