@@ -251,37 +251,43 @@ def finalize_v5_stage6_attempt(
             "V5 exact CHALK cannot be bound to a complete 29-stroke Bridge run: "
             + str(last_error)
         )
-    from fill001_screen_mask_v2 import audit_screen_mask_v2
-    if post_capture_callback is not None:
-        # Obtain a new immutable screen image after the completed Bridge-run,
-        # rather than auditing an image captured before Egret's final updates.
+    # Exact CHALK from the closed run is logically separate from PNG quality.
+    # A screenshot failure must not discard an independently verified counter.
+    result = {
+        "binding": binding,
+        "screen_mask_v2": None,
+        "quality_gate": "NOT_EVALUATED",
+        "quality_policy_id": POLICY,
+        "status": "EXACT_RUN_BOUND_PNG_AUDIT_PENDING",
+    }
+    try:
+        from fill001_screen_mask_v2 import audit_screen_mask_v2
+        if post_capture_callback is None:
+            raise Fill001V5Error("Settled post-run PNG capture was not requested.")
         settled_png = Path(post_capture_callback())
         if not settled_png.is_file() or settled_png == post_png:
             raise Fill001V5Error("Post-run settled PNG capture is missing or reused.")
-        post_png = settled_png
-    mapping=request.get("mapping")
-    if not isinstance(mapping, dict) or not isinstance(mapping.get("board_screen_corners"),dict):
-        raise Fill001V5Error("No run-bound independent screen geometry for V5 quality.")
-    # The passive screen transform is checked live before/during/after executor,
-    # and may be paired with the new run IDs only after exact Bridge binding.
-    geometry={
-        "run_id":request["attempt_id"],
-        "coordinate_system":"desktop_screen_css_pixels",
-        "validation_status":"valid",
-        "independent_screen_mapping":True,
-        "same_run":True,
-        "board_screen_corners":mapping["board_screen_corners"],
-        "evidence_sha256":mapping["passive_samples_sha256"],
-    }
-    quality=audit_screen_mask_v2(
-        "rectangle",pre_png,post_png,
-        run_id=request["attempt_id"],screen_roi=request["screen_roi"],
-        geometry=geometry,quality_policy=POLICY,
-    )
-    return {
-        "binding":binding,
-        "screen_mask_v2":quality,
-        "quality_gate":quality["active_quality_gate"],
-        "quality_policy_id":POLICY,
-        "status":"RUN_BOUND_SCREEN_AUDITED_NOT_INDEPENDENT_E5",
-    }
+        mapping=request.get("mapping")
+        if not isinstance(mapping, dict) or not isinstance(mapping.get("board_screen_corners"),dict):
+            raise Fill001V5Error("No run-bound independent screen geometry for V5 quality.")
+        geometry={
+            "run_id":request["attempt_id"],
+            "coordinate_system":"desktop_screen_css_pixels",
+            "validation_status":"valid",
+            "independent_screen_mapping":True,
+            "same_run":True,
+            "board_screen_corners":mapping["board_screen_corners"],
+            "evidence_sha256":mapping["passive_samples_sha256"],
+        }
+        quality=audit_screen_mask_v2(
+            "rectangle",pre_png,settled_png,
+            run_id=request["attempt_id"],screen_roi=request["screen_roi"],
+            geometry=geometry,quality_policy=POLICY,
+        )
+        result["screen_mask_v2"] = quality
+        result["quality_gate"] = quality["active_quality_gate"]
+        result["status"] = "RUN_BOUND_SCREEN_AUDITED_NOT_INDEPENDENT_E5"
+    except Exception as exc:
+        result["quality_error"] = f"{type(exc).__name__}: {exc}"
+        result["status"] = "EXACT_RUN_BOUND_PNG_AUDIT_BLOCKED"
+    return result
