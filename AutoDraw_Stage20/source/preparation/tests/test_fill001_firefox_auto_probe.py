@@ -120,6 +120,7 @@ def test_verified_selenium_and_real_mouse_passive_sequence_uses_existing_gate(
             Driver(),tmp_path,SID,
             build_fill001_v5_source_plan("K_trim_0_y189_w3"),
             native_mouse=native,now_utc=NOW,
+            firefox_foreground_checker=lambda: True,
         )
     assert len(native.moves)==3
     assert roi=={"x":497,"y":267,"width":674,"height":353}
@@ -147,3 +148,45 @@ def test_valid_v5_plan_without_optional_selenium_fails_closed_before_browser_acc
             build_fill001_v5_source_plan("K_trim_0_y190_w2"),
             native_mouse=object(), now_utc=NOW,
         )
+
+
+def test_missing_foreground_witness_blocks_before_any_selenium_move(tmp_path, monkeypatch):
+    import firefox_monitor_session
+    monkeypatch.setattr(
+        firefox_monitor_session, "find_game_frame",
+        lambda _driver: {"egret": True, "canvasCount": 1},
+    )
+    folder = tmp_path / SID
+    folder.mkdir()
+    session, _, _ = build_fixture()
+    (folder / "session.json").write_text(
+        json.dumps(session), encoding="utf-8"
+    )
+    class Driver:
+        def find_elements(self, *_args):
+            return [object()]
+        def execute_script(self, *_args):
+            return {"x": 0, "y": 0, "width": 1300, "height": 900}
+    class Actions:
+        def __init__(self, _driver):
+            pass
+        def move_to_element_with_offset(self, *_args):
+            raise AssertionError("No mouse motion without foreground witness")
+    selenium = types.ModuleType("selenium")
+    webdriver = types.ModuleType("selenium.webdriver")
+    common = types.ModuleType("selenium.webdriver.common")
+    by = types.ModuleType("selenium.webdriver.common.by")
+    by.By = SimpleNamespace(CSS_SELECTOR="css")
+    actions = types.ModuleType("selenium.webdriver.common.action_chains")
+    actions.ActionChains = Actions
+    with patch.dict(sys.modules, {
+        "selenium": selenium, "selenium.webdriver": webdriver,
+        "selenium.webdriver.common": common, "selenium.webdriver.common.by": by,
+        "selenium.webdriver.common.action_chains": actions,
+    }):
+        with pytest.raises(PreflightGeometryError, match="foreground"):
+            collect_verified_v5_firefox_roi(
+                Driver(), tmp_path, SID,
+                build_fill001_v5_source_plan("K_trim_0_y190_w2"),
+                native_mouse=object(), now_utc=NOW,
+            )
