@@ -1,5 +1,10 @@
 # AutoDraw — текущее состояние
 
+## FILL-001 V5 — Windows Firefox первичный E4: BLOCKED foreground PID (2026-11-10)
+
+[Пользовательский runtime commit 848aae2](https://github.com/Kiddos19882/AutoDraw/commit/848aae2fcc12d38691346b1a45592c0f1fb2cb7c) сохранил три неизменяемых исходных файла: `fill001/v5_passive_roi/probe-2a09a872a6d04a5db9e185a8a7a0ae8e.json`, `fill001/v5_source_plans/K_trim_0_y190_w2.json`, `game_monitor_bridge/1c9e3ec8-dc80-4641-ae56-ecc3369b66c6/session.json`. E4 **PARTIAL**: Firefox 159, игровой origin `https://eufbpet.hust.me` и BoardPane 460×240 обнаружены; Monitor 0.2.4 с Input Telemetry ON и Bridge подтверждены; exact baseline pointCount=1, maxPoints=6000, currentRadius=30; пассивные `buttons=0` samples зарегистрированы. ROI-пробник остановился **BLOCKED** с `Firefox is not proven to be the foreground window`; нет готового ROI, игровых штрихов, run-bound exact CHALK или PNG E5. Из этого отчёта нельзя установить, был ли в момент проверки активен другой процесс или GeckoDriver PID был невалиден. Следующее минимальное изменение: запросить активацию собственного Firefox через WebDriver и *затем* повторно проверить native foreground Win32 PID, сохранив строгий fail-closed. Изменения кода см. коммиты после `848aae2`. Первичные runtime-файлы не изменять.
+
+
 ## FILL-001 — автоматический read-only V5 ROI после Firefox confirmation (2026-11-10)
 
 По итогам [AutoDraw validation 42734007807](https://github.com/Kiddos19882/AutoDraw/actions/runs/42734007807) установлена E3 **FAIL** конкретного code SHA `63decb96`: один тест `test_no_browser_input_on_modified_v5_source` падал из-за `ModuleNotFoundError: selenium`, остальные **1125 passed**. Причина — импорт необязательного Selenium до проверки frozen V5 source. Порядок исправлен, добавлена негативная проверка отсутствия Selenium. Это не доказывает Windows E4.
