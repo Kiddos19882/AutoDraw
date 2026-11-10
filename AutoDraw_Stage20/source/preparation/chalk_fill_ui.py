@@ -357,7 +357,7 @@ class Fill001Tab:
             destination.parent.mkdir(parents=True, exist_ok=True)
             with destination.open("x", encoding="utf-8") as stream:
                 json.dump(plan, stream, ensure_ascii=False, indent=2, allow_nan=False)
-                stream.write("\\n")
+                stream.write("\n")
         except (OSError, ValueError, TypeError, Fill001V5Error) as exc:
             self.status_var.set(f"V5 BLOCKED: {exc}")
             return
