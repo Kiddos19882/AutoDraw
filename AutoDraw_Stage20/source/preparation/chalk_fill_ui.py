@@ -171,7 +171,7 @@ class Fill001Tab:
         ).pack(anchor="w", pady=(5, 0))
         ttk.Label(
             bridge_controls,
-            text=("Firefox: откройте доску, подтвердите её здесь, затем нажмите на 
+            text=("Firefox: откройте доску, подтвердите её здесь, затем нажмите на "
                   "верхнюю панель Firefox вне холста; ожидается native Win32 PID. "
                   "Selenium только подключает Monitor/Bridge к iframe; "
                   "рисование остаётся за штатным Stage6 и fail-closed preflight."),
