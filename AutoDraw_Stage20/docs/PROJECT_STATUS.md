@@ -1,5 +1,12 @@
 # AutoDraw — текущее состояние
 
+## FILL-001 — автоматический read-only V5 ROI после Firefox confirmation (2026-11-10)
+
+По итогам [AutoDraw validation 42734007807](https://github.com/Kiddos19882/AutoDraw/actions/runs/42734007807) установлена E3 **FAIL** конкретного code SHA `63decb96`: один тест `test_no_browser_input_on_modified_v5_source` падал из-за `ModuleNotFoundError: selenium`, остальные **1125 passed**. Причина — импорт необязательного Selenium до проверки frozen V5 source. Порядок исправлен, добавлена негативная проверка отсутствия Selenium. Это не доказывает Windows E4.
+
+После подтверждения доски из существующей FILL-001 вкладки включён **пассивный**, не исполняющий рисунок, probe для выбранного V5 кандидата: новая Monitor/Bridge session, Firefox foreground verified по совпадению GeckoDriver `moz:processID` с native Win32 PID, Selenium hover + три native OS mouse moves без click, существующий `boardpane_preflight_transform`, неперезаписываемый `v5_passive_roi/probe-<UUID>.json` с `stage6_execution_allowed=false`. Если Firefox не активен, PID недоступен или геометрия некорректна — BLOCKED до native cursor movement. Экспортированный mapping **не передаётся Stage6**, blank-board/Clear/brush gates не обойдены. Проверка Windows E4 и actual game CHALK по-прежнему NOT_RUN; полный CI новой интеграции отдельный, по конечному SHA/джобам.
+
+
 ## FILL-001 V5 — read-only Firefox desktop ROI probe (2026-11-10)
 
 Добавлен экспериментальный, **ещё не подключённый к игровому исполнительному workflow** путь `fill001_firefox_auto_probe.py` → `fill001_v5_auto_roi.py` → existing `boardpane_preflight_transform()`. Selenium hover и три реальные движения указателя без нажатий дают свежие `BOARD_SCREEN_PREFLIGHT_SAMPLE` одной authenticated Bridge-сессии, после чего проверяется равенство browser screenX/Y и физических OS mouse targets; координаты доски проходят уже существующий E4-preflight validator. Ошибки Origin/Canvas, расхождение DPI, stale geometry, некорректный источник или tampered frozen V5 source блокируют результат. Код и unit/fake tests подготовлены, **E4 Windows Firefox и E5 ещё NOT_RUN**, AutoDraw не применяет ROI для Stage6 и не очищает доску автоматически.
