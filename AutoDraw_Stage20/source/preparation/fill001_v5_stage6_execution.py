@@ -215,6 +215,22 @@ def execute_v5_with_stage6(
 
     calib = BrushSliderCalibration.from_dict(slider_calibration)
     calib.validate(native_mouse.size(), roi)
+    offset = mapping.get("client_to_desktop_offset")
+    corners = mapping.get("board_screen_corners")
+    if not isinstance(offset, dict) or not isinstance(corners, dict):
+        raise Fill001V5Error("Missing same-session geometry for V5 run binding.")
+    dx, dy = offset["x"], offset["y"]
+    request["board_client_rect"] = {
+        "left": corners["left"]-dx, "top": corners["top"]-dy,
+        "right": corners["right"]-dx, "bottom": corners["bottom"]-dy,
+    }
+    # Extra zero-point clicks are permitted ONLY on the currently confirmed
+    # brush slider track, not anywhere else outside the game board.
+    request["slider_client_corridor"] = {
+        "left": min(calib.x_at_min,calib.x_at_max)-dx-4,
+        "right": max(calib.x_at_min,calib.x_at_max)-dx+4,
+        "top": calib.y-dy-4, "bottom": calib.y-dy+4,
+    }
     bridge = Path(bridge_root)
     def current_gate(*, blank: bool = False) -> dict:
         if not firefox_foreground_witness(driver):
@@ -327,14 +343,29 @@ def execute_v5_with_stage6(
         if summary.status == "completed" and report["after_png"] is not None:
             try:
                 from fill001_v5_finalization import finalize_v5_stage6_attempt
+                # Stage6 can finish before delayed Egret point updates reach
+                # the Bridge. Await the CLOSED run and take another immutable
+                # PNG only after its final exact post-count is known.
+                settled_path = directory / "after_settled.png"
+                def capture_settled() -> Path:
+                    native_mouse.screenshot(region=(
+                        roi["x"],roi["y"],roi["width"],roi["height"],
+                    )).save(settled_path)
+                    return settled_path
                 verified = finalize_v5_stage6_attempt(
                     bridge_root=bridge, request=request,
                     baseline_files=baseline_run_files,
                     summary=summary.to_dict(cfg),
                     pre_png=before_path, post_png=after_path,
+                    post_capture_callback=capture_settled,
                 )
-                if verified["binding"]["post_pointCount"] != report["post_pointCount"]:
-                    raise Fill001V5Error("Final resource snapshot differs from Bridge run-bound post-count.")
+                if (report["post_pointCount"] is not None
+                        and verified["binding"]["post_pointCount"] < report["post_pointCount"]):
+                    raise Fill001V5Error("Final Bridge count regressed below the earlier Stage6 snapshot.")
+                report["post_settled_pointCount"] = verified["binding"]["post_pointCount"]
+                report["after_settled_png"] = {
+                    "file": str(settled_path), "sha256": sha(settled_path),
+                }
                 report["finalization"] = verified
                 report["actual_chalk"] = verified["binding"]["exact_chalk"]
                 report["monitor_binding"] = "EXACT_RUN_BOUND"
