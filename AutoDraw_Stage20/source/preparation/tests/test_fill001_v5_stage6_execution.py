@@ -105,3 +105,24 @@ def test_v5_rejects_prior_session_mapping_and_stale_roi(tmp_path,monkeypatch):
             session_id=SID,driver=driver,
             slider_calibration=slider,screen_size=(1920,1080),now_utc=NOW,
         )
+
+
+def test_v5_refuses_stale_loaded_finalizer_before_any_mouse_input(tmp_path, monkeypatch):
+    """A current V5 worker must not draw using an old global-radii validator."""
+    import sys
+    import fill001_v5_finalization as finalizer
+    source, mapped, mapping, roi, slider, driver, prepare = setup_case(
+        tmp_path, monkeypatch, initial=10)
+    request = prepare()
+    monkeypatch.setitem(sys.modules, "pyautogui", SimpleNamespace())
+    monkeypatch.setattr(finalizer, "V5_BINDING_CONTRACT", "OLD_GLOBAL_RADIUS_CHECK")
+    class Mouse:
+        def size(self):
+            pytest.fail("Mouse queried before V5 finalizer preflight")
+        def click(self, *args, **kwargs):
+            pytest.fail("Mouse clicked with stale V5 finalizer")
+    with pytest.raises(Fill001V5Error, match="finalizer contract is outdated"):
+        runtime.execute_v5_with_stage6(
+            request=request, source=source, mapped=mapped, mapping=mapping,
+            bridge_root=tmp_path, driver=driver, slider_calibration=slider,
+            stop_event=SimpleNamespace(), native_mouse=Mouse(), output_dir=tmp_path)
