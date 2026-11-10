@@ -9,7 +9,6 @@ import json
 import re
 import sys
 import time
-import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
@@ -353,26 +352,17 @@ class Fill001Tab:
                 )
             finally:
                 self.root.after(0, self.root.deiconify)
-            # This is independent passive proof, NOT an E4 game run.
-            out = self.output_dir / "v5_passive_roi"
-            out.mkdir(parents=True, exist_ok=True)
-            report_path = out / f"probe-{uuid.uuid4().hex}.json"
-            report = {
-                "schema": "FILL001_V5_FIREFOX_PASSIVE_ROI_DIAGNOSTIC_V1",
-                "status": "PASSIVE_MAPPING_ONLY_NOT_EXECUTOR_READY",
-                "candidate_id": candidate,
-                "source_strokes_sha256": plan["generation"]["source_strokes_sha256"],
-                "session_id": ready["session_id"],
-                "screen_roi": roi,
-                "mapping": witness,
-                "mapped_strokes": len(mapped["strokes"]),
-                "actual_chalk": None,
-                "game_png_quality": "NOT_EVALUATED",
-                "stage6_execution_allowed": False,
-            }
-            with report_path.open("x", encoding="utf-8") as stream:
-                json.dump(report, stream, ensure_ascii=False, indent=2, allow_nan=False)
-                stream.write("\n")
+            # Independent passive evidence, never an executable Stage6 gate.
+            from fill001_firefox_auto_probe import write_v5_probe_result
+            report_path = write_v5_probe_result(
+                self.output_dir / "v5_passive_roi",
+                candidate_id=candidate,
+                session_id=ready["session_id"],
+                status="PASSIVE_MAPPING_ONLY_NOT_EXECUTOR_READY",
+                source_strokes_sha256=plan["generation"]["source_strokes_sha256"],
+                roi=roi,
+                mapping=witness,
+            )
             self._firefox_messages.put((
                 "V5_PROBE_ONLY",
                 f"Пассивный ROI подтверждён для session={ready['session_id']}. "
@@ -381,8 +371,27 @@ class Fill001Tab:
             # Keep the browser alive for inspection until explicit stop.
             self._firefox_stop.wait()
         except Exception as exc:
-            self._firefox_messages.put(("BLOCKED", str(exc)))
-            # Retain a launched Firefox for diagnosis, not a nonexistent session.
+            details = str(exc)
+            sid = None
+            ready_state = locals().get("ready")
+            if isinstance(ready_state, dict):
+                sid = ready_state.get("session_id")
+            # Store run-scoped failure reason without cookies, auth tokens or
+            # browser profile. Diagnostics cannot grant Stage6 execution.
+            if driver is not None:
+                try:
+                    from fill001_firefox_auto_probe import write_v5_probe_result
+                    report_path = write_v5_probe_result(
+                        self.output_dir / "v5_passive_roi",
+                        candidate_id=getattr(self, "_firefox_selected_candidate", "") or "UNKNOWN",
+                        session_id=sid,
+                        status="BLOCKED",
+                        reason=details,
+                    )
+                    details = f"{details}. Диагностика: {report_path}"
+                except (OSError, ValueError, TypeError):
+                    pass
+            self._firefox_messages.put(("BLOCKED", details))
             if driver is not None:
                 self._firefox_stop.wait()
         finally:
