@@ -3,8 +3,11 @@ from __future__ import annotations
 """Tkinter single-task FILL-001 preflight UI."""
 
 import hashlib
+import queue
+import threading
 import json
 import re
+import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -84,7 +87,13 @@ class Fill001Tab:
         self.task_var = tk.StringVar()
         self.status_var = tk.StringVar(value="Создайте новую серию или откройте существующий manifest.")
         self.bridge_status_var = tk.StringVar(value="Monitor/Bridge: подключение ещё не проверено.")
+        self._firefox_driver = None
+        self._firefox_messages = queue.Queue()
+        self._firefox_confirm = threading.Event()
+        self._firefox_stop = threading.Event()
+        self._firefox_thread = None
         self._build(parent)
+        self.root.after(300, self._poll_firefox_messages)
 
     def _build(self, parent: tk.Widget) -> None:
         outer = ttk.Frame(parent, padding=10)
@@ -137,6 +146,27 @@ class Fill001Tab:
             controls, text="4. Проверить подключение",
             command=self.check_fill001_bridge,
         ).pack(side="left", padx=(0, 6))
+        firefox = ttk.Frame(bridge_controls)
+        firefox.pack(fill="x", pady=(6, 0))
+        ttk.Button(
+            firefox, text="Firefox: открыть игру + Bridge автоматически",
+            command=self.start_firefox_monitor,
+        ).pack(side="left", padx=(0, 6))
+        ttk.Button(
+            firefox, text="Подтвердить: доска открыта",
+            command=self.confirm_firefox_board,
+        ).pack(side="left", padx=(0, 6))
+        ttk.Button(
+            firefox, text="Остановить Firefox-сессию",
+            command=self.stop_firefox_monitor,
+        ).pack(side="left")
+        ttk.Label(
+            bridge_controls,
+            text=("Firefox experimental: после входа в игру подтвердите доску кнопкой. "
+                  "Selenium только подключает Monitor/Bridge к iframe; "
+                  "рисование остаётся за штатным Stage6 и fail-closed preflight."),
+            wraplength=1080, justify="left",
+        ).pack(anchor="w", pady=(3, 2))
         ttk.Label(
             bridge_controls,
             text=("Порядок: запустите Bridge; в F12 → Console именно игрового iframe "
@@ -170,6 +200,97 @@ class Fill001Tab:
         self.task_details = tk.Text(outer, height=10, wrap="word", state="disabled")
         self.task_details.pack(fill="both", expand=True, pady=(0, 8))
         ttk.Label(outer, textvariable=self.status_var, wraplength=1120).pack(anchor="w")
+
+    def _poll_firefox_messages(self) -> None:
+        try:
+            while True:
+                state, message = self._firefox_messages.get_nowait()
+                self.bridge_status_var.set(f"Firefox {state}: {message}")
+        except queue.Empty:
+            pass
+        try:
+            self.root.after(300, self._poll_firefox_messages)
+        except tk.TclError:
+            pass
+
+    def start_firefox_monitor(self) -> None:
+        """Opt-in browser telemetry; never bypass FILL-001 Stage6 preflight."""
+        if self._firefox_thread is not None and self._firefox_thread.is_alive():
+            self.bridge_status_var.set("Firefox уже запущен. Откройте доску и подтвердите.")
+            return
+        try:
+            # Reuse the only shared Bridge, bound to the actual game iframe origin.
+            accepted = self.brush_tab.start_game_monitor_bridge(
+                require_input_telemetry=True,
+                origin_override="https://eufbpet.hust.me/",
+            )
+        except (OSError, RuntimeError, ValueError, TypeError, AttributeError) as exc:
+            self.bridge_status_var.set(f"BLOCKED: {exc}")
+            return
+        if not accepted:
+            self.bridge_status_var.set("BLOCKED: Bridge не запущен с Input Telemetry ON.")
+            return
+        self._firefox_confirm.clear()
+        self._firefox_stop.clear()
+        self._firefox_thread = threading.Thread(
+            target=self._firefox_worker, name="fill001-firefox-monitor", daemon=True,
+        )
+        self._firefox_thread.start()
+
+    def confirm_firefox_board(self) -> None:
+        if self._firefox_thread is None or not self._firefox_thread.is_alive():
+            self.bridge_status_var.set("BLOCKED: Firefox ещё не запущен.")
+            return
+        self._firefox_confirm.set()
+
+    def stop_firefox_monitor(self) -> None:
+        self._firefox_stop.set()
+        self._firefox_confirm.set()
+
+    def _firefox_worker(self) -> None:
+        from firefox_monitor_session import (
+            FirefoxMonitorError, open_firefox, attach_monitor_after_confirmation,
+        )
+        driver = None
+        try:
+            driver = open_firefox()
+            self._firefox_messages.put(("READY", "Откройте игровую доску в Firefox, затем подтвердите."))
+            # No game input and no Monitor injection until the operator confirms.
+            if not self._firefox_confirm.wait(timeout=600) or self._firefox_stop.is_set():
+                raise FirefoxMonitorError("Доска не подтверждена; действие отменено.")
+            if getattr(sys, "frozen", False):
+                monitor_dir = Path(sys.executable).resolve().parent / "game_monitor"
+            else:
+                monitor_dir = Path(__file__).resolve().parents[1] / "game_monitor"
+            snippet_path = getattr(self.brush_tab, "bridge_snippet_path", None)
+            if not isinstance(snippet_path, Path):
+                raise FirefoxMonitorError("Нет одноразового Bridge snippet.")
+            deadline = time.monotonic() + 30
+            while not snippet_path.is_file() and time.monotonic() < deadline:
+                if self._firefox_stop.wait(0.5):
+                    raise FirefoxMonitorError("Оператор остановил сессию.")
+            attached = attach_monitor_after_confirmation(
+                driver, monitor_dir / "game_monitor.js", snippet_path,
+                operator_confirmed=True,
+            )
+            self._firefox_messages.put((
+                "CONNECTED",
+                f"Monitor {attached['monitor_version']} подключён. "
+                "Теперь проверьте Bridge и штатный FILL-001 preflight.",
+            ))
+            # Keep the WebDriver session alive and the game open for Stage6.
+            self._firefox_stop.wait()
+        except Exception as exc:
+            self._firefox_messages.put(("BLOCKED", str(exc)))
+            # Retain Firefox on failure for diagnosis until explicitly stopped.
+            self._firefox_stop.wait()
+        finally:
+            if driver is not None:
+                try:
+                    driver.quit()
+                except Exception:
+                    pass
+            self._firefox_messages.put(("STOPPED", "Firefox-сессия завершена."))
 
     def start_fill001_bridge(self) -> None:
         """Use the existing shared Bridge launcher with mandatory V3 telemetry."""
