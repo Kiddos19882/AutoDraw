@@ -1,5 +1,10 @@
 # AutoDraw — значимые изменения
 
+## 2026-11-10/11 — FILL-001 V5 first run-bound exact CHALK + active PNG quality PASS
+
+- [`1c722ba`](https://github.com/Kiddos19882/AutoDraw/commit/1c722ba82be2c91b03570460101061df74e6b9a2) recorded experimental W2 E4 29/29, exact completed Bridge CHALK1709 and **PASS** of existing versioned `FILL001_CHALK_FIRST_PERIMETER_V2`: coverage99.3578%, max overshoot1.327083 logical px ≤3, no distant pixels; pointer parked off ROI on before/settled captures. V1/V2 zero-leakage diagnostics still FAIL, E5 NOT_RUN. Historical failed `36e95e4` remains unmodified; no production changes.
+
+
 ## 2026-11-10 — FILL-001 V5 captured PNG pointer decontamination (experimental)
 
 - New live [36e95e4](https://github.com/Kiddos19882/AutoDraw/commit/36e95e49acfecdbae1969bdf3d7358f06ea72f54) confirms automated `EXACT_RUN_BOUND` CHALK1701 for 29/29, but independently reports perimeter PNG quality **FAIL**, not a quality-accepted candidate. Original before/after PNGs preserved.
