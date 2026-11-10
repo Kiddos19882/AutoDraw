@@ -4,6 +4,10 @@
 
 По статическому аудиту обнаружено, что пользовательская метка `now_utc`, установленная до Selenium/OS hover, могла ошибочно классифицировать фактически свежий DOM screen sample как future evidence. Диагностический collector теперь запрашивает UTC после трёх native moves; отдельный E2 regression требует вызова clock именно в этот момент. Штатные ROI/Stage6 validators, параметры кисти и game input не менялись. Live Windows/GeckoDriver и E4/E5 по-прежнему NOT_RUN, итоговый CI только для code SHA `de00f194bcb1feff3dd454ee3987b144d136626b` и завершённых обязательных jobs.
 
+## 2026-11-10 — сохраняемые причины BLOCKED для Firefox V5
+
+Существующий Firefox diagnostic writer вынесен в `fill001_firefox_auto_probe.write_v5_probe_result()`: неперезаписываемые PASSIVE/BLOCKED отчёты с обязательным `stage6_execution_allowed=false`, `actual_chalk=null`, `game_png_quality=NOT_EVALUATED`. UI сохраняет причину ошибки без паролей, cookie, токенов и WebDriver-профиля, сохраняя Firefox открытым до явной остановки при поздней блокировке. Добавлены negative tests на ложный E4 PASS, отсутствие reason и неполное свидетельство. Полный предыдущий code CI `de00f194` [SUCCESS](https://github.com/Kiddos19882/AutoDraw/actions/runs/42736422274), результат новой серии проверяется отдельно. Live E4/E5 NOT_RUN.
+
 ## 2026-11-10 — исправление CI Selenium и автоматизированный passive Firefox ROI
 
 В E3 `42734007807` было `1 failed / 1125 passed`, ошибка импортирования необязательного Selenium в негативном V5-source тесте. Порядок проверки изменён, добавлен isolated regression test. Добавлен fail-closed Win32 foreground PID witness для Firefox и тесты на отсутствие PID/другое окно/неверные capabilities. В существующий FILL-001 worker добавлен автоматический passive ROI probe после подтверждения доски: нет кликов, Clear, рисунка и Stage6 handoff, создаётся диагностический JSON с `stage6_execution_allowed=false`. До E4 этот интерфейс исследовательский, не production. `master`, MouseExecutor defaults, frozen source/PNG и CHALK estimator не менялись.
