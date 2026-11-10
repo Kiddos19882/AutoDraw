@@ -110,6 +110,12 @@ def test_verified_selenium_and_real_mouse_passive_sequence_uses_existing_gate(
     action_module = types.ModuleType("selenium.webdriver.common.action_chains")
     action_module.ActionChains = Actions
     native=Native()
+    validation_clock_calls = []
+    def completed_probe_clock():
+        # Must be called once after all three REAL/native pointer witnesses.
+        assert len(native.moves) == 3
+        validation_clock_calls.append(True)
+        return NOW
     with patch.dict(sys.modules,{
         "selenium":selenium,"selenium.webdriver":selenium_webdriver,
         "selenium.webdriver.common":selenium_common,
@@ -119,10 +125,11 @@ def test_verified_selenium_and_real_mouse_passive_sequence_uses_existing_gate(
         mapped,proof,roi=collect_verified_v5_firefox_roi(
             Driver(),tmp_path,SID,
             build_fill001_v5_source_plan("K_trim_0_y189_w3"),
-            native_mouse=native,now_utc=NOW,
+            native_mouse=native,now_utc=completed_probe_clock,
             firefox_foreground_checker=lambda: True,
         )
     assert len(native.moves)==3
+    assert validation_clock_calls == [True]
     assert roi=={"x":497,"y":267,"width":674,"height":353}
     assert mapped["coordinate_system"]=="local_canvas_pixels"
     assert mapped["strokes"][-1]["metadata"]["brush_value"]=="3"
