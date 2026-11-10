@@ -1629,6 +1629,22 @@ class Stage6App:
             state="normal" if self.execution_plan is not None and self.area is not None else "disabled"
         )
         status = result.get("status", "FAILED")
+        if result.get("failure_stage") == "BRUSH_SLIDER_NO_RESPONSE":
+            # A geometrically accepted but behaviorally unresponsive slider
+            # must not remain "confirmed" in future launches/saved settings.
+            self.brush_slider_confirmed_var.set(False)
+            self.brush_slider_status_var.set(
+                "V5 BLOCKED: Game Monitor не увидел изменения радиуса после "
+                "первого перетаскивания. Повторно проверьте точки X(1), X(30), Y "
+                "и способ управления кистью; подтвердите калибровку заново."
+            )
+            try:
+                self._save_settings(self._read_executor_config())
+            except (ValueError, OSError, TypeError):
+                self.brush_slider_status_var.set(
+                    self.brush_slider_status_var.get()
+                    + " Не удалось сохранить сброс калибровки в настройках."
+                )
         self.execution_state_var.set(f"Состояние: V5 {status}")
         self.status_var.set(
             "V5 single-run completed. Full E5/CHALK binding still requires "
