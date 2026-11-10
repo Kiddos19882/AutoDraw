@@ -1,5 +1,10 @@
 # AutoDraw — значимые изменения
 
+## 2026-11-10 — FILL-001 V5 immutable logical-plan export (experimental)
+
+Из исходной frozen DEC-030 native fixture доступен экспорт двух экспериментальных DrawingPlan по 29 штрихов с mixed width 10/2 или 10/3. Зафиксированы исходный geometry SHA, версия quality policy и запрет исполнения; Stage6 mono loader явно отклоняет смешанную диагностическую ширину до появления проверенного handoff. Добавлены unit/regression tests. Production execution остаётся без изменений.
+
+
 ## 2026-11-10 — FILL-001 Firefox Monitor opt-in (experimental)
 
 Добавлено опциональное подключение Firefox/Selenium к Game Monitor/Bridge из вкладки FILL-001: портал/iframe origin, подтверждение оператора, отдельный runtime, новая session, телеметрия, явное завершение. Исполнитель Stage6, frozen V5 geometry, CHALK estimator и production defaults не изменены. V5 automated mixed brush и live acceptance пока не готовы.
