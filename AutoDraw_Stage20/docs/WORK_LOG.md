@@ -2,7 +2,7 @@
 
 ## 2026-11-10 — FILL-001 V5 native fixture → fail-closed DrawingPlan
 
-Продолжена разрешённая работа: исследована фактическая frozen V5 геометрия в `chalk_fill_strategy_comparison.py`, создан `fill001_v5_handoff.py`, добавлены UI export и regression tests на 29 штрихов, pinned 10→2/3, SHA provenance, explicit execution blocked, overwrite refusal и tampering. В обычный Stage6 loader добавлен отказ для V5 экспериментального плана (включая обманную подмену coordinate space). Ни `MouseExecutor`, ни production CHALK predictor/defaults не менялись. Выполнены GitHub commits в `feature/image-geometry-optimization`; актуальные E2/E3 только по завершённому CI на соответствующем SHA. Новых игровых замеров и E4/E5 нет.
+Продолжена разрешённая работа: исследована фактическая frozen V5 геометрия в `chalk_fill_strategy_comparison.py`, создан `fill001_v5_handoff.py`, добавлены UI export и regression tests на 29 штрихов, pinned 10→2/3, SHA provenance, explicit execution blocked, overwrite refusal и tampering. В обычный Stage6 loader добавлен отказ для V5 экспериментального плана (включая обманную подмену coordinate space). Дополнительно подготовлен `V5BrushSequenceGuard` с проверкой упорядоченного применения кистей и unit/negative tests без реального ввода мыши. Ни `MouseExecutor`, ни production CHALK predictor/defaults не менялись. Выполнены GitHub commits в `feature/image-geometry-optimization`; актуальные E2/E3 только по завершённому CI на соответствующем SHA. Новых игровых замеров и E4/E5 нет.
 
 
 ## 2026-11-10 — FILL-001 opt-in Firefox Monitor connector
