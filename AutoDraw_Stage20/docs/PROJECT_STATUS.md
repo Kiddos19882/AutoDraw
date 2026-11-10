@@ -1,5 +1,12 @@
 # AutoDraw — текущее состояние
 
+## FILL-001 V5 — второй Windows E4 29/29, 2026-11-10
+
+Первичные артефакты: [3825d57](https://github.com/Kiddos19882/AutoDraw/commit/3825d571eff4717efd8f5dbde88524cdc4387073), attempt `884678ea-76ec-405e-9067-56be4dfa7546`, closed Monitor run `6f9bec0c-02b2-4335-9a07-77f45052ea77`. Stage6 completed 29/29 за 76.266s, verified 28×radius10→radius2, mouse released. Closed exact BoardPane `pointCount 1→1695`: E4 source CHALK=1694, 29 consuming strokes + five complete zero-point slider actions, no errors/drops/gaps, sampled deltas match CHALK. Stage6 early post=1670 (25 later game points). Original auto-report `actual_chalk=null`, `monitor_binding=BLOCKED`, PNG `NOT_EVALUATED`, no settled PNG/E5. Historical report remains unchanged.
+
+Observed radii `[1,2,8,10,30]` include slider transient 1/8/30, not off-plan paint. Original error `unexpected brush radii` matches legacy global-radius check at `ed74ffd`, whereas code `3189f860` already supports bounded zero-point slider actions. Which module was actually loaded by Windows is UNKNOWN (stale runtime is hypothesis, not proven). V5-only contract marker/early pre-draw check commits `aa56bb0`,`f1455b4`; real run regression `88a12aa`. E3 on new SHA check separately. Next: verify CI, restart updated Windows process, confirm module contract before further E4; require settled PNG and independent E5 before W3/production.
+
+
 ## FILL-001 V5 — первый полный Windows Stage6 29/29, E4 runtime 2026-11-10
 
 Primary immutable evidence: [commit `ed74ffd629a5b8bdae6b76e2adea8c8bb0a399ba`](https://github.com/Kiddos19882/AutoDraw/commit/ed74ffd629a5b8bdae6b76e2adea8c8bb0a399ba). **E4 Stage6 execution PASS**: candidate `K_trim_0_y190_w2`, attempt `09d783ae-616c-4db3-a1c0-9dcc1c6a856f`, Bridge session `6bd34aee-0c60-41ad-9902-f4dfca8d8ed8`; verified BoardPane ROI `483,243,694×363`, exact blank `pointCount=1`, 29/29 strokes, native brush sequence `10×28→2`, 76.125 s, `move_calls=3607`, release PASS. Calibration file changed from unresponsive `(x1=1354,328; x30=1199,328)` to operator-verified `(x1=1363,y306; x30=1207,y307)`; tests from old attempt `e0bdb411` 0/29 FAIL and two early PASS/BLOCKED passive probes remain preserved separately.
