@@ -97,6 +97,8 @@ class Fill001Tab:
         self._firefox_messages = queue.Queue()
         self._firefox_confirm = threading.Event()
         self._firefox_stop = threading.Event()
+        self._v5_stage6_completed = threading.Event()
+        self._v5_stage6_completed.set()
         self._firefox_thread = None
         self._build(parent)
         self.root.after(300, self._poll_firefox_messages)
@@ -261,6 +263,7 @@ class Fill001Tab:
         self._firefox_execute_v5 = bool(self.v5_run_after_probe_var.get())
         self._firefox_confirm.clear()
         self._firefox_stop.clear()
+        self._v5_stage6_completed.set()
         self._firefox_thread = threading.Thread(
             target=self._firefox_worker, name="fill001-firefox-monitor", daemon=True,
         )
@@ -423,6 +426,7 @@ class Fill001Tab:
                     raise RuntimeError(
                         f"BLOCKED: Stage6 refused V5: {outcome.get('error','preflight not accepted')}"
                     )
+                self._v5_stage6_completed.clear()
                 self._firefox_messages.put((
                     "V5_STAGE6_RUNNING",
                     "Stage6: pointCount=1, кисть 10→2/3, 29 штрихов; "
@@ -430,6 +434,9 @@ class Fill001Tab:
                 ))
             # Keep the browser alive for inspection until explicit stop.
             self._firefox_stop.wait()
+            # Never terminate the browser while the Stage6 stop handler is
+            # still releasing mouseDown from an in-progress stroke.
+            self._v5_stage6_completed.wait(timeout=30)
         except Exception as exc:
             details = str(exc)
             sid = None
@@ -464,6 +471,7 @@ class Fill001Tab:
             self._firefox_messages.put(("STOPPED", "Firefox-сессия завершена."))
 
     def _on_v5_stage6_finished(self, result: dict) -> None:
+        self._v5_stage6_completed.set()
         status = result.get("status", "FAILED")
         attempt = result.get("request", {}).get("attempt_id")
         self._firefox_messages.put((
