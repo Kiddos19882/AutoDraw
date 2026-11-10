@@ -123,6 +123,10 @@ def collect_verified_v5_firefox_roi(
                 "BLOCKED: Firefox is not proven to be the foreground window."
             )
 
+    if firefox_foreground_checker is None:
+        from firefox_foreground_witness import firefox_foreground_witness
+        firefox_foreground_checker = lambda: firefox_foreground_witness(driver)
+
     # W3C element-relative offset uses center of element. No click ever occurs.
     for cx,cy in css_targets:
         require_foreground()
