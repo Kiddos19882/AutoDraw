@@ -42,7 +42,7 @@ def test_v5_brush_guard_all_29_strokes_through_existing_hook(candidate, last):
 
 def test_v5_requires_exact_initial_width():
     guard = V5BrushSequenceGuard(build_fill001_v5_source_plan(CANDIDATES[0]))
-    with pytest.raises(Fill001V5Error, match="initial brush"):
+    with pytest.raises(Fill001V5Error, match="brush width is not 10"):
         guard.preflight(FakeSlider(initial=1))
 
 
@@ -83,3 +83,12 @@ def test_v5_rejects_false_brush_confirmation():
     with pytest.raises(Fill001V5Error, match="did not verify"):
         guard.before_stroke(slider, object(), 29,
                             SimpleNamespace(metadata=plan["strokes"][28]["metadata"]))
+
+
+def test_v5_guard_accepts_slider_calibrated_at_30_after_closed_loop_sets_10():
+    plan = build_fill001_v5_source_plan(CANDIDATES[0])
+    slider = FakeSlider(initial=30)
+    slider.current_value = 10
+    guard = V5BrushSequenceGuard(plan)
+    guard.preflight(slider)
+    assert guard.preflight_done is True
