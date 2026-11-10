@@ -1156,11 +1156,21 @@ class Stage6App:
                 "где он преобразуется в координаты экранной области."
             )
         generation = document.get("generation") if isinstance(document, dict) else None
-        if isinstance(generation, dict) and (
+        raw_strokes = document.get("strokes") if isinstance(document, dict) else None
+        has_v5_strokes = (
+            isinstance(raw_strokes, list)
+            and any(
+                isinstance(stroke, dict)
+                and isinstance(stroke.get("metadata"), dict)
+                and "fill001_v5_candidate" in stroke["metadata"]
+                for stroke in raw_strokes
+            )
+        )
+        if has_v5_strokes or (isinstance(generation, dict) and (
             generation.get("method") == "fill001_v5_dec030_frozen_mixed_width"
             or generation.get("protocol") == "FILL001_CHALK_FIRST_NATIVE_V5"
             or generation.get("requires_verified_mixed_width_stage6") is True
-        ):
+        )):
             raise ValueError(
                 "FILL-001 V5 mixed-width source plan не является исполняемым. "
                 "Требуется отдельный проверенный Stage6 mixed-brush handoff; "
