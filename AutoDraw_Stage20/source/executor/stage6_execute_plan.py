@@ -1533,6 +1533,102 @@ class Stage6App:
         config.validate()
         return config
 
+    def start_fill001_v5_single_run(
+        self, *, source: dict[str, Any], mapped: dict[str, Any],
+        mapping: dict[str, Any], roi: dict[str, int],
+        bridge_root: Path, session_id: str, driver: Any,
+        output_dir: Path, finished_callback: Any = None,
+    ) -> bool:
+        """Opt-in isolated V5 run on the EXISTING Stage6 executor and stop event.
+
+        A V5 diagnostic plan is *never* accepted through ordinary load_plan.
+        Missing verified slider calibration or exact blank board refuses input.
+        """
+        if self.running:
+            raise RuntimeError("Stage6 is already executing another plan.")
+        from fill001_v5_stage6_execution import (
+            execute_v5_with_stage6, prepare_v5_run,
+        )
+        from drawing.color_plan_execution import BrushSliderCalibration
+
+        if not getattr(self, "brush_slider_confirmed_var", None) \
+                or not self.brush_slider_confirmed_var.get() \
+                or self.brush_slider_screen_size is None:
+            raise ValueError(
+                "BLOCKED: Stage6 has no confirmed brush-slider calibration. "
+                "A passive ROI does not calibrate the brush slider."
+            )
+        calibration = {
+            "x_at_min": int(self.brush_slider_x_min_var.get()),
+            "x_at_max": int(self.brush_slider_x_max_var.get()),
+            "y": int(self.brush_slider_y_var.get()),
+            "initial_value": int(self.brush_slider_initial_value_var.get()),
+            "screen_width": self.brush_slider_screen_size[0],
+            "screen_height": self.brush_slider_screen_size[1],
+            "confirmed": True,
+        }
+        BrushSliderCalibration.from_dict(calibration).validate(pyautogui.size(), roi)
+        request = prepare_v5_run(
+            source, mapped, mapping, roi, bridge_root=bridge_root,
+            session_id=session_id, driver=driver,
+            slider_calibration=calibration, screen_size=pyautogui.size(),
+        )
+        self.running = True
+        self.stop_event = threading.Event()
+        self.stop_reason = None
+        self._set_execution_controls_enabled(False)
+        self.start_button.configure(state="disabled")
+        self.stop_button.configure(state="normal")
+        self.execution_state_var.set("Состояние: FILL-001 V5 Stage6 single run")
+        self.progress_var.set(0)
+        def worker() -> None:
+            try:
+                result = execute_v5_with_stage6(
+                    request=request, source=source, mapped=mapped,
+                    mapping=mapping, bridge_root=bridge_root,
+                    driver=driver, slider_calibration=calibration,
+                    stop_event=self.stop_event, native_mouse=pyautogui,
+                    output_dir=output_dir,
+                    progress=lambda current, total, detail: self.root.after(
+                        0, self._update_progress, current, total, detail
+                    ),
+                )
+            except Exception as exc:
+                result = {
+                    "status": "FAILED", "error": f"{type(exc).__name__}: {exc}",
+                    "request": request, "actual_chalk": None,
+                    "stage6_execution_allowed": False,
+                }
+            self.root.after(0, self._finish_fill001_v5_single_run, result, finished_callback)
+        try:
+            threading.Thread(
+                target=worker, name="FILL001-V5-Stage6", daemon=True,
+            ).start()
+        except Exception:
+            self.running = False
+            self._set_execution_controls_enabled(True)
+            self.stop_button.configure(state="disabled")
+            raise
+        return True
+
+    def _finish_fill001_v5_single_run(self, result: dict, callback: Any) -> None:
+        self.running = False
+        self._set_execution_controls_enabled(True)
+        self.stop_button.configure(state="disabled")
+        self.start_button.configure(
+            state="normal" if self.execution_plan is not None and self.area is not None else "disabled"
+        )
+        status = result.get("status", "FAILED")
+        self.execution_state_var.set(f"Состояние: V5 {status}")
+        self.status_var.set(
+            "V5 single-run completed. Full E5/CHALK binding still requires "
+            "independent Monitor run reconciliation."
+            if status == "completed"
+            else f"V5 single-run {status}: {result.get('error', 'see report')}"
+        )
+        if callable(callback):
+            callback(result)
+
     def start_execution_from_workflow(
         self, executor_config_override: dict[str, Any] | None = None
     ) -> bool:
