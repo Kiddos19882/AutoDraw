@@ -1,5 +1,14 @@
 # AutoDraw — действующие задачи
 
+## FILL-001 V5 — after first full workflow failure, 2026-11-10
+
+- [x] Analyzed actual user commit `fbb97ced` raw source: complete passive ROI and exact `pointCount=1` PASS; failure in 30→10 brush switch, **0/29 strokes**; five unsuccessful drags, radius30 always, board unchanged, mouse safely released. It is **NOT** a failed image-quality trial.
+- [x] For V5 ONLY, stop after the first verified unchanged-radius drag rather than trying speculative coordinate corrections; preserve blocked reason and slider coordinates in the attempt report; production controller unchanged, new no-response regression tests.
+- [ ] Confirm current E3 for code SHA `4003626b` (and any subsequent revisions).
+- [ ] **Next unresolved Windows gate:** inspect/verify actual location, orientation and interaction mechanism of brush-size control; existing saved slider calibration was geometrically accepted but **not proven to change actual game radius**. Do not guess coordinate offsets or increase correction attempts. Keep blank-board `pointCount==1` and same-session ROI safety constraints. Obtain independent native screen/monitor evidence for a successful 30→10 change, *then* execute 29 V5 strokes.
+- [ ] Only after completed run: exact run-bound CHALK, original PNG quality audit and independent E5; second candidate on newly cleaned board.
+
+
 ## FILL-001 V5 — single-run Stage6 executable candidate, дальнейшие проверки (2026-11-10)
 
 - [x] Созданы fail-closed same-session `pointCount==1` gate, V5 Stage6 single-run adapter, подключение кнопки UI и runtime-completion callback, безопасная остановка Firefox→Stage6, сохранение before/after PNG, версионированный run-attempt/report и проверяемый выбор 29 штрихов с замкнутой обратной связью по радиусу. Прежняя запретная generic Stage6 загрузка V5 осталась неизменной.
