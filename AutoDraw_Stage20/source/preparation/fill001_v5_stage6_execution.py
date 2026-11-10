@@ -100,6 +100,27 @@ def prepare_v5_run(
             "Live Game Monitor radius differs from slider initial calibration; "
             "recalibration required, no game input."
         )
+    # Bind each planned mouse-down to the *physical* screen point rounded by
+    # MouseExecutor, then to game iframe client coordinates proven by the
+    # same-session passive witness.  Phone/remote accidental clicks must not
+    # be counted as planned Stage6 strokes.
+    offset = mapping.get("client_to_desktop_offset")
+    if not isinstance(offset, dict):
+        raise Fill001V5Error("Missing verified client-to-desktop offset.")
+    from math import isfinite
+    dx, dy = offset.get("x"), offset.get("y")
+    if (type(dx) not in (int, float) or type(dy) not in (int, float)
+            or not isfinite(dx) or not isfinite(dy)):
+        raise Fill001V5Error("Invalid client-to-desktop offset.")
+    planned_pointer_downs = [
+        [
+            float(round(roi["x"] + stroke.points[0].x) - dx),
+            float(round(roi["y"] + stroke.points[0].y) - dy),
+        ]
+        for stroke in plan.strokes
+    ]
+    if len(planned_pointer_downs) != 29:
+        raise Fill001V5Error("V5 planned pointer-down count is invalid.")
     # Exactly one named run attempt; NEVER treat a prior passive ROI as executor-ready.
     return {
         "protocol": "FILL001_V5_STAGE6_SINGLE_RUN_V1",
@@ -112,6 +133,7 @@ def prepare_v5_run(
         "screen_roi": dict(roi),
         "initial_snapshot": gate,
         "brush_sequence": [10]*28 + [2 if candidate.endswith("w2") else 3],
+        "expected_pointer_down_client": planned_pointer_downs,
         "actual_chalk": None,
         "game_png_quality": "NOT_EVALUATED",
         "final_validation": "PENDING",
