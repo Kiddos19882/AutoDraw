@@ -1,5 +1,15 @@
 # AutoDraw — действующие задачи
 
+## FILL-001 V5 — first W2 active quality PASS + exact CHALK E4 (2026-11-10/11)
+
+- [x] Review primary `1c722ba` attempt `51480631`, closed run `c36be38c`, `before.png` and `after_settled.png`. Stage6 29/29, native 28×radius10 then radius2, verified final mouse release, 75.657 s; 5 zero-point slider inputs correctly excluded and 0 telemetry gaps/errors. Exact bound pre1→post1710 = CHALK1709, early post1687 not settled.
+- [x] Validate V5 pointer parking evidence before/settled at same screen (387,424), exact resource count unchanged during parking; PNG no visible cursor sprite inside ROI.
+- [x] Active frozen quality `FILL001_CHALK_FIRST_PERIMETER_V2` PASS: coverage 99.3578%≥99%, maximum overshoot 1.327083≤3 logical px, zero pixels beyond 3px halo. Preserve V1/V2 diagnostics FAIL; no threshold change or historical overwrite. Previous `36e95e4` CHALK1701 was **quality FAIL**, not accepted ranking evidence.
+- [ ] Confirm CI at code/evidence SHA `1c722ba`; audit current docs HEAD separately and address any failures.
+- [ ] **Next E4:** on *fresh clean board*, independent attempt for second immutable candidate `K_trim_0_y189_w3`, same validated mapping/calibration/foreground, 29 native brush strokes, exact run-bound counter, pointer-parked settled PNG, frozen quality gates. Only compare exact CHALK if quality PASS; preserve failure data.
+- [ ] Independent E5 validation and review for any production change; current W2 E4 PASS does not justify changing defaults or estimators.
+
+
 ## FILL-001 V5 — third live W2 automated CHALK 1701, quality FAIL (2026-11-10)
 
 - [x] Analyze immutable `36e95e4`: Stage6 29/29, 28×10→2, 75.578s, run-bound automated exact `pointCount 1→1702`, CHALK1701; 5 no-point slider drags correctly excluded. Settled PNG saved. This fixes prior V5 binding issue in real E4.
