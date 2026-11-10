@@ -258,7 +258,8 @@ def test_exact_bound_chalk_survives_independent_png_capture_failure(tmp_path):
     last=tmp_path/"after.png"
     first.write_bytes(b"unchanged-before-placeholder")
     last.write_bytes(b"unchanged-post-placeholder")
-    def fail_capture():
+    def fail_capture(exact_post):
+        assert exact_post == 1707
         raise OSError("simulated missing settled PNG")
     result=finalize_v5_stage6_attempt(
         bridge_root=tmp_path,
