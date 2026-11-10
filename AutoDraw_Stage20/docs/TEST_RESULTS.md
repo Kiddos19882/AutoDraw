@@ -1,5 +1,12 @@
 # AutoDraw — реестр проверенных результатов
 
+## FILL-001 V5 — third W2 run: automatic CHALK E4 PASS, PNG quality FAIL (2026-11-10)
+
+Immutable [commit 36e95e4](https://github.com/Kiddos19882/AutoDraw/commit/36e95e49acfecdbae1969bdf3d7358f06ea72f54): `fill001/v5_stage6_runs/v5-b28524eb-ea40-4ee9-9505-d526beef86e5/report.json`, original before/after/after_settled PNG, session `a8896ff8-be90-464a-9ea8-c403ae385071`, closed run `7d5357a5-5919-49bf-bd1f-732df0696af0`. Stage6 29/29, 75.578 s, mouse release PASS. Game Monitor closed exact pre1/post1702, auto `EXACT_RUN_BOUND` **CHALK1701**, 5 zero-point slider input exclusions, validated radii [10,2]; early Stage6 post1678 is not closed final post. Exact CHALK automatic regression now E4 PASS, independent E5 NOT_RUN.
+
+Same-run `after_settled.png` captured and hashed; V2 frozen perimeter quality: coverage=0.9936865329117789, leakage=2963 screen px, 2230 beyond 3 logical px, max=48.146794 logical px => **FAIL**. V1 source audit failed as well. In raw before and settled screenshots, the visible game brush/cursor sprite moves, contributing RGB differences outside frozen shape; its quantitative share of leakage is NOT independently established, so do not retroactively change result. Preventive V5-only pointer parking code and synthetic tests at `c1fe1f8`/`1b48fb1`/`0ca2a42`; new live quality status NOT_RUN, E3 pending.
+
+
 
 ## FILL-001 V5 — second E4 and real-data regression, 3825d57
 
