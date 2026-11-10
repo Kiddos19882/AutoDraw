@@ -1,5 +1,15 @@
 # AutoDraw — действующие задачи
 
+## FILL-001 V5 — single-run Stage6 executable candidate, дальнейшие проверки (2026-11-10)
+
+- [x] Созданы fail-closed same-session `pointCount==1` gate, V5 Stage6 single-run adapter, подключение кнопки UI и runtime-completion callback, безопасная остановка Firefox→Stage6, сохранение before/after PNG, версионированный run-attempt/report и проверяемый выбор 29 штрихов с замкнутой обратной связью по радиусу. Прежняя запретная generic Stage6 загрузка V5 осталась неизменной.
+- [x] Добавлен strict Bridge-run финализатор: полный 29-stroke + радиусы 10/2/3, exact непрерывность pointCount; несвязанному событию пользователя нельзя приписывать V5 exact CHALK. При подтверждении запускается original screen PNG audit по FILL001_CHALK_FIRST_PERIMETER_V2; независимая E5 отдельно.
+- [x] Сохранено пользовательское объяснение дополнительного одного штриха в предыдущем `5b7e6b8` (удалённое управление телефоном); это не AutoDraw V5. При реальном blank-state `pointCount==1`.
+- [ ] Дождаться полного E3 CI для итогового кодового SHA; устранить FAIL, если будет. Проверить Windows portable с optional Selenium.
+- [ ] **Следующий E4:** на Windows для одного V5 кандидата открыть чистую доску, подтвердить, активировать Firefox. Встроенный pipeline должен подтвердить ROI, точный `pointCount==1`, действующую калибровку ползунка и только затем стартовать Stage6. При отсутствии подтверждённой калибровки ползунка зафиксировать BLOCKED и калибровать по отдельному протоколу, не угадывать координаты. Сохранить `v5_stage6_runs/v5-<attempt-id>/before.png,after.png,report.json`, Bridge `session.json`, `game-monitor-run-*.json`.
+- [ ] Проверить post-run status, независимое E5 экранного качества, run-bound exact CHALK; после одного валидного run на w2 повторить на чистой доске для w3. Принять только по действующему quality policy; не изменять пороги и замороженные исходные PNG.
+
+
 ## FILL-001 V5 — после успешного Windows passive ROI (2026-11-10)
 
 - [x] Получен новый независимый Windows runtime E4: [`5b7e6b8`](https://github.com/Kiddos19882/AutoDraw/commit/5b7e6b877d5793720ad856997ada97417bfaeaab), `probe-0cca08ef367643beaf6397a30ab410c6.json`, `session.json`, `game-monitor-run-20261110T063915979800Z-3c8e7de5.json`. Пассивные три probe, one BoardPane, origin, offset (0,135), ROI (483,243,694,363) **PASS только в рамках этой сессии**; старый foreground PID BLOCKED преодолён.
