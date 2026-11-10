@@ -135,3 +135,113 @@ def test_finalizer_refuses_absent_raw_pointer_binding_even_with_completed_summar
             pre_png=tmp_path / "before.png", post_png=tmp_path / "after.png",
             timeout_seconds=0,
         )
+
+
+def _real_shaped_slider_and_29_strokes():
+    """Reduced immutable-shape fixture for ed74ffd: 29 paint + 5 zero-point drags."""
+    planned=[(625.0,193.0),(625.0,191.0)]+[
+        (596.0,float(199+6*i)) for i in range(26)
+    ]+[(630.0,395.0)]
+    # Use 29 unique ordered starts; no acceptance is based on estimated CHALK.
+    assert len(planned)==29
+    controls=[(1207,171,30),(1315,171,8),(1305,171,10),
+              (1358,171,1),(1353,171,1)]
+    events=[]
+    metrics=[]
+    def append(x,y,radius,consumed):
+        number=len(metrics)+1
+        sid=f"pointer-stroke-{number}"
+        events.append({
+            "monitorVersion":"0.2.4","type":"POINTER_DOWN_CANDIDATE",
+            "strokeId":sid,"clientX":x,"clientY":y,
+            "board":{"currentRadius":radius},
+        })
+        metrics.append({
+            "stroke_id":sid,"lifecycle_status":"complete",
+            "point_count_delta":consumed,
+            "point_update_event_count":consumed,
+            "point_count_delta_matches_updates": True if consumed else None,
+        })
+    for x,y,r in controls[:2]:
+        append(x,y,r,0)
+    for x,y in planned[:28]:
+        append(x,y,10,1)
+    for x,y,r in controls[2:]:
+        append(x,y,r,0)
+    append(*planned[28],2,1)
+    run=make_run(29,[1,2,8,10,30],pre=1,post=1707)
+    run["events"]=events
+    run["event_count"]=len(events)
+    run["per_stroke_metrics"]=metrics
+    run["stroke_candidate_count"]=34
+    run["non_consuming_stroke_candidate_count"]=5
+    rect={"left":483.45,"top":108.22,"right":1176.70,"bottom":470.62}
+    slider={"left":1203.0,"top":167.0,"right":1367.0,"bottom":175.0}
+    return run,planned,rect,slider
+
+
+def test_real_29_stroke_monitor_run_excludes_only_five_slider_drags():
+    run,planned,rect,slider=_real_shaped_slider_and_29_strokes()
+    result=validate_v5_bridge_runs(
+        [run],session_id=SID,candidate_id=CANDIDATE,
+        expected_pointer_down_client=planned,
+        expected_board_client_rect=rect,slider_client_corridor=slider,
+    )
+    assert result["exact_chalk"]==1706
+    assert result["excluded_zero_point_slider_drags"]==5
+    assert result["stroke_count"]==29
+    assert result["observed_brush_radii"]==[10,2]
+
+
+@pytest.mark.parametrize("tamper,message",[
+    ("phone_click","Unexpected off-plan"),
+    ("slider_point_consumed","Unexpected off-plan"),
+    ("slider_outside_track","Unexpected off-plan"),
+    ("wrong_paint_radius","drawing radius"),
+    ("missing_metric","Missing complete"),
+    ("wrong_stroke_id","stroke lifecycle"),
+    ("point_delta_unmatched","matched exact"),
+    ("unverified_corridor","overlaps game board"),
+])
+def test_real_shaped_v5_binding_stays_fail_closed(tamper,message):
+    run,planned,rect,slider=_real_shaped_slider_and_29_strokes()
+    if tamper=="phone_click":
+        run["events"][2]["clientX"]+=18
+    elif tamper=="slider_point_consumed":
+        run["per_stroke_metrics"][0]["point_count_delta"]=1
+    elif tamper=="slider_outside_track":
+        run["events"][0]["clientX"]=1190
+    elif tamper=="wrong_paint_radius":
+        run["events"][2]["board"]["currentRadius"]=30
+    elif tamper=="missing_metric":
+        run["per_stroke_metrics"].pop()
+    elif tamper=="wrong_stroke_id":
+        run["per_stroke_metrics"][2]["stroke_id"]="other"
+    elif tamper=="point_delta_unmatched":
+        run["per_stroke_metrics"][2]["point_count_delta_matches_updates"]=False
+    elif tamper=="unverified_corridor":
+        slider["left"]=500
+        slider["right"]=800
+        slider["top"]=110
+        slider["bottom"]=470
+    with pytest.raises(Fill001V5Error,match=message):
+        validate_v5_bridge_runs(
+            [run],session_id=SID,candidate_id=CANDIDATE,
+            expected_pointer_down_client=planned,
+            expected_board_client_rect=rect,slider_client_corridor=slider,
+        )
+
+
+def test_slider_exclusion_never_allowed_without_verifiable_bounds():
+    run,planned,rect,slider=_real_shaped_slider_and_29_strokes()
+    with pytest.raises(Fill001V5Error,match="both verified"):
+        validate_v5_bridge_runs(
+            [run],session_id=SID,candidate_id=CANDIDATE,
+            expected_pointer_down_client=planned,
+            expected_board_client_rect=rect,
+        )
+    with pytest.raises(Fill001V5Error,match="dropped/invalid"):
+        validate_v5_bridge_runs(
+            [run],session_id=SID,candidate_id=CANDIDATE,
+            expected_pointer_down_client=planned,
+        )
