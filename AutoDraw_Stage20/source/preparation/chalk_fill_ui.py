@@ -372,7 +372,7 @@ class Fill001Tab:
             }
             with report_path.open("x", encoding="utf-8") as stream:
                 json.dump(report, stream, ensure_ascii=False, indent=2, allow_nan=False)
-                stream.write("\\n")
+                stream.write("\n")
             self._firefox_messages.put((
                 "V5_PROBE_ONLY",
                 f"Пассивный ROI подтверждён для session={ready['session_id']}. "
