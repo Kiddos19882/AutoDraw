@@ -89,11 +89,12 @@ def test_focus_request_does_not_bypass_pid_mismatch():
     driver = _FakeDriver(False)
     with pytest.raises(
         FirefoxForegroundError,
-        match="expected PID=5421; before PID=1001; after PID=1001",
+        match="expected PID=5421; before PID=1001; after WebDriver PID=1001; after native PID=1001",
     ):
         establish_firefox_foreground(
             driver, active_pid_provider=lambda: 1001,
             sleep_fn=lambda _: None,
+            native_focus_request=lambda pid: False,
         )
     assert driver.switch_to.calls == ["owned-firefox-window"]
 
@@ -104,17 +105,53 @@ def test_missing_gecko_pid_never_requests_browser_focus():
         establish_firefox_foreground(
             driver, active_pid_provider=lambda: 5421,
             sleep_fn=lambda _: None,
+            native_focus_request=lambda pid: False,
         )
     assert driver.switch_to.calls == []
 
 
 def test_native_foreground_failure_stays_fail_closed():
     driver = _FakeDriver(False)
-    with pytest.raises(FirefoxForegroundError, match="after PID=None"):
+    with pytest.raises(FirefoxForegroundError, match="after native PID=None"):
         establish_firefox_foreground(
             driver,
             active_pid_provider=lambda: (_ for _ in ()).throw(
                 FirefoxForegroundError("Cannot inspect foreground window")
             ),
             sleep_fn=lambda _: None,
+        )
+
+
+def test_owned_win32_focus_request_must_recheck_pid():
+    state = {"pid": 932, "requested": []}
+    driver = _FakeDriver(False)
+    def request(pid):
+        state["requested"].append(pid)
+        state["pid"] = 5372
+        return True
+    driver.capabilities["moz:processID"] = 5372
+    establish_firefox_foreground(
+        driver, active_pid_provider=lambda: state["pid"],
+        native_focus_request=request, sleep_fn=lambda _: None,
+    )
+    assert state["requested"] == [5372]
+    assert driver.switch_to.calls == ["owned-firefox-window"]
+
+
+def test_win32_focus_refusal_stays_fail_closed():
+    driver = _FakeDriver(False, expected=5372)
+    with pytest.raises(FirefoxForegroundError, match="native focus request accepted=False"):
+        establish_firefox_foreground(
+            driver, active_pid_provider=lambda: 932,
+            native_focus_request=lambda pid: False, sleep_fn=lambda _: None,
+        )
+    assert driver.switch_to.calls == ["owned-firefox-window"]
+
+
+def test_wrong_native_pid_after_accepted_focus_still_blocks():
+    driver = _FakeDriver(False, expected=5372)
+    with pytest.raises(FirefoxForegroundError, match="after native PID=932"):
+        establish_firefox_foreground(
+            driver, active_pid_provider=lambda: 932,
+            native_focus_request=lambda pid: True, sleep_fn=lambda _: None,
         )
