@@ -1,5 +1,14 @@
 # AutoDraw — действующие задачи
 
+## FILL-001 Firefox auto ROI диагностический режим (2026-11-10)
+
+- [x] Разобрана конкретная причина E3 FAIL `42734007807`: необязательная библиотека Selenium импортировалась до проверки неизменности source-plan. Исправлен порядок, добавлен regression guard; не ослаблялись gate.
+- [x] Добавлены `firefox_foreground_witness.py` и negative tests: native Win32 foreground PID должен соответствовать `moz:processID` именно Firefox. Нет проверки фокуса — нет движений. Callback проверяется перед каждым passive move.
+- [x] После единственного подтверждения доски новый FILL-001 Firefox worker **только диагностически** собирает passive verified ROI и сохраняет неперезаписываемый JSON со статусом `PASSIVE_MAPPING_ONLY_NOT_EXECUTOR_READY`. Это не Stage6, не очистка игры и не доказательство качества.
+- [ ] Проверить Windows E4 (Firefox/GeckoDriver, Win32 foreground PID, authenticated BoardPane, DPI/screen coordinates), без рисования; сохранить отчет и причину BLOCKED при расхождениях. Принимать Stage6 ROI только после этой проверки и чистой доски.
+- [ ] Следующий разработческий шаг: versioned FILL-001 V5 single-run Stage6 mixed width `10×28→2/3` со свежими radius heartbeat и provenance, автоматический Clear/blank gate при baseline `pointCount=1` и независимая E5; до их завершения game input запрещён.
+
+
 ## FILL-001 V5 — автоматический ROI, без разрешения live input (2026-11-10)
 
 - [x] Подготовлен research-only Selenium hover + native OS mouse пассивный сборщик `fill001_firefox_auto_probe.py`; функция `fill001_v5_auto_roi.py` проверяет ROI через существующий `boardpane_preflight_transform()`, no guessed offsets, strict same-session, native targets и экранные границы. Добавлены positive/negative fake E2 tests.
