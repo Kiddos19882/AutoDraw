@@ -14,6 +14,7 @@ from typing import Any
 
 from fill001_boardpane_preflight import PreflightGeometryError
 from fill001_v5_auto_roi import derive_v5_roi_from_verified_passive_moves
+from fill001_v5_handoff import validate_fill001_v5_source_plan
 
 
 def _load_session(path: Path, sid: str) -> dict[str, Any]:
@@ -53,6 +54,8 @@ def collect_verified_v5_firefox_roi(
     from selenium.webdriver.common.by import By
     from firefox_monitor_session import find_game_frame
 
+    # Reject tampered source plans BEFORE any browser/desktop cursor movements.
+    validate_fill001_v5_source_plan(source_plan)
     if find_game_frame(driver) is None:
         raise PreflightGeometryError("Wrong Firefox frame / Egret board not found.")
     root = Path(bridge_root)
