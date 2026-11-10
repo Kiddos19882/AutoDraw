@@ -1,5 +1,13 @@
 # AutoDraw — действующие задачи
 
+## FILL-001 V5 — продолжение после реального Firefox BLOCKED (2026-11-10)
+
+- [x] Проанализированы runtime первичные файлы пользовательского commit `848aae2`: подключение Firefox/iframe/Monitor/Bridge подтверждено E4 PARTIAL, точный игровой CHALK/PNG E5 не выполнялись. Исходный failure: native foreground Firefox PID gate BLOCKED.
+- [x] В коде добавлена **одна безопасная WebDriver focus-попытка** только для owned Firefox, затем обязательная новая проверка нативного Win32 foreground PID; добавлены тесты на matched PID, wrong PID, недоступный PID, отказ фокусировки. Отрицательные случаи оставлены BLOCKED; никаких нажатий в игру.
+- [ ] Новый Windows passive-only rerun: из JSON проверить expected/previous/after foreground PID и завершение ROI, только затем переходить к проверке blank-board baseline/brush-свитча. Сборку/CI нового code SHA проверять отдельно. Не отключать fail-closed gate.
+- [ ] Разрешённый Stage6 mixed-width V5 single-run, exact CHALK, PNG/E5 — остаётся заблокированным до runtime calibration и чистой доски.
+
+
 ## FILL-001 Firefox auto ROI диагностический режим (2026-11-10)
 
 - [x] Разобрана конкретная причина E3 FAIL `42734007807`: необязательная библиотека Selenium импортировалась до проверки неизменности source-plan. Исправлен порядок, добавлен regression guard; не ослаблялись gate.
