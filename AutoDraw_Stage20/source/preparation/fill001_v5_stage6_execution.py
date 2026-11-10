@@ -14,7 +14,9 @@ from pathlib import Path
 import uuid
 from typing import Any, Callable
 
-from drawing.color_plan_execution import BrushSliderCalibration, BrushSliderController
+from drawing.color_plan_execution import (
+    BrushSliderCalibration, BrushSliderController, ColorPlanExecutionError,
+)
 from drawing.mouse_executor import ExecutorConfig, MouseExecutor
 from models import DrawingPlan
 from firefox_foreground_witness import firefox_foreground_witness
@@ -30,6 +32,49 @@ CONFIG = {
     "after_mouse_up_ms": 20, "end_hold_ms": 50,
     "countdown_seconds": 5,
 }
+
+
+class V5BrushSliderController(BrushSliderController):
+    """V5-only fail-closed rule: stop after one drag with NO game-radius response.
+
+    Ordinary Stage6 correction behavior is unchanged. A stable, fresh Monitor
+    report equal to the old radius proves only that no switch was observed,
+    not that another guessed coordinate or more slider drags will help.
+    """
+
+    def __init__(self, *args: Any, **kwargs: Any):
+        super().__init__(*args, **kwargs)
+        self._v5_requested_radius: int | None = None
+        self.last_no_response: dict[str, Any] | None = None
+
+    def select_value(self, executor: Any, value: int) -> str:
+        self._v5_requested_radius = value
+        try:
+            return super().select_value(executor, value)
+        finally:
+            self._v5_requested_radius = None
+
+    def _wait_for_stable_radius(self, executor: Any, after_utc: str) -> dict[str, Any]:
+        observed = super()._wait_for_stable_radius(executor, after_utc)
+        target = self._v5_requested_radius
+        previous = self.current_value
+        if target is not None and target != previous and observed.get("radius") == previous:
+            self.last_no_response = {
+                "requested_radius": target,
+                "radius_before": previous,
+                "observed_radius": observed.get("radius"),
+                "observed_at_utc": observed.get("observed_at_utc"),
+                "slider_x_at_min": self.calibration.x_at_min,
+                "slider_x_at_max": self.calibration.x_at_max,
+                "slider_y": self.calibration.y,
+            }
+            raise ColorPlanExecutionError(
+                "V5 BLOCKED: первый drag ползунка не изменил радиус "
+                f"(запрошен {target}, Monitor дважды подтвердил прежний {previous}). "
+                "Сохранённые координаты ползунка или способ его перемещения "
+                "не подтверждены в игре. Повторные перетаскивания запрещены."
+            )
+        return observed
 
 
 def prepare_v5_run(
@@ -194,7 +239,7 @@ def execute_v5_with_stage6(
             "observed_at_utc": stamp,
         }
 
-    controller = BrushSliderController(
+    controller = V5BrushSliderController(
         calib, roi, current_screen_size_provider=native_mouse.size,
         monitor_radius_provider=radius_provider,
     )
@@ -213,6 +258,11 @@ def execute_v5_with_stage6(
     report = {
         "schema": "FILL001_V5_STAGE6_SINGLE_RUN_RESULT_V1",
         "request": request, "status": "BLOCKED",
+        "brush_slider_calibration": {
+            "x_at_min": calib.x_at_min, "x_at_max": calib.x_at_max,
+            "y": calib.y, "initial_value": calib.initial_value,
+            "screen_width": calib.screen_width, "screen_height": calib.screen_height,
+        },
         "started_at_utc": datetime.now(timezone.utc).isoformat(),
         "before_png": None, "after_png": None,
         "pre_pointCount": None, "post_pointCount": None,
@@ -297,6 +347,10 @@ def execute_v5_with_stage6(
         report["status"] = "FAILED"
         report["error"] = f"{type(exc).__name__}: {exc}"
     finally:
+        if controller.last_no_response is not None:
+            report["brush_slider_no_response"] = controller.last_no_response
+            report["failure_stage"] = "BRUSH_SLIDER_NO_RESPONSE"
+
         report["finished_at_utc"] = datetime.now(timezone.utc).isoformat()
         # No exact CHALK claim before matching persisted run-bound Game Monitor
         # data. Even pre=1/post=N is not a run identity proof.
