@@ -50,12 +50,19 @@ def collect_verified_v5_firefox_roi(
     The caller must minimize AutoDraw first; no mouseDown, click or game
     invocation is performed here. Native OS pointer events are never faked.
     """
-    from selenium.webdriver.common.action_chains import ActionChains
-    from selenium.webdriver.common.by import By
-    from firefox_monitor_session import find_game_frame
-
-    # Reject tampered source plans BEFORE any browser/desktop cursor movements.
+    # Untrusted V5 geometry must be rejected before optional browser imports,
+    # WebDriver access, or any physical pointer movement.  In particular the
+    # negative CI test must not require Selenium to be installed.
     validate_fill001_v5_source_plan(source_plan)
+
+    try:
+        from selenium.webdriver.common.action_chains import ActionChains
+        from selenium.webdriver.common.by import By
+    except ImportError as exc:
+        raise PreflightGeometryError(
+            "Selenium is required for the optional Firefox V5 passive probe."
+        ) from exc
+    from firefox_monitor_session import find_game_frame
     if find_game_frame(driver) is None:
         raise PreflightGeometryError("Wrong Firefox frame / Egret board not found.")
     root = Path(bridge_root)
