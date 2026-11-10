@@ -17,6 +17,61 @@ from fill001_v5_auto_roi import derive_v5_roi_from_verified_passive_moves
 from fill001_v5_handoff import validate_fill001_v5_source_plan
 
 
+
+def write_v5_probe_result(
+    directory: Path,
+    *,
+    candidate_id: str,
+    session_id: str | None,
+    status: str,
+    reason: str | None = None,
+    roi: dict[str, int] | None = None,
+    mapping: dict[str, Any] | None = None,
+    source_strokes_sha256: str | None = None,
+) -> Path:
+    """Persist one immutable diagnostic outcome, never permission to execute.
+
+    No cookies, credentials, WebDriver profile, Bridge token, or untrusted JS
+    are collected.  BLOCKED results preserve failures for Windows E4 review.
+    """
+    import uuid
+    from datetime import datetime, timezone
+
+    allowed = {"PASSIVE_MAPPING_ONLY_NOT_EXECUTOR_READY", "BLOCKED"}
+    if status not in allowed:
+        raise PreflightGeometryError("Unknown V5 preflight diagnostic status.")
+    if (not isinstance(candidate_id, str) or not candidate_id
+            or session_id is not None and (not isinstance(session_id, str) or not session_id)):
+        raise PreflightGeometryError("Missing V5 diagnostic identity.")
+    if status == "BLOCKED" and (not isinstance(reason, str) or not reason.strip()):
+        raise PreflightGeometryError("Blocked diagnostics require a reason.")
+    if status != "BLOCKED" and (
+        not isinstance(roi, dict) or not isinstance(mapping, dict)
+        or not isinstance(source_strokes_sha256, str)
+    ):
+        raise PreflightGeometryError("Successful passive evidence is incomplete.")
+    document = {
+        "schema": "FILL001_V5_FIREFOX_PASSIVE_ROI_DIAGNOSTIC_V1",
+        "captured_at_utc": datetime.now(timezone.utc).isoformat(),
+        "status": status,
+        "candidate_id": candidate_id,
+        "session_id": session_id,
+        "source_strokes_sha256": source_strokes_sha256,
+        "screen_roi": roi,
+        "mapping": mapping,
+        "blocked_reason": reason,
+        "actual_chalk": None,
+        "game_png_quality": "NOT_EVALUATED",
+        "stage6_execution_allowed": False,
+    }
+    destination = Path(directory)
+    destination.mkdir(parents=True, exist_ok=True)
+    target = destination / f"probe-{uuid.uuid4().hex}.json"
+    with target.open("x", encoding="utf-8") as f:
+        json.dump(document, f, ensure_ascii=False, indent=2, allow_nan=False)
+        f.write("\n")
+    return target
+
 def _load_session(path: Path, sid: str) -> dict[str, Any]:
     try:
         session = json.loads(path.read_text(encoding="utf-8"))
