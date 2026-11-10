@@ -1,6 +1,7 @@
 """Exact V5 CHALK binding tests; all data synthetic and no game input."""
 from copy import deepcopy
 import json
+from pathlib import Path
 
 import pytest
 
@@ -282,3 +283,47 @@ def test_exact_bound_chalk_survives_independent_png_capture_failure(tmp_path):
     assert result["status"]=="EXACT_RUN_BOUND_PNG_AUDIT_BLOCKED"
     assert "simulated missing settled PNG" in result["quality_error"]
     assert first.read_bytes()==b"unchanged-before-placeholder"
+
+
+def test_real_3825d57_closed_bridge_replay_and_no_relaxed_guards():
+    """Replay immutable E4 3825d57; do not turn slider radii into paint radii."""
+    root = Path(__file__).resolve().parents[3]
+    prefix = root / "data/results/brush_behavior_tests"
+    report_path = (prefix / "fill001/v5_stage6_runs"
+                   / "v5-884678ea-76ec-405e-9067-56be4dfa7546/report.json")
+    run_path = (prefix / "game_monitor_bridge"
+                / "6c41cea3-8a5b-4340-aeba-1fbe3cc29327"
+                / "game-monitor-run-20261110T163103037862Z-6f9bec0c.json")
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    run = json.loads(run_path.read_text(encoding="utf-8"))
+    request = report["request"]
+    result = validate_v5_bridge_runs(
+        [run], session_id=request["session_id"],
+        candidate_id=request["candidate_id"],
+        expected_pointer_down_client=request["expected_pointer_down_client"],
+        expected_board_client_rect=request["board_client_rect"],
+        slider_client_corridor=request["slider_client_corridor"],
+    )
+    assert result["run_ids"] == ["6f9bec0c-02b2-4335-9a07-77f45052ea77"]
+    assert result["pre_pointCount"] == 1
+    assert result["post_pointCount"] == 1695
+    assert result["exact_chalk"] == 1694
+    assert result["stroke_count"] == 29
+    assert result["excluded_zero_point_slider_drags"] == 5
+    assert result["observed_brush_radii"] == [10, 2]
+    assert run["observed_brush_radii"] == [1, 2, 8, 10, 30]
+    # An accidental board touch cannot be relabelled as a control action.
+    contaminated = deepcopy(run)
+    extra = next(i for i, row in enumerate(contaminated["per_stroke_metrics"])
+                 if row["point_count_delta"] == 0)
+    downs = [e for e in contaminated["events"]
+             if e["type"] == "POINTER_DOWN_CANDIDATE"]
+    downs[extra]["clientX"] = 1100
+    with pytest.raises(Fill001V5Error, match="Unexpected off-plan"):
+        validate_v5_bridge_runs(
+            [contaminated], session_id=request["session_id"],
+            candidate_id=request["candidate_id"],
+            expected_pointer_down_client=request["expected_pointer_down_client"],
+            expected_board_client_rect=request["board_client_rect"],
+            slider_client_corridor=request["slider_client_corridor"],
+        )
