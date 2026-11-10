@@ -85,3 +85,53 @@ def test_no_run_and_wrong_candidate_never_give_chalk():
         validate_v5_bridge_runs(
             [make_run()],session_id=SID,candidate_id="unapproved",
         )
+
+
+def test_v5_phone_touch_cannot_be_accepted_as_planned_mouse_down():
+    run = make_run()
+    starts = [(100.0+i, 200.0+i) for i in range(29)]
+    run["events"] = [
+        {"monitorVersion": "0.2.4", "type": "POINTER_DOWN_CANDIDATE",
+         "clientX": x, "clientY": y}
+        for x, y in starts
+    ]
+    run["event_count"] = 29
+    accepted = validate_v5_bridge_runs(
+        [run], session_id=SID, candidate_id=CANDIDATE,
+        expected_pointer_down_client=starts,
+    )
+    assert accepted["exact_chalk"] == 1289
+    corrupted = deepcopy(run)
+    corrupted["events"][4]["clientX"] += 17
+    with pytest.raises(Fill001V5Error, match="differs from frozen planned"):
+        validate_v5_bridge_runs(
+            [corrupted], session_id=SID, candidate_id=CANDIDATE,
+            expected_pointer_down_client=starts,
+        )
+    extra = deepcopy(run)
+    extra["events"].append({
+        "monitorVersion": "0.2.4", "type": "POINTER_DOWN_CANDIDATE",
+        "clientX": 999, "clientY": 999,
+    })
+    extra["event_count"] = 30
+    with pytest.raises(Fill001V5Error, match="29 planned pointer-down"):
+        validate_v5_bridge_runs(
+            [extra], session_id=SID, candidate_id=CANDIDATE,
+            expected_pointer_down_client=starts,
+        )
+
+
+def test_finalizer_refuses_absent_raw_pointer_binding_even_with_completed_summary(tmp_path):
+    from fill001_v5_finalization import finalize_v5_stage6_attempt
+    (tmp_path / "before.png").write_bytes(b"png")
+    (tmp_path / "after.png").write_bytes(b"png")
+    (tmp_path / SID).mkdir()
+    with pytest.raises(Fill001V5Error, match="29 independent planned"):
+        finalize_v5_stage6_attempt(
+            bridge_root=tmp_path, request={
+                "session_id": SID, "candidate_id": CANDIDATE,
+            }, baseline_files=set(),
+            summary={"status": "completed", "completed_strokes": 29},
+            pre_png=tmp_path / "before.png", post_png=tmp_path / "after.png",
+            timeout_seconds=0,
+        )
