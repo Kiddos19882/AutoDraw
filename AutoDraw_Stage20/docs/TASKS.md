@@ -1,5 +1,13 @@
 # AutoDraw — действующие задачи
 
+## FILL-001 V5 — frozen source-plan в штатном AutoDraw (2026-11-10)
+
+- [x] Разрешены только два DEC-030 trim0 кандидата. `fill001_v5_handoff.py` строит 29 исходных штрихов `10×28 → 2/3` из native fixture, сохраняет SHA геометрии, frozen mask ID и versioned policy; не создаёт второго executor.
+- [x] В существующей вкладке FILL-001 добавлена экспортная операция immutable source DrawingPlan. Повторная запись запрещена. Stage6 ordinary monochrome loader fail-closed отклоняет V5 diagnostic plan; tamper/regression tests добавлены.
+- [ ] **Следующий шаг:** отдельный проверенный versioned Stage6 mixed-brush handoff с `BrushSliderController.before_stroke`, подтверждением радиуса 10 и 2/3 свежим Monitor, сохранением исходного source-plan SHA, task/session/run и planned brush sequence. Без этого ввод мыши запрещён.
+- [ ] Подключить автоматическую калибровку desktop/ROI и проверенный Clear/blank-board gate (не требовать `pointCount=0`), затем один E4 run на каждый кандидат и независимый E5; exact CHALK и screen quality NOT_RUN. Никаких batch/prod изменений.
+
+
 ## FILL-001 — Firefox/browser attachment + V5 mixed-width continuation (2026-11-10)
 
 - **Выполнено в коде, E1:** опциональная Firefox WebDriver сессия из существующей вкладки FILL-001; проверка Origin игрового iframe, подтверждение оператора, новая Monitor/Bridge-сессия с Input Telemetry ON, явная кнопка остановки; тесты и включение Selenium в Windows build. E2/E3 считать подтверждёнными только после завершения CI для HEAD.
