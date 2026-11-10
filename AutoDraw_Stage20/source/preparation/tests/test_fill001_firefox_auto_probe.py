@@ -126,3 +126,24 @@ def test_verified_selenium_and_real_mouse_passive_sequence_uses_existing_gate(
     assert mapped["coordinate_system"]=="local_canvas_pixels"
     assert mapped["strokes"][-1]["metadata"]["brush_value"]=="3"
     assert proof["no_fallback"] is True
+
+
+def test_valid_v5_plan_without_optional_selenium_fails_closed_before_browser_access(
+    tmp_path, monkeypatch,
+):
+    import builtins
+    original_import = builtins.__import__
+    def missing_selenium(name, *args, **kwargs):
+        if name.startswith("selenium"):
+            raise ModuleNotFoundError("No module named selenium")
+        return original_import(name, *args, **kwargs)
+    monkeypatch.setattr(builtins, "__import__", missing_selenium)
+    class NoBrowser:
+        def find_elements(self, *_args):
+            raise AssertionError("WebDriver must not be used without Selenium")
+    with pytest.raises(PreflightGeometryError, match="Selenium is required"):
+        collect_verified_v5_firefox_roi(
+            NoBrowser(), tmp_path, SID,
+            build_fill001_v5_source_plan("K_trim_0_y190_w2"),
+            native_mouse=object(), now_utc=NOW,
+        )
