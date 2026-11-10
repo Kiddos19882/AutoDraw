@@ -1,5 +1,12 @@
 # AutoDraw — реестр проверенных результатов
 
+## FILL-001 V5 — W2 run-bound exact CHALK1709 + active PNG quality PASS (2026-11-10/11, E4)
+
+Immutable [evidence commit `1c722ba`](https://github.com/Kiddos19882/AutoDraw/commit/1c722ba82be2c91b03570460101061df74e6b9a2), `fill001/v5_stage6_runs/v5-51480631-902c-47b1-b782-5fc74596246d/report.json`, original `before.png`/`after.png`/`after_settled.png`, `game_monitor_bridge/d0999212-c9d0-437e-90a9-26d03a5ffaa3/game-monitor-run-20261110T231212351769Z-c36be38c.json` and `session.json`. Stage6 29/29 completed in 75.657s, 28×radius10→2, safe mouse release PASS. Raw closed Bridge run `c36be38c-98c5-4654-b598-3ec3f07bf4c3` 34 pointer candidates =29 consuming painting plus 5 zero-delta slider operations, `execution_status=completed`, Monitor drops/errors/gaps/Bridge failures=0, `point_delta_matches_chalk=true`. Automated `EXACT_RUN_BOUND`: **pre1/post1710/CHALK1709**, early Stage6 post1687 not settled.
+
+Pre/settled pointer parking at off-ROI screen (387,424), exact pointCount 1→1 and 1710→1710; original PNGs show clean pre and cursor-free filled rounded rectangle after. `after_settled.png` SHA256 `22c3487f13de891f1f38c2894fbc86cdc9497a122367cdbf22fcd70189a90519`. Active quality policy `FILL001_CHALK_FIRST_PERIMETER_V2` **PASS**: target 101529 px, covered 100877, uncovered652, coverage `0.9935781894828078`, leakage599, leakage beyond halo0, max overshoot1.327083 logical px vs3 allowed. Historical V1 PNG status FAILED and V2 diagnostic gate FAIL (strict zero leakage); neither is relabeled. Previous `36e95e4` CHALK1701 and active quality FAIL is preserved. **E5 NOT_RUN**, W3 NOT_RUN on this evidence. CI of latest source SHA separate from live and not evidence for E5.
+
+
 ## FILL-001 V5 — third W2 run: automatic CHALK E4 PASS, PNG quality FAIL (2026-11-10)
 
 Immutable [commit 36e95e4](https://github.com/Kiddos19882/AutoDraw/commit/36e95e49acfecdbae1969bdf3d7358f06ea72f54): `fill001/v5_stage6_runs/v5-b28524eb-ea40-4ee9-9505-d526beef86e5/report.json`, original before/after/after_settled PNG, session `a8896ff8-be90-464a-9ea8-c403ae385071`, closed run `7d5357a5-5919-49bf-bd1f-732df0696af0`. Stage6 29/29, 75.578 s, mouse release PASS. Game Monitor closed exact pre1/post1702, auto `EXACT_RUN_BOUND` **CHALK1701**, 5 zero-point slider input exclusions, validated radii [10,2]; early Stage6 post1678 is not closed final post. Exact CHALK automatic regression now E4 PASS, independent E5 NOT_RUN.
