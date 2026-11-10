@@ -201,6 +201,15 @@ def execute_v5_with_stage6(
     candidate = validate_fill001_v5_source_plan(source)
     if request.get("candidate_id") != candidate or request.get("protocol") != "FILL001_V5_STAGE6_SINGLE_RUN_V1":
         raise Fill001V5Error("Wrong V5 run identity.")
+    # Fail before any pointer input if the loaded finalizer is not slider-aware.
+    # The loaded module is authoritative; a Git commit alone cannot prove which
+    # module a running Windows process imported.
+    import fill001_v5_finalization as v5_finalizer
+    required_contract = "FILL001_V5_SLIDER_AWARE_BINDING_V2"
+    if getattr(v5_finalizer, "V5_BINDING_CONTRACT", None) != required_contract:
+        raise Fill001V5Error("Loaded V5 finalizer contract is outdated; restart AutoDraw with updated code.")
+    request["finalizer_contract"] = required_contract
+    request["finalizer_module_origin"] = str(getattr(v5_finalizer, "__file__", "unknown"))
     sid = request["session_id"]
     roi = request["screen_roi"]
     mapping_sha = request["mapping_sha256"]
