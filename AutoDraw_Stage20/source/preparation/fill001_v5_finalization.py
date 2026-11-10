@@ -33,6 +33,7 @@ def validate_v5_bridge_runs(
     runs: list[dict], *,
     session_id: str, candidate_id: str,
     expected_pre: int = 1,
+    expected_pointer_down_client: list[tuple[float,float]] | None = None,
 ) -> dict:
     """An exact run chain needs 29 stroke candidates, all radii and no drops."""
     if not isinstance(runs, list) or not 1 <= len(runs) <= 2:
@@ -44,6 +45,7 @@ def validate_v5_bridge_runs(
     if expected_last is None:
         raise Fill001V5Error("Unknown frozen V5 candidate.")
     counts, radii, run_ids, totals = [], [], [], []
+    all_pointer_downs: list[dict] = []
     last_post = expected_pre
     for run in ordered:
         if not isinstance(run, dict) or run.get("session_id") != session_id:
@@ -91,6 +93,9 @@ def validate_v5_bridge_runs(
                 or any(not isinstance(e, dict) or e.get("monitorVersion") != "0.2.4"
                        for e in events)):
             raise Fill001V5Error("V5 raw Bridge events have wrong Monitor version.")
+        all_pointer_downs.extend(
+            event for event in events if event.get("type") == "POINTER_DOWN_CANDIDATE"
+        )
         counts.append(count)
         radii.extend(seen_radii)
         totals.append((pre,post))
@@ -103,6 +108,19 @@ def validate_v5_bridge_runs(
         or sorted(set(ordered[1]["observed_brush_radii"])) != [expected_last]
     ):
         raise Fill001V5Error("V5 two-run brush switch split is inconsistent.")
+    if expected_pointer_down_client is not None:
+        if (not isinstance(expected_pointer_down_client, list)
+                or len(expected_pointer_down_client) != 29
+                or len(all_pointer_downs) != 29):
+            raise Fill001V5Error("V5 29 planned pointer-down events are not proven.")
+        for index, (event, (x,y)) in enumerate(zip(all_pointer_downs,expected_pointer_down_client)):
+            ex, ey = event.get("clientX"), event.get("clientY")
+            if (type(ex) not in (int,float) or type(ey) not in (int,float)
+                    or abs(ex-x) > 3 or abs(ey-y) > 3):
+                raise Fill001V5Error(
+                    f"V5 pointer-down {index+1} differs from frozen planned start; "
+                    "unexpected user/game input or geometry drift."
+                )
     return {
         "status": "EXACT_RUN_BOUND",
         "session_id": session_id,
@@ -141,6 +159,7 @@ def finalize_v5_stage6_attempt(
             runs=[json.loads(p.read_text(encoding="utf-8")) for p in files]
             binding=validate_v5_bridge_runs(
                 runs,session_id=sid,candidate_id=request["candidate_id"],
+                expected_pointer_down_client=request.get("expected_pointer_down_client"),
             )
             binding["bridge_run_paths"]=[str(p) for p in files]
             break
