@@ -210,6 +210,8 @@ def main() -> int:
             "--collect-all", "cv2",
             "--collect-all", "pyautogui",
             "--collect-all", "pynput",
+            "--collect-all", "selenium",
+            "--hidden-import", "firefox_monitor_session",
             "--hidden-import", "pynput.keyboard._win32",
             "--hidden-import", "pynput.mouse._win32",
         ]
