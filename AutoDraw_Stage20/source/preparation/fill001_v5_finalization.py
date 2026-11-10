@@ -46,6 +46,8 @@ def validate_v5_bridge_runs(
     counts, radii, run_ids, totals = [], [], [], []
     last_post = expected_pre
     for run in ordered:
+        if not isinstance(run, dict) or run.get("session_id") != session_id:
+            raise Fill001V5Error("V5 Bridge run session mismatch.")
         if (
             not isinstance(run, dict)
             or run.get("schema_version") != 1
