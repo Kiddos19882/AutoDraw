@@ -6,6 +6,7 @@ import pytest
 
 from fill001_v5_handoff import (
     CANDIDATES, Fill001V5Error, build_fill001_v5_source_plan,
+    validate_fill001_v5_source_plan,
 )
 
 
@@ -41,3 +42,24 @@ def test_v5_adapter_strict_candidate_allowlist():
 def test_v5_adapter_json_serialization_is_deterministic():
     plan = build_fill001_v5_source_plan(CANDIDATES[0])
     assert json.loads(json.dumps(plan, allow_nan=False)) == plan
+
+@pytest.mark.parametrize("candidate", CANDIDATES)
+def test_v5_source_plan_validator_rejects_every_kind_of_tampering(candidate):
+    original = build_fill001_v5_source_plan(candidate)
+    assert validate_fill001_v5_source_plan(original) == candidate
+    attacks = [
+        ("strokes", 0, "points", 0, "x", 1),
+        ("strokes", 28, "metadata", "brush_value", "10"),
+        ("generation", "automatic_execution_allowed", True),
+        ("generation", "source_strokes_sha256", "0"*64),
+        ("generation", "actual_chalk", 123),
+    ]
+    for path in attacks:
+        corrupt = json.loads(json.dumps(original))
+        *keys, new_value = path
+        obj = corrupt
+        for key in keys[:-1]:
+            obj = obj[key]
+        obj[keys[-1]] = new_value
+        with pytest.raises(Fill001V5Error, match="differs"):
+            validate_fill001_v5_source_plan(corrupt)
