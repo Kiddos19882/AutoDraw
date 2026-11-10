@@ -1,5 +1,10 @@
 # AutoDraw — журнал выполненных действий
 
+## 2026-11-10 — second real V5 E4 3825d57 and runtime finalizer diagnosis
+
+Checked GitHub HEAD/recent commits/CI; inspected full run `6f9bec0c`, original Stage6 report and both versions of finalizer. E4 exact counter 1→1695 (1694) with 29 planned strokes and 5 zero-point slider actions, no telemetry drops. Report's unexpected radii error matches old `ed74ffd` global radius validator; current `3189f860` strict verified-slider code would allow those radii provided all 29 positions, lifecycles and point deltas pass. Windows loaded-module identity unknown. Added finalizer contract `aa56bb0`, pre-draw fail-closed guard recording module origin `f1455b4`, replay regression on real 3825d57 data/tamper guard `88a12aa`. No change to production defaults, quality thresholds, original artifacts, master; no new E4/E5. CI to confirm on new head.
+
+
 ## 2026-11-10 — E4 V5 full Stage6 run 29/29 and strict exact CHALK reconciliation
 
 Read primary commit `ed74ffd` (source report, calibration, game session and full 8176-event bridge run). Confirmed new operator slider x1=1363/y306, x30=1207/y307; V5 brush first28 radius10/last radius2, 29 complete strokes, safe release and saved screen PNG. Source game monitor full run `b0afe0bf` reports exact pointCount 1→1707 (CHALK1706), 29 on-board frozen pointer starts + five zero-point slider events x1207..1358 y171. Old finalizer's `actual_chalk=null` resulted from rejecting all non-consuming UI events, including valid slider controls, as well as intermediate Stage6 post1681 before 26 late accepted points. Did NOT edit historic result.
