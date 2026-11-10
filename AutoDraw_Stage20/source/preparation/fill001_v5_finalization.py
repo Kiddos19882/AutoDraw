@@ -212,7 +212,7 @@ def finalize_v5_stage6_attempt(
     *, bridge_root: Path, request: dict, baseline_files: set[str],
     summary: dict, pre_png: Path, post_png: Path,
     timeout_seconds: float = 12.0,
-    post_capture_callback: Callable[[], Path] | None = None,
+    post_capture_callback: Callable[[int], Path] | None = None,
 ) -> dict:
     """Conservatively bind new Bridge runs; preserve failures as evidence."""
     if summary.get("status") != "completed" or summary.get("completed_strokes") != 29:
@@ -264,7 +264,7 @@ def finalize_v5_stage6_attempt(
         from fill001_screen_mask_v2 import audit_screen_mask_v2
         if post_capture_callback is None:
             raise Fill001V5Error("Settled post-run PNG capture was not requested.")
-        settled_png = Path(post_capture_callback())
+        settled_png = Path(post_capture_callback(binding["post_pointCount"]))
         if not settled_png.is_file() or settled_png == post_png:
             raise Fill001V5Error("Post-run settled PNG capture is missing or reused.")
         mapping=request.get("mapping")
