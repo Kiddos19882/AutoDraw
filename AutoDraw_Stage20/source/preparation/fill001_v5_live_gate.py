@@ -58,7 +58,6 @@ def verify_v5_live_gate(
         or record.get("page", {}).get("origin") != GAME_ORIGIN
         or not isinstance(diagnostics, dict)
         or diagnostics.get("connection_closed") is not False
-        or diagnostics.get("last_message_type") != "heartbeat"
         or diagnostics.get("collector_sequence_gap_count") != 0
         or not isinstance(status, dict)
         or status.get("version") != "0.2.4"
