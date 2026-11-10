@@ -327,3 +327,28 @@ def test_real_3825d57_closed_bridge_replay_and_no_relaxed_guards():
             expected_board_client_rect=request["board_client_rect"],
             slider_client_corridor=request["slider_client_corridor"],
         )
+
+
+@pytest.mark.parametrize("invalid", [10.5, 0.5, 0.0, 31.0, float("nan"),
+                                     float("inf"), True, "10", None])
+def test_v5_rejects_nonintegral_or_unsafe_bridge_radii(invalid):
+    run, planned, rect, slider = _real_shaped_slider_and_29_strokes()
+    run["observed_brush_radii"] = [1.0, 2.0, 8.0, invalid, 30.0]
+    with pytest.raises(Fill001V5Error, match="unexpected brush radii"):
+        validate_v5_bridge_runs(
+            [run], session_id=SID, candidate_id=CANDIDATE,
+            expected_pointer_down_client=planned,
+            expected_board_client_rect=rect, slider_client_corridor=slider,
+        )
+
+
+def test_v5_accepts_only_integral_bridge_radius_floats():
+    run, planned, rect, slider = _real_shaped_slider_and_29_strokes()
+    run["observed_brush_radii"] = [1.0, 2.0, 8.0, 10.0, 30.0]
+    result = validate_v5_bridge_runs(
+        [run], session_id=SID, candidate_id=CANDIDATE,
+        expected_pointer_down_client=planned,
+        expected_board_client_rect=rect, slider_client_corridor=slider,
+    )
+    assert result["exact_chalk"] == 1706
+    assert result["excluded_zero_point_slider_drags"] == 5
