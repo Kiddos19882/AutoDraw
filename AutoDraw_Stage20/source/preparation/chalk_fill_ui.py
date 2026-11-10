@@ -154,7 +154,7 @@ class Fill001Tab:
             command=self.start_firefox_monitor,
         ).pack(side="left", padx=(0, 6))
         ttk.Button(
-            firefox, text="Подтвердить: доска открыта",
+            firefox, text="Подтвердить доску и разрешить ожидание Firefox",
             command=self.confirm_firefox_board,
         ).pack(side="left", padx=(0, 6))
         ttk.Button(
@@ -163,7 +163,8 @@ class Fill001Tab:
         ).pack(side="left")
         ttk.Label(
             bridge_controls,
-            text=("Firefox experimental: после входа в игру подтвердите доску кнопкой. "
+            text=("Firefox: откройте доску, подтвердите её здесь, затем нажмите на "
+                  "верхнюю панель Firefox вне холста; ожидается native Win32 PID. "
                   "Selenium только подключает Monitor/Bridge к iframe; "
                   "рисование остаётся за штатным Stage6 и fail-closed preflight."),
             wraplength=1080, justify="left",
@@ -271,7 +272,7 @@ class Fill001Tab:
                 FirefoxMonitorError, open_firefox, attach_monitor_after_confirmation,
             )
             driver = open_firefox()
-            self._firefox_messages.put(("READY", "Откройте игровую доску в Firefox, затем подтвердите."))
+            self._firefox_messages.put(("READY", "Откройте доску в Firefox, подтвердите её в AutoDraw, затем активируйте Firefox щелчком по верхней панели браузера."))
             # No game input and no Monitor injection until the operator confirms.
             if not self._firefox_confirm.wait(timeout=600) or self._firefox_stop.is_set():
                 raise FirefoxMonitorError("Доска не подтверждена; действие отменено.")
@@ -321,10 +322,10 @@ class Fill001Tab:
                     "однозначную сессию игровой доски."
                 )
             self._firefox_messages.put((
-                "CONNECTED",
-                f"Monitor {attached['monitor_version']}; "
-                f"Bridge session={ready['session_id']}. "
-                "Запускается пассивная проверка V5 ROI без нажатий мыши.",
+                "WAITING_FOR_USER_FOCUS",
+                f"Monitor {attached['monitor_version']}; session={ready['session_id']}. "
+                "Нажмите мышью на верхнюю панель Firefox (НЕ на игровую доску). "
+                "AutoDraw автоматически проверит, что Firefox активен.",
             ))
             # The automatic probe is diagnostic only.  It does not clear the
             # board, set a brush, transfer plans or authorize Stage6 input.
@@ -344,7 +345,21 @@ class Fill001Tab:
             try:
                 if self._firefox_stop.is_set():
                     raise RuntimeError("BLOCKED: Firefox probe был остановлен.")
-                time.sleep(0.4)
+                from firefox_foreground_witness import (
+                    wait_for_operator_firefox_foreground,
+                )
+                # This is intentionally a user gesture. Switching a Selenium
+                # window or calling Win32 SetForegroundWindow does not prove
+                # foreground ownership and must never replace this check.
+                wait_for_operator_firefox_foreground(
+                    driver, cancel_event=self._firefox_stop,
+                    timeout_seconds=90.0,
+                )
+                self._firefox_messages.put((
+                    "FOREGROUND_CONFIRMED",
+                    "Активное окно Firefox подтверждено через Win32 PID. "
+                    "Начинается пассивная ROI-проверка без кликов.",
+                ))
                 mapped, witness, roi = collect_verified_v5_firefox_roi(
                     driver, bridge_root, ready["session_id"], plan,
                     native_mouse=pyautogui,
