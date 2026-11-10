@@ -66,9 +66,30 @@ def prepare_v5_run(
             or not isinstance(mapped.get("strokes"), list)
             or len(mapped["strokes"]) != 29):
         raise Fill001V5Error("V5 mapped DrawingPlan is invalid.")
+    corners = mapping.get("board_screen_corners")
+    if not isinstance(corners, dict):
+        raise Fill001V5Error("Missing independently verified screen corners.")
+    try:
+        x0, y0, x1, y1 = [float(corners[k]) for k in ("left", "top", "right", "bottom")]
+        from math import isfinite
+        if not all(isfinite(v) for v in (x0, y0, x1, y1)):
+            raise ValueError("Non-finite mapping.")
+        sx = (x1 - x0) / 460
+        sy = (y1 - y0) / 240
+        if sx <= 0 or sy <= 0 or abs(sx-sy)/max(sx,sy) > .01:
+            raise ValueError("Non-uniform mapping.")
+    except (KeyError, TypeError, ValueError) as exc:
+        raise Fill001V5Error("Invalid V5 BoardPane screen transform.") from exc
     for expected, actual in zip(source["strokes"], mapped["strokes"]):
-        if actual.get("metadata") != expected["metadata"]:
-            raise Fill001V5Error("V5 stroke metadata changed during screen transform.")
+        if (actual.get("metadata") != expected["metadata"]
+                or len(actual.get("points", [])) != len(expected["points"])):
+            raise Fill001V5Error("V5 stroke identity changed during screen transform.")
+        for logical, pixel in zip(expected["points"], actual["points"]):
+            target_x = x0 + logical["x"]*sx - roi["x"]
+            target_y = y0 + logical["y"]*sy - roi["y"]
+            if (abs(float(pixel["x"])-target_x)>1e-5
+                    or abs(float(pixel["y"])-target_y)>1e-5):
+                raise Fill001V5Error("V5 screen coordinates changed after passive mapping.")
     plan = DrawingPlan.from_dict(mapped)
     plan.validate_bounds()
     if (plan.width, plan.height) != (roi["width"], roi["height"]):
