@@ -1,9 +1,11 @@
 # AutoDraw — реестр проверенных результатов
 
-## FILL-001 V5 — second raw E4, commit 3825d57 (2026-11-10)
 
-Primary report `fill001/v5_stage6_runs/v5-884678ea-76ec-405e-9067-56be4dfa7546/report.json` and `game_monitor_bridge/6c41cea3-8a5b-4340-aeba-1fbe3cc29327/game-monitor-run-20261110T163103037862Z-6f9bec0c.json` in [3825d57](https://github.com/Kiddos19882/AutoDraw/commit/3825d571eff4717efd8f5dbde88524cdc4387073). E4 Stage6 29/29, 76.266s, mouse safe release PASS. Monitor 8133 events; 34 pointer candidates = 29 consuming paint + 5 zero-point slider, complete lifecycle; 0 dropped/errors/gaps, `point_delta_matches_chalk=true`. Exact completed run pre1/post1695/CHALK1694; early Stage6 after1670 not settled. Raw `observed_brush_radii=[1,2,8,10,30]` includes slider transient values, drawing-only 10×28→2. Original auto finalization BLOCKED/null; screen quality `NOT_EVALUATED`; E5 `NOT_RUN`. Previous ed74ffd source CHALK1706 was a different run, no direct quality-accepted ranking. Regression added on immutable original run at `88a12aa`, CI result separately required; no alteration to original evidence.
+## FILL-001 V5 — second E4 and real-data regression, 3825d57
 
+Primary immutable [commit 3825d57](https://github.com/Kiddos19882/AutoDraw/commit/3825d571eff4717efd8f5dbde88524cdc4387073): `fill001/v5_stage6_runs/v5-884678ea-76ec-405e-9067-56be4dfa7546/report.json`, `game_monitor_bridge/6c41cea3-8a5b-4340-aeba-1fbe3cc29327/game-monitor-run-20261110T163103037862Z-6f9bec0c.json`. E4 Stage6 29/29, 76.266 s, mouse released. Closed run 8133 events, 29 paint plus five zero-point slider actions, exact 1→1695 **CHALK1694**, `point_delta_matches_chalk=true`, drops/errors/gaps=0; early post1670 not final. Original finalizer BLOCKED/null and quality NOT_EVALUATED; settled PNG and independent E5 NOT_RUN. Previous ed74ffd source CHALK1706 is a separate run; no quality-accepted comparison yet.
+
+**Defect reproduced by E3 on 88a12aa:** `test_real_3825d57_closed_bridge_replay_and_no_relaxed_guards` failed `V5 Bridge observed unexpected brush radii` because raw JSON uses floats `[1.0,2.0,8.0,10.0,30.0]` and old code demanded `type(v) is int`. See [failed workflow 42858034815](https://github.com/Kiddos19882/AutoDraw/actions/runs/42858034815). Corrected [252228c](https://github.com/Kiddos19882/AutoDraw/commit/252228cb054b1ab551ad0a2fd379f157d9ed0611), negative tests [6506774](https://github.com/Kiddos19882/AutoDraw/commit/650677409456483d330f0bd243ff9a17fa6cc167). New E3 CI pending at documentation write; no retroactive PASS.
 
 ## FILL-001 V5 — first 29/29 Stage6 live and closed Bridge exact measurement (2026-11-10, E4)
 
