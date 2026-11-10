@@ -347,7 +347,15 @@ def execute_v5_with_stage6(
                 # the Bridge. Await the CLOSED run and take another immutable
                 # PNG only after its final exact post-count is known.
                 settled_path = directory / "after_settled.png"
-                def capture_settled() -> Path:
+                def capture_settled(expected_post: int) -> Path:
+                    # No post-hoc screenshot may be paired with an unrelated
+                    # game state, even if the old Bridge run itself was exact.
+                    settled_gate = current_gate()
+                    if settled_gate["pointCount"] != expected_post:
+                        raise Fill001V5Error(
+                            "V5 settled screen changed after closed Bridge run; "
+                            "PNG quality BLOCKED, exact run CHALK preserved."
+                        )
                     native_mouse.screenshot(region=(
                         roi["x"],roi["y"],roi["width"],roi["height"],
                     )).save(settled_path)
