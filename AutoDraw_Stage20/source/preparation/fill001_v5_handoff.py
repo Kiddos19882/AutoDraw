@@ -148,14 +148,15 @@ class V5BrushSequenceGuard:
         """Require the native slider controller and an exact initial radius 10."""
         if self.next_index != 1 or self.preflight_done:
             raise Fill001V5Error("V5 brush preflight cannot be repeated.")
-        calibration = getattr(controller, "calibration", None)
-        if getattr(calibration, "initial_value", None) != 10:
-            raise Fill001V5Error("V5 requires a verified initial brush width 10.")
+        # The actual board can start at another radius (e.g. 30).
+        # Stage6 must first use the existing closed-loop slider to select 10.
+        # The initial calibration radius must match the observed value BEFORE
+        # that switch; it need not be 10 itself.
         if not callable(getattr(controller, "validate", None)):
             raise Fill001V5Error("Missing live BrushSliderController validation.")
         controller.validate()
         if getattr(controller, "current_value", None) != 10:
-            raise Fill001V5Error("Initial Game Monitor brush width is not 10.")
+            raise Fill001V5Error("Initial Game Monitor brush width is not 10 after verified switch.")
         self.preflight_done = True
 
     def before_stroke(
