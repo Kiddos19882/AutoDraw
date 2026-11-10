@@ -4,7 +4,8 @@
 
 - [x] Разрешены только два DEC-030 trim0 кандидата. `fill001_v5_handoff.py` строит 29 исходных штрихов `10×28 → 2/3` из native fixture, сохраняет SHA геометрии, frozen mask ID и versioned policy; не создаёт второго executor.
 - [x] В существующей вкладке FILL-001 добавлена экспортная операция immutable source DrawingPlan. Повторная запись запрещена. Stage6 ordinary monochrome loader fail-closed отклоняет V5 diagnostic plan; tamper/regression tests добавлены.
-- [ ] **Следующий шаг:** отдельный проверенный versioned Stage6 mixed-brush handoff с `BrushSliderController.before_stroke`, подтверждением радиуса 10 и 2/3 свежим Monitor, сохранением исходного source-plan SHA, task/session/run и planned brush sequence. Без этого ввод мыши запрещён.
+- [x] Создан `V5BrushSequenceGuard`: поверх существующего `BrushSliderController` выполняет preflight начальной кисти 10, фиксирует последовательность 29 штрихов и проверяет после callback фактический размер 2/3. Добавлены negative/unit tests; физический ввод не осуществляется новым компонентом.
+- [ ] **Следующий шаг:** подключить проверенный guard к отдельному versioned Stage6 mixed-brush handoff только после task/session/run, runtime desktop ROI и blank-board gate; сохранить SHA source-плана и per-stroke brush evidence. До этого ввод мыши запрещён.
 - [ ] Подключить автоматическую калибровку desktop/ROI и проверенный Clear/blank-board gate (не требовать `pointCount=0`), затем один E4 run на каждый кандидат и независимый E5; exact CHALK и screen quality NOT_RUN. Никаких batch/prod изменений.
 
 
