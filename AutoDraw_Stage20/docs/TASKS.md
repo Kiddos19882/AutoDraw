@@ -1,5 +1,13 @@
 # AutoDraw — действующие задачи
 
+## FILL-001 V5 — после второго foreground PID BLOCKED (2026-11-10)
+
+- [x] Проверено пользовательское E4 evidence `1bd38514`: новая Monitor/Bridge сессия подтверждена, но после WebDriver focus Win32 PID остаётся 932 вместо Firefox 5372; ROI/Mapped Stage6/CHALK/PNG NOT_RUN.
+- [x] Добавлен ограниченный native Win32 focus request к **ровно одному** top-level visible HWND с PID GeckoDriver Firefox (без ввода мыши/клавиш) с обязательной повторной проверкой реального foreground PID. Однозначного окна нет или SetForegroundWindow запрещён Windows — BLOCKED. Дополнены CI regression tests на отказ и несовпадение PID.
+- [ ] Повторить **только passive Firefox probe** на Windows и сохранить новую session/result, проверить PID after native focus, ROI и три OS mouse witnesses. До runtime E4 и PNG validation не включать Stage6; если повторится BLOCKED, собрать Win32 window owner diagnostic без угадывания координат.
+- [ ] Stage6 mixed V5, verified Clear, brush switch 10→2/3, exact CHALK и E5 quality остаются закрытыми.
+
+
 ## FILL-001 V5 — продолжение после реального Firefox BLOCKED (2026-11-10)
 
 - [x] Проанализированы runtime первичные файлы пользовательского commit `848aae2`: подключение Firefox/iframe/Monitor/Bridge подтверждено E4 PARTIAL, точный игровой CHALK/PNG E5 не выполнялись. Исходный failure: native foreground Firefox PID gate BLOCKED.
