@@ -1568,6 +1568,16 @@ class Stage6App:
             "confirmed": True,
         }
         BrushSliderCalibration.from_dict(calibration).validate(pyautogui.size(), roi)
+        from fill001_v5_live_gate import verify_v5_live_gate
+        # Only the verified slider track comes from the saved calibration.
+        # The actual initial knob value comes from the current game heartbeat;
+        # never assume an earlier session still has the same brush radius.
+        current_brush = verify_v5_live_gate(
+            bridge_root, session_id=session_id,
+            expected_mapping_sha256=mapping["boardpane_mapping_sha256"],
+            require_blank=True,
+        )["currentRadius"]
+        calibration["initial_value"] = current_brush
         request = prepare_v5_run(
             source, mapped, mapping, roi, bridge_root=bridge_root,
             session_id=session_id, driver=driver,
