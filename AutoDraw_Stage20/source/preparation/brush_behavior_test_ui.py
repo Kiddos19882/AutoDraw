@@ -1226,6 +1226,7 @@ class BrushBehaviorTestTab:
 
     def start_game_monitor_bridge(
         self, *, require_input_telemetry: bool | None = None,
+        origin_override: str | None = None,
     ) -> bool:
         """Launch the one shared Bridge, with an explicit FILL-001 opt-in mode.
 
@@ -1262,7 +1263,7 @@ class BrushBehaviorTestTab:
             return (
                 enable_input_telemetry == self.bridge_input_telemetry_requested
             )
-        origin_value = simpledialog.askstring(
+        origin_value = origin_override if origin_override is not None else simpledialog.askstring(
             "Запуск Game Monitor WebSocket",
             "Вставь точный Origin игрового iframe. Получить его можно в Console iframe командой location.origin:",
             parent=self.root,
