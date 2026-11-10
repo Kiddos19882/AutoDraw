@@ -1,5 +1,6 @@
 """Exact V5 CHALK binding tests; all data synthetic and no game input."""
 from copy import deepcopy
+import json
 
 import pytest
 
@@ -245,3 +246,38 @@ def test_slider_exclusion_never_allowed_without_verifiable_bounds():
             [run],session_id=SID,candidate_id=CANDIDATE,
             expected_pointer_down_client=planned,
         )
+
+
+def test_exact_bound_chalk_survives_independent_png_capture_failure(tmp_path):
+    from fill001_v5_finalization import finalize_v5_stage6_attempt
+    run,planned,rect,slider=_real_shaped_slider_and_29_strokes()
+    folder=tmp_path / SID
+    folder.mkdir()
+    (folder/"game-monitor-run-verified.json").write_text(json.dumps(run), encoding="utf-8")
+    first=tmp_path/"before.png"
+    last=tmp_path/"after.png"
+    first.write_bytes(b"unchanged-before-placeholder")
+    last.write_bytes(b"unchanged-post-placeholder")
+    def fail_capture():
+        raise OSError("simulated missing settled PNG")
+    result=finalize_v5_stage6_attempt(
+        bridge_root=tmp_path,
+        request={
+            "session_id":SID,"candidate_id":CANDIDATE,
+            "attempt_id":"synthetic-one-run",
+            "expected_pointer_down_client":planned,
+            "board_client_rect":rect,
+            "slider_client_corridor":slider,
+        },
+        baseline_files=set(),
+        summary={"status":"completed","completed_strokes":29},
+        pre_png=first,post_png=last,
+        post_capture_callback=fail_capture,
+        timeout_seconds=0.1,
+    )
+    assert result["binding"]["exact_chalk"]==1706
+    assert result["binding"]["excluded_zero_point_slider_drags"]==5
+    assert result["quality_gate"]=="NOT_EVALUATED"
+    assert result["status"]=="EXACT_RUN_BOUND_PNG_AUDIT_BLOCKED"
+    assert "simulated missing settled PNG" in result["quality_error"]
+    assert first.read_bytes()==b"unchanged-before-placeholder"
