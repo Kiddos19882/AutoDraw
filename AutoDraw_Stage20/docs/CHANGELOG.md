@@ -1,5 +1,10 @@
 # AutoDraw — значимые изменения
 
+## 2026-11-10 — FILL-001 Firefox Monitor opt-in (experimental)
+
+Добавлено опциональное подключение Firefox/Selenium к Game Monitor/Bridge из вкладки FILL-001: портал/iframe origin, подтверждение оператора, отдельный runtime, новая session, телеметрия, явное завершение. Исполнитель Stage6, frozen V5 geometry, CHALK estimator и production defaults не изменены. V5 automated mixed brush и live acceptance пока не готовы.
+
+
 ## 2026-11-09 — FILL-001 V5 native CHALK-first perimeter screening
 
 Extended existing FILL001 fixture generator, Egret BoardPane WebGL harness, Firefox runner, alpha analyst, regression tests and isolated native CI with `FILL001_CHALK_FIRST_NATIVE_V5` / `FILL001_CHALK_FIRST_NATIVE_AUDIT_V5`. New frozen 4×2 lateral trim vs bottom brush combinations plus unchanged V4 source control; all native RGBA/SHA and rejected candidates preserved. Native trim0 alpha128 coverage >99.42% and max leakage depth 1 logical px, but **no game quality PASS or exact CHALK**. [Native CI](https://github.com/Kiddos19882/AutoDraw/actions/runs/42694626385), [raw evidence](https://github.com/Kiddos19882/AutoDraw/actions/runs/42694626385/artifacts/13707703988). No production, runtime, historical mask, executor or default updates.
