@@ -34,3 +34,18 @@ def test_stage6_rejects_forged_v5_protocol_even_without_generation_method(tmp_pa
     app.running = False
     with pytest.raises(ValueError, match="mixed-width source plan"):
         app.load_plan_from_path(path)
+
+@pytest.mark.parametrize("candidate", ("K_trim_0_y190_w2", "K_trim_0_y189_w3"))
+def test_stage6_rejects_v5_after_normal_model_serialization_strips_generation(tmp_path, candidate):
+    from models import DrawingPlan
+    original = build_fill001_v5_source_plan(candidate)
+    stripped = DrawingPlan.from_dict(original).to_dict()
+    assert "generation" not in stripped
+    assert stripped["strokes"][0]["metadata"]["fill001_v5_candidate"] == candidate
+    path = tmp_path / "model-round-trip.json"
+    path.write_text(json.dumps(stripped), encoding="utf-8")
+    app = Stage6App.__new__(Stage6App)
+    app.running = False
+    with pytest.raises(ValueError, match="mixed-width source plan"):
+        app.load_plan_from_path(path)
+    assert not hasattr(app, "plan_path")
