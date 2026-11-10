@@ -1,5 +1,14 @@
 # AutoDraw — текущее состояние
 
+## FILL-001 V5 — автоматический exact CHALK принят; PNG FAIL, E4 2026-11-10
+
+Первичные неизменяемые данные: [runtime commit 36e95e4](https://github.com/Kiddos19882/AutoDraw/commit/36e95e49acfecdbae1969bdf3d7358f06ea72f54), attempt `b28524eb-ea40-4ee9-9505-d526beef86e5`, Bridge session `a8896ff8-be90-464a-9ea8-c403ae385071`, run `7d5357a5-5919-49bf-bd1f-732df0696af0`. **Stage6 E4 PASS** 29/29, 28×radius10→last radius2, 75.578s, mouse release PASS. **Automatic exact run-bound CHALK E4 PASS: 1→1702 = 1701**, `monitor_binding=EXACT_RUN_BOUND`, 29 consuming strokes plus five zero-point slider controls, no Monitor/Bridge drops/errors/gaps. Early Stage6 `post=1678` missed 24 later game points. Loaded finalizer contract `FILL001_V5_SLIDER_AWARE_BINDING_V2` and module path recorded. `after_settled.png` saved, same SHA as immediate `after.png`.
+
+**Quality gate FAIL, not a passing FILL-001 candidate:** active `FILL001_CHALK_FIRST_PERIMETER_V2`, coverage 99.368653% >= 99%; leakage 2963 screen pixels, 2230 farther than 3 logical px; maximum detected overshoot 48.146794 logical px. Original V1 also FAILED. Independent E5 NOT_RUN; do not rank W2/W3 by CHALK or promote production. Visual inspection of original before/settled PNG shows the Egret game brush cursor sprite at different locations outside the target; RGB before/after audit counts its movement as changed pixels. This is a **plausible substantial confounder** of the 48px outlier, not proof that all leakage is an artifact or that the paint passes.
+
+V5-only future-capture change `c1fe1f8`/`1b48fb1` parks an already released pointer 96 screen px outside the ROI before baseline/settled PNG, verifies precise pointer position and fresh same-session exact pointCount before/after motion; original immediate after capture preserved. Unit guards `0ca2a42`. Frozen masks, acceptance thresholds, original PNGs and production defaults untouched. This update has **not yet been validated in a new Windows E4**. CI on code SHA to check separately.
+
+
 
 ## FILL-001 V5 — второй Windows E4 29/29; найден точный дефект финализатора (2026-11-10)
 
