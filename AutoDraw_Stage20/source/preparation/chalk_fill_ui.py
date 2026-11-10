@@ -349,7 +349,7 @@ class Fill001Tab:
                 mapped, witness, roi = collect_verified_v5_firefox_roi(
                     driver, bridge_root, ready["session_id"], plan,
                     native_mouse=pyautogui,
-                    now_utc=datetime.now(timezone.utc),
+                    now_utc=lambda: datetime.now(timezone.utc),
                 )
             finally:
                 self.root.after(0, self.root.deiconify)
