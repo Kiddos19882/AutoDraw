@@ -197,3 +197,52 @@ def test_missing_foreground_witness_blocks_before_any_selenium_move(tmp_path, mo
                 build_fill001_v5_source_plan("K_trim_0_y190_w2"),
                 native_mouse=object(), now_utc=NOW,
             )
+
+
+def test_v5_probe_diagnostic_persists_blocked_reason_without_execution(tmp_path):
+    from fill001_firefox_auto_probe import write_v5_probe_result
+    result = write_v5_probe_result(
+        tmp_path / "v5_passive_roi",
+        candidate_id="K_trim_0_y190_w2",
+        session_id=SID,
+        status="BLOCKED",
+        reason="Firefox foreground PID mismatch",
+    )
+    document = json.loads(result.read_text(encoding="utf-8"))
+    assert document["status"] == "BLOCKED"
+    assert document["session_id"] == SID
+    assert document["blocked_reason"] == "Firefox foreground PID mismatch"
+    assert document["stage6_execution_allowed"] is False
+    assert document["actual_chalk"] is None
+    assert document["game_png_quality"] == "NOT_EVALUATED"
+    assert "token" not in document
+    assert "cookie" not in document
+    second = write_v5_probe_result(
+        tmp_path / "v5_passive_roi",
+        candidate_id="K_trim_0_y190_w2",
+        session_id=SID,
+        status="BLOCKED",
+        reason="Another independent failure",
+    )
+    assert second != result
+    assert json.loads(result.read_text(encoding="utf-8")) == document
+
+
+def test_v5_probe_diagnostic_rejects_false_pass_or_missing_proof(tmp_path):
+    from fill001_firefox_auto_probe import write_v5_probe_result
+    with pytest.raises(PreflightGeometryError, match="Unknown"):
+        write_v5_probe_result(
+            tmp_path, candidate_id="K_trim_0_y190_w2", session_id=SID,
+            status="PASS_E4",
+        )
+    with pytest.raises(PreflightGeometryError, match="reason"):
+        write_v5_probe_result(
+            tmp_path, candidate_id="K_trim_0_y190_w2", session_id=SID,
+            status="BLOCKED",
+        )
+    with pytest.raises(PreflightGeometryError, match="incomplete"):
+        write_v5_probe_result(
+            tmp_path, candidate_id="K_trim_0_y190_w2", session_id=SID,
+            status="PASSIVE_MAPPING_ONLY_NOT_EXECUTOR_READY",
+        )
+    assert not list(tmp_path.glob("*.json"))
