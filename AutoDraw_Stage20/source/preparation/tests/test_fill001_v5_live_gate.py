@@ -94,3 +94,11 @@ def test_gate_requires_exact_selected_session_not_just_newest(tmp_path):
             tmp_path, session_id="another-session",
             expected_mapping_sha256=mapping, now_utc=NOW,
         )
+
+
+def test_v5_recent_heartbeat_remains_valid_when_latest_message_is_stroke_event(tmp_path):
+    path, mapping = fixture(tmp_path)
+    record = json.loads(path.read_text(encoding="utf-8"))
+    record["bridge_diagnostics"]["last_message_type"] = "event"
+    path.write_text(json.dumps(record), encoding="utf-8")
+    assert verify(tmp_path, mapping)["pointCount"] == 1
