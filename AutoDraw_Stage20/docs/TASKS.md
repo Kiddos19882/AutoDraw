@@ -1,5 +1,13 @@
 # AutoDraw — действующие задачи
 
+## FILL-001 — Firefox/browser attachment + V5 mixed-width continuation (2026-11-10)
+
+- **Выполнено в коде, E1:** опциональная Firefox WebDriver сессия из существующей вкладки FILL-001; проверка Origin игрового iframe, подтверждение оператора, новая Monitor/Bridge-сессия с Input Telemetry ON, явная кнопка остановки; тесты и включение Selenium в Windows build. E2/E3 считать подтверждёнными только после завершения CI для HEAD.
+- **Открыто (BLOCKED на E4/E5 и разработку):** доказать Windows Firefox/GeckoDriver запуск, авторизованную новую сессию и правильный BoardPane. Затем закончить безопасную environment-fingerprint desktop/screenshot calibration и автоматическое подтверждение Clear (чистая доска может иметь `pointCount=1`; `pointCount==0` нельзя использовать как критерий). 
+- **Открыто (V5):** вывести frozen два DEC-030 trim0 кандидата в штатный FILL-001 single-run с отдельным протоколом mixed brush 10→2/3, verified brush switches и собственной идентичностью запуска. Сейчас fixed-radius handoff не обеспечивает такой режим; нельзя подменять ширины или выдавать этот проект за завершённую V5 live validation.
+- **Gate:** один управляемый run, сохранённые run/session/report/PNG, exact `post.pointCount-pre.pointCount`, quality gates без подбора порогов, затем независимая validation. Production defaults и `master` не затрагивать.
+
+
 ## P1 — FILL-001 V5 DEC-030: native trim0 99%+ periphery, CHALK gate open
 
 - [x] Versioned `FILL001_CHALK_FIRST_NATIVE_V5`: frozen rectangle SHA, неизменный V4 RGBA control и 8 заранее закреплённых trim0..3×bottom(W2/Y190 либо W3/Y189) вариантов. Изолированная native BoardPane/Egret WebGL проба, отдельный alpha анализ по 1/64/128/254, actual PNG/fixture SHA и fail-closed overwrite/tamper checks. [Native CI SUCCESS 42694626385](https://github.com/Kiddos19882/AutoDraw/actions/runs/42694626385); [source artifact 13707703988](https://github.com/Kiddos19882/AutoDraw/actions/runs/42694626385/artifacts/13707703988).
