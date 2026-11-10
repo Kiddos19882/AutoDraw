@@ -22,6 +22,8 @@ def active_window_process_id() -> int:
     from ctypes import wintypes
 
     user32 = ctypes.WinDLL("user32", use_last_error=True)
+    user32.GetForegroundWindow.argtypes = []
+    user32.GetForegroundWindow.restype = wintypes.HWND
     hwnd = user32.GetForegroundWindow()
     if not hwnd:
         raise FirefoxForegroundError("No foreground window.")
