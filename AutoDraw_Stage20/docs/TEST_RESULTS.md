@@ -1,5 +1,10 @@
 # AutoDraw — реестр проверенных результатов
 
+## FILL-001 V5 — second raw E4, commit 3825d57 (2026-11-10)
+
+Primary report `fill001/v5_stage6_runs/v5-884678ea-76ec-405e-9067-56be4dfa7546/report.json` and `game_monitor_bridge/6c41cea3-8a5b-4340-aeba-1fbe3cc29327/game-monitor-run-20261110T163103037862Z-6f9bec0c.json` in [3825d57](https://github.com/Kiddos19882/AutoDraw/commit/3825d571eff4717efd8f5dbde88524cdc4387073). E4 Stage6 29/29, 76.266s, mouse safe release PASS. Monitor 8133 events; 34 pointer candidates = 29 consuming paint + 5 zero-point slider, complete lifecycle; 0 dropped/errors/gaps, `point_delta_matches_chalk=true`. Exact completed run pre1/post1695/CHALK1694; early Stage6 after1670 not settled. Raw `observed_brush_radii=[1,2,8,10,30]` includes slider transient values, drawing-only 10×28→2. Original auto finalization BLOCKED/null; screen quality `NOT_EVALUATED`; E5 `NOT_RUN`. Previous ed74ffd source CHALK1706 was a different run, no direct quality-accepted ranking. Regression added on immutable original run at `88a12aa`, CI result separately required; no alteration to original evidence.
+
+
 ## FILL-001 V5 — first 29/29 Stage6 live and closed Bridge exact measurement (2026-11-10, E4)
 
 Primary archived [commit `ed74ffd629a5b8bdae6b76e2adea8c8bb0a399ba`](https://github.com/Kiddos19882/AutoDraw/commit/ed74ffd629a5b8bdae6b76e2adea8c8bb0a399ba), `AutoDraw_Stage20/data/results/brush_behavior_tests/fill001/v5_stage6_runs/v5-09d783ae-616c-4db3-a1c0-9dcc1c6a856f/report.json` + original `before.png` / `after.png`; `game_monitor_bridge/6bd34aee-0c60-41ad-9902-f4dfca8d8ed8/game-monitor-run-20261110T154452673488Z-b0afe0bf.json` and `session.json`; frozen candidate `K_trim_0_y190_w2`, source SHA `71cf46c0111cf141c99296981fb2a282c5468956b2c3dc3e442294c42aeef8db`. Stage6 execution `completed_strokes=29/29`, stable width sequence `10×28→2`, 76.125 seconds, mouse release PASS, before exact pointCount1; immediate Stage6 after snapshot 1681; its finalization `BLOCKED`, `actual_chalk=null`, quality NOT_EVALUATED.
