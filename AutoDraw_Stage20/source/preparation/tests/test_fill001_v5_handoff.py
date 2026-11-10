@@ -63,3 +63,15 @@ def test_v5_source_plan_validator_rejects_every_kind_of_tampering(candidate):
         obj[keys[-1]] = new_value
         with pytest.raises(Fill001V5Error, match="differs"):
             validate_fill001_v5_source_plan(corrupt)
+
+@pytest.mark.parametrize("candidate", CANDIDATES)
+def test_v5_source_plan_is_compatible_with_existing_drawing_model(candidate):
+    from models import DrawingPlan
+    document = build_fill001_v5_source_plan(candidate)
+    plan = DrawingPlan.from_dict(document)
+    plan.validate_bounds()
+    assert plan.stroke_count == 29
+    assert plan.width == 460 and plan.height == 240
+    assert [stroke.metadata["brush_value"] for stroke in plan.strokes] == [
+        str(width) for width in document["generation"]["brush_sequence"]
+    ]
