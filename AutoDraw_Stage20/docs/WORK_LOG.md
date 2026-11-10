@@ -1,5 +1,10 @@
 # AutoDraw — журнал выполненных действий
 
+## 2026-11-10 — исправление CI Selenium и автоматизированный passive Firefox ROI
+
+В E3 `42734007807` было `1 failed / 1125 passed`, ошибка импортирования необязательного Selenium в негативном V5-source тесте. Порядок проверки изменён, добавлен isolated regression test. Добавлен fail-closed Win32 foreground PID witness для Firefox и тесты на отсутствие PID/другое окно/неверные capabilities. В существующий FILL-001 worker добавлен автоматический passive ROI probe после подтверждения доски: нет кликов, Clear, рисунка и Stage6 handoff, создаётся диагностический JSON с `stage6_execution_allowed=false`. До E4 этот интерфейс исследовательский, не production. `master`, MouseExecutor defaults, frozen source/PNG и CHALK estimator не менялись.
+
+
 ## 2026-11-10 — исследовательский auto ROI probe для V5
 
 После pinned V5 source и brush guard подготовлена связка для автоматической same-run BoardPane ROI без ввода кнопок: `fill001_firefox_auto_probe.py` (Selenium hover + OS mouse passive events), `fill001_v5_auto_roi.py` (ROI вычисляется из свежего screenX-clientX и проверяется действующим BoardPane E4 validator). Добавлены test fixtures для совпадающих/неверных mouse targets, session IDs, stale heartbeat и выхода за экран; подмена frozen V5 source блокируется до движения мыши. Источник evidence — fake/unit E2 до завершения CI, никакого реального Firefox, игрового E4, CHALK и production-подключения этой геометрии пока нет.
