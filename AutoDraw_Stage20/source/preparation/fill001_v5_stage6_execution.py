@@ -17,7 +17,6 @@ from typing import Any, Callable
 from drawing.color_plan_execution import BrushSliderCalibration, BrushSliderController
 from drawing.mouse_executor import ExecutorConfig, MouseExecutor
 from models import DrawingPlan
-from brush_radius_feedback import read_active_bridge_radius
 from firefox_foreground_witness import firefox_foreground_witness
 from fill001_v5_handoff import (
     Fill001V5Error, V5BrushSequenceGuard, validate_fill001_v5_source_plan,
@@ -158,11 +157,20 @@ def execute_v5_with_stage6(
             require_blank=blank,
         )
     def radius_provider(*, after_utc=None):
-        observed = read_active_bridge_radius(bridge, after_utc=after_utc)
-        if not isinstance(observed, dict) or observed.get("session_id") != sid:
-            raise Fill001V5Error("Brush heartbeat belongs to another/missing Bridge session.")
-        current_gate()
-        return observed
+        # Strict exact-session heartbeat; unlike the generic helper, this
+        # cannot select another session if a browser reconnects mid-run.
+        snap = current_gate()
+        stamp = snap["heartbeat_at_utc"]
+        if after_utc is not None:
+            reference = datetime.fromisoformat(after_utc.replace("Z", "+00:00"))
+            observed_time = datetime.fromisoformat(stamp.replace("Z", "+00:00"))
+            if observed_time <= reference:
+                return None
+        return {
+            "radius": snap["currentRadius"],
+            "session_id": sid,
+            "observed_at_utc": stamp,
+        }
 
     controller = BrushSliderController(
         calib, roi, current_screen_size_provider=native_mouse.size,
@@ -218,6 +226,9 @@ def execute_v5_with_stage6(
         snap = current_gate(blank=(index == 1))
         if index > 1 and snap["pointCount"] < 1:
             raise Fill001V5Error("V5 exact resource counter reset while drawing.")
+        # Safety-only reserve; no guessed CHALK calculation or threshold tuning.
+        if snap["remainingPoints"] < 300:
+            raise Fill001V5Error("V5 point quota is within 300 points of exhaustion.")
         return guard.before_stroke(controller, worker, index, stroke)
 
     try:
