@@ -1,5 +1,10 @@
 # AutoDraw — журнал выполненных действий
 
+## 2026-11-10 — FILL-001 V5 native fixture → fail-closed DrawingPlan
+
+Продолжена разрешённая работа: исследована фактическая frozen V5 геометрия в `chalk_fill_strategy_comparison.py`, создан `fill001_v5_handoff.py`, добавлены UI export и regression tests на 29 штрихов, pinned 10→2/3, SHA provenance, explicit execution blocked, overwrite refusal и tampering. В обычный Stage6 loader добавлен отказ для V5 экспериментального плана (включая обманную подмену coordinate space). Ни `MouseExecutor`, ни production CHALK predictor/defaults не менялись. Выполнены GitHub commits в `feature/image-geometry-optimization`; актуальные E2/E3 только по завершённому CI на соответствующем SHA. Новых игровых замеров и E4/E5 нет.
+
+
 ## 2026-11-10 — FILL-001 opt-in Firefox Monitor connector
 
 По разрешению пользователя продолжена интеграция в существующий AutoDraw (без изменений `master`): создан `source/preparation/firefox_monitor_session.py`, дополнены `chalk_fill_ui.py` и `brush_behavior_test_ui.py`, добавлены тесты origin/confirmation/snippet, изменены `requirements-runtime.txt` и `build_windows.py`. Firefox открывает https://pet-eu.hust.me/, принимает только https://eufbpet.hust.me iframe и подключается через существующий Game Monitor/Bridge после явного подтверждения доски. Проверка новая session/telemetry ON, не рисует самостоятельно; изменения Stage6 и CHALK не вносились. V5 mixed-brush handoff по результатам чтения Stage6 остаётся открытым. На момент записи E4/Windows NOT_RUN; CI статус проверять на SHA последнего изменения кода.
