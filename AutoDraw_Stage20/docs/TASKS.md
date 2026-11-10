@@ -1,5 +1,15 @@
 # AutoDraw — действующие задачи
 
+## FILL-001 V5 — second E4 runtime mismatch, 3825d57
+
+- [x] Full raw 8133-event Bridge run reviewed: 29 planned paint strokes, five zero-consuming slider drags, CHALK source 1694 (1→1695), zero drops/errors, immediate Stage6 post1670 not settled.
+- [x] Compare legacy global-radius check with slider-aware strict verification; the original error is consistent with stale runtime, but imported Windows module not recorded.
+- [x] Add fail-closed V5 finalizer contract check before mouse input, origin metadata, real-run regression and tampering guard; immutable experiment preserved.
+- [ ] Confirm new CI commit `88a12aa` and any later docs commit. Never infer build PASS from old SHA.
+- [ ] On updated Windows process verify loaded finalizer contract, fresh ROI/blank/radius/foreground and then one isolated W2 run. Obtain automatic exact CHALK plus `after_settled.png`; enforce original PNG quality and E5 separately.
+- [ ] Only after accepted quality run W3 on freshly cleared board; production changes blocked.
+
+
 ## FILL-001 V5 — next gate after first 29/29 live, 2026-11-10
 
 - [x] Reviewed immutable `ed74ffd`: first fully completed V5 candidate `K_trim_0_y190_w2` E4 29/29, 10×28→2, 76.125s, screenshots saved. New slider `x1=1363,y306; x30=1207,y307` confirmed in operator calibration file; previous 0/29 attempt remains FAIL in record.
