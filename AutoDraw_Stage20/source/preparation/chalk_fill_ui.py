@@ -85,6 +85,7 @@ class Fill001Tab:
             value=f"fill001-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
         )
         self.task_var = tk.StringVar()
+        self.v5_candidate_var = tk.StringVar(value="K_trim_0_y190_w2")
         self.status_var = tk.StringVar(value="Создайте новую серию или откройте существующий manifest.")
         self.bridge_status_var = tk.StringVar(value="Monitor/Bridge: подключение ещё не проверено.")
         self._firefox_driver = None
@@ -196,6 +197,20 @@ class Fill001Tab:
             outer, text="Сравнить Smooth ON/OFF по двум сохранённым прогонам",
             command=self.analyze_smooth_ab,
         ).pack(anchor="w", pady=(0, 7))
+
+        v5_group = ttk.LabelFrame(outer, text="FILL-001 DEC-030 V5 — frozen-plan export (без запуска)", padding=6)
+        v5_group.pack(fill="x", pady=(0, 6))
+        ttk.Combobox(
+            v5_group, textvariable=self.v5_candidate_var, state="readonly", width=29,
+            values=("K_trim_0_y190_w2", "K_trim_0_y189_w3"),
+        ).pack(side="left", padx=(0, 8))
+        ttk.Button(
+            v5_group, text="Сохранить диагностический DrawingPlan V5",
+            command=self.export_v5_source_plan,
+        ).pack(side="left")
+        ttk.Label(
+            v5_group, text="Только файл плана. Штатный Stage6 блокирует mixed-width до runtime gate.",
+        ).pack(side="left", padx=(8, 0))
 
         self.task_details = tk.Text(outer, height=10, wrap="word", state="disabled")
         self.task_details.pack(fill="both", expand=True, pady=(0, 8))
@@ -322,6 +337,34 @@ class Fill001Tab:
                 except Exception:
                     pass
             self._firefox_messages.put(("STOPPED", "Firefox-сессия завершена."))
+
+    def export_v5_source_plan(self) -> None:
+        """Expose the pinned two-candidate source preview; never start Stage6."""
+        from fill001_v5_handoff import (
+            CANDIDATES, Fill001V5Error, build_fill001_v5_source_plan,
+        )
+        candidate = self.v5_candidate_var.get()
+        if candidate not in CANDIDATES:
+            self.status_var.set("V5 BLOCKED: кандидат не из frozen DEC-030 allowlist.")
+            return
+        destination = self.output_dir / "v5_source_plans" / f"{candidate}.json"
+        try:
+            plan = build_fill001_v5_source_plan(candidate)
+            if destination.exists():
+                raise FileExistsError(
+                    "Этот frozen V5 source plan уже сохранён. Перезапись запрещена."
+                )
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            with destination.open("x", encoding="utf-8") as stream:
+                json.dump(plan, stream, ensure_ascii=False, indent=2, allow_nan=False)
+                stream.write("\\n")
+        except (OSError, ValueError, TypeError, Fill001V5Error) as exc:
+            self.status_var.set(f"V5 BLOCKED: {exc}")
+            return
+        self.status_var.set(
+            f"V5 frozen source plan сохранён: {destination}. "
+            "Не исполнять до verified mixed-width Stage6 handoff."
+        )
 
     def start_fill001_bridge(self) -> None:
         """Use the existing shared Bridge launcher with mandatory V3 telemetry."""
