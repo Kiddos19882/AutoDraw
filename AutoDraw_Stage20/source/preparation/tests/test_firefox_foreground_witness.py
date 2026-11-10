@@ -2,12 +2,13 @@
 from __future__ import annotations
 
 from types import SimpleNamespace
+import threading
 
 import pytest
 
 from firefox_foreground_witness import (
     FirefoxForegroundError, active_window_process_id, firefox_foreground_witness,
-    establish_firefox_foreground,
+    establish_firefox_foreground, wait_for_operator_firefox_foreground,
 )
 
 
@@ -155,3 +156,66 @@ def test_wrong_native_pid_after_accepted_focus_still_blocks():
             driver, active_pid_provider=lambda: 932,
             native_focus_request=lambda pid: True, sleep_fn=lambda _: None,
         )
+
+
+def _virtual_clock_pid_provider(sequence):
+    state = {"now": 0.0, "index": 0}
+    def clock():
+        return state["now"]
+    def sleep(seconds):
+        state["now"] += seconds
+    def pid():
+        value = sequence[min(state["index"], len(sequence) - 1)]
+        state["index"] += 1
+        return value
+    return clock, sleep, pid, state
+
+
+def test_operator_activation_requires_three_consecutive_native_pid_matches():
+    driver = _FakeDriver(False, expected=5372)
+    clock, sleep, pid, state = _virtual_clock_pid_provider(
+        [932, 5372, 932, 5372, 5372, 5372]
+    )
+    wait_for_operator_firefox_foreground(
+        driver, cancel_event=threading.Event(),
+        timeout_seconds=5, poll_seconds=.1,
+        active_pid_provider=pid, monotonic_fn=clock, sleep_fn=sleep,
+    )
+    assert state["index"] == 6
+    assert driver.switch_to.calls == []
+
+
+def test_operator_activation_timeout_blocks_without_focus_or_input():
+    driver = _FakeDriver(False, expected=5372)
+    clock, sleep, pid, _ = _virtual_clock_pid_provider([932])
+    with pytest.raises(FirefoxForegroundError, match="manually activated"):
+        wait_for_operator_firefox_foreground(
+            driver, cancel_event=threading.Event(),
+            timeout_seconds=.5, poll_seconds=.1,
+            active_pid_provider=pid, monotonic_fn=clock, sleep_fn=sleep,
+        )
+    assert driver.switch_to.calls == []
+
+
+def test_operator_activation_cancellation_is_fail_closed():
+    driver = _FakeDriver(False, expected=5372)
+    stop = threading.Event()
+    stop.set()
+    clock, sleep, pid, _ = _virtual_clock_pid_provider([5372])
+    with pytest.raises(FirefoxForegroundError, match="cancelled"):
+        wait_for_operator_firefox_foreground(
+            driver, cancel_event=stop, timeout_seconds=5,
+            active_pid_provider=pid, monotonic_fn=clock, sleep_fn=sleep,
+        )
+    assert driver.switch_to.calls == []
+
+
+def test_operator_activation_rejects_invalid_geckodriver_pid_before_poll():
+    driver = _FakeDriver(False, expected="5372")
+    clock, sleep, pid, _ = _virtual_clock_pid_provider([5372])
+    with pytest.raises(FirefoxForegroundError, match="valid Firefox browser PID"):
+        wait_for_operator_firefox_foreground(
+            driver, cancel_event=threading.Event(),
+            active_pid_provider=pid, monotonic_fn=clock, sleep_fn=sleep,
+        )
+    assert driver.switch_to.calls == []
