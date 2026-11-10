@@ -110,3 +110,22 @@ def build_fill001_v5_source_plan(candidate_id: str) -> dict[str, Any]:
             "quality_status": "NOT_EVALUATED",
         },
     }
+
+def validate_fill001_v5_source_plan(document: Any) -> str:
+    """Fail closed on any change to the pinned source plan or execution flag.
+
+    Returns the candidate ID only for an exact deterministic reconstruction;
+    this does not authorize game execution.
+    """
+    if not isinstance(document, dict):
+        raise Fill001V5Error("V5 source plan must be a JSON object.")
+    generation = document.get("generation")
+    candidate = generation.get("candidate_id") if isinstance(generation, dict) else None
+    if candidate not in CANDIDATES:
+        raise Fill001V5Error("Unknown V5 frozen candidate.")
+    expected = build_fill001_v5_source_plan(candidate)
+    if document != expected:
+        raise Fill001V5Error(
+            "V5 source plan differs from pinned DEC-030 geometry/metadata."
+        )
+    return candidate
