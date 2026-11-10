@@ -161,8 +161,12 @@ def collect_verified_v5_firefox_roi(
     actual, samples = _recent_samples(
         session_file,session_id,len(baseline),deadline=time.monotonic()+8,
     )
+    # Resolve wall-clock time AFTER the passive samples were collected.
+    # A snapshot taken before Selenium/OS moves would make fresh samples
+    # appear to come from the future and correctly fail the E4 geometry gate.
+    validation_time = now_utc() if callable(now_utc) else now_utc
     return derive_v5_roi_from_verified_passive_moves(
         source_plan, actual, samples, expected_session_id=session_id,
         desktop_width=desktop_width, desktop_height=desktop_height,
-        native_mouse_targets=native_targets, now_utc=now_utc,
+        native_mouse_targets=native_targets, now_utc=validation_time,
     )
