@@ -1,9 +1,9 @@
 # AutoDraw — журнал выполненных действий
 
-## 2026-11-10 — second real V5 E4 3825d57 and runtime finalizer diagnosis
 
-Checked GitHub HEAD/recent commits/CI; inspected full run `6f9bec0c`, original Stage6 report and both versions of finalizer. E4 exact counter 1→1695 (1694) with 29 planned strokes and 5 zero-point slider actions, no telemetry drops. Report's unexpected radii error matches old `ed74ffd` global radius validator; current `3189f860` strict verified-slider code would allow those radii provided all 29 positions, lifecycles and point deltas pass. Windows loaded-module identity unknown. Added finalizer contract `aa56bb0`, pre-draw fail-closed guard recording module origin `f1455b4`, replay regression on real 3825d57 data/tamper guard `88a12aa`. No change to production defaults, quality thresholds, original artifacts, master; no new E4/E5. CI to confirm on new head.
+## 2026-11-10 — FILL-001 V5 second E4, root cause discovered by real CI replay
 
+Reviewed full 3825d57 source: attempt 884678ea completed 29/29 and closed run 6f9bec0c exact 1→1695 = CHALK1694, five zero-delta slider actions, zero drops. Original finalizer BLOCKED. Initially suspected stale runtime because observed radii appeared numerically integral in summaries; **actual GitHub Actions regression failed**, exposing that the raw JSON contains radii `1.0,2.0,8.0,10.0,30.0` (Python floats), whereas v2 still rejected `type(v) is not int`. This fully explains the original error; no evidence proves stale executable. Code `252228c` accepts only finite integral float/int values 1..30; `6506774` adds fractional/NaN/bool guard tests. Earlier pre-draw contract marker `aa56bb0` and guard `f1455b4` retained as defense-in-depth; real fixture `88a12aa` preserved. Original source JSON/PNG, thresholds, production defaults, estimator and master unchanged. CI pending latest code, no new E4/E5.
 
 ## 2026-11-10 — E4 V5 full Stage6 run 29/29 and strict exact CHALK reconciliation
 
