@@ -1,5 +1,10 @@
 # AutoDraw — значимые изменения
 
+## 2026-11-10 — экспериментальная автоматическая Firefox ROI-диагностика
+
+FILL-001 Firefox после подтверждения доски выполняет попытку безопасной пассивной BoardPane/OS ROI проверки с native Win32 foreground PID свидетельством и сохраняет версионированный неисполняемый JSON. Добавлена обработка отсутствующего Selenium в CI. Полное V5 исполнение и real CHALK не включены.
+
+
 ## 2026-11-10 — FILL-001 V5 immutable logical-plan export (experimental)
 
 Из исходной frozen DEC-030 native fixture доступен экспорт двух экспериментальных DrawingPlan по 29 штрихов с mixed width 10/2 или 10/3. Зафиксированы исходный geometry SHA, версия quality policy и запрет исполнения; Stage6 mono loader явно отклоняет смешанную диагностическую ширину до появления проверенного handoff. Добавлены unit/regression tests. Production execution остаётся без изменений.
