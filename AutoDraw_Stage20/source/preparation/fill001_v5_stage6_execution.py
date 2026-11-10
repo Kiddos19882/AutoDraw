@@ -413,7 +413,7 @@ def execute_v5_with_stage6(
                             "V5 settled screen changed after closed Bridge run; "
                             "PNG quality BLOCKED, exact run CHALK preserved."
                         )
-                    if not summary.mouse_release.succeeded:
+                    if not summary.mouse_release_succeeded:
                         raise Fill001V5Error("V5 PNG pointer parking requires confirmed released mouse.")
                     report.setdefault("capture_pointer_parking", {})["settled"] = (
                         park_v5_cursor_for_png(
