@@ -1,5 +1,10 @@
 # AutoDraw — журнал выполненных действий
 
+## 2026-11-10 — пользовательский второй Firefox E4 BLOCKED и Win32 owned-focus fallback
+
+Из коммита `1bd38514` изучены неизменённые исходные JSON: Firefox/Monitor/Bridge PASS подключения, fail-closed при `expected GeckoDriver PID=5372`, native PID `932` до/после WebDriver window switch; сессия не получила `passive_preflight_samples`, нет ROI или ввода мыши. Реализован один новый системный запрос foreground **только** для уникального окна с проверенным Firefox PID через EnumWindows/GetWindowThreadProcessId/SetForegroundWindow; повторная проверка Win32 PID обязательна, никакие clicks или unsafe fallback не добавлены. Добавлены regression tests; E4 после изменения и E5 NOT_RUN, CI зависит от нового SHA. Репозиторий `master` не изменялся.
+
+
 ## 2026-11-10 — разбор пользовательского Windows E4 `848aae2` (FILL-001 V5)
 
 Проверен GitHub commit `848aae2fcc12d38691346b1a45592c0f1fb2cb7c` с тремя первичными runtime-артефактами. Подтверждены Firefox 159/egret iframe, Monitor 0.2.4, BoardPane и действующая Bridge телеметрия; первое пассивное ROI-свидетельство **BLOCKED** при непроверенном foreground PID. Отчёт не содержит expected/actual Win32 PID, поэтому причина остаётся UNKNOWN. В экспериментальном `firefox_foreground_witness.py` добавлена одна WebDriver window activation и новая обязательная проверка native PID, в `fill001_firefox_auto_probe.py` подключён guard; расширены regression tests, включая отказ при mismatch. Ни Stage6, ни click/clear, ни CHALK/production не менялись. Исторические отчёты сохраняются без изменения. Статус E4 PARTIAL для подключения, V5 ROI BLOCKED, exact CHALK/PNG E5 NOT_RUN.
