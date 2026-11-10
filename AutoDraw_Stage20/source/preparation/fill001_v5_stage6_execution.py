@@ -109,6 +109,7 @@ def prepare_v5_run(
         "session_id": session_id,
         "source_strokes_sha256": source["generation"]["source_strokes_sha256"],
         "mapping_sha256": mapping["boardpane_mapping_sha256"],
+        "mapping": dict(mapping),
         "screen_roi": dict(roi),
         "initial_snapshot": gate,
         "brush_sequence": [10]*28 + [2 if candidate.endswith("w2") else 3],
@@ -175,6 +176,10 @@ def execute_v5_with_stage6(
     before_path = directory / "before.png"
     after_path = directory / "after.png"
     report_path = directory / "report.json"
+    # Exclude every Bridge run already present before this attempt, including
+    # unrelated user clicks and partial runs from earlier sessions.
+    session_folder = bridge / sid
+    baseline_run_files = {p.name for p in session_folder.glob("game-monitor-run-*.json")}
     report = {
         "schema": "FILL001_V5_STAGE6_SINGLE_RUN_RESULT_V1",
         "request": request, "status": "BLOCKED",
@@ -236,6 +241,25 @@ def execute_v5_with_stage6(
             report["post_pointCount"] = post["pointCount"]
         except Exception as exc:
             report["post_gate_error"] = f"{type(exc).__name__}: {exc}"
+        if summary.status == "completed" and report["after_png"] is not None:
+            try:
+                from fill001_v5_finalization import finalize_v5_stage6_attempt
+                verified = finalize_v5_stage6_attempt(
+                    bridge_root=bridge, request=request,
+                    baseline_files=baseline_run_files,
+                    summary=summary.to_dict(cfg),
+                    pre_png=before_path, post_png=after_path,
+                )
+                if verified["binding"]["post_pointCount"] != report["post_pointCount"]:
+                    raise Fill001V5Error("Final resource snapshot differs from Bridge run-bound post-count.")
+                report["finalization"] = verified
+                report["actual_chalk"] = verified["binding"]["exact_chalk"]
+                report["monitor_binding"] = "EXACT_RUN_BOUND"
+                report["game_png_quality"] = verified["quality_gate"]
+            except Exception as exc:
+                report["finalization_error"] = f"{type(exc).__name__}: {exc}"
+                report["monitor_binding"] = "BLOCKED"
+                report["game_png_quality"] = "NOT_EVALUATED"
     except Exception as exc:
         report["status"] = "FAILED"
         report["error"] = f"{type(exc).__name__}: {exc}"
