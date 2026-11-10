@@ -1,5 +1,10 @@
 # AutoDraw — журнал выполненных действий
 
+## 2026-11-10 — third W2 live run: binding PASS, cursor-confounded RGB FAIL
+
+Read [36e95e4](https://github.com/Kiddos19882/AutoDraw/commit/36e95e49acfecdbae1969bdf3d7358f06ea72f54) report, closed Bridge-run and saved screenshots. Verified first automatic real E4 bound CHALK1701 (pre1→post1702), 29/29 brush 10×28→2, 5 zero point slider actions, no monitor drops, settled PNG captured. Coverage passed 99% but perimeter failed badly (max 48.146794 > 3 logical px, 2230 far changed pixels); original report unchanged FAIL, independent E5 absent. Visual examination shows game cursor sprite moves from before to settled capture, causing off-target changes that RGB subtraction cannot distinguish from paint; not enough to conclude painted perimeter itself passes. Implemented V5-only released-pointer parking off ROI, fresh exact counter checks before/after and captured provenance in `c1fe1f8`, fixed summary field `1b48fb1`, tests `0ca2a42`; no mask/policy/production changes. New E4 test of this capture path NOT_RUN; code CI status to confirm.
+
+
 
 ## 2026-11-10 — FILL-001 V5 second E4, root cause discovered by real CI replay
 
