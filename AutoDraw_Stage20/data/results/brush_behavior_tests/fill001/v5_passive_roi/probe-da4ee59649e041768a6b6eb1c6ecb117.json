@@ -1,0 +1,14 @@
+{
+  "schema": "FILL001_V5_FIREFOX_PASSIVE_ROI_DIAGNOSTIC_V1",
+  "captured_at_utc": "2026-11-10T06:07:00.413296+00:00",
+  "status": "BLOCKED",
+  "candidate_id": "K_trim_0_y190_w2",
+  "session_id": "df6adfd8-efaf-424d-b9e3-6a528b00607e",
+  "source_strokes_sha256": null,
+  "screen_roi": null,
+  "mapping": null,
+  "blocked_reason": "BLOCKED: Firefox is not proven to be the foreground window; expected PID=5372; before PID=932; after PID=932. No mouse movement permitted.",
+  "actual_chalk": null,
+  "game_png_quality": "NOT_EVALUATED",
+  "stage6_execution_allowed": false
+}
