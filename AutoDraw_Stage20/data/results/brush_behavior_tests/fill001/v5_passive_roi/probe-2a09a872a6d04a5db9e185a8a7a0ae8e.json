@@ -1,0 +1,14 @@
+{
+  "schema": "FILL001_V5_FIREFOX_PASSIVE_ROI_DIAGNOSTIC_V1",
+  "captured_at_utc": "2026-11-10T05:53:25.450392+00:00",
+  "status": "BLOCKED",
+  "candidate_id": "K_trim_0_y190_w2",
+  "session_id": "1c9e3ec8-dc80-4641-ae56-ecc3369b66c6",
+  "source_strokes_sha256": null,
+  "screen_roi": null,
+  "mapping": null,
+  "blocked_reason": "BLOCKED: Firefox is not proven to be the foreground window.",
+  "actual_chalk": null,
+  "game_png_quality": "NOT_EVALUATED",
+  "stage6_execution_allowed": false
+}
