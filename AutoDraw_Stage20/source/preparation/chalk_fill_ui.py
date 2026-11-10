@@ -62,6 +62,7 @@ class Fill001Tab:
         on_transfer_plan: Callable[[dict[str, Any], Path], bool],
         on_start: Callable[[int, dict[str, Any], Path], bool],
         on_v5_run: Callable[..., bool] | None = None,
+        on_v5_cancel: Callable[[], None] | None = None,
     ) -> None:
         self.root = root
         self.output_dir = Path(output_dir).resolve() / "fill001"
@@ -70,6 +71,7 @@ class Fill001Tab:
         self.on_transfer_plan = on_transfer_plan
         self.on_start = on_start
         self.on_v5_run = on_v5_run
+        self.on_v5_cancel = on_v5_cancel
         self.v5_run_after_probe_var = tk.BooleanVar(value=True)
         self.matrix: dict[str, Any] | None = None
         self.manifest_path: Path | None = None
@@ -273,6 +275,9 @@ class Fill001Tab:
     def stop_firefox_monitor(self) -> None:
         self._firefox_stop.set()
         self._firefox_confirm.set()
+        if callable(self.on_v5_cancel):
+            # Stop Stage6 first: guarantees MouseExecutor releases mouseDown.
+            self.on_v5_cancel()
 
     def _firefox_worker(self) -> None:
         driver = None
