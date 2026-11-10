@@ -1,5 +1,10 @@
 # AutoDraw — журнал выполненных действий
 
+## 2026-11-10 — интеграция полного экспериментального FILL-001 V5 single-run через Stage6
+
+Пользователь разрешил весь этап и сообщил: после очистки доска имеет `pointCount=1`, лишние штрихи в предыдущем логе — его случайные действия с телефона. Реализованы `fill001_v5_live_gate.py`, `fill001_v5_stage6_execution.py`, `fill001_v5_finalization.py`, прямой одноразовый callback из `Fill001Tab` через `integrated_app` в реальный `Stage6App.start_fill001_v5_single_run`. Рисование идёт исключительно через существующие `MouseExecutor`/`BrushSliderController` и экспериментальный unchanged P1. Выделены чистая доска, Session/BoardPane SHA, актуальный Firefox foreground, confirmed slider geometry, radius 10→2/3, screenshots, exact CHALK только через завершённые Bridge run и forward screen quality diagnostic. Добавлены regression тесты на чистоту, stale Bridge, tampered plan, wrong slider radius, single/two Bridge run exact counters. Без E4/E5 на ПК не заявлять реальный PASS. Исторические и frozen evidence не изменены, изменения не затрагивают `master`.
+
+
 ## 2026-11-10 — разбор успешного пользовательского Windows passive ROI (E4 limited)
 
 Прочитаны три первичных JSON из коммита `5b7e6b8`. Зафиксированы E4 подтверждение native foreground+пассивного ROI `483,243,694×363` / offset `0,+135` и 3 read-only свидетеля. Дополнительно обнаружен отдельный завершённый Bridge run с точным `pointCount 2→3`, `CHALK=1`, radius30, `stroke_count=1`; он **не связан с V5 planned 29 strokes** и не доказывает пустую доску. В этом этапе первичные данные и код не изменялись, исправления не подбирались, Stage6 и production untouched. Следующий gate — версионированный blank-board/brush run identity перед V5 execution, без reuse screen ROI другого запуска.
