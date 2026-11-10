@@ -1,14 +1,14 @@
 # AutoDraw — действующие задачи
 
-## FILL-001 V5 — second E4 runtime mismatch, 3825d57
 
-- [x] Full raw 8133-event Bridge run reviewed: 29 planned paint strokes, five zero-consuming slider drags, CHALK source 1694 (1→1695), zero drops/errors, immediate Stage6 post1670 not settled.
-- [x] Compare legacy global-radius check with slider-aware strict verification; the original error is consistent with stale runtime, but imported Windows module not recorded.
-- [x] Add fail-closed V5 finalizer contract check before mouse input, origin metadata, real-run regression and tampering guard; immutable experiment preserved.
-- [ ] Confirm new CI commit `88a12aa` and any later docs commit. Never infer build PASS from old SHA.
-- [ ] On updated Windows process verify loaded finalizer contract, fresh ROI/blank/radius/foreground and then one isolated W2 run. Obtain automatic exact CHALK plus `after_settled.png`; enforce original PNG quality and E5 separately.
-- [ ] Only after accepted quality run W3 on freshly cleared board; production changes blocked.
+## FILL-001 V5 — second E4, 3825d57: numeric-type root cause and regression
 
+- [x] Audit full 8133-event Monitor run: 29 paint strokes 28×radius10→2, five zero-consuming slider drags, CHALK source 1→1695=1694, no telemetry errors/drops; early Stage6 post1670 is not final.
+- [x] Run real-data CI regression: code `3189f860` **FAIL** because `observed_brush_radii=[1.0,2.0,8.0,10.0,30.0]` are Python `float`, while validator requires exact Python `int`; stale Windows build hypothesis not proven.
+- [x] Fix finite integer-valued JSON float radii in `252228c`, preserve strict 29 planned stroke, point delta, zero-delta slider corridor and fail-closed; add malformed/fractional/NaN/bool negative regressions in `6506774`. Separate pre-draw finalizer contract guard also introduced.
+- [ ] Verify full current E3 CI on latest code and Markdown integrity on docs HEAD; investigate any FAIL before repeating game.
+- [ ] On fresh Windows startup and clean board perform one W2 run with same-session ROI/slider/foreground, prove automatic exact CHALK and obtain `after_settled.png`; quality policy and independent E5 separately.
+- [ ] Only after quality accepted compare frozen W3 on separately clean board. No production changes until evidence.
 
 ## FILL-001 V5 — next gate after first 29/29 live, 2026-11-10
 
