@@ -1,5 +1,12 @@
 # AutoDraw — действующие задачи
 
+## FILL-001 V5 — один механизм пользовательского foreground (2026-11-10)
+
+- [x] Вместо программной активации через WebDriver/Win32 введено ожидание **обычного действия пользователя**: подтвердить доску в AutoDraw, нажать по верхней панели Firefox. Проверка Win32 foreground PID повторяется три раза подряд; таймаут 90 секунд, отмена немедленно BLOCKED, исключено вмешательство в игру.
+- [x] Удалён невостребованный `establish_firefox_foreground` и Win32 SetForegroundWindow fallback; `fill001_firefox_auto_probe` только проверяет PID перед каждым пассивным перемещением. Добавлены unit/negative tests на дребезг PID, таймаут, отмену и неверный GeckoDriver PID.
+- [ ] Единственный следующий runtime gate: выполнить свежий Windows passive-only rerun, сохранить `probe-*.json` и свежий `session.json`, получить native mouse witnesses и `screen_roi` или точный BLOCKED reason. Только затем проектировать live Stage6 mixed-width, Clear и CHALK. Не использовать старые E4 отчёты как новые.
+
+
 ## FILL-001 V5 — после второго foreground PID BLOCKED (2026-11-10)
 
 - [x] Проверено пользовательское E4 evidence `1bd38514`: новая Monitor/Bridge сессия подтверждена, но после WebDriver focus Win32 PID остаётся 932 вместо Firefox 5372; ROI/Mapped Stage6/CHALK/PNG NOT_RUN.
