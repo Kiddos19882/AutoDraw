@@ -1,5 +1,11 @@
 # AutoDraw — значимые изменения
 
+## 2026-11-10 — FILL-001 V5 captured PNG pointer decontamination (experimental)
+
+- New live [36e95e4](https://github.com/Kiddos19882/AutoDraw/commit/36e95e49acfecdbae1969bdf3d7358f06ea72f54) confirms automated `EXACT_RUN_BOUND` CHALK1701 for 29/29, but independently reports perimeter PNG quality **FAIL**, not a quality-accepted candidate. Original before/after PNGs preserved.
+- Visual RGB confounder: in-game cursor sprite visibly shifts between captured frames, contributing changed pixels outside target. Added V5-only verified no-click pointer parking outside ROI before future baseline and settled screenshots (`c1fe1f8`, `1b48fb1`, `0ca2a42` tests). No historical revision or acceptance relaxation; new live validation pending.
+
+
 ## 2026-11-10 — FILL-001 V5 float-radius Bridge compatibility (research-only)
 
 - Fixed strict V5 finalizer rejecting mathematically integral radii serialized as JSON floats (`10.0`, `2.0`) with `type(v) is int`. Accepted values remain finite integer-valued numerics within 1..30; fractional, nonfinite, boolean and other unplanned drawing radii remain blocked. Code `252228c`, regression `6506774`.
