@@ -263,11 +263,11 @@ class Fill001Tab:
         self._firefox_confirm.set()
 
     def _firefox_worker(self) -> None:
-        from firefox_monitor_session import (
-            FirefoxMonitorError, open_firefox, attach_monitor_after_confirmation,
-        )
         driver = None
         try:
+            from firefox_monitor_session import (
+                FirefoxMonitorError, open_firefox, attach_monitor_after_confirmation,
+            )
             driver = open_firefox()
             self._firefox_messages.put(("READY", "Откройте игровую доску в Firefox, затем подтвердите."))
             # No game input and no Monitor injection until the operator confirms.
@@ -328,8 +328,9 @@ class Fill001Tab:
             self._firefox_stop.wait()
         except Exception as exc:
             self._firefox_messages.put(("BLOCKED", str(exc)))
-            # Retain Firefox on failure for diagnosis until explicitly stopped.
-            self._firefox_stop.wait()
+            # Retain a launched Firefox for diagnosis, not a nonexistent session.
+            if driver is not None:
+                self._firefox_stop.wait()
         finally:
             if driver is not None:
                 try:
