@@ -9,6 +9,7 @@ import json
 import re
 import sys
 import time
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
@@ -245,6 +246,8 @@ class Fill001Tab:
         if not accepted:
             self.bridge_status_var.set("BLOCKED: Bridge не запущен с Input Telemetry ON.")
             return
+        # Read Tk state on UI thread, never from the Firefox worker.
+        self._firefox_selected_candidate = self.v5_candidate_var.get()
         self._firefox_confirm.clear()
         self._firefox_stop.clear()
         self._firefox_thread = threading.Thread(
@@ -322,9 +325,60 @@ class Fill001Tab:
                 "CONNECTED",
                 f"Monitor {attached['monitor_version']}; "
                 f"Bridge session={ready['session_id']}. "
-                "Дальше используется штатный FILL-001 preflight и Stage6.",
+                "Запускается пассивная проверка V5 ROI без нажатий мыши.",
             ))
-            # Keep the WebDriver session alive and the game open for Stage6.
+            # The automatic probe is diagnostic only.  It does not clear the
+            # board, set a brush, transfer plans or authorize Stage6 input.
+            from fill001_v5_handoff import build_fill001_v5_source_plan
+            from fill001_firefox_auto_probe import collect_verified_v5_firefox_roi
+            candidate = getattr(self, "_firefox_selected_candidate", "")
+            plan = build_fill001_v5_source_plan(candidate)
+            minimized = threading.Event()
+            def hide_ui() -> None:
+                try:
+                    self.root.iconify()
+                finally:
+                    minimized.set()
+            self.root.after(0, hide_ui)
+            if not minimized.wait(timeout=5):
+                raise RuntimeError("BLOCKED: AutoDraw не подтвердил сворачивание окна.")
+            try:
+                if self._firefox_stop.is_set():
+                    raise RuntimeError("BLOCKED: Firefox probe был остановлен.")
+                time.sleep(0.4)
+                mapped, witness, roi = collect_verified_v5_firefox_roi(
+                    driver, bridge_root, ready["session_id"], plan,
+                    native_mouse=pyautogui,
+                    now_utc=datetime.now(timezone.utc),
+                )
+            finally:
+                self.root.after(0, self.root.deiconify)
+            # This is independent passive proof, NOT an E4 game run.
+            out = self.output_dir / "v5_passive_roi"
+            out.mkdir(parents=True, exist_ok=True)
+            report_path = out / f"probe-{uuid.uuid4().hex}.json"
+            report = {
+                "schema": "FILL001_V5_FIREFOX_PASSIVE_ROI_DIAGNOSTIC_V1",
+                "status": "PASSIVE_MAPPING_ONLY_NOT_EXECUTOR_READY",
+                "candidate_id": candidate,
+                "source_strokes_sha256": plan["generation"]["source_strokes_sha256"],
+                "session_id": ready["session_id"],
+                "screen_roi": roi,
+                "mapping": witness,
+                "mapped_strokes": len(mapped["strokes"]),
+                "actual_chalk": None,
+                "game_png_quality": "NOT_EVALUATED",
+                "stage6_execution_allowed": False,
+            }
+            with report_path.open("x", encoding="utf-8") as stream:
+                json.dump(report, stream, ensure_ascii=False, indent=2, allow_nan=False)
+                stream.write("\\n")
+            self._firefox_messages.put((
+                "V5_PROBE_ONLY",
+                f"Пассивный ROI подтверждён для session={ready['session_id']}. "
+                f"Отчёт: {report_path}. Рисование Stage6 всё ещё заблокировано.",
+            ))
+            # Keep the browser alive for inspection until explicit stop.
             self._firefox_stop.wait()
         except Exception as exc:
             self._firefox_messages.put(("BLOCKED", str(exc)))
