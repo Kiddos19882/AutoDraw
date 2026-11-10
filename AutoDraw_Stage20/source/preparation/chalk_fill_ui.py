@@ -61,6 +61,7 @@ class Fill001Tab:
         brush_tab: Any,
         on_transfer_plan: Callable[[dict[str, Any], Path], bool],
         on_start: Callable[[int, dict[str, Any], Path], bool],
+        on_v5_run: Callable[..., bool] | None = None,
     ) -> None:
         self.root = root
         self.output_dir = Path(output_dir).resolve() / "fill001"
@@ -68,6 +69,8 @@ class Fill001Tab:
         self.brush_tab = brush_tab
         self.on_transfer_plan = on_transfer_plan
         self.on_start = on_start
+        self.on_v5_run = on_v5_run
+        self.v5_run_after_probe_var = tk.BooleanVar(value=True)
         self.matrix: dict[str, Any] | None = None
         self.manifest_path: Path | None = None
         self.active_task: dict[str, Any] | None = None
@@ -161,9 +164,14 @@ class Fill001Tab:
             firefox, text="Остановить Firefox-сессию",
             command=self.stop_firefox_monitor,
         ).pack(side="left")
+        ttk.Checkbutton(
+            bridge_controls,
+            text="После ROI выполнить один V5 через Stage6 (только при pointCount=1 и проверенной кисти)",
+            variable=self.v5_run_after_probe_var,
+        ).pack(anchor="w", pady=(5, 0))
         ttk.Label(
             bridge_controls,
-            text=("Firefox: откройте доску, подтвердите её здесь, затем нажмите на "
+            text=("Firefox: откройте доску, подтвердите её здесь, затем нажмите на 
                   "верхнюю панель Firefox вне холста; ожидается native Win32 PID. "
                   "Selenium только подключает Monitor/Bridge к iframe; "
                   "рисование остаётся за штатным Stage6 и fail-closed preflight."),
@@ -248,6 +256,7 @@ class Fill001Tab:
             return
         # Read Tk state on UI thread, never from the Firefox worker.
         self._firefox_selected_candidate = self.v5_candidate_var.get()
+        self._firefox_execute_v5 = bool(self.v5_run_after_probe_var.get())
         self._firefox_confirm.clear()
         self._firefox_stop.clear()
         self._firefox_thread = threading.Thread(
@@ -366,7 +375,8 @@ class Fill001Tab:
                     now_utc=lambda: datetime.now(timezone.utc),
                 )
             finally:
-                self.root.after(0, self.root.deiconify)
+                if not getattr(self, "_firefox_execute_v5", False):
+                    self.root.after(0, self.root.deiconify)
             # Independent passive evidence, never an executable Stage6 gate.
             from fill001_firefox_auto_probe import write_v5_probe_result
             report_path = write_v5_probe_result(
@@ -383,6 +393,36 @@ class Fill001Tab:
                 f"Пассивный ROI подтверждён для session={ready['session_id']}. "
                 f"Отчёт: {report_path}. Рисование Stage6 всё ещё заблокировано.",
             ))
+            if getattr(self, "_firefox_execute_v5", False):
+                if not callable(self.on_v5_run):
+                    raise RuntimeError("BLOCKED: Stage6 V5 callback is not connected.")
+                started = threading.Event()
+                outcome = {}
+                def start_v5_on_ui_thread() -> None:
+                    try:
+                        outcome["accepted"] = bool(self.on_v5_run(
+                            source=plan, mapped=mapped, mapping=witness,
+                            roi=roi, bridge_root=bridge_root,
+                            session_id=ready["session_id"], driver=driver,
+                            output_dir=self.output_dir / "v5_stage6_runs",
+                            finished_callback=self._on_v5_stage6_finished,
+                        ))
+                    except Exception as exc:
+                        outcome["error"] = f"{type(exc).__name__}: {exc}"
+                    finally:
+                        started.set()
+                self.root.after(0, start_v5_on_ui_thread)
+                if not started.wait(timeout=15):
+                    raise RuntimeError("BLOCKED: Stage6 V5 launch callback timed out.")
+                if not outcome.get("accepted"):
+                    raise RuntimeError(
+                        f"BLOCKED: Stage6 refused V5: {outcome.get('error','preflight not accepted')}"
+                    )
+                self._firefox_messages.put((
+                    "V5_STAGE6_RUNNING",
+                    "Stage6: pointCount=1, кисть 10→2/3, 29 штрихов; "
+                    "PNG/Bridge отчёты сохраняются в v5_stage6_runs.",
+                ))
             # Keep the browser alive for inspection until explicit stop.
             self._firefox_stop.wait()
         except Exception as exc:
@@ -407,6 +447,7 @@ class Fill001Tab:
                 except (OSError, ValueError, TypeError):
                     pass
             self._firefox_messages.put(("BLOCKED", details))
+            self.root.after(0, self.root.deiconify)
             if driver is not None:
                 self._firefox_stop.wait()
         finally:
@@ -416,6 +457,19 @@ class Fill001Tab:
                 except Exception:
                     pass
             self._firefox_messages.put(("STOPPED", "Firefox-сессия завершена."))
+
+    def _on_v5_stage6_finished(self, result: dict) -> None:
+        status = result.get("status", "FAILED")
+        attempt = result.get("request", {}).get("attempt_id")
+        self._firefox_messages.put((
+            "V5_STAGE6_FINISHED",
+            f"Stage6 {status}, attempt={attempt}; "
+            "actual CHALK и E5 подтверждаются отдельно по run binding.",
+        ))
+        try:
+            self.root.deiconify()
+        except tk.TclError:
+            pass
 
     def export_v5_source_plan(self) -> None:
         """Expose the pinned two-candidate source preview; never start Stage6."""
