@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 import json
+import math
 from pathlib import Path
 import time
 from typing import Any, Callable
@@ -56,7 +57,6 @@ def validate_v5_bridge_runs(
             or expected_pointer_down_client is None):
         raise Fill001V5Error("Slider exclusion requires both verified board and slider bounds and planned inputs.")
     if strict_slider_witness:
-        import math
         def check_rect(rect: dict, label: str) -> None:
             if (not isinstance(rect, dict) or set(rect) != {"left", "top", "right", "bottom"}
                     or any(type(rect[k]) not in (int, float) or not math.isfinite(rect[k]) for k in rect)
@@ -109,11 +109,19 @@ def validate_v5_bridge_runs(
         if not isinstance(run.get("run_id"), str) or not run["run_id"]:
             raise Fill001V5Error("Missing Game Monitor run ID.")
         seen_radii = run.get("observed_brush_radii")
-        if (not isinstance(seen_radii, list)
+        # Bridge serializes observed slider radii as JSON floats (10.0),
+        # while game pointer-down currentRadius is an integer. Normalize only
+        # mathematically integral finite numeric values; never accept bool,
+        # fractional radii, NaN, infinity or unplanned drawing widths.
+        def integral_radius(value: Any) -> bool:
+            return (type(value) in (int, float)
+                    and 1 <= value <= 30
+                    and (type(value) is int
+                         or (math.isfinite(value) and value.is_integer())))
+        if (not isinstance(seen_radii, list) or not seen_radii
+                or any(not integral_radius(v) for v in seen_radii)
                 or (not strict_slider_witness
-                    and any(type(v) is not int or v not in (10,expected_last) for v in seen_radii))
-                or any(type(v) is not int or not 1 <= v <= 30 for v in seen_radii)
-                or not seen_radii):
+                    and any(v not in (10, expected_last) for v in seen_radii))):
             raise Fill001V5Error("V5 Bridge observed unexpected brush radii.")
         events = run.get("events")
         if (not isinstance(events, list)
