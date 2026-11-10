@@ -1,5 +1,10 @@
 # AutoDraw — журнал выполненных действий
 
+## 2026-11-10 — замена Firefox foreground activation на operator handoff
+
+По явному запросу пользователя и предыдущему PID mismatch `5372 != 932` изменён только V5 Firefox passive preflight. В `firefox_foreground_witness.py` добавлен bounded/abortable `wait_for_operator_firefox_foreground` (3 native PID подтверждения подряд); удалены альтернативные активаторы `establish_firefox_foreground` и `request_owned_firefox_window_focus`. Из `fill001_firefox_auto_probe.py` устранена любая попытка устанавливать фокус. `chalk_fill_ui.py` после подтверждения доски предлагает щёлкнуть по верхней панели Firefox вне canvas; AutoDraw сворачивается и ждёт, затем только read-only ROI. Тесты заменены с focus-forcing на stable PID/cancel/timeout failure. Изменений Stage6, frozen V5 geometry, production defaults, CHALK estimator и `master` нет. Новый E4 после коммита NOT_RUN; E2/E3 проверять по точному SHA CI.
+
+
 ## 2026-11-10 — пользовательский второй Firefox E4 BLOCKED и Win32 owned-focus fallback
 
 Из коммита `1bd38514` изучены неизменённые исходные JSON: Firefox/Monitor/Bridge PASS подключения, fail-closed при `expected GeckoDriver PID=5372`, native PID `932` до/после WebDriver window switch; сессия не получила `passive_preflight_samples`, нет ROI или ввода мыши. Реализован один новый системный запрос foreground **только** для уникального окна с проверенным Firefox PID через EnumWindows/GetWindowThreadProcessId/SetForegroundWindow; повторная проверка Win32 PID обязательна, никакие clicks или unsafe fallback не добавлены. Добавлены regression tests; E4 после изменения и E5 NOT_RUN, CI зависит от нового SHA. Репозиторий `master` не изменялся.
