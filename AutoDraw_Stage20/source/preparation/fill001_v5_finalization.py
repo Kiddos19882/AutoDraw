@@ -150,6 +150,11 @@ def finalize_v5_stage6_attempt(
     folder=Path(bridge_root)/sid
     if not folder.is_dir():
         raise Fill001V5Error("Missing authenticated V5 Bridge session folder.")
+    expected = request.get("expected_pointer_down_client")
+    if not isinstance(expected, list) or len(expected) != 29:
+        raise Fill001V5Error(
+            "V5 finalization requires all 29 independent planned pointer-down positions."
+        )
     deadline=time.monotonic()+timeout_seconds
     last_error=None
     while time.monotonic()<deadline:
@@ -159,7 +164,7 @@ def finalize_v5_stage6_attempt(
             runs=[json.loads(p.read_text(encoding="utf-8")) for p in files]
             binding=validate_v5_bridge_runs(
                 runs,session_id=sid,candidate_id=request["candidate_id"],
-                expected_pointer_down_client=request.get("expected_pointer_down_client"),
+                expected_pointer_down_client=expected,
             )
             binding["bridge_run_paths"]=[str(p) for p in files]
             break
