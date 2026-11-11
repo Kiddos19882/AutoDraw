@@ -413,6 +413,8 @@ def test_quota_limited_stroke_result_clears_and_continues(tmp_path):
     assert report["status"]=="completed_with_quota_limited"
     assert report["accepted"]==1
     assert report["quota_limited"]==1
+    assert report["completed_with_bound_chalk"]==1
+    assert report["quota_limited_with_bound_chalk"]==1
     assert report["exact_chalk_sum_of_quota_limited_runs"]==5758
     assert report["exact_chalk_sum_of_accepted_runs"]==100
     assert state["clears"]==1
