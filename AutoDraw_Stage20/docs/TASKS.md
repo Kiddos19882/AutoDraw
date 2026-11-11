@@ -1,5 +1,15 @@
 # AutoDraw — действующие задачи
 
+## FILL001-SERIES-001 — проверка очистки и quality-fail журнал (2026-11-11)
+
+- [x] Найти статическую цепочку игрового Clear в сохранённом bundle (§12.2 engine architecture), отличить `BoardPane.clear()` от `AutoDrawGameMonitor.clear()` (последний чистит события, не игровую доску). E1, не доказательство live UI.
+- [x] Добавить read-only `fill001_series_blank_verification.py` и synthetic regression: source blank PNG/counter той же session и mapping, два settled exact reset observations, 0 RGB differences, released off-ROI cursor; сохранять отрицательный результат. Без непосредственного game input.
+- [x] Требовать положительный `FILL001_SERIES_BLANK_SCREEN_VERIFICATION_V1` result в series Clear callback; unknown/invalid clear блокирует следующий рисунок.
+- [x] Разделить законный E4 quality FAIL и неполное E4 evidence: валидный точный CHALK с quality FAIL записывать как `QUALITY_FAIL`, но не включать в quality-PASS ranking и продолжать только после доказанного Clear. Неизвестный CHALK / monitor anomalies / отсутствующие PNG блокируют серию.
+- [ ] Подтвердить итоговые dedicated series CI и общую validation на актуальном SHA `eb36584846536a7d06fcbdc614ea504535615a15`. E4 и E5 для серии NOT_RUN.
+- [ ] **Live blocker:** установить координату/селектор штатной кнопки `PainterPopup.clearHandler` в Firefox с повторной идентификацией окна и поля BoardPane; выполнить один безопасный Clear-preflight при участии пользовательской игры и собрать raw Monitor, два exact settled snapshots, исходный/конечный PNG. Без прямых вызовов игровых внутренних методов/невалидированной калибровки.
+- [ ] После E4 доказательств подключить экспериментальный opt-in Stage6 single-run→clear→new-session loop, сохраняя all raw evidence, отдельный run ID, capture и quality-pass/quality-fail статистику; production defaults не менять.
+
 ## FILL001-SERIES-001 — многофигурный циклический тест, безопасный этап 1 (2026-11-11)
 
 - [x] Сформулировать контракт: циклы × фигур за цикл; разные frozen shapes, scanline methods и радиусы; каждая фигура отдельный run с собственным session, exact CHALK и before/settled PNG, immutable original JSON; fail-closed без пропуска ошибочных запусков.
