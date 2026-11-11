@@ -662,7 +662,7 @@ class Fill001Tab:
         BoardPane preflight, closed Monitor run, PNG and exact CHALK.
         """
         from fill001_series_runner import (
-            run_with_validated_callbacks, validate_manifest, SeriesBlocked,
+            run_with_series_owner_lock, validate_manifest, SeriesBlocked,
         )
         from fill001_series_handoff import build_series_source_plan
         from fill001_firefox_auto_probe import collect_verified_series_firefox_roi
@@ -855,7 +855,7 @@ class Fill001Tab:
             ))
             return clear
 
-        report=run_with_validated_callbacks(
+        report=run_with_series_owner_lock(
             manifest,results_dir=root_dir,
             observe_blank=observe_blank,run_one=run_one,
             clear_and_verify=clear_and_verify,
