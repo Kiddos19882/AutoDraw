@@ -1,0 +1,883 @@
+{
+  "schema": "FILL001_SERIES_STAGE6_SINGLE_RUN_RESULT_V1",
+  "request": {
+    "schema": "FILL001_SERIES_STAGE6_SINGLE_TASK_PREFLIGHT_V1",
+    "protocol": "FILL001_SERIES_STAGE6_SINGLE_RUN_V1",
+    "attempt_id": "7ea5ec29-bf0c-4400-874b-6f42b5c7417c",
+    "series_id": "fill001-series-ef09de5bce19",
+    "task_id": "fill001-series-ef09de5bce19-c001-f001",
+    "session_id": "1700bb94-41b0-44f8-863e-3c71ef01c7ce",
+    "source_strokes_sha256": "63a3d4ccac1c749470e7ba6defbaf220f4da7384abef5e133a73cdfd6fdafb81",
+    "mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+    "mapping": {
+      "schema": "FILL001_BOARDPANE_PREFLIGHT_V1",
+      "status": "validated_preflight_input_transform_not_live_draw",
+      "session_id": "1700bb94-41b0-44f8-863e-3c71ef01c7ce",
+      "renderer_geometry_sha256": "572c5f447022b6df540a8f0f18b836625849ad48fdd80109e50241e4ec871818",
+      "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+      "passive_samples_sha256": "7c736705e942a1eae69d93bb8b3c41021491812eb414a1af806acc12b40fad9c",
+      "passive_samples": [
+        {
+          "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+          "source": "window-bubble-after-egret-canvas",
+          "session_id": "1700bb94-41b0-44f8-863e-3c71ef01c7ce",
+          "renderer_geometry_sha256": "572c5f447022b6df540a8f0f18b836625849ad48fdd80109e50241e4ec871818",
+          "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+          "buttons": 0,
+          "pre_drawing": true,
+          "captured_at_utc": "2026-11-11T22:24:58.932+00:00",
+          "clientX": 719.0,
+          "clientY": 253.0,
+          "screenX": 719.0,
+          "screenY": 388.0
+        },
+        {
+          "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+          "source": "window-bubble-after-egret-canvas",
+          "session_id": "1700bb94-41b0-44f8-863e-3c71ef01c7ce",
+          "renderer_geometry_sha256": "572c5f447022b6df540a8f0f18b836625849ad48fdd80109e50241e4ec871818",
+          "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+          "buttons": 0,
+          "pre_drawing": true,
+          "captured_at_utc": "2026-11-11T22:24:59.383+00:00",
+          "clientX": 830.0,
+          "clientY": 297.0,
+          "screenX": 830.0,
+          "screenY": 432.0
+        },
+        {
+          "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+          "source": "window-bubble-after-egret-canvas",
+          "session_id": "1700bb94-41b0-44f8-863e-3c71ef01c7ce",
+          "renderer_geometry_sha256": "572c5f447022b6df540a8f0f18b836625849ad48fdd80109e50241e4ec871818",
+          "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+          "buttons": 0,
+          "pre_drawing": true,
+          "captured_at_utc": "2026-11-11T22:24:59.833+00:00",
+          "clientX": 941.0,
+          "clientY": 340.0,
+          "screenX": 941.0,
+          "screenY": 475.0
+        }
+      ],
+      "passive_sample_count": 3,
+      "client_to_desktop_offset": {
+        "x": 0.0,
+        "y": 135.0
+      },
+      "board_screen_corners": {
+        "left": 483.4536882098092,
+        "top": 243.22,
+        "right": 1176.703295745131,
+        "bottom": 605.62
+      },
+      "screen_roi": {
+        "x": 483,
+        "y": 243,
+        "width": 694,
+        "height": 363
+      },
+      "method": "same_session_passive_DOM_mouse_plus_validated_BoardPane_corners",
+      "no_fallback": true,
+      "preflight_valid_at_utc": "2026-11-11T22:25:00.230345+00:00"
+    },
+    "screen_roi": {
+      "x": 483,
+      "y": 243,
+      "width": 694,
+      "height": 363
+    },
+    "initial_snapshot": {
+      "schema": "FILL001_V5_LIVE_GATE_V1",
+      "session_id": "1700bb94-41b0-44f8-863e-3c71ef01c7ce",
+      "mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+      "heartbeat_at_utc": "2026-11-11T22:24:59.980+00:00",
+      "pointCount": 1,
+      "maxPoints": 6000,
+      "remainingPoints": 5999,
+      "currentRadius": 30,
+      "exact": true,
+      "blank_counter_confirmed": true,
+      "stage6_execution_allowed": false
+    },
+    "expected_pointer_down_client": [
+      [
+        625.0,
+        184.0
+      ],
+      [
+        616.0,
+        185.0
+      ],
+      [
+        612.0,
+        187.0
+      ],
+      [
+        609.0,
+        188.0
+      ],
+      [
+        606.0,
+        190.0
+      ],
+      [
+        604.0,
+        191.0
+      ],
+      [
+        603.0,
+        193.0
+      ],
+      [
+        601.0,
+        194.0
+      ],
+      [
+        599.0,
+        196.0
+      ],
+      [
+        598.0,
+        197.0
+      ],
+      [
+        596.0,
+        199.0
+      ],
+      [
+        595.0,
+        200.0
+      ],
+      [
+        595.0,
+        202.0
+      ],
+      [
+        593.0,
+        203.0
+      ],
+      [
+        593.0,
+        205.0
+      ],
+      [
+        592.0,
+        206.0
+      ],
+      [
+        592.0,
+        208.0
+      ],
+      [
+        592.0,
+        209.0
+      ],
+      [
+        590.0,
+        211.0
+      ],
+      [
+        590.0,
+        212.0
+      ],
+      [
+        590.0,
+        214.0
+      ],
+      [
+        590.0,
+        215.0
+      ],
+      [
+        590.0,
+        217.0
+      ],
+      [
+        590.0,
+        218.0
+      ],
+      [
+        589.0,
+        220.0
+      ],
+      [
+        589.0,
+        221.0
+      ],
+      [
+        589.0,
+        223.0
+      ],
+      [
+        589.0,
+        224.0
+      ],
+      [
+        589.0,
+        226.0
+      ],
+      [
+        589.0,
+        228.0
+      ],
+      [
+        589.0,
+        229.0
+      ],
+      [
+        589.0,
+        231.0
+      ],
+      [
+        589.0,
+        232.0
+      ],
+      [
+        589.0,
+        234.0
+      ],
+      [
+        589.0,
+        235.0
+      ],
+      [
+        589.0,
+        237.0
+      ],
+      [
+        589.0,
+        238.0
+      ],
+      [
+        589.0,
+        240.0
+      ],
+      [
+        589.0,
+        241.0
+      ],
+      [
+        589.0,
+        243.0
+      ],
+      [
+        589.0,
+        244.0
+      ],
+      [
+        589.0,
+        246.0
+      ],
+      [
+        589.0,
+        247.0
+      ],
+      [
+        589.0,
+        249.0
+      ],
+      [
+        589.0,
+        250.0
+      ],
+      [
+        589.0,
+        252.0
+      ],
+      [
+        589.0,
+        253.0
+      ],
+      [
+        589.0,
+        255.0
+      ],
+      [
+        589.0,
+        256.0
+      ],
+      [
+        589.0,
+        258.0
+      ],
+      [
+        589.0,
+        259.0
+      ],
+      [
+        589.0,
+        261.0
+      ],
+      [
+        589.0,
+        262.0
+      ],
+      [
+        589.0,
+        264.0
+      ],
+      [
+        589.0,
+        265.0
+      ],
+      [
+        589.0,
+        267.0
+      ],
+      [
+        589.0,
+        268.0
+      ],
+      [
+        589.0,
+        270.0
+      ],
+      [
+        589.0,
+        271.0
+      ],
+      [
+        589.0,
+        273.0
+      ],
+      [
+        589.0,
+        274.0
+      ],
+      [
+        589.0,
+        276.0
+      ],
+      [
+        589.0,
+        277.0
+      ],
+      [
+        589.0,
+        279.0
+      ],
+      [
+        589.0,
+        280.0
+      ],
+      [
+        589.0,
+        282.0
+      ],
+      [
+        589.0,
+        283.0
+      ],
+      [
+        589.0,
+        285.0
+      ],
+      [
+        589.0,
+        286.0
+      ],
+      [
+        589.0,
+        288.0
+      ],
+      [
+        589.0,
+        289.0
+      ],
+      [
+        589.0,
+        291.0
+      ],
+      [
+        589.0,
+        292.0
+      ],
+      [
+        589.0,
+        294.0
+      ],
+      [
+        589.0,
+        295.0
+      ],
+      [
+        589.0,
+        297.0
+      ],
+      [
+        589.0,
+        298.0
+      ],
+      [
+        589.0,
+        300.0
+      ],
+      [
+        589.0,
+        301.0
+      ],
+      [
+        589.0,
+        303.0
+      ],
+      [
+        589.0,
+        305.0
+      ],
+      [
+        589.0,
+        306.0
+      ],
+      [
+        589.0,
+        308.0
+      ],
+      [
+        589.0,
+        309.0
+      ],
+      [
+        589.0,
+        311.0
+      ],
+      [
+        589.0,
+        312.0
+      ],
+      [
+        589.0,
+        314.0
+      ],
+      [
+        589.0,
+        315.0
+      ],
+      [
+        589.0,
+        317.0
+      ],
+      [
+        589.0,
+        318.0
+      ],
+      [
+        589.0,
+        320.0
+      ],
+      [
+        589.0,
+        321.0
+      ],
+      [
+        589.0,
+        323.0
+      ],
+      [
+        589.0,
+        324.0
+      ],
+      [
+        589.0,
+        326.0
+      ],
+      [
+        589.0,
+        327.0
+      ],
+      [
+        589.0,
+        329.0
+      ],
+      [
+        589.0,
+        330.0
+      ],
+      [
+        589.0,
+        332.0
+      ],
+      [
+        589.0,
+        333.0
+      ],
+      [
+        589.0,
+        335.0
+      ],
+      [
+        589.0,
+        336.0
+      ],
+      [
+        589.0,
+        338.0
+      ],
+      [
+        589.0,
+        339.0
+      ],
+      [
+        589.0,
+        341.0
+      ],
+      [
+        589.0,
+        342.0
+      ],
+      [
+        589.0,
+        344.0
+      ],
+      [
+        589.0,
+        345.0
+      ],
+      [
+        589.0,
+        347.0
+      ],
+      [
+        589.0,
+        348.0
+      ],
+      [
+        589.0,
+        350.0
+      ],
+      [
+        589.0,
+        351.0
+      ],
+      [
+        589.0,
+        353.0
+      ],
+      [
+        589.0,
+        354.0
+      ],
+      [
+        589.0,
+        356.0
+      ],
+      [
+        589.0,
+        357.0
+      ],
+      [
+        589.0,
+        359.0
+      ],
+      [
+        590.0,
+        360.0
+      ],
+      [
+        590.0,
+        362.0
+      ],
+      [
+        590.0,
+        363.0
+      ],
+      [
+        590.0,
+        365.0
+      ],
+      [
+        590.0,
+        366.0
+      ],
+      [
+        590.0,
+        368.0
+      ],
+      [
+        592.0,
+        369.0
+      ],
+      [
+        592.0,
+        371.0
+      ],
+      [
+        592.0,
+        372.0
+      ],
+      [
+        593.0,
+        374.0
+      ],
+      [
+        593.0,
+        375.0
+      ],
+      [
+        595.0,
+        377.0
+      ],
+      [
+        595.0,
+        379.0
+      ],
+      [
+        596.0,
+        380.0
+      ],
+      [
+        598.0,
+        382.0
+      ],
+      [
+        599.0,
+        383.0
+      ],
+      [
+        601.0,
+        385.0
+      ],
+      [
+        603.0,
+        386.0
+      ],
+      [
+        604.0,
+        388.0
+      ],
+      [
+        606.0,
+        389.0
+      ],
+      [
+        609.0,
+        391.0
+      ],
+      [
+        612.0,
+        392.0
+      ],
+      [
+        616.0,
+        394.0
+      ],
+      [
+        625.0,
+        395.0
+      ]
+    ],
+    "expected_brush_radii": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "board_client_rect": {
+      "left": 483.4536882098092,
+      "right": 1176.703295745131,
+      "top": 108.22,
+      "bottom": 470.62
+    },
+    "slider_client_corridor": {
+      "left": 1203.0,
+      "right": 1367.0,
+      "top": 167.0,
+      "bottom": 175.0
+    },
+    "planned_strokes": 141,
+    "execution_allowed": false,
+    "exact_chalk": null,
+    "game_png_quality": "NOT_EVALUATED"
+  },
+  "task_id": "fill001-series-ef09de5bce19-c001-f001",
+  "session_id": "1700bb94-41b0-44f8-863e-3c71ef01c7ce",
+  "status": "BLOCKED",
+  "started_at_utc": "2026-11-11T22:25:00.284238+00:00",
+  "stage6_summary": {
+    "status": "failed",
+    "completed_strokes": 100,
+    "total_strokes": 141,
+    "started_at": "2026-11-12T01:25:00+03:00",
+    "ended_at": "2026-11-12T01:28:32+03:00",
+    "duration_seconds": 211.812,
+    "move_calls": 12090,
+    "error": "SeriesBlocked: Exact game remaining quota below 300-point safety margin",
+    "stop_reason": null,
+    "mouse_release": {
+      "attempted": true,
+      "succeeded": true,
+      "errors": []
+    },
+    "executor_config": {
+      "point_step_px": 4.0,
+      "line_extension_px": 0.0,
+      "point_delay_ms": 5,
+      "after_mouse_up_ms": 20,
+      "before_mouse_down_ms": 20,
+      "after_mouse_down_ms": 40,
+      "end_hold_ms": 50,
+      "countdown_seconds": 5
+    }
+  },
+  "actual_chalk": null,
+  "monitor_binding": "NOT_EVALUATED",
+  "game_png_quality": "NOT_EVALUATED",
+  "before_png": {
+    "file": "C:\\Users\\Kiddos\\Desktop\\clone autodraw2\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\fill001\\series\\fill001-series-ef09de5bce19-runs\\stage6\\series-7ea5ec29-bf0c-4400-874b-6f42b5c7417c\\before.png",
+    "sha256": "b825d973ab46bf89d267e6324a48a99526109b9cda74018a59ae450a58a692a6"
+  },
+  "after_png": {
+    "file": "C:\\Users\\Kiddos\\Desktop\\clone autodraw2\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\fill001\\series\\fill001-series-ef09de5bce19-runs\\stage6\\series-7ea5ec29-bf0c-4400-874b-6f42b5c7417c\\after.png",
+    "sha256": "b3dfd8acc394274dadce16a9b485324fed88a85e1ca931a1e36a368fdcafa200"
+  },
+  "after_settled_png": null,
+  "binding": null,
+  "png_audit": null,
+  "before_cursor_parking": {
+    "method": "released_pointer_off_roi_no_click_v1",
+    "screen_x": 387,
+    "screen_y": 424,
+    "exact_pointCount_before": 1,
+    "exact_pointCount_after": 1
+  },
+  "pre_pointCount": 1,
+  "error": "SeriesBlocked: Stage6 did not complete the entire series figure",
+  "finished_at_utc": "2026-11-11T22:28:32.140980+00:00"
+}
