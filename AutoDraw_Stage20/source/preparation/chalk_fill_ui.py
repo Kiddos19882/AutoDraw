@@ -239,7 +239,7 @@ class Fill001Tab:
         ).pack(side="left", padx=(8, 0))
 
         series_batch = ttk.LabelFrame(
-            outer, text="FILL001-SERIES-001 — несколько фигур (пока безопасная подготовка)", padding=6
+            outer, text="FILL001-SERIES-001 — последовательные эксперименты", padding=6
         )
         series_batch.pack(fill="x", pady=(0, 6))
         count_row = ttk.Frame(series_batch)
@@ -264,9 +264,10 @@ class Fill001Tab:
             ttk.Label(entry_row, text=description, width=43).pack(side="left")
             ttk.Entry(entry_row, textvariable=state, width=55).pack(side="left", fill="x", expand=True)
         ttk.Label(series_batch, text=(
-            "Режим подготовки: создаёт только manifest. Автоматическое рисование/очистка "
-            "заблокированы до проверенного игрового Clear и отдельной live-интеграции. "
-            "Одиночный FILL-001 и Stage6 не изменяются."
+            "Создание плана ничего не рисует. «Запустить серию» — отдельный "
+            "подтверждаемый опыт на тестовой доске: существующий Stage6, Monitor, "
+            "ENGINE-001 Clear; на любой ошибке — блокировка следующей фигуры. "
+            "Калибровка и исходный эталон чистой доски обязательны."
         ), wraplength=1080, justify="left").pack(anchor="w", pady=(3, 0))
 
         self.task_details = tk.Text(outer, height=10, wrap="word", state="disabled")
@@ -303,7 +304,8 @@ class Fill001Tab:
                 f"Подготовлена серия {manifest['series_id']}: {count} рисунков, "
                 f"{geometry['unique_variants']} геометрических вариантов. "
                 f"Manifest: {destination}; offline preview: {preview_path}. "
-                "Live запуск и Clear заблокированы."
+                "Для реального теста используйте отдельную кнопку «Запустить серию» "
+                "после подтверждения Bridge, Firefox и калибровки."
             )
         except (SeriesBlocked, ValueError, OSError) as exc:
             messagebox.showerror("FILL001-SERIES: подготовка заблокирована", str(exc))
