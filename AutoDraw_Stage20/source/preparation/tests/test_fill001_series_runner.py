@@ -312,3 +312,30 @@ def test_recycled_bridge_run_id_blocked_even_in_distinct_sessions(tmp_path):
     assert report["status"] == "blocked"
     assert report["accepted"] == 1
     assert state["n"] == 2
+
+
+def test_engine001_existing_clear_proof_is_accepted_without_zero_pixel_rule():
+    from fill001_series_runner import _clear_proof_valid
+    proof = {
+        "schema": "FILL001_SERIES_ENGINE001_CLEAR_REUSE_V1",
+        "status": "PASS", "session_id": "session-1",
+        "mapping_sha256": "a"*64,
+        "post_clear_pointCount": 1,
+        "reference_png_sha256": "b"*64,
+        "post_clear_png_sha256": "c"*64,
+        "last_settled_at_utc": "2026-11-11T00:00:11+00:00",
+        "engine001_visual_status": "restored_within_pixel_tolerance",
+        "engine001_tolerance_percent": 0.15,
+        "engine001_changed_percent": 0.06,
+        "clear_ui_action_proven": True,
+        "screen_evidence_status": "ENGINE001_EXISTING_COMPARATOR_PASS",
+    }
+    assert _clear_proof_valid(proof, "session-1") is True
+    proof["engine001_changed_percent"] = 0.16
+    assert _clear_proof_valid(proof, "session-1") is False
+    proof["engine001_changed_percent"] = 0.06
+    proof["engine001_tolerance_percent"] = 0.2
+    assert _clear_proof_valid(proof, "session-1") is False
+    proof["engine001_tolerance_percent"] = 0.15
+    proof["session_id"] = "foreign"
+    assert _clear_proof_valid(proof, "session-1") is False
