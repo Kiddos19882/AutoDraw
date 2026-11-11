@@ -13,6 +13,7 @@ def example():
         "status":"completed",
         "request":{"task_id":"series-figure-1","session_id":"sid"},
         "monitor_binding":"EXACT_RUN_BOUND",
+        "actual_chalk":1706,
         "game_png_quality":"PASS",
         "binding":{
             "status":"EXACT_RUN_BOUND","run_ids":["run-1"],
@@ -58,6 +59,7 @@ def test_valid_complete_quality_fail_keeps_exact_chalk():
     lambda r:r.update(game_png_quality="NOT_EVALUATED"),
     lambda r:r.update(status="BLOCKED"),
     lambda r:r["stage6_summary"]["mouse_release"].update(succeeded=False),
+    lambda r:r.update(actual_chalk=1),
     lambda r:r["binding"].update(status="UNKNOWN"),
     lambda r:r["binding"].update(run_ids=[]),
     lambda r:r.update(after_settled_png=None),
