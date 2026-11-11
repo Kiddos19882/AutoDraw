@@ -335,6 +335,7 @@ class AutoDrawUnifiedApp:
             on_transfer_plan=self._transfer_brush_test_plan,
             on_start=self._start_fill001_executor,
             on_v5_run=self._start_fill001_v5_stage6,
+            on_series_run=self._start_fill001_series_stage6,
             on_v5_cancel=self.executor._stop_execution,
         )
         # Only experiment plans are routed through their own completion handler;
@@ -972,6 +973,10 @@ class AutoDrawUnifiedApp:
             "V3 current BoardPane geometry verified from fresh passive Bridge samples; "
             "Stage6 plan loaded. No brush diameter/target change."
         )
+
+    def _start_fill001_series_stage6(self, **kwargs: Any) -> bool:
+        """Exactly one series figure through the single shared Stage6 owner."""
+        return bool(self.executor.start_fill001_series_single_run(**kwargs))
 
     def _start_fill001_v5_stage6(self, **kwargs: Any) -> bool:
         """One opt-in V5 attempt via the existing Stage6 owner, never another executor."""
