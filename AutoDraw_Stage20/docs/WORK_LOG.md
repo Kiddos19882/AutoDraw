@@ -1,5 +1,12 @@
 # AutoDraw — журнал выполненных действий
 
+## 2026-11-12 — FILL001-SERIES-001: Selenium reuse без преждевременного V5 trim gate
+
+- Проверены remote HEAD `5bc3885`, 20 коммитов, workflows/CI, регламент, текущая `Fill001Tab._firefox_worker`, `firefox_monitor_session.py` и series source/preflight. До фикса `build_fill001_v5_source_plan(candidate)` вызывался перед развилкой series/V5, а candidate принадлежит только 29-штриховому V5 trim. Исправлено минимальным переносом V5 импорта и построения `plan` после возврата series-ветки; общий WebDriver, operator-confirmed Monitor/Bridge и Stage6 без изменений.
+- Код/test commit [`0e5075b`](https://github.com/Kiddos19882/AutoDraw/commit/0e5075bdecf0557752533b46837b1401cf138427): 2 файла, AST-регрессия общего Selenium attach и отсутствия V5 gate до series. [Series safety CI 43109628909](https://github.com/Kiddos19882/AutoDraw/actions/runs/43109628909) **SUCCESS**; [main validation 43109630346](https://github.com/Kiddos19882/AutoDraw/actions/runs/43109630346) **IN_PROGRESS** (финальный E3 статус ещё не определён) на этом же SHA. До публикации документации E4/E5 серии не запускались, локальное состояние Windows ПК не проверено.
+- Открытый next gate: E4 1 цикл × 2 фигуры с exact CHALK, PNG, фактической проверкой Clear; не приписывать CI Selenium/реальной игре.
+
+
 ## 2026-11-11 — FILL001-SERIES-001: документационная синхронизация current E1–E3 и незакрытого E4
 
 - Read-only сверены baseline `3acc3dcdf69c`, последние 20 remote commits, GUI/Stage6/ENGINE-001 Clear/owner-lock код на `fea265f92aac` и текущие управляющие документы. Ранние `NOT_IMPLEMENTED` описывали предшествующий offline этап; новый opt-in adapter реализован в коде, но E4/E5 серии `NOT_RUN`.

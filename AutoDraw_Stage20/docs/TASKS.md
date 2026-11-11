@@ -1,5 +1,12 @@
 # AutoDraw — действующие задачи
 
+## FILL001-SERIES-001 — Selenium/V5 trim isolation (2026-11-12)
+
+- [x] Исправлена зависимость запуска серии от необязательного V5 trim кандидата: внутри общего Selenium Firefox worker V5 `build_fill001_v5_source_plan` вызывается лишь после завершения/обхода series-ветки. SHA [`0e5075b`](https://github.com/Kiddos19882/AutoDraw/commit/0e5075bdecf0557752533b46837b1401cf138427). Общие Firefox/Monitor/Bridge и Stage6 сохраняются.
+- [x] Добавлена offline регрессия на ветвление и общий WebDriver; [dedicated CI 43109628909](https://github.com/Kiddos19882/AutoDraw/actions/runs/43109628909) **SUCCESS** на `0e5075b`. [Main CI 43109630346](https://github.com/Kiddos19882/AutoDraw/actions/runs/43109630346) на том же SHA: **IN_PROGRESS** (финальный E3 статус ещё не определён).
+- [ ] Первый live E4 серии: отдельное разрешение/запуск на ПК пользователя, 1 цикл × 2 фигуры, доказанный Firefox/Bridge/Stage6/Clear handoff с raw PNG и exact run-bound CHALK. Это не закрывается unit/CI.
+
+
 ## FILL001-SERIES-001 — интеграция Clear/Stage6 выполнена в коде; оставшиеся runtime gates (2026-11-11)
 
 - [x] Найти и переиспользовать действующий ENGINE-001 Clear (калибровка, штатный клик, `evaluate_board_clear` 0.15%, 9/9 исторических live E4); не придумывать заново игровой Clear и не подменять его Monitor.clear.

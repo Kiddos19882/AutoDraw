@@ -1,5 +1,10 @@
 # AutoDraw — реестр проверенных результатов
 
+## FILL001-SERIES-001 — Selenium mode isolation и проверка без игры (2026-11-12)
+
+**Baseline:** `5bc388589013fcd47e34edfa3f469187b71166e7`; фикс [`0e5075b`](https://github.com/Kiddos19882/AutoDraw/commit/0e5075bdecf0557752533b46837b1401cf138427) только `chalk_fill_ui.py` и `tests/test_fill001_series_firefox_probe.py`. E1: общий `_firefox_worker` по-прежнему создаёт один Selenium Firefox WebDriver и подключает Game Monitor/Bridge; V5 trim fixture теперь строится только после раннего выхода series-ветки. E2: новый `test_series_firefox_mode_does_not_depend_on_v5_trim_candidate` — структурная AST/source-contract проверка расположения вызовов, **не** фактический Firefox/Selenium runtime-тест. E3: [dedicated series safety CI 43109628909](https://github.com/Kiddos19882/AutoDraw/actions/runs/43109628909) **SUCCESS** на `0e5075b`: регрессии, UI syntax check и offline manifest smoke. [Общий AutoDraw validation 43109630346](https://github.com/Kiddos19882/AutoDraw/actions/runs/43109630346) — **IN_PROGRESS** (финальный E3 статус ещё не определён) на том же SHA (по состоянию на запись). **Новый game E4/E5 NOT_RUN**; исторический V5 trim live PASS нельзя переносить на multi-figure series.
+
+
 ## FILL001-SERIES-001 — проверка кода интеграции и исторического Clear, 2026-11-11
 
 **Историческая первичная E4:** ENGINE-001 one-click Brush Lab Clear 9/9 PASS на реальной игре, описано в GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md. Фактический Clear использует `pyautogui.click` откалиброванной кнопки и `evaluate_board_clear` с допуском 0.15% — критерий не изменён. **Новые series runtime E4/E5: NOT_RUN**; данные ENGINE-001 нельзя переносить на связку широких/узких масок автоматически.

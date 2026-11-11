@@ -1,5 +1,10 @@
 # AutoDraw — значимые изменения
 
+## 2026-11-12 — FILL001-SERIES-001 Selenium Firefox branch isolation
+
+- Existing shared Selenium/Firefox + Monitor/Bridge worker retained. Moved V5 trim-only `build_fill001_v5_source_plan` behind the series early-return branch, so signed series figures no longer depend on selected V5 candidate; added AST source-contract regression preserving common browser owner. [Fix 0e5075b](https://github.com/Kiddos19882/AutoDraw/commit/0e5075bdecf0557752533b46837b1401cf138427), [series CI 43109628909](https://github.com/Kiddos19882/AutoDraw/actions/runs/43109628909) SUCCESS; [main CI 43109630346](https://github.com/Kiddos19882/AutoDraw/actions/runs/43109630346) **IN_PROGRESS** (финальный E3 статус ещё не определён). No game E4/E5, no production behavior/threshold change.
+
+
 ## 2026-11-11 — FILL001-SERIES-001 live orchestration code added using proven ENGINE-001 Clear
 
 - Added opt-in «Запустить серию (тестовая доска)» to existing FILL-001 GUI, wired through original integrated app/Stage6 owner with normal Stop; one signed figure at a time, fresh BoardPane passive witness/Monitor radius, generic exact CHALK binding, PNG quality, immutable reports then original calibrated Clear+blank comparator. Preserved ENGINE-001 0.15% tolerance and standard stage6/executor production defaults. Shared experiment cross-process owner lock. Synthetic regression [42975744219](https://github.com/Kiddos19882/AutoDraw/actions/runs/42975744219) SUCCESS на `fcd29dc`; latest [series safety 42975856803](https://github.com/Kiddos19882/AutoDraw/actions/runs/42975856803) и [main validation 42975856883](https://github.com/Kiddos19882/AutoDraw/actions/runs/42975856883) SUCCESS на `fea265f` (Windows portable SKIPPED); new multi-figure E4/E5 NOT_RUN. No production promotion.
