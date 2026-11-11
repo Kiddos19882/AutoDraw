@@ -1,0 +1,42 @@
+name: AutoDraw FILL-001 V5 independent W2 W3 E5 audit
+
+on:
+  push:
+    branches:
+      - feature/image-geometry-optimization
+    paths:
+      - ".github/workflows/fill001-v5-independent-e5.yml"
+      - "AutoDraw_Stage20/source/preparation/fill001_v5_independent_e5.py"
+      - "AutoDraw_Stage20/data/results/brush_behavior_tests/fill001/v5_stage6_runs/**"
+      - "AutoDraw_Stage20/data/results/brush_behavior_tests/game_monitor_bridge/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  independent-e5:
+    name: W2 W3 independent PNG and Bridge audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: AutoDraw_Stage20/source/preparation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install independent audit dependencies
+        run: python -m pip install numpy scipy pillow
+      - name: Independently audit original W2 W3 PNG and closed Bridge runs
+        run: |
+          python fill001_v5_independent_e5.py | tee "${RUNNER_TEMP}/fill001-v5-independent-e5.json"
+      - name: Upload independent audit evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: autodraw-fill001-v5-w2-w3-independent-e5
+          path: ${{ runner.temp }}/fill001-v5-independent-e5.json
+          if-no-files-found: warn
+          retention-days: 30
