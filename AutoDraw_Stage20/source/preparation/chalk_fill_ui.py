@@ -520,10 +520,7 @@ class Fill001Tab:
             ))
             # The automatic probe is diagnostic only.  It does not clear the
             # board, set a brush, transfer plans or authorize Stage6 input.
-            from fill001_v5_handoff import build_fill001_v5_source_plan
             from fill001_firefox_auto_probe import collect_verified_v5_firefox_roi
-            candidate = getattr(self, "_firefox_selected_candidate", "")
-            plan = build_fill001_v5_source_plan(candidate)
             minimized = threading.Event()
             def hide_ui() -> None:
                 try:
@@ -557,6 +554,11 @@ class Fill001Tab:
                     )
                     self._firefox_stop.wait()
                     return
+                # Series uses its own signed DrawingPlan; the optional V5 trim
+                # candidate is only required by the isolated V5 probe/run.
+                from fill001_v5_handoff import build_fill001_v5_source_plan
+                candidate = getattr(self, "_firefox_selected_candidate", "")
+                plan = build_fill001_v5_source_plan(candidate)
                 mapped, witness, roi = collect_verified_v5_firefox_roi(
                     driver, bridge_root, ready["session_id"], plan,
                     native_mouse=pyautogui,
