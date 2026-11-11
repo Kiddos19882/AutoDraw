@@ -19,6 +19,7 @@ from typing import Any, Callable
 
 from chalk_fill_execution import prepare_fill001_single_task_plan
 from fill001_series_runner import build_manifest as build_fill001_series_manifest, write_manifest as write_fill001_series_manifest, SeriesBlocked
+from fill001_series_offline_plans import prepare_offline_variants as prepare_fill001_series_geometry
 from chalk_fill_matrix import (
     FillMatrixError,
     build_fill001_matrix,
@@ -275,12 +276,23 @@ class Fill001Tab:
                 methods=values(self.series_methods_var.get()),
                 radii=[int(value) for value in values(self.series_radii_var.get())],
             )
+            # Prepare all geometry before writing either artifact. Preview is
+            # NOT executor-ready, never an estimate of exact game CHALK.
+            geometry = prepare_fill001_series_geometry(manifest)
             destination = self.output_dir / "series" / (manifest["series_id"] + ".json")
+            preview_path = destination.with_suffix(".geometry.json")
+            if destination.exists() or preview_path.exists():
+                raise SeriesBlocked("Серия уже существует, перезапись запрещена.")
             write_fill001_series_manifest(manifest, destination)
+            with preview_path.open("x", encoding="utf-8") as stream:
+                json.dump(geometry, stream, ensure_ascii=False, indent=2, allow_nan=False)
+                stream.write("\n")
             count = len(manifest["tasks"])
             self.status_var.set(
-                f"Подготовлена серия {manifest['series_id']}: {count} фигур; "
-                f"файл {destination}. Live запуск и Clear заблокированы."
+                f"Подготовлена серия {manifest['series_id']}: {count} рисунков, "
+                f"{geometry['unique_variants']} геометрических вариантов. "
+                f"Manifest: {destination}; offline preview: {preview_path}. "
+                "Live запуск и Clear заблокированы."
             )
         except (SeriesBlocked, ValueError, OSError) as exc:
             messagebox.showerror("FILL001-SERIES: подготовка заблокирована", str(exc))
