@@ -144,6 +144,7 @@ def run_with_validated_callbacks(
     results_dir = Path(results_dir)
     results_dir.mkdir(parents=True, exist_ok=True)
     accepted = []
+    quality_failed = []
     seen_sessions: set[str] = set()
     stop_requested = stop_requested or (lambda: False)
     status = "completed"
@@ -180,7 +181,7 @@ def run_with_validated_callbacks(
                     or result.get("task_id") != task["task_id"]
                     or result.get("execution_status") != "completed"
                     or result.get("monitor_binding") != "EXACT_RUN_BOUND"
-                    or result.get("quality_gate") != "PASS"
+                    or result.get("quality_gate") not in ("PASS", "FAIL")
                     or result.get("mouse_release_succeeded") is not True
                     or type(result.get("pre_pointCount")) is not int
                     or result["pre_pointCount"] != pre["pointCount"]
@@ -192,8 +193,10 @@ def run_with_validated_callbacks(
                     or not result.get("after_settled_png_sha256")
                     or not result.get("run_id")):
                 raise SeriesBlocked("Run lacks validated exact CHALK and quality evidence")
-            record.update(status="PASS", actual_chalk=result["actual_chalk"],
-                          quality_gate="PASS", runtime=result)
+            quality = result["quality_gate"]
+            record.update(status="PASS" if quality == "PASS" else "QUALITY_FAIL",
+                          actual_chalk=result["actual_chalk"],
+                          quality_gate=quality, runtime=result)
         except Exception as exc:
             record["status"] = "BLOCKED"
             record["error"] = f"{type(exc).__name__}: {exc}"
@@ -202,11 +205,14 @@ def run_with_validated_callbacks(
         with path.open("x", encoding="utf-8") as stream:
             json.dump(record, stream, ensure_ascii=False, indent=2)
             stream.write("\n")
-        if record["status"] != "PASS":
+        if record["status"] not in ("PASS", "QUALITY_FAIL"):
             break
-        accepted.append(record)
+        if record["status"] == "PASS":
+            accepted.append(record)
+        else:
+            quality_failed.append(record)
         # Never clear after last job; never continue if Clear is uncertain.
-        if len(accepted) < len(manifest["tasks"]):
+        if task["order"] < len(manifest["tasks"]):
             clear_record = results_dir / (task["task_id"] + ".clear.json")
             clear_evidence = {"schema": "FILL001_SERIES_CLEAR_V1",
                               "task_id": task["task_id"], "status": "BLOCKED"}
@@ -261,8 +267,10 @@ def run_with_validated_callbacks(
             row["mean_exact_chalk"] = row["total_exact_chalk"] / row["accepted"]
     return {"schema": "FILL001_SERIES_SUMMARY_V1", "series_id": manifest["series_id"],
             "status": status, "issue": issue, "scheduled": len(manifest["tasks"]),
-            "accepted": len(accepted),
+            "accepted": len(accepted), "quality_failed": len(quality_failed),
+            "completed_with_bound_chalk": len(accepted) + len(quality_failed),
             "exact_chalk_sum_of_accepted_runs": sum(r["actual_chalk"] for r in accepted),
+            "exact_chalk_sum_of_quality_failed_runs": sum(r["actual_chalk"] for r in quality_failed),
             "exact_chalk_is_per_run_only": True,
             "grouped_exact_chalk_statistics": groups,
             "next_task_requires_fresh_session": True}
