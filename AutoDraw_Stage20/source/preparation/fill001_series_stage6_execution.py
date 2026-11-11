@@ -14,16 +14,6 @@ from pathlib import Path
 import time
 from typing import Any, Callable
 
-from drawing.color_plan_execution import BrushSliderCalibration
-from drawing.mouse_executor import ExecutorConfig, MouseExecutor
-from models import DrawingPlan
-from firefox_foreground_witness import firefox_foreground_witness
-from fill001_v5_live_gate import verify_v5_live_gate
-from fill001_v5_stage6_execution import (
-    CONFIG as V5_EXPERIMENTAL_CONFIG,
-    V5BrushSliderController,
-    park_v5_cursor_for_png,
-)
 from fill001_series_handoff import validate_series_source_plan
 from fill001_series_run_binding import validate_series_bridge_runs
 from fill001_series_runner import SeriesBlocked
@@ -45,6 +35,17 @@ def execute_series_single_stage6(
     progress: Callable[[int,int,str],None] | None = None,
 ) -> dict:
     """Perform ONE previously preflighted task using normal game controls."""
+    # Imports requiring native display/Windows input stay inside the opt-in
+    # live runner, keeping offline analysis and CI importable headlessly.
+    from drawing.color_plan_execution import BrushSliderCalibration
+    from drawing.mouse_executor import ExecutorConfig, MouseExecutor
+    from models import DrawingPlan
+    from firefox_foreground_witness import firefox_foreground_witness
+    from fill001_v5_live_gate import verify_v5_live_gate
+    from fill001_v5_stage6_execution import (
+        CONFIG as V5_EXPERIMENTAL_CONFIG,
+        V5BrushSliderController, park_v5_cursor_for_png,
+    )
     generation = validate_series_source_plan(manifest, source)
     if generation["task_id"] != task_id:
         raise SeriesBlocked("Source task is not the requested series task")
