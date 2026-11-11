@@ -1,5 +1,9 @@
 # AutoDraw — значимые изменения
 
+## 2026-11-11 — FILL001-SERIES-001 verified offline per-task variants
+
+- Experimental configurable loop now has 30 frozen-shape/scanline/brush preview variants, source DrawingPlan export, immutable run-statistics aggregation, and read-only Clear screen/counter pilot. Repeated Bridge session use requires verified Clear freshness and new run IDs. UI manifest/preview/analysis controls added, no auto game Clear or live multi-task execution. `execution_allowed=false`, existing FILL-001 legacy batch and production executor defaults unchanged. [CI 42970208091](https://github.com/Kiddos19882/AutoDraw/actions/runs/42970208091) 58 synthetic PASS. End-to-end game E4 NOT_RUN; latest SHA follow-up CI pending.
+
 ## 2026-11-11 — FILL-001 V5: W3 E4 quality PASS and provisional lower exact CHALK
 
 - Archived W3 [`832bf2b`](https://github.com/Kiddos19882/AutoDraw/commit/832bf2bd52a8f5a3ca908562b4723c2983d603b6) completed Stage6 29/29, exact run-bound CHALK `1707-1=1706`, and active `FILL001_CHALK_FIRST_PERIMETER_V2` PNG PASS (99.3775% coverage, zero overshoot beyond 3 logical px). Previously quality-PASS W2 [`1c722ba`](https://github.com/Kiddos19882/AutoDraw/commit/1c722ba82be2c91b03570460101061df74e6b9a2) CHALK1709; W3 provisionally lower by 3 CHALK. Historic V1/V2 diagnostic FAIL unchanged. [CI 42923577993](https://github.com/Kiddos19882/AutoDraw/actions/runs/42923577993) SUCCESS on W3 commit; optional jobs skipped. Independent E5 and repeatability NOT_RUN; no production changes.
