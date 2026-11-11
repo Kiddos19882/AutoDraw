@@ -42,7 +42,8 @@ def click_calibrated_board_clear(
     states = status.get("points") if isinstance(status, dict) else None
     clear = points.get("clear_board") if isinstance(points, dict) else None
     if (not isinstance(clear, dict) or not isinstance(states, dict)
-            or states.get("clear_board") != "confirmed"
+            or states.get("clear_board") not in ("confirmed", "set")
+            or profile.get("needs_review") is True
             or any(type(clear.get(a)) is not int for a in ("x", "y"))):
         raise CalibratedClearBlocked("Game Clear coordinate is missing or not confirmed")
     x,y = clear["x"],clear["y"]
