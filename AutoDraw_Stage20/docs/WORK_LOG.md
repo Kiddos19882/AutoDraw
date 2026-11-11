@@ -1,5 +1,11 @@
 # AutoDraw — журнал выполненных действий
 
+## 2026-11-11 — FILL001-SERIES-001 offline geometry, traceable statistics and E4 Clear pilot
+
+- Added `fill001_series_offline_plans.py` (`fc34022`), `fill001_series_handoff.py` (`4cd628a`) to produce signed per-task plans and 30 factorial frozen variants; `fill001_series_statistics.py` (`e7bcab5`) to summarize only trustworthy exact-CHALK run records by shape/strategy/brush, preserving QUALITY_FAIL and missing data. Tests added for all 30, output immutability, non-executable flags and tamper resistance. GUI `chalk_fill_ui.py` now exports offline geometry and opens statistics (`81b004e`, `d8516bf`).
+- Added non-clicking `fill001_series_clear_pilot.py` (`ebc3c30`) + negative/pilot tests (`7b4bc1b`), and same-session Clear freshness improvements (`c750518`, `f0d75dc`, `0c1e9dc`, `e01a1f5`, `e0b10bf`). No actual game Clear, Stage6 batch or desktop execution performed.
+- [CI 42968857617](https://github.com/Kiddos19882/AutoDraw/actions/runs/42968857617) PASS offline 30 candidates; [CI 42970208091](https://github.com/Kiddos19882/AutoDraw/actions/runs/42970208091) 58 tests PASS. Latest CI after last source commit still needs final status check. Old intermediate FAIL left visible. Existing W2/W3 E4/E5 and production remain untouched.
+
 ## 2026-11-11 — FILL001-SERIES-001 persistent summary and no-repeat guards
 
 - `8518fc6` сохраняет итоговую статистику в отдельном immutable series summary и проверяет наличие прежних summary/failed Clear journals *до* game callbacks. `f6d608b` обновляет synthetic tests для новых состояний, включая блокировку повторов. CI на последнем source SHA остаётся отдельным обязательным подтверждением. Live Clear/series E4 NOT_RUN.
