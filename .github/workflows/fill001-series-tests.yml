@@ -43,9 +43,9 @@ jobs:
       - name: Install offline audit dependencies
         run: python -m pip install pytest numpy pillow opencv-python-headless
       - name: Run synthetic-only serial orchestration tests
-        run: python -m pytest -q -ra tests/test_fill001_series_runner.py tests/test_fill001_series_blank_verification.py tests/test_fill001_series_offline_plans.py tests/test_fill001_series_statistics.py tests/test_fill001_series_handoff.py tests/test_fill001_series_clear_pilot.py
+        run: python -m pytest -q -ra tests/test_fill001_series_runner.py tests/test_fill001_series_blank_verification.py tests/test_fill001_series_offline_plans.py tests/test_fill001_series_statistics.py tests/test_fill001_series_handoff.py tests/test_fill001_series_clear_pilot.py tests/test_calibrated_game_clear.py tests/test_fill001_series_engine001_clear.py
       - name: Syntax-check existing FILL-001 UI and series module
-        run: python -m py_compile chalk_fill_ui.py fill001_series_runner.py fill001_series_blank_verification.py fill001_series_offline_plans.py fill001_series_statistics.py fill001_series_handoff.py fill001_series_clear_pilot.py
+        run: python -m py_compile chalk_fill_ui.py fill001_series_runner.py fill001_series_blank_verification.py fill001_series_offline_plans.py fill001_series_statistics.py fill001_series_handoff.py fill001_series_clear_pilot.py calibrated_game_clear.py fill001_series_engine001_clear.py
       - name: Smoke-test offline 2-cycle manifest
         run: |
           python fill001_series_runner.py --cycles 2 --figures-per-cycle 3 --output "${RUNNER_TEMP}/series-manifest.json"
