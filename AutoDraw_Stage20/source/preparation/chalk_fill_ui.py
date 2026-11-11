@@ -20,6 +20,7 @@ from typing import Any, Callable
 from chalk_fill_execution import prepare_fill001_single_task_plan
 from fill001_series_runner import build_manifest as build_fill001_series_manifest, write_manifest as write_fill001_series_manifest, SeriesBlocked
 from fill001_series_offline_plans import prepare_offline_variants as prepare_fill001_series_geometry
+from fill001_series_statistics import write_analysis as write_fill001_series_analysis
 from chalk_fill_matrix import (
     FillMatrixError,
     build_fill001_matrix,
@@ -244,6 +245,8 @@ class Fill001Tab:
         ttk.Entry(count_row, textvariable=self.series_figures_var, width=6).pack(side="left", padx=(4, 12))
         ttk.Button(count_row, text="Создать план серии (без запуска)",
                    command=self.create_fill001_series_schedule).pack(side="left")
+        ttk.Button(count_row, text="Проанализировать результаты",
+                   command=self.analyze_fill001_series_schedule).pack(side="left", padx=(8, 0))
         for description, state in (
             ("Фигуры (через запятую)", self.series_shapes_var),
             ("Способы (dense_scanlines, spaced_scanlines)", self.series_methods_var),
@@ -296,6 +299,37 @@ class Fill001Tab:
             )
         except (SeriesBlocked, ValueError, OSError) as exc:
             messagebox.showerror("FILL001-SERIES: подготовка заблокирована", str(exc))
+
+    def analyze_fill001_series_schedule(self) -> None:
+        """Analyze immutable run records; no Firefox or executor calls."""
+        try:
+            selected = filedialog.askopenfilename(
+                parent=self.root, title="Выберите manifest серии",
+                filetypes=(("JSON", "*.json"),),
+                initialdir=str(self.output_dir / "series"),
+            )
+            if not selected:
+                return
+            manifest_path = Path(selected)
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            results_folder = filedialog.askdirectory(
+                parent=self.root, title="Выберите каталог JSON результатов",
+                initialdir=str(self.output_dir / "series"),
+            )
+            if not results_folder:
+                return
+            output_path = Path(results_folder) / (manifest["series_id"] + ".analytics.json")
+            write_fill001_series_analysis(manifest, Path(results_folder), output_path)
+            data = json.loads(output_path.read_text(encoding="utf-8"))
+            self.status_var.set(
+                f"Статистика серии {data['series_id']} сохранена: {output_path}; "
+                f"измерено {data['observed']}/{data['scheduled']}; "
+                f"quality PASS={data['quality_pass']}, FAIL={data['quality_fail']}, "
+                f"missing={len(data['missing'])}, rejected={len(data['rejected'])}. "
+                "Это анализ отдельных run-bound evidence, не E5/production validation."
+            )
+        except (OSError, ValueError, KeyError, TypeError) as exc:
+            messagebox.showerror("FILL001-SERIES: анализ", str(exc), parent=self.root)
 
     def _poll_firefox_messages(self) -> None:
         try:
