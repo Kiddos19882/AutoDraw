@@ -1,5 +1,12 @@
 # AutoDraw — действующие задачи
 
+## FILL001-SERIES-001 — сохранение сводки и защита истории (2026-11-11)
+
+- [x] Реализовать неизменяемый `<series_id>.summary.json` (exclusive create) с accepted, quality_failed, exact CHALK отдельно по группам; при повторном `series_id` блокировать работу до любых callbacks.
+- [x] Запретить повторное исполнение, если найден хотя бы старый `<task>.json` или `<task>.clear.json`; сохранить негативные capture/clear records, не переписывать.
+- [ ] Подтвердить финальные CI на кодовом SHA `f6d608b34e8428d7c970e14e6dd6882003e2f586`; не переносить PASS с предыдущих SHA.
+- [ ] Следующий live blocker прежний: доказать безопасную реальную UI Clear action с PNG+двумя exact counters, только затем подключать opt-in game adapter.
+
 ## FILL001-SERIES-001 — проверка очистки и quality-fail журнал (2026-11-11)
 
 - [x] Найти статическую цепочку игрового Clear в сохранённом bundle (§12.2 engine architecture), отличить `BoardPane.clear()` от `AutoDrawGameMonitor.clear()` (последний чистит события, не игровую доску). E1, не доказательство live UI.
