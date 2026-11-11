@@ -1,5 +1,10 @@
 # AutoDraw — журнал выполненных действий
 
+## 2026-11-11 — FILL001-SERIES-001 experimental multi-figure scheduler, offline stage
+
+- Разработан versioned fail-closed scheduler с пользовательскими `cycles × figures_per_cycle`, тремя frozen shapes, двумя именованными scanline methods, кистями 1/5/10/20/30, immutable per-task JSON и grouped exact CHALK для проверенных run-bound данных. Добавлены synthetic tests и отдельный CI workflow; UI FILL-001 получил поля/кнопку **только offline manifest**, не автозапуск. SHA: scheduler `25976cb`/refinement `f47e433`, tests `aff4e99`/`4b50967`, CI `b0ffbc3`, UI `3a7f939`. [First dedicated CI run 42946045653](https://github.com/Kiddos19882/AutoDraw/actions/runs/42946045653) SUCCESS на `b0ffbc3`; final test/validation CI на `4b50967` проверяется отдельно.
+- Game Clear adapter и live series runner **NOT_IMPLEMENTED / BLOCKED** до verified reset/blank-board proof. Frozen masks/policy, existing single-run FILL-001, Stage6 executor, estimator и production defaults не изменены. Tests synthetic only; no user Windows E4 or series E5.
+
 ## 2026-11-11 — FILL-001 archived W2/W3 independent E5 audit
 
 - Added independent read-only source `fill001_v5_independent_e5.py` [`014132c`](https://github.com/Kiddos19882/AutoDraw/commit/014132cde1c2f708236ae8140a3c1067e6f1f7f7) and dedicated GitHub Actions workflow [`dae4e18`](https://github.com/Kiddos19882/AutoDraw/commit/dae4e183712e0acde430f131aae45dc3940a5cbb). [CI 42944487257](https://github.com/Kiddos19882/AutoDraw/actions/runs/42944487257) completed SUCCESS, [numeric JSON evidence artifact](https://github.com/Kiddos19882/AutoDraw/actions/runs/42944487257/artifacts/13822167330) uploaded. Analyzer read original PNG bytes, checked SHA256 and frozen mask, independently recalculated RGB quality using scipy Euclidean distances, and parsed full immutable Bridge 8176/8157 event streams with exact point counter and stroke/slider checks.
