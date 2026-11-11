@@ -213,11 +213,24 @@ def run_with_validated_callbacks(
             try:
                 cleared = clear_and_verify(task)
                 clear_evidence["proof"] = cleared
+                proof = cleared.get("blank_screen_verification") if isinstance(cleared, dict) else None
                 if (not isinstance(cleared, dict) or cleared.get("valid") is not True
-                        or cleared.get("pointCount") != 1
+                        or type(cleared.get("pointCount")) is not int
+                        or cleared["pointCount"] != 1
                         or cleared.get("mouse_released") is not True
-                        or cleared.get("fresh_board") is not True):
-                    raise SeriesBlocked("Clear did not prove a fresh blank board")
+                        or cleared.get("fresh_board") is not True
+                        or not isinstance(proof, dict)
+                        or proof.get("schema") != "FILL001_SERIES_BLANK_SCREEN_VERIFICATION_V1"
+                        or proof.get("status") != "PASS"
+                        or proof.get("session_id") != pre["session_id"]
+                        or proof.get("post_clear_pointCount") != 1
+                        or proof.get("changed_screen_pixels") != 0
+                        or not isinstance(proof.get("reference_png_sha256"), str)
+                        or len(proof["reference_png_sha256"]) != 64
+                        or not isinstance(proof.get("post_clear_png_sha256"), str)
+                        or len(proof["post_clear_png_sha256"]) != 64
+                        or proof.get("clear_ui_action_proven") is not False):
+                    raise SeriesBlocked("Clear lacks independent blank-screen verification")
                 clear_evidence["status"] = "PASS"
             except Exception as exc:
                 clear_evidence["error"] = f"{type(exc).__name__}: {exc}"
