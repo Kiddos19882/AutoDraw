@@ -1,5 +1,10 @@
 # AutoDraw — дорожная карта будущих работ
 
+## Следующий gate FILL001-SERIES-001: quota-limited → ENGINE-001 Clear → следующая фигура (2026-11-12)
+
+Первая игровая попытка из [5acb2e6](https://github.com/Kiddos19882/AutoDraw/commit/5acb2e6284a4425cdfea8812257fa85ea55ed88f) E4 BLOCKED: radius1, 100/141 штрихов, remainingPoints=241, не создан полный exact/settled результат. Добавлен экспериментальный QUOTA_LIMITED путь, который фиксирует частичный exact run-bound CHALK и PNG, но не признаёт quality PASS, выполняет штатный Clear только после точной привязки и разрешает следующий task только по прежнему verified blank-board gate. [Series CI 43114637544](https://github.com/Kiddos19882/AutoDraw/actions/runs/43114637544) SUCCESS, [main 43114637531](https://github.com/Kiddos19882/AutoDraw/actions/runs/43114637531) IN_PROGRESS (not final).
+
+Следующий один live gate: пользовательский ограниченный опыт 1 цикл × 2 фигуры с ресурсно тяжёлой первой задачей, новой серией и оригинальными raw captures; отсутствие exact run/settled PNG/Clear-подтверждения должно приводить к BLOCKED. Затем повторяемость/E5, без изменения production defaults, оценки CHALK или acceptance thresholds. Подробности — [TASKS.md](TASKS.md).
 ## Текущий приоритет — FILL001-SERIES-001: ограниченный E4 smoke (2026-11-11)
 
 Экспериментальная opt-in интеграция FILL-001 → существующий Stage6 → run-bound Monitor/PNG/exact CHALK → штатный откалиброванный ENGINE-001 Clear → следующая фигура **реализована в коде**. E3 SUCCESS на `fea265f92aac`: [series CI 42975856803](https://github.com/Kiddos19882/AutoDraw/actions/runs/42975856803) и [main validation 42975856883](https://github.com/Kiddos19882/AutoDraw/actions/runs/42975856883). Серийные E4/E5 **NOT_RUN**, production eligibility FALSE; Windows portable job в последней main validation `SKIPPED`.
