@@ -1,5 +1,9 @@
 # AutoDraw — значимые изменения
 
+## 2026-11-11 — FILL-001 V5: W3 E4 quality PASS and provisional lower exact CHALK
+
+- Archived W3 [`832bf2b`](https://github.com/Kiddos19882/AutoDraw/commit/832bf2bd52a8f5a3ca908562b4723c2983d603b6) completed Stage6 29/29, exact run-bound CHALK `1707-1=1706`, and active `FILL001_CHALK_FIRST_PERIMETER_V2` PNG PASS (99.3775% coverage, zero overshoot beyond 3 logical px). Previously quality-PASS W2 [`1c722ba`](https://github.com/Kiddos19882/AutoDraw/commit/1c722ba82be2c91b03570460101061df74e6b9a2) CHALK1709; W3 provisionally lower by 3 CHALK. Historic V1/V2 diagnostic FAIL unchanged. [CI 42923577993](https://github.com/Kiddos19882/AutoDraw/actions/runs/42923577993) SUCCESS on W3 commit; optional jobs skipped. Independent E5 and repeatability NOT_RUN; no production changes.
+
 ## 2026-11-10/11 — FILL-001 V5 first run-bound exact CHALK + active PNG quality PASS
 
 - [`1c722ba`](https://github.com/Kiddos19882/AutoDraw/commit/1c722ba82be2c91b03570460101061df74e6b9a2) recorded experimental W2 E4 29/29, exact completed Bridge CHALK1709 and **PASS** of existing versioned `FILL001_CHALK_FIRST_PERIMETER_V2`: coverage99.3578%, max overshoot1.327083 logical px ≤3, no distant pixels; pointer parked off ROI on before/settled captures. V1/V2 zero-leakage diagnostics still FAIL, E5 NOT_RUN. Historical failed `36e95e4` remains unmodified; no production changes.
