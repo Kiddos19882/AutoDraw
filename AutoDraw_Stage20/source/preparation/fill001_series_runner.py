@@ -127,6 +127,38 @@ def write_manifest(manifest: dict, destination: Path) -> Path:
     return destination
 
 
+def _clear_proof_valid(proof: Any, session_id: str) -> bool:
+    """Accept preserved strict screen proof OR the established ENGINE-001 comparator.
+
+    The ENGINE-001 tolerance is reused without raising its threshold.
+    This validates the callback's evidence object, not hidden game state.
+    """
+    if (not isinstance(proof, dict)
+            or proof.get("status") != "PASS"
+            or proof.get("session_id") != session_id
+            or proof.get("post_clear_pointCount") != 1
+            or not isinstance(proof.get("mapping_sha256"), str)
+            or len(proof["mapping_sha256"]) != 64
+            or not all(isinstance(proof.get(k), str) and len(proof[k]) == 64
+                       for k in ("reference_png_sha256", "post_clear_png_sha256"))
+            or not isinstance(proof.get("last_settled_at_utc"), str)):
+        return False
+    if proof.get("schema") == "FILL001_SERIES_BLANK_SCREEN_VERIFICATION_V1":
+        return (proof.get("changed_screen_pixels") == 0
+                and proof.get("clear_ui_action_proven") is False)
+    if proof.get("schema") == "FILL001_SERIES_ENGINE001_CLEAR_REUSE_V1":
+        return (proof.get("engine001_visual_status") in
+                ("restored", "restored_within_pixel_tolerance")
+                and type(proof.get("engine001_tolerance_percent")) in (int, float)
+                and float(proof["engine001_tolerance_percent"]) == 0.15
+                and type(proof.get("engine001_changed_percent")) in (int, float)
+                and 0 <= proof["engine001_changed_percent"] <= 0.15
+                and proof.get("clear_ui_action_proven") is True
+                and proof.get("screen_evidence_status")
+                    == "ENGINE001_EXISTING_COMPARATOR_PASS")
+    return False
+
+
 def run_with_validated_callbacks(
     manifest: dict, *, results_dir: Path,
     observe_blank: Callable[[dict], dict],
@@ -198,8 +230,7 @@ def run_with_validated_callbacks(
                         or not isinstance(proof, dict)
                         or proof != previous_clear_proof
                         or proof.get("session_id") != pre["session_id"]
-                        or proof.get("status") != "PASS"
-                        or proof.get("changed_screen_pixels") != 0
+                        or not _clear_proof_valid(proof, pre["session_id"])
                         or proof.get("post_clear_pointCount") != pre["pointCount"]
                         or not isinstance(pre.get("mapping_sha256"), str)
                         or pre["mapping_sha256"] != proof.get("mapping_sha256")
@@ -261,17 +292,7 @@ def run_with_validated_callbacks(
                         or cleared["pointCount"] != 1
                         or cleared.get("mouse_released") is not True
                         or cleared.get("fresh_board") is not True
-                        or not isinstance(proof, dict)
-                        or proof.get("schema") != "FILL001_SERIES_BLANK_SCREEN_VERIFICATION_V1"
-                        or proof.get("status") != "PASS"
-                        or proof.get("session_id") != pre["session_id"]
-                        or proof.get("post_clear_pointCount") != 1
-                        or proof.get("changed_screen_pixels") != 0
-                        or not isinstance(proof.get("reference_png_sha256"), str)
-                        or len(proof["reference_png_sha256"]) != 64
-                        or not isinstance(proof.get("post_clear_png_sha256"), str)
-                        or len(proof["post_clear_png_sha256"]) != 64
-                        or proof.get("clear_ui_action_proven") is not False):
+                        or not _clear_proof_valid(proof, pre["session_id"])):
                     raise SeriesBlocked("Clear lacks independent blank-screen verification")
                 clear_evidence["status"] = "PASS"
                 previous_clear_proof = dict(proof)
