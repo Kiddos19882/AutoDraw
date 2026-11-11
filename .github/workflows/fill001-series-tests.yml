@@ -9,10 +9,12 @@ on:
       - "AutoDraw_Stage20/source/preparation/fill001_series_runner.py"
       - "AutoDraw_Stage20/source/preparation/fill001_series_offline_plans.py"
       - "AutoDraw_Stage20/source/preparation/fill001_series_statistics.py"
+      - "AutoDraw_Stage20/source/preparation/fill001_series_handoff.py"
       - "AutoDraw_Stage20/source/preparation/fill001_series_blank_verification.py"
       - "AutoDraw_Stage20/source/preparation/tests/test_fill001_series_runner.py"
       - "AutoDraw_Stage20/source/preparation/tests/test_fill001_series_offline_plans.py"
       - "AutoDraw_Stage20/source/preparation/tests/test_fill001_series_statistics.py"
+      - "AutoDraw_Stage20/source/preparation/tests/test_fill001_series_handoff.py"
       - "AutoDraw_Stage20/source/preparation/tests/test_fill001_series_blank_verification.py"
   workflow_dispatch:
 
@@ -37,7 +39,7 @@ jobs:
       - name: Run synthetic-only serial orchestration tests
         run: python -m pytest -q -ra tests/test_fill001_series_runner.py tests/test_fill001_series_blank_verification.py tests/test_fill001_series_offline_plans.py
       - name: Syntax-check existing FILL-001 UI and series module
-        run: python -m py_compile chalk_fill_ui.py fill001_series_runner.py fill001_series_blank_verification.py fill001_series_offline_plans.py fill001_series_statistics.py
+        run: python -m py_compile chalk_fill_ui.py fill001_series_runner.py fill001_series_blank_verification.py fill001_series_offline_plans.py fill001_series_statistics.py fill001_series_handoff.py
       - name: Smoke-test offline 2-cycle manifest
         run: |
           python fill001_series_runner.py --cycles 2 --figures-per-cycle 3 --output "${RUNNER_TEMP}/series-manifest.json"
