@@ -1,5 +1,15 @@
 # AutoDraw — действующие задачи
 
+## FILL001-SERIES-001 — следующий обязательный E4 gate и завершение live интеграции (2026-11-11)
+
+- [x] 30 frozen geometry candidates: rectangle/wide/narrow × dense/spaced scanlines × radii 1/5/10/20/30, offline signatures/coverage/leakage/sampling estimates; независимые game CHALK и PNG НЕ подменяются оценками.
+- [x] Экспорт проверяемого одиночного логического DrawingPlan для каждой задачи (строгое равенство повторно вычисленной исходной геометрии, `automatic_execution_allowed=false`), UI preview, read-only grouped stats и журнал Clear pilot.
+- [x] Синтетическая серия с непрерывной Bridge session возможна только при новом run ID, подтверждённом неизменном mapping и более позднем наблюдении после предыдущего Clear; перезапись output закрыта.
+- [x] [CI 42968857617](https://github.com/Kiddos19882/AutoDraw/actions/runs/42968857617) PASS генерации 30 вариантов; [CI 42970208091](https://github.com/Kiddos19882/AutoDraw/actions/runs/42970208091) PASS 58 synthetic tests; последние tests `e0b10bf` / overall validation проверить по завершению.
+- [ ] **BLOCKED на доступе к Windows game runtime:** собрать один E4 Clear pilot с актуальной BoardPane geometry, подтверждением нужной кнопки PainterPopup, одним action, до/после screen PNG, pre и двумя settled exact same-session snapshots и сохранённой raw Monitor/Bridge chain. `fill001_series_clear_pilot.py` только оценивает существующие файлы и выдаёт `SCREEN_AND_COUNTER_PASS`, **не** `e4_live_clear_action_verified`.
+- [ ] Только после этого E4 пилота — реализовать и проверить opt-in native Clear action, новый generic single-task Stage6+Monitor+PNG finalizer для произвольных штрихов, затем связать с UI (сегодня существуют только V5 execution/finalizer с фиксированными 29 rectangle strokes).
+- [ ] E4 по всем 3 маскам/обоим способам/радиусам, затем E5 независимых holdout и repeatability; production отдельно после safety-margin/quality decision. Не запускать legacy 45-task batch и не менять executor defaults.
+
 ## FILL001-SERIES-001 — сохранение сводки и защита истории (2026-11-11)
 
 - [x] Реализовать неизменяемый `<series_id>.summary.json` (exclusive create) с accepted, quality_failed, exact CHALK отдельно по группам; при повторном `series_id` блокировать работу до любых callbacks.
