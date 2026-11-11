@@ -1,0 +1,35 @@
+name: AutoDraw FILL-001 configurable series safety tests
+
+on:
+  push:
+    branches:
+      - feature/image-geometry-optimization
+    paths:
+      - ".github/workflows/fill001-series-tests.yml"
+      - "AutoDraw_Stage20/source/preparation/fill001_series_runner.py"
+      - "AutoDraw_Stage20/source/preparation/tests/test_fill001_series_runner.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  series-contract:
+    name: Offline series controls and fail-closed regression
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: AutoDraw_Stage20/source/preparation
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install pytest
+        run: python -m pip install pytest
+      - name: Run synthetic-only serial orchestration tests
+        run: python -m pytest -q -ra tests/test_fill001_series_runner.py
+      - name: Smoke-test offline 2-cycle manifest
+        run: |
+          python fill001_series_runner.py --cycles 2 --figures-per-cycle 3 --output "${RUNNER_TEMP}/series-manifest.json"
