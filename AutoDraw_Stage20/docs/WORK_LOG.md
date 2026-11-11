@@ -1,5 +1,11 @@
 # AutoDraw — журнал выполненных действий
 
+## 2026-11-11 — FILL001-SERIES-001: existing ENGINE-001 Clear + Stage6 live integration
+
+- Audited original proven Clear from `brush_behavior_test_ui.py`, `brush_experiment_capture.evaluate_board_clear` (0.15% native legacy tolerance) and `chalk_test_blocks.acquire_chalk_block_owner_lock`. Implemented one shared calibrated UI click helper and series Clear proof, preserving exact game counter and blank ROI comparison; source/test changes `24de371`, `dcd15ec`, `606ec2c`, `ce086aa`.
+- Reused V5 passive Firefox ROI for signed series plans (`e67e629`), introduced variable-stroke 0.2.4 Bridge binder (`0469c68`), generic Stage6 plan preflight (`e48bf5c`) and existing MouseExecutor single-figure adapter (`b50a352`, `a630099`), linked to `stage6_execute_plan.py` (`585f1f9`), `integrated_app.py` (`d8abeb9`), Tk FILL tab opt-in `start_fill001_series_live` and serial callbacks (`52d4790`, `bb44f59`, `7a4c34c`). Expanded tests & shared cross-process owner lock (`e2ceb6b`, `a5c9748`, `fcd29dc`). Added GUI invalid Bridge request reset (`4f605c8`) and accurate operator button copy.
+- [CI dedicated 42975744219](https://github.com/Kiddos19882/AutoDraw/actions/runs/42975744219) SUCCESS for `fcd29dc`. [Earlier 42975584450](https://github.com/Kiddos19882/AutoDraw/actions/runs/42975584450) retained FAIL: negative regression fixture regex expected `owner` but actual error says `owns`; fixed without weakening safety. Main CI after latest GUI/Stage6 code separately pending. No actual Windows live series run, no production or frozen-mask changes.
+
 ## 2026-11-11 — FILL001-SERIES-001 offline geometry, traceable statistics and E4 Clear pilot
 
 - Added `fill001_series_offline_plans.py` (`fc34022`), `fill001_series_handoff.py` (`4cd628a`) to produce signed per-task plans and 30 factorial frozen variants; `fill001_series_statistics.py` (`e7bcab5`) to summarize only trustworthy exact-CHALK run records by shape/strategy/brush, preserving QUALITY_FAIL and missing data. Tests added for all 30, output immutability, non-executable flags and tamper resistance. GUI `chalk_fill_ui.py` now exports offline geometry and opens statistics (`81b004e`, `d8516bf`).
