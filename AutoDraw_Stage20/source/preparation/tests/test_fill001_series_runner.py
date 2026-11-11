@@ -355,7 +355,7 @@ def test_shared_owner_lock_blocks_parallel_auto_draw_process(tmp_path):
     assert held is not None
     state, observe, run, clear = fake_callbacks()
     try:
-        with pytest.raises(SeriesBlocked, match="owner"):
+        with pytest.raises(SeriesBlocked, match="game-control lock"):
             run_with_series_owner_lock(
                 m, results_dir=parent / "run-a",
                 observe_blank=observe, run_one=run,
