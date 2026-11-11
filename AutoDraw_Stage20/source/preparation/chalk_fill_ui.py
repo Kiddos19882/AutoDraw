@@ -110,6 +110,9 @@ class Fill001Tab:
         self._v5_stage6_completed = threading.Event()
         self._v5_stage6_completed.set()
         self._firefox_thread = None
+        self._series_manifest_path: Path | None = None
+        self._series_pending_manifest: dict[str, Any] | None = None
+        self._firefox_execute_series = False
         self._build(parent)
         self.root.after(300, self._poll_firefox_messages)
 
@@ -247,6 +250,8 @@ class Fill001Tab:
         ttk.Entry(count_row, textvariable=self.series_figures_var, width=6).pack(side="left", padx=(4, 12))
         ttk.Button(count_row, text="Создать план серии (без запуска)",
                    command=self.create_fill001_series_schedule).pack(side="left")
+        ttk.Button(count_row, text="Запустить серию (тестовая доска)",
+                   command=self.start_fill001_series_live).pack(side="left", padx=(8, 0))
         ttk.Button(count_row, text="Проанализировать результаты",
                    command=self.analyze_fill001_series_schedule).pack(side="left", padx=(8, 0))
         for description, state in (
@@ -289,6 +294,7 @@ class Fill001Tab:
             if destination.exists() or preview_path.exists():
                 raise SeriesBlocked("Серия уже существует, перезапись запрещена.")
             write_fill001_series_manifest(manifest, destination)
+            self._series_manifest_path = destination
             with preview_path.open("x", encoding="utf-8") as stream:
                 json.dump(geometry, stream, ensure_ascii=False, indent=2, allow_nan=False)
                 stream.write("\n")
@@ -301,6 +307,62 @@ class Fill001Tab:
             )
         except (SeriesBlocked, ValueError, OSError) as exc:
             messagebox.showerror("FILL001-SERIES: подготовка заблокирована", str(exc))
+
+    def start_fill001_series_live(self) -> None:
+        """One explicit opt-in for a bounded series, reusing ENGINE-001 Clear."""
+        try:
+            from fill001_series_runner import validate_manifest
+            if (self._firefox_thread is not None
+                    and self._firefox_thread.is_alive()):
+                raise SeriesBlocked("Firefox/Stage6 is already owned by a test")
+            if not callable(self.on_series_run):
+                raise SeriesBlocked("The shared Stage6 series callback is unavailable")
+            selected = self._series_manifest_path
+            if selected is None or not selected.is_file():
+                filename = filedialog.askopenfilename(
+                    parent=self.root, title="Выберите новый FILL001 series manifest",
+                    initialdir=str(self.output_dir / "series"),
+                    filetypes=(("JSON", "*.json"),),
+                )
+                if not filename:
+                    return
+                selected = Path(filename)
+            manifest = json.loads(selected.read_text(encoding="utf-8"))
+            validate_manifest(manifest)
+            result_dir = self.output_dir / "series" / (manifest["series_id"] + "-runs")
+            if result_dir.exists() and any(result_dir.iterdir()):
+                raise SeriesBlocked("Series evidence already exists: overwriting or resuming is forbidden")
+            profile = self.brush_tab.get_calibration_profile() if callable(
+                self.brush_tab.get_calibration_profile) else None
+            reference, metadata = self.brush_tab._blank_board_reference_paths()
+            if not isinstance(profile, dict) or not reference.is_file() or not metadata.is_file():
+                raise SeriesBlocked(
+                    "Use the existing Brush Lab calibration and explicit blank-board reference first"
+                )
+            from calibrated_game_clear import click_calibrated_board_clear
+            screen = profile.get("screen_size", {})
+            point = profile.get("points", {}).get("clear_board")
+            if (not isinstance(point,dict) or profile.get("needs_review") is True
+                    or profile.get("status",{}).get("points",{}).get("clear_board")
+                       not in ("set","confirmed")
+                    or not isinstance(screen,dict)):
+                raise SeriesBlocked("Existing ENGINE-001 Clear calibration needs review")
+            if not messagebox.askyesno(
+                "Запустить FILL001-SERIES-001",
+                f"Будут нарисованы {len(manifest['tasks'])} фигур: одна полностью, "
+                "затем точный CHALK/PNG/Monitor, затем штатный Clear и следующая. "
+                "Текущий рисунок может быть удалён. Запускать только на тестовой доске. "
+                "Остановить можно через Stop/Alt. Продолжить?",
+                icon="warning", parent=self.root,
+            ):
+                return
+            self._series_pending_manifest = manifest
+            self._series_manifest_path = selected
+            self._firefox_execute_series = True
+            self.v5_run_after_probe_var.set(False)
+            self.start_firefox_monitor()
+        except (ValueError,OSError,TypeError,AttributeError,KeyError) as exc:
+            messagebox.showerror("FILL001-SERIES BLOCKED", str(exc), parent=self.root)
 
     def analyze_fill001_series_schedule(self) -> None:
         """Analyze immutable run records; no Firefox or executor calls."""
@@ -364,7 +426,7 @@ class Fill001Tab:
             return
         # Read Tk state on UI thread, never from the Firefox worker.
         self._firefox_selected_candidate = self.v5_candidate_var.get()
-        self._firefox_execute_v5 = bool(self.v5_run_after_probe_var.get())
+        self._firefox_execute_v5 = bool(self.v5_run_after_probe_var.get()) and not self._firefox_execute_series
         self._firefox_confirm.clear()
         self._firefox_stop.clear()
         self._v5_stage6_completed.set()
