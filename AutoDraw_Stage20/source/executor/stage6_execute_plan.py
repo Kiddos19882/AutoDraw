@@ -1621,6 +1621,122 @@ class Stage6App:
             raise
         return True
 
+    def start_fill001_series_single_run(
+        self, *, manifest: dict[str, Any], task_id: str,
+        source: dict[str, Any], mapped: dict[str, Any],
+        mapping: dict[str, Any], roi: dict[str, int],
+        bridge_root: Path, session_id: str, driver: Any,
+        output_dir: Path, finished_callback: Any = None,
+    ) -> bool:
+        """Execute exactly ONE verified FILL001-SERIES figure via existing Stage6.
+
+        A separate series owner controls subsequent Clear and tasks. This
+        function never loops and never modifies production executor settings.
+        """
+        if self.running:
+            raise RuntimeError("Stage6 already owns an active execution")
+        from drawing.color_plan_execution import BrushSliderCalibration
+        from fill001_series_stage6_preflight import prepare_series_stage6_preflight
+        from fill001_series_stage6_execution import execute_series_single_stage6
+        from fill001_v5_live_gate import verify_v5_live_gate
+        from firefox_foreground_witness import firefox_foreground_witness
+
+        if (not getattr(self, "brush_slider_confirmed_var", None)
+                or not self.brush_slider_confirmed_var.get()
+                or self.brush_slider_screen_size is None):
+            raise ValueError("Series Stage6 requires existing confirmed brush slider calibration")
+        calibration = {
+            "x_at_min": int(self.brush_slider_x_min_var.get()),
+            "x_at_max": int(self.brush_slider_x_max_var.get()),
+            "y": int(self.brush_slider_y_var.get()),
+            "initial_value": int(self.brush_slider_initial_value_var.get()),
+            "screen_width": self.brush_slider_screen_size[0],
+            "screen_height": self.brush_slider_screen_size[1],
+            "confirmed": True,
+        }
+        current = verify_v5_live_gate(
+            bridge_root, session_id=session_id,
+            expected_mapping_sha256=mapping["boardpane_mapping_sha256"],
+            require_blank=True,
+        )
+        calibration["initial_value"] = current["currentRadius"]
+        BrushSliderCalibration.from_dict(calibration).validate(pyautogui.size(), roi)
+        request = prepare_series_stage6_preflight(
+            manifest, source, mapped, mapping, roi, session_id=session_id,
+            calibration=calibration, screen_size=pyautogui.size(),
+            live_exact_gate=lambda: verify_v5_live_gate(
+                bridge_root, session_id=session_id,
+                expected_mapping_sha256=mapping["boardpane_mapping_sha256"],
+                require_blank=True,
+            ),
+            foreground_verified=lambda: firefox_foreground_witness(driver),
+        )
+        self.running = True
+        self.stop_event = threading.Event()
+        self.stop_reason = None
+        self._set_execution_controls_enabled(False)
+        self.start_button.configure(state="disabled")
+        self.stop_button.configure(state="normal")
+        self.execution_state_var.set("Состояние: FILL001-SERIES one figure")
+        self.progress_var.set(0)
+        def worker() -> None:
+            try:
+                result = execute_series_single_stage6(
+                    manifest=manifest, task_id=task_id,
+                    source=source, mapped=mapped, request=request,
+                    bridge_root=bridge_root, driver=driver,
+                    slider_calibration=calibration,
+                    stop_event=self.stop_event, native_mouse=pyautogui,
+                    output_dir=output_dir,
+                    progress=lambda current,total,detail:self.root.after(
+                        0,self._update_progress,current,total,detail,
+                    ),
+                )
+            except Exception as exc:
+                result = {
+                    "status":"BLOCKED","error":f"{type(exc).__name__}: {exc}",
+                    "request":request,"actual_chalk":None,
+                    "monitor_binding":"BLOCKED","game_png_quality":"NOT_EVALUATED",
+                }
+            self.root.after(
+                0,self._finish_fill001_series_single_run,result,finished_callback,
+            )
+        try:
+            threading.Thread(
+                target=worker,name="FILL001-SERIES-Stage6",daemon=True,
+            ).start()
+        except Exception:
+            self.running = False
+            self._set_execution_controls_enabled(True)
+            self.stop_button.configure(state="disabled")
+            raise
+        return True
+
+    def _finish_fill001_series_single_run(self, result: dict, callback: Any) -> None:
+        """Release Stage6 ownership before the series owner attempts Clear."""
+        self.running = False
+        self._set_execution_controls_enabled(True)
+        self.stop_button.configure(state="disabled")
+        self.start_button.configure(
+            state="normal"
+            if self.execution_plan is not None and self.area is not None
+            else "disabled"
+        )
+        if result.get("brush_slider_no_response") is not None:
+            self.brush_slider_confirmed_var.set(False)
+            self.brush_slider_status_var.set(
+                "Series BLOCKED: Game Monitor did not confirm brush control."
+            )
+        status = result.get("status","BLOCKED")
+        self.execution_state_var.set(f"Состояние: FILL001-SERIES {status}")
+        self.status_var.set(
+            f"Series Stage6 {status}; exact CHALK and quality in isolated report."
+            if status=="completed"
+            else f"Series Stage6 blocked: {result.get('error','see immutable report')}"
+        )
+        if callable(callback):
+            callback(result)
+
     def _finish_fill001_v5_single_run(self, result: dict, callback: Any) -> None:
         self.running = False
         self._set_execution_controls_enabled(True)
