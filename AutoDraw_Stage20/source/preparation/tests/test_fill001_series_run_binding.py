@@ -93,3 +93,32 @@ def test_wrong_or_ambiguous_slider_corridor_rejected():
             board_client_rect={"left":100,"right":400,"top":20,"bottom":260},
             slider_client_corridor={"left":300,"right":700,"top":80,"bottom":120},
         )
+
+
+def test_verified_prefix_only_binds_exact_executed_strokes():
+    r=sample_run()
+    # Additional unplanned stroke must never be attributed to a quota prefix.
+    with pytest.raises(SeriesBindingBlocked):
+        validate_series_bridge_runs(
+            [r],session_id="sid",task_id="figure-1",
+            expected_pointer_down_client=[(200,100)],
+            expected_brush_radii=[10],
+            board_client_rect={"left":100,"right":400,"top":20,"bottom":260},
+            slider_client_corridor={"left":550,"right":700,"top":80,"bottom":120},
+        )
+    r["events"]=r["events"][:-1]
+    r["per_stroke_metrics"]=r["per_stroke_metrics"][:-1]
+    r["event_count"]=2
+    r["stroke_candidate_count"]=2
+    r["stroke_count"]=1
+    r["post_test_snapshot"].update(pointCount=41,remainingPoints=5959)
+    r["chalk"].update(post_point_count=41,consumed_points=40)
+    proof=validate_series_bridge_runs(
+        [r],session_id="sid",task_id="figure-1",
+        expected_pointer_down_client=[(200,100)],expected_brush_radii=[10],
+        board_client_rect={"left":100,"right":400,"top":20,"bottom":260},
+        slider_client_corridor={"left":550,"right":700,"top":80,"bottom":120},
+    )
+    assert proof["status"]=="EXACT_RUN_BOUND"
+    assert proof["stroke_count"]==1
+    assert proof["exact_chalk"]==40

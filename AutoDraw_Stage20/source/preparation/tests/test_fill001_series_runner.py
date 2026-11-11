@@ -388,3 +388,68 @@ def test_series_owner_lock_released_after_success(tmp_path):
         observe_blank=observe2, run_one=run2, clear_and_verify=clear2,
     )
     assert next_result["accepted"] == 1
+
+
+def test_quota_limited_stroke_result_clears_and_continues(tmp_path):
+    m=manifest(cycles=1,figures_per_cycle=2,shapes=["rectangle"],
+               methods=["dense_scanlines","spaced_scanlines"],radii=[1])
+    state,observe,run,clear=fake_callbacks()
+    def limited_then_completed(task):
+        result=run(task)
+        if task["order"]==1:
+            result.update(
+                execution_status="quota_limited",quality_gate="NOT_EVALUATED",
+                post_pointCount=5759,actual_chalk=5758,
+                stage6_summary={"completed_strokes":100,"planned_strokes":141},
+                quota_stop={"reason":"EXACT_REMAINING_BELOW_SAFETY_MARGIN",
+                            "safety_margin_points":300,"remainingPoints":241,
+                            "pointCount":5759,"maxPoints":6000,
+                            "completed_strokes":100,"planned_strokes":141})
+        return result
+    report=run_with_validated_callbacks(
+        m,results_dir=tmp_path,observe_blank=observe,
+        run_one=limited_then_completed,clear_and_verify=clear,
+    )
+    assert report["status"]=="completed_with_quota_limited"
+    assert report["accepted"]==1
+    assert report["quota_limited"]==1
+    assert report["exact_chalk_sum_of_quota_limited_runs"]==5758
+    assert report["exact_chalk_sum_of_accepted_runs"]==100
+    assert state["clears"]==1
+    first=json.loads((tmp_path/(m["tasks"][0]["task_id"]+".json")).read_text())
+    assert first["status"]=="QUOTA_LIMITED"
+    assert first["quality_gate"]=="NOT_EVALUATED"
+    assert first["actual_chalk"]==5758
+
+
+@pytest.mark.parametrize("tamper",[
+    lambda r:r["quota_stop"].update(remainingPoints=300),
+    lambda r:r["quota_stop"].update(pointCount=99),
+    lambda r:r["quota_stop"].update(completed_strokes=141),
+    lambda r:r.update(actual_chalk=5757),
+    lambda r:r.update(monitor_binding="NOT_EVALUATED"),
+    lambda r:r.update(quality_gate="PASS"),
+])
+def test_invalid_quota_never_clears_or_starts_next(tmp_path,tamper):
+    m=manifest(cycles=1,figures_per_cycle=2,shapes=["rectangle"],methods=["dense_scanlines"],
+               radii=[1])
+    state,observe,run,clear=fake_callbacks()
+    def invalid(task):
+        result=run(task)
+        result.update(execution_status="quota_limited",quality_gate="NOT_EVALUATED",
+                      post_pointCount=5759,actual_chalk=5758,
+                      stage6_summary={"completed_strokes":100,"planned_strokes":141},
+                      quota_stop={"reason":"EXACT_REMAINING_BELOW_SAFETY_MARGIN",
+                                  "safety_margin_points":300,"remainingPoints":241,
+                                  "pointCount":5759,"maxPoints":6000,
+                                  "completed_strokes":100,"planned_strokes":141})
+        tamper(result)
+        return result
+    report=run_with_validated_callbacks(
+        m,results_dir=tmp_path,observe_blank=observe,
+        run_one=invalid,clear_and_verify=clear,
+    )
+    assert report["status"]=="blocked"
+    assert report["quota_limited"]==0
+    assert state["clears"]==0
+    assert state["n"]==1

@@ -21,6 +21,8 @@ from fill001_screen_mask_v2 import audit_screen_mask_v2
 from fill001_v5_handoff import POLICY
 
 SCHEMA = "FILL001_SERIES_STAGE6_SINGLE_RUN_RESULT_V1"
+QUOTA_GUARD_ERROR = "SeriesBlocked: Exact game remaining quota below 300-point safety margin"
+QUOTA_SAFETY_MARGIN = 300
 
 
 def _sha(path: Path) -> str:
@@ -191,7 +193,15 @@ def execute_series_single_stage6(
         result["status"]=summary.status
         if before.is_file():
             result["after_png"]=save_png(after)
-        if summary.status != "completed" or summary.completed_strokes != len(plan.strokes):
+        quota_limited = (
+            summary.status == "failed"
+            and summary.error == QUOTA_GUARD_ERROR
+            and type(summary.completed_strokes) is int
+            and 0 < summary.completed_strokes < len(plan.strokes)
+            and not stop_event.is_set()
+        )
+        if (not quota_limited and
+                (summary.status != "completed" or summary.completed_strokes != len(plan.strokes))):
             raise SeriesBlocked("Stage6 did not complete the entire series figure")
         if not summary.mouse_release_succeeded:
             raise SeriesBlocked("Stage6 mouse release not proven")
@@ -207,8 +217,14 @@ def execute_series_single_stage6(
                 raw=[json.loads(p.read_text(encoding="utf-8")) for p in new_paths]
                 binding=validate_series_bridge_runs(
                     raw,session_id=sid,task_id=task_id,
-                    expected_pointer_down_client=request["expected_pointer_down_client"],
-                    expected_brush_radii=request["expected_brush_radii"],
+                    expected_pointer_down_client=(
+                        request["expected_pointer_down_client"][:summary.completed_strokes]
+                        if quota_limited else request["expected_pointer_down_client"]
+                    ),
+                    expected_brush_radii=(
+                        request["expected_brush_radii"][:summary.completed_strokes]
+                        if quota_limited else request["expected_brush_radii"]
+                    ),
                     board_client_rect=request["board_client_rect"],
                     slider_client_corridor=request["slider_client_corridor"],
                     expected_pre=result["pre_pointCount"],
@@ -248,7 +264,29 @@ def execute_series_single_stage6(
             quality_policy=POLICY,
         )
         result["png_audit"]=quality
-        result["game_png_quality"]=quality["active_quality_gate"]
+        if quota_limited:
+            # Screen metrics remain diagnostic: a partial figure is NOT PASS.
+            terminal=current_gate()
+            remaining=terminal["remainingPoints"]
+            if (type(remaining) is not int
+                    or not 0 <= remaining < QUOTA_SAFETY_MARGIN
+                    or terminal["pointCount"] != binding["post_pointCount"]
+                    or terminal["maxPoints"] != binding["maxPoints"]
+                    or remaining != binding["maxPoints"]-binding["post_pointCount"]):
+                raise SeriesBlocked("Quota guard has no same-session exact terminal proof")
+            result["quota_stop"]={
+                "reason":"EXACT_REMAINING_BELOW_SAFETY_MARGIN",
+                "safety_margin_points":QUOTA_SAFETY_MARGIN,
+                "remainingPoints":remaining,
+                "pointCount":terminal["pointCount"],
+                "maxPoints":terminal["maxPoints"],
+                "completed_strokes":summary.completed_strokes,
+                "planned_strokes":len(plan.strokes),
+            }
+            result["game_png_quality"]="NOT_EVALUATED"
+            result["status"]="QUOTA_LIMITED"
+        else:
+            result["game_png_quality"]=quality["active_quality_gate"]
     except Exception as exc:
         result["error"]=f"{type(exc).__name__}: {exc}"
         if result["status"]!="completed":
@@ -269,16 +307,47 @@ def normalized_series_run(task: dict, result: dict) -> dict:
     binding=result.get("binding")
     summary=result.get("stage6_summary")
     quality=result.get("png_audit")
-    if (result.get("status")!="completed"
+    quota = result.get("status") == "QUOTA_LIMITED"
+    proof = result.get("quota_stop")
+    complete = (result.get("status") == "completed"
+                and result.get("game_png_quality") in ("PASS", "FAIL")
+                and isinstance(summary, dict) and summary.get("status") == "completed")
+    partial = (quota
+               and result.get("game_png_quality") == "NOT_EVALUATED"
+               and isinstance(summary, dict) and summary.get("status") == "failed"
+               and summary.get("error") == QUOTA_GUARD_ERROR
+               and isinstance(proof, dict)
+               and proof.get("reason") == "EXACT_REMAINING_BELOW_SAFETY_MARGIN"
+               and type(proof.get("safety_margin_points")) is int
+               and proof["safety_margin_points"] == QUOTA_SAFETY_MARGIN
+               and type(proof.get("remainingPoints")) is int
+               and 0 <= proof["remainingPoints"] < QUOTA_SAFETY_MARGIN
+               and type(proof.get("completed_strokes")) is int
+               and type(proof.get("planned_strokes")) is int
+               and 0 < proof["completed_strokes"] < proof["planned_strokes"]
+               and summary.get("completed_strokes") == proof["completed_strokes"]
+               and summary.get("total_strokes") == proof["planned_strokes"]
+               and isinstance(binding, dict)
+               and type(binding.get("maxPoints")) is int
+               and type(binding.get("post_pointCount")) is int
+               and proof.get("pointCount") == binding["post_pointCount"]
+               and proof.get("maxPoints") == binding["maxPoints"]
+               and proof["remainingPoints"] ==
+                   binding["maxPoints"]-binding["post_pointCount"]
+               and binding.get("stroke_count") == proof["completed_strokes"])
+    if (not (complete or partial)
             or request.get("task_id") != task["task_id"]
-            or result.get("monitor_binding")!="EXACT_RUN_BOUND"
-            or result.get("game_png_quality") not in ("PASS","FAIL")
-            or not isinstance(binding,dict) or binding.get("status")!="EXACT_RUN_BOUND"
-            or not isinstance(summary,dict) or summary.get("status")!="completed"
-            or not isinstance(quality,dict)
+            or result.get("monitor_binding") != "EXACT_RUN_BOUND"
+            or not isinstance(binding, dict) or binding.get("status") != "EXACT_RUN_BOUND"
+            or not isinstance(quality, dict)
             or result.get("before_png") is None
             or result.get("after_settled_png") is None
-            or not summary.get("mouse_release",{}).get("succeeded") is True):
+            or not summary.get("mouse_release", {}).get("succeeded") is True
+            or type(binding.get("pre_pointCount")) is not int
+            or type(binding.get("post_pointCount")) is not int
+            or type(binding.get("exact_chalk")) is not int
+            or binding["exact_chalk"] != binding["post_pointCount"]-binding["pre_pointCount"]
+            or result.get("actual_chalk") != binding["exact_chalk"]):
         raise SeriesBlocked("Stage6 report lacks complete run-bound result and screen evidence")
     run_ids=binding.get("run_ids")
     if not isinstance(run_ids,list) or not run_ids:
@@ -286,9 +355,10 @@ def normalized_series_run(task: dict, result: dict) -> dict:
     return {
         "task_id":task["task_id"], "session_id":request["session_id"],
         "run_id":"+".join(run_ids), "bridge_run_ids":run_ids,
-        "execution_status":"completed",
+        "execution_status":"quota_limited" if quota else "completed",
         "monitor_binding":"EXACT_RUN_BOUND",
         "quality_gate":result["game_png_quality"],
+        "quota_stop":proof if quota else None,
         "mouse_release_succeeded":True,
         "pre_pointCount":binding["pre_pointCount"],
         "post_pointCount":binding["post_pointCount"],
@@ -297,6 +367,7 @@ def normalized_series_run(task: dict, result: dict) -> dict:
         "after_settled_png_sha256":result["after_settled_png"]["sha256"],
         "stage6_summary":{
             "completed_strokes":summary["completed_strokes"],
+            "planned_strokes":summary.get("total_strokes"),
             "duration_seconds":summary["duration_seconds"],
         },
         "monitor_summary":{

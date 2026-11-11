@@ -87,3 +87,32 @@ def test_invalid_evidence_cannot_enter_stats(tmp_path, tamper):
     assert result["status"] == "PARTIAL"
     assert len(result["rejected"]) == 1
     assert result["lowest_observed_quality_pass_chalk"] is None
+
+
+def test_quota_limited_diagnostics_never_enter_quality_ranking(tmp_path):
+    m=manifest()
+    save_case(tmp_path,m,0,"QUALITY_FAIL",5758)
+    p=tmp_path/(m["tasks"][0]["task_id"]+".json")
+    data=json.loads(p.read_text(encoding="utf-8"))
+    data.update(status="QUOTA_LIMITED",quality_gate="NOT_EVALUATED")
+    data["runtime"].update(
+        execution_status="quota_limited",quality_gate="NOT_EVALUATED",
+        post_pointCount=5759,
+        quota_stop={"reason":"EXACT_REMAINING_BELOW_SAFETY_MARGIN",
+                    "safety_margin_points":300,"remainingPoints":241,
+                    "pointCount":5759,"maxPoints":6000,
+                    "completed_strokes":100,"planned_strokes":141},
+    )
+    p.write_text(json.dumps(data),encoding="utf-8")
+    report=analyze_series(m,tmp_path)
+    assert report["quota_limited"]==1
+    assert report["quality_pass"]==0
+    assert report["quality_fail"]==0
+    assert report["lowest_observed_quality_pass_chalk"] is None
+    assert report["runs"][0]["exact_chalk"]==5758
+    cell=report["grouped_statistics"]["shape_id"]["rectangle"]
+    assert cell["chalk_quota_limited_diagnostic"]["mean"]==5758
+    data["runtime"]["quota_stop"]["remainingPoints"]=301
+    p.write_text(json.dumps(data),encoding="utf-8")
+    bad=analyze_series(m,tmp_path)
+    assert bad["rejected"] and bad["quota_limited"]==0

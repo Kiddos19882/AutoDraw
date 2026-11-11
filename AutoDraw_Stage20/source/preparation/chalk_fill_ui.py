@@ -876,6 +876,7 @@ class Fill001Tab:
             f"Серия {manifest['series_id']}: статус={report['status']}, "
             f"полных quality PASS={report['accepted']}, "
             f"quality FAIL={report['quality_failed']}, "
+            f"quota-limited={report['quota_limited']} (не quality PASS), "
             f"подробности: {root_dir}",
         ))
         self._series_pending_manifest=None

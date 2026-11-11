@@ -68,3 +68,53 @@ def test_incomplete_execution_refuses_series_acceptance(mutate):
     mutate(result)
     with pytest.raises(SeriesBlocked):
         normalized_series_run(task,result)
+
+
+def test_quota_limited_stage6_is_diagnostic_not_quality_pass():
+    from fill001_series_stage6_execution import QUOTA_GUARD_ERROR
+    task,result=example()
+    result.update(
+        status="QUOTA_LIMITED",game_png_quality="NOT_EVALUATED",actual_chalk=5758,
+        quota_stop={"reason":"EXACT_REMAINING_BELOW_SAFETY_MARGIN",
+                    "safety_margin_points":300,"remainingPoints":241,
+                    "pointCount":5759,"maxPoints":6000,
+                    "completed_strokes":100,"planned_strokes":141})
+    result["binding"].update(pre_pointCount=1,post_pointCount=5759,
+                             exact_chalk=5758,maxPoints=6000,stroke_count=100)
+    result["stage6_summary"].update(
+        status="failed",completed_strokes=100,total_strokes=141,
+        error=QUOTA_GUARD_ERROR)
+    normalized=normalized_series_run(task,result)
+    assert normalized["execution_status"]=="quota_limited"
+    assert normalized["quality_gate"]=="NOT_EVALUATED"
+    assert normalized["actual_chalk"]==5758
+    assert normalized["stage6_summary"]["completed_strokes"]==100
+
+
+@pytest.mark.parametrize("damage",[
+    lambda r:r["quota_stop"].update(remainingPoints=300),
+    lambda r:r["quota_stop"].update(pointCount=5758),
+    lambda r:r["quota_stop"].update(completed_strokes=141),
+    lambda r:r["stage6_summary"].update(error="Other failure"),
+    lambda r:r["stage6_summary"]["mouse_release"].update(succeeded=False),
+    lambda r:r.update(after_settled_png=None),
+    lambda r:r["binding"].update(stroke_count=99),
+    lambda r:r.update(monitor_binding="NOT_EVALUATED"),
+])
+def test_invalid_quota_evidence_must_block(damage):
+    from fill001_series_stage6_execution import QUOTA_GUARD_ERROR
+    task,result=example()
+    result.update(
+        status="QUOTA_LIMITED",game_png_quality="NOT_EVALUATED",actual_chalk=5758,
+        quota_stop={"reason":"EXACT_REMAINING_BELOW_SAFETY_MARGIN",
+                    "safety_margin_points":300,"remainingPoints":241,
+                    "pointCount":5759,"maxPoints":6000,
+                    "completed_strokes":100,"planned_strokes":141})
+    result["binding"].update(pre_pointCount=1,post_pointCount=5759,
+                             exact_chalk=5758,maxPoints=6000,stroke_count=100)
+    result["stage6_summary"].update(
+        status="failed",completed_strokes=100,total_strokes=141,
+        error=QUOTA_GUARD_ERROR)
+    damage(result)
+    with pytest.raises(SeriesBlocked):
+        normalized_series_run(task,result)

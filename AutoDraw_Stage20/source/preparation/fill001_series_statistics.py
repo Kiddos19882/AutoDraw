@@ -81,15 +81,38 @@ def analyze_series(manifest: dict, results_dir: Path) -> dict:
                     or item.get("schema") != "FILL001_SERIES_RUN_V1"):
                 raise SeriesBlocked("Run manifest identity differs")
             state = item.get("status")
-            if state not in ("PASS", "QUALITY_FAIL", "BLOCKED"):
+            if state not in ("PASS", "QUALITY_FAIL", "QUOTA_LIMITED", "BLOCKED"):
                 raise SeriesBlocked("Unsupported run status")
             runtime = item.get("runtime")
             exact = None
-            if state in ("PASS", "QUALITY_FAIL"):
+            if state in ("PASS", "QUALITY_FAIL", "QUOTA_LIMITED"):
+                limited = state == "QUOTA_LIMITED"
+                proof = runtime.get("quota_stop") if isinstance(runtime, dict) else None
+                if (limited and (
+                        item.get("quality_gate") != "NOT_EVALUATED"
+                        or not isinstance(proof, dict)
+                        or proof.get("reason") != "EXACT_REMAINING_BELOW_SAFETY_MARGIN"
+                        or type(proof.get("safety_margin_points")) is not int
+                        or proof["safety_margin_points"] != 300
+                        or type(proof.get("remainingPoints")) is not int
+                        or not 0 <= proof["remainingPoints"] < 300
+                        or type(proof.get("pointCount")) is not int
+                        or type(proof.get("maxPoints")) is not int
+                        or proof["maxPoints"]-proof["pointCount"] != proof["remainingPoints"]
+                        or type(proof.get("completed_strokes")) is not int
+                        or type(proof.get("planned_strokes")) is not int
+                        or not 0 < proof["completed_strokes"] < proof["planned_strokes"]
+                        or proof["pointCount"] != runtime.get("post_pointCount")
+                        or runtime.get("execution_status") != "quota_limited"
+                    )):
+                    raise SeriesBlocked("Quota-limited evidence is incomplete")
                 if (not isinstance(runtime, dict)
                         or runtime.get("monitor_binding") != "EXACT_RUN_BOUND"
                         or runtime.get("task_id") != task["task_id"]
-                        or runtime.get("quality_gate") != ("PASS" if state == "PASS" else "FAIL")
+                        or runtime.get("quality_gate") != (
+                            "NOT_EVALUATED" if limited else
+                            "PASS" if state == "PASS" else "FAIL"
+                        )
                         or type(runtime.get("pre_pointCount")) is not int
                         or type(runtime.get("post_pointCount")) is not int
                         or runtime["post_pointCount"] < runtime["pre_pointCount"]
@@ -122,6 +145,7 @@ def analyze_series(manifest: dict, results_dir: Path) -> dict:
         for cell, members in sorted(cells.items()):
             good = [m for m in members if m["status"] == "PASS"]
             fail = [m for m in members if m["status"] == "QUALITY_FAIL"]
+            limited = [m for m in members if m["status"] == "QUOTA_LIMITED"]
             metric_values = {
                 name: [m["metrics"][name] for m in good if name in m["metrics"]]
                 for name in METRICS
@@ -129,9 +153,11 @@ def analyze_series(manifest: dict, results_dir: Path) -> dict:
             view[cell] = {
                 "observations": len(members),
                 "quality_pass": len(good), "quality_fail": len(fail),
+                "quota_limited": len(limited),
                 "blocked": sum(m["status"] == "BLOCKED" for m in members),
                 "chalk_quality_pass": _summary([m["exact_chalk"] for m in good]),
                 "chalk_quality_fail": _summary([m["exact_chalk"] for m in fail]),
+                "chalk_quota_limited_diagnostic": _summary([m["exact_chalk"] for m in limited]),
                 "metrics_quality_pass": {
                     name: _summary(values) for name, values in metric_values.items()
                 },
@@ -152,6 +178,7 @@ def analyze_series(manifest: dict, results_dir: Path) -> dict:
         "missing": missing, "rejected": rejected,
         "quality_pass": sum(x["status"] == "PASS" for x in rows),
         "quality_fail": sum(x["status"] == "QUALITY_FAIL" for x in rows),
+        "quota_limited": sum(x["status"] == "QUOTA_LIMITED" for x in rows),
         "blocked": sum(x["status"] == "BLOCKED" for x in rows),
         "ranking_basis": "observed quality PASS only; no repeatability or E5 implied",
         "lowest_observed_quality_pass_chalk": (

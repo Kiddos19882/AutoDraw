@@ -180,6 +180,7 @@ def run_with_validated_callbacks(
         raise SeriesBlocked("An immutable series summary already exists; use a new series ID")
     accepted = []
     quality_failed = []
+    quota_limited = []
     seen_sessions: set[str] = set()
     seen_run_ids: set[str] = set()
     previous_clear_proof: dict | None = None
@@ -240,12 +241,35 @@ def run_with_validated_callbacks(
                     )
             seen_sessions.add(pre["session_id"])
             result = run_one(task)
+            limited = (isinstance(result, dict)
+                       and result.get("execution_status") == "quota_limited")
+            proof = result.get("quota_stop") if limited else None
+            limited_valid = (
+                limited and isinstance(proof, dict)
+                and proof.get("reason") == "EXACT_REMAINING_BELOW_SAFETY_MARGIN"
+                and type(proof.get("safety_margin_points")) is int
+                and proof["safety_margin_points"] == 300
+                and type(proof.get("remainingPoints")) is int
+                and 0 <= proof["remainingPoints"] < 300
+                and type(proof.get("completed_strokes")) is int
+                and type(proof.get("planned_strokes")) is int
+                and 0 < proof["completed_strokes"] < proof["planned_strokes"]
+                and isinstance(result.get("stage6_summary"), dict)
+                and result["stage6_summary"].get("completed_strokes") == proof["completed_strokes"]
+                and result["stage6_summary"].get("planned_strokes") == proof["planned_strokes"]
+                and type(proof.get("pointCount")) is int
+                and type(proof.get("maxPoints")) is int
+                and proof["pointCount"] == result.get("post_pointCount")
+                and proof["maxPoints"]-proof["pointCount"] == proof["remainingPoints"]
+                and result.get("quality_gate") == "NOT_EVALUATED"
+            )
             if (not isinstance(result, dict)
                     or result.get("session_id") != pre["session_id"]
                     or result.get("task_id") != task["task_id"]
-                    or result.get("execution_status") != "completed"
+                    or (limited and not limited_valid)
+                    or (not limited and result.get("execution_status") != "completed")
                     or result.get("monitor_binding") != "EXACT_RUN_BOUND"
-                    or result.get("quality_gate") not in ("PASS", "FAIL")
+                    or (not limited and result.get("quality_gate") not in ("PASS", "FAIL"))
                     or result.get("mouse_release_succeeded") is not True
                     or type(result.get("pre_pointCount")) is not int
                     or result["pre_pointCount"] != pre["pointCount"]
@@ -261,7 +285,8 @@ def run_with_validated_callbacks(
                 raise SeriesBlocked("Run lacks validated exact CHALK and quality evidence")
             seen_run_ids.add(result["run_id"])
             quality = result["quality_gate"]
-            record.update(status="PASS" if quality == "PASS" else "QUALITY_FAIL",
+            record.update(status=("QUOTA_LIMITED" if limited else
+                                  "PASS" if quality == "PASS" else "QUALITY_FAIL"),
                           actual_chalk=result["actual_chalk"],
                           quality_gate=quality, runtime=result)
         except Exception as exc:
@@ -272,12 +297,14 @@ def run_with_validated_callbacks(
         with path.open("x", encoding="utf-8") as stream:
             json.dump(record, stream, ensure_ascii=False, indent=2)
             stream.write("\n")
-        if record["status"] not in ("PASS", "QUALITY_FAIL"):
+        if record["status"] not in ("PASS", "QUALITY_FAIL", "QUOTA_LIMITED"):
             break
         if record["status"] == "PASS":
             accepted.append(record)
-        else:
+        elif record["status"] == "QUALITY_FAIL":
             quality_failed.append(record)
+        else:
+            quota_limited.append(record)
         # Never clear after last job; never continue if Clear is uncertain.
         if task["order"] < len(manifest["tasks"]):
             clear_record = results_dir / (task["task_id"] + ".clear.json")
@@ -323,13 +350,17 @@ def run_with_validated_callbacks(
             row["min_exact_chalk"] = chalk if row["min_exact_chalk"] is None else min(row["min_exact_chalk"], chalk)
             row["max_exact_chalk"] = chalk if row["max_exact_chalk"] is None else max(row["max_exact_chalk"], chalk)
             row["mean_exact_chalk"] = row["total_exact_chalk"] / row["accepted"]
+    if status == "completed" and quota_limited:
+        status = "completed_with_quota_limited"
     summary = {"schema": "FILL001_SERIES_SUMMARY_V1", "series_id": manifest["series_id"],
                "manifest_sha256": manifest["manifest_sha256"],
                "status": status, "issue": issue, "scheduled": len(manifest["tasks"]),
                "accepted": len(accepted), "quality_failed": len(quality_failed),
-               "completed_with_bound_chalk": len(accepted) + len(quality_failed),
+               "quota_limited": len(quota_limited),
+               "completed_with_bound_chalk": len(accepted) + len(quality_failed) + len(quota_limited),
                "exact_chalk_sum_of_accepted_runs": sum(r["actual_chalk"] for r in accepted),
                "exact_chalk_sum_of_quality_failed_runs": sum(r["actual_chalk"] for r in quality_failed),
+               "exact_chalk_sum_of_quota_limited_runs": sum(r["actual_chalk"] for r in quota_limited),
                "exact_chalk_is_per_run_only": True,
                "grouped_exact_chalk_statistics": groups,
                "next_task_requires_fresh_session": True}
