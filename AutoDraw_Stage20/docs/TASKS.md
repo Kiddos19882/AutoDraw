@@ -6,46 +6,11 @@
 - [x] Подключить `Fill001Tab` → `integrated_app` → существующий Stage6 owner → generic signed single-task DrawingPlan/brush/preflight/Monitor → exact run binding → before/settled PNG quality → immutable report → ENGINE-001 Clear → следующая фигура; отдельный опциональный UI toggle/подтверждение/остановка.
 - [x] Обобщить binding с фиксированных V5 29 штрихов до любого заранее подписанного числа, запретить посторонние клики и неточные/неполные game events, сохранять quality FAIL отдельно без ложного лидера.
 - [x] Переиспользовать ENGINE-001 lock для всех серий в общей папке, запретить параллельный запуск, сохранить raw и negative evidence; сбрасывать устаревшее opt-in состояние после ошибки подключения.
-- [x] [Dedicated series CI 42975744219](https://github.com/Kiddos19882/AutoDraw/actions/runs/42975744219) PASS до последней UI правки; проверка нового HEAD/общее AutoDraw validation проводится отдельно. Промежуточные CI FAIL и их исправления сохранены.
+- [x] Итоговый code SHA `fea265f92aac`: [FILL-001 series safety 42975856803](https://github.com/Kiddos19882/AutoDraw/actions/runs/42975856803) и [AutoDraw validation 42975856883](https://github.com/Kiddos19882/AutoDraw/actions/runs/42975856883) **E3 SUCCESS**; прежний [42975744219](https://github.com/Kiddos19882/AutoDraw/actions/runs/42975744219) SUCCESS на `fcd29dc` сохранён. В main validation Windows portable build и optional benchmarks `SKIPPED`; CI не доказывает live E4.
 - [ ] **Реальный E4 smoke на ПК пользователя:** первая серия 1 цикл×2 фигуры только на тестовой доске с подтверждённым профилем/blank reference/Firefox foreground/Monitor/Bridge; собрать live JSON/PNG, exact pre/post CHALK для каждого, доказать переход через Clear и остановку. На GitHub без локального runtime это проверить нельзя.
 - [ ] Затем repeatability/factorial quality E4/E5 на всех frozen shape-method-brush комбинациях, доступной квоте, негативных случаях и визуальных holdout; проверить подход к лимитам CHALK и acceptance. Только после E5 — production решение, не менять defaults без отдельной validation.
 
-## FILL001-SERIES-001 — следующий обязательный E4 gate и завершение live интеграции (2026-11-11)
-
-- [x] 30 frozen geometry candidates: rectangle/wide/narrow × dense/spaced scanlines × radii 1/5/10/20/30, offline signatures/coverage/leakage/sampling estimates; независимые game CHALK и PNG НЕ подменяются оценками.
-- [x] Экспорт проверяемого одиночного логического DrawingPlan для каждой задачи (строгое равенство повторно вычисленной исходной геометрии, `automatic_execution_allowed=false`), UI preview, read-only grouped stats и журнал Clear pilot.
-- [x] Синтетическая серия с непрерывной Bridge session возможна только при новом run ID, подтверждённом неизменном mapping и более позднем наблюдении после предыдущего Clear; перезапись output закрыта.
-- [x] [CI 42968857617](https://github.com/Kiddos19882/AutoDraw/actions/runs/42968857617) PASS генерации 30 вариантов; [CI 42970208091](https://github.com/Kiddos19882/AutoDraw/actions/runs/42970208091) PASS 58 synthetic tests; последние tests `e0b10bf` / overall validation проверить по завершению.
-- [ ] **BLOCKED на доступе к Windows game runtime:** собрать один E4 Clear pilot с актуальной BoardPane geometry, подтверждением нужной кнопки PainterPopup, одним action, до/после screen PNG, pre и двумя settled exact same-session snapshots и сохранённой raw Monitor/Bridge chain. `fill001_series_clear_pilot.py` только оценивает существующие файлы и выдаёт `SCREEN_AND_COUNTER_PASS`, **не** `e4_live_clear_action_verified`.
-- [ ] Только после этого E4 пилота — реализовать и проверить opt-in native Clear action, новый generic single-task Stage6+Monitor+PNG finalizer для произвольных штрихов, затем связать с UI (сегодня существуют только V5 execution/finalizer с фиксированными 29 rectangle strokes).
-- [ ] E4 по всем 3 маскам/обоим способам/радиусам, затем E5 независимых holdout и repeatability; production отдельно после safety-margin/quality decision. Не запускать legacy 45-task batch и не менять executor defaults.
-
-## FILL001-SERIES-001 — сохранение сводки и защита истории (2026-11-11)
-
-- [x] Реализовать неизменяемый `<series_id>.summary.json` (exclusive create) с accepted, quality_failed, exact CHALK отдельно по группам; при повторном `series_id` блокировать работу до любых callbacks.
-- [x] Запретить повторное исполнение, если найден хотя бы старый `<task>.json` или `<task>.clear.json`; сохранить негативные capture/clear records, не переписывать.
-- [ ] Подтвердить финальные CI на кодовом SHA `f6d608b34e8428d7c970e14e6dd6882003e2f586`; не переносить PASS с предыдущих SHA.
-- [ ] Следующий live blocker прежний: доказать безопасную реальную UI Clear action с PNG+двумя exact counters, только затем подключать opt-in game adapter.
-
-## FILL001-SERIES-001 — проверка очистки и quality-fail журнал (2026-11-11)
-
-- [x] Найти статическую цепочку игрового Clear в сохранённом bundle (§12.2 engine architecture), отличить `BoardPane.clear()` от `AutoDrawGameMonitor.clear()` (последний чистит события, не игровую доску). E1, не доказательство live UI.
-- [x] Добавить read-only `fill001_series_blank_verification.py` и synthetic regression: source blank PNG/counter той же session и mapping, два settled exact reset observations, 0 RGB differences, released off-ROI cursor; сохранять отрицательный результат. Без непосредственного game input.
-- [x] Требовать положительный `FILL001_SERIES_BLANK_SCREEN_VERIFICATION_V1` result в series Clear callback; unknown/invalid clear блокирует следующий рисунок.
-- [x] Разделить законный E4 quality FAIL и неполное E4 evidence: валидный точный CHALK с quality FAIL записывать как `QUALITY_FAIL`, но не включать в quality-PASS ranking и продолжать только после доказанного Clear. Неизвестный CHALK / monitor anomalies / отсутствующие PNG блокируют серию.
-- [ ] Подтвердить итоговые dedicated series CI и общую validation на актуальном SHA `eb36584846536a7d06fcbdc614ea504535615a15`. E4 и E5 для серии NOT_RUN.
-- [ ] **Live blocker:** установить координату/селектор штатной кнопки `PainterPopup.clearHandler` в Firefox с повторной идентификацией окна и поля BoardPane; выполнить один безопасный Clear-preflight при участии пользовательской игры и собрать raw Monitor, два exact settled snapshots, исходный/конечный PNG. Без прямых вызовов игровых внутренних методов/невалидированной калибровки.
-- [ ] После E4 доказательств подключить экспериментальный opt-in Stage6 single-run→clear→new-session loop, сохраняя all raw evidence, отдельный run ID, capture и quality-pass/quality-fail статистику; production defaults не менять.
-
-## FILL001-SERIES-001 — многофигурный циклический тест, безопасный этап 1 (2026-11-11)
-
-- [x] Сформулировать контракт: циклы × фигур за цикл; разные frozen shapes, scanline methods и радиусы; каждая фигура отдельный run с собственным session, exact CHALK и before/settled PNG, immutable original JSON; fail-closed без пропуска ошибочных запусков.
-- [x] Реализовать `fill001_series_runner.py` с CLI `--cycles --figures-per-cycle --shapes --methods --radii --output`, unique offline manifest (`execution_allowed=false`) и callback orchestration без прямых game input/clear calls.
-- [x] Добавить ручные параметры и кнопку создания offline manifest в существующую вкладку FILL-001; синтетические проверки создают manifests, группируют CHALK, проверяют negative run/clear и запрет перезаписи.
-- [ ] Подтвердить финальные CI SHA `4b509676701e8052e36693e1ee2c050630a275b0` и UI syntax/regression на SHA `3a7f939` либо более новом, затем docs integrity.
-- [ ] **Блокер live:** идентифицировать подтверждённый игровой Clear/reset action и его telemetry; определить завершение очистки по same-session exact reset и проверке исходного экрана. Не считать pointCount=1 единственным доказательством чистой доски; нужен независимый run-bound blank-screen gate.
-- [ ] Реализовать opt-in автоматическое `Clear → prove blank → isolated Stage6 full figure → exact CHALK/PNG/Monitor capture → immutable report` для всех задач только после E2/E3 gate, без изменения legacy batch permissions или production defaults. Сейчас серия фактически не взаимодействует с игрой.
-- [ ] Независимая E5-validation на трех frozen формах, нескольких scanline variants и radius; quality failure и отрицательные результаты сохранять. Повторяемость W2/W3, multi-color и wide/narrow holdout остаются отдельными заданиями.
+**Закрытая подготовка FILL001-SERIES-001:** 30 frozen offline вариантов, signed DrawingPlan, immutable summary, generic Monitor/Stage6 binding, ENGINE-001 Clear, общий owner lock и GUI opt-in реализованы на E1–E3. Прежние незавершённые пункты «найти UI Clear», «подключить Stage6 live adapter», «проверить CI» более не являются открытыми задачами реализации; это **не** E4 PASS. Подробная история — [WORK_LOG.md](WORK_LOG.md), доказательства — [TEST_RESULTS.md](TEST_RESULTS.md). Текущие открытые gates новой серии собраны только в первом разделе.
 
 ## FILL-001 V5 — E5 audit of archived W2/W3 completed, next gates (2026-11-11)
 

@@ -1,5 +1,13 @@
 # AutoDraw — дорожная карта будущих работ
 
+## Текущий приоритет — FILL001-SERIES-001: ограниченный E4 smoke (2026-11-11)
+
+Экспериментальная opt-in интеграция FILL-001 → существующий Stage6 → run-bound Monitor/PNG/exact CHALK → штатный откалиброванный ENGINE-001 Clear → следующая фигура **реализована в коде**. E3 SUCCESS на `fea265f92aac`: [series CI 42975856803](https://github.com/Kiddos19882/AutoDraw/actions/runs/42975856803) и [main validation 42975856883](https://github.com/Kiddos19882/AutoDraw/actions/runs/42975856883). Серийные E4/E5 **NOT_RUN**, production eligibility FALSE; Windows portable job в последней main validation `SKIPPED`.
+
+**Следующий gate (только при отдельном разрешении на live):** на ПК пользователя проверить **1 цикл × 2 фигуры** на тестовой чистой доске. Зафиксировать действительные profile/Firefox/Bridge/Monitor preflight, per-figure run ID, before/settled PNG, exact `post.pointCount - pre.pointCount`, штатную ENGINE-001 очистку с исходным допуском 0.15% и двумя settled exact snapshots. Неоднозначный reset/calibration/CHALK → fail-closed до следующей фигуры. Только после подтверждённого E4 — repeatability и остальные frozen варианты с независимой E5, затем отдельное production-решение; не менять estimator, executor defaults или acceptance thresholds. [Активные задачи](TASKS.md).
+
+**Остальные планы ниже** — ранее записанные этапы V5/ENGINE-001/геометрии. Их хронология сохранена; они не отменяют текущий первичный E4 gate FILL001-SERIES-001. Актуальный backlog — [TASKS.md](TASKS.md).
+
 ## После V5 DEC-030 — native geometry proxy пройден, реальный CHALK впереди
 
 В нативном Egret BoardPane/WebGL frozen rectangle V5 два заранее зафиксированных trim0 варианта с одним нижним штрихом превысили 99% покрытия; утечка 54 backing-пикселя и не дальше 1 логического px по distanceTransform/3, на alpha128. Это **native alpha proxy**, не экранная качество/CHALK-валидация. [Raw evidence](https://github.com/Kiddos19882/AutoDraw/actions/runs/42694626385/artifacts/13707703988). Следующий этап: проверить новый mixed-width brush switch (W10 + W2 или W3), same-run Stage↔desktop screen geometry, реальный `FILL001_CHALK_FIRST_PERIMETER_V2` PNG audit и exact `post.pointCount-pre.pointCount` на отдельных изолированных E4 запусках; без такого измерения W2/W3 не ранжировать. Затем frozen wide/narrow, multi-color leakage visual holdout и отдельный production decision. Executor defaults, estimator, frozen masks и historical runs не изменять.

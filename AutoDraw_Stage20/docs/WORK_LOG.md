@@ -1,5 +1,11 @@
 # AutoDraw — журнал выполненных действий
 
+## 2026-11-11 — FILL001-SERIES-001: документационная синхронизация current E1–E3 и незакрытого E4
+
+- Read-only сверены baseline `3acc3dcdf69c`, последние 20 remote commits, GUI/Stage6/ENGINE-001 Clear/owner-lock код на `fea265f92aac` и текущие управляющие документы. Ранние `NOT_IMPLEMENTED` описывали предшествующий offline этап; новый opt-in adapter реализован в коде, но E4/E5 серии `NOT_RUN`.
+- Проверены [series safety CI 42975856803](https://github.com/Kiddos19882/AutoDraw/actions/runs/42975856803) и [main validation 42975856883](https://github.com/Kiddos19882/AutoDraw/actions/runs/42975856883) SUCCESS на `fea265f`, Windows portable/benchmarks SKIPPED, а также [Markdown integrity 42976063009](https://github.com/Kiddos19882/AutoDraw/actions/runs/42976063009) SUCCESS на прежнем docs HEAD `3acc3dc`. Промежуточный CI FAIL `42975584450` сохранён как отрицательный результат.
+- Уточнены `PROJECT_STATUS`, `TASKS`, `ROADMAP`, `TEST_RESULTS`, `WORK_LOG`, `CHANGELOG`: сняты закрытые E1–E3 блокеры live adapter; первичный открытый gate — E4 smoke 1 цикл × 2 фигуры с raw PNG/Monitor/Bridge/CHALK и проверкой Clear. Исходники, тесты, workflow, frozen evidence и production defaults не изменялись; новые тесты и live не запускались. GitHub не даёт локальный `git status`.
+
 ## 2026-11-11 — FILL001-SERIES-001: existing ENGINE-001 Clear + Stage6 live integration
 
 - Audited original proven Clear from `brush_behavior_test_ui.py`, `brush_experiment_capture.evaluate_board_clear` (0.15% native legacy tolerance) and `chalk_test_blocks.acquire_chalk_block_owner_lock`. Implemented one shared calibrated UI click helper and series Clear proof, preserving exact game counter and blank ROI comparison; source/test changes `24de371`, `dcd15ec`, `606ec2c`, `ce086aa`.
