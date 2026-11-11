@@ -222,7 +222,8 @@ def test_immutable_summary_blocks_repeat_before_callbacks(tmp_path):
     assert summary.read_text(encoding="utf-8") == "original summary"
 
 
-def test_same_bridge_session_allowed_after_verified_clear(tmp_path):
+@pytest.mark.parametrize("stale", [False, True])
+def test_same_bridge_session_allowed_after_verified_clear(tmp_path, stale):
     m = manifest(cycles=1, figures_per_cycle=3)
     state = {"n": 0, "clears": 0, "proof": None}
     def observe(task):
@@ -234,6 +235,8 @@ def test_same_bridge_session_allowed_after_verified_clear(tmp_path):
              "observed_at_utc": f"2026-11-11T00:00:{(state['n'] - 1)*10 + 2:02d}+00:00"}
         if state["proof"] is not None:
             x["blank_screen_verification"] = state["proof"]
+            if stale:
+                x["observed_at_utc"] = "2026-11-11T00:00:00+00:00"
         return x
     def run(task):
         return {
@@ -262,9 +265,15 @@ def test_same_bridge_session_allowed_after_verified_clear(tmp_path):
     report = run_with_validated_callbacks(
         m, results_dir=tmp_path, observe_blank=observe,
         run_one=run, clear_and_verify=clear)
-    assert report["status"] == "completed"
-    assert report["accepted"] == 3
-    assert state["clears"] == 2
+    if stale:
+        assert report["status"] == "blocked"
+        assert report["accepted"] == 1
+        assert state["clears"] == 1
+        assert state["n"] == 2
+    else:
+        assert report["status"] == "completed"
+        assert report["accepted"] == 3
+        assert state["clears"] == 2
 
 
 def test_same_session_without_clear_provenance_stops_before_second_draw(tmp_path):
