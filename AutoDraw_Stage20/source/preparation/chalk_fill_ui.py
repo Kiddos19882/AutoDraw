@@ -422,9 +422,13 @@ class Fill001Tab:
             )
         except (OSError, RuntimeError, ValueError, TypeError, AttributeError) as exc:
             self.bridge_status_var.set(f"BLOCKED: {exc}")
+            self._firefox_execute_series = False
+            self._series_pending_manifest = None
             return
         if not accepted:
             self.bridge_status_var.set("BLOCKED: Bridge не запущен с Input Telemetry ON.")
+            self._firefox_execute_series = False
+            self._series_pending_manifest = None
             return
         # Read Tk state on UI thread, never from the Firefox worker.
         self._firefox_selected_candidate = self.v5_candidate_var.get()
@@ -637,6 +641,10 @@ class Fill001Tab:
             if driver is not None:
                 self._firefox_stop.wait()
         finally:
+            # A failed/closed opt-in must not leak a live series request into
+            # the next ordinary Firefox/V5 launch.
+            self._firefox_execute_series = False
+            self._series_pending_manifest = None
             if driver is not None:
                 try:
                     driver.quit()
