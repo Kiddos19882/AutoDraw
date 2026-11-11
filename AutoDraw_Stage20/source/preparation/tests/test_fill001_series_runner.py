@@ -101,7 +101,10 @@ def test_all_figures_capture_then_clear_except_final(tmp_path):
     assert sum(x["accepted"] for x in report["grouped_exact_chalk_statistics"]["shape"].values()) == 6
     assert sum(x["total_exact_chalk"] for x in report["grouped_exact_chalk_statistics"]["brush"].values()) == 600
     assert state == {"n": 6, "clears": 5}
-    assert len(list(tmp_path.glob("*.json"))) == 11
+    assert len(list(tmp_path.glob("*.json"))) == 12
+    summary = tmp_path / "series-test.summary.json"
+    assert summary.is_file()
+    assert json.loads(summary.read_text(encoding="utf-8"))["status"] == "completed"
 
 
 def test_quality_fail_is_retained_and_still_requires_verified_clear(tmp_path):
@@ -116,7 +119,8 @@ def test_quality_fail_is_retained_and_still_requires_verified_clear(tmp_path):
     assert report["completed_with_bound_chalk"] == 6
     assert report["exact_chalk_sum_of_quality_failed_runs"] == 600
     assert state["clears"] == 5
-    saved = [p for p in tmp_path.glob("*.json") if not p.name.endswith(".clear.json")]
+    saved = [p for p in tmp_path.glob("*.json")
+             if not p.name.endswith((".clear.json", ".summary.json"))]
     assert len(saved) == 6
     assert all(json.loads(p.read_text(encoding="utf-8"))["status"] == "QUALITY_FAIL"
                for p in saved)
@@ -191,3 +195,28 @@ def test_missing_blank_screen_proof_never_advances(tmp_path):
     path = next(tmp_path.glob("*.clear.json"))
     data = json.loads(path.read_text(encoding="utf-8"))
     assert data["status"] == "BLOCKED"
+
+def test_previous_clear_evidence_prevents_any_new_game_action(tmp_path):
+    m = manifest()
+    stale = tmp_path / (m["tasks"][0]["task_id"] + ".clear.json")
+    stale.write_text("old clear evidence", encoding="utf-8")
+    state, observe, run, clear = fake_callbacks()
+    report = run_with_validated_callbacks(
+        m, results_dir=tmp_path, observe_blank=observe,
+        run_one=run, clear_and_verify=clear)
+    assert report["status"] == "blocked"
+    assert state == {"n": 0, "clears": 0}
+    assert stale.read_text(encoding="utf-8") == "old clear evidence"
+
+
+def test_immutable_summary_blocks_repeat_before_callbacks(tmp_path):
+    m = manifest()
+    summary = tmp_path / "series-test.summary.json"
+    summary.write_text("original summary", encoding="utf-8")
+    state, observe, run, clear = fake_callbacks()
+    with pytest.raises(SeriesBlocked, match="summary"):
+        run_with_validated_callbacks(
+            m, results_dir=tmp_path, observe_blank=observe,
+            run_one=run, clear_and_verify=clear)
+    assert state == {"n": 0, "clears": 0}
+    assert summary.read_text(encoding="utf-8") == "original summary"
