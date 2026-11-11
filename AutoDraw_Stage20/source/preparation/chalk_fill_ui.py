@@ -358,6 +358,8 @@ class Fill001Tab:
                 return
             self._series_pending_manifest = manifest
             self._series_manifest_path = selected
+            self._series_profile = profile
+            self._series_blank_paths = (reference, metadata)
             self._firefox_execute_series = True
             self.v5_run_after_probe_var.set(False)
             self.start_firefox_monitor()
@@ -543,6 +545,12 @@ class Fill001Tab:
                     "Активное окно Firefox подтверждено через Win32 PID. "
                     "Начинается пассивная ROI-проверка без кликов.",
                 ))
+                if self._firefox_execute_series:
+                    self._run_fill001_series_in_firefox(
+                        driver, bridge_root, ready["session_id"]
+                    )
+                    self._firefox_stop.wait()
+                    return
                 mapped, witness, roi = collect_verified_v5_firefox_roi(
                     driver, bridge_root, ready["session_id"], plan,
                     native_mouse=pyautogui,
