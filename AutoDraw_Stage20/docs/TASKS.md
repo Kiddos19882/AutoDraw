@@ -1,5 +1,14 @@
 # AutoDraw — действующие задачи
 
+## FILL-001 V5 — W3 E4 result and next independent validation (2026-11-11)
+
+- [x] Check branch HEAD `832bf2b` and [AutoDraw validation CI 42923577993](https://github.com/Kiddos19882/AutoDraw/actions/runs/42923577993): completed SUCCESS; required listed jobs SUCCESS; optional algorithm benchmark and Windows portable build SKIPPED. Earlier W2 CI 42921496275 SUCCESS.
+- [x] Receive new clean-board W3 `K_trim_0_y189_w3` primary attempt `8f770c4a-43a6-478f-b581-8af006cde6ec` on `832bf2b`: Stage6 29/29, 28×radius10→3, closed same-session exact 1→1707 = CHALK1706, pointer parking confirmed stable pointCount, `EXACT_RUN_BOUND`.
+- [x] Validate reported active-policy W3 screen audit: coverage99.3775%, 600 screen leakage pixels, zero farther than 3 logical px, max overshoot1.327083 => E4 quality PASS. W2 1709 CHALK and quality PASS; W3 provisional advantage 3 CHALK; do not use prior W2 CHALK1701 with quality FAIL in ranking.
+- [ ] **Next: independent E5**: obtain original W2/W3 before+settled PNG bytes and complete closed Bridge events, verify SHA-256 against immutable reports, independently recompute RGB threshold8/frozen mask metrics and run-bound pointer/brush/event integrity; record accepted/rejected/missing and analyzer/version. Current E5 NOT_RUN; connector report reconciliation is not independent E5.
+- [ ] Decide whether a predeclared repeatability series for W2 and W3 is required to substantiate a 3-point (0.176%) advantage. Future fresh game runs need separate run/session identities and no acceptance-threshold changes.
+- [ ] Multi-color halo and wide/narrow holdout E4/E5, independent review and explicit production decision before any estimator/executor/default promotion.
+
 ## FILL-001 V5 — first W2 active quality PASS + exact CHALK E4 (2026-11-10/11)
 
 - [x] Review primary `1c722ba` attempt `51480631`, closed run `c36be38c`, `before.png` and `after_settled.png`. Stage6 29/29, native 28×radius10 then radius2, verified final mouse release, 75.657 s; 5 zero-point slider inputs correctly excluded and 0 telemetry gaps/errors. Exact bound pre1→post1710 = CHALK1709, early post1687 not settled.
