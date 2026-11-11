@@ -43,6 +43,8 @@ jobs:
     defaults:
       run:
         working-directory: AutoDraw_Stage20/source/preparation
+    env:
+      PYTHONPATH: ${{ github.workspace }}/AutoDraw_Stage20/source/executor:${{ github.workspace }}/AutoDraw_Stage20/source/preparation
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
