@@ -87,6 +87,29 @@ def execute_series_single_stage6(
     for actual, frozen in zip(plan.strokes,source["strokes"]):
         if actual.metadata != frozen["metadata"]:
             raise SeriesBlocked("Stage6 stroke metadata differs from source")
+    # Re-verify the immutable source transform on the native execution entry.
+    # A once-valid preflight request must not authorize a different DrawingPlan.
+    corners=mapping.get("board_screen_corners")
+    off=mapping.get("client_to_desktop_offset")
+    if not isinstance(corners,dict) or not isinstance(off,dict):
+        raise SeriesBlocked("Stage6 missing authenticated source mapping")
+    x0,y0,x1,y1=[float(corners[k]) for k in ("left","top","right","bottom")]
+    sx,sy=(x1-x0)/460,(y1-y0)/240
+    if sx<=0 or sy<=0 or abs(sx-sy)/max(sx,sy)>.01:
+        raise SeriesBlocked("Stage6 BoardPane scale changed")
+    actual_starts=[]
+    for original,transformed in zip(source["strokes"],plan.strokes):
+        for logical,pixel in zip(original["points"],transformed.points):
+            x=x0+logical["x"]*sx-roi["x"]
+            y=y0+logical["y"]*sy-roi["y"]
+            if abs(pixel.x-x)>1e-5 or abs(pixel.y-y)>1e-5:
+                raise SeriesBlocked("Stage6 coordinates differ from frozen source")
+        actual_starts.append([
+            float(round(roi["x"]+transformed.points[0].x)-off["x"]),
+            float(round(roi["y"]+transformed.points[0].y)-off["y"]),
+        ])
+    if request.get("expected_pointer_down_client") != actual_starts:
+        raise SeriesBlocked("Stage6 pointer witness changed since passive preflight")
     calibration=BrushSliderCalibration.from_dict(slider_calibration)
     calibration.validate(native_mouse.size(),roi)
     if calibration.initial_value != startup["currentRadius"]:
