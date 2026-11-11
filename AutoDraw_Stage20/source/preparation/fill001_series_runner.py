@@ -149,6 +149,8 @@ def run_with_validated_callbacks(
     accepted = []
     quality_failed = []
     seen_sessions: set[str] = set()
+    seen_run_ids: set[str] = set()
+    previous_clear_proof: dict | None = None
     stop_requested = stop_requested or (lambda: False)
     status = "completed"
     issue = None
@@ -174,9 +176,18 @@ def run_with_validated_callbacks(
                     or pre.get("calibration_valid") is not True
                     or pre.get("fresh_board") is not True
                     or not isinstance(pre.get("session_id"), str)
-                    or not pre["session_id"]
-                    or pre["session_id"] in seen_sessions):
+                    or not pre["session_id"]):
                 raise SeriesBlocked("No fresh blank board / valid mapping / unique session")
+            if pre["session_id"] in seen_sessions:
+                proof = pre.get("blank_screen_verification")
+                if (previous_clear_proof is None
+                        or not isinstance(proof, dict)
+                        or proof != previous_clear_proof
+                        or proof.get("session_id") != pre["session_id"]
+                        or proof.get("status") != "PASS"
+                        or proof.get("changed_screen_pixels") != 0
+                        or proof.get("post_clear_pointCount") != pre["pointCount"]):
+                    raise SeriesBlocked("Reused session requires previous verified Clear and fresh blank observation")
             seen_sessions.add(pre["session_id"])
             result = run_one(task)
             if (not isinstance(result, dict)
@@ -194,8 +205,11 @@ def run_with_validated_callbacks(
                     or result["actual_chalk"] != result["post_pointCount"]-result["pre_pointCount"]
                     or not result.get("before_png_sha256")
                     or not result.get("after_settled_png_sha256")
-                    or not result.get("run_id")):
+                    or not isinstance(result.get("run_id"), str)
+                    or not result["run_id"]
+                    or result["run_id"] in seen_run_ids):
                 raise SeriesBlocked("Run lacks validated exact CHALK and quality evidence")
+            seen_run_ids.add(result["run_id"])
             quality = result["quality_gate"]
             record.update(status="PASS" if quality == "PASS" else "QUALITY_FAIL",
                           actual_chalk=result["actual_chalk"],
@@ -241,6 +255,7 @@ def run_with_validated_callbacks(
                         or proof.get("clear_ui_action_proven") is not False):
                     raise SeriesBlocked("Clear lacks independent blank-screen verification")
                 clear_evidence["status"] = "PASS"
+                previous_clear_proof = dict(proof)
             except Exception as exc:
                 clear_evidence["error"] = f"{type(exc).__name__}: {exc}"
                 status, issue = "blocked", f"Clear failed: {type(exc).__name__}: {exc}"
