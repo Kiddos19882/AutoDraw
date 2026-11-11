@@ -18,6 +18,7 @@ import pyautogui
 from typing import Any, Callable
 
 from chalk_fill_execution import prepare_fill001_single_task_plan
+from fill001_series_runner import build_manifest as build_fill001_series_manifest, write_manifest as write_fill001_series_manifest, SeriesBlocked
 from chalk_fill_matrix import (
     FillMatrixError,
     build_fill001_matrix,
@@ -91,6 +92,11 @@ class Fill001Tab:
         )
         self.task_var = tk.StringVar()
         self.v5_candidate_var = tk.StringVar(value="K_trim_0_y190_w2")
+        self.series_cycles_var = tk.StringVar(value="2")
+        self.series_figures_var = tk.StringVar(value="3")
+        self.series_shapes_var = tk.StringVar(value="rectangle,wide_irregular,narrow_irregular")
+        self.series_methods_var = tk.StringVar(value="dense_scanlines,spaced_scanlines")
+        self.series_radii_var = tk.StringVar(value="1,5,10")
         self.status_var = tk.StringVar(value="Создайте новую серию или откройте существующий manifest.")
         self.bridge_status_var = tk.StringVar(value="Monitor/Bridge: подключение ещё не проверено.")
         self._firefox_driver = None
@@ -225,9 +231,59 @@ class Fill001Tab:
             v5_group, text="Только файл плана. Штатный Stage6 блокирует mixed-width до runtime gate.",
         ).pack(side="left", padx=(8, 0))
 
+        series_batch = ttk.LabelFrame(
+            outer, text="FILL001-SERIES-001 — несколько фигур (пока безопасная подготовка)", padding=6
+        )
+        series_batch.pack(fill="x", pady=(0, 6))
+        count_row = ttk.Frame(series_batch)
+        count_row.pack(fill="x", pady=2)
+        ttk.Label(count_row, text="Циклов").pack(side="left")
+        ttk.Entry(count_row, textvariable=self.series_cycles_var, width=6).pack(side="left", padx=(4, 12))
+        ttk.Label(count_row, text="Фигур за цикл").pack(side="left")
+        ttk.Entry(count_row, textvariable=self.series_figures_var, width=6).pack(side="left", padx=(4, 12))
+        ttk.Button(count_row, text="Создать план серии (без запуска)",
+                   command=self.create_fill001_series_schedule).pack(side="left")
+        for description, state in (
+            ("Фигуры (через запятую)", self.series_shapes_var),
+            ("Способы (dense_scanlines, spaced_scanlines)", self.series_methods_var),
+            ("Радиусы кистей (1,5,10,20,30)", self.series_radii_var),
+        ):
+            entry_row = ttk.Frame(series_batch)
+            entry_row.pack(fill="x", pady=2)
+            ttk.Label(entry_row, text=description, width=43).pack(side="left")
+            ttk.Entry(entry_row, textvariable=state, width=55).pack(side="left", fill="x", expand=True)
+        ttk.Label(series_batch, text=(
+            "Режим подготовки: создаёт только manifest. Автоматическое рисование/очистка "
+            "заблокированы до проверенного игрового Clear и отдельной live-интеграции. "
+            "Одиночный FILL-001 и Stage6 не изменяются."
+        ), wraplength=1080, justify="left").pack(anchor="w", pady=(3, 0))
+
         self.task_details = tk.Text(outer, height=10, wrap="word", state="disabled")
         self.task_details.pack(fill="both", expand=True, pady=(0, 8))
         ttk.Label(outer, textvariable=self.status_var, wraplength=1120).pack(anchor="w")
+
+    def create_fill001_series_schedule(self) -> None:
+        """Create only a durable offline manifest, never execute or Clear."""
+        try:
+            def values(value: str) -> list[str]:
+                return [part.strip() for part in value.split(",") if part.strip()]
+
+            manifest = build_fill001_series_manifest(
+                cycles=int(self.series_cycles_var.get()),
+                figures_per_cycle=int(self.series_figures_var.get()),
+                shapes=values(self.series_shapes_var.get()),
+                methods=values(self.series_methods_var.get()),
+                radii=[int(value) for value in values(self.series_radii_var.get())],
+            )
+            destination = self.output_dir / "series" / (manifest["series_id"] + ".json")
+            write_fill001_series_manifest(manifest, destination)
+            count = len(manifest["tasks"])
+            self.status_var.set(
+                f"Подготовлена серия {manifest['series_id']}: {count} фигур; "
+                f"файл {destination}. Live запуск и Clear заблокированы."
+            )
+        except (SeriesBlocked, ValueError, OSError) as exc:
+            messagebox.showerror("FILL001-SERIES: подготовка заблокирована", str(exc))
 
     def _poll_firefox_messages(self) -> None:
         try:
