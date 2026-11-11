@@ -1,5 +1,9 @@
 # AutoDraw — текущее состояние
 
+## FILL001-SERIES-001 — immutable summary и защита от повторного исполнения (2026-11-11)
+
+После Clear screen/counter contract добавлена атомарная exclusive-create запись отдельного `<series_id>.summary.json` (`8518fc6`) с `accepted`, `quality_failed`, `completed_with_bound_chalk`, точным расходом для каждой из двух групп и группировкой quality-PASS CHALK по форме/методу/кисти. При обнаружении существующего summary **никакой callback не запускается**; существующий `<task>.json` либо `<task>.clear.json` также блокирует повторное управление игрой. Negative result сохраняется, но не объявляется quality PASS. Новые synthetic guards `f6d608b`; итоговые CI для этих SHA проверять отдельно. Это экспериментальный **offline/callback contract**, НЕ подтверждение автоматической игры или Clear в Windows.
+
 ## FILL001-SERIES-001 — E1 контракт игрового Clear и E2 экранный reset-gate (2026-11-11)
 
 Изучена архитектура сохранённого игрового движка: `PainterPopup.clearHandler() → BoardPane.clear() → BlackBoardAtom.clear() → redraw() → updateLess()` ([GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md](GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md), §12.2). **E1:** clear-код действительно существует; в расширенном режиме может остаться служебная точка, так что `pointCount=1` совместим с чистой доской. Это НЕ E4-подтверждение фактической UI-кнопки или допустимости автоматического нажатия в нынешнем Firefox. Monitor `clear()` очищает лишь собственный буфер событий, не доску.
