@@ -66,8 +66,15 @@ def build_manifest(*, cycles: int, figures_per_cycle: int,
             or any(c not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_" for c in series_id)):
         raise SeriesBlocked("Invalid series_id")
 
-    # Vary shape on consecutive drawings; sweep methods, then brush widths.
-    variants = [(s, m, r) for r in radii for m in methods for s in shapes]
+    # Balanced diagonal factorial: adjacent tasks vary shape, method and brush;
+    # each full rotation still visits every shape/method/radius combination once.
+    variants = []
+    for index in range(len(shapes) * len(methods) * len(radii)):
+        shape_index = index % len(shapes)
+        shape_block = index // len(shapes)
+        method_index = (shape_block + shape_index) % len(methods)
+        radius_index = (shape_block // len(methods) + shape_index) % len(radii)
+        variants.append((shapes[shape_index], methods[method_index], radii[radius_index]))
     tasks = []
     for cycle in range(1, cycles + 1):
         for figure in range(1, figures_per_cycle + 1):
