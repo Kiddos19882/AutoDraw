@@ -1,5 +1,9 @@
 # AutoDraw — журнал выполненных действий
 
+## 2026-11-11 — FILL001-SERIES-001 persistent summary and no-repeat guards
+
+- `8518fc6` сохраняет итоговую статистику в отдельном immutable series summary и проверяет наличие прежних summary/failed Clear journals *до* game callbacks. `f6d608b` обновляет synthetic tests для новых состояний, включая блокировку повторов. CI на последнем source SHA остаётся отдельным обязательным подтверждением. Live Clear/series E4 NOT_RUN.
+
 ## 2026-11-11 — FILL001-SERIES-001 Clear E1 audit and independent blank-screen E2 gate
 
 - Verified historical engine source architecture `PainterPopup.clearHandler → BoardPane.clear → atom.clear/redraw/updateLess` via existing documented bundle analysis; same code has extended-mode `pointCount=1` service point. Cannot treat monitor `clear()` as board Clear. E1 only, no live UI action.
