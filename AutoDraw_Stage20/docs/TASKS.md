@@ -1,5 +1,15 @@
 # AutoDraw — действующие задачи
 
+## FILL001-SERIES-001 — интеграция Clear/Stage6 выполнена в коде; оставшиеся runtime gates (2026-11-11)
+
+- [x] Найти и переиспользовать действующий ENGINE-001 Clear (калибровка, штатный клик, `evaluate_board_clear` 0.15%, 9/9 исторических live E4); не придумывать заново игровой Clear и не подменять его Monitor.clear.
+- [x] Подключить `Fill001Tab` → `integrated_app` → существующий Stage6 owner → generic signed single-task DrawingPlan/brush/preflight/Monitor → exact run binding → before/settled PNG quality → immutable report → ENGINE-001 Clear → следующая фигура; отдельный опциональный UI toggle/подтверждение/остановка.
+- [x] Обобщить binding с фиксированных V5 29 штрихов до любого заранее подписанного числа, запретить посторонние клики и неточные/неполные game events, сохранять quality FAIL отдельно без ложного лидера.
+- [x] Переиспользовать ENGINE-001 lock для всех серий в общей папке, запретить параллельный запуск, сохранить raw и negative evidence; сбрасывать устаревшее opt-in состояние после ошибки подключения.
+- [x] [Dedicated series CI 42975744219](https://github.com/Kiddos19882/AutoDraw/actions/runs/42975744219) PASS до последней UI правки; проверка нового HEAD/общее AutoDraw validation проводится отдельно. Промежуточные CI FAIL и их исправления сохранены.
+- [ ] **Реальный E4 smoke на ПК пользователя:** первая серия 1 цикл×2 фигуры только на тестовой доске с подтверждённым профилем/blank reference/Firefox foreground/Monitor/Bridge; собрать live JSON/PNG, exact pre/post CHALK для каждого, доказать переход через Clear и остановку. На GitHub без локального runtime это проверить нельзя.
+- [ ] Затем repeatability/factorial quality E4/E5 на всех frozen shape-method-brush комбинациях, доступной квоте, негативных случаях и визуальных holdout; проверить подход к лимитам CHALK и acceptance. Только после E5 — production решение, не менять defaults без отдельной validation.
+
 ## FILL001-SERIES-001 — следующий обязательный E4 gate и завершение live интеграции (2026-11-11)
 
 - [x] 30 frozen geometry candidates: rectangle/wide/narrow × dense/spaced scanlines × radii 1/5/10/20/30, offline signatures/coverage/leakage/sampling estimates; независимые game CHALK и PNG НЕ подменяются оценками.
