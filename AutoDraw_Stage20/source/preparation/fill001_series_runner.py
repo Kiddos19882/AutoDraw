@@ -339,6 +339,38 @@ def run_with_validated_callbacks(
     return summary
 
 
+def run_with_series_owner_lock(
+    manifest: dict, *, results_dir: Path,
+    observe_blank: Callable[[dict], dict],
+    run_one: Callable[[dict], dict],
+    clear_and_verify: Callable[[dict], dict],
+    stop_requested: Callable[[], bool] | None = None,
+) -> dict:
+    """Reuse ENGINE-001's cross-process owner lock for a whole series.
+
+    The lock lives in the shared series directory, not a single task folder.
+    It is held through drawing, evidence capture and game Clear. This prevents
+    two AutoDraw processes from driving the same game in parallel.
+    """
+    from chalk_test_blocks import (
+        acquire_chalk_block_owner_lock, release_chalk_block_owner_lock,
+    )
+    validate_manifest(manifest)
+    destination = Path(results_dir)
+    lock = acquire_chalk_block_owner_lock(destination.parent / "series-owner.json")
+    if lock is None:
+        raise SeriesBlocked("Another AutoDraw series already owns the game-control lock")
+    try:
+        return run_with_validated_callbacks(
+            manifest, results_dir=destination,
+            observe_blank=observe_blank, run_one=run_one,
+            clear_and_verify=clear_and_verify,
+            stop_requested=stop_requested,
+        )
+    finally:
+        release_chalk_block_owner_lock(lock)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Create a SAFE offline multi-figure FILL-001 schedule")
     parser.add_argument("--cycles", type=int, required=True)
