@@ -110,6 +110,38 @@ def collect_verified_v5_firefox_roi(
     # WebDriver access, or any physical pointer movement.  In particular the
     # negative CI test must not require Selenium to be installed.
     validate_fill001_v5_source_plan(source_plan)
+    return _collect_verified_boardpane_roi(
+        driver, bridge_root, session_id, source_plan,
+        native_mouse=native_mouse, now_utc=now_utc,
+        firefox_foreground_checker=firefox_foreground_checker,
+    )
+
+
+def collect_verified_series_firefox_roi(
+    manifest: dict, driver: Any, bridge_root: Path, session_id: str,
+    source_plan: dict, *, native_mouse: Any, now_utc: Any,
+    firefox_foreground_checker: Any = None,
+) -> tuple[dict[str, Any], dict[str, Any], dict[str, int]]:
+    """Reuse actual V5 passive Firefox/OS probes for one signed series plan.
+
+    No drawing, click or calibration fallback. The same native and Bridge
+    witness collection remains unchanged.
+    """
+    from fill001_series_handoff import validate_series_source_plan
+    validate_series_source_plan(manifest, source_plan)
+    return _collect_verified_boardpane_roi(
+        driver, bridge_root, session_id, source_plan,
+        native_mouse=native_mouse, now_utc=now_utc,
+        firefox_foreground_checker=firefox_foreground_checker,
+    )
+
+
+def _collect_verified_boardpane_roi(
+    driver: Any, bridge_root: Path, session_id: str,
+    source_plan: dict, *, native_mouse: Any, now_utc: Any,
+    firefox_foreground_checker: Any = None,
+) -> tuple[dict[str, Any], dict[str, Any], dict[str, int]]:
+    """Shared authenticated passive BoardPane probe; callers validate plans."""
 
     try:
         from selenium.webdriver.common.action_chains import ActionChains
