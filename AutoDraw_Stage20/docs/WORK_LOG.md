@@ -1,5 +1,11 @@
 # AutoDraw — журнал выполненных действий
 
+## 2026-11-11 — FILL001-SERIES-001 Clear E1 audit and independent blank-screen E2 gate
+
+- Verified historical engine source architecture `PainterPopup.clearHandler → BoardPane.clear → atom.clear/redraw/updateLess` via existing documented bundle analysis; same code has extended-mode `pointCount=1` service point. Cannot treat monitor `clear()` as board Clear. E1 only, no live UI action.
+- Added read-only PNG/counter matching verifier with immutable same-session blank reference and two settled exact observations, strict zero-RGB-difference policy, negative guard regressions and source-provenance checks. Code/test SHAs `be37772`, `7bd5290`, `fbf7610`, `eb36584`. Runner requires independently reported proof before next figure (`4301be0`, `a74a440`).
+- Preserved exact CHALK even when authentic PNG quality FAIL (status `QUALITY_FAIL`), but still requires Clear verification before next attempt; unknown exact binding continues BLOCKED. Source `43de0af`, tests `98715be`. No live game interaction, no production changes; dedicated CI after last commits to check by SHA.
+
 ## 2026-11-11 — FILL001-SERIES-001 experimental multi-figure scheduler, offline stage
 
 - Разработан versioned fail-closed scheduler с пользовательскими `cycles × figures_per_cycle`, тремя frozen shapes, двумя именованными scanline methods, кистями 1/5/10/20/30, immutable per-task JSON и grouped exact CHALK для проверенных run-bound данных. Добавлены synthetic tests и отдельный CI workflow; UI FILL-001 получил поля/кнопку **только offline manifest**, не автозапуск. SHA: scheduler `25976cb`/refinement `f47e433`, tests `aff4e99`/`4b50967`, CI `b0ffbc3`, UI `3a7f939`. [First dedicated CI run 42946045653](https://github.com/Kiddos19882/AutoDraw/actions/runs/42946045653) SUCCESS на `b0ffbc3`; final test/validation CI на `4b50967` проверяется отдельно.
