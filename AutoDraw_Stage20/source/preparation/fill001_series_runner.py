@@ -180,14 +180,33 @@ def run_with_validated_callbacks(
                 raise SeriesBlocked("No fresh blank board / valid mapping / unique session")
             if pre["session_id"] in seen_sessions:
                 proof = pre.get("blank_screen_verification")
+                try:
+                    latest_clear = datetime.fromisoformat(
+                        proof["last_settled_at_utc"].replace("Z", "+00:00")
+                    )
+                    latest_pre = datetime.fromisoformat(
+                        pre["observed_at_utc"].replace("Z", "+00:00")
+                    )
+                    timestamps_fresh = (
+                        latest_clear.tzinfo is not None
+                        and latest_pre.tzinfo is not None
+                        and latest_pre > latest_clear
+                    )
+                except (KeyError, TypeError, ValueError, AttributeError):
+                    timestamps_fresh = False
                 if (previous_clear_proof is None
                         or not isinstance(proof, dict)
                         or proof != previous_clear_proof
                         or proof.get("session_id") != pre["session_id"]
                         or proof.get("status") != "PASS"
                         or proof.get("changed_screen_pixels") != 0
-                        or proof.get("post_clear_pointCount") != pre["pointCount"]):
-                    raise SeriesBlocked("Reused session requires previous verified Clear and fresh blank observation")
+                        or proof.get("post_clear_pointCount") != pre["pointCount"]
+                        or not isinstance(pre.get("mapping_sha256"), str)
+                        or pre["mapping_sha256"] != proof.get("mapping_sha256")
+                        or not timestamps_fresh):
+                    raise SeriesBlocked(
+                        "Reused session requires fresh exact observation after previous Clear"
+                    )
             seen_sessions.add(pre["session_id"])
             result = run_one(task)
             if (not isinstance(result, dict)
