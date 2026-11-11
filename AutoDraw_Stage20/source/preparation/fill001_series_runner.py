@@ -199,27 +199,51 @@ def run_with_validated_callbacks(
         accepted.append(record)
         # Never clear after last job; never continue if Clear is uncertain.
         if len(accepted) < len(manifest["tasks"]):
+            clear_record = results_dir / (task["task_id"] + ".clear.json")
+            clear_evidence = {"schema": "FILL001_SERIES_CLEAR_V1",
+                              "task_id": task["task_id"], "status": "BLOCKED"}
             try:
                 cleared = clear_and_verify(task)
+                clear_evidence["proof"] = cleared
                 if (not isinstance(cleared, dict) or cleared.get("valid") is not True
                         or cleared.get("pointCount") != 1
                         or cleared.get("mouse_released") is not True
                         or cleared.get("fresh_board") is not True):
                     raise SeriesBlocked("Clear did not prove a fresh blank board")
-                clear_record = results_dir / (task["task_id"] + ".clear.json")
-                with clear_record.open("x", encoding="utf-8") as stream:
-                    json.dump({"schema": "FILL001_SERIES_CLEAR_V1",
-                               "task_id": task["task_id"], "proof": cleared},
-                              stream, ensure_ascii=False, indent=2)
-                    stream.write("\n")
+                clear_evidence["status"] = "PASS"
             except Exception as exc:
+                clear_evidence["error"] = f"{type(exc).__name__}: {exc}"
                 status, issue = "blocked", f"Clear failed: {type(exc).__name__}: {exc}"
+            finally:
+                with clear_record.open("x", encoding="utf-8") as stream:
+                    json.dump(clear_evidence, stream, ensure_ascii=False, indent=2)
+                    stream.write("\n")
+            if status == "blocked":
                 break
+    groups: dict[str, dict[str, dict]] = {"shape": {}, "method": {}, "brush": {}}
+    for item in accepted:
+        fields = {
+            "shape": item["shape_id"],
+            "method": item["fill_method"],
+            "brush": str(item["brush_radius"]),
+        }
+        for dimension, value in fields.items():
+            row = groups[dimension].setdefault(
+                value, {"accepted": 0, "total_exact_chalk": 0, "min_exact_chalk": None,
+                        "max_exact_chalk": None, "mean_exact_chalk": None}
+            )
+            chalk = item["actual_chalk"]
+            row["accepted"] += 1
+            row["total_exact_chalk"] += chalk
+            row["min_exact_chalk"] = chalk if row["min_exact_chalk"] is None else min(row["min_exact_chalk"], chalk)
+            row["max_exact_chalk"] = chalk if row["max_exact_chalk"] is None else max(row["max_exact_chalk"], chalk)
+            row["mean_exact_chalk"] = row["total_exact_chalk"] / row["accepted"]
     return {"schema": "FILL001_SERIES_SUMMARY_V1", "series_id": manifest["series_id"],
             "status": status, "issue": issue, "scheduled": len(manifest["tasks"]),
             "accepted": len(accepted),
             "exact_chalk_sum_of_accepted_runs": sum(r["actual_chalk"] for r in accepted),
             "exact_chalk_is_per_run_only": True,
+            "grouped_exact_chalk_statistics": groups,
             "next_task_requires_fresh_session": True}
 
 
