@@ -229,7 +229,9 @@ def test_same_bridge_session_allowed_after_verified_clear(tmp_path):
         state["n"] += 1
         x = {"valid": True, "fresh_board": True,
              "pointCount": 1, "calibration_valid": True,
-             "session_id": "persistent-session"}
+             "session_id": "persistent-session",
+             "mapping_sha256": "a"*64,
+             "observed_at_utc": f"2026-11-11T00:00:{(state['n'] - 1)*10 + 2:02d}+00:00"}
         if state["proof"] is not None:
             x["blank_screen_verification"] = state["proof"]
         return x
@@ -251,6 +253,8 @@ def test_same_bridge_session_allowed_after_verified_clear(tmp_path):
             "reference_png_sha256": "a"*64,
             "post_clear_png_sha256": "b"*64,
             "clear_ui_action_proven": False,
+            "mapping_sha256": "a"*64,
+            "last_settled_at_utc": f"2026-11-11T00:00:{(state['n'] - 1)*10 + 11:02d}+00:00",
         }
         state["proof"] = proof
         return {"valid": True, "pointCount": 1, "mouse_released": True,
