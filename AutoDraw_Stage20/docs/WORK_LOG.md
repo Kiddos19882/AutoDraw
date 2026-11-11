@@ -1,5 +1,11 @@
 # AutoDraw — журнал выполненных действий
 
+## 2026-11-11 — FILL-001 V5 W3 evidence reconciliation (read-only source audit; documentation update)
+
+- GitHub `feature/image-geometry-optimization` HEAD `832bf2b`; 20 remote commits and available Actions inspected. W3 primary attempt `8f770c4a-43a6-478f-b581-8af006cde6ec`, closed Bridge run `ca3bfa8b-a339-4c11-9f98-ed3881a16ad7` on immutable commit `832bf2b`.
+- Cross-checked W2 and W3 original `report.json` frozen mask SHA, original before PNG SHA, counters, policy and reported quality: W2 CHALK1709 / 99.3578% PASS; W3 CHALK1706 / 99.3775% PASS. Difference 3 CHALK in favour of W3 on two isolated runs; E5 **NOT_RUN** (no independent pixel replay or full raw Bridge event audit). Existing historical V1/V2 diagnostic FAIL retained.
+- [CI validation 42923577993](https://github.com/Kiddos19882/AutoDraw/actions/runs/42923577993) SUCCESS at W3 SHA; optional jobs SKIPPED; baseline W2 CI SUCCESS. Updated status, task tracker and evidence index only (plus concise work log/changelog). No source code/test changes, no new live execution, no production decision. Historical evidence artifacts retained unchanged.
+
 ## 2026-11-10/11 — FILL-001 V5 first combined automated E4 CHALK and active PNG-quality PASS
 
 Checked current HEAD `1c722ba` and prior HEAD, 20 commits, CI, primary Stage6 report, full 12 MB Monitor closed run and original PNGs. W2 attempt `51480631` completed all 29 with radius sequence10×28→2 in 75.657s, safe release; 34 pointer candidates include five zero-point confirmed slider operations, no telemetry errors. Automatic exact run bound `1→1710`=CHALK1709; fresh settled PNG captured with released cursor outside ROI, point counts stayed identical before/after parking. In contrast to earlier `36e95e4` which was quality FAIL due in part to moving cursor, this active predeclared `FILL001_CHALK_FIRST_PERIMETER_V2` is PASS (coverage99.3578%, overshoot1.327083≤3 logical px, 0 far pixels). V1/V2 zero-leakage gate still FAIL; independent E5 not performed. No original evidence/frozen masks/thresholds or production defaults changed. Next meaningful E4: separately clean board run for immutable W3; compare exact CHALK only among quality-PASS results, with E5 before production.
