@@ -45,6 +45,8 @@ def test_schedule_counts_order_and_identity():
     assert len(m["tasks"]) == 6
     assert [t["cycle"] for t in m["tasks"]] == [1, 1, 1, 2, 2, 2]
     assert [t["figure_in_cycle"] for t in m["tasks"]] == [1, 2, 3, 1, 2, 3]
+    assert [t["shape_id"] for t in m["tasks"]] == ["rectangle", "wide_irregular", "narrow_irregular"] * 2
+    assert [t["fill_method"] for t in m["tasks"]] == ["dense_scanlines"]*3 + ["spaced_scanlines"]*3
     assert m["execution_allowed"] is False
     assert m["automatic_clear_allowed"] is False
     validate_manifest(m)
