@@ -644,6 +644,217 @@ class Fill001Tab:
                     pass
             self._firefox_messages.put(("STOPPED", "Firefox-сессия завершена."))
 
+    def _run_fill001_series_in_firefox(
+        self, driver: Any, bridge_root: Path, session_id: str,
+    ) -> None:
+        """One bounded opt-in sequence on the existing Firefox, Stage6, Bridge.
+
+        No duplicate Clear executor: call the established ENGINE-001 calibrated
+        click+blank comparator. Each next task gets a new authenticated passive
+        BoardPane preflight, closed Monitor run, PNG and exact CHALK.
+        """
+        from fill001_series_runner import (
+            run_with_validated_callbacks, validate_manifest, SeriesBlocked,
+        )
+        from fill001_series_handoff import build_series_source_plan
+        from fill001_firefox_auto_probe import collect_verified_series_firefox_roi
+        from fill001_series_stage6_execution import normalized_series_run
+        from fill001_series_engine001_clear import clear_with_existing_engine001
+        from fill001_v5_live_gate import verify_v5_live_gate
+        from firefox_foreground_witness import firefox_foreground_witness
+        from fill001_series_statistics import write_analysis as write_series_analysis
+
+        manifest = self._series_pending_manifest
+        if not isinstance(manifest, dict):
+            raise SeriesBlocked("No operator-approved FILL001 series manifest")
+        validate_manifest(manifest)
+        if not callable(self.on_series_run):
+            raise SeriesBlocked("Stage6 series callback disconnected")
+        profile = getattr(self, "_series_profile", None)
+        blank_paths = getattr(self, "_series_blank_paths", None)
+        if (not isinstance(profile, dict)
+                or not isinstance(blank_paths, tuple)
+                or len(blank_paths) != 2):
+            raise SeriesBlocked("Existing ENGINE-001 Clear profile/reference missing")
+        blank_png, blank_meta_file = blank_paths
+        blank_meta = json.loads(blank_meta_file.read_text(encoding="utf-8"))
+        root_dir = self.output_dir / "series" / (manifest["series_id"] + "-runs")
+        state: dict[str, Any] = {"last_clear": None, "last_run": None}
+
+        def bridge_gate(*, blank: bool=False) -> dict:
+            if self._firefox_stop.is_set():
+                raise SeriesBlocked("Operator stopped the FILL001 series")
+            if firefox_foreground_witness(driver) is not True:
+                raise SeriesBlocked("Native Firefox foreground lost during series")
+            return verify_v5_live_gate(
+                bridge_root,session_id=session_id,
+                expected_mapping_sha256=state["mapping"]["boardpane_mapping_sha256"],
+                require_blank=blank,
+            )
+
+        def observe_blank(task: dict) -> dict:
+            if self._firefox_stop.is_set():
+                raise SeriesBlocked("Series stopped before new passive preflight")
+            source = build_series_source_plan(manifest,task["task_id"])
+            mapped,mapping,roi = collect_verified_series_firefox_roi(
+                manifest,driver,bridge_root,session_id,source,
+                native_mouse=pyautogui,
+                now_utc=lambda:datetime.now(timezone.utc),
+            )
+            state.update(source=source,mapped=mapped,mapping=mapping,roi=roi)
+            gate=bridge_gate(blank=True)
+            record={
+                "valid":True,"fresh_board":True,
+                "calibration_valid":True,
+                "session_id":session_id,
+                "mapping_sha256":mapping["boardpane_mapping_sha256"],
+                "observed_at_utc":gate["heartbeat_at_utc"],
+                "pointCount":gate["pointCount"],
+            }
+            if state["last_clear"] is not None:
+                record["blank_screen_verification"]=state["last_clear"]
+            self._firefox_messages.put((
+                "SERIES_PREFLIGHT",
+                f"Фигура {task['order']}/{len(manifest['tasks'])}: "
+                f"{task['shape_id']}, {task['fill_method']}, кисть {task['brush_radius']}. "
+                "Свежий Monitor и BoardPane подтверждены.",
+            ))
+            return record
+
+        def run_one(task: dict) -> dict:
+            if self._firefox_stop.is_set():
+                raise SeriesBlocked("Operator stopped before Stage6")
+            started=threading.Event()
+            done=threading.Event()
+            outcome: dict[str, Any]={}
+            def stage6_finished(result: dict) -> None:
+                outcome["report"]=result
+                done.set()
+            def start_on_ui_thread() -> None:
+                try:
+                    outcome["accepted"]=bool(self.on_series_run(
+                        manifest=manifest,task_id=task["task_id"],
+                        source=state["source"],mapped=state["mapped"],
+                        mapping=state["mapping"],roi=state["roi"],
+                        bridge_root=bridge_root,session_id=session_id,driver=driver,
+                        output_dir=root_dir / "stage6",
+                        finished_callback=stage6_finished,
+                    ))
+                except Exception as exc:
+                    outcome["error"]=f"{type(exc).__name__}: {exc}"
+                finally:
+                    started.set()
+            self.root.after(0,start_on_ui_thread)
+            if not started.wait(timeout=20) or outcome.get("accepted") is not True:
+                raise SeriesBlocked(
+                    "Stage6 refused the next series figure: " +
+                    str(outcome.get("error","callback timed out or refused"))
+                )
+            limit=time.monotonic()+3600
+            while not done.wait(timeout=.2):
+                if self._firefox_stop.is_set():
+                    raise SeriesBlocked("Operator stopped active Stage6; wait for safe mouse release")
+                if time.monotonic() > limit:
+                    raise SeriesBlocked("Stage6 figure timed out; stop before Clear")
+            report=outcome.get("report")
+            if not isinstance(report,dict):
+                raise SeriesBlocked("No Stage6 figure report")
+            state["last_run"]=report
+            return normalized_series_run(task,report)
+
+        def clear_and_verify(task: dict) -> dict:
+            previous=state.get("last_run")
+            if not isinstance(previous,dict) or not isinstance(previous.get("binding"),dict):
+                raise SeriesBlocked("Cannot clear before exact Stage6 run binding")
+            if self._firefox_stop.is_set():
+                raise SeriesBlocked("Operator stopped before Clear")
+            binding=previous["binding"]
+            gate=bridge_gate()
+            if gate["pointCount"] != binding["post_pointCount"]:
+                raise SeriesBlocked("Game counter moved between Stage6 and Clear")
+            def snapshot_from_bridge() -> dict:
+                deadline=time.monotonic()+8
+                last=state.get("snapshot_stamp", "")
+                while time.monotonic()<deadline:
+                    g=bridge_gate()
+                    stamp=g["heartbeat_at_utc"]
+                    if stamp>last:
+                        state["snapshot_stamp"]=stamp
+                        return {
+                            "session_id":session_id,
+                            "mapping_sha256":state["mapping"]["boardpane_mapping_sha256"],
+                            "pointCount":g["pointCount"],
+                            "maxPoints":g["maxPoints"],
+                            "remainingPoints":g["remainingPoints"],
+                            "isExact":g["exact"],
+                            "captured_at_utc":stamp,
+                        }
+                    if self._firefox_stop.wait(.2):
+                        raise SeriesBlocked("Operator stopped during Clear settle")
+                raise SeriesBlocked("No fresh exact Bridge heartbeat after Clear")
+            # Immediately bind the pre-Clear counter to the completed run.
+            state["snapshot_stamp"]=""
+            before=snapshot_from_bridge()
+            if before["pointCount"] != binding["post_pointCount"]:
+                raise SeriesBlocked("Pre-Clear snapshot does not match closed run")
+            region=profile["regions"]["board_area"]
+            def capture_board_roi() -> Image.Image:
+                screen=ImageGrab.grab()
+                size=profile["screen_size"]
+                if screen.size!=(size["width"],size["height"]):
+                    raise SeriesBlocked("Calibrated screen dimensions changed")
+                box=(region["x"],region["y"],
+                     region["x"]+region["width"],region["y"]+region["height"])
+                return screen.crop(box)
+            target=root_dir/"clear-png"/(task["task_id"]+"-after-clear.png")
+            clear=clear_with_existing_engine001(
+                profile=profile,reference_png=blank_png,
+                reference_metadata=blank_meta,
+                session_id=session_id,
+                mapping_sha256=state["mapping"]["boardpane_mapping_sha256"],
+                pre_clear_snapshot=before,
+                live_snapshot=snapshot_from_bridge,
+                grab_board_roi=capture_board_roi,
+                click=lambda x,y:pyautogui.click(x,y),
+                foreground_verified=lambda:firefox_foreground_witness(driver),
+                stop_requested=self._firefox_stop.is_set,
+                wait_settle=lambda:time.sleep(1.5),
+                after_clear_png=target,
+                mouse_released=previous.get("stage6_summary",{})
+                    .get("mouse_release",{}).get("succeeded") is True,
+            )
+            state["last_clear"]=clear["blank_screen_verification"]
+            state["last_run"]=None
+            self._firefox_messages.put((
+                "SERIES_CLEAR",
+                f"Штатный Clear после фигуры {task['order']} подтверждён "
+                "эталоном ENGINE-001 и exact game counter.",
+            ))
+            return clear
+
+        report=run_with_validated_callbacks(
+            manifest,results_dir=root_dir,
+            observe_blank=observe_blank,run_one=run_one,
+            clear_and_verify=clear_and_verify,
+            stop_requested=self._firefox_stop.is_set,
+        )
+        try:
+            analysis=root_dir/(manifest["series_id"]+".analytics.json")
+            write_series_analysis(manifest,root_dir,analysis)
+            report["analysis_path"]=str(analysis)
+        except (ValueError,TypeError,OSError) as exc:
+            report["analysis_error"]=f"{type(exc).__name__}: {exc}"
+        self._firefox_messages.put((
+            "SERIES_FINISHED",
+            f"Серия {manifest['series_id']}: статус={report['status']}, "
+            f"полных quality PASS={report['accepted']}, "
+            f"quality FAIL={report['quality_failed']}, "
+            f"подробности: {root_dir}",
+        ))
+        self._series_pending_manifest=None
+        self._firefox_execute_series=False
+        self.root.after(0,self.root.deiconify)
+
     def _on_v5_stage6_finished(self, result: dict) -> None:
         self._v5_stage6_completed.set()
         if result.get("failure_stage") == "BRUSH_SLIDER_NO_RESPONSE":
