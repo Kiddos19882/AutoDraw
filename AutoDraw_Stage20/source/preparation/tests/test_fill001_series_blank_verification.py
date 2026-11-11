@@ -42,7 +42,7 @@ def test_exact_png_and_settled_counter_pass(tmp_path):
         mapping_sha256=MAPPING,
         reference_blank_png=p,
         after_clear_png=after,
-        pre_clear_snapshot=snap(1707, 0),
+        reference_blank_snapshot=snap(1, -1), pre_clear_snapshot=snap(1707, 0),
         settled_snapshots=[snap(1, 1), snap(1, 2)],
         cursor_parked_off_roi=True,
         mouse_released=True,
@@ -74,7 +74,7 @@ def test_counter_provenance_fail_closed(tmp_path, tamper):
         verify_blank_screen_after_clear(
             session_id=SID, mapping_sha256=MAPPING,
             reference_blank_png=a, after_clear_png=b,
-            pre_clear_snapshot=pre, settled_snapshots=post,
+            reference_blank_snapshot=snap(1, -1), pre_clear_snapshot=pre, settled_snapshots=post,
             cursor_parked_off_roi=True, mouse_released=True,
         )
 
@@ -90,7 +90,7 @@ def test_visible_residual_never_accepted_even_if_counter_reset(tmp_path):
         verify_blank_screen_after_clear(
             session_id=SID, mapping_sha256=MAPPING,
             reference_blank_png=a, after_clear_png=b,
-            pre_clear_snapshot=snap(200, 0),
+            reference_blank_snapshot=snap(1, -1), pre_clear_snapshot=snap(200, 0),
             settled_snapshots=[snap(1, 1), snap(1, 2)],
             cursor_parked_off_roi=True, mouse_released=True,
         )
@@ -108,6 +108,7 @@ def test_no_unsafe_tolerance_or_pointer_state(tmp_path, kwargs):
     params = {
         "session_id": SID, "mapping_sha256": MAPPING,
         "reference_blank_png": a, "after_clear_png": a,
+        "reference_blank_snapshot": snap(1, -1),
         "pre_clear_snapshot": snap(200, 0),
         "settled_snapshots": [snap(1, 1), snap(1, 2)],
         "cursor_parked_off_roi": True, "mouse_released": True,
