@@ -341,3 +341,50 @@ def test_engine001_existing_clear_proof_is_accepted_without_zero_pixel_rule():
     proof["engine001_tolerance_percent"] = 0.15
     proof["session_id"] = "foreign"
     assert _clear_proof_valid(proof, "session-1") is False
+
+
+def test_shared_owner_lock_blocks_parallel_auto_draw_process(tmp_path):
+    from chalk_test_blocks import (
+        acquire_chalk_block_owner_lock, release_chalk_block_owner_lock,
+    )
+    from fill001_series_runner import run_with_series_owner_lock
+    m = manifest(cycles=1, figures_per_cycle=1)
+    parent = tmp_path / "series"
+    parent.mkdir()
+    held = acquire_chalk_block_owner_lock(parent / "series-owner.json")
+    assert held is not None
+    state, observe, run, clear = fake_callbacks()
+    try:
+        with pytest.raises(SeriesBlocked, match="owner"):
+            run_with_series_owner_lock(
+                m, results_dir=parent / "run-a",
+                observe_blank=observe, run_one=run,
+                clear_and_verify=clear,
+            )
+        assert state == {"n": 0, "clears": 0}
+    finally:
+        release_chalk_block_owner_lock(held)
+
+
+def test_series_owner_lock_released_after_success(tmp_path):
+    from fill001_series_runner import run_with_series_owner_lock
+    m = manifest(cycles=1, figures_per_cycle=1)
+    state, observe, run, clear = fake_callbacks()
+    folder = tmp_path / "series" / "run"
+    result = run_with_series_owner_lock(
+        m, results_dir=folder,
+        observe_blank=observe, run_one=run, clear_and_verify=clear,
+    )
+    assert result["status"] == "completed"
+    assert result["accepted"] == 1
+    assert state == {"n": 1, "clears": 0}
+    state2, observe2, run2, clear2 = fake_callbacks()
+    m2 = build_manifest(
+        cycles=1, figures_per_cycle=1, shapes=["rectangle"],
+        methods=["dense_scanlines"], radii=[10], series_id="different-series",
+    )
+    next_result = run_with_series_owner_lock(
+        m2, results_dir=tmp_path / "series" / "other",
+        observe_blank=observe2, run_one=run2, clear_and_verify=clear2,
+    )
+    assert next_result["accepted"] == 1
