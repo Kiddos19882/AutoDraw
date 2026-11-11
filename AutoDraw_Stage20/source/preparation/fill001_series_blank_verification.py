@@ -71,7 +71,8 @@ def _read_png(path: Path) -> tuple[np.ndarray, str]:
 def verify_blank_screen_after_clear(
     *, session_id: str, mapping_sha256: str,
     reference_blank_png: Path, after_clear_png: Path,
-    pre_clear_snapshot: dict, settled_snapshots: list[dict],
+    reference_blank_snapshot: dict, pre_clear_snapshot: dict,
+    settled_snapshots: list[dict],
     cursor_parked_off_roi: bool, mouse_released: bool,
     allow_rgb_pixel_differences: int = 0,
 ) -> dict:
@@ -95,6 +96,10 @@ def verify_blank_screen_after_clear(
         raise BlankVerificationError("Invalid mapping hash") from exc
     if not isinstance(settled_snapshots, list) or len(settled_snapshots) < 2:
         raise BlankVerificationError("At least two exact settled observations required")
+    reference_state = _snapshot(reference_blank_snapshot, session_id=session_id,
+                                mapping_sha256=mapping_sha256)
+    if reference_state["pointCount"] != 1:
+        raise BlankVerificationError("Reference screenshot lacks same-session blank counter")
     before = _snapshot(pre_clear_snapshot, session_id=session_id, mapping_sha256=mapping_sha256)
     settled = [_snapshot(x, session_id=session_id, mapping_sha256=mapping_sha256)
                for x in settled_snapshots]
@@ -102,7 +107,7 @@ def verify_blank_screen_after_clear(
         raise BlankVerificationError("No painted pre-Clear board proven")
     if any(x["pointCount"] != 1 or x["maxPoints"] != before["maxPoints"] for x in settled):
         raise BlankVerificationError("Counter did not return to exact clean baseline")
-    times = [_time(x["captured_at_utc"]) for x in [before, *settled]]
+    times = [_time(x["captured_at_utc"]) for x in [reference_state, before, *settled]]
     if not all(b > a for a, b in zip(times, times[1:])):
         raise BlankVerificationError("Snapshots are stale or out of sequence")
     reference, ref_sha = _read_png(reference_blank_png)
@@ -121,6 +126,7 @@ def verify_blank_screen_after_clear(
         "reference_png_sha256": ref_sha, "post_clear_png_sha256": after_sha,
         "reference_dimensions": [int(reference.shape[1]), int(reference.shape[0])],
         "changed_screen_pixels": mismatch,
+        "reference_blank_pointCount": reference_state["pointCount"],
         "pre_clear_pointCount": before["pointCount"],
         "post_clear_pointCount": settled[-1]["pointCount"],
         "settled_observations": len(settled),
