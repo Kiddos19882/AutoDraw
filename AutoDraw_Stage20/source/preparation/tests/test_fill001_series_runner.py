@@ -35,8 +35,15 @@ def fake_callbacks(*, invalid_run=False, invalid_clear=False):
                 "before_png_sha256": "a"*64, "after_settled_png_sha256": "b"*64}
     def clear(task):
         state["clears"] += 1
+        proof = {"schema": "FILL001_SERIES_BLANK_SCREEN_VERIFICATION_V1",
+                 "status": "PASS", "session_id": f"fresh-{state['n']}",
+                 "post_clear_pointCount": 1, "changed_screen_pixels": 0,
+                 "reference_png_sha256": "a"*64,
+                 "post_clear_png_sha256": "b"*64,
+                 "clear_ui_action_proven": False}
         return {"valid": not invalid_clear, "pointCount": 1,
-                "mouse_released": True, "fresh_board": True}
+                "mouse_released": True, "fresh_board": True,
+                "blank_screen_verification": proof}
     return state, observe, run, clear
 
 
@@ -147,3 +154,20 @@ def test_existing_run_never_overwritten(tmp_path):
     assert report["status"] == "blocked"
     assert state["n"] == 0
     assert path.read_text(encoding="utf-8") == "immutable evidence"
+
+def test_missing_blank_screen_proof_never_advances(tmp_path):
+    m = manifest()
+    state, observe, run, clear = fake_callbacks()
+    def unsafe_clear(task):
+        payload = clear(task)
+        payload.pop("blank_screen_verification")
+        return payload
+    report = run_with_validated_callbacks(
+        m, results_dir=tmp_path, observe_blank=observe,
+        run_one=run, clear_and_verify=unsafe_clear)
+    assert report["status"] == "blocked"
+    assert report["accepted"] == 1
+    assert state["n"] == 1
+    path = next(tmp_path.glob("*.clear.json"))
+    data = json.loads(path.read_text(encoding="utf-8"))
+    assert data["status"] == "BLOCKED"
