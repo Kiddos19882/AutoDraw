@@ -220,3 +220,82 @@ def test_immutable_summary_blocks_repeat_before_callbacks(tmp_path):
             run_one=run, clear_and_verify=clear)
     assert state == {"n": 0, "clears": 0}
     assert summary.read_text(encoding="utf-8") == "original summary"
+
+
+def test_same_bridge_session_allowed_after_verified_clear(tmp_path):
+    m = manifest(cycles=1, figures_per_cycle=3)
+    state = {"n": 0, "clears": 0, "proof": None}
+    def observe(task):
+        state["n"] += 1
+        x = {"valid": True, "fresh_board": True,
+             "pointCount": 1, "calibration_valid": True,
+             "session_id": "persistent-session"}
+        if state["proof"] is not None:
+            x["blank_screen_verification"] = state["proof"]
+        return x
+    def run(task):
+        return {
+            "task_id": task["task_id"], "session_id": "persistent-session",
+            "run_id": "run-" + str(state["n"]),
+            "execution_status": "completed", "monitor_binding": "EXACT_RUN_BOUND",
+            "quality_gate": "PASS", "mouse_release_succeeded": True,
+            "pre_pointCount": 1, "post_pointCount": 101, "actual_chalk": 100,
+            "before_png_sha256": "a"*64, "after_settled_png_sha256": "b"*64,
+        }
+    def clear(task):
+        state["clears"] += 1
+        proof = {
+            "schema": "FILL001_SERIES_BLANK_SCREEN_VERIFICATION_V1",
+            "status": "PASS", "session_id": "persistent-session",
+            "post_clear_pointCount": 1, "changed_screen_pixels": 0,
+            "reference_png_sha256": "a"*64,
+            "post_clear_png_sha256": "b"*64,
+            "clear_ui_action_proven": False,
+        }
+        state["proof"] = proof
+        return {"valid": True, "pointCount": 1, "mouse_released": True,
+                "fresh_board": True, "blank_screen_verification": proof}
+    report = run_with_validated_callbacks(
+        m, results_dir=tmp_path, observe_blank=observe,
+        run_one=run, clear_and_verify=clear)
+    assert report["status"] == "completed"
+    assert report["accepted"] == 3
+    assert state["clears"] == 2
+
+
+def test_same_session_without_clear_provenance_stops_before_second_draw(tmp_path):
+    m = manifest(cycles=1, figures_per_cycle=3)
+    state, _, run, clear = fake_callbacks()
+    def observe(task):
+        state["n"] += 1
+        return {"valid": True, "fresh_board": True, "pointCount": 1,
+                "calibration_valid": True, "session_id": "reused"}
+    def run_reused(task):
+        result = run(task)
+        result["session_id"] = "reused"
+        return result
+    def clear_reused(task):
+        result = clear(task)
+        result["blank_screen_verification"]["session_id"] = "reused"
+        return result
+    result = run_with_validated_callbacks(
+        m, results_dir=tmp_path, observe_blank=observe,
+        run_one=run_reused, clear_and_verify=clear_reused)
+    assert result["status"] == "blocked"
+    assert result["accepted"] == 1
+    assert state["n"] == 2
+
+
+def test_recycled_bridge_run_id_blocked_even_in_distinct_sessions(tmp_path):
+    m = manifest(cycles=1, figures_per_cycle=3)
+    state, observe, run, clear = fake_callbacks()
+    def reused_run(task):
+        value = run(task)
+        value["run_id"] = "recycled"
+        return value
+    report = run_with_validated_callbacks(
+        m, results_dir=tmp_path, observe_blank=observe,
+        run_one=reused_run, clear_and_verify=clear)
+    assert report["status"] == "blocked"
+    assert report["accepted"] == 1
+    assert state["n"] == 2
