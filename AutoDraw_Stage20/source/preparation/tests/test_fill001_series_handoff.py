@@ -41,7 +41,7 @@ def test_full_factorial_source_identity_and_nonexecutability():
     lambda x: x["generation"].update(automatic_execution_allowed=True),
     lambda x: x["strokes"][0]["points"][0].update(x=99999),
     lambda x: x["strokes"][0]["metadata"].update(brush_value="30"),
-    lambda x: x["generation"].update(shape_id="rectangle"),
+    lambda x: x["generation"].update(shape_id="wide_irregular"),
     lambda x: x["generation"].update(source_strokes_sha256="wrong"),
     lambda x: x["summary"].update(estimated_sampling_points_are_exact_chalk=True),
 ])
