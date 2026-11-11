@@ -104,18 +104,38 @@ def test_all_figures_capture_then_clear_except_final(tmp_path):
     assert len(list(tmp_path.glob("*.json"))) == 11
 
 
-def test_no_clear_after_quality_fail_and_negative_result_saved(tmp_path):
+def test_quality_fail_is_retained_and_still_requires_verified_clear(tmp_path):
     m = manifest()
     state, observe, run, clear = fake_callbacks(invalid_run=True)
     report = run_with_validated_callbacks(
         m, results_dir=tmp_path,
         observe_blank=observe, run_one=run, clear_and_verify=clear)
+    assert report["status"] == "completed"
+    assert report["accepted"] == 0
+    assert report["quality_failed"] == 6
+    assert report["completed_with_bound_chalk"] == 6
+    assert report["exact_chalk_sum_of_quality_failed_runs"] == 600
+    assert state["clears"] == 5
+    saved = [p for p in tmp_path.glob("*.json") if not p.name.endswith(".clear.json")]
+    assert len(saved) == 6
+    assert all(json.loads(p.read_text(encoding="utf-8"))["status"] == "QUALITY_FAIL"
+               for p in saved)
+
+
+def test_incomplete_chalk_stops_without_clear(tmp_path):
+    m = manifest()
+    state, observe, run, clear = fake_callbacks()
+    def invalid_run(task):
+        payload = run(task)
+        payload["actual_chalk"] = 99
+        return payload
+    report = run_with_validated_callbacks(
+        m, results_dir=tmp_path,
+        observe_blank=observe, run_one=invalid_run, clear_and_verify=clear)
     assert report["status"] == "blocked"
     assert report["accepted"] == 0
+    assert report["quality_failed"] == 0
     assert state["clears"] == 0
-    saved = list(tmp_path.glob("*.json"))
-    assert len(saved) == 1
-    assert json.loads(saved[0].read_text(encoding="utf-8"))["status"] == "BLOCKED"
 
 
 def test_no_next_figure_on_unverified_clear(tmp_path):
