@@ -66,7 +66,8 @@ def build_manifest(*, cycles: int, figures_per_cycle: int,
             or any(c not in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_" for c in series_id)):
         raise SeriesBlocked("Invalid series_id")
 
-    variants = [(s, m, r) for s in shapes for m in methods for r in radii]
+    # Vary shape on consecutive drawings; sweep methods, then brush widths.
+    variants = [(s, m, r) for r in radii for m in methods for s in shapes]
     tasks = []
     for cycle in range(1, cycles + 1):
         for figure in range(1, figures_per_cycle + 1):
