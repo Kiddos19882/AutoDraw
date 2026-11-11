@@ -1,5 +1,10 @@
 # AutoDraw — журнал выполненных действий
 
+## 2026-11-11 — FILL-001 archived W2/W3 independent E5 audit
+
+- Added independent read-only source `fill001_v5_independent_e5.py` [`014132c`](https://github.com/Kiddos19882/AutoDraw/commit/014132cde1c2f708236ae8140a3c1067e6f1f7f7) and dedicated GitHub Actions workflow [`dae4e18`](https://github.com/Kiddos19882/AutoDraw/commit/dae4e183712e0acde430f131aae45dc3940a5cbb). [CI 42944487257](https://github.com/Kiddos19882/AutoDraw/actions/runs/42944487257) completed SUCCESS, [numeric JSON evidence artifact](https://github.com/Kiddos19882/AutoDraw/actions/runs/42944487257/artifacts/13822167330) uploaded. Analyzer read original PNG bytes, checked SHA256 and frozen mask, independently recalculated RGB quality using scipy Euclidean distances, and parsed full immutable Bridge 8176/8157 event streams with exact point counter and stroke/slider checks.
+- Scoped **E5 PASS**: W2 1709 CHALK / 99.3578% coverage; W3 1706 CHALK / 99.3775% coverage; both zero overshoot beyond 3 logical pixels, 2 accepted, 0 rejected, 0 missing. Repeatability, independent new runtime execution, multi-color and production validation NOT_RUN. No production code/defaults changed; old evidence untouched.
+
 ## 2026-11-11 — FILL-001 V5 W3 evidence reconciliation (read-only source audit; documentation update)
 
 - GitHub `feature/image-geometry-optimization` HEAD `832bf2b`; 20 remote commits and available Actions inspected. W3 primary attempt `8f770c4a-43a6-478f-b581-8af006cde6ec`, closed Bridge run `ca3bfa8b-a339-4c11-9f98-ed3881a16ad7` on immutable commit `832bf2b`.
