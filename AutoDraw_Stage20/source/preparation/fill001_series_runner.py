@@ -143,6 +143,9 @@ def run_with_validated_callbacks(
     validate_manifest(manifest)
     results_dir = Path(results_dir)
     results_dir.mkdir(parents=True, exist_ok=True)
+    summary_path = results_dir / (manifest["series_id"] + ".summary.json")
+    if summary_path.exists():
+        raise SeriesBlocked("An immutable series summary already exists; use a new series ID")
     accepted = []
     quality_failed = []
     seen_sessions: set[str] = set()
@@ -160,8 +163,8 @@ def run_with_validated_callbacks(
                   "brush_radius": task["brush_radius"], "status": "BLOCKED",
                   "actual_chalk": None, "quality_gate": "NOT_EVALUATED"}
         path = results_dir / (task["task_id"] + ".json")
-        if path.exists():
-            status, issue = "blocked", "Existing task result: never overwrite or rerun"
+        if path.exists() or (results_dir / (task["task_id"] + ".clear.json")).exists():
+            status, issue = "blocked", "Existing run or Clear evidence: never overwrite or rerun"
             break
         try:
             pre = observe_blank(task)
@@ -265,15 +268,20 @@ def run_with_validated_callbacks(
             row["min_exact_chalk"] = chalk if row["min_exact_chalk"] is None else min(row["min_exact_chalk"], chalk)
             row["max_exact_chalk"] = chalk if row["max_exact_chalk"] is None else max(row["max_exact_chalk"], chalk)
             row["mean_exact_chalk"] = row["total_exact_chalk"] / row["accepted"]
-    return {"schema": "FILL001_SERIES_SUMMARY_V1", "series_id": manifest["series_id"],
-            "status": status, "issue": issue, "scheduled": len(manifest["tasks"]),
-            "accepted": len(accepted), "quality_failed": len(quality_failed),
-            "completed_with_bound_chalk": len(accepted) + len(quality_failed),
-            "exact_chalk_sum_of_accepted_runs": sum(r["actual_chalk"] for r in accepted),
-            "exact_chalk_sum_of_quality_failed_runs": sum(r["actual_chalk"] for r in quality_failed),
-            "exact_chalk_is_per_run_only": True,
-            "grouped_exact_chalk_statistics": groups,
-            "next_task_requires_fresh_session": True}
+    summary = {"schema": "FILL001_SERIES_SUMMARY_V1", "series_id": manifest["series_id"],
+               "manifest_sha256": manifest["manifest_sha256"],
+               "status": status, "issue": issue, "scheduled": len(manifest["tasks"]),
+               "accepted": len(accepted), "quality_failed": len(quality_failed),
+               "completed_with_bound_chalk": len(accepted) + len(quality_failed),
+               "exact_chalk_sum_of_accepted_runs": sum(r["actual_chalk"] for r in accepted),
+               "exact_chalk_sum_of_quality_failed_runs": sum(r["actual_chalk"] for r in quality_failed),
+               "exact_chalk_is_per_run_only": True,
+               "grouped_exact_chalk_statistics": groups,
+               "next_task_requires_fresh_session": True}
+    with summary_path.open("x", encoding="utf-8") as stream:
+        json.dump(summary, stream, ensure_ascii=False, indent=2)
+        stream.write("\n")
+    return summary
 
 
 def main() -> int:
