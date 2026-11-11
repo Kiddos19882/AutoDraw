@@ -1,5 +1,15 @@
 # AutoDraw — действующие задачи
 
+## FILL001-SERIES-001 — многофигурный циклический тест, безопасный этап 1 (2026-11-11)
+
+- [x] Сформулировать контракт: циклы × фигур за цикл; разные frozen shapes, scanline methods и радиусы; каждая фигура отдельный run с собственным session, exact CHALK и before/settled PNG, immutable original JSON; fail-closed без пропуска ошибочных запусков.
+- [x] Реализовать `fill001_series_runner.py` с CLI `--cycles --figures-per-cycle --shapes --methods --radii --output`, unique offline manifest (`execution_allowed=false`) и callback orchestration без прямых game input/clear calls.
+- [x] Добавить ручные параметры и кнопку создания offline manifest в существующую вкладку FILL-001; синтетические проверки создают manifests, группируют CHALK, проверяют negative run/clear и запрет перезаписи.
+- [ ] Подтвердить финальные CI SHA `4b509676701e8052e36693e1ee2c050630a275b0` и UI syntax/regression на SHA `3a7f939` либо более новом, затем docs integrity.
+- [ ] **Блокер live:** идентифицировать подтверждённый игровой Clear/reset action и его telemetry; определить завершение очистки по same-session exact reset и проверке исходного экрана. Не считать pointCount=1 единственным доказательством чистой доски; нужен независимый run-bound blank-screen gate.
+- [ ] Реализовать opt-in автоматическое `Clear → prove blank → isolated Stage6 full figure → exact CHALK/PNG/Monitor capture → immutable report` для всех задач только после E2/E3 gate, без изменения legacy batch permissions или production defaults. Сейчас серия фактически не взаимодействует с игрой.
+- [ ] Независимая E5-validation на трех frozen формах, нескольких scanline variants и radius; quality failure и отрицательные результаты сохранять. Повторяемость W2/W3, multi-color и wide/narrow holdout остаются отдельными заданиями.
+
 ## FILL-001 V5 — E5 audit of archived W2/W3 completed, next gates (2026-11-11)
 
 - [x] New independent read-only analyzer `source/preparation/fill001_v5_independent_e5.py` added `014132c`, workflow `dae4e18`; [E5 CI run 42944487257](https://github.com/Kiddos19882/AutoDraw/actions/runs/42944487257) **SUCCESS**, original JSON artifact [13822167330](https://github.com/Kiddos19882/AutoDraw/actions/runs/42944487257/artifacts/13822167330), 2 accepted / 0 rejected / 0 missing. Independent SciPy RGB/geometry and raw full Bridge event audits matched W2/W3 original reports, PNG hashes, frozen mask and run-bound exact counters.
