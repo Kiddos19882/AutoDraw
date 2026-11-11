@@ -130,6 +130,7 @@ def verify_blank_screen_after_clear(
         "pre_clear_pointCount": before["pointCount"],
         "post_clear_pointCount": settled[-1]["pointCount"],
         "settled_observations": len(settled),
+        "last_settled_at_utc": settled[-1]["captured_at_utc"],
         "clear_ui_action_proven": False,
         "live_clear_operation_executed_by_verifier": False,
     }
