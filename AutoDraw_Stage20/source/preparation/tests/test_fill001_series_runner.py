@@ -40,7 +40,9 @@ def fake_callbacks(*, invalid_run=False, invalid_clear=False):
                  "post_clear_pointCount": 1, "changed_screen_pixels": 0,
                  "reference_png_sha256": "a"*64,
                  "post_clear_png_sha256": "b"*64,
-                 "clear_ui_action_proven": False}
+                 "clear_ui_action_proven": False,
+                 "mapping_sha256": "a"*64,
+                 "last_settled_at_utc": "2026-11-11T00:00:11+00:00"}
         return {"valid": not invalid_clear, "pointCount": 1,
                 "mouse_released": True, "fresh_board": True,
                 "blank_screen_verification": proof}
