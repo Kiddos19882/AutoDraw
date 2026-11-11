@@ -7,8 +7,10 @@ on:
     paths:
       - ".github/workflows/fill001-series-tests.yml"
       - "AutoDraw_Stage20/source/preparation/fill001_series_runner.py"
+      - "AutoDraw_Stage20/source/preparation/fill001_series_offline_plans.py"
       - "AutoDraw_Stage20/source/preparation/fill001_series_blank_verification.py"
       - "AutoDraw_Stage20/source/preparation/tests/test_fill001_series_runner.py"
+      - "AutoDraw_Stage20/source/preparation/tests/test_fill001_series_offline_plans.py"
       - "AutoDraw_Stage20/source/preparation/tests/test_fill001_series_blank_verification.py"
   workflow_dispatch:
 
@@ -29,11 +31,15 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install offline audit dependencies
-        run: python -m pip install pytest numpy pillow
+        run: python -m pip install pytest numpy pillow opencv-python-headless
       - name: Run synthetic-only serial orchestration tests
-        run: python -m pytest -q -ra tests/test_fill001_series_runner.py tests/test_fill001_series_blank_verification.py
+        run: python -m pytest -q -ra tests/test_fill001_series_runner.py tests/test_fill001_series_blank_verification.py tests/test_fill001_series_offline_plans.py
       - name: Syntax-check existing FILL-001 UI and series module
-        run: python -m py_compile chalk_fill_ui.py fill001_series_runner.py fill001_series_blank_verification.py
+        run: python -m py_compile chalk_fill_ui.py fill001_series_runner.py fill001_series_blank_verification.py fill001_series_offline_plans.py
       - name: Smoke-test offline 2-cycle manifest
         run: |
           python fill001_series_runner.py --cycles 2 --figures-per-cycle 3 --output "${RUNNER_TEMP}/series-manifest.json"
+      - name: Smoke-test complete frozen shape/method/radius matrix offline
+        run: |
+          python fill001_series_runner.py --cycles 3 --figures-per-cycle 10 --output "${RUNNER_TEMP}/full-manifest.json"
+          python fill001_series_offline_plans.py --manifest "${RUNNER_TEMP}/full-manifest.json" --output "${RUNNER_TEMP}/full-geometry.json"
