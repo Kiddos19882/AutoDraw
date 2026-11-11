@@ -1,5 +1,11 @@
 # AutoDraw — реестр проверенных результатов
 
+## FILL001-SERIES-001 — проверка кода интеграции и исторического Clear, 2026-11-11
+
+**Историческая первичная E4:** ENGINE-001 one-click Brush Lab Clear 9/9 PASS на реальной игре, описано в GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md. Фактический Clear использует `pyautogui.click` откалиброванной кнопки и `evaluate_board_clear` с допуском 0.15% — критерий не изменён. **Новые series runtime E4/E5: NOT_RUN**; данные ENGINE-001 нельзя переносить на связку широких/узких масок автоматически.
+
+**E2/E3 новый код:** [dedicated series run 42975744219](https://github.com/Kiddos19882/AutoDraw/actions/runs/42975744219) SUCCESS на `fcd29dc`, в т.ч. проверка общего owner lock, generic Bridge binding, preflight/Stage6 report/GUI syntax. После следующей UI-only правки итоговые CI SHA проверяются отдельно. Успешные frozen W2/W3 E4/E5 остаются отдельными одиночными результатами.
+
 ## FILL001-SERIES-001 — offline factorial and safety validation, 2026-11-11
 
 **E1/E2/E3, не live E4:** frozen `build_fixed_radius_fill_plan` и `FILL001_RS_SCANLINE_CONFIGS` дают 30 вариантов; каждый имеет подписанный immutable shape/method/radius и `estimated_sampling_points_are_exact_chalk=false`. [CI 42968857617](https://github.com/Kiddos19882/AutoDraw/actions/runs/42968857617) SUCCESS. [CI 42970208091](https://github.com/Kiddos19882/AutoDraw/actions/runs/42970208091) SUCCESS, 58 synthetic tests covering configurations, manifest tamper, source plan identity, Clear screenshot verification, grouped statistics and monitor/counter guards. No game input; real batch CHALK, quality, actual UI Clear NOT_RUN. `e0b10bf` final same-session freshness and overall CI pending separate check. Historical red intermediate CI runs retained, not counted as final PASS.
