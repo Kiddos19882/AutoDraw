@@ -65,6 +65,7 @@ class Fill001Tab:
         on_transfer_plan: Callable[[dict[str, Any], Path], bool],
         on_start: Callable[[int, dict[str, Any], Path], bool],
         on_v5_run: Callable[..., bool] | None = None,
+        on_series_run: Callable[..., bool] | None = None,
         on_v5_cancel: Callable[[], None] | None = None,
     ) -> None:
         self.root = root
@@ -74,6 +75,7 @@ class Fill001Tab:
         self.on_transfer_plan = on_transfer_plan
         self.on_start = on_start
         self.on_v5_run = on_v5_run
+        self.on_series_run = on_series_run
         self.on_v5_cancel = on_v5_cancel
         self.v5_run_after_probe_var = tk.BooleanVar(value=True)
         self.matrix: dict[str, Any] | None = None
