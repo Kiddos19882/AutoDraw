@@ -59,12 +59,12 @@ def test_generic_preflight_accepts_existing_frozen_nonrectangle_plan():
     lambda a:a["mapping"].update(no_fallback=False),
     lambda a:a["mapping"].update(session_id="other"),
     lambda a:a.update(foreground_verified=lambda:False),
-    lambda a:a.update(live_exact_gate=lambda:{**a["live_exact_gate"](),"pointCount":20}),
+    lambda a:a.update(live_exact_gate=lambda:{"session_id":"sess","mapping_sha256":"a"*64,"pointCount":20,"remainingPoints":5980,"blank_counter_confirmed":False,"exact":True,"currentRadius":30}),
     lambda a:a["calibration"].update(initial_value=10),
     lambda a:a["mapping"]["board_screen_corners"].update(right=870.0),
     lambda a:a["mapped"]["strokes"][0]["metadata"].update(brush_value="30"),
     lambda a:a["mapping"]["screen_roi"].update(width=123),
-    lambda a:a["calibration"].update(y=250),
+    lambda a:a["calibration"].update(y=1200),
 ])
 def test_generic_preflight_rejects_ambiguous_live_inputs(damage):
     args=scenario()
