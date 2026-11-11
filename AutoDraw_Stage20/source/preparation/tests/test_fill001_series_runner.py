@@ -88,6 +88,8 @@ def test_all_figures_capture_then_clear_except_final(tmp_path):
     assert report["status"] == "completed"
     assert report["accepted"] == 6
     assert report["exact_chalk_sum_of_accepted_runs"] == 600
+    assert sum(x["accepted"] for x in report["grouped_exact_chalk_statistics"]["shape"].values()) == 6
+    assert sum(x["total_exact_chalk"] for x in report["grouped_exact_chalk_statistics"]["brush"].values()) == 600
     assert state == {"n": 6, "clears": 5}
     assert len(list(tmp_path.glob("*.json"))) == 11
 
@@ -115,6 +117,9 @@ def test_no_next_figure_on_unverified_clear(tmp_path):
     assert report["status"] == "blocked"
     assert report["accepted"] == 1
     assert state == {"n": 1, "clears": 1}
+    negative = list(tmp_path.glob("*.clear.json"))
+    assert len(negative) == 1
+    assert json.loads(negative[0].read_text(encoding="utf-8"))["status"] == "BLOCKED"
 
 
 def test_stop_before_game_interaction(tmp_path):
