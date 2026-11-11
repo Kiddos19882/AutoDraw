@@ -727,8 +727,10 @@ class Fill001Tab:
             started=threading.Event()
             done=threading.Event()
             outcome: dict[str, Any]={}
+            self._v5_stage6_completed.clear()
             def stage6_finished(result: dict) -> None:
                 outcome["report"]=result
+                self._v5_stage6_completed.set()
                 done.set()
             def start_on_ui_thread() -> None:
                 try:
@@ -746,16 +748,29 @@ class Fill001Tab:
                     started.set()
             self.root.after(0,start_on_ui_thread)
             if not started.wait(timeout=20) or outcome.get("accepted") is not True:
+                self._v5_stage6_completed.set()
                 raise SeriesBlocked(
                     "Stage6 refused the next series figure: " +
                     str(outcome.get("error","callback timed out or refused"))
                 )
             limit=time.monotonic()+3600
+            stopped=False
             while not done.wait(timeout=.2):
                 if self._firefox_stop.is_set():
-                    raise SeriesBlocked("Operator stopped active Stage6; wait for safe mouse release")
+                    # Existing Stop invokes Stage6 stop_event, which must finish
+                    # its own mouse-release finally before browser teardown.
+                    stopped=True
                 if time.monotonic() > limit:
-                    raise SeriesBlocked("Stage6 figure timed out; stop before Clear")
+                    self._firefox_messages.put((
+                        "SERIES_BLOCKED",
+                        "Stage6 timeout: use Stop; Firefox is retained until "
+                        "the executor reports mouse-release completion.",
+                    ))
+                    self._firefox_stop.wait()
+                    stopped=True
+                # Do not return while Stage6 still owns mouseDown.
+            if stopped:
+                raise SeriesBlocked("Operator stopped Stage6 after its safe release")
             report=outcome.get("report")
             if not isinstance(report,dict):
                 raise SeriesBlocked("No Stage6 figure report")
