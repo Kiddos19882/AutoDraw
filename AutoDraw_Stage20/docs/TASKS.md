@@ -1,5 +1,12 @@
 # AutoDraw — действующие задачи
 
+## FILL-001 V5 — E5 audit of archived W2/W3 completed, next gates (2026-11-11)
+
+- [x] New independent read-only analyzer `source/preparation/fill001_v5_independent_e5.py` added `014132c`, workflow `dae4e18`; [E5 CI run 42944487257](https://github.com/Kiddos19882/AutoDraw/actions/runs/42944487257) **SUCCESS**, original JSON artifact [13822167330](https://github.com/Kiddos19882/AutoDraw/actions/runs/42944487257/artifacts/13822167330), 2 accepted / 0 rejected / 0 missing. Independent SciPy RGB/geometry and raw full Bridge event audits matched W2/W3 original reports, PNG hashes, frozen mask and run-bound exact counters.
+- [x] Scope: W2 E5 CHALK1709, coverage99.3578%, 599 halo pixels, 0 beyond3px, 8176 Monitor events; W3 E5 CHALK1706, coverage99.3775%, 600 halo pixels, 0 beyond3px, 8157 events. Both quality PASS under unchanged DEC-030; historic strict diagnostic FAIL preserved. W3 provisional winner by 3 CHALK on these two single runs only.
+- [ ] **Next confirmatory design:** pre-register paired fresh-board W2/W3 repeat runs, sample size, stop/reject rules, SHA and environment; do not infer stable 3-CHALK advantage from n=1 per candidate. Run live only with actual user-controlled Windows environment and fresh same-session calibration/blank-board preflight.
+- [ ] Multi-color halo/visual leakage and wide/narrow holdout E4/E5; separate production decision. Independent E5 here is limited to archived rectangle W2/W3, not general production readiness.
+
 ## FILL-001 V5 — W3 E4 result and next independent validation (2026-11-11)
 
 - [x] Check branch HEAD `832bf2b` and [AutoDraw validation CI 42923577993](https://github.com/Kiddos19882/AutoDraw/actions/runs/42923577993): completed SUCCESS; required listed jobs SUCCESS; optional algorithm benchmark and Windows portable build SKIPPED. Earlier W2 CI 42921496275 SUCCESS.
