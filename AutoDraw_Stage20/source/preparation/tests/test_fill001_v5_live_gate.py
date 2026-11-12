@@ -102,3 +102,35 @@ def test_v5_recent_heartbeat_remains_valid_when_latest_message_is_stroke_event(t
     record["bridge_diagnostics"]["last_message_type"] = "event"
     path.write_text(json.dumps(record), encoding="utf-8")
     assert verify(tmp_path, mapping)["pointCount"] == 1
+
+
+@pytest.mark.parametrize("contents,error_type", [
+    (None, "FileNotFoundError"),
+    ("{not-valid-json", "JSONDecodeError"),
+])
+def test_session_read_failure_reports_cause_but_stays_fail_closed(
+        tmp_path, contents, error_type):
+    path, mapping = fixture(tmp_path)
+    if contents is None:
+        path.unlink()
+    else:
+        path.write_text(contents, encoding="utf-8")
+    with pytest.raises(Fill001V5Error, match="read_error=" + error_type) as exc:
+        verify(tmp_path, mapping)
+    assert exc.value.__cause__ is not None
+
+
+def test_session_permission_error_reports_cause_without_disabling_gate(
+        tmp_path, monkeypatch):
+    path, mapping = fixture(tmp_path)
+    real_read_text = type(path).read_text
+
+    def deny_session_read(self, *args, **kwargs):
+        if self == path:
+            raise PermissionError(13, "Access denied")
+        return real_read_text(self, *args, **kwargs)
+
+    monkeypatch.setattr(type(path), "read_text", deny_session_read)
+    with pytest.raises(Fill001V5Error, match="read_error=PermissionError") as exc:
+        verify(tmp_path, mapping)
+    assert isinstance(exc.value.__cause__, PermissionError)
