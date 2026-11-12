@@ -1,0 +1,14 @@
+{
+  "schema": "FILL001_SERIES_RUN_V1",
+  "series_id": "fill001-series-f1d18ed56f3b",
+  "manifest_sha256": "48e4ad5e1438f8c1e469c08961bd5c62b879410c4c084ca83a7013ac5cbb45dc",
+  "task_id": "fill001-series-f1d18ed56f3b-c001-f002",
+  "cycle": 1,
+  "shape_id": "wide_irregular",
+  "fill_method": "spaced_scanlines",
+  "brush_radius": 5,
+  "status": "BLOCKED",
+  "actual_chalk": null,
+  "quality_gate": "NOT_EVALUATED",
+  "error": "SeriesBlocked: Stage6 report lacks complete run-bound result and screen evidence"
+}

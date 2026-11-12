@@ -1,0 +1,23 @@
+{
+  "schema": "FILL001_SERIES_SUMMARY_V1",
+  "series_id": "fill001-series-f1d18ed56f3b",
+  "manifest_sha256": "48e4ad5e1438f8c1e469c08961bd5c62b879410c4c084ca83a7013ac5cbb45dc",
+  "status": "blocked",
+  "issue": "SeriesBlocked: Stage6 report lacks complete run-bound result and screen evidence",
+  "scheduled": 6,
+  "accepted": 0,
+  "quality_failed": 0,
+  "quota_limited": 1,
+  "completed_with_bound_chalk": 0,
+  "quota_limited_with_bound_chalk": 1,
+  "exact_chalk_sum_of_accepted_runs": 0,
+  "exact_chalk_sum_of_quality_failed_runs": 0,
+  "exact_chalk_sum_of_quota_limited_runs": 5751,
+  "exact_chalk_is_per_run_only": true,
+  "grouped_exact_chalk_statistics": {
+    "shape": {},
+    "method": {},
+    "brush": {}
+  },
+  "next_task_requires_fresh_session": true
+}
