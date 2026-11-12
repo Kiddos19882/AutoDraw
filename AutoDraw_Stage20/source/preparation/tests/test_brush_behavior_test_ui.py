@@ -1657,3 +1657,39 @@ def test_fill001_bridge_launcher_rejects_reusing_old_telemetry_off_process(
     )
     assert tab.start_game_monitor_bridge(require_input_telemetry=True) is False
     assert warnings
+
+
+def test_strict_downward_cursor_parking_uses_large_y_offset():
+    board = {"x": 483, "y": 243, "width": 694, "height": 363}
+    meter = {"x": 640, "y": 625, "width": 230, "height": 20}
+    point = brush_ui._cursor_safe_point_outside_region(
+        board, (1920, 1080), margin=160,
+        avoid_regions=(meter,), require_below=True,
+    )
+    assert point == (830, 805)
+    assert point[1] >= max(board["y"] + board["height"],
+                           meter["y"] + meter["height"]) + 160
+
+
+def test_strict_downward_cursor_parking_blocks_sideways_fallback():
+    board = {"x": 500, "y": 400, "width": 600, "height": 520}
+    with pytest.raises(ValueError, match="строго ниже"):
+        brush_ui._cursor_safe_point_outside_region(
+            board, (1920, 1080), margin=160, require_below=True,
+        )
+    # Historical Brush Lab capture keeps its legacy edge fallback.
+    legacy = brush_ui._cursor_safe_point_outside_region(
+        board, (1920, 1080), margin=32,
+    )
+    assert 0 <= legacy[0] < 1920
+    assert 0 <= legacy[1] < 1080
+    assert legacy[1] < 920
+
+
+def test_fill001_blank_and_after_clear_request_same_downward_cursor_policy():
+    import inspect
+    from chalk_fill_ui import Fill001Tab
+    source = inspect.getsource(Fill001Tab._run_fill001_series_in_firefox)
+    assert source.count("margin=160") == 2
+    assert source.count("require_below=True") == 2
+    assert source.count("pyautogui.moveTo(*safe_point, duration=0)") == 2
