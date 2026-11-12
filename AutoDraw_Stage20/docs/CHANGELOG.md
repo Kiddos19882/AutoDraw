@@ -1,5 +1,7 @@
 # AutoDraw — значимые изменения
 
+- DOC-CODE-REUSE-001 (2026-11-12): experimental FILL001 offline preview and signed DrawingPlan handoff now reuse `resolve_series_scanline_spacing`, preserving frozen dense/spaced parameters and source signatures. Added negative spacing tests and 30-cell preview/signature regression checks ([code/test `4dfec5c`](https://github.com/Kiddos19882/AutoDraw/commit/4dfec5cdd9b8cf973fe109c925f7314100872e84)); no executor, production estimator, game input, mask, legacy or acceptance threshold changes. New CI validation is not yet confirmed.
+
 - DOC-CODE-REUSE-001: added read-only `--usage` AST consumer/import-cycle inventory in the existing `tools/capability_catalog.py` + `check_markdown_docs.py`; static direct-call aliases, nested imports and producer owner relationships reported as E1 candidates. Separates 2 all-scope SCCs from **0 root-level SCCs** on current source; new unconditional `source/preparation` SCCs fail docs CI, without touching production/game code. [CI 43135827499](https://github.com/Kiddos19882/AutoDraw/actions/runs/43135827499) SUCCESS on `23a5a516`, 10 tests; first synthetic-fixture failure [43134688617](https://github.com/Kiddos19882/AutoDraw/actions/runs/43134688617) retained.
 
 
