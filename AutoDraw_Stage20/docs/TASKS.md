@@ -1,5 +1,9 @@
 # AutoDraw — действующие задачи
 
+- [x] **FILL001 / Bridge transient PermissionError mitigation (E1):** raw E4 `3ac6108` shows Clear PASS followed by 18/37 second figure `PermissionError`, no exact binding/CHALK for this figure. Source `accd410`: bounded session.json read retry (25/50/100ms), every successful read still undergoes exact session/heartbeat/geometry/telemetry gate; negative tests `d1c462e`. Not a claim that Windows sharing collision was independently demonstrated.
+- [ ] **CI E2/E3 for `d1c462e` or newer:** dedicated FILL001 and Windows validation, review all required jobs/checkout SHA and test logs; report failures separately. Doc audit.
+- [ ] **E4 2-figure retry:** independent fresh session/ID; verify first QUOTA_LIMITED + Clear PASS and second 37/37 or safe quota stop; persist run-bound CHALK, PNG, Monitor raw, and any file read errors. E5 independent. Do not relax 4s freshness or resource gates.
+
 - [x] **E2/E3 dedicated FILL001 после ring fix:** [43263463414](https://github.com/Kiddos19882/AutoDraw/actions/runs/43263463414) SUCCESS на `c2ecbf6` — 217 main synthetic PASS, 5 ring-specific PASS, 7 deselected, syntax/offline smoke PASS; логи просмотрены.
 - [ ] **Windows validation:** [43263429296](https://github.com/Kiddos19882/AutoDraw/actions/runs/43263429296) на `26dcf0b` все законченные критические jobs SUCCESS, Preparation пока IN_PROGRESS; не ставить общий PASS до окончательного conclusion. Учитывать что на SHA до workflow correction.
 
