@@ -207,6 +207,37 @@ def check_capability_catalog(root: Path):
     return problems, found
 
 
+
+def find_capabilities(root: Path, query: str, limit: int = 5):
+    """Rank documented candidate entrypoints; NOT a semantic runtime guarantee."""
+    errors, _ = check_capability_catalog(root)
+    if errors:
+        raise ValueError("Capability catalog is structurally invalid: " +
+                         str(errors[:3]))
+    if not isinstance(query, str) or not query.strip() or not 1 <= limit <= 20:
+        raise ValueError("A nonempty query and a bounded result limit are required")
+    catalog = (Path(root) / 'docs' / 'COMPONENT_CATALOG.md').read_text(encoding='utf-8')
+    section = catalog.split('<!-- AUTODRAW_CAPABILITIES_START -->', 1)[1].split(
+        '<!-- AUTODRAW_CAPABILITIES_END -->', 1)[0]
+    terms = set(re.findall(r'[^\W_]+', query.casefold()))
+    ranked = []
+    for row in section.splitlines():
+        if not row.startswith('| CAP-'):
+            continue
+        cells = [c.strip().strip(chr(96)) for c in row.strip().strip('|').split('|')]
+        cid, title, owner, entrypoint, _, scope, guard, _ = cells
+        title_terms = set(re.findall(r'[^\W_]+', title.casefold()))
+        all_terms = set(re.findall(r'[^\W_]+',
+                                   (owner + ' ' + entrypoint + ' ' + guard).casefold()))
+        score = 3 * len(terms & title_terms) + len(terms & all_terms)
+        if score:
+            ranked.append((score, {'id': cid, 'title': title,
+                                   'owner': owner, 'entrypoint': entrypoint,
+                                   'scope': scope, 'evidence': 'E1_CANDIDATE_ONLY'}))
+    ranked.sort(key=lambda item: (-item[0], item[1]['id']))
+    return [row for _, row in ranked[:limit]]
+
+
 def audit(root: Path):
     root = root.resolve()
     markdown = sorted(root.rglob('*.md'))
@@ -234,7 +265,17 @@ def main(argv=None):
     parser = argparse.ArgumentParser()
     parser.add_argument('--root', default='AutoDraw_Stage20')
     parser.add_argument('--report')
+    parser.add_argument('--find', help='Read-only lookup of existing capability candidates')
     args = parser.parse_args(argv)
+    if args.find is not None:
+        try:
+            candidates = find_capabilities(Path(args.root), args.find)
+        except ValueError as exc:
+            print(str(exc), file=sys.stderr)
+            return 1
+        print(json.dumps({'query': args.find, 'candidates': candidates},
+                         ensure_ascii=False, indent=2))
+        return 0 if candidates else 2
     result = audit(Path(args.root))
     if args.report:
         dest = Path(args.report)

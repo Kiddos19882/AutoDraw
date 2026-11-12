@@ -17,6 +17,8 @@
 | Как проверяются факты и эксперименты? | [EVIDENCE_AND_VALIDATION.md](EVIDENCE_AND_VALIDATION.md), [EXPERIMENT_STANDARD.md](EXPERIMENT_STANDARD.md) |
 | История и прежние версии? | [WORK_LOG.md](WORK_LOG.md), [CHANGELOG.md](CHANGELOG.md), snapshot файлы `*_HISTORY_THROUGH_2026-11-08.md` |
 
+**Поиск в терминале / агенте:** `python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20 --find "очистить доску"` — read-only кандидаты с owner/entrypoint (E1, не runtime). Если нет совпадений, искать вручную в [каталоге](COMPONENT_CATALOG.md) и исходниках.
+
 **Минимальный старт ИИ:** проверить текущий remote HEAD и последние commits; прочитать `PROJECT_STATUS` → `TASKS` → `ROADMAP`, затем профильный DECISION/инварианты/первичный эксперимент и актуальный код для конкретной задачи. Не перечитывать все 90+ файлов без причины.
 
 ## Основные исследовательские контуры

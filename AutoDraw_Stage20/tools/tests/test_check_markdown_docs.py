@@ -8,7 +8,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from check_markdown_docs import (check_links, decision_duplicates, github_slug,
                                  heading_anchors, markdown_links, git_blob_sha,
-                                 verify_history, check_capability_catalog)
+                                 verify_history, check_capability_catalog, find_capabilities)
 
 class MarkdownIntegrityTests(unittest.TestCase):
     def test_slug_and_duplicate_headings(self):
@@ -80,6 +80,10 @@ class MarkdownIntegrityTests(unittest.TestCase):
             catalog = root / 'docs' / 'COMPONENT_CATALOG.md'
             catalog.write_text(doc, encoding='utf-8')
             self.assertEqual(check_capability_catalog(root), ([], 1))
+            self.assertEqual(find_capabilities(root, 'найти существующий код')[0]['id'], 'CAP-001')
+            self.assertEqual(find_capabilities(root, 'слова без совпадений'), [])
+            with self.assertRaises(ValueError):
+                find_capabilities(root, '')
             catalog.write_text(doc.replace('value,safe', 'value,missing'),
                                encoding='utf-8')
             errors, n = check_capability_catalog(root)
