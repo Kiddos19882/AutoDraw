@@ -1,5 +1,7 @@
 # AutoDraw — значимые изменения
 
+- 2026-11-12 / FILL001 exact binder: distinguish cumulative browser-local Monitor export buffer overflow from genuine loss of run-recorder/Bridge events. Requires lossless per-run and internally consistent buffer counters; negative regressions and frozen 50MB raw replay in CI `874f2e1`, 43274926194 PASS. No retroactive reclassification or safety threshold change.
+
 - 2026-11-12 / FILL001 screenshot: stricter cursor parking 160 px down rather than 32, no side fallback in series captures, 0.4 s tooltip settling, synthetic tests + CI trigger. Legacy Brush Lab unaffected; live proof pending.
 
 - 2026-11-12 / FILL001 native BoardPane: unified fail-closed screenshot ROI, repeat native probes after Clear, cursor hover settling and standalone Clear-only calibration without manually selected board ROI; synthetic negative tests and CI scope expanded (`20fccadf`). Legacy Brush Lab/manual calibration unaffected; E2/E3/E4 pending verification.
