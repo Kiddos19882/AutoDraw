@@ -155,3 +155,93 @@ def test_rejected_clear_preserves_visual_metrics_and_png_but_never_passes(tmp_pa
     assert target.is_file()
     # The rejected comparator must not return valid Clear proof or schedule
     # another click / game stroke, even when exact counters are already blank.
+
+
+def test_boardpane_series_reference_uses_verified_native_roi_not_manual_profile(tmp_path):
+    from fill001_series_engine001_clear import (
+        capture_verified_series_boardpane_blank, require_same_series_boardpane_roi,
+    )
+    import json
+    screen = Image.new("RGB", (800, 600), (120, 30, 30))  # UI red
+    # The only game board is in the witness ROI, not at any manual coordinates.
+    for y in range(120, 320):
+        for x in range(170, 470):
+            screen.putpixel((x, y), (25, 25, 25))
+    roi = {"x": 170, "y": 120, "width": 300, "height": 200}
+    filename = tmp_path / "boardpane-blank" / "blank-board-reference.png"
+    metadata_path = filename.with_suffix(".json")
+    record = capture_verified_series_boardpane_blank(
+        roi=roi, screen_size={"width": 800, "height": 600},
+        session_id="live-sid", mapping_sha256="a"*64, point_count=1,
+        operator_confirmed=True, grab_screen=lambda: screen.copy(),
+        reference_png=filename, metadata_path=metadata_path,
+    )
+    assert record["board_region"] == roi
+    assert record["source"] == "verified_boardpane_native_probe"
+    assert json.loads(metadata_path.read_text(encoding="utf-8")) == record
+    with Image.open(filename) as blank:
+        assert blank.size == (300, 200)
+        assert blank.getpixel((0, 0)) == (25, 25, 25)
+        assert blank.getpixel((299, 199)) == (25, 25, 25)
+    assert require_same_series_boardpane_roi(
+        roi, record, session_id="live-sid", mapping_sha256="a"*64,
+    ) == roi
+    with pytest.raises(SeriesClearBlocked, match="overwrite forbidden"):
+        capture_verified_series_boardpane_blank(
+            roi=roi, screen_size={"width": 800, "height": 600},
+            session_id="live-sid", mapping_sha256="a"*64, point_count=1,
+            operator_confirmed=True, grab_screen=lambda: screen,
+            reference_png=filename, metadata_path=metadata_path,
+        )
+
+
+@pytest.mark.parametrize("change", [
+    "shifted_roi", "other_session", "changed_mapping",
+])
+def test_series_boardpane_blank_rejects_moved_window_or_other_session(tmp_path, change):
+    from fill001_series_engine001_clear import (
+        capture_verified_series_boardpane_blank, require_same_series_boardpane_roi,
+    )
+    roi = {"x": 100, "y": 50, "width": 120, "height": 80}
+    record = capture_verified_series_boardpane_blank(
+        roi=roi, screen_size={"width": 640, "height": 480},
+        session_id="sid", mapping_sha256="b"*64, point_count=1,
+        operator_confirmed=True,
+        grab_screen=lambda: Image.new("RGB", (640, 480)),
+        reference_png=tmp_path / "baseline.png",
+        metadata_path=tmp_path / "baseline.json",
+    )
+    new_roi = {**roi, "x": 101} if change == "shifted_roi" else roi
+    sid = "sid-other" if change == "other_session" else "sid"
+    mapping = "c"*64 if change == "changed_mapping" else "b"*64
+    with pytest.raises(SeriesClearBlocked, match="differs"):
+        require_same_series_boardpane_roi(
+            new_roi, record, session_id=sid, mapping_sha256=mapping,
+        )
+
+
+@pytest.mark.parametrize("change", [
+    "not_blank", "unconfirmed", "outside_screen", "screen_mismatch",
+])
+def test_series_boardpane_blank_refuses_invalid_evidence(tmp_path, change):
+    from fill001_series_engine001_clear import capture_verified_series_boardpane_blank
+    roi = {"x": 100, "y": 50, "width": 120, "height": 80}
+    props = dict(
+        roi=roi, screen_size={"width": 640, "height": 480},
+        session_id="sid", mapping_sha256="b"*64, point_count=1,
+        operator_confirmed=True,
+        grab_screen=lambda: Image.new("RGB", (640, 480)),
+        reference_png=tmp_path / "blank.png",
+        metadata_path=tmp_path / "blank.json",
+    )
+    if change == "not_blank":
+        props["point_count"] = 55
+    elif change == "unconfirmed":
+        props["operator_confirmed"] = False
+    elif change == "outside_screen":
+        props["roi"] = {**roi, "x": 610}
+    elif change == "screen_mismatch":
+        props["grab_screen"] = lambda: Image.new("RGB", (800, 600))
+    with pytest.raises(SeriesClearBlocked):
+        capture_verified_series_boardpane_blank(**props)
+    assert not (tmp_path / "blank.png").exists()
