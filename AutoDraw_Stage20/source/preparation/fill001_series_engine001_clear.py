@@ -7,7 +7,7 @@ The native callbacks are supplied by the current Firefox/Bridge owner.
 """
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 import hashlib
 import json
 from pathlib import Path
@@ -162,3 +162,84 @@ def clear_with_existing_engine001(
             "screen_evidence_status": "ENGINE001_EXISTING_COMPARATOR_PASS",
         },
     }
+
+
+def capture_verified_series_boardpane_blank(
+    *, roi: dict, screen_size: dict, session_id: str,
+    mapping_sha256: str, point_count: int, operator_confirmed: bool,
+    grab_screen: Callable[[], Image.Image], reference_png: Path,
+    metadata_path: Path,
+) -> dict:
+    """Capture immutable series-specific blank reference from a verified desktop ROI.
+
+    The caller owns the live native BoardPane witness and exact same-session
+    empty game gate. This function never estimates browser-to-desktop offsets
+    or silently falls back to a hand-calibrated board rectangle.
+    """
+    keys = ("x", "y", "width", "height")
+    if (not isinstance(roi, dict) or any(type(roi.get(k)) is not int for k in keys)
+            or roi["x"] < 0 or roi["y"] < 0
+            or roi["width"] <= 0 or roi["height"] <= 0
+            or not isinstance(screen_size, dict)
+            or any(type(screen_size.get(k)) is not int for k in ("width", "height"))
+            or screen_size["width"] <= 0 or screen_size["height"] <= 0
+            or roi["x"] + roi["width"] > screen_size["width"]
+            or roi["y"] + roi["height"] > screen_size["height"]
+            or not isinstance(session_id, str) or not session_id
+            or not isinstance(mapping_sha256, str) or len(mapping_sha256) != 64
+            or any(c not in "0123456789abcdef" for c in mapping_sha256)
+            or type(point_count) is not int or point_count != 1
+            or operator_confirmed is not True
+            or not callable(grab_screen)):
+        raise SeriesClearBlocked("Verified BoardPane blank-reference evidence is incomplete")
+    screen = grab_screen()
+    if not isinstance(screen, Image.Image) or screen.size != (
+            screen_size["width"], screen_size["height"]):
+        raise SeriesClearBlocked("BoardPane reference screen size changed")
+    region = {key: roi[key] for key in keys}
+    crop = screen.crop((
+        region["x"], region["y"],
+        region["x"] + region["width"], region["y"] + region["height"],
+    ))
+    reference_png = Path(reference_png)
+    metadata_path = Path(metadata_path)
+    if reference_png.exists() or metadata_path.exists():
+        raise SeriesClearBlocked("Series blank reference already exists; overwrite forbidden")
+    reference_png.parent.mkdir(parents=True, exist_ok=True)
+    metadata_path.parent.mkdir(parents=True, exist_ok=True)
+    with reference_png.open("xb") as stream:
+        crop.save(stream, format="PNG")
+    record = {
+        "schema_version": 1,
+        "reference_type": "user_confirmed_blank_board_roi",
+        "user_confirmed_blank": True,
+        "source": "verified_boardpane_native_probe",
+        "session_id": session_id,
+        "boardpane_mapping_sha256": mapping_sha256,
+        "blank_pointCount": point_count,
+        "screen_size": dict(screen_size),
+        "board_region": region,
+        "image_file": reference_png.name,
+        "image_sha256": _hash(reference_png),
+        "captured_at_utc": datetime.now(timezone.utc).isoformat(),
+        "limitations": "User-confirmed blank and exact counter; screenshot evidence is not independent E5.",
+    }
+    with metadata_path.open("x", encoding="utf-8") as stream:
+        json.dump(record, stream, ensure_ascii=False, indent=2)
+        stream.write("\n")
+    return record
+
+
+def require_same_series_boardpane_roi(
+    roi: dict, metadata: dict, *, session_id: str, mapping_sha256: str,
+) -> dict:
+    """Refuse any change in native ROI/session before reuse of a blank reference."""
+    if (not isinstance(metadata, dict)
+            or metadata.get("source") != "verified_boardpane_native_probe"
+            or metadata.get("user_confirmed_blank") is not True
+            or metadata.get("session_id") != session_id
+            or metadata.get("boardpane_mapping_sha256") != mapping_sha256
+            or not isinstance(roi, dict)
+            or metadata.get("board_region") != roi):
+        raise SeriesClearBlocked("BoardPane desktop ROI/session differs from series blank reference")
+    return roi
