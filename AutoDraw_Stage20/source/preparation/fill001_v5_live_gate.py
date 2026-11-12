@@ -8,6 +8,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 import json
 from pathlib import Path
+import time
 from typing import Any
 
 from fill001_monitor_diagnostic import _boardpane_mapping_fingerprint
@@ -44,16 +45,31 @@ def verify_v5_live_gate(
     if not isinstance(expected_mapping_sha256, str) or len(expected_mapping_sha256) != 64:
         raise Fill001V5Error("V5 requires the passive BoardPane fingerprint.")
     path = Path(bridge_root) / session_id / "session.json"
-    try:
-        record = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, ValueError) as exc:
-        # Keep the original fail-closed gate. Report only the exception type,
-        # never the filesystem path, so a later E4 run can distinguish
-        # transient file access from malformed persisted session evidence.
-        cause = type(exc).__name__
-        raise Fill001V5Error(
-            f"V5 Bridge session evidence is missing. read_error={cause}"
-        ) from exc
+    # Bridge atomically replaces session.json on every heartbeat. On Windows,
+    # an overlapping open/replace can briefly raise PermissionError. Retry
+    # only the open, never reuse a prior snapshot or relax heartbeat validation.
+    record = None
+    for attempt in range(4):
+        try:
+            record = json.loads(path.read_text(encoding="utf-8"))
+            break
+        except PermissionError as exc:
+            # Fail closed for permanent access denial too, after a bounded
+            # wait. Do not retry malformed JSON or missing session files.
+            if attempt < 3:
+                time.sleep((0.025, 0.05, 0.1)[attempt])
+                continue
+            winerror = getattr(exc, "winerror", None)
+            detail = (f", winerror={winerror}" if type(winerror) is int else "")
+            raise Fill001V5Error(
+                "V5 Bridge session evidence is missing. "
+                f"read_error=PermissionError{detail}"
+            ) from exc
+        except (OSError, ValueError) as exc:
+            raise Fill001V5Error(
+                "V5 Bridge session evidence is missing. "
+                f"read_error={type(exc).__name__}"
+            ) from exc
     diagnostics = record.get("bridge_diagnostics") if isinstance(record, dict) else None
     status = diagnostics.get("last_monitor_status") if isinstance(diagnostics, dict) else None
     snapshot = status.get("snapshot") if isinstance(status, dict) else None
