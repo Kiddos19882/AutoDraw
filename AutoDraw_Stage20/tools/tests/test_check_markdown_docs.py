@@ -1,12 +1,14 @@
 from __future__ import annotations
 import json
+import contextlib
+import io
 import sys
 import tempfile
 import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from check_markdown_docs import (check_links, decision_duplicates, github_slug,
+from check_markdown_docs import (main, check_links, decision_duplicates, github_slug,
                                  heading_anchors, markdown_links, git_blob_sha,
                                  verify_history, check_capability_catalog, find_capabilities,
                                  inspect_capability_consumers)
@@ -161,6 +163,8 @@ class MarkdownIntegrityTests(unittest.TestCase):
                 ['consumer', 'owner']])
             self.assertEqual(result['preparation_root_import_cycles'], [
                 ['consumer', 'owner']])
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(main(['--root', str(root), '--usage']), 1)
             hits = {x['path']: x for x in result['capabilities'][0]['consumers']}
             self.assertEqual(hits['source/preparation/consumer.py']['lines'], [3])
             self.assertEqual(hits['source/preparation/module_user.py']['lines'], [3])
@@ -175,6 +179,7 @@ class MarkdownIntegrityTests(unittest.TestCase):
         report = inspect_capability_consumers(root)
         self.assertEqual(report['catalog_count'], 20)
         self.assertEqual(report['evidence'], 'E1_STATIC_ONLY')
+        self.assertEqual(report['preparation_root_import_cycles'], [])
         capabilities = {x['id']: x for x in report['capabilities']}
         self.assertTrue(any(
             x['path'] == 'source/preparation/chalk_fill_ui.py'

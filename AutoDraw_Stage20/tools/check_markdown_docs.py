@@ -178,7 +178,9 @@ def main(argv=None):
             print(str(exc), file=sys.stderr)
             return 1
         print(json.dumps(report, ensure_ascii=False, indent=2))
-        return 0
+        # E1 fitness gate: new unconditional preparation-import SCCs must be reviewed.
+        # Deferred-import SCCs remain diagnostic only.
+        return 1 if report['preparation_root_import_cycles'] else 0
     if args.find is not None:
         try:
             candidates = find_capabilities(Path(args.root), args.find)
