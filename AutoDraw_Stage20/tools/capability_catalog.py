@@ -151,47 +151,63 @@ def inspect_capability_consumers(root: Path):
         # A partial inventory can silently hide actual consumers; fail closed.
         raise ValueError('Cannot complete source AST inventory: ' + str(parse_errors[:3]))
 
-    # Only flat module imports inside source/preparation are unambiguous
-    # within this scope. Imports in callbacks count as static candidates.
+    # Only flat source/preparation imports can be resolved unambiguously
+    # by module stem here. Nested imports are deferred, NOT load-time cycles.
     prep = root / 'source' / 'preparation'
     prep_modules = {p.stem: p for p in prep.glob('*.py') if p in trees}
-    edges = {name: set() for name in prep_modules}
+    all_edges = {name: set() for name in prep_modules}
+    root_edges = {name: set() for name in prep_modules}
+
+    def import_targets(node, source_name):
+        if isinstance(node, ast.Import):
+            return {alias.name for alias in node.names
+                    if alias.name in prep_modules and alias.name != source_name}
+        if isinstance(node, ast.ImportFrom):
+            if node.level == 0 and node.module in prep_modules and node.module != source_name:
+                return {node.module}
+        return set()
+
     for name, path in prep_modules.items():
-        for node in ast.walk(trees[path]):
-            if isinstance(node, ast.Import):
-                edges[name].update(alias.name for alias in node.names
-                                   if alias.name in prep_modules and alias.name != name)
-            elif isinstance(node, ast.ImportFrom):
-                if node.level == 0 and node.module in prep_modules and node.module != name:
-                    edges[name].add(node.module)
-    # Tarjan SCC: list potential cycles only, do not fail CI on legacy debt.
-    serial, stack, on_stack, index, low, cycles = 0, [], set(), {}, {}, []
-    def visit(v):
-        nonlocal serial
-        index[v] = serial
-        low[v] = serial
-        serial += 1
-        stack.append(v)
-        on_stack.add(v)
-        for w in sorted(edges[v]):
-            if w not in index:
-                visit(w)
-                low[v] = min(low[v], low[w])
-            elif w in on_stack:
-                low[v] = min(low[v], index[w])
-        if low[v] == index[v]:
-            component = []
-            while True:
-                w = stack.pop()
-                on_stack.remove(w)
-                component.append(w)
-                if w == v:
-                    break
-            if len(component) > 1:
-                cycles.append(sorted(component))
-    for name in sorted(edges):
-        if name not in index:
-            visit(name)
+        all_edges[name].update(
+            target for node in ast.walk(trees[path])
+            for target in import_targets(node, name))
+        # Module.body is only the unconditional root-level import list.
+        root_edges[name].update(
+            target for node in trees[path].body
+            for target in import_targets(node, name))
+
+    def strong_components(graph):
+        serial, stack, on_stack, index, low, found = 0, [], set(), {}, {}, []
+        def visit(v):
+            nonlocal serial
+            index[v] = serial
+            low[v] = serial
+            serial += 1
+            stack.append(v)
+            on_stack.add(v)
+            for w in sorted(graph[v]):
+                if w not in index:
+                    visit(w)
+                    low[v] = min(low[v], low[w])
+                elif w in on_stack:
+                    low[v] = min(low[v], index[w])
+            if low[v] == index[v]:
+                component = []
+                while True:
+                    w = stack.pop()
+                    on_stack.remove(w)
+                    component.append(w)
+                    if w == v:
+                        break
+                if len(component) > 1:
+                    found.append(sorted(component))
+        for name in sorted(graph):
+            if name not in index:
+                visit(name)
+        return sorted(found)
+
+    all_cycles = strong_components(all_edges)
+    root_cycles = strong_components(root_edges)
 
     capabilities = []
     for cid, record in sorted(entries.items()):
@@ -240,8 +256,10 @@ def inspect_capability_consumers(root: Path):
             'catalog_count': count,
             'capabilities': capabilities,
             'preparation_module_count': len(prep_modules),
-            'preparation_import_cycles': sorted(cycles),
+            'preparation_import_cycles': all_cycles,
+            'preparation_root_import_cycles': root_cycles,
             'limitations': ['imports in callbacks included',
                             'dynamic and reexported calls not resolved',
                             'name shadowing not resolved',
+                            'root cycles cover unconditional import statements only',
                             'cycles are static, not runtime execution traces']}

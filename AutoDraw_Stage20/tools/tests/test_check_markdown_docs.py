@@ -159,6 +159,8 @@ class MarkdownIntegrityTests(unittest.TestCase):
             self.assertEqual(result['source_files_scanned'], 4)
             self.assertEqual(result['preparation_import_cycles'], [
                 ['consumer', 'owner']])
+            self.assertEqual(result['preparation_root_import_cycles'], [
+                ['consumer', 'owner']])
             hits = {x['path']: x for x in result['capabilities'][0]['consumers']}
             self.assertEqual(hits['source/preparation/consumer.py']['lines'], [3])
             self.assertEqual(hits['source/preparation/module_user.py']['lines'], [3])

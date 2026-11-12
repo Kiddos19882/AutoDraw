@@ -42,7 +42,7 @@ jobs:
       - name: Inventory static capability consumers and local import cycles
         run: |
           python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20 --usage > "$RUNNER_TEMP/capability-usage.json"
-          python -c 'import json,os; d=json.load(open(os.environ["RUNNER_TEMP"]+"/capability-usage.json")); print(json.dumps({"source_files_scanned":d["source_files_scanned"],"capabilities":d["catalog_count"],"import_cycle_candidates":d["preparation_import_cycles"],"direct_calls":{c["id"]:[x["path"] for x in c["consumers"] if x["status"]=="DIRECT_CALL_CANDIDATE"] for c in d["capabilities"]}},ensure_ascii=False))'
+          python -c 'import json,os; d=json.load(open(os.environ["RUNNER_TEMP"]+"/capability-usage.json")); print(json.dumps({"source_files_scanned":d["source_files_scanned"],"capabilities":d["catalog_count"],"import_cycle_candidates":d["preparation_import_cycles"],"root_import_cycle_candidates":d["preparation_root_import_cycles"],"direct_calls":{c["id"]:[x["path"] for x in c["consumers"] if x["status"]=="DIRECT_CALL_CANDIDATE"] for c in d["capabilities"]}},ensure_ascii=False))'
       - name: Upload audit report
         if: always()
         uses: actions/upload-artifact@v4
