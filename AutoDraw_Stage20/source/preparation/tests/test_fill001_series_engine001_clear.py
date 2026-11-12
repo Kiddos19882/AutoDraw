@@ -245,3 +245,70 @@ def test_series_boardpane_blank_refuses_invalid_evidence(tmp_path, change):
     with pytest.raises(SeriesClearBlocked):
         capture_verified_series_boardpane_blank(**props)
     assert not (tmp_path / "blank.png").exists()
+
+
+def test_reuse_native_boardpane_crop_for_after_clear_and_blank(tmp_path):
+    from fill001_series_engine001_clear import (
+        capture_verified_series_boardpane_blank, capture_same_boardpane_roi,
+    )
+    roi = {"x": 170, "y": 120, "width": 300, "height": 200}
+    full = Image.new("RGB", (800, 600), (200, 60, 60))
+    full.paste(Image.new("RGB", (300, 200), (14, 26, 38)), (170, 120))
+    screen_size = {"width": 800, "height": 600}
+    reference = tmp_path / "series-board-blank.png"
+    meta = capture_verified_series_boardpane_blank(
+        roi=roi, screen_size=screen_size, session_id="sid",
+        mapping_sha256="a"*64, point_count=1, operator_confirmed=True,
+        grab_screen=lambda: full.copy(), reference_png=reference,
+        metadata_path=tmp_path / "series-board-blank.json",
+    )
+    image = capture_same_boardpane_roi(
+        roi=roi, reference_metadata=meta, session_id="sid",
+        mapping_sha256="a"*64, screen_size=screen_size,
+        grab_screen=lambda: full.copy(),
+    )
+    with Image.open(reference) as first:
+        assert first.tobytes() == image.tobytes()
+    assert image.size == (300, 200)
+    assert image.getpixel((0, 0)) == (14, 26, 38)
+
+
+@pytest.mark.parametrize("invalid", [
+    "shifted", "session", "mapping", "resolution", "wrong_screen",
+    "out_of_bounds", "invalid_image",
+])
+def test_native_boardpane_crop_never_falls_back_to_manual_roi(tmp_path, invalid):
+    from fill001_series_engine001_clear import (
+        capture_verified_series_boardpane_blank, capture_same_boardpane_roi,
+    )
+    roi = {"x": 40, "y": 30, "width": 120, "height": 80}
+    size = {"width": 640, "height": 480}
+    meta = capture_verified_series_boardpane_blank(
+        roi=roi, screen_size=size, session_id="sid",
+        mapping_sha256="b"*64, point_count=1, operator_confirmed=True,
+        grab_screen=lambda: Image.new("RGB", (640, 480)),
+        reference_png=tmp_path / "baseline.png",
+        metadata_path=tmp_path / "baseline.json",
+    )
+    kwargs = dict(
+        roi=roi, reference_metadata=meta, session_id="sid",
+        mapping_sha256="b"*64, screen_size=size,
+        grab_screen=lambda: Image.new("RGB", (640, 480)),
+    )
+    if invalid == "shifted":
+        kwargs["roi"] = {**roi, "x": 41}
+    elif invalid == "session":
+        kwargs["session_id"] = "other"
+    elif invalid == "mapping":
+        kwargs["mapping_sha256"] = "c"*64
+    elif invalid == "resolution":
+        kwargs["screen_size"] = {"width": 800, "height": 600}
+    elif invalid == "wrong_screen":
+        kwargs["grab_screen"] = lambda: Image.new("RGB", (800, 600))
+    elif invalid == "out_of_bounds":
+        kwargs["roi"] = {**roi, "x": 630}
+        kwargs["reference_metadata"] = {**meta, "board_region": kwargs["roi"]}
+    elif invalid == "invalid_image":
+        kwargs["grab_screen"] = lambda: None
+    with pytest.raises(SeriesClearBlocked):
+        capture_same_boardpane_roi(**kwargs)
