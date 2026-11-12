@@ -334,8 +334,10 @@ class Fill001Tab:
             result_dir = self.output_dir / "series" / (manifest["series_id"] + "-runs")
             if result_dir.exists() and any(result_dir.iterdir()):
                 raise SeriesBlocked("Series evidence already exists: overwriting or resuming is forbidden")
-            profile = self.brush_tab.get_calibration_profile() if callable(
-                self.brush_tab.get_calibration_profile) else None
+            # Point-only Clear controls; BoardPane screenshot ROI comes from
+            # the live native probe and must never depend on manual board_area.
+            clear_profile = getattr(self.brush_tab, "get_series_clear_profile", None)
+            profile = clear_profile() if callable(clear_profile) else None
             if not isinstance(profile, dict):
                 raise SeriesBlocked("Verified Brush Lab Clear button calibration is required")
             from calibrated_game_clear import click_calibrated_board_clear
