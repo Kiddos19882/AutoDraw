@@ -40,6 +40,39 @@ def _exact(snapshot: Any) -> tuple[int, int]:
     return point, maximum
 
 
+def _lossless_run_transport(run: dict) -> bool:
+    """Reject per-run/transport loss, not the browser's cumulative export-ring overflow.
+
+    Monitor's local 50_000-event buffer and its droppedEvents counter are
+    independent of the WebSocket subscriber. A positive historical
+    monitor_dropped_events alias is acceptable ONLY when the original run
+    also supplies a coherent start/end/delta for that local buffer. It never
+    excuses a single lost recorder event or a failed Bridge send.
+    """
+    if run.get("dropped_events") != 0:
+        return False
+    keys = (
+        "monitor_buffer_dropped_events_start",
+        "monitor_buffer_dropped_events_end",
+        "monitor_buffer_dropped_events_delta",
+    )
+    present = [key in run for key in keys]
+    legacy = run.get("monitor_dropped_events")
+    if any(present):
+        if not all(present):
+            return False
+        start, end, delta = (run[key] for key in keys)
+        if (any(type(v) is not int or v < 0 for v in (start, end, delta))
+                or end < start or delta != end - start
+                or type(legacy) is not int or legacy != end):
+            return False
+    elif legacy != 0:
+        # Old evidence without per-run start/end cannot establish that a
+        # nonzero cumulative alias denotes only the local export buffer.
+        return False
+    return True
+
+
 def validate_series_bridge_runs(
     runs: list[dict], *,
     session_id: str, task_id: str,
@@ -86,7 +119,7 @@ def validate_series_bridge_runs(
                 or run.get("record_type") != "autodraw_game_monitor_run"
                 or run.get("session_id") != session_id
                 or run.get("execution_status") != "completed"
-                or run.get("monitor_dropped_events") != 0
+                or not _lossless_run_transport(run)
                 or run.get("monitor_error_count") != 0
                 or run.get("collector_sequence_gap_count") != 0
                 or run.get("bridge_send_failures_delta") != 0
