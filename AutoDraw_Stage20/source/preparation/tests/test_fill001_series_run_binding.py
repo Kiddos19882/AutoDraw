@@ -122,3 +122,65 @@ def test_verified_prefix_only_binds_exact_executed_strokes():
     assert proof["status"]=="EXACT_RUN_BOUND"
     assert proof["stroke_count"]==1
     assert proof["exact_chalk"]==40
+
+
+def test_cumulative_local_monitor_export_overflow_is_not_per_run_transport_loss():
+    r = sample_run()
+    r.update(
+        dropped_events=0,
+        monitor_dropped_events=17806,
+        monitor_buffer_dropped_events_start=0,
+        monitor_buffer_dropped_events_end=17806,
+        monitor_buffer_dropped_events_delta=17806,
+    )
+    proof = run_gate([r])
+    assert proof["status"] == "EXACT_RUN_BOUND"
+    assert proof["exact_chalk"] == 100
+    assert proof["stroke_count"] == 2
+
+
+@pytest.mark.parametrize("fault", [
+    "recorder_overflow", "missing_delta", "negative_delta", "inconsistent_delta",
+    "wrong_cumulative_alias", "bool_delta", "broken_send", "sequence_gap",
+    "unclosed_run", "wrong_event_count", "wrong_point_delta",
+])
+def test_cumulative_overflow_never_waives_per_run_loss_or_inconsistent_proof(fault):
+    r = sample_run()
+    r.update(
+        dropped_events=0,
+        monitor_dropped_events=17806,
+        monitor_buffer_dropped_events_start=0,
+        monitor_buffer_dropped_events_end=17806,
+        monitor_buffer_dropped_events_delta=17806,
+    )
+    if fault == "recorder_overflow":
+        r["dropped_events"] = 1
+    elif fault == "missing_delta":
+        del r["monitor_buffer_dropped_events_delta"]
+    elif fault == "negative_delta":
+        r["monitor_buffer_dropped_events_delta"] = -1
+    elif fault == "inconsistent_delta":
+        r["monitor_buffer_dropped_events_delta"] = 17805
+    elif fault == "wrong_cumulative_alias":
+        r["monitor_dropped_events"] = 17807
+    elif fault == "bool_delta":
+        r["monitor_buffer_dropped_events_delta"] = True
+    elif fault == "broken_send":
+        r["bridge_send_failures_delta"] = 1
+    elif fault == "sequence_gap":
+        r["collector_sequence_gap_count"] = 1
+    elif fault == "unclosed_run":
+        r["execution_status"] = "partial"
+    elif fault == "wrong_event_count":
+        r["event_count"] = 2
+    elif fault == "wrong_point_delta":
+        r["point_delta_matches_chalk"] = False
+    with pytest.raises(SeriesBindingBlocked):
+        run_gate([r])
+
+
+def test_zero_local_overflow_still_requires_no_run_recorder_loss():
+    r = sample_run()
+    r["dropped_events"] = 1
+    with pytest.raises(SeriesBindingBlocked):
+        run_gate([r])
