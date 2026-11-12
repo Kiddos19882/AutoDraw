@@ -26,6 +26,18 @@ def _json_sha(value: Any) -> str:
                                      separators=(",", ":"), allow_nan=False).encode("utf-8")).hexdigest()
 
 
+def resolve_series_scanline_spacing(shape: str, radius: int, method: str) -> tuple[int, int]:
+    """Resolve frozen series spacing for offline preview and signed handoff."""
+    if method == "dense_scanlines":
+        return 1, 0
+    if method == "spaced_scanlines":
+        try:
+            return FILL001_RS_SCANLINE_CONFIGS[(shape, radius)]
+        except KeyError as exc:
+            raise SeriesBlocked("Unknown frozen series spacing cell") from exc
+    raise SeriesBlocked("Unknown series fill method")
+
+
 def build_series_source_plan(manifest: dict, task_id: str) -> dict:
     """Return deterministic non-executable geometry for exactly one task."""
     validate_manifest(manifest)
@@ -34,12 +46,7 @@ def build_series_source_plan(manifest: dict, task_id: str) -> dict:
         raise SeriesBlocked("Series task ID missing or ambiguous")
     task = candidates[0]
     shape, radius, method = task["shape_id"], task["brush_radius"], task["fill_method"]
-    if method == "dense_scanlines":
-        step, offset = 1, 0
-    elif method == "spaced_scanlines":
-        step, offset = FILL001_RS_SCANLINE_CONFIGS[(shape, radius)]
-    else:
-        raise SeriesBlocked("Unknown series fill method")
+    step, offset = resolve_series_scanline_spacing(shape, radius, method)
     plan = build_fixed_radius_fill_plan(
         shape, radius, scanline_row_step=step, scanline_offset=offset,
     )
