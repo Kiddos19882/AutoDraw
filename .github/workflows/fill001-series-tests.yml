@@ -94,6 +94,19 @@ jobs:
                   value = "<expected-session>" if value == session else "<other-session>"
               print("INITIAL_GATE", field, "PASS" if run.get(field) == target else "FAIL",
                     "observed", value, flush=True)
+          print("PER_RUN_INTEGRITY", json.dumps({
+              "recorder_dropped_events": run.get("dropped_events"),
+              "monitor_buffer_dropped_events_start": run.get("monitor_buffer_dropped_events_start"),
+              "monitor_buffer_dropped_events_end": run.get("monitor_buffer_dropped_events_end"),
+              "monitor_buffer_dropped_events_delta": run.get("monitor_buffer_dropped_events_delta"),
+              "monitor_error_count_delta": run.get("monitor_error_count_delta"),
+              "monitor_buffer_dropped_legacy_alias": run.get("monitor_dropped_events"),
+              "monitor_event_delivery_ok": run.get("collector_sequence_gap_count") == 0
+                  and run.get("bridge_send_failures_delta") == 0
+                  and run.get("dropped_events") == 0,
+              "sampled_point_delta_total": run.get("sampled_point_delta_total"),
+              "chalk_delta_matches_samples": run.get("point_delta_matches_chalk"),
+          }, ensure_ascii=False), flush=True)
           print("COUNTS", json.dumps({
               "run_id": run.get("run_id"),
               "events": len(run["events"]) if isinstance(run.get("events"), list) else None,
@@ -125,6 +138,26 @@ jobs:
                   "exact_chalk": binding["exact_chalk"],
                   "post_pointCount": binding["post_pointCount"],
               }), flush=True)
+          # Counterfactual read-only diagnostic: isolate the cumulative legacy
+          # Monitor counter from the immutable closed-run transport evidence.
+          shallow = dict(run)
+          shallow["monitor_dropped_events"] = 0
+          try:
+              tentative = validate_series_bridge_runs(
+                  [shallow], session_id=session, task_id=request["task_id"],
+                  expected_pointer_down_client=request["expected_pointer_down_client"][:161],
+                  expected_brush_radii=request["expected_brush_radii"][:161],
+                  board_client_rect=request["board_client_rect"],
+                  slider_client_corridor=request["slider_client_corridor"],
+                  expected_pre=1,
+              )
+          except ValueError as exc:
+              print("DIAGNOSTIC_ALIAS_ONLY_STILL_BLOCKED", type(exc).__name__, str(exc), flush=True)
+          else:
+              print("DIAGNOSTIC_ALIAS_ONLY_PASSES",
+                    "stroke_count", tentative["stroke_count"],
+                    "counter_delta", tentative["exact_chalk"],
+                    "NOT_AUTHORIZED_FOR_SERIES", flush=True)
           PY
       - name: Syntax-check existing FILL-001 UI and series module
         run: python -m py_compile brush_calibration.py brush_calibration_ui.py brush_behavior_test_ui.py chalk_fill_ui.py fill001_series_runner.py fill001_series_blank_verification.py fill001_series_offline_plans.py fill001_series_statistics.py fill001_series_handoff.py fill001_series_clear_pilot.py calibrated_game_clear.py fill001_series_engine001_clear.py fill001_series_run_binding.py fill001_series_stage6_preflight.py fill001_series_stage6_execution.py fill001_v5_live_gate.py ../executor/stage6_execute_plan.py ../../integrated_app.py fill001_firefox_auto_probe.py
