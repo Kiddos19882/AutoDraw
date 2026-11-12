@@ -134,26 +134,26 @@ class MarkdownIntegrityTests(unittest.TestCase):
             tests.mkdir(parents=True)
             docs.mkdir()
             (prep / 'owner.py').write_text(
-                'from consumer import helper\\n'
-                'def existing(value):\\n    return value\\n', encoding='utf-8')
+                'from consumer import helper\n'
+                'def existing(value):\n    return value\n', encoding='utf-8')
             (prep / 'consumer.py').write_text(
-                'from owner import existing as renamed\\n'
-                'def helper():\\n    return renamed(1)\\n', encoding='utf-8')
+                'from owner import existing as renamed\n'
+                'def helper():\n    return renamed(1)\n', encoding='utf-8')
             (prep / 'module_user.py').write_text(
-                'def use():\\n'
-                '    import owner as alias\\n'
-                '    return alias.existing(2)\\n', encoding='utf-8')
+                'def use():\n'
+                '    import owner as alias\n'
+                '    return alias.existing(2)\n', encoding='utf-8')
             (prep / 'unused.py').write_text(
-                'from owner import existing\\n'
-                'def no_call():\\n    return 3\\n', encoding='utf-8')
+                'from owner import existing\n'
+                'def no_call():\n    return 3\n', encoding='utf-8')
             (tests / 'test_owner.py').write_text(
-                'def test_thing():\\n    pass\\n', encoding='utf-8')
+                'def test_thing():\n    pass\n', encoding='utf-8')
             (docs / 'COMPONENT_CATALOG.md').write_text(
-                '<!-- AUTODRAW_CAPABILITIES_START -->\\n'
+                '<!-- AUTODRAW_CAPABILITIES_START -->\n'
                 '| CAP-001 | Existing | `source/preparation/owner.py` | '
                 '`existing` | `value` | shared | E1 only | '
-                '`source/preparation/tests/test_owner.py` |\\n'
-                '<!-- AUTODRAW_CAPABILITIES_END -->\\n', encoding='utf-8')
+                '`source/preparation/tests/test_owner.py` |\n'
+                '<!-- AUTODRAW_CAPABILITIES_END -->\n', encoding='utf-8')
             result = inspect_capability_consumers(root)
             self.assertEqual(result['catalog_count'], 1)
             self.assertEqual(result['source_files_scanned'], 4)
@@ -164,7 +164,7 @@ class MarkdownIntegrityTests(unittest.TestCase):
             self.assertEqual(hits['source/preparation/module_user.py']['lines'], [3])
             self.assertEqual(hits['source/preparation/unused.py']['status'],
                              'IMPORTED_ONLY')
-            (prep / 'unused.py').write_text('def broken(:\\n', encoding='utf-8')
+            (prep / 'unused.py').write_text('def broken(:\n', encoding='utf-8')
             with self.assertRaisesRegex(ValueError, 'Cannot complete source AST'):
                 inspect_capability_consumers(root)
 
