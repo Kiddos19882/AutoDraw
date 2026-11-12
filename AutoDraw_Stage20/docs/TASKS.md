@@ -9,7 +9,7 @@
 ## DOC-CODE-REUSE-001 — архитектура знаний и повторное использование (2026-11-12)
 
 - [x] Добавлен CLI `python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20 --find "очистить доску"` и модульный owner `(ф) tools/capability_catalog.py`; существующий docs checker сохраняет прежний API. [CI 43126121772](https://github.com/Kiddos19882/AutoDraw/actions/runs/43126121772) SUCCESS, 8/8 tests, 5/5 проверяемых запросов на реальном каталоге.
-- [ ] Проверить прямые consumers/циклы импортов для 20 карточек с привязкой к текущему SHA; проводить runtime рефакторинг только по отдельным доказанным кандидатам и с регрессиями, не нарушая открытый FILL001 E4 gate.
+- [ ] После подтверждения CI на новом SHA расширить read-only аудит потребителей на `integrated_app.py` и `source/executor`, чтобы CAP-009/012/013 были видимы без ручного поиска; проверить новые root-level SCC и доказать отсутствие нежелательного runtime влияния перед любым дополнительным рефакторингом. Не нарушать FILL001 E4 gate.
 
 - [x] Сверены свежий HEAD и существующие README/COMPONENT_CATALOG/MODULE_REFERENCE/DEPENDENCY_MAP/API references/UI/AI guide; устранено дублирование индекса. Обнаружено устаревшее описание fixed-radius FILL и раннего Selenium/V5.
 - [x] Добавлены 20 карточек в существующий [COMPONENT_CATALOG.md](COMPONENT_CATALOG.md), reuse-first в AI guide, канонический owner и принятое решение DEC-031. Это навигация E1, **не** E4.
