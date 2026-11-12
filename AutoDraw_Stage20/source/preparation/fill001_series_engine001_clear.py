@@ -131,7 +131,19 @@ def clear_with_existing_engine001(
     with after_clear_png.open("xb") as stream:
         image.save(stream, format="PNG")
     if visual["status"] not in ("restored", "restored_within_pixel_tolerance"):
-        raise SeriesClearBlocked("Existing ENGINE-001 blank-board comparator rejected Clear")
+        # Preserve fail-closed behavior but retain the original ENGINE-001
+        # comparator metrics in the immutable per-task Clear error record.
+        comparison = visual["comparison"]
+        raise SeriesClearBlocked(
+            "Existing ENGINE-001 blank-board comparator rejected Clear: "
+            f"status={visual['status']}, "
+            f"changed_percent={visual['changed_percent']}, "
+            f"tolerance_percent={visual['tolerance_percent']}, "
+            f"changed_pixels={comparison['changed_pixels']}, "
+            f"total_pixels={comparison['total_pixels']}, "
+            f"reference_sha256={_hash(reference_png)}, "
+            f"after_clear_sha256={_hash(after_clear_png)}"
+        )
     return {
         "valid": True, "fresh_board": True, "pointCount": 1,
         "mouse_released": True, "clear_click": click_report,
