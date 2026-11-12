@@ -1,0 +1,23 @@
+{
+  "schema": "FILL001_SERIES_SUMMARY_V1",
+  "series_id": "fill001-series-29dc9720814a",
+  "manifest_sha256": "b8285a5c68a52c90e5793faaa369805d532df85122d4efa4b58f4e204ffc1c94",
+  "status": "blocked",
+  "issue": "Clear failed: SeriesClearBlocked: Existing ENGINE-001 blank-board comparator rejected Clear",
+  "scheduled": 6,
+  "accepted": 0,
+  "quality_failed": 0,
+  "quota_limited": 1,
+  "completed_with_bound_chalk": 0,
+  "quota_limited_with_bound_chalk": 1,
+  "exact_chalk_sum_of_accepted_runs": 0,
+  "exact_chalk_sum_of_quality_failed_runs": 0,
+  "exact_chalk_sum_of_quota_limited_runs": 5745,
+  "exact_chalk_is_per_run_only": true,
+  "grouped_exact_chalk_statistics": {
+    "shape": {},
+    "method": {},
+    "brush": {}
+  },
+  "next_task_requires_fresh_session": true
+}

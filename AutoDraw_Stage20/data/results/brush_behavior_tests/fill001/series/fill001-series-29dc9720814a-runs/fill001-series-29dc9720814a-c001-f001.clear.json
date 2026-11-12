@@ -1,0 +1,6 @@
+{
+  "schema": "FILL001_SERIES_CLEAR_V1",
+  "task_id": "fill001-series-29dc9720814a-c001-f001",
+  "status": "BLOCKED",
+  "error": "SeriesClearBlocked: Existing ENGINE-001 blank-board comparator rejected Clear"
+}
