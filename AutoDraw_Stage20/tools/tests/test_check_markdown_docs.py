@@ -174,13 +174,63 @@ class MarkdownIntegrityTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'Cannot complete source AST'):
                 inspect_capability_consumers(root)
 
+    def test_cross_domain_bare_imports_only_in_known_entrypoints(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            prep = root / 'source' / 'preparation'
+            executor = root / 'source' / 'executor'
+            unrelated = root / 'source' / 'other'
+            docs = root / 'docs'
+            tests = prep / 'tests'
+            for folder in (executor, unrelated, docs, tests):
+                folder.mkdir(parents=True, exist_ok=True)
+            (prep / 'owner.py').write_text(
+                'def action(value):\\n    return value\\n'.replace('\\\\n', '\\n'),
+                encoding='utf-8')
+            (tests / 'test_owner.py').write_text(
+                'def test_owner():\\n    pass\\n'.replace('\\\\n', '\\n'),
+                encoding='utf-8')
+            (root / 'integrated_app.py').write_text(
+                'from owner import action as run\\nrun(1)\\n'.replace('\\\\n', '\\n'),
+                encoding='utf-8')
+            (executor / 'stage6_execute_plan.py').write_text(
+                'def execute():\\n'
+                '    import owner as module\\n'
+                '    return module.action(2)\\n'.replace('\\\\n', '\\n'),
+                encoding='utf-8')
+            (unrelated / 'decoy.py').write_text(
+                'from owner import action\\naction(3)\\n'.replace('\\\\n', '\\n'),
+                encoding='utf-8')
+            (docs / 'COMPONENT_CATALOG.md').write_text(
+                '<!-- AUTODRAW_CAPABILITIES_START -->\\n'
+                '| CAP-001 | act | `source/preparation/owner.py` | '
+                '`action` | `value` | shared | E1 | '
+                '`source/preparation/tests/test_owner.py` |\\n'
+                '<!-- AUTODRAW_CAPABILITIES_END -->\\n',
+                encoding='utf-8')
+            result = inspect_capability_consumers(root)
+            self.assertEqual(result['source_files_scanned'], 4)
+            matches = {x['path']: x for x in result['capabilities'][0]['consumers']}
+            self.assertEqual(matches['integrated_app.py']['lines'], [2])
+            self.assertEqual(matches['source/executor/stage6_execute_plan.py']['lines'], [3])
+            self.assertNotIn('source/other/decoy.py', matches)
+            self.assertEqual(result['preparation_root_import_cycles'], [])
+
     def test_actual_catalog_usage_is_structural_only(self):
         root = Path(__file__).resolve().parents[2]
         report = inspect_capability_consumers(root)
         self.assertEqual(report['catalog_count'], 20)
         self.assertEqual(report['evidence'], 'E1_STATIC_ONLY')
         self.assertEqual(report['preparation_root_import_cycles'], [])
+        self.assertGreaterEqual(report['source_files_scanned'], 130)
         capabilities = {x['id']: x for x in report['capabilities']}
+        self.assertTrue(any(
+            x['path'] == 'integrated_app.py' and x['lines']
+            for x in capabilities['CAP-009']['consumers']))
+        for cid in ('CAP-012', 'CAP-013'):
+            self.assertTrue(any(
+                x['path'] == 'source/executor/stage6_execute_plan.py' and x['lines']
+                for x in capabilities[cid]['consumers']))
         self.assertTrue(any(
             x['path'] == 'source/preparation/chalk_fill_ui.py'
             and x['status'] == 'DIRECT_CALL_CANDIDATE'
