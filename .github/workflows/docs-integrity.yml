@@ -7,6 +7,10 @@ on:
     paths:
       - "AutoDraw_Stage20/**/*.md"
       - "AutoDraw_Stage20/docs/HISTORY_SNAPSHOT_PROVENANCE.json"
+      # Contract rows are checked against Python AST, not just Markdown links.
+      - "AutoDraw_Stage20/source/**/*.py"
+      - "AutoDraw_Stage20/geometry_models/**/*.py"
+      - "AutoDraw_Stage20/shared_image_processing/**/*.py"
       - "AutoDraw_Stage20/tools/check_markdown_docs.py"
       - "AutoDraw_Stage20/tools/tests/test_check_markdown_docs.py"
       - ".github/workflows/docs-integrity.yml"

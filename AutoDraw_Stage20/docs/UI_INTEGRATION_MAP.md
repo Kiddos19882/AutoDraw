@@ -2,6 +2,9 @@
 
 ## FILL-001 — экспериментальное подключение Firefox Selenium (2026-11-10)
 
+> **Исторический снимок (2026-11-10).** Утверждения ниже о не подключённом Stage6 и отдельном V5 не являются текущим статусом. В нынешнем коде серия использует общий Selenium Firefox/Bridge worker и Stage6 через `source/preparation/chalk_fill_ui.py`, `fill001_series_runner.py`, `fill001_series_stage6_execution.py`, `fill001_series_engine001_clear.py`; фактические gates и неустранённые E4 см. [PROJECT_STATUS.md](PROJECT_STATUS.md) и [TASKS.md](TASKS.md). Исправление Selenium isolation — `0e5075b`, новая quota-limited ветка — `6eae2c9`. Описания API сверять по текущему SHA.
+
+
 Во вкладке `Fill001Tab` появились три дополнительные команды: «Firefox: открыть игру + Bridge автоматически», «Подтвердить: доска открыта», «Остановить Firefox-сессию». Они используют существующий `BrushBehaviorTestTab.start_game_monitor_bridge(require_input_telemetry=True, origin_override="https://eufbpet.hust.me/")`, новую вспомогательную функцию `firefox_monitor_session.attach_monitor_after_confirmation` и **не** запускают `Stage6App` самостоятельно. WebDriver открывает портал `https://pet-eu.hust.me/`, проверяет Origin Egret iframe и использует уже поставляемые `game_monitor.js` и одноразовый Bridge snippet. Успешное внедрение не равняется подтверждённому Bridge connection — проверяется новая отдельная сессия и Input Telemetry ON.
 
 Оператор подтверждает только видимую игровую доску, но это **не** замена существующим проверкам ROI, desktop coordinate mapping, brush radius, Clear или правилу одного FILL-001 task. В случае BLOCKED Firefox остаётся открытым для диагностики до явной остановки. Mixed-width DEC-030 V5 ещё не маршрутизирован в Stage6; альтернативный one-click runner не включён в production UI.

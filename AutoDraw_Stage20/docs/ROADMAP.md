@@ -1,5 +1,10 @@
 # AutoDraw — дорожная карта будущих работ
 
+## DOC-CODE-REUSE-001 — порядок внедрения каталога возможностей (2026-11-12)
+
+Первый шаг: reuse-first навигация в существующем [COMPONENT_CATALOG.md](COMPONENT_CATALOG.md) (20 возможностей на baseline `7cc938af`), read-only AST-контроль owner/entrypoint/args/test и новая regression проверка в Markdown CI; никакого runtime рефакторинга. После CI E3 — повторяемый тест навигации из нового ИИ-чата, затем read-only анализ реальных consumers, прямых зависимостей и только при доказанной пользе — маленькие совместимые извлечения с обязательными тестами. Не подменять граф импортов знанием об actual runtime и не повышать experimental до production без validation. Приоритет FILL001-SERIES-001 E4 остаётся отдельным.
+
+
 ## Следующий gate FILL001-SERIES-001: quota-limited → ENGINE-001 Clear → следующая фигура (2026-11-12)
 
 Первая игровая попытка из [5acb2e6](https://github.com/Kiddos19882/AutoDraw/commit/5acb2e6284a4425cdfea8812257fa85ea55ed88f) E4 BLOCKED: radius1, 100/141 штрихов, remainingPoints=241, не создан полный exact/settled результат. Добавлен экспериментальный QUOTA_LIMITED путь, который фиксирует частичный exact run-bound CHALK и PNG, но не признаёт quality PASS, выполняет штатный Clear только после точной привязки и разрешает следующий task только по прежнему verified blank-board gate. [Series CI 43114637544](https://github.com/Kiddos19882/AutoDraw/actions/runs/43114637544) SUCCESS, [main 43114637531](https://github.com/Kiddos19882/AutoDraw/actions/runs/43114637531) SUCCESS.

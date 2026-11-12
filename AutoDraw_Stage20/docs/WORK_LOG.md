@@ -1,5 +1,12 @@
 # AutoDraw — журнал выполненных действий
 
+## 2026-11-12 — DOC-CODE-REUSE-001: навигационный каталог и static contract checking
+
+- Проверены remote HEAD `7cc938af4`, последние 20 commits, GitHub Actions и existing docs/navigation/API/invariants. Подтверждены устаревшие описания фиксированного FILL planner и исторического Selenium/V5 handoff; код более позднего состояния отличается. Использована существующая система README→COMPONENT_CATALOG→API/Dependency/Tests, не создана параллельная knowledge base.
+- Создано 20 карточек reuse-first; добавлено правило для ИИ, DEC-031, AST checker в существующем docs audit, negative regression и CI source-path triggers. Исполнение игры/Windows/Python import не выполнялось; Stage6 и другие production исходники неизменны.
+- Проверка нового CI при публикации ещё PENDING; структурный checker не доказывает semantic correctness, production maturity или E4.
+
+
 ## 2026-11-12 — FILL001-SERIES-001: анализ первой живой resource-stop попытки и реализация продолжения
 
 - Проверен свежий remote HEAD 84be195 и последние 20 коммитов; пользовательские первичные файлы в [5acb2e6](https://github.com/Kiddos19882/AutoDraw/commit/5acb2e6284a4425cdfea8812257fa85ea55ed88f). Первый live run Stage6: 100/141, remaining 241/6000, quota guard <300, mouse release PASS, но closed exact/settled PNG отсутствуют, следующий task не выполнялся. Первичные raw и BLOCKED отчёты не изменены.

@@ -8,7 +8,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from check_markdown_docs import (check_links, decision_duplicates, github_slug,
                                  heading_anchors, markdown_links, git_blob_sha,
-                                 verify_history)
+                                 verify_history, check_capability_catalog)
 
 class MarkdownIntegrityTests(unittest.TestCase):
     def test_slug_and_duplicate_headings(self):
@@ -59,6 +59,48 @@ class MarkdownIntegrityTests(unittest.TestCase):
             self.assertEqual(verify_history(root), [])
             (docs / 'old.md').write_bytes(b'Changed!')
             self.assertEqual(verify_history(root)[0]['error'], 'snapshot_changed')
+
+
+    def test_capability_catalog_ast_contract_and_no_imports(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / 'docs').mkdir()
+            (root / 'source').mkdir()
+            (root / 'tests').mkdir()
+            (root / 'source' / 'demo.py').write_text(
+                'def existing(value, *, safe=True):\n    return value\n',
+                encoding='utf-8')
+            (root / 'tests' / 'test_demo.py').write_text(
+                'def test_smoke():\n    assert True\n', encoding='utf-8')
+            row = ('| CAP-001 | найти существующий код | `source/demo.py` | '
+                   '`existing` | `value,safe` | shared | только E1 | '
+                   '`tests/test_demo.py` |')
+            doc = ('<!-- AUTODRAW_CAPABILITIES_START -->\n'
+                   + row + '\n<!-- AUTODRAW_CAPABILITIES_END -->\n')
+            catalog = root / 'docs' / 'COMPONENT_CATALOG.md'
+            catalog.write_text(doc, encoding='utf-8')
+            self.assertEqual(check_capability_catalog(root), ([], 1))
+            catalog.write_text(doc.replace('value,safe', 'value,missing'),
+                               encoding='utf-8')
+            errors, n = check_capability_catalog(root)
+            self.assertEqual(n, 1)
+            self.assertIn('missing_contract_arguments', [e['error'] for e in errors])
+            catalog.write_text(doc.replace('source/demo.py', '../outside.py'),
+                               encoding='utf-8')
+            errors, _ = check_capability_catalog(root)
+            self.assertIn('invalid_owner', [e['error'] for e in errors])
+            catalog.write_text(doc.replace('<!-- AUTODRAW_CAPABILITIES_END -->',
+                                           row + '\n<!-- AUTODRAW_CAPABILITIES_END -->'),
+                               encoding='utf-8')
+            errors, _ = check_capability_catalog(root)
+            self.assertIn('invalid_or_duplicate_id', [e['error'] for e in errors])
+
+    def test_catalog_absent_is_not_pass(self):
+        with tempfile.TemporaryDirectory() as temp:
+            errors, total = check_capability_catalog(Path(temp))
+            self.assertEqual(total, 0)
+            self.assertEqual(errors[0]['error'], 'missing_catalog')
+
 
 if __name__ == '__main__':
     unittest.main()

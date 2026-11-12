@@ -2,6 +2,7 @@
 """Read-only AutoDraw Markdown audit. Historical warnings do not erase evidence."""
 from __future__ import annotations
 import argparse
+import ast
 import hashlib
 import json
 import re
@@ -133,6 +134,79 @@ def verify_history(root: Path):
     return problems
 
 
+
+def check_capability_catalog(root: Path):
+    """Static E1 index check; does not import Python or run game/GUI code."""
+    root = root.resolve()
+    path = root / 'docs' / 'COMPONENT_CATALOG.md'
+    if not path.is_file():
+        return [{'error': 'missing_catalog'}], 0
+    content = path.read_text(encoding='utf-8')
+    start = '<!-- AUTODRAW_CAPABILITIES_START -->'
+    end = '<!-- AUTODRAW_CAPABILITIES_END -->'
+    if content.count(start) != 1 or content.count(end) != 1:
+        return [{'error': 'missing_or_duplicate_capability_markers'}], 0
+    section = content.split(start, 1)[1].split(end, 1)[0]
+    problems, ids, found, cached = [], set(), 0, {}
+    for line in section.splitlines():
+        if not line.startswith('| CAP-'):
+            continue
+        cells = [v.strip().strip(chr(96)) for v in line.strip().strip('|').split('|')]
+        if len(cells) != 8:
+            problems.append({'error': 'wrong_column_count', 'row': line[:100]})
+            continue
+        cid, _, owner, symbol, arguments, scope, _, test = cells
+        found += 1
+        if not re.fullmatch(r'CAP-[0-9]{3}', cid) or cid in ids:
+            problems.append({'id': cid, 'error': 'invalid_or_duplicate_id'})
+        ids.add(cid)
+        if scope not in ('shared', 'adapter', 'experimental'):
+            problems.append({'id': cid, 'error': 'unknown_scope'})
+        for label, relative in (('owner', owner), ('test', test)):
+            file = (root / relative).resolve()
+            if (not relative or Path(relative).is_absolute()
+                    or not file.is_relative_to(root)
+                    or file.suffix != '.py' or not file.is_file()):
+                problems.append({'id': cid, 'error': 'invalid_' + label,
+                                 'path': relative})
+        source = (root / owner).resolve()
+        if not source.is_relative_to(root) or not source.is_file():
+            continue
+        if source not in cached:
+            try:
+                cached[source] = ast.parse(source.read_text(encoding='utf-8'),
+                                           filename=str(source))
+            except (SyntaxError, UnicodeError) as exc:
+                problems.append({'id': cid, 'error': 'invalid_python_ast',
+                                 'detail': str(exc)[:120]})
+                cached[source] = None
+        if cached[source] is None:
+            continue
+        nodes = [n for n in cached[source].body
+                 if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+                 and n.name == symbol]
+        if len(nodes) != 1:
+            problems.append({'id': cid, 'error': 'missing_entrypoint',
+                             'symbol': symbol})
+            continue
+        if arguments == '-':
+            continue
+        node = nodes[0]
+        if isinstance(node, ast.ClassDef):
+            problems.append({'id': cid, 'error': 'class_no_direct_signature'})
+            continue
+        actual = {a.arg for a in
+                  node.args.posonlyargs + node.args.args + node.args.kwonlyargs}
+        listed = [a.strip() for a in arguments.split(',')]
+        if (not all(listed) or len(set(listed)) != len(listed)
+                or not set(listed).issubset(actual)):
+            problems.append({'id': cid, 'error': 'missing_contract_arguments',
+                             'names': sorted(set(listed) - actual)})
+    if not found:
+        problems.append({'error': 'empty_capability_catalog'})
+    return problems, found
+
+
 def audit(root: Path):
     root = root.resolve()
     markdown = sorted(root.rglob('*.md'))
@@ -142,14 +216,17 @@ def audit(root: Path):
     decisions = root / 'docs' / 'DECISIONS.md'
     duplicates = decision_duplicates(decisions.read_text(encoding='utf-8'))
     snapshots = verify_history(root)
+    capability_errors, capability_count = check_capability_catalog(root)
     return {
         'schema_version': 1, 'total_markdown_files': len(markdown),
         'indexed_files': len(markdown) - len(not_indexed),
         'unindexed_files': not_indexed, 'duplicate_decisions': duplicates,
         'current_broken_links': current, 'historical_link_warnings': historical,
         'history_integrity_errors': snapshots,
+        'capability_count': capability_count,
+        'capability_catalog_errors': capability_errors,
         'external_ci_results_verified': False,
-        'status': 'FAIL' if (not_indexed or duplicates or current or snapshots) else 'PASS',
+        'status': 'FAIL' if (not_indexed or duplicates or current or snapshots or capability_errors) else 'PASS',
     }
 
 
@@ -167,7 +244,8 @@ def main(argv=None):
     summary = {k: len(v) if isinstance(v, list) else v for k, v in result.items()}
     print(json.dumps(summary, ensure_ascii=False, indent=2))
     for key in ('unindexed_files', 'duplicate_decisions', 'current_broken_links',
-                'historical_link_warnings', 'history_integrity_errors'):
+                'historical_link_warnings', 'history_integrity_errors',
+                'capability_catalog_errors'):
         if result[key]:
             print(key + ': ' + json.dumps(result[key][:12], ensure_ascii=False))
     return 0 if result['status'] == 'PASS' else 1

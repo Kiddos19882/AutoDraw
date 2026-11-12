@@ -34,6 +34,11 @@
 
 # Карта тестов, диагностик и CI AutoDraw
 
+## DOC-CODE-REUSE-001 — AST-аудит каталога возможностей (2026-11-12)
+
+`tools/check_markdown_docs.py::check_capability_catalog` читает ограниченный блок `<!-- AUTODRAW_CAPABILITIES_START -->` внутри [COMPONENT_CATALOG.md](COMPONENT_CATALOG.md) и проверяет 20 записей E1: уникальность ID, наличие owner/test Python-файлов, объявление top-level symbol, subset документированных имён аргументов, scope и корректность AST. Интегрирован в общий docs-integrity workflow и синтетические `tools/tests/test_check_markdown_docs.py`; workflow реагирует на изменения Python source, даже если Markdown не изменён. Не импортирует игровые модули, не вызывает GUI и не утверждает фактическое покрытие тестом. Конкретный CI на SHA новой реализации ещё ожидает завершения.
+
+
 **Область:** тестовые модули, диагностические скрипты, benchmark-инструменты и их запуск в GitHub Actions.  
 **Источники:** текущие тестовые файлы, `.github/workflows/geometry-tests.yml`, `ARCHITECTURE.md`, `UI_INTEGRATION_MAP.md` и актуальные результаты `TEST_RESULTS.md`. Исторические root-level `PROJECT_GUIDE.md` и `PROJECT_DOCUMENTATION.md` не являются источниками текущего статуса.  
 **Ограничение:** документ описывает обнаруженные связи и конфигурацию запуска. Тесты в рамках подготовки документа не запускались.

@@ -1,5 +1,10 @@
 # AutoDraw — значимые изменения
 
+## 2026-11-12 — DOC-CODE-REUSE-001 knowledge reuse and AST contract check
+
+- Expanded existing COMPONENT_CATALOG with 20 capability owner/entrypoint/scope/test-path entries, README navigation, reuse-first AI_WORK_GUIDE and DEC-031. Extended existing check_markdown_docs.py with read-only AST verification of indexed Python symbols/parameter names, duplicate capability IDs and owner/test paths; added regressions and source-aware docs CI triggers. No runtime, Stage6 or Monitor changes; CI status to be recorded by its exact SHA.
+
+
 ## 2026-11-12 — FILL001-SERIES-001 experimental quota-limited capture and verified Clear continuation
 
 - After first live E4 resource stop ([raw evidence 5acb2e6](https://github.com/Kiddos19882/AutoDraw/commit/5acb2e6284a4425cdfea8812257fa85ea55ed88f), 100/141 strokes, remaining 241, existing guard 300), added run-bound exact prefix capture with settled PNG and QUOTA_LIMITED diagnostic-only status. Only verified same-session closed Monitor events and released mouse authorize original ENGINE-001 Clear, then fresh preflight for next task. Partial CHALK is kept separately from completed/quality PASS ranking. [Code 90701e8](https://github.com/Kiddos19882/AutoDraw/commit/90701e8adb22cada121ccc6f1a2f5076baca1fde), [test 1236ce9](https://github.com/Kiddos19882/AutoDraw/commit/1236ce9d8f6ea8438294d31948a51226a1c70563), [tally 6eae2c9](https://github.com/Kiddos19882/AutoDraw/commit/6eae2c94a7cd72c6be3662374c9cb816c16a17e2); [series CI 43114637544](https://github.com/Kiddos19882/AutoDraw/actions/runs/43114637544) SUCCESS, [main 43114637531](https://github.com/Kiddos19882/AutoDraw/actions/runs/43114637531) SUCCESS. New quota→Clear live E4 NOT_RUN; no production promotion, threshold/estimator changes or overwrite of historical raw.

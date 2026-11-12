@@ -1,5 +1,10 @@
 # AutoDraw — текущее состояние
 
+## DOC-CODE-REUSE-001 — проверяемый поиск готового кода для нового ИИ-чата (2026-11-12)
+
+Инициатива reuse-first: существующий [каталог компонентов](COMPONENT_CATALOG.md) дополнен 20 карточками возможностей (owner / entrypoint / значимые аргументы / scope / ограничения / тестовый путь), а [AI_WORK_GUIDE.md](AI_WORK_GUIDE.md) определяет обязательный поиск перед новой реализацией. Принято [DEC-031](DECISIONS.md), используется прежний [контроль Markdown](../tools/check_markdown_docs.py) с дополнительным read-only Python AST contract audit и синтетическими отрицательными тестами. Исходники Stage6, Selenium, Game Monitor, Clear и CHALK не изменены. **E1 по GitHub-коду** на baseline `7cc938af4e349bd187981749d47f7e41c207ce24`; E2/E3 нового checker подтвердить отдельным CI данного коммита, E4/E5 не применяются к документационному аудиту. Аудит проверяет структуру, но не смысловое соответствие, качество тестов или реальное game behavior. [План следующего ограничения](TASKS.md).
+
+
 ## FILL001-SERIES-001 — первый E4 resource stop и экспериментальное продолжение после Clear (2026-11-12)
 
 В коммите [5acb2e6](https://github.com/Kiddos19882/AutoDraw/commit/5acb2e6284a4425cdfea8812257fa85ea55ed88f) получены реальные артефакты первого запуска серии: manifest fill001-series-ef09de5bce19 содержит 2 цикла × 3 фигуры; первая rectangle/dense_scanlines/radius1 имела 141 штрих, Stage6 выполнил 100/141 и остановился на существующем safety guard remainingPoints < 300. По raw snapshot: первоначально pointCount=1, перед остановкой наблюдалось pointCount=5759, remainingPoints=241 при maxPoints=6000, mouse release PASS. Итоговый immutable run BLOCKED, actual_chalk=null, after_settled_png=null, binding=null, quality NOT_EVALUATED, следующий task не запускался. Это E4 BLOCKED/частичное наблюдение, не принятый полный run и не E4 PASS. Разность 5759-1=5758 нельзя принимать как run-bound exact CHALK без закрытой проверки. Никакие исходные файлы не перезаписывались.

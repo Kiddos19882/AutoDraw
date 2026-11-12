@@ -1,5 +1,10 @@
 # AutoDraw — реестр проверенных результатов
 
+## DOC-CODE-REUSE-001 — baseline структурного каталога (2026-11-12)
+
+На baseline source SHA `7cc938af4e349bd187981749d47f7e41c207ce24` выборочно сверены определения 20 точек входа в Firefox/Selenium, Monitor/ROI, Clear/ENGINE-001, FILL001 Stage6/manifest/runner, CHALK, PNG, brush-radius и owner-lock. Карточки содержат пути к existing regression files, но их существование **не равно** PASS. В существующий Markdown audit добавлена проверка Python AST и ссылок на тесты без импорта и исполнения модулей; тесты охватывают отсутствующий путь, отсутствующий аргумент и дублирование ID. **Результат CI для нового коммита пока NOT_RUN** (в момент подготовки документа); после запуска проверять CI commit отдельно. Нет нового game E4/E5 и нет измерения CHALK.
+
+
 ## FILL001-SERIES-001 — первичная E4 BLOCKED и quota-limited E2/E3 (2026-11-12)
 
 [Raw commit 5acb2e6](https://github.com/Kiddos19882/AutoDraw/commit/5acb2e6284a4425cdfea8812257fa85ea55ed88f) подтверждает пользовательскую E4 попытку, а не серию PASS. Серия ef09de5bce19: scheduled=6, accepted=0, первая задача rectangle/dense_scanlines/radius1, planned_strokes=141, completed_strokes=100, Stage6 error Exact game remaining quota below 300-point safety margin. Pre snapshot pointCount=1, перед остановкой Monitor видел pointCount=5759, remainingPoints=241, maxPoints=6000. Mouse release PASS. Но after_settled_png, closed binding, actual_chalk и game PNG quality отсутствуют; report/summary имеют BLOCKED и NOT_EVALUATED. Не приписывать exact CHALK=5758 до валидной привязки к конкретному закрытому run. Последняя session.json после дополнительных действий содержит pointCount=1 и не может служить post snapshot остановленного рисунка.

@@ -13,6 +13,7 @@
 | Где фактический CHALK и проверки? | **[TEST_RESULTS.md](TEST_RESULTS.md)** |
 | Как ИИ должен работать с проектом? | [AI_WORK_GUIDE.md](AI_WORK_GUIDE.md) |
 | Архитектура, входы и API? | [ARCHITECTURE.md](ARCHITECTURE.md), [UI_INTEGRATION_MAP.md](UI_INTEGRATION_MAP.md), [PREPARATION_API_REFERENCE.md](PREPARATION_API_REFERENCE.md), [EXECUTOR_API_REFERENCE.md](EXECUTOR_API_REFERENCE.md) |
+| Найти готовый код для повторного использования? | **[Карта возможностей AutoDraw](COMPONENT_CATALOG.md)** → [API preparation](PREPARATION_API_REFERENCE.md), [executor](EXECUTOR_API_REFERENCE.md) → [тесты и CI](TESTS_AND_CI_MAP.md) |
 | Как проверяются факты и эксперименты? | [EVIDENCE_AND_VALIDATION.md](EVIDENCE_AND_VALIDATION.md), [EXPERIMENT_STANDARD.md](EXPERIMENT_STANDARD.md) |
 | История и прежние версии? | [WORK_LOG.md](WORK_LOG.md), [CHANGELOG.md](CHANGELOG.md), snapshot файлы `*_HISTORY_THROUGH_2026-11-08.md` |
 

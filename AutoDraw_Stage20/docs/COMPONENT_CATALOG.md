@@ -2,6 +2,39 @@
 
 Каталог предназначен для навигации по репозиторию. Он фиксирует размещение и тематическое назначение файлов, но не оценивает реализацию алгоритмов.
 
+## Карта возможностей для повторного использования (E1, проверка кода 2026-11-12)
+
+**Источник:** определения в рабочем дереве на commit `7cc938af4e349bd187981749d47f7e41c207ce24`. Здесь `owner` — модуль, реализующий возможность, а не имя человека; `shared/adapter/experimental` — область использования, **не** уровень E4/E5 и не разрешение на production. Поле «Тест» ведёт к исходнику проверки, но само наличие файла не доказывает E2 PASS. Актуальные сигнатуры, runtime side effects и CI подтверждать отдельно на текущем HEAD. Используйте поиск по действию/синонимам, затем откройте owner, consumer и тест.
+
+<!-- AUTODRAW_CAPABILITIES_START -->
+| ID | Что нужно / синонимы | Owner (от корня Stage20) | Entrypoint | Параметры контракта (AST) | Scope | Граница и запрет | Тест (путь, не PASS) |
+|---|---|---|---|---|---|---|---|
+| CAP-001 | Открыть Selenium Firefox | `source/preparation/firefox_monitor_session.py` | `open_firefox` | `-` | shared | Только браузер; разрешение на ввод отдельно | `source/preparation/tests/test_firefox_monitor_session.py` |
+| CAP-002 | Подключить Game Monitor и Bridge | `source/preparation/firefox_monitor_session.py` | `attach_monitor_after_confirmation` | `driver,operator_confirmed` | shared | Нужно подтверждение доски; подключение не запускает Stage6 | `source/preparation/tests/test_firefox_monitor_session.py` |
+| CAP-003 | Проверить foreground Firefox | `source/preparation/firefox_foreground_witness.py` | `wait_for_operator_firefox_foreground` | `-` | shared | Win32 PID и ручной фокус; при неоднозначности BLOCKED | `source/preparation/tests/test_firefox_foreground_witness.py` |
+| CAP-004 | Получить валидный ROI серии | `source/preparation/fill001_firefox_auto_probe.py` | `collect_verified_series_firefox_roi` | `manifest,session_id,source_plan` | adapter | Подписанный план и fresh BoardPane; без fallback | `source/preparation/tests/test_fill001_series_firefox_probe.py` |
+| CAP-005 | Кликнуть игровой Clear | `source/preparation/calibrated_game_clear.py` | `click_calibrated_board_clear` | `profile,screen_size` | shared | Это клик, не доказательство очистки; Monitor.clear запрещён | `source/preparation/tests/test_calibrated_game_clear.py` |
+| CAP-006 | Оценить PNG после Clear | `source/preparation/brush_experiment_capture.py` | `evaluate_board_clear` | `blank_reference,after_clear` | shared | Порог 0.15% не подстраивать под результат | `source/preparation/tests/test_brush_experiment_capture.py` |
+| CAP-007 | Очистить доску внутри серии | `source/preparation/fill001_series_engine001_clear.py` | `clear_with_existing_engine001` | `profile,session_id,mapping_sha256` | adapter | Требует released mouse и повторных exact snapshots | `source/preparation/tests/test_fill001_series_engine001_clear.py` |
+| CAP-008 | Проверить чистую доску | `source/preparation/fill001_series_blank_verification.py` | `verify_blank_screen_after_clear` | `session_id,mapping_sha256` | experimental | Read-only; не является вызовом Clear | `source/preparation/tests/test_fill001_series_blank_verification.py` |
+| CAP-009 | Построить fixed-radius фигуру | `source/preparation/chalk_fill_fixed_radius_planner.py` | `build_fixed_radius_fill_plan_for_task` | `task` | experimental | Offline геометрия не равна live quality | `source/preparation/tests/test_chalk_fill_fixed_radius_planner.py` |
+| CAP-010 | Сформировать manifest серии | `source/preparation/fill001_series_runner.py` | `build_manifest` | `cycles,figures_per_cycle` | experimental | Создание manifest не разрешает input | `source/preparation/tests/test_fill001_series_runner.py` |
+| CAP-011 | Выполнить защищённый цикл задач | `source/preparation/fill001_series_runner.py` | `run_with_validated_callbacks` | `manifest,run_one,clear_and_verify` | experimental | Только валидированные callbacks; no overwrite | `source/preparation/tests/test_fill001_series_runner.py` |
+| CAP-012 | Получить Stage6 preflight | `source/preparation/fill001_series_stage6_preflight.py` | `prepare_series_stage6_preflight` | `-` | adapter | Fresh session/ROI; запрет устаревшей калибровки | `source/preparation/tests/test_fill001_series_stage6_preflight.py` |
+| CAP-013 | Исполнить одну фигуру через Stage6 | `source/preparation/fill001_series_stage6_execution.py` | `execute_series_single_stage6` | `-` | adapter | Только opt-in, native input, release и Monitor | `source/preparation/tests/test_fill001_series_stage6_execution.py` |
+| CAP-014 | Нормализовать Stage6 evidence | `source/preparation/fill001_series_stage6_execution.py` | `normalized_series_run` | `task,result` | adapter | QUOTA_LIMITED не quality PASS; exact proof обязателен | `source/preparation/tests/test_fill001_series_stage6_execution.py` |
+| CAP-015 | Привязать точный CHALK к run | `source/preparation/fill001_series_run_binding.py` | `validate_series_bridge_runs` | `runs,session_id,task_id` | experimental | Только closed exact Monitor и post.pointCount-pre.pointCount | `source/preparation/tests/test_fill001_series_run_binding.py` |
+| CAP-016 | Проверить экранное качество | `source/preparation/fill001_screen_mask_v2.py` | `audit_screen_mask_v2` | `-` | experimental | Run-bound PNG и frozen policy; не подменять CHALK | `source/preparation/tests/test_fill001_screen_mask_v2.py` |
+| CAP-017 | Посчитать статистику серии | `source/preparation/fill001_series_statistics.py` | `analyze_series` | `manifest,results_dir` | experimental | QUOTA_LIMITED отдельно от quality PASS ranking | `source/preparation/tests/test_fill001_series_statistics.py` |
+| CAP-018 | Захватить owner lock | `source/preparation/chalk_test_blocks.py` | `acquire_chalk_block_owner_lock` | `journal_path` | shared | Нельзя создавать второго владельца game input | `source/preparation/tests/test_chalk_test_blocks.py` |
+| CAP-019 | Прочитать обратную связь кисти | `source/preparation/brush_radius_feedback.py` | `read_active_bridge_radius` | `-` | adapter | Достоверность свежей Bridge telemetry; не прогноз вместо факта | `source/preparation/tests/test_brush_radius_feedback.py` |
+| CAP-020 | Подготовить offline варианты серии | `source/preparation/fill001_series_offline_plans.py` | `prepare_offline_variants` | `manifest` | experimental | Без игрового input и без заявления exact CHALK | `source/preparation/tests/test_fill001_series_offline_plans.py` |
+<!-- AUTODRAW_CAPABILITIES_END -->
+
+**Алгоритм reuse-first:** поиск по задаче → owner/entrypoint → текущая AST/реализация → прямые consumers и тесты → safety/quality/evidence gates → минимальная интеграция. Если нужная функция отсутствует или запись устарела — не создавать дубль автоматически; зафиксировать расхождение и исследовать существующие адаптеры.
+
+**Граница автоматической проверки:** Python AST подтверждает наличие файла, top-level функции/класса, перечисленных имён параметров и тестового пути, но не безопасность вызова, производственный статус, точность описания, качество теста или runtime. Проверка контракта идёт через `tools/check_markdown_docs.py`.
+
 ## 1. Точки входа и упаковка
 
 | Файл | Назначение |

@@ -1,5 +1,14 @@
 # AutoDraw — действующие задачи
 
+## DOC-CODE-REUSE-001 — архитектура знаний и повторное использование (2026-11-12)
+
+- [x] Сверены свежий HEAD и существующие README/COMPONENT_CATALOG/MODULE_REFERENCE/DEPENDENCY_MAP/API references/UI/AI guide; устранено дублирование индекса. Обнаружено устаревшее описание fixed-radius FILL и раннего Selenium/V5.
+- [x] Добавлены 20 карточек в существующий [COMPONENT_CATALOG.md](COMPONENT_CATALOG.md), reuse-first в AI guide, канонический owner и принятое решение DEC-031. Это навигация E1, **не** E4.
+- [x] В existing `tools/check_markdown_docs.py` добавлена read-only AST проверка entrypoints, имён аргументов, owner/test path, уникальности ID и scope; в workflow docs-integrity добавлены триггеры на Python source. Новые regression tests на устаревший API, отсутствующий owner и дубликат ID.
+- [ ] Проверить конкретный CI SHA: docs-integrity job должен PASS; негативный тест должен подтверждать нарушение контракта. Если CI FAIL, устранить и сохранить исходный отрицательный результат.
+- [ ] После E3: выполнить ревизию фактических consumers и candidate import cycles в FILL001/V5/ENGINE-001 без автоматического изменения production; при подтверждённом дублировании — отдельный совместимый adapter/refactor с тестами.
+
+
 ## FILL001-SERIES-001 — resource stop: следующий E4 gate и сохранение истории (2026-11-12)
 
 - [x] Изучены [исходные файлы первого запуска 5acb2e6](https://github.com/Kiddos19882/AutoDraw/commit/5acb2e6284a4425cdfea8812257fa85ea55ed88f): первая из шести фигур, 100/141 штрихов, stop на резерве 300, remaining 241, мышь освобождена, final run-bound CHALK/settled PNG отсутствуют. Статус E4 BLOCKED, не PASS; исходные captures сохраняются.
