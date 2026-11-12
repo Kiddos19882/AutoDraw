@@ -134,3 +134,71 @@ def test_session_permission_error_reports_cause_without_disabling_gate(
     with pytest.raises(Fill001V5Error, match="read_error=PermissionError") as exc:
         verify(tmp_path, mapping)
     assert isinstance(exc.value.__cause__, PermissionError)
+
+
+def test_temporary_bridge_permission_error_recovers_with_fresh_full_validation(
+        tmp_path, monkeypatch):
+    path, mapping = fixture(tmp_path)
+    native_read = type(path).read_text
+    calls = []
+    waits = []
+
+    def transient(self, *args, **kwargs):
+        if self == path:
+            calls.append(True)
+            if len(calls) < 3:
+                raise PermissionError(13, "Windows replace in progress")
+        return native_read(self, *args, **kwargs)
+
+    monkeypatch.setattr(type(path), "read_text", transient)
+    monkeypatch.setattr("fill001_v5_live_gate.time.sleep", waits.append)
+    got = verify(tmp_path, mapping)
+    assert got["pointCount"] == 1
+    assert len(calls) == 3
+    assert waits == [0.025, 0.05]
+
+
+def test_permission_retry_never_accepts_wrong_session_or_stale_heartbeat(
+        tmp_path, monkeypatch):
+    path, mapping = fixture(tmp_path)
+    record = json.loads(path.read_text(encoding="utf-8"))
+    record["bridge_diagnostics"]["last_heartbeat_at_utc"] = (
+        NOW - timedelta(seconds=10)
+    ).isoformat()
+    path.write_text(json.dumps(record), encoding="utf-8")
+    native_read = type(path).read_text
+    calls = []
+
+    def transient(self, *args, **kwargs):
+        if self == path:
+            calls.append(True)
+            if len(calls) == 1:
+                raise PermissionError(13, "Windows replace in progress")
+        return native_read(self, *args, **kwargs)
+
+    monkeypatch.setattr(type(path), "read_text", transient)
+    monkeypatch.setattr("fill001_v5_live_gate.time.sleep", lambda delay: None)
+    with pytest.raises(Fill001V5Error, match="stale"):
+        verify(tmp_path, mapping)
+    assert len(calls) == 2
+
+
+def test_persistent_permission_error_is_bounded_and_preserves_root_cause(
+        tmp_path, monkeypatch):
+    path, mapping = fixture(tmp_path)
+    attempts = []
+    waits = []
+
+    def deny(self, *args, **kwargs):
+        if self == path:
+            attempts.append(True)
+            raise PermissionError(13, "Access denied")
+        raise AssertionError("unexpected file")
+
+    monkeypatch.setattr(type(path), "read_text", deny)
+    monkeypatch.setattr("fill001_v5_live_gate.time.sleep", waits.append)
+    with pytest.raises(Fill001V5Error, match="read_error=PermissionError") as exc:
+        verify(tmp_path, mapping)
+    assert len(attempts) == 4
+    assert waits == [0.025, 0.05, 0.1]
+    assert isinstance(exc.value.__cause__, PermissionError)
