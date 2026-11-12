@@ -1,5 +1,7 @@
 # AutoDraw — дорожная карта будущих работ
 
+**FILL001 pointer hover/screenshot gate (2026-11-12):** для baseline и after-Clear PNG изменён перенос курсора с legacy margin32 на строгую нижнюю точку `board/meter.bottom+160px` (без lateral fallback) и popup settle 0.4 s. Следующий E2/E3 dedicated CI, затем пользовательский E4 с PNG и подтверждением исчезновения overlay. Не считать саму координату защитой от всех иных интерактивных UI, и не ослаблять Clear comparator.
+
 **BoardPane migration gate (2026-11-12):** FILL001 screenshot capture hardened through exact native ROI contract, post-Clear re-probe and cursor-off-board; point-only Clear calibration removes manual board_area requirement at series launch (`20fccadf`). Next E2/E3 check on new commit, followed by E4 Windows 1×2; only then design Brush Lab authenticated browser/Bridge owner adapter. Standalone Brush Lab still legacy/manual; no unverified CSS client-to-desktop conversion, no threshold change.
 
 **Auto BoardPane screenshot ROI migration (2026-11-12):** FILL001 series board crop и blank reference переведены с ручного `board_area` на verified native ROI и per-series blank proof (`2448650` с тестами `92fdea7`); сначала CI E2/E3, затем E4 с новым series ID. Остальные Brush Lab autonomous screenshot workflows требуют отдельного Monitor-enabled path и provenance model (поскольку Monitor не всегда запущен). Preserve old profile for click/slider/meter; не создавать shadow screenshot calibration, не изменять frozen threshold `0.15%`.
