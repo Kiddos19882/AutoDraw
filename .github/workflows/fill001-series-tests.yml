@@ -33,6 +33,7 @@ on:
       - "AutoDraw_Stage20/source/preparation/tests/test_fill001_series_firefox_probe.py"
       - "AutoDraw_Stage20/source/preparation/tests/test_calibrated_game_clear.py"
       - "AutoDraw_Stage20/source/preparation/tests/test_brush_calibration.py"
+      - "AutoDraw_Stage20/source/preparation/tests/test_brush_behavior_test_ui.py"
       - "AutoDraw_Stage20/source/preparation/tests/test_fill001_series_engine001_clear.py"
       - "AutoDraw_Stage20/source/preparation/tests/test_fill001_series_offline_plans.py"
       - "AutoDraw_Stage20/source/preparation/tests/test_fill001_series_statistics.py"
@@ -63,6 +64,8 @@ jobs:
         run: python -m pip install pytest numpy pillow opencv-python-headless
       - name: Run synthetic-only serial orchestration tests
         run: python -m pytest -q -ra tests/test_fill001_series_runner.py tests/test_fill001_series_blank_verification.py tests/test_fill001_series_offline_plans.py tests/test_fill001_series_statistics.py tests/test_fill001_series_handoff.py tests/test_fill001_series_clear_pilot.py tests/test_calibrated_game_clear.py tests/test_brush_calibration.py tests/test_fill001_series_engine001_clear.py tests/test_fill001_series_firefox_probe.py tests/test_fill001_firefox_auto_probe.py tests/test_fill001_series_run_binding.py tests/test_fill001_series_stage6_preflight.py tests/test_fill001_series_stage6_execution.py tests/test_fill001_v5_live_gate.py
+      - name: Run targeted native pointer parking regression tests
+        run: python -m pytest -q -ra tests/test_brush_behavior_test_ui.py -k "strict_downward_cursor_parking or fill001_blank_and_after_clear_request_same_downward_cursor_policy"
       - name: Syntax-check existing FILL-001 UI and series module
         run: python -m py_compile brush_calibration.py brush_calibration_ui.py brush_behavior_test_ui.py chalk_fill_ui.py fill001_series_runner.py fill001_series_blank_verification.py fill001_series_offline_plans.py fill001_series_statistics.py fill001_series_handoff.py fill001_series_clear_pilot.py calibrated_game_clear.py fill001_series_engine001_clear.py fill001_series_run_binding.py fill001_series_stage6_preflight.py fill001_series_stage6_execution.py fill001_v5_live_gate.py ../executor/stage6_execute_plan.py ../../integrated_app.py fill001_firefox_auto_probe.py
       - name: Smoke-test offline 2-cycle manifest
