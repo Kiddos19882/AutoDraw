@@ -11,7 +11,8 @@ from collections import Counter
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
-from capability_catalog import check_capability_catalog, find_capabilities
+from capability_catalog import (check_capability_catalog, find_capabilities,
+                                inspect_capability_consumers)
 
 LINK_RE = re.compile(r'(?<!!)\[[^\]\n]+\]\(([^)\n]+)\)')
 HEADING_RE = re.compile(r'^\s{0,3}#{1,6}\s+(.+?)\s*$')
@@ -165,7 +166,19 @@ def main(argv=None):
     parser.add_argument('--root', default='AutoDraw_Stage20')
     parser.add_argument('--report')
     parser.add_argument('--find', help='Read-only lookup of existing capability candidates')
+    parser.add_argument('--usage', action='store_true',
+                        help='Read-only AST consumers and import-cycle inventory; never runtime proof')
     args = parser.parse_args(argv)
+    if args.find is not None and args.usage:
+        parser.error('--find and --usage are mutually exclusive')
+    if args.usage:
+        try:
+            report = inspect_capability_consumers(Path(args.root))
+        except ValueError as exc:
+            print(str(exc), file=sys.stderr)
+            return 1
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+        return 0
     if args.find is not None:
         try:
             candidates = find_capabilities(Path(args.root), args.find)

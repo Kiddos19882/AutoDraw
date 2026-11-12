@@ -112,3 +112,136 @@ def find_capabilities(root: Path, query: str, limit: int = 5):
                                    'scope': scope, 'evidence': 'E1_CANDIDATE_ONLY'}))
     ranked.sort(key=lambda item: (-item[0], item[1]['id']))
     return [row for _, row in ranked[:limit]]
+
+
+def inspect_capability_consumers(root: Path):
+    """Read-only E1 import/call candidates and flat preparation import cycles.
+
+    Only syntax is inspected. Dynamic imports, monkey-patching, reexports,
+    path shadowing and actual runtime behavior are outside this analysis.
+    """
+    root = Path(root).resolve()
+    errors, count = check_capability_catalog(root)
+    if errors:
+        raise ValueError('Capability catalog is structurally invalid: ' +
+                         str(errors[:3]))
+    catalog = (root / 'docs' / 'COMPONENT_CATALOG.md').read_text(encoding='utf-8')
+    section = catalog.split('<!-- AUTODRAW_CAPABILITIES_START -->', 1)[1].split(
+        '<!-- AUTODRAW_CAPABILITIES_END -->', 1)[0]
+    entries = {}
+    for row in section.splitlines():
+        if row.startswith('| CAP-'):
+            cells = [c.strip().strip(chr(96)) for c in row.strip().strip('|').split('|')]
+            entries[cells[0]] = {'owner': cells[2], 'entrypoint': cells[3]}
+
+    # Source files only. Test imports are not production consumers.
+    source_files = sorted(p for base in (root / 'source', root / 'geometry_models',
+                                        root / 'shared_image_processing')
+                          if base.is_dir()
+                          for p in base.rglob('*.py') if 'tests' not in p.parts)
+    trees, parse_errors = {}, []
+    for path in source_files:
+        try:
+            trees[path] = ast.parse(path.read_text(encoding='utf-8'),
+                                    filename=str(path))
+        except (SyntaxError, UnicodeError) as exc:
+            parse_errors.append({'path': str(path.relative_to(root)),
+                                 'error': str(exc)[:120]})
+    if parse_errors:
+        # A partial inventory can silently hide actual consumers; fail closed.
+        raise ValueError('Cannot complete source AST inventory: ' + str(parse_errors[:3]))
+
+    # Only flat module imports inside source/preparation are unambiguous
+    # within this scope. Imports in callbacks count as static candidates.
+    prep = root / 'source' / 'preparation'
+    prep_modules = {p.stem: p for p in prep.glob('*.py') if p in trees}
+    edges = {name: set() for name in prep_modules}
+    for name, path in prep_modules.items():
+        for node in ast.walk(trees[path]):
+            if isinstance(node, ast.Import):
+                edges[name].update(alias.name for alias in node.names
+                                   if alias.name in prep_modules and alias.name != name)
+            elif isinstance(node, ast.ImportFrom):
+                if node.level == 0 and node.module in prep_modules and node.module != name:
+                    edges[name].add(node.module)
+    # Tarjan SCC: list potential cycles only, do not fail CI on legacy debt.
+    serial, stack, on_stack, index, low, cycles = 0, [], set(), {}, {}, []
+    def visit(v):
+        nonlocal serial
+        index[v] = serial
+        low[v] = serial
+        serial += 1
+        stack.append(v)
+        on_stack.add(v)
+        for w in sorted(edges[v]):
+            if w not in index:
+                visit(w)
+                low[v] = min(low[v], low[w])
+            elif w in on_stack:
+                low[v] = min(low[v], index[w])
+        if low[v] == index[v]:
+            component = []
+            while True:
+                w = stack.pop()
+                on_stack.remove(w)
+                component.append(w)
+                if w == v:
+                    break
+            if len(component) > 1:
+                cycles.append(sorted(component))
+    for name in sorted(edges):
+        if name not in index:
+            visit(name)
+
+    capabilities = []
+    for cid, record in sorted(entries.items()):
+        owner = root / record['owner']
+        owner_stem = owner.stem
+        symbol = record['entrypoint']
+        matches = []
+        for source, tree in trees.items():
+            if source == owner:
+                continue
+            # A short module name is only unambiguous in its own directory.
+            # Cross-package imports must use an explicit dotted path.
+            owner_dot = '.'.join(owner.relative_to(root).with_suffix('').parts)
+            functions, modules = set(), set()
+            for node in ast.walk(tree):
+                if isinstance(node, ast.ImportFrom):
+                    if ((node.module == owner_stem and source.parent == owner.parent)
+                            or node.module == owner_dot):
+                        functions.update(alias.asname or alias.name
+                                         for alias in node.names if alias.name == symbol)
+                elif isinstance(node, ast.Import):
+                    for alias in node.names:
+                        if ((alias.name == owner_stem and source.parent == owner.parent)
+                                or alias.name == owner_dot):
+                            modules.add(alias.asname or alias.name.split('.')[0])
+            if not functions and not modules:
+                continue
+            lines = []
+            for node in ast.walk(tree):
+                if not isinstance(node, ast.Call):
+                    continue
+                fn = node.func
+                if isinstance(fn, ast.Name) and fn.id in functions:
+                    lines.append(node.lineno)
+                elif (isinstance(fn, ast.Attribute) and fn.attr == symbol
+                      and isinstance(fn.value, ast.Name) and fn.value.id in modules):
+                    lines.append(node.lineno)
+            matches.append({'path': str(source.relative_to(root)),
+                            'status': 'DIRECT_CALL_CANDIDATE' if lines else 'IMPORTED_ONLY',
+                            'lines': sorted(set(lines))})
+        capabilities.append({'id': cid, **record,
+                             'consumers': sorted(matches, key=lambda x: x['path'])})
+    return {'schema': 'AUTODRAW_CAPABILITY_STATIC_USAGE_V1',
+            'evidence': 'E1_STATIC_ONLY',
+            'source_files_scanned': len(trees),
+            'catalog_count': count,
+            'capabilities': capabilities,
+            'preparation_module_count': len(prep_modules),
+            'preparation_import_cycles': sorted(cycles),
+            'limitations': ['imports in callbacks included',
+                            'dynamic and reexported calls not resolved',
+                            'name shadowing not resolved',
+                            'cycles are static, not runtime execution traces']}
