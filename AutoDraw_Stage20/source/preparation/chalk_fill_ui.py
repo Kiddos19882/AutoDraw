@@ -723,6 +723,7 @@ class Fill001Tab:
             if firefox_foreground_witness(driver) is not True:
                 raise SeriesBlocked("Firefox foreground lost before BoardPane blank capture")
             pyautogui.moveTo(*safe_point, duration=0)
+            time.sleep(0.15)
             gate=bridge_gate(blank=True)
             if state["reference_meta"] is None:
                 # New per-series blank baseline: same native BoardPane probe
@@ -896,6 +897,7 @@ class Fill001Tab:
                 if firefox_foreground_witness(driver) is not True:
                     raise SeriesBlocked("Firefox foreground lost before after-Clear screenshot")
                 pyautogui.moveTo(*safe_point, duration=0)
+                time.sleep(0.15)
                 bridge_gate(blank=True)
                 return capture_same_boardpane_roi(
                     roi=latest_roi, reference_metadata=state["reference_meta"],
