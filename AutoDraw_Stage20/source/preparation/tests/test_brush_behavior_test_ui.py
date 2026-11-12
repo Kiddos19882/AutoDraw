@@ -1683,7 +1683,8 @@ def test_strict_downward_cursor_parking_blocks_sideways_fallback():
     )
     assert 0 <= legacy[0] < 1920
     assert 0 <= legacy[1] < 1080
-    assert legacy[1] < 920
+    # Legacy fallback prefers the valid point 32 px BELOW the board, not a side edge.
+    assert legacy == (800, 952)
 
 
 def test_fill001_blank_and_after_clear_request_same_downward_cursor_policy():
