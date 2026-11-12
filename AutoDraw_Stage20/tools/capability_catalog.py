@@ -139,6 +139,11 @@ def inspect_capability_consumers(root: Path):
                                         root / 'shared_image_processing')
                           if base.is_dir()
                           for p in base.rglob('*.py') if 'tests' not in p.parts)
+    # integrated_app is an actual production entrypoint outside source/.
+    # Keep this explicit rather than recursively indexing scripts and tests.
+    integrated_entrypoint = root / 'integrated_app.py'
+    if integrated_entrypoint.is_file():
+        source_files.append(integrated_entrypoint)
     trees, parse_errors = {}, []
     for path in source_files:
         try:
@@ -218,19 +223,24 @@ def inspect_capability_consumers(root: Path):
         for source, tree in trees.items():
             if source == owner:
                 continue
-            # A short module name is only unambiguous in its own directory.
-            # Cross-package imports must use an explicit dotted path.
+            # Stage20 puts preparation on sys.path for the integrated UI and
+            # Stage6 adapter. These two entrypoint domains use bare imports.
+            # Do NOT extend bare-stem resolution to arbitrary other packages.
             owner_dot = '.'.join(owner.relative_to(root).with_suffix('').parts)
+            cross_domain = (owner.parent == prep and
+                            (source == integrated_entrypoint or
+                             (root / 'source' / 'executor') in source.parents))
+            bare_allowed = source.parent == owner.parent or cross_domain
             functions, modules = set(), set()
             for node in ast.walk(tree):
                 if isinstance(node, ast.ImportFrom):
-                    if ((node.module == owner_stem and source.parent == owner.parent)
+                    if ((node.module == owner_stem and bare_allowed)
                             or node.module == owner_dot):
                         functions.update(alias.asname or alias.name
                                          for alias in node.names if alias.name == symbol)
                 elif isinstance(node, ast.Import):
                     for alias in node.names:
-                        if ((alias.name == owner_stem and source.parent == owner.parent)
+                        if ((alias.name == owner_stem and bare_allowed)
                                 or alias.name == owner_dot):
                             modules.add(alias.asname or alias.name.split('.')[0])
             if not functions and not modules:
@@ -260,6 +270,7 @@ def inspect_capability_consumers(root: Path):
             'preparation_root_import_cycles': root_cycles,
             'limitations': ['imports in callbacks included',
                             'dynamic and reexported calls not resolved',
-                            'name shadowing not resolved',
+                            'bare cross-domain imports limited to integrated_app and executor',
+                            'name shadowing and sys.path runtime resolution not verified',
                             'root cycles cover unconditional import statements only',
                             'cycles are static, not runtime execution traces']}
