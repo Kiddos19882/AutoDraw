@@ -324,6 +324,7 @@ class AutoDrawUnifiedApp:
             get_canvas_area=self._get_brush_test_canvas_area,
             get_brush_control=self._get_brush_test_brush_control,
             get_calibration_profile=self._get_brush_test_calibration_profile,
+            get_series_clear_profile=self._get_brush_series_clear_profile,
             on_transfer_plan=self._transfer_brush_test_plan,
             on_brush_ready=self._start_brush_test_executor,
         )
@@ -565,6 +566,11 @@ class AutoDrawUnifiedApp:
         """Return the saved, screen-compatible profile for ROI capture experiments."""
         calibration = getattr(self, "brush_calibration_tab", None)
         return calibration.get_experiment_capture_config() if calibration is not None else None
+
+    def _get_brush_series_clear_profile(self) -> dict[str, Any] | None:
+        """Native BoardPane ROI FILL001 needs a validated Clear point, not a manual board box."""
+        calibration = getattr(self, "brush_calibration_tab", None)
+        return calibration.get_series_clear_config() if calibration is not None else None
 
     def _get_brush_test_brush_control(self) -> dict[str, list[int]] | None:
         calibration = getattr(self, "brush_calibration_tab", None)
