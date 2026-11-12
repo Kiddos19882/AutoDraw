@@ -35,6 +35,12 @@
 
 **Граница автоматической проверки:** Python AST подтверждает наличие файла, top-level функции/класса, перечисленных имён параметров и тестового пути, но не безопасность вызова, производственный статус, точность описания, качество теста или runtime. Проверка контракта идёт через `tools/check_markdown_docs.py`.
 
+### Проверенные статические связи owner → потребитель
+
+В исходниках baseline `7cc938af` обнаружены прямые вызовы: `chalk_fill_ui.py` подключает общий `open_firefox()` и `attach_monitor_after_confirmation()`, использует `run_with_series_owner_lock()`, `normalized_series_run()` и `clear_with_existing_engine001()`; `fill001_series_stage6_execution.py` вызывает `validate_series_bridge_runs()` и `audit_screen_mask_v2()`. Эти связи дают маршрут для reuse, **не доказывают live PASS** и не заменяют текущий поиск всех consumers. Для новых импортов ориентироваться на текущий HEAD, а не копировать устаревший снимок зависимостей.
+
+**Пример:** задача «стереть доску между опытами» → CAP-007 (adapter) → CAP-005 (штатный UI click) и CAP-006 (PNG comparator). Не писать отдельный `BoardPane.clear` или Selenium click. Задача «посчитать расход» → CAP-015; не использовать offline estimator как exact game CHALK.
+
 ## 1. Точки входа и упаковка
 
 | Файл | Назначение |
@@ -71,7 +77,7 @@
 - `brush_calibration.py`, `brush_experiment_capture.py`, `brush_test_workflow.py`, `brush_footprint_geometry.py`, `brush_planner.py` — модули калибровки и лаборатории кистей.
 - `chalk_experiment_matrix.py`, `chalk_test_blocks.py` — контракты CHALK matrix, пакетное планирование, durable journal и capture acceptance.
 - `chalk_int006_validation.py`, `chalk_int006r_validation.py` — отдельные анализаторы независимой INT-006 model validation и INT006R radius × geometry captures.
-- `chalk_fill_experiment.py` — детерминированные frozen target masks и geometry SHA-256 для FILL-001; fixed-radius DrawingPlan generator пока не реализован.
+- `chalk_fill_experiment.py` — детерминированные frozen target masks и geometry SHA-256 для FILL-001; fixed-radius планировщик реализован экспериментально в `chalk_fill_fixed_radius_planner.py`; это не доказательство live-quality или production-ready.
 - `geometry_budget_optimizer.py`, `skeletonization.py`, `stroke_simplification.py`, `stroke_order_optimizer.py`, `interior_fill_planner.py`, `outline_first_fill_planner.py`, `swept_footprint_geometry.py` — модули геометрической подготовки планов.
 - `drawing_algorithm_benchmark.py` — вспомогательный benchmark-модуль.
 

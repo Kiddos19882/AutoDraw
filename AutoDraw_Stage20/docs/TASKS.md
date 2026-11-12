@@ -5,7 +5,7 @@
 - [x] Сверены свежий HEAD и существующие README/COMPONENT_CATALOG/MODULE_REFERENCE/DEPENDENCY_MAP/API references/UI/AI guide; устранено дублирование индекса. Обнаружено устаревшее описание fixed-radius FILL и раннего Selenium/V5.
 - [x] Добавлены 20 карточек в существующий [COMPONENT_CATALOG.md](COMPONENT_CATALOG.md), reuse-first в AI guide, канонический owner и принятое решение DEC-031. Это навигация E1, **не** E4.
 - [x] В existing `tools/check_markdown_docs.py` добавлена read-only AST проверка entrypoints, имён аргументов, owner/test path, уникальности ID и scope; в workflow docs-integrity добавлены триггеры на Python source. Новые regression tests на устаревший API, отсутствующий owner и дубликат ID.
-- [ ] Проверить конкретный CI SHA: docs-integrity job должен PASS; негативный тест должен подтверждать нарушение контракта. Если CI FAIL, устранить и сохранить исходный отрицательный результат.
+- [x] [docs-integrity CI 43124607337](https://github.com/Kiddos19882/AutoDraw/actions/runs/43124607337) **SUCCESS** на `7b8f4aaa`: 7/7 тестов, 20/20 карточек, 100/100 Markdown, 0 ошибок каталога и ссылок. Отрицательные тесты проверяют отсутствующий аргумент, owner и дубликат ID.
 - [ ] После E3: выполнить ревизию фактических consumers и candidate import cycles в FILL001/V5/ENGINE-001 без автоматического изменения production; при подтверждённом дублировании — отдельный совместимый adapter/refactor с тестами.
 
 

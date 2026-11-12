@@ -2,7 +2,7 @@
 
 ## 2026-11-12 — DOC-CODE-REUSE-001 knowledge reuse and AST contract check
 
-- Expanded existing COMPONENT_CATALOG with 20 capability owner/entrypoint/scope/test-path entries, README navigation, reuse-first AI_WORK_GUIDE and DEC-031. Extended existing check_markdown_docs.py with read-only AST verification of indexed Python symbols/parameter names, duplicate capability IDs and owner/test paths; added regressions and source-aware docs CI triggers. No runtime, Stage6 or Monitor changes; CI status to be recorded by its exact SHA.
+- Expanded existing COMPONENT_CATALOG with 20 capability owner/entrypoint/scope/test-path entries, README navigation, reuse-first AI_WORK_GUIDE and DEC-031. Extended existing check_markdown_docs.py with read-only AST verification of indexed Python symbols/parameter names, duplicate capability IDs and owner/test paths; added regressions and source-aware docs CI triggers. No runtime, Stage6 or Monitor changes; [docs-integrity CI 43124607337](https://github.com/Kiddos19882/AutoDraw/actions/runs/43124607337) SUCCESS on `7b8f4aaa` (7 tests, 20 indexed AST capability contracts).
 
 
 ## 2026-11-12 — FILL001-SERIES-001 experimental quota-limited capture and verified Clear continuation

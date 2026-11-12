@@ -4,7 +4,7 @@
 
 - Проверены remote HEAD `7cc938af4`, последние 20 commits, GitHub Actions и existing docs/navigation/API/invariants. Подтверждены устаревшие описания фиксированного FILL planner и исторического Selenium/V5 handoff; код более позднего состояния отличается. Использована существующая система README→COMPONENT_CATALOG→API/Dependency/Tests, не создана параллельная knowledge base.
 - Создано 20 карточек reuse-first; добавлено правило для ИИ, DEC-031, AST checker в существующем docs audit, negative regression и CI source-path triggers. Исполнение игры/Windows/Python import не выполнялось; Stage6 и другие production исходники неизменны.
-- Проверка нового CI при публикации ещё PENDING; структурный checker не доказывает semantic correctness, production maturity или E4.
+- [docs-integrity CI 43124607337](https://github.com/Kiddos19882/AutoDraw/actions/runs/43124607337) **SUCCESS** на `7b8f4aaa`: 7/7 tests, 20/20 AST records, 100/100 Markdown, 0 broken links, 0 duplicated DEC ID и 0 history violations. Структурный checker не доказывает semantic correctness, production maturity или E4.
 
 
 ## 2026-11-12 — FILL001-SERIES-001: анализ первой живой resource-stop попытки и реализация продолжения

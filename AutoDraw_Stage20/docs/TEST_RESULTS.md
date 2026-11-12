@@ -2,7 +2,7 @@
 
 ## DOC-CODE-REUSE-001 — baseline структурного каталога (2026-11-12)
 
-На baseline source SHA `7cc938af4e349bd187981749d47f7e41c207ce24` выборочно сверены определения 20 точек входа в Firefox/Selenium, Monitor/ROI, Clear/ENGINE-001, FILL001 Stage6/manifest/runner, CHALK, PNG, brush-radius и owner-lock. Карточки содержат пути к existing regression files, но их существование **не равно** PASS. В существующий Markdown audit добавлена проверка Python AST и ссылок на тесты без импорта и исполнения модулей; тесты охватывают отсутствующий путь, отсутствующий аргумент и дублирование ID. **Результат CI для нового коммита пока NOT_RUN** (в момент подготовки документа); после запуска проверять CI commit отдельно. Нет нового game E4/E5 и нет измерения CHALK.
+На baseline source SHA `7cc938af4e349bd187981749d47f7e41c207ce24` выборочно сверены определения 20 точек входа в Firefox/Selenium, Monitor/ROI, Clear/ENGINE-001, FILL001 Stage6/manifest/runner, CHALK, PNG, brush-radius и owner-lock. Карточки содержат пути к existing regression files, но их существование **не равно** PASS. В существующий Markdown audit добавлена проверка Python AST и ссылок на тесты без импорта и исполнения модулей; тесты охватывают отсутствующий путь, отсутствующий аргумент и дублирование ID. **Фактический E2/E3 PASS:** [docs-integrity CI 43124607337](https://github.com/Kiddos19882/AutoDraw/actions/runs/43124607337) SUCCESS на `7b8f4aaa`; 7 unit tests PASS, 100/100 Markdown indexed, 20/20 capability records, 0 catalog errors, 0 missing links, 0 duplicate decisions, 0 corrupt history. Это не semantic/runtime проверка. Нет нового game E4/E5 и нет измерения CHALK.
 
 
 ## FILL001-SERIES-001 — первичная E4 BLOCKED и quota-limited E2/E3 (2026-11-12)
