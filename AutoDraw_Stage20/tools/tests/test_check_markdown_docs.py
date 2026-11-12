@@ -106,5 +106,22 @@ class MarkdownIntegrityTests(unittest.TestCase):
             self.assertEqual(errors[0]['error'], 'missing_catalog')
 
 
+    def test_actual_catalog_finds_five_reuse_tasks(self):
+        root = Path(__file__).resolve().parents[2]
+        cases = (
+            ('очистить доску', 'CAP-007'),
+            ('Selenium Firefox', 'CAP-001'),
+            ('точный CHALK', 'CAP-015'),
+            ('owner lock', 'CAP-018'),
+            ('расход краски', 'CAP-015'),
+        )
+        for query, expected in cases:
+            with self.subTest(query=query):
+                found = find_capabilities(root, query)
+                self.assertTrue(found)
+                self.assertEqual(found[0]['id'], expected)
+                self.assertEqual(found[0]['evidence'], 'E1_CANDIDATE_ONLY')
+
+
 if __name__ == '__main__':
     unittest.main()
