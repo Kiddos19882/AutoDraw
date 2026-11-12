@@ -11,6 +11,7 @@ on:
       - "AutoDraw_Stage20/source/**/*.py"
       - "AutoDraw_Stage20/geometry_models/**/*.py"
       - "AutoDraw_Stage20/shared_image_processing/**/*.py"
+      - "AutoDraw_Stage20/tools/capability_catalog.py"
       - "AutoDraw_Stage20/tools/check_markdown_docs.py"
       - "AutoDraw_Stage20/tools/tests/test_check_markdown_docs.py"
       - ".github/workflows/docs-integrity.yml"
