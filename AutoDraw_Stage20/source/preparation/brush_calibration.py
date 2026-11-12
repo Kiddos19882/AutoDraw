@@ -294,3 +294,35 @@ def load_profile(path: str | Path) -> dict[str, Any]:
     except (OSError, json.JSONDecodeError) as exc:
         raise BrushCalibrationError(f"Не удалось загрузить профиль {source}: {exc}") from exc
     return deepcopy(validate_profile(document))
+
+
+def series_clear_controls_from_profile(
+    profile: dict[str, Any], *, profile_path: str | Path | None = None,
+) -> dict[str, Any] | None:
+    """Return validated Clear control without requiring manual board_area.
+
+    The exact screenshot board rectangle MUST be supplied independently by a
+    same-session verified native BoardPane probe. This helper does not
+    validate any screenshot, grant game input, or change the legacy calibration
+    requirements for ordinary Brush Lab tests.
+    """
+    validate_profile(profile)
+    point = profile["points"].get("clear_board")
+    status = profile["status"]["points"].get("clear_board")
+    width = profile["environment"].get("screen_width")
+    height = profile["environment"].get("screen_height")
+    if (not isinstance(point, dict) or status != "set"
+            or type(width) is not int or width <= 0
+            or type(height) is not int or height <= 0):
+        return None
+    return {
+        "points": {key: dict(value) if isinstance(value, dict) else None
+                   for key, value in profile["points"].items()},
+        "regions": {},
+        "status": {
+            "points": dict(profile["status"]["points"]),
+            "regions": {},
+        },
+        "profile_path": str(profile_path) if profile_path is not None else None,
+        "screen_size": {"width": width, "height": height},
+    }
