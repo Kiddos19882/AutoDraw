@@ -82,15 +82,42 @@ def _load_session(path: Path, sid: str) -> dict[str, Any]:
     return session
 
 
-def _recent_samples(path: Path, sid: str, baseline_count: int, *,
+def _recent_samples(path: Path, sid: str, baseline: list[dict], *,
                     deadline: float) -> tuple[dict, list[dict]]:
+    """Require three new events even when the Bridge 16-entry ring is full."""
+    from datetime import datetime, timezone
+
+    def utc(stamp: Any) -> datetime | None:
+        if not isinstance(stamp, str):
+            return None
+        try:
+            value = datetime.fromisoformat(stamp.replace("Z", "+00:00"))
+        except ValueError:
+            return None
+        if value.tzinfo is None:
+            return None
+        return value.astimezone(timezone.utc)
+
+    if not isinstance(baseline, list):
+        raise PreflightGeometryError("Invalid Bridge passive sample baseline.")
+    last = baseline[-1] if baseline else None
+    since = utc(last.get("captured_at_utc")) if isinstance(last, dict) else None
+    if last is not None and since is None:
+        raise PreflightGeometryError("Invalid Bridge baseline event timestamp.")
     while time.monotonic() < deadline:
         session = _load_session(path, sid)
         samples = session.get("passive_preflight_samples")
-        if isinstance(samples, list) and len(samples) >= baseline_count+3:
+        if isinstance(samples, list) and len(samples) >= 3:
             suffix = samples[-3:]
-            if all(isinstance(item, dict) and item.get("session_id") == sid
-                   for item in suffix):
+            stamps = [utc(item.get("captured_at_utc")) if isinstance(item, dict)
+                      else None for item in suffix]
+            if (all(isinstance(item, dict) and item.get("session_id") == sid
+                    for item in suffix)
+                    and all(stamp is not None and (since is None or stamp > since)
+                            for stamp in stamps)
+                    and stamps[0] < stamps[1] < stamps[2]
+                    and len({(item.get("clientX"), item.get("clientY"))
+                             for item in suffix}) == 3):
                 return session, suffix
         time.sleep(0.2)
     raise PreflightGeometryError("No three fresh passive BoardPane input witnesses.")
@@ -225,7 +252,7 @@ def _collect_verified_boardpane_roi(
         ActionChains(driver).move_to_element_with_offset(canvas,dx,dy).perform()
         time.sleep(0.3)
     preliminary, witnesses = _recent_samples(
-        session_file, session_id, len(before), deadline=time.monotonic()+8,
+        session_file, session_id, before, deadline=time.monotonic()+8,
     )
     offsets = [(float(e["screenX"])-float(e["clientX"]),
                 float(e["screenY"])-float(e["clientY"])) for e in witnesses]
@@ -249,7 +276,7 @@ def _collect_verified_boardpane_roi(
         native_mouse.moveTo(x,y,duration=0)
         time.sleep(0.35)
     actual, samples = _recent_samples(
-        session_file,session_id,len(baseline),deadline=time.monotonic()+8,
+        session_file,session_id,baseline,deadline=time.monotonic()+8,
     )
     # Resolve wall-clock time AFTER the passive samples were collected.
     # A snapshot taken before Selenium/OS moves would make fresh samples
