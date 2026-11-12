@@ -121,3 +121,37 @@ def test_counter_not_restored_blocks_after_single_click(tmp_path):
         )
     assert clicks == [(1500, 175)]
     assert not (tmp_path / "after-clear.png").exists()
+
+
+def test_rejected_clear_preserves_visual_metrics_and_png_but_never_passes(tmp_path):
+    reference, screenshot, profile, meta = setup(tmp_path)
+    # 100 / 40000 changed pixels = 0.25%, above frozen 0.15% threshold.
+    for x in range(100):
+        screenshot.putpixel((x, 0), (255, 255, 255))
+    calls = []
+    snapshots = iter([snap(1, 1), snap(1, 2)])
+    target = tmp_path / "after-clear.png"
+    with pytest.raises(SeriesClearBlocked, match="rejected Clear") as err:
+        clear_with_existing_engine001(
+            profile=profile, reference_png=reference, reference_metadata=meta,
+            session_id="persistent", mapping_sha256="a"*64,
+            pre_clear_snapshot=snap(100, 0),
+            live_snapshot=lambda: next(snapshots),
+            grab_board_roi=lambda: screenshot.copy(),
+            click=lambda x, y: calls.append((x, y)),
+            foreground_verified=lambda: True, stop_requested=lambda: False,
+            wait_settle=lambda: None,
+            after_clear_png=target, mouse_released=True,
+        )
+    message = str(err.value)
+    assert "status=not_restored" in message
+    assert "changed_percent=0.25" in message
+    assert "tolerance_percent=0.15" in message
+    assert "changed_pixels=100" in message
+    assert "total_pixels=40000" in message
+    assert "reference_sha256=" in message
+    assert "after_clear_sha256=" in message
+    assert calls == [(1500, 175)]
+    assert target.is_file()
+    # The rejected comparator must not return valid Clear proof or schedule
+    # another click / game stroke, even when exact counters are already blank.
