@@ -720,7 +720,8 @@ class Fill001Tab:
             meter = profile.get("regions", {}).get("paint_meter_area")
             safe_point = _cursor_safe_point_outside_region(
                 roi, (profile["screen_size"]["width"], profile["screen_size"]["height"]),
-                margin=32, avoid_regions=(meter,) if isinstance(meter, dict) else (),
+                margin=160, avoid_regions=(meter,) if isinstance(meter, dict) else (),
+                require_below=True,
             )
             if firefox_foreground_witness(driver) is not True:
                 raise SeriesBlocked("Firefox foreground lost before BoardPane blank capture")
@@ -894,7 +895,8 @@ class Fill001Tab:
                 safe_point = _cursor_safe_point_outside_region(
                     latest_roi,
                     (profile["screen_size"]["width"], profile["screen_size"]["height"]),
-                    margin=32, avoid_regions=(meter,) if isinstance(meter, dict) else (),
+                    margin=160, avoid_regions=(meter,) if isinstance(meter, dict) else (),
+                require_below=True,
                 )
                 if firefox_foreground_witness(driver) is not True:
                     raise SeriesBlocked("Firefox foreground lost before after-Clear screenshot")
