@@ -1,5 +1,9 @@
 # AutoDraw — действующие задачи
 
+- [x] **FILL001 / move cursor farther downward before PNG (E1):** `1f3c2e5` дополняет общий _cursor_safe_point_outside_region флагом `require_below` (по умолчанию false для legacy); `0aaf131` применяет строго вниз, отступ **160 px** вместо 32 к blank/after-Clear series PNG; `13b568f` увеличивает popup settle до `0.4s`; `d960b8d` negative tests; `bd324ee` CI. При недостатке места снизу — BLOCKED, не боковой fallback.
+- [ ] **CI E2/E3:** подтвердить `test_brush_behavior_test_ui.py -k strict_downward_cursor_parking... `, synthetic native ROI regression и docs integrity на соответствующем SHA. Пока результаты NOT_VERIFIED/UNKNOWN.
+- [ ] **Windows E4:** в новой сессии FILL001 проверить курсор и обе PNG, что всплывающая панель не заслоняет доску и что transition Clear→next действительно проходит. Если 160 px попадает на другой UI, не отключать проверку: выбрать проверяемый внеинтерфейсный safe zone, зафиксировать evidence и новый patch.
+
 - [x] **FILL001 native BoardPane screenshot & Clear-only profile / E1:** `20fccadf` — снимки blank/after-clear используют общий exact ROI contract, повторная проверка геометрии после Clear, cursor-off-board, 150ms settle; отдельный валидированный Clear-button config не требует `board_area`. Legacy Brush Lab getter сохранён. Новые targeted regression tests и CI triggers добавлены.
 - [ ] **Подтверждение E2/E3:** получить FILL001 series workflow run/job logs с checkout SHA `20fccadf` либо более новым итоговым SHA; убедиться в PASS всех обязательных jobs. При отсутствии лога NOT_VERIFIED/UNKNOWN.
 - [ ] **BoardPane в автономном Brush Lab:** провести явную интеграцию владельца authenticated Windows Firefox/Bridge и независимых native pointer witnesses. Только затем переводить blank/preclear/phase/postdraw/afterclear и visibility; без owner/свежего screen mapping precise capture — BLOCKED, legacy manual отдельно помечен. Не подменять CSS client pixels desktop pixels.
