@@ -182,8 +182,9 @@ def _cursor_safe_point_outside_region(
     *,
     margin: int = 32,
     avoid_regions: tuple[dict[str, Any], ...] = (),
+    require_below: bool = False,
 ) -> tuple[int, int]:
-    """Choose a capture point outside the board and every additional interactive ROI."""
+    """Choose an off-board capture point; optionally refuse sideways fallback."""
     if not isinstance(region, dict):
         raise ValueError("Область доски не задана.")
     try:
@@ -233,6 +234,11 @@ def _cursor_safe_point_outside_region(
         raise ValueError("Не удалось найти безопасную точку курсора вне доски и интерактивных областей.")
     if is_clear(candidates[0]):
         return candidates[0]
+    if require_below:
+        raise ValueError(
+            "Нет безопасной точки строго ниже доски с заданным отступом; "
+            "снимок без проверки всплывающего интерфейса запрещён."
+        )
     return min(valid, key=lambda point: (point[0] - center_x) ** 2 + (point[1] - center_y) ** 2)
 
 
