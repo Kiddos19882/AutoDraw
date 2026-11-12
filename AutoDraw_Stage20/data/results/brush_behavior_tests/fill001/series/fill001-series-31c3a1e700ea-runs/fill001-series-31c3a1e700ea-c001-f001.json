@@ -1,0 +1,54 @@
+{
+  "schema": "FILL001_SERIES_RUN_V1",
+  "series_id": "fill001-series-31c3a1e700ea",
+  "manifest_sha256": "9f067ba423307697568d3b10b61da9b30353b4d21734498ed10d2450728fa991",
+  "task_id": "fill001-series-31c3a1e700ea-c001-f001",
+  "cycle": 1,
+  "shape_id": "rectangle",
+  "fill_method": "dense_scanlines",
+  "brush_radius": 1,
+  "status": "QUOTA_LIMITED",
+  "actual_chalk": 5749,
+  "quality_gate": "NOT_EVALUATED",
+  "runtime": {
+    "task_id": "fill001-series-31c3a1e700ea-c001-f001",
+    "session_id": "a65dd394-1c7c-4035-96f7-d3d63876d48e",
+    "run_id": "5d0e91a2-22ed-40c4-8711-1e63fb2d8869",
+    "bridge_run_ids": [
+      "5d0e91a2-22ed-40c4-8711-1e63fb2d8869"
+    ],
+    "execution_status": "quota_limited",
+    "monitor_binding": "EXACT_RUN_BOUND",
+    "quality_gate": "NOT_EVALUATED",
+    "quota_stop": {
+      "reason": "EXACT_REMAINING_BELOW_SAFETY_MARGIN",
+      "safety_margin_points": 300,
+      "remainingPoints": 250,
+      "pointCount": 5750,
+      "maxPoints": 6000,
+      "completed_strokes": 100,
+      "planned_strokes": 141
+    },
+    "mouse_release_succeeded": true,
+    "pre_pointCount": 1,
+    "post_pointCount": 5750,
+    "actual_chalk": 5749,
+    "before_png_sha256": "b825d973ab46bf89d267e6324a48a99526109b9cda74018a59ae450a58a692a6",
+    "after_settled_png_sha256": "a2a060f31330536301d8671ca624486fe6696472f35048bdeed0ead40f0cf56e",
+    "stage6_summary": {
+      "completed_strokes": 100,
+      "planned_strokes": 141,
+      "duration_seconds": 211.437
+    },
+    "monitor_summary": {
+      "event_count": 28823,
+      "excluded_zero_point_slider_drags": 1
+    },
+    "quality_metrics": {
+      "coverage_fraction": 0.7116784367028139,
+      "leakage_pixels": 155,
+      "leakage_pixels_beyond_allowed_halo": 0,
+      "max_perimeter_overshoot_logical_px": 0.663542
+    }
+  }
+}

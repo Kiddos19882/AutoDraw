@@ -1,0 +1,6 @@
+{
+  "schema": "FILL001_SERIES_CLEAR_V1",
+  "task_id": "fill001-series-31c3a1e700ea-c001-f001",
+  "status": "BLOCKED",
+  "error": "PreflightGeometryError: No three fresh passive BoardPane input witnesses."
+}

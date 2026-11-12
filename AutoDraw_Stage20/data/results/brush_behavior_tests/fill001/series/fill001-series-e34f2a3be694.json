@@ -1,0 +1,103 @@
+{
+  "schema": "FILL001_SERIES_MANIFEST_V1",
+  "series_id": "fill001-series-e34f2a3be694",
+  "cycles": 2,
+  "figures_per_cycle": 3,
+  "shapes": [
+    "rectangle",
+    "wide_irregular",
+    "narrow_irregular"
+  ],
+  "methods": [
+    "dense_scanlines",
+    "spaced_scanlines"
+  ],
+  "radii": [
+    1,
+    5,
+    10
+  ],
+  "tasks": [
+    {
+      "task_id": "fill001-series-e34f2a3be694-c001-f001",
+      "cycle": 1,
+      "figure_in_cycle": 1,
+      "order": 1,
+      "shape_id": "rectangle",
+      "fill_method": "dense_scanlines",
+      "brush_radius": 1,
+      "state": "pending",
+      "execution_allowed": false,
+      "clear_allowed": false
+    },
+    {
+      "task_id": "fill001-series-e34f2a3be694-c001-f002",
+      "cycle": 1,
+      "figure_in_cycle": 2,
+      "order": 2,
+      "shape_id": "wide_irregular",
+      "fill_method": "spaced_scanlines",
+      "brush_radius": 5,
+      "state": "pending",
+      "execution_allowed": false,
+      "clear_allowed": false
+    },
+    {
+      "task_id": "fill001-series-e34f2a3be694-c001-f003",
+      "cycle": 1,
+      "figure_in_cycle": 3,
+      "order": 3,
+      "shape_id": "narrow_irregular",
+      "fill_method": "dense_scanlines",
+      "brush_radius": 10,
+      "state": "pending",
+      "execution_allowed": false,
+      "clear_allowed": false
+    },
+    {
+      "task_id": "fill001-series-e34f2a3be694-c002-f001",
+      "cycle": 2,
+      "figure_in_cycle": 1,
+      "order": 4,
+      "shape_id": "rectangle",
+      "fill_method": "spaced_scanlines",
+      "brush_radius": 1,
+      "state": "pending",
+      "execution_allowed": false,
+      "clear_allowed": false
+    },
+    {
+      "task_id": "fill001-series-e34f2a3be694-c002-f002",
+      "cycle": 2,
+      "figure_in_cycle": 2,
+      "order": 5,
+      "shape_id": "wide_irregular",
+      "fill_method": "dense_scanlines",
+      "brush_radius": 5,
+      "state": "pending",
+      "execution_allowed": false,
+      "clear_allowed": false
+    },
+    {
+      "task_id": "fill001-series-e34f2a3be694-c002-f003",
+      "cycle": 2,
+      "figure_in_cycle": 3,
+      "order": 6,
+      "shape_id": "narrow_irregular",
+      "fill_method": "spaced_scanlines",
+      "brush_radius": 10,
+      "state": "pending",
+      "execution_allowed": false,
+      "clear_allowed": false
+    }
+  ],
+  "manifest_sha256": "42b24e8b29f6a3e6e353689d9200b1c349358f6e61e9d7af2519bf5a0df4ec7d",
+  "execution_allowed": false,
+  "automatic_clear_allowed": false,
+  "mode": "offline_preparation_only",
+  "statistics": {
+    "exact_chalk": "post.pointCount-pre.pointCount, only run-bound",
+    "offline_estimate_is_not_exact_chalk": true,
+    "png_quality": "must be run-bound against corresponding frozen mask"
+  }
+}
