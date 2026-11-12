@@ -24,6 +24,7 @@ from brush_calibration import (
     normalize_region,
     save_profile,
     validate_profile,
+    series_clear_controls_from_profile,
 )
 
 POINT_LABELS = {
@@ -674,35 +675,12 @@ class BrushCalibrationTab:
         }
 
     def get_series_clear_config(self) -> dict[str, Any] | None:
-        """Return point-only Clear controls for verified BoardPane series.
-
-        Unlike get_experiment_capture_config(), a native-probed BoardPane
-        series must NOT require a manually selected board_area. Keep the
-        legacy screenshot experiment contract unchanged.
-        """
+        """Point-only Clear controls; native BoardPane owner supplies board ROI."""
         if self._ensure_screen_compatibility() or self._dirty:
             return None
-        points = self.profile["points"]
-        status = self.profile["status"]
-        if (not isinstance(points.get("clear_board"), dict)
-                or status["points"].get("clear_board") != "set"):
-            return None
-        width = self.profile["environment"].get("screen_width")
-        height = self.profile["environment"].get("screen_height")
-        if (type(width) is not int or width <= 0
-                or type(height) is not int or height <= 0):
-            return None
-        return {
-            "points": {key: dict(value) if isinstance(value, dict) else None
-                       for key, value in points.items()},
-            "regions": {},  # Board ROI is supplied only by native Monitor probe.
-            "status": {
-                "points": dict(status["points"]),
-                "regions": {},
-            },
-            "profile_path": str(self.profile_path),
-            "screen_size": {"width": width, "height": height},
-        }
+        return series_clear_controls_from_profile(
+            self.profile, profile_path=self.profile_path,
+        )
 
     def get_board_area(self) -> dict[str, int] | None:
         if self._ensure_screen_compatibility():
