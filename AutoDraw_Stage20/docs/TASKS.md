@@ -1,5 +1,8 @@
 # AutoDraw — действующие задачи
 
+- [x] **E2/E3 dedicated FILL001 после ring fix:** [43263463414](https://github.com/Kiddos19882/AutoDraw/actions/runs/43263463414) SUCCESS на `c2ecbf6` — 217 main synthetic PASS, 5 ring-specific PASS, 7 deselected, syntax/offline smoke PASS; логи просмотрены.
+- [ ] **Windows validation:** [43263429296](https://github.com/Kiddos19882/AutoDraw/actions/runs/43263429296) на `26dcf0b` все законченные критические jobs SUCCESS, Preparation пока IN_PROGRESS; не ставить общий PASS до окончательного conclusion. Учитывать что на SHA до workflow correction.
+
 - [x] **FILL001-SERIES-001 / ring buffer after quota stop:** E1 root cause установлена: Bridge `passive_preflight_samples` max16, а native probe ошибочно требовал увеличения списка после 16. `b10effc` проверяет 3 свежих timestamp-bound witnesses без сравнения длины, `4b1d3a8` включает ring-full/negative pytest. Существующий exact ROI, session, native mouse, Firefox PID и fail-closed сохраняются. Пользователь подтвердил визуально, что 160px pointer park НЕ перекрывает доску; положение курсора не менять.
 - [x] **CI false failures:** Windows legacy cursor assertion `legacy[1]<920` исправлено на `legacy==(800,952)` в `26dcf0b`; Linux dedicated GUI test с неустановленным pyautogui заменён headless Bridge ring tests в `c2ecbf6`. Старый `be705dac`: 1391 PASS/1 FAIL Windows; dedicated 212 PASS, затем import FAIL; причина документирована.
 - [ ] **E2/E3 на `c2ecbf6` или более новом:** дождаться completion всего mandatory FILL001 job, Windows validation на актуальном code SHA и docs integrity; проверить фактические тестовые totals и job logs. Не переносить success с других SHA.
