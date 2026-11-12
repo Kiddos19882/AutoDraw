@@ -1,7 +1,9 @@
 # AutoDraw — действующие задачи
 
 - [x] **DOC-CODE-REUSE-001 / import ownership E1–E3:** [CI 43135827499](https://github.com/Kiddos19882/AutoDraw/actions/runs/43135827499) SUCCESS на `23a5a516e788b2030663fc7ad11b3604dee3c5a4`, 10/10 инструментальных тестов; `--usage` на 129 Python-файлах, 20 возможностей, 2 all-scope SCC и **0 unconditional root-level SCC**. JSON evidence доступен в [артефакте](https://github.com/Kiddos19882/AutoDraw/actions/runs/43135827499/artifacts/13906713385); реальные связи и ограничения [DEPENDENCY_MAP.md](DEPENDENCY_MAP.md). Реализация анализа и regression tests завершены, E4 не затрагивалась.
-- [ ] **Следующий невыполненный архитектурный шаг:** проверить конкретные точки расширения CAP-009/011/012/013/017 (у анализатора нет внешних `DIRECT_CALL_CANDIDATE`; возможно внутреннее использование/callbacks), затем выбрать **один** минимальный совместимый adapter refactor только при доказанном повторении логики. Сохранять существующие CI/E4 gates и frozen методики.
+- [x] **CAP-009/011/012/013/017 read-only E1 trace:** подтверждены вызовы из `integrated_app.py`, `stage6_execute_plan.py` и через wrappers в GUI/runner; прежний `--usage` не охватывал все эти пути. Выбрано единственное доказанное дублирование spacing в FILL001 offline/signed source.
+- [x] **Минимальный adapter refactor:** общий `resolve_series_scanline_spacing` в существующем `fill001_series_handoff.py`; изменения `4eb81f5`, `1b2a8c6`, regression tests `be48666`, `4dfec5c`. Frozen masks, estimator, executor и acceptance не менялись; E1 diff проверен.
+- [ ] **Следующий gate E2/E3:** подтвердить dedicated series CI, docs integrity / root SCC gate и релевантные regression tests именно на `4dfec5c` или его doc-потомке; при FAIL исправить, не ослабляя gate. По доступному источнику status нового workflow пока UNKNOWN. После этого — отдельный E1 аудит необходимости расширить `--usage` на `integrated_app.py` и `source/executor`, не дублируя runtime реализацию.
 
 
 ## DOC-CODE-REUSE-001 — архитектура знаний и повторное использование (2026-11-12)
