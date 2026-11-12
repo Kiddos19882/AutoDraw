@@ -1,5 +1,7 @@
 # AutoDraw — значимые изменения
 
+- 2026-11-12 / FILL001 screenshot: stricter cursor parking 160 px down rather than 32, no side fallback in series captures, 0.4 s tooltip settling, synthetic tests + CI trigger. Legacy Brush Lab unaffected; live proof pending.
+
 - 2026-11-12 / FILL001 native BoardPane: unified fail-closed screenshot ROI, repeat native probes after Clear, cursor hover settling and standalone Clear-only calibration without manually selected board ROI; synthetic negative tests and CI scope expanded (`20fccadf`). Legacy Brush Lab/manual calibration unaffected; E2/E3/E4 pending verification.
 
 - FILL001-SERIES-001 (2026-11-12): two `QUOTA_LIMITED` E4 runs from [`9dbb74b`](https://github.com/Kiddos19882/AutoDraw/commit/9dbb74bb683bab30bbbb9b06a6cbfbd856ea5d74) both have run-bound exact CHALK but Clear comparator blocks next task. [`0b851c1`](https://github.com/Kiddos19882/AutoDraw/commit/0b851c19cdd569aa83c7528aa5cbf8d550601ce0) adds rejected-comparison metrics/hashes to fail-closed Clear error, [`b106fa1`](https://github.com/Kiddos19882/AutoDraw/commit/b106fa13dacf4c8ea68e2acfd70bdb1b8e0f4a40) adds negative regression; acceptance tolerance remains 0.15%. New E2/E3 pending.
