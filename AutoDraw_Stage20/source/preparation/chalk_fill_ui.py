@@ -841,10 +841,22 @@ class Fill001Tab:
             before=snapshot_from_bridge()
             if before["pointCount"] != binding["post_pointCount"]:
                 raise SeriesBlocked("Pre-Clear snapshot does not match closed run")
-            region=require_same_series_boardpane_roi(
-                state["roi"], state["reference_meta"], session_id=session_id,
-                mapping_sha256=state["mapping"]["boardpane_mapping_sha256"],
+            # Re-probe after Stage6 release: a moved Firefox window must not
+            # reuse desktop screen coordinates frozen at the initial preflight.
+            _, current_mapping, current_roi = collect_verified_series_firefox_roi(
+                manifest, driver, bridge_root, session_id, state["source"],
+                native_mouse=pyautogui,
+                now_utc=lambda:datetime.now(timezone.utc),
             )
+            if current_mapping["boardpane_mapping_sha256"] != (
+                    state["mapping"]["boardpane_mapping_sha256"]):
+                raise SeriesBlocked("BoardPane mapping changed before Clear")
+            region=require_same_series_boardpane_roi(
+                current_roi, state["reference_meta"], session_id=session_id,
+                mapping_sha256=current_mapping["boardpane_mapping_sha256"],
+            )
+            if bridge_gate()["pointCount"] != binding["post_pointCount"]:
+                raise SeriesBlocked("Game counter moved during Clear ROI revalidation")
             profile_for_clear = {
                 **profile, "regions": {**profile.get("regions", {}), "board_area": region},
             }
