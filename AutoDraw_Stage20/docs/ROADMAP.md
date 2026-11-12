@@ -1,5 +1,7 @@
 # AutoDraw — дорожная карта будущих работ
 
+**FILL001 third-run per-run binding (2026-11-12):** frozen 50MB run root cause diagnosed (local Monitor buffer overflow count 17806 misclassified as transport loss), binder fixed with strict per-run recorder/send/sequence gates and synthetic+real-frozen CI replay PASS `874f2e1` / 43274926194. Next fresh E4 3→4 transition with verified Clear and independently bound CHALK; then E5. Legacy blocked result not rewritten.
+
 **FILL001 pointer hover/screenshot gate (2026-11-12):** для baseline и after-Clear PNG изменён перенос курсора с legacy margin32 на строгую нижнюю точку `board/meter.bottom+160px` (без lateral fallback) и popup settle 0.4 s. Следующий E2/E3 dedicated CI, затем пользовательский E4 с PNG и подтверждением исчезновения overlay. Не считать саму координату защитой от всех иных интерактивных UI, и не ослаблять Clear comparator.
 
 **BoardPane migration gate (2026-11-12):** FILL001 screenshot capture hardened through exact native ROI contract, post-Clear re-probe and cursor-off-board; point-only Clear calibration removes manual board_area requirement at series launch (`20fccadf`). Next E2/E3 check on new commit, followed by E4 Windows 1×2; only then design Brush Lab authenticated browser/Bridge owner adapter. Standalone Brush Lab still legacy/manual; no unverified CSS client-to-desktop conversion, no threshold change.
