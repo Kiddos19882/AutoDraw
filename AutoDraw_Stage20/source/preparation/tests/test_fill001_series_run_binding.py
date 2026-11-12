@@ -21,7 +21,8 @@ def sample_run():
     return {
         "schema_version":1, "record_type":"autodraw_game_monitor_run",
         "session_id":"sid", "run_id":"run-1", "started_at_utc":"2026-11-11T01:00:00Z",
-        "execution_status":"completed", "monitor_dropped_events":0,"monitor_error_count":0,
+        "execution_status":"completed", "dropped_events":0,
+        "monitor_dropped_events":0,"monitor_error_count":0,
         "collector_sequence_gap_count":0, "bridge_send_failures_delta":0,
         "point_delta_matches_chalk":True, "monitor_errors":[],
         "pre_test_snapshot":{"isExact":True,"pointCount":1,"maxPoints":6000,"remainingPoints":5999},
