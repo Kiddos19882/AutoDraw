@@ -671,7 +671,7 @@ class Fill001Tab:
         from fill001_series_stage6_execution import normalized_series_run
         from fill001_series_engine001_clear import (
             clear_with_existing_engine001, capture_verified_series_boardpane_blank,
-            require_same_series_boardpane_roi,
+            require_same_series_boardpane_roi, capture_same_boardpane_roi,
         )
         from fill001_v5_live_gate import verify_v5_live_gate
         from firefox_foreground_witness import firefox_foreground_witness
@@ -711,6 +711,18 @@ class Fill001Tab:
                 now_utc=lambda:datetime.now(timezone.utc),
             )
             state.update(source=source,mapped=mapped,mapping=mapping,roi=roi)
+            gate=bridge_gate(blank=True)
+            # The native probe leaves the pointer inside BoardPane. Move
+            # without a click so hover/brush overlays cannot enter the blank
+            # reference and contaminate later Clear comparison.
+            meter = profile.get("regions", {}).get("paint_meter_area")
+            safe_point = _cursor_safe_point_outside_region(
+                roi, (profile["screen_size"]["width"], profile["screen_size"]["height"]),
+                margin=32, avoid_regions=(meter,) if isinstance(meter, dict) else (),
+            )
+            if firefox_foreground_witness(driver) is not True:
+                raise SeriesBlocked("Firefox foreground lost before BoardPane blank capture")
+            pyautogui.moveTo(*safe_point, duration=0)
             gate=bridge_gate(blank=True)
             if state["reference_meta"] is None:
                 # New per-series blank baseline: same native BoardPane probe
@@ -861,13 +873,37 @@ class Fill001Tab:
                 **profile, "regions": {**profile.get("regions", {}), "board_area": region},
             }
             def capture_board_roi() -> Image.Image:
-                screen=ImageGrab.grab()
-                size=profile["screen_size"]
-                if screen.size!=(size["width"],size["height"]):
-                    raise SeriesBlocked("Calibrated screen dimensions changed")
-                box=(region["x"],region["y"],
-                     region["x"]+region["width"],region["y"]+region["height"])
-                return screen.crop(box)
+                # After the Clear click/settle, confirm that the desktop
+                # mapping still matches the baseline. CSS-only coordinates
+                # or the previous native probe are not sufficient evidence.
+                _, latest_mapping, latest_roi = collect_verified_series_firefox_roi(
+                    manifest, driver, bridge_root, session_id, state["source"],
+                    native_mouse=pyautogui,
+                    now_utc=lambda:datetime.now(timezone.utc),
+                )
+                require_same_series_boardpane_roi(
+                    latest_roi, state["reference_meta"], session_id=session_id,
+                    mapping_sha256=latest_mapping["boardpane_mapping_sha256"],
+                )
+                if bridge_gate(blank=True)["pointCount"] != 1:
+                    raise SeriesBlocked("Board not exactly blank after Clear ROI probe")
+                meter = profile.get("regions", {}).get("paint_meter_area")
+                safe_point = _cursor_safe_point_outside_region(
+                    latest_roi,
+                    (profile["screen_size"]["width"], profile["screen_size"]["height"]),
+                    margin=32, avoid_regions=(meter,) if isinstance(meter, dict) else (),
+                )
+                if firefox_foreground_witness(driver) is not True:
+                    raise SeriesBlocked("Firefox foreground lost before after-Clear screenshot")
+                pyautogui.moveTo(*safe_point, duration=0)
+                bridge_gate(blank=True)
+                return capture_same_boardpane_roi(
+                    roi=latest_roi, reference_metadata=state["reference_meta"],
+                    session_id=session_id,
+                    mapping_sha256=latest_mapping["boardpane_mapping_sha256"],
+                    screen_size=profile["screen_size"],
+                    grab_screen=ImageGrab.grab,
+                )
             target=root_dir/"clear-png"/(task["task_id"]+"-after-clear.png")
             clear=clear_with_existing_engine001(
                 profile=profile_for_clear,
