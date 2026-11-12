@@ -184,30 +184,32 @@ class MarkdownIntegrityTests(unittest.TestCase):
             tests = prep / 'tests'
             for folder in (executor, unrelated, docs, tests):
                 folder.mkdir(parents=True, exist_ok=True)
+            newline = chr(10)
             (prep / 'owner.py').write_text(
-                'def action(value):\\n    return value\\n'.replace('\\\\n', '\\n'),
+                newline.join(('def action(value):', '    return value', '')),
                 encoding='utf-8')
             (tests / 'test_owner.py').write_text(
-                'def test_owner():\\n    pass\\n'.replace('\\\\n', '\\n'),
+                newline.join(('def test_owner():', '    pass', '')),
                 encoding='utf-8')
             (root / 'integrated_app.py').write_text(
-                'from owner import action as run\\nrun(1)\\n'.replace('\\\\n', '\\n'),
+                newline.join(('from owner import action as run', 'run(1)', '')),
                 encoding='utf-8')
             (executor / 'stage6_execute_plan.py').write_text(
-                'def execute():\\n'
-                '    import owner as module\\n'
-                '    return module.action(2)\\n'.replace('\\\\n', '\\n'),
+                newline.join(('def execute():', '    import owner as module',
+                              '    return module.action(2)', '')),
                 encoding='utf-8')
             (unrelated / 'decoy.py').write_text(
-                'from owner import action\\naction(3)\\n'.replace('\\\\n', '\\n'),
+                newline.join(('from owner import action', 'action(3)', '')),
                 encoding='utf-8')
             (docs / 'COMPONENT_CATALOG.md').write_text(
-                '<!-- AUTODRAW_CAPABILITIES_START -->\\n'
-                '| CAP-001 | act | `source/preparation/owner.py` | '
-                '`action` | `value` | shared | E1 | '
-                '`source/preparation/tests/test_owner.py` |\\n'
-                '<!-- AUTODRAW_CAPABILITIES_END -->\\n',
-                encoding='utf-8')
+                newline.join((
+                    '<!-- AUTODRAW_CAPABILITIES_START -->',
+                    '| CAP-001 | act | `source/preparation/owner.py` | '
+                    '`action` | `value` | shared | E1 | '
+                    '`source/preparation/tests/test_owner.py` |',
+                    '<!-- AUTODRAW_CAPABILITIES_END -->',
+                    '',
+                )), encoding='utf-8')
             result = inspect_capability_consumers(root)
             self.assertEqual(result['source_files_scanned'], 4)
             matches = {x['path']: x for x in result['capabilities'][0]['consumers']}
