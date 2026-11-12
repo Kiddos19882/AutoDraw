@@ -105,3 +105,40 @@ def test_save_load_profile_round_trip_is_atomic_and_valid(tmp_path):
     assert json.loads(path.read_text(encoding="utf-8"))["points"]["clear_board"] == {"x": 12, "y": 34}
     assert load_profile(path) == profile
     assert not list(tmp_path.glob("*.tmp"))
+
+
+def test_native_series_clear_profile_does_not_require_manually_selected_board():
+    from brush_calibration import series_clear_controls_from_profile
+    profile = create_default_profile((1920, 1080))
+    _set_point(profile, "clear_board", 1500, 175)
+    assert profile["regions"]["board_area"] is None
+    assert missing_required_fields(profile) == ["board_area", "paint_meter_area"]
+    result = series_clear_controls_from_profile(
+        profile, profile_path="brush_paint_calibration.json",
+    )
+    assert result is not None
+    assert result["points"]["clear_board"] == {"x": 1500, "y": 175}
+    assert result["regions"] == {}
+    assert result["status"]["regions"] == {}
+    assert result["screen_size"] == {"width": 1920, "height": 1080}
+    assert result["profile_path"] == "brush_paint_calibration.json"
+    # This does not relax the legacy full screenshot experiment contract.
+    assert profile["regions"]["board_area"] is None
+
+
+@pytest.mark.parametrize("condition", [
+    "missing_clear", "unverified_clear", "unavailable_screen",
+])
+def test_native_series_clear_profile_fails_closed_without_point_evidence(condition):
+    from brush_calibration import series_clear_controls_from_profile
+    profile = create_default_profile((1920, 1080))
+    _set_point(profile, "clear_board", 1500, 175)
+    if condition == "missing_clear":
+        profile["points"]["clear_board"] = None
+        profile["status"]["points"]["clear_board"] = "not_set"
+    elif condition == "unverified_clear":
+        profile["status"]["points"]["clear_board"] = "needs_review"
+    elif condition == "unavailable_screen":
+        profile["environment"]["screen_width"] = None
+        profile["environment"]["screen_height"] = None
+    assert series_clear_controls_from_profile(profile) is None
