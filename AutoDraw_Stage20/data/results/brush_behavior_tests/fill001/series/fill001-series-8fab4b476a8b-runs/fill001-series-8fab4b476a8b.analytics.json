@@ -1,0 +1,1111 @@
+{
+  "schema": "FILL001_SERIES_ANALYTICS_V1",
+  "series_id": "fill001-series-8fab4b476a8b",
+  "manifest_sha256": "dbc5379ff8ab2bc640291de8e874e1bf0de7478724bbe69fb576a09e91644df9",
+  "status": "PARTIAL",
+  "scheduled": 6,
+  "observed": 3,
+  "missing": [
+    "fill001-series-8fab4b476a8b-c002-f001",
+    "fill001-series-8fab4b476a8b-c002-f002",
+    "fill001-series-8fab4b476a8b-c002-f003"
+  ],
+  "rejected": [],
+  "quality_pass": 0,
+  "quality_fail": 1,
+  "quota_limited": 1,
+  "blocked": 1,
+  "ranking_basis": "observed quality PASS only; no repeatability or E5 implied",
+  "lowest_observed_quality_pass_chalk": null,
+  "grouped_statistics": {
+    "shape_id": {
+      "narrow_irregular": {
+        "observations": 1,
+        "quality_pass": 0,
+        "quality_fail": 0,
+        "quota_limited": 0,
+        "blocked": 1,
+        "chalk_quality_pass": {
+          "status": "NOT_EVALUATED",
+          "count": 0
+        },
+        "chalk_quality_fail": {
+          "status": "NOT_EVALUATED",
+          "count": 0
+        },
+        "chalk_quota_limited_diagnostic": {
+          "status": "NOT_EVALUATED",
+          "count": 0
+        },
+        "metrics_quality_pass": {
+          "coverage_fraction": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "leakage_pixels": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "leakage_pixels_beyond_allowed_halo": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "max_perimeter_overshoot_logical_px": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "stroke_count": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "completed_strokes": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "duration_seconds": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "event_count": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "dropped_events": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "monitor_errors": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "bridge_failures": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "sequence_gaps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "path_length_logical_pixels": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "color_switches": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "brush_switches": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "mean_fps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "min_fps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          }
+        }
+      },
+      "rectangle": {
+        "observations": 1,
+        "quality_pass": 0,
+        "quality_fail": 0,
+        "quota_limited": 1,
+        "blocked": 0,
+        "chalk_quality_pass": {
+          "status": "NOT_EVALUATED",
+          "count": 0
+        },
+        "chalk_quality_fail": {
+          "status": "NOT_EVALUATED",
+          "count": 0
+        },
+        "chalk_quota_limited_diagnostic": {
+          "status": "MEASURED",
+          "count": 1,
+          "min": 5757,
+          "max": 5757,
+          "mean": 5757,
+          "median": 5757,
+          "population_stdev": 0
+        },
+        "metrics_quality_pass": {
+          "coverage_fraction": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "leakage_pixels": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "leakage_pixels_beyond_allowed_halo": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "max_perimeter_overshoot_logical_px": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "stroke_count": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "completed_strokes": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "duration_seconds": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "event_count": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "dropped_events": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "monitor_errors": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "bridge_failures": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "sequence_gaps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "path_length_logical_pixels": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "color_switches": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "brush_switches": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "mean_fps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "min_fps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          }
+        }
+      },
+      "wide_irregular": {
+        "observations": 1,
+        "quality_pass": 0,
+        "quality_fail": 1,
+        "quota_limited": 0,
+        "blocked": 0,
+        "chalk_quality_pass": {
+          "status": "NOT_EVALUATED",
+          "count": 0
+        },
+        "chalk_quality_fail": {
+          "status": "MEASURED",
+          "count": 1,
+          "min": 1969,
+          "max": 1969,
+          "mean": 1969,
+          "median": 1969,
+          "population_stdev": 0
+        },
+        "chalk_quota_limited_diagnostic": {
+          "status": "NOT_EVALUATED",
+          "count": 0
+        },
+        "metrics_quality_pass": {
+          "coverage_fraction": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "leakage_pixels": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "leakage_pixels_beyond_allowed_halo": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "max_perimeter_overshoot_logical_px": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "stroke_count": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "completed_strokes": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "duration_seconds": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "event_count": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "dropped_events": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "monitor_errors": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "bridge_failures": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "sequence_gaps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "path_length_logical_pixels": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "color_switches": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "brush_switches": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "mean_fps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "min_fps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          }
+        }
+      }
+    },
+    "fill_method": {
+      "dense_scanlines": {
+        "observations": 2,
+        "quality_pass": 0,
+        "quality_fail": 0,
+        "quota_limited": 1,
+        "blocked": 1,
+        "chalk_quality_pass": {
+          "status": "NOT_EVALUATED",
+          "count": 0
+        },
+        "chalk_quality_fail": {
+          "status": "NOT_EVALUATED",
+          "count": 0
+        },
+        "chalk_quota_limited_diagnostic": {
+          "status": "MEASURED",
+          "count": 1,
+          "min": 5757,
+          "max": 5757,
+          "mean": 5757,
+          "median": 5757,
+          "population_stdev": 0
+        },
+        "metrics_quality_pass": {
+          "coverage_fraction": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "leakage_pixels": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "leakage_pixels_beyond_allowed_halo": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "max_perimeter_overshoot_logical_px": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "stroke_count": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "completed_strokes": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "duration_seconds": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "event_count": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "dropped_events": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "monitor_errors": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "bridge_failures": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "sequence_gaps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "path_length_logical_pixels": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "color_switches": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "brush_switches": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "mean_fps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "min_fps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          }
+        }
+      },
+      "spaced_scanlines": {
+        "observations": 1,
+        "quality_pass": 0,
+        "quality_fail": 1,
+        "quota_limited": 0,
+        "blocked": 0,
+        "chalk_quality_pass": {
+          "status": "NOT_EVALUATED",
+          "count": 0
+        },
+        "chalk_quality_fail": {
+          "status": "MEASURED",
+          "count": 1,
+          "min": 1969,
+          "max": 1969,
+          "mean": 1969,
+          "median": 1969,
+          "population_stdev": 0
+        },
+        "chalk_quota_limited_diagnostic": {
+          "status": "NOT_EVALUATED",
+          "count": 0
+        },
+        "metrics_quality_pass": {
+          "coverage_fraction": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "leakage_pixels": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "leakage_pixels_beyond_allowed_halo": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "max_perimeter_overshoot_logical_px": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "stroke_count": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "completed_strokes": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "duration_seconds": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "event_count": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "dropped_events": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "monitor_errors": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "bridge_failures": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "sequence_gaps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "path_length_logical_pixels": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "color_switches": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "brush_switches": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "mean_fps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "min_fps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          }
+        }
+      }
+    },
+    "brush_radius": {
+      "1": {
+        "observations": 1,
+        "quality_pass": 0,
+        "quality_fail": 0,
+        "quota_limited": 1,
+        "blocked": 0,
+        "chalk_quality_pass": {
+          "status": "NOT_EVALUATED",
+          "count": 0
+        },
+        "chalk_quality_fail": {
+          "status": "NOT_EVALUATED",
+          "count": 0
+        },
+        "chalk_quota_limited_diagnostic": {
+          "status": "MEASURED",
+          "count": 1,
+          "min": 5757,
+          "max": 5757,
+          "mean": 5757,
+          "median": 5757,
+          "population_stdev": 0
+        },
+        "metrics_quality_pass": {
+          "coverage_fraction": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "leakage_pixels": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "leakage_pixels_beyond_allowed_halo": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "max_perimeter_overshoot_logical_px": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "stroke_count": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "completed_strokes": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "duration_seconds": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "event_count": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "dropped_events": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "monitor_errors": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "bridge_failures": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "sequence_gaps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "path_length_logical_pixels": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "color_switches": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "brush_switches": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "mean_fps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "min_fps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          }
+        }
+      },
+      "10": {
+        "observations": 1,
+        "quality_pass": 0,
+        "quality_fail": 0,
+        "quota_limited": 0,
+        "blocked": 1,
+        "chalk_quality_pass": {
+          "status": "NOT_EVALUATED",
+          "count": 0
+        },
+        "chalk_quality_fail": {
+          "status": "NOT_EVALUATED",
+          "count": 0
+        },
+        "chalk_quota_limited_diagnostic": {
+          "status": "NOT_EVALUATED",
+          "count": 0
+        },
+        "metrics_quality_pass": {
+          "coverage_fraction": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "leakage_pixels": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "leakage_pixels_beyond_allowed_halo": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "max_perimeter_overshoot_logical_px": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "stroke_count": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "completed_strokes": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "duration_seconds": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "event_count": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "dropped_events": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "monitor_errors": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "bridge_failures": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "sequence_gaps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "path_length_logical_pixels": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "color_switches": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "brush_switches": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "mean_fps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "min_fps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          }
+        }
+      },
+      "5": {
+        "observations": 1,
+        "quality_pass": 0,
+        "quality_fail": 1,
+        "quota_limited": 0,
+        "blocked": 0,
+        "chalk_quality_pass": {
+          "status": "NOT_EVALUATED",
+          "count": 0
+        },
+        "chalk_quality_fail": {
+          "status": "MEASURED",
+          "count": 1,
+          "min": 1969,
+          "max": 1969,
+          "mean": 1969,
+          "median": 1969,
+          "population_stdev": 0
+        },
+        "chalk_quota_limited_diagnostic": {
+          "status": "NOT_EVALUATED",
+          "count": 0
+        },
+        "metrics_quality_pass": {
+          "coverage_fraction": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "leakage_pixels": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "leakage_pixels_beyond_allowed_halo": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "max_perimeter_overshoot_logical_px": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "stroke_count": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "completed_strokes": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "duration_seconds": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "event_count": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "dropped_events": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "monitor_errors": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "bridge_failures": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "sequence_gaps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "path_length_logical_pixels": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "color_switches": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "brush_switches": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "mean_fps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "min_fps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          }
+        }
+      }
+    },
+    "shape_id+fill_method+brush_radius": {
+      "narrow_irregular|dense_scanlines|10": {
+        "observations": 1,
+        "quality_pass": 0,
+        "quality_fail": 0,
+        "quota_limited": 0,
+        "blocked": 1,
+        "chalk_quality_pass": {
+          "status": "NOT_EVALUATED",
+          "count": 0
+        },
+        "chalk_quality_fail": {
+          "status": "NOT_EVALUATED",
+          "count": 0
+        },
+        "chalk_quota_limited_diagnostic": {
+          "status": "NOT_EVALUATED",
+          "count": 0
+        },
+        "metrics_quality_pass": {
+          "coverage_fraction": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "leakage_pixels": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "leakage_pixels_beyond_allowed_halo": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "max_perimeter_overshoot_logical_px": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "stroke_count": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "completed_strokes": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "duration_seconds": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "event_count": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "dropped_events": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "monitor_errors": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "bridge_failures": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "sequence_gaps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "path_length_logical_pixels": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "color_switches": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "brush_switches": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "mean_fps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "min_fps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          }
+        }
+      },
+      "rectangle|dense_scanlines|1": {
+        "observations": 1,
+        "quality_pass": 0,
+        "quality_fail": 0,
+        "quota_limited": 1,
+        "blocked": 0,
+        "chalk_quality_pass": {
+          "status": "NOT_EVALUATED",
+          "count": 0
+        },
+        "chalk_quality_fail": {
+          "status": "NOT_EVALUATED",
+          "count": 0
+        },
+        "chalk_quota_limited_diagnostic": {
+          "status": "MEASURED",
+          "count": 1,
+          "min": 5757,
+          "max": 5757,
+          "mean": 5757,
+          "median": 5757,
+          "population_stdev": 0
+        },
+        "metrics_quality_pass": {
+          "coverage_fraction": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "leakage_pixels": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "leakage_pixels_beyond_allowed_halo": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "max_perimeter_overshoot_logical_px": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "stroke_count": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "completed_strokes": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "duration_seconds": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "event_count": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "dropped_events": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "monitor_errors": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "bridge_failures": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "sequence_gaps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "path_length_logical_pixels": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "color_switches": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "brush_switches": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "mean_fps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "min_fps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          }
+        }
+      },
+      "wide_irregular|spaced_scanlines|5": {
+        "observations": 1,
+        "quality_pass": 0,
+        "quality_fail": 1,
+        "quota_limited": 0,
+        "blocked": 0,
+        "chalk_quality_pass": {
+          "status": "NOT_EVALUATED",
+          "count": 0
+        },
+        "chalk_quality_fail": {
+          "status": "MEASURED",
+          "count": 1,
+          "min": 1969,
+          "max": 1969,
+          "mean": 1969,
+          "median": 1969,
+          "population_stdev": 0
+        },
+        "chalk_quota_limited_diagnostic": {
+          "status": "NOT_EVALUATED",
+          "count": 0
+        },
+        "metrics_quality_pass": {
+          "coverage_fraction": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "leakage_pixels": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "leakage_pixels_beyond_allowed_halo": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "max_perimeter_overshoot_logical_px": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "stroke_count": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "completed_strokes": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "duration_seconds": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "event_count": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "dropped_events": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "monitor_errors": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "bridge_failures": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "sequence_gaps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "path_length_logical_pixels": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "color_switches": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "brush_switches": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "mean_fps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          },
+          "min_fps": {
+            "status": "NOT_EVALUATED",
+            "count": 0
+          }
+        }
+      }
+    }
+  },
+  "runs": [
+    {
+      "task_id": "fill001-series-8fab4b476a8b-c001-f001",
+      "order": 1,
+      "shape_id": "rectangle",
+      "fill_method": "dense_scanlines",
+      "brush_radius": 1,
+      "status": "QUOTA_LIMITED",
+      "quality_gate": "NOT_EVALUATED",
+      "exact_chalk": 5757,
+      "run_id": "75c2a04d-939b-40b7-906a-659bc49846d3",
+      "session_id": "8b06c144-eefa-4fe0-9547-4666914f95a6",
+      "metrics": {
+        "coverage_fraction": 0.7116784367028139,
+        "leakage_pixels": 155,
+        "leakage_pixels_beyond_allowed_halo": 0,
+        "max_perimeter_overshoot_logical_px": 0.663542,
+        "completed_strokes": 100,
+        "duration_seconds": 211.172,
+        "event_count": 28853
+      },
+      "source_sha256": "42e184d3a14d9df37e45dd97544b7b632ae4d628dce610866e54e21b97afac71"
+    },
+    {
+      "task_id": "fill001-series-8fab4b476a8b-c001-f002",
+      "order": 2,
+      "shape_id": "wide_irregular",
+      "fill_method": "spaced_scanlines",
+      "brush_radius": 5,
+      "status": "QUALITY_FAIL",
+      "quality_gate": "FAIL",
+      "exact_chalk": 1969,
+      "run_id": "4c74b44f-fd8f-426e-bd5f-13b5ba83439c",
+      "session_id": "8b06c144-eefa-4fe0-9547-4666914f95a6",
+      "metrics": {
+        "coverage_fraction": 0.9847751808190641,
+        "leakage_pixels": 39,
+        "leakage_pixels_beyond_allowed_halo": 0,
+        "max_perimeter_overshoot_logical_px": 0.663542,
+        "completed_strokes": 37,
+        "duration_seconds": 79.031,
+        "event_count": 9885
+      },
+      "source_sha256": "5f66da52dbaae87ec6fe6f00d042345080b997af2169f4a93f4238ffdaebd1ae"
+    },
+    {
+      "task_id": "fill001-series-8fab4b476a8b-c001-f003",
+      "order": 3,
+      "shape_id": "narrow_irregular",
+      "fill_method": "dense_scanlines",
+      "brush_radius": 10,
+      "status": "BLOCKED",
+      "quality_gate": "NOT_EVALUATED",
+      "exact_chalk": null,
+      "run_id": null,
+      "session_id": null,
+      "metrics": {},
+      "source_sha256": "7342bd0673eabb9fd841a519a97b65ab70ca7dde4f70b4f3579aea2569255f20"
+    }
+  ],
+  "independent_game_E5": "NOT_RUN",
+  "production_eligible": false
+}

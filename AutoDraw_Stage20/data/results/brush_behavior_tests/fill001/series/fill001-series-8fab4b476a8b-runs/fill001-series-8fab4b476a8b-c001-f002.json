@@ -1,0 +1,46 @@
+{
+  "schema": "FILL001_SERIES_RUN_V1",
+  "series_id": "fill001-series-8fab4b476a8b",
+  "manifest_sha256": "dbc5379ff8ab2bc640291de8e874e1bf0de7478724bbe69fb576a09e91644df9",
+  "task_id": "fill001-series-8fab4b476a8b-c001-f002",
+  "cycle": 1,
+  "shape_id": "wide_irregular",
+  "fill_method": "spaced_scanlines",
+  "brush_radius": 5,
+  "status": "QUALITY_FAIL",
+  "actual_chalk": 1969,
+  "quality_gate": "FAIL",
+  "runtime": {
+    "task_id": "fill001-series-8fab4b476a8b-c001-f002",
+    "session_id": "8b06c144-eefa-4fe0-9547-4666914f95a6",
+    "run_id": "4c74b44f-fd8f-426e-bd5f-13b5ba83439c",
+    "bridge_run_ids": [
+      "4c74b44f-fd8f-426e-bd5f-13b5ba83439c"
+    ],
+    "execution_status": "completed",
+    "monitor_binding": "EXACT_RUN_BOUND",
+    "quality_gate": "FAIL",
+    "quota_stop": null,
+    "mouse_release_succeeded": true,
+    "pre_pointCount": 1,
+    "post_pointCount": 1970,
+    "actual_chalk": 1969,
+    "before_png_sha256": "b825d973ab46bf89d267e6324a48a99526109b9cda74018a59ae450a58a692a6",
+    "after_settled_png_sha256": "9785618fad1736cdb18aaefe7106bf1e88bd2158870a90be8daef0b5efa19a50",
+    "stage6_summary": {
+      "completed_strokes": 37,
+      "planned_strokes": 37,
+      "duration_seconds": 79.031
+    },
+    "monitor_summary": {
+      "event_count": 9885,
+      "excluded_zero_point_slider_drags": 2
+    },
+    "quality_metrics": {
+      "coverage_fraction": 0.9847751808190641,
+      "leakage_pixels": 39,
+      "leakage_pixels_beyond_allowed_halo": 0,
+      "max_perimeter_overshoot_logical_px": 0.663542
+    }
+  }
+}
