@@ -336,11 +336,8 @@ class Fill001Tab:
                 raise SeriesBlocked("Series evidence already exists: overwriting or resuming is forbidden")
             profile = self.brush_tab.get_calibration_profile() if callable(
                 self.brush_tab.get_calibration_profile) else None
-            reference, metadata = self.brush_tab._blank_board_reference_paths()
-            if not isinstance(profile, dict) or not reference.is_file() or not metadata.is_file():
-                raise SeriesBlocked(
-                    "Use the existing Brush Lab calibration and explicit blank-board reference first"
-                )
+            if not isinstance(profile, dict):
+                raise SeriesBlocked("Verified Brush Lab Clear button calibration is required")
             from calibrated_game_clear import click_calibrated_board_clear
             screen = profile.get("screen_size", {})
             point = profile.get("points", {}).get("clear_board")
@@ -353,15 +350,16 @@ class Fill001Tab:
                 "Запустить FILL001-SERIES-001",
                 f"Будут нарисованы {len(manifest['tasks'])} фигур: одна полностью, "
                 "затем точный CHALK/PNG/Monitor, затем штатный Clear и следующая. "
-                "Текущий рисунок может быть удалён. Запускать только на тестовой доске. "
-                "Остановить можно через Stop/Alt. Продолжить?",
+                "Подтверди, что игровая доска СЕЙЧАС визуально пуста: "
+                "первый эталон будет снят автоматически по проверенному BoardPane ROI. "
+                "Текущий рисунок может быть удалён. Только тестовая доска. "
+                "Остановить можно через Stop/Alt. Подтверждаешь пустую доску и запуск?",
                 icon="warning", parent=self.root,
             ):
                 return
             self._series_pending_manifest = manifest
             self._series_manifest_path = selected
             self._series_profile = profile
-            self._series_blank_paths = (reference, metadata)
             self._firefox_execute_series = True
             self.v5_run_after_probe_var.set(False)
             self.start_firefox_monitor()
@@ -671,7 +669,10 @@ class Fill001Tab:
         from fill001_series_handoff import build_series_source_plan
         from fill001_firefox_auto_probe import collect_verified_series_firefox_roi
         from fill001_series_stage6_execution import normalized_series_run
-        from fill001_series_engine001_clear import clear_with_existing_engine001
+        from fill001_series_engine001_clear import (
+            clear_with_existing_engine001, capture_verified_series_boardpane_blank,
+            require_same_series_boardpane_roi,
+        )
         from fill001_v5_live_gate import verify_v5_live_gate
         from firefox_foreground_witness import firefox_foreground_witness
         from fill001_series_statistics import write_analysis as write_series_analysis
@@ -683,15 +684,11 @@ class Fill001Tab:
         if not callable(self.on_series_run):
             raise SeriesBlocked("Stage6 series callback disconnected")
         profile = getattr(self, "_series_profile", None)
-        blank_paths = getattr(self, "_series_blank_paths", None)
-        if (not isinstance(profile, dict)
-                or not isinstance(blank_paths, tuple)
-                or len(blank_paths) != 2):
-            raise SeriesBlocked("Existing ENGINE-001 Clear profile/reference missing")
-        blank_png, blank_meta_file = blank_paths
-        blank_meta = json.loads(blank_meta_file.read_text(encoding="utf-8"))
+        if not isinstance(profile, dict):
+            raise SeriesBlocked("Existing ENGINE-001 Clear button profile missing")
         root_dir = self.output_dir / "series" / (manifest["series_id"] + "-runs")
-        state: dict[str, Any] = {"last_clear": None, "last_run": None}
+        state: dict[str, Any] = {"last_clear": None, "last_run": None,
+                                 "reference_png": None, "reference_meta": None}
 
         def bridge_gate(*, blank: bool=False) -> dict:
             if self._firefox_stop.is_set():
@@ -715,6 +712,26 @@ class Fill001Tab:
             )
             state.update(source=source,mapped=mapped,mapping=mapping,roi=roi)
             gate=bridge_gate(blank=True)
+            if state["reference_meta"] is None:
+                # New per-series blank baseline: same native BoardPane probe
+                # as Stage6, not a stale manual brush_calibration board_area.
+                blank_png = root_dir / "boardpane-blank" / "blank-board-reference.png"
+                blank_meta_path = blank_png.with_suffix(".json")
+                blank_meta = capture_verified_series_boardpane_blank(
+                    roi=roi, screen_size=profile["screen_size"],
+                    session_id=session_id,
+                    mapping_sha256=mapping["boardpane_mapping_sha256"],
+                    point_count=gate["pointCount"], operator_confirmed=True,
+                    grab_screen=ImageGrab.grab,
+                    reference_png=blank_png, metadata_path=blank_meta_path,
+                )
+                state["reference_png"] = blank_png
+                state["reference_meta"] = blank_meta
+            else:
+                require_same_series_boardpane_roi(
+                    roi, state["reference_meta"], session_id=session_id,
+                    mapping_sha256=mapping["boardpane_mapping_sha256"],
+                )
             record={
                 "valid":True,"fresh_board":True,
                 "calibration_valid":True,
@@ -824,7 +841,13 @@ class Fill001Tab:
             before=snapshot_from_bridge()
             if before["pointCount"] != binding["post_pointCount"]:
                 raise SeriesBlocked("Pre-Clear snapshot does not match closed run")
-            region=profile["regions"]["board_area"]
+            region=require_same_series_boardpane_roi(
+                state["roi"], state["reference_meta"], session_id=session_id,
+                mapping_sha256=state["mapping"]["boardpane_mapping_sha256"],
+            )
+            profile_for_clear = {
+                **profile, "regions": {**profile.get("regions", {}), "board_area": region},
+            }
             def capture_board_roi() -> Image.Image:
                 screen=ImageGrab.grab()
                 size=profile["screen_size"]
@@ -835,8 +858,9 @@ class Fill001Tab:
                 return screen.crop(box)
             target=root_dir/"clear-png"/(task["task_id"]+"-after-clear.png")
             clear=clear_with_existing_engine001(
-                profile=profile,reference_png=blank_png,
-                reference_metadata=blank_meta,
+                profile=profile_for_clear,
+                reference_png=state["reference_png"],
+                reference_metadata=state["reference_meta"],
                 session_id=session_id,
                 mapping_sha256=state["mapping"]["boardpane_mapping_sha256"],
                 pre_clear_snapshot=before,
