@@ -69,6 +69,63 @@ jobs:
       # ring-buffer witness gate instead (also included in the main suite).
       - name: Run capped Bridge ring-buffer freshness regressions
         run: python -m pytest -q -ra tests/test_fill001_firefox_auto_probe.py -k "recent_samples"
+      - name: Diagnose frozen third FILL001 run binding (read-only, large JSON)
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from fill001_series_run_binding import validate_series_bridge_runs
+
+          root = Path.cwd().parents[1] / "data/results/brush_behavior_tests"
+          session = "8b06c144-eefa-4fe0-9547-4666914f95a6"
+          rid = "fill001-series-8fab4b476a8b"
+          raw = root / "game_monitor_bridge" / session / "game-monitor-run-20261112T173957581641Z-3610a9f1.json"
+          report = root / "fill001/series" / (rid + "-runs") / "stage6/series-8166be22-858b-4c56-9fb0-b5eb740771f8/report.json"
+          print("FROZEN_CASE", rid, "raw_bytes", raw.stat().st_size, "report_bytes", report.stat().st_size, flush=True)
+          run = json.loads(raw.read_text(encoding="utf-8"))
+          request = json.loads(report.read_text(encoding="utf-8"))["request"]
+          exact = ("schema_version", "record_type", "session_id", "execution_status",
+                   "monitor_dropped_events", "monitor_error_count", "collector_sequence_gap_count",
+                   "bridge_send_failures_delta", "point_delta_matches_chalk", "monitor_errors")
+          expected = (1, "autodraw_game_monitor_run", session, "completed", 0, 0, 0, 0, True, [])
+          for field, target in zip(exact, expected):
+              value = run.get(field)
+              if field == "session_id":
+                  value = "<expected-session>" if value == session else "<other-session>"
+              print("INITIAL_GATE", field, "PASS" if run.get(field) == target else "FAIL",
+                    "observed", value, flush=True)
+          print("COUNTS", json.dumps({
+              "run_id": run.get("run_id"),
+              "events": len(run["events"]) if isinstance(run.get("events"), list) else None,
+              "event_count": run.get("event_count"),
+              "per_stroke_metrics": len(run["per_stroke_metrics"]) if isinstance(run.get("per_stroke_metrics"), list) else None,
+              "stroke_count": run.get("stroke_count"),
+              "stroke_candidate_count": run.get("stroke_candidate_count"),
+              "non_consuming_stroke_candidate_count": run.get("non_consuming_stroke_candidate_count"),
+              "chalk": run.get("chalk"),
+              "pre": run.get("pre_test_snapshot"),
+              "post": run.get("post_test_snapshot"),
+          }, ensure_ascii=False, default=str), flush=True)
+          try:
+              binding = validate_series_bridge_runs(
+                  [run], session_id=session,
+                  task_id=request["task_id"],
+                  expected_pointer_down_client=request["expected_pointer_down_client"][:161],
+                  expected_brush_radii=request["expected_brush_radii"][:161],
+                  board_client_rect=request["board_client_rect"],
+                  slider_client_corridor=request["slider_client_corridor"],
+                  expected_pre=1,
+              )
+          except ValueError as exc:
+              print("EXACT_VALIDATOR_BLOCKED", type(exc).__name__, str(exc), flush=True)
+          else:
+              print("EXACT_VALIDATOR_PASS", json.dumps({
+                  "status": binding["status"],
+                  "stroke_count": binding["stroke_count"],
+                  "exact_chalk": binding["exact_chalk"],
+                  "post_pointCount": binding["post_pointCount"],
+              }), flush=True)
+          PY
       - name: Syntax-check existing FILL-001 UI and series module
         run: python -m py_compile brush_calibration.py brush_calibration_ui.py brush_behavior_test_ui.py chalk_fill_ui.py fill001_series_runner.py fill001_series_blank_verification.py fill001_series_offline_plans.py fill001_series_statistics.py fill001_series_handoff.py fill001_series_clear_pilot.py calibrated_game_clear.py fill001_series_engine001_clear.py fill001_series_run_binding.py fill001_series_stage6_preflight.py fill001_series_stage6_execution.py fill001_v5_live_gate.py ../executor/stage6_execute_plan.py ../../integrated_app.py fill001_firefox_auto_probe.py
       - name: Smoke-test offline 2-cycle manifest
