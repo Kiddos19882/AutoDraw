@@ -1,5 +1,9 @@
 # AutoDraw — действующие задачи
 
+- [x] **DOC-CODE-REUSE-001 / import ownership E1–E3:** [CI 43135827499](https://github.com/Kiddos19882/AutoDraw/actions/runs/43135827499) SUCCESS на `23a5a516e788b2030663fc7ad11b3604dee3c5a4`, 10/10 инструментальных тестов; `--usage` на 129 Python-файлах, 20 возможностей, 2 all-scope SCC и **0 unconditional root-level SCC**. JSON evidence доступен в [артефакте](https://github.com/Kiddos19882/AutoDraw/actions/runs/43135827499/artifacts/13906713385); реальные связи и ограничения [DEPENDENCY_MAP.md](DEPENDENCY_MAP.md). Реализация анализа и regression tests завершены, E4 не затрагивалась.
+- [ ] **Следующий невыполненный архитектурный шаг:** проверить конкретные точки расширения CAP-009/011/012/013/017 (у анализатора нет внешних `DIRECT_CALL_CANDIDATE`; возможно внутреннее использование/callbacks), затем выбрать **один** минимальный совместимый adapter refactor только при доказанном повторении логики. Сохранять существующие CI/E4 gates и frozen методики.
+
+
 ## DOC-CODE-REUSE-001 — архитектура знаний и повторное использование (2026-11-12)
 
 - [x] Добавлен CLI `python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20 --find "очистить доску"` и модульный owner `(ф) tools/capability_catalog.py`; существующий docs checker сохраняет прежний API. [CI 43126121772](https://github.com/Kiddos19882/AutoDraw/actions/runs/43126121772) SUCCESS, 8/8 tests, 5/5 проверяемых запросов на реальном каталоге.

@@ -10,6 +10,8 @@
 3. Определить конкретные source files, tests, protocols, [DECISIONS](DECISIONS.md), профильные инварианты и [TEST_RESULTS](TEST_RESULTS.md), только затем принимать решение. По CHALK, FILL, Game Monitor и renderer обязательно сверить исходную экспериментальную методику/данные.
 4. Зафиксировать цель, разрешённый тип работы, ограничения, baseline, способ проверки и возможные риски. Пользовательское последнее прямое разрешение определяет допустимый объём.
 
+**Проверка текущих потребителей:** после `--find` вызвать `python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20 --usage`. `DIRECT_CALL_CANDIDATE` и `IMPORTED_ONLY` — **синтаксические** результаты; локальные/callback/dynamic вызовы могут быть не распознаны. Сверить кандидатов вручную на текущем SHA. CI блокирует **новую** безусловную root-level SCC `source/preparation`, но deferred SCC — лишь предупреждение. [Границы](DEPENDENCY_MAP.md).
+
 **Быстрый поиск:** [единый индекс всех .md](README.md). Все старые управляющие документы до 2026-11-08 доступны как `*_HISTORY_THROUGH_2026-11-08.md` и не являются текущим backlog.
 
 ## Reuse-first перед любым новым кодом (2026-11-12)

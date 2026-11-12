@@ -1,5 +1,8 @@
 ## 2026-11-08 — DOC-INTEGRITY: контроль Markdown и исходной истории
 
+**DOC-CODE-REUSE-001 / проверка потребителей:** `tools/capability_catalog.py::inspect_capability_consumers`, CLI `check_markdown_docs.py --usage`, исходный [DEPEN­DENCY_MAP](DEPENDENCY_MAP.md) и [CI-артефакт](https://github.com/Kiddos19882/AutoDraw/actions/runs/43135827499/artifacts/13906713385). Workflow `docs-integrity.yml` выгружает `docs-integrity.json` и `capability-usage.json`, лог выводит source count, owner consumers и оба графа SCC. [CI 43135827499](https://github.com/Kiddos19882/AutoDraw/actions/runs/43135827499) SUCCESS на `23a5a516`: 10 unit tests, 20/20 owner/entrypoint, 129 scanned Python files, 0 root SCC; 2 all-scope SCC отложенного типа диагностические. Новый root-level SCC приводит к nonzero exit и CI FAIL. Динамические импорты, shadowing, nontrivial reexports и test-only consumers не анализируются; не E4.
+
+
 - `tools/check_markdown_docs.py`: проверяет полноту индекса `docs/README.md` для всех .md, обычные локальные ссылки и Markdown/explicit anchor, уникальность `DEC-NNN` и неизменность Git blob SHA исторических файлов из `docs/HISTORY_SNAPSHOT_PROVENANCE.json`.
 - `tools/tests/test_check_markdown_docs.py`: 5 unit tests. [GitHub workflow 42421451709](https://github.com/Kiddos19882/AutoDraw/actions/runs/42421451709) **SUCCESS** на `d778000e`; 99/99 indexed, 0 broken links (current и historical), 0 duplicates, 9/9 valid snapshots.
 - Первый [CI 42421193210](https://github.com/Kiddos19882/AutoDraw/actions/runs/42421193210) FAILED по пропуску одного архива в каталоге и одной старой ссылке; оба дефекта исправлены. Результат предыдущего run не перезаписывался.

@@ -1,5 +1,9 @@
 # AutoDraw — текущее состояние
 
+**Аудит зависимостей DOC-CODE-REUSE-001 (2026-11-12):** [CI 43135827499](https://github.com/Kiddos19882/AutoDraw/actions/runs/43135827499) **SUCCESS** на `23a5a516e788b2030663fc7ad11b3604dee3c5a4`. `--usage` просканировал 129 Python-файлов, подтвердил структурный каталог 20 возможностей, зафиксировал 2 SCC-кандидата при учёте всех вложенных импортов и **0 SCC** только среди безусловных root-level импортов `source/preparation`. Введён CI fitness gate: новый root-level SCC блокирует audit; отложенные связи лишь документируются. Код игры не менялся; evidence E1/E2/E3, не E4. Подробный owner/consumer и границы — [DEPENDENCY_MAP.md](DEPENDENCY_MAP.md); E4 quota-limited рисунка по-прежнему отдельно `NOT_RUN` после исправления.
+
+
+
 ## DOC-CODE-REUSE-001 — проверяемый поиск готового кода для нового ИИ-чата (2026-11-12)
 
 **Завершённая следующая часть:** read-only поиск `--find` по ключевым словам, включая «очистить доску» и «CHALK», вынесен в `(ф) tools/capability_catalog.py` вместе с AST проверкой; прежняя команда `check_markdown_docs.py` оставлена совместимой. [CI 43126121772](https://github.com/Kiddos19882/AutoDraw/actions/runs/43126121772) **SUCCESS** на `dd9ec43e`: 8/8 unit tests, 5/5 реальных навигационных запросов, 20 валидных карточек, 100/100 Markdown; поиск помечает результаты `E1_CANDIDATE_ONLY`. Ни один игровой source не изменён.

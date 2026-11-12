@@ -1,5 +1,9 @@
 # AutoDraw — дорожная карта будущих работ
 
+**Факт этапа E1/E3:** аудит реальных imports/call candidates завершён [CI 43135827499](https://github.com/Kiddos19882/AutoDraw/actions/runs/43135827499) на `23a5a516e788b2030663fc7ad11b3604dee3c5a4`, 129 модулей, 20 карточек; all-scope SCC 2, безусловных root-level SCC 0. Отчёт [DEPENDENCY_MAP.md](DEPENDENCY_MAP.md) и [raw JSON CI artifact](https://github.com/Kiddos19882/AutoDraw/actions/runs/43135827499/artifacts/13906713385). Следующий этап — проверить непрямые вызовы экспериментальных возможностей и определить одну доказанную безопасную границу переиспользования. Новый root-level SCC теперь блокирует docs CI, deferred cycles не считаются runtime FAIL.
+
+
+
 ## DOC-CODE-REUSE-001 — порядок внедрения каталога возможностей (2026-11-12)
 
 Read-only терминальный поиск и отдельный модуль `tools/capability_catalog.py` реализованы; [CI 43126121772](https://github.com/Kiddos19882/AutoDraw/actions/runs/43126121772) SUCCESS на `dd9ec43e` (8 tests, пять проверенных поисковых запросов). Следующий архитектурный этап — выборочная инвентаризация реальных consumers и import cycles, затем точечное совместимое извлечение при подтверждённой необходимости. E4 игрового рисунка этим CI не подтверждается.

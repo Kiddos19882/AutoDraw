@@ -1,5 +1,8 @@
 # AutoDraw — значимые изменения
 
+- DOC-CODE-REUSE-001: added read-only `--usage` AST consumer/import-cycle inventory in the existing `tools/capability_catalog.py` + `check_markdown_docs.py`; static direct-call aliases, nested imports and producer owner relationships reported as E1 candidates. Separates 2 all-scope SCCs from **0 root-level SCCs** on current source; new unconditional `source/preparation` SCCs fail docs CI, without touching production/game code. [CI 43135827499](https://github.com/Kiddos19882/AutoDraw/actions/runs/43135827499) SUCCESS on `23a5a516`, 10 tests; first synthetic-fixture failure [43134688617](https://github.com/Kiddos19882/AutoDraw/actions/runs/43134688617) retained.
+
+
 ## 2026-11-12 — DOC-CODE-REUSE-001 knowledge reuse and AST contract check
 
 - CLI `--find` ranks documented reuse candidates with E1-only provenance; extracted the capability registry/AST/search into `tools/capability_catalog.py` while keeping `check_markdown_docs.py` compatible. Added five real-repository lookup tests. [Final code CI 43126121772](https://github.com/Kiddos19882/AutoDraw/actions/runs/43126121772) SUCCESS on `dd9ec43e` (8 tests, 20 entries). No gameplay code affected.

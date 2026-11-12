@@ -4,6 +4,19 @@
 **Источник:** реальные import/from-import statements, экспортные списки адаптеров и код настройки путей в текущей ветке.  
 **Граница:** схема показывает прямые зависимости и уровни импорта. Она не является runtime trace и не утверждает, что каждый импортируемый модуль загружается при каждом пользовательском сценарии.
 
+## DOC-CODE-REUSE-001 — подтверждённая E1-карта потребителей и потенциальных циклов (2026-11-12)
+
+**Источник:** read-only `python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20 --usage`; baseline `23a5a516e788b2030663fc7ad11b3604dee3c5a4`, [CI 43135827499](https://github.com/Kiddos19882/AutoDraw/actions/runs/43135827499) **SUCCESS**, [полный JSON inventory в архиве CI](https://github.com/Kiddos19882/AutoDraw/actions/runs/43135827499/artifacts/13906713385). Из 129 прочитанных Python-модулей просканированы 20 owner/entrypoint карточек; для `source/preparation/*.py` построены два графа: **unconditional root-level imports** (`ast.Module.body`) и **all-scope static imports** (`ast.walk`, включая импорты внутри функций). В графе root-level **0 сильносвязных компонент размера >1**, в графе all-scope **2 кандидатные группы**. Отсутствие root-level SCC в данном разрешении не доказывает отсутствие циклов через `try`, условные/динамические импорты, `sys.path` или runtime.
+
+| Кандидатная SCC (all-scope) | Модули | Конкретные обратные зависимости | Вывод |
+|---|---|---|---|
+| FILL-001 / screen-mask (8) | `chalk_fill_capture_adapter`, `chalk_fill_matrix`, `chalk_fill_runtime_binding`, `fill001_screen_mask_v2`, `fill001_screen_mask_v2_binding`, `fill001_smooth_ab`, `fill001_smooth_ab_v2`, `fill001_smooth_ab_v3` | `chalk_fill_matrix.py:201–209` импортирует валидаторы AB внутри функций, `fill001_smooth_ab.py:16` импортирует capture adapter, `fill001_screen_mask_v2.py:24` импортирует capture adapter, `chalk_fill_capture_adapter.py:505–510` использует binding/screen audit | `E1 STATIC CANDIDATE`, не подтверждённая ошибка импорта и не причина менять frozen V1/V2/V3 policies |
+| Geometry / multi-board (3) | `geometry_budget_optimizer`, `geometry_color_plan`, `multi_board_splitter` | `geometry_color_plan.py:22–26` root-import оптимизатора и splitter; обратные `geometry_budget_optimizer.py:31,120,317` и `multi_board_splitter.py:140,277` выполняются внутри функций | Отложенные связи и сильная связанность API; нет доказанного root-level цикла или runtime сбоя |
+
+**Проверенные потребители:** `chalk_fill_ui.py` синтаксически вызывает CAP-001/002/003/004/007/010/014/020; `fill001_series_engine001_clear.py` вызывает CAP-005 и CAP-006; `fill001_series_stage6_execution.py` вызывает CAP-015 и CAP-016; `chalk_test_blocks.py` owner CAP-018 используется в `brush_behavior_test_ui.py` и `fill001_series_runner.py`. Путь в `consumers` означает синтаксический вызов при совпадении импорта, **не** гарантирует доступность/выполнение сценария. CAP-009/011/012/013/017 сейчас не имеют внешнего `DIRECT_CALL_CANDIDATE` в этом анализе: это **не доказательство неиспользуемости** (возможны вызовы из того же owner-модуля, callbacks, reexports, dynamic imports и тесты исключены из поиска).
+
+**Практическая архитектурная позиция:** новых root-level циклов в scope `source/preparation` не допускать — CLI `--usage` возвращает non-zero и CI FAIL при новом SCC; две all-scope SCC остаются диагностикой, без блокировки. Не менять production/FILL/Stage6/Bridge ради формального уменьшения SCC; будущий рефакторинг возможен только после проверки runtime imports/потребителей и совместимых regression tests. CI не является E4/E5 игрового поведения. Правило и поиск владельцев — [COMPONENT_CATALOG.md](COMPONENT_CATALOG.md), критерии — [AI_WORK_GUIDE.md](AI_WORK_GUIDE.md).
+
 ## 1. Точки входа
 
 | Файл | Роль |

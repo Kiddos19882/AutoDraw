@@ -1,5 +1,9 @@
 # AutoDraw — реестр проверенных результатов
 
+**DOC-CODE-REUSE-001 / static consumers:** [CI 43135827499](https://github.com/Kiddos19882/AutoDraw/actions/runs/43135827499) **SUCCESS** на `23a5a516e788b2030663fc7ad11b3604dee3c5a4`: 10/10 unittest PASS, 20/20 catalog entries (AST), 129 Python-файлов для source inventory; обнаружены 2 all-scope import SCC-кандидата и 0 unconditional root-level SCC в `source/preparation`. Тесты проверяют алиасы, вложенные импорты, связанный owner/call, root SCC и отказ при повреждённом Python. При root SCC инструмент `--usage` возвращает ненулевой exit code; CI проходит лишь при его отсутствии. [Artifact `capability-usage.json`](https://github.com/Kiddos19882/AutoDraw/actions/runs/43135827499/artifacts/13906713385) включает все 20 карточек, кандидатов consumers и циклы. Данные не показывают runtime import failure, E4/E5 или качество рисунка; E4 сериального quota recovery по-прежнему NOT_RUN.
+
+
+
 ## DOC-CODE-REUSE-001 — baseline структурного каталога (2026-11-12)
 
 **Навигация и модульность инструментария:** [CI 43126121772](https://github.com/Kiddos19882/AutoDraw/actions/runs/43126121772) SUCCESS на `dd9ec43e3fbda91053151d109549332f24e1bf3d`: 8/8 unit tests, 20 валидированных AST entrypoints, 5/5 запросов в реальном каталоге (очистка, Selenium, CHALK, lock, расход краски), 100/100 Markdown indexed, 0 catalog errors, 0 duplicate DEC IDs, 0 historical SHA errors. Поиск `--find` возвращает `E1_CANDIDATE_ONLY`, не доказательство отсутствия альтернатив и не E4. Модуль проверки вынесен в `tools/capability_catalog.py`, публичный CLI `check_markdown_docs.py` сохраняется.
