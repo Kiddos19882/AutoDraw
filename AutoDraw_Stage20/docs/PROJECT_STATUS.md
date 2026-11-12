@@ -2,6 +2,8 @@
 
 ## DOC-CODE-REUSE-001 — проверяемый поиск готового кода для нового ИИ-чата (2026-11-12)
 
+**Завершённая следующая часть:** read-only поиск `--find` по ключевым словам, включая «очистить доску» и «CHALK», вынесен в `(ф) tools/capability_catalog.py` вместе с AST проверкой; прежняя команда `check_markdown_docs.py` оставлена совместимой. [CI 43126121772](https://github.com/Kiddos19882/AutoDraw/actions/runs/43126121772) **SUCCESS** на `dd9ec43e`: 8/8 unit tests, 5/5 реальных навигационных запросов, 20 валидных карточек, 100/100 Markdown; поиск помечает результаты `E1_CANDIDATE_ONLY`. Ни один игровой source не изменён.
+
 Инициатива reuse-first: существующий [каталог компонентов](COMPONENT_CATALOG.md) дополнен 20 карточками возможностей (owner / entrypoint / значимые аргументы / scope / ограничения / тестовый путь), а [AI_WORK_GUIDE.md](AI_WORK_GUIDE.md) определяет обязательный поиск перед новой реализацией. Принято [DEC-031](DECISIONS.md), используется прежний [контроль Markdown](../tools/check_markdown_docs.py) с дополнительным read-only Python AST contract audit и синтетическими отрицательными тестами. Исходники Stage6, Selenium, Game Monitor, Clear и CHALK не изменены. **E1 по GitHub-коду** на baseline `7cc938af4e349bd187981749d47f7e41c207ce24`; E2/E3 checker: [docs-integrity CI 43124607337](https://github.com/Kiddos19882/AutoDraw/actions/runs/43124607337) **SUCCESS** на code/doc SHA `7b8f4aaa`; 7/7 тестов и 20/20 проверенных AST-карточек, E4/E5 не применяются к документационному аудиту. Аудит проверяет структуру, но не смысловое соответствие, качество тестов или реальное game behavior. [План следующего ограничения](TASKS.md).
 
 

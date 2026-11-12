@@ -94,6 +94,8 @@
 
 ### Навигация по возможностям и владение кодом (2026-11-12)
 
+**Инструмент:** `(ф) tools/capability_catalog.py` — owner статического AST-аудита и read-only поиска `--find`; `tools/check_markdown_docs.py` — совместимая точка CLI. Поиск отдаёт только кандидатов `E1_CANDIDATE_ONLY`. Это единственный индекс, а не вторая независимая база данных.
+
 [COMPONENT_CATALOG.md](COMPONENT_CATALOG.md) — один индекс **возможностей** (действие → owner-модуль → точка вызова → scope/ограничения → тестовый путь). [MODULE_REFERENCE.md](MODULE_REFERENCE.md) остаётся структурной картой файлов, [DEPENDENCY_MAP.md](DEPENDENCY_MAP.md) — импортов, а [PREPARATION_API_REFERENCE.md](PREPARATION_API_REFERENCE.md) и [EXECUTOR_API_REFERENCE.md](EXECUTOR_API_REFERENCE.md) — API. Не копировать сигнатуры и статусы в несколько независимых справочников: исходник остаётся истиной, а каталог хранит только ключевые имена аргументов и ссылки.
 
 Карточки иметь устойчивый ID и owner; новый consumer добавлять к существующему owner через API или совместимый адаптер. Для экспериментальных компонентов запрещено автоматически объявлять production-ready. После изменения owner/entrypoint менять его карточку и прогонять структурный аудит; текущий HEAD важнее датированной записи.

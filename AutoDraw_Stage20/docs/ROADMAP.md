@@ -2,6 +2,8 @@
 
 ## DOC-CODE-REUSE-001 — порядок внедрения каталога возможностей (2026-11-12)
 
+Read-only терминальный поиск и отдельный модуль `tools/capability_catalog.py` реализованы; [CI 43126121772](https://github.com/Kiddos19882/AutoDraw/actions/runs/43126121772) SUCCESS на `dd9ec43e` (8 tests, пять проверенных поисковых запросов). Следующий архитектурный этап — выборочная инвентаризация реальных consumers и import cycles, затем точечное совместимое извлечение при подтверждённой необходимости. E4 игрового рисунка этим CI не подтверждается.
+
 Первый шаг: reuse-first навигация в существующем [COMPONENT_CATALOG.md](COMPONENT_CATALOG.md) (20 возможностей на baseline `7cc938af`), read-only AST-контроль owner/entrypoint/args/test и новая regression проверка в Markdown CI; никакого runtime рефакторинга. [docs-integrity CI 43124607337](https://github.com/Kiddos19882/AutoDraw/actions/runs/43124607337) E3 SUCCESS на `7b8f4aaa`. Следующий шаг — повторяемый тест навигации из нового ИИ-чата, затем read-only анализ реальных consumers, прямых зависимостей и только при доказанной пользе — маленькие совместимые извлечения с обязательными тестами. Не подменять граф импортов знанием об actual runtime и не повышать experimental до production без validation. Приоритет FILL001-SERIES-001 E4 остаётся отдельным.
 
 

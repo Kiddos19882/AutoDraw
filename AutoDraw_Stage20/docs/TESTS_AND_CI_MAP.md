@@ -36,6 +36,8 @@
 
 ## DOC-CODE-REUSE-001 — AST-аудит каталога возможностей (2026-11-12)
 
+**Обновление:** отдельный read-only owner `(ф) tools/capability_catalog.py` реализует `check_capability_catalog()` и `find_capabilities()`; `tools/check_markdown_docs.py` переиспользует эти функции и предоставляет CLI `--find`. [CI 43126121772](https://github.com/Kiddos19882/AutoDraw/actions/runs/43126121772) SUCCESS на `dd9ec43e` (8 tests, 20 AST cards, пять real query smoke cases, 100 markdown). Тип E1 кандидата не заменяет реализацию, потребителей и runtime verification.
+
 `tools/check_markdown_docs.py::check_capability_catalog` читает ограниченный блок `<!-- AUTODRAW_CAPABILITIES_START -->` внутри [COMPONENT_CATALOG.md](COMPONENT_CATALOG.md) и проверяет 20 записей E1: уникальность ID, наличие owner/test Python-файлов, объявление top-level symbol, subset документированных имён аргументов, scope и корректность AST. Интегрирован в общий docs-integrity workflow и синтетические `tools/tests/test_check_markdown_docs.py`; workflow реагирует на изменения Python source, даже если Markdown не изменён. Не импортирует игровые модули, не вызывает GUI и не утверждает фактическое покрытие тестом. [docs-integrity CI 43124607337](https://github.com/Kiddos19882/AutoDraw/actions/runs/43124607337) **SUCCESS** на `7b8f4aaa`: 7/7 unit tests, 20/20 catalog entries structurally valid, 100/100 Markdown indexed; источник только E1/E2/E3.
 
 

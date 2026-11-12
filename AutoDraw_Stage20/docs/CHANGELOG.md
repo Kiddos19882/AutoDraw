@@ -2,6 +2,8 @@
 
 ## 2026-11-12 — DOC-CODE-REUSE-001 knowledge reuse and AST contract check
 
+- CLI `--find` ranks documented reuse candidates with E1-only provenance; extracted the capability registry/AST/search into `tools/capability_catalog.py` while keeping `check_markdown_docs.py` compatible. Added five real-repository lookup tests. [Final code CI 43126121772](https://github.com/Kiddos19882/AutoDraw/actions/runs/43126121772) SUCCESS on `dd9ec43e` (8 tests, 20 entries). No gameplay code affected.
+
 - Expanded existing COMPONENT_CATALOG with 20 capability owner/entrypoint/scope/test-path entries, README navigation, reuse-first AI_WORK_GUIDE and DEC-031. Extended existing check_markdown_docs.py with read-only AST verification of indexed Python symbols/parameter names, duplicate capability IDs and owner/test paths; added regressions and source-aware docs CI triggers. No runtime, Stage6 or Monitor changes; [docs-integrity CI 43124607337](https://github.com/Kiddos19882/AutoDraw/actions/runs/43124607337) SUCCESS on `7b8f4aaa` (7 tests, 20 indexed AST capability contracts).
 
 

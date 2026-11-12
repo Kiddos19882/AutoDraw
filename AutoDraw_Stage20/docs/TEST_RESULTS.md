@@ -2,6 +2,8 @@
 
 ## DOC-CODE-REUSE-001 — baseline структурного каталога (2026-11-12)
 
+**Навигация и модульность инструментария:** [CI 43126121772](https://github.com/Kiddos19882/AutoDraw/actions/runs/43126121772) SUCCESS на `dd9ec43e3fbda91053151d109549332f24e1bf3d`: 8/8 unit tests, 20 валидированных AST entrypoints, 5/5 запросов в реальном каталоге (очистка, Selenium, CHALK, lock, расход краски), 100/100 Markdown indexed, 0 catalog errors, 0 duplicate DEC IDs, 0 historical SHA errors. Поиск `--find` возвращает `E1_CANDIDATE_ONLY`, не доказательство отсутствия альтернатив и не E4. Модуль проверки вынесен в `tools/capability_catalog.py`, публичный CLI `check_markdown_docs.py` сохраняется.
+
 На baseline source SHA `7cc938af4e349bd187981749d47f7e41c207ce24` выборочно сверены определения 20 точек входа в Firefox/Selenium, Monitor/ROI, Clear/ENGINE-001, FILL001 Stage6/manifest/runner, CHALK, PNG, brush-radius и owner-lock. Карточки содержат пути к existing regression files, но их существование **не равно** PASS. В существующий Markdown audit добавлена проверка Python AST и ссылок на тесты без импорта и исполнения модулей; тесты охватывают отсутствующий путь, отсутствующий аргумент и дублирование ID. **Фактический E2/E3 PASS:** [docs-integrity CI 43124607337](https://github.com/Kiddos19882/AutoDraw/actions/runs/43124607337) SUCCESS на `7b8f4aaa`; 7 unit tests PASS, 100/100 Markdown indexed, 20/20 capability records, 0 catalog errors, 0 missing links, 0 duplicate decisions, 0 corrupt history. Это не semantic/runtime проверка. Нет нового game E4/E5 и нет измерения CHALK.
 
 

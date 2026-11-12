@@ -2,6 +2,8 @@
 
 ## 2026-11-12 — DOC-CODE-REUSE-001: навигационный каталог и static contract checking
 
+- Следующий этап: read-only `--find` без импорта игровых модулей, extracted `tools/capability_catalog.py` (AST + поиск) и оставлен существующий CLI `check_markdown_docs.py`; коммиты [fa99c15](https://github.com/Kiddos19882/AutoDraw/commit/fa99c15c1ebd7c804a64af2f1e80865166176bc8), [15a5498](https://github.com/Kiddos19882/AutoDraw/commit/15a54984ec26b8985833978a9cf43b446ab043b3), [dd9ec43](https://github.com/Kiddos19882/AutoDraw/commit/dd9ec43e3fbda91053151d109549332f24e1bf3d). [Final code CI 43126121772](https://github.com/Kiddos19882/AutoDraw/actions/runs/43126121772) SUCCESS: 8 unit tests, 5 реальные запросов, 20 AST entries, 100 Markdown; game E4/E5 не запускались.
+
 - Проверены remote HEAD `7cc938af4`, последние 20 commits, GitHub Actions и existing docs/navigation/API/invariants. Подтверждены устаревшие описания фиксированного FILL planner и исторического Selenium/V5 handoff; код более позднего состояния отличается. Использована существующая система README→COMPONENT_CATALOG→API/Dependency/Tests, не создана параллельная knowledge base.
 - Создано 20 карточек reuse-first; добавлено правило для ИИ, DEC-031, AST checker в существующем docs audit, negative regression и CI source-path triggers. Исполнение игры/Windows/Python import не выполнялось; Stage6 и другие production исходники неизменны.
 - [docs-integrity CI 43124607337](https://github.com/Kiddos19882/AutoDraw/actions/runs/43124607337) **SUCCESS** на `7b8f4aaa`: 7/7 tests, 20/20 AST records, 100/100 Markdown, 0 broken links, 0 duplicated DEC ID и 0 history violations. Структурный checker не доказывает semantic correctness, production maturity или E4.
