@@ -7,7 +7,9 @@ import pytest
 from fill001_series_runner import SeriesBlocked, build_manifest
 from fill001_series_handoff import (
     build_series_source_plan, validate_series_source_plan, export_series_source_plan,
+    resolve_series_scanline_spacing,
 )
+from chalk_fill_matrix import FILL001_RS_SCANLINE_CONFIGS
 
 
 def manifest():
@@ -61,3 +63,18 @@ def test_export_refuses_to_overwrite(tmp_path):
         m, m["tasks"][0]["task_id"])
     with pytest.raises(FileExistsError):
         export_series_source_plan(m, m["tasks"][0]["task_id"], path)
+
+@pytest.mark.parametrize("shape", ["rectangle", "wide_irregular", "narrow_irregular"])
+@pytest.mark.parametrize("radius", [1, 5, 10, 20, 30])
+def test_resolver_preserves_frozen_scanline_spacing(shape, radius):
+    assert resolve_series_scanline_spacing(shape, radius, "dense_scanlines") == (1, 0)
+    assert resolve_series_scanline_spacing(shape, radius, "spaced_scanlines") == (
+        FILL001_RS_SCANLINE_CONFIGS[(shape, radius)]
+    )
+
+
+def test_resolver_rejects_unknown_method_and_spacing_cell():
+    with pytest.raises(SeriesBlocked):
+        resolve_series_scanline_spacing("rectangle", 10, "unknown")
+    with pytest.raises(SeriesBlocked):
+        resolve_series_scanline_spacing("rectangle", 2, "spaced_scanlines")
