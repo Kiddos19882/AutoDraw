@@ -47,7 +47,13 @@ def verify_v5_live_gate(
     try:
         record = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
-        raise Fill001V5Error("V5 Bridge session evidence is missing.") from exc
+        # Keep the original fail-closed gate. Report only the exception type,
+        # never the filesystem path, so a later E4 run can distinguish
+        # transient file access from malformed persisted session evidence.
+        cause = type(exc).__name__
+        raise Fill001V5Error(
+            f"V5 Bridge session evidence is missing. read_error={cause}"
+        ) from exc
     diagnostics = record.get("bridge_diagnostics") if isinstance(record, dict) else None
     status = diagnostics.get("last_monitor_status") if isinstance(diagnostics, dict) else None
     snapshot = status.get("snapshot") if isinstance(status, dict) else None
