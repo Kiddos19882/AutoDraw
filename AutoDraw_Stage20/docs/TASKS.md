@@ -9,7 +9,9 @@
 ## DOC-CODE-REUSE-001 — архитектура знаний и повторное использование (2026-11-12)
 
 - [x] Добавлен CLI `python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20 --find "очистить доску"` и модульный owner `(ф) tools/capability_catalog.py`; существующий docs checker сохраняет прежний API. [CI 43126121772](https://github.com/Kiddos19882/AutoDraw/actions/runs/43126121772) SUCCESS, 8/8 tests, 5/5 проверяемых запросов на реальном каталоге.
-- [ ] После подтверждения CI на новом SHA расширить read-only аудит потребителей на `integrated_app.py` и `source/executor`, чтобы CAP-009/012/013 были видимы без ручного поиска; проверить новые root-level SCC и доказать отсутствие нежелательного runtime влияния перед любым дополнительным рефакторингом. Не нарушать FILL001 E4 gate.
+- [x] **Scoped consumer inventory extension E1:** `fe4a1de` включает `integrated_app.py` и разрешает bare imports в Stage6 executor; тесты `4e696f3`, `f2e5919` охватывают CAP-009/012/013, synthetic aliases и отрицательный decoy. Не расширялся scope SCC; игровой код не изменён. **E2/E3 ещё не подтверждены**.
+- [ ] **Первый текущий gate:** проверить docs integrity + `--usage` и серию regression tests на общем новом SHA; сохранить FAIL, если обнаружится. Не маркировать старый 129-module/0-root-SCC baseline как результат новой версии.
+- [ ] После E3 PASS выборочно проверить callbacks и динамические consumers, затем либо закрыть архитектурный пункт, либо обосновать ровно одно дополнительное совместимое исправление. E4 серии остаётся отдельным.
 
 - [x] Сверены свежий HEAD и существующие README/COMPONENT_CATALOG/MODULE_REFERENCE/DEPENDENCY_MAP/API references/UI/AI guide; устранено дублирование индекса. Обнаружено устаревшее описание fixed-radius FILL и раннего Selenium/V5.
 - [x] Добавлены 20 карточек в существующий [COMPONENT_CATALOG.md](COMPONENT_CATALOG.md), reuse-first в AI guide, канонический owner и принятое решение DEC-031. Это навигация E1, **не** E4.
