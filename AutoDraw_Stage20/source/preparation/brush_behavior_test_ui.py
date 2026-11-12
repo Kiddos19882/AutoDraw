@@ -901,6 +901,7 @@ class BrushBehaviorTestTab:
         self, root: tk.Misc, parent: tk.Widget, output_dir: str | Path,
         area_selector_cls, *, get_canvas_size, get_canvas_area, on_transfer_plan, get_brush_control=None,
         get_calibration_profile=None, on_brush_ready=None,
+        get_series_clear_profile=None,
     ):
         self.root = root
         self.output_dir = Path(output_dir).resolve()
@@ -910,6 +911,7 @@ class BrushBehaviorTestTab:
         self.get_canvas_area = get_canvas_area
         self.get_brush_control = get_brush_control
         self.get_calibration_profile = get_calibration_profile
+        self.get_series_clear_profile = get_series_clear_profile
         self.on_transfer_plan = on_transfer_plan
         self.on_brush_ready = on_brush_ready
         self._start_executor_after_brush_drag = False
