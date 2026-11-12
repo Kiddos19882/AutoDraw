@@ -896,7 +896,7 @@ class Fill001Tab:
                     latest_roi,
                     (profile["screen_size"]["width"], profile["screen_size"]["height"]),
                     margin=160, avoid_regions=(meter,) if isinstance(meter, dict) else (),
-                require_below=True,
+                    require_below=True,
                 )
                 if firefox_foreground_witness(driver) is not True:
                     raise SeriesBlocked("Firefox foreground lost before after-Clear screenshot")
