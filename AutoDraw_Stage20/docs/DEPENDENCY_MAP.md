@@ -1,5 +1,7 @@
 # Карта импортов и межмодульных зависимостей
 
+**DOC-CODE-REUSE-001 / updated analyzer boundary (2026-11-12):** AST owner/consumer scan now deliberately includes `integrated_app.py` and `source/executor` bare imports from `source/preparation` ([`fe4a1de`](https://github.com/Kiddos19882/AutoDraw/commit/fe4a1de300fc670373b76be52341385423569cae)). This fixes missed syntax candidates for CAP-009 and CAP-012/013; decoy imports from unrelated package remain out-of-scope. It **does not** expand the root-level SCC fitness graph beyond flat `source/preparation/*.py`, and does not prove dynamic imports, callback dispatch or actual runtime module resolution. New CI/AST inventory counts are NOT_VERIFIED; 129 files, 2 all-scope SCC and 0 root SCC remain the historical `23a5a516` baseline.
+
 **Область:** основные модули AutoDraw_Stage20 и точки входа.  
 **Источник:** реальные import/from-import statements, экспортные списки адаптеров и код настройки путей в текущей ветке.  
 **Граница:** схема показывает прямые зависимости и уровни импорта. Она не является runtime trace и не утверждает, что каждый импортируемый модуль загружается при каждом пользовательском сценарии.
