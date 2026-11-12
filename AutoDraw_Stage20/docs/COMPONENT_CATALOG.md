@@ -37,6 +37,12 @@
 
 **Расширенный аудит потребителей:** `python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20 --usage` — read-only JSON-карта `DIRECT_CALL_CANDIDATE` / `IMPORTED_ONLY` и статических SCC. [Проверенные группы, ограничения и owner→consumer маршруты](DEPENDENCY_MAP.md) и [CI-артефакт](https://github.com/Kiddos19882/AutoDraw/actions/runs/43135827499/artifacts/13906713385) на SHA `23a5a516`. Наличие вызова не означает E4 или production-ready. Приоритет: переиспользовать owner; не рефакторить отложенные циклы без анализа конкретного сценария.
 
+### Дополнение: потребители вне исходного scope анализатора (E1, 2026-11-12)
+
+В `integrated_app.py:1023,1040` CAP-009 (`build_fixed_radius_fill_plan_for_task`) вызывается при восстановлении плана FILL-001. В `source/executor/stage6_execute_plan.py:1664,1684` реально вызываются CAP-012 (`prepare_series_stage6_preflight`) и CAP-013 (`execute_series_single_stage6`) из Stage6 adapter. CAP-011 (`run_with_validated_callbacks`) используется через `run_with_series_owner_lock` в том же owner-модуле, а CAP-017 (`analyze_series`) — через `write_analysis`, импортированный как `write_fill001_series_analysis` в `chalk_fill_ui.py`. Предыдущие нулевые `DIRECT_CALL_CANDIDATE` для этих CAP — ограничение области и глубины анализатора, не отсутствие использования.
+
+Один найденный повтор устранён без создания второй реализации планировщика: `fill001_series_handoff.resolve_series_scanline_spacing` теперь единственный выбор frozen dense/spaced параметров для signed source и offline geometry preview (code/test SHA `4dfec5c`). Это внутренний reuse helper, а не новая production возможность; исходные `CAP-009`–`CAP-020` ID и контракты остались прежними. E1 diff подтверждён, CI нового SHA ещё не проверен; полный static `--usage` охват `integrated_app/executor` остаётся следующей задачей.
+
 ### Проверенные статические связи owner → потребитель
 
 В исходниках baseline `7cc938af` обнаружены прямые вызовы: `chalk_fill_ui.py` подключает общий `open_firefox()` и `attach_monitor_after_confirmation()`, использует `run_with_series_owner_lock()`, `normalized_series_run()` и `clear_with_existing_engine001()`; `fill001_series_stage6_execution.py` вызывает `validate_series_bridge_runs()` и `audit_screen_mask_v2()`. Эти связи дают маршрут для reuse, **не доказывают live PASS** и не заменяют текущий поиск всех consumers. Для новых импортов ориентироваться на текущий HEAD, а не копировать устаревший снимок зависимостей.
