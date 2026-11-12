@@ -15,7 +15,7 @@ from typing import Any
 
 from chalk_fill_experiment import FILL001_EXPECTED_MASK_SHA256
 from chalk_fill_fixed_radius_planner import build_fixed_radius_fill_plan
-from chalk_fill_matrix import FILL001_RS_SCANLINE_CONFIGS
+from fill001_series_handoff import resolve_series_scanline_spacing
 from fill001_series_runner import validate_manifest, SeriesBlocked
 
 SCHEMA = "FILL001_SERIES_OFFLINE_GEOMETRY_V1"
@@ -35,10 +35,7 @@ def prepare_offline_variants(manifest: dict[str, Any]) -> dict[str, Any]:
             raise SeriesBlocked(f"Unsupported fill method {method!r}")
         key = f"{shape}:{method}:r{radius}"
         if key not in variants:
-            if method == "dense_scanlines":
-                step, offset = 1, 0
-            else:
-                step, offset = FILL001_RS_SCANLINE_CONFIGS[(shape, radius)]
+            step, offset = resolve_series_scanline_spacing(shape, radius, method)
             plan = build_fixed_radius_fill_plan(
                 shape, radius, scanline_row_step=step, scanline_offset=offset
             )
