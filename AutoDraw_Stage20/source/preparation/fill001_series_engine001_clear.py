@@ -243,3 +243,40 @@ def require_same_series_boardpane_roi(
             or metadata.get("board_region") != roi):
         raise SeriesClearBlocked("BoardPane desktop ROI/session differs from series blank reference")
     return roi
+
+
+def capture_same_boardpane_roi(
+    *, roi: dict, reference_metadata: dict, session_id: str,
+    mapping_sha256: str, screen_size: dict,
+    grab_screen: Callable[[], Image.Image],
+) -> Image.Image:
+    """Capture only the native ROI of an authenticated series blank baseline.
+
+    The calling owner must perform a *fresh* authenticated/native BoardPane
+    probe immediately before this read. No CSS client coordinates, pixel
+    guessing, profile board_area fallback, or silent clipping is accepted.
+    """
+    require_same_series_boardpane_roi(
+        roi, reference_metadata, session_id=session_id,
+        mapping_sha256=mapping_sha256,
+    )
+    if (not isinstance(screen_size, dict)
+            or any(type(screen_size.get(k)) is not int
+                   for k in ("width", "height"))
+            or screen_size["width"] <= 0 or screen_size["height"] <= 0
+            or reference_metadata.get("screen_size") != screen_size
+            or not callable(grab_screen)):
+        raise SeriesClearBlocked("Verified BoardPane screenshot dimensions unavailable")
+    if (roi["x"] < 0 or roi["y"] < 0
+            or roi["width"] <= 0 or roi["height"] <= 0
+            or roi["x"] + roi["width"] > screen_size["width"]
+            or roi["y"] + roi["height"] > screen_size["height"]):
+        raise SeriesClearBlocked("Verified BoardPane ROI outside desktop")
+    screen = grab_screen()
+    if not isinstance(screen, Image.Image) or screen.size != (
+            screen_size["width"], screen_size["height"]):
+        raise SeriesClearBlocked("Verified BoardPane screenshot resolution changed")
+    return screen.crop((
+        roi["x"], roi["y"],
+        roi["x"] + roi["width"], roi["y"] + roi["height"],
+    ))
