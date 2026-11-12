@@ -6,6 +6,7 @@ import pytest
 
 from fill001_series_runner import build_manifest
 from fill001_series_offline_plans import prepare_offline_variants, write_offline_geometry
+from fill001_series_handoff import build_series_source_plan
 from chalk_fill_matrix import FILL001_RS_SCANLINE_CONFIGS
 from chalk_fill_experiment import FILL001_EXPECTED_MASK_SHA256
 
@@ -60,3 +61,20 @@ def test_manifest_tamper_rejected():
     manifest["tasks"][0]["brush_radius"] = 30
     with pytest.raises(Exception):
         prepare_offline_variants(manifest)
+
+def test_offline_preview_and_signed_source_keep_identical_frozen_signatures():
+    m = schedule()
+    preview = prepare_offline_variants(m)
+    for task in m["tasks"]:
+        key = f'{task["shape_id"]}:{task["fill_method"]}:r{task["brush_radius"]}'
+        variant = preview["variants"][key]
+        source = build_series_source_plan(m, task["task_id"])
+        generation = source["generation"]
+        assert variant["plan_signature"] == generation["plan_signature"]
+        assert variant["target_mask_sha256"] == generation["frozen_target_mask_sha256"]
+        assert (variant["scanline_row_step"], variant["scanline_offset"]) == (
+            generation["scanline_row_step"], generation["scanline_offset"]
+        )
+        assert variant["stroke_count"] == generation["expected_strokes"]
+        assert variant["execution_allowed"] is False
+        assert generation["automatic_execution_allowed"] is False
