@@ -23,6 +23,8 @@
 
 **Минимальный старт ИИ:** проверить текущий remote HEAD и последние commits; прочитать `PROJECT_STATUS` → `TASKS` → `ROADMAP`, затем профильный DECISION/инварианты/первичный эксперимент и актуальный код для конкретной задачи. Не перечитывать все 90+ файлов без причины.
 
+**Актуальное FILL001/Egret исследование (2026-11-13):** [6 оригинальных игровых фигур ↔ native Egret Stage WebGL, IoU 0.991656–0.999448, причины ограничений](GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md#23-fill001-series-001--native-egret-replay-шести-игровых-фигур-2026-11-13) · [CI 43431139220](https://github.com/Kiddos19882/AutoDraw/actions/runs/43431139220) PASS для offline renderer и 19 Node tests, 6 оригинальных игровых PNG; две из шести реконструкций только диагностические из-за pointDelta=2. Исторические FILL quality FAIL и QUOTA_LIMITED неизменны. Сначала читать актуальные PROJECT_STATUS/TASKS/TEST_RESULTS, затем §23.
+
 ## Основные исследовательские контуры
 
 - **Ресурс CHALK:** [G1/G2/G3, INT-006 и INT006R — общий реестр](TEST_RESULTS.md) → [официальный INT-006](CHALK_INT006_OFFICIAL_VALIDATION_RESULTS_2026-11-03.md) → [frozen model/analyzer](CHALK_INT006_FROZEN_PREDICTIONS_AND_ANALYZER_2026-11-02.md). Только exact `CHALK = post.pointCount - pre.pointCount` — реальное измерение.
