@@ -253,6 +253,10 @@ def main() -> int:
             projected = project_stage_rgba(stage, manifest, case["screen_corners"], case["roi"])
             folder = destination / fig
             folder.mkdir(parents=True, exist_ok=True)
+            # Preserve byte-identical game screenshots alongside the model PNGs
+            # for independent pixel audits and visual review of each frozen run.
+            (folder / "game-before.png").write_bytes(case["before_png"])
+            (folder / "game-after.png").write_bytes(case["after_png"])
             (folder / "native-stage-webgl.png").write_bytes(
                 base64.b64decode(png_url.partition(",")[2], validate=True))
             scores = compare_images(case["before_png"], case["after_png"], projected, folder)
