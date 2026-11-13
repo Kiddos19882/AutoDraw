@@ -43,11 +43,24 @@ jobs:
         run: |
           python AutoDraw_Stage20/tests/run_fill001_series_egret_replay.py --workspace . --validate-only --output-dir "$env:RUNNER_TEMP\fill001-egret-validate"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Bounded ENGINE-001 aggregated point inventory (read-only)
+        shell: pwsh
+        run: |
+          python AutoDraw_Stage20/tests/run_fill001_series_egret_replay.py --workspace . --audit-aggregated --output-dir "$env:RUNNER_TEMP\engine001-aggregated"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Render six native Egret figures and compare source screen ROI
         shell: pwsh
         run: |
           python AutoDraw_Stage20/tests/run_fill001_series_egret_replay.py --workspace . --output-dir "$env:RUNNER_TEMP\fill001-egret-six"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Upload bounded ENGINE-001 inventory
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-aggregated-point-inventory
+          path: ${{ runner.temp }}/engine001-aggregated/aggregated-point-inventory.json
+          if-no-files-found: warn
+          retention-days: 30
       - name: Upload immutable-input validation summary
         if: always()
         uses: actions/upload-artifact@v4
