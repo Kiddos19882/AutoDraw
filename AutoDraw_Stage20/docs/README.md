@@ -19,7 +19,7 @@
 
 **Поиск в терминале / агенте:** `python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20 --find "очистить доску"` — read-only кандидаты с owner/entrypoint (E1, не runtime). Если нет совпадений, искать вручную в [каталоге](COMPONENT_CATALOG.md) и исходниках.
 
-**Большие GitHub-файлы:** [RAW/Blob/Git и проверенные ограничения доступа](AI_WORK_GUIDE.md#чтение-больших-github-файлов-2026-11-13-воспроизводимый-рецепт-и-ограничения-проверки). Пустой `content` у Monitor JSON размером свыше 1 МБ не означает пустой файл; статус практической загрузки пока BLOCKED.
+**Большие GitHub-файлы:** [проверенный GitHub fetch_blob по SHA](AI_WORK_GUIDE.md#чтение-больших-файлов-github--проверенный-git-blob-способ-2026-11-13). Все 6 Monitor JSON FILL001 (12–51 млн символов) прочитаны и разобраны через GitHub connector; прямой RAW/curl в текущей среде BLOCKED.
 
 **Минимальный старт ИИ:** проверить текущий remote HEAD и последние commits; прочитать `PROJECT_STATUS` → `TASKS` → `ROADMAP`, затем профильный DECISION/инварианты/первичный эксперимент и актуальный код для конкретной задачи. Не перечитывать все 90+ файлов без причины.
 
