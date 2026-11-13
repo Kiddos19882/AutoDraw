@@ -26,6 +26,35 @@
 
 Контроль: `tools/check_markdown_docs.py` проверяет структурные записи каталога через Python AST, но **не** принимает архитектурное или production-решение автоматически.
 
+## Чтение больших GitHub-файлов (2026-11-13; воспроизводимый рецепт и ограничения проверки)
+
+**Проблема:** GitHub Contents API в JSON/object-формате при размере файла **более 1 МБ и до 100 МБ** может вернуть `content=""`, хотя файл существует и Git blob SHA известен. Это **не** означает, что JSON пуст. Встроенный GitHub `fetch_file` проекта при `encoding=utf-8` и `encoding=base64` вернул пустой `content` для Monitor JSON; менять `encoding` недостаточно.
+
+**Предпочтительный способ, когда доступны исходящие HTTPS-запросы:** читать файл **RAW** по **зафиксированному commit SHA**, потоково писать его на диск и проверить целостность. Для публичного репозитория в терминале:
+
+```bash
+COMMIT=3f67c05d8dfd2f4db8954063850bd67b96232dd1
+PATH_IN_REPO=AutoDraw_Stage20/data/results/brush_behavior_tests/game_monitor_bridge/e04234bc-b9ee-4d06-bd20-f1e13b8423ba/game-monitor-run-20261113T055652967299Z-66b8a7ae.json
+curl --fail --location --retry 2 --output /tmp/autodraw-monitor.json "https://raw.githubusercontent.com/Kiddos19882/AutoDraw/$COMMIT/$PATH_IN_REPO"
+git hash-object /tmp/autodraw-monitor.json
+python -m json.tool /tmp/autodraw-monitor.json >/dev/null
+```
+
+Ожидаемый **Git blob SHA** этого конкретного файла из GitHub `fetch_file`: `4d7959ba62479439eaa83f44c51e2a1008f1eabb`. Считать операцию успешной только после ненулевого размера, HTTP 200, совпадения `git hash-object`, корректного JSON, проверки `session_id/run_id` и run-bound integrity. Коммит закрепляет версию; `git hash-object` проверяет именно Git blob, а не SHA-256 PNG. Не печатать гигантский JSON целиком в чат — читать локально, извлекать требуемые поля.
+
+**Официальный REST fallback** для файлов 1–100 МБ: `GET https://api.github.com/repos/Kiddos19882/AutoDraw/contents/<PATH>?ref=<COMMIT>` с `Accept: application/vnd.github.raw+json`; альтернативно `GET https://api.github.com/repos/Kiddos19882/AutoDraw/git/blobs/<BLOB_SHA>` с тем же RAW media type. Обычный object response содержит пустое `content` и `encoding=none`; Git Blobs JSON response содержит base64, но требует больше памяти. Обе REST-операции документированы с ограничением 100 МБ. Для ещё больших файлов использовать `git clone` / `git fetch` с последующим `git show <COMMIT>:<PATH>` либо доступные git/LFS-процедуры — не считать это подтверждённым тестом до фактического чтения и проверки hash.
+
+**Фактическая проверка в этом чате:**
+- `GitHub fetch_file` (UTF-8 и base64) для указанного Monitor JSON: **BLOCKED**, `content.length=0`, Git blob SHA одинаковый.
+- RAW с `raw.githubusercontent.com` через web: **BLOCKED**, cache miss; Git Blobs API через web: **BLOCKED**, endpoint недоступен этому инструменту.
+- Из вычислительного контейнера `github.com`, `api.github.com`, `raw.githubusercontent.com`: **BLOCKED**, DNS/network. Поэтому **фактическая загрузка большого файла данным рецептом здесь НЕ ПРОВЕРЕНА**; его поддержка подтверждена официальной документацией, а не end-to-end тестом.
+- Не отмечать RAW/Blob/Git как PASS, пока реальный файл не скачан и не прошёл проверки. При восстановлении доступа первым делом проверить этот конкретный frozen Monitor JSON и внести результат со SHA в `TEST_RESULTS.md`.
+
+**Официальные источники:**
+- https://docs.github.com/en/rest/repos/contents — RAW в диапазоне 1–100 МБ;
+- https://docs.github.com/en/rest/git/blobs — blob и RAW до 100 МБ;
+- https://github.blog/changelog/2022-05-03-increased-file-size-limit-when-retrieving-file-contents-via-rest-api/ .
+
 ## 2. Что считать доказательством
 
 | Вопрос | Первичный источник |
