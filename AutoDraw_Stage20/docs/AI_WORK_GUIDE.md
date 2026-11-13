@@ -44,11 +44,15 @@ python -m json.tool /tmp/autodraw-monitor.json >/dev/null
 
 **Официальный REST fallback** для файлов 1–100 МБ: `GET https://api.github.com/repos/Kiddos19882/AutoDraw/contents/<PATH>?ref=<COMMIT>` с `Accept: application/vnd.github.raw+json`; альтернативно `GET https://api.github.com/repos/Kiddos19882/AutoDraw/git/blobs/<BLOB_SHA>` с тем же RAW media type. Обычный object response содержит пустое `content` и `encoding=none`; Git Blobs JSON response содержит base64, но требует больше памяти. Обе REST-операции документированы с ограничением 100 МБ. Для ещё больших файлов использовать `git clone` / `git fetch` с последующим `git show <COMMIT>:<PATH>` либо доступные git/LFS-процедуры — не считать это подтверждённым тестом до фактического чтения и проверки hash.
 
-**Фактическая проверка в этом чате:**
-- `GitHub fetch_file` (UTF-8 и base64) для указанного Monitor JSON: **BLOCKED**, `content.length=0`, Git blob SHA одинаковый.
-- RAW с `raw.githubusercontent.com` через web: **BLOCKED**, cache miss; Git Blobs API через web: **BLOCKED**, endpoint недоступен этому инструменту.
-- Из вычислительного контейнера `github.com`, `api.github.com`, `raw.githubusercontent.com`: **BLOCKED**, DNS/network. Поэтому **фактическая загрузка большого файла данным рецептом здесь НЕ ПРОВЕРЕНА**; его поддержка подтверждена официальной документацией, а не end-to-end тестом.
-- Не отмечать RAW/Blob/Git как PASS, пока реальный файл не скачан и не прошёл проверки. При восстановлении доступа первым делом проверить этот конкретный frozen Monitor JSON и внести результат со SHA в `TEST_RESULTS.md`.
+**Подтверждённый рабочий путь из подключённого GitHub (2026-11-13):**
+1. Вызвать `mcp__GitHub__fetch_file({repository_full_name:"Kiddos19882/AutoDraw",path:"<FILE_PATH>",ref:"<PINNED_COMMIT>"})`. Даже если `result.content===""`, взять **`result.sha` (Git blob SHA)**. Это не commit SHA.
+2. Вызвать **`mcp__GitHub__fetch_blob({repository_full_name:"Kiddos19882/AutoDraw",blob_sha:"<RESULT_SHA>"})`**. Данные находятся в `result.content` (полный текст UTF-8). Не выводить их целиком в ответ: внутри вызова обработать `JSON.parse(result.content)`, вернуть только необходимые показатели, идентификаторы, хеши и проблемы целостности.
+3. Сверить ожидаемые `session_id`, `run_id`, `task_id`, `pre/post pointCount`, `point_delta_matches_chalk`, `accepted_points`, `stroke` и доказательства PNG/Stage6. `accepted_points.length` не обязано равняться CHALK: возможен `point_delta=2`, причину надо проверить по Monitor event evidence до native replay.
+4. При ошибке API или отсутствии доступа не считать PASS; использовать перечисленные ниже RAW/REST/Git fallback.
+
+**Проверенный E1/E4-source retrieval (без нового игрового запуска):** все **6** Monitor JSON серии `fill001-series-3e1fd32c4d99` успешно получены через `fetch_blob` и распарсены как JSON. Размеры возвращённых текстов: 48 493 349; 15 101 029; 50 951 275; 48 533 168; 48 895 326; 12 409 863 символа. Для шестого: blob `4d7959ba62479439eaa83f44c51e2a1008f1eabb`, `run_id=66b8a7ae-ab13-44f1-93ec-409a77117e66`, `accepted_points=1528`, `post.pointCount-pre.pointCount=1528`. Прочитано через подключённый GitHub tool; независимая локальная сверка `git hash-object` и рендер Egret **NOT_RUN**. Содержимое из самого `fetch_blob` уже привязано к запрошенному blob SHA в GitHub API.
+
+**Проверенные нерабочие способы в данном окружении:** `fetch_file` UTF-8/base64 возвращает пустое содержимое; `raw.githubusercontent.com` и прямые `curl`/Python в прошлой сессии были недоступны инструментам. Команды RAW/REST/Git выше остаются *резервными инструкциями, а не лично проверенным PASS*.
 
 **Официальные источники:**
 - https://docs.github.com/en/rest/repos/contents — RAW в диапазоне 1–100 МБ;
