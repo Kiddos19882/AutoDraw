@@ -1,0 +1,23 @@
+{
+  "schema": "FILL001_SERIES_SUMMARY_V1",
+  "series_id": "fill001-series-3e1fd32c4d99",
+  "manifest_sha256": "639cfcd61949ceefbc4852ef743fb1e1af721b86a5bc0b8e959986e5bb858201",
+  "status": "completed_with_quota_limited",
+  "issue": null,
+  "scheduled": 6,
+  "accepted": 0,
+  "quality_failed": 2,
+  "quota_limited": 4,
+  "completed_with_bound_chalk": 2,
+  "quota_limited_with_bound_chalk": 4,
+  "exact_chalk_sum_of_accepted_runs": 0,
+  "exact_chalk_sum_of_quality_failed_runs": 3499,
+  "exact_chalk_sum_of_quota_limited_runs": 23019,
+  "exact_chalk_is_per_run_only": true,
+  "grouped_exact_chalk_statistics": {
+    "shape": {},
+    "method": {},
+    "brush": {}
+  },
+  "next_task_requires_fresh_session": true
+}

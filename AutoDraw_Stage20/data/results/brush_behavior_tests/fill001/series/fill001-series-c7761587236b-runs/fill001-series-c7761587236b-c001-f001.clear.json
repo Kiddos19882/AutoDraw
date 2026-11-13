@@ -1,0 +1,45 @@
+{
+  "schema": "FILL001_SERIES_CLEAR_V1",
+  "task_id": "fill001-series-c7761587236b-c001-f001",
+  "status": "PASS",
+  "proof": {
+    "valid": true,
+    "fresh_board": true,
+    "pointCount": 1,
+    "mouse_released": true,
+    "clear_click": {
+      "schema": "AUTODRAW_CALIBRATED_GAME_CLEAR_CLICK_V1",
+      "action": "normal_game_ui_clear",
+      "screen_x": 599,
+      "screen_y": 647,
+      "click_sent": true,
+      "board_cleared_verified": false
+    },
+    "blank_screen_verification": {
+      "schema": "FILL001_SERIES_ENGINE001_CLEAR_REUSE_V1",
+      "status": "PASS",
+      "session_id": "95f731e1-7bd0-4627-bd2f-a3bd22c7d388",
+      "mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+      "post_clear_pointCount": 1,
+      "reference_png_sha256": "b825d973ab46bf89d267e6324a48a99526109b9cda74018a59ae450a58a692a6",
+      "post_clear_png_sha256": "b825d973ab46bf89d267e6324a48a99526109b9cda74018a59ae450a58a692a6",
+      "engine001_visual_status": "restored",
+      "engine001_tolerance_percent": 0.15,
+      "engine001_changed_percent": 0.0,
+      "last_settled_at_utc": "2026-11-12T23:43:39.905+00:00",
+      "comparison": {
+        "width": 694,
+        "height": 363,
+        "total_pixels": 251922,
+        "changed_pixels": 0,
+        "changed_percent": 0.0,
+        "pixel_similarity_percent": 100.0,
+        "mean_absolute_rgb_difference": 0.0,
+        "exact_match": true,
+        "interpretation": "visual_pixel_comparison_only_not_a_reading_of_the_game_resource_counter"
+      },
+      "clear_ui_action_proven": true,
+      "screen_evidence_status": "ENGINE001_EXISTING_COMPARATOR_PASS"
+    }
+  }
+}

@@ -1,0 +1,436 @@
+{
+  "schema": "FILL001_SERIES_STAGE6_SINGLE_RUN_RESULT_V1",
+  "request": {
+    "schema": "FILL001_SERIES_STAGE6_SINGLE_TASK_PREFLIGHT_V1",
+    "protocol": "FILL001_SERIES_STAGE6_SINGLE_RUN_V1",
+    "attempt_id": "d82741a2-3246-40a7-81b6-5292f514ae28",
+    "series_id": "fill001-series-c7761587236b",
+    "task_id": "fill001-series-c7761587236b-c001-f002",
+    "session_id": "95f731e1-7bd0-4627-bd2f-a3bd22c7d388",
+    "source_strokes_sha256": "6b3e1ab17c642d9ed71ff1ff6ef000c41d5b9f0778881aeb5536fc06f08887c9",
+    "mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+    "mapping": {
+      "schema": "FILL001_BOARDPANE_PREFLIGHT_V1",
+      "status": "validated_preflight_input_transform_not_live_draw",
+      "session_id": "95f731e1-7bd0-4627-bd2f-a3bd22c7d388",
+      "renderer_geometry_sha256": "572c5f447022b6df540a8f0f18b836625849ad48fdd80109e50241e4ec871818",
+      "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+      "passive_samples_sha256": "4a9b180c3fc3545d4ecb249b7f95baf5e8f981daebf2e2ab3adf2fd801855359",
+      "passive_samples": [
+        {
+          "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+          "source": "window-bubble-after-egret-canvas",
+          "session_id": "95f731e1-7bd0-4627-bd2f-a3bd22c7d388",
+          "renderer_geometry_sha256": "572c5f447022b6df540a8f0f18b836625849ad48fdd80109e50241e4ec871818",
+          "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+          "buttons": 0,
+          "pre_drawing": true,
+          "captured_at_utc": "2026-11-12T23:43:45.054+00:00",
+          "clientX": 719.0,
+          "clientY": 253.0,
+          "screenX": 719.0,
+          "screenY": 388.0
+        },
+        {
+          "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+          "source": "window-bubble-after-egret-canvas",
+          "session_id": "95f731e1-7bd0-4627-bd2f-a3bd22c7d388",
+          "renderer_geometry_sha256": "572c5f447022b6df540a8f0f18b836625849ad48fdd80109e50241e4ec871818",
+          "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+          "buttons": 0,
+          "pre_drawing": true,
+          "captured_at_utc": "2026-11-12T23:43:45.404+00:00",
+          "clientX": 830.0,
+          "clientY": 297.0,
+          "screenX": 830.0,
+          "screenY": 432.0
+        },
+        {
+          "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+          "source": "window-bubble-after-egret-canvas",
+          "session_id": "95f731e1-7bd0-4627-bd2f-a3bd22c7d388",
+          "renderer_geometry_sha256": "572c5f447022b6df540a8f0f18b836625849ad48fdd80109e50241e4ec871818",
+          "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+          "buttons": 0,
+          "pre_drawing": true,
+          "captured_at_utc": "2026-11-12T23:43:45.754+00:00",
+          "clientX": 941.0,
+          "clientY": 340.0,
+          "screenX": 941.0,
+          "screenY": 475.0
+        }
+      ],
+      "passive_sample_count": 3,
+      "client_to_desktop_offset": {
+        "x": 0.0,
+        "y": 135.0
+      },
+      "board_screen_corners": {
+        "left": 483.4536882098092,
+        "top": 243.22,
+        "right": 1176.703295745131,
+        "bottom": 605.62
+      },
+      "screen_roi": {
+        "x": 483,
+        "y": 243,
+        "width": 694,
+        "height": 363
+      },
+      "method": "same_session_passive_DOM_mouse_plus_validated_BoardPane_corners",
+      "no_fallback": true,
+      "preflight_valid_at_utc": "2026-11-12T23:43:46.049702+00:00"
+    },
+    "screen_roi": {
+      "x": 483,
+      "y": 243,
+      "width": 694,
+      "height": 363
+    },
+    "initial_snapshot": {
+      "schema": "FILL001_V5_LIVE_GATE_V1",
+      "session_id": "95f731e1-7bd0-4627-bd2f-a3bd22c7d388",
+      "mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+      "heartbeat_at_utc": "2026-11-12T23:43:45.914+00:00",
+      "pointCount": 1,
+      "maxPoints": 6000,
+      "remainingPoints": 5999,
+      "currentRadius": 1,
+      "exact": true,
+      "blank_counter_confirmed": true,
+      "stage6_execution_allowed": false
+    },
+    "expected_pointer_down_client": [
+      [
+        648.0,
+        181.0
+      ],
+      [
+        628.0,
+        187.0
+      ],
+      [
+        622.0,
+        193.0
+      ],
+      [
+        616.0,
+        199.0
+      ],
+      [
+        613.0,
+        205.0
+      ],
+      [
+        610.0,
+        211.0
+      ],
+      [
+        609.0,
+        217.0
+      ],
+      [
+        607.0,
+        223.0
+      ],
+      [
+        606.0,
+        229.0
+      ],
+      [
+        604.0,
+        235.0
+      ],
+      [
+        603.0,
+        241.0
+      ],
+      [
+        601.0,
+        247.0
+      ],
+      [
+        599.0,
+        253.0
+      ],
+      [
+        598.0,
+        259.0
+      ],
+      [
+        598.0,
+        265.0
+      ],
+      [
+        596.0,
+        271.0
+      ],
+      [
+        596.0,
+        277.0
+      ],
+      [
+        596.0,
+        283.0
+      ],
+      [
+        596.0,
+        289.0
+      ],
+      [
+        596.0,
+        295.0
+      ],
+      [
+        596.0,
+        301.0
+      ],
+      [
+        598.0,
+        308.0
+      ],
+      [
+        598.0,
+        314.0
+      ],
+      [
+        599.0,
+        320.0
+      ],
+      [
+        601.0,
+        326.0
+      ],
+      [
+        603.0,
+        332.0
+      ],
+      [
+        604.0,
+        338.0
+      ],
+      [
+        606.0,
+        344.0
+      ],
+      [
+        607.0,
+        350.0
+      ],
+      [
+        609.0,
+        356.0
+      ],
+      [
+        610.0,
+        362.0
+      ],
+      [
+        612.0,
+        368.0
+      ],
+      [
+        615.0,
+        374.0
+      ],
+      [
+        618.0,
+        380.0
+      ],
+      [
+        622.0,
+        386.0
+      ],
+      [
+        630.0,
+        392.0
+      ],
+      [
+        648.0,
+        398.0
+      ]
+    ],
+    "expected_brush_radii": [
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5
+    ],
+    "board_client_rect": {
+      "left": 483.4536882098092,
+      "right": 1176.703295745131,
+      "top": 108.22,
+      "bottom": 470.62
+    },
+    "slider_client_corridor": {
+      "left": 1203.0,
+      "right": 1367.0,
+      "top": 167.0,
+      "bottom": 175.0
+    },
+    "planned_strokes": 37,
+    "execution_allowed": false,
+    "exact_chalk": null,
+    "game_png_quality": "NOT_EVALUATED"
+  },
+  "task_id": "fill001-series-c7761587236b-c001-f002",
+  "session_id": "95f731e1-7bd0-4627-bd2f-a3bd22c7d388",
+  "status": "completed",
+  "started_at_utc": "2026-11-12T23:43:46.486440+00:00",
+  "stage6_summary": {
+    "status": "completed",
+    "completed_strokes": 37,
+    "total_strokes": 37,
+    "started_at": "2026-11-13T02:43:46+03:00",
+    "ended_at": "2026-11-13T02:45:05+03:00",
+    "duration_seconds": 79.125,
+    "move_calls": 4134,
+    "error": null,
+    "stop_reason": null,
+    "mouse_release": {
+      "attempted": true,
+      "succeeded": true,
+      "errors": []
+    },
+    "executor_config": {
+      "point_step_px": 4.0,
+      "line_extension_px": 0.0,
+      "point_delay_ms": 5,
+      "after_mouse_up_ms": 20,
+      "before_mouse_down_ms": 20,
+      "after_mouse_down_ms": 40,
+      "end_hold_ms": 50,
+      "countdown_seconds": 5
+    }
+  },
+  "actual_chalk": 1961,
+  "monitor_binding": "EXACT_RUN_BOUND",
+  "game_png_quality": "FAIL",
+  "before_png": {
+    "file": "C:\\Users\\Kiddos\\Desktop\\clone autodraw2\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\fill001\\series\\fill001-series-c7761587236b-runs\\stage6\\series-d82741a2-3246-40a7-81b6-5292f514ae28\\before.png",
+    "sha256": "b825d973ab46bf89d267e6324a48a99526109b9cda74018a59ae450a58a692a6"
+  },
+  "after_png": {
+    "file": "C:\\Users\\Kiddos\\Desktop\\clone autodraw2\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\fill001\\series\\fill001-series-c7761587236b-runs\\stage6\\series-d82741a2-3246-40a7-81b6-5292f514ae28\\after.png",
+    "sha256": "d3a33b51298bea98d8eb493ff57339610d5cbc0d64321ed1fe34ec1041864af2"
+  },
+  "after_settled_png": {
+    "file": "C:\\Users\\Kiddos\\Desktop\\clone autodraw2\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\fill001\\series\\fill001-series-c7761587236b-runs\\stage6\\series-d82741a2-3246-40a7-81b6-5292f514ae28\\after_settled.png",
+    "sha256": "9785618fad1736cdb18aaefe7106bf1e88bd2158870a90be8daef0b5efa19a50"
+  },
+  "binding": {
+    "status": "EXACT_RUN_BOUND",
+    "session_id": "95f731e1-7bd0-4627-bd2f-a3bd22c7d388",
+    "task_id": "fill001-series-c7761587236b-c001-f002",
+    "run_ids": [
+      "cf452418-ac16-4344-839f-4547dc53da74"
+    ],
+    "stroke_count": 37,
+    "excluded_zero_point_slider_drags": 2,
+    "monitor_event_count": 9877,
+    "pre_pointCount": 1,
+    "post_pointCount": 1962,
+    "exact_chalk": 1961,
+    "maxPoints": 6000,
+    "method": "post.pointCount - pre.pointCount, continuous full closed Monitor runs",
+    "png_quality": "NOT_EVALUATED",
+    "independent_E5": "NOT_RUN",
+    "bridge_run_paths": [
+      "C:\\Users\\Kiddos\\Desktop\\clone autodraw2\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\game_monitor_bridge\\95f731e1-7bd0-4627-bd2f-a3bd22c7d388\\game-monitor-run-20261112T234509071138Z-cf452418.json"
+    ]
+  },
+  "png_audit": {
+    "schema": "FILL001_SCREEN_MASK_V2",
+    "diagnostic_only": true,
+    "run_id": "d82741a2-3246-40a7-81b6-5292f514ae28",
+    "geometry_evidence_sha256": "4a9b180c3fc3545d4ecb249b7f95baf5e8f981daebf2e2ab3adf2fd801855359",
+    "frozen_target_mask_sha256": "ffff041d8fcaf53ce4f680ddbefb43a949dd72fdb10f44d6c95cf4832555d7db",
+    "before_png_sha256": "b825d973ab46bf89d267e6324a48a99526109b9cda74018a59ae450a58a692a6",
+    "after_png_sha256": "9785618fad1736cdb18aaefe7106bf1e88bd2158870a90be8daef0b5efa19a50",
+    "rgb_change_threshold": 8,
+    "target_pixels": 102727,
+    "covered_pixels": 101163,
+    "uncovered_pixels": 1564,
+    "coverage_fraction": 0.9847751808190641,
+    "leakage_pixels": 39,
+    "changed_pixels": 101202,
+    "v1_original": {
+      "coverage_fraction": 0.9886957626207853,
+      "leakage_pixels": 8,
+      "png_audit_status": "failed"
+    },
+    "v2_diagnostic_gate": "FAIL",
+    "acceptance_override": false,
+    "active_quality_policy_id": "FILL001_CHALK_FIRST_PERIMETER_V2",
+    "active_quality_gate": "FAIL",
+    "active_quality_metrics": {
+      "policy_id": "FILL001_CHALK_FIRST_PERIMETER_V2",
+      "quality_gate": "FAIL",
+      "coverage_fraction": 0.9847751808190641,
+      "minimum_coverage_fraction": 0.99,
+      "target_pixels": 102727,
+      "uncovered_pixels": 1564,
+      "leakage_pixels": 39,
+      "max_perimeter_overshoot_logical_px": 0.663542,
+      "maximum_allowed_overshoot_logical_px": 3.0,
+      "leakage_pixels_beyond_allowed_halo": 0,
+      "screen_pixels_per_logical_x": 1.5070643642072217,
+      "screen_pixels_per_logical_y": 1.51,
+      "distance_method": "screen_euclidean_min_uniform_scale_conservative",
+      "chalk_selection_priority": "min_run_bound_exact_chalk_among_quality_PASS",
+      "exact_chalk": null,
+      "chalk_evidence_status": "NOT_EVALUATED",
+      "scope": "run_bound_screen_RGB_quality_only_not_game_execution_or_CHALK"
+    }
+  },
+  "before_cursor_parking": {
+    "method": "released_pointer_off_roi_no_click_v1",
+    "screen_x": 387,
+    "screen_y": 424,
+    "exact_pointCount_before": 1,
+    "exact_pointCount_after": 1
+  },
+  "pre_pointCount": 1,
+  "post_settled_pointCount": 1962,
+  "settled_cursor_parking": {
+    "method": "released_pointer_off_roi_no_click_v1",
+    "screen_x": 387,
+    "screen_y": 424,
+    "exact_pointCount_before": 1962,
+    "exact_pointCount_after": 1962
+  },
+  "finished_at_utc": "2026-11-12T23:45:10.535540+00:00"
+}

@@ -1,0 +1,1315 @@
+{
+  "schema": "FILL001_SERIES_STAGE6_SINGLE_RUN_RESULT_V1",
+  "request": {
+    "schema": "FILL001_SERIES_STAGE6_SINGLE_TASK_PREFLIGHT_V1",
+    "protocol": "FILL001_SERIES_STAGE6_SINGLE_RUN_V1",
+    "attempt_id": "04878c22-c9c8-4f3b-9caf-a5cf0d8347dc",
+    "series_id": "fill001-series-c7761587236b",
+    "task_id": "fill001-series-c7761587236b-c001-f003",
+    "session_id": "95f731e1-7bd0-4627-bd2f-a3bd22c7d388",
+    "source_strokes_sha256": "06bad1af0605f95b727791fa4c115d004a59fa8cf3c0604740c3af9d386e7d0e",
+    "mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+    "mapping": {
+      "schema": "FILL001_BOARDPANE_PREFLIGHT_V1",
+      "status": "validated_preflight_input_transform_not_live_draw",
+      "session_id": "95f731e1-7bd0-4627-bd2f-a3bd22c7d388",
+      "renderer_geometry_sha256": "43041c4b74d235b748eb32e2f89dc32c89ca4eb3add670831b8a652f369e9fc6",
+      "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+      "passive_samples_sha256": "55197c189b6b4192dba6301dd5309d80c8c325d46b6df82305f5c28d2f4e86f6",
+      "passive_samples": [
+        {
+          "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+          "source": "window-bubble-after-egret-canvas",
+          "session_id": "95f731e1-7bd0-4627-bd2f-a3bd22c7d388",
+          "renderer_geometry_sha256": "c2907b27c0e3369db5e29229c4d1df29986170eab175935a7e1d831562b901eb",
+          "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+          "buttons": 0,
+          "pre_drawing": true,
+          "captured_at_utc": "2026-11-12T23:45:20.113+00:00",
+          "clientX": 719.0,
+          "clientY": 253.0,
+          "screenX": 719.0,
+          "screenY": 388.0
+        },
+        {
+          "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+          "source": "window-bubble-after-egret-canvas",
+          "session_id": "95f731e1-7bd0-4627-bd2f-a3bd22c7d388",
+          "renderer_geometry_sha256": "5310c3207ad88133a6c4dc524811ae971347cdba583718f6383bc049690a3a71",
+          "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+          "buttons": 0,
+          "pre_drawing": true,
+          "captured_at_utc": "2026-11-12T23:45:20.462+00:00",
+          "clientX": 830.0,
+          "clientY": 297.0,
+          "screenX": 830.0,
+          "screenY": 432.0
+        },
+        {
+          "type": "BOARD_SCREEN_PREFLIGHT_SAMPLE",
+          "source": "window-bubble-after-egret-canvas",
+          "session_id": "95f731e1-7bd0-4627-bd2f-a3bd22c7d388",
+          "renderer_geometry_sha256": "43041c4b74d235b748eb32e2f89dc32c89ca4eb3add670831b8a652f369e9fc6",
+          "boardpane_mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+          "buttons": 0,
+          "pre_drawing": true,
+          "captured_at_utc": "2026-11-12T23:45:20.812+00:00",
+          "clientX": 941.0,
+          "clientY": 340.0,
+          "screenX": 941.0,
+          "screenY": 475.0
+        }
+      ],
+      "passive_sample_count": 3,
+      "client_to_desktop_offset": {
+        "x": 0.0,
+        "y": 135.0
+      },
+      "board_screen_corners": {
+        "left": 483.4536882098092,
+        "top": 243.22,
+        "right": 1176.703295745131,
+        "bottom": 605.62
+      },
+      "screen_roi": {
+        "x": 483,
+        "y": 243,
+        "width": 694,
+        "height": 363
+      },
+      "method": "same_session_passive_DOM_mouse_plus_validated_BoardPane_corners",
+      "no_fallback": true,
+      "preflight_valid_at_utc": "2026-11-12T23:45:21.103349+00:00"
+    },
+    "screen_roi": {
+      "x": 483,
+      "y": 243,
+      "width": 694,
+      "height": 363
+    },
+    "initial_snapshot": {
+      "schema": "FILL001_V5_LIVE_GATE_V1",
+      "session_id": "95f731e1-7bd0-4627-bd2f-a3bd22c7d388",
+      "mapping_sha256": "d4347002b074a914f09ca04e864e1fa59c3bf08d1118b3062b7a19db8acf47fd",
+      "heartbeat_at_utc": "2026-11-12T23:45:21.053+00:00",
+      "pointCount": 1,
+      "maxPoints": 6000,
+      "remainingPoints": 5999,
+      "currentRadius": 5,
+      "exact": true,
+      "blank_counter_confirmed": true,
+      "stage6_execution_allowed": false
+    },
+    "expected_pointer_down_client": [
+      [
+        717.0,
+        131.0
+      ],
+      [
+        706.0,
+        132.0
+      ],
+      [
+        705.0,
+        134.0
+      ],
+      [
+        702.0,
+        135.0
+      ],
+      [
+        700.0,
+        137.0
+      ],
+      [
+        699.0,
+        138.0
+      ],
+      [
+        697.0,
+        140.0
+      ],
+      [
+        697.0,
+        141.0
+      ],
+      [
+        696.0,
+        143.0
+      ],
+      [
+        696.0,
+        144.0
+      ],
+      [
+        694.0,
+        146.0
+      ],
+      [
+        694.0,
+        147.0
+      ],
+      [
+        694.0,
+        149.0
+      ],
+      [
+        693.0,
+        151.0
+      ],
+      [
+        693.0,
+        152.0
+      ],
+      [
+        693.0,
+        154.0
+      ],
+      [
+        693.0,
+        155.0
+      ],
+      [
+        693.0,
+        157.0
+      ],
+      [
+        693.0,
+        158.0
+      ],
+      [
+        693.0,
+        160.0
+      ],
+      [
+        693.0,
+        161.0
+      ],
+      [
+        693.0,
+        163.0
+      ],
+      [
+        693.0,
+        164.0
+      ],
+      [
+        693.0,
+        166.0
+      ],
+      [
+        693.0,
+        167.0
+      ],
+      [
+        693.0,
+        169.0
+      ],
+      [
+        693.0,
+        170.0
+      ],
+      [
+        693.0,
+        172.0
+      ],
+      [
+        693.0,
+        173.0
+      ],
+      [
+        693.0,
+        175.0
+      ],
+      [
+        693.0,
+        176.0
+      ],
+      [
+        691.0,
+        178.0
+      ],
+      [
+        691.0,
+        179.0
+      ],
+      [
+        691.0,
+        181.0
+      ],
+      [
+        691.0,
+        182.0
+      ],
+      [
+        691.0,
+        184.0
+      ],
+      [
+        691.0,
+        185.0
+      ],
+      [
+        691.0,
+        187.0
+      ],
+      [
+        690.0,
+        188.0
+      ],
+      [
+        690.0,
+        190.0
+      ],
+      [
+        690.0,
+        191.0
+      ],
+      [
+        690.0,
+        193.0
+      ],
+      [
+        690.0,
+        194.0
+      ],
+      [
+        688.0,
+        196.0
+      ],
+      [
+        688.0,
+        197.0
+      ],
+      [
+        688.0,
+        199.0
+      ],
+      [
+        688.0,
+        200.0
+      ],
+      [
+        688.0,
+        202.0
+      ],
+      [
+        687.0,
+        203.0
+      ],
+      [
+        687.0,
+        205.0
+      ],
+      [
+        687.0,
+        206.0
+      ],
+      [
+        687.0,
+        208.0
+      ],
+      [
+        685.0,
+        209.0
+      ],
+      [
+        685.0,
+        211.0
+      ],
+      [
+        685.0,
+        212.0
+      ],
+      [
+        685.0,
+        214.0
+      ],
+      [
+        684.0,
+        215.0
+      ],
+      [
+        684.0,
+        217.0
+      ],
+      [
+        684.0,
+        218.0
+      ],
+      [
+        684.0,
+        220.0
+      ],
+      [
+        682.0,
+        221.0
+      ],
+      [
+        682.0,
+        223.0
+      ],
+      [
+        682.0,
+        224.0
+      ],
+      [
+        682.0,
+        226.0
+      ],
+      [
+        681.0,
+        228.0
+      ],
+      [
+        681.0,
+        229.0
+      ],
+      [
+        681.0,
+        231.0
+      ],
+      [
+        681.0,
+        232.0
+      ],
+      [
+        679.0,
+        234.0
+      ],
+      [
+        679.0,
+        235.0
+      ],
+      [
+        679.0,
+        237.0
+      ],
+      [
+        679.0,
+        238.0
+      ],
+      [
+        678.0,
+        240.0
+      ],
+      [
+        678.0,
+        241.0
+      ],
+      [
+        678.0,
+        243.0
+      ],
+      [
+        678.0,
+        244.0
+      ],
+      [
+        678.0,
+        246.0
+      ],
+      [
+        676.0,
+        247.0
+      ],
+      [
+        676.0,
+        249.0
+      ],
+      [
+        676.0,
+        250.0
+      ],
+      [
+        676.0,
+        252.0
+      ],
+      [
+        676.0,
+        253.0
+      ],
+      [
+        676.0,
+        255.0
+      ],
+      [
+        676.0,
+        256.0
+      ],
+      [
+        675.0,
+        258.0
+      ],
+      [
+        675.0,
+        259.0
+      ],
+      [
+        675.0,
+        261.0
+      ],
+      [
+        675.0,
+        262.0
+      ],
+      [
+        675.0,
+        264.0
+      ],
+      [
+        675.0,
+        265.0
+      ],
+      [
+        675.0,
+        267.0
+      ],
+      [
+        675.0,
+        268.0
+      ],
+      [
+        675.0,
+        270.0
+      ],
+      [
+        675.0,
+        271.0
+      ],
+      [
+        675.0,
+        273.0
+      ],
+      [
+        675.0,
+        274.0
+      ],
+      [
+        675.0,
+        276.0
+      ],
+      [
+        675.0,
+        277.0
+      ],
+      [
+        675.0,
+        279.0
+      ],
+      [
+        675.0,
+        280.0
+      ],
+      [
+        675.0,
+        282.0
+      ],
+      [
+        675.0,
+        283.0
+      ],
+      [
+        675.0,
+        285.0
+      ],
+      [
+        676.0,
+        286.0
+      ],
+      [
+        676.0,
+        288.0
+      ],
+      [
+        676.0,
+        289.0
+      ],
+      [
+        676.0,
+        291.0
+      ],
+      [
+        676.0,
+        292.0
+      ],
+      [
+        676.0,
+        294.0
+      ],
+      [
+        676.0,
+        295.0
+      ],
+      [
+        676.0,
+        297.0
+      ],
+      [
+        678.0,
+        298.0
+      ],
+      [
+        678.0,
+        300.0
+      ],
+      [
+        678.0,
+        301.0
+      ],
+      [
+        678.0,
+        303.0
+      ],
+      [
+        678.0,
+        305.0
+      ],
+      [
+        679.0,
+        306.0
+      ],
+      [
+        679.0,
+        308.0
+      ],
+      [
+        679.0,
+        309.0
+      ],
+      [
+        679.0,
+        311.0
+      ],
+      [
+        681.0,
+        312.0
+      ],
+      [
+        681.0,
+        314.0
+      ],
+      [
+        681.0,
+        315.0
+      ],
+      [
+        681.0,
+        317.0
+      ],
+      [
+        682.0,
+        318.0
+      ],
+      [
+        682.0,
+        320.0
+      ],
+      [
+        682.0,
+        321.0
+      ],
+      [
+        682.0,
+        323.0
+      ],
+      [
+        684.0,
+        324.0
+      ],
+      [
+        684.0,
+        326.0
+      ],
+      [
+        684.0,
+        327.0
+      ],
+      [
+        684.0,
+        329.0
+      ],
+      [
+        685.0,
+        330.0
+      ],
+      [
+        685.0,
+        332.0
+      ],
+      [
+        685.0,
+        333.0
+      ],
+      [
+        685.0,
+        335.0
+      ],
+      [
+        687.0,
+        336.0
+      ],
+      [
+        687.0,
+        338.0
+      ],
+      [
+        687.0,
+        339.0
+      ],
+      [
+        687.0,
+        341.0
+      ],
+      [
+        688.0,
+        342.0
+      ],
+      [
+        688.0,
+        344.0
+      ],
+      [
+        688.0,
+        345.0
+      ],
+      [
+        688.0,
+        347.0
+      ],
+      [
+        690.0,
+        348.0
+      ],
+      [
+        690.0,
+        350.0
+      ],
+      [
+        690.0,
+        351.0
+      ],
+      [
+        690.0,
+        353.0
+      ],
+      [
+        690.0,
+        354.0
+      ],
+      [
+        690.0,
+        356.0
+      ],
+      [
+        691.0,
+        357.0
+      ],
+      [
+        691.0,
+        359.0
+      ],
+      [
+        691.0,
+        360.0
+      ],
+      [
+        691.0,
+        362.0
+      ],
+      [
+        691.0,
+        363.0
+      ],
+      [
+        691.0,
+        365.0
+      ],
+      [
+        691.0,
+        366.0
+      ],
+      [
+        693.0,
+        368.0
+      ],
+      [
+        693.0,
+        369.0
+      ],
+      [
+        693.0,
+        371.0
+      ],
+      [
+        693.0,
+        372.0
+      ],
+      [
+        693.0,
+        374.0
+      ],
+      [
+        693.0,
+        375.0
+      ],
+      [
+        693.0,
+        377.0
+      ],
+      [
+        693.0,
+        379.0
+      ],
+      [
+        693.0,
+        380.0
+      ],
+      [
+        693.0,
+        382.0
+      ],
+      [
+        693.0,
+        383.0
+      ],
+      [
+        693.0,
+        385.0
+      ],
+      [
+        693.0,
+        386.0
+      ],
+      [
+        693.0,
+        388.0
+      ],
+      [
+        693.0,
+        389.0
+      ],
+      [
+        693.0,
+        391.0
+      ],
+      [
+        693.0,
+        392.0
+      ],
+      [
+        693.0,
+        394.0
+      ],
+      [
+        693.0,
+        395.0
+      ],
+      [
+        691.0,
+        397.0
+      ],
+      [
+        691.0,
+        398.0
+      ],
+      [
+        691.0,
+        400.0
+      ],
+      [
+        691.0,
+        401.0
+      ],
+      [
+        691.0,
+        403.0
+      ],
+      [
+        691.0,
+        404.0
+      ],
+      [
+        691.0,
+        406.0
+      ],
+      [
+        690.0,
+        407.0
+      ],
+      [
+        690.0,
+        409.0
+      ],
+      [
+        690.0,
+        410.0
+      ],
+      [
+        690.0,
+        412.0
+      ],
+      [
+        690.0,
+        413.0
+      ],
+      [
+        688.0,
+        415.0
+      ],
+      [
+        688.0,
+        416.0
+      ],
+      [
+        688.0,
+        418.0
+      ],
+      [
+        688.0,
+        419.0
+      ],
+      [
+        687.0,
+        421.0
+      ],
+      [
+        687.0,
+        422.0
+      ],
+      [
+        687.0,
+        424.0
+      ],
+      [
+        687.0,
+        425.0
+      ],
+      [
+        687.0,
+        427.0
+      ],
+      [
+        687.0,
+        428.0
+      ],
+      [
+        687.0,
+        430.0
+      ],
+      [
+        687.0,
+        431.0
+      ],
+      [
+        687.0,
+        433.0
+      ],
+      [
+        687.0,
+        434.0
+      ],
+      [
+        688.0,
+        436.0
+      ],
+      [
+        688.0,
+        437.0
+      ],
+      [
+        690.0,
+        439.0
+      ],
+      [
+        690.0,
+        440.0
+      ],
+      [
+        691.0,
+        442.0
+      ],
+      [
+        693.0,
+        443.0
+      ],
+      [
+        696.0,
+        445.0
+      ],
+      [
+        699.0,
+        446.0
+      ],
+      [
+        708.0,
+        448.0
+      ]
+    ],
+    "expected_brush_radii": [
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10,
+      10
+    ],
+    "board_client_rect": {
+      "left": 483.4536882098092,
+      "right": 1176.703295745131,
+      "top": 108.22,
+      "bottom": 470.62
+    },
+    "slider_client_corridor": {
+      "left": 1203.0,
+      "right": 1367.0,
+      "top": 167.0,
+      "bottom": 175.0
+    },
+    "planned_strokes": 211,
+    "execution_allowed": false,
+    "exact_chalk": null,
+    "game_png_quality": "NOT_EVALUATED"
+  },
+  "task_id": "fill001-series-c7761587236b-c001-f003",
+  "session_id": "95f731e1-7bd0-4627-bd2f-a3bd22c7d388",
+  "status": "QUOTA_LIMITED",
+  "started_at_utc": "2026-11-12T23:45:21.569114+00:00",
+  "stage6_summary": {
+    "status": "failed",
+    "completed_strokes": 162,
+    "total_strokes": 211,
+    "started_at": "2026-11-13T02:45:21+03:00",
+    "ended_at": "2026-11-13T02:49:01+03:00",
+    "duration_seconds": 220.093,
+    "move_calls": 11967,
+    "error": "SeriesBlocked: Exact game remaining quota below 300-point safety margin",
+    "stop_reason": null,
+    "mouse_release": {
+      "attempted": true,
+      "succeeded": true,
+      "errors": []
+    },
+    "executor_config": {
+      "point_step_px": 4.0,
+      "line_extension_px": 0.0,
+      "point_delay_ms": 5,
+      "after_mouse_up_ms": 20,
+      "before_mouse_down_ms": 20,
+      "after_mouse_down_ms": 40,
+      "end_hold_ms": 50,
+      "countdown_seconds": 5
+    }
+  },
+  "actual_chalk": 5748,
+  "monitor_binding": "EXACT_RUN_BOUND",
+  "game_png_quality": "NOT_EVALUATED",
+  "before_png": {
+    "file": "C:\\Users\\Kiddos\\Desktop\\clone autodraw2\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\fill001\\series\\fill001-series-c7761587236b-runs\\stage6\\series-04878c22-c9c8-4f3b-9caf-a5cf0d8347dc\\before.png",
+    "sha256": "b825d973ab46bf89d267e6324a48a99526109b9cda74018a59ae450a58a692a6"
+  },
+  "after_png": {
+    "file": "C:\\Users\\Kiddos\\Desktop\\clone autodraw2\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\fill001\\series\\fill001-series-c7761587236b-runs\\stage6\\series-04878c22-c9c8-4f3b-9caf-a5cf0d8347dc\\after.png",
+    "sha256": "2f41bb43300b2b05149082723099a8539f25f715ce8d9c968a203a0a83f29f97"
+  },
+  "after_settled_png": {
+    "file": "C:\\Users\\Kiddos\\Desktop\\clone autodraw2\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\fill001\\series\\fill001-series-c7761587236b-runs\\stage6\\series-04878c22-c9c8-4f3b-9caf-a5cf0d8347dc\\after_settled.png",
+    "sha256": "ea2b3477a19e090596ed537c6528a8dda9900167a88b06fc236aaf650ca219da"
+  },
+  "binding": {
+    "status": "EXACT_RUN_BOUND",
+    "session_id": "95f731e1-7bd0-4627-bd2f-a3bd22c7d388",
+    "task_id": "fill001-series-c7761587236b-c001-f003",
+    "run_ids": [
+      "d65b194b-d8f4-4a27-a558-affe24058044"
+    ],
+    "stroke_count": 162,
+    "excluded_zero_point_slider_drags": 1,
+    "monitor_event_count": 28961,
+    "pre_pointCount": 1,
+    "post_pointCount": 5749,
+    "exact_chalk": 5748,
+    "maxPoints": 6000,
+    "method": "post.pointCount - pre.pointCount, continuous full closed Monitor runs",
+    "png_quality": "NOT_EVALUATED",
+    "independent_E5": "NOT_RUN",
+    "bridge_run_paths": [
+      "C:\\Users\\Kiddos\\Desktop\\clone autodraw2\\AutoDraw\\AutoDraw_Stage20\\data\\results\\brush_behavior_tests\\game_monitor_bridge\\95f731e1-7bd0-4627-bd2f-a3bd22c7d388\\game-monitor-run-20261112T234904447193Z-d65b194b.json"
+    ]
+  },
+  "png_audit": {
+    "schema": "FILL001_SCREEN_MASK_V2",
+    "diagnostic_only": true,
+    "run_id": "04878c22-c9c8-4f3b-9caf-a5cf0d8347dc",
+    "geometry_evidence_sha256": "55197c189b6b4192dba6301dd5309d80c8c325d46b6df82305f5c28d2f4e86f6",
+    "frozen_target_mask_sha256": "50d45794d9594b5b11f93ddfe407c47210eb315ae10f3d70e0b3978eff5764a3",
+    "before_png_sha256": "b825d973ab46bf89d267e6324a48a99526109b9cda74018a59ae450a58a692a6",
+    "after_png_sha256": "ea2b3477a19e090596ed537c6528a8dda9900167a88b06fc236aaf650ca219da",
+    "rgb_change_threshold": 8,
+    "target_pixels": 102180,
+    "covered_pixels": 78916,
+    "uncovered_pixels": 23264,
+    "coverage_fraction": 0.7723233509493052,
+    "leakage_pixels": 179,
+    "changed_pixels": 79095,
+    "v1_original": {
+      "coverage_fraction": 0.7743735326764963,
+      "leakage_pixels": 263,
+      "png_audit_status": "failed"
+    },
+    "v2_diagnostic_gate": "FAIL",
+    "acceptance_override": false,
+    "active_quality_policy_id": "FILL001_CHALK_FIRST_PERIMETER_V2",
+    "active_quality_gate": "FAIL",
+    "active_quality_metrics": {
+      "policy_id": "FILL001_CHALK_FIRST_PERIMETER_V2",
+      "quality_gate": "FAIL",
+      "coverage_fraction": 0.7723233509493052,
+      "minimum_coverage_fraction": 0.99,
+      "target_pixels": 102180,
+      "uncovered_pixels": 23264,
+      "leakage_pixels": 179,
+      "max_perimeter_overshoot_logical_px": 1.327083,
+      "maximum_allowed_overshoot_logical_px": 3.0,
+      "leakage_pixels_beyond_allowed_halo": 0,
+      "screen_pixels_per_logical_x": 1.5070643642072217,
+      "screen_pixels_per_logical_y": 1.51,
+      "distance_method": "screen_euclidean_min_uniform_scale_conservative",
+      "chalk_selection_priority": "min_run_bound_exact_chalk_among_quality_PASS",
+      "exact_chalk": null,
+      "chalk_evidence_status": "NOT_EVALUATED",
+      "scope": "run_bound_screen_RGB_quality_only_not_game_execution_or_CHALK"
+    }
+  },
+  "before_cursor_parking": {
+    "method": "released_pointer_off_roi_no_click_v1",
+    "screen_x": 387,
+    "screen_y": 424,
+    "exact_pointCount_before": 1,
+    "exact_pointCount_after": 1
+  },
+  "pre_pointCount": 1,
+  "post_settled_pointCount": 5749,
+  "settled_cursor_parking": {
+    "method": "released_pointer_off_roi_no_click_v1",
+    "screen_x": 387,
+    "screen_y": 424,
+    "exact_pointCount_before": 5749,
+    "exact_pointCount_after": 5749
+  },
+  "quota_stop": {
+    "reason": "EXACT_REMAINING_BELOW_SAFETY_MARGIN",
+    "safety_margin_points": 300,
+    "remainingPoints": 251,
+    "pointCount": 5749,
+    "maxPoints": 6000,
+    "completed_strokes": 162,
+    "planned_strokes": 211
+  },
+  "finished_at_utc": "2026-11-12T23:49:08.563237+00:00"
+}
