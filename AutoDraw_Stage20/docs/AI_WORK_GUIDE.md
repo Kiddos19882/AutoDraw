@@ -28,14 +28,9 @@
 
 ## Чтение больших файлов GitHub — проверенный Git blob способ (2026-11-13)
 
-**Рабочее решение (E1/PASS на шести реальных файлах):** подключённый GitHub `fetch_file` для JSON больше 1 МБ даёт `content=""` даже с `encoding=base64`, но возвращает **Git blob SHA**. Использовать подключённую операцию GitHub **`fetch_blob(repository_full_name, blob_sha)`**, подставляя ровно этот SHA. Она вернула полное UTF-8 содержимое всех шести Monitor JSON серии `fill001-series-3e1fd32c4d99` (12.4–51.0 млн символов каждый); каждый JSON был успешно разобран в памяти. **В следующем чате найти действие `mcp__GitHub__fetch_blob` через список доступных GitHub tools, а не повторять безуспешные вызовы `fetch_file`.** Для больших документов получать один файл за раз и выводить только сводку, не всё содержимое.
+**Исторический способ (E1, 2026-11-13; не рекомендуемый default):** GitHub `fetch_file` для JSON >1 МБ возвращал пустой `content` и blob SHA; `fetch_blob` тогда успешно прочитал шесть файлов размером 12.4–51.0 млн символов. Этот результат остаётся историческим evidence, но **не является инструкцией повторять полную загрузку в чат**: выявлены проблемы передачи и расхода контекста. Действующее правило ниже, в разделе «Работа с большими первичными данными без перегрузки чата», имеет приоритет.
 
-**Рецепт при наличии GitHub connector:**
-1. На текущей ветке/зафиксированном commit прочитать `fetch_file({repository_full_name:"Kiddos19882/AutoDraw",path:".../game-monitor-run-....json",ref:"<commit>"})`. При пустом `content` сохранить `result.sha` (Git blob SHA).
-2. Вызвать `fetch_blob({repository_full_name:"Kiddos19882/AutoDraw",blob_sha:"<sha>"})`; взять `result.content` и разобрать `JSON.parse` непосредственно внутри одного вызова оркестратора tools. Не выводить массив `events` целиком.
-3. Сопоставить `session_id`, `run_id`, `pre_test_snapshot`, `post_test_snapshot`, `point_delta_matches_chalk` с Stage6/series artifact; проверить `sum(accepted_points[*].point_delta) == post.pointCount-pre.pointCount`, ошибки, пропуски и transport drop. **Не считать `accepted_points.length` эквивалентом CHALK**: в отдельных runs встречается `point_delta=2`.
-4. Для Egret replay проверять, что реализованный replay validator поддерживает конкретные события и их `point_delta` (не подгонять raw evidence); сохранять реальные границы штрихов и наблюдавшиеся радиусы, отделяя изменения кисти при slider от рисования.
-5. `fetch_blob` возвращает разобранный текст **через connector**, а не локальный файл. Прямой `curl`/raw.githubusercontent.com и локальный git в текущем контейнере заблокированы сетью. Если нужен физический файл, использовать отдельно разрешённый экспорт/артефакт; не утверждать, что JSON уже лежит на диске.
+**Вместо прежнего рецепта:** получить SHA и метаданные коротким запросом; использовать существующий `run_fill001_series_egret_replay.py --validate-only` либо специализированный bounded diagnostic в GitHub Actions, читающий pinned Git objects непосредственно на runner. В ответе только ограниченные summary/ID/hash/status; при недоступном CI — `BLOCKED`, не fallback на полную загрузку через `fetch_blob`. Запуск новых CI и изменение анализатора требуют разрешённого scope и проверки diff/tests.
 
 **Замороженная выборка:** source commit `3f67c05d8dfd2f4db8954063850bd67b96232dd1`, одна сессия `e04234bc-b9ee-4d06-bd20-f1e13b8423ba`:
 
