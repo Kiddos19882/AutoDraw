@@ -194,6 +194,9 @@ def audit_aggregated_points(workspace: Path) -> dict:
                             coordinates[key] = subset
                 witnesses.append({
                     "type": witness.get("type"),
+                    "point_count": witness.get("pointCount") if isinstance(witness.get("pointCount"), int) else None,
+                    "point_delta": witness.get("pointDelta") if isinstance(witness.get("pointDelta"), int) else None,
+                    "observed_point_delta_since_previous_frame": witness.get("observedPointDeltaSincePreviousFrame") if isinstance(witness.get("observedPointDeltaSincePreviousFrame"), int) else None,
                     "delta_t": witness["t"] - event_time,
                     "stroke_id": witness.get("strokeId"),
                     "coordinate_values": coordinates,
