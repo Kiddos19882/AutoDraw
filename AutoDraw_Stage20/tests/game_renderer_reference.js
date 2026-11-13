@@ -131,6 +131,80 @@
     };
   }
 
+
+  // FILL001_SERIES_EGRET_REPLAY_V1: separate from strict ENGINE-001 semantics.
+  // The run recorder may aggregate two accepted points into one DRAW_SAMPLE;
+  // in that case exactly one coordinate is missing and pixel identity cannot
+  // be asserted even though exact game CHALK remains known.
+  function extractFill001SeriesStrokes(run) {
+    if (!run || run.record_type !== "autodraw_game_monitor_run" ||
+        run.execution_status !== "completed" || !Array.isArray(run.accepted_points) ||
+        !Array.isArray(run.events) || run.point_delta_matches_chalk !== true) {
+      throw new Error("FILL001 replay requires complete, bound Monitor event and accepted-point arrays.");
+    }
+    const before=run.pre_test_snapshot, after=run.post_test_snapshot;
+    if (!before || !after || before.isExact !== true || after.isExact !== true ||
+        before.logicalWidth !== 460 || before.logicalHeight !== 240 ||
+        after.logicalWidth !== 460 || after.logicalHeight !== 240) {
+      throw new Error("FILL001 requires exact 460x240 before/after counter snapshots.");
+    }
+    const chalk=Number(after.pointCount)-Number(before.pointCount);
+    const events=run.events.filter(e=>e && e.type==="DRAW_SAMPLE" && Number(e.pointDelta)>0);
+    const accepted=run.accepted_points;
+    if (!Number.isSafeInteger(chalk) || chalk<=0 || events.length!==accepted.length ||
+        Number(run.dropped_events)!==0 || Number(run.bridge_send_failures_delta)!==0 ||
+        Number(run.collector_sequence_gap_count)!==0 || Number(run.monitor_error_count_delta)!==0 ||
+        (Array.isArray(run.monitor_errors) && run.monitor_errors.length)) {
+      throw new Error("FILL001 recorder/transport integrity or event-count mismatch.");
+    }
+    const observed=new Map((run.observed_stroke_modes||[]).map(m=>[m.stroke_id,m.stroke_option_raw]));
+    const strokes=[], seen=new Set();
+    let sum=0,missing=0,lastTime=-Infinity,lastId=null;
+    for (let i=0;i<accepted.length;i++) {
+      const p=accepted[i],e=events[i];
+      const d=Number(p?.point_delta);
+      if (!p || !e || !Number.isSafeInteger(d) || d<1 || d>2 ||
+          d!==Number(e.pointDelta) || p.stroke_id!==e.strokeId || p.t!==e.t ||
+          e.acceptedPoint?.x!==p.x || e.acceptedPoint?.y!==p.y ||
+          !Number.isFinite(p.x) || !Number.isFinite(p.y) ||
+          p.x<0 || p.x>=460 || p.y<0 || p.y>=240 ||
+          !Number.isFinite(p.t) || p.t<lastTime) {
+        throw new Error("FILL001 invalid ordered accepted-point/evidence at "+i);
+      }
+      const radius=Number(e.board?.currentRadius);
+      if (!Number.isInteger(radius) || radius<1 || radius>30 ||
+          observed.get(p.stroke_id)!==false) {
+        throw new Error("FILL001 brush radius or observed normal mode unavailable at "+i);
+      }
+      if (lastId!==p.stroke_id) {
+        if (seen.has(p.stroke_id)) throw new Error("FILL001 interleaved stroke IDs.");
+        seen.add(p.stroke_id);
+        strokes.push({strokeId:p.stroke_id,width:radius,points:[]});
+        lastId=p.stroke_id;
+      }
+      const stroke=strokes[strokes.length-1];
+      if (stroke.width!==radius) throw new Error("FILL001 mid-stroke radius change.");
+      if (stroke.points.length) {
+        const old=stroke.points[stroke.points.length-1];
+        if (old.x===p.x && old.y===p.y) throw new Error("FILL001 duplicate accepted point.");
+      }
+      stroke.points.push({x:p.x,y:p.y});
+      sum+=d;
+      missing+=d-1;
+      lastTime=p.t;
+    }
+    if (sum!==chalk || strokes.length!==Number(run.stroke_count)) {
+      throw new Error("FILL001 accepted-point sum/stroke count differs from game counters.");
+    }
+    return {
+      runId:run.run_id,sessionId:run.session_id,strokes,
+      exactHistoricalChalk:chalk,observedCoordinateCount:accepted.length,
+      missingCoordinateCount:missing,
+      pixelExactEligible:missing===0,
+      replayStatus:missing===0?"COMPLETE_ACCEPTED_COORDINATES":"DIAGNOSTIC_MISSING_ACCEPTED_COORDINATES"
+    };
+  }
+
   function midpoint(a, b) {
     return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
   }
@@ -278,7 +352,7 @@
     };
   }
 
-  function renderStageWebGL(mode, points, lineWidth, profile, roundOrigin, state) {
+  function renderStageWebGL(mode, points, lineWidth, profile, roundOrigin, state, boardOverride) {
     const placement = buildStagePlacement(profile, roundOrigin);
     if (state.bufferSize.width !== placement.backingWidth ||
         state.bufferSize.height !== placement.backingHeight) {
@@ -290,7 +364,7 @@
     stage.addChild(container);
     const mask = makeBoardMaskShape();
     container.addChild(mask);
-    const board = makeActualBoardPane(mode, points, lineWidth).shape;
+    const board = boardOverride || makeActualBoardPane(mode, points, lineWidth).shape;
     container.addChild(board);
     board.mask = mask;
 
@@ -375,6 +449,7 @@
     shouldWebGLRendererRasterize,
     extractAcceptedPoints,
     extractTemporalStrokes,
+    extractFill001SeriesStrokes,
     buildStagePlacement,
     buildStageRendererTransform
   };
@@ -735,7 +810,7 @@
     parent.appendChild(link);
   }
 
-  function initializeWebGL(stageProfile) {
+  function initializeWebGL(stageProfile, seriesScale) {
     if (!egret.sys || typeof egret.sys.setRenderMode !== "function") {
       throw new Error("Egret sys.setRenderMode is unavailable.");
     }
@@ -745,8 +820,8 @@
       throw new Error("Egret did not initialize WebGLRenderer/WebGLRenderBuffer.");
     }
     const displayList = egret.sys.DisplayList;
-    displayList.$canvasScaleX = RASTER_SCALE;
-    displayList.$canvasScaleY = RASTER_SCALE;
+    displayList.$canvasScaleX = seriesScale || RASTER_SCALE;
+    displayList.$canvasScaleY = seriesScale || RASTER_SCALE;
     displayList.$canvasScaleFactor = RUNTIME_CANVAS_SCALE_FACTOR;
 
     const outputWidth = BOARD_WIDTH * RASTER_SCALE;
@@ -2115,6 +2190,100 @@
     }
   }
 
+
+  const FILL001_SERIES_SOURCE="e04234bc-b9ee-4d06-bd20-f1e13b8423ba";
+  const FILL001_SERIES_PATHS={
+    "c001-f001":"game-monitor-run-20261113T054218164207Z-8524ea6c.json",
+    "c001-f002":"game-monitor-run-20261113T054356143388Z-e854a22e.json",
+    "c001-f003":"game-monitor-run-20261113T054750518764Z-4de9069f.json",
+    "c002-f001":"game-monitor-run-20261113T055140766170Z-3f06caa0.json",
+    "c002-f002":"game-monitor-run-20261113T055532027637Z-641e682c.json",
+    "c002-f003":"game-monitor-run-20261113T055652967299Z-66b8a7ae.json"
+  };
+
+  function renderFill001SeriesReplay() {
+    try {
+      const figure=new URLSearchParams(window.location.search).get("figure");
+      const name=FILL001_SERIES_PATHS[figure];
+      if (!name) throw new Error("FILL001 replay requires a pinned six-series figure ID.");
+      const path="../data/results/brush_behavior_tests/game_monitor_bridge/"+
+        FILL001_SERIES_SOURCE+"/"+name;
+      const req=new XMLHttpRequest();
+      req.open("GET",path,false);
+      req.send(null);
+      if(req.status!==200)throw new Error("FILL001 frozen source HTTP "+req.status);
+      const run=JSON.parse(req.responseText);
+      const input=extractFill001SeriesStrokes(run);
+      if(input.sessionId!==FILL001_SERIES_SOURCE)throw new Error("FILL001 session mismatch.");
+      const g=run.renderer_geometry_at_start;
+      const h=run.renderer_geometry_at_end;
+      if(!g || !h || g.engineVersion!=="5.4.1" || g.renderMode!=="webgl" ||
+          g.canvasScaleX!==4 || g.canvasScaleY!==4 ||
+          !g.boardDetected || !h.boardDetected || g.playerCount!==1 || h.playerCount!==1) {
+        throw new Error("FILL001 unsupported source Egret/Stage geometry.");
+      }
+      const player=g.players?.[0], other=h.players?.[0];
+      if (!player || !other) throw new Error("FILL001 missing source player.");
+      const corners=player.boardStageCorners;
+      const otherCorners=other.boardStageCorners;
+      const important=x=>JSON.stringify({
+        s:x?.stage, c:{width:x?.canvas?.width,height:x?.canvas?.height},
+        corners:x?.boardStageCorners
+      });
+      if(important(player)!==important(other) ||
+          g.canvasScaleX!==h.canvasScaleX || g.canvasScaleY!==h.canvasScaleY) {
+        throw new Error("FILL001 Stage backing/BoardPane geometry changed.");
+      }
+      const profile={
+        stageWidth:Number(player.stage?.width),stageHeight:Number(player.stage?.height),
+        canvasBackingWidth:Number(player.canvas?.width),
+        canvasBackingHeight:Number(player.canvas?.height),
+        canvasScaleX:g.canvasScaleX,canvasScaleY:g.canvasScaleY,
+        boardWidth:460,boardHeight:240,boardStageCorners:corners
+      };
+      buildStagePlacement(profile,false);
+      const board=makeTemporalBoard(input.strokes,10,"normal",false);
+      if(board.accepted!==input.observedCoordinateCount) {
+        throw new Error("FILL001 BoardPane accepted coordinate mismatch.");
+      }
+      const state=initializeWebGL(profile,4);
+      const rendered=renderStageWebGL("normal",[],10,profile,false,state,board.shape);
+      const manifest={
+        schema:"FILL001_SERIES_EGRET_REPLAY_V1",figure,
+        source:path,run_id:input.runId,session_id:input.sessionId,
+        exact_historical_chalk:input.exactHistoricalChalk,
+        observed_coordinate_count:input.observedCoordinateCount,
+        missing_coordinate_count:input.missingCoordinateCount,
+        pixel_exact_eligible:input.pixelExactEligible,
+        replay_status:input.replayStatus,stroke_count:input.strokes.length,
+        stroke_widths:[...new Set(input.strokes.map(x=>x.width))],
+        observed_normal_mode:true,source_stage_profile:profile,
+        stage_placement:rendered.placement,stage_output:{
+          width:rendered.canvas.width,height:rendered.canvas.height
+        },
+        renderer:"real Egret 5.4.1 Stage WebGLRenderer",
+        exclusions:[
+          "Unrecorded ENTER_FRAME redraw callbacks and order",
+          "One unknown coordinate per point_delta=2, if present",
+          "Not a new live game measurement"
+        ]
+      };
+      const card=document.createElement("section");
+      card.className="fixture";
+      addDownloadLink(card,rendered.canvas,"fill001-"+figure+"-stage-webgl.png","Native Egret Stage WebGL PNG");
+      casesNode.replaceChildren(card);
+      document.getElementById("renderer-manifest-json").textContent=JSON.stringify(manifest);
+      document.body.dataset.referenceStatus="fill001_series_complete";
+      document.body.dataset.seriesStatus="complete";
+      statusNode.textContent="FILL001 "+figure+" native Egret replay: "+input.replayStatus;
+    }catch(error){
+      document.body.dataset.seriesStatus="error";
+      document.body.dataset.referenceStatus="error";
+      statusNode.className="error";
+      statusNode.textContent="FILL001 native series replay error: "+(error?.stack||error);
+    }
+  }
+
   api.renderContourFirstNativeStudy = renderContourFirstNativeStudy;
   api.renderContourTrimNativeStudy = renderContourTrimNativeStudy;
   api.renderFill001ChalkFirstV5Study = renderFill001ChalkFirstV5Study;
@@ -2125,7 +2294,8 @@
   api.renderEndpointStudy = renderEndpointStudy;
   api.renderDuplicateFrameStudy = renderDuplicateFrameStudy;
   const params = new URLSearchParams(window.location.search);
-  const startup = params.get("contour") === "fill001v5" ? renderFill001ChalkFirstV5Study
+  const startup = params.get("fill001series") === "3e1fd32c4d99" ? renderFill001SeriesReplay
+    : params.get("contour") === "fill001v5" ? renderFill001ChalkFirstV5Study
     : params.get("contour") === "fill001v4" ? renderFill001BottomRepairStudy
     : params.get("footprint") === "fill001a" ? renderFill001FootprintStudy
     : params.get("contour") === "fill001v3" ? () => renderContourTrimNativeStudy(true)
