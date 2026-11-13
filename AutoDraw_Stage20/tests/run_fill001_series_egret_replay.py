@@ -121,6 +121,64 @@ def validate_case(workspace: Path, figure: str, expected_blob: str) -> dict:
     }
 
 
+
+def audit_aggregated_points(workspace: Path) -> dict:
+    """Bounded, read-only E1 inventory; no coordinate inference or raw event export."""
+    cases = []
+    for figure, blob in CASES:
+        if figure not in ("c001-f003", "c002-f002"):
+            continue
+        validated = validate_case(workspace, figure, blob)
+        path = workspace / validated["monitor_path"]
+        relative = path.relative_to(workspace).as_posix()
+        raw = subprocess.run(
+            ["git", "show", f"HEAD:{relative}"],
+            cwd=workspace, check=True, capture_output=True,
+        ).stdout
+        if git_blob_sha(raw) != blob:
+            raise ValueError(f"{figure}: pinned blob changed")
+        run = json.loads(raw)
+        accepted = run["accepted_points"]
+        events = [e for e in run["events"]
+                  if e.get("type") == "DRAW_SAMPLE" and int(e.get("pointDelta") or 0) > 0]
+        if len(events) != len(accepted):
+            raise ValueError(f"{figure}: accepted/event length mismatch")
+        gaps = []
+        for index, (point, event) in enumerate(zip(accepted, events)):
+            delta = int(point["point_delta"])
+            if delta <= 1:
+                continue
+            if delta != int(event.get("pointDelta") or 0):
+                raise ValueError(f"{figure}: aggregated delta mismatch")
+            # Only describe field availability, not speculative reconstructed points.
+            candidate_keys = sorted(k for k in event if any(
+                word in k.lower() for word in ("point", "coord", "path", "sample", "position")))
+            gaps.append({
+                "accepted_index": index, "point_delta": delta,
+                "stroke_id": point.get("stroke_id"),
+                "event_candidate_fields": candidate_keys[:16],
+                "accepted_fields": sorted(point.keys())[:16],
+                "previous_same_stroke": index > 0 and accepted[index-1].get("stroke_id") == point.get("stroke_id"),
+                "next_same_stroke": index+1 < len(accepted) and accepted[index+1].get("stroke_id") == point.get("stroke_id"),
+                "missing_coordinate_count": delta-1,
+                "recovery_status": "NOT_ESTABLISHED",
+            })
+        if sum(g["missing_coordinate_count"] for g in gaps) != validated["missing_points"]:
+            raise ValueError(f"{figure}: gap accounting mismatch")
+        cases.append({
+            "figure": figure, "monitor_blob_sha": blob,
+            "run_id": validated["run_id"], "exact_chalk": validated["exact_chalk"],
+            "missing_points": validated["missing_points"], "gaps": gaps,
+            "status": "DIAGNOSTIC_ONLY",
+        })
+    return {
+        "schema": "ENGINE001_AGGREGATED_POINT_INVENTORY_V1",
+        "source_commit": "3f67c05d8dfd2f4db8954063850bd67b96232dd1",
+        "scope": "Monitor DRAW_SAMPLE and accepted_points only; no independent source recovery",
+        "status": "E1_INVENTORY_ONLY", "cases": cases,
+    }
+
+
 def project_stage_rgba(stage: Image.Image, native_profile: dict, screen: dict, roi: dict) -> Image.Image:
     """Pre-declared Stage→verified desktop-ROI affine, no post-hoc alignment."""
     placement = native_profile["stage_placement"]
@@ -185,10 +243,18 @@ def main() -> int:
     ap.add_argument("--workspace", type=Path, default=Path("."))
     ap.add_argument("--output-dir", type=Path, required=True)
     ap.add_argument("--validate-only", action="store_true")
+    ap.add_argument("--audit-aggregated", action="store_true")
     args = ap.parse_args()
     workspace = args.workspace.resolve()
     destination = args.output_dir.resolve()
     destination.mkdir(parents=True, exist_ok=True)
+    if args.audit_aggregated:
+        audit = audit_aggregated_points(workspace)
+        (destination / "aggregated-point-inventory.json").write_text(
+            json.dumps(audit, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        print("ENGINE001_AGGREGATED_POINT_INVENTORY_V1", audit["status"],
+              "cases", len(audit["cases"]), flush=True)
+        return 0
     results = {"schema": "FILL001_SERIES_EGRET_COMPARISON_V1", "series_id": SERIES,
                "source_commit": "3f67c05d8dfd2f4db8954063850bd67b96232dd1",
                "status": "NOT_RUN", "cases": []}
