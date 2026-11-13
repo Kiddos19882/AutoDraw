@@ -26,38 +26,33 @@
 
 Контроль: `tools/check_markdown_docs.py` проверяет структурные записи каталога через Python AST, но **не** принимает архитектурное или production-решение автоматически.
 
-## Чтение больших GitHub-файлов (2026-11-13; воспроизводимый рецепт и ограничения проверки)
+## Чтение больших файлов GitHub — проверенный Git blob способ (2026-11-13)
 
-**Проблема:** GitHub Contents API в JSON/object-формате при размере файла **более 1 МБ и до 100 МБ** может вернуть `content=""`, хотя файл существует и Git blob SHA известен. Это **не** означает, что JSON пуст. Встроенный GitHub `fetch_file` проекта при `encoding=utf-8` и `encoding=base64` вернул пустой `content` для Monitor JSON; менять `encoding` недостаточно.
+**Рабочее решение (E1/PASS на шести реальных файлах):** подключённый GitHub `fetch_file` для JSON больше 1 МБ даёт `content=""` даже с `encoding=base64`, но возвращает **Git blob SHA**. Использовать подключённую операцию GitHub **`fetch_blob(repository_full_name, blob_sha)`**, подставляя ровно этот SHA. Она вернула полное UTF-8 содержимое всех шести Monitor JSON серии `fill001-series-3e1fd32c4d99` (12.4–51.0 млн символов каждый); каждый JSON был успешно разобран в памяти. **В следующем чате найти действие `mcp__GitHub__fetch_blob` через список доступных GitHub tools, а не повторять безуспешные вызовы `fetch_file`.** Для больших документов получать один файл за раз и выводить только сводку, не всё содержимое.
 
-**Предпочтительный способ, когда доступны исходящие HTTPS-запросы:** читать файл **RAW** по **зафиксированному commit SHA**, потоково писать его на диск и проверить целостность. Для публичного репозитория в терминале:
+**Рецепт при наличии GitHub connector:**
+1. На текущей ветке/зафиксированном commit прочитать `fetch_file({repository_full_name:"Kiddos19882/AutoDraw",path:".../game-monitor-run-....json",ref:"<commit>"})`. При пустом `content` сохранить `result.sha` (Git blob SHA).
+2. Вызвать `fetch_blob({repository_full_name:"Kiddos19882/AutoDraw",blob_sha:"<sha>"})`; взять `result.content` и разобрать `JSON.parse` непосредственно внутри одного вызова оркестратора tools. Не выводить массив `events` целиком.
+3. Сопоставить `session_id`, `run_id`, `pre_test_snapshot`, `post_test_snapshot`, `point_delta_matches_chalk` с Stage6/series artifact; проверить `sum(accepted_points[*].point_delta) == post.pointCount-pre.pointCount`, ошибки, пропуски и transport drop. **Не считать `accepted_points.length` эквивалентом CHALK**: в отдельных runs встречается `point_delta=2`.
+4. Для Egret replay проверять, что реализованный replay validator поддерживает конкретные события и их `point_delta` (не подгонять raw evidence); сохранять реальные границы штрихов и наблюдавшиеся радиусы, отделяя изменения кисти при slider от рисования.
+5. `fetch_blob` возвращает разобранный текст **через connector**, а не локальный файл. Прямой `curl`/raw.githubusercontent.com и локальный git в текущем контейнере заблокированы сетью. Если нужен физический файл, использовать отдельно разрешённый экспорт/артефакт; не утверждать, что JSON уже лежит на диске.
 
-```bash
-COMMIT=3f67c05d8dfd2f4db8954063850bd67b96232dd1
-PATH_IN_REPO=AutoDraw_Stage20/data/results/brush_behavior_tests/game_monitor_bridge/e04234bc-b9ee-4d06-bd20-f1e13b8423ba/game-monitor-run-20261113T055652967299Z-66b8a7ae.json
-curl --fail --location --retry 2 --output /tmp/autodraw-monitor.json "https://raw.githubusercontent.com/Kiddos19882/AutoDraw/$COMMIT/$PATH_IN_REPO"
-git hash-object /tmp/autodraw-monitor.json
-python -m json.tool /tmp/autodraw-monitor.json >/dev/null
-```
+**Замороженная выборка:** source commit `3f67c05d8dfd2f4db8954063850bd67b96232dd1`, одна сессия `e04234bc-b9ee-4d06-bd20-f1e13b8423ba`:
 
-Ожидаемый **Git blob SHA** этого конкретного файла из GitHub `fetch_file`: `4d7959ba62479439eaa83f44c51e2a1008f1eabb`. Считать операцию успешной только после ненулевого размера, HTTP 200, совпадения `git hash-object`, корректного JSON, проверки `session_id/run_id` и run-bound integrity. Коммит закрепляет версию; `git hash-object` проверяет именно Git blob, а не SHA-256 PNG. Не печатать гигантский JSON целиком в чат — читать локально, извлекать требуемые поля.
+| Figure | Monitor JSON Git blob SHA | accepted_points.length | sum(point_delta) = exact CHALK |
+|---|---|---:|---:|
+| C1-F1 | `623be5e5e730fb009ee49afe2267d7de8d826a78` | 5759 | 5759 |
+| C1-F2 | `93771f49728c54b33a303dab68377e9df4f418a1` | 1971 | 1971 |
+| C1-F3 | `3b939c4454f986c1954f192e75f5438939d11643` | 5740 | 5741 |
+| C2-F1 | `5ef05dcfeded397df3f55ab7dcdb88ea560e7b8c` | 5752 | 5752 |
+| C2-F2 | `f1bdbbac9a13a8f3d3a14309c6856dfeead8262f` | 5766 | 5767 |
+| C2-F3 | `4d7959ba62479439eaa83f44c51e2a1008f1eabb` | 1528 | 1528 |
 
-**Официальный REST fallback** для файлов 1–100 МБ: `GET https://api.github.com/repos/Kiddos19882/AutoDraw/contents/<PATH>?ref=<COMMIT>` с `Accept: application/vnd.github.raw+json`; альтернативно `GET https://api.github.com/repos/Kiddos19882/AutoDraw/git/blobs/<BLOB_SHA>` с тем же RAW media type. Обычный object response содержит пустое `content` и `encoding=none`; Git Blobs JSON response содержит base64, но требует больше памяти. Обе REST-операции документированы с ограничением 100 МБ. Для ещё больших файлов использовать `git clone` / `git fetch` с последующим `git show <COMMIT>:<PATH>` либо доступные git/LFS-процедуры — не считать это подтверждённым тестом до фактического чтения и проверки hash.
+Для всех шести `point_delta_matches_chalk=true`, `dropped_events=0`, `bridge_send_failures_delta=0`, `collector_sequence_gap_count=0`; первые пять не обязаны быть полными качественными рисунками (часть `QUOTA_LIMITED`). Два файла имеют **один** event `point_delta=2`. `monitor_buffer_dropped_events_delta` в некоторых runs положителен, но это локальный capped history buffer, не потеря записей run recorder.
 
-**Подтверждённый рабочий путь из подключённого GitHub (2026-11-13):**
-1. Вызвать `mcp__GitHub__fetch_file({repository_full_name:"Kiddos19882/AutoDraw",path:"<FILE_PATH>",ref:"<PINNED_COMMIT>"})`. Даже если `result.content===""`, взять **`result.sha` (Git blob SHA)**. Это не commit SHA.
-2. Вызвать **`mcp__GitHub__fetch_blob({repository_full_name:"Kiddos19882/AutoDraw",blob_sha:"<RESULT_SHA>"})`**. Данные находятся в `result.content` (полный текст UTF-8). Не выводить их целиком в ответ: внутри вызова обработать `JSON.parse(result.content)`, вернуть только необходимые показатели, идентификаторы, хеши и проблемы целостности.
-3. Сверить ожидаемые `session_id`, `run_id`, `task_id`, `pre/post pointCount`, `point_delta_matches_chalk`, `accepted_points`, `stroke` и доказательства PNG/Stage6. `accepted_points.length` не обязано равняться CHALK: возможен `point_delta=2`, причину надо проверить по Monitor event evidence до native replay.
-4. При ошибке API или отсутствии доступа не считать PASS; использовать перечисленные ниже RAW/REST/Git fallback.
+**Статусы:** connected GitHub blob retrieval 6/6 **PASS (E1 чтение данных)**; исходный игровой exact CHALK — архивное E4, не новый E4; Egret replay 6/6 **NOT_RUN**; визуальное сравнение **NOT_RUN**; новое CI **NOT_RUN**. Реальный Git blob hash предоставлен API как ключ fetch; независимая повторная локальная `git hash-object` этих текстов здесь не запускалась.
 
-**Проверенный E1/E4-source retrieval (без нового игрового запуска):** все **6** Monitor JSON серии `fill001-series-3e1fd32c4d99` успешно получены через `fetch_blob` и распарсены как JSON. Размеры возвращённых текстов: 48 493 349; 15 101 029; 50 951 275; 48 533 168; 48 895 326; 12 409 863 символа. Для шестого: blob `4d7959ba62479439eaa83f44c51e2a1008f1eabb`, `run_id=66b8a7ae-ab13-44f1-93ec-409a77117e66`, `accepted_points=1528`, `post.pointCount-pre.pointCount=1528`. Прочитано через подключённый GitHub tool; независимая локальная сверка `git hash-object` и рендер Egret **NOT_RUN**. Содержимое из самого `fetch_blob` уже привязано к запрошенному blob SHA в GitHub API.
-
-**Проверенные нерабочие способы в данном окружении:** `fetch_file` UTF-8/base64 возвращает пустое содержимое; `raw.githubusercontent.com` и прямые `curl`/Python в прошлой сессии были недоступны инструментам. Команды RAW/REST/Git выше остаются *резервными инструкциями, а не лично проверенным PASS*.
-
-**Официальные источники:**
-- https://docs.github.com/en/rest/repos/contents — RAW в диапазоне 1–100 МБ;
-- https://docs.github.com/en/rest/git/blobs — blob и RAW до 100 МБ;
-- https://github.blog/changelog/2022-05-03-increased-file-size-limit-when-retrieving-file-contents-via-rest-api/ .
+**Внешний запасной путь:** RAW по закреплённому commit через `https://raw.githubusercontent.com/<owner>/<repo>/<commit>/<path>` с `curl --fail --location --output ...`, затем `git hash-object` и JSON parse. GitHub REST Contents API поддерживает `Accept: application/vnd.github.raw+json` для диапазона 1–100 МБ; также Git Blobs API. **В этом окружении прямые HTTPS-загрузки BLOCKED**, поэтому не приписывать им PASS. Документация GitHub: https://docs.github.com/en/rest/repos/contents и https://docs.github.com/en/rest/git/blobs.
 
 ## 2. Что считать доказательством
 
