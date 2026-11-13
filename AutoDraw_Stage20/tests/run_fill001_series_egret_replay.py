@@ -13,6 +13,7 @@ import hashlib
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from io import BytesIO
 import json
+import subprocess
 from pathlib import Path, PureWindowsPath
 import threading
 import traceback
@@ -66,7 +67,12 @@ def validate_case(workspace: Path, figure: str, expected_blob: str) -> dict:
     if len(raw_names) != 1:
         raise ValueError(f"{figure}: expected one pinned Monitor run")
     monitor_path = workspace / MONITOR_BASE / PureWindowsPath(raw_names[0]).name
-    raw = monitor_path.read_bytes()
+    # Read exactly the frozen committed blob, avoiding Windows CRLF working-tree filters.
+    relative_monitor = monitor_path.relative_to(workspace).as_posix()
+    raw = subprocess.run(
+        ["git", "show", f"3f67c05d8dfd2f4db8954063850bd67b96232dd1:{relative_monitor}"],
+        cwd=workspace, check=True, capture_output=True,
+    ).stdout
     sha = git_blob_sha(raw)
     if sha != expected_blob:
         raise ValueError(f"{figure}: frozen Git blob SHA mismatch {sha}")
