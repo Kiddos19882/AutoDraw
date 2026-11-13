@@ -167,6 +167,37 @@ def audit_aggregated_points(workspace: Path) -> dict:
                 if any(w in str(k).lower() for w in
                        ("point", "coord", "pointer", "mouse", "position", "sample"))
             })[:24]
+            # Small, source-faithful pointer/frame payload witness. Values are
+            # observational only; never label them as accepted game points.
+            witness_types = {"POINTER_DOWN_CANDIDATE", "MOUSE_MOVE_SAMPLE",
+                             "ENGINE_FRAME_SAMPLE", "POINT_QUOTA_UPDATE"}
+            witnesses = []
+            ordered = sorted(
+                (e for e in near if e.get("type") in witness_types),
+                key=lambda e: (abs(e["t"] - event_time), str(e.get("type"))),
+            )
+            for witness in ordered[:12]:
+                coordinates = {}
+                for key in ("x", "y", "clientX", "clientY", "offsetX", "offsetY",
+                            "logicalX", "logicalY", "screenX", "screenY"):
+                    value = witness.get(key)
+                    if isinstance(value, (int, float)) and not isinstance(value, bool):
+                        coordinates[key] = value
+                for key in ("acceptedPoint", "pointer", "position", "mouse"):
+                    value = witness.get(key)
+                    if isinstance(value, dict):
+                        subset = {k: value[k] for k in
+                                  ("x", "y", "clientX", "clientY", "logicalX", "logicalY")
+                                  if isinstance(value.get(k), (int, float))
+                                  and not isinstance(value.get(k), bool)}
+                        if subset:
+                            coordinates[key] = subset
+                witnesses.append({
+                    "type": witness.get("type"),
+                    "delta_t": witness["t"] - event_time,
+                    "stroke_id": witness.get("strokeId"),
+                    "coordinate_values": coordinates,
+                })
             report = validated["stage6_report"]
             stage_request = report.get("request") or {}
             stage_binding = report.get("binding") or {}
@@ -179,6 +210,7 @@ def audit_aggregated_points(workspace: Path) -> dict:
                 "next_same_stroke": index+1 < len(accepted) and accepted[index+1].get("stroke_id") == point.get("stroke_id"),
                 "missing_coordinate_count": delta-1,
                 "nearby_event_types_100ms": nearby_types,
+                "nearest_first_party_witnesses": witnesses,
                 "nearby_coordinate_field_names_100ms": nearby_candidate_fields,
                 "stage6_request_top_level_keys": sorted(stage_request.keys())[:32],
                 "stage6_binding_top_level_keys": sorted(stage_binding.keys())[:32],
@@ -195,7 +227,7 @@ def audit_aggregated_points(workspace: Path) -> dict:
     return {
         "schema": "ENGINE001_AGGREGATED_POINT_INVENTORY_V1",
         "source_commit": "3f67c05d8dfd2f4db8954063850bd67b96232dd1",
-        "scope": "Monitor accepted/event field inventory, nearby event types and Stage6 metadata keys; no independent coordinate recovery",
+        "scope": "Monitor accepted/event field inventory, bounded pointer/frame payload witnesses and Stage6 metadata keys; no independent coordinate recovery",
         "status": "E1_INVENTORY_ONLY", "cases": cases,
     }
 
