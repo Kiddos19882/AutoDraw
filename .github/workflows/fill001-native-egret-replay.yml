@@ -1,0 +1,66 @@
+name: FILL001 six-run native Egret replay
+
+on:
+  push:
+    branches:
+      - feature/image-geometry-optimization
+    paths:
+      - ".github/workflows/fill001-native-egret-replay.yml"
+      - "AutoDraw_Stage20/tests/game_renderer_reference.js"
+      - "AutoDraw_Stage20/tests/game_renderer_reference.test.js"
+      - "AutoDraw_Stage20/tests/run_fill001_series_egret_replay.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fill001-native-egret-six-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  replay:
+    name: Six archived FILL001 figures vs Egret WebGL (offline)
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout frozen raw runs, Egret bundles and renderer harness
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install screen analysis and browser dependencies
+        run: python -m pip install selenium Pillow numpy
+      - name: JavaScript renderer syntax and regression tests
+        shell: pwsh
+        run: |
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Validate all six immutable Monitor/Game PNG bindings
+        shell: pwsh
+        run: |
+          python AutoDraw_Stage20/tests/run_fill001_series_egret_replay.py --workspace . --validate-only --output-dir "$env:RUNNER_TEMP\fill001-egret-validate"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Render six native Egret figures and compare source screen ROI
+        shell: pwsh
+        run: |
+          python AutoDraw_Stage20/tests/run_fill001_series_egret_replay.py --workspace . --output-dir "$env:RUNNER_TEMP\fill001-egret-six"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Upload immutable-input validation summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fill001-egret-six-source-validation
+          path: ${{ runner.temp }}/fill001-egret-validate/summary.json
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Upload Egret PNGs, pixel diffs and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fill001-egret-six-native-replay
+          path: ${{ runner.temp }}/fill001-egret-six/
+          if-no-files-found: warn
+          retention-days: 30
