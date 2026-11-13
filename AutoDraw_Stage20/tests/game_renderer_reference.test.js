@@ -9,6 +9,7 @@ const {
   shouldWebGLRendererRasterize,
   extractAcceptedPoints,
   extractTemporalStrokes,
+  extractFill001SeriesStrokes,
   buildStagePlacement,
   buildStageRendererTransform
 } = require("./game_renderer_reference.js");
@@ -268,3 +269,52 @@ test("ENGINE-001 imports complete run-bound fractional accepted points without q
     assert.throws(() => extractAcceptedPoints(changed), error, label);
   }
 });
+
+test("FILL001 replay validates normal multi-stroke coordinates and exact chalk", () => {
+  const run={
+    record_type:"autodraw_game_monitor_run",execution_status:"completed",
+    run_id:"r",session_id:"s",point_delta_matches_chalk:true,
+    pre_test_snapshot:{isExact:true,pointCount:1,logicalWidth:460,logicalHeight:240},
+    post_test_snapshot:{isExact:true,pointCount:4,logicalWidth:460,logicalHeight:240},
+    dropped_events:0,bridge_send_failures_delta:0,
+    collector_sequence_gap_count:0,monitor_error_count_delta:0,
+    monitor_errors:[],stroke_count:2,
+    observed_stroke_modes:[
+      {stroke_id:"s1",stroke_option_raw:false},
+      {stroke_id:"s2",stroke_option_raw:false}
+    ],
+    accepted_points:[
+      {stroke_id:"s1",t:1,x:2,y:3,point_delta:1},
+      {stroke_id:"s1",t:2,x:3,y:3,point_delta:1},
+      {stroke_id:"s2",t:3,x:5,y:7,point_delta:1}
+    ]
+  };
+  run.events=run.accepted_points.map((p,i)=>({
+    type:"DRAW_SAMPLE",pointDelta:p.point_delta,strokeId:p.stroke_id,
+    t:p.t,acceptedPoint:{x:p.x,y:p.y},board:{currentRadius:i<2?5:10}
+  }));
+  const exact=extractFill001SeriesStrokes(run);
+  assert.equal(exact.pixelExactEligible,true);
+  assert.equal(exact.exactHistoricalChalk,3);
+  assert.deepEqual(exact.strokes.map(s=>s.width),[5,10]);
+  assert.equal(exact.strokes.length,2);
+  const aggregate=structuredClone(run);
+  aggregate.accepted_points[2].point_delta=2;
+  aggregate.events[2].pointDelta=2;
+  aggregate.post_test_snapshot.pointCount=5;
+  const partial=extractFill001SeriesStrokes(aggregate);
+  assert.equal(partial.exactHistoricalChalk,4);
+  assert.equal(partial.missingCoordinateCount,1);
+  assert.equal(partial.pixelExactEligible,false);
+  assert.equal(partial.replayStatus,"DIAGNOSTIC_MISSING_ACCEPTED_COORDINATES");
+  const changed=structuredClone(run);
+  changed.events[1].board.currentRadius=30;
+  assert.throws(()=>extractFill001SeriesStrokes(changed),/mid-stroke radius/);
+  const lost=structuredClone(run);
+  lost.bridge_send_failures_delta=1;
+  assert.throws(()=>extractFill001SeriesStrokes(lost),/recorder\/transport/);
+  const unobserved=structuredClone(run);
+  unobserved.observed_stroke_modes[0].stroke_option_raw=true;
+  assert.throws(()=>extractFill001SeriesStrokes(unobserved),/observed normal mode/);
+});
+
