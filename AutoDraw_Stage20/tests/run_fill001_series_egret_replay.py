@@ -153,6 +153,23 @@ def audit_aggregated_points(workspace: Path) -> dict:
             # Only describe field availability, not speculative reconstructed points.
             candidate_keys = sorted(k for k in event if any(
                 word in k.lower() for word in ("point", "coord", "path", "sample", "position")))
+            # Inspect bounded metadata from independent event categories, not
+            # inferred coordinates. Keep payload values out of the report.
+            event_time = event.get("t")
+            near = [e for e in run["events"]
+                    if e is not event and isinstance(e, dict)
+                    and isinstance(e.get("t"), (int, float))
+                    and isinstance(event_time, (int, float))
+                    and abs(e["t"] - event_time) <= 100]
+            nearby_types = sorted({str(e.get("type")) for e in near})[:24]
+            nearby_candidate_fields = sorted({
+                str(k) for e in near for k in e
+                if any(w in str(k).lower() for w in
+                       ("point", "coord", "pointer", "mouse", "position", "sample"))
+            })[:24]
+            report = validated["stage6_report"]
+            stage_request = report.get("request") or {}
+            stage_binding = report.get("binding") or {}
             gaps.append({
                 "accepted_index": index, "point_delta": delta,
                 "stroke_id": point.get("stroke_id"),
@@ -161,6 +178,10 @@ def audit_aggregated_points(workspace: Path) -> dict:
                 "previous_same_stroke": index > 0 and accepted[index-1].get("stroke_id") == point.get("stroke_id"),
                 "next_same_stroke": index+1 < len(accepted) and accepted[index+1].get("stroke_id") == point.get("stroke_id"),
                 "missing_coordinate_count": delta-1,
+                "nearby_event_types_100ms": nearby_types,
+                "nearby_coordinate_field_names_100ms": nearby_candidate_fields,
+                "stage6_request_top_level_keys": sorted(stage_request.keys())[:32],
+                "stage6_binding_top_level_keys": sorted(stage_binding.keys())[:32],
                 "recovery_status": "NOT_ESTABLISHED",
             })
         if sum(g["missing_coordinate_count"] for g in gaps) != validated["missing_points"]:
@@ -174,7 +195,7 @@ def audit_aggregated_points(workspace: Path) -> dict:
     return {
         "schema": "ENGINE001_AGGREGATED_POINT_INVENTORY_V1",
         "source_commit": "3f67c05d8dfd2f4db8954063850bd67b96232dd1",
-        "scope": "Monitor DRAW_SAMPLE and accepted_points only; no independent source recovery",
+        "scope": "Monitor accepted/event field inventory, nearby event types and Stage6 metadata keys; no independent coordinate recovery",
         "status": "E1_INVENTORY_ONLY", "cases": cases,
     }
 
