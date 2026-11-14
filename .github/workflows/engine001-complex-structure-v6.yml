@@ -47,8 +47,8 @@ jobs:
           recall_text = "N/A (no source edges)" if recall is None else f"{recall:.6%}"
           lines = [
               "## ENGINE001_COMPLEX_STRUCTURE_V6 — exploratory only",
-              f"- Checkout SHA: \`{data['checkout_sha']}\`",
-              f"- Source SHA256: \`{data['source']['png_sha256']}\`",
+              f"- Checkout SHA: `{data['checkout_sha']}`",
+              f"- Source SHA256: `{data['source']['png_sha256']}`",
               f"- ROI (logical): {roi['width']}×{roi['height']} at {roi['paste_xy']}",
               f"- Source edge pixels: {m['source_edge_pixels']}",
               f"- Palette edge pixels: {m['palette_edge_pixels']}",
@@ -62,7 +62,7 @@ jobs:
               "- Interpretation: palette-edge diagnostics, not an image-quality PASS.",
           ]
           with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as stream:
-              stream.write("\\n".join(lines) + "\\n")
+              stream.write("\n".join(lines) + "\n")
           PY
       - name: Upload original and quantized crops, diagnostic masks and report
         if: always()
