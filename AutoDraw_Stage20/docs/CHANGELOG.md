@@ -1,5 +1,8 @@
 # AutoDraw — значимые изменения
 
+- 2026-11-14 / ENGINE-001: added an opt-in actual native Egret WebGL two-icon composite-mask experiment using two unchanged `testImages` PNGs (home+envelope), synthetic radius2 normal plan and five regressions (`d60956a`; [CI 43546565112](https://github.com/Kiddos19882/AutoDraw/actions/runs/43546565112) SUCCESS; [artifact 14093549419](https://github.com/Kiddos19882/AutoDraw/actions/runs/43546565112/artifacts/14093549419)). Mask IoU 91.9157%, coverage 92.1094%, missing12432/outside332: **offline quality FAIL**, preserved. No new live E4/E5, exact game CHALK, production defaults, thresholds or original captures altered.
+
+
 - 2026-11-14 / ENGINE-001: added reproducible fixed-boundary residual analyzer and five synthetic regressions to the six-run native Egret CI (`ae7ecc4`, [CI 43541756465](https://github.com/Kiddos19882/AutoDraw/actions/runs/43541756465) SUCCESS; [artifact 14091649173](https://github.com/Kiddos19882/AutoDraw/actions/runs/43541756465/artifacts/14091649173)). Six frozen residual totals 40/535/659/40/530/404, all within a fixed 2px boundary band; no posthoc projection or threshold fitting. Still DIAGNOSTIC_ONLY, no E4/E5 or quality acceptance, no production changes.
 
 
