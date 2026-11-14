@@ -59,6 +59,19 @@ jobs:
         run: |
           python AutoDraw_Stage20/tests/run_fill001_series_egret_replay.py --workspace . --output-dir "$env:RUNNER_TEMP\fill001-egret-six"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Opt-in quota-restored Egret replay (separate diagnostic outputs)
+        shell: pwsh
+        run: |
+          python AutoDraw_Stage20/tests/run_fill001_series_egret_replay.py --workspace . --quota-recovery --output-dir "$env:RUNNER_TEMP\\engine001-quota-recovered"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Upload opt-in quota-recovered PNG evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-quota-recovered-native-replay
+          path: ${{ runner.temp }}/engine001-quota-recovered/
+          if-no-files-found: warn
+          retention-days: 30
       - name: Upload bounded ENGINE-001 inventory
         if: always()
         uses: actions/upload-artifact@v4
