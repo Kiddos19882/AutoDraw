@@ -8,6 +8,8 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import os
+import re
 import json
 from pathlib import Path
 
@@ -104,6 +106,16 @@ def write_png(out: Path, filename: str, data: np.ndarray) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def provenance_sha() -> str | None:
+    """Record GitHub checkout identity only when the runner supplies a valid SHA."""
+    value = os.environ.get("GITHUB_SHA", "")
+    if not value:
+        return None
+    if not re.fullmatch(r"[0-9a-fA-F]{40}", value):
+        raise ValueError("GITHUB_SHA must be a full 40-hex commit ID")
+    return value.lower()
+
+
 def run(workspace: Path, output: Path) -> dict:
     labels, metadata, logical = source_palette(workspace)
     if metadata["png_sha256"] != SOURCE_SHA256:
@@ -134,6 +146,12 @@ def run(workspace: Path, output: Path) -> dict:
         sha[name] = write_png(output, name, data)
     report = {
         "experiment_id": EXPERIMENT,
+        "checkout_sha": provenance_sha(),
+        "runtime_versions": {
+            "numpy": np.__version__,
+            "opencv": cv2.__version__,
+            "pillow": Image.__version__,
+        },
         "status": "DIAGNOSTIC_COMPLETE_NOT_RECOGNITION_PASS",
         "protocol": "docs/ENGINE001_COMPLEX_STRUCTURE_V6_PROTOCOL_2026-11-14.md",
         "baseline": "frozen V5 eight-color MEDIANCUT geometry",
@@ -173,6 +191,7 @@ def main() -> int:
     report = run(args.workspace.resolve(), args.output_dir.resolve())
     print(json.dumps({
         "experiment_id": report["experiment_id"],
+        "checkout_sha": report["checkout_sha"],
         "status": report["status"],
         "source_sha256": report["source"]["png_sha256"],
         "roi": report["roi"],
