@@ -2398,7 +2398,7 @@
     for (const stroke of strokes) {
       if (!stroke || typeof stroke.strokeId!=="string" ||
           !/^icon-[0-9]+$/.test(stroke.strokeId) ||
-          ![2,4,8,15,30].includes(stroke.width) || !Array.isArray(stroke.points) ||
+          ![2,4,6,8,10,15,30].includes(stroke.width) || !Array.isArray(stroke.points) ||
           stroke.points.length<2 || stroke.points.length>128) {
         throw new Error("Invalid adaptive two-icon width or stroke.");
       }
