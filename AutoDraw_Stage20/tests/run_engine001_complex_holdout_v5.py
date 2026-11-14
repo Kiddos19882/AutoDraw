@@ -199,7 +199,7 @@ def build_variants(labels:np.ndarray,palette:dict) -> tuple[dict,dict]:
     if len(variants["V3"])!=len(variants["V4"]) or len(variants["V3"])!=len(variants["V5"]):
         raise AssertionError("Variants must preserve source stroke count")
     for a,b,c in zip(variants["V3"],variants["V4"],variants["V5"]):
-        if a["points"]!=b["points"] or a["points"]!=c["points"] or a["colorRgb"]!=b["colorRgb"]!=c["colorRgb"]:
+        if a["points"]!=b["points"] or a["points"]!=c["points"] or a["colorRgb"]!=b["colorRgb"] or a["colorRgb"]!=c["colorRgb"]:
             raise AssertionError("Color-aware variants must not modify original points/colors")
     return variants,{"per_color":base_counts,"candidate_decisions":decisions}
 
