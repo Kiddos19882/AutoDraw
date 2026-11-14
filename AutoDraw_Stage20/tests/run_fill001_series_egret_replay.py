@@ -398,7 +398,10 @@ def main() -> int:
     ap.add_argument("--output-dir", type=Path, required=True)
     ap.add_argument("--validate-only", action="store_true")
     ap.add_argument("--audit-aggregated", action="store_true")
+    ap.add_argument("--quota-recovery", action="store_true", help="opt-in diagnostic from verified first-party quota stream")
     args = ap.parse_args()
+    if args.quota_recovery and (args.audit_aggregated or args.validate_only):
+        ap.error("--quota-recovery requires native replay, not validation-only/audit")
     workspace = args.workspace.resolve()
     destination = args.output_dir.resolve()
     destination.mkdir(parents=True, exist_ok=True)
@@ -409,7 +412,8 @@ def main() -> int:
         print("ENGINE001_AGGREGATED_POINT_INVENTORY_V1", audit["status"],
               "cases", len(audit["cases"]), flush=True)
         return 0
-    results = {"schema": "FILL001_SERIES_EGRET_COMPARISON_V1", "series_id": SERIES,
+    results = {"schema": ("FILL001_SERIES_QUOTA_RECONSTRUCTED_DIAGNOSTIC_V1" if args.quota_recovery
+                          else "FILL001_SERIES_EGRET_COMPARISON_V1"), "series_id": SERIES,
                "source_commit": "3f67c05d8dfd2f4db8954063850bd67b96232dd1",
                "status": "NOT_RUN", "cases": []}
     driver = None
@@ -451,7 +455,9 @@ def main() -> int:
                       ("figure", "monitor_sha", "run_id", "exact_chalk",
                        "observed_points", "missing_points", "strokes")}
             results["cases"].append(single)
-            driver.get(base + "?fill001series=3e1fd32c4d99&figure=" + quote(fig))
+            recovered = case["missing_points"] if args.quota_recovery else 0
+            driver.get(base + "?fill001series=3e1fd32c4d99&figure=" + quote(fig)
+                       + ("&quota=verified" if recovered else ""))
             WebDriverWait(driver, 240, poll_frequency=0.5).until(
                 lambda d: d.execute_script(
                     "return document.body.dataset.seriesStatus") in ("complete", "error")
@@ -461,8 +467,11 @@ def main() -> int:
             manifest = json.loads(driver.find_element("id", "renderer-manifest-json").get_property("textContent"))
             if (manifest.get("figure") != fig or manifest.get("run_id") != case["run_id"] or
                     manifest.get("exact_historical_chalk") != case["exact_chalk"] or
-                    manifest.get("observed_coordinate_count") != case["observed_points"] or
-                    manifest.get("missing_coordinate_count") != case["missing_points"]):
+                    manifest.get("observed_coordinate_count") != case["observed_points"] + recovered or
+                    manifest.get("missing_coordinate_count") != case["missing_points"] - recovered or
+                    manifest.get("recovered_coordinate_count") != recovered or
+                    manifest.get("recovery_method") != ("FIRST_PARTY_QUOTA_VERIFIED" if recovered else "NONE") or
+                    (recovered > 0 and manifest.get("pixel_exact_eligible") is not False)):
                 raise ValueError(f"{fig}: browser replay provenance mismatch")
             png_url = driver.execute_script(
                 "return document.querySelector('a[download$=\"stage-webgl.png\"]').href"
@@ -480,8 +489,10 @@ def main() -> int:
             (folder / "native-stage-webgl.png").write_bytes(
                 base64.b64decode(png_url.partition(",")[2], validate=True))
             scores = compare_images(case["before_png"], case["after_png"], projected, folder)
-            single.update({"status": "DIAGNOSTIC_MISSING_COORDINATE" if case["missing_points"]
-                           else "ACCEPTED_COORDINATES_COMPLETE",
+            single.update({"status": ("QUOTA_RECONSTRUCTED_DIAGNOSTIC" if recovered else
+                                      "DIAGNOSTIC_MISSING_COORDINATE" if case["missing_points"] else
+                                      "ACCEPTED_COORDINATES_COMPLETE"),
+                           "recovered_coordinate_count": recovered,
                            "manifest": manifest, "comparison": scores,
                            "native_stage_sha256": hashlib.sha256(
                                (folder / "native-stage-webgl.png").read_bytes()).hexdigest()})
@@ -490,7 +501,8 @@ def main() -> int:
             print(f"{fig}: CHALK={case['exact_chalk']} missing={case['missing_points']} "
                   f"IoU={scores['iou']:.6f} live-only={scores['live_only']} model-only={scores['model_only']}",
                   flush=True)
-        results["status"] = "COMPLETED_DIAGNOSTIC_ONLY"
+        results["status"] = ("COMPLETED_RECONSTRUCTION_DIAGNOSTIC" if args.quota_recovery
+                             else "COMPLETED_DIAGNOSTIC_ONLY")
         return 0
     except Exception as exc:
         results["status"] = "BLOCKED"
