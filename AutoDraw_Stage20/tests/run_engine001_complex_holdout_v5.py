@@ -160,9 +160,16 @@ def build_variants(labels:np.ndarray,palette:dict) -> tuple[dict,dict]:
         try:
             originals,planner,_=plan_adaptive(own)
         except ValueError as exc:
-            if "nonempty pinned" in str(exc):
+            if (str(exc) == "Native rendering quota exceeded"
+                    and own.any()):
+                # V3 raises the same exception for no candidate strokes.
+                # Its planner caps <=428 strokes and <=1864 vertices, so
+                # an individual color cannot actually exceed native limits.
+                # Preserve the entire unpainted class as a holdout failure.
                 originals=[]
-                planner={"note":"empty mask or no safe strokes"}
+                planner={"status":"NO_LONG_STROKES_FIT",
+                         "target_logical_pixels":int(own.sum()),
+                         "exception":str(exc)}
             else:
                 raise
         # Every non-background class remains in the report even if unpaintable
