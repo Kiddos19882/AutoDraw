@@ -1,5 +1,8 @@
 # AutoDraw — журнал выполненных действий
 
+**2026-11-15 / ENGINE-001 / V14 implemented without manual project edits:** checked branch HEAD `37ea0c7`, latest 20 commits and current docs; inspected public FDoG CMake and CLI, AniLines infer.py and upstream Detail model drive link. Preregistered [V14](ENGINE001_FDOG_ANILINES_V14_PROTOCOL_2026-11-15.md) at `345ef12` before any run. Added isolated upstream CPU FP32 adapter `run_engine001_anilines_detail_v14.py`, source-bound postprocess `run_engine001_line_extraction_v14_report.py`, 4 regression fixtures `test_engine001_line_extraction_v14_report.py`, and independent FDoG/AniLines CI jobs in `.github/workflows/engine001-line-extract-v14.yml`. External repos are pinned to exact git commits; AniLines weights downloaded only to ephemeral runner and hash recorded; automatic fetch may fail. No verified CI outcome or semantic quality claim, native/E4/E5 untouched. No code changes to production, executor, monitor or master.
+
+
 **2026-11-15 / ENGINE-001 V13 dark suit line extraction:** confirmed HEAD `22ac0b4` and project docs; prereg `a6e74dc`, fixed XDoG dark-ridge sign `d4b047f` before first run. Local original pinned PNG 200×320 SHA verified. Python generated five detector masks/overlays/crops and comparative 3×2 jacket grid; A XDoG, B BlackHat, C directional coherence proxy (not full FDoG), D cleaned union; exact counts in TEST_RESULTS. Visual weak inner lines still missing in XDoG/C, many candidate artifacts in B/D. Supplementary dark interior mask `gray<105` erosion5×5 was posthoc, not prereg, reported only as exploratory. ZIP evidence `6d23167e27b7bd4842664fa72bc6b3ed98716613d150100f19665e7537a4228c`, source code included. No production/test CI/game modifications; no AniLines inference.
 
 
