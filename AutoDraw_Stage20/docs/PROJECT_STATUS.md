@@ -1,5 +1,8 @@
 # AutoDraw — текущее состояние
 
+**ENGINE-001 V9/V10 light compatibility experiment (2026-11-15):** V9 prereg `4c21db3` correctly FAIL-CLOSED because labels 1..5 max RGB distance42.626>40, no output. V10 prereg `0e1a573` used separate `{1..4}`, `{5}`, `{6}`, `{7}` groups; pinned original offline geometry produced **6849/24473=27.9859%** coverage vs V8 23.8916%, 169 fill strokes/338 synthetic vertices. Although forbidden background and different-group overlaps are zero in cv2 proxy, 618 of painted pixels recolor a different original palette label. **FAIL** at >=99% and human-recognition not established. Standalone local report+plan+PNG archived SHA256 `d292c0e4…` ([TEST_RESULTS](TEST_RESULTS.md)); no native/CI/game/E5. No production change.
+
+
 **ENGINE-001 / new V8 composite local preview (2026-11-15):** prereg [V8](ENGINE001_STRUCTURE_COLOR_COMPOSITE_V8_PROTOCOL_2026-11-15.md) `7b6f064` before run. On exact pinned original, independent local composite 140 color-safe long-run fill strokes +84 Canny contours, total224 paths/2423 synthetic vertices, **fill coverage 5847/24473 = 23.8916%**; 4 foreground palette classes completely unpainted. More legible subject outline than V7 line-only in nonblind inspection, but **OFFLINE FAIL** at >=99%, contour overpaint not validated. One **protocol deviation** (darkest RGB along whole contour instead of per-vertex) recorded, so STRICT V8 PROTOCOL VALIDATION NOT_GRANTED. See [TEST_RESULTS](TEST_RESULTS.md). New V9 ID needed before reworking color grouping; no native/CHALK/E4/E5, production unchanged.
 
 
