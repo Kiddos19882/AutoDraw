@@ -10,6 +10,7 @@ const {
   extractAcceptedPoints,
   extractTemporalStrokes,
   extractFill001SeriesStrokes,
+  quotaGroupsForMergedDraws,
   buildStagePlacement,
   buildStageRendererTransform
 } = require("./game_renderer_reference.js");
@@ -318,3 +319,26 @@ test("FILL001 replay validates normal multi-stroke coordinates and exact chalk",
   assert.throws(()=>extractFill001SeriesStrokes(unobserved),/observed normal mode/);
 });
 
+
+test("ENGINE-001 opt-in quota grouping recovers two independently accepted points", () => {
+  const draws=[
+    {type:"DRAW_SAMPLE",strokeId:"s",pointDelta:2,t:30,acceptedPoint:{x:20,y:5}},
+    {type:"DRAW_SAMPLE",strokeId:"s",pointDelta:1,t:50,acceptedPoint:{x:30,y:5}}
+  ];
+  const quota=[
+    {type:"POINT_QUOTA_UPDATE",strokeId:"s",pointDelta:1,t:10,acceptedPoint:{x:10,y:5}},
+    {type:"POINT_QUOTA_UPDATE",strokeId:"s",pointDelta:1,t:30,acceptedPoint:{x:20,y:5}},
+    {type:"POINT_QUOTA_UPDATE",strokeId:"s",pointDelta:1,t:50,acceptedPoint:{x:30,y:5}}
+  ];
+  const groups=quotaGroupsForMergedDraws({events:quota},draws);
+  assert.deepEqual(groups.get(draws[0]),[{x:10,y:5},{x:20,y:5}]);
+  assert.deepEqual(groups.get(draws[1]),[{x:30,y:5}]);
+  assert.throws(()=>quotaGroupsForMergedDraws({events:quota.slice(1)},draws),/invalid unit accepted point|extra accepted points/);
+  assert.throws(()=>quotaGroupsForMergedDraws({events:[...quota,...quota.slice(-1)]},draws),/extra accepted points/);
+  assert.throws(()=>quotaGroupsForMergedDraws({events:[quota[0],
+    {...quota[1],acceptedPoint:{x:21,y:5}},quota[2]]},draws),/terminal point/);
+  assert.throws(()=>quotaGroupsForMergedDraws({events:[quota[0],
+    {...quota[1],t:31},quota[2]]},draws),/invalid unit accepted point/);
+  assert.throws(()=>quotaGroupsForMergedDraws({events:[
+    {...quota[0],pointDelta:2},quota[2]]},draws),/invalid unit accepted point/);
+});
