@@ -1,5 +1,8 @@
 # AutoDraw — дорожная карта будущих работ
 
+**ENGINE-001 / V14 authentic line extractors before next geometry:** [V14 protocol](ENGINE001_FDOG_ANILINES_V14_PROTOCOL_2026-11-15.md) and opt-in CI independent CPU jobs for real upstream FDoG and AniLines Detail have been committed. Obtain source-bound outputs and inspect jacket internal seam recovery and false positives, preferably with annotated ground truth before a V15 planner. Do not equate CNN pixels or Canny overlap to recognizability or native painting; retain V3–V13 negatives and >=99%, 3logical px quality diagnostics. Actual external weight download availability and Actions run still UNKNOWN, so require verified execution evidence.
+
+
 **ENGINE-001 V9/V10 negative decision (2026-11-15):** V9 failed before any plan because proposed light group RGB spread exceeded frozen 40 bound. V10 independently preregistered light-core group 1..4, 5/6/7 singleton; on pinned image predicted coverage 27.99% vs V8 23.89% and recolors 618 original-label pixels, so **FAIL** for full color art and low-resource continuity. Future **new-ID** research must address thin connected regions without relaxed RGB ownership; separate color-safety and recognizability gates; maintain E4 exact CHALK and E5 requirement.
 
 
