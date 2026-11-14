@@ -1,0 +1,54 @@
+name: ENGINE-001 two-icon composite mask versus native Egret
+
+on:
+  push:
+    branches:
+      - feature/image-geometry-optimization
+    paths:
+      - ".github/workflows/engine001-two-icon-mask.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_two_icon_mask_probe.py"
+      - "AutoDraw_Stage20/tests/test_engine001_two_icon_mask_probe.py"
+      - "AutoDraw_Stage20/tests/game_renderer_reference.js"
+      - "AutoDraw_Stage20/testImages/free-icon-font-home-3917033.png"
+      - "AutoDraw_Stage20/testImages/free-icon-font-envelope-3916611.png"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engine001-two-icon-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-two-icon-mask:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout pinned icons and actual Egret game bundle
+        uses: actions/checkout@v4
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install browser and mask dependencies
+        run: python -m pip install selenium Pillow numpy
+      - name: Validate reference JS syntax and synthetic mask planning
+        shell: pwsh
+        run: |
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          python -m unittest discover -s AutoDraw_Stage20/tests -p "test_engine001_two_icon_mask_probe.py" -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Render pinned home plus envelope as one native BoardPane/WebGL mask
+        shell: pwsh
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_two_icon_mask_probe.py --workspace . --output-dir "$env:RUNNER_TEMP\\engine001-two-icon-mask"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Upload complete offline diagnostic, mask, native PNG and fixed plan
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-two-icon-composite-mask-v1
+          path: ${{ runner.temp }}/engine001-two-icon-mask/
+          if-no-files-found: warn
+          retention-days: 30
