@@ -2354,7 +2354,7 @@
       if (!stroke || typeof stroke.strokeId!=="string" ||
           !/^icon-[0-9]+$/.test(stroke.strokeId) ||
           stroke.width!==2 || !Array.isArray(stroke.points) ||
-          stroke.points.length!==2) {
+          stroke.points.length<2 || stroke.points.length>128) {
         throw new Error("Invalid two-icon fixed radius2 stroke.");
       }
       for (const p of stroke.points) {
