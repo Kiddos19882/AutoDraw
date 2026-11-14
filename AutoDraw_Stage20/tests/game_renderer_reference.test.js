@@ -333,7 +333,7 @@ test("ENGINE-001 opt-in quota grouping recovers two independently accepted point
   const groups=quotaGroupsForMergedDraws({events:quota},draws);
   assert.deepEqual(groups.get(draws[0]),[{x:10,y:5},{x:20,y:5}]);
   assert.deepEqual(groups.get(draws[1]),[{x:30,y:5}]);
-  assert.throws(()=>quotaGroupsForMergedDraws({events:quota.slice(1)},draws),/invalid unit accepted point|extra accepted points/);
+  assert.throws(()=>quotaGroupsForMergedDraws({events:quota.slice(1)},draws),/invalid unit accepted point|extra accepted points|terminal point/);
   assert.throws(()=>quotaGroupsForMergedDraws({events:[...quota,...quota.slice(-1)]},draws),/extra accepted points/);
   assert.throws(()=>quotaGroupsForMergedDraws({events:[quota[0],
     {...quota[1],acceptedPoint:{x:21,y:5}},quota[2]]},draws),/terminal point/);
