@@ -1,5 +1,8 @@
 # AutoDraw — журнал выполненных действий
 
+**2026-11-14 / ENGINE-001 / V7 prereg and exploratory outcome:** created [V7 prereg](ENGINE001_STRUCTURE_FIRST_V7_PROTOCOL_2026-11-14.md) on GitHub commit `2844a2f` before running local contour-path research. Source SHA/blob pinned, 148 contours, 84 stroke paths, 2143 synthetic vertices and 8502.8277 logical length. Static 2px OpenCV preview covers 4816/4869 source Canny pixels within1px, but visibly faint line-only result (NOT human recognition gate); raw path JSON + 4 preview PNG + report ZIP SHA256 `20dce6d7f948a6f23cc894c8464d47d02bd3d0b3e88ea6e67dca72d501fb96a8`. Runner was standalone local, not committed production/CI. **Negative V7 not retroactively refitted**. Next new prereg composite contour+fill proposal. 
+
+
 **2026-11-14 / ENGINE-001 / actual pinned PNG obtained, V6 local diagnostic E2 PARTIAL:** contrary to previous blocked assessment, active runtime had mounted exact raw original at `/mnt/data/wV6VeZI9S1Y (1).png`, with SHA256 `07cc4568…`/Git blob `d3cd95b8`/97308B/200×320 verified independently. Ran standalone read-only Python reimplementation of frozen V5 palette / V6 edge protocol, not GitHub runner: 4869 source vs 4407 palette edge pixels, 4402 matched within1px, 467 missing (90.4087%); 41/48 eligible components retained >=50%; fixed 3×4 totals exact, V5 quantization RMSE8.62542567 reproduced. Saved report.json and 6 derived PNG, verified ZIP SHA256 `6485f9da860da6020984a7271697c2a858f69a6e2270ded6d19d6bd393171be1`, versions Python3.13.5/OpenCV4.13.0/NumPy2.3.5/Pillow12.3.0. No source code, originals, production or master modified; V6 GitHub E3, game E4, E5, recognition unknown. Details in TEST_RESULTS.md. Previous 960×1536 proxy 88.85% explicitly separate.
 
 
