@@ -1,5 +1,8 @@
 # AutoDraw — текущее состояние
 
+**ENGINE-001 / V13 dark jacket seam recovery diagnostic (2026-11-15):** [V13 prereg](ENGINE001_DARK_SUIT_LINES_V13_PROTOCOL_2026-11-15.md) `a6e74dc` and pre-result mathematical sign correction `d4b047f`; pinned original 200×320 confirmed by SHA. Local comparative A XDoG, B CLAHE/BlackHat, C directional coherence *proxy not full FDoG*, D union, against Canny. In fixed broad ROI, BlackHat generates many candidate pixels but false-positive risk, XDoG and directional proxy miss weak dark interiors. No actual AniLines weights/model, full FDoG, native Egret or exact CHALK. Local ZIP SHA256 `6d23167e…`, details [TEST_RESULTS](TEST_RESULTS.md). Status **E2 exploratory PARTIAL**, no new accepted quality; next obtain independent manual jacket-line ground truth and measure precision/recall.
+
+
 **ENGINE-001 V9/V10 light compatibility experiment (2026-11-15):** V9 prereg `4c21db3` correctly FAIL-CLOSED because labels 1..5 max RGB distance42.626>40, no output. V10 prereg `0e1a573` used separate `{1..4}`, `{5}`, `{6}`, `{7}` groups; pinned original offline geometry produced **6849/24473=27.9859%** coverage vs V8 23.8916%, 169 fill strokes/338 synthetic vertices. Although forbidden background and different-group overlaps are zero in cv2 proxy, 618 of painted pixels recolor a different original palette label. **FAIL** at >=99% and human-recognition not established. Standalone local report+plan+PNG archived SHA256 `d292c0e4…` ([TEST_RESULTS](TEST_RESULTS.md)); no native/CI/game/E5. No production change.
 
 
