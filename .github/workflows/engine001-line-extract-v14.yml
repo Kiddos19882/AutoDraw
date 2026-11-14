@@ -1,0 +1,119 @@
+name: ENGINE-001 V14 authentic FDoG and AniLines Detail CPU
+
+on:
+  push:
+    branches:
+      - feature/image-geometry-optimization
+    paths:
+      - ".github/workflows/engine001-line-extract-v14.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_anilines_detail_v14.py"
+      - "AutoDraw_Stage20/tests/run_engine001_line_extraction_v14_report.py"
+      - "AutoDraw_Stage20/tests/test_engine001_line_extraction_v14_report.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fdog-cpu:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - name: Checkout pinned AutoDraw source
+        uses: actions/checkout@v4
+      - name: Install build prerequisites (upstream CMake requires wxWidgets and Boost)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake pkg-config libopencv-dev libboost-program-options-dev libwxgtk3.2-dev
+      - name: Get fixed upstream FDoG revision
+        run: |
+          git clone https://github.com/SSARCandy/Coherent-Line-Drawing.git "$RUNNER_TEMP/fdog-src"
+          cd "$RUNNER_TEMP/fdog-src"
+          git checkout --detach 37887374e99fe22f1d22004ca114ed2538f0abaf
+          test "$(git rev-parse HEAD)" = "37887374e99fe22f1d22004ca114ed2538f0abaf"
+      - name: Build genuine upstream cld CLI
+        run: |
+          cmake -S "$RUNNER_TEMP/fdog-src" -B "$RUNNER_TEMP/fdog-build" -DCMAKE_BUILD_TYPE=Release
+          cmake --build "$RUNNER_TEMP/fdog-build" --target cld --parallel 2
+          "$RUNNER_TEMP/fdog-build/cld" --help
+      - name: Run FDoG on immutable pinned PNG
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib
+          p=Path("AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png")
+          assert p.stat().st_size == 97308
+          assert hashlib.sha256(p.read_bytes()).hexdigest() == "07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          PY
+          "$RUNNER_TEMP/fdog-build/cld" --src "$GITHUB_WORKSPACE/AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png" \
+            -o "$RUNNER_TEMP/fdog-result.png" \
+            --ETF_kernel 5 --ETF_iter 1 --CLD_iter 1 --sigma_c 1 --sigma_m 3 --rho 0.997 --tau 0.8
+      - name: Install evidence dependencies
+        run: python3 -m pip install --break-system-packages "numpy<2" Pillow opencv-python-headless
+      - name: Generate bounded FDoG ROI report and PNG hashes
+        run: |
+          python3 AutoDraw_Stage20/tests/run_engine001_line_extraction_v14_report.py \
+            --engine fdog --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --generated "$RUNNER_TEMP/fdog-result.png" --output "$RUNNER_TEMP/v14-fdog" \
+            --upstream-sha 37887374e99fe22f1d22004ca114ed2538f0abaf
+      - name: Upload FDoG evidence, even when a later step fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-v14-fdog
+          path: ${{ runner.temp }}/v14-fdog
+          if-no-files-found: warn
+
+  anilines-detail-cpu:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Checkout pinned AutoDraw source
+        uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install CPU PyTorch and support libraries
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --index-url https://download.pytorch.org/whl/cpu torch==2.5.1 torchvision==0.20.1
+          python -m pip install "numpy<2" "opencv-python-headless<5" "Pillow<12" tqdm gdown
+      - name: Checkout immutable AniLines upstream
+        run: |
+          git clone https://github.com/zhenglinpan/AniLines-Anime-Lineart-Extractor.git "$RUNNER_TEMP/anilines-src"
+          cd "$RUNNER_TEMP/anilines-src"
+          git checkout --detach 5d188fb68f40fb04fbe3c9c54dcc57b16c914818
+          test "$(git rev-parse HEAD)" = "5d188fb68f40fb04fbe3c9c54dcc57b16c914818"
+      - name: Fetch upstream-published Detail checkpoint to ephemeral runner
+        run: |
+          mkdir -p "$RUNNER_TEMP/anilines-src/weights"
+          python -m gdown --id 12U1Mwlonoipk2Yvr12mNaFB30foy420o \
+            -O "$RUNNER_TEMP/anilines-src/weights/detail.pth"
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib, os
+          p=Path(os.environ["RUNNER_TEMP"])/"anilines-src/weights/detail.pth"
+          assert p.stat().st_size > 1024, "Model checkpoint missing or too small"
+          print("External Detail checkpoint", p.stat().st_size, hashlib.sha256(p.read_bytes()).hexdigest())
+          PY
+      - name: Run genuine AniLines Detail on CPU, FP32
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_anilines_detail_v14.py \
+            --upstream "$RUNNER_TEMP/anilines-src" \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --output "$RUNNER_TEMP/anilines-result.png" \
+            --weights "$RUNNER_TEMP/anilines-src/weights/detail.pth"
+      - name: Generate bounded AniLines ROI report and PNG hashes
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_line_extraction_v14_report.py \
+            --engine anilines --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --generated "$RUNNER_TEMP/anilines-result.png" --output "$RUNNER_TEMP/v14-anilines" \
+            --upstream-sha 5d188fb68f40fb04fbe3c9c54dcc57b16c914818 \
+            --weights "$RUNNER_TEMP/anilines-src/weights/detail.pth"
+      - name: Upload AniLines evidence, even when a later step fails
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-v14-anilines-detail
+          path: ${{ runner.temp }}/v14-anilines
+          if-no-files-found: warn
