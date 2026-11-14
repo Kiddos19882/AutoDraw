@@ -2343,6 +2343,52 @@
     }
   }
 
+  // ENGINE-001 two existing repository icons, one composite mask.
+  // Accepted synthetic vertices are NOT an exact game CHALK measurement.
+  function renderTwoIconMaskProbe(strokes) {
+    if (!Array.isArray(strokes) || !strokes.length || strokes.length > 3000) {
+      throw new Error("Two-icon fixture requires 1..3000 synthetic strokes.");
+    }
+    let total=0;
+    for (const stroke of strokes) {
+      if (!stroke || typeof stroke.strokeId!=="string" ||
+          !/^icon-[0-9]+$/.test(stroke.strokeId) ||
+          stroke.width!==2 || !Array.isArray(stroke.points) ||
+          stroke.points.length!==2) {
+        throw new Error("Invalid two-icon fixed radius2 stroke.");
+      }
+      for (const p of stroke.points) {
+        if (!p || !Number.isFinite(p.x) || !Number.isFinite(p.y) ||
+            p.x<0 || p.x>=BOARD_WIDTH || p.y<0 || p.y>=BOARD_HEIGHT) {
+          throw new Error("Two-icon geometry leaves 460x240 logical board.");
+        }
+        total+=1;
+      }
+    }
+    if (total>5900) throw new Error("Two-icon synthetic point quota exceeded.");
+    const board=makeTemporalBoard(strokes,2,"normal",false);
+    if(board.accepted!==total) throw new Error("Two-icon native BoardPane rejected vertices.");
+    const state=initializeWebGL(null,3);
+    const blank=document.createElement("canvas");
+    blank.width=BOARD_WIDTH*3;blank.height=BOARD_HEIGHT*3;
+    const result=renderWebGLProbe("normal",[],2,blank,state,board.shape);
+    if(!result.sceneDiagnostics.stageAttached ||
+       result.sceneDiagnostics.boardRenderMode!==3 ||
+       result.canvas.width!==1380 || result.canvas.height!==720) {
+      throw new Error("Two-icon actual Egret WebGL mask failed.");
+    }
+    return {
+      schema:"ENGINE001_TWO_ICON_NATIVE_MASK_V1",
+      renderer:"real Egret 5.4.1 BoardPane/WebGLRenderer",
+      maskSource:"two pinned repository PNGs; independent Python target mask",
+      mode:"normal",brushRadius:2,syntheticAcceptedVerticesNotChalk:total,
+      strokeCount:strokes.length,glInfo:result.glInfo,
+      webglDrawCalls:result.drawCalls,sceneDiagnostics:result.sceneDiagnostics,
+      webglPngDataUrl:result.canvas.toDataURL("image/png")
+    };
+  }
+
+  api.renderTwoIconMaskProbe = renderTwoIconMaskProbe;
   api.renderContourFirstNativeStudy = renderContourFirstNativeStudy;
   api.renderContourTrimNativeStudy = renderContourTrimNativeStudy;
   api.renderFill001ChalkFirstV5Study = renderFill001ChalkFirstV5Study;
@@ -2353,7 +2399,9 @@
   api.renderEndpointStudy = renderEndpointStudy;
   api.renderDuplicateFrameStudy = renderDuplicateFrameStudy;
   const params = new URLSearchParams(window.location.search);
-  const startup = params.get("fill001series") === "3e1fd32c4d99" ? renderFill001SeriesReplay
+  const startup = params.get("twoicons") === "home-envelope"
+    ? () => { document.body.dataset.twoIconStatus="ready"; statusNode.textContent="ENGINE001 two-icon native-mask probe ready."; }
+    : params.get("fill001series") === "3e1fd32c4d99" ? renderFill001SeriesReplay
     : params.get("contour") === "fill001v5" ? renderFill001ChalkFirstV5Study
     : params.get("contour") === "fill001v4" ? renderFill001BottomRepairStudy
     : params.get("footprint") === "fill001a" ? renderFill001FootprintStudy
