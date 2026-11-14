@@ -1,5 +1,8 @@
 # AutoDraw — значимые изменения
 
+**2026-11-14 — ENGINE-001 V6/V7 research (production unchanged):** verified pinned 200×320 original, local replicated V6 source edge recall 90.4087% and 7/48 component failures; prereg V7 `2844a2f` before local 84-stroke line-only preview, which is visually insufficient despite 98.91% edge proxy. Added isolated GitHub V7 runner, five tests, dedicated workflow (`c9edc35`, `520b985`, `9b868dd`) for reproducibility; CI NOT_VERIFIED, V5 frozen and master untouched.
+
+
 **2026-11-14 — ENGINE-001 exploratory V6 (no production changes):** после пользовательского визуального FAIL сложного V5 разработан отдельный [пререгистрированный анализ потери структурных границ](ENGINE001_COMPLEX_STRUCTURE_V6_PROTOCOL_2026-11-14.md): `tests/run_engine001_complex_structure_v6.py`, `tests/test_engine001_complex_structure_v6.py`, `.github/workflows/engine001-complex-structure-v6.yml`. Добавлены E1 source-palette edge diagnostics и red/green RGB overlay для визуальной локализации потерь линий; пререгистрирована 3×4 сетка source/palette edge-loss и 2 regression fixtures и 12 unit fixtures; CI/result UNKNOWN до проверки, recognize quality не улучшена и не заявлена. Frozen V5, production и master не менялись.
 
 
