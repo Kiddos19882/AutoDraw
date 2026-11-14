@@ -76,6 +76,41 @@ def compare_edges(source_edges: np.ndarray, palette_edges: np.ndarray) -> dict:
     }
 
 
+def fixed_grid_edge_loss(source_edges: np.ndarray,
+                         palette_edges: np.ndarray) -> list[dict]:
+    """Fixed spatial decomposition of global edge-matching metrics, not new Canny."""
+    if (source_edges.shape != palette_edges.shape or source_edges.ndim != 2 or
+            source_edges.dtype != np.dtype(bool) or
+            palette_edges.dtype != np.dtype(bool)):
+        raise ValueError("Expected matching 2D bool edge masks")
+    height, width = source_edges.shape
+    if height < 4 or width < 3:
+        raise ValueError("Too small for predeclared 3x4 grid")
+    supported = cv2.dilate(
+        palette_edges.astype(np.uint8), np.ones((3, 3), dtype=np.uint8)
+    ).astype(bool)
+    tiles = []
+    for row in range(4):
+        y0 = height * row // 4
+        y1 = height * (row + 1) // 4
+        for col in range(3):
+            x0 = width * col // 3
+            x1 = width * (col + 1) // 3
+            own = source_edges[y0:y1, x0:x1]
+            matched = int(np.count_nonzero(own & supported[y0:y1, x0:x1]))
+            count = int(np.count_nonzero(own))
+            tiles.append({
+                "row": row, "column": col,
+                "x0": x0, "y0": y0, "x1_exclusive": x1,
+                "y1_exclusive": y1,
+                "source_edge_pixels": count,
+                "matched_edge_pixels": matched,
+                "missing_edge_pixels": count - matched,
+                "edge_recall": matched / count if count else None,
+            })
+    return tiles
+
+
 def reconstruct_palette(labels: np.ndarray, palette: dict) -> np.ndarray:
     colors = {int(k): np.asarray(v, dtype=np.uint8)
               for k, v in palette["palette_rgb"].items()}
@@ -130,6 +165,14 @@ def run(workspace: Path, output: Path) -> dict:
     original_edges = extract_edges(original_crop)
     palette_edges = extract_edges(palette_crop)
     metrics = compare_edges(original_edges, palette_edges)
+    tiles = fixed_grid_edge_loss(original_edges, palette_edges)
+    for field, total in [
+        ("source_edge_pixels", metrics["source_edge_pixels"]),
+        ("matched_edge_pixels", metrics["source_edges_matched_within_1px"]),
+        ("missing_edge_pixels", metrics["missing_source_edge_pixels"]),
+    ]:
+        if sum(tile[field] for tile in tiles) != total:
+            raise AssertionError(f"Fixed-grid metric total mismatch: {field}")
     palette_neighbor = cv2.dilate(
         palette_edges.astype(np.uint8), np.ones((3, 3), dtype=np.uint8)
     ).astype(bool)
@@ -177,6 +220,7 @@ def run(workspace: Path, output: Path) -> dict:
             "component_retain_fraction": COMPONENT_RETAIN_FRACTION,
         },
         "metrics": metrics,
+        "fixed_grid_3cols_4rows": tiles,
         "derived_png_sha256": sha,
         "quality": {
             "v5_user_visual_judgment": "FAIL_UNRECOGNIZABLE",
