@@ -1,0 +1,55 @@
+name: ENGINE-001 predictive contour-first two-icon native comparison
+
+on:
+  push:
+    branches:
+      - feature/image-geometry-optimization
+    paths:
+      - ".github/workflows/engine001-predictive-contour.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_predictive_contour_probe.py"
+      - "AutoDraw_Stage20/tests/test_engine001_predictive_contour_probe.py"
+      - "AutoDraw_Stage20/tests/run_engine001_two_icon_mask_probe.py"
+      - "AutoDraw_Stage20/tests/game_renderer_reference.js"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engine001-predictive-contour-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-predictive-contour:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout pinned source icons and actual game bundle
+        uses: actions/checkout@v4
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install deterministic preview and native browser prerequisites
+        run: python -m pip install selenium Pillow numpy opencv-python-headless
+      - name: Synthetic regressions before actual native run
+        shell: pwsh
+        run: |
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          python -m unittest discover -s AutoDraw_Stage20/tests -p "test_engine001_predictive_contour_probe.py" -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m unittest discover -s AutoDraw_Stage20/tests -p "test_engine001_two_icon_mask_probe.py" -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Compare frozen source target to joint-plan native Egret WebGL
+        shell: pwsh
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_predictive_contour_probe.py --workspace . --output-dir "$env:RUNNER_TEMP\\engine001-predictive-contour"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Upload all fixed pre-render forecasts, plan, native output and failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-two-icon-predictive-contour-v1
+          path: ${{ runner.temp }}/engine001-predictive-contour/
+          if-no-files-found: warn
+          retention-days: 30
