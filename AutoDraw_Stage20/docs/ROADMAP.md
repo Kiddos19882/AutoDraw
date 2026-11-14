@@ -1,5 +1,8 @@
 # AutoDraw — дорожная карта будущих работ
 
+**ENGINE-001 next after fixed residual audit (2026-11-14):** [CI 43541756465](https://github.com/Kiddos19882/AutoDraw/actions/runs/43541756465) E3 confirmed that all 2,208 original residual pixels across six frozen 694×363 images lie within the fixed 2px band of either binary-mask boundary (40+535+659+40+530+404=2,208); original/first-party quota-recovered images maintain historical negative acceptance. Do **not** treat a 2px boundary-localized mismatch as acceptable, nor tune projection/resampler/thresholds to these six seen results. Next preregister held-out geometry and objective residual metrics under frozen mapping, then compare native game GPU/ENTER_FRAME temporal evidence supplied by the user; E4 and independent E5 separately. No PC control by assistant.
+
+
 **ENGINE-001 next: residual raster/temporal validation (2026-11-14).** Quota coordinate recovery itself is evidenced E1/E3; [CI 43536560568](https://github.com/Kiddos19882/AutoDraw/actions/runs/43536560568) opt-in native Egret replay on `7581b7c` shows slight IoU decrease for C1-F3 and unchanged C2-F2, so two missing coordinates do not explain remaining pixel residuals. Freeze existing transforms/thresholds and preserve original PNG/CHALK. Next design held-out projections and independent live GPU/temporal ordering validation; no rerun on user PC while its remote runtime is offline.
 
 
