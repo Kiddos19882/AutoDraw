@@ -8,7 +8,7 @@ Extract dark-line candidates from **original RGB 200×320 before 150×240 resizi
 
 ## Fixed candidates (all thresholds frozen before local run)
 
-A. **XDoG:** luminance uint8, two Gaussian blur sigma0.8 and1.6; response difference (G1-G2) for local dark valley, normalize using global max to 0..255; binary >=45; thin using deterministic morphological skeleton.
+A. **XDoG:** luminance uint8, two Gaussian blur sigma0.8 and1.6; response difference (G2-G1) for local dark valley (large-blur minus small-blur luminance), normalize using global max to 0..255; binary >=45; thin using deterministic morphological skeleton.
 B. **Local blackhat+CLAHE:** luminance grayscale CLAHE(clipLimit2.0,tileGridSize8×8), blackhat 9×9 elliptical structuring element, threshold >=14; thin.
 C. **Directional coherence proxy (NOT full FDoG):** `cv2.Sobel` grayscale gradients 3×3, Hessian coherence proxy via Gaussian-smoothed structure tensor sigma1.5; accept dark ridge (XDoG threshold>=28) only if coherence >0.35; thinning. This is explicitly **not implementation of Kang et al. FDoG**, and may reject thin weak lines. Compare honestly, do not call FDoG itself tested.
 D. **Union A/B with local continuity constraint:** candidate A OR B; 8-connected components with >=8 pixels survive, skeleton. All evaluated before fill and distinct from color-palette boundaries; no generative neural inference.
