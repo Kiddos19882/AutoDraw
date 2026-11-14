@@ -1,0 +1,38 @@
+name: ENGINE-001 structure-first V7 line-only negative control
+
+on:
+  push:
+    branches:
+      - feature/image-geometry-optimization
+    paths:
+      - ".github/workflows/engine001-structure-first-v7.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_structure_first_v7.py"
+      - "AutoDraw_Stage20/tests/test_engine001_structure_first_v7.py"
+      - "AutoDraw_Stage20/tests/run_engine001_complex_holdout_v5.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  research-line-only-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install frozen diagnostic dependencies
+        run: python -m pip install selenium Pillow numpy opencv-python-headless
+      - name: Synthetic path tests and pinned source integration test
+        run: python -m unittest discover -s AutoDraw_Stage20/tests -p "test_engine001_structure_first_v7.py" -v
+      - name: Freeze original artwork V7 line-only negative preview
+        run: python AutoDraw_Stage20/tests/run_engine001_structure_first_v7.py --workspace . --output-dir "$RUNNER_TEMP/engine001-v7"
+      - name: Preserve all source-bound research artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-v7-line-only-previews
+          path: ${{ runner.temp }}/engine001-v7
+          if-no-files-found: warn
