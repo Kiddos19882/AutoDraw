@@ -136,7 +136,46 @@
   // The run recorder may aggregate two accepted points into one DRAW_SAMPLE;
   // in that case exactly one coordinate is missing and pixel identity cannot
   // be asserted even though exact game CHALK remains known.
-  function extractFill001SeriesStrokes(run) {
+  function quotaGroupsForMergedDraws(run, draws) {
+    // This is a separate, opt-in reconstruction from accepted game quota
+    // events, not an interpolation from planned or browser mouse coordinates.
+    const affected = new Set(draws.filter(e => Number(e.pointDelta)>1).map(e => e.strokeId));
+    const aligned = new Map();
+    for (const strokeId of affected) {
+      const strokeDraws=draws.filter(e=>e.strokeId===strokeId);
+      const strokeQuota=run.events.filter(e=>e && e.type==="POINT_QUOTA_UPDATE" &&
+        e.strokeId===strokeId && Number(e.pointDelta)>0);
+      let cursor=0;
+      for (const draw of strokeDraws) {
+        const d=draw.pointDelta;
+        if (!Number.isSafeInteger(d) || d<1 || !Number.isFinite(draw.t)) {
+          throw new Error("FILL001 quota recovery invalid DRAW_SAMPLE delta/time.");
+        }
+        const group=[];
+        for (let i=0;i<d;i++) {
+          const q=strokeQuota[cursor++];
+          const p=q?.acceptedPoint;
+          if (!q || q.pointDelta!==1 || !Number.isFinite(q.t) || q.t>draw.t ||
+              !p || !Number.isFinite(p.x) || !Number.isFinite(p.y) ||
+              p.x<0 || p.x>=460 || p.y<0 || p.y>=240) {
+            throw new Error("FILL001 quota recovery missing/invalid unit accepted point.");
+          }
+          group.push({x:p.x,y:p.y});
+        }
+        const last=group.at(-1);
+        if (last.x!==draw.acceptedPoint?.x || last.y!==draw.acceptedPoint?.y) {
+          throw new Error("FILL001 quota recovery terminal point disagrees with DRAW_SAMPLE.");
+        }
+        aligned.set(draw,group);
+      }
+      if (cursor!==strokeQuota.length) {
+        throw new Error("FILL001 quota recovery extra accepted points.");
+      }
+    }
+    return aligned;
+  }
+
+  function extractFill001SeriesStrokes(run, recoverQuota=false) {
     if (!run || run.record_type !== "autodraw_game_monitor_run" ||
         run.execution_status !== "completed" || !Array.isArray(run.accepted_points) ||
         !Array.isArray(run.events) || run.point_delta_matches_chalk !== true) {
@@ -157,9 +196,10 @@
         (Array.isArray(run.monitor_errors) && run.monitor_errors.length)) {
       throw new Error("FILL001 recorder/transport integrity or event-count mismatch.");
     }
+    const quotaGroups=recoverQuota ? quotaGroupsForMergedDraws(run,events) : null;
     const observed=new Map((run.observed_stroke_modes||[]).map(m=>[m.stroke_id,m.stroke_option_raw]));
     const strokes=[], seen=new Set();
-    let sum=0,missing=0,lastTime=-Infinity,lastId=null;
+    let sum=0,missing=0,recovered=0,lastTime=-Infinity,lastId=null;
     for (let i=0;i<accepted.length;i++) {
       const p=accepted[i],e=events[i];
       const d=Number(p?.point_delta);
@@ -184,13 +224,22 @@
       }
       const stroke=strokes[strokes.length-1];
       if (stroke.width!==radius) throw new Error("FILL001 mid-stroke radius change.");
-      if (stroke.points.length) {
-        const old=stroke.points[stroke.points.length-1];
-        if (old.x===p.x && old.y===p.y) throw new Error("FILL001 duplicate accepted point.");
+      const coordinates=quotaGroups?.get(e) || [{x:p.x,y:p.y}];
+      if (recoverQuota && d>1 && (!quotaGroups.has(e) || coordinates.length!==d)) {
+        throw new Error("FILL001 quota recovery incomplete group.");
       }
-      stroke.points.push({x:p.x,y:p.y});
+      for (const candidate of coordinates) {
+        if (stroke.points.length) {
+          const old=stroke.points[stroke.points.length-1];
+          if (old.x===candidate.x && old.y===candidate.y) {
+            throw new Error("FILL001 duplicate accepted point.");
+          }
+        }
+        stroke.points.push(candidate);
+      }
       sum+=d;
-      missing+=d-1;
+      missing+=d-coordinates.length;
+      recovered+=coordinates.length-1;
       lastTime=p.t;
     }
     if (sum!==chalk || strokes.length!==Number(run.stroke_count)) {
@@ -198,10 +247,12 @@
     }
     return {
       runId:run.run_id,sessionId:run.session_id,strokes,
-      exactHistoricalChalk:chalk,observedCoordinateCount:accepted.length,
+      exactHistoricalChalk:chalk,observedCoordinateCount:accepted.length+recovered,
+      recoveredCoordinateCount:recovered,
       missingCoordinateCount:missing,
-      pixelExactEligible:missing===0,
-      replayStatus:missing===0?"COMPLETE_ACCEPTED_COORDINATES":"DIAGNOSTIC_MISSING_ACCEPTED_COORDINATES"
+      pixelExactEligible:missing===0 && recovered===0,
+      replayStatus:recovered>0?"QUOTA_RECONSTRUCTED_DIAGNOSTIC":
+        missing===0?"COMPLETE_ACCEPTED_COORDINATES":"DIAGNOSTIC_MISSING_ACCEPTED_COORDINATES"
     };
   }
 
@@ -450,6 +501,7 @@
     extractAcceptedPoints,
     extractTemporalStrokes,
     extractFill001SeriesStrokes,
+    quotaGroupsForMergedDraws,
     buildStagePlacement,
     buildStageRendererTransform
   };
@@ -2213,7 +2265,11 @@
       req.send(null);
       if(req.status!==200)throw new Error("FILL001 frozen source HTTP "+req.status);
       const run=JSON.parse(req.responseText);
-      const input=extractFill001SeriesStrokes(run);
+      const recoverQuota=new URLSearchParams(window.location.search).get("quota")==="verified";
+      if (recoverQuota && !["c001-f003","c002-f002"].includes(figure)) {
+        throw new Error("FILL001 quota reconstruction restricted to two pinned gap cases.");
+      }
+      const input=extractFill001SeriesStrokes(run,recoverQuota);
       if(input.sessionId!==FILL001_SERIES_SOURCE)throw new Error("FILL001 session mismatch.");
       const g=run.renderer_geometry_at_start;
       const h=run.renderer_geometry_at_end;
@@ -2255,6 +2311,8 @@
         observed_coordinate_count:input.observedCoordinateCount,
         missing_coordinate_count:input.missingCoordinateCount,
         pixel_exact_eligible:input.pixelExactEligible,
+        recovered_coordinate_count:input.recoveredCoordinateCount,
+        recovery_method:recoverQuota?"FIRST_PARTY_QUOTA_VERIFIED":"NONE",
         replay_status:input.replayStatus,stroke_count:input.strokes.length,
         stroke_widths:[...new Set(input.strokes.map(x=>x.width))],
         observed_normal_mode:true,source_stage_profile:profile,
@@ -2264,7 +2322,8 @@
         renderer:"real Egret 5.4.1 Stage WebGLRenderer",
         exclusions:[
           "Unrecorded ENTER_FRAME redraw callbacks and order",
-          "One unknown coordinate per point_delta=2, if present",
+          recoverQuota?"Quota-based reconstruction is not independent pixel validation":
+            "One unknown coordinate per point_delta=2, if present",
           "Not a new live game measurement"
         ]
       };
