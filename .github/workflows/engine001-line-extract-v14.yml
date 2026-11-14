@@ -21,6 +21,9 @@ jobs:
     steps:
       - name: Checkout pinned AutoDraw source
         uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
       - name: Install build prerequisites (upstream CMake requires wxWidgets and Boost)
         run: |
           sudo apt-get update
@@ -49,7 +52,9 @@ jobs:
             -o "$RUNNER_TEMP/fdog-result.png" \
             --ETF_kernel 5 --ETF_iter 1 --CLD_iter 1 --sigma_c 1 --sigma_m 3 --rho 0.997 --tau 0.8
       - name: Install evidence dependencies
-        run: python3 -m pip install --break-system-packages "numpy<2" Pillow opencv-python-headless
+        run: python -m pip install "numpy<2" "Pillow<12" opencv-python-headless
+      - name: Validate pinned source and ROI analysis unit fixtures
+        run: python -m unittest discover -s AutoDraw_Stage20/tests -p "test_engine001_line_extraction_v14_report.py" -v
       - name: Generate bounded FDoG ROI report and PNG hashes
         run: |
           python3 AutoDraw_Stage20/tests/run_engine001_line_extraction_v14_report.py \
@@ -96,6 +101,8 @@ jobs:
           assert p.stat().st_size > 1024, "Model checkpoint missing or too small"
           print("External Detail checkpoint", p.stat().st_size, hashlib.sha256(p.read_bytes()).hexdigest())
           PY
+      - name: Validate pinned source and ROI analysis unit fixtures
+        run: python -m unittest discover -s AutoDraw_Stage20/tests -p "test_engine001_line_extraction_v14_report.py" -v
       - name: Run genuine AniLines Detail on CPU, FP32
         run: |
           python AutoDraw_Stage20/tests/run_engine001_anilines_detail_v14.py \
