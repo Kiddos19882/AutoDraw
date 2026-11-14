@@ -1,5 +1,8 @@
 # AutoDraw — значимые изменения
 
+**2026-11-15 — ENGINE-001 V14 experimental CI (production unchanged):** prereg original-image pinned authentic FDoG vs AniLines Detail CPU jobs, fixed upstream repository SHAs, source/hash validation and bounded jacket ROI PNG/JSON evidence; isolated Python reporter and regression tests. Weights auto-fetched from publisher Google Drive to ephemeral runner only. No evidence of completed V14 workflow yet; no native game CHALK or semantic recognition claim.
+
+
 **2026-11-14 — ENGINE-001 V6/V7 research (production unchanged):** verified pinned 200×320 original, local replicated V6 source edge recall 90.4087% and 7/48 component failures; prereg V7 `2844a2f` before local 84-stroke line-only preview, which is visually insufficient despite 98.91% edge proxy. Added isolated GitHub V7 runner, five tests, dedicated workflow (`c9edc35`, `520b985`, `9b868dd`) for reproducibility; CI NOT_VERIFIED, V5 frozen and master untouched.
 
 
