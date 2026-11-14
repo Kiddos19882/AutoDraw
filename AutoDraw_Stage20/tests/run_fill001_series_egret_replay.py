@@ -144,7 +144,8 @@ def align_positive_quota_with_draw(draws: list[dict], quota: list[dict]) -> list
         required = positive_delta(draw)
         draw_xy = xy(draw)
         draw_t = draw.get("t")
-        if required is None or draw_xy is None or type(draw_t) not in (int, float):
+        if (required is None or draw_xy is None or type(draw_t) not in (int, float)
+                or not np.isfinite(draw_t)):
             return None
         group: list[dict] = []
         while required > 0 and cursor < len(quota):
