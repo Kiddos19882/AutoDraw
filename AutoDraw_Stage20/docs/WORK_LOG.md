@@ -1,5 +1,8 @@
 # AutoDraw — журнал выполненных действий
 
+**2026-11-15 / ENGINE-001 V9 preflight FAIL and V10 offline negative:** V9 prereg `4c21db3` before outcomes, fail-closed before strokes on max within {1..5} palette distance42.626>40. V10 prereg `0e1a573` before results: groups core{1..4}, singleton5/6/7, pinned SHA256 original. Local standalone exact 460×240→150×240 V5 palette preview: 169 width2 fill strokes/338 vertices, 6849/24473=27.9859% vs V8 23.8916%, background/group foreign0, original-label recolor618, cover missing17624. No native, no repo CI, exact CHALK or blind visual PASS. Saved local `autodraw_v10_evidence.zip` SHA256 `d292c0e4b0508989f2ae2c41f5cfe9827bb27a58753644eeb5f771765ed64176`; negative preserved, no fitting or production edits.
+
+
 **2026-11-15 / ENGINE-001 / pinned V8 local exploratory outcome:** prereg [V8](ENGINE001_STRUCTURE_COLOR_COMPOSITE_V8_PROTOCOL_2026-11-15.md) on GitHub `7b6f064` before generating outputs. Executed local stand-alone script against SHA-verified original PNG; 8-color oracle and composite preview; fill=140 paths, edges=84, 224 total, 2423 synthetic vertices, 5847/24473=23.8916% fill (target >=99%). Visual composite easier to recognize than line-only but not accepted quality; 1088 line-on-fill overlap pixels, source RGB/contamination gate unverified. Deviated from per-vertex ink sampling in prereg; saved OFF-PROTOCOL FAIL, do not reuse V8 as formal PASS. Local ZIP `autodraw_v8_evidence.zip` SHA256 `390960f6992c559d292befc818b4a2230954130b3ac7a8f1a8182d3db1023f15`, no GitHub runner/CI or exact CHALK. Next V9 prereg required; production/master unchanged.
 
 
