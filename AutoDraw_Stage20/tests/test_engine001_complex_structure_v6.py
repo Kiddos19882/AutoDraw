@@ -10,7 +10,7 @@ import numpy as np
 
 from run_engine001_complex_structure_v6 import (
     extract_edges, compare_edges, reconstruct_palette, roi_bounds, provenance_sha,
-    run, SOURCE_SHA256,
+    run, SOURCE_SHA256, fixed_grid_edge_loss,
 )
 
 
@@ -95,6 +95,10 @@ class ComplexStructureV6Tests(unittest.TestCase):
             self.assertEqual(result["status"],
                              "DIAGNOSTIC_COMPLETE_NOT_RECOGNITION_PASS")
             self.assertEqual(result["quality"]["v6_recognition"], "NOT_TESTED")
+            self.assertEqual(len(result["fixed_grid_3cols_4rows"]), 12)
+            self.assertEqual(
+                sum(tile["missing_edge_pixels"] for tile in result["fixed_grid_3cols_4rows"]),
+                result["metrics"]["missing_source_edge_pixels"])
             self.assertEqual(len(result["derived_png_sha256"]), 6)
             self.assertIn("edge-retention-overlay.png", result["derived_png_sha256"])
             from PIL import Image
@@ -110,6 +114,32 @@ class ComplexStructureV6Tests(unittest.TestCase):
             for name, digest in report["derived_png_sha256"].items():
                 self.assertEqual(hashlib.sha256((out / name).read_bytes()).hexdigest(),
                                  digest)
+
+    def test_fixed_spatial_grid_retains_global_edge_totals(self):
+        src = np.zeros((24, 30), dtype=bool)
+        pal = np.zeros_like(src)
+        src[5, 9] = True
+        src[6, 10] = True
+        src[23, 29] = True
+        pal[5, 10] = True  # One-pixel match across x=10 tile boundary.
+        tiles = fixed_grid_edge_loss(src, pal)
+        self.assertEqual(len(tiles), 12)
+        self.assertEqual(sum(t["source_edge_pixels"] for t in tiles), 3)
+        self.assertEqual(sum(t["matched_edge_pixels"] for t in tiles), 2)
+        self.assertEqual(sum(t["missing_edge_pixels"] for t in tiles), 1)
+        self.assertEqual(tiles[0]["matched_edge_pixels"], 1)
+        self.assertEqual(tiles[1]["matched_edge_pixels"], 1)
+        self.assertIsNone(tiles[2]["edge_recall"])
+
+    def test_fixed_spatial_grid_fails_closed_for_bad_shapes(self):
+        a = np.zeros((4, 3), dtype=bool)
+        with self.assertRaises(ValueError):
+            fixed_grid_edge_loss(a, a.astype(np.uint8))
+        with self.assertRaises(ValueError):
+            fixed_grid_edge_loss(a, np.zeros((4, 4), dtype=bool))
+        with self.assertRaises(ValueError):
+            fixed_grid_edge_loss(np.zeros((3, 3), dtype=bool),
+                                 np.zeros((3, 3), dtype=bool))
 
     def test_canny_detects_sharp_boundary(self):
         rgb = np.full((64, 64, 3), 255, dtype=np.uint8)
