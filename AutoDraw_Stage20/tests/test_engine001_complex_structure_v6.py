@@ -128,7 +128,8 @@ class ComplexStructureV6Tests(unittest.TestCase):
         self.assertEqual(sum(t["matched_edge_pixels"] for t in tiles), 2)
         self.assertEqual(sum(t["missing_edge_pixels"] for t in tiles), 1)
         self.assertEqual(tiles[0]["matched_edge_pixels"], 1)
-        self.assertEqual(tiles[1]["matched_edge_pixels"], 1)
+        self.assertEqual(tiles[4]["matched_edge_pixels"], 1)
+        self.assertEqual(tiles[1]["matched_edge_pixels"], 0)
         self.assertIsNone(tiles[2]["edge_recall"])
 
     def test_fixed_spatial_grid_fails_closed_for_bad_shapes(self):
