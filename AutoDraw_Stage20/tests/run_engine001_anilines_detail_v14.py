@@ -30,8 +30,10 @@ def main() -> None:
     parser.add_argument("--weights", type=Path, required=True)
     args = parser.parse_args()
     upstream = args.upstream.resolve()
+    source = args.source.resolve()
+    output = args.output.resolve()
     weights = args.weights.resolve()
-    if not (upstream / "infer.py").is_file() or not weights.is_file():
+    if not source.is_file() or not (upstream / "infer.py").is_file() or not weights.is_file():
         raise RuntimeError("Missing upstream infer.py or Detail checkpoint")
     if weights.stat().st_size < 1024:
         raise RuntimeError("Detail checkpoint suspiciously small")
@@ -48,9 +50,9 @@ def main() -> None:
     print("Detail weights sha256", sha256(weights), "bytes", weights.stat().st_size, flush=True)
     print("Torch", torch.__version__, "cpu fp16=False", flush=True)
     model = load_model(opts)
-    args.output.resolve().parent.mkdir(parents=True, exist_ok=True)
-    process_image(str(args.source.resolve()), str(args.output.resolve()), model=model, args=opts)
-    if not args.output.is_file() or args.output.stat().st_size < 100:
+    output.parent.mkdir(parents=True, exist_ok=True)
+    process_image(str(source), str(output), model=model, args=opts)
+    if not output.is_file() or output.stat().st_size < 100:
         raise RuntimeError("AniLines did not produce usable output")
 
 
