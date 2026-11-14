@@ -1,5 +1,8 @@
 # AutoDraw — дорожная карта будущих работ
 
+**ENGINE-001 next: residual raster/temporal validation (2026-11-14).** Quota coordinate recovery itself is evidenced E1/E3; [CI 43536560568](https://github.com/Kiddos19882/AutoDraw/actions/runs/43536560568) opt-in native Egret replay on `7581b7c` shows slight IoU decrease for C1-F3 and unchanged C2-F2, so two missing coordinates do not explain remaining pixel residuals. Freeze existing transforms/thresholds and preserve original PNG/CHALK. Next design held-out projections and independent live GPU/temporal ordering validation; no rerun on user PC while its remote runtime is offline.
+
+
 **ENGINE-001 / next research gate (2026-11-14):** [CI 43535607144](https://github.com/Kiddos19882/AutoDraw/actions/runs/43535607144) on `52c8c41` verified first-party quota-stream provenance of two omitted accepted coordinates (C1-F3, C2-F2), 8/8 negative/positive tests, unchanged frozen source. Next make an **opt-in** Egret replay of the two affected figures using separately validated quota events without altering original Monitor JSON or default diagnostic outputs; compare new PNG/IoU at fixed pre-registered mapping, preserve historical negative results. Only after this separate experimental replay pursue held-out/live GPU/temporal validation; do not promote E3 source parity to E5 pixel/quality PASS.
 
 
