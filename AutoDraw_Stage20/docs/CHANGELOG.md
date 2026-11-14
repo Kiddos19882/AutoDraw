@@ -1,5 +1,8 @@
 # AutoDraw — значимые изменения
 
+- 2026-11-14 / ENGINE-001: added reproducible fixed-boundary residual analyzer and five synthetic regressions to the six-run native Egret CI (`ae7ecc4`, [CI 43541756465](https://github.com/Kiddos19882/AutoDraw/actions/runs/43541756465) SUCCESS; [artifact 14091649173](https://github.com/Kiddos19882/AutoDraw/actions/runs/43541756465/artifacts/14091649173)). Six frozen residual totals 40/535/659/40/530/404, all within a fixed 2px boundary band; no posthoc projection or threshold fitting. Still DIAGNOSTIC_ONLY, no E4/E5 or quality acceptance, no production changes.
+
+
 - 2026-11-14 / ENGINE-001: bounded source-faithful `POINT_QUOTA_UPDATE`→`DRAW_SAMPLE` coordinate recovery with fail-closed alignment, eight negative/positive unit regressions, opt-in native Egret re-render and separately archived PNGs (`7581b7c`, [CI 43536560568](https://github.com/Kiddos19882/AutoDraw/actions/runs/43536560568) SUCCESS attempt 2). Two missing points traced to immutable run-bound Monitor streams; C1-F3 IoU slightly decreased, C2-F2 unchanged, so FILL quality/E5 acceptance not claimed. Default renderer path and production Stage6/CHALK/thresholds unchanged.
 
 - 2026-11-12 / FILL001 exact binder: distinguish cumulative browser-local Monitor export buffer overflow from genuine loss of run-recorder/Bridge events. Requires lossless per-run and internally consistent buffer counters; negative regressions and frozen 50MB raw replay in CI `874f2e1`, 43274926194 PASS. No retroactive reclassification or safety threshold change.
