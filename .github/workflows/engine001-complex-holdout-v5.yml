@@ -1,0 +1,53 @@
+name: ENGINE-001 complex multicolor pinned holdout V5
+
+on:
+  push:
+    branches:
+      - feature/image-geometry-optimization
+    paths:
+      - ".github/workflows/engine001-complex-holdout-v5.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_complex_holdout_v5.py"
+      - "AutoDraw_Stage20/tests/test_engine001_complex_holdout_v5.py"
+      - "AutoDraw_Stage20/tests/game_renderer_reference.js"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engine001-complex-holdout-v5-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-color-art-holdout:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install existing renderer test dependencies
+        run: python -m pip install selenium Pillow numpy opencv-python-headless
+      - name: Validate opt-in multicolor JS and Python guard tests
+        shell: pwsh
+        run: |
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m unittest discover -s AutoDraw_Stage20/tests -p "test_engine001_complex_holdout_v5.py" -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m unittest discover -s AutoDraw_Stage20/tests -p "test_engine001_adaptive_brush_v3.py" -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Replay frozen V3 V4 and color-aware V5 on original pinned complex PNG
+        shell: pwsh
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_complex_holdout_v5.py --workspace . --output-dir "$env:RUNNER_TEMP\\engine001-complex-v5"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Preserve all native composited and per-color artifacts even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-complex-multicolor-holdout-v5
+          path: ${{ runner.temp }}/engine001-complex-v5/
+          if-no-files-found: warn
+          retention-days: 30
