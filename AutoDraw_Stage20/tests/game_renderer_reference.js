@@ -2388,7 +2388,53 @@
     };
   }
 
+
+  // Opt-in V3 only: mixed per-stroke brush size, original fixed-radius probe untouched.
+  function renderTwoIconAdaptiveBrushProbe(strokes) {
+    if (!Array.isArray(strokes) || !strokes.length || strokes.length > 3000) {
+      throw new Error("Two-icon fixture requires 1..3000 synthetic strokes.");
+    }
+    let total=0;
+    for (const stroke of strokes) {
+      if (!stroke || typeof stroke.strokeId!=="string" ||
+          !/^icon-[0-9]+$/.test(stroke.strokeId) ||
+          ![2,4,8,15,30].includes(stroke.width) || !Array.isArray(stroke.points) ||
+          stroke.points.length<2 || stroke.points.length>128) {
+        throw new Error("Invalid adaptive two-icon width or stroke.");
+      }
+      for (const p of stroke.points) {
+        if (!p || !Number.isFinite(p.x) || !Number.isFinite(p.y) ||
+            p.x<0 || p.x>=BOARD_WIDTH || p.y<0 || p.y>=BOARD_HEIGHT) {
+          throw new Error("Two-icon geometry leaves 460x240 logical board.");
+        }
+        total+=1;
+      }
+    }
+    if (total>5900) throw new Error("Two-icon synthetic point quota exceeded.");
+    const board=makeTemporalBoard(strokes,2,"normal",false);
+    if(board.accepted!==total) throw new Error("Two-icon native BoardPane rejected vertices.");
+    const state=initializeWebGL(null,3);
+    const blank=document.createElement("canvas");
+    blank.width=BOARD_WIDTH*3;blank.height=BOARD_HEIGHT*3;
+    const result=renderWebGLProbe("normal",[],2,blank,state,board.shape);
+    if(!result.sceneDiagnostics.stageAttached ||
+       result.sceneDiagnostics.boardRenderMode!==3 ||
+       result.canvas.width!==1380 || result.canvas.height!==720) {
+      throw new Error("Two-icon actual Egret WebGL mask failed.");
+    }
+    return {
+      schema:"ENGINE001_TWO_ICON_ADAPTIVE_BRUSH_V3",
+      renderer:"real Egret 5.4.1 BoardPane/WebGLRenderer",
+      maskSource:"two pinned repository PNGs; independent Python target mask",
+      mode:"normal",brushSizes:[...new Set(strokes.map(s=>s.width))],syntheticAcceptedVerticesNotChalk:total,
+      strokeCount:strokes.length,glInfo:result.glInfo,
+      webglDrawCalls:result.drawCalls,sceneDiagnostics:result.sceneDiagnostics,
+      webglPngDataUrl:result.canvas.toDataURL("image/png")
+    };
+  }
+
   api.renderTwoIconMaskProbe = renderTwoIconMaskProbe;
+  api.renderTwoIconAdaptiveBrushProbe = renderTwoIconAdaptiveBrushProbe;
   api.renderContourFirstNativeStudy = renderContourFirstNativeStudy;
   api.renderContourTrimNativeStudy = renderContourTrimNativeStudy;
   api.renderFill001ChalkFirstV5Study = renderFill001ChalkFirstV5Study;
