@@ -9,6 +9,7 @@ on:
       - "AutoDraw_Stage20/tests/game_renderer_reference.js"
       - "AutoDraw_Stage20/tests/game_renderer_reference.test.js"
       - "AutoDraw_Stage20/tests/run_fill001_series_egret_replay.py"
+      - "AutoDraw_Stage20/tests/test_engine001_quota_alignment.py"
   workflow_dispatch:
 
 permissions:
@@ -37,6 +38,11 @@ jobs:
         run: |
           node --check AutoDraw_Stage20/tests/game_renderer_reference.js
           node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Negative and positive ENGINE-001 quota alignment regression
+        shell: pwsh
+        run: |
+          python -m unittest discover -s AutoDraw_Stage20/tests -p "test_engine001_quota_alignment.py" -v
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Validate all six immutable Monitor/Game PNG bindings
         shell: pwsh
