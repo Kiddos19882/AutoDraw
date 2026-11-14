@@ -10,6 +10,8 @@ on:
       - "AutoDraw_Stage20/tests/game_renderer_reference.test.js"
       - "AutoDraw_Stage20/tests/run_fill001_series_egret_replay.py"
       - "AutoDraw_Stage20/tests/test_engine001_quota_alignment.py"
+      - "AutoDraw_Stage20/tests/engine001_residual_audit.py"
+      - "AutoDraw_Stage20/tests/test_engine001_residual_audit.py"
   workflow_dispatch:
 
 permissions:
@@ -64,6 +66,24 @@ jobs:
         run: |
           python AutoDraw_Stage20/tests/run_fill001_series_egret_replay.py --workspace . --quota-recovery --output-dir "$env:RUNNER_TEMP\\engine001-quota-recovered"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: ENGINE-001 fixed 2px boundary residual synthetic regressions
+        shell: pwsh
+        run: |
+          python -m unittest discover -s AutoDraw_Stage20/tests -p "test_engine001_residual_audit.py" -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: ENGINE-001 original vs recovered fixed-mask residual audit
+        shell: pwsh
+        run: |
+          python AutoDraw_Stage20/tests/engine001_residual_audit.py --original-dir "$env:RUNNER_TEMP\\fill001-egret-six" --recovered-dir "$env:RUNNER_TEMP\\engine001-quota-recovered" --output "$env:RUNNER_TEMP\\engine001-fixed-residual\\report.json"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Upload bounded fixed-mask residual audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-fixed-boundary-residual-audit
+          path: ${{ runner.temp }}/engine001-fixed-residual/report.json
+          if-no-files-found: warn
+          retention-days: 30
       - name: Upload opt-in quota-recovered PNG evidence
         if: always()
         uses: actions/upload-artifact@v4
