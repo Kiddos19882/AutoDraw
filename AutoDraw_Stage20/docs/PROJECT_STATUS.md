@@ -1,5 +1,8 @@
 # AutoDraw — текущее состояние
 
+**ENGINE-001 / V14 real external inference succeeded:** [CI 43653371987](https://github.com/Kiddos19882/AutoDraw/actions/runs/43653371987) **SUCCESS both FDoG/AniLines jobs** at SHA `df362426` after syntax-only gdown fix, source binding exact. AniLines Detail checkpoint sha256 `876e4efb8d4cb3602da2b034fdb3503e1816070b4ec6d4430783fc99c7fe02c8`, output artifact14136459858; FDoG artifact14137151210. ROI AniLines 4343 candidate pixels/2161-of-2166 Canny references within1px and 834 dark interior candidates vs FDoG 2121/1489-of-2166/97. These are edge proxies, **not manually verified seam precision or safe game paths**. Need independent jacket seam annotation, false-positive pruning, new heldout and native after a separate prereg; production unchanged. Details [TEST_RESULTS](TEST_RESULTS.md).
+
+
 **ENGINE-001 V14 actual CI runs inspected:** [43652840343](https://github.com/Kiddos19882/AutoDraw/actions/runs/43652840343) and [43652803847](https://github.com/Kiddos19882/AutoDraw/actions/runs/43652803847) overall FAIL (AniLines step downloading weights fails: installed gdown6.5.1 rejects `--id`, exit2). FDoG in both jobs PASS, later artifact14136663521 and pinned source verified; ROI FDoG2121 candidate pixels, 1489/2166 Canny reference within1px=68.74%, dark interior97/4429 proxy — does not prove suit seams recognized. Workflow-only gdown syntax correction commit `df362426` pushed; no confirmed new job outcome. See [TEST_RESULTS](TEST_RESULTS.md). No manual step required unless new run reveals real weights access issue. Production unchanged.
 
 
