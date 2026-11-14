@@ -201,6 +201,40 @@ def audit_aggregated_points(workspace: Path) -> dict:
                     "stroke_id": witness.get("strokeId"),
                     "coordinate_values": coordinates,
                 })
+            # Correlate both telemetry streams without assuming quota events
+            # are interchangeable with accepted DRAW_SAMPLE coordinates.
+            same_stroke_draw = [e for e in events if e.get("strokeId") == point.get("stroke_id")]
+            same_stroke_quota = [
+                e for e in run["events"] if e.get("type") == "POINT_QUOTA_UPDATE"
+                and e.get("strokeId") == point.get("stroke_id")
+                and isinstance(e.get("pointDelta"), int) and e["pointDelta"] > 0
+            ]
+            before_quota = [e for e in same_stroke_quota
+                            if isinstance(e.get("t"), (int, float)) and e["t"] <= event_time]
+            candidate_quota = [{
+                "t_offset_ms": e["t"] - event_time,
+                "point_delta": e["pointDelta"],
+                "accepted_point": {k: e["acceptedPoint"][k] for k in ("x", "y")}
+                    if isinstance(e.get("acceptedPoint"), dict)
+                    and all(isinstance(e["acceptedPoint"].get(k), (int, float))
+                            for k in ("x", "y")) else None,
+            } for e in before_quota[-3:]]
+            stroke_quota_deltas = sum(e["pointDelta"] for e in same_stroke_quota)
+            stroke_draw_deltas = sum(int(e.get("pointDelta") or 0) for e in same_stroke_draw)
+            # Counts are evidence to inspect; do not automatically upgrade
+            # replay completeness, including on apparent stream parity.
+            quota_provenance = {
+                "draw_accepted_point": {k: point[k] for k in ("x", "y")},
+                "draw_t": event_time,
+                "same_stroke_draw_count": len(same_stroke_draw),
+                "same_stroke_draw_delta_total": stroke_draw_deltas,
+                "same_stroke_quota_count": len(same_stroke_quota),
+                "same_stroke_quota_delta_total": stroke_quota_deltas,
+                "before_draw_quota_count": len(before_quota),
+                "before_draw_quota_delta_total": sum(e["pointDelta"] for e in before_quota),
+                "last_three_quota_updates_at_or_before_draw": candidate_quota,
+                "stroke_delta_parity": stroke_draw_deltas == stroke_quota_deltas,
+            }
             report = validated["stage6_report"]
             stage_request = report.get("request") or {}
             stage_binding = report.get("binding") or {}
@@ -214,6 +248,7 @@ def audit_aggregated_points(workspace: Path) -> dict:
                 "missing_coordinate_count": delta-1,
                 "nearby_event_types_100ms": nearby_types,
                 "nearest_first_party_witnesses": witnesses,
+                "quota_provenance": quota_provenance,
                 "nearby_coordinate_field_names_100ms": nearby_candidate_fields,
                 "stage6_request_top_level_keys": sorted(stage_request.keys())[:32],
                 "stage6_binding_top_level_keys": sorted(stage_binding.keys())[:32],
