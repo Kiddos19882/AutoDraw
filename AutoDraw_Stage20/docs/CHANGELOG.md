@@ -1,5 +1,8 @@
 # AutoDraw — значимые изменения
 
+- 2026-11-14 / ENGINE-001: added preregistered opt-in `ENGINE001_TWO_ICON_PREDICTIVE_CONTOUR_V1` for two existing source icons, long target-contour segments selected by forecast holes, and horizontal endpoint trimming (`38f5b58` protocol; `27521f3` code); 5 synthetic tests, native Egret WebGL [CI 43549152669](https://github.com/Kiddos19882/AutoDraw/actions/runs/43549152669) SUCCESS, [artifact 14095253373](https://github.com/Kiddos19882/AutoDraw/actions/runs/43549152669/artifacts/14095253373). Coverage92.7288% / IoU92.5327% / leakage334, vs old coverage92.1094% / IoU91.9157% / leakage332; 381 vs 380 strokes. **OFFLINE QUALITY FAIL**, not exact CHALK or independent E4/E5. First [CI 43548972752](https://github.com/Kiddos19882/AutoDraw/actions/runs/43548972752) FAILED due test-only 2-vertex guard, corrected by bounded contour polyline support without fitting geometry. Production behavior, thresholds, original source icons, historical captures remain unchanged.
+
+
 - 2026-11-14 / ENGINE-001: added an opt-in actual native Egret WebGL two-icon composite-mask experiment using two unchanged `testImages` PNGs (home+envelope), synthetic radius2 normal plan and five regressions (`d60956a`; [CI 43546565112](https://github.com/Kiddos19882/AutoDraw/actions/runs/43546565112) SUCCESS; [artifact 14093549419](https://github.com/Kiddos19882/AutoDraw/actions/runs/43546565112/artifacts/14093549419)). Mask IoU 91.9157%, coverage 92.1094%, missing12432/outside332: **offline quality FAIL**, preserved. No new live E4/E5, exact game CHALK, production defaults, thresholds or original captures altered.
 
 
