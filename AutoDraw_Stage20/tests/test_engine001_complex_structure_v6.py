@@ -1,10 +1,11 @@
 """Synthetic E2 guards for preregistered ENGINE001_COMPLEX_STRUCTURE_V6."""
 import unittest
+from unittest.mock import patch
 
 import numpy as np
 
 from run_engine001_complex_structure_v6 import (
-    extract_edges, compare_edges, reconstruct_palette, roi_bounds,
+    extract_edges, compare_edges, reconstruct_palette, roi_bounds, provenance_sha,
 )
 
 
@@ -63,6 +64,15 @@ class ComplexStructureV6Tests(unittest.TestCase):
         self.assertEqual(rgb[ys, xs].shape, (2, 2, 3))
         with self.assertRaises(ValueError):
             roi_bounds({"paste_xy": [2, 0], "resized_size": [2, 2]}, labels.shape)
+
+    def test_checkout_sha_provenance_fail_closed(self):
+        with patch.dict("os.environ", {"GITHUB_SHA": "A" * 40}):
+            self.assertEqual(provenance_sha(), "a" * 40)
+        with patch.dict("os.environ", {"GITHUB_SHA": "not-a-sha"}):
+            with self.assertRaises(ValueError):
+                provenance_sha()
+        with patch.dict("os.environ", {"GITHUB_SHA": ""}):
+            self.assertIsNone(provenance_sha())
 
     def test_canny_detects_sharp_boundary(self):
         rgb = np.full((64, 64, 3), 255, dtype=np.uint8)
