@@ -1,5 +1,8 @@
 # AutoDraw — журнал выполненных действий
 
+**2026-11-15 / ENGINE-001 / pinned V8 local exploratory outcome:** prereg [V8](ENGINE001_STRUCTURE_COLOR_COMPOSITE_V8_PROTOCOL_2026-11-15.md) on GitHub `7b6f064` before generating outputs. Executed local stand-alone script against SHA-verified original PNG; 8-color oracle and composite preview; fill=140 paths, edges=84, 224 total, 2423 synthetic vertices, 5847/24473=23.8916% fill (target >=99%). Visual composite easier to recognize than line-only but not accepted quality; 1088 line-on-fill overlap pixels, source RGB/contamination gate unverified. Deviated from per-vertex ink sampling in prereg; saved OFF-PROTOCOL FAIL, do not reuse V8 as formal PASS. Local ZIP `autodraw_v8_evidence.zip` SHA256 `390960f6992c559d292befc818b4a2230954130b3ac7a8f1a8182d3db1023f15`, no GitHub runner/CI or exact CHALK. Next V9 prereg required; production/master unchanged.
+
+
 **2026-11-14 / ENGINE-001 / reproducibility of V7 after local negative:** added opt-in GitHub runner `tests/run_engine001_structure_first_v7.py` (commit `c9edc35`), 5 regression fixtures including pinned image `test_engine001_structure_first_v7.py` (`520b985`), CI workflow `.github/workflows/engine001-structure-first-v7.yml` (`9b868dd`). Reuses source_palette V5 rather than duplicate source preparation. E1 implementation present; repository E2/E3 and runtime not yet confirmed. Does not retroactively change predeclared V7 path thresholds, previous preview or user recognition gate.
 
 
