@@ -981,7 +981,7 @@
   }
 
 
-  function makeTemporalBoard(strokes, lineWidth, mode, incremental, duplicateFinalFrames) {
+  function makeTemporalBoard(strokes, lineWidth, mode, incremental, duplicateFinalFrames, usePerStrokeColor) {
     if (duplicateFinalFrames === undefined) duplicateFinalFrames = 0;
     if (!Number.isInteger(duplicateFinalFrames) || duplicateFinalFrames < 0 ||
         duplicateFinalFrames > 3 || (duplicateFinalFrames > 0 && !incremental)) {
@@ -1003,7 +1003,7 @@
         throw new Error("Invalid per-stroke brush width in offline replay.");
       }
       board.setRadius(strokeWidth);
-      board.setColor(0x000000);
+      board.setColor(usePerStrokeColor ? stroke.colorRgb : 0x000000);
       board.setSmooth(mode === "smooth");
       for (let i = 0; i < stroke.points.length; i += 1) {
         const point = stroke.points[i];
@@ -2433,7 +2433,59 @@
     };
   }
 
+  // ENGINE-001 V5 only: permitted per-stroke RGB for independently frozen
+  // palette-class holdout. Existing black/fixed-radius research is untouched.
+  function renderComplexHoldoutColorProbe(strokes) {
+    if (!Array.isArray(strokes) || strokes.length < 1 || strokes.length > 3000) {
+      throw new Error("V5 requires 1..3000 bounded strokes.");
+    }
+    let count = 0;
+    for (const stroke of strokes) {
+      if (!stroke || typeof stroke.strokeId !== "string" ||
+          !/^icon-[0-9]+$/.test(stroke.strokeId) ||
+          ![2,4,6,8,10,15,30].includes(stroke.width) ||
+          !Number.isInteger(stroke.colorRgb) ||
+          stroke.colorRgb < 0 || stroke.colorRgb > 0xffffff ||
+          !Array.isArray(stroke.points) || stroke.points.length < 2 ||
+          stroke.points.length > 128) {
+        throw new Error("V5 invalid color, size, or bounded polyline.");
+      }
+      for (const p of stroke.points) {
+        if (!p || !Number.isFinite(p.x) || !Number.isFinite(p.y) ||
+            p.x < 0 || p.x >= BOARD_WIDTH || p.y < 0 || p.y >= BOARD_HEIGHT) {
+          throw new Error("V5 point outside original 460x240 logical board.");
+        }
+        count++;
+      }
+    }
+    if (count > 5900) throw new Error("V5 point budget exceeded.");
+    const board = makeTemporalBoard(strokes,2,"normal",false,0,true);
+    if (board.accepted !== count) throw new Error("V5 synthetic points rejected.");
+    const state = initializeWebGL(null,3);
+    const blank = document.createElement("canvas");
+    blank.width = BOARD_WIDTH*3;
+    blank.height = BOARD_HEIGHT*3;
+    const result = renderWebGLProbe("normal",[],2,blank,state,board.shape);
+    if (!result.sceneDiagnostics.stageAttached ||
+        result.sceneDiagnostics.boardRenderMode !== 3 ||
+        result.canvas.width !== 1380 || result.canvas.height !== 720) {
+      throw new Error("V5 native Egret Stage geometry mismatch.");
+    }
+    return {
+      schema:"ENGINE001_COMPLEX_MULTICOLOR_HOLDOUT_V5",
+      renderer:"real Egret 5.4.1 BoardPane/WebGLRenderer",
+      mode:"normal",syntheticAcceptedVerticesNotChalk:count,
+      strokeCount:strokes.length,
+      usedWidths:[...new Set(strokes.map(s=>s.width))],
+      usedColors:[...new Set(strokes.map(s=>s.colorRgb))],
+      glInfo:result.glInfo,webglDrawCalls:result.drawCalls,
+      sceneDiagnostics:result.sceneDiagnostics,
+      webglPngDataUrl:result.canvas.toDataURL("image/png")
+    };
+  }
+
   api.renderTwoIconMaskProbe = renderTwoIconMaskProbe;
+  api.renderComplexHoldoutColorProbe = renderComplexHoldoutColorProbe;
   api.renderTwoIconAdaptiveBrushProbe = renderTwoIconAdaptiveBrushProbe;
   api.renderContourFirstNativeStudy = renderContourFirstNativeStudy;
   api.renderContourTrimNativeStudy = renderContourTrimNativeStudy;
