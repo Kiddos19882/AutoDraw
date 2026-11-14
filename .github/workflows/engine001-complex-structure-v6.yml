@@ -60,7 +60,18 @@ jobs:
               "- Human recognizability: **NOT_TESTED**",
               "- Native V6 / exact CHALK / E4 / E5: **NOT_RUN**",
               "- Interpretation: palette-edge diagnostics, not an image-quality PASS.",
+              "",
+              "### Fixed 3×4 ROI grid (row-major, exploratory)",
+              "| Row | Column | Source edges | Matched | Missing | Recall |",
+              "|---:|---:|---:|---:|---:|---:|",
           ]
+          for tile in data["fixed_grid_3cols_4rows"]:
+              frac = tile["edge_recall"]
+              pct = "N/A" if frac is None else f"{frac:.2%}"
+              lines.append(
+                  f"| {tile['row']} | {tile['column']} | {tile['source_edge_pixels']} "
+                  f"| {tile['matched_edge_pixels']} | {tile['missing_edge_pixels']} | {pct} |"
+              )
           with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as stream:
               stream.write("\n".join(lines) + "\n")
           PY
