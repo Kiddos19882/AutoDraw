@@ -1,5 +1,8 @@
 # AutoDraw — значимые изменения
 
+- 2026-11-14 / ENGINE-001: preregistered mixed-brush **V3** adaptive contour-first+long centreline test (`219fc6be8`), added opt-in per-stroke Egret BoardPane sizes 2/4/8/15/30, new Python research planner, five synthetic regression tests and dedicated Windows CI. [Actual native CI 43565322109](https://github.com/Kiddos19882/AutoDraw/actions/runs/43565322109) SUCCESS at `969812e`; [artifact 14101843435](https://github.com/Kiddos19882/AutoDraw/actions/runs/43565322109/artifacts/14101843435). 97.6681% coverage / 93.5282% IoU / 3674 missing / 6974 leakage all within0.667 logical px; 198 missing deeper than symmetric 3px interior boundary. 323 strokes/674 synthetic vertices vs V2 403/1943; only 2/4/8 actually selected, 15/30 unused. **OFFLINE QUALITY FAIL** (<99%), no CHALK/E4/E5. All original V0/V1/V2 data, production settings and acceptance gates preserved.
+
+
 - 2026-11-14 / ENGINE-001: new preregistered (task commit `e83c324`) V2 experimental **painted-stripe frontier** planner, using 24 long contour segments over original 379 horizontal strokes, native Egret WebGL [CI 43563405147](https://github.com/Kiddos19882/AutoDraw/actions/runs/43563405147) SUCCESS code `d6ef11e`; [artifact 14101297101](https://github.com/Kiddos19882/AutoDraw/actions/runs/43563405147/artifacts/14101297101). **OFFLINE QUALITY FAIL** coverage96.4742% <99%, mask IoU92.3523%, missing5555; leaked7032 within allowed 3-logical-px **diagnostic** halo (max1.0541, far=0). Stroke and synthetic vertex counts increase to 403/1943 versus original 380/760; exact CHALK unknown. Includes 5 new deterministic tests and fixed preview/native PNG audit. No source/production/acceptance change, no game E4/E5.
 
 
