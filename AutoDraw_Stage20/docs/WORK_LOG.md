@@ -1,5 +1,8 @@
 # AutoDraw — журнал выполненных действий
 
+**2026-11-14 / ENGINE-001 / reproducibility of V7 after local negative:** added opt-in GitHub runner `tests/run_engine001_structure_first_v7.py` (commit `c9edc35`), 5 regression fixtures including pinned image `test_engine001_structure_first_v7.py` (`520b985`), CI workflow `.github/workflows/engine001-structure-first-v7.yml` (`9b868dd`). Reuses source_palette V5 rather than duplicate source preparation. E1 implementation present; repository E2/E3 and runtime not yet confirmed. Does not retroactively change predeclared V7 path thresholds, previous preview or user recognition gate.
+
+
 **2026-11-14 / ENGINE-001 / V7 prereg and exploratory outcome:** created [V7 prereg](ENGINE001_STRUCTURE_FIRST_V7_PROTOCOL_2026-11-14.md) on GitHub commit `2844a2f` before running local contour-path research. Source SHA/blob pinned, 148 contours, 84 stroke paths, 2143 synthetic vertices and 8502.8277 logical length. Static 2px OpenCV preview covers 4816/4869 source Canny pixels within1px, but visibly faint line-only result (NOT human recognition gate); raw path JSON + 4 preview PNG + report ZIP SHA256 `20dce6d7f948a6f23cc894c8464d47d02bd3d0b3e88ea6e67dca72d501fb96a8`. Runner was standalone local, not committed production/CI. **Negative V7 not retroactively refitted**. Next new prereg composite contour+fill proposal. 
 
 
