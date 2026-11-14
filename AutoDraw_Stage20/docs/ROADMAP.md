@@ -1,5 +1,8 @@
 # AutoDraw — дорожная карта будущих работ
 
+**ENGINE-001 follow-up to user's two-icon mask smoke (2026-11-14):** the single composite `home + envelope` source-mask test completed [CI 43546565112](https://github.com/Kiddos19882/AutoDraw/actions/runs/43546565112) on `d60956a`. Actual Egret normal/radius2 fixed row-step2 synthetic plan achieved coverage **92.1094%**, IoU **91.9157%**, 12432 missing / 332 outside backing pixels, so FILL-like 99% target is **NOT MET**. The test is independent of prior six FILL live/replay cases but is **not** held-out real game-vs-renderer validation: no live game capture exists for these two icons. Preserve this baseline and work on planner edge/row coverage with a new preregistered experiment ID before comparing changes. Separately retain actual live-vs-Egret held-out source bindings and temporal GPU E4/E5 for ENGINE-001. No acceptance threshold retrofits or production promotion.
+
+
 **ENGINE-001 next after fixed residual audit (2026-11-14):** [CI 43541756465](https://github.com/Kiddos19882/AutoDraw/actions/runs/43541756465) E3 confirmed that all 2,208 original residual pixels across six frozen 694×363 images lie within the fixed 2px band of either binary-mask boundary (40+535+659+40+530+404=2,208); original/first-party quota-recovered images maintain historical negative acceptance. Do **not** treat a 2px boundary-localized mismatch as acceptable, nor tune projection/resampler/thresholds to these six seen results. Next preregister held-out geometry and objective residual metrics under frozen mapping, then compare native game GPU/ENTER_FRAME temporal evidence supplied by the user; E4 and independent E5 separately. No PC control by assistant.
 
 
