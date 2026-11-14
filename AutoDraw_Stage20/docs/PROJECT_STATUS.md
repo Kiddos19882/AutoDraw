@@ -1,5 +1,8 @@
 # AutoDraw — текущее состояние
 
+**ENGINE-001 / new V8 composite local preview (2026-11-15):** prereg [V8](ENGINE001_STRUCTURE_COLOR_COMPOSITE_V8_PROTOCOL_2026-11-15.md) `7b6f064` before run. On exact pinned original, independent local composite 140 color-safe long-run fill strokes +84 Canny contours, total224 paths/2423 synthetic vertices, **fill coverage 5847/24473 = 23.8916%**; 4 foreground palette classes completely unpainted. More legible subject outline than V7 line-only in nonblind inspection, but **OFFLINE FAIL** at >=99%, contour overpaint not validated. One **protocol deviation** (darkest RGB along whole contour instead of per-vertex) recorded, so STRICT V8 PROTOCOL VALIDATION NOT_GRANTED. See [TEST_RESULTS](TEST_RESULTS.md). New V9 ID needed before reworking color grouping; no native/CHALK/E4/E5, production unchanged.
+
+
 **ENGINE-001 / reproducible V7 implementation added (2026-11-14):** prereg `2844a2f` before local outcome; after exploratory negative preview, a separate opt-in repository runner `tests/run_engine001_structure_first_v7.py` committed at `c9edc35` (reuses V5 `source_palette` with pinned SHA guard), five synthetic/integration regression fixtures `520b985`, and [standalone workflow](../../.github/workflows/engine001-structure-first-v7.yml) `9b868dd`. These are experimental only, **repository V7 tests/CI NOT_VERIFIED** and local prototype output should not be treated as a completed CI gate. Line-only visual FAIL remains the observed evidence; no production change.
 
 
