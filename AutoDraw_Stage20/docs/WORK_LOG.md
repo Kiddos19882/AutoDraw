@@ -1,5 +1,8 @@
 # AutoDraw — журнал выполненных действий
 
+**2026-11-15 / ENGINE-001 V13 dark suit line extraction:** confirmed HEAD `22ac0b4` and project docs; prereg `a6e74dc`, fixed XDoG dark-ridge sign `d4b047f` before first run. Local original pinned PNG 200×320 SHA verified. Python generated five detector masks/overlays/crops and comparative 3×2 jacket grid; A XDoG, B BlackHat, C directional coherence proxy (not full FDoG), D cleaned union; exact counts in TEST_RESULTS. Visual weak inner lines still missing in XDoG/C, many candidate artifacts in B/D. Supplementary dark interior mask `gray<105` erosion5×5 was posthoc, not prereg, reported only as exploratory. ZIP evidence `6d23167e27b7bd4842664fa72bc6b3ed98716613d150100f19665e7537a4228c`, source code included. No production/test CI/game modifications; no AniLines inference.
+
+
 **2026-11-15 / ENGINE-001 V9 preflight FAIL and V10 offline negative:** V9 prereg `4c21db3` before outcomes, fail-closed before strokes on max within {1..5} palette distance42.626>40. V10 prereg `0e1a573` before results: groups core{1..4}, singleton5/6/7, pinned SHA256 original. Local standalone exact 460×240→150×240 V5 palette preview: 169 width2 fill strokes/338 vertices, 6849/24473=27.9859% vs V8 23.8916%, background/group foreign0, original-label recolor618, cover missing17624. No native, no repo CI, exact CHALK or blind visual PASS. Saved local `autodraw_v10_evidence.zip` SHA256 `d292c0e4b0508989f2ae2c41f5cfe9827bb27a58753644eeb5f771765ed64176`; negative preserved, no fitting or production edits.
 
 
