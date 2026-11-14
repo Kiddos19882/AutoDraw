@@ -134,6 +134,13 @@ def run(workspace: Path, output: Path) -> dict:
         palette_edges.astype(np.uint8), np.ones((3, 3), dtype=np.uint8)
     ).astype(bool)
     missing = original_edges & ~palette_neighbor
+    # Diagnostic visualization only; neither source edges nor numeric metrics change.
+    # Red = unmatched source edge, green = source edge matched to palette within 1px.
+    overlay = np.clip(original_crop.astype(np.float32) * 0.68 + 255 * 0.32,
+                      0, 255).astype(np.uint8)
+    retained = original_edges & palette_neighbor
+    overlay[retained] = (32, 180, 64)
+    overlay[missing] = (255, 32, 32)
     output.mkdir(exist_ok=True, parents=True)
     sha = {}
     for name, data in [
@@ -142,6 +149,7 @@ def run(workspace: Path, output: Path) -> dict:
         ("source-edges.png", original_edges.astype(np.uint8) * 255),
         ("v5-palette-edges.png", palette_edges.astype(np.uint8) * 255),
         ("missing-v5-edges.png", missing.astype(np.uint8) * 255),
+        ("edge-retention-overlay.png", overlay),
     ]:
         sha[name] = write_png(output, name, data)
     report = {
