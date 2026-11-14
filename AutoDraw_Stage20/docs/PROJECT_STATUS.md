@@ -1,5 +1,8 @@
 # AutoDraw — текущее состояние
 
+**ENGINE-001 V14 actual CI runs inspected:** [43652840343](https://github.com/Kiddos19882/AutoDraw/actions/runs/43652840343) and [43652803847](https://github.com/Kiddos19882/AutoDraw/actions/runs/43652803847) overall FAIL (AniLines step downloading weights fails: installed gdown6.5.1 rejects `--id`, exit2). FDoG in both jobs PASS, later artifact14136663521 and pinned source verified; ROI FDoG2121 candidate pixels, 1489/2166 Canny reference within1px=68.74%, dark interior97/4429 proxy — does not prove suit seams recognized. Workflow-only gdown syntax correction commit `df362426` pushed; no confirmed new job outcome. See [TEST_RESULTS](TEST_RESULTS.md). No manual step required unless new run reveals real weights access issue. Production unchanged.
+
+
 **ENGINE-001 / V14 authentic FDoG vs AniLines CPU CI implementation (2026-11-15):** [preregistered](ENGINE001_FDOG_ANILINES_V14_PROTOCOL_2026-11-15.md) before outcomes (commit `345ef12`). Added isolated GitHub workflow `engine001-line-extract-v14.yml` (independent FDoG C++/OpenCV and AniLines Detail PyTorch CPU jobs), pinned external source SHA `37887374e99fe22f1d22004ca114ed2538f0abaf` / `5d188fb68f40fb04fbe3c9c54dcc57b16c914818`, upstream official Google Drive Detail checkpoint ID `12U1Mwlonoipk2Yvr12mNaFB30foy420o` downloaded to temporary runner with SHA logged; report and source validation tests in `tests/*v14*.py`. **Code/CI configured E1, job results UNKNOWN until independently verified; no claims FDoG or AniLines rendered or recovered suit seams.** Model trusted publisher hash not available; checkpoint hash at runtime alone does not establish immutable model. Manual upload only if official download is blocked. Production and master unchanged.
 
 
