@@ -122,6 +122,47 @@ def validate_case(workspace: Path, figure: str, expected_blob: str) -> dict:
 
 
 
+def align_positive_quota_with_draw(draws: list[dict], quota: list[dict]) -> list[list[dict]] | None:
+    """Exact ordered per-stroke mapping, without time/coordinate interpolation."""
+    def positive_delta(e: dict) -> int | None:
+        d = e.get("pointDelta")
+        return d if type(d) is int and d > 0 else None
+
+    def xy(e: dict) -> tuple[float, float] | None:
+        p = e.get("acceptedPoint")
+        if not isinstance(p, dict):
+            return None
+        x, y = p.get("x"), p.get("y")
+        if (not all(type(v) in (int, float) for v in (x, y))
+                or not all(np.isfinite(v) for v in (x, y))):
+            return None
+        return (x, y)
+
+    groups: list[list[dict]] = []
+    cursor = 0
+    for draw in draws:
+        required = positive_delta(draw)
+        draw_xy = xy(draw)
+        draw_t = draw.get("t")
+        if required is None or draw_xy is None or type(draw_t) not in (int, float):
+            return None
+        group: list[dict] = []
+        while required > 0 and cursor < len(quota):
+            event = quota[cursor]
+            delta, point, t = positive_delta(event), xy(event), event.get("t")
+            if (delta is None or delta > required or point is None
+                    or type(t) not in (int, float) or not np.isfinite(t)
+                    or t > draw_t):
+                return None
+            group.append(event)
+            required -= delta
+            cursor += 1
+        if required or not group or xy(group[-1]) != draw_xy:
+            return None
+        groups.append(group)
+    return groups if cursor == len(quota) else None
+
+
 def audit_aggregated_points(workspace: Path) -> dict:
     """Bounded, read-only E1 inventory; no coordinate inference or raw event export."""
     cases = []
@@ -221,6 +262,22 @@ def audit_aggregated_points(workspace: Path) -> dict:
             } for e in before_quota[-3:]]
             stroke_quota_deltas = sum(e["pointDelta"] for e in same_stroke_quota)
             stroke_draw_deltas = sum(int(e.get("pointDelta") or 0) for e in same_stroke_draw)
+            aligned_groups = align_positive_quota_with_draw(
+                same_stroke_draw, same_stroke_quota)
+            draw_position = next(
+                (i for i, e in enumerate(same_stroke_draw) if e is event), None)
+            aligned_gap = (aligned_groups[draw_position]
+                           if aligned_groups is not None and draw_position is not None
+                           else None)
+            candidate_missing = (
+                [{"x": e["acceptedPoint"]["x"], "y": e["acceptedPoint"]["y"]}
+                 for e in aligned_gap[:-1]]
+                if aligned_gap is not None
+                and len(aligned_gap) == delta
+                and all(e.get("pointDelta") == 1 for e in aligned_gap)
+                else [])
+            strict_gap_candidate = len(candidate_missing) == delta - 1
+
             # Counts are evidence to inspect; do not automatically upgrade
             # replay completeness, including on apparent stream parity.
             quota_provenance = {
@@ -234,6 +291,11 @@ def audit_aggregated_points(workspace: Path) -> dict:
                 "before_draw_quota_delta_total": sum(e["pointDelta"] for e in before_quota),
                 "last_three_quota_updates_at_or_before_draw": candidate_quota,
                 "stroke_delta_parity": stroke_draw_deltas == stroke_quota_deltas,
+                "ordered_stroke_coordinate_parity": aligned_groups is not None,
+                "gap_quota_group_size": len(aligned_gap) if aligned_gap is not None else None,
+                "missing_coordinate_candidates": candidate_missing,
+                "candidate_status": ("FIRST_PARTY_QUOTA_SEQUENCE_MATCH_E1"
+                                     if strict_gap_candidate else "NOT_ESTABLISHED"),
             }
             report = validated["stage6_report"]
             stage_request = report.get("request") or {}
