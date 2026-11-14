@@ -25,7 +25,7 @@ V5 на исходном многоцветном изображении даё�
 5. Оценка результатов: `DIAGNOSTIC_COMPLETE` только если source/hash/ROI, два edge masks, component summary и тесты проверены; иначе FAIL/BLOCKED. **Никакого численного порога узнаваемости не объявлено.** Численный edge recall не равен recognition PASS; пользовательское наблюдение сохраняется в статусе FAIL V5.
 6. Сохранить raw V5/HOLDOUT outcomes без изменений, не подменять renderer quality/CHALK. Имеющиеся 99% coverage и симметричные 3 logical px не меняются.
 
-**Ожидаемые outputs:** JSON с SHA/version/status, исходный crop и реконструированный palette crop, два binary edge PNG и `missing-v5-edges.png`, component stats. Все файлы derived, не исходные captures. GitHub workflow с явным checkout SHA, unit tests и artifacts. Вся статистика exploratory-only, интерпретация E3 не выше native/render pipeline и не выше E4.
+**Ожидаемые outputs:** JSON с GitHub checkout SHA (или null локально), NumPy/OpenCV/Pillow version, source SHA/status, исходный crop и реконструированный palette crop, два binary edge PNG и `missing-v5-edges.png`, component stats. Все файлы derived, не исходные captures. GitHub workflow с явным checkout SHA, unit tests и artifacts. Вся статистика exploratory-only, интерпретация E3 не выше native/render pipeline и не выше E4.
 
 ## Следующий gate
 
