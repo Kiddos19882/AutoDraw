@@ -1,5 +1,8 @@
 # AutoDraw — дорожная карта будущих работ
 
+**ENGINE-001 / next research gate (2026-11-14):** [CI 43535607144](https://github.com/Kiddos19882/AutoDraw/actions/runs/43535607144) on `52c8c41` verified first-party quota-stream provenance of two omitted accepted coordinates (C1-F3, C2-F2), 8/8 negative/positive tests, unchanged frozen source. Next make an **opt-in** Egret replay of the two affected figures using separately validated quota events without altering original Monitor JSON or default diagnostic outputs; compare new PNG/IoU at fixed pre-registered mapping, preserve historical negative results. Only after this separate experimental replay pursue held-out/live GPU/temporal validation; do not promote E3 source parity to E5 pixel/quality PASS.
+
+
 **FILL001 third-run per-run binding (2026-11-12):** frozen 50MB run root cause diagnosed (local Monitor buffer overflow count 17806 misclassified as transport loss), binder fixed with strict per-run recorder/send/sequence gates and synthetic+real-frozen CI replay PASS `874f2e1` / 43274926194. Next fresh E4 3→4 transition with verified Clear and independently bound CHALK; then E5. Legacy blocked result not rewritten.
 
 **FILL001 pointer hover/screenshot gate (2026-11-12):** для baseline и after-Clear PNG изменён перенос курсора с legacy margin32 на строгую нижнюю точку `board/meter.bottom+160px` (без lateral fallback) и popup settle 0.4 s. Следующий E2/E3 dedicated CI, затем пользовательский E4 с PNG и подтверждением исчезновения overlay. Не считать саму координату защитой от всех иных интерактивных UI, и не ослаблять Clear comparator.
