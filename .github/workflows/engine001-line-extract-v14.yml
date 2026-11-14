@@ -92,7 +92,7 @@ jobs:
       - name: Fetch upstream-published Detail checkpoint to ephemeral runner
         run: |
           mkdir -p "$RUNNER_TEMP/anilines-src/weights"
-          python -m gdown --id 12U1Mwlonoipk2Yvr12mNaFB30foy420o \
+          python -m gdown 'https://drive.google.com/uc?id=12U1Mwlonoipk2Yvr12mNaFB30foy420o' \
             -O "$RUNNER_TEMP/anilines-src/weights/detail.pth"
           python - <<'PY'
           from pathlib import Path
