@@ -1,0 +1,17 @@
+# ENGINE001_STRUCTURE_COLOR_COMPOSITE_V8 — предварительный протокол (2026-11-15)
+
+**Задача:** ENGINE-001 / multicolor complex-art recognition architecture. **Статус:** PREREGISTERED BEFORE V8 RESULTS. **Предыдущая версия:** V7 frozen line-only negative; не переписывать. **Source:** оригинальный pinned `testImages/wV6VeZI9S1Y.png`, 200×320, 97308 bytes, SHA256 `07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a`, Git blob `d3cd95b846f036a3f8acecf75d2a237e46dcf13a`. Тот же рисунок ранее использовался в V5/V6/V7 — **только exploratory**, не независимая acceptance validation.
+
+## Вопрос и гипотезы
+
+Может ли разделение структуры и цветовой заливки дать более читаемую картинку по сравнению с V7 line-only при сохранении границ цветовых областей? H1: composite (контуры поверх area fills) повышает субъективную читаемость; H0: без семантической сегментации и точной кисти остаётся неузнаваемым. RGB palette и исходная ROI V5 не меняются.
+
+Пререгистрированы **две справочные визуализации**, ни одна не считается измеренной игрой: 
+A. `palette-oracle.png`: точная 8-классовая V5 raster palette (идеальный *недостижимый пока* fill coverage reference), НЕ stroke-plan и НЕ заявка на приемлемый CHALK.
+B. `composite-longrun-preview.png`: те же восемь классов; для каждого из семи foreground классов строить горизонтальные линии по исходной palette label маске, с inward 1 logical px (3×3 erosion), каждые 2 строки, непрерывный run >=8 px, только width=2, center points (x0,y)..(x1-1,y), OpenCV LINE_8. При любом прогнозируемом попадании raster footprint в другой `labels!=color` пиксель — *REJECT candidate*; цвет берётся из точной палитры; canvas белый. Без contour correction для заполнения пропусков. Сверху отдельным слоем нарисовать исходные V7-style Canny contours (Gaussian3×3, Canny60/120, L2, RETR_LIST/CHAIN_APPROX_NONE, arc>=12, approxPolyDP epsilon 0.65, split<=128, path length>=12); **исследовательский тёмный цвет** линии — ближайший по яркости (минимальная RGB luminance `0.2126R+0.7152G+0.0722B`) пиксель оригинала в 3×3 окрестности каждой вершины; если локальная luminance>210, линия остаётся в естественном исходном цвете (т.е. не усилять все почти белые). Line thickness=1, LINE_AA. This is a **raster preview**, contour layer may overpaint palette classes and **must** report overlap, cannot imply safety.
+
+## Метрики и критерии
+
+Source identity fail-closed; сохранить все candidate accept/reject, path geometry/colors, preview/source/target PNG and hashes; stroke and synthetic vertices counts, no CHALK extrapolation. Separate palette fill coverage `count(foreground & predicted per-color fill)/count(foreground)`, per-color conflicts, raw contour-edge recall within1px and composite RGB MAE to quantized palette in foreground **diagnostic only**. Snapshot V7 line-only as frozen visual control; no after-result fitting constants or thresholds within V8; qualitative visual comparison labelled non-blind/no formal PASS. Visual recognizability *not established* unless independently judged on new held-out art, native Egret render and game E4/independent E5. Existing >=99% coverage and 3 logical px diagnostic boundary unchanged; no production or master changes.
+
+Unit fixtures: correct source hash, no stroke on class conflicts, stroke bounds/length, all output artifact hashes, verify edge/fill order. Native Egret/color quality must be checked separately. A poor preview is a preserved negative, not justification to modify this frozen protocol.
