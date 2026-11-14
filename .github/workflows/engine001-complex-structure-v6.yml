@@ -36,6 +36,34 @@ jobs:
       - name: Check pinned source and generate bounded exploratory diagnosis
         run: |
           python AutoDraw_Stage20/tests/run_engine001_complex_structure_v6.py --workspace . --output-dir "$RUNNER_TEMP/engine001-v6"
+      - name: Publish bounded source-structure metrics on Actions summary
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          data = json.loads((Path(os.environ["RUNNER_TEMP"]) / "engine001-v6" / "report.json").read_text(encoding="utf-8"))
+          m, roi = data["metrics"], data["roi"]
+          recall = m["source_edge_recall_within_1px"]
+          recall_text = "N/A (no source edges)" if recall is None else f"{recall:.6%}"
+          lines = [
+              "## ENGINE001_COMPLEX_STRUCTURE_V6 — exploratory only",
+              f"- Checkout SHA: \`{data['checkout_sha']}\`",
+              f"- Source SHA256: \`{data['source']['png_sha256']}\`",
+              f"- ROI (logical): {roi['width']}×{roi['height']} at {roi['paste_xy']}",
+              f"- Source edge pixels: {m['source_edge_pixels']}",
+              f"- Palette edge pixels: {m['palette_edge_pixels']}",
+              f"- Retained source edges within 1px: {m['source_edges_matched_within_1px']} ({recall_text})",
+              f"- Missing source edge pixels: {m['missing_source_edge_pixels']}",
+              f"- Connected source components >=12px: {m['eligible_source_components_ge12']}",
+              f"- Components retained >=50%: {m['components_retained_ge50pct']}",
+              f"- Components lost >=50%: {m['components_lost_ge50pct']}",
+              "- Human recognizability: **NOT_TESTED**",
+              "- Native V6 / exact CHALK / E4 / E5: **NOT_RUN**",
+              "- Interpretation: palette-edge diagnostics, not an image-quality PASS.",
+          ]
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as stream:
+              stream.write("\\n".join(lines) + "\\n")
+          PY
       - name: Upload original and quantized crops, diagnostic masks and report
         if: always()
         uses: actions/upload-artifact@v4
