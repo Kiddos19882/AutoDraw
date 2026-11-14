@@ -1,5 +1,8 @@
 # AutoDraw — текущее состояние
 
+**ENGINE-001 / reproducible V7 implementation added (2026-11-14):** prereg `2844a2f` before local outcome; after exploratory negative preview, a separate opt-in repository runner `tests/run_engine001_structure_first_v7.py` committed at `c9edc35` (reuses V5 `source_palette` with pinned SHA guard), five synthetic/integration regression fixtures `520b985`, and [standalone workflow](../../.github/workflows/engine001-structure-first-v7.yml) `9b868dd`. These are experimental only, **repository V7 tests/CI NOT_VERIFIED** and local prototype output should not be treated as a completed CI gate. Line-only visual FAIL remains the observed evidence; no production change.
+
+
 **ENGINE-001 / V7 structure-first pinned original local line-only preview (2026-11-14):** preregistered [V7](ENGINE001_STRUCTURE_FIRST_V7_PROTOCOL_2026-11-14.md) at `2844a2f` before V7 preview. Exact pinned original processed by isolated local prototype; 148 extracted edge contours, 84 accepted width2 paths, **2143 synthetic vertices**, path length8502.83 logical; preview edge match **4816/4869 = 98.9115%** within1px but preview **visually insufficient/faint**, not a recognizability PASS. Note 16642 pixels in preview strokes, 11898 not on exact 1px Canny edge; this is not a cross-color boundary leakage metric. Evidence ZIP SHA256 `20dce6d7f9…` preserved locally, see [TEST_RESULTS](TEST_RESULTS.md). Native, exact CHALK, blind review all NOT_RUN. Next: prereg a composite contour+fill path with controlled colors before any further appearance optimization. Production untouched.
 
 
