@@ -95,7 +95,12 @@ class ComplexStructureV6Tests(unittest.TestCase):
             self.assertEqual(result["status"],
                              "DIAGNOSTIC_COMPLETE_NOT_RECOGNITION_PASS")
             self.assertEqual(result["quality"]["v6_recognition"], "NOT_TESTED")
-            self.assertEqual(len(result["derived_png_sha256"]), 5)
+            self.assertEqual(len(result["derived_png_sha256"]), 6)
+            self.assertIn("edge-retention-overlay.png", result["derived_png_sha256"])
+            from PIL import Image
+            with Image.open(out / "edge-retention-overlay.png") as img:
+                self.assertEqual(img.size, (150, 240))
+                self.assertEqual(img.mode, "RGB")
             report = json.loads((out / "report.json").read_text(encoding="utf-8"))
             self.assertEqual(report["source"]["png_sha256"], SOURCE_SHA256)
             self.assertEqual(
