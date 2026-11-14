@@ -1,11 +1,16 @@
 """Synthetic E2 guards for preregistered ENGINE001_COMPLEX_STRUCTURE_V6."""
 import unittest
+import hashlib
+import json
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
 import numpy as np
 
 from run_engine001_complex_structure_v6 import (
     extract_edges, compare_edges, reconstruct_palette, roi_bounds, provenance_sha,
+    run, SOURCE_SHA256,
 )
 
 
@@ -73,6 +78,33 @@ class ComplexStructureV6Tests(unittest.TestCase):
                 provenance_sha()
         with patch.dict("os.environ", {"GITHUB_SHA": ""}):
             self.assertIsNone(provenance_sha())
+
+    def test_pinned_repository_image_end_to_end_artifacts(self):
+        # Regression of original-to-report provenance; this is not native art quality.
+        workspace = Path(__file__).resolve().parents[2]
+        png = workspace / "AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png"
+        self.assertTrue(png.is_file(), "Pinned source missing from checkout")
+        self.assertEqual(hashlib.sha256(png.read_bytes()).hexdigest(), SOURCE_SHA256)
+        with TemporaryDirectory() as td:
+            out = Path(td)
+            result = run(workspace, out)
+            self.assertEqual(result["source"]["original_size"], [200, 320])
+            self.assertEqual(result["roi"]["width"], 150)
+            self.assertEqual(result["roi"]["height"], 240)
+            self.assertEqual(result["roi"]["paste_xy"], [155, 0])
+            self.assertEqual(result["status"],
+                             "DIAGNOSTIC_COMPLETE_NOT_RECOGNITION_PASS")
+            self.assertEqual(result["quality"]["v6_recognition"], "NOT_TESTED")
+            self.assertEqual(len(result["derived_png_sha256"]), 5)
+            report = json.loads((out / "report.json").read_text(encoding="utf-8"))
+            self.assertEqual(report["source"]["png_sha256"], SOURCE_SHA256)
+            self.assertEqual(
+                report["metrics"]["missing_source_edge_pixels"],
+                report["metrics"]["source_edge_pixels"] -
+                report["metrics"]["source_edges_matched_within_1px"])
+            for name, digest in report["derived_png_sha256"].items():
+                self.assertEqual(hashlib.sha256((out / name).read_bytes()).hexdigest(),
+                                 digest)
 
     def test_canny_detects_sharp_boundary(self):
         rgb = np.full((64, 64, 3), 255, dtype=np.uint8)
