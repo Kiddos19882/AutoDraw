@@ -1,5 +1,7 @@
 # AutoDraw — дорожная карта будущих работ
 
+**ENGINE-001 / next following V6 pinned-image local E2 analysis:** Original repository PNG now obtainable in active workspace (200×320, full hash verified). V6 local reimplementation confirms 90.4087% Canny source-edge matching within1px in V5 8-color palette, with 467 missing original-edge pixels and 7/48 eligible components below half retention. This is evidence that palette alone does not erase all geometry, *not* quantitative decomposition of the 35% painted coverage failure. Next create separately preregistered, opt-in structure-aware path proposal (line continuity, color-aware boundaries and connected narrow regions) with limited geometric preview and native Egret, then new art held-out and blind human recognizability check; do not retrofit V5/V6 or change production.
+
 **ENGINE-001 V6 prerequisite (2026-11-14):** пользователь сообщил FAIL визуальной узнаваемости V3/V4/V5 независимо от численного coverage. На prereg `f6e7167` создан диагностический V6 для independent source-vs-eight-class-palette edge + connected-component retention, [protocol](ENGINE001_COMPLEX_STRUCTURE_V6_PROTOCOL_2026-11-14.md). Сначала получить ограниченный CI report/PNG/SHA и проверить, исчезают ли важные линии в palette **до** stroke planner; это не означает улучшение рисунка. Затем новая версия prereg для сохранения исходной структуры при составлении длинных цветобезопасных штрихов, с independently held-out art, native Egret и blind human recognizability gate. Текущие 3px/99% thresholds без изменений, E4/CHALK и E5 отдельно.
 
 
