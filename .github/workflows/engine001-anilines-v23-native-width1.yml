@@ -1,0 +1,73 @@
+name: ENGINE-001 V23 archived Egret width1 footprint
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-anilines-v23-native-width1.yml"
+      - "AutoDraw_Stage20/tests/game_renderer_reference.js"
+      - "AutoDraw_Stage20/tests/run_engine001_anilines_v23.py"
+      - "AutoDraw_Stage20/tests/test_engine001_anilines_v23.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  native-width1:
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install read-only analysis and browser dependencies
+        run: python -m pip install "selenium>=4,<5" "Pillow>=11,<13" "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "scikit-image>=0.25,<0.27"
+      - name: Verify renderer syntax and V23 synthetic source guards
+        shell: pwsh
+        run: |
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -m unittest discover -s AutoDraw_Stage20/tests -p "test_engine001_anilines_v23.py" -v
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Download frozen genuine V14/V18 and immutable V22 profiles
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/v14" "$RUNNER_TEMP/v18" "$RUNNER_TEMP/v22"
+          gh run download 43653371987 --repo Kiddos19882/AutoDraw -n engine001-v14-anilines-detail -D "$RUNNER_TEMP/v14"
+          gh run download 43677851946 --repo Kiddos19882/AutoDraw -n engine001-v18-anilines-junction-ab -D "$RUNNER_TEMP/v18"
+          gh run download 43683615871 --repo Kiddos19882/AutoDraw -n engine001-v22-palette-proxy-evidence -D "$RUNNER_TEMP/v22"
+          python - <<'PY'
+          import os,hashlib,zipfile,sys
+          from pathlib import Path
+          base=Path(os.environ["RUNNER_TEMP"])
+          if hashlib.sha256((base/"v14"/"line-output.png").read_bytes()).hexdigest()!="2d4220381e18a86400e4afa950caa064ada5fe1adc821c9a230239cb91848f3b":
+              raise ValueError("Wrong authentic V14 source")
+          with zipfile.ZipFile(base/"v18-bound.zip","w",compression=zipfile.ZIP_DEFLATED) as out:
+              for p in sorted((base/"v18").iterdir()):
+                  if p.is_file():out.write(p,p.name)
+          sys.path.insert(0,"AutoDraw_Stage20/tests")
+          from run_engine001_anilines_v19_audit import frozen_b
+          source,roi=frozen_b(base/"v18-bound.zip")
+          assert int(source.sum())>0 and roi.shape==(240,150,3)
+          print("Authentic V18 SHA-bound source and ROI validated")
+          PY
+      - name: Run 89 actual BoardPane width1 WebGL+Canvas2D comparisons
+        shell: pwsh
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_anilines_v23.py --workspace . --v22 "$env:RUNNER_TEMP/v22" --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png --anilines "$env:RUNNER_TEMP/v14/line-output.png" --output "$env:RUNNER_TEMP/engine001-v23"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -c 'import json,os,hashlib,pathlib;p=pathlib.Path(os.environ["RUNNER_TEMP"])/"engine001-v23";r=json.loads((p/"report.json").read_text());assert r["metrics"]["vertices"]["count"]==56 and r["metrics"]["links"]["count"]==33 and r["baseline_supported_source_pixels"]==5812 and not r["geometry_modified"];assert all(hashlib.sha256((p/n).read_bytes()).hexdigest()==h for n,h in r["artifacts_sha256"].items());print("V23 archived native renderer reproducibility PASS, NOT live E4")'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Preserve V23 native reports and three deterministic PNG samples
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-v23-native-width1-evidence
+          path: ${{ runner.temp }}/engine001-v23
+          if-no-files-found: warn
