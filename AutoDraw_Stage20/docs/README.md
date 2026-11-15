@@ -2,6 +2,8 @@
 
 **Рабочая ветка:** `feature/image-geometry-optimization`. **Актуальный evidence baseline ENGINE-001:** `177165361b0340515fe3bb74f4847ab3ec579ebc` (9/9 live E4, E5 PARTIAL; см. §21). Исторический baseline прежней системы документации — `a2d1f0a52d47`. Текущий remote HEAD проверять заново в каждом чате. Это вход в существующую систему документации, а не отдельный источник статуса. Полная предыдущая редакция индекса сохранена [здесь](README_HISTORY_THROUGH_2026-11-08.md).
 
+**Обязательное правило игровых кистей:** [GAME_BRUSH_FOOTPRINT_TEST_POLICY_2026-11-15.md](GAME_BRUSH_FOOTPRINT_TEST_POLICY_2026-11-15.md) — использовать реальный след BoardPane/Egret во всех brush-dependent тестах; модели не заменяют native quality.
+
 ## Начните с этих документов
 
 | Вопрос | Куда идти |
@@ -89,7 +91,7 @@
 - [`WORK_LOG_HISTORY_THROUGH_2026-11-08.md`](WORK_LOG_HISTORY_THROUGH_2026-11-08.md)
 - [`WORK_LOG.md`](WORK_LOG.md)
 
-### ENGINE-001 — дополнительные experimental source-bound protocols (21)
+### ENGINE-001 — дополнительные experimental source-bound protocols (22)
 
 Эти протоколы зарегистрированы для исследовательских сравнений на сложной картинке. Не являются production gate PASS; актуальный статус — в [PROJECT_STATUS](PROJECT_STATUS.md) и [TEST_RESULTS](TEST_RESULTS.md).
 
@@ -114,6 +116,7 @@
 - [`ENGINE001_VISUAL_ROI_PALETTE_V28_PROTOCOL_2026-11-15.md`](ENGINE001_VISUAL_ROI_PALETTE_V28_PROTOCOL_2026-11-15.md) — V28 предрегистрация сравнения цветных палитр: A canvas8, B ROI8, C ROI6, D ROI8 без почти белых штрихов.
 - [`ENGINE001_VISUAL_BUDGET_V29_PROTOCOL_2026-11-15.md`](ENGINE001_VISUAL_BUDGET_V29_PROTOCOL_2026-11-15.md) — V29: prereg сопоставления действующего resource-aware optimizer с цветным V28-D по узнаваемости и прогнозному лимиту 6000.
 - [`ENGINE001_VISUAL_ADAPTIVE_FILL_V30_PROTOCOL_2026-11-15.md`](ENGINE001_VISUAL_ADAPTIVE_FILL_V30_PROTOCOL_2026-11-15.md) — V30: независимые только модельные проверки existing interior-fill/outline-first с широкой кистью и сохранением деталей.
+- [`ENGINE001_NATIVE_GAME_BRUSH_V31_PROTOCOL_2026-11-15.md`](ENGINE001_NATIVE_GAME_BRUSH_V31_PROTOCOL_2026-11-15.md) — V31: native archived Egret BoardPane 5 ширин × 6 траекторий, сравнение с ideal capsule MODEL_ONLY.
 
 ### CHALK, FILL, INT — отчёты и протоколы (37)
 
