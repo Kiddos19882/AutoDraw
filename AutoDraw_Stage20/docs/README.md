@@ -89,7 +89,7 @@
 - [`WORK_LOG_HISTORY_THROUGH_2026-11-08.md`](WORK_LOG_HISTORY_THROUGH_2026-11-08.md)
 - [`WORK_LOG.md`](WORK_LOG.md)
 
-### ENGINE-001 — дополнительные experimental source-bound protocols (18)
+### ENGINE-001 — дополнительные experimental source-bound protocols (19)
 
 Эти протоколы зарегистрированы для исследовательских сравнений на сложной картинке. Не являются production gate PASS; актуальный статус — в [PROJECT_STATUS](PROJECT_STATUS.md) и [TEST_RESULTS](TEST_RESULTS.md).
 
@@ -111,6 +111,7 @@
 - [`ENGINE001_ANILINES_VISUAL_RECOGNIZABILITY_REVIEW_V25_2026-11-15.md`](ENGINE001_ANILINES_VISUAL_RECOGNIZABILITY_REVIEW_V25_2026-11-15.md) — ретроспективный визуальный обзор узнаваемости V14/V18/V20 на сложной картинке, без утверждений об итоговой цветной игре.
 - [`ENGINE001_VISUAL_COLOR_PLAN_V26_PROTOCOL_2026-11-15.md`](ENGINE001_VISUAL_COLOR_PLAN_V26_PROTOCOL_2026-11-15.md) — prereg сравнения существующих цветных Stage20-планов scanline/contour/skeleton на том же изображении.
 - [`ENGINE001_VISUAL_COLOR_DIAGNOSTIC_V27_PROTOCOL_2026-11-15.md`](ENGINE001_VISUAL_COLOR_DIAGNOSTIC_V27_PROTOCOL_2026-11-15.md) — V27 сохраняет ROI FAIL из V26 и строит все исходные цветные планы только для сравнения видимых деталей.
+- [`ENGINE001_VISUAL_ROI_PALETTE_V28_PROTOCOL_2026-11-15.md`](ENGINE001_VISUAL_ROI_PALETTE_V28_PROTOCOL_2026-11-15.md) — V28 предрегистрация сравнения цветных палитр: A canvas8, B ROI8, C ROI6, D ROI8 без почти белых штрихов.
 
 ### CHALK, FILL, INT — отчёты и протоколы (37)
 
