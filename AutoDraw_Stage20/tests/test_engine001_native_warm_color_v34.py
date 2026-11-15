@@ -3,7 +3,8 @@
 import unittest
 import numpy as np
 from PIL import Image
-from run_engine001_native_warm_color_v34 import median_map,warm_mask,mae,recolor_strokes
+from run_engine001_native_warm_color_v34 import median_map,warm_mask,mae,recolor_strokes,prepare_source,quantize_case,SOURCE_SHA,sha
+from pathlib import Path
 
 class V34ColorOnlyTests(unittest.TestCase):
     def test_lower_median_is_deterministic_and_original_unchanged(self):
@@ -20,6 +21,20 @@ class V34ColorOnlyTests(unittest.TestCase):
         self.assertEqual(colors[5],[255,255,255])
         self.assertTrue(np.array_equal(np.asarray(original),pixels))
         self.assertEqual(colors,median_map(original,idx,[4,5,6,7]))
+    def test_frozen_original_logical_roi_palette_and_medians(self):
+        source=Path(__file__).resolve().parents[1]/"testImages"/"wV6VeZI9S1Y.png"
+        self.assertEqual(sha(source),SOURCE_SHA)
+        roi,canvas=prepare_source(source)
+        labels,palette,skipped=quantize_case(roi,canvas,8,False,True)
+        self.assertEqual(labels.shape,(240,460))
+        self.assertEqual(skipped,[0,1,2,3])
+        self.assertTrue(np.all(labels[:,:155]==-1))
+        self.assertTrue(np.all(labels[:,305:]==-1))
+        self.assertEqual(median_map(roi,labels[:,155:305],[4,5,6,7]),
+            {4:[242,242,236],5:[220,189,172],6:[170,130,113],7:[79,57,63]})
+        with self.assertRaises(ValueError):
+            median_map(roi,labels,[4,5,6,7])
+
     def test_reject_empty_label(self):
         original=Image.new("RGB",(150,240),"white")
         labels=np.zeros((240,150),dtype=np.int16)
