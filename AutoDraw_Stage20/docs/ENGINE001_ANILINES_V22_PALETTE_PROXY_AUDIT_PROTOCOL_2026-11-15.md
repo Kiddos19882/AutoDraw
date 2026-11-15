@@ -1,0 +1,21 @@
+# ENGINE001_ANILINES_V22_PALETTE_PROXY_AUDIT — preregistered no-geometry diagnostic
+
+**ENGINE-001, 2026-11-15. Status PREREGISTERED / NOT_RUN, committed BEFORE V22 measurements.** Aim: explain why all 23 V20-rejected short chains (56 vertices and 33 links) fail the strict 3×3 same-owner palette proxy. No candidate paths, parameter selection, production or frozen baseline changes. V21 NO_GAIN is immutable.
+
+## Baseline and source pin
+
+Original `AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png` exact 97308 bytes SHA256 `07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a`, dimensions 200×320. Frozen V14 AniLines detail `line-output.png` SHA256 `2d4220381e18a86400e4afa950caa064ada5fe1adc821c9a230239cb91848f3b` from [CI43653371987](https://github.com/Kiddos19882/AutoDraw/actions/runs/43653371987). Frozen V18-B [CI43677851946](https://github.com/Kiddos19882/AutoDraw/actions/runs/43677851946), artifact14147096853, pinned mask/paths/ROI verified by existing `frozen_b` (V19). V20 [CI43682497864](https://github.com/Kiddos19882/AutoDraw/actions/runs/43682497864) baseline exactly 9 paths/20 vertices and 5812/5943 source skeleton within1px. V21 [CI43682841556](https://github.com/Kiddos19882/AutoDraw/actions/runs/43682841556) 23 ambiguous 2–9px simple-chain components, 56 vertices, 33 adjacent links, all rejected by unchanged V20 3×3 palette rule; NO_GAIN.
+
+## Hypotheses and fixed measurements
+
+H1: the whole 3×3 homogeneity test rejects candidate *contour* pixels frequently because quantized palette background/other classes touch a dark line, rather than because a real width1 game brush has proven cross-class leakage. H0: all rejected vertices center on background or out-of-ROI; stricter proxy remains provisionally justified. Both are descriptive, not proof of renderer safety.
+
+- Reuse unchanged V20 `palette_of`, `geometry_masks`, `owner_guard`, `components`, `chain_of_component`, `candidates` and V21 `split_chain`. Locate same 23 chains by frozen V19 missing mask with 8-connectivity; assert count, total vertices=56, links=33, and V20 controls. No output geometry accepted or painted.
+- For each source vertex, project logical point `(x*.75+155, y*.75)`; use existing OpenCV raster of a point (matching `geometry_masks([p,p])`). Analyze **all** raster pixels. Flags: outside ROI, center class == modal background label, distinct palette labels in center raster, within 3×3 and 5×5 center-based windows: any different label, any background. The class homogeneity of 1×1/3×3/5×5 is *diagnostic*: do not substitute it for V20 gate. Source RGB intensity grayscale<105 at original source point is a proxy only. Separate counts: background-center, nonbackground-center but 3×3 mixed, truly 3×3 uniform nonbackground, outside ROI; overlapping reasons explicitly.
+- For every adjacent pair of each original chain (33 links), similarly analyze **complete** OpenCV LINE_8 logical raster and classify center-background, mixed center classes, 3×3 neighborhood mixed and safe; cross-owner links must remain blocked.
+- Record aggregate and per-component counts, exact frozen control hashes, versions, SHA256 of generated report/PNG overlays. Create descriptive overlays showing rejected source vertices by category using original-resized 150×240 ROI and isolated palette index raster PNG. Max 23 components; outputs non-overwrite.
+- Checks: conservation of 56 vertices and 33 links, same baseline 5943/5792/5812, unchanged V20/21 rejected counts; synthetic center-background versus neighbor-cross-color, 1×1/3×3/5×5 ordering, out-of-ROI, deterministic examples and checksum guard. Failure must fail-closed. Do not infer a new acceptance threshold or simulate a native brush from OpenCV.
+
+## Outcome policy
+
+Only diagnostic E2/E3 PASS on reproducibility; V22 does **not** increase 5812/5943 coverage or alter V20/V21. A strong concentration of 3×3-mixed but center-nonbackground pixels can motivate a *new-ID* source-backed renderer-footprint study; it does not validate relaxing color safety, 3 logical px boundary, or >=99% fill gates. Exact game CHALK = post.pointCount-pre.pointCount only in run-bound game E4. Real native width1 footprint, per-color leakage and independent E5 remain NOT_RUN unless independently observed.
