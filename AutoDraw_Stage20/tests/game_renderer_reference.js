@@ -2484,6 +2484,105 @@
     };
   }
 
+  // ENGINE-001 V23 only: read-only synthetic native width1 diagnostic.
+  // Reuses actual BoardPane/CanvasRenderer/WebGLRenderer; no painting in game.
+  function renderV23Width1Footprints(fixtures, paletteRows) {
+    if (!Array.isArray(fixtures) || fixtures.length !== 89 ||
+        !Array.isArray(paletteRows) || paletteRows.length !== 240 ||
+        paletteRows.some(row => !Array.isArray(row) || row.length !== 150)) {
+      throw new Error("V23 requires exactly 89 pinned fixtures and 240x150 palette.");
+    }
+    const ids=new Set();
+    let vertexCount=0,linkCount=0;
+    for (const f of fixtures) {
+      if (!f || typeof f.id!=="string" || ids.has(f.id) ||
+          !["vertex","link"].includes(f.kind) ||
+          !Array.isArray(f.points) || f.points.length!==2 ||
+          f.points.some(p=>!p || !Number.isFinite(p.x) || !Number.isFinite(p.y) ||
+            p.x<155 || p.x>=305 || p.y<0 || p.y>=240)) {
+        throw new Error("V23 invalid fixture identity, type, or coordinates.");
+      }
+      ids.add(f.id);
+      if (f.kind==="vertex") {
+        vertexCount++;
+        if (f.points[0].x!==f.points[1].x || f.points[0].y!==f.points[1].y) {
+          throw new Error("V23 vertex must be zero-length.");
+        }
+      } else {
+        linkCount++;
+        const dx=Math.abs(f.points[0].x-f.points[1].x);
+        const dy=Math.abs(f.points[0].y-f.points[1].y);
+        if (dx>0.75000001 || dy>0.75000001 || (dx===0 && dy===0)) {
+          throw new Error("V23 link must be adjacent source pixels.");
+        }
+      }
+    }
+    if (vertexCount!==56 || linkCount!==33) {
+      throw new Error("V23 population mismatch.");
+    }
+    if (!window.egret || typeof getBoardPaneClass()!=="function") {
+      throw new Error("V23 archived Egret BoardPane unavailable.");
+    }
+    const state=initializeWebGL(null,RASTER_SCALE),mask=createBoardMask();
+    const images={},out=[];
+    for (const f of fixtures) {
+      const actual=makeActualBoardPane("normal",f.points,1);
+      const source=renderGraphicsNode(actual.shape.$renderNode,false);
+      const canvas2D=composeBoard(source,source.nodeBounds,mask);
+      const webgl=renderWebGLProbe("normal",f.points,1,canvas2D,state,actual.shape);
+      if (!webgl.sceneDiagnostics.stageAttached ||
+          webgl.sceneDiagnostics.boardRenderMode!==3 ||
+          webgl.canvas.width!==1380 || webgl.canvas.height!==720) {
+        throw new Error("V23 actual Egret Stage/BoardPane mismatch.");
+      }
+      const sx=Math.floor(f.points[0].x),sy=Math.floor(f.points[0].y);
+      const classIndex=paletteRows[sy][sx-155];
+      if (!Number.isInteger(classIndex) || classIndex<0 || classIndex>7) {
+        throw new Error("V23 missing seed palette class.");
+      }
+      const pixels=webgl.canvas.getContext("2d",{willReadFrequently:true}).getImageData(
+        0,0,1380,720).data;
+      const coverage={};
+      for (const threshold of [1,64,128,254]) {
+        coverage[threshold]={alphaPixels:0,foreignClassPixels:0,outsideRoiPixels:0};
+      }
+      for (let y=0;y<720;y++) {
+        for (let x=0;x<1380;x++) {
+          const alpha=pixels[(y*1380+x)*4+3];
+          if (!alpha)continue;
+          const lx=Math.floor(x/3),ly=Math.floor(y/3);
+          const outside=lx<155||lx>=305,other=!outside &&
+            paletteRows[ly][lx-155]!==classIndex;
+          for (const threshold of [1,64,128,254]) {
+            if (alpha>=threshold) {
+              const q=coverage[threshold];
+              q.alphaPixels++;
+              if (outside)q.outsideRoiPixels++;
+              else if (other)q.foreignClassPixels++;
+            }
+          }
+        }
+      }
+      const result={id:f.id,kind:f.kind,sourcePoints:f.sourcePoints||null,
+        firstPaletteClass:classIndex,
+        syntheticVerticesNotChalk:f.points.length,
+        coverage,canvas2dVsWebgl:webgl.comparison,
+        nativeDrawCalls:webgl.drawCalls,
+        sceneDiagnostics:webgl.sceneDiagnostics};
+      out.push(result);
+      const exemplar=f.kind==="vertex"?"vertex":
+        f.centerMixed?"link-mixed":"link-uniform";
+      if (!images[exemplar])images[exemplar]=webgl.canvas.toDataURL("image/png");
+    }
+    return {schema:"ENGINE001_V23_WIDTH1_NATIVE_OFFLINE",engineVersion:egret.Capabilities.engineVersion,
+      renderer:"actual BoardPane CanvasRenderer and WebGLRenderer",width:1,mode:"normal",
+      rasterScale:3,vertexCount,linkCount,
+      browser:navigator.userAgent,glInfo:state.glInfo,
+      cases:out,representativePngDataUrls:images,
+      exactGameChalk:null,gameQuality:null};
+  }
+
+  api.renderV23Width1Footprints = renderV23Width1Footprints;
   api.renderTwoIconMaskProbe = renderTwoIconMaskProbe;
   api.renderComplexHoldoutColorProbe = renderComplexHoldoutColorProbe;
   api.renderTwoIconAdaptiveBrushProbe = renderTwoIconAdaptiveBrushProbe;
