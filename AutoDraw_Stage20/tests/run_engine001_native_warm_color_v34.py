@@ -17,7 +17,7 @@ ROI=(155,0,305,240)
 def png_chunks(path):
     """Preserve exact IDAT bytes; ancillary metadata may be renderer-generated."""
     data=path.read_bytes()
-    if not data.startswith(b"\\x89PNG\\r\\n\\x1a\\n"):
+    if not data.startswith(b"\x89PNG\r\n\x1a\n"):
         raise ValueError("V34R invalid native PNG signature")
     offset=8; chunks=[]
     while offset<len(data):
