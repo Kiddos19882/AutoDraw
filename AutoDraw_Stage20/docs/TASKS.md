@@ -1,5 +1,8 @@
 # AutoDraw — действующие задачи
 
+- [ ] **ENGINE-001 / V37-P1 full-outline color-only A/B/C:** [пререгистрация](ENGINE001_FULL_OUTLINE_V37_P1_PROTOCOL_2026-11-15.md) до CI: all 410 user-selected V35-B dark contours kept after 1945-color fill, total2355 strokes/5682 synthetic vertices; A exact original V35-B, B source-RGB median per contour, C half-tint, no omitted lines. New native runner `tests/run_engine001_full_outline_native_v37.py`, unit test and Windows `.github/workflows/engine001-full-outline-native-v37.yml`. Check CI and real Egret PNG, preserve negative; no production/E4/exact CHALK claims.
+
+
 - [ ] **ENGINE-001 / V37 user visual reference V35-B full outline:** user selected **V35-B 410 contours after paint** as best line art (visual preference, not E5). Freeze V35-B native geometry/ordering as preferred reference, and test source-aware fill/color changes without silently replacing it with V35-C/V36 297-contour variants. Compare final native image, face/hand/hair recognition, source colors, cross-color spill, color coverage >=99%, <=3 logical px leakage, and resource quota separately; CHALK only in actual game E4. [V35 visual sign-off](ENGINE001_PAINT_THEN_DETAIL_V35_PROTOCOL_2026-11-15.md).
 
 
