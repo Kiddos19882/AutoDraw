@@ -13,3 +13,19 @@ For each mode: calculate **actual full 460×240 alpha pixel count outside ROI** 
 Compare visual recognizability qualitatively (figures, expressions, hair, hands, garment color blocks), and report forecast strokes/vertices and ROI RGB error as descriptive only. This is *one* difficult test image; no generalization or observer-validated PASS. Any ROI FAIL is a **hard production blocker**, even if aesthetically pleasing. Actual Stage6 game brush width/overpaint, E4 game CHALK and >=99% native fill quality remain NOT_RUN. GitHub Actions E3 SUCCESS means successful *diagnostic audit*, not color plan accepted.
 
 Next after visual inspection: choose the most promising plan for a **new-ID, restricted ROI-safe repair study**, if meaningful; otherwise preserve failure. No parameter/threshold changes retroactively to V26/V27.
+
+## Post-run derived evidence (append-only, 2026-11-15)
+
+[Focused V27 CI43687584670](https://github.com/Kiddos19882/AutoDraw/actions/runs/43687584670) **E3 SUCCESS** at SHA `0a59a0d97151e40884976efe90e80aa126bd5049`: source V14/V18/V20 pinned SHA, existing Stage20 plans validated, three actual plan JSONs and individual native offline PNGs, derived SHA consistency PASS. Artifact **14150963966** `engine001-v27-existing-color-plans-visual-evidence` size1059594 bytes; downloaded ZIP SHA256 `7d9c9899ad8839e8495f8de0e017f85e85ba8f85fa87f861601906b8006af394`, independent check of all reported internal file SHA PASS.
+
+| Mode | Actual planner strokes | Plan coordinate vertices | ROI alpha preview px (of 36000) | ROI RGB MAE (diagnostic only) | ROI gate |
+|---|---:|---:|---:|---:|---|
+| scanline | 11638 | 23276 | 36000 | 7.5691 | **PASS**: zero outside ROI |
+| contour | 4104 | 25120 | 18867 | 33.9877 | **FAIL**: 5 alpha px at logical x305,y90..95 |
+| skeleton | 5497 | 14819 | 15407 | 37.0031 | **FAIL**: 5 alpha px at logical x305,y90..95 |
+
+V27 workflow success denotes reproducible **diagnostic**; two actual output ROI gates FAIL and thus are not safe to run. The V26 stricter run [43687362812](https://github.com/Kiddos19882/AutoDraw/actions/runs/43687362812) remains **FAIL** and unchanged. V25 visual comparison (manual non-blind, one image) shows full-color scanline preserves two characters, their dark/light outfit distinction and most expressions much better than monochrome skeleton/outline previews; contour and skeleton color modes omit important filled shapes. This is not independent human recognition success and not native Egret output.
+
+**Critical resource blocker:** the *existing plan summary* for scanline calculates **25585 predicted unique game points** (426.4% of nominal 6000 limit, planning safe budget 5100), 11638 strokes and 11426 switches; this is an ESTIMATE, not run-bound exact CHALK. Hence scanline visual fidelity does NOT make it executable on one BoardItem2 board. The fixed V27 quantizer placed five of eight palette colors close to pure white: `#FFFFFF`, `#FFFFFD`, `#FDFFFC`, `#FDFDFB`, `#F9FCF7`; one peach class `#C9A28C` and darkest `#4F363B`. Orange and warm detail visually lose saturation. This is caused by quantizing all white 460×240 canvas rather than the 150×240 source ROI, a **hypothesis** until separated by new-ID test. No posthoc palette edits.
+
+**Decision:** retain raw AniLines contour extraction as candidate for selective facial/detail overlay, but direct V20 tiny-pixel recovery is not useful for major recognizability. Next prereg comparison of ROI-only palette quantization and near-white avoidance, with same pinned image/actual existing color scanline planner. Retain V27 positive recognizability impression as exploratory only, and retain both ROI FAILs and large resource forecast. No production promotion, E4 game quality/CHALK, independent E5, or coverage >=99% native validation.
