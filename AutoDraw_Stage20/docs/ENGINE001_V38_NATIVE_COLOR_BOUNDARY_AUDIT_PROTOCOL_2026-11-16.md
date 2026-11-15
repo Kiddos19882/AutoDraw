@@ -17,3 +17,17 @@ Original `AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png`, SHA256 `07cc4568cb5e90d9
 5. At this diagnostic phase original native RGB color candidate A/B/C may differ but identical mask geometry must be demonstrated. Existing game color coverage acceptance >=99% per required class, <=3 logical px exterior, exact `CHALK=post.pointCount-pre.pointCount`, and E4/E5 remain unchanged. CI PASS for audit means reproducible measurements, **not** quality PASS.
 
 **Decision:** only after audit, design independently preregistered resource-neutral boundary-placement V39 on frozen full V35-B contours and source mask, **not** simply adding paths that violate 5900 native cap or actual game CHALK. Keep all historical V35–V37 results and failures. For new brush-dependent hypotheses use actual BoardPane/Egret WebGL A/B; model-only candidate planning must be labeled E1/E2 and never counted as native quality.
+
+
+## After-run archived Egret alpha audit — 2026-11-16
+
+[CI43767506202](https://github.com/Kiddos19882/AutoDraw/actions/runs/43767506202) **SUCCESS (E3 audit execution only)**, SHA `e31d920e9b8cf40a9d1cac42c76f7a3ec1a56221`; archived input original Egret PNGs from V37-P2 verified by all report-linked hashes. New V38 evidence artifact **14182976831**, ZIP SHA256 `b3638a459fcdeeaac1cf2d2e3a58b7a08f211f7eec527221b6d5f85db6fd3208`, `audit.json`. A/B/C archived true native alpha exact across all composite+five isolate scenes.
+
+| α threshold | Class 4 recall | Class 5 recall | Class 6 recall | Class 7 recall | Fill-only source foreground recall / precision | missed foreground native px | outside >3 logical px |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 24 | 71.0778% | 77.8104% | 57.7122% | 94.7256% | 93.8684% / 87.9985% | 9127 | **0** |
+| 128 | 68.0485% | 75.7529% | 55.5366% | 93.9692% | 92.4938% / 88.8773% | 11173 | **0** |
+
+At **α24** each required class misses **zero** pixels with its quantized source-class distanceTransform>=3 native px (~1 logical), while class misses 4=10235, 5=9534, 6=8902, 7=2608 native px occur nearer boundaries. At **α128**, the corresponding deeper class misses are 19,21,8,49 native px (very small relative to class miss counts), demonstrating sensitivity to opacity threshold. There are hundreds of tiny disconnected missed target components per class (α24 809,643,507,157); these measurements indicate **thin local class allocation/edge registration** rather than large class interiors unpainted. This is a diagnostic about **MEDIANCUT source target classes**, not verified source RGB semantic gap nor direct proof any specific shift repairs it. Native alpha paint outside original board ROI = 0, >3logical px from quantized original figure=0 on this frozen image. Full 410 contour geometry and real game quota untouched.
+
+**Action:** independently prereg V39 native 0.25 / 0.5 logical y-shift of current paint segments toward own-class supporting source neighbors, **all410 V35-B dark contour paths immutable**; no extra points, source RGB or brush proxy. Require real Egret test and existing quality gates; do not reinterpret V38 audit `E3 SUCCESS` as per-color coverage quality PASS.
