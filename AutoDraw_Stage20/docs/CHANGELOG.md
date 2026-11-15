@@ -1,5 +1,8 @@
 # AutoDraw — значимые изменения
 
+**2026-11-15 — ENGINE-001 V17 isolated AniLines brush1 exploratory preview:** user removed independent annotation requirement as prerequisite to experimental planning; original V16 reviewer tool preserved. Registered new V17 before preview, generated 417 brush1 path candidates from frozen real V14 AniLines, 1499 synthetic vertices; preserved short-chain losses and non-native status. Added dedicated opt-in repository runner/tests/Actions, indexed protocol. No production, executor or master changes.
+
+
 **2026-11-15 — ENGINE-001 V16 reviewer readiness correction:** repaired incorrect V14 FDoG artifact SHA pin (actual `ab83ae44…`), added fail-closed regression; source-only offline HTML reviewer utility exports binary grayscale annotation masks and manifest checksums, bundled by V16 CI. [Run43671763378](https://github.com/Kiddos19882/AutoDraw/actions/runs/43671763378) E3 PASS on `8581f87` for readiness only; external human seam ground truth missing, production unchanged.
 
 
