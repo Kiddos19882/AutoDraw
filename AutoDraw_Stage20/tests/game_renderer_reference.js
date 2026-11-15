@@ -2486,7 +2486,7 @@
 
   // ENGINE-001 V35 pilot2 ONLY: paint width2 first, then V18-B detail width1.
   // Same real archived Egret BoardPane/WebGL renderer; V5 API remains unchanged.
-  function renderV35LayeredColorProbe(strokes, allowV36SourceColors=false) {
+  function renderV35LayeredColorProbe(strokes, allowV36SourceColors=false, allowV43WideBrush=false) {
     if (!Array.isArray(strokes) || strokes.length < 1 || strokes.length > 3000) {
       throw new Error("V35 requires 1..3000 bounded strokes.");
     }
@@ -2502,7 +2502,7 @@
       const isFill=/^icon-[0-9]+$/.test(stroke.strokeId);
       const isDetail=/^detail-v18-B-[0-9]+$/.test(stroke.strokeId);
       if ((!isFill && !isDetail) ||
-          (isFill && stroke.width!==2) ||
+          (isFill && !(allowV43WideBrush ? [2,4,6].includes(stroke.width) : stroke.width===2)) ||
           (isDetail && (stroke.width!==1 || (!allowV36SourceColors && stroke.colorRgb!==0x31262B)))) {
         throw new Error("V35 source-bound layer or native width mismatch.");
       }
@@ -2532,7 +2532,8 @@
       throw new Error("V35 native Egret Stage geometry mismatch.");
     }
     return {
-      schema:allowV36SourceColors ? "ENGINE001_SOURCE_COLOR_CONTOUR_V36" :
+      schema:allowV43WideBrush ? "ENGINE001_V43P2A_NATIVE_WIDE_INTERIOR" :
+        allowV36SourceColors ? "ENGINE001_SOURCE_COLOR_CONTOUR_V36" :
         "ENGINE001_PAINT_THEN_DETAIL_V35_NATIVE_PILOT_2",
       renderer:"real Egret 5.4.1 BoardPane/WebGLRenderer",
       mode:"normal",syntheticAcceptedVerticesNotChalk:count,
@@ -2548,6 +2549,12 @@
   // V36 isolated color-only variation; same actual BoardPane/Egret paths and widths.
   function renderV36SourceColoredContourProbe(strokes) {
     return renderV35LayeredColorProbe(strokes,true);
+  }
+
+  // ENGINE-001 V43-P2a opt-in only: actual BoardPane widths 2/4/6 on paint.
+  // Full user-selected V35-B dark width1 detail layer and order remain strict.
+  function renderV43WideInteriorProbe(strokes) {
+    return renderV35LayeredColorProbe(strokes,false,true);
   }
 
   // ENGINE-001 V23 only: read-only synthetic native width1 diagnostic.
@@ -2769,6 +2776,7 @@
   api.renderComplexHoldoutColorProbe = renderComplexHoldoutColorProbe;
   api.renderV35LayeredColorProbe = renderV35LayeredColorProbe;
   api.renderV36SourceColoredContourProbe = renderV36SourceColoredContourProbe;
+  api.renderV43WideInteriorProbe = renderV43WideInteriorProbe;
   api.renderTwoIconAdaptiveBrushProbe = renderTwoIconAdaptiveBrushProbe;
   api.renderContourFirstNativeStudy = renderContourFirstNativeStudy;
   api.renderContourTrimNativeStudy = renderContourTrimNativeStudy;
