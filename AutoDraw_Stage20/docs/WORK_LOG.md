@@ -1,5 +1,8 @@
 # AutoDraw — журнал выполненных действий
 
+**2026-11-15 / ENGINE-001 V37-P1 full user-selected outline started:** Refreshed branch HEAD `3788e474`, checked last20 commits and five active documentation entrypoints and Actions. Built separate prereg `ENGINE001_FULL_OUTLINE_V37_P1_PROTOCOL_2026-11-15.md` commit `1f23ada`, source-bound real Egret runner `run_engine001_full_outline_native_v37.py` commit `70e22bf`, contract tests `test_engine001_full_outline_v37.py` commit `6543cdc`, opt-in Windows native CI workflow commit `5b67a05`. Preserve 410 V35-B contours / 1945 fill paths and strict V35-B RGBA control replay; isolate only source-aware RGB change, do not confuse synthetic5682 with game CHALK. E3 result not yet verified; production/master unchanged.
+
+
 **2026-11-15 / ENGINE-001 user outline visual sign-off:** User reviewed genuine V35/V36 output and explicitly preferred **V35-B full 410-contour overlay** for outline appearance. Recorded in [V35 native protocol](ENGINE001_PAINT_THEN_DETAIL_V35_PROTOCOL_2026-11-15.md) without altering immutable native RGB/point metrics. Corrected next-step prioritization: V37 compare color/fill refinements with V35-B **geometry/line recognition preserved**, not assume V35-C or V36-B is best looking because of lower RGB error. Visual preference only, NOT E5, color gate PASS or CHALK.
 
 
