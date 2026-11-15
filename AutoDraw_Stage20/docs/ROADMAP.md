@@ -1,5 +1,7 @@
 # AutoDraw — дорожная карта будущих работ
 
+**ENGINE-001 / V39 native negative / V40 next (2026-11-16):** [CI43768005475](https://github.com/Kiddos19882/AutoDraw/actions/runs/43768005475) E3 SUCCESS execution, archive14183021860; fixed ±0.25/0.5 source-guided vertical paint row shifts on 959 existing strokes **worsen all four original-source class recalls and RGB MAE** while all410 V35-B dark contours unchanged, quota identical synthetic5682 and 3px exterior diagnostic remains0. Preserve V39 FAIL criteria, never promote. Next study allocation along existing scanlines or class-specific edge placement with actual Egret under same resource cap and prereg, not another blind vertical shift. Full >=99% per-color, E4/CHALK/E5 remain blocked. [V39](ENGINE001_BOUNDARY_SHIFT_V39_PROTOCOL_2026-11-16.md).
+
 **ENGINE-001 / V38→V39 boundary color placement (2026-11-16):** source-bound [V38 CI43767506202](https://github.com/Kiddos19882/AutoDraw/actions/runs/43767506202) E3 archival audit confirms most per-class misses tightly localized to MEDIANCUT source boundaries (α24 0 missed pixels at class interior distance>=3 native px; source silhouette93.8684%, color6 recall57.7122%). Next independently preregistered [V39](ENGINE001_BOUNDARY_SHIFT_V39_PROTOCOL_2026-11-16.md) subpixel source-driven y shifts 0.25/0.5 on original fill, frozen full410 V35-B dark outlines remain after paint, no additional strokes/synthetic vertices. Accept only actual Egret per-color nonregression and no visual/RGB loss; 99% quality and game CHALK remain blocked until proven.
 
 
