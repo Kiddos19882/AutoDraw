@@ -27,6 +27,8 @@
 
 **Актуальное FILL001/Egret исследование (2026-11-13):** [6 оригинальных игровых фигур ↔ native Egret Stage WebGL, IoU 0.991656–0.999448, причины ограничений](GAME_ENGINE_DRAWING_BOARD_ARCHITECTURE.md#23-fill001-series-001--native-egret-replay-шести-игровых-фигур-2026-11-13) · [CI 43431139220](https://github.com/Kiddos19882/AutoDraw/actions/runs/43431139220) PASS для offline renderer и 19 Node tests, 6 оригинальных игровых PNG; две из шести реконструкций только диагностические из-за pointDelta=2. Исторические FILL quality FAIL и QUOTA_LIMITED неизменны. Сначала читать актуальные PROJECT_STATUS/TASKS/TEST_RESULTS, затем §23.
 
+**ENGINE-001 V34 (preregistered, NOT_RUN):** [native warm-color fidelity on frozen V33 real Egret strokes](ENGINE001_NATIVE_WARM_COLOR_V34_PROTOCOL_2026-11-15.md) — сравнить исходные цвета V33 с deterministic source-RGB medians при идентичной геометрии 1945 strokes; native E3 обязателен, E4/CHALK отсутствуют.
+
 **Текущий V6 structural exploration:** [предрегистрация source-vs-V5 edge retention после визуального FAIL](ENGINE001_COMPLEX_STRUCTURE_V6_PROTOCOL_2026-11-14.md). Это диагностический анализ до stroke planner, а не новый renderer/recognition PASS.
 
 ## Основные исследовательские контуры
