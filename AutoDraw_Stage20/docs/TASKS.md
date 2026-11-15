@@ -1,5 +1,8 @@
 # AutoDraw — действующие задачи
 
+- [x] **ENGINE-001 / принято правило реальной игровой кисти (2026-11-15):** [GAME_BRUSH_FOOTPRINT_TEST_POLICY_2026-11-15.md](GAME_BRUSH_FOOTPRINT_TEST_POLICY_2026-11-15.md). Во всех новых brush-dependent тестах реальные BoardPane/Egret stroke width/caps/joins/masks/backing alpha обязательны для quality gate; rectangle/ideal-capsule MODEL_ONLY не считается game/native PASS. Исторический V30 не переписывается.
+- [ ] **ENGINE-001 / V31 game brush reference:** prereg нативную матрицу разных ширин/углов/стыков с исходным архивным BoardPane, сравнить с `brush_footprint_geometry` потенциальными/гарантированными масками, получить source-bound raw PNG/alpha и только после этого выбрать безопасный footprint для адаптивных заполнений. Не менять production, game E4/CHALK не заявлять.
+
 - [x] **ENGINE-001 / V30 conservative adaptive fill model-only E3:** [CI43689298730](https://github.com/Kiddos19882/AutoDraw/actions/runs/43689298730) SUCCESS SHA `9e350ef`, artifact14152215078. Existing interior-fill 6396 strokes, outline-first7892 vs V28-D6373; both model target coverage16539/16539, zero model color leakage, but NO stroke savings and **not executor-ready**. No real native brush or exact CHALK, E4/E5 NOT_RUN. Negative frozen.
 - [ ] **ENGINE-001 / next recognition-first optimization after V30:** prereg experimental *feature-aware color image* plan with clearly labeled human-recognizable facial/hand/hair silhouettes and saturated warm outfit regions; predefine lightweight baseline and resource model, preserve all V28D/V29/V30 negatives. Validate real output previews then native game E4 when safe. Avoid generic global row skipping and never claim modeled rectangular coverage is actual game quality.
 
