@@ -89,7 +89,7 @@
 - [`WORK_LOG_HISTORY_THROUGH_2026-11-08.md`](WORK_LOG_HISTORY_THROUGH_2026-11-08.md)
 - [`WORK_LOG.md`](WORK_LOG.md)
 
-### ENGINE-001 — дополнительные experimental source-bound protocols (14)
+### ENGINE-001 — дополнительные experimental source-bound protocols (15)
 
 Эти протоколы зарегистрированы для исследовательских сравнений на сложной картинке. Не являются production gate PASS; актуальный статус — в [PROJECT_STATUS](PROJECT_STATUS.md) и [TEST_RESULTS](TEST_RESULTS.md).
 
@@ -107,6 +107,7 @@
 - [`ENGINE001_ANILINES_V21_OWNER_SPLIT_PROTOCOL_2026-11-15.md`](ENGINE001_ANILINES_V21_OWNER_SPLIT_PROTOCOL_2026-11-15.md) — prereg цветобезопасного разделения V20-отклонённых коротких цепочек, без bridging и изменений production.
 - [`ENGINE001_ANILINES_V22_PALETTE_PROXY_AUDIT_PROTOCOL_2026-11-15.md`](ENGINE001_ANILINES_V22_PALETTE_PROXY_AUDIT_PROTOCOL_2026-11-15.md) — prereg диагностики 3×3 палитровых отбраковок, без восстановления линий и без изменения production.
 - [`ENGINE001_ANILINES_V23_NATIVE_WIDTH1_FOOTPRINT_PROTOCOL_2026-11-15.md`](ENGINE001_ANILINES_V23_NATIVE_WIDTH1_FOOTPRINT_PROTOCOL_2026-11-15.md) — prereg isolated archived Egret BoardPane width1/Canvas2D/WebGL footprint для 56 вершин и 33 соединений V22.
+- [`ENGINE001_ANILINES_V24_NATIVE_FOOTPRINT_PROVENANCE_PROTOCOL_2026-11-15.md`](ENGINE001_ANILINES_V24_NATIVE_FOOTPRINT_PROVENANCE_PROTOCOL_2026-11-15.md) — prereg нулевого BoardPane-контроля, поточечной альфы и цветового риска V23 без новых маршрутов.
 
 ### CHALK, FILL, INT — отчёты и протоколы (37)
 
