@@ -2486,7 +2486,7 @@
 
   // ENGINE-001 V23 only: read-only synthetic native width1 diagnostic.
   // Reuses actual BoardPane/CanvasRenderer/WebGLRenderer; no painting in game.
-  function renderV23Width1Footprints(fixtures, paletteRows) {
+  function renderV23Width1Footprints(fixtures, paletteRows, captureAlpha) {
     if (!Array.isArray(fixtures) || fixtures.length !== 89 ||
         !Array.isArray(paletteRows) || paletteRows.length !== 240 ||
         paletteRows.some(row => !Array.isArray(row) || row.length !== 150)) {
@@ -2543,6 +2543,7 @@
       const pixels=webgl.canvas.getContext("2d",{willReadFrequently:true}).getImageData(
         0,0,1380,720).data;
       const coverage={};
+      const alphaCoordinates=captureAlpha?[]:null;
       for (const threshold of [1,64,128,254]) {
         coverage[threshold]={alphaPixels:0,foreignClassPixels:0,outsideRoiPixels:0};
       }
@@ -2550,6 +2551,10 @@
         for (let x=0;x<1380;x++) {
           const alpha=pixels[(y*1380+x)*4+3];
           if (!alpha)continue;
+          if (captureAlpha) {
+            if (alphaCoordinates.length>=250)throw new Error("V24 alpha fixture quota exceeded");
+            alphaCoordinates.push([x,y,alpha]);
+          }
           const lx=Math.floor(x/3),ly=Math.floor(y/3);
           const outside=lx<155||lx>=305,other=!outside &&
             paletteRows[ly][lx-155]!==classIndex;
@@ -2569,6 +2574,7 @@
         coverage,canvas2dVsWebgl:webgl.comparison,
         nativeDrawCalls:webgl.drawCalls,
         sceneDiagnostics:webgl.sceneDiagnostics};
+      if (captureAlpha)result.alphaCoordinates=alphaCoordinates;
       out.push(result);
       const exemplar=f.kind==="vertex"?"vertex":
         f.centerMixed?"link-mixed":"link-uniform";
@@ -2582,7 +2588,34 @@
       exactGameChalk:null,gameQuality:null};
   }
 
+  // V24 no-paint negative control. This is an opt-in diagnostic and does not
+  // change the default V23 method or any real game input execution.
+  function renderV24NativeAlphaProvenance(fixtures, paletteRows) {
+    const native=renderV23Width1Footprints(fixtures,paletteRows,true);
+    const blank=makeActualBoardPane("normal",[],1);
+    const source=renderGraphicsNode(blank.shape.$renderNode,false);
+    const mask=createBoardMask();
+    const canvas2d=composeBoard(source,source.nodeBounds,mask);
+    const state=initializeWebGL(null,RASTER_SCALE);
+    const webgl=renderWebGLProbe("normal",[],1,canvas2d,state,blank.shape);
+    const image=webgl.canvas.getContext("2d",{willReadFrequently:true}).getImageData(
+      0,0,1380,720).data;
+    let nonTransparent=0;
+    for(let i=3;i<image.length;i+=4)if(image[i]>0)nonTransparent++;
+    if (!webgl.comparison.equal)throw new Error("V24 blank Canvas2D/WebGL mismatch");
+    return {schema:"ENGINE001_V24_NATIVE_ALPHA_PROVENANCE",
+      source:"archived actual Egret 5.4.1 BoardPane 3x",
+      blank:{nonTransparent,drawCalls:webgl.drawCalls,
+        graphicsNodeBounds:blank.shape.$renderNode?
+          {x:blank.shape.$renderNode.x,y:blank.shape.$renderNode.y,
+           width:blank.shape.$renderNode.width,height:blank.shape.$renderNode.height}:null,
+        canvas2dVsWebgl:webgl.comparison,
+        png:webgl.canvas.toDataURL("image/png")},
+      native};
+  }
+
   api.renderV23Width1Footprints = renderV23Width1Footprints;
+  api.renderV24NativeAlphaProvenance = renderV24NativeAlphaProvenance;
   api.renderTwoIconMaskProbe = renderTwoIconMaskProbe;
   api.renderComplexHoldoutColorProbe = renderComplexHoldoutColorProbe;
   api.renderTwoIconAdaptiveBrushProbe = renderTwoIconAdaptiveBrushProbe;
