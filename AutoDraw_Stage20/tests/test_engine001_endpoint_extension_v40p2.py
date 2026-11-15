@@ -12,10 +12,11 @@ def plan():
             "colorIndex":5,"points":[{"x":155.0,"y":5.0},
                                      {"x":155.25,"y":5.0}]}})
     for i in range(410):
+        count = 5 if i < 152 else 4  # 152*5+258*4=1792 actual frozen detail vertices
         p.append({"layer":"detail","stroke":{
             "strokeId":f"detail-v18-B-{i}","width":1,"colorRgb":0x31262B,
-            "colorIndex":100,"points":[{"x":155.0,"y":5.0},
-                                       {"x":156.0,"y":5.0}]}})
+            "colorIndex":100,
+            "points":[{"x":155.0+j*0.25,"y":5.0} for j in range(count)]}})
     return {"paint_strokes":1945,"detail_strokes":410,
             "synthetic_vertices_NOT_CHALK":5682,"strokes":p}
 
