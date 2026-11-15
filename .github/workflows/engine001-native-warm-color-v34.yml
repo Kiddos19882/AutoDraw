@@ -6,6 +6,7 @@ on:
     paths:
       - ".github/workflows/engine001-native-warm-color-v34.yml"
       - "AutoDraw_Stage20/tests/run_engine001_native_warm_color_v34.py"
+      - "AutoDraw_Stage20/tests/test_engine001_native_warm_color_v34.py"
   workflow_dispatch:
 
 permissions:
@@ -37,6 +38,7 @@ jobs:
           node --check AutoDraw_Stage20/tests/game_renderer_reference.js
           node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
           python -m py_compile AutoDraw_Stage20/tests/run_engine001_native_warm_color_v34.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_native_warm_color_v34.py -v
           python AutoDraw_Stage20/tests/run_engine001_native_warm_color_v34.py \
             --workspace . \
             --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
