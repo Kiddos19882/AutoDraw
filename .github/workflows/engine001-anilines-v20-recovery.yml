@@ -1,0 +1,77 @@
+name: ENGINE-001 V20 AniLines owner-guarded short recovery
+
+on:
+  push:
+    branches:
+      - feature/image-geometry-optimization
+    paths:
+      - ".github/workflows/engine001-anilines-v20-recovery.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_anilines_v20.py"
+      - "AutoDraw_Stage20/tests/test_engine001_anilines_v20.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  frozen-source-v20:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install research-only dependencies
+        run: |
+          python -m pip install "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scikit-image>=0.25,<0.27"
+      - name: Synthetic chain and owner fail-closed guards
+        run: python -m unittest discover -s AutoDraw_Stage20/tests -p "test_engine001_anilines_v20.py" -v
+      - name: Download genuine frozen V14/V18
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/frozen-v14" "$RUNNER_TEMP/frozen-v18"
+          gh run download 43653371987 --repo Kiddos19882/AutoDraw \
+            -n engine001-v14-anilines-detail -D "$RUNNER_TEMP/frozen-v14"
+          gh run download 43677851946 --repo Kiddos19882/AutoDraw \
+            -n engine001-v18-anilines-junction-ab -D "$RUNNER_TEMP/frozen-v18"
+          python - <<'PY'
+          import hashlib,os,zipfile
+          from pathlib import Path
+          base=Path(os.environ["RUNNER_TEMP"])
+          ani=base/"frozen-v14"/"line-output.png"
+          assert hashlib.sha256(ani.read_bytes()).hexdigest()=="2d4220381e18a86400e4afa950caa064ada5fe1adc821c9a230239cb91848f3b"
+          with zipfile.ZipFile(base/"v18-bound.zip","w",compression=zipfile.ZIP_DEFLATED) as z:
+              for src in sorted((base/"frozen-v18").iterdir()):
+                  if src.is_file():z.write(src,src.name)
+          PY
+      - name: Measure V20 against frozen V18-B
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_anilines_v20.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --anilines "$RUNNER_TEMP/frozen-v14/line-output.png" \
+            --v18-zip "$RUNNER_TEMP/v18-bound.zip" \
+            --output "$RUNNER_TEMP/engine001-v20"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          p=Path(os.environ["RUNNER_TEMP"])/"engine001-v20"
+          report=json.loads((p/"report.json").read_text())
+          m=report["metrics"]
+          assert m["source_skeleton"]==5943 and m["baseline_supported_1px"]==5792
+          assert m["missing_components"]==83 and m["final_supported_1px"]>=5792
+          assert m["foreign_source_beyond1px"]==m["new_owner_violations"]==0
+          assert sum(m["rejected"].values())+m["accepted_paths"]==83
+          assert all(hashlib.sha256((p/name).read_bytes()).hexdigest()==h
+                     for name,h in report["artifacts_sha256"].items())
+          print("V20 offline reproducibility PASS; geometry result:",report["geometry_result"])
+          PY
+      - name: Publish V20 bounded original diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-v20-owner-guarded-short-recovery
+          path: ${{ runner.temp }}/engine001-v20
+          if-no-files-found: warn
