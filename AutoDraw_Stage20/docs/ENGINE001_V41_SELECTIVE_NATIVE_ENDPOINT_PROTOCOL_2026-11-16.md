@@ -1,0 +1,27 @@
+# ENGINE-001 / V41 — source-owned edge-gap selective endpoint extension
+
+**2026-11-16. PRE-REGISTERED / NOT_RUN.** Existing task ENGINE-001/V41. The user prefers **all 410 dark V35-B contours after 1945 paint paths** and explicitly permits foreign-color overlap **up to 3 logical px**, not zero.
+
+## Frozen source, rationale and baseline
+
+Original `AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png` SHA256 `07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a`. Frozen V37-P2-C [CI43747149144](https://github.com/Kiddos19882/AutoDraw/actions/runs/43747149144) SHA `04e506a3bf41b5d197a19bb20e36e8f445d79dec`, artifact14175105717 ZIP SHA256 `a9d97229fada28875d718ba7c1c068464dfe8529fc1b313becb9a77e2ed50959`, valid original source/full A/B/C PNG checksums. 460×240 logical BoardPane, original source ROI150×240 at x155–304, backing3×1380×720. 1945 fill width2 paths followed by **410 immutable original dark V18-B width1 contours**, 2355 strokes,5682 accepted synthetic vertices **NOT game CHALK**. Source RGB MAE19.420333/warm27.904503, true native alpha24 silhouette recall93.868365%; per-original-source class4–7 coverage71.077766/77.810362/57.712223/94.725559%. At source alpha24, 38,479 foreign-class pixel-layer overlaps **all within3 logical px**, 0 excess, exterior >3px0 [V40 audit](ENGINE001_V40_INTERNAL_COLOR_TOLERANCE_AUDIT_PROTOCOL_2026-11-16.md).
+
+[V40-P2 CI43770948329](https://github.com/Kiddos19882/AutoDraw/actions/runs/43770948329) real Egret blanket ±0.25/±0.5 logical endpoint extension increases own class source coverage, but both **FAIL RGB nonregression**. V41 hypothesis: extending **only endpoints with uncovered source-owned pixels beyond the existing native brush edge**, rather than all endpoints, improves coverage with fewer wrong-color pixels and without degrading final source RGB. Negative evidence is admissible; **no adaptive posthoc retuning**.
+
+## Fixed A/B/C candidates and selector (frozen before any V41 native run)
+
+**A** = byte-identical frozen V37-P2-C plan, native composite must exactly match archived `C/V37P2-C-composite.png` decoded RGBA; otherwise BLOCKED.
+
+**B** = extend only eligible starts/ends outward by **0.25 logical pixel**. **C** = same eligibility procedure with proposed extension **0.5 logical pixel**. Eligibility uses ONLY frozen **V37-P2-C actual Egret per-class isolated alpha** and immutable source-label map, **never V40-P2 B/C or V41 output**:
+
+For each original width2 horizontal paint path, treat left endpoint with sign -1 and right with +1. At native logical `probe_x = endpoint.x + sign * (1.0 + extension)` and `probe_y = endpoint.y`, interpret **one logical pixel beyond the approximate nominal width2 edge** as a *candidate diagnostic lookup*, not as a brush-footprint approximation. Reject if probe leaves original ROI x155..304.75 or board y0..239; let source class be `source_labels[round(probe_y),round(probe_x)]`, using Python integer `round` and clamping only within legal ROI. Probe native Egret alpha at `[round(probe_y*3),round(probe_x*3)]`. **Select endpoint iff source pixel belongs to this path's source palette class AND frozen actual Egret alpha <24 at this probe.** A physical Egret α24 sample, not a simulated brush, establishes uncovered support. This filter may still miss many shape/AA cases or reduce RGB score: it is E1 proposal only.
+
+The selected endpoint x moves outward by **0.25** (B) or **0.5** (C), clamped to [155,304.75]. Other endpoints remain unchanged. No y, RGB, brush width, paths, IDs, point count, outline positions/colors or ordering changes. **All 410 contours are immutable and are drawn last.** If source input, source-label quantization, native isolated PNG, colors, resource counts or native accepted point count differs, fail-closed. Record every eligibility decision (strokeId, side, probe source class, observed frozen Egret alpha, delta), selected-endpoint count and changed-stroke count before rendering. The selector is **not** a claim of exact future Egret footprint.
+
+## Predeclared native gates and interpretation
+
+Run actual archived BoardPane/Egret WebGL renderer via existing `native_batch`, **not** PIL or rectangles. Archive A/B/C original six isolate/composite native PNG, source/generator config, side-by-side full and face crops, SHA256, per-class actual α24/128 target recall, union recall/precision, α24/128 foreign class overlap allowed ≤9 native px and **excess >9 px**, exterior >9px, native final full RGB MAE and warm source RGB MAE, alpha of unchanged user-selected dark lines, and synthetically accepted vertex counts.
+
+**Candidate PASS requires simultaneously**: A RGBA exact frozen replay; unchanged 2355 strokes/5682 synthetic vertices and dark410 contour pixels; α24 **all four original-source class recalls >= A**, at least one strictly greater; α24 silhouette recall>=A; internal excess >3logical px **zero** at both α24 and α128; exterior >3logical px no increase at both alpha thresholds; source full and warm native RGB MAE **not greater** than A; visual eyes/face/hair/hand detail not degraded on the same image crops (visual non-blind, separate from objective gates). Track all negative outcomes without threshold adjustment.
+
+Only E3 native-quality *experiment execution*, not production PASS. Original required >=99% per-class, real run-bound `CHALK=post.pointCount-pre.pointCount` E4, E5 independent validity and quota safety margin remain unchanged and unmeasured. No production, master, Stage6/Bridge/executor defaults change.
