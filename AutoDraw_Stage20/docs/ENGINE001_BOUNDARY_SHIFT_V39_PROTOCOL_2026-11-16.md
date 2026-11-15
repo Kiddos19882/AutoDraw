@@ -29,3 +29,20 @@ Measure at alpha thresholds24 and128 against **fixed MEDIANCUT source**: per-cla
 **Candidate boundary-placement diagnostic improvement** only if at alpha24 **all four correct-class recalls >= A**, at least one strictly >A, union foreground recall>=A, leakage>3 logical px not increased and no extra accepted points. Additional prerequisite for recommendation: source full RGB MAE and warm-region MAE cannot worsen vs A; source changed colors strictly forbidden. Visual review cannot lose recognizable eyes/hair/hands. Negative outcomes kept, no retuning of0.25/0.5 or support difference2 after seeing results.
 
 This is **E3 native experiment only**, not game E4/independent E5 or exact CHALK. Equal synthetic accepted vertices do not guarantee actual game quota/cost safety. Original production >=99% required per-color gate and <=3logical-px exterior remain fixed, no promotion without source quality and actual-game run-bound `CHALK=post.pointCount-pre.pointCount` plus independent validation.
+
+
+## Completed actual Egret native V39 — 2026-11-16 (negative result)
+
+[CI43768005475](https://github.com/Kiddos19882/AutoDraw/actions/runs/43768005475) completed **E3 SUCCESS (all mandatory job steps)** at commit `dcd28f3734da394a11b020a584726aa001eea790`. Artifact `14183021860`, ZIP SHA256 `cbf46e3972c8c8c91d7a1f23ec9cebc1739a3fab93129badf12e454bc1de2564`. Independently read real native Egret original PNG artifacts; **24/24** report-linked SHA256 matches, V37-P2-C A control actual native RGBA pixel exact, 410 dark detail strokes native alpha A/B/C pixel exact. All 2355 strokes, 5682 synthetic accepted vertices unchanged; 959/1945 paint routes moved in B/C by fixed shift sign (-1 on725, +1 on234; 986 unchanged), no new path, width, color, or game E4/CHALK.
+
+| Variant | Original-source full RGB MAE | Warm RGB MAE | Native alpha24 per-class recall 4/5/6/7 | α24 silhouette recall/precision |
+|---|---:|---:|---|---|
+| A original unchanged V37-P2 C | **19.42033** | **27.90450** | 71.078 / 77.810 / 57.712 / 94.726% | 93.8684 / 87.9985% |
+| B source-guided ±0.25 logical y | 19.44508 | 28.54888 | 70.792 / 77.466 / 57.627 / 94.683% | 93.5822 / 87.8060% |
+| C same support ±0.5 logical y | 19.62644 | 29.67402 | 68.292 / 74.510 / 55.356 / 93.453% | 90.7021 / 87.3518% |
+
+At α128 per-class recalls: A68.048/75.753/55.537/93.969%; B65.652/72.832/53.142/92.738%; C64.228/71.817/52.202/92.596%. All A/B/C have **zero** painted source-quantized foreground leakage more than 3 logical px outside. **Both B and C FAIL** every prereg class-recall/RGB nonregression requirement. No quality PASS; this is a scientific negative with CI execution PASS, not a CI FAIL. V39 candidate path placement rejected, freeze all raw PNG/report and avoid changing thresholds to manufacture improvement.
+
+**Interpretation limitations:** reference is quantized MEDIANCUT source mask, not final perceptual acceptance. A source-neighborhood y-direction does not necessarily align with true Egret painted pixel grid and can reduce alpha>=128 overlap substantially. Do not conclude that *all* geometry adjustments are harmful; only fixed ±0.25 and ±0.5 entire horizontal stroke y-shifts were tested, on this one frozen picture. Native budget still2355 strokes/5682 synthetic accepted vertices, **not exact game CHALK**. Full user-chosen 410 contour geometry remains intact. Real game E4/E5 and production >=99% each required color remain NOT_RUN/BLOCKED.
+
+**Next step (requires a new independent prereg):** audit resource-neutral **within-row** endpoint allocation or selective contour-adjacent paint footprint sizes using source-native alpha class overlap, while preserving full V35-B dark contour layer; avoid adding crude global shifts. Evaluate per-class correct-color recall AND perceptual fidelity on native Egret, not just surrogate geometry. Prefer reuse of existing planners and frozen harness; never silently change production defaults.
