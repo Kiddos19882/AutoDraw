@@ -1,5 +1,8 @@
 # AutoDraw — действующие задачи
 
+- [ ] **ENGINE-001 / V35 pilot2 native paint→details:** pilot1 [CI43742229570](https://github.com/Kiddos19882/AutoDraw/actions/runs/43742229570) FAIL before B/C render due to V5-only brush width2 and `icon-*` restrictions, archived artifact14173565050; user-approved two layers and existing V18-B thin width1 paths must not be coerced to width2. [Protocol addendum](ENGINE001_PAINT_THEN_DETAIL_V35_PROTOCOL_2026-11-15.md) new `V35_NATIVE_PILOT_2` frozen same candidates; separate JS native BoardPane width1 handler at `373be5a`, opt-in Python native method preserving old V5 default `4b8cf8b`, V35 pilot2 runner `37623c4` and CI workflow `a183b53`. [CI43742747278](https://github.com/Kiddos19882/AutoDraw/actions/runs/43742747278) RUNNING; verify full raw PNG, image differences, 99%/3px and resource before decisions. No production/live E4/exact CHALK.
+
+
 - [ ] **ENGINE-001 / V35 native A/B/C pilot (queued):** [V35 prereg and frozen native pilot addendum](ENGINE001_PAINT_THEN_DETAIL_V35_PROTOCOL_2026-11-15.md). Reuse V34R color strokes and archived V18-B contour JSON; A=1945/3890, B=2355/5682, C=2242/5269 strokes/synthetic vertices (NOT CHALK). Actual Egret WebGL Windows [V35 native CI43742229570](https://github.com/Kiddos19882/AutoDraw/actions/runs/43742229570) SHA `dd65be6e` queued when checked. Preserve real native PNG/composite/face crop; compare to source and never mark E4 or production PASS from offline native E3. Algorithm-only [CI43741790932](https://github.com/Kiddos19882/AutoDraw/actions/runs/43741790932) E3 SUCCESS at `d211796`, no brush quality claim.
 
 
