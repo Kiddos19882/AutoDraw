@@ -1,5 +1,8 @@
 # AutoDraw — журнал выполненных действий
 
+**2026-11-15 / ENGINE-001 user outline visual sign-off:** User reviewed genuine V35/V36 output and explicitly preferred **V35-B full 410-contour overlay** for outline appearance. Recorded in [V35 native protocol](ENGINE001_PAINT_THEN_DETAIL_V35_PROTOCOL_2026-11-15.md) without altering immutable native RGB/point metrics. Corrected next-step prioritization: V37 compare color/fill refinements with V35-B **geometry/line recognition preserved**, not assume V35-C or V36-B is best looking because of lower RGB error. Visual preference only, NOT E5, color gate PASS or CHALK.
+
+
 **2026-11-15 / ENGINE-001 V36 completed source-aware RGB contour experiment:** After V35 native source-visible but RGB-overdark regression, separately preregistered frozen V36 [protocol](ENGINE001_SOURCE_COLOR_CONTOUR_V36_PROTOCOL_2026-11-15.md) commit `12f1116`; added V36-only JS native color handler `fa36f96` preserving old V35 dark contract, strict native method allowlist `a7f663b`, source medians/half-tint runner `bdae49d`, source-test `bd5a2b4`, opt-in Windows CI `86f8d5d`, indexed README `8950e28`. [CI43743810164](https://github.com/Kiddos19882/AutoDraw/actions/runs/43743810164) E3 SUCCESS SHA `86f8d5d`, artifact14173870057 ZIP SHA `acf7743e…`, 24/24 hashes PASS. Measured native A old dark RGB18.5822/warm36.0898, B locally sampled RGB12.2778/warm28.1013, C half-tint14.4613/warm29.8469; true native pixel alpha exact, 2242 strokes/5269 synthetic vertices, unchanged source. B improves RGB most, C visibly stronger contours; detail prominence independent E5 UNKNOWN, no game E4/exact CHALK, >=99% class still not validated, production unchanged. Next V37 source color region restoration/visual fidelity, no posthoc threshold change.
 
 
