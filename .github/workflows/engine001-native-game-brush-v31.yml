@@ -28,7 +28,7 @@ jobs:
         run: |
           node --check AutoDraw_Stage20/tests/game_renderer_reference.js
           node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
-          python -m pytest AutoDraw_Stage20/source/preparation/tests/test_brush_footprint_geometry.py -q
+          PYTHONPATH=AutoDraw_Stage20/source/preparation python -m pytest AutoDraw_Stage20/source/preparation/tests/test_brush_footprint_geometry.py -q
       - name: Real archived Egret BoardPane game brush matrix, 30 cases plus blank
         run: |
           python AutoDraw_Stage20/tests/run_engine001_native_brush_v31.py \
