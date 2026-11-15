@@ -2486,7 +2486,7 @@
 
   // ENGINE-001 V35 pilot2 ONLY: paint width2 first, then V18-B detail width1.
   // Same real archived Egret BoardPane/WebGL renderer; V5 API remains unchanged.
-  function renderV35LayeredColorProbe(strokes) {
+  function renderV35LayeredColorProbe(strokes, allowV36SourceColors=false) {
     if (!Array.isArray(strokes) || strokes.length < 1 || strokes.length > 3000) {
       throw new Error("V35 requires 1..3000 bounded strokes.");
     }
@@ -2503,7 +2503,7 @@
       const isDetail=/^detail-v18-B-[0-9]+$/.test(stroke.strokeId);
       if ((!isFill && !isDetail) ||
           (isFill && stroke.width!==2) ||
-          (isDetail && (stroke.width!==1 || stroke.colorRgb!==0x31262B))) {
+          (isDetail && (stroke.width!==1 || (!allowV36SourceColors && stroke.colorRgb!==0x31262B)))) {
         throw new Error("V35 source-bound layer or native width mismatch.");
       }
       if (isDetail) detailStarted=true;
@@ -2532,7 +2532,8 @@
       throw new Error("V35 native Egret Stage geometry mismatch.");
     }
     return {
-      schema:"ENGINE001_PAINT_THEN_DETAIL_V35_NATIVE_PILOT_2",
+      schema:allowV36SourceColors ? "ENGINE001_SOURCE_COLOR_CONTOUR_V36" :
+        "ENGINE001_PAINT_THEN_DETAIL_V35_NATIVE_PILOT_2",
       renderer:"real Egret 5.4.1 BoardPane/WebGLRenderer",
       mode:"normal",syntheticAcceptedVerticesNotChalk:count,
       strokeCount:strokes.length,
@@ -2542,6 +2543,11 @@
       sceneDiagnostics:result.sceneDiagnostics,
       webglPngDataUrl:result.canvas.toDataURL("image/png")
     };
+  }
+
+  // V36 isolated color-only variation; same actual BoardPane/Egret paths and widths.
+  function renderV36SourceColoredContourProbe(strokes) {
+    return renderV35LayeredColorProbe(strokes,true);
   }
 
   // ENGINE-001 V23 only: read-only synthetic native width1 diagnostic.
@@ -2762,6 +2768,7 @@
   api.renderTwoIconMaskProbe = renderTwoIconMaskProbe;
   api.renderComplexHoldoutColorProbe = renderComplexHoldoutColorProbe;
   api.renderV35LayeredColorProbe = renderV35LayeredColorProbe;
+  api.renderV36SourceColoredContourProbe = renderV36SourceColoredContourProbe;
   api.renderTwoIconAdaptiveBrushProbe = renderTwoIconAdaptiveBrushProbe;
   api.renderContourFirstNativeStudy = renderContourFirstNativeStudy;
   api.renderContourTrimNativeStudy = renderContourTrimNativeStudy;
