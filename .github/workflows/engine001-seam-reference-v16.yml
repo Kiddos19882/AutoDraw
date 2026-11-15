@@ -7,6 +7,7 @@ on:
     paths:
       - ".github/workflows/engine001-seam-reference-v16.yml"
       - "AutoDraw_Stage20/tests/run_engine001_seam_reference_v16.py"
+      - "AutoDraw_Stage20/tests/engine001_seam_reference_v16_annotator.html"
       - "AutoDraw_Stage20/tests/test_engine001_seam_reference_v16.py"
       - "AutoDraw_Stage20/tests/run_engine001_line_extraction_v14_report.py"
       - "AutoDraw_Stage20/docs/ENGINE001_ANILINES_SEAM_REFERENCE_V16_PROTOCOL_2026-11-15.md"
