@@ -1,0 +1,57 @@
+name: ENGINE-001 V29 existing one-board budget visual review
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-visual-budget-v29.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_visual_budget_v29.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  budgeted-color:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install known preprocessing dependencies
+        run: python -m pip install "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scikit-image>=0.25,<0.27" "scipy>=1.13,<2"
+      - name: Download frozen actual V28-D scanline preview
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/v28"
+          gh run download 43687934758 --repo Kiddos19882/AutoDraw -n engine001-v28-roi-palette-visual-evidence -D "$RUNNER_TEMP/v28"
+      - name: Run unmodified existing Stage20 resource-aware optimizer
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_visual_budget_v29.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --frozen-v28 "$RUNNER_TEMP/v28/D-roi8-skipwhite.png" \
+            --output "$RUNNER_TEMP/engine001-v29"
+          python - <<'PY'
+          import os,json,hashlib
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-v29"
+          d=json.loads((root/"report.json").read_text())
+          assert d["original_D"]["strokes"]==6373
+          assert d["original_D"]["estimated_game_points"]==13258
+          assert d["budgeted"]["estimated_game_points"]<=6000
+          assert d["optimized_resource_report"]["game_point_target_met"]
+          assert all(hashlib.sha256((root/k).read_bytes()).hexdigest()==v
+                     for k,v in d["derived_sha256"].items())
+          print("V29 source-bound estimate E3 validation; NOT actual game CHALK")
+          PY
+      - name: Preserve all actual optimizer plans and visual comparisons
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-v29-budgeted-color-visual-evidence
+          path: ${{ runner.temp }}/engine001-v29
+          if-no-files-found: warn
