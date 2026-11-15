@@ -10,6 +10,17 @@ class V20Tests(unittest.TestCase):
         self.assertIsNone(chain_of_component([(10,10)]))
         self.assertIsNone(chain_of_component([(i,10) for i in range(10)]))
 
+    def test_two_and_eight_pixel_source_chains(self):
+        self.assertEqual(len(chain_of_component([(20,60),(21,60)])),2)
+        full=[(30+i,60) for i in range(8)]
+        self.assertEqual(chain_of_component(full),full)
+        self.assertIsNone(chain_of_component([(20,60),(21,60),(21,60)]))
+        self.assertIsNone(chain_of_component([(20,60),(22,60)]))
+
+    def test_wrong_palette_dimensions(self):
+        with self.assertRaises(ValueError):
+            owner_guard(np.zeros((240,460),bool),np.zeros((240,150),np.uint8),0)
+
     def test_branch_and_cycle(self):
         self.assertIsNone(chain_of_component([(10,10),(11,10),(10,11),(11,11)]))
         self.assertIsNone(chain_of_component([(10,10),(11,10),(12,10),(11,11)]))
