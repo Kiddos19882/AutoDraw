@@ -2614,7 +2614,90 @@
       native};
   }
 
+  // V31 opt-in: actual game Egret BoardPane/Graphics normal-mode brush-width
+  // raster. Never treat the ideal capsule or bounding rectangle as game pixels.
+  function renderV31NativeGameBrush(fixtures) {
+    const templates = {
+      dot:[[230,120],[230,120]],
+      horizontal:[[215,120],[245,120]],
+      diagonal:[[215,105],[245,135]],
+      elbow:[[215,110],[230,110],[230,135]],
+      curved:[[210,125],[220,115],[230,112],[240,118],[250,127]],
+      roi_edge:[[155,100],[170,100]]
+    };
+    const widths=[1,3,10,20,30];
+    if (!Array.isArray(fixtures)||fixtures.length!==30)
+      throw new Error("V31 requires exactly 30 frozen cases");
+    let caseIndex=0;
+    for(const name of Object.keys(templates)) {
+      for(const width of widths) {
+        const f=fixtures[caseIndex++];
+        if(!f||f.id!==name+"-w"+width||f.kind!==name||
+           f.lineWidth!==width||!Array.isArray(f.points)||
+           JSON.stringify(f.points)!==JSON.stringify(templates[name])) {
+          throw new Error("V31 frozen fixture mismatch "+name+" width "+width);
+        }
+      }
+    }
+    if (!window.egret||typeof getBoardPaneClass()!=="function")
+      throw new Error("V31 native Egret game BoardPane missing");
+    const state=initializeWebGL(null,RASTER_SCALE);
+    const mask=createBoardMask();
+    function nativeOne(f) {
+      const points=f.points.map(p=>({x:p[0],y:p[1]}));
+      const actual=makeActualBoardPane("normal",points,f.lineWidth,0x31a3d3);
+      const source=renderGraphicsNode(actual.shape.$renderNode,false);
+      const canvas2d=composeBoard(source,source.nodeBounds,mask);
+      const native=renderWebGLProbe("normal",points,f.lineWidth,canvas2d,state,actual.shape);
+      if (!native.sceneDiagnostics.stageAttached||
+          native.sceneDiagnostics.boardRenderMode!==3||
+          native.canvas.width!==1380||native.canvas.height!==720)
+        throw new Error("V31 native Stage/mask/backing mismatch");
+      const data=native.canvas.getContext("2d",{willReadFrequently:true})
+                         .getImageData(0,0,1380,720).data;
+      const thresholds={1:new Set(),128:new Set()};
+      let backingAlpha1=0,backingAlpha128=0;
+      for(let y=0;y<720;y++)for(let x=0;x<1380;x++) {
+        const alpha=data[(y*1380+x)*4+3];
+        if(!alpha)continue;
+        const coord=Math.floor(y/3)*460+Math.floor(x/3);
+        thresholds[1].add(coord);backingAlpha1++;
+        if(alpha>=128) {thresholds[128].add(coord);backingAlpha128++;}
+      }
+      for(const t of [1,128])if(thresholds[t].size>12000)
+        throw new Error("V31 native logical pixel quota exceeded");
+      const toPairs=t=>Array.from(thresholds[t]).sort((a,b)=>a-b)
+        .map(i=>[i%460,Math.floor(i/460)]);
+      return {id:f.id,kind:f.kind,lineWidth:f.lineWidth,points:f.points,
+        logicalAlpha1:toPairs(1),logicalAlpha128:toPairs(128),
+        backingAlpha1,backingAlpha128,drawCalls:native.drawCalls,
+        canvas2dVsWebgl:native.comparison,
+        boardRenderMode:native.sceneDiagnostics.boardRenderMode,
+        nativeTextureParameters:native.textureParameters,
+        png:native.canvas.toDataURL("image/png")};
+    }
+    const blank=nativeOne({id:"blank",kind:"blank",lineWidth:1,points:[]});
+    if(blank.backingAlpha1!==0||blank.logicalAlpha1.length!==0||
+       !blank.canvas2dVsWebgl.equal)
+      throw new Error("V31 native blank control not transparent");
+    const out=[],examples={};
+    for(const f of fixtures) {
+      const item=nativeOne(f);
+      if(["dot-w1","diagonal-w20","elbow-w30","roi_edge-w30"].includes(f.id))
+        examples[f.id]=item.png;
+      delete item.png;
+      out.push(item);
+    }
+    return {schema:"ENGINE001_V31_ACTUAL_EGRET_BRUSH",source:"actual BoardPane redraw native Egret 5.4.1",
+      rasterScale:RASTER_SCALE,board:{width:460,height:240},engineVersion:egret.engineVersion,
+      glInfo:state.glInfo,
+      blank:{backingAlpha1:blank.backingAlpha1,logicalAlpha1:blank.logicalAlpha1,
+             canvas2dVsWebgl:blank.canvas2dVsWebgl},
+      cases:out,representativePngDataUrls:examples};
+  }
+
   api.renderV23Width1Footprints = renderV23Width1Footprints;
+  api.renderV31NativeGameBrush = renderV31NativeGameBrush;
   api.renderV24NativeAlphaProvenance = renderV24NativeAlphaProvenance;
   api.renderTwoIconMaskProbe = renderTwoIconMaskProbe;
   api.renderComplexHoldoutColorProbe = renderComplexHoldoutColorProbe;
