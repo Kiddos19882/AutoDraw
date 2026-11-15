@@ -1,0 +1,25 @@
+# ENGINE-001 / V37-P1 — исходные цвета линий при полной обводке V35-B
+
+**Дата:** 2026-11-15. **Статус:** PREREGISTERED / NOT_RUN, до первого native V37-P1 CI. **Задача:** ENGINE-001. **Решение пользователя:** «v35b лучше всего получилась обводка». Это предпочитаемая визуальная геометрия, НЕ автоматический RGB- или production-PASS.
+
+## Цель и границы
+
+Первый, изолированный подэтап V37 проверяет, можно ли сократить цветовой ущерб от **полной обводки V35-B**, не удаляя ни один из предпочитаемых пользователем 410 штрихов. **Меняется только RGB контурных линий; цветовая заливка и её геометрия не изменяются.** Восстановление недостающих насыщенных оранжевых/жёлтых областей остаётся следующим отдельным экспериментом V37-P2 и не смешивается с этим A/B/C.
+
+Baseline — [V35 pilot2 CI43742747278](https://github.com/Kiddos19882/AutoDraw/actions/runs/43742747278), SHA `a183b53e366a2f6e50867bf3124f9420c58928e0`, immutable artifact `14173635779`, ZIP SHA256 `350892e45a1941072e0dc3b590d348ea817d0ee8f7daf004915e683a3368f170`, 23/23 report-linked hashes verified in source archive. Frozen exact source PNG SHA256 `07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a`, original200×320, logical board460×240, ROI x155..304 / y0..239, native1380×720 / scale3. V35-B: **1945 width2 fill then 410 width1 V18-B detail**, 2355 strokes, 5682 synthetic accepted vertices (**NOT** game CHALK). Source RGB MAE20.21118519 / warm source HSV MAE37.89431998. Original V34R fill-only source RGB MAE14.08882407/warm31.21305725 is secondary context, not substitution for full-outline A. V36 source-median algorithm on *297* selected contours is a proof-of-concept only; V37-P1 transfers the predetermined RGB transformation to **all 410** and tests anew, never assumes its result.
+
+## Predeclared candidates, single variable
+
+- **A: exact V35-B** all 410 dark [49,38,43] contours over untouched V34R fill. Frozen original B native PNG `B/V35-B-composite.png` must match current control **RGBA pixel-for-pixel**, and `IHDR` / `IDAT` exactly as in existing V34R/V36 comparator; ancillary PNG metadata allowed to differ and reported. If control differs: BLOCKED.
+- **B: per-stroke source RGB.** For all 410 original V18-B contours use existing deterministic `run_engine001_source_color_contour_native_v36.medians_for_path`: 150×240 original LANCZOS ROI at logical x155..304/y0..239; sample each accepted vertex using Python round+clamp, select **lower per-channel median**; one packed RGB per contour.
+- **C: midpoint contour RGB.** Same per-stroke source median as B, with each RGB channel `(dark + original_median + 1)//2` (half-up). No posthoc tuning coefficient.
+
+A/B/C retain identical 1945+410 strokes, 5682 accepted synthetic vertices, geometry, stroke IDs, width (2 fill, 1 detail), layer order, original palette fill RGB and 447 frozen V33 quarter-pixel endpoint shims. **Never** replace user-selected 410 contours with V35-C/V36 297 contour subset. Existing V36 `renderV36SourceColoredContourProbe` invokes actual archived BoardPane/Egret WebGL. Controls must reject if source, per-route count/IDs/points, SHA or native A replay differ; native A/B/C composite and detail alpha must match *all pixels*. Source sampling is for color proposals only and not a proxy brush footprint.
+
+## Evidence, metrics, criteria
+
+Save raw native PNG of all isolated classes and composite, full/facial crop comparison against **original actual source**, proposed RGB by contour with IDs, unchanged plan JSON, source/artifact hashes and report. At alpha>=24 and >=128 report native composite silhouette, source ROI foreign-color overlap, and exterior leakage >3 logical px from source foreground. Record source RGB MAE full 150×240 and warm HSV (H5..55°,S>=0.30,V>=0.20), total used line RGBs/color switches, line detail visibility (eyes/face, hair, fingers, garment boundaries), and synthetic counts. Compare B/C to V35-B A; separate cost and visual results.
+
+Color candidate passes *diagnostic* only when both original-source full RGB MAE and warm-region MAE **strictly lower** than A, alpha unchanged and no geometry/resource increase. **Visual decision**: independent of RGB alone, compare same-scale face/hand/hair crops to user's V35-B outline; if faint lines lose preferred features, label **VISUAL_REGRESSION** even if MAE improves. No numeric metric can overrule the user preference for full 410 contour topology. Full acceptance still requires >=99% each required color, <=3 logical px exterior, bound game CHALK (`post.pointCount-pre.pointCount`) with quota safety and E4/E5 when applicable. No adaptation of thresholds to results, no Stage6, executor, Bridge, Monitor, production or master modifications.
+
+**Decision after V37-P1:** only if B/C preserves preferred full native line geometry and passes explicit visual review should V37-P2 tackle additional source color-region fill; if both wash out contrast, next separately prereg variant with edge-aware dark-color preservation, not covert tuning of this run.
