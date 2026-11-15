@@ -14,7 +14,8 @@ from PIL import Image
 
 from run_engine001_seam_reference_v16 import (
     ROI, ROI_SHAPE, SOURCE_SHA, evaluate_mask, prepare_source_only,
-    read_mask, read_review, validate_annotation,
+    read_mask, read_review, read_v14_candidate, EXPECTED_OUTPUT_SHA,
+    validate_annotation,
 )
 
 
@@ -110,6 +111,23 @@ class SeamReferenceV16Tests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             with self.assertRaises(ValueError):
                 read_review(Path(td))
+
+    def test_v14_pinned_output_sha_rejects_wrong_bytes(self):
+        self.assertEqual(
+            EXPECTED_OUTPUT_SHA["anilines"],
+            "2d4220381e18a86400e4afa950caa064ada5fe1adc821c9a230239cb91848f3b",
+        )
+        self.assertEqual(
+            EXPECTED_OUTPUT_SHA["fdog"],
+            "ab83ae4410f8ec5be90019030a57d3f391f1c62398a61f867cde4abba71d32ec",
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp) / "line-output.png"
+            Image.fromarray(np.full((320, 200), 255, dtype=np.uint8)).save(output)
+            with self.assertRaises(ValueError):
+                read_v14_candidate(output, "fdog")
+            with self.assertRaises(ValueError):
+                read_v14_candidate(output, "anilines")
 
     def test_prepare_source_only_pack_is_not_annotation(self):
         source = Path(__file__).resolve().parents[1]/"testImages"/"wV6VeZI9S1Y.png"
