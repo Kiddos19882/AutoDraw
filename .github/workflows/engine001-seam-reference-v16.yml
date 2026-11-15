@@ -29,6 +29,19 @@ jobs:
         run: python -m pip install "numpy<2" "opencv-python-headless<5" "Pillow<12"
       - name: Execute V16 synthetic annotation and metric guards
         run: python -m unittest discover -s AutoDraw_Stage20/tests -p "test_engine001_seam_reference_v16.py" -v
+      - name: Check offline annotation browser JavaScript syntax
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re, os
+          html = Path("AutoDraw_Stage20/tests/engine001_seam_reference_v16_annotator.html").read_text(encoding="utf-8")
+          found = re.search(r"<script>(.*?)</script>", html, re.DOTALL)
+          if not found:
+              raise RuntimeError("No source-only annotation script found")
+          dest = Path(os.environ["RUNNER_TEMP"]) / "v16-annotator-check.js"
+          dest.write_text(found.group(1), encoding="utf-8")
+          PY
+          node --check "$RUNNER_TEMP/v16-annotator-check.js"
       - name: Prepare input-only independent annotation pack
         run: |
           python AutoDraw_Stage20/tests/run_engine001_seam_reference_v16.py \
