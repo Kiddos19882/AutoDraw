@@ -1,5 +1,9 @@
 # AutoDraw — действующие задачи
 
+- [x] **ENGINE-001 / V35 native paint-first then detail-last A/B/C pilot completed E3:** [CI43742747278](https://github.com/Kiddos19882/AutoDraw/actions/runs/43742747278) SUCCESS SHA `a183b53e`, artifact14173635779 23/23 SHA PASS. A source RGB MAE14.0888, B20.2112, C18.5822; B/C markedly better visual faces/hair/hands, but **RGB_FIDELITY_REGRESSION**; 1945/2355/2242 strokes, synthetic vertices3890/5682/5269 NOT CHALK. Native pixel source-silhouette recall A93.868/B95.455/C95.114%, 3px exterior diagnostic PASS; per-color 99% remains unproven. No production acceptance. Original pilot1 FAIL preserved. [Protocol/results](ENGINE001_PAINT_THEN_DETAIL_V35_PROTOCOL_2026-11-15.md).
+- [ ] **ENGINE-001 / next V36 color-faithful selective top contour:** prereg source-aware contour color/important-feature selection on frozen V35 pilot2; compare actual native A/B/C and minimize warm-region overpaint while retaining faces/hair/hand recognizability; do not relax RGB non-regression/per-color 99%, 3px or game run-bound CHALK, and no production before E4/E5.
+
+
 - [ ] **ENGINE-001 / V35 pilot2 native paint→details:** pilot1 [CI43742229570](https://github.com/Kiddos19882/AutoDraw/actions/runs/43742229570) FAIL before B/C render due to V5-only brush width2 and `icon-*` restrictions, archived artifact14173565050; user-approved two layers and existing V18-B thin width1 paths must not be coerced to width2. [Protocol addendum](ENGINE001_PAINT_THEN_DETAIL_V35_PROTOCOL_2026-11-15.md) new `V35_NATIVE_PILOT_2` frozen same candidates; separate JS native BoardPane width1 handler at `373be5a`, opt-in Python native method preserving old V5 default `4b8cf8b`, V35 pilot2 runner `37623c4` and CI workflow `a183b53`. [CI43742747278](https://github.com/Kiddos19882/AutoDraw/actions/runs/43742747278) RUNNING; verify full raw PNG, image differences, 99%/3px and resource before decisions. No production/live E4/exact CHALK.
 
 
