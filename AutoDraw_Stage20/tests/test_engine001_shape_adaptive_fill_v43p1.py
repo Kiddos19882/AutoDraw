@@ -26,7 +26,9 @@ class V43SourceShapeTests(unittest.TestCase):
         row = analyze_component(mask, 6, 3)
         self.assertEqual(row["role"], "thin_shape_candidate")
         self.assertTrue(row["oriented_sweep_candidate"])
-        self.assertGreaterEqual(row["anisotropy_ratio"], 2)
+        # A perfectly straight line has a zero minor eigenvalue: ratio is +Inf
+        # internally and JSON-safe None in this report, not a finite float.
+        self.assertIsNone(row["anisotropy_ratio"])
         self.assertGreater(row["skeleton_pixels_or_status"], 0)
 
     def test_small_component_not_oriented(self):
