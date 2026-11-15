@@ -1,5 +1,8 @@
 # AutoDraw — действующие задачи
 
+- [x] **ENGINE-001 / V22 palette-proxy rejection audit:** [E3 CI43683615871](https://github.com/Kiddos19882/AutoDraw/actions/runs/43683615871) SUCCESS on `637fa899`, artifact14149696969 with independent SHA verification. All 56 source vertices in 23 V21-rejected components are 1x1 homogeneous non-background but all 56 fail 3x3 mixed-neighbor gate; 33 link rasters: 24 center-uniform, 9 center-mixed, all 33 mixed 3x3. Diagnostic ONLY; unchanged V20 skeleton 5812/5943, zero new strokes, NO CHALK.
+- [ ] **ENGINE-001 / after V22:** reuse existing Egret CanvasRenderer reference/harness to analyze actual width1 brush footprint and per-color boundary when available; separate prereg new experiment and preserve 3 logical px / >=99% coverage gates. Do not promote 1x1 owner criterion to drawing acceptance from quantized preview statistics.
+
 - [x] **ENGINE-001 / V21 owner split E3 investigation NO_GAIN:** [CI 43682841556](https://github.com/Kiddos19882/AutoDraw/actions/runs/43682841556) SUCCESS SHA `8aaafd9`, artifact 14149690523; 23 V20-ambiguous source components, 56 unsafe vertices, 33 unsafe connecting edges, 0 safe subpaths. V20 supported 5812/5943 remains unchanged; no production, native, CHALK or E5 acceptance.
 - [ ] **ENGINE-001 / next gate after V21:** preregister independent source-bound audit of palette-class suitability to dark contour owner and/or native Egret width1 footprint (without assuming same-owner 3x3 risk proxy equals game leakage). Preserve 23 V21 negative components, frozen V18/V20 and existing 3 logical px boundary and >=99% fill gates.
 
