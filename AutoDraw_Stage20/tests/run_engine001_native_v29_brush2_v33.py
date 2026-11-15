@@ -104,7 +104,7 @@ def main():
                 "native_target_recall":c["coverage"],
                 "painted_native_pixels":int(np.count_nonzero(painted)),
                 "foreign_palette_pixel_count":int(np.count_nonzero(painted&(targets>=0)&(targets!=color))),
-                "outside_artwork_roi_pixels":int(np.count_nonzero(painted[:,:155]))+
+                "outside_artwork_roi_pixels":int(np.count_nonzero(painted[:,:155*3]))+
                                              int(np.count_nonzero(painted[:,305*3:])),
                 "inside_3_logical_halo":halo["all_leakage_in_3logical_halo"],
                 "target_diagnostic":c}
