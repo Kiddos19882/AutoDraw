@@ -1,0 +1,64 @@
+name: ENGINE-001 V37 P1 native full 410 outline RGB
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-full-outline-native-v37.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_full_outline_native_v37.py"
+      - "AutoDraw_Stage20/tests/test_engine001_full_outline_v37.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  full-outline-real-egret:
+    runs-on: windows-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install existing native BoardPane dependencies
+        run: python -m pip install "selenium>=4,<5" "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scikit-image>=0.25,<0.27" "scipy>=1.13,<2"
+      - name: Recover frozen V35-B full contour archived Egret run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/v35"
+          gh run download 43742747278 --repo Kiddos19882/AutoDraw -n engine001-v35-pilot2-native-paint-then-detail-evidence -D "$RUNNER_TEMP/v35"
+      - name: Test and render native full contour A B C
+        shell: bash
+        run: |
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_full_outline_v37.py -v
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_full_outline_native_v37.py
+          python AutoDraw_Stage20/tests/run_engine001_full_outline_native_v37.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --v35-archive "$RUNNER_TEMP/v35" \
+            --output "$RUNNER_TEMP/engine001-v37-p1"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-v37-p1"
+          report=json.loads((root/"report.json").read_text(encoding="utf-8"))
+          assert report["experiment"]=="ENGINE001_FULL_OUTLINE_V37_P1"
+          assert report["control_V35B_RGBA_exact"]
+          assert report["native_alpha_exact_all_variants"]
+          assert all(report["metrics"][c]["detail_strokes"]==410 for c in "ABC") if all("detail_strokes" in report["metrics"][c] for c in "ABC") else all(report["metrics"][c]["total_strokes"]==2355 for c in "ABC")
+          assert all(hashlib.sha256((root/p).read_bytes()).hexdigest()==v for p,v in report["artifact_sha256"].items())
+          print("native full outline experiment captured; exact game CHALK NOT RUN")
+          PY
+      - name: Preserve original Egret pixels and failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-v37p1-native-full-contours-evidence
+          path: ${{ runner.temp }}/engine001-v37-p1
+          if-no-files-found: warn
