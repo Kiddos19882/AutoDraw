@@ -1,5 +1,8 @@
 # AutoDraw — дорожная карта будущих работ
 
+**ENGINE-001 / V37-P1 native user-preferred 410-line preservation (2026-11-15):** [CI43745869245](https://github.com/Kiddos19882/AutoDraw/actions/runs/43745869245) E3 PASS, full V35-B 410 contour geometry, original A RGB MAE20.2112/warm37.8943, source RGB B11.9760/warm27.0636, midpoint C14.8606/warm29.7231, all actual Egret alpha identical, 2355 strokes/5682 synthetic vertices NOT CHALK. User's V35-B preferred dark outlines remain *visual reference*, B best RGB but softer face/hair, C retains more line contrast visually. No native per-color99% acceptance, no E4/CHALK/E5. Next separately prereg V37-P2 *paint color-region restoration* preserving original 410 contour topology with resource-bound native Egret experiments before game tests. [Protocol/results](ENGINE001_FULL_OUTLINE_V37_P1_PROTOCOL_2026-11-15.md).
+
+
 **ENGINE-001 / V36 native source-colored contours (2026-11-15):** [CI43743810164](https://github.com/Kiddos19882/AutoDraw/actions/runs/43743810164) E3 PASS, 24/24 hashes artifact14173870057, real Egret BoardPane paint->details. Original V35-C dark A source RGB MAE18.5822/warm36.0898; per-path locally original sampled RGB B12.2778/warm28.1013; half tint C14.4613/warm29.8469, native all alpha identical. B restores warm-color fidelity best, C retains stronger dark line readability in visual audit, but **no objective recognizability validation and per-color >=99% unmet**. Next V37 separately prereg target-region-aware color fill restoration (orange/gold), only then adapt salient detail and game cost, preserve E3 PNG evidence; no E4/CHALK/E5 or production.
 
 
