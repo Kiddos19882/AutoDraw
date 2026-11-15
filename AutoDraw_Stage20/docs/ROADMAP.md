@@ -1,5 +1,8 @@
 # AutoDraw — дорожная карта будущих работ
 
+**ENGINE-001 / AniLines next stage after V14 real E3 PASS (2026-11-15):** CI [43653371987](https://github.com/Kiddos19882/AutoDraw/actions/runs/43653371987) authentic FDoG/AniLines Detail `SUCCESS` on SHA `df362426`. AniLines recovers more dark-jacket line candidates but still has uncertain false positives; subsequent local cleanup was **posthoc exploratory**, used line cutoff<180 against V14 cutoff<128 and an approximate dark-suit RGB proxy, so its lower candidate count cannot establish improved line quality. Before V15-style path preparation register a NEW ID and blind/independent annotated seam and nonseam sample with fixed mask/threshold selection; compare original AniLines vs filtered by grounded semantic precision/recall and continuity while preserving true suit folds. Then separately plan opt-in brush1 paths and evaluate source color ownership, native Egret, game exact CHALK and E5. No promotion on Canny recall or lower pixel counts alone.
+
+
 **ENGINE-001 / V14 authentic line extractors before next geometry:** [V14 protocol](ENGINE001_FDOG_ANILINES_V14_PROTOCOL_2026-11-15.md) and opt-in CI independent CPU jobs for real upstream FDoG and AniLines Detail have been committed. Obtain source-bound outputs and inspect jacket internal seam recovery and false positives, preferably with annotated ground truth before a V15 planner. Do not equate CNN pixels or Canny overlap to recognizability or native painting; retain V3–V13 negatives and >=99%, 3logical px quality diagnostics. Actual external weight download availability and Actions run still UNKNOWN, so require verified execution evidence.
 
 
