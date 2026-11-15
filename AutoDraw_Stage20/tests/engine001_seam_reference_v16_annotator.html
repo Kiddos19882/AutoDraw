@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ENGINE-001 V16 — независимая разметка швов</title>
+<style>
+body{font:15px/1.5 system-ui,sans-serif;background:#f8f9fc;color:#182236;max-width:950px;margin:20px auto;padding:0 14px}
+h1{font-size:23px}fieldset{border:1px solid #aab4c5;border-radius:8px;margin:12px 0;padding:12px}
+button,select,input{font:inherit;padding:8px;margin:4px;border:1px solid #9ca8b8;border-radius:5px}
+button{cursor:pointer;background:white}button:focus-visible{outline:3px solid #326ee1}
+#scene{width:300px;height:567px;position:relative;border:2px solid #536680;touch-action:none;user-select:none}
+#source,#overlay{position:absolute;inset:0;width:300px;height:567px;image-rendering:pixelated}
+#overlay{touch-action:none;cursor:crosshair}#status{white-space:pre-line}
+small{color:#43536b}.warning{color:#9a1926}
+</style>
+</head>
+<body>
+<h1>V16 — независимая разметка швов</h1>
+<p>Этот автономный инструмент показывает <strong>только оригинал</strong>, без предсказаний AniLines/FDoG.
+Разметку должен выполнить проверяющий, который ранее не видел вывод моделей.
+Это часть исследовательского протокола, <strong>не оценка качества автоматически</strong>.</p>
+<fieldset><legend>Режим</legend>
+<label><input type="radio" name="tool" value="positive" checked>Настоящий шов / складка (центральная линия 1 px, бирюзовый)</label>
+<label><input type="radio" name="tool" value="negative">Заведомо НЕ шов пиджака (область кистью 5 px, красный)</label>
+<label><input type="radio" name="tool" value="erase">Ластик — выбранный слой</label>
+<label>Ластик для <select id="eraselayer"><option value="positive">швов</option><option value="negative">не-швов</option></select></label>
+<button id="clear" type="button">Очистить обе маски</button>
+</fieldset>
+<div id="scene" aria-label="Исходный рисунок с размеченными поверх линиями">
+  <img id="source" src="reviewer_source_only.png" alt="100 на 189 пикселей: оригинал, без результатов модели">
+  <canvas id="overlay" width="100" height="189"></canvas>
+</div>
+<p><small>Координаты — в исходном фрагменте 100×189, не в увеличенном отображении.
+Размечайте только уверенные швы/складки. Непонятные пиксели оставляйте пустыми.
+Не покрывайте отрицательной маской положительные линии и их ближайшее окружение 1 px.</small></p>
+<fieldset><legend>Сведения независимого проверяющего</legend>
+<label>Идентификатор проверки <input id="annotation" placeholder="например, seams-review-01" autocomplete="off"></label>
+<label>Идентификатор проверяющего <input id="reviewer" placeholder="нейтральный псевдоним" autocomplete="off"></label>
+<label>Версия <input id="version" value="1" autocomplete="off" style="width:60px"></label>
+<p><label><input type="checkbox" id="blind"> Подтверждаю: я разметил(а) только оригинал, не видя результатов AniLines и FDoG</label></p>
+<button type="button" id="download">Проверить и скачать 3 файла</button>
+<p id="status" role="status"></p>
+</fieldset>
+<p>Будут созданы: <code>seams_positive.png</code> (grayscale PNG 100×189, строго 0/255),
+<code>definite_nonseam.png</code> (тот же формат) и <code>annotation.json</code> с SHA-256 и подтверждением слепой разметки.
+Все три файла следует сохранить вместе и передать владельцу проекта. Не публикуйте имя или другую личную информацию проверяющего.</p>
+<script>
+"use strict";
+const W=100,H=189,ROI=[100,62,200,251];
+const SOURCE_SHA="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a";
+const pos=new Uint8Array(W*H),neg=new Uint8Array(W*H);
+const c=document.getElementById("overlay"),ctx=c.getContext("2d",{willReadFrequently:true});
+const status=document.getElementById("status");
+const mode=()=>document.querySelector('input[name="tool"]:checked').value;
+let dragging=false,last=null;
+function paint(x,y){
+ const m=mode(),key=(m==="erase"?document.getElementById("eraselayer").value:m);
+ const layer=key==="positive"?pos:neg;
+ const r=(key==="negative"&&m!=="erase")?2:0;
+ for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){
+  if(dx*dx+dy*dy>r*r)continue;
+  const px=x+dx,py=y+dy;if(px<0||py<0||px>=W||py>=H)continue;
+  layer[py*W+px]=(m==="erase")?0:255;
+ }
+}
+function line(a,b){
+ const steps=Math.max(Math.abs(b[0]-a[0]),Math.abs(b[1]-a[1]));
+ for(let k=0;k<=steps;k++){const x=Math.round(a[0]+(b[0]-a[0])*k/Math.max(1,steps));const y=Math.round(a[1]+(b[1]-a[1])*k/Math.max(1,steps));paint(x,y)}
+}
+function xy(e){
+ const r=c.getBoundingClientRect();return [Math.max(0,Math.min(W-1,Math.floor((e.clientX-r.left)*W/r.width))),
+ Math.max(0,Math.min(H-1,Math.floor((e.clientY-r.top)*H/r.height)))];
+}
+function redraw(){
+ const data=ctx.createImageData(W,H);
+ for(let i=0;i<pos.length;i++){
+  const k=i*4,p=pos[i],n=neg[i];
+  if(p){data.data[k]=0;data.data[k+1]=210;data.data[k+2]=196;data.data[k+3]=225}
+  if(n){data.data[k]=245;data.data[k+1]=49;data.data[k+2]=72;data.data[k+3]=180}
+  if(p&&n){data.data[k]=240;data.data[k+1]=30;data.data[k+2]=240;data.data[k+3]=255}
+ }
+ ctx.putImageData(data,0,0);
+}
+c.addEventListener("pointerdown",e=>{dragging=true;last=xy(e);paint(...last);c.setPointerCapture(e.pointerId);redraw();e.preventDefault()});
+c.addEventListener("pointermove",e=>{if(!dragging)return;const next=xy(e);line(last,next);last=next;redraw();e.preventDefault()});
+c.addEventListener("pointerup",()=>{dragging=false;last=null});
+c.addEventListener("pointercancel",()=>{dragging=false;last=null});
+document.getElementById("clear").onclick=()=>{if(confirm("Удалить обе маски?")){pos.fill(0);neg.fill(0);redraw()}};
+// Encode real PNG grayscale (color-type 0, 8-bit). No dependencies or browser image re-encoding.
+function u32(n){return new Uint8Array([(n>>>24)&255,(n>>>16)&255,(n>>>8)&255,n&255])}
+function concat(parts){const n=parts.reduce((sum,a)=>sum+a.length,0),out=new Uint8Array(n);let o=0;for(const p of parts){out.set(p,o);o+=p.length}return out}
+function crc32(data){let c=0xffffffff;for(const b of data){c^=b;for(let j=0;j<8;j++)c=(c>>>1)^(c&1?0xedb88320:0)}return(c^0xffffffff)>>>0}
+function chunk(name,data){const type=new TextEncoder().encode(name),payload=concat([type,data]);return concat([u32(data.length),payload,u32(crc32(payload))])}
+function zlibStore(bytes){
+ let a=1,b=0;for(const x of bytes){a=(a+x)%65521;b=(b+a)%65521}
+ const blocks=[new Uint8Array([0x78,0x01])];let offset=0;
+ while(offset<bytes.length){
+  const size=Math.min(65535,bytes.length-offset),final=offset+size===bytes.length;
+  blocks.push(new Uint8Array([final?1:0,size&255,(size>>>8)&255,(~size)&255,((~size)>>>8)&255]));
+  blocks.push(bytes.subarray(offset,offset+size));offset+=size;
+ }
+ blocks.push(u32(((b<<16)|a)>>>0));return concat(blocks);
+}
+function maskPNG(mask){
+ const raw=new Uint8Array(H*(W+1));for(let y=0;y<H;y++)raw.set(mask.subarray(y*W,(y+1)*W),y*(W+1)+1);
+ const hdr=concat([u32(W),u32(H),new Uint8Array([8,0,0,0,0])]);
+ return concat([new Uint8Array([137,80,78,71,13,10,26,10]),chunk("IHDR",hdr),chunk("IDAT",zlibStore(raw)),chunk("IEND",new Uint8Array(0))]);
+}
+function download(name,bytes,type){const blob=new Blob([bytes],{type}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000)}
+async function sha256(bytes){
+ if(!crypto.subtle||!crypto.subtle.digest)throw new Error("Для SHA-256 требуется поддержка Web Crypto в браузере");
+ return [...new Uint8Array(await crypto.subtle.digest("SHA-256",bytes))].map(x=>x.toString(16).padStart(2,"0")).join("");
+}
+function dilatedPositiveConflict(){
+ for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(neg[y*W+x]){
+  for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){
+   const px=x+dx,py=y+dy;
+   if(px>=0&&px<W&&py>=0&&py<H&&pos[py*W+px])return true;
+  }
+ }
+ return false;
+}
+document.getElementById("download").onclick=async()=>{
+ try{
+  const annotation_id=document.getElementById("annotation").value.trim(),
+        reviewer_id=document.getElementById("reviewer").value.trim(),
+        annotation_version=document.getElementById("version").value.trim();
+  if(!annotation_id||!reviewer_id||!annotation_version)throw new Error("Заполните ID разметки, проверяющего и версию");
+  if(!document.getElementById("blind").checked)throw new Error("Без честного подтверждения слепого просмотра эта разметка не является независимой");
+  if(!pos.some(x=>x)||!neg.some(x=>x))throw new Error("Нужны непустые маски подтверждённых швов и заведомо не-швов");
+  if(dilatedPositiveConflict())throw new Error("Есть пересечение отрицательной маски с швом или его окрестностью 1 px");
+  const positive=maskPNG(pos),negative=maskPNG(neg);
+  const manifest={
+   annotation_id,reviewer_id,annotation_version,reviewed_at:new Date().toISOString(),
+   blind_to_model_outputs:true,source_sha256:SOURCE_SHA,roi:ROI,
+   positive_sha256:await sha256(positive),negative_sha256:await sha256(negative),
+   annotation_status:"HUMAN_SOURCE_ONLY_SUBMITTED_UNVERIFIED"
+  };
+  download("seams_positive.png",positive,"image/png");
+  download("definite_nonseam.png",negative,"image/png");
+  download("annotation.json",new TextEncoder().encode(JSON.stringify(manifest,null,2)+"\n"),"application/json");
+  status.textContent="Созданы 3 файла. Сохраните их вместе. Итоговый V16 scorer проверит SHA, формат и пересечения; это не подтверждённый quality PASS.";
+ }catch(err){status.textContent="Ошибка: "+err.message;status.classList.add("warning")}
+};
+</script>
+</body></html>
