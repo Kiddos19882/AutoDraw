@@ -1,5 +1,8 @@
 # AutoDraw — значимые изменения
 
+**2026-11-15 — ENGINE-001 AniLines evidence clarification (documentation only):** indexed post-V14 local filtering as unregistered exploratory analysis, clarified threshold mismatch (V14<128, local<180), missing seam truth and non-semantic suit proxy. Updated canonical status/task/roadmap/log/test-index without changing any experiment algorithm, production files or `master`. V14 authentic FDoG/AniLines CPU jobs remain verified E3 PASS on SHA `df362426`; cleanup and artwork quality still NOT_ACCEPTED.
+
+
 **2026-11-15 — ENGINE-001 V14 experimental CI (production unchanged):** prereg original-image pinned authentic FDoG vs AniLines Detail CPU jobs, fixed upstream repository SHAs, source/hash validation and bounded jacket ROI PNG/JSON evidence; isolated Python reporter and regression tests. Weights auto-fetched from publisher Google Drive to ephemeral runner only. No evidence of completed V14 workflow yet; no native game CHALK or semantic recognition claim.
 
 
