@@ -1,0 +1,29 @@
+name: ENGINE-001 V35 paint-then-detail experimental plan unit tests
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - "AutoDraw_Stage20/tests/engine001_paint_then_detail_v35.py"
+      - "AutoDraw_Stage20/tests/test_engine001_paint_then_detail_v35.py"
+      - ".github/workflows/engine001-paint-then-detail-v35.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  layered-plan-model-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Check experimental V35 plan and regression tests
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/engine001_paint_then_detail_v35.py AutoDraw_Stage20/tests/test_engine001_paint_then_detail_v35.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_paint_then_detail_v35.py -v
+      - name: Report scope
+        run: echo "E2/E3 algorithm-only checks. No native Egret quality, live E4 or exact CHALK certified."
