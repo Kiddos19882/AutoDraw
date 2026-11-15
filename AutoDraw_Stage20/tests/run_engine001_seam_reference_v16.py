@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import shutil
 from pathlib import Path
 
 import cv2
@@ -169,6 +170,12 @@ def prepare_source_only(source: Path, output_dir: Path) -> None:
         "negative_sha256": None,
         "annotation_status": "BLOCKED_NOT_ANNOTATED",
     }
+    # Offline reviewer receives a source-only browser UI; no model prediction
+    # and no implicit or fabricated positive/negative annotation is included.
+    annotator = Path(__file__).with_name("engine001_seam_reference_v16_annotator.html")
+    if not annotator.is_file():
+        raise ValueError("Source-only annotation UI missing; refuse incomplete pack")
+    shutil.copyfile(annotator, output_dir / "annotate_source_only.html")
     (output_dir / "annotation.template.json").write_text(
         json.dumps(template, indent=2) + "\n", encoding="utf-8"
     )
