@@ -1,5 +1,7 @@
 # AutoDraw — действующие задачи
 
+- [ ] **ENGINE-001 / V34 source-RGB color-only native A/B (RUN NOT VERIFIED):** [preregistered protocol](ENGINE001_NATIVE_WARM_COLOR_V34_PROTOCOL_2026-11-15.md), opt-in runner `tests/run_engine001_native_warm_color_v34.py`, Windows workflow `engine001-native-warm-color-v34.yml`. Frozen V33 geometry1945 strokes/3890 synthetic points; source median colors classes4–7 only, compare native alpha and ROI/warm RGB MAE, require V33 A exact PNG replay. CI E3 and improvement **UNKNOWN** until run/jobs/artifact verified; no E4/CHALK/E5, no production. If no fidelity gain or no replay, preserve negative, move to separately prereg source-region segmentation.
+
 - [x] **ENGINE-001 / V33 true game brush2 on unchanged V29 color plan:** [CI43696364638](https://github.com/Kiddos19882/AutoDraw/actions/runs/43696364638) E3 PASS SHA `386c8c24`, artifact14154601656. Native Egret source-class silhouette coverage93.868%, 1945 strokes and3890 synthetic vertices (447 x+0.25 accepted-point shims), much more recognizable than thin V29 preview, but 4/4 colors FAIL 99% coverage and substantial color-class overlap. Production BLOCKED; no game CHALK E4/E5.
 - [ ] **ENGINE-001 / next V34 native color-detail refinement:** prereg frozen V33 color plan+actual native WebGL as baseline, address missing warm/orange palette and selective face/hand/hair detail while reducing other-color overpainting. Preserve global 99% color coverage, 3 logical px exterior gate and CHALK exact run binding. No AABB/PIL-only brush acceptance or unvalidated production promotion.
 
