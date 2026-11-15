@@ -89,7 +89,7 @@
 - [`WORK_LOG_HISTORY_THROUGH_2026-11-08.md`](WORK_LOG_HISTORY_THROUGH_2026-11-08.md)
 - [`WORK_LOG.md`](WORK_LOG.md)
 
-### ENGINE-001 — дополнительные experimental source-bound protocols (11)
+### ENGINE-001 — дополнительные experimental source-bound protocols (12)
 
 Эти протоколы зарегистрированы для исследовательских сравнений на сложной картинке. Не являются production gate PASS; актуальный статус — в [PROJECT_STATUS](PROJECT_STATUS.md) и [TEST_RESULTS](TEST_RESULTS.md).
 
@@ -104,6 +104,7 @@
 - [`ENGINE001_ANILINES_JUNCTION_REPAIR_V18_PROTOCOL_2026-11-15.md`](ENGINE001_ANILINES_JUNCTION_REPAIR_V18_PROTOCOL_2026-11-15.md) — A удаление избыточных диагоналей в графе AniLines; B объединение ветвей по направлению, без дорисованных линий; exploratory, не native/CHALK.
 - [`ENGINE001_ANILINES_V19_MISSING_DETAIL_AND_COLOR_AUDIT_PROTOCOL_2026-11-15.md`](ENGINE001_ANILINES_V19_MISSING_DETAIL_AND_COLOR_AUDIT_PROTOCOL_2026-11-15.md) — source-bound аудит пропущенных линий V18-B и соседств палитры, без изменения траекторий.
 - [`ENGINE001_ANILINES_V20_OWNER_GUARDED_SHORT_RECOVERY_PROTOCOL_2026-11-15.md`](ENGINE001_ANILINES_V20_OWNER_GUARDED_SHORT_RECOVERY_PROTOCOL_2026-11-15.md) — предрегистрация коротких line fragments с консервативной палитровой защитой; offline E2/E3, не качество Egret/CHALK.
+- [`ENGINE001_ANILINES_V21_OWNER_SPLIT_PROTOCOL_2026-11-15.md`](ENGINE001_ANILINES_V21_OWNER_SPLIT_PROTOCOL_2026-11-15.md) — prereg цветобезопасного разделения V20-отклонённых коротких цепочек, без bridging и изменений production.
 
 ### CHALK, FILL, INT — отчёты и протоколы (37)
 
