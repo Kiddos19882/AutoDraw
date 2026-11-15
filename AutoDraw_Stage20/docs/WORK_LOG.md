@@ -1,5 +1,8 @@
 # AutoDraw — журнал выполненных действий
 
+**2026-11-15 / ENGINE-001 V34R first CI failure:** [Run 43740229154](https://github.com/Kiddos19882/AutoDraw/actions/runs/43740229154) E3 **FAIL** at `43600d7cf5478960cdf1ba6686a05fe456608156`: 20 Node renderer tests PASS, 6/7 Python tests PASS, new metadata-only PNG fixture FAIL before native rendering because `png_chunks` used literal backslash escapes (`b"\\x89PNG..."`) instead of Python PNG signature bytes (`b"\x89PNG..."`). No artifact or V34R native result; fail is a test-infrastructure bug, not altered Egret pixels. Minimal source-only correction at commit `a209b409a417b5b4af12e2544c0e42866b27dcd4`. V34 initial CI43738303188 FAIL remains preserved; no production/CHALK/E4/E5. New CI status to be checked on exact correction SHA.
+
+
 **2026-11-15 / ENGINE-001 V34 failed CI root cause and V34R prereg:** User supplied exact run [43738303188](https://github.com/Kiddos19882/AutoDraw/actions/runs/43738303188). Fetched run, jobs, logs, artifacts; E3 FAIL at `5bd5d9a`: Node20/20 and Python6/6 PASS, raw PNG byte replay fails on V34-A composite. Downloaded failure artifact14170739558; verified 5/5 V33 original vs V34 A PNG raw RGBA pixel equality and critical IHDR/IDAT exact equality, 5/5 A/B alpha pixel equality; private ancillary `deBG` bytes drift. Exploratory native candidate source RGB MAE whole 14.7566→14.0888, warm34.8742→31.2131. **V34 original FAIL preserved**; new prereg V34R at commit `8e44009`, minimal runner fix `4010d6b`, metadata-versus-pixel regression `e9a7cfa`, separate renamed CI at `43600d7`. No V34R run verified yet; no game CHALK E4/E5, no production/master change.
 
 
