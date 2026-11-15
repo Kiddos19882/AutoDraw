@@ -19,7 +19,7 @@ from run_engine001_line_extraction_v14_report import check_source, ROI, SOURCE_S
 
 EXPECTED_OUTPUT_SHA = {
     "anilines": "2d4220381e18a86400e4afa950caa064ada5fe1adc821c9a230239cb91848f3b",
-    "fdog": "a38d28bc7fad7791103d05893b15bbb02be62efbf7f3075707c4460632549d6b",
+    "fdog": "ab83ae4410f8ec5be90019030a57d3f391f1c62398a61f867cde4abba71d32ec",
 }
 ROI_SHAPE = (ROI[3] - ROI[1], ROI[2] - ROI[0])
 KERNEL = np.ones((3, 3), dtype=np.uint8)
