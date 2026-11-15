@@ -1,5 +1,9 @@
 # AutoDraw — действующие задачи
 
+- [x] **ENGINE-001 / V38 read-only original native Egret color boundary gap audit:** [CI43767506202](https://github.com/Kiddos19882/AutoDraw/actions/runs/43767506202) E3 audit SUCCESS SHA `e31d920e`, artifact14182976831 SHA `b3638a45…`. At α24 source MEDIANCUT class misses exclusively within3 native px of class boundary, union painted source foreground93.8684%, no >3logical px exterior. True color per-class99% NOT ACCEPTED, 410 V35-B dark outlines preserved. [Full V38 audit](ENGINE001_V38_NATIVE_COLOR_BOUNDARY_AUDIT_PROTOCOL_2026-11-16.md).
+- [ ] **ENGINE-001 / V39 resource-neutral native boundary placement:** [preregistered](ENGINE001_BOUNDARY_SHIFT_V39_PROTOCOL_2026-11-16.md) compare original frozen V37-P2-C vs y±0.25 and ±0.5 logical source neighborhood shifts on existing1945 fill strokes only; all410 V35-B dark contours exact,2355 strokes/5682 synthetic vertices. Actual archived Egret A/B/C alpha per class24/128, RGB/foreign overlap and leak; unchanged <=3px, >=99% quality gates, no real game CHALK E4/E5. Workflow `.github/workflows/engine001-boundary-shift-native-v39.yml` triggered; result pending.
+
+
 - [ ] **ENGINE-001 / V38 source-native boundary gap audit:** [preregistered method](ENGINE001_V38_NATIVE_COLOR_BOUNDARY_AUDIT_PROTOCOL_2026-11-16.md), read-only `tests/run_engine001_native_color_boundary_audit_v38.py` and unit tests, CI `.github/workflows/engine001-native-color-boundary-audit-v38.yml`. Measure alpha24/128 recall per palette class4–7 and connected misses boundary vs interior, wrong-class overlap, true Egret PNG exterior>3px, do not model brush with rectangles. Historical V37-P2 E3 PASS; V38 diagnostic CI pending. No added strokes, no game exact CHALK. After E2/E3 report, prereg resource-neutral boundary correction test preserving all 410 V35-B dark contours.
 
 
