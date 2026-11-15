@@ -15,7 +15,7 @@ from run_engine001_native_v29_brush2_v33 import logical_crop
 from run_engine001_complex_holdout_v5 import native_batch
 from run_engine001_visual_roi_palette_v28 import prepare_source,sheet
 
-EXP="ENGINE001_PAINT_THEN_DETAIL_V35_NATIVE_PILOT_1"
+EXP="ENGINE001_PAINT_THEN_DETAIL_V35_NATIVE_PILOT_2"
 V34R_SHA="93b46223f5525b02def1631de8b49af4e1ddc0c799e5ec28224143d94fac0be2"
 V18_B_SHA="752dbc5ff55e90b0d38f492fadfde9be8811b70ebc66bce4999f716c4a86ed57"
 V18_RGB=[49,38,43]
@@ -109,7 +109,9 @@ def main():
     score={};cropped={}
     for key,plan in plans.items():
         scene=out/key;scene.mkdir()
-        raw,scenes,manifest=native_batch(a.workspace,"V35-"+key,native_strokes(plan),scene)
+        raw,scenes,manifest=native_batch(
+            a.workspace,"V35-"+key,native_strokes(plan),scene,
+            renderer_method="renderV35LayeredColorProbe")
         if key=="A":
             replay=png_pixel_exact_replay(a.v34r_archive/"V34-B-composite.png",
                                           scene/"V35-A-composite.png")
