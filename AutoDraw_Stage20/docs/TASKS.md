@@ -4,40 +4,21 @@
 - [x] **ENGINE-001 / V39 native source-directed vertical row-shifts rejected:** [CI43768005475](https://github.com/Kiddos19882/AutoDraw/actions/runs/43768005475) E3 execution SUCCESS SHA `dcd28f3`, artifact14183021860 24/24 hashes PASS. Original V37-P2-C control native pixel-exact, 410 dark V35-B contours preserved; B ±0.25 y and C ±0.5 y on959 fill paths both **FAIL prereg native class-recall and source RGB non-regression**. Source silhouette α24 A93.8684%, B93.5822%, C90.7021%; no >3logical px leak. New geometry candidate not accepted. [Full report](ENGINE001_BOUNDARY_SHIFT_V39_PROTOCOL_2026-11-16.md).
 - [ ] **ENGINE-001 / next V40 resource-neutral intra-row color-boundary allocation:** characterize existing horizontal scanline endpoint/width routing and overlap on source-bound actual Egret PNG; prereg candidate preserving all410 original V35-B dark contours and total synthetic vertex cap before new native rendering. Do not repeat V39 vertical shift, add unbudgeted paths or claim exact CHALK without E4.
 
-- [ ] **ENGINE-001 / V39 resource-neutral native boundary placement:** [preregistered](ENGINE001_BOUNDARY_SHIFT_V39_PROTOCOL_2026-11-16.md) compare original frozen V37-P2-C vs y±0.25 and ±0.5 logical source neighborhood shifts on existing1945 fill strokes only; all410 V35-B dark contours exact,2355 strokes/5682 synthetic vertices. Actual archived Egret A/B/C alpha per class24/128, RGB/foreign overlap and leak; unchanged <=3px, >=99% quality gates, no real game CHALK E4/E5. Workflow `.github/workflows/engine001-boundary-shift-native-v39.yml` triggered; result pending.
-
-
-- [ ] **ENGINE-001 / V38 source-native boundary gap audit:** [preregistered method](ENGINE001_V38_NATIVE_COLOR_BOUNDARY_AUDIT_PROTOCOL_2026-11-16.md), read-only `tests/run_engine001_native_color_boundary_audit_v38.py` and unit tests, CI `.github/workflows/engine001-native-color-boundary-audit-v38.yml`. Measure alpha24/128 recall per palette class4–7 and connected misses boundary vs interior, wrong-class overlap, true Egret PNG exterior>3px, do not model brush with rectangles. Historical V37-P2 E3 PASS; V38 diagnostic CI pending. No added strokes, no game exact CHALK. After E2/E3 report, prereg resource-neutral boundary correction test preserving all 410 V35-B dark contours.
-
-
+- [x] **ENGINE-001 / V37-P2 full 410 V35-B dark contours + locally source-colored fill:** [CI43747149144](https://github.com/Kiddos19882/AutoDraw/actions/runs/43747149144) E3 SUCCESS SHA `04e506a`, artifact14175105717 24/24 SHA PASS. Source full RGB MAE original A20.2112, B19.4052, C19.4203; warm A37.8943, B27.7570, C27.9045. 410 dark contours unchanged, 2355 strokes/5682 synthetic accepted vertices NOT game CHALK; no per-color99% acceptance or E4/E5/exact CHALK. Original failed first CI43746951664 retained [protocol/result](ENGINE001_LOCAL_FILL_COLOR_V37_P2_PROTOCOL_2026-11-15.md).
 - [x] **ENGINE-001 / V37-P1 full V35-B contour color-only native:** [CI43745869245](https://github.com/Kiddos19882/AutoDraw/actions/runs/43745869245) SUCCESS E3 SHA `5b67a05`, artifact14174860868 ZIP/24 inner hashes PASS. Same **410 V35-B contours** +1945 fill, 2355 strokes/5682 synthetic vertices, A exact frozen V35-B native RGBA, B/C identical alpha. Original RGB MAE A20.2112/warm37.8943, B source RGB **11.9760/27.0636**, C half-tint14.8606/29.7231; RGB diagnostic B/C PASS; visual B softer hair/face outlines, C clearer than B, user still prefers V35-B as reference. No native per-color99% acceptance, live E4/CHALK/E5. [Protocol](ENGINE001_FULL_OUTLINE_V37_P1_PROTOCOL_2026-11-15.md).
-- [ ] **ENGINE-001 / V37-P2 full-contour source color-region restoration:** next **separately prereg** on V37-P1 with complete 410 lines and source-bound paint; investigate original saturated orange/gold/skin regions with Egret-native candidate strokes, compare objective RGB and recognizable facial/hand/hair details to user's V35-B. Must budget native widths/vertices and actual CHALK separately; do not apply production defaults from a model-only proxy.
-
-
-- [ ] **ENGINE-001 / V37-P1 full-outline color-only A/B/C:** [пререгистрация](ENGINE001_FULL_OUTLINE_V37_P1_PROTOCOL_2026-11-15.md) до CI: all 410 user-selected V35-B dark contours kept after 1945-color fill, total2355 strokes/5682 synthetic vertices; A exact original V35-B, B source-RGB median per contour, C half-tint, no omitted lines. New native runner `tests/run_engine001_full_outline_native_v37.py`, unit test and Windows `.github/workflows/engine001-full-outline-native-v37.yml`. Check CI and real Egret PNG, preserve negative; no production/E4/exact CHALK claims.
-
-
-- [ ] **ENGINE-001 / V37 user visual reference V35-B full outline:** user selected **V35-B 410 contours after paint** as best line art (visual preference, not E5). Freeze V35-B native geometry/ordering as preferred reference, and test source-aware fill/color changes without silently replacing it with V35-C/V36 297-contour variants. Compare final native image, face/hand/hair recognition, source colors, cross-color spill, color coverage >=99%, <=3 logical px leakage, and resource quota separately; CHALK only in actual game E4. [V35 visual sign-off](ENGINE001_PAINT_THEN_DETAIL_V35_PROTOCOL_2026-11-15.md).
-
 
 - [x] **ENGINE-001 / V36 source-colored contours over separate paint native A/B/C:** [CI43743810164](https://github.com/Kiddos19882/AutoDraw/actions/runs/43743810164) E3 SUCCESS SHA `86f8d5d`, artifact14173870057 24/24 SHA PASS. Frozen V35-C paint1945 width2 then detail297 width1, 2242 strokes/5269 synthetic vertices NOT CHALK; original dark contour A source RGB MAE18.5822/warm36.0898, source-color B **12.2778/28.1013**, half-tint C14.4613/29.8469, alpha exact across variants. B best RGB, C stronger visible facial/garment line contrast exploratory; production NOT accepted, E4/E5/exact CHALK NOT_RUN. [Protocol/result](ENGINE001_SOURCE_COLOR_CONTOUR_V36_PROTOCOL_2026-11-15.md).
-- [ ] **ENGINE-001 / next V37 color-region restoration with native layered detail:** prereg separately frozen V36 B/C, source-aware additional warm/orange color regions, prioritize hair/eyes/hands, avoid weakening lines or overbudget; real Egret color-class/fidelity, coverage>=99% and <=3px gates and CHALK run-bound remain. Check exact resources before game execution. No production until validation.
-
 
 - [x] **ENGINE-001 / V35 native paint-first then detail-last A/B/C pilot completed E3:** [CI43742747278](https://github.com/Kiddos19882/AutoDraw/actions/runs/43742747278) SUCCESS SHA `a183b53e`, artifact14173635779 23/23 SHA PASS. A source RGB MAE14.0888, B20.2112, C18.5822; B/C markedly better visual faces/hair/hands, but **RGB_FIDELITY_REGRESSION**; 1945/2355/2242 strokes, synthetic vertices3890/5682/5269 NOT CHALK. Native pixel source-silhouette recall A93.868/B95.455/C95.114%, 3px exterior diagnostic PASS; per-color 99% remains unproven. No production acceptance. Original pilot1 FAIL preserved. [Protocol/results](ENGINE001_PAINT_THEN_DETAIL_V35_PROTOCOL_2026-11-15.md).
 - [ ] **ENGINE-001 / next V36 color-faithful selective top contour:** prereg source-aware contour color/important-feature selection on frozen V35 pilot2; compare actual native A/B/C and minimize warm-region overpaint while retaining faces/hair/hand recognizability; do not relax RGB non-regression/per-color 99%, 3px or game run-bound CHALK, and no production before E4/E5.
 
-
 - [ ] **ENGINE-001 / V35 pilot2 native paint→details:** pilot1 [CI43742229570](https://github.com/Kiddos19882/AutoDraw/actions/runs/43742229570) FAIL before B/C render due to V5-only brush width2 and `icon-*` restrictions, archived artifact14173565050; user-approved two layers and existing V18-B thin width1 paths must not be coerced to width2. [Protocol addendum](ENGINE001_PAINT_THEN_DETAIL_V35_PROTOCOL_2026-11-15.md) new `V35_NATIVE_PILOT_2` frozen same candidates; separate JS native BoardPane width1 handler at `373be5a`, opt-in Python native method preserving old V5 default `4b8cf8b`, V35 pilot2 runner `37623c4` and CI workflow `a183b53`. [CI43742747278](https://github.com/Kiddos19882/AutoDraw/actions/runs/43742747278) RUNNING; verify full raw PNG, image differences, 99%/3px and resource before decisions. No production/live E4/exact CHALK.
 
-
 - [ ] **ENGINE-001 / V35 native A/B/C pilot (queued):** [V35 prereg and frozen native pilot addendum](ENGINE001_PAINT_THEN_DETAIL_V35_PROTOCOL_2026-11-15.md). Reuse V34R color strokes and archived V18-B contour JSON; A=1945/3890, B=2355/5682, C=2242/5269 strokes/synthetic vertices (NOT CHALK). Actual Egret WebGL Windows [V35 native CI43742229570](https://github.com/Kiddos19882/AutoDraw/actions/runs/43742229570) SHA `dd65be6e` queued when checked. Preserve real native PNG/composite/face crop; compare to source and never mark E4 or production PASS from offline native E3. Algorithm-only [CI43741790932](https://github.com/Kiddos19882/AutoDraw/actions/runs/43741790932) E3 SUCCESS at `d211796`, no brush quality claim.
-
 
 - [ ] **ENGINE-001 / V35 PAINT -> DETAIL overlay experimental architecture:** пользователь утвердил раздельную покраску и последующие штрихи **поверх**. [Пререгистрация](ENGINE001_PAINT_THEN_DETAIL_V35_PROTOCOL_2026-11-15.md): A=V34R paint-only control, B=paint+all candidate contours, C=paint+salient contours; native Egret RGBA на одинаковой доске, качество/ресурс/CHALK раздельно. Созданы fail-closed planning helper `tests/engine001_paint_then_detail_v35.py`, regressions `tests/test_engine001_paint_then_detail_v35.py`, opt-in `.github/workflows/engine001-paint-then-detail-v35.yml`. Это пока MODEL_ONLY E1/E2, native V35 **NOT_RUN**, production неизменен. Следующий шаг: проверить CI планировщика, затем адаптировать существующие контуры AniLines/V18 к нативному исполняемому формату без превышения budget.
 
 - [ ] **ENGINE-001 / V34R native replay after metadata-only V34 failure:** Original [V34 CI43738303188](https://github.com/Kiddos19882/AutoDraw/actions/runs/43738303188) FAIL SHA `5bd5d9a` on byte-level PNG `deBG`; 20/20 Node, 6/6 Python PASS, actual 10 native captures archived artifact14170739558. Independent source-bound PNG analysis: 5/5 V33-vs-A RGBA pixel and IDAT equality despite ancillary drift; A/B MAE exploratory improved 14.7566→14.0888 and warm 34.8742→31.2131, not V34 quality PASS. V34R [new prereg](ENGINE001_NATIVE_WARM_COLOR_V34R_REPLAY_PROTOCOL_2026-11-15.md) with strict pixel+IDAT compare, pixel-drift regression test and changed workflow; verify complete V34R CI + hashes/quality before closing. No exact CHALK/live.
-
 
 - [ ] **ENGINE-001 / V34 source-RGB color-only native A/B (RUN NOT VERIFIED):** [preregistered protocol](ENGINE001_NATIVE_WARM_COLOR_V34_PROTOCOL_2026-11-15.md), opt-in runner `tests/run_engine001_native_warm_color_v34.py`, Windows workflow `engine001-native-warm-color-v34.yml`. Frozen V33 geometry1945 strokes/3890 synthetic points; source median colors classes4–7 only, compare native alpha and ROI/warm RGB MAE, require V33 A exact PNG replay. CI E3 and improvement **UNKNOWN** until run/jobs/artifact verified; no E4/CHALK/E5, no production. If no fidelity gain or no replay, preserve negative, move to separately prereg source-region segmentation.
 
@@ -115,7 +96,6 @@
 
 - [ ] **ENGINE-001 / ENGINE001_COMPLEX_STRUCTURE_V6 (2026-11-14):** после прямого пользовательского визуального FAIL («без оригинала невозможно понять рисунок») зафиксирован [новый V6 prereg](ENGINE001_COMPLEX_STRUCTURE_V6_PROTOCOL_2026-11-14.md) до outcomes на `f6e7167`; создан opt-in edge diagnostic и 12 synthetic regressions, отдельный push/dispatch [workflow](../../.github/workflows/engine001-complex-structure-v6.yml) на code commit `fb7d38d`. Сравнить source-vs-V5 palette Canny edge recall/connected detail components внутри неизменной 150×240 ROI; отдать source hashes, 6 derived PNG включая RGB red/green source-edge retention overlay, и JSON с пререгистрированной 3×4 сеткой edge-loss, суммы совпадают с глобальными метриками; **пока результат CI, source diagnostic и recognition NOT_VERIFIED**. Даже высокий edge recall не является recognition PASS. После E1 проверки GitHub workflow добавлена Actions job summary (commit `f575296`), которая отображает source/check-out SHA, ROI и ограниченные edge/component metrics без скачивания ZIP; фактический job run и метрики всё ещё UNKNOWN. Следующий gate: CI/job inspection с точным SHA и анализ artifacts; затем новый prereg на structure-aware stroke geometry с новым held-out образцом, без production changes.
 
-
 - [x] **ENGINE-001 / source-faithful aggregated-point provenance (E1/E2/E3, 2026-11-14):** [CI 43535607144](https://github.com/Kiddos19882/AutoDraw/actions/runs/43535607144) SUCCESS on `52c8c419` (8 positive/negative unittest PASS, JS regression, six frozen SHA/run bindings and native replay). [bounded inventory artifact 14088429301](https://github.com/Kiddos19882/AutoDraw/actions/runs/43535607144/artifacts/14088429301): ordered per-stroke quota-to-draw alignment confirms missing accepted-point candidates C1-F3=(155.2083339691162,15), `pointer-stroke-144`, and C2-F2=(74.20833396911621,125), `pointer-stroke-486`; first aggregate draw has two independently emitted `POINT_QUOTA_UPDATE` with delta=1, terminal accepted coordinates equal DRAW_SAMPLE, full affected strokes match (30/30 and 55/55). Source remains immutable; analysis is in existing runner, fail-closed for missing/mismatched/non-finite event data. This establishes first-party provenance (E1+E3), **not** new renderer PNG, live temporal fidelity, independent E5 or FILL quality PASS. Historical replay remains `DIAGNOSTIC_ONLY`.
 - [x] **ENGINE-001 / opt-in recovered-quota replay gate (E2/E3):** [CI 43536560568](https://github.com/Kiddos19882/AutoDraw/actions/runs/43536560568) SUCCESS on `7581b7c` (attempt 2). Recovered coordinates inserted only into separate opt-in in-memory native Egret replay; originals remain unmodified. C1-F3 IoU `0.9916564324→0.9916315343` (slightly worse); C2-F2 `0.9930742493→0.9930742493` (unchanged). Independent PNG-only recount confirms 6/0 added alpha mask pixels in the affected figures. [Recovered artifact 14090211960](https://github.com/Kiddos19882/AutoDraw/actions/runs/43536560568/artifacts/14090211960) and [original artifact 14090202029](https://github.com/Kiddos19882/AutoDraw/actions/runs/43536560568/artifacts/14090202029). Pixel-exact and FILL acceptance NOT_GRANTED; E4/E5 still open.
 - [x] **ENGINE-001 / fixed-mask residual localization (E2/E3, 2026-11-14):** [CI 43541756465](https://github.com/Kiddos19882/AutoDraw/actions/runs/43541756465) SUCCESS on `ae7ecc439` (five synthetic tests, six source-bound original and opt-in reconstructed native replays, original/recovered mask provenance checks); [report 14091649173](https://github.com/Kiddos19882/AutoDraw/actions/runs/43541756465/artifacts/14091649173). Immutable DEC-025 thresholds/Stage→ROI transform: original residual totals 40/535/659/40/530/404 (six figure order), all within a predeclared 2px 4-connected boundary band; C1-F3 quota recovery raises residual 659→661, C2-F2 stays 530. **DIAGNOSTIC_ONLY**, no new E4/E5 or quality promotion.
@@ -185,7 +165,6 @@
 - [x] **Минимальный adapter refactor:** общий `resolve_series_scanline_spacing` в существующем `fill001_series_handoff.py`; изменения `4eb81f5`, `1b2a8c6`, regression tests `be48666`, `4dfec5c`. Frozen masks, estimator, executor и acceptance не менялись; E1 diff проверен.
 - [x] **E2/E3 для spacing reuse и cross-domain inventory подтверждены:** [FILL001 series CI 43140218990](https://github.com/Kiddos19882/AutoDraw/actions/runs/43140218990) **SUCCESS** на code SHA `4dfec5cdd9b8cf973fe109c925f7314100872e84`: 165/165 pytest PASS, syntax-check, 2-cycle и full factorial offline smoke PASS; 8 warnings. [docs integrity CI 43164791087](https://github.com/Kiddos19882/AutoDraw/actions/runs/43164791087) **SUCCESS** на `b317348aad91e1b4ad5b50c613f623f0bfad9425`: 11/11 unittest PASS, 100/100 Markdown, 20/20 catalog contracts, 130 Python-модулей, 2 all-scope SCC и 0 root-level SCC. Проверены logs/checkout SHA, не только summary; E4/E5 не запускались.
 
-
 ## DOC-CODE-REUSE-001 — архитектура знаний и повторное использование (2026-11-12)
 
 - [x] Добавлен CLI `python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20 --find "очистить доску"` и модульный owner `(ф) tools/capability_catalog.py`; существующий docs checker сохраняет прежний API. [CI 43126121772](https://github.com/Kiddos19882/AutoDraw/actions/runs/43126121772) SUCCESS, 8/8 tests, 5/5 проверяемых запросов на реальном каталоге.
@@ -198,7 +177,6 @@
 - [x] В existing `tools/check_markdown_docs.py` добавлена read-only AST проверка entrypoints, имён аргументов, owner/test path, уникальности ID и scope; в workflow docs-integrity добавлены триггеры на Python source. Новые regression tests на устаревший API, отсутствующий owner и дубликат ID.
 - [x] [docs-integrity CI 43124607337](https://github.com/Kiddos19882/AutoDraw/actions/runs/43124607337) **SUCCESS** на `7b8f4aaa`: 7/7 тестов, 20/20 карточек, 100/100 Markdown, 0 ошибок каталога и ссылок. Отрицательные тесты проверяют отсутствующий аргумент, owner и дубликат ID.
 - [ ] После E3: выполнить ревизию фактических consumers и candidate import cycles в FILL001/V5/ENGINE-001 без автоматического изменения production; при подтверждённом дублировании — отдельный совместимый adapter/refactor с тестами.
-
 
 ## FILL001-SERIES-001 — resource stop: следующий E4 gate и сохранение истории (2026-11-12)
 
@@ -225,7 +203,6 @@
 - [x] Исправлена зависимость запуска серии от необязательного V5 trim кандидата: внутри общего Selenium Firefox worker V5 `build_fill001_v5_source_plan` вызывается лишь после завершения/обхода series-ветки. SHA [`0e5075b`](https://github.com/Kiddos19882/AutoDraw/commit/0e5075bdecf0557752533b46837b1401cf138427). Общие Firefox/Monitor/Bridge и Stage6 сохраняются.
 - [x] Добавлена offline регрессия на ветвление и общий WebDriver; [dedicated CI 43109628909](https://github.com/Kiddos19882/AutoDraw/actions/runs/43109628909) **SUCCESS** на `0e5075b`. [Main CI 43109630346](https://github.com/Kiddos19882/AutoDraw/actions/runs/43109630346) на том же SHA: **SUCCESS**, обязательные jobs Application integration, Executor, Preparation/G3, Game Monitor/Bridge, Egret CanvasRenderer и INT-006 PNG audit `SUCCESS`; optional algorithm benchmarks и Windows portable build `SKIPPED`.
 - [ ] Первый live E4 серии: отдельное разрешение/запуск на ПК пользователя, 1 цикл × 2 фигуры, доказанный Firefox/Bridge/Stage6/Clear handoff с raw PNG и exact run-bound CHALK. Это не закрывается unit/CI.
-
 
 ## FILL001-SERIES-001 — интеграция Clear/Stage6 выполнена в коде; оставшиеся runtime gates (2026-11-11)
 
@@ -264,7 +241,6 @@
 - [ ] **Next E4:** on *fresh clean board*, independent attempt for second immutable candidate `K_trim_0_y189_w3`, same validated mapping/calibration/foreground, 29 native brush strokes, exact run-bound counter, pointer-parked settled PNG, frozen quality gates. Only compare exact CHALK if quality PASS; preserve failure data.
 - [ ] Independent E5 validation and review for any production change; current W2 E4 PASS does not justify changing defaults or estimators.
 
-
 ## FILL-001 V5 — third live W2 automated CHALK 1701, quality FAIL (2026-11-10)
 
 - [x] Analyze immutable `36e95e4`: Stage6 29/29, 28×10→2, 75.578s, run-bound automated exact `pointCount 1→1702`, CHALK1701; 5 no-point slider drags correctly excluded. Settled PNG saved. This fixes prior V5 binding issue in real E4.
@@ -273,8 +249,6 @@
 - [x] Add V5-only pointer parking before future baseline and settled capture (96 px outside ROI; no click; exact counter + Firefox foreground gates) and synthetic fail-closed tests `c1fe1f8`/`1b48fb1`/`0ca2a42`. Original raw PNG and reports preserved.
 - [ ] Confirm CI at new code SHA and Markdown audit at docs HEAD; fix any FAIL before live.
 - [ ] Next E4 on Windows: new clean-board W2 isolated run with cursor parked before both screenshots; require same-session exact CHALK and fresh settled PNG. Verify whether remaining real perimeter pixels exceed 3 px; do not assume quality PASS. Independent E5 required before W3 comparison.
-
-
 
 ## FILL-001 V5 — second E4, 3825d57: numeric-type root cause and regression
 
@@ -294,7 +268,6 @@
 - [ ] **Next E4:** re-run same single frozen V5 candidate on freshly clean board with new validator. Require automated run-bound exact CHALK, `after_settled.png` and independently inspect screen/perimeter quality; earlier 1706 is E4 source result but not accepted as automated screenshot-quality PASS.
 - [ ] Once quality gates and source evidence validated, run candidate `K_trim_0_y189_w3` independently on cleared board and compare exact CHALK only between quality-accepted trials. No production promotion until E5.
 
-
 ## FILL-001 V5 — after first full workflow failure, 2026-11-10
 
 - [x] Analyzed actual user commit `fbb97ced` raw source: complete passive ROI and exact `pointCount=1` PASS; failure in 30→10 brush switch, **0/29 strokes**; five unsuccessful drags, radius30 always, board unchanged, mouse safely released. It is **NOT** a failed image-quality trial.
@@ -302,7 +275,6 @@
 - [ ] Confirm current E3 for code SHA `4003626b` (and any subsequent revisions).
 - [ ] **Next unresolved Windows gate:** inspect/verify actual location, orientation and interaction mechanism of brush-size control; existing saved slider calibration was geometrically accepted but **not proven to change actual game radius**. Do not guess coordinate offsets or increase correction attempts. Keep blank-board `pointCount==1` and same-session ROI safety constraints. Obtain independent native screen/monitor evidence for a successful 30→10 change, *then* execute 29 V5 strokes.
 - [ ] Only after completed run: exact run-bound CHALK, original PNG quality audit and independent E5; second candidate on newly cleaned board.
-
 
 ## FILL-001 V5 — single-run Stage6 executable candidate, дальнейшие проверки (2026-11-10)
 
@@ -313,20 +285,17 @@
 - [ ] **Следующий E4:** на Windows для одного V5 кандидата открыть чистую доску, подтвердить, активировать Firefox. Встроенный pipeline должен подтвердить ROI, точный `pointCount==1`, действующую калибровку ползунка и только затем стартовать Stage6. При отсутствии подтверждённой калибровки ползунка зафиксировать BLOCKED и калибровать по отдельному протоколу, не угадывать координаты. Сохранить `v5_stage6_runs/v5-<attempt-id>/before.png,after.png,report.json`, Bridge `session.json`, `game-monitor-run-*.json`.
 - [ ] Проверить post-run status, независимое E5 экранного качества, run-bound exact CHALK; после одного валидного run на w2 повторить на чистой доске для w3. Принять только по действующему quality policy; не изменять пороги и замороженные исходные PNG.
 
-
 ## FILL-001 V5 — после успешного Windows passive ROI (2026-11-10)
 
 - [x] Получен новый независимый Windows runtime E4: [`5b7e6b8`](https://github.com/Kiddos19882/AutoDraw/commit/5b7e6b877d5793720ad856997ada97417bfaeaab), `probe-0cca08ef367643beaf6397a30ab410c6.json`, `session.json`, `game-monitor-run-20261110T063915979800Z-3c8e7de5.json`. Пассивные три probe, one BoardPane, origin, offset (0,135), ROI (483,243,694,363) **PASS только в рамках этой сессии**; старый foreground PID BLOCKED преодолён.
 - [ ] Перед любым V5 вводом установить **новую** валидную сессию и доказать blank-board + exact baseline: проверенный визуальный эталон пустой доски и стабильная ресурсная телеметрия. `pointCount=1` — обычный минимум на пустой доске, но сам по себе не доказательство пустоты. В данном E4 session `pointCount=2→3`, radius30; recorded exact CHALK1 относится лишь к отдельному непроектному pointer run, не к V5.
 - [ ] Далее versioned single-run mixed-width Stage6 `10×28→2/3` с проверенными brush switches, task/session/run source SHA, отдельным Clear и immutable pre/post/PNG; E5 acceptance и V5 actual CHALK всё ещё NOT_RUN. Не переносить старое screen ROI в новую сессию и не менять production defaults.
 
-
 ## FILL-001 V5 — один механизм пользовательского foreground (2026-11-10)
 
 - [x] Вместо программной активации через WebDriver/Win32 введено ожидание **обычного действия пользователя**: подтвердить доску в AutoDraw, нажать по верхней панели Firefox. Проверка Win32 foreground PID повторяется три раза подряд; таймаут 90 секунд, отмена немедленно BLOCKED, исключено вмешательство в игру.
 - [x] Удалён невостребованный `establish_firefox_foreground` и Win32 SetForegroundWindow fallback; `fill001_firefox_auto_probe` только проверяет PID перед каждым пассивным перемещением. Добавлены unit/negative tests на дребезг PID, таймаут, отмену и неверный GeckoDriver PID.
 - [ ] Единственный следующий runtime gate: выполнить свежий Windows passive-only rerun, сохранить `probe-*.json` и свежий `session.json`, получить native mouse witnesses и `screen_roi` или точный BLOCKED reason. Только затем проектировать live Stage6 mixed-width, Clear и CHALK. Не использовать старые E4 отчёты как новые.
-
 
 ## FILL-001 V5 — после второго foreground PID BLOCKED (2026-11-10)
 
@@ -335,14 +304,12 @@
 - [ ] Повторить **только passive Firefox probe** на Windows и сохранить новую session/result, проверить PID after native focus, ROI и три OS mouse witnesses. До runtime E4 и PNG validation не включать Stage6; если повторится BLOCKED, собрать Win32 window owner diagnostic без угадывания координат.
 - [ ] Stage6 mixed V5, verified Clear, brush switch 10→2/3, exact CHALK и E5 quality остаются закрытыми.
 
-
 ## FILL-001 V5 — продолжение после реального Firefox BLOCKED (2026-11-10)
 
 - [x] Проанализированы runtime первичные файлы пользовательского commit `848aae2`: подключение Firefox/iframe/Monitor/Bridge подтверждено E4 PARTIAL, точный игровой CHALK/PNG E5 не выполнялись. Исходный failure: native foreground Firefox PID gate BLOCKED.
 - [x] В коде добавлена **одна безопасная WebDriver focus-попытка** только для owned Firefox, затем обязательная новая проверка нативного Win32 foreground PID; добавлены тесты на matched PID, wrong PID, недоступный PID, отказ фокусировки. Отрицательные случаи оставлены BLOCKED; никаких нажатий в игру.
 - [ ] Новый Windows passive-only rerun: из JSON проверить expected/previous/after foreground PID и завершение ROI, только затем переходить к проверке blank-board baseline/brush-свитча. Сборку/CI нового code SHA проверять отдельно. Не отключать fail-closed gate.
 - [ ] Разрешённый Stage6 mixed-width V5 single-run, exact CHALK, PNG/E5 — остаётся заблокированным до runtime calibration и чистой доски.
-
 
 ## FILL-001 Firefox auto ROI диагностический режим (2026-11-10)
 
@@ -352,13 +319,11 @@
 - [ ] Проверить Windows E4 (Firefox/GeckoDriver, Win32 foreground PID, authenticated BoardPane, DPI/screen coordinates), без рисования; сохранить отчет и причину BLOCKED при расхождениях. Принимать Stage6 ROI только после этой проверки и чистой доски.
 - [ ] Следующий разработческий шаг: versioned FILL-001 V5 single-run Stage6 mixed width `10×28→2/3` со свежими radius heartbeat и provenance, автоматический Clear/blank gate при baseline `pointCount=1` и независимая E5; до их завершения game input запрещён.
 
-
 ## FILL-001 V5 — автоматический ROI, без разрешения live input (2026-11-10)
 
 - [x] Подготовлен research-only Selenium hover + native OS mouse пассивный сборщик `fill001_firefox_auto_probe.py`; функция `fill001_v5_auto_roi.py` проверяет ROI через существующий `boardpane_preflight_transform()`, no guessed offsets, strict same-session, native targets и экранные границы. Добавлены positive/negative fake E2 tests.
 - [ ] Проверить этот сборщик в реальном Firefox + Game Monitor 0.2.4 на Windows, создать run-bound evidence и подтвердить соответствие физических координат, DPI и PNG. **Пока результат нельзя применять к executor.**
 - [ ] Подключить проверенный ROI и V5BrushSequenceGuard к отдельному single-run Stage6, реализовать безопасный Clear с подтверждением пустой доски (не `pointCount==0`), затем собрать 2 E4 точных CHALK и E5 PNG comparison. Без этого automatic V5 execution BLOCKED.
-
 
 ## FILL-001 V5 — frozen source-plan в штатном AutoDraw (2026-11-10)
 
@@ -368,7 +333,6 @@
 - [ ] **Следующий шаг:** подключить проверенный guard к отдельному versioned Stage6 mixed-brush handoff только после task/session/run, runtime desktop ROI и blank-board gate; сохранить SHA source-плана и per-stroke brush evidence. До этого ввод мыши запрещён.
 - [ ] Подключить автоматическую калибровку desktop/ROI и проверенный Clear/blank-board gate (не требовать `pointCount=0`), затем один E4 run на каждый кандидат и независимый E5; exact CHALK и screen quality NOT_RUN. Никаких batch/prod изменений.
 
-
 ## FILL-001 — Firefox/browser attachment + V5 mixed-width continuation (2026-11-10)
 
 - **Выполнено в коде, E1:** опциональная Firefox WebDriver сессия из существующей вкладки FILL-001; проверка Origin игрового iframe, подтверждение оператора, новая Monitor/Bridge-сессия с Input Telemetry ON, явная кнопка остановки; тесты и включение Selenium в Windows build. E2/E3 считать подтверждёнными только после завершения CI для HEAD.
@@ -376,14 +340,12 @@
 - **Открыто (V5):** вывести frozen два DEC-030 trim0 кандидата в штатный FILL-001 single-run с отдельным протоколом mixed brush 10→2/3, verified brush switches и собственной идентичностью запуска. Сейчас fixed-radius handoff не обеспечивает такой режим; нельзя подменять ширины или выдавать этот проект за завершённую V5 live validation.
 - **Gate:** один управляемый run, сохранённые run/session/report/PNG, exact `post.pointCount-pre.pointCount`, quality gates без подбора порогов, затем независимая validation. Production defaults и `master` не затрагивать.
 
-
 ## P1 — FILL-001 V5 DEC-030: native trim0 99%+ periphery, CHALK gate open
 
 - [x] Versioned `FILL001_CHALK_FIRST_NATIVE_V5`: frozen rectangle SHA, неизменный V4 RGBA control и 8 заранее закреплённых trim0..3×bottom(W2/Y190 либо W3/Y189) вариантов. Изолированная native BoardPane/Egret WebGL проба, отдельный alpha анализ по 1/64/128/254, actual PNG/fixture SHA и fail-closed overwrite/tamper checks. [Native CI SUCCESS 42694626385](https://github.com/Kiddos19882/AutoDraw/actions/runs/42694626385); [source artifact 13707703988](https://github.com/Kiddos19882/AutoDraw/actions/runs/42694626385/artifacts/13707703988).
 - [x] Два trim0 кандидата на native alpha128 имеют coverage **99.425944%** / **99.426939%**, leakage 54 backing px (max1 logical px, none outside 3px). Alpha254 coverage >99.25%, far leakage 0. Контроль V4 — 98.943707%, leak0; все trim1/2/3 alpha128 ниже 99%. Все результаты, в том числе отрицательные, сохранены. **Native-screening qualified ≠ game PASS.**
 - [ ] **Следующий невыполненный шаг:** отдельная предварительная проверка и E4 live run-bound capture для trim0 (включая mixed-width brush change validation, source-plan signature, calibration, exact CHALK) и независимый E5 screen/renderer comparison. Нельзя выбирать W2 или W3 как CHALK winner без 2 exact run-bound deltas.
 - [ ] Повторить new policy на frozen wide/narrow и многоцветных holdouts; лишь потом рассматривать production/defaults и 45-cell. Live E4/E5/CHALK новой геометрии NOT_RUN, production BLOCKED.
-
 
 - [x] Новый capture validator также требует **SHA оригинальных before/after PNG из PASS_E4_RAW_CAPTURE** и совпадение E4 run/session/task/plan/ROI/exact CHALK; непроверенная screen-геометрия или подмена PNG не принимаются. Поддержка V3 BoardPane-only E4 явно включается флагом, без автоматического fallback. [CI code SHA `33fa812e4a81f9c03b2f5b43660eeb4f21018e9d`](https://github.com/Kiddos19882/AutoDraw/actions/runs/42645465734) после завершения необходимых jobs.
 
@@ -395,12 +357,9 @@
 - [ ] **Первый следующий шаг:** получить real E4 capture с независимым same-run screen mapping по новому policy; затем сравнить два и более quality-PASS плана по exact CHALK. Новые mixed-width планы пока не привязаны к frozen legacy one-radius task; не выдавать synthetic capture за live E4.
 - [ ] Проверить новую политику на frozen rectangle/wide/narrow с фактическим screen RGB, учесть multi-color visual holds и лишь после independent validation разрешать продвижение planner/executor. CHALK-предсказатели, frozen captures и старый 45-task batch всё ещё BLOCKED.
 
-
 ## P1 — FILL-001 V4: локальный нижний ремонт проверен (2026-11-09)
 
 - [x] V4 raw provenance усилена: исходный `fixture-input.json` находится рядом с PNG в [артефакте 13655990846](https://github.com/Kiddos19882/AutoDraw/actions/runs/42577013425/artifacts/13655990846); собственный SHA SHA-256 проверяется одновременно против `fixture-provenance.json` и read-only отчёта. Native CI [42577013425](https://github.com/Kiddos19882/AutoDraw/actions/runs/42577013425) SUCCESS на `7814eec3`, test-only SHA `5d3c5904` добавляет негативный test изменения байтов. PNG/пороговые метрики неизменны.
-
-
 
 - [x] Изолированная V4 fixture = идентичный V2 `G_trim_3` (RGBA equality PASS в native Egret) плюс один тонкий нижний normal stroke с frozen X=97..363, Y=189/190, width1/2/3, без executor и game CHALK. [CI 42576168617](https://github.com/Kiddos19882/AutoDraw/actions/runs/42576168617); [7 native PNG, manifest, SHA и независимый audit](https://github.com/Kiddos19882/AutoDraw/actions/runs/42576168617/artifacts/13655800959).
 - [x] Alpha≥128 контроль missing6655/bottom2457/leak0; y190 width2 missing4245/bottom47/leak0, y189 width3 missing4238/bottom43/leak0. y190 width3 FAIL leakage2414 below mask, несмотря на улучшение покрытия. y189 width1/2 оставляют bottom2457; отрицательные данные сохранены.
@@ -408,14 +367,12 @@
 - [ ] **Следующий невыполненный шаг:** локальная боковая коррекция на базе V4 безопасного нижнего штриха, сначала native rectangle, затем независимые wide/narrow frozen holdouts. В дополнение обязательно Stage/client/desktop↔screen run-bound E5.
 - [ ] Только после достаточной validation принять решение об отдельном новом E4 и exact CHALK. Production planner/Stage6 defaults и 45-cell matrix остаются BLOCKED; no threshold relaxation.
 
-
 ## P1 — FILL-001 native spatial residual: следующий узкий эксперимент
 
 - [x] `FILL001_NATIVE_CONTOUR_SPATIAL_AUDIT_V1`: frozen rectangle, native V2+V3, alpha1/128/254; verified проверяются **PNG SHA, manifest SHA, frozen mask SHA и прежний alpha audit**. Read-only и fail-closed при изменённых файлах, новой форме или попытке overwrite. [CI 42573526457](https://github.com/Kiddos19882/AutoDraw/actions/runs/42573526457), [source JSON/PNG](https://github.com/Kiddos19882/AutoDraw/actions/runs/42573526457/artifacts/13653904396).
 - [x] При alpha≥128 baseline E: missing4717 (bottom2457/right1738/left517/interior5), leak54 (left44,right10). G_trim_3: missing6655, leak0; нижний невосстановленный участок всё ещё bottom2457. V3 H0: missing4394, leak74, bottom2457. Это **offline/native**, не игровой PNG gate.
 - [ ] **Следующий невыполненный шаг:** ограниченно испытать закрытие нижних 3 backing-строк отдельно от уже исправленных боковых концов, используя подтверждённый native brush footprint; предварительно измерить необходимые мелкие размеры кисти. Запретить исполнение до независимого native raster PASS; не восстанавливать дефект ценой leakage.
 - [ ] Затем отдельно повторить freeze-geometry screening на wide/narrow masks, проверить Stage/screen E5 и только после решения одиночный E4; production/45-cell batch BLOCKED, exact CHALK новой стратегии NOT_RUN.
-
 
 ## P1 — FILL-001 этап A: native Egret footprint и локальная калибровка
 
@@ -428,14 +385,12 @@
 
 Native CI SHA `8dae4b91`: [run](https://github.com/Kiddos19882/AutoDraw/actions/runs/42571729011); full validation code SHA `c31f6415`: [run](https://github.com/Kiddos19882/AutoDraw/actions/runs/42571645484). Статус whole runs проверять по конечному заключению, не делать вывод о live E5.
 
-
 ## P1 — FILL-001: native V2/V3 отрицательные результаты и следующий шаг
 
 - [x] Проверены неизменяемые V2 (width10 contour/inset6 + X-trim1–4) и V3 (width5 contour/inset3, interior width10, trim0–4) в настоящем offline BoardPane/Egret WebGL на frozen rectangle. V2 alpha≥1 leakage 88→1, но coverage 98.9273→98.3816%; V3 лучший coverage 98.9895% при 128 leak. **Оба FAIL**.
 - [x] [Native CI 42552197466](https://github.com/Kiddos19882/AutoDraw/actions/runs/42552197466) SUCCESS; сохранены native PNG/manifest/raw alpha reports и отдельно ранний CLI-key FAIL. Исторический game run pointCount baseline=1, exact CHALK1461 не изменён; новый exact CHALK NOT_RUN.
 - [ ] **Следующий шаг:** локализовать native leakage/missing по строкам/сторонам и проверить адаптивное boundary repair, не единый trim. Проверить на frozen rectangle, затем wide и narrow, сохраняя отрицательные результаты.
 - [ ] Run-bound native Stage→screen RGB E5 для живой геометрии V3, только после него — решение о новом одиночном live E4. Production planner, thresholds и batch BLOCKED.
-
 
 ## P1 — native Egret contour-first: результат и следующий gate
 
@@ -458,11 +413,9 @@ Native CI SHA `8dae4b91`: [run](https://github.com/Kiddos19882/AutoDraw/actions/
 
 [Code/CI c0248162](https://github.com/Kiddos19882/AutoDraw/actions/runs/42547807009); [V1](https://github.com/Kiddos19882/AutoDraw/actions/runs/42547807009/artifacts/13644670082), [V2](https://github.com/Kiddos19882/AutoDraw/actions/runs/42547807009/artifacts/13643764696). Эксперименты только E1–E3 offline; CHALK по этим кандидатам NOT_RUN.
 
-
 ## P1 — FILL-001 V3: разбор нового E4 Smooth OFF (активно)
 
 **Новая E2/E3 проверка V3 OFF (2026-11-09):** [CI 42545897296](https://github.com/Kiddos19882/AutoDraw/actions/runs/42545897296) SUCCESS на `3eb92e79`, 47 тестов + 6 subtests; `FILL001_V3_OFF_SPATIAL_RESIDUAL_V1` вывел 18 leaks (10 left/8 right/0 above/0 below), 427 missing, max input roundtrip error 2 logical px. [Отчёт + overlay](https://github.com/Kiddos19882/AutoDraw/actions/runs/42545897296/artifacts/13643392258). Прежний пункт о выполнении spatial audit теперь частично закрыт: **локализация leaks PASS, анализ причинности / native replay OPEN**. Следующий шаг — интерпретировать `missing_by_roi_row` / `missing_by_roi_column` и overlay, сопоставить со stroke endpoints и native renderer, не меняя live план по одному E3 результату.
-
 
 - [x] Новый одиночный V3 запуск OFF на commit `4efa33c`: 27/27 strokes, Smooth OFF 27/27, exact CHALK=1461, run-bound E4 PASS; неизменные board mapping и runtime binding PASS. Исходное `pointCount=1` — нормальный baseline пустой доски со слов оператора; не трактовать как загрязнение.
 - [x] Сохранены исходные raw/PNG/plan и отрицательные PNG quality результаты: V1 coverage 98.3317%, leakage 521; V2 diagnostic coverage 99.5522%, leakage 18 (FAIL).
@@ -471,7 +424,6 @@ Native CI SHA `8dae4b91`: [run](https://github.com/Kiddos19882/AutoDraw/actions/
 - [ ] Только после определения причины решить, нужен ли новый корректирующий эксперимент или чистая парная Smooth ON серия на сопоставимой геометрии. Не менять thresholds, production planner/executor и не запускать batch.
 
 См. [commit 4efa33c](https://github.com/Kiddos19882/AutoDraw/commit/4efa33c655c1e35a36114df316da77cf54f31300) и [PROJECT_STATUS](PROJECT_STATUS.md#fill-001--новый-v3-smooth-off-e4-2026-11-09-commit-4efa33c).
-
 
 **Дата:** 2026-11-08 · **Ветка:** `feature/image-geometry-optimization`. Это список **открытых** работ. Полный старый журнал задач с закрытыми пунктами, историческими `PENDING` и ссылками: [TASKS_HISTORY_THROUGH_2026-11-08.md](TASKS_HISTORY_THROUGH_2026-11-08.md).
 
