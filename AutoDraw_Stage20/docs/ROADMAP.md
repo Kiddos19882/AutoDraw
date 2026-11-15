@@ -1,5 +1,8 @@
 # AutoDraw — дорожная карта будущих работ
 
+**ENGINE-001 after V18 prereg and local A/B (2026-11-15):** source-bound study compared V17 88.24% skeleton support with repaired topology A 95.19% and tangent-paired B 97.46% (1 source px tolerance). V18 A only suppresses redundant diagonal graph links; B rescues short chains without connecting across empty image regions. This is geometric evidence not artwork quality acceptance; no true semantic seam mask or per-color safety. Next verify reproducibility of GitHub Actions V18 job after V17 helper API import fix, inspect source/palette overlays for visually meaningful false paths, and choose a **new prereg ID** for remaining short details or contour-color ownership before any Egret or large-brush fill. Retain V17/V18 negatives and >=99% fill / 3 logical px gates; native width1 and exact game CHALK remain unknown.
+
+
 **ENGINE-001 / after user waived V16 blind reviewer (2026-11-15):** no more manual annotation blocker for **exploratory** AniLines path planning; keep V16 intact for optional later independent validation. New [V17 contour-only prereg](ENGINE001_ANILINES_BRUSH1_PATHS_V17_PROTOCOL_2026-11-15.md) before local outcomes: authentic V14 AniLines source-bound graph skeleton, 417 paths, 1499 synthetic vertices, source skeleton support 88.24%, yet 2479/2896 very short chains discarded. First verify reproducible V17 CI output; next prereg **separate ID** short-feature rescue (avoid global threshold fitting), check source own-color/neighbor contamination, then native width1 support, potential contour-first + large brush fill. Do not claim exact CHALK or native success from pixel coverage; current >=99% and 3 logical px gates unchanged.
 
 
