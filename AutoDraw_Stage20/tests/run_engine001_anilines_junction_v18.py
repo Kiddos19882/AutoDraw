@@ -7,7 +7,7 @@ import cv2
 import numpy as np
 from PIL import Image
 from skimage.morphology import skeletonize
-from run_engine001_anilines_brush1_v17 import rdp, arc
+from run_engine001_anilines_brush1_v17 import simplify as rdp, length as arc
 
 SOURCE_SHA="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
 ANI_SHA="2d4220381e18a86400e4afa950caa064ada5fe1adc821c9a230239cb91848f3b"
@@ -114,7 +114,7 @@ def render_variant(kind,routes,members,chains,skel,inkmask,out,suppressed,edges,
         if arc(path)<4:short_reject+=1;continue
         rescued+=sum(arc(chains[i])<4 for i in ids)
         retained.update(ids)
-        points=rdp(path,eps=0.6)
+        points=rdp(path,epsilon=0.6)
         for index in range(0,len(points)-1,127):
             part=points[index:min(index+128,len(points))]
             if len(part)<2:continue
