@@ -1,0 +1,60 @@
+name: ENGINE-001 V30 experimental adaptive brush visual models
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-visual-adaptive-v30.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_visual_adaptive_fill_v30.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  experimental-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install processing dependencies
+        run: python -m pip install "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scikit-image>=0.25,<0.27" "scipy>=1.13,<2"
+      - name: Download original V28-D and V29 baseline previews
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/v28" "$RUNNER_TEMP/v29"
+          gh run download 43687934758 --repo Kiddos19882/AutoDraw -n engine001-v28-roi-palette-visual-evidence -D "$RUNNER_TEMP/v28"
+          gh run download 43688844089 --repo Kiddos19882/AutoDraw -n engine001-v29-budgeted-color-visual-evidence -D "$RUNNER_TEMP/v29"
+      - name: Reuse nonexecutable adaptive fill planners and verify source ownership
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_visual_adaptive_fill_v30.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --frozen-d "$RUNNER_TEMP/v28/D-roi8-skipwhite.png" \
+            --frozen-v29 "$RUNNER_TEMP/v29/budgeted-roi.png" \
+            --output "$RUNNER_TEMP/engine001-v30"
+          python - <<'PY'
+          import os,json,hashlib
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-v30"
+          r=json.loads((root/"report.json").read_text())
+          assert r["status"]=="EXPERIMENTAL_MODEL_ONLY_NOT_GAME"
+          assert set(r["modes"])=={"interior","outline-first"}
+          assert all(not m["automatic_execution_allowed"]
+                     and m["owner_mismatch_model_pixels"]==0
+                     and m["outside_target_model_pixels"]==0 for m in r["modes"].values())
+          assert all(hashlib.sha256((root/f).read_bytes()).hexdigest()==v
+                     for f,v in r["derived_sha256"].items())
+          print("V30 offline axis-aligned footprint MODEL reproducibility E3 PASS only")
+          PY
+      - name: Preserve model-only plans, PNG and source SHA
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-v30-adaptive-fill-model-evidence
+          path: ${{ runner.temp }}/engine001-v30
+          if-no-files-found: warn
