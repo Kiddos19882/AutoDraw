@@ -27,6 +27,9 @@ def pinned(path, expected):
 
 
 def frozen_b(zip_file):
+    # Reject malformed archives consistently, before treating any content as evidence.
+    if not zipfile.is_zipfile(zip_file):
+        raise ValueError("Invalid V18 artifact ZIP: "+str(zip_file))
     with zipfile.ZipFile(zip_file) as archive:
         report=json.loads(archive.read("report.json"))
         if report.get("source_sha256")!=SOURCE_SHA or report.get("anilines_sha256")!=ANILINES_SHA:
