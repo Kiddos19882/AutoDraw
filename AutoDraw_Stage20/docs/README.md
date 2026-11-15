@@ -89,7 +89,7 @@
 - [`WORK_LOG_HISTORY_THROUGH_2026-11-08.md`](WORK_LOG_HISTORY_THROUGH_2026-11-08.md)
 - [`WORK_LOG.md`](WORK_LOG.md)
 
-### ENGINE-001 — дополнительные experimental source-bound protocols (8)
+### ENGINE-001 — дополнительные experimental source-bound protocols (9)
 
 Эти протоколы зарегистрированы для исследовательских сравнений на сложной картинке. Не являются production gate PASS; актуальный статус — в [PROJECT_STATUS](PROJECT_STATUS.md) и [TEST_RESULTS](TEST_RESULTS.md).
 
@@ -101,6 +101,7 @@
 - [`ENGINE001_FDOG_ANILINES_V14_PROTOCOL_2026-11-15.md`](ENGINE001_FDOG_ANILINES_V14_PROTOCOL_2026-11-15.md) — настоящие FDoG / AniLines Detail, [CI 43653371987](https://github.com/Kiddos19882/AutoDraw/actions/runs/43653371987) E3 PASS только для inference.
 - [`ENGINE001_ANILINES_SEAM_REFERENCE_V16_PROTOCOL_2026-11-15.md`](ENGINE001_ANILINES_SEAM_REFERENCE_V16_PROTOCOL_2026-11-15.md) — подготовка независимого эталона: без ручной blind-разметки semantic evaluation BLOCKED.
 - [`ENGINE001_ANILINES_BRUSH1_PATHS_V17_PROTOCOL_2026-11-15.md`](ENGINE001_ANILINES_BRUSH1_PATHS_V17_PROTOCOL_2026-11-15.md) — AniLines Detail → source-bound скелетные траектории кисти 1 без обязательной blind-разметки; offline exploratory, не качество game/CHALK.
+- [`ENGINE001_ANILINES_JUNCTION_REPAIR_V18_PROTOCOL_2026-11-15.md`](ENGINE001_ANILINES_JUNCTION_REPAIR_V18_PROTOCOL_2026-11-15.md) — A удаление избыточных диагоналей в графе AniLines; B объединение ветвей по направлению, без дорисованных линий; exploratory, не native/CHALK.
 
 ### CHALK, FILL, INT — отчёты и протоколы (37)
 
