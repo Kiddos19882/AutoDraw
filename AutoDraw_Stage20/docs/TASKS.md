@@ -1,5 +1,8 @@
 # AutoDraw — действующие задачи
 
+- [ ] **ENGINE-001 / V37 user visual reference V35-B full outline:** user selected **V35-B 410 contours after paint** as best line art (visual preference, not E5). Freeze V35-B native geometry/ordering as preferred reference, and test source-aware fill/color changes without silently replacing it with V35-C/V36 297-contour variants. Compare final native image, face/hand/hair recognition, source colors, cross-color spill, color coverage >=99%, <=3 logical px leakage, and resource quota separately; CHALK only in actual game E4. [V35 visual sign-off](ENGINE001_PAINT_THEN_DETAIL_V35_PROTOCOL_2026-11-15.md).
+
+
 - [x] **ENGINE-001 / V36 source-colored contours over separate paint native A/B/C:** [CI43743810164](https://github.com/Kiddos19882/AutoDraw/actions/runs/43743810164) E3 SUCCESS SHA `86f8d5d`, artifact14173870057 24/24 SHA PASS. Frozen V35-C paint1945 width2 then detail297 width1, 2242 strokes/5269 synthetic vertices NOT CHALK; original dark contour A source RGB MAE18.5822/warm36.0898, source-color B **12.2778/28.1013**, half-tint C14.4613/29.8469, alpha exact across variants. B best RGB, C stronger visible facial/garment line contrast exploratory; production NOT accepted, E4/E5/exact CHALK NOT_RUN. [Protocol/result](ENGINE001_SOURCE_COLOR_CONTOUR_V36_PROTOCOL_2026-11-15.md).
 - [ ] **ENGINE-001 / next V37 color-region restoration with native layered detail:** prereg separately frozen V36 B/C, source-aware additional warm/orange color regions, prioritize hair/eyes/hands, avoid weakening lines or overbudget; real Egret color-class/fidelity, coverage>=99% and <=3px gates and CHALK run-bound remain. Check exact resources before game execution. No production until validation.
 
