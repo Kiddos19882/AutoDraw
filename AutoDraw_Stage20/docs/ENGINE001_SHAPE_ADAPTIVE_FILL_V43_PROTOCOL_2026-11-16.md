@@ -47,3 +47,20 @@ Only after P1 E2 and source component evidence inspected, freeze three candidate
 Preserve A/B/C full physical source-mask and source RGB, all 410 final dark contours, same BoardPane WebGL image coordinate mapping and width semantics, native alpha24/128 by required class and per-color foreign overlap at<=9/>9 native px, silhouette leakage, original-source full/warm RGB MAE, user-reviewable face/hair/hand crops, stroke counts, synthetic accepted vertices and color switches. **Reject** an A/B/C candidate exceeding3000 native strokes/5900 synthetic accepted vertices or dropping contour paths; archive such a case as `OVER_BUDGET`, do not crop silently. Every native scene uses the real `BoardPane.redraw()` Egret canvas, not geometric raster proxies. Correct class coverage, silhouette and RGB non-regression remain separate gates; source α footprint cannot serve as exact game CHALK. E4/E5 and production changes are **NOT AUTHORIZED** by P1.
 
 **Stopping rule:** if P1 only yields no sufficiently broad components, preserve `NO_WIDE_REGIONS` finding and do not blindly generate oversized brush paths. If P2 B/C worsens source RGB, violates internal/external3logical px, any class recall or visual outline legibility, reject and retain the frozen baseline.
+
+
+## P1 after-run source evidence (2026-11-16)
+
+Focused [CI43777328342](https://github.com/Kiddos19882/AutoDraw/actions/runs/43777328342), commit `8d3a1892ab14ce288f161158e1688cf8b6b457af`, **SUCCESS** after test-only repair. Initial [CI43777201381](https://github.com/Kiddos19882/AutoDraw/actions/runs/43777201381) SHA `d167519a8023a2a53a1575b98154191509103411` **FAIL**: perfectly diagonal line has mathematical infinite PCA anisotropy encoded JSON-safe as `null`, not a finite ratio. Only the unit expectation changed in SHA `8d3a189`; no geometry, thresholds, image/experiment alteration. Failed run preserved.
+
+Successful artifact **14187245530** `engine001-v43-p1-source-shape-model-only`, ZIP SHA256 `640702e266306e4bfb4d07e1f0d2fa46d99d05240de1d75f9994176484198af2`; independently opened `component-shape-analysis.json`, experiment ID/source classes consistent. Unit tests5/5 PASS, only source component analysis **E2 MODEL_ONLY**, not actual Egret paint evidence, no native/CHALK E4/E5.
+
+| Original source class | Source target pixels | 8-connected components | Wide components max radius>=4 | Area of wide components | PCA-oriented candidates |
+|---|---:|---:|---:|---:|---:|
+| 4 | 3932 | 628 | 1 | 329 | 45 |
+| 5 | 4774 | 452 | 4 | 1324 | 41 |
+| 6 | 2339 | 409 | 2 | 209 | 20 |
+| 7 | 5494 | 86 | 2 | 5066 | 6 |
+| Total | **16539** | **1575** | **9** | **6928** (41.89% source-target pixels) | **112** |
+
+The largest component is class7 dark garment at area5005 source pixels and maximum inscribed radius16 logical source pixels; class5 biggest area487, class4 area329, class6 area227. Source palette classes are highly fragmented; a naive global sweep or all-wide brush is not justified. **Decision:** isolate a native large-region brush feasibility probe first, focusing on the large class7 area and preserving every frozen other fill stroke and all410 V35-B final dark outline strokes; avoid representing this as a validated complete hybrid strategy. The broader oriented/skeleton B/C remain future P2 after evidence of supported native variable width and resource safety. The next gate is actual Egret BoardPane WebGL, 3logical px internal and external tolerance, original RGB, native accepted vertices, no production promotion.
