@@ -1,5 +1,8 @@
 # AutoDraw — действующие задачи
 
+- [ ] **ENGINE-001 / V40-P2 native within-row endpoint correction:** [pre-registered](ENGINE001_V40P2_ENDPOINT_EXTENSION_PROTOCOL_2026-11-16.md) original V37-P2-C unchanged 1945 width2 fills +410 dark full V35-B outline strokes. Compare A vs B horizontal endpoints ±0.25 vs C ±0.5 logical px under shared resource2355 strokes/5682 synthetic vertices (NOT CHALK), true Egret alpha24/128 four-class own recall, **internal foreign-color crossing allowed ≤3 logical px** and >3 violation, exterior silhouette, RGB and recognizability. Runner/tests/workflow added; do not promote/retune on FAIL; CI outcome pending.
+
+
 - [ ] **ENGINE-001 / V40 confirmed internal 3-logical-pixel overlap tolerance:** [prereg](ENGINE001_V40_INTERNAL_COLOR_TOLERANCE_AUDIT_PROTOCOL_2026-11-16.md) separate source-class own coverage, allowed foreign overlap≤9 native px, violation>9 native px at α24/128, external silhouette leak and final true Egret composite with 410 dark user-chosen V35-B contours. Reuse frozen V37-P2-C archive14175105717, opt-in runner `tests/run_engine001_internal_color_tolerance_v40.py`, focused regression tests, CI `.github/workflows/engine001-internal-color-tolerance-v40.yml`; report exact SHA/failed metrics, then prereg safe resource-neutral intra-row correction. NOT production quality or game CHALK until E4.
 
 
