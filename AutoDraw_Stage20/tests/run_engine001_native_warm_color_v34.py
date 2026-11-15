@@ -111,18 +111,33 @@ def main():
     sheet([original,img_a,img_b],["Original RGB","V33 native A","V34 median RGB B"],out/"comparison-faces.png",top=True)
     full_a,full_b=mae(img_a,original),mae(img_b,original)
     warm_a,warm_b=mae(img_a,original,warm),mae(img_b,original,warm)
-    alpha24=np.zeros((720,1380),bool)
     per_color={}
     target=np.repeat(np.repeat(labels,3,axis=0),3,axis=1)
     for k in (4,5,6,7):
-        mask=rgba_a[f"color-{k}"][:,:,3]>=24
-        alpha24|=mask
-        per_color[str(k)]={
+        record={
             "old_rgb":next(s["colorRgb"] for s in base if s["colorIndex"]==k),
             "new_rgb":rgb_int(colors[k]),
-            "target_pixels":int(np.count_nonzero(target==k)),
-            "covered_native_alpha24":int(np.count_nonzero(mask&(target==k))),
-            "foreign_class_alpha24":int(np.count_nonzero(mask&(target>=0)&(target!=k)))}
+            "target_pixels":int(np.count_nonzero(target==k))}
+        for threshold in ALPHA:
+            mask=rgba_a[f"color-{k}"][:,:,3]>=threshold
+            actual={
+                "native_target_recall":float(np.count_nonzero(mask&(target==k))/
+                                             max(1,np.count_nonzero(target==k))),
+                "painted_native_pixels":int(np.count_nonzero(mask)),
+                "foreign_palette_pixel_count":int(np.count_nonzero(mask&(target>=0)&(target!=k))),
+                "outside_artwork_roi_pixels":int(np.count_nonzero(mask[:,:155*3]))+
+                                             int(np.count_nonzero(mask[:,305*3:]))}
+            frozen=v33_report["native_per_color"][str(k)][str(threshold)]
+            for key,value in actual.items():
+                if isinstance(value,float):
+                    if abs(value-frozen[key])>1e-12:
+                        raise ValueError("V34 native recall changed from V33: "+str(k))
+                elif value!=frozen[key]:
+                    raise ValueError("V34 native color footprint changed from V33: "+str(k)+" "+key)
+            if not frozen["inside_3_logical_halo"]:
+                raise ValueError("V33 failed frozen color halo gate")
+            record[str(threshold)]=actual
+        per_color[str(k)]=record
     approved=bool(full_b<full_a and warm_b<warm_a)
     hashes={str(path.relative_to(out)).replace("\\","/"):sha(path)
             for path in out.rglob("*") if path.is_file()}
