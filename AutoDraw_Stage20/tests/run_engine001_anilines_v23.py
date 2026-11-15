@@ -15,6 +15,28 @@ ANI_SHA="2d4220381e18a86400e4afa950caa064ada5fe1adc821c9a230239cb91848f3b"
 def digest(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
+def make_fixtures(verts,links):
+    def logical(point):
+        x,y=point
+        if not (type(x) is int and type(y) is int and 0<=x<200 and 0<=y<320):
+            raise ValueError("Invalid source point")
+        return {"x":x*.75+155,"y":y*.75}
+    fixtures=[]
+    for index,v in enumerate(verts):
+        xy=v["source_xy"];pt=logical(xy)
+        fixtures.append({"id":f"vertex-{index:03d}","kind":"vertex",
+                         "sourcePoints":[xy,xy],"points":[pt,pt]})
+    for index,v in enumerate(links):
+        a,b=v["source_start"],v["source_end"]
+        if max(abs(a[0]-b[0]),abs(a[1]-b[1]))!=1:
+            raise ValueError("Link is not source-adjacent")
+        fixtures.append({"id":f"link-{index:03d}","kind":"link",
+                         "sourcePoints":[a,b],"points":[logical(a),logical(b)],
+                         "centerMixed":bool(v["mixed_center_classes"])})
+    if sum(f.get("centerMixed",False) for f in fixtures)!=9:
+        raise ValueError("V22 cross-class link count mismatch")
+    return fixtures
+
 def check_input(root,source,anilines):
     report=json.loads((root/"report.json").read_text(encoding="utf8"))
     if (report.get("source_sha256")!=SOURCE_SHA or
@@ -35,25 +57,7 @@ def check_input(root,source,anilines):
         palette=list(map(list, __import__("numpy").asarray(im.convert("L"),dtype="uint8")))
     if len(palette)!=240 or any(len(row)!=150 for row in palette):
         raise ValueError("V22 palette dimensions changed")
-    def logical(point):
-        x,y=point
-        if not (type(x) is int and type(y) is int and 0<=x<200 and 0<=y<320):
-            raise ValueError("Invalid source point")
-        return {"x":x*.75+155,"y":y*.75}
-    fixtures=[]
-    for index,v in enumerate(verts):
-        xy=v["source_xy"];pt=logical(xy)
-        fixtures.append({"id":f"vertex-{index:03d}","kind":"vertex",
-                         "sourcePoints":[xy,xy],"points":[pt,pt]})
-    for index,v in enumerate(links):
-        a,b=v["source_start"],v["source_end"]
-        if max(abs(a[0]-b[0]),abs(a[1]-b[1]))!=1:
-            raise ValueError("Link is not source-adjacent")
-        fixtures.append({"id":f"link-{index:03d}","kind":"link",
-                         "sourcePoints":[a,b],"points":[logical(a),logical(b)],
-                         "centerMixed":bool(v["mixed_center_classes"])})
-    if sum(f.get("centerMixed",False) for f in fixtures)!=9:
-        raise ValueError("V22 cross-class link count mismatch")
+    fixtures=make_fixtures(verts,links)
     return fixtures,palette,report
 
 def browser_measure(workspace,fixtures,palette):
