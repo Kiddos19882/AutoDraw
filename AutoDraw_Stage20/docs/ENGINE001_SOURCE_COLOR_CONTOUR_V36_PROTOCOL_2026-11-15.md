@@ -25,3 +25,20 @@ Interpretation: **candidate improves color fidelity** only if it reduces **both*
 ## Pipeline
 
 Minimal adapter into existing `tests/run_engine001_paint_then_detail_native_v35.py` or separate focused V36 test runner, no alternative renderer. Pin user source and V35 artifact input; preserve independent V36 artifact identity and failure evidence, compare native actual Egret RGB/alpha and inspect face crops. Begin as opt-in Windows GitHub Actions. Do not promote automatically based solely on MAE or recognizability.
+
+
+## After-run evidence — V36 native actual Egret E3 (2026-11-15)
+
+[CI43743810164](https://github.com/Kiddos19882/AutoDraw/actions/runs/43743810164) **E3 SUCCESS** at SHA `86f8d5d5a85d051b3883571de1f284430aac87b2`, all required native job steps PASS, original source-bound V35-C PNG control exactly reproduced in decoded RGBA, A/B/C full composite plus isolated actual BoardPane/Egret WebGL strokes captured. Artifact **14173870057**, ZIP SHA256 **`acf7743e283b33d5d8cb3da82934eb8a4d8fcad1f4bff6e6db5c7de1fc5ec318`**, all **24/24** report-linked SHA256 PASS. Actual native alpha identical across A/B/C for all composite and isolated color layers. Same paint-first/297 selected width1 detail routes,2242 strokes/5269 synthetic accepted vertices **NOT exact CHALK**.
+
+| Variant | Actual native ROI original RGB MAE | Warm HSV original RGB MAE | Native composite alpha>=24 px | Detail strokes |
+|---|---:|---:|---:|---:|
+| A / V35-C dark [49,38,43] | 18.58220370 | 36.08983933 | 160904 | 297 |
+| B / per-path original RGB lower median | **12.27775926** | **28.10126726** | 160904 | 297 |
+| C / fixed half-up 50% dark / 50% local RGB | 14.46130556 | 29.84691107 | 160904 | 297 |
+
+Both B and C **PASS the prereg color MAE non-regression relative to V35-C A** (full and warm). B yields lowest numeric RGB error; C retains darker contours and, in *non-blind single-image review*, more distinct hair/face and clothing boundaries, potentially better recognition than B. A's lines are darkest but wash out warm detail. This is an exploratory tradeoff; **no independently established semantic recognizability score**. Compared against the pure V34R color fill without lines, RGB MAE14.088824 and warm MAE31.213057, B improves both, C is slightly worse in full RGB but improves warm RGB. It is incorrect to call C universally optimal.
+
+True native RGBA alpha unchanged from V35-C, thus earlier real native source-silhouette recall95.113906% and all related geometric/3logical-px-exterior **diagnostics** are invariant under V36 color-only substitution, on this frozen image, alpha threshold24. **Per-color >=99% final actual quality remains NOT_ACCEPTED**, no game E4/E5/exact CHALK or independent safety margin. Strong result is source-RGB fidelity improvement **with real game-shaped thin overlay lines**, not production acceptance.
+
+**Classification:** `NATIVE_E3_PASS / RGB_FIDELITY_IMPROVEMENT / RECOGNIZABILITY_EXPLORATORY / COLOR_QUALITY_NOT_ACCEPTED / PRODUCTION_BLOCKED`. Preserve entire A/B/C and failed V35 pilot1, neither re-tune RGB mixing coefficients nor replace historical baselines. Next separately prereg source-aware high-fidelity **paint/region restoration** and semantic contour selection, focused on saturated orange/pink costume and facial/hand details, before game runtime eligibility.
