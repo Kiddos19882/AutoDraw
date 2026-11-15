@@ -18,3 +18,22 @@ The *existing* [V5 actual native multicolor holdout CI43692740514](https://githu
 6. **Decision gates remain frozen:** aim for improvement over V5 35.0549585% silhouette, but reject promotion if any individual class has native coverage<99% or 3 logical px exterior halo fails, if target-color boundaries worsen, if plan exceeds experimental caps, or if qualitative recognizability suffers. Do **not** relax these gates or claim V32 final PASS just because its workflow completed. A real game E4 and exact run-bound CHALK=`post.pointCount-pre.pointCount` are **NOT_RUN**; a native offline example does not prove BoardItem2 ≤6000 actual quota.
 
 **Negative/failure outcomes acceptable and retained.** V32 is a *reuse-first isolated diagnostic*, not the final adaptive planner. Next iteration only after actual PNG inspection and evidence, using a new prereg experiment ID if changing algorithm/parameters.
+
+## Append-only results — 2026-11-15 (measured after preregistration)
+
+[Actual V32 Windows CI43695370109](https://github.com/Kiddos19882/AutoDraw/actions/runs/43695370109) **E3 SUCCESS** at SHA `5ac570facef0b2180e77bfde4b4d8727b26be0dc` (frozen V5/engine native renderer, source hash, Node regression 20/20, standalone plan validation, 17 derived SHA checks). Original artifact **14153284187** `engine001-v32-native-adaptive-color-visual-evidence`, ZIP size **464652 bytes**, SHA256 **`2c869708a2f940e408ed3c8f3c1a49f7d19ce9719cb9c6dbd18715324790e107`**, inspected report and validated 17/17 internal SHA hashes. **This is a valid E3 native measurement, NOT a recognition/quality success.** The earlier Markdown audit [43695228487](https://github.com/Kiddos19882/AutoDraw/actions/runs/43695228487) FAIL solely because the newly created protocol had not yet been indexed in README at that SHA; current index was added separately.
+
+| Measured metric | Unmodified archived native V5 | Native V32 |
+|---|---:|---:|
+| Stroke count | 123 | 136 |
+| Synthetic planned vertices, NOT CHALK | 558 | 584 |
+| Actual WebGL alpha>=24 target silhouette recall | 0.3505495853 | **0.3609783117** |
+| Color quality gate | FAIL | **FAIL** |
+
+The native silhouette recall gain is **1.0428736 percentage points** (single image, source palette-defined target, not original RGB fidelity). **7/7** individually rendered foreground labels failed the >=99% target coverage requirement. V32 per-class source-mask coverage: class1=2.63%, class2=1.81%, class3=4.82%, class4=15.11%, class5=3.91%, class6=49.54%, class7=83.59%. Fixed V5 full-white-canvas palette over-allocates nearly-white RGB classes and does not preserve the original vivid yellow/orange costume; that deficiency remains.
+
+**Cause of negligible gain:** V32 created only **13** additional strokes (26 vertices); per-class centerline candidates thousands, but nearly all were rejected by the preliminary `cv2.LINE_8` `foreign pixels==0` condition. All seven class proposal sets processed; not stopped by budget (`cap_reached=false`). Individual model-side candidate rejection totals: class1 100/100 foreign; class2 99/100; class3 299/299; class4 699/703; class5 330/330; class6 624/734; class7 474/693 (other failures were low incremental gain). This is a **diagnostic of the preliminary candidate-selector model only**; do not infer the real Egret stroke safety for rejected paths. Current user-accepted [INV-012 policy](GAME_BRUSH_FOOTPRINT_TEST_POLICY_2026-11-15.md) requires measuring actual Egret brush footprint for coverage, so do not promote the model gate as definitive.
+
+**Qualitative same-crop visual review (one image, nonblind):** V5 already paints right dark silhouette, but left light-haired character's face, hair and warm clothing are almost absent. V32 appearance is essentially unchanged, with a few added dark/peach strokes. No meaningful improvement to eyes/mouth/hand separation or orange saturation. Mark **NATIVE_E3_PASS / RESOURCE_CAP_PASS / QUALITY_FAIL / RECOGNIZABILITY_NO_MEANINGFUL_GAIN**. A synthetic vertex count below 5900 does not imply safe actual BoardItem2 CHALK; live E4, run-bound exact CHALK, independent E5 all NOT_RUN. No production changes.
+
+**Next step:** separate prereg V33 testing source-ROI palette with a protected warm/orange representation plus **actual native per-width/per-path leakage screening**, not `cv2.line` hard rejection as a surrogate game footprint. Require genuine paired color preview before any acceptance or executor integration. Preserve V32 failed quality evidence; do not retune V32 thresholds post hoc.
