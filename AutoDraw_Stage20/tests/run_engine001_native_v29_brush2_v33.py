@@ -24,7 +24,7 @@ def translate(plan,indexes,palette):
     if len(plan["strokes"])!=1945 or (
        plan["summary"]["point_quota_estimate"]["estimated_point_count"]!=4498):
         raise ValueError("Frozen V29 plan counts/forecast changed")
-    rgb_by_idx={int(entry["index"]):list(entry["rgb"]) for entry in palette}
+    rgb_by_idx={i:list(entry["rgb"]) for i,entry in enumerate(palette)}
     converted=[]
     zero=0
     for i,item in enumerate(plan["strokes"]):
