@@ -1,5 +1,8 @@
 # AutoDraw — действующие задачи
 
+- [x] **ENGINE-001 / V21 owner split E3 investigation NO_GAIN:** [CI 43682841556](https://github.com/Kiddos19882/AutoDraw/actions/runs/43682841556) SUCCESS SHA `8aaafd9`, artifact 14149690523; 23 V20-ambiguous source components, 56 unsafe vertices, 33 unsafe connecting edges, 0 safe subpaths. V20 supported 5812/5943 remains unchanged; no production, native, CHALK or E5 acceptance.
+- [ ] **ENGINE-001 / next gate after V21:** preregister independent source-bound audit of palette-class suitability to dark contour owner and/or native Egret width1 footprint (without assuming same-owner 3x3 risk proxy equals game leakage). Preserve 23 V21 negative components, frozen V18/V20 and existing 3 logical px boundary and >=99% fill gates.
+
 - [x] **ENGINE-001 / V20 offline owner-guarded short recovery E3:** prereg `d656200`, [CI 43682273860](https://github.com/Kiddos19882/AutoDraw/actions/runs/43682273860) SUCCESS on `107af276`, artifact 14149075750. 9 new paths/20 vertices; V18-B 5792→V20 5812 of5943 source skeleton within1px (97.4592→97.7957%), 131 missed; 45 size, 6 topology, 23 ambiguous-owner rejected. No native/E4/exact CHALK or production promotion. Source-bound + synthetic fail-closed guards E3 PASS; visual semantic quality UNKNOWN.
 - [ ] **ENGINE-001 / next V20 gate:** inspect color-owner rejected short source fragments (23 candidates) against fixed palette/source boundaries; separately preregister any alternative and check native Egret width1 before proposing production. Preserve V20 and V18 raw evidence, no relaxed 3 logical px or >=99% fill thresholds, no proxy-to-CHALK inference.
 
