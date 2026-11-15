@@ -1,5 +1,8 @@
 # AutoDraw — текущее состояние
 
+**ENGINE-001 / V17 source-bound AniLines path reproducibility verified:** [CI 43676075893](https://github.com/Kiddos19882/AutoDraw/actions/runs/43676075893) SUCCESS on SHA `7cdabbf`, downloaded artifact14146078622 ZIP SHA256 `5ee6679f…`; `strokes.json` hash matches initial local preview exactly (`0f5e5c39…`). Paths417/vertices1499, 5244/5943 source skeleton px within1px; 2479 short chains rejected, so some short details disappear and line continuity at junctions remains questionable. Experiment E3 confirmed as **offline only**, game width1 availability/CHALK, per-color paint safety and overall recognizability still NOT_RUN. User allows exploratory iteration without blind reviewer; do not claim independent E5. [TEST_RESULTS](TEST_RESULTS.md).
+
+
 **ENGINE-001 / AniLines-first V17 contour-only exploratory (2026-11-15):** per user request stop requiring independent reviewer for exploratory iteration; optional V16 blind annotation work remains available but not a gating step. [V17 prereg](ENGINE001_ANILINES_BRUSH1_PATHS_V17_PROTOCOL_2026-11-15.md) at `c7093cc` before local output. Pinned original and authentic V14 AniLines SHA validated; local 1px skeleton/graph plan **417 strokes/1499 synthetic vertices**, 2479/2896 short source chains dropped, skeleton matching **5244/5943=88.24%**, source path forecast **0 pixels beyond1px** from line mask. Visual misses short seams/branches; none of these are semantic quality PASS. Experimental runner/tests/CI committed, native width1/real CHALK/game quality UNKNOWN. [TEST_RESULTS](TEST_RESULTS.md). Next: verify actual V17 GitHub CI artifact and use its preview to decide a separately preregistered short-feature rescue strategy, before any fill.
 
 
