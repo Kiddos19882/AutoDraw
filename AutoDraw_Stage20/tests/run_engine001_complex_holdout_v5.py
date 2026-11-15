@@ -226,7 +226,11 @@ def read_webgl_result(response:dict,out:Path,stem:str) -> tuple[np.ndarray,dict]
 
 
 def native_batch(workspace:Path,variant:str,strokes:list[dict],
-                 output:Path) -> tuple[dict,dict,dict]:
+                 output:Path,renderer_method:str="renderComplexHoldoutColorProbe") -> tuple[dict,dict,dict]:
+    # Opt-in V35 native width1 detail method; existing V5/V33/V34 default unchanged.
+    if renderer_method not in ("renderComplexHoldoutColorProbe",
+                               "renderV35LayeredColorProbe"):
+        raise ValueError("Unsupported native Egret renderer method")
     class Handler(SimpleHTTPRequestHandler):
         def __init__(self,*a,**kw):
             super().__init__(*a,directory=str(workspace),**kw)
@@ -255,7 +259,7 @@ def native_batch(workspace:Path,variant:str,strokes:list[dict],
         items=[(f"color-{k}",v) for k,v in groups.items()]+[("composite",strokes)]
         for stem,plan in items:
             result=driver.execute_script(
-                "return window.AutoDrawGameRendererReference.renderComplexHoldoutColorProbe(arguments[0]);",
+                "return window.AutoDrawGameRendererReference."+renderer_method+"(arguments[0]);",
                 plan)
             data,meta=read_webgl_result(result,output,f"{variant}-{stem}")
             arrays[stem]=data
