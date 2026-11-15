@@ -1,0 +1,66 @@
+name: ENGINE-001 V35 native paint first, V18 detail last A B C
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-paint-then-detail-native-v35.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_paint_then_detail_native_v35.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  actual-egret-layered-paint:
+    runs-on: windows-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Reuse proven V34R native Egret dependencies
+        run: python -m pip install "selenium>=4,<5" "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scikit-image>=0.25,<0.27" "scipy>=1.13,<2"
+      - name: Recover pinned V34R fill and V18-B contour evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/v34r" "$RUNNER_TEMP/v18"
+          gh run download 43740639321 --repo Kiddos19882/AutoDraw -n engine001-v34r-native-warm-color-evidence -D "$RUNNER_TEMP/v34r"
+          gh run download 43677851946 --repo Kiddos19882/AutoDraw -n engine001-v18-anilines-junction-ab -D "$RUNNER_TEMP/v18"
+      - name: Validate experimental layer ordering and native reference
+        shell: bash
+        run: |
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_paint_then_detail_v35.py -v
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_paint_then_detail_native_v35.py
+          python AutoDraw_Stage20/tests/run_engine001_paint_then_detail_native_v35.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --v34r-archive "$RUNNER_TEMP/v34r" \
+            --v18-archive "$RUNNER_TEMP/v18" \
+            --output "$RUNNER_TEMP/engine001-v35-native"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-v35-native"
+          r=json.loads((root/"report.json").read_text(encoding="utf-8"))
+          assert r["experiment"]=="ENGINE001_PAINT_THEN_DETAIL_V35_NATIVE_PILOT_1"
+          assert r["native_A_replay_V34R_pixel_exact"]
+          assert [r["variants"][k]["strokes"] for k in ("A","B","C")]==[1945,2355,2242]
+          assert [r["variants"][k]["synthetic_vertices_NOT_CHALK"] for k in ("A","B","C")]==[3890,5682,5269]
+          assert all(hashlib.sha256((root/p).read_bytes()).hexdigest()==h
+                     for p,h in r["artifacts_sha256"].items())
+          print("V35 genuine native actual Egret experiment captured; production NOT accepted")
+          PY
+      - name: Preserve native A B C originals and negative results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-v35-native-paint-then-detail-evidence
+          path: ${{ runner.temp }}/engine001-v35-native
+          if-no-files-found: warn
