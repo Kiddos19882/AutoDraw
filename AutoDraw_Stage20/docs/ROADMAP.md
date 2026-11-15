@@ -1,5 +1,8 @@
 # AutoDraw — дорожная карта будущих работ
 
+**ENGINE-001 / V36 native source-colored contours (2026-11-15):** [CI43743810164](https://github.com/Kiddos19882/AutoDraw/actions/runs/43743810164) E3 PASS, 24/24 hashes artifact14173870057, real Egret BoardPane paint->details. Original V35-C dark A source RGB MAE18.5822/warm36.0898; per-path locally original sampled RGB B12.2778/warm28.1013; half tint C14.4613/warm29.8469, native all alpha identical. B restores warm-color fidelity best, C retains stronger dark line readability in visual audit, but **no objective recognizability validation and per-color >=99% unmet**. Next V37 separately prereg target-region-aware color fill restoration (orange/gold), only then adapt salient detail and game cost, preserve E3 PNG evidence; no E4/CHALK/E5 or production.
+
+
 **ENGINE-001 / V35 two-layer native A/B/C result and next V36 (2026-11-15):** [actual Egret CI43742747278](https://github.com/Kiddos19882/AutoDraw/actions/runs/43742747278) E3 PASS, artifact14173635779. Fill-only A RGB MAE14.0888 vs all V18-B contour-after-fill B20.2112 vs selected C18.5822; actual rendered B/C have substantially clearer faces/hair/hands, but cost and color fidelity regress. **Two-layer principle visually promising, naive dark-line overlay NOT accepted**. Next isolated, predeclared color-aware contour line/rank study: preserve native source-colored fill, reduce black outlines and foreign-class overpaint, prioritize features, compare true Egret RGB MAE and visual check; no E4/exact CHALK/E5, no production promotion. Full V35 [protocol/outcomes](ENGINE001_PAINT_THEN_DETAIL_V35_PROTOCOL_2026-11-15.md).
 
 
