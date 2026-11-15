@@ -29,6 +29,8 @@
 
 **ENGINE-001 V34 (preregistered, NOT_RUN):** [native warm-color fidelity on frozen V33 real Egret strokes](ENGINE001_NATIVE_WARM_COLOR_V34_PROTOCOL_2026-11-15.md) — сравнить исходные цвета V33 с deterministic source-RGB medians при идентичной геометрии 1945 strokes; native E3 обязателен, E4/CHALK отсутствуют.
 
+**ENGINE-001 V36 source-colored contours:** [предрегистрация native Egret: исходный V35-C → RGB оригинала на штрихах → смешанный оттенок](ENGINE001_SOURCE_COLOR_CONTOUR_V36_PROTOCOL_2026-11-15.md). Изменяются только цвета линий после заливки, геометрия/alpha остаются контрольными; ожидаемый native E3 нельзя считать PASS до CI.
+
 **ENGINE-001 V35 (experimental paint → detail):** [предрегистрация отдельной покраски с последующими контурами поверх](ENGINE001_PAINT_THEN_DETAIL_V35_PROTOCOL_2026-11-15.md). Первый шаг: тестируемый слойный план/ресурсный валидатор, без claims native quality; исходный V34R E3 PASS, детали ещё NOT_RUN.
 
 **ENGINE-001 V34R native replay verification (preregistered):** [отдельный протокол V34R после FAIL исходного V34](ENGINE001_NATIVE_WARM_COLOR_V34R_REPLAY_PROTOCOL_2026-11-15.md) — пиксельно точное RGBA/IDAT совпадение, служебные PNG метаданные не считаются изменением игровой кисти; до успешного CI не объявлять quality PASS.
