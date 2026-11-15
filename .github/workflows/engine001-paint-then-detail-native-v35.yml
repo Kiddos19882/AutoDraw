@@ -1,4 +1,4 @@
-name: ENGINE-001 V35 native paint first, V18 detail last A B C
+name: ENGINE-001 V35 pilot2 native paint then width1 detail
 
 on:
   push:
@@ -6,6 +6,8 @@ on:
     paths:
       - ".github/workflows/engine001-paint-then-detail-native-v35.yml"
       - "AutoDraw_Stage20/tests/run_engine001_paint_then_detail_native_v35.py"
+      - "AutoDraw_Stage20/tests/run_engine001_complex_holdout_v5.py"
+      - "AutoDraw_Stage20/tests/game_renderer_reference.js"
   workflow_dispatch:
 
 permissions:
@@ -43,13 +45,13 @@ jobs:
             --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
             --v34r-archive "$RUNNER_TEMP/v34r" \
             --v18-archive "$RUNNER_TEMP/v18" \
-            --output "$RUNNER_TEMP/engine001-v35-native"
+            --output "$RUNNER_TEMP/engine001-v35-pilot2"
           python - <<'PY'
           import hashlib,json,os
           from pathlib import Path
-          root=Path(os.environ["RUNNER_TEMP"])/"engine001-v35-native"
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-v35-pilot2"
           r=json.loads((root/"report.json").read_text(encoding="utf-8"))
-          assert r["experiment"]=="ENGINE001_PAINT_THEN_DETAIL_V35_NATIVE_PILOT_1"
+          assert r["experiment"]=="ENGINE001_PAINT_THEN_DETAIL_V35_NATIVE_PILOT_2"
           assert r["native_A_replay_V34R_pixel_exact"]
           assert [r["variants"][k]["strokes"] for k in ("A","B","C")]==[1945,2355,2242]
           assert [r["variants"][k]["synthetic_vertices_NOT_CHALK"] for k in ("A","B","C")]==[3890,5682,5269]
@@ -61,6 +63,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: engine001-v35-native-paint-then-detail-evidence
-          path: ${{ runner.temp }}/engine001-v35-native
+          name: engine001-v35-pilot2-native-paint-then-detail-evidence
+          path: ${{ runner.temp }}/engine001-v35-pilot2
           if-no-files-found: warn
