@@ -75,7 +75,7 @@ def main():
     frozen_preview=archive/"budgeted-roi.png"
     if sha(frozen_plan)!=FROZEN_PLAN_SHA or sha(frozen_preview)!=FROZEN_PREVIEW_SHA:
         raise ValueError("Frozen V29 original plan/preview SHA mismatch")
-    plan=json.loads(frozen_plan.read_text())
+    plan=json.loads(frozen_plan.read_text(encoding="utf-8"))
     if [k["rgb"] for k in plan["palette"]] != [c["rgb"] for c in pal]:
         raise ValueError("Actual original Stage20 V29 palette differs")
     strokes,zeros=translate(plan,idx,pal)
