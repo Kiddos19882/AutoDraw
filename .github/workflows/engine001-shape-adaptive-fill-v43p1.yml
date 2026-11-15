@@ -1,0 +1,51 @@
+name: ENGINE-001 V43 P1 source-shape adaptive fill analysis
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-shape-adaptive-fill-v43p1.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_shape_adaptive_fill_v43p1.py"
+      - "AutoDraw_Stage20/tests/test_engine001_shape_adaptive_fill_v43p1.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-component-analysis-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install existing mask-analysis dependencies
+        run: python -m pip install "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13"
+      - name: Verify isolated source-component and skeleton model
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_shape_adaptive_fill_v43p1.py AutoDraw_Stage20/tests/test_engine001_shape_adaptive_fill_v43p1.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_shape_adaptive_fill_v43p1.py -v
+          python AutoDraw_Stage20/tests/run_engine001_shape_adaptive_fill_v43p1.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --output "$RUNNER_TEMP/engine001-v43-p1"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          p=Path(os.environ["RUNNER_TEMP"])/"engine001-v43-p1"/"component-shape-analysis.json"
+          r=json.loads(p.read_text(encoding="utf-8"))
+          assert r["experiment"]=="ENGINE001_SHAPE_ADAPTIVE_FILL_V43_P1"
+          assert r["evidence_level"]=="E2_MODEL_ONLY" and r["native_quality"]=="NOT_RUN"
+          assert r["production_accepted"] is False and r["game_exact_CHALK"] is None
+          assert r["target_source_pixels"]==sum(x["source_class_pixels"] for x in r["per_color"].values())
+          assert all(not x["safe_to_execute"] for x in r["components"])
+          print("V43-P1 geometry classification only; true native variable-width quality NOT_RUN")
+          PY
+      - name: Archive source-only hypotheses and negatives
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-v43-p1-source-shape-model-only
+          path: ${{ runner.temp }}/engine001-v43-p1
+          if-no-files-found: warn
