@@ -89,6 +89,18 @@
 - [`WORK_LOG_HISTORY_THROUGH_2026-11-08.md`](WORK_LOG_HISTORY_THROUGH_2026-11-08.md)
 - [`WORK_LOG.md`](WORK_LOG.md)
 
+### ENGINE-001 — дополнительные experimental source-bound protocols (7)
+
+Эти протоколы зарегистрированы для исследовательских сравнений на сложной картинке. Не являются production gate PASS; актуальный статус — в [PROJECT_STATUS](PROJECT_STATUS.md) и [TEST_RESULTS](TEST_RESULTS.md).
+
+- [`ENGINE001_STRUCTURE_FIRST_V7_PROTOCOL_2026-11-14.md`](ENGINE001_STRUCTURE_FIRST_V7_PROTOCOL_2026-11-14.md) — контуры до заливки, отрицательный line-only preview.
+- [`ENGINE001_STRUCTURE_COLOR_COMPOSITE_V8_PROTOCOL_2026-11-15.md`](ENGINE001_STRUCTURE_COLOR_COMPOSITE_V8_PROTOCOL_2026-11-15.md) — двухслойный contour+fill, низкое покрытие и зарегистрированное отклонение.
+- [`ENGINE001_COMPATIBLE_REGIONS_V9_PROTOCOL_2026-11-15.md`](ENGINE001_COMPATIBLE_REGIONS_V9_PROTOCOL_2026-11-15.md) — отклонённая до запуска цветовая группировка.
+- [`ENGINE001_COMPATIBLE_REGIONS_V10_PROTOCOL_2026-11-15.md`](ENGINE001_COMPATIBLE_REGIONS_V10_PROTOCOL_2026-11-15.md) — цветобезопасная группировка, offline FAIL.
+- [`ENGINE001_DARK_SUIT_LINES_V13_PROTOCOL_2026-11-15.md`](ENGINE001_DARK_SUIT_LINES_V13_PROTOCOL_2026-11-15.md) — слабые внутренние линии пиджака, classical methods E2 partial.
+- [`ENGINE001_FDOG_ANILINES_V14_PROTOCOL_2026-11-15.md`](ENGINE001_FDOG_ANILINES_V14_PROTOCOL_2026-11-15.md) — настоящие FDoG / AniLines Detail, [CI 43653371987](https://github.com/Kiddos19882/AutoDraw/actions/runs/43653371987) E3 PASS только для inference.
+- [`ENGINE001_ANILINES_SEAM_REFERENCE_V16_PROTOCOL_2026-11-15.md`](ENGINE001_ANILINES_SEAM_REFERENCE_V16_PROTOCOL_2026-11-15.md) — подготовка независимого эталона: без ручной blind-разметки semantic evaluation BLOCKED.
+
 ### CHALK, FILL, INT — отчёты и протоколы (37)
 
 - [`CHALK_95_PERCENT_CALIBRATION_HOLDOUT_PROTOCOL_2026-11-07.md`](CHALK_95_PERCENT_CALIBRATION_HOLDOUT_PROTOCOL_2026-11-07.md)
