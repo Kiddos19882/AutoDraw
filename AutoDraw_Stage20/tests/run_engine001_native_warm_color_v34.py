@@ -26,6 +26,24 @@ def median_map(original,idx,classes):
         # Even samples: lower of two center sorted byte values, not mean.
         result[k]=[int(np.sort(owned[:,c])[((len(owned)-1)//2)]) for c in range(3)]
     return result
+def recolor_strokes(base,colors):
+    """Return color-only copy; leave frozen routing, width, order and metadata intact."""
+    result=copy.deepcopy(base)
+    if sorted(colors)!=[4,5,6,7]:
+        raise ValueError("V34 expected four unchanged target color classes")
+    for s in result:
+        label=int(s["colorIndex"])
+        if label not in colors: raise ValueError("V34 stroke with unknown palette class")
+        rgb=colors[label]
+        if len(rgb)!=3 or any(not isinstance(v,int) or not 0<=v<=255 for v in rgb):
+            raise ValueError("V34 invalid color byte")
+        s["colorRgb"]=rgb_int(rgb)
+    if len(result)!=len(base) or any(
+        {k:v for k,v in x.items() if k!="colorRgb"} !=
+        {k:v for k,v in y.items() if k!="colorRgb"} for x,y in zip(base,result)):
+        raise ValueError("V34 changed frozen geometry")
+    return result
+
 def warm_mask(source):
     rgb=np.asarray(source.convert("RGB"),dtype=np.uint8)
     hsv=cv2.cvtColor(rgb,cv2.COLOR_RGB2HSV)
@@ -71,13 +89,7 @@ def main():
         raise ValueError("V34 no-overwrite evidence")
     original,labels,palette,base,v33_report=verify_inputs(a.source,a.v29_archive,a.v33_archive)
     colors=median_map(original,labels,(4,5,6,7))
-    b=copy.deepcopy(base)
-    for s in b:
-        s["colorRgb"]=rgb_int(colors[s["colorIndex"]])
-    if len(b)!=len(base) or any(
-        {k:v for k,v in x.items() if k!="colorRgb"} !=
-        {k:v for k,v in y.items() if k!="colorRgb"} for x,y in zip(base,b)):
-        raise ValueError("V34 changed frozen geometry")
+    b=recolor_strokes(base,colors)
     out=a.output;out.mkdir(parents=True)
     (out/"V34-B-strokes.json").write_text(json.dumps({
         "experiment":"ENGINE001_NATIVE_WARM_COLOR_V34","strokes":b,
