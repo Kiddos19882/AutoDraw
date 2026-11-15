@@ -1,5 +1,9 @@
 # Регламент работы ИИ с AutoDraw — краткий вход
 
+### Обязательная игровая кисть при тестах (2026-11-15)
+
+Перед любым тестированием заполнения, размера/траектории кисти, границ цветов и покрытия перечитать [GAME_BRUSH_FOOTPRINT_TEST_POLICY_2026-11-15.md](GAME_BRUSH_FOOTPRINT_TEST_POLICY_2026-11-15.md). Для результатов качества использовать реальные native BoardPane/Egret strokes/alpha, не прямоугольные прокси или только Pillow/OpenCV. Без native evidence помечать MODEL_ONLY/NOT_VALIDATED; E4 и exact CHALK требуют привязанного игрового запуска. Чистые алгоритмические unit-тесты без утверждений о кисти остаются допустимы.
+
 **Статус:** ACTIVE. **Обновление навигации:** 2026-11-08.  
 Прежняя подробная редакция сохранена побайтово: [AI_WORK_GUIDE_HISTORY_THROUGH_2026-11-08.md](AI_WORK_GUIDE_HISTORY_THROUGH_2026-11-08.md). Постоянные доказательные и инженерные правила остаются в [EVIDENCE_AND_VALIDATION](EVIDENCE_AND_VALIDATION.md), [ENGINEERING_INVARIANTS](ENGINEERING_INVARIANTS.md) и [EXPERIMENT_STANDARD](EXPERIMENT_STANDARD.md).
 
