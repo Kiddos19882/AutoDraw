@@ -1,0 +1,51 @@
+name: ENGINE-001 V16 independent seam reference readiness
+
+on:
+  push:
+    branches:
+      - feature/image-geometry-optimization
+    paths:
+      - ".github/workflows/engine001-seam-reference-v16.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_seam_reference_v16.py"
+      - "AutoDraw_Stage20/tests/test_engine001_seam_reference_v16.py"
+      - "AutoDraw_Stage20/tests/run_engine001_line_extraction_v14_report.py"
+      - "AutoDraw_Stage20/docs/ENGINE001_ANILINES_SEAM_REFERENCE_V16_PROTOCOL_2026-11-15.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  annotation-readiness:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install source-bound offline test dependencies
+        run: python -m pip install "numpy<2" "opencv-python-headless<5" "Pillow<12"
+      - name: Execute V16 synthetic annotation and metric guards
+        run: python -m unittest discover -s AutoDraw_Stage20/tests -p "test_engine001_seam_reference_v16.py" -v
+      - name: Prepare input-only independent annotation pack
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_seam_reference_v16.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --prepare-review "$RUNNER_TEMP/engine001-v16-reviewer-source-only"
+      - name: Publish explicit unannotated status
+        run: |
+          {
+            echo "## ENGINE-001 / V16: independent annotation NOT available"
+            echo "- Synthetic annotation-validator tests: inspect job result"
+            echo "- Source-only 100×189 PNG and manifest template: artifact below"
+            echo "- Human seam ground truth: **BLOCKED / NOT_ANNOTATED**"
+            echo "- AniLines-vs-FDoG semantic precision, recall, recognizability: **NOT_RUN**"
+            echo "- Native Egret and exact game CHALK: **NOT_RUN**"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Preserve source-only annotation input, NOT fake ground truth
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-v16-source-only-annotation-input
+          path: ${{ runner.temp }}/engine001-v16-reviewer-source-only
+          if-no-files-found: error
