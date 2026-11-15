@@ -15,3 +15,17 @@ Can existing experimental wide-brush planners lower stroke count **without globa
 5. Independently compare modeling capability vs existing planner summary: no execution allowed, output widths up to20 use abstract footprint. If any planner emits a path unsafe or a modeled source-color mismatch, **experiment FAIL**; retain artifacts. A model visually acceptable on one pinned input permits only a separate native Egret/color-E4 investigation, not production promotion.
 
 **Status policy:** E3 PASS = deterministic authenticated research/model replay, not a reliable real footprint, not gamed target coverage>=99%, not 3px leakage PASS and not game exact CHALK. E4 and independent E5 NOT_RUN. No Stage6/executor/Bridge/Monitor/master modifications.
+
+## Actual evidence after preregistration (2026-11-15)
+
+[Focused V30 CI43689298730](https://github.com/Kiddos19882/AutoDraw/actions/runs/43689298730) **E3 SUCCESS** on SHA `9e350ef432c88100116a25227557f2b077bb63f4`: original and frozen V28-D/V29 input checks, two genuine existing experimental non-executable planner runs with fixed brush defaults, conservative axis-aligned footprint ownership guards, all output SHA PASS. Artifact **14152215078** `engine001-v30-adaptive-fill-model-evidence`, original ZIP SHA256 **`af144e3b320860dfc4eee21e2c0c89e46d495b6f855deff181866882c21a21cc`**, independently verified all nine report-listed inner SHA256 hashes. Original frozen source and target pixels unchanged.
+
+| Variant | Strokes | Source-color rectangle model coverage | Per-class leakage in this model | RGB MAE (model preview only) |
+|---|---:|---:|---:|---:|
+| V28-D real Stage20 scanline baseline | 6373 | not comparable native vs model | not native tested | 7.7909 |
+| V30 existing `interior_fill_planner` MODEL | **6396** | 16539 / 16539 visible target pixels | 0 | 7.7909 |
+| V30 existing `outline_first_fill_planner` MODEL | **7892** | 16539 / 16539 | 0 | 7.7909 |
+
+Each stroke remains `safe_to_execute=False`; modeled ROI preview is a composition of **conservative rectangular footprints**, not native Egret, not an executor-ready plan or full-color gameplay. Displaying an identical model preview to V28-D is a tautological consequence of model coverage and palette target ownership, **not evidence of actual brush accuracy**. Simple endpoint counts: interior12792, outline15784; these are not a model of actual game point count or CHALK. Both methods produce **more** strokes than V28-D; no resource-saving result on this highly fragmented single-color-label input.
+
+**Conclusion: MODEL_OWNER_CHECK_PASS / STROKE_SAVINGS_NO_GAIN.** Neither existing V30 planner directly solves one-board recognizability. Preserve negative outcome without relaxing real game gates. The next highest leverage research is *semantically salient filled shapes and palette fidelity* (e.g. reserve meaningful orange/red and black/dark blocks) plus economical route/planner design, rather than re-testing boundary-adjacent 1px fragments. A new-ID experiment must define a concrete renderer and test one full-color image. E4 live, exact CHALK, real >=99% coverage / <=3 logical px leakage, independent E5 NOT_RUN, production/master unchanged.
