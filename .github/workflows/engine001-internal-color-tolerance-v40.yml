@@ -1,0 +1,64 @@
+name: ENGINE-001 V40 native internal color 3px tolerance audit
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-internal-color-tolerance-v40.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_internal_color_tolerance_v40.py"
+      - "AutoDraw_Stage20/tests/test_engine001_internal_color_tolerance_v40.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  archived-true-egret-internal-boundary-measurement:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Reuse source-bound analysis and frozen native Egret tools
+        run: python -m pip install "selenium>=4,<5" "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scikit-image>=0.25,<0.27" "scipy>=1.13,<2"
+      - name: Download frozen true Egret original complete paint then 410 outlines
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/v37p2"
+          gh run download 43747149144 --repo Kiddos19882/AutoDraw -n engine001-v37p2-native-full-contour-fill-color-evidence -D "$RUNNER_TEMP/v37p2"
+      - name: Verify allowed 3 logical pixel internal crossing and measure real alpha
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_internal_color_tolerance_v40.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_internal_color_tolerance_v40.py -v
+          python AutoDraw_Stage20/tests/run_engine001_internal_color_tolerance_v40.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --v37p2-archive "$RUNNER_TEMP/v37p2" \
+            --output "$RUNNER_TEMP/engine001-v40-audit"
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          f=Path(os.environ["RUNNER_TEMP"])/"engine001-v40-audit"/"internal-color-overlap.json"
+          r=json.loads(f.read_text(encoding="utf-8"))
+          assert r["experiment"]=="ENGINE001_V40_INTERNAL_COLOR_TOLERANCE_AUDIT"
+          assert r["native_Egret_alpha_ABC_exact"]
+          assert (r["logical_pixel_tolerance"],r["native_distance_tolerance_pixels"])==(3,9)
+          for threshold in ("24","128"):
+              s=r["measurements"][threshold]
+              assert s["total_foreign_required_class_native_pixels"]==s["allowed_internal_overlap_native_pixels"]+s["excess_internal_overlap_native_pixels"]
+              assert set(s["per_paint_owner_class"])=={"4","5","6","7"}
+          assert r["quality_accepted"] is False and r["game_exact_CHALK"] is None
+          print("V40 archived true-Egret internal boundary analysis complete; quality gate evaluated separately")
+          PY
+      - name: Preserve immutable diagnostics including negative outcome
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-v40-archived-native-internal-color-tolerance
+          path: ${{ runner.temp }}/engine001-v40-audit
+          if-no-files-found: warn
