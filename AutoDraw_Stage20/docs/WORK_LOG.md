@@ -1,5 +1,7 @@
 # AutoDraw — журнал выполненных действий
 
+**2026-11-15 / ENGINE-001 V34 static regression follow-up:** On refreshed remote HEAD `282aceb1`, latest20 commits and runner/workflow inspected. Public Actions page, direct GitHub API and connector push workflow listing unavailable; no verified V34 run/job/artifacts, status `UNKNOWN`, not FAIL/PASS. Extracted color-only `recolor_strokes` fail-closed helper (`da5d5d4`), added five offline deterministic regression cases (lower-median, empty class, immutable color-only route, malformed color rejection, warm-mask/MAE) at `57db82f`, added workflow unittest step `743bbb4`, corrected pre-run synthetic test fixture class ownership `99a2f57`. No E2 result claimed until executed; no native E3, game E4/E5, exact CHALK. All V33 source/protocol and production remain unchanged.
+
 **2026-11-15 / ENGINE-001 V34 implementation pre-run:** Refreshed remote HEAD `d30a40f4a3b7`, latest20 commits, status/tasks/roadmap, native V33 protocol/brush policy and V33/V32 runners. V34 color-only [prereg](ENGINE001_NATIVE_WARM_COLOR_V34_PROTOCOL_2026-11-15.md) commit `cb793c5`, indexed README `fa0dfe4`, opt-in runner `360e6ce` and native Windows workflow `94e2eea`. Candidate B uses original RGB channel lower medians in quantized source labels4–7 with frozen original 1945 width2 strokes; native A/V33 replay SHA and A/B alpha equality fail-closed. No collected V34 CI/job result yet; **E3 UNKNOWN**, quality UNKNOWN, E4/game CHALK/E5 NOT_RUN, production/master unchanged. This is implementation, **not experiment PASS**.
 
 
