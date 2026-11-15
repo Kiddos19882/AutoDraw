@@ -1,0 +1,74 @@
+name: ENGINE-001 V22 Palette Proxy Rejection Audit
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-anilines-v22-palette-audit.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_anilines_v22.py"
+      - "AutoDraw_Stage20/tests/test_engine001_anilines_v22.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  frozen-v22:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install offline-only dependencies
+        run: |
+          python -m pip install "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scikit-image>=0.25,<0.27"
+      - name: Validate V22 synthetic proxy classification
+        run: python -m unittest discover -s AutoDraw_Stage20/tests -p "test_engine001_anilines_v22.py" -v
+      - name: Fetch frozen genuine V14 and V18-B
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/v14" "$RUNNER_TEMP/v18"
+          gh run download 43653371987 --repo Kiddos19882/AutoDraw -n engine001-v14-anilines-detail -D "$RUNNER_TEMP/v14"
+          gh run download 43677851946 --repo Kiddos19882/AutoDraw -n engine001-v18-anilines-junction-ab -D "$RUNNER_TEMP/v18"
+          python - <<'PY'
+          import hashlib,os,zipfile
+          from pathlib import Path
+          base=Path(os.environ["RUNNER_TEMP"])
+          source=base/"v14"/"line-output.png"
+          assert hashlib.sha256(source.read_bytes()).hexdigest()=="2d4220381e18a86400e4afa950caa064ada5fe1adc821c9a230239cb91848f3b"
+          with zipfile.ZipFile(base/"v18-frozen.zip","w",compression=zipfile.ZIP_DEFLATED) as z:
+              for src in sorted((base/"v18").iterdir()):
+                  if src.is_file():z.write(src,src.name)
+          PY
+      - name: V22 no-geometry rejection proxy audit
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_anilines_v22.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --anilines "$RUNNER_TEMP/v14/line-output.png" \
+            --v18-zip "$RUNNER_TEMP/v18-frozen.zip" \
+            --output "$RUNNER_TEMP/engine001-v22"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          p=Path(os.environ["RUNNER_TEMP"])/"engine001-v22"
+          d=json.loads((p/"report.json").read_text())
+          m=d["metrics"]
+          assert m["source_skeleton"]==5943 and m["frozen_v18_supported"]==5792
+          assert m["frozen_v20_supported"]==m["frozen_v21_supported"]==5812
+          assert m["ambiguous_components"]==23 and m["vertex_profiles"]["count"]==56
+          assert m["link_profiles"]["count"]==33 and not m["geometry_modified"]
+          assert all(hashlib.sha256((p/k).read_bytes()).hexdigest()==v
+                     for k,v in d["derived_sha256"].items())
+          print("V22 proxy audit E3 reproducibility only, no geometry changes")
+          PY
+      - name: Publish V22 no-paint diagnostic
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-v22-palette-proxy-evidence
+          path: ${{ runner.temp }}/engine001-v22
+          if-no-files-found: warn
