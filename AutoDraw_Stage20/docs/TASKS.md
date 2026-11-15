@@ -1,5 +1,9 @@
 # AutoDraw — действующие задачи
 
+- [x] **ENGINE-001 / V37-P1 full V35-B contour color-only native:** [CI43745869245](https://github.com/Kiddos19882/AutoDraw/actions/runs/43745869245) SUCCESS E3 SHA `5b67a05`, artifact14174860868 ZIP/24 inner hashes PASS. Same **410 V35-B contours** +1945 fill, 2355 strokes/5682 synthetic vertices, A exact frozen V35-B native RGBA, B/C identical alpha. Original RGB MAE A20.2112/warm37.8943, B source RGB **11.9760/27.0636**, C half-tint14.8606/29.7231; RGB diagnostic B/C PASS; visual B softer hair/face outlines, C clearer than B, user still prefers V35-B as reference. No native per-color99% acceptance, live E4/CHALK/E5. [Protocol](ENGINE001_FULL_OUTLINE_V37_P1_PROTOCOL_2026-11-15.md).
+- [ ] **ENGINE-001 / V37-P2 full-contour source color-region restoration:** next **separately prereg** on V37-P1 with complete 410 lines and source-bound paint; investigate original saturated orange/gold/skin regions with Egret-native candidate strokes, compare objective RGB and recognizable facial/hand/hair details to user's V35-B. Must budget native widths/vertices and actual CHALK separately; do not apply production defaults from a model-only proxy.
+
+
 - [ ] **ENGINE-001 / V37-P1 full-outline color-only A/B/C:** [пререгистрация](ENGINE001_FULL_OUTLINE_V37_P1_PROTOCOL_2026-11-15.md) до CI: all 410 user-selected V35-B dark contours kept after 1945-color fill, total2355 strokes/5682 synthetic vertices; A exact original V35-B, B source-RGB median per contour, C half-tint, no omitted lines. New native runner `tests/run_engine001_full_outline_native_v37.py`, unit test and Windows `.github/workflows/engine001-full-outline-native-v37.yml`. Check CI and real Egret PNG, preserve negative; no production/E4/exact CHALK claims.
 
 
