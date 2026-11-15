@@ -3,8 +3,10 @@
 import unittest
 import numpy as np
 from PIL import Image
-from run_engine001_native_warm_color_v34 import median_map,warm_mask,mae,recolor_strokes,prepare_source,quantize_case,SOURCE_SHA,sha
+from run_engine001_native_warm_color_v34 import median_map,warm_mask,mae,recolor_strokes,prepare_source,quantize_case,SOURCE_SHA,sha,png_pixel_exact_replay
 from pathlib import Path
+from tempfile import TemporaryDirectory
+import zlib
 
 class V34ColorOnlyTests(unittest.TestCase):
     def test_lower_median_is_deterministic_and_original_unchanged(self):
@@ -62,6 +64,32 @@ class V34ColorOnlyTests(unittest.TestCase):
             recolor_strokes(base,{4:[1,2,3]})
         with self.assertRaises(ValueError):
             recolor_strokes([{"colorIndex":9}],{4:[1,2,3],5:[0,0,0],6:[0,0,0],7:[0,0,0]})
+    def test_pixel_exact_png_ancillary_metadata_and_drift_rejection(self):
+        # Two byte-different PNGs with unchanged IDAT, just as V34 failed.
+        def insert_debg(blob,payload):
+            self.assertEqual(len(payload),16)
+            index=blob.rfind(b"IEND")-4
+            chunk=(len(payload).to_bytes(4,"big")+b"deBG"+payload+
+                   (zlib.crc32(b"deBG"+payload)&0xffffffff).to_bytes(4,"big"))
+            return blob[:index]+chunk+blob[index:]
+        with TemporaryDirectory() as d:
+            a=Path(d)/"a.png";b=Path(d)/"b.png";c=Path(d)/"c.png"
+            from io import BytesIO
+            mem=BytesIO()
+            Image.new("RGBA",(1380,720),(12,34,56,255)).save(mem,format="PNG")
+            data=mem.getvalue()
+            a.write_bytes(insert_debg(data,b"1234567890ABCDEF"))
+            b.write_bytes(insert_debg(data,b"FEDCBA0987654321"))
+            result=png_pixel_exact_replay(a,b)
+            self.assertTrue(result["pixel_rgba_exact"])
+            self.assertFalse(result["PNG_byte_exact"])
+            self.assertTrue(result["ancillary_chunks_differ"])
+            changed=BytesIO()
+            Image.new("RGBA",(1380,720),(12,34,57,255)).save(changed,format="PNG")
+            c.write_bytes(changed.getvalue())
+            with self.assertRaisesRegex(ValueError,"pixel RGBA"):
+                png_pixel_exact_replay(a,c)
+
     def test_warm_mask_and_mae(self):
         pixels=np.full((240,150,3),255,dtype=np.uint8)
         pixels[0,0]=[255,128,0] # warm orange
