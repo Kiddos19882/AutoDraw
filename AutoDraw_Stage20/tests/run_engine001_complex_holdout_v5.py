@@ -229,7 +229,8 @@ def native_batch(workspace:Path,variant:str,strokes:list[dict],
                  output:Path,renderer_method:str="renderComplexHoldoutColorProbe") -> tuple[dict,dict,dict]:
     # Opt-in V35 native width1 detail method; existing V5/V33/V34 default unchanged.
     if renderer_method not in ("renderComplexHoldoutColorProbe",
-                               "renderV35LayeredColorProbe"):
+                               "renderV35LayeredColorProbe",
+                               "renderV36SourceColoredContourProbe"):
         raise ValueError("Unsupported native Egret renderer method")
     class Handler(SimpleHTTPRequestHandler):
         def __init__(self,*a,**kw):
