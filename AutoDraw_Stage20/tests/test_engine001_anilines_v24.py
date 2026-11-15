@@ -19,13 +19,13 @@ class Tests(unittest.TestCase):
         x=self.case([[600,300,255]])
         self.assertEqual(classify_alpha(x,self.fixture,self.palette,self.roi)["counts"]["128"]["alphaPixels"],1)
     def test_palette_mismatch_fails_closed(self):
-        x=self.case([[600,300,255]])
-        self.palette[100,45]=6
+        x=self.case([[603,300,255]])
+        self.palette[100,46]=6
         with self.assertRaises(ValueError):
             classify_alpha(x,self.fixture,self.palette,self.roi)
     def test_non_background_rgb_distance(self):
-        x=self.case([[600,300,255]])
-        self.roi[100,45]=[200,100,100]
+        x=self.case([[603,300,255]])
+        self.roi[100,46]=[200,100,100]
         outcome=classify_alpha(x,self.fixture,self.palette,self.roi)
         self.assertEqual(outcome["counts"]["128"]["same_class_far_rgb_ge_64"],1)
     def test_empty_and_bad_alpha(self):
@@ -36,7 +36,7 @@ class Tests(unittest.TestCase):
         with self.assertRaises(ValueError):
             classify_alpha(x,self.fixture,self.palette,self.roi)
     def test_foreign_palette_near_rgb(self):
-        x=self.case([[600,300,255]])
+        x=self.case([[603,300,255]])
         self.palette[100,45]=6
         for t in x["coverage"].values():t["foreignClassPixels"]=1
         outcome=classify_alpha(x,self.fixture,self.palette,self.roi)
