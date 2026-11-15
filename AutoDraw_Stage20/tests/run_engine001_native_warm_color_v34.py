@@ -88,7 +88,7 @@ def main():
     if a.output.exists() and any(a.output.iterdir()):
         raise ValueError("V34 no-overwrite evidence")
     original,labels,palette,base,v33_report=verify_inputs(a.source,a.v29_archive,a.v33_archive)
-    colors=median_map(original,labels,(4,5,6,7))
+    colors=median_map(original,labels[:,155:305],(4,5,6,7))
     b=recolor_strokes(base,colors)
     out=a.output;out.mkdir(parents=True)
     (out/"V34-B-strokes.json").write_text(json.dumps({
