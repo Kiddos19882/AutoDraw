@@ -8,10 +8,10 @@ from run_engine001_native_warm_color_v34 import median_map,warm_mask,mae,recolor
 class V34ColorOnlyTests(unittest.TestCase):
     def test_lower_median_is_deterministic_and_original_unchanged(self):
         pixels=np.full((240,150,3),255,dtype=np.uint8)
-        idx=np.full((240,150),4,dtype=np.int16)
+        idx=np.full((240,150),5,dtype=np.int16)
         pixels[0,0]=[20,30,40]
         pixels[0,1]=[100,110,120]
-        idx[0,2:]=5
+        idx[0,:2]=4
         idx[1,:]=6
         idx[2,:]=7
         original=Image.fromarray(pixels.copy(),"RGB")
