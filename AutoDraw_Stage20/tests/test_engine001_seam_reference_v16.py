@@ -135,6 +135,11 @@ class SeamReferenceV16Tests(unittest.TestCase):
             target = Path(td)/"source-only"
             prepare_source_only(source, target)
             self.assertTrue((target/"reviewer_source_only.png").is_file())
+            offline_html = target/"annotate_source_only.html"
+            self.assertTrue(offline_html.is_file())
+            self.assertIn("seams_positive.png", offline_html.read_text(encoding="utf-8"))
+            self.assertIn("definite_nonseam.png", offline_html.read_text(encoding="utf-8"))
+            self.assertIn("reviewer_source_only.png", offline_html.read_text(encoding="utf-8"))
             self.assertFalse((target/"annotation.json").exists())
             self.assertFalse((target/"seams_positive.png").exists())
             with Image.open(target/"reviewer_source_only.png") as im:
