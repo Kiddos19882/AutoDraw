@@ -25,3 +25,25 @@ Run actual archived BoardPane/Egret WebGL renderer via existing `native_batch`, 
 **Candidate PASS requires simultaneously**: A RGBA exact frozen replay; unchanged 2355 strokes/5682 synthetic vertices and dark410 contour pixels; α24 **all four original-source class recalls >= A**, at least one strictly greater; α24 silhouette recall>=A; internal excess >3logical px **zero** at both α24 and α128; exterior >3logical px no increase at both alpha thresholds; source full and warm native RGB MAE **not greater** than A; visual eyes/face/hair/hand detail not degraded on the same image crops (visual non-blind, separate from objective gates). Track all negative outcomes without threshold adjustment.
 
 Only E3 native-quality *experiment execution*, not production PASS. Original required >=99% per-class, real run-bound `CHALK=post.pointCount-pre.pointCount` E4, E5 independent validity and quota safety margin remain unchanged and unmeasured. No production, master, Stage6/Bridge/executor defaults change.
+
+
+## Completed actual native V41 — 2026-11-16 (partial gain, combined diagnostic FAIL)
+
+[CI43775534257](https://github.com/Kiddos19882/AutoDraw/actions/runs/43775534257) **E3 SUCCESS (experiment execution)** SHA `f77c1acab9d74f01c14a8599aa42c56834ebe2dd`, Windows archived BoardPane/Egret WebGL, artifact **14186770222** ZIP SHA256 `51148962483517c3b5e4516e1dcac43d172876d597b4d828f79635986d837c48`. Independently verified original ZIP and **24/24** report-linked SHA256 files. A control native RGBA pixel-identical to frozen V37-P2-C, 410 user-preferred V35-B dark contours native alpha pixel-identical A/B/C. Same2355 total strokes/5682 synthetic accepted vertices (**NOT actual game CHALK**).
+
+| Actual native metric | A frozen | B select source+Egret gap, extend0.25 | C select source+Egret gap, extend0.5 |
+|---|---:|---:|---:|
+| Changed endpoints / distinct fill paths | 0 / 0 | 530 / 489 | 374 / 354 |
+| Source-quantized silhouette recall α24 | **93.868365%** | 94.079314% | **94.268094%** |
+| Correct owner-color class4 recall α24 | 71.0778% | 71.6655% | 72.7365% |
+| Class5 | 77.8104% | 78.3131% | 79.0951% |
+| Class6 | 57.7122% | 58.2965% | 59.2513% |
+| Class7 | 94.7256% | 94.9986% | 95.3768% |
+| Original full ROI RGB MAE | **19.420333** | 19.504074 | 19.466120 |
+| Warm HSV source RGB MAE | **27.904503** | 28.037905 | 27.967640 |
+| Internal wrong-class overlap **beyond3logical px** at α24/128 | **0/0** | **0/0** | **0/0** |
+| Exterior beyond3logical px at α24 | **0** | **0** | **0** |
+
+Predeclared checks: **all 4 own-color native α24 recalls, overall silhouette, native internal/external 3logical-px tolerance all PASS** for B/C, but **both full RGB and warm source RGB non-regression FAIL** for B/C. Therefore **V41 B/C combined numeric diagnostic FAIL**, no production or automatic “best image” claim. C's RGB degradation is smaller than B and alpha coverage greater, but both are still worse than unchanged A in RGB. This is better targeted than frozen all-path V40-P2 (source silhouette gain B≈+1.216pp/C≈+2.509pp but larger RGB damage), though **not** an accepted fix. Actual face/hand/hair visual recognizability is a subjective separate check; no independent E5 score was obtained.
+
+**Decision:** preserve frozen negative outcomes; 3px internal crossing is **allowed** and not the source problem. Next **V42 must be independently preregistered** to address wrong-color source RGB changes, perhaps full native color-weighted edge selection or different paint ownership, without relaxing per-color >=99% acceptance, removing any410 dark contours, or assuming synthetic count equals live CHALK. Keep V37-P2-C as current control. Real E4/E5, game quota and exact bound CHALK remain NOT_RUN.
