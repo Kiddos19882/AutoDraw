@@ -54,7 +54,7 @@ def check_input(root,source,anilines):
     links=json.loads((root/"link-profiles.json").read_text(encoding="utf8"))
     if len(verts)!=56 or len(links)!=33:raise ValueError("Missing cases")
     with Image.open(root/"quantized-palette-labels.png") as im:
-        palette=list(map(list, __import__("numpy").asarray(im.convert("L"),dtype="uint8")))
+        palette=__import__("numpy").asarray(im.convert("L"),dtype="uint8").astype(int).tolist()
     if len(palette)!=240 or any(len(row)!=150 for row in palette):
         raise ValueError("V22 palette dimensions changed")
     fixtures=make_fixtures(verts,links)
