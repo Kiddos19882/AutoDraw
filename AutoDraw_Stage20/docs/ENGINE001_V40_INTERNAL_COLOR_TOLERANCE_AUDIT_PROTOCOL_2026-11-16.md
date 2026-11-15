@@ -22,3 +22,17 @@ For every **actual** isolated color4/5/6/7 alpha PNG and each alpha threshold:
 Audit CI PASS means source evidence integrity and deterministic metric execution **only**. Diagnostic internal tolerance PASS for this source requires **zero** foreign-color painted pixels farther than9 native px (for each alpha threshold and all required colors); report failures explicitly, no threshold tuning after result. This criterion does *not* replace the existing quality gate >=99% per required color, <=3logical px exterior, user-recognizability of facial/hair/hand details, or real game E4/exact CHALK `post.pointCount - pre.pointCount` and E5. If the source palette's segmentation does not correspond to actual visible semantic boundaries, flag interpretation as provisional, not as a license to hide violations.
 
 **Next development after measurement:** preregister minimal resource-neutral **within-row endpoint allocation** using existing native brush/harness, preserving all410 contours and frozen 2355 strokes/5682 synthetic accepted vertices. Never move strokes without a signed A/B comparison: internal overpaint >3 px must not increase; each class own coverage and final-recognizability must not regress. Prior V39 entire-row y movement is excluded.
+
+
+## After-run native archival alpha evidence — 2026-11-16
+
+[CI43770499251](https://github.com/Kiddos19882/AutoDraw/actions/runs/43770499251) **E3 SUCCESS for archival source-bound audit only** SHA `13739e8b356df6bb8fef5aa3b627348f0f1652a7`, artifact **14183662948**, ZIP SHA256 `0d3af2787e38cfb2a9f8048eb7878e4b293cd2273fff3b3ceec00a36632734af`. Source and every frozen V37-P2 original native file hash verified, A/B/C actual Egret alpha pixel-exact on composite and all five isolates; original source RGB final native composite frozen source ROI MAE19.42033333, warm MAE27.90450328. The archived original C contains all 410 dark contours on top.
+
+| α threshold | Actual foreign source-class native painted pixels (all owners) | ALLOWED within 9 native px | EXCESS >9 native px | Exterior >3 logical px |
+|---|---:|---:|---:|---:|
+| 24 | 38,479 | **38,479** | **0** | **0** |
+| 128 | 35,660 | **35,660** | **0** | **0** |
+
+Alpha24 by paint owner4: foreign11969/allowed11969/excess0, max distance6.708 native px; owner5:13630/13630/0,6.708 native px; owner6:7721/7721/0,6.0 native px; owner7:5159/5159/0,6.0 native px. At alpha128 corresponding foreign counts4:11067,5:12696,6:7126,7:4771, **zero** beyond 9 native px for each. **The agreed 3 logical px internal color crossing tolerance is already fulfilled in this source-bound Egret baseline**, so minimizing all wrong-owner overlap to zero would be counterproductive. These are overlap pixel counts **per isolated source-color paint class**; overlapping multiple owners may count the same native screen pixel more than once across classes. No inference of final semantic visible owner after dark outline compositing. Correct own-source-class recall remains4 71.08%,5 77.81%,6 57.71%,7 94.73% (alpha24), well below production >=99%; native alpha controls do not prove game E4/exact CHALK or E5.
+
+**Decision:** V40-P1 diagnostic **PASS**, production/semantic color coverage still **BLOCKED**. Separately preregistered [V40-P2 horizontal endpoints](ENGINE001_V40P2_ENDPOINT_EXTENSION_PROTOCOL_2026-11-16.md): preserve all user-selected 410 contours, test actual Egret 0.25/0.5 logical x expansion and reject if resulting internal color excess>3px or own-color quality regresses. Historical V39 entire-row y-shift FAIL unchanged.
