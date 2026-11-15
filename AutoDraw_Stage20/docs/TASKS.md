@@ -1,5 +1,9 @@
 # AutoDraw — действующие задачи
 
+- [x] **ENGINE-001 / V41 selective native end growth completed with negative combined outcome:** [CI43775534257](https://github.com/Kiddos19882/AutoDraw/actions/runs/43775534257) E3 SUCCESS SHA f77c1ac, artifact14186770222 24/24 SHA PASS. A pixel-exact V37-P2-C, all410 V35-B dark contours exact, B530/C374 selected endpoints, 2355 strokes/5682 synthetics NOT CHALK. Alpha24 silhouette improves 93.8684→94.0793/94.2681%, all 4 own-color classes improve, internal/external >3logical px 0. Full RGB MAE worsens19.4203→19.5041/19.4661 and warm27.9045→28.0379/27.9676, so **B/C prereg overall FAIL**. [V41 full report](ENGINE001_V41_SELECTIVE_NATIVE_ENDPOINT_PROTOCOL_2026-11-16.md).
+- [ ] **ENGINE-001 / V42 selective endpoint/source RGB nonregression:** independently prereg resource-neutral source-RGB-aware edge decision; retain all410 full dark V35-B contours, color-owner crossing<=3logical px and 2355 paths/5682 synthetic accepted vertices; only native Egret E3 and later real game E4/CHALK and E5 can support production.
+
+
 - [ ] **ENGINE-001 / V41 selective original-source/Egret-alpha fill endpoints:** [preregistered V41](ENGINE001_V41_SELECTIVE_NATIVE_ENDPOINT_PROTOCOL_2026-11-16.md) after V40-P2 negative RGB. Real frozen original V37-P2-C Egret isolated alpha24 and source MEDIANCUT owner at native pen edge choose **individual endpoints** on 1945 existing fill paths, not all paths: A frozen exact, B extension0.25logical, C extension0.5logical. All410 dark V35-B contours unchanged, 2355 strokes/5682 synthetic accepted vertices NOT CHALK; internal foreign-color crossing<=3logical px, per-source-class alpha24 recall and source RGB/warm nonregression required; actual native Windows CI [V41 workflow](https://github.com/Kiddos19882/AutoDraw/actions/runs/43775534257) initially running at SHA `f77c1ac`, results pending. No production/E4/exact CHALK/E5.
 
 
