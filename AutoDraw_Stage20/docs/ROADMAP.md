@@ -1,5 +1,8 @@
 # AutoDraw — дорожная карта будущих работ
 
+**ENGINE-001 / V38→V39 boundary color placement (2026-11-16):** source-bound [V38 CI43767506202](https://github.com/Kiddos19882/AutoDraw/actions/runs/43767506202) E3 archival audit confirms most per-class misses tightly localized to MEDIANCUT source boundaries (α24 0 missed pixels at class interior distance>=3 native px; source silhouette93.8684%, color6 recall57.7122%). Next independently preregistered [V39](ENGINE001_BOUNDARY_SHIFT_V39_PROTOCOL_2026-11-16.md) subpixel source-driven y shifts 0.25/0.5 on original fill, frozen full410 V35-B dark outlines remain after paint, no additional strokes/synthetic vertices. Accept only actual Egret per-color nonregression and no visual/RGB loss; 99% quality and game CHALK remain blocked until proven.
+
+
 **ENGINE-001 / V38 gap diagnosis before geometry change (2026-11-16):** [source-bound native Egret alpha audit](ENGINE001_V38_NATIVE_COLOR_BOUNDARY_AUDIT_PROTOCOL_2026-11-16.md) on frozen V37-P2 artifacts; source class recall 4~71%,5~78%,6~58%,7~95% and union~94% despite preferred full410-outline legibility. Need distinguish boundary allocation/misregistration from interior holes and measure real extent using native alpha before adding strokes; 5682/5900 synthetic probe vertices, game CHALK unmeasured. Only then prereg resource-neutral adaptive boundary repositioning with genuine Egret, preserving V35-B user-preferred contour topology and existing <=3px, >=99%, E4/E5 quality gates.
 
 
