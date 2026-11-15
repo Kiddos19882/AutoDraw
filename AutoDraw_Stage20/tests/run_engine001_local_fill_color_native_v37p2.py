@@ -35,7 +35,7 @@ def source_samples(stroke,source,labels,warm):
         y=round((1-t)*p0["y"]+t*p1["y"])
         x=max(155,min(304,x));y=max(0,min(239,y))
         if labels[y,x]!=stroke["colorIndex"]:continue
-        rgb=arr[y,x].tolist()
+        rgb=arr[y,x-155].tolist()
         taken.append(rgb);coords.append([x,y])
         if warm[y,x-155]:warm_taken.append(rgb)
     return taken,warm_taken,coords
