@@ -14,6 +14,49 @@ from run_engine001_complex_holdout_v5 import native_batch
 V33_ZIP_SHA="d3eeb4dc7bc37924aef7713b4b77c76ad3e4adeb2f7baad17b782f4764b66fb1"
 ALPHA=(24,128)
 ROI=(155,0,305,240)
+def png_chunks(path):
+    """Preserve exact IDAT bytes; ancillary metadata may be renderer-generated."""
+    data=path.read_bytes()
+    if not data.startswith(b"\\x89PNG\\r\\n\\x1a\\n"):
+        raise ValueError("V34R invalid native PNG signature")
+    offset=8; chunks=[]
+    while offset<len(data):
+        if offset+12>len(data):raise ValueError("V34R truncated native PNG")
+        size=int.from_bytes(data[offset:offset+4],"big")
+        kind=data[offset+4:offset+8]
+        stop=offset+12+size
+        if stop>len(data):raise ValueError("V34R truncated PNG chunk")
+        chunks.append((kind,data[offset+8:offset+8+size]))
+        offset=stop
+        if kind==b"IEND":break
+    if offset!=len(data):raise ValueError("V34R unexpected PNG trailing data")
+    return chunks
+
+def png_pixel_exact_replay(reference,new):
+    """Reject pixel/IDAT drift, allow only changed ancillary PNG metadata."""
+    from io import BytesIO
+    ref_bytes=reference.read_bytes();new_bytes=new.read_bytes()
+    with Image.open(BytesIO(ref_bytes)) as a, Image.open(BytesIO(new_bytes)) as b:
+        a=np.asarray(a.convert("RGBA"))
+        b=np.asarray(b.convert("RGBA"))
+    if a.shape!=(720,1380,4) or b.shape!=a.shape or not np.array_equal(a,b):
+        raise ValueError("V34R frozen native pixel RGBA reproducibility FAILED")
+    ref_chunks=png_chunks(reference);new_chunks=png_chunks(new)
+    for key in (b"IHDR",b"IDAT"):
+        left=[chunk for kind,chunk in ref_chunks if kind==key]
+        right=[chunk for kind,chunk in new_chunks if kind==key]
+        if not left or left!=right:
+            raise ValueError("V34R frozen native critical PNG data changed: "+key.decode())
+    ref_other=[(key,body) for key,body in ref_chunks if key not in (b"IHDR",b"IDAT",b"IEND")]
+    new_other=[(key,body) for key,body in new_chunks if key not in (b"IHDR",b"IDAT",b"IEND")]
+    return {"pixel_rgba_exact":True,
+            "PNG_byte_exact":ref_bytes==new_bytes,
+            "ancillary_chunks_differ":ref_other!=new_other,
+            "reference_SHA256":hashlib.sha256(ref_bytes).hexdigest(),
+            "replay_SHA256":hashlib.sha256(new_bytes).hexdigest(),
+            "reference_ancillary_types":[kind.decode("latin1") for kind,_ in ref_other],
+            "replay_ancillary_types":[kind.decode("latin1") for kind,_ in new_other]}
+
 def rgb_int(rgb): return (int(rgb[0])<<16)|(int(rgb[1])<<8)|int(rgb[2])
 def median_map(original,idx,classes):
     pixels=np.asarray(original.convert("RGB"),dtype=np.uint8)
@@ -98,11 +141,12 @@ def main():
     # Actual archived BoardPane/Egret WebGL native RGBA, never a CV/PIL brush.
     rgba_a,scenes_a,meta_a=native_batch(a.workspace,"V34-A",base,out)
     rgba_b,scenes_b,meta_b=native_batch(a.workspace,"V34-B",b,out)
+    control_replay={}
     for stem in ["composite"]+[f"color-{k}" for k in (4,5,6,7)]:
         if not np.array_equal(rgba_a[stem][:,:,3],rgba_b[stem][:,:,3]):
-            raise ValueError("V34 native alpha geometry changed: "+stem)
-        if sha(out/("V34-A-"+stem+".png")) != sha(a.v33_archive/("V33-"+stem+".png")):
-            raise ValueError("V34 A fails frozen V33 native PNG reproducibility: "+stem)
+            raise ValueError("V34R native alpha geometry changed: "+stem)
+        control_replay[stem]=png_pixel_exact_replay(
+            a.v33_archive/("V33-"+stem+".png"),out/("V34-A-"+stem+".png"))
     warm=warm_mask(original)
     img_a=logical_crop(rgba_a["composite"])
     img_b=logical_crop(rgba_b["composite"])
@@ -142,12 +186,14 @@ def main():
     hashes={str(path.relative_to(out)).replace("\\","/"):sha(path)
             for path in out.rglob("*") if path.is_file()}
     report={
-        "experiment":"ENGINE001_NATIVE_WARM_COLOR_V34",
+        "experiment":"ENGINE001_NATIVE_WARM_COLOR_V34R",
         "status":"E3_NATIVE_REPLAY_ONLY_NOT_LIVE",
         "source_sha256":SOURCE_SHA,
         "baseline_V33_sha":"386c8c24c0e99765230e7de0e11c864716a1e815",
         "identical_geometry":True,"native_alpha_identical":True,
-        "v33_native_png_byte_hash_reproduced":True,
+        "v33_native_pixel_rgba_exact_replay":True,
+        "v33_native_png_byte_hash_reproduced":all(v["PNG_byte_exact"] for v in control_replay.values()),
+        "frozen_native_PNG_replay_per_scene":control_replay,
         "strokes":1945,"synthetic_vertices_NOT_CHALK":3890,
         "medians":colors,"per_color":per_color,
         "warm_pixel_count":int(warm.sum()),
