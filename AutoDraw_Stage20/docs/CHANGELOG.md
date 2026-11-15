@@ -1,5 +1,8 @@
 # AutoDraw — значимые изменения
 
+**2026-11-15 — ENGINE-001 V18 topology research:** prereg A triangle-aware diagonal graph repair and B direction-based junction chain joining (without added gap-bridging ink); local pinned-source A=527 paths/95.19% skeleton support, B=410 paths/97.46%. Isolated runner/tests/CI and README protocol index added; first CI import mismatch corrected without changing methods. Production, native/game CHALK, master unchanged.
+
+
 **2026-11-15 — ENGINE-001 V17 isolated AniLines brush1 exploratory preview:** user removed independent annotation requirement as prerequisite to experimental planning; original V16 reviewer tool preserved. Registered new V17 before preview, generated 417 brush1 path candidates from frozen real V14 AniLines, 1499 synthetic vertices; preserved short-chain losses and non-native status. Added dedicated opt-in repository runner/tests/Actions, indexed protocol. No production, executor or master changes.
 
 
