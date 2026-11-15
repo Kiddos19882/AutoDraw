@@ -2484,6 +2484,66 @@
     };
   }
 
+  // ENGINE-001 V35 pilot2 ONLY: paint width2 first, then V18-B detail width1.
+  // Same real archived Egret BoardPane/WebGL renderer; V5 API remains unchanged.
+  function renderV35LayeredColorProbe(strokes) {
+    if (!Array.isArray(strokes) || strokes.length < 1 || strokes.length > 3000) {
+      throw new Error("V35 requires 1..3000 bounded strokes.");
+    }
+    let count=0, detailStarted=false;
+    for (const stroke of strokes) {
+      if (!stroke || typeof stroke.strokeId!=="string" ||
+          !Number.isInteger(stroke.colorRgb) ||
+          stroke.colorRgb<0 || stroke.colorRgb>0xffffff ||
+          !Array.isArray(stroke.points) || stroke.points.length<2 ||
+          stroke.points.length>128) {
+        throw new Error("V35 invalid native stroke metadata.");
+      }
+      const isFill=/^icon-[0-9]+$/.test(stroke.strokeId);
+      const isDetail=/^detail-v18-B-[0-9]+$/.test(stroke.strokeId);
+      if ((!isFill && !isDetail) ||
+          (isFill && stroke.width!==2) ||
+          (isDetail && (stroke.width!==1 || stroke.colorRgb!==0x31262B))) {
+        throw new Error("V35 source-bound layer or native width mismatch.");
+      }
+      if (isDetail) detailStarted=true;
+      if (isFill && detailStarted)
+        throw new Error("V35 paint stroke after detail layer.");
+      for (const p of stroke.points) {
+        if (!p || !Number.isFinite(p.x) || !Number.isFinite(p.y) ||
+            p.x<0 || p.x>=BOARD_WIDTH || p.y<0 || p.y>=BOARD_HEIGHT) {
+          throw new Error("V35 point outside frozen logical board.");
+        }
+        count++;
+      }
+    }
+    if (count>5900) throw new Error("V35 synthetic point cap exceeded.");
+    const board=makeTemporalBoard(strokes,2,"normal",false,0,true);
+    if (board.accepted!==count)
+      throw new Error("V35 accepted-point mismatch; reject native experiment.");
+    const state=initializeWebGL(null,3);
+    const blank=document.createElement("canvas");
+    blank.width=BOARD_WIDTH*3;
+    blank.height=BOARD_HEIGHT*3;
+    const result=renderWebGLProbe("normal",[],2,blank,state,board.shape);
+    if (!result.sceneDiagnostics.stageAttached ||
+        result.sceneDiagnostics.boardRenderMode!==3 ||
+        result.canvas.width!==1380 || result.canvas.height!==720) {
+      throw new Error("V35 native Egret Stage geometry mismatch.");
+    }
+    return {
+      schema:"ENGINE001_PAINT_THEN_DETAIL_V35_NATIVE_PILOT_2",
+      renderer:"real Egret 5.4.1 BoardPane/WebGLRenderer",
+      mode:"normal",syntheticAcceptedVerticesNotChalk:count,
+      strokeCount:strokes.length,
+      usedWidths:[...new Set(strokes.map(s=>s.width))],
+      usedColors:[...new Set(strokes.map(s=>s.colorRgb))],
+      glInfo:result.glInfo,webglDrawCalls:result.drawCalls,
+      sceneDiagnostics:result.sceneDiagnostics,
+      webglPngDataUrl:result.canvas.toDataURL("image/png")
+    };
+  }
+
   // ENGINE-001 V23 only: read-only synthetic native width1 diagnostic.
   // Reuses actual BoardPane/CanvasRenderer/WebGLRenderer; no painting in game.
   function renderV23Width1Footprints(fixtures, paletteRows, captureAlpha) {
@@ -2701,6 +2761,7 @@
   api.renderV24NativeAlphaProvenance = renderV24NativeAlphaProvenance;
   api.renderTwoIconMaskProbe = renderTwoIconMaskProbe;
   api.renderComplexHoldoutColorProbe = renderComplexHoldoutColorProbe;
+  api.renderV35LayeredColorProbe = renderV35LayeredColorProbe;
   api.renderTwoIconAdaptiveBrushProbe = renderTwoIconAdaptiveBrushProbe;
   api.renderContourFirstNativeStudy = renderContourFirstNativeStudy;
   api.renderContourTrimNativeStudy = renderContourTrimNativeStudy;
