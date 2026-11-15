@@ -91,7 +91,7 @@
 - [`WORK_LOG_HISTORY_THROUGH_2026-11-08.md`](WORK_LOG_HISTORY_THROUGH_2026-11-08.md)
 - [`WORK_LOG.md`](WORK_LOG.md)
 
-### ENGINE-001 — дополнительные experimental source-bound protocols (22)
+### ENGINE-001 — дополнительные experimental source-bound protocols (23)
 
 Эти протоколы зарегистрированы для исследовательских сравнений на сложной картинке. Не являются production gate PASS; актуальный статус — в [PROJECT_STATUS](PROJECT_STATUS.md) и [TEST_RESULTS](TEST_RESULTS.md).
 
@@ -117,6 +117,7 @@
 - [`ENGINE001_VISUAL_BUDGET_V29_PROTOCOL_2026-11-15.md`](ENGINE001_VISUAL_BUDGET_V29_PROTOCOL_2026-11-15.md) — V29: prereg сопоставления действующего resource-aware optimizer с цветным V28-D по узнаваемости и прогнозному лимиту 6000.
 - [`ENGINE001_VISUAL_ADAPTIVE_FILL_V30_PROTOCOL_2026-11-15.md`](ENGINE001_VISUAL_ADAPTIVE_FILL_V30_PROTOCOL_2026-11-15.md) — V30: независимые только модельные проверки existing interior-fill/outline-first с широкой кистью и сохранением деталей.
 - [`ENGINE001_NATIVE_GAME_BRUSH_V31_PROTOCOL_2026-11-15.md`](ENGINE001_NATIVE_GAME_BRUSH_V31_PROTOCOL_2026-11-15.md) — V31: native archived Egret BoardPane 5 ширин × 6 траекторий, сравнение с ideal capsule MODEL_ONLY.
+- [`ENGINE001_NATIVE_ADAPTIVE_COLOR_V32_PROTOCOL_2026-11-15.md`](ENGINE001_NATIVE_ADAPTIVE_COLOR_V32_PROTOCOL_2026-11-15.md) — V32: дополнение V5 shape-guided цветными штрихами, измерение настоящим Egret WebGL без production.
 
 ### CHALK, FILL, INT — отчёты и протоколы (37)
 
