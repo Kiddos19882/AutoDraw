@@ -1,4 +1,4 @@
-name: ENGINE-001 V34 native warm color fidelity on frozen V33
+name: ENGINE-001 V34R native warm color with pixel-exact baseline replay
 
 on:
   push:
@@ -44,23 +44,24 @@ jobs:
             --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
             --v29-archive "$RUNNER_TEMP/v29" \
             --v33-archive "$RUNNER_TEMP/v33" \
-            --output "$RUNNER_TEMP/engine001-v34"
+            --output "$RUNNER_TEMP/engine001-v34r"
           python - <<'PY'
           import hashlib,json,os
           from pathlib import Path
-          root=Path(os.environ["RUNNER_TEMP"])/"engine001-v34"
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-v34r"
           r=json.loads((root/"report.json").read_text(encoding="utf-8"))
           assert r["strokes"]==1945 and r["synthetic_vertices_NOT_CHALK"]==3890
           assert r["identical_geometry"] and r["native_alpha_identical"]
-          assert r["v33_native_png_byte_hash_reproduced"]
+          assert r["v33_native_pixel_rgba_exact_replay"]
+          assert r["experiment"]=="ENGINE001_NATIVE_WARM_COLOR_V34R"
           assert all(hashlib.sha256((root/p).read_bytes()).hexdigest()==d
                      for p,d in r["derived_sha256"].items())
-          print("V34 measured; candidate improvement is separate from quality gate:",r["color_fidelity_improvement_diagnostic"])
+          print("V34R pixel-exact replay; archived PNG byte metadata may vary. Improvement diagnostic:",r["color_fidelity_improvement_diagnostic"])
           PY
       - name: Preserve evidence even if diagnostics fail
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: engine001-v34-native-warm-color-evidence
-          path: ${{ runner.temp }}/engine001-v34
+          name: engine001-v34r-native-warm-color-evidence
+          path: ${{ runner.temp }}/engine001-v34r
           if-no-files-found: warn
