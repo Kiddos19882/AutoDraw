@@ -26,3 +26,20 @@ Use existing real Egret `renderV36SourceColoredContourProbe` via unchanged `nati
 ## Initial CI preflight failure (before any native V37-P2 quality result)
 
 [CI43746951664](https://github.com/Kiddos19882/AutoDraw/actions/runs/43746951664) on SHA `31f81c26c8b3e8b16b0e2dc3e7f99d2d926258f8` completed **FAIL** in 2/4 new Python deterministic source sample tests, before running Egret. Traceback `IndexError: index 155 is out of bounds for axis 1 with size 150` in `source_samples`: RGB sampling erroneously used full-board x rather than ROI local x-155. The original prereg already specified source ROI x155..304 and logical-to-original mapping; this is a minimal **implementation correction, not a change to experimental independent variables, masks, thresholds or V35-B lines**. Fix commit `04e506a3bf41b5d197a19bb20e36e8f445d79dec` changes `arr[y,x]` to `arr[y,x-155]`. Prior CI remains FAIL and no V37-P2 native pixels or artifact are claimed. Native acceptance waits a separate exact-SHA successful run.
+
+
+## Completed native V37-P2 E3 measurements — 2026-11-15
+
+[CI43747149144](https://github.com/Kiddos19882/AutoDraw/actions/runs/43747149144) **E3 SUCCESS** SHA `04e506a3bf41b5d197a19bb20e36e8f445d79dec`, Windows actual archived Egret BoardPane/WebGL renderer and unchanged original V35-B full dark contour geometry. Artifact **14175105717** ZIP SHA256 `a9d97229fada28875d718ba7c1c068464dfe8529fc1b313becb9a77e2ed50959`. Inspected ZIP and **24/24** report-linked SHA256 files PASS. Baseline V35-B control exact native RGBA pixel replay, **A/B/C all native isolated composite alpha identical**, 2355 strokes / 5682 synthetic accepted vertices (NOT game CHALK), complete 410 original dark width1 contours retained.
+
+| Variant | Original-source RGB MAE | Warm RGB MAE (2946 original warm pixels) | Changed original fill strokes | Distinct paint RGB | Paint RGB switches | Composite native alpha>=24 px |
+|---|---:|---:|---:|---:|---:|---:|
+| A unchanged V35-B full dark contour | 20.21118519 | 37.89431998 | 0 | 4 | 1535 | 161544 |
+| B 5-point source median in palette-owned regions | **19.40516667** | **27.75695859** | 1550 | 1449 | 1927 | 161544 |
+| C source warm-region-only owned median | 19.42033333 | 27.90450328 | **166** | 170 | **1543** | 161544 |
+
+Both B/C meet prereg **source RGB MAE + warm RGB MAE decrease** with native alpha identical. Source ROI native alpha coverage cannot change when only RGB changes; per-color >=99% remains **not accepted**. Additional paint color switches (B +392 compared with A; C +8) may matter in game, and synthetic point count unchanged does **not** establish CHALK or real quota safety margin. No real gameplay E4, no independent E5, no exact CHALK.
+
+**Unblinded visual inspection of original/raw native A/B/C:** Both B/C restore gold/orange belt/ribbon, pink hem/shading and skin tone compared with muted V35-B, while **all user-preferred dark expressive 410 contour routes remain**. B colors more paint strokes and may introduce fine, uneven localized tint; C reaches nearly same error improvement with fewer paint-color changes/switches. The user's aesthetic preference still applies to V35-B full outline; the judgement that C is a more conservative experimental successor is **exploratory**, not user sign-off or external recognition E5. Do not infer C best for all inputs from this single source.
+
+**Classification:** `E3_NATIVE_SUCCESS / LOCAL_RGB_WARM_IMPROVEMENT / FULL_USER_PREFERRED_CONTOURS_PRESERVED / SOURCE_CLASS_COVERAGE_NOT_FIXED / PRODUCTION_BLOCKED`. Historical initial CI43746951664 FAIL due 150px ROI indexing remains preserved; no retroactive PASS. Next independent experiment must target native source-color **coverage gaps** under remaining resource headroom (5900-5682 = 218 synthetic vertices only), or seek resource-neutral stroke rearrangement, with full V35-B outlines immutable and no acceptance threshold relaxation.
