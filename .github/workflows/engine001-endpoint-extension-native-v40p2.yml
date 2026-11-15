@@ -1,0 +1,67 @@
+name: ENGINE-001 V40P2 full outline endpoint extension native Egret
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-endpoint-extension-native-v40p2.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_endpoint_extension_native_v40p2.py"
+      - "AutoDraw_Stage20/tests/test_engine001_endpoint_extension_v40p2.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  actual-egret-internal-tolerance-endpoint-probe:
+    runs-on: windows-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install previously verified actual native Egret libraries
+        run: python -m pip install "selenium>=4,<5" "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scikit-image>=0.25,<0.27" "scipy>=1.13,<2"
+      - name: Restore source-bound frozen V37-P2 full contours and fill
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/v37p2"
+          gh run download 43747149144 --repo Kiddos19882/AutoDraw -n engine001-v37p2-native-full-contour-fill-color-evidence -D "$RUNNER_TEMP/v37p2"
+      - name: Unit check and actual Egret horizontal endpoint placement A B C
+        shell: bash
+        run: |
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_endpoint_extension_v40p2.py -v
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_endpoint_extension_native_v40p2.py
+          python AutoDraw_Stage20/tests/run_engine001_endpoint_extension_native_v40p2.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --v37p2-archive "$RUNNER_TEMP/v37p2" \
+            --output "$RUNNER_TEMP/engine001-v40p2"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-v40p2"
+          report=json.loads((root/"report.json").read_text(encoding="utf-8"))
+          assert report["experiment"]=="ENGINE001_V40P2_NATIVE_ENDPOINT_EXTENSION"
+          assert report["original_V37P2_C_control_RGBA_exact"]
+          assert report["full_user_preferred_contours_alpha_identical"]
+          assert (report["strokes"],report["synthetic_vertices_NOT_CHALK"])==(2355,5682)
+          assert all(hashlib.sha256((root/p).read_bytes()).hexdigest()==digest
+                     for p,digest in report["artifact_SHA256"].items())
+          assert report["production_quality_accepted"] is False
+          assert report["game_exact_CHALK"] is None
+          print("Actual Egret native endpoint extension A/B/C completed, NOT game acceptance")
+          PY
+      - name: Preserve full original native Egret A B C even for negative outcomes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-v40p2-native-endpoint-extension
+          path: ${{ runner.temp }}/engine001-v40p2
+          if-no-files-found: warn
