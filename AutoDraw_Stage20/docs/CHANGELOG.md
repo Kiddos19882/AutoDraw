@@ -1,5 +1,8 @@
 # AutoDraw — значимые изменения
 
+**2026-11-15 — ENGINE-001 V16 research validation readiness (no production changes):** new prereg blind-source jacket-seam protocol, fail-closed positive/definite-negative mask validator, seven synthetic tests and dedicated Actions workflow; [run43668919593](https://github.com/Kiddos19882/AutoDraw/actions/runs/43668919593) E3 PASS for *readiness only*, semantic seam assessment remains BLOCKED pending independent annotation. Updated README protocol index after observed Markdown unindexed-file failures; old V15 posthoc cutoff mismatch remains documented.
+
+
 **2026-11-15 — ENGINE-001 AniLines evidence clarification (documentation only):** indexed post-V14 local filtering as unregistered exploratory analysis, clarified threshold mismatch (V14<128, local<180), missing seam truth and non-semantic suit proxy. Updated canonical status/task/roadmap/log/test-index without changing any experiment algorithm, production files or `master`. V14 authentic FDoG/AniLines CPU jobs remain verified E3 PASS on SHA `df362426`; cleanup and artwork quality still NOT_ACCEPTED.
 
 
