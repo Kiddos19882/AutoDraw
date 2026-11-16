@@ -7,7 +7,7 @@
 
 **Обязательное правило игровых кистей:** [GAME_BRUSH_FOOTPRINT_TEST_POLICY_2026-11-15.md](GAME_BRUSH_FOOTPRINT_TEST_POLICY_2026-11-15.md) — использовать реальный след BoardPane/Egret во всех brush-dependent тестах; модели не заменяют native quality.
 
-**ENGINE-001 V44-P1 (2026-11-16):** [пререгистрация цветоадаптивной обводки](ENGINE001_ADAPTIVE_COLOR_OUTLINE_V44_PROTOCOL_2026-11-16.md). Экспериментальный pure RGB/contrast адаптер для всех 410 исходных контуров V35-B поверх неизменной заливки V37-P2-C и отдельный [native Egret CI](../../.github/workflows/engine001-adaptive-color-outline-native-v44.yml). A исходная тёмная обводка, B исходный median RGB, C локальный порог контраста 2.5; изменения только цвета, без новых линий. CI/native quality/CHALK не объявлять PASS до получения отчётов.
+**ENGINE-001 V44-P1 (2026-11-16; завершённое исследование):** [исходная пререгистрация и результаты](ENGINE001_ADAPTIVE_COLOR_OUTLINE_V44_PROTOCOL_2026-11-16.md), [настоящий Windows BoardPane/Egret CI43813812976](https://github.com/Kiddos19882/AutoDraw/actions/runs/43813812976) E3 SUCCESS. Все 410 исходных контуров сохранены геометрически; вариант **V44-B выбран пользователем как визуальный эталон** для `wV6VeZI9S1Y`, source RGB MAE 11.13399074 (warm 16.42272007). Это подтверждает native-рендер и выбор эталона, **не** per-class ≥99%, E4 game CHALK, E5 и не production acceptance. Для нового V43-P4 сохранять точно все 410 цветных V44-B контуров последними.
 
 **V43-P3a:** [исследование ориентированной width4/6 заливки с V44-B контуром](ENGINE001_V43P3_ORIENTED_REPLACEMENT_PROTOCOL_2026-11-16.md), первая стадия SOURCE_ONLY без заявлений о native-качестве.
 
