@@ -12,6 +12,8 @@
 
 **V43-P3a3:** [настоящий Egret width4/6/10/20/30 для ориентированных мазков](ENGINE001_V43P3A3_NATIVE_ORIENTED_FOOTPRINT_PROTOCOL_2026-11-16.md) — изолированная проверка отпечатков, full fill/CHALK NOT_RUN.
 
+**V43-P3a3 actual native:** [CI43864508620](https://github.com/Kiddos19882/AutoDraw/actions/runs/43864508620) width4/6/10 real Egret isolated alpha result, width20/30 NO_ELIGIBLE. [Next V43-P3b path replacement protocol](ENGINE001_V43P3B_NATIVE_REPLACEMENT_PROTOCOL_2026-11-16.md) (design, NOT_RUN); V44-B full colored contours must remain last.
+
 ## Начните с этих документов
 
 | Вопрос | Куда идти |
