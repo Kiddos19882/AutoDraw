@@ -1,5 +1,8 @@
 # AutoDraw — значимые изменения
 
+**2026-11-16 — ENGINE-001 V43-P4 / DOC-SYNC-20261116 (документация):** утверждён и записан единый протокол **полной замены старых1945 paint strokes** новым adaptive fill B0 (required classes4–7, widths10/6/4/2), неизменные410 пользовательских цветных V44-B контуров последними; B1 исправляет ошибки только после архивирования B0. [Протокол](ENGINE001_V43P4_FULL_ADAPTIVE_FILL_PROTOCOL_2026-11-16.md), [новая инвентаризация](DOCUMENTATION_INVENTORY_2026-11-16.md); действующие индексы согласованы с CI P3b-P0/P1, 0/18 и 0/36 полных замен. Исторические отрицательные материалы и production не менялись; P4 code/CI/native NOT_RUN.
+
+
 **2026-11-15 — ENGINE-001 V18 topology research:** prereg A triangle-aware diagonal graph repair and B direction-based junction chain joining (without added gap-bridging ink); local pinned-source A=527 paths/95.19% skeleton support, B=410 paths/97.46%. Isolated runner/tests/CI and README protocol index added; first CI import mismatch corrected without changing methods. Production, native/game CHALK, master unchanged.
 
 
