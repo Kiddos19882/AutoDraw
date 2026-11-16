@@ -1,0 +1,64 @@
+name: ENGINE-001 V43P3a3 isolated oriented native Egret footprints
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-v43p3a3-native-oriented-footprint.yml"
+      - "AutoDraw_Stage20/tests/game_renderer_reference.js"
+      - "AutoDraw_Stage20/tests/run_engine001_complex_holdout_v5.py"
+      - "AutoDraw_Stage20/tests/run_engine001_v43p3a3_native_probe.py"
+      - "AutoDraw_Stage20/tests/test_engine001_v43p3a3_native_probe.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  isolated-native-footprint:
+    runs-on: windows-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install existing native Egret analysis dependencies
+        run: python -m pip install "selenium>=4,<5" "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scikit-image>=0.25,<0.27" "scipy>=1.13,<2"
+      - name: Validate Python, JS and native probe source contracts
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_v43p3a3_native_probe.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_v43p3a3_native_probe.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+      - name: Capture isolated oriented width4 6 10 20 30 Egret WebGL alpha
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_v43p3a3_native_probe.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --output "$RUNNER_TEMP/v43p3a3"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"v43p3a3"
+          data=json.loads((root/"report.json").read_text(encoding="utf-8"))
+          assert data["experiment"]=="ENGINE001_V43P3A3_NATIVE_ORIENTED_FOOTPRINT"
+          assert list(data["per_width"])==["4","6","10","20","30"]
+          assert data["source_fill_paths_replaced"]==0
+          assert data["V44B_410_outlines_modified"] is False
+          assert data["game_exact_CHALK"] is None
+          assert all(v["selected_paths"] <= 3 and v["synthetic_vertices_NOT_CHALK"] <= 6
+                     for v in data["per_width"].values())
+          assert all(hashlib.sha256((root/p).read_bytes()).hexdigest()==h
+                     for p,h in data["report_linked_SHA256"].items())
+          print("Actual native isolated paint captured; FULL FILL/CHALK NOT_RUN")
+          PY
+      - name: Keep raw native PNG, report and failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-v43p3a3-isolated-native-footprint-evidence
+          path: ${{ runner.temp }}/v43p3a3
+          if-no-files-found: warn
