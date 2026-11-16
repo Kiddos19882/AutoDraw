@@ -1,5 +1,8 @@
 # AutoDraw — действующие задачи
 
+- [ ] **ENGINE-001/V43-P3a:** проверить [новый source-only ориентированный width4/6 протокол](ENGINE001_V43P3_ORIENTED_REPLACEMENT_PROTOCOL_2026-11-16.md), `tests/run_engine001_v43p3_oriented_source.py`, 3 deterministic unit tests, [CI workflow](../../.github/workflows/engine001-v43p3a-oriented-source.yml). MODEL_ONLY; отсутствие game/native Egret output, geometry safe_to_execute=False. После E2 определить **отдельное** строгое правило удаления заменяемых горизонтальных штрихов и native P3b с неизменной цветной обводкой V44-B.
+
+
 **2026-11-16 / ENGINE-001 V44-P1 USER VISUAL DECISION:** Пользователь после просмотра native A/B/C прямо выбрал **V44-B как визуально лучший вариант** для `wV6VeZI9S1Y`. Предыдущая субъективная оценка ассистента «B визуально хуже / C предпочтительнее» **отменена как рекомендация**, но оставлена в исторических протоколах для прослеживаемости; пользовательская оценка имеет приоритет. Native E3 [CI43813812976](https://github.com/Kiddos19882/AutoDraw/actions/runs/43813812976): B RGB MAE 11.13399074, warm 16.42272007 — лучшие из A/B/C; все 410 геометрических контуров сохранены, native alpha не изменена. **V44-B — выбранный визуальный эталон для следующего исследования V44-P2 на этой картинке**; не применять навязанное затемнение C. Порог source-only контраста 2.5:1 не является визуальным критерием и не должен автоматически отклонять B. Признание production остаётся BLOCKED: per-class≥99%, run-bound game CHALK/E4 и независимые проверки не завершены.
 
 
