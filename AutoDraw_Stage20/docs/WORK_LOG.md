@@ -1,5 +1,8 @@
 # AutoDraw — журнал выполненных действий
 
+**2026-11-16 / DOC-SYNC-20261116 CI correction:** real docs-integrity CI43952023203 and CI43952243621 FAILED with respectively 2/3 unindexed docs, although 11/11 auditor unit tests PASS, broken links0, history errors0, duplicate decision IDs0. Root cause: `check_markdown_docs.check_links` considers index only direct Markdown links in `docs/README.md`. Added missing P3b-P1 link in commit `db21a97b`, along with P4 and new inventory links already present; new CI43952776987 was PENDING at observation. Negative CI evidence retained; no code/production/E4 tests run by documentation update.
+
+
 **2026-11-16 / DOC-SYNC-20261116 + ENGINE-001 V43-P4 plan:** проверены remote HEAD и последние20 commits, GitHub tree (7485 items, неусечён), 127 docs Markdown/16 root Markdown/44 ENGINE001 protocols/58 workflows, действующие проектные правила и P3b результаты. Созданы [новый точный P4 full adaptive fill plan](ENGINE001_V43P4_FULL_ADAPTIVE_FILL_PROTOCOL_2026-11-16.md) и [датированная инвентаризация](DOCUMENTATION_INVENTORY_2026-11-16.md); синхронизированы действующие индексы без изменения frozen history. Пользователь согласовал заменить все1945 paint strokes новыми адаптивными по классам4–7, сохранив 410 V44-B цветных контуров LAST, а дефекты исправлять только после первого полного B0. P3b-P1 CI43882838806 E3 capture SUCCESS, 0/36 whole line swaps; первичная попытка FAIL сохранена. **В этой документационной задаче код/native/игровые тесты не запускались**, P4 implementation NOT_RUN; master/production untouched.
 
 
