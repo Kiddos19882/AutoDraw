@@ -1,5 +1,7 @@
 # AutoDraw — журнал выполненных действий
 
+**2026-11-16 / ENGINE-001 V44-P1 CI43810927684:** Windows run FAIL at Python test before native Egret; 7 PASS + 1 ERROR due to reused same detail dict across 410 paths in test fixture. Archives downloaded, no V44 output artifacts. Corrected independent detail objects and unique IDs in commit `37ca9cd`. No algorithm, gates or production changes. New CI pending verification, E4/E5/exact CHALK NOT_RUN.
+
 **2026-11-16 / ENGINE-001 V44-P1 continued:** Added source-side RGB ratio diagnostic per 410 frozen contour paths, tracked missing/failing ratios without treating it as native Egret color visibility. Unit coverage for accounting/missing-source added. Frozen A/B/C RGB and geometry unchanged. Commits `5dcd35e`, `18710ec`; CI status UNKNOWN pending reliable run linkage. Native/game quality and exact CHALK not claimed.
 
 **2026-11-16 / ENGINE-001 V44-P1:** Созданы независимый протокол, pure адаптер выбора RGB контура по двум сторонам, unit-тесты и opt-in Windows workflow для настоящего BoardPane/Egret A/B/C. Основа: замороженный V37-P2-C и все 410 V35-B штрихов. GitHub branch feature/image-geometry-optimization; production/master и исходные raw artifacts не менялись. CI на момент записи UNKNOWN; E4/E5 и game CHALK NOT_RUN.
