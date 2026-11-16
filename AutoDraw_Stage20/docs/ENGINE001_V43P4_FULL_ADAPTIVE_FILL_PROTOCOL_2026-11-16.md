@@ -53,3 +53,20 @@
 Этапы коммитов после текущего документирования: (1) deterministic planner+unit E2; (2) native A baseline fidelity E3; (3) full B0 native A/B E3 + артефакты; (4) review/defect map и отдельный протокол B1. Проверка Markdown: `python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20` через разрешённый CI. После каждого шага обновлять только необходимые `PROJECT_STATUS`, `TASKS`, `TEST_RESULTS`, `WORK_LOG`, `CHANGELOG`.
 
 **Следующий невыполненный шаг:** реализация deterministic multi-color full-replacement B0 planner с unit-тестами; это разрешение только на экспериментальные исходники/CI, **не** на production или E4 game execution.
+
+
+## Addendum 2026-11-17 — независимая предварительная оценка сложности source masks (E1, НЕ prereg B0)
+
+Исходный пользовательский PNG `wV6VeZI9S1Y` проверен локально по SHA256 `07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a`; Pillow RGB resize 150×240 LANCZOS + MEDIANCUT8 без dithering воспроизвёл ожидаемую frozen palette. **Это диагностическое исследование после пререгистрации, не кандидат B0 и не результат утверждённых P4.0/P4.1/P4.2.**
+
+| Source owner | Source pixels | 8-connected components | Single-pixel components | Crude horizontal proxy strokes |
+|---|---:|---:|---:|---:|
+| 4 | 3932 | 628 | 256 | 2152 |
+| 5 | 4774 | 452 | 216 | 1905 |
+| 6 | 2339 | 409 | 187 | 1139 |
+| 7 | 5494 | 86 | 31 | 738 |
+| **Total** | **16539** | **1575** | **690** | **5934** |
+
+**Как воспроизведён proxy (не Egret):** для каждого source owner отдельно бинарная mask 240×150, OpenCV 8-connected; для width10→6→4 брались строки `distanceTransform(mask) >= width/2+1` длиной не меньше `max(3,width//2)`, после каждого выбранного хода помечали как покрытые пиксели моделью `cv2.line(..., thickness=width)`. Остаток проходили строками width2, обновляя модельную маску. Итог: **5934 paint paths + 410 frozen detail = 6344 total**, `2*5934 + (5682-2*1945) = 13660` synthetic vertices **NOT CHALK**. Это не проверка leakage и не реальная игровая кисть; модель могла ошибочно засчитать покрытие или потерять качество, поэтому никаких positive coverage assertions.
+
+Результат **модельно превышает** оба исходных cap (3000 strokes/5900 synthetic vertices). При сохранении 410 detail и 1792 их frozen synthetic vertices верхний допустимый размер новой покраски **min(3000-410, floor((5900-1792)/2)) = 2054 двухточечных paint strokes**; если план содержит больше двух точек, фактический лимит ещё строже. Ни threshold, ни игровые лимиты не менялись. Для P4.1 требуется реально source-oriented/local-anisotropy grouping, экономное покрытие фрагментированных цветов и ограниченное разрешённое пересечение до3 логических px; исходные color blobs не разрешается тихо выкидывать ради cap. При недостатке бюджета — `BLOCKED_RESOURCE`, а не частичная заливка, объявленная успешной. P4 B0 planner всё ещё NOT_RUN, native Egret/E4/E5 NOT_RUN. Никаких экспериментальных файлов в production не добавлено.
