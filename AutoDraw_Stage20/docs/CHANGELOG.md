@@ -1,5 +1,7 @@
 # AutoDraw — значимые изменения
 
+**2026-11-17 — ENGINE-001 V43-P4.2 experimental native A/B0 infrastructure:** opt-in original Egret method for new width2/4/6/10 paint IDs, strict frozen V44-B A replay SHA and pixel-exact before first B0, 410 color RGB details unchanged, alpha24/128/class/3px and RGB diagnostics, Windows native workflow. No production defaults changed; actual CI E3 outcome UNKNOWN. [Preregistered B0 method](ENGINE001_V43P4_FULL_ADAPTIVE_FILL_PROTOCOL_2026-11-16.md#p42-fixed-b0-native-execution-rule--registered-before-first-b0-native-run-2026-11-17).
+
 **2026-11-17 — ENGINE-001 V43-P4.1 experimental planner:** new isolated source-only class4–7 adaptive multi-angle/width10→6→4→2 greedy selector, deterministic provenance, fail-closed budget, 3 regression methods and separate GitHub workflow. Preliminary original-PNG OpenCV MODEL_ONLY 955 paint strokes; candidate not yet combined with frozen V44-B details, and E3 native game quality not claimed. CI E2 UNKNOWN. [Protocol](ENGINE001_V43P4_FULL_ADAPTIVE_FILL_PROTOCOL_2026-11-16.md).
 
 **2026-11-17 — ENGINE-001 P4 source feasibility evidence:** подтверждён source SHA и palette, учтены 1575 фрагментов и отрицательный эвристический horizontal-width proxy (5934 paint paths vs предельные2054 для 2-point); записано, что это MODEL_ONLY не native. Уточнён ресурсный риск в активной задаче без изменения кода, production/CI. [P4 addendum](ENGINE001_V43P4_FULL_ADAPTIVE_FILL_PROTOCOL_2026-11-16.md).
