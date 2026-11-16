@@ -46,6 +46,13 @@ def native_footprint_metrics(alpha, owner, component):
         cv2.DIST_L2,cv2.DIST_MASK_PRECISE)
     owned=np.repeat(np.repeat(owner==7,3,axis=0),3,axis=1)
     inside=np.repeat(np.repeat(component,3,axis=0),3,axis=1)
+    foreign_required=np.repeat(np.repeat(np.isin(owner,(4,5,6)),3,axis=0),3,axis=1)
+    skipped=np.repeat(np.repeat(np.isin(owner,(0,1,2,3)),3,axis=0),3,axis=1)
+    foreground=np.repeat(np.repeat(np.isin(owner,(4,5,6,7)),3,axis=0),3,axis=1)
+    distance_from_class7=cv2.distanceTransform(
+        (~owned).astype(np.uint8),cv2.DIST_L2,cv2.DIST_MASK_PRECISE)
+    distance_from_foreground=cv2.distanceTransform(
+        (~foreground).astype(np.uint8),cv2.DIST_L2,cv2.DIST_MASK_PRECISE)
     results={}
     for threshold in ALPHA_THRESHOLDS:
         painted=alpha>=threshold
@@ -55,6 +62,12 @@ def native_footprint_metrics(alpha, owner, component):
             "native_ink_inside_largest_component":int((painted&inside).sum()),
             "native_ink_over_other_source_classes":int((painted &
                 np.repeat(np.repeat(original_foreign,3,axis=0),3,axis=1)).sum()),
+            "native_ink_on_other_required_classes_4_5_6":int((painted & foreign_required).sum()),
+            "native_ink_on_skipped_background_classes_0_1_2_3":int((painted & skipped).sum()),
+            "native_foreign_required_color_more_than_3logical_px":int(
+                (painted & foreign_required & (distance_from_class7>9)).sum()),
+            "native_exterior_silhouette_more_than_3logical_px":int(
+                (painted & (~foreground) & (distance_from_foreground>9)).sum()),
             "native_ink_outside_component_more_than_3logical_px":int(
                 (painted & (outside_distance>9)).sum()),
             "largest_component_native_coverage_DIAGNOSTIC_ONLY":float(
