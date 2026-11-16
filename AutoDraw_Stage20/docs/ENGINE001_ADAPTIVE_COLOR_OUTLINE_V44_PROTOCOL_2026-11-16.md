@@ -19,3 +19,7 @@ A/B/C: неизменные ID, точки, ширина, порядок, 1945 �
 
 ## Шаги
 P1: изолированный pure color adapter + unit tests; E1/E2 без заявлений о native качестве. P2: при подтверждённом P1 использовать существующий Egret native_batch и baseline archive через отдельный prereg CI, сохранять raw PNG/report/hash. В случае невозможности сборки или CI честно выставить BLOCKED/NOT_RUN.
+
+## Implementation audit — 2026-11-16
+
+V44 P1 code created on branch `feature/image-geometry-optimization`: `tests/engine001_adaptive_color_outline_v44.py` (pure color proposal), `tests/test_engine001_adaptive_color_outline_v44.py` (guards), `tests/run_engine001_adaptive_color_outline_native_v44.py` (native A/B/C), `.github/workflows/engine001-adaptive-color-outline-native-v44.yml` (push/opt-in Windows runner). Corrective commit `cf5a819ee3e6604fd2d6cff47e120b748fe3a309` validates **all** report-linked SHA-256s in the immutable V37-P2 native archive before rendering and rejects bad baseline identity; commit `517ed1ede10e86eb85fd5c42cb24149fefa8aee2` adds tamper/count regression fixture. No changed acceptance rule. CI status not confirmed by connector, E2/E3 UNKNOWN; E4/E5/real game CHALK NOT_RUN. Main method limitations: source-background color is not actual painted Egret RGB; path-level RGB can hide detail when the line spans multiple color regions. Do not infer visual acceptance from computed contrast. Native comparison and face/hair/hand review remain required.
