@@ -1,5 +1,8 @@
 # AutoDraw — действующие задачи
 
+- [ ] **ENGINE-001 / V43-P3a2:** [prereg](ENGINE001_V43P3A2_BROAD_BRUSH_AUDIT_PROTOCOL_2026-11-16.md), source-only audit ширин 4/6/10/20/30 на крупнейшей области класса7, тесты, [CI](../../.github/workflows/engine001-v43p3a2-width-audit.yml). Не объявлять native/E4/CHALK PASS по этой модели. Получить E2 output, затем native footprint этих размеров, отдельно заморозить реальное правило замены исходных линий с неизменной V44-B обводкой.
+
+
 - [ ] **ENGINE-001/V43-P3a:** проверить [новый source-only ориентированный width4/6 протокол](ENGINE001_V43P3_ORIENTED_REPLACEMENT_PROTOCOL_2026-11-16.md), `tests/run_engine001_v43p3_oriented_source.py`, 3 deterministic unit tests, [CI workflow](../../.github/workflows/engine001-v43p3a-oriented-source.yml). MODEL_ONLY; отсутствие game/native Egret output, geometry safe_to_execute=False. После E2 определить **отдельное** строгое правило удаления заменяемых горизонтальных штрихов и native P3b с неизменной цветной обводкой V44-B.
 
 
