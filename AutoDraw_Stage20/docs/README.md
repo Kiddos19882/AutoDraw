@@ -1,5 +1,8 @@
 # Документация AutoDraw — быстрый вход
 
+**ТЕКУЩАЯ НАВИГАЦИЯ (16.11.2026):** [ENGINE-001 V43-P4 — полный adaptive fill, новый активный план](ENGINE001_V43P4_FULL_ADAPTIVE_FILL_PROTOCOL_2026-11-16.md) · [инвентаризация документации и синхронизация](DOCUMENTATION_INVENTORY_2026-11-16.md) · [статус](PROJECT_STATUS.md) · [открытые задачи](TASKS.md). Предыдущие V43-P3b P0/P1 завершили тесты замены отдельных старых линий без экономии (0/18 и 0/36); теперь тестируем **полную новую заливку** с оригинальными 410 цветными V44-B контурами последними. P4 код/CI/full image/E4 пока NOT_RUN. Ниже прежние заметки по V43/V44 — **исторические ссылки**, не текущий следующий шаг.
+
+
 **Рабочая ветка:** `feature/image-geometry-optimization`. **Актуальный evidence baseline ENGINE-001:** `177165361b0340515fe3bb74f4847ab3ec579ebc` (9/9 live E4, E5 PARTIAL; см. §21). Исторический baseline прежней системы документации — `a2d1f0a52d47`. Текущий remote HEAD проверять заново в каждом чате. Это вход в существующую систему документации, а не отдельный источник статуса. Полная предыдущая редакция индекса сохранена [здесь](README_HISTORY_THROUGH_2026-11-08.md).
 
 **Обязательное правило игровых кистей:** [GAME_BRUSH_FOOTPRINT_TEST_POLICY_2026-11-15.md](GAME_BRUSH_FOOTPRINT_TEST_POLICY_2026-11-15.md) — использовать реальный след BoardPane/Egret во всех brush-dependent тестах; модели не заменяют native quality.
@@ -12,7 +15,7 @@
 
 **V43-P3a3:** [настоящий Egret width4/6/10/20/30 для ориентированных мазков](ENGINE001_V43P3A3_NATIVE_ORIENTED_FOOTPRINT_PROTOCOL_2026-11-16.md) — изолированная проверка отпечатков, full fill/CHALK NOT_RUN.
 
-**V43-P3a3 actual native:** [CI43864508620](https://github.com/Kiddos19882/AutoDraw/actions/runs/43864508620) width4/6/10 real Egret isolated alpha result, width20/30 NO_ELIGIBLE. [Next V43-P3b path replacement protocol](ENGINE001_V43P3B_NATIVE_REPLACEMENT_PROTOCOL_2026-11-16.md) (design, NOT_RUN); V44-B full colored contours must remain last.
+**V43-P3a3 actual native:** [CI43864508620](https://github.com/Kiddos19882/AutoDraw/actions/runs/43864508620) width4/6/10 real Egret isolated alpha result, width20/30 NO_ELIGIBLE. [P3b path replacement protocol](ENGINE001_V43P3B_NATIVE_REPLACEMENT_PROTOCOL_2026-11-16.md) (исторический P0/P1, завершён отрицательно); V44-B full colored contours must remain last.
 
 ## Начните с этих документов
 
