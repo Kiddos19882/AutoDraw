@@ -1,5 +1,9 @@
 # AutoDraw — действующие задачи
 
+- [x] **ENGINE-001 / V43-P3a3 E3 isolated native proof:** [CI43864508620](https://github.com/Kiddos19882/AutoDraw/actions/runs/43864508620) SUCCESS SHA `e2cc4d15`, artifact14224453656, original ZIP/6 PNG checksums PASS; Egret widths4/6/10 first3 each rendered, alpha24 wrong-class0/2/0 backing pixels, over3logicalpx=0, silhouette over3logicalpx=0; widths20/30 `NO_ELIGIBLE_PATHS` (not tested natively). Full-fill/E4/exact CHALK NOT_RUN; no production acceptance.
+- [ ] **ENGINE-001 / V43-P3b actual replacement:** [separate prereg](ENGINE001_V43P3B_NATIVE_REPLACEMENT_PROTOCOL_2026-11-16.md) freezes source-owned whole width2 scanline deletion ONLY when the proposed oriented real Egret alpha fully substitutes its own-color footprint. Show strict reduction in count and synthetic vertices, unchanged full410 user-preferred V44-B RGB contours last; full original/warm RGB, per-class>=99%, 3logicalpx, E4/E5 not yet validated. Next: native path-subset feasibility using pinned baseline and reference renderer; no whole-image B produced yet.
+
+
 - [ ] **ENGINE-001 / V43-P3a3:** pre-native report now separately counts foreign4/5/6 vs silhouette >3logicalpx and rejects all-width-empty `NO_NATIVE_SAMPLE`; combined P3a/P3a2/P3a3 tests in CI (`e2cc4d15`), E2/E3 UNKNOWN.  [native opt-in probe prereg](ENGINE001_V43P3A3_NATIVE_ORIENTED_FOOTPRINT_PROTOCOL_2026-11-16.md), [Windows workflow](../../.github/workflows/engine001-v43p3a3-native-oriented-footprint.yml): genuine Egret alpha для ориентированных width4/6/10/20/30 на class7, по 0–3 маршрута/ширину. Проверить CI raw PNG/hash, native alpha24/128 и перетекание >3 logical px; E3 еще UNKNOWN. **Не** путать изолированный footprint с полноценной заливкой/экономией/CHALK; затем отдельно фиксировать замену узких линий с неизменным V44-B RGB контуром.
 
 
