@@ -20,7 +20,8 @@ from run_engine001_native_wide_interior_v43p2a import largest_dark_component
 from run_engine001_shape_adaptive_fill_v43p1 import analyze_component
 
 EXP = "ENGINE001_V43P3_ORIENTED_REPLACEMENT_P3A_MODEL_ONLY"
-WIDTHS = (4, 6)
+WIDTHS = (4, 6)  # Frozen original P3a variants
+SUPPORTED_WIDTHS = (4, 6, 10, 20, 30)  # P3a2 research; unchanged P3a output
 MIN_SPAN = 8
 INTERIOR_MARGIN = 1.0
 
@@ -34,7 +35,7 @@ def oriented_source_candidates(mask, distance, width):
             or not np.isfinite(distance).all()
             or (distance < 0).any()):
         raise ValueError("V43P3 invalid source mask/distance")
-    if width not in WIDTHS:
+    if width not in SUPPORTED_WIDTHS:
         raise ValueError("V43P3 unsupported candidate width")
     ys, xs = np.nonzero(mask)
     coords = np.column_stack((xs, ys)).astype(np.float64)
