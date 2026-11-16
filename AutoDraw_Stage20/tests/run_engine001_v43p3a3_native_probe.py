@@ -117,6 +117,8 @@ def main():
             if not report["native_alpha_color7_matches_composite"]:
                 raise ValueError("P3a3 isolated class alpha mismatch")
         details[str(width)]=report
+    if not any(row["status"]=="NATIVE_CAPTURED" for row in details.values()):
+        raise ValueError("P3a3 NO_NATIVE_SAMPLE: all widths lacked source paths")
     hashes={str(p.relative_to(output)).replace("\\","/"):sha(p)
             for p in output.rglob("*") if p.is_file()}
     summary={"experiment":EXP,"source_sha256":SOURCE_SHA,
