@@ -47,8 +47,10 @@ def verified_v44(folder: Path):
             or report.get("native_alpha_exact_all_variants") is not True):
         raise ValueError("BLOCKED_BASELINE_DRIFT V44 metadata")
     checksums = report.get("report_linked_SHA256")
-    if not isinstance(checksums, dict) or not checksums:
-        raise ValueError("BLOCKED_BASELINE_DRIFT missing V44 checksums")
+    if (not isinstance(checksums, dict) or
+            "color-plans.json" not in checksums or
+            "B/V44-B-composite.png" not in checksums):
+        raise ValueError("BLOCKED_BASELINE_DRIFT missing pinned V44 plan/PNG hashes")
     for name, digest in checksums.items():
         rel = Path(name)
         if (rel.is_absolute() or ".." in rel.parts or len(str(digest)) != 64
