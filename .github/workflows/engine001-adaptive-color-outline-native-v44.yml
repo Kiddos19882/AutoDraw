@@ -1,0 +1,69 @@
+name: ENGINE-001 V44 adaptive color outlines native Egret
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-adaptive-color-outline-native-v44.yml"
+      - "AutoDraw_Stage20/tests/engine001_adaptive_color_outline_v44.py"
+      - "AutoDraw_Stage20/tests/test_engine001_adaptive_color_outline_v44.py"
+      - "AutoDraw_Stage20/tests/run_engine001_adaptive_color_outline_native_v44.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  native-adaptive-outline:
+    runs-on: windows-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install existing native renderer dependencies
+        run: python -m pip install "selenium>=4,<5" "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scikit-image>=0.25,<0.27" "scipy>=1.13,<2"
+      - name: Fetch frozen baseline native artifacts
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/v35" "$RUNNER_TEMP/v37p2"
+          gh run download 43742747278 --repo Kiddos19882/AutoDraw -n engine001-v35-pilot2-native-paint-then-detail-evidence -D "$RUNNER_TEMP/v35"
+          gh run download 43747149144 --repo Kiddos19882/AutoDraw -n engine001-v37p2-native-full-contour-fill-color-evidence -D "$RUNNER_TEMP/v37p2"
+      - name: Test pure RGB selection and execute native BoardPane A/B/C
+        shell: bash
+        run: |
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_adaptive_color_outline_v44.py -v
+          python -m py_compile AutoDraw_Stage20/tests/engine001_adaptive_color_outline_v44.py AutoDraw_Stage20/tests/run_engine001_adaptive_color_outline_native_v44.py
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          python AutoDraw_Stage20/tests/run_engine001_adaptive_color_outline_native_v44.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --v35-archive "$RUNNER_TEMP/v35" \
+            --v37p2-archive "$RUNNER_TEMP/v37p2" \
+            --output "$RUNNER_TEMP/engine001-v44"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-v44"
+          r=json.loads((root/"report.json").read_text(encoding="utf-8"))
+          assert r["experiment"]=="ENGINE001_ADAPTIVE_COLOR_OUTLINE_V44_P1"
+          assert r["control_V37P2C_RGBA_exact"]
+          assert r["native_alpha_exact_all_variants"]
+          assert all(r["metrics"][k]["detail_strokes"]==410 for k in "ABC")
+          assert all(r["metrics"][k]["synthetic_vertices_NOT_CHALK"]==5682 for k in "ABC")
+          assert all(hashlib.sha256((root/p).read_bytes()).hexdigest()==v
+                     for p,v in r["report_linked_SHA256"].items())
+          print("V44 actual native Egret A/B/C captured; E4/CHALK NOT_RUN")
+          PY
+      - name: Archive native results including failed candidates
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-v44-adaptive-contour-native-evidence
+          path: ${{ runner.temp }}/engine001-v44
+          if-no-files-found: warn
