@@ -1,0 +1,74 @@
+name: ENGINE-001 V43P3b P0 original scanline native subset feasibility
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-v43p3b-native-subset.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_v43p3b_native_subset.py"
+      - "AutoDraw_Stage20/tests/test_engine001_v43p3b_native_subset.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  old-source-native-subset:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install existing Python native Egret dependencies
+        run: python -m pip install "selenium>=4,<5" "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scikit-image>=0.25,<0.27" "scipy>=1.13,<2"
+      - name: Download frozen original paint and source-oriented genuine Egret PNG
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/v37p2" "$RUNNER_TEMP/p3a3"
+          gh run download 43747149144 --repo Kiddos19882/AutoDraw -n engine001-v37p2-native-full-contour-fill-color-evidence -D "$RUNNER_TEMP/v37p2"
+          gh run download 43864508620 --repo Kiddos19882/AutoDraw -n engine001-v43p3a3-isolated-native-footprint-evidence -D "$RUNNER_TEMP/p3a3"
+      - name: Verify P3b source and native subset Python and JS regressions
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_v43p3b_native_subset.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_v43p3b_native_subset.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+      - name: Replay bounded old horizontal strokes as native Egret
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_v43p3b_native_subset.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --v37p2-archive "$RUNNER_TEMP/v37p2" \
+            --p3a3-archive "$RUNNER_TEMP/p3a3" \
+            --output "$RUNNER_TEMP/engine001-v43p3b-p0"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-v43p3b-p0"
+          data=json.loads((root/"report.json").read_text(encoding="utf-8"))
+          assert data["experiment"]=="ENGINE001_V43P3B_P0_NATIVE_OLD_STROKE_SUBSET"
+          assert data["source_original_paint_strokes_deleted"]==0
+          assert data["new_oriented_strokes_added_to_full_plan"]==0
+          assert data["original_V44B_410_detail_modified"] is False
+          assert data["whole_image_RGB_and_visual"]=="NOT_RUN"
+          assert data["game_exact_CHALK"] is None
+          assert 1 <= data["native_single_old_strokes_rendered"] <= 36
+          assert all(len(row["old_stroke_evidence"]) <= 12 for row in data["per_width"].values())
+          assert all(hashlib.sha256((root/path).read_bytes()).hexdigest()==digest
+                     for path,digest in data["report_linked_SHA256"].items())
+          print("Bounded native old-stroke subset feasibility captured, no full replacement.")
+          PY
+      - name: Preserve raw Egret old-stroke images and negative evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-v43p3b-p0-native-old-stroke-subset-evidence
+          path: ${{ runner.temp }}/engine001-v43p3b-p0
+          if-no-files-found: warn
