@@ -31,3 +31,12 @@ At writing: **E1 code inspection only, E2/E3 CI UNKNOWN, E4/E5/exact CHALK NOT_R
 ## Pre-CI static compatibility correction
 
 Static audit of the actual remote JS revealed that first opt-in wrapper commit `b3eb2fb2` added `renderV43P3PaintBrushProbe` but left its underlying V5 brush-width predicate unchanged; without correction the width20 call would fail before WebGL capture. Commit `4b3d87d305764c47ffe2decaee20c3a0a34eb289` explicitly switches the width set only when `allowV43P3Widths=true`: width4/6/10/20/30 new opt-in; original V5 default exactly2/4/6/8/10/15/30. The historical native V31 width20 exists but does not prove this new method has run. The bug is detected **E1 static**, fixed in source; E2/E3 for P3a3 **UNKNOWN** until its own CI executes; no accepted native PNGs yet.
+
+## Pre-result diagnostic extension: distinguish foreign colors vs exterior
+
+Before any confirmed P3a3 native output, explicitly extend report-only alpha24/128 diagnostics. `owner` frozen palette labels 0..7; required foreign color is `owner in [4,5,6] `, skipped/light background is 0..3. For each isolated class7 native stroke group:
+- count alpha-positive ink on native pixels belonging to any **other required color class4/5/6** and separately on skipped/background labels0..3;
+- define **source class7 boundary depth** as native backing-pixel Euclidean distance from the nearest class7 pixel; count foreign required-color coverage where depth exceeds9 native px (3 logical px);
+- define **source foreground silhouette depth** as distance to required-class foreground union4..7; count painted outside silhouette beyond9 native px;
+- retain original largest-component depth diagnostic as a separate component identity measure; it is NOT synonymous with forbidden cross-color leakage.
+These are *native reference-image diagnostics*, not exact RGB quality or full-scene ownership: if a width has zero sampled paths, retain `NO_ELIGIBLE_PATHS`. All thresholds frozen (alpha24/128; 9 backing px) before report. No source candidate geometry changes, no posthoc filtering, no promotion to production.
