@@ -1,0 +1,58 @@
+name: ENGINE-001 V43P3a oriented multi-width source-only candidates
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-v43p3a-oriented-source.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_v43p3_oriented_source.py"
+      - "AutoDraw_Stage20/tests/test_engine001_v43p3_oriented_source.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  p3a-source-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install bounded source-mask dependencies
+        run: python -m pip install "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scipy>=1.13,<2" "scikit-image>=0.25,<0.27"
+      - name: Test deterministic oriented source candidates
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_v43p3_oriented_source.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_v43p3_oriented_source.py -v
+      - name: Generate bounded source-only path proposal
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_v43p3_oriented_source.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --output "${{ runner.temp }}/engine001-v43p3a"
+          python - <<'PY'
+          import json,hashlib,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-v43p3a"
+          p=root/"oriented-candidates.json"
+          data=json.loads(p.read_text(encoding="utf-8"))
+          assert data["experiment"]=="ENGINE001_V43P3_ORIENTED_REPLACEMENT_P3A_MODEL_ONLY"
+          assert data["component"]["component_area"]==5005
+          assert data["safe_to_execute"] is False
+          assert data["original_fill_routes_removed"]==0
+          assert data["exact_CHALK"] is None
+          assert set(data["variants"])=={"4","6"}
+          assert all(v["safe_to_execute"] is False for v in data["variants"].values())
+          print("MODEL_ONLY SHA256",hashlib.sha256(p.read_bytes()).hexdigest())
+          PY
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+      - name: Archive immutable source-only output and failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-v43p3a-oriented-source-model-only
+          path: ${{ runner.temp }}/engine001-v43p3a
+          if-no-files-found: warn
