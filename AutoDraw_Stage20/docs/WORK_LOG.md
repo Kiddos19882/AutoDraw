@@ -1,5 +1,7 @@
 # AutoDraw — журнал выполненных действий
 
+**2026-11-17 / ENGINE-001 V43-P4.2 native pipeline E1:** checked authentic V44-B artifact14201581692 available (not expired). Preregistered first full B0 RGB mode from frozen V44-B paint before native. Added narrow opt-in P4 renderer to original Egret JS, P4.2 native A/B0 harness, immutable410 detail assembly tests, shared native_batch method allowlist and Windows GitHub CI; required baseline pixel-exact A is checked before B0. Diff isolated from production defaults. CI run/PNG/result UNKNOWN (no completed result verified); P4.0 native A and P4.2 native B0 **NOT_CONFIRMED**, E4/E5/CHALK NOT_RUN. See [P4 protocol](ENGINE001_V43P4_FULL_ADAPTIVE_FILL_PROTOCOL_2026-11-16.md#p42-fixed-b0-native-execution-rule--registered-before-first-b0-native-run-2026-11-17).
+
 **2026-11-17 / ENGINE-001 P4.1 source candidate:** after remote head audit, reused original labels and P1 component analyzer; committed isolated source-only deterministic multi-angle greedy selector, 3 regression methods and opt-in push GitHub CI (`d6ebbc7f`, `bf42a47c`, `c7c119e2`). Local original-source SHA model:955 paint paths/1365 projected total/3702 synthetic vertices, 99.0167–99.8474% owner coverage **MODEL_ONLY**. Unit methods passed individually with stubbed imports; actual GitHub CI result UNKNOWN, frozen V44-B contour integration and native A/B not run. No production/Stage6/executor/master changes. See [protocol](ENGINE001_V43P4_FULL_ADAPTIVE_FILL_PROTOCOL_2026-11-16.md#p41-implementation-checkpoint--2026-11-17-e1local-partial-e2-ci-unknown).
 
 
