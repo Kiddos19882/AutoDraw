@@ -1,5 +1,7 @@
 # AutoDraw — журнал выполненных действий
 
+**2026-11-16 / ENGINE-001 V44-P1 native result:** reviewed [CI43813812976](https://github.com/Kiddos19882/AutoDraw/actions/runs/43813812976) and downloaded artifact14201581692. Job SUCCESS, Python8/8 + Node20/20, BoardPane/Egret A/B/C true native rendered. ZIP sha256 `43cb8e14a7e387b26772612ac06d1c7c6f176b8bd0c2d41e8945042fc80304a1`; archive and all24/24 manifest hashes verified. A RGB19.4203/warm27.9045, B11.1340/16.4227, C13.2578/19.1609. Original dark A strong edges, B light-haired face washed out, C exploratory compromise; 410 original contours identical, no production or E4/CHALK acceptance. Protocol/status/task/result index updated, prior FAIL retained.
+
 **2026-11-16 / ENGINE-001 V44-P1 CI43810927684:** Windows run FAIL at Python test before native Egret; 7 PASS + 1 ERROR due to reused same detail dict across 410 paths in test fixture. Archives downloaded, no V44 output artifacts. Corrected independent detail objects and unique IDs in commit `37ca9cd`. No algorithm, gates or production changes. New CI pending verification, E4/E5/exact CHALK NOT_RUN.
 
 **2026-11-16 / ENGINE-001 V44-P1 continued:** Added source-side RGB ratio diagnostic per 410 frozen contour paths, tracked missing/failing ratios without treating it as native Egret color visibility. Unit coverage for accounting/missing-source added. Frozen A/B/C RGB and geometry unchanged. Commits `5dcd35e`, `18710ec`; CI status UNKNOWN pending reliable run linkage. Native/game quality and exact CHALK not claimed.
