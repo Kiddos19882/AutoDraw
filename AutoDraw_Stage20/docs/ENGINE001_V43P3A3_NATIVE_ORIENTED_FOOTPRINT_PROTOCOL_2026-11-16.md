@@ -44,3 +44,19 @@ These are *native reference-image diagnostics*, not exact RGB quality or full-sc
 ## Native evidence completeness gate (before outcome)
 
 Per width, `NO_ELIGIBLE_PATHS` remains a legitimate negative observation. For the **entire** run, however, zero eligible paths across all five widths means **no actual Egret ink was measured** and must be classified `NO_NATIVE_SAMPLE` / FAIL (retain source diagnostics and any outputs), not E3 native PASS. CI must run existing P3a and P3a2 unit suites because P3a3 directly imports their candidate path generator and source audit. Artifact upload remains `if: always()`.
+
+## Native E3 result — 2026-11-16, CI43864508620
+
+[CI43864508620](https://github.com/Kiddos19882/AutoDraw/actions/runs/43864508620) **completed SUCCESS**, head SHA `e2cc4d156f3b7946f2d88c2da056430be17b4083`, job133289482949 `isolated-native-footprint` SUCCESS, Python planner/probe preflight and 20 Node renderer regression tests PASS, Windows Firefox archived real BoardPane/Egret WebGL capture PASS. Artifact **14224453656**, original ZIP SHA256 `4565925cead78a67a993a0b4629a457d9f3d6f5bcea230a1baa91e33b817faa6`; ZIP CRC PASS and **6/6 report-linked PNG SHA256 matches** (3 sizes x color-7 and composite). PNG compare is source/isolation-only, not live game. Source identity pinned SHA `07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a`.
+
+| lineStyle width | source candidate routes | native routes drawn | own color alpha24 ink backing pixels | foreign source classes4/5/6 alpha24 | foreign >3 logical px alpha24 | exterior silhouette >3 logical px alpha24 |
+|---|---:|---:|---:|---:|---:|---:|
+| 4 | 29 | 3 | 2244 | 0 | 0 | 0 |
+| 6 | 17 | 3 | 3718 | 2 | 0 | 0 |
+| 10 | 9 | 3 | 6510 | 0 | 0 | 0 |
+| 20 | 0 | 0 | NOT_RUN | NOT_RUN | NOT_RUN | NOT_RUN |
+| 30 | 0 | 0 | NOT_RUN | NOT_RUN | NOT_RUN | NOT_RUN |
+
+At alpha128 own-color backing pixels: width4=2208, width6=3669, width10=6426; **foreign required-color pixels=0** and excess>3logicalpx=0 on all rendered widths at this threshold. At alpha24: width6 foreign2 backing pixels (zero >3logicalpx); width4/10 foreign0. All sampled runs had zero outside silhouette>3logicalpx at both thresholds. Source class7 largest-component coverage ratios for **just those three routes** at alpha24: 4=4.9816849817%, 6=8.2539682540%, 10=14.4522144522%; these are **not full color coverage percentages**, cannot be compared to production >=99% gate. The 9 native isolated strokes are not a filled image or outline comparison. Width20/30 `NO_ELIGIBLE_PATHS` follows frozen source-distance/8logicalpx route restriction; **NOT a native failure or an assertion those brushes cannot be used elsewhere**.
+
+**Evidence assessment:** E3_CAPTURE_PASS / three tested widths within tolerance on a narrow frozen sample; **full fill quality UNKNOWN, replacing old width2 source paths NOT_RUN, V44-B full-image new composite NOT_RUN, E4 exact CHALK NOT_RUN, E5 NOT_RUN**. Decision: advance only to separately frozen resource-saving route-replacement methodology, prioritizing width10 as a candidate but never globally selecting it without native alpha for the actual replacement strokes. Preserve raw positive/negative artifact and all thresholds.
