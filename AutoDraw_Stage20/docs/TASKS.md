@@ -1,5 +1,9 @@
 # AutoDraw — действующие задачи
 
+- [x] **ENGINE-001/V43-P3b-P0 archived native E3:** [CI43878183627](https://github.com/Kiddos19882/AutoDraw/actions/runs/43878183627) capture PASS artifact14232130110, 36/36 hashes verified, actual full-source old line substitution **0/18 FAIL** under frozen P0 bbox filter. Width6 own alpha24 overlap0/297, width10 42/1512; P0 cannot save strokes. Earlier CI43878092364 FAIL fixture x150 was fixed; both results preserved.
+- [ ] **ENGINE-001/V43-P3b-P1:** [new separate prereg](ENGINE001_V43P3B_P1_ROW_INTERSECTION_PROTOCOL_2026-11-16.md), native-alpha source-row ranking for width4/6/10, 14/26/40 candidate old lines at E1, first12/width to be individually checked on real Egret. [Windows CI](../../.github/workflows/engine001-v43p3b-p1-native-row-subset.yml) created; E2/E3 UNKNOWN. No full-image plan deletion, V44-B preserved. Next review new run/PNG and stop this candidate family if no strict savings.
+
+
 - [ ] **ENGINE-001 / V43-P3b-P0 native subset:** [isolated Windows workflow](../../.github/workflows/engine001-v43p3b-native-subset.yml), [protocol](ENGINE001_V43P3B_NATIVE_REPLACEMENT_PROTOCOL_2026-11-16.md), source E1 0/6/15 candidates after connected-component filter at widths4/6/10, deterministic 0/6/12=18 sampled original width2 strokes for genuine Egret alpha subset. E2/E3 P0 UNKNOWN; no plan routes deleted, no full RGB/CHALK acceptance. Next evaluate run/artifact, then only if strict savings and unchanged quality build V44-B full composite B.
 
 
