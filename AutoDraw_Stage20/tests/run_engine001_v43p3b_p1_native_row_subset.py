@@ -5,6 +5,7 @@ Never edits or executes full A/B paint plan; P0 is imported without changing it.
 """
 from __future__ import annotations
 import argparse
+import math
 import json
 from pathlib import Path
 import numpy as np
@@ -43,10 +44,10 @@ def rank_old_strokes(base:dict, candidate_alpha:np.ndarray):
         a,b=stroke["points"]
         if (stroke["width"]!=2 or len(stroke["points"])!=2 or
             a["y"]!=b["y"] or a["y"]!=round(a["y"]) or
-            a["x"]!=round(a["x"]) or b["x"]!=round(b["x"]) or
+            not all(math.isfinite(float(p[k])) for p in (a,b) for k in ("x","y")) or
             not (155<=a["x"]<=b["x"]<305 and 0<=a["y"]<240)):
             raise ValueError("P1 original color7 width2 geometry drift")
-        x0,x1,y=int(a["x"]),int(b["x"]),int(a["y"])
+        x0,x1,y=math.floor(a["x"]),math.ceil(b["x"]),int(a["y"])
         score=int(np.count_nonzero(candidate_alpha[
             3*y:3*(y+1),3*x0:3*(x1+1)]>=24))
         if score>0:
