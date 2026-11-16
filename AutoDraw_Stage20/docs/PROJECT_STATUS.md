@@ -1,5 +1,7 @@
 # AutoDraw — текущее состояние
 
+**ENGINE-001 / V44-P1 validation hardening (2026-11-16):** corrected candidate runner to check every SHA256 from immutable V37-P2 source native artifact and frozen identity (full410 details, 5682 synthetic vertices, exact C recolor count166) BEFORE A/B/C; regression tests reject tampering and count drift. Commits `cf5a819`, `517ed1e`. V44 native CI run identification still UNKNOWN (GitHub connector exposes no push-triggered run listing); no E2/E3 PASS claim, E4/CHALK NOT_RUN. **Source-side contrast does not prove true painted contrast or facial detail quality.** [Protocol](ENGINE001_ADAPTIVE_COLOR_OUTLINE_V44_PROTOCOL_2026-11-16.md).
+
 **ENGINE-001 / V44-P1 started (2026-11-16):** user-authorized separate color-adaptive full-outline experiment. [Prereg](ENGINE001_ADAPTIVE_COLOR_OUTLINE_V44_PROTOCOL_2026-11-16.md); created opt-in [native Windows workflow](../../.github/workflows/engine001-adaptive-color-outline-native-v44.yml) and pure source/contrast adapter with deterministic unit tests. A frozen V37-P2-C paint + full 410 V35-B dark detail, B source lower-median RGB, C source RGB guarded by 2.5:1 against two sampled local sides; never splits lines. No change to production, source PNG, V35/V37 artifacts, accepted RGB/3px gates or actual CHALK. At write time **CI result UNKNOWN; E3 NOT_CONFIRMED; E4/E5/CHALK NOT_RUN**, no quality acceptance.
 
 
