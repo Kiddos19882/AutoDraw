@@ -47,6 +47,19 @@ class NativeRowRankingTests(unittest.TestCase):
         self.assertEqual(meta["selection"],
                          "P1_REAL_NATIVE_INK_SOURCE_ROW_RANKING_NOT_FULL_REPLACEMENT")
 
+    def test_frozen_fractional_x_endpoint_is_valid_ranked_native_row(self):
+        p=original_fixture()
+        old=p["strokes"][2]["stroke"]
+        old["points"]=[{"x":235.0,"y":41.0},{"x":235.25,"y":41.0}]
+        native=np.zeros((720,1380),dtype=np.uint8)
+        # Fractional right endpoint rounds UP for rank window only: x236.
+        native[123,708]=24
+        selected,meta=rank_old_strokes(p,native)
+        self.assertEqual(meta["eligible_positive_score"],1)
+        self.assertEqual(meta["selected_IDs_in_ranking_order"],["icon-2"])
+        self.assertEqual(selected[0]["stroke"]["points"][1]["x"],235.25)
+        self.assertEqual(selected[0]["native_candidate_row_alpha24_score"],1)
+
     def test_frozen_plan_and_native_shape_fail_closed(self):
         p=original_fixture()
         native=np.zeros((720,1380),dtype=np.uint8)
