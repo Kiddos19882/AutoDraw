@@ -1,5 +1,8 @@
 # AutoDraw — дорожная карта будущих работ
 
+**ENGINE-001 / V44 adaptive color outlines (2026-11-16):** parallel independent experiment to V43-P3, user-requested. [Frozen prereg](ENGINE001_ADAPTIVE_COLOR_OUTLINE_V44_PROTOCOL_2026-11-16.md): first prove source RGB + local contrast against two sides without changing 410 preferred V35-B contours or V37-P2-C paint; then actual Egret A/B/C review and only consider color variation along paths if needed and resource safety allows. No production promotion on source RGB metrics alone.
+
+
 **ENGINE-001 / V43-P2b native wide-overlays rejected; next P3 resource-saving substitution (2026-11-16):** [actual Egret CI43778700514](https://github.com/Kiddos19882/AutoDraw/actions/runs/43778700514) E3 SUCCESS as execution, 24/24 artifact checks, real thin-boundary/width4-or6-wide-center strokes applied to 40/50 class7 source runs but own-class α24 coverage identical to baseline, full RGB MAE slightly worse and native synthetic vertices increased5682→5842/5882. No native crossing >3logical px and complete410 preferred dark outlines unchanged. A genuinely wide brush works but **overlaying it on already-painted inner segments is redundant**. Next separately prereg P3: use actual Egret alpha to replace several **existing** interior narrow lines by fewer wide passes; resource and coverage/visual acceptance cannot be inferred from brush radius or rectangle proxy; fail-closed if >5900 synthetic native vertices, 410 outlines modified, color/RGB regress, or foreign/internal/exterior3px exceedance. No production/master/CHALK E4/E5.
 
 
