@@ -2,6 +2,13 @@
 
 # AutoDraw — дорожная карта будущих работ
 
+## Действующий следующий этап (16.11.2026): V43-P4 — полная адаптивная заливка
+
+[Подробная пререгистрация и полный план](ENGINE001_V43P4_FULL_ADAPTIVE_FILL_PROTOCOL_2026-11-16.md) · [инвентаризация](DOCUMENTATION_INVENTORY_2026-11-16.md). **Принято:** прекратить P3b замену старых горизонтальных штрихов по одной; генерировать **всю** новую покраску B0 для required classes4–7 из source masks, ни одной старой paint-линии, widths10/6/4/2, все410 цветных V44-B RGB контуров последними. Последовательность: **P4.0** freeze/pixel-exact A → **P4.1** deterministic planner/unit E2 → **P4.2** full Egret native A/B0 E3 → **P4.3** visual + alpha24/128 RGB/class/3px/resource review → **B1/B2** отдельные версии исправления по архивированному B0. При FAIL сохранять исходный B0; не подгонять acceptance gates. CHALK в игре E4 и независимая E5 отдельно; production BLOCKED.
+
+**Исторический контекст:** P3b-P0 E3 capture SUCCESS / 0 из18 целых линий заменено; P3b-P1 E3 capture SUCCESS / 0 из36 заменено — не отождествлять `CI PASS` с quality PASS. Ранее записанные планы ниже не являются текущей очередью работ.
+
+
 **ENGINE-001 / V43-P3a3 actual native E3 RESULT (2026-11-16):** [CI43864508620](https://github.com/Kiddos19882/AutoDraw/actions/runs/43864508620) SUCCESS at SHA `e2cc4d156f3b7946f2d88c2da056430be17b4083`, Windows Egret actual WebGL, artifact14224453656 original ZIP SHA256 `4565925cead78a67a993a0b4629a457d9f3d6f5bcea230a1baa91e33b817faa6`, ZIP CRC PASS, 6/6 PNG manifest SHA PASS. Width4/6/10 respectively 29/17/9 eligible source paths; first3/each native rendered. At native alpha24 class7 own ink2244/3718/6510 backing pixels, foreign required color4/5/6 0/2/0, **foreign beyond3logicalpx0** and **exterior beyond3logicalpx0** for all nine sampled strokes. At alpha128 foreign0 for all. Width20 and30 `NO_ELIGIBLE_PATHS` under fixed source rules, native NOT_RUN for these widths (not width unsupported). Only isolated probes, no full scene, no full-image coverage or savings; E4/CHALK/E5 NOT_RUN. [Archived P3a3 protocol](ENGINE001_V43P3A3_NATIVE_ORIENTED_FOOTPRINT_PROTOCOL_2026-11-16.md). Next [V43-P3b prereg](ENGINE001_V43P3B_NATIVE_REPLACEMENT_PROTOCOL_2026-11-16.md): only delete old width2 source strokes if actual native alpha is completely replaced, preserve original user-selected 410 V44-B RGB contours last; strict native stroke/vertex savings, original quality gates unchanged.
 
 
