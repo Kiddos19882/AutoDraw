@@ -2,6 +2,10 @@
 
 # AutoDraw — дорожная карта будущих работ
 
+**ENGINE-001 / V43-P3a (2026-11-16):** по прямому разрешению пользователя зафиксирован [отдельный протокол ориентированной заливки](ENGINE001_V43P3_ORIENTED_REPLACEMENT_PROTOCOL_2026-11-16.md), вместо повторного добавления широких мазков поверх уже залитых горизонтальных. Разработан изолированный source-only генератор PCA-ориентированных width4/6 линий для крупнейшей области класса7 с дистанцией до границы, тестами и [CI](../../.github/workflows/engine001-v43p3a-oriented-source.yml); **это MODEL_ONLY, safe_to_execute=False**, исходные линии пока НЕ удаляются, реальный отпечаток Egret не утверждается. Все будущие native варианты должны сохранять **выбранную пользователем цветную обводку V44-B**, 410 линий последним слоем, RGB/3px/99% gates. E2/CI на текущем commit пока UNKNOWN; E3 native/E4/CHALK NOT_RUN.
+
+
+
 **ENGINE-001 / V44 adaptive color outlines (2026-11-16):** parallel independent experiment to V43-P3, user-requested. [Frozen prereg](ENGINE001_ADAPTIVE_COLOR_OUTLINE_V44_PROTOCOL_2026-11-16.md): first prove source RGB + local contrast against two sides without changing 410 preferred V35-B contours or V37-P2-C paint; then actual Egret A/B/C review and only consider color variation along paths if needed and resource safety allows. No production promotion on source RGB metrics alone.
 
 
