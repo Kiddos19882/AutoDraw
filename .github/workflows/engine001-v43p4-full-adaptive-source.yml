@@ -1,0 +1,62 @@
+name: ENGINE-001 V43-P4.1 full adaptive paint source-only
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-v43p4-full-adaptive-source.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_full_adaptive_fill_v43p4.py"
+      - "AutoDraw_Stage20/tests/test_engine001_full_adaptive_fill_v43p4.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  p4-source-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install existing source image analysis dependencies
+        run: python -m pip install "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scipy>=1.13,<2" "scikit-image>=0.25,<0.27"
+      - name: Run fail-closed deterministic source-only regression
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_full_adaptive_fill_v43p4.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_full_adaptive_fill_v43p4.py -v
+      - name: Generate immutable B0 source-only candidate (NOT native/Stage6)
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_full_adaptive_fill_v43p4.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --output "${{ runner.temp }}/engine001-v43p4-source"
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          p=Path(os.environ["RUNNER_TEMP"])/"engine001-v43p4-source/candidate-b0-source.json"
+          d=json.loads(p.read_text(encoding="utf-8"))
+          assert d["experiment"]=="ENGINE001_V43P4_FULL_ADAPTIVE_FILL_REPLACEMENT_P4_1_MODEL_ONLY"
+          assert d["source_sha256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert d["safe_to_execute"] is False and d["production_accepted"] is False
+          assert d["original_paint_retained"]==0 and d["details_exact_verified"] is False
+          assert d["native_E3"]=="NOT_RUN" and d["exact_CHALK"] is None
+          assert d["allowed_nominal_widths_desc"]==[10,6,4,2]
+          assert len(d["paint"])==d["paint_strokes"]
+          assert d["paint_strokes"]+410<=3000
+          assert d["synthetic_vertices_with_frozen_detail_NOT_CHALK"]<=5900
+          assert set(d["source_model_diagnostics_NOT_EGRET"])=={"4","5","6","7"}
+          print("SOURCE_MODEL_ONLY SHA256", hashlib.sha256(p.read_bytes()).hexdigest())
+          print("SOURCE_MODEL_ONLY coverage", {k:v["model_coverage"] for k,v in d["source_model_diagnostics_NOT_EGRET"].items()})
+          PY
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+      - name: Archive model-only candidate and failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-v43p4-source-only-candidate-not-native
+          path: ${{ runner.temp }}/engine001-v43p4-source
+          if-no-files-found: warn
+          retention-days: 30
