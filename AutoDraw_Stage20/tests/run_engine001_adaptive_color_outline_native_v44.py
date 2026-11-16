@@ -23,6 +23,35 @@ from run_engine001_visual_roi_palette_v28 import prepare_source, quantize_case, 
 EXP = "ENGINE001_ADAPTIVE_COLOR_OUTLINE_V44_P1"
 
 
+def validate_v37p2_archive(folder):
+    """Reject missing or altered frozen native baseline evidence before rendering."""
+    report_path = folder / "report.json"
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    if (report.get("experiment") != "ENGINE001_LOCAL_FILL_COLOR_V37_P2"
+            or report.get("original_source_SHA256") != SOURCE_SHA
+            or not report.get("V35_B_control_RGBA_pixel_exact")
+            or not report.get("same_native_alpha_all_variants")):
+        raise ValueError("V44 invalid frozen V37-P2 native report")
+    c = report.get("metrics", {}).get("C", {})
+    if (c.get("complete_detail_strokes") != 410
+            or c.get("synthetic_accepted_vertices_NOT_CHALK") != 5682
+            or c.get("changed_fill_strokes") != 166):
+        raise ValueError("V44 frozen V37-P2-C count/identity drift")
+    checksums = report.get("report_linked_SHA256")
+    baseline = "C/V37P2-C-composite.png"
+    if not isinstance(checksums, dict) or baseline not in checksums:
+        raise ValueError("V44 missing pinned baseline manifest entry")
+    for name, digest in checksums.items():
+        relative = Path(name)
+        if (relative.is_absolute() or ".." in relative.parts
+                or not isinstance(digest, str) or len(digest) != 64):
+            raise ValueError("V44 unsafe archive manifest")
+        path = folder / relative
+        if not path.is_file() or sha(path) != digest:
+            raise ValueError("V44 altered native V37-P2 archive: " + name)
+    return folder / baseline
+
+
 def main():
     ap = argparse.ArgumentParser()
     for name in ("workspace", "source", "v35-archive", "v37p2-archive", "output"):
@@ -37,6 +66,7 @@ def main():
     if skipped != [0, 1, 2, 3]:
         raise ValueError("V44 source palette changed")
     warm = warm_mask(src)
+    frozen_native_baseline = validate_v37p2_archive(args.v37p2_archive)
     v35 = frozen_full_outline(args.v35_archive)
     baseline, _, changed = recolor_paint(v35, src, labels, warm, "C")
     if changed != 166:
@@ -77,10 +107,8 @@ def main():
             "native_composite_alpha24": int(np.count_nonzero(scenes["composite"][:, :, 3] >= 24)),
             "metadata": metadata,
         }
-    old = args.v37p2_archive / "C" / "V37P2-C-composite.png"
-    if not old.is_file():
-        raise ValueError("V44 missing exact frozen V37-P2-C native baseline")
-    replay = png_pixel_exact_replay(old, out / "A" / "V44-A-composite.png")
+    replay = png_pixel_exact_replay(
+        frozen_native_baseline, out / "A" / "V44-A-composite.png")
     if not replay["pixel_rgba_exact"]:
         raise ValueError("V44 native A differs from frozen V37-P2-C")
     for stem in ["composite", "color-100"] + [f"color-{n}" for n in (4, 5, 6, 7)]:
