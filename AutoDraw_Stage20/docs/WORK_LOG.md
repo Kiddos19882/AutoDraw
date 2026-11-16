@@ -1,5 +1,7 @@
 # AutoDraw — журнал выполненных действий
 
+**2026-11-16 / ENGINE-001 V43-P3a3 quality gate:** prior CI listing unavailable, so no E3 PASS claim. Before results, preregistered and added native alpha thresholds24/128 diagnostic fields for other required colors4/5/6 >3 logical px vs external silhouette >3 logical px, distinct from leaving largest component. New regression test checks both. Windows workflow now tests dependent P3a and P3a2, and all-width NO_NATIVE_SAMPLE is a fail-closed error, retaining individual no-eligible widths. Commits `021b2010`, `6000b308`, `f1d67867`, `0945d562`, `aa81da16`, `e2cc4d15`. Frozen user choice V44-B unchanged; production untouched.
+
 **2026-11-16 / ENGINE-001 V43-P3a3 pre-CI audit:** discovered opt-in width20 predicate was still original V5 list, fixed in `4b3d87d` with conditional flag and preservation of frozen default widths; documented the failure mode and current E1-only status. E2/E3 await verified native CI; no runtime E4/exact CHALK.
 
 **2026-11-16 / ENGINE-001 V43-P3a3 native Egret footprint probe:** отдельно prereg class7 source-oriented width4/6/10/20/30 isolated real Egret alpha24/128, max3 paths per size, no original fill removal. Reused native_batch and opt-in renderV43P3PaintBrushProbe wrapper without changing V5 default whitelist or V44-B full color. Added runner, unit tests, Windows CI, docs. Need inspect actual run before asserting E2/E3; game E4/E5/CHALK NOT_RUN. No production changes.
