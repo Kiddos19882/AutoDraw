@@ -48,7 +48,17 @@ jobs:
           assert b["experiment"]=="ENGINE001_V43P3A2_BROAD_BRUSH_SOURCE_AUDIT"
           assert sorted(a["variants"])==["4","6"]
           assert list(b["variants"])==["4","6","10","20","30"]
-          assert a["variants"]=={k:b["variants"][k] for k in ("4","6")}
+          # P3a2 appends independent path-continuity diagnostics only; original
+          # P3a candidate coordinates/counts and provenance must stay unchanged.
+          for width in ("4","6"):
+              original=a["variants"][width]
+              extended=b["variants"][width]
+              assert {k:v for k,v in extended.items()
+                      if k not in ("source_centerline_flagged_paths","native_footprint_validated","candidate_strokes")} == {
+                          k:v for k,v in original.items() if k!="candidate_strokes"}
+              assert [{k:v for k,v in path.items()
+                       if k!="additional_source_centerline_audit"}
+                      for path in extended["candidate_strokes"]]==original["candidate_strokes"]
           assert all(not item["safe_to_execute"] for item in b["variants"].values())
           assert b["original_fill_routes_removed"]==0
           assert b["exact_CHALK"] is None
