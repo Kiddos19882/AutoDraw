@@ -91,6 +91,22 @@ class AdaptiveColorOutlineV44Tests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "identity drift"):
                 validate_v37p2_archive(root)
 
+    def test_source_contrast_diagnostic_is_not_native_evidence(self):
+        from run_engine001_adaptive_color_outline_native_v44 import (
+            source_side_contrast_diagnostic,
+        )
+        rows = [{"assigned_RGB": list(DARK),
+                 "sides_RGB": [[235, 220, 200], [235, 220, 200]]}
+                for _ in range(409)]
+        rows.append({"assigned_RGB": list(DARK), "sides_RGB": None})
+        summary = source_side_contrast_diagnostic(rows)
+        self.assertEqual(summary["type"], "SOURCE_RGB_ONLY_NOT_NATIVE_PAINT")
+        self.assertEqual(summary["measurable_contours"], 409)
+        self.assertEqual(summary["missing_side_contours"], 1)
+        self.assertEqual(summary["passing_contours"] + summary["failing_contours"], 409)
+        with self.assertRaisesRegex(ValueError, "missing outlines"):
+            source_side_contrast_diagnostic(rows[:-1])
+
     def test_invalid_roi_rejected(self):
         with self.assertRaisesRegex(ValueError, "ROI"):
             side_backgrounds(Image.new("RGB", (10, 10)),
