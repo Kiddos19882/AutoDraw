@@ -12,7 +12,7 @@ from pathlib import Path
 import numpy as np
 
 from engine001_paint_then_detail_v35 import native_strokes
-from engine001_adaptive_color_outline_v44 import adaptive_recolor
+from engine001_adaptive_color_outline_v44 import adaptive_recolor, contrast, MIN_CONTRAST
 from run_engine001_full_outline_native_v37 import frozen_full_outline
 from run_engine001_local_fill_color_native_v37p2 import recolor_paint
 from run_engine001_native_warm_color_v34 import SOURCE_SHA, sha, mae, warm_mask, png_pixel_exact_replay
@@ -21,6 +21,30 @@ from run_engine001_complex_holdout_v5 import native_batch
 from run_engine001_visual_roi_palette_v28 import prepare_source, quantize_case, sheet
 
 EXP = "ENGINE001_ADAPTIVE_COLOR_OUTLINE_V44_P1"
+
+def source_side_contrast_diagnostic(journal):
+    """Source-only luminance heuristic. Not actual painted Egret contrast."""
+    valid = []
+    missing = 0
+    for item in journal:
+        sides = item["sides_RGB"]
+        if sides is None:
+            missing += 1
+            continue
+        pair = [contrast(item["assigned_RGB"], side) for side in sides]
+        valid.append(min(pair))
+    if len(valid) + missing != 410:
+        raise ValueError("V44 contrast diagnostic missing outlines")
+    return {
+        "type": "SOURCE_RGB_ONLY_NOT_NATIVE_PAINT",
+        "min_side_ratio_threshold": MIN_CONTRAST,
+        "measurable_contours": len(valid),
+        "missing_side_contours": missing,
+        "passing_contours": sum(value >= MIN_CONTRAST for value in valid),
+        "failing_contours": sum(value < MIN_CONTRAST for value in valid),
+        "min_observed_side_ratio": min(valid) if valid else None,
+    }
+
 
 
 def validate_v37p2_archive(folder):
@@ -99,6 +123,7 @@ def main():
             "full_RGB_MAE": mae(im, src),
             "warm_RGB_MAE": mae(im, src, warm),
             "contour_decisions": counts,
+            "source_side_contrast_diagnostic": source_side_contrast_diagnostic(journals[key]),
             "distinct_contour_RGB": len(set(rgb)),
             "contour_color_switches": sum(a != b for a, b in zip(rgb, rgb[1:])),
             "strokes": 2355,
