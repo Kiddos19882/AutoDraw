@@ -1,5 +1,8 @@
 # AutoDraw — текущее состояние
 
+**ENGINE-001 / V43-P3a3 pre-CI correction (2026-11-16):** статический аудит нашёл, что первый opt-in renderer всё ещё запрещал width20 по наследованному списку V5. Исправлено в `4b3d87d305764c47ffe2decaee20c3a0a34eb289`: только новый метод `renderV43P3PaintBrushProbe` принимает [4,6,10,20,30], исходный V5 список остался [2,4,6,8,10,15,30]. E1 static FIXED; E2/E3 нового native workflow не подтверждены. Исторические результаты не менялись, P3a3 пока не является полной заливкой или игровым измерением.
+
+
 **ENGINE-001 / V43-P3a3 native isolated footprints (2026-11-16):** [new separate prereg](ENGINE001_V43P3A3_NATIVE_ORIENTED_FOOTPRINT_PROTOCOL_2026-11-16.md) and [Windows Egret CI](../../.github/workflows/engine001-v43p3a3-native-oriented-footprint.yml) added to test **actual** WebGL alpha of up to first3 source-oriented paths at each width4/6/10/20/30. Reuses P3a2 PCA source paths, P2a class7 mask, existing `native_batch` and original V5 Egret renderer; new opt-in JS method includes20 while original V5 width whitelist and V43/V44 unchanged. Reports original owner and >3logical px component leakage alpha24/128 with raw PNG/SHA, no stroke replacement or game CHALK. Unit/native CI status UNKNOWN until inspected; E4/E5 NOT_RUN, production/master unchanged.
 
 
