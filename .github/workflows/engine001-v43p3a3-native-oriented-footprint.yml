@@ -28,7 +28,9 @@ jobs:
       - name: Validate Python, JS and native probe source contracts
         shell: bash
         run: |
-          python -m py_compile AutoDraw_Stage20/tests/run_engine001_v43p3a3_native_probe.py
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_v43p3_oriented_source.py AutoDraw_Stage20/tests/run_engine001_v43p3a2_width_audit.py AutoDraw_Stage20/tests/run_engine001_v43p3a3_native_probe.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_v43p3_oriented_source.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_v43p3a2_width_audit.py -v
           python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_v43p3a3_native_probe.py -v
           node --check AutoDraw_Stage20/tests/game_renderer_reference.js
           node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
@@ -50,6 +52,9 @@ jobs:
           assert data["V44B_410_outlines_modified"] is False
           assert data["game_exact_CHALK"] is None
           assert all(v["selected_paths"] <= 3 and v["synthetic_vertices_NOT_CHALK"] <= 6
+                     for v in data["per_width"].values())
+          assert any(v["status"]=="NATIVE_CAPTURED" for v in data["per_width"].values())
+          assert all(v["status"] in ("NATIVE_CAPTURED","NO_ELIGIBLE_PATHS")
                      for v in data["per_width"].values())
           assert all(hashlib.sha256((root/p).read_bytes()).hexdigest()==h
                      for p,h in data["report_linked_SHA256"].items())
