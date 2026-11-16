@@ -194,10 +194,11 @@ def main() -> None:
             "native_renderer_metadata": meta,
         }
         crops[variant] = logical_crop(images[variant]["composite"])
-    replay = png_pixel_exact_replay(
-        frozen_png, output / "A" / "V43P4-A-composite.png")
-    if not replay["pixel_rgba_exact"]:
-        raise ValueError("BLOCKED_BASELINE_DRIFT P4 native A is not V44-B")
+        if variant == "A":
+            replay = png_pixel_exact_replay(
+                frozen_png, output / "A" / "V43P4-A-composite.png")
+            if not replay["pixel_rgba_exact"]:
+                raise ValueError("BLOCKED_BASELINE_DRIFT P4 native A is not V44-B")
     for variant in ("A", "B0"):
         crops[variant].save(output / f"V43P4-{variant}-roi.png")
     sheet([original, crops["A"], crops["B0"]],
