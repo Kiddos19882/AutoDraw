@@ -34,7 +34,7 @@ class V43P3a3ProbeTests(unittest.TestCase):
         component[20:60,200:250]=True
         native=np.zeros((720,1380),dtype=np.uint8)
         native[90:93,690:693]=255  # inside class7
-        native[90:93,756:759]=255  # outside class7, far from component
+        native[90:93,780:783]=255  # outside class7, far from component
         result=native_footprint_metrics(native,owner,component)
         self.assertEqual(result["24"]["native_backing_ink_pixels"],18)
         self.assertEqual(result["128"]["native_backing_ink_pixels"],18)
