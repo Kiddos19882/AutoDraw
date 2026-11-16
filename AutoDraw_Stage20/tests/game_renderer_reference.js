@@ -2443,7 +2443,7 @@
     for (const stroke of strokes) {
       if (!stroke || typeof stroke.strokeId !== "string" ||
           !/^icon-[0-9]+$/.test(stroke.strokeId) ||
-          ![2,4,6,8,10,15,30].includes(stroke.width) ||
+          !(allowV43P3Widths ? [4,6,10,20,30].includes(stroke.width) : [2,4,6,8,10,15,30].includes(stroke.width)) ||
           !Number.isInteger(stroke.colorRgb) ||
           stroke.colorRgb < 0 || stroke.colorRgb > 0xffffff ||
           !Array.isArray(stroke.points) || stroke.points.length < 2 ||
