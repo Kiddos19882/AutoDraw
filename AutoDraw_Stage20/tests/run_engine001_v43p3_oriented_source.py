@@ -99,7 +99,7 @@ def main():
         raise ValueError("V43P3 reject overwrite")
     labels = original_labels(a.source)[::3,::3].copy()
     mask, distance, component=largest_dark_component(labels)
-    if component.get("area") != 5005:
+    if component.get("component_area") != 5005:
         raise ValueError("V43P3 pinned largest dark source component drift")
     geom=analyze_component(mask,7,1)
     results={str(w):oriented_source_candidates(mask,distance,w) for w in WIDTHS}
