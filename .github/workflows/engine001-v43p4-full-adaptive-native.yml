@@ -16,6 +16,10 @@ permissions:
   contents: read
   actions: read
 
+concurrency:
+  group: engine001-v43p4-native-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   first-full-native-b0:
     runs-on: windows-latest
