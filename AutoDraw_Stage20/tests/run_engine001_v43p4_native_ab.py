@@ -19,10 +19,11 @@ import numpy as np
 from engine001_paint_then_detail_v35 import native_strokes
 from run_engine001_boundary_shift_native_v39 import native_metrics
 from run_engine001_full_adaptive_fill_v43p4 import (
-    COLORS, FROZEN_DETAILS, MAX_STROKES, MAX_VERTICES, SOURCE_SHA,
-    source_plan, sha,
+    ANGLES, COLORS, FROZEN_DETAILS, MAX_LEAKAGE_LOGICAL_PX, MAX_STROKES,
+    MAX_VERTICES, MIN_NEW, SOURCE_SHA, WIDTHS, source_plan, sha,
 )
 from run_engine001_internal_color_tolerance_v40 import overlap_by_class
+from run_engine001_shape_adaptive_fill_v43p1 import analyze_index_map
 from run_engine001_native_color_boundary_audit_v38 import original_labels
 from run_engine001_native_warm_color_v34 import (
     warm_mask, png_pixel_exact_replay,
@@ -167,7 +168,19 @@ def main() -> None:
     frozen, frozen_png, frozen_hashes = verified_v44(args.v44_archive)
     original, _ = prepare_source(args.source)
     labels3 = original_labels(args.source)
-    model = source_plan(labels3[::3, ::3][:, 155:305].copy())
+    indexes = labels3[::3, ::3][:, 155:305].copy()
+    model = source_plan(indexes)
+    model["source_sha256"] = SOURCE_SHA
+    model["source_labels_sha256"] = hashlib.sha256(indexes.tobytes()).hexdigest()
+    model["source_components"] = analyze_index_map(indexes)["per_color"]
+    model["selection_thresholds"] = {
+        "minimum_new_source_pixels_per_stroke_by_width": MIN_NEW,
+        "maximum_model_exterior_distance_from_own_source_class":
+            MAX_LEAKAGE_LOGICAL_PX,
+        "angle_candidates_deg": list(ANGLES),
+        "width_order": list(WIDTHS),
+        "source_proxy_only": True,
+    }
     b0, preflight = assemble_b0(model, frozen)
     # Preserve all preflight data even on a native quality failure.
     output = args.output
