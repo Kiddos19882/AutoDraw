@@ -26,3 +26,24 @@ Archive genuine A/B/C composite and classes4–7 and detail100 original RGBA PNG
 Predeclared experimental **numeric PASS** only if class7 own alpha24 recall>A, all other required classes own recall>=A, source silhouette recall>=A, no added internal/exterior >3logical px at both alpha24/128, **both original full and warm source RGB MAE <= A**, and no native cap violation. Face/hair/hand readable lines (410 user-selected outlines) additionally preserved on same-scale actual Egret comparisons. If fails, freeze negative and proceed to separate resource-neutral coarser reallocation research; do not switch production.
 
 This **P2b is not full oriented-boustrophedon / medial skeleton hybrid validation**; it tests wide interior paint feasibility without losing thin edges, at *increased* native synthetic command count. Real run-bound `CHALK=post.pointCount-pre.pointCount`, E4/E5, >=99% production owner-class coverage and safety margin remain unmeasured/unaccepted.
+
+
+## P2b true Egret after-run — 2026-11-16 (wider cores do not improve coverage)
+
+[CI43778700514](https://github.com/Kiddos19882/AutoDraw/actions/runs/43778700514) **E3 SUCCESS experiment execution** at SHA `c3d6edbcce03f02abb658ff57aecd690c05b6c3a`, artifact **14187577081** ZIP SHA256 **`4493b73cb1f772ab30af71595841d7fa26d649ae7e7a5534a9f2a699eb009473`**, independently opened 24/24 report-linked SHA256 files PASS. Frozen V37-P2-C source/control A native PNG decoded RGBA exact and original **all410 dark V35-B contour** actual native alpha exact for B/C, source SHA and original evidence checked.
+
+| Actual native BoardPane metric | A unchanged original | B 40 thin/width4/thin split | C 50 thin/width6/thin split |
+|---|---:|---:|---:|
+| Native paths | 2355 | 2435 | 2455 |
+| Synthetic accepted vertices (NOT game CHALK) | 5682 | 5842 | 5882 |
+| Split original dark class7 strokes | 0 | 40 | 50 |
+| Original source class7 native α24 own-color recall | **94.725559%** | 94.725559% | 94.725559% |
+| Source all-classes native α24 silhouette recall | **93.868365%** | 93.868365% | 93.868365% |
+| Original source full RGB MAE | **19.42033333** | 19.42043519 | 19.42042593 |
+| Original warm RGB MAE | 27.90450328 | 27.90450328 | 27.90450328 |
+| Source-color internal excess beyond3logical px α24 | 0 | 0 | 0 |
+| Exterior excess beyond3logical px α24 | 0 | 0 | 0 |
+
+**Both candidates FAIL predeclared strict own-color coverage improvement and full RGB nonregression.** Native effect is extremely small (full MAE +0.000102/+0.000093); do not misrepresent as a substantial degradation, but still a failure under unchanged thresholds. Main practical observation: on these interior locations, original source width2 scanlines already adequately paint the own-color target, so layering width4/6 does not add missing target pixels. Meanwhile +160/+200 accepted synthetic vertices without saving any original narrow route is wasteful under the native5900 resource cap and potentially game quota (exact CHALK NOT_RUN). Preserve negative P2a/P2b separately.
+
+**Interpretation:** wide interior brush may still save drawing points **if it replaces rather than supplements multiple nearby width2 scanlines**; neither P2a nor P2b tested resource-reducing replacement, locally oriented sweeps, skeleton paths or whole-image semantic likeness. Next separate prereg of **resource-reducing replacement inside source-deep class7 component** must establish source-owned path selection, actual Egret widths, per-class alpha24/128, 3px crossing/exterior, RGB and visual gates, full410 final dark contour preservation. Reuse frozen baseline; do not change production, E4/E5, or exact game CHALK estimator/defaults without run-bound evidence.
