@@ -1,5 +1,9 @@
 """V44-P1 deterministic tests. Run: python -m unittest tests/test_engine001_adaptive_color_outline_v44.py"""
 import unittest
+import hashlib
+import json
+import tempfile
+from pathlib import Path
 import numpy as np
 from PIL import Image
 
@@ -54,6 +58,38 @@ class AdaptiveColorOutlineV44Tests(unittest.TestCase):
                 self.assertEqual(a["stroke"]["strokeId"], b["stroke"]["strokeId"])
                 self.assertEqual(a["stroke"]["width"], b["stroke"]["width"])
         self.assertEqual(base["strokes"][1945]["stroke"]["colorRgb"], 0x31262B)
+
+
+    def test_archive_manifest_integrity_and_frozen_identity(self):
+        from run_engine001_adaptive_color_outline_native_v44 import validate_v37p2_archive
+        from run_engine001_native_warm_color_v34 import SOURCE_SHA
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            native = root / "C" / "V37P2-C-composite.png"
+            native.parent.mkdir()
+            native.write_bytes(b"fixture")
+            digest = hashlib.sha256(native.read_bytes()).hexdigest()
+            report = {
+                "experiment": "ENGINE001_LOCAL_FILL_COLOR_V37_P2",
+                "original_source_SHA256": SOURCE_SHA,
+                "V35_B_control_RGBA_pixel_exact": True,
+                "same_native_alpha_all_variants": True,
+                "metrics": {"C": {
+                    "complete_detail_strokes": 410,
+                    "synthetic_accepted_vertices_NOT_CHALK": 5682,
+                    "changed_fill_strokes": 166}},
+                "report_linked_SHA256": {"C/V37P2-C-composite.png": digest},
+            }
+            (root / "report.json").write_text(json.dumps(report), encoding="utf-8")
+            self.assertEqual(validate_v37p2_archive(root), native)
+            native.write_bytes(b"tampered")
+            with self.assertRaisesRegex(ValueError, "altered native"):
+                validate_v37p2_archive(root)
+            native.write_bytes(b"fixture")
+            report["metrics"]["C"]["complete_detail_strokes"] = 409
+            (root / "report.json").write_text(json.dumps(report), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "identity drift"):
+                validate_v37p2_archive(root)
 
     def test_invalid_roi_rejected(self):
         with self.assertRaisesRegex(ValueError, "ROI"):
