@@ -1,5 +1,8 @@
 # AutoDraw — текущее состояние
 
+**ENGINE-001/V43-P3a2 E1 safety audit 2026-11-16:** ранее выполненный [V31 CI43693170456](https://github.com/Kiddos19882/AutoDraw/actions/runs/43693170456) уже даёт E3 native Egret footprint для width10/20/30, и для каждого из этих размеров 6/6 траекторий имеют alpha128 пиксели за пределами идеальной капсулы; гипотеза о гарантированно круглой капсуле опровергнута. Source-only генератор V43-P3a2 расширен **дополнительным**, не влияющим на выбор маршрутов аудитом всех центровых участков с шагом0.25 logical px; отчёт считает source-owner/margin violations и явно помечает `SOURCE_CENTERLINE_ONLY_NOT_EGRET_FOOTPRINT`. Тесты и CI сравнение P3a4/6 идентичности обновлены в `2274e528`, `7265ea09`, `3b8c048e`. Native P3b реальные штрихи и CHALK НЕ запускались; E2 новых тестов / P3a2 CI UNKNOWN, production unchanged. [Подробности](ENGINE001_V43P3A2_BROAD_BRUSH_AUDIT_PROTOCOL_2026-11-16.md).
+
+
 **ENGINE-001 / V43-P3a2 (2026-11-16):** пользователь согласовал продолжение многоразмерной заливки до width30. [Отдельный source-only prereg](ENGINE001_V43P3A2_BROAD_BRUSH_AUDIT_PROTOCOL_2026-11-16.md) фиксирует ширины **4,6,10,20,30** без изменения замороженного P3a 4/6. Переиспользуется тот же PCA-генератор, создаются отдельный отчёт, тесты и [CI](../../.github/workflows/engine001-v43p3a2-width-audit.yml). P3a/P3a2 не меняют заливку, не рисуют Egret, не оценивают CHALK; `safe_to_execute=False`. Обводка V44-B (410 исходных цветных линий) остаётся визуальным baseline; P3b требуется отдельно подтвердить нативный footprint и реальную замену старых горизонтальных проходов. E2/CI не подтверждён, E3 native/E4/E5 NOT_RUN.
 
 
