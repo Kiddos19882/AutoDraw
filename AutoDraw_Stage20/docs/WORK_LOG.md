@@ -1,5 +1,7 @@
 # AutoDraw — журнал выполненных действий
 
+**2026-11-16 / ENGINE-001 V43-P3a3 pre-CI audit:** discovered opt-in width20 predicate was still original V5 list, fixed in `4b3d87d` with conditional flag and preservation of frozen default widths; documented the failure mode and current E1-only status. E2/E3 await verified native CI; no runtime E4/exact CHALK.
+
 **2026-11-16 / ENGINE-001 V43-P3a3 native Egret footprint probe:** отдельно prereg class7 source-oriented width4/6/10/20/30 isolated real Egret alpha24/128, max3 paths per size, no original fill removal. Reused native_batch and opt-in renderV43P3PaintBrushProbe wrapper without changing V5 default whitelist or V44-B full color. Added runner, unit tests, Windows CI, docs. Need inspect actual run before asserting E2/E3; game E4/E5/CHALK NOT_RUN. No production changes.
 
 **2026-11-16 / ENGINE-001 V43-P3a2 safety follow-up:** V31 E3 CI43693170456 native archive reused as risk evidence: 10/20/30 outside ideal capsule at alpha128 for6/6 cases each. Added source centerline quarter-pixel diagnostic to existing P3a2 output (not geometry filter); unit tests detect crossing and NaN; CI verifies same baseline P3a width4/6 paths. Commits `2274e528`, `7265ea09`, `3b8c048e`, protocol `137d22e5`. E2/P3a2 CI UNKNOWN; native P3b/E4/exact CHALK NOT_RUN. No production changes.
