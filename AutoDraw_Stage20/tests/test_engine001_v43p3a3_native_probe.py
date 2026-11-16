@@ -24,6 +24,21 @@ class V43P3a3ProbeTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"width"):
             make_probe_strokes(data,30)
 
+    def test_native_foreign_color_and_exterior_are_separate(self):
+        owner=np.zeros((240,460),dtype=np.int16)
+        component=np.zeros((240,460),dtype=np.bool_)
+        owner[20:60,200:250]=7
+        component[20:60,200:250]=True
+        owner[20:60,250:290]=4
+        native=np.zeros((720,1380),dtype=np.uint8)
+        native[90:93,780:783]=255  # x=260, other required class4, >3logical px
+        native[90:93,930:933]=255  # x=310, outside all required colors
+        result=native_footprint_metrics(native,owner,component)["24"]
+        self.assertEqual(result["native_ink_on_other_required_classes_4_5_6"],9)
+        self.assertEqual(result["native_ink_on_skipped_background_classes_0_1_2_3"],9)
+        self.assertEqual(result["native_foreign_required_color_more_than_3logical_px"],9)
+        self.assertEqual(result["native_exterior_silhouette_more_than_3logical_px"],9)
+
     def test_empty_width_is_valid_not_fabricated(self):
         self.assertEqual(make_probe_strokes({"width":30,"candidate_strokes":[]},30),[])
 
