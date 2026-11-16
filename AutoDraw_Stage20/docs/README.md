@@ -4,6 +4,8 @@
 
 **Обязательное правило игровых кистей:** [GAME_BRUSH_FOOTPRINT_TEST_POLICY_2026-11-15.md](GAME_BRUSH_FOOTPRINT_TEST_POLICY_2026-11-15.md) — использовать реальный след BoardPane/Egret во всех brush-dependent тестах; модели не заменяют native quality.
 
+**ENGINE-001 V44-P1 (2026-11-16):** [пререгистрация цветоадаптивной обводки](ENGINE001_ADAPTIVE_COLOR_OUTLINE_V44_PROTOCOL_2026-11-16.md). Экспериментальный pure RGB/contrast адаптер для всех 410 исходных контуров V35-B поверх неизменной заливки V37-P2-C и отдельный [native Egret CI](../../.github/workflows/engine001-adaptive-color-outline-native-v44.yml). A исходная тёмная обводка, B исходный median RGB, C локальный порог контраста 2.5; изменения только цвета, без новых линий. CI/native quality/CHALK не объявлять PASS до получения отчётов.
+
 ## Начните с этих документов
 
 | Вопрос | Куда идти |
