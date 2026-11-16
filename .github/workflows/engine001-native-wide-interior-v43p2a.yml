@@ -1,0 +1,68 @@
+name: ENGINE-001 V43 P2a genuine Egret wide interior brush feasibility
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-native-wide-interior-v43p2a.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_native_wide_interior_v43p2a.py"
+      - "AutoDraw_Stage20/tests/test_engine001_native_wide_interior_v43p2a.py"
+      - "AutoDraw_Stage20/tests/game_renderer_reference.js"
+      - "AutoDraw_Stage20/tests/run_engine001_complex_holdout_v5.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  actual-egret-wide-interior:
+    runs-on: windows-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install previously proven original Egret replay libraries
+        run: python -m pip install "selenium>=4,<5" "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scikit-image>=0.25,<0.27" "scipy>=1.13,<2"
+      - name: Restore frozen full dark outline and original paint
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/v37p2"
+          gh run download 43747149144 --repo Kiddos19882/AutoDraw -n engine001-v37p2-native-full-contour-fill-color-evidence -D "$RUNNER_TEMP/v37p2"
+      - name: Validate native full outline contract and compare widths 2 4 6
+        shell: bash
+        run: |
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_native_wide_interior_v43p2a.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_native_wide_interior_v43p2a.py -v
+          python AutoDraw_Stage20/tests/run_engine001_native_wide_interior_v43p2a.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --v37p2-archive "$RUNNER_TEMP/v37p2" \
+            --output "$RUNNER_TEMP/engine001-v43-p2a"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-v43-p2a"
+          data=json.loads((root/"report.json").read_text(encoding="utf-8"))
+          assert data["experiment"]=="ENGINE001_V43_P2A_NATIVE_WIDE_INTERIOR"
+          assert data["baseline_C_RGBA_exact"] and data["all_410_original_contours_alpha_exact"]
+          assert (data["strokes"],data["synthetic_vertices_NOT_CHALK"])==(2355,5682)
+          assert data["component"]["component_area"]==5005
+          assert all(hashlib.sha256((root/p).read_bytes()).hexdigest()==h
+                     for p,h in data["artifact_SHA256"].items())
+          assert data["game_exact_CHALK"] is None and data["production_quality_accepted"] is False
+          print("Actual Egret width2/4/6 evidence complete; native numeric outcome is separate from workflow PASS")
+          PY
+      - name: Preserve A B C true Egret PNG including negative result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-v43p2a-native-wide-interior-evidence
+          path: ${{ runner.temp }}/engine001-v43-p2a
+          if-no-files-found: warn
