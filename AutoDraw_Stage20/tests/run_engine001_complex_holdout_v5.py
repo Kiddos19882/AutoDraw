@@ -231,7 +231,8 @@ def native_batch(workspace:Path,variant:str,strokes:list[dict],
     if renderer_method not in ("renderComplexHoldoutColorProbe",
                                "renderV35LayeredColorProbe",
                                "renderV36SourceColoredContourProbe",
-                               "renderV43WideInteriorProbe"):
+                               "renderV43WideInteriorProbe",
+                               "renderV43P3PaintBrushProbe"):
         raise ValueError("Unsupported native Egret renderer method")
     class Handler(SimpleHTTPRequestHandler):
         def __init__(self,*a,**kw):
