@@ -1,5 +1,8 @@
 # AutoDraw — действующие задачи
 
+- [ ] **ENGINE-001 / V43-P2b real Egret thin-boundary/wide-interior split:** [separate prereg](ENGINE001_V43P2B_NATIVE_SPLIT_INTERIOR_PROTOCOL_2026-11-16.md) after P2a no-op negative, find longest source-only interior class7 run with radius>=4/5 and span>=8logical px in frozen V37-P2-C, split top40 paths into 2/4/2 strokes (B,2435 paths/5842 synthetic accepted vertices) and top50 into 2/6/2 (C,2455/5882), within 3000/5900 native cap **but increased resource vs baseline**. Preserve all410 original V35-B dark contours last and original source RGB. Native alpha class recall, source full/warm RGB MAE, internal/external3logical px and image readability independent, no live CHALK/E4/E5/production. Opt-in Windows CI `.github/workflows/engine001-native-split-interior-v43p2b.yml` pending.
+
+
 - [ ] **ENGINE-001 / V43-P2a first real Egret wide interior feasibility:** [separately preregistered](ENGINE001_V43P2A_NATIVE_WIDE_INTERIOR_PROTOCOL_2026-11-16.md) source class7 largest component5005 pixels, only original interior width2 strokes with five source-distance samples>=4/5 upgraded to native width4/6, other original width2 fill and all410 full dark V35-B width1 contour paths unchanged and last. A exact frozen V37-P2-C, native alpha24/128 own-class+3logicalpx internal/exterior, RGB/warm source, silhouette; reject resource drift. Not oriented/skeleton hybrid yet; no production/CHALK/E4/E5 claims. New workflow `.github/workflows/engine001-native-wide-interior-v43p2a.yml`.
 
 
