@@ -47,7 +47,7 @@ class OrientedSourceV43P3aTests(unittest.TestCase):
 
     def test_invalid_geometry_fails_closed(self):
         with self.assertRaisesRegex(ValueError,"unsupported"):
-            oriented_source_candidates(self.mask,self.distance,30)
+            oriented_source_candidates(self.mask,self.distance,31)
         with self.assertRaisesRegex(ValueError,"source mask"):
             oriented_source_candidates(self.mask[:5],self.distance[:5],4)
         broken=self.distance.copy()
