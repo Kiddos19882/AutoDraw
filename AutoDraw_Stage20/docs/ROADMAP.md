@@ -2,6 +2,10 @@
 
 # AutoDraw — дорожная карта будущих работ
 
+**ENGINE-001 / V43-P3a3 native isolated footprints (2026-11-16):** [new separate prereg](ENGINE001_V43P3A3_NATIVE_ORIENTED_FOOTPRINT_PROTOCOL_2026-11-16.md) and [Windows Egret CI](../../.github/workflows/engine001-v43p3a3-native-oriented-footprint.yml) added to test **actual** WebGL alpha of up to first3 source-oriented paths at each width4/6/10/20/30. Reuses P3a2 PCA source paths, P2a class7 mask, existing `native_batch` and original V5 Egret renderer; new opt-in JS method includes20 while original V5 width whitelist and V43/V44 unchanged. Reports original owner and >3logical px component leakage alpha24/128 with raw PNG/SHA, no stroke replacement or game CHALK. Unit/native CI status UNKNOWN until inspected; E4/E5 NOT_RUN, production/master unchanged.
+
+
+
 **ENGINE-001 / V43-P3a2 (2026-11-16):** пользователь согласовал продолжение многоразмерной заливки до width30. [Отдельный source-only prereg](ENGINE001_V43P3A2_BROAD_BRUSH_AUDIT_PROTOCOL_2026-11-16.md) фиксирует ширины **4,6,10,20,30** без изменения замороженного P3a 4/6. Переиспользуется тот же PCA-генератор, создаются отдельный отчёт, тесты и [CI](../../.github/workflows/engine001-v43p3a2-width-audit.yml). P3a/P3a2 не меняют заливку, не рисуют Egret, не оценивают CHALK; `safe_to_execute=False`. Обводка V44-B (410 исходных цветных линий) остаётся визуальным baseline; P3b требуется отдельно подтвердить нативный footprint и реальную замену старых горизонтальных проходов. E2/CI не подтверждён, E3 native/E4/E5 NOT_RUN.
 
 
