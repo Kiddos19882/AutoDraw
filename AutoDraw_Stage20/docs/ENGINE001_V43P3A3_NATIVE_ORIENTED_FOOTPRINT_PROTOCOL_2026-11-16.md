@@ -40,3 +40,7 @@ Before any confirmed P3a3 native output, explicitly extend report-only alpha24/1
 - define **source foreground silhouette depth** as distance to required-class foreground union4..7; count painted outside silhouette beyond9 native px;
 - retain original largest-component depth diagnostic as a separate component identity measure; it is NOT synonymous with forbidden cross-color leakage.
 These are *native reference-image diagnostics*, not exact RGB quality or full-scene ownership: if a width has zero sampled paths, retain `NO_ELIGIBLE_PATHS`. All thresholds frozen (alpha24/128; 9 backing px) before report. No source candidate geometry changes, no posthoc filtering, no promotion to production.
+
+## Native evidence completeness gate (before outcome)
+
+Per width, `NO_ELIGIBLE_PATHS` remains a legitimate negative observation. For the **entire** run, however, zero eligible paths across all five widths means **no actual Egret ink was measured** and must be classified `NO_NATIVE_SAMPLE` / FAIL (retain source diagnostics and any outputs), not E3 native PASS. CI must run existing P3a and P3a2 unit suites because P3a3 directly imports their candidate path generator and source audit. Artifact upload remains `if: always()`.
