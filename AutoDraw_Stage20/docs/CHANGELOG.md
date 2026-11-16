@@ -1,5 +1,7 @@
 # AutoDraw — значимые изменения
 
+**2026-11-17 — DOC-SYNC-20261116 continued:** clarified active P4 vs legacy V44-P2 next phrasing in ROADMAP, scoped archival checkboxes to ENGINE-001 without closing other tasks, corrected README so NOT_RUN P4 is not presented as an ongoing test. No code/master/CI execution; [audit addendum](DOCUMENTATION_INVENTORY_2026-11-16.md).
+
 **2026-11-17 — DOC-SYNC-20261116 (повторная проверка документации):** выделена действующая задача V43-P4 от исторических `[ ]` в TASKS, исправлен преднативный V44-P1 статус в README по уже подтверждённому Egret CI43813812976; дополнена инвентаризация с честным `PARTIAL`, старые tree counts не выданы за текущие. Документирование без изменения production/master/кода; CI на новом SHA не запускался. [Инвентаризация](DOCUMENTATION_INVENTORY_2026-11-16.md).
 
 **2026-11-16 — ENGINE-001 V43-P4 / DOC-SYNC-20261116 (документация):** утверждён и записан единый протокол **полной замены старых1945 paint strokes** новым adaptive fill B0 (required classes4–7, widths10/6/4/2), неизменные410 пользовательских цветных V44-B контуров последними; B1 исправляет ошибки только после архивирования B0. [Протокол](ENGINE001_V43P4_FULL_ADAPTIVE_FILL_PROTOCOL_2026-11-16.md), [новая инвентаризация](DOCUMENTATION_INVENTORY_2026-11-16.md); действующие индексы согласованы с CI P3b-P0/P1, 0/18 и 0/36 полных замен. Исторические отрицательные материалы и production не менялись; P4 code/CI/native NOT_RUN.
