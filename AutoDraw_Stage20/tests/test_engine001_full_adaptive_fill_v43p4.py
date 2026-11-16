@@ -44,6 +44,55 @@ class FullAdaptiveFillP4Tests(unittest.TestCase):
     def test_deterministic(self):
         self.assertEqual(source_plan(self.labels), source_plan(self.labels))
 
+    def test_native_assembly_preserves_410_details_and_rejects_original_paint(self):
+        from copy import deepcopy
+        from run_engine001_v43p4_native_ab import assemble_b0
+        paints = []
+        for i in range(1945):
+            owner = COLORS[i % 4]
+            paints.append({"layer": "paint", "stroke": {
+                "strokeId": f"icon-{i}", "colorIndex": owner, "width": 2,
+                "colorRgb": (owner << 16) | 0x2020,
+                "points": [{"x": 155, "y": 5}, {"x": 156, "y": 5}],
+            }})
+        details = []
+        for i in range(410):
+            count = 5 if i < 152 else 4
+            details.append({"layer": "detail", "stroke": {
+                "strokeId": f"detail-v18-B-{i}", "colorIndex": 100,
+                "width": 1, "colorRgb": 0xDD77AA + i,
+                "points": [{"x": 160 + j, "y": i % 240}
+                           for j in range(count)],
+            }})
+        frozen = {"strokes": paints + details}
+        source = {
+            "candidate": "B0_SOURCE_ONLY", "safe_to_execute": False,
+            "original_paint_retained": 0, "paint_strokes": 4,
+            "synthetic_vertices_with_frozen_detail_NOT_CHALK": 1800,
+            "paint": [{"strokeId": f"p4-b0-{owner}-{i:05d}",
+                       "colorIndex": owner, "width": WIDTHS[i],
+                       "points": [{"x": 165, "y": 10 + i},
+                                  {"x": 175, "y": 10 + i}]}
+                      for i, owner in enumerate(COLORS)],
+        }
+        original = deepcopy(frozen)
+        native, metadata = assemble_b0(source, frozen)
+        self.assertEqual(frozen, original)
+        self.assertEqual(native[4:], [entry["stroke"] for entry in details])
+        self.assertEqual(metadata["original_paint_retained"], 0)
+        self.assertEqual(metadata["detail_count"], 410)
+        self.assertEqual(metadata["synthetic_vertices_NOT_CHALK"], 1800)
+        self.assertTrue(metadata["V44B_410_detail_exact"])
+        self.assertEqual(len(native), 414)
+        bad = deepcopy(source)
+        bad["paint"][0]["strokeId"] = "icon-0"
+        with self.assertRaisesRegex(ValueError, "unexpected B0 paint"):
+            assemble_b0(bad, frozen)
+        bad = deepcopy(source)
+        bad["safe_to_execute"] = True
+        with self.assertRaisesRegex(ValueError, "invalid source-only"):
+            assemble_b0(bad, frozen)
+
     def test_fail_closed_for_invalid_inputs(self):
         with self.assertRaisesRegex(ValueError, "source labels"):
             checked_labels(np.zeros((5, 5), np.int16))
