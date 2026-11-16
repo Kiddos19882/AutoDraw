@@ -1,5 +1,8 @@
 # AutoDraw — действующие задачи
 
+- [ ] **ENGINE-001 / V43-P3b-P0 native subset:** [isolated Windows workflow](../../.github/workflows/engine001-v43p3b-native-subset.yml), [protocol](ENGINE001_V43P3B_NATIVE_REPLACEMENT_PROTOCOL_2026-11-16.md), source E1 0/6/15 candidates after connected-component filter at widths4/6/10, deterministic 0/6/12=18 sampled original width2 strokes for genuine Egret alpha subset. E2/E3 P0 UNKNOWN; no plan routes deleted, no full RGB/CHALK acceptance. Next evaluate run/artifact, then only if strict savings and unchanged quality build V44-B full composite B.
+
+
 - [x] **ENGINE-001 / V43-P3a3 E3 isolated native proof:** [CI43864508620](https://github.com/Kiddos19882/AutoDraw/actions/runs/43864508620) SUCCESS SHA `e2cc4d15`, artifact14224453656, original ZIP/6 PNG checksums PASS; Egret widths4/6/10 first3 each rendered, alpha24 wrong-class0/2/0 backing pixels, over3logicalpx=0, silhouette over3logicalpx=0; widths20/30 `NO_ELIGIBLE_PATHS` (not tested natively). Full-fill/E4/exact CHALK NOT_RUN; no production acceptance.
 - [ ] **ENGINE-001 / V43-P3b actual replacement:** [separate prereg](ENGINE001_V43P3B_NATIVE_REPLACEMENT_PROTOCOL_2026-11-16.md) freezes source-owned whole width2 scanline deletion ONLY when the proposed oriented real Egret alpha fully substitutes its own-color footprint. Show strict reduction in count and synthetic vertices, unchanged full410 user-preferred V44-B RGB contours last; full original/warm RGB, per-class>=99%, 3logicalpx, E4/E5 not yet validated. Next: native path-subset feasibility using pinned baseline and reference renderer; no whole-image B produced yet.
 
