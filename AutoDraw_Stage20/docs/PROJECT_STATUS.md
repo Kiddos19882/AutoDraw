@@ -1,5 +1,8 @@
 # AutoDraw — текущее состояние
 
+**ENGINE-001 / V43-P3a3 pre-native hardening (2026-11-16):** before a confirmed workflow outcome extended isolated real-Egret alpha24/128 metrics to distinguish **foreign required colors4/5/6 >3 logical px** from **exterior silhouette >3 logical px**, retaining largest-class7-component distance separately. Unit test verifies both disjoint failure types. Added E2 runs of P3a and P3a2 dependencies to same Windows workflow and fail-closed `NO_NATIVE_SAMPLE` if every width4/6/10/20/30 has zero eligible paths; individual empty widths remain recorded. Commits `6000b308`, `f1d67867`, `aa81da16`, `e2cc4d15`; prereg diagnostic addendum `021b2010` and completeness gate `0945d562`. **E1 static only; E2/E3 P3a3 not confirmed, E4/E5/CHALK NOT_RUN**. No production/frozen V44-B modifications. [Protocol](ENGINE001_V43P3A3_NATIVE_ORIENTED_FOOTPRINT_PROTOCOL_2026-11-16.md).
+
+
 **ENGINE-001 / V43-P3a3 pre-CI correction (2026-11-16):** статический аудит нашёл, что первый opt-in renderer всё ещё запрещал width20 по наследованному списку V5. Исправлено в `4b3d87d305764c47ffe2decaee20c3a0a34eb289`: только новый метод `renderV43P3PaintBrushProbe` принимает [4,6,10,20,30], исходный V5 список остался [2,4,6,8,10,15,30]. E1 static FIXED; E2/E3 нового native workflow не подтверждены. Исторические результаты не менялись, P3a3 пока не является полной заливкой или игровым измерением.
 
 
