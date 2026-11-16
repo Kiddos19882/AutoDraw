@@ -9,6 +9,7 @@ on:
       - "AutoDraw_Stage20/tests/run_engine001_v43p4_native_ab.py"
       - "AutoDraw_Stage20/tests/test_engine001_full_adaptive_fill_v43p4.py"
       - "AutoDraw_Stage20/tests/game_renderer_reference.js"
+      - "AutoDraw_Stage20/tests/run_engine001_complex_holdout_v5.py"
   workflow_dispatch:
 
 permissions:
