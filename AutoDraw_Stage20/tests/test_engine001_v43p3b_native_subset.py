@@ -19,7 +19,7 @@ class P3bSubsetTests(unittest.TestCase):
             {"layer":"paint","stroke":{"strokeId":"icon-0","colorIndex":7,"width":2,
               "points":[{"x":180.0,"y":100.0},{"x":220.0,"y":100.0}]}},
             {"layer":"paint","stroke":{"strokeId":"icon-1","colorIndex":7,"width":2,
-              "points":[{"x":150.0,"y":100.0},{"x":220.0,"y":100.0}]}},
+              "points":[{"x":155.0,"y":100.0},{"x":220.0,"y":100.0}]}},
             {"layer":"paint","stroke":{"strokeId":"icon-2","colorIndex":6,"width":2,
               "points":[{"x":180.0,"y":100.0},{"x":220.0,"y":100.0}]}},
         ]
