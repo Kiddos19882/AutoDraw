@@ -1,0 +1,68 @@
+name: ENGINE-001 V43P3a2 broad widths source-only audit
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-v43p3a2-width-audit.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_v43p3_oriented_source.py"
+      - "AutoDraw_Stage20/tests/run_engine001_v43p3a2_width_audit.py"
+      - "AutoDraw_Stage20/tests/test_engine001_v43p3_oriented_source.py"
+      - "AutoDraw_Stage20/tests/test_engine001_v43p3a2_width_audit.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  p3a2-source-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install existing source analysis dependencies
+        run: python -m pip install "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scipy>=1.13,<2" "scikit-image>=0.25,<0.27"
+      - name: Test original P3a and broadened P3a2 without native claims
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_v43p3_oriented_source.py AutoDraw_Stage20/tests/run_engine001_v43p3a2_width_audit.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_v43p3_oriented_source.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_v43p3a2_width_audit.py -v
+      - name: Generate frozen source geometry reports
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_v43p3_oriented_source.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --output "${{ runner.temp }}/v43p3a"
+          python AutoDraw_Stage20/tests/run_engine001_v43p3a2_width_audit.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --output "${{ runner.temp }}/v43p3a2"
+          python - <<'PY'
+          import json,hashlib,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])
+          a=json.loads((root/"v43p3a/oriented-candidates.json").read_text())
+          b=json.loads((root/"v43p3a2/width-candidates.json").read_text())
+          assert a["experiment"]=="ENGINE001_V43P3_ORIENTED_REPLACEMENT_P3A_MODEL_ONLY"
+          assert b["experiment"]=="ENGINE001_V43P3A2_BROAD_BRUSH_SOURCE_AUDIT"
+          assert sorted(a["variants"])==["4","6"]
+          assert list(b["variants"])==["4","6","10","20","30"]
+          assert a["variants"]=={k:b["variants"][k] for k in ("4","6")}
+          assert all(not item["safe_to_execute"] for item in b["variants"].values())
+          assert b["original_fill_routes_removed"]==0
+          assert b["exact_CHALK"] is None
+          for p in (root/"v43p3a/oriented-candidates.json",root/"v43p3a2/width-candidates.json"):
+              print(p.name,hashlib.sha256(p.read_bytes()).hexdigest())
+          PY
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+      - name: Archive source-only reports, including negative results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-v43p3a2-source-width-audit-model-only
+          path: |
+            ${{ runner.temp }}/v43p3a
+            ${{ runner.temp }}/v43p3a2
+          if-no-files-found: warn
