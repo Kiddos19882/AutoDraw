@@ -47,8 +47,19 @@ class AdaptiveColorOutlineV44Tests(unittest.TestCase):
         detail = {"layer": "detail", "stroke": {
             "strokeId": "detail-v18-B-test", "width": 1, "colorRgb": 0x31262B,
             "points": [{"x": 180, "y": 80}, {"x": 200, "y": 80}]}}
-        base = {"strokes": [fill] * 1945 + [detail] * 410,
+        # Each source contour is a distinct stroke object, as in frozen V35-B.
+        # Reusing [detail] * 410 aliases one dictionary: recoloring the first
+        # changes the next and falsely triggers the immutable-RGB guard.
+        details = []
+        for i in range(410):
+            route = {"layer": "detail", "stroke": {
+                **detail["stroke"], "strokeId": f"detail-v18-B-{i}",
+                "points": [dict(p) for p in detail["stroke"]["points"]]}}
+            details.append(route)
+        base = {"strokes": [fill] * 1945 + details,
                 "synthetic_vertices_NOT_CHALK": 5682}
+        self.assertEqual(len({id(e) for e in details}), 410)
+        self.assertEqual(len({e["stroke"]["strokeId"] for e in details}), 410)
         for variant in ("A", "B", "C"):
             changed, report = adaptive_recolor(base, img, variant)
             self.assertEqual(len(report), 410)
