@@ -1,0 +1,78 @@
+name: ENGINE-001 V43-P4.2 first full adaptive native A B0
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-v43p4-full-adaptive-native.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_full_adaptive_fill_v43p4.py"
+      - "AutoDraw_Stage20/tests/run_engine001_v43p4_native_ab.py"
+      - "AutoDraw_Stage20/tests/test_engine001_full_adaptive_fill_v43p4.py"
+      - "AutoDraw_Stage20/tests/game_renderer_reference.js"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  first-full-native-b0:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install existing frozen renderer and analysis dependencies
+        run: python -m pip install "selenium>=4,<5" "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scikit-image>=0.25,<0.27" "scipy>=1.13,<2"
+      - name: Retrieve original V44-B native evidence
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/v44"
+          gh run download 43813812976 --repo Kiddos19882/AutoDraw -n engine001-v44-adaptive-contour-native-evidence -D "$RUNNER_TEMP/v44"
+      - name: Source regression, B0 assembly regression and Egret Node checks
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_full_adaptive_fill_v43p4.py AutoDraw_Stage20/tests/run_engine001_v43p4_native_ab.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_full_adaptive_fill_v43p4.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+      - name: Native pixel-exact A and first full adaptive B0
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_v43p4_native_ab.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --v44-archive "$RUNNER_TEMP/v44" \
+            --output "$RUNNER_TEMP/engine001-v43p4-first-b0"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-v43p4-first-b0"
+          r=json.loads((root/"report.json").read_text(encoding="utf-8"))
+          assert r["experiment"]=="ENGINE001_V43P4_FULL_ADAPTIVE_FILL_B0_NATIVE_E3"
+          assert r["frozen_native_A_V44B_pixel_exact"] is True
+          assert r["b0"]["original_paint_retained"]==0
+          assert r["b0"]["V44B_410_detail_exact"] is True
+          assert r["b0"]["detail_after_paint"] is True
+          assert r["b0"]["detail_count"]==410
+          assert r["b0"]["paint_count"]+410<=3000
+          assert r["b0"]["synthetic_vertices_NOT_CHALK"]<=5900
+          assert r["quality_accepted"] is False and r["game_exact_CHALK"] is None
+          assert r["E4"]=="NOT_RUN" and r["E5"]=="NOT_RUN"
+          for name,digest in r["report_linked_SHA256"].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==digest
+          print("Actual full Egret B0 archived; numeric outcome",r["quality_status"])
+          print("This CI is execution evidence E3, never game CHALK or live quality.")
+          PY
+      - name: Archive original A/B0 full PNGs, RGB/alpha metrics and negative results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-v43p4-first-full-adaptive-native-ab-evidence
+          path: ${{ runner.temp }}/engine001-v43p4-first-b0
+          if-no-files-found: warn
+          retention-days: 30
