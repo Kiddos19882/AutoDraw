@@ -1,5 +1,8 @@
 # AutoDraw — действующие задачи
 
+- [ ] **ENGINE-001 / V43-P2a first real Egret wide interior feasibility:** [separately preregistered](ENGINE001_V43P2A_NATIVE_WIDE_INTERIOR_PROTOCOL_2026-11-16.md) source class7 largest component5005 pixels, only original interior width2 strokes with five source-distance samples>=4/5 upgraded to native width4/6, other original width2 fill and all410 full dark V35-B width1 contour paths unchanged and last. A exact frozen V37-P2-C, native alpha24/128 own-class+3logicalpx internal/exterior, RGB/warm source, silhouette; reject resource drift. Not oriented/skeleton hybrid yet; no production/CHALK/E4/E5 claims. New workflow `.github/workflows/engine001-native-wide-interior-v43p2a.yml`.
+
+
 - [ ] **ENGINE-001 / V43 hybrid shape-aware adaptive fill, experimental:** [prereg](ENGINE001_SHAPE_ADAPTIVE_FILL_V43_PROTOCOL_2026-11-16.md). P1 source-only connected components of each required color4..7, PCA principal axis, medial distance transform and reusable `skeletonization.thin_binary_mask`; explicit `safe_to_execute=False` MODEL_ONLY. P2 after P1 evidence: opt-in genuine Egret variable-width native A/B/C, fixed full410 dark V35-B outlines last, internal and external 3logical px boundaries, per-class >=99% acceptance and RGB/face/hand quality nonregression, native harness cap3000 strokes/5900 synthetic vertices. No claims of quota-fit/exact CHALK until real E4; keep separate V42 color-aware endpoint task.
 
 
