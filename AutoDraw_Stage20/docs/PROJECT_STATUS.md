@@ -1,5 +1,8 @@
 # AutoDraw — текущее состояние
 
+**ENGINE-001 / V43-P3a3 native isolated footprints (2026-11-16):** [new separate prereg](ENGINE001_V43P3A3_NATIVE_ORIENTED_FOOTPRINT_PROTOCOL_2026-11-16.md) and [Windows Egret CI](../../.github/workflows/engine001-v43p3a3-native-oriented-footprint.yml) added to test **actual** WebGL alpha of up to first3 source-oriented paths at each width4/6/10/20/30. Reuses P3a2 PCA source paths, P2a class7 mask, existing `native_batch` and original V5 Egret renderer; new opt-in JS method includes20 while original V5 width whitelist and V43/V44 unchanged. Reports original owner and >3logical px component leakage alpha24/128 with raw PNG/SHA, no stroke replacement or game CHALK. Unit/native CI status UNKNOWN until inspected; E4/E5 NOT_RUN, production/master unchanged.
+
+
 **ENGINE-001/V43-P3a2 E1 safety audit 2026-11-16:** ранее выполненный [V31 CI43693170456](https://github.com/Kiddos19882/AutoDraw/actions/runs/43693170456) уже даёт E3 native Egret footprint для width10/20/30, и для каждого из этих размеров 6/6 траекторий имеют alpha128 пиксели за пределами идеальной капсулы; гипотеза о гарантированно круглой капсуле опровергнута. Source-only генератор V43-P3a2 расширен **дополнительным**, не влияющим на выбор маршрутов аудитом всех центровых участков с шагом0.25 logical px; отчёт считает source-owner/margin violations и явно помечает `SOURCE_CENTERLINE_ONLY_NOT_EGRET_FOOTPRINT`. Тесты и CI сравнение P3a4/6 идентичности обновлены в `2274e528`, `7265ea09`, `3b8c048e`. Native P3b реальные штрихи и CHALK НЕ запускались; E2 новых тестов / P3a2 CI UNKNOWN, production unchanged. [Подробности](ENGINE001_V43P3A2_BROAD_BRUSH_AUDIT_PROTOCOL_2026-11-16.md).
 
 
