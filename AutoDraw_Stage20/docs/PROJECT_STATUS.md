@@ -1,5 +1,14 @@
 # AutoDraw — текущее состояние
 
+## Актуальная работа на 2026-11-16 — ENGINE-001 / V43-P4
+
+**Текущий план:** [полная замена 1945 старых paint-штрихов адаптивной заливкой B0](ENGINE001_V43P4_FULL_ADAPTIVE_FILL_PROTOCOL_2026-11-16.md) с сохранением **410 исходных цветных V44-B контуров последним слоем**. Утверждено пользователем: не выполнять больше поштучную замену горизонтальных линий и исправлять пропуски **после** первого целого B0 native-рендера. Вариант A — замороженный V44-B; вариант B0 — **0 старых paint**, новые компоненты цвета4–7, widths10/6/4/2; затем отдельные B1/B2 коррекции по настоящему Egret alpha. **P4 implementation/tests/native/full-image/CHALK: NOT_RUN**; production/master/Stage6/Monitor/Bridge без изменений.
+
+**Почему:** [P3b-P0 CI43878183627](https://github.com/Kiddos19882/AutoDraw/actions/runs/43878183627) genuine Egret capture PASS, whole-line replacement 0/18; [P3b-P1 CI43882838806](https://github.com/Kiddos19882/AutoDraw/actions/runs/43882838806) E3 native capture SUCCESS at `acf9017fa5ff4de0788047eb1e214040ec5daa2c` (unit + Node checks PASS), **0/36** whole original horizontal strokes substitutable from 14/26/40 potential row-intersections widths4/6/10. Algorithm savings/quality **FAIL in sampled P0/P1**, no inference about new full B0. The earlier [P1 CI43880821942](https://github.com/Kiddos19882/AutoDraw/actions/runs/43880821942) FAIL before native due to valid fractional coordinate icon-174 was fixed without changing the source; failure retained. Не считать успешный CI доказательством полноценной картинки. Истинный game CHALK P4: **E4 NOT_RUN**, только `post.pointCount - pre.pointCount` с run-bound pre/post; E5 NOT_RUN. [Инвентаризация и найденные дубли](DOCUMENTATION_INVENTORY_2026-11-16.md).
+
+**Далее:** P4.0 воспроизводимый A baseline + P4.1 детерминированный полностью новый paint planner (unit E2), затем P4.2 native full A/B и P4.3 визуальные/пиксельные измерения. Исторические записи ниже отражают состояние **на момент записи**, а не актуальный backlog.
+
+
 **ENGINE-001 / V43-P3b-P1 CI failure and source precision fix (2026-11-16):** [CI43880821942](https://github.com/Kiddos19882/AutoDraw/actions/runs/43880821942) at `53596d6b23bedf77fa536f4388ad52769d01f209` FAIL before any new native P1 capture: P0/P1 unit + Node tests PASS, P1 ranker rejected valid original class7 `icon-174` endpoints `(235,41)→(235.25,41)` because it incorrectly required integer X. Verified authentic V37-P2-C archive14175105717: 209 class7 lines, exactly 1 fractional-X. Fix in `f1b4b6ed`: accept finite fractional original X without changing any stored stroke; source-only rank window floor(x0)..ceil(x1), actual replay will use untouched exact endpoints. Regression fixture in `acf9017f`. P1 new E2/E3 **UNKNOWN** until rerun; original failed CI and frozen P0 negative preserved. Full V44-B/E4/CHALK still NOT_RUN.
 
 
