@@ -12,6 +12,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: engine001-v43p4-source-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   p4-source-only:
     runs-on: ubuntu-latest
