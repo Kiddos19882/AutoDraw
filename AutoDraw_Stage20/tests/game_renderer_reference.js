@@ -2398,7 +2398,7 @@
     for (const stroke of strokes) {
       if (!stroke || typeof stroke.strokeId!=="string" ||
           !/^icon-[0-9]+$/.test(stroke.strokeId) ||
-          ![2,4,6,8,10,15,30].includes(stroke.width) || !Array.isArray(stroke.points) ||
+          !(allowV43P3Widths ? [4,6,10,20,30].includes(stroke.width) : [2,4,6,8,10,15,30].includes(stroke.width)) || !Array.isArray(stroke.points) ||
           stroke.points.length<2 || stroke.points.length>128) {
         throw new Error("Invalid adaptive two-icon width or stroke.");
       }
@@ -2435,7 +2435,7 @@
 
   // ENGINE-001 V5 only: permitted per-stroke RGB for independently frozen
   // palette-class holdout. Existing black/fixed-radius research is untouched.
-  function renderComplexHoldoutColorProbe(strokes) {
+  function renderComplexHoldoutColorProbe(strokes, allowV43P3Widths=false) {
     if (!Array.isArray(strokes) || strokes.length < 1 || strokes.length > 3000) {
       throw new Error("V5 requires 1..3000 bounded strokes.");
     }
@@ -2773,7 +2773,12 @@
   api.renderV31NativeGameBrush = renderV31NativeGameBrush;
   api.renderV24NativeAlphaProvenance = renderV24NativeAlphaProvenance;
   api.renderTwoIconMaskProbe = renderTwoIconMaskProbe;
+  // V43-P3a3 opt-in: same real Egret renderer, wider source-only paint probes.
+  function renderV43P3PaintBrushProbe(strokes) {
+    return renderComplexHoldoutColorProbe(strokes, true);
+  }
   api.renderComplexHoldoutColorProbe = renderComplexHoldoutColorProbe;
+  api.renderV43P3PaintBrushProbe = renderV43P3PaintBrushProbe;
   api.renderV35LayeredColorProbe = renderV35LayeredColorProbe;
   api.renderV36SourceColoredContourProbe = renderV36SourceColoredContourProbe;
   api.renderV43WideInteriorProbe = renderV43WideInteriorProbe;
