@@ -1,5 +1,7 @@
 # AutoDraw — журнал выполненных действий
 
+**2026-11-17 / DOC-SYNC-20261116 read-only re-audit and authorized documentation corrections:** checked remote HEAD `50f82ff0e4e1` before edits and latest20 commits. Distinct from frozen historical checkboxes, only ENGINE-001 V43-P4 is active. Clarified boundary in TASKS (commit `e1514a2f`), corrected V44-P1 to actual native CI43813812976 / user V44-B visual choice without E4/E5 claim in README (commit `f275c564`), and added dated partial re-audit to DOCUMENTATION_INVENTORY (commit `f06299d4`). Prior tree counts remain frozen to `8273918226ff` and were NOT recounted. Docs-integrity CI43952023203/43952243621 FAIL preserved; CI43952776987 result UNKNOWN from available API, **no new audit execution**. Changes limited to docs; no production/master/code/testing/game runs.
+
 **2026-11-16 / DOC-SYNC-20261116 CI correction:** real docs-integrity CI43952023203 and CI43952243621 FAILED with respectively 2/3 unindexed docs, although 11/11 auditor unit tests PASS, broken links0, history errors0, duplicate decision IDs0. Root cause: `check_markdown_docs.check_links` considers index only direct Markdown links in `docs/README.md`. Added missing P3b-P1 link in commit `db21a97b`, along with P4 and new inventory links already present; new CI43952776987 was PENDING at observation. Negative CI evidence retained; no code/production/E4 tests run by documentation update.
 
 
