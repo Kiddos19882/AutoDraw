@@ -4,7 +4,7 @@ import unittest
 import cv2
 import numpy as np
 
-from run_engine001_v43p3a2_width_audit import source_width_audit
+from run_engine001_v43p3a2_width_audit import source_width_audit, sample_source_segment
 from run_engine001_v43p3_oriented_source import SUPPORTED_WIDTHS, WIDTHS
 
 
@@ -28,6 +28,24 @@ class V43P3a2WidthsTests(unittest.TestCase):
             self.assertTrue(all(not line["safe_to_execute"]
                                 and line["width"] == width
                                 for line in trial["candidate_strokes"]))
+
+    def test_subpixel_diagnostic_source_only_and_detects_crossing(self):
+        mask=np.zeros((240,460),dtype=np.bool_)
+        mask[60:120,170:300]=True
+        distance=cv2.distanceTransform(np.pad(mask.astype(np.uint8),1),
+                                       cv2.DIST_L2,cv2.DIST_MASK_PRECISE)[1:-1,1:-1]
+        safe=sample_source_segment(mask,distance,
+            [{"x":190.0,"y":90.0},{"x":250.0,"y":90.0}],10)
+        self.assertEqual(safe["source_owner_violations"],0)
+        self.assertEqual(safe["interior_margin_violations"],0)
+        self.assertEqual(safe["proof_type"],
+                         "SOURCE_CENTERLINE_ONLY_NOT_EGRET_FOOTPRINT")
+        crossing=sample_source_segment(mask,distance,
+            [{"x":170.0,"y":90.0},{"x":310.0,"y":90.0}],10)
+        self.assertGreater(crossing["source_owner_violations"],0)
+        with self.assertRaisesRegex(ValueError,"nonfinite"):
+            sample_source_segment(mask,distance,
+                [{"x":float("nan"),"y":90},{"x":250,"y":90}],10)
 
     def test_no_eligible_is_valid_result(self):
         mask = np.zeros((240, 460), dtype=np.bool_)
