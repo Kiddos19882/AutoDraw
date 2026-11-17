@@ -1,5 +1,8 @@
 # Документация AutoDraw — быстрый вход
 
+**ENGINE-001 S5-P1 pretrained-model experiment:** [исходный RGB → настоящая семантическая карта OneFormer, без фиктивной game32 покраски](ENGINE001_COLOR32_S5P1_PRETRAINED_ONEFORMER_ORIGINAL_SEMANTIC_PROTOCOL_2026-11-17.md). Pinned upstream checkpoint, self-contained source-only CI, original V44-B410 unchanged; model inference/visual quality remain NOT_VERIFIED pending CI.
+
+
 **Новый следующий эксперимент S5 (2026-11-17):** [пререгистрация обучаемой game32 head](ENGINE001_COLOR32_NEURAL_S5_TRAINABLE_PALETTE_HEAD_PROTOCOL_2026-11-17.md); пока только проверка доступности достоверных label и независимых holdout, `BLOCKED_DATASET_LABEL_VALIDATION`. Реальное обучение не проводилось. S3 [CI44145478173](https://github.com/Kiddos19882/AutoDraw/actions/runs/44145478173) успешен технически (7/7 tests, authenticity), но все четыре source color кандидата **QUALITY FAIL**, V44-B410 immutable.
 
 
