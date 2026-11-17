@@ -1,3 +1,7 @@
+## 2026-11-18 — ENGINE-001 S5-P4 isolated color-conditioning trial
+
+Read current HEAD 005fe60e, last20 commits, README/PROJECT_STATUS/TASKS/ROADMAP/AI_WORK_GUIDE; inspected source S5-P2/P3 runners, tests and workflows. Preregistered [S5-P4 foreground-balanced visual protocol](ENGINE001_S5_P4_FOREGROUND_BALANCED_SIX_RECOLOR_PROTOCOL_2026-11-18.md); added separate source-only experiment, tests, GitHub Actions workflow. Reused existing original loader, real ONNX mask/integrity code and real pretrained six-color inference. Pinned checkpoint and alpha handling; corrected workflow dependencies and step-scope U2NET_HOME. **E1 only until actual checks run.** No baseline/P3, production, master or V44-B410 changes; new E2/E3 NOT_VERIFIED.
+
 ## ENGINE-001 S5-P3 — pretrained native six-color full-RGB visual trial, 2026-11-17
 
 **User decision:** for new **visual-only** pretrained-model trials, suspend game32 swatch limit and source game32 acceptance gates; evaluate RGB recognition and visually first. Historical S3/S4/S5 game32 gates and rejected evidence remain frozen/unchanged. [Preregistered S5-P3 protocol](ENGINE001_S5_P3_NATIVE6_PRETRAINED_RECOLOR_VISUAL_PROTOCOL_2026-11-17.md) was committed before inference; no training dataset, no fine-tuning.
