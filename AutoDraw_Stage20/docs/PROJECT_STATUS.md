@@ -1,5 +1,10 @@
 # AutoDraw — текущее состояние
 
+## 2026-11-17 — COLOR32-NEURAL-S1 CPU/manifest preflight strengthening
+
+Read-only inspected official pinned SAM2 `setup.py` at `2b90b9f5ceec907a1c18123530e92e794ad901a4`: default build attempts CUDA extension; CPU-only workflow now sets `SAM2_BUILD_CUDA=0`, preserving original code/checkpoint. Verified original Meta checkpoint SHA256 `7402e0d864fa82708a20fbd15bc84245c2f26dff0eb43a4b5b93452deb34be69` against official [facebook/sam2.1-hiera-tiny](https://huggingface.co/facebook/sam2.1-hiera-tiny/blob/main/sam2.1_hiera_tiny.pt). Mask consumer now rejects other official source SHAs/weights (same constants as exporter), altered archive SHA, wrong mask shape; synthetic regression added. No model inference outcome yet confirmed; this is E1 static implementation only; tests/CI E2 NOT_VERIFIED, visual N1/N2 and native Egret NOT_RUN. Previous original P4c2 FAIL unchanged.
+
+
 ## ENGINE-001 / новый COLOR32-NEURAL-S1 после P4c2 native FAIL — 2026-11-17
 
 Первичный [CI44119887018](https://github.com/Kiddos19882/AutoDraw/actions/runs/44119887018), SHA `9cd12e2c04d47f7fabf6a3d4bae796a1e1606183`, job134168079359, artifact14343464778 ZIP GitHub digest `97a6007b8b88939d0449b5dee2ae5fe24f757db70a4292b8415229914e486e1c`; оригинальный report SHA `82c3ca81451ea60f31342d75d03c4bfe69c420f1022065965733a5901213ea86`. E3 **real Egret paint-only data PASS, quality FAIL** `P4C2_NATIVE_PAINT_FAIL`: 14/17 owners below alpha24≥99%, beyond3logical pixels=0 for all colors but color28 outside original ROI18 pixels alpha24/16 alpha128, thus safety FAIL. Native full with original V44-B410 LAST and actual game CHALK NOT_RUN. Изображение пользователем визуально отклонено как чрезмерно фрагментированное и шумное, вклад сегментации и недостающего покрытия кистью ещё не разделён экспериментально.
