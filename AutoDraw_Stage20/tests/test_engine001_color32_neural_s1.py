@@ -32,13 +32,14 @@ class NeuralS1SourceContracts(unittest.TestCase):
     def test_protected_edges_are_exactly_preserved(self):
         m = np.zeros((240, 150), bool)
         m[20:50, 30:70] = True
-        self.rgb[35, 35] = [0, 255, 0]
+        self.rgb[20:50, 30:70] = [0, 255, 0]
         protected = np.zeros(self.g.shape, bool)
         protected[35, 35] = True
         out, stats = apply_masks(
             self.rgb, self.palette, self.g, [(0.9, 0.96, int(m.sum()), "m0", m)],
             protected)
         self.assertEqual(out[35, 35], 3)
+        self.assertEqual(out[35, 36], 4)
         self.assertEqual(stats["restored_protected_pixels"], 1)
 
     def test_invalid_mask_shape_rejected(self):
