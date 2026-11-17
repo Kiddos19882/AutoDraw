@@ -1,0 +1,66 @@
+name: ENGINE-001 V43-P4 B1 owner-constrained source-only
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-v43p4-b1-source.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_v43p4_b1_source.py"
+      - "AutoDraw_Stage20/tests/test_engine001_v43p4_b1_source.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: autodraw-v43p4-b1-source-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  b1-source-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install existing source-analysis dependencies
+        run: python -m pip install "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "selenium>=4,<5" "scipy>=1.13,<2" "scikit-image>=0.25,<0.27"
+      - name: B1 Python syntax and independent fail-closed regressions
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_v43p4_b1_source.py AutoDraw_Stage20/tests/test_engine001_v43p4_b1_source.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_v43p4_b1_source.py -v
+      - name: Generate frozen-source B1 correction (MODEL_ONLY)
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_v43p4_b1_source.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --output "${{ runner.temp }}/engine001-v43p4-b1-source"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          p=Path(os.environ["RUNNER_TEMP"])/"engine001-v43p4-b1-source/candidate-b1-source.json"
+          x=json.loads(p.read_text(encoding="utf-8"))
+          assert x["experiment"]=="ENGINE001_V43P4_B1_OWNER_CONSTRAINED_FILL_SOURCE_ONLY"
+          assert x["source_sha256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert x["safe_to_execute"] is False and x["E3_native"]=="NOT_RUN"
+          assert x["original_A_paint_retained"]==0 and x["original_B0_paint_retained"]==0
+          assert x["detail_410_exact_required"] and not x["detail_verified_at_source_stage"]
+          assert x["projected_total_strokes"]<=3000
+          assert x["projected_synthetic_vertices_NOT_CHALK"]<=5900
+          assert set(x["source_model_diagnostics_NOT_EGRET"])=={"4","5","6","7"}
+          print("B1 candidate file SHA256",hashlib.sha256(p.read_bytes()).hexdigest())
+          print("B1 SOURCE_MODEL_ONLY metrics",{
+              k:v["source_model_coverage_NOT_NATIVE"] for k,v in
+              x["source_model_diagnostics_NOT_EGRET"].items()})
+          PY
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+      - name: Preserve B1 model output and failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-v43p4-b1-source-owner-constrained-model-only
+          path: ${{ runner.temp }}/engine001-v43p4-b1-source
+          if-no-files-found: warn
+          retention-days: 30
