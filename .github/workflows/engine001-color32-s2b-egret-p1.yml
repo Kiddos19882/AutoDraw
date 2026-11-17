@@ -44,7 +44,7 @@ jobs:
           from pathlib import Path
           def blob(path):
               data=Path(path).read_bytes()
-              return hashlib.sha1(b"blob "+str(len(data)).encode()+b"\\0"+data).hexdigest()
+              return hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest()
           expected={
               "AutoDraw_Stage20/tests/game_renderer_reference.js":"74ad4d8ad162bb04bf8f1ff94860ef673c02512b",
               "AutoDraw_Stage20/data/palettes/browser_palette.json":"461b5f3725b9b79888ad36e807b3cf4c9e445e98",
