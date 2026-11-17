@@ -1,0 +1,67 @@
+name: ENGINE-001 V43-P4 B3b direct owner-skeleton source
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-v43p4-b3b-owner-skeleton-source.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_v43p4_b3b_owner_skeleton_source.py"
+      - "AutoDraw_Stage20/tests/test_engine001_v43p4_b3b_owner_skeleton_source.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engine001-v43p4-b3b-source-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  b3b-source-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install pinned-family original source analysis dependencies
+        run: python -m pip install "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "selenium>=4,<5" "scipy>=1.13,<2" "scikit-image>=0.25,<0.27"
+      - name: Original owner mask skeleton, deterministic paths, resources E2
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_v43p4_b3b_owner_skeleton_source.py AutoDraw_Stage20/tests/test_engine001_v43p4_b3b_owner_skeleton_source.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_v43p4_b3b_owner_skeleton_source.py -v
+      - name: First original-source B3b or full resource blocker
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_v43p4_b3b_owner_skeleton_source.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --output "${{ runner.temp }}/engine001-b3b-owner-skeleton"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          p=Path(os.environ["RUNNER_TEMP"])/"engine001-b3b-owner-skeleton/b3b-original-owner-skeleton-source-report.json"
+          d=json.loads(p.read_text(encoding="utf-8"))
+          assert d["experiment"]=="ENGINE001_V43P4_B3B_ORIGINAL_OWNER_SKELETON_SOURCE_MODEL"
+          assert d["source_sha256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert d["same_owner_overlap_penalty"]==0
+          assert d["original_A_B0_B1_B2_B3_B3a_paint_retained"]==0
+          assert d["status"] in ["BLOCKED_RESOURCE","MODEL_LOW_COVERAGE","SOURCE_CANDIDATE_FOR_NATIVE_REVIEW"]
+          assert d["total_strokes_including_frozen_contours"]<=3000
+          assert d["synthetic_vertices_NOT_CHALK_including_details"]<=5900
+          assert d["frozen_original_V44B_details_required_last"]==410
+          assert not d["safe_to_execute"] and d["exact_game_CHALK"] is None
+          assert set(d["per_owner"])=={"4","5","6","7"}
+          print("B3b source model SHA256",hashlib.sha256(p.read_bytes()).hexdigest())
+          print("B3b status",d["status"],"new paint",d["new_paint_strokes"],
+                "model coverage",{k:x["source_model_coverage_NOT_NATIVE"] for k,x in d["per_owner"].items()})
+          PY
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+      - name: Archive B3b actual source metrics and fail-closed results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-b3b-original-owner-skeleton-source-first
+          path: ${{ runner.temp }}/engine001-b3b-owner-skeleton
+          if-no-files-found: warn
+          retention-days: 30
