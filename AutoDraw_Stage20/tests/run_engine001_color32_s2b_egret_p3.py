@@ -252,7 +252,7 @@ def native_compare(p2:dict,p3:dict):
             foreign=after["non_owner_beyond_3logical_px"]
             outside=after["ink_outside_image_ROI"]
             key=f"alpha{alpha}_owner{owner}"
-            gate[key]=bool(improvement>=MIN_ABSOLUTE_NATIVE_GAIN_PP and
+            gate[key]=bool((alpha!=24 or improvement>=MIN_ABSOLUTE_NATIVE_GAIN_PP) and
                            foreign==0 and outside==0)
             entries[key]={
                 "p2_native_owner_pixels":before["native_correct_owner_pixels"],
