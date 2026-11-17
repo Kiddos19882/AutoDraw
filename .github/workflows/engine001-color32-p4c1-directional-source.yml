@@ -1,0 +1,89 @@
+name: ENGINE-001 P4c1 G32 directional micro residual source-only
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-color32-p4c1-directional-source.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_color32_p4c1_directional_micro.py"
+      - "AutoDraw_Stage20/tests/test_engine001_color32_p4c1_directional_micro.py"
+      - "AutoDraw_Stage20/tests/run_engine001_color32_p4c0_all_owner_feasibility.py"
+      - "AutoDraw_Stage20/docs/README.md"
+      - ".gitattributes"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engine001-p4c1-source-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  p4c1-original-g32-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install existing original G32 and B3 P3 geometry source dependencies
+        run: python -m pip install "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scipy>=1.13,<2" "scikit-image>=0.25,<0.27" "selenium>=4,<5"
+      - name: Verify frozen P4c0, P4c1 directional micro and docs regressions
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_color32_p4c1_directional_micro.py AutoDraw_Stage20/tests/test_engine001_color32_p4c1_directional_micro.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color32_p4c1_directional_micro.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color32_p4c0_all_owner_feasibility.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Fixed all owner G32 directional and micro source feasibility (not native brush)
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_color32_p4c1_directional_micro.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --palette AutoDraw_Stage20/data/palettes/browser_palette.json \
+            --output "$RUNNER_TEMP/engine001-color32-p4c1"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-color32-p4c1"
+          r=json.loads((root/"report.json").read_text(encoding="utf-8"))
+          assert r["experiment"]=="ENGINE001_COLOR32_P4C1_DIRECTIONAL_MICRO_ALL_OWNER_SOURCE_ONLY"
+          assert r["github_sha"]==os.environ["GITHUB_SHA"]
+          assert r["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert r["status"] in ("BLOCKED_RESOURCE",
+                                 "SOURCE_INCREMENTAL_PASS_NATIVE_PENDING",
+                                 "MODEL_LOW_INCREMENTAL_GAIN")
+          assert r["original_P4c0_strokes_SHA256"]=="b9ca97fde1b3ed205b8b69cd3c6dc3bf6ef6af7d52060a3b1e93a07a1b1f7901"
+          assert r["original_G_index_png_SHA256"]=="b8dcd5f00d2c39c81997aaae084eaae19a776454e6fd6466209839288c1e5637"
+          assert r["baseline_P4c0_paths"]==119
+          assert r["baseline_P4c0_vertices_NOT_CHALK"]==1457
+          assert len(r["original_owners"])==17
+          assert r["total_paint_strokes"]<=2590
+          assert r["total_paint_vertices_NOT_CHALK"]<=4108
+          assert r["projected_total_strokes_with_frozen_V44B410_LAST"]<=3000
+          assert r["projected_total_vertices_with_frozen_V44B1792_NOT_CHALK"]<=5900
+          assert r["full_Egret_alpha24_128"]=="NOT_RUN"
+          assert r["exact_CHALK"] is None and not r["production_accepted"]
+          assert all(x["incremental_SOURCE_MODEL_pp"]>=-1e-9
+                     for x in r["model_only_per_owner"].values())
+          for name,expected in r["source_file_sha256"].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==expected,name
+          print("P4C1 STATUS:",r["status"])
+          print("P4C1 EXTRA STROKES:",r["additional_strokes"])
+          print("P4C1 MICRO STROKES:",r["micro_strokes_0_25_logical_MODEL_ONLY"])
+          print("P4C1 SOURCE BELOW99 OWNERS:",r["owners_below99_SOURCE_MODEL_ONLY"])
+          print("P4C1 FIRST RESOURCE:",r["first_resource_rejection"])
+          print("P4C1 REPORT SHA:",hashlib.sha256((root/"report.json").read_bytes()).hexdigest())
+          PY
+      - name: Always archive original and new SOURCE-only residual maps and negative data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-color32-p4c1-directed-micro-source
+          path: ${{ runner.temp }}/engine001-color32-p4c1
+          if-no-files-found: warn
+          retention-days: 30
