@@ -1,8 +1,18 @@
 # Решения и инженерные договорённости AutoDraw
 
-**Актуальная запись:** принятые решения `DEC-001`–`DEC-032`; `DEC-027` — прежняя **вторая** `DEC-016`, переименована для устранения коллизии. Содержание старого журнала до этой редакции сохранено полностью: [DECISIONS_HISTORY_THROUGH_2026-11-08.md](DECISIONS_HISTORY_THROUGH_2026-11-08.md). Не использовать историю решений как список текущих задач — см. [TASKS](TASKS.md).
+**Актуальная запись:** принятые решения `DEC-001`–`DEC-033`; `DEC-027` — прежняя **вторая** `DEC-016`, переименована для устранения коллизии. Содержание старого журнала до этой редакции сохранено полностью: [DECISIONS_HISTORY_THROUGH_2026-11-08.md](DECISIONS_HISTORY_THROUGH_2026-11-08.md). Не использовать историю решений как список текущих задач — см. [TASKS](TASKS.md).
 
 **Быстрый поиск:** `DEC-007` — точный CHALK; `DEC-013` — safety margin; `DEC-016` — logical board/ROI; `DEC-021` — PNG affine; `DEC-024` — границы local runtime; `DEC-026` — 95% coverage target; `DEC-027` — постоянная архитектура знаний.
+
+## DEC-033. ENGINE-001 R2: нейросеть помогает математике, оригинальный RGB — источник истины
+
+**Дата:** 2026-11-18. **Статус:** ACCEPTED — явное решение пользователя «переделываем план, где нейронка помощник в математике». **Область:** новая экспериментальная ветка подготовки цветовых областей ENGINE-001 / COLOR-ISLAND-R2; изменение плана, не принятие R2 реализации.
+
+**Решение:** математический алгоритм владеет исходной RGB-геометрией, связностью, защитой деталей/границ, выбором original-derived color medoid, оценкой ΔE00/chroma/hue и финальными правилами merge/keep и игровых palette swatches. Реальная, SHA-bound предобученная сеть поставляет *необязательные мягкие подсказки* о структурном сходстве соседних зон, границе foreground/background и вероятности значимой детали; **не имеет права подменять исходные RGB, назначать фантазийные цвета, обходить protected edges или удалять настоящие микродетали**. Начать с абляций DINOv2 dense features как merge-order guidance и BiRefNet soft foreground отдельно; SAM2/OneFormer только если докажут улучшение на данной задаче. Каждый neural вклад сравнивать с идентичным математическим контролем M0. Само число удалённых островков не является quality PASS.
+
+**Основание:** [R1 CI44201266143](https://github.com/Kiddos19882/AutoDraw/actions/runs/44201266143), SHA `0acf2539`, real source-only E3 PASS / quality FAIL: недостаточная детализация SLIC, 1017 непредставимых game32 пикселей, drift фона3929. S4 genuine DINOv2 менял color assignment, но S4 quality FAIL; повторить метод S4 без смены роли сети запрещено. Recolorization-Pro P3/P4 остаётся исследовательским отрицательным контролем, не исходником цветов. R1 thresholds/отрицательные артефакты исторически заморожены.
+
+**Проверки/этапы:** [R2 hybrid plan](ENGINE001_COLOR_ISLAND_R2_NEURAL_ASSISTED_MATH_PLAN_2026-11-18.md), [TASKS](TASKS.md), [ROADMAP](ROADMAP.md). Сначала R2-0 readonly APIs/checkpoints и prereg конкретных параметров; затем математика M0, изолированная DINO N1, optional BiRefNet N2 и RGB-vs-game32 отдельные результаты. Визуальное принятие пользователя перед нативным Egret; original V44-B410 LAST, production, Stage6, Bridge, Monitor и master неизменны. Game E4/E5 и exact run-bound `CHALK=post.pointCount-pre.pointCount` отдельно. **На момент принятия: R2 E0 PLAN_REGISTERED; R2 E1/E2/E3/E4/E5 NOT_RUN.**
 
 ---
 
