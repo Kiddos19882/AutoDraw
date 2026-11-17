@@ -1,0 +1,73 @@
+name: ENGINE-001 V43-P4 B2 full adaptive source resource preflight
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-v43p4-b2-full-source.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_v43p4_b2_full_source.py"
+      - "AutoDraw_Stage20/tests/test_engine001_v43p4_b2_full_source.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: autodraw-v43p4-b2-full-source-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  b2-full-source-resource-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install original source analysis dependencies
+        run: python -m pip install "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "selenium>=4,<5" "scipy>=1.13,<2" "scikit-image>=0.25,<0.27"
+      - name: Unit E2 determinism and resource rejection, never Egret
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_v43p4_b2_full_source.py AutoDraw_Stage20/tests/test_engine001_v43p4_b2_full_source.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_v43p4_b2_full_source.py -v
+      - name: Compute first full B2 source candidate or frozen resource blocker
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_v43p4_b2_full_source.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --output "${{ runner.temp }}/v43p4-b2-full-source"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          p=Path(os.environ["RUNNER_TEMP"])/"v43p4-b2-full-source/b2-full-source-report.json"
+          result=json.loads(p.read_text(encoding="utf-8"))
+          assert result["experiment"]=="ENGINE001_V43P4_B2_FULL_ADAPTIVE_BOUNDARY_REPAIR_SOURCE_MODEL"
+          assert result["source_sha256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert result["original_A_paint_retained"]==0 and result["original_B0_paint_retained"]==0
+          assert result["original_B1_paint_retained"]==0 and not result["native_allowed"]
+          assert result["safe_to_execute"] is False and result["E3"]=="NOT_RUN"
+          assert result["status"] in ("BLOCKED_RESOURCE","MODEL_CANDIDATE_READY_FOR_REVIEW")
+          assert result["width_sequence"]==[10,6,4,2]
+          assert all(x["strokeId"].startswith("p4-b2-")
+                     for x in result["paint_diagnostic_only"])
+          if result["status"]=="BLOCKED_RESOURCE":
+              assert result["blocked_resource"]["no_partial_native_render"] is True
+              assert result["blocked_resource"]["attempted_total_strokes"]>3000 or result["blocked_resource"]["attempted_vertices_NOT_CHALK"]>5900
+              print("B2_FULL_SOURCE_RESOURCE_FAIL_CLOSED",result["blocked_resource"])
+          else:
+              assert result["projected_total_strokes"]<=3000
+              assert result["projected_synthetic_vertices_NOT_CHALK"]<=5900
+              print("B2_FULL_SOURCE_MODEL_READY_NOT_NATIVE")
+          print("B2 source SHA256",hashlib.sha256(p.read_bytes()).hexdigest())
+          print("B2 source missing",result["model_missing_pixels_by_owner_after_attempt"])
+          PY
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+      - name: Save full source candidate OR negative resource blocker without overwrite
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-v43p4-b2-full-source-resource-gate
+          path: ${{ runner.temp }}/v43p4-b2-full-source
+          if-no-files-found: warn
+          retention-days: 30
