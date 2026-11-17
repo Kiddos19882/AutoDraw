@@ -1,0 +1,73 @@
+name: ENGINE-001 COLOR32-S2b historical RGB edge source experiment
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-color32-s2b-rgb-edge.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_color32_s2b_rgb_edge.py"
+      - "AutoDraw_Stage20/tests/test_engine001_color32_s2b_rgb_edge.py"
+      - "AutoDraw_Stage20/tests/run_engine001_color32_s2_edge_protection.py"
+      - "AutoDraw_Stage20/tests/run_engine001_palette32_region_study.py"
+      - "AutoDraw_Stage20/data/palettes/browser_palette.json"
+      - "AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engine001-color32-s2b-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  source-s2b:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install deterministic source-analysis dependencies
+        run: python -m pip install "numpy>=2,<3" "Pillow>=11,<13" "scikit-image>=0.25,<0.27" "scipy>=1.13,<2" "opencv-python-headless>=4.10,<5"
+      - name: Compile and execute all S2b tests
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_color32_s2b_rgb_edge.py AutoDraw_Stage20/tests/test_engine001_color32_s2b_rgb_edge.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color32_s2b_rgb_edge.py -v
+      - name: Audit documentation integrity
+        run: python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Create frozen-source B E G comparison and validated hashes
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_color32_s2b_rgb_edge.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --palette AutoDraw_Stage20/data/palettes/browser_palette.json \
+            --output "${{ runner.temp }}/engine001-color32-s2b"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-color32-s2b"
+          data=json.loads((root/"report.json").read_text(encoding="utf-8"))
+          assert data["experiment"]=="ENGINE001_COLOR32_S2B_RGB_EDGE_SOURCE_ONLY"
+          assert data["input_source_sha256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert data["settings"]["game_colors"]==32
+          assert data["visual_review"]=="PENDING"
+          assert data["native_Egret_fill"]=="NOT_RUN" and data["production_accepted"] is False
+          assert data["exact_CHALK"] is None
+          assert len(data["variants"])==3
+          for file,digest in data["file_sha256"].items():
+              assert hashlib.sha256((root/file).read_bytes()).hexdigest()==digest
+          print("S2b SOURCE GATE:",data["status"])
+          print("S2b SCORE:",data["source_gate"])
+          print("S2b REPORT SHA256:",hashlib.sha256((root/"report.json").read_bytes()).hexdigest())
+          PY
+      - name: Archive positive or negative source-only results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-color32-s2b-rgb-source-only
+          path: ${{ runner.temp }}/engine001-color32-s2b
+          if-no-files-found: warn
+          retention-days: 30
