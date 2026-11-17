@@ -84,7 +84,9 @@ def run(source: Path, output: Path) -> dict:
         labels = processor.post_process_semantic_segmentation(
             logits, target_sizes=[SIZE]
         )[0].cpu().numpy()
-    stats = validate_labels(labels, limit=len(model.config.id2label))
+    # ADE20K segmentation has 150 categories; upstream id2label may carry ImageNet names.
+    # Never promote unvalidated names or >149 IDs into this source-only report.
+    stats = validate_labels(labels, limit=MODEL_LABEL_LIMIT)
     u8 = labels.astype(np.uint8)
     Image.fromarray(u8, "L").save(output / "oneformer-semantic-labels.png")
     Image.fromarray(preview_labels(u8), "RGB").save(output / "oneformer-semantic-preview.png")
@@ -98,8 +100,8 @@ def run(source: Path, output: Path) -> dict:
         "model_checkpoint_bytes": checkpoint.stat().st_size,
         "actual_pretrained_inference": True, "source_sha256": SOURCE_SHA,
         "input_original_rgb_only": True, "input_shape": list(rgb.shape),
-        "model_semantic_label_names": {str(k): model.config.id2label.get(k, "")
-                                       for k in stats["class_pixel_counts"] for k in [int(k)]},
+        "semantic_class_names": "NOT_VERIFIED_UPSTREAM_ID2LABEL_MAPPING",
+        "upstream_config_id2label_count": len(model.config.id2label),
         "semantic_stats": stats,
         "trained_game32_palette_head": False, "game32_palette_conversion": "NOT_RUN",
         "native_Egret_quality": "NOT_RUN", "game_E4": "NOT_RUN",
