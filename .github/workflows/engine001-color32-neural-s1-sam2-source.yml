@@ -1,0 +1,150 @@
+name: ENGINE-001 COLOR32 NEURAL S1 true SAM2 tiny vs frozen G32 source
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-color32-neural-s1-sam2-source.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_color32_neural_s1.py"
+      - "AutoDraw_Stage20/tests/run_engine001_color32_neural_s1_sam2.py"
+      - "AutoDraw_Stage20/tests/test_engine001_color32_neural_s1.py"
+      - "AutoDraw_Stage20/docs/ENGINE001_COLOR32_NEURAL_S1_REGION_SEGMENTATION_PROTOCOL_2026-11-17.md"
+      - "AutoDraw_Stage20/docs/README.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engine001-color32-neural-s1-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frozen-g32-source-and-adapter:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install original G32 pipeline and simple source adapter
+        run: python -m pip install "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scikit-image>=0.25,<0.27" "scipy>=1.13,<2"
+      - name: Test and index the independent NEURAL-S1 source-only experiment
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_color32_neural_s1.py AutoDraw_Stage20/tests/run_engine001_color32_neural_s1_sam2.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color32_neural_s1.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Run ORIGINAL frozen G32 source control without neural inference
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_color32_neural_s1.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --palette AutoDraw_Stage20/data/palettes/browser_palette.json \
+            --output "$RUNNER_TEMP/engine001-neural-s1-baseline"
+          python - <<'PY'
+          import os,json,hashlib
+          from pathlib import Path
+          p=Path(os.environ["RUNNER_TEMP"])/"engine001-neural-s1-baseline"
+          r=json.loads((p/"report.json").read_text())
+          assert r["status"]=="BASELINE_ONLY_NO_NEURAL_INFERENCE"
+          assert list(r["source_only_metrics"])==["B0_G32"]
+          assert r["production_accepted"] is False
+          assert r["visual_recognizability"]=="PENDING"
+          assert r["native_Egret_paint"]=="NOT_RUN"
+          for n,h in r["output_file_sha256"].items():
+              assert hashlib.sha256((p/n).read_bytes()).hexdigest()==h
+          print("NEURAL-S1 BASELINE source:",json.dumps(r["source_only_metrics"],ensure_ascii=False))
+          PY
+      - name: Always archive original frozen G32 and source-only negative control
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-neural-s1-original-frozen-g32-baseline
+          path: ${{ runner.temp }}/engine001-neural-s1-baseline
+          if-no-files-found: warn
+          retention-days: 30
+
+  real-sam2-tiny-cpu-exploratory:
+    needs: frozen-g32-source-and-adapter
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch original SAM2 implementation separately (record exact SHA)
+        uses: actions/checkout@v4
+        with:
+          repository: facebookresearch/sam2
+          path: external/sam2
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install CPU PyTorch, official SAM2 and existing original G32 dependencies
+        shell: bash
+        run: |
+          python -m pip install torch==2.5.1 torchvision==0.20.1 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scikit-image>=0.25,<0.27" "scipy>=1.13,<2" "hydra-core>=1.3,<2"
+          python -m pip install -e external/sam2
+          git -C external/sam2 rev-parse HEAD
+      - name: Download only official SAM2.1 Hiera Tiny weights and record SHA
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          curl -fLSs --retry 2 --max-time 300 \
+            https://dl.fbaipublicfiles.com/segment_anything_2/092824/sam2.1_hiera_tiny.pt \
+            -o "$RUNNER_TEMP/sam2.1_hiera_tiny.pt"
+          sha256sum "$RUNNER_TEMP/sam2.1_hiera_tiny.pt"
+      - name: REAL SAM2 tiny automatic mask inference (not simulated)
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+          OMP_NUM_THREADS: "2"
+          MKL_NUM_THREADS: "2"
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_color32_neural_s1_sam2.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --sam2-repo external/sam2 \
+            --checkpoint "$RUNNER_TEMP/sam2.1_hiera_tiny.pt" \
+            --output "$RUNNER_TEMP/engine001-neural-s1-sam2"
+      - name: Compare true SAM2 N1/N2 proposals against frozen source G32
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_color32_neural_s1.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --palette AutoDraw_Stage20/data/palettes/browser_palette.json \
+            --masks "$RUNNER_TEMP/engine001-neural-s1-sam2/sam2_masks.npz" \
+            --manifest "$RUNNER_TEMP/engine001-neural-s1-sam2/sam2_manifest.json" \
+            --output "$RUNNER_TEMP/engine001-neural-s1-evaluation"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-neural-s1-evaluation"
+          r=json.loads((root/"report.json").read_text())
+          assert r["status"]=="SOURCE_CANDIDATES_VISUAL_PENDING"
+          assert sorted(r["source_only_metrics"])==["B0_G32","N1_SAM2","N2_SAM2_EDGE"]
+          assert r["visual_recognizability"]=="PENDING"
+          assert r["native_Egret_paint"]=="NOT_RUN"
+          assert not r["production_accepted"] and r["exact_CHALK"] is None
+          for file,digest in r["output_file_sha256"].items():
+              assert hashlib.sha256((root/file).read_bytes()).hexdigest()==digest
+          print("NEURAL S1 SOURCE CANDIDATE GATES:",r["source_candidate_gates"])
+          print("NEURAL S1 SOURCE METRICS:",r["source_only_metrics"])
+          print("NEURAL S1 REPORT SHA:",hashlib.sha256((root/"report.json").read_bytes()).hexdigest())
+          PY
+      - name: Archive real neural masks, source comparison and negative attempts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-neural-s1-real-sam2-tiny-exploratory
+          path: |
+            ${{ runner.temp }}/engine001-neural-s1-sam2
+            ${{ runner.temp }}/engine001-neural-s1-evaluation
+          if-no-files-found: warn
+          retention-days: 30
