@@ -66,9 +66,10 @@ class EdgeProtectedS2Tests(unittest.TestCase):
             self.assertIsNone(report["exact_CHALK"])
             self.assertEqual(len(report["variants"]), 3)
             self.assertTrue((out / "G_edge_protected32_indices.png").is_file())
-            self.assertEqual(report["variants"]["G_edge_protected32"]["changed_from_B_pixels"],
-                             sum(report["variants"]["G_edge_protected32"]["changed_from_B_pixels"]
-                                 for _ in range(1)))
+            self.assertEqual(report["variants"]["B_frozen_direct32"]["changed_from_B_pixels"], 0)
+            self.assertGreaterEqual(report["protected_pixels"], 1)
+            self.assertTrue(all(v["components"]["used_game_swatches_or_adaptive_colors"] <= 32
+                                for v in report["variants"].values()))
             for p, digest in report["report_linked_SHA256"].items():
                 import hashlib
                 self.assertEqual(hashlib.sha256((out / p).read_bytes()).hexdigest(), digest)
