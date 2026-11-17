@@ -1,5 +1,10 @@
 # AutoDraw — текущее состояние
 
+## ENGINE-001 / P4c1 latest remote checkpoint — 2026-11-17
+
+Remote branch `feature/image-geometry-optimization` HEAD `02303521af46bc0f5d60241592b861f73d03a253` verified by branch comparison. P4c0 [E2 source CI44096977608](https://github.com/Kiddos19882/AutoDraw/actions/runs/44096977608) PASS for execution but MODEL_LOW_OWNER_COVERAGE for all 17 original G32 owners. Following independent [P4c1 preregistration](ENGINE001_COLOR32_P4C1_DIRECTIONAL_MICRO_RESIDUAL_PROTOCOL_2026-11-17.md), source runner, tests and workflow have been committed. **P4c1 CI run/job, artifacts and source coverage NOT_VERIFIED** at this checkpoint: do not imply E2 PASS. P4c1 proposes source-only multi-angle widths30/15/10/6/4/2, including width2 micro-residual; 119 original P4c0 rings and 410 V44-B LAST contours are frozen. Next verify source CI, then register separate P4c2 true native Egret E3. 17/17 native alpha24 owner coverage≥99%, no foreign >3 logical px, 3000 strokes/5900 synthetic vertices and final recognizability remain unchanged gates. E4/E5/exact game CHALK NOT_RUN.
+
+
 ## ENGINE-001 / P4c0 all-color B3 resource feasibility measured — 2026-11-17
 
 [CI44096977608](https://github.com/Kiddos19882/AutoDraw/actions/runs/44096977608) SHA `51daf38b493a2ab3752ea3464773e0ef8adeaa15` **E2 source computation PASS, model quality FAIL**. Artifact14333369069 ZIP CRC+4/4 linked hash PASS, report SHA `9bf7a13cfa317fabae753e485d4f611db4ba0689c57af20bc6f4fb9c6022ca07`. Original G32 17 nonwhite palette owners, 119 source B3 contour ring paths/1457 vertices, projected with original V44-B410 LAST total529 strokes/3249 vertices (under3000/5900), no resource exhaust. **All17 owners <99% source MODEL**, e.g 31=95.09%,29=79.64%,28=8.08%,15=0%, some micro island classes 0%. Primary obstacle no candidate ring for narrow/small source regions; next independently prereg P4c1 locally sized multi-angle directional micro-residual paths with true native E3 follow-up. Original G/V44-B/P2/P3/P3b/P4a/P4b results untouched. E3 full native, E4/E5/game CHALK NOT_RUN.
