@@ -1,0 +1,84 @@
+name: ENGINE-001 COLOR32-S1 source game palette and spatial regions
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-color32-spatial-s1.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_color32_spatial_segmentation_s1.py"
+      - "AutoDraw_Stage20/tests/test_engine001_color32_spatial_segmentation_s1.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engine001-color32-s1-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  game32-source-a-b-c-d:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install original palette quantization plus scikit-image dependencies
+        run: python -m pip install "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "selenium>=4,<5" "scipy>=1.13,<2" "scikit-image>=0.25,<0.27"
+      - name: Assert 32 real swatches, original source, SLIC and protected boundaries
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_color32_spatial_segmentation_s1.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color32_spatial_segmentation_s1.py -v
+      - name: Render identical ROI A/B/C/D previews and SHA-provenance
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_color32_spatial_segmentation_s1.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --palette AutoDraw_Stage20/data/palettes/browser_palette.json \
+            --output "${{ runner.temp }}/engine001-color32-s1"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          from PIL import Image
+          import numpy as np
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-color32-s1"
+          r=json.loads((root/"report.json").read_text(encoding="utf-8"))
+          assert r["experiment"]=="ENGINE001_COLOR32_S1_SPATIAL_SEGMENTATION"
+          assert r["source_sha256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert r["actual_game_palette_count"]==32
+          assert len(r["palette"])==32
+          assert set(r["metrics"])=={"A","B","C","D"}
+          assert r["true_Egret"]=="NOT_RUN" and r["game_exact_CHALK"] is None
+          assert r["production_accepted"] is False
+          palette=np.array([x["rgb"] for x in r["palette"]],dtype=np.uint8)
+          palette_values={tuple(x.tolist()) for x in palette}
+          for key in "ABCD":
+              img=Image.open(root/f"{key}-color-preview.png").convert("RGB")
+              assert img.size==(150,240)
+              if key!="A":
+                  assert all(tuple(x.tolist()) in palette_values
+                             for x in np.unique(np.asarray(img).reshape(-1,3),axis=0))
+              assert r["metrics"][key]["used_colors"]<= (8 if key=="A" else 32)
+              with np.load(root/f"{key}-labels.npz") as label:
+                  assert label["palette_index_map"].shape==(240,150)
+          for name,digest in r["report_linked_SHA256"].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==digest
+          print("A/B/C/D source comparison archived", {
+              x:{k:r["metrics"][x][k] for k in (
+                "used_colors","RGB_MAE","deltaE00_mean",
+                "connected_8_components","singleton_components",
+                "contours_including_holes","top_decile_source_edge_overlap")}
+              for x in "ABCD"})
+          print("Region merging",r["D_merging"])
+          PY
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+      - name: Preserve originals, visual previews, index maps, and failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-color32-s1-a-b-c-d-source-evidence
+          path: ${{ runner.temp }}/engine001-color32-s1
+          if-no-files-found: warn
+          retention-days: 30
