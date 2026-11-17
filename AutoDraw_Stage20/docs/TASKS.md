@@ -3,7 +3,8 @@
 ## CI-AUDIT-001 — fast vs research validation
 
 - [x] Проверен исходный workflow, path-фильтры и зависимости, исследования FILL-001/INT-006 изолированы в reusable `geometry-research.yml`, полный ручной запуск доступен через `run_full_validation=true`.
-- [ ] Подтвердить на финальном HEAD обязательные fast jobs, отсутствие лишних research jobs на push, затем отдельно manual full (reusable download/upload, все source quality статусы); выполнить измерение затрат runner до/после на сравнимых изменениях. Без CI evidence статусы `NOT_VERIFIED`.
+- [x] Fast CI `44141220966` SHA `60440ed9` SUCCESS: 5/5 required jobs, research SKIPPED; Markdown `44141411294` SHA `8bf71c0b` SUCCESS. Initial non-paired summed completed job time 764s→516s (−32.46%), not a cost guarantee.
+- [ ] Run one SHA-bound `workflow_dispatch` with `run_full_validation=true`; verify reusable FILL-001 and INT-006 artifact transfer, benchmarks and portable build and compare runtime on equivalent changes. Until then manual full validation `NOT_RUN`.
 
 
 ## Приоритет ENGINE-001 — после завершённого COLOR32-NEURAL-S4
