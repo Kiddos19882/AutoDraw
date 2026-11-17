@@ -2486,7 +2486,7 @@
 
   // ENGINE-001 V35 pilot2 ONLY: paint width2 first, then V18-B detail width1.
   // Same real archived Egret BoardPane/WebGL renderer; V5 API remains unchanged.
-  function renderV35LayeredColorProbe(strokes, allowV36SourceColors=false, allowV43WideBrush=false, allowV43P4=false) {
+  function renderV35LayeredColorProbe(strokes, allowV36SourceColors=false, allowV43WideBrush=false, allowV43P4=false, allowV43P4B1=false) {
     if (!Array.isArray(strokes) || strokes.length < 1 || strokes.length > 3000) {
       throw new Error("V35 requires 1..3000 bounded strokes.");
     }
@@ -2499,11 +2499,11 @@
           stroke.points.length>128) {
         throw new Error("V35 invalid native stroke metadata.");
       }
-      const isFill=allowV43P4 ? /^p4-b0-[4-7]-[0-9]{5}$/.test(stroke.strokeId) : /^icon-[0-9]+$/.test(stroke.strokeId);
+      const isFill=allowV43P4B1 ? /^p4-b1-[4-7]-[0-9]{5}$/.test(stroke.strokeId) : allowV43P4 ? /^p4-b0-[4-7]-[0-9]{5}$/.test(stroke.strokeId) : /^icon-[0-9]+$/.test(stroke.strokeId);
       const isDetail=/^detail-v18-B-[0-9]+$/.test(stroke.strokeId);
       if ((!isFill && !isDetail) ||
-          (isFill && !(allowV43P4 ? [2,4,6,10].includes(stroke.width) : allowV43WideBrush ? [2,4,6].includes(stroke.width) : stroke.width===2)) ||
-          (isDetail && (stroke.width!==1 || (!allowV36SourceColors && !allowV43P4 && stroke.colorRgb!==0x31262B)))) {
+          (isFill && !((allowV43P4 || allowV43P4B1) ? [2,4,6,10].includes(stroke.width) : allowV43WideBrush ? [2,4,6].includes(stroke.width) : stroke.width===2)) ||
+          (isDetail && (stroke.width!==1 || (!allowV36SourceColors && !allowV43P4 && !allowV43P4B1 && stroke.colorRgb!==0x31262B)))) {
         throw new Error("V35 source-bound layer or native width mismatch.");
       }
       if (isDetail) detailStarted=true;
@@ -2532,7 +2532,8 @@
       throw new Error("V35 native Egret Stage geometry mismatch.");
     }
     return {
-      schema:allowV43P4 ? "ENGINE001_V43P4_FULL_ADAPTIVE_FILL_NATIVE" :
+      schema:allowV43P4B1 ? "ENGINE001_V43P4_B1_OWNER_CONSTRAINED_FILL_NATIVE" :
+      allowV43P4 ? "ENGINE001_V43P4_FULL_ADAPTIVE_FILL_NATIVE" :
       allowV43WideBrush ? "ENGINE001_V43P2A_NATIVE_WIDE_INTERIOR" :
         allowV36SourceColors ? "ENGINE001_SOURCE_COLOR_CONTOUR_V36" :
         "ENGINE001_PAINT_THEN_DETAIL_V35_NATIVE_PILOT_2",
@@ -2562,6 +2563,11 @@
   // original V44-B detail IDs/RGB untouched; old V35/V36/P2a defaults unchanged.
   function renderV43P4FullAdaptiveProbe(strokes) {
     return renderV35LayeredColorProbe(strokes,true,false,true);
+  }
+
+  // B1 opt-in only: original B0 P4 method remains frozen and unchanged.
+  function renderV43P4B1OwnerConstrainedProbe(strokes) {
+    return renderV35LayeredColorProbe(strokes,true,false,false,true);
   }
 
   // ENGINE-001 V23 only: read-only synthetic native width1 diagnostic.
@@ -2790,6 +2796,7 @@
   api.renderV36SourceColoredContourProbe = renderV36SourceColoredContourProbe;
   api.renderV43WideInteriorProbe = renderV43WideInteriorProbe;
   api.renderV43P4FullAdaptiveProbe = renderV43P4FullAdaptiveProbe;
+  api.renderV43P4B1OwnerConstrainedProbe = renderV43P4B1OwnerConstrainedProbe;
   api.renderTwoIconAdaptiveBrushProbe = renderTwoIconAdaptiveBrushProbe;
   api.renderContourFirstNativeStudy = renderContourFirstNativeStudy;
   api.renderContourTrimNativeStudy = renderContourTrimNativeStudy;
