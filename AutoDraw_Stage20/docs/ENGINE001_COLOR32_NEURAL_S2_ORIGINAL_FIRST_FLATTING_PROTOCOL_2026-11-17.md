@@ -1,0 +1,28 @@
+# ENGINE-001 / COLOR32-NEURAL-S2 — оригинал → независимые цветовые области
+
+**Пререгистрация 2026-11-17 до новых S2 результатов.** ID `ENGINE001_COLOR32_NEURAL_S2_ORIGINAL_FIRST_FLATTING`, отдельный от завершённого NEURAL-S1; ветка `feature/image-geometry-optimization`, оригинал `testImages/wV6VeZI9S1Y.png` SHA256 `07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a`, RGB 200×320, рабочая ROI RGB 150×240 после Lanczos. Только фиксированная 32-цветная игровая палитра Git blob `461b5f3725b9b79888ad36e807b3cf4c9e445e98`. G32 `b8dcd5f00d2c39c81997aaae084eaae19a776454e6fd6466209839288c1e5637` — **только независимый baseline**; S2 создаёт карту БЕЗ чтения индексов G32 в генераторе.
+
+## Проблема и гипотеза
+
+NEURAL-S1 [CI44127991472](https://github.com/Kiddos19882/AutoDraw/actions/runs/44127991472) E2 genuine SAM2.1 tiny PASS, image-quality FAIL (только 2 маски; N1 -3.66%, N2 -1.95% фрагментации против G32). Исходная G32 имела 1284 4-connected областей, 779 singletons, 1097 area≤4, ΔE00 mean5.5314. Сильно насыщенные игровые цвета розовый `#E20085` и `#A5015B` могут назначаться исходным приглушённым красно-коричневым пикселям; запретить розовый вручную **нельзя**, потому что он существует в реальной палитре и может присутствовать в оригинале. Проверять причину, а не возвращать ранее исправляемые цвета.
+
+**Гипотеза S2:** partition, построенная только из исходного RGB и настоящих нейросетевых масок, с assignment одного стабильного игрового цвета на цельную область будет лучше воспроизводить крупные цветовые массы и снизит паразитные фрагменты. Не считать количество масок доказательством их цветовой релевантности; запрещено объявлять SLIC нейросетью.
+
+## Метод и переменные
+
+- **B0:** frozen исходная G32, только измеряется после независимого формирования кандидатов.
+- **C1:** независимая SLIC-сегментация оригинального RGB, `n_segments=240`, `compactness=8.0`, `sigma=0.7`, `enforce_connectivity=True`, `start_label=0`, без G32. Это **детерминированный non-neural control**.
+- **C2:** точно такие же SLIC-регионы из оригинала плюс приоритетные неперекрывающиеся **реальные** SAM2.1 Tiny маски, найденные оригинальной pretrained моделью (продолжение S1 checkpoint+source; source `2b90b9f5ceec907a1c18123530e92e794ad901a4`, weights SHA256 `7402e0d864fa82708a20fbd15bc84245c2f26dff0eb43a4b5b93452deb34be69`). До нового inference разрешён пилот с **2 immutable реальными S1 масками** `sam2_masks.npz`, SHA-linked CI44127991472: это честно маркируется как `REUSED_S1_MASKS_EXPLORATORY`, не новая нейросеть. В C2 вся оставшаяся площадь образована SLIC, **не** искусственно выдаётся за neural output.
+- C2 составить из SLIC-region IDs и SAM masks (IoU/stability desc, min area4); SAM pixels забирают право владения, остатки SLIC делятся на 4-connected components и имеют отдельный ID. Каждый пиксель относится ровно одной области. Цвета назначать по original median CIELAB области через CIEDE2000 к 32 fixed swatches. Не использовать соседнюю метку G32, исходные S1 N1/N2, прежние цветные штрихи или нейросетевую генерацию RGB.
+- Фон: маска белой среды определяется только из original RGB как 8-connected flood от границы по `ΔE00(pixel,white)<=10`. Это независимый original RGB prior, не G32; зафиксировать sensitivity проблему тонкой белой обводки как edge-case. Background=palette index30. Вынести пиксели фона из цветовых масок; вне фона все pixels получают игровую метку. Никаких пользовательских/контурных ручных цветовых исправлений.
+- Цветовая насыщенность: основной C1/C2 assignment — **минимальный ΔE00 median-LAB к игровой палитре** без запрещённых оттенков. Отдельно логировать saturation/mean RGB mismatch в исходных областях индексов10/15/19/29 (розовый/винный/сиреневый/персиковый); не настраивать penalty post hoc. Контуры V44-B410 остаются неизменной отдельной visual overlay и НЕ смешиваются с исходной RGB сегментацией.
+
+## Метрики и prereg acceptance
+
+Вся ROI 150×240: source RGB vs palette map mean/p95 ΔE00 и RGB MAE; nonwhite 4-connected компонентов, singletons, regions≤4 px, color neighbor boundaries, per-color frequency and ΔE source mean/median, background fraction, original foreground false-white vs frozen G32 как **диагностика**, доля пикселей C1/C2, отличных от G32, fraction, owned by SAM2, независимый SLIC fallback %. Сравнивать C2 не только с B0, но **непременно с C1**, чтобы оценить реальный эффект нейросети.
+
+Source candidate gate C2: regions4 reduction≥25% vs B0; mean ΔE00 increase≤1.0 vs B0; used palette colors≤32; background-drift difference vs B0≤2% of ROI **как диагностический порог первоначальной пригодности**; at least 1% actual foreground pixels owned by neural SAM masks, no illegal palette labels. C2 qualifies as `SOURCE_CANDIDATE_VISUAL_PENDING` only if all fixed numeric checks pass; визуальная узнаваемость лица/позы/волос/одежды отдельно проверяется пользователем, и не может быть заменена numeric gate. C1 metrics — контроль, а не neural-success. Не изменять threshold после результатов; новым параметрам — новый ID.
+
+Raw: original PNG, B0 frozen palette maps, C1/C2 indexed + RGB PNG, original-sourced background mask, 4-conn partition images, exact SAM mask input ZIP SHA and manifest + per-file SHA, exact source/palette SHA, code commit, mask coverage, report metadata, protocol, negative outcomes. No overwriting old artifacts. On failure archived report labels `FAIL/NOT_RUN` correctly.
+
+**Evidence:** S2 source-only `E2/MODEL_ONLY`; no native brush or CHALK claims. Original410 V44-B LAST, ≤3000/5900 cap, Egret alpha24≥99% per owner and 3 logical px, game E4/E5 separate. Do not modify production / Stage6 / Bridge / Monitor / master. 
