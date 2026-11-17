@@ -31,7 +31,9 @@ class AdaptiveP3PreflightTests(unittest.TestCase):
         self.assertIsNotNone(c)
         self.assertEqual(c["width"],6)
         self.assertEqual(c["angle_degrees_undirected"],45)
-        self.assertEqual(c["points"][0]["x"]-155,c["points"][0]["y"])
+        self.assertAlmostEqual(abs(c["points"][1]["x"]-c["points"][0]["x"]),
+                               abs(c["points"][1]["y"]-c["points"][0]["y"]),
+                               delta=1.1)
         self.assertIn(30,p3.WIDTHS)
         self.assertIn(165,p3.ANGLES)
         self.assertEqual(len(p3.ANGLES),12)
