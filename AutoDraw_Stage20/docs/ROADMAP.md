@@ -1,3 +1,7 @@
+## ENGINE-001 S5-P4 (2026-11-18) — next visual-first color experiment
+
+Preregistered [S5-P4 foreground-balanced visual protocol](ENGINE001_S5_P4_FOREGROUND_BALANCED_SIX_RECOLOR_PROTOCOL_2026-11-18.md): reuse real S5-P2 BiRefNet ONNX as foreground guidance for six **source-derived** palette colors (one nearwhite background + five chroma/diversity-based foreground colors), then unchanged genuine Recolorization-Pro checkpoint; retain frozen S5-P3 baseline. Next verify source-only E2 and E3 workflow/artifact on exact SHA, then user visual review. This is not trained game32 conversion, native Egret, production or live CHALK. No changes to V44-B410 LAST.
+
 ## ENGINE-001 S5-P3 — pretrained native six-color full-RGB visual trial, 2026-11-17
 
 **User decision:** for new **visual-only** pretrained-model trials, suspend game32 swatch limit and source game32 acceptance gates; evaluate RGB recognition and visually first. Historical S3/S4/S5 game32 gates and rejected evidence remain frozen/unchanged. [Preregistered S5-P3 protocol](ENGINE001_S5_P3_NATIVE6_PRETRAINED_RECOLOR_VISUAL_PROTOCOL_2026-11-17.md) was committed before inference; no training dataset, no fine-tuning.
