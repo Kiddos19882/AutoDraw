@@ -65,7 +65,7 @@ def contour_candidates(mask: np.ndarray, width: int):
         contours, _ = cv2.findContours(ring_mask, cv2.RETR_LIST,
                                        cv2.CHAIN_APPROX_SIMPLE)
         # Stable connected contour ordering, including inner holes.
-        contours.sort(key=lambda c: (
+        contours = sorted(contours, key=lambda c: (
             int(cv2.boundingRect(c)[1]), int(cv2.boundingRect(c)[0]),
             int(cv2.boundingRect(c)[2]), int(cv2.boundingRect(c)[3])))
         for raw in contours:
