@@ -1,3 +1,7 @@
+## 2026-11-18 — DEC-033 / ENGINE-001 R2 neural-assisted mathematics plan
+
+New independent R2 protocol supersedes R1 as *active research priority* after R1 E3 technical PASS / SOURCE_GATE_FAIL. Color truth remains original RGB; mathematical source edges/geometry/ΔE/chroma hold final authority; verified DINOv2 real features may influence only safe merge ordering, optional BiRefNet soft-alpha is a separate foreground ablation, SAM2/OneFormer not assumed to provide flat-color owners. Pre-register M0/N1/N2 controls, detail preservation, false-accent localization, separate unrestricted-RGB visual stage and pinned game32 projection/abstention before experiment. R1 histories and thresholds frozen, V44-B410 LAST, production/master untouched. Documentation-only; R2 tests and native NOT_RUN.
+
 ## 2026-11-18 — experimental ENGINE-001 COLOR-ISLAND-R1 code
 
 Added separate original-RGB first source regions, conservative adjacent region cleanup, source-supported game32 assignment with explicit unrepresentable swatch abstention, 8 synthetic regression tests, and isolated source-only Actions workflow. Local first-image candidate SOURCE_GATE_FAIL (1017 unrepresentable pixels, background drift3929, fine detail regression); no retune or production integration. Official E3 CI pending exact run44198309906. Frozen G32/P4a/S5-P3/P4 and V44-B410 unchanged.
