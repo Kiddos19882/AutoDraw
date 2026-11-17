@@ -1,5 +1,7 @@
 # AutoDraw — значимые изменения
 
+**2026-11-17 — B3b owner-mask skeleton first source E2:** [CI43993003719](https://github.com/Kiddos19882/AutoDraw/actions/runs/43993003719) tests 5/5 PASS, source BLOCKED_RESOURCE on next 5902 synthetic vertices after1078 new paint. Model coverage4–7=81.82/81.78/81.87/91.86%, better than B3a 63/63/63/92 but not accepted. 883 owner skeleton routes/0 residual micro executed, same-color overlap penalty0, full native B3b NOT_RUN. [Evidence](TEST_RESULTS.md).
+
 **2026-11-17 — B3a frozen negative source result:** CI43992170465 E2 workflow SUCCESS / 4 tests PASS, but generated1339 paint /5899 projected vertices and blocked next +2 vertices >5900. Model coverage4/5/6/7=63.28/63.28/63.36/91.86%; 1144 residual micros, 0 usable owner-medial routes. The next method needs actual source-mask skeleton/continuous polylines; same-color overpaint remains free. No full B3a Egret. [Detailed evidence](TEST_RESULTS.md).
 
 **2026-11-17 — B3 actual isolated Egret contour rings:** [CI43991432235](https://github.com/Kiddos19882/AutoDraw/actions/runs/43991432235) E3 capture PASS, 14 source-selected contour paths /283 synthetic vertices NOT CHALK, no foreign/exterior>3px; coverage only isolated tiny sample, not full fill. Source B3 MODEL_LOW_COVERAGE, full B3 NOT_RUN. [Evidence](TEST_RESULTS.md).
