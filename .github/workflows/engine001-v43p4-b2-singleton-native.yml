@@ -1,0 +1,73 @@
+name: ENGINE-001 V43-P4 B2 native fractional singleton micro-strokes
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-v43p4-b2-singleton-native.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_v43p4_b2_singleton_native.py"
+      - "AutoDraw_Stage20/tests/test_engine001_v43p4_b2_singleton_native.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: autodraw-v43p4-b2-singleton-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  b2-singleton-native:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install existing source and Egret capture dependencies
+        run: python -m pip install "selenium>=4,<5" "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scikit-image>=0.25,<0.27" "scipy>=1.13,<2"
+      - name: Unit validation and archived renderer regression
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_v43p4_b2_singleton_native.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_v43p4_b2_singleton_native.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+      - name: Real BoardPane/Egret singleton 0.25px width2 and width4 probe
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_v43p4_b2_singleton_native.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --output "$RUNNER_TEMP/v43p4-b2-singleton"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"v43p4-b2-singleton"
+          r=json.loads((root/"report.json").read_text(encoding="utf-8"))
+          assert r["experiment"]=="ENGINE001_V43P4_B2_NATIVE_SINGLETON_MICRO_STROKE_PROBE"
+          assert r["status"]=="E3_REAL_EGRET_ISOLATED_NOT_B2_FULL"
+          assert r["source_sha256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert len(r["samples"])==12 and set(r["results"])=={"2","4"}
+          for width,row in r["results"].items():
+              assert row["stroke_count"]==12
+              assert row["synthetic_vertices_NOT_CHALK"]==24
+              assert all(len(s["points"])==2 for s in row["paths"])
+              assert set(row["alpha24_128_native"])=={"24","128"}
+              assert all(len(v["samples"])==3 for measured in row["alpha24_128_native"].values()
+                         for v in measured.values())
+          assert r["full_B2_quality"]=="NOT_RUN"
+          assert r["E4"]=="NOT_RUN" and r["E5"]=="NOT_RUN" and r["game_CHALK"] is None
+          for path,digest in r["report_linked_SHA256"].items():
+              assert hashlib.sha256((root/path).read_bytes()).hexdigest()==digest
+          print("B2 measured genuine Egret singleton proof, not full image.")
+          PY
+      - name: Preserve raw Egret PNGs and positive/negative singleton results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-v43p4-b2-singleton-fractional-native-probe
+          path: ${{ runner.temp }}/v43p4-b2-singleton
+          if-no-files-found: warn
+          retention-days: 30
