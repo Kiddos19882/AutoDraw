@@ -32,6 +32,13 @@ BACKING_SHAPE = (720, 1380, 4)
 MAX_COLORS = 4
 INSET = 6.0
 ALPHAS = (24, 128)
+FROZEN_PALETTE_GIT_BLOB = "461b5f3725b9b79888ad36e807b3cf4c9e445e98"
+FROZEN_RENDERER_GIT_BLOB = "74ad4d8ad162bb04bf8f1ff94860ef673c02512b"
+
+
+def git_blob_sha(path: Path) -> str:
+    data = path.read_bytes()
+    return hashlib.sha1(b"blob " + str(len(data)).encode() + b"\\0" + data).hexdigest()
 
 
 def select_interior_loops(g: np.ndarray, palette: np.ndarray) -> tuple[list[dict], dict]:
@@ -133,6 +140,10 @@ def native_metrics(images: dict, g: np.ndarray, strokes: list[dict]) -> dict:
 def run(workspace: Path, source: Path, palette_path: Path, output: Path) -> dict:
     if output.exists():
         raise ValueError("BLOCKED_EXISTING_NATIVE_EVIDENCE")
+    if (git_blob_sha(palette_path) != FROZEN_PALETTE_GIT_BLOB or
+            git_blob_sha(workspace / "AutoDraw_Stage20/tests/game_renderer_reference.js")
+            != FROZEN_RENDERER_GIT_BLOB):
+        raise ValueError("BLOCKED_PALETTE_OR_RENDERER_BLOB_DRIFT")
     _, original = read_source(source)
     palette = read_palette(palette_path)
     b = nearest32(original, palette)
@@ -146,6 +157,8 @@ def run(workspace: Path, source: Path, palette_path: Path, output: Path) -> dict
         "experiment": EXP,
         "source_sha256": sha(source),
         "palette_sha256": sha(palette_path),
+        "palette_git_blob": FROZEN_PALETTE_GIT_BLOB,
+        "renderer_git_blob": FROZEN_RENDERER_GIT_BLOB,
         "g_index_map_sha256": hashlib.sha256(g.tobytes()).hexdigest(),
         "source_edge_threshold": threshold,
         "g_accepted_merges": changes,
@@ -194,6 +207,8 @@ def run(workspace: Path, source: Path, palette_path: Path, output: Path) -> dict
         "github_run_id": os.environ.get("GITHUB_RUN_ID"),
         "actual_renderer": "archived BoardPane via renderComplexHoldoutColorProbe",
         "backend": "Firefox WebGL", "source_sha256": sha(source),
+        "palette_git_blob": FROZEN_PALETTE_GIT_BLOB,
+        "renderer_git_blob": FROZEN_RENDERER_GIT_BLOB,
         "palette_sha256": sha(palette_path),
         "selected_G_colors": selection["selected_colors"],
         "source_probes": selection, "widths": list(WIDTHS),
