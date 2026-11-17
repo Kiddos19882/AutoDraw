@@ -28,6 +28,8 @@ from run_engine001_color32_p4c0_all_owner_feasibility import (
 )
 
 EXP = "ENGINE001_COLOR32_NEURAL_S1_REGION_MASKS"
+FROZEN_SAM2_SOURCE_SHA = "2b90b9f5ceec907a1c18123530e92e794ad901a4"
+FROZEN_SAM2_TINY_CHECKPOINT_SHA = "7402e0d864fa82708a20fbd15bc84245c2f26dff0eb43a4b5b93452deb34be69"
 BG = 30
 MIN_MASK_PIXELS = 4
 MAX_MASKS = 32
@@ -56,8 +58,8 @@ def _load_mask_archive(path: Path, manifest_path: Path):
                 "crop_n_layers": 0, "pred_iou_thresh": 0.8,
                 "stability_score_thresh": 0.95} or
             manifest.get("mask_archive_sha256") != sha(path) or
-            not manifest.get("model_checkpoint_sha256") or
-            not manifest.get("sam2_git_sha")):
+            manifest.get("model_checkpoint_sha256") != FROZEN_SAM2_TINY_CHECKPOINT_SHA or
+            manifest.get("sam2_git_sha") != FROZEN_SAM2_SOURCE_SHA):
         raise ValueError("BLOCKED_NEURAL_S1_MODEL_OR_ARCHIVE_IDENTITY")
     entries = manifest.get("masks", [])
     if type(entries) is not list or len(entries) > 1024:
