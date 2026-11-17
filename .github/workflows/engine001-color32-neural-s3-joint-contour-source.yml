@@ -46,7 +46,7 @@ jobs:
               14348287404:("original-s1-sam2.zip",
               "9cceb35e8a6f1ef70ba8a4e4157e9409bb1125c0f50b22c1883a46686b225bd0"),
               14201581692:("original-v44b-native.zip",
-              "43cb8e14a7e387b26772612ac06d1c7c6f176b8bd0c41e8945042fc80304a1"),
+              "43cb8e14a7e387b26772612ac06d1c7c6f176b8bd0c2d41e8945042fc80304a1"),
           }
           root=Path(os.environ["RUNNER_TEMP"])
           for artifact,(name,sha) in expected.items():
