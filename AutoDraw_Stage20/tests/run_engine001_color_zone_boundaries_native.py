@@ -146,6 +146,7 @@ def main() -> None:
         "production_accepted": False,
         "exact_CHALK": None,
     }, ensure_ascii=False, indent=2, allow_nan=False) + "\n", encoding="utf-8")
+    (args.output / "native").mkdir()
     native, metadata, _ = native_batch(
         args.workspace, "ZONE-BOUNDARIES", strokes,
         args.output / "native", renderer_method="renderComplexHoldoutColorProbe")
