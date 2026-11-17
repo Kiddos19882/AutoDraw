@@ -45,11 +45,12 @@ class EdgeProtectedS2Tests(unittest.TestCase):
         self.assertLess(np.count_nonzero(a), img.shape[0] * img.shape[1])
 
     def test_legacy_rgb_gradient_diagnostic_distinct_from_s2_boundary_metric(self):
-        original = np.full((ROI_WH[1], ROI_WH[0], 3), 255, dtype=np.uint8)
-        original[:, :50] = 27
+        rng = np.random.default_rng(20261117)
+        original = rng.integers(0, 256, size=(ROI_WH[1], ROI_WH[0], 3),
+                                dtype=np.uint8)
         self.assertAlmostEqual(s1_rgb_gradient_overlap(original, original), 100.0)
-        flat = np.full_like(original, 255)
-        self.assertLess(s1_rgb_gradient_overlap(original, flat), 100.0)
+        unrelated = rng.integers(0, 256, size=original.shape, dtype=np.uint8)
+        self.assertLess(s1_rgb_gradient_overlap(original, unrelated), 50.0)
 
     def test_gate_negative_and_positive_does_not_rewrite_thresholds(self):
         def item(edge, comps, de):
