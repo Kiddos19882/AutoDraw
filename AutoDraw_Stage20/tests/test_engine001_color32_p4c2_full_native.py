@@ -17,6 +17,50 @@ class P4c2Contracts(unittest.TestCase):
         self.assertEqual(FROZEN_PAINT_PATHS, 1133)
         self.assertEqual(FROZEN_PAINT_VERTICES, 3485)
 
+    @staticmethod
+    def synthetic_frozen_shape():
+        # Exercises metadata guards with the same count/vertices as the
+        # immutable plan. The ZIP SHA validation is independently stronger.
+        base = []
+        for i in range(119):
+            n = 41 if i == 118 else 12
+            base.append({"strokeId": f"icon-{i}",
+                         "colorIndex": OWNERS[i % len(OWNERS)],
+                         "colorRgb": 0x123456, "width": 2,
+                         "points": [{"x": 1., "y": 1.} for _ in range(n)]})
+        extra = [{"strokeId": f"icon-{i}",
+                  "colorIndex": OWNERS[i % len(OWNERS)],
+                  "colorRgb": 0x123456, "width": 2,
+                  "points": [{"x": 1., "y": 1.}, {"x": 2., "y": 1.}]}
+                 for i in range(119, 1133)]
+        return {"original_P4c0_strokes": base, "P4c1_additions": extra,
+                "safe_to_execute_game": False}
+
+    def test_native_renderer_metadata_rejects_width_and_rgb(self):
+        for field, value in (("width", 3), ("colorRgb", -1),
+                             ("colorRgb", 0x1000000)):
+            plan = self.synthetic_frozen_shape()
+            plan["P4c1_additions"][0][field] = value
+            with self.assertRaisesRegex(
+                    ValueError, "BLOCKED_P4C2_NATIVE_STROKE_METADATA"):
+                validate_frozen_paths(plan)
+
+    def test_native_renderer_coordinates_fail_closed(self):
+        for xy in ({"x": 460., "y": 1.},
+                   {"x": float("nan"), "y": 1.},
+                   {"x": 1., "y": -1.}):
+            plan = self.synthetic_frozen_shape()
+            plan["P4c1_additions"][0]["points"][0] = xy
+            with self.assertRaisesRegex(
+                    ValueError, "BLOCKED_P4C2_NATIVE_COORDINATES"):
+                validate_frozen_paths(plan)
+
+    def test_synthetic_native_contract_shape_accepted_not_quality(self):
+        plan = self.synthetic_frozen_shape()
+        self.assertEqual(len(validate_frozen_paths(plan)), 1133)
+        self.assertEqual(sum(len(s["points"]) for s in
+                             validate_frozen_paths(plan)), 3485)
+
     def fixture(self, coverage=.995, leak=0, exterior=0):
         data = {}
         for alpha in (24, 128):
