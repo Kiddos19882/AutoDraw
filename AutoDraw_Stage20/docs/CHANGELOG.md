@@ -1,3 +1,5 @@
+**2026-11-17 — ENGINE-001 COLOR32-S2b source-only follow-up:** New preregistered [RGB-edge experiment](ENGINE001_COLOR32_S2B_RGB_EDGE_PROTOCOL_2026-11-17.md) uses existing frozen B/E/G and historical S1 gradient score instead of the invalid-for-this-purpose saturated S2 index overlap. Standalone test runner, regression and GitHub workflow added on feature branch. No production change, no historical result rewritten. E1 candidate projected from previous independent local diagnostics, new E2 CI/visual/Egret/game/CHALK not yet verified. See [TEST_RESULTS](TEST_RESULTS.md).
+
 # AutoDraw — значимые изменения
 
 **2026-11-17 — PAL32-REGION-V1 supplementary offline experiment E2:** [CI43997979526](https://github.com/Kiddos19882/AutoDraw/actions/runs/43997979526) 4/4 Python tests PASS, 20/20 artifact SHA valid; six source color/region variants, E (direct32 + small neighbor merge) 2369→1044 4-connected components (−55.93%) and mean ΔE00 5.44375→5.55870, with posthoc strong-edge overlap B86.17%→E84.42%. SLIC C/D/F lose details; no native Egret fill/CHALK. [Results](TEST_RESULTS.md), [protocol](ENGINE001_PAL32_REGION_V1_PROTOCOL_2026-11-17.md).
