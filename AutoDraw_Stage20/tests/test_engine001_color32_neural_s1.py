@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
 """NEURAL-S1 deterministic source-region adapter tests (NOT neural inference)."""
 import unittest
+import hashlib
+import json
+import tempfile
+from pathlib import Path
 
 import numpy as np
 
 from run_engine001_color32_neural_s1 import (
     BG, MAX_MASKS, apply_masks, source_metrics, source_gate,
+    _load_mask_archive, EXP, FROZEN_SAM2_SOURCE_SHA,
+    FROZEN_SAM2_TINY_CHECKPOINT_SHA,
 )
+from run_engine001_palette32_region_study import SOURCE_SHA
 
 
 class NeuralS1SourceContracts(unittest.TestCase):
@@ -56,6 +63,56 @@ class NeuralS1SourceContracts(unittest.TestCase):
             "palette_le32"])
         self.assertFalse(source_gate(metrics, metrics, edge_protected=True)[
             "component_reduction_ge25pct"])
+
+    def test_real_mask_archive_manifest_fails_on_wrong_checkpoint_or_code(self):
+        with tempfile.TemporaryDirectory() as work:
+            root = Path(work)
+            a = np.zeros((240, 150), dtype=np.bool_)
+            a[20:45, 35:60] = True
+            file = root / "masks.npz"
+            manifest_path = root / "manifest.json"
+            np.savez_compressed(file, mask_0000=a)
+            manifest = {
+                "experiment": EXP,
+                "source_sha256": SOURCE_SHA,
+                "mask_shape_hw": [240, 150],
+                "model": "SAM2.1_HIERA_TINY",
+                "parameters": {
+                    "points_per_side": 8, "points_per_batch": 8,
+                    "crop_n_layers": 0, "pred_iou_thresh": 0.8,
+                    "stability_score_thresh": 0.95
+                },
+                "mask_archive_sha256": hashlib.sha256(file.read_bytes()).hexdigest(),
+                "model_checkpoint_sha256": FROZEN_SAM2_TINY_CHECKPOINT_SHA,
+                "sam2_git_sha": FROZEN_SAM2_SOURCE_SHA,
+                "masks": [{
+                    "key": "mask_0000",
+                    "area": int(a.sum()),
+                    "sha256": hashlib.sha256(a.tobytes()).hexdigest(),
+                    "predicted_iou": 0.99,
+                    "stability_score": 0.99
+                }]
+            }
+            def write():
+                manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+            write()
+            masks, loaded = _load_mask_archive(file, manifest_path)
+            self.assertEqual(len(masks), 1)
+            self.assertEqual(masks[0][3], "mask_0000")
+            self.assertEqual(loaded["sam2_git_sha"], FROZEN_SAM2_SOURCE_SHA)
+            for key in ("model_checkpoint_sha256", "sam2_git_sha"):
+                original = manifest[key]
+                manifest[key] = "0" * len(original)
+                write()
+                with self.assertRaisesRegex(
+                        ValueError, "BLOCKED_NEURAL_S1_MODEL_OR_ARCHIVE_IDENTITY"):
+                    _load_mask_archive(file, manifest_path)
+                manifest[key] = original
+            manifest["mask_archive_sha256"] = "0" * 64
+            write()
+            with self.assertRaisesRegex(
+                    ValueError, "BLOCKED_NEURAL_S1_MODEL_OR_ARCHIVE_IDENTITY"):
+                _load_mask_archive(file, manifest_path)
 
     def test_frozen_resource_caps_not_changed_by_adapter(self):
         self.assertEqual(MAX_MASKS, 32)
