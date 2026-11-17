@@ -1,3 +1,5 @@
+**2026-11-17 — COLOR32-NEURAL-S1 B0 verified E2 / SAM2 shell preflight fix:** [CI44127150880](https://github.com/Kiddos19882/AutoDraw/actions/runs/44127150880) baseline PASS, ZIP14346804951 SHA-linked 1284 regions/779 singletons/1097≤4px; SAM2 install PASS but checksum command literal `\\n` FAIL before model inference. Corrected command newline `0d8e276`; N1/N2 pending. Production unaffected.
+
 **2026-11-17 — NEURAL-S1 CI44126371197 import correction:** baseline job compile PASS but unit import FAIL, missing transitive `selenium`; SAM2 skipped/no artifacts. Added `selenium>=4,<5` to both source workflow jobs at `52a4b600`. E2/inference result still UNKNOWN, no model/production changes.
 
 **2026-11-17 — NEURAL-S1 CI pre-inference fix:** [CI44125694634](https://github.com/Kiddos19882/AutoDraw/actions/runs/44125694634) FAIL due literal `\\n` in Python exporter; model never ran, no artifacts. Fixed syntax only `9162756`; new CI pending. No source G32/P4c2/model parameters changed.
