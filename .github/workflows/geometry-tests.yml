@@ -46,11 +46,12 @@ on:
         default: false
 
 concurrency:
-  group: autodraw-validation-v2-${{ github.ref }}
-  cancel-in-progress: true
+  group: autodraw-validation-v2-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
   game-monitor-tests:
