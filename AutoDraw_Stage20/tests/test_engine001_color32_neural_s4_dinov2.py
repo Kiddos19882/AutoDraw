@@ -33,6 +33,16 @@ class S4RealNeuralContracts(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,"BLOCKED_S4_MODEL_SHA_DRIFT"):
                 real_dino_features(rgb,root)
 
+    def test_missing_checkpoint_and_processor_fail_closed(self):
+        rgb=np.full((240,150,3),255,np.uint8)
+        with tempfile.TemporaryDirectory() as d:
+            root=Path(d)
+            with self.assertRaisesRegex(ValueError,"BLOCKED_S4_MODEL_SHA_DRIFT"):
+                real_dino_features(rgb,root)
+            (root/"model.safetensors").write_bytes(b"incorrect-weights")
+            with self.assertRaisesRegex(ValueError,"BLOCKED_S4_MODEL_SHA_DRIFT"):
+                real_dino_features(rgb,root)
+
     def test_original_background_and_fixed_palette(self):
         rgb,palette,regions,ink=self.fixture()
         out,report=choose_colors(rgb,palette,regions,ink)
