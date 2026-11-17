@@ -1,3 +1,5 @@
+**2026-11-17 — NEURAL-S1 CI44126371197 import correction:** baseline job compile PASS but unit import FAIL, missing transitive `selenium`; SAM2 skipped/no artifacts. Added `selenium>=4,<5` to both source workflow jobs at `52a4b600`. E2/inference result still UNKNOWN, no model/production changes.
+
 **2026-11-17 — NEURAL-S1 CI pre-inference fix:** [CI44125694634](https://github.com/Kiddos19882/AutoDraw/actions/runs/44125694634) FAIL due literal `\\n` in Python exporter; model never ran, no artifacts. Fixed syntax only `9162756`; new CI pending. No source G32/P4c2/model parameters changed.
 
 **2026-11-17 — NEURAL-S1 CPU preflight and model provenance:** Disabled SAM2 CUDA-extension build on CPU job (`SAM2_BUILD_CUDA=0`), shared exact pinned Meta SAM2 source/checkpoint SHA across exporter and mask consumer, added synthetic manifest/archive tampering regression. Neural CI/inference result not verified; production and frozen P4c2 unchanged.
