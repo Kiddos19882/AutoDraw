@@ -1,3 +1,7 @@
+## 2026-11-18 — experimental ENGINE-001 COLOR-ISLAND-R1 code
+
+Added separate original-RGB first source regions, conservative adjacent region cleanup, source-supported game32 assignment with explicit unrepresentable swatch abstention, 8 synthetic regression tests, and isolated source-only Actions workflow. Local first-image candidate SOURCE_GATE_FAIL (1017 unrepresentable pixels, background drift3929, fine detail regression); no retune or production integration. Official E3 CI pending exact run44198309906. Frozen G32/P4a/S5-P3/P4 and V44-B410 unchanged.
+
 ## 2026-11-18 — ENGINE-001 color-island cleanup planning
 
 Documented new user-directed first-priority `ENGINE001_COLOR_ISLAND_R1_SOURCE_AWARE_REGIONS` plan: original-RGB region consistency, unsupported local accent detection, protected selective tiny-island cleanup, brush-ready geometry diagnostics, and separate 32-swatch projection. Recolorization-Pro no longer next research priority; all S5-P3/P4 negative artifacts kept. Docs only, no implementation/testing/native/production changes.
