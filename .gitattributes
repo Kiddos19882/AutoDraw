@@ -1,0 +1,4 @@
+# Preserve byte-for-byte frozen Markdown history on Windows and Linux.
+# HISTORY_SNAPSHOT_PROVENANCE.json verifies the exact archived Git blob bytes.
+# Do not apply text conversion (LF -> CRLF) to immutable snapshots.
+AutoDraw_Stage20/docs/*_HISTORY_THROUGH_2026-11-08.md -text
