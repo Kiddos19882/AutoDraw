@@ -21,7 +21,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 50
     env:
-      U2NET_HOME: ${{ runner.temp }}/s5p2-birefnet-model
       OMP_NUM_THREADS: "2"
     steps:
       - uses: actions/checkout@v4
@@ -41,6 +40,8 @@ jobs:
           python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
       - name: Real pretrained BiRefNet General Lite original RGB foreground-only inference
         shell: bash
+        env:
+          U2NET_HOME: ${{ runner.temp }}/s5p2-birefnet-model
         run: |
           python AutoDraw_Stage20/tests/run_engine001_color32_s5p2_birefnet.py \
             --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
