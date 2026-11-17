@@ -4,6 +4,10 @@
 
 ## ENGINE-001 / актуальная последовательность 2026-11-17
 
+**2026-11-17 / NEURAL-S2 original-first pilot:** independent source RGB C1 SLIC and C2 SLIC+original authentic S1 SAM2 masks, no G32 candidate pixel seed. Original RGB→32 palette candidate suppresses most pink/fragmentation, B0 1284→C2 368 components (-71.3%) but source ΔE mean5.53→8.58, original source white background differs from original G32 on3929 pixels (10.9%), fails prereg source accuracy/background gates. New S2 CI verification pending; next analyze fidelity/foreground-blank tradeoff and, if necessary, prereg independent S3 refinement before another model run. Egret/contours LAST/CHALK NOT_RUN. [Protocol](ENGINE001_COLOR32_NEURAL_S2_ORIGINAL_FIRST_FLATTING_PROTOCOL_2026-11-17.md). Older items below historical.
+
+
+
 **2026-11-17 / NEURAL-S1 actual model negative evidence:** [CI44127991472](https://github.com/Kiddos19882/AutoDraw/actions/runs/44127991472) real SAM2.1 Tiny CPU and original frozen G32 source comparison are E2 PASS, but image candidate SOURCE QUALITY FAIL: just two automatic masks, B0 1284 regions, N1 1237 (−3.66%), N2 1259 (−1.95%), fail predeclared ≥25% reduction; neither visually accepted or native-painted. **Next is independent preregistered color-region/flatting or contour-guided segmentation hypothesis, not more brush strokes nor silent threshold retuning**. Retain V44-B410 LAST unchanged; separate E3/E4/E5 afterward. Older text below describes historical plans.
 
 
