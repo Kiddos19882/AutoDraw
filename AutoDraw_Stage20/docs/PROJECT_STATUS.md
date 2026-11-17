@@ -1,5 +1,10 @@
 # AutoDraw — текущее состояние
 
+## ENGINE-001 / P4c2 frozen-source Windows preflight hardening — 2026-11-17
+
+Following unchanged frozen P4c1 original artifact14334728680 SHA-linked replay, new Windows P4c2 workflow commit `714756b08e74d253746eca412223d8ab2f2253f1` adds a *gating* real archived ZIP+owner/index/geometry preflight (17 original nonwhite G32 owners; 1133 immutable paint paths; 3485 paint vertices) and explicit corrupted-ZIP fail-closed assertion. Cross-OS G32 recalculation is now `continue-on-error: true` **diagnostic only**; cannot block native replay after proven original archived G32 is loaded. Read-only local archive check: PNG shape(240,150),17 original class IDs and 5/5 report-linked file hashes PASS. Local check is not Windows CI or E3. Fresh CI run ID, actual Egret owner PNGs/alpha/3px outcome **NOT_VERIFIED**. Previous [CI44113999297](https://github.com/Kiddos19882/AutoDraw/actions/runs/44113999297) remains original pre-native FAIL evidence; no source/production/master modifications.
+
+
 ## ENGINE-001 / P4c2 cross-platform frozen-source correction — 2026-11-17
 
 [Windows CI44113999297](https://github.com/Kiddos19882/AutoDraw/actions/runs/44113999297) job134146930705 **FAIL before Egret**, while P4c2 tests5/5, P4c1 tests5/5, Markdown and Node20/20 all PASS. Python reconstructed original G32 on Windows, but original P4c1 frozen source PNG SHA preflight failed `BLOCKED_P4C1_ORIGINAL_G_DRIFT`. No native PNG or artifact from this run. Linux original P4c1 [CI44098998634](https://github.com/Kiddos19882/AutoDraw/actions/runs/44098998634) artifact14334728680 ZIP SHA `fac1fcf1ff6a43ac6e59da116b68b86e2238c2da13be0b167cf34f8241ac5eeb` preserves original frozen indexed G and exact 119+1014 paths. Both CI jobs installed NumPy2.4.6 / OpenCV4.14.0.94 / Pillow12.3.0 / scikit-image0.26.0; the *cause* of pixel mismatch is not yet isolated, so no unsupported platform claim.
