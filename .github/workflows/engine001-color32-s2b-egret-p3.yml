@@ -1,0 +1,87 @@
+name: ENGINE-001 S2b Egret P3 adaptive local width and directional repair
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-color32-s2b-egret-p3.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_color32_s2b_egret_p3.py"
+      - "AutoDraw_Stage20/tests/test_engine001_color32_s2b_egret_p3.py"
+      - "AutoDraw_Stage20/tests/run_engine001_color32_s2b_egret_p2.py"
+      - "AutoDraw_Stage20/docs/README.md"
+      - ".gitattributes"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engine001-s2b-egret-p3-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  p3-native-ab:
+    runs-on: windows-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install original archived BoardPane native dependencies
+        run: python -m pip install "selenium>=4,<5" "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scipy>=1.13,<2" "scikit-image>=0.25,<0.27"
+      - name: Verify P3 local width and angular probes with frozen P2 and original renderer
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_color32_s2b_egret_p3.py AutoDraw_Stage20/tests/test_engine001_color32_s2b_egret_p3.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color32_s2b_egret_p3.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color32_s2b_egret_p2.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color32_s2b_rgb_edge.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+      - name: Render same P2 and locally adaptive P3 in actual original Egret BoardPane
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_color32_s2b_egret_p3.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --palette AutoDraw_Stage20/data/palettes/browser_palette.json \
+            --output "$RUNNER_TEMP/engine001-s2b-egret-p3"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-s2b-egret-p3"
+          r=json.loads((root/"report.json").read_text(encoding="utf-8"))
+          assert r["experiment"]=="ENGINE001_COLOR32_S2B_EGRET_P3_DIRECTIONAL_NATIVE"
+          assert r["github_sha"]==os.environ["GITHUB_SHA"]
+          assert r["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert r["status"] in ("P3_NATIVE_INCREMENTAL_PASS_NOT_FULL_IMAGE",
+                                 "P3_NATIVE_INCREMENTAL_FAIL_NOT_FULL_IMAGE")
+          assert r["preflight"]["status"]=="SOURCE_READY_FOR_E3"
+          assert r["preflight"]["planned_total_strokes_with_frozen_V44B410"]<=3000
+          assert r["preflight"]["planned_total_vertices_with_frozen_V44B_NOT_CHALK"]<=5900
+          assert r["preflight"]["additional_paths"]<=240
+          assert r["preflight"]["additional_vertices_NOT_CHALK"]<=480
+          assert r["full_image_quality"]=="NOT_RUN"
+          assert r["exact_game_CHALK"] is None and r["production_accepted"] is False
+          for p,digest in r["report_linked_SHA256"].items():
+              assert hashlib.sha256((root/p).read_bytes()).hexdigest()==digest
+          for v in ("P2-BASELINE","P3-DIRECTIONAL"):
+              assert len(list((root/v).glob("*-color-*.png")))==2
+              assert len(list((root/v).glob("*-composite.png")))==1
+          print("P3 NATIVE STATUS:",r["status"])
+          print("P3 SOURCE PATH COUNT:",r["preflight"]["additional_paths"])
+          print("P3 NATIVE GATES:",json.dumps(r["native_comparison"],ensure_ascii=False))
+          print("P3 REPORT SHA256:",hashlib.sha256((root/"report.json").read_bytes()).hexdigest())
+          PY
+      - name: Preserve positive and negative native Egret evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-s2b-egret-p3-directional-vs-p2
+          path: ${{ runner.temp }}/engine001-s2b-egret-p3
+          retention-days: 30
+          if-no-files-found: warn
