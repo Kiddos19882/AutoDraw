@@ -29,6 +29,11 @@ on:
       - "AutoDraw_Stage20/README.txt"
   workflow_dispatch:
     inputs:
+      run_full_validation:
+        description: Include long FILL-001/INT-006 research, algorithm benchmarks and portable build
+        required: false
+        type: boolean
+        default: false
       run_algorithm_benchmarks:
         description: Run the long Stage 5/7/8 algorithm benchmark suite
         required: false
@@ -118,333 +123,13 @@ jobs:
         run: |
           $env:PYTHONPATH = "$env:GITHUB_WORKSPACE\AutoDraw_Stage20;$env:GITHUB_WORKSPACE\AutoDraw_Stage20\source\preparation;$env:GITHUB_WORKSPACE\AutoDraw_Stage20\source\executor"
           python -m pytest -q -ra tests
-      - name: FILL-001 contour-first overlap study on frozen masks (offline)
-        shell: pwsh
-        run: |
-          python chalk_fill_strategy_comparison.py --contour-first --output-dir "$env:RUNNER_TEMP\fill001-contour-first-v1"
-      - name: Upload FILL-001 contour-first research (not live quality)
-        uses: actions/upload-artifact@v4
-        with:
-          name: fill001-contour-first-offline-v1
-          path: ${{ runner.temp }}/fill001-contour-first-v1/
-          if-no-files-found: error
-          retention-days: 30
-      - name: FILL-001 contour-first endpoint-only V2 study (offline)
-        shell: pwsh
-        run: |
-          python chalk_fill_strategy_comparison.py --contour-edge-trims --output-dir "$env:RUNNER_TEMP\fill001-contour-edge-trims-v2"
-      - name: Upload FILL-001 contour-first endpoint study
-        uses: actions/upload-artifact@v4
-        with:
-          name: fill001-contour-edge-trims-v2
-          path: ${{ runner.temp }}/fill001-contour-edge-trims-v2/
-          if-no-files-found: error
-          retention-days: 30
-      - name: Benchmark capsule global versus per-segment broad phase
-        shell: pwsh
-        run: |
-          python ..\..\tests\benchmark_capsule_rasterization.py --repeats 7 --output "$env:RUNNER_TEMP\capsule-broad-phase\benchmark.json"
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: Upload capsule broad-phase benchmark
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: autodraw-capsule-broad-phase-benchmark
-          path: ${{ runner.temp }}/capsule-broad-phase/
-          if-no-files-found: warn
-          retention-days: 14
-      - name: Compare FILL-001 frozen A-D strategies (offline only)
-        shell: pwsh
-        run: |
-          $env:PYTHONPATH = "$env:GITHUB_WORKSPACE/AutoDraw_Stage20;$env:GITHUB_WORKSPACE/AutoDraw_Stage20/source/preparation"
-          python chalk_fill_strategy_comparison.py --output-dir "$env:RUNNER_TEMP/fill001-ad-offline-v1"
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: Upload FILL-001 A-D offline diagnostic rasters
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: autodraw-fill001-ad-offline-v1
-          path: ${{ runner.temp }}/fill001-ad-offline-v1/
-          if-no-files-found: warn
-          retention-days: 14
-      - name: Compare actual committed FILL-001 PNG residual with modeled contour (offline only)
-        shell: pwsh
-        run: |
-          python chalk_fill_screen_residual_comparison.py --results-root "..\..\data\results\brush_behavior_tests" --output-dir "$env:RUNNER_TEMP\fill001-screen-residual-v1"
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: Upload FILL-001 saved-screen residual counterfactual evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: autodraw-fill001-screen-residual-v1
-          path: ${{ runner.temp }}/fill001-screen-residual-v1/
-          if-no-files-found: warn
-          retention-days: 30
-      - name: Replay immutable FILL-001 Smooth A/B using verified Screen Mask V2
-        shell: pwsh
-        run: |
-          python fill001_screen_mask_v2_batch.py --results-root "..\\..\\data\\results\\brush_behavior_tests" --output-dir "$env:RUNNER_TEMP\\fill001-screen-mask-v2"
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: Upload FILL-001 Screen Mask V2 numeric evidence only
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: autodraw-fill001-screen-mask-v2
-          path: ${{ runner.temp }}/fill001-screen-mask-v2/report.json
-          if-no-files-found: warn
-          retention-days: 30
-      - name: Reproduce exhaustive FILL-001-RS static spacing sweep
-        shell: pwsh
-        run: |
-          python ..\..\tests\analyze_chalk_fill001_rs_sweep.py --output "$env:RUNNER_TEMP\fill001-rs-static-sweep\analysis.json"
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: Upload FILL-001-RS static sweep evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: autodraw-fill001-rs-static-sweep
-          path: ${{ runner.temp }}/fill001-rs-static-sweep/
-          if-no-files-found: warn
-          retention-days: 14
-
-  chalk-png-analysis:
-    name: INT-006 pixel-level PNG geometry audit
+  research-validation:
+    name: On-demand FILL-001 and INT-006 research (full validation only)
+    if: github.event_name == 'workflow_dispatch' && inputs.run_full_validation == true
     needs:
       - preparation-tests
       - egret-renderer-reference
-    runs-on: windows-latest
-    timeout-minutes: 30
-    defaults:
-      run:
-        working-directory: AutoDraw_Stage20
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v7
-      - name: Set up Python
-        uses: actions/setup-python@v7
-        with:
-          python-version: "3.11"
-          cache: pip
-          cache-dependency-path: AutoDraw_Stage20/source/preparation/requirements.txt
-      - name: Install image-analysis dependencies
-        run: python -m pip install -r source/preparation/requirements.txt
-      - name: Download Stage A-D browser artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: autodraw-egret-renderer-reference
-          path: ${{ runner.temp }}/egret-renderer-reference
-      - name: Independently compare native Egret endpoint PNGs with OpenCV board-local capsules
-        shell: pwsh
-        run: |
-          python tests\\analyze_engine001_endpoint_reference.py --workspace "$env:GITHUB_WORKSPACE" --reference-dir "$env:RUNNER_TEMP\\egret-renderer-reference" --output-dir "$env:RUNNER_TEMP\\engine001-endpoint-boardlocal"
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: Upload ENGINE-001 native endpoint board-local evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: autodraw-engine001-endpoint-boardlocal-v1
-          path: ${{ runner.temp }}/engine001-endpoint-boardlocal/
-          if-no-files-found: warn
-          retention-days: 30
-      - name: Compare native 5px closed outline on all Egret endpoint variants (offline only)
-        shell: pwsh
-        run: |
-          python tests\\analyze_engine001_outline5_reference.py --workspace "$env:GITHUB_WORKSPACE" --reference-dir "$env:RUNNER_TEMP\\egret-renderer-reference" --output-dir "$env:RUNNER_TEMP\\engine001-endpoint-outline5"
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: Upload ENGINE-001 native 5px contour vs OpenCV evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: autodraw-engine001-native-outline5-v1
-          path: ${{ runner.temp }}/engine001-endpoint-outline5/
-          if-no-files-found: warn
-          retention-days: 30
-      - name: Audit accepted-only duplicate-frame Egret PNG pixel differences
-        shell: pwsh
-        run: |
-          python tests\\analyze_engine001_duplicate_frames.py --workspace "$env:GITHUB_WORKSPACE" --reference-dir "$env:RUNNER_TEMP\\egret-renderer-reference" --output-dir "$env:RUNNER_TEMP\\engine001-duplicate-frames"
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: Upload ENGINE-001 duplicate-frame native Egret PNG comparison
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: autodraw-engine001-duplicate-frames-v1
-          path: ${{ runner.temp }}/engine001-duplicate-frames/
-          if-no-files-found: warn
-          retention-days: 30
-      - name: Test Stage screenshot transform and mask metrics
-        run: python tests\\test_stage_renderer_comparison.py
-      - name: Apply paired live/offline renderer per-run acceptance gates
-        shell: pwsh
-        run: |
-          python tests\\compare_live_renderer_reference.py --experiment-dir data\\results\\brush_behavior_tests\\experiment-20261105-041705-b10-paired_renderer_single_stroke-d47cc0a5 --blank data\\results\\brush_behavior_tests\\blank-board-reference.png --offline-png data\\renderer_result\\live-accepted-points-width-10-webgl-board-reference.png --manifest data\\renderer_result\\egret-5.4.1-renderer-reference-manifest.json --plan data\\results\\brush_behavior_tests\\brush-plan-paired_renderer_single_stroke-b10-20261105-041703-d47cc0a5.json --output-dir "$env:RUNNER_TEMP\\paired-renderer-png-comparison" --geometry-audit data\\results\\brush_behavior_tests\\experiment-20261105-041705-b10-paired_renderer_single_stroke-d47cc0a5\\screen_geometry_audit.json
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: Replay all saved vertical and diagonal paired-renderer captures
-        if: always()
-        shell: pwsh
-        run: |
-          python tests\run_paired_renderer_acceptance.py --experiment-root data\results\brush_behavior_tests --blank data\results\brush_behavior_tests\blank-board-reference.png --renderer-root data\results\renderer_compare --run-reference-root "$env:RUNNER_TEMP\egret-renderer-reference\paired-renderer" --output-root "$env:RUNNER_TEMP\paired-renderer-png-comparison"
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: Compare Stage A/B against same-run live screenshots (diagnostic only)
-        if: always()
-        shell: pwsh
-        run: |
-          $cases = @(
-            @{
-              Name = "vertical"
-              Experiment = "experiment-20261105-192426-b10-paired_renderer_vertical_single_stroke-6f2227c7"
-            },
-            @{
-              Name = "diagonal"
-              Experiment = "experiment-20261105-192602-b10-paired_renderer_diagonal_single_stroke-0e61bc40"
-            }
-          )
-          $failed = $false
-          foreach ($case in $cases) {
-            $stageDir = Join-Path "$env:RUNNER_TEMP\\egret-renderer-reference" ("stage-level-" + $case.Name)
-            $experimentDir = "data\\results\\brush_behavior_tests\\$($case.Experiment)"
-            $comparisonReport = Join-Path (Join-Path "$env:RUNNER_TEMP\\paired-renderer-png-comparison" $case.Name) "comparison-report-independent-transform.json"
-            $outputDir = Join-Path "$env:RUNNER_TEMP\\stage-renderer-live-comparison" $case.Name
-            python tests\\compare_stage_renderer_reference.py --orientation $case.Name --stage-manifest (Join-Path $stageDir "manifest.json") --stage-png-dir $stageDir --experiment-dir $experimentDir --comparison-report $comparisonReport --output-dir $outputDir --variants A B C D
-            if ($LASTEXITCODE -ne 0) {
-              Write-Host "$($case.Name) Stage A/B diagnostic comparison failed with exit code $LASTEXITCODE."
-              $failed = $true
-            }
-          }
-          if ($failed) { throw "At least one same-run Stage A/B diagnostic comparison could not complete." }
-      - name: Compare saved local NVIDIA Stage A-D with same-run live captures (diagnostic only)
-        if: always()
-        shell: pwsh
-        run: |
-          python tests\run_local_nvidia_stage_comparison.py --archive data\AutoDraw-Stage-Firefox-Local-20261106-075246.zip --paired-report-root "$env:RUNNER_TEMP\paired-renderer-png-comparison" --experiment-root data\results\brush_behavior_tests --output-dir "$env:RUNNER_TEMP\local-nvidia-stage-comparison" --series-output "$env:RUNNER_TEMP\paired-renderer-png-comparison\multi-axis-series-summary.json"
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: Include paired full-screen source captures for independent board-edge audit
-        if: always()
-        shell: pwsh
-        run: |
-          $target = "$env:RUNNER_TEMP\paired-renderer-png-comparison"
-          $sources = @(
-            @{
-              Name = "horizontal"
-              Directory = "data\results\brush_behavior_tests\experiment-20261105-041705-b10-paired_renderer_single_stroke-d47cc0a5"
-            },
-            @{
-              Name = "vertical"
-              Directory = "data\results\brush_behavior_tests\experiment-20261105-192426-b10-paired_renderer_vertical_single_stroke-6f2227c7"
-            },
-            @{
-              Name = "diagonal"
-              Directory = "data\results\brush_behavior_tests\experiment-20261105-192602-b10-paired_renderer_diagonal_single_stroke-0e61bc40"
-            }
-          )
-          foreach ($source in $sources) {
-            $caseTarget = Join-Path $target $source.Name
-            New-Item -ItemType Directory -Path $caseTarget -Force | Out-Null
-            foreach ($fileName in @("before_clear-screen.png", "after_draw-screen.png")) {
-              $sourceFile = Join-Path $source.Directory $fileName
-              if (-not (Test-Path $sourceFile -PathType Leaf)) { throw "Missing paired screen capture: $sourceFile" }
-              Copy-Item $sourceFile (Join-Path $caseTarget $fileName) -Force
-            }
-          }
-      - name: Upload paired renderer PNG comparison diagnostics
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: autodraw-paired-renderer-png-comparison
-          path: ${{ runner.temp }}/paired-renderer-png-comparison/
-          if-no-files-found: warn
-          retention-days: 14
-      - name: Upload Stage compositor live comparison diagnostics
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: autodraw-stage-renderer-live-comparison
-          path: ${{ runner.temp }}/stage-renderer-live-comparison/
-          if-no-files-found: warn
-          retention-days: 14
-      - name: Upload local NVIDIA Stage comparison diagnostics
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: autodraw-local-nvidia-stage-comparison
-          path: ${{ runner.temp }}/local-nvidia-stage-comparison/
-          if-no-files-found: warn
-          retention-days: 14
-      - name: Analyse all INT-006 V1-V5 board captures
-        shell: pwsh
-        run: |
-          python tests\\analyze_chalk_int006_png.py data\\results\\brush_behavior_tests --output-dir "$env:RUNNER_TEMP\\int006-png-analysis" --expected-runs-per-series 9
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: Upload pixel-level metrics and diagnostic images
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: autodraw-int006-png-analysis
-          path: ${{ runner.temp }}/int006-png-analysis/
-          if-no-files-found: warn
-          retention-days: 14
-      - name: Run independent INT-006 CHALK prediction validation
-        shell: pwsh
-        run: |
-          $env:PYTHONPATH = "$env:GITHUB_WORKSPACE/AutoDraw_Stage20/source/preparation"
-          python source/preparation/chalk_int006_validation.py --journal data/results/brush_behavior_tests/chalk_test_blocks/chalk-block-INT006-chalk-20261102-232320-7cea27-1f93ddca.json --results-dir data/results/brush_behavior_tests --output "$env:RUNNER_TEMP/int006-chalk-validation/analysis.json"
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: Upload independent INT-006 CHALK validation report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: autodraw-int006-chalk-validation
-          path: ${{ runner.temp }}/int006-chalk-validation/
-          if-no-files-found: warn
-          retention-days: 14
-      - name: Run independent INT006R radius × geometry validation on live captures
-        shell: pwsh
-        run: |
-          $env:PYTHONPATH = "$env:GITHUB_WORKSPACE/AutoDraw_Stage20;$env:GITHUB_WORKSPACE/AutoDraw_Stage20/source/preparation;$env:GITHUB_WORKSPACE/AutoDraw_Stage20/source/executor"
-          python source/preparation/chalk_int006r_validation.py --journal data/results/brush_behavior_tests/chalk_test_blocks/chalk-block-INT006R-chalk-20261103-030837-a20df5-a8e0b9ec.json --results-dir data/results/brush_behavior_tests --output "$env:RUNNER_TEMP/int006r-live-validation/analysis.json"
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: Upload INT006R live validation report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: autodraw-int006r-live-validation
-          path: ${{ runner.temp }}/int006r-live-validation/
-          if-no-files-found: warn
-          retention-days: 14
-      - name: Package INT006R before/after PNGs for manual visual review
-        if: always()
-        shell: pwsh
-        run: |
-          $journalPath = "data/results/brush_behavior_tests/chalk_test_blocks/chalk-block-INT006R-chalk-20261103-030837-a20df5-a8e0b9ec.json"
-          $journal = Get-Content $journalPath -Raw | ConvertFrom-Json
-          if ($journal.tasks.Count -ne 45) { throw "Expected 45 INT006R tasks, found $($journal.tasks.Count)." }
-          $sourceRoot = "data/results/brush_behavior_tests"
-          $targetRoot = Join-Path $env:RUNNER_TEMP "int006r-visual-review-source"
-          New-Item -ItemType Directory -Path $targetRoot -Force | Out-Null
-          $copied = 0
-          foreach ($task in $journal.tasks) {
-            $attempt = $task.attempts | Where-Object { $_.status -eq "completed" } | Select-Object -First 1
-            if ($null -eq $attempt) { throw "Completed attempt missing for task $($task.task_id)." }
-            $directoryName = Split-Path -Path $attempt.experiment_dir -Leaf
-            $sourceDirectory = Join-Path $sourceRoot $directoryName
-            $targetDirectory = Join-Path $targetRoot $directoryName
-            New-Item -ItemType Directory -Path $targetDirectory -Force | Out-Null
-            foreach ($fileName in @("before_clear-board.png", "after_draw-board.png", "experiment.json", "monitor_report.json")) {
-              $sourceFile = Join-Path $sourceDirectory $fileName
-              if (-not (Test-Path $sourceFile -PathType Leaf)) { throw "Missing $fileName for $($task.task_id)." }
-              Copy-Item $sourceFile (Join-Path $targetDirectory $fileName) -Force
-              $copied++
-            }
-          }
-          if ($copied -ne 180) { throw "Expected 180 visual review source files, copied $copied." }
-      - name: Upload INT006R visual review source captures
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: autodraw-int006r-visual-review-source
-          path: ${{ runner.temp }}/int006r-visual-review-source/
-          if-no-files-found: error
-          retention-days: 14
+    uses: ./.github/workflows/geometry-research.yml
 
   integration-tests:
     name: Application integration tests
@@ -537,7 +222,7 @@ jobs:
           retention-days: 14
 
   windows-build-smoke:
-    if: github.event_name == 'workflow_dispatch' && inputs.run_windows_portable_build == true
+    if: github.event_name == 'workflow_dispatch' && (inputs.run_windows_portable_build == true || inputs.run_full_validation == true)
     name: Windows portable build and startup smoke-test
     needs:
       - game-monitor-tests
@@ -576,7 +261,7 @@ jobs:
           retention-days: 7
   algorithm-benchmarks:
     name: Optional algorithm benchmarks
-    if: github.event_name == 'workflow_dispatch' && inputs.run_algorithm_benchmarks == true
+    if: github.event_name == 'workflow_dispatch' && (inputs.run_algorithm_benchmarks == true || inputs.run_full_validation == true)
     runs-on: windows-latest
     timeout-minutes: 60
     defaults:
