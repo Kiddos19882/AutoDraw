@@ -2,6 +2,9 @@
 
 ## Приоритет ENGINE-001 — 2026-11-17, COLOR32-NEURAL-S1
 
+**Updated CI blocker:** [run44126371197](https://github.com/Kiddos19882/AutoDraw/actions/runs/44126371197) baseline FAIL on missing transitive Selenium at unit import; SAM2 job SKIPPED, no files. Both jobs' source dependencies corrected at `52a4b600`; next required proof is new CI jobs + genuine SAM2 masks, not production/brush trials.
+
+
 **Current CI evidence:** [run44125694634](https://github.com/Kiddos19882/AutoDraw/actions/runs/44125694634) failed on Python syntax in SAM2 exporter before inference; dependent model job SKIPPED, no artifacts. Corrected \\n code escape in `9162756`; next verify new CI both jobs, original source/weights and N1/N2 actual results. No neural quality claims. 
 
 
