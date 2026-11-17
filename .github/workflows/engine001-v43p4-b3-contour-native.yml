@@ -1,0 +1,70 @@
+name: ENGINE-001 V43-P4 B3 isolated contour rings actual Egret
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-v43p4-b3-contour-native.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_v43p4_b3_contour_native_probe.py"
+      - "AutoDraw_Stage20/tests/test_engine001_v43p4_b3_contour_native_probe.py"
+      - "AutoDraw_Stage20/tests/run_engine001_v43p4_b3_contour_source.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engine001-v43p4-b3-contour-native-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  b3-isolated-native:
+    runs-on: windows-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install original Egret/Python dependencies
+        run: python -m pip install "selenium>=4,<5" "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scipy>=1.13,<2" "scikit-image>=0.25,<0.27"
+      - name: Validate deterministic contour samples and original Egret reference
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_v43p4_b3_contour_native_probe.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_v43p4_b3_contour_native_probe.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+      - name: Render up to sixteen isolated contour rings on REAL BoardPane
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_v43p4_b3_contour_native_probe.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --output "$RUNNER_TEMP/engine001-b3-contour-native"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-b3-contour-native"
+          r=json.loads((root/"report.json").read_text(encoding="utf-8"))
+          assert r["experiment"]=="ENGINE001_V43P4_B3_ISOLATED_CONTOUR_NATIVE_E3"
+          assert r["mode"]=="E3_ISOLATED_ORIGINAL_EGRET_NOT_FULL_B3"
+          assert 1<=r["sample_strokes"]<=16
+          assert r["sample_vertices_NOT_CHALK"]<=5900
+          assert r["source_owner_overlap_penalty"]==0
+          assert r["whole_picture_quality"]=="NOT_RUN"
+          assert r["game_exact_CHALK"] is None and r["production_accepted"] is False
+          for name,digest in r["report_linked_SHA256"].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==digest
+          print("Isolated actual Egret B3 contour footprint archived; full B3 NOT_RUN")
+          PY
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+      - name: Preserve actual Egret PNGs/negative cases and report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-b3-real-egret-isolated-contour-rings
+          path: ${{ runner.temp }}/engine001-b3-contour-native
+          if-no-files-found: warn
+          retention-days: 30
