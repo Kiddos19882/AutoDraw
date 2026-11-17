@@ -2,7 +2,7 @@
 
 ## Приоритет ENGINE-001 — 2026-11-17, COLOR32-NEURAL-S3
 
-- [ ] **S3 совместная цветовая карта J0/J1:** подтвердить тесты и истинный GitHub CI [source-only workflow](../../.github/workflows/engine001-color32-neural-s3-joint-contour-source.yml), оригинальные V44-B SHA/410/1792 native contours unchanged; получить J0/J1 карты и сравнить хрома-абляцию, ΔE00/фон/количество островков и лицо/волосы/одежду с B0/S2. [S3 protocol](ENGINE001_COLOR32_NEURAL_S3_JOINT_COLOR_CONTOUR_PROTOCOL_2026-11-17.md). Нельзя выдавать математический граф за нейросетевую цветовую модель. Если J1 архив/совпадение границ невалидны — contour BLOCKED, оставить V44-B неизменным. 
+- [ ] **S3 совместная цветовая карта J0/J1:** 6 synthetic tests authored; original V44-B exact 410/1792 + alpha24 8855 logical pixels verified E1; J1 archive drift fail-closed with J0 fallback; actual S3 CI E2 not yet verified.  подтвердить тесты и истинный GitHub CI [source-only workflow](../../.github/workflows/engine001-color32-neural-s3-joint-contour-source.yml), оригинальные V44-B SHA/410/1792 native contours unchanged; получить J0/J1 карты и сравнить хрома-абляцию, ΔE00/фон/количество островков и лицо/волосы/одежду с B0/S2. [S3 protocol](ENGINE001_COLOR32_NEURAL_S3_JOINT_COLOR_CONTOUR_PROTOCOL_2026-11-17.md). Нельзя выдавать математический граф за нейросетевую цветовую модель. Если J1 архив/совпадение границ невалидны — contour BLOCKED, оставить V44-B неизменным. 
 - [ ] **S3 learned contextual color scorer:** выбрать реально доступную pretrained модель, verify checkpoint/license/source/git SHA and output features, preregister J2 separately; не переопределять цвета после получения S3 результатов. 
 
 ## Исторический ENGINE-001 — 2026-11-17, COLOR32-NEURAL-S2
