@@ -4,6 +4,10 @@
 
 ## ENGINE-001 / актуальная последовательность 2026-11-17
 
+**2026-11-17 / NEURAL-S3 joint colors and outlines:** [preregistered joint-color/contour protocol](ENGINE001_COLOR32_NEURAL_S3_JOINT_COLOR_CONTOUR_PROTOCOL_2026-11-17.md), E1 immutable V44-B native color100 archive provenance 410/1792/50,832 alpha24 ink all within ROI; test-only J0 original RGB region graph, J1 same with true original V44-B soft alpha edge prior, CHROMA on/off. Real SAM2 S1 masks reused as pretrained proposals. Next verify E2 CI, compare face and visual maps. Learned semantic-color network **not yet chosen or run**; distinct prereg J2 only after pinned checkpoint. V44-B original contours always drawn LAST and never modified; if guide cannot align, fallback J0 + unchanged contours. Egret/CHALK E4/E5 remain separate. Older records below historical.
+
+
+
 **2026-11-17 / NEURAL-S2 original-first pilot:** independent source RGB C1 SLIC and C2 SLIC+original authentic S1 SAM2 masks, no G32 candidate pixel seed. Original RGB→32 palette candidate suppresses most pink/fragmentation, B0 1284→C2 368 components (-71.3%) but source ΔE mean5.53→8.58, original source white background differs from original G32 on3929 pixels (10.9%), fails prereg source accuracy/background gates. New S2 CI verification pending; next analyze fidelity/foreground-blank tradeoff and, if necessary, prereg independent S3 refinement before another model run. Egret/contours LAST/CHALK NOT_RUN. [Protocol](ENGINE001_COLOR32_NEURAL_S2_ORIGINAL_FIRST_FLATTING_PROTOCOL_2026-11-17.md). Older items below historical.
 
 
