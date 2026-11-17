@@ -233,7 +233,8 @@ def native_batch(workspace:Path,variant:str,strokes:list[dict],
                                "renderV36SourceColoredContourProbe",
                                "renderV43WideInteriorProbe",
                                "renderV43P3PaintBrushProbe",
-                               "renderV43P4FullAdaptiveProbe"):
+                               "renderV43P4FullAdaptiveProbe",
+                               "renderV43P4B1OwnerConstrainedProbe"):
         raise ValueError("Unsupported native Egret renderer method")
     class Handler(SimpleHTTPRequestHandler):
         def __init__(self,*a,**kw):
