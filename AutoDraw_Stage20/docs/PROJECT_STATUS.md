@@ -1,5 +1,10 @@
 # AutoDraw — текущее состояние
 
+## ENGINE-001 / P4c2 native JS contract preflight — 2026-11-17
+
+Static inspection of original `renderComplexHoldoutColorProbe` identified strict accepted widths `{2,4,6,8,10,15,30}`, RGB integer `0..0xffffff`, logical coordinates `0<=x<460`, `0<=y<240`, 2..128 points, <=3000 paint strokes and <=5900 points. Read-only inspection of original P4c1 archive14334728680 found **1133 strokes/3485 vertices, widths2/4/6/10, no out-of-board points or invalid RGB**. P4c2-only `validate_frozen_paths` now prechecks identical native metadata and finite coordinates fail-closed before browser; three new regression cases cover rejected widths/RGB, invalid coordinates, and contract-shaped synthetic fixture (not a native test). No P4c1/archive/production alterations. New CI/test execution and E3 native PNG/coverage **NOT_VERIFIED**, previous pre-native failures preserved.
+
+
 ## ENGINE-001 / P4c2 frozen-source Windows preflight hardening — 2026-11-17
 
 Following unchanged frozen P4c1 original artifact14334728680 SHA-linked replay, new Windows P4c2 workflow commit `714756b08e74d253746eca412223d8ab2f2253f1` adds a *gating* real archived ZIP+owner/index/geometry preflight (17 original nonwhite G32 owners; 1133 immutable paint paths; 3485 paint vertices) and explicit corrupted-ZIP fail-closed assertion. Cross-OS G32 recalculation is now `continue-on-error: true` **diagnostic only**; cannot block native replay after proven original archived G32 is loaded. Read-only local archive check: PNG shape(240,150),17 original class IDs and 5/5 report-linked file hashes PASS. Local check is not Windows CI or E3. Fresh CI run ID, actual Egret owner PNGs/alpha/3px outcome **NOT_VERIFIED**. Previous [CI44113999297](https://github.com/Kiddos19882/AutoDraw/actions/runs/44113999297) remains original pre-native FAIL evidence; no source/production/master modifications.
