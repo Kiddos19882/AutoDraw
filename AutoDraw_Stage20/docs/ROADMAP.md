@@ -4,6 +4,10 @@
 
 ## ENGINE-001 / актуальная последовательность 2026-11-17
 
+**2026-11-17 / S4 real DINOv2 feature-conditioned color conversion:** [prereg neural-context protocol](ENGINE001_COLOR32_NEURAL_S4_DINOV2_CONTEXT_PALETTE_PROTOCOL_2026-11-17.md), D0 deterministic original RGB region graph vs D1 authentic pretrained DINOv2-small patch features (weight SHA fixed) coupled to 32 original game colors, with original V44-B only as immutable soft prior. Next verify real S4 CI/log and actual output artifacts, calculate neural contribution and visually review face/hair/pose, then consider separately learned palette-index head (S5) if pretrained-feature coupling fails. Current S4 CI/model evidence not yet verified, old S3 unfinished; no Egret/CHALK promotion. Older paragraphs below are historical.
+
+
+
 **2026-11-17 / NEURAL-S3 joint colors and outlines:** [preregistered joint-color/contour protocol](ENGINE001_COLOR32_NEURAL_S3_JOINT_COLOR_CONTOUR_PROTOCOL_2026-11-17.md), E1 immutable V44-B native color100 archive provenance 410/1792/50,832 alpha24 ink all within ROI; test-only J0 original RGB region graph, J1 same with true original V44-B soft alpha edge prior, CHROMA on/off. Real SAM2 S1 masks reused as pretrained proposals. Next verify E2 CI, compare face and visual maps. Learned semantic-color network **not yet chosen or run**; distinct prereg J2 only after pinned checkpoint. V44-B original contours always drawn LAST and never modified; if guide cannot align, fallback J0 + unchanged contours. Egret/CHALK E4/E5 remain separate. Older records below historical.
 
 
