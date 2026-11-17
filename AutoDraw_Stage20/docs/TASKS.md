@@ -2,7 +2,7 @@
 
 ## Приоритет ENGINE-001 — 2026-11-17, COLOR32-NEURAL-S1
 
-- [ ] **COLOR32-NEURAL-S1 настоящий SAM2.1 E2 source experimental:** завершить [registered protocol](ENGINE001_COLOR32_NEURAL_S1_REGION_SEGMENTATION_PROTOCOL_2026-11-17.md), unit source-adapter tests и два Linux CI jobs, забрать original artifacts, проверить SHA model/weights, mask source и B0/N1/N2 RGB/region metrics. Не объявлять пройденным без реальных pretrained масок и пользовательского визуального сравнения. 
+- [ ] **COLOR32-NEURAL-S1 настоящий SAM2.1 E2 source experimental:** CPU build disabled SAM2 CUDA extension per official pinned setup.py, consumer+exporter share exact source/weight SHA and manifest tampering regression; CI outcome still NOT_VERIFIED.  завершить [registered protocol](ENGINE001_COLOR32_NEURAL_S1_REGION_SEGMENTATION_PROTOCOL_2026-11-17.md), unit source-adapter tests и два Linux CI jobs, забрать original artifacts, проверить SHA model/weights, mask source и B0/N1/N2 RGB/region metrics. Не объявлять пройденным без реальных pretrained масок и пользовательского визуального сравнения. 
 - [ ] **NEURAL-S1 визуальный gate:** оригинал + B0 + N1 + N2 с user-preferred V44-B contours как отдельный контроль, сохранить лицо/волосы/позу; только после этого новый отдельный native Egret 99%/3px опыт. FlatMagic weights availability UNKNOWN.
 
 ## Исторический завершённый P4c2 paint-only E3 quality FAIL и открытый full LAST
