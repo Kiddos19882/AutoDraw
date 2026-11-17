@@ -125,6 +125,39 @@ jobs:
           print("S4 GATES",r["source_gates"])
           print("S4 REPORT SHA",hashlib.sha256((root/"report.json").read_bytes()).hexdigest())
           PY
+      - name: Preserve failure evidence even if authentic model inference never starts
+        if: failure()
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-neural-s4-original"
+          root.mkdir(parents=True,exist_ok=True)
+          diagnostic=root/"ci-failure.json"
+          if not diagnostic.exists():
+              model_path=Path(os.environ["RUNNER_TEMP"])/"dinov2-model-path.txt"
+              model_provenance="NOT_VERIFIED"
+              if model_path.exists():
+                  model_provenance="CHECKPOINT_DOWNLOAD_STEP_COMPLETED__NOT_INFERENCE"
+              diagnostic.write_text(json.dumps({
+                  "experiment":"ENGINE001_COLOR32_NEURAL_S4_DINOV2_CONTEXT_PALETTE",
+                  "status":"CI_FAIL_INFERENCE_OR_PRECHECK",
+                  "github_sha":os.environ.get("GITHUB_SHA"),
+                  "github_run_id":os.environ.get("GITHUB_RUN_ID"),
+                  "learned_32_color_palette_head":"NOT_TRAINED",
+                  "model_inference":"NOT_CONFIRMED",
+                  "checkpoint_download":model_provenance,
+                  "source_gates":"NOT_EVALUATED",
+                  "native_Egret":"NOT_RUN",
+                  "exact_CHALK":None,
+                  "production_accepted":False,
+                  "note":"Inspect failed job step/logs for root cause. No quality PASS implied."
+              },ensure_ascii=False,indent=2)+"\\n",encoding="utf-8")
+              print("FAIL-CLOSED S4 archive diagnostic",hashlib.sha256(diagnostic.read_bytes()).hexdigest())
+          PY
       - name: Always preserve real neural features or failures (no quality promotion)
         if: always()
         uses: actions/upload-artifact@v4
