@@ -9,7 +9,6 @@ on:
       - "AutoDraw_Stage20/tests/run_engine001_color32_neural_s1_sam2.py"
       - "AutoDraw_Stage20/tests/test_engine001_color32_neural_s1.py"
       - "AutoDraw_Stage20/docs/ENGINE001_COLOR32_NEURAL_S1_REGION_SEGMENTATION_PROTOCOL_2026-11-17.md"
-      - "AutoDraw_Stage20/docs/README.md"
   workflow_dispatch:
 
 permissions:
