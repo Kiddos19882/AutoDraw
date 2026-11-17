@@ -1,0 +1,94 @@
+name: ENGINE-001 COLOR32 NEURAL-S2 original-first flatting with frozen real SAM masks
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-color32-neural-s2-original-first.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_color32_neural_s2.py"
+      - "AutoDraw_Stage20/tests/test_engine001_color32_neural_s2.py"
+      - "AutoDraw_Stage20/docs/ENGINE001_COLOR32_NEURAL_S2_ORIGINAL_FIRST_FLATTING_PROTOCOL_2026-11-17.md"
+      - "AutoDraw_Stage20/docs/README.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  independent-original-color-regions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install same source colors/segmentation dependencies
+        run: |
+          python -m pip install "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scikit-image>=0.25,<0.27" "scipy>=1.13,<2" requests
+      - name: Compile and run independent original-first contracts
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_color32_neural_s2.py AutoDraw_Stage20/tests/test_engine001_color32_neural_s2.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color32_neural_s2.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Download exact original successful S1 SAM2 artifact with immutable ZIP SHA
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python - <<'PY'
+          import hashlib,os
+          from pathlib import Path
+          import requests
+          url="https://api.github.com/repos/Kiddos19882/AutoDraw/actions/artifacts/14348287404/zip"
+          response=requests.get(url,headers={
+              "Authorization":"Bearer "+os.environ["GH_TOKEN"],
+              "Accept":"application/vnd.github+json",
+              "User-Agent":"AutoDraw-ENGINE001-NEURAL-S2"},timeout=180,
+              allow_redirects=True)
+          response.raise_for_status()
+          data=response.content
+          digest=hashlib.sha256(data).hexdigest()
+          assert digest=="9cceb35e8a6f1ef70ba8a4e4157e9409bb1125c0f50b22c1883a46686b225bd0", "BLOCKED_S2_ARCHIVE_SHA"
+          path=Path(os.environ["RUNNER_TEMP"])/"original-s1-sam2.zip"
+          path.write_bytes(data)
+          print("PINNED REAL S1 SAM2 ZIP",len(data),digest)
+          PY
+      - name: Construct C1 and C2 from original pixels with no G32 candidate input
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_color32_neural_s2.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --palette AutoDraw_Stage20/data/palettes/browser_palette.json \
+            --s1-archive "$RUNNER_TEMP/original-s1-sam2.zip" \
+            --output "$RUNNER_TEMP/engine001-neural-s2-original-first"
+          python - <<'PY'
+          import os,json,hashlib
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-neural-s2-original-first"
+          report=json.loads((root/"report.json").read_text())
+          assert report["no_G32_in_candidate_construction"] is True
+          assert report["real_neural_mask_origin"]=="CI44127991472_REUSED_S1_MASKS_EXPLORATORY"
+          assert report["mask_count"]==2
+          assert report["source_only"] and not report["production_accepted"]
+          assert report["exact_CHALK"] is None and report["native_Egret"]=="NOT_RUN"
+          assert report["status"] in ("SOURCE_CANDIDATE_FAIL","SOURCE_CANDIDATE_VISUAL_PENDING")
+          for name,expected in report["output_file_sha256"].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==expected
+          print("INDEPENDENT SOURCE S2:",json.dumps(report["metrics"],ensure_ascii=False))
+          print("S2 CANDIDATE GATES:",report["source_candidate_gates"])
+          print("S2 EXPERIMENT REPORT SHA:",hashlib.sha256((root/"report.json").read_bytes()).hexdigest())
+          PY
+      - name: Preserve independent original-first RGB maps and negative evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-neural-s2-original-first-source-only
+          path: ${{ runner.temp }}/engine001-neural-s2-original-first
+          if-no-files-found: warn
+          retention-days: 30
