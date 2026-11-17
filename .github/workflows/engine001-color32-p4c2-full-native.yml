@@ -68,6 +68,40 @@ jobs:
           path.write_bytes(blob)
           print("Verified original P4c1 ZIP",len(blob),digest)
           PY
+      - name: Diagnose Windows G32 recomputation against frozen original (non-gating)
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python - <<'PY'
+          import hashlib,json,os,sys
+          from pathlib import Path
+          import numpy as np
+          sys.path.insert(0, "AutoDraw_Stage20/tests")
+          from run_engine001_color32_p4c2_full_native import load_frozen_archive
+          from run_engine001_palette32_region_study import read_source,read_palette,nearest32
+          from run_engine001_color32_s2_edge_protection import strong_edges,protected_merge
+          archive=Path(os.environ["RUNNER_TEMP"])/"engine001-p4c1-original.zip"
+          original,_=load_frozen_archive(archive)
+          source=Path("AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png")
+          palette=read_palette(Path("AutoDraw_Stage20/data/palettes/browser_palette.json"))
+          _,rgb=read_source(source)
+          b=nearest32(rgb,palette)
+          protected,_=strong_edges(rgb)
+          reconstructed,_=protected_merge(rgb,b,palette,protected)
+          ys,xs=np.nonzero(reconstructed!=original)
+          details={
+              "diagnostic_only":True,
+              "frozen_original_array_SHA256":hashlib.sha256(original.tobytes()).hexdigest(),
+              "windows_recomputed_array_SHA256":hashlib.sha256(reconstructed.tobytes()).hexdigest(),
+              "mismatched_logical_pixels":int(len(xs)),
+              "first_12_mismatches":[{"x":int(x),"y":int(y),
+                  "frozen":int(original[y,x]),"windows":int(reconstructed[y,x])}
+                  for y,x in zip(ys[:12],xs[:12])],
+              "native_uses_original_frozen_G_only":True,
+          }
+          print("P4C2 CROSS-OS G RECOMPUTATION:",json.dumps(details))
+          PY
       - name: Paint every frozen original G32 owner using actual archived BoardPane
         shell: bash
         env:
