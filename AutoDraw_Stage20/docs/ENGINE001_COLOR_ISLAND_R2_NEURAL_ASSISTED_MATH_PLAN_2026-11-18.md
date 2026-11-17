@@ -1,0 +1,74 @@
+# ENGINE-001 / COLOR-ISLAND-R2 — нейросеть как помощник математической сегментации и очистки областей
+
+**ID:** `ENGINE001_COLOR_ISLAND_R2_NEURAL_ASSISTED_MATH`. **Решение пользователя:** 2026-11-18 — переработать план с нейросетевой помощью математике при выделении областей, выборе цвета и устранении ложных мелких островков. **Статус:** `PLAN_REGISTERED / E0`. **Текущий scope:** документирование; новый код, обучение, загрузка модели и R2 inference **NOT_RUN**. **Базовый remote HEAD до регистрации:** `9d8da0b962765fce8a8f13a98084a686b7285094` на `feature/image-geometry-optimization`.
+
+## 1. Цель и доказанная причина смены R1
+
+AutoDraw должен превратить исходные цвета в осмысленные связные области, пригодные для дальнейшей заливки настоящей круглой игровой кистью, **не вводя неподдержанный оригиналом цвет** (например, розовый внутри исходной тёмной массы), не уничтожая маленькие настоящие детали и не повышая утечку за границы.
+
+- Исходник `AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png` SHA256 `07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a`, original resize 150×240 RGB. Истинные цвета берутся **только** из оригинальных RGB; сеть не перекрашивает их.
+- Замороженная игровая палитра `AutoDraw_Stage20/data/palettes/browser_palette.json` Git blob SHA `461b5f3725b9b79888ad36e807b3cf4c9e445e98`, фон index30 белый, frozen G32 индексная PNG SHA `b8dcd5f00d2c39c81997aaae084eaae19a776454e6fd6466209839288c1e5637`.
+- G32 baseline (нефоновые четырёхсвязные компоненты) `1284`, singletons `779`, area≤4 `1097`, mean ΔE00 `5.5314`, p95 `17.2715`. С фоном компонентов `1339`, сравнивать только идентичные scopes.
+- [R1 CI44201266143](https://github.com/Kiddos19882/AutoDraw/actions/runs/44201266143) SHA `0acf253983c977e0e762e2ef130375e90d9d2b68` E3 **TECHNICAL_PASS**, 8/8 unit PASS, artifact `14381387060` verified 17/17 hashes, но **SOURCE_GATE_FAIL**: original-first слишком крупная SLIC partition теряет детализацию лица/одежды, одной очисткой было объединено только 1 region /3px; `1017` пикселей не представлены game32, original-first background mismatch `3929` vs лимит720; R1_G32 full ΔE невалидна из-за abstentions. R1 и его prereg gates **не изменять**. R1-3 native остается BLOCKED по качеству.
+- Исторические S1 SAM2 (2 masks, game32 quality FAIL), S4 DINOv2 (настоящий learned effect D0→D1 593 pixels, обе версии color quality FAIL), S5-P1 OneFormer (2 semantic labels), S5-P2 BiRefNet (foreground alpha, не цветовая разметка) и S5-P3/P4 Recolorization-Pro (цветовой дрейф) являются controls и отрицательными/частичными evidence, а не основанием объявлять нейросетевое качество проверенным.
+
+**H0:** добавление подлинных neural features к неизменной математической исходно-цветовой задаче не улучшает одновременно идентификацию ложных островков, сохранение деталей, fidelity и пригодность областей относительно математического контроля. **H1:** нейросетевые *мягкие подсказки* в неоднозначных местах улучшают selective merge/keep решения при прежних safety gates, не ухудшая protected details/background.
+
+## 2. Разделение полномочий: нейросеть советует, математика решает
+
+| Компонент | Вход / выход | Допустимое влияние | Запрет |
+|---|---|---|---|
+| **Original RGB, edge/contour geometry** | SHA-bound original → LAB/градиент/граница, source connected regions, RGB medoid | Главный цвет, protected edges, adjacency, source plausibility | Нельзя генерировать/подменять RGB по предсказанию нейросети |
+| **Multi-scale mathematical partition** | Original RGB + frozen source edges → мелкие базовые суперпиксели/связные регионы и confidence | Сначала сохранить мелкие детали, потом избирательно объединять | Не считать удаление всех мелких компонент успехом |
+| **DINOv2 pretrained feature helper** | Оригинал → patch-embedding, region cosine similarity | **Только** предпочтение `merge` или `keep` для математически допустимых соседей, со score/confidence | Не напрямую назначать RGB/game32, не преодолевать strong source edge, не принимать cosine за идентичность цвета |
+| **BiRefNet soft foreground helper** | Оригинал → alpha/confidence | Дополнительный сигнал для сомнительного border background/foreground; ambiguous alpha → abstain | Не объявлять alpha127/128 истинным источником фоновой маски; белый глаз/блик ≠ фон |
+| **SAM2 / OneFormer** | Исторические mask/semantic proposals | Отдельная optional sensitivity-абляция лишь при проверенных hash/форме/покрытии | Не считать object label целой цветовой областью; не делать обязательным до доказательства детализации |
+| **Final deterministic scorer** | RGB representative, ΔE00, chroma/hue support, edges, neighbors, neural score | Решает merge/keep; при выборе RGB — оригинальный medoid; game32 — один pinned swatch либо явный unsupported | Нейросеть не может отменить исходную цветовую/геометрическую проверку или молча заполнить неподходящую область |
+
+**Приоритеты:** (1) сохранность оригинальных границ/деталей, (2) RGB plausibility, (3) наличие безопасного соседнего merge, (4) уменьшение ненужных островков/brush complexity. При конфликте — **KEEP / ABSTAIN / FAIL-CLOSED**, не «нейросеть лучше знает».
+
+## 3. Повторное использование, модели и ограничения фактического разрешения
+
+- `tests/run_engine001_color_island_r1.py` — frozen R1 original-first partition/cleanup/game32 diag и воспроизводимость. **Не менять R1 исходники/параметры**, создать отдельный R2 test-only runner, чтобы не подгонять отрицательный результат.
+- `tests/run_engine001_palette32_region_study.py`: `read_source`, `read_palette`, `quality`, `nearest32` (только B0/control).
+- `tests/run_engine001_color32_s2_edge_protection.py`: `strong_edges` и source-protected guards; `tests/run_engine001_color32_s2b_p4a_component_islands.py`: 4-connected adjacency, компонентная диагностика.
+- `tests/run_engine001_color32_neural_s4_dinov2.py`: `real_dino_features`, `region_embeddings`, существующий pinned official `facebook/dinov2-small` checkpoint revision `ed25f3a31f01632728cabb09d1542f84ab7b0056` / weights SHA256 `ae1e99fcefd534ed978cdeb8326f08030c96e28b7a81ffcbc98a857c84d14be1` [S4 CI44137289780](https://github.com/Kiddos19882/AutoDraw/actions/runs/44137289780) E3 pretrained inference PASS **only historical SHA**. Patch features of this model are spatially coarse (S4 used 16×16 features upsampled to 240×150), so they **cannot independently protect a 1–3px eye/line**.
+- `tests/run_engine001_color32_s5p2_birefnet.py`: pinned ONNX alpha helper, checkpoint SHA256 `5600024376f572a557870a5eb0afb1e5961636bef4e1e22132025467d0f03333` [S5-P2 CI44149349577](https://github.com/Kiddos19882/AutoDraw/actions/runs/44149349577). Во время R2 обновлённая версия модели/сторонняя загрузка без checksum => BLOCKED; вначале можно повторно использовать валидированный frozen alpha output **только** при подтверждённом source SHA и artifact hash. Не смешивать маску RGBA с классами цветов.
+- Точный frozen V44-B **410 contours LAST, 1792 vertices** только защищает значимые детали/границы при проверенной provenance и корректном отображении координат; будущая покраска выполняется отдельно. Не менять производственный `source/preparation/*`, Stage6, Bridge, Monitor, game palette, CHALK estimator или `master`.
+- **Нового обучения нет**: использовать только фактически доступные pretrained features с проверенными checkpoint/code/license/shape. Если лицензия новой модели или checkpoint не подтверждены — BLOCKED_MODEL / research-only, не production.
+
+## 4. Порядок выполнения и варианты (до первого R2 inference)
+
+**R2-0 / E1 / reuse and prereg:** подтвердить актуальный branch/20 commits/CI и SHA всех frozen inputs/masks, размерность neural embeddings и зависимость от `source/preparation`; определить точную шкалу source edge, сколько новых регионов даст multi-scale partition, и **до первого результата** зафиксировать параметры числом в отдельном `R2-P1` протоколе: размеры SLIC/сети, min region/width, contact count, RGB ΔE00 limits, neural cosine thresholds/weights, uncertainty/abstain, перечень detail ROIs и no-overwrite artifacts. Изменение порогов после pilot — **новый ID**, не R2-P1.
+
+**R2-1 / test-only mathematical control (M0):** исследовать *original-first* многоуровневое SLIC + strong edges с проверкой 4-связных компонент и тонких оригинальных деталей; representative RGB medoid каждого региона, protected micro-components не поглощаются. Старый R1 и frozen B0 служат обязательными baseline. Никаких neural tensors в M0. Сделать `M0_NO_MERGE`, `M0_SOURCE_MERGE` (идентичная геометрическая опора) и `M0_NO_DETAIL_PROTECTION` **только диагностическая опасная абляция, без acceptance**.
+
+**R2-2 / neural assistant (N1):** те же input/partition/background/thresholds/score as M0, но только **одна изменённая переменная** — подлинная DINOv2 per-region similarity влияет на *приоритет* потенциального объединения, которое уже прошло RGB, adjacency и protected edges. Записать all merge proposals и причины accept/reject, contributions на отдельных деталях и темном/розовом районе. Если DINO feature не меняет ни одного решения — `NEURAL_NO_EFFECT`, не считать успехом.
+
+**R2-2b / optional background assistant (N2):** N1 плюс ровно один BiRefNet **soft-alpha** border term; отдельно `N1_NO_BIREFNET` и `N2`. В uncertainty-band near-white/background — сохранять исходный RGB/неразрешенность, **не перекрашивать** в белый. При уменьшении fidelity или потере глаз/волос revert N1 or M0; N2 не принимается из-за того, что foreground fraction «выглядит правильно».
+
+**R2-2c / deferred SAM2 or OneFormer:** лишь если N1/N2 не защищают конкретные подтвержденные важные детали, а настоящие masks на оригинальном масштабе могут это исправить; новая ablation/version, отдельный checkpoint hash. Исторические 2 auto SAM2 masks и 2 семантических OneFormer labels **не обещают** улучшения.
+
+**R2-3 / color decision:** сначала отдельные `M0_RGB`/`N1_RGB`/`N2_RGB` однородные *исходно-цветовые* карты **без ограничения 32**, визуальный детальный gate. Затем отдельные `M0_G32`/`N1_G32`/`N2_G32`: original pixel distribution + neighbor context + color support, только настоящие 32 swatches; если нет кандидата, записать `UNREPRESENTABLE_BY_GAME32`/точную причину, **не заменять розовым, белым или серым как игровым цветом**. `R2_RGB` не принимать как игровую 32-цветную заливку. Доказать, что помощь модели изменила **какие** decisions, а не только число компонентов.
+
+**R2-4 / E2-E3 + visual review:** единый воспроизводимый workflow с bound checkout (по уроку R1 checkout 20min stall), фиксированными dependencies и artifact upload `if:always()`; 8+ synthetic contracts и adverse scenarios: чужой ярко-розовый в тёмном RGB, настоящий крошечный розовый, глаза/блики, узкие линии/диагонали, белый фон и замкнутые белые детали, strong original edge, межобъектное соседство, wrong-shape/misaligned neural features, модель недоступна/изменён SHA. Версии M0/N1/N2 на одинаковом input и одной разбивке. Приложить full-resolution+crop sheet original/B0/R1/M0/N1/N2, labels, source RGB, neural embeddings/alpha, mask provenance, per-merge ledger, RGBA overlays, JSON, hashes, total/foreground island tables. Статус `VISUAL_PENDING` до решения пользователя; исходный опыт на одном PNG — exploratory, не E5.
+
+**R2-5 / native Egret только после source+visual PASS:** отдельно prereg BoardPane настоящие ширины, направления и адаптивные круглые brush-paths с frozen V44-B410 LAST; per-owner alpha24≥99%, leakage≤3 logical px, ≤3000 strokes/5900 vertices и качество лица/волос/одежды. Offline metrics никогда не E4 game; exact `CHALK=post.pointCount-pre.pointCount` только после run-bound game Monitor evidence.
+
+## 5. Acceptance, сравнения и прозрачные негативные результаты
+
+**Сравнить R2 RGB М0/N1/N2 до game32:** исходный RGB source-gamut support, целостность всех original pixels, процент false-accent pixels/area, отдельные `connected_components_4` включая/исключая фон, 1/2/4/8/24px islands, длинные узкие meaningful structures, ΔE00 mean/p95 по всему исходному ROI, цвет фоновых border pixels и закрытых глазных/кожных белых деталей, edge preservation и manual face/hair/clothes/accessories/pose. `N1` и `N2` должны сравниваться с **тем же M0**, иначе нельзя приписывать улучшение нейросети. Все назначенные region RGB должны быть source-derived medoids. Не объявлять «значимость глаза» по низкому математическому ΔE без отдельного detail mask/crop review.
+
+**R2 game32 отдельно:** сохранить historical B0 / R1 snapshots, prereg для новых `R2_G32` полные source gates (не переписывая R1): nonwhite 4-connected components≤963, mean ΔE00≤6.5314, p95≤19.2715, mismatch с frozen B0 bg≤720 из36000, protected-edge pixels unchanged, нелегитимные accent pixels не выше baseline, ноль unknown/unassigned при заключении о finished game32. Ни сокращение островков, ни модельный confidence, ни нефоновая компонента-метрика исключая abstained пиксели **не** заменяют эти gates.
+
+**Нейросетевой вклад:** вести `proposed_merges`, `neural_changed_merges`, `accepted_neural_guided_merges`, loss/gain by detail ROIs, new false accent masks, background drift и extra ΔE vs M0. Если N1 хуже M0 хотя бы на обязательном quality gate, N1 отклонить; если N2 хуже N1, N2 отклонить. Старые R1/S4 negative artifacts/frozen thresholds остаются, даже если R2 лучше.
+
+**Пропуск/ошибка:** отсутствующий или невалидный checkpoint/архив, shape mismatch 240×150, несоответствие logical/CSS/PNG, порча source/frozen SHA, no-safe-game32 swatch, неизвестная модельная confidence и нарушение protected edge → конкретный `BLOCKED/FAIL/PARTIAL`, raw evidence сохранять и не объявлять production-ready.
+
+## 6. Зависимости, файлы и критерии завершения плана
+
+**Зависимости:** готовые source/mask/protocol/CI checkpoints S4 DINOv2, S5-P2 BiRefNet, source RGB, frozen G32, R1, V44-B authentic contour; установленная или CI-обеспеченная CPU PyTorch/transformers и ONNXruntime только для тех branches, которые реально используют соответствующий model. Предварительная проверка времени и ресурсов; не включать тяжелые модели во все CI подряд, не скачивать веса для M0.
+
+**Планируемые изменения только после разрешённой разработки:** (п) `AutoDraw_Stage20/tests/` новые R2 test-only runner/contract files; (п) `.github/workflows/` отдельный workflow; (п) `AutoDraw_Stage20/docs/` только точные статусы/evidence. **Не изменять** (п) `AutoDraw_Stage20/source/`, замороженные (ф) `tests/run_engine001_color_island_r1.py`, (ф) `data/palettes/browser_palette.json`, (ф) `testImages/wV6VeZI9S1Y.png`, исходные V44-B.
+
+**Definition of Done R2 experimental:** source-bound model weights/embeddings, completed required E2/E3 jobs, audited artifact hashes, ablation M0/N1/N2 with actual measured differential effect, visual user acceptance, then separately native brush evidence. Без этих уровней не заявлять, что «нейросеть улучшила заливку». **На момент записи:** E0 `PLAN_REGISTERED`, все новые R2 tests/CI/PNG `NOT_RUN`.
