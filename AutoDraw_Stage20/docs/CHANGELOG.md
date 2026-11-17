@@ -1,5 +1,7 @@
 # AutoDraw — значимые изменения
 
+**2026-11-17 — ENGINE-001 B2-FULL source-only implementation:** added opt-in deterministic source-only broad width10/6/4 plus micro width2 0.25px plan and regression+GitHub CI with strict BLOCKED_RESOURCE/no partial native, retaining frozen B0/B1 and user-selected410 colored contours requirement. E2 result not verified at writing; no full Egret B2 yet. [Protocol](ENGINE001_V43P4_B2_FULL_BOUNDARY_REPAIR_PROTOCOL_2026-11-17.md).
+
 **2026-11-17 — V43-P4/B2 full-image research preregistration:** registered separate deterministic broad-interior width10/6/4 and owner-residual width2 0.25px microstroke model, unmodified V44-B RGB410 LAST, strict resource and quality gates. No B2-FULL code or native quality claimed; [protocol](ENGINE001_V43P4_B2_FULL_BOUNDARY_REPAIR_PROTOCOL_2026-11-17.md).
 
 **2026-11-17 — ENGINE-001 B2 genuine Egret singleton E3:** [CI43987609480](https://github.com/Kiddos19882/AutoDraw/actions/runs/43987609480) successful 4 Python +20 Node and true BoardPane fractional strokes; 12/12 isolated singletons hit at alpha24/128 by both width2 and4, but actual alpha24 foreign pixel count width2=237 versus width4=955. All foreign/exterior beyond3 logicalpx zero in bounded probes. Archived original ZIP/11 hashes, no full B2 acceptance, E4/E5/CHALK NOT_RUN. [B2 protocol](ENGINE001_V43P4_B2_NATIVE_SINGLETON_PROBE_PROTOCOL_2026-11-17.md).
