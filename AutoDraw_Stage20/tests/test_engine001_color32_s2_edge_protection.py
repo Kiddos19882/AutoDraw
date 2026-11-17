@@ -8,7 +8,7 @@ import numpy as np
 
 from run_engine001_palette32_region_study import ROI_WH, read_palette
 from run_engine001_color32_s2_edge_protection import (
-    EXP, protected_merge, source_gate, run, strong_edges,
+    EXP, protected_merge, source_gate, run, strong_edges, s1_rgb_gradient_overlap,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -44,6 +44,13 @@ class EdgeProtectedS2Tests(unittest.TestCase):
         self.assertGreater(np.count_nonzero(a), 0)
         self.assertLess(np.count_nonzero(a), img.shape[0] * img.shape[1])
 
+    def test_legacy_rgb_gradient_diagnostic_distinct_from_s2_boundary_metric(self):
+        original = np.full((ROI_WH[1], ROI_WH[0], 3), 255, dtype=np.uint8)
+        original[:, :50] = 27
+        self.assertAlmostEqual(s1_rgb_gradient_overlap(original, original), 100.0)
+        flat = np.full_like(original, 255)
+        self.assertLess(s1_rgb_gradient_overlap(original, flat), 100.0)
+
     def test_gate_negative_and_positive_does_not_rewrite_thresholds(self):
         def item(edge, comps, de):
             return {"edge_overlap_percent": edge, "components": {"all_4_connected_components": comps},
@@ -65,6 +72,10 @@ class EdgeProtectedS2Tests(unittest.TestCase):
             self.assertEqual(report["native_Egret_fill"], "NOT_RUN")
             self.assertIsNone(report["exact_CHALK"])
             self.assertEqual(len(report["variants"]), 3)
+            self.assertIn("NOT equivalent", report["edge_metric_disclaimer"])
+            for v in report["variants"].values():
+                self.assertGreaterEqual(v["historical_S1_RGB_gradient_overlap_percent"], 0.0)
+                self.assertLessEqual(v["historical_S1_RGB_gradient_overlap_percent"], 100.0)
             self.assertTrue((out / "G_edge_protected32_indices.png").is_file())
             self.assertEqual(report["variants"]["B_frozen_direct32"]["changed_from_B_pixels"], 0)
             self.assertGreaterEqual(report["protected_pixels"], 1)
