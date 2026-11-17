@@ -38,6 +38,8 @@ class OneFormerSemanticContracts(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "LABEL_RANGE"):
             validate_labels(np.full((240, 150), 255, np.int32))
         with self.assertRaisesRegex(ValueError, "LABEL_RANGE"):
+            validate_labels(np.full((240, 150), 150, np.int32))
+        with self.assertRaisesRegex(ValueError, "LABEL_RANGE"):
             validate_labels(np.full((240, 150), -1, np.int32))
 
     def test_no_output_overwrite_before_network_or_inference(self):
