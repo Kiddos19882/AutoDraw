@@ -1,3 +1,7 @@
+## 2026-11-18 — experimental S5-P4 (research only)
+
+Added preregistered S5-P4 foreground-balanced source-RGB conditioning prototype, synthetic contracts and isolated GitHub Actions workflow. S5-P3 source/outputs frozen. No game32, production, Stage6, master or V44-B contour modifications. E3 inference not yet verified.
+
 **2026-11-17 — S5-P3 native RGB pretrained visual trial:** user temporarily removed game32 gate only for new visual experiments; historical S3/S4 controls untouched. Pinned Recolorization-Pro original RGB, six-color source conditioning, genuine neural CPU CI44151445030 PASS, artifact14359920550, 15890 RGB colors, user visual evaluation PENDING; no training, production or frozen contours changed.
 
 **2026-11-17 — S5-P1/S5-P2 real pretrained research:** OneFormer semantics pretrained E3 CI44148335302 PASS, only two numeric classes, not game32. BiRefNet Lite ONNX real pretrained E3 CI44149349577 PASS, mask-only foreground at alpha128=51.5%, verified ONNX checkpoint SHA; no 32-swatch trained palette model or production changes. Keep V44-B410 frozen.\n\n**2026-11-17 — S3 real source CI regression fix and S5 prereg:** S3 prior repeated CI failed on NumPy int64 report JSON; fix + 7 tests CI44145478173 E3 PASS, 4/4 source candidate quality FAIL (ΔE/background), original410 V44-B preserved. New S5 trained game32 head readiness preregistration added; training BLOCKED until independent trustworthy labels and heldout manifests verified, no production changes.
