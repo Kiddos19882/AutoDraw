@@ -1,0 +1,135 @@
+name: ENGINE-001 S4 real pretrained DINOv2 context to original game32 colors
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-color32-neural-s4-dinov2-context.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_color32_neural_s4_dinov2.py"
+      - "AutoDraw_Stage20/tests/test_engine001_color32_neural_s4_dinov2.py"
+      - "AutoDraw_Stage20/docs/ENGINE001_COLOR32_NEURAL_S4_DINOV2_CONTEXT_PALETTE_PROTOCOL_2026-11-17.md"
+      - "AutoDraw_Stage20/docs/README.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  authentic-dinov2-conditional-palette-32:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install pinned pretrained CPU inference and original source dependencies
+        shell: bash
+        run: |
+          python -m pip install torch==2.5.1 torchvision==0.20.1 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install "transformers==4.57.1" "huggingface-hub>=0.34,<1" "numpy>=1.26,<2.3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scikit-image>=0.25,<0.27" "scipy>=1.13,<2" requests
+      - name: Unit contracts and documentation audit before neural download
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_color32_neural_s4_dinov2.py AutoDraw_Stage20/tests/test_engine001_color32_neural_s4_dinov2.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color32_neural_s4_dinov2.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Get exact archived source SAM2 masks and original immutable native V44-B contours
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python - <<'PY'
+          import hashlib,os,requests
+          from pathlib import Path
+          archives={
+            14348287404:("original-s1-sam2.zip","9cceb35e8a6f1ef70ba8a4e4157e9409bb1125c0f50b22c1883a46686b225bd0"),
+            14201581692:("original-v44b-native.zip","43cb8e14a7e387b26772612ac06d1c7c6f176b8bd0c2d41e8945042fc80304a1")
+          }
+          for aid,(name,digest) in archives.items():
+              url=f"https://api.github.com/repos/Kiddos19882/AutoDraw/actions/artifacts/{aid}/zip"
+              try:
+                  r=requests.get(url,headers={"Authorization":"Bearer "+os.environ["GH_TOKEN"],
+                           "Accept":"application/vnd.github+json","User-Agent":"AutoDraw-S4"},timeout=180)
+                  r.raise_for_status()
+                  blob=r.content
+                  if hashlib.sha256(blob).hexdigest()!=digest:
+                      raise ValueError("BLOCKED_S4_FROZEN_SOURCE_ZIP_SHA")
+                  (Path(os.environ["RUNNER_TEMP"])/name).write_bytes(blob)
+                  print("Verified pinned archive",aid,name,digest)
+              except Exception:
+                  if aid != 14201581692:raise
+                  print("BLOCKED_CONTOUR_PROVENANCE: J0 and D1 color-only still permitted")
+          PY
+      - name: Download and verify authentic fixed DINOv2-small model weights
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+          HF_HUB_DISABLE_XET: "1"
+        run: |
+          python - <<'PY'
+          import hashlib,os
+          from pathlib import Path
+          from huggingface_hub import snapshot_download
+          revision="ed25f3a31f01632728cabb09d1542f84ab7b0056"
+          directory=snapshot_download(
+              repo_id="facebook/dinov2-small",revision=revision,
+              allow_patterns=["model.safetensors","config.json","preprocessor_config.json"])
+          path=Path(directory)/"model.safetensors"
+          digest=hashlib.sha256(path.read_bytes()).hexdigest()
+          expected="ae1e99fcefd534ed978cdeb8326f08030c96e28b7a81ffcbc98a857c84d14be1"
+          if digest!=expected:
+              raise ValueError("BLOCKED_S4_PRETRAINED_WEIGHT_SHA")
+          (Path(os.environ["RUNNER_TEMP"])/"dinov2-model-path.txt").write_text(directory)
+          print("VERIFIED REAL DINOv2 MODEL",revision,digest)
+          PY
+      - name: Compare real DINOv2-conditioned colors with graph-only original color control
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+          OMP_NUM_THREADS: "2"
+          MKL_NUM_THREADS: "2"
+        run: |
+          MODEL_DIR="$(cat "$RUNNER_TEMP/dinov2-model-path.txt")"
+          if test -f "$RUNNER_TEMP/original-v44b-native.zip"; then
+            python AutoDraw_Stage20/tests/run_engine001_color32_neural_s4_dinov2.py \
+              --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+              --palette AutoDraw_Stage20/data/palettes/browser_palette.json \
+              --s1-archive "$RUNNER_TEMP/original-s1-sam2.zip" \
+              --v44b-archive "$RUNNER_TEMP/original-v44b-native.zip" \
+              --model-dir "$MODEL_DIR" \
+              --output "$RUNNER_TEMP/engine001-neural-s4-original"
+          else
+            python AutoDraw_Stage20/tests/run_engine001_color32_neural_s4_dinov2.py \
+              --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+              --palette AutoDraw_Stage20/data/palettes/browser_palette.json \
+              --s1-archive "$RUNNER_TEMP/original-s1-sam2.zip" \
+              --model-dir "$MODEL_DIR" \
+              --output "$RUNNER_TEMP/engine001-neural-s4-original"
+          fi
+          python - <<'PY'
+          import json,os,hashlib
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-neural-s4-original"
+          r=json.loads((root/"report.json").read_text())
+          assert r["genuine_neural_encoder"]=="PRETRAINED_DINOV2_SMALL"
+          assert r["checkpoint"]["weights_sha256"]=="ae1e99fcefd534ed978cdeb8326f08030c96e28b7a81ffcbc98a857c84d14be1"
+          assert r["learned_32_color_palette_head"]=="NOT_TRAINED"
+          assert r["original_410_contours_unchanged"] and not r["production_accepted"]
+          assert r["native_Egret"]=="NOT_RUN" and r["exact_CHALK"] is None
+          for name,digest in r["output_file_sha256"].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==digest
+          print("DINO REAL NEURAL COLOR IMPACT PIXELS",r["D0_D1_neural_changed_pixels"])
+          print("S4 SOURCE METRICS",r["source_metrics"])
+          print("S4 GATES",r["source_gates"])
+          print("S4 REPORT SHA",hashlib.sha256((root/"report.json").read_bytes()).hexdigest())
+          PY
+      - name: Always preserve real neural features or failures (no quality promotion)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-neural-s4-real-dinov2-source-exploratory
+          path: ${{ runner.temp }}/engine001-neural-s4-original
+          if-no-files-found: warn
+          retention-days: 30
