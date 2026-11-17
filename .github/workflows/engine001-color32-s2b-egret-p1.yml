@@ -9,6 +9,8 @@ on:
       - "AutoDraw_Stage20/tests/test_engine001_color32_s2b_egret_p1.py"
       - "AutoDraw_Stage20/tests/run_engine001_color32_s2_edge_protection.py"
       - "AutoDraw_Stage20/tests/run_engine001_palette32_region_study.py"
+      - "AutoDraw_Stage20/tests/run_engine001_color32_s2b_rgb_edge.py"
+      - "AutoDraw_Stage20/tests/test_engine001_color32_s2b_rgb_edge.py"
   workflow_dispatch:
 
 permissions:
@@ -34,6 +36,8 @@ jobs:
         run: |
           python -m py_compile AutoDraw_Stage20/tests/run_engine001_color32_s2b_egret_p1.py AutoDraw_Stage20/tests/test_engine001_color32_s2b_egret_p1.py
           python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color32_s2b_egret_p1.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color32_s2b_rgb_edge.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
           node --check AutoDraw_Stage20/tests/game_renderer_reference.js
           node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
       - name: Render the same G-zone paths with widths 2 4 6 10 on real BoardPane
