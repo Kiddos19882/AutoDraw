@@ -10,7 +10,6 @@ on:
       - "AutoDraw_Stage20/tests/run_engine001_color32_s2b_egret_p1.py"
       - "AutoDraw_Stage20/tests/run_engine001_v43p4_b3_contour_source.py"
       - ".gitattributes"
-      - "AutoDraw_Stage20/docs/README.md"
   workflow_dispatch:
 
 permissions:
