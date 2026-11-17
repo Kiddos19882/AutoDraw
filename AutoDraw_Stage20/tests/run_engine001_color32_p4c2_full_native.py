@@ -193,7 +193,7 @@ def run(workspace: Path, source: Path, palette: Path, output: Path,
             FROZEN_PAINT_VERTICES + FROZEN_DETAIL_VERTICES,
         "windows_G_recomputation": "NOT_USED; original P4c1 archived pixels are authoritative",
         "safe_to_execute_game": False, "exact_CHALK": None,
-    }, indent=2) + "\\n", encoding="utf-8")
+    }, indent=2) + "\n", encoding="utf-8")
     folder = output / "P4c1-PAINT-ONLY"
     folder.mkdir()
     frames, metadata, manifest = native_batch(
