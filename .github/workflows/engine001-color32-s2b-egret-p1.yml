@@ -5,6 +5,7 @@ on:
     branches: [feature/image-geometry-optimization]
     paths:
       - ".github/workflows/engine001-color32-s2b-egret-p1.yml"
+      - ".gitattributes"
       - "AutoDraw_Stage20/tests/run_engine001_color32_s2b_egret_p1.py"
       - "AutoDraw_Stage20/tests/test_engine001_color32_s2b_egret_p1.py"
       - "AutoDraw_Stage20/tests/run_engine001_color32_s2_edge_protection.py"
@@ -37,6 +38,7 @@ jobs:
           python -m py_compile AutoDraw_Stage20/tests/run_engine001_color32_s2b_egret_p1.py AutoDraw_Stage20/tests/test_engine001_color32_s2b_egret_p1.py
           python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color32_s2b_egret_p1.py -v
           python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color32_s2b_rgb_edge.py -v
+          git check-attr text -- AutoDraw_Stage20/docs/PROJECT_STATUS_HISTORY_THROUGH_2026-11-08.md
           python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
           node --check AutoDraw_Stage20/tests/game_renderer_reference.js
           node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
