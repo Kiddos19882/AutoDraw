@@ -7,9 +7,11 @@ on:
       - ".github/workflows/engine001-color32-neural-s4-dinov2-context.yml"
       - "AutoDraw_Stage20/tests/run_engine001_color32_neural_s4_dinov2.py"
       - "AutoDraw_Stage20/tests/test_engine001_color32_neural_s4_dinov2.py"
-      - "AutoDraw_Stage20/docs/ENGINE001_COLOR32_NEURAL_S4_DINOV2_CONTEXT_PALETTE_PROTOCOL_2026-11-17.md"
-      - "AutoDraw_Stage20/docs/README.md"
   workflow_dispatch:
+
+concurrency:
+  group: autodraw-s4-dinov2-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -24,6 +26,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: pip
+          cache-dependency-path: .github/workflows/engine001-color32-neural-s4-dinov2-context.yml
       - name: Install pinned pretrained CPU inference and original source dependencies
         shell: bash
         run: |
