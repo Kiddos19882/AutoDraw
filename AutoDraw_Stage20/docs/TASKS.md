@@ -1,6 +1,11 @@
 # AutoDraw — действующие задачи
 
-## Приоритет ENGINE-001 — 2026-11-17, COLOR32-NEURAL-S2
+## Приоритет ENGINE-001 — 2026-11-17, COLOR32-NEURAL-S3
+
+- [ ] **S3 совместная цветовая карта J0/J1:** подтвердить тесты и истинный GitHub CI [source-only workflow](../../.github/workflows/engine001-color32-neural-s3-joint-contour-source.yml), оригинальные V44-B SHA/410/1792 native contours unchanged; получить J0/J1 карты и сравнить хрома-абляцию, ΔE00/фон/количество островков и лицо/волосы/одежду с B0/S2. [S3 protocol](ENGINE001_COLOR32_NEURAL_S3_JOINT_COLOR_CONTOUR_PROTOCOL_2026-11-17.md). Нельзя выдавать математический граф за нейросетевую цветовую модель. Если J1 архив/совпадение границ невалидны — contour BLOCKED, оставить V44-B неизменным. 
+- [ ] **S3 learned contextual color scorer:** выбрать реально доступную pretrained модель, verify checkpoint/license/source/git SHA and output features, preregister J2 separately; не переопределять цвета после получения S3 результатов. 
+
+## Исторический ENGINE-001 — 2026-11-17, COLOR32-NEURAL-S2
 
 - [ ] **Reproducible E2 run of original-first C1/C2:** [S2 prereg](ENGINE001_COLOR32_NEURAL_S2_ORIGINAL_FIRST_FLATTING_PROTOCOL_2026-11-17.md), [test-only runner](../tests/run_engine001_color32_neural_s2.py), [workflow](../../.github/workflows/engine001-color32-neural-s2-original-first.yml). Local source pilot -71.3% islands, but color ΔE grows 5.53→8.58 and source-white bg drift10.9% vs2% gate; **candidate rejected**. Next fetch new CI output, preserve negative raw images, inspect face and white background, register a new S3 only if changing thresholds/method; do NOT promote to Egret yet. Neural masks only two reused S1 genuine original RGB masks; all remaining pixels deterministic SLIC.
 
