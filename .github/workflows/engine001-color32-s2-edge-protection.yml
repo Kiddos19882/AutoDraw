@@ -1,0 +1,64 @@
+name: ENGINE-001 COLOR32-S2 edge protected game palette (source only)
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-color32-s2-edge-protection.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_color32_s2_edge_protection.py"
+      - "AutoDraw_Stage20/tests/test_engine001_color32_s2_edge_protection.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engine001-color32-s2-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  s2-source-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install source-only analysis dependencies
+        run: python -m pip install "numpy>=2,<3" "Pillow>=11,<13" "scikit-image>=0.25,<0.27" "scipy>=1.13,<2"
+      - name: Compile and regression tests
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_color32_s2_edge_protection.py AutoDraw_Stage20/tests/test_engine001_color32_s2_edge_protection.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color32_s2_edge_protection.py -v
+      - name: Preserve new independent B E G source report
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_color32_s2_edge_protection.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --palette AutoDraw_Stage20/data/palettes/browser_palette.json \
+            --output "${{ runner.temp }}/engine001-color32-s2"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-color32-s2"
+          r=json.loads((root/"report.json").read_text(encoding="utf-8"))
+          assert r["experiment"]=="ENGINE001_COLOR32_S2_EDGE_PROTECTION_SOURCE_ONLY"
+          assert r["actual_game_swatch_count"]==32
+          assert set(r["variants"])=={"B_frozen_direct32","E_frozen_regularized32","G_edge_protected32"}
+          assert r["native_Egret_fill"]=="NOT_RUN" and not r["production_accepted"]
+          assert r["exact_CHALK"] is None
+          for name,sha in r["report_linked_SHA256"].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==sha
+          print("SOURCE_GATE:",r["status"],r["source_gate"])
+          print("report sha256:",hashlib.sha256((root/"report.json").read_bytes()).hexdigest())
+          PY
+      - name: Upload even on quality gate negative result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-color32-s2-edge-protected-source-only
+          path: ${{ runner.temp }}/engine001-color32-s2
+          if-no-files-found: warn
+          retention-days: 30
