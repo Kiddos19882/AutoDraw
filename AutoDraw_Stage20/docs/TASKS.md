@@ -1,3 +1,13 @@
+## ENGINE-001 / COLOR-ISLAND-R1 — текущий первый приоритет (2026-11-18)
+
+**Цель:** убрать маленькие **ложные** цветовые островки и локально необоснованные оттенки (пример: яркий розовый на исходной тёмной области), не уничтожая настоящие мелкие детали. [Зарегистрированный план и проверки](ENGINE001_COLOR_ISLAND_R1_SOURCE_AWARE_REGION_PLAN_2026-11-18.md). Не начинать новую нейросетевую recolor-разработку как следующий шаг; S5-P3/P4 оставить историческими отрицательными результатами.
+
+- [x] R1 PLAN_REGISTERED до реализации: независимая source-RGB partition, контекстная проверка source-color plausibility, game32 variant/абляции, сохранение оригинальных границ и brush-readiness, native gate отдельно; no production changes.
+- [ ] **R1-0 следующий первый невыполненный шаг — E1 read-only audit:** на актуальном SHA изучить применимость `read_source`, `nearest32`, `strong_edges`, `protected_merge`, `component_aware_h`, SLIC/region-label API, frozen palette/G32 SHA и существующие тесты/потребители. Составить minimal diff/dependency план. Без новых runner/workflow до этого аудита.
+- [ ] **R1-1 E1/E2 (после разрешения на разработку):** отдельный source-only эксперимент R1_RGB/R1_G32 + абляции, deterministic tests: ложный розовый, истинный розовый, границы, узкие детали, белый фон, unrepresentable game32, не создавать новые swatches/глобальный pink ban.
+- [ ] **R1-2 E2/CI:** pinned inputs/control B0/C0, метрики island count + unsupported accents + RGB fidelity + background + protected edges, PNG и SHA-linked отчет. R1_G32 numeric source gates проверять все вместе, отрицательные результаты сохранять.
+- [ ] **R1-3 visual/native separation:** показать original/B0/R1_RGB/R1_G32 пользователю, лицо/волосы/одежда/оранжевый/белый фон/малые детали; только затем отдельный native Egret round brush+410 LAST experiment, E4/E5/exact CHALK отдельно.
+
 ## ENGINE-001 S5-P4 — verified outcome and next decision (2026-11-18)
 
 - [x] [S5-P4 CI44190035785](https://github.com/Kiddos19882/AutoDraw/actions/runs/44190035785) SHA `7fcd0288` job `134416660325`: E2 6/6 PASS, docs PASS, genuine BiRefNet+Recolorization-Pro E3 PASS; artifact `14375034749`, 7 internal output hashes independently verified. Frozen P3 unchanged.
