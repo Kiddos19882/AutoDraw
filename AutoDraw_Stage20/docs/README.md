@@ -1,5 +1,8 @@
 # Документация AutoDraw — быстрый вход
 
+**Актуальный ENGINE-001 / NEURAL-S3:** [совместный протокол областей, цветов и оригинального контура V44-B](ENGINE001_COLOR32_NEURAL_S3_JOINT_COLOR_CONTOUR_PROTOCOL_2026-11-17.md), [test-only source graph runner](../tests/run_engine001_color32_neural_s3_joint.py), [regression tests](../tests/test_engine001_color32_neural_s3_joint.py), [CI](../../.github/workflows/engine001-color32-neural-s3-joint-contour-source.yml). Варианты J0 без контурной подсказки и J1 с исходным нативным V44-B (строго архивный, 410 последних штрихов не изменять) проверяются как отдельный E2 source-only контурный prior; **обученный нейросетевой выбор цвета пока NOT_RUN**, используются лишь реальные SAM2 предложения областей + математический региональный граф. После E2/визуальной оценки решать дальнейший шаг, production и live CHALK не затрагивать.
+
+
 **Текущий ENGINE-001 / NEURAL-S2:** [протокол независимой сегментации оригинала](ENGINE001_COLOR32_NEURAL_S2_ORIGINAL_FIRST_FLATTING_PROTOCOL_2026-11-17.md), [исходный runner](../tests/run_engine001_color32_neural_s2.py), [тесты](../tests/test_engine001_color32_neural_s2.py), [CI](../../.github/workflows/engine001-color32-neural-s2-original-first.yml). В отличие от S1 новые C1/C2-кандидаты создаются только из RGB оригинала, без G32 как seed; S1 genuine SAM2 mask 2шт берутся из SHA-linked архива. SLIC — не нейросеть. В локальном source-only пилоте 1284→368 цветовых островков, но ΔE ухудшилась с5.53 до8.58 и фон drift 10.9%; поэтому **кандидат отклонён по prereg source quality**. Новый CI ещё не подтверждён, Egret E3/E4/E5 и CHALK NOT_RUN.
 
 
