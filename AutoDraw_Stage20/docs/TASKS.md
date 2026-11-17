@@ -1,3 +1,9 @@
+## ENGINE-001 S5-P4 — verified outcome and next decision (2026-11-18)
+
+- [x] [S5-P4 CI44190035785](https://github.com/Kiddos19882/AutoDraw/actions/runs/44190035785) SHA `7fcd0288` job `134416660325`: E2 6/6 PASS, docs PASS, genuine BiRefNet+Recolorization-Pro E3 PASS; artifact `14375034749`, 7 internal output hashes independently verified. Frozen P3 unchanged.
+- [x] Source-color fidelity diagnostic: P4 mean ΔE00 11.769 and p95 25.858 (both worse than frozen P3 8.115 / 18.955); output nearwhite zero; source/P4 visual shows strong olive shift of orange and background tint. **SOURCE_COLOR_FIDELITY_FAIL**, despite technical CI SUCCESS.
+- [ ] User visual evaluation P4 vs original; do not infer acceptance from CI or image metrics. Next preregistered ID should test pretrained color fidelity / original-preserving transformation rather than retuning frozen P4 after seeing output. No production promotion.
+
 ## ENGINE-001 S5-P4 — visual-first pretrained conditioning comparison (2026-11-18)
 
 - [x] Preregister new [S5-P4 foreground-balanced visual protocol](ENGINE001_S5_P4_FOREGROUND_BALANCED_SIX_RECOLOR_PROTOCOL_2026-11-18.md) and create isolated runner / synthetic contracts / CI using existing S5-P2 and S5-P3 APIs, original RGB and fixed checkpoint hashes; no modifications to frozen P3 or production.
