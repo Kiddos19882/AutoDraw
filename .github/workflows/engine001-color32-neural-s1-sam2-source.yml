@@ -101,7 +101,8 @@ jobs:
           curl -fLSs --retry 2 --max-time 300 \
             https://huggingface.co/facebook/sam2.1-hiera-tiny/resolve/main/sam2.1_hiera_tiny.pt \
             -o "$RUNNER_TEMP/sam2.1_hiera_tiny.pt"
-          echo "7402e0d864fa82708a20fbd15bc84245c2f26dff0eb43a4b5b93452deb34be69  $RUNNER_TEMP/sam2.1_hiera_tiny.pt" | sha256sum --check\n          sha256sum "$RUNNER_TEMP/sam2.1_hiera_tiny.pt"
+          echo "7402e0d864fa82708a20fbd15bc84245c2f26dff0eb43a4b5b93452deb34be69  $RUNNER_TEMP/sam2.1_hiera_tiny.pt" | sha256sum --check
+          sha256sum "$RUNNER_TEMP/sam2.1_hiera_tiny.pt"
       - name: REAL SAM2 tiny automatic mask inference (not simulated)
         shell: bash
         env:
