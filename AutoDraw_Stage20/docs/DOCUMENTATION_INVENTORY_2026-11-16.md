@@ -82,3 +82,20 @@ E1 PASS: GitHub tree (без усечения), файловые размеры,
 | Historical `*HISTORY*/*SNAPSHOT*` Markdown | 10 | 0 | **10** |
 
 **Оговорка:** объём байт в дереве не пересчитан; 4 132 427 B — только прежний snapshot. Указанные выводы о количестве относятся к проверенному HEAD `6629c9d2` до новых документов этого аудита (все последующие правки — существующих файлов). Показатели CI/Markdown validation не меняются на PASS от этого сравнения; нужна отдельно подтверждённая job `markdown-integrity` с конкретным SHA.
+
+
+## Delta-инвентаризация после P4/B0/B1 — 2026-11-17 (E1, GitHub Compare)
+
+Проверка [GitHub Compare](https://github.com/Kiddos19882/AutoDraw/compare/8273918226ff221dc94faf7a212e959a4c49fa49...feature/image-geometry-optimization) от исходного tree `8273918226ff221dc94faf7a212e959a4c49fa49` до `13e85c7bf63667d4d236eccc9754989b31358127` (до этой дописки): `ahead_by=86`, `behind_by=0`, **22 изменённых пути**, из них **13 added**, 9 modified и **0 removed/renamed**. Все новые файлы локализованы: **3 Markdown docs** (`DOCUMENTATION_INVENTORY_2026-11-16.md`, P4 protocol, B1 protocol), **4 Actions YAML** (P4 source/native, B1 source/native), **6 tests/tools Python** (P4/B1 planners, P4/B1 native runners, P4/B1 tests). Это точная дельта путей GitHub, **не самостоятельное рекурсивное перечисление** дерева HEAD. Дополнительных удалений или изменений архива `*HISTORY*/*SNAPSHOT*` по этому сравнению нет.
+
+| Категория | На исходном tree | Дельта | Вывод на `13e85c7b` |
+|---|---:|---:|---:|
+| (п) docs, Markdown `*.md` |127|+3|**130**|
+| (п) docs, все файлы |128|+3|**131** (130 MD +1 JSON)|
+| `ENGINE001_*PROTOCOL_*.md` |44|+2|**46**|
+| (п) корень `AutoDraw_Stage20/`, Markdown не в docs |16|0|**16**|
+| (п) `.github/workflows/`, YAML |58|+4|**62**|
+| Исторические docs Markdown HISTORY/SNAPSHOT |10|0|**10**|
+| Элементы Git tree |7485|+13|**7498** (delta-derived, не повторный рекурсивный tree API)|
+
+**CI доказательства отдельно от количеств:** [docs-integrity CI43985999558](https://github.com/Kiddos19882/AutoDraw/actions/runs/43985999558) SUCCESS на `e7bf5f79` после индексации B1, более ранний [CI43985691856](https://github.com/Kiddos19882/AutoDraw/actions/runs/43985691856) FAIL из-за нового неиндексированного B1 protocol — отрицательный исход сохранён. Для последующих документационных SHA проверять их собственный CI. Не считать Markdown PASS доказательством корректности native B0/B1 качества. Исторические абсолютные байты документов не пересчитывались.
