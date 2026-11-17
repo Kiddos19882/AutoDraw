@@ -1,5 +1,8 @@
 # Документация AutoDraw — быстрый вход
 
+**ENGINE-001 S5-P3 / визуальный эксперимент без ограничения game32:** [протокол реальной предобученной перекраски шестью исходными цветами Recolorization-Pro](ENGINE001_S5_P3_NATIVE6_PRETRAINED_RECOLOR_VISUAL_PROTOCOL_2026-11-17.md); только original RGB, результат сравнивается визуально, без дообучения, production и оригинального контура.
+
+
 **ENGINE-001 S5-P2:** [пререгистрация проверки реальной pretrained BiRefNet General Lite ONNX для foreground-only](ENGINE001_COLOR32_S5P2_PRETRAINED_BIREFNET_ONNX_FOREGROUND_PROTOCOL_2026-11-17.md). Без дообучения, без замены 32-цветной модели и без production-изменений.
 
 
