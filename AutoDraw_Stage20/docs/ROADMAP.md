@@ -4,6 +4,10 @@
 
 ## ENGINE-001 / актуальная последовательность 2026-11-17
 
+**Актуальное продолжение (COLOR32-NEURAL-S1):** P4c2 [CI44119887018](https://github.com/Kiddos19882/AutoDraw/actions/runs/44119887018) завершён нативным измерением paint-only (E3), но full image quality FAIL: 14/17 цветов ниже native99%, outside-ROI color28. После пользовательского визуального отказа от шумных островков зарегистрирован [NEURAL-S1](ENGINE001_COLOR32_NEURAL_S1_REGION_SEGMENTATION_PROTOCOL_2026-11-17.md) до кода: B0 frozen G32 vs N1 genuine SAM2.1 tiny masks vs N2 protected-edge variants, source-only metrics + визуальная пригодность. Далее **только после** source+visual E2: отдельный реальный Egret fill + exact410 V44-B LAST, E4/E5/live CHALK отдельно. Оригинальные P4c1/P4c2/G32 данные не менять. Старые пункты ниже — исторический план на тот момент.
+
+
+
 **2026-11-17 / ENGINE-001 P4c1 verified E2 and P4c2 E1:** [P4c1 CI44098998634](https://github.com/Kiddos19882/AutoDraw/actions/runs/44098998634) SHA `02303521af46bc0f5d60241592b861f73d03a253` complete SUCCESS (5 P4c1 and 3 P4c0 unit tests); artifact14334728680 original ZIP SHA256 `fac1fcf1ff6a43ac6e59da116b68b86e2238c2da13be0b167cf34f8241ac5eeb`, CRC and 5/5 linked hashes PASS, report SHA `1badb1913369cbad690c1cfbdf04778a4e6fde126042d633f8548fc77d606873`. Status `SOURCE_INCREMENTAL_PASS_NATIVE_PENDING`; 12/17 G32 owners source-model≥99%, five remaining 4/5/16/23/28, 327 combined residual pixels (301 belong to28), 1014 additions incl628 width2 micro, 1543 strokes/5277 synthetic vertices incl410 original V44-B details reserved LAST. **E2 source-only not native image quality.** [P4c2 independent prereg](ENGINE001_COLOR32_P4C2_FULL_NATIVE_17_OWNER_PROTOCOL_2026-11-17.md) plus test-only runner, unit tests and [Windows workflow](../../.github/workflows/engine001-color32-p4c2-full-native.yml) committed, E1 static; P4c2 CI/E3 UNKNOWN, and this first stage renders genuine all-owner **PAINT ONLY** (original 410 details NOT rendered), no E4/E5 or exact CHALK.
 
 
