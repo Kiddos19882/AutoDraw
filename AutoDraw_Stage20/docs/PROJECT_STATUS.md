@@ -1,5 +1,12 @@
 # AutoDraw — текущее состояние
 
+## ENGINE-001 / COLOR32-NEURAL-S1 first CI FAIL_PRE_INFERENCE — 2026-11-17
+
+Original [CI44125694634](https://github.com/Kiddos19882/AutoDraw/actions/runs/44125694634) at checkout `d67c142a7ac58f342839a98554fc059297c02620`: job `frozen-g32-source-and-adapter` ID134188762037 **FAIL** at Python compile of `tests/run_engine001_color32_neural_s1_sam2.py:35` — literal escaped `\\n` in source produced `SyntaxError: unexpected character after line continuation character`. Package install PASS, unit tests/docs audit/base G32 generation NOT_RUN, dependent `real-sam2-tiny-cpu-exploratory` job ID134189384474 SKIPPED, artifacts=0, actual SAM2 inference and N1/N2 comparison **NOT_RUN**. This is a code-generation/preflight defect, not negative SAM2 color segmentation evidence.
+
+Minimal source-only fix `9162756620b9c0c82bf7798b1891b8a6b92a635a`: converted the malformed escaped source fragment to actual Python newlines without changing frozen code/weight SHA, original G32, thresholds or experimental methodology. Inspected all 3 NEURAL-S1 Python files for remaining literal escaped newlines in executable code; only intentional JSON newline string escapes remain. New push CI status **NOT_VERIFIED**, no E2/visual/real Egret acceptance. Negative original run retained.
+
+
 ## 2026-11-17 — COLOR32-NEURAL-S1 CPU/manifest preflight strengthening
 
 Read-only inspected official pinned SAM2 `setup.py` at `2b90b9f5ceec907a1c18123530e92e794ad901a4`: default build attempts CUDA extension; CPU-only workflow now sets `SAM2_BUILD_CUDA=0`, preserving original code/checkpoint. Verified original Meta checkpoint SHA256 `7402e0d864fa82708a20fbd15bc84245c2f26dff0eb43a4b5b93452deb34be69` against official [facebook/sam2.1-hiera-tiny](https://huggingface.co/facebook/sam2.1-hiera-tiny/blob/main/sam2.1_hiera_tiny.pt). Mask consumer now rejects other official source SHAs/weights (same constants as exporter), altered archive SHA, wrong mask shape; synthetic regression added. No model inference outcome yet confirmed; this is E1 static implementation only; tests/CI E2 NOT_VERIFIED, visual N1/N2 and native Egret NOT_RUN. Previous original P4c2 FAIL unchanged.
