@@ -136,7 +136,7 @@ def source_metrics(rgb, idx, palette, protected, g):
     per_owner = {}
     for k in sorted(int(x) for x in np.unique(idx) if int(x) != BG):
         own = (idx == k).astype(np.uint8)
-        n, cc, stats, _ = cv2.connectedComponentsWithStats(own, 4)
+        n, cc, stats, _ = cv2.connectedComponentsWithStats(own, connectivity=4)
         sizes = stats[1:, cv2.CC_STAT_AREA]
         per_owner[str(k)] = {"components4": n - 1,
                              "singletons": int(np.count_nonzero(sizes == 1)),
