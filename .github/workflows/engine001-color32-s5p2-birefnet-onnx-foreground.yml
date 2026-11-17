@@ -1,0 +1,90 @@
+name: ENGINE-001 S5-P2 genuine pretrained BiRefNet Lite ONNX original foreground
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-color32-s5p2-birefnet-onnx-foreground.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_color32_s5p2_birefnet.py"
+      - "AutoDraw_Stage20/tests/test_engine001_color32_s5p2_birefnet.py"
+  workflow_dispatch:
+
+concurrency:
+  group: autodraw-s5p2-birefnet-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
+
+permissions:
+  contents: read
+
+jobs:
+  authentic-birefnet-onnx-foreground:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    env:
+      U2NET_HOME: ${{ runner.temp }}/s5p2-birefnet-model
+      OMP_NUM_THREADS: "2"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: .github/workflows/engine001-color32-s5p2-birefnet-onnx-foreground.yml
+      - name: Install pinned CPU ONNX runtime and source-only test dependencies
+        run: |
+          python -m pip install "rembg==2.0.87" "onnxruntime==1.23.2" "Pillow>=11,<13" "numpy>=2,<3" "scikit-image>=0.25,<0.27" "scipy>=1.13,<2"
+      - name: S5-P2 synthetic original foreground contracts and docs audit
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_color32_s5p2_birefnet.py AutoDraw_Stage20/tests/test_engine001_color32_s5p2_birefnet.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color32_s5p2_birefnet.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Real pretrained BiRefNet General Lite original RGB foreground-only inference
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_color32_s5p2_birefnet.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --output "${{ runner.temp }}/engine001-s5p2-birefnet"
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          root=Path("${{ runner.temp }}/engine001-s5p2-birefnet")
+          report=json.loads((root/"report.json").read_text())
+          assert report["actual_pretrained_onnx_inference"] is True
+          assert report["model_md5"] == "4fab47adc4ff364be1713e97b7e66334"
+          assert report["source_original_rgb_only"] is True
+          assert report["game32_color_conversion"] == "NOT_RUN"
+          assert report["V44_B_410_final_strokes_changed"] is False
+          assert not report["production_accepted"] and report["exact_CHALK"] is None
+          for name,sha in report["output_sha256"].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==sha
+          print("S5P2 SOURCE MASK FEASIBILITY",report["mask_metrics"]["feasibility_gate"])
+          print("S5P2 REPORT SHA",hashlib.sha256((root/"report.json").read_bytes()).hexdigest())
+          PY
+      - name: Fail closed and preserve negative evidence on model failure
+        if: failure()
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-s5p2-birefnet"
+          root.mkdir(parents=True,exist_ok=True)
+          if not (root/"report.json").is_file():
+              (root/"ci-failure.json").write_text(json.dumps({
+                  "status":"CI_FAIL_BIREFNET_INFERENCE_NOT_CONFIRMED",
+                  "real_onnx_inference":"NOT_CONFIRMED",
+                  "github_sha":os.getenv("GITHUB_SHA"),
+                  "github_run_id":os.getenv("GITHUB_RUN_ID"),
+                  "production_accepted":False},indent=2)+"\n")
+          PY
+      - name: Always preserve pretrained foreground or original failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-s5p2-birefnet-original-foreground-only
+          path: ${{ runner.temp }}/engine001-s5p2-birefnet/
+          if-no-files-found: warn
+          retention-days: 30
