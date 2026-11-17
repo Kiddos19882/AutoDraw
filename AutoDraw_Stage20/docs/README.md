@@ -1,5 +1,8 @@
 # Документация AutoDraw — быстрый вход
 
+**ENGINE-001 S5-P2:** [пререгистрация проверки реальной pretrained BiRefNet General Lite ONNX для foreground-only](ENGINE001_COLOR32_S5P2_PRETRAINED_BIREFNET_ONNX_FOREGROUND_PROTOCOL_2026-11-17.md). Без дообучения, без замены 32-цветной модели и без production-изменений.
+
+
 **ENGINE-001 S5-P1 pretrained-model experiment:** [исходный RGB → настоящая семантическая карта OneFormer, без фиктивной game32 покраски](ENGINE001_COLOR32_S5P1_PRETRAINED_ONEFORMER_ORIGINAL_SEMANTIC_PROTOCOL_2026-11-17.md). Pinned upstream checkpoint, self-contained source-only CI, original V44-B410 unchanged; model inference/visual quality remain NOT_VERIFIED pending CI.
 
 
