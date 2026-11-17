@@ -1,3 +1,7 @@
+## ENGINE-001 R1-1 update (2026-11-18)
+
+Test-only source RGB segment/cleanup/projector and 8 synthetic local contracts implemented; [R1 protocol §10](ENGINE001_COLOR_ISLAND_R1_SOURCE_AWARE_REGION_PLAN_2026-11-18.md). First local candidate source gate FAIL: coarse segmentation loses some details, 1017 game32 abstentions, background drift 3929; unsupported pink proxy improves but is insufficient. **Next:** verify exact GitHub Actions CI job and raw artifacts on current R1 SHA, preserve negative result; do not retune parameters under R1 or run native Egret before source+visual quality PASS. The R1-2 E3 status remains UNKNOWN pending job link.
+
 **ENGINE-001 R1 progress 2026-11-18:** Первый этап **R1-0 E1 completed**, подробный владельческий аудит и frozen G32 SHA/CRC/8 hashes PASS в [протоколе R1 §8](ENGINE001_COLOR_ISLAND_R1_SOURCE_AWARE_REGION_PLAN_2026-11-18.md). Следующий невыполненный этап **R1-1 source-only implementation** после отдельного разрешения: исходный RGB partition и локальная проверка цвета, без изменения production. Считать 4-компоненты в одном scope: G32 без index30=1284, включая фон=1339. R1-2 CI и R1-3 visual/native NOT_RUN.
 
 ## ENGINE-001 / COLOR-ISLAND-R1 — новая последовательность (2026-11-18)
