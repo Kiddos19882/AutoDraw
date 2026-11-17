@@ -2,6 +2,8 @@
 
 # AutoDraw — дорожная карта будущих работ
 
+**2026-11-17 / current next active study COLOR32-S2b:** [separate RGB-edge prereg](ENGINE001_COLOR32_S2B_RGB_EDGE_PROTOCOL_2026-11-17.md) supersedes S2 *as the next experiment only*, not its negative history; previous S2 index-boundary gate remains FAIL. New S2b code and CI have been committed; obtain actual S2b source report+checksums, classify primary RGB-edge gate, visually inspect important details over frozen V44-B410 true Egret contour, and only then independently preregister real round-brush B3c/Egret with3logical px, alpha24 coverage99% and resource caps. No native/game/E4/E5/CHALK acceptance based on source metrics.
+
 **После local COLOR32-S2 negative E1:** S2 index-boundary gate FAIL, но S1-compatible RGB-gradient signal для G частично восстанавливается; подробнее [TEST_RESULTS](TEST_RESULTS.md). Следующий независимый эксперимент должен заранее использовать историческую RGB-gradient метрику и дополнительные source facial/detail reviews; не править S2 thresholds задним числом, не переходить сразу к native fill/B3c. GitHub CI E2 в этом сеансе не подтверждён.
 
 **2026-11-17 / current independent preprocessing follow-up:** [COLOR32-S2](ENGINE001_COLOR32_S2_EDGE_PROTECTED_PROTOCOL_2026-11-17.md) fixes the next edge-preservation candidate **without modifying original PAL32 E**: B/E/G frozen comparison, protect original strongest Sobel edges before tiny region merge. E1 implementation and CI workflow committed, E2 results currently UNKNOWN; inspect genuine source gate, images and hashes before proposing native paint and then B3c resource-efficient round-brush routing. E3/E4/E5 NOT_RUN.
