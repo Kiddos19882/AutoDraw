@@ -127,7 +127,7 @@ def run(source,palette_path,s1_archive,outline_archive,model_dir,output):
     if output.exists():
         raise ValueError("BLOCKED_S4_NO_OVERWRITE")
     raw=palette_path.read_bytes()
-    blob=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\\0"+raw).hexdigest()
+    blob=hashlib.sha1(b"blob "+str(len(raw)).encode()+b"\0"+raw).hexdigest()
     if blob != PALETTE_BLOB:
         raise ValueError("BLOCKED_S4_PALETTE_DRIFT")
     _,rgb=read_source(source)
@@ -190,7 +190,7 @@ def run(source,palette_path,s1_archive,outline_archive,model_dir,output):
             "github_sha":os.getenv("GITHUB_SHA"),
             "github_run_id":os.getenv("GITHUB_RUN_ID"),
             "output_file_sha256":hashes}
-    (output/"report.json").write_text(json.dumps(report,indent=2,ensure_ascii=False,allow_nan=False)+"\\n")
+    (output/"report.json").write_text(json.dumps(report,indent=2,ensure_ascii=False,allow_nan=False)+"\n")
     return report
 
 
