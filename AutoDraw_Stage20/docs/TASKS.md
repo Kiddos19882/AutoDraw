@@ -1,6 +1,10 @@
 # AutoDraw — действующие задачи
 
-## Приоритет ENGINE-001 — 2026-11-17, COLOR32-NEURAL-S1
+## Приоритет ENGINE-001 — 2026-11-17, COLOR32-NEURAL-S2
+
+- [ ] **Reproducible E2 run of original-first C1/C2:** [S2 prereg](ENGINE001_COLOR32_NEURAL_S2_ORIGINAL_FIRST_FLATTING_PROTOCOL_2026-11-17.md), [test-only runner](../tests/run_engine001_color32_neural_s2.py), [workflow](../../.github/workflows/engine001-color32-neural-s2-original-first.yml). Local source pilot -71.3% islands, but color ΔE grows 5.53→8.58 and source-white bg drift10.9% vs2% gate; **candidate rejected**. Next fetch new CI output, preserve negative raw images, inspect face and white background, register a new S3 only if changing thresholds/method; do NOT promote to Egret yet. Neural masks only two reused S1 genuine original RGB masks; all remaining pixels deterministic SLIC.
+
+## Исторический ENGINE-001 — 2026-11-17, COLOR32-NEURAL-S1
 
 **Latest verified E2 CI44127991472:** true SAM2 Tiny inference with exact official weights/source PASS (2 masks; original run artifacts verified). B0 1284 source regions, N1 1237 (−3.66%), N2 1259 (−1.95%): BOTH NEURAL-S1 candidates FAIL preregistered ≥25% region reduction. **Do not retune/continue same experiment**. Next new-version protocol must target actual color regions/flatting and preserve accepted V44-B contour boundaries; do not treat object proposals as flat-color masks or run new Egret fill yet. Historical open NEURAL-S1 CI/model boxes below are superseded by this verified result.
 
