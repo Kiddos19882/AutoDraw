@@ -71,7 +71,7 @@ def _make_medial_candidates(mask, outside):
             continue
         result.append({
             "points":[a,b], "width":2,
-            "owned":fp & mask,"vertices":2,
+            "owned_index":np.asarray(owned_flat,dtype=np.int32),"vertices":2,
             "route_kind":"owner_medial",
         })
     return result
@@ -81,9 +81,7 @@ def _make_micro_candidates(mask, remaining):
     ys,xs=np.nonzero(remaining)
     result=[]
     for i,(y,x) in enumerate(zip(ys.tolist(),xs.tolist())):
-        owned=np.zeros(SHAPE,bool)
         ids=micro_candidate(mask,int(y),int(x))
-        owned.ravel()[list(ids)]=True
         if i%2==0:
             points=[(float(x)+.125,float(y)),
                     (float(x)+.375,float(y))]
@@ -91,7 +89,8 @@ def _make_micro_candidates(mask, remaining):
             points=[(float(x),float(y)+.125),
                     (float(x),float(y)+.375)]
         result.append({
-            "points":points,"width":2,"owned":owned,
+            "points":points,"width":2,
+            "owned_index":np.asarray(ids,dtype=np.int32),
             "vertices":2, "route_kind":"short_residual",
         })
     return result
@@ -122,12 +121,32 @@ def source_plan(indexes: np.ndarray,
     vertices=FROZEN_DETAIL_VERTICES
     first_rejected=None
 
+    def gain_for(option, remainder):
+        if "owned_index" in option:
+            return int(np.count_nonzero(remainder.ravel()[option["owned_index"]]))
+        return int(np.count_nonzero(option["owned"] & remainder))
+
+    def revisit_count(option, owner):
+        # Purely informational: never used for ranking or rejection.
+        if "owned_index" in option:
+            ix=option["owned_index"]
+            return int(np.count_nonzero(
+                masks[owner].ravel()[ix] & ~remaining[owner].ravel()[ix]))
+        return int(np.count_nonzero(
+            option["owned"] & masks[owner] & ~remaining[owner]))
+
+    def mark_covered(option, owner):
+        if "owned_index" in option:
+            remaining[owner].ravel()[option["owned_index"]]=False
+        else:
+            remaining[owner][option["owned"] & masks[owner]]=False
+
     def best_from_heap(heap, options, remainder):
         # Re-score only stale heap roots, not every image candidate per stroke.
         while heap:
             _, idx, prev_gain = heap[0]
             opt=options[idx]
-            gain=int(np.count_nonzero(opt["owned"] & remainder))
+            gain=gain_for(opt,remainder)
             if gain!=prev_gain:
                 heapq.heappop(heap)
                 if gain:
@@ -154,7 +173,7 @@ def source_plan(indexes: np.ndarray,
             options[owner]=choices
             heap=[]
             for idx,opt in enumerate(choices):
-                gain=int(np.count_nonzero(opt["owned"] & remaining[owner]))
+                gain=gain_for(opt,remaining[owner])
                 if gain:
                     heapq.heappush(heap,(-gain/opt["vertices"],idx,gain))
             heaps[owner]=heap
@@ -191,8 +210,7 @@ def source_plan(indexes: np.ndarray,
                 }
                 blocked="BLOCKED_RESOURCE"
                 break
-            own_revisited[owner]+=int(np.count_nonzero(
-                opt["owned"] & masks[owner] & ~remaining[owner]))
+            own_revisited[owner]+=revisit_count(opt,owner)
             pts=[{"x":float(x+ROI_X0),"y":float(y)}
                  for x,y in opt["points"]]
             routes.append({
@@ -201,7 +219,7 @@ def source_plan(indexes: np.ndarray,
                 "points":pts,"stage":stage,
                 "source_gain_new_pixels":gain,
             })
-            remaining[owner][opt["owned"] & masks[owner]]=False
+            mark_covered(opt,owner)
             counts[owner][stage]+=1
             vertices=attempted_vertices
         if blocked:
