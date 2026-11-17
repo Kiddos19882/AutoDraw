@@ -16,10 +16,9 @@ from pathlib import Path
 
 import numpy as np
 from run_engine001_palette32_region_study import SOURCE_SHA, read_source, sha
-from run_engine001_color32_neural_s1 import EXP
-
-FROZEN_SAM2_SOURCE_SHA = "2b90b9f5ceec907a1c18123530e92e794ad901a4"
-FROZEN_SAM2_TINY_CHECKPOINT_SHA = "7402e0d864fa82708a20fbd15bc84245c2f26dff0eb43a4b5b93452deb34be69"
+from run_engine001_color32_neural_s1 import (
+    EXP, FROZEN_SAM2_SOURCE_SHA, FROZEN_SAM2_TINY_CHECKPOINT_SHA,
+)
 
 
 def git_sha(directory: Path):
