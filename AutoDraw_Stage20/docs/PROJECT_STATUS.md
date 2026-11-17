@@ -1,5 +1,12 @@
 # AutoDraw — текущее состояние
 
+## ENGINE-001 / COLOR32-NEURAL-S1 CI44126371197: transitive import dependency blocked before model — 2026-11-17
+
+[CI44126371197](https://github.com/Kiddos19882/AutoDraw/actions/runs/44126371197) (checkout SHA `2b9cd63f607dd3a54b6fc5516602149015126ac9`), baseline job `frozen-g32-source-and-adapter` ID134191163148 **FAIL at unit-test import**. Python compile PASS; error `ModuleNotFoundError: No module named 'selenium'`. Exact static chain: `run_engine001_color32_neural_s1` → `run_engine001_color32_p4c0_all_owner_feasibility` → `run_engine001_color32_s2b_egret_p1` → `run_engine001_complex_holdout_v5` → Selenium. Original G32 baseline SKIPPED, dependent `real-sam2-tiny-cpu-exploratory` ID134191711468 SKIPPED, artifacts none. No real SAM2 inference, B0/N1/N2 masks or candidate metrics; **FAIL_PRE_INFERENCE**, not a negative segmentation result.
+
+Narrow CI dependency correction at SHA `52a4b600f7632119fc364d1d99cbab6c0b959d7e` adds `selenium>=4,<5` to both existing NEURAL-S1 Linux dependency installation steps. This changes neither frozen source, model/checkpoint/code SHAs, preregistered thresholds, mask generation, baseline definitions nor production; Selenium only fulfills inherited import, no browser is run in source-only phase. **Post-fix CI/E2 UNKNOWN** until new run job logs and actual SAM2 artifact are verified. Preserve original run failure.
+
+
 ## ENGINE-001 / COLOR32-NEURAL-S1 first CI FAIL_PRE_INFERENCE — 2026-11-17
 
 Original [CI44125694634](https://github.com/Kiddos19882/AutoDraw/actions/runs/44125694634) at checkout `d67c142a7ac58f342839a98554fc059297c02620`: job `frozen-g32-source-and-adapter` ID134188762037 **FAIL** at Python compile of `tests/run_engine001_color32_neural_s1_sam2.py:35` — literal escaped `\\n` in source produced `SyntaxError: unexpected character after line continuation character`. Package install PASS, unit tests/docs audit/base G32 generation NOT_RUN, dependent `real-sam2-tiny-cpu-exploratory` job ID134189384474 SKIPPED, artifacts=0, actual SAM2 inference and N1/N2 comparison **NOT_RUN**. This is a code-generation/preflight defect, not negative SAM2 color segmentation evidence.
