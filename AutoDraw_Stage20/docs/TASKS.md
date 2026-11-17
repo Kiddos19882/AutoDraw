@@ -13,6 +13,11 @@
 
 ## Приоритет ENGINE-001 — после завершённого COLOR32-NEURAL-S4
 
+- [x] Real pretrained BiRefNet Lite ONNX P2 [CI44149349577](https://github.com/Kiddos19882/AutoDraw/actions/runs/44149349577) SHA `00e9c9e1`: 5 unit contracts + original CPU checkpoint inference E3 PASS; actual model SHA `5600024376f572a557870a5eb0afb1e5961636bef4e1e22132025467d0f03333`; foreground at alpha128=51.497%, ambiguous alpha1844px, source-nearwhite overlap3750px heuristic. This is NOT a game32 trained color predictor or source-color acceptance.
+- [ ] Next: verify true 32-swatch-compatible pretrained palette-conditioned recolor model (Repalette has Apache-2.0 code + S3 checkpoint claims; Recolorization-Pro defaults to 6 swatches with no confirmed repo license). Validate checkpoint, license and exact model input interface **before** experimental source color candidate; retain B0/S3/S4 gates, V44-B410 immutable.
+
+
+
 - [x] S5-P1 genuine OneFormer semantic preflight [CI44147852418](https://github.com/Kiddos19882/AutoDraw/actions/runs/44147852418) SHA `d22740d2` E3 SUCCESS, pretrained model checkpoint SHA verified, only two semantic label IDs (0,22), not 32-swatch color mapping; no production change. Follow-up strict ADE20K label-bounds / upstream metadata fix at `7f3ccf49` CI PENDING.
 - [ ] Investigate original foreground/background only as separate pretrained BiRefNet P2 after immutable checkpoint and custom code security review; semantic OneFormer labels are too coarse to establish face/hair/clothes color owners. Then choose trained palette recoloring candidate with actual 32-swatch interface and verified weights; no retraining requested.
 
