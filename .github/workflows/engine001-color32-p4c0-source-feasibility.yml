@@ -7,7 +7,6 @@ on:
       - ".github/workflows/engine001-color32-p4c0-source-feasibility.yml"
       - "AutoDraw_Stage20/tests/run_engine001_color32_p4c0_all_owner_feasibility.py"
       - "AutoDraw_Stage20/tests/test_engine001_color32_p4c0_all_owner_feasibility.py"
-      - "AutoDraw_Stage20/docs/README.md"
       - ".gitattributes"
   workflow_dispatch:
 
