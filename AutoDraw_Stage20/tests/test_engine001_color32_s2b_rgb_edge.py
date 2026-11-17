@@ -6,6 +6,7 @@ import unittest
 from pathlib import Path
 
 import numpy as np
+from PIL import Image
 
 from run_engine001_palette32_region_study import read_palette
 from run_engine001_color32_s2_edge_protection import s1_rgb_gradient_overlap
@@ -68,6 +69,27 @@ class S2BTests(unittest.TestCase):
             self.assertEqual(len(report["variants"]), 3)
             self.assertEqual(report["settings"]["game_colors"], 32)
             self.assertIn(report["status"], ("SOURCE_GATE_PASS_VISUAL_PENDING", "SOURCE_GATE_FAIL"))
+            # Independent previous E1 source probe values: identity regressions,
+            # NOT fixed acceptance thresholds and NOT E2 evidence.
+            expected = {
+                "B_direct32": (2369, 86.16666666666667, 5.443752),
+                "E_regularized32": (1044, 84.41666666666667, 5.558705),
+                "G_edge_protected32": (1339, 85.33333333333333, 5.531418),
+            }
+            for name, (components, rgb_overlap, delta_e) in expected.items():
+                case = report["variants"][name]
+                self.assertEqual(case["components"]["all_4_connected_components"],
+                                 components, name)
+                self.assertAlmostEqual(case["rgb_gradient_overlap_percent"],
+                                       rgb_overlap, places=4, msg=name)
+                self.assertAlmostEqual(case["quality"]["mean_delta_e00"],
+                                       delta_e, places=3, msg=name)
+            idx_b = np.asarray(Image.open(out / "B_direct32_indices.png"))
+            idx_g = np.asarray(Image.open(out / "G_edge_protected32_indices.png"))
+            protected = np.asarray(Image.open(out / "protected_source_edges.png")) > 0
+            np.testing.assert_array_equal(idx_b[protected], idx_g[protected])
+            self.assertTrue(report["source_gate"]["passed"])
+            self.assertEqual(report["status"], "SOURCE_GATE_PASS_VISUAL_PENDING")
             for name, digest in report["file_sha256"].items():
                 self.assertEqual(hashlib.sha256((out / name).read_bytes()).hexdigest(), digest)
             with self.assertRaisesRegex(ValueError, "BLOCKED_OUTPUT_EXISTS"):
