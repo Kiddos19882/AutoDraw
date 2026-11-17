@@ -1,0 +1,106 @@
+name: ENGINE-001 P4b original V44-B native outline HYBRID source G H visual control
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-color32-s2b-p4b-v44b-hybrid.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_color32_s2b_p4b_v44b_hybrid.py"
+      - "AutoDraw_Stage20/tests/test_engine001_color32_s2b_p4b_v44b_hybrid.py"
+      - "AutoDraw_Stage20/docs/README.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: engine001-color32-p4b-hybrid-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  p4b-hybrid-original-egret-contours:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install imaging-only dependencies, no new native renderer
+        run: python -m pip install "numpy>=2,<3" "Pillow>=11,<13"
+      - name: Immutable contour plan, exact source and docs regressions
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_color32_s2b_p4b_v44b_hybrid.py AutoDraw_Stage20/tests/test_engine001_color32_s2b_p4b_v44b_hybrid.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color32_s2b_p4b_v44b_hybrid.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Download exact immutable user-selected original Egret E3 and P4a source ZIPs
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python - <<'PY'
+          import os,hashlib
+          from urllib.request import Request,urlopen
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])
+          source={
+            14297724490:("p4a-original.zip","d02ec009f2b0cba026a4d6ef23e25021bab6e77174f15b2ee8ab655bae3f552b"),
+            14201581692:("v44-original.zip","43cb8e14a7e387b26772612ac06d1c7c6f176b8bd0c2d41e8945042fc80304a1")
+          }
+          for artifact_id,(filename,expected) in source.items():
+              req=Request(
+                "https://api.github.com/repos/Kiddos19882/AutoDraw/actions/artifacts/"
+                +str(artifact_id)+"/zip",
+                headers={"Authorization":"Bearer "+os.environ["GH_TOKEN"],
+                         "Accept":"application/vnd.github+json",
+                         "User-Agent":"AutoDraw-ENGINE001-P4b"})
+              with urlopen(req,timeout=180) as response:
+                  blob=response.read()
+              digest=hashlib.sha256(blob).hexdigest()
+              assert digest==expected,(artifact_id,digest,expected)
+              (root/filename).write_bytes(blob)
+              print("Verified original archived ZIP:",artifact_id,digest,len(blob))
+          PY
+      - name: Compose ORIGINAL Egret V44-B410 native RGBA with source G H bitmap controls
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_color32_s2b_p4b_v44b_hybrid.py \
+            --p4a-archive "$RUNNER_TEMP/p4a-original.zip" \
+            --v44-archive "$RUNNER_TEMP/v44-original.zip" \
+            --output "$RUNNER_TEMP/engine001-color32-p4b-hybrid"
+          python - <<'PY'
+          import json,hashlib,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-color32-p4b-hybrid"
+          r=json.loads((root/"report.json").read_text(encoding="utf-8"))
+          assert r["experiment"]=="ENGINE001_COLOR32_S2B_P4B_V44B_HYBRID_VISUAL_ONLY"
+          assert r["status"]=="HYBRID_INTEGRITY_PASS_VISUAL_PENDING"
+          assert r["github_sha"]==os.environ["GITHUB_SHA"]
+          assert r["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert r["original_410_detail_identity"]["original_contours_LAST"]==410
+          assert r["original_410_detail_identity"]["detail_vertices_NOT_CHALK"]==1792
+          assert r["bitmap_background_is_source_only_NOT_native_brush"]
+          assert r["outline_alpha_is_original_boardpane_webgl_E3"]
+          assert r["color_compositing_Pillow_NOT_original_Egret"]
+          assert r["full_native_color_fill"]=="NOT_RUN"
+          assert r["exact_game_CHALK"] is None and not r["production_accepted"]
+          for path,digest in r["file_sha256"].items():
+              assert hashlib.sha256((root/path).read_bytes()).hexdigest()==digest
+          print("P4B HYBRID VISUAL STATUS:",r["status"])
+          print("P4B ORIGINAL NATIVE CONTOUR ALPHA24:",r["original_native_detail_alpha24_pixels"])
+          print("P4B LINKED SHA256 FILES:",len(r["file_sha256"]))
+          print("P4B REPORT SHA:",hashlib.sha256((root/"report.json").read_bytes()).hexdigest())
+          PY
+      - name: Preserve hybrid controls and contour-only original Egret capture
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-color32-p4b-original-v44b-native-contour-over-G-H-hybrid
+          path: ${{ runner.temp }}/engine001-color32-p4b-hybrid
+          retention-days: 30
+          if-no-files-found: warn
