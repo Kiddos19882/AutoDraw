@@ -8,7 +8,6 @@ on:
       - "AutoDraw_Stage20/tests/run_engine001_color32_p4c1_directional_micro.py"
       - "AutoDraw_Stage20/tests/test_engine001_color32_p4c1_directional_micro.py"
       - "AutoDraw_Stage20/tests/run_engine001_color32_p4c0_all_owner_feasibility.py"
-      - "AutoDraw_Stage20/docs/README.md"
       - ".gitattributes"
   workflow_dispatch:
 
