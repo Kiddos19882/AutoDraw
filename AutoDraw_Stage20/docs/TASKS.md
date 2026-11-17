@@ -1,12 +1,24 @@
+# AutoDraw — действующие задачи
+
+## Приоритет ENGINE-001 — 2026-11-17, P4c1
+
+- [ ] **P4c1 CI evidence gate:** Preregistration, source runner, unit tests and workflow committed through `02303521af46bc0f5d60241592b861f73d03a253`; **CI result NOT_VERIFIED**. Inspect exact run SHA, jobs, linked artifact hashes, per-owner source coverage, immutable P4c0 ring baseline and 3000/5900 budgets. Retain negative result if gate fails; do not treat source OpenCV as native Egret.
+- [ ] **P4c2 independent native E3 gate (after P4c1):** Use genuine round BoardPane/Egret brush on all 17 G32 nonwhite owners, alpha24 per owner≥99%, zero foreign farther than3 logical px alpha24/128, original 410 V44-B contours LAST and full recognizable image. Game E4/E5/run-bound CHALK separate.
+- [x] **P4c0 E2 source feasibility:** [CI44096977608](https://github.com/Kiddos19882/AutoDraw/actions/runs/44096977608), original 119 rings/1457 vertices, total529/3249 with V44-B, MODEL_LOW_OWNER_COVERAGE all17 classes, not resource-bound.
+- [x] **P4b hybrid source + original Egret contour comparison:** [CI44016120503](https://github.com/Kiddos19882/AutoDraw/actions/runs/44016120503) E2 PASS, not native fill.
+- [x] **P4a source island audit:** [CI44015038442](https://github.com/Kiddos19882/AutoDraw/actions/runs/44015038442) E2 PASS, negligible visual improvement.
+- [x] **P3b native isolated safety:** [CI44013208184](https://github.com/Kiddos19882/AutoDraw/actions/runs/44013208184) E3 incremental numeric PASS, full image quality not accepted.
+
+## Исторические записи ниже: старые «next», PENDING и незакрытые чекбоксы описывают момент их создания и НЕ являются действующим backlog
+
 **2026-11-17 Egret P1 follow-up:** [CI44006697216](https://github.com/Kiddos19882/AutoDraw/actions/runs/44006697216) second Windows job has P1/S2b Python PASS, native reference JS20/20 PASS, docs audit PASS, but **BLOCKED_PALETTE_OR_RENDERER_BLOB_DRIFT** before browser; no native PNG. Narrow raw-source checkout `.gitattributes` fix `592039ffd4e5` + explicit blob CI assertion `5e2247e6c945`. Next: inspect new Windows Egret P1 run for source hash guard PASS, actual Firefox WebGL captures, alpha24/128 and >3px leakage; E3 remains UNKNOWN until hashes validated. Game/E4/E5/CHALK NOT_RUN.
 
 **2026-11-17 / S2b verified & native P1 blocker:** [S2b CI44003045004](https://github.com/Kiddos19882/AutoDraw/actions/runs/44003045004) E2 source gates PASS/visual PENDING; report SHA `db975bff8b15f9ee54eded6e186cc7eb9279cb6b22df13f6db76351d4daaf25a`, artifact14293490848 ZIP CRC+8/8 PNG hashes PASS. [Egret P1 CI44005570889](https://github.com/Kiddos19882/AutoDraw/actions/runs/44005570889) E3 **BLOCKED_PRE_NATIVE**: 8/8 unit tests PASS but Windows docs audit history9 false-byte-drift errors; Egret renderer SKIPPED and no native PNG. Added targeted `.gitattributes` `-text` archive fix, new P1 trigger `b37a356b9d`; next: obtain rerun ID, inspect Windows docs audit and real per-width BoardPane RGBA/native leakage. Do not mark E3 tested until actual PNG evidence. E4/E5/CHALK NOT_RUN.
 
 **2026-11-17 / COLOR32-S2b reproducibility audit:** new identity regression [test](../tests/test_engine001_color32_s2b_rgb_edge.py) at `f6229777957d` asserts B/E/G components2369/1044/1339, historical RGB edge86.1667/84.4167/85.3333%, source ΔE00 and unmodified protected pixels from prior E1 baseline. GitHub CI job is NOT VERIFIED, not PASS. Next required: validate S2b workflow log and report manifest at exact SHA, then visually assess protected character details before Egret.
 
-# AutoDraw — действующие задачи
 
-## Текущий приоритет — 2026-11-16
+## Архивная отметка приоритета 2026-11-16
 
 - [x] **ENGINE-001 / P4c0 all 17 G32 owner ring feasibility (E2 COMPLETE; model low-coverage NEGATIVE):** [CI44096977608](https://github.com/Kiddos19882/AutoDraw/actions/runs/44096977608) SHA51daf38b job PASS / report `MODEL_LOW_OWNER_COVERAGE`, original artifact14333369069 ZIP CRC+4/4 linked SHA PASS, report SHA9bf7a13cfa317fabae753e485d4f611db4ba0689c57af20bc6f4fb9c6022ca07. Under V44-B410 LAST reserve,119 paint strokes/1457 vertices, total529/3249, no resource block; **all17** G32 owners below99 source model; 31=95.09%,29=79.64%,28=8.08%,15=0%. No true Egret/game/CHALK quality claim. Original test-only preflight failure CI44096764765 retained.
 - [ ] **ENGINE-001 / P4c1 directed residual on full original G32 (prereg/implementation next):** Reuse immutable P4c0 ring baseline, add locally sized short strokes, including horizontal/vertical/diagonal and arbitrary angles with original game32 owner masks. Address tiny disconnected islands with micro-segments; same-color overlap free. Source-only first, resource<=3000 strokes/5900 vertices incl410/1792 V44-B LAST, original source RGB protected/32 palette unchanged, strict3 logical px actual Egret later; 99% per owner MUST be native verified before production. Next prereg separate P4c1 then implement/test CI; avoid promising E3 from OpenCV proxies.
