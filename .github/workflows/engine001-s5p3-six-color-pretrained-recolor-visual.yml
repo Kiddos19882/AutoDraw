@@ -1,0 +1,109 @@
+name: ENGINE-001 S5-P3 pretrained six-source-color RGB visual comparison
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-s5p3-six-color-pretrained-recolor-visual.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_s5p3_pretrained_six_recolor.py"
+      - "AutoDraw_Stage20/tests/test_engine001_s5p3_pretrained_six_recolor.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: autodraw-s5p3-pretrained-six-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
+
+jobs:
+  genuine-six-color-rgb-visual:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: .github/workflows/engine001-s5p3-six-color-pretrained-recolor-visual.yml
+      - name: Install CPU PyTorch and source-only dependencies
+        run: |
+          python -m pip install --index-url https://download.pytorch.org/whl/cpu "torch==2.7.1" "torchvision==0.22.1"
+          python -m pip install "Pillow>=11,<13" "numpy>=2,<3" "scikit-image>=0.25,<0.27" "scipy>=1.13,<2" "gdown==5.2.0"
+      - name: Synthetic six-color source and output contracts
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_s5p3_pretrained_six_recolor.py AutoDraw_Stage20/tests/test_engine001_s5p3_pretrained_six_recolor.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_s5p3_pretrained_six_recolor.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Fetch exact public upstream model implementation (never latest main)
+        shell: bash
+        run: |
+          git clone --quiet --no-checkout https://github.com/itmesneha/Recolorization-Pro.git "${{ runner.temp }}/recolorization-upstream"
+          git -C "${{ runner.temp }}/recolorization-upstream" checkout --detach 4ef126095ad21394deabf72db807aeb3e728b553
+          test "$(git -C "${{ runner.temp }}/recolorization-upstream" rev-parse HEAD)" = "4ef126095ad21394deabf72db807aeb3e728b553"
+      - name: Download released pretrained checkpoint (no fabricated neural fallback)
+        shell: bash
+        run: |
+          mkdir -p "${{ runner.temp }}/s5p3-model"
+          python -m gdown "https://drive.google.com/uc?id=1dLir8CG_BdsSfxCKlHDgpOPShKpWooRr" -O "${{ runner.temp }}/s5p3-model/checkpoint_epoch_90.pt"
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          path=Path("${{ runner.temp }}/s5p3-model/checkpoint_epoch_90.pt")
+          if not path.is_file() or path.stat().st_size < 1_000_000:
+              raise RuntimeError("BLOCKED_PRETRAINED_WEIGHTS_INVALID_DOWNLOAD")
+          print("S5P3 downloaded checkpoint sha256:",hashlib.sha256(path.read_bytes()).hexdigest())
+          print("S5P3 pretrained checkpoint bytes:",path.stat().st_size)
+          PY
+      - name: Perform real pretrained six-source-color RGB recolor of original Egret
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_s5p3_pretrained_six_recolor.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --checkpoint "${{ runner.temp }}/s5p3-model/checkpoint_epoch_90.pt" \
+            --upstream "${{ runner.temp }}/recolorization-upstream/deployments/inference" \
+            --output "${{ runner.temp }}/engine001-s5p3-six-rgb"
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          root=Path("${{ runner.temp }}/engine001-s5p3-six-rgb")
+          report=json.loads((root/"report.json").read_text())
+          assert report["actual_pretrained_neural_inference"] is True
+          assert report["RGB_output_unrestricted"] is True
+          assert report["game32_gate"] == "NOT_APPLICABLE_VISUAL_PILOT"
+          assert len(report["conditioning_six_colors_rgb"]) == 6
+          assert report["measurements"]["changed_pixels"] > 0
+          assert report["V44_B_410_final_contours_changed"] is False
+          assert report["production_accepted"] is False
+          for name,sha in report["file_sha256"].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==sha
+          print("S5P3 report sha256",hashlib.sha256((root/"report.json").read_bytes()).hexdigest())
+          PY
+      - name: Preserve explicit negative evidence when official model is unavailable
+        if: failure()
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          output=Path(os.environ["RUNNER_TEMP"])/"engine001-s5p3-six-rgb"
+          output.mkdir(exist_ok=True,parents=True)
+          if not (output/"report.json").is_file():
+              (output/"ci-failure.json").write_text(json.dumps({
+                  "status":"BLOCKED_S5P3_REAL_PRETRAINED_RGB_RESULT_NOT_CONFIRMED",
+                  "actual_pretrained_inference":"NOT_CONFIRMED",
+                  "run":os.getenv("GITHUB_RUN_ID"),"sha":os.getenv("GITHUB_SHA"),
+                  "production_accepted":False},indent=2)+"\n")
+          PY
+      - name: Archive original and neural side-by-side or failure details
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-s5p3-pretrained-native-six-rgb-visual
+          path: ${{ runner.temp }}/engine001-s5p3-six-rgb/
+          if-no-files-found: warn
+          retention-days: 30
