@@ -127,7 +127,8 @@ jobs:
           python -m pytest -q -ra tests
   research-validation:
     name: On-demand FILL-001 and INT-006 research (full validation only)
-    if: github.event_name == 'workflow_dispatch' && inputs.run_full_validation == true
+    # One-shot evidence run: remove this push marker condition after research CI completes.
+    if: (github.event_name == 'workflow_dispatch' && inputs.run_full_validation == true) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[CI-RESEARCH-VERIFY]'))
     needs:
       - preparation-tests
       - egret-renderer-reference
