@@ -1,5 +1,11 @@
 # AutoDraw — действующие задачи
 
+## CI-AUDIT-001 — fast vs research validation
+
+- [x] Проверен исходный workflow, path-фильтры и зависимости, исследования FILL-001/INT-006 изолированы в reusable `geometry-research.yml`, полный ручной запуск доступен через `run_full_validation=true`.
+- [ ] Подтвердить на финальном HEAD обязательные fast jobs, отсутствие лишних research jobs на push, затем отдельно manual full (reusable download/upload, все source quality статусы); выполнить измерение затрат runner до/после на сравнимых изменениях. Без CI evidence статусы `NOT_VERIFIED`.
+
+
 ## Приоритет ENGINE-001 — после завершённого COLOR32-NEURAL-S4
 
 - [x] **S4 real DINOv2 source CI and neural contribution:** [S4 CI44137289780](https://github.com/Kiddos19882/AutoDraw/actions/runs/44137289780), source SHA `439e95c9b7dd226c4b1cbb1a554fb6f1b3475eb8`, job `134230185321` SUCCESS; official DINOv2-small revision `ed25f3a31f01632728cabb09d1542f84ab7b0056`, weights SHA256 `ae1e99fcefd534ed978cdeb8326f08030c96e28b7a81ffcbc98a857c84d14be1` verified in job log. Artifact `14352502866` (uploaded ZIP digest SHA256 `408f26b7d349bb5ee503bdf8f825c9f1dde9d639abd4bf4c96ee575beb3c860e`); report SHA256 `ac197d22a54ba0b586e708efa39ec384f7827a7f94fbfbec0cfd41fc8c9c1ef9` printed after report-file hash checks. Changed 593 pixels D0→D1, but `SOURCE_QUALITY_FAIL` on mean/p95 ΔE and white background. User visual review PENDING, source candidate rejected, native/game/CHALK NOT_RUN; original V44-B410 unchanged. Do not rerun or retune frozen S4 for acceptance.
