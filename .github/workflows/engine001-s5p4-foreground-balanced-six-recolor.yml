@@ -1,4 +1,5 @@
 name: ENGINE-001 S5-P4 foreground-balanced pretrained RGB six-color pilot
+# S5-P4 first validation trigger after protocol registration and documentation indexing.
 
 on:
   push:
