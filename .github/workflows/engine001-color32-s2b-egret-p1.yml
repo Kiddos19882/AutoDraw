@@ -1,0 +1,80 @@
+name: ENGINE-001 S2b G interior loops real Egret width sweep P1
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-color32-s2b-egret-p1.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_color32_s2b_egret_p1.py"
+      - "AutoDraw_Stage20/tests/test_engine001_color32_s2b_egret_p1.py"
+      - "AutoDraw_Stage20/tests/run_engine001_color32_s2_edge_protection.py"
+      - "AutoDraw_Stage20/tests/run_engine001_palette32_region_study.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engine001-s2b-egret-p1-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  true-egret-p1:
+    runs-on: windows-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install same native Egret Python dependencies as B3 isolated reference
+        run: python -m pip install "selenium>=4,<5" "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scipy>=1.13,<2" "scikit-image>=0.25,<0.27"
+      - name: Source safety and real BoardPane reference regression
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_color32_s2b_egret_p1.py AutoDraw_Stage20/tests/test_engine001_color32_s2b_egret_p1.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color32_s2b_egret_p1.py -v
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+      - name: Render the same G-zone paths with widths 2 4 6 10 on real BoardPane
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_color32_s2b_egret_p1.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --palette AutoDraw_Stage20/data/palettes/browser_palette.json \
+            --output "$RUNNER_TEMP/engine001-s2b-egret-p1"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-s2b-egret-p1"
+          data=json.loads((root/"report.json").read_text(encoding="utf-8"))
+          assert data["experiment"]=="ENGINE001_COLOR32_S2B_EGRET_P1_NATIVE_ISOLATED"
+          assert data["status"]=="REAL_EGRET_E3_ISOLATED_NOT_FULL_FILL"
+          assert data["github_sha"]==os.environ["GITHUB_SHA"]
+          assert data["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert data["widths"]==[2,4,6,10]
+          assert 1 <= len(data["selected_G_colors"]) <= 4
+          assert data["full_owner_coverage_gate"]=="NOT_RUN"
+          assert data["exact_game_CHALK"] is None
+          assert data["V44B_frozen_410_detail_unchanged"] is True
+          assert data["production_accepted"] is False
+          for path,digest in data["report_linked_SHA256"].items():
+              assert hashlib.sha256((root/path).read_bytes()).hexdigest()==digest
+          for width in ("2","4","6","10"):
+              folder=root/("native-width-"+width)
+              assert any(folder.glob("*-composite.png"))
+          print("Native Egret isolated source G probe:",data["selected_G_colors"])
+          print("all native paths within tolerance:",data["native_all_probes_beyond_3px_zero"])
+          print("report SHA256:",hashlib.sha256((root/"report.json").read_bytes()).hexdigest())
+          PY
+      - name: Archive genuine alpha PNG and rejected cases
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-s2b-egret-p1-native-widths-2-4-6-10
+          path: ${{ runner.temp }}/engine001-s2b-egret-p1
+          if-no-files-found: warn
+          retention-days: 30
