@@ -1,0 +1,113 @@
+name: ENGINE-001 S5-P4 foreground-balanced pretrained RGB six-color pilot
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-s5p4-foreground-balanced-six-recolor.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_s5p4_foreground_balanced_recolor.py"
+      - "AutoDraw_Stage20/tests/test_engine001_s5p4_foreground_balanced_recolor.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: autodraw-s5p4-six-rgb-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
+
+jobs:
+  original-foreground-pretrained-rgb:
+    runs-on: ubuntu-latest
+    timeout-minutes: 65
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: .github/workflows/engine001-s5p4-foreground-balanced-six-recolor.yml
+      - name: Install pinned CPU inference dependencies
+        shell: bash
+        run: |
+          python -m pip install --index-url https://download.pytorch.org/whl/cpu "torch==2.7.1" "torchvision==0.22.1"
+          python -m pip install "Pillow>=11,<13" "numpy>=2,<3" "scikit-image>=0.25,<0.27" "scipy>=1.13,<2" "gdown==5.2.0"
+          python -m pip install "rembg==2.0.67" "onnxruntime==1.22.1"
+      - name: E2 deterministic palette and immutable-source contracts
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_s5p4_foreground_balanced_recolor.py AutoDraw_Stage20/tests/test_engine001_s5p4_foreground_balanced_recolor.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_s5p4_foreground_balanced_recolor.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Fetch pinned Recolorization-Pro upstream
+        shell: bash
+        run: |
+          git clone --quiet --no-checkout https://github.com/itmesneha/Recolorization-Pro.git "${{ runner.temp }}/s5p4-upstream"
+          git -C "${{ runner.temp }}/s5p4-upstream" checkout --detach 4ef126095ad21394deabf72db807aeb3e728b553
+          test "$(git -C "${{ runner.temp }}/s5p4-upstream" rev-parse HEAD)" = "4ef126095ad21394deabf72db807aeb3e728b553"
+      - name: Fetch and verify original official Recolorization-Pro checkpoint
+        shell: bash
+        run: |
+          mkdir -p "${{ runner.temp }}/s5p4-weights"
+          python -m gdown "https://drive.google.com/uc?id=1dLir8CG_BdsSfxCKlHDgpOPShKpWooRr" -O "${{ runner.temp }}/s5p4-weights/checkpoint_epoch_90.pt"
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          p=Path("${{ runner.temp }}/s5p4-weights/checkpoint_epoch_90.pt")
+          expected="525144a0022ea43096079b8a27f1d4bbb7768dfdcae98444b5275de4ac536321"
+          assert p.stat().st_size == 118010004, "BLOCKED_S5P4_CHECKPOINT_SIZE_DRIFT"
+          assert hashlib.sha256(p.read_bytes()).hexdigest() == expected, "BLOCKED_S5P4_CHECKPOINT_SHA_DRIFT"
+          print("S5P4 exact pretrained recolor checkpoint verified",expected)
+          PY
+      - name: Genuine BiRefNet ONNX guidance and genuine pretrained RGB inference
+        shell: bash
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_s5p4_foreground_balanced_recolor.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --checkpoint "${{ runner.temp }}/s5p4-weights/checkpoint_epoch_90.pt" \
+            --upstream "${{ runner.temp }}/s5p4-upstream/deployments/inference" \
+            --output "${{ runner.temp }}/engine001-s5p4-six-rgb"
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          root=Path("${{ runner.temp }}/engine001-s5p4-six-rgb")
+          r=json.loads((root/"report.json").read_text())
+          assert r["mask_real_pretrained_onnx"] is True
+          assert r["actual_pretrained_neural_recolor"] is True
+          assert r["mask_checkpoint_sha256"] == "5600024376f572a557870a5eb0afb1e5961636bef4e1e22132025467d0f03333"
+          assert r["recolor_checkpoint_sha256"] == "525144a0022ea43096079b8a27f1d4bbb7768dfdcae98444b5275de4ac536321"
+          assert len(r["six_source_conditioning_rgb"]) == 6
+          assert r["metrics"]["changed_pixels"] > 0
+          assert r["historical_gates_modified"] is False
+          assert r["V44_B_410_last_contours_modified"] is False
+          assert r["production_accepted"] is False
+          for name,digest in r["file_sha256"].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest() == digest
+          print("S5P4 report sha256:",hashlib.sha256((root/"report.json").read_bytes()).hexdigest())
+          print("S5P4 metrics:",json.dumps(r["metrics"],sort_keys=True))
+          PY
+      - name: Preserve negative evidence on failure
+        if: failure()
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-s5p4-six-rgb"
+          root.mkdir(parents=True,exist_ok=True)
+          if not (root/"report.json").exists():
+              (root/"ci-failure.json").write_text(json.dumps({
+                  "status":"BLOCKED_S5P4_REAL_PRETRAINED_RESULT_NOT_CONFIRMED",
+                  "github_sha":os.getenv("GITHUB_SHA"),"github_run_id":os.getenv("GITHUB_RUN_ID"),
+                  "production_accepted":False},indent=2)+"\n")
+          PY
+      - name: Upload immutable original and raw neural RGB comparison or failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-s5p4-foreground-balanced-pretrained-rgb
+          path: ${{ runner.temp }}/engine001-s5p4-six-rgb/
+          if-no-files-found: warn
+          retention-days: 30
