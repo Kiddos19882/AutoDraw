@@ -1,5 +1,8 @@
 # Документация AutoDraw — быстрый вход
 
+**Новый следующий эксперимент S5 (2026-11-17):** [пререгистрация обучаемой game32 head](ENGINE001_COLOR32_NEURAL_S5_TRAINABLE_PALETTE_HEAD_PROTOCOL_2026-11-17.md); пока только проверка доступности достоверных label и независимых holdout, `BLOCKED_DATASET_LABEL_VALIDATION`. Реальное обучение не проводилось. S3 [CI44145478173](https://github.com/Kiddos19882/AutoDraw/actions/runs/44145478173) успешен технически (7/7 tests, authenticity), но все четыре source color кандидата **QUALITY FAIL**, V44-B410 immutable.
+
+
 **CI-AUDIT-001:** `geometry-tests.yml` запускает обязательные fast regression jobs на push; длительные FILL-001 и INT-006 перенесены в reusable `geometry-research.yml` и доступны через **Actions → AutoDraw validation → Run workflow → `run_full_validation=true`** (один ручной запуск включает также benchmark и Windows portable build). При обычном push остальные обязательные тесты и Egret reference остаются. [Зависимости и evidence](WORK_LOG.md); [открытые проверки](TASKS.md). Изменение CI не доказывает новую игровую validation.
 
 
