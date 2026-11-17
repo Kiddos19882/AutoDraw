@@ -2,6 +2,10 @@
 
 ## CI-AUDIT-001 — fast vs research validation
 
+- [x] Реальный one-shot push [CI44142622503](https://github.com/Kiddos19882/AutoDraw/actions/runs/44142622503), SHA `5b4c183c`: 5/5 fast PASS, reusable INT-006/FILL-001 PASS, Egret artifact download PASS, all 17 GitHub artifacts linked to same run. Step parity 13 FILL + 27 INT audited E1. Temporary push-marker subsequently removed at `2e30dd67`.
+- [ ] Единственный непройденный CI-путь: ручной `workflow_dispatch` с `run_full_validation=true`, включая optional Stage5/7/8 benchmarks и portable build. Запуск из подключённого GitHub инструмента не доступен; не считать проверенным. Отдельно измерить cost/reliability на matched SHA и проверить ZIP независимо при необходимости.
+
+
 - [x] Проверен исходный workflow, path-фильтры и зависимости, исследования FILL-001/INT-006 изолированы в reusable `geometry-research.yml`, полный ручной запуск доступен через `run_full_validation=true`.
 - [x] Fast CI `44141220966` SHA `60440ed9` SUCCESS: 5/5 required jobs, research SKIPPED; Markdown `44141411294` SHA `8bf71c0b` SUCCESS. Initial non-paired summed completed job time 764s→516s (−32.46%), not a cost guarantee.
 - [ ] Run one SHA-bound `workflow_dispatch` with `run_full_validation=true`; verify reusable FILL-001 and INT-006 artifact transfer, benchmarks and portable build and compare runtime on equivalent changes. Until then manual full validation `NOT_RUN`.
