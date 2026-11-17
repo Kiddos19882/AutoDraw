@@ -2,6 +2,13 @@
 
 # AutoDraw — дорожная карта будущих работ
 
+## ENGINE-001 / актуальная последовательность 2026-11-17
+
+1. Verify P4c1 source-only CI/results on exact SHA `02303521af46bc0f5d60241592b861f73d03a253` (prereg/source runner/tests/workflow committed; CI evidence still NOT_VERIFIED).
+2. Independently preregister P4c2 native full 17-G32-owner BoardPane/Egret painting, with real round brush alpha24/128, each original owner≥99%, zero foreign beyond3 logical px, original 410 V44-B details LAST, 3000/5900 caps and recognizable image.
+3. E4/E5 live validation and run-bound exact CHALK only after image acceptance. Earlier «next» steps below are historical checkpoints, not parallel current tasks.
+
+
 **2026-11-17 / P4b hybrid verified, actual 17-owner G32 Egret fill next:** [CI44016120503](https://github.com/Kiddos19882/AutoDraw/actions/runs/44016120503) source hybrid E2 PASS, reusing exact original V44-B410 native contour-only RGBA over source G/H source bitmap. G+native outlines improves source RGB MAE14.099→13.257 and restores recognizability; H scarcely differs and slightly worse, do NOT silently promote H. RGB source map G has17 nonwhite swatches and1284 nonwhite 4-connected components (924 8conn), so full alpha24≥99% each per owner with ≤3000 strokes/5900 vertices and original410 last contour paths requires a new independent all-owner source feasibility study and actual BoardPane native render. Source bitmap hybrid is not a native brush painting, E4/E5/exact CHALK untested.
 
 **2026-11-17 / after P4a E2:** original G32 source fixed from CI44003045004, P4a [CI44015038442](https://github.com/Kiddos19882/AutoDraw/actions/runs/44015038442) source-only E2 PASS numeric: 12 components,67px, component4conn1339→1323, mean source ΔE+0.00193; **visually G≈H, facial and hair lines not restored.** Do not increase P4a merge thresholds posthoc. Original V44-B user-preferred 410 colored contours LAST could restore source edges; separately preregister P4b controlled contour overlay with original source/CI SHA and real Egret stroke, keeping G/H source-raster nature explicit. Only after that consider new 32-color region model or full native adaptive round-brush plan; game E4/E5/CHALK require separate evidence.
