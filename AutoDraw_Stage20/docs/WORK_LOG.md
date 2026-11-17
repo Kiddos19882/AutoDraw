@@ -1,3 +1,7 @@
+## 2026-11-17 / ENGINE-001 COLOR32-S2 local diagnostic
+
+After S2 prereg and isolated B/E/G implementation, checked original COLOR32-S1 metric definitions. Found that S1 compares RGB Sobel gradient top-deciles whereas initial S2 evaluates original Sobel vs palette-index boundaries: **not equivalent**. Added separate legacy RGB-gradient diagnostic and seeded regression guard; original S2 threshold remains frozen. Verified user-provided source SHA and real 32 RGB values; local independent transcription B/E/G produced B/E/G 4-components2369/1044/1339, historical gradient86.1667/84.4167/85.3333%; S2 gate **FAIL** despite component/color subgates PASS because min edge recovery0.875pp > actual0.148093pp. Local report SHA256 `ea365366601ec24779c887db249e4bb89e953fdff74350e76d31e4e28e745028`. Source-only E1, GitHub CI E2 still UNKNOWN. No production/master/Stage6/Monitor/Bridge modifications or Egret/game run. Follow-up: verify CI report and protocol-aware experiment using actual S1 RGB edge metric under **new** registered ID before considering B3c.
+
 # AutoDraw — журнал выполненных действий
 
 ## PAL32-REGION-V1: actual GitHub E2 after local pilot, 2026-11-17
