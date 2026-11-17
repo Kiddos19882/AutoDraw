@@ -8,7 +8,6 @@ on:
       - "AutoDraw_Stage20/tests/run_engine001_color32_neural_s3_joint.py"
       - "AutoDraw_Stage20/tests/test_engine001_color32_neural_s3_joint.py"
       - "AutoDraw_Stage20/docs/ENGINE001_COLOR32_NEURAL_S3_JOINT_COLOR_CONTOUR_PROTOCOL_2026-11-17.md"
-      - "AutoDraw_Stage20/docs/README.md"
   workflow_dispatch:
 
 permissions:
