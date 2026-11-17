@@ -1,3 +1,7 @@
+## 2026-11-18 — S5-P4 run44190035785 artifact and negative quality result
+
+Checked source-bound completed job `134416660325`, actual step log, 6/6 synthetic tests, Markdown PASS and pretrained inference; downloaded artifact `14375034749`, inspected original/P4 PNG and verified report SHA256 `ad6b7962a0a302f32edf7f70704966ffa530522079aabb0abbbf85cf595a6025` plus all 7 file hashes. Relative-to-original P4 ΔE00 11.769/25.858 mean/p95 is worse than P3 8.115/18.955; white source proxy 19416→0 and orange→olive persists. E3 TECHNICAL_PASS, color fidelity FAIL, user visual acceptance PENDING. Preserve historic P3 and P4 output. Next investigate distinct pretrained original-preserving pathway with new experiment ID; Stage6, V44-B410 LAST, game32, master and production untouched.
+
 ## 2026-11-18 — ENGINE-001 S5-P4 isolated color-conditioning trial
 
 Read current HEAD 005fe60e, last20 commits, README/PROJECT_STATUS/TASKS/ROADMAP/AI_WORK_GUIDE; inspected source S5-P2/P3 runners, tests and workflows. Preregistered [S5-P4 foreground-balanced visual protocol](ENGINE001_S5_P4_FOREGROUND_BALANCED_SIX_RECOLOR_PROTOCOL_2026-11-18.md); added separate source-only experiment, tests, GitHub Actions workflow. Reused existing original loader, real ONNX mask/integrity code and real pretrained six-color inference. Pinned checkpoint and alpha handling; corrected workflow dependencies and step-scope U2NET_HOME. **E1 only until actual checks run.** No baseline/P3, production, master or V44-B410 changes; new E2/E3 NOT_VERIFIED.
