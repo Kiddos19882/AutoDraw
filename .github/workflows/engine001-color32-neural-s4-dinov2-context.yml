@@ -155,7 +155,7 @@ jobs:
                   "exact_CHALK":None,
                   "production_accepted":False,
                   "note":"Inspect failed job step/logs for root cause. No quality PASS implied."
-              },ensure_ascii=False,indent=2)+"\\n",encoding="utf-8")
+              },ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
               print("FAIL-CLOSED S4 archive diagnostic",hashlib.sha256(diagnostic.read_bytes()).hexdigest())
           PY
       - name: Always preserve real neural features or failures (no quality promotion)
