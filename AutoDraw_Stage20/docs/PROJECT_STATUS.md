@@ -1,5 +1,9 @@
 # AutoDraw — текущее состояние
 
+## ENGINE-001 / COLOR32-S2 edge-protected region merging — 2026-11-17
+
+**Status E1 IMPLEMENTED / E2 UNKNOWN (pending verified workflow output), NOT a game-quality result.** [Preregistration](ENGINE001_COLOR32_S2_EDGE_PROTECTED_PROTOCOL_2026-11-17.md) committed at `f5ed07365e` before implementation; [isolated runner](../tests/run_engine001_color32_s2_edge_protection.py) `940b58f510`, regression fixture `6b8116c14f` (revised `7175e3c589`), opt-in/push CI [workflow](../../.github/workflows/engine001-color32-s2-edge-protection.yml) `166f1619d8`. Frozen B-direct32 and E-tiny-owner control are recomputed unchanged from existing source methods; G rejects entire tiny-region merge if any original component pixel lies on top-decile Sobel source edge. S2 evaluates single independent change in merge decision and archives negative gate results. **This is not runtime brush geometry**; original input SHA and real-game palette32 are verified by code fail-closed at execution, but new CI artifact/log/result not yet retrieved; no assertion of actual E2 completion. Preregistered G gates: recover >=half B→E edge loss (min0.875pp), retain >=25% fewer all-color 4-components than B, mean ΔE00<=E+0.1. This analysis does not change the chosen V44-B 410 contours, earlier frozen results, Stage6, production, or game color coordinates. Full native Egret E3, E4/E5 and run-bound exact CHALK **NOT_RUN**. Next step: verify S2 GitHub Actions log, output images and immutable hashes, decide whether G merits native contour/paint pilot and then budget-safe B3c.
+
 ## Актуальная работа на 2026-11-16 — ENGINE-001 / V43-P4
 
 ## PAL32-REGION-V1: actual GitHub E2 after local pilot, 2026-11-17
