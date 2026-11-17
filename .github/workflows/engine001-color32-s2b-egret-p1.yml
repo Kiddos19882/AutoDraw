@@ -38,7 +38,22 @@ jobs:
           python -m py_compile AutoDraw_Stage20/tests/run_engine001_color32_s2b_egret_p1.py AutoDraw_Stage20/tests/test_engine001_color32_s2b_egret_p1.py
           python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color32_s2b_egret_p1.py -v
           python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color32_s2b_rgb_edge.py -v
-          git check-attr text -- AutoDraw_Stage20/docs/PROJECT_STATUS_HISTORY_THROUGH_2026-11-08.md
+          git check-attr text -- AutoDraw_Stage20/docs/PROJECT_STATUS_HISTORY_THROUGH_2026-11-08.md AutoDraw_Stage20/tests/game_renderer_reference.js AutoDraw_Stage20/data/palettes/browser_palette.json
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          def blob(path):
+              data=Path(path).read_bytes()
+              return hashlib.sha1(b"blob "+str(len(data)).encode()+b"\\0"+data).hexdigest()
+          expected={
+              "AutoDraw_Stage20/tests/game_renderer_reference.js":"74ad4d8ad162bb04bf8f1ff94860ef673c02512b",
+              "AutoDraw_Stage20/data/palettes/browser_palette.json":"461b5f3725b9b79888ad36e807b3cf4c9e445e98",
+          }
+          for path,sha in expected.items():
+              actual=blob(path)
+              assert actual==sha,(path,actual,sha)
+              print("P1 pinned raw Git blob PASS:",path,sha)
+          PY
           python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
           node --check AutoDraw_Stage20/tests/game_renderer_reference.js
           node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
