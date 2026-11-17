@@ -1,5 +1,7 @@
 # AutoDraw — значимые изменения
 
+**2026-11-17 — B3a frozen negative source result:** CI43992170465 E2 workflow SUCCESS / 4 tests PASS, but generated1339 paint /5899 projected vertices and blocked next +2 vertices >5900. Model coverage4/5/6/7=63.28/63.28/63.36/91.86%; 1144 residual micros, 0 usable owner-medial routes. The next method needs actual source-mask skeleton/continuous polylines; same-color overpaint remains free. No full B3a Egret. [Detailed evidence](TEST_RESULTS.md).
+
 **2026-11-17 — B3 actual isolated Egret contour rings:** [CI43991432235](https://github.com/Kiddos19882/AutoDraw/actions/runs/43991432235) E3 capture PASS, 14 source-selected contour paths /283 synthetic vertices NOT CHALK, no foreign/exterior>3px; coverage only isolated tiny sample, not full fill. Source B3 MODEL_LOW_COVERAGE, full B3 NOT_RUN. [Evidence](TEST_RESULTS.md).
 
 **2026-11-17 — B3 contour-parallel first source E2:** 195 new ring paths, same-color overlap penalty zero, source CI43991126674 PASS 4 tests/605 total strokes/3611 synthetic vertices, but source quality **MODEL_LOW_COVERAGE** (17.98/44.45/23.34/91.86%). Isolated Egret path probe workflow added; full B3 not accepted. [Protocol](ENGINE001_V43P4_B3_CONTOUR_PARALLEL_PROTOCOL_2026-11-17.md), [evidence](TEST_RESULTS.md).
