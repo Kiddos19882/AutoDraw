@@ -2,3 +2,7 @@
 # HISTORY_SNAPSHOT_PROVENANCE.json verifies the exact archived Git blob bytes.
 # Do not apply text conversion (LF -> CRLF) to immutable snapshots.
 AutoDraw_Stage20/docs/*_HISTORY_THROUGH_2026-11-08.md -text
+# Keep exact Git blob bytes for the archived BoardPane and 32-game-color palette.
+# Egret P1 fail-closed binding compares bytes, not normalized text.
+AutoDraw_Stage20/tests/game_renderer_reference.js -text
+AutoDraw_Stage20/data/palettes/browser_palette.json -text
