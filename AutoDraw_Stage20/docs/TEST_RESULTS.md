@@ -1,3 +1,23 @@
+## ENGINE-001 / V43-P4.0–P4.3 — first full B0 native negative, 2026-11-17 (E2/E3)
+
+**Confirmed live Actions API:** [source P4.1 CI43983625827](https://github.com/Kiddos19882/AutoDraw/actions/runs/43983625827) `d047afe1be4a6629a64d7026c0efe418c1462af3` SUCCESS, 4/4 Python regressions PASS, source-only 955 strokes and source-model recall4/5/6/7=99.8474/99.7277/99.0167/99.6906% **NOT NATIVE**; artifact14283648394. [full native CI43983619222](https://github.com/Kiddos19882/AutoDraw/actions/runs/43983619222) `00db132c518bc006e9c5785a6f9b17ac0013fd71` SUCCESS, all mandatory steps PASS, Python4/4, Node20/20; **genuine Windows Egret composite+isolated class4–7/contour** artifact14285005715, `expired=false`. Original ZIP SHA256 `9ad1a6ccfb942f5bd4f7fe38f29c01ce44ecdfd99ffd457dc5021f401b341c06`; report `report.json` SHA256 `5e1b62ae38ca15fc55efac7edb1d2d8ce393c237e4d96f8221427c5c7a90dd3a`; 17/17 report-linked data SHA256, ZIP integrity PASS. Frozen A `frozen_native_A_V44B_pixel_exact=true`, 410 V44-B colored contours exact-last, original B0 paint retained0.
+
+| Metric | Frozen V44-B A | First full B0 | Result |
+|---|---:|---:|---|
+| Paint/total strokes |1945/2355|955/1365| Resource count lower, **not game CHALK** |
+| Synthetic vertices |5682|3702| Within frozen5900 cap |
+| Source RGB MAE |11.13399074|19.92983333| **FAIL nonregression** |
+| Warm RGB MAE |16.42272007|33.70411858| **FAIL nonregression** |
+| Native class4 recall alpha24 / alpha128 |71.078% /68.048%|83.102% /81.570%| **FAIL >=99%** |
+| Native class5 recall alpha24 / alpha128 |77.810% /75.753%|87.597% /85.840%| **FAIL >=99%** |
+| Native class6 recall alpha24 / alpha128 |57.712% /55.537%|80.462% /78.742%| **FAIL >=99%** |
+| Native class7 recall alpha24 / alpha128 |94.726% /93.969%|94.752% /94.319%| **FAIL >=99%** |
+| Native foreign/exterior distance >3logicalpx |0 /0|0 /0| spatial max bound PASS, **not color quality PASS** |
+
+At alpha24 native owner-color foreign pixels A→B0: c4 **11969→29607**, c5 **13630→36944**, c6 **7721→30428**, c7 **5159→11010** (all inside 3logicalpx relative to own owner mask). This high boundary bleed is a **qualitative visual/MAE regression despite no >3px-distance violation**. Image `comparison-full.png` and `comparison-faces.png` in frozen archive show noisy girl's hair/face, hands, clothing and contour intersections. **NATIVE_RENDER_PASS / B0_QUALITY_FAIL**. Source proxy claimed >99% but did not predict true alpha/visual. Preserve this negative and all RAW PNGs; do not re-run modified B0 or silently tune its params. B1 requires new registered ID/method. Full user perception decision not claimed; E4/E5/exact CHALK NOT_RUN.
+
+**Historical failures retained:** [source CI43982669819](https://github.com/Kiddos19882/AutoDraw/actions/runs/43982669819) FAIL before tests due to missing selenium dependency, later fixed; [first native CI43982793077](https://github.com/Kiddos19882/AutoDraw/actions/runs/43982793077) FAIL because `native_batch` allowlist rejected new method before B0, later fixed; do not count these as algorithm quality results. [Markdown CI43983778165](https://github.com/Kiddos19882/AutoDraw/actions/runs/43983778165) SUCCESS commit `afb6e5ff`, 11/11 audit units PASS, `current_broken_links=0`, `history_integrity_errors=0`, `capability_catalog_errors=0`, final `status=PASS`; a newer SHA requires its own audit if CI is retriggered.
+
 ## ENGINE-001 V43-P4.2 — native pipeline committed, no verified CI result yet (2026-11-17)
 
 E1: installed opt-in JS `renderV43P4FullAdaptiveProbe` on genuine old BoardPane/Egret and added the method to existing `native_batch` allowlist, without changing legacy renderer defaults. Added P4.2 [A/B0 native runner](../tests/run_engine001_v43p4_native_ab.py), expanded regression for immutable410 detail, and [Windows CI](../../.github/workflows/engine001-v43p4-full-adaptive-native.yml). Registered frozen archive V44-B and color owner RGB mode prior to first native run, [full prereg](ENGINE001_V43P4_FULL_ADAPTIVE_FILL_PROTOCOL_2026-11-16.md#p42-fixed-b0-native-execution-rule--registered-before-first-b0-native-run-2026-11-17). Original V44-B artifact14201581692 `expired=false` confirmed through GitHub connector. New run completion / native pixel-exact A / first B0 image / hashes / alpha24/128 / RGB / quality all **UNKNOWN/NOT_CONFIRMED**, not PASS; E4/E5/exact CHALK NOT_RUN. Changes SHA include `cd10fc7e`, `4b09a152`, `136983f5`, `aa4dad5c`, `44aaa1ea`, `20bdac90`, `eca21778`. No frozen archive overwritten.
