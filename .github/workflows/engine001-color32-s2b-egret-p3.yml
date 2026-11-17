@@ -8,7 +8,6 @@ on:
       - "AutoDraw_Stage20/tests/run_engine001_color32_s2b_egret_p3.py"
       - "AutoDraw_Stage20/tests/test_engine001_color32_s2b_egret_p3.py"
       - "AutoDraw_Stage20/tests/run_engine001_color32_s2b_egret_p2.py"
-      - "AutoDraw_Stage20/docs/README.md"
       - ".gitattributes"
   workflow_dispatch:
 
