@@ -6,6 +6,7 @@ on:
       - feature/image-geometry-optimization
     paths:
       - ".github/workflows/geometry-tests.yml"
+      - ".github/workflows/geometry-research.yml"
       - "AutoDraw_Stage20/source/**"
       - "AutoDraw_Stage20/integrated_app.py"
       - "AutoDraw_Stage20/tests/**"
