@@ -4,6 +4,10 @@
 
 ## ENGINE-001 / актуальная последовательность 2026-11-17
 
+**2026-11-17 / NEURAL-S1 actual model negative evidence:** [CI44127991472](https://github.com/Kiddos19882/AutoDraw/actions/runs/44127991472) real SAM2.1 Tiny CPU and original frozen G32 source comparison are E2 PASS, but image candidate SOURCE QUALITY FAIL: just two automatic masks, B0 1284 regions, N1 1237 (−3.66%), N2 1259 (−1.95%), fail predeclared ≥25% reduction; neither visually accepted or native-painted. **Next is independent preregistered color-region/flatting or contour-guided segmentation hypothesis, not more brush strokes nor silent threshold retuning**. Retain V44-B410 LAST unchanged; separate E3/E4/E5 afterward. Older text below describes historical plans.
+
+
+
 **Актуальное продолжение (COLOR32-NEURAL-S1):** P4c2 [CI44119887018](https://github.com/Kiddos19882/AutoDraw/actions/runs/44119887018) завершён нативным измерением paint-only (E3), но full image quality FAIL: 14/17 цветов ниже native99%, outside-ROI color28. После пользовательского визуального отказа от шумных островков зарегистрирован [NEURAL-S1](ENGINE001_COLOR32_NEURAL_S1_REGION_SEGMENTATION_PROTOCOL_2026-11-17.md) до кода: B0 frozen G32 vs N1 genuine SAM2.1 tiny masks vs N2 protected-edge variants, source-only metrics + визуальная пригодность. Далее **только после** source+visual E2: отдельный реальный Egret fill + exact410 V44-B LAST, E4/E5/live CHALK отдельно. Оригинальные P4c1/P4c2/G32 данные не менять. Старые пункты ниже — исторический план на тот момент.
 
 
