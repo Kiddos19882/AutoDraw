@@ -1,5 +1,8 @@
 # Документация AutoDraw — быстрый вход
 
+**CI trigger hygiene (2026-11-17):** historical neural S1/S2/S3, P4c0/P4c1/P4c2, P4a/P4b and Egret P2/P3 workflows no longer run on shared documentation-index updates alone. Their own code/workflow triggers and manual dispatch are preserved. Only `docs-integrity.yml` should normally run when the shared index itself changes. One-time workflow-change runs and CI queue are not evidence of cost savings. [Work log](WORK_LOG.md).
+
+
 **Текущая точка ENGINE-001 / NEURAL-S4 (2026-11-17):** [S4 CI44137289780](https://github.com/Kiddos19882/AutoDraw/actions/runs/44137289780), source SHA `439e95c9b7dd226c4b1cbb1a554fb6f1b3475eb8`, job `134230185321` SUCCESS; official DINOv2-small revision `ed25f3a31f01632728cabb09d1542f84ab7b0056`, weights SHA256 `ae1e99fcefd534ed978cdeb8326f08030c96e28b7a81ffcbc98a857c84d14be1` verified in job log. Artifact `14352502866` (uploaded ZIP digest SHA256 `408f26b7d349bb5ee503bdf8f825c9f1dde9d639abd4bf4c96ee575beb3c860e`); report SHA256 `ac197d22a54ba0b586e708efa39ec384f7827a7f94fbfbec0cfd41fc8c9c1ef9` printed after report-file hash checks. D0→D1 changed 593 pixels, genuine DINOv2 contribution exists, but original-first D1 quality `SOURCE_QUALITY_FAIL`: mean ΔE00 8.586 vs B0 5.531, large white-background drift, only 8 of allowed32 colors used. Next: source/background diagnosis + separately preregistered S5 trained palette-head hypothesis; 410 original V44-B contours LAST immutable, no production or native/game CHALK validation. Older `NOT_VERIFIED` statements below are dated snapshots and superseded by this verified current result. [Active status](PROJECT_STATUS.md) · [tasks](TASKS.md) · [result index](TEST_RESULTS.md).
 
 
