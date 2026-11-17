@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """S3 original source color-graph and immutable native V44-B archive preflight."""
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -7,7 +8,7 @@ from pathlib import Path
 import numpy as np
 
 from run_engine001_color32_neural_s3_joint import (
-    BG, PARAMS, read_immutable_contour, optional_native_contour, solve_region_colors,
+    BG, PARAMS, json_numpy_scalar, read_immutable_contour, optional_native_contour, solve_region_colors,
 )
 
 
@@ -79,6 +80,19 @@ class S3ImmutableContours(unittest.TestCase):
         self.assertTrue(y["chroma_excess_penalty"])
         self.assertIn("NOT_NEURAL", x["solver"])
         self.assertEqual(PARAMS["icm_sweeps"], 3)
+
+    def test_report_serializes_numpy_metrics_without_relaxing_json_contract(self):
+        payload = {"regions": np.int64(137), "ratio": np.float64(0.25),
+                   "flag": np.bool_(True), "ids": [np.int32(3)]}
+        result = json.loads(json.dumps(payload, allow_nan=False,
+                                       default=json_numpy_scalar))
+        self.assertEqual(result, {"regions": 137, "ratio": 0.25,
+                                  "flag": True, "ids": [3]})
+        with self.assertRaisesRegex(TypeError, "Unsupported S3 report type"):
+            json.dumps({"bad": object()}, default=json_numpy_scalar)
+        with self.assertRaises(ValueError):
+            json.dumps({"invalid": float("nan")}, allow_nan=False,
+                       default=json_numpy_scalar)
 
     def test_invalid_dimensions_are_rejected(self):
         rgb, palette, regions, ink = self.fixture()
