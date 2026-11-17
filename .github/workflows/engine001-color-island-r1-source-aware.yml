@@ -1,0 +1,100 @@
+name: ENGINE-001 COLOR-ISLAND-R1 original RGB regions source-only
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-color-island-r1-source-aware.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_color_island_r1.py"
+      - "AutoDraw_Stage20/tests/test_engine001_color_island_r1.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: autodraw-engine001-color-island-r1-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  r1-source-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install source metric dependencies
+        run: |
+          python -m pip install "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scipy>=1.13,<2" "scikit-image>=0.25,<0.27" "selenium>=4,<5"
+      - name: E2 frozen source, colors, boundaries and abstention contracts
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_color_island_r1.py AutoDraw_Stage20/tests/test_engine001_color_island_r1.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color_island_r1.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: R1 real original 150x240 source-only candidate and negative gates
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_color_island_r1.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --palette AutoDraw_Stage20/data/palettes/browser_palette.json \
+            --output "$RUNNER_TEMP/engine001-color-island-r1"
+          python - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          root = Path(os.environ["RUNNER_TEMP"]) / "engine001-color-island-r1"
+          r = json.loads((root / "report.json").read_text(encoding="utf-8"))
+          assert r["experiment"] == "ENGINE001_COLOR_ISLAND_R1_SOURCE_AWARE_REGIONS"
+          assert r["github_sha"] == os.environ["GITHUB_SHA"]
+          assert r["github_run_id"] == os.environ["GITHUB_RUN_ID"]
+          assert r["source_sha256"] == "07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert r["game_palette_git_blob"] == "461b5f3725b9b79888ad36e807b3cf4c9e445e98"
+          assert r["frozen_G32_index_sha256"] == "b8dcd5f00d2c39c81997aaae084eaae19a776454e6fd6466209839288c1e5637"
+          assert r["source_gates"]["frozen_source_and_G32_hash_pass"]
+          assert r["source_gates"]["protected_region_ownership_unchanged"]
+          assert r["source_gates"]["region_pixels_partition_complete"]
+          assert r["source_gates"]["no_new_game_colors"]
+          assert r["status"] in ("SOURCE_GATE_FAIL", "SOURCE_CANDIDATE_VISUAL_PENDING")
+          assert r["source_model_only"] and not r["production_accepted"]
+          assert r["original_V44B_410_LAST"] == "UNCHANGED_NOT_OVERLAID"
+          assert r["native_Egret"] == r["game_E4"] == r["independent_E5"] == "NOT_RUN"
+          assert r["exact_CHALK"] is None
+          for name, expected in r["file_sha256"].items():
+              assert hashlib.sha256((root / name).read_bytes()).hexdigest() == expected, name
+          print("R1 SOURCE gate:", r["status"])
+          print("R1 source gate details:", json.dumps(r["source_gates"], sort_keys=True))
+          print("R1 abstained pixels:", r["R1_G32_assignment"]["abstained_pixels"])
+          print("R1 cleanup:", r["cleanup"]["merged_regions"], r["cleanup"]["changed_pixels"])
+          print("R1 unsupported original-accent pixels B0/R1:", r["unsupported_accents_B0"]["pixels"], r["unsupported_accents_R1"]["pixels"])
+          print("R1 report sha256:", hashlib.sha256((root / "report.json").read_bytes()).hexdigest())
+          PY
+      - name: Preserve explicit failure metadata if source run failed early
+        if: failure()
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python - <<'PY'
+          import os, json
+          from pathlib import Path
+          folder = Path(os.environ["RUNNER_TEMP"]) / "engine001-color-island-r1"
+          folder.mkdir(exist_ok=True, parents=True)
+          if not (folder / "report.json").exists():
+              (folder / "ci-failure.json").write_text(json.dumps({
+                  "status": "BLOCKED_R1_TECHNICAL_INFERENCE_OR_CONTRACT",
+                  "github_sha": os.getenv("GITHUB_SHA"), "github_run_id": os.getenv("GITHUB_RUN_ID"),
+                  "source_pass": False, "production_accepted": False
+              }, indent=2) + "\n")
+          PY
+      - name: Preserve R1 source PNG and raw negative evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-color-island-r1-source-only
+          path: ${{ runner.temp }}/engine001-color-island-r1/
+          if-no-files-found: warn
+          retention-days: 30
