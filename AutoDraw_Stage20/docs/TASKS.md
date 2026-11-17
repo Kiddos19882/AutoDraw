@@ -1,5 +1,11 @@
 # AutoDraw — действующие задачи
 
+## ENGINE-001 — пользовательский visual-first RGB эксперимент без ограничения game32
+
+- [x] S5-P3 original RGB + ready-made Recolorization-Pro 6-palette-color conditioning, pretrained checkpoint real E3 [CI44151445030](https://github.com/Kiddos19882/AutoDraw/actions/runs/44151445030) PASS; output **unrestricted RGB** 15890 distinct colors, source P3 comparison verified artifact14359920550 and file hashes; no changes to production or V44-B410. Old game32 thresholds remain frozen for old experiments and are NOT_APPLICABLE to visual P3.
+- [ ] **WAITING_USER_VISUAL_REVIEW:** evaluate source vs pretrained P3: muted color details, olive replacing orange, nearwhite background drift. Do not claim improvement or retune P3 after result. Upon rejection, preregister P4 alternative with improved source six-color conditioning or different pretrained model; upon acceptance, separately evaluate feasibility for game colors and true Egret/native geometry. User does not want custom training/labels.
+
+
 ## CI-AUDIT-001 — fast vs research validation
 
 - [x] Реальный one-shot push [CI44142622503](https://github.com/Kiddos19882/AutoDraw/actions/runs/44142622503), SHA `5b4c183c`: 5/5 fast PASS, reusable INT-006/FILL-001 PASS, Egret artifact download PASS, all 17 GitHub artifacts linked to same run. Step parity 13 FILL + 27 INT audited E1. Temporary push-marker subsequently removed at `2e30dd67`.
