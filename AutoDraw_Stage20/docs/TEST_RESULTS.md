@@ -1,3 +1,15 @@
+## ENGINE-001 / COLOR32-S2 — local source diagnostic E1, 2026-11-17
+
+**Not GitHub CI E2.** Source `wV6VeZI9S1Y.png` SHA256 `07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a` verified from user-provided identical PNG; game palette32 RGB transcribed from GitHub blob `461b5f3725b9b79888ad36e807b3cf4c9e445e98`. Independent local implementation mirrors B nearest32, frozen E area<=8/ΔE00<=5/two passes and G conservative Sobel edge-protected merge. Local Python environment numpy2.3.5 / skimage0.26.0 / OpenCV4.13.0 / Pillow12.3.0; no full GitHub workflow replay. Derived local report SHA256 `ea365366601ec24779c887db249e4bb89e953fdff74350e76d31e4e28e745028`; separate ZIP SHA256 `fa4f3742e417bea1d363c8c13f43e10426c59ac2d4ba0701b334cb4f7b9b567d` in conversation artifacts, not committed to GitHub. Input from original user attachment and palette values are not a native game capture.
+
+| Source model | Used game swatches | 4-components | Mean ΔE00 | S2 index boundary ∩ strong source edge | Historical S1 RGB gradient overlap |
+|---|---:|---:|---:|---:|---:|
+| B direct32 | 20 | 2369 | 5.443752 | 99.925953% | 86.166667% |
+| E frozen tiny merge | 15 | 1044 | 5.558705 | 99.777860% | 84.416667% |
+| G protected tiny merge | 18 | 1339 | 5.531418 | 99.925953% | 85.333333% |
+
+Protected original Sobel pixels=2701; changed pixels vs B E1653/G1309; G accepted merges 880+126, blocked candidate regions 790+736. G reduces 4-components vs B by43.48%, and historical S1 RGB-gradient overlap regains0.916667 of the1.75 percentage-point B→E loss (diagnostic only). **Frozen S2 source gate FAIL:** source-index-boundary B→E loss0.148093pp and G recovers the full0.148093pp, but registered minimum edge recovery0.875pp is not met. Other component>=25% and ΔE00<=E+0.1 checks PASS. S2 index-boundary metric saturates near100% and **is not comparable to** original S1 RGB-gradient metric; a new independent experiment ID is required if changing primary edge metric/acceptance. Do not retroactively rewrite gates or call G production-ready. Static source diagnostic E1 only, unverified workflow CI E2 UNKNOWN, Egret E3 / game E4 / E5 / exact run-bound CHALK NOT_RUN. Visual source-only sheet retains recognizable characters but has palette artifacts; requires V44-B contour overlay and genuine Egret fill review before promotion.
+
 ## PAL32-REGION-V1: actual GitHub E2 after local pilot, 2026-11-17
 
 [Completed source-only CI43997979526](https://github.com/Kiddos19882/AutoDraw/actions/runs/43997979526) at commit `b3ee8c8d15e402ce5e3127d7f74a3f9cf7ac124b`, **SUCCESS**, all mandatory steps incl upload, 4/4 regressions PASS. Artifact14290961591 `engine001-pal32-region-v1-six-variants-source-only`, 21 ZIP members; original `report.json` SHA256 `ff8b38526b5ff18c9300a519e353087a2ff96463ea14d6b3cadd62b08d373b83`, 20/20 report-linked PNG hashes and ZIP CRC/integrity PASS, source/palette frozen verified. Both variants A/B/C/D and additional E/F are archived together. Comparability warning: these are **all-color 4-connected source pixel components**, not only earlier1838 real Egret boundary contours on owners4–7.
