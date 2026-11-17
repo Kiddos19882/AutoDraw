@@ -79,7 +79,7 @@ def run(source: Path, sam2_repo: Path, checkpoint: Path, output: Path):
         "model_checkpoint_sha256": sha(checkpoint),
         "sam2_git_sha": git_sha(sam2_repo),
         "model_config": "configs/sam2.1/sam2.1_hiera_t.yaml",
-        "model_checkpoint_download": "https://dl.fbaipublicfiles.com/segment_anything_2/092824/sam2.1_hiera_tiny.pt",
+        "model_checkpoint_download": "https://huggingface.co/facebook/sam2.1-hiera-tiny/resolve/main/sam2.1_hiera_tiny.pt",
         "parameters": {"points_per_side": 8, "points_per_batch": 8,
                        "crop_n_layers": 0, "pred_iou_thresh": 0.8,
                        "stability_score_thresh": 0.95},
