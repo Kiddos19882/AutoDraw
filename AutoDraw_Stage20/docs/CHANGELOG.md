@@ -1,5 +1,7 @@
 # AutoDraw — значимые изменения
 
+**2026-11-17 — COLOR32-S1 first A/B/C/D E2 comparison:** [CI43997569635](https://github.com/Kiddos19882/AutoDraw/actions/runs/43997569635) PASS 5/5 tests;32 real game swatches, B uses20 with1575 regions and ΔE00mean5.44 vs legacy A3507/3.70; SLIC C/D use8 and18 regions but destroy facial details and source strong-edge agreement falls to51.47%. D performs268 SLIC merges but game-color output exactly matches C. Frozen negative captured; no native/production/CHALK claim. [Source evidence](TEST_RESULTS.md).
+
 **2026-11-17 — real Egret diagnostic of 1838 color-zone boundaries:** [CI43995008472](https://github.com/Kiddos19882/AutoDraw/actions/runs/43995008472) E3 capture PASS / artifact14289576492; 1838 all-source boundaries (4/5/6/7 counts746/544/443/105), 5649 synthetic vertices, 3/3 Python and20/20 Node tests, no fill. PNGs show source zones alone and with original Egret V44-B detail layer. This diagnostic is not game/E4/CHALK or accepted fill geometry. [Evidence](TEST_RESULTS.md).
 
 **2026-11-17 — B3b owner-mask skeleton first source E2:** [CI43993003719](https://github.com/Kiddos19882/AutoDraw/actions/runs/43993003719) tests 5/5 PASS, source BLOCKED_RESOURCE on next 5902 synthetic vertices after1078 new paint. Model coverage4–7=81.82/81.78/81.87/91.86%, better than B3a 63/63/63/92 but not accepted. 883 owner skeleton routes/0 residual micro executed, same-color overlap penalty0, full native B3b NOT_RUN. [Evidence](TEST_RESULTS.md).
