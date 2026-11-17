@@ -28,3 +28,19 @@
 Для каждого варианта сохранять PNG fill proxy, PNG boundaries, `index_map` как lossless npz/PNG при разрешённых индексах, mapping-used game swatches и SHA256. Report: source/palette blob/SHA, versions, фиксированные параметры и seed/отсутствие randomness; ΔE00 mean/p95/max по всей150×240 ROI, RGB MAE, число используемых игровых цветов, **все** 4-связные компоненты и количество мелких (<8/<16/<32), topology change vs B, boundary distance, распределение метрик foreground/background отдельно и визуальное сравнение лица/волос/одежды. Для предварительного визуального сравнения поверх base PNG разрешено положить замороженный native Egret V44-B `color-100` слой с маркировкой `offline fill + true Egret contour overlay`. Нельзя называть такой composite native Egret fill.
 
 Acceptance: пока **не назначать победителя автоматически только по ΔE00 или числу компонент**. Первый GitHub E2 должен подтвердить точный input/palette, deterministic repeatability, 32-swatch-only для B/C/D/E/F, source SHA, отсутствие dithering, сохранение всех четырёх вариантов плюс отрицательных результатов, дефект важных границ и практический бюджет будущих путей. Малые зоны не удалять ценой распознаваемости глаз/лиц/рук и сохранения белого фона. E3 реальные кисти Egret и E4 game/CHALK/ E5 **NOT_RUN** до отдельной проверки. Описанные цифры пилота E1 не равны GitHub E2.
+
+## PAL32-REGION-V1: actual GitHub E2 after local pilot, 2026-11-17
+
+[Completed source-only CI43997979526](https://github.com/Kiddos19882/AutoDraw/actions/runs/43997979526) at commit `b3ee8c8d15e402ce5e3127d7f74a3f9cf7ac124b`, **SUCCESS**, all mandatory steps incl upload, 4/4 regressions PASS. Artifact14290961591 `engine001-pal32-region-v1-six-variants-source-only`, 21 ZIP members; original `report.json` SHA256 `ff8b38526b5ff18c9300a519e353087a2ff96463ea14d6b3cadd62b08d373b83`, 20/20 report-linked PNG hashes and ZIP CRC/integrity PASS, source/palette frozen verified. Both variants A/B/C/D and additional E/F are archived together. Comparability warning: these are **all-color 4-connected source pixel components**, not only earlier1838 real Egret boundary contours on owners4–7.
+
+| Variant | Colors used | All 4-connected comps | mean ΔE00 |
+|---|---:|---:|---:|
+| A adaptive MEDIANCUT8 (NOT 32-restricted) |8|5879|3.70356|
+| B direct nearest game32 CIEDE2000 |20|2369|5.44375|
+| C coarse SLIC260 + game32 |9|28|8.09811|
+| D C + tiny region merge |9|28|8.09811|
+| E direct game32 + tiny-owner merge area<=8 / mean extra ΔE00<=5 / 2 passes |15|1044|5.55870|
+| F finer SLIC1600 + game32 |10|76|7.48370|
+
+**Pilot/source E2 conclusion:** C/D collapse details, even F severely simplifies the characters. E cuts B's 4-connected components by **55.93%** while increasing mean ΔE00 only **+0.11495**; 1653/36000 source ROI pixels (4.5917%) change labels. A **posthoc E1** edge-agreement check using the *same gradient/top-decile criterion* as [COLOR32-S1](ENGINE001_COLOR32_SPATIAL_SEGMENTATION_PROTOCOL_2026-11-17.md) found B **86.1667%** vs E **84.4167%**; this is a measurable loss of **1.75 percentage points** of strong-source-edge overlap. This is NOT in the frozen PAL32 CI JSON and must remain explicitly E1 supplementary until separately reproduced by E2; it is not a quality PASS. E visually looks closer to B than SLIC with the existing 410 V44-B contours overlaid, but source model+Pillow preview **does not equal Egret-painted fill or gameplay**. No A/B output path changed, no source/game palette/palette_quantization/prod/Stage6/master edits; E3 genuine Egret fill, E4, E5 and run-bound game CHALK NOT_RUN. Next goal is protecting important contour/face/hand/eye regions while reducing source class fragmentation and testing actual fill-route geometry, *not* promoting E automatically. Avoid duplicating the already closed original [COLOR32-S1](ENGINE001_COLOR32_SPATIAL_SEGMENTATION_PROTOCOL_2026-11-17.md) research: PAL32 E/F are supplementary sensitivity/regularization evidence.
+
