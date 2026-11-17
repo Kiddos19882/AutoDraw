@@ -128,7 +128,9 @@ def _simplify_owner_path(mask, chain):
     i=0
     while i<len(xy)-1:
         far=min(i+MAX_SKELETON_STRAIGHT_LOOKAHEAD,len(xy)-1)
-        while far>i+1 and not _line_inside(mask,xy[i],xy[far]):
+        while far>i+1 and (xy[far]==xy[i] or
+                             not _line_inside(mask,xy[i],xy[far])):
+            # Do not collapse a closed skeleton loop to a zero-length dot.
             far-=1
         if not _line_inside(mask,xy[i],xy[far]):
             raise ValueError("BLOCKED_CENTERLINE original-owner skeleton edge drift")
