@@ -13,6 +13,10 @@
 
 ## Приоритет ENGINE-001 — после завершённого COLOR32-NEURAL-S4
 
+- [x] S3 archived report crash repaired, reproducible E3 [CI44145478173](https://github.com/Kiddos19882/AutoDraw/actions/runs/44145478173) SHA `b28536fd`, 7/7 tests PASS, immutable inputs verified; **4/4 source candidates QUALITY FAIL** ΔE/background. No source acceptance/native/game/CHALK. Next S5 independent preregistration, do not reopen S3 thresholds.
+
+
+
 - [x] **S4 real DINOv2 source CI and neural contribution:** [S4 CI44137289780](https://github.com/Kiddos19882/AutoDraw/actions/runs/44137289780), source SHA `439e95c9b7dd226c4b1cbb1a554fb6f1b3475eb8`, job `134230185321` SUCCESS; official DINOv2-small revision `ed25f3a31f01632728cabb09d1542f84ab7b0056`, weights SHA256 `ae1e99fcefd534ed978cdeb8326f08030c96e28b7a81ffcbc98a857c84d14be1` verified in job log. Artifact `14352502866` (uploaded ZIP digest SHA256 `408f26b7d349bb5ee503bdf8f825c9f1dde9d639abd4bf4c96ee575beb3c860e`); report SHA256 `ac197d22a54ba0b586e708efa39ec384f7827a7f94fbfbec0cfd41fc8c9c1ef9` printed after report-file hash checks. Changed 593 pixels D0→D1, but `SOURCE_QUALITY_FAIL` on mean/p95 ΔE and white background. User visual review PENDING, source candidate rejected, native/game/CHALK NOT_RUN; original V44-B410 unchanged. Do not rerun or retune frozen S4 for acceptance.
 - [ ] **NEXT: ENGINE-001 S5 hypothesis/preregistration only:** inspect S4 D0/D1 raw maps and report provenance, original-RGB/foreground-vs-background mismatch, face/hair/clothing fidelity; choose and preregister an independently trained 32-game-color scoring approach with held-out evaluation and explicit B0/D0/D1 controls. Do not treat pretrained DINOv2 features as an already-trained palette head. No production code changes before validation.
 
