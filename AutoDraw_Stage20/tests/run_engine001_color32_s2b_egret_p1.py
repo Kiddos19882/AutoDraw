@@ -38,7 +38,7 @@ FROZEN_RENDERER_GIT_BLOB = "74ad4d8ad162bb04bf8f1ff94860ef673c02512b"
 
 def git_blob_sha(path: Path) -> str:
     data = path.read_bytes()
-    return hashlib.sha1(b"blob " + str(len(data)).encode() + b"\\0" + data).hexdigest()
+    return hashlib.sha1(b"blob " + str(len(data)).encode() + b"\0" + data).hexdigest()
 
 
 def select_interior_loops(g: np.ndarray, palette: np.ndarray) -> tuple[list[dict], dict]:
