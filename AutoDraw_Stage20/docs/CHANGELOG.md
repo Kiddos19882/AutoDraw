@@ -1,3 +1,7 @@
+## 2026-11-18 — ENGINE-001 color-island cleanup planning
+
+Documented new user-directed first-priority `ENGINE001_COLOR_ISLAND_R1_SOURCE_AWARE_REGIONS` plan: original-RGB region consistency, unsupported local accent detection, protected selective tiny-island cleanup, brush-ready geometry diagnostics, and separate 32-swatch projection. Recolorization-Pro no longer next research priority; all S5-P3/P4 negative artifacts kept. Docs only, no implementation/testing/native/production changes.
+
 ## 2026-11-18 — experimental S5-P4 (research only)
 
 Added preregistered S5-P4 foreground-balanced source-RGB conditioning prototype, synthetic contracts and isolated GitHub Actions workflow. S5-P3 source/outputs frozen. No game32, production, Stage6, master or V44-B contour modifications. E3 inference not yet verified.
