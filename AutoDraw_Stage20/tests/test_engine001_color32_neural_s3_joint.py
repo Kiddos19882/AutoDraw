@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 
 from run_engine001_color32_neural_s3_joint import (
-    BG, PARAMS, read_immutable_contour, solve_region_colors,
+    BG, PARAMS, read_immutable_contour, optional_native_contour, solve_region_colors,
 )
 
 
@@ -18,6 +18,18 @@ class S3ImmutableContours(unittest.TestCase):
             wrong.write_bytes(b"not the authenticated V44-B")
             with self.assertRaisesRegex(ValueError, "BLOCKED_S3_CONTOUR_ZIP_SHA"):
                 read_immutable_contour(wrong)
+
+    def test_bad_native_contour_blocks_j1_but_keeps_j0_control(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            wrong = Path(tmp) / "unverified-V44B.zip"
+            wrong.write_bytes(b"not the native source")
+            ink, evidence = optional_native_contour(wrong)
+            self.assertIsNone(ink)
+            self.assertEqual(evidence["status"], "BLOCKED_CONTOUR_PROVENANCE")
+            self.assertEqual(evidence["reason"], "BLOCKED_S3_CONTOUR_ZIP_SHA")
+            missing, evidence2 = optional_native_contour(None)
+            self.assertIsNone(missing)
+            self.assertEqual(evidence2["status"], "BLOCKED_CONTOUR_PROVENANCE")
 
     @staticmethod
     def fixture():
