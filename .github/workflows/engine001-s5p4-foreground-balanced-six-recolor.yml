@@ -22,7 +22,6 @@ jobs:
     timeout-minutes: 65
     env:
       OMP_NUM_THREADS: "2"
-      U2NET_HOME: \${{ runner.temp }}/s5p4-birefnet-model
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -64,6 +63,8 @@ jobs:
           PY
       - name: Genuine BiRefNet ONNX guidance and genuine pretrained RGB inference
         shell: bash
+        env:
+          U2NET_HOME: ${{ runner.temp }}/s5p4-birefnet-model
         run: |
           python AutoDraw_Stage20/tests/run_engine001_s5p4_foreground_balanced_recolor.py \
             --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
