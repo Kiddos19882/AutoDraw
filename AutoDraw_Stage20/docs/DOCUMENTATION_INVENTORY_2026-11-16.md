@@ -116,3 +116,20 @@ GitHub Compare `8273918226ff221dc94faf7a212e959a4c49fa49...feature/image-geometr
 | Всего элементов Git tree (derived by path delta) |7485|+17|**7502**|
 
 Этот пересчёт основан на полном списке **изменённых путей GitHub Compare**, а не на новом рекурсивном tree call; bytes не переизмерены. Исторические числовые таблицы на прежних SHA ниже/выше — датированные и не считаются активными без указания SHA. CI проверяется отдельно и никогда не доказывает качество рисунка.
+
+
+## Актуализация после B2-FULL source-only preflight — 2026-11-17 (E1)
+
+GitHub Compare исходного SHA `8273918226ff221dc94faf7a212e959a4c49fa49` с рабочей веткой HEAD `39f5c76c802dd154688bf02b8ddb9179cd1f75bf` (перед этой записью): **127 commits ahead**, behind0; **30 changed paths**, из них21 новых, 9 modified, zero deleted/renamed. В сравнении с предыдущим снимком добавлены: (ф) `ENGINE001_V43P4_B2_FULL_BOUNDARY_REPAIR_PROTOCOL_2026-11-17.md`, (ф) `tests/run_engine001_v43p4_b2_full_source.py`, (ф) `tests/test_engine001_v43p4_b2_full_source.py`, (ф) `.github/workflows/engine001-v43p4-b2-full-source.yml`; текущий code/result CI не подтверждает native full B2.
+
+| Категория | Старое дерево `82739182` | Разница по Compare | На `39f5c76c` |
+|---|---:|---:|---:|
+| Markdown в (п) `docs` |127|+5|**132**|
+| Все файлы в (п) `docs` |128|+5|**133** (132 MD + 1 JSON)|
+| Протоколы `ENGINE001_*PROTOCOL_*.md` |44|+4|**48**|
+| Root Stage20 Markdown вне docs |16|0|**16**|
+| GitHub workflow YAML |58|+6|**64**|
+| Исторические HISTORY/SNAPSHOT Markdown |10|0|**10**|
+| Все tree entries |7485|+21|**7506** (получено дельтой, не рекурсивным tree GET)|
+
+Данные проверены по списку путей GitHub Compare, а не по свежему рекурсивному дереву. Объёмы байт не пересчитаны. CI Markdown, native качество и exact CHALK оцениваются отдельно. Исторические файлы не удалялись и frozen evidence не переписывался.
