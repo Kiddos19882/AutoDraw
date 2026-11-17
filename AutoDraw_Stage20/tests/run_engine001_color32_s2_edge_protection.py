@@ -8,6 +8,7 @@ import hashlib
 import json
 from pathlib import Path
 
+import cv2
 import numpy as np
 from PIL import Image
 from skimage import color, filters, measure, segmentation
@@ -82,6 +83,24 @@ def protected_merge(source: np.ndarray, indices: np.ndarray, palette: np.ndarray
     return out, stats
 
 
+def s1_rgb_gradient_overlap(source: np.ndarray, painted_rgb: np.ndarray) -> float:
+    """Exact historic COLOR32-S1 top-decile gradient-overlap formula, as percent.
+
+    This diagnostic is distinct from S2 source-index-boundary overlap.
+    """
+    def gradient(rgb):
+        gray = cv2.cvtColor(rgb, cv2.COLOR_RGB2GRAY).astype(np.float32) / 255.0
+        gx = cv2.Sobel(gray, cv2.CV_32F, 1, 0, ksize=3) / 8.0
+        gy = cv2.Sobel(gray, cv2.CV_32F, 0, 1, ksize=3) / 8.0
+        return np.hypot(gx, gy)
+    original = gradient(source)
+    rendered = gradient(painted_rgb)
+    hard_original = original >= np.percentile(original, 90)
+    hard_rendered = rendered >= np.percentile(rendered, 90)
+    return float(np.count_nonzero(hard_original & hard_rendered)
+                 / max(1, np.count_nonzero(hard_original)) * 100.0)
+
+
 def overlap(idx: np.ndarray, edges: np.ndarray) -> float:
     if not np.any(edges):
         raise ValueError("no source strong edges")
@@ -121,6 +140,7 @@ def run(source_path: Path, palette_path: Path, output: Path) -> dict:
         Image.fromarray(idx, "L").save(output / (name + "_indices.png"))
         variants[name] = {"components": topology(idx), "quality": quality(source, rgb),
                           "edge_overlap_percent": overlap(idx, edges),
+                          "historical_S1_RGB_gradient_overlap_percent": s1_rgb_gradient_overlap(source, rgb),
                           "changed_from_B_pixels": int(np.count_nonzero(idx != b)),
                           "used_palette_indices": [int(x) for x in np.unique(idx)]}
     Image.fromarray((edges.astype(np.uint8) * 255), "L").save(output / "source_edge_protection.png")
@@ -140,6 +160,7 @@ def run(source_path: Path, palette_path: Path, output: Path) -> dict:
                        "strong_edge_percentile_positive": 90,
                        "component_connectivity": 4},
         "edge_threshold": threshold, "protected_pixels": int(edges.sum()),
+        "edge_metric_disclaimer": "SOURCE_GATE uses S2 palette-index boundaries; historical S1 uses RGB Sobel gradient-overlap, NOT equivalent. Never compare numeric results as identical.",
         "frozen_E_merges_per_pass": e_changes, "G_merge_stats": stats,
         "variants": variants, "source_gate": gate,
         "actual_game_swatch_count": 32, "dither_used": False,
@@ -164,7 +185,8 @@ def main():
                       "source_gate": result["source_gate"],
                       "variant_scores": {k: {"components": v["components"]["all_4_connected_components"],
                                             "edge_overlap_percent": v["edge_overlap_percent"],
-                                            "delta_e00": v["quality"]["mean_delta_e00"]}
+                                            "delta_e00": v["quality"]["mean_delta_e00"],
+                                            "historical_S1_RGB_gradient_overlap_percent": v["historical_S1_RGB_gradient_overlap_percent"]}
                                          for k, v in result["variants"].items()}}, ensure_ascii=False))
 
 
