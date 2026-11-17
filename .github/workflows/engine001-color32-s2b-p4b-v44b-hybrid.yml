@@ -7,7 +7,6 @@ on:
       - ".github/workflows/engine001-color32-s2b-p4b-v44b-hybrid.yml"
       - "AutoDraw_Stage20/tests/run_engine001_color32_s2b_p4b_v44b_hybrid.py"
       - "AutoDraw_Stage20/tests/test_engine001_color32_s2b_p4b_v44b_hybrid.py"
-      - "AutoDraw_Stage20/docs/README.md"
   workflow_dispatch:
 
 permissions:
