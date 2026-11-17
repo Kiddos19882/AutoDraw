@@ -7,7 +7,6 @@ on:
       - ".github/workflows/engine001-color32-s2b-p4a-component-islands.yml"
       - "AutoDraw_Stage20/tests/run_engine001_color32_s2b_p4a_component_islands.py"
       - "AutoDraw_Stage20/tests/test_engine001_color32_s2b_p4a_component_islands.py"
-      - "AutoDraw_Stage20/docs/README.md"
       - ".gitattributes"
   workflow_dispatch:
 
