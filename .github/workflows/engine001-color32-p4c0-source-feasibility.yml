@@ -1,0 +1,83 @@
+name: ENGINE-001 P4c0 all G32 owner source feasibility and V44B410 budget
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-color32-p4c0-source-feasibility.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_color32_p4c0_all_owner_feasibility.py"
+      - "AutoDraw_Stage20/tests/test_engine001_color32_p4c0_all_owner_feasibility.py"
+      - "AutoDraw_Stage20/docs/README.md"
+      - ".gitattributes"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engine001-p4c0-source-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  all-owner-source-resource:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install existing B3 and original game32 source dependencies
+        run: python -m pip install "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scipy>=1.13,<2" "scikit-image>=0.25,<0.27" "selenium>=4,<5"
+      - name: Verify exact G32 and bounded resource planning regressions, docs
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_color32_p4c0_all_owner_feasibility.py AutoDraw_Stage20/tests/test_engine001_color32_p4c0_all_owner_feasibility.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color32_p4c0_all_owner_feasibility.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color32_s2b_rgb_edge.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Preregistered all G32 owners source MODEL_ONLY feasibility
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_color32_p4c0_all_owner_feasibility.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --palette AutoDraw_Stage20/data/palettes/browser_palette.json \
+            --output "$RUNNER_TEMP/engine001-color32-p4c0"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-color32-p4c0"
+          r=json.loads((root/"report.json").read_text(encoding="utf-8"))
+          assert r["experiment"]=="ENGINE001_COLOR32_P4C0_ALL_OWNER_B3_RESOURCE_SOURCE_ONLY"
+          assert r["github_sha"]==os.environ["GITHUB_SHA"]
+          assert r["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert r["status"] in ("BLOCKED_RESOURCE","MODEL_LOW_OWNER_COVERAGE",
+                                 "SOURCE_CANDIDATE_NEEDS_NATIVE_E3")
+          assert r["G_frozen_index_png_sha"]=="b8dcd5f00d2c39c81997aaae084eaae19a776454e6fd6466209839288c1e5637"
+          assert len(r["nonwhite_owners"])==17
+          assert r["paint_strokes"]<=2590
+          assert r["paint_vertices_NOT_CHALK"]<=4108
+          assert r["planned_total_strokes_with_V44B410"]<=3000
+          assert r["planned_total_vertices_with_V44B1792_NOT_CHALK"]<=5900
+          assert not r["safe_to_execute_game"]
+          assert not r["production_accepted"]
+          assert r["native_E3"]=="NOT_RUN" and r["exact_CHALK"] is None
+          for name,expected in r["source_only_artifacts_sha256"].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==expected,name
+          print("P4C0 STATUS:",r["status"])
+          print("P4C0 PAINT PATHS:",r["paint_strokes"])
+          print("P4C0 SYNTHETIC VERTICES:",r["paint_vertices_NOT_CHALK"])
+          print("P4C0 SOURCE-ONLY BELOW99 OWNERS:",r["owners_below_99_percent_SOURCE_MODEL_ONLY"])
+          print("P4C0 FIRST RESOURCE FAIL:",r["first_rejected_resource"])
+          print("P4C0 REPORT SHA:",hashlib.sha256((root/"report.json").read_bytes()).hexdigest())
+          PY
+      - name: Preserve source candidate and negative partial result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-color32-p4c0-all-owner-source-feasibility
+          path: ${{ runner.temp }}/engine001-color32-p4c0
+          if-no-files-found: warn
+          retention-days: 30
