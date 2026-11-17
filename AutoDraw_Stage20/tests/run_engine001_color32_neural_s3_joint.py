@@ -42,6 +42,13 @@ PARAMS = {"rgb_region_mean_deltaE00_to_allow_smoothing": 8.0,
 def digest(blob: bytes) -> str:
     return hashlib.sha256(blob).hexdigest()
 
+def json_numpy_scalar(value):
+    """Serialize measured NumPy scalar values without changing numeric evidence."""
+    if isinstance(value, np.generic):
+        return value.item()
+    raise TypeError(f"Unsupported S3 report type: {type(value).__name__}")
+
+
 
 def read_immutable_contour(path: Path):
     if sha(path) != FROZEN_CONTOUR_ZIP_SHA:
@@ -266,7 +273,7 @@ def run(source_path: Path, palette_path: Path, s1_path: Path,
               "game_E4": "NOT_RUN", "independent_E5": "NOT_RUN", "exact_CHALK": None,
               "production_accepted": False, "output_file_sha256": hashes}
     (output/"report.json").write_text(json.dumps(report, ensure_ascii=False,
-        indent=2, allow_nan=False)+"\n", encoding="utf-8")
+        indent=2, allow_nan=False, default=json_numpy_scalar)+"\n", encoding="utf-8")
     return report
 
 
@@ -281,4 +288,4 @@ if __name__ == "__main__":
     result = run(args.source, args.palette, args.s1_archive, args.v44b_archive, args.output)
     print(json.dumps({"status": result["status"], "source_gates": result["source_gates"],
                      "metrics": result["metrics"], "contour": result["V44_B_native_contour"]},
-                     ensure_ascii=False))
+                     ensure_ascii=False, allow_nan=False, default=json_numpy_scalar))
