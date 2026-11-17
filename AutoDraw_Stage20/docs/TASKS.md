@@ -1,3 +1,9 @@
+## ENGINE-001 S5-P4 — visual-first pretrained conditioning comparison (2026-11-18)
+
+- [x] Preregister new [S5-P4 foreground-balanced visual protocol](ENGINE001_S5_P4_FOREGROUND_BALANCED_SIX_RECOLOR_PROTOCOL_2026-11-18.md) and create isolated runner / synthetic contracts / CI using existing S5-P2 and S5-P3 APIs, original RGB and fixed checkpoint hashes; no modifications to frozen P3 or production.
+- [ ] Verify E2 contracts and actual E3 CI run on current SHA; audit native checkpoints, original SHA, alpha, six conditioning colors, raw RGB, report hashes, complete jobs and artifact PNG. CI PASS does not mean visual PASS.
+- [ ] User visual review original vs P4 (and frozen P3 if independently available); assess face, details, warm/orange tones, background and saturation. On failure preserve negative evidence and use a new ID for further changes.
+
 # AutoDraw — действующие задачи
 
 ## ENGINE-001 — пользовательский visual-first RGB эксперимент без ограничения game32
