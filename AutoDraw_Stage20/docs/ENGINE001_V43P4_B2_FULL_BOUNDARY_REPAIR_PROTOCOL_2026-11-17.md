@@ -30,3 +30,8 @@
 ## Порядок работы
 
 (1) Отдельные source planner + unit E2/CI, сохранение source-only результатов даже при BLOCKED_RESOURCE. (2) Только если E2 и cap выполнены — отдельный opt-in Egret native A/B2. (3) Визуальный просмотр и quality assessment с frozen B0/B1 evidence. Источники для reuse: tests/run_engine001_full_adaptive_fill_v43p4.py::candidates_for_width, tests/run_engine001_v43p4_b2_singleton_native.py, V44-B frozen archive validator and native_batch, исходные metrics; НЕ переписывать старые реализации.
+
+
+## First implementation, before CI result — 2026-11-17
+
+Created standalone (ф) [B2-FULL source planner](../tests/run_engine001_v43p4_b2_full_source.py), commit `f2efa30f`, (ф) [source regression](../tests/test_engine001_v43p4_b2_full_source.py), commit `1a6da790`, and (ф) [source-only CI resource gate](../../.github/workflows/engine001-v43p4-b2-full-source.yml), commit `0f619a59`. Source output under distinct ID has hard resource check and `native_allowed=false`; on cap crossing reports `BLOCKED_RESOURCE`, first rejected route, projected stroke/vertex count and remaining source class pixels, never silently crops or sends partial result to Egret. This is E1 implementation; actual E2 CI PENDING/UNKNOWN. No full-image B2 E3, E4/E5/CHALK.
