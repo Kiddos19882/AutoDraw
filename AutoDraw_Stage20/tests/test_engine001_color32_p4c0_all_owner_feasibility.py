@@ -57,13 +57,13 @@ class P4c0Tests(unittest.TestCase):
 
     def test_budget_failure_records_first_rejection_and_never_accepts_partial(self):
         _,r=plan_all_owners(self.labels,self.palette,max_strokes=1,
-                            max_vertices=6,cap=3)
+                            max_vertices=MAX_PAINT_VERTICES,cap=3)
         self.assertEqual(r["status"],"BLOCKED_RESOURCE")
         self.assertIsNotNone(r["first_rejected_resource"])
         self.assertTrue(r["partial_source_paths_not_accepted"])
         self.assertFalse(r["safe_to_execute_game"])
         self.assertEqual(r["paint_strokes"],1)
-        self.assertLessEqual(r["paint_vertices_NOT_CHALK"],6)
+        self.assertLessEqual(r["paint_vertices_NOT_CHALK"],MAX_PAINT_VERTICES)
         self.assertEqual(r["game_foreign_3px"],"NOT_RUN")
 
 if __name__=="__main__":
