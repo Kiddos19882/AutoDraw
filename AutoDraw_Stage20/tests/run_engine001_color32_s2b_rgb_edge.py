@@ -5,9 +5,14 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
+import platform
 from pathlib import Path
 
+import cv2
 import numpy as np
+import skimage
+import PIL
 from PIL import Image
 
 from run_engine001_palette32_region_study import (
@@ -82,6 +87,9 @@ def run(source_path: Path, palette_path: Path, output: Path) -> dict:
                   variants["G_edge_protected32"], bool(np.array_equal(g[mask], b[mask])))
     report = {
         "experiment": EXP,
+        "github_sha": os.environ.get("GITHUB_SHA") or None,
+        "github_run_id": os.environ.get("GITHUB_RUN_ID") or None,
+        "versions": {"Python": platform.python_version(), "numpy": np.__version__, "Pillow": PIL.__version__, "scikit_image": skimage.__version__, "OpenCV": cv2.__version__},
         "status": "SOURCE_GATE_PASS_VISUAL_PENDING" if gate["passed"] else "SOURCE_GATE_FAIL",
         "input_source_sha256": sha(source_path),
         "input_palette_sha256": sha(palette_path),
