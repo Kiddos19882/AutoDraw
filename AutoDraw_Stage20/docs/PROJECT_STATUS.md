@@ -2,6 +2,8 @@
 
 # AutoDraw — текущее состояние
 
+**2026-11-17 / Egret P1 E3 ISOLATED PASS:** [CI44007375262](https://github.com/Kiddos19882/AutoDraw/actions/runs/44007375262) SHA `5e2247e6c945`, Windows native job SUCCESS; archived original artifact14294803651 ZIP SHA `1c79b94080980ab41fdc8c7b28d0b8381a905b6dd915d244dfae0e7afc67e324`, report SHA `bf3495f409850a348c097042165002f631cfdbbd498a184773fd3a91f43116f4`, CRC +14/14 raw files hashes PASS. Actual Egret owner31 dark/owner29 pink contour widths2/4/6/10, alpha24 width10 own ink9319/1558 vs2px2068/287; foreign >3logical px ZERO at both alpha24/128, width10 has5/3 total foreign within tolerance dark owner. But ring-only max20.65%/14.68% of two full owner masks, no full fill or V44-B overlay. **E3 isolated PASS; full-image quality NOT_RUN; E4/E5 exact game CHALK NOT_RUN.** Next: preregister native adaptive interior fill with genuine brush; preserve V44-B410 detail LAST and B3b resource history. [Evidence](TEST_RESULTS.md).
+
 **2026-11-17 Egret P1 CI follow-up:** [CI44006697216](https://github.com/Kiddos19882/AutoDraw/actions/runs/44006697216) SHA `b37a356b9d63` **FAIL at source blob check before renderer**. First Windows archive fix **PASS**: 8/8 relevant Python and20/20 BoardPane Node tests PASS; Markdown audit now PASS; no Egret PNG output. New targeted `.gitattributes` `-text` for archival renderer JS + game32 JSON palette in `592039ffd4e5`, plus workflow explicit actual Git blob equality preflight `5e2247e6c945`; source files and historical snapshots unchanged. E3 native measurement **NOT_YET_VERIFIED**, full-image quality and E4/E5/CHALK NOT_RUN. [Primary evidence log](TEST_RESULTS.md).
 
 ## ENGINE-001 / COLOR32-S2b-EGRET-P1 — isolated native round-brush experiment started, 2026-11-17
