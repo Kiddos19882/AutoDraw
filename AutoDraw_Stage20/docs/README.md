@@ -1,5 +1,8 @@
 # Документация AutoDraw — быстрый вход
 
+**Текущий ENGINE-001 / NEURAL-S2:** [протокол независимой сегментации оригинала](ENGINE001_COLOR32_NEURAL_S2_ORIGINAL_FIRST_FLATTING_PROTOCOL_2026-11-17.md), [исходный runner](../tests/run_engine001_color32_neural_s2.py), [тесты](../tests/test_engine001_color32_neural_s2.py), [CI](../../.github/workflows/engine001-color32-neural-s2-original-first.yml). В отличие от S1 новые C1/C2-кандидаты создаются только из RGB оригинала, без G32 как seed; S1 genuine SAM2 mask 2шт берутся из SHA-linked архива. SLIC — не нейросеть. В локальном source-only пилоте 1284→368 цветовых островков, но ΔE ухудшилась с5.53 до8.58 и фон drift 10.9%; поэтому **кандидат отклонён по prereg source quality**. Новый CI ещё не подтверждён, Egret E3/E4/E5 и CHALK NOT_RUN.
+
+
 **ENGINE-001 / COLOR32-NEURAL-S1 (2026-11-17):** [пререгистрированный отдельный neural experiment](ENGINE001_COLOR32_NEURAL_S1_REGION_SEGMENTATION_PROTOCOL_2026-11-17.md), [source-only mask adapter](../tests/run_engine001_color32_neural_s1.py), [real SAM2.1 Tiny mask exporter](../tests/run_engine001_color32_neural_s1_sam2.py) и [Linux workflow](../../.github/workflows/engine001-color32-neural-s1-sam2-source.yml). Сравнение замороженной G32 (B0) с настоящими нейросетевыми масками SAM2.1 (N1) и теми же масками плюс защищённые исходные границы (N2). Только 32 игровых цвета. Фиксированные предварительные source-гейты и отдельный визуальный review; **neural CI/model evidence пока NOT_VERIFIED**. Оригинальный P4c2 [CI44119887018](https://github.com/Kiddos19882/AutoDraw/actions/runs/44119887018) genuine Egret paint-only E3, job success но `P4C2_NATIVE_PAINT_FAIL`, 14/17 цветов ниже native99%, полные 410 V44-B contours LAST отсутствуют. Production/CHALK не затронуты.
 
 
