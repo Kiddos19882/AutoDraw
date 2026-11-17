@@ -29,11 +29,13 @@ class ContourParallelB3Tests(unittest.TestCase):
         self.assertGreater(len(loops),1)
         self.assertTrue(all(x["vertices"]<=128 for x in loops))
         self.assertTrue(all(x["width"]==4 for x in loops))
-        # A ring is a connected trajectory, not a bridge across a hole.
+        # Valid long straight ring edges must NOT be rejected simply by
+        # their vertex spacing. Assert source-boundness, including holes.
+        outside=cv2.distanceTransform(
+            (~mask).astype(np.uint8),cv2.DIST_L2,cv2.DIST_MASK_PRECISE)
         for ring in loops:
-            coords=ring["points"]
-            for a,b in zip(coords,coords[1:]):
-                self.assertLessEqual(max(abs(a[0]-b[0]),abs(a[1]-b[1])),12)
+            ink=_footprint(ring["points"],ring["width"])
+            self.assertFalse(np.any(ink & (outside>3.0)))
         self.assertGreater(len(contour_candidates(self.labels==4,2)),0)
 
     def test_all_owner_fair_selection_and_zero_overlap_penalty(self):
