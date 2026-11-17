@@ -1,3 +1,7 @@
+## 2026-11-17 — P4c2 exact renderer input preflight
+
+Reviewed original archived BoardPane JS `renderComplexHoldoutColorProbe` and existing native_batch. The original P4c1 1133 routes,3485 vertices all satisfy accepted width2/4/6/10, RGB0..0xffffff and board bounds. Extended P4c2-only `validate_frozen_paths` to detect nonfinite/off-board positions, bad RGB/width before Firefox; added targeted regression fixtures. No changes to original source plan/palette, quality gates or production. New CI not yet verified; E3 NOT_RUN/UNKNOWN.
+
 ## 2026-11-17 — P4c2 archived-plan preflight and diagnostic isolation
 
 Refreshed remote HEAD/20 commits/docs; connected Windows device offline, GitHub connector's commit workflow lookup covers only PR runs and no new push run ID; public GitHub Actions/API not reachable through current web/network. Examined original P4c1 ZIP14334728680 locally: indexed original G array240x150, 17 IDs, 1133 routes,3485 vertices,5/5 SHA-linked files PASS. Added a gating frozen-archive identity preflight and deliberately damaged-ZIP rejection before actual Firefox BoardPane, and marked independent Windows G32 recalculation explicitly non-gating so a diagnostic mismatch no longer blocks verified native source capture. New GitHub workflow SHA714756b; no local Windows Egret/Firefox available. E3/CI quality NOT_VERIFIED, E4/E5/exact CHALK NOT_RUN.
