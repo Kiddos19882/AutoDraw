@@ -30,6 +30,7 @@ from run_engine001_color32_s2_edge_protection import strong_edges, protected_mer
 from run_engine001_complex_holdout_v5 import native_batch
 
 EXP = "ENGINE001_COLOR32_S2B_EGRET_P3_DIRECTIONAL_NATIVE"
+FROZEN_SOURCE_SHA256 = "07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
 WIDTHS = (30, 15, 10, 6, 4, 2)
 ANGLES = tuple(range(0, 180, 15))
 MAX_SEEDS_PER_OWNER = 80
@@ -280,6 +281,8 @@ def run(workspace:Path,source:Path,palette_path:Path,output:Path):
             git_blob_sha(workspace/"AutoDraw_Stage20/tests/game_renderer_reference.js")
             !=FROZEN_RENDERER_GIT_BLOB):
         raise ValueError("BLOCKED_P3_SOURCE_BLOB_DRIFT")
+    if sha(source)!=FROZEN_SOURCE_SHA256:
+        raise ValueError("BLOCKED_P3_SOURCE_PNG_DRIFT")
     _,rgb=read_source(source)
     palette=read_palette(palette_path)
     b=nearest32(rgb,palette)
