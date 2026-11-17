@@ -31,6 +31,8 @@ jobs:
         run: |
           python -m py_compile AutoDraw_Stage20/tests/run_engine001_color32_s2_edge_protection.py AutoDraw_Stage20/tests/test_engine001_color32_s2_edge_protection.py
           python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color32_s2_edge_protection.py -v
+      - name: Audit Markdown documentation links and protocol index
+        run: python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
       - name: Preserve new independent B E G source report
         env:
           RUNNER_TEMP: ${{ runner.temp }}
