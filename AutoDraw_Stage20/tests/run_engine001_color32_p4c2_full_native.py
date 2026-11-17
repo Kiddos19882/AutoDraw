@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import os
 import platform
 import re
@@ -63,6 +64,22 @@ def validate_frozen_paths(source_paths):
         raise ValueError("BLOCKED_P4C2_RESOURCE_CAP")
     if any(not 2 <= len(s["points"]) <= 128 for s in paths):
         raise ValueError("BLOCKED_P4C2_POINT_COUNT")
+    # Match the existing renderComplexHoldoutColorProbe's strict input contract
+    # before Firefox. This is a preflight, NOT native coverage evidence.
+    allowed_widths = {2, 4, 6, 8, 10, 15, 30}
+    for stroke in paths:
+        width, rgb = stroke.get("width"), stroke.get("colorRgb")
+        if (type(width) is not int or width not in allowed_widths or
+                type(rgb) is not int or not 0 <= rgb <= 0xffffff):
+            raise ValueError("BLOCKED_P4C2_NATIVE_STROKE_METADATA")
+        for point in stroke["points"]:
+            if (not isinstance(point, dict) or
+                    any(k not in point or
+                        type(point[k]) not in (float, int) or
+                        not math.isfinite(point[k]) or
+                        not 0 <= point[k] < limit
+                        for k, limit in (("x", 460), ("y", 240)))):
+                raise ValueError("BLOCKED_P4C2_NATIVE_COORDINATES")
     return paths
 
 
