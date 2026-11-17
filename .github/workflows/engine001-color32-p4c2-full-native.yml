@@ -1,0 +1,79 @@
+name: ENGINE-001 P4c2 frozen P4c1 all 17 owners actual Egret paint only
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-color32-p4c2-full-native.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_color32_p4c2_full_native.py"
+      - "AutoDraw_Stage20/tests/test_engine001_color32_p4c2_full_native.py"
+      - "AutoDraw_Stage20/tests/run_engine001_color32_p4c1_directional_micro.py"
+      - ".gitattributes"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engine001-p4c2-native-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  full17-frozen-native-paint:
+    runs-on: windows-latest
+    timeout-minutes: 95
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install existing native Egret and G32 dependencies
+        run: python -m pip install "selenium>=4,<5" "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scipy>=1.13,<2" "scikit-image>=0.25,<0.27"
+      - name: Immutable P4c1 source and P4c2 native metric regressions
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_color32_p4c2_full_native.py AutoDraw_Stage20/tests/test_engine001_color32_p4c2_full_native.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color32_p4c2_full_native.py -v
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color32_p4c1_directional_micro.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+          node --check AutoDraw_Stage20/tests/game_renderer_reference.js
+          node --test AutoDraw_Stage20/tests/game_renderer_reference.test.js
+      - name: Paint every frozen original G32 owner using actual archived BoardPane
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_color32_p4c2_full_native.py \
+            --workspace . \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --palette AutoDraw_Stage20/data/palettes/browser_palette.json \
+            --output "$RUNNER_TEMP/engine001-p4c2-native"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-p4c2-native"
+          r=json.loads((root/"report.json").read_text(encoding="utf-8"))
+          assert r["experiment"]=="ENGINE001_COLOR32_P4C2_FULL_17_OWNER_NATIVE"
+          assert r["github_sha"]==os.environ["GITHUB_SHA"]
+          assert r["github_run_id"]==os.environ["GITHUB_RUN_ID"]
+          assert r["status"] in ("P4C2_NATIVE_PAINT_ONLY_PARTIAL","P4C2_NATIVE_PAINT_FAIL")
+          assert r["original_410_V44B_LAST"]=="NOT_RENDERED_UNCHANGED"
+          assert r["native_paint_only"] and r["exact_CHALK"] is None
+          assert not r["production_accepted"] and r["game_E4"]=="NOT_RUN"
+          assert len(r["native_manifest"]["colors_rendered"])==17
+          assert len(r["linked_file_SHA256"])>=19
+          for name,expected in r["linked_file_SHA256"].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==expected,name
+          print("P4C2 NATIVE STATUS:",r["status"])
+          print("P4C2 NATIVE ALPHA24 BELOW99:",r["native_observations"]["owners_below99_native_alpha24"])
+          print("P4C2 ALL17 NATIVE SAFE:",r["native_observations"]["native_alpha24_128_all17_safety"])
+          print("P4C2 REPORT SHA:",hashlib.sha256((root/"report.json").read_bytes()).hexdigest())
+          PY
+      - name: Preserve all 17 original Egret owner PNGs, composite and negative evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-p4c2-frozen-g32-native-paint-only
+          path: ${{ runner.temp }}/engine001-p4c2-native
+          if-no-files-found: warn
+          retention-days: 30
