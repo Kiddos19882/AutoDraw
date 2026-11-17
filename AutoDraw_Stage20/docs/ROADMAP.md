@@ -2,6 +2,8 @@
 
 # AutoDraw — дорожная карта будущих работ
 
+**2026-11-17 / current independent preprocessing follow-up:** [COLOR32-S2](ENGINE001_COLOR32_S2_EDGE_PROTECTED_PROTOCOL_2026-11-17.md) fixes the next edge-preservation candidate **without modifying original PAL32 E**: B/E/G frozen comparison, protect original strongest Sobel edges before tiny region merge. E1 implementation and CI workflow committed, E2 results currently UNKNOWN; inspect genuine source gate, images and hashes before proposing native paint and then B3c resource-efficient round-brush routing. E3/E4/E5 NOT_RUN.
+
 **2026-11-17 / new preprocessing priority:** before B3c fill, perform [COLOR32-S1 fixed A/B/C/D source comparison](ENGINE001_COLOR32_SPATIAL_SEGMENTATION_PROTOCOL_2026-11-17.md), using32 actual game colors and protected spatial region merge; evaluate color error, fine-detail fidelity and fragmented zones. Legacy 1838 V43-P4 Egret region outlines belong only to MEDIANCUT8 owners4–7. E2 comparison before native region outlines and visual selection; do not revise fill gates or old frozen archives.
 
 ## Действующий следующий этап (16.11.2026): V43-P4 — полная адаптивная заливка
