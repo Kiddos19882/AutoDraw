@@ -1,3 +1,5 @@
+**2026-11-17 — NEURAL-S1 completed E2 (negative candidate quality):** [CI44127991472](https://github.com/Kiddos19882/AutoDraw/actions/runs/44127991472) genuine SAM2.1 Hiera Tiny inference PASS, two masks; full artifacts SHA/CRC verified. Frozen G32 B0 1284 components; N1 1237 (−3.66%), N2 1259 (−1.95%), both FAIL predeclared −25% source quality gate. Original segmentation/production unchanged; new independent color-region method must be preregistered.
+
 **2026-11-17 — COLOR32-NEURAL-S1 B0 verified E2 / SAM2 shell preflight fix:** [CI44127150880](https://github.com/Kiddos19882/AutoDraw/actions/runs/44127150880) baseline PASS, ZIP14346804951 SHA-linked 1284 regions/779 singletons/1097≤4px; SAM2 install PASS but checksum command literal `\\n` FAIL before model inference. Corrected command newline `0d8e276`; N1/N2 pending. Production unaffected.
 
 **2026-11-17 — NEURAL-S1 CI44126371197 import correction:** baseline job compile PASS but unit import FAIL, missing transitive `selenium`; SAM2 skipped/no artifacts. Added `selenium>=4,<5` to both source workflow jobs at `52a4b600`. E2/inference result still UNKNOWN, no model/production changes.
