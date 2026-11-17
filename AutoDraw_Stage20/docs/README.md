@@ -1,3 +1,5 @@
+**ENGINE-001 S5-P4 (2026-11-18):** [S5-P4 foreground-balanced visual protocol](ENGINE001_S5_P4_FOREGROUND_BALANCED_SIX_RECOLOR_PROTOCOL_2026-11-18.md). Новая отдельная source-RGB visual-only гипотеза: настоящая BiRefNet foreground-mask, один source nearwhite фон + пять разнообразных source foreground conditioning colors, неизменённая Recolorization-Pro модель. [Runner](../tests/run_engine001_s5p4_foreground_balanced_recolor.py), [тесты](../tests/test_engine001_s5p4_foreground_balanced_recolor.py), [CI](../../.github/workflows/engine001-s5p4-foreground-balanced-six-recolor.yml). E1 COMMITTED; E2/E3 и визуальный итог **NOT_VERIFIED** до конкретного CI/PNG. P3 и game32 frozen unchanged; V44-B410 LAST, production/master untouched.
+
 # Документация AutoDraw — быстрый вход
 
 **ENGINE-001 S5-P3 / визуальный эксперимент без ограничения game32:** [протокол реальной предобученной перекраски шестью исходными цветами Recolorization-Pro](ENGINE001_S5_P3_NATIVE6_PRETRAINED_RECOLOR_VISUAL_PROTOCOL_2026-11-17.md); только original RGB, результат сравнивается визуально, без дообучения, production и оригинального контура.
