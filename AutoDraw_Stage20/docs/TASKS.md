@@ -2,6 +2,9 @@
 
 ## Приоритет ENGINE-001 — 2026-11-17, COLOR32-NEURAL-S1
 
+**Current CI:** [44127150880](https://github.com/Kiddos19882/AutoDraw/actions/runs/44127150880): B0 G32 E2 source PASS, source artifact14346804951 verified ZIP/CRC/PNG/metrics; 1284 components,1097≤4px,779 singletons; real SAM2 source installed but weights verification shell syntax FAIL before inference. Corrected YAML `0d8e276` without changing weights SHA; new CI/model outcome UNKNOWN.
+
+
 **Updated CI blocker:** [run44126371197](https://github.com/Kiddos19882/AutoDraw/actions/runs/44126371197) baseline FAIL on missing transitive Selenium at unit import; SAM2 job SKIPPED, no files. Both jobs' source dependencies corrected at `52a4b600`; next required proof is new CI jobs + genuine SAM2 masks, not production/brush trials.
 
 
