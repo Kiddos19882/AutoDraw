@@ -68,7 +68,41 @@ jobs:
           path.write_bytes(blob)
           print("Verified original P4c1 ZIP",len(blob),digest)
           PY
+      - name: Strict archived P4c1 original G32 and paths provenance preflight
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python - <<'PY'
+          import hashlib,os,sys,tempfile
+          from pathlib import Path
+          sys.path.insert(0, "AutoDraw_Stage20/tests")
+          from run_engine001_color32_p4c2_full_native import (
+              load_frozen_archive, FROZEN_PAINT_PATHS,
+              FROZEN_PAINT_VERTICES, OWNERS)
+          archive=Path(os.environ["RUNNER_TEMP"])/"engine001-p4c1-original.zip"
+          g,paths=load_frozen_archive(archive)
+          assert g.shape==(240,150) and g.dtype.name=="uint8"
+          assert sorted(int(x) for x in set(g.flat) if x != 30)==list(OWNERS)
+          assert len(paths)==FROZEN_PAINT_PATHS==1133
+          assert sum(len(x["points"]) for x in paths)==FROZEN_PAINT_VERTICES==3485
+          with tempfile.TemporaryDirectory() as tmp:
+              corrupt=Path(tmp)/"corrupted-original.zip"
+              content=bytearray(archive.read_bytes())
+              content[0] ^= 1
+              corrupt.write_bytes(content)
+              try:
+                  load_frozen_archive(corrupt)
+              except ValueError as exc:
+                  assert str(exc)=="BLOCKED_P4C2_FROZEN_ZIP_SHA",str(exc)
+              else:
+                  raise AssertionError("P4c2 corrupt original archive must fail closed")
+          print("P4C2 FROZEN INPUT PASS: 17 owners, 1133 unique strokes, 3485 vertices")
+          print("P4C2 FAIL-CLOSED BAD ARCHIVE PASS")
+          print("P4C2 ORIGINAL PNG ARRAY SHA:",hashlib.sha256(g.tobytes()).hexdigest())
+          PY
       - name: Diagnose Windows G32 recomputation against frozen original (non-gating)
+        continue-on-error: true
         shell: bash
         env:
           RUNNER_TEMP: ${{ runner.temp }}
