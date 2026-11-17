@@ -1,3 +1,7 @@
+## 2026-11-17 — new independent neural color-region experiment
+
+Following user's visual negative of P4c2, fetched original [CI44119887018](https://github.com/Kiddos19882/AutoDraw/actions/runs/44119887018), jobs and original artifact ZIP14343464778; CRC verified, report 82c3ca81451ea60f31342d75d03c4bfe69c420f1022065965733a5901213ea86; E3 paint-only FAIL 14/17 below99 and owner28 18 ROI pixels outside at alpha24. Examined original G32 nearest32/protected_merge and original V44-B contours, standard experiment invariants. Researched official SAM2.1 Tiny automatic mask generator and FlatMagic backend; preregistered COLOR32-NEURAL-S1 before code. Added test-only G32 vs pretrained SAM2 real-mask source benchmark, original code/checkpoint SHA manifest and isolated Linux workflow (baseline + genuine CPU SAM2). FlatMagic/actual AniLines semantic masks not claimed as executed. No production/master/source P4c2 modifications. CI neural experiment not yet verified.
+
 ## 2026-11-17 — P4c2 exact renderer input preflight
 
 Reviewed original archived BoardPane JS `renderComplexHoldoutColorProbe` and existing native_batch. The original P4c1 1133 routes,3485 vertices all satisfy accepted width2/4/6/10, RGB0..0xffffff and board bounds. Extended P4c2-only `validate_frozen_paths` to detect nonfinite/off-board positions, bad RGB/width before Firefox; added targeted regression fixtures. No changes to original source plan/palette, quality gates or production. New CI not yet verified; E3 NOT_RUN/UNKNOWN.
