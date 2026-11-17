@@ -1,0 +1,72 @@
+name: ENGINE-001 PAL32 six-variant region optimization source-only
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-pal32-region-study.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_palette32_region_study.py"
+      - "AutoDraw_Stage20/tests/test_engine001_palette32_region_study.py"
+      - "AutoDraw_Stage20/data/palettes/browser_palette.json"
+      - "AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engine001-pal32-region-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pal32-source-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install deterministic offline image-analysis dependencies
+        run: python -m pip install "numpy>=2,<3" "Pillow>=11,<13" "scikit-image>=0.25,<0.27" "scipy>=1.13,<2"
+      - name: Test palette fidelity, protected tiny regions and determinism
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_palette32_region_study.py AutoDraw_Stage20/tests/test_engine001_palette32_region_study.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_palette32_region_study.py -v
+      - name: Generate six frozen comparison variants and report
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_palette32_region_study.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --palette AutoDraw_Stage20/data/palettes/browser_palette.json \
+            --output "${{ runner.temp }}/engine001-pal32-region-v1"
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json,os
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-pal32-region-v1"
+          data=json.loads((root/"report.json").read_text(encoding="utf-8"))
+          assert data["experiment"]=="ENGINE001_PAL32_REGION_V1_SOURCE_ONLY"
+          assert data["source_sha256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert len(data["palette_hex_in_index_order"])==32
+          assert set(data["variants"])=={"A_mediancut8","B_direct32","C_slic32","D_slic32_merge","E_regularized32","F_fine_slic32"}
+          assert data["dither_used"] is False
+          assert data["native_Egret_fill"]=="NOT_RUN"
+          assert data["run_bound_exact_CHALK"] is None and data["production_accepted"] is False
+          for f,digest in data["report_linked_SHA256"].items():
+              assert hashlib.sha256((root/f).read_bytes()).hexdigest()==digest
+          print("PAL32 original 32 real colors, six variants, offline E2 ONLY")
+          for name,v in data["variants"].items():
+              print(name, "colors",v["components"]["used_game_swatches_or_adaptive_colors"],
+                    "components",v["components"]["all_4_connected_components"],
+                    "dE00",round(v["quality"]["mean_delta_e00"],4))
+          print("report SHA256",hashlib.sha256((root/"report.json").read_bytes()).hexdigest())
+          PY
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+      - name: Archive all PNGs, maps, metrics and negative variants
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-pal32-region-v1-six-variants-source-only
+          path: ${{ runner.temp }}/engine001-pal32-region-v1
+          if-no-files-found: warn
+          retention-days: 30
