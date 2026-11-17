@@ -1,0 +1,104 @@
+name: ENGINE-001 NEURAL S3 immutable V44B contour linked region palette prototype
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-color32-neural-s3-joint-contour-source.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_color32_neural_s3_joint.py"
+      - "AutoDraw_Stage20/tests/test_engine001_color32_neural_s3_joint.py"
+      - "AutoDraw_Stage20/docs/ENGINE001_COLOR32_NEURAL_S3_JOINT_COLOR_CONTOUR_PROTOCOL_2026-11-17.md"
+      - "AutoDraw_Stage20/docs/README.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  original-regions-joined-to-immutable-v44b:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install original source-only dependencies
+        run: python -m pip install "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "scikit-image>=0.25,<0.27" "scipy>=1.13,<2" requests
+      - name: Unit tests source-only and docs audit
+        shell: bash
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_color32_neural_s3_joint.py AutoDraw_Stage20/tests/test_engine001_color32_neural_s3_joint.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_color32_neural_s3_joint.py -v
+          python AutoDraw_Stage20/tools/check_markdown_docs.py --root AutoDraw_Stage20
+      - name: Download exact original frozen SAM2 S1 and native V44-B artifact ZIPs
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python - <<'PY'
+          import hashlib,os
+          from pathlib import Path
+          import requests
+          expected={
+              14348287404:("original-s1-sam2.zip",
+              "9cceb35e8a6f1ef70ba8a4e4157e9409bb1125c0f50b22c1883a46686b225bd0"),
+              14201581692:("original-v44b-native.zip",
+              "43cb8e14a7e387b26772612ac06d1c7c6f176b8bd0c41e8945042fc80304a1"),
+          }
+          root=Path(os.environ["RUNNER_TEMP"])
+          for artifact,(name,sha) in expected.items():
+              resp=requests.get(
+                  f"https://api.github.com/repos/Kiddos19882/AutoDraw/actions/artifacts/{artifact}/zip",
+                  headers={"Authorization":"Bearer "+os.environ["GH_TOKEN"],
+                           "Accept":"application/vnd.github+json",
+                           "User-Agent":"AutoDraw-NEURAL-S3"},
+                  timeout=180,allow_redirects=True)
+              resp.raise_for_status()
+              blob=resp.content
+              if hashlib.sha256(blob).hexdigest()!=sha:
+                  raise ValueError(f"BLOCKED_S3_ORIGINAL_ARCHIVE_SHA:{artifact}")
+              (root/name).write_bytes(blob)
+              print("Original artifact verified:",artifact,len(blob),sha)
+          PY
+      - name: Real original contour alpha linked to independent source-only region color graphs
+        shell: bash
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_color32_neural_s3_joint.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --palette AutoDraw_Stage20/data/palettes/browser_palette.json \
+            --s1-archive "$RUNNER_TEMP/original-s1-sam2.zip" \
+            --v44b-archive "$RUNNER_TEMP/original-v44b-native.zip" \
+            --output "$RUNNER_TEMP/engine001-neural-s3-joint-contour"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          root=Path(os.environ["RUNNER_TEMP"])/"engine001-neural-s3-joint-contour"
+          report=json.loads((root/"report.json").read_text())
+          assert report["V44_B_contours_changed"] is False
+          assert report["V44_B_native_contour"]["detail_strokes"]==410
+          assert report["V44_B_native_contour"]["detail_vertices"]==1792
+          assert report["V44_B_native_contour"]["native_ink_outside_roi"]==0
+          assert set(report["solver_details"])=={
+              "J0_COLOR_ONLY_PLAIN","J0_COLOR_ONLY_CHROMA",
+              "J1_FROZEN_CONTOUR_PLAIN","J1_FROZEN_CONTOUR_CHROMA"}
+          assert report["learned_semantic_color_model"]=="NOT_RUN"
+          assert report["real_Egret_brush_quality"]=="NOT_RUN"
+          assert not report["production_accepted"] and report["exact_CHALK"] is None
+          for name,sha in report["output_file_sha256"].items():
+              assert hashlib.sha256((root/name).read_bytes()).hexdigest()==sha
+          print("SOURCE CANDIDATE GATES",report["source_gates"])
+          print("S3 report SHA",hashlib.sha256((root/"report.json").read_bytes()).hexdigest())
+          PY
+      - name: Preserve source maps and original outline evidence provenance
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-neural-s3-original-context-v44b-immutable-source
+          path: ${{ runner.temp }}/engine001-neural-s3-joint-contour
+          if-no-files-found: warn
+          retention-days: 30
