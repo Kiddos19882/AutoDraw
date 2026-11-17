@@ -1,5 +1,10 @@
 # AutoDraw — текущее состояние
 
+## ENGINE-001 / P4c2 early Windows preflight failure (NOT native failure) — 2026-11-17
+
+[CI44112655316](https://github.com/Kiddos19882/AutoDraw/actions/runs/44112655316) job134142139040 `failure` on old checkout SHA `8100cefdbac9aa2619e4b4138e8120999ebbb2ab`: P4c2 and P4c1 unit regressions 5/5+5/5 PASS; documentation audit FAIL (one P4c2 protocol missing from README index at this historical SHA). Native paint job SKIPPED, no archives/PNGs. Current README already has correct protocol link after that commit; next step is trigger/inspect latest-SHA CI and real native per-owner RGBA, retaining original negative preflight. All 17 native coverage/3px/contours LAST NOT_RUN, game E4/E5/exact CHALK NOT_RUN.
+
+
 ## ENGINE-001 / verified P4c1 E2, P4c2 native paint-only E1 — 2026-11-17
 
 **2026-11-17 / ENGINE-001 P4c1 verified E2 and P4c2 E1:** [P4c1 CI44098998634](https://github.com/Kiddos19882/AutoDraw/actions/runs/44098998634) SHA `02303521af46bc0f5d60241592b861f73d03a253` complete SUCCESS (5 P4c1 and 3 P4c0 unit tests); artifact14334728680 original ZIP SHA256 `fac1fcf1ff6a43ac6e59da116b68b86e2238c2da13be0b167cf34f8241ac5eeb`, CRC and 5/5 linked hashes PASS, report SHA `1badb1913369cbad690c1cfbdf04778a4e6fde126042d633f8548fc77d606873`. Status `SOURCE_INCREMENTAL_PASS_NATIVE_PENDING`; 12/17 G32 owners source-model≥99%, five remaining 4/5/16/23/28, 327 combined residual pixels (301 belong to28), 1014 additions incl628 width2 micro, 1543 strokes/5277 synthetic vertices incl410 original V44-B details reserved LAST. **E2 source-only not native image quality.** [P4c2 independent prereg](ENGINE001_COLOR32_P4C2_FULL_NATIVE_17_OWNER_PROTOCOL_2026-11-17.md) plus test-only runner, unit tests and [Windows workflow](../../.github/workflows/engine001-color32-p4c2-full-native.yml) committed, E1 static; P4c2 CI/E3 UNKNOWN, and this first stage renders genuine all-owner **PAINT ONLY** (original 410 details NOT rendered), no E4/E5 or exact CHALK.
