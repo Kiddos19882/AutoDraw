@@ -1,5 +1,7 @@
 # AutoDraw — значимые изменения
 
+**2026-11-17 — B3 actual isolated Egret contour rings:** [CI43991432235](https://github.com/Kiddos19882/AutoDraw/actions/runs/43991432235) E3 capture PASS, 14 source-selected contour paths /283 synthetic vertices NOT CHALK, no foreign/exterior>3px; coverage only isolated tiny sample, not full fill. Source B3 MODEL_LOW_COVERAGE, full B3 NOT_RUN. [Evidence](TEST_RESULTS.md).
+
 **2026-11-17 — B3 contour-parallel first source E2:** 195 new ring paths, same-color overlap penalty zero, source CI43991126674 PASS 4 tests/605 total strokes/3611 synthetic vertices, but source quality **MODEL_LOW_COVERAGE** (17.98/44.45/23.34/91.86%). Isolated Egret path probe workflow added; full B3 not accepted. [Protocol](ENGINE001_V43P4_B3_CONTOUR_PARALLEL_PROTOCOL_2026-11-17.md), [evidence](TEST_RESULTS.md).
 
 **2026-11-17 — ENGINE-001 B2-FULL source-only implementation:** added opt-in deterministic source-only broad width10/6/4 plus micro width2 0.25px plan and regression+GitHub CI with strict BLOCKED_RESOURCE/no partial native, retaining frozen B0/B1 and user-selected410 colored contours requirement. E2 result not verified at writing; no full Egret B2 yet. [Protocol](ENGINE001_V43P4_B2_FULL_BOUNDARY_REPAIR_PROTOCOL_2026-11-17.md).
