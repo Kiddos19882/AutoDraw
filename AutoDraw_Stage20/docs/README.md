@@ -1,5 +1,8 @@
 # Документация AutoDraw — быстрый вход
 
+**CI-AUDIT-001:** `geometry-tests.yml` запускает обязательные fast regression jobs на push; длительные FILL-001 и INT-006 перенесены в reusable `geometry-research.yml` и доступны через **Actions → AutoDraw validation → Run workflow → `run_full_validation=true`** (один ручной запуск включает также benchmark и Windows portable build). При обычном push остальные обязательные тесты и Egret reference остаются. [Зависимости и evidence](WORK_LOG.md); [открытые проверки](TASKS.md). Изменение CI не доказывает новую игровую validation.
+
+
 **CI trigger hygiene (2026-11-17):** historical neural S1/S2/S3, P4c0/P4c1/P4c2, P4a/P4b and Egret P2/P3 workflows no longer run on shared documentation-index updates alone. Their own code/workflow triggers and manual dispatch are preserved. Only `docs-integrity.yml` should normally run when the shared index itself changes. One-time workflow-change runs and CI queue are not evidence of cost savings. [Work log](WORK_LOG.md).
 
 
