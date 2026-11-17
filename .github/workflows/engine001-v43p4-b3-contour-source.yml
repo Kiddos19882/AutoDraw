@@ -1,0 +1,69 @@
+name: ENGINE-001 V43-P4 B3 contour-parallel source feasibility
+
+on:
+  push:
+    branches: [feature/image-geometry-optimization]
+    paths:
+      - ".github/workflows/engine001-v43p4-b3-contour-source.yml"
+      - "AutoDraw_Stage20/tests/run_engine001_v43p4_b3_contour_source.py"
+      - "AutoDraw_Stage20/tests/test_engine001_v43p4_b3_contour_source.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: engine001-v43p4-b3-contour-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  b3-contour-model-only:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install existing source analysis dependencies
+        run: python -m pip install "numpy>=2,<3" "opencv-python-headless>=4.10,<5" "Pillow>=11,<13" "selenium>=4,<5" "scipy>=1.13,<2" "scikit-image>=0.25,<0.27"
+      - name: Test independent contour source logic and fail-closed gates
+        run: |
+          python -m py_compile AutoDraw_Stage20/tests/run_engine001_v43p4_b3_contour_source.py AutoDraw_Stage20/tests/test_engine001_v43p4_b3_contour_source.py
+          python -m unittest discover -s AutoDraw_Stage20/tests -p test_engine001_v43p4_b3_contour_source.py -v
+      - name: Produce frozen-owner contour model or hard blocker
+        run: |
+          python AutoDraw_Stage20/tests/run_engine001_v43p4_b3_contour_source.py \
+            --source AutoDraw_Stage20/testImages/wV6VeZI9S1Y.png \
+            --output "${{ runner.temp }}/engine001-b3-contour-source"
+          python - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          p=Path(os.environ["RUNNER_TEMP"])/"engine001-b3-contour-source/b3-contour-source-report.json"
+          r=json.loads(p.read_text(encoding="utf-8"))
+          assert r["experiment"]=="ENGINE001_V43P4_B3_CONTOUR_PARALLEL_SOURCE_MODEL"
+          assert r["source_sha256"]=="07cc4568cb5e90d9514bc6f6c2112fee623f87f8fd0cea02fa517b04108e502a"
+          assert r["status"] in ["BLOCKED_RESOURCE","MODEL_LOW_COVERAGE","SOURCE_CANDIDATE_FOR_NATIVE_FOOTPRINT_REVIEW"]
+          assert r["own_color_overlap_penalty"]==0
+          assert r["no_original_A_B0_B1_B2_paint"]
+          assert r["required_original_V44B_detail_strokes_last"]==410
+          assert r["projected_total_strokes"]<=3000
+          assert r["projected_total_vertices_NOT_CHALK"]<=5900
+          assert r["safe_to_execute"] is False
+          assert r["game_exact_CHALK"] is None
+          assert set(r["source_only_diagnostics"])=={"4","5","6","7"}
+          print("B3 source JSON SHA256",hashlib.sha256(p.read_bytes()).hexdigest())
+          print("B3 SOURCE_ONLY STATE",r["status"])
+          print("B3 model owner coverages",
+                {k:x["source_model_coverage_NOT_EGRET"] for k,x in r["source_only_diagnostics"].items()})
+          PY
+        env:
+          RUNNER_TEMP: ${{ runner.temp }}
+      - name: Preserve source model and blocked outcomes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine001-b3-contour-parallel-model-only
+          path: ${{ runner.temp }}/engine001-b3-contour-source
+          if-no-files-found: warn
+          retention-days: 30
