@@ -1,5 +1,8 @@
 # Документация AutoDraw — быстрый вход
 
+**Актуальный ENGINE-001 / NEURAL-S4:** [отдельный протокол настоящих DINOv2 признаков и игрового выбора цвета](ENGINE001_COLOR32_NEURAL_S4_DINOV2_CONTEXT_PALETTE_PROTOCOL_2026-11-17.md), [Python-модуль](../tests/run_engine001_color32_neural_s4_dinov2.py), [регрессии](../tests/test_engine001_color32_neural_s4_dinov2.py), [отдельный CI](../../.github/workflows/engine001-color32-neural-s4-dinov2-context.yml). Контроль D0 без нейропризнаков vs D1 с настоящей pretrained DINOv2; V44-B410 original LAST только как immutable опциональный guide. **Действительно нейронный encoder**, но обученная 32-color classification head НЕ существует; game color assignment пока математический. CI/inference ещё не подтверждены, production не меняется.
+
+
 **Актуальный ENGINE-001 / NEURAL-S3:** [совместный протокол областей, цветов и оригинального контура V44-B](ENGINE001_COLOR32_NEURAL_S3_JOINT_COLOR_CONTOUR_PROTOCOL_2026-11-17.md), [test-only source graph runner](../tests/run_engine001_color32_neural_s3_joint.py), [regression tests](../tests/test_engine001_color32_neural_s3_joint.py), [CI](../../.github/workflows/engine001-color32-neural-s3-joint-contour-source.yml). Варианты J0 без контурной подсказки и J1 с исходным нативным V44-B (строго архивный, 410 последних штрихов не изменять) проверяются как отдельный E2 source-only контурный prior; **обученный нейросетевой выбор цвета пока NOT_RUN**, используются лишь реальные SAM2 предложения областей + математический региональный граф. После E2/визуальной оценки решать дальнейший шаг, production и live CHALK не затрагивать.
 
 
